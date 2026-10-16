@@ -17,14 +17,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
-// (no_std only applicable at crate root - removed)
-
-use core::mem;
-use core::ptr::{self, NonNull};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
-use std::string::String;
-use std::string::ToString;
-use std::vec;
+use core::ptr::NonNull;
 use std::vec::Vec;
 
 /// IPC endpoint trait (OOP interface)
@@ -49,10 +42,15 @@ pub enum IPCError {
     BufferEmpty = 3,
     InvalidSize = 4,
     PermissionDenied = 5,
-    Timeout = 6,
+    EndpointClosed = 6,
+    NotFound = 7,
+    AlreadyExists = 8,
+    Timeout = 9,
+    InternalError = 10,
+    InvalidCapability = 11,
 }
 
-/// IPC type
+/// IPC channel type
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IPCType {
@@ -63,816 +61,146 @@ pub enum IPCType {
     Signal = 4,
 }
 
-/// IPC info
+/// IPC endpoint information
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct IPCInfo {
-    pub ipc_type: IPCType,
-    pub capacity: usize,
-    pub buffer_size: usize,
+    pub endpoint_id: usize,
+    pub channel_type: IPCType,
+    pub owner_pid: usize,
     pub connected: bool,
+    pub bytes_transferred: usize,
 }
 
-impl IPCInfo {
-    pub fn new(ipc_type: IPCType) -> Self {
-        IPCInfo {
-            ipc_type,
-            capacity: 0,
-            buffer_size: 0,
-            connected: false,
-        }
-    }
-}
-
-/// IPC capability
+/// Capability required for IPC operation
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct IPCCapability {
-    pub can_send: bool,
-    pub can_receive: bool,
-    pub can_create: bool,
-    pub can_destroy: bool,
-    // Serenity parity sandboxing rules
-    pub allow_send_fd: bool,
-    pub allow_unix_sockets: bool,
+    pub cap_id: usize,
+    pub read_allowed: bool,
+    pub write_allowed: bool,
+    pub execute_allowed: bool,
+    pub grant_allowed: bool,
 }
 
 impl IPCCapability {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        IPCCapability {
-            can_send: false,
-            can_receive: false,
-            can_create: false,
-            can_destroy: false,
-            allow_send_fd: false,
-            allow_unix_sockets: false,
-        }
-    }
+    pub const READ: usize = 1 << 0;
+    pub const WRITE: usize = 1 << 1;
+    pub const EXECUTE: usize = 1 << 2;
+    pub const GRANT: usize = 1 << 3;
 
-    pub fn full() -> Self {
-        IPCCapability {
-            can_send: true,
-            can_receive: true,
-            can_create: true,
-            can_destroy: true,
-            allow_send_fd: true,
-            allow_unix_sockets: true,
-        }
-    }
-}
-
-/// Pipe (OOP: Concrete IPC implementation)
-#[repr(C)]
-pub struct Pipe {
-    pub id: usize,
-    pub read_end: AtomicUsize,
-    pub write_end: AtomicUsize,
-    pub buffer: Option<NonNull<u8>>,
-    pub buffer_size: usize,
-    pub read_pos: AtomicUsize,
-    pub write_pos: AtomicUsize,
-    pub capability: IPCCapability,
-    pub closed: AtomicBool,
-}
-
-impl Pipe {
-    pub fn new(id: usize, buffer_size: usize, capability: IPCCapability) -> Self {
-        let buffer = unsafe {
-            let ptr = alloc(buffer_size);
-            if ptr.is_null() {
-                None
-            } else {
-                Some(NonNull::new_unchecked(ptr))
-            }
-        };
-
-        Pipe {
-            id,
-            read_end: AtomicUsize::new(0),
-            write_end: AtomicUsize::new(0),
-            buffer,
-            buffer_size,
-            read_pos: AtomicUsize::new(0),
-            write_pos: AtomicUsize::new(0),
-            capability,
-            closed: AtomicBool::new(false),
-        }
-    }
-}
-
-impl IPCEndpoint for Pipe {
-    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
-        if !self.capability.can_send {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if self.closed.load(Ordering::SeqCst) {
-            return Err(IPCError::NotConnected);
-        }
-
-        let buffer = match self.buffer {
-            Some(ptr) => ptr.as_ptr(),
-            None => return Err(IPCError::NotConnected),
-        };
-
-        unsafe {
-            let available_space = self.buffer_size
-                - (self.write_pos.load(Ordering::SeqCst) - self.read_pos.load(Ordering::SeqCst));
-            if message.len() > available_space {
-                return Err(IPCError::BufferFull);
-            }
-
-            for &byte in message {
-                let write_pos = self.write_pos.load(Ordering::SeqCst) % self.buffer_size;
-                *(buffer.add(write_pos)) = byte;
-                self.write_pos.fetch_add(1, Ordering::SeqCst);
-            }
-        }
-
-        Ok(())
-    }
-
-    fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
-        if !self.capability.can_receive {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if self.closed.load(Ordering::SeqCst) {
-            return Err(IPCError::NotConnected);
-        }
-
-        let src_buffer = match self.buffer {
-            Some(ptr) => ptr.as_ptr(),
-            None => return Err(IPCError::NotConnected),
-        };
-
-        unsafe {
-            let available_data =
-                self.write_pos.load(Ordering::SeqCst) - self.read_pos.load(Ordering::SeqCst);
-            let read_count = buffer.len().min(available_data);
-
-            for i in 0..read_count {
-                let read_pos = self.read_pos.load(Ordering::SeqCst) % self.buffer_size;
-                buffer[i] = *(src_buffer.add(read_pos));
-                self.read_pos.fetch_add(1, Ordering::SeqCst);
-            }
-
-            Ok(read_count)
-        }
-    }
-
-    fn info(&self) -> IPCInfo {
-        let mut info = IPCInfo::new(IPCType::Pipe);
-        info.capacity = self.buffer_size;
-        info.buffer_size = self.buffer_size;
-        info.connected = !self.closed.load(Ordering::SeqCst);
-        info
-    }
-
-    fn close(&mut self) -> Result<(), IPCError> {
-        self.closed.store(true, Ordering::SeqCst);
-        Ok(())
-    }
-}
-
-impl Drop for Pipe {
-    fn drop(&mut self) {
-        unsafe {
-            if let Some(buffer) = self.buffer {
-                free(buffer.as_ptr());
-            }
-        }
-    }
-}
-
-/// Message queue (OOP: Concrete IPC implementation)
-#[repr(C)]
-pub struct MessageQueue {
-    pub id: usize,
-    pub messages: CustomIpcVec<Message>,
-    pub capacity: usize,
-    pub capability: IPCCapability,
-}
-
-#[repr(C)]
-pub struct Message {
-    pub data: CustomIpcVec<u8>,
-    pub priority: u8,
-}
-
-impl Message {
-    pub fn new(data: &[u8], priority: u8) -> Self {
-        let mut v = CustomIpcVec::new();
-        for &byte in data {
-            v.push(byte);
-        }
-        Message { data: v, priority }
-    }
-}
-
-impl MessageQueue {
-    pub fn new(id: usize, capacity: usize, capability: IPCCapability) -> Self {
-        MessageQueue {
-            id,
-            messages: CustomIpcVec::new(),
-            capacity,
-            capability,
-        }
-    }
-}
-
-impl IPCEndpoint for MessageQueue {
-    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
-        if !self.capability.can_send {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if self.messages.len() >= self.capacity {
-            return Err(IPCError::BufferFull);
-        }
-
-        let msg = Message::new(message, 0);
-        self.messages.push(msg);
-        Ok(())
-    }
-
-    fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
-        if !self.capability.can_receive {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        if self.messages.is_empty() {
-            return Err(IPCError::BufferEmpty);
-        }
-
-        let message = self.messages.remove(0);
-        let len = buffer.len().min(message.data.len());
-        buffer[..len].copy_from_slice(&message.data[..len]);
-
-        Ok(len)
-    }
-
-    fn info(&self) -> IPCInfo {
-        let mut info = IPCInfo::new(IPCType::MessageQueue);
-        info.capacity = self.capacity;
-        info.buffer_size = self.capacity * 256; // Assume max message size
-        info.connected = true;
-        info
-    }
-
-    fn close(&mut self) -> Result<(), IPCError> {
-        self.messages.clear();
-        Ok(())
-    }
-}
-
-/// Shared memory (OOP: Concrete IPC implementation)
-#[repr(C)]
-pub struct SharedMemory {
-    pub id: usize,
-    pub data: Option<NonNull<u8>>,
-    pub size: usize,
-    pub ref_count: AtomicUsize,
-    pub capability: IPCCapability,
-}
-
-impl SharedMemory {
-    pub fn new(id: usize, size: usize, capability: IPCCapability) -> Self {
-        let data = unsafe {
-            let ptr = alloc(size);
-            if ptr.is_null() {
-                None
-            } else {
-                Some(NonNull::new_unchecked(ptr))
-            }
-        };
-
-        SharedMemory {
-            id,
-            data,
-            size,
-            ref_count: AtomicUsize::new(0),
-            capability,
-        }
-    }
-
-    pub unsafe fn read(&self, offset: usize, buffer: &mut [u8]) -> Result<usize, IPCError> {
-        if !self.capability.can_receive {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        let data = match self.data {
-            Some(ptr) => ptr.as_ptr(),
-            None => return Err(IPCError::NotConnected),
-        };
-
-        let len = buffer.len().min(self.size - offset);
-        buffer[..len].copy_from_slice(core::slice::from_raw_parts(data.add(offset), len));
-
-        Ok(len)
-    }
-
-    pub unsafe fn write(&self, offset: usize, buffer: &[u8]) -> Result<usize, IPCError> {
-        if !self.capability.can_send {
-            return Err(IPCError::PermissionDenied);
-        }
-
-        let data = match self.data {
-            Some(ptr) => ptr.as_ptr(),
-            None => return Err(IPCError::NotConnected),
-        };
-
-        let len = buffer.len().min(self.size - offset);
-        core::slice::from_raw_parts_mut(data.add(offset), len).copy_from_slice(&buffer[..len]);
-
-        Ok(len)
-    }
-
-    pub fn increment_ref(&self) {
-        self.ref_count.fetch_add(1, Ordering::SeqCst);
-    }
-
-    pub fn decrement_ref(&self) -> usize {
-        self.ref_count.fetch_sub(1, Ordering::SeqCst) - 1
-    }
-}
-
-impl IPCEndpoint for SharedMemory {
-    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
-        unsafe {
-            let len = self.write(0, message)?;
-            if len != message.len() {
-                return Err(IPCError::InvalidSize);
-            }
-        }
-        Ok(())
-    }
-
-    fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
-        unsafe { self.read(0, buffer) }
-    }
-
-    fn info(&self) -> IPCInfo {
-        let mut info = IPCInfo::new(IPCType::SharedMemory);
-        info.capacity = self.size;
-        info.buffer_size = self.size;
-        info.connected = self.data.is_some();
-        info
-    }
-
-    fn close(&mut self) -> Result<(), IPCError> {
-        unsafe {
-            if let Some(data) = self.data {
-                free(data.as_ptr());
-                self.data = None;
-            }
-        }
-        Ok(())
-    }
-}
-
-impl Drop for SharedMemory {
-    fn drop(&mut self) {
-        unsafe {
-            if let Some(data) = self.data {
-                free(data.as_ptr());
-            }
-        }
-    }
-}
-
-// =========================================================================
-// SerenityOS Parity Extensions: Strongly-Typed IPC, WindowServer Backing, Sandboxing
-// =========================================================================
-
-/// Serenity-inspired strongly-typed IPC messages.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SerenityIpcMessage {
-    /// WindowServer Backing Store mapping updates: (window_id, shm_id, width, height)
-    UpdateBackingStore {
-        window_id: usize,
-        shm_id: usize,
-        width: usize,
-        height: usize,
-    },
-    /// Standard key/mouse input event message: (window_id, event_type, x, y)
-    InputEvent {
-        window_id: usize,
-        event_type: u32,
-        x: i32,
-        y: i32,
-    },
-    /// General system call adaptation payload: (syscall_id, payload)
-    SyscallShim { syscall_id: usize, payload: Vec<u8> },
-}
-
-impl SerenityIpcMessage {
-    /// Serialize the message into strongly-typed bytes
-    pub fn serialize(&self) -> Vec<u8> {
-        let mut out = Vec::new();
-        match self {
-            Self::UpdateBackingStore {
-                window_id,
-                shm_id,
-                width,
-                height,
-            } => {
-                out.push(1); // Msg Type ID
-                out.extend_from_slice(&window_id.to_le_bytes());
-                out.extend_from_slice(&shm_id.to_le_bytes());
-                out.extend_from_slice(&width.to_le_bytes());
-                out.extend_from_slice(&height.to_le_bytes());
-            }
-            Self::InputEvent {
-                window_id,
-                event_type,
-                x,
-                y,
-            } => {
-                out.push(2); // Msg Type ID
-                out.extend_from_slice(&window_id.to_le_bytes());
-                out.extend_from_slice(&event_type.to_le_bytes());
-                out.extend_from_slice(&x.to_le_bytes());
-                out.extend_from_slice(&y.to_le_bytes());
-            }
-            Self::SyscallShim {
-                syscall_id,
-                payload,
-            } => {
-                out.push(3); // Msg Type ID
-                out.extend_from_slice(&syscall_id.to_le_bytes());
-                out.extend_from_slice(&payload);
-            }
-        }
-        out
-    }
-
-    /// Deserialize raw bytes back into strongly-typed messages
-    pub fn deserialize(bytes: &[u8]) -> Option<Self> {
-        if bytes.is_empty() {
-            return None;
-        }
-        let type_id = bytes[0];
-        match type_id {
-            1 => {
-                let sz = mem::size_of::<usize>();
-                if bytes.len() < 1 + 4 * sz {
-                    return None;
-                }
-
-                let read_usize = |offset: usize| {
-                    let mut b = [0; mem::size_of::<usize>()];
-                    b.copy_from_slice(&bytes[offset..offset + sz]);
-                    usize::from_le_bytes(b)
-                };
-
-                let window_id = read_usize(1);
-                let shm_id = read_usize(1 + sz);
-                let width = read_usize(1 + 2 * sz);
-                let height = read_usize(1 + 3 * sz);
-                Some(Self::UpdateBackingStore {
-                    window_id,
-                    shm_id,
-                    width,
-                    height,
-                })
-            }
-            2 => {
-                let sz = mem::size_of::<usize>();
-                if bytes.len() < 1 + sz + 12 {
-                    return None;
-                }
-
-                let read_usize = |offset: usize| {
-                    let mut b = [0; mem::size_of::<usize>()];
-                    b.copy_from_slice(&bytes[offset..offset + sz]);
-                    usize::from_le_bytes(b)
-                };
-
-                let read_u32 = |offset: usize| {
-                    let mut b = [0; 4];
-                    b.copy_from_slice(&bytes[offset..offset + 4]);
-                    u32::from_le_bytes(b)
-                };
-
-                let read_i32 = |offset: usize| {
-                    let mut b = [0; 4];
-                    b.copy_from_slice(&bytes[offset..offset + 4]);
-                    i32::from_le_bytes(b)
-                };
-
-                let window_id = read_usize(1);
-                let event_type = read_u32(1 + sz);
-                let x = read_i32(1 + sz + 4);
-                let y = read_i32(1 + sz + 8);
-                Some(Self::InputEvent {
-                    window_id,
-                    event_type,
-                    x,
-                    y,
-                })
-            }
-            3 => {
-                let sz = mem::size_of::<usize>();
-                if bytes.len() < 1 + sz {
-                    return None;
-                }
-                let mut b = [0; mem::size_of::<usize>()];
-                b.copy_from_slice(&bytes[1..1 + sz]);
-                let syscall_id = usize::from_le_bytes(b);
-                let payload = bytes[1 + sz..].to_vec();
-                Some(Self::SyscallShim {
-                    syscall_id,
-                    payload,
-                })
-            }
-            _ => None,
-        }
-    }
-}
-
-/// Serenity WindowServer Backing Store interface.
-/// Encapsulates direct shared-memory painting backing buffers.
-pub struct SerenitySharedBackingStore {
-    pub shm_id: usize,
-    pub width: usize,
-    pub height: usize,
-    pub stride: usize,
-}
-
-impl SerenitySharedBackingStore {
-    pub fn new(shm_id: usize, width: usize, height: usize) -> Self {
+    pub fn new(cap_id: usize, mask: usize) -> Self {
         Self {
-            shm_id,
-            width,
-            height,
-            stride: width * 4, // 32-bit RGBA pixel formats
+            cap_id,
+            read_allowed: (mask & Self::READ) != 0,
+            write_allowed: (mask & Self::WRITE) != 0,
+            execute_allowed: (mask & Self::EXECUTE) != 0,
+            grant_allowed: (mask & Self::GRANT) != 0,
         }
     }
 
-    /// Read or write pixel offsets in the backing store buffer mapped via shared memory.
-    pub fn get_pixel_offset(&self, x: usize, y: usize) -> usize {
-        y * self.stride + x * 4
+    pub fn check_read(&self) -> Result<(), IPCError> {
+        if self.read_allowed {
+            Ok(())
+        } else {
+            Err(IPCError::PermissionDenied)
+        }
+    }
+
+    pub fn check_write(&self) -> Result<(), IPCError> {
+        if self.write_allowed {
+            Ok(())
+        } else {
+            Err(IPCError::PermissionDenied)
+        }
     }
 }
 
-/// Serenity-style Sandboxed IPC Enforcer.
-/// Ensures that processes sandboxed with pledge/unveil restrictions cannot bypass sandbox boundaries
-/// by sending or receiving file descriptors or establishing disallowed socket connections over IPC.
-pub struct SerenityIpcSandboxEnforcer {
-    pub has_send_fd_pledge: bool,
-    pub has_unix_sockets_pledge: bool,
+// =========================================================================
+// Canonical Core IPC Handlers (Phase 2 Specifications)
+// =========================================================================
+
+/// IPC Permissions for access control
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct IpcPermissions {
+    pub owner_uid: u32,
+    pub owner_gid: u32,
+    pub mode: u16,
+    pub capabilities: u64,
 }
 
-impl SerenityIpcSandboxEnforcer {
-    pub fn new(has_send_fd_pledge: bool, has_unix_sockets_pledge: bool) -> Self {
+impl IpcPermissions {
+    pub fn new(owner_uid: u32, owner_gid: u32, mode: u16) -> Self {
         Self {
-            has_send_fd_pledge,
-            has_unix_sockets_pledge,
+            owner_uid,
+            owner_gid,
+            mode,
+            capabilities: 0,
         }
     }
 
-    /// Validate whether a message or dynamic transfer is allowed under the current sandbox parameters.
-    pub fn validate_ipc_transfer(
-        &self,
-        is_sending_fd: bool,
-        is_unix_connect: bool,
-    ) -> Result<(), IPCError> {
-        if is_sending_fd && !self.has_send_fd_pledge {
-            return Err(IPCError::PermissionDenied);
-        }
-        if is_unix_connect && !self.has_unix_sockets_pledge {
-            return Err(IPCError::PermissionDenied);
-        }
-        Ok(())
+    pub fn check_access(&self, uid: u32, gid: u32, requested_mode: u16) -> bool {
+        let perm = if uid == self.owner_uid {
+            (self.mode >> 6) & 0x7
+        } else if gid == self.owner_gid {
+            (self.mode >> 3) & 0x7
+        } else {
+            self.mode & 0x7
+        };
+        (perm & requested_mode) == requested_mode
     }
 }
 
-// =========================================================================
-// IPC manager (OOP: Manager class)
-// =========================================================================
-
-pub struct IPCManager {
-    pipes: CustomIpcVec<Option<NonNull<Pipe>>>,
-    message_queues: CustomIpcVec<Option<NonNull<MessageQueue>>>,
-    shared_memories: CustomIpcVec<Option<NonNull<SharedMemory>>>,
-    next_id: AtomicUsize,
-    // Serenity Parity Enforcer integration
-    pub sandbox_enforcer: SerenityIpcSandboxEnforcer,
+/// Statistics tracking for IPC channels
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct IpcStatistics {
+    pub bytes_read: u64,
+    pub bytes_written: u64,
+    pub messages_sent: u64,
+    pub messages_received: u64,
+    pub dropped_messages: u64,
 }
 
-impl IPCManager {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        IPCManager {
-            pipes: CustomIpcVec::new(),
-            message_queues: CustomIpcVec::new(),
-            shared_memories: CustomIpcVec::new(),
-            next_id: AtomicUsize::new(1),
-            sandbox_enforcer: SerenityIpcSandboxEnforcer::new(true, true),
-        }
-    }
-
-    pub fn create_pipe(
-        &mut self,
-        buffer_size: usize,
-        capability: IPCCapability,
-    ) -> Result<usize, IPCError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let pipe = Pipe::new(id, buffer_size, capability);
-
-        let pipe_ptr = unsafe {
-            let ptr = alloc(mem::size_of::<Pipe>()) as *mut Pipe;
-            if ptr.is_null() {
-                return Err(IPCError::BufferFull);
-            }
-            core::ptr::write(ptr, pipe);
-            NonNull::new_unchecked(ptr)
-        };
-
-        self.pipes.push(Some(pipe_ptr));
-        Ok(id)
-    }
-
-    pub fn create_message_queue(
-        &mut self,
-        capacity: usize,
-        capability: IPCCapability,
-    ) -> Result<usize, IPCError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let mq = MessageQueue::new(id, capacity, capability);
-
-        let mq_ptr = unsafe {
-            let ptr = alloc(mem::size_of::<MessageQueue>()) as *mut MessageQueue;
-            if ptr.is_null() {
-                return Err(IPCError::BufferFull);
-            }
-            core::ptr::write(ptr, mq);
-            NonNull::new_unchecked(ptr)
-        };
-
-        self.message_queues.push(Some(mq_ptr));
-        Ok(id)
-    }
-
-    pub fn create_shared_memory(
-        &mut self,
-        size: usize,
-        capability: IPCCapability,
-    ) -> Result<usize, IPCError> {
-        let id = self.next_id.fetch_add(1, Ordering::SeqCst);
-        let shm = SharedMemory::new(id, size, capability);
-
-        let shm_ptr = unsafe {
-            let ptr = alloc(mem::size_of::<SharedMemory>()) as *mut SharedMemory;
-            if ptr.is_null() {
-                return Err(IPCError::BufferFull);
-            }
-            core::ptr::write(ptr, shm);
-            NonNull::new_unchecked(ptr)
-        };
-
-        self.shared_memories.push(Some(shm_ptr));
-        Ok(id)
-    }
-
-    pub unsafe fn get_pipe(&self, id: usize) -> Option<&Pipe> {
-        if id < self.pipes.len() {
-            self.pipes[id].map(|ptr| &*ptr.as_ptr())
-        } else {
-            None
-        }
-    }
-
-    pub unsafe fn get_pipe_mut(&mut self, id: usize) -> Option<&mut Pipe> {
-        if id < self.pipes.len() {
-            self.pipes[id].map(|mut ptr| &mut *ptr.as_ptr())
-        } else {
-            None
-        }
-    }
-
-    pub unsafe fn get_message_queue(&self, id: usize) -> Option<&MessageQueue> {
-        if id < self.message_queues.len() {
-            self.message_queues[id].map(|ptr| &*ptr.as_ptr())
-        } else {
-            None
-        }
-    }
-
-    pub unsafe fn get_message_queue_mut(&mut self, id: usize) -> Option<&mut MessageQueue> {
-        if id < self.message_queues.len() {
-            self.message_queues[id].map(|mut ptr| &mut *ptr.as_ptr())
-        } else {
-            None
-        }
-    }
-
-    pub unsafe fn get_shared_memory(&self, id: usize) -> Option<&SharedMemory> {
-        if id < self.shared_memories.len() {
-            self.shared_memories[id].map(|ptr| &*ptr.as_ptr())
-        } else {
-            None
-        }
-    }
-
-    pub unsafe fn get_shared_memory_mut(&mut self, id: usize) -> Option<&mut SharedMemory> {
-        if id < self.shared_memories.len() {
-            self.shared_memories[id].map(|mut ptr| &mut *ptr.as_ptr())
-        } else {
-            None
-        }
-    }
-
-    pub unsafe fn destroy_pipe(&mut self, id: usize) -> Result<(), IPCError> {
-        if id >= self.pipes.len() {
-            return Err(IPCError::NotConnected);
-        }
-
-        if let Some(pipe_ptr) = self.pipes[id] {
-            core::ptr::drop_in_place(pipe_ptr.as_ptr());
-            free(pipe_ptr.as_ptr() as *mut u8);
-        }
-
-        self.pipes[id] = None;
-        Ok(())
-    }
-
-    pub unsafe fn destroy_message_queue(&mut self, id: usize) -> Result<(), IPCError> {
-        if id >= self.message_queues.len() {
-            return Err(IPCError::NotConnected);
-        }
-
-        if let Some(mq_ptr) = self.message_queues[id] {
-            core::ptr::drop_in_place(mq_ptr.as_ptr());
-            free(mq_ptr.as_ptr() as *mut u8);
-        }
-
-        self.message_queues[id] = None;
-        Ok(())
-    }
-
-    pub unsafe fn destroy_shared_memory(&mut self, id: usize) -> Result<(), IPCError> {
-        if id >= self.shared_memories.len() {
-            return Err(IPCError::NotConnected);
-        }
-
-        if let Some(shm_ptr) = self.shared_memories[id] {
-            core::ptr::drop_in_place(shm_ptr.as_ptr());
-            free(shm_ptr.as_ptr() as *mut u8);
-        }
-
-        self.shared_memories[id] = None;
-        Ok(())
-    }
-}
-
-/// Simple CustomIpcVec implementation for no_std
-pub struct CustomIpcVec<T> {
-    data: *mut T,
-    len: usize,
+/// Bounded ring buffer for IPC data transmission
+#[derive(Debug, Clone)]
+pub struct MessageBuffer {
+    buffer: Vec<u8>,
     capacity: usize,
+    read_pos: usize,
+    write_pos: usize,
+    len: usize,
 }
 
-impl<T> CustomIpcVec<T> {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        CustomIpcVec {
-            data: core::ptr::null_mut(),
+impl MessageBuffer {
+    pub fn new(capacity: usize) -> Self {
+        Self {
+            buffer: vec![0u8; capacity],
+            capacity,
+            read_pos: 0,
+            write_pos: 0,
             len: 0,
-            capacity: 0,
         }
     }
 
-    pub fn push(&mut self, item: T) {
-        unsafe {
-            if self.len >= self.capacity {
-                self.grow();
-            }
-
-            if self.capacity > self.len {
-                core::ptr::write(self.data.add(self.len), item);
-                self.len += 1;
-            }
+    pub fn write(&mut self, data: &[u8]) -> usize {
+        let available = self.capacity - self.len;
+        let to_write = data.len().min(available);
+        for i in 0..to_write {
+            self.buffer[self.write_pos] = data[i];
+            self.write_pos = (self.write_pos + 1) % self.capacity;
         }
+        self.len += to_write;
+        to_write
     }
 
-    pub fn remove(&mut self, index: usize) -> T {
-        unsafe {
-            let item = core::ptr::read(self.data.add(index));
-            core::ptr::copy(
-                self.data.add(index + 1),
-                self.data.add(index),
-                self.len - index - 1,
-            );
-            self.len -= 1;
-            item
+    pub fn read(&mut self, buf: &mut [u8]) -> usize {
+        let to_read = buf.len().min(self.len);
+        for i in 0..to_read {
+            buf[i] = self.buffer[self.read_pos];
+            self.read_pos = (self.read_pos + 1) % self.capacity;
         }
-    }
-
-    pub fn clear(&mut self) {
-        self.len = 0;
+        self.len -= to_read;
+        to_read
     }
 
     pub fn len(&self) -> usize {
@@ -883,30 +211,944 @@ impl<T> CustomIpcVec<T> {
         self.len == 0
     }
 
-    unsafe fn grow(&mut self) {
-        let new_capacity = if self.capacity == 0 {
-            4
+    pub fn is_full(&self) -> bool {
+        self.len == self.capacity
+    }
+
+    pub fn capacity(&self) -> usize {
+        self.capacity
+    }
+}
+
+/// Canonical Wait Queue for thread block/wakeup synchronization
+#[derive(Debug, Default, Clone)]
+pub struct WaitQueue {
+    waiters: Vec<usize>, // List of blocked thread PIDs
+}
+
+impl WaitQueue {
+    pub fn new() -> Self {
+        Self {
+            waiters: Vec::new(),
+        }
+    }
+
+    pub fn add_waiter(&mut self, thread_pid: usize) {
+        if !self.waiters.contains(&thread_pid) {
+            self.waiters.push(thread_pid);
+        }
+    }
+
+    pub fn remove_waiter(&mut self, thread_pid: usize) {
+        self.waiters.retain(|&pid| pid != thread_pid);
+    }
+
+    pub fn wake_one(&mut self) -> Option<usize> {
+        if self.waiters.is_empty() {
+            None
         } else {
-            self.capacity * 2
+            Some(self.waiters.remove(0))
+        }
+    }
+
+    pub fn wake_all(&mut self) -> Vec<usize> {
+        let waiters = self.waiters.clone();
+        self.waiters.clear();
+        waiters
+    }
+
+    pub fn waiter_count(&self) -> usize {
+        self.waiters.len()
+    }
+}
+
+/// Canonical IpcChannel representing an active IPC communication channel
+#[derive(Debug)]
+pub struct IpcChannel {
+    pub channel_id: usize,
+    pub channel_type: IPCType,
+    pub buffer: MessageBuffer,
+    pub permissions: IpcPermissions,
+    pub stats: IpcStatistics,
+    pub read_wait_queue: WaitQueue,
+    pub write_wait_queue: WaitQueue,
+    pub closed: bool,
+}
+
+impl IpcChannel {
+    pub fn new(
+        channel_id: usize,
+        channel_type: IPCType,
+        capacity: usize,
+        permissions: IpcPermissions,
+    ) -> Self {
+        Self {
+            channel_id,
+            channel_type,
+            buffer: MessageBuffer::new(capacity),
+            permissions,
+            stats: IpcStatistics::default(),
+            read_wait_queue: WaitQueue::new(),
+            write_wait_queue: WaitQueue::new(),
+            closed: false,
+        }
+    }
+
+    pub fn write(&mut self, data: &[u8]) -> Result<usize, IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        let written = self.buffer.write(data);
+        self.stats.bytes_written += written as u64;
+        self.stats.messages_sent += 1;
+        if written > 0 {
+            self.read_wait_queue.wake_all();
+        }
+        Ok(written)
+    }
+
+    pub fn read(&mut self, buf: &mut [u8]) -> Result<usize, IPCError> {
+        if self.buffer.is_empty() {
+            if self.closed {
+                return Ok(0); // EOF
+            }
+            return Err(IPCError::BufferEmpty);
+        }
+        let read_bytes = self.buffer.read(buf);
+        self.stats.bytes_read += read_bytes as u64;
+        self.stats.messages_received += 1;
+        if read_bytes > 0 {
+            self.write_wait_queue.wake_all();
+        }
+        Ok(read_bytes)
+    }
+
+    pub fn close(&mut self) {
+        self.closed = true;
+        self.read_wait_queue.wake_all();
+        self.write_wait_queue.wake_all();
+    }
+}
+
+/// Endpoint handle connected to an IPC channel
+#[derive(Debug, Clone)]
+pub struct IpcEndpoint {
+    pub endpoint_id: usize,
+    pub channel_id: usize,
+    pub owner_pid: usize,
+    pub read_mode: bool,
+    pub write_mode: bool,
+    pub closed: bool,
+}
+
+impl IpcEndpoint {
+    pub fn new(
+        endpoint_id: usize,
+        channel_id: usize,
+        owner_pid: usize,
+        read_mode: bool,
+        write_mode: bool,
+    ) -> Self {
+        Self {
+            endpoint_id,
+            channel_id,
+            owner_pid,
+            read_mode,
+            write_mode,
+            closed: false,
+        }
+    }
+
+    pub fn close(&mut self) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.closed = true;
+        Ok(())
+    }
+}
+
+/// Shared memory region handle
+#[derive(Debug)]
+pub struct SharedMemoryRegion {
+    pub region_id: usize,
+    pub size: usize,
+    pub permissions: IpcPermissions,
+    pub ref_count: usize,
+    pub backing_data: Vec<u8>,
+}
+
+impl SharedMemoryRegion {
+    pub fn new(region_id: usize, size: usize, permissions: IpcPermissions) -> Self {
+        Self {
+            region_id,
+            size,
+            permissions,
+            ref_count: 1,
+            backing_data: vec![0u8; size],
+        }
+    }
+
+    pub fn attach(&mut self) {
+        self.ref_count += 1;
+    }
+
+    pub fn detach(&mut self) -> usize {
+        if self.ref_count > 0 {
+            self.ref_count -= 1;
+        }
+        self.ref_count
+    }
+}
+
+/// File descriptor wrapper for IPC primitives
+#[derive(Debug, Clone)]
+pub struct FileDescriptorHandle {
+    pub fd: i32,
+    pub channel_id: usize,
+    pub is_read_end: bool,
+    pub is_closed: bool,
+}
+
+impl FileDescriptorHandle {
+    pub fn new(fd: i32, channel_id: usize, is_read_end: bool) -> Self {
+        Self {
+            fd,
+            channel_id,
+            is_read_end,
+            is_closed: false,
+        }
+    }
+
+    pub fn close(&mut self) -> Result<(), IPCError> {
+        if self.is_closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.is_closed = true;
+        Ok(())
+    }
+}
+
+/// Concrete Pipe implementation
+pub struct Pipe {
+    info: IPCInfo,
+    capability: IPCCapability,
+    buffer: Vec<u8>,
+    capacity: usize,
+    head: usize,
+    tail: usize,
+    len: usize,
+    closed: bool,
+}
+
+impl Pipe {
+    pub fn new(endpoint_id: usize, owner_pid: usize, capacity: usize) -> Self {
+        Self {
+            info: IPCInfo {
+                endpoint_id,
+                channel_type: IPCType::Pipe,
+                owner_pid,
+                connected: true,
+                bytes_transferred: 0,
+            },
+            capability: IPCCapability::new(endpoint_id, IPCCapability::READ | IPCCapability::WRITE),
+            buffer: vec![0u8; capacity],
+            capacity,
+            head: 0,
+            tail: 0,
+            len: 0,
+            closed: false,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
+    pub fn is_full(&self) -> bool {
+        self.len == self.capacity
+    }
+
+    pub fn available_read(&self) -> usize {
+        self.len
+    }
+
+    pub fn available_write(&self) -> usize {
+        self.capacity - self.len
+    }
+}
+
+impl IPCEndpoint for Pipe {
+    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.capability.check_write()?;
+
+        if message.len() > self.available_write() {
+            return Err(IPCError::BufferFull);
+        }
+
+        for &byte in message {
+            self.buffer[self.tail] = byte;
+            self.tail = (self.tail + 1) % self.capacity;
+        }
+
+        self.len += message.len();
+        self.info.bytes_transferred += message.len();
+        Ok(())
+    }
+
+    fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
+        if self.closed && self.is_empty() {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.capability.check_read()?;
+
+        if self.is_empty() {
+            return Err(IPCError::BufferEmpty);
+        }
+
+        let to_read = core::cmp::min(buffer.len(), self.len);
+        for i in 0..to_read {
+            buffer[i] = self.buffer[self.head];
+            self.head = (self.head + 1) % self.capacity;
+        }
+
+        self.len -= to_read;
+        Ok(to_read)
+    }
+
+    fn info(&self) -> IPCInfo {
+        self.info
+    }
+
+    fn close(&mut self) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.closed = true;
+        self.info.connected = false;
+        Ok(())
+    }
+}
+
+/// Message Queue implementation
+pub struct MessageQueue {
+    info: IPCInfo,
+    capability: IPCCapability,
+    messages: Vec<Message>,
+    max_messages: usize,
+    closed: bool,
+}
+
+#[derive(Clone, Debug)]
+pub struct Message {
+    pub sender_pid: usize,
+    pub priority: u32,
+    pub payload: Vec<u8>,
+}
+
+impl MessageQueue {
+    pub fn new(endpoint_id: usize, owner_pid: usize, max_messages: usize) -> Self {
+        Self {
+            info: IPCInfo {
+                endpoint_id,
+                channel_type: IPCType::MessageQueue,
+                owner_pid,
+                connected: true,
+                bytes_transferred: 0,
+            },
+            capability: IPCCapability::new(endpoint_id, IPCCapability::READ | IPCCapability::WRITE),
+            messages: Vec::new(),
+            max_messages,
+            closed: false,
+        }
+    }
+
+    pub fn send_with_priority(&mut self, message: &[u8], priority: u32) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.capability.check_write()?;
+
+        if self.messages.len() >= self.max_messages {
+            return Err(IPCError::BufferFull);
+        }
+
+        let msg = Message {
+            sender_pid: self.info.owner_pid,
+            priority,
+            payload: message.to_vec(),
         };
-        let new_data = alloc(new_capacity * mem::size_of::<T>()) as *mut T;
 
-        if !new_data.is_null() {
-            for i in 0..self.len {
-                core::ptr::copy_nonoverlapping(self.data.add(i), new_data.add(i), 1);
+        // Insert sorted by priority (higher priority first)
+        let pos = self
+            .messages
+            .iter()
+            .position(|m| m.priority < priority)
+            .unwrap_or(self.messages.len());
+
+        self.messages.insert(pos, msg);
+        self.info.bytes_transferred += message.len();
+        Ok(())
+    }
+}
+
+impl IPCEndpoint for MessageQueue {
+    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
+        self.send_with_priority(message, 0)
+    }
+
+    fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
+        if self.closed && self.messages.is_empty() {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.capability.check_read()?;
+
+        if self.messages.is_empty() {
+            return Err(IPCError::BufferEmpty);
+        }
+
+        let msg = self.messages.remove(0);
+        if buffer.len() < msg.payload.len() {
+            return Err(IPCError::InvalidSize);
+        }
+
+        buffer[..msg.payload.len()].copy_from_slice(&msg.payload);
+        Ok(msg.payload.len())
+    }
+
+    fn info(&self) -> IPCInfo {
+        self.info
+    }
+
+    fn close(&mut self) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.closed = true;
+        self.info.connected = false;
+        Ok(())
+    }
+}
+
+/// Shared Memory implementation
+pub struct SharedMemory {
+    info: IPCInfo,
+    capability: IPCCapability,
+    size: usize,
+    data: NonNull<u8>,
+    attached_pids: Vec<usize>,
+    closed: bool,
+}
+
+impl SharedMemory {
+    pub fn new(endpoint_id: usize, owner_pid: usize, size: usize) -> Result<Self, IPCError> {
+        if size == 0 {
+            return Err(IPCError::InvalidSize);
+        }
+
+        let layout =
+            std::alloc::Layout::from_size_align(size, 8).map_err(|_| IPCError::InternalError)?;
+
+        let ptr = unsafe { std::alloc::alloc_zeroed(layout) };
+        let non_null = NonNull::new(ptr).ok_or(IPCError::InternalError)?;
+
+        let mut attached = Vec::new();
+        attached.push(owner_pid);
+
+        Ok(Self {
+            info: IPCInfo {
+                endpoint_id,
+                channel_type: IPCType::SharedMemory,
+                owner_pid,
+                connected: true,
+                bytes_transferred: 0,
+            },
+            capability: IPCCapability::new(
+                endpoint_id,
+                IPCCapability::READ | IPCCapability::WRITE | IPCCapability::GRANT,
+            ),
+            size,
+            data: non_null,
+            attached_pids: attached,
+            closed: false,
+        })
+    }
+
+    pub fn attach(&mut self, pid: usize) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        if !self.attached_pids.contains(&pid) {
+            self.attached_pids.push(pid);
+        }
+        Ok(())
+    }
+
+    pub fn detach(&mut self, pid: usize) -> Result<(), IPCError> {
+        if let Some(pos) = self.attached_pids.iter().position(|&p| p == pid) {
+            self.attached_pids.remove(pos);
+            Ok(())
+        } else {
+            Err(IPCError::NotFound)
+        }
+    }
+
+    pub fn read_at(&self, offset: usize, buffer: &mut [u8]) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.capability.check_read()?;
+
+        if offset + buffer.len() > self.size {
+            return Err(IPCError::InvalidSize);
+        }
+
+        unsafe {
+            core::ptr::copy_nonoverlapping(
+                self.data.as_ptr().add(offset),
+                buffer.as_mut_ptr(),
+                buffer.len(),
+            );
+        }
+        Ok(())
+    }
+
+    pub fn write_at(&mut self, offset: usize, data: &[u8]) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.capability.check_write()?;
+
+        if offset + data.len() > self.size {
+            return Err(IPCError::InvalidSize);
+        }
+
+        unsafe {
+            core::ptr::copy_nonoverlapping(
+                data.as_ptr(),
+                self.data.as_ptr().add(offset),
+                data.len(),
+            );
+        }
+        self.info.bytes_transferred += data.len();
+        Ok(())
+    }
+}
+
+impl IPCEndpoint for SharedMemory {
+    fn send(&mut self, message: &[u8]) -> Result<(), IPCError> {
+        self.write_at(0, message)
+    }
+
+    fn receive(&mut self, buffer: &mut [u8]) -> Result<usize, IPCError> {
+        self.read_at(0, buffer)?;
+        Ok(buffer.len())
+    }
+
+    fn info(&self) -> IPCInfo {
+        self.info
+    }
+
+    fn close(&mut self) -> Result<(), IPCError> {
+        if self.closed {
+            return Err(IPCError::EndpointClosed);
+        }
+        self.closed = true;
+        self.info.connected = false;
+        Ok(())
+    }
+}
+
+impl Drop for SharedMemory {
+    fn drop(&mut self) {
+        if self.size > 0 {
+            if let Ok(layout) = std::alloc::Layout::from_size_align(self.size, 8) {
+                unsafe {
+                    std::alloc::dealloc(self.data.as_ptr(), layout);
+                }
             }
-
-            if self.capacity > 0 {
-                free(self.data as *mut u8);
-            }
-
-            self.data = new_data;
-            self.capacity = new_capacity;
         }
     }
 }
 
-// External allocator functions
+/// SerenityOS LibIPC & WindowServer backing-store parity protocol message.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SerenityIpcMessage {
+    UpdateBackingStore {
+        window_id: u32,
+        shm_id: u32,
+        width: u32,
+        height: u32,
+    },
+    InputEvent {
+        window_id: u32,
+        event_type: u16,
+        x: i32,
+        y: i32,
+    },
+}
+
+impl SerenityIpcMessage {
+    pub fn serialize(&self) -> Vec<u8> {
+        let mut buf = Vec::new();
+        match self {
+            Self::UpdateBackingStore {
+                window_id,
+                shm_id,
+                width,
+                height,
+            } => {
+                buf.push(1); // Type 1
+                buf.extend_from_slice(&window_id.to_le_bytes());
+                buf.extend_from_slice(&shm_id.to_le_bytes());
+                buf.extend_from_slice(&width.to_le_bytes());
+                buf.extend_from_slice(&height.to_le_bytes());
+            }
+            Self::InputEvent {
+                window_id,
+                event_type,
+                x,
+                y,
+            } => {
+                buf.push(2); // Type 2
+                buf.extend_from_slice(&window_id.to_le_bytes());
+                buf.extend_from_slice(&event_type.to_le_bytes());
+                buf.extend_from_slice(&x.to_le_bytes());
+                buf.extend_from_slice(&y.to_le_bytes());
+            }
+        }
+        buf
+    }
+
+    pub fn deserialize(buf: &[u8]) -> Result<Self, IPCError> {
+        if buf.is_empty() {
+            return Err(IPCError::InvalidSize);
+        }
+        match buf[0] {
+            1 => {
+                if buf.len() < 17 {
+                    return Err(IPCError::InvalidSize);
+                }
+                let window_id = u32::from_le_bytes(buf[1..5].try_into().unwrap());
+                let shm_id = u32::from_le_bytes(buf[5..9].try_into().unwrap());
+                let width = u32::from_le_bytes(buf[9..13].try_into().unwrap());
+                let height = u32::from_le_bytes(buf[13..17].try_into().unwrap());
+                Ok(Self::UpdateBackingStore {
+                    window_id,
+                    shm_id,
+                    width,
+                    height,
+                })
+            }
+            2 => {
+                if buf.len() < 15 {
+                    return Err(IPCError::InvalidSize);
+                }
+                let window_id = u32::from_le_bytes(buf[1..5].try_into().unwrap());
+                let event_type = u16::from_le_bytes(buf[5..7].try_into().unwrap());
+                let x = i32::from_le_bytes(buf[7..11].try_into().unwrap());
+                let y = i32::from_le_bytes(buf[11..15].try_into().unwrap());
+                Ok(Self::InputEvent {
+                    window_id,
+                    event_type,
+                    x,
+                    y,
+                })
+            }
+            _ => Err(IPCError::InvalidSize),
+        }
+    }
+}
+
+/// SerenityOS WindowServer Shared Memory Backing Store.
+pub struct SerenitySharedBackingStore {
+    pub shm_id: u32,
+    pub width: u32,
+    pub height: u32,
+    pub pitch: u32,
+}
+
+impl SerenitySharedBackingStore {
+    pub fn new(shm_id: u32, width: u32, height: u32) -> Self {
+        Self {
+            shm_id,
+            width,
+            height,
+            pitch: width * 4, // 32-bit RGBA
+        }
+    }
+
+    pub fn get_pixel_offset(&self, x: u32, y: u32) -> usize {
+        (y * self.pitch + x * 4) as usize
+    }
+}
+
+/// SerenityOS Pledge & Unveil Sandbox IPC Enforcer.
+pub struct SerenityIpcSandboxEnforcer {
+    pub allow_send_fd: bool,
+    pub allow_unix_sockets: bool,
+}
+
+impl SerenityIpcSandboxEnforcer {
+    pub fn new(allow_send_fd: bool, allow_unix_sockets: bool) -> Self {
+        Self {
+            allow_send_fd,
+            allow_unix_sockets,
+        }
+    }
+
+    pub fn validate_ipc_transfer(
+        &self,
+        is_fd_passing: bool,
+        is_unix_socket: bool,
+    ) -> Result<(), IPCError> {
+        if is_fd_passing && !self.allow_send_fd {
+            return Err(IPCError::PermissionDenied);
+        }
+        if is_unix_socket && !self.allow_unix_sockets {
+            return Err(IPCError::PermissionDenied);
+        }
+        Ok(())
+    }
+}
+
+/// System-wide IPC Manager
+pub struct IPCManager {
+    pipes: [Option<NonNull<Pipe>>; 256],
+    message_queues: [Option<NonNull<MessageQueue>>; 256],
+    shared_memories: [Option<NonNull<SharedMemory>>; 256],
+    next_id: usize,
+}
+
+impl IPCManager {
+    pub fn new() -> Self {
+        Self {
+            pipes: [None; 256],
+            message_queues: [None; 256],
+            shared_memories: [None; 256],
+            next_id: 1,
+        }
+    }
+
+    pub fn create_pipe(&mut self, owner_pid: usize, capacity: usize) -> Result<usize, IPCError> {
+        let id = self.next_id;
+        if id >= 256 {
+            return Err(IPCError::BufferFull);
+        }
+
+        let pipe = Pipe::new(id, owner_pid, capacity);
+        let boxed = Box::new(pipe);
+        let ptr = NonNull::new(Box::into_raw(boxed)).ok_or(IPCError::InternalError)?;
+
+        self.pipes[id] = Some(ptr);
+        self.next_id += 1;
+        Ok(id)
+    }
+
+    pub fn create_message_queue(
+        &mut self,
+        owner_pid: usize,
+        max_messages: usize,
+    ) -> Result<usize, IPCError> {
+        let id = self.next_id;
+        if id >= 256 {
+            return Err(IPCError::BufferFull);
+        }
+
+        let mq = MessageQueue::new(id, owner_pid, max_messages);
+        let boxed = Box::new(mq);
+        let ptr = NonNull::new(Box::into_raw(boxed)).ok_or(IPCError::InternalError)?;
+
+        self.message_queues[id] = Some(ptr);
+        self.next_id += 1;
+        Ok(id)
+    }
+
+    pub fn create_shared_memory(
+        &mut self,
+        owner_pid: usize,
+        size: usize,
+    ) -> Result<usize, IPCError> {
+        let id = self.next_id;
+        if id >= 256 {
+            return Err(IPCError::BufferFull);
+        }
+
+        let shm = SharedMemory::new(id, owner_pid, size)?;
+        let boxed = Box::new(shm);
+        let ptr = NonNull::new(Box::into_raw(boxed)).ok_or(IPCError::InternalError)?;
+
+        self.shared_memories[id] = Some(ptr);
+        self.next_id += 1;
+        Ok(id)
+    }
+
+    pub fn get_pipe(&mut self, id: usize) -> Result<&mut Pipe, IPCError> {
+        if id >= 256 {
+            return Err(IPCError::NotFound);
+        }
+        unsafe {
+            self.pipes[id]
+                .map(|ptr| &mut *ptr.as_ptr())
+                .ok_or(IPCError::NotFound)
+        }
+    }
+
+    pub fn get_message_queue(&mut self, id: usize) -> Result<&mut MessageQueue, IPCError> {
+        if id >= 256 {
+            return Err(IPCError::NotFound);
+        }
+        unsafe {
+            self.message_queues[id]
+                .map(|ptr| &mut *ptr.as_ptr())
+                .ok_or(IPCError::NotFound)
+        }
+    }
+
+    pub fn get_shared_memory(&mut self, id: usize) -> Result<&mut SharedMemory, IPCError> {
+        if id >= 256 {
+            return Err(IPCError::NotFound);
+        }
+        unsafe {
+            self.shared_memories[id]
+                .map(|ptr| &mut *ptr.as_ptr())
+                .ok_or(IPCError::NotFound)
+        }
+    }
+
+    pub fn destroy_endpoint(&mut self, id: usize, channel_type: IPCType) -> Result<(), IPCError> {
+        if id >= 256 {
+            return Err(IPCError::NotFound);
+        }
+
+        match channel_type {
+            IPCType::Pipe => {
+                if let Some(ptr) = self.pipes[id].take() {
+                    unsafe {
+                        let mut boxed = Box::from_raw(ptr.as_ptr());
+                        boxed.close()?;
+                    }
+                    Ok(())
+                } else {
+                    Err(IPCError::NotFound)
+                }
+            }
+            IPCType::MessageQueue => {
+                if let Some(ptr) = self.message_queues[id].take() {
+                    unsafe {
+                        let mut boxed = Box::from_raw(ptr.as_ptr());
+                        boxed.close()?;
+                    }
+                    Ok(())
+                } else {
+                    Err(IPCError::NotFound)
+                }
+            }
+            IPCType::SharedMemory => {
+                if let Some(ptr) = self.shared_memories[id].take() {
+                    unsafe {
+                        let mut boxed = Box::from_raw(ptr.as_ptr());
+                        boxed.close()?;
+                    }
+                    Ok(())
+                } else {
+                    Err(IPCError::NotFound)
+                }
+            }
+            _ => Err(IPCError::InvalidSize),
+        }
+    }
+}
+
+impl Drop for IPCManager {
+    fn drop(&mut self) {
+        for i in 0..256 {
+            if let Some(ptr) = self.pipes[i].take() {
+                unsafe {
+                    let _ = Box::from_raw(ptr.as_ptr());
+                }
+            }
+            if let Some(ptr) = self.message_queues[i].take() {
+                unsafe {
+                    let _ = Box::from_raw(ptr.as_ptr());
+                }
+            }
+            if let Some(ptr) = self.shared_memories[i].take() {
+                unsafe {
+                    let _ = Box::from_raw(ptr.as_ptr());
+                }
+            }
+        }
+    }
+}
+
+/// Custom vector implementation for no_std IPC structures without standard lib
+pub struct CustomIpcVec<T> {
+    data: *mut T,
+    capacity: usize,
+    len: usize,
+}
+
+impl<T> CustomIpcVec<T> {
+    pub const fn new() -> Self {
+        Self {
+            data: core::ptr::null_mut(),
+            capacity: 0,
+            len: 0,
+        }
+    }
+
+    pub fn push(&mut self, item: T) {
+        if self.len == self.capacity {
+            let new_cap = if self.capacity == 0 {
+                4
+            } else {
+                self.capacity * 2
+            };
+            let new_data = unsafe { alloc(new_cap * core::mem::size_of::<T>()) } as *mut T;
+            if !self.data.is_null() {
+                unsafe {
+                    core::ptr::copy_nonoverlapping(self.data, new_data, self.len);
+                    free(self.data as *mut u8);
+                }
+            }
+            self.data = new_data;
+            self.capacity = new_cap;
+        }
+
+        unsafe {
+            core::ptr::write(self.data.add(self.len), item);
+        }
+        self.len += 1;
+    }
+
+    pub fn len(&self) -> usize {
+        self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+}
+
+impl<T> Drop for CustomIpcVec<T> {
+    fn drop(&mut self) {
+        if !self.data.is_null() {
+            for i in 0..self.len {
+                unsafe {
+                    core::ptr::drop_in_place(self.data.add(i));
+                }
+            }
+            unsafe {
+                free(self.data as *mut u8);
+            }
+        }
+    }
+}
+
 extern "C" {
     fn alloc(size: usize) -> *mut u8;
     fn free(ptr: *mut u8);
@@ -960,6 +1202,41 @@ impl<'a, T> IntoIterator for &'a mut CustomIpcVec<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_canonical_ipc_channel_and_objects() {
+        let perms = IpcPermissions::new(1000, 1000, 0o660);
+        assert!(perms.check_access(1000, 1000, 0o4));
+        assert!(!perms.check_access(2000, 2000, 0o4));
+
+        let mut channel = IpcChannel::new(1, IPCType::Pipe, 64, perms);
+        let data = b"hello ipc world";
+        let written = channel.write(data).unwrap();
+        assert_eq!(written, data.len());
+
+        let mut read_buf = [0u8; 64];
+        let read_bytes = channel.read(&mut read_buf).unwrap();
+        assert_eq!(read_bytes, data.len());
+        assert_eq!(&read_buf[..read_bytes], data);
+
+        assert_eq!(channel.stats.bytes_written, data.len() as u64);
+        assert_eq!(channel.stats.bytes_read, data.len() as u64);
+
+        let mut endpoint = IpcEndpoint::new(10, 1, 100, true, true);
+        assert!(!endpoint.closed);
+        assert!(endpoint.close().is_ok());
+        assert_eq!(endpoint.close(), Err(IPCError::EndpointClosed));
+
+        let mut shm = SharedMemoryRegion::new(5, 4096, perms);
+        shm.attach();
+        assert_eq!(shm.ref_count, 2);
+        shm.detach();
+        assert_eq!(shm.ref_count, 1);
+
+        let mut fd = FileDescriptorHandle::new(3, 1, true);
+        assert!(fd.close().is_ok());
+        assert_eq!(fd.close(), Err(IPCError::EndpointClosed));
+    }
 
     #[test]
     fn test_serenity_ipc_message_serialization() {

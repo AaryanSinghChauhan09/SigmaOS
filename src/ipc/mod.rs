@@ -35,8 +35,10 @@ pub use sigmabus::{
 };
 
 pub use ipc::{
-    IPCCapability, IPCEndpoint, IPCError, IPCInfo, IPCManager, IPCType, MessageQueue, Pipe,
+    FileDescriptorHandle, IPCCapability, IPCEndpoint, IPCError, IPCInfo, IPCManager, IPCType,
+    IpcChannel, IpcEndpoint, IpcPermissions, IpcStatistics, MessageBuffer, MessageQueue, Pipe,
     SerenityIpcMessage, SerenityIpcSandboxEnforcer, SerenitySharedBackingStore, SharedMemory,
+    SharedMemoryRegion, WaitQueue,
 };
 
 pub use unix_socket::{

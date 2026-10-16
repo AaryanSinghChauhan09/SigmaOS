@@ -1,43 +1,58 @@
 ## Summary
 
-<!-- What component does this PR improve or add? -->
+<!-- What changed and why? -->
 
-## Related issue
+## Component
 
-Closes #<issue-id>
-
-## Upstream study
-
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
-
-## What SigmaOS adopts
-
-<!-- State the design principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
-
-## Component impact
-
-- Component:
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
+- [ ] IPC handler
+- [ ] Pipes / FIFOs
+- [ ] UNIX-domain sockets
+- [ ] Shared memory
+- [ ] Message queues
+- [ ] Event wakeups
+- [ ] Signals
+- [ ] Process/thread management
+- [ ] VFS
+- [ ] Security
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Changes
 
-- [ ] Source implementation
+-
+
+## Motivation
+
+<!-- Link issue, roadmap item, or gap-analysis entry. -->
+
+## IPC semantics
+
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Error behavior:
+- Permission model:
+- Resource limits:
+- Backpressure policy:
+
+## Security review
+
+- [ ] User input validated
+- [ ] Descriptor lifecycle checked
+- [ ] Capability/namespace checks enforced
+- [ ] No unbounded kernel allocation
+- [ ] `unsafe` justified with SAFETY comments
+- [ ] Threat model updated
+
+## Tests
+
 - [ ] Unit tests
 - [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test for fixed bug
 
 ## Verification
 
@@ -52,29 +67,18 @@ make test
 make format
 ```
 
-Paste relevant output below.
+Paste output below.
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+## Capability status
 
 - Previous status:
 - New status:
 - Evidence:
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+## Integration impact
 
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Tests cover the change
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported parity claims
+- [ ] Unit-tested only
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
