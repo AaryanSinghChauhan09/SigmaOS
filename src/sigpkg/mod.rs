@@ -421,3 +421,6 @@ pub use nix_store::{
     NixGcRoot, NixHash, NixHashAlgo, NixOutput, NixProfile, NixProfileGeneration, NixStore,
     NixStorePath,
 };
+
+pub use crate::package::sovereign_distro_package_advancements_v37::*;
+pub use crate::package::sovereign_distro_package_advancements_v47::*;
