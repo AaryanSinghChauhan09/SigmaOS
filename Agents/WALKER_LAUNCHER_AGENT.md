@@ -1,37 +1,46 @@
 # Walker Fast Fuzzy Application Launcher Component Agent
 
-## Component Overview
-Provides instantaneous fuzzy search application launching, dmenu command execution, clipboard history browsing, web search shortcuts, and mathematical expression evaluation inspired by Omarchy Linux Walker.
+## Role
+The **Walker Launcher Agent** (`SigmaWalkerAgent`) drives instantaneous, keyboard-centric application launching, open window switching, calculator evaluations, and custom command dispatching inspired by Omarchy's `walker` (https://github.com/omacom/walker) and Rofi/Fuzzel.
 
-## Linux Inspiration
-Walker (Go/Rust fast launcher), Rofi application switcher, Fuzzel Wayland launcher, and Albert desktop search.
-
-## BSD Inspiration
-OpenBSD dmenu minimalist keyboard-driven menu, FreeBSD pkg search integration.
+## Linux & BSD Inspiration
+- **Omarchy / Linux**: Walker (Go/Rust ultra-fast launcher with SIMD matching), Rofi application switcher, Fuzzel Wayland launcher, Albert desktop search.
+- **BSD**: OpenBSD dmenu minimalist keyboard-driven menu, FreeBSD pkg search integration.
 
 ## Current SigmaOS Status
-Fuzzy search scoring and application indexing implemented in OmarchyWalkerLauncherEngine. Clipboard history parser and terminal command runner functional.
+Sub-millisecond fuzzy search scoring, desktop item indexing, and Wayland layer-shell keyboard grabbing implemented in `SovereignWalkerEngine` (`src/desktop/walker_engine.rs`).
 
-## Critical Missing Features
-Asynchronous file search with mlocate/fd index caching, custom emoji picker, and shell history search integration.
+## Public API & Invariant Contract
+```rust
+pub struct LauncherItem {
+    pub title: String,
+    pub subtitle: String,
+    pub exec_cmd: String,
+    pub icon_name: String,
+    pub item_type: LauncherItemType,
+}
 
-## Implementation Priority
-HIGH (Phase 1)
+pub struct SovereignWalkerEngine {
+    pub fn register_item(&mut self, item: LauncherItem);
+    pub fn fuzzy_score(pattern: &str, text: &str) -> i32;
+    pub fn query<'a>(&'a self, search_query: &str, limit: usize) -> Vec<ScoredMatch<'a>>;
+}
+```
 
-## Key Files to Create/Improve
-src/distro/omarchy_linux_apex_engine.rs, src/desktop/launcher.rs, src/desktop/omarchy_palette.rs
+## Key Files to Maintain & Improve
+- `src/desktop/walker_engine.rs`
+- `src/desktop/mod.rs`
+- `src/distro/omarchy_linux_apex_engine.rs`
 
 ## Testing Strategy
-Search latency benchmarks across 10,000 indexed binaries (<1ms query response), fuzzy ranking accuracy tests.
-
-## Dependencies
-DESKTOP_ENVIRONMENT_AGENT, IPC_AGENT, FILESYSTEM_VFS_AGENT
-
-## Success Criteria
-Sub-1ms keystroke-to-results response, zero search lag, seamless keyboard-only navigation.
-
-## Open Source Competitors Analysis
-10x faster than Electron and Python launchers (like Ulauncher or GNOME search), using zero heap allocations during search cycles.
+```bash
+rustc --test src/desktop/walker_engine.rs --edition 2021 -o /tmp/test_walker && /tmp/test_walker --test-threads=1
+```
+- Verify sub-1ms response latency across 10,000 indexed candidates.
+- Ensure exact prefix matches score higher than scattered substring matches.
+- Enforce limit truncations to prevent unbounded vector allocation.
 
 ## Future Enhancements
-Predictive launcher suggestions learning user habit patterns based on time of day and active workspace.
+- Asynchronous file search with mlocate/fd index caching.
+- Custom emoji picker, clipboard history ring, and shell history search integration.
+- Predictive launcher suggestions learning user habit patterns based on time of day and active workspace.

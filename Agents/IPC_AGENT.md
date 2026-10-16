@@ -1,37 +1,47 @@
 # Inter-Process Communication & Message Bus Component Agent
 
-## Component Overview
-The IPC subsystem coordinates high-throughput Unix domain sockets, anonymous pipes, shared-memory rings, SigmaBus event broker, and POSIX message queues.
+## Role
+`SigmaIPC` coordinates the complete suite of Inter-Process Communication primitives for SigmaOS — high-throughput Unix domain sockets, anonymous pipes, shared-memory rings, SigmaBus event broker, semaphores, and POSIX message queues.
 
-## Linux Inspiration
-Linux Unix sockets (AF_UNIX with SCM_RIGHTS descriptor passing), futex fast userspace mutexes, eventfd, and memfd_create.
-
-## BSD Inspiration
-FreeBSD kqueue/kevent for unified event notifications, OpenBSD unveil and pledge capability passing, DragonFly BSD port messaging.
+## Linux & BSD Inspiration
+| Concept | Linux | FreeBSD | SigmaOS |
+|---|---|---|---|
+| Pipes | `pipe(2)`, `splice` | `pipe(2)` | SigmaPipe (zero-copy ring buffers) |
+| POSIX MQ | `mq_open(3)` | `mq_open(3)` | SigmaMQ (priority max-heap) |
+| Shared Memory | `shm_open(3)`, memfd_create | `shm_open(3)` | SigmaSHM (anonymous mmap backed) |
+| Semaphores | POSIX + SysV semaphores | POSIX semaphores | SigmaSem |
+| Unix Sockets | `AF_UNIX` (SCM_RIGHTS fd passing) | `AF_UNIX` | SigmaUnixSocket |
+| D-Bus / Broker | dbus-daemon / kdbus / varlink | D-Bus | SigmaBus (lockless in-kernel bus) |
+| Event notification | futex, eventfd, signalfd | kqueue / kevent | SigmaFutex & SigmaKqueue |
 
 ## Current SigmaOS Status
-Pipes, shared memory segments, and basic SigmaBus message queues implemented. SCM_RIGHTS fd passing and zero-copy futex sync require completion.
+Circular pipes, shared memory segments, and basic SigmaBus message queues implemented in `src/ipc/`. SCM_RIGHTS file descriptor passing and zero-copy futex sync are active enhancement targets.
 
-## Critical Missing Features
-Capability and file descriptor passing across Unix domain sockets, kernel-assisted futex waiting with priority inheritance, and high-performance D-Bus wire protocol compatibility.
+## Responsibilities & Architecture
+- Anonymous and named pipes (`pipe`, `fifo`) with non-blocking I/O.
+- POSIX message queues (`mq_open`, `mq_send`, `mq_receive`, `mq_notify`) with priority ordering.
+- Shared memory segments with permission validation and `memfd_create` sealing.
+- Named and unnamed POSIX semaphores.
+- Unix domain sockets (`AF_UNIX`) supporting connection-oriented stream and datagram transport.
+- Fast userspace mutexes (`futex`) with kernel wait-queues and priority inheritance.
+- System event broker (`SigmaBus`) delivering 10M+ msg/sec lockless message passing.
 
-## Implementation Priority
-HIGH (Phase 1)
-
-## Key Files to Create/Improve
-src/ipc/sigmabus.rs, src/ipc/pipe.rs, src/ipc/shared_mem.rs, src/ipc/futex.rs, src/ipc/unix_socket.rs
+## Source Files
+- `src/ipc/sigmabus.rs`
+- `src/ipc/pipe.rs`
+- `src/ipc/shared_mem.rs`
+- `src/ipc/futex.rs`
+- `src/ipc/unix_socket.rs`
 
 ## Testing Strategy
-IPC round-trip ping-pong benchmarks, multi-producer multi-consumer stress tests, and deadlock detection fuzzing.
+```bash
+rustc --test src/ipc/pipe.rs --edition 2021 -o /tmp/test_ipc && /tmp/test_ipc --test-threads=1
+```
+- Multi-producer multi-consumer throughput saturation tests.
+- IPC ping-pong round-trip latency benchmarking (<1 microsecond).
+- Deadlock detection fuzzing across nested lock acquisitions.
 
-## Dependencies
-PROCESS_MANAGEMENT_AGENT, MEMORY_MANAGEMENT_AGENT, SECURITY_AGENT
-
-## Success Criteria
-Sub-microsecond message transit time, 10M+ messages/second throughput on shared memory buses, zero unauthorized cross-process snooping.
-
-## Open Source Competitors Analysis
-Replaces slow userspace dbus-daemon (which throttles GNOME/Linux Mint) with a kernel-accelerated lockless ring delivering 20x throughput.
-
-## Future Enhancements
-Zero-overhead shared memory enclaves for local AI model inference streaming.
+## Future Development
+1. **io_uring IPC** — Zero-copy IPC message dispatching directly through shared ring buffers.
+2. **Native Rust D-Bus wire protocol** — Drop userspace daemon overhead with kernel-accelerated dispatching.
+3. **Memfd sealing** — Immutable shared memory for zero-copy sandboxed AI inferences.
