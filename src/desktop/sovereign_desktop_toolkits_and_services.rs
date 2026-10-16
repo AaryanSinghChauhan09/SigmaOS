@@ -404,11 +404,7 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
-    pub fn initiate_xdmcp_remote_handshake(
-        &mut self,
-        client_address: &str,
-        display_number: u32,
-    ) -> usize {
+    pub fn initiate_xdmcp_remote_handshake(&mut self, client_address: &str, display_number: u32) -> usize {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
             session_id: id,
@@ -416,8 +412,7 @@ impl SovereignDisplayManagerSuiteEngine {
             display_number,
             status: "Active".to_string(),
         });
-        self.xdmcp_manager
-            .initiate_handshake(&format!(":{}", display_number), client_address);
+        self.xdmcp_manager.initiate_handshake(&format!(":{}", display_number), client_address);
         id
     }
 

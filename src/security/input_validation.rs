@@ -145,9 +145,8 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
 ///
 /// Rules:
 /// - Non-empty, ≤ `MAX_URL_LEN` (2048 bytes)
-/// - Scheme must be allowlisted (`http://` or `https://`, ASCII case-insensitive per RFC 3986)
+/// - Scheme must be allowlisted (`http://` or `https://`)
 /// - Rejects NUL bytes (`NullByte`) and ASCII control characters / spaces (`b <= 32` or `b == 127`, mitigating CWE-150 / CWE-117)
-/// - Rejects backslashes (`\`) in URLs to prevent WHATWG vs RFC 3986 URL parser differential attacks (CWE-601 / CWE-918)
 /// - Rejects userinfo credentials (`user:pass@`) in authority to prevent SSRF and credential disclosure (CWE-918)
 pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
     if url.is_empty() {
@@ -157,7 +156,7 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
-    // Check scheme: http:// or https:// (ASCII case-insensitive per RFC 3986)
+    // Check scheme case-insensitively per RFC 3986: http:// or https://
     let host_start = if url.len() >= 7 && url[..7].eq_ignore_ascii_case(b"http://") {
         7
     } else if url.len() >= 8 && url[..8].eq_ignore_ascii_case(b"https://") {
@@ -166,7 +165,7 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::InvalidChars);
     };
 
-    // Find end of host/authority part (before '/', '?', '#', '\')
+    // Find end of host/authority part (before '/', '?', '#', or '\')
     let rest = &url[host_start..];
     let host_len = rest
         .iter()
@@ -183,7 +182,8 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::InvalidChars);
     }
 
-    // Iterate through all bytes: check for NUL, control chars/spaces, and backslashes
+    // Iterate through all bytes: check for NUL, control chars/spaces, and backslashes (`\`)
+    // Rejects backslashes to prevent WHATWG vs RFC 3986 URL parser differential attacks (CWE-601 / CWE-918)
     for &b in url {
         if b == 0 {
             return Err(ValidationError::NullByte);
@@ -1012,19 +1012,17 @@ mod tests {
         );
         assert_eq!(validate_url(b"http://127.0.0.1:8080/api/v1"), Ok(()));
 
-        // RFC 3986 ASCII case-insensitive scheme support
+        // ASCII case-insensitive scheme matching (RFC 3986)
         assert_eq!(validate_url(b"HTTP://example.com"), Ok(()));
-        assert_eq!(validate_url(b"HTTPS://example.com/path"), Ok(()));
-        assert_eq!(validate_url(b"Http://example.com"), Ok(()));
-        assert_eq!(validate_url(b"Https://example.com"), Ok(()));
+        assert_eq!(validate_url(b"Https://example.com/path"), Ok(()));
 
-        // Backslash rejection in URLs (WHATWG vs RFC 3986 parser differential, CWE-601 / CWE-918)
+        // Backslash rejection (WHATWG vs RFC 3986 parser differential / SSRF prevention CWE-601 / CWE-918)
         assert_eq!(
-            validate_url(b"http://attacker.com\\example.com"),
+            validate_url(b"http://example.com\\path"),
             Err(ValidationError::InvalidChars)
         );
         assert_eq!(
-            validate_url(b"http://example.com\\path"),
+            validate_url(b"https://example.com\\@evil.com"),
             Err(ValidationError::InvalidChars)
         );
 

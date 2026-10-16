@@ -445,8 +445,7 @@ impl ElementaryAppCenterEngine {
     }
 
     pub fn set_pwyw_custom_price(&mut self, package_id: &str, price_usd: u32) {
-        self.custom_pwyw_payments
-            .insert(package_id.to_string(), price_usd);
+        self.custom_pwyw_payments.insert(package_id.to_string(), price_usd);
     }
 
     pub fn generate_pr_proposal(&self) -> ElementaryComponentPrProposal {

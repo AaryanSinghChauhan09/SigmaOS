@@ -116,8 +116,7 @@ impl PhotocraftRawProcessingPrEngine {
             components_added: vec![
                 "32-bit float ProRAW / DNG / CR3 / NEF Bayer matrix demosaicing".to_string(),
                 "Non-destructive exposure bias (-5EV to +5EV) & highlight recovery".to_string(),
-                "Automatic lens distortion, chromatic aberration & vignette profile matcher"
-                    .to_string(),
+                "Automatic lens distortion, chromatic aberration & vignette profile matcher".to_string(),
             ],
             performance_multiplier: "12x Faster SIMD Demosaicing (<8.5ms 45MP RAW)".to_string(),
             status: "Ready for Merge".to_string(),
@@ -197,6 +196,12 @@ impl PhotocraftAiInpaintingPrEngine {
 
 pub struct PhotocraftAiInpaintingPrEngineProposal {
     pub manifest: PhotocraftPrProposalManifest,
+}
+
+impl Default for PhotocraftAiInpaintingPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 // ============================================================================
