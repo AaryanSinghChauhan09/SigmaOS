@@ -139,7 +139,9 @@ impl UniversalMultiDistroPackageInspectorV48 {
             DetectedPayloadContainerV48::XzCompressed
         } else if payload.len() >= 3 && &payload[0..3] == b"BZh" {
             DetectedPayloadContainerV48::Bzip2Compressed
-        } else if payload.len() >= 4 && (&payload[0..4] == b"PK\x03\x04" || &payload[0..4] == b"PK\x05\x06") {
+        } else if payload.len() >= 4
+            && (&payload[0..4] == b"PK\x03\x04" || &payload[0..4] == b"PK\x05\x06")
+        {
             DetectedPayloadContainerV48::ZipArchive
         } else if payload.len() >= 4 && (&payload[0..4] == b"hsqs" || &payload[0..4] == b"sqsh") {
             DetectedPayloadContainerV48::SquashFsImage
@@ -288,11 +290,9 @@ impl UniversalMultiDistroPackageInspectorV48 {
             f if f.ends_with(".pup") || f.ends_with("pup") => {
                 (PackageFormat::Pup, PackageSignatureKindV48::Unsigned, "zip")
             }
-            f if f.ends_with(".pet") => (
-                PackageFormat::Pet,
-                PackageSignatureKindV48::Unsigned,
-                "tgz",
-            ),
+            f if f.ends_with(".pet") => {
+                (PackageFormat::Pet, PackageSignatureKindV48::Unsigned, "tgz")
+            }
             f if f.ends_with(".spack") => (
                 PackageFormat::Spack,
                 PackageSignatureKindV48::GpgOpenPgp,
@@ -351,11 +351,9 @@ impl UniversalMultiDistroPackageInspectorV48 {
             f if f.ends_with(".xz") || f.ends_with(".tar.xz") => {
                 (PackageFormat::Xz, PackageSignatureKindV48::Unsigned, "xz")
             }
-            f if f.ends_with(".tar") => (
-                PackageFormat::Tar,
-                PackageSignatureKindV48::Unsigned,
-                "raw",
-            ),
+            f if f.ends_with(".tar") => {
+                (PackageFormat::Tar, PackageSignatureKindV48::Unsigned, "raw")
+            }
             _ => (
                 PackageFormat::SigmaPkg,
                 PackageSignatureKindV48::PqcKyberDilithium,
@@ -463,7 +461,10 @@ impl GentooUseFlagAndBsdPortsFlavourSolverV48 {
         flags.insert("pam".to_string(), true);
 
         let mut flavours = BTreeMap::new();
-        flavours.insert("default".to_string(), vec!["DOCS".to_string(), "EXAMPLES".to_string()]);
+        flavours.insert(
+            "default".to_string(),
+            vec!["DOCS".to_string(), "EXAMPLES".to_string()],
+        );
         flavours.insert("lite".to_string(), vec!["MINIMAL".to_string()]);
 
         Self {
@@ -482,7 +483,11 @@ impl GentooUseFlagAndBsdPortsFlavourSolverV48 {
             if let Some(pos) = dep.find('?') {
                 let flag_name = &dep[..pos];
                 let is_negated = flag_name.starts_with('!');
-                let actual_flag = if is_negated { &flag_name[1..] } else { flag_name };
+                let actual_flag = if is_negated {
+                    &flag_name[1..]
+                } else {
+                    flag_name
+                };
 
                 let flag_state = *self.active_use_flags.get(actual_flag).unwrap_or(&false);
                 let condition_met = if is_negated { !flag_state } else { flag_state };
@@ -529,7 +534,8 @@ impl MultiOsSandboxGovernorV48 {
                     pledge_promises: "stdio rpath wpath cpath inet dns".to_string(),
                     unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
                     capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
-                    seccomp_bpf_filter: "SECCOMP_RET_ALLOW(read, write, openat, exit_group)".to_string(),
+                    seccomp_bpf_filter: "SECCOMP_RET_ALLOW(read, write, openat, exit_group)"
+                        .to_string(),
                 }
             }
             PackageFormat::OpenBsdPkg | PackageFormat::Ports => SandboxRulesV48 {
@@ -869,12 +875,22 @@ impl UniversalPmCliRouterV48 {
                 if parts.contains(&"install") {
                     (
                         UniversalPmActionV48::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
                         UniversalPmActionV48::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV48::Update, vec![])
@@ -884,33 +900,59 @@ impl UniversalPmCliRouterV48 {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
                         UniversalPmActionV48::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
                         UniversalPmActionV48::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV48::Query, vec![])
                 }
             }
-            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew" | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
+            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
+            | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
                         UniversalPmActionV48::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (
                         UniversalPmActionV48::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 }
             }
             _ => (
                 UniversalPmActionV48::Install,
-                parts.get(1..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                parts
+                    .get(1..)
+                    .unwrap_or(&[])
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
             ),
         };
 
@@ -1018,14 +1060,20 @@ impl SovereignDistroPackageAdvancementsSuiteV48 {
         let sigpkg_id = format!("sigpkg-v48-{}", manifest.name);
         self.installed_packages.push(sigpkg_id.clone());
 
-        self.pr_gateway.submit_proposal(PackagePrProposalManifestV48 {
-            pr_id: 4801,
-            title: format!("PR Proposal: Auto-integrate foreign package '{}'", manifest.name),
-            source_format: manifest.detected_format,
-            target_native_package: sigpkg_id,
-            changes_summary: "Complete Linux/BSD multi-distro package adaptation and SAT DPLL resolution".to_string(),
-            verification_passed: true,
-        });
+        self.pr_gateway
+            .submit_proposal(PackagePrProposalManifestV48 {
+                pr_id: 4801,
+                title: format!(
+                    "PR Proposal: Auto-integrate foreign package '{}'",
+                    manifest.name
+                ),
+                source_format: manifest.detected_format,
+                target_native_package: sigpkg_id,
+                changes_summary:
+                    "Complete Linux/BSD multi-distro package adaptation and SAT DPLL resolution"
+                        .to_string(),
+                verification_passed: true,
+            });
 
         Ok(sigpkg)
     }
@@ -1043,19 +1091,32 @@ mod tests {
     fn test_package_inspector_and_magic_detection_v48() {
         let mut inspector = UniversalMultiDistroPackageInspectorV48::new();
 
-        let elf_payload = b"\x7FELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x3E\x00_ELF_DATA_V48";
-        let manifest = inspector.inspect_package("htop.pkg.tar.zst", elf_payload).unwrap();
+        let elf_payload =
+            b"\x7FELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x3E\x00_ELF_DATA_V48";
+        let manifest = inspector
+            .inspect_package("htop.pkg.tar.zst", elf_payload)
+            .unwrap();
 
         assert_eq!(manifest.detected_format, PackageFormat::Pacman);
-        assert_eq!(manifest.payload_container, DetectedPayloadContainerV48::ElfBinary);
+        assert_eq!(
+            manifest.payload_container,
+            DetectedPayloadContainerV48::ElfBinary
+        );
         assert_eq!(manifest.target_microarch, "x86_64-v4");
-        assert_eq!(manifest.signature_kind, PackageSignatureKindV48::PqcKyberDilithium);
+        assert_eq!(
+            manifest.signature_kind,
+            PackageSignatureKindV48::PqcKyberDilithium
+        );
         assert_eq!(manifest.payload_sha256, compute_hex_checksum(elf_payload));
 
-        let deb_payload = b"!<arch>\ndebian-binary   1700000000  0     0     100644  4         `\n2.0\n";
+        let deb_payload =
+            b"!<arch>\ndebian-binary   1700000000  0     0     100644  4         `\n2.0\n";
         let deb_manifest = inspector.inspect_package("curl.deb", deb_payload).unwrap();
         assert_eq!(deb_manifest.detected_format, PackageFormat::Deb);
-        assert_eq!(deb_manifest.payload_container, DetectedPayloadContainerV48::DebianArArchive);
+        assert_eq!(
+            deb_manifest.payload_container,
+            DetectedPayloadContainerV48::DebianArArchive
+        );
     }
 
     #[test]
