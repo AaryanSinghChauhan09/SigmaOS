@@ -76,6 +76,18 @@ impl DesigncraftPrCategory {
             Self::CodeExporterMultiFramework => {
                 "design-to-code generator & multi-framework asset exporter"
             }
+            Self::ComponentVariantsStateMachine => {
+                "interactive component variants & state machine manager"
+            }
+            Self::DesignTokensStyleDictionary => {
+                "W3C design tokens & style dictionary transformer"
+            }
+            Self::IconSystemPackagingSymbols => {
+                "vector icon library packaging & SVG symbol sprite compiler"
+            }
+            Self::AccessibilityAuditWcagLint => {
+                "WCAG 2.1 AA/AAA accessibility contrast & touch target auditor"
+            }
         }
     }
 }
@@ -226,8 +238,7 @@ impl DesigncraftInteractivePrototypingPrEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title: "feat(designcraft): Interactive Screen Flow Prototyping & Smart Transitions"
-                .to_string(),
+            pr_title: "feat(designcraft): Interactive Screen Flow Prototyping & Smart Transitions".to_string(),
             target_subsystem: "Interactive Prototyping Engine".to_string(),
             original_suite: "ArtCraft DesignCraft Prototyper".to_string(),
             components_added: vec![
@@ -347,8 +358,7 @@ impl DesigncraftAutoLayoutFlexEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title: "feat(designcraft): Auto-Layout Flexbox Containers & Resizing Constraints"
-                .to_string(),
+            pr_title: "feat(designcraft): Auto-Layout Flexbox Containers & Resizing Constraints".to_string(),
             target_subsystem: "Flexbox Auto-Layout Engine".to_string(),
             original_suite: "ArtCraft DesignCraft Auto-Layout Studio".to_string(),
             components_added: vec![
@@ -456,8 +466,7 @@ impl DesigncraftDesignSystemVariablesEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title: "feat(designcraft): Design System Tokens, Theme Variable Modes & Aliasing"
-                .to_string(),
+            pr_title: "feat(designcraft): Design System Tokens, Theme Variable Modes & Aliasing".to_string(),
             target_subsystem: "Design System Token Engine".to_string(),
             original_suite: "ArtCraft DesignCraft Variable Studio".to_string(),
             components_added: vec![
@@ -595,8 +604,7 @@ impl DesigncraftVectorGeometryEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title: "feat(designcraft): Non-Destructive Boolean Vector Geometry & Bezier Knots"
-                .to_string(),
+            pr_title: "feat(designcraft): Non-Destructive Boolean Vector Geometry & Bezier Knots".to_string(),
             target_subsystem: "Vector Geometry Engine".to_string(),
             original_suite: "ArtCraft DesignCraft Vector Suite".to_string(),
             components_added: vec![
@@ -604,8 +612,7 @@ impl DesigncraftVectorGeometryEngine {
                 "Sub-pixel precision cubic Bezier control points and knot handles".to_string(),
                 "Stroke caps (Butt/Round/Square) & joins (Miter/Round/Bevel)".to_string(),
             ],
-            performance_multiplier: "GPU-Accelerated Resolution-Independent Vector Render"
-                .to_string(),
+            performance_multiplier: "GPU-Accelerated Resolution-Independent Vector Render".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -681,15 +688,12 @@ impl DesigncraftMultiplayerCrdtEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title:
-                "feat(designcraft): Real-Time Multiplayer CRDT State Sync & Collaborative Cursors"
-                    .to_string(),
+            pr_title: "feat(designcraft): Real-Time Multiplayer CRDT State Sync & Collaborative Cursors".to_string(),
             target_subsystem: "CRDT Multiplayer Collaboration Hub".to_string(),
             original_suite: "ArtCraft DesignCraft Multiplayer Engine".to_string(),
             components_added: vec![
                 "Lockless operation-based CRDT state history log".to_string(),
-                "Multi-user presence, multiplayer live cursor tracking & selection bounds"
-                    .to_string(),
+                "Multi-user presence, multiplayer live cursor tracking & selection bounds".to_string(),
                 "Non-destructive conflict-free branch merging and undo/redo".to_string(),
             ],
             performance_multiplier: "Sub-10ms Global State Synchronization".to_string(),
@@ -764,8 +768,7 @@ impl DesigncraftCodeExportEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title: "feat(designcraft): Multi-Framework Design-to-Code Exporter Engine"
-                .to_string(),
+            pr_title: "feat(designcraft): Multi-Framework Design-to-Code Exporter Engine".to_string(),
             target_subsystem: "Design-to-Code Asset Exporter".to_string(),
             original_suite: "ArtCraft DesignCraft Code Exporter".to_string(),
             components_added: vec![
@@ -816,24 +819,15 @@ impl DesigncraftComponentVariantsPrEngine {
         id
     }
 
-    pub fn set_override(
-        &mut self,
-        variant_id: u32,
-        prop: String,
-        val: String,
-    ) -> Result<(), &'static str> {
-        let variant = self
-            .variants
-            .get_mut(&variant_id)
-            .ok_or("Variant not found")?;
+    pub fn set_override(&mut self, variant_id: u32, prop: String, val: String) -> Result<(), &'static str> {
+        let variant = self.variants.get_mut(&variant_id).ok_or("Variant not found")?;
         variant.property_overrides.insert(prop, val);
         Ok(())
     }
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title: "feat(designcraft): Interactive Component Variants & State Machine Manager"
-                .to_string(),
+            pr_title: "feat(designcraft): Interactive Component Variants & State Machine Manager".to_string(),
             target_subsystem: "Component Variant State Machine".to_string(),
             original_suite: "ArtCraft DesignCraft Component Studio".to_string(),
             components_added: vec![
@@ -870,9 +864,7 @@ pub struct DesigncraftDesignTokensStyleDictionaryPrEngine {
 
 impl DesigncraftDesignTokensStyleDictionaryPrEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            tokens: BTreeMap::new(),
-        };
+        let mut engine = Self { tokens: BTreeMap::new() };
         engine.register_token("color.primary", "color", "#0066FF");
         engine.register_token("size.padding.md", "dimension", "16px");
         engine
@@ -899,15 +891,12 @@ impl DesigncraftDesignTokensStyleDictionaryPrEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title:
-                "feat(designcraft): W3C Design Tokens & Style Dictionary Multi-Platform Transformer"
-                    .to_string(),
+            pr_title: "feat(designcraft): W3C Design Tokens & Style Dictionary Multi-Platform Transformer".to_string(),
             target_subsystem: "Style Dictionary Token Pipeline".to_string(),
             original_suite: "ArtCraft DesignCraft Tokens Transformer".to_string(),
             components_added: vec![
                 "W3C Design Token Standard JSON specification parser".to_string(),
-                "Cross-platform transformer for CSS variables, SCSS, Swift & Android XML"
-                    .to_string(),
+                "Cross-platform transformer for CSS variables, SCSS, Swift & Android XML".to_string(),
                 "Token dependency graph alias resolver".to_string(),
             ],
             performance_multiplier: "Automated Multi-Platform Token Synchronizer".to_string(),
@@ -939,14 +928,8 @@ pub struct DesigncraftIconSystemPackagingPrEngine {
 
 impl DesigncraftIconSystemPackagingPrEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            icons: BTreeMap::new(),
-        };
-        engine.add_icon(
-            "check",
-            "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z",
-            "0 0 24 24",
-        );
+        let mut engine = Self { icons: BTreeMap::new() };
+        engine.add_icon("check", "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z", "0 0 24 24");
         engine
     }
 
@@ -973,9 +956,7 @@ impl DesigncraftIconSystemPackagingPrEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title:
-                "feat(designcraft): Vector Icon Library Packaging & SVG Symbol Sprite Compiler"
-                    .to_string(),
+            pr_title: "feat(designcraft): Vector Icon Library Packaging & SVG Symbol Sprite Compiler".to_string(),
             target_subsystem: "Vector Icon System".to_string(),
             original_suite: "ArtCraft DesignCraft Icon Packaging Studio".to_string(),
             components_added: vec![
@@ -1043,9 +1024,7 @@ pub struct DesigncraftAccessibilityAuditLintPrEngine {
 
 impl DesigncraftAccessibilityAuditLintPrEngine {
     pub fn new() -> Self {
-        Self {
-            min_touch_target: 44.0,
-        }
+        Self { min_touch_target: 44.0 }
     }
 
     pub fn audit_contrast(&self, fg: RgbColor, bg: RgbColor) -> (f32, bool, bool) {
@@ -1061,19 +1040,15 @@ impl DesigncraftAccessibilityAuditLintPrEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftPrProposalManifest {
         DesigncraftPrProposalManifest {
-            pr_title:
-                "feat(designcraft): WCAG 2.1 AA/AAA Accessibility Contrast & Touch Target Auditor"
-                    .to_string(),
+            pr_title: "feat(designcraft): WCAG 2.1 AA/AAA Accessibility Contrast & Touch Target Auditor".to_string(),
             target_subsystem: "Design System Accessibility Auditor".to_string(),
             original_suite: "ArtCraft DesignCraft Accessibility Linter".to_string(),
             components_added: vec![
                 "WCAG 2.1 AA (4.5:1) & AAA (7:1) contrast ratio validator".to_string(),
                 "Minimum touch target size (44x44px) interactive layout linter".to_string(),
-                "Color blindness simulation matrices (Protanopia, Deuteranopia, Tritanopia)"
-                    .to_string(),
+                "Color blindness simulation matrices (Protanopia, Deuteranopia, Tritanopia)".to_string(),
             ],
-            performance_multiplier: "Automated Real-Time Design System Accessibility Audit"
-                .to_string(),
+            performance_multiplier: "Automated Real-Time Design System Accessibility Audit".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -1318,13 +1293,8 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         assert!(code.contains("left-[10px]"));
 
         // 7. Verify Component Variants
-        let var_id = self
-            .variants_engine
-            .add_variant("PrimaryButton".to_string(), "Hover".to_string());
-        assert!(self
-            .variants_engine
-            .set_override(var_id, "bg".to_string(), "#0055CC".to_string())
-            .is_ok());
+        let var_id = self.variants_engine.add_variant("PrimaryButton".to_string(), "Hover".to_string());
+        assert!(self.variants_engine.set_override(var_id, "bg".to_string(), "#0055CC".to_string()).is_ok());
 
         // 8. Verify Style Dictionary
         let css = self.tokens_dictionary_engine.export_style_dictionary_css();
@@ -1336,13 +1306,8 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
 
         // 10. Verify Accessibility Audit
         let black = RgbColor { r: 0, g: 0, b: 0 };
-        let white = RgbColor {
-            r: 255,
-            g: 255,
-            b: 255,
-        };
-        let (ratio, passes_aa, passes_aaa) =
-            self.accessibility_audit_engine.audit_contrast(black, white);
+        let white = RgbColor { r: 255, g: 255, b: 255 };
+        let (ratio, passes_aa, passes_aaa) = self.accessibility_audit_engine.audit_contrast(black, white);
         assert!(ratio > 20.0);
         assert!(passes_aa && passes_aaa);
 
@@ -1398,9 +1363,7 @@ mod tests {
         let mut engine = DesigncraftComponentVariantsPrEngine::new();
         let id = engine.add_variant("IconButton".to_string(), "Disabled".to_string());
         assert_eq!(id, 1);
-        assert!(engine
-            .set_override(id, "opacity".to_string(), "0.5".to_string())
-            .is_ok());
+        assert!(engine.set_override(id, "opacity".to_string(), "0.5".to_string()).is_ok());
     }
 
     #[test]
@@ -1422,16 +1385,8 @@ mod tests {
     #[test]
     fn test_accessibility_audit_engine_functional() {
         let engine = DesigncraftAccessibilityAuditLintPrEngine::new();
-        let fg = RgbColor {
-            r: 120,
-            g: 120,
-            b: 120,
-        };
-        let bg = RgbColor {
-            r: 255,
-            g: 255,
-            b: 255,
-        };
+        let fg = RgbColor { r: 120, g: 120, b: 120 };
+        let bg = RgbColor { r: 255, g: 255, b: 255 };
         let (ratio, _passes_aa, _) = engine.audit_contrast(fg, bg);
         assert!(ratio > 1.0);
         assert!(engine.verify_touch_target(48.0, 48.0));

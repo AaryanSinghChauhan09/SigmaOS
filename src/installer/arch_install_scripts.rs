@@ -125,11 +125,7 @@ mod tests {
     fn test_pacstrap_execution() {
         let cfg = PacstrapConfig {
             target_directory: "/mnt".to_string(),
-            base_packages: vec![
-                "base".to_string(),
-                "linux".to_string(),
-                "linux-firmware".to_string(),
-            ],
+            base_packages: vec!["base".to_string(), "linux".to_string(), "linux-firmware".to_string()],
             copy_mirrorlist: true,
             use_host_cache: false,
         };

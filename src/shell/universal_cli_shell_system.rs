@@ -859,11 +859,7 @@ impl UniversalCliOptionTranslator {
         let args = &parts[1..];
 
         // 1. BSD Style Translations
-        if cmd == "ps"
-            && (args.get(0) == Some(&"aux")
-                || args.get(0) == Some(&"-ef")
-                || args.get(0) == Some(&"-A"))
-        {
+        if cmd == "ps" && (args.get(0) == Some(&"aux") || args.get(0) == Some(&"-ef") || args.get(0) == Some(&"-A")) {
             return TranslatedCliOptionCommand {
                 original_command: trimmed.to_string(),
                 canonical_command: "ps".to_string(),
@@ -871,24 +867,10 @@ impl UniversalCliOptionTranslator {
                 translated_args: vec!["-e".to_string(), "-f".to_string()],
             };
         }
-        if cmd == "tar"
-            && (args.get(0) == Some(&"xvf")
-                || args.get(0) == Some(&"czvf")
-                || args.get(0) == Some(&"xjvf"))
-        {
+        if cmd == "tar" && (args.get(0) == Some(&"xvf") || args.get(0) == Some(&"czvf") || args.get(0) == Some(&"xjvf")) {
             let mut tr_args = match args.get(0).copied() {
-                Some("czvf") => vec![
-                    "-c".to_string(),
-                    "-z".to_string(),
-                    "-v".to_string(),
-                    "-f".to_string(),
-                ],
-                Some("xjvf") => vec![
-                    "-x".to_string(),
-                    "-j".to_string(),
-                    "-v".to_string(),
-                    "-f".to_string(),
-                ],
+                Some("czvf") => vec!["-c".to_string(), "-z".to_string(), "-v".to_string(), "-f".to_string()],
+                Some("xjvf") => vec!["-x".to_string(), "-j".to_string(), "-v".to_string(), "-f".to_string()],
                 _ => vec!["-x".to_string(), "-v".to_string(), "-f".to_string()],
             };
             if args.len() > 1 {
@@ -911,11 +893,7 @@ impl UniversalCliOptionTranslator {
         }
 
         // 2. BSD & GNU CLI Option Translations (free, vmstat, ss/netstat, ip/ifconfig, df, du, sysctl, lsof, top, grep, sed, find)
-        if cmd == "grep"
-            && (args.get(0) == Some(&"-P")
-                || args.get(0) == Some(&"-E")
-                || args.get(0) == Some(&"-R"))
-        {
+        if cmd == "grep" && (args.get(0) == Some(&"-P") || args.get(0) == Some(&"-E") || args.get(0) == Some(&"-R")) {
             let flag = match args.get(0).copied() {
                 Some("-P") => "-E", // Perl regex -> Extended POSIX regex
                 Some("-R") => "-r", // Recursive
@@ -1580,13 +1558,9 @@ mod tests {
         assert_eq!(grep_p.canonical_command, "grep");
         assert_eq!(grep_p.translated_args[0], "-E");
 
-        let sed_i =
-            UniversalCliOptionTranslator::translate_command("sed -i '' 's/old/new/g' file.txt");
+        let sed_i = UniversalCliOptionTranslator::translate_command("sed -i '' 's/old/new/g' file.txt");
         assert_eq!(sed_i.canonical_command, "sed");
-        assert_eq!(
-            sed_i.translated_args,
-            vec!["-i", "'s/old/new/g'", "file.txt"]
-        );
+        assert_eq!(sed_i.translated_args, vec!["-i", "'s/old/new/g'", "file.txt"]);
 
         let df_h = UniversalCliOptionTranslator::translate_command("df -h");
         assert_eq!(df_h.canonical_command, "df");
