@@ -19,7 +19,6 @@ pub mod pdfcraft_artcraft_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
-pub mod soundcraft_missing_components_parity_pr;
 pub mod vectoranimation;
 pub mod vectorcraft;
 

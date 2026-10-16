@@ -1247,6 +1247,43 @@ pub struct LaunchdJobSpec {
 }
 
 /// macOS launchd Job Supervisor Engine
+pub struct LaunchdJobSupervisorEngine {
+    pub jobs: BTreeMap<String, LaunchdJobSpec>,
+    pub job_states: BTreeMap<String, ServiceState>,
+}
+
+impl LaunchdJobSupervisorEngine {
+    pub fn new() -> Self {
+        Self {
+            jobs: BTreeMap::new(),
+            job_states: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_job(&mut self, job: LaunchdJobSpec) {
+        if job.run_at_load {
+            self.job_states
+                .insert(job.label.clone(), ServiceState::Running);
+        } else {
+            self.job_states
+                .insert(job.label.clone(), ServiceState::Stopped);
+        }
+        self.jobs.insert(job.label.clone(), job);
+    }
+
+    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
+        for job in self.jobs.values() {
+            if job.mach_services.contains(&mach_service.to_string()) {
+                self.job_states
+                    .insert(job.label.clone(), ServiceState::Running);
+                return Some(job.label.clone());
+            }
+        }
+        None
+    }
+}
+
+/// macOS launchd Job Supervisor Engine
 #[derive(Debug, Clone, Default)]
 pub struct LaunchdJobSupervisorEngine {
     pub jobs: BTreeMap<String, LaunchdJobSpec>,
@@ -1504,15 +1541,6 @@ impl AtSpoolQueueManager {
     pub fn new(spool_dir: &str) -> Self {
         Self {
             spool_dir: spool_dir.to_string(),
-            jobs: BTreeMap::new(),
-            queued_jobs: Vec::new(),
-            next_job_id: 1,
-        }
-    }
-
-    pub fn new_empty() -> Self {
-        Self {
-            spool_dir: "/var/spool/at".to_string(),
             jobs: BTreeMap::new(),
             queued_jobs: Vec::new(),
             next_job_id: 1,
