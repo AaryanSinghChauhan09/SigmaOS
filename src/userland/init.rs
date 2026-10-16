@@ -1189,14 +1189,14 @@ impl AtSpoolQueueManager {
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
-pub struct UserlandInitPrGatewayEngine {
+pub struct CleanRoomUserlandInitPrGatewayEngine {
     pub pr_id: u32,
     pub title: String,
     pub author: String,
     pub pqc_signature: String,
 }
 
-impl UserlandInitPrGatewayEngine {
+impl CleanRoomUserlandInitPrGatewayEngine {
     pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
         Self {
             pr_id,
@@ -2001,8 +2001,8 @@ mod tests {
     }
 
     #[test]
-    fn test_userland_init_pr_gateway() {
-        let gw = UserlandInitPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
+    fn test_clean_room_userland_init_pr_gateway() {
+        let gw = CleanRoomUserlandInitPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));
