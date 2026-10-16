@@ -25,10 +25,10 @@ pub struct LdSigmaPrSubmissionSpec {
 /// Dynamic Linking GOT/PLT Relocation Type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GotPltRelocType {
-    GlobDat,  // R_X86_64_GLOB_DAT
-    JumpSlot, // R_X86_64_JUMP_SLOT
-    Relative, // R_X86_64_RELATIVE
-    IRelative,// R_X86_64_IRELATIVE
+    GlobDat,   // R_X86_64_GLOB_DAT
+    JumpSlot,  // R_X86_64_JUMP_SLOT
+    Relative,  // R_X86_64_RELATIVE
+    IRelative, // R_X86_64_IRELATIVE
 }
 
 /// Global Offset Table (GOT) Entry
@@ -102,11 +102,16 @@ impl LdSigmaLinkerPrDeployer {
     }
 
     fn bootstrap_core_symbols(&mut self) {
-        self.symbol_table.insert(String::from("malloc"), 0x7FFF00010000);
-        self.symbol_table.insert(String::from("free"), 0x7FFF00010080);
-        self.symbol_table.insert(String::from("write"), 0x7FFF00010100);
-        self.symbol_table.insert(String::from("read"), 0x7FFF00010180);
-        self.symbol_table.insert(String::from("printf"), 0x7FFF00010200);
+        self.symbol_table
+            .insert(String::from("malloc"), 0x7FFF00010000);
+        self.symbol_table
+            .insert(String::from("free"), 0x7FFF00010080);
+        self.symbol_table
+            .insert(String::from("write"), 0x7FFF00010100);
+        self.symbol_table
+            .insert(String::from("read"), 0x7FFF00010180);
+        self.symbol_table
+            .insert(String::from("printf"), 0x7FFF00010200);
     }
 
     pub fn generate_pr_spec(&self) -> LdSigmaPrSubmissionSpec {
@@ -219,14 +224,13 @@ impl SovereignLdSigmaMasterSuite {
     }
 
     pub fn run_full_verification(&mut self) -> bool {
-        self.linker.register_shared_library("libc.so.6", 0x7FFF00000000);
+        self.linker
+            .register_shared_library("libc.so.6", 0x7FFF00000000);
         self.linker.export_symbol("puts", 0x7FFF00010280);
 
-        let patch_res = self.linker.patch_got_entry(
-            0x403000,
-            "puts",
-            GotPltRelocType::JumpSlot,
-        );
+        let patch_res = self
+            .linker
+            .patch_got_entry(0x403000, "puts", GotPltRelocType::JumpSlot);
         if patch_res.is_err() {
             return false;
         }

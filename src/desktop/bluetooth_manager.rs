@@ -110,28 +110,44 @@ impl BluetoothManager {
 
     /// Pair device
     pub fn pair_device(&mut self, address: String) -> Result<(), &'static str> {
-        let device = self.devices.iter_mut().find(|d| d.address == address).ok_or("Device not found")?;
+        let device = self
+            .devices
+            .iter_mut()
+            .find(|d| d.address == address)
+            .ok_or("Device not found")?;
         device.status = DeviceStatus::Paired;
         Ok(())
     }
 
     /// Unpair device
     pub fn unpair_device(&mut self, address: String) -> Result<(), &'static str> {
-        let device = self.devices.iter_mut().find(|d| d.address == address).ok_or("Device not found")?;
+        let device = self
+            .devices
+            .iter_mut()
+            .find(|d| d.address == address)
+            .ok_or("Device not found")?;
         device.status = DeviceStatus::Available;
         Ok(())
     }
 
     /// Connect device
     pub fn connect_device(&mut self, address: String) -> Result<(), &'static str> {
-        let device = self.devices.iter_mut().find(|d| d.address == address).ok_or("Device not found")?;
+        let device = self
+            .devices
+            .iter_mut()
+            .find(|d| d.address == address)
+            .ok_or("Device not found")?;
         device.status = DeviceStatus::Connected;
         Ok(())
     }
 
     /// Disconnect device
     pub fn disconnect_device(&mut self, address: String) -> Result<(), &'static str> {
-        let device = self.devices.iter_mut().find(|d| d.address == address).ok_or("Not found")?;
+        let device = self
+            .devices
+            .iter_mut()
+            .find(|d| d.address == address)
+            .ok_or("Not found")?;
         device.status = DeviceStatus::Paired;
         Ok(())
     }
@@ -143,7 +159,10 @@ impl BluetoothManager {
 
     /// Get paired devices
     pub fn get_paired_devices(&self) -> Vec<&BluetoothDevice> {
-        self.devices.iter().filter(|d| d.status == DeviceStatus::Paired || d.status == DeviceStatus::Connected).collect()
+        self.devices
+            .iter()
+            .filter(|d| d.status == DeviceStatus::Paired || d.status == DeviceStatus::Connected)
+            .collect()
     }
 
     /// Device count
@@ -165,7 +184,9 @@ pub fn init_bluetooth_manager() {
 /// Get bluetooth manager
 pub fn get_bluetooth_manager() -> &'static mut BluetoothManager {
     unsafe {
-        BLUETOOTH_MANAGER.as_mut().expect("Bluetooth manager not initialized")
+        BLUETOOTH_MANAGER
+            .as_mut()
+            .expect("Bluetooth manager not initialized")
     }
 }
 

@@ -230,7 +230,12 @@ pub struct SystemdPathMonitorEngine {
 }
 
 impl SystemdPathMonitorEngine {
-    pub fn check_trigger(&self, path: &str, event: SystemdPathEventType, is_dir_nonempty: bool) -> bool {
+    pub fn check_trigger(
+        &self,
+        path: &str,
+        event: SystemdPathEventType,
+        is_dir_nonempty: bool,
+    ) -> bool {
         if self.monitored_path != path {
             return false;
         }
@@ -265,7 +270,14 @@ impl SystemdTransientScopeGovernor {
 pub struct SystemdOnCalendarParser;
 
 impl SystemdOnCalendarParser {
-    pub fn matches(expression: &str, min: u32, hour: u32, mday: u32, month: u32, wday: u32) -> bool {
+    pub fn matches(
+        expression: &str,
+        min: u32,
+        hour: u32,
+        mday: u32,
+        month: u32,
+        wday: u32,
+    ) -> bool {
         let expr = expression.trim();
         if expr.eq_ignore_ascii_case("minutely") {
             return true;
@@ -488,7 +500,9 @@ pub struct OpenRcHeader {
 pub struct OpenRcDependencySolverEngine;
 
 impl OpenRcDependencySolverEngine {
-    pub fn resolve_order(scripts: &BTreeMap<String, OpenRcHeader>) -> Result<Vec<String>, &'static str> {
+    pub fn resolve_order(
+        scripts: &BTreeMap<String, OpenRcHeader>,
+    ) -> Result<Vec<String>, &'static str> {
         let mut sorted = Vec::new();
         let mut visited = BTreeSet::new();
         let mut temp_mark = BTreeSet::new();
@@ -565,17 +579,29 @@ impl OpenRcHeader {
         for line in script_content.lines() {
             let trimmed = line.trim();
             if let Some(rest) = trimmed.strip_prefix("provide") {
-                header.provide.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .provide
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header.need.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .need
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header.use_deps.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .use_deps
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header.before.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header.after.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .after
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header.keywords.extend(rest.split_whitespace().map(|s| s.to_string()));
+                header
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             }
         }
         header
@@ -624,7 +650,10 @@ impl OpenRcStatusControllerEngine {
     }
 
     pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses.get(service).copied().unwrap_or(ServiceState::Stopped)
+        self.service_statuses
+            .get(service)
+            .copied()
+            .unwrap_or(ServiceState::Stopped)
     }
 }
 
@@ -703,7 +732,12 @@ impl RunitS6SupervisionTreeGovernor {
         self.current_stage = stage;
     }
 
-    pub fn register_service(&mut self, name: String, srv: SupervisedService, log_srv: Option<String>) {
+    pub fn register_service(
+        &mut self,
+        name: String,
+        srv: SupervisedService,
+        log_srv: Option<String>,
+    ) {
         if let Some(log) = log_srv {
             self.log_pipelines.insert(name.clone(), log);
         }
@@ -814,14 +848,21 @@ impl SysVinitRunlevelStateMachine {
         self.current_runlevel = new_runlevel;
         self.inittab_entries
             .iter()
-            .filter(|e| e.runlevels.contains(&new_runlevel) || e.runlevels.contains(&'a') || e.runlevels.contains(&'b') || e.runlevels.contains(&'c'))
+            .filter(|e| {
+                e.runlevels.contains(&new_runlevel)
+                    || e.runlevels.contains(&'a')
+                    || e.runlevels.contains(&'b')
+                    || e.runlevels.contains(&'c')
+            })
             .collect()
     }
 
     pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
-            if entry.action == SysVAction::Respawn && entry.runlevels.contains(&self.current_runlevel) {
+            if entry.action == SysVAction::Respawn
+                && entry.runlevels.contains(&self.current_runlevel)
+            {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
@@ -883,7 +924,10 @@ impl SysVinitRunlevelStateMachine {
 
         for entry in &self.entries {
             if entry.runlevels.contains(&target_runlevel) {
-                if entry.action == SysVAction::Respawn || entry.action == SysVAction::Once || entry.action == SysVAction::Wait {
+                if entry.action == SysVAction::Respawn
+                    || entry.action == SysVAction::Once
+                    || entry.action == SysVAction::Wait
+                {
                     start_scripts.push(format!("S{:02}{}", start_scripts.len(), entry.id));
                 }
             } else {
@@ -953,20 +997,27 @@ impl BsdRcScript {
             let line = line.trim();
             if line.starts_with("# PROVIDE:") {
                 let rest = &line["# PROVIDE:".len()..];
-                let provides: Vec<String> = rest.split_whitespace().map(|s| s.to_string()).collect();
+                let provides: Vec<String> =
+                    rest.split_whitespace().map(|s| s.to_string()).collect();
                 if script.name.is_empty() && !provides.is_empty() {
                     script.name = provides[0].clone();
                 }
                 script.provides.extend(provides);
             } else if line.starts_with("# REQUIRE:") {
                 let rest = &line["# REQUIRE:".len()..];
-                script.requires.extend(rest.split_whitespace().map(|s| s.to_string()));
+                script
+                    .requires
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if line.starts_with("# BEFORE:") {
                 let rest = &line["# BEFORE:".len()..];
-                script.before.extend(rest.split_whitespace().map(|s| s.to_string()));
+                script
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if line.starts_with("# KEYWORD:") {
                 let rest = &line["# KEYWORD:".len()..];
-                script.keywords.extend(rest.split_whitespace().map(|s| s.to_string()));
+                script
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
             } else if line.starts_with("precmd=") {
                 script.precmd = Some(line["precmd=".len()..].trim_matches('"').to_string());
             } else if line.starts_with("postcmd=") {
@@ -1008,7 +1059,9 @@ impl BsdRcSubrEngine {
         if let Some(script) = self.scripts.get(script_name) {
             if let Some(var) = &script.enabled_variable {
                 if let Some(val) = self.rc_conf.get(var) {
-                    return val.eq_ignore_ascii_case("YES") || val == "1" || val.eq_ignore_ascii_case("TRUE");
+                    return val.eq_ignore_ascii_case("YES")
+                        || val == "1"
+                        || val.eq_ignore_ascii_case("TRUE");
                 }
             }
         }
@@ -1049,9 +1102,11 @@ impl LaunchdJobSupervisorEngine {
 
     pub fn register_job(&mut self, job: LaunchdJobSpec) {
         if job.run_at_load {
-            self.job_states.insert(job.label.clone(), ServiceState::Running);
+            self.job_states
+                .insert(job.label.clone(), ServiceState::Running);
         } else {
-            self.job_states.insert(job.label.clone(), ServiceState::Stopped);
+            self.job_states
+                .insert(job.label.clone(), ServiceState::Stopped);
         }
         self.jobs.insert(job.label.clone(), job);
     }
@@ -1059,7 +1114,8 @@ impl LaunchdJobSupervisorEngine {
     pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
         for job in self.jobs.values() {
             if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states.insert(job.label.clone(), ServiceState::Running);
+                self.job_states
+                    .insert(job.label.clone(), ServiceState::Running);
                 return Some(job.label.clone());
             }
         }
@@ -1397,16 +1453,25 @@ impl AtSpoolQueueManager {
         }
     }
 
-    pub fn schedule_at_job(&mut self, execute_at: u64, command: String, queue: char, max_load: Option<f32>) -> u64 {
+    pub fn schedule_at_job(
+        &mut self,
+        execute_at: u64,
+        command: String,
+        queue: char,
+        max_load: Option<f32>,
+    ) -> u64 {
         let id = self.next_job_id;
         self.next_job_id += 1;
-        self.jobs.insert(id, AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        });
+        self.jobs.insert(
+            id,
+            AtJob {
+                job_id: id,
+                execute_at,
+                command,
+                queue,
+                max_load_average: max_load,
+            },
+        );
         id
     }
 }
@@ -1425,9 +1490,17 @@ pub struct SystemdTimerSpec {
 }
 
 impl SystemdTimerSpec {
-    pub fn is_triggered(&self, now_timestamp: u64, boot_timestamp: u64, unit_active_timestamp: u64) -> bool {
+    pub fn is_triggered(
+        &self,
+        now_timestamp: u64,
+        boot_timestamp: u64,
+        unit_active_timestamp: u64,
+    ) -> bool {
         if let Some(boot_sec) = self.on_boot_sec {
-            if now_timestamp >= boot_timestamp + boot_sec && (self.last_trigger_timestamp == 0 || self.last_trigger_timestamp < boot_timestamp) {
+            if now_timestamp >= boot_timestamp + boot_sec
+                && (self.last_trigger_timestamp == 0
+                    || self.last_trigger_timestamp < boot_timestamp)
+            {
                 return true;
             }
         }
@@ -1506,14 +1579,23 @@ impl SovereignCoreUserlandInitEngine {
         self.supervised_services.insert(name, service);
     }
 
-    pub fn dispatch_supervisor_verb(&mut self, service_name: &str, verb: SupervisorControlVerb) -> Result<ServiceState, &'static str> {
-        let srv = self.supervised_services.get_mut(service_name).ok_or("Supervised service not found")?;
+    pub fn dispatch_supervisor_verb(
+        &mut self,
+        service_name: &str,
+        verb: SupervisorControlVerb,
+    ) -> Result<ServiceState, &'static str> {
+        let srv = self
+            .supervised_services
+            .get_mut(service_name)
+            .ok_or("Supervised service not found")?;
         match verb {
             SupervisorControlVerb::Up | SupervisorControlVerb::Continue => {
                 srv.state = ServiceState::Running;
                 srv.pid = Some(2000 + service_name.len() as u32);
             }
-            SupervisorControlVerb::Down | SupervisorControlVerb::Term | SupervisorControlVerb::Kill => {
+            SupervisorControlVerb::Down
+            | SupervisorControlVerb::Term
+            | SupervisorControlVerb::Kill => {
                 srv.state = ServiceState::Stopped;
                 srv.pid = None;
             }
@@ -1525,7 +1607,10 @@ impl SovereignCoreUserlandInitEngine {
             SupervisorControlVerb::Pause => {
                 srv.state = ServiceState::Stopped;
             }
-            SupervisorControlVerb::Alarm | SupervisorControlVerb::Once | SupervisorControlVerb::Exit | SupervisorControlVerb::Interrupt => {}
+            SupervisorControlVerb::Alarm
+            | SupervisorControlVerb::Once
+            | SupervisorControlVerb::Exit
+            | SupervisorControlVerb::Interrupt => {}
         }
         Ok(srv.state)
     }
@@ -1538,14 +1623,25 @@ impl SovereignCoreUserlandInitEngine {
         self.launchd_jobs.insert(job.label.clone(), job);
     }
 
-    pub fn process_cron_tasks(&self, min: u32, hour: u32, mday: u32, month: u32, wday: u32) -> Vec<&VixieCronEntry> {
+    pub fn process_cron_tasks(
+        &self,
+        min: u32,
+        hour: u32,
+        mday: u32,
+        month: u32,
+        wday: u32,
+    ) -> Vec<&VixieCronEntry> {
         self.cron_entries
             .iter()
             .filter(|e| e.matches_time(min, hour, mday, month, wday))
             .collect()
     }
 
-    pub fn process_due_anacron_jobs(&mut self, now_timestamp: u64, current_hour: u32) -> Vec<AnacronJob> {
+    pub fn process_due_anacron_jobs(
+        &mut self,
+        now_timestamp: u64,
+        current_hour: u32,
+    ) -> Vec<AnacronJob> {
         let mut due = Vec::new();
         for job in &mut self.anacron_jobs {
             if job.is_due(now_timestamp, current_hour) {
@@ -1608,7 +1704,13 @@ impl UserlandInitPrGatewayEngine {
         }
     }
 
-    pub fn submit_pr(&mut self, title: String, author: String, target_subsystem: String, description: String) -> u64 {
+    pub fn submit_pr(
+        &mut self,
+        title: String,
+        author: String,
+        target_subsystem: String,
+        description: String,
+    ) -> u64 {
         let pr_id = self.next_pr_id;
         self.next_pr_id += 1;
 
@@ -1670,7 +1772,10 @@ mod tests {
         assert_eq!(sorted, vec!["network", "httpd"]);
 
         init.start_all().unwrap();
-        assert_eq!(init.services.get("httpd").unwrap().state, ServiceState::Running);
+        assert_eq!(
+            init.services.get("httpd").unwrap().state,
+            ServiceState::Running
+        );
     }
 
     #[test]
@@ -1679,7 +1784,10 @@ mod tests {
         let msgs = SdNotifyMessage::parse(raw);
         assert_eq!(msgs.len(), 4);
         assert_eq!(msgs[0], SdNotifyMessage::Ready);
-        assert_eq!(msgs[1], SdNotifyMessage::Status("Processing requests".to_string()));
+        assert_eq!(
+            msgs[1],
+            SdNotifyMessage::Status("Processing requests".to_string())
+        );
         assert_eq!(msgs[2], SdNotifyMessage::MainPid(1234));
         assert_eq!(msgs[3], SdNotifyMessage::ExtendTimeoutUsec(5000000));
     }
@@ -1704,7 +1812,10 @@ mod tests {
     #[test]
     fn test_systemd_target_resolver() {
         let mut resolver = SystemdTargetDependencyResolver::new();
-        resolver.register_target("multi-user.target", vec!["sshd.service".to_string(), "dbus.service".to_string()]);
+        resolver.register_target(
+            "multi-user.target",
+            vec!["sshd.service".to_string(), "dbus.service".to_string()],
+        );
 
         let members = resolver.activate_target("multi-user.target");
         assert_eq!(members.len(), 2);
@@ -1730,13 +1841,16 @@ mod tests {
     #[test]
     fn test_systemd_transient_scope() {
         let mut governor = SystemdTransientScopeGovernor::new();
-        governor.create_scope("session-1.scope".to_string(), SystemdCgroupsv2Slice {
-            slice_name: "user-1000.slice".to_string(),
-            memory_max_bytes: Some(1073741824),
-            cpu_weight: Some(100),
-            io_weight: Some(100),
-            tasks_max: Some(512),
-        });
+        governor.create_scope(
+            "session-1.scope".to_string(),
+            SystemdCgroupsv2Slice {
+                slice_name: "user-1000.slice".to_string(),
+                memory_max_bytes: Some(1073741824),
+                cpu_weight: Some(100),
+                io_weight: Some(100),
+                tasks_max: Some(512),
+            },
+        );
 
         let limits = governor.get_scope_limit("session-1.scope").unwrap();
         assert_eq!(limits.tasks_max, Some(512));
@@ -1764,20 +1878,27 @@ mod tests {
     #[test]
     fn test_runit_s6_supervision_tree() {
         let mut tree = RunitS6SupervisionTreeGovernor::new();
-        tree.register_service("nginx".to_string(), SupervisedService {
-            service_dir: "/etc/service/nginx".to_string(),
-            run_script: "./run".to_string(),
-            finish_script: None,
-            state: ServiceState::Starting,
-            pid: Some(123),
-            auto_restart: true,
-            notification_fd: Some(3),
-        }, Some("nginx-log".to_string()));
+        tree.register_service(
+            "nginx".to_string(),
+            SupervisedService {
+                service_dir: "/etc/service/nginx".to_string(),
+                run_script: "./run".to_string(),
+                finish_script: None,
+                state: ServiceState::Starting,
+                pid: Some(123),
+                auto_restart: true,
+                notification_fd: Some(3),
+            },
+            Some("nginx-log".to_string()),
+        );
 
         tree.enter_stage(SupervisionStage::Stage2SupervisionLoop);
         let ready = tree.parse_s6_readiness_notification("nginx", "READY");
         assert!(ready);
-        assert_eq!(tree.services.get("nginx").unwrap().state, ServiceState::Running);
+        assert_eq!(
+            tree.services.get("nginx").unwrap().state,
+            ServiceState::Running
+        );
     }
 
     #[test]
@@ -1827,10 +1948,16 @@ mod tests {
             sockets: BTreeMap::new(),
         });
 
-        assert_eq!(launchd.job_states.get("com.apple.syslogd"), Some(&ServiceState::Stopped));
+        assert_eq!(
+            launchd.job_states.get("com.apple.syslogd"),
+            Some(&ServiceState::Stopped)
+        );
         let triggered = launchd.trigger_mach_service("com.apple.system.logger");
         assert_eq!(triggered, Some("com.apple.syslogd".to_string()));
-        assert_eq!(launchd.job_states.get("com.apple.syslogd"), Some(&ServiceState::Running));
+        assert_eq!(
+            launchd.job_states.get("com.apple.syslogd"),
+            Some(&ServiceState::Running)
+        );
     }
 
     #[test]
@@ -1896,8 +2023,16 @@ mod tests {
             event_type: SystemdPathEventType::PathModified,
             unit_to_trigger: "log.service".to_string(),
         };
-        assert!(path_mon.check_trigger("/var/log/app.log", SystemdPathEventType::PathModified, false));
-        assert!(!path_mon.check_trigger("/var/log/other.log", SystemdPathEventType::PathModified, false));
+        assert!(path_mon.check_trigger(
+            "/var/log/app.log",
+            SystemdPathEventType::PathModified,
+            false
+        ));
+        assert!(!path_mon.check_trigger(
+            "/var/log/other.log",
+            SystemdPathEventType::PathModified,
+            false
+        ));
 
         assert!(SystemdOnCalendarParser::matches("hourly", 0, 12, 1, 1, 1));
         assert!(!SystemdOnCalendarParser::matches("hourly", 15, 12, 1, 1, 1));
@@ -1906,22 +2041,28 @@ mod tests {
     #[test]
     fn test_openrc_dependency_solver() {
         let mut scripts = BTreeMap::new();
-        scripts.insert("net".to_string(), OpenRcHeader {
-            provide: vec!["net".to_string()],
-            need: vec![],
-            use_deps: vec![],
-            before: vec![],
-            after: vec![],
-            keywords: vec![],
-        });
-        scripts.insert("sshd".to_string(), OpenRcHeader {
-            provide: vec!["sshd".to_string()],
-            need: vec!["net".to_string()],
-            use_deps: vec![],
-            before: vec![],
-            after: vec![],
-            keywords: vec![],
-        });
+        scripts.insert(
+            "net".to_string(),
+            OpenRcHeader {
+                provide: vec!["net".to_string()],
+                need: vec![],
+                use_deps: vec![],
+                before: vec![],
+                after: vec![],
+                keywords: vec![],
+            },
+        );
+        scripts.insert(
+            "sshd".to_string(),
+            OpenRcHeader {
+                provide: vec!["sshd".to_string()],
+                need: vec!["net".to_string()],
+                use_deps: vec![],
+                before: vec![],
+                after: vec![],
+                keywords: vec![],
+            },
+        );
 
         let order = OpenRcDependencySolverEngine::resolve_order(&scripts).unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
@@ -1939,22 +2080,25 @@ mod tests {
         assert_eq!(gov.active_services.len(), 2);
 
         gov.process_death("syslogd");
-        assert_eq!(gov.active_services.get("syslogd").unwrap().state, ServiceState::Running);
+        assert_eq!(
+            gov.active_services.get("syslogd").unwrap().state,
+            ServiceState::Running
+        );
 
         assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("READY=1"));
-        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("ready notification"));
+        assert!(
+            RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("ready notification")
+        );
     }
 
     #[test]
     fn test_sysv_and_bsd_rc_subr() {
-        let entries = vec![
-            SysVInittabEntry {
-                id: "1".to_string(),
-                runlevels: vec!['2', '3'],
-                action: SysVAction::Respawn,
-                process: "/sbin/getty tty1".to_string(),
-            }
-        ];
+        let entries = vec![SysVInittabEntry {
+            id: "1".to_string(),
+            runlevels: vec!['2', '3'],
+            action: SysVAction::Respawn,
+            process: "/sbin/getty tty1".to_string(),
+        }];
         let mut sysv = SysVinitRunlevelStateMachine::new('1', entries);
         let matching = sysv.set_runlevel('2');
         assert_eq!(matching.len(), 1);
@@ -2002,7 +2146,11 @@ mod tests {
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let gw = UserlandInitPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
+        let gw = UserlandInitPrGatewayEngine::new(
+            4001,
+            "feat(init): Complete Init Parity",
+            "SovereignAgent",
+        );
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));

@@ -59,7 +59,12 @@ pub struct MailMessage {
 
 impl MailMessage {
     /// Create a new mail message
-    pub fn new(message_id: String, sender: String, recipients: Vec<String>, subject: String) -> Self {
+    pub fn new(
+        message_id: String,
+        sender: String,
+        recipients: Vec<String>,
+        subject: String,
+    ) -> Self {
         Self {
             message_id,
             sender,
@@ -123,7 +128,7 @@ impl SigmaMail {
         if self.messages.contains_key(&message.message_id) {
             return Err(format!("Message '{}' already exists", message.message_id));
         }
-        
+
         self.messages.insert(message.message_id.clone(), message);
         self.message_counter += 1;
         Ok(())
@@ -142,7 +147,7 @@ impl SigmaMail {
         if !self.running {
             return Err("SigmaMail not running".to_string());
         }
-        
+
         match self.messages.get_mut(message_id) {
             Some(message) => {
                 message.state = MailMessageState::Sending;
@@ -157,7 +162,7 @@ impl SigmaMail {
         if !self.running {
             return Err("SigmaMail not running".to_string());
         }
-        
+
         match self.messages.get_mut(message_id) {
             Some(message) => {
                 message.state = MailMessageState::Sent;
@@ -172,7 +177,7 @@ impl SigmaMail {
         if !self.running {
             return Err("SigmaMail not running".to_string());
         }
-        
+
         match self.messages.get_mut(message_id) {
             Some(message) => {
                 message.state = MailMessageState::Failed;
@@ -187,7 +192,7 @@ impl SigmaMail {
         if !self.running {
             return Err("SigmaMail not running".to_string());
         }
-        
+
         match self.messages.get_mut(message_id) {
             Some(message) => {
                 message.state = MailMessageState::Bounced;
@@ -209,14 +214,16 @@ impl SigmaMail {
 
     /// List messages by state
     pub fn list_by_state(&self, state: MailMessageState) -> Vec<&MailMessage> {
-        self.messages.values()
+        self.messages
+            .values()
             .filter(|m| m.state == state)
             .collect()
     }
 
     /// List messages by sender
     pub fn list_by_sender(&self, sender: &str) -> Vec<&MailMessage> {
-        self.messages.values()
+        self.messages
+            .values()
             .filter(|m| m.sender == sender)
             .collect()
     }
@@ -229,12 +236,38 @@ impl SigmaMail {
     /// Get mail server statistics
     pub fn mail_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_messages".to_string(), self.message_count().to_string());
-        stats.insert("queued_messages".to_string(), self.list_by_state(MailMessageState::Queued).len().to_string());
-        stats.insert("sending_messages".to_string(), self.list_by_state(MailMessageState::Sending).len().to_string());
-        stats.insert("sent_messages".to_string(), self.list_by_state(MailMessageState::Sent).len().to_string());
-        stats.insert("failed_messages".to_string(), self.list_by_state(MailMessageState::Failed).len().to_string());
-        stats.insert("bounced_messages".to_string(), self.list_by_state(MailMessageState::Bounced).len().to_string());
+        stats.insert(
+            "total_messages".to_string(),
+            self.message_count().to_string(),
+        );
+        stats.insert(
+            "queued_messages".to_string(),
+            self.list_by_state(MailMessageState::Queued)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "sending_messages".to_string(),
+            self.list_by_state(MailMessageState::Sending)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "sent_messages".to_string(),
+            self.list_by_state(MailMessageState::Sent).len().to_string(),
+        );
+        stats.insert(
+            "failed_messages".to_string(),
+            self.list_by_state(MailMessageState::Failed)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "bounced_messages".to_string(),
+            self.list_by_state(MailMessageState::Bounced)
+                .len()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -286,7 +319,7 @@ mod tests {
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         )
         .with_state(MailMessageState::Sent)
         .with_size(1024);
@@ -309,14 +342,14 @@ mod tests {
     #[test]
     fn test_sigmamail_add_message() {
         let mut mail = SigmaMail::new();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         );
-        
+
         assert!(mail.add_message(message).is_ok());
         assert_eq!(mail.message_count(), 1);
     }
@@ -325,17 +358,17 @@ mod tests {
     fn test_sigmamail_send_message() {
         let mut mail = SigmaMail::new();
         mail.start();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         );
-        
+
         mail.add_message(message).unwrap();
         assert!(mail.send_message("msg1").is_ok());
-        
+
         let msg = mail.get_message("msg1").unwrap();
         assert_eq!(msg.state, MailMessageState::Sending);
     }
@@ -344,18 +377,18 @@ mod tests {
     fn test_sigmamail_mark_sent() {
         let mut mail = SigmaMail::new();
         mail.start();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         )
         .with_state(MailMessageState::Sending);
-        
+
         mail.add_message(message).unwrap();
         assert!(mail.mark_sent("msg1").is_ok());
-        
+
         let msg = mail.get_message("msg1").unwrap();
         assert_eq!(msg.state, MailMessageState::Sent);
     }
@@ -364,17 +397,17 @@ mod tests {
     fn test_sigmamail_mark_failed() {
         let mut mail = SigmaMail::new();
         mail.start();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         );
-        
+
         mail.add_message(message).unwrap();
         assert!(mail.mark_failed("msg1").is_ok());
-        
+
         let msg = mail.get_message("msg1").unwrap();
         assert_eq!(msg.state, MailMessageState::Failed);
     }
@@ -382,17 +415,17 @@ mod tests {
     #[test]
     fn test_sigmamail_list_by_state() {
         let mut mail = SigmaMail::new();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         )
         .with_state(MailMessageState::Sent);
-        
+
         mail.add_message(message).unwrap();
-        
+
         let messages = mail.list_by_state(MailMessageState::Sent);
         assert_eq!(messages.len(), 1);
     }
@@ -400,16 +433,16 @@ mod tests {
     #[test]
     fn test_sigmamail_list_by_sender() {
         let mut mail = SigmaMail::new();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         );
-        
+
         mail.add_message(message).unwrap();
-        
+
         let messages = mail.list_by_sender("sender@example.com");
         assert_eq!(messages.len(), 1);
     }
@@ -417,17 +450,17 @@ mod tests {
     #[test]
     fn test_sigmamail_stats() {
         let mut mail = SigmaMail::new();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         )
         .with_state(MailMessageState::Sent);
-        
+
         mail.add_message(message).unwrap();
-        
+
         let stats = mail.mail_stats();
         assert_eq!(stats.get("total_messages"), Some(&"1".to_string()));
         assert_eq!(stats.get("sent_messages"), Some(&"1".to_string()));
@@ -436,19 +469,19 @@ mod tests {
     #[test]
     fn test_send_mail_message_convenience() {
         init_sigmamail();
-        
+
         let mut mail = get_sigmamail().unwrap();
         mail.start();
-        
+
         let message = MailMessage::new(
             "msg1".to_string(),
             "sender@example.com".to_string(),
             vec!["recipient@example.com".to_string()],
-            "Test Subject".to_string()
+            "Test Subject".to_string(),
         );
-        
+
         mail.add_message(message).unwrap();
-        
+
         let result = send_mail_message("msg1");
         assert!(result.is_ok());
     }

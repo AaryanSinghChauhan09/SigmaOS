@@ -110,7 +110,13 @@ impl KvmQemuEngine {
         }
     }
 
-    pub fn convert_disk_image(&mut self, path: &str, fmt: &str, size_bytes: u64, backing: Option<&str>) {
+    pub fn convert_disk_image(
+        &mut self,
+        path: &str,
+        fmt: &str,
+        size_bytes: u64,
+        backing: Option<&str>,
+    ) {
         self.disk_images.push(QemuDiskImageSpec {
             image_path: path.to_string(),
             format: fmt.to_string(),
@@ -177,9 +183,9 @@ pub enum LibvirtStoragePoolType {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtNwFilterRule {
     pub name: String,
-    pub action: String, // "accept", "drop", "reject"
+    pub action: String,    // "accept", "drop", "reject"
     pub direction: String, // "in", "out", "inout"
-    pub protocol: String, // "ip", "tcp", "udp", "icmp"
+    pub protocol: String,  // "ip", "tcp", "udp", "icmp"
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -225,7 +231,13 @@ impl LibvirtDomainEngine {
         }
     }
 
-    pub fn create_storage_volume(&mut self, name: &str, pool: &str, capacity_bytes: u64, fmt: &str) {
+    pub fn create_storage_volume(
+        &mut self,
+        name: &str,
+        pool: &str,
+        capacity_bytes: u64,
+        fmt: &str,
+    ) {
         self.storage_volumes.push(LibvirtStorageVolume {
             volume_name: name.to_string(),
             pool_name: pool.to_string(),
@@ -297,9 +309,9 @@ impl LibvirtDomainEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum XenGuestMode {
-    Paravirtualized,       // PV
-    HardwareVirtualMachine,// HVM
-    Pvh,                   // PVH
+    Paravirtualized,        // PV
+    HardwareVirtualMachine, // HVM
+    Pvh,                    // PVH
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -527,8 +539,16 @@ impl OciDockerPodmanRuncEngine {
             image: image.to_string(),
             command: alloc::vec!["/bin/sh".to_string()],
             rootless: true,
-            uid_mapping: SubUidGidMapping { host_start_id: 100000, container_start_id: 0, id_range_count: 65536 },
-            gid_mapping: SubUidGidMapping { host_start_id: 100000, container_start_id: 0, id_range_count: 65536 },
+            uid_mapping: SubUidGidMapping {
+                host_start_id: 100000,
+                container_start_id: 0,
+                id_range_count: 65536,
+            },
+            gid_mapping: SubUidGidMapping {
+                host_start_id: 100000,
+                container_start_id: 0,
+                id_range_count: 65536,
+            },
             cgroup_cpu_weight: 100,
             cgroup_memory_limit_bytes: mem_mb * 1024 * 1024,
         });
@@ -722,7 +742,8 @@ impl KubernetesK3sRancherEngine {
     }
 
     pub fn map_harvester_vm_to_pod(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 }
 
@@ -826,7 +847,9 @@ pub struct GvisorKataSandboxEngine {
 
 impl GvisorKataSandboxEngine {
     pub fn new() -> Self {
-        Self { sandboxes: Vec::new() }
+        Self {
+            sandboxes: Vec::new(),
+        }
     }
 
     pub fn create_gvisor_sentry_sandbox(&mut self, id: &str, mem_mb: u64) {
@@ -869,7 +892,9 @@ pub struct AppleHypervisorFrameworkEngine {
 
 impl AppleHypervisorFrameworkEngine {
     pub fn new() -> Self {
-        Self { instances: Vec::new() }
+        Self {
+            instances: Vec::new(),
+        }
     }
 
     pub fn launch_apple_hv_guest(&mut self, id: &str, vcpus: u32, rosetta: bool) {
@@ -942,7 +967,9 @@ pub struct AlpineMobyApplianceEngine {
 
 impl AlpineMobyApplianceEngine {
     pub fn new() -> Self {
-        Self { appliances: Vec::new() }
+        Self {
+            appliances: Vec::new(),
+        }
     }
 
     pub fn build_moby_appliance(&mut self, name: &str, pkgs: &[&str]) {
@@ -1007,7 +1034,9 @@ pub struct FreeBsdBhyveCapsicumEngine {
 
 impl FreeBsdBhyveCapsicumEngine {
     pub fn new() -> Self {
-        Self { helpers: Vec::new() }
+        Self {
+            helpers: Vec::new(),
+        }
     }
 
     pub fn register_capsicum_bhyve_helper(&mut self, vm_name: &str, pid: u32) {
@@ -1100,8 +1129,13 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
         vbox_bhyve_vmm.launch_openbsd_vmd_vm("obsd-router", "stdio rpath wpath cpath inet vmm");
 
         let mut oci_docker_podman = OciDockerPodmanRuncEngine::new();
-        oci_docker_podman.run_rootless_podman_container("podman-web-1", "quay.io/fedora/fedora:39", 2048);
-        oci_docker_podman.generate_podman_quadlet_unit("web-server", "docker.io/library/nginx:alpine");
+        oci_docker_podman.run_rootless_podman_container(
+            "podman-web-1",
+            "quay.io/fedora/fedora:39",
+            2048,
+        );
+        oci_docker_podman
+            .generate_podman_quadlet_unit("web-server", "docker.io/library/nginx:alpine");
 
         let mut lxc_lxd_nspawn = LxcLxdNspawnEngine::new();
         lxc_lxd_nspawn.spawn_nspawn_chroot("arch-chroot-container", "/var/lib/machines/arch", true);
@@ -1129,7 +1163,12 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
         apple_hv.launch_apple_hv_guest("apple-hv-vm1", 4, true);
 
         let mut smartos_zones = SmartOsZoneVirtualizationEngine::new();
-        smartos_zones.create_vmadm_zone("11111111-2222-3333-4444-555555555555", "zone-web", "joyent", 2048);
+        smartos_zones.create_vmadm_zone(
+            "11111111-2222-3333-4444-555555555555",
+            "zone-web",
+            "joyent",
+            2048,
+        );
 
         let mut alpine_moby = AlpineMobyApplianceEngine::new();
         alpine_moby.build_moby_appliance("moby-router", &["wireguard-tools", "dnsmasq"]);
@@ -1395,7 +1434,11 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
         for p in &proposals {
             md.push_str(&format!(
                 "- **PR #{}:** {} (`{}`)\n  - *Inspirations:* {}\n  - *Isolation:* {}\n",
-                p.pr_id, p.title, p.category, p.inspiration_sources.join(", "), p.isolation_level
+                p.pr_id,
+                p.title,
+                p.category,
+                p.inspiration_sources.join(", "),
+                p.isolation_level
             ));
         }
         md
@@ -1411,7 +1454,12 @@ mod tests {
         let mut engine = KvmQemuEngine::new();
         engine.add_vcpu(0, 0);
         engine.attach_vfio_device("0000:02:00.0", 0x10de, 0x2206, 15);
-        engine.convert_disk_image("/var/lib/libvirt/images/disk.qcow2", "qcow2", 20 * 1024 * 1024 * 1024, None);
+        engine.convert_disk_image(
+            "/var/lib/libvirt/images/disk.qcow2",
+            "qcow2",
+            20 * 1024 * 1024 * 1024,
+            None,
+        );
         assert_eq!(engine.vcpus.len(), 1);
         assert_eq!(engine.vfio_passthrough_devices.len(), 1);
         assert_eq!(engine.disk_images.len(), 1);
@@ -1442,7 +1490,10 @@ mod tests {
         assert_eq!(engine.argo_ports.len(), 1);
         assert_eq!(engine.disp_vm_policies.len(), 1);
         assert_eq!(engine.domains.len(), 2);
-        assert_eq!(engine.xenstore_read("/local/domain/10/name").unwrap(), "sys-usb");
+        assert_eq!(
+            engine.xenstore_read("/local/domain/10/name").unwrap(),
+            "sys-usb"
+        );
     }
 
     #[test]
@@ -1492,7 +1543,10 @@ mod tests {
         engine.map_harvester_vm_to_pod("vm-web", "pod-web");
         engine.register_crio_runtime_handler("gvisor");
         assert_eq!(engine.pods.len(), 1);
-        assert_eq!(engine.harvester_vm_mappings.get("vm-web").unwrap(), "pod-web");
+        assert_eq!(
+            engine.harvester_vm_mappings.get("vm-web").unwrap(),
+            "pod-web"
+        );
         assert!(engine.crio_runtime_handlers.contains(&"gvisor".to_string()));
     }
 

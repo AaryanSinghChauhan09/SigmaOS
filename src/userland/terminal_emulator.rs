@@ -91,12 +91,22 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub const EMPTY: Cell = Cell { ch: ' ', attrs: Attributes {
-        foreground: Color::Default,
-        background: Color::Default,
-        bold: false, dim: false, italic: false, underline: false,
-        blink: false, reverse: false, invisible: false, strikethrough: false,
-    }, wide_filler: false };
+    pub const EMPTY: Cell = Cell {
+        ch: ' ',
+        attrs: Attributes {
+            foreground: Color::Default,
+            background: Color::Default,
+            bold: false,
+            dim: false,
+            italic: false,
+            underline: false,
+            blink: false,
+            reverse: false,
+            invisible: false,
+            strikethrough: false,
+        },
+        wide_filler: false,
+    };
 }
 
 // ---------------------------------------------------------------------------
@@ -246,7 +256,10 @@ pub struct ScrollbackBuffer {
 
 impl ScrollbackBuffer {
     pub fn new(capacity: usize) -> Self {
-        Self { capacity, lines: Vec::new() }
+        Self {
+            capacity,
+            lines: Vec::new(),
+        }
     }
 
     /// Pushes a row of cells into the scrollback history.
@@ -295,14 +308,21 @@ enum ParseState {
     /// SOS/PM/APC: ignored
     SosPmApcString,
     /// Accumulating a UTF-8 multi-byte sequence.
-    Utf8 { remaining: u8, accum: u32 },
+    Utf8 {
+        remaining: u8,
+        accum: u32,
+    },
 }
 
 /// Parsed escape sequence types emitted by the parser.
 #[derive(Debug)]
 pub enum EscapeSequence {
     /// CSI sequence with collected parameters and final byte.
-    Csi { params: Vec<u16>, intermediates: Vec<u8>, final_byte: u8 },
+    Csi {
+        params: Vec<u16>,
+        intermediates: Vec<u8>,
+        final_byte: u8,
+    },
     /// OSC sequence with the raw string payload.
     Osc(String),
     /// DCS sequence with params and data.
@@ -361,23 +381,35 @@ impl EscapeParser {
 
     fn handle_ground(&mut self, byte: u8) -> Option<EscapeSequence> {
         match byte {
-            0x1B => { self.state = ParseState::Escape; None }
+            0x1B => {
+                self.state = ParseState::Escape;
+                None
+            }
             0x00..=0x1A | 0x1C..=0x1F => Some(EscapeSequence::Control(byte)),
             0x20..=0x7E => Some(EscapeSequence::Print(byte as char)),
             0x80..=0xBF => None, // unexpected continuation byte
             0xC0..=0xDF => {
                 let accum = (byte as u32) & 0x1F;
-                self.state = ParseState::Utf8 { remaining: 1, accum };
+                self.state = ParseState::Utf8 {
+                    remaining: 1,
+                    accum,
+                };
                 None
             }
             0xE0..=0xEF => {
                 let accum = (byte as u32) & 0x0F;
-                self.state = ParseState::Utf8 { remaining: 2, accum };
+                self.state = ParseState::Utf8 {
+                    remaining: 2,
+                    accum,
+                };
                 None
             }
             0xF0..=0xF7 => {
                 let accum = (byte as u32) & 0x07;
-                self.state = ParseState::Utf8 { remaining: 3, accum };
+                self.state = ParseState::Utf8 {
+                    remaining: 3,
+                    accum,
+                };
                 None
             }
             0x7F => None, // DEL
@@ -391,9 +423,18 @@ impl EscapeParser {
         self.osc_buf.clear();
         self.private_marker = None;
         match byte {
-            b'[' => { self.state = ParseState::CsiEntry; None }
-            b']' => { self.state = ParseState::OscString; None }
-            _ => { self.state = ParseState::Ground; None }
+            b'[' => {
+                self.state = ParseState::CsiEntry;
+                None
+            }
+            b']' => {
+                self.state = ParseState::OscString;
+                None
+            }
+            _ => {
+                self.state = ParseState::Ground;
+                None
+            }
         }
     }
 
@@ -426,14 +467,18 @@ impl EscapeParser {
                 self.state = ParseState::Ground;
                 Some(seq)
             }
-            _ => { self.state = ParseState::Ground; None }
+            _ => {
+                self.state = ParseState::Ground;
+                None
+            }
         }
     }
 
     fn handle_csi_param(&mut self, byte: u8) -> Option<EscapeSequence> {
         match byte {
             b'0'..=b'9' => {
-                self.current_param = self.current_param
+                self.current_param = self
+                    .current_param
                     .saturating_mul(10)
                     .saturating_add((byte - b'0') as u16);
                 self.has_param = true;
@@ -455,7 +500,10 @@ impl EscapeParser {
                 self.state = ParseState::Ground;
                 Some(seq)
             }
-            _ => { self.state = ParseState::Ground; None }
+            _ => {
+                self.state = ParseState::Ground;
+                None
+            }
         }
     }
 
@@ -488,7 +536,10 @@ impl EscapeParser {
                 return Some(EscapeSequence::Print(ch));
             }
         } else {
-            self.state = ParseState::Utf8 { remaining: remaining - 1, accum: new_accum };
+            self.state = ParseState::Utf8 {
+                remaining: remaining - 1,
+                accum: new_accum,
+            };
         }
         None
     }
@@ -533,7 +584,10 @@ impl TerminalEmulator {
             alternate_active: false,
             scrollback: ScrollbackBuffer::new(10_000),
             cursor: Cursor::new(),
-            scroll_region: ScrollRegion { top: 0, bottom: rows - 1 },
+            scroll_region: ScrollRegion {
+                top: 0,
+                bottom: rows - 1,
+            },
             parser: EscapeParser::new(),
             scroll_offset: 0,
             cols,
@@ -544,12 +598,20 @@ impl TerminalEmulator {
 
     /// Returns a reference to the currently active screen buffer.
     pub fn screen(&self) -> &ScreenBuffer {
-        if self.alternate_active { &self.alternate } else { &self.primary }
+        if self.alternate_active {
+            &self.alternate
+        } else {
+            &self.primary
+        }
     }
 
     /// Returns a mutable reference to the currently active screen buffer.
     pub fn screen_mut(&mut self) -> &mut ScreenBuffer {
-        if self.alternate_active { &mut self.alternate } else { &mut self.primary }
+        if self.alternate_active {
+            &mut self.alternate
+        } else {
+            &mut self.primary
+        }
     }
 
     /// Feeds raw bytes (e.g. from a PTY) into the emulator.
@@ -567,7 +629,10 @@ impl TerminalEmulator {
         self.rows = rows;
         self.primary = ScreenBuffer::new(cols, rows);
         self.alternate = ScreenBuffer::new(cols, rows);
-        self.scroll_region = ScrollRegion { top: 0, bottom: rows - 1 };
+        self.scroll_region = ScrollRegion {
+            top: 0,
+            bottom: rows - 1,
+        };
         self.cursor.col = self.cursor.col.min(cols - 1);
         self.cursor.row = self.cursor.row.min(rows - 1);
     }
@@ -580,7 +645,11 @@ impl TerminalEmulator {
         match seq {
             EscapeSequence::Print(ch) => self.print_char(ch),
             EscapeSequence::Control(c) => self.handle_control(c),
-            EscapeSequence::Csi { params, intermediates: _, final_byte } => {
+            EscapeSequence::Csi {
+                params,
+                intermediates: _,
+                final_byte,
+            } => {
                 self.handle_csi(&params, final_byte);
             }
             EscapeSequence::Osc(s) => self.handle_osc(&s),
@@ -607,17 +676,25 @@ impl TerminalEmulator {
 
     fn handle_control(&mut self, c: u8) {
         match c {
-            0x08 => { // BS
-                if self.cursor.col > 0 { self.cursor.col -= 1; }
+            0x08 => {
+                // BS
+                if self.cursor.col > 0 {
+                    self.cursor.col -= 1;
+                }
             }
-            0x09 => { // HT – horizontal tab (next tab stop)
+            0x09 => {
+                // HT – horizontal tab (next tab stop)
                 self.cursor.col = ((self.cursor.col / 8) + 1) * 8;
-                if self.cursor.col >= self.cols { self.cursor.col = self.cols - 1; }
+                if self.cursor.col >= self.cols {
+                    self.cursor.col = self.cols - 1;
+                }
             }
-            0x0A | 0x0B | 0x0C => { // LF / VT / FF
+            0x0A | 0x0B | 0x0C => {
+                // LF / VT / FF
                 self.advance_line();
             }
-            0x0D => { // CR
+            0x0D => {
+                // CR
                 self.cursor.col = 0;
             }
             _ => {}
@@ -645,50 +722,65 @@ impl TerminalEmulator {
         let p0 = params.first().copied().unwrap_or(0);
         let p1 = params.get(1).copied().unwrap_or(0);
         match final_byte {
-            b'A' => { // CUU – cursor up
+            b'A' => {
+                // CUU – cursor up
                 let n = p0.max(1) as usize;
                 self.cursor.row = self.cursor.row.saturating_sub(n);
             }
-            b'B' => { // CUD – cursor down
+            b'B' => {
+                // CUD – cursor down
                 let n = p0.max(1) as usize;
                 self.cursor.row = (self.cursor.row + n).min(self.rows - 1);
             }
-            b'C' => { // CUF – cursor forward
+            b'C' => {
+                // CUF – cursor forward
                 let n = p0.max(1) as usize;
                 self.cursor.col = (self.cursor.col + n).min(self.cols - 1);
             }
-            b'D' => { // CUB – cursor back
+            b'D' => {
+                // CUB – cursor back
                 let n = p0.max(1) as usize;
                 self.cursor.col = self.cursor.col.saturating_sub(n);
             }
-            b'H' | b'f' => { // CUP / HVP – cursor position
+            b'H' | b'f' => {
+                // CUP / HVP – cursor position
                 let row = p0.saturating_sub(1) as usize;
                 let col = p1.saturating_sub(1) as usize;
                 self.cursor.row = row.min(self.rows - 1);
                 self.cursor.col = col.min(self.cols - 1);
             }
-            b'J' => { // ED – erase in display
+            b'J' => {
+                // ED – erase in display
                 self.erase_in_display(p0);
             }
-            b'K' => { // EL – erase in line
+            b'K' => {
+                // EL – erase in line
                 self.erase_in_line(p0);
             }
-            b'm' => { // SGR – select graphic rendition
+            b'm' => {
+                // SGR – select graphic rendition
                 self.apply_sgr(params);
             }
-            b'r' => { // DECSTBM – set top and bottom margins
+            b'r' => {
+                // DECSTBM – set top and bottom margins
                 let top = p0.saturating_sub(1) as usize;
-                let bottom = if p1 == 0 { self.rows - 1 } else { (p1 - 1) as usize };
+                let bottom = if p1 == 0 {
+                    self.rows - 1
+                } else {
+                    (p1 - 1) as usize
+                };
                 if top < bottom {
                     self.scroll_region = ScrollRegion { top, bottom };
                 }
             }
-            b'S' => { // SU – scroll up
+            b'S' => {
+                // SU – scroll up
                 let n = p0.max(1) as usize;
                 let (top, bottom) = (self.scroll_region.top, self.scroll_region.bottom);
                 self.screen_mut().scroll_up(top, bottom, n);
             }
-            b'T' => { // SD – scroll down
+            b'T' => {
+                // SD – scroll down
                 let n = p0.max(1) as usize;
                 let (top, bottom) = (self.scroll_region.top, self.scroll_region.bottom);
                 self.screen_mut().scroll_down(top, bottom, n);
@@ -700,7 +792,8 @@ impl TerminalEmulator {
     fn erase_in_display(&mut self, mode: u16) {
         let (rows, cols) = (self.rows, self.cols);
         match mode {
-            0 => { // from cursor to end
+            0 => {
+                // from cursor to end
                 let (cr, cc) = (self.cursor.row, self.cursor.col);
                 for c in cc..cols {
                     *self.screen_mut().get_mut(c, cr) = Cell::EMPTY;
@@ -709,7 +802,8 @@ impl TerminalEmulator {
                     self.screen_mut().clear_row(r);
                 }
             }
-            1 => { // from start to cursor
+            1 => {
+                // from start to cursor
                 let (cr, cc) = (self.cursor.row, self.cursor.col);
                 for r in 0..cr {
                     self.screen_mut().clear_row(r);
@@ -718,7 +812,8 @@ impl TerminalEmulator {
                     *self.screen_mut().get_mut(c, cr) = Cell::EMPTY;
                 }
             }
-            2 | 3 => { // entire screen (3 also clears scrollback)
+            2 | 3 => {
+                // entire screen (3 also clears scrollback)
                 for r in 0..rows {
                     self.screen_mut().clear_row(r);
                 }
@@ -732,9 +827,19 @@ impl TerminalEmulator {
         let row = self.cursor.row;
         let col = self.cursor.col;
         match mode {
-            0 => { for c in col..cols { *self.screen_mut().get_mut(c, row) = Cell::EMPTY; } }
-            1 => { for c in 0..=col { *self.screen_mut().get_mut(c, row) = Cell::EMPTY; } }
-            2 => { self.screen_mut().clear_row(row); }
+            0 => {
+                for c in col..cols {
+                    *self.screen_mut().get_mut(c, row) = Cell::EMPTY;
+                }
+            }
+            1 => {
+                for c in 0..=col {
+                    *self.screen_mut().get_mut(c, row) = Cell::EMPTY;
+                }
+            }
+            2 => {
+                self.screen_mut().clear_row(row);
+            }
             _ => {}
         }
     }
@@ -743,23 +848,58 @@ impl TerminalEmulator {
         let mut i = 0;
         while i < params.len() {
             match params[i] {
-                0 => { self.cursor.attrs = Attributes::default(); }
-                1 => { self.cursor.attrs.bold = true; }
-                2 => { self.cursor.attrs.dim = true; }
-                3 => { self.cursor.attrs.italic = true; }
-                4 => { self.cursor.attrs.underline = true; }
-                5 | 6 => { self.cursor.attrs.blink = true; }
-                7 => { self.cursor.attrs.reverse = true; }
-                8 => { self.cursor.attrs.invisible = true; }
-                9 => { self.cursor.attrs.strikethrough = true; }
-                22 => { self.cursor.attrs.bold = false; self.cursor.attrs.dim = false; }
-                23 => { self.cursor.attrs.italic = false; }
-                24 => { self.cursor.attrs.underline = false; }
-                25 => { self.cursor.attrs.blink = false; }
-                27 => { self.cursor.attrs.reverse = false; }
-                28 => { self.cursor.attrs.invisible = false; }
-                29 => { self.cursor.attrs.strikethrough = false; }
-                30..=37 => { self.cursor.attrs.foreground = Color::Ansi((params[i] - 30) as u8); }
+                0 => {
+                    self.cursor.attrs = Attributes::default();
+                }
+                1 => {
+                    self.cursor.attrs.bold = true;
+                }
+                2 => {
+                    self.cursor.attrs.dim = true;
+                }
+                3 => {
+                    self.cursor.attrs.italic = true;
+                }
+                4 => {
+                    self.cursor.attrs.underline = true;
+                }
+                5 | 6 => {
+                    self.cursor.attrs.blink = true;
+                }
+                7 => {
+                    self.cursor.attrs.reverse = true;
+                }
+                8 => {
+                    self.cursor.attrs.invisible = true;
+                }
+                9 => {
+                    self.cursor.attrs.strikethrough = true;
+                }
+                22 => {
+                    self.cursor.attrs.bold = false;
+                    self.cursor.attrs.dim = false;
+                }
+                23 => {
+                    self.cursor.attrs.italic = false;
+                }
+                24 => {
+                    self.cursor.attrs.underline = false;
+                }
+                25 => {
+                    self.cursor.attrs.blink = false;
+                }
+                27 => {
+                    self.cursor.attrs.reverse = false;
+                }
+                28 => {
+                    self.cursor.attrs.invisible = false;
+                }
+                29 => {
+                    self.cursor.attrs.strikethrough = false;
+                }
+                30..=37 => {
+                    self.cursor.attrs.foreground = Color::Ansi((params[i] - 30) as u8);
+                }
                 38 => {
                     if params.get(i + 1) == Some(&5) && i + 2 < params.len() {
                         self.cursor.attrs.foreground = Color::Palette256(params[i + 2] as u8);
@@ -773,8 +913,12 @@ impl TerminalEmulator {
                         i += 4;
                     }
                 }
-                39 => { self.cursor.attrs.foreground = Color::Default; }
-                40..=47 => { self.cursor.attrs.background = Color::Ansi((params[i] - 40) as u8); }
+                39 => {
+                    self.cursor.attrs.foreground = Color::Default;
+                }
+                40..=47 => {
+                    self.cursor.attrs.background = Color::Ansi((params[i] - 40) as u8);
+                }
                 48 => {
                     if params.get(i + 1) == Some(&5) && i + 2 < params.len() {
                         self.cursor.attrs.background = Color::Palette256(params[i + 2] as u8);
@@ -788,9 +932,15 @@ impl TerminalEmulator {
                         i += 4;
                     }
                 }
-                49 => { self.cursor.attrs.background = Color::Default; }
-                90..=97 => { self.cursor.attrs.foreground = Color::Ansi((params[i] - 90 + 8) as u8); }
-                100..=107 => { self.cursor.attrs.background = Color::Ansi((params[i] - 100 + 8) as u8); }
+                49 => {
+                    self.cursor.attrs.background = Color::Default;
+                }
+                90..=97 => {
+                    self.cursor.attrs.foreground = Color::Ansi((params[i] - 90 + 8) as u8);
+                }
+                100..=107 => {
+                    self.cursor.attrs.background = Color::Ansi((params[i] - 100 + 8) as u8);
+                }
                 _ => {}
             }
             i += 1;

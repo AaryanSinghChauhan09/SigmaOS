@@ -147,8 +147,12 @@ impl ContactManager {
                 .filter(|c| {
                     c.first_name.to_lowercase().contains(&filter_lower)
                         || c.last_name.to_lowercase().contains(&filter_lower)
-                        || c.email_addresses.iter().any(|e| e.email.to_lowercase().contains(&filter_lower))
-                        || c.phone_numbers.iter().any(|p| p.number.contains(&filter_lower))
+                        || c.email_addresses
+                            .iter()
+                            .any(|e| e.email.to_lowercase().contains(&filter_lower))
+                        || c.phone_numbers
+                            .iter()
+                            .any(|p| p.number.contains(&filter_lower))
                 })
                 .collect()
         }
@@ -176,7 +180,11 @@ impl ContactManager {
     }
 
     /// Add contact to group
-    pub fn add_to_group(&mut self, group_id: String, contact_id: String) -> Result<(), &'static str> {
+    pub fn add_to_group(
+        &mut self,
+        group_id: String,
+        contact_id: String,
+    ) -> Result<(), &'static str> {
         let group = self.groups.get_mut(&group_id).ok_or("Group not found")?;
         if !group.contact_ids.contains(&contact_id) {
             group.contact_ids.push(contact_id);
@@ -185,9 +193,17 @@ impl ContactManager {
     }
 
     /// Remove contact from group
-    pub fn remove_from_group(&mut self, group_id: String, contact_id: String) -> Result<(), &'static str> {
+    pub fn remove_from_group(
+        &mut self,
+        group_id: String,
+        contact_id: String,
+    ) -> Result<(), &'static str> {
         let group = self.groups.get_mut(&group_id).ok_or("Group not found")?;
-        let index = group.contact_ids.iter().position(|id| id == &contact_id).ok_or("Contact not in group")?;
+        let index = group
+            .contact_ids
+            .iter()
+            .position(|id| id == &contact_id)
+            .ok_or("Contact not in group")?;
         group.contact_ids.remove(index);
         Ok(())
     }
@@ -239,7 +255,9 @@ pub fn init_contact_manager() {
 /// Get contact manager
 pub fn get_contact_manager() -> &'static mut ContactManager {
     unsafe {
-        CONTACT_MANAGER.as_mut().expect("Contact manager not initialized")
+        CONTACT_MANAGER
+            .as_mut()
+            .expect("Contact manager not initialized")
     }
 }
 

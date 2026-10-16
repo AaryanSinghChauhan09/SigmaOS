@@ -37,10 +37,10 @@ pub struct TraceRecord {
     pub cpu: u32,
     pub pid: u32,
     pub timestamp_ns: u64,
-    pub ip: usize,       // Instruction pointer of traced function
-    pub parent_ip: usize,// Return address / caller
-    pub depth: u16,      // Call depth for graph tracer
-    pub duration_ns: u64,// Execution time for graph return
+    pub ip: usize,        // Instruction pointer of traced function
+    pub parent_ip: usize, // Return address / caller
+    pub depth: u16,       // Call depth for graph tracer
+    pub duration_ns: u64, // Execution time for graph return
 }
 
 /// Call frame on the shadow call stack for tracking function returns
@@ -110,7 +110,14 @@ impl FtraceEngine {
     }
 
     /// Function entry hook invoked by `__fentry__`.
-    pub fn trace_function_entry(&mut self, cpu: u32, pid: u32, ip: usize, parent_ip: usize, ts: u64) {
+    pub fn trace_function_entry(
+        &mut self,
+        cpu: u32,
+        pid: u32,
+        ip: usize,
+        parent_ip: usize,
+        ts: u64,
+    ) {
         if !self.enabled {
             return;
         }

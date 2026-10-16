@@ -213,7 +213,7 @@ pub struct MediaLibrary {
 
 /// Media player
 pub struct MediaPlayer {
-    pub current_item: Option<u32>, // media item ID
+    pub current_item: Option<u32>,     // media item ID
     pub current_playlist: Option<u32>, // playlist ID
     pub library: BTreeMap<u32, MediaLibrary>,
     pub playback_state: PlaybackState,
@@ -245,16 +245,46 @@ impl MediaPlayer {
                 muted: false,
                 equalizer_enabled: false,
                 equalizer_bands: vec![
-                    EqualizerBand { frequency: 60.0, gain: 0.0 },
-                    EqualizerBand { frequency: 170.0, gain: 0.0 },
-                    EqualizerBand { frequency: 310.0, gain: 0.0 },
-                    EqualizerBand { frequency: 600.0, gain: 0.0 },
-                    EqualizerBand { frequency: 1000.0, gain: 0.0 },
-                    EqualizerBand { frequency: 3000.0, gain: 0.0 },
-                    EqualizerBand { frequency: 6000.0, gain: 0.0 },
-                    EqualizerBand { frequency: 12000.0, gain: 0.0 },
-                    EqualizerBand { frequency: 14000.0, gain: 0.0 },
-                    EqualizerBand { frequency: 16000.0, gain: 0.0 },
+                    EqualizerBand {
+                        frequency: 60.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 170.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 310.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 600.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 1000.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 3000.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 6000.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 12000.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 14000.0,
+                        gain: 0.0,
+                    },
+                    EqualizerBand {
+                        frequency: 16000.0,
+                        gain: 0.0,
+                    },
                 ],
                 current_preset: None,
             },
@@ -294,8 +324,19 @@ impl MediaPlayer {
     }
 
     /// Add media item to library
-    pub fn add_media_item(&mut self, library_id: u32, title: String, file_path: String, media_type: MediaType, container: ContainerFormat, duration: u32) -> Result<u32, &'static str> {
-        let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
+    pub fn add_media_item(
+        &mut self,
+        library_id: u32,
+        title: String,
+        file_path: String,
+        media_type: MediaType,
+        container: ContainerFormat,
+        duration: u32,
+    ) -> Result<u32, &'static str> {
+        let library = self
+            .library
+            .get_mut(&library_id)
+            .ok_or("Library not found")?;
         let id = self.next_item_id.fetch_add(1, Ordering::Relaxed);
         let item = MediaItem {
             id,
@@ -317,7 +358,10 @@ impl MediaPlayer {
 
     /// Create playlist
     pub fn create_playlist(&mut self, library_id: u32, name: String) -> Result<u32, &'static str> {
-        let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
+        let library = self
+            .library
+            .get_mut(&library_id)
+            .ok_or("Library not found")?;
         let id = self.next_playlist_id.fetch_add(1, Ordering::Relaxed);
         let playlist = Playlist {
             id,
@@ -332,9 +376,20 @@ impl MediaPlayer {
     }
 
     /// Add item to playlist
-    pub fn add_to_playlist(&mut self, library_id: u32, playlist_id: u32, item_id: u32) -> Result<(), &'static str> {
-        let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
-        let playlist = library.playlists.get_mut(&playlist_id).ok_or("Playlist not found")?;
+    pub fn add_to_playlist(
+        &mut self,
+        library_id: u32,
+        playlist_id: u32,
+        item_id: u32,
+    ) -> Result<(), &'static str> {
+        let library = self
+            .library
+            .get_mut(&library_id)
+            .ok_or("Library not found")?;
+        let playlist = library
+            .playlists
+            .get_mut(&playlist_id)
+            .ok_or("Playlist not found")?;
         if !playlist.items.contains(&item_id) {
             playlist.items.push(item_id);
         }
@@ -355,7 +410,10 @@ impl MediaPlayer {
     /// Play playlist
     pub fn play_playlist(&mut self, library_id: u32, playlist_id: u32) -> Result<(), &'static str> {
         let library = self.library.get(&library_id).ok_or("Library not found")?;
-        let playlist = library.playlists.get(&playlist_id).ok_or("Playlist not found")?;
+        let playlist = library
+            .playlists
+            .get(&playlist_id)
+            .ok_or("Playlist not found")?;
         if playlist.items.is_empty() {
             return Err("Playlist is empty");
         }
@@ -409,15 +467,22 @@ impl MediaPlayer {
     pub fn next(&mut self) -> Result<(), &'static str> {
         if let Some(playlist_id) = self.current_playlist {
             if let Some(library_id) = self.get_current_library_id() {
-                let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
-                let playlist = library.playlists.get_mut(&playlist_id).ok_or("Playlist not found")?;
-                
+                let library = self
+                    .library
+                    .get_mut(&library_id)
+                    .ok_or("Library not found")?;
+                let playlist = library
+                    .playlists
+                    .get_mut(&playlist_id)
+                    .ok_or("Playlist not found")?;
+
                 match playlist.repeat_mode {
                     RepeatMode::One => {
                         // Replay current
                     }
                     _ => {
-                        playlist.current_index = (playlist.current_index + 1) % playlist.items.len();
+                        playlist.current_index =
+                            (playlist.current_index + 1) % playlist.items.len();
                         let item_id = playlist.items[playlist.current_index];
                         self.play(library_id, item_id)?;
                     }
@@ -431,9 +496,15 @@ impl MediaPlayer {
     pub fn previous(&mut self) -> Result<(), &'static str> {
         if let Some(playlist_id) = self.current_playlist {
             if let Some(library_id) = self.get_current_library_id() {
-                let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
-                let playlist = library.playlists.get_mut(&playlist_id).ok_or("Playlist not found")?;
-                
+                let library = self
+                    .library
+                    .get_mut(&library_id)
+                    .ok_or("Library not found")?;
+                let playlist = library
+                    .playlists
+                    .get_mut(&playlist_id)
+                    .ok_or("Playlist not found")?;
+
                 if playlist.current_index > 0 {
                     playlist.current_index -= 1;
                 } else {
@@ -450,8 +521,14 @@ impl MediaPlayer {
     pub fn set_repeat_mode(&mut self, repeat_mode: RepeatMode) -> Result<(), &'static str> {
         if let Some(playlist_id) = self.current_playlist {
             if let Some(library_id) = self.get_current_library_id() {
-                let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
-                let playlist = library.playlists.get_mut(&playlist_id).ok_or("Playlist not found")?;
+                let library = self
+                    .library
+                    .get_mut(&library_id)
+                    .ok_or("Library not found")?;
+                let playlist = library
+                    .playlists
+                    .get_mut(&playlist_id)
+                    .ok_or("Playlist not found")?;
                 playlist.repeat_mode = repeat_mode;
             }
         }
@@ -462,8 +539,14 @@ impl MediaPlayer {
     pub fn toggle_shuffle(&mut self) -> Result<(), &'static str> {
         if let Some(playlist_id) = self.current_playlist {
             if let Some(library_id) = self.get_current_library_id() {
-                let library = self.library.get_mut(&library_id).ok_or("Library not found")?;
-                let playlist = library.playlists.get_mut(&playlist_id).ok_or("Playlist not found")?;
+                let library = self
+                    .library
+                    .get_mut(&library_id)
+                    .ok_or("Library not found")?;
+                let playlist = library
+                    .playlists
+                    .get_mut(&playlist_id)
+                    .ok_or("Playlist not found")?;
                 playlist.shuffle_mode = match playlist.shuffle_mode {
                     ShuffleMode::Off => ShuffleMode::On,
                     ShuffleMode::On => ShuffleMode::Off,
@@ -504,9 +587,20 @@ impl MediaPlayer {
     }
 
     /// Play stream
-    pub fn play_stream(&mut self, url: String, protocol: StreamProtocol) -> Result<u32, &'static str> {
+    pub fn play_stream(
+        &mut self,
+        url: String,
+        protocol: StreamProtocol,
+    ) -> Result<u32, &'static str> {
         let library_id = self.create_library("Streams".to_string());
-        let item_id = self.add_media_item(library_id, url.clone(), url.clone(), MediaType::Stream, ContainerFormat::TS, 0)?;
+        let item_id = self.add_media_item(
+            library_id,
+            url.clone(),
+            url.clone(),
+            MediaType::Stream,
+            ContainerFormat::TS,
+            0,
+        )?;
         self.play(library_id, item_id)?;
         Ok(item_id)
     }
@@ -547,9 +641,7 @@ pub fn init_mediacraft() {
 
 /// Get global mediacraft
 pub fn get_mediacraft() -> Option<&'static mut MediaPlayer> {
-    unsafe {
-        MEDIACRAFT.as_mut()
-    }
+    unsafe { MEDIACRAFT.as_mut() }
 }
 
 #[cfg(test)]
@@ -576,7 +668,16 @@ mod tests {
         let mut player = MediaPlayer::new();
         player.init();
         let library_id = player.create_library("Music".to_string());
-        let item_id = player.add_media_item(library_id, "Song.mp3".to_string(), "/music/song.mp3".to_string(), MediaType::Audio, ContainerFormat::MP3, 180).unwrap();
+        let item_id = player
+            .add_media_item(
+                library_id,
+                "Song.mp3".to_string(),
+                "/music/song.mp3".to_string(),
+                MediaType::Audio,
+                ContainerFormat::MP3,
+                180,
+            )
+            .unwrap();
         assert!(player.library[&library_id].items.contains_key(&item_id));
     }
 
@@ -585,10 +686,28 @@ mod tests {
         let mut player = MediaPlayer::new();
         player.init();
         let library_id = player.create_library("Music".to_string());
-        let item_id = player.add_media_item(library_id, "Song.mp3".to_string(), "/music/song.mp3".to_string(), MediaType::Audio, ContainerFormat::MP3, 180).unwrap();
-        let playlist_id = player.create_playlist(library_id, "Favorites".to_string()).unwrap();
-        player.add_to_playlist(library_id, playlist_id, item_id).unwrap();
-        assert_eq!(player.library[&library_id].playlists[&playlist_id].items.len(), 1);
+        let item_id = player
+            .add_media_item(
+                library_id,
+                "Song.mp3".to_string(),
+                "/music/song.mp3".to_string(),
+                MediaType::Audio,
+                ContainerFormat::MP3,
+                180,
+            )
+            .unwrap();
+        let playlist_id = player
+            .create_playlist(library_id, "Favorites".to_string())
+            .unwrap();
+        player
+            .add_to_playlist(library_id, playlist_id, item_id)
+            .unwrap();
+        assert_eq!(
+            player.library[&library_id].playlists[&playlist_id]
+                .items
+                .len(),
+            1
+        );
     }
 
     #[test]
@@ -596,7 +715,16 @@ mod tests {
         let mut player = MediaPlayer::new();
         player.init();
         let library_id = player.create_library("Music".to_string());
-        let item_id = player.add_media_item(library_id, "Song.mp3".to_string(), "/music/song.mp3".to_string(), MediaType::Audio, ContainerFormat::MP3, 180).unwrap();
+        let item_id = player
+            .add_media_item(
+                library_id,
+                "Song.mp3".to_string(),
+                "/music/song.mp3".to_string(),
+                MediaType::Audio,
+                ContainerFormat::MP3,
+                180,
+            )
+            .unwrap();
         player.play(library_id, item_id).unwrap();
         assert_eq!(player.playback_state, PlaybackState::Playing);
         assert_eq!(player.current_item, Some(item_id));
@@ -607,7 +735,16 @@ mod tests {
         let mut player = MediaPlayer::new();
         player.init();
         let library_id = player.create_library("Music".to_string());
-        let item_id = player.add_media_item(library_id, "Song.mp3".to_string(), "/music/song.mp3".to_string(), MediaType::Audio, ContainerFormat::MP3, 180).unwrap();
+        let item_id = player
+            .add_media_item(
+                library_id,
+                "Song.mp3".to_string(),
+                "/music/song.mp3".to_string(),
+                MediaType::Audio,
+                ContainerFormat::MP3,
+                180,
+            )
+            .unwrap();
         player.play(library_id, item_id).unwrap();
         player.pause();
         assert_eq!(player.playback_state, PlaybackState::Paused);
@@ -620,7 +757,16 @@ mod tests {
         let mut player = MediaPlayer::new();
         player.init();
         let library_id = player.create_library("Music".to_string());
-        let item_id = player.add_media_item(library_id, "Song.mp3".to_string(), "/music/song.mp3".to_string(), MediaType::Audio, ContainerFormat::MP3, 180).unwrap();
+        let item_id = player
+            .add_media_item(
+                library_id,
+                "Song.mp3".to_string(),
+                "/music/song.mp3".to_string(),
+                MediaType::Audio,
+                ContainerFormat::MP3,
+                180,
+            )
+            .unwrap();
         player.play(library_id, item_id).unwrap();
         player.seek(90);
         assert_eq!(player.position, 90);
@@ -648,12 +794,28 @@ mod tests {
         let mut player = MediaPlayer::new();
         player.init();
         let library_id = player.create_library("Music".to_string());
-        let item_id = player.add_media_item(library_id, "Song.mp3".to_string(), "/music/song.mp3".to_string(), MediaType::Audio, ContainerFormat::MP3, 180).unwrap();
-        let playlist_id = player.create_playlist(library_id, "Favorites".to_string()).unwrap();
-        player.add_to_playlist(library_id, playlist_id, item_id).unwrap();
+        let item_id = player
+            .add_media_item(
+                library_id,
+                "Song.mp3".to_string(),
+                "/music/song.mp3".to_string(),
+                MediaType::Audio,
+                ContainerFormat::MP3,
+                180,
+            )
+            .unwrap();
+        let playlist_id = player
+            .create_playlist(library_id, "Favorites".to_string())
+            .unwrap();
+        player
+            .add_to_playlist(library_id, playlist_id, item_id)
+            .unwrap();
         player.play_playlist(library_id, playlist_id).unwrap();
         player.set_repeat_mode(RepeatMode::All).unwrap();
-        assert_eq!(player.library[&library_id].playlists[&playlist_id].repeat_mode, RepeatMode::All);
+        assert_eq!(
+            player.library[&library_id].playlists[&playlist_id].repeat_mode,
+            RepeatMode::All
+        );
     }
 
     #[test]
@@ -682,7 +844,12 @@ mod tests {
     fn test_stream() {
         let mut player = MediaPlayer::new();
         player.init();
-        let item_id = player.play_stream("https://example.com/stream.m3u8".to_string(), StreamProtocol::HLS).unwrap();
+        let item_id = player
+            .play_stream(
+                "https://example.com/stream.m3u8".to_string(),
+                StreamProtocol::HLS,
+            )
+            .unwrap();
         assert!(player.current_item == Some(item_id));
         assert_eq!(player.playback_state, PlaybackState::Playing);
     }

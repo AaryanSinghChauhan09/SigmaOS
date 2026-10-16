@@ -151,7 +151,12 @@ impl SovereignRsyncResticBorgAdvancedEngine {
         tags: Vec<String>,
     ) -> String {
         let snap_num = self.snapshots.len() + 1;
-        let snapshot_id = format!("snap-{:04}-{}-{}", snap_num, file_paths.len(), self.vault_config.vault_id);
+        let snapshot_id = format!(
+            "snap-{:04}-{}-{}",
+            snap_num,
+            file_paths.len(),
+            self.vault_config.vault_id
+        );
         let mut chunk_hashes = Vec::new();
         let mut total_size = 0u64;
 
@@ -220,11 +225,11 @@ pub const BSD_DUMP_MAGIC_NUMBER: u32 = 0x00013912;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BsdTapeHeaderType {
-    TapeHeader, // TS_TAPE
-    InodeHeader,// TS_INODE
-    BitsHeader, // TS_BITS
-    AddrHeader, // TS_ADDR
-    EndHeader,  // TS_END
+    TapeHeader,  // TS_TAPE
+    InodeHeader, // TS_INODE
+    BitsHeader,  // TS_BITS
+    AddrHeader,  // TS_ADDR
+    EndHeader,   // TS_END
 }
 
 #[derive(Debug, Clone)]
@@ -299,7 +304,10 @@ impl SovereignBsdAndExt4DumpRestoreEngine {
                         } else {
                             " "
                         };
-                        format!("{}ino #{:06} | mode {:o} | {:8} B | {}", mark, i.inode_id, i.mode, i.file_size_bytes, i.path)
+                        format!(
+                            "{}ino #{:06} | mode {:o} | {:8} B | {}",
+                            mark, i.inode_id, i.mode, i.file_size_bytes, i.path
+                        )
                     })
                     .collect();
                 Ok(items.join("\n"))
@@ -310,7 +318,10 @@ impl SovereignBsdAndExt4DumpRestoreEngine {
                 } else {
                     self.current_interactive_dir = arg.to_string();
                 }
-                Ok(format!("Changed restore directory to {}", self.current_interactive_dir))
+                Ok(format!(
+                    "Changed restore directory to {}",
+                    self.current_interactive_dir
+                ))
             }
             "add" => {
                 if let Ok(ino) = arg.parse::<u32>() {
@@ -337,9 +348,15 @@ impl SovereignBsdAndExt4DumpRestoreEngine {
             "extract" => {
                 let count = self.marked_for_restore.len();
                 self.marked_for_restore.clear();
-                Ok(format!("Successfully extracted {} marked inode file records", count))
+                Ok(format!(
+                    "Successfully extracted {} marked inode file records",
+                    count
+                ))
             }
-            "pwd" => Ok(format!("Current restore shell directory: {}", self.current_interactive_dir)),
+            "pwd" => Ok(format!(
+                "Current restore shell directory: {}",
+                self.current_interactive_dir
+            )),
             _ => Err(format!("Unknown restore command: {}", cmd)),
         }
     }
@@ -404,10 +421,18 @@ impl SovereignTimeshiftSnapperSnapshotGovernor {
         let snapshot_id = self.snapshots.len() as u32 + 1;
         let path = match self.backend {
             SnapshotFsBackend::BtrfsSubvolume => format!("@snapshots/{}_{}", snapshot_id, name),
-            SnapshotFsBackend::ZfsDataset => format!("zroot/ROOT/default@snap_{}_{}", snapshot_id, name),
-            SnapshotFsBackend::DragonFlyHammer2Pfs => format!("/build/hammer2/pfs/{}_{}", snapshot_id, name),
-            SnapshotFsBackend::Ext4LvmThin => format!("/dev/vg0/thin_snap_{}_{}", snapshot_id, name),
-            SnapshotFsBackend::BcachefsSnapshot => format!("/mnt/bcachefs/@snap_{}_{}", snapshot_id, name),
+            SnapshotFsBackend::ZfsDataset => {
+                format!("zroot/ROOT/default@snap_{}_{}", snapshot_id, name)
+            }
+            SnapshotFsBackend::DragonFlyHammer2Pfs => {
+                format!("/build/hammer2/pfs/{}_{}", snapshot_id, name)
+            }
+            SnapshotFsBackend::Ext4LvmThin => {
+                format!("/dev/vg0/thin_snap_{}_{}", snapshot_id, name)
+            }
+            SnapshotFsBackend::BcachefsSnapshot => {
+                format!("/mnt/bcachefs/@snap_{}_{}", snapshot_id, name)
+            }
         };
 
         self.snapshots.push(SystemFsSnapshotRecord {
@@ -438,10 +463,16 @@ impl SovereignTimeshiftSnapperSnapshotGovernor {
 
         let msg = match snap.backend {
             SnapshotFsBackend::BtrfsSubvolume => {
-                format!("Btrfs subvolume atomic swap: mv {} /@ && update grub-btrfs", snap.dataset_or_path)
+                format!(
+                    "Btrfs subvolume atomic swap: mv {} /@ && update grub-btrfs",
+                    snap.dataset_or_path
+                )
             }
             SnapshotFsBackend::ZfsDataset => {
-                format!("ZFS bectl activate {} && zfs rollback -r {}", snap.name, snap.dataset_or_path)
+                format!(
+                    "ZFS bectl activate {} && zfs rollback -r {}",
+                    snap.name, snap.dataset_or_path
+                )
             }
             SnapshotFsBackend::DragonFlyHammer2Pfs => {
                 format!("HAMMER2 PFS root mount switch -> {}", snap.dataset_or_path)
@@ -503,7 +534,9 @@ impl SovereignDdrescueTestdiskPhotorecEngine {
         let chunk_size = 500_000u64;
 
         for offset in (0..total_size).step_by(chunk_size as usize) {
-            let is_bad = bad_sectors.iter().any(|&bad| bad >= offset && bad < offset + chunk_size);
+            let is_bad = bad_sectors
+                .iter()
+                .any(|&bad| bad >= offset && bad < offset + chunk_size);
             if is_bad {
                 self.total_error_bytes += chunk_size;
                 self.mapfile.push(MapfileRecord {
@@ -608,7 +641,11 @@ impl SovereignRescueLiveIsoAndInstallerSuite {
             ("/proc", "/proc", "proc"),
             ("/sys", "/sys", "sysfs"),
             ("/run", "/run", "tmpfs"),
-            ("/sys/firmware/efi/efivars", "/sys/firmware/efi/efivars", "efivarfs"),
+            (
+                "/sys/firmware/efi/efivars",
+                "/sys/firmware/efi/efivars",
+                "efivarfs",
+            ),
         ];
 
         for (src, sub, fs) in default_mounts {
@@ -621,22 +658,35 @@ impl SovereignRescueLiveIsoAndInstallerSuite {
             });
         }
 
-        self.repair_logs.push(format!("Rescue chroot bound at {}", target_root));
+        self.repair_logs
+            .push(format!("Rescue chroot bound at {}", target_root));
         self.chroot_mounts.len()
     }
 
     /// Bootloader repair & /etc/fstab UUID reconstruction
     pub fn repair_bootloader_and_fstab(&mut self, target_root: &str) -> Result<String, String> {
-        self.repair_logs.push(format!("{}: GRUB2 / systemd-boot NVRAM entry re-written", target_root));
-        self.repair_logs.push(format!("{}: Reconstructed /etc/fstab with blkid UUIDs", target_root));
-        self.repair_logs.push(format!("{}: Rebuilt initramfs via dracut / mkinitcpio", target_root));
+        self.repair_logs.push(format!(
+            "{}: GRUB2 / systemd-boot NVRAM entry re-written",
+            target_root
+        ));
+        self.repair_logs.push(format!(
+            "{}: Reconstructed /etc/fstab with blkid UUIDs",
+            target_root
+        ));
+        self.repair_logs.push(format!(
+            "{}: Rebuilt initramfs via dracut / mkinitcpio",
+            target_root
+        ));
 
         Ok("System boot components successfully repaired".to_string())
     }
 
     /// Reset emergency root password
     pub fn reset_root_password(&mut self, target_root: &str) -> bool {
-        self.repair_logs.push(format!("{}: Root account password unlocked in /etc/shadow", target_root));
+        self.repair_logs.push(format!(
+            "{}: Root account password unlocked in /etc/shadow",
+            target_root
+        ));
         true
     }
 }
@@ -656,10 +706,18 @@ pub struct SovereignBackupRecoveryDistroPinnacleSuite {
 impl SovereignBackupRecoveryDistroPinnacleSuite {
     pub fn new() -> Self {
         Self {
-            rsync_borg_engine: SovereignRsyncResticBorgAdvancedEngine::new("pinnacle-vault-01", "p1nn@cl3_s3cur3"),
+            rsync_borg_engine: SovereignRsyncResticBorgAdvancedEngine::new(
+                "pinnacle-vault-01",
+                "p1nn@cl3_s3cur3",
+            ),
             bsd_dump_engine: SovereignBsdAndExt4DumpRestoreEngine::new("/dev/zvol/zroot/usr", 0),
-            snapshot_governor: SovereignTimeshiftSnapperSnapshotGovernor::new(SnapshotFsBackend::BtrfsSubvolume),
-            forensic_recovery: SovereignDdrescueTestdiskPhotorecEngine::new("/dev/nvme0n1", "/mnt/rescue/nvme0n1.img"),
+            snapshot_governor: SovereignTimeshiftSnapperSnapshotGovernor::new(
+                SnapshotFsBackend::BtrfsSubvolume,
+            ),
+            forensic_recovery: SovereignDdrescueTestdiskPhotorecEngine::new(
+                "/dev/nvme0n1",
+                "/mnt/rescue/nvme0n1.img",
+            ),
             rescue_installer: SovereignRescueLiveIsoAndInstallerSuite::new(),
         }
     }
@@ -686,8 +744,7 @@ impl SovereignBackupRecoveryDistroPinnacleSuite {
         ));
         report.push_str(&format!(
             "4. Forensic Recovery: Source={}, Target={}\n",
-            self.forensic_recovery.source_dev,
-            self.forensic_recovery.dest_image
+            self.forensic_recovery.source_dev, self.forensic_recovery.dest_image
         ));
         report.push_str(&format!(
             "5. Rescue ISO Suite: Ephemeral RAMFS Overlay Active={}\n",
@@ -714,7 +771,10 @@ mod tests {
 
         let snap_id = engine.create_snapshot(
             "Pinnacle Backup",
-            vec!["/etc/sigma.conf".to_string(), "/etc/sigma.conf.bak".to_string()],
+            vec![
+                "/etc/sigma.conf".to_string(),
+                "/etc/sigma.conf.bak".to_string(),
+            ],
             &[file1.clone(), file2.clone()],
             vec!["pinnacle".to_string()],
         );
@@ -723,7 +783,8 @@ mod tests {
         assert!(engine.total_dedup_saved_bytes > 0);
         assert!(snap_id.contains("snap-0001"));
 
-        let (matched, modified) = engine.compute_rsync_block_delta(&file1, b"SOVEREIGN_MODIFIED_OS_DATA");
+        let (matched, modified) =
+            engine.compute_rsync_block_delta(&file1, b"SOVEREIGN_MODIFIED_OS_DATA");
         assert!(matched + modified > 0);
     }
 
@@ -745,7 +806,8 @@ mod tests {
 
     #[test]
     fn test_timeshift_snapper_governor_pinnacle() {
-        let mut governor = SovereignTimeshiftSnapperSnapshotGovernor::new(SnapshotFsBackend::BtrfsSubvolume);
+        let mut governor =
+            SovereignTimeshiftSnapperSnapshotGovernor::new(SnapshotFsBackend::BtrfsSubvolume);
         let id1 = governor.create_snapshot("pre_apt", SnapshotTriggerHook::PreAptUpgrade);
         assert_eq!(id1, 1);
 
@@ -755,7 +817,8 @@ mod tests {
 
     #[test]
     fn test_ddrescue_testdisk_photorec_pinnacle() {
-        let mut recovery = SovereignDdrescueTestdiskPhotorecEngine::new("/dev/sda", "/mnt/backup/sda.img");
+        let mut recovery =
+            SovereignDdrescueTestdiskPhotorecEngine::new("/dev/sda", "/mnt/backup/sda.img");
         recovery.run_rescue_pass(&[1_000_000]);
         assert!(recovery.total_rescued_bytes > 0);
         assert!(recovery.total_error_bytes > 0);

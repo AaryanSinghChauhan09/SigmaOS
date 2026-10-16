@@ -54,7 +54,7 @@ pub struct SystemCleaner {
 impl SystemCleaner {
     pub fn new() -> Self {
         let mut options = BTreeMap::new();
-        
+
         // Default cleaner options
         options.insert(
             1,
@@ -67,7 +67,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             2,
             CleanerOption {
@@ -79,7 +79,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             3,
             CleanerOption {
@@ -91,7 +91,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             4,
             CleanerOption {
@@ -103,7 +103,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             5,
             CleanerOption {
@@ -115,7 +115,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             6,
             CleanerOption {
@@ -127,7 +127,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             7,
             CleanerOption {
@@ -139,7 +139,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             8,
             CleanerOption {
@@ -151,7 +151,7 @@ impl SystemCleaner {
                 space_freed: 0,
             },
         );
-        
+
         options.insert(
             9,
             CleanerOption {
@@ -193,11 +193,19 @@ impl SystemCleaner {
 
     /// Get options by category
     pub fn get_options_by_category(&self, category: CleanerCategory) -> Vec<&CleanerOption> {
-        self.options.values().filter(|o| o.category == category).collect()
+        self.options
+            .values()
+            .filter(|o| o.category == category)
+            .collect()
     }
 
     /// Add custom option
-    pub fn add_custom_option(&mut self, name: String, description: String, category: CleanerCategory) -> u32 {
+    pub fn add_custom_option(
+        &mut self,
+        name: String,
+        description: String,
+        category: CleanerCategory,
+    ) -> u32 {
         let id = 100 + self.custom_options.len() as u32;
         let option = CleanerOption {
             id,
@@ -213,7 +221,11 @@ impl SystemCleaner {
 
     /// Remove custom option
     pub fn remove_custom_option(&mut self, id: u32) -> Result<(), &'static str> {
-        let index = self.custom_options.iter().position(|o| o.id == id).ok_or("Option not found")?;
+        let index = self
+            .custom_options
+            .iter()
+            .position(|o| o.id == id)
+            .ok_or("Option not found")?;
         self.custom_options.remove(index);
         Ok(())
     }
@@ -222,7 +234,7 @@ impl SystemCleaner {
     pub fn preview_clean(&self) -> CleanResult {
         let enabled_options = self.get_enabled_options();
         let total_space_freed = enabled_options.iter().map(|_| 1024 * 1024).sum(); // Simplified
-        
+
         CleanResult {
             options_cleaned: enabled_options.iter().map(|o| o.name.clone()).collect(),
             total_space_freed,
@@ -233,7 +245,7 @@ impl SystemCleaner {
     /// Perform clean
     pub fn clean(&mut self) -> CleanResult {
         let mut result = self.preview_clean();
-        
+
         // Simulate cleaning
         for id in self.options.keys() {
             if let Some(option) = self.options.get_mut(id) {
@@ -242,7 +254,7 @@ impl SystemCleaner {
                 }
             }
         }
-        
+
         result
     }
 
@@ -258,7 +270,10 @@ impl SystemCleaner {
 
     /// Get all options
     pub fn get_all_options(&self) -> Vec<&CleanerOption> {
-        self.options.values().chain(self.custom_options.iter()).collect()
+        self.options
+            .values()
+            .chain(self.custom_options.iter())
+            .collect()
     }
 
     /// Format size
@@ -292,7 +307,9 @@ pub fn init_system_cleaner() {
 /// Get system cleaner
 pub fn get_system_cleaner() -> &'static mut SystemCleaner {
     unsafe {
-        SYSTEM_CLEANER.as_mut().expect("System cleaner not initialized")
+        SYSTEM_CLEANER
+            .as_mut()
+            .expect("System cleaner not initialized")
     }
 }
 
@@ -328,7 +345,7 @@ mod tests {
         let id = cleaner.add_custom_option(
             "Custom".to_string(),
             "Description".to_string(),
-            CleanerCategory::Cache
+            CleanerCategory::Cache,
         );
         assert!(id >= 100);
     }

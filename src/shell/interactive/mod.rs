@@ -82,7 +82,8 @@ impl InteractiveShellEngine {
     }
 
     pub fn handle_key_input(&mut self, input: &str) -> SignalEvent {
-        if input == "\x03" { // Ctrl-C
+        if input == "\x03" {
+            // Ctrl-C
             self.line_buffer.clear();
             self.multiline_buffer.clear();
             self.cursor_position = 0;
@@ -90,7 +91,8 @@ impl InteractiveShellEngine {
             return SignalEvent::Interrupt;
         }
 
-        if input == "\x04" { // Ctrl-D
+        if input == "\x04" {
+            // Ctrl-D
             if self.line_buffer.is_empty() && !self.in_multiline {
                 return SignalEvent::Eof;
             }
@@ -98,9 +100,10 @@ impl InteractiveShellEngine {
 
         for ch in input.chars() {
             match ch {
-                '\x01' => self.cursor_position = 0, // Ctrl-A
+                '\x01' => self.cursor_position = 0,                      // Ctrl-A
                 '\x05' => self.cursor_position = self.line_buffer.len(), // Ctrl-E
-                '\x15' => { // Ctrl-U
+                '\x15' => {
+                    // Ctrl-U
                     self.line_buffer.clear();
                     self.cursor_position = 0;
                 }

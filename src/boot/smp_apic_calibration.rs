@@ -110,7 +110,9 @@ impl ApicCalibrator {
     /// Execute bootstrap sequence for a single AP core
     pub fn bootstrap_ap(&mut self, apic_id: u8, trampoline_addr: u32) -> Result<(), &'static str> {
         if trampoline_addr >= 0x100000 || (trampoline_addr & 0xFFF) != 0 {
-            return Err("Trampoline address must be 4KB page aligned below 1MB (real mode addressable)");
+            return Err(
+                "Trampoline address must be 4KB page aligned below 1MB (real mode addressable)",
+            );
         }
         let trampoline_page = (trampoline_addr >> 12) as u8;
 
@@ -149,7 +151,11 @@ impl ApicCalibrator {
 
     /// Get count of online cores including BSP
     pub fn online_core_count(&self) -> usize {
-        1 + self.ap_cpus.iter().filter(|c| c.state == ApCpuState::Online).count()
+        1 + self
+            .ap_cpus
+            .iter()
+            .filter(|c| c.state == ApCpuState::Online)
+            .count()
     }
 }
 

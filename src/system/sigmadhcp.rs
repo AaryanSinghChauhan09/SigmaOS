@@ -64,7 +64,12 @@ pub struct DhcpLease {
 
 impl DhcpLease {
     /// Create a new DHCP lease
-    pub fn new(interface: String, ip_address: String, subnet_mask: String, gateway: String) -> Self {
+    pub fn new(
+        interface: String,
+        ip_address: String,
+        subnet_mask: String,
+        gateway: String,
+    ) -> Self {
         Self {
             interface,
             ip_address,
@@ -133,9 +138,12 @@ impl SigmaDHCP {
     /// Add a DHCP lease
     pub fn add_lease(&mut self, lease: DhcpLease) -> Result<(), String> {
         if self.leases.contains_key(&lease.interface) {
-            return Err(format!("Lease for interface '{}' already exists", lease.interface));
+            return Err(format!(
+                "Lease for interface '{}' already exists",
+                lease.interface
+            ));
         }
-        
+
         self.leases.insert(lease.interface.clone(), lease);
         self.lease_counter += 1;
         Ok(())
@@ -154,7 +162,7 @@ impl SigmaDHCP {
         if !self.running {
             return Err("SigmaDHCP not running".to_string());
         }
-        
+
         match self.leases.get_mut(interface) {
             Some(lease) => {
                 lease.state = DhcpState::Requesting;
@@ -169,7 +177,7 @@ impl SigmaDHCP {
         if !self.running {
             return Err("SigmaDHCP not running".to_string());
         }
-        
+
         match self.leases.get_mut(interface) {
             Some(lease) => {
                 lease.state = DhcpState::Initializing;
@@ -184,7 +192,7 @@ impl SigmaDHCP {
         if !self.running {
             return Err("SigmaDHCP not running".to_string());
         }
-        
+
         match self.leases.get_mut(interface) {
             Some(lease) => {
                 lease.state = DhcpState::Renewing;
@@ -206,7 +214,8 @@ impl SigmaDHCP {
 
     /// List bound leases
     pub fn list_bound_leases(&self) -> Vec<&DhcpLease> {
-        self.leases.values()
+        self.leases
+            .values()
             .filter(|l| l.state == DhcpState::Bound)
             .collect()
     }
@@ -220,7 +229,10 @@ impl SigmaDHCP {
     pub fn dhcp_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_leases".to_string(), self.lease_count().to_string());
-        stats.insert("bound_leases".to_string(), self.list_bound_leases().len().to_string());
+        stats.insert(
+            "bound_leases".to_string(),
+            self.list_bound_leases().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -272,7 +284,7 @@ mod tests {
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         )
         .with_dns_servers(vec!["8.8.8.8".to_string()])
         .with_lease_time(3600)
@@ -296,14 +308,14 @@ mod tests {
     #[test]
     fn test_sigmadhcp_add_lease() {
         let mut dhcp = SigmaDHCP::new();
-        
+
         let lease = DhcpLease::new(
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         );
-        
+
         assert!(dhcp.add_lease(lease).is_ok());
         assert_eq!(dhcp.lease_count(), 1);
     }
@@ -312,17 +324,17 @@ mod tests {
     fn test_sigmadhcp_request_lease() {
         let mut dhcp = SigmaDHCP::new();
         dhcp.start();
-        
+
         let lease = DhcpLease::new(
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         );
-        
+
         dhcp.add_lease(lease).unwrap();
         assert!(dhcp.request_lease("eth0").is_ok());
-        
+
         let lease = dhcp.get_lease("eth0").unwrap();
         assert_eq!(lease.state, DhcpState::Requesting);
     }
@@ -331,17 +343,17 @@ mod tests {
     fn test_sigmadhcp_renew_lease() {
         let mut dhcp = SigmaDHCP::new();
         dhcp.start();
-        
+
         let lease = DhcpLease::new(
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         );
-        
+
         dhcp.add_lease(lease).unwrap();
         assert!(dhcp.renew_lease("eth0").is_ok());
-        
+
         let lease = dhcp.get_lease("eth0").unwrap();
         assert_eq!(lease.state, DhcpState::Renewing);
     }
@@ -349,17 +361,17 @@ mod tests {
     #[test]
     fn test_sigmadhcp_list_bound_leases() {
         let mut dhcp = SigmaDHCP::new();
-        
+
         let lease = DhcpLease::new(
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         )
         .with_state(DhcpState::Bound);
-        
+
         dhcp.add_lease(lease).unwrap();
-        
+
         let bound = dhcp.list_bound_leases();
         assert_eq!(bound.len(), 1);
     }
@@ -367,17 +379,17 @@ mod tests {
     #[test]
     fn test_sigmadhcp_stats() {
         let mut dhcp = SigmaDHCP::new();
-        
+
         let lease = DhcpLease::new(
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         )
         .with_state(DhcpState::Bound);
-        
+
         dhcp.add_lease(lease).unwrap();
-        
+
         let stats = dhcp.dhcp_stats();
         assert_eq!(stats.get("total_leases"), Some(&"1".to_string()));
         assert_eq!(stats.get("bound_leases"), Some(&"1".to_string()));
@@ -386,19 +398,19 @@ mod tests {
     #[test]
     fn test_request_dhcp_lease_convenience() {
         init_sigmadhcp();
-        
+
         let mut dhcp = get_sigmadhcp().unwrap();
         dhcp.start();
-        
+
         let lease = DhcpLease::new(
             "eth0".to_string(),
             "192.168.1.100".to_string(),
             "255.255.255.0".to_string(),
-            "192.168.1.1".to_string()
+            "192.168.1.1".to_string(),
         );
-        
+
         dhcp.add_lease(lease).unwrap();
-        
+
         let result = request_dhcp_lease("eth0");
         assert!(result.is_ok());
     }

@@ -173,7 +173,8 @@ impl SquashfsReader {
 
     /// Check if the image has valid uncompressed data size
     pub fn is_valid(&self) -> bool {
-        self.superblock.magic == SQUASHFS_MAGIC && self.raw_data.len() >= self.superblock.bytes_used as usize
+        self.superblock.magic == SQUASHFS_MAGIC
+            && self.raw_data.len() >= self.superblock.bytes_used as usize
     }
 
     /// Total number of inodes

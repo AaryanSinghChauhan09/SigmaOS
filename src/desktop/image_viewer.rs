@@ -367,9 +367,7 @@ pub fn init_image_viewer() {
 
 /// Get image viewer
 pub fn get_image_viewer() -> &'static mut ImageViewer {
-    unsafe {
-        IMAGE_VIEWER.as_mut().expect("Image viewer not initialized")
-    }
+    unsafe { IMAGE_VIEWER.as_mut().expect("Image viewer not initialized") }
 }
 
 #[cfg(test)]
@@ -392,7 +390,11 @@ mod tests {
             size_bytes: 1024 * 1024,
             has_alpha: true,
         };
-        viewer.add_image("/path/to/image.png".to_string(), "image.png".to_string(), metadata);
+        viewer.add_image(
+            "/path/to/image.png".to_string(),
+            "image.png".to_string(),
+            metadata,
+        );
         assert_eq!(viewer.image_count(), 1);
     }
 
@@ -406,7 +408,11 @@ mod tests {
             size_bytes: 1024 * 1024,
             has_alpha: true,
         };
-        viewer.add_image("image1.png".to_string(), "image1.png".to_string(), metadata.clone());
+        viewer.add_image(
+            "image1.png".to_string(),
+            "image1.png".to_string(),
+            metadata.clone(),
+        );
         viewer.add_image("image2.png".to_string(), "image2.png".to_string(), metadata);
         viewer.next_image();
         assert_eq!(viewer.current_index(), 1);
@@ -439,7 +445,10 @@ mod tests {
         };
         viewer.add_image("image.png".to_string(), "image.png".to_string(), metadata);
         viewer.rotate_clockwise();
-        assert_eq!(viewer.get_current_image().unwrap().rotation, Rotation::Degrees90);
+        assert_eq!(
+            viewer.get_current_image().unwrap().rotation,
+            Rotation::Degrees90
+        );
     }
 
     #[test]

@@ -35,9 +35,8 @@ pub use sovereign_process_engine::{
 };
 
 pub use pthread::{
-    PthreadT, PthreadAttr, DetachState, ThreadFunc, ThreadControlBlock,
-    PthreadMutex, PthreadCond, PthreadKey, ThreadLocalStorage, PthreadManager,
-    pthread_init, get_pthread_manager,
-    pthread_create, pthread_join, pthread_detach, pthread_exit,
-    pthread_key_create, pthread_key_delete, pthread_setspecific, pthread_getspecific,
+    get_pthread_manager, pthread_create, pthread_detach, pthread_exit, pthread_getspecific,
+    pthread_init, pthread_join, pthread_key_create, pthread_key_delete, pthread_setspecific,
+    DetachState, PthreadAttr, PthreadCond, PthreadKey, PthreadManager, PthreadMutex, PthreadT,
+    ThreadControlBlock, ThreadFunc, ThreadLocalStorage,
 };

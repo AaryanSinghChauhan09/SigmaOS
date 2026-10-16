@@ -120,7 +120,16 @@ impl BridgeId {
 
     pub fn to_bytes(&self) -> [u8; 8] {
         let p = self.priority.to_be_bytes();
-        [p[0], p[1], self.mac[0], self.mac[1], self.mac[2], self.mac[3], self.mac[4], self.mac[5]]
+        [
+            p[0],
+            p[1],
+            self.mac[0],
+            self.mac[1],
+            self.mac[2],
+            self.mac[3],
+            self.mac[4],
+            self.mac[5],
+        ]
     }
 }
 
@@ -145,7 +154,10 @@ impl ConfigBpdu {
     pub fn to_bytes(&self) -> [u8; 35] {
         let mut b = [0u8; 35];
         // Protocol ID = 0x0000, Version = 0x00, Type = 0x00 (Config)
-        b[0] = 0; b[1] = 0; b[2] = 0; b[3] = 0;
+        b[0] = 0;
+        b[1] = 0;
+        b[2] = 0;
+        b[3] = 0;
         b[4] = self.flags;
         let rb = self.root_id.to_bytes();
         b[5..13].copy_from_slice(&rb);
@@ -164,7 +176,9 @@ impl ConfigBpdu {
 
     /// Parse from a 35-byte slice.
     pub fn from_bytes(raw: &[u8]) -> Result<Self, BridgeError> {
-        if raw.len() < 35 { return Err(BridgeError::InvalidBpdu); }
+        if raw.len() < 35 {
+            return Err(BridgeError::InvalidBpdu);
+        }
         let root_id = BridgeId {
             priority: u16::from_be_bytes([raw[5], raw[6]]),
             mac: raw[7..13].try_into().unwrap(),
@@ -311,7 +325,10 @@ impl Bridge {
 
     /// Remove a port by name.
     pub fn remove_port(&mut self, name: &str) -> Result<(), BridgeError> {
-        let pos = self.ports.iter().position(|p| p.name == name)
+        let pos = self
+            .ports
+            .iter()
+            .position(|p| p.name == name)
             .ok_or(BridgeError::PortNotFound)?;
         self.ports.remove(pos);
         // Flush FDB entries learned on this port
@@ -321,7 +338,11 @@ impl Bridge {
 
     /// Learn a source MAC on an ingress port (if the port allows learning).
     fn learn(&mut self, mac: [u8; 6], port_idx: usize) {
-        let entry = FdbEntry { port_idx, last_seen: self.tick, is_static: false };
+        let entry = FdbEntry {
+            port_idx,
+            last_seen: self.tick,
+            is_static: false,
+        };
         self.fdb.insert(mac, entry);
     }
 
@@ -374,11 +395,7 @@ impl Bridge {
     }
 
     /// Process a received BPDU on the specified port and run STP decision.
-    pub fn receive_bpdu(
-        &mut self,
-        port_idx: usize,
-        bpdu_bytes: &[u8],
-    ) -> Result<(), BridgeError> {
+    pub fn receive_bpdu(&mut self, port_idx: usize, bpdu_bytes: &[u8]) -> Result<(), BridgeError> {
         let bpdu = ConfigBpdu::from_bytes(bpdu_bytes)?;
         if port_idx >= self.ports.len() {
             return Err(BridgeError::PortNotFound);
@@ -408,7 +425,8 @@ impl Bridge {
     pub fn tick_timer(&mut self) {
         self.tick += 1;
         // Age FDB entries
-        self.fdb.retain(|_, e| e.is_static || (self.tick - e.last_seen < FDB_AGEING_TICKS));
+        self.fdb
+            .retain(|_, e| e.is_static || (self.tick - e.last_seen < FDB_AGEING_TICKS));
         // TODO: decrement STP timers per port and trigger state transitions
     }
 

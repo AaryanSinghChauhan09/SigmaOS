@@ -1,7 +1,7 @@
 // SigmaOS Swap Queue and Request Dispatcher
 // Queued swap request engine with depth limits, priority levels, and OOM observability metrics.
 
-use super::core::{SwapManager, SwapResult, SwapError};
+use super::core::{SwapError, SwapManager, SwapResult};
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::VecDeque;
 use std::sync::Mutex;
@@ -41,7 +41,13 @@ impl SwapQueueManager {
     }
 
     /// Enqueue a swap request with depth backpressure checks
-    pub fn enqueue_request(&self, virt_addr: u64, phys_frame: u64, priority: SwapPriority, is_swap_out: bool) -> SwapResult<u64> {
+    pub fn enqueue_request(
+        &self,
+        virt_addr: u64,
+        phys_frame: u64,
+        priority: SwapPriority,
+        is_swap_out: bool,
+    ) -> SwapResult<u64> {
         let mut q = self.queue.lock().unwrap();
 
         if q.len() >= self.max_queue_depth {
@@ -77,7 +83,9 @@ impl SwapQueueManager {
         self.pending_count.fetch_sub(1, Ordering::SeqCst);
 
         if req.is_swap_out {
-            let res = swap_mgr.swap_out_page(req.virt_addr, req.phys_frame).map(|slot| (req.virt_addr, slot));
+            let res = swap_mgr
+                .swap_out_page(req.virt_addr, req.phys_frame)
+                .map(|slot| (req.virt_addr, slot));
             Some(res)
         } else {
             let res = swap_mgr.swap_in_page(req.virt_addr);

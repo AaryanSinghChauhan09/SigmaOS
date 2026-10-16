@@ -34,57 +34,55 @@ impl HeroicLauncher {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize Heroic launcher
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Add game
     pub fn add_game(&mut self, game: HeroicGame) {
         self.games.insert(game.app_name.clone(), game);
     }
-    
+
     /// Get game
     pub fn get_game(&self, app_name: &str) -> Option<&HeroicGame> {
         self.games.get(app_name)
     }
-    
+
     /// Launch game
     pub fn launch_game(&mut self, app_name: &str) -> Result<(), &'static str> {
         let game = self.games.get_mut(app_name).ok_or("Game not found")?;
-        
+
         if !game.installed {
             return Err("Game not installed");
         }
-        
+
         game.running = true;
-        
+
         // In real implementation, would run:
         // heroic --launch {app_name}
-        
+
         Ok(())
     }
-    
+
     /// Stop game
     pub fn stop_game(&mut self, app_name: &str) -> Result<(), &'static str> {
         let game = self.games.get_mut(app_name).ok_or("Game not found")?;
         game.running = false;
         Ok(())
     }
-    
+
     /// Install game
     pub fn install_game(&mut self, app_name: &str) -> Result<(), &'static str> {
         let game = self.games.get_mut(app_name).ok_or("Game not found")?;
         game.installed = true;
         Ok(())
     }
-    
+
     /// Get installed games
     pub fn get_installed_games(&self) -> Vec<&HeroicGame> {
-        self.games.values()
-            .filter(|g| g.installed)
-            .collect()
+        self.games.values().filter(|g| g.installed).collect()
     }
 }
 
@@ -106,22 +104,20 @@ pub fn init_heroic_launcher() {
 
 /// Get global Heroic launcher
 pub fn get_heroic_launcher() -> Option<&'static mut HeroicLauncher> {
-    unsafe {
-        HEROIC_LAUNCHER.as_mut()
-    }
+    unsafe { HEROIC_LAUNCHER.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_heroic_launcher_init() {
         let mut launcher = HeroicLauncher::new();
         launcher.init();
         assert!(launcher.active.load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_add_game() {
         let mut launcher = HeroicLauncher::new();
@@ -135,7 +131,7 @@ mod tests {
         launcher.add_game(game);
         assert!(launcher.get_game("TestGame").is_some());
     }
-    
+
     #[test]
     fn test_launch_game() {
         let mut launcher = HeroicLauncher::new();

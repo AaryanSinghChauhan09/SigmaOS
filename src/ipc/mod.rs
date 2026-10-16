@@ -16,13 +16,13 @@
 pub mod async_io;
 pub mod bus;
 pub mod futex;
-pub mod sigmabus;
 pub mod helenos_async;
 pub mod ipc;
 pub mod ipc_namespace;
 pub mod mechanism;
 pub mod message;
 pub mod pipe;
+pub mod sigmabus;
 pub mod signals;
 pub mod socket;
 pub mod sovereign_async_procedure_call;
@@ -30,8 +30,8 @@ pub mod std_streams;
 pub mod unix_socket;
 pub use bus::{BusEndpoint, BusName, IpcBus, IpcMessage, MessageType};
 pub use sigmabus::{
-    SigmaBus, BusMessage as SigmaBusMessage, ServiceEndpoint, MessageType as SigmaMessageType,
-    init_sigmabus, get_sigmabus, register_service_endpoint, send_bus_message,
+    get_sigmabus, init_sigmabus, register_service_endpoint, send_bus_message,
+    BusMessage as SigmaBusMessage, MessageType as SigmaMessageType, ServiceEndpoint, SigmaBus,
 };
 
 pub use ipc::{
@@ -91,8 +91,12 @@ pub mod zircon_channels;
 
 pub use fuchsia_fidl::{FidlDispatcher, FidlMethod, FidlMsgHeader, FidlProtocol, FidlType};
 pub use minix_rendezvous::{MinixMessage, MinixRendezvousEngine, RendezvousState};
-pub use robust_futex::{RobustFutexManager, RobustFutexState, RobustFutexWaiter, FUTEX_OWNER_DIED, FUTEX_WAITERS};
-pub use rt_signals::{ProcessRtSignalManager, QueuedRtSignal, RtSignalQueue, SigVal, SIGRTMAX, SIGRTMIN};
+pub use robust_futex::{
+    RobustFutexManager, RobustFutexState, RobustFutexWaiter, FUTEX_OWNER_DIED, FUTEX_WAITERS,
+};
+pub use rt_signals::{
+    ProcessRtSignalManager, QueuedRtSignal, RtSignalQueue, SigVal, SIGRTMAX, SIGRTMIN,
+};
 
 pub use posix_mq::{MessageQueue as PosixMessageQueue, MqAttr, MqError, MqRegistry};
 pub use sysv_ipc::{

@@ -290,7 +290,9 @@ impl AhciController {
             // Reset controller
             hba.ghc |= 0x00000001; // HR bit
             let mut timeout = 1000;
-            while core::ptr::read_volatile(core::ptr::addr_of!(hba.ghc)) & 0x00000001 != 0 && timeout > 0 {
+            while core::ptr::read_volatile(core::ptr::addr_of!(hba.ghc)) & 0x00000001 != 0
+                && timeout > 0
+            {
                 timeout -= 1;
             }
             hba.ghc &= !0x00000001;
@@ -426,7 +428,9 @@ impl AhciController {
                 // Stop command engine
                 port.cmd &= 0xFFFFFFFE; // Clear ST bit
                 let mut cr_timeout = 1000;
-                while (core::ptr::read_volatile(core::ptr::addr_of!(port.cmd)) & 0x8000) != 0 || (core::ptr::read_volatile(core::ptr::addr_of!(port.cmd)) & 0x4000) != 0 {
+                while (core::ptr::read_volatile(core::ptr::addr_of!(port.cmd)) & 0x8000) != 0
+                    || (core::ptr::read_volatile(core::ptr::addr_of!(port.cmd)) & 0x4000) != 0
+                {
                     cr_timeout -= 1;
                     if cr_timeout == 0 {
                         port.cmd &= !0xC000;

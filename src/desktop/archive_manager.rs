@@ -55,7 +55,12 @@ impl ArchiveManager {
     }
 
     /// Create archive
-    pub fn create_archive(&mut self, path: String, format: ArchiveFormat, files: Vec<String>) -> Result<(), &'static str> {
+    pub fn create_archive(
+        &mut self,
+        path: String,
+        format: ArchiveFormat,
+        files: Vec<String>,
+    ) -> Result<(), &'static str> {
         let archive = Archive {
             path: path.clone(),
             format,
@@ -68,7 +73,11 @@ impl ArchiveManager {
     }
 
     /// Extract archive
-    pub fn extract_archive(&mut self, path: String, destination: String) -> Result<(), &'static str> {
+    pub fn extract_archive(
+        &mut self,
+        path: String,
+        destination: String,
+    ) -> Result<(), &'static str> {
         // Simplified - in real implementation would extract actual files
         Ok(())
     }
@@ -117,7 +126,9 @@ pub fn init_archive_manager() {
 /// Get archive manager
 pub fn get_archive_manager() -> &'static mut ArchiveManager {
     unsafe {
-        ARCHIVE_MANAGER.as_mut().expect("Archive manager not initialized")
+        ARCHIVE_MANAGER
+            .as_mut()
+            .expect("Archive manager not initialized")
     }
 }
 
@@ -134,14 +145,16 @@ mod tests {
     #[test]
     fn test_create_archive() {
         let mut am = ArchiveManager::new();
-        am.create_archive("test.zip".to_string(), ArchiveFormat::Zip, Vec::new()).unwrap();
+        am.create_archive("test.zip".to_string(), ArchiveFormat::Zip, Vec::new())
+            .unwrap();
         assert_eq!(am.archive_count(), 1);
     }
 
     #[test]
     fn test_remove_archive() {
         let mut am = ArchiveManager::new();
-        am.create_archive("test.zip".to_string(), ArchiveFormat::Zip, Vec::new()).unwrap();
+        am.create_archive("test.zip".to_string(), ArchiveFormat::Zip, Vec::new())
+            .unwrap();
         am.remove_archive(0).unwrap();
         assert_eq!(am.archive_count(), 0);
     }

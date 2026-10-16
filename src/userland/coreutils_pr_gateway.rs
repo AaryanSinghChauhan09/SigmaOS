@@ -71,7 +71,12 @@ impl GnuCoreutilsBsdUserlandEngine {
         output
     }
 
-    pub fn run_ls(&self, entries: &[CoreUtilityFileInfo], long_format: bool, show_all: bool) -> Vec<String> {
+    pub fn run_ls(
+        &self,
+        entries: &[CoreUtilityFileInfo],
+        long_format: bool,
+        show_all: bool,
+    ) -> Vec<String> {
         let mut result = Vec::new();
 
         for entry in entries {
@@ -81,10 +86,7 @@ impl GnuCoreutilsBsdUserlandEngine {
 
             if long_format {
                 let file_type = if entry.is_dir { 'd' } else { '-' };
-                let perm_str = format!(
-                    "{}{:o}",
-                    file_type, entry.permissions & 0o777
-                );
+                let perm_str = format!("{}{:o}", file_type, entry.permissions & 0o777);
                 result.push(format!(
                     "{} {:>8} {:>8} {:>10} {}",
                     perm_str, entry.owner, entry.group, entry.size, entry.path
@@ -100,10 +102,18 @@ impl GnuCoreutilsBsdUserlandEngine {
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
         let lines: Vec<&str> = content.lines().collect();
         if is_head {
-            lines.into_iter().take(lines_count).map(|s| s.to_string()).collect()
+            lines
+                .into_iter()
+                .take(lines_count)
+                .map(|s| s.to_string())
+                .collect()
         } else {
             let skip_count = lines.len().saturating_sub(lines_count);
-            lines.into_iter().skip(skip_count).map(|s| s.to_string()).collect()
+            lines
+                .into_iter()
+                .skip(skip_count)
+                .map(|s| s.to_string())
+                .collect()
         }
     }
 
@@ -152,7 +162,10 @@ impl GnuCoreutilsBsdUserlandEngine {
 
     pub fn run_df(&self, mounts: &[FilesystemUsageSpec]) -> Vec<String> {
         let mut out = Vec::new();
-        out.push(format!("{:<15} {:>10} {:>10} {:>10} {:>5} {}", "Filesystem", "1K-blocks", "Used", "Available", "Use%", "Mounted on"));
+        out.push(format!(
+            "{:<15} {:>10} {:>10} {:>10} {:>5} {}",
+            "Filesystem", "1K-blocks", "Used", "Available", "Use%", "Mounted on"
+        ));
         for m in mounts {
             let pct = if m.total_blocks > 0 {
                 (m.used_blocks * 100) / m.total_blocks
@@ -172,15 +185,26 @@ impl GnuCoreutilsBsdUserlandEngine {
     }
 
     pub fn run_chown(&self, path: &str, owner: &str, group: &str) -> String {
-        format!("chown: ownership of '{}' changed to {}:{}", path, owner, group)
+        format!(
+            "chown: ownership of '{}' changed to {}:{}",
+            path, owner, group
+        )
     }
 
     pub fn run_touch(&self, path: &str, create_if_missing: bool) -> String {
-        format!("touch: updated timestamp for '{}' (create={})", path, create_if_missing)
+        format!(
+            "touch: updated timestamp for '{}' (create={})",
+            path, create_if_missing
+        )
     }
 
     pub fn run_mkdir(&self, path: &str, create_parents: bool, mode: u32) -> String {
-        format!("mkdir: created directory '{}' (parents={}, mode={:04o})", path, create_parents, mode & 0o7777)
+        format!(
+            "mkdir: created directory '{}' (parents={}, mode={:04o})",
+            path,
+            create_parents,
+            mode & 0o7777
+        )
     }
 
     pub fn run_du(&self, entries: &[CoreUtilityFileInfo], summary_only: bool) -> Vec<String> {
@@ -198,7 +222,11 @@ impl GnuCoreutilsBsdUserlandEngine {
         results
     }
 
-    pub fn run_env(&self, vars: &BTreeMap<String, String>, filter_prefix: Option<&str>) -> Vec<String> {
+    pub fn run_env(
+        &self,
+        vars: &BTreeMap<String, String>,
+        filter_prefix: Option<&str>,
+    ) -> Vec<String> {
         vars.iter()
             .filter(|(k, _)| {
                 if let Some(prefix) = filter_prefix {
@@ -288,7 +316,11 @@ impl BusyBoxMulticallEngine {
         }
     }
 
-    pub fn run_applet_sandboxed(&self, applet_name: &str, memory_limit_mb: usize) -> Result<String, String> {
+    pub fn run_applet_sandboxed(
+        &self,
+        applet_name: &str,
+        memory_limit_mb: usize,
+    ) -> Result<String, String> {
         if let Some(applet) = self.applets.get(applet_name) {
             if !applet.is_enabled {
                 return Err(format!("Applet '{}' is disabled", applet_name));
@@ -379,7 +411,10 @@ impl UtilLinuxSubsystemEngine {
         let mut map = BTreeMap::new();
         map.insert("Architecture".to_string(), "x86_64".to_string());
         map.insert("CPU(s)".to_string(), "16".to_string());
-        map.insert("Model name".to_string(), "Sovereign Ultra-Core Processor".to_string());
+        map.insert(
+            "Model name".to_string(),
+            "Sovereign Ultra-Core Processor".to_string(),
+        );
         map.insert("L3 cache".to_string(), "32 MiB".to_string());
         map
     }
@@ -402,7 +437,10 @@ impl UtilLinuxSubsystemEngine {
     }
 
     pub fn run_mount_status(&self, target: &str) -> String {
-        format!("{} on / type btrfs (rw,relatime,ssd,space_cache=v2,subvolid=256,subvol=/@)", target)
+        format!(
+            "{} on / type btrfs (rw,relatime,ssd,space_cache=v2,subvolid=256,subvol=/@)",
+            target
+        )
     }
 
     pub fn run_chrt_taskset(&self, pid: u32, policy: &str, priority: u32, cpu_mask: u32) -> String {
@@ -420,7 +458,14 @@ impl UtilLinuxSubsystemEngine {
         ]
     }
 
-    pub fn uptime_summary(&self, uptime_secs: u64, users_count: usize, load_1: f32, load_5: f32, load_15: f32) -> String {
+    pub fn uptime_summary(
+        &self,
+        uptime_secs: u64,
+        users_count: usize,
+        load_1: f32,
+        load_5: f32,
+        load_15: f32,
+    ) -> String {
         let days = uptime_secs / 86400;
         let hours = (uptime_secs % 86400) / 3600;
         let mins = (uptime_secs % 3600) / 60;
@@ -432,8 +477,16 @@ impl UtilLinuxSubsystemEngine {
 
     pub fn lsmod_summary(&self) -> Vec<(String, usize, Vec<String>)> {
         vec![
-            ("btrfs".to_string(), 1835008, vec!["zstd_compress".to_string(), "raid6_pq".to_string()]),
-            ("zstd_compress".to_string(), 126976, vec!["btrfs".to_string()]),
+            (
+                "btrfs".to_string(),
+                1835008,
+                vec!["zstd_compress".to_string(), "raid6_pq".to_string()],
+            ),
+            (
+                "zstd_compress".to_string(),
+                126976,
+                vec!["btrfs".to_string()],
+            ),
             ("nvme".to_string(), 65536, vec!["nvme_core".to_string()]),
         ]
     }
@@ -461,7 +514,13 @@ impl FindutilsDiffutilsEngine {
         matched
     }
 
-    pub fn find_eval_predicates(&self, files: &[CoreUtilityFileInfo], name_pattern: &str, min_size: u64, is_dir_only: bool) -> Vec<String> {
+    pub fn find_eval_predicates(
+        &self,
+        files: &[CoreUtilityFileInfo],
+        name_pattern: &str,
+        min_size: u64,
+        is_dir_only: bool,
+    ) -> Vec<String> {
         let mut matched = Vec::new();
         for file in files {
             if is_dir_only && !file.is_dir {
@@ -540,7 +599,12 @@ impl TextProcessingEngine {
         Self
     }
 
-    pub fn grep_match(&self, content: &str, pattern: &str, case_insensitive: bool) -> Vec<(usize, String)> {
+    pub fn grep_match(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+    ) -> Vec<(usize, String)> {
         let mut matches = Vec::new();
         let pat_target = if case_insensitive {
             pattern.to_lowercase()
@@ -563,7 +627,12 @@ impl TextProcessingEngine {
         matches
     }
 
-    pub fn grep_match_context(&self, content: &str, pattern: &str, context_lines: usize) -> Vec<(usize, String, bool)> {
+    pub fn grep_match_context(
+        &self,
+        content: &str,
+        pattern: &str,
+        context_lines: usize,
+    ) -> Vec<(usize, String, bool)> {
         let lines: Vec<&str> = content.lines().collect();
         let mut results = Vec::new();
 
@@ -586,7 +655,12 @@ impl TextProcessingEngine {
         content.replace(target, replacement)
     }
 
-    pub fn sed_in_place_stream(&self, content: &str, target: &str, replacement: &str) -> (String, usize) {
+    pub fn sed_in_place_stream(
+        &self,
+        content: &str,
+        target: &str,
+        replacement: &str,
+    ) -> (String, usize) {
         let count = content.matches(target).count();
         let replaced = content.replace(target, replacement);
         (replaced, count)
@@ -603,7 +677,13 @@ impl TextProcessingEngine {
         results
     }
 
-    pub fn awk_process_script(&self, content: &str, field_delimiter: char, field_idx: usize, sum_column: bool) -> (Vec<String>, f64) {
+    pub fn awk_process_script(
+        &self,
+        content: &str,
+        field_delimiter: char,
+        field_idx: usize,
+        sum_column: bool,
+    ) -> (Vec<String>, f64) {
         let mut fields = Vec::new();
         let mut sum = 0.0;
 
@@ -652,13 +732,17 @@ impl ArchivalCompressionEngine {
             CompressionFormat::Zstd
         } else if magic_bytes.len() >= 4 && magic_bytes[0..4] == [0x04, 0x22, 0x4D, 0x18] {
             CompressionFormat::Lz4
-        } else if magic_bytes.len() >= 6 && magic_bytes[0..6] == [0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C] {
+        } else if magic_bytes.len() >= 6
+            && magic_bytes[0..6] == [0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C]
+        {
             CompressionFormat::SevenZip
         } else if magic_bytes.len() >= 2 && magic_bytes[0..2] == [0x1F, 0x8B] {
             CompressionFormat::Gzip
         } else if magic_bytes.len() >= 3 && magic_bytes[0..3] == [b'B', b'Z', b'h'] {
             CompressionFormat::Bzip2
-        } else if magic_bytes.len() >= 6 && magic_bytes[0..6] == [0xFD, b'7', b'z', b'X', b'Z', 0x00] {
+        } else if magic_bytes.len() >= 6
+            && magic_bytes[0..6] == [0xFD, b'7', b'z', b'X', b'Z', 0x00]
+        {
             CompressionFormat::Xz
         } else {
             CompressionFormat::Tar
@@ -674,7 +758,12 @@ impl ArchivalCompressionEngine {
         }
     }
 
-    pub fn parallel_zstd_compression_ratio(&self, original_size: usize, compressed_size: usize, threads: usize) -> (f64, String) {
+    pub fn parallel_zstd_compression_ratio(
+        &self,
+        original_size: usize,
+        compressed_size: usize,
+        threads: usize,
+    ) -> (f64, String) {
         let ratio = if original_size > 0 {
             compressed_size as f64 / original_size as f64
         } else {
@@ -682,7 +771,10 @@ impl ArchivalCompressionEngine {
         };
         let desc = format!(
             "Zstd multithreaded (threads={}): {} -> {} bytes (ratio: {:.2}%)",
-            threads, original_size, compressed_size, ratio * 100.0
+            threads,
+            original_size,
+            compressed_size,
+            ratio * 100.0
         );
         (ratio, desc)
     }
@@ -754,7 +846,13 @@ impl ProcpsPsmiscEngine {
     pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
         let pids = self.pgrep_find(name);
         let count = pids.len();
-        (count, format!("pkill: sent signal {} to {} process(es) matching '{}'", signal, count, name))
+        (
+            count,
+            format!(
+                "pkill: sent signal {} to {} process(es) matching '{}'",
+                signal, count, name
+            ),
+        )
     }
 
     pub fn pstree_hierarchy(&self) -> String {
@@ -765,8 +863,8 @@ impl ProcpsPsmiscEngine {
 
     pub fn free_memory_summary(&self) -> (u64, u64, u64) {
         let total = 32_768; // 32 GB
-        let used = 8_192;   // 8 GB
-        let free = 24_576;  // 24 GB
+        let used = 8_192; // 8 GB
+        let free = 24_576; // 24 GB
         (total, used, free)
     }
 }
@@ -793,8 +891,12 @@ impl DocumentationPagerEngine {
         match page_name {
             "ls" => Some("LS(1) User Commands - List directory contents".to_string()),
             "grep" => Some("GREP(1) User Commands - Print lines matching a pattern".to_string()),
-            "sudo" => Some("SUDO(8) System Administration - Execute a command as another user".to_string()),
-            "btrfs" => Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string()),
+            "sudo" => Some(
+                "SUDO(8) System Administration - Execute a command as another user".to_string(),
+            ),
+            "btrfs" => {
+                Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string())
+            }
             _ => None,
         }
     }
@@ -863,7 +965,10 @@ impl AuthPrivilegeSessionEngine {
         if user.is_empty() {
             Err("PAM: Empty username provided")
         } else {
-            Ok(format!("PAM: Session granted for user '{}' under service '{}'", user, service))
+            Ok(format!(
+                "PAM: Session granted for user '{}' under service '{}'",
+                user, service
+            ))
         }
     }
 
@@ -874,14 +979,24 @@ impl AuthPrivilegeSessionEngine {
             .collect()
     }
 
-    pub fn verify_shadow_expiry(&self, days_since_epoch: u32, last_changed: u32, max_days: u32) -> bool {
+    pub fn verify_shadow_expiry(
+        &self,
+        days_since_epoch: u32,
+        last_changed: u32,
+        max_days: u32,
+    ) -> bool {
         if max_days == 0 || max_days == 99999 {
             return false; // password never expires
         }
         days_since_epoch >= (last_changed + max_days)
     }
 
-    pub fn pam_verify_module_chain(&self, user: &str, service: &str, required_modules: &[&str]) -> (bool, Vec<String>) {
+    pub fn pam_verify_module_chain(
+        &self,
+        user: &str,
+        service: &str,
+        required_modules: &[&str],
+    ) -> (bool, Vec<String>) {
         let mut audit_log = Vec::new();
         let mut all_passed = true;
 
@@ -890,7 +1005,13 @@ impl AuthPrivilegeSessionEngine {
             if !pass {
                 all_passed = false;
             }
-            audit_log.push(format!("PAM [{}] service='{}' user='{}' -> {}", module, service, user, if pass { "SUCCESS" } else { "FAILURE" }));
+            audit_log.push(format!(
+                "PAM [{}] service='{}' user='{}' -> {}",
+                module,
+                service,
+                user,
+                if pass { "SUCCESS" } else { "FAILURE" }
+            ));
         }
 
         (all_passed, audit_log)
@@ -1230,7 +1351,11 @@ mod tests {
         assert!(auth.evaluate_sudoers("sovereign", "ls"));
         assert!(auth.evaluate_doas("sovereign", "pacman -Syu"));
         assert!(auth.pam_authenticate("root", "login").is_ok());
-        assert!(auth.verify_argon2id_shadow("root", "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass", "sovereign_pass"));
+        assert!(auth.verify_argon2id_shadow(
+            "root",
+            "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass",
+            "sovereign_pass"
+        ));
     }
 
     #[test]
@@ -1308,7 +1433,8 @@ mod tests {
         assert!(auth.verify_shadow_expiry(20000, 10000, 90));
         assert!(!auth.verify_shadow_expiry(20000, 10000, 99999));
 
-        let (all_pass, audit) = auth.pam_verify_module_chain("sovereign", "sudo", &["pam_unix", "pam_permit"]);
+        let (all_pass, audit) =
+            auth.pam_verify_module_chain("sovereign", "sudo", &["pam_unix", "pam_permit"]);
         assert!(all_pass);
         assert_eq!(audit.len(), 2);
 

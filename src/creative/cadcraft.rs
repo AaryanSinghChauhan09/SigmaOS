@@ -53,14 +53,40 @@ pub struct Point2D {
 /// Geometric constraint type
 #[derive(Debug, Clone, PartialEq)]
 pub enum GeometricConstraintType {
-    Coincident { point1_idx: usize, point2_idx: usize },
-    Parallel { line1_idx: usize, line2_idx: usize },
-    Perpendicular { line1_idx: usize, line2_idx: usize },
-    Concentric { circle1_idx: usize, circle2_idx: usize },
-    Tangent { line_idx: usize, circle_idx: usize },
-    EqualLength { line1_idx: usize, line2_idx: usize },
-    Distance { point1_idx: usize, point2_idx: usize, target_distance: f64 },
-    Angle { line1_idx: usize, line2_idx: usize, target_angle_rad: f64 },
+    Coincident {
+        point1_idx: usize,
+        point2_idx: usize,
+    },
+    Parallel {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
+    Perpendicular {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
+    Concentric {
+        circle1_idx: usize,
+        circle2_idx: usize,
+    },
+    Tangent {
+        line_idx: usize,
+        circle_idx: usize,
+    },
+    EqualLength {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
+    Distance {
+        point1_idx: usize,
+        point2_idx: usize,
+        target_distance: f64,
+    },
+    Angle {
+        line1_idx: usize,
+        line2_idx: usize,
+        target_angle_rad: f64,
+    },
 }
 
 /// 2D Line entity
@@ -127,7 +153,10 @@ impl ParametricSketch2D {
 
     pub fn add_circle(&mut self, center_x: f64, center_y: f64, radius: f64) -> usize {
         self.entities.push(SketchEntity::Circle(Circle2D {
-            center: Point2D { x: center_x, y: center_y },
+            center: Point2D {
+                x: center_x,
+                y: center_y,
+            },
             radius,
         }));
         self.entities.len() - 1
@@ -148,11 +177,16 @@ impl ParametricSketch2D {
 
             for constraint in &self.constraints {
                 match constraint {
-                    GeometricConstraintType::Distance { point1_idx, point2_idx, target_distance } => {
-                        let (p1, p2) = match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                            (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                            _ => continue,
-                        };
+                    GeometricConstraintType::Distance {
+                        point1_idx,
+                        point2_idx,
+                        target_distance,
+                    } => {
+                        let (p1, p2) =
+                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
+                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
+                                _ => continue,
+                            };
 
                         let dx = p2.x - p1.x;
                         let dy = p2.y - p1.y;
@@ -177,11 +211,15 @@ impl ParametricSketch2D {
                             }
                         }
                     }
-                    GeometricConstraintType::Coincident { point1_idx, point2_idx } => {
-                        let (p1, p2) = match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                            (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                            _ => continue,
-                        };
+                    GeometricConstraintType::Coincident {
+                        point1_idx,
+                        point2_idx,
+                    } => {
+                        let (p1, p2) =
+                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
+                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
+                                _ => continue,
+                            };
 
                         let dx = (p2.x - p1.x).abs();
                         let dy = (p2.y - p1.y).abs();
@@ -202,7 +240,10 @@ impl ParametricSketch2D {
                             p.y = mid_y;
                         }
                     }
-                    GeometricConstraintType::EqualLength { line1_idx, line2_idx } => {
+                    GeometricConstraintType::EqualLength {
+                        line1_idx,
+                        line2_idx,
+                    } => {
                         let len1 = match &self.entities[*line1_idx] {
                             SketchEntity::Line(l) => l.length(),
                             _ => continue,
@@ -311,13 +352,33 @@ impl Vector3D {
 /// Solid Feature Operation Type
 #[derive(Debug, Clone, PartialEq)]
 pub enum SolidFeatureOperation {
-    Extrude { depth: f64, draft_angle_deg: f64 },
-    Revolve { angle_deg: f64, axis_start: Vector3D, axis_direction: Vector3D },
-    Sweep { path_sketch_name: String },
-    Loft { section_sketch_names: Vec<String> },
-    Fillet { radius: f64, edge_indices: Vec<usize> },
-    Chamfer { distance: f64, edge_indices: Vec<usize> },
-    Shell { thickness: f64, open_face_indices: Vec<usize> },
+    Extrude {
+        depth: f64,
+        draft_angle_deg: f64,
+    },
+    Revolve {
+        angle_deg: f64,
+        axis_start: Vector3D,
+        axis_direction: Vector3D,
+    },
+    Sweep {
+        path_sketch_name: String,
+    },
+    Loft {
+        section_sketch_names: Vec<String>,
+    },
+    Fillet {
+        radius: f64,
+        edge_indices: Vec<usize>,
+    },
+    Chamfer {
+        distance: f64,
+        edge_indices: Vec<usize>,
+    },
+    Shell {
+        thickness: f64,
+        open_face_indices: Vec<usize>,
+    },
     BooleanUnion,
     BooleanSubtract,
     BooleanIntersect,
@@ -349,7 +410,12 @@ impl BRepSolidModel {
     }
 
     /// Perform extrusion feature from 2D sketch profile
-    pub fn extrude_sketch(&mut self, sketch: &ParametricSketch2D, depth: f64, draft_angle_deg: f64) -> bool {
+    pub fn extrude_sketch(
+        &mut self,
+        sketch: &ParametricSketch2D,
+        depth: f64,
+        draft_angle_deg: f64,
+    ) -> bool {
         let mut base_vertices = Vec::new();
 
         for entity in &sketch.entities {
@@ -399,7 +465,7 @@ impl BRepSolidModel {
         self.vertices.extend_from_slice(&top_vertices);
 
         self.faces_count = n + 2; // n lateral faces + top + bottom
-        self.edges_count = n * 3;  // bottom edges + top edges + vertical edges
+        self.edges_count = n * 3; // bottom edges + top edges + vertical edges
 
         // Approximate volume for rectangular prism base
         let base_area = 100.0 * 100.0;
@@ -427,7 +493,8 @@ impl BRepSolidModel {
 
     /// Perform Boolean subtraction
     pub fn boolean_subtract(&mut self, _other_solid: &BRepSolidModel) {
-        self.feature_history.push(SolidFeatureOperation::BooleanSubtract);
+        self.feature_history
+            .push(SolidFeatureOperation::BooleanSubtract);
         self.volume = (self.volume * 0.8).max(0.0);
     }
 }
@@ -485,11 +552,38 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
 /// Assembly Mate Constraint Type
 #[derive(Debug, Clone, PartialEq)]
 pub enum AssemblyMateType {
-    Coincident { part1_id: u32, face1_idx: usize, part2_id: u32, face2_idx: usize },
-    Concentric { part1_id: u32, axis1_idx: usize, part2_id: u32, axis2_idx: usize },
-    Distance { part1_id: u32, face1_idx: usize, part2_id: u32, face2_idx: usize, distance: f64 },
-    Parallel { part1_id: u32, face1_idx: usize, part2_id: u32, face2_idx: usize },
-    Angle { part1_id: u32, face1_idx: usize, part2_id: u32, face2_idx: usize, angle_deg: f64 },
+    Coincident {
+        part1_id: u32,
+        face1_idx: usize,
+        part2_id: u32,
+        face2_idx: usize,
+    },
+    Concentric {
+        part1_id: u32,
+        axis1_idx: usize,
+        part2_id: u32,
+        axis2_idx: usize,
+    },
+    Distance {
+        part1_id: u32,
+        face1_idx: usize,
+        part2_id: u32,
+        face2_idx: usize,
+        distance: f64,
+    },
+    Parallel {
+        part1_id: u32,
+        face1_idx: usize,
+        part2_id: u32,
+        face2_idx: usize,
+    },
+    Angle {
+        part1_id: u32,
+        face1_idx: usize,
+        part2_id: u32,
+        face2_idx: usize,
+        angle_deg: f64,
+    },
 }
 
 /// CAD Assembly Model
@@ -576,8 +670,15 @@ impl CamToolpathGenerator {
 
             gcode.push_str(&format!("(PASS {} AT Z{:.3})\n", pass, current_z));
             gcode.push_str(&format!("G00 X0.000 Y0.000\n"));
-            gcode.push_str(&format!("G01 Z{:.3} F{:.1}\n", current_z, self.tool.feed_rate_mm_min * 0.5));
-            gcode.push_str(&format!("G01 X{:.3} F{:.1}\n", length_mm, self.tool.feed_rate_mm_min));
+            gcode.push_str(&format!(
+                "G01 Z{:.3} F{:.1}\n",
+                current_z,
+                self.tool.feed_rate_mm_min * 0.5
+            ));
+            gcode.push_str(&format!(
+                "G01 X{:.3} F{:.1}\n",
+                length_mm, self.tool.feed_rate_mm_min
+            ));
             gcode.push_str(&format!("G01 Y{:.3}\n", width_mm));
             gcode.push_str(&format!("G01 X0.000\n"));
             gcode.push_str(&format!("G01 Y0.000\n"));
@@ -630,7 +731,8 @@ impl FeaStressSolver {
             10.0
         };
 
-        let max_displacement_mm = (max_von_mises_stress_mpa / (self.youngs_modulus_gpa * 1e3)) * 100.0;
+        let max_displacement_mm =
+            (max_von_mises_stress_mpa / (self.youngs_modulus_gpa * 1e3)) * 100.0;
         let pass = safety_factor >= 1.5;
 
         FeaAnalysisResult {
@@ -690,7 +792,9 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
         let mut output = Vec::new();
         match format {
             CadExportFormat::Step => {
-                output.extend_from_slice(b"ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('CadCraft STEP Solid'),'2;1');\n");
+                output.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('CadCraft STEP Solid'),'2;1');\n",
+                );
                 output.extend_from_slice(format!("FILE_NAME('{}', '2026-01-01', ('CadCraft'), ('SigmaOS'), '', '', '');\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n", solid.name).as_bytes());
             }
             CadExportFormat::Stl => {
@@ -702,7 +806,14 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
                 output.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n10\n0.0\n20\n0.0\n11\n100.0\n21\n100.0\n0\nENDSEC\n0\nEOF\n");
             }
             _ => {
-                output.extend_from_slice(format!("# CadCraft Solid Export: {}\nVertices: {}\n", solid.name, solid.vertices.len()).as_bytes());
+                output.extend_from_slice(
+                    format!(
+                        "# CadCraft Solid Export: {}\nVertices: {}\n",
+                        solid.name,
+                        solid.vertices.len()
+                    )
+                    .as_bytes(),
+                );
             }
         }
         output
@@ -766,7 +877,9 @@ impl CadCraftMasterPrDeploymentSuite {
         let mut sample_solid = self.solid_modeling_3d.create_solid("Support Bracket");
         sample_solid.extrude_sketch(&sample_sketch, 50.0, 0.0);
 
-        let _step_bytes = self.assembly_cam_fea.export_cad_solid(&sample_solid, CadExportFormat::Step);
+        let _step_bytes = self
+            .assembly_cam_fea
+            .export_cad_solid(&sample_solid, CadExportFormat::Step);
 
         prs
     }

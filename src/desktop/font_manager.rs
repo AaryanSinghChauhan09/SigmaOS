@@ -70,7 +70,11 @@ impl FontManager {
 
     /// Uninstall font
     pub fn uninstall_font(&mut self, name: String) -> Result<(), &'static str> {
-        let index = self.installed_fonts.iter().position(|f| f.name == name).ok_or("Font not found")?;
+        let index = self
+            .installed_fonts
+            .iter()
+            .position(|f| f.name == name)
+            .ok_or("Font not found")?;
         self.installed_fonts.remove(index);
         Ok(())
     }
@@ -83,7 +87,10 @@ impl FontManager {
             let filter_lower = self.filter.to_lowercase();
             self.installed_fonts
                 .iter()
-                .filter(|f| f.name.to_lowercase().contains(&filter_lower) || f.family.to_lowercase().contains(&filter_lower))
+                .filter(|f| {
+                    f.name.to_lowercase().contains(&filter_lower)
+                        || f.family.to_lowercase().contains(&filter_lower)
+                })
                 .collect()
         }
     }
@@ -111,9 +118,7 @@ pub fn init_font_manager() {
 
 /// Get font manager
 pub fn get_font_manager() -> &'static mut FontManager {
-    unsafe {
-        FONT_MANAGER.as_mut().expect("Font manager not initialized")
-    }
+    unsafe { FONT_MANAGER.as_mut().expect("Font manager not initialized") }
 }
 
 #[cfg(test)]

@@ -15,59 +15,48 @@ pub mod hyprland_tiling;
 pub use hyprland_tiling::*;
 pub mod hyprland;
 pub use hyprland::{
-    HyprlandInstance, HyprlandWindow, HyprlandWorkspace, LayoutRule, WindowState, HyprlandConfig,
-    init_hyprland, get_hyprland,
+    get_hyprland, init_hyprland, HyprlandConfig, HyprlandInstance, HyprlandWindow,
+    HyprlandWorkspace, LayoutRule, WindowState,
 };
 pub mod wayland;
 pub use wayland::{
-    WaylandDisplay, WaylandCompositor, WaylandObject, WaylandObjectType,
-    WaylandMessage, WaylandArg, WaylandSurface, WaylandSeat,
-    WaylandPointer, WaylandKeyboard, WaylandTouch,
-    init_wayland_compositor, get_wayland_compositor,
+    get_wayland_compositor, init_wayland_compositor, WaylandArg, WaylandCompositor, WaylandDisplay,
+    WaylandKeyboard, WaylandMessage, WaylandObject, WaylandObjectType, WaylandPointer, WaylandSeat,
+    WaylandSurface, WaylandTouch,
 };
 pub mod layer_shell;
 pub use layer_shell::{
-    Layer, Anchor, ExclusiveZone, LayerSurfaceState, LayerSurface,
-    LayerShellManager,
-    init_layer_shell_manager, get_layer_shell_manager,
-    create_hud_overlay, create_status_bar,
+    create_hud_overlay, create_status_bar, get_layer_shell_manager, init_layer_shell_manager,
+    Anchor, ExclusiveZone, Layer, LayerShellManager, LayerSurface, LayerSurfaceState,
 };
 pub mod waybar;
 pub use waybar::{
-    WaybarInstance, WaybarModule, WaybarModuleType, WaybarConfig, BarPosition,
-    init_waybar, get_waybar,
+    get_waybar, init_waybar, BarPosition, WaybarConfig, WaybarInstance, WaybarModule,
+    WaybarModuleType,
 };
 pub mod wofi;
-pub use wofi::{
-    WofiInstance, AppEntry,
-    init_wofi, get_wofi, show_wofi, hide_wofi,
-};
+pub use wofi::{get_wofi, hide_wofi, init_wofi, show_wofi, AppEntry, WofiInstance};
 pub mod mako;
 pub use mako::{
-    MakoDaemon, Notification, NotificationUrgency, MakoConfig, Layer as MakoLayer,
-    init_mako_daemon, get_mako_daemon, send_notification,
+    get_mako_daemon, init_mako_daemon, send_notification, Layer as MakoLayer, MakoConfig,
+    MakoDaemon, Notification, NotificationUrgency,
 };
 pub mod swaylock;
 pub use swaylock::{
-    SwaylockInstance, LockState as SwaylockLockState,
-    init_swaylock, get_swaylock, lock_screen, unlock_screen,
+    get_swaylock, init_swaylock, lock_screen, unlock_screen, LockState as SwaylockLockState,
+    SwaylockInstance,
 };
 pub mod direct_scanout;
 pub use direct_scanout::{
-    DirectScanoutManager, ScanoutMode, DirectScanoutConfig,
-    init_direct_scanout_manager, get_direct_scanout_manager,
-    enable_gaming_direct_scanout, disable_direct_scanout,
+    disable_direct_scanout, enable_gaming_direct_scanout, get_direct_scanout_manager,
+    init_direct_scanout_manager, DirectScanoutConfig, DirectScanoutManager, ScanoutMode,
 };
 pub mod wlogout;
 pub use wlogout::{
-    WlogoutInstance, LogoutAction,
-    init_wlogout, get_wlogout, show_wlogout, hide_wlogout,
+    get_wlogout, hide_wlogout, init_wlogout, show_wlogout, LogoutAction, WlogoutInstance,
 };
 pub mod waypaper;
-pub use waypaper::{
-    WaypaperInstance, Wallpaper,
-    init_waypaper, get_waypaper, set_wallpaper,
-};
+pub use waypaper::{get_waypaper, init_waypaper, set_wallpaper, Wallpaper, WaypaperInstance};
 pub mod xreader;
 pub use xreader::*;
 pub mod walker_launcher;
@@ -283,13 +272,10 @@ pub mod omarchy_palette;
 pub mod omarchy_theme;
 pub mod unified_shell;
 pub use unified_shell::{
-    UnifiedShellEngine, Theme as ShellTheme, ThemeVariant,
-    Plugin, PluginType, PluginState,
-    KeyBinding, KeyboardLayout as ShellKeyboardLayout,
-    UnifiedNotification, NotificationUrgency as ShellNotificationUrgency,
-    Widget, WidgetPosition,
-    Panel, OSDElement, PolicyRule,
-    init_unified_shell, get_unified_shell,
+    get_unified_shell, init_unified_shell, KeyBinding, KeyboardLayout as ShellKeyboardLayout,
+    NotificationUrgency as ShellNotificationUrgency, OSDElement, Panel, Plugin, PluginState,
+    PluginType, PolicyRule, Theme as ShellTheme, ThemeVariant, UnifiedNotification,
+    UnifiedShellEngine, Widget, WidgetPosition,
 };
 pub mod pantheon;
 pub mod screensaver;
@@ -330,7 +316,8 @@ pub use mint_tools::{
 };
 
 pub use screensaver::{
-    DpmsState, LockState as ScreensaverLockState, ScreenSaverConfig, ScreenSaverEngine, ScreenSaverFrame, ScreenSaverMode,
+    DpmsState, LockState as ScreensaverLockState, ScreenSaverConfig, ScreenSaverEngine,
+    ScreenSaverFrame, ScreenSaverMode,
 };
 
 pub use pantheon::{
@@ -364,16 +351,10 @@ pub use crate::desktop::sovereign_navigation_engine::{
 pub use weather_panel::{WeatherCondition, WeatherData, WeatherForecast, WeatherPanel};
 pub mod compositor;
 pub use compositor::{
-    Compositor,
-    DesktopEnvironment as CompositorDesktopEnvironment,
-    InputEvent as CompositorInputEvent,
-    InputEventType as CompositorInputEventType,
-    Surface as CompositorSurface,
-    SurfaceFormat,
-    Window, WindowAttributes,
-    WindowState as CompositorWindowState,
-    WindowManager,
-    init_desktop_environment, get_desktop_environment,
+    get_desktop_environment, init_desktop_environment, Compositor,
+    DesktopEnvironment as CompositorDesktopEnvironment, InputEvent as CompositorInputEvent,
+    InputEventType as CompositorInputEventType, Surface as CompositorSurface, SurfaceFormat,
+    Window, WindowAttributes, WindowManager, WindowState as CompositorWindowState,
 };
 pub mod launcher;
 pub mod shortcuts;
@@ -388,8 +369,8 @@ pub mod mint_update_manager;
 pub mod notification;
 pub mod sigmanotify;
 pub use sigmanotify::{
-    SigmaNotify, Notification as SystemNotification, NotificationUrgency, NotificationCategory,
-    init_sigmanotify, get_sigmanotify, show_notification,
+    get_sigmanotify, init_sigmanotify, show_notification, Notification as SystemNotification,
+    NotificationCategory, NotificationUrgency, SigmaNotify,
 };
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
@@ -420,175 +401,148 @@ pub mod omarchy_hidpi_scale_engine;
 pub use omarchy_hidpi_scale_engine::*;
 pub mod sigma_quickshell;
 pub use sigma_quickshell::{
-    Anchors,
-    AppEntry as QuickshellAppEntry,
-    HyprlandEvent, LauncherContent,
-    LayerSurface as QuickshellLayerSurface,
-    NotificationContent,
-    NotificationUrgency as QuickshellNotificationUrgency,
-    PanelContent, PanelItem, ReactiveCell, ShellWidget, SigmaQuickshell,
-    StatusBarContent, StatusBarModule, WidgetContent,
+    Anchors, AppEntry as QuickshellAppEntry, HyprlandEvent, LauncherContent,
+    LayerSurface as QuickshellLayerSurface, NotificationContent,
+    NotificationUrgency as QuickshellNotificationUrgency, PanelContent, PanelItem, ReactiveCell,
+    ShellWidget, SigmaQuickshell, StatusBarContent, StatusBarModule, WidgetContent,
 };
 pub mod sigma_ghostty;
+pub use archive_manager::{
+    get_archive_manager, init_archive_manager, Archive, ArchiveFormat, ArchiveManager,
+    CompressionLevel,
+};
+pub use audio_editor::{
+    get_audio_editor, init_audio_editor, AudioEditor, AudioEffect, AudioFormat, AudioRegion,
+    AudioTool, AudioTrack, BitDepth, ChannelCount, SampleRate,
+};
+pub use audio_recorder::{
+    get_audio_recorder, init_audio_recorder, AudioFormat, AudioRecorder, BitDepth, Recording,
+    RecordingState, SampleRate,
+};
+pub use bluetooth_manager::{
+    get_bluetooth_manager, init_bluetooth_manager, BluetoothAdapter, BluetoothDevice,
+    BluetoothManager, DeviceStatus, DeviceType,
+};
+pub use calculator::{
+    get_calculator, init_calculator, AngleUnit, Calculator, CalculatorError, CalculatorMode,
+    MemoryOperation,
+};
+pub use calendar::{
+    get_calendar, init_calendar, Calendar, CalendarManager, Date, Event, EventColor, Recurrence,
+    Reminder,
+};
+pub use clipboard_manager::{
+    get_clipboard_manager, init_clipboard_manager, ClipboardItem, ClipboardManager,
+};
+pub use color_picker::{
+    get_color_picker, init_color_picker, Color, ColorFormat, ColorPicker, Palette,
+};
+pub use contact_manager::{
+    get_contact_manager, init_contact_manager, Address, AddressType, Contact, ContactGroup,
+    ContactManager, EmailAddress, EmailType, PhoneNumber, PhoneType,
+};
+pub use dictionary::{
+    get_dictionary, init_dictionary, Definition, Dictionary, DictionaryType, Synonym, Word,
+};
+pub use disk_manager::{
+    get_disk_manager, init_disk_manager, Disk, DiskManager, DiskOperation, DiskOperationTask,
+    FileSystemType, OperationStatus, Partition, PartitionType,
+};
+pub use disk_usage_analyzer::{
+    get_disk_usage_analyzer, init_disk_usage_analyzer, DiskUsageAnalyzer, FileSystemEntry,
+    ScanResult,
+};
+pub use email_client::{
+    get_email_client, init_email_client, AccountType, Email, EmailAccount, EmailAttachment,
+    EmailClient, EmailFolder, EmailPriority, EncryptionType,
+};
+pub use file_manager::{
+    get_file_manager, init_file_manager, File, FileManager, FileMetadata, FilePermission, FileType,
+    SelectionMode, SortOrder, ViewMode,
+};
+pub use font_manager::{
+    get_font_manager, init_font_manager, Font, FontFamily, FontManager, FontStyle,
+};
+pub use image_editor::{
+    get_image_editor, init_image_editor, BlendMode, ColorMode, ImageEditor, ImageFormat, Layer,
+    Selection, ToolType,
+};
+pub use image_viewer::{
+    get_image_viewer, init_image_viewer, FlipDirection, Image, ImageMetadata, ImageViewer,
+    Rotation, SlideshowMode, ZoomMode,
+};
+pub use keyboard_shortcuts::{
+    get_keyboard_shortcuts_manager, init_keyboard_shortcuts_manager, KeyModifier, KeyboardShortcut,
+    KeyboardShortcutsManager, ShortcutAction, ShortcutCategory,
+};
+pub use media_player::{
+    get_media_player, init_media_player, AudioTrack, EqualizerBand, MediaItem, MediaPlayer,
+    PlaybackState, Playlist, RepeatMode, ShuffleMode, SubtitleTrack, VideoTrack,
+};
+pub use news_reader::{get_news_reader, init_news_reader, Feed, FeedItem, FeedType, NewsReader};
+pub use notes_app::{get_notes_app, init_notes_app, Note, NoteColor, NoteFolder, NotesApp};
+pub use password_manager::{
+    get_password_manager, init_password_manager, Folder, GeneratorOptions, PasswordEntry,
+    PasswordManager, PasswordStrength,
+};
+pub use pdf_viewer::{
+    get_pdf_viewer, init_pdf_viewer, PageMode, PdfDocument, PdfViewer, ZoomLevel,
+};
+pub use printer_manager::{
+    get_printer_manager, init_printer_manager, ConnectionType, PaperSize, PrintJob, PrintQuality,
+    Printer, PrinterManager, PrinterStatus,
+};
+pub use screen_recorder::{
+    get_screen_recorder, init_screen_recorder, AudioCodec, ContainerFormat, RecordingArea,
+    RecordingConfig, RecordingQuality, RecordingState, ScreenRecorder, VideoCodec,
+};
+pub use screenshot_tool::{
+    get_screenshot_tool, init_screenshot_tool, CaptureDelay, CaptureMode, ImageFormat,
+    IncludeCursor, Screenshot, ScreenshotOptions, ScreenshotTool,
+};
+pub use search_app::{
+    get_search_app, init_search_app, FileTypeFilter, SearchApp, SearchIndex, SearchResult,
+    SearchType, SortOrder,
+};
 pub use sigma_ghostty::{
     CellAttrs, CursorStyle, GhosttyConfig, SigmaGhostty, TermCell, TermColor, TermGrid, VtAction,
     VtParser,
 };
-pub use file_manager::{
-    FileManager, File, FileType, FileMetadata, FilePermission,
-    ViewMode, SortOrder, SelectionMode,
-    init_file_manager, get_file_manager,
-};
-pub use terminal::{
-    TerminalEmulator, TerminalProfile, TerminalTab, TerminalSession,
-    ColorScheme, CursorShape, ScrollbarPosition, BellMode,
-    init_terminal, get_terminal,
-};
-pub use text_editor::{
-    TextEditor, Document, CursorPosition, Selection, EditorState,
-    Language, Theme, TabSize, LineEnding, Encoding,
-    init_text_editor, get_text_editor,
-};
-pub use calculator::{
-    Calculator, CalculatorMode, AngleUnit, MemoryOperation, CalculatorError,
-    init_calculator, get_calculator,
-};
-pub use calendar::{
-    CalendarManager, Calendar, Event, EventColor, Reminder, Recurrence, Date,
-    init_calendar, get_calendar,
-};
-pub use image_viewer::{
-    ImageViewer, Image, ImageMetadata,
-    ZoomMode, Rotation, FlipDirection, SlideshowMode,
-    init_image_viewer, get_image_viewer,
-};
-pub use password_manager::{
-    PasswordManager, PasswordEntry, Folder, PasswordStrength, GeneratorOptions,
-    init_password_manager, get_password_manager,
-};
-pub use screenshot_tool::{
-    ScreenshotTool, Screenshot, ScreenshotOptions,
-    CaptureMode, CaptureDelay, IncludeCursor, ImageFormat,
-    init_screenshot_tool, get_screenshot_tool,
-};
-pub use clipboard_manager::{
-    ClipboardManager, ClipboardItem,
-    init_clipboard_manager, get_clipboard_manager,
-};
-pub use notes_app::{
-    NotesApp, Note, NoteFolder, NoteColor,
-    init_notes_app, get_notes_app,
-};
-pub use weather_app::{
-    WeatherApp, CurrentWeather, ForecastDay, WeatherLocation,
-    WeatherCondition, TemperatureUnit, WindDirection,
-    init_weather_app, get_weather_app,
-};
-pub use media_player::{
-    MediaPlayer, MediaItem, Playlist, AudioTrack, SubtitleTrack, VideoTrack,
-    PlaybackState, RepeatMode, ShuffleMode, EqualizerBand,
-    init_media_player, get_media_player,
-};
-pub use disk_usage_analyzer::{
-    DiskUsageAnalyzer, FileSystemEntry, ScanResult,
-    init_disk_usage_analyzer, get_disk_usage_analyzer,
-};
 pub use system_cleaner::{
-    SystemCleaner, CleanerOption, CleanerCategory, CleanResult,
-    init_system_cleaner, get_system_cleaner,
-};
-pub use color_picker::{
-    ColorPicker, Color, Palette, ColorFormat,
-    init_color_picker, get_color_picker,
-};
-pub use audio_recorder::{
-    AudioRecorder, Recording, RecordingState, AudioFormat, SampleRate, BitDepth,
-    init_audio_recorder, get_audio_recorder,
-};
-pub use task_manager::{
-    TaskManager, Process, ProcessState,
-    init_task_manager, get_task_manager,
-};
-pub use archive_manager::{
-    ArchiveManager, Archive, ArchiveFormat, CompressionLevel,
-    init_archive_manager, get_archive_manager,
-};
-pub use pdf_viewer::{
-    PdfViewer, PdfDocument, ZoomLevel, PageMode,
-    init_pdf_viewer, get_pdf_viewer,
-};
-pub use font_manager::{
-    FontManager, Font, FontFamily, FontStyle,
-    init_font_manager, get_font_manager,
-};
-pub use bluetooth_manager::{
-    BluetoothManager, BluetoothDevice, BluetoothAdapter, DeviceType, DeviceStatus,
-    init_bluetooth_manager, get_bluetooth_manager,
-};
-pub use printer_manager::{
-    PrinterManager, Printer, PrintJob, PrinterStatus, ConnectionType, PaperSize, PrintQuality,
-    init_printer_manager, get_printer_manager,
-};
-pub use themes_manager::{
-    ThemesManager, Theme, AppearanceSettings, ThemeType, ColorScheme, AccentColor,
-    init_themes_manager, get_themes_manager,
-};
-pub use screen_recorder::{
-    ScreenRecorder, RecordingConfig, RecordingArea, VideoCodec, AudioCodec, ContainerFormat,
-    RecordingQuality, RecordingState,
-    init_screen_recorder, get_screen_recorder,
-};
-pub use timer_app::{
-    TimerApp, Timer, Stopwatch, Lap, Alarm, TimerState, StopwatchState, AlarmState,
-    init_timer_app, get_timer_app,
-};
-pub use search_app::{
-    SearchApp, SearchResult, SearchIndex, SearchType, FileTypeFilter, SortOrder,
-    init_search_app, get_search_app,
+    get_system_cleaner, init_system_cleaner, CleanResult, CleanerCategory, CleanerOption,
+    SystemCleaner,
 };
 pub use system_info::{
-    SystemInfo, CpuInfo, MemoryInfo, DiskInfo, GpuInfo, NetworkInfo,
-    init_system_info, get_system_info,
+    get_system_info, init_system_info, CpuInfo, DiskInfo, GpuInfo, MemoryInfo, NetworkInfo,
+    SystemInfo,
 };
-pub use keyboard_shortcuts::{
-    KeyboardShortcutsManager, KeyboardShortcut, ShortcutAction, KeyModifier, ShortcutCategory,
-    init_keyboard_shortcuts_manager, get_keyboard_shortcuts_manager,
+pub use task_manager::{get_task_manager, init_task_manager, Process, ProcessState, TaskManager};
+pub use terminal::{
+    get_terminal, init_terminal, BellMode, ColorScheme, CursorShape, ScrollbarPosition,
+    TerminalEmulator, TerminalProfile, TerminalSession, TerminalTab,
 };
-pub use disk_manager::{
-    DiskManager, Disk, Partition, PartitionType, FileSystemType, DiskOperation, DiskOperationTask, OperationStatus,
-    init_disk_manager, get_disk_manager,
+pub use text_editor::{
+    get_text_editor, init_text_editor, CursorPosition, Document, EditorState, Encoding, Language,
+    LineEnding, Selection, TabSize, TextEditor, Theme,
 };
-pub use image_editor::{
-    ImageEditor, Layer, Selection, ImageFormat, ColorMode, ToolType, BlendMode,
-    init_image_editor, get_image_editor,
+pub use themes_manager::{
+    get_themes_manager, init_themes_manager, AccentColor, AppearanceSettings, ColorScheme, Theme,
+    ThemeType, ThemesManager,
+};
+pub use timer_app::{
+    get_timer_app, init_timer_app, Alarm, AlarmState, Lap, Stopwatch, StopwatchState, Timer,
+    TimerApp, TimerState,
 };
 pub use video_editor::{
-    VideoEditor, Clip, Track, Transition, Effect, VideoCodec, AudioCodec, Resolution, FrameRate, ClipType,
-    init_video_editor, get_video_editor,
+    get_video_editor, init_video_editor, AudioCodec, Clip, ClipType, Effect, FrameRate, Resolution,
+    Track, Transition, VideoCodec, VideoEditor,
 };
-pub use audio_editor::{
-    AudioEditor, AudioRegion, AudioTrack, AudioEffect, AudioFormat, SampleRate, BitDepth, ChannelCount, AudioTool,
-    init_audio_editor, get_audio_editor,
-};
-pub use email_client::{
-    EmailClient, EmailAccount, Email, EmailFolder, EmailAttachment, AccountType, EncryptionType, EmailPriority,
-    init_email_client, get_email_client,
-};
-pub use contact_manager::{
-    ContactManager, Contact, ContactGroup, PhoneNumber, EmailAddress, Address, PhoneType, EmailType, AddressType,
-    init_contact_manager, get_contact_manager,
-};
-pub use news_reader::{
-    NewsReader, Feed, FeedItem, FeedType,
-    init_news_reader, get_news_reader,
+pub use weather_app::{
+    get_weather_app, init_weather_app, CurrentWeather, ForecastDay, TemperatureUnit, WeatherApp,
+    WeatherCondition, WeatherLocation, WindDirection,
 };
 pub use weather_map::{
-    WeatherMap, MapLocation, MapLayer, MapZoom,
-    init_weather_map, get_weather_map,
-};
-pub use dictionary::{
-    Dictionary, Word, Definition, Synonym, DictionaryType,
-    init_dictionary, get_dictionary,
+    get_weather_map, init_weather_map, MapLayer, MapLocation, MapZoom, WeatherMap,
 };
 pub mod webapp_manager;
 pub use webapp_manager::*;
@@ -598,71 +552,71 @@ pub mod clipboard_advanced;
 pub mod desktop_portal;
 pub mod elementary_os_github_inspired_components;
 pub use elementary_os_github_inspired_components::*;
+pub mod archive_manager;
+pub mod audio_editor;
+pub mod audio_recorder;
+pub mod bluetooth_manager;
+pub mod calculator;
+pub mod calendar;
+pub mod clipboard_manager;
+pub mod color_picker;
+pub mod contact_manager;
+pub mod dictionary;
+pub mod disk_manager;
+pub mod disk_usage_analyzer;
 pub mod elementary_pantheon_innovations;
+pub mod email_client;
 pub mod file_manager;
 pub mod filemanager;
+pub mod font_manager;
 pub mod gaming_engine;
 pub mod granite_contractor;
+pub mod image_editor;
+pub mod image_viewer;
+pub mod keyboard_shortcuts;
 pub mod mate_packages;
 pub mod media_inspired_desktop;
+pub mod media_player;
 pub mod menu;
 pub mod network_panel;
+pub mod news_reader;
+pub mod notes_app;
 pub mod notifications;
 pub mod onboarding;
 pub mod panel;
+pub mod password_manager;
+pub mod pdf_viewer;
+pub mod printer_manager;
+pub mod screen_recorder;
 pub mod screenshot;
+pub mod screenshot_tool;
+pub mod search_app;
 pub mod settings;
+pub mod sovereign_gui_development_and_pr_suite;
+pub mod system_cleaner;
+pub mod system_info;
+pub mod task_manager;
 pub mod terminal;
 pub mod text_editor;
-pub mod calculator;
-pub mod calendar;
-pub mod image_viewer;
-pub mod password_manager;
-pub mod screenshot_tool;
-pub mod clipboard_manager;
-pub mod notes_app;
-pub mod weather_app;
-pub mod media_player;
-pub mod disk_usage_analyzer;
-pub mod system_cleaner;
-pub mod color_picker;
-pub mod audio_recorder;
-pub mod task_manager;
-pub mod archive_manager;
-pub mod pdf_viewer;
-pub mod font_manager;
-pub mod bluetooth_manager;
-pub mod printer_manager;
-pub mod themes_manager;
-pub mod screen_recorder;
-pub mod timer_app;
-pub mod search_app;
-pub mod system_info;
-pub mod keyboard_shortcuts;
-pub mod disk_manager;
-pub mod image_editor;
-pub mod video_editor;
-pub mod audio_editor;
-pub mod email_client;
-pub mod contact_manager;
-pub mod news_reader;
-pub mod weather_map;
-pub mod dictionary;
 pub mod text_scaling;
+pub mod themes_manager;
+pub mod timer_app;
 pub mod universal_desktop_framework;
+pub mod video_editor;
 pub mod volume_manager;
+pub mod weather_app;
+pub mod weather_map;
 pub mod workspace;
 pub mod x11_desktop_environment;
 pub mod xfce_engine;
 pub mod zenith;
-pub mod sovereign_gui_development_and_pr_suite;
 pub use sovereign_gui_development_and_pr_suite::*;
 pub mod sovereign_desktop_toolkits_and_services;
 pub use sovereign_desktop_toolkits_and_services::*;
 pub mod sovereign_de_wm_innovation_engine;
 pub use sovereign_de_wm_innovation_engine::*;
-pub mod zenith_advanced_features;
 pub mod elementary_os_missing_components_pr;
+pub mod zenith_advanced_features;
 pub use elementary_os_missing_components_pr::*;
 
 pub mod omarchy_hypr_ecosystem;
