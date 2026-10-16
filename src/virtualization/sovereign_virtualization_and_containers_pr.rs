@@ -56,6 +56,16 @@ pub struct KvmVcpuState {
     pub dirty_pages_count: u64,
 }
 
+/// QEMU disk image specification
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QemuDiskImageSpec {
+    pub image_path: String,
+    pub format: String,
+    pub size_bytes: u64,
+    pub backing_file: Option<String>,
+    pub is_compressed: bool,
+}
+
 /// VFIO PCI device passthrough mapping
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VfioDevicePassthrough {
@@ -70,6 +80,7 @@ pub struct VfioDevicePassthrough {
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
     pub vcpus: Vec<KvmVcpuState>,
+    pub disk_images: Vec<QemuDiskImageSpec>,
     pub memory_mapped_bytes: u64,
     pub thp_hugepages_active: bool,
     pub io_uring_sqpoll_enabled: bool,
@@ -81,6 +92,7 @@ impl KvmQemuEngine {
     pub fn new() -> Self {
         Self {
             vcpus: Vec::new(),
+            disk_images: Vec::new(),
             memory_mapped_bytes: 0,
             thp_hugepages_active: true,
             io_uring_sqpoll_enabled: true,
@@ -178,9 +190,19 @@ pub struct LibvirtDomainConfig {
     pub is_active: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibvirtStorageVolume {
+    pub volume_name: String,
+    pub pool_name: String,
+    pub capacity_bytes: u64,
+    pub allocation_bytes: u64,
+    pub format: String,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
+    pub storage_pool_type: LibvirtStoragePoolType,
     pub storage_pool_path: String,
     pub virtual_bridges: Vec<String>,
     pub storage_volumes: Vec<LibvirtStorageVolume>,
@@ -194,6 +216,7 @@ impl LibvirtDomainEngine {
         bridges.push("virbr1".to_string());
         Self {
             domains: Vec::new(),
+            storage_pool_type: LibvirtStoragePoolType::Directory,
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
             virtual_bridges: bridges,
             storage_volumes: Vec::new(),
@@ -638,14 +661,20 @@ pub struct KubernetesPodState {
 #[derive(Debug, Clone, Default)]
 pub struct KubernetesK3sRancherEngine {
     pub pods: Vec<KubernetesPodState>,
+    pub crio_runtime_handlers: Vec<String>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
 }
 
 impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
+        let mut handlers = Vec::new();
+        handlers.push("runc".to_string());
+        handlers.push("gvisor".to_string());
+        handlers.push("kata".to_string());
         Self {
             pods: Vec::new(),
+            crio_runtime_handlers: handlers,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
         }

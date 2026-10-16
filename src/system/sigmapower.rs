@@ -14,7 +14,7 @@ use alloc::vec::Vec;
 use core::fmt;
 
 /// Power profile
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum PowerProfile {
     /// Power saver profile
     PowerSaver,

@@ -302,7 +302,7 @@ mod tests {
 
     #[test]
     fn test_thermal_throttling() {
-        let device = IntelXeDevice::new(0x8086, 0x56A0, 0, 0, 0, IntelGpuArch::Xe);
+        let mut device = IntelXeDevice::new(0x8086, 0x56A0, 0, 0, 0, IntelGpuArch::Xe);
         device.set_gt_frequency(1500);
         device.update_temperature(95);
         assert_eq!(device.power_state.gt_frequency, 1200); // Throttled

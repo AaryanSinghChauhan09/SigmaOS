@@ -356,8 +356,8 @@ mod tests {
         let mut manager = DesktopVolumeManager::new();
 
         // Try to remove default output (should fail)
-        let default_output = manager.get_default_output().unwrap();
-        let result = manager.remove_device(&default_output.id);
+        let default_output_id = manager.get_default_output().unwrap().id.clone();
+        let result = manager.remove_device(&default_output_id);
         assert!(!result);
     }
 

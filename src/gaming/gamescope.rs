@@ -190,14 +190,14 @@ mod tests {
 
     #[test]
     fn test_performance_metrics() {
-        let metrics = PerformanceMetrics::new();
+        let mut metrics = PerformanceMetrics::new();
         metrics.update_fps(60.0);
         assert_eq!(metrics.get_fps(), 60.0);
     }
 
     #[test]
     fn test_update_frame_time() {
-        let metrics = PerformanceMetrics::new();
+        let mut metrics = PerformanceMetrics::new();
         metrics.update_frame_time(16.67);
         assert_eq!(metrics.get_frame_time(), 16.67);
     }
