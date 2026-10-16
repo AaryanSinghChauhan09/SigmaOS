@@ -25,7 +25,102 @@ pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod wordcraft;
 
-pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, ProjectType, Workspace};
+pub use photocraft::{
+    PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
+    LayerStyle, SelectionTool, SmartFilter, MaskType,
+    init_photocraft, get_photocraft,
+};
+pub use photocraft_missing_components_parity_pr::{
+    PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
+    PhotocraftAiInpaintingPrEngine, PhotocraftColorGradingFrequencySeparationPrEngine,
+    PhotocraftHdrExposureStackingPrEngine, PhotocraftVectorMaskPenPathPrEngine,
+    PhotocraftBatchActionMacroPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
+};
+pub use filmcraft::{
+    VideoEditor, VideoTrack, Timeline, Effect,
+    VideoCodec, AudioCodec, Resolution, FrameRate,
+    Clip, Transition, TransitionType,
+    ColorGrading, ColorWheel,
+    AudioMixer, AudioChannel,
+    ExportSettings,
+    init_filmcraft, get_filmcraft,
+};
+pub use vectorcraft::{
+    VectorEditor, Shape, Path, VectorLayer, PathPoint, FillRule, BooleanOperation,
+    PenToolMode, ShapeProperties,
+    init_vectorcraft, get_vectorcraft,
+};
+pub use pdfcraft::{
+    PdfEditor, PdfPage, PdfElement,
+    FontFamily as PdfFontFamily, FontSize, TextAlignment as PdfTextAlignment,
+    TextObject, ImageObject, ShapeObject,
+    ShapeType, AnnotationType, Annotation,
+    FormFieldType, FormField,
+    Bookmark, Hyperlink,
+    PdfMetadata, SecuritySettings, ExportFormat as PdfExportFormat,
+    init_pdfcraft, get_pdfcraft,
+};
+pub use pdfcraft_artcraft_parity_pr::{
+    PdfcraftArtcraftPrProposalManifest, PdfcraftVectorArtImportPrEngine,
+    PdfcraftMultiWorkspaceProjectPrEngine, PdfcraftBatchExportRenderPrEngine,
+    PdfcraftDigitalSignatureWatermarkPrEngine, PdfcraftOcrTextRecognitionPrEngine,
+    PdfcraftInteractiveFormsXfaPrEngine, PdfcraftColorPreflightCmykPrEngine,
+    PdfcraftRedactionSanitizationPrEngine, PdfcraftPageImpositionBookletPrEngine,
+    PdfcraftArchivalValidationPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
+};
+pub use designcraft::{
+    DesignEditor, Canvas, Element, Color,
+    ColorModel, FontFamily, FontWeight, TextAlignment,
+    ElementType, TextElement, Layer, DesignBlendMode,
+    Guide, GuideOrientation, Grid,
+    Component, Style, StyleType, ExportFormat as DesignExportFormat, Artboard,
+    init_designcraft, get_designcraft,
+};
+pub use designcraft_missing_components_parity_pr::{
+    DesigncraftPrCategory, DesigncraftPrProposalSpec,
+    DesigncraftInteractivePrototypingPrEngine,
+    DesigncraftAutoLayoutFlexEngine,
+    DesigncraftDesignSystemVariablesEngine,
+    DesigncraftVectorGeometryEngine,
+    DesigncraftMultiplayerCrdtEngine,
+    DesigncraftCodeExportEngine,
+    SovereignDesigncraftArtcraftParityPrGateway,
+};
+pub use effectcraft::{
+    EffectEngine, Effect as EffectCraftEffect, Parameter,
+    BlendMode as EffectBlendMode, EffectCategory, ParameterType,
+    Keyframe, InterpolationType, AnimatedParameter,
+    EffectInstance, NodeType, CompositingNode, NodeGraph,
+    EffectCraftPullRequestSpec, EffectCraftNodeCompositingPrDeployer,
+    EffectCraftParticleShaderPrDeployer, EffectCraftMotionTrackingKeyingPrDeployer,
+    EffectCraftMasterPrDeploymentSuite, fnv1a_effectcraft_pr_digest,
+    init_effectcraft, get_effectcraft,
+};
+pub use effectcraft_missing_components_parity_pr::{
+    EffectcraftPrProposalManifest, ShaderFilterGraphPrEngine,
+    ParticlePhysicsEffectPrEngine, NeuralMatteSegmentationPrEngine,
+    AudioReactiveVisualizerPrEngine, Spatial3DDepthCompositorPrEngine,
+    ArtCraftOpenFxPluginPrEngine, EffectcraftOpticalFlowMotionVectorPrEngine,
+    EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
+    EffectcraftExpressionScriptingRiggingPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway, EffectcraftMissingComponentsParityPrSuite,
+};
+pub use lightcraft::{
+    LightEngine, Light, LightType, Material, Scene,
+    RawFormat, ColorSpace, ToneCurve, ToneCurvePoint, CurveType,
+    ColorMixer, ColorMixerBand, ColorGradingWheel, ThreeWayColorGrading,
+    Mask, MaskType as LightMaskType, Preset, PhotoMetadata, Photo, Album, Rating, Flag,
+    init_lightcraft, get_lightcraft,
+};
+pub use mediacraft::{
+    MediaPlayer, MediaItem, MediaLibrary, Playlist,
+    MediaType, AudioCodec as MediaAudioCodec, VideoCodec as MediaVideoCodec, ContainerFormat,
+    PlaybackState, RepeatMode, ShuffleMode,
+    AudioTrack, SubtitleTrack, VideoTrack as MediaVideoTrack,
+    EqualizerBand, EqualizerPreset, AudioSettings, VideoSettings,
+    StreamProtocol, StreamSource,
+    init_mediacraft, get_mediacraft,
+};
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
     AudioExportFormat, AudioTrack as AudioCraftTrack, AutomationInterpolation, AutomationLane,
