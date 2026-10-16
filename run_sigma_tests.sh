@@ -296,6 +296,20 @@ if [ -f "src/creative/wordcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_wordcraft_missing
 fi
 
+if [ -f "src/creative/sovereign_artcraft_craftlibs_pr_engine.rs" ]; then
+    echo "Running Sovereign Artcraft Craftlibs Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/sovereign_artcraft_craftlibs_pr_engine.rs --edition=2021 -o build/test_artcraft_pr
+    ./build/test_artcraft_pr
+fi
+
+if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign ArtCraft Craftlibs Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs --edition=2021 -o build/test_artcraft_parity
+    ./build/test_artcraft_parity
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build

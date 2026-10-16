@@ -23,6 +23,22 @@ pub enum ProjectType {
     Scene,
     Deck,
     Presentation,
+    Light,
+    Audio,
+    Media,
+    Model3D,
+    Drafting,
+    SoundCraft,
+    DeckCraft,
+    GridCraft,
+    CadCraft,
+    WordCraft,
+    Figcraft,
+    Animation,
+    Spreadsheet,
+    LightCraft,
+    MediaCraft,
+    AudioCraft,
 }
 
 /// Project

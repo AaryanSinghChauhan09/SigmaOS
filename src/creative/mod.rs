@@ -20,6 +20,8 @@ pub mod vectoranimation;
 pub mod model3d;
 pub mod cadcraft;
 pub mod artcraft;
+pub mod sovereign_artcraft_craftlibs_pr_engine;
+pub mod filmcraft_lightcraft_mediacraft_artcraft_parity_pr;
 pub mod deckcraft;
 
 pub use photocraft::{
@@ -150,6 +152,18 @@ pub use wordcraft_missing_components_parity_pr::{
 pub use artcraft::{
     ArtSuite, Project, Workspace, ProjectType,
     init_artcraft, get_artcraft,
+};
+pub use sovereign_artcraft_craftlibs_pr_engine::{
+    ArtcraftCraftlibsMasterPrDeploymentSuite, ArtcraftCraftlibsPrPullRequestSpec,
+    ArtcraftPhotoDesignPrDeployer, ArtcraftFilmEffectLightPrDeployer,
+    ArtcraftAudioMedia3DPrDeployer, ArtcraftSuiteIntegrationPrDeployer,
+    fnv1a_artcraft_pr_digest,
+};
+pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::{
+    CraftlibsPrProposalManifest, FilmcraftNleTimelineOpticalFlowPrEngine,
+    LightcraftToneCurveAiMaskingCatalogPrEngine, MediacraftLowLatencyPipelineEqualizerPrEngine,
+    Model3dSculptingRiggingPbrExporterPrEngine, VectorcraftAnimationLottieBonesPrEngine,
+    AudiocraftDawSynthesizerVst3MasteringPrEngine, SovereignArtcraftCraftlibsParityPrGateway,
 };
 pub use deckcraft::{
     DeckCraftEngine, DeckCraftMasterPrDeploymentSuite, DeckCraftPullRequestSpec,
