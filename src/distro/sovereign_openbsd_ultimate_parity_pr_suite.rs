@@ -20,9 +20,9 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PfStateRule {
     pub rule_id: u32,
-    pub action: String, // "pass" or "block"
+    pub action: String,    // "pass" or "block"
     pub direction: String, // "in" or "out"
-    pub protocol: String, // "tcp", "udp", "icmp"
+    pub protocol: String,  // "tcp", "udp", "icmp"
     pub src_addr: String,
     pub dst_addr: String,
     pub state_kept: bool,
@@ -48,7 +48,10 @@ impl OpenBsdPfAltqEngine {
     }
 
     pub fn add_rule(&mut self, rule: PfStateRule) -> String {
-        let msg = format!("PR Proposal: Added PF rule #{} [{}]", rule.rule_id, rule.action);
+        let msg = format!(
+            "PR Proposal: Added PF rule #{} [{}]",
+            rule.rule_id, rule.action
+        );
         if let Some(ref q) = rule.altq_queue {
             if !self.altq_queues.contains_key(q) {
                 self.altq_queues.insert(q.clone(), 10_000_000); // Default 10Mbps
@@ -60,7 +63,8 @@ impl OpenBsdPfAltqEngine {
 
     pub fn register_state(&mut self, state_id: &str, flow_info: &str) -> bool {
         if self.pf_enabled {
-            self.active_state_table.insert(state_id.to_string(), flow_info.to_string());
+            self.active_state_table
+                .insert(state_id.to_string(), flow_info.to_string());
             true
         } else {
             false
@@ -94,12 +98,19 @@ impl OpenBsdPledgeUnveilEnforcementEngine {
                 self.active_pledges.push(promise.to_string());
             }
         }
-        Ok(format!("PR Proposal: OpenBSD pledge() enforced promises: {}", promises))
+        Ok(format!(
+            "PR Proposal: OpenBSD pledge() enforced promises: {}",
+            promises
+        ))
     }
 
     pub fn apply_unveil(&mut self, path: &str, permissions: &str) -> Result<String, String> {
-        self.unveil_map.insert(path.to_string(), permissions.to_string());
-        Ok(format!("PR Proposal: OpenBSD unveil() restricted path '{}' to '{}'", path, permissions))
+        self.unveil_map
+            .insert(path.to_string(), permissions.to_string());
+        Ok(format!(
+            "PR Proposal: OpenBSD unveil() restricted path '{}' to '{}'",
+            path, permissions
+        ))
     }
 
     pub fn validate_access(&self, path: &str, required_perm: &str) -> bool {
@@ -227,7 +238,10 @@ impl OpenBsdVmmVmdLifecycleEngine {
         let mut vm_entry = vm;
         vm_entry.running = true;
         self.active_vms.insert(id, vm_entry);
-        format!("PR Proposal: Started OpenBSD vmm/vmd microVM '{}' (ID: {})", name, id)
+        format!(
+            "PR Proposal: Started OpenBSD vmm/vmd microVM '{}' (ID: {})",
+            name, id
+        )
     }
 
     pub fn stop_vm(&mut self, vm_id: u32) -> bool {
@@ -322,18 +336,27 @@ impl SovereignOpenBsdUltimateParityPrSuite {
             state_kept: true,
             altq_queue: Some("std_out".to_string()),
         });
-        let pf_ok = self.pf_altq.register_state("state-100", "tcp 192.168.1.5 -> 1.1.1.1:443");
+        let pf_ok = self
+            .pf_altq
+            .register_state("state-100", "tcp 192.168.1.5 -> 1.1.1.1:443");
 
         // 2. Pledge & Unveil
-        let pledge_ok = self.pledge_unveil.apply_pledge("stdio rpath wpath cpath inet").is_ok();
+        let pledge_ok = self
+            .pledge_unveil
+            .apply_pledge("stdio rpath wpath cpath inet")
+            .is_ok();
         let unveil_ok = self.pledge_unveil.apply_unveil("/etc/ssl", "r").is_ok();
 
         // 3. KARL & Retguard
-        let retguard_ok = self.karl_retguard.verify_retguard_canary("kernel_main", 0x89ABCDEF01234567 ^ 0xA5A5A5A5A5A5A5A5);
+        let retguard_ok = self
+            .karl_retguard
+            .verify_retguard_canary("kernel_main", 0x89ABCDEF01234567 ^ 0xA5A5A5A5A5A5A5A5);
 
         // 4. doas & signify
         let doas_ok = self.doas_signify.evaluate_doas(":wheel", "root", "pkg_add");
-        let signify_ok = self.doas_signify.verify_signify("openbsd-76-base", b"SHA256.sig");
+        let signify_ok = self
+            .doas_signify
+            .verify_signify("openbsd-76-base", b"SHA256.sig");
 
         // 5. vmm / vmd
         let vm_msg = self.vmm_vmd.start_vm(OpenBsdVmInstance {
@@ -348,7 +371,14 @@ impl SovereignOpenBsdUltimateParityPrSuite {
         // 6. Daemons
         let daemon_ok = !self.daemons.daemon_status_summary().is_empty();
 
-        pf_ok && pledge_ok && unveil_ok && retguard_ok && doas_ok && signify_ok && !vm_msg.is_empty() && daemon_ok
+        pf_ok
+            && pledge_ok
+            && unveil_ok
+            && retguard_ok
+            && doas_ok
+            && signify_ok
+            && !vm_msg.is_empty()
+            && daemon_ok
     }
 }
 
