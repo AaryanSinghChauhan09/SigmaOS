@@ -379,7 +379,9 @@ impl CadCraftEngine {
                 output.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
             }
             ExportFormat::STEP => {
-                output.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
+                output.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
             }
             _ => {
                 output.extend_from_slice(b"CadCraft Export\n");
