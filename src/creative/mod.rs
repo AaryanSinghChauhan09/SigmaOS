@@ -20,13 +20,52 @@ pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
 pub mod vectoranimation;
-pub mod vectorcraft;
+pub mod model3d;
+pub mod cadcraft;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
+pub mod wordcraft;
+pub mod wordcraft_missing_components_parity_pr;
+pub mod artcraft;
+pub mod deckcraft;
+pub mod deckcraft_missing_components_parity_pr;
 
 pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, ProjectType, Workspace};
 pub use audiocraft::{
-    get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
-    AudioExportFormat, AudioTrack as AudioCraftTrack, AutomationInterpolation, AutomationLane,
-    AutomationPoint, ChannelConfig, SampleFormat, SampleRate, TrackType,
+    AudioEditor, AudioClip, AudioTrack as AudioCraftTrack, AudioEffect,
+    SampleFormat, SampleRate, ChannelConfig, TrackType,
+    AudioEffectType, AutomationPoint, AutomationInterpolation, AutomationLane,
+    AudioExportFormat,
+    init_audiocraft, get_audiocraft,
+};
+pub use soundcraft::{
+    SoundCraftEngine, SoundTrack, SoundClip, Spatial3DPosition, Waveform, SynthesizerVoice,
+    SoundCraftPullRequestSpec, SoundCraftAudioEnginePrDeployer,
+    SoundCraftDspSynthesizerPrDeployer, SoundCraftSpatialMixingMasteringPrDeployer,
+    SoundCraftMasterPrDeploymentSuite, fnv1a_soundcraft_pr_digest,
+};
+pub use vectoranimation::{
+    AnimationProject as VectorAnimationProject, AnimationLayer, AnimationLayerType,
+    Keyframe as VectorKeyframe, InterpolationMode, Bone, Rig, Timeline as VectorTimeline, OnionSkin,
+    AnimationExportFormat,
+    init_vectoranimation, get_vectoranimation,
+};
+pub use model3d::{
+    Scene as Model3DScene, Object3D, Mesh, Vertex,
+    MeshType, ObjectType, SculptBrushType, SculptBrush,
+    Material as Model3DMaterial, Light as Model3DLight, LightType as Model3DLightType, Camera,
+    ExportFormat as Model3DExportFormat,
+    init_model3d, get_model3d,
+};
+pub use wordcraft_missing_components_parity_pr::{
+    WordcraftPrProposalManifest, WordcraftTypographyLayoutPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftMailMergeAutomationPrEngine, SovereignWordcraftArtcraftParityPrGateway,
+};
+pub use artcraft::{
+    ArtSuite, Project, Workspace, ProjectType,
+    init_artcraft, get_artcraft,
 };
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
@@ -126,4 +165,16 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
+};
+pub use deckcraft_missing_components_parity_pr::{
+    DeckcraftPrProposalManifest, DeckcraftAdvancedVectorAnimationTimelinePrEngine,
+    DeckcraftSmartDiagramDataChartPrEngine, DeckcraftInteractivePollAudienceQnaPrEngine,
+    DeckcraftRealtimeCrdtMultiUserCollabPrEngine, DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine,
+    DeckcraftMultiFormatBatchExportRenderPrEngine, SovereignDeckcraftArtcraftParityPrGateway,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    GridcraftPrProposalManifest, GridcraftAdvancedFormulaXlookupPrEngine,
+    GridcraftDataValidationConditionalFormattingPrEngine, GridcraftRealtimeDataStreamSpillArrayPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMultiUserCrdtCollabPrEngine,
+    GridcraftMacroScriptingUdfPrEngine, SovereignGridcraftArtcraftParityPrGateway,
 };
