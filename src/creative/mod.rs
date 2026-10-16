@@ -13,6 +13,7 @@ pub mod figcraft_missing_components_parity_pr;
 pub mod effectcraft;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod filmcraft;
+pub mod filmcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod model3d;
@@ -44,6 +45,15 @@ pub use filmcraft::{
     AudioMixer, AudioChannel,
     ExportSettings,
     init_filmcraft, get_filmcraft,
+};
+pub use filmcraft_missing_components_parity_pr::{
+    FilmcraftAcesColorGradingLutPrEngine, FilmcraftChromaKeySpillSuppressionPrEngine,
+    FilmcraftGpuOpticalFlowTimeWarpPrEngine, FilmcraftHardwareAcceleratedExportPrEngine,
+    FilmcraftMissingComponentsParityPrSuite, FilmcraftNleMulticamWaveformSyncPrEngine,
+    FilmcraftPrProposalManifest, FilmcraftProxyBackgroundTranscodePrEngine,
+    FilmcraftSmartCutSceneDetectionPrEngine, FilmcraftSpatial3dAudioPanningPrEngine,
+    FilmcraftTextTitleMotionGraphicPrEngine, FilmcraftXmlFcpxmlEdlInteroperabilityPrEngine,
+    SovereignFilmcraftArtcraftParityPrGateway,
 };
 pub use vectorcraft::{
     VectorEditor, Shape, Path, VectorLayer, PathPoint, FillRule, BooleanOperation,
