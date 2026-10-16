@@ -178,6 +178,7 @@ pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
+pub use distro::openbsd_missing_components_v59_pr::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
@@ -494,6 +495,5 @@ pub mod workflow;
 
 pub mod io;
 
-pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
