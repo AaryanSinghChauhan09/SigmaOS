@@ -152,7 +152,13 @@ impl OpenBsdSmtpdMailServerPrEngine {
         }
     }
 
-    pub fn add_filter_rule(&mut self, name: &str, direction: &str, action: &str, tls: bool) -> String {
+    pub fn add_filter_rule(
+        &mut self,
+        name: &str,
+        direction: &str,
+        action: &str,
+        tls: bool,
+    ) -> String {
         let rule = SmtpdFilterRule {
             name: name.to_string(),
             direction: direction.to_string(),
@@ -609,7 +615,9 @@ impl OpenBsdMissingComponentsV60PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let smtpd_diff = self.smtpd.add_filter_rule("inbound_mx", "inbound", "accept", true);
+        let smtpd_diff = self
+            .smtpd
+            .add_filter_rule("inbound_mx", "inbound", "accept", true);
         let pr2 = self.submit_pr_proposal(
             "Configure OpenSMTPD TLS-enforced inbound mail filter",
             "jules",
@@ -629,7 +637,9 @@ impl OpenBsdMissingComponentsV60PrSuite {
         );
         self.validate_and_merge_pr(pr3);
 
-        self.proposals.values().all(|p| p.status == OpenBsdPrStatusV60::Merged)
+        self.proposals
+            .values()
+            .all(|p| p.status == OpenBsdPrStatusV60::Merged)
     }
 }
 
