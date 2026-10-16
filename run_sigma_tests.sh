@@ -1425,6 +1425,20 @@ if [ -f "src/distro/arch_linux_github_repo_components_pr_engine.rs" ]; then
     ./build/test_arch_github_repo_components
 fi
 
+if [ -f "tests/test_open_source_os_arch_unimplemented_ideas_v58_pr.rs" ]; then
+    echo "Running Open Source OS & Arch Linux GitHub Repo Unimplemented Ideas V58 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_arch_unimplemented_ideas_v58_pr.rs --edition=2021 -o build/test_open_source_os_arch_v58_pr
+    ./build/test_open_source_os_arch_v58_pr
+fi
+
+if [ -f "tests/test_open_source_os_unimplemented_ideas_and_arch_github_prs.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas & Arch GitHub PRs test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_unimplemented_ideas_and_arch_github_prs.rs --edition=2021 -o build/test_open_source_os_arch_prs
+    ./build/test_open_source_os_arch_prs
+fi
+
 
 if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
     echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
