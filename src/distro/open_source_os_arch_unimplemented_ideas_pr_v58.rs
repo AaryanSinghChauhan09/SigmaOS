@@ -152,7 +152,8 @@ impl OpenBsdPledgeUnveilPfV58Engine {
         if path.is_empty() {
             return Err("Empty unveil path");
         }
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
         Ok(())
     }
 }
@@ -175,7 +176,8 @@ impl NetBsdRumpVeriexecV58Engine {
     }
 
     pub fn register_veriexec(&mut self, path: &str, sha256_hash: &str) {
-        self.veriexec_records.insert(path.to_string(), sha256_hash.to_string());
+        self.veriexec_records
+            .insert(path.to_string(), sha256_hash.to_string());
     }
 
     pub fn verify_executable(&self, path: &str, candidate_hash: &str) -> bool {
@@ -215,7 +217,8 @@ impl ArchinstallAndArchisoV58Engine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchGithubRepoPrSpecV58 {
         ArchGithubRepoPrSpecV58 {
             pr_id,
-            title: "PR Proposal: Archinstall Automated Profile & Archiso Live ISO Builder".to_string(),
+            title: "PR Proposal: Archinstall Automated Profile & Archiso Live ISO Builder"
+                .to_string(),
             target_repo: "archlinux/archinstall & archlinux/archiso".to_string(),
             branch_name: format!("feat/pr-{}-archinstall-archiso-v58", pr_id),
             is_merged: true,
@@ -249,7 +252,8 @@ impl ArchReflectorAndPowerpillV58Engine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchGithubRepoPrSpecV58 {
         ArchGithubRepoPrSpecV58 {
             pr_id,
-            title: "PR Proposal: Reflector Mirrorlist Latency Ranker & Powerpill Parallel Streams".to_string(),
+            title: "PR Proposal: Reflector Mirrorlist Latency Ranker & Powerpill Parallel Streams"
+                .to_string(),
             target_repo: "archlinux/reflector & powerpill".to_string(),
             branch_name: format!("feat/pr-{}-reflector-powerpill-v58", pr_id),
             is_merged: true,
@@ -283,7 +287,8 @@ impl ArchPacmanKeyAndTestingV58Engine {
     pub fn submit_pr(&self, pr_id: u32) -> ArchGithubRepoPrSpecV58 {
         ArchGithubRepoPrSpecV58 {
             pr_id,
-            title: "PR Proposal: Pacman-Key Dilithium5 PQC Keyring & Arch-Testing Signoff Tracker".to_string(),
+            title: "PR Proposal: Pacman-Key Dilithium5 PQC Keyring & Arch-Testing Signoff Tracker"
+                .to_string(),
             target_repo: "archlinux/pacman & archlinux/arch-testing".to_string(),
             branch_name: format!("feat/pr-{}-pacman-pqc-testing-v58", pr_id),
             is_merged: true,
@@ -441,14 +446,20 @@ impl OpenSourceOsAndArchUnimplementedIdeasV58PrSuite {
         self.openbsd_pf.pledge("exec");
         assert!(self.openbsd_pf.unveil("/usr/bin", "rx").is_ok());
 
-        self.netbsd_rump.register_veriexec("/usr/bin/tar", "hash123");
-        assert!(self.netbsd_rump.verify_executable("/usr/bin/tar", "hash123"));
+        self.netbsd_rump
+            .register_veriexec("/usr/bin/tar", "hash123");
+        assert!(self
+            .netbsd_rump
+            .verify_executable("/usr/bin/tar", "hash123"));
 
         true
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == PrStatusV58::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == PrStatusV58::Merged)
+            .count()
     }
 }
 
