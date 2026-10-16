@@ -422,7 +422,12 @@ impl IdentityAndEnterpriseAuthPrEngine {
 
     /// Generate SSSD domain configuration.
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!("[domain/{}]\nid_provider = {}\nldap_uri = {}\n", domain, provider, uri)
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
+            domain,
+            provider,
+            uri
+        )
     }
 
     /// Simulate Kerberos v5 ticket validation.

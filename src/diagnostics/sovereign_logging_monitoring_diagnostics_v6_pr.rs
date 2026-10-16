@@ -161,7 +161,8 @@ impl JournaldSyslogNgLogEngineV6 {
     }
 
     pub fn add_logrotate_policy(&mut self, policy: LogrotatePolicyV6) {
-        self.logrotate_policies.insert(policy.log_path.clone(), policy);
+        self.logrotate_policies
+            .insert(policy.log_path.clone(), policy);
     }
 
     pub fn get_namespaces(&self) -> &HashMap<String, JournaldNamespaceV6> {
@@ -488,7 +489,7 @@ pub struct SsSocketMemoryV6 {
 pub struct SsTcpSocketDetailsV6 {
     pub local_endpoint: String,
     pub remote_endpoint: String,
-    pub state: String, // ESTABLISHED, TIME_WAIT, SYN_SENT
+    pub state: String,           // ESTABLISHED, TIME_WAIT, SYN_SENT
     pub congestion_algo: String, // cubic, bbr, reno
     pub inode: u64,
     pub pid: u32,
@@ -548,11 +549,17 @@ impl SsLsofIpcInspectorEngineV6 {
     }
 
     pub fn query_sockets_by_algo(&self, algo: &str) -> Vec<&SsTcpSocketDetailsV6> {
-        self.tcp_sockets.iter().filter(|s| s.congestion_algo == algo).collect()
+        self.tcp_sockets
+            .iter()
+            .filter(|s| s.congestion_algo == algo)
+            .collect()
     }
 
     pub fn query_fds_by_type(&self, fd_type: &str) -> Vec<&OpenFdInfoV6> {
-        self.open_fds.iter().filter(|f| f.fd_type == fd_type).collect()
+        self.open_fds
+            .iter()
+            .filter(|f| f.fd_type == fd_type)
+            .collect()
     }
 
     pub fn get_tcp_sockets(&self) -> &[SsTcpSocketDetailsV6] {
@@ -834,20 +841,24 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV6 {
     fn seed_presets(&mut self) {
         self.submissions.push(DiagnosticsPrSubmissionV6 {
             pr_id: 601,
-            title: "PR #601: Journald FSS HMAC Sealing & Isolated Namespace Partitioning".to_string(),
+            title: "PR #601: Journald FSS HMAC Sealing & Isolated Namespace Partitioning"
+                .to_string(),
             author: "SigmaLoggingTeam".to_string(),
             target_component: "journald_v6".to_string(),
-            description: "Implements FSS HMAC sealing and multi-tenant journal namespace isolation".to_string(),
+            description: "Implements FSS HMAC sealing and multi-tenant journal namespace isolation"
+                .to_string(),
             pqc_signature: "DILITHIUM5_SIG_JOURNAL_NS_601".to_string(),
             status: DiagnosticsPrStatusV6::Merged,
         });
 
         self.submissions.push(DiagnosticsPrSubmissionV6 {
             pr_id: 602,
-            title: "PR #602: Ethtool Offloads, NVMe SMART Health & OpenMetrics OTLP Exporters".to_string(),
+            title: "PR #602: Ethtool Offloads, NVMe SMART Health & OpenMetrics OTLP Exporters"
+                .to_string(),
             author: "SigmaHardwareTeam".to_string(),
             target_component: "hardware_discovery_v6".to_string(),
-            description: "Implements Ethtool offloads, NVMe SMART health, and OTLP gRPC telemetry".to_string(),
+            description: "Implements Ethtool offloads, NVMe SMART health, and OTLP gRPC telemetry"
+                .to_string(),
             pqc_signature: "DILITHIUM5_SIG_HW_HEALTH_602".to_string(),
             status: DiagnosticsPrStatusV6::CiGated,
         });
@@ -953,7 +964,9 @@ mod tests {
         });
 
         assert_eq!(engine.get_namespaces().len(), 3);
-        let entry = engine.lookup_catalog("f7701587a5f442d73830cc0b0809b52a").unwrap();
+        let entry = engine
+            .lookup_catalog("f7701587a5f442d73830cc0b0809b52a")
+            .unwrap();
         assert!(entry.subject_template.contains("logged in"));
         assert_eq!(engine.get_bsd_rules().len(), 1);
     }

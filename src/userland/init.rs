@@ -1998,7 +1998,11 @@ mod tests {
         );
 
         assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification_static("READY=1"));
-        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification_static("ready notification"));
+        assert!(
+            RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification_static(
+                "ready notification"
+            )
+        );
     }
 
     #[test]

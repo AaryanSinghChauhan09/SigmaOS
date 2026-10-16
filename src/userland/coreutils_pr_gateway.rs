@@ -345,12 +345,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         result
     }
 
-    pub fn run_head_tail_bytes(
-        &self,
-        bytes: &[u8],
-        count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
+    pub fn run_head_tail_bytes(&self, bytes: &[u8], count: usize, is_head: bool) -> Vec<u8> {
         if is_head {
             bytes.iter().take(count).copied().collect()
         } else {
@@ -1110,10 +1105,7 @@ impl ArchivalCompressionEngine {
         format: CompressionFormat,
         level: i32,
     ) -> Result<String, String> {
-        Ok(format!(
-            "Configured {:?} level {}",
-            format, level
-        ))
+        Ok(format!("Configured {:?} level {}", format, level))
     }
 
     pub fn verify_archive_integrity(&self, magic_bytes: &[u8], payload_bytes: &[u8]) -> bool {
