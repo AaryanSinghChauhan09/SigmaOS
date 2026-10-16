@@ -141,6 +141,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+    /// Evaluate Landlock v5 access ruleset bitmask permission.
+    pub fn check_landlock_access(held_ruleset_mask: u32, requested_access: u32) -> bool {
+        (held_ruleset_mask & requested_access) == requested_access
+    }
+
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -405,8 +410,11 @@ impl IdentityAndEnterpriseAuthPrEngine {
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
+    /// Bolt ⚡ optimization: Pre-allocate vector capacity by counting RDN separators (',')
+    /// eliminating intermediate reallocations during DN parsing.
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
-        let mut parts = Vec::new();
+        let estimated_parts = dn.as_bytes().iter().filter(|&&b| b == b',').count() + 1;
+        let mut parts = Vec::with_capacity(estimated_parts);
         for rdn in dn.split(',') {
             if let Some((key, val)) = rdn.split_once('=') {
                 parts.push((key.trim().to_string(), val.trim().to_string()));
@@ -418,6 +426,18 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD domain configuration file format string.
+    pub fn generate_sssd_domain_conf(
+        domain_name: &str,
+        id_provider: &str,
+        ldap_uri: &str,
+    ) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain_name, id_provider, ldap_uri
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
