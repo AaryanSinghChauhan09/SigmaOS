@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Semgrep
-        uses: returntocorp/semgrep-action@fcd5ab632e1fe2b451ae9491ea83f0f7015a9a4b # v1
+        uses: semgrep/semgrep-action@v1
         with:
           config: >-
             p/rust
@@ -47,7 +47,7 @@ jobs:
           fi
 
       - name: Upload Semgrep SARIF
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@4b05b84d422108edb0d1e2632b737f10e40ccb3f # v3.28.10
         with:
           sarif_file: semgrep.sarif
         if: always() && steps.check_sarif.outputs.exists == 'true'
