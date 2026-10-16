@@ -661,14 +661,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 "sigreturn_frame_guard_and_uncatchable_signal_bypass",
                 true,
             ),
-            (
-                SigmaOsSubsystem::ProcessActivity,
-                SigmaOsSubsystem::SecuritySandboxing,
-                LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec",
-                "freebsd_proc_cgroup_capsicum_isolation",
-                true,
-            ),
         ];
 
         for (src, tgt, distro, id, rule, strict) in default_rules {
@@ -746,7 +738,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystem_compliance_vector(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_all_subsystems_distro_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
@@ -756,7 +748,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn format_subsystem_payload(
+    pub fn translate_cross_distro_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1214,14 +1206,14 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystem_compliance_vector();
+        let audits = engine.audit_all_subsystems_distro_compliance();
         assert_eq!(audits.len(), 31);
         for (_, compliant, score) in audits {
             assert!(compliant);
             assert_eq!(score, 100);
         }
 
-        let translated = engine.format_subsystem_payload(
+        let translated = engine.translate_cross_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             SigmaOsSubsystem::SecuritySandboxing,
             "mac_capsicum_enforce",
