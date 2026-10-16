@@ -26,6 +26,10 @@ pub enum ProjectType {
     Grid,
     Spreadsheet,
     GridCraft,
+    WordCraft,
+    Document,
+    TextDocument,
+    Word,
 }
 
 /// Project
