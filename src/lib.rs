@@ -183,6 +183,7 @@ pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_freebsd_advanced_subsystems_pr::*;
 pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub use distro::sovereign_openbsd_complete_gap_closure_pr_suite::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::openbsd_missing_components_v59_pr::*;
