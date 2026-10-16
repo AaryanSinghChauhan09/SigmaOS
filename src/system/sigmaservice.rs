@@ -9,7 +9,9 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt;
 
@@ -22,9 +24,12 @@ pub enum ServiceState {
     Stopped,
     /// Starting
     Starting,
-    /// Stopping,
-    /// Failed,
-    /// Reloading,
+    /// Stopping
+    Stopping,
+    /// Failed
+    Failed,
+    /// Reloading
+    Reloading,
 }
 
 impl fmt::Display for ServiceState {
