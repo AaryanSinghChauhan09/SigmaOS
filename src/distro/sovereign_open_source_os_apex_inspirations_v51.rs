@@ -144,8 +144,10 @@ impl NushellFishStructuredPipelineEngine {
 
         match input {
             StructuredValue::TableVal(rows) => {
-                let filtered: Vec<Vec<String>> =
-                    rows.into_iter().filter(|row| !row.is_empty()).collect();
+                let filtered: Vec<Vec<String>> = rows
+                    .into_iter()
+                    .filter(|row| !row.is_empty())
+                    .collect();
                 StructuredValue::TableVal(filtered)
             }
             other => other,
@@ -287,10 +289,7 @@ impl AsahiSiliconMailboxPowerEngine {
     }
 
     pub fn route_aic_interrupt(&self, vector: u32) -> String {
-        format!(
-            "AIC Interrupt vector {} routed to primary P-Core cluster",
-            vector
-        )
+        format!("AIC Interrupt vector {} routed to primary P-Core cluster", vector)
     }
 }
 
@@ -330,30 +329,21 @@ impl SovereignOpenSourceOsApexMasterSuiteV51 {
 
     pub fn run_v51_apex_suite(&mut self) -> Vec<ApexAuditResultV51> {
         // 1. Immutable OS
-        self.immutable_os
-            .apply_config("cluster.name", "sigma-production", true);
-        self.immutable_os
-            .register_container("kubelet", "k8s.gcr.io/kubelet:v1.30", true, 2048);
+        self.immutable_os.apply_config("cluster.name", "sigma-production", true);
+        self.immutable_os.register_container("kubelet", "k8s.gcr.io/kubelet:v1.30", true, 2048);
 
         // 2. Structured Shell
-        self.structured_shell
-            .add_autosuggestion("ls -la --sort=time");
-        let suggestion = self
-            .structured_shell
-            .get_autosuggestion("ls")
-            .unwrap_or_default();
+        self.structured_shell.add_autosuggestion("ls -la --sort=time");
+        let suggestion = self.structured_shell.get_autosuggestion("ls").unwrap_or_default();
 
         // 3. Async Window
         self.async_window.add_layout_box(1, 1920, 1080, "flex");
-        self.async_window
-            .post_window_message(10, "render_frame", b"\x00\x01\x02");
+        self.async_window.post_window_message(10, "render_frame", b"\x00\x01\x02");
         let msg = self.async_window.process_next_message();
 
         // 4. Asahi Silicon
-        self.asahi_power
-            .send_rtkit_message(0x01, 0x4150504C00000000);
-        self.asahi_power
-            .register_power_cluster("P-Core", 3200, 1100);
+        self.asahi_power.send_rtkit_message(0x01, 0x4150504C00000000);
+        self.asahi_power.register_power_cluster("P-Core", 3200, 1100);
         self.asahi_power.register_power_cluster("E-Core", 2000, 900);
         let aic_msg = self.asahi_power.route_aic_interrupt(48);
 
@@ -361,10 +351,7 @@ impl SovereignOpenSourceOsApexMasterSuiteV51 {
             ApexAuditResultV51 {
                 subsystem_name: "Talos/Bottlerocket Immutable OS".to_string(),
                 status: "PASS".to_string(),
-                detail: format!(
-                    "Immutable state valid: {}",
-                    self.immutable_os.validate_immutable_state()
-                ),
+                detail: format!("Immutable state valid: {}", self.immutable_os.validate_immutable_state()),
             },
             ApexAuditResultV51 {
                 subsystem_name: "NuShell/Fish Structured Shell".to_string(),

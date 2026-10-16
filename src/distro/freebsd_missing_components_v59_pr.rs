@@ -120,10 +120,7 @@ impl FreeBsdZfsBectlPrEngine {
             for spec in self.boot_environments.values_mut() {
                 spec.active_on_boot = spec.name == name;
             }
-            Ok(format!(
-                "bectl activate: Successfully set '{}' as default boot environment",
-                name
-            ))
+            Ok(format!("bectl activate: Successfully set '{}' as default boot environment", name))
         } else {
             Err(format!("Boot environment '{}' does not exist", name))
         }
@@ -275,7 +272,10 @@ impl FreeBsdPoudriereBuilderPrEngine {
             arch: arch.to_string(),
         };
         self.jails.insert(name.to_string(), jail);
-        format!("poudriere jail -c -j {} -v {} -a {}", name, version, arch)
+        format!(
+            "poudriere jail -c -j {} -v {} -a {}",
+            name, version, arch
+        )
     }
 }
 
@@ -478,14 +478,13 @@ impl FreeBsdCarpPfsyncPrEngine {
             interface_name: name.to_string(),
             vhid,
             advskew: skew,
-            state: if skew == 0 {
-                "MASTER".to_string()
-            } else {
-                "BACKUP".to_string()
-            },
+            state: if skew == 0 { "MASTER".to_string() } else { "BACKUP".to_string() },
         };
         self.carp_interfaces.insert(name.to_string(), spec);
-        format!("ifconfig {} vhid {} advskew {}", name, vhid, skew)
+        format!(
+            "ifconfig {} vhid {} advskew {}",
+            name, vhid, skew
+        )
     }
 }
 
@@ -681,9 +680,7 @@ impl FreeBsdMissingComponentsV59PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let ng_diff = self
-            .netgraph
-            .create_node("ng_vlan0", "vlan", vec!["downstream"]);
+        let ng_diff = self.netgraph.create_node("ng_vlan0", "vlan", vec!["downstream"]);
         let pr2 = self.submit_pr_proposal(
             "Integrate Netgraph modular networking ng_vlan node",
             "jules",
@@ -703,9 +700,7 @@ impl FreeBsdMissingComponentsV59PrSuite {
         );
         self.validate_and_merge_pr(pr3);
 
-        self.proposals
-            .values()
-            .all(|p| p.status == FreeBsdPrStatusV59::Merged)
+        self.proposals.values().all(|p| p.status == FreeBsdPrStatusV59::Merged)
     }
 }
 

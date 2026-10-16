@@ -874,21 +874,11 @@ impl LfsAutomatedReadinessAuditorEngine {
         let mut engine = Self {
             readiness_checks: BTreeMap::new(),
         };
-        engine
-            .readiness_checks
-            .insert("lfs_mount_devtmpfs".to_string(), true);
-        engine
-            .readiness_checks
-            .insert("lfs_sysv_runlevel_3".to_string(), true);
-        engine
-            .readiness_checks
-            .insert("glibc_linker_ld_so".to_string(), true);
-        engine
-            .readiness_checks
-            .insert("pam_shadow_argon2id".to_string(), true);
-        engine
-            .readiness_checks
-            .insert("blfs_pkg_porg_indexer".to_string(), true);
+        engine.readiness_checks.insert("lfs_mount_devtmpfs".to_string(), true);
+        engine.readiness_checks.insert("lfs_sysv_runlevel_3".to_string(), true);
+        engine.readiness_checks.insert("glibc_linker_ld_so".to_string(), true);
+        engine.readiness_checks.insert("pam_shadow_argon2id".to_string(), true);
+        engine.readiness_checks.insert("blfs_pkg_porg_indexer".to_string(), true);
         engine
     }
 
@@ -918,22 +908,10 @@ impl BsdCrossKernelAbiTranslationEngine {
         let mut engine = Self {
             active_abi_rules: BTreeMap::new(),
         };
-        engine.active_abi_rules.insert(
-            "freebsd_capsicum".to_string(),
-            "capability_rights_limit".to_string(),
-        );
-        engine.active_abi_rules.insert(
-            "openbsd_pledge".to_string(),
-            "stdio_rpath_wpath_inet".to_string(),
-        );
-        engine.active_abi_rules.insert(
-            "netbsd_veriexec".to_string(),
-            "sha256_strict_enforce".to_string(),
-        );
-        engine.active_abi_rules.insert(
-            "dragonfly_hammer2".to_string(),
-            "multi_master_txg_replay".to_string(),
-        );
+        engine.active_abi_rules.insert("freebsd_capsicum".to_string(), "capability_rights_limit".to_string());
+        engine.active_abi_rules.insert("openbsd_pledge".to_string(), "stdio_rpath_wpath_inet".to_string());
+        engine.active_abi_rules.insert("netbsd_veriexec".to_string(), "sha256_strict_enforce".to_string());
+        engine.active_abi_rules.insert("dragonfly_hammer2".to_string(), "multi_master_txg_replay".to_string());
         engine
     }
 
@@ -1168,11 +1146,6 @@ mod tests {
         // 8. BSD Cross-Kernel ABI Translator
         let translator = BsdCrossKernelAbiTranslationEngine::new();
         assert_eq!(translator.audit_abi_coverage(), 4);
-        assert_eq!(
-            translator
-                .translate_bsd_syscall("openbsd", "pledge")
-                .unwrap(),
-            "sigma_pledge_sandbox_apply"
-        );
+        assert_eq!(translator.translate_bsd_syscall("openbsd", "pledge").unwrap(), "sigma_pledge_sandbox_apply");
     }
 }

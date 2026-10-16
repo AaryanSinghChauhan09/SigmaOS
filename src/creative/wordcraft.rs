@@ -175,7 +175,7 @@ impl Section {
             id,
             paragraphs: Vec::new(),
             tables: Vec::new(),
-            page_width: 612.0,  // 8.5 inches at 72 dpi
+            page_width: 612.0, // 8.5 inches at 72 dpi
             page_height: 792.0, // 11 inches at 72 dpi
             margin_top: 72.0,
             margin_bottom: 72.0,
@@ -436,8 +436,7 @@ impl WordCraftCollaborationRevisionPrDeployer {
     }
 
     pub fn add_comment(&self, doc: &mut Document, paragraph_id: u32, content: &str) -> u32 {
-        self.total_comments_processed
-            .fetch_add(1, Ordering::Relaxed);
+        self.total_comments_processed.fetch_add(1, Ordering::Relaxed);
         self.deployed.store(true, Ordering::Relaxed);
         doc.add_comment(paragraph_id, content)
     }
@@ -447,8 +446,7 @@ impl WordCraftCollaborationRevisionPrDeployer {
         for change in doc.tracked_changes.iter_mut() {
             change.accepted = true;
         }
-        self.total_revisions_processed
-            .fetch_add(count as u32, Ordering::Relaxed);
+        self.total_revisions_processed.fetch_add(count as u32, Ordering::Relaxed);
         self.deployed.store(true, Ordering::Relaxed);
         count
     }
@@ -579,16 +577,11 @@ impl WordCraftMasterPrDeploymentSuite {
         }
 
         // Trigger active deployment states
-        let mut sample_doc = self
-            .doc_engine
-            .create_document("SigmaOS WordCraft Overview", "SigmaOS Team");
-        sample_doc
-            .add_paragraph("Welcome to WordCraft document editing in SigmaOS ArtCraft suite.");
+        let mut sample_doc = self.doc_engine.create_document("SigmaOS WordCraft Overview", "SigmaOS Team");
+        sample_doc.add_paragraph("Welcome to WordCraft document editing in SigmaOS ArtCraft suite.");
         self.collaboration.enable_track_changes(&mut sample_doc);
-        self.collaboration
-            .add_comment(&mut sample_doc, 1, "Verify typography spacing.");
-        self.exporter
-            .export_document(&sample_doc, DocumentExportFormat::Pdf);
+        self.collaboration.add_comment(&mut sample_doc, 1, "Verify typography spacing.");
+        self.exporter.export_document(&sample_doc, DocumentExportFormat::Pdf);
 
         prs
     }
@@ -637,8 +630,7 @@ mod tests {
     fn test_wordcraft_document_creation_and_stats() {
         let mut doc = Document::new("Technical Report", "Developer");
         let p1 = doc.add_paragraph("The quick brown fox jumps over the lazy dog.");
-        let p2 =
-            doc.add_paragraph("SigmaOS provides zero-dependency operating system capabilities.");
+        let p2 = doc.add_paragraph("SigmaOS provides zero-dependency operating system capabilities.");
 
         assert_eq!(p1, 1);
         assert_eq!(p2, 2);

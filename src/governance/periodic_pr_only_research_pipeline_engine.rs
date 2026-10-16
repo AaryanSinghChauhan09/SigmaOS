@@ -207,160 +207,28 @@ impl PeriodicPrOnlyResearchPipelineEngine {
 
     fn seed_roadmap_items(&mut self) {
         let items = [
-            (
-                ComponentPriority::P0,
-                "Reproducible CI/build gate",
-                "Fedora, Debian",
-                "CI workflow and build manifest",
-                "Clean build and tests pass",
-            ),
-            (
-                ComponentPriority::P0,
-                "QEMU boot validator",
-                "OSDev, xv6",
-                "Boot script and boot matrix",
-                "QEMU boot-to-shell log",
-            ),
-            (
-                ComponentPriority::P0,
-                "Bootloader integration",
-                "OSDev, GRUB/systemd-boot concepts",
-                "UEFI boot path",
-                "QEMU UEFI boot",
-            ),
-            (
-                ComponentPriority::P0,
-                "Kernel entry and serial logging",
-                "xv6, Linux",
-                "Early console and kernel entry",
-                "Serial trace",
-            ),
-            (
-                ComponentPriority::P1,
-                "Physical memory manager",
-                "xv6, Linux",
-                "Frame allocator",
-                "Allocation tests",
-            ),
-            (
-                ComponentPriority::P1,
-                "Virtual memory/paging",
-                "xv6, Linux",
-                "Page tables and address spaces",
-                "Boot and memory tests",
-            ),
-            (
-                ComponentPriority::P1,
-                "Interrupts and timer",
-                "xv6, OSDev",
-                "IDT, exception handlers, timer",
-                "Interrupt trace",
-            ),
-            (
-                ComponentPriority::P1,
-                "Scheduler",
-                "Linux, xv6",
-                "Minimal round-robin scheduler",
-                "Process-switch test",
-            ),
-            (
-                ComponentPriority::P1,
-                "Syscall interface",
-                "Linux, FreeBSD",
-                "Stable syscall table and validation",
-                "Syscall tests",
-            ),
-            (
-                ComponentPriority::P1,
-                "Init and shell",
-                "Linux Mint, Arch",
-                "PID 1, service startup, shell",
-                "Boot-to-shell",
-            ),
-            (
-                ComponentPriority::P2,
-                "VFS",
-                "Linux, xv6",
-                "Path resolution, FDs, file ops",
-                "Filesystem tests",
-            ),
-            (
-                ComponentPriority::P2,
-                "RAM-disk filesystem",
-                "Linux tmpfs concepts",
-                "Simple in-memory FS",
-                "QEMU RAM-disk boot",
-            ),
-            (
-                ComponentPriority::P2,
-                "Processes and signals",
-                "Linux, xv6",
-                "Process lifecycle and signals",
-                "Interop tests",
-            ),
-            (
-                ComponentPriority::P2,
-                "Pipes and IPC",
-                "Linux, FreeBSD",
-                "Pipes, event queues, shared memory",
-                "IPC tests",
-            ),
-            (
-                ComponentPriority::P2,
-                "Installer",
-                "Debian, Mint",
-                "Clean QEMU install",
-                "Install log",
-            ),
-            (
-                ComponentPriority::P2,
-                "Atomic update/rollback",
-                "Fedora, Mint",
-                "Update manifest and rollback",
-                "Failed-update recovery test",
-            ),
-            (
-                ComponentPriority::P2,
-                "Security capabilities",
-                "OpenBSD, Linux",
-                "Capability checks and sandbox policy",
-                "Denial tests",
-            ),
-            (
-                ComponentPriority::P3,
-                "Drivers",
-                "Linux, FreeBSD",
-                "virtio-blk, virtio-net, VGA",
-                "Device logs",
-            ),
-            (
-                ComponentPriority::P3,
-                "Networking",
-                "Linux, FreeBSD",
-                "Socket API and basic TCP/IP path",
-                "Network integration test",
-            ),
-            (
-                ComponentPriority::P3,
-                "Desktop",
-                "Redox, Mint, Omarchy",
-                "Framebuffer, input, window launch",
-                "Graphical smoke test",
-            ),
-            (
-                ComponentPriority::P3,
-                "Package manager",
-                "Arch, Debian",
-                "Metadata parser and dependency resolver",
-                "Package corpus tests",
-            ),
-            (
-                ComponentPriority::P3,
-                "Distro compatibility",
-                "Arch, Debian, Fedora, BSD",
-                "Metadata compatibility layer",
-                "Compatibility matrix",
-            ),
+            (ComponentPriority::P0, "Reproducible CI/build gate", "Fedora, Debian", "CI workflow and build manifest", "Clean build and tests pass"),
+            (ComponentPriority::P0, "QEMU boot validator", "OSDev, xv6", "Boot script and boot matrix", "QEMU boot-to-shell log"),
+            (ComponentPriority::P0, "Bootloader integration", "OSDev, GRUB/systemd-boot concepts", "UEFI boot path", "QEMU UEFI boot"),
+            (ComponentPriority::P0, "Kernel entry and serial logging", "xv6, Linux", "Early console and kernel entry", "Serial trace"),
+            (ComponentPriority::P1, "Physical memory manager", "xv6, Linux", "Frame allocator", "Allocation tests"),
+            (ComponentPriority::P1, "Virtual memory/paging", "xv6, Linux", "Page tables and address spaces", "Boot and memory tests"),
+            (ComponentPriority::P1, "Interrupts and timer", "xv6, OSDev", "IDT, exception handlers, timer", "Interrupt trace"),
+            (ComponentPriority::P1, "Scheduler", "Linux, xv6", "Minimal round-robin scheduler", "Process-switch test"),
+            (ComponentPriority::P1, "Syscall interface", "Linux, FreeBSD", "Stable syscall table and validation", "Syscall tests"),
+            (ComponentPriority::P1, "Init and shell", "Linux Mint, Arch", "PID 1, service startup, shell", "Boot-to-shell"),
+            (ComponentPriority::P2, "VFS", "Linux, xv6", "Path resolution, FDs, file ops", "Filesystem tests"),
+            (ComponentPriority::P2, "RAM-disk filesystem", "Linux tmpfs concepts", "Simple in-memory FS", "QEMU RAM-disk boot"),
+            (ComponentPriority::P2, "Processes and signals", "Linux, xv6", "Process lifecycle and signals", "Interop tests"),
+            (ComponentPriority::P2, "Pipes and IPC", "Linux, FreeBSD", "Pipes, event queues, shared memory", "IPC tests"),
+            (ComponentPriority::P2, "Installer", "Debian, Mint", "Clean QEMU install", "Install log"),
+            (ComponentPriority::P2, "Atomic update/rollback", "Fedora, Mint", "Update manifest and rollback", "Failed-update recovery test"),
+            (ComponentPriority::P2, "Security capabilities", "OpenBSD, Linux", "Capability checks and sandbox policy", "Denial tests"),
+            (ComponentPriority::P3, "Drivers", "Linux, FreeBSD", "virtio-blk, virtio-net, VGA", "Device logs"),
+            (ComponentPriority::P3, "Networking", "Linux, FreeBSD", "Socket API and basic TCP/IP path", "Network integration test"),
+            (ComponentPriority::P3, "Desktop", "Redox, Mint, Omarchy", "Framebuffer, input, window launch", "Graphical smoke test"),
+            (ComponentPriority::P3, "Package manager", "Arch, Debian", "Metadata parser and dependency resolver", "Package corpus tests"),
+            (ComponentPriority::P3, "Distro compatibility", "Arch, Debian, Fedora, BSD", "Metadata compatibility layer", "Compatibility matrix"),
         ];
 
         for (prio, comp, upstream, deliv, val) in items {
@@ -459,8 +327,7 @@ impl PeriodicPrOnlyResearchPipelineEngine {
                 "Boot report schema".to_string(),
                 "Initial boot-to-shell test".to_string(),
             ],
-            acceptance: "Boot attempt produces structured logs and a classified failure stage."
-                .to_string(),
+            acceptance: "Boot attempt produces structured logs and a classified failure stage.".to_string(),
         });
 
         self.first_six_prs.push(FirstSixPrDeliverable {
@@ -549,34 +416,13 @@ impl PeriodicPrOnlyResearchPipelineEngine {
 
     fn seed_branch_conventions(&mut self) {
         let conventions = [
-            (
-                "study/<component>-<topic>-<short-id>",
-                "study/vfs-path-resolution-042",
-            ),
-            (
-                "feat/<component>-<capability>-<short-id>",
-                "feat/kernel-qemu-boot-043",
-            ),
-            (
-                "fix/<component>-<issue>-<short-id>",
-                "fix/vfs-normalize-errors-048",
-            ),
-            (
-                "test/<component>-<scenario>-<short-id>",
-                "test/vfs-ramdisk-044",
-            ),
-            (
-                "docs/<component>-<topic>-<short-id>",
-                "docs/capability-matrix-audit-045",
-            ),
-            (
-                "chore/ci-<topic>-<short-id>",
-                "chore/ci-verify-workflow-001",
-            ),
-            (
-                "security/<component>-<topic>-<short-id>",
-                "security/package-sandbox-046",
-            ),
+            ("study/<component>-<topic>-<short-id>", "study/vfs-path-resolution-042"),
+            ("feat/<component>-<capability>-<short-id>", "feat/kernel-qemu-boot-043"),
+            ("fix/<component>-<issue>-<short-id>", "fix/vfs-normalize-errors-048"),
+            ("test/<component>-<scenario>-<short-id>", "test/vfs-ramdisk-044"),
+            ("docs/<component>-<topic>-<short-id>", "docs/capability-matrix-audit-045"),
+            ("chore/ci-<topic>-<short-id>", "chore/ci-verify-workflow-001"),
+            ("security/<component>-<topic>-<short-id>", "security/package-sandbox-046"),
         ];
 
         for (pat, ex) in conventions {
@@ -590,80 +436,34 @@ impl PeriodicPrOnlyResearchPipelineEngine {
     pub fn validate_pipeline_rules(&self) -> bool {
         let cadence_ok = self.cadence_rules.len() == 5;
         let roadmap_ok = self.roadmap_items.len() == 22;
-        let rules_ok =
-            self.review_rules.len() == 12 && self.review_rules.iter().all(|r| r.enforced);
-        let dod_ok = self.definition_of_done.len() == 10
-            && self.definition_of_done.iter().all(|d| d.verified);
+        let rules_ok = self.review_rules.len() == 12 && self.review_rules.iter().all(|r| r.enforced);
+        let dod_ok = self.definition_of_done.len() == 10 && self.definition_of_done.iter().all(|d| d.verified);
         let prs_ok = self.first_six_prs.len() == 6;
         let schedule_ok = self.thirty_day_schedule.len() == 4;
 
         cadence_ok && roadmap_ok && rules_ok && dod_ok && prs_ok && schedule_ok
     }
 
-    pub fn get_roadmap_by_priority(
-        &self,
-        priority: ComponentPriority,
-    ) -> Vec<MissingComponentItem> {
-        self.roadmap_items
-            .iter()
-            .filter(|i| i.priority == priority)
-            .cloned()
-            .collect()
+    pub fn get_roadmap_by_priority(&self, priority: ComponentPriority) -> Vec<MissingComponentItem> {
+        self.roadmap_items.iter().filter(|i| i.priority == priority).cloned().collect()
     }
 
     pub fn get_rule(&self, rule_number: usize) -> Option<&PrReviewRule> {
-        self.review_rules
-            .iter()
-            .find(|r| r.rule_number == rule_number)
+        self.review_rules.iter().find(|r| r.rule_number == rule_number)
     }
 
     pub fn generate_pr_gateway_report(&self) -> String {
-        let mut report =
-            String::from("# Periodic PR-Only Research-and-Implementation Pipeline Report\n\n");
-        report.push_str(&format!(
-            "- Cadence Levels Configured: {}\n",
-            self.cadence_rules.len()
-        ));
-        report.push_str(&format!(
-            "- Total Missing Component Roadmap Items: {}\n",
-            self.roadmap_items.len()
-        ));
-        report.push_str(&format!(
-            "  - P0 Items: {}\n",
-            self.get_roadmap_by_priority(ComponentPriority::P0).len()
-        ));
-        report.push_str(&format!(
-            "  - P1 Items: {}\n",
-            self.get_roadmap_by_priority(ComponentPriority::P1).len()
-        ));
-        report.push_str(&format!(
-            "  - P2 Items: {}\n",
-            self.get_roadmap_by_priority(ComponentPriority::P2).len()
-        ));
-        report.push_str(&format!(
-            "  - P3 Items: {}\n",
-            self.get_roadmap_by_priority(ComponentPriority::P3).len()
-        ));
-        report.push_str(&format!(
-            "- Mandatory PR Review Rules Enforced: {}/12\n",
-            self.review_rules.len()
-        ));
-        report.push_str(&format!(
-            "- Definition of Done Criteria: {}/10\n",
-            self.definition_of_done.len()
-        ));
-        report.push_str(&format!(
-            "- Initial PR Deliverables Defined: {}\n",
-            self.first_six_prs.len()
-        ));
-        report.push_str(&format!(
-            "- Overall Pipeline Validation: {}\n",
-            if self.validate_pipeline_rules() {
-                "VERIFIED PASS"
-            } else {
-                "FAILED"
-            }
-        ));
+        let mut report = String::from("# Periodic PR-Only Research-and-Implementation Pipeline Report\n\n");
+        report.push_str(&format!("- Cadence Levels Configured: {}\n", self.cadence_rules.len()));
+        report.push_str(&format!("- Total Missing Component Roadmap Items: {}\n", self.roadmap_items.len()));
+        report.push_str(&format!("  - P0 Items: {}\n", self.get_roadmap_by_priority(ComponentPriority::P0).len()));
+        report.push_str(&format!("  - P1 Items: {}\n", self.get_roadmap_by_priority(ComponentPriority::P1).len()));
+        report.push_str(&format!("  - P2 Items: {}\n", self.get_roadmap_by_priority(ComponentPriority::P2).len()));
+        report.push_str(&format!("  - P3 Items: {}\n", self.get_roadmap_by_priority(ComponentPriority::P3).len()));
+        report.push_str(&format!("- Mandatory PR Review Rules Enforced: {}/12\n", self.review_rules.len()));
+        report.push_str(&format!("- Definition of Done Criteria: {}/10\n", self.definition_of_done.len()));
+        report.push_str(&format!("- Initial PR Deliverables Defined: {}\n", self.first_six_prs.len()));
+        report.push_str(&format!("- Overall Pipeline Validation: {}\n", if self.validate_pipeline_rules() { "VERIFIED PASS" } else { "FAILED" }));
 
         report
     }
