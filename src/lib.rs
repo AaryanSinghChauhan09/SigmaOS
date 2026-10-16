@@ -140,7 +140,6 @@ pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
-pub use distro::cachy_linux_missing_components_v58_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
@@ -375,6 +374,7 @@ pub use sigpkg::{
     PackageDependencyResolver, PacmanAdapter, RecipeError, RecipeManager, RpmAdapter, SatSolver,
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
+pub use userland::coreutils_pr_gateway::*;
 pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::shell::{
