@@ -153,6 +153,29 @@ impl SystemdInspirationsPrEngine {
         entry
     }
 
+    /// Parse `WATCHDOG_USEC=` line from `sd_notify` payload.
+    pub fn parse_watchdog_usec(&self, payload: &str) -> Option<u64> {
+        for line in payload.lines() {
+            let line = line.trim();
+            if line.starts_with("WATCHDOG_USEC=") {
+                if let Ok(usec) = line[14..].parse::<u64>() {
+                    return Some(usec);
+                }
+            }
+        }
+        None
+    }
+
+    /// Calculate exponential backoff delay for service restart attempts.
+    pub fn calculate_backoff_delay(&self, attempt: u32, base_sec: u32, max_sec: u32) -> u32 {
+        if attempt == 0 {
+            return base_sec;
+        }
+        let shift = attempt.min(30);
+        let calculated = base_sec.saturating_mul(1u32.checked_shl(shift).unwrap_or(u32::MAX));
+        calculated.min(max_sec)
+    }
+
     /// Allocate socket activation file descriptors (SD_LISTEN_FDS_START = 3).
     pub fn prepare_socket_activation(&self, listen_sockets: &[&str]) -> (i32, Vec<(i32, String)>) {
         const SD_LISTEN_FDS_START: i32 = 3;
@@ -263,6 +286,31 @@ impl OpenRcInspirationsPrEngine {
         services_to_run
     }
 
+    /// Resolve runlevel sequence chain from current to target runlevel.
+    pub fn resolve_runlevel_dependencies(&self, target: OpenRcRunlevel, current: OpenRcRunlevel) -> Vec<OpenRcRunlevel> {
+        let all_levels = [
+            OpenRcRunlevel::SysInit,
+            OpenRcRunlevel::Boot,
+            OpenRcRunlevel::Default,
+            OpenRcRunlevel::Shutdown,
+        ];
+        let mut chain = Vec::new();
+        if target >= current {
+            for &rl in &all_levels {
+                if rl >= current && rl <= target {
+                    chain.push(rl);
+                }
+            }
+        } else {
+            for &rl in all_levels.iter().rev() {
+                if rl <= current && rl >= target {
+                    chain.push(rl);
+                }
+            }
+        }
+        chain
+    }
+
     /// Generate OpenRC Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -348,6 +396,17 @@ impl RunitS6InspirationsPrEngine {
     /// Simulate s6 event notification pipeline pipe message.
     pub fn send_s6_event_notification(&self, service_name: &str, event_code: char) -> String {
         alloc::format!("s6-event:{}:{}", service_name, event_code)
+    }
+
+    /// Match log entry against s6-log filter directive prefix (`+` include, `-` exclude).
+    pub fn match_s6_log_filter(&self, filter_rule: &str, log_message: &str) -> bool {
+        if filter_rule.starts_with('+') {
+            log_message.contains(&filter_rule[1..])
+        } else if filter_rule.starts_with('-') {
+            !log_message.contains(&filter_rule[1..])
+        } else {
+            true
+        }
     }
 
     /// Generate runit & s6 Pull Request proposal.
@@ -450,6 +509,25 @@ impl SysVinitInspirationsPrEngine {
             }
         }
         commands
+    }
+
+    /// Sort `/etc/rc.d/rc*.d/` scripts into ordered Kill (K*) and Start (S*) sequences.
+    pub fn sort_rc_d_scripts(&self, script_names: &[&str]) -> (Vec<String>, Vec<String>) {
+        let mut kill_scripts: Vec<String> = Vec::new();
+        let mut start_scripts: Vec<String> = Vec::new();
+
+        for &s in script_names {
+            if s.starts_with('K') {
+                kill_scripts.push(s.to_string());
+            } else if s.starts_with('S') {
+                start_scripts.push(s.to_string());
+            }
+        }
+
+        kill_scripts.sort();
+        start_scripts.sort();
+
+        (kill_scripts, start_scripts)
     }
 
     /// Generate SysVinit Pull Request proposal.
@@ -581,6 +659,19 @@ impl BsdRcInspirationsPrEngine {
         )
     }
 
+    /// Merge `/etc/rc.conf` base configuration with `/etc/rc.conf.local` local overrides.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
     /// Generate BSD rc Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -644,6 +735,31 @@ impl LaunchdInspirationsPrEngine {
         } else {
             network_state_active
         }
+    }
+
+    /// Evaluate launchd KeepAlive rules with optional conditions (ExitCondition, PathState, NetworkState).
+    pub fn evaluate_keep_alive_rules(
+        &self,
+        successful_exit: Option<bool>,
+        path_exists: Option<bool>,
+        network_up: Option<bool>,
+    ) -> bool {
+        if let Some(succ) = successful_exit {
+            if succ {
+                return false;
+            }
+        }
+        if let Some(pe) = path_exists {
+            if !pe {
+                return false;
+            }
+        }
+        if let Some(nu) = network_up {
+            if !nu {
+                return false;
+            }
+        }
+        true
     }
 
     /// Generate launchd Pull Request proposal.
@@ -803,6 +919,24 @@ impl CronAnacronTimersAtPrEngine {
         ready
     }
 
+    /// Expand Cron shorthand macro alias (`@reboot`, `@daily`, `@weekly`, `@monthly`, `@yearly`).
+    pub fn expand_cron_shorthand_alias(&self, alias: &str) -> Option<(&'static str, &'static str, &'static str, &'static str, &'static str)> {
+        match alias {
+            "@reboot" => Some(("@reboot", "@reboot", "@reboot", "@reboot", "@reboot")),
+            "@hourly" => Some(("0", "*", "*", "*", "*")),
+            "@daily" | "@midnight" => Some(("0", "0", "*", "*", "*")),
+            "@weekly" => Some(("0", "0", "*", "*", "0")),
+            "@monthly" => Some(("0", "0", "1", "*", "*")),
+            "@yearly" | "@annually" => Some(("0", "0", "1", "1", "*")),
+            _ => None,
+        }
+    }
+
+    /// Sort `at` job queue by timestamp order.
+    pub fn sort_at_job_queue(&self, queue: &mut [AtJobSpec]) {
+        queue.sort_by_key(|job| job.run_at_timestamp);
+    }
+
     /// Generate Cron, Anacron, Timers & At Pull Request proposal.
     pub fn generate_proposal(&self) -> CoreUserlandPrProposalManifest {
         CoreUserlandPrProposalManifest {
@@ -854,6 +988,29 @@ impl SovereignInitAndSupervisorParityPrGateway {
             self.launchd.generate_proposal(),
             self.cron_timers_at.generate_proposal(),
         ]
+    }
+
+    /// Generate full Pull Request Proposal documentation report in Markdown format.
+    pub fn generate_pr_proposal_markdown(&self) -> String {
+        let proposals = self.collect_all_proposals();
+        let mut md = String::from("# Pull Request Proposals: Core Userland Supervisors, Init Systems, Timers & Scheduled Job Engine Parity\n\n");
+        md.push_str("## Overview\n");
+        md.push_str("This collection of Pull Request proposals introduces native parity and high-performance zero-dependency `#![no_std]` / `alloc` implementations for landmark Linux and BSD init systems, service supervisors, process managers, timers, and scheduled job execution engines in SigmaOS.\n\n---\n\n");
+
+        for (idx, p) in proposals.iter().enumerate() {
+            md.push_str(&alloc::format!("### PR #{}: {}\n", 4001 + idx, p.pr_title));
+            md.push_str(&alloc::format!("- **Category**: {}\n", p.target_subsystem));
+            md.push_str(&alloc::format!("- **Inspiration Sources**: {}\n", p.original_system));
+            md.push_str(&alloc::format!("- **Performance Impact**: {}\n", p.performance_multiplier));
+            md.push_str(&alloc::format!("- **Status**: {}\n", p.status));
+            md.push_str("- **Key Features Implemented**:\n");
+            for comp in &p.components_added {
+                md.push_str(&alloc::format!("  - {}\n", comp));
+            }
+            md.push_str("\n");
+        }
+
+        md
     }
 
     /// Execute end-to-end verification across all supervisor and job scheduling engines.
@@ -938,6 +1095,11 @@ mod tests {
         assert_eq!(msg, Some("Operational".to_string()));
         assert_eq!(pid, Some(1024));
 
+        assert_eq!(engine.parse_watchdog_usec("WATCHDOG_USEC=5000000"), Some(5000000));
+        assert_eq!(engine.calculate_backoff_delay(0, 1, 60), 1);
+        assert_eq!(engine.calculate_backoff_delay(2, 2, 60), 8);
+        assert_eq!(engine.calculate_backoff_delay(10, 2, 30), 30);
+
         assert!(engine.validate_cgroups_v2_limits(512 * 1024 * 1024, 100, 256));
 
         let entry = engine.format_journald_entry(
@@ -971,6 +1133,10 @@ mod tests {
         let plan =
             engine.transition_runlevel(OpenRcRunlevel::SysInit, OpenRcRunlevel::Default, &services);
         assert_eq!(plan, vec!["sshd"]);
+
+        let chain = engine.resolve_runlevel_dependencies(OpenRcRunlevel::Default, OpenRcRunlevel::SysInit);
+        assert_eq!(chain.len(), 3);
+        assert_eq!(chain[0], OpenRcRunlevel::SysInit);
     }
 
     #[test]
@@ -984,6 +1150,9 @@ mod tests {
 
         let evt = engine.send_s6_event_notification("sshd", 'u');
         assert_eq!(evt, "s6-event:sshd:u");
+
+        assert!(engine.match_s6_log_filter("+error", "fatal error occurred"));
+        assert!(!engine.match_s6_log_filter("-debug", "debug trace message"));
     }
 
     #[test]
@@ -998,6 +1167,10 @@ mod tests {
 
         let cmds = engine.execute_telinit(3, &[entry]);
         assert_eq!(cmds.len(), 1);
+
+        let (kills, starts) = engine.sort_rc_d_scripts(&["S20sshd", "K10net", "S10network", "K01halt"]);
+        assert_eq!(kills, vec!["K01halt", "K10net"]);
+        assert_eq!(starts, vec!["S10network", "S20sshd"]);
     }
 
     #[test]
@@ -1023,6 +1196,11 @@ mod tests {
         let conf = engine.parse_rc_conf("sshd_enable=\"YES\"\nhostname=\"sigma\"\n");
         assert_eq!(conf.get("sshd_enable"), Some(&"YES".to_string()));
 
+        let mut local = BTreeMap::new();
+        local.insert("sshd_flags".to_string(), "-4".to_string());
+        let merged = engine.merge_rc_conf_overrides(&conf, &local);
+        assert_eq!(merged.get("sshd_flags"), Some(&"-4".to_string()));
+
         let res = engine.execute_rc_subr_action("sshd", "start", true, "-4");
         assert!(res.contains("Executing rc.subr: sshd start"));
     }
@@ -1033,6 +1211,8 @@ mod tests {
         assert!(engine.trigger_launchd_socket_activation("com.apple.sshd", "IPv4", 22));
         assert!(engine.evaluate_keep_alive(false, 1, true));
         assert!(!engine.evaluate_keep_alive(true, 0, true));
+        assert!(engine.evaluate_keep_alive_rules(Some(false), Some(true), Some(true)));
+        assert!(!engine.evaluate_keep_alive_rules(Some(true), None, None));
     }
 
     #[test]
@@ -1044,6 +1224,8 @@ mod tests {
         assert!(!engine.parse_and_match_cron("0", "12", "*", "*", "*", 10, 12, 1, 1, 1));
         assert!(engine.parse_and_match_cron("@daily", "0", "0", "0", "0", 0, 0, 1, 1, 1));
 
+        assert_eq!(engine.expand_cron_shorthand_alias("@daily"), Some(("0", "0", "*", "*", "*")));
+
         // Anacron catchup
         assert!(engine.evaluate_anacron_job("daily.job", 1, 0, 1000, 1000 + 86400, 0.5, 2.0));
         assert!(!engine.evaluate_anacron_job("daily.job", 1, 0, 1000, 1000 + 86400, 3.0, 2.0));
@@ -1054,16 +1236,29 @@ mod tests {
         assert!(!engine.should_trigger_timer(&trigger, 100, 120, 0));
 
         // at queue
-        let mut queue = vec![AtJobSpec {
-            job_id: 1,
-            run_at_timestamp: 500,
-            queue_letter: 'a',
-            command: "backup.sh".to_string(),
-            user: "root".to_string(),
-        }];
+        let mut queue = vec![
+            AtJobSpec {
+                job_id: 2,
+                run_at_timestamp: 800,
+                queue_letter: 'a',
+                command: "report.sh".to_string(),
+                user: "root".to_string(),
+            },
+            AtJobSpec {
+                job_id: 1,
+                run_at_timestamp: 500,
+                queue_letter: 'a',
+                command: "backup.sh".to_string(),
+                user: "root".to_string(),
+            },
+        ];
+        engine.sort_at_job_queue(&mut queue);
+        assert_eq!(queue[0].job_id, 1);
+
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
-        assert!(queue.is_empty());
+        assert_eq!(ready[0].job_id, 1);
+        assert_eq!(queue.len(), 1);
     }
 
     #[test]
@@ -1076,6 +1271,10 @@ mod tests {
             assert_eq!(prop.status, "Ready for Merge");
             assert!(!prop.components_added.is_empty());
         }
+
+        let markdown = gateway.generate_pr_proposal_markdown();
+        assert!(markdown.contains("# Pull Request Proposals: Core Userland Supervisors"));
+        assert!(markdown.contains("PR #4001: feat(systemd)"));
 
         assert!(gateway.run_master_verification());
     }
