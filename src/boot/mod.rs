@@ -82,3 +82,6 @@ pub use sovereign_kernel_and_bootloader_advancements_v47_pr::*;
 
 pub mod sovereign_kernel_and_boot_innovations_v52_pr;
 pub use sovereign_kernel_and_boot_innovations_v52_pr::*;
+
+pub mod sovereign_kernel_and_boot_innovations_v53_pr;
+pub use sovereign_kernel_and_boot_innovations_v53_pr::*;
