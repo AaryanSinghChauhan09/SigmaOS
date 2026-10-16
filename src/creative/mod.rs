@@ -20,13 +20,30 @@ pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
 pub mod vectoranimation;
-pub mod vectorcraft;
+pub mod model3d;
+pub mod cadcraft;
+pub mod artcraft;
+pub mod sovereign_artcraft_craftlibs_pr_engine;
+pub mod filmcraft_lightcraft_mediacraft_artcraft_parity_pr;
+pub mod deckcraft;
 
 pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, ProjectType, Workspace};
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
     AudioExportFormat, AudioTrack as AudioCraftTrack, AutomationInterpolation, AutomationLane,
     AutomationPoint, ChannelConfig, SampleFormat, SampleRate, TrackType,
+};
+pub use sovereign_artcraft_craftlibs_pr_engine::{
+    ArtcraftCraftlibsMasterPrDeploymentSuite, ArtcraftCraftlibsPrPullRequestSpec,
+    ArtcraftPhotoDesignPrDeployer, ArtcraftFilmEffectLightPrDeployer,
+    ArtcraftAudioMedia3DPrDeployer, ArtcraftSuiteIntegrationPrDeployer,
+    fnv1a_artcraft_pr_digest,
+};
+pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::{
+    CraftlibsPrProposalManifest, FilmcraftNleTimelineOpticalFlowPrEngine,
+    LightcraftToneCurveAiMaskingCatalogPrEngine, MediacraftLowLatencyPipelineEqualizerPrEngine,
+    Model3dSculptingRiggingPbrExporterPrEngine, VectorcraftAnimationLottieBonesPrEngine,
+    AudiocraftDawSynthesizerVst3MasteringPrEngine, SovereignArtcraftCraftlibsParityPrGateway,
 };
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
