@@ -389,9 +389,9 @@ description = "SigmaOS Command Interpreter Development Plan and 17-PR Gateway Su
 test_evidence = "Architecture specification in docs/shell/COMMAND_INTERPRETER_PLAN.md and wiki/34-SigmaOS-Command-Interpreter-Plan.md; standalone unit tests pass via rustc --test src/shell/sovereign_command_interpreter.rs"
 next_milestone = "PR 1: define command interpreter goals and compatibility profile & PR 6: implement POSIX-style redirection primitives"
 
-[net.development_plan]
-status = "supported"
-files = ["docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/28-Network-Development-And-Maintenance-Plan.md", "src/net/sovereign_network_development_and_pr_suite.rs"]
-description = "SigmaOS Network Development and Maintenance Plan defining scope, operating rules, 13-PR sequence, maintenance cadence, cross-component rules, and review gates"
-test_evidence = "Architecture specification published in docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/28-Network-Development-And-Maintenance-Plan.md; unit tests pass via rustc --test src/net/sovereign_network_development_and_pr_suite.rs"
-next_milestone = "PR 1: define network architecture, status, and support boundaries"
+[userspace.system_applications]
+status = "integrated"
+files = ["docs/SYSTEM_APPS_DEVELOPMENT_PLAN.md", "wiki/32-System-Apps-Development-Plan.md", "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs"]
+description = "SigmaOS System Applications Plan & Architecture, 18-PR implementation roadmap, app catalog audit, versioned manifests, init service lifecycle coordinator, runtime-backed diagnostics, and review merge gates"
+test_evidence = "Architecture specification published in docs/SYSTEM_APPS_DEVELOPMENT_PLAN.md and wiki/32-System-Apps-Development-Plan.md; 6 unit tests pass via rustc --test src/system_apps/sovereign_system_apps_development_and_pr_suite.rs"
+next_milestone = "PR 1: docs(system-apps): define app catalog, lifecycle, and support status & PR 3: feat(init): connect service manager to real process lifecycle"

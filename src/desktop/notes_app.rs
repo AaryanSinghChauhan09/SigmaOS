@@ -232,9 +232,11 @@ impl NotesApp {
         self.notes
             .values()
             .filter(|n| {
-                contains_ignore_case(&n.title, query)
-                    || contains_ignore_case(&n.content, query)
-                    || n.tags.iter().any(|t| contains_ignore_case(t, query))
+                n.title.to_lowercase().contains(&query_lower)
+                    || n.content.to_lowercase().contains(&query_lower)
+                    || n.tags
+                        .iter()
+                        .any(|t| t.to_lowercase().contains(&query_lower))
             })
             .collect()
     }
