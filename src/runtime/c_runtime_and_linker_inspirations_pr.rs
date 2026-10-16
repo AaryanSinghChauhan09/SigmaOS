@@ -48,7 +48,12 @@ impl GlibcInspirationsPrEngine {
     }
 
     /// Simulate glibc STT_GNU_IFUNC indirect function selection based on CPU flags.
-    pub fn resolve_ifunc_symbol(&self, symbol_name: &str, has_avx512: bool, has_avx2: bool) -> &'static str {
+    pub fn resolve_ifunc_symbol(
+        &self,
+        symbol_name: &str,
+        has_avx512: bool,
+        has_avx2: bool,
+    ) -> &'static str {
         match symbol_name {
             "memcpy" => {
                 if has_avx512 {
@@ -91,7 +96,11 @@ impl GlibcInspirationsPrEngine {
     }
 
     /// Match dynamic symbol version strings against provided library version sets (e.g. GLIBC_2.34).
-    pub fn gnu_symbol_version_match(&self, required_version: &str, provided_versions: &[&str]) -> bool {
+    pub fn gnu_symbol_version_match(
+        &self,
+        required_version: &str,
+        provided_versions: &[&str],
+    ) -> bool {
         provided_versions.contains(&required_version)
     }
 
@@ -118,7 +127,11 @@ impl GlibcInspirationsPrEngine {
     }
 
     /// Simulate glibc malloc_info XML heap telemetry output generator.
-    pub fn malloc_info_xml_telemetry(&self, total_allocated: usize, active_arenas: usize) -> String {
+    pub fn malloc_info_xml_telemetry(
+        &self,
+        total_allocated: usize,
+        active_arenas: usize,
+    ) -> String {
         format!(
             "<malloc version=\"1\"><heap size=\"{}\"/><arenas count=\"{}\"/></malloc>",
             total_allocated, active_arenas
@@ -146,7 +159,9 @@ impl GlibcInspirationsPrEngine {
     /// Generate glibc pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(glibc): Implement IFUNC AVX-512 Dispatch, DT_GNU_HASH & Tunables Router".to_string(),
+            pr_title:
+                "feat(glibc): Implement IFUNC AVX-512 Dispatch, DT_GNU_HASH & Tunables Router"
+                    .to_string(),
             target_subsystem: "C Library Core Runtime".to_string(),
             original_runtime: "GNU C Library (glibc)".to_string(),
             components_added: alloc::vec![
@@ -155,7 +170,8 @@ impl GlibcInspirationsPrEngine {
                 "GLIBC_TUNABLES runtime environment configuration parser".to_string(),
                 "TLS Variant I / Variant II DTV & TCB allocation manager".to_string(),
                 "GNU symbol version matching filter (GLIBC_2.34+)".to_string(),
-                "dl_iterate_phdr ELF Program Header iterator & malloc_trim memory return".to_string(),
+                "dl_iterate_phdr ELF Program Header iterator & malloc_trim memory return"
+                    .to_string(),
             ],
             performance_multiplier: "4.8x SIMD Throughput (AVX-512 ERMS)".to_string(),
             status: "Ready for Merge".to_string(),
@@ -230,7 +246,8 @@ impl MuslLibcInspirationsPrEngine {
     /// Generate musl libc pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(musl): Implement Ultra-Lightweight Pthread, malloc-ng & Hardened Stdio".to_string(),
+            pr_title: "feat(musl): Implement Ultra-Lightweight Pthread, malloc-ng & Hardened Stdio"
+                .to_string(),
             target_subsystem: "Lightweight POSIX C Runtime".to_string(),
             original_runtime: "musl libc".to_string(),
             components_added: alloc::vec![
@@ -240,7 +257,8 @@ impl MuslLibcInspirationsPrEngine {
                 "FILE stdio stream buffer lock optimization for high concurrency".to_string(),
                 "__syscall_cp POSIX cancellation point signal wrapper".to_string(),
             ],
-            performance_multiplier: "0.2x Memory Footprint & Sub-Microsecond Thread Spawn".to_string(),
+            performance_multiplier: "0.2x Memory Footprint & Sub-Microsecond Thread Spawn"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -295,7 +313,9 @@ impl UclibcInspirationsPrEngine {
     /// Generate uClibc-ng pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(uclibc): Implement Embedded FLAT/FD-PIC Loader & Micro-Footprint Syscalls".to_string(),
+            pr_title:
+                "feat(uclibc): Implement Embedded FLAT/FD-PIC Loader & Micro-Footprint Syscalls"
+                    .to_string(),
             target_subsystem: "Embedded & MMU-less C Runtime".to_string(),
             original_runtime: "uClibc-ng".to_string(),
             components_added: alloc::vec![
@@ -323,7 +343,9 @@ impl BsdLibcInspirationsPrEngine {
     pub fn arc4random_buf(&self, buf: &mut [u8], seed: u64) {
         let mut state = seed.wrapping_add(0x9e3779b97f4a7c15);
         for byte in buf.iter_mut() {
-            state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             *byte = (state >> 32) as u8;
         }
     }
@@ -345,7 +367,11 @@ impl BsdLibcInspirationsPrEngine {
         if dst.is_empty() {
             return src_len;
         }
-        let copy_len = if src_len < dst.len() { src_len } else { dst.len() - 1 };
+        let copy_len = if src_len < dst.len() {
+            src_len
+        } else {
+            dst.len() - 1
+        };
         dst[..copy_len].copy_from_slice(&src_bytes[..copy_len]);
         dst[copy_len] = 0;
         src_len
@@ -376,7 +402,13 @@ impl BsdLibcInspirationsPrEngine {
     }
 
     /// OpenBSD unveil path privilege access level evaluation.
-    pub fn unveil_path_check(&self, target_path: &str, unveil_path: &str, granted_permissions: &str, requested_perm: char) -> bool {
+    pub fn unveil_path_check(
+        &self,
+        target_path: &str,
+        unveil_path: &str,
+        granted_permissions: &str,
+        requested_perm: char,
+    ) -> bool {
         if target_path.starts_with(unveil_path) {
             granted_permissions.contains(requested_perm)
         } else {
@@ -435,7 +467,11 @@ impl BionicInspirationsPrEngine {
     }
 
     /// Simulate Bionic android_dlopen_ext linker namespace isolation loader.
-    pub fn android_dlopen_ext_namespace(&self, lib_name: &str, namespace_id: &str) -> Result<String, &'static str> {
+    pub fn android_dlopen_ext_namespace(
+        &self,
+        lib_name: &str,
+        namespace_id: &str,
+    ) -> Result<String, &'static str> {
         if namespace_id.is_empty() {
             Err("invalid_namespace")
         } else {
@@ -446,16 +482,21 @@ impl BionicInspirationsPrEngine {
     /// Generate Bionic C library pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(bionic): Implement Scudo Hardened Allocator, ARM64 PAC/BTI & Property Bus".to_string(),
+            pr_title:
+                "feat(bionic): Implement Scudo Hardened Allocator, ARM64 PAC/BTI & Property Bus"
+                    .to_string(),
             target_subsystem: "Mobile & Security-Hardened C Runtime".to_string(),
             original_runtime: "Android Bionic libc".to_string(),
             components_added: alloc::vec![
-                "LLVM Scudo hardened memory allocator with chunk tagging & double-free mitigation".to_string(),
-                "ARM64 Pointer Authentication (PAC) & Branch Target Identification (BTI) guard".to_string(),
+                "LLVM Scudo hardened memory allocator with chunk tagging & double-free mitigation"
+                    .to_string(),
+                "ARM64 Pointer Authentication (PAC) & Branch Target Identification (BTI) guard"
+                    .to_string(),
                 "__system_property_get lockless shared-memory property service router".to_string(),
                 "Custom lightweight linker (linker64) with Android zip-alignment".to_string(),
             ],
-            performance_multiplier: "Hardened Memory Security & Sub-Millisecond Property Query".to_string(),
+            performance_multiplier: "Hardened Memory Security & Sub-Millisecond Property Query"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -476,7 +517,12 @@ impl NewlibInspirationsPrEngine {
     }
 
     /// Simulate Newlib minimal sbrk memory heap expansion.
-    pub fn simulate_sbrk(&self, increment: isize, current_heap_end: usize, heap_max: usize) -> Result<usize, &'static str> {
+    pub fn simulate_sbrk(
+        &self,
+        increment: isize,
+        current_heap_end: usize,
+        heap_max: usize,
+    ) -> Result<usize, &'static str> {
         let new_end = if increment >= 0 {
             current_heap_end.saturating_add(increment as usize)
         } else {
@@ -519,7 +565,12 @@ impl LibstdcxxInspirationsPrEngine {
     pub fn demangle_cxa_symbol(&self, mangled: &str) -> String {
         if let Some(rest) = mangled.strip_prefix("_Z") {
             if rest.starts_with("N") {
-                let parts: Vec<&str> = rest.trim_start_matches('N').trim_end_matches('E').split(|c: char| c.is_numeric()).filter(|s| !s.is_empty()).collect();
+                let parts: Vec<&str> = rest
+                    .trim_start_matches('N')
+                    .trim_end_matches('E')
+                    .split(|c: char| c.is_numeric())
+                    .filter(|s| !s.is_empty())
+                    .collect();
                 parts.join("::")
             } else {
                 rest.to_string()
@@ -539,7 +590,11 @@ impl LibstdcxxInspirationsPrEngine {
     }
 
     /// Allocate memory block from C++ Polymorphic Memory Resource (std::pmr) buffer.
-    pub fn allocate_pmr_buffer(&self, requested_size: usize, available_buffer_capacity: usize) -> Result<usize, &'static str> {
+    pub fn allocate_pmr_buffer(
+        &self,
+        requested_size: usize,
+        available_buffer_capacity: usize,
+    ) -> Result<usize, &'static str> {
         if requested_size <= available_buffer_capacity {
             Ok(requested_size)
         } else {
@@ -568,11 +623,14 @@ impl LibstdcxxInspirationsPrEngine {
     /// Generate libstdc++ pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(libstdc++): Implement C++ ABI Demangler, SSO std::string & std::pmr Arenas".to_string(),
+            pr_title:
+                "feat(libstdc++): Implement C++ ABI Demangler, SSO std::string & std::pmr Arenas"
+                    .to_string(),
             target_subsystem: "GNU Standard C++ Runtime".to_string(),
             original_runtime: "libstdc++".to_string(),
             components_added: alloc::vec![
-                "Itanium C++ ABI runtime support (__cxa_demangle, __cxa_throw, __cxa_atexit)".to_string(),
+                "Itanium C++ ABI runtime support (__cxa_demangle, __cxa_throw, __cxa_atexit)"
+                    .to_string(),
                 "15-byte Short String Optimization (SSO) inline string analyzer".to_string(),
                 "std::pmr::memory_resource polymorphic arena & pool allocators".to_string(),
                 "Parallel execution policy dispatcher (std::execution::par_unseq)".to_string(),
@@ -658,7 +716,9 @@ impl LibcxxInspirationsPrEngine {
     /// Generate libc++ pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(libc++): Implement DWARF .eh_frame Unwinder, Ryū <charconv> & Futex Atomics".to_string(),
+            pr_title:
+                "feat(libc++): Implement DWARF .eh_frame Unwinder, Ryū <charconv> & Futex Atomics"
+                    .to_string(),
             target_subsystem: "LLVM Standard C++ Runtime".to_string(),
             original_runtime: "libc++".to_string(),
             components_added: alloc::vec![
@@ -706,8 +766,14 @@ impl DynamicLinkerLdSoInspirationsPrEngine {
     }
 
     /// Evaluate symbol interposition when LD_PRELOAD libraries are loaded.
-    pub fn evaluate_ld_preload_interposition(&self, preload_libs: &[&str], symbol_name: &str) -> Option<&'static str> {
-        if !preload_libs.is_empty() && (symbol_name == "malloc" || symbol_name == "open" || symbol_name == "read") {
+    pub fn evaluate_ld_preload_interposition(
+        &self,
+        preload_libs: &[&str],
+        symbol_name: &str,
+    ) -> Option<&'static str> {
+        if !preload_libs.is_empty()
+            && (symbol_name == "malloc" || symbol_name == "open" || symbol_name == "read")
+        {
             Some("interposed_by_preload")
         } else {
             None
@@ -737,7 +803,9 @@ impl DynamicLinkerLdSoInspirationsPrEngine {
     /// Generate Dynamic Linker pull request proposal.
     pub fn generate_proposal(&self) -> CRuntimePrProposalManifest {
         CRuntimePrProposalManifest {
-            pr_title: "feat(ld.so): Implement LD_PRELOAD Stack, Lazy GOT/PLT, GNU_RELRO & rtld-audit".to_string(),
+            pr_title:
+                "feat(ld.so): Implement LD_PRELOAD Stack, Lazy GOT/PLT, GNU_RELRO & rtld-audit"
+                    .to_string(),
             target_subsystem: "ELF Dynamic Linker (ld.so)".to_string(),
             original_runtime: "Linux/BSD Dynamic Linker".to_string(),
             components_added: alloc::vec![
@@ -804,7 +872,11 @@ impl SovereignCRuntimeAndLinkerParityPrGateway {
         for p in &proposals {
             out.push_str(&format!(
                 "| {} | {} | {} | {} | {} |\n",
-                p.target_subsystem, p.original_runtime, p.pr_title, p.performance_multiplier, p.status
+                p.target_subsystem,
+                p.original_runtime,
+                p.pr_title,
+                p.performance_multiplier,
+                p.status
             ));
         }
 
@@ -812,9 +884,15 @@ impl SovereignCRuntimeAndLinkerParityPrGateway {
 
         for p in &proposals {
             out.push_str(&format!("### {}\n", p.pr_title));
-            out.push_str(&format!("- **Original Inspiration**: {}\n", p.original_runtime));
+            out.push_str(&format!(
+                "- **Original Inspiration**: {}\n",
+                p.original_runtime
+            ));
             out.push_str(&format!("- **Target Subsystem**: {}\n", p.target_subsystem));
-            out.push_str(&format!("- **Performance Impact**: {}\n", p.performance_multiplier));
+            out.push_str(&format!(
+                "- **Performance Impact**: {}\n",
+                p.performance_multiplier
+            ));
             out.push_str("- **Components Added**:\n");
             for c in &p.components_added {
                 out.push_str(&format!("  - {}\n", c));
@@ -849,7 +927,8 @@ mod tests {
         let resolved_avx2 = engine.resolve_ifunc_symbol("memcpy", false, true);
         assert_eq!(resolved_avx2, "memcpy_avx2_unaligned_erms");
 
-        let tunables = engine.parse_glibc_tunables("glibc.malloc.arena_max=8:glibc.cpu.hwcaps=-AVX2");
+        let tunables =
+            engine.parse_glibc_tunables("glibc.malloc.arena_max=8:glibc.cpu.hwcaps=-AVX2");
         assert_eq!(tunables.len(), 2);
         assert_eq!(tunables[0].0, "glibc.malloc.arena_max");
         assert_eq!(tunables[0].1, "8");
@@ -872,9 +951,18 @@ mod tests {
 
     #[test]
     fn test_musl_malloc_ng() {
-        assert_eq!(MuslLibcInspirationsPrEngine::calculate_malloc_ng_size_class(10), 16);
-        assert_eq!(MuslLibcInspirationsPrEngine::calculate_malloc_ng_size_class(200), 256);
-        assert_eq!(MuslLibcInspirationsPrEngine::calculate_malloc_ng_size_class(5000), 8192);
+        assert_eq!(
+            MuslLibcInspirationsPrEngine::calculate_malloc_ng_size_class(10),
+            16
+        );
+        assert_eq!(
+            MuslLibcInspirationsPrEngine::calculate_malloc_ng_size_class(200),
+            256
+        );
+        assert_eq!(
+            MuslLibcInspirationsPrEngine::calculate_malloc_ng_size_class(5000),
+            8192
+        );
 
         let engine = MuslLibcInspirationsPrEngine::new();
         assert!(engine.execute_synccall_barrier(4));
@@ -883,7 +971,10 @@ mod tests {
         assert_eq!(engine.execute_syscall_cp(0), Err("invalid_syscall_zero"));
         assert_eq!(engine.set_thread_area(0x7fff0000), Ok(0x7fff0000));
         assert_eq!(engine.set_thread_area(0), Err("null_thread_pointer"));
-        assert_eq!(engine.pthread_atfork_dispatch("prepare"), "atfork_prepare_locks_acquired");
+        assert_eq!(
+            engine.pthread_atfork_dispatch("prepare"),
+            "atfork_prepare_locks_acquired"
+        );
     }
 
     #[test]
@@ -931,7 +1022,10 @@ mod tests {
         let mut ent_buf = [0u8; 32];
         assert_eq!(engine.getentropy_fill(&mut ent_buf, 0x999), Ok(()));
         let mut oversize_buf = [0u8; 300];
-        assert_eq!(engine.getentropy_fill(&mut oversize_buf, 0x999), Err("getentropy_size_limit_exceeded"));
+        assert_eq!(
+            engine.getentropy_fill(&mut oversize_buf, 0x999),
+            Err("getentropy_size_limit_exceeded")
+        );
 
         assert!(engine.unveil_path_check("/etc/passwd", "/etc", "r", 'r'));
         assert!(!engine.unveil_path_check("/etc/passwd", "/etc", "r", 'w'));
@@ -943,16 +1037,25 @@ mod tests {
         assert!(bionic.verify_pac_bti_integrity(0x1234, 0x5678));
         assert!(bionic.verify_scudo_chunk_tag(0x0A, 0x0A));
         assert!(!bionic.verify_scudo_chunk_tag(0x0A, 0x0B));
-        assert_eq!(bionic.get_system_property("ro.product.model"), Some("SigmaOS-Sovereign"));
+        assert_eq!(
+            bionic.get_system_property("ro.product.model"),
+            Some("SigmaOS-Sovereign")
+        );
         assert_eq!(bionic.get_system_property("unknown"), None);
-        assert_eq!(bionic.android_dlopen_ext_namespace("libart.so", "default"), Ok("ns:default:libart.so".to_string()));
+        assert_eq!(
+            bionic.android_dlopen_ext_namespace("libart.so", "default"),
+            Ok("ns:default:libart.so".to_string())
+        );
 
         let newlib = NewlibInspirationsPrEngine::new();
         let (tid, ctx) = newlib.get_reent_context(42);
         assert_eq!(tid, 42);
         assert_eq!(ctx, "global_reent_struct");
         assert_eq!(newlib.simulate_sbrk(1024, 0x1000, 0x4000), Ok(0x1400));
-        assert_eq!(newlib.simulate_sbrk(0x5000, 0x1000, 0x4000), Err("out_of_memory_sbrk_overflow"));
+        assert_eq!(
+            newlib.simulate_sbrk(0x5000, 0x1000, 0x4000),
+            Err("out_of_memory_sbrk_overflow")
+        );
     }
 
     #[test]
@@ -970,7 +1073,10 @@ mod tests {
         assert_eq!(capacity_heap, 32);
 
         assert_eq!(engine.allocate_pmr_buffer(64, 128), Ok(64));
-        assert_eq!(engine.allocate_pmr_buffer(256, 128), Err("pmr_buffer_overflow_fallback_to_upstream"));
+        assert_eq!(
+            engine.allocate_pmr_buffer(256, 128),
+            Err("pmr_buffer_overflow_fallback_to_upstream")
+        );
 
         assert_eq!(engine.lookup_unwind_eh_frame(0x12345678), Some(0x12345670));
         assert_eq!(engine.lookup_unwind_eh_frame(0), None);
@@ -999,16 +1105,27 @@ mod tests {
 
     #[test]
     fn test_ld_so_search_paths() {
-        let paths = DynamicLinkerLdSoInspirationsPrEngine::resolve_search_path_order("", "run/path", "ld/path");
+        let paths = DynamicLinkerLdSoInspirationsPrEngine::resolve_search_path_order(
+            "", "run/path", "ld/path",
+        );
         assert_eq!(paths[0], "ld/path");
         assert_eq!(paths[1], "run/path");
         assert!(paths.contains(&"/lib"));
 
         let engine = DynamicLinkerLdSoInspirationsPrEngine::new();
-        assert_eq!(engine.evaluate_ld_preload_interposition(&["libfaketime.so"], "malloc"), Some("interposed_by_preload"));
-        assert_eq!(engine.evaluate_ld_preload_interposition(&[], "malloc"), None);
+        assert_eq!(
+            engine.evaluate_ld_preload_interposition(&["libfaketime.so"], "malloc"),
+            Some("interposed_by_preload")
+        );
+        assert_eq!(
+            engine.evaluate_ld_preload_interposition(&[], "malloc"),
+            None
+        );
 
-        assert_eq!(engine.execute_rtld_audit_hooks("la_version"), "audit_interface_v1_active");
+        assert_eq!(
+            engine.execute_rtld_audit_hooks("la_version"),
+            "audit_interface_v1_active"
+        );
         assert!(engine.verify_gnu_relro_protection(0x01));
         assert!(!engine.verify_gnu_relro_protection(0x00));
 
@@ -1027,7 +1144,9 @@ mod tests {
         }
 
         let markdown = gateway.generate_pr_proposal_markdown();
-        assert!(markdown.contains("# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity"));
+        assert!(markdown.contains(
+            "# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity"
+        ));
         assert!(markdown.contains("glibc"));
         assert!(markdown.contains("bionic"));
 
