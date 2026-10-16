@@ -19,8 +19,13 @@ pub mod soundcraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod cadcraft;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
+pub mod wordcraft;
+pub mod wordcraft_missing_components_parity_pr;
 pub mod artcraft;
 pub mod deckcraft;
+pub mod deckcraft_missing_components_parity_pr;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
@@ -130,14 +135,14 @@ pub use soundcraft::{
 };
 pub use vectoranimation::{
     AnimationProject as VectorAnimationProject, AnimationLayer, AnimationLayerType,
-    Keyframe, InterpolationMode, Bone, Rig, Timeline, OnionSkin,
+    Keyframe as VectorKeyframe, InterpolationMode, Bone, Rig, Timeline as VectorTimeline, OnionSkin,
     AnimationExportFormat,
     init_vectoranimation, get_vectoranimation,
 };
 pub use model3d::{
     Scene as Model3DScene, Object3D, Mesh, Vertex,
     MeshType, ObjectType, SculptBrushType, SculptBrush,
-    Material, Light, LightType, Camera,
+    Material as Model3DMaterial, Light as Model3DLight, LightType as Model3DLightType, Camera,
     ExportFormat as Model3DExportFormat,
     init_model3d, get_model3d,
 };
@@ -157,4 +162,16 @@ pub use deckcraft::{
     DeckCraftPresenterZenithPrDeployer, PresentationDeck, Slide, SlideElement,
     SlideLayoutType, SlideExporterEngine, PresenterState, DeckExportFormat,
     fnv1a_deckcraft_pr_digest, init_deckcraft, get_deckcraft,
+};
+pub use deckcraft_missing_components_parity_pr::{
+    DeckcraftPrProposalManifest, DeckcraftAdvancedVectorAnimationTimelinePrEngine,
+    DeckcraftSmartDiagramDataChartPrEngine, DeckcraftInteractivePollAudienceQnaPrEngine,
+    DeckcraftRealtimeCrdtMultiUserCollabPrEngine, DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine,
+    DeckcraftMultiFormatBatchExportRenderPrEngine, SovereignDeckcraftArtcraftParityPrGateway,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    GridcraftPrProposalManifest, GridcraftAdvancedFormulaXlookupPrEngine,
+    GridcraftDataValidationConditionalFormattingPrEngine, GridcraftRealtimeDataStreamSpillArrayPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMultiUserCrdtCollabPrEngine,
+    GridcraftMacroScriptingUdfPrEngine, SovereignGridcraftArtcraftParityPrGateway,
 };

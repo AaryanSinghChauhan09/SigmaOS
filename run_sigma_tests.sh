@@ -1498,4 +1498,11 @@ if [ -f "tests/scheduler/core.rs" ]; then
     rustc --test tests/scheduler/affinity/affinity_test.rs --edition=2021 -o build/test_sched_affinity && ./build/test_sched_affinity
 fi
 
+if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_deckcraft_missing
+    ./build/test_deckcraft_missing
+fi
+
 echo "All SigmaOS test suites completed."
