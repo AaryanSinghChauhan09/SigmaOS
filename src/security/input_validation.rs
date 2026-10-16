@@ -327,7 +327,9 @@ pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     Ok(())
 }
 
-/// Validate an environment variable value (no NUL; length-bounded).
+/// Validate an environment variable value (no NUL; length-bounded; no unsafe control characters).
+/// Rejects non-whitespace ASCII control characters (`b < 32` except `\t`, `\n`, `\r`) and DEL (`127`)
+/// to prevent terminal sequence hijacking (CWE-150) and environment injection in subprocesses.
 pub fn validate_env_value(val: &[u8]) -> Result<(), ValidationError> {
     if val.len() > MAX_ENV_VAR_LEN {
         return Err(ValidationError::TooLong);
@@ -335,6 +337,9 @@ pub fn validate_env_value(val: &[u8]) -> Result<(), ValidationError> {
     for &b in val {
         if b == 0 {
             return Err(ValidationError::NullByte);
+        }
+        if (b < 32 && b != b'\t' && b != b'\n' && b != b'\r') || b == 127 {
+            return Err(ValidationError::InvalidChars);
         }
     }
     Ok(())
@@ -759,6 +764,38 @@ mod tests {
             validate_hostname(&long_hostname),
             Err(ValidationError::TooLong)
         );
+    }
+
+    #[test]
+    fn test_env_value_validation() {
+        assert_eq!(validate_env_value(b"plain text value"), Ok(()));
+        assert_eq!(validate_env_value(b"/usr/local/bin:/usr/bin"), Ok(()));
+        assert_eq!(validate_env_value(b"line1\nline2\r\nline3\t"), Ok(()));
+        assert_eq!(validate_env_value(b""), Ok(()));
+
+        // NUL byte rejection
+        assert_eq!(
+            validate_env_value(&[b'a', 0, b'b']),
+            Err(ValidationError::NullByte)
+        );
+
+        // Control character rejection (CWE-150 / ANSI terminal sequence hijacking)
+        assert_eq!(
+            validate_env_value(b"val\x1b[31m"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_value(b"val\x07bell"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_env_value(b"val\x7fdel"),
+            Err(ValidationError::InvalidChars)
+        );
+
+        // Exceed max length
+        let long_val = [b'v'; MAX_ENV_VAR_LEN + 1];
+        assert_eq!(validate_env_value(&long_val), Err(ValidationError::TooLong));
     }
 
     #[test]
