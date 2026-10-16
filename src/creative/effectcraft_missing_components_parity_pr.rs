@@ -652,13 +652,7 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
         }
     }
 
-    pub fn compute_motion_vectors(
-        &mut self,
-        prev_frame: &[u8],
-        curr_frame: &[u8],
-        width: u32,
-        height: u32,
-    ) -> Result<usize, String> {
+    pub fn compute_motion_vectors(&mut self, prev_frame: &[u8], curr_frame: &[u8], width: u32, height: u32) -> Result<usize, String> {
         let pixel_count = (width * height) as usize;
         if prev_frame.len() != pixel_count * 4 || curr_frame.len() != pixel_count * 4 {
             return Err("Frame dimensions mismatch for optical flow computation".to_string());
@@ -748,12 +742,7 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
         }
     }
 
-    pub fn convert_color_space(
-        &mut self,
-        source_space: WorkingColorSpace,
-        target_space: WorkingColorSpace,
-        rgb: &mut [f32; 3],
-    ) {
+    pub fn convert_color_space(&mut self, source_space: WorkingColorSpace, target_space: WorkingColorSpace, rgb: &mut [f32; 3]) {
         self.current_space = target_space;
         if source_space == WorkingColorSpace::Rec709 && target_space == WorkingColorSpace::AcesCg {
             // Rec.709 to ACEScg conversion matrix approximation
@@ -761,9 +750,7 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
             rgb[0] = (r * 0.6131) + (g * 0.3395) + (b * 0.0474);
             rgb[1] = (r * 0.0702) + (g * 0.9164) + (b * 0.0134);
             rgb[2] = (r * 0.0206) + (g * 0.1096) + (b * 0.8698);
-        } else if source_space == WorkingColorSpace::AcesCg
-            && target_space == WorkingColorSpace::Rec709
-        {
+        } else if source_space == WorkingColorSpace::AcesCg && target_space == WorkingColorSpace::Rec709 {
             // ACEScg to Rec.709 display transform approximation
             let [r, g, b] = *rgb;
             rgb[0] = (r * 1.7051) - (g * 0.6218) - (b * 0.0833);
@@ -774,9 +761,7 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title:
-                "feat(effectcraft): Implement ACES Color Management & OpenColorIO (OCIO v2) Engine"
-                    .to_string(),
+            pr_title: "feat(effectcraft): Implement ACES Color Management & OpenColorIO (OCIO v2) Engine".to_string(),
             target_subsystem: "Color Science & ACES Engine".to_string(),
             original_suite: "ArtCraft EffectCraft Color Pipeline".to_string(),
             components_added: vec![
@@ -817,14 +802,11 @@ pub struct EffectcraftCryptomatteAovExtractorPrEngine {
 impl EffectcraftCryptomatteAovExtractorPrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert(
-            "character_skin".to_string(),
-            CryptomatteLayer {
-                name: "character_skin".to_string(),
-                hash_id: 0x3A8F1C20,
-                coverage: 0.98,
-            },
-        );
+        map.insert("character_skin".to_string(), CryptomatteLayer {
+            name: "character_skin".to_string(),
+            hash_id: 0x3A8F1C20,
+            coverage: 0.98,
+        });
         Self { layers: map }
     }
 
@@ -842,10 +824,7 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
     }
 
     pub fn extract_id_matte(&self, layer_name: &str, output_mask: &mut [u8]) -> Result<(), String> {
-        let layer = self
-            .layers
-            .get(layer_name)
-            .ok_or("Cryptomatte layer not found")?;
+        let layer = self.layers.get(layer_name).ok_or("Cryptomatte layer not found")?;
         let mask_val = (layer.coverage * 255.0) as u8;
         for byte in output_mask.iter_mut() {
             *byte = mask_val;
@@ -895,21 +874,15 @@ pub struct EffectcraftExpressionScriptingRiggingPrEngine {
 impl EffectcraftExpressionScriptingRiggingPrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert(
-            "position_wiggle".to_string(),
-            ExpressionDriver {
-                param_name: "Transform.Position".to_string(),
-                expression_script: "wiggle(5, 20)".to_string(),
-            },
-        );
+        map.insert("position_wiggle".to_string(), ExpressionDriver {
+            param_name: "Transform.Position".to_string(),
+            expression_script: "wiggle(5, 20)".to_string(),
+        });
         Self { drivers: map }
     }
 
     pub fn evaluate_expression(&self, driver_name: &str, time_sec: f32) -> Result<f32, String> {
-        let driver = self
-            .drivers
-            .get(driver_name)
-            .ok_or("Expression driver not found")?;
+        let driver = self.drivers.get(driver_name).ok_or("Expression driver not found")?;
         if driver.expression_script.contains("wiggle") {
             let val = (time_sec * 5.0).sin() * 20.0;
             Ok(val)
@@ -997,29 +970,13 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             color: [1.0, 0.0, 0.0],
         }];
         let _spatial_ok = self.spatial_3d.project_points(&pts).is_ok();
-        let _ofx_ok = self
-            .ofx_adapter
-            .load_openfx_plugin("com.artcraft.FilmGrain")
-            .is_ok();
-        let _optical_ok = self
-            .optical_flow
-            .compute_motion_vectors(&frame, &frame, 1, 1)
-            .is_ok();
+        let _ofx_ok = self.ofx_adapter.load_openfx_plugin("com.artcraft.FilmGrain").is_ok();
+        let _optical_ok = self.optical_flow.compute_motion_vectors(&frame, &frame, 1, 1).is_ok();
         let mut color = [0.5, 0.5, 0.5];
-        self.aces_ocio.convert_color_space(
-            WorkingColorSpace::Rec709,
-            WorkingColorSpace::AcesCg,
-            &mut color,
-        );
+        self.aces_ocio.convert_color_space(WorkingColorSpace::Rec709, WorkingColorSpace::AcesCg, &mut color);
         let mut mask_out = vec![0u8; 4];
-        let _crypto_ok = self
-            .cryptomatte
-            .extract_id_matte("character_skin", &mut mask_out)
-            .is_ok();
-        let _expr_ok = self
-            .expressions
-            .evaluate_expression("position_wiggle", 1.0)
-            .is_ok();
+        let _crypto_ok = self.cryptomatte.extract_id_matte("character_skin", &mut mask_out).is_ok();
+        let _expr_ok = self.expressions.evaluate_expression("position_wiggle", 1.0).is_ok();
         true
     }
 
@@ -1059,8 +1016,7 @@ impl EffectcraftMissingComponentsParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_effectcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_effectcraft_parity() && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -1179,9 +1135,7 @@ mod tests {
         let mut engine = EffectcraftOpticalFlowMotionVectorPrEngine::new();
         let frame1 = vec![0, 0, 0, 255];
         let frame2 = vec![100, 100, 0, 255];
-        let count = engine
-            .compute_motion_vectors(&frame1, &frame2, 1, 1)
-            .unwrap();
+        let count = engine.compute_motion_vectors(&frame1, &frame2, 1, 1).unwrap();
         assert_eq!(count, 1);
         assert!(engine.vector_field[0].dx > 0.0);
     }
@@ -1190,11 +1144,7 @@ mod tests {
     fn test_aces_ocio_engine_functional() {
         let mut engine = EffectcraftAcesOcioColorManagementPrEngine::new();
         let mut rgb = [1.0, 0.5, 0.2];
-        engine.convert_color_space(
-            WorkingColorSpace::Rec709,
-            WorkingColorSpace::AcesCg,
-            &mut rgb,
-        );
+        engine.convert_color_space(WorkingColorSpace::Rec709, WorkingColorSpace::AcesCg, &mut rgb);
         assert_eq!(engine.current_space, WorkingColorSpace::AcesCg);
         assert_ne!(rgb[0], 1.0);
     }
