@@ -1,19 +1,22 @@
 ## Summary
 
-<!-- What scheduler or component behavior changed and why? -->
+<!-- What process-management behavior changed and why? -->
 
-## Scheduler component
+## Process component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
+- [ ] Process table / PID allocation
 - [ ] fork / clone
 - [ ] exec
+- [ ] Scheduler / run queue
 - [ ] Context switch
-- [ ] Preemption & quantum
-- [ ] Signals & wait queues
-- [ ] Zombie / reaping & orphan adoption
-- [ ] Resource limits & CPU affinity
-- [ ] Documentation & ADRs
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
 - [ ] CI / tooling
 
 ## Recurring task
@@ -25,6 +28,8 @@
 - [ ] Biweekly scheduler audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
+- [ ] Monthly rlimit rehearsal
+- [ ] Monthly namespace review
 - [ ] Quarterly architecture/security/release review
 
 ## Reference behavior
@@ -32,7 +37,7 @@
 <!-- Required for lifecycle, ABI, or scheduler changes -->
 
 - POSIX section:
-- Linux/BSD/Redox reference:
+- Linux/BSD/Redox/xv6 reference:
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -42,36 +47,40 @@
 -
 -
 
-## Scheduler safety review
+## Process safety review
 
-- [ ] Lifecycle transitions are valid (NEW -> READY -> RUNNING -> SLEEPING -> READY, READY -> RUNNING -> ZOMBIE, RUNNING -> STOPPED -> READY, ANY -> ZOMBIE -> REAPED)
+- [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted by PID 1
+- [ ] Orphans are adopted
 - [ ] PID reuse is safe
-- [ ] Lock ordering and concurrency model documented
+- [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
-- [ ] Lost-wakeup prevention verified
-- [ ] Double-reap and double-switch prevented
-- [ ] Resource limits and run-queue capacity enforced
+- [ ] Signal races considered
+- [ ] Double-reap prevented
+- [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Verification
+## Evidence
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Scheduler benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
-## Runtime evidence
+## Status updates
 
-- [ ] QEMU boot-to-shell log
-- [ ] Scheduler test / benchmark report
-- [ ] Artifact hash
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Process documentation
+- [ ] Boot matrix, if applicable
 
-## Safety and rollback
+## Risks and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- Risk:
+- Rollback:
