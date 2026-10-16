@@ -2,10 +2,13 @@
 // SigmaOS - Creative Suite Module
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
-pub mod artcraft;
-pub mod audiocraft;
-pub mod cadcraft;
-pub mod deckcraft;
+pub mod photocraft;
+pub mod photocraft_missing_components_parity_pr;
+pub mod filmcraft;
+pub mod vectorcraft;
+pub mod pdfcraft;
+pub mod pdfcraft_artcraft_parity_pr;
+pub mod pdfcraft_missing_components_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -72,6 +75,10 @@ pub use pdfcraft_artcraft_parity_pr::{
     PdfcraftInteractiveFormsXfaPrEngine, PdfcraftColorPreflightCmykPrEngine,
     PdfcraftRedactionSanitizationPrEngine, PdfcraftPageImpositionBookletPrEngine,
     PdfcraftArchivalValidationPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
+};
+pub use pdfcraft_missing_components_parity_pr::{
+    PdfcraftPrCategory, PdfcraftPrProposalManifest,
+    SovereignPdfcraftMissingComponentsParityPrGateway,
 };
 pub use designcraft::{
     DesignEditor, Canvas, Element, Color,
