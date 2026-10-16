@@ -204,7 +204,11 @@ impl AudioRecorder {
 
     /// Remove recording
     pub fn remove_recording(&mut self, id: u32) -> Result<(), &'static str> {
-        let index = self.recordings.iter().position(|r| r.id == id).ok_or("Recording not found")?;
+        let index = self
+            .recordings
+            .iter()
+            .position(|r| r.id == id)
+            .ok_or("Recording not found")?;
         self.recordings.remove(index);
         Ok(())
     }
@@ -241,7 +245,9 @@ pub fn init_audio_recorder() {
 /// Get audio recorder
 pub fn get_audio_recorder() -> &'static mut AudioRecorder {
     unsafe {
-        AUDIO_RECORDER.as_mut().expect("Audio recorder not initialized")
+        AUDIO_RECORDER
+            .as_mut()
+            .expect("Audio recorder not initialized")
     }
 }
 

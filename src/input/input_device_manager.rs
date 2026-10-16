@@ -207,14 +207,17 @@ impl InputDeviceManager {
 
     /// List devices by type
     pub fn list_by_type(&self, device_type: InputDeviceType) -> Vec<&InputDevice> {
-        self.devices.values()
+        self.devices
+            .values()
             .filter(|d| d.device_type == device_type)
             .collect()
     }
 
     /// Enable a device
     pub fn enable(&mut self, id: &str) -> Result<(), String> {
-        let device = self.devices.get_mut(id)
+        let device = self
+            .devices
+            .get_mut(id)
             .ok_or_else(|| format!("Device {} not found", id))?;
 
         device.set_enabled(true);
@@ -223,7 +226,9 @@ impl InputDeviceManager {
 
     /// Disable a device
     pub fn disable(&mut self, id: &str) -> Result<(), String> {
-        let device = self.devices.get_mut(id)
+        let device = self
+            .devices
+            .get_mut(id)
             .ok_or_else(|| format!("Device {} not found", id))?;
 
         device.set_enabled(false);
@@ -263,16 +268,20 @@ impl InputDeviceManager {
     /// Get statistics
     pub fn get_statistics(&self) -> InputDeviceStatistics {
         let total_devices = self.devices.len();
-        let enabled_count = self.devices.values()
-            .filter(|d| d.is_enabled)
-            .count();
-        let keyboard_count = self.devices.values()
+        let enabled_count = self.devices.values().filter(|d| d.is_enabled).count();
+        let keyboard_count = self
+            .devices
+            .values()
             .filter(|d| d.device_type == InputDeviceType::Keyboard)
             .count();
-        let mouse_count = self.devices.values()
+        let mouse_count = self
+            .devices
+            .values()
             .filter(|d| d.device_type == InputDeviceType::Mouse)
             .count();
-        let touchpad_count = self.devices.values()
+        let touchpad_count = self
+            .devices
+            .values()
             .filter(|d| d.device_type == InputDeviceType::Touchpad)
             .count();
 
@@ -308,8 +317,14 @@ mod tests {
 
     #[test]
     fn test_input_device_type_from_str() {
-        assert_eq!(InputDeviceType::from_str("keyboard"), Some(InputDeviceType::Keyboard));
-        assert_eq!(InputDeviceType::from_str("mouse"), Some(InputDeviceType::Mouse));
+        assert_eq!(
+            InputDeviceType::from_str("keyboard"),
+            Some(InputDeviceType::Keyboard)
+        );
+        assert_eq!(
+            InputDeviceType::from_str("mouse"),
+            Some(InputDeviceType::Mouse)
+        );
     }
 
     #[test]

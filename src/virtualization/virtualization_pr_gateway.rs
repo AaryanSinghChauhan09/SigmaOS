@@ -93,14 +93,29 @@ impl VirtualizationTechnologyFormat {
 
     pub fn category(&self) -> VirtualizationPrCategory {
         match self {
-            Self::Kvm | Self::Qemu | Self::Xen | Self::Bhyve | Self::OpenBsdVmm | Self::VirtualBox | Self::Firecracker | Self::CloudHypervisor | Self::AppleHypervisor => {
-                VirtualizationPrCategory::HypervisorCore
+            Self::Kvm
+            | Self::Qemu
+            | Self::Xen
+            | Self::Bhyve
+            | Self::OpenBsdVmm
+            | Self::VirtualBox
+            | Self::Firecracker
+            | Self::CloudHypervisor
+            | Self::AppleHypervisor => VirtualizationPrCategory::HypervisorCore,
+            Self::Docker
+            | Self::Podman
+            | Self::Containerd
+            | Self::Runc
+            | Self::Lxc
+            | Self::Lxd
+            | Self::SystemdNspawn
+            | Self::AlpineMoby => VirtualizationPrCategory::ContainerRuntime,
+            Self::FreeBsdJails | Self::GvisorKata | Self::SmartOsZones => {
+                VirtualizationPrCategory::SecurityIsolation
             }
-            Self::Docker | Self::Podman | Self::Containerd | Self::Runc | Self::Lxc | Self::Lxd | Self::SystemdNspawn | Self::AlpineMoby => {
-                VirtualizationPrCategory::ContainerRuntime
+            Self::Libvirt | Self::Kubernetes | Self::Incus => {
+                VirtualizationPrCategory::OrchestrationCluster
             }
-            Self::FreeBsdJails | Self::GvisorKata | Self::SmartOsZones => VirtualizationPrCategory::SecurityIsolation,
-            Self::Libvirt | Self::Kubernetes | Self::Incus => VirtualizationPrCategory::OrchestrationCluster,
         }
     }
 }
@@ -399,7 +414,10 @@ impl SovereignVirtualizationPrGatewayEngine {
                 desc.to_string(),
                 spec.to_string(),
                 manifest.to_string(),
-                vec![0x53, 0x49, 0x47, 0x4d, 0x41, 0x5F, 0x50, 0x51, 0x43, 0x5F, 0x56, 0x49, 0x52, 0x54], // PQC signature marker
+                vec![
+                    0x53, 0x49, 0x47, 0x4d, 0x41, 0x5F, 0x50, 0x51, 0x43, 0x5F, 0x56, 0x49, 0x52,
+                    0x54,
+                ], // PQC signature marker
             );
         }
     }
@@ -423,7 +441,10 @@ impl SovereignVirtualizationPrGatewayEngine {
             return Err("Pull Request author cannot be empty".to_string());
         }
         if pqc_signature.is_empty() {
-            return Err("PQC post-quantum cryptographic signature is required for PR submission".to_string());
+            return Err(
+                "PQC post-quantum cryptographic signature is required for PR submission"
+                    .to_string(),
+            );
         }
 
         let pr_id = self.next_pr_id;
@@ -471,7 +492,10 @@ impl SovereignVirtualizationPrGatewayEngine {
 
         if !pr.pqc_signature.starts_with(b"SIGMA_PQC_") {
             pr.status = VirtualizationPrStatus::Rejected;
-            return Err(format!("PQC Signature verification failed for PR #{}", pr_id));
+            return Err(format!(
+                "PQC Signature verification failed for PR #{}",
+                pr_id
+            ));
         }
 
         if pr.config_manifest.trim().is_empty() {
@@ -611,8 +635,11 @@ mod tests {
                 VirtualizationPrCategory::HypervisorCore,
                 "MicroVM minimal jailer isolation".to_string(),
                 "[firecracker]\nvsock=true\njailer=true".to_string(),
-                "[config]\nkernel = \"/boot/vmlinux\"\nrootfs = \"/var/lib/rootfs.ext4\"".to_string(),
-                vec![0x53, 0x49, 0x47, 0x4d, 0x41, 0x5F, 0x50, 0x51, 0x43, 0x5F, 0x31],
+                "[config]\nkernel = \"/boot/vmlinux\"\nrootfs = \"/var/lib/rootfs.ext4\""
+                    .to_string(),
+                vec![
+                    0x53, 0x49, 0x47, 0x4d, 0x41, 0x5F, 0x50, 0x51, 0x43, 0x5F, 0x31,
+                ],
             )
             .unwrap();
 
@@ -641,15 +668,24 @@ mod tests {
 
         let bhyve_results = gateway.search_prs("FreeBSD bhyve");
         assert_eq!(bhyve_results.len(), 1);
-        assert_eq!(bhyve_results[0].technology, VirtualizationTechnologyFormat::Bhyve);
+        assert_eq!(
+            bhyve_results[0].technology,
+            VirtualizationTechnologyFormat::Bhyve
+        );
 
         let podman_results = gateway.search_prs("podman rootless");
         assert_eq!(podman_results.len(), 1);
-        assert_eq!(podman_results[0].technology, VirtualizationTechnologyFormat::Podman);
+        assert_eq!(
+            podman_results[0].technology,
+            VirtualizationTechnologyFormat::Podman
+        );
 
         let k8s_results = gateway.search_prs("kubernetes");
         assert_eq!(k8s_results.len(), 1);
-        assert_eq!(k8s_results[0].technology, VirtualizationTechnologyFormat::Kubernetes);
+        assert_eq!(
+            k8s_results[0].technology,
+            VirtualizationTechnologyFormat::Kubernetes
+        );
 
         let fc_results = gateway.search_prs("Firecracker");
         assert!(fc_results.len() >= 1);

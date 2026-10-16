@@ -604,7 +604,10 @@ impl SaneOptionDescriptorEngine {
                 return Ok(SaneStatus::Good);
             }
         }
-        Err(format!("Option {} not found in SANE descriptor table", name))
+        Err(format!(
+            "Option {} not found in SANE descriptor table",
+            name
+        ))
     }
 
     /// Generate 8-bit gamma lookup table (256 entries)
@@ -661,14 +664,22 @@ impl AirScanWsdDiscoveryEngine {
                 name: "Epson EcoTank AirScan".to_string(),
                 ip_address: "192.168.1.120".to_string(),
                 protocol: DriverlessScanProtocol::ESCL,
-                capabilities: vec!["Color".to_string(), "300DPI".to_string(), "600DPI".to_string()],
+                capabilities: vec![
+                    "Color".to_string(),
+                    "300DPI".to_string(),
+                    "600DPI".to_string(),
+                ],
             },
             DiscoveredNetworkScanner {
                 id: "wsd-002".to_string(),
                 name: "Canon PIXMA WSD Scanner".to_string(),
                 ip_address: "192.168.1.121".to_string(),
                 protocol: DriverlessScanProtocol::WSD,
-                capabilities: vec!["Color".to_string(), "Grayscale".to_string(), "1200DPI".to_string()],
+                capabilities: vec![
+                    "Color".to_string(),
+                    "Grayscale".to_string(),
+                    "1200DPI".to_string(),
+                ],
             },
         ];
 
@@ -834,7 +845,10 @@ impl PrintScanDiagnosticsTelemetryEngine {
     /// Generate human-readable diagnostics summary report
     pub fn generate_health_summary_report(&self) -> String {
         let results = self.run_comprehensive_diagnostics();
-        let pass_count = results.iter().filter(|r| r.status == DiagnosticCheckStatus::Pass).count();
+        let pass_count = results
+            .iter()
+            .filter(|r| r.status == DiagnosticCheckStatus::Pass)
+            .count();
         format!(
             "Sovereign Print & Scan Ecosystem Health Report: {}/{} tests PASSED [ALL SYSTEMS OPERATIONAL]",
             pass_count,
@@ -891,11 +905,18 @@ impl SaneDaemonAuthenticationEngine {
         if client_ip == "127.0.0.1" || client_ip.starts_with("192.168.1.") {
             return true;
         }
-        self.allowed_subnets_acl.iter().any(|subnet| subnet.contains(client_ip))
+        self.allowed_subnets_acl
+            .iter()
+            .any(|subnet| subnet.contains(client_ip))
     }
 
     /// Challenge-response password authentication for saned RPC client
-    pub fn authenticate_saned_client(&self, host: &str, user: &str, pass: &str) -> Result<bool, String> {
+    pub fn authenticate_saned_client(
+        &self,
+        host: &str,
+        user: &str,
+        pass: &str,
+    ) -> Result<bool, String> {
         if !self.evaluate_acl(host) {
             return Err(format!("Access denied for host {} by saned ACL", host));
         }
@@ -907,7 +928,10 @@ impl SaneDaemonAuthenticationEngine {
                 Err(format!("Invalid password for saned user {}", user))
             }
         } else {
-            Err(format!("User {} not authorized for saned remote scanning", user))
+            Err(format!(
+                "User {} not authorized for saned remote scanning",
+                user
+            ))
         }
     }
 }
@@ -1018,7 +1042,11 @@ impl AirScanEsclServerEngine {
     }
 
     /// Process POST /eSCL/ScanJobs request
-    pub fn handle_post_scan_jobs_request(&mut self, dpi: u32, color_mode: &str) -> Result<String, String> {
+    pub fn handle_post_scan_jobs_request(
+        &mut self,
+        dpi: u32,
+        color_mode: &str,
+    ) -> Result<String, String> {
         self.active_job_count += 1;
         let job_id = format!("escl-job-{}", self.active_job_count);
         let location_uri = format!("http://localhost:{}/eSCL/ScanJobs/{}", self.port, job_id);
@@ -1032,7 +1060,9 @@ impl AirScanEsclServerEngine {
         if !job_uri.contains("escl-job-") {
             return Err("Invalid eSCL Job URI".to_string());
         }
-        Ok(Vec::from(b"%PDF-1.7 eSCL Scanned Document Payload\n".as_slice()))
+        Ok(Vec::from(
+            b"%PDF-1.7 eSCL Scanned Document Payload\n".as_slice(),
+        ))
     }
 }
 
@@ -1068,7 +1098,10 @@ impl ScannerManager {
             jobs: HashMap::new(),
             next_job_id: 1,
             sane_backends: HashMap::new(),
-            airscan_engine: DriverlessAirScanEngine::new(DriverlessScanProtocol::ESCL, "192.168.1.100"),
+            airscan_engine: DriverlessAirScanEngine::new(
+                DriverlessScanProtocol::ESCL,
+                "192.168.1.100",
+            ),
             adf_engine: AdfBatchScanEngine::new(false),
             pr_gateway: None,
             sane_options: SaneOptionDescriptorEngine::default(),
@@ -1093,7 +1126,9 @@ impl ScannerManager {
 
         // Add default SANE backend
         let sane_backend = SaneBackendEngine::new("genesys", "Epson", "Perfection V39");
-        manager.sane_backends.insert("genesys".to_string(), sane_backend);
+        manager
+            .sane_backends
+            .insert("genesys".to_string(), sane_backend);
 
         manager
     }
@@ -1446,7 +1481,9 @@ mod tests {
         let diag = PrintScanDiagnosticsTelemetryEngine::new();
         let check_results = diag.run_comprehensive_diagnostics();
         assert_eq!(check_results.len(), 5);
-        assert!(check_results.iter().all(|r| r.status == DiagnosticCheckStatus::Pass));
+        assert!(check_results
+            .iter()
+            .all(|r| r.status == DiagnosticCheckStatus::Pass));
 
         let report = diag.generate_health_summary_report();
         assert!(report.contains("5/5 tests PASSED"));
@@ -1459,10 +1496,12 @@ mod tests {
         assert!(saned_auth.evaluate_acl("127.0.0.1"));
         assert!(saned_auth.evaluate_acl("192.168.1.50"));
 
-        let auth_res = saned_auth.authenticate_saned_client("127.0.0.1", "scanadmin", "saned_secret_pass");
+        let auth_res =
+            saned_auth.authenticate_saned_client("127.0.0.1", "scanadmin", "saned_secret_pass");
         assert!(auth_res.unwrap());
 
-        let invalid_res = saned_auth.authenticate_saned_client("127.0.0.1", "scanadmin", "wrong_pass");
+        let invalid_res =
+            saned_auth.authenticate_saned_client("127.0.0.1", "scanadmin", "wrong_pass");
         assert!(invalid_res.is_err());
     }
 

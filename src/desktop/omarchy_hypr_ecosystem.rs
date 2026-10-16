@@ -264,7 +264,8 @@ impl CliphistClipboardEngine {
 
         if self.history.len() >= self.max_history_size {
             if let Some(evicted) = self.history.pop_back() {
-                self.seen_hashes.remove(&format!("{}:{}", evicted.mime_type, evicted.text_preview));
+                self.seen_hashes
+                    .remove(&format!("{}:{}", evicted.mime_type, evicted.text_preview));
             }
         }
 

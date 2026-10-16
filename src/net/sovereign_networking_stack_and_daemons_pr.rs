@@ -148,7 +148,8 @@ impl SovereignNetworkConfigDaemonsEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             interfaces: Vec::new(),
-            netplan_yaml_config: "network:\n  version: 2\n  ethernets:\n    eth0:\n      dhcp4: true\n".to_string(),
+            netplan_yaml_config:
+                "network:\n  version: 2\n  ethernets:\n    eth0:\n      dhcp4: true\n".to_string(),
         };
         engine.interfaces.push(NetworkInterfaceState {
             name: "eth0".to_string(),
@@ -467,7 +468,10 @@ impl SovereignNetUtilitiesAndDiagnosticsEngine {
     pub fn new() -> Self {
         Self {
             ntp_offset_ms: 0.12,
-            avahi_mdns_services: vec!["_http._tcp.local".to_string(), "_ipp._tcp.local".to_string()],
+            avahi_mdns_services: vec![
+                "_http._tcp.local".to_string(),
+                "_ipp._tcp.local".to_string(),
+            ],
             active_captures: 0,
         }
     }

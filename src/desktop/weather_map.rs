@@ -148,9 +148,7 @@ pub fn init_weather_map() {
 
 /// Get weather map
 pub fn get_weather_map() -> &'static mut WeatherMap {
-    unsafe {
-        WEATHER_MAP.as_mut().expect("Weather map not initialized")
-    }
+    unsafe { WEATHER_MAP.as_mut().expect("Weather map not initialized") }
 }
 
 #[cfg(test)]

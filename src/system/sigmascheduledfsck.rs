@@ -96,7 +96,8 @@ impl FSCKScheduleTarget {
                         >= self.check_interval_seconds
             }
             FSCKSchedulePolicy::MountCountOrTime => {
-                let count_due = self.max_mount_count > 0 && self.current_mount_count >= self.max_mount_count;
+                let count_due =
+                    self.max_mount_count > 0 && self.current_mount_count >= self.max_mount_count;
                 let time_due = self.check_interval_seconds > 0
                     && current_timestamp.saturating_sub(self.last_checked_timestamp)
                         >= self.check_interval_seconds;
@@ -182,7 +183,9 @@ impl SigmaScheduledFSCK {
 
     /// Check if a device is due for checking
     pub fn is_due(&self, device_path: &str, current_timestamp: u64) -> bool {
-        self.targets.get(device_path).map_or(false, |t| t.is_check_due(current_timestamp))
+        self.targets
+            .get(device_path)
+            .map_or(false, |t| t.is_check_due(current_timestamp))
     }
 
     /// Find all devices due for checking
@@ -195,7 +198,11 @@ impl SigmaScheduledFSCK {
     }
 
     /// Run and record a scheduled check
-    pub fn execute_check(&mut self, device_path: &str, current_timestamp: u64) -> Option<ScheduledCheckRecord> {
+    pub fn execute_check(
+        &mut self,
+        device_path: &str,
+        current_timestamp: u64,
+    ) -> Option<ScheduledCheckRecord> {
         let target = self.targets.get_mut(device_path)?;
         target.mark_checked(current_timestamp);
 
@@ -247,16 +254,12 @@ pub fn init_sigmascheduledfsck() {
 
 /// Get global SigmaScheduledFSCK instance
 pub fn get_sigmascheduledfsck() -> Option<&'static SigmaScheduledFSCK> {
-    unsafe {
-        SIGMA_SCHEDULED_FSCK_INSTANCE.as_ref()
-    }
+    unsafe { SIGMA_SCHEDULED_FSCK_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaScheduledFSCK instance
 pub fn get_sigmascheduledfsck_mut() -> Option<&'static mut SigmaScheduledFSCK> {
-    unsafe {
-        SIGMA_SCHEDULED_FSCK_INSTANCE.as_mut()
-    }
+    unsafe { SIGMA_SCHEDULED_FSCK_INSTANCE.as_mut() }
 }
 
 /// Convenience function to check if a device is due for check
@@ -269,7 +272,10 @@ pub fn is_fsck_due(device_path: &str, current_timestamp: u64) -> bool {
 }
 
 /// Convenience function to execute a scheduled check
-pub fn execute_scheduled_fsck(device_path: &str, current_timestamp: u64) -> Option<ScheduledCheckRecord> {
+pub fn execute_scheduled_fsck(
+    device_path: &str,
+    current_timestamp: u64,
+) -> Option<ScheduledCheckRecord> {
     if let Some(mgr) = get_sigmascheduledfsck_mut() {
         mgr.execute_check(device_path, current_timestamp)
     } else {

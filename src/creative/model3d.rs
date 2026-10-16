@@ -264,7 +264,13 @@ impl Scene {
     }
 
     /// Update object transform
-    pub fn update_object_transform(&mut self, object_id: u32, location: [f32; 3], rotation: [f32; 3], scale: [f32; 3]) -> Result<(), &'static str> {
+    pub fn update_object_transform(
+        &mut self,
+        object_id: u32,
+        location: [f32; 3],
+        rotation: [f32; 3],
+        scale: [f32; 3],
+    ) -> Result<(), &'static str> {
         let object = self.objects.get_mut(&object_id).ok_or("Object not found")?;
         object.location = location;
         object.rotation = rotation;
@@ -273,7 +279,12 @@ impl Scene {
     }
 
     /// Set light properties
-    pub fn set_light_properties(&mut self, light_id: u32, color: [f32; 3], intensity: f32) -> Result<(), &'static str> {
+    pub fn set_light_properties(
+        &mut self,
+        light_id: u32,
+        color: [f32; 3],
+        intensity: f32,
+    ) -> Result<(), &'static str> {
         let light = self.lights.get_mut(&light_id).ok_or("Light not found")?;
         light.color = color;
         light.intensity = intensity;
@@ -316,9 +327,7 @@ pub fn init_model3d(name: String) {
 
 /// Get scene
 pub fn get_model3d() -> &'static mut Scene {
-    unsafe {
-        SCENE.as_mut().expect("Model3D not initialized")
-    }
+    unsafe { SCENE.as_mut().expect("Model3D not initialized") }
 }
 
 #[cfg(test)]

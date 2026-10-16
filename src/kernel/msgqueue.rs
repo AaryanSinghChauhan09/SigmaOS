@@ -104,9 +104,10 @@ impl MessageQueue {
             // Receive first message with matching type
             let pos = self.messages.iter().position(|m| m.mtype == mtype);
             match pos {
-                Some(idx) => {
-                    self.messages.remove(idx).ok_or_else(|| "Failed to remove message".to_string())
-                }
+                Some(idx) => self
+                    .messages
+                    .remove(idx)
+                    .ok_or_else(|| "Failed to remove message".to_string()),
                 None => Err("No message with matching type".to_string()),
             }
         }

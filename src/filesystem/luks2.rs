@@ -294,12 +294,7 @@ pub struct AesXtsKey {
 /// # Panics
 /// Panics if `ciphertext.len() != plaintext.len()` or lengths are not a
 /// multiple of the sector size.
-pub fn aes_xts_decrypt(
-    key: &AesXtsKey,
-    sector_num: u64,
-    ciphertext: &[u8],
-    plaintext: &mut [u8],
-) {
+pub fn aes_xts_decrypt(key: &AesXtsKey, sector_num: u64, ciphertext: &[u8], plaintext: &mut [u8]) {
     assert_eq!(ciphertext.len(), plaintext.len());
     let _ = (key, sector_num);
     // TODO: implement AES-XTS decryption (IEEE 1619-2007)
@@ -307,12 +302,7 @@ pub fn aes_xts_decrypt(
 }
 
 /// Encrypt one or more 512-byte sectors using AES-XTS.
-pub fn aes_xts_encrypt(
-    key: &AesXtsKey,
-    sector_num: u64,
-    plaintext: &[u8],
-    ciphertext: &mut [u8],
-) {
+pub fn aes_xts_encrypt(key: &AesXtsKey, sector_num: u64, plaintext: &[u8], ciphertext: &mut [u8]) {
     assert_eq!(plaintext.len(), ciphertext.len());
     let _ = (key, sector_num);
     // TODO: implement AES-XTS encryption (IEEE 1619-2007)
@@ -341,7 +331,12 @@ pub fn unlock_keyslot(
     let derived_key = match &keyslot.kdf_params {
         KdfParams::Pbkdf2(p) => {
             if let KdfType::Pbkdf2 = keyslot.kdf_type {
-                pbkdf2_sha256(passphrase, &keyslot.salt, p.iterations, keyslot.area_key_size as usize)
+                pbkdf2_sha256(
+                    passphrase,
+                    &keyslot.salt,
+                    p.iterations,
+                    keyslot.area_key_size as usize,
+                )
             } else {
                 return Err(Luks2Error::KdfMismatch);
             }
@@ -481,7 +476,10 @@ impl Luks2Device {
     /// Attempt to unlock the device using `passphrase`.
     pub fn unlock(&mut self, passphrase: &[u8], key_area_data: &[u8]) -> Result<(), Luks2Error> {
         for keyslot in &self.metadata.keyslots {
-            let digest = self.metadata.digests.iter()
+            let digest = self
+                .metadata
+                .digests
+                .iter()
                 .find(|d| d.keyslots.contains(&keyslot.index))
                 .ok_or(Luks2Error::NoActiveKeyslot)?;
             match unlock_keyslot(keyslot, digest, passphrase, key_area_data) {
@@ -503,8 +501,16 @@ impl Luks2Device {
     }
 
     /// Decrypt a range of sectors from the bulk data area.
-    pub fn read_sectors(&self, sector_num: u64, ciphertext: &[u8], plaintext: &mut [u8]) -> Result<(), Luks2Error> {
-        let key = self.cipher_key.as_ref().ok_or(Luks2Error::WrongPassphrase)?;
+    pub fn read_sectors(
+        &self,
+        sector_num: u64,
+        ciphertext: &[u8],
+        plaintext: &mut [u8],
+    ) -> Result<(), Luks2Error> {
+        let key = self
+            .cipher_key
+            .as_ref()
+            .ok_or(Luks2Error::WrongPassphrase)?;
         aes_xts_decrypt(key, sector_num, ciphertext, plaintext);
         Ok(())
     }

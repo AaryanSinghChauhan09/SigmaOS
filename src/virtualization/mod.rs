@@ -1,4 +1,5 @@
 // SigmaOS Virtualization Module
+pub mod firecracker;
 pub mod kvm;
 pub mod kvm_vcpu;
 pub mod kvm_vmcs;
@@ -6,7 +7,6 @@ pub mod oci_pod;
 pub mod orchestration;
 pub mod rancher;
 pub mod virtiofsd;
-pub mod firecracker;
 pub mod virtualization_pr_gateway;
 
 pub use virtiofsd::{VirtioFsConfig, VirtioFsDaemon, VirtioFsInodeMap};
@@ -14,7 +14,6 @@ pub use virtualization_pr_gateway::{
     SovereignVirtualizationPrGatewayEngine, VirtualizationPrCategory, VirtualizationPrStatus,
     VirtualizationPrSubmission, VirtualizationTechnologyFormat,
 };
-
 
 pub use kvm_vcpu::{
     KvmExitCode, KvmMemoryRegion, KvmVcpu, KvmVcpuRegisters, KvmVcpuSregs, VirtioDeviceBackend,

@@ -123,7 +123,7 @@ impl SigmaNTP {
         if self.servers.contains_key(&server.server_id) {
             return Err(format!("Server '{}' already exists", server.server_id));
         }
-        
+
         self.servers.insert(server.server_id.clone(), server);
         self.server_counter += 1;
         Ok(())
@@ -142,7 +142,7 @@ impl SigmaNTP {
         if !self.running {
             return Err("SigmaNTP not running".to_string());
         }
-        
+
         // In a real implementation, this would actually sync with NTP servers
         Ok(())
     }
@@ -159,9 +159,7 @@ impl SigmaNTP {
 
     /// List servers by state
     pub fn list_by_state(&self, state: NtpServerState) -> Vec<&NtpServer> {
-        self.servers.values()
-            .filter(|s| s.state == state)
-            .collect()
+        self.servers.values().filter(|s| s.state == state).collect()
     }
 
     /// Get server count
@@ -173,8 +171,14 @@ impl SigmaNTP {
     pub fn ntp_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_servers".to_string(), self.server_count().to_string());
-        stats.insert("peer_servers".to_string(), self.list_by_state(NtpServerState::Peer).len().to_string());
-        stats.insert("server_servers".to_string(), self.list_by_state(NtpServerState::Server).len().to_string());
+        stats.insert(
+            "peer_servers".to_string(),
+            self.list_by_state(NtpServerState::Peer).len().to_string(),
+        );
+        stats.insert(
+            "server_servers".to_string(),
+            self.list_by_state(NtpServerState::Server).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -222,14 +226,10 @@ mod tests {
 
     #[test]
     fn test_ntp_server() {
-        let server = NtpServer::new(
-            "server1".to_string(),
-            "pool.ntp.org".to_string(),
-            123
-        )
-        .with_state(NtpServerState::Server)
-        .with_offset(5)
-        .with_stratum(2);
+        let server = NtpServer::new("server1".to_string(), "pool.ntp.org".to_string(), 123)
+            .with_state(NtpServerState::Server)
+            .with_offset(5)
+            .with_stratum(2);
 
         assert_eq!(server.server_id, "server1");
         assert_eq!(server.state, NtpServerState::Server);
@@ -249,13 +249,9 @@ mod tests {
     #[test]
     fn test_sigmantp_add_server() {
         let mut ntp = SigmaNTP::new();
-        
-        let server = NtpServer::new(
-            "server1".to_string(),
-            "pool.ntp.org".to_string(),
-            123
-        );
-        
+
+        let server = NtpServer::new("server1".to_string(), "pool.ntp.org".to_string(), 123);
+
         assert!(ntp.add_server(server).is_ok());
         assert_eq!(ntp.server_count(), 1);
     }
@@ -264,13 +260,9 @@ mod tests {
     fn test_sigmantp_sync_time() {
         let mut ntp = SigmaNTP::new();
         ntp.start();
-        
-        let server = NtpServer::new(
-            "server1".to_string(),
-            "pool.ntp.org".to_string(),
-            123
-        );
-        
+
+        let server = NtpServer::new("server1".to_string(), "pool.ntp.org".to_string(), 123);
+
         ntp.add_server(server).unwrap();
         assert!(ntp.sync_time().is_ok());
     }
@@ -278,16 +270,12 @@ mod tests {
     #[test]
     fn test_sigmantp_list_by_state() {
         let mut ntp = SigmaNTP::new();
-        
-        let server = NtpServer::new(
-            "server1".to_string(),
-            "pool.ntp.org".to_string(),
-            123
-        )
-        .with_state(NtpServerState::Server);
-        
+
+        let server = NtpServer::new("server1".to_string(), "pool.ntp.org".to_string(), 123)
+            .with_state(NtpServerState::Server);
+
         ntp.add_server(server).unwrap();
-        
+
         let servers = ntp.list_by_state(NtpServerState::Server);
         assert_eq!(servers.len(), 1);
     }
@@ -295,16 +283,12 @@ mod tests {
     #[test]
     fn test_sigmantp_stats() {
         let mut ntp = SigmaNTP::new();
-        
-        let server = NtpServer::new(
-            "server1".to_string(),
-            "pool.ntp.org".to_string(),
-            123
-        )
-        .with_state(NtpServerState::Server);
-        
+
+        let server = NtpServer::new("server1".to_string(), "pool.ntp.org".to_string(), 123)
+            .with_state(NtpServerState::Server);
+
         ntp.add_server(server).unwrap();
-        
+
         let stats = ntp.ntp_stats();
         assert_eq!(stats.get("total_servers"), Some(&"1".to_string()));
         assert_eq!(stats.get("server_servers"), Some(&"1".to_string()));
@@ -313,18 +297,14 @@ mod tests {
     #[test]
     fn test_sync_ntp_time_convenience() {
         init_sigmantp();
-        
+
         let mut ntp = get_sigmantp().unwrap();
         ntp.start();
-        
-        let server = NtpServer::new(
-            "server1".to_string(),
-            "pool.ntp.org".to_string(),
-            123
-        );
-        
+
+        let server = NtpServer::new("server1".to_string(), "pool.ntp.org".to_string(), 123);
+
         ntp.add_server(server).unwrap();
-        
+
         let result = sync_ntp_time();
         assert!(result.is_ok());
     }

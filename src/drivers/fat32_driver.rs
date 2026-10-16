@@ -13,7 +13,7 @@ use alloc::sync::Arc;
 use alloc::vec::Vec;
 use std::sync::Mutex;
 
-use crate::filesystem::fat32::{Fat32Bpb, ExFatBootSector, Fat32Error};
+use crate::filesystem::fat32::{ExFatBootSector, Fat32Bpb, Fat32Error};
 
 /// Generic block device abstraction for FAT filesystem mounting.
 pub trait BlockDevice: Send + Sync {
@@ -117,7 +117,8 @@ impl Fat32DeviceDriver {
             return Err(DriverError::DeviceError);
         }
 
-        self.device.read_sectors(cluster_start_lba, &mut buf[..total_bytes])
+        self.device
+            .read_sectors(cluster_start_lba, &mut buf[..total_bytes])
     }
 
     /// Write cluster data from buffer for FAT32.
@@ -134,6 +135,7 @@ impl Fat32DeviceDriver {
             return Err(DriverError::DeviceError);
         }
 
-        self.device.write_sectors(cluster_start_lba, &buf[..total_bytes])
+        self.device
+            .write_sectors(cluster_start_lba, &buf[..total_bytes])
     }
 }

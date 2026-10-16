@@ -54,12 +54,20 @@ impl GrimblastScreenshotEngine {
 
     pub fn set_area(&mut self, x: i32, y: i32, width: u32, height: u32) {
         self.target = CaptureTarget::SelectedArea;
-        self.capture_rect = Some(CaptureRect { x, y, width, height });
+        self.capture_rect = Some(CaptureRect {
+            x,
+            y,
+            width,
+            height,
+        });
     }
 
     pub fn generate_capture_command(&self) -> String {
         let area_arg = if let Some(rect) = &self.capture_rect {
-            format!("-g \"{},{} {}x{}\"", rect.x, rect.y, rect.width, rect.height)
+            format!(
+                "-g \"{},{} {}x{}\"",
+                rect.x, rect.y, rect.width, rect.height
+            )
         } else {
             String::new()
         };
@@ -109,7 +117,8 @@ impl BrightnessBacklightEngine {
     }
 
     pub fn set_brightness(&mut self, percent: u32) -> u32 {
-        self.current_brightness_percent = percent.clamp(self.min_brightness_percent, self.max_brightness_percent);
+        self.current_brightness_percent =
+            percent.clamp(self.min_brightness_percent, self.max_brightness_percent);
         self.current_brightness_percent
     }
 

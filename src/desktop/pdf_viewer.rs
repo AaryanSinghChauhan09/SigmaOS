@@ -166,9 +166,7 @@ pub fn init_pdf_viewer() {
 
 /// Get PDF viewer
 pub fn get_pdf_viewer() -> &'static mut PdfViewer {
-    unsafe {
-        PDF_VIEWER.as_mut().expect("PDF viewer not initialized")
-    }
+    unsafe { PDF_VIEWER.as_mut().expect("PDF viewer not initialized") }
 }
 
 #[cfg(test)]

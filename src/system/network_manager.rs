@@ -151,7 +151,10 @@ impl NetworkManager {
 
     /// Activate connection
     pub fn activate_connection(&mut self, id: u32) -> Result<(), &'static str> {
-        let connection = self.connections.get_mut(&id).ok_or("Connection not found")?;
+        let connection = self
+            .connections
+            .get_mut(&id)
+            .ok_or("Connection not found")?;
         connection.state = ConnectionState::Activating;
         connection.state = ConnectionState::Activated;
         self.active_connection = Some(id);
@@ -160,7 +163,10 @@ impl NetworkManager {
 
     /// Deactivate connection
     pub fn deactivate_connection(&mut self, id: u32) -> Result<(), &'static str> {
-        let connection = self.connections.get_mut(&id).ok_or("Connection not found")?;
+        let connection = self
+            .connections
+            .get_mut(&id)
+            .ok_or("Connection not found")?;
         connection.state = ConnectionState::Deactivating;
         connection.state = ConnectionState::Deactivated;
         if self.active_connection == Some(id) {
@@ -170,23 +176,46 @@ impl NetworkManager {
     }
 
     /// Set IP configuration
-    pub fn set_ip_config(&mut self, id: u32, ip_method: IPMethod, ip_address: Option<IPAddress>) -> Result<(), &'static str> {
-        let connection = self.connections.get_mut(&id).ok_or("Connection not found")?;
+    pub fn set_ip_config(
+        &mut self,
+        id: u32,
+        ip_method: IPMethod,
+        ip_address: Option<IPAddress>,
+    ) -> Result<(), &'static str> {
+        let connection = self
+            .connections
+            .get_mut(&id)
+            .ok_or("Connection not found")?;
         connection.ip_method = ip_method;
         connection.ip_address = ip_address;
         Ok(())
     }
 
     /// Set DNS servers
-    pub fn set_dns_servers(&mut self, id: u32, dns_servers: Vec<DNSServer>) -> Result<(), &'static str> {
-        let connection = self.connections.get_mut(&id).ok_or("Connection not found")?;
+    pub fn set_dns_servers(
+        &mut self,
+        id: u32,
+        dns_servers: Vec<DNSServer>,
+    ) -> Result<(), &'static str> {
+        let connection = self
+            .connections
+            .get_mut(&id)
+            .ok_or("Connection not found")?;
         connection.dns_servers = dns_servers;
         Ok(())
     }
 
     /// Set WiFi configuration
-    pub fn set_wifi_config(&mut self, id: u32, ssid: String, security: WiFiSecurity) -> Result<(), &'static str> {
-        let connection = self.connections.get_mut(&id).ok_or("Connection not found")?;
+    pub fn set_wifi_config(
+        &mut self,
+        id: u32,
+        ssid: String,
+        security: WiFiSecurity,
+    ) -> Result<(), &'static str> {
+        let connection = self
+            .connections
+            .get_mut(&id)
+            .ok_or("Connection not found")?;
         connection.wifi_ssid = Some(ssid);
         connection.wifi_security = Some(security);
         Ok(())
@@ -194,13 +223,21 @@ impl NetworkManager {
 
     /// Set auto connect
     pub fn set_auto_connect(&mut self, id: u32, auto_connect: bool) -> Result<(), &'static str> {
-        let connection = self.connections.get_mut(&id).ok_or("Connection not found")?;
+        let connection = self
+            .connections
+            .get_mut(&id)
+            .ok_or("Connection not found")?;
         connection.auto_connect = auto_connect;
         Ok(())
     }
 
     /// Add device
-    pub fn add_device(&mut self, name: String, device_type: ConnectionType, mac_address: String) -> u32 {
+    pub fn add_device(
+        &mut self,
+        name: String,
+        device_type: ConnectionType,
+        mac_address: String,
+    ) -> u32 {
         let id = self.next_device_id.fetch_add(1, Ordering::Relaxed);
         let device = NetworkDevice {
             id,
@@ -219,13 +256,18 @@ impl NetworkManager {
     pub fn set_device_state(&mut self, id: u32, is_up: bool) -> Result<(), &'static str> {
         let device = self.devices.get_mut(&id).ok_or("Device not found")?;
         device.is_up = is_up;
-        device.state = if is_up { ConnectionState::Activated } else { ConnectionState::Deactivated };
+        device.state = if is_up {
+            ConnectionState::Activated
+        } else {
+            ConnectionState::Deactivated
+        };
         Ok(())
     }
 
     /// Get active connection
     pub fn get_active_connection(&self) -> Option<&Connection> {
-        self.active_connection.and_then(|id| self.connections.get(&id))
+        self.active_connection
+            .and_then(|id| self.connections.get(&id))
     }
 
     /// Scan WiFi networks
@@ -264,7 +306,9 @@ pub fn init_network_manager() {
 /// Get network manager
 pub fn get_network_manager() -> &'static mut NetworkManager {
     unsafe {
-        NETWORK_MANAGER.as_mut().expect("Network manager not initialized")
+        NETWORK_MANAGER
+            .as_mut()
+            .expect("Network manager not initialized")
     }
 }
 
@@ -317,7 +361,11 @@ mod tests {
     #[test]
     fn test_add_device() {
         let mut nm = NetworkManager::new();
-        let id = nm.add_device("eth0".to_string(), ConnectionType::Ethernet, "00:11:22:33:44:55".to_string());
+        let id = nm.add_device(
+            "eth0".to_string(),
+            ConnectionType::Ethernet,
+            "00:11:22:33:44:55".to_string(),
+        );
         assert!(nm.devices.contains_key(&id));
     }
 }

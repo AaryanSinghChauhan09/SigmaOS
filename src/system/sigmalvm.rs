@@ -370,16 +370,12 @@ pub fn init_sigmalvm() {
 
 /// Get the global SigmaLVM instance
 pub fn get_sigmalvm() -> Option<&'static SigmaLVM> {
-    unsafe {
-        SIGMALVM_INSTANCE.as_ref()
-    }
+    unsafe { SIGMALVM_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaLVM instance
 pub fn get_sigmalvm_mut() -> Option<&'static mut SigmaLVM> {
-    unsafe {
-        SIGMALVM_INSTANCE.as_mut()
-    }
+    unsafe { SIGMALVM_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a volume group

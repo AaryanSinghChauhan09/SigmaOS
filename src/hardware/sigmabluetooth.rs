@@ -205,7 +205,7 @@ impl SigmaBluetooth {
         if !self.running {
             return Err("SigmaBluetooth not running".to_string());
         }
-        
+
         self.adapter_state = AdapterState::PoweredOn;
         Ok(())
     }
@@ -215,7 +215,7 @@ impl SigmaBluetooth {
         if !self.running {
             return Err("SigmaBluetooth not running".to_string());
         }
-        
+
         self.adapter_state = AdapterState::PoweredOff;
         self.discovering = false;
         Ok(())
@@ -226,11 +226,11 @@ impl SigmaBluetooth {
         if !self.running {
             return Err("SigmaBluetooth not running".to_string());
         }
-        
+
         if self.adapter_state != AdapterState::PoweredOn {
             return Err("Adapter not powered on".to_string());
         }
-        
+
         self.adapter_state = AdapterState::Discovering;
         self.discovering = true;
         Ok(())
@@ -241,7 +241,7 @@ impl SigmaBluetooth {
         if !self.running {
             return Err("SigmaBluetooth not running".to_string());
         }
-        
+
         self.discovering = false;
         if self.adapter_state == AdapterState::Discovering {
             self.adapter_state = AdapterState::PoweredOn;
@@ -254,7 +254,7 @@ impl SigmaBluetooth {
         if self.devices.contains_key(&device.address) {
             return Err(format!("Device '{}' already exists", device.address));
         }
-        
+
         self.devices.insert(device.address.clone(), device);
         self.device_counter += 1;
         Ok(())
@@ -327,14 +327,19 @@ impl SigmaBluetooth {
 
     /// List paired devices
     pub fn list_paired(&self) -> Vec<&BluetoothDevice> {
-        self.devices.values()
-            .filter(|d| d.status == BluetoothDeviceStatus::Paired || d.status == BluetoothDeviceStatus::Connected)
+        self.devices
+            .values()
+            .filter(|d| {
+                d.status == BluetoothDeviceStatus::Paired
+                    || d.status == BluetoothDeviceStatus::Connected
+            })
             .collect()
     }
 
     /// List connected devices
     pub fn list_connected(&self) -> Vec<&BluetoothDevice> {
-        self.devices.values()
+        self.devices
+            .values()
             .filter(|d| d.status == BluetoothDeviceStatus::Connected)
             .collect()
     }
@@ -358,8 +363,14 @@ impl SigmaBluetooth {
     pub fn bluetooth_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_devices".to_string(), self.device_count().to_string());
-        stats.insert("paired_devices".to_string(), self.list_paired().len().to_string());
-        stats.insert("connected_devices".to_string(), self.list_connected().len().to_string());
+        stats.insert(
+            "paired_devices".to_string(),
+            self.list_paired().len().to_string(),
+        );
+        stats.insert(
+            "connected_devices".to_string(),
+            self.list_connected().len().to_string(),
+        );
         stats.insert("adapter_state".to_string(), self.adapter_state.to_string());
         stats.insert("discovering".to_string(), self.discovering.to_string());
         stats.insert("running".to_string(), self.running.to_string());
@@ -433,7 +444,7 @@ mod tests {
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         )
         .with_status(BluetoothDeviceStatus::Paired)
         .with_rssi(-60)
@@ -458,7 +469,7 @@ mod tests {
     fn test_sigmabluetooth_power_on() {
         let mut bluetooth = SigmaBluetooth::new();
         bluetooth.start();
-        
+
         assert!(bluetooth.power_on().is_ok());
         assert_eq!(bluetooth.get_adapter_state(), AdapterState::PoweredOn);
     }
@@ -468,7 +479,7 @@ mod tests {
         let mut bluetooth = SigmaBluetooth::new();
         bluetooth.start();
         bluetooth.power_on().unwrap();
-        
+
         assert!(bluetooth.power_off().is_ok());
         assert_eq!(bluetooth.get_adapter_state(), AdapterState::PoweredOff);
     }
@@ -478,7 +489,7 @@ mod tests {
         let mut bluetooth = SigmaBluetooth::new();
         bluetooth.start();
         bluetooth.power_on().unwrap();
-        
+
         assert!(bluetooth.start_discovery().is_ok());
         assert!(bluetooth.is_discovering());
     }
@@ -486,13 +497,13 @@ mod tests {
     #[test]
     fn test_sigmabluetooth_add_device() {
         let mut bluetooth = SigmaBluetooth::new();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         );
-        
+
         assert!(bluetooth.add_device(device).is_ok());
         assert_eq!(bluetooth.device_count(), 1);
     }
@@ -500,16 +511,16 @@ mod tests {
     #[test]
     fn test_sigmabluetooth_pair_device() {
         let mut bluetooth = SigmaBluetooth::new();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         );
-        
+
         bluetooth.add_device(device).unwrap();
         assert!(bluetooth.pair_device("00:11:22:33:44:55").is_ok());
-        
+
         let device = bluetooth.get_device("00:11:22:33:44:55").unwrap();
         assert_eq!(device.status, BluetoothDeviceStatus::Paired);
     }
@@ -517,17 +528,17 @@ mod tests {
     #[test]
     fn test_sigmabluetooth_connect_device() {
         let mut bluetooth = SigmaBluetooth::new();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         )
         .with_status(BluetoothDeviceStatus::Paired);
-        
+
         bluetooth.add_device(device).unwrap();
         assert!(bluetooth.connect_device("00:11:22:33:44:55").is_ok());
-        
+
         let device = bluetooth.get_device("00:11:22:33:44:55").unwrap();
         assert_eq!(device.status, BluetoothDeviceStatus::Connected);
     }
@@ -535,16 +546,16 @@ mod tests {
     #[test]
     fn test_sigmabluetooth_list_paired() {
         let mut bluetooth = SigmaBluetooth::new();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         )
         .with_status(BluetoothDeviceStatus::Paired);
-        
+
         bluetooth.add_device(device).unwrap();
-        
+
         let paired = bluetooth.list_paired();
         assert_eq!(paired.len(), 1);
     }
@@ -554,16 +565,16 @@ mod tests {
         let mut bluetooth = SigmaBluetooth::new();
         bluetooth.start();
         bluetooth.power_on().unwrap();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         )
         .with_status(BluetoothDeviceStatus::Paired);
-        
+
         bluetooth.add_device(device).unwrap();
-        
+
         let stats = bluetooth.bluetooth_stats();
         assert_eq!(stats.get("total_devices"), Some(&"1".to_string()));
         assert_eq!(stats.get("paired_devices"), Some(&"1".to_string()));
@@ -572,17 +583,17 @@ mod tests {
     #[test]
     fn test_pair_bluetooth_device_convenience() {
         init_sigmabluetooth();
-        
+
         let mut bluetooth = get_sigmabluetooth().unwrap();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         );
-        
+
         bluetooth.add_device(device).unwrap();
-        
+
         let result = pair_bluetooth_device("00:11:22:33:44:55");
         assert!(result.is_ok());
     }
@@ -590,18 +601,18 @@ mod tests {
     #[test]
     fn test_connect_bluetooth_device_convenience() {
         init_sigmabluetooth();
-        
+
         let mut bluetooth = get_sigmabluetooth().unwrap();
-        
+
         let device = BluetoothDevice::new(
             "00:11:22:33:44:55".to_string(),
             "Test Device".to_string(),
-            BluetoothDeviceType::Headset
+            BluetoothDeviceType::Headset,
         )
         .with_status(BluetoothDeviceStatus::Paired);
-        
+
         bluetooth.add_device(device).unwrap();
-        
+
         let result = connect_bluetooth_device("00:11:22:33:44:55");
         assert!(result.is_ok());
     }

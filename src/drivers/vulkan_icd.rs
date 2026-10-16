@@ -82,14 +82,12 @@ impl VulkanIcdLoader {
     /// Select the highest performance GPU (prefers discrete over integrated over CPU)
     pub fn select_best_gpu(&self) -> Option<VkPhysicalDeviceProperties> {
         let all_gpus = self.enumerate_physical_devices();
-        all_gpus
-            .into_iter()
-            .max_by_key(|g| match g.device_type {
-                VkPhysicalDeviceType::DiscreteGpu => 3000 + g.vram_mb,
-                VkPhysicalDeviceType::IntegratedGpu => 2000 + g.vram_mb,
-                VkPhysicalDeviceType::VirtualGpu => 1000,
-                VkPhysicalDeviceType::CpuRasterizer => 100,
-            })
+        all_gpus.into_iter().max_by_key(|g| match g.device_type {
+            VkPhysicalDeviceType::DiscreteGpu => 3000 + g.vram_mb,
+            VkPhysicalDeviceType::IntegratedGpu => 2000 + g.vram_mb,
+            VkPhysicalDeviceType::VirtualGpu => 1000,
+            VkPhysicalDeviceType::CpuRasterizer => 100,
+        })
     }
 }
 

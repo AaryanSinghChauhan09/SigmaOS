@@ -20,10 +20,21 @@ impl core::fmt::Display for SwapError {
         match self {
             Self::OutOfSwapSlots => write!(f, "SwapError: no available swap slots"),
             Self::SlotNotFound(slot) => write!(f, "SwapError: swap slot {} not found", slot),
-            Self::AlreadySwapped(addr) => write!(f, "SwapError: address {:#x} is already swapped out", addr),
-            Self::NotSwapped(addr) => write!(f, "SwapError: address {:#x} is not present in swap space", addr),
-            Self::DoubleFreeSlot(slot) => write!(f, "SwapError: attempted double free of swap slot {}", slot),
-            Self::DeviceIoError => write!(f, "SwapError: secondary storage I/O error during swap operation"),
+            Self::AlreadySwapped(addr) => {
+                write!(f, "SwapError: address {:#x} is already swapped out", addr)
+            }
+            Self::NotSwapped(addr) => write!(
+                f,
+                "SwapError: address {:#x} is not present in swap space",
+                addr
+            ),
+            Self::DoubleFreeSlot(slot) => {
+                write!(f, "SwapError: attempted double free of swap slot {}", slot)
+            }
+            Self::DeviceIoError => write!(
+                f,
+                "SwapError: secondary storage I/O error during swap operation"
+            ),
         }
     }
 }
@@ -98,10 +109,14 @@ impl SwapManager {
     /// Perform race-free page swap-in
     pub fn swap_in_page(&self, virt_addr: u64) -> SwapResult<(u64, usize)> {
         let mut addr_map = self.address_to_slot.lock().unwrap();
-        let slot_id = addr_map.remove(&virt_addr).ok_or(SwapError::NotSwapped(virt_addr))?;
+        let slot_id = addr_map
+            .remove(&virt_addr)
+            .ok_or(SwapError::NotSwapped(virt_addr))?;
 
         let mut slots_map = self.used_slots.lock().unwrap();
-        let entry = slots_map.remove(&slot_id).ok_or(SwapError::SlotNotFound(slot_id))?;
+        let entry = slots_map
+            .remove(&slot_id)
+            .ok_or(SwapError::SlotNotFound(slot_id))?;
 
         let mut free_list = self.free_slots.lock().unwrap();
         free_list.push(slot_id);

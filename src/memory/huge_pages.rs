@@ -182,12 +182,12 @@ impl Default for SovereignHugePageEngine {
 /// THP Page Promotion Policy Descriptor
 #[derive(Debug, Clone)]
 pub struct ThpPagePromotionPolicy {
-    pub pages_to_scan: usize,          // Pages scanned per khugepaged iteration (default: 4096)
-    pub scan_sleep_millisecs: u64,     // Sleep between scan passes (default: 10000ms)
-    pub alloc_sleep_millisecs: u64,    // Sleep on allocation failure (default: 60000ms)
-    pub max_ptes_none: usize,          // Max unmapped PTEs allowed during collapse (default: 511)
-    pub max_ptes_swap: usize,          // Max swapped PTEs allowed during collapse (default: 64)
-    pub max_ptes_shared: usize,        // Max shared PTEs allowed during collapse (default: 256)
+    pub pages_to_scan: usize, // Pages scanned per khugepaged iteration (default: 4096)
+    pub scan_sleep_millisecs: u64, // Sleep between scan passes (default: 10000ms)
+    pub alloc_sleep_millisecs: u64, // Sleep on allocation failure (default: 60000ms)
+    pub max_ptes_none: usize, // Max unmapped PTEs allowed during collapse (default: 511)
+    pub max_ptes_swap: usize, // Max swapped PTEs allowed during collapse (default: 64)
+    pub max_ptes_shared: usize, // Max shared PTEs allowed during collapse (default: 256)
     pub access_frequency_threshold: u32, // Access count required for 4KiB -> 2MiB promotion
 }
 
@@ -278,10 +278,7 @@ pub struct ThpKhugepagedDefragDaemon {
 }
 
 impl ThpKhugepagedDefragDaemon {
-    pub fn new(
-        thp_mode: TransparentHugePageMode,
-        defrag_mode: ThpDefragMode,
-    ) -> Self {
+    pub fn new(thp_mode: TransparentHugePageMode, defrag_mode: ThpDefragMode) -> Self {
         Self {
             policy: ThpPagePromotionPolicy::default(),
             compactor: ThpMemoryCompactor::new(defrag_mode),
@@ -307,7 +304,8 @@ impl ThpKhugepagedDefragDaemon {
             return None;
         }
 
-        if self.huge_page_engine.thp_mode == TransparentHugePageMode::Madvise && !has_madv_hugepage {
+        if self.huge_page_engine.thp_mode == TransparentHugePageMode::Madvise && !has_madv_hugepage
+        {
             self.alloc_fail += 1;
             return None;
         }
@@ -323,7 +321,10 @@ impl ThpKhugepagedDefragDaemon {
             contiguous_4k_pages.push(base_phys_2mb + (i * PAGE_SIZE_4KB) as u64);
         }
 
-        if let Some(promoted_2mb) = self.huge_page_engine.attempt_thp_coalesce(&contiguous_4k_pages) {
+        if let Some(promoted_2mb) = self
+            .huge_page_engine
+            .attempt_thp_coalesce(&contiguous_4k_pages)
+        {
             self.pages_collapsed += PAGES_PER_2MB_HUGE_PAGE as u64;
             self.alloc_success += 1;
             Some(promoted_2mb)
@@ -334,17 +335,17 @@ impl ThpKhugepagedDefragDaemon {
     }
 
     /// Triggers memory compaction on defragmentation requests and promotes newly formed 2MiB blocks
-    pub fn trigger_khugepaged_scan_and_defrag(
-        &mut self,
-        fragmented_pages: &mut [u64],
-    ) -> usize {
+    pub fn trigger_khugepaged_scan_and_defrag(&mut self, fragmented_pages: &mut [u64]) -> usize {
         self.scan_count += 1;
 
         if let Ok(compacted_blocks) = self.compactor.compact_zone_for_thp(fragmented_pages) {
             let mut promoted_count = 0;
             for block_base in compacted_blocks {
                 let dummy_access = [20u32; PAGES_PER_2MB_HUGE_PAGE];
-                if self.evaluate_and_promote_page_range(block_base, &dummy_access, true).is_some() {
+                if self
+                    .evaluate_and_promote_page_range(block_base, &dummy_access, true)
+                    .is_some()
+                {
                     promoted_count += 1;
                 }
             }
@@ -403,10 +404,8 @@ mod tests {
 
     #[test]
     fn test_thp_khugepaged_daemon_and_compaction() {
-        let mut daemon = ThpKhugepagedDefragDaemon::new(
-            TransparentHugePageMode::Always,
-            ThpDefragMode::Always,
-        );
+        let mut daemon =
+            ThpKhugepagedDefragDaemon::new(TransparentHugePageMode::Always, ThpDefragMode::Always);
 
         let base_phys = 0x4000_0000u64; // 2MiB aligned
         let access_counts = [15u32; PAGES_PER_2MB_HUGE_PAGE];

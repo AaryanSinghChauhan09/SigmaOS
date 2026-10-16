@@ -107,7 +107,12 @@ pub struct BackupJob {
 
 impl BackupJob {
     /// Create a new backup job
-    pub fn new(job_id: String, source: String, destination: String, backup_type: BackupType) -> Self {
+    pub fn new(
+        job_id: String,
+        source: String,
+        destination: String,
+        backup_type: BackupType,
+    ) -> Self {
         Self {
             job_id,
             source,
@@ -180,7 +185,7 @@ impl SigmaBackup {
         if self.jobs.contains_key(&job.job_id) {
             return Err(format!("Job '{}' already exists", job.job_id));
         }
-        
+
         self.jobs.insert(job.job_id.clone(), job);
         self.job_counter += 1;
         Ok(())
@@ -242,14 +247,13 @@ impl SigmaBackup {
 
     /// List jobs by status
     pub fn list_by_status(&self, status: BackupStatus) -> Vec<&BackupJob> {
-        self.jobs.values()
-            .filter(|j| j.status == status)
-            .collect()
+        self.jobs.values().filter(|j| j.status == status).collect()
     }
 
     /// List jobs by type
     pub fn list_by_type(&self, backup_type: BackupType) -> Vec<&BackupJob> {
-        self.jobs.values()
+        self.jobs
+            .values()
             .filter(|j| j.backup_type == backup_type)
             .collect()
     }
@@ -263,8 +267,16 @@ impl SigmaBackup {
     pub fn backup_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_jobs".to_string(), self.job_count().to_string());
-        stats.insert("completed_jobs".to_string(), self.list_by_status(BackupStatus::Completed).len().to_string());
-        stats.insert("failed_jobs".to_string(), self.list_by_status(BackupStatus::Failed).len().to_string());
+        stats.insert(
+            "completed_jobs".to_string(),
+            self.list_by_status(BackupStatus::Completed)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "failed_jobs".to_string(),
+            self.list_by_status(BackupStatus::Failed).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -328,7 +340,7 @@ mod tests {
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         )
         .with_compression(CompressionLevel::Standard)
         .with_retention(7)
@@ -352,14 +364,14 @@ mod tests {
     #[test]
     fn test_sigmabackup_add_job() {
         let mut backup = SigmaBackup::new();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         );
-        
+
         assert!(backup.add_job(job).is_ok());
         assert_eq!(backup.job_count(), 1);
     }
@@ -368,17 +380,17 @@ mod tests {
     fn test_sigmabackup_start_job() {
         let mut backup = SigmaBackup::new();
         backup.start();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         );
-        
+
         backup.add_job(job).unwrap();
         assert!(backup.start_job("job1").is_ok());
-        
+
         let job = backup.get_job("job1").unwrap();
         assert_eq!(job.status, BackupStatus::Running);
     }
@@ -386,17 +398,17 @@ mod tests {
     #[test]
     fn test_sigmabackup_complete_job() {
         let mut backup = SigmaBackup::new();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         );
-        
+
         backup.add_job(job).unwrap();
         assert!(backup.complete_job("job1").is_ok());
-        
+
         let job = backup.get_job("job1").unwrap();
         assert_eq!(job.status, BackupStatus::Completed);
     }
@@ -404,17 +416,17 @@ mod tests {
     #[test]
     fn test_sigmabackup_fail_job() {
         let mut backup = SigmaBackup::new();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         );
-        
+
         backup.add_job(job).unwrap();
         assert!(backup.fail_job("job1").is_ok());
-        
+
         let job = backup.get_job("job1").unwrap();
         assert_eq!(job.status, BackupStatus::Failed);
     }
@@ -422,17 +434,17 @@ mod tests {
     #[test]
     fn test_sigmabackup_list_by_status() {
         let mut backup = SigmaBackup::new();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         )
         .with_status(BackupStatus::Completed);
-        
+
         backup.add_job(job).unwrap();
-        
+
         let completed = backup.list_by_status(BackupStatus::Completed);
         assert_eq!(completed.len(), 1);
     }
@@ -440,16 +452,16 @@ mod tests {
     #[test]
     fn test_sigmabackup_list_by_type() {
         let mut backup = SigmaBackup::new();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         );
-        
+
         backup.add_job(job).unwrap();
-        
+
         let full = backup.list_by_type(BackupType::Full);
         assert_eq!(full.len(), 1);
     }
@@ -457,17 +469,17 @@ mod tests {
     #[test]
     fn test_sigmabackup_stats() {
         let mut backup = SigmaBackup::new();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         )
         .with_status(BackupStatus::Completed);
-        
+
         backup.add_job(job).unwrap();
-        
+
         let stats = backup.backup_stats();
         assert_eq!(stats.get("total_jobs"), Some(&"1".to_string()));
         assert_eq!(stats.get("completed_jobs"), Some(&"1".to_string()));
@@ -476,19 +488,19 @@ mod tests {
     #[test]
     fn test_start_backup_job_convenience() {
         init_sigmabackup();
-        
+
         let mut backup = get_sigmabackup().unwrap();
         backup.start();
-        
+
         let job = BackupJob::new(
             "job1".to_string(),
             "/home".to_string(),
             "/backup".to_string(),
-            BackupType::Full
+            BackupType::Full,
         );
-        
+
         backup.add_job(job).unwrap();
-        
+
         let result = start_backup_job("job1");
         assert!(result.is_ok());
     }

@@ -135,7 +135,7 @@ impl SigmaSwap {
         if self.spaces.contains_key(&space.swap_id) {
             return Err(format!("Swap space '{}' already exists", space.swap_id));
         }
-        
+
         self.spaces.insert(space.swap_id.clone(), space);
         self.space_counter += 1;
         Ok(())
@@ -154,7 +154,7 @@ impl SigmaSwap {
         if !self.running {
             return Err("SigmaSwap not running".to_string());
         }
-        
+
         match self.spaces.get_mut(swap_id) {
             Some(space) => {
                 space.state = SwapState::Active;
@@ -169,7 +169,7 @@ impl SigmaSwap {
         if !self.running {
             return Err("SigmaSwap not running".to_string());
         }
-        
+
         match self.spaces.get_mut(swap_id) {
             Some(space) => {
                 space.state = SwapState::Inactive;
@@ -192,14 +192,16 @@ impl SigmaSwap {
 
     /// List active swap spaces
     pub fn list_active_swaps(&self) -> Vec<&SwapSpace> {
-        self.spaces.values()
+        self.spaces
+            .values()
             .filter(|s| s.state == SwapState::Active)
             .collect()
     }
 
     /// Get total swap size
     pub fn total_swap_size(&self) -> u64 {
-        self.spaces.values()
+        self.spaces
+            .values()
             .filter(|s| s.state == SwapState::Active)
             .map(|s| s.size)
             .sum()
@@ -207,7 +209,8 @@ impl SigmaSwap {
 
     /// Get total swap used
     pub fn total_swap_used(&self) -> u64 {
-        self.spaces.values()
+        self.spaces
+            .values()
             .filter(|s| s.state == SwapState::Active)
             .map(|s| s.used)
             .sum()
@@ -221,8 +224,14 @@ impl SigmaSwap {
     /// Get swap manager statistics
     pub fn swap_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_spaces".to_string(), self.swap_space_count().to_string());
-        stats.insert("active_spaces".to_string(), self.list_active_swaps().len().to_string());
+        stats.insert(
+            "total_spaces".to_string(),
+            self.swap_space_count().to_string(),
+        );
+        stats.insert(
+            "active_spaces".to_string(),
+            self.list_active_swaps().len().to_string(),
+        );
         stats.insert("total_size".to_string(), self.total_swap_size().to_string());
         stats.insert("total_used".to_string(), self.total_swap_used().to_string());
         stats.insert("running".to_string(), self.running.to_string());
@@ -282,7 +291,7 @@ mod tests {
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         )
         .with_state(SwapState::Active)
         .with_used(512 * 1024 * 1024);
@@ -305,14 +314,14 @@ mod tests {
     #[test]
     fn test_sigmaswap_add_swap_space() {
         let mut swap = SigmaSwap::new();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         );
-        
+
         assert!(swap.add_swap_space(space).is_ok());
         assert_eq!(swap.swap_space_count(), 1);
     }
@@ -321,17 +330,17 @@ mod tests {
     fn test_sigmaswap_activate_swap() {
         let mut swap = SigmaSwap::new();
         swap.start();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         );
-        
+
         swap.add_swap_space(space).unwrap();
         assert!(swap.activate_swap("swap1").is_ok());
-        
+
         let space = swap.get_swap_space("swap1").unwrap();
         assert_eq!(space.state, SwapState::Active);
     }
@@ -340,19 +349,19 @@ mod tests {
     fn test_sigmaswap_deactivate_swap() {
         let mut swap = SigmaSwap::new();
         swap.start();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         )
         .with_state(SwapState::Active)
         .with_used(512 * 1024 * 1024);
-        
+
         swap.add_swap_space(space).unwrap();
         assert!(swap.deactivate_swap("swap1").is_ok());
-        
+
         let space = swap.get_swap_space("swap1").unwrap();
         assert_eq!(space.state, SwapState::Inactive);
         assert_eq!(space.used, 0);
@@ -361,17 +370,17 @@ mod tests {
     #[test]
     fn test_sigmaswap_list_active_swaps() {
         let mut swap = SigmaSwap::new();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         )
         .with_state(SwapState::Active);
-        
+
         swap.add_swap_space(space).unwrap();
-        
+
         let active = swap.list_active_swaps();
         assert_eq!(active.len(), 1);
     }
@@ -379,35 +388,35 @@ mod tests {
     #[test]
     fn test_sigmaswap_total_swap_size() {
         let mut swap = SigmaSwap::new();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         )
         .with_state(SwapState::Active);
-        
+
         swap.add_swap_space(space).unwrap();
-        
+
         assert_eq!(swap.total_swap_size(), 1024 * 1024 * 1024);
     }
 
     #[test]
     fn test_sigmaswap_stats() {
         let mut swap = SigmaSwap::new();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         )
         .with_state(SwapState::Active)
         .with_used(512 * 1024 * 1024);
-        
+
         swap.add_swap_space(space).unwrap();
-        
+
         let stats = swap.swap_stats();
         assert_eq!(stats.get("total_spaces"), Some(&"1".to_string()));
         assert_eq!(stats.get("active_spaces"), Some(&"1".to_string()));
@@ -416,19 +425,19 @@ mod tests {
     #[test]
     fn test_activate_swap_space_convenience() {
         init_sigmaswap();
-        
+
         let mut swap = get_sigmaswap().unwrap();
         swap.start();
-        
+
         let space = SwapSpace::new(
             "swap1".to_string(),
             "/dev/sda1".to_string(),
             1024 * 1024 * 1024,
-            SwapPriority::Normal
+            SwapPriority::Normal,
         );
-        
+
         swap.add_swap_space(space).unwrap();
-        
+
         let result = activate_swap_space("swap1");
         assert!(result.is_ok());
     }

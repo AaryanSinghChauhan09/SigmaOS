@@ -1,8 +1,8 @@
 //! SigmaOS I/O Scheduler Subsystem
 
+use super::scheduler_queue::{IoOperationKind, IoPriority, IoRequest, IoStage};
 use std::collections::{BTreeMap, VecDeque};
 use std::sync::atomic::{AtomicU64, Ordering};
-use super::scheduler_queue::{IoOperationKind, IoPriority, IoRequest, IoStage};
 
 /// Typed errors for I/O scheduler operations.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -45,7 +45,10 @@ impl IoScheduler {
         length_bytes: usize,
         priority: IoPriority,
     ) -> Result<u64, SchedulerError> {
-        let total = self.rt_queue.len() + self.be_queue.len() + self.idle_queue.len() + self.active_requests.len();
+        let total = self.rt_queue.len()
+            + self.be_queue.len()
+            + self.idle_queue.len()
+            + self.active_requests.len();
         if total >= self.max_queue_depth {
             return Err(SchedulerError::QueueFull);
         }
@@ -70,7 +73,9 @@ impl IoScheduler {
 
     /// Stage 4: Dequeue and execute next scheduled I/O request.
     pub fn dispatch_next(&mut self) -> Option<IoRequest> {
-        let mut req = self.rt_queue.pop_front()
+        let mut req = self
+            .rt_queue
+            .pop_front()
             .or_else(|| self.be_queue.pop_front())
             .or_else(|| self.idle_queue.pop_front())?;
 
@@ -80,7 +85,11 @@ impl IoScheduler {
     }
 
     /// Stage 5 to 10: Process completion, callback, reclaim, and free.
-    pub fn complete_request(&mut self, id: u64, result: Result<(), i32>) -> Result<IoStage, SchedulerError> {
+    pub fn complete_request(
+        &mut self,
+        id: u64,
+        result: Result<(), i32>,
+    ) -> Result<IoStage, SchedulerError> {
         if let Some(mut req) = self.active_requests.remove(&id) {
             match result {
                 Ok(()) => {

@@ -100,8 +100,12 @@ impl CachyOsPackageDbParallelDownloadPrEngineV56 {
 
     pub fn resolve_optimal_repository_url(&self) -> String {
         match self.current_tier {
-            MicroarchTierLevelV56::X86_64_V4 => "https://mirror.cachyos.org/repo/x86_64_v4".to_string(),
-            MicroarchTierLevelV56::X86_64_V3 => "https://mirror.cachyos.org/repo/x86_64_v3".to_string(),
+            MicroarchTierLevelV56::X86_64_V4 => {
+                "https://mirror.cachyos.org/repo/x86_64_v4".to_string()
+            }
+            MicroarchTierLevelV56::X86_64_V3 => {
+                "https://mirror.cachyos.org/repo/x86_64_v3".to_string()
+            }
             MicroarchTierLevelV56::X86_64_V2 | MicroarchTierLevelV56::GenericX86_64 => {
                 "https://mirror.cachyos.org/repo/x86_64".to_string()
             }
@@ -420,7 +424,10 @@ impl CachyOsHandheldGamingTdpPrEngineV56 {
             return Err("TDP limit out of bounds (5W-30W)");
         }
         self.tdp_watts = watts;
-        Ok(format!("Handheld TDP set to {}W for {}", watts, self.device_name))
+        Ok(format!(
+            "Handheld TDP set to {}W for {}",
+            watts, self.device_name
+        ))
     }
 }
 
@@ -580,10 +587,14 @@ impl CachyLinuxMissingComponentsV56PrSuite {
     }
 
     pub fn execute_and_verify_all(&mut self) -> bool {
-        let repo_url = self.package_download_engine.resolve_optimal_repository_url();
+        let repo_url = self
+            .package_download_engine
+            .resolve_optimal_repository_url();
         assert!(repo_url.contains("x86_64_v4"));
 
-        let sched_info = self.sched_ext_engine.switch_scheduler(ScxSchedulerKindV56::ScxFlash);
+        let sched_info = self
+            .sched_ext_engine
+            .switch_scheduler(ScxSchedulerKindV56::ScxFlash);
         assert!(sched_info.contains("ScxFlash"));
 
         let compiler_flags = self.kernel_pgo_engine.generate_compiler_flags();
@@ -592,7 +603,9 @@ impl CachyLinuxMissingComponentsV56PrSuite {
         let hybrid_msg = self.chwd_gpu_engine.configure_hybrid_prime();
         assert!(hybrid_msg.contains("CHWD Hybrid PRIME"));
 
-        let gamemode_msg = self.gamemode_ananicy.activate_gamemode_for_process("cyberpunk2077.exe");
+        let gamemode_msg = self
+            .gamemode_ananicy
+            .activate_gamemode_for_process("cyberpunk2077.exe");
         assert!(gamemode_msg.contains("cyberpunk2077.exe"));
 
         let net_msg = self.network_bbrv3.apply_network_optimizations();
@@ -601,7 +614,9 @@ impl CachyLinuxMissingComponentsV56PrSuite {
         let proton_envs = self.proton_ntsync.render_proton_env();
         assert!(proton_envs.iter().any(|(k, _)| k == "PROTON_USE_NTSYNC"));
 
-        let snap_count = self.btrfs_snapper.take_pre_transaction_snapshot("Pacman sysupgrade");
+        let snap_count = self
+            .btrfs_snapper
+            .take_pre_transaction_snapshot("Pacman sysupgrade");
         assert!(snap_count > 8);
 
         let tdp_msg = self.handheld_tdp.set_tdp_watts(22);
@@ -614,7 +629,10 @@ impl CachyLinuxMissingComponentsV56PrSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == CachyPrStatusV56::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == CachyPrStatusV56::Merged)
+            .count()
     }
 }
 
@@ -634,11 +652,21 @@ mod tests {
 
     #[test]
     fn test_package_download_and_fallback() {
-        let mut engine = CachyOsPackageDbParallelDownloadPrEngineV56::new(MicroarchTierLevelV56::X86_64_V4);
-        assert_eq!(engine.resolve_optimal_repository_url(), "https://mirror.cachyos.org/repo/x86_64_v4");
+        let mut engine =
+            CachyOsPackageDbParallelDownloadPrEngineV56::new(MicroarchTierLevelV56::X86_64_V4);
+        assert_eq!(
+            engine.resolve_optimal_repository_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v4"
+        );
 
-        assert_eq!(engine.fallback_to_lower_tier(), MicroarchTierLevelV56::X86_64_V3);
-        assert_eq!(engine.resolve_optimal_repository_url(), "https://mirror.cachyos.org/repo/x86_64_v3");
+        assert_eq!(
+            engine.fallback_to_lower_tier(),
+            MicroarchTierLevelV56::X86_64_V3
+        );
+        assert_eq!(
+            engine.resolve_optimal_repository_url(),
+            "https://mirror.cachyos.org/repo/x86_64_v3"
+        );
     }
 
     #[test]
