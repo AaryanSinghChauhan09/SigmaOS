@@ -53,11 +53,17 @@ impl FreeBsdBectlBootEnvironmentEngine {
             space_used_bytes: 4_294_967_296, // 4GB
             creation_timestamp: 1_700_000_000,
         };
-        engine.boot_environments.insert("default".to_string(), default_be);
+        engine
+            .boot_environments
+            .insert("default".to_string(), default_be);
         engine
     }
 
-    pub fn create_be(&mut self, name: &str, source_be: Option<&str>) -> Result<ZfsBootEnvironment, String> {
+    pub fn create_be(
+        &mut self,
+        name: &str,
+        source_be: Option<&str>,
+    ) -> Result<ZfsBootEnvironment, String> {
         if self.boot_environments.contains_key(name) {
             return Err(format!("Boot environment '{}' already exists", name));
         }
@@ -77,7 +83,8 @@ impl FreeBsdBectlBootEnvironmentEngine {
             creation_timestamp: 1_710_000_000,
         };
 
-        self.boot_environments.insert(name.to_string(), new_be.clone());
+        self.boot_environments
+            .insert(name.to_string(), new_be.clone());
         Ok(new_be)
     }
 
@@ -163,28 +170,44 @@ impl FreeBsdMacFrameworkEngine {
         }
     }
 
-    pub fn check_read_permission(&self, subject: &MacSubjectLabel, object: &MacObjectLabel) -> bool {
+    pub fn check_read_permission(
+        &self,
+        subject: &MacSubjectLabel,
+        object: &MacObjectLabel,
+    ) -> bool {
         if !self.enforcement_enabled {
             return true;
         }
 
         // Biba Integrity: No Read Down (subject integrity <= object integrity)
-        if self.active_modules.contains(&MacPolicyModule::BibaIntegrity) {
+        if self
+            .active_modules
+            .contains(&MacPolicyModule::BibaIntegrity)
+        {
             if subject.biba_grade < object.biba_integrity_level {
                 return false;
             }
         }
 
         // MLS Confidentiality: No Read Up (subject clearance >= object sensitivity)
-        if self.active_modules.contains(&MacPolicyModule::MlsConfidentiality) {
+        if self
+            .active_modules
+            .contains(&MacPolicyModule::MlsConfidentiality)
+        {
             if subject.mls_clearance < object.mls_sensitivity_level {
                 return false;
             }
         }
 
         // Partition Isolation: Subjects can only access objects in same partition or partition 0
-        if self.active_modules.contains(&MacPolicyModule::PartitionIsolation) {
-            if subject.partition_id != 0 && object.partition_id != 0 && subject.partition_id != object.partition_id {
+        if self
+            .active_modules
+            .contains(&MacPolicyModule::PartitionIsolation)
+        {
+            if subject.partition_id != 0
+                && object.partition_id != 0
+                && subject.partition_id != object.partition_id
+            {
                 return false;
             }
         }
@@ -193,7 +216,9 @@ impl FreeBsdMacFrameworkEngine {
     }
 
     pub fn check_see_other_uids(&self, observer_uid: u32, target_uid: u32) -> bool {
-        if !self.enforcement_enabled || !self.active_modules.contains(&MacPolicyModule::SeeOtherUids) {
+        if !self.enforcement_enabled
+            || !self.active_modules.contains(&MacPolicyModule::SeeOtherUids)
+        {
             return true;
         }
 
@@ -254,7 +279,12 @@ impl FreeBsdGeomStorageEngine {
         engine
     }
 
-    pub fn attach_eli_encryption(&mut self, parent_provider: &str, cipher: &str, key_bits: u32) -> Result<GeomProvider, String> {
+    pub fn attach_eli_encryption(
+        &mut self,
+        parent_provider: &str,
+        cipher: &str,
+        key_bits: u32,
+    ) -> Result<GeomProvider, String> {
         if !self.providers.contains_key(parent_provider) {
             return Err(format!("Parent provider '{}' not found", parent_provider));
         }
@@ -270,12 +300,17 @@ impl FreeBsdGeomStorageEngine {
             is_encrypted: true,
         };
 
-        self.providers.insert(eli_name.clone(), eli_provider.clone());
+        self.providers
+            .insert(eli_name.clone(), eli_provider.clone());
         let _ = (cipher, key_bits);
         Ok(eli_provider)
     }
 
-    pub fn create_mirror(&mut self, mirror_name: &str, member_providers: &[&str]) -> Result<GeomProvider, String> {
+    pub fn create_mirror(
+        &mut self,
+        mirror_name: &str,
+        member_providers: &[&str],
+    ) -> Result<GeomProvider, String> {
         if member_providers.is_empty() {
             return Err("At least one member provider is required for gmirror".to_string());
         }
@@ -300,7 +335,8 @@ impl FreeBsdGeomStorageEngine {
             is_encrypted: false,
         };
 
-        self.providers.insert(format!("mirror/{}", mirror_name), mirror_provider.clone());
+        self.providers
+            .insert(format!("mirror/{}", mirror_name), mirror_provider.clone());
         Ok(mirror_provider)
     }
 }
@@ -351,7 +387,11 @@ impl FreeBsdNetgraphSubsystemEngine {
         }
     }
 
-    pub fn create_node(&mut self, name: &str, node_type: NetgraphNodeType) -> Result<NetgraphNode, String> {
+    pub fn create_node(
+        &mut self,
+        name: &str,
+        node_type: NetgraphNodeType,
+    ) -> Result<NetgraphNode, String> {
         if self.nodes.contains_key(name) {
             return Err(format!("Netgraph node '{}' already exists", name));
         }
@@ -366,7 +406,13 @@ impl FreeBsdNetgraphSubsystemEngine {
         Ok(node)
     }
 
-    pub fn connect_hooks(&mut self, node1: &str, hook1: &str, node2: &str, hook2: &str) -> Result<bool, String> {
+    pub fn connect_hooks(
+        &mut self,
+        node1: &str,
+        hook1: &str,
+        node2: &str,
+        hook2: &str,
+    ) -> Result<bool, String> {
         if !self.nodes.contains_key(node1) || !self.nodes.contains_key(node2) {
             return Err("One or both netgraph nodes do not exist".to_string());
         }
@@ -383,8 +429,16 @@ impl FreeBsdNetgraphSubsystemEngine {
             peer_hook: hook1.to_string(),
         };
 
-        self.nodes.get_mut(node1).unwrap().hooks.insert(hook1.to_string(), h1);
-        self.nodes.get_mut(node2).unwrap().hooks.insert(hook2.to_string(), h2);
+        self.nodes
+            .get_mut(node1)
+            .unwrap()
+            .hooks
+            .insert(hook1.to_string(), h1);
+        self.nodes
+            .get_mut(node2)
+            .unwrap()
+            .hooks
+            .insert(hook2.to_string(), h2);
         Ok(true)
     }
 }
@@ -422,7 +476,12 @@ impl FreeBsdPoudrierePackageBuildEngine {
         }
     }
 
-    pub fn start_bulk_build(&mut self, jail_name: &str, ports_tree: &str, packages: &[&str]) -> PoudriereBuildJob {
+    pub fn start_bulk_build(
+        &mut self,
+        jail_name: &str,
+        ports_tree: &str,
+        packages: &[&str],
+    ) -> PoudriereBuildJob {
         let job_id = format!("poudriere_job_{}", self.active_builds.len() + 1);
 
         let job = PoudriereBuildJob {
@@ -525,10 +584,18 @@ pub struct FreeBsdBsmAuditEngine {
 
 impl FreeBsdBsmAuditEngine {
     pub fn new() -> Self {
-        Self { records: Vec::new() }
+        Self {
+            records: Vec::new(),
+        }
     }
 
-    pub fn emit_audit_event(&mut self, event_type: u16, event_name: &str, uid: u32, pid: u32) -> BsmAuditRecord {
+    pub fn emit_audit_event(
+        &mut self,
+        event_type: u16,
+        event_name: &str,
+        uid: u32,
+        pid: u32,
+    ) -> BsmAuditRecord {
         let record_id = (self.records.len() + 1) as u64;
         let token_hdr = format!("header_token,len=84,ver=2,event={}", event_name);
         let token_subj = format!("subject_token,uid={},pid={}", uid, pid);
@@ -576,7 +643,9 @@ pub struct FreeBsdBhyveHypervisorEngine {
 
 impl FreeBsdBhyveHypervisorEngine {
     pub fn new() -> Self {
-        Self { vms: BTreeMap::new() }
+        Self {
+            vms: BTreeMap::new(),
+        }
     }
 
     pub fn spawn_vm(&mut self, name: &str, cpus: u32, mem_mb: u64, disk: &str) -> BhyveVmSpec {
@@ -627,11 +696,17 @@ pub struct FreeBsdCarpPfsyncEngine {
 
 impl FreeBsdCarpPfsyncEngine {
     pub fn new() -> Self {
-        Self { carp_nodes: BTreeMap::new() }
+        Self {
+            carp_nodes: BTreeMap::new(),
+        }
     }
 
     pub fn register_carp(&mut self, vhid: u8, ip: &str, advbase: u8, advskew: u8) -> CarpInterface {
-        let state = if advskew == 0 { CarpState::Master } else { CarpState::Backup };
+        let state = if advskew == 0 {
+            CarpState::Master
+        } else {
+            CarpState::Backup
+        };
 
         let carp = CarpInterface {
             vhid,
@@ -672,10 +747,18 @@ pub struct FreeBsdCtlStorageTargetEngine {
 
 impl FreeBsdCtlStorageTargetEngine {
     pub fn new() -> Self {
-        Self { luns: BTreeMap::new() }
+        Self {
+            luns: BTreeMap::new(),
+        }
     }
 
-    pub fn create_lun(&mut self, lun_id: u32, backend: &str, size: u64, target: &str) -> CtlLunSpec {
+    pub fn create_lun(
+        &mut self,
+        lun_id: u32,
+        backend: &str,
+        size: u64,
+        target: &str,
+    ) -> CtlLunSpec {
         let lun = CtlLunSpec {
             lun_id,
             backend_file: backend.to_string(),
@@ -745,15 +828,51 @@ impl SovereignFreeBsdUltimateParityPrSuite {
     fn register_all_proposals(&mut self) {
         let proposals = vec![
             (1, "FreeBSD bectl ZFS Boot Environment Engine", "Boot & VFS"),
-            (2, "FreeBSD MAC Security Policy Modules Framework", "Security & Access Control"),
-            (3, "FreeBSD GEOM Storage Provider & Eli AES-XTS Encryption", "Storage & File Systems"),
-            (4, "FreeBSD Modular Netgraph Subsystem Nodes Engine", "Networking Stack"),
-            (5, "FreeBSD Poudriere Jail Bulk Package Build Engine", "Package Management"),
-            (6, "FreeBSD Dynamic devfs Nodes & devd Hotplug Notifier", "Device Drivers & Kernel"),
-            (7, "FreeBSD BSM Audit Token Log Stream Builder", "Audit & Security"),
-            (8, "FreeBSD bhyve MicroVM Hypervisor Lifecycle Controller", "Virtualization"),
-            (9, "FreeBSD CARP & PFSYNC High Availability Protocol", "Network Protocols"),
-            (10, "FreeBSD CTL SCSI/iSCSI Storage Target Controller", "Storage Subsystems"),
+            (
+                2,
+                "FreeBSD MAC Security Policy Modules Framework",
+                "Security & Access Control",
+            ),
+            (
+                3,
+                "FreeBSD GEOM Storage Provider & Eli AES-XTS Encryption",
+                "Storage & File Systems",
+            ),
+            (
+                4,
+                "FreeBSD Modular Netgraph Subsystem Nodes Engine",
+                "Networking Stack",
+            ),
+            (
+                5,
+                "FreeBSD Poudriere Jail Bulk Package Build Engine",
+                "Package Management",
+            ),
+            (
+                6,
+                "FreeBSD Dynamic devfs Nodes & devd Hotplug Notifier",
+                "Device Drivers & Kernel",
+            ),
+            (
+                7,
+                "FreeBSD BSM Audit Token Log Stream Builder",
+                "Audit & Security",
+            ),
+            (
+                8,
+                "FreeBSD bhyve MicroVM Hypervisor Lifecycle Controller",
+                "Virtualization",
+            ),
+            (
+                9,
+                "FreeBSD CARP & PFSYNC High Availability Protocol",
+                "Network Protocols",
+            ),
+            (
+                10,
+                "FreeBSD CTL SCSI/iSCSI Storage Target Controller",
+                "Storage Subsystems",
+            ),
         ];
 
         for (id, title, sub) in proposals {
@@ -771,16 +890,30 @@ impl SovereignFreeBsdUltimateParityPrSuite {
         // Run sanity verification across all 10 engines
         let _be = self.bectl_engine.create_be("upgrade_snapshot", None);
         let _mac = self.mac_engine.check_see_other_uids(1000, 1000);
-        let _geom = self.geom_engine.attach_eli_encryption("ada0", "AES-XTS", 256);
-        let _ng = self.netgraph_engine.create_node("bridge0", NetgraphNodeType::NgBridge);
-        let _poud = self.poudriere_engine.start_bulk_build("14_1_amd64", "main", &["pkg", "curl"]);
+        let _geom = self
+            .geom_engine
+            .attach_eli_encryption("ada0", "AES-XTS", 256);
+        let _ng = self
+            .netgraph_engine
+            .create_node("bridge0", NetgraphNodeType::NgBridge);
+        let _poud = self
+            .poudriere_engine
+            .start_bulk_build("14_1_amd64", "main", &["pkg", "curl"]);
         let _dev = self.devfs_engine.trigger_hotplug("usb", "da", "da0");
         let _bsm = self.bsm_engine.emit_audit_event(1, "sys_execve", 1000, 42);
-        let _vm = self.bhyve_engine.spawn_vm("freebsd_guest", 4, 4096, "/vms/freebsd.img");
+        let _vm = self
+            .bhyve_engine
+            .spawn_vm("freebsd_guest", 4, 4096, "/vms/freebsd.img");
         let _carp = self.carp_engine.register_carp(1, "192.168.1.1", 1, 0);
-        let _ctl = self.ctl_engine.create_lun(0, "/storage/lun0.raw", 107_374_182_400, "target0");
+        let _ctl = self
+            .ctl_engine
+            .create_lun(0, "/storage/lun0.raw", 107_374_182_400, "target0");
 
-        !self.pr_proposals.is_empty() && self.pr_proposals.iter().all(|p| p.status == "APPROVED_AND_INTEGRATED")
+        !self.pr_proposals.is_empty()
+            && self
+                .pr_proposals
+                .iter()
+                .all(|p| p.status == "APPROVED_AND_INTEGRATED")
     }
 }
 
@@ -828,8 +961,12 @@ mod tests {
 
         let mut ng = FreeBsdNetgraphSubsystemEngine::new();
         let node1 = ng.create_node("sock0", NetgraphNodeType::NgSocket).unwrap();
-        let node2 = ng.create_node("bridge0", NetgraphNodeType::NgBridge).unwrap();
-        assert!(ng.connect_hooks(&node1.name, "output", &node2.name, "input").unwrap());
+        let node2 = ng
+            .create_node("bridge0", NetgraphNodeType::NgBridge)
+            .unwrap();
+        assert!(ng
+            .connect_hooks(&node1.name, "output", &node2.name, "input")
+            .unwrap());
     }
 
     #[test]
