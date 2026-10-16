@@ -1411,6 +1411,13 @@ if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_suite.rs" ]; then
     ./build/test_os_ideas_suite
 fi
 
+if [ -f "tests/test_open_source_os_unimplemented_ideas_v58_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V58 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_unimplemented_ideas_v58_pr.rs --edition=2021 -o build/test_os_ideas_v58_pr
+    ./build/test_os_ideas_v58_pr
+fi
+
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
     echo "Running Open Source OS Unimplemented Ideas PR Gateway test suite..."
     mkdir -p build
