@@ -24,12 +24,9 @@ pub enum ServiceState {
     Stopped,
     /// Starting
     Starting,
-    /// Stopping
-    Stopping,
-    /// Failed
-    Failed,
-    /// Reloading
-    Reloading,
+    // Stopping,
+    // Failed,
+    // Reloading,
 }
 impl fmt::Display for ServiceState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
