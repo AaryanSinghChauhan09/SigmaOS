@@ -10,6 +10,7 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -139,6 +140,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } else {
             limit_str.parse::<u64>().unwrap_or(0)
         }
+    }
+
+    /// Evaluate Landlock access rule (e.g. requested access mask vs allowed access mask).
+    pub fn check_landlock_access(allowed_mask: u32, requested_mask: u32) -> bool {
+        (allowed_mask & requested_mask) == requested_mask
     }
 
     /// Generate Linux Access Control & Sandboxing PR proposal.
@@ -305,7 +311,7 @@ impl AuditAndIntrusionPreventionPrEngine {
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
             pr_title: "feat(security_audit): Implement auditd Syscall Monitoring, Fail2ban Auto-Shunting, Lynis & AIDE Integrity".to_string(),
-            target_subsystem: "Kernel Audit, Intrusion Detection & Compliance".to_system(),
+            target_subsystem: "Kernel Audit, Intrusion Detection & Compliance".to_string(),
             original_distro_inspiration: "Debian / RHEL / Kali Linux / Parrot Security".to_string(),
             components_added: alloc::vec![
                 "Linux auditd kernel event dispatcher with syscall & watch rule compiler".to_string(),
@@ -418,6 +424,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD domain configuration snippet.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nldap_uri = {}\n",
+            domain, provider, provider, uri
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
