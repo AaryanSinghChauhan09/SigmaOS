@@ -1315,14 +1315,14 @@ impl AtSpoolQueueManager {
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
-pub struct CleanRoomUserlandInitPrGatewayEngine {
+pub struct UserlandInitCleanRoomPrGatewayEngine {
     pub pr_id: u32,
     pub title: String,
     pub author: String,
     pub pqc_signature: String,
 }
 
-impl CleanRoomUserlandInitPrGatewayEngine {
+impl UserlandInitCleanRoomPrGatewayEngine {
     pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
         Self {
             pr_id,
@@ -1430,6 +1430,7 @@ impl VixieCronEntry {
             && field_matches(fields[4], wday)
     }
 }
+
 
 /// Anacron Catchup Job Specification
 #[derive(Debug, Clone)]
@@ -2190,11 +2191,7 @@ mod tests {
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let gw = UserlandInitPrGatewayEngine::new(
-            4001,
-            "feat(init): Complete Init Parity",
-            "SovereignAgent",
-        );
+        let gw = UserlandInitCleanRoomPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));
