@@ -141,6 +141,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+    /// Check Landlock v5 access rights bitmask match.
+    pub fn check_landlock_access(handled_access: u32, requested_access: u32) -> bool {
+        (handled_access & requested_access) == requested_access
+    }
+
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -305,7 +310,7 @@ impl AuditAndIntrusionPreventionPrEngine {
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
             pr_title: "feat(security_audit): Implement auditd Syscall Monitoring, Fail2ban Auto-Shunting, Lynis & AIDE Integrity".to_string(),
-            target_subsystem: "Kernel Audit, Intrusion Detection & Compliance".to_system(),
+            target_subsystem: "Kernel Audit, Intrusion Detection & Compliance".to_string(),
             original_distro_inspiration: "Debian / RHEL / Kali Linux / Parrot Security".to_string(),
             components_added: alloc::vec![
                 "Linux auditd kernel event dispatcher with syscall & watch rule compiler".to_string(),
@@ -420,6 +425,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
     }
 
+    /// Generate SSSD domain configuration string.
+    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
+            domain_name, provider, uri
+        )
+    }
+
     /// Generate Identity & Enterprise Authentication PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -435,17 +448,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
             security_level: "Enterprise Active Directory / FreeIPA Interoperable".to_string(),
             status: "Ready for Merge".to_string(),
         }
-    }
-}
-
-/// Helper trait for converting str to String in no_std helper.
-trait ToSystem {
-    fn to_system(&self) -> String;
-}
-
-impl ToSystem for str {
-    fn to_system(&self) -> String {
-        self.to_string()
     }
 }
 

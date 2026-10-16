@@ -35,6 +35,8 @@
 
 <!-- Required for design-changing kernel PRs -->
 
+- Upstream study:
+- What SigmaOS adopts:
 - Study document:
 - Linux/BSD/Redox/xv6 reference:
 - Decision: Adopt / Adapt / Reject
@@ -50,6 +52,11 @@
 - [ ] Capability/status update
 - [ ] Regression protection
 - [ ] Security review, if applicable
+
+## Shell component
+
+- [ ] POSIX compliance
+- [ ] Builtin commands
 
 ## Kernel safety review
 
@@ -83,7 +90,14 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks and rollback
+## Shell safety review
+
+- [ ] Quoting integrity
+- [ ] Redirection safety
+
+## Safety and rollback
 
 - Risk:
 - Rollback:
+
+## Reviewer checklist
