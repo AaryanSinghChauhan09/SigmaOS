@@ -248,7 +248,12 @@ impl OffsetPageTableManager {
     }
 
     /// Map a virtual page to a physical frame with specified flags
-    pub fn map_page(&mut self, page: Page, frame: PhysFrame, flags: u64) -> Result<(), &'static str> {
+    pub fn map_page(
+        &mut self,
+        page: Page,
+        frame: PhysFrame,
+        flags: u64,
+    ) -> Result<(), &'static str> {
         if (flags & PageTableFlags::PRESENT) == 0 {
             return Err("Flags must include PRESENT");
         }
@@ -574,10 +579,7 @@ impl LinkedListHeapAllocator {
 
     /// Free allocated block back to hole list
     pub fn deallocate(&mut self, ptr: usize, size: usize) {
-        self.holes.push(HeapHole {
-            address: ptr,
-            size,
-        });
+        self.holes.push(HeapHole { address: ptr, size });
         self.allocated_bytes = self.allocated_bytes.saturating_sub(size);
         // Merge adjacent holes
         self.holes.sort_by_key(|h| h.address);
@@ -649,9 +651,22 @@ impl Pic8259Manager {
 /// ACPI MADT Interrupt Controller Type
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AcpiMadtEntry {
-    LocalApic { processor_id: u8, apic_id: u8, flags: u32 },
-    IoApic { io_apic_id: u8, address: u32, global_system_interrupt_base: u32 },
-    InterruptSourceOverride { bus: u8, irq: u8, gsi: u32, flags: u16 },
+    LocalApic {
+        processor_id: u8,
+        apic_id: u8,
+        flags: u32,
+    },
+    IoApic {
+        io_apic_id: u8,
+        address: u32,
+        global_system_interrupt_base: u32,
+    },
+    InterruptSourceOverride {
+        bus: u8,
+        irq: u8,
+        gsi: u32,
+        flags: u16,
+    },
 }
 
 /// ACPI Parser & Table Manager
@@ -741,7 +756,9 @@ pub struct RustOsdevPrProposalGateway {
 
 impl RustOsdevPrProposalGateway {
     pub fn new() -> Self {
-        let mut gateway = Self { proposals: Vec::new() };
+        let mut gateway = Self {
+            proposals: Vec::new(),
+        };
         gateway.stage_all_proposals();
         gateway
     }
@@ -749,7 +766,8 @@ impl RustOsdevPrProposalGateway {
     fn stage_all_proposals(&mut self) {
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5101,
-            title: "feat(arch_x86_64): Integrate bootloader crate BootInfo & MemoryMap handoff".to_string(),
+            title: "feat(arch_x86_64): Integrate bootloader crate BootInfo & MemoryMap handoff"
+                .to_string(),
             target_subsystem: "Kernel Boot & Handoff".to_string(),
             rust_osdev_crate_inspiration: "bootloader".to_string(),
             components_added: vec![
@@ -762,7 +780,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5102,
-            title: "feat(arch_x86_64): Implement x86_64 crate OffsetPageTable, GDT, IDT & CR registers".to_string(),
+            title:
+                "feat(arch_x86_64): Implement x86_64 crate OffsetPageTable, GDT, IDT & CR registers"
+                    .to_string(),
             target_subsystem: "Architecture Core & Paging".to_string(),
             rust_osdev_crate_inspiration: "x86_64".to_string(),
             components_added: vec![
@@ -776,7 +796,8 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5103,
-            title: "feat(arch_x86_64): Safe MMIO VolatileCell & 16550 UART Serial Driver".to_string(),
+            title: "feat(arch_x86_64): Safe MMIO VolatileCell & 16550 UART Serial Driver"
+                .to_string(),
             target_subsystem: "Drivers & Hardware Abstraction".to_string(),
             rust_osdev_crate_inspiration: "volatile / uart_16550".to_string(),
             components_added: vec![
@@ -789,7 +810,8 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5104,
-            title: "feat(arch_x86_64): LinkedListHeapAllocator & Pic8259 Interrupt Remapper".to_string(),
+            title: "feat(arch_x86_64): LinkedListHeapAllocator & Pic8259 Interrupt Remapper"
+                .to_string(),
             target_subsystem: "Memory Allocation & PIC Remapping".to_string(),
             rust_osdev_crate_inspiration: "linked_list_allocator / pic8259".to_string(),
             components_added: vec![
@@ -802,7 +824,8 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5105,
-            title: "feat(arch_x86_64): ACPI MADT Parser & UEFI ExitBootServices Handoff Engine".to_string(),
+            title: "feat(arch_x86_64): ACPI MADT Parser & UEFI ExitBootServices Handoff Engine"
+                .to_string(),
             target_subsystem: "Firmware & Platform Discovery".to_string(),
             rust_osdev_crate_inspiration: "acpi / uefi-rs".to_string(),
             components_added: vec![
@@ -848,7 +871,13 @@ mod tests {
         let mut pt = OffsetPageTableManager::new(0x0000_8000_0000_0000, 0x0050_0000);
         let page = Page::containing_address(0x0010_0000);
         let frame = PhysFrame::containing_address(0x0010_0000);
-        assert!(pt.map_page(page, frame, PageTableFlags::PRESENT | PageTableFlags::WRITABLE).is_ok());
+        assert!(pt
+            .map_page(
+                page,
+                frame,
+                PageTableFlags::PRESENT | PageTableFlags::WRITABLE
+            )
+            .is_ok());
 
         let translated = pt.translate_address(0x0000_8000_0010_0000);
         assert_eq!(translated, Some(0x0010_0000));
@@ -923,7 +952,9 @@ mod tests {
         assert_eq!(gateway.proposals.len(), 5);
         assert!(gateway.evaluate_ci_gate());
 
-        let diff = gateway.generate_unified_diff(5101).expect("Diff should be generated");
+        let diff = gateway
+            .generate_unified_diff(5101)
+            .expect("Diff should be generated");
         assert!(diff.contains("PR #5101"));
     }
 }

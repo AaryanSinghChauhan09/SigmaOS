@@ -1751,10 +1751,7 @@ impl CoreUtilsPullRequestGatewayEngine {
         self.submissions.values().cloned().collect()
     }
 
-    pub fn get_prs_by_category(
-        &self,
-        category: CoreUtilsPrCategory,
-    ) -> Vec<CoreUtilsPrSubmission> {
+    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
         self.submissions
             .values()
             .filter(|pr| pr.category == category)
