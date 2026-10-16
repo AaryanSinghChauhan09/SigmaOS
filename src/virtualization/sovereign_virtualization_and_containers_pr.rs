@@ -183,6 +183,8 @@ pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
     pub storage_pool_path: String,
     pub virtual_bridges: Vec<String>,
+    pub storage_volumes: Vec<LibvirtStorageVolume>,
+    pub nwfilter_rules: Vec<LibvirtNwFilterRule>,
 }
 
 impl LibvirtDomainEngine {
@@ -194,6 +196,8 @@ impl LibvirtDomainEngine {
             domains: Vec::new(),
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
             virtual_bridges: bridges,
+            storage_volumes: Vec::new(),
+            nwfilter_rules: Vec::new(),
         }
     }
 
@@ -262,9 +266,21 @@ impl LibvirtDomainEngine {
             HypervisorType::Xen => "xen",
             HypervisorType::OpenBsdVmm => "vmm",
         };
+        let mut nwfilter_xml = String::new();
+        for rule in &self.nwfilter_rules {
+            nwfilter_xml.push_str(&format!(
+                "      <filterref filter='{}'>\n        <parameter name='ACTION' value='{}'/>\n        <parameter name='DIRECTION' value='{}'/>\n        <parameter name='PROTOCOL' value='{}'/>\n      </filterref>\n",
+                rule.name, rule.action, rule.direction, rule.protocol
+            ));
+        }
+        let nwfilter_block = if nwfilter_xml.is_empty() {
+            String::new()
+        } else {
+            format!("\n{}", nwfilter_xml)
+        };
         Some(format!(
-            "<domain type='{}'>\n  <name>{}</name>\n  <memory unit='KiB'>{}</memory>\n  <vcpu>{}</vcpu>\n  <devices>\n    <disk type='file'><source file='{}'/></disk>\n    <interface type='bridge'><source bridge='{}'/></interface>\n  </devices>\n</domain>",
-            hyp_str, dom.domain_name, dom.memory_ki_b, dom.vcpu_count, dom.disk_path, dom.bridge_interface
+            "<domain type='{}'>\n  <name>{}</name>\n  <memory unit='KiB'>{}</memory>\n  <vcpu>{}</vcpu>\n  <devices>\n    <disk type='file'><source file='{}'/></disk>\n    <interface type='bridge'><source bridge='{}'/>{}    </interface>\n  </devices>\n</domain>",
+            hyp_str, dom.domain_name, dom.memory_ki_b, dom.vcpu_count, dom.disk_path, dom.bridge_interface, nwfilter_block
         ))
     }
 }
@@ -1375,10 +1391,18 @@ mod tests {
     fn test_libvirt_engine() {
         let mut engine = LibvirtDomainEngine::new();
         engine.define_domain("test-vm", HypervisorType::QemuKvm, 4096, 2);
+        engine.create_storage_volume("vol1", "default", 100 * 1024 * 1024 * 1024, "qcow2");
+        engine.add_nat_bridge("virbr2");
+        engine.add_nwfilter_rule("clean-traffic", "accept", "inout", "ip");
         assert!(engine.start_domain("test-vm"));
+        assert_eq!(engine.storage_volumes.len(), 1);
+        assert_eq!(engine.nwfilter_rules.len(), 1);
+        assert!(engine.virtual_bridges.contains(&"virbr2".to_string()));
         let xml = engine.generate_domain_xml("test-vm");
         assert!(xml.is_some());
-        assert!(xml.unwrap().contains("test-vm"));
+        let xml_str = xml.unwrap();
+        assert!(xml_str.contains("test-vm"));
+        assert!(xml_str.contains("filterref filter='clean-traffic'"));
     }
 
     #[test]
