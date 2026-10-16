@@ -1,13 +1,13 @@
 ## Summary
 
-<!-- What secondary-memory behavior changed and why? -->
+<!-- What file-management behavior changed and why? -->
 
-## Storage component
+## File component
 
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
 - [ ] Mount / unmount
 - [ ] Cache
 - [ ] Filesystem
@@ -23,14 +23,14 @@
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly storage audit
+- [ ] Biweekly memory audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
 ## Upstream study
 
-<!-- Required for lifecycle, ABI, or storage changes -->
+<!-- Required for lifecycle, ABI, or file changes -->
 
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
@@ -49,7 +49,7 @@
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## Storage safety review
+## File safety review
 
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
@@ -58,7 +58,7 @@
 - [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
 - [ ] Signal races considered
-- [ ] Double-completion prevented
+- [ ] Double-unlink prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
@@ -71,15 +71,15 @@
 - [ ] New/updated unit tests
 - [ ] Integration tests
 - [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Storage documentation
+- [ ] File documentation
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback
