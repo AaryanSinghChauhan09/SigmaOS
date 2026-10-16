@@ -21,9 +21,9 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@babb50d85ef4172775f0a0614138e6e8e815617a # v3.28.10
+        uses: github/codeql-action/init@v3
         with:
           languages: 'rust'
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@babb50d85ef4172775f0a0614138e6e8e815617a # v3.28.10
+        uses: github/codeql-action/analyze@v3

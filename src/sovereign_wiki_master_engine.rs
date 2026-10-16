@@ -961,6 +961,8 @@ impl Default for SovereignWikiMasterEngine {
     }
 }
 
+#[derive(Debug)]
+#[allow(dead_code)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub master_engine: SovereignWikiMasterEngine,
 }
