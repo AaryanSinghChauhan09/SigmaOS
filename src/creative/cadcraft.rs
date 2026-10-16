@@ -383,7 +383,9 @@ impl CadCraftEngine {
                 out.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n");
             }
             ExportFormat::STEP => {
-                out.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
+                out.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
             }
             _ => {
                 out.extend_from_slice(b"# CadCraft Export\n");
@@ -973,7 +975,10 @@ mod tests {
             alloc::vec![[10.0, 0.0], [10.0, 10.0]],
         );
         let c1 = engine.add_geometric_constraint(
-            GeometricConstraintType::Perpendicular { line1_idx: 0, line2_idx: 1 },
+            GeometricConstraintType::Perpendicular {
+                line1_idx: 0,
+                line2_idx: 1,
+            },
             alloc::vec![e1, e2],
             90.0,
         );
