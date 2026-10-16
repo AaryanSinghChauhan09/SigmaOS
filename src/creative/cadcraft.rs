@@ -270,7 +270,11 @@ impl CadCraftEngine {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, points: Vec<[f32; 2]>) -> u32 {
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity {
             id,
@@ -507,6 +511,7 @@ impl BRepSolidModel {
 }
 
 /// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
+#[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
@@ -561,6 +566,7 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
 // ============================================================================
 
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
+#[derive(Debug, Clone)]
 pub struct CadCraftAssemblyFemSimulationPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
@@ -666,7 +672,10 @@ mod tests {
             alloc::vec![[10.0, 0.0], [10.0, 10.0]],
         );
         let c1 = engine.add_geometric_constraint(
-            GeometricConstraintType::Perpendicular { line1_idx: 0, line2_idx: 1 },
+            GeometricConstraintType::Perpendicular {
+                line1_idx: 0,
+                line2_idx: 1,
+            },
             alloc::vec![e1, e2],
             90.0,
         );

@@ -123,7 +123,8 @@ impl FreeBsd15CapsicumCasperNvmeOfV60PrEngine {
     pub fn new() -> Self {
         Self {
             casper_service_name: "casper.system.nvme_of_v60".to_string(),
-            nvme_of_target_uri: "nvme://192.168.1.100:4420/nqn.2026-10.io.sigma:subsys1".to_string(),
+            nvme_of_target_uri: "nvme://192.168.1.100:4420/nqn.2026-10.io.sigma:subsys1"
+                .to_string(),
             tls13_offload_active: true,
             capability_rights: 0x00FF_FFFF_0000_0000,
         }
@@ -167,7 +168,8 @@ impl OpenBsdPinsyscallUnveilShadowV60PrEngine {
     }
 
     pub fn unveil_path(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
     }
 
     pub fn verify_syscall(&self, sys_num: u32) -> bool {
@@ -531,9 +533,21 @@ impl DebianLintianStaticAnalysisV60PrEngine {
         let mut engine = Self {
             check_tags: Vec::new(),
         };
-        engine.register_tag("no-copyright-file", "error", "Package lacks debian/copyright");
-        engine.register_tag("hardening-no-relro", "warning", "Binary missing RELRO hardening");
-        engine.register_tag("hardening-no-fortify", "warning", "Binary missing FORTIFY_SOURCE");
+        engine.register_tag(
+            "no-copyright-file",
+            "error",
+            "Package lacks debian/copyright",
+        );
+        engine.register_tag(
+            "hardening-no-relro",
+            "warning",
+            "Binary missing RELRO hardening",
+        );
+        engine.register_tag(
+            "hardening-no-fortify",
+            "warning",
+            "Binary missing FORTIFY_SOURCE",
+        );
         engine
     }
 
@@ -647,7 +661,10 @@ impl DebianPopconTelemetryAnalyzerV60PrEngine {
     }
 
     pub fn record_execution(&mut self, binary_path: &str) {
-        *self.tracked_executables.entry(binary_path.to_string()).or_insert(0) += 1;
+        *self
+            .tracked_executables
+            .entry(binary_path.to_string())
+            .or_insert(0) += 1;
     }
 }
 
@@ -816,7 +833,9 @@ impl OpenSourceOsDebianUnimplementedIdeasV60PrSuite {
         let processed = self.dpkg_triggers.process_deferred_triggers();
         assert_eq!(processed, 1);
 
-        assert!(self.apt_pqc_keyring.verify_inrelease_pqc("SIGMA-PQC-DILITHIUM5-2026-PRIMARY"));
+        assert!(self
+            .apt_pqc_keyring
+            .verify_inrelease_pqc("SIGMA-PQC-DILITHIUM5-2026-PRIMARY"));
 
         assert_eq!(
             self.debconf_db.get_value("sigma-desktop/theme").unwrap(),
@@ -832,15 +851,23 @@ impl OpenSourceOsDebianUnimplementedIdeasV60PrSuite {
         assert!(self.debsums_auditor.audit_installed_package("sigma-base"));
 
         self.popcon_telemetry.record_execution("/usr/bin/rustc");
-        assert!(self.popcon_telemetry.tracked_executables.contains_key("/usr/bin/rustc"));
+        assert!(self
+            .popcon_telemetry
+            .tracked_executables
+            .contains_key("/usr/bin/rustc"));
 
-        assert!(self.piuparts_sanity.run_install_upgrade_purge_test("sigma-core.deb"));
+        assert!(self
+            .piuparts_sanity
+            .run_install_upgrade_purge_test("sigma-core.deb"));
 
         true
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == OsPrStatusV60::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == OsPrStatusV60::Merged)
+            .count()
     }
 }
 

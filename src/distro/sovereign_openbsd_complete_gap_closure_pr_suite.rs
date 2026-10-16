@@ -70,7 +70,7 @@ pub struct OpenBsdSlicePartition {
     pub slice_letter: char, // 'a'..'p'
     pub size_sectors: u64,
     pub offset_sectors: u64,
-    pub fstype: String,     // "4.2BSD", "swap", "RAID", "unused"
+    pub fstype: String, // "4.2BSD", "swap", "RAID", "unused"
     pub mount_point: Option<String>,
 }
 
@@ -122,8 +122,19 @@ impl OpenBsdDisklabelDuidPartitionEngine {
         }
     }
 
-    pub fn add_slice(&mut self, letter: char, size: u64, fstype: &str, mount: Option<&str>) -> String {
-        let offset = self.partitions.values().map(|p| p.offset_sectors + p.size_sectors).max().unwrap_or(64);
+    pub fn add_slice(
+        &mut self,
+        letter: char,
+        size: u64,
+        fstype: &str,
+        mount: Option<&str>,
+    ) -> String {
+        let offset = self
+            .partitions
+            .values()
+            .map(|p| p.offset_sectors + p.size_sectors)
+            .max()
+            .unwrap_or(64);
         let slice = OpenBsdSlicePartition {
             slice_letter: letter,
             size_sectors: size,
@@ -178,14 +189,18 @@ pub struct OpenBsdSysupgradeReleaseEngine {
 impl OpenBsdSysupgradeReleaseEngine {
     pub fn new(target_release: &str) -> Self {
         let mut sets = BTreeMap::new();
-        for set_name in &["bsd", "base", "comp", "man", "game", "xbase", "xfont", "xserv", "xshare"] {
+        for set_name in &[
+            "bsd", "base", "comp", "man", "game", "xbase", "xfont", "xserv", "xshare",
+        ] {
             let file_name = format!("{}{}.tgz", set_name, target_release.replace('.', ""));
             sets.insert(
                 file_name.clone(),
                 OpenBsdReleaseSet {
                     name: file_name,
-                    sha256_hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
-                    signify_signature: "untrusted comment: verify with openbsd-76-base.pub".to_string(),
+                    sha256_hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                        .to_string(),
+                    signify_signature: "untrusted comment: verify with openbsd-76-base.pub"
+                        .to_string(),
                     installed: false,
                 },
             );
@@ -240,15 +255,18 @@ impl OpenBsdSyssigtrampPinsyscallEngine {
         pinned.insert(4, (0x7FFF00002100, 0x7FFF00002200));
         pinned.insert(5, (0x7FFF00002200, 0x7FFF00002300));
         Self {
-            sigtramp_sites: vec![
-                SigtrampCallsite { trampoline_addr: 0x7FFF00000100, valid: true },
-            ],
+            sigtramp_sites: vec![SigtrampCallsite {
+                trampoline_addr: 0x7FFF00000100,
+                valid: true,
+            }],
             pinned_syscalls: pinned,
         }
     }
 
     pub fn validate_syssigtramp(&self, addr: u64) -> bool {
-        self.sigtramp_sites.iter().any(|s| s.valid && s.trampoline_addr == addr)
+        self.sigtramp_sites
+            .iter()
+            .any(|s| s.valid && s.trampoline_addr == addr)
     }
 
     pub fn validate_pinsyscall(&self, syscall_id: u32, callsite: u64) -> bool {
@@ -284,10 +302,10 @@ pub enum KeventFilter {
 pub struct OpenBsdKevent {
     pub ident: u64,
     pub filter: KeventFilter,
-    pub flags: u16,   // EV_ADD, EV_DELETE, EV_ENABLE, EV_DISABLE
-    pub fflags: u32,  // Filter-specific flags
-    pub data: i64,    // Filter-specific data
-    pub udata: u64,   // User opaque data
+    pub flags: u16,  // EV_ADD, EV_DELETE, EV_ENABLE, EV_DISABLE
+    pub fflags: u32, // Filter-specific flags
+    pub data: i64,   // Filter-specific data
+    pub udata: u64,  // User opaque data
 }
 
 #[derive(Debug, Clone)]
@@ -344,14 +362,12 @@ pub struct OpenBsdDrmKmsPledgeUnveilEngine {
 impl OpenBsdDrmKmsPledgeUnveilEngine {
     pub fn new() -> Self {
         Self {
-            connectors: vec![
-                OpenBsdDrmConnector {
-                    connector_id: 1,
-                    name: "HDMI-A-1".to_string(),
-                    connected: true,
-                    current_mode: "1920x1080@60".to_string(),
-                },
-            ],
+            connectors: vec![OpenBsdDrmConnector {
+                connector_id: 1,
+                name: "HDMI-A-1".to_string(),
+                connected: true,
+                current_mode: "1920x1080@60".to_string(),
+            }],
             pledge_drm_restricted: true,
             unveil_dev_drm_active: true,
         }
@@ -474,7 +490,7 @@ pub struct OpenBsdSoftraidRaidArray {
     pub array_id: String,
     pub raid_level: String, // "CRYPTO", "RAID0", "RAID1", "RAID5"
     pub chunk_devs: Vec<String>,
-    pub status: String,     // "ONLINE", "DEGRADED", "REBUILDING"
+    pub status: String, // "ONLINE", "DEGRADED", "REBUILDING"
 }
 
 #[derive(Debug, Clone)]
@@ -490,7 +506,11 @@ impl OpenBsdBioctlSoftraidRaid5Engine {
             OpenBsdSoftraidRaidArray {
                 array_id: "sd1".to_string(),
                 raid_level: "RAID5".to_string(),
-                chunk_devs: vec!["/dev/sd0a".to_string(), "/dev/sd2a".to_string(), "/dev/sd3a".to_string()],
+                chunk_devs: vec![
+                    "/dev/sd0a".to_string(),
+                    "/dev/sd2a".to_string(),
+                    "/dev/sd3a".to_string(),
+                ],
                 status: "ONLINE".to_string(),
             },
         );
@@ -651,7 +671,9 @@ impl SovereignOpenBsdCompleteGapClosurePrGateway {
 
     pub fn execute_openbsd_complete_gap_closure_verification(&mut self) -> bool {
         // 1. Disklabel & DUID
-        let disk_diff = self.disklabel.add_slice('d', 20_000_000, "4.2BSD", Some("/home"));
+        let disk_diff = self
+            .disklabel
+            .add_slice('d', 20_000_000, "4.2BSD", Some("/home"));
         let pr1 = self.submit_gap_pr_proposal(
             "Add disklabel slice 'd' for /home partition",
             "jules",
@@ -684,7 +706,9 @@ impl SovereignOpenBsdCompleteGapClosurePrGateway {
         self.verify_and_merge_pr(pr3);
 
         // 4. Softraid RAID5
-        let (cmd, raid_diff) = self.softraid5.create_raid5_array("sd2", &["/dev/sd0a", "/dev/sd3a", "/dev/sd4a"]);
+        let (cmd, raid_diff) = self
+            .softraid5
+            .create_raid5_array("sd2", &["/dev/sd0a", "/dev/sd3a", "/dev/sd4a"]);
         let pr4 = self.submit_gap_pr_proposal(
             "Configure bioctl softraid RAID5 volume on sd2",
             "jules",
@@ -695,7 +719,9 @@ impl SovereignOpenBsdCompleteGapClosurePrGateway {
         self.verify_and_merge_pr(pr4);
 
         // 5. PF ALTQ HFSC
-        let pf_diff = self.pf_altq.add_hfsc_queue("voip_out", "em0", 50_000_000, 10_000_000);
+        let pf_diff = self
+            .pf_altq
+            .add_hfsc_queue("voip_out", "em0", 50_000_000, 10_000_000);
         let pr5 = self.submit_gap_pr_proposal(
             "Add PF ALTQ HFSC queue for high-priority traffic",
             "jules",
@@ -705,7 +731,9 @@ impl SovereignOpenBsdCompleteGapClosurePrGateway {
         );
         self.verify_and_merge_pr(pr5);
 
-        self.proposals.values().all(|p| p.status == OpenBsdGapPrStatus::Merged)
+        self.proposals
+            .values()
+            .all(|p| p.status == OpenBsdGapPrStatus::Merged)
     }
 }
 
@@ -728,7 +756,10 @@ mod tests {
         let mut disk = OpenBsdDisklabelDuidPartitionEngine::new("deadbeef12345678", 50_000_000);
         let diff = disk.add_slice('e', 5_000_000, "4.2BSD", Some("/var"));
         assert!(diff.contains("deadbeef12345678.e /var"));
-        assert!(disk.generate_duid_fstab_entry('e').unwrap().contains("/var"));
+        assert!(disk
+            .generate_duid_fstab_entry('e')
+            .unwrap()
+            .contains("/var"));
 
         let mut sysupgrade = OpenBsdSysupgradeReleaseEngine::new("7.6");
         let up_res = sysupgrade.apply_sysupgrade();
