@@ -233,7 +233,11 @@ impl OmarchyHerdrAiAgentRoutingPrEngineV59 {
     pub fn route_prompt(&self, prompt: &str) -> String {
         format!(
             "HerdrAgentRouting: Routed prompt '{}...' through active router '{}' across {} agents",
-            if prompt.len() > 15 { &prompt[..15] } else { prompt },
+            if prompt.len() > 15 {
+                &prompt[..15]
+            } else {
+                prompt
+            },
             self.active_router,
             self.registered_agents.len()
         )
