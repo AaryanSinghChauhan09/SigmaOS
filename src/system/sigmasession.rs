@@ -89,7 +89,12 @@ pub struct UserSession {
 
 impl UserSession {
     /// Create a new user session
-    pub fn new(session_id: String, user_id: String, username: String, session_type: SessionType) -> Self {
+    pub fn new(
+        session_id: String,
+        user_id: String,
+        username: String,
+        session_type: SessionType,
+    ) -> Self {
         Self {
             session_id,
             user_id,
@@ -174,7 +179,7 @@ impl SigmaSession {
         if self.sessions.contains_key(&session.session_id) {
             return Err(format!("Session '{}' already exists", session.session_id));
         }
-        
+
         self.sessions.insert(session.session_id.clone(), session);
         self.session_counter += 1;
         Ok(())
@@ -233,21 +238,24 @@ impl SigmaSession {
 
     /// List sessions by user
     pub fn list_by_user(&self, user_id: &str) -> Vec<&UserSession> {
-        self.sessions.values()
+        self.sessions
+            .values()
             .filter(|s| s.user_id == user_id)
             .collect()
     }
 
     /// List active sessions
     pub fn list_active(&self) -> Vec<&UserSession> {
-        self.sessions.values()
+        self.sessions
+            .values()
             .filter(|s| s.state == SessionState::Active)
             .collect()
     }
 
     /// List sessions by type
     pub fn list_by_type(&self, session_type: SessionType) -> Vec<&UserSession> {
-        self.sessions.values()
+        self.sessions
+            .values()
             .filter(|s| s.session_type == session_type)
             .collect()
     }
@@ -260,8 +268,14 @@ impl SigmaSession {
     /// Get session statistics
     pub fn session_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_sessions".to_string(), self.session_count().to_string());
-        stats.insert("active_sessions".to_string(), self.list_active().len().to_string());
+        stats.insert(
+            "total_sessions".to_string(),
+            self.session_count().to_string(),
+        );
+        stats.insert(
+            "active_sessions".to_string(),
+            self.list_active().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -319,7 +333,7 @@ mod tests {
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         )
         .with_state(SessionState::Active)
         .with_display(":0".to_string())
@@ -343,14 +357,14 @@ mod tests {
     #[test]
     fn test_sigmasession_add_session() {
         let mut session_mgr = SigmaSession::new();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         );
-        
+
         assert!(session_mgr.add_session(session).is_ok());
         assert_eq!(session_mgr.session_count(), 1);
     }
@@ -358,18 +372,18 @@ mod tests {
     #[test]
     fn test_sigmasession_activate_session() {
         let mut session_mgr = SigmaSession::new();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         )
         .with_state(SessionState::Online);
-        
+
         session_mgr.add_session(session).unwrap();
         assert!(session_mgr.activate_session("session1").is_ok());
-        
+
         let session = session_mgr.get_session("session1").unwrap();
         assert_eq!(session.state, SessionState::Active);
     }
@@ -377,17 +391,17 @@ mod tests {
     #[test]
     fn test_sigmasession_close_session() {
         let mut session_mgr = SigmaSession::new();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         );
-        
+
         session_mgr.add_session(session).unwrap();
         assert!(session_mgr.close_session("session1").is_ok());
-        
+
         let session = session_mgr.get_session("session1").unwrap();
         assert_eq!(session.state, SessionState::Closing);
     }
@@ -395,16 +409,16 @@ mod tests {
     #[test]
     fn test_sigmasession_list_by_user() {
         let mut session_mgr = SigmaSession::new();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         );
-        
+
         session_mgr.add_session(session).unwrap();
-        
+
         let sessions = session_mgr.list_by_user("1000");
         assert_eq!(sessions.len(), 1);
     }
@@ -412,16 +426,16 @@ mod tests {
     #[test]
     fn test_sigmasession_list_by_type() {
         let mut session_mgr = SigmaSession::new();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         );
-        
+
         session_mgr.add_session(session).unwrap();
-        
+
         let sessions = session_mgr.list_by_type(SessionType::X11);
         assert_eq!(sessions.len(), 1);
     }
@@ -429,17 +443,17 @@ mod tests {
     #[test]
     fn test_sigmasession_stats() {
         let mut session_mgr = SigmaSession::new();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         )
         .with_state(SessionState::Active);
-        
+
         session_mgr.add_session(session).unwrap();
-        
+
         let stats = session_mgr.session_stats();
         assert_eq!(stats.get("total_sessions"), Some(&"1".to_string()));
         assert_eq!(stats.get("active_sessions"), Some(&"1".to_string()));
@@ -448,14 +462,14 @@ mod tests {
     #[test]
     fn test_add_user_session_convenience() {
         init_sigmasession();
-        
+
         let session = UserSession::new(
             "session1".to_string(),
             "1000".to_string(),
             "user".to_string(),
-            SessionType::X11
+            SessionType::X11,
         );
-        
+
         let result = add_user_session(session);
         assert!(result.is_ok());
     }

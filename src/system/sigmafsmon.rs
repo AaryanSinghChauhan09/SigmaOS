@@ -165,7 +165,9 @@ impl FSMetrics {
     fn update_latency(&mut self, latency_us: u32) {
         let total_ops = self.read_ops + self.write_ops;
         if total_ops > 0 {
-            self.average_latency_us = (((self.average_latency_us as u64 * (total_ops - 1)) + latency_us as u64) / total_ops) as u32;
+            self.average_latency_us = (((self.average_latency_us as u64 * (total_ops - 1))
+                + latency_us as u64)
+                / total_ops) as u32;
         }
     }
 }
@@ -366,16 +368,12 @@ pub fn init_sigmafsmon() {
 
 /// Get global SigmaFSMon reference
 pub fn get_sigmafsmon() -> Option<&'static SigmaFSMon> {
-    unsafe {
-        SIGMA_FSMON_INSTANCE.as_ref()
-    }
+    unsafe { SIGMA_FSMON_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaFSMon reference
 pub fn get_sigmafsmon_mut() -> Option<&'static mut SigmaFSMon> {
-    unsafe {
-        SIGMA_FSMON_INSTANCE.as_mut()
-    }
+    unsafe { SIGMA_FSMON_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a filesystem watch
@@ -398,12 +396,7 @@ mod tests {
 
     #[test]
     fn test_fs_watch_creation() {
-        let watch = FSWatch::new(
-            "w1".to_string(),
-            "/etc".to_string(),
-            true,
-            0xFF,
-        );
+        let watch = FSWatch::new("w1".to_string(), "/etc".to_string(), true, 0xFF);
         assert_eq!(watch.watch_id, "w1");
         assert_eq!(watch.path, "/etc");
         assert!(watch.recursive);
@@ -438,8 +431,22 @@ mod tests {
         mon.add_watch(watch);
         assert_eq!(mon.watch_count(), 1);
 
-        let ev1 = FSEvent::new(1, "/var/log/syslog".to_string(), FSEventType::Modify, 100, 42, false);
-        let ev2 = FSEvent::new(2, "/var/log/auth.log".to_string(), FSEventType::Create, 101, 42, false);
+        let ev1 = FSEvent::new(
+            1,
+            "/var/log/syslog".to_string(),
+            FSEventType::Modify,
+            100,
+            42,
+            false,
+        );
+        let ev2 = FSEvent::new(
+            2,
+            "/var/log/auth.log".to_string(),
+            FSEventType::Create,
+            101,
+            42,
+            false,
+        );
         mon.record_event(ev1);
         mon.record_event(ev2);
         assert_eq!(mon.event_count(), 2);

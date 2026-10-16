@@ -88,10 +88,8 @@ impl VxlanHeader {
     pub fn to_bytes(&self) -> [u8; 8] {
         let vnid_be = self.vnid.to_be_bytes(); // [0, b0, b1, b2]
         [
-            self.flags,
-            0, 0, 0,          // reserved
-            vnid_be[1], vnid_be[2], vnid_be[3],
-            0,                // reserved
+            self.flags, 0, 0, 0, // reserved
+            vnid_be[1], vnid_be[2], vnid_be[3], 0, // reserved
         ]
     }
 
@@ -101,7 +99,10 @@ impl VxlanHeader {
             return Err(VxlanError::InvalidFlag);
         }
         let vnid = u32::from_be_bytes([0, raw[4], raw[5], raw[6]]);
-        Ok(VxlanHeader { flags: raw[0], vnid })
+        Ok(VxlanHeader {
+            flags: raw[0],
+            vnid,
+        })
     }
 }
 
@@ -271,7 +272,12 @@ impl VxlanInterface {
 
     /// Insert or refresh a static FDB entry.
     pub fn fdb_add(&mut self, mac: [u8; 6], remote_vtep_ip: u32) {
-        let entry = FdbEntry { mac, remote_vtep_ip, vnid: self.vnid, age_ticks: 0 };
+        let entry = FdbEntry {
+            mac,
+            remote_vtep_ip,
+            vnid: self.vnid,
+            age_ticks: 0,
+        };
         self.fdb.insert(mac, entry);
     }
 
@@ -282,7 +288,8 @@ impl VxlanInterface {
 
     /// Age out FDB entries older than `max_ticks`.
     pub fn fdb_age(&mut self, current_tick: u64, max_ticks: u64) {
-        self.fdb.retain(|_, e| current_tick - e.age_ticks < max_ticks);
+        self.fdb
+            .retain(|_, e| current_tick - e.age_ticks < max_ticks);
     }
 
     /// Lookup the remote VTEP for a destination MAC; returns None for BUM.
@@ -310,7 +317,9 @@ pub struct VxlanRegistry {
 
 impl VxlanRegistry {
     pub fn new() -> Self {
-        VxlanRegistry { interfaces: BTreeMap::new() }
+        VxlanRegistry {
+            interfaces: BTreeMap::new(),
+        }
     }
 
     /// Register a new VTEP interface.

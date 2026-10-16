@@ -138,7 +138,12 @@ pub struct MountPoint {
 
 impl MountPoint {
     /// Create a new mount point
-    pub fn new(device_id: String, device_path: String, mount_point: String, fs_type: FsType) -> Self {
+    pub fn new(
+        device_id: String,
+        device_path: String,
+        mount_point: String,
+        fs_type: FsType,
+    ) -> Self {
         Self {
             device_id,
             device_path,
@@ -218,9 +223,13 @@ impl SigmaAutoMount {
     /// Add a mount point
     pub fn add_mount_point(&mut self, mount_point: MountPoint) -> Result<(), String> {
         if self.mount_points.contains_key(&mount_point.device_id) {
-            return Err(format!("Mount point for '{}' already exists", mount_point.device_id));
+            return Err(format!(
+                "Mount point for '{}' already exists",
+                mount_point.device_id
+            ));
         }
-        self.mount_points.insert(mount_point.device_id.clone(), mount_point);
+        self.mount_points
+            .insert(mount_point.device_id.clone(), mount_point);
         Ok(())
     }
 
@@ -249,12 +258,18 @@ impl SigmaAutoMount {
 
     /// List mounted mount points
     pub fn list_mounted(&self) -> Vec<&MountPoint> {
-        self.mount_points.values().filter(|m| m.status == MountStatus::Mounted).collect()
+        self.mount_points
+            .values()
+            .filter(|m| m.status == MountStatus::Mounted)
+            .collect()
     }
 
     /// List auto-mount enabled points
     pub fn list_auto_mount(&self) -> Vec<&MountPoint> {
-        self.mount_points.values().filter(|m| m.auto_mount).collect()
+        self.mount_points
+            .values()
+            .filter(|m| m.auto_mount)
+            .collect()
     }
 
     /// Mount a device
@@ -296,7 +311,7 @@ impl SigmaAutoMount {
     /// Auto-mount devices
     pub fn auto_mount(&mut self, current_time: u64) -> Vec<String> {
         let mut errors = Vec::new();
-        
+
         if !self.running || !self.auto_mount_enabled {
             return errors;
         }
@@ -319,15 +334,24 @@ impl SigmaAutoMount {
 
     /// Get mounted count
     pub fn mounted_count(&self) -> usize {
-        self.mount_points.values().filter(|m| m.status == MountStatus::Mounted).count()
+        self.mount_points
+            .values()
+            .filter(|m| m.status == MountStatus::Mounted)
+            .count()
     }
 
     /// Get auto-mount statistics
     pub fn auto_mount_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_mount_points".to_string(), self.mount_point_count().to_string());
+        stats.insert(
+            "total_mount_points".to_string(),
+            self.mount_point_count().to_string(),
+        );
         stats.insert("mounted".to_string(), self.mounted_count().to_string());
-        stats.insert("auto_mount_enabled".to_string(), self.auto_mount_enabled.to_string());
+        stats.insert(
+            "auto_mount_enabled".to_string(),
+            self.auto_mount_enabled.to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -409,7 +433,7 @@ mod tests {
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         )
         .with_option(MountOption::ReadWrite)
         .with_option(MountOption::Sync)
@@ -435,14 +459,14 @@ mod tests {
     #[test]
     fn test_sigmaautomount_add_mount_point() {
         let mut automount = SigmaAutoMount::new();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         assert!(automount.add_mount_point(mount_point).is_ok());
         assert_eq!(automount.mount_point_count(), 1);
     }
@@ -450,21 +474,21 @@ mod tests {
     #[test]
     fn test_sigmaautomount_duplicate_mount_point() {
         let mut automount = SigmaAutoMount::new();
-        
+
         let mount_point1 = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         let mount_point2 = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data2".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         assert!(automount.add_mount_point(mount_point1).is_ok());
         assert!(automount.add_mount_point(mount_point2).is_err());
     }
@@ -473,18 +497,18 @@ mod tests {
     fn test_sigmaautomount_mount() {
         let mut automount = SigmaAutoMount::new();
         automount.start();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         automount.add_mount_point(mount_point).unwrap();
-        
+
         assert!(automount.mount("sda1", 1000).is_ok());
-        
+
         let mp = automount.get_mount_point("sda1").unwrap();
         assert_eq!(mp.status, MountStatus::Mounted);
         assert_eq!(mp.mount_time, Some(1000));
@@ -494,19 +518,19 @@ mod tests {
     fn test_sigmaautomount_unmount() {
         let mut automount = SigmaAutoMount::new();
         automount.start();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         automount.add_mount_point(mount_point).unwrap();
         automount.mount("sda1", 1000).unwrap();
-        
+
         assert!(automount.unmount("sda1").is_ok());
-        
+
         let mp = automount.get_mount_point("sda1").unwrap();
         assert_eq!(mp.status, MountStatus::NotMounted);
         assert_eq!(mp.mount_time, None);
@@ -516,20 +540,20 @@ mod tests {
     fn test_sigmaautomount_auto_mount() {
         let mut automount = SigmaAutoMount::new();
         automount.start();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         )
         .with_auto_mount(true);
-        
+
         automount.add_mount_point(mount_point).unwrap();
-        
+
         let errors = automount.auto_mount(1000);
         assert!(errors.is_empty());
-        
+
         let mp = automount.get_mount_point("sda1").unwrap();
         assert_eq!(mp.status, MountStatus::Mounted);
     }
@@ -538,17 +562,17 @@ mod tests {
     fn test_sigmaautomount_stats() {
         let mut automount = SigmaAutoMount::new();
         automount.start();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         automount.add_mount_point(mount_point).unwrap();
         automount.mount("sda1", 1000).unwrap();
-        
+
         let stats = automount.auto_mount_stats();
         assert_eq!(stats.get("total_mount_points"), Some(&"1".to_string()));
         assert_eq!(stats.get("mounted"), Some(&"1".to_string()));
@@ -558,14 +582,14 @@ mod tests {
     #[test]
     fn test_add_mount_point_convenience() {
         init_sigmaautomount();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         let result = add_mount_point(mount_point);
         assert!(result.is_ok());
     }
@@ -573,19 +597,19 @@ mod tests {
     #[test]
     fn test_mount_device_convenience() {
         init_sigmaautomount();
-        
+
         let mut automount = get_sigmaautomount().unwrap();
         automount.start();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         add_mount_point(mount_point).unwrap();
-        
+
         let result = mount_device("sda1", 1000);
         assert!(result.is_ok());
     }
@@ -593,20 +617,20 @@ mod tests {
     #[test]
     fn test_unmount_device_convenience() {
         init_sigmaautomount();
-        
+
         let mut automount = get_sigmaautomount().unwrap();
         automount.start();
-        
+
         let mount_point = MountPoint::new(
             "sda1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         add_mount_point(mount_point).unwrap();
         mount_device("sda1", 1000).unwrap();
-        
+
         let result = unmount_device("sda1");
         assert!(result.is_ok());
     }

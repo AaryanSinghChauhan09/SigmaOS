@@ -55,7 +55,12 @@ impl UserfaultFd {
     }
 
     /// Register a virtual address range for userspace fault handling
-    pub fn register(&mut self, start_addr: u64, length: u64, mode: UffdMode) -> Result<(), &'static str> {
+    pub fn register(
+        &mut self,
+        start_addr: u64,
+        length: u64,
+        mode: UffdMode,
+    ) -> Result<(), &'static str> {
         if (start_addr & 0xFFF) != 0 || (length & 0xFFF) != 0 {
             return Err("Range start and length must be page aligned");
         }
@@ -69,9 +74,10 @@ impl UserfaultFd {
 
     /// Dispatch page fault from kernel exception handler; queues event if covered
     pub fn handle_fault(&mut self, fault_addr: u64, flags: u32, pid: u32) -> bool {
-        let is_registered = self.ranges.iter().any(|r| {
-            fault_addr >= r.start_addr && fault_addr < r.start_addr + r.length
-        });
+        let is_registered = self
+            .ranges
+            .iter()
+            .any(|r| fault_addr >= r.start_addr && fault_addr < r.start_addr + r.length);
 
         if is_registered {
             self.pending_events.push(UffdEvent {
@@ -112,7 +118,9 @@ mod tests {
     #[test]
     fn test_userfaultfd_registration_and_event() {
         let mut uffd = UserfaultFd::new();
-        assert!(uffd.register(0x1000_0000, 0x10000, UffdMode::Missing).is_ok());
+        assert!(uffd
+            .register(0x1000_0000, 0x10000, UffdMode::Missing)
+            .is_ok());
 
         assert!(uffd.handle_fault(0x1000_4000, 0x02, 1234));
         assert_eq!(uffd.pending_events.len(), 1);

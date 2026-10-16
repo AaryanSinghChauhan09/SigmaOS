@@ -58,12 +58,12 @@ pub enum Effect {
     LensBlur,
     SurfaceBlur,
     SmartBlur,
-    
+
     // Sharpen effects
     Sharpen,
     UnsharpMask,
     HighPass,
-    
+
     // Distortion effects
     Ripple,
     Wave,
@@ -72,7 +72,7 @@ pub enum Effect {
     Twirl,
     Liquify,
     PolarCoordinates,
-    
+
     // Color correction
     BrightnessContrast,
     HueSaturation,
@@ -82,7 +82,7 @@ pub enum Effect {
     ColorLookup,
     ChannelMixer,
     GradientMap,
-    
+
     // Light effects
     Glow,
     Bloom,
@@ -91,7 +91,7 @@ pub enum Effect {
     AmbientOcclusion,
     Shadow,
     Reflection,
-    
+
     // Stylize effects
     Emboss,
     EdgeDetect,
@@ -102,14 +102,14 @@ pub enum Effect {
     Grain,
     FilmGrain,
     Halftone,
-    
+
     // Generate effects
     Solid,
     Gradient,
     NoisePattern,
     Grid,
     Checkerboard,
-    
+
     // Transition effects
     Dissolve,
     Fade,
@@ -117,14 +117,14 @@ pub enum Effect {
     Iris,
     Slide,
     Zoom,
-    
+
     // Transform effects
     Scale,
     Rotate,
     Translate,
     Skew,
     Perspective,
-    
+
     // Keying effects
     ChromaKey,
     LumaKey,
@@ -211,7 +211,7 @@ pub struct CompositingNode {
     pub id: u32,
     pub node_type: NodeType,
     pub effect: Option<Effect>,
-    pub inputs: Vec<u32>, // input node IDs
+    pub inputs: Vec<u32>,  // input node IDs
     pub outputs: Vec<u32>, // output node IDs
     pub position: (f32, f32),
     pub enabled: bool,
@@ -285,7 +285,11 @@ impl EffectEngine {
     }
 
     /// Set blend mode
-    pub fn set_blend_mode(&mut self, effect_id: u32, blend_mode: BlendMode) -> Result<(), &'static str> {
+    pub fn set_blend_mode(
+        &mut self,
+        effect_id: u32,
+        blend_mode: BlendMode,
+    ) -> Result<(), &'static str> {
         let effect = self.effects.get_mut(&effect_id).ok_or("Effect not found")?;
         effect.blend_mode = blend_mode;
         Ok(())
@@ -299,7 +303,11 @@ impl EffectEngine {
     }
 
     /// Add parameter
-    pub fn add_parameter(&mut self, effect_id: u32, parameter: Parameter) -> Result<(), &'static str> {
+    pub fn add_parameter(
+        &mut self,
+        effect_id: u32,
+        parameter: Parameter,
+    ) -> Result<(), &'static str> {
         let effect = self.effects.get_mut(&effect_id).ok_or("Effect not found")?;
         effect.parameters.push(AnimatedParameter {
             parameter,
@@ -310,7 +318,12 @@ impl EffectEngine {
     }
 
     /// Set parameter value
-    pub fn set_parameter(&mut self, effect_id: u32, name: String, value: f32) -> Result<(), &'static str> {
+    pub fn set_parameter(
+        &mut self,
+        effect_id: u32,
+        name: String,
+        value: f32,
+    ) -> Result<(), &'static str> {
         let effect = self.effects.get_mut(&effect_id).ok_or("Effect not found")?;
         for param in effect.parameters.iter_mut() {
             if param.parameter.name == name {
@@ -322,11 +335,22 @@ impl EffectEngine {
     }
 
     /// Add keyframe
-    pub fn add_keyframe(&mut self, effect_id: u32, param_name: String, frame: u32, value: f32, interpolation: InterpolationType) -> Result<(), &'static str> {
+    pub fn add_keyframe(
+        &mut self,
+        effect_id: u32,
+        param_name: String,
+        frame: u32,
+        value: f32,
+        interpolation: InterpolationType,
+    ) -> Result<(), &'static str> {
         let effect = self.effects.get_mut(&effect_id).ok_or("Effect not found")?;
         for param in effect.parameters.iter_mut() {
             if param.parameter.name == param_name {
-                param.keyframes.push(Keyframe { frame, value, interpolation });
+                param.keyframes.push(Keyframe {
+                    frame,
+                    value,
+                    interpolation,
+                });
                 param.animated = true;
                 return Ok(());
             }
@@ -358,9 +382,19 @@ impl EffectEngine {
         if !self.node_graph.nodes.contains_key(&to_id) {
             return Err("Target node not found");
         }
-        
-        self.node_graph.nodes.get_mut(&from_id).unwrap().outputs.push(to_id);
-        self.node_graph.nodes.get_mut(&to_id).unwrap().inputs.push(from_id);
+
+        self.node_graph
+            .nodes
+            .get_mut(&from_id)
+            .unwrap()
+            .outputs
+            .push(to_id);
+        self.node_graph
+            .nodes
+            .get_mut(&to_id)
+            .unwrap()
+            .inputs
+            .push(from_id);
         self.node_graph.connections.push((from_id, to_id));
         Ok(())
     }
@@ -375,7 +409,8 @@ impl EffectEngine {
     /// Toggle GPU acceleration
     pub fn toggle_gpu_acceleration(&mut self) {
         let current = self.gpu_acceleration_enabled.load(Ordering::Relaxed);
-        self.gpu_acceleration_enabled.store(!current, Ordering::Relaxed);
+        self.gpu_acceleration_enabled
+            .store(!current, Ordering::Relaxed);
     }
 
     /// Remove effect
@@ -386,8 +421,13 @@ impl EffectEngine {
 
     /// Remove node
     pub fn remove_node(&mut self, node_id: u32) -> Result<(), &'static str> {
-        self.node_graph.nodes.remove(&node_id).ok_or("Node not found")?;
-        self.node_graph.connections.retain(|(from, to)| *from != node_id && *to != node_id);
+        self.node_graph
+            .nodes
+            .remove(&node_id)
+            .ok_or("Node not found")?;
+        self.node_graph
+            .connections
+            .retain(|(from, to)| *from != node_id && *to != node_id);
         Ok(())
     }
 
@@ -425,9 +465,7 @@ pub fn init_effectcraft() {
 
 /// Get global effectcraft
 pub fn get_effectcraft() -> Option<&'static mut EffectEngine> {
-    unsafe {
-        EFFECTCRAFT.as_mut()
-    }
+    unsafe { EFFECTCRAFT.as_mut() }
 }
 
 // ============================================================================
@@ -705,7 +743,10 @@ mod tests {
         engine.init();
         let id = engine.add_effect(Effect::GaussianBlur, EffectCategory::Blur);
         assert!(engine.get_effect(id).is_some());
-        assert_eq!(engine.get_effect(id).unwrap().category, EffectCategory::Blur);
+        assert_eq!(
+            engine.get_effect(id).unwrap().category,
+            EffectCategory::Blur
+        );
     }
 
     #[test]
@@ -714,9 +755,17 @@ mod tests {
         engine.init();
         let id = engine.add_effect(Effect::GaussianBlur, EffectCategory::Blur);
         engine.disable_effect(id).unwrap();
-        assert!(!engine.get_effect(id).unwrap().enabled.load(Ordering::Relaxed));
+        assert!(!engine
+            .get_effect(id)
+            .unwrap()
+            .enabled
+            .load(Ordering::Relaxed));
         engine.enable_effect(id).unwrap();
-        assert!(engine.get_effect(id).unwrap().enabled.load(Ordering::Relaxed));
+        assert!(engine
+            .get_effect(id)
+            .unwrap()
+            .enabled
+            .load(Ordering::Relaxed));
     }
 
     #[test]
@@ -751,8 +800,13 @@ mod tests {
             default: 5.0,
         };
         engine.add_parameter(id, param).unwrap();
-        engine.set_parameter(id, "radius".to_string(), 10.0).unwrap();
-        assert_eq!(engine.get_effect(id).unwrap().parameters[0].parameter.value, 10.0);
+        engine
+            .set_parameter(id, "radius".to_string(), 10.0)
+            .unwrap();
+        assert_eq!(
+            engine.get_effect(id).unwrap().parameters[0].parameter.value,
+            10.0
+        );
     }
 
     #[test]
@@ -769,9 +823,28 @@ mod tests {
             default: 0.0,
         };
         engine.add_parameter(id, param).unwrap();
-        engine.add_keyframe(id, "brightness".to_string(), 0, 0.0, InterpolationType::Linear).unwrap();
-        engine.add_keyframe(id, "brightness".to_string(), 30, 50.0, InterpolationType::EaseInOut).unwrap();
-        assert_eq!(engine.get_effect(id).unwrap().parameters[0].keyframes.len(), 2);
+        engine
+            .add_keyframe(
+                id,
+                "brightness".to_string(),
+                0,
+                0.0,
+                InterpolationType::Linear,
+            )
+            .unwrap();
+        engine
+            .add_keyframe(
+                id,
+                "brightness".to_string(),
+                30,
+                50.0,
+                InterpolationType::EaseInOut,
+            )
+            .unwrap();
+        assert_eq!(
+            engine.get_effect(id).unwrap().parameters[0].keyframes.len(),
+            2
+        );
         assert!(engine.get_effect(id).unwrap().parameters[0].animated);
     }
 
@@ -782,10 +855,10 @@ mod tests {
         let input_id = engine.add_node(NodeType::Input, None, 0.0, 0.0);
         let effect_id = engine.add_node(NodeType::Effect, Some(Effect::GaussianBlur), 100.0, 0.0);
         let output_id = engine.add_node(NodeType::Output, None, 200.0, 0.0);
-        
+
         engine.connect_nodes(input_id, effect_id).unwrap();
         engine.connect_nodes(effect_id, output_id).unwrap();
-        
+
         assert_eq!(engine.node_graph.nodes.len(), 3);
         assert_eq!(engine.node_graph.connections.len(), 2);
     }

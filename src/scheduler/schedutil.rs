@@ -57,11 +57,7 @@ impl SchedutilGovernor {
 
     /// Calculate next frequency target using the Linux schedutil formula:
     /// target = 1.25 * max_freq * (util / max_util)
-    pub fn compute_target_freq(
-        policy: &CpuFreqPolicy,
-        cpu_util: u64,
-        max_util: u64,
-    ) -> u32 {
+    pub fn compute_target_freq(policy: &CpuFreqPolicy, cpu_util: u64, max_util: u64) -> u32 {
         if max_util == 0 {
             return policy.min_freq_mhz;
         }

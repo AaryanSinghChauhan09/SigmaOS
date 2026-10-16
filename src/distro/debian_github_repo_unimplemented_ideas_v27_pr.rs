@@ -72,7 +72,11 @@ impl DebianPiupartsPackageSanityPrEngine {
         }
     }
 
-    pub fn execute_sanity_test(&mut self, package: &str, simulate_leftover: bool) -> PiupartsTestResult {
+    pub fn execute_sanity_test(
+        &mut self,
+        package: &str,
+        simulate_leftover: bool,
+    ) -> PiupartsTestResult {
         let mut stages = vec![
             PiupartsStage::ChrootSetup,
             PiupartsStage::PackageInstall,
@@ -96,7 +100,8 @@ impl DebianPiupartsPackageSanityPrEngine {
             is_clean: leftover_files.is_empty(),
         };
 
-        self.test_records.insert(package.to_string(), result.clone());
+        self.test_records
+            .insert(package.to_string(), result.clone());
         result
     }
 }
@@ -144,7 +149,13 @@ impl DebianAutopkgtestServicePrEngine {
         engine
     }
 
-    pub fn register_test_case(&mut self, name: &str, cmd: &str, deps: &[&str], restrictions: &[&str]) {
+    pub fn register_test_case(
+        &mut self,
+        name: &str,
+        cmd: &str,
+        deps: &[&str],
+        restrictions: &[&str],
+    ) {
         self.test_cases.push(Dep8TestCase {
             test_name: name.to_string(),
             command: cmd.to_string(),
@@ -184,7 +195,10 @@ impl DebianDevscriptsAutomationPrEngine {
         let mut engine = Self {
             watch_entries: BTreeMap::new(),
         };
-        engine.watch_entries.insert("sigma-core".to_string(), "https://github.com/sigma/core/releases v(.*)".to_string());
+        engine.watch_entries.insert(
+            "sigma-core".to_string(),
+            "https://github.com/sigma/core/releases v(.*)".to_string(),
+        );
         engine
     }
 
@@ -232,7 +246,10 @@ impl DebianDpkgVendorDerivationPrEngine {
         };
 
         let mut sigma_flags = BTreeMap::new();
-        sigma_flags.insert("CFLAGS".to_string(), "-O3 -march=native -fstack-protector-strong".to_string());
+        sigma_flags.insert(
+            "CFLAGS".to_string(),
+            "-O3 -march=native -fstack-protector-strong".to_string(),
+        );
         sigma_flags.insert("LDFLAGS".to_string(), "-Wl,-z,relro,-z,now".to_string());
 
         engine.vendors.insert(
@@ -257,7 +274,11 @@ impl DebianDpkgVendorDerivationPrEngine {
     }
 
     pub fn get_vendor_flags(&self, vendor: &str, flag_name: &str) -> Option<String> {
-        self.vendors.get(vendor)?.custom_build_flags.get(flag_name).cloned()
+        self.vendors
+            .get(vendor)?
+            .custom_build_flags
+            .get(flag_name)
+            .cloned()
     }
 }
 
@@ -288,7 +309,12 @@ impl DebianAptListbugsWarningPrEngine {
         let mut engine = Self {
             critical_bugs: Vec::new(),
         };
-        engine.report_bug(1029384, "glibc", "grave", "Buffer overflow in resolver routines");
+        engine.report_bug(
+            1029384,
+            "glibc",
+            "grave",
+            "Buffer overflow in resolver routines",
+        );
         engine
     }
 
@@ -400,11 +426,31 @@ impl OpenSourceOsDebianUnimplementedIdeasPrMatrixEngine {
 
     fn register_default_proposals(&mut self) {
         let proposals = [
-            ("feat(debian): piuparts chroot sandbox & autopkgtest DEP-8 runner", "Debian GNU/Linux", "Package QA"),
-            ("feat(debian): devscripts debdiff & checkbashisms static analysis", "Debian GNU/Linux", "Developer Tools"),
-            ("feat(debian): dpkg-vendor custom distribution build flags", "Debian GNU/Linux", "Build System"),
-            ("feat(debian): apt-listbugs critical CVE warning guard", "Debian GNU/Linux", "Package Management"),
-            ("feat(debian): aptitude extended dependency graph why-query engine", "Debian GNU/Linux", "Dependency Solver"),
+            (
+                "feat(debian): piuparts chroot sandbox & autopkgtest DEP-8 runner",
+                "Debian GNU/Linux",
+                "Package QA",
+            ),
+            (
+                "feat(debian): devscripts debdiff & checkbashisms static analysis",
+                "Debian GNU/Linux",
+                "Developer Tools",
+            ),
+            (
+                "feat(debian): dpkg-vendor custom distribution build flags",
+                "Debian GNU/Linux",
+                "Build System",
+            ),
+            (
+                "feat(debian): apt-listbugs critical CVE warning guard",
+                "Debian GNU/Linux",
+                "Package Management",
+            ),
+            (
+                "feat(debian): aptitude extended dependency graph why-query engine",
+                "Debian GNU/Linux",
+                "Dependency Solver",
+            ),
         ];
 
         for (title, os, sub) in proposals {
@@ -474,7 +520,9 @@ impl DebianGithubRepoUnimplementedIdeasMasterSuite {
     pub fn run_master_audit(&mut self) -> bool {
         let piuparts_res = self.piuparts.execute_sanity_test("sigma-core", false);
         let test_results = self.autopkgtest.run_all_tests();
-        let bashisms = self.devscripts.checkbashisms("function bad() { [[ -f /tmp ]] }");
+        let bashisms = self
+            .devscripts
+            .checkbashisms("function bad() { [[ -f /tmp ]] }");
         let is_derived = self.dpkg_vendor.derives_from("SigmaOS", "Debian");
         let bugs = self.listbugs.check_pending_install("glibc");
         let why_list = self.aptitude.why_package_installed("libc6");

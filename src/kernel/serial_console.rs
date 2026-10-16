@@ -21,15 +21,15 @@ pub const COM1_BASE: u16 = 0x03F8;
 pub const COM2_BASE: u16 = 0x02F8;
 
 /// UART register offsets from base I/O port
-pub const UART_DATA: u16 = 0;       // Read/Write Data (DLAB = 0)
-pub const UART_DLL: u16 = 0;        // Divisor Latch Low (DLAB = 1)
-pub const UART_IER: u16 = 1;        // Interrupt Enable (DLAB = 0)
-pub const UART_DLM: u16 = 1;        // Divisor Latch High (DLAB = 1)
-pub const UART_IIR_FCR: u16 = 2;    // Interrupt Ident / FIFO Control
-pub const UART_LCR: u16 = 3;        // Line Control Register
-pub const UART_MCR: u16 = 4;        // Modem Control Register
-pub const UART_LSR: u16 = 5;        // Line Status Register
-pub const UART_MSR: u16 = 6;        // Modem Status Register
+pub const UART_DATA: u16 = 0; // Read/Write Data (DLAB = 0)
+pub const UART_DLL: u16 = 0; // Divisor Latch Low (DLAB = 1)
+pub const UART_IER: u16 = 1; // Interrupt Enable (DLAB = 0)
+pub const UART_DLM: u16 = 1; // Divisor Latch High (DLAB = 1)
+pub const UART_IIR_FCR: u16 = 2; // Interrupt Ident / FIFO Control
+pub const UART_LCR: u16 = 3; // Line Control Register
+pub const UART_MCR: u16 = 4; // Modem Control Register
+pub const UART_LSR: u16 = 5; // Line Status Register
+pub const UART_MSR: u16 = 6; // Modem Status Register
 
 /// Line Status Register bits
 pub const LSR_DATA_READY: u8 = 1 << 0;

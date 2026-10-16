@@ -83,7 +83,12 @@ pub struct FirewallRule {
 
 impl FirewallRule {
     /// Create a new firewall rule
-    pub fn new(rule_id: String, chain: String, protocol: FirewallProtocol, action: FirewallAction) -> Self {
+    pub fn new(
+        rule_id: String,
+        chain: String,
+        protocol: FirewallProtocol,
+        action: FirewallAction,
+    ) -> Self {
         Self {
             rule_id,
             chain,
@@ -168,7 +173,7 @@ impl SigmaFirewall {
         if self.rules.contains_key(&rule.rule_id) {
             return Err(format!("Rule '{}' already exists", rule.rule_id));
         }
-        
+
         self.rules.insert(rule.rule_id.clone(), rule);
         self.rule_counter += 1;
         Ok(())
@@ -216,21 +221,18 @@ impl SigmaFirewall {
 
     /// List rules by chain
     pub fn list_by_chain(&self, chain: &str) -> Vec<&FirewallRule> {
-        self.rules.values()
-            .filter(|r| r.chain == chain)
-            .collect()
+        self.rules.values().filter(|r| r.chain == chain).collect()
     }
 
     /// List enabled rules
     pub fn list_enabled(&self) -> Vec<&FirewallRule> {
-        self.rules.values()
-            .filter(|r| r.enabled)
-            .collect()
+        self.rules.values().filter(|r| r.enabled).collect()
     }
 
     /// List rules by protocol
     pub fn list_by_protocol(&self, protocol: FirewallProtocol) -> Vec<&FirewallRule> {
-        self.rules.values()
+        self.rules
+            .values()
             .filter(|r| r.protocol == protocol)
             .collect()
     }
@@ -244,7 +246,10 @@ impl SigmaFirewall {
     pub fn firewall_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_rules".to_string(), self.rule_count().to_string());
-        stats.insert("enabled_rules".to_string(), self.list_enabled().len().to_string());
+        stats.insert(
+            "enabled_rules".to_string(),
+            self.list_enabled().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -302,7 +307,7 @@ mod tests {
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         )
         .with_source("192.168.1.0/24".to_string())
         .with_destination_port(80)
@@ -326,14 +331,14 @@ mod tests {
     #[test]
     fn test_sigmafirewall_add_rule() {
         let mut firewall = SigmaFirewall::new();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         );
-        
+
         assert!(firewall.add_rule(rule).is_ok());
         assert_eq!(firewall.rule_count(), 1);
     }
@@ -341,18 +346,18 @@ mod tests {
     #[test]
     fn test_sigmafirewall_enable_rule() {
         let mut firewall = SigmaFirewall::new();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         )
         .with_enabled(false);
-        
+
         firewall.add_rule(rule).unwrap();
         assert!(firewall.enable_rule("rule1").is_ok());
-        
+
         let rule = firewall.get_rule("rule1").unwrap();
         assert!(rule.enabled);
     }
@@ -360,17 +365,17 @@ mod tests {
     #[test]
     fn test_sigmafirewall_disable_rule() {
         let mut firewall = SigmaFirewall::new();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         );
-        
+
         firewall.add_rule(rule).unwrap();
         assert!(firewall.disable_rule("rule1").is_ok());
-        
+
         let rule = firewall.get_rule("rule1").unwrap();
         assert!(!rule.enabled);
     }
@@ -378,16 +383,16 @@ mod tests {
     #[test]
     fn test_sigmafirewall_list_by_chain() {
         let mut firewall = SigmaFirewall::new();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         );
-        
+
         firewall.add_rule(rule).unwrap();
-        
+
         let rules = firewall.list_by_chain("input");
         assert_eq!(rules.len(), 1);
     }
@@ -395,16 +400,16 @@ mod tests {
     #[test]
     fn test_sigmafirewall_list_by_protocol() {
         let mut firewall = SigmaFirewall::new();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         );
-        
+
         firewall.add_rule(rule).unwrap();
-        
+
         let rules = firewall.list_by_protocol(FirewallProtocol::Tcp);
         assert_eq!(rules.len(), 1);
     }
@@ -412,16 +417,16 @@ mod tests {
     #[test]
     fn test_sigmafirewall_stats() {
         let mut firewall = SigmaFirewall::new();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         );
-        
+
         firewall.add_rule(rule).unwrap();
-        
+
         let stats = firewall.firewall_stats();
         assert_eq!(stats.get("total_rules"), Some(&"1".to_string()));
         assert_eq!(stats.get("enabled_rules"), Some(&"1".to_string()));
@@ -430,14 +435,14 @@ mod tests {
     #[test]
     fn test_add_firewall_rule_convenience() {
         init_sigmafirewall();
-        
+
         let rule = FirewallRule::new(
             "rule1".to_string(),
             "input".to_string(),
             FirewallProtocol::Tcp,
-            FirewallAction::Accept
+            FirewallAction::Accept,
         );
-        
+
         let result = add_firewall_rule(rule);
         assert!(result.is_ok());
     }

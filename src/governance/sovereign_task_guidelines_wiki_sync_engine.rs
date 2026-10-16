@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "SystemAppsDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "32-System-Apps-Development-Plan.md".to_string(),
+                source_path: "wiki/32-System-Apps-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "NetworkDevelopmentAndMaintenancePlan".to_string(),
             FeatureMdStatus {
                 spec_name: "28-Network-Development-And-Maintenance-Plan.md".to_string(),
@@ -201,7 +212,8 @@ impl WikiDataTransferEngine {
             "DeviceDriverDevelopmentPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "31-Device-Driver-Development-And-Maintenance-Plan.md".to_string(),
-                source_path: "wiki/31-Device-Driver-Development-And-Maintenance-Plan.md".to_string(),
+                source_path: "wiki/31-Device-Driver-Development-And-Maintenance-Plan.md"
+                    .to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,
@@ -517,18 +529,62 @@ impl PeriodicImprovementGovernor {
 
     fn seed_default_components(&mut self) {
         let default_list = [
-            ("KernelCore", "Linux/xv6/Redox", ComponentMaturityLevel::Integrated),
-            ("Memory", "Linux/xv6/Redox", ComponentMaturityLevel::Integrated),
-            ("VfsFilesystems", "Linux/xv6/FreeBSD", ComponentMaturityLevel::Integrated),
+            (
+                "KernelCore",
+                "Linux/xv6/Redox",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "Memory",
+                "Linux/xv6/Redox",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "VfsFilesystems",
+                "Linux/xv6/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
             ("Ipc", "Linux/FreeBSD", ComponentMaturityLevel::Integrated),
-            ("Syscalls", "Linux/FreeBSD", ComponentMaturityLevel::Integrated),
-            ("Security", "OpenBSD/Linux/FreeBSD", ComponentMaturityLevel::Integrated),
-            ("Drivers", "Linux/FreeBSD", ComponentMaturityLevel::Integrated),
-            ("Networking", "Linux/FreeBSD", ComponentMaturityLevel::Integrated),
-            ("Packaging", "Arch/Debian/Fedora", ComponentMaturityLevel::Integrated),
-            ("DesktopZenith", "LinuxMint/Omarchy/Redox", ComponentMaturityLevel::Integrated),
-            ("InstallerUpdate", "Debian/Fedora/Mint", ComponentMaturityLevel::Integrated),
-            ("DistroCompatibility", "Arch/Debian/Fedora/FreeBSD", ComponentMaturityLevel::Integrated),
+            (
+                "Syscalls",
+                "Linux/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "Security",
+                "OpenBSD/Linux/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "Drivers",
+                "Linux/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "Networking",
+                "Linux/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "Packaging",
+                "Arch/Debian/Fedora",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "DesktopZenith",
+                "LinuxMint/Omarchy/Redox",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "InstallerUpdate",
+                "Debian/Fedora/Mint",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "DistroCompatibility",
+                "Arch/Debian/Fedora/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
         ];
 
         for (name, ref_proj, mat) in default_list {

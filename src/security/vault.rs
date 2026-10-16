@@ -371,7 +371,9 @@ mod fail_closed_tests {
     };
 
     fn generate_test_bytes(len: usize) -> Vec<u8> {
-        (0..len).map(|i| ((i.wrapping_mul(43).wrapping_add(29)) & 0xFF) as u8).collect()
+        (0..len)
+            .map(|i| ((i.wrapping_mul(43).wrapping_add(29)) & 0xFF) as u8)
+            .collect()
     }
 
     #[test]

@@ -34,13 +34,13 @@ pub struct Token {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RedirectKind {
-    Output,          // >
-    Append,          // >>
-    Input,           // <
-    DupOutput,       // >&
-    DupInput,        // <&
-    CombinedOutput,  // &>
-    CloseFd,         // >&-
+    Output,         // >
+    Append,         // >>
+    Input,          // <
+    DupOutput,      // >&
+    DupInput,       // <&
+    CombinedOutput, // &>
+    CloseFd,        // >&-
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -348,8 +348,7 @@ impl ShellLexerParserEngine {
             column: col,
         });
 
-        self.resource_governor
-            .validate_tokens_count(tokens.len())?;
+        self.resource_governor.validate_tokens_count(tokens.len())?;
         Ok(tokens)
     }
 
@@ -537,14 +536,20 @@ impl EnvironmentAndExpanderEngine {
         let mut vars = BTreeMap::new();
         let mut exported_vars = BTreeMap::new();
 
-        vars.insert("PATH".to_string(), "/bin:/usr/bin:/usr/local/bin".to_string());
+        vars.insert(
+            "PATH".to_string(),
+            "/bin:/usr/bin:/usr/local/bin".to_string(),
+        );
         vars.insert("HOME".to_string(), "/root".to_string());
         vars.insert("USER".to_string(), "root".to_string());
         vars.insert("SHELL".to_string(), "/bin/sh".to_string());
         vars.insert("PWD".to_string(), "/".to_string());
         vars.insert("?".to_string(), "0".to_string());
 
-        exported_vars.insert("PATH".to_string(), "/bin:/usr/bin:/usr/local/bin".to_string());
+        exported_vars.insert(
+            "PATH".to_string(),
+            "/bin:/usr/bin:/usr/local/bin".to_string(),
+        );
         exported_vars.insert("HOME".to_string(), "/root".to_string());
 
         Self {
@@ -648,7 +653,11 @@ impl CommandResolverAndExecutorEngine {
                             "~"
                         };
                         let new_dir = if target == "~" {
-                            self.env.vars.get("HOME").cloned().unwrap_or_else(|| "/root".to_string())
+                            self.env
+                                .vars
+                                .get("HOME")
+                                .cloned()
+                                .unwrap_or_else(|| "/root".to_string())
                         } else {
                             target.to_string()
                         };
@@ -658,7 +667,12 @@ impl CommandResolverAndExecutorEngine {
                         Ok(0)
                     }
                     "pwd" => {
-                        let pwd = self.env.vars.get("PWD").cloned().unwrap_or_else(|| "/".to_string());
+                        let pwd = self
+                            .env
+                            .vars
+                            .get("PWD")
+                            .cloned()
+                            .unwrap_or_else(|| "/".to_string());
                         let output = format!("{}\n", pwd);
                         self.write_stdout(output.as_bytes(), redirects);
                         self.last_exit_status = 0;
@@ -718,7 +732,8 @@ impl CommandResolverAndExecutorEngine {
                         } else {
                             for arg in &expanded_args[1..] {
                                 if let Some(eq) = arg.find('=') {
-                                    self.aliases.insert(arg[..eq].to_string(), arg[eq + 1..].to_string());
+                                    self.aliases
+                                        .insert(arg[..eq].to_string(), arg[eq + 1..].to_string());
                                 }
                             }
                         }
@@ -781,9 +796,7 @@ impl CommandResolverAndExecutorEngine {
                     Ok(status)
                 }
             }
-            ShellAstNode::Background { command } => {
-                self.execute_ast(command)
-            }
+            ShellAstNode::Background { command } => self.execute_ast(command),
             ShellAstNode::IfStatement {
                 condition,
                 then_branch,
@@ -805,7 +818,10 @@ impl CommandResolverAndExecutorEngine {
         for redir in redirects {
             if redir.kind == RedirectKind::Output || redir.kind == RedirectKind::Append {
                 // Log redirection target in environment for auditability
-                self.env.set_var(format!("REDIRECT_{}", redir.target_path), "active".to_string());
+                self.env.set_var(
+                    format!("REDIRECT_{}", redir.target_path),
+                    "active".to_string(),
+                );
             }
         }
         self.captured_stdout.extend_from_slice(data);
@@ -839,7 +855,9 @@ impl InteractiveLineEditor {
 
     pub fn complete(&self, line: &str) -> Vec<String> {
         let mut candidates = Vec::new();
-        let builtins = ["cd", "pwd", "echo", "export", "unset", "exit", "alias", "unalias", "help"];
+        let builtins = [
+            "cd", "pwd", "echo", "export", "unset", "exit", "alias", "unalias", "help",
+        ];
         for b in builtins {
             if b.starts_with(line) {
                 candidates.push(b.to_string());
@@ -882,27 +900,64 @@ impl SovereignCommandInterpreterSuite {
 
     fn seed_pr_roadmap(&mut self) {
         let roadmap = [
-            (1, "docs(shell): define command interpreter goals and compatibility profile"),
-            (2, "refactor(shell): split lexer parser expander and executor modules"),
-            (3, "test(shell): add golden lexer and parser regression suite"),
-            (4, "feat(shell): implement command lookup and process execution contract"),
+            (
+                1,
+                "docs(shell): define command interpreter goals and compatibility profile",
+            ),
+            (
+                2,
+                "refactor(shell): split lexer parser expander and executor modules",
+            ),
+            (
+                3,
+                "test(shell): add golden lexer and parser regression suite",
+            ),
+            (
+                4,
+                "feat(shell): implement command lookup and process execution contract",
+            ),
             (5, "feat(shell): add variables assignments and safe quoting"),
-            (6, "feat(shell): implement POSIX-style redirection primitives"),
-            (7, "feat(shell): implement pipelines with bounded process and pipe lifecycle"),
-            (8, "feat(shell): define exit status and command-list operators"),
+            (
+                6,
+                "feat(shell): implement POSIX-style redirection primitives",
+            ),
+            (
+                7,
+                "feat(shell): implement pipelines with bounded process and pipe lifecycle",
+            ),
+            (
+                8,
+                "feat(shell): define exit status and command-list operators",
+            ),
             (9, "feat(shell): add environment and PATH built-ins"),
             (10, "feat(shell): add script mode and startup policy"),
             (11, "feat(shell): add control-flow subset for shell scripts"),
-            (12, "feat(shell): add interactive line editor and bounded history"),
-            (13, "feat(shell): add foreground job control and signal handling"),
+            (
+                12,
+                "feat(shell): add interactive line editor and bounded history",
+            ),
+            (
+                13,
+                "feat(shell): add foreground job control and signal handling",
+            ),
             (14, "feat(shell): add command completion and help metadata"),
-            (15, "security(shell): enforce parser and expansion resource limits"),
-            (16, "test(shell): add POSIX subset and Linux BSD interoperability matrix"),
-            (17, "docs(shell): publish command reference and maturity evidence"),
+            (
+                15,
+                "security(shell): enforce parser and expansion resource limits",
+            ),
+            (
+                16,
+                "test(shell): add POSIX subset and Linux BSD interoperability matrix",
+            ),
+            (
+                17,
+                "docs(shell): publish command reference and maturity evidence",
+            ),
         ];
 
         for (id, title) in roadmap {
-            self.pr_maturity_matrix.insert(id, (title.to_string(), PrMaturityLevel::Prototype));
+            self.pr_maturity_matrix
+                .insert(id, (title.to_string(), PrMaturityLevel::Prototype));
         }
     }
 
@@ -918,7 +973,9 @@ impl SovereignCommandInterpreterSuite {
                     assert!(matches!(ast, ShellAstNode::SimpleCommand { .. }));
                 }
                 3 => {
-                    let tokens = self.parser_engine.tokenize("echo 'hello world' # comment")?;
+                    let tokens = self
+                        .parser_engine
+                        .tokenize("echo 'hello world' # comment")?;
                     assert!(tokens.len() >= 2);
                 }
                 4 => {
@@ -927,7 +984,9 @@ impl SovereignCommandInterpreterSuite {
                     assert_eq!(status, 0);
                 }
                 5 => {
-                    self.executor.env.set_var("VAR".to_string(), "val".to_string());
+                    self.executor
+                        .env
+                        .set_var("VAR".to_string(), "val".to_string());
                     let expanded = self.executor.env.expand("hello $VAR");
                     assert_eq!(expanded, "hello val");
                 }
@@ -949,7 +1008,10 @@ impl SovereignCommandInterpreterSuite {
                 9 => {
                     let ast = self.parser_engine.parse("export FOO=bar")?;
                     self.executor.execute_ast(&ast)?;
-                    assert_eq!(self.executor.env.vars.get("FOO").cloned(), Some("bar".to_string()));
+                    assert_eq!(
+                        self.executor.env.vars.get("FOO").cloned(),
+                        Some("bar".to_string())
+                    );
                 }
                 10 => {
                     let ast = self.parser_engine.parse("echo script_mode")?;
@@ -971,7 +1033,10 @@ impl SovereignCommandInterpreterSuite {
                     assert!(candidates.contains(&"echo".to_string()));
                 }
                 15 => {
-                    let overflow_res = self.parser_engine.resource_governor.validate_input_size(&"a".repeat(100000));
+                    let overflow_res = self
+                        .parser_engine
+                        .resource_governor
+                        .validate_input_size(&"a".repeat(100000));
                     assert!(overflow_res.is_err());
                 }
                 16 => {
@@ -990,7 +1055,10 @@ impl SovereignCommandInterpreterSuite {
 
         let mut summary = String::from("SigmaOS Command Interpreter PR Maturity Matrix:\n");
         for (pr, (title, level)) in &self.pr_maturity_matrix {
-            summary.push_str(&format!("PR {:02}: {:<65} | Status: {:?}\n", pr, title, level));
+            summary.push_str(&format!(
+                "PR {:02}: {:<65} | Status: {:?}\n",
+                pr, title, level
+            ));
         }
         Ok(summary)
     }
@@ -1033,11 +1101,19 @@ mod tests {
     #[test]
     fn test_short_circuit_and_or() {
         let mut suite = SovereignCommandInterpreterSuite::new();
-        let ast = suite.parser_engine.parse("false && echo should_not_run").unwrap();
+        let ast = suite
+            .parser_engine
+            .parse("false && echo should_not_run")
+            .unwrap();
         suite.executor.execute_ast(&ast).unwrap();
-        assert!(!String::from_utf8_lossy(&suite.executor.captured_stdout).contains("should_not_run"));
+        assert!(
+            !String::from_utf8_lossy(&suite.executor.captured_stdout).contains("should_not_run")
+        );
 
-        let ast_or = suite.parser_engine.parse("false || echo should_run").unwrap();
+        let ast_or = suite
+            .parser_engine
+            .parse("false || echo should_run")
+            .unwrap();
         suite.executor.execute_ast(&ast_or).unwrap();
         assert!(String::from_utf8_lossy(&suite.executor.captured_stdout).contains("should_run"));
     }

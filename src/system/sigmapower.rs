@@ -168,21 +168,21 @@ impl SigmaPower {
     /// Create a new SigmaPower instance
     pub fn new() -> Self {
         let mut profile_settings = BTreeMap::new();
-        
+
         // Power saver settings
         let mut power_saver = BTreeMap::new();
         power_saver.insert("cpu_governor".to_string(), "powersave".to_string());
         power_saver.insert("screen_brightness".to_string(), "50".to_string());
         power_saver.insert("disk_apm".to_string(), "127".to_string());
         profile_settings.insert(PowerProfile::PowerSaver, power_saver);
-        
+
         // Balanced settings
         let mut balanced = BTreeMap::new();
         balanced.insert("cpu_governor".to_string(), "ondemand".to_string());
         balanced.insert("screen_brightness".to_string(), "75".to_string());
         balanced.insert("disk_apm".to_string(), "255".to_string());
         profile_settings.insert(PowerProfile::Balanced, balanced);
-        
+
         // Performance settings
         let mut performance = BTreeMap::new();
         performance.insert("cpu_governor".to_string(), "performance".to_string());
@@ -227,12 +227,12 @@ impl SigmaPower {
         if !self.running {
             return Err("SigmaPower not running".to_string());
         }
-        
+
         if self.current_profile != profile {
             self.current_profile = profile;
             self.stats.profile_switches += 1;
         }
-        
+
         Ok(())
     }
 
@@ -246,15 +246,15 @@ impl SigmaPower {
         if !self.running {
             return Err("SigmaPower not running".to_string());
         }
-        
+
         self.current_state = state;
-        
+
         match state {
             PowerState::Suspended => self.stats.suspend_count += 1,
             PowerState::Hibernated => self.stats.hibernate_count += 1,
             _ => {}
         }
-        
+
         Ok(())
     }
 
@@ -296,7 +296,7 @@ impl SigmaPower {
         if self.batteries.is_empty() {
             return 0;
         }
-        
+
         let total: u32 = self.batteries.values().map(|b| b.capacity as u32).sum();
         (total / self.batteries.len() as u32) as u8
     }
@@ -306,7 +306,7 @@ impl SigmaPower {
         if !self.running {
             return Err("SigmaPower not running".to_string());
         }
-        
+
         self.set_state(PowerState::Suspended)?;
         Ok(())
     }
@@ -316,7 +316,7 @@ impl SigmaPower {
         if !self.running {
             return Err("SigmaPower not running".to_string());
         }
-        
+
         self.set_state(PowerState::Hibernated)?;
         Ok(())
     }
@@ -326,7 +326,7 @@ impl SigmaPower {
         if !self.running {
             return Err("SigmaPower not running".to_string());
         }
-        
+
         self.set_state(PowerState::ShuttingDown)?;
         Ok(())
     }
@@ -353,9 +353,9 @@ impl SigmaPower {
         if !self.running {
             return None;
         }
-        
+
         let capacity = self.total_capacity();
-        
+
         let new_profile = if capacity < 20 {
             PowerProfile::PowerSaver
         } else if capacity > 80 {
@@ -363,7 +363,7 @@ impl SigmaPower {
         } else {
             PowerProfile::Balanced
         };
-        
+
         if new_profile != self.current_profile {
             let _ = self.set_profile(new_profile);
             Some(new_profile)
@@ -469,7 +469,7 @@ mod tests {
     fn test_sigmapower_set_profile() {
         let mut power = SigmaPower::new();
         power.start();
-        
+
         assert!(power.set_profile(PowerProfile::Performance).is_ok());
         assert_eq!(power.get_profile(), PowerProfile::Performance);
     }
@@ -478,10 +478,10 @@ mod tests {
     fn test_sigmapower_profile_switches() {
         let mut power = SigmaPower::new();
         power.start();
-        
+
         power.set_profile(PowerProfile::Performance).unwrap();
         power.set_profile(PowerProfile::PowerSaver).unwrap();
-        
+
         let stats = power.get_stats();
         assert_eq!(stats.profile_switches, 2);
     }
@@ -489,7 +489,7 @@ mod tests {
     #[test]
     fn test_sigmapower_add_battery() {
         let mut power = SigmaPower::new();
-        
+
         let battery = BatteryInfo::new("BAT0".to_string(), 85, BatteryStatus::Charging);
         assert!(power.add_battery(battery).is_ok());
         assert_eq!(power.list_batteries().len(), 1);
@@ -498,13 +498,13 @@ mod tests {
     #[test]
     fn test_sigmapower_update_battery() {
         let mut power = SigmaPower::new();
-        
+
         let battery1 = BatteryInfo::new("BAT0".to_string(), 85, BatteryStatus::Charging);
         power.add_battery(battery1).unwrap();
-        
+
         let battery2 = BatteryInfo::new("BAT0".to_string(), 90, BatteryStatus::Charging);
         assert!(power.update_battery(battery2).is_ok());
-        
+
         let battery = power.get_battery("BAT0").unwrap();
         assert_eq!(battery.capacity, 90);
     }
@@ -512,13 +512,13 @@ mod tests {
     #[test]
     fn test_sigmapower_total_capacity() {
         let mut power = SigmaPower::new();
-        
+
         let battery1 = BatteryInfo::new("BAT0".to_string(), 80, BatteryStatus::Charging);
         let battery2 = BatteryInfo::new("BAT1".to_string(), 90, BatteryStatus::Charging);
-        
+
         power.add_battery(battery1).unwrap();
         power.add_battery(battery2).unwrap();
-        
+
         assert_eq!(power.total_capacity(), 85);
     }
 
@@ -526,7 +526,7 @@ mod tests {
     fn test_sigmapower_suspend() {
         let mut power = SigmaPower::new();
         power.start();
-        
+
         assert!(power.suspend().is_ok());
         assert_eq!(power.get_state(), PowerState::Suspended);
     }
@@ -535,7 +535,7 @@ mod tests {
     fn test_sigmapower_hibernate() {
         let mut power = SigmaPower::new();
         power.start();
-        
+
         assert!(power.hibernate().is_ok());
         assert_eq!(power.get_state(), PowerState::Hibernated);
     }
@@ -544,7 +544,7 @@ mod tests {
     fn test_sigmapower_shutdown() {
         let mut power = SigmaPower::new();
         power.start();
-        
+
         assert!(power.shutdown().is_ok());
         assert_eq!(power.get_state(), PowerState::ShuttingDown);
     }
@@ -553,10 +553,10 @@ mod tests {
     fn test_sigmapower_auto_switch() {
         let mut power = SigmaPower::new();
         power.start();
-        
+
         let battery = BatteryInfo::new("BAT0".to_string(), 15, BatteryStatus::Discharging);
         power.add_battery(battery).unwrap();
-        
+
         let new_profile = power.auto_switch_profile();
         assert_eq!(new_profile, Some(PowerProfile::PowerSaver));
     }
@@ -564,10 +564,10 @@ mod tests {
     #[test]
     fn test_set_power_profile_convenience() {
         init_sigmapower();
-        
+
         let mut power = get_sigmapower().unwrap();
         power.start();
-        
+
         let result = set_power_profile(PowerProfile::Performance);
         assert!(result.is_ok());
     }
@@ -575,10 +575,10 @@ mod tests {
     #[test]
     fn test_suspend_system_convenience() {
         init_sigmapower();
-        
+
         let mut power = get_sigmapower().unwrap();
         power.start();
-        
+
         let result = suspend_system();
         assert!(result.is_ok());
     }
@@ -586,10 +586,10 @@ mod tests {
     #[test]
     fn test_shutdown_system_convenience() {
         init_sigmapower();
-        
+
         let mut power = get_sigmapower().unwrap();
         power.start();
-        
+
         let result = shutdown_system();
         assert!(result.is_ok());
     }

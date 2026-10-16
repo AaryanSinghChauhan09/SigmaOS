@@ -61,7 +61,9 @@ pub fn list_archive(path: &str) -> Result<Vec<TarHeader>, String> {
     let mut block = [0u8; TAR_BLOCK_SIZE];
 
     loop {
-        let n = file.read(&mut block).map_err(|e| format!("tar read: {}", e))?;
+        let n = file
+            .read(&mut block)
+            .map_err(|e| format!("tar read: {}", e))?;
         if n < TAR_BLOCK_SIZE {
             break;
         }

@@ -100,7 +100,10 @@ impl SystemAppPrTracker {
         let integrated_count = self
             .prs
             .values()
-            .filter(|p| p.status == SystemAppSupportStatus::Integrated || p.status == SystemAppSupportStatus::Supported)
+            .filter(|p| {
+                p.status == SystemAppSupportStatus::Integrated
+                    || p.status == SystemAppSupportStatus::Supported
+            })
             .count();
 
         if integrated_count == self.prs.len() {
@@ -360,7 +363,8 @@ impl SystemAppManifestAndClientGovernor {
     }
 
     pub fn register_manifest(&mut self, manifest: SystemAppManifest) -> Result<(), &'static str> {
-        if manifest.app_id.is_empty() || manifest.name.is_empty() || manifest.entry_point.is_empty() {
+        if manifest.app_id.is_empty() || manifest.name.is_empty() || manifest.entry_point.is_empty()
+        {
             return Err("Manifest Error: Missing required fields (app_id, name, or entry_point)");
         }
 
@@ -371,7 +375,8 @@ impl SystemAppManifestAndClientGovernor {
             }
         }
 
-        self.installed_manifests.insert(manifest.app_id.clone(), manifest);
+        self.installed_manifests
+            .insert(manifest.app_id.clone(), manifest);
         Ok(())
     }
 
@@ -387,14 +392,21 @@ impl SystemAppManifestAndClientGovernor {
             .ok_or("ServiceClient Error: Application manifest not registered")?;
 
         if !manifest.permissions.contains(&required_permission) {
-            return Err("ServiceClient Access Denied: App lacks required permission for service call");
+            return Err(
+                "ServiceClient Access Denied: App lacks required permission for service call",
+            );
         }
 
         if !manifest.required_services.iter().any(|s| s == service_name) {
-            return Err("ServiceClient Service Error: Service not listed in app manifest dependencies");
+            return Err(
+                "ServiceClient Service Error: Service not listed in app manifest dependencies",
+            );
         }
 
-        Ok(format!("RPC_SUCCESS: App {} invoked {}", app_id, service_name))
+        Ok(format!(
+            "RPC_SUCCESS: App {} invoked {}",
+            app_id, service_name
+        ))
     }
 }
 
@@ -548,8 +560,16 @@ impl SystemInfoDiagnosticsProvider {
             ("hardware.arch", "x86_64", InformationSource::Live),
             ("system.init_status", "Active", InformationSource::Live),
             ("package.count", "142", InformationSource::Cached),
-            ("host.linux_release", "Linux Mint 22 (Host Tool)", InformationSource::HostDerived),
-            ("gpu.temperature", "Unavailable", InformationSource::Unavailable),
+            (
+                "host.linux_release",
+                "Linux Mint 22 (Host Tool)",
+                InformationSource::HostDerived,
+            ),
+            (
+                "gpu.temperature",
+                "Unavailable",
+                InformationSource::Unavailable,
+            ),
         ];
 
         for (k, v, src) in initial_metrics {
@@ -614,8 +634,12 @@ impl SovereignSystemAppsDevelopmentAndPrSuite {
 
     fn initialize_baseline(&mut self) {
         // Register core service node in init coordinator
-        self.init_coordinator.register_service("dbus_daemon", vec![], 3);
-        let pid = self.init_coordinator.start_service("dbus_daemon").unwrap_or(100);
+        self.init_coordinator
+            .register_service("dbus_daemon", vec![], 3);
+        let pid = self
+            .init_coordinator
+            .start_service("dbus_daemon")
+            .unwrap_or(100);
 
         // Register default manifest for system settings
         let settings_manifest = SystemAppManifest {
@@ -673,8 +697,14 @@ mod tests {
     fn test_system_app_pr_tracker() {
         let tracker = SystemAppPrTracker::new();
         assert_eq!(tracker.prs.len(), 18);
-        assert_eq!(tracker.prs.get(&1).unwrap().status, SystemAppSupportStatus::Supported);
-        assert_eq!(tracker.prs.get(&18).unwrap().status, SystemAppSupportStatus::Supported);
+        assert_eq!(
+            tracker.prs.get(&1).unwrap().status,
+            SystemAppSupportStatus::Supported
+        );
+        assert_eq!(
+            tracker.prs.get(&18).unwrap().status,
+            SystemAppSupportStatus::Supported
+        );
         assert_eq!(tracker.overall_status(), SystemAppSupportStatus::Supported);
     }
 
@@ -704,11 +734,19 @@ mod tests {
         governor.register_manifest(manifest).unwrap();
 
         // Valid call
-        let res = governor.invoke_service_call("com.example.editor", SystemAppPermission::VfsRead, "vfs_service");
+        let res = governor.invoke_service_call(
+            "com.example.editor",
+            SystemAppPermission::VfsRead,
+            "vfs_service",
+        );
         assert!(res.is_ok());
 
         // Call without required permission in call
-        let unauth = governor.invoke_service_call("com.example.editor", SystemAppPermission::NetworkAccess, "vfs_service");
+        let unauth = governor.invoke_service_call(
+            "com.example.editor",
+            SystemAppPermission::NetworkAccess,
+            "vfs_service",
+        );
         assert!(unauth.is_err());
     }
 
@@ -755,6 +793,8 @@ mod tests {
     fn test_master_suite() {
         let suite = SovereignSystemAppsDevelopmentAndPrSuite::new();
         assert!(suite.health_check());
-        assert!(suite.summary_report().contains("Defined System App PRs: 18"));
+        assert!(suite
+            .summary_report()
+            .contains("Defined System App PRs: 18"));
     }
 }

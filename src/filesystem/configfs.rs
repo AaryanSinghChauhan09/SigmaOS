@@ -46,9 +46,18 @@ pub struct AttributeMode {
 }
 
 impl AttributeMode {
-    pub const RO: Self = Self { read: true, write: false };
-    pub const WO: Self = Self { read: false, write: true };
-    pub const RW: Self = Self { read: true, write: true };
+    pub const RO: Self = Self {
+        read: true,
+        write: false,
+    };
+    pub const WO: Self = Self {
+        read: false,
+        write: true,
+    };
+    pub const RW: Self = Self {
+        read: true,
+        write: true,
+    };
 }
 
 /// An attribute file representing a tunable parameter of a config_item.
@@ -151,7 +160,8 @@ impl ConfigGroup {
         }
 
         let child_arc = Arc::new(RwLock::new(child));
-        self.dynamic_children.insert(name.to_string(), child_arc.clone());
+        self.dynamic_children
+            .insert(name.to_string(), child_arc.clone());
         Ok(child_arc)
     }
 
@@ -183,7 +193,11 @@ impl ConfigfsSubsystem {
     }
 
     /// Register a top-level subsystem group (e.g. "target", "usb_gadget", "rdma").
-    pub fn register_subsystem(&self, name: &str, item_type: Option<Arc<ConfigItemType>>) -> Result<(), ConfigfsError> {
+    pub fn register_subsystem(
+        &self,
+        name: &str,
+        item_type: Option<Arc<ConfigItemType>>,
+    ) -> Result<(), ConfigfsError> {
         let mut root_guard = self.root.write().unwrap();
         if root_guard.default_groups.contains_key(name) {
             return Err(ConfigfsError::AlreadyExists);
@@ -191,7 +205,9 @@ impl ConfigfsSubsystem {
 
         let mut group = ConfigGroup::new(name);
         group.allowed_item_type = item_type;
-        root_guard.default_groups.insert(name.to_string(), Arc::new(RwLock::new(group)));
+        root_guard
+            .default_groups
+            .insert(name.to_string(), Arc::new(RwLock::new(group)));
         Ok(())
     }
 
@@ -204,22 +220,34 @@ impl ConfigfsSubsystem {
 
         let root_guard = self.root.read().unwrap();
         let sub_name = parts[0];
-        let sub_group = root_guard.default_groups.get(sub_name).ok_or(ConfigfsError::NotFound)?;
+        let sub_group = root_guard
+            .default_groups
+            .get(sub_name)
+            .ok_or(ConfigfsError::NotFound)?;
         let sub_lock = sub_group.read().unwrap();
 
         if parts.len() == 2 {
             // Attribute directly on subsystem
             let attr_name = parts[1];
-            let attr = sub_lock.item.get_attribute(attr_name).ok_or(ConfigfsError::NotFound)?;
+            let attr = sub_lock
+                .item
+                .get_attribute(attr_name)
+                .ok_or(ConfigfsError::NotFound)?;
             return attr.read();
         }
 
         // Deeper path
         let item_name = parts[1];
-        let item_group = sub_lock.dynamic_children.get(item_name).ok_or(ConfigfsError::NotFound)?;
+        let item_group = sub_lock
+            .dynamic_children
+            .get(item_name)
+            .ok_or(ConfigfsError::NotFound)?;
         let item_lock = item_group.read().unwrap();
         let attr_name = parts[2];
-        let attr = item_lock.item.get_attribute(attr_name).ok_or(ConfigfsError::NotFound)?;
+        let attr = item_lock
+            .item
+            .get_attribute(attr_name)
+            .ok_or(ConfigfsError::NotFound)?;
         attr.read()
     }
 
@@ -232,20 +260,32 @@ impl ConfigfsSubsystem {
 
         let root_guard = self.root.write().unwrap();
         let sub_name = parts[0];
-        let sub_group = root_guard.default_groups.get(sub_name).ok_or(ConfigfsError::NotFound)?;
+        let sub_group = root_guard
+            .default_groups
+            .get(sub_name)
+            .ok_or(ConfigfsError::NotFound)?;
         let sub_lock = sub_group.read().unwrap();
 
         if parts.len() == 2 {
             let attr_name = parts[1];
-            let attr = sub_lock.item.get_attribute(attr_name).ok_or(ConfigfsError::NotFound)?;
+            let attr = sub_lock
+                .item
+                .get_attribute(attr_name)
+                .ok_or(ConfigfsError::NotFound)?;
             return attr.write(val);
         }
 
         let item_name = parts[1];
-        let item_group = sub_lock.dynamic_children.get(item_name).ok_or(ConfigfsError::NotFound)?;
+        let item_group = sub_lock
+            .dynamic_children
+            .get(item_name)
+            .ok_or(ConfigfsError::NotFound)?;
         let item_lock = item_group.read().unwrap();
         let attr_name = parts[2];
-        let attr = item_lock.item.get_attribute(attr_name).ok_or(ConfigfsError::NotFound)?;
+        let attr = item_lock
+            .item
+            .get_attribute(attr_name)
+            .ok_or(ConfigfsError::NotFound)?;
         attr.write(val)
     }
 }

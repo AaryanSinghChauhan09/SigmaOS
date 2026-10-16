@@ -150,9 +150,18 @@ impl AnimationProject {
     }
 
     /// Add keyframe
-    pub fn add_keyframe(&mut self, layer_id: u32, property: String, keyframe: Keyframe) -> Result<(), &'static str> {
+    pub fn add_keyframe(
+        &mut self,
+        layer_id: u32,
+        property: String,
+        keyframe: Keyframe,
+    ) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
-        layer.keyframes.entry(property).or_insert_with(Vec::new).push(keyframe);
+        layer
+            .keyframes
+            .entry(property)
+            .or_insert_with(Vec::new)
+            .push(keyframe);
         Ok(())
     }
 
@@ -180,7 +189,8 @@ impl AnimationProject {
 
     /// Set current frame
     pub fn set_frame(&mut self, frame: u32) {
-        self.timeline.current_frame = frame.clamp(self.timeline.start_frame, self.timeline.end_frame);
+        self.timeline.current_frame =
+            frame.clamp(self.timeline.start_frame, self.timeline.end_frame);
     }
 
     /// Set fps
@@ -194,10 +204,15 @@ impl AnimationProject {
     }
 
     /// Get interpolated value at frame
-    pub fn get_interpolated_value(&self, layer_id: u32, property: String, frame: u32) -> Option<f32> {
+    pub fn get_interpolated_value(
+        &self,
+        layer_id: u32,
+        property: String,
+        frame: u32,
+    ) -> Option<f32> {
         let layer = self.layers.get(&layer_id)?;
         let keyframes = layer.keyframes.get(&property)?;
-        
+
         if keyframes.is_empty() {
             return None;
         }
@@ -205,7 +220,7 @@ impl AnimationProject {
         // Find surrounding keyframes
         let mut before = None;
         let mut after = None;
-        
+
         for kf in keyframes {
             if kf.frame <= frame {
                 before = Some(kf);
@@ -225,13 +240,16 @@ impl AnimationProject {
                     let value = match b.interpolation {
                         InterpolationMode::Linear => b.value + (a.value - b.value) * t,
                         InterpolationMode::EaseIn => b.value + (a.value - b.value) * t * t,
-                        InterpolationMode::EaseOut => b.value + (a.value - b.value) * (1.0 - (1.0 - t) * (1.0 - t)),
+                        InterpolationMode::EaseOut => {
+                            b.value + (a.value - b.value) * (1.0 - (1.0 - t) * (1.0 - t))
+                        }
                         InterpolationMode::EaseInOut => {
                             let t2 = t * 2.0;
                             if t2 < 1.0 {
                                 b.value + (a.value - b.value) * 0.5 * t2 * t2
                             } else {
-                                b.value + (a.value - b.value) * (1.0 - 0.5 * (2.0 - t2) * (2.0 - t2))
+                                b.value
+                                    + (a.value - b.value) * (1.0 - 0.5 * (2.0 - t2) * (2.0 - t2))
                             }
                         }
                         _ => b.value + (a.value - b.value) * t,
@@ -274,7 +292,9 @@ pub fn init_vectoranimation(name: String, width: u32, height: u32) {
 /// Get animation project
 pub fn get_vectoranimation() -> &'static mut AnimationProject {
     unsafe {
-        ANIMATION_PROJECT.as_mut().expect("VectorAnimation not initialized")
+        ANIMATION_PROJECT
+            .as_mut()
+            .expect("VectorAnimation not initialized")
     }
 }
 
@@ -308,8 +328,13 @@ mod tests {
             handle_left: (0.0, 0.0),
             handle_right: (0.0, 0.0),
         };
-        project.add_keyframe(layer_id, "position_x".to_string(), keyframe).unwrap();
-        assert_eq!(project.layers.get(&layer_id).unwrap().keyframes["position_x"].len(), 1);
+        project
+            .add_keyframe(layer_id, "position_x".to_string(), keyframe)
+            .unwrap();
+        assert_eq!(
+            project.layers.get(&layer_id).unwrap().keyframes["position_x"].len(),
+            1
+        );
     }
 
     #[test]
@@ -323,7 +348,7 @@ mod tests {
     fn test_interpolation() {
         let mut project = AnimationProject::new("Test".to_string(), 1920, 1080);
         let layer_id = project.add_layer("Layer 1".to_string(), AnimationLayerType::Vector);
-        
+
         let kf1 = Keyframe {
             frame: 0,
             value: 0.0,
@@ -331,7 +356,7 @@ mod tests {
             handle_left: (0.0, 0.0),
             handle_right: (0.0, 0.0),
         };
-        
+
         let kf2 = Keyframe {
             frame: 10,
             value: 100.0,
@@ -339,10 +364,14 @@ mod tests {
             handle_left: (0.0, 0.0),
             handle_right: (0.0, 0.0),
         };
-        
-        project.add_keyframe(layer_id, "test".to_string(), kf1).unwrap();
-        project.add_keyframe(layer_id, "test".to_string(), kf2).unwrap();
-        
+
+        project
+            .add_keyframe(layer_id, "test".to_string(), kf1)
+            .unwrap();
+        project
+            .add_keyframe(layer_id, "test".to_string(), kf2)
+            .unwrap();
+
         let value = project.get_interpolated_value(layer_id, "test".to_string(), 5);
         assert_eq!(value, Some(50.0));
     }

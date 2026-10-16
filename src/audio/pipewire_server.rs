@@ -124,7 +124,9 @@ mod tests {
         assert_eq!(server.nodes.len(), 2);
         assert_ne!(app_node, sink_node);
 
-        let link = server.link_ports(app_node * 10, sink_node * 10).expect("Linked");
+        let link = server
+            .link_ports(app_node * 10, sink_node * 10)
+            .expect("Linked");
         assert_eq!(server.links.len(), 1);
 
         let active_links = server.process_quantum(512);

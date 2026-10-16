@@ -7297,7 +7297,7 @@ impl Default for SovereignGoogleDocsPaginatedLayoutEngine {
 impl SovereignGoogleDocsPaginatedLayoutEngine {
     pub fn new() -> Self {
         Self {
-            page_width_mm: 210.0,  // A4 Standard
+            page_width_mm: 210.0, // A4 Standard
             page_height_mm: 297.0,
             margin_top_mm: 25.4,
             margin_bottom_mm: 25.4,
@@ -8502,10 +8502,17 @@ impl SovereignGoogleSheetsDataValidationListFormulaEngine {
         Self
     }
 
-    pub fn validate_cell_value(&self, value: &str, rule: &SheetDataValidationRule) -> core::result::Result<bool, String> {
+    pub fn validate_cell_value(
+        &self,
+        value: &str,
+        rule: &SheetDataValidationRule,
+    ) -> core::result::Result<bool, String> {
         match &rule.rule_kind {
             ValidationRuleKind::ListOfItems(items) => {
-                if items.iter().any(|i| i.trim().eq_ignore_ascii_case(value.trim())) {
+                if items
+                    .iter()
+                    .any(|i| i.trim().eq_ignore_ascii_case(value.trim()))
+                {
                     Ok(true)
                 } else if rule.allow_invalid_with_warning {
                     Ok(false)
@@ -8538,7 +8545,8 @@ impl SovereignGoogleSheetsDataValidationListFormulaEngine {
                 }
             }
             ValidationRuleKind::RegexPattern(pattern) => {
-                if pattern.is_empty() || value.contains(pattern.trim_matches('^').trim_matches('$')) {
+                if pattern.is_empty() || value.contains(pattern.trim_matches('^').trim_matches('$'))
+                {
                     Ok(true)
                 } else if rule.allow_invalid_with_warning {
                     Ok(false)
@@ -8653,57 +8661,113 @@ impl SovereignMicrosoft365CoauthoringOperationalTransformEngine {
 
         match (&op_a.op_kind, &op_b.op_kind) {
             (
-                CoauthorOpKind::Insert { position: pos_a, text: text_a },
-                CoauthorOpKind::Insert { position: pos_b, text: _text_b },
+                CoauthorOpKind::Insert {
+                    position: pos_a,
+                    text: text_a,
+                },
+                CoauthorOpKind::Insert {
+                    position: pos_b,
+                    text: _text_b,
+                },
             ) => {
                 if pos_a < pos_b || (pos_a == pos_b && op_a.site_id < op_b.site_id) {
-                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_b.op_kind {
+                    if let CoauthorOpKind::Insert {
+                        position: ref mut p,
+                        ..
+                    } = prime_b.op_kind
+                    {
                         *p += text_a.len();
                     }
                 } else {
-                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_a.op_kind {
+                    if let CoauthorOpKind::Insert {
+                        position: ref mut p,
+                        ..
+                    } = prime_a.op_kind
+                    {
                         *p += op_b_text_len(&op_b.op_kind);
                     }
                 }
             }
             (
-                CoauthorOpKind::Insert { position: pos_a, text: text_a },
-                CoauthorOpKind::Delete { position: pos_b, length: len_b },
+                CoauthorOpKind::Insert {
+                    position: pos_a,
+                    text: text_a,
+                },
+                CoauthorOpKind::Delete {
+                    position: pos_b,
+                    length: len_b,
+                },
             ) => {
                 if *pos_a <= *pos_b {
-                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_b.op_kind {
+                    if let CoauthorOpKind::Delete {
+                        position: ref mut p,
+                        ..
+                    } = prime_b.op_kind
+                    {
                         *p += text_a.len();
                     }
                 } else if *pos_a > *pos_b + *len_b {
-                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_a.op_kind {
+                    if let CoauthorOpKind::Insert {
+                        position: ref mut p,
+                        ..
+                    } = prime_a.op_kind
+                    {
                         *p -= len_b;
                     }
                 } else {
-                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_a.op_kind {
+                    if let CoauthorOpKind::Insert {
+                        position: ref mut p,
+                        ..
+                    } = prime_a.op_kind
+                    {
                         *p = *pos_b;
                     }
                 }
             }
             (
-                CoauthorOpKind::Delete { position: pos_a, length: len_a },
-                CoauthorOpKind::Insert { position: pos_b, text: text_b },
+                CoauthorOpKind::Delete {
+                    position: pos_a,
+                    length: len_a,
+                },
+                CoauthorOpKind::Insert {
+                    position: pos_b,
+                    text: text_b,
+                },
             ) => {
                 if *pos_b <= *pos_a {
-                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_a.op_kind {
+                    if let CoauthorOpKind::Delete {
+                        position: ref mut p,
+                        ..
+                    } = prime_a.op_kind
+                    {
                         *p += text_b.len();
                     }
                 } else if *pos_b > *pos_a + *len_a {
-                    if let CoauthorOpKind::Insert { position: ref mut p, .. } = prime_b.op_kind {
+                    if let CoauthorOpKind::Insert {
+                        position: ref mut p,
+                        ..
+                    } = prime_b.op_kind
+                    {
                         *p -= len_a;
                     }
                 }
             }
             (
-                CoauthorOpKind::Delete { position: pos_a, length: len_a },
-                CoauthorOpKind::Delete { position: pos_b, length: len_b },
+                CoauthorOpKind::Delete {
+                    position: pos_a,
+                    length: len_a,
+                },
+                CoauthorOpKind::Delete {
+                    position: pos_b,
+                    length: len_b,
+                },
             ) => {
                 if *pos_a < *pos_b {
-                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_b.op_kind {
+                    if let CoauthorOpKind::Delete {
+                        position: ref mut p,
+                        ..
+                    } = prime_b.op_kind
+                    {
                         if *p >= *pos_a + *len_a {
                             *p -= len_a;
                         } else {
@@ -8711,7 +8775,11 @@ impl SovereignMicrosoft365CoauthoringOperationalTransformEngine {
                         }
                     }
                 } else if *pos_a > *pos_b {
-                    if let CoauthorOpKind::Delete { position: ref mut p, .. } = prime_a.op_kind {
+                    if let CoauthorOpKind::Delete {
+                        position: ref mut p,
+                        ..
+                    } = prime_a.op_kind
+                    {
                         if *p >= *pos_b + *len_b {
                             *p -= len_b;
                         } else {
@@ -8727,7 +8795,10 @@ impl SovereignMicrosoft365CoauthoringOperationalTransformEngine {
 
     pub fn apply_operation_to_text(&self, text: &mut String, op: &CoauthorOperation) {
         match &op.op_kind {
-            CoauthorOpKind::Insert { position, text: insert_str } => {
+            CoauthorOpKind::Insert {
+                position,
+                text: insert_str,
+            } => {
                 let pos = (*position).min(text.len());
                 text.insert_str(pos, insert_str);
             }
@@ -8798,7 +8869,10 @@ impl SovereignZohoBooksMultiCurrencyFxRevaluationEngine {
             .collect()
     }
 
-    pub fn generate_revaluation_journal_entry(&self, revaluations: &[FxRevaluationResult]) -> (f64, f64) {
+    pub fn generate_revaluation_journal_entry(
+        &self,
+        revaluations: &[FxRevaluationResult],
+    ) -> (f64, f64) {
         let mut total_gains = 0.0;
         let mut total_losses = 0.0;
 
@@ -8847,9 +8921,11 @@ impl SovereignSalesforceCpqSubscriptionRenewalDiscountEngine {
         additional_expansion_arr: f64,
         early_renewal_discount_bonus_pct: f64,
     ) -> RenewalQuote {
-        let gross_arr = contract.annual_recurring_revenue * (1.0 + contract.renewal_uplift_pct / 100.0)
+        let gross_arr = contract.annual_recurring_revenue
+            * (1.0 + contract.renewal_uplift_pct / 100.0)
             + additional_expansion_arr;
-        let effective_discount_pct = (contract.current_discount_pct - early_renewal_discount_bonus_pct).max(0.0);
+        let effective_discount_pct =
+            (contract.current_discount_pct - early_renewal_discount_bonus_pct).max(0.0);
         let renewal_arr = gross_arr * (1.0 - effective_discount_pct / 100.0);
         let net_mrr = renewal_arr / 12.0;
         let total_quote_amount = renewal_arr * (term_months as f64 / 12.0);
@@ -8898,19 +8974,23 @@ impl SovereignOdooMrpWorkCenterOeeEfficiencyEngine {
 
         let operating_seconds = metrics.actual_operating_hours * 3600.0;
         let performance_rate = if operating_seconds > 0.0 {
-            ((metrics.total_units_produced as f64 * metrics.ideal_cycle_time_per_unit_sec) / operating_seconds).clamp(0.0, 1.0)
+            ((metrics.total_units_produced as f64 * metrics.ideal_cycle_time_per_unit_sec)
+                / operating_seconds)
+                .clamp(0.0, 1.0)
         } else {
             0.0
         };
 
         let quality_rate = if metrics.total_units_produced > 0 {
-            (metrics.good_units_produced as f64 / metrics.total_units_produced as f64).clamp(0.0, 1.0)
+            (metrics.good_units_produced as f64 / metrics.total_units_produced as f64)
+                .clamp(0.0, 1.0)
         } else {
             0.0
         };
 
         let overall_oee_pct = availability_rate * performance_rate * quality_rate * 100.0;
-        let total_downtime_hours = (metrics.planned_production_hours - metrics.actual_operating_hours).max(0.0);
+        let total_downtime_hours =
+            (metrics.planned_production_hours - metrics.actual_operating_hours).max(0.0);
 
         OeeCalculationResult {
             availability_rate,
@@ -11846,7 +11926,12 @@ impl SovereignLookerStudioFieldCalculatedMetricEngine {
         }
     }
 
-    pub fn evaluate_custom_metric_expression(&self, base_val: f64, multiplier: f64, offset: f64) -> f64 {
+    pub fn evaluate_custom_metric_expression(
+        &self,
+        base_val: f64,
+        multiplier: f64,
+        offset: f64,
+    ) -> f64 {
         base_val * multiplier + offset
     }
 }
@@ -12093,7 +12178,9 @@ impl SovereignBitrix24OmnichannelQueueRoutingEngine {
         let mut best_agent: Option<(&AgentWorkloadProfile, u32)> = None;
 
         for agent in agents {
-            if agent.active_tickets < agent.max_capacity && agent.skills.iter().any(|s| s == required_skill) {
+            if agent.active_tickets < agent.max_capacity
+                && agent.skills.iter().any(|s| s == required_skill)
+            {
                 let capacity_remaining = agent.max_capacity - agent.active_tickets;
                 match best_agent {
                     None => {
@@ -12146,7 +12233,10 @@ impl SovereignGoogleSheetsFormulaDependencyTreeEngine {
             in_degree.entry(node.cell_ref.clone()).or_insert(0);
 
             for dep in &node.depends_on {
-                adj_list.entry(dep.clone()).or_default().push(node.cell_ref.clone());
+                adj_list
+                    .entry(dep.clone())
+                    .or_default()
+                    .push(node.cell_ref.clone());
                 *in_degree.entry(node.cell_ref.clone()).or_insert(0) += 1;
             }
         }
@@ -12528,8 +12618,12 @@ impl SovereignGoogleWorkspaceGeminiSmartSummaryEngine {
         project_name: &str,
     ) -> WorkspaceSmartSummary {
         let key_insights = vec![
-            format!("Project '{}' contains {} active documents and {} financial models.", project_name, docs_count, sheets_count),
-            "Operational performance across team tasks is tracking 15% ahead of target.".to_string(),
+            format!(
+                "Project '{}' contains {} active documents and {} financial models.",
+                project_name, docs_count, sheets_count
+            ),
+            "Operational performance across team tasks is tracking 15% ahead of target."
+                .to_string(),
             "No unresolved critical budget blockers identified.".to_string(),
         ];
 
@@ -12780,7 +12874,10 @@ mod tests_phase2 {
         let intensities = heatmap_engine.compute_pivot_heatmap_cell_intensities(&matrix);
         assert_eq!(intensities[0][0], 0.0);
         assert_eq!(intensities[1][1], 1.0);
-        assert_eq!(heatmap_engine.calculate_quantile_bucket(25.0, &[20.0, 50.0, 80.0]), 1);
+        assert_eq!(
+            heatmap_engine.calculate_quantile_bucket(25.0, &[20.0, 50.0, 80.0]),
+            1
+        );
 
         // 16. Sovereign Looker Studio Field Calculated Metric Engine
         let looker_metric_engine = SovereignLookerStudioFieldCalculatedMetricEngine::new();
@@ -12801,15 +12898,24 @@ mod tests_phase2 {
         let territory_engine = SovereignZohoCrmTerritoryScoringEngine::new();
         let score = territory_engine.calculate_account_territory_score(5_000_000.0, 200, 15.0);
         assert!(score >= 80.0);
-        assert_eq!(territory_engine.assign_territory(score, 75.0), "Enterprise Tier A");
+        assert_eq!(
+            territory_engine.assign_territory(score, 75.0),
+            "Enterprise Tier A"
+        );
 
         // 19. Sovereign Microsoft Loop Interactive Card Engine
         let loop_engine = SovereignMicrosoftLoopInteractiveCardEngine::new();
         let mut card = loop_engine.create_interactive_card("Q4 Budget Review", "Alice");
         assert_eq!(card.author, "Alice");
         loop_engine.apply_field_update(&mut card, "status", "Approved", "Bob");
-        assert_eq!(card.fields.get("status").map(|s| s.as_str()), Some("Approved"));
-        assert_eq!(loop_engine.resolve_field_conflict("Local Text", "Remote Text", true), "Remote Text");
+        assert_eq!(
+            card.fields.get("status").map(|s| s.as_str()),
+            Some("Approved")
+        );
+        assert_eq!(
+            loop_engine.resolve_field_conflict("Local Text", "Remote Text", true),
+            "Remote Text"
+        );
 
         // 20. Sovereign Microsoft Power BI DAX Formula Engine
         let dax_engine = SovereignMicrosoftPowerBiDaxFormulaEngine::new();
@@ -12855,13 +12961,23 @@ mod tests_phase2 {
         let list_rule = SheetDataValidationRule {
             rule_id: "rule_dept".to_string(),
             field_name: "department".to_string(),
-            rule_kind: ValidationRuleKind::ListOfItems(vec!["Engineering".to_string(), "Sales".to_string()]),
+            rule_kind: ValidationRuleKind::ListOfItems(vec![
+                "Engineering".to_string(),
+                "Sales".to_string(),
+            ]),
             allow_invalid_with_warning: false,
             error_message: "Department must be Engineering or Sales".to_string(),
         };
-        assert!(sheet_val_engine.validate_cell_value("Engineering", &list_rule).unwrap());
-        assert!(sheet_val_engine.validate_cell_value("Marketing", &list_rule).is_err());
-        assert_eq!(sheet_val_engine.generate_dropdown_options(&list_rule).len(), 2);
+        assert!(sheet_val_engine
+            .validate_cell_value("Engineering", &list_rule)
+            .unwrap());
+        assert!(sheet_val_engine
+            .validate_cell_value("Marketing", &list_rule)
+            .is_err());
+        assert_eq!(
+            sheet_val_engine.generate_dropdown_options(&list_rule).len(),
+            2
+        );
 
         // 25. Sovereign Google Docs Watermark & Header Footer Layout Engine
         let layout_engine = SovereignGoogleDocsWatermarkAndHeaderFooterLayoutEngine::new();
@@ -12890,18 +13006,36 @@ mod tests_phase2 {
         // 26. Sovereign Microsoft 365 Co-authoring Operational Transformation Engine
         let ot_engine = SovereignMicrosoft365CoauthoringOperationalTransformEngine::new();
         let op_a = CoauthorOperation {
-            op_kind: CoauthorOpKind::Insert { position: 5, text: "Hello ".to_string() },
+            op_kind: CoauthorOpKind::Insert {
+                position: 5,
+                text: "Hello ".to_string(),
+            },
             site_id: 1,
             vector_clock: 1,
         };
         let op_b = CoauthorOperation {
-            op_kind: CoauthorOpKind::Insert { position: 5, text: "World ".to_string() },
+            op_kind: CoauthorOpKind::Insert {
+                position: 5,
+                text: "World ".to_string(),
+            },
             site_id: 2,
             vector_clock: 1,
         };
         let (p_a, p_b) = ot_engine.transform_operations(&op_a, &op_b);
-        assert_eq!(p_a.op_kind, CoauthorOpKind::Insert { position: 5, text: "Hello ".to_string() });
-        assert_eq!(p_b.op_kind, CoauthorOpKind::Insert { position: 11, text: "World ".to_string() });
+        assert_eq!(
+            p_a.op_kind,
+            CoauthorOpKind::Insert {
+                position: 5,
+                text: "Hello ".to_string()
+            }
+        );
+        assert_eq!(
+            p_b.op_kind,
+            CoauthorOpKind::Insert {
+                position: 11,
+                text: "World ".to_string()
+            }
+        );
 
         let mut doc_text = "Sigma OS".to_string();
         ot_engine.apply_operation_to_text(&mut doc_text, &op_a);
@@ -12934,7 +13068,8 @@ mod tests_phase2 {
             renewal_uplift_pct: 5.0,
             is_cotermed: false,
         };
-        let renewal_quote = cpq_renewal_engine.calculate_renewal_quote(&sub_contract, 12, 10000.0, 2.0);
+        let renewal_quote =
+            cpq_renewal_engine.calculate_renewal_quote(&sub_contract, 12, 10000.0, 2.0);
         assert!(renewal_quote.renewal_arr > 100000.0);
         assert_eq!(renewal_quote.final_discount_pct, 8.0);
 
@@ -12951,7 +13086,10 @@ mod tests_phase2 {
         assert!(oee_res.availability_rate > 0.9);
         assert!(oee_res.performance_rate > 0.8);
         assert!(oee_res.quality_rate > 0.9);
-        assert_eq!(oee_engine.classify_oee_status(oee_res.overall_oee_pct), "Effective");
+        assert_eq!(
+            oee_engine.classify_oee_status(oee_res.overall_oee_pct),
+            "Effective"
+        );
 
         // 30. Sovereign Bitrix24 Omnichannel SLA Escalation Router Engine
         let sla_engine = SovereignBitrix24OmnichannelSlaEscalationRouterEngine::new();

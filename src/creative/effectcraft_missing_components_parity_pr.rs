@@ -87,10 +87,16 @@ impl ShaderFilterGraphPrEngine {
             compiled: true,
         };
         map.insert("default_passthrough".to_string(), default_node);
-        Self { compiled_nodes: map }
+        Self {
+            compiled_nodes: map,
+        }
     }
 
-    pub fn compile_glsl_shader(&mut self, shader_name: &str, glsl_code: &str) -> Result<String, String> {
+    pub fn compile_glsl_shader(
+        &mut self,
+        shader_name: &str,
+        glsl_code: &str,
+    ) -> Result<String, String> {
         if glsl_code.is_empty() {
             return Err("Shader source code cannot be empty".to_string());
         }
@@ -130,8 +136,16 @@ impl ShaderFilterGraphPrEngine {
         ))
     }
 
-    pub fn execute_shader_pass(&self, shader_name: &str, input_pixels: &[u8], output_pixels: &mut [u8]) -> Result<usize, String> {
-        let node = self.compiled_nodes.get(shader_name).ok_or("Shader node not found")?;
+    pub fn execute_shader_pass(
+        &self,
+        shader_name: &str,
+        input_pixels: &[u8],
+        output_pixels: &mut [u8],
+    ) -> Result<usize, String> {
+        let node = self
+            .compiled_nodes
+            .get(shader_name)
+            .ok_or("Shader node not found")?;
         if !node.compiled {
             return Err("Shader node is not compiled".to_string());
         }
@@ -140,7 +154,9 @@ impl ShaderFilterGraphPrEngine {
         }
 
         // Apply shader pass operation across RGBA pixel channels
-        let opacity = node.uniforms.iter()
+        let opacity = node
+            .uniforms
+            .iter()
             .find(|u| u.name == "u_opacity")
             .and_then(|u| u.value.first().copied())
             .unwrap_or(1.0);
@@ -159,7 +175,9 @@ impl ShaderFilterGraphPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-Time Custom GLSL Shader Node Graph Compiler".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Real-Time Custom GLSL Shader Node Graph Compiler"
+                    .to_string(),
             target_subsystem: "GPU Shader Graph Renderer".to_string(),
             original_suite: "ArtCraft EffectCraft / Blender Compositor".to_string(),
             components_added: vec![
@@ -250,7 +268,9 @@ impl ParticlePhysicsEffectPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-Time GPU Particle Physics Simulation Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Real-Time GPU Particle Physics Simulation Engine"
+                    .to_string(),
             target_subsystem: "Particle & Fluid Simulator".to_string(),
             original_suite: "ArtCraft EffectCraft Particle System".to_string(),
             components_added: vec![
@@ -287,7 +307,12 @@ impl NeuralMatteSegmentationPrEngine {
         }
     }
 
-    pub fn execute_auto_keying(&mut self, frame_pixels: &[u8], width: u32, height: u32) -> Result<SegmentationMask, String> {
+    pub fn execute_auto_keying(
+        &mut self,
+        frame_pixels: &[u8],
+        width: u32,
+        height: u32,
+    ) -> Result<SegmentationMask, String> {
         if frame_pixels.len() != (width * height * 4) as usize {
             return Err("Frame buffer size does not match width * height * 4".to_string());
         }
@@ -321,7 +346,8 @@ impl NeuralMatteSegmentationPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement AI Neural Matte & Auto-Segmentation Keyer".to_string(),
+            pr_title: "feat(effectcraft): Implement AI Neural Matte & Auto-Segmentation Keyer"
+                .to_string(),
             target_subsystem: "AI Keying & Isolation Engine".to_string(),
             original_suite: "ArtCraft EffectCraft AI Studio".to_string(),
             components_added: vec![
@@ -373,7 +399,8 @@ impl AudioReactiveVisualizerPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-Time FFT Audio-Reactive Effect Modulator".to_string(),
+            pr_title: "feat(effectcraft): Implement Real-Time FFT Audio-Reactive Effect Modulator"
+                .to_string(),
             target_subsystem: "Audio-Visual Modulation Matrix".to_string(),
             original_suite: "ArtCraft EffectCraft Audio-Visualizer".to_string(),
             components_added: vec![
@@ -416,7 +443,11 @@ impl Spatial3DDepthCompositorPrEngine {
 
         let mut projected = Vec::with_capacity(points.len());
         for pt in points {
-            let z = if pt.position[2].abs() < 1e-4 { 1.0 } else { pt.position[2] };
+            let z = if pt.position[2].abs() < 1e-4 {
+                1.0
+            } else {
+                pt.position[2]
+            };
             let x_proj = (self.focal_length * pt.position[0]) / z;
             let y_proj = (self.focal_length * pt.position[1]) / z;
             projected.push((x_proj, y_proj));
@@ -428,7 +459,9 @@ impl Spatial3DDepthCompositorPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement 3D Spatial Camera Tracking & Z-Depth Compositor".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement 3D Spatial Camera Tracking & Z-Depth Compositor"
+                    .to_string(),
             target_subsystem: "3D Spatial Compositing Pipeline".to_string(),
             original_suite: "ArtCraft EffectCraft 3D Spatial Studio".to_string(),
             components_added: vec![
@@ -482,8 +515,14 @@ impl ArtCraftOpenFxPluginPrEngine {
         let descriptor = OfxPluginDescriptor {
             plugin_id: plugin_name.to_string(),
             parameters: vec![
-                OfxParam { name: "intensity".to_string(), val: 1.0 },
-                OfxParam { name: "mix".to_string(), val: 1.0 },
+                OfxParam {
+                    name: "intensity".to_string(),
+                    val: 1.0,
+                },
+                OfxParam {
+                    name: "mix".to_string(),
+                    val: 1.0,
+                },
             ],
             active: true,
         };
@@ -494,7 +533,12 @@ impl ArtCraftOpenFxPluginPrEngine {
         ))
     }
 
-    pub fn set_plugin_parameter(&mut self, plugin_id: &str, param_name: &str, value: f32) -> Result<(), String> {
+    pub fn set_plugin_parameter(
+        &mut self,
+        plugin_id: &str,
+        param_name: &str,
+        value: f32,
+    ) -> Result<(), String> {
         let plugin = self.plugins.get_mut(plugin_id).ok_or("Plugin not found")?;
         for param in plugin.parameters.iter_mut() {
             if param.name == param_name {
@@ -511,7 +555,9 @@ impl ArtCraftOpenFxPluginPrEngine {
             return Err("Plugin is inactive".to_string());
         }
 
-        let mix = plugin.parameters.iter()
+        let mix = plugin
+            .parameters
+            .iter()
             .find(|p| p.name == "mix" || p.name == "intensity")
             .map(|p| p.val)
             .unwrap_or(1.0);
@@ -524,7 +570,8 @@ impl ArtCraftOpenFxPluginPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement OpenFX (OFX) & ArtCraft Preset Host Adapter".to_string(),
+            pr_title: "feat(effectcraft): Implement OpenFX (OFX) & ArtCraft Preset Host Adapter"
+                .to_string(),
             target_subsystem: "Plugin Interoperability Layer".to_string(),
             original_suite: "ArtCraft OpenFX / Preset Ecosystem".to_string(),
             components_added: vec![
@@ -562,14 +609,29 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
     }
 
     pub fn evaluate_effectcraft_parity(&mut self) -> bool {
-        let _shader_ok = self.shader_graph.compile_glsl_shader("chroma_distort", "void main(){}").is_ok();
-        let _particle_ok = self.particle_physics.emit_particles("fire_emitter", 100).is_ok();
+        let _shader_ok = self
+            .shader_graph
+            .compile_glsl_shader("chroma_distort", "void main(){}")
+            .is_ok();
+        let _particle_ok = self
+            .particle_physics
+            .emit_particles("fire_emitter", 100)
+            .is_ok();
         let frame = vec![0u8, 200u8, 0u8, 255u8];
         let _matte_ok = self.neural_matte.execute_auto_keying(&frame, 1, 1).is_ok();
-        let _audio_ok = self.audio_reactive.process_audio_buffer(&[0.5, 0.8, 0.2, 0.9, 0.1]).is_ok();
-        let pts = vec![Point3D { position: [1.0, 2.0, 5.0], color: [1.0, 0.0, 0.0] }];
+        let _audio_ok = self
+            .audio_reactive
+            .process_audio_buffer(&[0.5, 0.8, 0.2, 0.9, 0.1])
+            .is_ok();
+        let pts = vec![Point3D {
+            position: [1.0, 2.0, 5.0],
+            color: [1.0, 0.0, 0.0],
+        }];
         let _spatial_ok = self.spatial_3d.project_points(&pts).is_ok();
-        let _ofx_ok = self.ofx_adapter.load_openfx_plugin("com.artcraft.FilmGrain").is_ok();
+        let _ofx_ok = self
+            .ofx_adapter
+            .load_openfx_plugin("com.artcraft.FilmGrain")
+            .is_ok();
         true
     }
 
@@ -617,7 +679,8 @@ mod tests {
 
         let input_rgba = vec![255, 128, 64, 200];
         let mut output_rgba = vec![0, 0, 0, 0];
-        let pass_res = engine.execute_shader_pass("default_passthrough", &input_rgba, &mut output_rgba);
+        let pass_res =
+            engine.execute_shader_pass("default_passthrough", &input_rgba, &mut output_rgba);
         assert!(pass_res.is_ok());
         assert_eq!(output_rgba[3], 200);
     }
@@ -637,14 +700,14 @@ mod tests {
         let mut engine = NeuralMatteSegmentationPrEngine::new();
         // 2x2 pixels RGBA: Top-left green background, remaining red foreground
         let pixels = vec![
-            0, 200, 0, 255,   // Green bg
-            255, 0, 0, 255,   // Red fg
-            255, 0, 0, 255,   // Red fg
-            255, 0, 0, 255,   // Red fg
+            0, 200, 0, 255, // Green bg
+            255, 0, 0, 255, // Red fg
+            255, 0, 0, 255, // Red fg
+            255, 0, 0, 255, // Red fg
         ];
 
         let mask = engine.execute_auto_keying(&pixels, 2, 2).unwrap();
-        assert_eq!(mask.alpha_map[0], 0);   // Keyed out background
+        assert_eq!(mask.alpha_map[0], 0); // Keyed out background
         assert_eq!(mask.alpha_map[1], 255); // Keyed foreground
     }
 
@@ -660,9 +723,10 @@ mod tests {
     #[test]
     fn test_spatial_3d_engine_functional() {
         let mut engine = Spatial3DDepthCompositorPrEngine::new();
-        let points = vec![
-            Point3D { position: [10.0, 20.0, 50.0], color: [1.0, 1.0, 1.0] }
-        ];
+        let points = vec![Point3D {
+            position: [10.0, 20.0, 50.0],
+            color: [1.0, 1.0, 1.0],
+        }];
 
         let projected = engine.project_points(&points).unwrap();
         assert_eq!(projected.len(), 1);
@@ -676,10 +740,14 @@ mod tests {
         let load_res = engine.load_openfx_plugin("com.artcraft.Sharpen");
         assert!(load_res.is_ok());
 
-        engine.set_plugin_parameter("com.artcraft.Sharpen", "intensity", 0.5).unwrap();
+        engine
+            .set_plugin_parameter("com.artcraft.Sharpen", "intensity", 0.5)
+            .unwrap();
 
         let mut pixels = vec![100, 150, 200, 255];
-        engine.process_frame("com.artcraft.Sharpen", &mut pixels).unwrap();
+        engine
+            .process_frame("com.artcraft.Sharpen", &mut pixels)
+            .unwrap();
         assert_eq!(pixels[0], 50); // 100 * 0.5
     }
 }
