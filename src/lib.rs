@@ -150,6 +150,7 @@ pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
+pub use distro::open_source_os_missing_components_v58_pr::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
