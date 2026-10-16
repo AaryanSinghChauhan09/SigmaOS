@@ -522,10 +522,7 @@ impl OpenBsdOpenrsyncPrEngine {
     }
 
     pub fn sync_directory(&mut self, src: &str, dst: &str) -> String {
-        format!(
-            "openrsync -avz --pledge --unveil {} {}",
-            src, dst
-        )
+        format!("openrsync -avz --pledge --unveil {} {}", src, dst)
     }
 }
 
@@ -637,7 +634,9 @@ impl OpenBsdMissingComponentsV59PrSuite {
         );
         self.validate_and_merge_pr(bgp_pr);
 
-        self.proposals.values().all(|p| p.status == OpenBsdPrStatusV59::Merged)
+        self.proposals
+            .values()
+            .all(|p| p.status == OpenBsdPrStatusV59::Merged)
     }
 }
 
@@ -664,7 +663,10 @@ mod tests {
         let mut acme = OpenBsdAcmeClientTlsPrEngine::new();
         let adiff = acme.issue_or_renew_cert("app.sigmaos.org");
         assert!(adiff.contains("app.sigmaos.org"));
-        assert_eq!(acme.certs.get("app.sigmaos.org").unwrap().days_remaining, 90);
+        assert_eq!(
+            acme.certs.get("app.sigmaos.org").unwrap().days_remaining,
+            90
+        );
     }
 
     #[test]
