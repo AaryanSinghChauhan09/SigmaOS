@@ -36,7 +36,13 @@ pub struct HandlerMetadata {
 }
 
 impl HandlerMetadata {
-    pub fn new(id: HandlerId, name: impl Into<String>, irq: u32, priority: InterruptPriority, mode: HandlerMode) -> Self {
+    pub fn new(
+        id: HandlerId,
+        name: impl Into<String>,
+        irq: u32,
+        priority: InterruptPriority,
+        mode: HandlerMode,
+    ) -> Self {
         Self {
             id,
             name: name.into(),

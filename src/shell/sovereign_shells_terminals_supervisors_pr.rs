@@ -29,13 +29,13 @@ pub struct ShellsTerminalsSupervisorsPrProposalManifest {
 /// Supported supervisor/init system kind.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SupervisorKind {
-    Systemd,     // Fedora / Arch / Debian systemd unit supervisor & D-Bus activation
-    OpenRc,      // Gentoo OpenRC runlevel dependency supervisor
-    Runit,       // Void Linux runit service directory supervisor
-    S6,          // Alpine / Void s6 readiness fd notification supervisor
-    SysVinit,    // Devuan / Slackware SysV init script supervisor
-    BsdRc,       // FreeBSD / OpenBSD / NetBSD /etc/rc.subr supervisor
-    Launchd,     // macOS launchd plist Mach/socket activation supervisor
+    Systemd,  // Fedora / Arch / Debian systemd unit supervisor & D-Bus activation
+    OpenRc,   // Gentoo OpenRC runlevel dependency supervisor
+    Runit,    // Void Linux runit service directory supervisor
+    S6,       // Alpine / Void s6 readiness fd notification supervisor
+    SysVinit, // Devuan / Slackware SysV init script supervisor
+    BsdRc,    // FreeBSD / OpenBSD / NetBSD /etc/rc.subr supervisor
+    Launchd,  // macOS launchd plist Mach/socket activation supervisor
 }
 
 /// Service unit execution status.
@@ -76,7 +76,12 @@ impl InitSupervisorsAndTimersPrEngine {
         Self
     }
 
-    pub fn evaluate_service_unit(&self, name: &str, kind: SupervisorKind, readiness_notified: bool) -> ServiceUnitState {
+    pub fn evaluate_service_unit(
+        &self,
+        name: &str,
+        kind: SupervisorKind,
+        readiness_notified: bool,
+    ) -> ServiceUnitState {
         ServiceUnitState {
             name: name.to_string(),
             supervisor: kind,
@@ -87,7 +92,12 @@ impl InitSupervisorsAndTimersPrEngine {
         }
     }
 
-    pub fn evaluate_cron_schedule(&self, job_name: &str, expression: &str, current_time_sec: u64) -> ScheduledJobStatus {
+    pub fn evaluate_cron_schedule(
+        &self,
+        job_name: &str,
+        expression: &str,
+        current_time_sec: u64,
+    ) -> ScheduledJobStatus {
         let is_interval = expression.contains("*/") || expression == "* * * * *";
         let interval_sec = if is_interval { 60 } else { 3600 };
         ScheduledJobStatus {
@@ -98,7 +108,13 @@ impl InitSupervisorsAndTimersPrEngine {
         }
     }
 
-    pub fn evaluate_anacron_catchup(&self, job_name: &str, period_days: u32, last_run_timestamp_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
+    pub fn evaluate_anacron_catchup(
+        &self,
+        job_name: &str,
+        period_days: u32,
+        last_run_timestamp_sec: u64,
+        current_time_sec: u64,
+    ) -> ScheduledJobStatus {
         let period_sec = (period_days as u64) * 86400;
         let elapsed_sec = current_time_sec.saturating_sub(last_run_timestamp_sec);
         let is_overdue = elapsed_sec >= period_sec;
@@ -106,13 +122,27 @@ impl InitSupervisorsAndTimersPrEngine {
         ScheduledJobStatus {
             job_name: job_name.to_string(),
             kind: ScheduledJobKind::Anacron,
-            next_fire_timestamp_sec: if is_overdue { current_time_sec } else { last_run_timestamp_sec + period_sec },
+            next_fire_timestamp_sec: if is_overdue {
+                current_time_sec
+            } else {
+                last_run_timestamp_sec + period_sec
+            },
             missed_execution_catchup: is_overdue,
         }
     }
 
-    pub fn evaluate_systemd_timer(&self, timer_name: &str, calendar_spec: &str, randomized_delay_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
-        let base_interval = if calendar_spec == "daily" { 86400 } else { 3600 };
+    pub fn evaluate_systemd_timer(
+        &self,
+        timer_name: &str,
+        calendar_spec: &str,
+        randomized_delay_sec: u64,
+        current_time_sec: u64,
+    ) -> ScheduledJobStatus {
+        let base_interval = if calendar_spec == "daily" {
+            86400
+        } else {
+            3600
+        };
         let next_fire = current_time_sec + base_interval + (randomized_delay_sec % 300);
 
         ScheduledJobStatus {
@@ -123,7 +153,12 @@ impl InitSupervisorsAndTimersPrEngine {
         }
     }
 
-    pub fn evaluate_at_job(&self, job_name: &str, scheduled_timestamp_sec: u64, current_time_sec: u64) -> ScheduledJobStatus {
+    pub fn evaluate_at_job(
+        &self,
+        job_name: &str,
+        scheduled_timestamp_sec: u64,
+        current_time_sec: u64,
+    ) -> ScheduledJobStatus {
         ScheduledJobStatus {
             job_name: job_name.to_string(),
             kind: ScheduledJobKind::AtDeferred,
@@ -174,13 +209,13 @@ impl InitSupervisorsAndTimersPrEngine {
 /// Dialects of shell syntax supported.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ShellDialect {
-    Bash,  // GNU Bash 5.2+ (process substitution, brace expansion, associative arrays)
-    Zsh,   // Zsh 5.9+ (zshzle line editor, prompt expansion %F, extended globbing)
-    Fish,  // Fish 3.7+ (syntax highlighting, inline autosuggestions, clean syntax)
-    Dash,  // Debian Almquist Shell (POSIX script execution)
-    Ksh,   // KornShell ksh93 (typeset, compound vars, math evaluation)
-    Tcsh,  // C Shell tcsh (foreach, switch, C-like syntax)
-    Ash,   // BusyBox ash / POSIX sh fallback
+    Bash, // GNU Bash 5.2+ (process substitution, brace expansion, associative arrays)
+    Zsh,  // Zsh 5.9+ (zshzle line editor, prompt expansion %F, extended globbing)
+    Fish, // Fish 3.7+ (syntax highlighting, inline autosuggestions, clean syntax)
+    Dash, // Debian Almquist Shell (POSIX script execution)
+    Ksh,  // KornShell ksh93 (typeset, compound vars, math evaluation)
+    Tcsh, // C Shell tcsh (foreach, switch, C-like syntax)
+    Ash,  // BusyBox ash / POSIX sh fallback
 }
 
 /// Syntax highlight classification token type.
@@ -233,7 +268,9 @@ impl PosixAndAdvancedShellsPrEngine {
                 ShellTokenType::PipelineOperator
             } else if *word == ">" || *word == ">>" || *word == "<" {
                 ShellTokenType::Redirection
-            } else if matches!(dialect, ShellDialect::Bash | ShellDialect::Zsh) && (*word == "if" || *word == "then" || *word == "fi") {
+            } else if matches!(dialect, ShellDialect::Bash | ShellDialect::Zsh)
+                && (*word == "if" || *word == "then" || *word == "fi")
+            {
                 ShellTokenType::Keyword
             } else {
                 ShellTokenType::Argument
@@ -248,7 +285,11 @@ impl PosixAndAdvancedShellsPrEngine {
         tokens
     }
 
-    pub fn expand_parameters(&self, input: &str, variables: &[(&str, &str)]) -> ShellExpansionResult {
+    pub fn expand_parameters(
+        &self,
+        input: &str,
+        variables: &[(&str, &str)],
+    ) -> ShellExpansionResult {
         let mut result = input.to_string();
         let mut was_expanded = false;
 
@@ -281,7 +322,10 @@ impl PosixAndAdvancedShellsPrEngine {
     }
 
     pub fn format_zsh_prompt(&self, user: &str, host: &str, current_dir: &str) -> String {
-        format!("\x1b[32m{}@{}\x1b[0m:\x1b[34m{}\x1b[0m%# ", user, host, current_dir)
+        format!(
+            "\x1b[32m{}@{}\x1b[0m:\x1b[34m{}\x1b[0m%# ",
+            user, host, current_dir
+        )
     }
 
     pub fn generate_proposal(&self) -> ShellsTerminalsSupervisorsPrProposalManifest {
@@ -362,7 +406,11 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         Self
     }
 
-    pub fn parse_escape_sequence(&self, input: &str, kind: TerminalEmulatorKind) -> Vec<TerminalCell> {
+    pub fn parse_escape_sequence(
+        &self,
+        input: &str,
+        kind: TerminalEmulatorKind,
+    ) -> Vec<TerminalCell> {
         let mut cells = Vec::new();
         let is_kitty = matches!(kind, TerminalEmulatorKind::Kitty);
 
@@ -390,7 +438,13 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         }
     }
 
-    pub fn create_multiplexer_pane(&self, pane_id: u32, width: u16, height: u16, horizontal: bool) -> PaneGridSplit {
+    pub fn create_multiplexer_pane(
+        &self,
+        pane_id: u32,
+        width: u16,
+        height: u16,
+        horizontal: bool,
+    ) -> PaneGridSplit {
         PaneGridSplit {
             pane_id,
             width_cells: if horizontal { width / 2 } else { width },
@@ -399,10 +453,17 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         }
     }
 
-    pub fn render_status_line(&self, session_name: &str, active_window: u32, kind: MultiplexerKind) -> String {
+    pub fn render_status_line(
+        &self,
+        session_name: &str,
+        active_window: u32,
+        kind: MultiplexerKind,
+    ) -> String {
         match kind {
             MultiplexerKind::Tmux => format!("[{}] {}:sigma-sh*", session_name, active_window),
-            MultiplexerKind::Screen => format!("screen ({}) {} sigma-sh", session_name, active_window),
+            MultiplexerKind::Screen => {
+                format!("screen ({}) {} sigma-sh", session_name, active_window)
+            }
         }
     }
 
@@ -466,7 +527,9 @@ impl SovereignShellsTerminalsSupervisorsParityPrGateway {
         let total_features: usize = proposals.iter().map(|p| p.key_features_added.len()).sum();
 
         let mut summary = String::new();
-        summary.push_str("=== SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY PR PROPOSAL SUMMARY ===\n");
+        summary.push_str(
+            "=== SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY PR PROPOSAL SUMMARY ===\n",
+        );
         summary.push_str("Total PR Proposals: ");
         summary.push_str(&proposals.len().to_string());
         summary.push_str("\nTotal Tools Covered: ");
@@ -560,11 +623,15 @@ mod tests {
         assert_eq!(tokens[1].token_type, ShellTokenType::OptionFlag);
         assert_eq!(tokens[2].token_type, ShellTokenType::Variable);
 
-        let expansion = engine.expand_parameters("echo ${USER} on $HOST", &[("USER", "root"), ("HOST", "sigma")]);
+        let expansion = engine.expand_parameters(
+            "echo ${USER} on $HOST",
+            &[("USER", "root"), ("HOST", "sigma")],
+        );
         assert_eq!(expansion.expanded_value, "echo root on sigma");
         assert!(expansion.was_expanded);
 
-        let suggestion = engine.predict_autosuggestion("car", &["ls", "cargo build --release", "cat file"]);
+        let suggestion =
+            engine.predict_autosuggestion("car", &["ls", "cargo build --release", "cat file"]);
         assert_eq!(suggestion, Some("cargo build --release".to_string()));
 
         let prompt = engine.format_zsh_prompt("root", "sigma", "/root");
@@ -605,10 +672,14 @@ mod tests {
         assert_eq!(proposals.len(), 3);
 
         let summary = gateway.generate_master_summary();
-        assert!(summary.contains("SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY PR PROPOSAL SUMMARY"));
+        assert!(
+            summary.contains("SIGMAOS SHELLS, TERMINALS & SUPERVISORS PARITY PR PROPOSAL SUMMARY")
+        );
         assert!(summary.contains("Total PR Proposals: 3"));
 
         let markdown = gateway.generate_pr_proposal_markdown();
-        assert!(markdown.contains("# Pull Request Proposal: Universal Linux & BSD Shells, Terminals"));
+        assert!(
+            markdown.contains("# Pull Request Proposal: Universal Linux & BSD Shells, Terminals")
+        );
     }
 }

@@ -13,7 +13,6 @@ pub mod client;
 pub mod daemon;
 pub mod https_mirror_client;
 
-
 pub use aurweb::{
     AurComment, AurCommentThread, AurGitRepoManager, AurGitRepository, AurPackageRecord,
     AurRpcQueryType, AurRpcResponse, AurVotingSystem, SovereignAurWebEngine,
@@ -90,10 +89,10 @@ pub use crate::package::sovereign_distro_package_advancements_v30::*;
 pub use crate::package::sovereign_distro_package_advancements_v31::*;
 pub use crate::package::sovereign_distro_package_advancements_v33::*;
 pub use crate::package::sovereign_distro_package_advancements_v37::*;
+pub use crate::package::sovereign_distro_package_advancements_v4::*;
 pub use crate::package::sovereign_distro_package_advancements_v40::*;
 pub use crate::package::sovereign_distro_package_advancements_v41::*;
 pub use crate::package::sovereign_distro_package_advancements_v42::*;
-pub use crate::package::sovereign_distro_package_advancements_v4::*;
 pub use crate::package::sovereign_distro_package_advancements_v5::*;
 pub use crate::package::sovereign_distro_package_advancements_v6::*;
 pub use crate::package::sovereign_distro_package_advancements_v7::*;

@@ -158,7 +158,10 @@ impl DebugfsNode {
 
     /// Remove a child by name.  Returns `DebugfsError::NotFound` if not found.
     pub fn remove_child(&mut self, name: &str) -> Result<(), DebugfsError> {
-        let pos = self.children.iter().position(|c| c.name == name)
+        let pos = self
+            .children
+            .iter()
+            .position(|c| c.name == name)
             .ok_or(DebugfsError::NotFound)?;
         self.children.remove(pos);
         Ok(())
@@ -197,7 +200,11 @@ impl DebugFilesystem {
     ///
     /// Returns a mutable reference to the node or `DebugfsError::NotFound`.
     pub fn lookup_dir_mut(&mut self, path: &str) -> Result<&mut DebugfsNode, DebugfsError> {
-        let parts: Vec<&str> = path.trim_matches('/').split('/').filter(|s| !s.is_empty()).collect();
+        let parts: Vec<&str> = path
+            .trim_matches('/')
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .collect();
         let mut node = &mut self.root;
         for part in parts {
             if !node.is_dir() {
@@ -210,12 +217,20 @@ impl DebugFilesystem {
 
     /// Create intermediate directories along `path` (like `mkdir -p`).
     pub fn mkdir_p(&mut self, path: &str) -> Result<(), DebugfsError> {
-        let parts: Vec<&str> = path.trim_matches('/').split('/').filter(|s| !s.is_empty()).collect();
+        let parts: Vec<&str> = path
+            .trim_matches('/')
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .collect();
         // We have to re-navigate from root for each component to satisfy borrow rules.
         for depth in 0..parts.len() {
             let ino = self.alloc_ino();
             let component_path = parts[..=depth].join("/");
-            let parent_path = if depth == 0 { String::new() } else { parts[..depth].join("/") };
+            let parent_path = if depth == 0 {
+                String::new()
+            } else {
+                parts[..depth].join("/")
+            };
             let name = parts[depth];
             let parent = self.lookup_dir_mut(&parent_path)?;
             if parent.find_child(name).is_none() {
@@ -246,7 +261,12 @@ impl DebugFilesystem {
     }
 
     /// Read from the file at `path`.
-    pub fn read_file(&self, path: &str, offset: u64, buf: &mut [u8]) -> Result<usize, DebugfsError> {
+    pub fn read_file(
+        &self,
+        path: &str,
+        offset: u64,
+        buf: &mut [u8],
+    ) -> Result<usize, DebugfsError> {
         let node = self.lookup_node(path)?;
         match &node.ops {
             Some(ops) => ops.read(offset, buf),
@@ -265,7 +285,11 @@ impl DebugFilesystem {
 
     /// Immutable lookup helper.
     fn lookup_node(&self, path: &str) -> Result<&DebugfsNode, DebugfsError> {
-        let parts: Vec<&str> = path.trim_matches('/').split('/').filter(|s| !s.is_empty()).collect();
+        let parts: Vec<&str> = path
+            .trim_matches('/')
+            .split('/')
+            .filter(|s| !s.is_empty())
+            .collect();
         let mut node = &self.root;
         for part in parts {
             node = node.find_child(part).ok_or(DebugfsError::NotFound)?;
@@ -389,7 +413,12 @@ pub fn debugfs_create_file_static(
     name: &str,
     content: &'static str,
 ) -> Result<(), DebugfsError> {
-    fs.create_file(parent_path, name, 0o444, Box::new(StaticDebugFile::new(content)))
+    fs.create_file(
+        parent_path,
+        name,
+        0o444,
+        Box::new(StaticDebugFile::new(content)),
+    )
 }
 
 /// Create a read-only dynamic file at `parent_path/name` in `fs`.
@@ -402,5 +431,10 @@ pub fn debugfs_create_file_dynamic<F>(
 where
     F: Fn() -> Vec<u8> + Send + Sync + 'static,
 {
-    fs.create_file(parent_path, name, 0o444, Box::new(DynamicDebugFile::new(generator)))
+    fs.create_file(
+        parent_path,
+        name,
+        0o444,
+        Box::new(DynamicDebugFile::new(generator)),
+    )
 }

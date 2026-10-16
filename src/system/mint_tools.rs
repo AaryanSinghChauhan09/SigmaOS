@@ -299,7 +299,10 @@ impl SystemToolsEngine {
 
     /// Start backup
     pub fn start_backup(&mut self, backup_id: u32) -> Result<(), &'static str> {
-        let job = self.backup_jobs.get_mut(&backup_id).ok_or("Backup not found")?;
+        let job = self
+            .backup_jobs
+            .get_mut(&backup_id)
+            .ok_or("Backup not found")?;
         job.status = BackupStatus::InProgress;
         job.start_time = 0; // Would be actual timestamp
         Ok(())
@@ -307,7 +310,10 @@ impl SystemToolsEngine {
 
     /// Complete backup
     pub fn complete_backup(&mut self, backup_id: u32, size_bytes: u64) -> Result<(), &'static str> {
-        let job = self.backup_jobs.get_mut(&backup_id).ok_or("Backup not found")?;
+        let job = self
+            .backup_jobs
+            .get_mut(&backup_id)
+            .ok_or("Backup not found")?;
         job.status = BackupStatus::Completed;
         job.end_time = Some(0); // Would be actual timestamp
         job.size_bytes = size_bytes;
@@ -316,7 +322,10 @@ impl SystemToolsEngine {
 
     /// Fail backup
     pub fn fail_backup(&mut self, backup_id: u32, error: String) -> Result<(), &'static str> {
-        let job = self.backup_jobs.get_mut(&backup_id).ok_or("Backup not found")?;
+        let job = self
+            .backup_jobs
+            .get_mut(&backup_id)
+            .ok_or("Backup not found")?;
         job.status = BackupStatus::Failed;
         job.end_time = Some(0);
         job.error_message = Some(error);
@@ -331,7 +340,11 @@ impl SystemToolsEngine {
 
     /// Install update
     pub fn install_update(&mut self, package_name: String) -> Result<(), &'static str> {
-        let index = self.update_manager.available_updates.iter().position(|u| u.name == package_name);
+        let index = self
+            .update_manager
+            .available_updates
+            .iter()
+            .position(|u| u.name == package_name);
         if let Some(idx) = index {
             self.update_manager.available_updates.remove(idx);
             Ok(())
@@ -354,21 +367,34 @@ impl SystemToolsEngine {
     pub fn search_software(&mut self, query: String) -> Vec<&SoftwarePackage> {
         self.software_manager.search_query = query.clone();
         let query_lower = query.to_lowercase();
-        self.software_manager.packages.values()
-            .filter(|pkg| pkg.name.to_lowercase().contains(&query_lower) || pkg.description.to_lowercase().contains(&query_lower))
+        self.software_manager
+            .packages
+            .values()
+            .filter(|pkg| {
+                pkg.name.to_lowercase().contains(&query_lower)
+                    || pkg.description.to_lowercase().contains(&query_lower)
+            })
             .collect()
     }
 
     /// Install software
     pub fn install_software(&mut self, package_name: String) -> Result<(), &'static str> {
-        let pkg = self.software_manager.packages.get_mut(&package_name).ok_or("Package not found")?;
+        let pkg = self
+            .software_manager
+            .packages
+            .get_mut(&package_name)
+            .ok_or("Package not found")?;
         pkg.installed = true;
         Ok(())
     }
 
     /// Remove software
     pub fn remove_software(&mut self, package_name: String) -> Result<(), &'static str> {
-        let pkg = self.software_manager.packages.get_mut(&package_name).ok_or("Package not found")?;
+        let pkg = self
+            .software_manager
+            .packages
+            .get_mut(&package_name)
+            .ok_or("Package not found")?;
         pkg.installed = false;
         Ok(())
     }
@@ -380,7 +406,12 @@ impl SystemToolsEngine {
 
     /// Install driver
     pub fn install_driver(&mut self, driver_name: String) -> Result<(), &'static str> {
-        let driver = self.driver_manager.drivers.iter_mut().find(|d| d.name == driver_name).ok_or("Driver not found")?;
+        let driver = self
+            .driver_manager
+            .drivers
+            .iter_mut()
+            .find(|d| d.name == driver_name)
+            .ok_or("Driver not found")?;
         driver.status = DriverStatus::Installed;
         Ok(())
     }
@@ -391,7 +422,11 @@ impl SystemToolsEngine {
     }
 
     /// Generate system report
-    pub fn generate_report(&mut self, hardware_info: HardwareInfo, software_info: SoftwareInfo) -> u32 {
+    pub fn generate_report(
+        &mut self,
+        hardware_info: HardwareInfo,
+        software_info: SoftwareInfo,
+    ) -> u32 {
         let id = self.next_report_id.fetch_add(1, Ordering::Relaxed);
         let report = SystemReport {
             id,
@@ -405,8 +440,17 @@ impl SystemToolsEngine {
     }
 
     /// Add diagnostic
-    pub fn add_diagnostic(&mut self, report_id: u32, test: DiagnosticTest, result: TestResult, message: String) -> Result<(), &'static str> {
-        let report = self.system_reports.get_mut(&report_id).ok_or("Report not found")?;
+    pub fn add_diagnostic(
+        &mut self,
+        report_id: u32,
+        test: DiagnosticTest,
+        result: TestResult,
+        message: String,
+    ) -> Result<(), &'static str> {
+        let report = self
+            .system_reports
+            .get_mut(&report_id)
+            .ok_or("Report not found")?;
         report.diagnostics.push(DiagnosticEntry {
             test,
             result,
@@ -440,9 +484,7 @@ pub fn init_system_tools() {
 
 /// Get global system tools
 pub fn get_system_tools() -> Option<&'static mut SystemToolsEngine> {
-    unsafe {
-        SYSTEM_TOOLS.as_mut()
-    }
+    unsafe { SYSTEM_TOOLS.as_mut() }
 }
 
 #[cfg(test)]
@@ -471,9 +513,15 @@ mod tests {
         };
         let backup_id = tools.create_backup(config);
         tools.start_backup(backup_id).unwrap();
-        assert_eq!(tools.backup_jobs[&backup_id].status, BackupStatus::InProgress);
+        assert_eq!(
+            tools.backup_jobs[&backup_id].status,
+            BackupStatus::InProgress
+        );
         tools.complete_backup(backup_id, 1024 * 1024).unwrap();
-        assert_eq!(tools.backup_jobs[&backup_id].status, BackupStatus::Completed);
+        assert_eq!(
+            tools.backup_jobs[&backup_id].status,
+            BackupStatus::Completed
+        );
     }
 
     #[test]
@@ -498,7 +546,10 @@ mod tests {
             size_bytes: 1024,
             rating: 4.5,
         };
-        tools.software_manager.packages.insert("TestApp".to_string(), pkg);
+        tools
+            .software_manager
+            .packages
+            .insert("TestApp".to_string(), pkg);
         tools.install_software("TestApp".to_string()).unwrap();
         assert!(tools.software_manager.packages["TestApp"].installed);
     }
@@ -517,7 +568,10 @@ mod tests {
         };
         tools.register_driver(driver);
         tools.install_driver("Test Driver".to_string()).unwrap();
-        assert_eq!(tools.driver_manager.drivers[0].status, DriverStatus::Installed);
+        assert_eq!(
+            tools.driver_manager.drivers[0].status,
+            DriverStatus::Installed
+        );
     }
 
     #[test]
@@ -540,7 +594,14 @@ mod tests {
             uptime_seconds: 3600,
         };
         let report_id = tools.generate_report(hw_info, sw_info);
-        tools.add_diagnostic(report_id, DiagnosticTest::CPU, TestResult::Pass, "CPU OK".to_string()).unwrap();
+        tools
+            .add_diagnostic(
+                report_id,
+                DiagnosticTest::CPU,
+                TestResult::Pass,
+                "CPU OK".to_string(),
+            )
+            .unwrap();
         assert_eq!(tools.system_reports[&report_id].diagnostics.len(), 1);
     }
 }

@@ -273,7 +273,12 @@ impl SovereignBsdDumpRestoreEngine {
                 let listing: Vec<String> = self
                     .dumped_inodes
                     .iter()
-                    .map(|i| format!("ino #{} - {} ({} bytes)", i.inode_id, i.file_path, i.file_size))
+                    .map(|i| {
+                        format!(
+                            "ino #{} - {} ({} bytes)",
+                            i.inode_id, i.file_path, i.file_size
+                        )
+                    })
                     .collect();
                 Ok(listing.join("\n"))
             }
@@ -292,7 +297,10 @@ impl SovereignBsdDumpRestoreEngine {
             "extract" => {
                 let count = self.selected_restore_inodes.len();
                 self.selected_restore_inodes.clear();
-                Ok(format!("Extracted {} selected inode records successfully", count))
+                Ok(format!(
+                    "Extracted {} selected inode records successfully",
+                    count
+                ))
             }
             _ => Err(format!("Unknown BSD restore command: {}", cmd)),
         }
@@ -393,7 +401,10 @@ impl SovereignTimeshiftSnapperSnapshotGovernor {
                 format!("ZFS zfs rollback -r {}", snap.path_or_dataset)
             }
             SnapshotBackend::DragonFlyHammer2Pfs => {
-                format!("HAMMER2 PFS root mount switched to {}", snap.path_or_dataset)
+                format!(
+                    "HAMMER2 PFS root mount switched to {}",
+                    snap.path_or_dataset
+                )
             }
             SnapshotBackend::Ext4LvmThin => {
                 format!("LVM lvconvert --merge {}", snap.path_or_dataset)
@@ -449,7 +460,9 @@ impl SovereignDdrescueTestDiskRecoveryEngine {
         let chunk_size = 1_000_000u64;
 
         for offset in (0..total_size).step_by(chunk_size as usize) {
-            let is_bad = simulated_bad_sectors.iter().any(|&bad| bad >= offset && bad < offset + chunk_size);
+            let is_bad = simulated_bad_sectors
+                .iter()
+                .any(|&bad| bad >= offset && bad < offset + chunk_size);
             if is_bad {
                 self.total_error_bytes += chunk_size;
                 self.mapfile_records.push(BadSectorMapRecord {
@@ -475,7 +488,10 @@ impl SovereignDdrescueTestDiskRecoveryEngine {
         let mut found_partitions = Vec::new();
 
         // MBR signature check (0x55, 0xAA at offset 510)
-        if raw_disk_header.len() >= 512 && raw_disk_header[510] == 0x55 && raw_disk_header[511] == 0xAA {
+        if raw_disk_header.len() >= 512
+            && raw_disk_header[510] == 0x55
+            && raw_disk_header[511] == 0xAA
+        {
             found_partitions.push("Found valid MBR Partition Table Header".to_string());
         }
 
@@ -490,7 +506,8 @@ impl SovereignDdrescueTestDiskRecoveryEngine {
         }
 
         if found_partitions.is_empty() {
-            found_partitions.push("No standard partition header found; initiating deep scan".to_string());
+            found_partitions
+                .push("No standard partition header found; initiating deep scan".to_string());
         }
 
         found_partitions
@@ -566,16 +583,27 @@ impl SovereignRescueLiveIsoInstallerSuite {
             });
         }
 
-        self.repair_logs
-            .push(format!("Rescue chroot bound successfully at {}", target_root));
+        self.repair_logs.push(format!(
+            "Rescue chroot bound successfully at {}",
+            target_root
+        ));
         self.chroot_mounts.len()
     }
 
     /// Emergency bootloader & system file repair
     pub fn repair_bootloader_and_fstab(&mut self, target_root: &str) -> Result<String, String> {
-        let log1 = format!("{}: Reinstalled GRUB2 / systemd-boot to NVRAM & EFI system partition", target_root);
-        let log2 = format!("{}: Regenerated /etc/fstab with valid filesystem UUIDs", target_root);
-        let log3 = format!("{}: Rebuilt initramfs image via dracut / mkinitcpio", target_root);
+        let log1 = format!(
+            "{}: Reinstalled GRUB2 / systemd-boot to NVRAM & EFI system partition",
+            target_root
+        );
+        let log2 = format!(
+            "{}: Regenerated /etc/fstab with valid filesystem UUIDs",
+            target_root
+        );
+        let log3 = format!(
+            "{}: Rebuilt initramfs image via dracut / mkinitcpio",
+            target_root
+        );
 
         self.repair_logs.push(log1.clone());
         self.repair_logs.push(log2);
@@ -586,7 +614,10 @@ impl SovereignRescueLiveIsoInstallerSuite {
 
     /// Reset emergency root password
     pub fn reset_root_password(&mut self, target_root: &str) -> bool {
-        self.repair_logs.push(format!("{}: Cleared locked password in /etc/shadow for user 'root'", target_root));
+        self.repair_logs.push(format!(
+            "{}: Cleared locked password in /etc/shadow for user 'root'",
+            target_root
+        ));
         true
     }
 }
@@ -606,10 +637,18 @@ pub struct SovereignBackupAndRecoveryMasterSuite {
 impl SovereignBackupAndRecoveryMasterSuite {
     pub fn new() -> Self {
         Self {
-            rsync_borg_engine: SovereignRsyncBorgResticBackupEngine::new("master-vault-01", "s3cur3_p@ss"),
+            rsync_borg_engine: SovereignRsyncBorgResticBackupEngine::new(
+                "master-vault-01",
+                "s3cur3_p@ss",
+            ),
             bsd_dump_engine: SovereignBsdDumpRestoreEngine::new("/dev/ada0s1a", 0),
-            snapshot_governor: SovereignTimeshiftSnapperSnapshotGovernor::new(SnapshotBackend::BtrfsSubvolume),
-            ddrescue_testdisk: SovereignDdrescueTestDiskRecoveryEngine::new("/dev/sdb", "/mnt/backup/sdb_rescue.img"),
+            snapshot_governor: SovereignTimeshiftSnapperSnapshotGovernor::new(
+                SnapshotBackend::BtrfsSubvolume,
+            ),
+            ddrescue_testdisk: SovereignDdrescueTestDiskRecoveryEngine::new(
+                "/dev/sdb",
+                "/mnt/backup/sdb_rescue.img",
+            ),
             rescue_live_suite: SovereignRescueLiveIsoInstallerSuite::new(),
         }
     }
@@ -635,8 +674,7 @@ impl SovereignBackupAndRecoveryMasterSuite {
         ));
         report.push_str(&format!(
             "4. Rescue Engine: Source={}, Dest={}\n",
-            self.ddrescue_testdisk.source_device,
-            self.ddrescue_testdisk.destination_image
+            self.ddrescue_testdisk.source_device, self.ddrescue_testdisk.destination_image
         ));
         report.push_str(&format!(
             "5. Live ISO Rescue: RAMFS Overlay Active={}\n",
@@ -673,7 +711,8 @@ mod tests {
         assert_eq!(snap_id, "snap-1-2");
 
         // Test rsync block delta
-        let (matched, modified) = engine.compute_rsync_block_delta(&file1, b"SOVEREIGN_OS_MODIFIED_SYSTEM_DATA");
+        let (matched, modified) =
+            engine.compute_rsync_block_delta(&file1, b"SOVEREIGN_OS_MODIFIED_SYSTEM_DATA");
         assert!(matched + modified > 0);
     }
 
@@ -695,7 +734,8 @@ mod tests {
 
     #[test]
     fn test_timeshift_snapper_governor() {
-        let mut gov = SovereignTimeshiftSnapperSnapshotGovernor::new(SnapshotBackend::BtrfsSubvolume);
+        let mut gov =
+            SovereignTimeshiftSnapperSnapshotGovernor::new(SnapshotBackend::BtrfsSubvolume);
         let id1 = gov.create_snapshot("pre_apt_upgrade", SnapshotTrigger::PreApt);
         assert_eq!(id1, 1);
 

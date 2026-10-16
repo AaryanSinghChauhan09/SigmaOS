@@ -150,7 +150,7 @@ impl SigmaProcess {
         if self.processes.contains_key(&process.pid) {
             return Err(format!("Process '{}' already exists", process.pid));
         }
-        
+
         self.processes.insert(process.pid, process);
         self.process_counter += 1;
         Ok(())
@@ -169,7 +169,7 @@ impl SigmaProcess {
         if !self.running {
             return Err("SigmaProcess not running".to_string());
         }
-        
+
         match self.processes.get_mut(&pid) {
             Some(process) => {
                 match signal {
@@ -197,16 +197,15 @@ impl SigmaProcess {
 
     /// List processes by state
     pub fn list_by_state(&self, state: ProcessState) -> Vec<&ProcessInfo> {
-        self.processes.values()
+        self.processes
+            .values()
             .filter(|p| p.state == state)
             .collect()
     }
 
     /// List processes by user
     pub fn list_by_user(&self, uid: u32) -> Vec<&ProcessInfo> {
-        self.processes.values()
-            .filter(|p| p.uid == uid)
-            .collect()
+        self.processes.values().filter(|p| p.uid == uid).collect()
     }
 
     /// Get process count
@@ -217,11 +216,26 @@ impl SigmaProcess {
     /// Get process manager statistics
     pub fn process_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_processes".to_string(), self.process_count().to_string());
-        stats.insert("running_processes".to_string(), self.list_by_state(ProcessState::Running).len().to_string());
-        stats.insert("sleeping_processes".to_string(), self.list_by_state(ProcessState::Sleeping).len().to_string());
-        stats.insert("stopped_processes".to_string(), self.list_by_state(ProcessState::Stopped).len().to_string());
-        stats.insert("zombie_processes".to_string(), self.list_by_state(ProcessState::Zombie).len().to_string());
+        stats.insert(
+            "total_processes".to_string(),
+            self.process_count().to_string(),
+        );
+        stats.insert(
+            "running_processes".to_string(),
+            self.list_by_state(ProcessState::Running).len().to_string(),
+        );
+        stats.insert(
+            "sleeping_processes".to_string(),
+            self.list_by_state(ProcessState::Sleeping).len().to_string(),
+        );
+        stats.insert(
+            "stopped_processes".to_string(),
+            self.list_by_state(ProcessState::Stopped).len().to_string(),
+        );
+        stats.insert(
+            "zombie_processes".to_string(),
+            self.list_by_state(ProcessState::Zombie).len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -275,15 +289,9 @@ mod tests {
 
     #[test]
     fn test_process_info() {
-        let process = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        )
-        .with_cpu_usage(10.5)
-        .with_memory_usage(1024 * 1024);
+        let process = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running)
+            .with_cpu_usage(10.5)
+            .with_memory_usage(1024 * 1024);
 
         assert_eq!(process.pid, 1234);
         assert_eq!(process.cpu_usage, 10.5);
@@ -303,15 +311,9 @@ mod tests {
     #[test]
     fn test_sigmaprocess_add_process() {
         let mut process = SigmaProcess::new();
-        
-        let proc_info = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        );
-        
+
+        let proc_info = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running);
+
         assert!(process.add_process(proc_info).is_ok());
         assert_eq!(process.process_count(), 1);
     }
@@ -320,18 +322,12 @@ mod tests {
     fn test_sigmaprocess_send_signal() {
         let mut process = SigmaProcess::new();
         process.start();
-        
-        let proc_info = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        );
-        
+
+        let proc_info = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running);
+
         process.add_process(proc_info).unwrap();
         assert!(process.send_signal(1234, Signal::Term).is_ok());
-        
+
         let proc = process.get_process(1234).unwrap();
         assert_eq!(proc.state, ProcessState::Zombie);
     }
@@ -339,17 +335,11 @@ mod tests {
     #[test]
     fn test_sigmaprocess_list_by_state() {
         let mut process = SigmaProcess::new();
-        
-        let proc_info = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        );
-        
+
+        let proc_info = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running);
+
         process.add_process(proc_info).unwrap();
-        
+
         let running = process.list_by_state(ProcessState::Running);
         assert_eq!(running.len(), 1);
     }
@@ -357,17 +347,11 @@ mod tests {
     #[test]
     fn test_sigmaprocess_list_by_user() {
         let mut process = SigmaProcess::new();
-        
-        let proc_info = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        );
-        
+
+        let proc_info = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running);
+
         process.add_process(proc_info).unwrap();
-        
+
         let user_procs = process.list_by_user(1000);
         assert_eq!(user_procs.len(), 1);
     }
@@ -375,17 +359,11 @@ mod tests {
     #[test]
     fn test_sigmaprocess_stats() {
         let mut process = SigmaProcess::new();
-        
-        let proc_info = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        );
-        
+
+        let proc_info = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running);
+
         process.add_process(proc_info).unwrap();
-        
+
         let stats = process.process_stats();
         assert_eq!(stats.get("total_processes"), Some(&"1".to_string()));
         assert_eq!(stats.get("running_processes"), Some(&"1".to_string()));
@@ -394,20 +372,14 @@ mod tests {
     #[test]
     fn test_send_process_signal_convenience() {
         init_sigmaprocess();
-        
+
         let mut process = get_sigmaprocess().unwrap();
         process.start();
-        
-        let proc_info = ProcessInfo::new(
-            1234,
-            1,
-            1000,
-            "test".to_string(),
-            ProcessState::Running
-        );
-        
+
+        let proc_info = ProcessInfo::new(1234, 1, 1000, "test".to_string(), ProcessState::Running);
+
         process.add_process(proc_info).unwrap();
-        
+
         let result = send_process_signal(1234, Signal::Term);
         assert!(result.is_ok());
     }

@@ -17,14 +17,14 @@ use core::fmt;
 /// Log priority levels following syslog standard
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SigmaLogLevel {
-    Emergency = 0,  // System is unusable
-    Alert = 1,      // Action must be taken immediately
-    Critical = 2,   // Critical conditions
-    Error = 3,      // Error conditions
-    Warning = 4,    // Warning conditions
-    Notice = 5,     // Normal but significant condition
-    Info = 6,       // Informational messages
-    Debug = 7,      // Debug-level messages
+    Emergency = 0, // System is unusable
+    Alert = 1,     // Action must be taken immediately
+    Critical = 2,  // Critical conditions
+    Error = 3,     // Error conditions
+    Warning = 4,   // Warning conditions
+    Notice = 5,    // Normal but significant condition
+    Info = 6,      // Informational messages
+    Debug = 7,     // Debug-level messages
 }
 
 impl fmt::Display for SigmaLogLevel {
@@ -277,7 +277,7 @@ impl RotationPolicy {
         Self {
             max_size: Some(10 * 1024 * 1024), // 10 MB default
             max_age: Some(7 * 24 * 3600),     // 7 days default
-            max_files: Some(5),                // Keep 5 rotated files
+            max_files: Some(5),               // Keep 5 rotated files
             rotate_on_schedule: None,
         }
     }
@@ -751,7 +751,7 @@ mod tests {
     fn test_sigmalog_logging() {
         let mut logger = SigmaLog::with_default_config();
         logger.start();
-        
+
         let entry = LogEntry::new(
             SigmaLogLevel::Info,
             SigmaLogFacility::User,
@@ -760,7 +760,7 @@ mod tests {
             "Test message".to_string(),
         );
         logger.log(entry);
-        
+
         assert_eq!(logger.log_count(), 1);
     }
 
@@ -768,7 +768,7 @@ mod tests {
     fn test_sigmalog_query() {
         let mut logger = SigmaLog::with_default_config();
         logger.start();
-        
+
         let entry1 = LogEntry::new(
             SigmaLogLevel::Error,
             SigmaLogFacility::User,
@@ -785,7 +785,7 @@ mod tests {
         );
         logger.log(entry1);
         logger.log(entry2);
-        
+
         let filter = LogFilter::new().with_min_level(SigmaLogLevel::Error);
         let results = logger.query(&filter);
         assert_eq!(results.len(), 1);
@@ -796,7 +796,7 @@ mod tests {
     fn test_sigmalog_clear() {
         let mut logger = SigmaLog::with_default_config();
         logger.start();
-        
+
         let entry = LogEntry::new(
             SigmaLogLevel::Info,
             SigmaLogFacility::User,
@@ -805,7 +805,7 @@ mod tests {
             "Test message".to_string(),
         );
         logger.log(entry);
-        
+
         assert_eq!(logger.log_count(), 1);
         logger.clear_logs();
         assert_eq!(logger.log_count(), 0);

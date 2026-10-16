@@ -8,6 +8,7 @@ pub mod chmod;
 pub mod chown;
 pub mod comm;
 pub mod cp;
+pub mod curl;
 pub mod cut;
 pub mod df;
 pub mod du;
@@ -24,8 +25,10 @@ pub mod mkdir;
 pub mod mv;
 pub mod pwd;
 pub mod rm;
+pub mod rsync;
 pub mod sed;
 pub mod sort;
+pub mod ssh;
 pub mod tail;
 pub mod tar;
 pub mod tee;
@@ -36,10 +39,6 @@ pub mod uname;
 pub mod uniq;
 pub mod wc;
 pub mod xargs;
-pub mod curl;
-pub mod rsync;
-pub mod ssh;
-
 
 pub use awk::{run as awk_run, AwkConfig};
 pub use cat::run as cat_run;
@@ -75,4 +74,3 @@ pub use uname::{run as uname_run, SystemInfo, UnameOptions};
 pub use uniq::{run as uniq_run, UniqOptions};
 pub use wc::{count_reader as wc_count_reader, run as wc_run, WcOptions, WcStats};
 pub use xargs::{run as xargs_run, XargsOptions};
-

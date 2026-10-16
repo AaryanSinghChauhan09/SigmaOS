@@ -77,7 +77,12 @@ pub struct FsMount {
 
 impl FsMount {
     /// Create a new filesystem mount
-    pub fn new(mount_id: String, device_path: String, mount_point: String, fs_type: FsType) -> Self {
+    pub fn new(
+        mount_id: String,
+        device_path: String,
+        mount_point: String,
+        fs_type: FsType,
+    ) -> Self {
         Self {
             mount_id,
             device_path,
@@ -141,7 +146,7 @@ impl SigmaFS {
         if self.mounts.contains_key(&mount.mount_id) {
             return Err(format!("Mount '{}' already exists", mount.mount_id));
         }
-        
+
         self.mounts.insert(mount.mount_id.clone(), mount);
         self.mount_counter += 1;
         Ok(())
@@ -160,7 +165,7 @@ impl SigmaFS {
         if !self.running {
             return Err("SigmaFS not running".to_string());
         }
-        
+
         match self.mounts.get_mut(mount_id) {
             Some(mount) => {
                 mount.state = MountState::Mounted;
@@ -175,7 +180,7 @@ impl SigmaFS {
         if !self.running {
             return Err("SigmaFS not running".to_string());
         }
-        
+
         match self.mounts.get_mut(mount_id) {
             Some(mount) => {
                 mount.state = MountState::Unmounted;
@@ -197,7 +202,8 @@ impl SigmaFS {
 
     /// List mounted filesystems
     pub fn list_mounted(&self) -> Vec<&FsMount> {
-        self.mounts.values()
+        self.mounts
+            .values()
             .filter(|m| m.state == MountState::Mounted)
             .collect()
     }
@@ -211,7 +217,10 @@ impl SigmaFS {
     pub fn fs_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_mounts".to_string(), self.mount_count().to_string());
-        stats.insert("mounted_count".to_string(), self.list_mounted().len().to_string());
+        stats.insert(
+            "mounted_count".to_string(),
+            self.list_mounted().len().to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -269,7 +278,7 @@ mod tests {
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         )
         .with_state(MountState::Mounted)
         .with_options("rw".to_string());
@@ -292,14 +301,14 @@ mod tests {
     #[test]
     fn test_sigmafs_add_mount() {
         let mut fs = SigmaFS::new();
-        
+
         let mount = FsMount::new(
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         assert!(fs.add_mount(mount).is_ok());
         assert_eq!(fs.mount_count(), 1);
     }
@@ -308,17 +317,17 @@ mod tests {
     fn test_sigmafs_mount_fs() {
         let mut fs = SigmaFS::new();
         fs.start();
-        
+
         let mount = FsMount::new(
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         fs.add_mount(mount).unwrap();
         assert!(fs.mount_fs("mount1").is_ok());
-        
+
         let mount = fs.get_mount("mount1").unwrap();
         assert_eq!(mount.state, MountState::Mounted);
     }
@@ -327,18 +336,18 @@ mod tests {
     fn test_sigmafs_unmount_fs() {
         let mut fs = SigmaFS::new();
         fs.start();
-        
+
         let mount = FsMount::new(
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         )
         .with_state(MountState::Mounted);
-        
+
         fs.add_mount(mount).unwrap();
         assert!(fs.unmount_fs("mount1").is_ok());
-        
+
         let mount = fs.get_mount("mount1").unwrap();
         assert_eq!(mount.state, MountState::Unmounted);
     }
@@ -346,17 +355,17 @@ mod tests {
     #[test]
     fn test_sigmafs_list_mounted() {
         let mut fs = SigmaFS::new();
-        
+
         let mount = FsMount::new(
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         )
         .with_state(MountState::Mounted);
-        
+
         fs.add_mount(mount).unwrap();
-        
+
         let mounted = fs.list_mounted();
         assert_eq!(mounted.len(), 1);
     }
@@ -364,17 +373,17 @@ mod tests {
     #[test]
     fn test_sigmafs_stats() {
         let mut fs = SigmaFS::new();
-        
+
         let mount = FsMount::new(
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         )
         .with_state(MountState::Mounted);
-        
+
         fs.add_mount(mount).unwrap();
-        
+
         let stats = fs.fs_stats();
         assert_eq!(stats.get("total_mounts"), Some(&"1".to_string()));
         assert_eq!(stats.get("mounted_count"), Some(&"1".to_string()));
@@ -383,19 +392,19 @@ mod tests {
     #[test]
     fn test_mount_filesystem_convenience() {
         init_sigmafs();
-        
+
         let mut fs = get_sigmafs().unwrap();
         fs.start();
-        
+
         let mount = FsMount::new(
             "mount1".to_string(),
             "/dev/sda1".to_string(),
             "/mnt/data".to_string(),
-            FsType::Ext4
+            FsType::Ext4,
         );
-        
+
         fs.add_mount(mount).unwrap();
-        
+
         let result = mount_filesystem("mount1");
         assert!(result.is_ok());
     }

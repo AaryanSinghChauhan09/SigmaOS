@@ -39,7 +39,9 @@ impl IntelCetEngine {
     /// Emulate CALL instruction: push return address onto both normal stack and shadow stack
     pub fn on_call_instruction(&mut self, ret_addr: u64) {
         if self.shadow_stack_enabled {
-            self.shadow_stack.push(ShadowStackFrame { return_addr: ret_addr });
+            self.shadow_stack.push(ShadowStackFrame {
+                return_addr: ret_addr,
+            });
             self.shadow_stack_pointer = self.shadow_stack.len();
         }
     }
@@ -65,7 +67,10 @@ impl IntelCetEngine {
     }
 
     /// Emulate indirect jump/call target check: must land on an ENDBR64 instruction
-    pub fn verify_indirect_branch_target(&mut self, target_code: &[u8]) -> Result<(), &'static str> {
+    pub fn verify_indirect_branch_target(
+        &mut self,
+        target_code: &[u8],
+    ) -> Result<(), &'static str> {
         if !self.ibt_enabled {
             return Ok(());
         }

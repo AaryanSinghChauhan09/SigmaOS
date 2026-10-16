@@ -2,26 +2,25 @@
 // SigmaOS - GPU Module
 // GPU-related components including frequency scaling, drivers, and management
 
-pub mod frequency_scaling;
 pub mod amdgpu;
-pub mod nvidia;
+pub mod frequency_scaling;
 pub mod intel_xe;
+pub mod nvidia;
 
-pub use frequency_scaling::{
-    GpuVendor, GpuFrequencyMode, GpuPowerProfile,
-    GpuFrequencyController, GpuManager,
-    init_gpu_manager, get_gpu_manager,
-};
 pub use amdgpu::{
-    AmdgpuDevice, AmdgpuManager, AmdgpuPowerProfile, AmdgpuPerfLevel,
-    AmdgpuSclk, AmdgpuMclk, AmdgpuVoltage, AmdgpuPowerState, AmdgpuOverdrive,
-    init_amdgpu_manager, get_amdgpu_manager,
+    get_amdgpu_manager, init_amdgpu_manager, AmdgpuDevice, AmdgpuManager, AmdgpuMclk,
+    AmdgpuOverdrive, AmdgpuPerfLevel, AmdgpuPowerProfile, AmdgpuPowerState, AmdgpuSclk,
+    AmdgpuVoltage,
 };
-pub use nvidia::{
-    NvidiaDevice, NvidiaManager, NvidiaDriverType, NvidiaPerfLevel, NvidiaPowerState,
-    init_nvidia_manager, get_nvidia_manager,
+pub use frequency_scaling::{
+    get_gpu_manager, init_gpu_manager, GpuFrequencyController, GpuFrequencyMode, GpuManager,
+    GpuPowerProfile, GpuVendor,
 };
 pub use intel_xe::{
-    IntelXeDevice, IntelXeManager, IntelGpuArch, IntelPerfLevel, IntelPowerState,
-    init_intel_xe_manager, get_intel_xe_manager,
+    get_intel_xe_manager, init_intel_xe_manager, IntelGpuArch, IntelPerfLevel, IntelPowerState,
+    IntelXeDevice, IntelXeManager,
+};
+pub use nvidia::{
+    get_nvidia_manager, init_nvidia_manager, NvidiaDevice, NvidiaDriverType, NvidiaManager,
+    NvidiaPerfLevel, NvidiaPowerState,
 };

@@ -31,7 +31,12 @@ pub fn run(pattern: &str, paths: &[String], options: &GrepOptions) -> Result<usi
             let file = File::open(Path::new(path)).map_err(|e| format!("grep: {}: {}", path, e))?;
             let reader = BufReader::new(file);
             let show_filename = paths.len() > 1;
-            let matches = match_reader(reader, &pat, options, if show_filename { Some(path) } else { None })?;
+            let matches = match_reader(
+                reader,
+                &pat,
+                options,
+                if show_filename { Some(path) } else { None },
+            )?;
             total_matches += matches;
         }
     }
@@ -56,7 +61,11 @@ fn match_reader<R: BufRead>(
         };
 
         let is_match = check_line.contains(pattern);
-        let passes = if options.invert_match { !is_match } else { is_match };
+        let passes = if options.invert_match {
+            !is_match
+        } else {
+            is_match
+        };
 
         if passes {
             match_count += 1;

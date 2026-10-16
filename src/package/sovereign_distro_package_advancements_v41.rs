@@ -658,12 +658,22 @@ impl UniversalPmCliRouterV41 {
                 if parts.contains(&"install") {
                     (
                         UniversalPmActionV41::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
                         UniversalPmActionV41::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV41::Update, vec![])
@@ -673,33 +683,59 @@ impl UniversalPmCliRouterV41 {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
                         UniversalPmActionV41::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
                         UniversalPmActionV41::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV41::Query, vec![])
                 }
             }
-            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew" | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
+            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
+            | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
                         UniversalPmActionV41::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (
                         UniversalPmActionV41::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 }
             }
             _ => (
                 UniversalPmActionV41::Install,
-                parts.get(1..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                parts
+                    .get(1..)
+                    .unwrap_or(&[])
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
             ),
         };
 
@@ -916,9 +952,16 @@ mod tests {
     #[test]
     fn test_sat_solver_and_sandboxing_v41() {
         let solver = UniversalCrossDistroSatSolverV41::new();
-        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string(), "dbus".to_string()];
+        let raw_deps = vec![
+            "libssl-dev".to_string(),
+            "glibc".to_string(),
+            "dbus".to_string(),
+        ];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]);
+        assert_eq!(
+            solved,
+            vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]
+        );
 
         let sandbox_gov = UniversalMultiSandboxGovernorV41::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);

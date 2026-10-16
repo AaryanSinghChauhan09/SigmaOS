@@ -150,13 +150,27 @@ pub struct Elf64Phdr {
 #[derive(Debug, Clone, Copy, Default)]
 #[repr(C)]
 pub struct X86_64Regs {
-    pub r15: u64, pub r14: u64, pub r13: u64, pub r12: u64,
-    pub rbp: u64, pub rbx: u64, pub r11: u64, pub r10: u64,
-    pub r9: u64,  pub r8: u64,  pub rax: u64, pub rcx: u64,
-    pub rdx: u64, pub rsi: u64, pub rdi: u64,
+    pub r15: u64,
+    pub r14: u64,
+    pub r13: u64,
+    pub r12: u64,
+    pub rbp: u64,
+    pub rbx: u64,
+    pub r11: u64,
+    pub r10: u64,
+    pub r9: u64,
+    pub r8: u64,
+    pub rax: u64,
+    pub rcx: u64,
+    pub rdx: u64,
+    pub rsi: u64,
+    pub rdi: u64,
     pub orig_rax: u64,
-    pub rip: u64, pub cs: u64,  pub eflags: u64,
-    pub rsp: u64, pub ss: u64,
+    pub rip: u64,
+    pub cs: u64,
+    pub eflags: u64,
+    pub rsp: u64,
+    pub ss: u64,
 }
 
 /// ELF note header (`Nhdr`).
@@ -189,9 +203,9 @@ impl CrashNote {
             cpu_id,
             regs: X86_64Regs::default(), // TODO: inline asm to read registers
             nhdr: Nhdr {
-                n_namesz: 5,  // "CORE\0"
+                n_namesz: 5, // "CORE\0"
                 n_descsz: core::mem::size_of::<X86_64Regs>() as u32,
-                n_type: 1,    // NT_PRSTATUS
+                n_type: 1, // NT_PRSTATUS
             },
         }
     }
@@ -232,7 +246,10 @@ pub enum DumpDestination {
         remote_port: u16,
     },
     /// Write to an in-memory buffer (for testing / capture-kernel scenarios).
-    Memory { buffer_addr: usize, buffer_size: usize },
+    Memory {
+        buffer_addr: usize,
+        buffer_size: usize,
+    },
 }
 
 /// Boot-time kdump configuration.
@@ -297,7 +314,8 @@ impl NetconsoleUdpDump {
             total_size,
         };
         self.seq = self.seq.wrapping_add(1);
-        self.bytes_sent.fetch_add(payload.len() as u64, Ordering::Relaxed);
+        self.bytes_sent
+            .fetch_add(payload.len() as u64, Ordering::Relaxed);
         // TODO: write header + payload into NIC Tx descriptor ring
         let _ = offset;
         true

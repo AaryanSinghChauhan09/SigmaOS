@@ -108,7 +108,7 @@ impl SigmaConfig {
         if self.entries.contains_key(&entry.key) {
             return Err(format!("Entry '{}' already exists", entry.key));
         }
-        
+
         self.entries.insert(entry.key.clone(), entry);
         self.entry_counter += 1;
         Ok(())
@@ -122,7 +122,7 @@ impl SigmaConfig {
             }
             _ => {}
         }
-        
+
         if self.entries.remove(key).is_none() {
             return Err(format!("Entry '{}' not found", key));
         }
@@ -139,7 +139,7 @@ impl SigmaConfig {
         if !self.running {
             return Err("SigmaConfig not running".to_string());
         }
-        
+
         match self.entries.get_mut(key) {
             Some(entry) => {
                 if entry.read_only {
@@ -164,7 +164,8 @@ impl SigmaConfig {
 
     /// List entries by pattern
     pub fn list_by_pattern(&self, pattern: &str) -> Vec<&ConfigEntry> {
-        self.entries.values()
+        self.entries
+            .values()
             .filter(|e| e.key.contains(pattern))
             .collect()
     }
@@ -178,8 +179,14 @@ impl SigmaConfig {
     pub fn config_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("total_entries".to_string(), self.entry_count().to_string());
-        stats.insert("read_only_entries".to_string(), 
-            self.entries.values().filter(|e| e.read_only).count().to_string());
+        stats.insert(
+            "read_only_entries".to_string(),
+            self.entries
+                .values()
+                .filter(|e| e.read_only)
+                .count()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -230,7 +237,7 @@ mod tests {
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         )
         .with_read_only(false);
 
@@ -251,13 +258,13 @@ mod tests {
     #[test]
     fn test_sigmaconfig_add_entry() {
         let mut config = SigmaConfig::new();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         );
-        
+
         assert!(config.add_entry(entry).is_ok());
         assert_eq!(config.entry_count(), 1);
     }
@@ -266,16 +273,21 @@ mod tests {
     fn test_sigmaconfig_set_value() {
         let mut config = SigmaConfig::new();
         config.start();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         );
-        
+
         config.add_entry(entry).unwrap();
-        assert!(config.set_value("system.hostname", ConfigValue::String("newname".to_string())).is_ok());
-        
+        assert!(config
+            .set_value(
+                "system.hostname",
+                ConfigValue::String("newname".to_string())
+            )
+            .is_ok());
+
         let entry = config.get_entry("system.hostname").unwrap();
         assert_eq!(entry.value, ConfigValue::String("newname".to_string()));
     }
@@ -283,28 +295,33 @@ mod tests {
     #[test]
     fn test_sigmaconfig_read_only() {
         let mut config = SigmaConfig::new();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         )
         .with_read_only(true);
-        
+
         config.add_entry(entry).unwrap();
-        assert!(config.set_value("system.hostname", ConfigValue::String("newname".to_string())).is_err());
+        assert!(config
+            .set_value(
+                "system.hostname",
+                ConfigValue::String("newname".to_string())
+            )
+            .is_err());
     }
 
     #[test]
     fn test_sigmaconfig_remove_entry() {
         let mut config = SigmaConfig::new();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         );
-        
+
         config.add_entry(entry).unwrap();
         assert!(config.remove_entry("system.hostname").is_ok());
         assert_eq!(config.entry_count(), 0);
@@ -313,15 +330,15 @@ mod tests {
     #[test]
     fn test_sigmaconfig_list_by_pattern() {
         let mut config = SigmaConfig::new();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         );
-        
+
         config.add_entry(entry).unwrap();
-        
+
         let matches = config.list_by_pattern("system");
         assert_eq!(matches.len(), 1);
     }
@@ -329,15 +346,15 @@ mod tests {
     #[test]
     fn test_sigmaconfig_stats() {
         let mut config = SigmaConfig::new();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         );
-        
+
         config.add_entry(entry).unwrap();
-        
+
         let stats = config.config_stats();
         assert_eq!(stats.get("total_entries"), Some(&"1".to_string()));
     }
@@ -345,19 +362,22 @@ mod tests {
     #[test]
     fn test_set_config_value_convenience() {
         init_sigmaconfig();
-        
+
         let mut config = get_sigmaconfig().unwrap();
         config.start();
-        
+
         let entry = ConfigEntry::new(
             "system.hostname".to_string(),
             ConfigValue::String("sigmaos".to_string()),
-            "System hostname".to_string()
+            "System hostname".to_string(),
         );
-        
+
         config.add_entry(entry).unwrap();
-        
-        let result = set_config_value("system.hostname", ConfigValue::String("newname".to_string()));
+
+        let result = set_config_value(
+            "system.hostname",
+            ConfigValue::String("newname".to_string()),
+        );
         assert!(result.is_ok());
     }
 }

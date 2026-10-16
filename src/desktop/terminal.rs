@@ -96,7 +96,7 @@ pub struct TerminalEmulator {
 impl TerminalEmulator {
     pub fn new() -> Self {
         let mut profiles = BTreeMap::new();
-        
+
         // Default profile
         profiles.insert(
             "Default".to_string(),
@@ -208,7 +208,11 @@ impl TerminalEmulator {
     }
 
     /// Set current directory
-    pub fn set_current_directory(&mut self, index: usize, path: String) -> Result<(), &'static str> {
+    pub fn set_current_directory(
+        &mut self,
+        index: usize,
+        path: String,
+    ) -> Result<(), &'static str> {
         if index >= self.tabs.len() {
             return Err("Tab index out of bounds");
         }
@@ -222,7 +226,7 @@ impl TerminalEmulator {
         let mut environment = BTreeMap::new();
         environment.insert("TERM".to_string(), "xterm-256color".to_string());
         environment.insert("LANG".to_string(), "en_US.UTF-8".to_string());
-        
+
         let session = TerminalSession {
             id,
             shell_command,
@@ -244,7 +248,10 @@ impl TerminalEmulator {
 
     /// Send input to session
     pub fn send_input(&mut self, session_id: u32, input: String) -> Result<(), &'static str> {
-        let session = self.sessions.get_mut(&session_id).ok_or("Session not found")?;
+        let session = self
+            .sessions
+            .get_mut(&session_id)
+            .ok_or("Session not found")?;
         if !session.is_running {
             return Err("Session not running");
         }
@@ -286,7 +293,9 @@ pub fn init_terminal() {
 /// Get terminal emulator
 pub fn get_terminal() -> &'static mut TerminalEmulator {
     unsafe {
-        TERMINAL_EMULATOR.as_mut().expect("Terminal emulator not initialized")
+        TERMINAL_EMULATOR
+            .as_mut()
+            .expect("Terminal emulator not initialized")
     }
 }
 

@@ -107,7 +107,11 @@ impl Dictionary {
 
     /// Remove from favorites
     pub fn remove_favorite(&mut self, text: String) -> Result<(), &'static str> {
-        let index = self.favorites.iter().position(|w| w == &text).ok_or("Word not in favorites")?;
+        let index = self
+            .favorites
+            .iter()
+            .position(|w| w == &text)
+            .ok_or("Word not in favorites")?;
         self.favorites.remove(index);
         Ok(())
     }
@@ -149,9 +153,7 @@ pub fn init_dictionary() {
 
 /// Get dictionary
 pub fn get_dictionary() -> &'static mut Dictionary {
-    unsafe {
-        DICTIONARY.as_mut().expect("Dictionary not initialized")
-    }
+    unsafe { DICTIONARY.as_mut().expect("Dictionary not initialized") }
 }
 
 #[cfg(test)]

@@ -59,7 +59,13 @@ pub struct DbConnection {
 
 impl DbConnection {
     /// Create a new database connection
-    pub fn new(connection_id: String, client_address: String, client_port: u16, username: String, database: String) -> Self {
+    pub fn new(
+        connection_id: String,
+        client_address: String,
+        client_port: u16,
+        username: String,
+        database: String,
+    ) -> Self {
         Self {
             connection_id,
             client_address,
@@ -115,10 +121,14 @@ impl SigmaDB {
     /// Add a database connection
     pub fn add_connection(&mut self, connection: DbConnection) -> Result<(), String> {
         if self.connections.contains_key(&connection.connection_id) {
-            return Err(format!("Connection '{}' already exists", connection.connection_id));
+            return Err(format!(
+                "Connection '{}' already exists",
+                connection.connection_id
+            ));
         }
-        
-        self.connections.insert(connection.connection_id.clone(), connection);
+
+        self.connections
+            .insert(connection.connection_id.clone(), connection);
         self.connection_counter += 1;
         Ok(())
     }
@@ -136,7 +146,7 @@ impl SigmaDB {
         if !self.running {
             return Err("SigmaDB not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = DbConnectionState::Authenticated;
@@ -151,7 +161,7 @@ impl SigmaDB {
         if !self.running {
             return Err("SigmaDB not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = DbConnectionState::Querying;
@@ -166,7 +176,7 @@ impl SigmaDB {
         if !self.running {
             return Err("SigmaDB not running".to_string());
         }
-        
+
         match self.connections.get_mut(connection_id) {
             Some(connection) => {
                 connection.state = DbConnectionState::Closed;
@@ -188,14 +198,16 @@ impl SigmaDB {
 
     /// List connections by state
     pub fn list_by_state(&self, state: DbConnectionState) -> Vec<&DbConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.state == state)
             .collect()
     }
 
     /// List connections by database
     pub fn list_by_database(&self, database: &str) -> Vec<&DbConnection> {
-        self.connections.values()
+        self.connections
+            .values()
             .filter(|c| c.database == database)
             .collect()
     }
@@ -208,9 +220,22 @@ impl SigmaDB {
     /// Get database server statistics
     pub fn db_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
-        stats.insert("total_connections".to_string(), self.connection_count().to_string());
-        stats.insert("authenticated_connections".to_string(), self.list_by_state(DbConnectionState::Authenticated).len().to_string());
-        stats.insert("querying_connections".to_string(), self.list_by_state(DbConnectionState::Querying).len().to_string());
+        stats.insert(
+            "total_connections".to_string(),
+            self.connection_count().to_string(),
+        );
+        stats.insert(
+            "authenticated_connections".to_string(),
+            self.list_by_state(DbConnectionState::Authenticated)
+                .len()
+                .to_string(),
+        );
+        stats.insert(
+            "querying_connections".to_string(),
+            self.list_by_state(DbConnectionState::Querying)
+                .len()
+                .to_string(),
+        );
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
@@ -263,7 +288,7 @@ mod tests {
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         )
         .with_state(DbConnectionState::Authenticated);
 
@@ -285,15 +310,15 @@ mod tests {
     #[test]
     fn test_sigmadb_add_connection() {
         let mut db = SigmaDB::new();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         );
-        
+
         assert!(db.add_connection(connection).is_ok());
         assert_eq!(db.connection_count(), 1);
     }
@@ -302,18 +327,18 @@ mod tests {
     fn test_sigmadb_authenticate_connection() {
         let mut db = SigmaDB::new();
         db.start();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         );
-        
+
         db.add_connection(connection).unwrap();
         assert!(db.authenticate_connection("conn1").is_ok());
-        
+
         let conn = db.get_connection("conn1").unwrap();
         assert_eq!(conn.state, DbConnectionState::Authenticated);
     }
@@ -322,19 +347,19 @@ mod tests {
     fn test_sigmadb_execute_query() {
         let mut db = SigmaDB::new();
         db.start();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         )
         .with_state(DbConnectionState::Authenticated);
-        
+
         db.add_connection(connection).unwrap();
         assert!(db.execute_query("conn1").is_ok());
-        
+
         let conn = db.get_connection("conn1").unwrap();
         assert_eq!(conn.state, DbConnectionState::Querying);
     }
@@ -342,18 +367,18 @@ mod tests {
     #[test]
     fn test_sigmadb_list_by_state() {
         let mut db = SigmaDB::new();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         )
         .with_state(DbConnectionState::Authenticated);
-        
+
         db.add_connection(connection).unwrap();
-        
+
         let connections = db.list_by_state(DbConnectionState::Authenticated);
         assert_eq!(connections.len(), 1);
     }
@@ -361,17 +386,17 @@ mod tests {
     #[test]
     fn test_sigmadb_list_by_database() {
         let mut db = SigmaDB::new();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         );
-        
+
         db.add_connection(connection).unwrap();
-        
+
         let connections = db.list_by_database("testdb");
         assert_eq!(connections.len(), 1);
     }
@@ -379,41 +404,44 @@ mod tests {
     #[test]
     fn test_sigmadb_stats() {
         let mut db = SigmaDB::new();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         )
         .with_state(DbConnectionState::Authenticated);
-        
+
         db.add_connection(connection).unwrap();
-        
+
         let stats = db.db_stats();
         assert_eq!(stats.get("total_connections"), Some(&"1".to_string()));
-        assert_eq!(stats.get("authenticated_connections"), Some(&"1".to_string()));
+        assert_eq!(
+            stats.get("authenticated_connections"),
+            Some(&"1".to_string())
+        );
     }
 
     #[test]
     fn test_execute_db_query_convenience() {
         init_sigmadb();
-        
+
         let mut db = get_sigmadb().unwrap();
         db.start();
-        
+
         let connection = DbConnection::new(
             "conn1".to_string(),
             "192.168.1.100".to_string(),
             5432,
             "user".to_string(),
-            "testdb".to_string()
+            "testdb".to_string(),
         )
         .with_state(DbConnectionState::Authenticated);
-        
+
         db.add_connection(connection).unwrap();
-        
+
         let result = execute_db_query("conn1");
         assert!(result.is_ok());
     }

@@ -56,12 +56,7 @@ pub struct RAIDDevice {
 
 impl RAIDDevice {
     /// Create a new RAID device
-    pub fn new(
-        device_id: String,
-        device_path: String,
-        size: u64,
-        array_id: String,
-    ) -> Self {
+    pub fn new(device_id: String, device_path: String, size: u64, array_id: String) -> Self {
         Self {
             device_id,
             device_path,
@@ -133,7 +128,12 @@ impl RAIDArray {
     }
 
     /// Update device counts
-    pub fn update_counts(&mut self, device_count: usize, active_devices: usize, spare_devices: usize) {
+    pub fn update_counts(
+        &mut self,
+        device_count: usize,
+        active_devices: usize,
+        spare_devices: usize,
+    ) {
         self.device_count = device_count;
         self.active_devices = active_devices;
         self.spare_devices = spare_devices;
@@ -217,10 +217,7 @@ impl SigmaRAID {
 
     /// List arrays by state
     pub fn list_arrays_by_state(&self, state: RAIDState) -> Vec<&RAIDArray> {
-        self.arrays
-            .values()
-            .filter(|a| a.state == state)
-            .collect()
+        self.arrays.values().filter(|a| a.state == state).collect()
     }
 
     /// Activate a RAID array
@@ -273,10 +270,7 @@ impl SigmaRAID {
 
     /// List devices by state
     pub fn list_devices_by_state(&self, state: RAIDDeviceState) -> Vec<&RAIDDevice> {
-        self.devices
-            .values()
-            .filter(|d| d.state == state)
-            .collect()
+        self.devices.values().filter(|d| d.state == state).collect()
     }
 
     /// Mark a device as failed
@@ -292,7 +286,8 @@ impl SigmaRAID {
     /// Replace a failed device
     pub fn replace_device(&mut self, old_device_id: &str, new_device: RAIDDevice) -> bool {
         if self.devices.remove(old_device_id).is_some() {
-            self.devices.insert(new_device.device_id.clone(), new_device);
+            self.devices
+                .insert(new_device.device_id.clone(), new_device);
             true
         } else {
             false
@@ -327,16 +322,12 @@ pub fn init_sigmaraid() {
 
 /// Get the global SigmaRAID instance
 pub fn get_sigmaraid() -> Option<&'static SigmaRAID> {
-    unsafe {
-        SIGMARAD_INSTANCE.as_ref()
-    }
+    unsafe { SIGMARAD_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaRAID instance
 pub fn get_sigmaraid_mut() -> Option<&'static mut SigmaRAID> {
-    unsafe {
-        SIGMARAD_INSTANCE.as_mut()
-    }
+    unsafe { SIGMARAD_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a RAID array
