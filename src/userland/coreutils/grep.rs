@@ -44,6 +44,29 @@ pub fn run(pattern: &str, paths: &[String], options: &GrepOptions) -> Result<usi
     Ok(total_matches)
 }
 
+/// Zero-allocation case-insensitive string matching helper for line scanning.
+/// For ASCII content (the vast majority of files and logs), window slice comparisons
+/// are performed in-place without allocating temporary heap `String` instances.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack.as_bytes().windows(needle_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(needle_bytes.iter())
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 fn match_reader<R: BufRead>(
     reader: R,
     pattern: &str,
@@ -54,13 +77,13 @@ fn match_reader<R: BufRead>(
 
     for (line_idx, line_res) in reader.lines().enumerate() {
         let line = line_res.map_err(|e| format!("grep read error: {}", e))?;
-        let check_line = if options.ignore_case {
-            line.to_lowercase()
+        // Optimization: Avoid allocating a heap String (`line.clone()` or `line.to_lowercase()`) for every line read.
+        let is_match = if options.ignore_case {
+            contains_ignore_case(&line, pattern)
         } else {
-            line.clone()
+            line.contains(pattern)
         };
 
-        let is_match = check_line.contains(pattern);
         let passes = if options.invert_match {
             !is_match
         } else {
@@ -91,4 +114,56 @@ fn match_reader<R: BufRead>(
     }
 
     Ok(match_count)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn test_contains_ignore_case_ascii() {
+        assert!(contains_ignore_case("Hello World", "world"));
+        assert!(contains_ignore_case("Hello World", "World"));
+        assert!(contains_ignore_case("SIGMAOS LINUX", "sigmaos"));
+        assert!(!contains_ignore_case("Alpha Beta", "gamma"));
+    }
+
+    #[test]
+    fn test_match_reader_case_sensitive() {
+        let data = "line 1\nLine 2\nline 3\n";
+        let cursor = Cursor::new(data);
+        let opts = GrepOptions {
+            count_only: true,
+            ..Default::default()
+        };
+        let matches = match_reader(cursor, "line", &opts, None).unwrap();
+        assert_eq!(matches, 2);
+    }
+
+    #[test]
+    fn test_match_reader_case_insensitive() {
+        let data = "line 1\nLine 2\nLINE 3\n";
+        let cursor = Cursor::new(data);
+        let opts = GrepOptions {
+            ignore_case: true,
+            count_only: true,
+            ..Default::default()
+        };
+        let matches = match_reader(cursor, "line", &opts, None).unwrap();
+        assert_eq!(matches, 3);
+    }
+
+    #[test]
+    fn test_match_reader_invert_match() {
+        let data = "apple\nbanana\ncherry\n";
+        let cursor = Cursor::new(data);
+        let opts = GrepOptions {
+            invert_match: true,
+            count_only: true,
+            ..Default::default()
+        };
+        let matches = match_reader(cursor, "banana", &opts, None).unwrap();
+        assert_eq!(matches, 2);
+    }
 }
