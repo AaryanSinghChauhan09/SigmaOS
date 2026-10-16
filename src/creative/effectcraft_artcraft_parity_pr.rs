@@ -72,9 +72,15 @@ impl EffectcraftCameraTracker3dReconstructionPrEngine {
         }
     }
 
-    pub fn solve_camera_motion(&mut self, tracked_points: &[(u32, f32, f32)]) -> Result<f32, String> {
+    pub fn solve_camera_motion(
+        &mut self,
+        tracked_points: &[(u32, f32, f32)],
+    ) -> Result<f32, String> {
         if tracked_points.len() < 8 {
-            return Err("At least 8 tracked points required for 8-point camera solver algorithm".to_string());
+            return Err(
+                "At least 8 tracked points required for 8-point camera solver algorithm"
+                    .to_string(),
+            );
         }
 
         self.survey_points.clear();
@@ -150,7 +156,11 @@ impl EffectcraftVolumetricLightingRaymarchingPrEngine {
         }
     }
 
-    pub fn execute_raymarch_pass(&self, ray_origin: (f32, f32, f32), ray_dir: (f32, f32, f32)) -> f32 {
+    pub fn execute_raymarch_pass(
+        &self,
+        ray_origin: (f32, f32, f32),
+        ray_dir: (f32, f32, f32),
+    ) -> f32 {
         let step_size = 1.0 / (self.params.raymarch_steps as f32);
         let mut accumulated_light = 0.0f32;
 
@@ -168,7 +178,10 @@ impl EffectcraftVolumetricLightingRaymarchingPrEngine {
             .sqrt();
 
             let attenuation = 1.0 / (1.0 + dist_to_light * dist_to_light);
-            accumulated_light += attenuation * self.params.scattering_coefficient * self.params.fog_density * step_size;
+            accumulated_light += attenuation
+                * self.params.scattering_coefficient
+                * self.params.fog_density
+                * step_size;
         }
 
         accumulated_light.clamp(0.0, 1.0)
@@ -227,7 +240,11 @@ impl EffectcraftDeepCompositingExrChannelPrEngine {
         }
 
         // Sort deep samples front-to-back by Z depth
-        samples.sort_by(|a, b| a.z_front.partial_cmp(&b.z_front).unwrap_or(core::cmp::Ordering::Equal));
+        samples.sort_by(|a, b| {
+            a.z_front
+                .partial_cmp(&b.z_front)
+                .unwrap_or(core::cmp::Ordering::Equal)
+        });
 
         let mut final_rgba = [0.0f32; 4];
         let mut accumulated_opacity = 0.0f32;
@@ -252,7 +269,9 @@ impl EffectcraftDeepCompositingExrChannelPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftArtcraftPrProposalManifest {
         EffectcraftArtcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Deep Pixel Z-Sample Compositing & EXR Channel Merger".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Deep Pixel Z-Sample Compositing & EXR Channel Merger"
+                    .to_string(),
             target_subsystem: "Effectcraft Deep Image Compositing Engine".to_string(),
             original_suite: "ArtCraft EffectCraft Deep Compositor".to_string(),
             components_added: vec![
@@ -426,7 +445,12 @@ impl EffectcraftTimeWarpRetimingOpticalFlowPrEngine {
         }
     }
 
-    pub fn interpolate_frame_at_time(&self, prev_frame: &[u8], next_frame: &[u8], t: f32) -> Result<Vec<u8>, String> {
+    pub fn interpolate_frame_at_time(
+        &self,
+        prev_frame: &[u8],
+        next_frame: &[u8],
+        t: f32,
+    ) -> Result<Vec<u8>, String> {
         if prev_frame.len() != next_frame.len() {
             return Err("Frame buffer size mismatch for time warp interpolation".to_string());
         }
@@ -436,7 +460,8 @@ impl EffectcraftTimeWarpRetimingOpticalFlowPrEngine {
         let factor_prev = 1.0 - factor_t;
 
         for i in 0..prev_frame.len() {
-            let pixel_val = (prev_frame[i] as f32) * factor_prev + (next_frame[i] as f32) * factor_t;
+            let pixel_val =
+                (prev_frame[i] as f32) * factor_prev + (next_frame[i] as f32) * factor_t;
             output[i] = pixel_val.clamp(0.0, 255.0) as u8;
         }
 
@@ -482,7 +507,11 @@ impl EffectcraftCleanPlateWireRemovalPrEngine {
         }
     }
 
-    pub fn generate_clean_plate(&self, frame_sequence: &[Vec<u8>], mask: &[u8]) -> Result<Vec<u8>, String> {
+    pub fn generate_clean_plate(
+        &self,
+        frame_sequence: &[Vec<u8>],
+        mask: &[u8],
+    ) -> Result<Vec<u8>, String> {
         if frame_sequence.is_empty() {
             return Err("Frame sequence cannot be empty".to_string());
         }
@@ -554,10 +583,17 @@ pub struct EffectcraftColorMatchPytorchGradePrEngine {
 
 impl EffectcraftColorMatchPytorchGradePrEngine {
     pub fn new() -> Self {
-        Self { histogram_bins: 256 }
+        Self {
+            histogram_bins: 256,
+        }
     }
 
-    pub fn match_color_palette(&self, source_frame: &[u8], reference_frame: &[u8], target_frame: &mut [u8]) -> Result<(), String> {
+    pub fn match_color_palette(
+        &self,
+        source_frame: &[u8],
+        reference_frame: &[u8],
+        target_frame: &mut [u8],
+    ) -> Result<(), String> {
         if source_frame.len() != target_frame.len() || source_frame.len() != reference_frame.len() {
             return Err("Frame buffer lengths must match for color transfer".to_string());
         }
@@ -586,8 +622,10 @@ impl EffectcraftColorMatchPytorchGradePrEngine {
         for i in 0..count {
             let px = i * 4;
             target_frame[px] = ((source_frame[px] as f32) * scale_r).clamp(0.0, 255.0) as u8;
-            target_frame[px + 1] = ((source_frame[px + 1] as f32) * scale_g).clamp(0.0, 255.0) as u8;
-            target_frame[px + 2] = ((source_frame[px + 2] as f32) * scale_b).clamp(0.0, 255.0) as u8;
+            target_frame[px + 1] =
+                ((source_frame[px + 1] as f32) * scale_g).clamp(0.0, 255.0) as u8;
+            target_frame[px + 2] =
+                ((source_frame[px + 2] as f32) * scale_b).clamp(0.0, 255.0) as u8;
             target_frame[px + 3] = source_frame[px + 3];
         }
 
@@ -642,7 +680,9 @@ impl EffectcraftProjectionMapping3dMeshPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftArtcraftPrProposalManifest {
         EffectcraftArtcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement 3D Projection Mapping & Camera UV Texture Unwrapper".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement 3D Projection Mapping & Camera UV Texture Unwrapper"
+                    .to_string(),
             target_subsystem: "Effectcraft 3D Projection & Geometry Engine".to_string(),
             original_suite: "ArtCraft EffectCraft Projection Studio".to_string(),
             components_added: vec![
@@ -690,7 +730,12 @@ impl EffectcraftStereoscopic3dDepthMapPrEngine {
         }
     }
 
-    pub fn render_anaglyph_frame(&self, left_eye: &[u8], right_eye: &[u8], output: &mut [u8]) -> Result<(), String> {
+    pub fn render_anaglyph_frame(
+        &self,
+        left_eye: &[u8],
+        right_eye: &[u8],
+        output: &mut [u8],
+    ) -> Result<(), String> {
         if left_eye.len() != right_eye.len() || left_eye.len() != output.len() {
             return Err("Eye buffer sizes must match output frame size".to_string());
         }
@@ -766,20 +811,34 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
 
     pub fn evaluate_effectcraft_artcraft_parity(&mut self) -> bool {
         let points = vec![
-            (1, 10.0, 10.0), (2, 20.0, 15.0), (3, 30.0, 20.0), (4, 40.0, 25.0),
-            (5, 50.0, 30.0), (6, 60.0, 35.0), (7, 70.0, 40.0), (8, 80.0, 45.0),
+            (1, 10.0, 10.0),
+            (2, 20.0, 15.0),
+            (3, 30.0, 20.0),
+            (4, 40.0, 25.0),
+            (5, 50.0, 30.0),
+            (6, 60.0, 35.0),
+            (7, 70.0, 40.0),
+            (8, 80.0, 45.0),
         ];
         let camera_ok = self.camera_tracker.solve_camera_motion(&points).is_ok();
-        let ray_ok = self.volumetric_light.execute_raymarch_pass((0.0, 0.0, 0.0), (0.0, 0.0, 1.0)) >= 0.0;
+        let ray_ok = self
+            .volumetric_light
+            .execute_raymarch_pass((0.0, 0.0, 0.0), (0.0, 0.0, 1.0))
+            >= 0.0;
 
         let mut deep_pixel = vec![DeepPixelSample {
             z_front: 1.0,
             z_back: 1.1,
             rgba: [1.0, 0.0, 0.0, 0.5],
         }];
-        let deep_ok = self.deep_compositing.composite_deep_samples(&mut deep_pixel)[3] > 0.0;
+        let deep_ok = self
+            .deep_compositing
+            .composite_deep_samples(&mut deep_pixel)[3]
+            > 0.0;
 
-        let sss_color = self.sss_skin_shader.evaluate_dipole_diffusion(1.0, [0.5, 0.5, 0.5]);
+        let sss_color = self
+            .sss_skin_shader
+            .evaluate_dipole_diffusion(1.0, [0.5, 0.5, 0.5]);
         let sss_ok = sss_color[0] > 0.0;
 
         self.fluid_dynamics.inject_density_source(10, 10, 5.0);
@@ -787,21 +846,44 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
 
         let frame1 = vec![100u8; 16];
         let frame2 = vec![200u8; 16];
-        let warp_ok = self.time_warp.interpolate_frame_at_time(&frame1, &frame2, 0.5).is_ok();
+        let warp_ok = self
+            .time_warp
+            .interpolate_frame_at_time(&frame1, &frame2, 0.5)
+            .is_ok();
 
         let mask = vec![255u8; 4];
-        let clean_ok = self.clean_plate.generate_clean_plate(&[frame1.clone(), frame2.clone()], &mask).is_ok();
+        let clean_ok = self
+            .clean_plate
+            .generate_clean_plate(&[frame1.clone(), frame2.clone()], &mask)
+            .is_ok();
 
         let mut target = vec![0u8; 16];
-        let match_ok = self.color_match.match_color_palette(&frame1, &frame2, &mut target).is_ok();
+        let match_ok = self
+            .color_match
+            .match_color_palette(&frame1, &frame2, &mut target)
+            .is_ok();
 
-        let (u, v) = self.projection_mapping.project_texture_to_uv((10.0, 20.0, 50.0));
+        let (u, v) = self
+            .projection_mapping
+            .project_texture_to_uv((10.0, 20.0, 50.0));
         let proj_ok = u > 0.0 && v > 0.0;
 
         let mut stereo_out = vec![0u8; 16];
-        let stereo_ok = self.stereo_3d.render_anaglyph_frame(&frame1, &frame2, &mut stereo_out).is_ok();
+        let stereo_ok = self
+            .stereo_3d
+            .render_anaglyph_frame(&frame1, &frame2, &mut stereo_out)
+            .is_ok();
 
-        camera_ok && ray_ok && deep_ok && sss_ok && fluid_ok && warp_ok && clean_ok && match_ok && proj_ok && stereo_ok
+        camera_ok
+            && ray_ok
+            && deep_ok
+            && sss_ok
+            && fluid_ok
+            && warp_ok
+            && clean_ok
+            && match_ok
+            && proj_ok
+            && stereo_ok
     }
 
     pub fn collect_all_proposals(&self) -> Vec<EffectcraftArtcraftPrProposalManifest> {
@@ -840,7 +922,8 @@ impl EffectcraftArtcraftParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_effectcraft_artcraft_parity() && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_effectcraft_artcraft_parity()
+            && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -878,8 +961,14 @@ mod tests {
     fn test_camera_tracker_engine() {
         let mut engine = EffectcraftCameraTracker3dReconstructionPrEngine::new();
         let pts = vec![
-            (1, 10.0, 10.0), (2, 20.0, 15.0), (3, 30.0, 20.0), (4, 40.0, 25.0),
-            (5, 50.0, 30.0), (6, 60.0, 35.0), (7, 70.0, 40.0), (8, 80.0, 45.0),
+            (1, 10.0, 10.0),
+            (2, 20.0, 15.0),
+            (3, 30.0, 20.0),
+            (4, 40.0, 25.0),
+            (5, 50.0, 30.0),
+            (6, 60.0, 35.0),
+            (7, 70.0, 40.0),
+            (8, 80.0, 45.0),
         ];
         let error = engine.solve_camera_motion(&pts).unwrap();
         assert!(error >= 0.0);
@@ -897,8 +986,16 @@ mod tests {
     fn test_deep_compositing_engine() {
         let engine = EffectcraftDeepCompositingExrChannelPrEngine::new();
         let mut samples = vec![
-            DeepPixelSample { z_front: 2.0, z_back: 2.1, rgba: [0.0, 1.0, 0.0, 0.5] },
-            DeepPixelSample { z_front: 1.0, z_back: 1.1, rgba: [1.0, 0.0, 0.0, 0.5] },
+            DeepPixelSample {
+                z_front: 2.0,
+                z_back: 2.1,
+                rgba: [0.0, 1.0, 0.0, 0.5],
+            },
+            DeepPixelSample {
+                z_front: 1.0,
+                z_back: 1.1,
+                rgba: [1.0, 0.0, 0.0, 0.5],
+            },
         ];
         let comp = engine.composite_deep_samples(&mut samples);
         assert!(comp[3] > 0.5);
@@ -961,7 +1058,9 @@ mod tests {
         let left = vec![255, 0, 0, 255];
         let right = vec![0, 255, 255, 255];
         let mut out = vec![0u8; 4];
-        assert!(engine.render_anaglyph_frame(&left, &right, &mut out).is_ok());
+        assert!(engine
+            .render_anaglyph_frame(&left, &right, &mut out)
+            .is_ok());
         assert_eq!(out[0], 255); // Red from left
         assert_eq!(out[1], 255); // Green from right
     }
