@@ -46,13 +46,7 @@ impl GuixApkV3OciLayerEngine {
         }
     }
 
-    pub fn register_oci_layer(
-        &mut self,
-        layer_hash: &str,
-        diff_id: &str,
-        size_bytes: u64,
-        read_only: bool,
-    ) {
+    pub fn register_oci_layer(&mut self, layer_hash: &str, diff_id: &str, size_bytes: u64, read_only: bool) {
         self.layers.push(OciLayerMetadata {
             layer_hash: layer_hash.to_string(),
             diff_id: diff_id.to_string(),
@@ -250,13 +244,7 @@ impl OpenBsdLandlockV5PathPolicyEngine {
         true
     }
 
-    pub fn set_pledge_promises(
-        &mut self,
-        stdio: bool,
-        rpath: bool,
-        wpath: bool,
-        inet: bool,
-    ) -> bool {
+    pub fn set_pledge_promises(&mut self, stdio: bool, rpath: bool, wpath: bool, inet: bool) -> bool {
         if self.is_locked {
             return false;
         }
@@ -335,13 +323,7 @@ impl IoUringVnetZeroCopyNetworkEngine {
         });
     }
 
-    pub fn attach_vnet_interface(
-        &mut self,
-        vnet_id: u32,
-        if_name: &str,
-        mac: [u8; 6],
-        zero_copy: bool,
-    ) {
+    pub fn attach_vnet_interface(&mut self, vnet_id: u32, if_name: &str, mac: [u8; 6], zero_copy: bool) {
         self.vnet_interfaces.push(VnetJailInterface {
             vnet_id,
             if_name: if_name.to_string(),
@@ -402,8 +384,7 @@ impl SovereignOpenSourceOsApexMasterSuiteV52 {
 
     pub fn run_v52_apex_suite(&mut self) -> Vec<ApexAuditResultV52> {
         // 1. Guix & Alpine APK v3 OCI Layer Engine
-        self.guix_apk
-            .register_oci_layer("sha256:abc12345", "sha256:diff1234", 1024000, true);
+        self.guix_apk.register_oci_layer("sha256:abc12345", "sha256:diff1234", 1024000, true);
         self.guix_apk.install_package_transactional(
             "sigma-coreutils",
             "1.0.0",
@@ -419,17 +400,11 @@ impl SovereignOpenSourceOsApexMasterSuiteV52 {
 
         // 3. OpenBSD Landlock V5
         self.landlock_pledge.add_unveil_path("/usr/lib", 1); // Read only
-        self.landlock_pledge
-            .set_pledge_promises(true, true, false, false);
+        self.landlock_pledge.set_pledge_promises(true, true, false, false);
         self.landlock_pledge.lock_policy();
 
         // 4. IoUring VNET Zero Copy
-        self.io_uring_vnet.attach_vnet_interface(
-            100,
-            "vnet0",
-            [0x02, 0x00, 0x00, 0x00, 0x00, 0x01],
-            true,
-        );
+        self.io_uring_vnet.attach_vnet_interface(100, "vnet0", [0x02, 0x00, 0x00, 0x00, 0x00, 0x01], true);
         self.io_uring_vnet.submit_sqe(1, 3, 0x7fff0000, 4096, 0);
         let processed = self.io_uring_vnet.poll_cqe();
 

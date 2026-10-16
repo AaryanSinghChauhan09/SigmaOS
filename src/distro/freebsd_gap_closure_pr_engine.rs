@@ -155,15 +155,7 @@ impl FreeBsdIpfwDummynetEngine {
         engine
     }
 
-    pub fn add_rule(
-        &mut self,
-        num: u32,
-        action: &str,
-        proto: &str,
-        src: &str,
-        dst: &str,
-        state: bool,
-    ) {
+    pub fn add_rule(&mut self, num: u32, action: &str, proto: &str, src: &str, dst: &str, state: bool) {
         self.rules.insert(
             num,
             IpfwRule {
@@ -220,10 +212,7 @@ impl FreeBsdCapsicumCasperEngine {
             casper_services: BTreeMap::new(),
         };
 
-        engine.register_casper_service(
-            "cap_dns",
-            vec!["freebsd.org".to_string(), "sigmaos.org".to_string()],
-        );
+        engine.register_casper_service("cap_dns", vec!["freebsd.org".to_string(), "sigmaos.org".to_string()]);
         engine.register_casper_service("cap_sysctl", vec!["kern.hostname".to_string()]);
         engine
     }
@@ -278,13 +267,7 @@ impl FreeBsdBhyveMicrovmEngine {
             vms: BTreeMap::new(),
         };
 
-        engine.create_vm(
-            "sigma-freebsd-node1",
-            4,
-            8192,
-            "/dev/zvol/tank/vms/node1",
-            "tap0",
-        );
+        engine.create_vm("sigma-freebsd-node1", 4, 8192, "/dev/zvol/tank/vms/node1", "tap0");
         engine
     }
 
@@ -371,7 +354,7 @@ impl FreeBsdKqueueEvfiltEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PoudriereBuildJob {
-    pub port_origin: String,  // e.g. "sysutils/tmux"
+    pub port_origin: String, // e.g. "sysutils/tmux"
     pub build_status: String, // "queued", "building", "success", "failed"
     pub build_time_secs: u32,
 }
@@ -514,14 +497,11 @@ impl FreeBsdDtraceLockProfileEngine {
     }
 
     pub fn record_contention(&mut self, lock_name: &str, wait_ns: u64) {
-        let metric = self
-            .lock_metrics
-            .entry(lock_name.to_string())
-            .or_insert_with(|| LockContentionMetric {
-                lock_name: lock_name.to_string(),
-                contention_count: 0,
-                total_wait_ns: 0,
-            });
+        let metric = self.lock_metrics.entry(lock_name.to_string()).or_insert_with(|| LockContentionMetric {
+            lock_name: lock_name.to_string(),
+            contention_count: 0,
+            total_wait_ns: 0,
+        });
         metric.contention_count += 1;
         metric.total_wait_ns += wait_ns;
     }
@@ -537,7 +517,7 @@ impl FreeBsdDtraceLockProfileEngine {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DevdRule {
-    pub match_type: String,      // "attach", "detach"
+    pub match_type: String, // "attach", "detach"
     pub match_subsystem: String, // "USB", "NET"
     pub action_cmd: String,
 }
@@ -612,9 +592,7 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5001".to_string(),
                 title: "FreeBSD GEOM ELI Disk Encryption & GEOM Gate Network Storage".to_string(),
                 subsystem: "storage".to_string(),
-                description:
-                    "AES-XTS sector encryption key derivation and remote block device gateway"
-                        .to_string(),
+                description: "AES-XTS sector encryption key derivation and remote block device gateway".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_GEOM_ELI_5001".to_string(),
             },
@@ -622,19 +600,15 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5002".to_string(),
                 title: "FreeBSD IPFW Stateful Filtering & Dummynet Bandwidth Shaper".to_string(),
                 subsystem: "networking".to_string(),
-                description: "Stateful IPv4/v6 filtering rules with dummynet latency/loss queues"
-                    .to_string(),
+                description: "Stateful IPv4/v6 filtering rules with dummynet latency/loss queues".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_IPFW_DUMMYNET_5002".to_string(),
             },
             FreeBsdPrProposal {
                 pr_id: "#FBSD-5003".to_string(),
-                title: "FreeBSD Capsicum Sub-Capability Rights & Casper IPC Helper Daemon"
-                    .to_string(),
+                title: "FreeBSD Capsicum Sub-Capability Rights & Casper IPC Helper Daemon".to_string(),
                 subsystem: "security".to_string(),
-                description:
-                    "Refined descriptor cap_rights_limit and cap_dns/cap_sysctl Casper services"
-                        .to_string(),
+                description: "Refined descriptor cap_rights_limit and cap_dns/cap_sysctl Casper services".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_CAPSICUM_CASPER_5003".to_string(),
             },
@@ -642,9 +616,7 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5004".to_string(),
                 title: "FreeBSD Bhyve MicroVM Lifecycle & VirtIO/PPT Emulation".to_string(),
                 subsystem: "virtualization".to_string(),
-                description:
-                    "MicroVM sandbox vCPU management with VirtIO-blk/net and PPT PCI assignment"
-                        .to_string(),
+                description: "MicroVM sandbox vCPU management with VirtIO-blk/net and PPT PCI assignment".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_BHYVE_MICROVM_5004".to_string(),
             },
@@ -652,9 +624,7 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5005".to_string(),
                 title: "FreeBSD Kqueue EVFILT Filter Event Extensions".to_string(),
                 subsystem: "kernel".to_string(),
-                description:
-                    "Extended event loop polling for EVFILT_USER, EVFILT_VNODE, EVFILT_PROC"
-                        .to_string(),
+                description: "Extended event loop polling for EVFILT_USER, EVFILT_VNODE, EVFILT_PROC".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_KQUEUE_EVFILT_5005".to_string(),
             },
@@ -662,9 +632,7 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5006".to_string(),
                 title: "FreeBSD Poudriere Clean-Chroot Ports Builder & PQC Repo Signer".to_string(),
                 subsystem: "package".to_string(),
-                description:
-                    "Automated bulk package compilation pipeline with Dilithium-5 signatures"
-                        .to_string(),
+                description: "Automated bulk package compilation pipeline with Dilithium-5 signatures".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_POUDRIERE_BULK_5006".to_string(),
             },
@@ -672,19 +640,15 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5007".to_string(),
                 title: "FreeBSD bectl ZFS Boot Environment Manager".to_string(),
                 subsystem: "storage".to_string(),
-                description:
-                    "Dataset lifecycle management, snapshot promotion, and reboot rollbacks"
-                        .to_string(),
+                description: "Dataset lifecycle management, snapshot promotion, and reboot rollbacks".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_BECTL_BOOT_5007".to_string(),
             },
             FreeBsdPrProposal {
                 pr_id: "#FBSD-5008".to_string(),
-                title: "FreeBSD DTrace Kernel Dynamic Tracing & Lock Contention Profiler"
-                    .to_string(),
+                title: "FreeBSD DTrace Kernel Dynamic Tracing & Lock Contention Profiler".to_string(),
                 subsystem: "diagnostics".to_string(),
-                description: "In-kernel probe providers and adaptive mutex lock contention metrics"
-                    .to_string(),
+                description: "In-kernel probe providers and adaptive mutex lock contention metrics".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_DTRACE_LOCK_5008".to_string(),
             },
@@ -692,8 +656,7 @@ impl SovereignFreeBsdGapClosurePrGateway {
                 pr_id: "#FBSD-5009".to_string(),
                 title: "FreeBSD devctl Bus Controller & devd Event Rule Daemon".to_string(),
                 subsystem: "driver".to_string(),
-                description: "Hardware attach/detach event rule processing and bus controller API"
-                    .to_string(),
+                description: "Hardware attach/detach event rule processing and bus controller API".to_string(),
                 status: FreeBsdPrStatus::Verified,
                 pqc_signature: "DILITHIUM5_SIG_DEVCTL_DEVD_5009".to_string(),
             },
@@ -784,13 +747,7 @@ mod tests {
         let mut bectl = FreeBsdBectlBootEnvEngine::new("zroot");
         assert!(bectl.verify_bectl());
         assert!(bectl.activate_be("be-14.1-release"));
-        assert!(
-            bectl
-                .boot_environments
-                .get("be-14.1-release")
-                .unwrap()
-                .active_reboot
-        );
+        assert!(bectl.boot_environments.get("be-14.1-release").unwrap().active_reboot);
     }
 
     #[test]
@@ -798,14 +755,7 @@ mod tests {
         let mut dtrace = FreeBsdDtraceLockProfileEngine::new();
         assert!(dtrace.verify_dtrace());
         dtrace.record_contention("vnode_free_mtx", 50);
-        assert_eq!(
-            dtrace
-                .lock_metrics
-                .get("vnode_free_mtx")
-                .unwrap()
-                .contention_count,
-            2
-        );
+        assert_eq!(dtrace.lock_metrics.get("vnode_free_mtx").unwrap().contention_count, 2);
     }
 
     #[test]

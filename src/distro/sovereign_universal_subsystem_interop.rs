@@ -514,12 +514,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ProcessActivity,
                 true,
                 true,
-                &[
-                    "cgroup_v2",
-                    "freebsd_racct",
-                    "rusage_collector",
-                    "pidfd_signals",
-                ],
+                &["cgroup_v2", "freebsd_racct", "rusage_collector", "pidfd_signals"],
                 6,
             ),
         );
@@ -530,12 +525,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::MemoryVirtualization,
                 true,
                 true,
-                &[
-                    "mglru_reclaim",
-                    "damon_harvest",
-                    "zram_zstd",
-                    "cxl_photonic",
-                ],
+                &["mglru_reclaim", "damon_harvest", "zram_zstd", "cxl_photonic"],
                 7,
             ),
         );
@@ -557,11 +547,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::SignalDelivery,
                 true,
                 true,
-                &[
-                    "realtime_sigqueue",
-                    "sigreturn_frame_guard",
-                    "uncatchable_bypass",
-                ],
+                &["realtime_sigqueue", "sigreturn_frame_guard", "uncatchable_bypass"],
                 5,
             ),
         );
@@ -605,12 +591,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::AccessibilityInput,
                 true,
                 true,
-                &[
-                    "orca_screenreader",
-                    "fcitx5_ime",
-                    "libinput_gestures",
-                    "braille_display",
-                ],
+                &["orca_screenreader", "fcitx5_ime", "libinput_gestures", "braille_display"],
                 6,
             ),
         );
@@ -892,9 +873,7 @@ impl SovereignUniversalSubsystemInteropEngine {
             "audio" | "audiosound" | "audio_sound" => "audio",
             "power" | "hardwarepower" | "hardware_power" => "power",
             "container" | "containervirt" | "container_virt" => "container",
-            "observability" | "observabilitydiagnostics" | "observability_diagnostics" => {
-                "observability"
-            }
+            "observability" | "observabilitydiagnostics" | "observability_diagnostics" => "observability",
             "shell" | "shellterminal" | "shell_terminal" => "shell",
             "ipc_mem" | "ipcmemory" | "ipc_memory" => "ipc_mem",
             "drivers" | "drivershardware" | "drivers_hardware" => "drivers",
@@ -906,19 +885,13 @@ impl SovereignUniversalSubsystemInteropEngine {
             "automation" | "automationprovisioning" | "automation_provisioning" => "automation",
             "audit" | "systemaudit" | "system_audit" => "audit",
             "ai_agent" | "aiworkflowagent" | "ai_workflow_agent" => "ai_agent",
-            "virt_hypervisor" | "virtualizationhypervisor" | "virtualization_hypervisor" => {
-                "virt_hypervisor"
-            }
+            "virt_hypervisor" | "virtualizationhypervisor" | "virtualization_hypervisor" => "virt_hypervisor",
             "process" | "processactivity" | "process_activity" => "process_activity",
-            "memory" | "memoryvirtualization" | "memory_virt" | "memory_virtualization" => {
-                "memory_virt"
-            }
+            "memory" | "memoryvirtualization" | "memory_virt" | "memory_virtualization" => "memory_virt",
             "time" | "timesynchronization" | "time_sync" | "time_synchronization" => "time_sync",
             "signal" | "signaldelivery" | "signal_delivery" => "signal_delivery",
             "device" | "devicehotplug" | "device_hotplug" => "device_hotplug",
-            "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => {
-                "crypto_sec"
-            }
+            "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => "crypto_sec",
             "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry",
             "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility",
             _ => return None,
@@ -939,12 +912,8 @@ impl SovereignUniversalSubsystemInteropEngine {
         kind: &str,
         payload: &str,
     ) -> Result<u64, &'static str> {
-        let resolved_origin = self
-            .resolve_subsystem_key(origin)
-            .ok_or("Unknown origin subsystem")?;
-        let resolved_target = self
-            .resolve_subsystem_key(target)
-            .ok_or("Unknown target subsystem")?;
+        let resolved_origin = self.resolve_subsystem_key(origin).ok_or("Unknown origin subsystem")?;
+        let resolved_target = self.resolve_subsystem_key(target).ok_or("Unknown target subsystem")?;
 
         self.event_counter += 1;
         let event = SubsystemInteropEvent {
@@ -1025,12 +994,8 @@ impl SovereignUniversalSubsystemInteropEngine {
         target: &str,
         action: &str,
     ) -> Result<u64, &'static str> {
-        let resolved_origin = self
-            .resolve_subsystem_key(origin)
-            .ok_or("Unknown origin subsystem")?;
-        let resolved_target = self
-            .resolve_subsystem_key(target)
-            .ok_or("Unknown target subsystem")?;
+        let resolved_origin = self.resolve_subsystem_key(origin).ok_or("Unknown origin subsystem")?;
+        let resolved_target = self.resolve_subsystem_key(target).ok_or("Unknown target subsystem")?;
         let origin_adapter = self
             .subsystem_adapters
             .get(&resolved_origin)
@@ -1045,12 +1010,7 @@ impl SovereignUniversalSubsystemInteropEngine {
         let _policy = self.translate_policy(origin_adapter.category, target_adapter.category);
 
         let payload = format!("action={};mode={}", action, self.active_distro_mode);
-        self.dispatch_event(
-            &resolved_origin,
-            &resolved_target,
-            "cross_distro_op",
-            &payload,
-        )
+        self.dispatch_event(&resolved_origin, &resolved_target, "cross_distro_op", &payload)
     }
 }
 

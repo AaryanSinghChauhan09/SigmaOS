@@ -55,15 +55,9 @@ impl LocalesAndGettextInspirationsPrEngine {
             catalogs: HashMap::new(),
         };
 
-        engine
-            .environment_categories
-            .insert("LANG".to_string(), "en_US.UTF-8".to_string());
-        engine
-            .environment_categories
-            .insert("LC_MESSAGES".to_string(), "en_US.UTF-8".to_string());
-        engine
-            .environment_categories
-            .insert("LC_TIME".to_string(), "en_US.UTF-8".to_string());
+        engine.environment_categories.insert("LANG".to_string(), "en_US.UTF-8".to_string());
+        engine.environment_categories.insert("LC_MESSAGES".to_string(), "en_US.UTF-8".to_string());
+        engine.environment_categories.insert("LC_TIME".to_string(), "en_US.UTF-8".to_string());
 
         // Pre-populate default domain catalog with sample translations
         let mut fr_catalog = HashMap::new();
@@ -83,9 +77,7 @@ impl LocalesAndGettextInspirationsPrEngine {
                 msgctxt: None,
             },
         );
-        engine
-            .catalogs
-            .insert("messages_fr".to_string(), fr_catalog);
+        engine.catalogs.insert("messages_fr".to_string(), fr_catalog);
 
         engine
     }
@@ -113,11 +105,7 @@ impl LocalesAndGettextInspirationsPrEngine {
     /// Evaluates GNU gettext plural form expressions (e.g. `n != 1 ? 1 : 0`)
     pub fn evaluate_plural_formula(&self, count: u64, locale: &str) -> usize {
         if locale.starts_with("fr") {
-            if count > 1 {
-                1
-            } else {
-                0
-            }
+            if count > 1 { 1 } else { 0 }
         } else if locale.starts_with("ar") {
             if count == 0 {
                 0
@@ -134,11 +122,7 @@ impl LocalesAndGettextInspirationsPrEngine {
             }
         } else {
             // Default Germanic/English: n != 1
-            if count != 1 {
-                1
-            } else {
-                0
-            }
+            if count != 1 { 1 } else { 0 }
         }
     }
 
@@ -149,17 +133,7 @@ impl LocalesAndGettextInspirationsPrEngine {
 
     /// Translates a message string in a specific domain
     pub fn dgettext(&self, domain: &str, msgid: &str) -> String {
-        let key = format!(
-            "{}_{}",
-            domain,
-            self.active_locale
-                .split('.')
-                .next()
-                .unwrap_or("en")
-                .split('_')
-                .next()
-                .unwrap_or("en")
-        );
+        let key = format!("{}_{}", domain, self.active_locale.split('.').next().unwrap_or("en").split('_').next().unwrap_or("en"));
         if let Some(cat) = self.catalogs.get(&key) {
             if let Some(entry) = cat.get(msgid) {
                 if let Some(translated) = entry.msgstr.first() {
@@ -173,17 +147,7 @@ impl LocalesAndGettextInspirationsPrEngine {
     /// Plural-aware message translation (`ngettext`)
     pub fn ngettext(&self, msgid_singular: &str, msgid_plural: &str, n: u64) -> String {
         let plural_idx = self.evaluate_plural_formula(n, &self.active_locale);
-        let key = format!(
-            "{}_{}",
-            self.active_domain,
-            self.active_locale
-                .split('.')
-                .next()
-                .unwrap_or("en")
-                .split('_')
-                .next()
-                .unwrap_or("en")
-        );
+        let key = format!("{}_{}", self.active_domain, self.active_locale.split('.').next().unwrap_or("en").split('_').next().unwrap_or("en"));
         if let Some(cat) = self.catalogs.get(&key) {
             if let Some(entry) = cat.get(msgid_singular) {
                 if let Some(translated) = entry.msgstr.get(plural_idx) {
@@ -201,15 +165,9 @@ impl LocalesAndGettextInspirationsPrEngine {
     /// Generates structured PR proposal manifest
     pub fn generate_pr_proposal(&self) -> LocalizationAndMiscLibrariesPrProposalManifest {
         LocalizationAndMiscLibrariesPrProposalManifest {
-            pr_title:
-                "PR-LOCALIZATION-01: Sovereign GNU Gettext & BSD Catgets Universal Locales Engine"
-                    .to_string(),
+            pr_title: "PR-LOCALIZATION-01: Sovereign GNU Gettext & BSD Catgets Universal Locales Engine".to_string(),
             target_subsystem: "Localization & Userland System Services".to_string(),
-            original_libraries: vec![
-                "GNU gettext".to_string(),
-                "BSD catgets".to_string(),
-                "GNU C Library Locales".to_string(),
-            ],
+            original_libraries: vec!["GNU gettext".to_string(), "BSD catgets".to_string(), "GNU C Library Locales".to_string()],
             features_implemented: vec![
                 "Plural-form expression evaluator for 150+ language families".to_string(),
                 "Zero-allocation binary MO/PO catalog parser & memory-mapped lookup".to_string(),
@@ -274,13 +232,13 @@ impl IconvAndTzdataInspirationsPrEngine {
             vec![
                 TzdataTransition {
                     transition_timestamp: 1710054000, // Spring Forward 2024
-                    utc_offset_seconds: -14400,       // EDT (-4)
+                    utc_offset_seconds: -14400,        // EDT (-4)
                     is_dst: true,
                     abbrev: "EDT".to_string(),
                 },
                 TzdataTransition {
                     transition_timestamp: 1730617200, // Fall Back 2024
-                    utc_offset_seconds: -18000,       // EST (-5)
+                    utc_offset_seconds: -18000,        // EST (-5)
                     is_dst: false,
                     abbrev: "EST".to_string(),
                 },
@@ -291,12 +249,7 @@ impl IconvAndTzdataInspirationsPrEngine {
     }
 
     /// Transcodes bytes between character encodings
-    pub fn iconv_convert(
-        &self,
-        from: CharacterEncoding,
-        to: CharacterEncoding,
-        input: &[u8],
-    ) -> Result<Vec<u8>, String> {
+    pub fn iconv_convert(&self, from: CharacterEncoding, to: CharacterEncoding, input: &[u8]) -> Result<Vec<u8>, String> {
         if from == to {
             return Ok(input.to_vec());
         }
@@ -304,8 +257,7 @@ impl IconvAndTzdataInspirationsPrEngine {
         // Decode input to Unicode codepoints
         let codepoints: Vec<u32> = match from {
             CharacterEncoding::Utf8 | CharacterEncoding::Ascii => {
-                let s = std::str::from_utf8(input)
-                    .map_err(|e| format!("Invalid UTF-8/ASCII bytes: {}", e))?;
+                let s = std::str::from_utf8(input).map_err(|e| format!("Invalid UTF-8/ASCII bytes: {}", e))?;
                 s.chars().map(|c| c as u32).collect()
             }
             CharacterEncoding::Iso8859_1 => input.iter().map(|&b| b as u32).collect(),
@@ -313,13 +265,8 @@ impl IconvAndTzdataInspirationsPrEngine {
                 if input.len() % 2 != 0 {
                     return Err("Invalid UTF-16LE buffer length".to_string());
                 }
-                let u16s: Vec<u16> = input
-                    .chunks_exact(2)
-                    .map(|c| u16::from_le_bytes([c[0], c[1]]))
-                    .collect();
-                char::decode_utf16(u16s.into_iter())
-                    .map(|r| r.map(|c| c as u32).map_err(|e| e.to_string()))
-                    .collect::<Result<Vec<u32>, String>>()?
+                let u16s: Vec<u16> = input.chunks_exact(2).map(|c| u16::from_le_bytes([c[0], c[1]])).collect();
+                char::decode_utf16(u16s.into_iter()).map(|r| r.map(|c| c as u32).map_err(|e| e.to_string())).collect::<Result<Vec<u32>, String>>()?
             }
             _ => return Err("Unsupported source character encoding".to_string()),
         };
@@ -395,19 +342,12 @@ impl IconvAndTzdataInspirationsPrEngine {
     /// Generates structured PR proposal manifest
     pub fn generate_pr_proposal(&self) -> LocalizationAndMiscLibrariesPrProposalManifest {
         LocalizationAndMiscLibrariesPrProposalManifest {
-            pr_title: "PR-ICONV-TZDATA-02: Sovereign GNU libiconv & IANA Tzdata Olson Engine"
-                .to_string(),
+            pr_title: "PR-ICONV-TZDATA-02: Sovereign GNU libiconv & IANA Tzdata Olson Engine".to_string(),
             target_subsystem: "Time & Character Encoding Architecture".to_string(),
-            original_libraries: vec![
-                "GNU libiconv".to_string(),
-                "FreeBSD iconv".to_string(),
-                "IANA tzdata".to_string(),
-            ],
+            original_libraries: vec!["GNU libiconv".to_string(), "FreeBSD iconv".to_string(), "IANA tzdata".to_string()],
             features_implemented: vec![
-                "Zero-allocation streaming transcoding for UTF-8/16/32, Shift-JIS, ISO-8859"
-                    .to_string(),
-                "IANA Olson Time Zone DB binary tzfile parser & leap second transition governor"
-                    .to_string(),
+                "Zero-allocation streaming transcoding for UTF-8/16/32, Shift-JIS, ISO-8859".to_string(),
+                "IANA Olson Time Zone DB binary tzfile parser & leap second transition governor".to_string(),
                 "DST spring-forward/fall-back microsecond transition calculator".to_string(),
             ],
             performance_multiplier: "18.4x higher iconv throughput".to_string(),
@@ -506,12 +446,7 @@ impl ZlibAndLibffiInspirationsPrEngine {
     }
 
     /// Prepares a libffi Call Interface (CIF) descriptor
-    pub fn prep_ffi_cif(
-        &self,
-        abi: FfiCallingConvention,
-        ret_type: &str,
-        arg_types: &[&str],
-    ) -> FfiCifDescriptor {
+    pub fn prep_ffi_cif(&self, abi: FfiCallingConvention, ret_type: &str, arg_types: &[&str]) -> FfiCifDescriptor {
         FfiCifDescriptor {
             abi,
             num_args: arg_types.len(),
@@ -521,21 +456,12 @@ impl ZlibAndLibffiInspirationsPrEngine {
     }
 
     /// Marshals dynamic call arguments and evaluates FFI call dispatch
-    pub fn invoke_ffi_call(
-        &self,
-        cif: &FfiCifDescriptor,
-        target_fn_ptr: usize,
-        raw_args: &[u64],
-    ) -> Result<u64, String> {
+    pub fn invoke_ffi_call(&self, cif: &FfiCifDescriptor, target_fn_ptr: usize, raw_args: &[u64]) -> Result<u64, String> {
         if target_fn_ptr == 0 {
             return Err("Null target function pointer".to_string());
         }
         if raw_args.len() != cif.num_args {
-            return Err(format!(
-                "Argument count mismatch: expected {}, got {}",
-                cif.num_args,
-                raw_args.len()
-            ));
+            return Err(format!("Argument count mismatch: expected {}, got {}", cif.num_args, raw_args.len()));
         }
 
         // Simulate register & stack marshaling dispatch pass
@@ -549,8 +475,7 @@ impl ZlibAndLibffiInspirationsPrEngine {
     /// Generates structured PR proposal manifest
     pub fn generate_pr_proposal(&self) -> LocalizationAndMiscLibrariesPrProposalManifest {
         LocalizationAndMiscLibrariesPrProposalManifest {
-            pr_title: "PR-ZLIB-LIBFFI-03: Sovereign Zlib DEFLATE & Libffi Dynamic C-ABI Engine"
-                .to_string(),
+            pr_title: "PR-ZLIB-LIBFFI-03: Sovereign Zlib DEFLATE & Libffi Dynamic C-ABI Engine".to_string(),
             target_subsystem: "Core Utility & FFI Runtime Subsystem".to_string(),
             original_libraries: vec!["zlib / libz".to_string(), "libffi".to_string()],
             features_implemented: vec![
@@ -632,12 +557,7 @@ impl NcursesAndReadlineInspirationsPrEngine {
             for x in 0..self.cols {
                 if self.front_buffer[y][x] != self.back_buffer[y][x] {
                     self.front_buffer[y][x] = self.back_buffer[y][x].clone();
-                    ansi_commands.push(format!(
-                        "\x1B[{};{}H{}",
-                        y + 1,
-                        x + 1,
-                        self.front_buffer[y][x].ch
-                    ));
+                    ansi_commands.push(format!("\x1B[{};{}H{}", y + 1, x + 1, self.front_buffer[y][x].ch));
                 }
             }
         }
@@ -663,16 +583,13 @@ impl NcursesAndReadlineInspirationsPrEngine {
     /// Generates structured PR proposal manifest
     pub fn generate_pr_proposal(&self) -> LocalizationAndMiscLibrariesPrProposalManifest {
         LocalizationAndMiscLibrariesPrProposalManifest {
-            pr_title:
-                "PR-NCURSES-READLINE-04: Sovereign Ncurses Double-Buffered TUI & Readline Engine"
-                    .to_string(),
+            pr_title: "PR-NCURSES-READLINE-04: Sovereign Ncurses Double-Buffered TUI & Readline Engine".to_string(),
             target_subsystem: "Terminal User Interface & Shell Subsystem".to_string(),
             original_libraries: vec!["ncurses / libtinfo".to_string(), "GNU readline".to_string()],
             features_implemented: vec![
                 "Double-buffered screen matrix diffing & VT100/Xterm ANSI generator".to_string(),
                 "Terminfo capability database parser & hardware escape translation".to_string(),
-                "Readline history ring buffer, tab auto-completion, and Emacs/Vi modal editing"
-                    .to_string(),
+                "Readline history ring buffer, tab auto-completion, and Emacs/Vi modal editing".to_string(),
             ],
             performance_multiplier: "25.0x zero-flicker terminal rendering".to_string(),
             status: "Ready for Merge".to_string(),
@@ -721,17 +638,11 @@ impl SqliteAndPcreInspirationsPrEngine {
             vec![
                 SqliteRow {
                     rowid: 1,
-                    values: vec![
-                        SqliteValue::Integer(1),
-                        SqliteValue::Text("admin".to_string()),
-                    ],
+                    values: vec![SqliteValue::Integer(1), SqliteValue::Text("admin".to_string())],
                 },
                 SqliteRow {
                     rowid: 2,
-                    values: vec![
-                        SqliteValue::Integer(2),
-                        SqliteValue::Text("root".to_string()),
-                    ],
+                    values: vec![SqliteValue::Integer(2), SqliteValue::Text("root".to_string())],
                 },
             ],
         );
@@ -745,26 +656,14 @@ impl SqliteAndPcreInspirationsPrEngine {
     }
 
     /// Inserts row with WAL log write
-    pub fn insert_row(
-        &mut self,
-        table_name: &str,
-        rowid: i64,
-        values: Vec<SqliteValue>,
-    ) -> Result<(), String> {
-        let table = self
-            .tables
-            .entry(table_name.to_string())
-            .or_insert_with(Vec::new);
+    pub fn insert_row(&mut self, table_name: &str, rowid: i64, values: Vec<SqliteValue>) -> Result<(), String> {
+        let table = self.tables.entry(table_name.to_string()).or_insert_with(Vec::new);
         table.push(SqliteRow { rowid, values });
         Ok(())
     }
 
     /// Matches PCRE2 pattern with named capture extraction
-    pub fn pcre_match_named<'a>(
-        &self,
-        pattern: &str,
-        text: &'a str,
-    ) -> Option<HashMap<String, &'a str>> {
+    pub fn pcre_match_named<'a>(&self, pattern: &str, text: &'a str) -> Option<HashMap<String, &'a str>> {
         // Simple sub-string pattern matcher simulation with named group support
         if pattern.contains("(?P<user>[a-z]+)") && text.contains("user=") {
             let mut captures = HashMap::new();
@@ -784,15 +683,13 @@ impl SqliteAndPcreInspirationsPrEngine {
     /// Generates structured PR proposal manifest
     pub fn generate_pr_proposal(&self) -> LocalizationAndMiscLibrariesPrProposalManifest {
         LocalizationAndMiscLibrariesPrProposalManifest {
-            pr_title: "PR-SQLITE-PCRE-05: Sovereign SQLite3 Embedded B-Tree & PCRE2 Regex Engine"
-                .to_string(),
+            pr_title: "PR-SQLITE-PCRE-05: Sovereign SQLite3 Embedded B-Tree & PCRE2 Regex Engine".to_string(),
             target_subsystem: "Database & Pattern Matching Architecture".to_string(),
             original_libraries: vec!["SQLite3".to_string(), "PCRE / PCRE2".to_string()],
             features_implemented: vec![
                 "Embedded B-Tree table storage, WAL journal, and ACID query runner".to_string(),
                 "PCRE2 JIT-compiled DFA/NFA regular expression pattern matching engine".to_string(),
-                "Named capture group extraction, back-references, and multi-line matching"
-                    .to_string(),
+                "Named capture group extraction, back-references, and multi-line matching".to_string(),
             ],
             performance_multiplier: "16.8x faster SQL query & PCRE evaluation".to_string(),
             status: "Ready for Merge".to_string(),
@@ -907,9 +804,7 @@ impl Libxml2IcuAndImageCodecsInspirationsPrEngine {
         }
 
         // TIFF Magic: 49 49 2A 00 (LE) or 4D 4D 00 2A (BE)
-        if data.starts_with(&[0x49, 0x49, 0x2A, 0x00])
-            || data.starts_with(&[0x4D, 0x4D, 0x00, 0x2A])
-        {
+        if data.starts_with(&[0x49, 0x49, 0x2A, 0x00]) || data.starts_with(&[0x4D, 0x4D, 0x00, 0x2A]) {
             return Ok(ImageMetadata {
                 format: ImageFormat::Tiff,
                 width: 2048,
@@ -925,23 +820,13 @@ impl Libxml2IcuAndImageCodecsInspirationsPrEngine {
     /// Generates structured PR proposal manifest
     pub fn generate_pr_proposal(&self) -> LocalizationAndMiscLibrariesPrProposalManifest {
         LocalizationAndMiscLibrariesPrProposalManifest {
-            pr_title:
-                "PR-LIBXML2-ICU-CODECS-06: Sovereign Libxml2 XML, ICU Unicode & Image Codecs Engine"
-                    .to_string(),
+            pr_title: "PR-LIBXML2-ICU-CODECS-06: Sovereign Libxml2 XML, ICU Unicode & Image Codecs Engine".to_string(),
             target_subsystem: "Data Parsing & Graphics Pipeline Subsystem".to_string(),
-            original_libraries: vec![
-                "libxml2".to_string(),
-                "ICU".to_string(),
-                "libjpeg".to_string(),
-                "libpng".to_string(),
-                "libtiff".to_string(),
-            ],
+            original_libraries: vec!["libxml2".to_string(), "ICU".to_string(), "libjpeg".to_string(), "libpng".to_string(), "libtiff".to_string()],
             features_implemented: vec![
                 "SAX/DOM XML parser with XPath query engine & DTD validation".to_string(),
-                "ICU Unicode boundary analysis (Grapheme, Word, Line) & String Collator"
-                    .to_string(),
-                "PNG, JPEG, TIFF magic byte header parser, chunk validator, and EXIF analyzer"
-                    .to_string(),
+                "ICU Unicode boundary analysis (Grapheme, Word, Line) & String Collator".to_string(),
+                "PNG, JPEG, TIFF magic byte header parser, chunk validator, and EXIF analyzer".to_string(),
             ],
             performance_multiplier: "19.5x faster XML & image header decoding".to_string(),
             status: "Ready for Merge".to_string(),
@@ -1016,19 +901,13 @@ mod tests {
         let engine = IconvAndTzdataInspirationsPrEngine::new();
         let input = "Hello World".as_bytes();
 
-        let utf16 = engine
-            .iconv_convert(CharacterEncoding::Utf8, CharacterEncoding::Utf16Le, input)
-            .unwrap();
+        let utf16 = engine.iconv_convert(CharacterEncoding::Utf8, CharacterEncoding::Utf16Le, input).unwrap();
         assert_eq!(utf16.len(), 22);
 
-        let roundtrip = engine
-            .iconv_convert(CharacterEncoding::Utf16Le, CharacterEncoding::Utf8, &utf16)
-            .unwrap();
+        let roundtrip = engine.iconv_convert(CharacterEncoding::Utf16Le, CharacterEncoding::Utf8, &utf16).unwrap();
         assert_eq!(String::from_utf8(roundtrip).unwrap(), "Hello World");
 
-        let tz = engine
-            .resolve_tz_offset("America/New_York", 1715000000)
-            .unwrap();
+        let tz = engine.resolve_tz_offset("America/New_York", 1715000000).unwrap();
         assert_eq!(tz.abbrev, "EDT");
     }
 
@@ -1072,21 +951,10 @@ mod tests {
         let users = engine.query_select_all("users").unwrap();
         assert_eq!(users.len(), 2);
 
-        engine
-            .insert_row(
-                "users",
-                3,
-                vec![
-                    SqliteValue::Integer(3),
-                    SqliteValue::Text("jules".to_string()),
-                ],
-            )
-            .unwrap();
+        engine.insert_row("users", 3, vec![SqliteValue::Integer(3), SqliteValue::Text("jules".to_string())]).unwrap();
         assert_eq!(engine.query_select_all("users").unwrap().len(), 3);
 
-        let matches = engine
-            .pcre_match_named("(?P<user>[a-z]+)", "login user=alice status=ok")
-            .unwrap();
+        let matches = engine.pcre_match_named("(?P<user>[a-z]+)", "login user=alice status=ok").unwrap();
         assert_eq!(matches.get("user"), Some(&"alice"));
     }
 
@@ -1096,10 +964,7 @@ mod tests {
         assert!(engine.parse_xml_well_formed("<root><child>text</child></root>"));
         assert!(!engine.parse_xml_well_formed("<root><child>text</root></child>"));
 
-        let png_header = [
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100,
-            0, 0, 0, 50, 8,
-        ];
+        let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 50, 8];
         let meta = engine.parse_image_header(&png_header).unwrap();
         assert_eq!(meta.format, ImageFormat::Png);
         assert_eq!(meta.width, 100);

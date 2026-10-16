@@ -812,7 +812,12 @@ impl SovereignSubsystemDistroHarmonyEngine {
         subsystem: SigmaOsSubsystem,
         payload: &str,
     ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
+        format!(
+            "[{}:{}] {}",
+            distro.as_str(),
+            subsystem.as_str(),
+            payload
+        )
     }
 
     pub fn dispatch_event(
@@ -1143,10 +1148,7 @@ mod tests {
             SigmaOsSubsystem::SecuritySandboxing,
             "mac_capsicum_enforce",
         );
-        assert_eq!(
-            translated,
-            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
-        );
+        assert_eq!(translated, "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce");
     }
 
     #[test]
@@ -1169,9 +1171,6 @@ mod tests {
                 SigmaOsSubsystem::SecuritySandboxing,
             )
             .expect("ProcessActivity -> SecuritySandboxing policy must exist");
-        assert_eq!(
-            policy.distro_inspiration,
-            LinuxBsdDistroInspiration::FreeBSD
-        );
+        assert_eq!(policy.distro_inspiration, LinuxBsdDistroInspiration::FreeBSD);
     }
 }

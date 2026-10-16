@@ -23,9 +23,9 @@ use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::klib::btreemap::BTreeMap;
-use core::time::Duration;
 #[cfg(feature = "standalone_test")]
 use std::collections::BTreeMap;
+use core::time::Duration;
 // Instant not in no_std
 
 /// Zero-allocation case-insensitive substring search helper.

@@ -27,14 +27,8 @@ fn test_cadences_and_outputs() {
 
 #[test]
 fn test_curriculum_cycles() {
-    assert_eq!(
-        CurriculumCycle::Xv6AndOsDev.title(),
-        "Cycle 1: xv6 and OSDev"
-    );
-    assert_eq!(
-        CurriculumCycle::LinuxKernel.title(),
-        "Cycle 2: Linux kernel"
-    );
+    assert_eq!(CurriculumCycle::Xv6AndOsDev.title(), "Cycle 1: xv6 and OSDev");
+    assert_eq!(CurriculumCycle::LinuxKernel.title(), "Cycle 2: Linux kernel");
     assert_eq!(
         CurriculumCycle::ArchLinuxAndArchWiki.title(),
         "Cycle 3: Arch Linux and ArchWiki"

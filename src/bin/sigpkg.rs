@@ -416,11 +416,9 @@ mod tests {
 
 fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
     match source_pm.to_lowercase().as_str() {
-        "apt" | "apt-get" | "apt-cache" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" => {
-            Some("--apt")
-        }
-        "dnf" | "dnf5" | "yum" | "microdnf" | "rpm" | "urpmq" | "urpme" | "urpmi" | "fedora"
-        | "rhel" | "centos" | "rocky" | "alma" | "almalinux" => Some("--dnf"),
+        "apt" | "apt-get" | "apt-cache" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" => Some("--apt"),
+        "dnf" | "dnf5" | "yum" | "microdnf" | "rpm" | "urpmq" | "urpme" | "urpmi" | "fedora" | "rhel"
+        | "centos" | "rocky" | "alma" | "almalinux" => Some("--dnf"),
         "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy"
         | "cachyos" => Some("--pacman"),
         "apk" | "alpine" => Some("--apk"),

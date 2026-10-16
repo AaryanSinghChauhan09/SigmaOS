@@ -271,9 +271,7 @@ impl NixGuixHermeticCasFlakeV57PrEngine {
         Self {
             store_path: "/sigma/store/v57-hermetic".to_string(),
             active_generation: 142,
-            merkle_root_hash:
-                "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                    .to_string(),
+            merkle_root_hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
         }
     }
 
@@ -539,9 +537,7 @@ impl OpenSourceOsMissingComponentsV57PrSuite {
     }
 
     pub fn execute_and_verify_all(&mut self) -> bool {
-        let sched_msg = self
-            .sched_ext_ai
-            .set_policy(SchedExtGovernorPolicyV57::RealtimeAudioVisual);
+        let sched_msg = self.sched_ext_ai.set_policy(SchedExtGovernorPolicyV57::RealtimeAudioVisual);
         assert!(sched_msg.contains("RealtimeAudioVisual"));
 
         let freed_gb = self.bcachefs_photonic.trigger_tier_compaction();
@@ -574,10 +570,7 @@ impl OpenSourceOsMissingComponentsV57PrSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions
-            .values()
-            .filter(|s| s.status == OsPrStatusV57::Merged)
-            .count()
+        self.submissions.values().filter(|s| s.status == OsPrStatusV57::Merged).count()
     }
 }
 

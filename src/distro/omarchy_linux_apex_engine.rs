@@ -203,9 +203,7 @@ pub struct OmarchyWalkerLauncherEngine {
 
 impl OmarchyWalkerLauncherEngine {
     pub fn new() -> Self {
-        let mut launcher = Self {
-            entries: Vec::new(),
-        };
+        let mut launcher = Self { entries: Vec::new() };
         launcher.register_app("Alacritty Terminal", "alacritty", "terminal");
         launcher.register_app("Brave Browser", "brave", "web-browser");
         launcher.register_app("Files (Thunar)", "thunar", "system-file-manager");
@@ -404,9 +402,7 @@ pub struct OmarchyQuickshellWidgetsEngine {
 
 impl OmarchyQuickshellWidgetsEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            widgets: Vec::new(),
-        };
+        let mut engine = Self { widgets: Vec::new() };
         engine.register_widget("VolumeOSD", 860, 480, 200, 60);
         engine.register_widget("BrightnessOSD", 860, 560, 200, 60);
         engine.register_widget("MediaController", 20, 20, 320, 100);
@@ -658,9 +654,7 @@ impl ConcurrentOmarchyThemeRouter {
         index.insert("files".to_string(), "thunar".to_string());
 
         Self {
-            active_theme: std::sync::Arc::new(std::sync::Mutex::new(
-                "SigmaOS Zenith Cyber".to_string(),
-            )),
+            active_theme: std::sync::Arc::new(std::sync::Mutex::new("SigmaOS Zenith Cyber".to_string())),
             app_index: index,
         }
     }
@@ -726,10 +720,7 @@ mod tests {
     #[test]
     fn test_concurrent_theme_router() {
         let router = ConcurrentOmarchyThemeRouter::new();
-        assert_eq!(
-            router.lookup_app("terminal"),
-            Some(&"alacritty".to_string())
-        );
+        assert_eq!(router.lookup_app("terminal"), Some(&"alacritty".to_string()));
         assert!(router.set_theme("Tokyo Night").is_ok());
         assert_eq!(router.get_theme().unwrap(), "Tokyo Night");
     }

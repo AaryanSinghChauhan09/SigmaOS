@@ -173,10 +173,7 @@ impl CachyOsInteractiveKernelBuilderPrEngine {
             self.isa_target.clone(),
             format!("-mprefer-vector-width={}", self.vector_width),
         ];
-        if self
-            .compiler_passes
-            .contains(&KernelOptimizationPass::ThinLto)
-        {
+        if self.compiler_passes.contains(&KernelOptimizationPass::ThinLto) {
             flags.push("-flto=thin".to_string());
         }
         flags
@@ -317,10 +314,7 @@ impl CachyOsAnanicyProcessPriorityPrEngine {
     pub fn register_process_rule(&mut self, rule: AnanicyRuleSpec) -> String {
         let name = rule.process_name.clone();
         self.active_rules.push(rule);
-        format!(
-            "PR Proposal: Ananicy process rule registered for '{}'",
-            name
-        )
+        format!("PR Proposal: Ananicy process rule registered for '{}'", name)
     }
 
     pub fn apply_process_priorities(&self) -> usize {
@@ -524,21 +518,11 @@ impl CachyParityPrCategory {
             Self::NetworkTuning => "cachyos-network-tuner TCP BBRv3 & DoH proxy",
             Self::ProtonWineRuntime => "cachyos-gaming-meta-v2 Proton/Wine eSync/fSync/NTSync",
             Self::ChwdGuiInstaller => "cachyos-chwd-gui hardware detection & driver installer",
-            Self::AnanicyProcessPriority => {
-                "cachyos-ananicy-rules auto-nice & SCHED_RR process priorities"
-            }
-            Self::ProtonDxvkShaderOpt => {
-                "cachyos-proton-dxvk-opt DXVK & VKD3D async shader optimizer"
-            }
-            Self::HandheldHardwareQuirks => {
-                "cachyos-handheld-quirks ROG Ally & Legion Go ACPI/DMI quirks"
-            }
-            Self::AutoCpuFreqPowerGovernor => {
-                "cachyos-auto-cpufreq EPP governor & turbo-boost switcher"
-            }
-            Self::UksmMemoryDeduplication => {
-                "cachyos-uksm UKSM background RAM deduplication governor"
-            }
+            Self::AnanicyProcessPriority => "cachyos-ananicy-rules auto-nice & SCHED_RR process priorities",
+            Self::ProtonDxvkShaderOpt => "cachyos-proton-dxvk-opt DXVK & VKD3D async shader optimizer",
+            Self::HandheldHardwareQuirks => "cachyos-handheld-quirks ROG Ally & Legion Go ACPI/DMI quirks",
+            Self::AutoCpuFreqPowerGovernor => "cachyos-auto-cpufreq EPP governor & turbo-boost switcher",
+            Self::UksmMemoryDeduplication => "cachyos-uksm UKSM background RAM deduplication governor",
         }
     }
 }
@@ -702,9 +686,7 @@ impl SovereignCachyLinuxMissingComponentsParityPrGateway {
         let quirks_msg = self.quirks_engine.apply_device_quirks();
         assert!(quirks_msg.contains("ROG Ally"));
 
-        let pwr_msg = self
-            .autocpufreq_engine
-            .set_power_state(PowerState::BatteryPower);
+        let pwr_msg = self.autocpufreq_engine.set_power_state(PowerState::BatteryPower);
         assert!(pwr_msg.contains("powersave"));
 
         let uksm_msg = self.uksm_engine.perform_uksm_scan_pass();

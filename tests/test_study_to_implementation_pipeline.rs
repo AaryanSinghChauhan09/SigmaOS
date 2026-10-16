@@ -10,16 +10,9 @@ fn test_full_pipeline_verification() {
     let engine = StudyToImplementationPipelineEngine::new();
 
     // Verify study items (xv6, Linux, Redox, Arch, Mint, FreeBSD, OpenBSD, Debian, Fedora, NixOS, OSDev)
-    assert!(
-        engine.study_items.len() >= 11,
-        "Expected at least 11 study items"
-    );
+    assert!(engine.study_items.len() >= 11, "Expected at least 11 study items");
 
-    let projects: Vec<&str> = engine
-        .study_items
-        .iter()
-        .map(|s| s.project_name.as_str())
-        .collect();
+    let projects: Vec<&str> = engine.study_items.iter().map(|s| s.project_name.as_str()).collect();
     assert!(projects.contains(&"xv6"));
     assert!(projects.contains(&"Linux Kernel"));
     assert!(projects.contains(&"Redox OS"));

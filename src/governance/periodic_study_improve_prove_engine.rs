@@ -99,9 +99,7 @@ impl ComponentDomain {
             Self::VfsFilesystems => "Path resolution, mounts, file operations, crash consistency",
             Self::Ipc => "Pipes, signals, shared memory, message queues, eventfd",
             Self::Syscalls => "ABI stability, validation, error codes, syscall coverage",
-            Self::Security => {
-                "Capabilities, sandboxing, seccomp-like restrictions, unveil concepts"
-            }
+            Self::Security => "Capabilities, sandboxing, seccomp-like restrictions, unveil concepts",
             Self::Drivers => "Device probe, initialization, error handling, virtio devices",
             Self::Networking => "Socket API, TCP/IP, packet filtering, WireGuard concepts",
             Self::Packaging => "Metadata, dependencies, install, update, rollback",
@@ -397,9 +395,9 @@ impl PeriodicImprovementEngine {
         match target {
             ComponentMaturity::Proposed => true,
             ComponentMaturity::Prototype => has_unit_tests,
-            ComponentMaturity::Integrated
-            | ComponentMaturity::Hardened
-            | ComponentMaturity::Supported => has_runtime_evidence && has_unit_tests,
+            ComponentMaturity::Integrated | ComponentMaturity::Hardened | ComponentMaturity::Supported => {
+                has_runtime_evidence && has_unit_tests
+            }
         }
     }
 
@@ -469,11 +467,7 @@ impl PeriodicImprovementEngine {
         month: u8,
         evidence_log: String,
     ) -> Result<(), String> {
-        if let Some(milestone) = self
-            .monthly_milestones
-            .iter_mut()
-            .find(|m| m.month == month)
-        {
+        if let Some(milestone) = self.monthly_milestones.iter_mut().find(|m| m.month == month) {
             milestone.completed = true;
             milestone.evidence_log = Some(evidence_log);
             Ok(())
@@ -497,10 +491,7 @@ impl PeriodicImprovementEngine {
         }
 
         report.push_str("\n## Completed Weekly Cycles\n");
-        report.push_str(&format!(
-            "Total cycles completed: {}\n",
-            self.weekly_records.len()
-        ));
+        report.push_str(&format!("Total cycles completed: {}\n", self.weekly_records.len()));
 
         for record in &self.weekly_records {
             report.push_str(&format!(
@@ -520,11 +511,7 @@ impl PeriodicImprovementEngine {
                 "- Month {}: {} [{}] — {}\n",
                 milestone.month,
                 milestone.milestone_name,
-                if milestone.completed {
-                    "COMPLETED"
-                } else {
-                    "PENDING"
-                },
+                if milestone.completed { "COMPLETED" } else { "PENDING" },
                 milestone.validation_gate
             ));
         }

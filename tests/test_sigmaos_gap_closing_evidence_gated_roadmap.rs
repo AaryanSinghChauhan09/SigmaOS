@@ -12,9 +12,7 @@ fn test_gap_closing_distro_practices() {
 
     assert_eq!(practices.len(), 7);
     assert_eq!(practices[0].practice, "Debian installer first");
-    assert!(practices[0]
-        .application
-        .contains("QEMU x86_64 boot-to-shell"));
+    assert!(practices[0].application.contains("QEMU x86_64 boot-to-shell"));
     assert_eq!(practices[1].practice, "Arch reproducible build discipline");
     assert_eq!(practices[2].practice, "FreeBSD release engineering");
     assert_eq!(practices[3].practice, "OpenBSD least privilege");
@@ -30,9 +28,7 @@ fn test_priority_gap_classes() {
 
     assert_eq!(gap_classes.len(), 7);
     assert_eq!(gap_classes[0].name, "Boot and installation");
-    assert!(gap_classes[0]
-        .current_signal
-        .contains("QEMU x86_64 boot success is 0%"));
+    assert!(gap_classes[0].current_signal.contains("QEMU x86_64 boot success is 0%"));
     assert_eq!(gap_classes[1].name, "Runtime integration");
     assert_eq!(gap_classes[2].name, "Capability truth");
     assert_eq!(gap_classes[3].name, "Hardware enablement");
@@ -64,18 +60,10 @@ fn test_canonical_status_vocabulary() {
     assert_eq!(CanonicalStatus::Integrated.as_str(), "Integrated");
     assert_eq!(CanonicalStatus::Supported.as_str(), "Supported");
 
-    assert!(CanonicalStatus::Proposed
-        .allowed_evidence()
-        .contains("Design document"));
-    assert!(CanonicalStatus::Prototype
-        .allowed_evidence()
-        .contains("Unit test"));
-    assert!(CanonicalStatus::Integrated
-        .allowed_evidence()
-        .contains("Integration test"));
-    assert!(CanonicalStatus::Supported
-        .allowed_evidence()
-        .contains("Reproducible QEMU/hardware test"));
+    assert!(CanonicalStatus::Proposed.allowed_evidence().contains("Design document"));
+    assert!(CanonicalStatus::Prototype.allowed_evidence().contains("Unit test"));
+    assert!(CanonicalStatus::Integrated.allowed_evidence().contains("Integration test"));
+    assert!(CanonicalStatus::Supported.allowed_evidence().contains("Reproducible QEMU/hardware test"));
 }
 
 #[test]
@@ -142,10 +130,7 @@ fn test_pr_proposal_and_patch_diff_generation() {
     let engine = GapClosingPrEngine::new();
     let spec = engine.generate_proposal_spec();
 
-    assert_eq!(
-        spec.pr_title,
-        "feat(roadmap): Distro-Style Evidence-Gated Gap-Closing Roadmap"
-    );
+    assert_eq!(spec.pr_title, "feat(roadmap): Distro-Style Evidence-Gated Gap-Closing Roadmap");
     assert_eq!(spec.pr_branch, "feature/gap-closing-evidence-gated-roadmap");
     assert_eq!(spec.severities_count, 4);
     assert_eq!(spec.rules_count, 12);

@@ -6454,8 +6454,7 @@ impl SovereignQubesDisposableAppVmScrubberEngine {
     }
 
     pub fn appvm_scrubber(&mut self, vm_name: &str, allocated_pages: usize) -> bool {
-        self.active_appvms
-            .insert(vm_name.to_string(), allocated_pages);
+        self.active_appvms.insert(vm_name.to_string(), allocated_pages);
         true
     }
 

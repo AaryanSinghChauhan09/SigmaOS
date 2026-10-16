@@ -82,9 +82,7 @@ impl CanonicalStatus {
             Self::Proposed => "Design document or issue",
             Self::Prototype => "Unit test or isolated demo",
             Self::Integrated => "Integration test plus runtime path",
-            Self::Supported => {
-                "Reproducible QEMU/hardware test, release checklist, regression coverage"
-            }
+            Self::Supported => "Reproducible QEMU/hardware test, release checklist, regression coverage",
         }
     }
 
@@ -162,15 +160,11 @@ impl GapClosingRule {
         match self {
             Self::Rule1SingleSourceOfTruth => "Single source of truth",
             Self::Rule2EvidenceGatedPromotion => "Evidence-gated promotion",
-            Self::Rule3VerticalSlicesOverHorizontalPromises => {
-                "Vertical slices over horizontal promises"
-            }
+            Self::Rule3VerticalSlicesOverHorizontalPromises => "Vertical slices over horizontal promises",
             Self::Rule4CiIsAGate => "CI is a gate, not a dashboard",
             Self::Rule5Reproducibility => "Reproducibility",
             Self::Rule6LeastPrivilege => "Least privilege",
-            Self::Rule7SecurityChangesRequireSeparateReview => {
-                "Security changes require separate review"
-            }
+            Self::Rule7SecurityChangesRequireSeparateReview => "Security changes require separate review",
             Self::Rule8FailSafely => "Fail safely",
             Self::Rule9NoUnsupportedClaims => "No unsupported claims",
             Self::Rule10RegressionProtection => "Regression protection",
@@ -221,36 +215,16 @@ impl EvidenceProofChecklist {
 
     pub fn satisfied_count(&self) -> usize {
         let mut count = 0;
-        if self.implementation_exists {
-            count += 1;
-        }
-        if self.unit_tests_pass {
-            count += 1;
-        }
-        if self.integration_tests_pass {
-            count += 1;
-        }
-        if self.runtime_evidence_exists {
-            count += 1;
-        }
-        if self.documentation_matches_reality {
-            count += 1;
-        }
-        if self.regression_test_exists {
-            count += 1;
-        }
-        if self.rollback_recovery_path_defined {
-            count += 1;
-        }
-        if self.security_review_complete {
-            count += 1;
-        }
-        if self.status_updated_on_canonical_page {
-            count += 1;
-        }
-        if self.evidence_linked_and_reproducible {
-            count += 1;
-        }
+        if self.implementation_exists { count += 1; }
+        if self.unit_tests_pass { count += 1; }
+        if self.integration_tests_pass { count += 1; }
+        if self.runtime_evidence_exists { count += 1; }
+        if self.documentation_matches_reality { count += 1; }
+        if self.regression_test_exists { count += 1; }
+        if self.rollback_recovery_path_defined { count += 1; }
+        if self.security_review_complete { count += 1; }
+        if self.status_updated_on_canonical_page { count += 1; }
+        if self.evidence_linked_and_reproducible { count += 1; }
         count
     }
 
@@ -298,8 +272,7 @@ impl GapClosingPrEngine {
             },
             DistroPracticeEntry {
                 practice: "Arch reproducible build discipline",
-                application:
-                    "Every artifact must be rebuildable from a locked toolchain and commit",
+                application: "Every artifact must be rebuildable from a locked toolchain and commit",
             },
             DistroPracticeEntry {
                 practice: "FreeBSD release engineering",
@@ -307,8 +280,7 @@ impl GapClosingPrEngine {
             },
             DistroPracticeEntry {
                 practice: "OpenBSD least privilege",
-                application:
-                    "Security boundaries are reviewed separately and never bypassed for speed",
+                application: "Security boundaries are reviewed separately and never bypassed for speed",
             },
             DistroPracticeEntry {
                 practice: "Fedora CI/gating",
@@ -344,8 +316,7 @@ impl GapClosingPrEngine {
             },
             PriorityGapClass {
                 name: "Hardware enablement",
-                current_signal:
-                    "No real hardware tested; missing graphics, Wi-Fi, audio, USB, suspend",
+                current_signal: "No real hardware tested; missing graphics, Wi-Fi, audio, USB, suspend",
                 closure_outcome: "Tiered device support with test logs",
             },
             PriorityGapClass {
@@ -418,14 +389,12 @@ impl GapClosingPrEngine {
                     "Treat non-reachable subsystems as Prototype",
                     "Add fault-injection tests",
                 ],
-                exit_criterion:
-                    "Boot-to-shell run exercises every claimed core subsystem with trace.",
+                exit_criterion: "Boot-to-shell run exercises every claimed core subsystem with trace.",
             },
             WorkstreamSpec {
                 id: 3,
                 title: "Security and isolation",
-                gap_description:
-                    "Security boundaries require explicit threat model and capability tests.",
+                gap_description: "Security boundaries require explicit threat model and capability tests.",
                 closure_plan: alloc::vec![
                     "Create threat model covering untrusted packages/binaries/network",
                     "Define capability boundaries",
@@ -433,14 +402,12 @@ impl GapClosingPrEngine {
                     "Separate security review from feature review",
                     "Use fuzzing for parsers and syscall handlers",
                 ],
-                exit_criterion:
-                    "Documented threat model, capability matrix, and passing denial tests.",
+                exit_criterion: "Documented threat model, capability matrix, and passing denial tests.",
             },
             WorkstreamSpec {
                 id: 4,
                 title: "Packaging, updates, and recovery",
-                gap_description:
-                    "Package installation and update recovery need atomic transaction verification.",
+                gap_description: "Package installation and update recovery need atomic transaction verification.",
                 closure_plan: alloc::vec![
                     "Phase 1 metadata parse",
                     "Phase 2 dependency resolution and dry-run",
@@ -448,14 +415,12 @@ impl GapClosingPrEngine {
                     "Phase 4 sandboxed script execution",
                     "Phase 5 atomic update and rollback tests",
                 ],
-                exit_criterion:
-                    "Failed update completes atomically or restores prior state proven by test.",
+                exit_criterion: "Failed update completes atomically or restores prior state proven by test.",
             },
             WorkstreamSpec {
                 id: 5,
                 title: "Hardware enablement",
-                gap_description:
-                    "No real hardware tested; missing GPU, Wi-Fi, audio, USB, suspend.",
+                gap_description: "No real hardware tested; missing GPU, Wi-Fi, audio, USB, suspend.",
                 closure_plan: alloc::vec![
                     "Keep QEMU x86_64 as Tier 1",
                     "Add ARM64 QEMU after x86_64 target",
@@ -468,15 +433,13 @@ impl GapClosingPrEngine {
             WorkstreamSpec {
                 id: 6,
                 title: "Desktop and userspace",
-                gap_description:
-                    "Desktop compositor and apps should not precede reliable boot and runtime.",
+                gap_description: "Desktop compositor and apps should not precede reliable boot and runtime.",
                 closure_plan: alloc::vec![
                     "Define minimal desktop contract",
                     "Add automated UI smoke tests",
                     "Add crash reporting and diagnostics",
                 ],
-                exit_criterion:
-                    "QEMU boot reaches desktop, launches app, accepts input, shuts down cleanly.",
+                exit_criterion: "QEMU boot reaches desktop, launches app, accepts input, shuts down cleanly.",
             },
             WorkstreamSpec {
                 id: 7,
@@ -488,114 +451,33 @@ impl GapClosingPrEngine {
                     "Add front-matter verification blocks",
                     "Add contributor guide",
                 ],
-                exit_criterion:
-                    "Every active component page has current status and evidence links.",
+                exit_criterion: "Every active component page has current status and evidence links.",
             },
         ]
     }
 
     pub fn get_backlog(&self) -> Vec<BacklogTask> {
         alloc::vec![
-            BacklogTask {
-                priority: "P0",
-                id: 1,
-                title: "Create machine-readable gap register"
-            },
-            BacklogTask {
-                priority: "P0",
-                id: 2,
-                title: "Audit all component pages and downgrade unevidenced claims"
-            },
-            BacklogTask {
-                priority: "P0",
-                id: 3,
-                title: "Add CI gates for clean build, unit tests, formatting, and test scripts"
-            },
-            BacklogTask {
-                priority: "P0",
-                id: 4,
-                title: "Create QEMU x86_64 boot-to-shell validator"
-            },
-            BacklogTask {
-                priority: "P0",
-                id: 5,
-                title: "Publish Verified Today report from actual test evidence"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 6,
-                title: "Prove UEFI boot in QEMU"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 7,
-                title: "Prove BIOS boot in QEMU"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 8,
-                title: "Prove boot-to-shell with serial logs"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 9,
-                title: "Add VGA framebuffer smoke test"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 10,
-                title: "Add basic virtio-net networking test"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 11,
-                title: "Add clean-install test on disposable virtual disk"
-            },
-            BacklogTask {
-                priority: "P1",
-                id: 12,
-                title: "Add update rollback and recovery test"
-            },
-            BacklogTask {
-                priority: "P2",
-                id: 13,
-                title: "Connect VFS, process creation, syscalls, and shell into runtime trace"
-            },
-            BacklogTask {
-                priority: "P2",
-                id: 14,
-                title: "Add package metadata parsing and dependency resolution"
-            },
-            BacklogTask {
-                priority: "P2",
-                id: 15,
-                title: "Add sandboxed package installation"
-            },
-            BacklogTask {
-                priority: "P2",
-                id: 16,
-                title: "Add minimal desktop launch and input smoke tests"
-            },
-            BacklogTask {
-                priority: "P2",
-                id: 17,
-                title: "Add diagnostics, crash logs, and known-issue report"
-            },
-            BacklogTask {
-                priority: "P3",
-                id: 18,
-                title: "Add ARM64 QEMU after x86_64 target"
-            },
-            BacklogTask {
-                priority: "P3",
-                id: 19,
-                title: "Add real-hardware validation program with named devices and logs"
-            },
-            BacklogTask {
-                priority: "P3",
-                id: 20,
-                title: "Expand package compatibility after sandbox and rollback tests pass"
-            },
+            BacklogTask { priority: "P0", id: 1, title: "Create machine-readable gap register" },
+            BacklogTask { priority: "P0", id: 2, title: "Audit all component pages and downgrade unevidenced claims" },
+            BacklogTask { priority: "P0", id: 3, title: "Add CI gates for clean build, unit tests, formatting, and test scripts" },
+            BacklogTask { priority: "P0", id: 4, title: "Create QEMU x86_64 boot-to-shell validator" },
+            BacklogTask { priority: "P0", id: 5, title: "Publish Verified Today report from actual test evidence" },
+            BacklogTask { priority: "P1", id: 6, title: "Prove UEFI boot in QEMU" },
+            BacklogTask { priority: "P1", id: 7, title: "Prove BIOS boot in QEMU" },
+            BacklogTask { priority: "P1", id: 8, title: "Prove boot-to-shell with serial logs" },
+            BacklogTask { priority: "P1", id: 9, title: "Add VGA framebuffer smoke test" },
+            BacklogTask { priority: "P1", id: 10, title: "Add basic virtio-net networking test" },
+            BacklogTask { priority: "P1", id: 11, title: "Add clean-install test on disposable virtual disk" },
+            BacklogTask { priority: "P1", id: 12, title: "Add update rollback and recovery test" },
+            BacklogTask { priority: "P2", id: 13, title: "Connect VFS, process creation, syscalls, and shell into runtime trace" },
+            BacklogTask { priority: "P2", id: 14, title: "Add package metadata parsing and dependency resolution" },
+            BacklogTask { priority: "P2", id: 15, title: "Add sandboxed package installation" },
+            BacklogTask { priority: "P2", id: 16, title: "Add minimal desktop launch and input smoke tests" },
+            BacklogTask { priority: "P2", id: 17, title: "Add diagnostics, crash logs, and known-issue report" },
+            BacklogTask { priority: "P3", id: 18, title: "Add ARM64 QEMU after x86_64 target" },
+            BacklogTask { priority: "P3", id: 19, title: "Add real-hardware validation program with named devices and logs" },
+            BacklogTask { priority: "P3", id: 20, title: "Expand package compatibility after sandbox and rollback tests pass" },
         ]
     }
 
@@ -604,8 +486,7 @@ impl GapClosingPrEngine {
         let rules = self.get_rules();
         let workstreams = self.get_workstreams();
 
-        let mut payload =
-            String::from("PR: feat(roadmap): Distro-Style Evidence-Gated Gap-Closing Roadmap\n");
+        let mut payload = String::from("PR: feat(roadmap): Distro-Style Evidence-Gated Gap-Closing Roadmap\n");
         for s in &severities {
             payload.push_str(s.code());
             payload.push_str(": ");
@@ -624,9 +505,7 @@ impl GapClosingPrEngine {
         let patch_digest = fnv1a_gap_closing_digest(payload.as_bytes());
 
         GapClosingPrProposalSpec {
-            pr_title: String::from(
-                "feat(roadmap): Distro-Style Evidence-Gated Gap-Closing Roadmap",
-            ),
+            pr_title: String::from("feat(roadmap): Distro-Style Evidence-Gated Gap-Closing Roadmap"),
             pr_branch: String::from("feature/gap-closing-evidence-gated-roadmap"),
             severities_count: severities.len(),
             rules_count: rules.len(),
@@ -673,9 +552,7 @@ mod tests {
         assert_eq!(severities[3].code(), "S3");
 
         assert_eq!(CanonicalStatus::Supported.as_str(), "Supported");
-        assert!(CanonicalStatus::Proposed
-            .allowed_evidence()
-            .contains("Design document"));
+        assert!(CanonicalStatus::Proposed.allowed_evidence().contains("Design document"));
     }
 
     #[test]

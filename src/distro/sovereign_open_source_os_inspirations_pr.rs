@@ -87,11 +87,7 @@ impl NixGuixDeclarativeCasStorePrEngine {
     }
 
     pub fn rollback_generation(&mut self, target_gen_id: u32) -> bool {
-        if self
-            .generations
-            .iter()
-            .any(|g| g.generation_id == target_gen_id)
-        {
+        if self.generations.iter().any(|g| g.generation_id == target_gen_id) {
             for g in &mut self.generations {
                 g.active = g.generation_id == target_gen_id;
             }
@@ -159,8 +155,7 @@ impl FreeBsdOpenBsdHardeningPrEngine {
 
     fn seed_defaults(&mut self) {
         self.active_promises = vec![OpenBsdPledgePromise::Stdio, OpenBsdPledgePromise::Rpath];
-        self.unveiled_paths
-            .push(("/usr/share".to_string(), "r".to_string()));
+        self.unveiled_paths.push(("/usr/share".to_string(), "r".to_string()));
         self.jails.push(BsdJailSpec {
             jail_id: 1,
             name: "web_isolation_jail".to_string(),
@@ -173,8 +168,7 @@ impl FreeBsdOpenBsdHardeningPrEngine {
     }
 
     pub fn unveil_path(&mut self, path: &str, perms: &str) {
-        self.unveiled_paths
-            .push((path.to_string(), perms.to_string()));
+        self.unveiled_paths.push((path.to_string(), perms.to_string()));
     }
 
     pub fn check_access(&self, promise: OpenBsdPledgePromise, path: &str) -> bool {
@@ -247,8 +241,7 @@ impl Plan9HaikuSystemServicesPrEngine {
     }
 
     pub fn add_bfs_attribute(&mut self, filepath: &str, name: &str, value: &str) {
-        self.bfs_attributes
-            .push((filepath.to_string(), name.to_string(), value.to_string()));
+        self.bfs_attributes.push((filepath.to_string(), name.to_string(), value.to_string()));
     }
 
     pub fn query_bfs_attribute(&self, name: &str, value: &str) -> Vec<String> {
@@ -298,15 +291,13 @@ impl AndroidCosmoIllumosPrEngine {
     }
 
     fn seed_defaults(&mut self) {
-        self.binder_handles
-            .push((1, "android.os.IServiceManager".to_string()));
+        self.binder_handles.push((1, "android.os.IServiceManager".to_string()));
         self.ashmem_regions.push((100, 4096, true));
         self.dtrace_probes.push("syscall::read:entry".to_string());
     }
 
     pub fn register_binder(&mut self, handle_id: u32, descriptor: &str) {
-        self.binder_handles
-            .push((handle_id, descriptor.to_string()));
+        self.binder_handles.push((handle_id, descriptor.to_string()));
     }
 
     pub fn allocate_ashmem(&mut self, region_id: u32, size: usize) {
@@ -390,9 +381,7 @@ mod tests {
         engine.register_store_package("hash123", "test-pkg-1.0", 512);
         engine.create_generation(2, "/nix/store/gen2", "6.12.1");
         assert!(engine.rollback_generation(1));
-        assert!(engine
-            .generate_pr_proposal()
-            .contains("Active Store Packages"));
+        assert!(engine.generate_pr_proposal().contains("Active Store Packages"));
     }
 
     #[test]

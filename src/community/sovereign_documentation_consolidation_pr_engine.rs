@@ -8,15 +8,15 @@ use std::collections::BTreeMap;
 /// Section category for traditional Unix/BSD/Linux man pages
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ManSection {
-    UserCommands = 1,     // Executable programs / shell commands
-    SystemCalls = 2,      // Kernel system calls
-    LibraryFunctions = 3, // C/POSIX library functions
-    SpecialFiles = 4,     // Special files / devices (/dev/*)
-    FileFormats = 5,      // File formats and conventions (/etc/*)
-    Games = 6,            // Games and screensavers
-    Miscellaneous = 7,    // Overview, macro packages, conventions
-    SystemAdmin = 8,      // System administration commands and daemons
-    KernelRoutines = 9,   // Non-standard kernel routines / BSD sysctl
+    UserCommands = 1,       // Executable programs / shell commands
+    SystemCalls = 2,        // Kernel system calls
+    LibraryFunctions = 3,   // C/POSIX library functions
+    SpecialFiles = 4,       // Special files / devices (/dev/*)
+    FileFormats = 5,        // File formats and conventions (/etc/*)
+    Games = 6,              // Games and screensavers
+    Miscellaneous = 7,      // Overview, macro packages, conventions
+    SystemAdmin = 8,        // System administration commands and daemons
+    KernelRoutines = 9,     // Non-standard kernel routines / BSD sysctl
 }
 
 impl ManSection {
@@ -52,10 +52,7 @@ impl SovereignManPage {
         let mut md = String::new();
         md.push_str(&format!("# {}({})\n\n", self.title, self.section as u8));
         md.push_str(&format!("**Section:** {}\n", self.section.description()));
-        md.push_str(&format!(
-            "**Origin/Inspiration:** {}\n\n",
-            self.bsd_linux_source
-        ));
+        md.push_str(&format!("**Origin/Inspiration:** {}\n\n", self.bsd_linux_source));
         md.push_str("## SYNOPSIS\n```text\n");
         md.push_str(&self.synopsis);
         md.push_str("\n```\n\n");
@@ -129,8 +126,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "cap_rights_limit".to_string(),
             section: ManSection::LibraryFunctions,
             synopsis: "int cap_rights_limit(int fd, const cap_rights_t *rights);".to_string(),
-            description: "FreeBSD Capsicum capability rights limitation for file descriptors."
-                .to_string(),
+            description: "FreeBSD Capsicum capability rights limitation for file descriptors.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["pledge(2)".to_string(), "rights(4)".to_string()],
             bsd_linux_source: "FreeBSD Capsicum cap_rights_limit(3)".to_string(),
@@ -141,8 +137,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "bpf".to_string(),
             section: ManSection::SpecialFiles,
             synopsis: "/dev/bpf".to_string(),
-            description: "Berkeley Packet Filter device node for raw link-layer packet capturing."
-                .to_string(),
+            description: "Berkeley Packet Filter device node for raw link-layer packet capturing.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["pcap(3)".to_string(), "netintro(4)".to_string()],
             bsd_linux_source: "FreeBSD & OpenBSD bpf(4)".to_string(),
@@ -153,8 +148,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "fstab".to_string(),
             section: ManSection::FileFormats,
             synopsis: "/etc/fstab".to_string(),
-            description: "Static filesystem information table specifying mount points and options."
-                .to_string(),
+            description: "Static filesystem information table specifying mount points and options.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["mount(8)".to_string(), "swapon(8)".to_string()],
             bsd_linux_source: "POSIX & NetBSD fstab(5)".to_string(),
@@ -165,8 +159,7 @@ impl SovereignManPagesConsolidationEngine {
             title: "cgroups".to_string(),
             section: ManSection::Miscellaneous,
             synopsis: "cgroup v2 hierarchy".to_string(),
-            description: "Linux control groups v2 resource management and container isolation."
-                .to_string(),
+            description: "Linux control groups v2 resource management and container isolation.".to_string(),
             options: BTreeMap::new(),
             see_also: vec!["systemd(1)".to_string(), "landlock(7)".to_string()],
             bsd_linux_source: "Linux kernel cgroups(7)".to_string(),
@@ -273,18 +266,9 @@ impl SovereignInfoPagesConsolidationEngine {
             prev_node: "None".to_string(),
             content: "Welcome to the GNU Info Texinfo manual tree for SigmaOS.".to_string(),
             menu_items: vec![
-                (
-                    "Kernel Architecture".to_string(),
-                    "SMP, eBPF, Buddy Allocator".to_string(),
-                ),
-                (
-                    "Packaging System".to_string(),
-                    "Universal package format and SAT solver".to_string(),
-                ),
-                (
-                    "Sandboxing Security".to_string(),
-                    "Pledge, Unveil, Capsicum, Landlock".to_string(),
-                ),
+                ("Kernel Architecture".to_string(), "SMP, eBPF, Buddy Allocator".to_string()),
+                ("Packaging System".to_string(), "Universal package format and SAT solver".to_string()),
+                ("Sandboxing Security".to_string(), "Pledge, Unveil, Capsicum, Landlock".to_string()),
             ],
         });
 
@@ -318,10 +302,7 @@ pub struct SovereignPackageDocRecord {
 impl SovereignPackageDocRecord {
     pub fn to_markdown(&self) -> String {
         let mut md = String::new();
-        md.push_str(&format!(
-            "# Package Documentation: {} (v{})\n\n",
-            self.package_name, self.version
-        ));
+        md.push_str(&format!("# Package Documentation: {} (v{})\n\n", self.package_name, self.version));
         md.push_str(&format!("**Installed Path:** `{}`\n\n", self.doc_path));
         md.push_str("## README\n");
         md.push_str(&self.readme);
@@ -368,11 +349,9 @@ impl SovereignUsrShareDocConsolidationEngine {
                 package_name: "sigma-pkg".to_string(),
                 version: "1.0.0".to_string(),
                 doc_path: "/usr/share/doc/sigma-pkg".to_string(),
-                changelog: "* 1.0.0: Multi-format package ingestion and DPLL SAT solver."
-                    .to_string(),
+                changelog: "* 1.0.0: Multi-format package ingestion and DPLL SAT solver.".to_string(),
                 copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
-                readme: "Universal package manager documentation and schema definition."
-                    .to_string(),
+                readme: "Universal package manager documentation and schema definition.".to_string(),
             },
         );
     }
@@ -392,10 +371,7 @@ impl SovereignHandbookArticle {
     pub fn to_markdown(&self) -> String {
         let mut md = String::new();
         md.push_str(&format!("# {}\n\n", self.title));
-        md.push_str(&format!(
-            "**Category:** {} | **Inspiration:** {}\n\n",
-            self.category, self.distro_inspiration
-        ));
+        md.push_str(&format!("**Category:** {} | **Inspiration:** {}\n\n", self.category, self.distro_inspiration));
         md.push_str(&self.content);
         md.push_str("\n\n");
 
@@ -433,9 +409,7 @@ impl SovereignWikiHandbookConsolidationEngine {
                 title: "SigmaOS Installation & Deployment Guide".to_string(),
                 category: "System Administration".to_string(),
                 distro_inspiration: "Arch Linux Wiki & FreeBSD Handbook".to_string(),
-                content:
-                    "Step-by-step installation guide for bare-metal, QEMU/KVM, and cloud instances."
-                        .to_string(),
+                content: "Step-by-step installation guide for bare-metal, QEMU/KVM, and cloud instances.".to_string(),
                 troubleshooting_steps: vec![
                     "Check UEFI Secure Boot status if bootloader fails to handoff.".to_string(),
                     "Verify ZFS/Btrfs subvolume mounting flags in /etc/fstab.".to_string(),
@@ -493,22 +467,10 @@ impl SovereignDocumentationConsolidationPrGateway {
         md.push_str("| **Arch Wiki & FreeBSD Handbook** | Arch Linux & FreeBSD | `wiki/Consolidated-OS-Documentation-System.md` | Comprehensive system administration & guides |\n\n");
 
         md.push_str("## Summary Statistics\n");
-        md.push_str(&format!(
-            "* **Man Pages Registered:** {}\n",
-            self.man_engine.pages.len()
-        ));
-        md.push_str(&format!(
-            "* **Info Nodes Registered:** {}\n",
-            self.info_engine.nodes.len()
-        ));
-        md.push_str(&format!(
-            "* **Package Docs Tracked:** {}\n",
-            self.doc_engine.docs.len()
-        ));
-        md.push_str(&format!(
-            "* **Handbook Articles:** {}\n\n",
-            self.wiki_engine.articles.len()
-        ));
+        md.push_str(&format!("* **Man Pages Registered:** {}\n", self.man_engine.pages.len()));
+        md.push_str(&format!("* **Info Nodes Registered:** {}\n", self.info_engine.nodes.len()));
+        md.push_str(&format!("* **Package Docs Tracked:** {}\n", self.doc_engine.docs.len()));
+        md.push_str(&format!("* **Handbook Articles:** {}\n\n", self.wiki_engine.articles.len()));
 
         md.push_str("## Verification & Quality Assurance\n");
         md.push_str("1. Execute `./run_sigma_tests.sh` to run tests for documentation engines.\n");

@@ -15,10 +15,7 @@ fn test_distro_maintainer_operating_model_agent_roles() {
     let steward = &roles[0];
     assert_eq!(steward.name(), "Repository Steward");
     assert!(steward.purpose().contains("hygiene"));
-    assert_eq!(
-        steward.primary_deliverable(),
-        "reports/steward/daily-status.md"
-    );
+    assert_eq!(steward.primary_deliverable(), "reports/steward/daily-status.md");
 
     let sentinel = &roles[1];
     assert_eq!(sentinel.name(), "Build and Test Sentinel");
@@ -26,17 +23,11 @@ fn test_distro_maintainer_operating_model_agent_roles() {
 
     let validator = &roles[2];
     assert_eq!(validator.name(), "Boot and Runtime Validator");
-    assert_eq!(
-        validator.primary_deliverable(),
-        "reports/boot/qemu_x86_64.json"
-    );
+    assert_eq!(validator.primary_deliverable(), "reports/boot/qemu_x86_64.json");
 
     let auditor = &roles[3];
     assert_eq!(auditor.name(), "Capability Auditor");
-    assert_eq!(
-        auditor.primary_deliverable(),
-        "reports/capability/truth_table.json"
-    );
+    assert_eq!(auditor.primary_deliverable(), "reports/capability/truth_table.json");
 }
 
 #[test]

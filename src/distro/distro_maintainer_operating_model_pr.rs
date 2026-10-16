@@ -43,25 +43,13 @@ impl AgentRole {
 
     pub fn purpose(&self) -> &'static str {
         match self {
-            Self::RepositorySteward => {
-                "Maintain repository hygiene, coherence, and review readiness."
-            }
+            Self::RepositorySteward => "Maintain repository hygiene, coherence, and review readiness.",
             Self::BuildAndTestSentinel => "Make existing build and test workflows trustworthy.",
-            Self::BootAndRuntimeValidator => {
-                "Prove the firmware-to-desktop path in QEMU and target environments."
-            }
-            Self::CapabilityAuditor => {
-                "Prevent aspirational completion and enforce evidence-gated claims."
-            }
-            Self::KernelAndSubsystemAgents => {
-                "Maintain ownership boundaries and evidence for core kernel/subsystems."
-            }
-            Self::PackageAndDistroCompatibilityAgent => {
-                "Maintain package metadata compatibility and sandboxed execution."
-            }
-            Self::DocumentationAndOnboardingAgent => {
-                "Ensure contributor and agent onboarding usability."
-            }
+            Self::BootAndRuntimeValidator => "Prove the firmware-to-desktop path in QEMU and target environments.",
+            Self::CapabilityAuditor => "Prevent aspirational completion and enforce evidence-gated claims.",
+            Self::KernelAndSubsystemAgents => "Maintain ownership boundaries and evidence for core kernel/subsystems.",
+            Self::PackageAndDistroCompatibilityAgent => "Maintain package metadata compatibility and sandboxed execution.",
+            Self::DocumentationAndOnboardingAgent => "Ensure contributor and agent onboarding usability.",
         }
     }
 
@@ -192,12 +180,8 @@ impl ReleaseChannel {
         match self {
             Self::Dev => "Build and unit tests pass.",
             Self::Nightly => "Build, unit tests, and QEMU smoke test pass.",
-            Self::Validated => {
-                "Full boot matrix, installer test, known-issue list, and rollback instructions."
-            }
-            Self::Experimental => {
-                "Clearly labeled experimental subsystem, not suitable for daily use."
-            }
+            Self::Validated => "Full boot matrix, installer test, known-issue list, and rollback instructions.",
+            Self::Experimental => "Clearly labeled experimental subsystem, not suitable for daily use.",
         }
     }
 }
@@ -297,76 +281,16 @@ impl DistroMaintainerPrEngine {
 
     pub fn get_first_ten_tasks(&self) -> Vec<TaskFileSpec> {
         alloc::vec![
-            TaskFileSpec {
-                id: "REG-001",
-                title: "Create .agents/registry.toml defining agents and scopes",
-                agent: "repository-steward",
-                priority: "P0",
-                repeat: "once"
-            },
-            TaskFileSpec {
-                id: "POL-001",
-                title: "Create .agents/policies/test-evidence.md policy",
-                agent: "capability-auditor",
-                priority: "P0",
-                repeat: "once"
-            },
-            TaskFileSpec {
-                id: "CLI-001",
-                title: "Build tools/agent_cli.py task runner",
-                agent: "build-test-sentinel",
-                priority: "P0",
-                repeat: "once"
-            },
-            TaskFileSpec {
-                id: "CI-001",
-                title: "Add CI workflow for documented check/test commands",
-                agent: "build-test-sentinel",
-                priority: "P0",
-                repeat: "once"
-            },
-            TaskFileSpec {
-                id: "BOOT-X86-001",
-                title: "Implement QEMU x86_64 boot-to-shell validator",
-                agent: "boot-runtime-validator",
-                priority: "P0",
-                repeat: "daily"
-            },
-            TaskFileSpec {
-                id: "AUDIT-001",
-                title: "Audit every working claim in capability files",
-                agent: "capability-auditor",
-                priority: "P0",
-                repeat: "weekly"
-            },
-            TaskFileSpec {
-                id: "DASH-001",
-                title: "Generate Verified Today dashboard from test/boot evidence",
-                agent: "documentation-onboarding-agent",
-                priority: "P1",
-                repeat: "daily"
-            },
-            TaskFileSpec {
-                id: "TASK-001",
-                title: "Convert five largest roadmap docs into task files",
-                agent: "repository-steward",
-                priority: "P1",
-                repeat: "once"
-            },
-            TaskFileSpec {
-                id: "PKG-001",
-                title: "Add package metadata compatibility test corpus and dry-run policy",
-                agent: "package-distro-compatibility-agent",
-                priority: "P1",
-                repeat: "weekly"
-            },
-            TaskFileSpec {
-                id: "NIGHTLY-001",
-                title: "Define first nightly artifact requirements",
-                agent: "boot-runtime-validator",
-                priority: "P0",
-                repeat: "daily"
-            },
+            TaskFileSpec { id: "REG-001", title: "Create .agents/registry.toml defining agents and scopes", agent: "repository-steward", priority: "P0", repeat: "once" },
+            TaskFileSpec { id: "POL-001", title: "Create .agents/policies/test-evidence.md policy", agent: "capability-auditor", priority: "P0", repeat: "once" },
+            TaskFileSpec { id: "CLI-001", title: "Build tools/agent_cli.py task runner", agent: "build-test-sentinel", priority: "P0", repeat: "once" },
+            TaskFileSpec { id: "CI-001", title: "Add CI workflow for documented check/test commands", agent: "build-test-sentinel", priority: "P0", repeat: "once" },
+            TaskFileSpec { id: "BOOT-X86-001", title: "Implement QEMU x86_64 boot-to-shell validator", agent: "boot-runtime-validator", priority: "P0", repeat: "daily" },
+            TaskFileSpec { id: "AUDIT-001", title: "Audit every working claim in capability files", agent: "capability-auditor", priority: "P0", repeat: "weekly" },
+            TaskFileSpec { id: "DASH-001", title: "Generate Verified Today dashboard from test/boot evidence", agent: "documentation-onboarding-agent", priority: "P1", repeat: "daily" },
+            TaskFileSpec { id: "TASK-001", title: "Convert five largest roadmap docs into task files", agent: "repository-steward", priority: "P1", repeat: "once" },
+            TaskFileSpec { id: "PKG-001", title: "Add package metadata compatibility test corpus and dry-run policy", agent: "package-distro-compatibility-agent", priority: "P1", repeat: "weekly" },
+            TaskFileSpec { id: "NIGHTLY-001", title: "Define first nightly artifact requirements", agent: "boot-runtime-validator", priority: "P0", repeat: "daily" },
         ]
     }
 
@@ -377,8 +301,7 @@ impl DistroMaintainerPrEngine {
         let channels = self.get_release_channels();
         let initial_tasks = self.get_first_ten_tasks();
 
-        let mut payload =
-            String::from("PR: feat(distro): Adopt Distro-Maintainer Operating Model\n");
+        let mut payload = String::from("PR: feat(distro): Adopt Distro-Maintainer Operating Model\n");
         for r in &roles {
             payload.push_str(r.name());
             payload.push('\n');
