@@ -1308,14 +1308,14 @@ impl VixieCronEntry {
 
 /// Vixie Cron Environment Context
 #[derive(Debug, Clone)]
-pub struct VixieCronEnvContext {
+pub struct VixieCronSystemEnvContext {
     pub mailto: Option<String>,
     pub path: String,
     pub shell: String,
     pub home: String,
 }
 
-impl Default for VixieCronEnvContext {
+impl Default for VixieCronSystemEnvContext {
     fn default() -> Self {
         Self {
             mailto: Some("root".to_string()),
@@ -1595,12 +1595,12 @@ pub struct UserlandInitPrSubmission {
 }
 
 /// Userland Init Pull Request Gateway Engine
-pub struct UserlandInitPrGatewayEngine {
+pub struct UserlandInitSubmissionsPrGatewayEngine {
     pub submissions: BTreeMap<u64, UserlandInitPrSubmission>,
     pub next_pr_id: u64,
 }
 
-impl UserlandInitPrGatewayEngine {
+impl UserlandInitSubmissionsPrGatewayEngine {
     pub fn new() -> Self {
         Self {
             submissions: BTreeMap::new(),
@@ -1868,7 +1868,7 @@ mod tests {
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let mut gateway = UserlandInitPrGatewayEngine::new();
+        let mut gateway = UserlandInitSubmissionsPrGatewayEngine::new();
         let pr_id = gateway.submit_pr(
             "Add systemd socket activation support".to_string(),
             "Jules".to_string(),

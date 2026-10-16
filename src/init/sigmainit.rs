@@ -384,17 +384,22 @@ impl SigmaInit {
 
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), String> {
-        let service = self.services.get_mut(name)
-            .ok_or_else(|| format!("Service '{}' not found", name))?;
-
-        // Check dependencies
-        for dep in &service.dependencies {
-            if let Some(dep_service) = self.services.get(dep) {
-                if dep_service.state != ServiceState::Running {
-                    return Err(format!("Dependency '{}' is not running", dep));
+        // Check dependencies first with immutable borrow
+        {
+            let service = self.services.get(name)
+                .ok_or_else(|| format!("Service '{}' not found", name))?;
+            for dep in &service.dependencies {
+                if let Some(dep_service) = self.services.get(dep) {
+                    if dep_service.state != ServiceState::Running {
+                        return Err(format!("Dependency '{}' is not running", dep));
+                    }
                 }
             }
         }
+
+        let total_services = self.services.len();
+        let service = self.services.get_mut(name)
+            .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         // Update state
         service.state = ServiceState::Starting;
@@ -402,7 +407,7 @@ impl SigmaInit {
         // In a real implementation, this would actually start the process
         // For now, simulate success
         service.state = ServiceState::Running;
-        service.pid = Some(1000 + self.services.len() as u32); // Placeholder PID
+        service.pid = Some(1000 + total_services as u32); // Placeholder PID
         service.exit_code = None;
 
         Ok(())
@@ -474,20 +479,22 @@ impl SigmaInit {
 
     /// Switch to a target
     pub fn switch_target(&mut self, target_name: &str) -> Result<(), String> {
-        let target = self.targets.get(target_name)
-            .ok_or_else(|| format!("Target '{}' not found", target_name))?;
+        let target_services: Vec<String> = self.targets.get(target_name)
+            .ok_or_else(|| format!("Target '{}' not found", target_name))?
+            .services.clone();
 
         // Stop current target services
         if let Some(current) = &self.current_target {
             if let Some(current_target) = self.targets.get(current) {
-                for service_name in &current_target.services {
+                let stop_list = current_target.services.clone();
+                for service_name in &stop_list {
                     let _ = self.stop_service(service_name);
                 }
             }
         }
 
         // Start new target services
-        for service_name in &target.services {
+        for service_name in &target_services {
             let _ = self.start_service(service_name);
         }
 

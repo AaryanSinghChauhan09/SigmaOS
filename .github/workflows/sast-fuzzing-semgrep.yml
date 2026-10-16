@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Semgrep
-        uses: returntocorp/semgrep-action@fcd5ab632e1fe2b451ae9491ea83f0f7015a9a4b # v1
+        uses: returntocorp/semgrep-action@v1
         with:
           config: >-
             p/rust
