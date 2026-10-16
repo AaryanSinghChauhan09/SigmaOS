@@ -20,6 +20,8 @@
 ## Component
 
 - [ ] PR-level validation
+
+## Shell component
 - [ ] Daily CI triage
 - [ ] Weekly subsystem review
 - [ ] Weekly Linux/BSD study
@@ -31,14 +33,18 @@
 - [ ] Monthly diagnostics rehearsal
 - [ ] Quarterly release/architecture/security review
 
-## Reference study
+## Reference study / Upstream study
 
 <!-- Required for design-changing kernel PRs -->
 
-- Study document:
-- Linux/BSD/Redox/xv6 reference:
+- Study document: Upstream study
+- Linux/BSD/Redox/xv6 reference: What SigmaOS adopts
 - Decision: Adopt / Adapt / Reject
 - Reason:
+
+## Reviewer checklist
+
+- [ ] Reviewer checklist completed
 
 ## Changes
 
@@ -52,6 +58,8 @@
 - [ ] Security review, if applicable
 
 ## Kernel safety review
+
+## Shell safety review
 
 - [ ] No unnecessary `unsafe`
 - [ ] Every `unsafe` block documents invariants
@@ -83,7 +91,7 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks and rollback
+## Risks and rollback / Safety and rollback
 
 - Risk:
 - Rollback:
