@@ -16,6 +16,7 @@ pub mod lightcraft;
 pub mod mediacraft;
 pub mod audiocraft;
 pub mod soundcraft;
+pub mod soundcraft_missing_components_parity_pr;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod cadcraft;
@@ -127,6 +128,12 @@ pub use soundcraft::{
     SoundCraftPullRequestSpec, SoundCraftAudioEnginePrDeployer,
     SoundCraftDspSynthesizerPrDeployer, SoundCraftSpatialMixingMasteringPrDeployer,
     SoundCraftMasterPrDeploymentSuite, fnv1a_soundcraft_pr_digest,
+};
+pub use soundcraft_missing_components_parity_pr::{
+    SoundcraftPrProposalManifest, SoundcraftAdvancedMultiTrackEnginePrEngine,
+    SoundcraftSpectralSynthesisSamplerPrEngine, SoundcraftSpatial3dAmbisonicMasterPrEngine,
+    SoundcraftMidiVst3ClapPluginPrEngine, SoundcraftMasteringLoudnessMeterPrEngine,
+    SoundcraftRealtimeCollabCrdtPrEngine, SovereignSoundcraftArtcraftParityPrGateway,
 };
 pub use vectoranimation::{
     AnimationProject as VectorAnimationProject, AnimationLayer, AnimationLayerType,
