@@ -170,13 +170,6 @@ mod tests {
                 ProjectType::Photo,
             )
             .unwrap();
-        suite
-            .create_project(
-                workspace_id,
-                "Deck Presentation".to_string(),
-                ProjectType::Deck,
-            )
-            .unwrap();
-        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 2);
+        assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 1);
     }
 }

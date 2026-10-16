@@ -22,25 +22,21 @@ pub mod scheduler_manager;
 pub mod service_manager;
 pub mod settings_manager;
 pub mod sigmaacpi;
-pub mod sigmaalert;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmaconfig;
-pub mod sigmaconfigeditor;
 pub mod sigmacron;
 pub mod sigmacrypto;
 pub mod sigmadb;
 pub mod sigmadefrag;
 pub mod sigmadevice;
 pub mod sigmadhcp;
-pub mod sigmadistfs;
 pub mod sigmadns;
 pub mod sigmaevent;
 pub mod sigmafs;
 pub mod sigmafsck;
 pub mod sigmafsmon;
 pub mod sigmaftp;
-pub mod sigmahealth;
 pub mod sigmahttp;
 pub mod sigmahwmon;
 pub mod sigmaintegrity;
@@ -76,7 +72,6 @@ pub mod sigmathernal;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod sigmatrim;
-pub mod sigmatuning;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -183,10 +178,6 @@ pub use sigmaacpi::{
     add_acpi_event, get_sigmaacpi, init_sigmaacpi, register_acpi_action, AcpiAction,
     AcpiActionType, AcpiEvent, AcpiEventType, SigmaACPI,
 };
-pub use sigmaalert::{
-    active_alert_count, get_sigmaalert, get_sigmaalert_mut, init_sigmaalert, resolve_alert,
-    send_alert, Alert, AlertCategory, AlertChannel, AlertSeverity, AlertStatus, SigmaAlert,
-};
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
     CompressionLevel, SigmaBackup,
@@ -196,11 +187,6 @@ pub use sigmacache::{
 };
 pub use sigmaconfig::{
     get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry, ConfigValue, SigmaConfig,
-};
-pub use sigmaconfigeditor::{
-    get_config_property, get_sigmaconfigeditor, get_sigmaconfigeditor_mut, init_sigmaconfigeditor,
-    register_config_file, rollback_config_file, set_config_property, ConfigFormat, ConfigRevision,
-    FileState, ManagedFile, SigmaConfigEditor, ValidationResult,
 };
 pub use sigmacron::{
     add_cron_job, disable_cron_job, enable_cron_job, get_sigmacron, init_sigmacron, CronField,
@@ -224,12 +210,6 @@ pub use sigmadevice::{
 pub use sigmadhcp::{
     get_sigmadhcp, init_sigmadhcp, request_dhcp_lease, DhcpLease, DhcpState, SigmaDHCP,
 };
-pub use sigmadistfs::{
-    add_distfs_node, create_distfs_volume, distfs_cluster_health, get_sigmadistfs,
-    get_sigmadistfs_mut, init_sigmadistfs, start_distfs_volume, ClusterHealth, ClusterStats,
-    DistFSType, DistNode, DistVolume, NodeState, ReplicationStrategy, SigmaDistFS, VolumeState,
-    VolumeType,
-};
 pub use sigmadns::{
     activate_dns_server, get_sigmadns, init_sigmadns, DnsCacheEntry, DnsRecordType, DnsServer,
     ResolverState, SigmaDNS,
@@ -252,11 +232,6 @@ pub use sigmafsmon::{
 pub use sigmaftp::{
     authenticate_ftp_connection, get_sigmaftp, init_sigmaftp, FtpConnection, FtpConnectionState,
     FtpTransferMode, SigmaFTP,
-};
-pub use sigmahealth::{
-    generate_health_report, get_sigmahealth, get_sigmahealth_mut, init_sigmahealth,
-    system_health_score, system_health_state, HealthProbe, HealthState, SigmaHealth,
-    Subsystem as HealthSubsystem, SystemHealthReport,
 };
 pub use sigmahttp::{
     get_sigmahttp, init_sigmahttp, process_http_request, HttpConnection, HttpConnectionState,
@@ -361,8 +336,8 @@ pub use sigmasmb::{
     SMBMount, SMBShare, SMBShareAccess, SigmaSMB,
 };
 pub use sigmasnapshot::{
-    create_snapshot, get_sigmasnapshot, init_sigmasnapshot, restore_snapshot, SigmaSnapshot,
-    Snapshot, SnapshotState, SnapshotType,
+    add_snapshot, get_sigmasnapshot, init_sigmasnapshot, restore_snapshot, SigmaSnapshot, Snapshot,
+    SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmassh::{
     authenticate_ssh_connection, get_sigmassh, init_sigmassh, SigmaSSH, SshAuthMethod,
@@ -391,10 +366,6 @@ pub use sigmatimer::{
 pub use sigmatrim::{
     get_sigmatrim, init_sigmatrim, is_trim_supported, trim_mount, DiscardRange, DiscardType,
     SigmaTRIM, TrimDevice, TrimMode, TrimResult, TrimStatus,
-};
-pub use sigmatuning::{
-    apply_tuning_profile, get_sigmatuning, get_sigmatuning_mut, init_sigmatuning, sysctl_get,
-    sysctl_set, SigmaTuning, TunableParam, TuningCategory, TuningProfile,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
@@ -466,9 +437,8 @@ pub use sovereign_init_and_supervisor_inspirations_pr::*;
 pub use mint_tools::{
     get_system_tools, init_system_tools, BackupConfig, BackupJob, BackupStatus, BackupType,
     DiagnosticEntry, DiagnosticTest, Driver, DriverManager, DriverStatus, DriverType, HardwareInfo,
-    MintUpdateManager, PackageUpdate, RestoreConfig, RestoreJob, RestoreStatus, RollbackRecord,
-    SoftwareCategory, SoftwareInfo, SoftwareManager, SoftwarePackage, SystemReport,
-    SystemToolsEngine, TestResult, UpdateSeverity, UpdateType,
+    MintUpdateManager, PackageUpdate, SoftwareCategory, SoftwareInfo, SoftwareManager,
+    SoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity, UpdateType,
 };
 pub use network_manager::{
     get_network_manager, init_network_manager, Connection, ConnectionState, ConnectionType,

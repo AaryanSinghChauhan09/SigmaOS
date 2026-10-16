@@ -183,16 +183,62 @@ pub enum ExportFormat {
     Markdown,
 }
 
-/// Live presenter state during projection
-#[derive(Debug, Clone)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
+/// Slide Exporter Engine
+pub struct SlideExporterEngine;
+
+impl SlideExporterEngine {
+    pub fn export_deck(deck: &PresentationDeck, format: DeckExportFormat) -> Vec<u8> {
+        let mut output = Vec::new();
+
+        match format {
+            DeckExportFormat::Pdf => {
+                output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"\nSlides Count: ");
+                output.extend_from_slice(deck.slides.len().to_string().as_bytes());
+            }
+            DeckExportFormat::Pptx => {
+                output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
+            }
+            DeckExportFormat::Html5 => {
+                output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(
+                    b"</title></head><body>\n<div class=\"reveal\">\n<div class=\"slides\">\n",
+                );
+                for slide in &deck.slides {
+                    output.extend_from_slice(b"<section><h2>");
+                    output.extend_from_slice(slide.title.as_bytes());
+                    output.extend_from_slice(b"</h2></section>\n");
+                }
+                output.extend_from_slice(b"</div></div></body></html>");
+            }
+            DeckExportFormat::Svg => {
+                output.extend_from_slice(
+                    b"<svg width=\"1920\" height=\"1080\" xmlns=\"http://www.w3.org/2000/svg\">\n",
+                );
+                if let Some(active_slide) = deck.get_active_slide() {
+                    output.extend_from_slice(b"  <text x=\"100\" y=\"100\" font-size=\"48\">");
+                    output.extend_from_slice(active_slide.title.as_bytes());
+                    output.extend_from_slice(b"</text>\n");
+                }
+                output.extend_from_slice(b"</svg>");
+            }
+            DeckExportFormat::Markdown => {
+                output.extend_from_slice(b"# ");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"\n\n");
+                for slide in &deck.slides {
+                    output.extend_from_slice(b"---\n\n## ");
+                    output.extend_from_slice(slide.title.as_bytes());
+                    output.extend_from_slice(b"\n\n");
+                }
+            }
+        }
+
+        output
+    }
 }
 
 /// Core Deckcraft Engine

@@ -29,7 +29,8 @@ impl PdfcraftVectorArtImportPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Integrate Artcraft Vector Layer & Spline Import Engine".to_string(),
+            pr_title: "feat(pdfcraft): Integrate Artcraft Vector Layer & Spline Import Engine"
+                .to_string(),
             target_subsystem: "Pdfcraft Vector Graphics Engine".to_string(),
             original_suite: "Artcraft Vectorcraft".to_string(),
             components_added: alloc::vec![
@@ -54,7 +55,8 @@ impl PdfcraftMultiWorkspaceProjectPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Artcraft Multi-Workspace Document Manager".to_string(),
+            pr_title: "feat(pdfcraft): Implement Artcraft Multi-Workspace Document Manager"
+                .to_string(),
             target_subsystem: "Pdfcraft Document Management System".to_string(),
             original_suite: "Artcraft Workspace Engine".to_string(),
             components_added: alloc::vec![
@@ -79,7 +81,9 @@ impl PdfcraftBatchExportRenderPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Multi-Format Batch Export & ICC Color Profile Engine".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement Multi-Format Batch Export & ICC Color Profile Engine"
+                    .to_string(),
             target_subsystem: "Pdfcraft Export & Color Pipeline".to_string(),
             original_suite: "Artcraft Designcraft & Lightcraft".to_string(),
             components_added: alloc::vec![
@@ -104,7 +108,8 @@ impl PdfcraftDigitalSignatureWatermarkPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Cryptographic Signatures & Dynamic Watermarks".to_string(),
+            pr_title: "feat(pdfcraft): Implement Cryptographic Signatures & Dynamic Watermarks"
+                .to_string(),
             target_subsystem: "Pdfcraft Security & Provenance Suite".to_string(),
             original_suite: "Artcraft Security & Watermarking Framework".to_string(),
             components_added: alloc::vec![
@@ -129,7 +134,8 @@ impl PdfcraftOcrTextRecognitionPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement AI OCR Text Extraction & Invisible Search Layer".to_string(),
+            pr_title: "feat(pdfcraft): Implement AI OCR Text Extraction & Invisible Search Layer"
+                .to_string(),
             target_subsystem: "Pdfcraft OCR & Search Pipeline".to_string(),
             original_suite: "Artcraft Text & Layout Processing".to_string(),
             components_added: alloc::vec![
@@ -154,7 +160,8 @@ impl PdfcraftInteractiveFormsXfaPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Interactive Form Filling & Dynamic XFA Engine".to_string(),
+            pr_title: "feat(pdfcraft): Implement Interactive Form Filling & Dynamic XFA Engine"
+                .to_string(),
             target_subsystem: "Pdfcraft Interactive Forms Engine".to_string(),
             original_suite: "Artcraft Interactive Forms Suite".to_string(),
             components_added: alloc::vec![
@@ -179,7 +186,9 @@ impl PdfcraftColorPreflightCmykPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Professional Print Preflight & CMYK Color Separation".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement Professional Print Preflight & CMYK Color Separation"
+                    .to_string(),
             target_subsystem: "Pdfcraft Color & Preflight Suite".to_string(),
             original_suite: "Artcraft Print & Prepress Engine".to_string(),
             components_added: alloc::vec![
@@ -204,7 +213,9 @@ impl PdfcraftRedactionSanitizationPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Permanent Document Redaction & Metadata Sanitization".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement Permanent Document Redaction & Metadata Sanitization"
+                    .to_string(),
             target_subsystem: "Pdfcraft Security & Redaction Pipeline".to_string(),
             original_suite: "Artcraft Security & Compliance Engine".to_string(),
             components_added: alloc::vec![
@@ -229,7 +240,8 @@ impl PdfcraftPageImpositionBookletPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement Page Imposition Layout & N-Up Booklet Assembly".to_string(),
+            pr_title: "feat(pdfcraft): Implement Page Imposition Layout & N-Up Booklet Assembly"
+                .to_string(),
             target_subsystem: "Pdfcraft Page Geometry & Imposition Engine".to_string(),
             original_suite: "Artcraft Layout & Print Assembly Engine".to_string(),
             components_added: alloc::vec![
@@ -254,11 +266,14 @@ impl PdfcraftArchivalValidationPrEngine {
 
     pub fn generate_proposal(&self) -> PdfcraftArtcraftPrProposalManifest {
         PdfcraftArtcraftPrProposalManifest {
-            pr_title: "feat(pdfcraft): Implement PDF/A & PDF/X Compliance Validation & Repair Engine".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement PDF/A & PDF/X Compliance Validation & Repair Engine"
+                    .to_string(),
             target_subsystem: "Pdfcraft Archival & Compliance Suite".to_string(),
             original_suite: "Artcraft Archival & Standards Engine".to_string(),
             components_added: alloc::vec![
-                "ISO 19005 (PDF/A-1/2/3/4) long-term preservation validator and repairer".to_string(),
+                "ISO 19005 (PDF/A-1/2/3/4) long-term preservation validator and repairer"
+                    .to_string(),
                 "ISO 15930 (PDF/X-1a/3/4/6) print exchange compliance inspector".to_string(),
                 "Automatic font embedding and missing color space auto-repair".to_string(),
             ],

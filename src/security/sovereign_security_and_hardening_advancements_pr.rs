@@ -73,6 +73,58 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         path == profile_pattern
     }
 
+    /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW).
+    pub fn evaluate_seccomp_bpf(&self, syscall_nr: u32, allowed_syscalls: &[u32]) -> u32 {
+        if allowed_syscalls.contains(&syscall_nr) {
+            3 // SECCOMP_RET_ALLOW
+        } else {
+            0 // SECCOMP_RET_KILL_PROCESS
+        }
+    }
+
+    /// Check if Linux capability bit mask contains target capability.
+    pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
+        if cap_bit >= 64 {
+            return false;
+        }
+        (effective_mask & (1u64 << cap_bit)) != 0
+    }
+
+    /// Construct Linux namespace isolation flags bitmask (CLONE_NEWPID | CLONE_NEWNET | etc.).
+    pub fn build_namespace_flags(
+        pid: bool,
+        net: bool,
+        mnt: bool,
+        ipc: bool,
+        uts: bool,
+        user: bool,
+        cgroup: bool,
+    ) -> u32 {
+        let mut flags = 0u32;
+        if pid {
+            flags |= 0x20000000;
+        } // CLONE_NEWPID
+        if net {
+            flags |= 0x40000000;
+        } // CLONE_NEWNET
+        if mnt {
+            flags |= 0x00020000;
+        } // CLONE_NEWNS
+        if ipc {
+            flags |= 0x08000000;
+        } // CLONE_NEWIPC
+        if uts {
+            flags |= 0x04000000;
+        } // CLONE_NEWUTS
+        if user {
+            flags |= 0x10000000;
+        } // CLONE_NEWUSER
+        if cgroup {
+            flags |= 0x02000000;
+        } // CLONE_NEWCGROUP
+        flags
+    }
+
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
         if limit_str == "max" {
@@ -144,6 +196,32 @@ impl BsdHardeningAndIsolationPrEngine {
             return permissions.contains(requested_perm);
         }
         false
+    }
+
+    /// Generate FreeBSD Jail configuration file format string.
+    pub fn generate_freebsd_jail_conf(
+        jail_name: &str,
+        path: &str,
+        ip4_addr: &str,
+        vnet: bool,
+    ) -> String {
+        alloc::format!(
+            "{} {{\n  path = \"{}\";\n  ip4.addr = \"{}\";\n  vnet = {};\n  exec.start = \"/bin/sh /etc/rc\";\n  exec.stop = \"/bin/sh /etc/rc.shutdown\";\n}}",
+            jail_name, path, ip4_addr, if vnet { "1" } else { "0" }
+        )
+    }
+
+    /// Verify Capsicum cap_rights_t bitmask rights (CAP_READ, CAP_WRITE, CAP_FSTAT, CAP_SEEK).
+    pub fn check_capsicum_rights(held_rights: u64, required_right: u64) -> bool {
+        (held_rights & required_right) == required_right
+    }
+
+    /// Evaluate FreeBSD Mandatory Access Control (MAC) label policy match.
+    pub fn evaluate_mac_label_match(&self, subject_label: &str, object_label: &str) -> bool {
+        if subject_label == "mac/biba/high" {
+            return true;
+        }
+        subject_label == object_label
     }
 
     /// Check BSD securelevel restriction for operation.
@@ -258,6 +336,24 @@ impl AntivirusAndCryptoEnginePrEngine {
         content
             .windows(signature.len())
             .any(|window| window == signature)
+    }
+
+    /// Validate GnuPG / OpenPGP key ID fingerprint string (40 hex chars).
+    pub fn validate_gnupg_key_fingerprint(&self, fingerprint: &str) -> bool {
+        fingerprint.len() == 40 && fingerprint.chars().all(|c| c.is_ascii_hexdigit())
+    }
+
+    /// Verify UEFI Secure Boot database certificate match (`db` vs `dbx` revocation).
+    pub fn is_uefi_boot_binary_allowed(
+        &self,
+        binary_hash: &[u8; 32],
+        db_allowed_hashes: &[[u8; 32]],
+        dbx_revoked_hashes: &[[u8; 32]],
+    ) -> bool {
+        if dbx_revoked_hashes.contains(binary_hash) {
+            return false; // Revoked!
+        }
+        db_allowed_hashes.contains(binary_hash)
     }
 
     /// Validate TPM 2.0 PCR register bank digest extension (SHA256(PCR_old || input)).
@@ -401,6 +497,23 @@ mod tests {
         assert!(engine.matches_apparmor_path_profile("/var/log/syslog", "/var/log/*"));
         assert!(engine.matches_apparmor_path_profile("/var/log/nginx/access.log", "/var/log/**"));
 
+        assert_eq!(engine.evaluate_seccomp_bpf(1, &[1, 2, 3]), 3);
+        assert_eq!(engine.evaluate_seccomp_bpf(99, &[1, 2, 3]), 0);
+
+        assert!(LinuxAccessControlAndSandboxingPrEngine::has_capability(
+            0x0000_0001,
+            0
+        ));
+        assert!(!LinuxAccessControlAndSandboxingPrEngine::has_capability(
+            0x0000_0001,
+            1
+        ));
+
+        let ns_flags = LinuxAccessControlAndSandboxingPrEngine::build_namespace_flags(
+            true, true, true, false, false, false, false,
+        );
+        assert_ne!(ns_flags, 0);
+
         assert_eq!(
             LinuxAccessControlAndSandboxingPrEngine::parse_cgroup_memory_limit("512M"),
             536870912
@@ -409,6 +522,9 @@ mod tests {
             LinuxAccessControlAndSandboxingPrEngine::parse_cgroup_memory_limit("max"),
             u64::MAX
         );
+
+        assert!(LinuxAccessControlAndSandboxingPrEngine::check_landlock_access(0b111, 0b001));
+        assert!(!LinuxAccessControlAndSandboxingPrEngine::check_landlock_access(0b001, 0b010));
     }
 
     #[test]
@@ -419,6 +535,27 @@ mod tests {
 
         assert!(engine.check_unveil_access("/usr/lib", "r", "/usr/lib/libc.so", 'r'));
         assert!(!engine.check_unveil_access("/usr/lib", "r", "/usr/lib/libc.so", 'w'));
+
+        let jail_conf = BsdHardeningAndIsolationPrEngine::generate_freebsd_jail_conf(
+            "webjail",
+            "/usr/jails/web",
+            "192.168.1.50",
+            true,
+        );
+        assert!(jail_conf.contains("192.168.1.50"));
+        assert!(jail_conf.contains("vnet = 1"));
+
+        assert!(BsdHardeningAndIsolationPrEngine::check_capsicum_rights(
+            0x0000_000F,
+            0x0000_0001
+        ));
+        assert!(!BsdHardeningAndIsolationPrEngine::check_capsicum_rights(
+            0x0000_0001,
+            0x0000_0002
+        ));
+
+        assert!(engine.evaluate_mac_label_match("mac/biba/high", "mac/biba/low"));
+        assert!(engine.evaluate_mac_label_match("mac/biba/low", "mac/biba/low"));
 
         assert!(
             !BsdHardeningAndIsolationPrEngine::is_operation_allowed_at_securelevel(
@@ -478,6 +615,14 @@ mod tests {
 
         assert!(engine.validate_kerberos_tgt("SIGMAOS.ORG", "jules", &[0x01; 20]));
         assert!(!engine.validate_kerberos_tgt("SIGMAOS.ORG", "jules", &[0x01; 5]));
+
+        let sssd_conf = IdentityAndEnterpriseAuthPrEngine::generate_sssd_domain_conf(
+            "SIGMAOS.ORG",
+            "ldap",
+            "ldap://ldap.sigmaos.org",
+        );
+        assert!(sssd_conf.contains("[domain/SIGMAOS.ORG]"));
+        assert!(sssd_conf.contains("ldap://ldap.sigmaos.org"));
     }
 
     #[test]

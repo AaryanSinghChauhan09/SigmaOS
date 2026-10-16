@@ -27,3 +27,7 @@
 ## 2025-06-01 - Pre-Allocating Vector Capacity for Master Verification Engines
 **Learning:** Initializing collection fields with `Vec::new()` in heavily instantiated engine descriptors causes multiple sequential heap reallocations as elements are registered. Utilizing `Vec::with_capacity(exact_or_upper_bound)` eliminates dynamic vector resizing and re-allocation overhead during initialization loops.
 **Action:** Always specify expected collection capacity using `Vec::with_capacity` when populating static arrays or registry collections.
+
+## 2025-06-05 - Zero-Allocation Byte Slice Substring Search in Search Filters
+**Learning:** In clipboard and history search filtering functions over raw byte content (`Vec<u8>`), calling `String::from_utf8_lossy(&content).to_lowercase().contains(&search.to_lowercase())` allocates temporary heap `String` objects on every history item evaluation. Using an inline `contains_ignore_case` helper (`haystack.windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle))`) directly on byte slice windows performs the case-insensitive substring match in-place with zero heap allocations.
+**Action:** Use byte slice window comparison helpers (`eq_ignore_ascii_case`) directly on raw buffer slices during search filtering instead of converting to lowercased `String`s.

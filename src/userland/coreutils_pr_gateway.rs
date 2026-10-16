@@ -179,6 +179,65 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
         out
     }
+
+    pub fn run_chmod(&self, path: &str, mode: u32) -> String {
+        format!("chmod: mode of '{}' changed to {:04o}", path, mode & 0o7777)
+    }
+
+    pub fn run_chown(&self, path: &str, owner: &str, group: &str) -> String {
+        format!(
+            "chown: ownership of '{}' changed to {}:{}",
+            path, owner, group
+        )
+    }
+
+    pub fn run_touch(&self, path: &str, create_if_missing: bool) -> String {
+        format!(
+            "touch: updated timestamp for '{}' (create={})",
+            path, create_if_missing
+        )
+    }
+
+    pub fn run_mkdir(&self, path: &str, create_parents: bool, mode: u32) -> String {
+        format!(
+            "mkdir: created directory '{}' (parents={}, mode={:04o})",
+            path,
+            create_parents,
+            mode & 0o7777
+        )
+    }
+
+    pub fn run_du(&self, entries: &[CoreUtilityFileInfo], summary_only: bool) -> Vec<String> {
+        let mut results = Vec::new();
+        let total_blocks: u64 = entries.iter().map(|e| e.blocks).sum();
+
+        if summary_only {
+            results.push(format!("{}\ttotal", total_blocks * 512 / 1024));
+        } else {
+            for entry in entries {
+                results.push(format!("{}\t{}", entry.blocks * 512 / 1024, entry.path));
+            }
+            results.push(format!("{}\ttotal", total_blocks * 512 / 1024));
+        }
+        results
+    }
+
+    pub fn run_env(
+        &self,
+        vars: &BTreeMap<String, String>,
+        filter_prefix: Option<&str>,
+    ) -> Vec<String> {
+        vars.iter()
+            .filter(|(k, _)| {
+                if let Some(prefix) = filter_prefix {
+                    k.starts_with(prefix)
+                } else {
+                    true
+                }
+            })
+            .map(|(k, v)| format!("{}={}", k, v))
+            .collect()
+    }
 }
 
 // =========================================================================
@@ -389,6 +448,47 @@ impl UtilLinuxSubsystemEngine {
             "chrt/taskset: PID {} assigned policy {} prio {} with CPU affinity mask 0x{:X}",
             pid, policy, priority, cpu_mask
         )
+    }
+
+    pub fn swapon_status(&self) -> Vec<String> {
+        vec![
+            "Filename\t\t\tType\t\tSize\t\tUsed\t\tPriority".to_string(),
+            "/dev/nvme0n1p3\t\tpartition\t8388604\t\t0\t\t-2".to_string(),
+            "/var/swapfile\t\tfile\t\t4194304\t\t1024\t\t-3".to_string(),
+        ]
+    }
+
+    pub fn uptime_summary(
+        &self,
+        uptime_secs: u64,
+        users_count: usize,
+        load_1: f32,
+        load_5: f32,
+        load_15: f32,
+    ) -> String {
+        let days = uptime_secs / 86400;
+        let hours = (uptime_secs % 86400) / 3600;
+        let mins = (uptime_secs % 3600) / 60;
+        format!(
+            "up {} days, {:02}:{:02}, {} user(s), load average: {:.2}, {:.2}, {:.2}",
+            days, hours, mins, users_count, load_1, load_5, load_15
+        )
+    }
+
+    pub fn lsmod_summary(&self) -> Vec<(String, usize, Vec<String>)> {
+        vec![
+            (
+                "btrfs".to_string(),
+                1835008,
+                vec!["zstd_compress".to_string(), "raid6_pq".to_string()],
+            ),
+            (
+                "zstd_compress".to_string(),
+                126976,
+                vec!["btrfs".to_string()],
+            ),
+            ("nvme".to_string(), 65536, vec!["nvme_core".to_string()]),
+        ]
     }
 }
 
@@ -878,6 +978,51 @@ impl AuthPrivilegeSessionEngine {
             .map(|mod_name| (mod_name.to_string(), !user.is_empty()))
             .collect()
     }
+
+    pub fn verify_shadow_expiry(
+        &self,
+        days_since_epoch: u32,
+        last_changed: u32,
+        max_days: u32,
+    ) -> bool {
+        if max_days == 0 || max_days == 99999 {
+            return false; // password never expires
+        }
+        days_since_epoch >= (last_changed + max_days)
+    }
+
+    pub fn pam_verify_module_chain(
+        &self,
+        user: &str,
+        service: &str,
+        required_modules: &[&str],
+    ) -> (bool, Vec<String>) {
+        let mut audit_log = Vec::new();
+        let mut all_passed = true;
+
+        for module in required_modules {
+            let pass = !user.is_empty() && !service.is_empty();
+            if !pass {
+                all_passed = false;
+            }
+            audit_log.push(format!(
+                "PAM [{}] service='{}' user='{}' -> {}",
+                module,
+                service,
+                user,
+                if pass { "SUCCESS" } else { "FAILURE" }
+            ));
+        }
+
+        (all_passed, audit_log)
+    }
+
+    pub fn getty_init_tty_spec(&self, tty_line: &str, baud_rate: u32, term_type: &str) -> String {
+        format!(
+            "getty: initialized '{}' at {} baud (TERM={})",
+            tty_line, baud_rate, term_type
+        )
+    }
 }
 
 // =========================================================================
@@ -1247,5 +1392,85 @@ mod tests {
         assert!(gateway.validate_pr(pr_id));
         assert!(gateway.run_ci_gate_pipeline(pr_id));
         assert!(gateway.merge_pr(pr_id));
+    }
+
+    #[test]
+    fn test_gnu_coreutils_expanded_helpers() {
+        let engine = GnuCoreutilsBsdUserlandEngine::new();
+        let chmod_res = engine.run_chmod("/etc/passwd", 0o644);
+        assert!(chmod_res.contains("0644"));
+
+        let chown_res = engine.run_chown("/var/log/syslog", "root", "adm");
+        assert!(chown_res.contains("root:adm"));
+
+        let touch_res = engine.run_touch("/tmp/foo", true);
+        assert!(touch_res.contains("updated timestamp"));
+
+        let mkdir_res = engine.run_mkdir("/tmp/a/b/c", true, 0o755);
+        assert!(mkdir_res.contains("parents=true"));
+
+        let file = CoreUtilityFileInfo {
+            path: "/var/log/test.log".to_string(),
+            size: 2048,
+            permissions: 0o644,
+            owner: "root".to_string(),
+            group: "root".to_string(),
+            is_dir: false,
+            inode: 100,
+            blocks: 4,
+            device_id: 1,
+        };
+        let du_res = engine.run_du(&[file], false);
+        assert!(!du_res.is_empty());
+
+        let mut env_map = BTreeMap::new();
+        env_map.insert("PATH".to_string(), "/bin:/usr/bin".to_string());
+        env_map.insert("HOME".to_string(), "/root".to_string());
+        let env_res = engine.run_env(&env_map, Some("P"));
+        assert_eq!(env_res.len(), 1);
+        assert!(env_res[0].starts_with("PATH="));
+    }
+
+    #[test]
+    fn test_util_linux_expanded_helpers() {
+        let util = UtilLinuxSubsystemEngine::new();
+        let swap = util.swapon_status();
+        assert!(swap.len() >= 2);
+
+        let uptime = util.uptime_summary(90000, 2, 0.15, 0.20, 0.05);
+        assert!(uptime.contains("1 days"));
+
+        let lsmod = util.lsmod_summary();
+        assert!(!lsmod.is_empty());
+        assert_eq!(lsmod[0].0, "btrfs");
+    }
+
+    #[test]
+    fn test_auth_privilege_expanded_helpers() {
+        let auth = AuthPrivilegeSessionEngine::new();
+        assert!(auth.verify_shadow_expiry(20000, 10000, 90));
+        assert!(!auth.verify_shadow_expiry(20000, 10000, 99999));
+
+        let (all_pass, audit) =
+            auth.pam_verify_module_chain("sovereign", "sudo", &["pam_unix", "pam_permit"]);
+        assert!(all_pass);
+        assert_eq!(audit.len(), 2);
+
+        let getty = auth.getty_init_tty_spec("tty1", 38400, "linux");
+        assert!(getty.contains("tty1"));
+        assert!(getty.contains("38400"));
+    }
+
+    #[test]
+    fn test_coreutils_pr_gateway_filters() {
+        let gateway = CoreUtilsPullRequestGatewayEngine::new();
+        let core_prs = gateway.get_prs_by_category(CoreUtilsPrCategory::GnuCoreutilsBsdUserland);
+        assert!(core_prs.len() >= 2);
+
+        let proposed_prs = gateway.get_prs_by_status(CoreUtilsPrStatus::Proposed);
+        assert!(!proposed_prs.is_empty());
+
+        let author_prs = gateway.get_prs_by_author("SovereignCoreTeam");
+        assert_eq!(author_prs.len(), gateway.collect_all_proposals().len());
     }
 }

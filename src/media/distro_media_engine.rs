@@ -1496,8 +1496,13 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
         let mut gateway = LinuxBsdAudioVideoPrGatewayEngine::new();
         let prs = vec![
             ("ALSA UCM2 Profile Sequencer & Software Mixing", "ALSA"),
+            ("ALSA Userland Hardware Plugin ioplug Interface", "ALSA"),
             (
                 "OSS v4 /dev/dsp Peak Meter Querying & Fragment Tuning",
+                "OSS",
+            ),
+            (
+                "OSS v4 /dev/mixer Extension Controls & Channel Levels",
                 "OSS",
             ),
             (
@@ -1505,21 +1510,40 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
                 "PulseAudio",
             ),
             (
+                "PulseAudio Simple Protocol & Network Audio Streaming",
+                "PulseAudio",
+            ),
+            (
                 "PipeWire SPA POD Buffer & Bluetooth Codec Engine",
+                "PipeWire",
+            ),
+            (
+                "PipeWire SPA Filter-Chain Equalizer & Convolver Node Graph",
                 "PipeWire",
             ),
             (
                 "JACK Pro-Audio Realtime Graph Cycle Synchronization",
                 "JACK",
             ),
+            ("JACK Session API v2 Graph Save and Restore", "JACK"),
             ("sndio OpenBSD MIDI & PCM Stream Multiplexer", "sndio"),
+            ("sndio Raw MIDI Time Code (MTC) Clock Generator", "sndio"),
             (
                 "GStreamer Dynamic Pipeline Linkage & Caps Negotiation",
                 "GStreamer",
             ),
+            (
+                "GStreamer RTSP Server & RTP Packetization Engine",
+                "GStreamer",
+            ),
             ("FFmpeg Zero-Copy Filtergraph Execution Engine", "FFmpeg"),
+            ("FFmpeg AVIOContext Custom Memory I/O Callbacks", "FFmpeg"),
             (
                 "V4L2 DMABUF Buffer Exporter & Camera Control Engine",
+                "V4L2",
+            ),
+            (
+                "V4L2 Media Controller Topology & Subdevice Pad Routing",
                 "V4L2",
             ),
             ("VLC LibVLC Core Instance & ASS Subtitle Renderer", "VLC"),
@@ -1815,6 +1839,77 @@ mod tests {
         assert_eq!(merged_status, AudioVideoPrStatus::Merged);
 
         let gap_closure = LinuxBsdAudioVideoGapClosurePrGateway::new();
-        assert_eq!(gap_closure.gateway.submissions.len(), 11);
+        assert_eq!(gap_closure.gateway.submissions.len(), 22);
+    }
+
+    #[test]
+    fn test_new_advanced_media_engines() {
+        // ALSA ioplug
+        let mut ioplug = AlsaHardwarePluginIoplugEngine::new("softvol_ioplug");
+        assert_eq!(ioplug.update_pointer(1024), 1024);
+        ioplug.set_softvol_db(-6.0);
+        assert_eq!(ioplug.softvol_db_scale, -6.0);
+
+        // OSS4 mixer
+        let mut oss4 = Oss4MixerDeviceControlEngine::new("/dev/mixer0");
+        assert!(oss4.set_extension_control("pcm.bass", 80).is_ok());
+        assert_eq!(*oss4.extension_controls.get("pcm.bass").unwrap(), 80);
+
+        // PulseAudio network
+        let mut pa_net = PulseAudioNetworkAudioEngine::new(4713);
+        assert_eq!(pa_net.register_client(), 1);
+        pa_net.update_jitter(12);
+        assert_eq!(pa_net.network_jitter_ms, 12);
+
+        // PipeWire filter chain
+        let mut pw_filter = PipeWireFilterChainEngine::new();
+        assert!(pw_filter.set_band_gain(0, 3.5).is_ok());
+        assert_eq!(pw_filter.equalizer_bands_gain_db[0], 3.5);
+
+        // JACK session control
+        let mut jack_session = JackSessionControlEngine::new("/tmp/jack_sessions");
+        jack_session.save_session(vec![("sys:out_1".to_string(), "app:in_1".to_string())]);
+        assert!(jack_session.is_session_saved);
+        assert_eq!(jack_session.restore_session().len(), 1);
+
+        // sndio MTC clock
+        let mut mtc = SndioRawMTCClockEngine::new(30);
+        mtc.start_clock();
+        assert_eq!(mtc.advance_ticks(100), 100);
+
+        // GStreamer RTSP
+        let mut rtsp = GStreamerRtpRtspStreamEngine::new("/live", 8554);
+        rtsp.start_server();
+        assert!(rtsp.is_rtsp_serving);
+
+        // FFmpeg custom IO
+        let mut custom_io = FfmpegCustomIoBufferEngine::new(4096);
+        let read = custom_io.read_packet_callback(2048);
+        assert_eq!(read, 2048);
+        assert_eq!(custom_io.bytes_read_total, 2048);
+
+        // V4L2 subdevice media controller
+        let mut media_ctrl = V4l2SubdeviceMediaControllerEngine::new("/dev/media0");
+        media_ctrl.setup_link("/dev/v4l-subdev0:1", "/dev/v4l-subdev1:0");
+        assert_eq!(media_ctrl.active_links.len(), 1);
+
+        // VLC plugin registry
+        let mut vlc_plugins = VlcPluginModuleRegistryEngine::new();
+        vlc_plugins.register_plugin("jack_output", "audio output");
+        assert_eq!(
+            vlc_plugins.loaded_plugins.get("jack_output").unwrap(),
+            "audio output"
+        );
+
+        // mpv property observer
+        let mut mpv_obs = MpvPropertyObserverEngine::new();
+        let obs_id = mpv_obs.observe_property("pause");
+        assert_eq!(obs_id, 1);
+        mpv_obs.push_change_event(obs_id, "yes");
+        assert_eq!(mpv_obs.property_change_events.len(), 1);
+
+        // Verify master suite instantiation
+        let suite = LinuxBsdDistroMediaSuite::new();
+        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 22);
     }
 }

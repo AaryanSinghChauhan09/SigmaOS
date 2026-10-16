@@ -12233,7 +12233,10 @@ impl SovereignGoogleSheetsFormulaDependencyTreeEngine {
             in_degree.entry(node.cell_ref.clone()).or_insert(0);
 
             for dep in &node.depends_on {
-                adj_list.entry(dep.clone()).or_default().push(node.cell_ref.clone());
+                adj_list
+                    .entry(dep.clone())
+                    .or_default()
+                    .push(node.cell_ref.clone());
                 *in_degree.entry(node.cell_ref.clone()).or_insert(0) += 1;
             }
         }
@@ -12615,8 +12618,12 @@ impl SovereignGoogleWorkspaceGeminiSmartSummaryEngine {
         project_name: &str,
     ) -> WorkspaceSmartSummary {
         let key_insights = vec![
-            format!("Project '{}' contains {} active documents and {} financial models.", project_name, docs_count, sheets_count),
-            "Operational performance across team tasks is tracking 15% ahead of target.".to_string(),
+            format!(
+                "Project '{}' contains {} active documents and {} financial models.",
+                project_name, docs_count, sheets_count
+            ),
+            "Operational performance across team tasks is tracking 15% ahead of target."
+                .to_string(),
             "No unresolved critical budget blockers identified.".to_string(),
         ];
 

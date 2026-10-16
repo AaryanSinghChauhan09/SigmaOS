@@ -9,38 +9,31 @@ pub mod deckcraft;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
+pub mod effectcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
+pub mod pdfcraft_artcraft_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
+pub mod soundcraft;
 pub mod vectoranimation;
 pub mod vectorcraft;
 
-pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, Workspace};
+pub use artcraft::{get_artcraft, init_artcraft, ArtSuite, Project, ProjectType, Workspace};
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
     AudioExportFormat, AudioTrack as AudioCraftTrack, AutomationInterpolation, AutomationLane,
     AutomationPoint, ChannelConfig, SampleFormat, SampleRate, TrackType,
 };
-pub use cadcraft::{
-    fnv1a_cadcraft_pr_digest, get_cadcraft, init_cadcraft, AssemblyComponent, AssemblyMate,
-    AssemblyMateType, CadCraft2dDraftingConstraintPrDeployer, CadCraft3dSolidModelingPrDeployer,
-    CadCraftAssemblyFemSimulationPrDeployer, CadCraftEngine, CadCraftMasterPrDeploymentSuite,
-    CadCraftPullRequestSpec, CamToolpath, CamToolpathType, ConstraintType,
-    ExportFormat as CadExportFormat, FeaElement, FeaMesh, GeometricConstraint, SketchEntity,
-    SketchEntityType, SolidFeature, SolidFeatureType,
-};
 pub use deckcraft::{
-    fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft, AnimationType as DeckAnimationType,
-    AspectRatio, DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine,
-    DeckCraftMasterPrDeploymentSuite, DeckCraftPresenterZenithPrDeployer, DeckCraftPullRequestSpec,
-    DeckCraftSlideLayoutMasterPrDeployer, ElementType as DeckElementType,
-    ExportFormat as DeckExportFormat, PresenterNotes, PresenterState, Slide, SlideAnimation,
-    SlideDeck, SlideElement, SlideLayout, SlideTheme, SlideTransition,
-    TransitionType as DeckTransitionType,
+    fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
+    DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine, DeckCraftMasterPrDeploymentSuite,
+    DeckCraftPresenterZenithPrDeployer, DeckCraftPullRequestSpec,
+    DeckCraftSlideLayoutMasterPrDeployer, DeckExportFormat, PresentationDeck, PresenterState,
+    Slide, SlideElement, SlideExporterEngine, SlideLayoutType,
 };
 pub use designcraft::{
     get_designcraft, init_designcraft, Artboard, Canvas, Color, ColorModel, Component,
@@ -61,6 +54,11 @@ pub use effectcraft::{
     EffectCraftNodeCompositingPrDeployer, EffectCraftParticleShaderPrDeployer,
     EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
     NodeGraph, NodeType, Parameter, ParameterType,
+};
+pub use effectcraft_missing_components_parity_pr::{
+    ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine, EffectcraftPrProposalManifest,
+    NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
@@ -90,6 +88,14 @@ pub use pdfcraft::{
     FormFieldType, Hyperlink, ImageObject, PdfEditor, PdfElement, PdfMetadata, PdfPage,
     SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
 };
+pub use pdfcraft_artcraft_parity_pr::{
+    PdfcraftArchivalValidationPrEngine, PdfcraftArtcraftPrProposalManifest,
+    PdfcraftBatchExportRenderPrEngine, PdfcraftColorPreflightCmykPrEngine,
+    PdfcraftDigitalSignatureWatermarkPrEngine, PdfcraftInteractiveFormsXfaPrEngine,
+    PdfcraftMultiWorkspaceProjectPrEngine, PdfcraftOcrTextRecognitionPrEngine,
+    PdfcraftPageImpositionBookletPrEngine, PdfcraftRedactionSanitizationPrEngine,
+    PdfcraftVectorArtImportPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
+};
 pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
@@ -100,6 +106,12 @@ pub use photocraft_missing_components_parity_pr::{
     PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
     PhotocraftVectorMaskPenPathPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
 };
+pub use soundcraft::{
+    fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
+    SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,
+    SoundCraftPullRequestSpec, SoundCraftSpatialMixingMasteringPrDeployer, SoundTrack,
+    Spatial3DPosition, SynthesizerVoice, Waveform,
+};
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
     AnimationLayerType, AnimationProject as VectorAnimationProject, Bone, InterpolationMode,
@@ -108,4 +120,10 @@ pub use vectoranimation::{
 pub use vectorcraft::{
     get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,
     Shape, ShapeProperties, VectorEditor, VectorLayer,
+};
+pub use wordcraft_missing_components_parity_pr::{
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
+    WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
+    WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
 };

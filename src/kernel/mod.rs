@@ -257,8 +257,10 @@ pub use timekeeping::{
     init_timekeeping, ClockQuality, ClockSource, HighResTimer, Timekeeper, TimerManager,
 };
 pub mod crash_dump;
+pub mod hardware_firmware_subsystem;
 pub mod kasan;
 pub mod kmsan;
 pub mod serial_console;
 pub mod smp_load_balancer;
+pub mod sovereign_parity_apex_v100;
 pub mod wx_pte_hardening;

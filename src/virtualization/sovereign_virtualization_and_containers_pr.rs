@@ -89,6 +89,22 @@ impl KvmQemuEngine {
         }
     }
 
+    pub fn convert_disk_image(
+        &mut self,
+        path: &str,
+        fmt: &str,
+        size_bytes: u64,
+        backing: Option<&str>,
+    ) {
+        self.disk_images.push(QemuDiskImageSpec {
+            image_path: path.to_string(),
+            format: fmt.to_string(),
+            size_bytes,
+            backing_file: backing.map(|s| s.to_string()),
+            is_compressed: fmt == "qcow2",
+        });
+    }
+
     pub fn add_vcpu(&mut self, vcpu_id: u32, core: u32) {
         self.vcpus.push(KvmVcpuState {
             vcpu_id,
@@ -134,6 +150,23 @@ pub enum HypervisorType {
     OpenBsdVmm,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum LibvirtStoragePoolType {
+    #[default]
+    Directory,
+    Zfs,
+    LvmThin,
+    CephRbd,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibvirtNwFilterRule {
+    pub name: String,
+    pub action: String,    // "accept", "drop", "reject"
+    pub direction: String, // "in", "out", "inout"
+    pub protocol: String,  // "ip", "tcp", "udp", "icmp"
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtDomainConfig {
     pub domain_name: String,
@@ -162,6 +195,42 @@ impl LibvirtDomainEngine {
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
             virtual_bridges: bridges,
         }
+    }
+
+    pub fn create_storage_volume(
+        &mut self,
+        name: &str,
+        pool: &str,
+        capacity_bytes: u64,
+        fmt: &str,
+    ) {
+        self.storage_volumes.push(LibvirtStorageVolume {
+            volume_name: name.to_string(),
+            pool_name: pool.to_string(),
+            capacity_bytes,
+            allocation_bytes: 1024 * 1024 * 1024,
+            format: fmt.to_string(),
+        });
+    }
+
+    pub fn add_nat_bridge(&mut self, bridge_name: &str) {
+        if !self.virtual_bridges.contains(&bridge_name.to_string()) {
+            self.virtual_bridges.push(bridge_name.to_string());
+        }
+    }
+
+    pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
+        self.storage_pool_type = pool_type;
+        self.storage_pool_path = path.to_string();
+    }
+
+    pub fn add_nwfilter_rule(&mut self, name: &str, action: &str, direction: &str, protocol: &str) {
+        self.nwfilter_rules.push(LibvirtNwFilterRule {
+            name: name.to_string(),
+            action: action.to_string(),
+            direction: direction.to_string(),
+            protocol: protocol.to_string(),
+        });
     }
 
     pub fn define_domain(&mut self, name: &str, hyp: HypervisorType, memory_mb: u64, vcpus: u32) {
@@ -209,6 +278,21 @@ pub enum XenGuestMode {
     Paravirtualized,        // PV
     HardwareVirtualMachine, // HVM
     Pvh,                    // PVH
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct XenArgoPort {
+    pub port_id: u32,
+    pub source_domid: u32,
+    pub dest_domid: u32,
+    pub ring_size_bytes: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QubesDisposableVmPolicy {
+    pub template_vm: String,
+    pub auto_wipe_on_shutdown: bool,
+    pub netvm_isolation: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1275,6 +1359,12 @@ mod tests {
         let mut engine = KvmQemuEngine::new();
         engine.add_vcpu(0, 0);
         engine.attach_vfio_device("0000:02:00.0", 0x10de, 0x2206, 15);
+        engine.convert_disk_image(
+            "/var/lib/libvirt/images/disk.qcow2",
+            "qcow2",
+            20 * 1024 * 1024 * 1024,
+            None,
+        );
         assert_eq!(engine.vcpus.len(), 1);
         assert_eq!(engine.vfio_passthrough_devices.len(), 1);
         let sync = engine.simulate_dirty_page_ring_sync();
@@ -1348,6 +1438,7 @@ mod tests {
             engine.harvester_vm_mappings.get("vm-web").unwrap(),
             "pod-web"
         );
+        assert!(engine.crio_runtime_handlers.contains(&"gvisor".to_string()));
     }
 
     #[test]

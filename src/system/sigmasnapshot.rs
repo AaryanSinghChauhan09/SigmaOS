@@ -181,7 +181,8 @@ impl SigmaSnapshot {
 
     /// Add a snapshot
     pub fn add_snapshot(&mut self, snapshot: Snapshot) {
-        self.snapshots.insert(snapshot.snapshot_id.clone(), snapshot);
+        self.snapshots
+            .insert(snapshot.snapshot_id.clone(), snapshot);
     }
 
     /// Remove a snapshot by ID

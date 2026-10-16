@@ -75,6 +75,20 @@ pub trait ClipboardBackend {
     fn name(&self) -> &str;
 }
 
+/// Fast zero-allocation case-insensitive ASCII substring search helper.
+#[inline]
+fn contains_ignore_case(haystack: &[u8], needle: &[u8]) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    haystack
+        .windows(needle.len())
+        .any(|w| w.eq_ignore_ascii_case(needle))
+}
+
 /// System clipboard backend
 pub struct SystemClipboardBackend {
     current_item: Option<ClipboardItem>,
@@ -239,8 +253,10 @@ impl ClipboardManager {
                     }
                 }
                 if let Some(ref search) = filter.search_text {
-                    let content_str = String::from_utf8_lossy(&item.content);
-                    if !content_str.to_lowercase().contains(&search.to_lowercase()) {
+                    // Performance Optimization: Use zero-allocation ASCII window slice search
+                    // directly over raw bytes to avoid heap-allocating temporary String objects
+                    // and calling `.to_lowercase()` for every history item during search.
+                    if !contains_ignore_case(&item.content, search.as_bytes()) {
                         return false;
                     }
                 }

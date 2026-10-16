@@ -1454,9 +1454,15 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 212);
-        assert!(proposal.replaced_applications.contains(&"Transmission".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Deluge".to_string()));
-        assert!(proposal.replaced_applications.contains(&"qBittorrent".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Transmission".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Deluge".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"qBittorrent".to_string()));
     }
 
     #[test]
@@ -1466,9 +1472,15 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 213);
-        assert!(proposal.replaced_applications.contains(&"HexChat".to_string()));
-        assert!(proposal.replaced_applications.contains(&"Element (Matrix)".to_string()));
-        assert!(proposal.replaced_applications.contains(&"WeeChat".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"HexChat".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"Element (Matrix)".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"WeeChat".to_string()));
     }
 
     #[test]
@@ -1478,8 +1490,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 214);
-        assert!(proposal.replaced_applications.contains(&"KDE Ark".to_string()));
-        assert!(proposal.replaced_applications.contains(&"GNOME File Roller".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"KDE Ark".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNOME File Roller".to_string()));
     }
 
     #[test]
@@ -1489,8 +1505,12 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 215);
-        assert!(proposal.replaced_applications.contains(&"GParted".to_string()));
-        assert!(proposal.replaced_applications.contains(&"GNOME Disks (gnome-disk-utility)".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GParted".to_string()));
+        assert!(proposal
+            .replaced_applications
+            .contains(&"GNOME Disks (gnome-disk-utility)".to_string()));
     }
 
     #[test]

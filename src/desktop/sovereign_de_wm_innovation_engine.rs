@@ -129,7 +129,10 @@ impl GnomeInnovationEngine {
     }
 
     pub fn screencast_portal_session_active(&self) -> bool {
-        self.quick_settings_state.get("screencast").cloned().unwrap_or(false)
+        self.quick_settings_state
+            .get("screencast")
+            .cloned()
+            .unwrap_or(false)
     }
 }
 
@@ -436,11 +439,15 @@ impl LxqtInnovationEngine {
     }
 
     pub fn register_panel_plugin(&mut self, plugin_name: &str) {
-        self.autostart_services.insert(format!("lxqt-panel-plugin-{}", plugin_name), true);
+        self.autostart_services
+            .insert(format!("lxqt-panel-plugin-{}", plugin_name), true);
     }
 
     pub fn generate_qterminal_color_scheme(&self) -> String {
-        format!("[QTerminalColorScheme]\nStyle={}\nPaletteSync={}\n", self.lxqt_style, self.qt_palette_sync_enabled)
+        format!(
+            "[QTerminalColorScheme]\nStyle={}\nPaletteSync={}\n",
+            self.lxqt_style, self.qt_palette_sync_enabled
+        )
     }
 }
 
@@ -494,7 +501,10 @@ impl LxdeInnovationEngine {
     }
 
     pub fn generate_openbox_pipe_menu_xml(&self) -> String {
-        format!("<openbox_pipe_menu config=\"{}\"/>", self.openbox_config_path)
+        format!(
+            "<openbox_pipe_menu config=\"{}\"/>",
+            self.openbox_config_path
+        )
     }
 
     pub fn switch_lxappearance_gtk_theme(&mut self, theme: &str) {
@@ -1154,9 +1164,12 @@ impl OpenboxInnovationEngine {
     }
 
     pub fn transpile_pipe_menu_to_xml(&self, menu_id: &str) -> Option<String> {
-        self.pipe_menus
-            .get(menu_id)
-            .map(|cmd| format!("<openbox_pipe_menu id=\"{}\" execute=\"{}\"/>", menu_id, cmd))
+        self.pipe_menus.get(menu_id).map(|cmd| {
+            format!(
+                "<openbox_pipe_menu id=\"{}\" execute=\"{}\"/>",
+                menu_id, cmd
+            )
+        })
     }
 
     pub fn execute_keybind_action(&self, shortcut: &str) -> Option<String> {
@@ -2152,10 +2165,14 @@ mod tests {
 
         let mut lxqt = LxqtInnovationEngine::new();
         lxqt.register_panel_plugin("clock");
-        assert!(lxqt.generate_qterminal_color_scheme().contains("QTerminalColorScheme"));
+        assert!(lxqt
+            .generate_qterminal_color_scheme()
+            .contains("QTerminalColorScheme"));
 
         let mut lxde = LxdeInnovationEngine::new();
-        assert!(lxde.generate_openbox_pipe_menu_xml().contains("openbox_pipe_menu"));
+        assert!(lxde
+            .generate_openbox_pipe_menu_xml()
+            .contains("openbox_pipe_menu"));
         lxde.switch_lxappearance_gtk_theme("Adwaita-Dark");
         assert_eq!(lxde.gtk_theme, "Adwaita-Dark");
 
@@ -2189,14 +2206,18 @@ mod tests {
         assert_eq!(dwm.bar_text, "dwm-v6.5");
 
         let ob = OpenboxInnovationEngine::new();
-        assert!(ob.transpile_pipe_menu_to_xml("openbox-pipemenu-sysinfo").is_some());
+        assert!(ob
+            .transpile_pipe_menu_to_xml("openbox-pipemenu-sysinfo")
+            .is_some());
 
         let mut fb = FluxboxInnovationEngine::new();
         assert_eq!(fb.persist_slit_order().len(), 2);
         fb.dock_window_tab(1, 201);
 
         let awesome = AwesomeWmInnovationEngine::new();
-        assert!(awesome.generate_awesome_lua_layout().contains("awful.layout"));
+        assert!(awesome
+            .generate_awesome_lua_layout()
+            .contains("awful.layout"));
 
         let hypr = HyprlandInnovationEngine::new();
         assert_eq!(hypr.match_window_rules_v2("pavucontrol").len(), 1);
