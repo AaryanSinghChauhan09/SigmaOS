@@ -7,9 +7,11 @@ This document presents the consolidated GNU Info Texinfo documentation tree for 
 | Node Name | Title | Up Node | Next Node | Prev Node |
 | :--- | :--- | :--- | :--- | :--- |
 | **`Kernel Architecture`** | Kernel Architecture Details | `Top` | `Packaging System` | `Top` |
+| **`Network Stack`** | Network Stack & eBPF Filters | `Top` | `Toolchain & C Runtime` | `Storage and Filesystems` |
 | **`Packaging System`** | Packaging System Manual | `Top` | `Sandboxing Security` | `Kernel Architecture` |
 | **`Sandboxing Security`** | Sandboxing Security Architecture | `Top` | `Storage and Filesystems` | `Packaging System` |
-| **`Storage and Filesystems`** | Storage and Filesystems Handbook | `Top` | `Top` | `Sandboxing Security` |
+| **`Storage and Filesystems`** | Storage and Filesystems Handbook | `Top` | `Network Stack` | `Sandboxing Security` |
+| **`Toolchain & C Runtime`** | Toolchain & C Runtime Architecture | `Top` | `Top` | `Network Stack` |
 | **`Top`** | SigmaOS Core Utilities | `(dir)` | `Kernel Architecture` | `None` |
 
 ---
@@ -21,6 +23,15 @@ This document presents the consolidated GNU Info Texinfo documentation tree for 
 **Node Navigation:** Up: `[Top]` | Next: `[Packaging System]` | Prev: `[Top]`
 
 Detailed documentation on SMP multi-core dispatch, eBPF JIT, and lockless memory queues.
+
+
+---
+
+# Info Node: Network Stack & eBPF Filters
+
+**Node Navigation:** Up: `[Top]` | Next: `[Toolchain & C Runtime]` | Prev: `[Storage and Filesystems]`
+
+Dual IPv4/IPv6 networking stack with eBPF socket filters, XDP packet acceleration, and WireGuard VPN tunnel routing.
 
 
 ---
@@ -45,9 +56,18 @@ Multi-layered sandboxing governor synthesizing OpenBSD pledge/unveil, FreeBSD Ca
 
 # Info Node: Storage and Filesystems Handbook
 
-**Node Navigation:** Up: `[Top]` | Next: `[Top]` | Prev: `[Sandboxing Security]`
+**Node Navigation:** Up: `[Top]` | Next: `[Network Stack]` | Prev: `[Sandboxing Security]`
 
 High-reliability transactional storage management with OpenZFS pools, Btrfs subvolume Snapper snapshots, and DragonFly HAMMER2 PFS.
+
+
+---
+
+# Info Node: Toolchain & C Runtime Architecture
+
+**Node Navigation:** Up: `[Top]` | Next: `[Top]` | Prev: `[Network Stack]`
+
+Sovereign toolchain with LLVM/Clang integration, PQC signature validation, and musl/BSD libc compatibility layer.
 
 
 ---
@@ -62,7 +82,6 @@ Welcome to the GNU Info Texinfo manual tree for SigmaOS.
 * * Kernel Architecture: SMP, eBPF, Buddy Allocator
 * * Packaging System: Universal package format and SAT solver
 * * Sandboxing Security: Pledge, Unveil, Capsicum, Landlock
-* * Storage and Filesystems: OpenZFS, Btrfs, and HAMMER2
 
 
 ---

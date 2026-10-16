@@ -321,6 +321,36 @@ impl SovereignManPagesConsolidationEngine {
             bsd_linux_source: "FreeBSD bectl(8) & Illumos beadm(1)".to_string(),
         });
 
+        self.register_page(SovereignManPage {
+            title: "sysctl".to_string(),
+            section: ManSection::SystemAdmin,
+            synopsis: "sysctl [-w] name[=value]...".to_string(),
+            description: "Inspects and dynamically configures kernel tunables and system state parameters.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("-a".to_string(), "Display all currently available kernel parameters".to_string());
+                opts.insert("-w".to_string(), "Write a new value to specified parameter key".to_string());
+                opts
+            },
+            see_also: vec!["sysctl.conf(5)".to_string()],
+            bsd_linux_source: "FreeBSD sysctl(8) & Linux procps sysctl(8)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "pfctl".to_string(),
+            section: ManSection::SystemAdmin,
+            synopsis: "pfctl [-e] [-d] [-f file] [-s modifier]".to_string(),
+            description: "Control interface for Packet Filter (PF) firewall, NAT tables, and stateful tracking.".to_string(),
+            options: {
+                let mut opts = BTreeMap::new();
+                opts.insert("-e".to_string(), "Enable Packet Filter firewall".to_string());
+                opts.insert("-f".to_string(), "Load firewall rules from specified path".to_string());
+                opts
+            },
+            see_also: vec!["pf.conf(5)".to_string(), "nftables(8)".to_string()],
+            bsd_linux_source: "OpenBSD pfctl(8) & FreeBSD PF".to_string(),
+        });
+
         // Section 9 - Kernel Routines
         self.register_page(SovereignManPage {
             title: "vfs".to_string(),
@@ -340,6 +370,26 @@ impl SovereignManPagesConsolidationEngine {
             options: BTreeMap::new(),
             see_also: vec!["vfs(9)".to_string()],
             bsd_linux_source: "Linux mm buddy allocator & FreeBSD vm_page".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "kqueue".to_string(),
+            section: ManSection::SystemCalls,
+            synopsis: "int kqueue(void); int kevent(int kq, ...);".to_string(),
+            description: "Kernel event notification mechanism monitoring descriptor, signal, and process events.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["epoll(2)".to_string(), "poll(2)".to_string()],
+            bsd_linux_source: "FreeBSD kqueue(2) & OpenBSD kqueue(2)".to_string(),
+        });
+
+        self.register_page(SovereignManPage {
+            title: "netgraph".to_string(),
+            section: ManSection::KernelRoutines,
+            synopsis: "struct ng_node *ng_make_node_common(...);".to_string(),
+            description: "Graph-based kernel networking subsystem for modular packet processing hooks.".to_string(),
+            options: BTreeMap::new(),
+            see_also: vec!["bpf(4)".to_string(), "vfs(9)".to_string()],
+            bsd_linux_source: "FreeBSD netgraph(9)".to_string(),
         });
     }
 
@@ -491,9 +541,29 @@ impl SovereignInfoPagesConsolidationEngine {
             title: "Storage and Filesystems Handbook".to_string(),
             node_name: "Storage and Filesystems".to_string(),
             up_node: "Top".to_string(),
-            next_node: "Top".to_string(),
+            next_node: "Network Stack".to_string(),
             prev_node: "Sandboxing Security".to_string(),
             content: "High-reliability transactional storage management with OpenZFS pools, Btrfs subvolume Snapper snapshots, and DragonFly HAMMER2 PFS.".to_string(),
+            menu_items: vec![],
+        });
+
+        self.register_node(SovereignInfoNode {
+            title: "Network Stack & eBPF Filters".to_string(),
+            node_name: "Network Stack".to_string(),
+            up_node: "Top".to_string(),
+            next_node: "Toolchain & C Runtime".to_string(),
+            prev_node: "Storage and Filesystems".to_string(),
+            content: "Dual IPv4/IPv6 networking stack with eBPF socket filters, XDP packet acceleration, and WireGuard VPN tunnel routing.".to_string(),
+            menu_items: vec![],
+        });
+
+        self.register_node(SovereignInfoNode {
+            title: "Toolchain & C Runtime Architecture".to_string(),
+            node_name: "Toolchain & C Runtime".to_string(),
+            up_node: "Top".to_string(),
+            next_node: "Top".to_string(),
+            prev_node: "Network Stack".to_string(),
+            content: "Sovereign toolchain with LLVM/Clang integration, PQC signature validation, and musl/BSD libc compatibility layer.".to_string(),
             menu_items: vec![],
         });
     }
@@ -623,6 +693,30 @@ impl SovereignUsrShareDocConsolidationEngine {
                 changelog: "* 1.0.0: PQC Dilithium signatures & multi-sandbox policy governor.".to_string(),
                 copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
                 readme: "Security hardening guidelines, PQC attestation, and capability sandbox policies.".to_string(),
+            },
+        );
+
+        self.docs.insert(
+            "sigma-net".to_string(),
+            SovereignPackageDocRecord {
+                package_name: "sigma-net".to_string(),
+                version: "1.0.0".to_string(),
+                doc_path: "/usr/share/doc/sigma-net".to_string(),
+                changelog: "* 1.0.0: Dual stack networking, eBPF XDP acceleration & WireGuard VPN.".to_string(),
+                copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
+                readme: "Sovereign network suite and stateful packet filter documentation.".to_string(),
+            },
+        );
+
+        self.docs.insert(
+            "sigma-toolchain".to_string(),
+            SovereignPackageDocRecord {
+                package_name: "sigma-toolchain".to_string(),
+                version: "1.0.0".to_string(),
+                doc_path: "/usr/share/doc/sigma-toolchain".to_string(),
+                changelog: "* 1.0.0: Sovereign C/Rust toolchain with post-quantum signing.".to_string(),
+                copyright: "Copyright (c) 2026 SigmaOS Project. MIT License.".to_string(),
+                readme: "Sovereign compiler, linker, and post-quantum signing toolchain documentation.".to_string(),
             },
         );
     }
@@ -758,6 +852,34 @@ impl SovereignWikiHandbookConsolidationEngine {
                 troubleshooting_steps: vec![
                     "Ensure target ISA flags match hardware capability (`sigma-fetch --json`).".to_string(),
                     "Check initramfs microcode splicing if early boot panics occur.".to_string(),
+                ],
+            },
+        );
+
+        self.articles.insert(
+            "PipeWire-Audio-Guide".to_string(),
+            SovereignHandbookArticle {
+                title: "PipeWire Audio & Multimedia Routing Handbook".to_string(),
+                category: "Desktop & Audio".to_string(),
+                distro_inspiration: "Arch Linux PipeWire Wiki & Fedora Audio Guide".to_string(),
+                content: "Low-latency multimedia server configuration guide for PipeWire, WirePlumber policy management, and PulseAudio/ALSA/JACK API emulation.".to_string(),
+                troubleshooting_steps: vec![
+                    "Check sample rate match with `sigma-ctl status pipewire` if audio clicks occur.".to_string(),
+                    "Verify WirePlumber policy node priority setting.".to_string(),
+                ],
+            },
+        );
+
+        self.articles.insert(
+            "Network-Firewall-Handbook".to_string(),
+            SovereignHandbookArticle {
+                title: "Network Configuration & Stateful Firewall Handbook".to_string(),
+                category: "Networking & Security".to_string(),
+                distro_inspiration: "OpenBSD PF Handbook & FreeBSD Network Guide".to_string(),
+                content: "Stateful packet filter setup, NAT table configuration, eBPF XDP acceleration, and WireGuard VPN tunnel routing.".to_string(),
+                troubleshooting_steps: vec![
+                    "Verify firewall rule syntax via `pfctl -nf /etc/pf.conf` before loading.".to_string(),
+                    "Check state table entry exhaustion using `pfctl -si`.".to_string(),
                 ],
             },
         );

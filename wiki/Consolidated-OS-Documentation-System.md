@@ -8,7 +8,9 @@ Inspired by the **Arch Linux Wiki** and **FreeBSD Handbook**, this single-source
 | :--- | :--- | :--- |
 | **SigmaOS Installation & Deployment Guide** | System Administration | Arch Linux Wiki & FreeBSD Handbook |
 | **Kernel Compilation & Custom Module Build Handbook** | Kernel Development | Gentoo Kernel Handbook & Debian Kernel Guide |
+| **Network Configuration & Stateful Firewall Handbook** | Networking & Security | OpenBSD PF Handbook & FreeBSD Network Guide |
 | **Universal Package Management Handbook** | Software Management | Arch Linux pacman Wiki & FreeBSD pkg Handbook |
+| **PipeWire Audio & Multimedia Routing Handbook** | Desktop & Audio | Arch Linux PipeWire Wiki & Fedora Audio Guide |
 | **Security Hardening & Multi-Sandbox Policy Guide** | Security & Auditing | OpenBSD Security Handbook & HardenedBSD |
 
 ---
@@ -41,6 +43,19 @@ Guide to compiling sovereign kernel images, configuring microarchitecture optimi
 
 ---
 
+# Network Configuration & Stateful Firewall Handbook
+
+**Category:** Networking & Security | **Inspiration:** OpenBSD PF Handbook & FreeBSD Network Guide
+
+Stateful packet filter setup, NAT table configuration, eBPF XDP acceleration, and WireGuard VPN tunnel routing.
+
+## Troubleshooting & FAQ
+1. Verify firewall rule syntax via `pfctl -nf /etc/pf.conf` before loading.
+1. Check state table entry exhaustion using `pfctl -si`.
+
+
+---
+
 # Universal Package Management Handbook
 
 **Category:** Software Management | **Inspiration:** Arch Linux pacman Wiki & FreeBSD pkg Handbook
@@ -50,6 +65,19 @@ Comprehensive guide to managing 100+ package formats via sigma-pkg and DPLL cons
 ## Troubleshooting & FAQ
 1. Run `sigma-pkg --verify-signatures` if PQC attestation fails.
 1. Use `sigma-pkg --rollback` to revert to previous boot environment snapshot.
+
+
+---
+
+# PipeWire Audio & Multimedia Routing Handbook
+
+**Category:** Desktop & Audio | **Inspiration:** Arch Linux PipeWire Wiki & Fedora Audio Guide
+
+Low-latency multimedia server configuration guide for PipeWire, WirePlumber policy management, and PulseAudio/ALSA/JACK API emulation.
+
+## Troubleshooting & FAQ
+1. Check sample rate match with `sigma-ctl status pipewire` if audio clicks occur.
+1. Verify WirePlumber policy node priority setting.
 
 
 ---

@@ -13,7 +13,10 @@ This catalog consolidates Unix/Linux/BSD manual pages across all 9 standard POSI
 | **`cgroups`** | Section 7 | Linux kernel cgroups(7) | `cgroup v2 hierarchy` |
 | **`fstab`** | Section 5 | POSIX & NetBSD fstab(5) | `/etc/fstab` |
 | **`gettext`** | Section 3 | GNU gettext(3) & FreeBSD catgets(3) | `char *gettext(const char *msgid);` |
+| **`kqueue`** | Section 2 | FreeBSD kqueue(2) & OpenBSD kqueue(2) | `int kqueue(void); int kevent(int kq, ...);` |
+| **`netgraph`** | Section 9 | FreeBSD netgraph(9) | `struct ng_node *ng_make_node_common(...);` |
 | **`pacman.conf`** | Section 5 | Arch Linux pacman.conf(5) | `/etc/pacman.conf` |
+| **`pfctl`** | Section 8 | OpenBSD pfctl(8) & FreeBSD PF | `pfctl [-e] [-d] [-f file] [-s modifier]` |
 | **`pledge`** | Section 2 | OpenBSD pledge(2) | `int pledge(const char *promises, const char *execpromises);` |
 | **`pqc_signatures`** | Section 7 | OpenBSD signify(1) & NIST PQC Standard | `Post-Quantum Cryptographic Attestation Specification` |
 | **`seccomp`** | Section 2 | Linux seccomp(2) | `int seccomp(unsigned int operation, unsigned int flags, void *args);` |
@@ -23,6 +26,7 @@ This catalog consolidates Unix/Linux/BSD manual pages across all 9 standard POSI
 | **`sigma-quest`** | Section 6 | BSD Games tradition (rogue/hack) | `sigma-quest` |
 | **`sigma-sh`** | Section 1 | OpenBSD ksh(1) & GNU bash(1) | `sigma-sh [-c COMMAND] [FILE]` |
 | **`sigma-top`** | Section 1 | Linux htop(1) & FreeBSD top(1) | `sigma-top [-d DELAY] [-p PID]` |
+| **`sysctl`** | Section 8 | FreeBSD sysctl(8) & Linux procps sysctl(8) | `sysctl [-w] name[=value]...` |
 | **`unveil`** | Section 2 | OpenBSD unveil(2) | `int unveil(const char *path, const char *permissions);` |
 | **`vfs`** | Section 9 | FreeBSD & DragonFly BSD vfs(9) | `int vfs_mount(struct mount *mp, ...);` |
 | **`zfs`** | Section 4 | OpenZFS / FreeBSD zfs(4) | `/dev/zfs` |
@@ -161,6 +165,42 @@ catgets(3), ngettext(3)
 
 ---
 
+# kqueue(2)
+
+**Section:** 2 - Kernel System Calls
+**Origin/Inspiration:** FreeBSD kqueue(2) & OpenBSD kqueue(2)
+
+## SYNOPSIS
+```text
+int kqueue(void); int kevent(int kq, ...);
+```
+
+## DESCRIPTION
+Kernel event notification mechanism monitoring descriptor, signal, and process events.
+
+## SEE ALSO
+epoll(2), poll(2)
+
+---
+
+# netgraph(9)
+
+**Section:** 9 - Kernel Subsystems and BSD Internals
+**Origin/Inspiration:** FreeBSD netgraph(9)
+
+## SYNOPSIS
+```text
+struct ng_node *ng_make_node_common(...);
+```
+
+## DESCRIPTION
+Graph-based kernel networking subsystem for modular packet processing hooks.
+
+## SEE ALSO
+bpf(4), vfs(9)
+
+---
+
 # pacman.conf(5)
 
 **Section:** 5 - File Formats and Configurations
@@ -176,6 +216,28 @@ Package manager configuration file specifying repositories, mirrors, and signatu
 
 ## SEE ALSO
 sigma-pkg(8), pkg.conf(5)
+
+---
+
+# pfctl(8)
+
+**Section:** 8 - System Administration and Daemons
+**Origin/Inspiration:** OpenBSD pfctl(8) & FreeBSD PF
+
+## SYNOPSIS
+```text
+pfctl [-e] [-d] [-f file] [-s modifier]
+```
+
+## DESCRIPTION
+Control interface for Packet Filter (PF) firewall, NAT tables, and stateful tracking.
+
+## OPTIONS
+* `-e`: Enable Packet Filter firewall
+* `-f`: Load firewall rules from specified path
+
+## SEE ALSO
+pf.conf(5), nftables(8)
 
 ---
 
@@ -358,6 +420,28 @@ Interactive real-time process monitor with Cgroup v2 PSI metrics and per-CPU bre
 
 ## SEE ALSO
 htop(1), top(1)
+
+---
+
+# sysctl(8)
+
+**Section:** 8 - System Administration and Daemons
+**Origin/Inspiration:** FreeBSD sysctl(8) & Linux procps sysctl(8)
+
+## SYNOPSIS
+```text
+sysctl [-w] name[=value]...
+```
+
+## DESCRIPTION
+Inspects and dynamically configures kernel tunables and system state parameters.
+
+## OPTIONS
+* `-a`: Display all currently available kernel parameters
+* `-w`: Write a new value to specified parameter key
+
+## SEE ALSO
+sysctl.conf(5)
 
 ---
 
