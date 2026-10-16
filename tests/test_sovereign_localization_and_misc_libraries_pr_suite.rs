@@ -11,7 +11,10 @@ use sovereign_localization_and_misc_libraries_pr_suite::*;
 #[test]
 fn test_locales_and_gettext_full_workflow() {
     let mut engine = LocalesAndGettextInspirationsPrEngine::new();
-    assert_eq!(engine.resolve_effective_locale("LC_MESSAGES"), "en_US.UTF-8");
+    assert_eq!(
+        engine.resolve_effective_locale("LC_MESSAGES"),
+        "en_US.UTF-8"
+    );
 
     // Test German locale plural formula
     assert_eq!(engine.evaluate_plural_formula(0, "de_DE"), 1);
@@ -36,17 +39,25 @@ fn test_iconv_and_tzdata_full_workflow() {
 
     // Test UTF-8 -> ISO-8859-1 conversion
     let input = "Sovereign OS".as_bytes();
-    let latin1 = engine.iconv_convert(CharacterEncoding::Utf8, CharacterEncoding::Iso8859_1, input).unwrap();
+    let latin1 = engine
+        .iconv_convert(CharacterEncoding::Utf8, CharacterEncoding::Iso8859_1, input)
+        .unwrap();
     assert_eq!(latin1, input);
 
     // Test UTF-8 -> UTF-16LE conversion and back
-    let utf16 = engine.iconv_convert(CharacterEncoding::Utf8, CharacterEncoding::Utf16Le, input).unwrap();
+    let utf16 = engine
+        .iconv_convert(CharacterEncoding::Utf8, CharacterEncoding::Utf16Le, input)
+        .unwrap();
     assert_eq!(utf16.len(), input.len() * 2);
-    let utf8_back = engine.iconv_convert(CharacterEncoding::Utf16Le, CharacterEncoding::Utf8, &utf16).unwrap();
+    let utf8_back = engine
+        .iconv_convert(CharacterEncoding::Utf16Le, CharacterEncoding::Utf8, &utf16)
+        .unwrap();
     assert_eq!(String::from_utf8(utf8_back).unwrap(), "Sovereign OS");
 
     // Test tzdata DST offset lookup
-    let transition = engine.resolve_tz_offset("America/New_York", 1715000000).unwrap();
+    let transition = engine
+        .resolve_tz_offset("America/New_York", 1715000000)
+        .unwrap();
     assert_eq!(transition.abbrev, "EDT");
     assert_eq!(transition.utc_offset_seconds, -14400);
 
@@ -77,7 +88,9 @@ fn test_zlib_and_libffi_full_workflow() {
     );
     assert_eq!(cif.num_args, 3);
 
-    let result = engine.invoke_ffi_call(&cif, 0x4000, &[100, 200, 300]).unwrap();
+    let result = engine
+        .invoke_ffi_call(&cif, 0x4000, &[100, 200, 300])
+        .unwrap();
     assert_eq!(result, 600);
 
     let pr = engine.generate_pr_proposal();
@@ -125,7 +138,10 @@ fn test_sqlite_and_pcre_full_workflow() {
         .insert_row(
             "users",
             3,
-            vec![SqliteValue::Integer(3), SqliteValue::Text("developer".to_string())],
+            vec![
+                SqliteValue::Integer(3),
+                SqliteValue::Text("developer".to_string()),
+            ],
         )
         .unwrap();
 
@@ -156,7 +172,10 @@ fn test_libxml2_icu_and_codecs_full_workflow() {
     assert_eq!(graphemes.len(), 7);
 
     // Test PNG header parsing
-    let png_header = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0, 0, 64, 8];
+    let png_header = [
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 0, 0,
+        0, 64, 8,
+    ];
     let png_meta = engine.parse_image_header(&png_header).unwrap();
     assert_eq!(png_meta.format, ImageFormat::Png);
     assert_eq!(png_meta.width, 128);

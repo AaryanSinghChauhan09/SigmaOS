@@ -2482,8 +2482,8 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "dnf" | "dnf5" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos"
-            | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" => {
+            "dnf" | "dnf5" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel"
+            | "centos" | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
