@@ -38,7 +38,7 @@ pub enum ToolchainOptMode {
 /// Hardening profile inspired by Linux & BSD security posture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainHardeningMode {
-    FedoraFortifyLevel3,   // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
+    FedoraFortifyLevel3, // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
     StandardFortifyLevel2, // Standard Ubuntu/Debian hardening (-D_FORTIFY_SOURCE=2 -fstack-protector-strong)
     None,
 }
@@ -206,13 +206,16 @@ impl GccClangLlvmToolchainPrEngine {
 
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifest {
         ToolchainDevelopmentPrProposalManifest {
-            pr_title: "feat(toolchain): Implement Distro-Optimized GCC, Clang/LLVM, binutils & LLD Engine".to_string(),
+            pr_title:
+                "feat(toolchain): Implement Distro-Optimized GCC, Clang/LLVM, binutils & LLD Engine"
+                    .to_string(),
             target_subsystem: "Compiler & Linker Optimization Subsystem".to_string(),
             distro_inspirations: vec![
                 "Clear Linux (AVX-512/FMV auto-tuning & zero-overhead flag injection)".to_string(),
                 "CachyOS (ThinLTO, PGO, BORE CPU scheduler compiler passes)".to_string(),
                 "Gentoo (Portage USE flag conditionally compiled binary optimization)".to_string(),
-                "Fedora/NixOS (Fortify Source v3, Stack Clash Protection, DWARF5 debug indexes)".to_string(),
+                "Fedora/NixOS (Fortify Source v3, Stack Clash Protection, DWARF5 debug indexes)"
+                    .to_string(),
                 "OpenBSD (Retguard return address validation & static PIE binaries)".to_string(),
             ],
             tools_covered: vec![
@@ -223,9 +226,11 @@ impl GccClangLlvmToolchainPrEngine {
             ],
             key_features_added: vec![
                 "AVX-512 & AVX2 Function Multi-Versioning (FMV) dispatch matrix".to_string(),
-                "ThinLTO & Profile-Guided Optimization (PGO) automated profile collector".to_string(),
+                "ThinLTO & Profile-Guided Optimization (PGO) automated profile collector"
+                    .to_string(),
                 "OpenBSD Retguard return-address XOR cookie stack frame guard".to_string(),
-                "Fedora-style -D_FORTIFY_SOURCE=3 + -fstack-clash-protection hardening injections".to_string(),
+                "Fedora-style -D_FORTIFY_SOURCE=3 + -fstack-clash-protection hardening injections"
+                    .to_string(),
                 "LLD lock-free parallel ELF section merging (3.8x faster linking)".to_string(),
             ],
             performance_multiplier: "4.2x Faster Compilation & 3.8x Link Speedup".to_string(),
@@ -326,10 +331,7 @@ impl BuildSystemsPkgConfigPrEngine {
                     let rule_and_inputs: Vec<&str> = parts[1].trim().split_whitespace().collect();
                     if !rule_and_inputs.is_empty() {
                         let rule = rule_and_inputs[0].to_string();
-                        let inputs = rule_and_inputs[1..]
-                            .iter()
-                            .map(|s| s.to_string())
-                            .collect();
+                        let inputs = rule_and_inputs[1..].iter().map(|s| s.to_string()).collect();
                         nodes.push(NinjaBuildGraphNode {
                             target,
                             rule,
@@ -342,7 +344,11 @@ impl BuildSystemsPkgConfigPrEngine {
         nodes
     }
 
-    pub fn query_pkg_config(&self, pkg_name: &str, required_version: &str) -> Option<PkgConfigQueryResult> {
+    pub fn query_pkg_config(
+        &self,
+        pkg_name: &str,
+        required_version: &str,
+    ) -> Option<PkgConfigQueryResult> {
         if pkg_name.is_empty() {
             return None;
         }
@@ -449,7 +455,12 @@ impl DebuggerTracerProfilerPrEngine {
         Self
     }
 
-    pub fn strace_ebpf_event_interceptor(&self, syscall_nr: u64, pid: u32, args: [u64; 6]) -> SyscallTraceEvent {
+    pub fn strace_ebpf_event_interceptor(
+        &self,
+        syscall_nr: u64,
+        pid: u32,
+        args: [u64; 6],
+    ) -> SyscallTraceEvent {
         SyscallTraceEvent {
             syscall_nr,
             pid,
@@ -458,7 +469,13 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
-    pub fn dtrace_probe_fire(&self, provider: &str, probe_name: &str, arg0: u64, arg1: u64) -> DTraceProbeResult {
+    pub fn dtrace_probe_fire(
+        &self,
+        provider: &str,
+        probe_name: &str,
+        arg0: u64,
+        arg1: u64,
+    ) -> DTraceProbeResult {
         DTraceProbeResult {
             provider: provider.to_string(),
             probe_name: probe_name.to_string(),
@@ -468,7 +485,12 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
-    pub fn valgrind_shadow_memory_validate(&self, address: usize, _len: usize, is_write: bool) -> ShadowMemoryStatus {
+    pub fn valgrind_shadow_memory_validate(
+        &self,
+        address: usize,
+        _len: usize,
+        is_write: bool,
+    ) -> ShadowMemoryStatus {
         if address == 0 {
             return ShadowMemoryStatus::UseAfterFree;
         }
@@ -478,7 +500,12 @@ impl DebuggerTracerProfilerPrEngine {
         ShadowMemoryStatus::Valid
     }
 
-    pub fn perf_sample_hardware_counters(&self, cycles: u64, instructions: u64, cache_misses: u64) -> PerfSampleResult {
+    pub fn perf_sample_hardware_counters(
+        &self,
+        cycles: u64,
+        instructions: u64,
+        cache_misses: u64,
+    ) -> PerfSampleResult {
         let ipc = if cycles > 0 {
             instructions as f64 / cycles as f64
         } else {
@@ -504,7 +531,11 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
-    pub fn lldb_dwarf_expression_evaluator(&self, expr_bytes: &[u8], frame_ptr: u64) -> Result<u64, &'static str> {
+    pub fn lldb_dwarf_expression_evaluator(
+        &self,
+        expr_bytes: &[u8],
+        frame_ptr: u64,
+    ) -> Result<u64, &'static str> {
         if expr_bytes.is_empty() {
             return Err("Empty DWARF Expression");
         }
@@ -517,14 +548,22 @@ impl DebuggerTracerProfilerPrEngine {
     }
 
     pub fn ltrace_symbol_interceptor(&self, symbol_name: &str, plt_offset: u64) -> String {
-        format!("[ltrace] {}@PLT at 0x{:x} intercepted", symbol_name, plt_offset)
+        format!(
+            "[ltrace] {}@PLT at 0x{:x} intercepted",
+            symbol_name, plt_offset
+        )
     }
 
     pub fn ktrace_record_formatter(&self, pid: u32, trace_type: &str, record: &str) -> String {
         format!("[ktrace] PID {}: {} -> {}", pid, trace_type, record)
     }
 
-    pub fn ptrace_security_pledge_validator(&self, request: u32, pid: u32, pledge_mask: u32) -> bool {
+    pub fn ptrace_security_pledge_validator(
+        &self,
+        request: u32,
+        pid: u32,
+        pledge_mask: u32,
+    ) -> bool {
         // PTRACE_TRACEME = 0, PTRACE_PEEKTEXT = 1
         let allowed = (pledge_mask & 0x01) != 0;
         pid > 0 && (request <= 24) && allowed
@@ -589,7 +628,11 @@ impl VcsAndLanguageRuntimesPrEngine {
         Self
     }
 
-    pub fn git_packfile_index_lookup(&self, object_sha256: &[u8; 32], pack_index_data: &[u8]) -> Option<usize> {
+    pub fn git_packfile_index_lookup(
+        &self,
+        object_sha256: &[u8; 32],
+        pack_index_data: &[u8],
+    ) -> Option<usize> {
         if pack_index_data.len() < 8 {
             return None;
         }
@@ -601,8 +644,14 @@ impl VcsAndLanguageRuntimesPrEngine {
         }
     }
 
-    pub fn cargo_vendor_mirror_verify(&self, package_name: &str, checksum: &str, crate_tarball: &[u8]) -> CargoVendorMirrorResult {
-        let is_valid = !package_name.is_empty() && !checksum.is_empty() && !crate_tarball.is_empty();
+    pub fn cargo_vendor_mirror_verify(
+        &self,
+        package_name: &str,
+        checksum: &str,
+        crate_tarball: &[u8],
+    ) -> CargoVendorMirrorResult {
+        let is_valid =
+            !package_name.is_empty() && !checksum.is_empty() && !crate_tarball.is_empty();
         CargoVendorMirrorResult {
             package_name: package_name.to_string(),
             is_valid,
@@ -610,7 +659,11 @@ impl VcsAndLanguageRuntimesPrEngine {
         }
     }
 
-    pub fn go_cgo_zero_copy_bridge_dispatch(&self, buffer_ptr: usize, len: usize) -> Result<u32, ()> {
+    pub fn go_cgo_zero_copy_bridge_dispatch(
+        &self,
+        buffer_ptr: usize,
+        len: usize,
+    ) -> Result<u32, ()> {
         if buffer_ptr == 0 || len == 0 {
             Err(())
         } else {
@@ -618,7 +671,10 @@ impl VcsAndLanguageRuntimesPrEngine {
         }
     }
 
-    pub fn openjdk_graalvm_native_image_optimize(&self, jar_size_bytes: usize) -> GraalVmNativeImageResult {
+    pub fn openjdk_graalvm_native_image_optimize(
+        &self,
+        jar_size_bytes: usize,
+    ) -> GraalVmNativeImageResult {
         GraalVmNativeImageResult {
             original_jar_size_bytes: jar_size_bytes,
             native_elf_size_bytes: (jar_size_bytes as f64 * 0.40) as usize,
@@ -627,7 +683,11 @@ impl VcsAndLanguageRuntimesPrEngine {
     }
 
     pub fn python_bytecode_aot_compile(&self, source_path: &str, opt_level: u8) -> String {
-        format!("{}.pyc (opt_level={})", source_path.trim_end_matches(".py"), opt_level)
+        format!(
+            "{}.pyc (opt_level={})",
+            source_path.trim_end_matches(".py"),
+            opt_level
+        )
     }
 
     pub fn perl_cpan_vendor_sandbox_verify(&self, module_name: &str) -> bool {
@@ -635,7 +695,10 @@ impl VcsAndLanguageRuntimesPrEngine {
     }
 
     pub fn ruby_yjit_profile_evaluator(&self, opt_threshold: u32) -> String {
-        format!("YJIT compiled at threshold {} calls (0.01ms warm overhead)", opt_threshold)
+        format!(
+            "YJIT compiled at threshold {} calls (0.01ms warm overhead)",
+            opt_threshold
+        )
     }
 
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifest {
@@ -717,13 +780,18 @@ impl SovereignToolchainDevelopmentParityPrGateway {
         md.push_str("This Pull Request proposal introduces comprehensive `#![no_std]` and `alloc`-compatible ");
         md.push_str("toolchain and development ecosystem parity for SigmaOS, drawing architecture from flagship ");
         md.push_str("Linux distributions (Gentoo, Clear Linux, CachyOS, Fedora, Arch Linux, Debian, Void, Alpine) ");
-        md.push_str("and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Illumos).\n\n");
+        md.push_str(
+            "and BSD operating systems (FreeBSD, OpenBSD, NetBSD, DragonFly BSD, Illumos).\n\n",
+        );
         md.push_str("## Subsystem Proposals\n\n");
 
         for (i, p) in proposals.iter().enumerate() {
             md.push_str(&format!("### {}. {}\n\n", i + 1, p.pr_title));
             md.push_str(&format!("- **Target Subsystem**: {}\n", p.target_subsystem));
-            md.push_str(&format!("- **Performance Multiplier**: {}\n", p.performance_multiplier));
+            md.push_str(&format!(
+                "- **Performance Multiplier**: {}\n",
+                p.performance_multiplier
+            ));
             md.push_str(&format!("- **Status**: {}\n\n", p.status));
 
             md.push_str("#### Tools Covered\n");

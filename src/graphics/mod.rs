@@ -1,6 +1,5 @@
 pub mod advanced_accel;
 pub mod bsd_graphics;
-pub mod sovereign_graphics_display_pr_suite;
 pub mod compositor;
 pub mod drm_kms;
 pub mod gaming_layer;
@@ -11,6 +10,7 @@ pub mod nvidia_prime;
 pub mod paint;
 pub mod raytracer;
 pub mod render3d;
+pub mod sovereign_graphics_display_pr_suite;
 pub mod vector_engine;
 pub mod video;
 pub mod video_editor;
@@ -24,8 +24,8 @@ pub use drm_kms::{
     DrmAtomicCommit, DrmConnector, DrmConnectorStatus, DrmConnectorType, DrmCrtc, DrmEncoder,
     DrmFramebuffer, DrmKmsDevice, DrmMode, DrmNodeType, DrmPlane, DrmPlaneType, GemBuffer,
 };
-pub use video::{PixelRgba, VideoFrame};
 pub use sovereign_graphics_display_pr_suite::*;
+pub use video::{PixelRgba, VideoFrame};
 
 // Color type for UI compatibility
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

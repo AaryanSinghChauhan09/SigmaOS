@@ -72,7 +72,7 @@ impl PasswordManager {
             entries: BTreeMap::new(),
             folders: BTreeMap::new(),
             master_password_hash: None,
-            auto_lock_timeout: 300, // 5 minutes
+            auto_lock_timeout: 300,      // 5 minutes
             clipboard_clear_timeout: 30, // 30 seconds
             next_entry_id: AtomicU32::new(1),
             next_folder_id: AtomicU32::new(1),
@@ -121,7 +121,14 @@ impl PasswordManager {
     }
 
     /// Add password entry
-    pub fn add_entry(&mut self, title: String, username: String, password: String, url: String, folder_id: Option<u32>) -> u32 {
+    pub fn add_entry(
+        &mut self,
+        title: String,
+        username: String,
+        password: String,
+        url: String,
+        folder_id: Option<u32>,
+    ) -> u32 {
         let id = self.next_entry_id.fetch_add(1, Ordering::Relaxed);
         let now = 0; // Simplified - would use actual timestamp
         let entry = PasswordEntry {
@@ -140,7 +147,15 @@ impl PasswordManager {
     }
 
     /// Update entry
-    pub fn update_entry(&mut self, id: u32, title: String, username: String, password: String, url: String, notes: String) -> Result<(), &'static str> {
+    pub fn update_entry(
+        &mut self,
+        id: u32,
+        title: String,
+        username: String,
+        password: String,
+        url: String,
+        notes: String,
+    ) -> Result<(), &'static str> {
         let entry = self.entries.get_mut(&id).ok_or("Entry not found")?;
         entry.title = title;
         entry.username = username;
@@ -189,7 +204,7 @@ impl PasswordManager {
     /// Generate password
     pub fn generate_password(&self, options: &GeneratorOptions) -> String {
         let mut charset = String::new();
-        
+
         if options.lowercase {
             charset.push_str("abcdefghijklmnopqrstuvwxyz");
         }
@@ -202,7 +217,7 @@ impl PasswordManager {
         if options.symbols {
             charset.push_str("!@#$%^&*()_+-=[]{}|;:,.<>?/");
         }
-        
+
         if options.exclude_ambiguous {
             // Remove ambiguous characters
             let ambiguous = ['i', 'l', '1', 'O', '0'];
@@ -210,11 +225,11 @@ impl PasswordManager {
                 charset = charset.chars().filter(|&x| x != c).collect();
             }
         }
-        
+
         if charset.is_empty() {
             return String::new();
         }
-        
+
         let chars: Vec<char> = charset.chars().collect();
         let mut password = String::new();
         for _ in 0..options.length {
@@ -227,7 +242,7 @@ impl PasswordManager {
     /// Check password strength
     pub fn check_strength(&self, password: &str) -> PasswordStrength {
         let mut score = 0;
-        
+
         if password.len() >= 8 {
             score += 1;
         }
@@ -246,7 +261,7 @@ impl PasswordManager {
         if password.chars().any(|c| !c.is_alphanumeric()) {
             score += 1;
         }
-        
+
         match score {
             0..=1 => PasswordStrength::VeryWeak,
             2 => PasswordStrength::Weak,
@@ -291,7 +306,9 @@ pub fn init_password_manager() {
 /// Get password manager
 pub fn get_password_manager() -> &'static mut PasswordManager {
     unsafe {
-        PASSWORD_MANAGER.as_mut().expect("Password manager not initialized")
+        PASSWORD_MANAGER
+            .as_mut()
+            .expect("Password manager not initialized")
     }
 }
 
@@ -320,7 +337,7 @@ mod tests {
             "user@gmail.com".to_string(),
             "password123".to_string(),
             "https://gmail.com".to_string(),
-            None
+            None,
         );
         assert_eq!(pm.entry_count(), 1);
     }
@@ -345,9 +362,12 @@ mod tests {
         let pm = PasswordManager::new();
         let strength = pm.check_strength("weak");
         assert_eq!(strength, PasswordStrength::VeryWeak);
-        
+
         let strength = pm.check_strength("StrongP@ssw0rd!");
-        assert!(matches!(strength, PasswordStrength::Strong | PasswordStrength::VeryStrong));
+        assert!(matches!(
+            strength,
+            PasswordStrength::Strong | PasswordStrength::VeryStrong
+        ));
     }
 
     #[test]
@@ -358,9 +378,9 @@ mod tests {
             "user@gmail.com".to_string(),
             "password".to_string(),
             "https://gmail.com".to_string(),
-            None
+            None,
         );
-        
+
         let results = pm.search_entries("gmail");
         assert_eq!(results.len(), 1);
     }

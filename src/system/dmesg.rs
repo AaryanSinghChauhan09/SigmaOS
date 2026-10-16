@@ -100,7 +100,13 @@ impl DmesgRingBuffer {
     pub fn format_record(record: &KernelLogRecord) -> String {
         let sec = record.timestamp_ns / 1_000_000_000;
         let usec = (record.timestamp_ns % 1_000_000_000) / 1000;
-        alloc::format!("[{:5}.{:06}] {:?}: {}", sec, usec, record.level, record.message)
+        alloc::format!(
+            "[{:5}.{:06}] {:?}: {}",
+            sec,
+            usec,
+            record.level,
+            record.message
+        )
     }
 
     pub fn clear(&mut self) {

@@ -38,9 +38,8 @@ impl PageCompactor {
         const EMPTY_LIST: Vec<u64> = Vec::new();
         Self {
             free_lists: [
+                EMPTY_LIST, EMPTY_LIST, EMPTY_LIST, EMPTY_LIST, EMPTY_LIST, EMPTY_LIST, EMPTY_LIST,
                 EMPTY_LIST, EMPTY_LIST, EMPTY_LIST, EMPTY_LIST,
-                EMPTY_LIST, EMPTY_LIST, EMPTY_LIST, EMPTY_LIST,
-                EMPTY_LIST, EMPTY_LIST, EMPTY_LIST,
             ],
             total_pages,
             migrated_pages: 0,

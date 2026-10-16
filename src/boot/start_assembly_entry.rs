@@ -133,8 +133,16 @@ pub struct EarlyCmdlineParser {
 impl EarlyCmdlineParser {
     pub fn parse(cmdline: &str) -> Self {
         Self {
-            earlyprintk: if cmdline.contains("earlyprintk=serial") { "serial".to_string() } else { "vga".to_string() },
-            console: if cmdline.contains("console=ttyS0") { "ttyS0".to_string() } else { "tty0".to_string() },
+            earlyprintk: if cmdline.contains("earlyprintk=serial") {
+                "serial".to_string()
+            } else {
+                "vga".to_string()
+            },
+            console: if cmdline.contains("console=ttyS0") {
+                "ttyS0".to_string()
+            } else {
+                "tty0".to_string()
+            },
             debug_mode: cmdline.contains("debug"),
         }
     }
@@ -165,7 +173,11 @@ impl StartAssemblyEntryEngine {
         let is_valid = magic == MULTIBOOT2_MAGIC;
         Multiboot2HeaderValidation {
             magic_valid: is_valid,
-            bootloader_name: if is_valid { "GRUB/sigma-boot".to_string() } else { "Unknown".to_string() },
+            bootloader_name: if is_valid {
+                "GRUB/sigma-boot".to_string()
+            } else {
+                "Unknown".to_string()
+            },
             memory_map_entries: if is_valid { 8 } else { 0 },
         }
     }
@@ -215,7 +227,8 @@ impl StartAssemblyEntryEngine {
              .hang:\n\
                  hlt\n\
                  jmp .hang\n",
-            MULTIBOOT2_MAGIC, COM1_UART_BASE
+            MULTIBOOT2_MAGIC,
+            COM1_UART_BASE
         )
     }
 }

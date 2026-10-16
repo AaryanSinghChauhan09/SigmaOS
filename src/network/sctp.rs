@@ -74,9 +74,9 @@ pub struct DataChunk {
     pub unordered: bool,
     pub beginning_fragment: bool,
     pub ending_fragment: bool,
-    pub tsn: u32,            // Transmission Sequence Number
-    pub stream_id: u16,      // Stream Identifier
-    pub stream_seq: u16,     // Stream Sequence Number
+    pub tsn: u32,        // Transmission Sequence Number
+    pub stream_id: u16,  // Stream Identifier
+    pub stream_seq: u16, // Stream Sequence Number
     pub payload_proto_id: u32,
     pub user_data: Vec<u8>,
 }
@@ -85,7 +85,7 @@ pub struct DataChunk {
 #[derive(Debug, Clone)]
 pub struct SackChunk {
     pub cumulative_tsn_ack: u32,
-    pub a_rwnd: u32, // Advertised receiver window credit
+    pub a_rwnd: u32,                     // Advertised receiver window credit
     pub gap_ack_blocks: Vec<(u16, u16)>, // Start and End offsets relative to cumulative TSN
     pub duplicate_tsns: Vec<u32>,
 }
@@ -132,22 +132,33 @@ pub struct SctpAssociation {
 
 impl SctpAssociation {
     /// Create a new local association initiating a connection.
-    pub fn new(local_port: u16, peer_port: u16, local_ips: Vec<[u8; 4]>, peer_ips: Vec<[u8; 4]>) -> Self {
-        let local_addrs = local_ips.into_iter().map(|ip| TransportAddress {
-            ip,
-            port: local_port,
-            active: true,
-            rtt_ms: 50,
-            error_count: 0,
-        }).collect();
+    pub fn new(
+        local_port: u16,
+        peer_port: u16,
+        local_ips: Vec<[u8; 4]>,
+        peer_ips: Vec<[u8; 4]>,
+    ) -> Self {
+        let local_addrs = local_ips
+            .into_iter()
+            .map(|ip| TransportAddress {
+                ip,
+                port: local_port,
+                active: true,
+                rtt_ms: 50,
+                error_count: 0,
+            })
+            .collect();
 
-        let peer_addrs = peer_ips.into_iter().map(|ip| TransportAddress {
-            ip,
-            port: peer_port,
-            active: true,
-            rtt_ms: 50,
-            error_count: 0,
-        }).collect();
+        let peer_addrs = peer_ips
+            .into_iter()
+            .map(|ip| TransportAddress {
+                ip,
+                port: peer_port,
+                active: true,
+                rtt_ms: 50,
+                error_count: 0,
+            })
+            .collect();
 
         Self {
             state: AssociationState::Closed,
@@ -179,7 +190,12 @@ impl SctpAssociation {
     }
 
     /// Handle incoming INIT-ACK, generate COOKIE-ECHO.
-    pub fn handle_init_ack(&mut self, peer_vtag: u32, initial_tsn: u32, cookie: &[u8]) -> Result<Vec<u8>, SctpError> {
+    pub fn handle_init_ack(
+        &mut self,
+        peer_vtag: u32,
+        initial_tsn: u32,
+        cookie: &[u8],
+    ) -> Result<Vec<u8>, SctpError> {
         if self.state != AssociationState::CookieWait {
             return Err(SctpError::InvalidState);
         }
@@ -201,7 +217,13 @@ impl SctpAssociation {
     }
 
     /// Queue user message to send on a specific stream.
-    pub fn send_message(&mut self, stream_id: u16, ppid: u32, unordered: bool, data: Vec<u8>) -> Result<u32, SctpError> {
+    pub fn send_message(
+        &mut self,
+        stream_id: u16,
+        ppid: u32,
+        unordered: bool,
+        data: Vec<u8>,
+    ) -> Result<u32, SctpError> {
         if self.state != AssociationState::Established {
             return Err(SctpError::NotConnected);
         }
@@ -228,7 +250,8 @@ impl SctpAssociation {
     pub fn handle_sack(&mut self, sack: &SackChunk) {
         self.peer_rwnd = sack.a_rwnd;
         // Remove acknowledged TSNs up to cumulative_tsn_ack
-        self.unacked_data.retain(|&tsn, _| tsn > sack.cumulative_tsn_ack);
+        self.unacked_data
+            .retain(|&tsn, _| tsn > sack.cumulative_tsn_ack);
     }
 }
 

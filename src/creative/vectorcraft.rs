@@ -43,7 +43,8 @@ pub struct PathPoint {
 impl PathPoint {
     pub fn new(x: f32, y: f32) -> Self {
         Self {
-            x, y,
+            x,
+            y,
             control_in_x: x,
             control_in_y: y,
             control_out_x: x,
@@ -53,7 +54,8 @@ impl PathPoint {
 
     pub fn with_controls(x: f32, y: f32, cin_x: f32, cin_y: f32, cout_x: f32, cout_y: f32) -> Self {
         Self {
-            x, y,
+            x,
+            y,
             control_in_x: cin_x,
             control_in_y: cin_y,
             control_out_x: cout_x,
@@ -148,12 +150,12 @@ impl VectorEditor {
             exact_booleans: true,
         }
     }
-    
+
     /// Initialize vector editor
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Create layer
     pub fn create_layer(&mut self, name: String) -> u32 {
         let id = self.next_layer_id.fetch_add(1, Ordering::Relaxed);
@@ -175,21 +177,21 @@ impl VectorEditor {
         self.layers.insert(id, layer);
         id
     }
-    
+
     /// Add shape to layer
     pub fn add_shape(&mut self, layer_id: u32, shape: Shape) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         layer.shapes.push(shape);
         Ok(())
     }
-    
+
     /// Add path to layer
     pub fn add_path(&mut self, layer_id: u32, path: Path) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         layer.paths.push(path);
         Ok(())
     }
-    
+
     /// Get layer
     pub fn get_layer(&self, id: u32) -> Option<&VectorLayer> {
         self.layers.get(&id)
@@ -201,14 +203,22 @@ impl VectorEditor {
     }
 
     /// Perform boolean operation on shapes
-    pub fn boolean_operation(&mut self, layer_id: u32, operation: BooleanOperation) -> Result<(), &'static str> {
+    pub fn boolean_operation(
+        &mut self,
+        layer_id: u32,
+        operation: BooleanOperation,
+    ) -> Result<(), &'static str> {
         self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         // Implementation would perform exact boolean operations
         Ok(())
     }
 
     /// Set shape properties
-    pub fn set_shape_properties(&mut self, layer_id: u32, properties: ShapeProperties) -> Result<(), &'static str> {
+    pub fn set_shape_properties(
+        &mut self,
+        layer_id: u32,
+        properties: ShapeProperties,
+    ) -> Result<(), &'static str> {
         let layer = self.layers.get_mut(&layer_id).ok_or("Layer not found")?;
         layer.properties = properties;
         Ok(())
@@ -260,22 +270,20 @@ pub fn init_vectorcraft() {
 
 /// Get global vectorcraft
 pub fn get_vectorcraft() -> Option<&'static mut VectorEditor> {
-    unsafe {
-        VECTORCRAFT.as_mut()
-    }
+    unsafe { VECTORCRAFT.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_vectorcraft_init() {
         let mut editor = VectorEditor::new();
         editor.init();
         assert!(editor.is_active());
     }
-    
+
     #[test]
     fn test_create_layer() {
         let mut editor = VectorEditor::new();
@@ -283,7 +291,7 @@ mod tests {
         let id = editor.create_layer("Layer1".to_string());
         assert!(editor.get_layer(id).is_some());
     }
-    
+
     #[test]
     fn test_add_shape() {
         let mut editor = VectorEditor::new();
@@ -315,7 +323,9 @@ mod tests {
         let mut editor = VectorEditor::new();
         editor.init();
         let id = editor.create_layer("Layer1".to_string());
-        editor.boolean_operation(id, BooleanOperation::Union).unwrap();
+        editor
+            .boolean_operation(id, BooleanOperation::Union)
+            .unwrap();
     }
 
     #[test]
@@ -333,7 +343,11 @@ mod tests {
         editor.init();
         let id = editor.create_layer("Layer1".to_string());
         editor.toggle_visibility(id).unwrap();
-        assert!(!editor.get_layer(id).unwrap().visible.load(Ordering::Relaxed));
+        assert!(!editor
+            .get_layer(id)
+            .unwrap()
+            .visible
+            .load(Ordering::Relaxed));
     }
 
     #[test]

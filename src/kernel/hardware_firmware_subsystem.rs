@@ -60,11 +60,18 @@ impl AcpiPowerGovernor {
         }
     }
 
-    pub fn update_temperature(&mut self, zone_name: &str, temp_milli_c: u32) -> Result<bool, String> {
+    pub fn update_temperature(
+        &mut self,
+        zone_name: &str,
+        temp_milli_c: u32,
+    ) -> Result<bool, String> {
         if let Some(zone) = self.thermal_zones.get_mut(zone_name) {
             zone.current_temp_milli_celsius = temp_milli_c;
             if temp_milli_c >= zone.trip_point_critical_milli_celsius {
-                return Err(format!("CRITICAL: Thermal runaway on {} at {}mC", zone_name, temp_milli_c));
+                return Err(format!(
+                    "CRITICAL: Thermal runaway on {} at {}mC",
+                    zone_name, temp_milli_c
+                ));
             }
             zone.fan_active = temp_milli_c >= zone.trip_point_passive_milli_celsius;
             Ok(zone.fan_active)
@@ -74,7 +81,10 @@ impl AcpiPowerGovernor {
     }
 
     pub fn request_sleep_state(&mut self, target: AcpiSleepState) -> Result<(), String> {
-        if target == AcpiSleepState::S4Hibernate && self.battery_percentage < 5 && !self.ac_connected {
+        if target == AcpiSleepState::S4Hibernate
+            && self.battery_percentage < 5
+            && !self.ac_connected
+        {
             return Err("Cannot hibernate: battery critically low with no AC adapter".to_string());
         }
         self.sleep_state = target;
@@ -140,9 +150,12 @@ impl CpuFreqGovernorManager {
 
     pub fn adjust_load(&mut self, core_id: u32, utilization_percent: u8) -> Result<u32, String> {
         if let Some(core) = self.cores.get_mut(&core_id) {
-            if core.governor == CpuGovernorPolicy::Schedutil || core.governor == CpuGovernorPolicy::Ondemand {
+            if core.governor == CpuGovernorPolicy::Schedutil
+                || core.governor == CpuGovernorPolicy::Ondemand
+            {
                 let range = core.max_freq_khz - core.min_freq_khz;
-                let target = core.min_freq_khz + ((range as u64 * utilization_percent as u64) / 100) as u32;
+                let target =
+                    core.min_freq_khz + ((range as u64 * utilization_percent as u64) / 100) as u32;
                 core.cur_freq_khz = target.clamp(core.min_freq_khz, core.max_freq_khz);
             }
             Ok(core.cur_freq_khz)
@@ -183,7 +196,10 @@ impl PciExpressBusTree {
     }
 
     pub fn find_by_class(&self, class_code: u8) -> Vec<&PciDeviceDescriptor> {
-        self.devices.iter().filter(|d| d.class_code == class_code).collect()
+        self.devices
+            .iter()
+            .filter(|d| d.class_code == class_code)
+            .collect()
     }
 
     pub fn record_aer_error(&mut self, bus: u8, dev: u8, func: u8) -> Result<u32, String> {
@@ -193,7 +209,10 @@ impl PciExpressBusTree {
                 return Ok(d.aer_error_count);
             }
         }
-        Err(format!("PCIe device {:02x}:{:02x}.{:x} not found", bus, dev, func))
+        Err(format!(
+            "PCIe device {:02x}:{:02x}.{:x} not found",
+            bus, dev, func
+        ))
     }
 }
 
@@ -281,7 +300,8 @@ impl IommuDomainManager {
 
     pub fn translate_iova(&self, iova: u64) -> Option<u64> {
         for entry in &self.translations {
-            if iova >= entry.iova_address && iova < entry.iova_address + (entry.length_bytes as u64) {
+            if iova >= entry.iova_address && iova < entry.iova_address + (entry.length_bytes as u64)
+            {
                 let offset = iova - entry.iova_address;
                 return Some(entry.physical_address + offset);
             }
@@ -321,7 +341,9 @@ impl FirmwareMicrocodeUpdater {
         let matching: Vec<&MicrocodePatch> = self
             .patches
             .iter()
-            .filter(|p| p.processor_signature == signature && p.update_revision > self.current_revision)
+            .filter(|p| {
+                p.processor_signature == signature && p.update_revision > self.current_revision
+            })
             .collect();
 
         if let Some(best) = matching.into_iter().max_by_key(|p| p.update_revision) {
@@ -372,10 +394,13 @@ mod tests {
         let mut acpi = AcpiPowerGovernor::new();
         assert_eq!(acpi.sleep_state, AcpiSleepState::S0Working);
 
-        let fan = acpi.update_temperature("TZ00", 76_000).expect("Update temp");
+        let fan = acpi
+            .update_temperature("TZ00", 76_000)
+            .expect("Update temp");
         assert!(fan, "Fan should activate at 76C");
 
-        acpi.request_sleep_state(AcpiSleepState::S3SuspendToRam).expect("S3 sleep");
+        acpi.request_sleep_state(AcpiSleepState::S3SuspendToRam)
+            .expect("S3 sleep");
         assert_eq!(acpi.sleep_state, AcpiSleepState::S3SuspendToRam);
     }
 
@@ -418,7 +443,9 @@ mod tests {
     fn test_dm_crypt_and_iommu() {
         let mut dm = DeviceMapperSubsystem::new();
         dm.create_luks_target("root_crypt", 100_000_000, "aes-xts-plain64");
-        let unlocked = dm.unlock_volume("root_crypt", "supersecret").expect("Unlock");
+        let unlocked = dm
+            .unlock_volume("root_crypt", "supersecret")
+            .expect("Unlock");
         assert!(unlocked);
 
         let mut iommu = IommuDomainManager::new(10);

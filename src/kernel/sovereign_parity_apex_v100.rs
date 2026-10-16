@@ -35,11 +35,23 @@ impl SysctlTunablesEngine {
     pub fn new() -> Self {
         let mut t = BTreeMap::new();
         t.insert("vm.swappiness".to_string(), SysctlValue::Integer(60));
-        t.insert("vm.vfs_cache_pressure".to_string(), SysctlValue::Integer(100));
-        t.insert("net.ipv4.ip_forward".to_string(), SysctlValue::Boolean(false));
-        t.insert("net.ipv4.tcp_congestion_control".to_string(), SysctlValue::String("bbr".to_string()));
+        t.insert(
+            "vm.vfs_cache_pressure".to_string(),
+            SysctlValue::Integer(100),
+        );
+        t.insert(
+            "net.ipv4.ip_forward".to_string(),
+            SysctlValue::Boolean(false),
+        );
+        t.insert(
+            "net.ipv4.tcp_congestion_control".to_string(),
+            SysctlValue::String("bbr".to_string()),
+        );
         t.insert("kernel.pid_max".to_string(), SysctlValue::Integer(4194304));
-        t.insert("fs.file-max".to_string(), SysctlValue::Integer(9223372036854775807));
+        t.insert(
+            "fs.file-max".to_string(),
+            SysctlValue::Integer(9223372036854775807),
+        );
         Self { tunables: t }
     }
 
@@ -94,13 +106,15 @@ impl UdevHotplugManager {
     pub fn dispatch_event(&mut self, event: UdevDeviceEvent) {
         match event.action {
             UdevAction::Add | UdevAction::Online => {
-                self.active_devices.insert(event.devnode.clone(), event.clone());
+                self.active_devices
+                    .insert(event.devnode.clone(), event.clone());
             }
             UdevAction::Remove => {
                 self.active_devices.remove(&event.devnode);
             }
             UdevAction::Change => {
-                self.active_devices.insert(event.devnode.clone(), event.clone());
+                self.active_devices
+                    .insert(event.devnode.clone(), event.clone());
             }
         }
         self.event_log.push_back(event);
@@ -110,7 +124,10 @@ impl UdevHotplugManager {
     }
 
     pub fn find_by_subsystem(&self, subsystem: &str) -> Vec<&UdevDeviceEvent> {
-        self.active_devices.values().filter(|d| d.subsystem == subsystem).collect()
+        self.active_devices
+            .values()
+            .filter(|d| d.subsystem == subsystem)
+            .collect()
     }
 }
 
@@ -359,8 +376,13 @@ impl SovereignParityApexV100Engine {
         Self {
             sysctl: Arc::new(Mutex::new(SysctlTunablesEngine::new())),
             udev: Arc::new(Mutex::new(UdevHotplugManager::new())),
-            zram: Arc::new(Mutex::new(ZramSwapDevice::new("zram0", 8 * 1024 * 1024 * 1024))), // 8GB
-            seccomp: Arc::new(Mutex::new(SeccompBpfFilter::new(SeccompAction::KillProcess))),
+            zram: Arc::new(Mutex::new(ZramSwapDevice::new(
+                "zram0",
+                8 * 1024 * 1024 * 1024,
+            ))), // 8GB
+            seccomp: Arc::new(Mutex::new(SeccompBpfFilter::new(
+                SeccompAction::KillProcess,
+            ))),
             tpm: Arc::new(Mutex::new(Tpm2SecurityModule::new())),
             fuse: Arc::new(Mutex::new(FuseUserspaceBridge::new())),
             watchdog: Arc::new(Mutex::new(HardwareWatchdogGovernor::new(60))),
@@ -383,7 +405,9 @@ mod tests {
     fn test_sysctl_tunables() {
         let mut sysctl = SysctlTunablesEngine::new();
         assert_eq!(sysctl.get("vm.swappiness"), Some(&SysctlValue::Integer(60)));
-        sysctl.set("vm.swappiness", SysctlValue::Integer(10)).unwrap();
+        sysctl
+            .set("vm.swappiness", SysctlValue::Integer(10))
+            .unwrap();
         assert_eq!(sysctl.get("vm.swappiness"), Some(&SysctlValue::Integer(10)));
     }
 

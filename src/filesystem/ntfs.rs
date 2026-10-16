@@ -110,9 +110,7 @@ impl NtfsBpb {
 
     /// Byte offset of the MFT on the volume.
     pub fn mft_byte_offset(&self) -> u64 {
-        self.mft_lcn
-            * self.sectors_per_cluster as u64
-            * self.bytes_per_sector as u64
+        self.mft_lcn * self.sectors_per_cluster as u64 * self.bytes_per_sector as u64
     }
 }
 
@@ -419,7 +417,9 @@ pub fn decode_runlist(data: &[u8]) -> Result<Vec<Run>, NtfsError> {
                 delta |= !((1i64 << (8 * off_bytes)) - 1);
             }
             pos += off_bytes;
-            current_lcn = current_lcn.checked_add(delta).ok_or(NtfsError::InvalidRunlist)?;
+            current_lcn = current_lcn
+                .checked_add(delta)
+                .ok_or(NtfsError::InvalidRunlist)?;
             Some(current_lcn as u64)
         } else {
             // Sparse run.
@@ -427,7 +427,11 @@ pub fn decode_runlist(data: &[u8]) -> Result<Vec<Run>, NtfsError> {
             None
         };
 
-        runs.push(Run { vcn: current_vcn, length: run_len, lcn });
+        runs.push(Run {
+            vcn: current_vcn,
+            length: run_len,
+            lcn,
+        });
         current_vcn += run_len;
     }
     Ok(runs)
@@ -553,13 +557,16 @@ impl NtfsVolume {
     /// Initialise an NTFS volume from the raw VBR sector.
     pub fn open(vbr: &[u8; 512]) -> Result<Self, NtfsError> {
         // SAFETY: buffer is exactly 512 bytes.
-        let bpb: NtfsBpb =
-            unsafe { core::ptr::read_unaligned(vbr.as_ptr() as *const NtfsBpb) };
+        let bpb: NtfsBpb = unsafe { core::ptr::read_unaligned(vbr.as_ptr() as *const NtfsBpb) };
         if !bpb.is_ntfs() {
             return Err(NtfsError::NotNtfs);
         }
         let mft_record_size = bpb.mft_record_size();
-        Ok(NtfsVolume { bpb, mft_record_size, mft_runs: Vec::new() })
+        Ok(NtfsVolume {
+            bpb,
+            mft_record_size,
+            mft_runs: Vec::new(),
+        })
     }
 
     /// Load the MFT runlist after reading the boot MFT record from the device.
@@ -583,7 +590,10 @@ impl NtfsVolume {
     /// Parse attributes from raw MFT record bytes.
     ///
     /// Returns a list of `(AttributeType, byte_offset_in_record)` pairs.
-    pub fn parse_attributes(&self, record: &[u8]) -> Result<Vec<(AttributeType, usize)>, NtfsError> {
+    pub fn parse_attributes(
+        &self,
+        record: &[u8],
+    ) -> Result<Vec<(AttributeType, usize)>, NtfsError> {
         let hdr: MftRecordHeader =
             unsafe { core::ptr::read_unaligned(record.as_ptr() as *const MftRecordHeader) };
         if !hdr.is_valid() {
@@ -592,8 +602,9 @@ impl NtfsVolume {
         let mut attrs = Vec::new();
         let mut offset = hdr.first_attribute_offset as usize;
         while offset + core::mem::size_of::<AttributeHeader>() <= record.len() {
-            let attr: AttributeHeader =
-                unsafe { core::ptr::read_unaligned(record[offset..].as_ptr() as *const AttributeHeader) };
+            let attr: AttributeHeader = unsafe {
+                core::ptr::read_unaligned(record[offset..].as_ptr() as *const AttributeHeader)
+            };
             if attr.attr_type == ATTR_END_MARKER || attr.length == 0 {
                 break;
             }

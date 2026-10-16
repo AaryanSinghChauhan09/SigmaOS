@@ -9,7 +9,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Notification urgency
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,7 +34,14 @@ pub struct Notification {
 }
 
 impl Notification {
-    pub fn new(id: u32, app_name: String, summary: String, body: String, urgency: NotificationUrgency, timeout: u32) -> Self {
+    pub fn new(
+        id: u32,
+        app_name: String,
+        summary: String,
+        body: String,
+        urgency: NotificationUrgency,
+        timeout: u32,
+    ) -> Self {
         Self {
             id,
             app_name,
@@ -46,28 +53,28 @@ impl Notification {
             dismissed: AtomicBool::new(false),
         }
     }
-    
+
     /// Show notification
     pub fn show(&self) {
         self.visible.store(true, Ordering::Relaxed);
     }
-    
+
     /// Hide notification
     pub fn hide(&self) {
         self.visible.store(false, Ordering::Relaxed);
     }
-    
+
     /// Dismiss notification
     pub fn dismiss(&self) {
         self.dismissed.store(true, Ordering::Relaxed);
         self.hide();
     }
-    
+
     /// Is visible
     pub fn is_visible(&self) -> bool {
         self.visible.load(Ordering::Relaxed)
     }
-    
+
     /// Is dismissed
     pub fn is_dismissed(&self) -> bool {
         self.dismissed.load(Ordering::Relaxed)
@@ -119,72 +126,88 @@ impl MakoDaemon {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize mako daemon
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Create notification
-    pub fn create_notification(&mut self, app_name: String, summary: String, body: String, urgency: NotificationUrgency) -> u32 {
+    pub fn create_notification(
+        &mut self,
+        app_name: String,
+        summary: String,
+        body: String,
+        urgency: NotificationUrgency,
+    ) -> u32 {
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let timeout = self.config.default_timeout;
         let notification = Notification::new(id, app_name, summary, body, urgency, timeout);
         self.notifications.insert(id, notification);
         id
     }
-    
+
     /// Get notification
     pub fn get_notification(&self, id: u32) -> Option<&Notification> {
         self.notifications.get(&id)
     }
-    
+
     /// Get mutable notification
     pub fn get_notification_mut(&mut self, id: u32) -> Option<&mut Notification> {
         self.notifications.get_mut(&id)
     }
-    
+
     /// Show notification
     pub fn show_notification(&self, id: u32) -> Result<(), &'static str> {
-        let notification = self.notifications.get(&id).ok_or("Notification not found")?;
+        let notification = self
+            .notifications
+            .get(&id)
+            .ok_or("Notification not found")?;
         notification.show();
         Ok(())
     }
-    
+
     /// Dismiss notification
     pub fn dismiss_notification(&self, id: u32) -> Result<(), &'static str> {
-        let notification = self.notifications.get(&id).ok_or("Notification not found")?;
+        let notification = self
+            .notifications
+            .get(&id)
+            .ok_or("Notification not found")?;
         notification.dismiss();
         Ok(())
     }
-    
+
     /// Close notification
     pub fn close_notification(&mut self, id: u32) -> Result<(), &'static str> {
-        self.notifications.remove(&id).ok_or("Notification not found")?;
+        self.notifications
+            .remove(&id)
+            .ok_or("Notification not found")?;
         Ok(())
     }
-    
+
     /// Get visible notifications
     pub fn get_visible_notifications(&self) -> Vec<&Notification> {
-        let mut visible: Vec<_> = self.notifications.values()
+        let mut visible: Vec<_> = self
+            .notifications
+            .values()
             .filter(|n| n.is_visible() && !n.is_dismissed())
             .collect();
-        
+
         if self.config.sort {
             visible.sort_by(|a, b| (b.urgency as i32).cmp(&(a.urgency as i32)));
         }
-        
+
         visible.truncate(self.config.max_visible as usize);
         visible
     }
-    
+
     /// Dismiss all notifications
     pub fn dismiss_all(&self) {
         for notification in self.notifications.values() {
             notification.dismiss();
         }
     }
-    
+
     /// Set configuration
     pub fn set_config(&mut self, config: MakoConfig) {
         self.config = config;
@@ -209,13 +232,16 @@ pub fn init_mako_daemon() {
 
 /// Get global mako daemon
 pub fn get_mako_daemon() -> Option<&'static mut MakoDaemon> {
-    unsafe {
-        MAKO_DAEMON.as_mut()
-    }
+    unsafe { MAKO_DAEMON.as_mut() }
 }
 
 /// Send notification (convenience function)
-pub fn send_notification(app_name: String, summary: String, body: String, urgency: NotificationUrgency) -> u32 {
+pub fn send_notification(
+    app_name: String,
+    summary: String,
+    body: String,
+    urgency: NotificationUrgency,
+) -> u32 {
     if let Some(daemon) = get_mako_daemon() {
         let id = daemon.create_notification(app_name, summary, body, urgency);
         daemon.show_notification(id).ok();
@@ -228,14 +254,14 @@ pub fn send_notification(app_name: String, summary: String, body: String, urgenc
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_mako_daemon_init() {
         let mut daemon = MakoDaemon::new();
         daemon.init();
         assert!(daemon.active.load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_create_notification() {
         let mut daemon = MakoDaemon::new();
@@ -247,7 +273,7 @@ mod tests {
         );
         assert!(daemon.get_notification(id).is_some());
     }
-    
+
     #[test]
     fn test_show_notification() {
         let mut daemon = MakoDaemon::new();
@@ -260,7 +286,7 @@ mod tests {
         daemon.show_notification(id).unwrap();
         assert!(daemon.get_notification(id).unwrap().is_visible());
     }
-    
+
     #[test]
     fn test_dismiss_notification() {
         let mut daemon = MakoDaemon::new();
@@ -274,7 +300,7 @@ mod tests {
         daemon.dismiss_notification(id).unwrap();
         assert!(daemon.get_notification(id).unwrap().is_dismissed());
     }
-    
+
     #[test]
     fn test_get_visible_notifications() {
         let mut daemon = MakoDaemon::new();
@@ -295,7 +321,7 @@ mod tests {
         let visible = daemon.get_visible_notifications();
         assert!(visible.len() > 0);
     }
-    
+
     #[test]
     fn test_send_notification() {
         init_mako_daemon();

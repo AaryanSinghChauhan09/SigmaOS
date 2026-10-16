@@ -99,10 +99,16 @@ impl WeeklyStudyStage {
     pub fn description(&self) -> &'static str {
         match self {
             Self::Day1SelectMechanism => "Day 1: Select one narrowly bounded OS mechanism",
-            Self::Day2StudyUpstream => "Day 2: Read upstream source, docs, and record structures/flow",
+            Self::Day2StudyUpstream => {
+                "Day 2: Read upstream source, docs, and record structures/flow"
+            }
             Self::Day3WriteDesignNoteAdr => "Day 3: Write an Architecture Decision Record (ADR)",
-            Self::Day4To5ImplementSmallestSlice => "Days 4–5: Implement the smallest connected vertical slice",
-            Self::Day6To7ValidateAndPublish => "Days 6–7: Run full test suite, QEMU boot, and publish weekly report",
+            Self::Day4To5ImplementSmallestSlice => {
+                "Days 4–5: Implement the smallest connected vertical slice"
+            }
+            Self::Day6To7ValidateAndPublish => {
+                "Days 6–7: Run full test suite, QEMU boot, and publish weekly report"
+            }
         }
     }
 }
@@ -126,20 +132,77 @@ pub struct IndustryRule {
 }
 
 pub const INDUSTRY_RULES: [IndustryRule; 14] = [
-    IndustryRule { id: 1, title: "One mechanism per cycle", description: "Narrow topic selection required" },
-    IndustryRule { id: 2, title: "Research must produce a decision", description: "Every cycle ends with an ADR" },
-    IndustryRule { id: 3, title: "Implementation must be a vertical slice", description: "Small complete connected paths" },
-    IndustryRule { id: 4, title: "Runtime evidence controls status", description: "QEMU/hardware evidence required for promotion" },
-    IndustryRule { id: 5, title: "CI gates every change", description: "Clean build, unit, integration, and QEMU smoke tests required" },
-    IndustryRule { id: 6, title: "Reproducibility is mandatory", description: "Record commit, toolchain, commands, exit codes, hashes" },
-    IndustryRule { id: 7, title: "License compliance first", description: "Dual MIT/GPL-2.0 verification or clean-room implementation" },
-    IndustryRule { id: 8, title: "Security review is separate", description: "Dedicated review for security boundaries" },
-    IndustryRule { id: 9, title: "Least privilege", description: "Sandboxed task and script execution" },
-    IndustryRule { id: 10, title: "Fail safely", description: "Define rollback behavior before merge" },
-    IndustryRule { id: 11, title: "Regression tests are mandatory", description: "Tests required for every implemented slice" },
-    IndustryRule { id: 12, title: "Human approval for high-risk work", description: "Bootloader, installer, update, security changes require human approval" },
-    IndustryRule { id: 13, title: "Archive stale research", description: "Research older than 2 quarters must be archived or reaffirmed" },
-    IndustryRule { id: 14, title: "No borrowed-status claims", description: "Reference project features do not establish SigmaOS parity without runtime proof" },
+    IndustryRule {
+        id: 1,
+        title: "One mechanism per cycle",
+        description: "Narrow topic selection required",
+    },
+    IndustryRule {
+        id: 2,
+        title: "Research must produce a decision",
+        description: "Every cycle ends with an ADR",
+    },
+    IndustryRule {
+        id: 3,
+        title: "Implementation must be a vertical slice",
+        description: "Small complete connected paths",
+    },
+    IndustryRule {
+        id: 4,
+        title: "Runtime evidence controls status",
+        description: "QEMU/hardware evidence required for promotion",
+    },
+    IndustryRule {
+        id: 5,
+        title: "CI gates every change",
+        description: "Clean build, unit, integration, and QEMU smoke tests required",
+    },
+    IndustryRule {
+        id: 6,
+        title: "Reproducibility is mandatory",
+        description: "Record commit, toolchain, commands, exit codes, hashes",
+    },
+    IndustryRule {
+        id: 7,
+        title: "License compliance first",
+        description: "Dual MIT/GPL-2.0 verification or clean-room implementation",
+    },
+    IndustryRule {
+        id: 8,
+        title: "Security review is separate",
+        description: "Dedicated review for security boundaries",
+    },
+    IndustryRule {
+        id: 9,
+        title: "Least privilege",
+        description: "Sandboxed task and script execution",
+    },
+    IndustryRule {
+        id: 10,
+        title: "Fail safely",
+        description: "Define rollback behavior before merge",
+    },
+    IndustryRule {
+        id: 11,
+        title: "Regression tests are mandatory",
+        description: "Tests required for every implemented slice",
+    },
+    IndustryRule {
+        id: 12,
+        title: "Human approval for high-risk work",
+        description: "Bootloader, installer, update, security changes require human approval",
+    },
+    IndustryRule {
+        id: 13,
+        title: "Archive stale research",
+        description: "Research older than 2 quarters must be archived or reaffirmed",
+    },
+    IndustryRule {
+        id: 14,
+        title: "No borrowed-status claims",
+        description:
+            "Reference project features do not establish SigmaOS parity without runtime proof",
+    },
 ];
 
 /// Record of an Architecture Decision Record (ADR)
@@ -335,14 +398,26 @@ impl SovereignPeriodicResearchEngine {
     pub fn generate_summary_report(&self) -> String {
         let mut report = String::from("# Sovereign Periodic Research Program Status\n\n");
         report.push_str("## Program Metrics\n");
-        report.push_str(&format!("- Mechanisms Studied: {}\n", self.metrics.mechanisms_studied));
+        report.push_str(&format!(
+            "- Mechanisms Studied: {}\n",
+            self.metrics.mechanisms_studied
+        ));
         report.push_str(&format!("- ADRs Created: {}\n", self.metrics.adrs_created));
-        report.push_str(&format!("- Runtime Validated: {}\n", self.metrics.mechanisms_runtime_validated));
-        report.push_str(&format!("- QEMU Boot Success Rate: {}%\n", self.metrics.qemu_boot_success_rate_percent));
+        report.push_str(&format!(
+            "- Runtime Validated: {}\n",
+            self.metrics.mechanisms_runtime_validated
+        ));
+        report.push_str(&format!(
+            "- QEMU Boot Success Rate: {}%\n",
+            self.metrics.qemu_boot_success_rate_percent
+        ));
 
         report.push_str("\n## ADR Inventory\n");
         for adr in &self.adrs {
-            report.push_str(&format!("- **{}**: {} [{}] — {}\n", adr.id, adr.title, adr.status, adr.file_path));
+            report.push_str(&format!(
+                "- **{}**: {} [{}] — {}\n",
+                adr.id, adr.title, adr.status, adr.file_path
+            ));
         }
 
         report.push_str("\n## Monthly Capability Progress\n");
@@ -390,7 +465,13 @@ mod tests {
     #[test]
     fn test_cadences_and_curriculum() {
         assert_eq!(ResearchCadence::Weekly.duration(), "3–5 hours");
-        assert_eq!(CurriculumCycle::Xv6AndOsDev.title(), "Cycle 1: xv6 and OSDev");
-        assert_eq!(WeeklyStudyStage::Day1SelectMechanism.description(), "Day 1: Select one narrowly bounded OS mechanism");
+        assert_eq!(
+            CurriculumCycle::Xv6AndOsDev.title(),
+            "Cycle 1: xv6 and OSDev"
+        );
+        assert_eq!(
+            WeeklyStudyStage::Day1SelectMechanism.description(),
+            "Day 1: Select one narrowly bounded OS mechanism"
+        );
     }
 }

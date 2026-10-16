@@ -27,7 +27,10 @@ pub enum ProcessState {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SchedulerError {
-    InvalidStateTransition { from: ProcessState, to: ProcessState },
+    InvalidStateTransition {
+        from: ProcessState,
+        to: ProcessState,
+    },
     ProcessTableFull,
     ProcessNotFound(u64),
     ProcessAlreadyExists(u64),
@@ -112,7 +115,13 @@ impl SchedulerCore {
     }
 
     /// Allocates and initializes a new process (`NEW` state).
-    pub fn create_process(&mut self, pid: u64, ppid: u64, priority: u8, cpu_affinity: u64) -> Result<(), SchedulerError> {
+    pub fn create_process(
+        &mut self,
+        pid: u64,
+        ppid: u64,
+        priority: u8,
+        cpu_affinity: u64,
+    ) -> Result<(), SchedulerError> {
         if self.process_table.len() >= MAX_PROCESS_TABLE_SIZE {
             return Err(SchedulerError::ProcessTableFull);
         }
@@ -128,7 +137,10 @@ impl SchedulerCore {
     /// Enqueues process from `NEW` / `SLEEPING` / `STOPPED` into `READY` state.
     pub fn mark_ready(&mut self, pid: u64) -> Result<(), SchedulerError> {
         let (old_state, priority, cpu_affinity) = {
-            let pcb = self.process_table.get(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+            let pcb = self
+                .process_table
+                .get(&pid)
+                .ok_or(SchedulerError::ProcessNotFound(pid))?;
 
             // Valid transitions to READY: NEW -> READY, SLEEPING -> READY, STOPPED -> READY
             match pcb.state {
@@ -136,7 +148,12 @@ impl SchedulerCore {
                     (pcb.state, pcb.priority, pcb.cpu_affinity)
                 }
                 ProcessState::Ready => return Ok(()), // Already ready
-                _ => return Err(SchedulerError::InvalidStateTransition { from: pcb.state, to: ProcessState::Ready }),
+                _ => {
+                    return Err(SchedulerError::InvalidStateTransition {
+                        from: pcb.state,
+                        to: ProcessState::Ready,
+                    })
+                }
             }
         };
 
@@ -177,7 +194,12 @@ impl SchedulerCore {
                     } else {
                         // Quantum expired, yield back to READY
                         pcb.remaining_quantum_ticks = 10;
-                        let task_ref = TaskRunRef::new(curr_pid, pcb.priority, pcb.cpu_affinity, self.current_tick);
+                        let task_ref = TaskRunRef::new(
+                            curr_pid,
+                            pcb.priority,
+                            pcb.cpu_affinity,
+                            self.current_tick,
+                        );
                         self.run_queues[cpu_idx].enqueue(task_ref, self.current_tick)?;
                         pcb.state = ProcessState::Ready;
                         self.active_pids[cpu_idx] = None;
@@ -197,7 +219,10 @@ impl SchedulerCore {
 
         if let Some(pcb) = self.process_table.get_mut(&next_pid) {
             if pcb.state != ProcessState::Ready {
-                return Err(SchedulerError::InvalidStateTransition { from: pcb.state, to: ProcessState::Running });
+                return Err(SchedulerError::InvalidStateTransition {
+                    from: pcb.state,
+                    to: ProcessState::Running,
+                });
             }
             pcb.state = ProcessState::Running;
             pcb.current_cpu = cpu_id;
@@ -218,10 +243,16 @@ impl SchedulerCore {
         }
 
         let action = {
-            let pcb = self.process_table.get_mut(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+            let pcb = self
+                .process_table
+                .get_mut(&pid)
+                .ok_or(SchedulerError::ProcessNotFound(pid))?;
 
             if pcb.state != ProcessState::Running && pcb.state != ProcessState::Ready {
-                return Err(SchedulerError::InvalidStateTransition { from: pcb.state, to: ProcessState::Sleeping });
+                return Err(SchedulerError::InvalidStateTransition {
+                    from: pcb.state,
+                    to: ProcessState::Sleeping,
+                });
             }
 
             // Lost wakeup protection: if event pending or signal pending, remain READY
@@ -232,7 +263,10 @@ impl SchedulerCore {
                 if is_running {
                     let cpu_idx = pcb.current_cpu as usize;
                     self.active_pids[cpu_idx] = None;
-                    SleepAction::RemainReadyReenqueue { priority: pcb.priority, affinity: pcb.cpu_affinity }
+                    SleepAction::RemainReadyReenqueue {
+                        priority: pcb.priority,
+                        affinity: pcb.cpu_affinity,
+                    }
                 } else {
                     SleepAction::RemainReadyInQueue
                 }
@@ -263,7 +297,10 @@ impl SchedulerCore {
 
     /// Wake up a sleeping process (`SLEEPING -> READY`) with lost-wakeup protection.
     pub fn wake_process(&mut self, pid: u64) -> Result<(), SchedulerError> {
-        let pcb = self.process_table.get_mut(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+        let pcb = self
+            .process_table
+            .get_mut(&pid)
+            .ok_or(SchedulerError::ProcessNotFound(pid))?;
 
         match pcb.state {
             ProcessState::Sleeping => {
@@ -281,10 +318,16 @@ impl SchedulerCore {
 
     /// Stops running or ready task (`RUNNING`/`READY` -> `STOPPED`).
     pub fn stop_process(&mut self, pid: u64) -> Result<(), SchedulerError> {
-        let pcb = self.process_table.get_mut(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+        let pcb = self
+            .process_table
+            .get_mut(&pid)
+            .ok_or(SchedulerError::ProcessNotFound(pid))?;
 
         if pcb.state != ProcessState::Running && pcb.state != ProcessState::Ready {
-            return Err(SchedulerError::InvalidStateTransition { from: pcb.state, to: ProcessState::Stopped });
+            return Err(SchedulerError::InvalidStateTransition {
+                from: pcb.state,
+                to: ProcessState::Stopped,
+            });
         }
 
         let cpu_idx = pcb.current_cpu as usize;
@@ -300,7 +343,10 @@ impl SchedulerCore {
 
     /// Terminates process (`RUNNING`/`ANY` -> `ZOMBIE`).
     pub fn exit_process(&mut self, pid: u64, exit_code: i32) -> Result<(), SchedulerError> {
-        let pcb = self.process_table.get_mut(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+        let pcb = self
+            .process_table
+            .get_mut(&pid)
+            .ok_or(SchedulerError::ProcessNotFound(pid))?;
 
         if pcb.state == ProcessState::Zombie || pcb.state == ProcessState::Reaped {
             return Ok(());
@@ -317,7 +363,12 @@ impl SchedulerCore {
         pcb.exit_code = exit_code;
 
         // Reparent orphans to PID 1 (init)
-        let child_pids: Vec<u64> = self.process_table.values().filter(|p| p.ppid == pid).map(|p| p.pid).collect();
+        let child_pids: Vec<u64> = self
+            .process_table
+            .values()
+            .filter(|p| p.ppid == pid)
+            .map(|p| p.pid)
+            .collect();
         for child_pid in child_pids {
             if let Some(child_pcb) = self.process_table.get_mut(&child_pid) {
                 child_pcb.ppid = 1;
@@ -329,7 +380,10 @@ impl SchedulerCore {
 
     /// Reaps a zombie process (`ZOMBIE -> REAPED`). Releases process resources.
     pub fn reap_process(&mut self, pid: u64) -> Result<i32, SchedulerError> {
-        let pcb = self.process_table.get(&pid).ok_or(SchedulerError::ProcessNotFound(pid))?;
+        let pcb = self
+            .process_table
+            .get(&pid)
+            .ok_or(SchedulerError::ProcessNotFound(pid))?;
 
         if pcb.state != ProcessState::Zombie {
             return Err(SchedulerError::CannotReapNonZombie(pid));

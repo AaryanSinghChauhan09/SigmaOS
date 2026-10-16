@@ -46,7 +46,14 @@ pub struct IoRequest {
 }
 
 impl IoRequest {
-    pub fn new(id: u64, dev_id: u32, op: IoOperationKind, block_num: u64, length_bytes: usize, priority: IoPriority) -> Self {
+    pub fn new(
+        id: u64,
+        dev_id: u32,
+        op: IoOperationKind,
+        block_num: u64,
+        length_bytes: usize,
+        priority: IoPriority,
+    ) -> Self {
         Self {
             id,
             dev_id,

@@ -161,8 +161,14 @@ impl PfEngine {
         // 1. Check existing state table
         for state in &mut self.states {
             if state.proto == proto
-                && ((state.src_ip == src_ip && state.dst_ip == dst_ip && state.src_port == src_port && state.dst_port == dst_port)
-                    || (state.src_ip == dst_ip && state.dst_ip == src_ip && state.src_port == dst_port && state.dst_port == src_port))
+                && ((state.src_ip == src_ip
+                    && state.dst_ip == dst_ip
+                    && state.src_port == src_port
+                    && state.dst_port == dst_port)
+                    || (state.src_ip == dst_ip
+                        && state.dst_ip == src_ip
+                        && state.src_port == dst_port
+                        && state.dst_port == src_port))
             {
                 self.stats.state_hits += 1;
                 self.stats.passed += 1;

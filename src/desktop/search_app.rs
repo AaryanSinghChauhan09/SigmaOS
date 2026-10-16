@@ -191,9 +191,7 @@ pub fn init_search_app() {
 
 /// Get search app
 pub fn get_search_app() -> &'static mut SearchApp {
-    unsafe {
-        SEARCH_APP.as_mut().expect("Search app not initialized")
-    }
+    unsafe { SEARCH_APP.as_mut().expect("Search app not initialized") }
 }
 
 #[cfg(test)]

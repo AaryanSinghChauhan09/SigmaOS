@@ -356,7 +356,15 @@ impl PdfEditor {
     }
 
     /// Add text to page
-    pub fn add_text(&mut self, page_id: u32, content: String, font_family: FontFamily, font_size: FontSize, x: f32, y: f32) -> Result<u32, &'static str> {
+    pub fn add_text(
+        &mut self,
+        page_id: u32,
+        content: String,
+        font_family: FontFamily,
+        font_size: FontSize,
+        x: f32,
+        y: f32,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let text = TextObject {
@@ -375,7 +383,15 @@ impl PdfEditor {
     }
 
     /// Add image to page
-    pub fn add_image(&mut self, page_id: u32, data: Vec<u8>, x: f32, y: f32, width: f32, height: f32) -> Result<u32, &'static str> {
+    pub fn add_image(
+        &mut self,
+        page_id: u32,
+        data: Vec<u8>,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let image = ImageObject {
@@ -393,7 +409,15 @@ impl PdfEditor {
     }
 
     /// Add shape to page
-    pub fn add_shape(&mut self, page_id: u32, shape_type: ShapeType, x: f32, y: f32, width: f32, height: f32) -> Result<u32, &'static str> {
+    pub fn add_shape(
+        &mut self,
+        page_id: u32,
+        shape_type: ShapeType,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let shape = ShapeObject {
@@ -413,7 +437,17 @@ impl PdfEditor {
     }
 
     /// Add annotation
-    pub fn add_annotation(&mut self, page_id: u32, annotation_type: AnnotationType, x: f32, y: f32, width: f32, height: f32, content: String, author: String) -> Result<u32, &'static str> {
+    pub fn add_annotation(
+        &mut self,
+        page_id: u32,
+        annotation_type: AnnotationType,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        content: String,
+        author: String,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let annotation = Annotation {
@@ -434,7 +468,16 @@ impl PdfEditor {
     }
 
     /// Add form field
-    pub fn add_form_field(&mut self, page_id: u32, field_type: FormFieldType, name: String, x: f32, y: f32, width: f32, height: f32) -> Result<u32, &'static str> {
+    pub fn add_form_field(
+        &mut self,
+        page_id: u32,
+        field_type: FormFieldType,
+        name: String,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let field = FormField {
@@ -469,7 +512,15 @@ impl PdfEditor {
     }
 
     /// Add hyperlink
-    pub fn add_hyperlink(&mut self, page_id: u32, url: String, x: f32, y: f32, width: f32, height: f32) -> Result<u32, &'static str> {
+    pub fn add_hyperlink(
+        &mut self,
+        page_id: u32,
+        url: String,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let hyperlink = Hyperlink {
@@ -504,7 +555,13 @@ impl PdfEditor {
     }
 
     /// Set metadata
-    pub fn set_metadata(&mut self, title: String, author: String, subject: String, keywords: String) {
+    pub fn set_metadata(
+        &mut self,
+        title: String,
+        author: String,
+        subject: String,
+        keywords: String,
+    ) {
         self.metadata.title = title;
         self.metadata.author = author;
         self.metadata.subject = subject;
@@ -512,7 +569,13 @@ impl PdfEditor {
     }
 
     /// Set security
-    pub fn set_security(&mut self, user_password: String, owner_password: String, can_print: bool, can_copy: bool) {
+    pub fn set_security(
+        &mut self,
+        user_password: String,
+        owner_password: String,
+        can_print: bool,
+        can_copy: bool,
+    ) {
         self.security.encrypted = true;
         self.security.user_password = user_password;
         self.security.owner_password = owner_password;
@@ -532,7 +595,15 @@ impl PdfEditor {
     }
 
     /// Import Artcraft vector path object onto a page
-    pub fn import_vector_layer(&mut self, page_id: u32, path_data: String, x: f32, y: f32, fill: Option<(u8, u8, u8)>, stroke: Option<(u8, u8, u8)>) -> Result<u32, &'static str> {
+    pub fn import_vector_layer(
+        &mut self,
+        page_id: u32,
+        path_data: String,
+        x: f32,
+        y: f32,
+        fill: Option<(u8, u8, u8)>,
+        stroke: Option<(u8, u8, u8)>,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let vector_obj = VectorPathObject {
@@ -568,7 +639,13 @@ impl PdfEditor {
     }
 
     /// Sign document with cryptographic digital signature
-    pub fn sign_document(&mut self, page_id: u32, signer_name: String, reason: String, sig_data: Vec<u8>) -> Result<u32, &'static str> {
+    pub fn sign_document(
+        &mut self,
+        page_id: u32,
+        signer_name: String,
+        reason: String,
+        sig_data: Vec<u8>,
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let sig = DigitalSignature {
@@ -584,7 +661,13 @@ impl PdfEditor {
     }
 
     /// Add OCR invisible text layer to page
-    pub fn apply_ocr_layer(&mut self, page_id: u32, extracted_text: String, confidence: f32, bbox: (f32, f32, f32, f32)) -> Result<u32, &'static str> {
+    pub fn apply_ocr_layer(
+        &mut self,
+        page_id: u32,
+        extracted_text: String,
+        confidence: f32,
+        bbox: (f32, f32, f32, f32),
+    ) -> Result<u32, &'static str> {
         let page = self.pages.get_mut(&page_id).ok_or("Page not found")?;
         let id = self.next_element_id.fetch_add(1, Ordering::Relaxed);
         let ocr = OcrTextLayer {
@@ -627,9 +710,7 @@ pub fn init_pdfcraft() {
 
 /// Get global pdfcraft
 pub fn get_pdfcraft() -> Option<&'static mut PdfEditor> {
-    unsafe {
-        PDFCRAFT.as_mut()
-    }
+    unsafe { PDFCRAFT.as_mut() }
 }
 
 #[cfg(test)]
@@ -666,7 +747,16 @@ mod tests {
         let mut editor = PdfEditor::new();
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
-        let text_id = editor.add_text(page_id, "Hello World".to_string(), FontFamily::Helvetica, 12.0, 50.0, 750.0).unwrap();
+        let text_id = editor
+            .add_text(
+                page_id,
+                "Hello World".to_string(),
+                FontFamily::Helvetica,
+                12.0,
+                50.0,
+                750.0,
+            )
+            .unwrap();
         assert!(text_id > 0);
         assert_eq!(editor.get_page(page_id).unwrap().elements.len(), 1);
     }
@@ -677,7 +767,9 @@ mod tests {
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
         let image_data = vec![0u8; 100];
-        let image_id = editor.add_image(page_id, image_data, 50.0, 50.0, 200.0, 150.0).unwrap();
+        let image_id = editor
+            .add_image(page_id, image_data, 50.0, 50.0, 200.0, 150.0)
+            .unwrap();
         assert!(image_id > 0);
     }
 
@@ -686,7 +778,9 @@ mod tests {
         let mut editor = PdfEditor::new();
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
-        let shape_id = editor.add_shape(page_id, ShapeType::Rectangle, 100.0, 100.0, 200.0, 150.0).unwrap();
+        let shape_id = editor
+            .add_shape(page_id, ShapeType::Rectangle, 100.0, 100.0, 200.0, 150.0)
+            .unwrap();
         assert!(shape_id > 0);
     }
 
@@ -695,7 +789,18 @@ mod tests {
         let mut editor = PdfEditor::new();
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
-        let annotation_id = editor.add_annotation(page_id, AnnotationType::Highlight, 50.0, 700.0, 100.0, 20.0, "Important".to_string(), "User".to_string()).unwrap();
+        let annotation_id = editor
+            .add_annotation(
+                page_id,
+                AnnotationType::Highlight,
+                50.0,
+                700.0,
+                100.0,
+                20.0,
+                "Important".to_string(),
+                "User".to_string(),
+            )
+            .unwrap();
         assert!(annotation_id > 0);
         assert_eq!(editor.get_page(page_id).unwrap().annotations.len(), 1);
     }
@@ -705,7 +810,17 @@ mod tests {
         let mut editor = PdfEditor::new();
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
-        let field_id = editor.add_form_field(page_id, FormFieldType::TextField, "name".to_string(), 100.0, 700.0, 200.0, 30.0).unwrap();
+        let field_id = editor
+            .add_form_field(
+                page_id,
+                FormFieldType::TextField,
+                "name".to_string(),
+                100.0,
+                700.0,
+                200.0,
+                30.0,
+            )
+            .unwrap();
         assert!(field_id > 0);
         assert_eq!(editor.get_page(page_id).unwrap().form_fields.len(), 1);
     }
@@ -724,7 +839,16 @@ mod tests {
         let mut editor = PdfEditor::new();
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
-        let link_id = editor.add_hyperlink(page_id, "https://sigmaos.org".to_string(), 50.0, 50.0, 100.0, 20.0).unwrap();
+        let link_id = editor
+            .add_hyperlink(
+                page_id,
+                "https://sigmaos.org".to_string(),
+                50.0,
+                50.0,
+                100.0,
+                20.0,
+            )
+            .unwrap();
         assert!(link_id > 0);
     }
 
@@ -741,7 +865,12 @@ mod tests {
     fn test_metadata() {
         let mut editor = PdfEditor::new();
         editor.init();
-        editor.set_metadata("Test Document".to_string(), "Author".to_string(), "Subject".to_string(), "keywords".to_string());
+        editor.set_metadata(
+            "Test Document".to_string(),
+            "Author".to_string(),
+            "Subject".to_string(),
+            "keywords".to_string(),
+        );
         assert_eq!(editor.metadata.title, "Test Document");
         assert_eq!(editor.metadata.author, "Author");
     }
@@ -760,14 +889,16 @@ mod tests {
         let mut editor = PdfEditor::new();
         editor.init();
         let page_id = editor.add_page(595.0, 842.0);
-        let id = editor.import_vector_layer(
-            page_id,
-            "M 10 10 L 100 100 Z".to_string(),
-            0.0,
-            0.0,
-            Some((255, 0, 0)),
-            Some((0, 0, 0)),
-        ).unwrap();
+        let id = editor
+            .import_vector_layer(
+                page_id,
+                "M 10 10 L 100 100 Z".to_string(),
+                0.0,
+                0.0,
+                Some((255, 0, 0)),
+                Some((0, 0, 0)),
+            )
+            .unwrap();
         assert!(id > 0);
     }
 
@@ -787,20 +918,24 @@ mod tests {
         editor.apply_watermark("CONFIDENTIAL".to_string(), 0.5, 45.0);
         assert_eq!(editor.watermarks.len(), 1);
 
-        let sig_id = editor.sign_document(
-            page_id,
-            "Alice".to_string(),
-            "Approval".to_string(),
-            vec![1, 2, 3, 4],
-        ).unwrap();
+        let sig_id = editor
+            .sign_document(
+                page_id,
+                "Alice".to_string(),
+                "Approval".to_string(),
+                vec![1, 2, 3, 4],
+            )
+            .unwrap();
         assert!(sig_id > 0);
 
-        let ocr_id = editor.apply_ocr_layer(
-            page_id,
-            "Extracted Text".to_string(),
-            0.98,
-            (10.0, 10.0, 100.0, 20.0),
-        ).unwrap();
+        let ocr_id = editor
+            .apply_ocr_layer(
+                page_id,
+                "Extracted Text".to_string(),
+                0.98,
+                (10.0, 10.0, 100.0, 20.0),
+            )
+            .unwrap();
         assert!(ocr_id > 0);
     }
 }

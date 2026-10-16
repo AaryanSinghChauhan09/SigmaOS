@@ -77,108 +77,132 @@ impl WineManager {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize Wine manager
     pub fn init(&mut self) -> Result<(), &'static str> {
         self.active.store(true, Ordering::Relaxed);
         Ok(())
     }
-    
+
     /// Create Wine prefix
-    pub fn create_prefix(&mut self, name: String, path: String, arch: WineArch) -> Result<(), &'static str> {
+    pub fn create_prefix(
+        &mut self,
+        name: String,
+        path: String,
+        arch: WineArch,
+    ) -> Result<(), &'static str> {
         let prefix = WinePrefix {
             path: path.clone(),
             wine_version: "7.0".to_string(),
             architecture: arch,
             windows_version: WindowsVersion::Windows10,
         };
-        
+
         self.prefixes.insert(name.clone(), prefix);
-        
+
         // In real implementation, would run:
         // WINEPREFIX={path} WINEARCH={arch} wineboot --init
-        
+
         Ok(())
     }
-    
+
     /// Get prefix
     pub fn get_prefix(&self, name: &str) -> Option<&WinePrefix> {
         self.prefixes.get(name)
     }
-    
+
     /// Set default prefix
     pub fn set_default_prefix(&mut self, name: String) {
         self.default_prefix = Some(name);
     }
-    
+
     /// Add application
     pub fn add_application(&mut self, name: String, app: WineApplication) {
         self.applications.insert(name, app);
     }
-    
+
     /// Get application
     pub fn get_application(&self, name: &str) -> Option<&WineApplication> {
         self.applications.get(name)
     }
-    
+
     /// Run application with Wine
     pub fn run_wine(&mut self, name: &str) -> Result<(), &'static str> {
-        let app = self.applications.get_mut(name).ok_or("Application not found")?;
-        
+        let app = self
+            .applications
+            .get_mut(name)
+            .ok_or("Application not found")?;
+
         // In real implementation, would run:
         // WINEPREFIX={prefix_path} wine {exe_path}
-        
+
         app.running = true;
         app.pid = Some(1234); // Simulated PID
-        
+
         Ok(())
     }
-    
+
     /// Run application with Proton
     pub fn run_proton(&mut self, name: &str) -> Result<(), &'static str> {
-        let app = self.applications.get_mut(name).ok_or("Application not found")?;
-        
+        let app = self
+            .applications
+            .get_mut(name)
+            .ok_or("Application not found")?;
+
         if app.proton_config.is_none() {
             return Err("Proton not configured for this application");
         }
-        
+
         // In real implementation, would run:
         // STEAM_COMPAT_DATA_PATH={prefix_path} \
         //   STEAM_COMPAT_CLIENT_INSTALL_PATH={proton_path} \
         //   proton run {exe_path}
-        
+
         app.running = true;
         app.pid = Some(1234); // Simulated PID
-        
+
         Ok(())
     }
-    
+
     /// Stop application
     pub fn stop_application(&mut self, name: &str) -> Result<(), &'static str> {
-        let app = self.applications.get_mut(name).ok_or("Application not found")?;
-        
+        let app = self
+            .applications
+            .get_mut(name)
+            .ok_or("Application not found")?;
+
         if !app.running {
             return Err("Application not running");
         }
-        
+
         // In real implementation, would send SIGTERM to PID
-        
+
         app.running = false;
         app.pid = None;
-        
+
         Ok(())
     }
-    
+
     /// Configure Proton for application
-    pub fn configure_proton(&mut self, name: &str, config: ProtonConfig) -> Result<(), &'static str> {
-        let app = self.applications.get_mut(name).ok_or("Application not found")?;
+    pub fn configure_proton(
+        &mut self,
+        name: &str,
+        config: ProtonConfig,
+    ) -> Result<(), &'static str> {
+        let app = self
+            .applications
+            .get_mut(name)
+            .ok_or("Application not found")?;
         app.proton_config = Some(config);
         Ok(())
     }
-    
+
     /// Is application running
     pub fn is_running(&self, name: &str) -> bool {
-        self.applications.get(name).map(|a| a.running).unwrap_or(false)
+        self.applications
+            .get(name)
+            .map(|a| a.running)
+            .unwrap_or(false)
     }
 }
 
@@ -200,9 +224,7 @@ pub fn init_wine_manager() {
 
 /// Get global Wine manager
 pub fn get_wine_manager() -> Option<&'static mut WineManager> {
-    unsafe {
-        WINE_MANAGER.as_mut()
-    }
+    unsafe { WINE_MANAGER.as_mut() }
 }
 
 /// Create default Wine prefix
@@ -220,21 +242,27 @@ pub fn create_default_prefix() -> Result<(), &'static str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_wine_manager_init() {
         let mut manager = WineManager::new();
         manager.init().unwrap();
         assert!(manager.active.load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_create_prefix() {
         let mut manager = WineManager::new();
-        manager.create_prefix("test".to_string(), "/tmp/wine_test".to_string(), WineArch::Win64).unwrap();
+        manager
+            .create_prefix(
+                "test".to_string(),
+                "/tmp/wine_test".to_string(),
+                WineArch::Win64,
+            )
+            .unwrap();
         assert!(manager.get_prefix("test").is_some());
     }
-    
+
     #[test]
     fn test_add_application() {
         let mut manager = WineManager::new();
@@ -254,7 +282,7 @@ mod tests {
         manager.add_application("test_app".to_string(), app);
         assert!(manager.get_application("test_app").is_some());
     }
-    
+
     #[test]
     fn test_run_wine() {
         let mut manager = WineManager::new();
@@ -275,7 +303,7 @@ mod tests {
         manager.run_wine("test_app").unwrap();
         assert!(manager.is_running("test_app"));
     }
-    
+
     #[test]
     fn test_stop_application() {
         let mut manager = WineManager::new();
@@ -297,7 +325,7 @@ mod tests {
         manager.stop_application("test_app").unwrap();
         assert!(!manager.is_running("test_app"));
     }
-    
+
     #[test]
     fn test_configure_proton() {
         let mut manager = WineManager::new();
@@ -325,6 +353,10 @@ mod tests {
             fsync_enabled: true,
         };
         manager.configure_proton("test_app", config).unwrap();
-        assert!(manager.get_application("test_app").unwrap().proton_config.is_some());
+        assert!(manager
+            .get_application("test_app")
+            .unwrap()
+            .proton_config
+            .is_some());
     }
 }
