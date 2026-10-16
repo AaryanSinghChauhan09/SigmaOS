@@ -111,7 +111,8 @@ impl PdfcraftVectorArtImportPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 820,
-            pr_title: "feat(pdfcraft): Integrate Artcraft Vector Layer & Spline Import Engine".to_string(),
+            pr_title: "feat(pdfcraft): Integrate Artcraft Vector Layer & Spline Import Engine"
+                .to_string(),
             category: PdfcraftPrCategory::VectorArtImport,
             target_subsystem: "Pdfcraft Vector Graphics Engine".to_string(),
             original_suite: "Artcraft Vectorcraft".to_string(),
@@ -145,7 +146,8 @@ impl PdfcraftMultiWorkspaceProjectPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 821,
-            pr_title: "feat(pdfcraft): Implement Artcraft Multi-Workspace Document Manager".to_string(),
+            pr_title: "feat(pdfcraft): Implement Artcraft Multi-Workspace Document Manager"
+                .to_string(),
             category: PdfcraftPrCategory::MultiWorkspaceProject,
             target_subsystem: "Pdfcraft Document Management System".to_string(),
             original_suite: "Artcraft Workspace Engine".to_string(),
@@ -173,13 +175,19 @@ impl PdfcraftBatchExportRenderPrEngine {
     }
 
     pub fn render_page_batch(&self, page_count: usize, icc_profile: &str) -> usize {
-        if !icc_profile.is_empty() { page_count } else { 0 }
+        if !icc_profile.is_empty() {
+            page_count
+        } else {
+            0
+        }
     }
 
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 822,
-            pr_title: "feat(pdfcraft): Implement Multi-Format Batch Export & ICC Color Profile Engine".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement Multi-Format Batch Export & ICC Color Profile Engine"
+                    .to_string(),
             category: PdfcraftPrCategory::BatchExportRender,
             target_subsystem: "Pdfcraft Export & Color Pipeline".to_string(),
             original_suite: "Artcraft Designcraft & Lightcraft".to_string(),
@@ -213,7 +221,8 @@ impl PdfcraftDigitalSignatureWatermarkPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 823,
-            pr_title: "feat(pdfcraft): Implement Cryptographic Signatures & Dynamic Watermarks".to_string(),
+            pr_title: "feat(pdfcraft): Implement Cryptographic Signatures & Dynamic Watermarks"
+                .to_string(),
             category: PdfcraftPrCategory::DigitalSignatureWatermark,
             target_subsystem: "Pdfcraft Security & Provenance Suite".to_string(),
             original_suite: "Artcraft Security & Watermarking Framework".to_string(),
@@ -251,7 +260,8 @@ impl PdfcraftOcrTextRecognitionPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 824,
-            pr_title: "feat(pdfcraft): Implement AI OCR Text Extraction & Invisible Search Layer".to_string(),
+            pr_title: "feat(pdfcraft): Implement AI OCR Text Extraction & Invisible Search Layer"
+                .to_string(),
             category: PdfcraftPrCategory::OcrTextRecognition,
             target_subsystem: "Pdfcraft OCR & Search Pipeline".to_string(),
             original_suite: "Artcraft Text & Layout Processing".to_string(),
@@ -285,7 +295,8 @@ impl PdfcraftInteractiveFormsXfaPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 825,
-            pr_title: "feat(pdfcraft): Implement Interactive Form Filling & Dynamic XFA Engine".to_string(),
+            pr_title: "feat(pdfcraft): Implement Interactive Form Filling & Dynamic XFA Engine"
+                .to_string(),
             category: PdfcraftPrCategory::InteractiveFormsXfa,
             target_subsystem: "Pdfcraft Interactive Forms Engine".to_string(),
             original_suite: "Artcraft Interactive Forms Suite".to_string(),
@@ -323,7 +334,9 @@ impl PdfcraftColorPreflightCmykPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 826,
-            pr_title: "feat(pdfcraft): Implement Professional Print Preflight & CMYK Color Separation".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement Professional Print Preflight & CMYK Color Separation"
+                    .to_string(),
             category: PdfcraftPrCategory::ColorPreflightCmyk,
             target_subsystem: "Pdfcraft Color & Preflight Suite".to_string(),
             original_suite: "Artcraft Print & Prepress Engine".to_string(),
@@ -361,7 +374,9 @@ impl PdfcraftRedactionSanitizationPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 827,
-            pr_title: "feat(pdfcraft): Implement Permanent Document Redaction & Metadata Sanitization".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement Permanent Document Redaction & Metadata Sanitization"
+                    .to_string(),
             category: PdfcraftPrCategory::RedactionSanitization,
             target_subsystem: "Pdfcraft Security & Redaction Pipeline".to_string(),
             original_suite: "Artcraft Security & Compliance Engine".to_string(),
@@ -389,13 +404,18 @@ impl PdfcraftPageImpositionBookletPrEngine {
     }
 
     pub fn calculate_nup_grid(&self, total_pages: usize, nup: usize) -> usize {
-        if nup == 0 { 0 } else { (total_pages + nup - 1) / nup }
+        if nup == 0 {
+            0
+        } else {
+            (total_pages + nup - 1) / nup
+        }
     }
 
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 828,
-            pr_title: "feat(pdfcraft): Implement Page Imposition Layout & N-Up Booklet Assembly".to_string(),
+            pr_title: "feat(pdfcraft): Implement Page Imposition Layout & N-Up Booklet Assembly"
+                .to_string(),
             category: PdfcraftPrCategory::PageImpositionBooklet,
             target_subsystem: "Pdfcraft Page Geometry & Imposition Engine".to_string(),
             original_suite: "Artcraft Layout & Print Assembly Engine".to_string(),
@@ -429,12 +449,15 @@ impl PdfcraftArchivalValidationPrEngine {
     pub fn generate_proposal(&self) -> PdfcraftPrProposalManifest {
         PdfcraftPrProposalManifest {
             pr_id: 829,
-            pr_title: "feat(pdfcraft): Implement PDF/A & PDF/X Compliance Validation & Repair Engine".to_string(),
+            pr_title:
+                "feat(pdfcraft): Implement PDF/A & PDF/X Compliance Validation & Repair Engine"
+                    .to_string(),
             category: PdfcraftPrCategory::ArchivalValidation,
             target_subsystem: "Pdfcraft Archival & Compliance Suite".to_string(),
             original_suite: "Artcraft Archival & Standards Engine".to_string(),
             components_added: vec![
-                "ISO 19005 (PDF/A-1/2/3/4) long-term preservation validator and repairer".to_string(),
+                "ISO 19005 (PDF/A-1/2/3/4) long-term preservation validator and repairer"
+                    .to_string(),
                 "ISO 15930 (PDF/X-1a/3/4/6) print exchange compliance inspector".to_string(),
                 "Automatic font embedding and missing color space auto-repair".to_string(),
             ],
@@ -475,9 +498,14 @@ impl SovereignPdfcraftMissingComponentsParityPrGateway {
         let o_ok = self.ocr_text.extract_searchable_text(&[255, 0]).1 > 0.5;
         let f_ok = self.interactive_forms.validate_form_value("Name", "Alice");
         let c_ok = self.color_preflight.analyze_cmyk_coverage(255, 0, 0).0 >= 0.0;
-        let r_ok = self.redaction_sanitization.sanitize_pii_text("User SSN 123").contains("[REDACTED SSN]");
+        let r_ok = self
+            .redaction_sanitization
+            .sanitize_pii_text("User SSN 123")
+            .contains("[REDACTED SSN]");
         let p_ok = self.page_imposition.calculate_nup_grid(8, 2) == 4;
-        let a_ok = self.archival_validation.validate_pdfa_compliance(&[37, 80, 68, 70]);
+        let a_ok = self
+            .archival_validation
+            .validate_pdfa_compliance(&[37, 80, 68, 70]);
 
         v_ok && w_ok && e_ok && s_ok && o_ok && f_ok && c_ok && r_ok && p_ok && a_ok
     }
@@ -502,7 +530,10 @@ impl SovereignPdfcraftMissingComponentsParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -512,7 +543,11 @@ impl SovereignPdfcraftMissingComponentsParityPrGateway {
         let pr = proposals.into_iter().find(|p| p.pr_id == pr_id)?;
         let patch_content = format!(
             "PR #{}: {}\nCategory: {}\nTarget: {}\nStatus: {}\n",
-            pr.pr_id, pr.pr_title, pr.category.as_str(), pr.target_subsystem, pr.status
+            pr.pr_id,
+            pr.pr_title,
+            pr.category.as_str(),
+            pr.target_subsystem,
+            pr.status
         );
         let _digest = fnv1a_pdfcraft_patch_digest(patch_content.as_bytes());
         Some(format!(
