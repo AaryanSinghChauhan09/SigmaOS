@@ -11,6 +11,7 @@ pub mod designcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
 pub mod effectcraft;
+pub mod effectcraft_artcraft_parity_pr;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod lightcraft;
@@ -103,7 +104,17 @@ pub use effectcraft_missing_components_parity_pr::{
     ArtCraftOpenFxPluginPrEngine, EffectcraftOpticalFlowMotionVectorPrEngine,
     EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
     EffectcraftExpressionScriptingRiggingPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway, EffectcraftMissingComponentsParityPrSuite,
+    SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftMissingComponentsParityPrGateway,
+    EffectcraftMissingComponentsParityPrSuite,
+};
+pub use effectcraft_artcraft_parity_pr::{
+    EffectcraftArtcraftPrProposalManifest, EffectcraftCameraTracker3dReconstructionPrEngine,
+    EffectcraftVolumetricLightingRaymarchingPrEngine, EffectcraftDeepCompositingExrChannelPrEngine,
+    EffectcraftSubsurfaceScatteringSkinShaderPrEngine, EffectcraftGpuFluidDynamicsSimulationPrEngine,
+    EffectcraftTimeWarpRetimingOpticalFlowPrEngine, EffectcraftCleanPlateWireRemovalPrEngine,
+    EffectcraftColorMatchPytorchGradePrEngine, EffectcraftProjectionMapping3dMeshPrEngine,
+    EffectcraftStereoscopic3dDepthMapPrEngine, SovereignEffectcraftArtcraftParityPrGateway,
+    EffectcraftArtcraftParityPrSuite,
 };
 pub use lightcraft::{
     LightEngine, Light, LightType, Material, Scene,
@@ -152,11 +163,6 @@ pub use effectcraft::{
     EffectCraftNodeCompositingPrDeployer, EffectCraftParticleShaderPrDeployer,
     EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
     NodeGraph, NodeType, Parameter, ParameterType,
-};
-pub use effectcraft_missing_components_parity_pr::{
-    ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine, EffectcraftPrProposalManifest,
-    NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
