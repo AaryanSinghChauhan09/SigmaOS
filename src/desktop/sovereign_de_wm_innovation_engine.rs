@@ -208,6 +208,8 @@ impl KdePlasmaInnovationEngine {
                 String::from("WorkActivity"),
                 String::from("GamingActivity"),
             ],
+            window_rules: Vec::new(),
+            look_and_feel_theme: String::from("org.kde.breezedark.desktop"),
         }
     }
 
@@ -523,6 +525,19 @@ impl LxqtInnovationEngine {
             self.lxqt_style = String::from("Fusion");
         }
         self.lxqt_style.clone()
+    }
+
+    pub fn set_session_idle_timeout(&mut self, timeout_sec: u32) {
+        self.session_idle_timeout_sec = timeout_sec;
+    }
+
+    pub fn configure_wallpaper_slideshow(&mut self, interval_sec: u32) {
+        self.wallpaper_slideshow_interval_sec = interval_sec;
+    }
+
+    pub fn configure_qterminal(&mut self, opacity_pct: u8, scrollback_lines: u32) {
+        self.qterminal_opacity_pct = opacity_pct;
+        self.qterminal_scrollback_lines = scrollback_lines;
     }
 
     pub fn register_panel_plugin(&mut self, plugin_name: &str) {
@@ -1739,6 +1754,20 @@ impl SwayWmInnovationEngine {
             }
         }
         Err("sway: unrecognized swaymsg command")
+    }
+
+    pub fn register_sway_criteria(&mut self, criteria: &str, command: &str) {
+        self.sway_criteria_rules
+            .insert(criteria.to_string(), command.to_string());
+    }
+
+    pub fn match_sway_criteria(&self, criteria: &str) -> Option<String> {
+        self.sway_criteria_rules.get(criteria).cloned()
+    }
+
+    pub fn set_output_transform(&mut self, output: &str, transform: &str) {
+        self.output_transforms
+            .insert(output.to_string(), transform.to_string());
     }
 
     pub fn get_output_config_state(&self, output_id: &str) -> Option<String> {
