@@ -24,10 +24,15 @@
 
 ### 1. Core Kernel & Hardware
 - [Kernel Core Component Guide](./Kernel-Core-Component-Guide.md) &ndash; Sovereign microkernel core, bootstrap, and multi-core AP bring-up.
+- [Operating System Structure Component Guide](./Operating-System-Structure-Component-Guide.md) &ndash; Modular hybrid topology, microkernel isolation, and lifecycle traits.
+- [Kernel Scheduler Component Guide](./Kernel-Scheduler-Component-Guide.md) &ndash; CFS / EEVDF fair scheduling, real-time deadlines, and Linux/BSD comparisons.
 - [Scheduler Component Guide](./Scheduler-Component-Guide.md) &ndash; Multi-queue CFS / BORE low-latency preemptive task scheduler.
-- [Dispatcher Master Architecture & Support Matrix Plan](./DISPATCHER_PLAN.md) &ndash; Boundary definition between scheduler, context-switch, interrupt handling, and deferred work; 16-PR roadmap.
+- [Process Management Component Guide](./Process-Management-Component-Guide.md) &ndash; Process lifecycle, PCB state machine, cloning, and zombie reaping.
 - [Memory Management Component Guide](./Memory-Management-Component-Guide.md) &ndash; Paging, slab allocator, NUMA memory tiers, and page cache.
-- [Physical Memory Manager Plan](./PHYSICAL_MEMORY_MANAGER_PLAN.md) &ndash; Two-stage physical memory management architecture, 11 PMM rules & invariants, 20-PR sequence roadmap, periodic maintenance schedule, cross-component implementation rules, and merge gates.
+- [Virtual Memory Manager Component Guide](./Virtual-Memory-Manager-Component-Guide.md) &ndash; Demand paging, Copy-on-Write fork, ASLR, and mmap sealing.
+- [Concurrency & Deadlocks Component Guide](./Concurrency-And-Deadlocks-Component-Guide.md) &ndash; Hierarchical spinlocks, witness cycle detection, and lockless RCU.
+- [Syscall Interface Component Guide](./Syscall-Interface-Component-Guide.md) &ndash; Fast syscall entry dispatch, vDSO time page, and seccomp filters.
+- [Tty Management Component Guide](./Tty-Management-Component-Guide.md) &ndash; Terminal line disciplines, PTY /dev/ptmx multiplexing, and virtual consoles.
 - [PCI Express Bus Enumeration Component Guide](./Pci-Express-Bus-Enumeration-Component-Guide.md) &ndash; PCIe root complex enumeration, MSI/MSI-X, and AER error logging.
 - [DMA & IOMMU Direct Memory Access Component Guide](./Dma-Iommu-Direct-Memory-Access-Component-Guide.md) &ndash; Zero-copy scatter-gather DMA memory manager and IOMMU domain translation.
 - [ACPI Power Resource Parser Component Guide](./Acpi-Power-Resource-Parser-Component-Guide.md) &ndash; ACPI AML bytecode interpreter, thermal trip points, and S0-S5 power states.
@@ -66,8 +71,6 @@
 - [IPC Component Guide](./Ipc-Component-Guide.md) &ndash; Shared memory, Unix domain sockets, pipes, and message queues.
 - [Dynamic Linker Loader Component Guide](./Dynamic-Linker-Loader-Component-Guide.md) &ndash; ELF shared object loader, symbol resolution, and lazy binding.
 - [System Calls ABI Component Guide](./System-Calls-Abi-Component-Guide.md) &ndash; POSIX syscall interface, register conventions, and error translation.
-- [Signal Handler Architecture Plan](./SIGNAL_HANDLER_PLAN.md) &ndash; POSIX.1-2024 signal handler architecture, safety rules, 18-PR roadmap, and merge gates.
-- [Signal Path Audit & ABI Profile](./SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) &ndash; Subsystem audit, signal numbers, ABI layouts, and x86_64 user frame layout.
 
 ---
 
@@ -88,6 +91,7 @@
 ### 5. Networking & Wireless Communications
 - [Networking Stack Component Guide](./Networking-Stack-Component-Guide.md) &ndash; Zero-copy TCP/UDP/IPv4/IPv6 socket stack with high-throughput ring buffers.
 - [NetworkManager & IWD Component Guide](./Network-Manager-Iwd-Component-Guide.md) &ndash; Connection lifecycle manager, DHCP client, and fast roaming daemon.
+- [Linux Mint Warpinator Component Guide](./Linuxmint-Warpinator-Component-Guide.md) &ndash; Local peer-to-peer secure network file transfer engine with TLS/gRPC discovery.
 - [Wireless WiFi Component Guide](./Wireless-Wifi-Component-Guide.md) &ndash; IEEE 802.11 mac80211 wireless driver model, WPA3 SAE, and scan engine.
 - [Bluetooth Stack Component Guide](./Bluetooth-Stack-Component-Guide.md) &ndash; HCI host controller interface, BlueZ protocol compatibility, and BLE GATT services.
 - [Dynamic DNS Resolver Component Guide](./Dynamic-Dns-Resolver-Component-Guide.md) &ndash; Asynchronous caching DNS resolver with DNS-over-TLS/HTTPS support.
@@ -100,6 +104,7 @@
 - [Wayland Compositor Component Guide](./Wayland-Compositor-Component-Guide.md) &ndash; Core Wayland display server, wlroots protocol support, and hardware surfaces.
 - [Hyprland Tiling Component Guide](./Hyprland-Tiling-Component-Guide.md) &ndash; Dynamic tiling Wayland compositor with fluid physics, gestures, and window rules.
 - [Desktop Environment Component Guide](./Desktop-Environment-Component-Guide.md) &ndash; Integrated sovereign desktop shell, wallpaper manager, and panel dispatch.
+- [Linux Mint Slick Greeter Component Guide](./Linuxmint-Slick-Greeter-Component-Guide.md) &ndash; Elegant, secure Display Manager greeter with PAM authentication and guest sessions.
 - [Session Manager (UWSM) Component Guide](./Session-Manager-Uwsm-Component-Guide.md) &ndash; Universal Wayland Session Manager with systemd user unit wrapping.
 - [Waybar Status Bar Component Guide](./Waybar-Status-Bar-Component-Guide.md) &ndash; Modular multi-monitor status bar with dynamic battery, net, and workspace modules.
 - [Waybar Custom CSS Component Guide](./Waybar-Custom-Css-Component-Guide.md) &ndash; Pixel-perfect themes, gradients, border radiuses, and Omarchy aesthetic styling.
@@ -155,6 +160,9 @@
 ---
 
 ### 10. Package Management & Maintenance
+- [Arch ALPM Pacman Component Guide](./Arch-Alpm-Pacman-Component-Guide.md) &ndash; Sovereign ALPM package database synchronization, dependency resolution, and pacman parity.
+- [Arch Mkinitcpio Component Guide](./Arch-Mkinitcpio-Component-Guide.md) &ndash; Modular early userspace initramfs and Unified Kernel Image (UKI) builder.
+- [Arch Install Scripts Component Guide](./Arch-Install-Scripts-Component-Guide.md) &ndash; System bootstrap (pacstrap), declarative fstab (genfstab), and isolated arch-chroot.
 - [Package Management Component Guide](./Package-Management-Component-Guide.md) &ndash; `sigpkg` sovereign package manager with cryptographic signing and rollback.
 - [Package Build Ports Component Guide](./Package-Build-Ports-Component-Guide.md) &ndash; BSD-style ports tree and PKGBUILD recipe build infrastructure.
 - [Package Delta & Reproducible Build Component Guide](./Package-Delta-Reproducible-Build-Component-Guide.md) &ndash; Bit-for-bit deterministic builds and zsync binary delta updates.
@@ -166,16 +174,8 @@
 
 ---
 
-### 11. PR-Formatted Subsystem Roadmaps
-- [36. Open Source OS Inspiration V58 PR Suite](./36-Open-Source-OS-Inspiration-V58-PR-Suite.md) &ndash; Open source OS capabilities across Linux, FreeBSD, OpenBSD, Haiku, Plan 9, and Illumos.
-- [37. Tech Media & Linux/BSD Distro Kernel & Hardening Parity PR Roadmap](./37-Tech-Media-And-Linux-BSD-Distro-Parity-PR-Roadmap.md) &ndash; Future development roadmap for Kernel `sched_ext` BPF, ATX 3.1 power governors, and Landlock V6 security.
-- [38. Universal Desktop & Userland Innovations PR Roadmap](./38-Universal-Desktop-And-Userland-Innovations-PR-Roadmap.md) &ndash; Future development roadmap for Wayland 1.24 HDR, Sovereign FOSS apps, Omakase themes, and CadCraft.
-- [39. Enterprise Security, AI & High-Performance Networking PR Roadmap](./39-Enterprise-Security-AI-And-Networking-PR-Roadmap.md) &ndash; Future development roadmap for Active Directory SSSD, eBPF PQC WireGuard VPN, SIMD AI inference, and universal package transpilation.
-
----
-
 ## 📚 Maintenance, Governance & Architecture
-- [Process Synchronization Plan](./PROCESS_SYNCHRONIZATION_PLAN.md) &ndash; Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR roadmap, maintenance cadences, component rules, PR review template, and completion gates.
+- [AI Development Agent Operating Manual](./AI-Development-Agent-Operating-Manual.md) &ndash; Binding 5-step operational lifecycle, branch & PR merging via 'Theirs', and OOPS/SOLID programming principles.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.
 - [Contributing Guidelines](./CONTRIBUTING.md) &ndash; Submitting patches, test requirements, and coding conventions.
 - [Main Repository Codebase](https://github.com/AaryanSinghChauhan09/SigmaOS) &ndash; Official SigmaOS GitHub repository.
