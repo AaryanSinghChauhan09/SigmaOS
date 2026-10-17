@@ -101,12 +101,16 @@ fn test_pr_gateway_generation_standalone() {
     assert!(md.contains("Arch Wiki & FreeBSD Handbook"));
 
     let temp_dir = std::env::temp_dir().join("sigma_doc_test_export_integration");
-    let files = gateway.export_all_wiki_pages(&temp_dir).expect("Wiki export failed");
+    let files = gateway
+        .export_all_wiki_pages(&temp_dir)
+        .expect("Wiki export failed");
     assert_eq!(files.len(), 4);
     assert!(temp_dir.join("Man-Pages-Catalog.md").exists());
     assert!(temp_dir.join("Info-Pages-Tree.md").exists());
     assert!(temp_dir.join("Package-Docs-Registry.md").exists());
-    assert!(temp_dir.join("Consolidated-OS-Documentation-System.md").exists());
+    assert!(temp_dir
+        .join("Consolidated-OS-Documentation-System.md")
+        .exists());
 
     let _ = fs::remove_dir_all(&temp_dir);
 }
