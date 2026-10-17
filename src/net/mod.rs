@@ -92,3 +92,6 @@ pub use pf_firewall::{
 
 pub mod sovereign_networking_stack_and_daemons_pr;
 pub use sovereign_networking_stack_and_daemons_pr::*;
+
+pub mod sovereign_networking_stack_and_daemons_v61_pr;
+pub use sovereign_networking_stack_and_daemons_v61_pr::*;
