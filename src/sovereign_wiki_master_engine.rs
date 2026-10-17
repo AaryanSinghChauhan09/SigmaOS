@@ -5,6 +5,8 @@ extern crate alloc;
 
 extern crate alloc;
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
@@ -15,21 +17,25 @@ use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-/// Source type for feature roadmap ideas
+/// Feature source types for wiki and roadmap tracking.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
+    ArticleIdea,
     ArchitectureDocument,
     DistroGapMatrix,
+    CoreArchitectureDoc,
     UnimplementedIdeas,
+    MediaWikiDoc,
     AppReplacementPr,
+    SovereignArchitectureDoc,
 }
 
-/// Single feature idea entry from wiki or roadmap
+/// Feature or idea item tracked across wiki and roadmap.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
+    pub idea_id: u64,
     pub title: String,
     pub source_type: FeatureSourceType,
     pub source_file: String,
@@ -37,7 +43,7 @@ pub struct RoadmapFeatureIdea {
     pub is_fully_implemented: bool,
 }
 
-/// Category of improvement ideas
+/// Categories for the 100 Improvement Ideas Evaluator.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
@@ -52,7 +58,7 @@ pub enum IdeaCategory {
     FuturisticAndAiInnovations,
 }
 
-/// Single improvement idea record
+/// Record for a single improvement idea.
 #[derive(Debug, Clone)]
 pub struct ImprovementIdeaRecord {
     pub id: u32,
@@ -63,7 +69,7 @@ pub struct ImprovementIdeaRecord {
     pub is_fulfilled: bool,
 }
 
-/// Suite containing 100 improvement ideas
+/// 100 Improvement Ideas Suite.
 #[derive(Debug)]
 pub struct Sovereign100IdeasSuite {
     pub ideas: Vec<RoadmapFeatureIdea>,
@@ -192,7 +198,7 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
-/// Identifiers for 12 Sovereign Native System Shards
+/// Sovereign System Shard ID enum.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
@@ -209,7 +215,7 @@ pub enum SovereignShardId {
     Shard12GovernanceCommunityWiki,
 }
 
-/// Descriptor for a native system shard
+/// Shard Descriptor.
 #[derive(Debug, Clone)]
 pub struct SovereignShardDescriptor {
     pub id: SovereignShardId,
@@ -219,7 +225,8 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
-/// Master registry for all 12 Sovereign Shards
+/// Twelve System Shards Master Registry.
+#[derive(Debug)]
 pub struct SovereignShardsMasterRegistry {
     pub shards: BTreeMap<u8, SovereignShardDescriptor>,
 }
@@ -371,7 +378,7 @@ impl Default for SovereignShardsMasterRegistry {
     }
 }
 
-/// Distro gap feature record
+/// Distro gap feature record.
 #[derive(Debug, Clone)]
 pub struct DistroGapFeatureRecord {
     pub distro_name: &'static str,
@@ -380,7 +387,8 @@ pub struct DistroGapFeatureRecord {
     pub verification_passed: bool,
 }
 
-/// Distro gap closure engine
+/// Distro gap closure engine.
+#[derive(Debug)]
 pub struct SovereignDistroGapClosureEngine {
     pub features: Vec<DistroGapFeatureRecord>,
 }
@@ -433,7 +441,7 @@ impl Default for SovereignDistroGapClosureEngine {
     }
 }
 
-/// Parity engine for roadmap features
+/// Parity engine for wiki and roadmap tracking.
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
     pub ideas: Vec<RoadmapFeatureIdea>,
@@ -483,7 +491,7 @@ impl Default for SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-/// Syncer for wiki specifications
+/// Wiki specification syncer.
 #[derive(Debug)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
@@ -507,7 +515,7 @@ impl Default for WikiSpecificationDataSyncer {
     }
 }
 
-/// Master wiki & roadmap verification suite
+/// Master Wiki and Roadmap Verification Suite.
 #[derive(Debug)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
@@ -540,7 +548,8 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
     }
 }
 
-/// Master Engine for Sovereign OS Wiki Documentation & Roadmap Absorption
+/// Sovereign Wiki Master Absorption Engine.
+#[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,

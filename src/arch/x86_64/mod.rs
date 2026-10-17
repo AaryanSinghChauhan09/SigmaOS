@@ -5,7 +5,10 @@ pub mod gdt;
 pub mod idt;
 pub mod interrupts;
 pub mod paging;
+pub mod sovereign_rust_osdev_synthesis;
 pub mod tss_ring3_user_mode;
+
+pub use sovereign_rust_osdev_synthesis::*;
 
 pub fn initialize() {
     cpu::init();

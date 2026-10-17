@@ -142,7 +142,9 @@ impl PcieHotplugManager {
             return Err("Device not identified");
         }
 
-        let device_id = (slot.vendor_id.unwrap() as u16) << 16 | (slot.device_id.unwrap() as u16);
+        let device_id =
+            (u32::from(slot.vendor_id.unwrap()) << 16) | u32::from(slot.device_id.unwrap());
+        let device_id_u16 = (slot.device_id.unwrap_or(0)) as u16;
 
         // Configure MSI for the device
         let config = MsiConfig {
@@ -152,12 +154,12 @@ impl PcieHotplugManager {
             per_vector_masking_capable: false,
         };
 
-        self.msi_routing.configure_msi(device_id, config)?;
+        self.msi_routing.configure_msi(device_id_u16, config)?;
 
         // Get the allocated vector
         let msi_vector = self
             .msi_routing
-            .get_msi_vector(device_id)
+            .get_msi_vector(device_id_u16)
             .ok_or("MSI vector not allocated")?;
 
         // Update slot with interrupt vector
@@ -178,8 +180,8 @@ impl PcieHotplugManager {
 
             // Disable MSI for the device
             if let Some(vendor_id) = slot.vendor_id {
-                let device_id = (vendor_id as u16) ^ (slot.device_id.unwrap_or(0));
-                self.msi_routing.disable_msi(device_id)?;
+                let device_id = (vendor_id as u32) << 16 | (slot.device_id.unwrap_or(0) as u32);
+                self.msi_routing.disable_msi(device_id as u16)?;
             }
         }
 

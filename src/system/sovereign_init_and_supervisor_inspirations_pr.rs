@@ -665,17 +665,17 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
-    /// Merge rc.conf override entries into base map.
+    /// Merge local rc.conf override key-value pairs into base rc.conf map.
     pub fn merge_rc_conf_overrides(
         &self,
         base: &BTreeMap<String, String>,
         overrides: &BTreeMap<String, String>,
     ) -> BTreeMap<String, String> {
-        let mut result = base.clone();
+        let mut merged = base.clone();
         for (k, v) in overrides {
-            result.insert(k.clone(), v.clone());
+            merged.insert(k.clone(), v.clone());
         }
-        result
+        merged
     }
 
     /// Execute `rc.subr` command action routing (start, stop, restart, status, poll).

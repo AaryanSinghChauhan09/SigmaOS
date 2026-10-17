@@ -139,7 +139,7 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// State for presenter view
+/// Presenter view state
 #[derive(Debug, Clone)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
@@ -302,17 +302,17 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            DeckExportFormat::PDF => {
+            ExportFormat::PDF => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
                 output.extend_from_slice(deck.slides.len().to_string().as_bytes());
             }
-            DeckExportFormat::PPTX => {
+            ExportFormat::PPTX => {
                 output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
                 output.extend_from_slice(deck.title.as_bytes());
             }
-            DeckExportFormat::HTML5Slideshow | DeckExportFormat::ZenithPresentation => {
+            ExportFormat::HTML5Slideshow => {
                 output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(
@@ -326,7 +326,7 @@ impl SlideExporterEngine {
                 output.extend_from_slice(b"</div></div></body></html>");
             }
             ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_DECK_V1:\nTitle: ");
+                output.extend_from_slice(b"ZENITH_DECK_V1:\n");
                 output.extend_from_slice(deck.title.as_bytes());
             }
             ExportFormat::Markdown => {
