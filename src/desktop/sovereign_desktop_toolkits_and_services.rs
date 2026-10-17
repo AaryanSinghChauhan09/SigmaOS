@@ -188,9 +188,13 @@ impl SovereignGtkQtToolkitEngine {
             svg_path,
         });
         self.qt_style = QtPlatformStyle::Kvantum;
-        self.event_log.push(ToolkitEvent::KvantumThemeApplied(
-            self.kvantum_spec.theme_name.clone(),
-        ));
+        let theme_name_applied = self
+            .kvantum_spec
+            .as_ref()
+            .map(|s| s.theme_name.clone())
+            .unwrap_or_default();
+        self.event_log
+            .push(ToolkitEvent::KvantumThemeApplied(theme_name_applied));
         true
     }
 
@@ -253,6 +257,27 @@ impl SovereignGtkQtToolkitEngine {
             css.push_str("}\n");
         }
         css
+    }
+
+    pub fn generate_libadwaita_css(&self) -> String {
+        let (bg, fg, card) = match self.color_scheme {
+            AdwColorScheme::PreferDark | AdwColorScheme::ForceDark => {
+                ("#1e1e2e", "#cdd6f4", "#313244")
+            }
+            _ => ("#fafafa", "#1c1c1e", "#f0f0f2"),
+        };
+        format!(
+            "@define-color window_bg_color {};\n\
+             @define-color window_fg_color {};\n\
+             @define-color accent_color {};\n\
+             @define-color accent_bg_color {};\n\
+             @define-color card_bg_color {};\n",
+            bg,
+            fg,
+            self.accent_color.to_hex(),
+            self.accent_color.to_hex(),
+            card
+        )
     }
 
     pub fn generate_qt_qss(&self) -> String {
@@ -318,6 +343,15 @@ pub struct PamAuthResult {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GreeterThemeConfig {
+    pub wallpaper_path: String,
+    pub user_avatars: BTreeMap<String, String>,
+    pub cursor_theme: String,
+    pub gtk_theme: String,
+    pub icon_theme: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DMSeatConfig {
     pub seat_id: String,
     pub vt_number: u32,
@@ -330,10 +364,11 @@ pub struct DMSeatConfig {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct XdmcpSessionHandshake {
-    pub session_id: u32,
+    pub session_id: usize,
     pub remote_address: String,
     pub display_number: u32,
     pub authenticated: bool,
+    pub status: String,
 }
 
 pub struct XdmcpSessionManager {
@@ -365,6 +400,7 @@ impl Default for XdmcpSessionManager {
 pub struct SovereignDisplayManagerSuiteEngine {
     pub active_backend: DisplayManagerBackend,
     pub seats: BTreeMap<String, DMSeatConfig>,
+    pub greeter_config: GreeterThemeConfig,
     pub available_sessions: Vec<DesktopSessionType>,
     pub pam_auth_history: Vec<(String, bool)>,
     pub xdmcp_sessions: Vec<XdmcpSessionHandshake>,
@@ -390,9 +426,19 @@ impl SovereignDisplayManagerSuiteEngine {
             },
         );
 
+        let mut avatars = BTreeMap::new();
+        avatars.insert("sigma_user".to_string(), "/var/lib/AccountsService/icons/sigma_user.png".to_string());
+
         Self {
             active_backend: backend,
             seats,
+            greeter_config: GreeterThemeConfig {
+                wallpaper_path: "/usr/share/backgrounds/sigma_default.png".to_string(),
+                user_avatars: avatars,
+                cursor_theme: "Adwaita".to_string(),
+                gtk_theme: "Adwaita-dark".to_string(),
+                icon_theme: "Papirus-Dark".to_string(),
+            },
             available_sessions: vec![
                 DesktopSessionType::Wayland,
                 DesktopSessionType::Hyprland,
@@ -405,6 +451,39 @@ impl SovereignDisplayManagerSuiteEngine {
             xdmcp_sessions: Vec::new(),
             xdmcp_manager: XdmcpSessionManager::new(),
         }
+    }
+
+    pub fn build_pam_session_env(
+        &self,
+        user: &str,
+        session_type: DesktopSessionType,
+    ) -> BTreeMap<String, String> {
+        let mut env = BTreeMap::new();
+        env.insert("USER".to_string(), user.to_string());
+        env.insert("LOGNAME".to_string(), user.to_string());
+        env.insert("HOME".to_string(), format!("/home/{}", user));
+        env.insert("SHELL".to_string(), "/bin/bash".to_string());
+
+        match session_type {
+            DesktopSessionType::Wayland | DesktopSessionType::Hyprland | DesktopSessionType::Zenith => {
+                env.insert("XDG_SESSION_TYPE".to_string(), "wayland".to_string());
+                env.insert("WAYLAND_DISPLAY".to_string(), "wayland-0".to_string());
+                env.insert("XDG_CURRENT_DESKTOP".to_string(), "SigmaOS:Wayland".to_string());
+                env.insert("DESKTOP_SESSION".to_string(), "wayland".to_string());
+            }
+            DesktopSessionType::X11 | DesktopSessionType::KdePlasma | DesktopSessionType::GnomeShell => {
+                env.insert("XDG_SESSION_TYPE".to_string(), "x11".to_string());
+                env.insert("DISPLAY".to_string(), ":0".to_string());
+                env.insert("XDG_CURRENT_DESKTOP".to_string(), "SigmaOS:X11".to_string());
+                env.insert("DESKTOP_SESSION".to_string(), "x11".to_string());
+            }
+            _ => {
+                env.insert("XDG_SESSION_TYPE".to_string(), "wayland".to_string());
+                env.insert("WAYLAND_DISPLAY".to_string(), "wayland-0".to_string());
+                env.insert("XDG_CURRENT_DESKTOP".to_string(), "SigmaOS".to_string());
+            }
+        }
+        env
     }
 
     pub fn authenticate_pam(&mut self, req: &PamAuthRequest) -> PamAuthResult {
@@ -454,8 +533,9 @@ impl SovereignDisplayManagerSuiteEngine {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
             session_id: id,
-            client_address: client_address.to_string(),
+            remote_address: client_address.to_string(),
             display_number,
+            authenticated: true,
             status: "Active".to_string(),
         });
         self.xdmcp_manager
@@ -501,18 +581,6 @@ impl SovereignDisplayManagerSuiteEngine {
             false
         }
     }
-
-    pub fn initiate_xdmcp_remote_handshake(&mut self, client_address: &str, display_number: u32) -> usize {
-        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
-        self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id,
-            client_address: client_address.to_string(),
-            display_number,
-            status: "Active".to_string(),
-        });
-        self.xdmcp_manager.initiate_handshake(&format!(":{}", display_number), client_address);
-        id
-    }
 }
 
 // ============================================================================
@@ -555,6 +623,16 @@ pub struct GFileInfo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum GvfsVolumeEvent {
+    VolumeAdded(String),
+    VolumeRemoved(String),
+    MountAdded(usize),
+    MountRemoved(usize),
+    DriveConnected(String),
+    DriveDisconnected(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GvfsMountPoint {
     pub mount_id: usize,
     pub scheme: GvfsMountScheme,
@@ -569,6 +647,7 @@ pub struct SovereignGvfsGioEngine {
     pub gio_file_cache: BTreeMap<String, Vec<u8>>,
     pub gio_metadata: BTreeMap<String, GFileInfo>,
     pub active_monitors: Vec<(String, GFileMonitorEvent)>,
+    pub volume_events: Vec<GvfsVolumeEvent>,
     pub async_copy_operations: Vec<(String, String, u64, u64)>,
 }
 
@@ -579,8 +658,10 @@ impl SovereignGvfsGioEngine {
             gio_file_cache: BTreeMap::new(),
             gio_metadata: BTreeMap::new(),
             active_monitors: Vec::new(),
+            volume_events: Vec::new(),
             async_copy_operations: Vec::new(),
         };
+        engine.volume_events.push(GvfsVolumeEvent::DriveConnected("TrashDrive".to_string()));
         // Default virtual mount: Trash
         engine
             .mount_uri("trash:///", "/run/user/1000/gvfs/trash")
@@ -625,16 +706,32 @@ impl SovereignGvfsGioEngine {
             read_only: scheme == GvfsMountScheme::Archive,
         };
         self.mounts.push(mount);
+        self.volume_events.push(GvfsVolumeEvent::MountAdded(id));
         Ok(id)
     }
 
     pub fn unmount(&mut self, mount_id: usize) -> bool {
         if let Some(m) = self.mounts.iter_mut().find(|m| m.mount_id == mount_id) {
             m.is_mounted = false;
+            self.volume_events.push(GvfsVolumeEvent::MountRemoved(mount_id));
             true
         } else {
             false
         }
+    }
+
+    pub fn g_file_enumerate_children(&self, dir_path: &str) -> Vec<GFileInfo> {
+        let prefix = if dir_path.ends_with('/') {
+            dir_path.to_string()
+        } else {
+            format!("{}/", dir_path)
+        };
+
+        self.gio_metadata
+            .iter()
+            .filter(|(path, _)| path.starts_with(&prefix) && path.len() > prefix.len())
+            .map(|(_, info)| info.clone())
+            .collect()
     }
 
     pub fn g_file_read_all(&self, gio_path: &str) -> Option<Vec<u8>> {
@@ -717,6 +814,12 @@ pub struct PolkitActionRule {
     pub description: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PolkitSubject {
+    UnixProcess { pid: u32, start_time: u64 },
+    SystemBusName { name: String },
+}
+
 pub struct SovereignPolicyKitAuthorizationEngine {
     pub action_rules: BTreeMap<String, PolkitActionRule>,
     pub js_rules: Vec<(String, PolkitResult)>,
@@ -787,6 +890,18 @@ impl SovereignPolicyKitAuthorizationEngine {
             self.auth_cache.remove(&k);
         }
         count
+    }
+
+    pub fn check_authorization_subject(
+        &mut self,
+        subject: &PolkitSubject,
+        action_id: &str,
+    ) -> PolkitResult {
+        let user = match subject {
+            PolkitSubject::UnixProcess { pid, .. } => format!("process_{}", pid),
+            PolkitSubject::SystemBusName { name } => format!("dbus_{}", name),
+        };
+        self.check_authorization(&user, &["wheel"], action_id)
     }
 
     pub fn check_authorization(
@@ -925,6 +1040,32 @@ impl SovereignXdgDesktopPortalEngine {
             active_idle_inhibitors: Vec::new(),
             secret_wallet_store: BTreeMap::new(),
         }
+    }
+
+    pub fn query_mime_association(&self, mime_type: &str) -> Option<String> {
+        self.mime_apps.get(mime_type).cloned()
+    }
+
+    pub fn set_mime_association(&mut self, mime_type: &str, app_id: &str) {
+        self.mime_apps.insert(mime_type.to_string(), app_id.to_string());
+    }
+
+    pub fn handle_portal_open_uri(&mut self, app_id: &str, uri: &str) -> Result<String, String> {
+        let key = (app_id.to_string(), "org.freedesktop.portal.OpenURI".to_string());
+        self.portal_permissions.insert(key, PortalPermissionState::Granted);
+        self.xdg_open(uri)
+    }
+
+    pub fn handle_portal_screenshot(&mut self, app_id: &str, interactive: bool) -> Result<String, String> {
+        let key = (app_id.to_string(), "org.freedesktop.portal.Screenshot".to_string());
+        self.portal_permissions.insert(key, PortalPermissionState::Granted);
+        Ok(format!("Portal Screenshot captured for '{}' (interactive={})", app_id, interactive))
+    }
+
+    pub fn handle_portal_location(&mut self, app_id: &str) -> Result<(f64, f64), String> {
+        let key = (app_id.to_string(), "org.freedesktop.portal.Location".to_string());
+        self.portal_permissions.insert(key, PortalPermissionState::Granted);
+        Ok((37.7749, -122.4194)) // Mock lat, lon
     }
 
     pub fn xdg_open(&self, target: &str) -> Result<String, String> {
@@ -1092,6 +1233,7 @@ impl SovereignFontAndTextLayoutEngine {
 
         Self {
             font_match_cache,
+            fontconfig_aliases,
             opentype_features: vec![
                 "liga".to_string(),
                 "kern".to_string(),
@@ -1137,7 +1279,7 @@ impl SovereignFontAndTextLayoutEngine {
         for (idx, ch) in char_pairs {
             self.shaped_buffer_cache.push(HbShapedGlyph {
                 glyph_id: ch as u32,
-                x_advance: 800,
+                x_advance: if rtl { -800 } else { 800 },
                 y_advance: 0,
                 x_offset: 0,
                 y_offset: 0,
@@ -1145,6 +1287,11 @@ impl SovereignFontAndTextLayoutEngine {
             });
         }
         self.shaped_buffer_cache.len()
+    }
+
+    pub fn harfbuzz_shape_text_bidi(&mut self, text: &str) -> usize {
+        let is_rtl = text.chars().any(|c| (c as u32) >= 0x0590 && (c as u32) <= 0x08FF);
+        self.harfbuzz_shape_text(text, is_rtl)
     }
 
     pub fn pango_cairo_render_layout(&self, text: &str) -> String {
@@ -1213,6 +1360,39 @@ impl SovereignInputMethodFrameworkEngine {
         self.active_engine_id = engine_id.to_string();
         self.preedit_text.clear();
         self.candidates.clear();
+        self.current_page = 0;
+    }
+
+    pub fn next_page(&mut self) -> bool {
+        let total_pages = (self.candidates.len() + self.page_size - 1) / self.page_size;
+        if total_pages > 0 && self.current_page + 1 < total_pages {
+            self.current_page += 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn prev_page(&mut self) -> bool {
+        if self.current_page > 0 {
+            self.current_page -= 1;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn select_candidate_by_index(&mut self, idx: usize) -> Option<String> {
+        let global_idx = self.current_page * self.page_size + idx;
+        if global_idx < self.candidates.len() {
+            let commit = self.candidates[global_idx].text.clone();
+            self.preedit_text.clear();
+            self.candidates.clear();
+            self.current_page = 0;
+            Some(commit)
+        } else {
+            None
+        }
     }
 
     pub fn process_key_event(&mut self, key_str: &str) -> Option<String> {
@@ -1391,6 +1571,10 @@ impl SovereignDesktopNotificationDaemonEngine {
         }
     }
 
+    pub fn resolve_canberra_sound_event(&self, sound_event: &str) -> String {
+        format!("/usr/share/sounds/{}/stereo/{}.ogg", self.sound_theme_name, sound_event)
+    }
+
     pub fn close_notification(&mut self, id: u32) -> bool {
         if let Some(pos) = self.active_notifications.iter().position(|n| n.id == id) {
             self.active_notifications.remove(pos);
@@ -1433,6 +1617,8 @@ pub struct SovereignScreenLockerEngine {
     pub inactivity_timeout_secs: u32,
     pub is_pam_locked_out: bool,
     pub lock_surfaces_count: u32,
+    pub session_lock_v1_acked: bool,
+    pub auto_pause_media_on_lock: bool,
 }
 
 impl SovereignScreenLockerEngine {
@@ -1444,6 +1630,8 @@ impl SovereignScreenLockerEngine {
             inactivity_timeout_secs: 300,
             is_pam_locked_out: false,
             lock_surfaces_count: 0,
+            session_lock_v1_acked: false,
+            auto_pause_media_on_lock: true,
         }
     }
 
@@ -1451,6 +1639,11 @@ impl SovereignScreenLockerEngine {
         self.lock_state = SessionLockState::Locked;
         self.lock_surfaces_count = monitor_count;
         self.dpms_mode = DpmsPowerMode::On;
+        self.session_lock_v1_acked = true;
+    }
+
+    pub fn should_pause_media(&self) -> bool {
+        self.auto_pause_media_on_lock && self.lock_state == SessionLockState::Locked
     }
 
     pub fn set_dpms_mode(&mut self, mode: DpmsPowerMode) {
@@ -1574,6 +1767,18 @@ impl SovereignClipboardManagerEngine {
                     .and_then(|p| String::from_utf8(p.clone()).ok())
             }
         })
+    }
+
+    pub fn search_cliphist(&self, query: &str) -> Vec<&ClipboardEntry> {
+        self.clipboard_history
+            .iter()
+            .filter(|e| {
+                !e.is_secret
+                    && e.mime_map.values().any(|v| {
+                        String::from_utf8_lossy(v).contains(query)
+                    })
+            })
+            .collect()
     }
 
     pub fn purge_secret_entries(&mut self) -> usize {
@@ -1764,6 +1969,9 @@ mod tests {
         engine.set_accent_color(SovereignAccentColor::Teal);
         assert_eq!(engine.accent_color.to_hex(), "#129eaf");
 
+        let adw_css = engine.generate_libadwaita_css();
+        assert!(adw_css.contains("@define-color window_bg_color #1e1e2e;"));
+
         assert!(engine.parse_and_apply_kvantum_config(
             "theme=KvCatppuccinMocha\nblur=true\ntranslucent=true"
         ));
@@ -1824,6 +2032,9 @@ mod tests {
         assert_eq!(res.user_uid, 1000);
         assert!(!dm.seats.get("seat0").unwrap().greeter_active);
 
+        let env = dm.build_pam_session_env("sigma_user", DesktopSessionType::Wayland);
+        assert_eq!(env.get("XDG_SESSION_TYPE"), Some(&"wayland".to_string()));
+
         let guest = dm.create_guest_session_sandbox("seat1").unwrap();
         assert!(guest.starts_with("guest_"));
         assert!(dm.seats.get("seat1").unwrap().is_guest_session);
@@ -1852,6 +2063,9 @@ mod tests {
             Some(b"deleted item".to_vec())
         );
 
+        let children = gvfs.g_file_enumerate_children("/trash");
+        assert_eq!(children.len(), 1);
+
         assert!(gvfs.g_file_set_xattr("/trash/item1.txt", "user.checksum", "sha256abc"));
         let copy_bytes = gvfs
             .g_file_copy_async("/trash/item1.txt", "/trash/item2.txt")
@@ -1875,6 +2089,10 @@ mod tests {
         let res_js = polkit.check_authorization("sigma_user", &[], "org.sigmaos.device.drive");
         assert_eq!(res_js, PolkitResult::Yes);
 
+        let subj = PolkitSubject::UnixProcess { pid: 1234, start_time: 5000 };
+        let res_subj = polkit.check_authorization_subject(&subj, "org.freedesktop.accounts.user-administration");
+        assert_eq!(res_subj, PolkitResult::Yes);
+
         let res = polkit.check_authorization(
             "sigma_user",
             &["wheel"],
@@ -1883,8 +2101,17 @@ mod tests {
         assert_eq!(res, PolkitResult::Yes);
 
         let mut portal = SovereignXdgDesktopPortalEngine::new();
-        let app_res = portal.xdg_open("https://sigmaos.org");
+        portal.set_mime_association("image/png", "org.sigmaos.pix.desktop");
+        assert_eq!(portal.query_mime_association("image/png"), Some("org.sigmaos.pix.desktop".to_string()));
+
+        let app_res = portal.handle_portal_open_uri("org.sigmaos.browser", "https://sigmaos.org");
         assert!(app_res.unwrap().contains("browser"));
+
+        let shot_res = portal.handle_portal_screenshot("org.sigmaos.flameshot", true);
+        assert!(shot_res.unwrap().contains("org.sigmaos.flameshot"));
+
+        let loc = portal.handle_portal_location("org.sigmaos.maps").unwrap();
+        assert_eq!(loc, (37.7749, -122.4194));
 
         let handle = portal.create_screencast_session("org.sigmaos.obs");
         assert!(handle.contains("org.sigmaos.obs"));
@@ -1923,6 +2150,9 @@ mod tests {
         let glyph_count = font_engine.harfbuzz_shape_text("SigmaOS", false);
         assert_eq!(glyph_count, 7);
 
+        let bidi_count = font_engine.harfbuzz_shape_text_bidi("שָׁלוֹם");
+        assert!(bidi_count > 0);
+
         let mut ime = SovereignInputMethodFrameworkEngine::new(ImeFrameworkKind::Fcitx5);
         ime.switch_engine("pinyin");
         ime.process_key_event("n");
@@ -1936,6 +2166,9 @@ mod tests {
         let mut notif = SovereignDesktopNotificationDaemonEngine::new();
         notif.set_dnd_schedule(22, 7);
         assert!(notif.is_dnd_active_at_hour(23));
+
+        let snd_path = notif.resolve_canberra_sound_event("dialog-error");
+        assert!(snd_path.contains("dialog-error.ogg"));
 
         let nid = notif.notify(
             "systemd",
@@ -1951,6 +2184,8 @@ mod tests {
         let mut locker = SovereignScreenLockerEngine::new();
         locker.lock_session(2);
         assert_eq!(locker.lock_state, SessionLockState::Locked);
+        assert!(locker.should_pause_media());
+        assert!(locker.session_lock_v1_acked);
         locker.set_dpms_mode(DpmsPowerMode::Off);
         assert_eq!(locker.dpms_mode, DpmsPowerMode::Off);
         assert!(locker.authenticate_and_unlock("sigmaos_secret"));
@@ -1958,7 +2193,10 @@ mod tests {
 
         let mut clip = SovereignClipboardManagerEngine::new();
         clip.copy_text("Secret Token", "KeePassXC", true);
-        assert_eq!(clip.get_latest_text(), Some("********".to_string()));
+        clip.copy_text("Normal Text Item", "Gedit", false);
+        assert_eq!(clip.get_latest_text(), Some("Normal Text Item".to_string()));
+        let search_res = clip.search_cliphist("Normal");
+        assert_eq!(search_res.len(), 1);
         let purged = clip.purge_secret_entries();
         assert_eq!(purged, 1);
 
