@@ -45,7 +45,8 @@
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
 <!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- POSIX section:
+- Upstream study:
+- What SigmaOS adopts:
 - Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
@@ -67,7 +68,20 @@
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Evidence & Reviewer checklist
+## Shell component
+
+- [ ] Interactive REPL
+- [ ] Scripting engine
+- [ ] Job control
+- [ ] Builtins
+
+## Shell safety review
+
+- [ ] Input validation
+- [ ] Signal handling
+- [ ] Memory safety
+
+## Evidence
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -91,7 +105,6 @@
 
 - Risk:
 - Rollback:
+- Safety and rollback:
 
 ## Reviewer checklist
-
-- [ ] Verification complete
