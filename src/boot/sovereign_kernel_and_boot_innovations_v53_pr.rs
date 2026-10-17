@@ -125,7 +125,13 @@ impl LinuxBsdKernelInnovationsV53Engine {
             bcachefs_cow_tiering: false,
             capsicum_rights_mask: 0,
             vnet_jail_isolated: false,
-            pledge_promises: vec!["stdio".to_string(), "rpath".to_string(), "wpath".to_string(), "cpath".to_string(), "inet".to_string()],
+            pledge_promises: vec![
+                "stdio".to_string(),
+                "rpath".to_string(),
+                "wpath".to_string(),
+                "cpath".to_string(),
+                "inet".to_string(),
+            ],
             unveil_paths: unveil,
             karl_seed: 0xCAFE_BABE_DEAD_BEEF,
             softraid_crypto_algo: "softraid-CRYPTO-AES-256".to_string(),
@@ -244,7 +250,10 @@ impl KernelModuleAndDriverRuntimeV53Engine {
                 name: "nvme".to_string(),
                 license: "GPL".to_string(),
                 version: "2.2.0".to_string(),
-                exported_symbols: vec!["nvme_alloc_request".to_string(), "nvme_submit_cmd".to_string()],
+                exported_symbols: vec![
+                    "nvme_alloc_request".to_string(),
+                    "nvme_submit_cmd".to_string(),
+                ],
                 relocations_resolved: 48,
                 is_loaded: true,
             },
@@ -290,7 +299,14 @@ impl KernelModuleAndDriverRuntimeV53Engine {
         );
     }
 
-    pub fn load_module(&mut self, name: &str, license: &str, version: &str, symbols: Vec<String>, relocs: usize) -> bool {
+    pub fn load_module(
+        &mut self,
+        name: &str,
+        license: &str,
+        version: &str,
+        symbols: Vec<String>,
+        relocs: usize,
+    ) -> bool {
         let mod_entry = KernelModuleV53 {
             name: name.to_string(),
             license: license.to_string(),
@@ -303,7 +319,14 @@ impl KernelModuleAndDriverRuntimeV53Engine {
         true
     }
 
-    pub fn probe_device(&mut self, device_id: &str, driver_name: &str, bus_type: &str, bar_addr: u64, irq: u32) -> bool {
+    pub fn probe_device(
+        &mut self,
+        device_id: &str,
+        driver_name: &str,
+        bus_type: &str,
+        bar_addr: u64,
+        irq: u32,
+    ) -> bool {
         let driver = DeviceDriverV53 {
             driver_name: driver_name.to_string(),
             bus_type: bus_type.to_string(),
@@ -354,7 +377,8 @@ impl FirmwareAndMicrocodeLoaderV53Engine {
                 path: "kernel/x86/microcode/GenuineIntel.bin".to_string(),
                 size_bytes: 3_670_016, // ~3.5MB
                 vendor: "Intel".to_string(),
-                sha256_hash: "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0".to_string(),
+                sha256_hash: "a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0"
+                    .to_string(),
                 is_early_microcode: true,
             },
         );
@@ -366,7 +390,8 @@ impl FirmwareAndMicrocodeLoaderV53Engine {
                 path: "kernel/x86/microcode/AuthenticAMD.bin".to_string(),
                 size_bytes: 1_258_291, // ~1.2MB
                 vendor: "AMD".to_string(),
-                sha256_hash: "b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef01".to_string(),
+                sha256_hash: "b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef01"
+                    .to_string(),
                 is_early_microcode: true,
             },
         );
@@ -378,13 +403,21 @@ impl FirmwareAndMicrocodeLoaderV53Engine {
                 path: "/lib/firmware/amdgpu/gc_11_0_0_mes.bin".to_string(),
                 size_bytes: 524_288,
                 vendor: "AMD Radeon".to_string(),
-                sha256_hash: "c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef012".to_string(),
+                sha256_hash: "c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef012"
+                    .to_string(),
                 is_early_microcode: false,
             },
         );
     }
 
-    pub fn add_firmware(&mut self, path: &str, size: usize, vendor: &str, sha256: &str, is_ucode: bool) {
+    pub fn add_firmware(
+        &mut self,
+        path: &str,
+        size: usize,
+        vendor: &str,
+        sha256: &str,
+        is_ucode: bool,
+    ) {
         let blob = FirmwareBlobV53 {
             path: path.to_string(),
             size_bytes: size,
@@ -396,7 +429,11 @@ impl FirmwareAndMicrocodeLoaderV53Engine {
     }
 
     pub fn total_microcode_size(&self) -> usize {
-        self.blobs.values().filter(|b| b.is_early_microcode).map(|b| b.size_bytes).sum()
+        self.blobs
+            .values()
+            .filter(|b| b.is_early_microcode)
+            .map(|b| b.size_bytes)
+            .sum()
     }
 }
 
@@ -475,7 +512,11 @@ impl InitramfsInitrdStagingV53Engine {
     }
 
     pub fn calculate_compressed_size(&self) -> usize {
-        let raw_size: usize = self.files.iter().map(|f| 110 + f.path.len() + f.size_bytes).sum();
+        let raw_size: usize = self
+            .files
+            .iter()
+            .map(|f| 110 + f.path.len() + f.size_bytes)
+            .sum();
         match self.compression {
             CompressionAlgoV53::Zstd => (raw_size as f64 * 0.35) as usize,
             CompressionAlgoV53::Xz => (raw_size as f64 * 0.30) as usize,
@@ -588,11 +629,20 @@ impl MultiDistroBootloaderConfigV53Engine {
     }
 
     pub fn generate_grub2_cfg(&self) -> String {
-        let mut out = format!("# Sovereign GRUB2 Configuration V53\nset timeout={}\nset default=0\n\n", self.timeout_seconds);
+        let mut out = format!(
+            "# Sovereign GRUB2 Configuration V53\nset timeout={}\nset default=0\n\n",
+            self.timeout_seconds
+        );
         for entry in &self.entries {
-            out.push_str(&format!("menuentry '{}' --id '{}' {{\n", entry.title, entry.id));
+            out.push_str(&format!(
+                "menuentry '{}' --id '{}' {{\n",
+                entry.title, entry.id
+            ));
             out.push_str("    insmod gpt\n    insmod ext2\n");
-            out.push_str(&format!("    linux {} {}\n", entry.kernel_path, entry.cmdline));
+            out.push_str(&format!(
+                "    linux {} {}\n",
+                entry.kernel_path, entry.cmdline
+            ));
             for initrd in &entry.initrd_paths {
                 out.push_str(&format!("    initrd {}\n", initrd));
             }
@@ -606,9 +656,15 @@ impl MultiDistroBootloaderConfigV53Engine {
         for entry in &self.entries {
             out.push_str(&format!(":{}\n", entry.title));
             out.push_str("PROTOCOL=stivale2\n");
-            out.push_str(&format!("KERNEL_PATH=boot:///{}\n", entry.kernel_path.trim_start_matches('/')));
+            out.push_str(&format!(
+                "KERNEL_PATH=boot:///{}\n",
+                entry.kernel_path.trim_start_matches('/')
+            ));
             for initrd in &entry.initrd_paths {
-                out.push_str(&format!("MODULE_PATH=boot:///{}\n", initrd.trim_start_matches('/')));
+                out.push_str(&format!(
+                    "MODULE_PATH=boot:///{}\n",
+                    initrd.trim_start_matches('/')
+                ));
             }
             out.push_str(&format!("KERNEL_CMDLINE={}\n\n", entry.cmdline));
         }
@@ -662,10 +718,13 @@ impl UefiBiosGopHandoffV53Engine {
     }
 
     fn seed_nvram(&mut self) {
-        self.nvram_vars.insert("BootOrder".to_string(), vec![0x00, 0x01, 0x00, 0x02]);
+        self.nvram_vars
+            .insert("BootOrder".to_string(), vec![0x00, 0x01, 0x00, 0x02]);
         self.nvram_vars.insert("SecureBoot".to_string(), vec![0x01]);
-        self.nvram_vars.insert("PK".to_string(), vec![0xAA, 0xBB, 0xCC, 0xDD]);
-        self.nvram_vars.insert("KEK".to_string(), vec![0x11, 0x22, 0x33, 0x44]);
+        self.nvram_vars
+            .insert("PK".to_string(), vec![0xAA, 0xBB, 0xCC, 0xDD]);
+        self.nvram_vars
+            .insert("KEK".to_string(), vec![0x11, 0x22, 0x33, 0x44]);
     }
 
     pub fn negotiate_gop(&mut self, mode: GopDisplayModeV53) -> GopFramebufferInfoV53 {
@@ -726,24 +785,34 @@ impl FlattenedDeviceTreeFdtV53Engine {
     }
 
     fn seed_tree(&mut self) {
-        self.root.properties.insert("compatible".to_string(), "sovereign,v53-board,arm64-x86".to_string());
-        self.root.properties.insert("#address-cells".to_string(), "2".to_string());
-        self.root.properties.insert("#size-cells".to_string(), "2".to_string());
+        self.root.properties.insert(
+            "compatible".to_string(),
+            "sovereign,v53-board,arm64-x86".to_string(),
+        );
+        self.root
+            .properties
+            .insert("#address-cells".to_string(), "2".to_string());
+        self.root
+            .properties
+            .insert("#size-cells".to_string(), "2".to_string());
 
         let mut soc = FdtNodeV53 {
             name: "soc".to_string(),
             properties: BTreeMap::new(),
             children: Vec::new(),
         };
-        soc.properties.insert("compatible".to_string(), "simple-bus".to_string());
+        soc.properties
+            .insert("compatible".to_string(), "simple-bus".to_string());
 
         let mut uart = FdtNodeV53 {
             name: "serial@fe201000".to_string(),
             properties: BTreeMap::new(),
             children: Vec::new(),
         };
-        uart.properties.insert("compatible".to_string(), "arm,pl011".to_string());
-        uart.properties.insert("status".to_string(), "okay".to_string());
+        uart.properties
+            .insert("compatible".to_string(), "arm,pl011".to_string());
+        uart.properties
+            .insert("status".to_string(), "okay".to_string());
         soc.children.push(uart);
 
         self.root.children.push(soc);
@@ -752,13 +821,17 @@ impl FlattenedDeviceTreeFdtV53Engine {
     pub fn apply_overlay(&mut self, target_node: &str, prop_name: &str, prop_val: &str) -> bool {
         for child in &mut self.root.children {
             if child.name == target_node {
-                child.properties.insert(prop_name.to_string(), prop_val.to_string());
+                child
+                    .properties
+                    .insert(prop_name.to_string(), prop_val.to_string());
                 self.applied_overlays += 1;
                 return true;
             }
             for grandchild in &mut child.children {
                 if grandchild.name == target_node {
-                    grandchild.properties.insert(prop_name.to_string(), prop_val.to_string());
+                    grandchild
+                        .properties
+                        .insert(prop_name.to_string(), prop_val.to_string());
                     self.applied_overlays += 1;
                     return true;
                 }
@@ -894,10 +967,17 @@ impl SovereignKernelAndBootInnovationsV53Suite {
         let gop_ok = self.uefi_gop_engine.active_gop.is_some();
 
         // 7. FDT Overlay
-        let overlay_ok = self.fdt_engine.apply_overlay("serial@fe201000", "status", "okay");
+        let overlay_ok = self
+            .fdt_engine
+            .apply_overlay("serial@fe201000", "status", "okay");
 
         // 8. Kexec Staging
-        let kexec_count = self.kexec_engine.stage_kexec_image(0x0200_0000, 16 * 1024 * 1024, 8 * 1024 * 1024, 512 * 1024);
+        let kexec_count = self.kexec_engine.stage_kexec_image(
+            0x0200_0000,
+            16 * 1024 * 1024,
+            8 * 1024 * 1024,
+            512 * 1024,
+        );
 
         mod_loaded
             && drv_probed
@@ -922,14 +1002,22 @@ impl SovereignKernelAndBootInnovationsV53Suite {
              - Active GOP Mode: {}x{}\n\
              - FDT Overlays Applied: {}\n\
              - Kexec Staged Segments: {}",
-            self.kernel_engine.get_active_config().map_or("None", |c| &c.name),
+            self.kernel_engine
+                .get_active_config()
+                .map_or("None", |c| &c.name),
             self.module_driver_engine.modules.len(),
             self.module_driver_engine.drivers.len(),
             self.firmware_engine.blobs.len(),
             self.initramfs_engine.files.len(),
             self.bootloader_engine.entries.len(),
-            self.uefi_gop_engine.active_gop.as_ref().map_or(0, |g| g.width),
-            self.uefi_gop_engine.active_gop.as_ref().map_or(0, |g| g.height),
+            self.uefi_gop_engine
+                .active_gop
+                .as_ref()
+                .map_or(0, |g| g.width),
+            self.uefi_gop_engine
+                .active_gop
+                .as_ref()
+                .map_or(0, |g| g.height),
             self.fdt_engine.applied_overlays,
             self.kexec_engine.staged_segments.len()
         )
@@ -969,7 +1057,9 @@ mod tests {
     #[test]
     fn test_firmware_and_microcode_v53() {
         let engine = FirmwareAndMicrocodeLoaderV53Engine::new();
-        assert!(engine.blobs.contains_key("kernel/x86/microcode/GenuineIntel.bin"));
+        assert!(engine
+            .blobs
+            .contains_key("kernel/x86/microcode/GenuineIntel.bin"));
         assert!(engine.total_microcode_size() >= 4_194_304);
     }
 

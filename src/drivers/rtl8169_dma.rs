@@ -276,7 +276,7 @@ impl RTL8169Driver {
             self.write_reg(REG_TNPDS, (rx_ring_phys & 0xFFFFFFFF) as u32);
             self.write_reg(REG_TNPDS + 4, (rx_ring_phys >> 32) as u32);
         }
-        
+
         Ok(())
     }
 
@@ -304,7 +304,7 @@ impl RTL8169Driver {
             self.write_reg(REG_TNPDS, (tx_ring_phys & 0xFFFFFFFF) as u32);
             self.write_reg(REG_TNPDS + 4, (tx_ring_phys >> 32) as u32);
         }
-        
+
         Ok(())
     }
 

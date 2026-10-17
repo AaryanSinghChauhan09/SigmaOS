@@ -267,10 +267,7 @@ impl NoteTakingApp {
             for note in notes {
                 let title_match = contains_ignore_case(&note.title, query);
                 let content_match = contains_ignore_case(&note.content, query);
-                let tag_match = note
-                    .tags
-                    .iter()
-                    .any(|t| contains_ignore_case(t, query));
+                let tag_match = note.tags.iter().any(|t| contains_ignore_case(t, query));
 
                 if title_match || content_match || tag_match {
                     let relevance_score = if title_match { 1.0 } else { 0.5 };

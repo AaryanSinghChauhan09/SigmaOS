@@ -186,40 +186,57 @@ impl UniversalPackageFormatInspectorV51 {
                 || f.ends_with(".pacman")
                 || f.ends_with("pacman") =>
             {
-                (PackageFormat::Pacman, PackageSignatureKindV51::PqcKyberDilithium)
+                (
+                    PackageFormat::Pacman,
+                    PackageSignatureKindV51::PqcKyberDilithium,
+                )
             }
-            f if f.ends_with(".apk") => {
-                (PackageFormat::Apk, PackageSignatureKindV51::ApkV2V3Signature)
-            }
+            f if f.ends_with(".apk") => (
+                PackageFormat::Apk,
+                PackageSignatureKindV51::ApkV2V3Signature,
+            ),
             f if f.ends_with(".xbps") => {
                 (PackageFormat::Xbps, PackageSignatureKindV51::OpenBsdSignify)
             }
             f if f.ends_with(".eopkg") || f.ends_with(".pisi") || f.ends_with(".PiSi") => {
                 (PackageFormat::Eopkg, PackageSignatureKindV51::GpgOpenPgp)
             }
-            f if f.ends_with(".hpkg") => {
-                (PackageFormat::Hpkg, PackageSignatureKindV51::X509Certificate)
-            }
+            f if f.ends_with(".hpkg") => (
+                PackageFormat::Hpkg,
+                PackageSignatureKindV51::X509Certificate,
+            ),
             f if f.ends_with(".rock") || f.ends_with(".rockspec") => {
                 (PackageFormat::LuaRock, PackageSignatureKindV51::Unsigned)
             }
-            f if f.ends_with(".openbsd.tgz") => {
-                (PackageFormat::OpenBsdPkg, PackageSignatureKindV51::OpenBsdSignify)
-            }
+            f if f.ends_with(".openbsd.tgz") => (
+                PackageFormat::OpenBsdPkg,
+                PackageSignatureKindV51::OpenBsdSignify,
+            ),
             f if f.ends_with(".freebsd.pkg") => {
                 (PackageFormat::Pkg, PackageSignatureKindV51::X509Certificate)
             }
-            f if f.ends_with(".nixpkg") || f.ends_with(".nix") || f.ends_with(".nar") || f.ends_with(".scm") => {
-                (PackageFormat::Nixpkg, PackageSignatureKindV51::CosignSigstore)
+            f if f.ends_with(".nixpkg")
+                || f.ends_with(".nix")
+                || f.ends_with(".nar")
+                || f.ends_with(".scm") =>
+            {
+                (
+                    PackageFormat::Nixpkg,
+                    PackageSignatureKindV51::CosignSigstore,
+                )
             }
             f if f.ends_with(".ebuild") || f.ends_with(".portage") => {
                 (PackageFormat::Ebuild, PackageSignatureKindV51::GpgOpenPgp)
             }
-            f if f.ends_with(".snap") => {
-                (PackageFormat::Snap, PackageSignatureKindV51::X509Certificate)
-            }
+            f if f.ends_with(".snap") => (
+                PackageFormat::Snap,
+                PackageSignatureKindV51::X509Certificate,
+            ),
             f if f.ends_with(".flatpak") || f.ends_with(".flatpakref") || f.contains("Flatpak") => {
-                (PackageFormat::Flatpak, PackageSignatureKindV51::CosignSigstore)
+                (
+                    PackageFormat::Flatpak,
+                    PackageSignatureKindV51::CosignSigstore,
+                )
             }
             f if f.ends_with(".AppImage") || f.ends_with(".appimage") => {
                 (PackageFormat::AppImage, PackageSignatureKindV51::GpgOpenPgp)
@@ -227,117 +244,109 @@ impl UniversalPackageFormatInspectorV51 {
             f if f.ends_with(".air") => {
                 (PackageFormat::Air, PackageSignatureKindV51::X509Certificate)
             }
-            f if f.ends_with(".bottle") || f.ends_with(".brew") || f.contains("bottle") => {
-                (PackageFormat::Bottle, PackageSignatureKindV51::CosignSigstore)
-            }
+            f if f.ends_with(".bottle") || f.ends_with(".brew") || f.contains("bottle") => (
+                PackageFormat::Bottle,
+                PackageSignatureKindV51::CosignSigstore,
+            ),
             f if f.ends_with(".ipa") => {
                 (PackageFormat::Ipa, PackageSignatureKindV51::X509Certificate)
             }
-            f if f.ends_with(".ports") || f.ends_with(".cports") || f.ends_with(".dports") => {
-                (PackageFormat::Ports, PackageSignatureKindV51::OpenBsdSignify)
-            }
+            f if f.ends_with(".ports") || f.ends_with(".cports") || f.ends_with(".dports") => (
+                PackageFormat::Ports,
+                PackageSignatureKindV51::OpenBsdSignify,
+            ),
             f if f.ends_with(".pkg") || f.ends_with(".mpkg") => {
                 (PackageFormat::Pkg, PackageSignatureKindV51::X509Certificate)
             }
-            f if f.ends_with(".aab") => {
-                (PackageFormat::Aab, PackageSignatureKindV51::ApkV2V3Signature)
-            }
+            f if f.ends_with(".aab") => (
+                PackageFormat::Aab,
+                PackageSignatureKindV51::ApkV2V3Signature,
+            ),
             f if f.ends_with(".app") => {
                 (PackageFormat::App, PackageSignatureKindV51::X509Certificate)
             }
             f if f.ends_with(".hap") => {
                 (PackageFormat::Hap, PackageSignatureKindV51::X509Certificate)
             }
-            f if f.ends_with(".lzm") => {
-                (PackageFormat::Lzm, PackageSignatureKindV51::Unsigned)
-            }
+            f if f.ends_with(".lzm") => (PackageFormat::Lzm, PackageSignatureKindV51::Unsigned),
             f if f.ends_with(".pup") || f.ends_with("pup") => {
                 (PackageFormat::Pup, PackageSignatureKindV51::Unsigned)
             }
-            f if f.ends_with(".pet") => {
-                (PackageFormat::Pet, PackageSignatureKindV51::Unsigned)
-            }
+            f if f.ends_with(".pet") => (PackageFormat::Pet, PackageSignatureKindV51::Unsigned),
             f if f.ends_with(".spack") => {
                 (PackageFormat::Spack, PackageSignatureKindV51::GpgOpenPgp)
             }
-            f if f.ends_with(".conan") => {
-                (PackageFormat::Conan, PackageSignatureKindV51::CosignSigstore)
-            }
-            f if f.ends_with(".whl") => {
-                (PackageFormat::Wheel, PackageSignatureKindV51::Unsigned)
-            }
-            f if f.ends_with(".crate") => {
-                (PackageFormat::Crate, PackageSignatureKindV51::CosignSigstore)
-            }
-            f if f.ends_with(".gem") => {
-                (PackageFormat::Gem, PackageSignatureKindV51::GpgOpenPgp)
-            }
-            f if f.ends_with(".nupkg") => {
-                (PackageFormat::Nupkg, PackageSignatureKindV51::X509Certificate)
-            }
+            f if f.ends_with(".conan") => (
+                PackageFormat::Conan,
+                PackageSignatureKindV51::CosignSigstore,
+            ),
+            f if f.ends_with(".whl") => (PackageFormat::Wheel, PackageSignatureKindV51::Unsigned),
+            f if f.ends_with(".crate") => (
+                PackageFormat::Crate,
+                PackageSignatureKindV51::CosignSigstore,
+            ),
+            f if f.ends_with(".gem") => (PackageFormat::Gem, PackageSignatureKindV51::GpgOpenPgp),
+            f if f.ends_with(".nupkg") => (
+                PackageFormat::Nupkg,
+                PackageSignatureKindV51::X509Certificate,
+            ),
             f if f.ends_with(".msi") || f.ends_with(".msix") || f.ends_with(".appx") => {
                 (PackageFormat::Msi, PackageSignatureKindV51::X509Certificate)
             }
-            f if f.ends_with(".apex") => {
-                (PackageFormat::Apex, PackageSignatureKindV51::ApkV2V3Signature)
-            }
-            f if f.ends_with(".conda") => {
-                (PackageFormat::Conda, PackageSignatureKindV51::CosignSigstore)
-            }
-            f if f.ends_with(".sysext") || f.ends_with(".sysupdate") => {
-                (PackageFormat::Sysext, PackageSignatureKindV51::PqcKyberDilithium)
-            }
+            f if f.ends_with(".apex") => (
+                PackageFormat::Apex,
+                PackageSignatureKindV51::ApkV2V3Signature,
+            ),
+            f if f.ends_with(".conda") => (
+                PackageFormat::Conda,
+                PackageSignatureKindV51::CosignSigstore,
+            ),
+            f if f.ends_with(".sysext") || f.ends_with(".sysupdate") => (
+                PackageFormat::Sysext,
+                PackageSignatureKindV51::PqcKyberDilithium,
+            ),
             f if f.ends_with(".tazpkg") => {
                 (PackageFormat::Tazpkg, PackageSignatureKindV51::GpgOpenPgp)
             }
-            f if f.ends_with(".sif") => {
-                (PackageFormat::SingularitySif, PackageSignatureKindV51::CosignSigstore)
-            }
-            f if f.ends_with(".slp") => {
-                (PackageFormat::StampedeSlp, PackageSignatureKindV51::Unsigned)
-            }
-            f if f.ends_with(".winget") => {
-                (PackageFormat::Winget, PackageSignatureKindV51::X509Certificate)
-            }
-            f if f.ends_with(".scoop") => {
-                (PackageFormat::Scoop, PackageSignatureKindV51::Unsigned)
-            }
-            f if f.ends_with(".choco") => {
-                (PackageFormat::Choco, PackageSignatureKindV51::X509Certificate)
-            }
+            f if f.ends_with(".sif") => (
+                PackageFormat::SingularitySif,
+                PackageSignatureKindV51::CosignSigstore,
+            ),
+            f if f.ends_with(".slp") => (
+                PackageFormat::StampedeSlp,
+                PackageSignatureKindV51::Unsigned,
+            ),
+            f if f.ends_with(".winget") => (
+                PackageFormat::Winget,
+                PackageSignatureKindV51::X509Certificate,
+            ),
+            f if f.ends_with(".scoop") => (PackageFormat::Scoop, PackageSignatureKindV51::Unsigned),
+            f if f.ends_with(".choco") => (
+                PackageFormat::Choco,
+                PackageSignatureKindV51::X509Certificate,
+            ),
             f if f.ends_with(".pixi") => {
                 (PackageFormat::Pixi, PackageSignatureKindV51::CosignSigstore)
             }
             f if f.ends_with(".nimble") => {
                 (PackageFormat::Nimble, PackageSignatureKindV51::Unsigned)
             }
-            f if f.ends_with(".zig") => {
-                (PackageFormat::ZigPkg, PackageSignatureKindV51::Minisign)
-            }
-            f if f.ends_with(".swift") => {
-                (PackageFormat::SwiftPkg, PackageSignatureKindV51::CosignSigstore)
-            }
-            f if f.ends_with(".dub") => {
-                (PackageFormat::DubPkg, PackageSignatureKindV51::Unsigned)
-            }
-            f if f.ends_with(".opam") => {
-                (PackageFormat::Opam, PackageSignatureKindV51::GpgOpenPgp)
-            }
-            f if f.ends_with(".shard") => {
-                (PackageFormat::Shard, PackageSignatureKindV51::Unsigned)
-            }
-            f if f.ends_with(".plt") => {
-                (PackageFormat::PltPkg, PackageSignatureKindV51::Unsigned)
-            }
+            f if f.ends_with(".zig") => (PackageFormat::ZigPkg, PackageSignatureKindV51::Minisign),
+            f if f.ends_with(".swift") => (
+                PackageFormat::SwiftPkg,
+                PackageSignatureKindV51::CosignSigstore,
+            ),
+            f if f.ends_with(".dub") => (PackageFormat::DubPkg, PackageSignatureKindV51::Unsigned),
+            f if f.ends_with(".opam") => (PackageFormat::Opam, PackageSignatureKindV51::GpgOpenPgp),
+            f if f.ends_with(".shard") => (PackageFormat::Shard, PackageSignatureKindV51::Unsigned),
+            f if f.ends_with(".plt") => (PackageFormat::PltPkg, PackageSignatureKindV51::Unsigned),
             f if f.ends_with(".tar.gz") || f.ends_with(".tgz") => {
                 (PackageFormat::TarGz, PackageSignatureKindV51::Unsigned)
             }
             f if f.ends_with(".xz") || f.ends_with(".tar.xz") => {
                 (PackageFormat::Xz, PackageSignatureKindV51::Unsigned)
             }
-            f if f.ends_with(".tar") => {
-                (PackageFormat::Tar, PackageSignatureKindV51::Unsigned)
-            }
+            f if f.ends_with(".tar") => (PackageFormat::Tar, PackageSignatureKindV51::Unsigned),
             _ => (
                 PackageFormat::SigmaPkg,
                 PackageSignatureKindV51::PqcKyberDilithium,
@@ -560,7 +569,9 @@ pub struct UniversalCasDeltaStoreGovernorV51 {
 
 impl UniversalCasDeltaStoreGovernorV51 {
     pub fn new() -> Self {
-        Self { records: Vec::new() }
+        Self {
+            records: Vec::new(),
+        }
     }
 
     pub fn apply_delta_patch(
@@ -794,14 +805,15 @@ impl SovereignDistroPackageAdvancementsSuiteV51 {
         self.udf_engine
             .execute_hooks_for_phase(&manifest.name, UdfHookTypeV51::PostInstall)?;
 
-        self.pr_gateway.submit_proposal(PackagePrProposalManifestV51 {
-            pr_id: 5101,
-            title: format!("PR: Transpile and Install {}", manifest.name),
-            source_format: manifest.detected_format,
-            target_native_package: format!("sigpkg-v51-{}", manifest.name),
-            changes_summary: format!("Resolved dependencies: {:?}", solved_deps),
-            verification_passed: true,
-        });
+        self.pr_gateway
+            .submit_proposal(PackagePrProposalManifestV51 {
+                pr_id: 5101,
+                title: format!("PR: Transpile and Install {}", manifest.name),
+                source_format: manifest.detected_format,
+                target_native_package: format!("sigpkg-v51-{}", manifest.name),
+                changes_summary: format!("Resolved dependencies: {:?}", solved_deps),
+                verification_passed: true,
+            });
 
         Ok(unified_pkg)
     }
@@ -895,9 +907,16 @@ mod tests {
     #[test]
     fn test_sat_solver_and_sandboxing_v51() {
         let solver = UniversalCrossDistroSatSolverV51::new();
-        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string(), "dbus".to_string()];
+        let raw_deps = vec![
+            "libssl-dev".to_string(),
+            "glibc".to_string(),
+            "dbus".to_string(),
+        ];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]);
+        assert_eq!(
+            solved,
+            vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]
+        );
 
         let sandbox_gov = UniversalMultiSandboxGovernorV51::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
