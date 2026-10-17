@@ -816,6 +816,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v50.rs" ]; then
     ./build/sovereign_advancements_v50_test
 fi
 
+if [ -f "src/package/sovereign_distro_package_advancements_v52.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V52 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v52.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v52_test
+    ./build/sovereign_advancements_v52_test
+fi
+
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
     mkdir -p build
@@ -1225,7 +1232,7 @@ fi
 if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs" ]; then
     echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V43 test suite..."
     mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_gap_closure_v43_pr
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v43_pr.rs --edition=2021 -o build/test_gap_closure_v43_pr
     ./build/test_gap_closure_v43_pr
 fi
 

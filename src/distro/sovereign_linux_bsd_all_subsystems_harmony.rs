@@ -1204,14 +1204,14 @@ mod tests {
             "rpm"
         );
 
-        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance_summary();
         assert_eq!(audits.len(), 31);
         assert_eq!(score, 100);
         for (_, compliant) in audits {
             assert!(compliant);
         }
 
-        let translated = engine.translate_subsystem_payload(
+        let translated = engine.translate_cross_distro_payload_direct(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",

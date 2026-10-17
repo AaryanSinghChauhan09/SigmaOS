@@ -577,18 +577,6 @@ impl BsdRcInspirationsPrEngine {
         Self
     }
 
-    pub fn merge_rc_conf_overrides(
-        &self,
-        conf: &alloc::collections::BTreeMap<String, String>,
-        local: &alloc::collections::BTreeMap<String, String>,
-    ) -> alloc::collections::BTreeMap<String, String> {
-        let mut merged = conf.clone();
-        for (k, v) in local {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
-    }
-
     /// Simulate FreeBSD / OpenBSD / NetBSD `rcorder` topological dependency sorting.
     pub fn sort_rcorder_scripts(
         &self,
@@ -663,19 +651,6 @@ impl BsdRcInspirationsPrEngine {
             }
         }
         map
-    }
-
-    /// Merge default rc.conf options with local override map.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base: &BTreeMap<String, String>,
-        local: &BTreeMap<String, String>,
-    ) -> BTreeMap<String, String> {
-        let mut merged = base.clone();
-        for (k, v) in local {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
     }
 
     /// Execute `rc.subr` command action routing (start, stop, restart, status, poll).
