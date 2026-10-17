@@ -33,6 +33,17 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         Self
     }
 
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
+            domain, domain, kdc, realm
+        )
+    }
+
+    pub fn check_landlock_access(mask: u16, requested: u16) -> bool {
+        (mask & requested) == requested
+    }
+
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
     pub fn format_selinux_context(
         user: &str,
@@ -169,6 +180,13 @@ pub struct BsdHardeningAndIsolationPrEngine;
 impl BsdHardeningAndIsolationPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
+            domain, domain, kdc, realm
+        )
     }
 
     /// Verify OpenBSD pledge promise mask against required system syscall string.
@@ -402,6 +420,13 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
+            domain, domain, kdc, realm
+        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
