@@ -129,7 +129,7 @@ impl PhotocraftRawProcessingPrEngine {
 // 2. AI Generative Inpainting & Content-Aware Synthesis PR Engine
 // ============================================================================
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct PhotocraftAiInpaintingPrEngine;
 
 impl PhotocraftAiInpaintingPrEngine {
