@@ -397,14 +397,9 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn generate_cam_toolpath(
-        &mut self,
-        toolpath_type: CamToolpathType,
-        tool_diameter: f32,
-        feed_rate: f32,
-    ) -> u32 {
-        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
-        let toolpath = CamToolpath {
+    pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
+        let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
+        let mesh = FeaMesh {
             id,
             toolpath_type,
             tool_diameter,
@@ -414,28 +409,6 @@ impl CadCraftEngine {
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
-    }
-
-                        let dx = p2.x - p1.x;
-                        let dy = p2.y - p1.y;
-                        let current_dist = (dx * dx + dy * dy).sqrt();
-                        let error = (current_dist - target_distance).abs();
-                        if error > max_error {
-                            max_error = error;
-                        }
-
-    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut output = Vec::new();
-        match format {
-            ExportFormat::DXF => {
-                output.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n")
-            }
-            ExportFormat::STEP => output.extend_from_slice(
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
-            ),
-            _ => output.extend_from_slice(b"# CadCraft Export Data\n"),
-        }
-        output
     }
 }
 
