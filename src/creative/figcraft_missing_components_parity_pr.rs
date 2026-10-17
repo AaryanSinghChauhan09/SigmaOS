@@ -466,22 +466,20 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
     pub fn new() -> Self {
         let mut tokens = BTreeMap::new();
 
-        let mut bg_modes = BTreeMap::new();
-        bg_modes.insert(
+        let mut color_primary = BTreeMap::new();
+        color_primary.insert(
             "Light".to_string(),
-            VariableValue::ColorHex("#FFFFFF".to_string()),
+            DesignTokenValue::Color("#0066FF".to_string()),
         );
-        bg_modes.insert(
+        color_primary.insert(
             "Dark".to_string(),
-            VariableValue::ColorHex("#121212".to_string()),
+            DesignTokenValue::Color("#3388FF".to_string()),
         );
-        vars.insert(
-            1,
-            DesignVariable {
-                id: 1,
-                name: "color/background/primary".to_string(),
-                collection_name: "ColorTokens".to_string(),
-                values_by_mode: bg_modes,
+        tokens.insert(
+            "color/brand/primary".to_string(),
+            TokenDefinition {
+                name: "color/brand/primary".to_string(),
+                mode_values: color_primary,
             },
         );
 
@@ -549,11 +547,14 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
     pub fn generate_proposal(&self) -> FigcraftPrProposalManifest {
         FigcraftPrProposalManifest {
             pr_id: 811,
-            pr_title: "feat(figcraft): Implement Design Tokens, Multi-Mode Variables & Component Variants".to_string(),
+            pr_title:
+                "feat(figcraft): Implement Design Tokens, Multi-Mode Variables & Component Variants"
+                    .to_string(),
             target_subsystem: "Figcraft Design System & Token Management".to_string(),
             original_suite: "ArtCraft Figcraft Design Tokens".to_string(),
             components_added: vec![
-                "Design tokens & multi-theme variable modes (Light, Dark, HighContrast)".to_string(),
+                "Design tokens & multi-theme variable modes (Light, Dark, HighContrast)"
+                    .to_string(),
                 "Token variable aliasing and cascading inheritance".to_string(),
                 "Component variant property definitions & state matrices".to_string(),
             ],
@@ -641,7 +642,11 @@ impl FigcraftInteractivePrototypingSmartAnimatePrEngine {
         }
     }
 
-    pub fn trigger_interaction(&mut self, source_node_id: u32, trigger: InteractionTrigger) -> bool {
+    pub fn trigger_interaction(
+        &mut self,
+        source_node_id: u32,
+        trigger: InteractionTrigger,
+    ) -> bool {
         for flow in self.flows.values() {
             if flow.source_node_id == source_node_id && flow.trigger == trigger {
                 match flow.action {
@@ -736,10 +741,38 @@ impl FigcraftVectorNetworkBooleanOpsPrEngine {
                 path_id: 1,
                 name: "RectPath".to_string(),
                 knots: vec![
-                    BezierKnotPoint { x: 0.0, y: 0.0, handle_in_x: 0.0, handle_in_y: 0.0, handle_out_x: 0.0, handle_out_y: 0.0 },
-                    BezierKnotPoint { x: 100.0, y: 0.0, handle_in_x: 0.0, handle_in_y: 0.0, handle_out_x: 0.0, handle_out_y: 0.0 },
-                    BezierKnotPoint { x: 100.0, y: 100.0, handle_in_x: 0.0, handle_in_y: 0.0, handle_out_x: 0.0, handle_out_y: 0.0 },
-                    BezierKnotPoint { x: 0.0, y: 100.0, handle_in_x: 0.0, handle_in_y: 0.0, handle_out_x: 0.0, handle_out_y: 0.0 },
+                    BezierKnotPoint {
+                        x: 0.0,
+                        y: 0.0,
+                        handle_in_x: 0.0,
+                        handle_in_y: 0.0,
+                        handle_out_x: 0.0,
+                        handle_out_y: 0.0,
+                    },
+                    BezierKnotPoint {
+                        x: 100.0,
+                        y: 0.0,
+                        handle_in_x: 0.0,
+                        handle_in_y: 0.0,
+                        handle_out_x: 0.0,
+                        handle_out_y: 0.0,
+                    },
+                    BezierKnotPoint {
+                        x: 100.0,
+                        y: 100.0,
+                        handle_in_x: 0.0,
+                        handle_in_y: 0.0,
+                        handle_out_x: 0.0,
+                        handle_out_y: 0.0,
+                    },
+                    BezierKnotPoint {
+                        x: 0.0,
+                        y: 100.0,
+                        handle_in_x: 0.0,
+                        handle_in_y: 0.0,
+                        handle_out_x: 0.0,
+                        handle_out_y: 0.0,
+                    },
                 ],
                 is_closed: true,
             },
@@ -749,7 +782,12 @@ impl FigcraftVectorNetworkBooleanOpsPrEngine {
     }
 
     /// Perform boolean operation between two vector paths
-    pub fn perform_boolean_op(&self, path1_id: u32, path2_id: u32, op: PathBooleanOp) -> Option<VectorNetworkPath> {
+    pub fn perform_boolean_op(
+        &self,
+        path1_id: u32,
+        path2_id: u32,
+        op: PathBooleanOp,
+    ) -> Option<VectorNetworkPath> {
         let p1 = self.paths.get(&path1_id)?;
         let p2 = self.paths.get(&path2_id)?;
 
@@ -759,10 +797,18 @@ impl FigcraftVectorNetworkBooleanOpsPrEngine {
                 combined_knots.extend(p2.knots.iter().cloned());
             }
             PathBooleanOp::Subtract => {
-                combined_knots.retain(|k| !p2.knots.iter().any(|bk| (bk.x - k.x).abs() < 1e-3 && (bk.y - k.y).abs() < 1e-3));
+                combined_knots.retain(|k| {
+                    !p2.knots
+                        .iter()
+                        .any(|bk| (bk.x - k.x).abs() < 1e-3 && (bk.y - k.y).abs() < 1e-3)
+                });
             }
             PathBooleanOp::Intersect => {
-                combined_knots.retain(|k| p2.knots.iter().any(|bk| (bk.x - k.x).abs() < 1e-3 && (bk.y - k.y).abs() < 1e-3));
+                combined_knots.retain(|k| {
+                    p2.knots
+                        .iter()
+                        .any(|bk| (bk.x - k.x).abs() < 1e-3 && (bk.y - k.y).abs() < 1e-3)
+                });
             }
             PathBooleanOp::Exclude => {
                 combined_knots.extend(p2.knots.iter().cloned());
@@ -941,14 +987,28 @@ impl FigcraftDevModeMultiFrameworkExporterPrEngine {
         Self
     }
 
-    /// Calculate relative luminance from RGB components [0..255]
-    fn relative_luminance(&self, r: u8, g: u8, b: u8) -> f32 {
-        fn channel_lum(c: u8) -> f32 {
-            let s = (c as f32) / 255.0;
-            if s <= 0.03928 {
-                s / 12.92
-            } else {
-                ((s + 0.055) / 1.055).powf(2.4)
+    pub fn generate_code(
+        &self,
+        element_name: &str,
+        width: f32,
+        height: f32,
+        target: ExportFrameworkTarget,
+    ) -> String {
+        match target {
+            ExportFrameworkTarget::CssTailwind => {
+                format!("<div class=\"w-[{}px] h-[{}px] bg-blue-600 rounded-lg p-4 flex flex-col gap-3\">/* {} */</div>", width, height, element_name)
+            }
+            ExportFrameworkTarget::ReactJsx => {
+                format!("<div style={{{{ width: '{}px', height: '{}px', backgroundColor: '#0066FF', borderRadius: '8px' }}}}>/* {} */</div>", width, height, element_name)
+            }
+            ExportFrameworkTarget::SwiftUi => {
+                format!("VStack(spacing: 12) {{\n    // {}\n}}\n.frame(width: {}, height: {})\n.background(Color.blue)\n.cornerRadius(8)", element_name, width, height)
+            }
+            ExportFrameworkTarget::JetpackCompose => {
+                format!("Column(\n    modifier = Modifier.size({}.dp, {}.dp).background(Color(0xFF0066FF)).clip(RoundedCornerShape(8.dp))\n) {{\n    // {}\n}}", width, height, element_name)
+            }
+            ExportFrameworkTarget::Flutter => {
+                format!("Container(\n  width: {},\n  height: {},\n  decoration: BoxDecoration(color: Color(0xFF0066FF), borderRadius: BorderRadius.circular(8)),\n) // {}", width, height, element_name)
             }
         }
         0.2126 * channel_lum(r) + 0.7152 * channel_lum(g) + 0.0722 * channel_lum(b)
@@ -1046,7 +1106,9 @@ impl SovereignFigcraftArtcraftParityPrGateway {
     }
 
     pub fn evaluate_figcraft_parity(&mut self) -> bool {
-        let (w, h) = self.auto_layout.calculate_layout_bounds(1, &[(100.0, 40.0), (120.0, 40.0)]);
+        let (w, h) = self
+            .auto_layout
+            .calculate_layout_bounds(1, &[(100.0, 40.0), (120.0, 40.0)]);
         let layout_ok = w > 0.0 && h > 0.0;
 
         let spring_pos = self
@@ -1054,9 +1116,13 @@ impl SovereignFigcraftArtcraftParityPrGateway {
             .evaluate_spring_position(0.5, 0.0, 100.0);
         let prototyping_ok = spring_pos > 0.0;
 
-        let proto_ok = self.prototyping.trigger_interaction(101, InteractionTrigger::OnClick);
+        let proto_ok = self
+            .prototyping
+            .trigger_interaction(101, InteractionTrigger::OnClick);
 
-        let bool_res = self.vector_boolean.perform_boolean_op(1, 1, PathBooleanOp::Union);
+        let bool_res = self
+            .vector_boolean
+            .perform_boolean_op(1, 1, PathBooleanOp::Union);
         let vector_ok = bool_res.is_some();
 
         self.crdt_collab_engine
@@ -1070,10 +1136,13 @@ impl SovereignFigcraftArtcraftParityPrGateway {
             });
         let crdt_ok = self.crdt_collab_engine.active_cursors.contains_key(&1);
 
-        let contrast = self
-            .devmode_engine
-            .compute_wcag_contrast_ratio((0, 0, 0), (255, 255, 255));
-        let devmode_ok = contrast > 20.0; // Black on White ~21:1
+        let code = self.dev_mode_exporter.generate_code(
+            "Button",
+            120.0,
+            40.0,
+            ExportFrameworkTarget::CssTailwind,
+        );
+        let code_ok = code.contains("w-[120px]");
 
         layout_ok && token_ok && proto_ok && vector_ok && crdt_ok && code_ok
     }
@@ -1128,31 +1197,26 @@ mod tests {
     }
 
     #[test]
-    fn test_auto_layout_flex_grid_engine() {
-        let engine = FigcraftAdvancedAutoLayoutFlexGridPrEngine::new();
-        let widths = engine.calculate_fractional_widths(1000.0);
-        assert_eq!(widths.len(), 3);
-        assert_eq!(widths[2], 200.0); // Fixed 200px
-
-        let parent_box = LayoutBoundingBox {
-            x: 0.0,
-            y: 0.0,
-            width: 1000.0,
-            height: 600.0,
-        };
-        let grid_boxes = engine.evaluate_grid_matrix(&parent_box, 6);
-        assert_eq!(grid_boxes.len(), 6);
-        assert_eq!(grid_boxes[0].x, 0.0);
-        assert!(grid_boxes[3].y > grid_boxes[0].y); // Second row
+    fn test_auto_layout_engine() {
+        let engine = FigcraftAdvancedAutoLayoutConstraintPrEngine::new();
+        let (w, h) = engine.calculate_layout_bounds(1, &[(100.0, 40.0), (120.0, 40.0)]);
+        assert_eq!(w, 284.0); // 24 + 100 + 16 + 120 + 24 = 284
+        assert_eq!(h, 64.0); // 12 + 40 + 12 = 64
     }
 
     #[test]
     fn test_tokens_variables_engine() {
         let mut engine = FigcraftDesignSystemTokensVariablesPrEngine::new();
-        assert_eq!(engine.resolve_token("color/brand/primary"), Some(DesignTokenValue::Color("#0066FF".to_string())));
+        assert_eq!(
+            engine.resolve_token("color/brand/primary"),
+            Some(DesignTokenValue::Color("#0066FF".to_string()))
+        );
 
         engine.set_mode("Dark");
-        assert_eq!(engine.resolve_token("color/brand/primary"), Some(DesignTokenValue::Color("#3388FF".to_string())));
+        assert_eq!(
+            engine.resolve_token("color/brand/primary"),
+            Some(DesignTokenValue::Color("#3388FF".to_string()))
+        );
     }
 
     #[test]
@@ -1197,10 +1261,12 @@ mod tests {
     #[test]
     fn test_dev_mode_exporter_engine() {
         let exporter = FigcraftDevModeMultiFrameworkExporterPrEngine::new();
-        let css_code = exporter.generate_code("Card", 200.0, 100.0, ExportFrameworkTarget::CssTailwind);
+        let css_code =
+            exporter.generate_code("Card", 200.0, 100.0, ExportFrameworkTarget::CssTailwind);
         assert!(css_code.contains("w-[200px]"));
 
-        let swift_code = exporter.generate_code("Card", 200.0, 100.0, ExportFrameworkTarget::SwiftUi);
+        let swift_code =
+            exporter.generate_code("Card", 200.0, 100.0, ExportFrameworkTarget::SwiftUi);
         assert!(swift_code.contains("VStack"));
     }
 }

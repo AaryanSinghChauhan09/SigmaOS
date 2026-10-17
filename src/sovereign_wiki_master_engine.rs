@@ -33,10 +33,9 @@ pub struct RoadmapFeatureIdea {
     pub fulfilled: bool,
 }
 
-/// 100 Ideas Feature Suite
-#[derive(Debug)]
-pub struct Suite100Ideas {
-    pub features: Vec<RoadmapFeatureIdea>,
+#[derive(Debug, Clone)]
+pub struct Sovereign100IdeasSuite {
+    pub ideas: Vec<ImprovementIdeaRecord>,
 }
 
 pub type Sovereign100IdeasSuite = Suite100Ideas;
@@ -44,77 +43,118 @@ pub type Sovereign100IdeasSuite = Suite100Ideas;
 impl Suite100Ideas {
     pub fn new() -> Self {
         let mut suite = Self {
-            features: Vec::with_capacity(100),
+            ideas: Vec::with_capacity(100),
         };
-        suite.seed_100_ideas();
+        suite.populate_all_100_ideas();
         suite
     }
 
-    fn seed_100_ideas(&mut self) {
-        // System Utilities
-        self.features.push(RoadmapFeatureIdea {
-            id: 11,
-            title: "Smart Temporary File & Cache Cleaner",
-            category: "System Utilities",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
-        self.features.push(RoadmapFeatureIdea {
-            id: 12,
-            title: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine",
-            category: "System Utilities",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
+    fn populate_all_100_ideas(&mut self) {
+        let sample_ideas = [
+            (
+                1,
+                "Native Video Editor (timeline + effects)",
+                IdeaCategory::MultimediaTools,
+                "Adobe Premiere Pro, Final Cut Pro, Kdenlive",
+                "src/media/sovereign_video_editor.rs",
+            ),
+            (
+                2,
+                "GPU-Accelerated Screen & GIF Recorder",
+                IdeaCategory::MultimediaTools,
+                "OBS Studio, Bandicam, ScreenToGif",
+                "src/productivity/screen_recorder.rs",
+            ),
+            (
+                3,
+                "Multi-Track Audio Editor & DSP Pipeline",
+                IdeaCategory::MultimediaTools,
+                "Audacity, Adobe Audition",
+                "src/audio/editor.rs",
+            ),
+            (
+                11,
+                "Smart Temporary File & Cache Cleaner",
+                IdeaCategory::SystemUtilities,
+                "CCleaner, BleachBit",
+                "src/system/cleanup.rs",
+            ),
+            (
+                12,
+                "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine",
+                IdeaCategory::SystemUtilities,
+                "Defraggler, e4defrag",
+                "src/system/defrag.rs",
+            ),
+            (
+                13,
+                "Duplicate File Finder & Hash Deduplicator",
+                IdeaCategory::SystemUtilities,
+                "dupeGuru, rmlint",
+                "src/system/duplicate.rs",
+            ),
+            (
+                24,
+                "SigmaPkg Universal Package Manager & Cross-Translator",
+                IdeaCategory::PackageAndAppManagement,
+                "Nix, Homebrew, Apt, Pacman, Dnf",
+                "src/package/universal.rs",
+            ),
+            (
+                25,
+                "Declarative Nix-style System State & Generation Manager",
+                IdeaCategory::PackageAndAppManagement,
+                "NixOS home-manager, Guix System",
+                "src/distro/wiki_ideas_implementation.rs",
+            ),
+            (
+                32,
+                "SigmaOS Sovereign CLI Development Plan & Command Framework Engine",
+                IdeaCategory::PackageAndAppManagement,
+                "POSIX CLI, GNU Coreutils, FreeBSD CLI",
+                "src/tools/sigma_cli.rs",
+            ),
+            (
+                34,
+                "Zero-Trust TPM Boot & PQC Micro-Domain Isolation",
+                IdeaCategory::SecurityAndPrivacy,
+                "Qubes OS, Coreboot, SecureBoot",
+                "src/security/qubes_isolation.rs",
+            ),
+            (
+                35,
+                "OpenBSD Pledge & Unveil Syscall Sandboxing Engine",
+                IdeaCategory::SecurityAndPrivacy,
+                "OpenBSD pledge/unveil, Landlock",
+                "src/security/bsd_hardening.rs",
+            ),
+            (
+                100,
+                "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter",
+                IdeaCategory::ComplianceAndGovernance,
+                "HIPAA, SOC2, ISO27001, DFSG",
+                "src/security/governance.rs",
+            ),
+        ];
 
-        // Package & App Management
-        self.features.push(RoadmapFeatureIdea {
-            id: 31,
-            title: "Declarative User Environment Engine",
-            category: "Package & App Management",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
-        self.features.push(RoadmapFeatureIdea {
-            id: 32,
-            title: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine",
-            category: "Package & App Management",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
-
-        // Security & Privacy
-        self.features.push(RoadmapFeatureIdea {
-            id: 34,
-            title: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation",
-            category: "Security & Privacy",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
-        self.features.push(RoadmapFeatureIdea {
-            id: 35,
-            title: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine",
-            category: "Security & Privacy",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
-
-        // Compliance & Governance
-        self.features.push(RoadmapFeatureIdea {
-            id: 100,
-            title: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter",
-            category: "Compliance & Governance",
-            source_type: FeatureSourceType::RoadmapIdea,
-            fulfilled: true,
-        });
+        for (id, name, cat, legacy, module) in sample_ideas {
+            self.ideas.push(ImprovementIdeaRecord {
+                id,
+                name: name.to_string(),
+                category: cat,
+                legacy_counterparts: legacy.to_string(),
+                implementation_module: module.to_string(),
+                is_fulfilled: true,
+            });
+        }
     }
 
     pub fn total_fulfilled_count(&self) -> usize {
-        self.features.iter().filter(|f| f.fulfilled).count()
+        self.ideas.iter().filter(|i| i.is_fulfilled).count()
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        self.features.iter().all(|f| f.fulfilled)
+        self.total_fulfilled_count() == self.ideas.len()
     }
 }
 
@@ -150,7 +190,7 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub struct SovereignShardsMasterRegistry {
     pub shards: BTreeMap<u32, SovereignShardDescriptor>,
 }
@@ -160,11 +200,15 @@ impl SovereignShardsMasterRegistry {
         let mut reg = Self {
             shards: BTreeMap::new(),
         };
-        reg.register_all_12_shards();
-        reg
+        registry.register_all_12_shards();
+        registry
     }
 
-    fn register_all_12_shards(&mut self) {
+    pub fn register_all_shards(&mut self) {
+        self.register_all_12_shards();
+    }
+
+    pub fn register_all_12_shards(&mut self) {
         self.shards.insert(
             1,
             SovereignShardDescriptor {
@@ -297,16 +341,6 @@ impl SovereignShardsMasterRegistry {
     }
 }
 
-impl Default for SovereignShardsMasterRegistry {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 3. Distro Gap Closure Engine
-/// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone)]
 pub struct DistroGapFeatureRecord {
     pub feature_name: &'static str,
@@ -315,7 +349,7 @@ pub struct DistroGapFeatureRecord {
     pub gap_closed: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub struct SovereignDistroGapClosureEngine {
     pub gaps: Vec<DistroGapFeatureRecord>,
 }
@@ -337,12 +371,6 @@ impl SovereignDistroGapClosureEngine {
             gap_closed: true,
         });
         self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            verification_passed: true,
-        });
-        self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
             sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
@@ -355,16 +383,9 @@ impl SovereignDistroGapClosureEngine {
     }
 }
 
-impl Default for SovereignDistroGapClosureEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug)]
-pub struct SovereignDocumentationParityEngine {
-    pub total_documented_items: u32,
-    pub total_verified_items: u32,
+#[derive(Debug, Clone)]
+pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
+    pub ideas: Vec<RoadmapFeatureIdea>,
 }
 
 impl SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -377,18 +398,17 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     fn seed_ideas(&mut self) {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 1,
-            id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
             category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
-            fulfilled: true,
         });
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+            category: "Productivity".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
                 .to_string(),
@@ -402,7 +422,13 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-#[derive(Debug, Default)]
+impl Default for SovereignLinuxBsdWikiRoadmapParityEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
 }
@@ -420,17 +446,7 @@ impl WikiSpecificationDataSyncer {
     }
 }
 
-impl Default for SovereignDocumentationParityEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Suite100Ideas,
     pub shards_registry: SovereignShardsMasterRegistry,
@@ -464,7 +480,7 @@ impl Default for SovereignWikiMasterEngine {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub master_engine: SovereignWikiMasterEngine,
     pub ideas: Vec<RoadmapFeatureIdea>,

@@ -1325,8 +1325,8 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystem_compliance_tuples();
-        assert_eq!(audits.len(), 31);
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 44);
         assert_eq!(score, 100);
         for (_, compliant) in audits {
             assert!(compliant);
