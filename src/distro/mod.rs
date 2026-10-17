@@ -690,6 +690,9 @@ pub use open_source_os_missing_components_v58_pr::*;
 pub mod omarchy_linux_apex_engine;
 pub use omarchy_linux_apex_engine::*;
 
+pub mod openbsd_ultimate_gap_closure_v60_pr;
+pub use openbsd_ultimate_gap_closure_v60_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
