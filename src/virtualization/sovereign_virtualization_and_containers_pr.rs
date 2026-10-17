@@ -76,16 +76,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// QEMU Disk Image Specification
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QemuDiskImageSpec {
-    pub image_path: String,
-    pub format: String,
-    pub size_bytes: u64,
-    pub backing_file: Option<String>,
-    pub is_compressed: bool,
-}
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -95,9 +85,7 @@ pub struct KvmQemuEngine {
     pub thp_hugepages_active: bool,
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
-    pub disk_images: Vec<QemuDiskImageSpec>,
     pub virtio_fs_inodes_cached: u64,
-    pub disk_images: Vec<QemuDiskImageSpec>,
 }
 
 impl KvmQemuEngine {
@@ -109,9 +97,7 @@ impl KvmQemuEngine {
             thp_hugepages_active: true,
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
-            disk_images: Vec::new(),
             virtio_fs_inodes_cached: 0,
-            disk_images: Vec::new(),
         }
     }
 
@@ -200,15 +186,6 @@ pub struct LibvirtStorageVolume {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtNwFilterRule {
     pub name: String,
     pub action: String,    // "accept", "drop", "reject"
@@ -225,15 +202,6 @@ pub struct LibvirtDomainConfig {
     pub disk_path: String,
     pub bridge_interface: String,
     pub is_active: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -284,6 +252,7 @@ impl LibvirtDomainEngine {
     }
 
     pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
+        self.storage_pool_type = pool_type;
         self.storage_pool_path = path.to_string();
     }
 
@@ -700,7 +669,6 @@ pub struct KubernetesK3sRancherEngine {
     pub crio_runtime_handlers: Vec<String>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
-    pub crio_runtime_handlers: Vec<String>,
 }
 
 impl KubernetesK3sRancherEngine {
@@ -712,10 +680,9 @@ impl KubernetesK3sRancherEngine {
         handlers.push("gvisor".to_string());
         Self {
             pods: Vec::new(),
-            crio_runtime_handlers: crio,
+            crio_runtime_handlers: handlers,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: handlers,
         }
     }
 
@@ -1462,6 +1429,7 @@ mod tests {
         engine.create_storage_volume("vol1", "default", 100 * 1024 * 1024 * 1024, "qcow2");
         engine.add_nat_bridge("virbr2");
         engine.add_nwfilter_rule("clean-traffic", "accept", "inout", "ip");
+        engine.set_storage_pool(LibvirtStoragePoolType::Zfs, "/zfs/pool");
         assert!(engine.start_domain("test-vm"));
         assert_eq!(engine.storage_volumes.len(), 1);
         assert_eq!(engine.nwfilter_rules.len(), 1);
