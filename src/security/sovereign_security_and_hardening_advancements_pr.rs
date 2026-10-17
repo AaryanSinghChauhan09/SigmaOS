@@ -417,7 +417,9 @@ impl IdentityAndEnterpriseAuthPrEngine {
     ) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain_name, id_provider, ldap_uri
+            domain_name,
+            id_provider,
+            ldap_uri
         )
     }
 

@@ -8,8 +8,8 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;
-use alloc::vec::Vec;
 use alloc::vec;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// FNV-1a checksum for CadCraft PR verification
@@ -292,7 +292,8 @@ impl ParametricSketch2D {
     }
 
     pub fn add_point(&mut self, x: f64, y: f64) -> usize {
-        self.entities.push(SketchEntityEnum::Point(Point2D { x, y }));
+        self.entities
+            .push(SketchEntityEnum::Point(Point2D { x, y }));
         self.entities.len() - 1
     }
 
@@ -456,7 +457,9 @@ impl CadCraftEngine {
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
         match format {
             ExportFormat::DXF => b"SECTION\nHEADER\nENDSEC\nEOF".to_vec(),
-            ExportFormat::STEP => b"ISO-10303-21;HEADER;ENDSEC;DATA;ENDSEC;END-ISO-10303-21;".to_vec(),
+            ExportFormat::STEP => {
+                b"ISO-10303-21;HEADER;ENDSEC;DATA;ENDSEC;END-ISO-10303-21;".to_vec()
+            }
             _ => b"CADCRAFT_EXPORT_DATA".to_vec(),
         }
     }
@@ -1212,7 +1215,10 @@ mod tests {
             alloc::vec![[10.0, 0.0], [10.0, 10.0]],
         );
         let c1 = engine.add_geometric_constraint(
-            GeometricConstraintType::EqualLength { line1_idx: 0, line2_idx: 1 },
+            GeometricConstraintType::EqualLength {
+                line1_idx: 0,
+                line2_idx: 1,
+            },
             alloc::vec![e1, e2],
             90.0,
         );
