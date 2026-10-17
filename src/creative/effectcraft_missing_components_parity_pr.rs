@@ -994,7 +994,9 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
     pub fn raymarch_volumetric_lighting(&self, view_dir: [f32; 3], opacity: f32) -> [f32; 3] {
         let mut total_light = [0.0f32; 3];
         for shaft in &self.light_shafts {
-            let dot = view_dir[0] * shaft.origin[0] + view_dir[1] * shaft.origin[1] + view_dir[2] * shaft.origin[2];
+            let dot = view_dir[0] * shaft.origin[0]
+                + view_dir[1] * shaft.origin[1]
+                + view_dir[2] * shaft.origin[2];
             let scattering = (dot * self.mie_scattering_g).exp() * shaft.intensity * opacity;
             total_light[0] += shaft.color[0] * scattering;
             total_light[1] += shaft.color[1] * scattering;
@@ -1007,7 +1009,12 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
         ]
     }
 
-    pub fn compute_volumetric_shafts(&self, _light_dir: [f32; 3], _view_dir: [f32; 3], depths: &[f32]) -> Result<f32, String> {
+    pub fn compute_volumetric_shafts(
+        &self,
+        _light_dir: [f32; 3],
+        _view_dir: [f32; 3],
+        depths: &[f32],
+    ) -> Result<f32, String> {
         let sum: f32 = depths.iter().sum();
         Ok((sum * self.fog_density).clamp(0.0, 10.0))
     }
@@ -1069,7 +1076,12 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
         Ok(())
     }
 
-    pub fn render_procedural_fractal(&self, w: usize, h: usize, scale: f32) -> Result<Vec<u8>, String> {
+    pub fn render_procedural_fractal(
+        &self,
+        w: usize,
+        h: usize,
+        scale: f32,
+    ) -> Result<Vec<u8>, String> {
         let size = w * h * 4;
         let mut buf = vec![0u8; size];
         for i in (0..size).step_by(4) {
@@ -1159,7 +1171,11 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         Ok(out)
     }
 
-    pub fn apply_synthetic_grain(&self, frame: &mut [u8], profile: &FilmGrainProfile) -> Result<(), String> {
+    pub fn apply_synthetic_grain(
+        &self,
+        frame: &mut [u8],
+        profile: &FilmGrainProfile,
+    ) -> Result<(), String> {
         let add = (profile.intensity * 255.0) as u8;
         for px in frame.iter_mut() {
             *px = px.saturating_add(add);
@@ -1567,7 +1583,9 @@ mod tests {
         let frame1 = vec![100u8; 16];
         let frame2 = vec![110u8; 16];
         let mut output = vec![0u8; 16];
-        let processed = engine.process_temporal_denoise(&[&frame1, &frame2], &mut output).unwrap();
+        let processed = engine
+            .process_temporal_denoise(&[&frame1, &frame2], &mut output)
+            .unwrap();
         assert_eq!(processed, 16);
         assert_eq!(output[0], 105);
     }
@@ -1577,7 +1595,9 @@ mod tests {
         let engine = StereoscopicVr360SpatialVideoPrEngine::new();
         let left_eye = vec![255u8, 128u8, 64u8, 255u8];
         let mut right_eye = vec![0u8; 4];
-        let len = engine.generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0).unwrap();
+        let len = engine
+            .generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0)
+            .unwrap();
         assert_eq!(len, 4);
     }
 

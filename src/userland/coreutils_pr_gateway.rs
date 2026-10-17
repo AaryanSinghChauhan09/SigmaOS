@@ -179,13 +179,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         sorted
     }
 
-    pub fn run_tr(
-        &self,
-        input: &str,
-        from_set: &str,
-        to_set: &str,
-        delete_mode: bool,
-    ) -> String {
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
         if delete_mode {
             input.chars().filter(|c| !from_set.contains(*c)).collect()
         } else {

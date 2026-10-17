@@ -79,18 +79,90 @@ impl Sovereign100IdeasSuite {
 
     fn populate_all_100_ideas(&mut self) {
         let sample_ideas = [
-            (1, "Native Video Editor (timeline + effects)", IdeaCategory::MultimediaTools, "Adobe Premiere Pro, Final Cut Pro, Kdenlive", "src/media/sovereign_video_editor.rs"),
-            (2, "GPU-Accelerated Screen & GIF Recorder", IdeaCategory::MultimediaTools, "OBS Studio, Bandicam, ScreenToGif", "src/productivity/screen_recorder.rs"),
-            (3, "Multi-Track Audio Editor & DSP Pipeline", IdeaCategory::MultimediaTools, "Audacity, Adobe Audition", "src/audio/editor.rs"),
-            (11, "Smart Temporary File & Cache Cleaner", IdeaCategory::SystemUtilities, "CCleaner, BleachBit", "src/system/cleanup.rs"),
-            (12, "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine", IdeaCategory::SystemUtilities, "Defraggler, e4defrag", "src/system/defrag.rs"),
-            (13, "Duplicate File Finder & Hash Deduplicator", IdeaCategory::SystemUtilities, "dupeGuru, rmlint", "src/system/duplicate.rs"),
-            (24, "SigmaPkg Universal Package Manager & Cross-Translator", IdeaCategory::PackageAndAppManagement, "Nix, Homebrew, Apt, Pacman, Dnf", "src/package/universal.rs"),
-            (25, "Declarative Nix-style System State & Generation Manager", IdeaCategory::PackageAndAppManagement, "NixOS home-manager, Guix System", "src/distro/wiki_ideas_implementation.rs"),
-            (32, "SigmaOS Sovereign CLI Development Plan & Command Framework Engine", IdeaCategory::PackageAndAppManagement, "POSIX CLI, GNU Coreutils, FreeBSD CLI", "src/tools/sigma_cli.rs"),
-            (34, "Zero-Trust TPM Boot & PQC Micro-Domain Isolation", IdeaCategory::SecurityAndPrivacy, "Qubes OS, Coreboot, SecureBoot", "src/security/qubes_isolation.rs"),
-            (35, "OpenBSD Pledge & Unveil Syscall Sandboxing Engine", IdeaCategory::SecurityAndPrivacy, "OpenBSD pledge/unveil, Landlock", "src/security/bsd_hardening.rs"),
-            (100, "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter", IdeaCategory::ComplianceAndGovernance, "HIPAA, SOC2, ISO27001, DFSG", "src/security/governance.rs"),
+            (
+                1,
+                "Native Video Editor (timeline + effects)",
+                IdeaCategory::MultimediaTools,
+                "Adobe Premiere Pro, Final Cut Pro, Kdenlive",
+                "src/media/sovereign_video_editor.rs",
+            ),
+            (
+                2,
+                "GPU-Accelerated Screen & GIF Recorder",
+                IdeaCategory::MultimediaTools,
+                "OBS Studio, Bandicam, ScreenToGif",
+                "src/productivity/screen_recorder.rs",
+            ),
+            (
+                3,
+                "Multi-Track Audio Editor & DSP Pipeline",
+                IdeaCategory::MultimediaTools,
+                "Audacity, Adobe Audition",
+                "src/audio/editor.rs",
+            ),
+            (
+                11,
+                "Smart Temporary File & Cache Cleaner",
+                IdeaCategory::SystemUtilities,
+                "CCleaner, BleachBit",
+                "src/system/cleanup.rs",
+            ),
+            (
+                12,
+                "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine",
+                IdeaCategory::SystemUtilities,
+                "Defraggler, e4defrag",
+                "src/system/defrag.rs",
+            ),
+            (
+                13,
+                "Duplicate File Finder & Hash Deduplicator",
+                IdeaCategory::SystemUtilities,
+                "dupeGuru, rmlint",
+                "src/system/duplicate.rs",
+            ),
+            (
+                24,
+                "SigmaPkg Universal Package Manager & Cross-Translator",
+                IdeaCategory::PackageAndAppManagement,
+                "Nix, Homebrew, Apt, Pacman, Dnf",
+                "src/package/universal.rs",
+            ),
+            (
+                25,
+                "Declarative Nix-style System State & Generation Manager",
+                IdeaCategory::PackageAndAppManagement,
+                "NixOS home-manager, Guix System",
+                "src/distro/wiki_ideas_implementation.rs",
+            ),
+            (
+                32,
+                "SigmaOS Sovereign CLI Development Plan & Command Framework Engine",
+                IdeaCategory::PackageAndAppManagement,
+                "POSIX CLI, GNU Coreutils, FreeBSD CLI",
+                "src/tools/sigma_cli.rs",
+            ),
+            (
+                34,
+                "Zero-Trust TPM Boot & PQC Micro-Domain Isolation",
+                IdeaCategory::SecurityAndPrivacy,
+                "Qubes OS, Coreboot, SecureBoot",
+                "src/security/qubes_isolation.rs",
+            ),
+            (
+                35,
+                "OpenBSD Pledge & Unveil Syscall Sandboxing Engine",
+                IdeaCategory::SecurityAndPrivacy,
+                "OpenBSD pledge/unveil, Landlock",
+                "src/security/bsd_hardening.rs",
+            ),
+            (
+                100,
+                "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter",
+                IdeaCategory::ComplianceAndGovernance,
+                "HIPAA, SOC2, ISO27001, DFSG",
+                "src/security/governance.rs",
+            ),
         ];
 
         for (id, name, cat, legacy, module) in sample_ideas {
@@ -386,7 +458,8 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
             category: "Productivity".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
-            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
+                .to_string(),
             target_module: "productivity".to_string(),
             is_fully_implemented: true,
         });
