@@ -17,6 +17,15 @@
 - [ ] Diagnostics
 - [ ] Build / CI
 
+## Shell component
+
+- [ ] Lexer / Parser
+- [ ] Interpreter / AST
+- [ ] Builtin applet
+- [ ] Interactive REPL
+- [ ] Redirection / Pipe
+- [ ] Job control
+
 ## Component
 
 - [ ] PR-level validation
@@ -35,8 +44,9 @@
 
 <!-- Required for design-changing kernel PRs -->
 
-- Study document:
+- Upstream study:
 - Linux/BSD/Redox/xv6 reference:
+- What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
@@ -62,7 +72,15 @@
 - [ ] Error paths tested
 - [ ] No silent failure introduced
 
-## Evidence
+## Shell safety review
+
+- [ ] Deterministic script execution
+- [ ] Explicit exit status on error
+- [ ] Quoting and globbing expansion verified
+- [ ] No partial execution on parse error
+- [ ] Signal handling and redirection safe
+
+## Reviewer checklist
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -83,7 +101,7 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks and rollback
+## Safety and rollback
 
 - Risk:
-- Rollback:
+- Safety and rollback:
