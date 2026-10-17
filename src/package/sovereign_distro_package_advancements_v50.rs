@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Sovereign Distro Package Advancements Suite V50
 // (`src/package/sovereign_distro_package_advancements_v50.rs`)
+// Provides universal package format inspection, zero-copy classification, scriptlet sandboxing, SAT DPLL dependency resolution across Linux & BSD package formats (.air, .bottle, .ipa, .ports, .pkg, .aab, .apk, AppImage, .eopkg, .nixpkg, .portage, .deb, .tar.gz, .xz, .rpm, .ebuild, .pkg.tar.xz, Flatpak, .app, .hap, .PiSi, .tgz, .superdeb, .lzm, pup, .snap, pacman, .tar, .pet, etc.).
 //
 // Inspired by Linux & BSD distributions, this suite provides complete universal
 // multi-format package inspection, zero-copy classification, scriptlet sandboxing,
@@ -826,12 +827,22 @@ impl UniversalPmCliRouterV50 {
                 if parts.contains(&"install") {
                     (
                         UniversalPmActionV50::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
                         UniversalPmActionV50::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV50::Update, vec![])
@@ -841,33 +852,60 @@ impl UniversalPmCliRouterV50 {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
                         UniversalPmActionV50::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
                         UniversalPmActionV50::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV50::Query, vec![])
                 }
             }
-            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew" | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" | "winget" | "scoop" | "choco" | "pixi" => {
+            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
+            | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift"
+            | "winget" | "scoop" | "choco" | "pixi" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
                         UniversalPmActionV50::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (
                         UniversalPmActionV50::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 }
             }
             _ => (
                 UniversalPmActionV50::Install,
-                parts.get(1..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                parts
+                    .get(1..)
+                    .unwrap_or(&[])
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
             ),
         };
 
@@ -1035,14 +1073,19 @@ impl SovereignDistroPackageAdvancementsSuiteV50 {
         let sigpkg_id = format!("sigpkg-v50-{}", manifest.name);
         self.installed_packages.push(sigpkg_id.clone());
 
-        self.pr_gateway.submit_proposal(PackagePrProposalManifestV50 {
-            pr_id: 5001,
-            title: format!("PR Proposal: Auto-integrate foreign package '{}'", manifest.name),
-            source_format: manifest.detected_format,
-            target_native_package: sigpkg_id,
-            changes_summary: "Complete foreign format adaptation and SAT DPLL resolution".to_string(),
-            verification_passed: true,
-        });
+        self.pr_gateway
+            .submit_proposal(PackagePrProposalManifestV50 {
+                pr_id: 5001,
+                title: format!(
+                    "PR Proposal: Auto-integrate foreign package '{}'",
+                    manifest.name
+                ),
+                source_format: manifest.detected_format,
+                target_native_package: sigpkg_id,
+                changes_summary: "Complete foreign format adaptation and SAT DPLL resolution"
+                    .to_string(),
+                verification_passed: true,
+            });
 
         Ok(sigpkg)
     }
@@ -1168,9 +1211,16 @@ mod tests {
     #[test]
     fn test_sat_solver_and_sandboxing_v50() {
         let solver = UniversalCrossDistroSatSolverV50::new();
-        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string(), "dbus".to_string()];
+        let raw_deps = vec![
+            "libssl-dev".to_string(),
+            "glibc".to_string(),
+            "dbus".to_string(),
+        ];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]);
+        assert_eq!(
+            solved,
+            vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]
+        );
 
         let sandbox_gov = UniversalMultiSandboxGovernorV50::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);

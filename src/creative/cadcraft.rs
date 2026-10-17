@@ -86,16 +86,16 @@ pub struct SketchEntity {
 }
 
 /// Geometric constraint type
-#[derive(Debug, Clone, PartialEq)]
-pub enum GeometricConstraintType {
-    Coincident { point1_idx: usize, point2_idx: usize },
-    Parallel { line1_idx: usize, line2_idx: usize },
-    Perpendicular { line1_idx: usize, line2_idx: usize },
-    Concentric { circle1_idx: usize, circle2_idx: usize },
-    Tangent { line_idx: usize, circle_idx: usize },
-    EqualLength { line1_idx: usize, line2_idx: usize },
-    Distance { point1_idx: usize, point2_idx: usize, target_distance: f64 },
-    Angle { line1_idx: usize, line2_idx: usize, target_angle_rad: f64 },
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConstraintType {
+    Coincident,
+    Parallel,
+    Perpendicular,
+    Concentric,
+    Tangent,
+    EqualLength,
+    Distance,
+    Angle,
 }
 
 /// Constraint Type alias for backward compatibility
@@ -332,7 +332,11 @@ impl CadCraftEngine {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, points: Vec<[f32; 2]>) -> u32 {
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity {
             id,
@@ -398,7 +402,12 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn generate_cam_toolpath(&mut self, toolpath_type: CamToolpathType, tool_diameter: f32, feed_rate: f32) -> u32 {
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
         let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
         let toolpath = CamToolpath {
             id,
@@ -406,7 +415,7 @@ impl CadCraftEngine {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F100\n"),
+            gcode_output: format!("G00 Z5.0\nG01 Z-2.0 F{:.1}\nG01 X100.0\n", feed_rate),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -429,9 +438,17 @@ impl CadCraftEngine {
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
         let mut output = Vec::new();
         match format {
-            ExportFormat::DXF => output.extend_from_slice(b"SECTION HEADER ENDSEC SECTION ENTITIES ENDSEC EOF"),
-            ExportFormat::STEP => output.extend_from_slice(b"ISO-10303-21; HEADER; DATA; ENDSEC; END-ISO-10303-21;"),
-            _ => output.extend_from_slice(b"CadCraft Export Data"),
+            ExportFormat::DXF => {
+                output.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
+            }
+            ExportFormat::STEP => {
+                output.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
+            }
+            _ => {
+                output.extend_from_slice(b"CADCRAFT_EXPORT_DATA_STREAM\n");
+            }
         }
         output
     }
@@ -539,7 +556,7 @@ impl CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
-/// Deployer 2: 3D B-Rep Solid Feature Modeling & Direct Modeling Engine
+/// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
 #[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
     pub pr_id: u32,
@@ -585,19 +602,6 @@ impl CadCraft3dSolidModelingPrDeployer {
     pub fn create_solid(&self, name: &str) -> BRepSolidModel {
         BRepSolidModel::new(name)
     }
-
-    pub fn generate_pr(&self) -> CadCraftPullRequestSpec {
-        CadCraftPullRequestSpec {
-            pr_id: 2811,
-            component_name: String::from("cadcraft-brep-solid-engine"),
-            pr_title: String::from("feat(cadcraft): 3D Boundary Representation solid modeling"),
-            pr_branch: String::from("pr/cadcraft-2811-solid"),
-            target_subsystem: String::from("cad_brep_kernel"),
-            patch_digest: 0xD4E5F678,
-            is_merged: true,
-        }
-    }
-}
 
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Clone)]
@@ -692,12 +696,6 @@ impl CadCraftMasterPrDeploymentSuite {
             assembly_fem: CadCraftAssemblyFemSimulationPrDeployer::new(),
             deployed_prs: BTreeMap::new(),
         }
-    }
-
-    pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
-        self.drafting_constraints.get_merged_pr_count()
-            + self.solid_modeling.get_merged_pr_count()
-            + self.assembly_fem.get_merged_pr_count()
     }
 
     pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
