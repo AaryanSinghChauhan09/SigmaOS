@@ -48,6 +48,10 @@ pub enum ProjectType {
     LightCraft,
     MediaCraft,
     AudioCraft,
+    Figcraft,
+    Fig,
+    UiUx,
+    Prototype,
 }
 
 /// Project
