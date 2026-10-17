@@ -907,6 +907,13 @@ if [ -f "src/distro/freebsd_gap_closure_pr_engine.rs" ]; then
     ./build/test_freebsd_gap_closure_pr_engine
 fi
 
+if [ -f "src/distro/sovereign_freebsd_advanced_subsystems_pr.rs" ]; then
+    echo "Running Sovereign FreeBSD Advanced Subsystems & Ecosystem Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_freebsd_advanced_subsystems_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_freebsd_advanced_subsystems_pr
+    ./build/test_freebsd_advanced_subsystems_pr
+fi
+
 if [ -f "src/distro/sovereign_tech_media_wiki_ultimate_parity_pr.rs" ]; then
     echo "Running Sovereign Tech Media, GitHub Wiki & Distro Ultimate Parity test suite..."
     mkdir -p build
