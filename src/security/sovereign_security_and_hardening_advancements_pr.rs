@@ -10,7 +10,6 @@
 
 extern crate alloc;
 
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -42,10 +41,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         level: &str,
     ) -> String {
         alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
-    }
-
-    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
-        (allowed_mask & requested_access) == requested_access
     }
 
     /// Evaluate SELinux access vector decision (Type Enforcement).
@@ -133,11 +128,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
             flags |= 0x02000000;
         } // CLONE_NEWCGROUP
         flags
-    }
-
-    /// Check Landlock access rule against requested access rights bitmask.
-    pub fn check_landlock_access(handled_access: u32, access_request: u32) -> bool {
-        (handled_access & access_request) == access_request
     }
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
@@ -443,16 +433,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
-    }
-
-    /// Generate SSSD domain config file string.
-    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
-            domain_name,
-            provider,
-            uri
-        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
