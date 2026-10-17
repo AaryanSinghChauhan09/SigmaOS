@@ -143,6 +143,8 @@ pub mod open_source_os_missing_components_parity;
 pub use open_source_os_missing_components_parity::*;
 pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
+pub use distro::arch_linux_missing_components_v55_pr::*;
+pub use distro::arch_linux_missing_components_v60_pr::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
 pub use distro::cachy_linux_missing_components_v60_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
