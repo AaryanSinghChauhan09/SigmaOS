@@ -127,6 +127,18 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
+/// Presenter view state
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u64,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
+
 /// Slide deck styling theme
 #[derive(Debug, Clone)]
 pub struct SlideTheme {
@@ -175,11 +187,7 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-impl SlideDeck {
-    pub fn get_active_slide(&self) -> Option<&Slide> {
-        self.slides.first()
-    }
-}
+pub type PresentationDeck = SlideDeck;
 
 pub type PresentationDeck = SlideDeck;
 
@@ -203,10 +211,6 @@ pub enum ExportFormat {
     Html5,
     Svg,
     Markdown,
-    Pdf,
-    Pptx,
-    Html5,
-    Svg,
 }
 
 pub type DeckExportFormat = ExportFormat;

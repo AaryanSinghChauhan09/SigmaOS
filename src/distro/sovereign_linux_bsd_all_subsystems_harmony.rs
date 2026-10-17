@@ -554,11 +554,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::BluetoothWireless,
-                vec![
-                    "BlueZ_5",
-                    "FreeBSD_Netgraph_Bluetooth",
-                    "PQC_Bluetooth_Mesh",
-                ],
+                vec!["BlueZ_5", "FreeBSD_Netgraph_Bluetooth", "PQC_Bluetooth_Mesh"],
             ),
             (
                 SigmaOsSubsystem::ThermalCooling,
@@ -1346,9 +1342,10 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystems_compliance_list();
-        assert_eq!(audits.len(), 31);
-        for (_, compliant, score) in audits {
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 44);
+        assert_eq!(score, 100);
+        for (_, compliant) in audits {
             assert!(compliant);
         }
 
