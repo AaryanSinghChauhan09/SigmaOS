@@ -1378,8 +1378,6 @@ impl AtSpoolQueueSpecManager {
     }
 }
 
-pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
-
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
 pub struct UserlandInitCleanRoomPrGatewayEngine {
