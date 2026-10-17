@@ -61,10 +61,7 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     let mut seg_len = 0usize;
     let mut seg_only_dots = true;
 
-    let mut i = 0;
-    while i < len {
-        let b = path[i];
-
+    for (i, &b) in path.iter().enumerate() {
         if b == 0 {
             return Err(ValidationError::NullByte);
         }
@@ -103,8 +100,6 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
                 seg_only_dots = false;
             }
         }
-
-        i += 1;
     }
 
     if seg_only_dots && seg_len >= 2 {

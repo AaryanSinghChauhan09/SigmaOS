@@ -32,6 +32,6 @@
 **Learning:** In interactive desktop note search loops, calling `note.title.to_lowercase()` and `note.content.to_lowercase()` per item incurs hundreds of dynamic heap `String` allocations per search query. Utilizing ASCII window byte matching (`contains_ignore_case` & `find_ignore_case`) performs in-place case-insensitive matching without intermediate heap allocations.
 **Action:** Always use window slice matching helpers (`contains_ignore_case` / `find_ignore_case`) for text searching across interactive desktop models.
 
-## 2026-03-30 - Single-Pass URL-Encoded Path Traversal Validation
-**Learning:** Checking URL-encoded traversal patterns (`%2e%2e`, `%2f`, `%5c`) using separate slice window iterations (`path.windows(6)` and `path.windows(3)`) before scanning the buffer for NUL bytes, control characters, and segment dot paths causes redundant multi-pass slice traversals over path buffers. Fusing URL-encoded sequence checks inline during the primary byte-indexing loop reduces path validation iteration passes from 3 to 1 while preserving full security guarantees.
-**Action:** Fuse multi-pattern sequence checks into single-pass byte scanning loops when validating input buffers and paths.
+## 2026-10-17 - Fusing URL-encoded traversal checks into single-pass byte scan
+**Learning:** Combining multi-pass slice window iterations (`windows(6)` and `windows(3)`) directly into a single linear byte scan loop using `for (i, &b) in path.iter().enumerate()` avoids redundant buffer traversal passes and slice iterator allocation overhead on hot input validation paths without compromising security invariants.
+**Action:** When validating byte buffers for multi-byte security patterns or traversal signatures, merge pattern window scans into the primary byte loop using index lookups when encountering trigger bytes (such as `%`).
