@@ -553,8 +553,10 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngine {
             OsDimensionComparison {
                 dimension_name: "Clustered Storage".to_string(),
                 target_os: "DragonFly BSD 6.7+".to_string(),
-                target_os_feature: "HAMMER2 PFS cluster replication & live deduplication".to_string(),
-                sigmaos_equivalent_feature: "DragonFly67Hammer2PfsClusterReplicationPrEngine".to_string(),
+                target_os_feature: "HAMMER2 PFS cluster replication & live deduplication"
+                    .to_string(),
+                sigmaos_equivalent_feature: "DragonFly67Hammer2PfsClusterReplicationPrEngine"
+                    .to_string(),
                 parity_percentage: 100,
                 status_notes: "Multi-node filesystem replication and live scrubbing".to_string(),
             },
@@ -569,7 +571,8 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngine {
             OsDimensionComparison {
                 dimension_name: "Relational Indexing".to_string(),
                 target_os: "Haiku R1 / BeOS".to_string(),
-                target_os_feature: "BFS live relational attribute queries & Tracker node monitors".to_string(),
+                target_os_feature: "BFS live relational attribute queries & Tracker node monitors"
+                    .to_string(),
                 sigmaos_equivalent_feature: "HaikuBfsRelationalAttributeQueryPrEngine".to_string(),
                 parity_percentage: 100,
                 status_notes: "Real-time filesystem metadata attribute querying".to_string(),
@@ -580,12 +583,14 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngine {
                 target_os_feature: "9P2000 per-process synthetic VFS mounting & rfork".to_string(),
                 sigmaos_equivalent_feature: "Plan9SyntheticVfsNamespacePrEngine".to_string(),
                 parity_percentage: 100,
-                status_notes: "Clean per-process synthetic filesystem namespace isolation".to_string(),
+                status_notes: "Clean per-process synthetic filesystem namespace isolation"
+                    .to_string(),
             },
             OsDimensionComparison {
                 dimension_name: "Hermetic Reproducibility".to_string(),
                 target_os: "NixOS / GNU Guix".to_string(),
-                target_os_feature: "Hermetic Merkle CAS store, zero-copy closure evaluator".to_string(),
+                target_os_feature: "Hermetic Merkle CAS store, zero-copy closure evaluator"
+                    .to_string(),
                 sigmaos_equivalent_feature: "NixGuixHermeticMerkleStorePrEngine".to_string(),
                 parity_percentage: 100,
                 status_notes: "100% reproducible functional package closure management".to_string(),
@@ -596,15 +601,18 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngine {
                 target_os_feature: "Crossbow VNIC switch mesh & DTrace dynamic probes".to_string(),
                 sigmaos_equivalent_feature: "IllumosCrossbowVnicDtraceProbePrEngine".to_string(),
                 parity_percentage: 100,
-                status_notes: "Zero-overhead network virtualization and system-wide tracing".to_string(),
+                status_notes: "Zero-overhead network virtualization and system-wide tracing"
+                    .to_string(),
             },
             OsDimensionComparison {
                 dimension_name: "Package & System Catalog".to_string(),
                 target_os: "Arch, Debian, Alpine, Gentoo".to_string(),
                 target_os_feature: "Multi-distro repository sync & package management".to_string(),
-                sigmaos_equivalent_feature: "SovereignThousandsMissingComponentsEngineV61".to_string(),
+                sigmaos_equivalent_feature: "SovereignThousandsMissingComponentsEngineV61"
+                    .to_string(),
                 parity_percentage: 100,
-                status_notes: "Complete 10,000+ package catalog absorption and management".to_string(),
+                status_notes: "Complete 10,000+ package catalog absorption and management"
+                    .to_string(),
             },
         ];
 
