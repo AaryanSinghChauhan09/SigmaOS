@@ -2738,7 +2738,7 @@ impl UniversalPmCommandDispatcher {
                     }
                 }
             }
-            "pisi" | "urpmi" | "urpmq" | "urpme" | "slapt-get" => {
+            "pisi" | "urpmi" | "urpmq" | "urpme" => {
                 if pm == "urpme" {
                     operation = UniversalPmOperation::Remove;
                 } else if pm == "urpmq" {
