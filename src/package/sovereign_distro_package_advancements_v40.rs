@@ -417,9 +417,7 @@ impl UdfScriptletEngineV40 {
 // 3. Cross-Distro Dependency SAT DPLL Solver & Capability Governor V40
 // ============================================================================
 
-pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
-
-pub struct UniversalCrossDistroSatSolverV39 {
+pub struct UniversalCrossDistroSatSolverV40 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
@@ -447,7 +445,7 @@ impl UniversalCrossDistroSatSolverV40 {
 
     /// Resolves foreign package dependency queries into canonical `sovereign-*` dependencies V40
     pub fn solve_dependencies(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
-        let mut resolved = Vec::new();
+        let mut resolved: Vec<String> = Vec::new();
         for dep in raw_deps {
             if let Some(mapped) = self.canonical_mapping.get(dep) {
                 if !resolved.contains(mapped) {
@@ -609,9 +607,6 @@ impl UniversalBootEnvSnapshotGovernorV40 {
 // 7. Universal Foreign PM CLI Router V40
 // ============================================================================
 
-pub type UniversalPmActionV40 = UniversalPmActionV39;
-pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UniversalPmActionV40 {
     Install,
@@ -621,8 +616,6 @@ pub enum UniversalPmActionV40 {
     Query,
     Audit,
 }
-
-pub type UniversalPmActionV40 = UniversalPmActionV39;
 
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV40 {
@@ -656,11 +649,11 @@ impl UniversalPmCliRouterV40 {
                 || p == "-p"
         });
 
-        let (action, targets): (UniversalPmActionV39, Vec<String>) = match pm.as_str() {
+        let (action, targets): (UniversalPmActionV40, Vec<String>) = match pm.as_str() {
             "apt" | "apt-get" => {
                 if parts.contains(&"install") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -670,7 +663,7 @@ impl UniversalPmCliRouterV40 {
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -685,7 +678,7 @@ impl UniversalPmCliRouterV40 {
             "pacman" => {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -695,7 +688,7 @@ impl UniversalPmCliRouterV40 {
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -711,7 +704,7 @@ impl UniversalPmCliRouterV40 {
             | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -721,7 +714,7 @@ impl UniversalPmCliRouterV40 {
                     )
                 } else {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -732,7 +725,7 @@ impl UniversalPmCliRouterV40 {
                 }
             }
             _ => (
-                UniversalPmActionV39::Install,
+                UniversalPmActionV40::Install,
                 parts
                     .get(1..)
                     .unwrap_or(&[])
@@ -783,29 +776,29 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV40 {
 // 9. Sovereign Distro Package Advancements Master Suite V40
 // ============================================================================
 
-pub struct SovereignDistroPackageAdvancementsSuiteV39 {
-    pub inspector: UniversalPackageFormatInspectorV39,
-    pub udf_engine: UdfScriptletEngineV39,
+pub struct SovereignDistroPackageAdvancementsSuiteV40 {
+    pub inspector: UniversalPackageFormatInspectorV40,
+    pub udf_engine: UdfScriptletEngineV40,
     pub sat_solver: UniversalCrossDistroSatSolverV40,
-    pub sandbox_governor: UniversalMultiSandboxGovernorV39,
-    pub cas_store: UniversalCasDeltaStoreGovernorV39,
-    pub boot_env_governor: UniversalBootEnvSnapshotGovernorV39,
-    pub cli_router: UniversalPmCliRouterV39,
-    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39,
+    pub sandbox_governor: UniversalMultiSandboxGovernorV40,
+    pub cas_store: UniversalCasDeltaStoreGovernorV40,
+    pub boot_env_governor: UniversalBootEnvSnapshotGovernorV40,
+    pub cli_router: UniversalPmCliRouterV40,
+    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV40,
     pub installed_packages: Vec<String>,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV40 {
     pub fn new() -> Self {
         Self {
-            inspector: UniversalPackageFormatInspectorV39::new(),
-            udf_engine: UdfScriptletEngineV39::new(),
+            inspector: UniversalPackageFormatInspectorV40::new(),
+            udf_engine: UdfScriptletEngineV40::new(),
             sat_solver: UniversalCrossDistroSatSolverV40::new(),
-            sandbox_governor: UniversalMultiSandboxGovernorV39::new(),
-            cas_store: UniversalCasDeltaStoreGovernorV39::new(),
-            boot_env_governor: UniversalBootEnvSnapshotGovernorV39::new(),
-            cli_router: UniversalPmCliRouterV39::new(),
-            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39::new(),
+            sandbox_governor: UniversalMultiSandboxGovernorV40::new(),
+            cas_store: UniversalCasDeltaStoreGovernorV40::new(),
+            boot_env_governor: UniversalBootEnvSnapshotGovernorV40::new(),
+            cli_router: UniversalPmCliRouterV40::new(),
+            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV40::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -954,7 +947,7 @@ mod tests {
 
     #[test]
     fn test_sat_solver_and_sandboxing_v40() {
-        let solver = UniversalCrossDistroSatSolverV39::new();
+        let solver = UniversalCrossDistroSatSolverV40::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
             "glibc".to_string(),
