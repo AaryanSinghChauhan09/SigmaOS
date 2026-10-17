@@ -609,6 +609,9 @@ impl UniversalBootEnvSnapshotGovernorV39 {
 // 7. Universal Foreign PM CLI Router V39
 // ============================================================================
 
+pub type UniversalPmActionV40 = UniversalPmActionV39;
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UniversalPmActionV39 {
     Install,

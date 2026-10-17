@@ -24,12 +24,8 @@
 
 ## Shell component
 
-- [ ] Lexer / Parser
-- [ ] Interpreter / AST
-- [ ] Builtin applet
-- [ ] Interactive REPL
-- [ ] Redirection / Pipe
-- [ ] Job control
+- [ ] Interactive shell
+- [ ] Command interpreter
 
 ## Component
 
@@ -48,14 +44,13 @@
 - [ ] Monthly diagnostics rehearsal
 - [ ] Quarterly release/architecture/security review
 
-## Reference study / Upstream study
+## Reference study (Upstream study)
 
 ## Shell component
 
 - Upstream study:
 - Linux/BSD/Redox/xv6 reference:
-- What SigmaOS adopts:
-- Decision: Adopt / Adapt / Reject
+- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
 - Reason:
 
 ## Reviewer checklist
@@ -66,39 +61,13 @@
 
 -
 
-## Reviewer checklist
-
-- [ ] Upstream study and reference checked
-- [ ] What SigmaOS adopts is clearly stated
-- [ ] Safety and rollback reviewed
-
 ## Shell safety review
 
-- [ ] No unbounded inputs
-- [ ] Safe quoting & expansion
+- [ ] Quote-aware lexer & parser safety
+- [ ] Safe environment expansion
+- [ ] Built-in command error handling
 
-## Shell safety review
-
-- [ ] Deterministic script execution
-- [ ] Explicit exit status codes
-- [ ] Safe expansion order
-- [ ] Quoting integrity
-
-## Shell safety review
-
-- [ ] Deterministic script execution verified
-- [ ] Explicit exit status codes
-- [ ] Safe expansion order
-- [ ] Quoting integrity & redirection safety
-- [ ] No unbounded input or partial execution on parse error
-
-## Reviewer checklist & Safety and rollback
-
-- [ ] Upstream study notes provided
-- [ ] Reviewer checklist completed
-- [ ] Safety and rollback plan defined
-
-## Shell safety review
+## Kernel safety review
 
 - [ ] No unnecessary `unsafe`
 
@@ -142,4 +111,8 @@
 ## Safety and rollback
 
 - Risk:
-- Safety and rollback:
+- Rollback:
+
+## Reviewer checklist
+
+- [ ] Verification complete
