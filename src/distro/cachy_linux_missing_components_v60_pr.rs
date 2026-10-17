@@ -177,7 +177,10 @@ impl CachyOsChwdWaylandSelectorPrEngine {
         let mut envs = BTreeMap::new();
         envs.insert("WLR_NO_HARDWARE_CURSORS".to_string(), "1".to_string());
         envs.insert("GBM_BACKEND".to_string(), "nvidia-drm".to_string());
-        envs.insert("__GLX_VENDOR_LIBRARY_NAME".to_string(), "nvidia".to_string());
+        envs.insert(
+            "__GLX_VENDOR_LIBRARY_NAME".to_string(),
+            "nvidia".to_string(),
+        );
 
         Self {
             detected_gpus: vec![
@@ -336,7 +339,10 @@ impl CachyOsProtonLatencyFlexPrEngine {
 
     pub fn get_proton_env_vars(&self) -> Vec<(String, String)> {
         vec![
-            ("DXVK_NVAPI_DRIVER_VERSION".to_string(), "5555800".to_string()),
+            (
+                "DXVK_NVAPI_DRIVER_VERSION".to_string(),
+                "5555800".to_string(),
+            ),
             ("LFX_ENABLE".to_string(), "1".to_string()),
             ("PROTON_ENABLE_NVAPI".to_string(), "1".to_string()),
         ]
@@ -653,7 +659,9 @@ mod tests {
     #[test]
     fn test_bcachefs_and_ksm_advisor() {
         let tiering = CachyOsBcachefsTieringPrEngine::new();
-        assert!(tiering.generate_mount_options().contains("background_target=hdd"));
+        assert!(tiering
+            .generate_mount_options()
+            .contains("background_target=hdd"));
 
         let mut ksm = CachyOsKsmSmartAdvisorPrEngine::new();
         let (pages, sleep) = ksm.optimize_scan_rate(50);

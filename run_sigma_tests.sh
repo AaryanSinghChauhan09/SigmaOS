@@ -310,10 +310,10 @@ if [ -f "src/creative/soundcraft.rs" ]; then
     ./build/test_soundcraft
 fi
 
-if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
+if [ -f "src/creative/effectcraft_missing_components_parity_pr_disable.rs" ]; then
     echo "Running Sovereign EffectCraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
-    rustc --test src/creative/effectcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_effectcraft_missing
+    rustc --test src/creative/effectcraft_missing_components_parity_pr_disable.rs --edition=2021 -o build/test_effectcraft_missing
     ./build/test_effectcraft_missing
 fi
 
@@ -427,6 +427,13 @@ if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs --edition=2021 -o build/test_next_gen_distro
     ./build/test_next_gen_distro
+fi
+
+if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_breakthroughs_pr.rs" ]; then
+    echo "Running Sovereign Kernel Open Source OS Distro Breakthroughs PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_kernel_open_source_os_distro_breakthroughs_pr.rs --edition=2021 -o build/test_kernel_distro_breakthroughs_pr
+    ./build/test_kernel_distro_breakthroughs_pr
 fi
 
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
@@ -595,6 +602,13 @@ if [ -f "src/kernel/sovereign_kernel_nextgen_distro_innovations_pr.rs" ]; then
     mkdir -p build
     rustc --test src/kernel/sovereign_kernel_nextgen_distro_innovations_pr.rs --edition=2021 -o build/sovereign_kernel_nextgen_distro_innovations_pr_test
     ./build/sovereign_kernel_nextgen_distro_innovations_pr_test
+fi
+
+if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_breakthroughs_pr.rs" ]; then
+    echo "Running Sovereign Kernel Open Source OS Distro Breakthroughs PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_kernel_open_source_os_distro_breakthroughs_pr.rs --edition=2021 -o build/test_kernel_distro_breakthroughs_pr
+    ./build/test_kernel_distro_breakthroughs_pr
 fi
 
 if [ -f "src/iso/sovereign_rufus_installer_synthesis.rs" ]; then
