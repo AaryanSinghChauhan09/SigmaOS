@@ -113,4 +113,10 @@ fn test_pr_gateway_generation_standalone() {
         .exists());
 
     let _ = fs::remove_dir_all(&temp_dir);
+
+    // Export to project wiki directory
+    let wiki_files = gateway
+        .export_all_wiki_pages("wiki")
+        .expect("Project wiki export failed");
+    assert_eq!(wiki_files.len(), 4);
 }

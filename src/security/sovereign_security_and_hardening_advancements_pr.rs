@@ -163,9 +163,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Evaluate Landlock v5 access rights bitmask check.
-    pub fn check_landlock_access(allowed_access: u32, requested_access: u32) -> bool {
-        (allowed_access & requested_access) == requested_access
+    /// Check if Landlock access rights bitmask allows requested operation.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
     }
 
     /// Generate Linux Access Control & Sandboxing PR proposal.
@@ -485,13 +485,15 @@ impl IdentityAndEnterpriseAuthPrEngine {
 
     /// Generate SSSD domain configuration section.
     pub fn generate_sssd_domain_conf(
-        domain: &str,
+        domain_name: &str,
         id_provider: &str,
         ldap_uri: &str,
     ) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain, id_provider, ldap_uri
+            domain_name,
+            id_provider,
+            ldap_uri
         )
     }
 

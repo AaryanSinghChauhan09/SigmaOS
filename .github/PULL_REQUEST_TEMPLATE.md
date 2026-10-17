@@ -39,7 +39,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Upstream study
+## Reference study & Upstream study
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
@@ -67,26 +67,7 @@
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Shell safety review
-
-<!-- Safety and rollback review checklist -->
-<!-- Reviewer checklist: Verification, lock ordering, memory limits, and runtime evidence -->
-
-- [ ] Deterministic script execution
-- [ ] Explicit exit status codes
-- [ ] No partial execution on parse error
-- [ ] Quoting and expansion integrity verified
-- [ ] Redirection and file descriptor limits enforced
-
-## Shell safety review
-
-- [ ] Deterministic script execution
-- [ ] Explicit exit status on error
-- [ ] Quoting and globbing expansion verified
-- [ ] No partial execution on parse error
-- [ ] Signal handling and redirection safe
-
-## Reviewer checklist
+## Evidence & Reviewer checklist
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -106,7 +87,7 @@
 - [ ] Storage documentation
 - [ ] Boot matrix, if applicable
 
-## Safety and rollback
+## Risks, Safety and rollback
 
 - Risk:
 - Rollback:

@@ -665,7 +665,7 @@ impl UniversalPmCliRouterV40 {
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect(),
+                            .collect::<Vec<String>>(),
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
@@ -675,7 +675,7 @@ impl UniversalPmCliRouterV40 {
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect(),
+                            .collect::<Vec<String>>(),
                     )
                 } else {
                     (UniversalPmActionV40::Update, vec![])
@@ -690,7 +690,7 @@ impl UniversalPmCliRouterV40 {
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect(),
+                            .collect::<Vec<String>>(),
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
@@ -700,7 +700,7 @@ impl UniversalPmCliRouterV40 {
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect(),
+                            .collect::<Vec<String>>(),
                     )
                 } else {
                     (UniversalPmActionV40::Query, vec![])
@@ -716,7 +716,7 @@ impl UniversalPmCliRouterV40 {
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect(),
+                            .collect::<Vec<String>>(),
                     )
                 } else {
                     (
@@ -726,7 +726,7 @@ impl UniversalPmCliRouterV40 {
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect(),
+                            .collect::<Vec<String>>(),
                     )
                 }
             }
@@ -737,7 +737,7 @@ impl UniversalPmCliRouterV40 {
                     .unwrap_or(&[])
                     .iter()
                     .map(|s| s.to_string())
-                    .collect(),
+                    .collect::<Vec<String>>(),
             ),
         };
 

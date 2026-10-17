@@ -440,6 +440,56 @@ impl CadCraftEngine {
         self.cam_toolpaths.insert(id, toolpath);
         id
     }
+
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
+        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
+        let entity = SketchEntity {
+            id,
+            entity_type,
+            points,
+            dimensions: Vec::new(),
+            properties: BTreeMap::new(),
+        };
+        self.sketch_entities.insert(id, entity);
+        id
+    }
+
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
+        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
+        let toolpath = CamToolpath {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            spindle_speed: 12000.0,
+            gcode_output: String::from("G0 X0 Y0 Z5\nG1 Z-2 F100\nM30"),
+        };
+        self.cam_toolpaths.insert(id, toolpath);
+        id
+    }
+
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        let mut data = Vec::new();
+        match format {
+            ExportFormat::DXF => {
+                data.extend_from_slice(b"SECTION HEADER ENDSEC SECTION ENTITIES ENDSEC EOF")
+            }
+            ExportFormat::STEP => data.extend_from_slice(
+                b"ISO-10303-21; HEADER; ENDSEC; DATA; ENDSEC; END-ISO-10303-21;",
+            ),
+            _ => data.extend_from_slice(b"CADCRAFT_SOLID_EXPORT"),
+        }
+        data
+    }
 }
 
 impl Default for CadCraftEngine {
