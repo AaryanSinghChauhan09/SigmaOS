@@ -502,7 +502,7 @@ mod tests {
 
     #[test]
     fn test_thermal_throttling() {
-        let device = AmdgpuDevice::new(0x1002, 0x15DD, 0, 0, 0);
+        let mut device = AmdgpuDevice::new(0x1002, 0x15DD, 0, 0, 0);
         device.set_sclk(2000);
         device.update_temperature(95); // Above 90°C
         assert_eq!(device.power_state.sclk.current, 1600); // Throttled to 80%

@@ -661,7 +661,7 @@ mod tests {
 
     #[test]
     fn test_sigmainit_creation() {
-        let init = SigmaInit::new();
+        let mut init = SigmaInit::new();
         assert!(!init.is_running());
         init.start();
         assert!(init.is_running());

@@ -665,8 +665,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec_freebsd",
-                "freebsd_racct_vnet_jail_process_isolation",
+                "pol_proc_sec",
+                "process_racct_mac_policy_isolation",
                 true,
             ),
         ];
@@ -746,7 +746,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystem_compliance_tuples(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_subsystems_compliance_list(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
@@ -756,7 +756,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn translate_subsystem_payload(
+    pub fn format_subsystem_distro_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1214,14 +1214,14 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystem_compliance_tuples();
+        let audits = engine.audit_subsystems_compliance_list();
         assert_eq!(audits.len(), 31);
         assert_eq!(score, 100);
         for compliant in audits.values() {
             assert!(compliant);
         }
 
-        let translated = engine.translate_subsystem_payload(
+        let translated = engine.format_subsystem_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",

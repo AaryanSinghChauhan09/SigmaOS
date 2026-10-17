@@ -418,7 +418,7 @@ mod tests {
         entry1.add_option(MountOption::Auto);
         mount.add_entry(entry1);
 
-        let entry2 = MountEntry::new(
+        let mut entry2 = MountEntry::new(
             "entry2".to_string(),
             "/dev/sda2".to_string(),
             "/home".to_string(),
@@ -429,7 +429,7 @@ mod tests {
         entry2.add_option(MountOption::Auto);
         mount.add_entry(entry2);
 
-        let entry3 = MountEntry::new(
+        let mut entry3 = MountEntry::new(
             "entry3".to_string(),
             "/dev/sda3".to_string(),
             "/data".to_string(),

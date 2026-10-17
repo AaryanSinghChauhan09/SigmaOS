@@ -78,6 +78,22 @@ pub use effectcraft::{
     EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
     NodeGraph, NodeType, Parameter, ParameterType,
 };
+pub use effectcraft::{
+    fnv1a_effectcraft_pr_digest, get_effectcraft, init_effectcraft, AnimatedParameter,
+    BlendMode as EffectBlendMode, CompositingNode, Effect as EffectCraftEffect, EffectCategory,
+    EffectCraftMasterPrDeploymentSuite, EffectCraftMotionTrackingKeyingPrDeployer,
+    EffectCraftNodeCompositingPrDeployer, EffectCraftParticleShaderPrDeployer,
+    EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
+    NodeGraph, NodeType, Parameter, ParameterType,
+};
+pub use effectcraft_missing_components_parity_pr::{
+    ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine,
+    EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
+    EffectcraftExpressionScriptingRiggingPrEngine, EffectcraftMissingComponentsParityPrSuite,
+    EffectcraftOpticalFlowMotionVectorPrEngine, EffectcraftPrProposalManifest,
+    NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
+};
 pub use effectcraft_missing_components_parity_pr::{
     ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine,
     EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
@@ -103,21 +119,26 @@ pub use filmcraft::{
 };
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
-    ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline as FilmTimeline,
-    Transition, TransitionType, VideoCodec, VideoEditor, VideoTrack,
-};
-pub use lightcraft::{
-    get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
-    ColorSpace, CurveType, Flag, Light as LightcraftLight, LightEngine,
-    LightType as LightcraftLightType, Mask, MaskType as LightMaskType, Material, Photo,
-    PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading, ToneCurve,
-    ToneCurvePoint,
+    ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
+    TransitionType, VideoCodec, VideoEditor, VideoTrack,
 };
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
     ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
     Material, Photo, PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading,
     ToneCurve, ToneCurvePoint,
+};
+pub use lightcraft::{
+    get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
+    ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
+    Material, Photo, PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading,
+    ToneCurve, ToneCurvePoint,
+};
+pub use mediacraft::{
+    get_mediacraft, init_mediacraft, AudioCodec as MediaAudioCodec, AudioSettings, AudioTrack,
+    ContainerFormat, EqualizerBand, EqualizerPreset, MediaItem, MediaLibrary, MediaPlayer,
+    MediaType, PlaybackState, Playlist, RepeatMode, ShuffleMode, StreamProtocol, StreamSource,
+    SubtitleTrack, VideoCodec as MediaVideoCodec, VideoSettings, VideoTrack as MediaVideoTrack,
 };
 pub use mediacraft::{
     get_mediacraft, init_mediacraft, AudioCodec as MediaAudioCodec, AudioSettings, AudioTrack,
@@ -147,6 +168,20 @@ pub use pdfcraft::{
     ExportFormat as PdfExportFormat, FontFamily as PdfFontFamily, FontSize, FormField,
     FormFieldType, Hyperlink, ImageObject, PdfEditor, PdfElement, PdfMetadata, PdfPage,
     SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
+};
+pub use pdfcraft::{
+    get_pdfcraft, init_pdfcraft, Annotation, AnnotationType, Bookmark,
+    ExportFormat as PdfExportFormat, FontFamily as PdfFontFamily, FontSize, FormField,
+    FormFieldType, Hyperlink, ImageObject, PdfEditor, PdfElement, PdfMetadata, PdfPage,
+    SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
+};
+pub use pdfcraft_artcraft_parity_pr::{
+    PdfcraftArchivalValidationPrEngine, PdfcraftArtcraftPrProposalManifest,
+    PdfcraftBatchExportRenderPrEngine, PdfcraftColorPreflightCmykPrEngine,
+    PdfcraftDigitalSignatureWatermarkPrEngine, PdfcraftInteractiveFormsXfaPrEngine,
+    PdfcraftMultiWorkspaceProjectPrEngine, PdfcraftOcrTextRecognitionPrEngine,
+    PdfcraftPageImpositionBookletPrEngine, PdfcraftRedactionSanitizationPrEngine,
+    PdfcraftVectorArtImportPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
 };
 pub use pdfcraft_artcraft_parity_pr::{
     PdfcraftArchivalValidationPrEngine, PdfcraftArtcraftPrProposalManifest,
@@ -194,6 +229,10 @@ pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
     AnimationLayerType, AnimationProject as VectorAnimationProject, Bone, InterpolationMode,
     Keyframe as VectorKeyframe, OnionSkin, Rig, Timeline as VectorTimeline,
+};
+pub use vectorcraft::{
+    get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,
+    Shape, ShapeProperties, VectorEditor, VectorLayer,
 };
 pub use vectorcraft::{
     get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,

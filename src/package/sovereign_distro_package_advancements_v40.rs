@@ -950,7 +950,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sat_solver_and_sandboxing_v40() {
+    fn test_sat_solver_and_sandboxing_v39() {
         let solver = UniversalCrossDistroSatSolverV39::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),

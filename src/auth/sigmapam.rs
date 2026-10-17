@@ -723,7 +723,7 @@ mod tests {
 
         assert!(account.is_valid());
 
-        let disabled = account.with_enabled(false);
+        let disabled = account.clone().with_enabled(false);
         assert!(!disabled.is_valid());
 
         let locked = account.with_locked(true);

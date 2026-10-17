@@ -319,7 +319,7 @@ mod tests {
 
     #[test]
     fn test_thermal_throttling() {
-        let device = NvidiaDevice::new(0x10DE, 0x2204, 0, 0, 0, NvidiaDriverType::Nouveau);
+        let mut device = NvidiaDevice::new(0x10DE, 0x2204, 0, 0, 0, NvidiaDriverType::Nouveau);
         device.set_gpu_clock(2000);
         device.update_temperature(95);
         assert_eq!(device.power_state.gpu_clock, 1600); // Throttled
