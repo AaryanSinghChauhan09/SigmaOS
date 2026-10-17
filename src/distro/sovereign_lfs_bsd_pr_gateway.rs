@@ -36,11 +36,17 @@ pub enum LfsBsdPrCategory {
     LfsSysvInitRunlevels,
     LfsPkgtoolDestdir,
     LfsKernelConfigOptimizer,
+    LfsGlibcDynamicLinker,
+    LfsUdevColdplug,
+    LfsPamShadowAuth,
+    LfsPorgCollisionTracker,
     OpenBsdKarlRelinking,
     FreeBsdVimageVnet,
     FreeBsdPoudrierePorts,
     NetBsdRumpVeriexec,
+    NetBsdVeriexecSignatures,
     DragonFlyHammer2Pfs,
+    DragonFlyHammer2PfsReplication,
     DragonFlyVkernelSandbox,
     LfsAutomatedReadinessAuditor,
     BsdCrossKernelAbiTranslation,
@@ -77,8 +83,12 @@ impl LfsBsdPrCategory {
                 "DragonFly BSD HAMMER2 PFS multi-master transaction replication"
             }
             Self::DragonFlyVkernelSandbox => "DragonFly BSD VKernel virtual kernel execution",
-            Self::LfsAutomatedReadinessAuditor => "LFS automated system readiness & BLFS dependency auditor",
-            Self::BsdCrossKernelAbiTranslation => "Cross-BSD system call ABI & sandbox translation matrix",
+            Self::LfsAutomatedReadinessAuditor => {
+                "LFS automated system readiness & BLFS dependency auditor"
+            }
+            Self::BsdCrossKernelAbiTranslation => {
+                "Cross-BSD system call ABI & sandbox translation matrix"
+            }
         }
     }
 }
@@ -281,7 +291,10 @@ impl SovereignLfsBsdPrGateway {
         assert_eq!(built, 1);
 
         // 7. Verify LFS readiness auditor
-        assert!(self.master_harmony.lfs_readiness_auditor.audit_system_readiness());
+        assert!(self
+            .master_harmony
+            .lfs_readiness_auditor
+            .audit_system_readiness());
 
         // 8. Verify BSD cross-kernel ABI translator
         assert!(self.master_harmony.bsd_abi_translator.audit_abi_coverage() >= 4);

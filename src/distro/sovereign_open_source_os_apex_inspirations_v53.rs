@@ -147,7 +147,11 @@ impl FreeBsdGeomZfsVdevTieringEngine {
     }
 
     pub fn allocate_block(&mut self, preferred_tier: StorageTierType, size: u64) -> Option<u32> {
-        if let Some(vdev) = self.vdev_nodes.iter_mut().find(|v| v.tier == preferred_tier && v.free_bytes >= size) {
+        if let Some(vdev) = self
+            .vdev_nodes
+            .iter_mut()
+            .find(|v| v.tier == preferred_tier && v.free_bytes >= size)
+        {
             vdev.allocated_bytes += size;
             vdev.free_bytes -= size;
             Some(vdev.vdev_id)
@@ -161,7 +165,11 @@ impl FreeBsdGeomZfsVdevTieringEngine {
     }
 
     pub fn promote_hot_data(&mut self, _vdev_id: u32, size: u64) -> bool {
-        if let Some(fast_vdev) = self.vdev_nodes.iter_mut().find(|v| v.tier == StorageTierType::NvmeMemoryFast && v.free_bytes >= size) {
+        if let Some(fast_vdev) = self
+            .vdev_nodes
+            .iter_mut()
+            .find(|v| v.tier == StorageTierType::NvmeMemoryFast && v.free_bytes >= size)
+        {
             fast_vdev.allocated_bytes += size;
             fast_vdev.free_bytes -= size;
             self.promotion_counter += 1;
@@ -277,7 +285,12 @@ impl NixGuixContentAddressedStoreEngine {
         }
     }
 
-    pub fn register_store_path(&mut self, hash_prefix: &str, store_name: &str, deps: &[&str]) -> String {
+    pub fn register_store_path(
+        &mut self,
+        hash_prefix: &str,
+        store_name: &str,
+        deps: &[&str],
+    ) -> String {
         let output_path = format!("/sigma/store/{}-{}", hash_prefix, store_name);
         self.store_paths.push(StoreDerivationPath {
             hash_prefix: hash_prefix.to_string(),
@@ -342,13 +355,18 @@ impl SovereignOpenSourceOsApexMasterSuiteV53 {
     pub fn run_v53_apex_suite(&mut self) -> Vec<ApexAuditResultV53> {
         // 1. Linux BPF-LSM Landlock V6
         self.landlock_bpf.add_path_rule("/etc", 4); // Read file
-        self.landlock_bpf.attach_bpf_lsm_hook("file_open", "sigma_init");
+        self.landlock_bpf
+            .attach_bpf_lsm_hook("file_open", "sigma_init");
         self.landlock_bpf.restrict_self_domain();
 
         // 2. FreeBSD GEOM ZFS Tiering
-        self.geom_zfs.register_vdev(1, "nvme0", StorageTierType::NvmeMemoryFast, 1024000000);
-        self.geom_zfs.register_vdev(2, "sda", StorageTierType::SsdCapacityMedium, 5000000000);
-        let _alloc = self.geom_zfs.allocate_block(StorageTierType::NvmeMemoryFast, 4096);
+        self.geom_zfs
+            .register_vdev(1, "nvme0", StorageTierType::NvmeMemoryFast, 1024000000);
+        self.geom_zfs
+            .register_vdev(2, "sda", StorageTierType::SsdCapacityMedium, 5000000000);
+        let _alloc = self
+            .geom_zfs
+            .allocate_block(StorageTierType::NvmeMemoryFast, 4096);
         self.geom_zfs.promote_hot_data(2, 4096);
 
         // 3. OpenBSD Signify & Sigstore Cosign
@@ -362,7 +380,9 @@ impl SovereignOpenSourceOsApexMasterSuiteV53 {
         );
 
         // 4. Nix/Guix Store
-        let store_path = self.nix_store.register_store_path("z9a8b7c6d5", "sigma-libc", &[]);
+        let store_path = self
+            .nix_store
+            .register_store_path("z9a8b7c6d5", "sigma-libc", &[]);
         self.nix_store.pin_closure_lock("sha256:fedcba9876543210");
 
         vec![
@@ -449,8 +469,20 @@ mod tests {
         let mut engine = OpenBsdSignifyCosignAttestationEngine::new();
         engine.add_trusted_pubkey("key-prod");
 
-        assert!(engine.register_attestation("app-binary", "sig-123", "bundle-456", "spdx-789", "key-prod"));
-        assert!(!engine.register_attestation("untrusted-binary", "sig-000", "bundle-000", "spdx-000", "key-unknown"));
+        assert!(engine.register_attestation(
+            "app-binary",
+            "sig-123",
+            "bundle-456",
+            "spdx-789",
+            "key-prod"
+        ));
+        assert!(!engine.register_attestation(
+            "untrusted-binary",
+            "sig-000",
+            "bundle-000",
+            "spdx-000",
+            "key-unknown"
+        ));
 
         assert!(engine.verify_provenance("app-binary"));
         assert!(!engine.verify_provenance("untrusted-binary"));

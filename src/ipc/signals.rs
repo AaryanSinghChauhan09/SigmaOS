@@ -145,18 +145,14 @@ impl SignalDeliverySystem {
                 .processes
                 .get(&sender_pid)
                 .ok_or(IPCError::NotConnected)?;
-            if !sender.capability.can_send {
-                return Err(IPCError::PermissionDenied);
-            }
+            sender.capability.check_write()?;
         }
 
         let receiver = self
             .processes
             .get_mut(&receiver_pid)
             .ok_or(IPCError::NotConnected)?;
-        if !receiver.capability.can_receive {
-            return Err(IPCError::PermissionDenied);
-        }
+        receiver.capability.check_read()?;
 
         let pending = PendingSignal {
             signal_type,
@@ -176,7 +172,7 @@ mod tests {
     #[test]
     fn test_signal_delivery() {
         let mut sds = SignalDeliverySystem::new();
-        let cap = IPCCapability::full();
+        let cap = IPCCapability::new(1, IPCCapability::READ | IPCCapability::WRITE);
 
         sds.register_process(100, cap);
         sds.register_process(101, cap);
@@ -208,7 +204,7 @@ mod tests {
     #[test]
     fn test_signal_masking() {
         let mut sds = SignalDeliverySystem::new();
-        let cap = IPCCapability::full();
+        let cap = IPCCapability::new(1, IPCCapability::READ | IPCCapability::WRITE);
 
         sds.register_process(200, cap);
 
@@ -244,7 +240,7 @@ mod tests {
     #[test]
     fn test_realtime_signals() {
         let mut sds = SignalDeliverySystem::new();
-        let cap = IPCCapability::full();
+        let cap = IPCCapability::new(1, IPCCapability::READ | IPCCapability::WRITE);
 
         sds.register_process(300, cap);
         sds.register_process(301, cap);
@@ -263,13 +259,13 @@ mod tests {
     #[test]
     fn test_signal_delivery_permissions() {
         let mut sds = SignalDeliverySystem::new();
-        let mut cap_sender = IPCCapability::full();
-        cap_sender.can_send = false; // No send permission
+        let cap_no_write = IPCCapability::new(1, IPCCapability::READ);
+        let cap_full = IPCCapability::new(2, IPCCapability::READ | IPCCapability::WRITE);
 
-        sds.register_process(400, cap_sender);
-        sds.register_process(401, IPCCapability::full());
+        sds.register_process(400, cap_no_write);
+        sds.register_process(401, cap_full);
 
-        // Should fail because sender lacks send permission
+        // Should fail because sender lacks write permission
         assert!(sds.send_signal(400, 401, SignalType::SigInt, None).is_err());
     }
 }

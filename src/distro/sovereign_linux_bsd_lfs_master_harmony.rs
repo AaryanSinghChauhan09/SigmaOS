@@ -874,11 +874,21 @@ impl LfsAutomatedReadinessAuditorEngine {
         let mut engine = Self {
             readiness_checks: BTreeMap::new(),
         };
-        engine.readiness_checks.insert("lfs_mount_devtmpfs".to_string(), true);
-        engine.readiness_checks.insert("lfs_sysv_runlevel_3".to_string(), true);
-        engine.readiness_checks.insert("glibc_linker_ld_so".to_string(), true);
-        engine.readiness_checks.insert("pam_shadow_argon2id".to_string(), true);
-        engine.readiness_checks.insert("blfs_pkg_porg_indexer".to_string(), true);
+        engine
+            .readiness_checks
+            .insert("lfs_mount_devtmpfs".to_string(), true);
+        engine
+            .readiness_checks
+            .insert("lfs_sysv_runlevel_3".to_string(), true);
+        engine
+            .readiness_checks
+            .insert("glibc_linker_ld_so".to_string(), true);
+        engine
+            .readiness_checks
+            .insert("pam_shadow_argon2id".to_string(), true);
+        engine
+            .readiness_checks
+            .insert("blfs_pkg_porg_indexer".to_string(), true);
         engine
     }
 
@@ -908,10 +918,22 @@ impl BsdCrossKernelAbiTranslationEngine {
         let mut engine = Self {
             active_abi_rules: BTreeMap::new(),
         };
-        engine.active_abi_rules.insert("freebsd_capsicum".to_string(), "capability_rights_limit".to_string());
-        engine.active_abi_rules.insert("openbsd_pledge".to_string(), "stdio_rpath_wpath_inet".to_string());
-        engine.active_abi_rules.insert("netbsd_veriexec".to_string(), "sha256_strict_enforce".to_string());
-        engine.active_abi_rules.insert("dragonfly_hammer2".to_string(), "multi_master_txg_replay".to_string());
+        engine.active_abi_rules.insert(
+            "freebsd_capsicum".to_string(),
+            "capability_rights_limit".to_string(),
+        );
+        engine.active_abi_rules.insert(
+            "openbsd_pledge".to_string(),
+            "stdio_rpath_wpath_inet".to_string(),
+        );
+        engine.active_abi_rules.insert(
+            "netbsd_veriexec".to_string(),
+            "sha256_strict_enforce".to_string(),
+        );
+        engine.active_abi_rules.insert(
+            "dragonfly_hammer2".to_string(),
+            "multi_master_txg_replay".to_string(),
+        );
         engine
     }
 
@@ -945,6 +967,10 @@ pub struct SovereignLinuxBsdLfsMasterHarmonyEngine {
     pub lfs_kernel_optimizer: LfsKernelConfigOptimizer,
     pub netbsd_rump: NetBsdRumpKernelIsolatedDriverEngine,
     pub freebsd_poudriere: FreeBsdPoudrierePortsBuilder,
+    pub lfs_dynamic_linker: LfsGlibcDynamicLinkerEngine,
+    pub lfs_udev_coldplug: LfsUdevColdplugDevtmpfsEngine,
+    pub lfs_pam_auth: LfsPamShadowAuthSuite,
+    pub netbsd_veriexec: NetBsdVeriexecCryptographicAuditEngine,
     pub dragonfly_hammer2_pfs: DragonFlyHammer2PfsReplicationEngine,
     pub lfs_readiness_auditor: LfsAutomatedReadinessAuditorEngine,
     pub bsd_abi_translator: BsdCrossKernelAbiTranslationEngine,
@@ -961,6 +987,10 @@ impl SovereignLinuxBsdLfsMasterHarmonyEngine {
             lfs_bootscripts: LfsBootscriptsInitEngine::new(),
             lfs_pkgtool: LfsPkgtoolPackageEngine::new(),
             lfs_kernel_optimizer: LfsKernelConfigOptimizer::new(),
+            lfs_dynamic_linker: LfsGlibcDynamicLinkerEngine::new(),
+            lfs_udev_coldplug: LfsUdevColdplugDevtmpfsEngine::new(),
+            lfs_pam_auth: LfsPamShadowAuthSuite::new(),
+            netbsd_veriexec: NetBsdVeriexecCryptographicAuditEngine::new(),
             netbsd_rump: NetBsdRumpKernelIsolatedDriverEngine::new(),
             freebsd_poudriere: FreeBsdPoudrierePortsBuilder::new("sovereign_14_amd64", "head"),
             dragonfly_hammer2_pfs: DragonFlyHammer2PfsReplicationEngine::new(),
@@ -1146,6 +1176,11 @@ mod tests {
         // 8. BSD Cross-Kernel ABI Translator
         let translator = BsdCrossKernelAbiTranslationEngine::new();
         assert_eq!(translator.audit_abi_coverage(), 4);
-        assert_eq!(translator.translate_bsd_syscall("openbsd", "pledge").unwrap(), "sigma_pledge_sandbox_apply");
+        assert_eq!(
+            translator
+                .translate_bsd_syscall("openbsd", "pledge")
+                .unwrap(),
+            "sigma_pledge_sandbox_apply"
+        );
     }
 }

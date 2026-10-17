@@ -14,7 +14,11 @@ fn test_v58_os_and_arch_prs_full_cycle() {
     assert!(suite.execute_and_verify_all_os_prs());
 
     let arch_prs = suite.execute_all_arch_prs();
-    assert_eq!(arch_prs.len(), 3, "Expected 3 Arch Linux GitHub repo PR proposals");
+    assert_eq!(
+        arch_prs.len(),
+        3,
+        "Expected 3 Arch Linux GitHub repo PR proposals"
+    );
 
     let expected_repos = [
         "archlinux/archinstall & archlinux/archiso",
