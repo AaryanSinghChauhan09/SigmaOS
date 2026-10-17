@@ -34,6 +34,10 @@ impl LinuxAccessControlAndSandboxingPrEngine {
     }
 
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
+    pub fn check_landlock_access(allowed_mask: u32, requested_mask: u32) -> bool {
+        (allowed_mask & requested_mask) == requested_mask
+    }
+
     pub fn format_selinux_context(
         user: &str,
         role: &str,
@@ -405,6 +409,15 @@ impl IdentityAndEnterpriseAuthPrEngine {
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
+    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, ldap_uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
+            domain_name,
+            provider,
+            ldap_uri
+        )
+    }
+
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
         let mut parts = Vec::new();
         for rdn in dn.split(',') {
