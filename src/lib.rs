@@ -112,7 +112,8 @@ pub use desktop::{
 pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
     SovereignKernelDistroParityPrGateway, SovereignKernelNextGenDistroInnovationsPrGateway,
-    SovereignKernelOpenSourceInnovationsPrGateway, SovereignLinuxBsdKernelInnovationsPrGateway,
+    SovereignKernelOpenSourceInnovationsPrGateway, SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
+    SovereignLinuxBsdKernelInnovationsPrGateway,
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
