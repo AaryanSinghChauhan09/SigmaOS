@@ -17,6 +17,14 @@
 - [ ] Diagnostics
 - [ ] Build / CI
 
+## Shell component
+
+- [ ] Interactive prompt & signals
+- [ ] Command execution & builtins
+- [ ] Environment & expansion
+- [ ] Resource limits governor
+- [ ] Short circuit && / ||
+
 ## Component
 
 - [ ] PR-level validation
@@ -31,12 +39,13 @@
 - [ ] Monthly diagnostics rehearsal
 - [ ] Quarterly release/architecture/security review
 
-## Reference study
+## Reference study & Upstream study
 
 <!-- Required for design-changing kernel PRs -->
 
-- Study document:
+- Upstream study document:
 - Linux/BSD/Redox/xv6 reference:
+- What SigmaOS adopts / adapts / rejects:
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
@@ -51,9 +60,16 @@
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## Kernel safety review
+## Kernel safety review & Reviewer checklist
 
+- [ ] Safety and rollback plan defined
 - [ ] No unnecessary `unsafe`
+
+## Shell safety review
+
+- [ ] Command injection prevention verified
+- [ ] Environment variable sanitization checked
+- [ ] Signal trap safety verified
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
@@ -83,7 +99,7 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks and rollback
+## Safety and rollback
 
 - Risk:
-- Rollback:
+- Safety and rollback:
