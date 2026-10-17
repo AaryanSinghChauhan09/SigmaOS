@@ -61,6 +61,13 @@ pub struct Point2D {
     pub y: f64,
 }
 
+/// 2D Circle
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Circle2D {
+    pub center: Point2D,
+    pub radius: f64,
+}
+
 /// 3D Vector / Point
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector3D {
@@ -109,16 +116,6 @@ pub enum SketchEntity {
     },
 }
 
-/// 2D Sketch entity
-#[derive(Debug, Clone)]
-pub struct SketchEntity {
-    pub id: u32,
-    pub entity_type: SketchEntityType,
-    pub points: Vec<[f32; 2]>,
-    pub dimensions: Vec<f32>,
-    pub properties: BTreeMap<String, String>,
-}
-
 /// Geometric constraint type
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GeometricConstraintType {
@@ -132,7 +129,7 @@ pub enum GeometricConstraintType {
     Angle,
 }
 
-pub type GeometricConstraintType = ConstraintType;
+pub type ConstraintType = GeometricConstraintType;
 
 /// Geometric constraint
 #[derive(Debug, Clone)]
@@ -148,8 +145,8 @@ pub struct GeometricConstraint {
 #[derive(Debug, Clone)]
 pub struct ParametricSketch2D {
     pub name: String,
-    pub entities: Vec<SketchEntityEnum>,
-    pub constraints: Vec<GeometricConstraintType>,
+    pub entities: Vec<SketchEntity>,
+    pub constraints: Vec<GeometricConstraint>,
     pub solved: bool,
 }
 
@@ -164,11 +161,11 @@ impl ParametricSketch2D {
     }
 
     pub fn add_point(&mut self, x: f64, y: f64) -> usize {
-        self.entities.push(SketchEntityEnum::Point(Point2D { x, y }));
+        self.entities.push(SketchEntity::Point(Point2D { x, y }));
         self.entities.len() - 1
     }
 
-    pub fn add_constraint(&mut self, constraint: GeometricConstraintType) {
+    pub fn add_constraint(&mut self, constraint: GeometricConstraint) {
         self.constraints.push(constraint);
     }
 
@@ -381,6 +378,8 @@ pub enum ExportFormat {
     ParasolidXT,
 }
 
+pub type CadExportFormat = ExportFormat;
+
 /// CadCraft Main Engine
 pub struct CadCraftEngine {
     pub entities: Vec<SketchEntity>,
@@ -402,6 +401,7 @@ pub struct CadCraftEngine {
 impl CadCraftEngine {
     pub fn new() -> Self {
         Self {
+            entities: Vec::new(),
             sketch_entities: BTreeMap::new(),
             constraints: BTreeMap::new(),
             solid_features: BTreeMap::new(),
@@ -563,7 +563,7 @@ pub fn get_cadcraft() -> Option<&'static mut CadCraftEngine> {
 // ============================================================================
 
 /// Deployer for 2D Drafting & Parametric Constraints in PR Format
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CadCraft2dDraftingConstraintPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
@@ -612,10 +612,6 @@ impl CadCraft2dDraftingConstraintPrDeployer {
 
     pub fn create_sketch(&self, name: &str) -> ParametricSketch2D {
         ParametricSketch2D::new(name)
-    }
-
-    pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged).count()
     }
 
     pub fn generate_pr(&self) -> CadCraftPullRequestSpec {
@@ -719,7 +715,7 @@ impl CadCraft3dSolidModelingPrDeployer {
 }
 
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CadCraftAssemblyFemSimulationPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
@@ -779,10 +775,6 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
             };
             self.deployed_prs.insert(pr_id, pr);
         }
-    }
-
-    pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged).count()
     }
 
     pub fn generate_pr(&self) -> CadCraftPullRequestSpec {
@@ -847,7 +839,7 @@ impl Default for CadCraftAssemblyFemSimulationPrDeployer {
 }
 
 /// Master Deployment Coordinator for CadCraft
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CadCraftMasterPrDeploymentSuite {
     pub drafting_2d: CadCraft2dDraftingConstraintPrDeployer,
     pub solid_modeling_3d: CadCraft3dSolidModelingPrDeployer,
@@ -880,17 +872,11 @@ impl CadCraftMasterPrDeploymentSuite {
         }
     }
 
-    pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
-        self.drafting_constraints.get_merged_pr_count()
-            + self.solid_modeling.get_merged_pr_count()
-            + self.assembly_fem.get_merged_pr_count()
-    }
-
     pub fn deploy_all(&mut self) -> Vec<CadCraftPullRequestSpec> {
         let mut prs = Vec::new();
-        prs.extend(self.drafting_constraints.deployed_prs.values().cloned());
-        prs.extend(self.solid_modeling.deployed_prs.values().cloned());
-        prs.extend(self.assembly_fem.deployed_prs.values().cloned());
+        prs.extend(self.drafting_2d.deployed_prs.values().cloned());
+        prs.extend(self.solid_modeling_3d.deployed_prs.values().cloned());
+        prs.extend(self.assembly_cam_fea.deployed_prs.values().cloned());
 
         for pr in &prs {
             self.deployed_prs.insert(pr.pr_id, pr.clone());
@@ -901,14 +887,14 @@ impl CadCraftMasterPrDeploymentSuite {
         let p2 = sample_sketch.add_point(50.0, 0.0);
         sample_sketch.add_constraint(GeometricConstraint {
             id: 1,
-            constraint_type: ConstraintType::Distance,
+            constraint_type: ConstraintType::Distance { point1_idx: p1, point2_idx: p2, target_distance: 100.0 },
             entity_ids: vec![p1 as u32, p2 as u32],
             target_value: 100.0,
             satisfied: true,
         });
         sample_sketch.solve_constraints();
 
-        let mut sample_solid = self.solid_modeling.create_solid("Support Bracket");
+        let mut sample_solid = self.solid_modeling_3d.create_solid("Support Bracket");
         sample_solid.extrude_sketch(&sample_sketch, 50.0, 0.0);
 
         let _step_bytes = self
@@ -1012,6 +998,6 @@ mod tests {
         assert_eq!(master.compute_total_cadcraft_pr_deployments(), 9);
         assert!(master.verify_complete_cadcraft_pr_deployment());
         let deployed = master.deploy_all();
-        assert_eq!(deployed.len(), 3);
+        assert_eq!(deployed.len(), 9);
     }
 }

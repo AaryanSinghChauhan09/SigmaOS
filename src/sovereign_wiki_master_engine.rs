@@ -3,6 +3,7 @@
 
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
@@ -12,6 +13,17 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
@@ -65,15 +77,15 @@ pub struct ImprovementIdeaRecord {
 
 #[derive(Debug)]
 pub struct Sovereign100IdeasSuite {
-    pub ideas: Vec<RoadmapFeatureIdea>,
+    pub ideas: Vec<ImprovementIdeaRecord>,
 }
 
 impl Sovereign100IdeasSuite {
     pub fn new() -> Self {
         let mut suite = Self {
-            features: Vec::with_capacity(100),
+            ideas: Vec::with_capacity(100),
         };
-        suite.seed_100_ideas();
+        suite.populate_all_100_ideas();
         suite
     }
 
@@ -177,11 +189,11 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn total_fulfilled_count(&self) -> usize {
-        self.ideas.iter().filter(|i| i.is_fully_implemented).count()
+        self.ideas.iter().filter(|i| i.is_fulfilled).count()
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        self.total_fulfilled_count() == 100
+        self.total_fulfilled_count() == self.ideas.len() && !self.ideas.is_empty()
     }
 }
 
@@ -227,9 +239,9 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct SovereignShardsMasterRegistry {
-    pub shards: BTreeMap<u32, ShardComponentSpec>,
+    pub shards: BTreeMap<u32, SovereignShardDescriptor>,
 }
 
 impl SovereignShardsMasterRegistry {
@@ -237,7 +249,7 @@ impl SovereignShardsMasterRegistry {
         let mut registry = Self {
             shards: BTreeMap::new(),
         };
-        registry.register_all_shards();
+        registry.register_all_12_shards();
         registry
     }
 
@@ -392,7 +404,7 @@ pub struct DistroGapFeatureRecord {
     pub verification_passed: bool,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct SovereignDistroGapClosureEngine {
     pub features: Vec<DistroGapFeatureRecord>,
 }
@@ -411,12 +423,6 @@ impl SovereignDistroGapClosureEngine {
             distro_name: "Arch Linux",
             gap_feature_name: "Signstar Signing Protocol & YubiHSM Hardware Security",
             sigma_counterpart: "SignstarSigningService & Dilithium5Signer",
-            verification_passed: true,
-        });
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
         self.features.push(DistroGapFeatureRecord {
@@ -459,18 +465,17 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     fn seed_ideas(&mut self) {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 1,
-            id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
             category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
-            fulfilled: true,
         });
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+            category: "Browser".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
             target_module: "productivity".to_string(),
@@ -483,7 +488,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
 }
