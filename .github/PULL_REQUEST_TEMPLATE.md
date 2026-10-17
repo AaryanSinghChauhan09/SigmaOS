@@ -27,6 +27,14 @@
 - [ ] Builtins
 - [ ] Pipeline
 
+## Shell component
+
+- [ ] Interactive prompt & signals
+- [ ] Command execution & builtins
+- [ ] Environment & expansion
+- [ ] Resource limits governor
+- [ ] Short circuit && / ||
+
 ## Component
 
 - [ ] Lexer / Parser
@@ -57,7 +65,7 @@
 
 - Upstream study document:
 - Linux/BSD/Redox/xv6 reference:
-- What SigmaOS adopts:
+- What SigmaOS adopts / adapts / rejects:
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
@@ -67,24 +75,16 @@
 
 -
 
-## Shell component
+## Kernel safety review & Reviewer checklist
 
-- [ ] POSIX compliance
-- [ ] Builtin commands
-
-## Shell safety review
-
-- [ ] Quoting integrity
-- [ ] Expansion order
-
-## Kernel safety review & Safety and rollback
-
-- [ ] Reviewer checklist completed
+- [ ] Safety and rollback plan defined
 - [ ] No unnecessary `unsafe`
 
 ## Shell safety review
 
-- [ ] Quoting integrity
+- [ ] Command injection prevention verified
+- [ ] Environment variable sanitization checked
+- [ ] Signal trap safety verified
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
@@ -126,7 +126,7 @@
 - [ ] Storage documentation
 - [ ] Boot matrix, if applicable
 
-## Shell safety review
+## Safety and rollback
 
 - [ ] Quoting integrity
 - [ ] Redirection safety
@@ -135,6 +135,4 @@
 
 - Safety and rollback:
 - Risk:
-- Rollback:
-
-## Reviewer checklist
+- Safety and rollback:

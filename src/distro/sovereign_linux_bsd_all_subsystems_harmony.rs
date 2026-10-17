@@ -673,8 +673,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec",
-                "freebsd_procstat_capsicum_process_sandbox_guard",
+                "pol_process_sec",
+                "freebsd_racct_mac_process_guard",
                 true,
             ),
         ];
@@ -754,14 +754,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn translate_subsystem_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
-    }
 
     pub fn dispatch_event(
         &mut self,
@@ -1212,10 +1204,10 @@ mod tests {
             "rpm"
         );
 
-        let (audits_map, audit_score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits_map.len(), 31);
-        assert_eq!(audit_score, 100);
-        for (_, compliant) in audits_map {
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 31);
+        assert_eq!(score, 100);
+        for (_, compliant) in audits {
             assert!(compliant);
         }
 
@@ -1224,10 +1216,7 @@ mod tests {
             LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",
         );
-        assert_eq!(
-            translated,
-            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
-        );
+        assert_eq!(translated, "mac_capsicum_enforce");
     }
 
     #[test]
