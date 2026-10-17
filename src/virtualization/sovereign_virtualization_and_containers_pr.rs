@@ -176,13 +176,27 @@ pub enum HypervisorType {
     OpenBsdVmm,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LibvirtStoragePoolType {
-    #[default]
     Directory,
     Zfs,
     LvmThin,
     CephRbd,
+}
+
+impl Default for LibvirtStoragePoolType {
+    fn default() -> Self {
+        Self::Directory
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibvirtStorageVolume {
+    pub volume_name: String,
+    pub pool_name: String,
+    pub capacity_bytes: u64,
+    pub allocation_bytes: u64,
+    pub format: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -691,15 +705,17 @@ pub struct KubernetesK3sRancherEngine {
 
 impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
-        let mut crio = Vec::new();
-        crio.push("crun".to_string());
-        crio.push("gvisor".to_string());
+        let mut handlers = Vec::new();
+        handlers.push("runc".to_string());
+        handlers.push("crun".to_string());
+        handlers.push("kata".to_string());
+        handlers.push("gvisor".to_string());
         Self {
             pods: Vec::new(),
             crio_runtime_handlers: crio,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: crio,
+            crio_runtime_handlers: handlers,
         }
     }
 
