@@ -90,8 +90,9 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51, SovereignUniversalPackageFormatMasterEngine,
-    UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51,
+    SovereignDistroPackageAdvancementsSuiteV61, SovereignUniversalPackageFormatMasterEngine,
+    UniversalPackageFormatInspectorV61, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
