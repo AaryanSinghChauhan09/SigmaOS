@@ -86,10 +86,7 @@ impl OpenBsdSoftraidCryptoVolumePrEngine {
             return Err("Passphrase cannot be empty".to_string());
         }
         self.key_locked = false;
-        Ok(format!(
-            "bioctl -c {} -l {} softraid0 -> unlocked",
-            self.raid_level, self.volume_id
-        ))
+        Ok(format!("bioctl -c {} -l {} softraid0 -> unlocked", self.raid_level, self.volume_id))
     }
 
     pub fn generate_bioctl_diff(&self) -> String {
@@ -232,18 +229,14 @@ impl OpenBsdIkedIpsecDaemonPrEngine {
     }
 
     pub fn establish_sa(&mut self, peer_ip: &str, proposal: &str) -> String {
-        self.active_sas
-            .insert(peer_ip.to_string(), proposal.to_string());
+        self.active_sas.insert(peer_ip.to_string(), proposal.to_string());
         format!("iked: established IKEv2 SA with {} ({})", peer_ip, proposal)
     }
 
     pub fn generate_iked_conf_diff(&self) -> String {
         let mut diff = String::from("--- /etc/iked.conf\n+++ /etc/iked.conf\n");
         for (peer, prop) in &self.active_sas {
-            diff.push_str(&format!(
-                "+ikev2 active esp from any to {} peer {} main {}\n",
-                peer, peer, prop
-            ));
+            diff.push_str(&format!("+ikev2 active esp from any to {} peer {} main {}\n", peer, peer, prop));
         }
         diff
     }
@@ -301,12 +294,7 @@ impl OpenBsdKernelCfiHardeningPrEngine {
         }
     }
 
-    pub fn verify_pinsyscall(
-        &self,
-        syscall_num: u32,
-        pc: usize,
-        expected_range: (usize, usize),
-    ) -> bool {
+    pub fn verify_pinsyscall(&self, syscall_num: u32, pc: usize, expected_range: (usize, usize)) -> bool {
         if !self.pinsyscall_active {
             return true;
         }
@@ -338,8 +326,7 @@ impl OpenBsdAutoinstallInstallerPrEngine {
     }
 
     pub fn add_answer(&mut self, question_key: &str, answer: &str) {
-        self.responsefile_answers
-            .insert(question_key.to_string(), answer.to_string());
+        self.responsefile_answers.insert(question_key.to_string(), answer.to_string());
     }
 
     pub fn generate_install_resp_diff(&self) -> String {
@@ -443,11 +430,7 @@ impl OpenBsdMissingComponentsV60PrSuite {
     pub fn new() -> Self {
         let mut suite = Self {
             proposals: BTreeMap::new(),
-            softraid_engine: OpenBsdSoftraidCryptoVolumePrEngine::new(
-                "sd0",
-                "CRYPTO",
-                "aes-xts-256",
-            ),
+            softraid_engine: OpenBsdSoftraidCryptoVolumePrEngine::new("sd0", "CRYPTO", "aes-xts-256"),
             smtpd_engine: OpenBsdSmtpdMailServerPrEngine::new(),
             slaacd_engine: OpenBsdSlaacdIpv6AutoconfPrEngine::new("em0"),
             relayd_engine: OpenBsdRelaydLoadBalancerPrEngine::new("web_cluster", 80, "roundrobin"),
@@ -568,9 +551,7 @@ impl OpenBsdMissingComponentsV60PrSuite {
             self.submit_proposal(k);
             self.validate_and_merge(k);
         }
-        self.proposals
-            .values()
-            .all(|p| p.status == OpenBsdPrStatusV60::Merged)
+        self.proposals.values().all(|p| p.status == OpenBsdPrStatusV60::Merged)
     }
 }
 

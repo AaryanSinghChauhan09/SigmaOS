@@ -204,7 +204,7 @@ impl FrappeEnterpriseBrokerEngine {
 /// 6. Linux sched_ext EEVDF BORE Burst Latency Governor Engine (inspired by Phoronix & Linux 6.13)
 #[derive(Debug, Clone)]
 pub struct LinuxSchedExtEevdfBoreEngine {
-    task_vruntime: HashMap<u64, u64>,   // PID -> Virtual Runtime
+    task_vruntime: HashMap<u64, u64>, // PID -> Virtual Runtime
     task_bore_score: HashMap<u64, u32>, // PID -> BORE Burst Score
 }
 
@@ -259,217 +259,50 @@ impl SovereignGlobalTechMediaWikiDistroParityEngine {
     /// Instantiate engine pre-populated with all 33 global tech media portals and baseline ideas
     pub fn new() -> Self {
         let raw_portals = vec![
-            (
-                "9to5Google",
-                "9to5google.com",
-                "https://9to5google.com/feed/",
-                "Android & Mobile OS",
-            ),
-            (
-                "9to5Linux",
-                "9to5linux.com",
-                "https://9to5linux.com/feed/",
-                "Linux Kernels & Desktop",
-            ),
-            (
-                "9to5Mac",
-                "9to5mac.com",
-                "https://9to5mac.com/feed/",
-                "macOS & Darwin Binary Compat",
-            ),
-            (
-                "Android Authority",
-                "androidauthority.com",
-                "https://androidauthority.com/feed/",
-                "Android Architecture",
-            ),
-            (
-                "Android Police",
-                "androidpolice.com",
-                "https://androidpolice.com/feed/",
-                "Android Ecosystem",
-            ),
-            (
-                "Appuals",
-                "appuals.com",
-                "https://appuals.com/feed/",
-                "Hardware & Drivers",
-            ),
-            (
-                "DistroWatch",
-                "distrowatch.com",
-                "https://distrowatch.com/news/dw.xml",
-                "Linux & BSD Distro News",
-            ),
-            (
-                "Frappe",
-                "frappe.io",
-                "https://frappe.io/blog/feed",
-                "Enterprise ERP & Portal Systems",
-            ),
-            (
-                "Geeky Gadgets",
-                "geeky-gadgets.com",
-                "https://www.geeky-gadgets.com/feed/",
-                "Single-Board Computers & DIY",
-            ),
-            (
-                "HW Busters",
-                "hwbusters.com",
-                "https://www.hwbusters.com/feed/",
-                "Hardware Benchmarks & PSUs",
-            ),
-            (
-                "How-To Geek",
-                "howtogeek.com",
-                "https://www.howtogeek.com/feed/",
-                "End-User Productivity & Guides",
-            ),
-            (
-                "InfoWorld",
-                "infoworld.com",
-                "https://www.infoworld.com/index.rss",
-                "Enterprise & Cloud Infra",
-            ),
-            (
-                "It's FOSS",
-                "itsfoss.com",
-                "https://itsfoss.com/feed/",
-                "Desktop Linux & FOSS Apps",
-            ),
-            (
-                "IT Daily",
-                "itdaily.com",
-                "https://itdaily.com/feed/",
-                "Enterprise IT & Security",
-            ),
-            (
-                "KDnuggets",
-                "kdnuggets.com",
-                "https://kdnuggets.com/feed",
-                "Data Science & AI/ML",
-            ),
-            (
-                "Linux.com",
-                "linux.com",
-                "https://www.linux.com/feed/",
-                "Linux Foundation & Kernel",
-            ),
-            (
-                "Linux.org",
-                "linux.org",
-                "https://www.linux.org/forums/-/index.rss",
-                "Linux Forum & Kernel Dev",
-            ),
-            (
-                "Linux Foundation",
-                "linuxfoundation.org",
-                "https://www.linuxfoundation.org/feed",
-                "Open Source Compliance",
-            ),
-            (
-                "LinuxTeck",
-                "linuxteck.com",
-                "https://linuxteck.com/feed/",
-                "Sysadmin & Security Automation",
-            ),
-            (
-                "MakeUseOf",
-                "makeuseof.com",
-                "https://www.makeuseof.com/feed/",
-                "Software & Productivity Tools",
-            ),
-            (
-                "MarkTechPost",
-                "marktechpost.com",
-                "https://www.marktechpost.com/feed/",
-                "AI Agents & Machine Learning",
-            ),
-            (
-                "Open Source For You",
-                "opensourceforu.com",
-                "https://www.opensourceforu.com/feed/",
-                "FOSS Community & Tools",
-            ),
-            (
-                "PCMag",
-                "pcmag.com",
-                "https://www.pcmag.com/rss",
-                "Hardware & Consumer Tech",
-            ),
-            (
-                "PCWorld",
-                "pcworld.com",
-                "https://www.pcworld.com/feed",
-                "PC Hardware & Gaming",
-            ),
-            (
-                "Phoronix",
-                "phoronix.com",
-                "https://www.phoronix.com/phoronix-rss.xml",
-                "Linux Hardware Benchmarks",
-            ),
-            (
-                "TechCrunch",
-                "techcrunch.com",
-                "https://techcrunch.com/feed/",
-                "Tech News & Cloud Services",
-            ),
-            (
-                "TechPowerUp",
-                "techpowerup.com",
-                "https://www.techpowerup.com/rss/news",
-                "GPU & Hardware Benchmarks",
-            ),
-            (
-                "TechSpot",
-                "techspot.com",
-                "https://www.techspot.com/backend.xml",
-                "PC Tech & Peripheral Drivers",
-            ),
-            (
-                "The New Stack",
-                "thenewstack.io",
-                "https://thenewstack.io/feed/",
-                "Cloud-Native & eBPF Infra",
-            ),
-            (
-                "Windows Central",
-                "windowscentral.com",
-                "https://www.windowscentral.com/feed",
-                "Windows Subsystem Interop",
-            ),
-            (
-                "Windows Latest",
-                "windowslatest.com",
-                "https://www.windowslatest.com/feed/",
-                "Windows Kernel & GUI",
-            ),
-            (
-                "XDA Developers",
-                "xda-developers.com",
-                "https://www.xda-developers.com/feed/",
-                "Mobile Custom ROMs & Modding",
-            ),
-            (
-                "ZDNet",
-                "zdnet.com",
-                "https://www.zdnet.com/news/rss.xml",
-                "Enterprise Tech & Cybersecurity",
-            ),
+            ("9to5Google", "9to5google.com", "https://9to5google.com/feed/", "Android & Mobile OS"),
+            ("9to5Linux", "9to5linux.com", "https://9to5linux.com/feed/", "Linux Kernels & Desktop"),
+            ("9to5Mac", "9to5mac.com", "https://9to5mac.com/feed/", "macOS & Darwin Binary Compat"),
+            ("Android Authority", "androidauthority.com", "https://androidauthority.com/feed/", "Android Architecture"),
+            ("Android Police", "androidpolice.com", "https://androidpolice.com/feed/", "Android Ecosystem"),
+            ("Appuals", "appuals.com", "https://appuals.com/feed/", "Hardware & Drivers"),
+            ("DistroWatch", "distrowatch.com", "https://distrowatch.com/news/dw.xml", "Linux & BSD Distro News"),
+            ("Frappe", "frappe.io", "https://frappe.io/blog/feed", "Enterprise ERP & Portal Systems"),
+            ("Geeky Gadgets", "geeky-gadgets.com", "https://www.geeky-gadgets.com/feed/", "Single-Board Computers & DIY"),
+            ("HW Busters", "hwbusters.com", "https://www.hwbusters.com/feed/", "Hardware Benchmarks & PSUs"),
+            ("How-To Geek", "howtogeek.com", "https://www.howtogeek.com/feed/", "End-User Productivity & Guides"),
+            ("InfoWorld", "infoworld.com", "https://www.infoworld.com/index.rss", "Enterprise & Cloud Infra"),
+            ("It's FOSS", "itsfoss.com", "https://itsfoss.com/feed/", "Desktop Linux & FOSS Apps"),
+            ("IT Daily", "itdaily.com", "https://itdaily.com/feed/", "Enterprise IT & Security"),
+            ("KDnuggets", "kdnuggets.com", "https://kdnuggets.com/feed", "Data Science & AI/ML"),
+            ("Linux.com", "linux.com", "https://www.linux.com/feed/", "Linux Foundation & Kernel"),
+            ("Linux.org", "linux.org", "https://www.linux.org/forums/-/index.rss", "Linux Forum & Kernel Dev"),
+            ("Linux Foundation", "linuxfoundation.org", "https://www.linuxfoundation.org/feed", "Open Source Compliance"),
+            ("LinuxTeck", "linuxteck.com", "https://linuxteck.com/feed/", "Sysadmin & Security Automation"),
+            ("MakeUseOf", "makeuseof.com", "https://www.makeuseof.com/feed/", "Software & Productivity Tools"),
+            ("MarkTechPost", "marktechpost.com", "https://www.marktechpost.com/feed/", "AI Agents & Machine Learning"),
+            ("Open Source For You", "opensourceforu.com", "https://www.opensourceforu.com/feed/", "FOSS Community & Tools"),
+            ("PCMag", "pcmag.com", "https://www.pcmag.com/rss", "Hardware & Consumer Tech"),
+            ("PCWorld", "pcworld.com", "https://www.pcworld.com/feed", "PC Hardware & Gaming"),
+            ("Phoronix", "phoronix.com", "https://www.phoronix.com/phoronix-rss.xml", "Linux Hardware Benchmarks"),
+            ("TechCrunch", "techcrunch.com", "https://techcrunch.com/feed/", "Tech News & Cloud Services"),
+            ("TechPowerUp", "techpowerup.com", "https://www.techpowerup.com/rss/news", "GPU & Hardware Benchmarks"),
+            ("TechSpot", "techspot.com", "https://www.techspot.com/backend.xml", "PC Tech & Peripheral Drivers"),
+            ("The New Stack", "thenewstack.io", "https://thenewstack.io/feed/", "Cloud-Native & eBPF Infra"),
+            ("Windows Central", "windowscentral.com", "https://www.windowscentral.com/feed", "Windows Subsystem Interop"),
+            ("Windows Latest", "windowslatest.com", "https://www.windowslatest.com/feed/", "Windows Kernel & GUI"),
+            ("XDA Developers", "xda-developers.com", "https://www.xda-developers.com/feed/", "Mobile Custom ROMs & Modding"),
+            ("ZDNet", "zdnet.com", "https://www.zdnet.com/news/rss.xml", "Enterprise Tech & Cybersecurity"),
         ];
 
         let portals = raw_portals
             .into_iter()
-            .map(
-                |(name, domain, feed_url, category)| GlobalTechMediaPortalSource {
-                    name: name.to_string(),
-                    domain: domain.to_string(),
-                    feed_url: feed_url.to_string(),
-                    category: category.to_string(),
-                    active: true,
-                },
-            )
+            .map(|(name, domain, feed_url, category)| GlobalTechMediaPortalSource {
+                name: name.to_string(),
+                domain: domain.to_string(),
+                feed_url: feed_url.to_string(),
+                category: category.to_string(),
+                active: true,
+            })
             .collect();
 
         let initial_ideas = vec![
@@ -635,18 +468,10 @@ mod tests {
         let mut engine = SovereignGlobalTechMediaWikiDistroParityEngine::new();
 
         // 1. Android Ashmem & Binder
-        assert!(engine
-            .ashmem_binder
-            .create_region("test_ashmem", 4096, 0x3)
-            .is_ok());
+        assert!(engine.ashmem_binder.create_region("test_ashmem", 4096, 0x3).is_ok());
         assert!(engine.ashmem_binder.pin_region("test_ashmem", true));
-        let parcel_idx = engine
-            .ashmem_binder
-            .write_binder_parcel(b"BINDER_PARCEL_DATA");
-        assert_eq!(
-            engine.ashmem_binder.read_binder_parcel(parcel_idx),
-            Some(&b"BINDER_PARCEL_DATA"[..])
-        );
+        let parcel_idx = engine.ashmem_binder.write_binder_parcel(b"BINDER_PARCEL_DATA");
+        assert_eq!(engine.ashmem_binder.read_binder_parcel(parcel_idx), Some(&b"BINDER_PARCEL_DATA"[..]));
 
         // 2. FreeBSD Capsicum
         engine.capsicum_vnet.limit_fd(3, CAP_READ | CAP_WRITE);
@@ -657,33 +482,18 @@ mod tests {
 
         // 3. OpenBSD Retguard
         let encoded = engine.retguard.encode_retaddr(0x0040_0000, 0x7FFF_0000);
-        assert!(engine
-            .retguard
-            .verify_retaddr(encoded, 0x0040_0000, 0x7FFF_0000));
-        assert!(!engine
-            .retguard
-            .verify_retaddr(encoded, 0x0040_0001, 0x7FFF_0000));
+        assert!(engine.retguard.verify_retaddr(encoded, 0x0040_0000, 0x7FFF_0000));
+        assert!(!engine.retguard.verify_retaddr(encoded, 0x0040_0001, 0x7FFF_0000));
 
         // 4. HAMMER2
         engine.hammer2.write_pfs_node("/system/bin/init", 1024);
-        assert_eq!(
-            engine.hammer2.lookup_pfs_node("/system/bin/init"),
-            Some(1024)
-        );
+        assert_eq!(engine.hammer2.lookup_pfs_node("/system/bin/init"), Some(1024));
         assert_eq!(engine.hammer2.create_atomic_snapshot(), 1);
 
         // 5. Frappe Broker
-        engine
-            .frappe_broker
-            .emit_event("WORKFLOW_TRIGGER", "{\"action\": \"approve\"}");
+        engine.frappe_broker.emit_event("WORKFLOW_TRIGGER", "{\"action\": \"approve\"}");
         let evt = engine.frappe_broker.process_next();
-        assert_eq!(
-            evt,
-            Some((
-                "WORKFLOW_TRIGGER".to_string(),
-                "{\"action\": \"approve\"}".to_string()
-            ))
-        );
+        assert_eq!(evt, Some(("WORKFLOW_TRIGGER".to_string(), "{\"action\": \"approve\"}".to_string())));
 
         // 6. sched_ext BORE
         engine.sched_ext_bore.register_task(100, 500);

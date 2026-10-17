@@ -78,8 +78,7 @@ impl LinuxCxlMemoryTieringEngine {
                 region.current_tier = MemoryTierKind::DramFastTier;
                 self.tier_promotions += 1;
                 rebalanced += 1;
-            } else if region.heat_score < 30 && region.current_tier == MemoryTierKind::DramFastTier
-            {
+            } else if region.heat_score < 30 && region.current_tier == MemoryTierKind::DramFastTier {
                 region.current_tier = MemoryTierKind::CxlNumaNearTier;
                 self.tier_demotions += 1;
                 rebalanced += 1;
@@ -325,22 +324,16 @@ impl SovereignKernelNextGenDistroInnovationsPrGateway {
         }
     }
 
-    pub fn generate_nextgen_kernel_pr_proposal(
-        &mut self,
-    ) -> KernelNextGenDistroInnovationsPrDescriptor {
-        self.cxl_tiering
-            .register_region(0x1000_0000, 0x2000_0000, MemoryTierKind::CxlNumaNearTier);
+    pub fn generate_nextgen_kernel_pr_proposal(&mut self) -> KernelNextGenDistroInnovationsPrDescriptor {
+        self.cxl_tiering.register_region(0x1000_0000, 0x2000_0000, MemoryTierKind::CxlNumaNearTier);
         self.cxl_tiering.record_access_event(0x1000_5000);
         let _ = self.cxl_tiering.balance_memory_tiers();
 
-        self.zfs_vdev
-            .submit_vdev_io(1001, 2048, 4096, ZfsIoClass::SyncRead);
+        self.zfs_vdev.submit_vdev_io(1001, 2048, 4096, ZfsIoClass::SyncRead);
         let _ = self.zfs_vdev.dispatch_next_batch();
 
         self.pinsyscall_karl.pin_syscall_entry(0xFFFFFFFF81001000);
-        let _ = self
-            .pinsyscall_karl
-            .validate_syscall_execution(0xFFFFFFFF81001000);
+        let _ = self.pinsyscall_karl.validate_syscall_execution(0xFFFFFFFF81001000);
 
         self.hammer2_fastpath.insert_node(1, "/usr/bin", true, 1);
         let _ = self.hammer2_fastpath.lockless_btree_lookup("/usr/bin");
@@ -356,9 +349,7 @@ impl SovereignKernelNextGenDistroInnovationsPrGateway {
             self.cxl_tiering.monitored_regions.len()
         );
 
-        let pqc_sig = String::from(
-            "DILITHIUM5_SIG_9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f",
-        );
+        let pqc_sig = String::from("DILITHIUM5_SIG_9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f");
 
         KernelNextGenDistroInnovationsPrDescriptor {
             pr_id: String::from("PR-KERNEL-NEXTGEN-DISTRO-INNOVATIONS-2026-V1"),
@@ -392,10 +383,7 @@ mod tests {
         }
         let rebalanced = cxl.balance_memory_tiers();
         assert_eq!(rebalanced, 1);
-        assert_eq!(
-            cxl.monitored_regions[0].current_tier,
-            MemoryTierKind::DramFastTier
-        );
+        assert_eq!(cxl.monitored_regions[0].current_tier, MemoryTierKind::DramFastTier);
     }
 
     #[test]
