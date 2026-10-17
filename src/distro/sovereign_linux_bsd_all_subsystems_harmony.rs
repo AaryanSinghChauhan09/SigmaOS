@@ -673,8 +673,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec_sandbox",
-                "enforce_proc_capsicum_sandbox",
+                "pol_proc_sec",
+                "apply_racct_rctl_resource_limits_and_capsicum",
                 true,
             ),
         ];
@@ -754,7 +754,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystems_distro_compliance_vec(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_subsystem_compliance_list(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
@@ -1222,10 +1222,10 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystems_distro_compliance_vec();
-        assert_eq!(audits.len(), 31);
+        let (audit_map, score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audit_map.len(), 31);
         assert_eq!(score, 100);
-        for (_, compliant) in audits {
+        for compliant in audit_map.values() {
             assert!(compliant);
         }
 
