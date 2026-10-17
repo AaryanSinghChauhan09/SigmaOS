@@ -71,7 +71,7 @@ impl fmt::Display for CoolingDeviceType {
 }
 
 /// Thermal trip point type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TripPointType {
     /// Critical trip point
     Critical,

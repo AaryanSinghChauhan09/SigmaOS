@@ -76,6 +76,18 @@ impl DesigncraftPrCategory {
             Self::CodeExporterMultiFramework => {
                 "design-to-code generator & multi-framework asset exporter"
             }
+            Self::ComponentVariantsStateMachine => {
+                "component variants & interactive state machine transitions"
+            }
+            Self::DesignTokensStyleDictionary => {
+                "design tokens & W3C style dictionary transformations"
+            }
+            Self::IconSystemPackagingSymbols => {
+                "vector icon library packaging & SVG symbol sprite sheets"
+            }
+            Self::AccessibilityAuditWcagLint => {
+                "design accessibility (WCAG 2.1) & automated contrast audit"
+            }
         }
     }
 }
