@@ -1307,7 +1307,7 @@ mod tests {
         );
 
         let (audits, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 31);
+        assert_eq!(audits.len(), 44);
         assert_eq!(score, 100);
         for (_, compliant) in audits {
             assert!(compliant);
