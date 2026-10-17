@@ -66,10 +66,21 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
+/// QEMU Disk Image Specification
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QemuDiskImageSpec {
+    pub image_path: String,
+    pub format: String,
+    pub size_bytes: u64,
+    pub backing_file: Option<String>,
+    pub is_compressed: bool,
+}
+
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
     pub vcpus: Vec<KvmVcpuState>,
+    pub disk_images: Vec<QemuDiskImageSpec>,
     pub memory_mapped_bytes: u64,
     pub thp_hugepages_active: bool,
     pub io_uring_sqpoll_enabled: bool,
@@ -81,6 +92,7 @@ impl KvmQemuEngine {
     pub fn new() -> Self {
         Self {
             vcpus: Vec::new(),
+            disk_images: Vec::new(),
             memory_mapped_bytes: 0,
             thp_hugepages_active: true,
             io_uring_sqpoll_enabled: true,
@@ -181,6 +193,7 @@ pub struct LibvirtDomainConfig {
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
+    pub storage_pool_type: LibvirtStoragePoolType,
     pub storage_pool_path: String,
     pub virtual_bridges: Vec<String>,
     pub storage_volumes: Vec<LibvirtStorageVolume>,
@@ -194,6 +207,7 @@ impl LibvirtDomainEngine {
         bridges.push("virbr1".to_string());
         Self {
             domains: Vec::new(),
+            storage_pool_type: LibvirtStoragePoolType::Directory,
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
             virtual_bridges: bridges,
             storage_volumes: Vec::new(),

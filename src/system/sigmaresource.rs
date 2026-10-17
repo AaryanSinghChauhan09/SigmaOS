@@ -14,7 +14,7 @@ use alloc::vec::Vec;
 use core::fmt;
 
 /// Resource type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ResourceType {
     /// CPU limit
     Cpu,
