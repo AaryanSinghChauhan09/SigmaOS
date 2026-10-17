@@ -684,9 +684,12 @@ impl DragonFlyBsdMissingComponentsV60PrSuite {
     }
 
     pub fn evaluate_dragonfly_v60_parity(&mut self) -> bool {
-        let dedup_diff =
-            self.hammer2_dedup
-                .allocate_compressed_extent(0x2000, 131072, "zstd", "sha256:fedcba987654");
+        let dedup_diff = self.hammer2_dedup.allocate_compressed_extent(
+            0x2000,
+            131072,
+            "zstd",
+            "sha256:fedcba987654",
+        );
         let pr1 = self.submit_pr_proposal(
             "Add HAMMER2 extent zero-copy deduplication & ZSTD compression",
             "jules",

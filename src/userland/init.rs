@@ -1,11 +1,6 @@
-#![no_std]
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
-use std::vec::Vec;
-
 // Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
 //
 // Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
@@ -13,21 +8,30 @@ use std::vec::Vec;
 // - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
 // - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-#![no_std]
+#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-// Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
-//
-// Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-// - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-// - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-// - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
-
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::{BTreeMap, BTreeSet};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::{BTreeMap, BTreeSet};
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 // ============================================================================
 // Core Service & Init Abstractions
