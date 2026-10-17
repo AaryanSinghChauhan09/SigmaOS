@@ -76,6 +76,18 @@ impl DesigncraftPrCategory {
             Self::CodeExporterMultiFramework => {
                 "design-to-code generator & multi-framework asset exporter"
             }
+            Self::ComponentVariantsStateMachine => {
+                "component variants & state transitions"
+            }
+            Self::DesignTokensStyleDictionary => {
+                "design tokens W3C style dictionary transformer"
+            }
+            Self::IconSystemPackagingSymbols => {
+                "vector icon library packaging & symbol sprites"
+            }
+            Self::AccessibilityAuditWcagLint => {
+                "WCAG accessibility audit & contrast linter"
+            }
         }
     }
 }
@@ -1285,12 +1297,12 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         };
         let p1 = self.geometry_engine.create_path(
             String::from("PathA"),
-            alloc::vec![knot1.clone()],
+            vec![knot1.clone()],
             true,
         );
         let p2 = self
             .geometry_engine
-            .create_path(String::from("PathB"), alloc::vec![knot1], true);
+            .create_path(String::from("PathB"), vec![knot1], true);
         let merged_p = self
             .geometry_engine
             .perform_boolean_op(p1, p2, BooleanOpType::Union);
