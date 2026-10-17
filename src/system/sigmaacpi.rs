@@ -14,7 +14,7 @@ use alloc::vec::Vec;
 use core::fmt;
 
 /// ACPI event type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum AcpiEventType {
     /// Power button pressed
     PowerButton,

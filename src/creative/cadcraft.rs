@@ -7,7 +7,7 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -339,6 +339,25 @@ impl CadCraftEngine {
         id
     }
 
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
+        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
+        let path = CamToolpath {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            spindle_speed: 12000.0,
+            gcode_output: String::from("G0 X0 Y0 Z5\nG1 Z-2 F500\nM3 S12000\nG1 X100 Y50\nG0 Z5\n"),
+        };
+        self.cam_toolpaths.insert(id, path);
+        id
+    }
+
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -352,6 +371,27 @@ impl CadCraftEngine {
         };
         self.fea_meshes.insert(id, mesh);
         id
+    }
+
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        let mut out = Vec::new();
+        match format {
+            ExportFormat::DXF => {
+                out.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
+            }
+            ExportFormat::STEP => {
+                out.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
+            }
+            ExportFormat::STL => {
+                out.extend_from_slice(b"solid cadcraft_export\nendsolid cadcraft_export\n");
+            }
+            _ => {
+                out.extend_from_slice(b"# CadCraft Export Data\n");
+            }
+        }
+        out
     }
 }
 
@@ -430,7 +470,7 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
 }
 
 // ============================================================================
-// 2. 3D B-Rep Solid Feature Modeling & Direct Modeling Engine
+// 2. 3D B-Rep Solid Feature Modeling Engine
 // ============================================================================
 
 /// 3D Vector / Point
@@ -448,14 +488,6 @@ impl Vector3D {
 
     pub fn length(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
-    }
-
-    pub fn add(&self, other: &Vector3D) -> Vector3D {
-        Vector3D::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-
-    pub fn scale(&self, factor: f64) -> Vector3D {
-        Vector3D::new(self.x * factor, self.y * factor, self.z * factor)
     }
 }
 
@@ -646,8 +678,8 @@ mod tests {
         );
         let c1 = engine.add_geometric_constraint(
             GeometricConstraintType::Perpendicular {
-                line1_idx: 0,
-                line2_idx: 1,
+                line1_idx: e1 as usize,
+                line2_idx: e2 as usize,
             },
             alloc::vec![e1, e2],
             90.0,
