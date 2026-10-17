@@ -240,7 +240,6 @@ impl SystemdTargetDependencyResolver {
         Self::default()
     }
 
-impl SystemdTargetDependencyResolverSpec {
     pub fn resolve_target_units(
         &self,
         target_name: &str,
@@ -1372,55 +1371,6 @@ pub struct UserlandInitCleanRoomPrGatewayEngine {
     pub title: String,
     pub author: String,
     pub pqc_signature: String,
-}
-
-pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
-
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        self.jobs.insert(
-            id,
-            AtJob {
-                job_id: id,
-                execute_at,
-                command,
-                queue,
-                max_load_average: max_load,
-            },
-        );
-        id
-    }
-}
-
-pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
-
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job.clone());
-        self.queued_jobs.push(job);
-        id
-    }
 }
 
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
