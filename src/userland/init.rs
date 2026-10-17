@@ -351,7 +351,8 @@ impl SystemdTransientScopeGovernor {
     }
 
     pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.clone(), slice.clone());
+        self.transient_scopes
+            .insert(scope_name.clone(), slice.clone());
         self.active_scopes.insert(scope_name, slice);
     }
 
@@ -609,12 +610,14 @@ impl OpenRcStatusControllerEngine {
 
     pub fn mark_started(&mut self, service_name: &str) {
         self.active_services.insert(service_name.to_string());
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Running);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Running);
     }
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Stopped);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Stopped);
     }
 }
 
