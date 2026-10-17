@@ -17,6 +17,12 @@
 - [ ] Diagnostics
 - [ ] Build / CI
 
+## Shell component
+
+- [ ] Interactive shell
+- [ ] Script execution
+- [ ] POSIX compliance
+
 ## Component
 
 - [ ] PR-level validation
@@ -35,8 +41,9 @@
 
 <!-- Required for design-changing kernel PRs -->
 
-- Study document:
+- Upstream study:
 - Linux/BSD/Redox/xv6 reference:
+- What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
@@ -50,6 +57,13 @@
 - [ ] Capability/status update
 - [ ] Regression protection
 - [ ] Security review, if applicable
+
+## Shell safety review
+
+- [ ] Deterministic script execution
+- [ ] Explicit exit status codes
+- [ ] Safe expansion order
+- [ ] Quoting integrity
 
 ## Kernel safety review
 
@@ -83,7 +97,12 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks and rollback
+## Safety and rollback
 
 - Risk:
 - Rollback:
+
+## Reviewer checklist
+
+- [ ] Safety and rollback reviewed
+- [ ] Evidence provided
