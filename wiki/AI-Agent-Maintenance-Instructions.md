@@ -1,347 +1,117 @@
 # AI Agent Maintenance Instructions
 
 ## Purpose
-This document provides instructions for AI agents to maintain SigmaOS by creating component-specific GitHub Wiki pages and agent files based on open source competitors (Linux, BSD, Windows, etc.).
-## Mandatory Rule: Component Wiki Pages Created by AI Agents with Open Source Competitor Inspiration
+This document provides binding instructions for autonomous AI development agents to maintain, improve, and consolidate the **SigmaOS** repository (https://github.com/AaryanSinghChauhan09/SigmaOS) and its official GitHub Wiki (https://github.com/AaryanSinghChauhan09/SigmaOS/wiki).
 
-AI agents MUST strictly adhere to the following rule:
-1. **Exclusive Component Wiki Creation**: AI agents are permitted to create and maintain ONLY component-specific GitHub wiki pages. No other types of wiki pages (such as session-specific logs, temporary work files, PR-specific logs, date-stamped notes, or generic scratch pages) shall ever be created on the GitHub Wiki.
-2. **Open Source Competitor Inspiration**: Every component wiki page MUST take inspiration for current architecture and future development directly from leading open-source competitors (Linux kernel, FreeBSD, OpenBSD, NetBSD, DragonFly BSD, illumos, systemd, etc.).
-3. **Consolidation & Uniqueness**: Exactly ONE wiki page shall exist per OS component (e.g., `Scheduler-Component-Guide.md`, `Memory-Management-Component-Guide.md`, `Filesystem-VFS-Component-Guide.md`). When modifying, improving, or adding ideas to a component, the AI agent MUST update the existing component wiki page rather than creating duplicate or fragmented pages.
+---
+
+## Mandatory Rule: Component Wiki Pages & Single Agent File Invariant
+
+AI agents MUST strictly adhere to the following rules:
+1. **Exclusive Component Wiki Creation**: AI agents are permitted to create and maintain ONLY various component-specific GitHub wiki pages and canonical navigation portals. Every component wiki page MUST be created by the AI agent by taking inspiration for current architecture and future development based on open-source competitors (Linux kernel, FreeBSD, OpenBSD, NetBSD, DragonFly BSD, illumos, systemd, CachyOS, Omarchy, Linux Mint, Arch Linux, etc.).
+2. **One Agent File Per Component Invariant in `Agents/`**: For every component of the operating system (including those components which are currently missing in SigmaOS, but are critical to SigmaOS, taking inspiration from Linux & BSD distributions), exactly ONE `[COMPONENT]_AGENT.md` file MUST exist in the `Agents/` folder. There must NEVER be multiple agent `.md` files for the same component. Any duplicates must be consolidated into the single canonical agent file.
+3. **Consolidation & Uniqueness**: Exactly ONE wiki page shall exist per OS component (e.g., `Scheduler-Component-Guide.md`, `Memory-Management-Component-Guide.md`, `Filesystem-Vfs-Component-Guide.md`). When modifying, improving, or adding ideas to a component, the AI agent MUST update the existing component wiki page rather than creating duplicate or fragmented pages.
 4. **Future Development Roadmap**: Each component wiki page must document concrete future development roadmaps, feature gap analyses against Linux/BSD distributions, architectural diagrams, implementation priorities, and testing strategies.
+5. **Executable Code Integrity**: Ensure `.md` files contain executable code that works if directly implemented. If a `.md` specification file is fully implemented, migrate its comprehensive documentation into the GitHub Wiki.
+6. **Single-Branch Invariant on Main Repository**: Ensure there is ONLY the `main` branch active on the GitHub repository. All pull requests and remote branches must be merged via `-X theirs` into `main` and deleted immediately.
 
+---
 
-## AI Agent Guidelines
+## Core Programming & Engineering Principles
 
-### 1. Component Wiki Page Creation
+AI agents MUST maximize the usage of modern low-level systems languages (**Rust, Zig, Nim**) and adhere to the Master Engineering Principles Codex defined in [`AI-Development-Agent-Operating-Manual.md`](./AI-Development-Agent-Operating-Manual.md):
 
-**When to Create:**
-- When implementing a new component in SigmaOS
-- When significantly improving an existing component
-- When adding missing critical components from Linux/BSD
+### 1. Object-Oriented Principles (OOPS) & Structural Discipline
+- **Objects, Classes & Instances**: Model kernel state, drivers, and subsystems as concrete typed Rust structs implementing clear lifecycle behaviors.
+- **Encapsulation & Information Hiding**: Enforce strict private field boundaries; state mutations are permitted exclusively via validated public APIs.
+- **Clear Abstraction & Blackbox Design**: Conceal MMIO, assembly primitives, and hardware details behind clean abstract trait interfaces.
+- **Inheritance, Polymorphism & Composition**: Leverage Rust trait polymorphism (`impl Trait`, `dyn Trait`), trait inheritance (`trait Sub: Super`), and favor composition over inheritance.
+- **Booch Method & GRASP**: Systematic object-oriented assignment of responsibilities with low coupling and high cohesion.
+- **Demeter Law & Command-Query Separation (CQS)**: Methods either mutate state or return queries, never chain arbitrary external dependencies.
+- **Uniform Access & Inversion of Control (IoC)**: Standardized access semantics; drivers register with centralized dispatchers.
 
-**CRITICAL RULE: One Wiki Page Per Component**
-- AI agents MUST create only ONE wiki page per OS component
-- All component-specific documentation must be consolidated into a single canonical page
-- Do NOT create duplicate or redundant wiki pages for the same component
-- If a component wiki page already exists, UPDATE it instead of creating a new one
-- Future development ideas for the component should be documented in the component's single wiki page by taking inspiration from open source competitors (Linux, BSD, Windows, etc.)
-- Research open source competitors and document future development plans in the component's wiki page
+### 2. SOLID Architecture
+- **S - Single Responsibility Principle (SRP)**: Every struct, function, and file must have one single, well-defined responsibility.
+- **O - Open/Closed Principle (OCP)**: Systems must be open for extension (via traits and plugins) but closed for modification of core dispatch engines.
+- **L - Liskov Substitution Principle (LSP)**: Derived implementations (e.g., specific block device drivers) must be interchangeable without violating callers' expectations.
+- **I - Interface Segregation Principle (ISP)**: Create small, focused traits rather than monolithic, bloated interfaces.
+- **D - Dependency Inversion Principle (DIP)**: Depend on abstractions rather than low-level concrete implementations.
 
-**Wiki Page Naming Convention:**
-- Format: `COMPONENT_NAME-Component-Guide.md`
-- Examples: `Scheduler-Component-Guide.md`, `Memory-Management-Component-Guide.md`
+### 3. Pragmatic Industry Principles & Clean Code
+- **DRY (Don't Repeat Yourself)**: Unify duplicate logic across system tools and kernel services.
+- **KISS (Keep It Simple, Stupid)**: Favor simple, deterministic, readable implementations over unnecessarily complex abstractions.
+- **YAGNI (You Aren't Gonna Need It)**: Implement only what is required to fulfill the component specification and competitor parity.
+- **Separation of Concerns & Isolation**: Isolate drivers, filesystems, network protocols, and process management into distinct modular domains.
+- **Design by Contract**: Explicitly define and verify preconditions, postconditions, and system invariants.
+- **Boy Scout Rule & Refactor Regularly**: Continually clean up obsolete code paths, remove warnings, and modernize implementations.
+- **Clean Code Mindset & Zen of Python**: Explicit is better than implicit; readable, expressive code with self-documenting identifiers.
+- **Optimise for Deletion & Rule of Three**: Build modular subsystems that can be cleanly removed; wait for three instances before abstracting.
+- **Ninety-Ninety Rule & Power of Ten**: Rigorously engineer the critical details; bound loops and limit scoping.
+- **Gall's Law & Worse is Better**: Build from proven, simple components; pragmatic simplicity trumps theoretical complexity.
+- **Theirs Strategy for Merges**: Resolve branch integration conflicts by prioritizing the modern, enhanced SigmaOS implementation over deprecated legacy code.
 
-**Wiki Page Structure:**
-```markdown
-# COMPONENT_NAME Component Guide
+### 4. Low-Level Control & Operating System Fundamentals
+- **Low-Level Languages & Direct Device Control**: Pure Rust (`#![no_std]`), Zig, and Nim interacting safely with MMIO and CPU control registers.
+- **Process Management & Efficient Scheduling**: Preemptive scheduling (EEVDF/CFS/ULE inspired), task switching, PID 1 init supervision, POSIX signal handling, process groups, and sessions.
+- **Memory Discipline & Virtual Memory Abstraction**: Physical page allocation (Buddy system), kernel object caching (UMA/Slab), demand paging, CoW fork, guard pages, ASLR, and manual memory control.
+- **Zero-Copy & Cache Conscious Design**: Zero-copy network/storage/IPC pipelines (shared memory, DMA-BUF) and cache-line aligned data structures.
+- **Interrupt Handling Discipline**: Fast top-half interrupt service routines with work deferred to bottom-halves/worker threads.
+- **File Management & Transactional Storage**: Virtual File System (VFS), directory entries, inode tables, page caches, journaling, and modern transactional storage (ZFS/HAMMER2 inspired).
+- **Deadlock Avoidance & Safe Concurrency**: Hierarchical lock ordering, lockless ring buffers, atomic primitives, and race-free compile-time safety.
+- **System Security & Least Privilege**: Principle of least privilege (PoLP), principle of least astonishment (POLA), secure defaults, memory safety invariants, constant-time cryptography, access control lists, capability tokens, and sandbox isolation.
+- **Bootloader Integration & Cross Compilation**: Seamless bootloader-to-kernel handoff and multi-architecture HAL portability (`x86_64`, `aarch64`, `riscv64`).
+- **Deterministic Testing & FIRST**: Unit tests following Arrange-Act-Assert (AAA), running fast, isolated, repeatable, self-validating, and timely.
 
-## Overview
-[Brief description of the component and its purpose]
+---
 
-## Linux Inspiration
-[List relevant Linux kernel/user-space components and their features]
+## Repository & Branch Management Strategy
 
-## BSD Inspiration
-[List relevant BSD components and their features]
+### Single-Branch Invariant
+- **The repository must ONLY have the `main` branch active.**
+- All pull requests from `https://github.com/AaryanSinghChauhan09/SigmaOS/pulls` must be reviewed, tested, merged into `main`, and closed.
+- All remote branches from `https://github.com/AaryanSinghChauhan09/SigmaOS/branches` must be merged into `main` and then deleted immediately.
+- Regularly execute `git remote prune origin` to keep the remote tracking references clean.
 
-## Current SigmaOS Status
-[Current implementation status, what works, what's missing]
+### Branch Merging Routine
+```bash
+# 1. Fetch all updates and prune stale references
+git fetch --all --prune
 
-## Critical Missing Features
-[List critical features that SigmaOS is missing compared to Linux/BSD]
+# 2. Iterate and merge all non-main remote branches using -X theirs
+for ref in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin/ | grep -v "^origin$\|^origin/main$\|^origin/HEAD$\|wiki-origin"); do
+    echo "Merging $ref..."
+    if ! git merge-base --is-ancestor "$ref" HEAD 2>/dev/null; then
+        git merge --no-edit -X theirs "$ref" || git merge --abort
+    fi
+    branch_name=$(echo "$ref" | sed 's|^origin/||')
+    echo "Deleting remote branch $branch_name..."
+    git push origin --delete "$branch_name" 2>&1 || true
+done
 
-## Future Development Plan (Open Source Competitor Analysis)
-[List future improvements based on research of Linux, BSD, Windows, and other open source competitors]
-- Competitor A: Feature X - How to implement in SigmaOS
-- Competitor B: Feature Y - How to implement in SigmaOS
-- Competitor C: Feature Z - How to implement in SigmaOS
-
-## Implementation Priority
-[HIGH/MEDIUM/LOW priority for each missing feature]
-
-## Key Files to Create/Improve
-[List specific source files that need to be created or improved]
-
-## Testing Strategy
-[How to test the component implementation]
-
-## Dependencies
-[What other components this depends on]
-
-## Success Criteria
-[What defines successful implementation]
-
-## Open Source Competitors Analysis
-[Compare with Linux, BSD, Windows implementations]
-
-## Future Enhancements
-[Potential future improvements]
+# 3. Push consolidated main
+git push origin main
 ```
 
-### 2. Agent File Creation
+---
 
-**Location:** `Agents/COMPONENT_AGENT.md`
+## Security & Quality Assurance Directives
 
-**CRITICAL RULE: One Agent File Per Component**
-- AI agents MUST create only ONE agent file per OS component
-- Agent files must use the naming convention: `COMPONENT_AGENT.md` (e.g., `MEMORY_AGENT.md`, `SCHEDULER_AGENT.md`)
-- Do NOT create duplicate or redundant agent files for the same component
-- If an agent file already exists for a component, UPDATE it instead of creating a new one
-- Agent files should document research on open source competitors and future development plans
-- Even for components not yet implemented in SigmaOS, create agent files for critical OS components
-- Research should cover Linux, BSD, Windows, and other open source competitors
+1. **GitHub Security Scans**: Continuously monitor and fix vulnerabilities reported in https://github.com/AaryanSinghChauhan09/SigmaOS/security/code-scanning:
+   - Remediate access of invalid pointers and dangling pointers.
+   - Prevent DOM text reinterpretation as HTML in UI components.
+   - Fix prototype-polluting functions and property overwrites.
+   - Eliminate hardcoded cryptographic keys and unverified PRNG seeds.
+   - Prevent buffer overflows, format string vulnerabilities, and command injection.
+2. **GitHub Actions Workflows**: Validate that workflows in https://github.com/AaryanSinghChauhan09/SigmaOS/actions pass cleanly.
+3. **Standalone Testing**: Run tests with `--test-threads=1` to ensure thread safety when testing global singleton kernel states.
 
-**When to Create:**
-- One agent file per OS component
-- Even for components not yet implemented in SigmaOS
-- Focus on critical components from Linux/BSD
+---
 
-**Current Agent Files Status:**
-As of the latest update, the following agent files have been created:
-- AUDIO_AGENT.md
-- BOOT_BOOTLOADER_AGENT.md
-- CONTAINER_RUNTIME_AGENT.md
-- FILESYSTEM_AGENT.md
-- GRAPHICS_GPU_AGENT.md
-- INPUT_ACCESSIBILITY_AGENT.md
-- INTERRUPT_MANAGEMENT_AGENT.md
-- LOGGING_AGENT.md
-- NETWORKING_STACK_AGENT.md
-- PACKAGE_MANAGEMENT_AGENT.md
-- POWER_MANAGEMENT_AGENT.md
-- PROCESS_MANAGEMENT_AGENT.md
-- STORAGE_AGENT.md
-- SYSTEM_SERVICES_INIT_AGENT.md
-- VIRTUALIZATION_AGENT.md
-- WAYLAND_COMPOSITOR_AGENT.md
-- HYPRLAND_AGENT.md
-- MANGOHUD_AGENT.md
-- LUTRIS_AGENT.md
-- HEROIC_AGENT.md
-- GAMESCOPE_AGENT.md
-- WLOGOUT_AGENT.md
-- WAYPAPER_AGENT.md
-- SOFTWARE_MANAGER_AGENT.md
-- UPDATE_MANAGER_AGENT.md
-- BACKUP_TOOL_AGENT.md
-- DRIVER_MANAGER_AGENT.md
-- SYSTEM_TOOLS_AGENT.md
-- PHOTOCRAFT_AGENT.md
-- FILMCRAFT_AGENT.md
-- VECTORCRAFT_AGENT.md
-- PDFCRAFT_AGENT.md
-- DESIGNCRAFT_AGENT.md
-- EFFECTCRAFT_AGENT.md
-- LIGHTCRAFT_AGENT.md
-- ARTCRAFT_AGENT.md
-- SYSTEM_MONITOR_AGENT.md (NEW)
-- TASK_SCHEDULER_AGENT.md (NEW)
+## Code & Documentation Synchronization
 
-**Agent File Structure:**
-```markdown
-# COMPONENT Component Agent
-
-## Component Overview
-[Brief description]
-
-## Linux Inspiration
-[Linux components and features]
-
-## BSD Inspiration
-[BSD components and features]
-
-## Current SigmaOS Status
-[Current implementation status]
-
-## Critical Missing Features
-[List missing features]
-
-## Implementation Priority
-[HIGH/MEDIUM/LOW priority]
-
-## Key Files to Create/Improve
-[Specific files needed]
-
-## Testing Strategy
-[Testing approach]
-
-## Dependencies
-[Component dependencies]
-
-## Success Criteria
-[Success metrics]
-
-## Open Source Competitors Analysis
-[Competitor comparison]
-
-## Future Enhancements
-[Future improvements]
-```
-
-### 3. Research Requirements
-
-**Open Source Competitors to Research:**
-- **Linux Kernel:** https://github.com/torvalds/linux
-- **FreeBSD:** https://github.com/freebsd/freebsd-src
-- **OpenBSD:** https://github.com/openbsd/src
-- **NetBSD:** https://github.com/NetBSD/src
-- **DragonFlyBSD:** https://github.com/DragonFlyBSD/DragonFlyBSD
-- **systemd:** https://github.com/systemd/systemd
-- **GNOME:** https://github.com/GNOME
-- **KDE:** https://github.com/KDE
-
-**Research Focus:**
-- Architecture and design patterns
-- Key algorithms and data structures
-- API design and interfaces
-- Security considerations
-- Performance optimizations
-- Known limitations and trade-offs
-
-### 4. Implementation Guidelines
-
-**Code Style:**
-- Follow existing SigmaOS code style
-- Use Rust idioms and patterns
-- Write comprehensive unit tests
-- Add inline documentation comments
-- Use unsafe only when necessary with justification
-
-**Architecture Principles:**
-- Standard libraries & standard functions (`std`, libc, runtime functions in Rust, Zig, Nim, and C) are permitted and MUST be used as and when required for robust concurrency, memory management, and I/O efficiency
-- The rule of non-usage of standard library & functions is officially DROPPED
-- Safe abstractions over unsafe operations
-- Clear separation of concerns and modular subsystem boundaries
-- Document trade-offs and performance characteristics
-
-**Documentation Requirements:**
-- Update FEATURE_STATUS.toml with component status
-- Update CAPABILITY_MATRIX.tomL with capabilities
-- Update WHAT_IS_WORKING_AND_NOT_WORKING.md with progress
-- Create/update wiki pages for component documentation
-
-### 5. Workflow
-
-**For New Components:**
-1. Create `Agents/COMPONENT_AGENT.md` with research
-2. Implement component in `src/` directory
-3. Write comprehensive unit tests
-4. Update documentation (FEATURE_STATUS, CAPABILITY_MATRIX, wiki)
-5. Commit and push to main branch
-6. Create GitHub Wiki page for component
-
-**For Existing Components:**
-1. Review existing implementation
-2. Identify gaps compared to Linux/BSD
-3. Implement missing features
-4. Update documentation
-5. Commit and push
-6. Update GitHub Wiki page
-
-### 6. Critical Components List
-
-**Must Have Agent Files (even if not implemented):**
-- Bootloaders
-- Scheduler
-- Memory Management
-- Filesystems
-- Networking
-- Security
-- Desktop Environment
-- Systemd/Init
-- Package Management
-- Drivers
-- Virtualization
-- Container Runtime
-- System Monitoring
-- Logging
-- IPC
-- Timekeeping
-- Cryptography
-- Internationalization (i18n)
-- Accessibility
-
-### 7. Quality Standards
-
-**Code Quality:**
-- All code must pass `cargo check`
-- All tests must pass
-- No clippy warnings
-- Proper error handling
-- Memory safety guarantees
-
-**Documentation Quality:**
-- Clear and concise
-- Up-to-date with implementation
-- Includes examples where appropriate
-- References to standards (RFCs, specifications)
-
-**Testing Quality:**
-- Unit tests for all functions
-- Integration tests for component interactions
-- Edge case coverage
-- Performance benchmarks where applicable
-
-### 8. Git Workflow
-
-**Branch Policy:**
-- Only main branch exists
-- All commits go directly to main
-- No feature branches
-- No pull requests (direct commits)
-
-**Commit Message Format:**
-```
-Brief summary of changes
-
-Detailed description if needed
-
-Generated with [Devin](https://devin.ai)
-
-Co-Authored-By: Devin <158243242+devin-ai-integration[bot]@users.noreply.github.com>
-```
-
-**Sync with GitHub:**
-- Commit all changes
-- Push to origin/main immediately
-- Update GitHub Wiki after each major change
-
-### 9. Continuous Improvement
-
-**Review Cycle:**
-- Periodically review existing components
-- Compare with latest Linux/BSD releases
-- Identify new features to implement
-- Update agent files with new research
-
-**Feedback Loop:**
-- Monitor GitHub issues for component requests
-- Update priorities based on user feedback
-- Revise implementation plans based on testing results
-
-### 10. Safety and Security
-
-**Security Considerations:**
-- Audit all unsafe code
-- Validate all user input
-- Use secure coding practices
-- Follow principle of least privilege
-- Test for common vulnerabilities
-
-**Safety Checklist:**
-- No buffer overflows
-- No use-after-free
-- No double-free
-- No integer overflows
-- Proper bounds checking
-- Safe error handling
-
-## Conclusion
-
-Follow these guidelines to ensure SigmaOS grows with high-quality, well-documented components that match or exceed Linux/BSD capabilities. Always prioritize:
-1. Correctness and safety
-2. Performance
-3. Compatibility with Linux/BSD
-4. Clear documentation
-5. Comprehensive testing
+1. **Agent Files in `Agents/`**:
+   - Every OS component must have exactly one `.md` file in `Agents/` (e.g., `KERNEL_SCHEDULER_AGENT.md`).
+   - Every operational role must have a guide in `Agents/` (e.g., `TESTING_AGENT.md`, `FIXING_AGENT.md`, `IMPROVING_AGENT.md`, `RESEARCHING_AGENT.md`, `STABILISING_AGENT.md`, `COMMENTING_AGENT.md`, `PLANNING_AGENT.md`, `ITERATING_AGENT.md`, `MODULARISING_AGENT.md`, `REVIEWING_AGENT.md`, `COMPARING_AGENT.md`, `COMPETITOR_ADVANTAGE_ANALYSING_AGENT.md`, `COMPETITOR_ABSORBING_AGENT.md`, `MAINTENANCE_AGENT.md`, `INSPIRATION_TAKING_AGENT.md`).
+2. **GitHub Wiki Synchronization**:
+   - Keep the standalone wiki repository (`SigmaOS.wiki`) synchronized with the main code repository.
+   - Fully implemented `.md` specifications must be elevated into Arch Linux Wiki style component guides on the GitHub Wiki.
