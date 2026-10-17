@@ -33,13 +33,9 @@ fn test_pull_request_template_exists() {
     );
     let content =
         fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md").expect("Failed to read PR template");
+    assert!(content.contains("## Kernel component") || content.contains("## Shell component"));
     assert!(
-        content.contains("## Shell component")
-            || content.contains("## Component")
-            || content.contains("## Kernel component")
-    );
-    assert!(
-        content.contains("## Shell safety review") || content.contains("## Kernel safety review")
+        content.contains("## Kernel safety review") || content.contains("## Shell safety review")
     );
 }
 

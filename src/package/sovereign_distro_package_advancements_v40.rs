@@ -613,7 +613,7 @@ pub type UniversalPmActionV40 = UniversalPmActionV39;
 pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UniversalPmActionV39 {
+pub enum UniversalPmActionV40 {
     Install,
     Remove,
     Update,
@@ -626,21 +626,21 @@ pub type UniversalPmActionV40 = UniversalPmActionV39;
 pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
 
 #[derive(Debug, Clone)]
-pub struct RoutedPmCommandV39 {
+pub struct RoutedPmCommandV40 {
     pub source_pm: String,
-    pub action: UniversalPmActionV39,
+    pub action: UniversalPmActionV40,
     pub target_packages: Vec<String>,
     pub dry_run: bool,
 }
 
-pub struct UniversalPmCliRouterV39;
+pub struct UniversalPmCliRouterV40;
 
-impl UniversalPmCliRouterV39 {
+impl UniversalPmCliRouterV40 {
     pub fn new() -> Self {
         Self
     }
 
-    pub fn route_command(&self, input_cli: &str) -> Result<RoutedPmCommandV39, String> {
+    pub fn route_command(&self, input_cli: &str) -> Result<RoutedPmCommandV40, String> {
         let parts: Vec<&str> = input_cli.split_whitespace().collect();
         if parts.is_empty() {
             return Err("Empty CLI input".to_string());
@@ -657,7 +657,7 @@ impl UniversalPmCliRouterV39 {
                 || p == "-p"
         });
 
-        let (action, targets): (UniversalPmActionV39, Vec<String>) = match pm.as_str() {
+        let (action, targets): (UniversalPmActionV40, Vec<String>) = match pm.as_str() {
             "apt" | "apt-get" => {
                 if parts.contains(&"install") {
                     (
@@ -680,7 +680,7 @@ impl UniversalPmCliRouterV39 {
                             .collect(),
                     )
                 } else {
-                    (UniversalPmActionV39::Update, vec![])
+                    (UniversalPmActionV40::Update, vec![])
                 }
             }
             "pacman" => {
@@ -705,7 +705,7 @@ impl UniversalPmCliRouterV39 {
                             .collect(),
                     )
                 } else {
-                    (UniversalPmActionV39::Query, vec![])
+                    (UniversalPmActionV40::Query, vec![])
                 }
             }
             "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
@@ -748,7 +748,7 @@ impl UniversalPmCliRouterV39 {
             .filter(|t: &String| !t.starts_with('-'))
             .collect();
 
-        Ok(RoutedPmCommandV39 {
+        Ok(RoutedPmCommandV40 {
             source_pm: pm,
             action,
             target_packages: clean_targets,
@@ -791,7 +791,7 @@ pub struct SovereignDistroPackageAdvancementsSuiteV39 {
     pub sandbox_governor: UniversalMultiSandboxGovernorV39,
     pub cas_store: UniversalCasDeltaStoreGovernorV39,
     pub boot_env_governor: UniversalBootEnvSnapshotGovernorV39,
-    pub cli_router: UniversalPmCliRouterV39,
+    pub cli_router: UniversalPmCliRouterV40,
     pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39,
     pub installed_packages: Vec<String>,
 }
@@ -805,7 +805,7 @@ impl SovereignDistroPackageAdvancementsSuiteV39 {
             sandbox_governor: UniversalMultiSandboxGovernorV39::new(),
             cas_store: UniversalCasDeltaStoreGovernorV39::new(),
             boot_env_governor: UniversalBootEnvSnapshotGovernorV39::new(),
-            cli_router: UniversalPmCliRouterV39::new(),
+            cli_router: UniversalPmCliRouterV40::new(),
             transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39::new(),
             installed_packages: Vec::new(),
         }
@@ -955,7 +955,7 @@ mod tests {
 
     #[test]
     fn test_sat_solver_and_sandboxing_v40() {
-        let solver = UniversalCrossDistroSatSolverV40::new();
+        let solver = UniversalCrossDistroSatSolverV39::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
             "glibc".to_string(),
@@ -1008,7 +1008,7 @@ mod tests {
             .cli_router
             .route_command("apt install ripgrep --dry-run")
             .unwrap();
-        assert_eq!(cmd.action, UniversalPmActionV39::Install);
+        assert_eq!(cmd.action, UniversalPmActionV40::Install);
         assert!(cmd.dry_run);
 
         let sigpkg = suite
