@@ -13,7 +13,9 @@ pub mod figcraft_missing_components_parity_pr;
 pub mod effectcraft;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod filmcraft;
+pub mod filmcraft_lightcraft_mediacraft_artcraft_parity_pr;
 pub mod lightcraft;
+pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
@@ -237,3 +239,5 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
 };
+pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::*;
+pub use sovereign_artcraft_craftlibs_pr_engine::*;
