@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
-//!
-//! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-//! - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-//! - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-//! - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
+//  Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
+//
+//  Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
+//  - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
+//  - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
+//  - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-#![no_std]
 extern crate alloc;
 
 use alloc::collections::{BTreeMap, BTreeSet};
@@ -640,7 +639,6 @@ impl OpenRcStatusControllerEngine {
         self.active_services.remove(service_name);
     }
 }
-
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
         let mut header = OpenRcHeader::default();
@@ -696,12 +694,14 @@ impl OpenRcDependencySolverEngine {
 
     pub fn mark_started(&mut self, service_name: &str) {
         self.active_services.insert(service_name.to_string());
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Running);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Running);
     }
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Stopped);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Stopped);
     }
 
     pub fn update_status(&mut self, service: String, state: ServiceState) {
@@ -833,7 +833,11 @@ impl RunitS6SupervisionTreeGovernor {
         self.services.insert(name, srv);
     }
 
-    pub fn scan_service_directory(&mut self, service_dir_path: &str, known_services: &[(&str, &str)]) {
+    pub fn scan_service_directory(
+        &mut self,
+        service_dir_path: &str,
+        known_services: &[(&str, &str)],
+    ) {
         self.service_dir_path = service_dir_path.to_string();
         for (name, script) in known_services {
             self.active_services.insert(
@@ -864,13 +868,21 @@ impl RunitS6SupervisionTreeGovernor {
         }
         if let Some(srv) = self.services.get_mut(service_name) {
             srv.pid = self.active_services.get(service_name).and_then(|s| s.pid);
-            srv.state = self.active_services.get(service_name).map(|s| s.state).unwrap_or(ServiceState::Stopped);
+            srv.state = self
+                .active_services
+                .get(service_name)
+                .map(|s| s.state)
+                .unwrap_or(ServiceState::Stopped);
         }
     }
 
     pub fn parse_s6_readiness_notification(&mut self, service_name: &str, line: &str) -> bool {
         let trimmed = line.trim();
-        if trimmed == "READY" || trimmed == "READY=1" || trimmed.contains("s6-notifyready") || trimmed.starts_with("ready") {
+        if trimmed == "READY"
+            || trimmed == "READY=1"
+            || trimmed.contains("s6-notifyready")
+            || trimmed.starts_with("ready")
+        {
             if let Some(srv) = self.services.get_mut(service_name) {
                 srv.state = ServiceState::Running;
                 return true;
@@ -1011,14 +1023,21 @@ impl SysVinitRunlevelStateMachine {
         self.current_runlevel = new_runlevel;
         self.inittab_entries
             .iter()
-            .filter(|e| e.runlevels.contains(&new_runlevel) || e.runlevels.contains(&'a') || e.runlevels.contains(&'b') || e.runlevels.contains(&'c'))
+            .filter(|e| {
+                e.runlevels.contains(&new_runlevel)
+                    || e.runlevels.contains(&'a')
+                    || e.runlevels.contains(&'b')
+                    || e.runlevels.contains(&'c')
+            })
             .collect()
     }
 
     pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
-            if entry.action == SysVAction::Respawn && entry.runlevels.contains(&self.current_runlevel) {
+            if entry.action == SysVAction::Respawn
+                && entry.runlevels.contains(&self.current_runlevel)
+            {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
@@ -1231,9 +1250,11 @@ impl LaunchdJobSupervisorEngine {
             if job.keep_alive {
                 let mock_pid = 5000 + label.len() as u32;
                 self.running_pids.insert(label.to_string(), mock_pid);
-                self.job_states.insert(label.to_string(), ServiceState::Running);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
             } else {
-                self.job_states.insert(label.to_string(), ServiceState::Stopped);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
             }
         }
     }
@@ -1344,7 +1365,6 @@ impl AtSpoolQueueManager {
         ready
     }
 }
-
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
 pub struct UserlandInitCleanRoomPrGatewayEngine {
