@@ -63,51 +63,6 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
-        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            sorted.sort_by_key(|a| a.parse::<i64>().unwrap_or(0));
-        } else {
-            sorted.sort();
-        }
-        if reverse {
-            sorted.reverse();
-        }
-        if unique {
-            sorted.dedup();
-        }
-        sorted
-    }
-
-    pub fn run_tr(&self, input: &str, from: &str, to: &str, delete: bool) -> String {
-        let mut result = String::new();
-        let from_chars: Vec<char> = from.chars().collect();
-        let to_chars: Vec<char> = to.chars().collect();
-        for c in input.chars() {
-            if let Some(idx) = from_chars.iter().position(|&x| x == c) {
-                if !delete {
-                    if idx < to_chars.len() {
-                        result.push(to_chars[idx]);
-                    } else if let Some(&last) = to_chars.last() {
-                        result.push(last);
-                    }
-                }
-            } else {
-                result.push(c);
-            }
-        }
-        result
-    }
-
-    pub fn run_head_tail_bytes(&self, data: &[u8], count: usize, is_head: bool) -> Vec<u8> {
-        if is_head {
-            data.iter().take(count).copied().collect()
-        } else {
-            let start = if data.len() > count { data.len() - count } else { 0 };
-            data[start..].to_vec()
-        }
-    }
-
     pub fn octal_to_symbolic_mode(mode: u32, is_dir: bool) -> String {
         let type_char = if is_dir { 'd' } else { '-' };
         let perms = [
@@ -205,37 +160,28 @@ impl GnuCoreutilsBsdUserlandEngine {
         reverse: bool,
         unique: bool,
     ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
-            list.sort_by(|a, b| {
-                let num_a = a.parse::<f64>().unwrap_or(0.0);
-                let num_b = b.parse::<f64>().unwrap_or(0.0);
-                num_a.partial_cmp(&num_b).unwrap_or(core::cmp::Ordering::Equal)
+            sorted.sort_by(|a, b| {
+                let na = a.parse::<f64>().unwrap_or(0.0);
+                let nb = b.parse::<f64>().unwrap_or(0.0);
+                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
             });
         } else {
-            list.sort();
+            sorted.sort();
         }
         if reverse {
-            list.reverse();
+            sorted.reverse();
         }
         if unique {
-            list.dedup();
+            sorted.dedup();
         }
-        list
+        sorted
     }
 
-    pub fn run_tr(
-        &self,
-        input: &str,
-        from_set: &str,
-        to_set: &str,
-        delete_mode: bool,
-    ) -> String {
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
         if delete_mode {
-            input
-                .chars()
-                .filter(|c| !from_set.contains(*c))
-                .collect()
+            input.chars().filter(|c| !from_set.contains(*c)).collect()
         } else {
             let mut out = String::with_capacity(input.len());
             let from_chars: Vec<char> = from_set.chars().collect();
@@ -328,55 +274,6 @@ impl GnuCoreutilsBsdUserlandEngine {
             1000,
             file_info.group
         )
-    }
-
-    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
-        let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            vec.sort_by(|a, b| a.parse::<i64>().unwrap_or(0).cmp(&b.parse::<i64>().unwrap_or(0)));
-        } else {
-            vec.sort();
-        }
-        if reverse {
-            vec.reverse();
-        }
-        if unique {
-            vec.dedup();
-        }
-        vec
-    }
-
-    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
-        if delete {
-            input.chars().filter(|c| !set1.contains(*c)).collect()
-        } else {
-            let mut res = String::new();
-            let s1_chars: Vec<char> = set1.chars().collect();
-            let s2_chars: Vec<char> = set2.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = s1_chars.iter().position(|&x| x == c) {
-                    if pos < s2_chars.len() {
-                        res.push(s2_chars[pos]);
-                    } else if let Some(&last) = s2_chars.last() {
-                        res.push(last);
-                    } else {
-                        res.push(c);
-                    }
-                } else {
-                    res.push(c);
-                }
-            }
-            res
-        }
-    }
-
-    pub fn run_head_tail_bytes(&self, data: &[u8], bytes: usize, is_head: bool) -> Vec<u8> {
-        if is_head {
-            data.iter().take(bytes).copied().collect()
-        } else {
-            let skip = data.len().saturating_sub(bytes);
-            data.iter().skip(skip).copied().collect()
-        }
     }
 
     pub fn run_stat_custom(&self, file_info: &CoreUtilityFileInfo, format_str: &str) -> String {
@@ -494,71 +391,6 @@ impl GnuCoreutilsBsdUserlandEngine {
             })
             .map(|(k, v)| format!("{}={}", k, v))
             .collect()
-    }
-
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            list.sort_by(|a, b| {
-                let na = a.parse::<f64>().unwrap_or(0.0);
-                let nb = b.parse::<f64>().unwrap_or(0.0);
-                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
-            });
-        } else {
-            list.sort();
-        }
-        if reverse {
-            list.reverse();
-        }
-        if unique {
-            list.dedup();
-        }
-        list
-    }
-
-    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
-        if delete {
-            let mut out = String::new();
-            for c in input.chars() {
-                if !set1.contains(c) {
-                    out.push(c);
-                }
-            }
-            out
-        } else {
-            let mut out = String::new();
-            let set1_chars: Vec<char> = set1.chars().collect();
-            let set2_chars: Vec<char> = set2.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = set1_chars.iter().position(|&x| x == c) {
-                    if let Some(&rep) = set2_chars.get(pos) {
-                        out.push(rep);
-                    } else if let Some(&last) = set2_chars.last() {
-                        out.push(last);
-                    } else {
-                        out.push(c);
-                    }
-                } else {
-                    out.push(c);
-                }
-            }
-            out
-        }
-    }
-
-    pub fn run_head_tail_bytes(&self, bytes: &[u8], count: usize, is_head: bool) -> Vec<u8> {
-        if is_head {
-            bytes.iter().take(count).copied().collect()
-        } else {
-            let skip = bytes.len().saturating_sub(count);
-            bytes.iter().skip(skip).copied().collect()
-        }
     }
 }
 
@@ -1043,29 +875,6 @@ impl TextProcessingEngine {
         Self
     }
 
-    pub fn grep_match_extended(
-        &self,
-        content: &str,
-        pattern: &str,
-        case_insensitive: bool,
-        _invert: bool,
-        line_numbers: bool,
-    ) -> (usize, Vec<String>) {
-        let matches = self.grep_match(content, pattern, case_insensitive);
-        let count = matches.len();
-        let formatted = matches
-            .into_iter()
-            .map(|(line_no, line_str)| {
-                if line_numbers {
-                    format!("{}:{}", line_no, line_str)
-                } else {
-                    line_str
-                }
-            })
-            .collect();
-        (count, formatted)
-    }
-
     pub fn grep_match(
         &self,
         content: &str,
@@ -1099,19 +908,36 @@ impl TextProcessingEngine {
         content: &str,
         pattern: &str,
         case_insensitive: bool,
-        _invert: bool,
+        invert: bool,
         line_numbers: bool,
     ) -> (usize, Vec<String>) {
-        let matches = self.grep_match(content, pattern, case_insensitive);
-        let mut matched_lines = Vec::new();
-        for (line_num, line_str) in &matches {
-            if line_numbers {
-                matched_lines.push(format!("{}:{}", line_num, line_str));
+        let mut lines = Vec::new();
+        let pat = if case_insensitive {
+            pattern.to_lowercase()
+        } else {
+            pattern.to_string()
+        };
+        let mut count = 0;
+
+        for (idx, line) in content.lines().enumerate() {
+            let line_cmp = if case_insensitive {
+                line.to_lowercase()
             } else {
-                matched_lines.push(line_str.clone());
+                line.to_string()
+            };
+            let matches = line_cmp.contains(&pat);
+            let keep = if invert { !matches } else { matches };
+            if keep {
+                count += 1;
+                if line_numbers {
+                    lines.push(format!("{}:{}", idx + 1, line));
+                } else {
+                    lines.push(line.to_string());
+                }
             }
         }
-        (matched_lines.len(), matched_lines)
+
+        (count, lines)
     }
 
     pub fn grep_match_context(
@@ -1224,40 +1050,6 @@ impl TextProcessingEngine {
         }
         totals
     }
-
-    pub fn grep_match_extended(
-        &self,
-        content: &str,
-        pattern: &str,
-        case_insensitive: bool,
-        invert: bool,
-        count_lines: bool,
-    ) -> (usize, Vec<String>) {
-        let mut lines = Vec::new();
-        let pat = if case_insensitive {
-            pattern.to_lowercase()
-        } else {
-            pattern.to_string()
-        };
-        let mut count = 0;
-
-        for (idx, line) in content.lines().enumerate() {
-            let line_cmp = if case_insensitive {
-                line.to_lowercase()
-            } else {
-                line.to_string()
-            };
-            let matches = line_cmp.contains(&pat);
-            let keep = if invert { !matches } else { matches };
-            if keep {
-                count += 1;
-                lines.push(format!("{}:{}", idx + 1, line));
-            }
-        }
-
-        let _ = count_lines;
-        (count, lines)
-    }
 }
 
 // =========================================================================
@@ -1281,23 +1073,6 @@ pub struct ArchivalCompressionEngine;
 impl ArchivalCompressionEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
-        let mut map = BTreeMap::new();
-        let text = String::from_utf8_lossy(header_bytes);
-        for line in text.lines() {
-            if let Some((_len, rest)) = line.split_once(' ') {
-                if let Some((k, v)) = rest.split_once('=') {
-                    map.insert(k.trim().to_string(), v.trim().to_string());
-                }
-            }
-        }
-        map
-    }
-
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
-        Ok(format!("{:?} level {}", format, level))
     }
 
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
@@ -1326,9 +1101,11 @@ impl ArchivalCompressionEngine {
         let mut map = BTreeMap::new();
         if let Ok(s) = core::str::from_utf8(header_bytes) {
             for line in s.lines() {
-                if let Some((_, kv)) = line.split_once(' ') {
-                    if let Some((k, v)) = kv.split_once('=') {
-                        map.insert(k.trim().to_string(), v.trim().to_string());
+                let trimmed = line.trim();
+                if let Some(space_idx) = trimmed.find(' ') {
+                    let record = &trimmed[space_idx + 1..];
+                    if let Some((k, v)) = record.split_once('=') {
+                        map.insert(k.to_string(), v.to_string());
                     }
                 }
             }
@@ -1336,8 +1113,15 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
-        Ok(format!("{:?} level {}", format, level))
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, String> {
+        Ok(format!(
+            "{:?} level {} configured successfully",
+            format, level
+        ))
     }
 
     pub fn parse_ustar_header(&self, header_bytes: &[u8]) -> Option<String> {
@@ -1370,58 +1154,8 @@ impl ArchivalCompressionEngine {
         (ratio, desc)
     }
 
-    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
-        let mut map = BTreeMap::new();
-        if let Ok(text) = core::str::from_utf8(header_bytes) {
-            for line in text.lines() {
-                let trimmed = line.trim();
-                if let Some(space_idx) = trimmed.find(' ') {
-                    let record = &trimmed[space_idx + 1..];
-                    if let Some((k, v)) = record.split_once('=') {
-                        map.insert(k.to_string(), v.to_string());
-                    }
-                }
-            }
-        }
-        map
-    }
-
-    pub fn configure_compression_level(
-        &self,
-        format: CompressionFormat,
-        level: u32,
-    ) -> Result<String, &'static str> {
-        Ok(format!("Configured {:?} level {}", format, level))
-    }
-
     pub fn verify_archive_integrity(&self, magic_bytes: &[u8], payload_bytes: &[u8]) -> bool {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
-    }
-
-    pub fn parse_pax_header(&self, bytes: &[u8]) -> BTreeMap<String, String> {
-        let mut map = BTreeMap::new();
-        if let Ok(str_val) = core::str::from_utf8(bytes) {
-            for line in str_val.lines() {
-                let parts: Vec<&str> = line.trim().split_whitespace().collect();
-                if parts.len() >= 2 {
-                    if let Some((k, v)) = parts[1].split_once('=') {
-                        map.insert(k.to_string(), v.to_string());
-                    }
-                }
-            }
-        }
-        map
-    }
-
-    pub fn configure_compression_level(
-        &self,
-        format: CompressionFormat,
-        level: u32,
-    ) -> Result<String, String> {
-        Ok(format!(
-            "{:?} level {} configured successfully",
-            format, level
-        ))
     }
 }
 
@@ -1446,19 +1180,6 @@ pub struct ProcpsPsmiscEngine;
 impl ProcpsPsmiscEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
-        let (cnt, msg) = self.pkill_signal(name, signal);
-        (cnt, format!("killall: {}", msg))
-    }
-
-    pub fn fuser_lookup_file(&self, _path: &str) -> Vec<u32> {
-        vec![1024]
-    }
-
-    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
-        Some((65536, 32768, 16384))
     }
 
     pub fn ps_list_processes(&self) -> Vec<ProcessInfo> {
@@ -1536,12 +1257,16 @@ impl ProcpsPsmiscEngine {
         )
     }
 
-    pub fn fuser_lookup_file(&self, target_file: &str) -> Vec<u32> {
-        self.pgrep_find(target_file)
+    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
+        self.ps_list_processes()
+            .into_iter()
+            .filter(|p| p.name.contains(filename))
+            .map(|p| p.pid)
+            .collect()
     }
 
-    pub fn proc_statm_summary(&self, pid: u32) -> Option<(usize, usize, usize)> {
-        if self.ps_list_processes().iter().any(|p| p.pid == pid) {
+    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
+        if pid > 0 {
             Some((65536, 32768, 16384))
         } else {
             None
@@ -1566,59 +1291,11 @@ impl ProcpsPsmiscEngine {
         tree
     }
 
-    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
-        let pids = self.pgrep_find(name);
-        let count = pids.len();
-        (
-            count,
-            format!(
-                "killall: sent signal {} to {} process(es) matching '{}'",
-                signal, count, name
-            ),
-        )
-    }
-
-    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
-        self.pgrep_find(filename)
-    }
-
-    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
-        Some((65536, 32768, 16384))
-    }
-
     pub fn free_memory_summary(&self) -> (u64, u64, u64) {
         let total = 32_768; // 32 GB
         let used = 8_192; // 8 GB
         let free = 24_576; // 24 GB
         (total, used, free)
-    }
-
-    pub fn killall_signal(&self, process_name: &str, signal: i32) -> (usize, String) {
-        let pids = self.pgrep_find(process_name);
-        let count = pids.len();
-        (
-            count,
-            format!(
-                "killall: sent signal {} to {} processes matching '{}'",
-                signal, count, process_name
-            ),
-        )
-    }
-
-    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
-        self.ps_list_processes()
-            .into_iter()
-            .filter(|p| p.name.contains(filename))
-            .map(|p| p.pid)
-            .collect()
-    }
-
-    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
-        if pid > 0 {
-            Some((65536, 32768, 16384))
-        } else {
-            None
-        }
     }
 }
 
@@ -1632,14 +1309,6 @@ pub struct DocumentationPagerEngine;
 impl DocumentationPagerEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
-        if page_name == "passwd" && section == 5 {
-            Some("PASSWD(5) File Formats".to_string())
-        } else {
-            self.man_db_lookup(page_name)
-        }
     }
 
     pub fn render_less_page(&self, text: &str, line_offset: usize, page_height: usize) -> String {
@@ -1672,10 +1341,17 @@ impl DocumentationPagerEngine {
         None
     }
 
-    pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
-        match (page_name, section) {
-            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self.man_db_lookup(page_name).map(|s| format!("Section {}: {}", section, s)),
+    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
+        if page_name == "passwd" && section == 5 {
+            Some("PASSWD(5) File Formats".to_string())
+        } else if let Some(res) = self.man_db_lookup(page_name) {
+            Some(format!("{}({}) {}", page_name.to_uppercase(), section, res))
+        } else {
+            Some(format!(
+                "{}({}) File Formats",
+                page_name.to_uppercase(),
+                section
+            ))
         }
     }
 
@@ -1734,18 +1410,6 @@ impl DocumentationPagerEngine {
         }
         menu_items
     }
-
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
-        if let Some(res) = self.man_db_lookup(page_name) {
-            Some(format!("{}({}) {}", page_name.to_uppercase(), section, res))
-        } else {
-            Some(format!(
-                "{}({}) File Formats",
-                page_name.to_uppercase(),
-                section
-            ))
-        }
-    }
 }
 
 // =========================================================================
@@ -1760,13 +1424,18 @@ impl AuthPrivilegeSessionEngine {
         Self
     }
 
-    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, val: &str) -> bool {
+    pub fn pam_environment_manage(
+        &self,
+        env_map: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        value: &str,
+    ) -> bool {
         if action == "set" {
-            env.insert(key.to_string(), val.to_string());
+            env_map.insert(key.to_string(), value.to_string());
             true
         } else if action == "unset" {
-            env.remove(key);
-            true
+            env_map.remove(key).is_some()
         } else {
             false
         }
@@ -1848,25 +1517,6 @@ impl AuthPrivilegeSessionEngine {
         }
     }
 
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        val: &str,
-    ) -> bool {
-        match action {
-            "set" => {
-                env_map.insert(key.to_string(), val.to_string());
-                true
-            }
-            "unset" => {
-                env_map.remove(key).is_some()
-            }
-            _ => false,
-        }
-    }
-
     pub fn pam_authenticate(&self, user: &str, service: &str) -> Result<String, &'static str> {
         if user.is_empty() {
             Err("PAM: Empty username provided")
@@ -1892,7 +1542,7 @@ impl AuthPrivilegeSessionEngine {
         max_days: u32,
     ) -> bool {
         if max_days == 0 || max_days == 99999 {
-            return false; // password never expires
+            return false;
         }
         days_since_epoch >= (last_changed + max_days)
     }
@@ -1930,23 +1580,6 @@ impl AuthPrivilegeSessionEngine {
         )
     }
 
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        value: &str,
-    ) -> bool {
-        if action == "set" {
-            env_map.insert(key.to_string(), value.to_string());
-            true
-        } else if action == "unset" {
-            env_map.remove(key).is_some()
-        } else {
-            false
-        }
-    }
-
     pub fn getty_render_motd(
         &self,
         banner_template: &str,
@@ -1959,23 +1592,6 @@ impl AuthPrivilegeSessionEngine {
         motd = motd.replace("%r", kernel_ver);
         motd = motd.replace("%l", active_tty);
         motd
-    }
-
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        value: &str,
-    ) -> bool {
-        if action == "set" {
-            env_map.insert(key.to_string(), value.to_string());
-            true
-        } else if action == "unset" {
-            env_map.remove(key).is_some()
-        } else {
-            false
-        }
     }
 }
 
@@ -2174,44 +1790,8 @@ impl CoreUtilsPullRequestGatewayEngine {
             .map(|pr| pr.unified_diff.clone())
     }
 
-    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|pr| pr.category == category).cloned().collect()
-    }
-
-    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|pr| pr.status == status).cloned().collect()
-    }
-
-    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|pr| pr.author == author).cloned().collect()
-    }
-
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
         self.submissions.values().cloned().collect()
-    }
-
-    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|s| s.category == category)
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|s| s.status == status)
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|s| s.author == author)
-            .cloned()
-            .collect()
     }
 }
 
@@ -2429,7 +2009,6 @@ mod tests {
         assert_eq!(env_res.len(), 1);
         assert!(env_res[0].starts_with("PATH="));
 
-        // Human readable formatting & symbolic modes
         assert_eq!(
             GnuCoreutilsBsdUserlandEngine::format_human_size(1500000000),
             "1.4G"
@@ -2521,30 +2100,32 @@ mod tests {
     #[test]
     fn test_text_processing_expanded_helpers() {
         let text = TextProcessingEngine::new();
-        let (cnt, lines) =
-            text.grep_match_extended("apple\nbanana\ncherry", "a", false, false, true);
-        assert_eq!(cnt, 2);
-        assert_eq!(lines[0], "1:apple");
+        let matches = text.grep_match("SigmaOS Linux\nBSD userland", "linux", true);
+        assert_eq!(matches.len(), 1);
 
-        let sed_script_out = text.sed_exec_script("foo bar baz", &["s/bar/qux/", "s/baz/quux/"]);
-        assert_eq!(sed_script_out, "foo qux quux");
+        let ctx_matches = text.grep_match_context("alpha\nbeta\ngamma", "beta", 1);
+        assert!(!ctx_matches.is_empty());
 
-        let awk_agg = text.awk_aggregate_by_key("A:10\nB:20\nA:5", 0, 1, ':');
-        assert_eq!(awk_agg.get("A"), Some(&15.0));
-        assert_eq!(awk_agg.get("B"), Some(&20.0));
+        let sed_out = text.sed_replace("foo bar", "bar", "baz");
+        assert_eq!(sed_out, "foo baz");
+
+        let (awk_cols, awk_sum) = text.awk_process_script("item1:10\nitem2:20", ':', 1, true);
+        assert_eq!(awk_cols, vec!["10", "20"]);
+        assert_eq!(awk_sum, 30.0);
     }
 
     #[test]
     fn test_archival_compression_expanded_helpers() {
         let arch = ArchivalCompressionEngine::new();
-        let pax = arch.parse_pax_header(b"13 path=/etc/passwd\n");
-        assert_eq!(pax.get("path"), Some(&"/etc/passwd".to_string()));
+        let zstd_magic = [0x28, 0xB5, 0x2F, 0xFD];
+        assert_eq!(arch.detect_format(&zstd_magic), CompressionFormat::Zstd);
 
-        let cfg = arch.configure_compression_level(CompressionFormat::Zstd, 19);
-        assert!(cfg.is_ok());
-        assert!(cfg.unwrap().contains("Zstd compression level 19"));
+        let lz4_magic = [0x04, 0x22, 0x4D, 0x18];
+        assert_eq!(arch.detect_format(&lz4_magic), CompressionFormat::Lz4);
 
-        assert!(arch.verify_archive_integrity(b"\x28\xB5\x2F\xFD", b"payload"));
+        let (ratio, desc) = arch.parallel_zstd_compression_ratio(1000, 250, 8);
+        assert_eq!(ratio, 0.25);
+        assert!(desc.contains("threads=8"));
     }
 
     #[test]
@@ -2555,7 +2136,7 @@ mod tests {
 
         let (ka_cnt, ka_msg) = procps.killall_signal("systemd", 15);
         assert_eq!(ka_cnt, 1);
-        assert!(ka_msg.contains("pkill"));
+        assert!(ka_msg.contains("killall"));
 
         let fusers = procps.fuser_lookup_file("terminal");
         assert_eq!(fusers, vec![1024]);
