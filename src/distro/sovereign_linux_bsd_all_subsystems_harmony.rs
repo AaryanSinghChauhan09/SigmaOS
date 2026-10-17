@@ -554,7 +554,11 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::BluetoothWireless,
-                vec!["BlueZ_5", "FreeBSD_Netgraph_Bluetooth", "PQC_Bluetooth_Mesh"],
+                vec![
+                    "BlueZ_5",
+                    "FreeBSD_Netgraph_Bluetooth",
+                    "PQC_Bluetooth_Mesh",
+                ],
             ),
             (
                 SigmaOsSubsystem::ThermalCooling,
@@ -1113,13 +1117,17 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         target_distro: LinuxBsdDistroInspiration,
         payload: &str,
     ) -> String {
-        self.harmony_engine
-            .translate_cross_distro_payload_direct(source_distro, target_distro, payload)
+        self.harmony_engine.translate_cross_distro_payload_direct(
+            source_distro,
+            target_distro,
+            payload,
+        )
     }
 
     /// Perform system-wide distro compliance audit across all core subsystems.
     pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
-        self.harmony_engine.audit_all_subsystems_distro_compliance_summary()
+        self.harmony_engine
+            .audit_all_subsystems_distro_compliance_summary()
     }
 
     /// Execute an automated cross-subsystem workflow.
