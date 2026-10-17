@@ -40,7 +40,13 @@ pub struct CadCraftPullRequestSpec {
 }
 
 impl CadCraftPullRequestSpec {
-    pub fn new(pr_id: u32, component_name: &str, pr_title: &str, target_subsystem: &str, patch_digest: u64) -> Self {
+    pub fn new(
+        pr_id: u32,
+        component_name: &str,
+        pr_title: &str,
+        target_subsystem: &str,
+        patch_digest: u64,
+    ) -> Self {
         Self {
             pr_id,
             component_name: component_name.to_string(),
@@ -393,7 +399,8 @@ impl BRepSolidModel {
     }
 
     pub fn boolean_subtract(&mut self, _other_solid: &BRepSolidModel) {
-        self.feature_history.push(SolidFeatureOperation::BooleanSubtract);
+        self.feature_history
+            .push(SolidFeatureOperation::BooleanSubtract);
         self.volume = (self.volume * 0.8).max(0.0);
     }
 }
@@ -598,7 +605,11 @@ impl CadCraftEngine {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, points: Vec<[f32; 2]>) -> u32 {
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity {
             id,
@@ -704,7 +715,9 @@ impl CadCraftEngine {
                 data.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
             }
             ExportFormat::STEP => {
-                data.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
+                data.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
             }
             ExportFormat::IGES => {
                 data.extend_from_slice(b"S      1\nG      1\nD      1\nP      1\nT      1\n");
@@ -782,7 +795,10 @@ impl CadCraft2dDraftingConstraintPrDeployer {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged || pr.status == "Merged").count()
+        self.deployed_prs
+            .values()
+            .filter(|pr| pr.is_merged || pr.status == "Merged")
+            .count()
     }
 }
 
@@ -825,7 +841,10 @@ impl CadCraft3dSolidModelingPrDeployer {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged || pr.status == "Merged").count()
+        self.deployed_prs
+            .values()
+            .filter(|pr| pr.is_merged || pr.status == "Merged")
+            .count()
     }
 }
 
@@ -868,7 +887,10 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged || pr.status == "Merged").count()
+        self.deployed_prs
+            .values()
+            .filter(|pr| pr.is_merged || pr.status == "Merged")
+            .count()
     }
 }
 
