@@ -306,14 +306,14 @@ impl SlideExporterEngine {
     }
 }
 
-/// Presenter view runtime state
-#[derive(Debug, Clone, Default)]
+/// Presenter view state
+#[derive(Debug, Clone)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,
     pub in_presenter_mode: bool,
     pub timer_running: bool,
-    pub elapsed_secs: u32,
+    pub elapsed_secs: u64,
     pub laser_pointer_active: bool,
     pub black_screen: bool,
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
+//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway
 //!
 //! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
 //! - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
@@ -624,74 +624,14 @@ impl OpenRcStatusControllerEngine {
 
     pub fn mark_started(&mut self, service_name: &str) {
         self.active_services.insert(service_name.to_string());
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Running);
     }
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
-    }
-
-}
-impl OpenRcHeader {
-    pub fn parse(script_content: &str) -> Self {
-        let mut header = OpenRcHeader::default();
-        for line in script_content.lines() {
-            let trimmed = line.trim();
-            if let Some(rest) = trimmed.strip_prefix("provide") {
-                header
-                    .provide
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header
-                    .need
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header
-                    .use_deps
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header
-                    .before
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header
-                    .after
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header
-                    .keywords
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            }
-        }
-        header
-    }
-}
-
-/// OpenRC Dependency Solver Engine
-pub struct OpenRcDependencySolverEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-}
-
-impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self {
-            current_runlevel: OpenRcRunlevel::SysInit,
-            scripts: BTreeMap::new(),
-        }
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Stopped);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Stopped);
     }
 
     pub fn update_status(&mut self, service: String, state: ServiceState) {
@@ -777,6 +717,7 @@ pub enum SupervisionStage {
 pub struct RunitS6SupervisionTreeSpecGovernor {
     pub current_stage: SupervisionStage,
     pub services: BTreeMap<String, SupervisedService>,
+    pub log_pipelines: BTreeMap<String, String>,
     pub active_services: BTreeMap<String, SupervisedService>,
     pub log_pipelines: BTreeMap<String, String>,
 }
@@ -864,8 +805,11 @@ impl RunitS6SupervisionTreeSpecGovernor {
 
     pub fn parse_s6_readiness(&mut self, service_name: &str, line: &str) -> bool {
         let trimmed = line.trim();
-        if trimmed == "READY" || trimmed == "READY=1" || trimmed.contains("s6-notifyready") || trimmed.starts_with("ready") {
-            let mut updated = false;
+        if trimmed == "READY"
+            || trimmed == "READY=1"
+            || trimmed.contains("s6-notifyready")
+            || trimmed.starts_with("ready")
+        {
             if let Some(srv) = self.services.get_mut(service_name) {
                 srv.state = ServiceState::Running;
                 updated = true;
@@ -877,12 +821,6 @@ impl RunitS6SupervisionTreeSpecGovernor {
             return updated;
         }
         false
-    }
-}
-
-impl Default for SupervisionStage {
-    fn default() -> Self {
-        SupervisionStage::Stage1Boot
     }
 }
 
@@ -914,10 +852,6 @@ pub struct SysVInittabEntry {
 
 impl SysVInittabEntry {
     pub fn parse(line: &str) -> Option<Self> {
-        Self::parse_line(line)
-    }
-
-    pub fn parse_line(line: &str) -> Option<Self> {
         let parts: Vec<&str> = line.trim().split(':').collect();
         if parts.len() != 4 {
             return None;
@@ -1191,26 +1125,17 @@ impl LaunchdJobSupervisorEngine {
         self.register_job(job);
     }
 
-    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
-        for job in self.jobs.values() {
-            if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states
-                    .insert(job.label.clone(), ServiceState::Running);
-                return Some(job.label.clone());
-            }
-        }
-        None
-    }
-
     pub fn handle_process_exit(&mut self, label: &str) {
         self.running_pids.remove(label);
         if let Some(job) = self.jobs.get(label) {
             if job.keep_alive {
                 let mock_pid = 5000 + label.len() as u32;
                 self.running_pids.insert(label.to_string(), mock_pid);
-                self.job_states.insert(label.to_string(), ServiceState::Running);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
             } else {
-                self.job_states.insert(label.to_string(), ServiceState::Stopped);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
             }
         }
     }
@@ -1268,6 +1193,42 @@ impl AnacronSpoolManager {
     }
 }
 
+/// Anacron Catchup Job Specification
+#[derive(Debug, Clone)]
+pub struct AnacronJob {
+    pub period_days: u32,
+    pub delay_mins: u32,
+    pub job_id: String,
+    pub command: String,
+    pub last_run_timestamp: u64,
+    pub random_delay_mins: u32,
+    pub start_hours_range: (u32, u32),
+}
+
+impl AnacronJob {
+    pub fn is_due(&self, now_timestamp: u64, current_hour: u32) -> bool {
+        let seconds_in_day = 86400u64;
+        let elapsed_days = (now_timestamp.saturating_sub(self.last_run_timestamp)) / seconds_in_day;
+        if elapsed_days >= self.period_days as u64 {
+            let (start_h, end_h) = self.start_hours_range;
+            if current_hour >= start_h && current_hour <= end_h {
+                return true;
+            }
+        }
+        false
+    }
+}
+
+/// `at` and `batch` Delayed Job Queue Entry
+#[derive(Debug, Clone)]
+pub struct AtJob {
+    pub job_id: u64,
+    pub execute_at: u64,
+    pub command: String,
+    pub queue: char,
+    pub max_load_average: Option<f32>,
+}
+
 /// `at` & `batch` Spool Queue Manager
 #[derive(Debug, Clone, Default)]
 pub struct AtSpoolQueueManager {
@@ -1312,35 +1273,65 @@ impl AtSpoolQueueManager {
         ready
     }
 
+    pub fn schedule_at_job(
+        &mut self,
+        execute_at: u64,
+        command: String,
+        queue: char,
+        max_load: Option<f32>,
+    ) -> u64 {
+        let id = self.next_job_id;
+        self.next_job_id += 1;
+        self.jobs.insert(
+            id,
+            AtJob {
+                job_id: id,
+                execute_at,
+                command,
+                queue,
+                max_load_average: max_load,
+            },
+        );
+        id
+    }
 }
-/// Userland Init Clean-Room Pull Request Proposal Gateway
+
+/// Systemd Timer Specification
 #[derive(Debug, Clone)]
-pub struct UserlandInitCleanRoomPrGatewayEngine {
-    pub pr_id: u32,
-    pub title: String,
-    pub author: String,
-    pub pqc_signature: String,
+pub struct SystemdTimerSpec {
+    pub name: String,
+    pub unit_to_trigger: String,
+    pub on_calendar: Option<String>,
+    pub on_boot_sec: Option<u64>,
+    pub on_unit_active_sec: Option<u64>,
+    pub persistent: bool,
+    pub accuracy_sec: u64,
+    pub last_trigger_timestamp: u64,
 }
 
-impl UserlandInitCleanRoomPrGatewayEngine {
-    pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
-        Self {
-            pr_id,
-            title: title.to_string(),
-            author: author.to_string(),
-            pqc_signature: format!("dilithium5:sig:{}", pr_id),
+impl SystemdTimerSpec {
+    pub fn is_triggered(
+        &self,
+        now_timestamp: u64,
+        boot_timestamp: u64,
+        unit_active_timestamp: u64,
+    ) -> bool {
+        if let Some(boot_sec) = self.on_boot_sec {
+            if now_timestamp >= boot_timestamp + boot_sec
+                && (self.last_trigger_timestamp == 0
+                    || self.last_trigger_timestamp < boot_timestamp)
+            {
+                return true;
+            }
         }
-    }
-
-    pub fn generate_unified_diff(&self) -> String {
-        format!(
-            "--- a/src/userland/init.rs\n+++ b/src/userland/init.rs\n@@ -1,5 +1,120 @@\n+// PR #{}: {}\n+// Author: {}\n",
-            self.pr_id, self.title, self.author
-        )
-    }
-
-    pub fn run_automated_ci_gate(&self) -> bool {
-        !self.title.is_empty() && self.pqc_signature.starts_with("dilithium5:")
+        if let Some(active_sec) = self.on_unit_active_sec {
+            if unit_active_timestamp > 0 && now_timestamp >= unit_active_timestamp + active_sec {
+                if now_timestamp.saturating_sub(self.last_trigger_timestamp) >= active_sec {
+                    return true;
+                }
+            }
+        }
+        false
     }
 }
 
@@ -1428,189 +1419,6 @@ impl VixieCronEntry {
             && field_matches(fields[2], mday)
             && field_matches(fields[3], month)
             && field_matches(fields[4], wday)
-    }
-}
-
-/// Anacron Spool Manager
-#[derive(Debug, Clone, Default)]
-pub struct AnacronSpoolManager {
-    pub spool_path: String,
-    pub timestamps: BTreeMap<String, u64>,
-}
-
-impl AnacronSpoolManager {
-    pub fn new(spool_path: &str) -> Self {
-        Self {
-            spool_path: spool_path.to_string(),
-            timestamps: BTreeMap::new(),
-        }
-    }
-
-    pub fn record_job_run(&mut self, job_id: &str, timestamp: u64) {
-        self.timestamps.insert(job_id.to_string(), timestamp);
-    }
-
-    pub fn get_last_run(&self, job_id: &str) -> Option<u64> {
-        self.timestamps.get(job_id).copied()
-    }
-}
-
-/// Anacron Catchup Job Specification
-#[derive(Debug, Clone)]
-pub struct AnacronJob {
-    pub period_days: u32,
-    pub delay_mins: u32,
-    pub job_id: String,
-    pub command: String,
-    pub last_run_timestamp: u64,
-    pub random_delay_mins: u32,
-    pub start_hours_range: (u32, u32),
-}
-
-impl AnacronJob {
-    pub fn is_due(&self, now_timestamp: u64, current_hour: u32) -> bool {
-        let seconds_in_day = 86400u64;
-        let elapsed_days = (now_timestamp.saturating_sub(self.last_run_timestamp)) / seconds_in_day;
-        if elapsed_days >= self.period_days as u64 {
-            let (start_h, end_h) = self.start_hours_range;
-            if current_hour >= start_h && current_hour <= end_h {
-                return true;
-            }
-        }
-        false
-    }
-}
-
-/// `at` and `batch` Delayed Job Queue Entry
-#[derive(Debug, Clone)]
-pub struct AtJob {
-    pub job_id: u64,
-    pub execute_at: u64,
-    pub command: String,
-    pub queue: char,
-    pub max_load_average: Option<f32>,
-}
-
-/// `atd` Queue Spool Manager
-#[derive(Debug, Clone, Default)]
-pub struct AtSpoolQueueManager {
-    pub spool_dir: String,
-    pub queued_jobs: Vec<AtJob>,
-    pub jobs: BTreeMap<u64, AtJob>,
-    pub next_job_id: u64,
-}
-
-impl AtSpoolQueueManager {
-    pub fn new(spool_dir: &str) -> Self {
-        Self {
-            spool_dir: spool_dir.to_string(),
-            queued_jobs: Vec::new(),
-            jobs: BTreeMap::new(),
-            next_job_id: 1,
-        }
-    }
-
-    pub fn enqueue_job(&mut self, job: AtJob) {
-        self.queued_jobs.push(job);
-    }
-
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job.clone());
-        self.queued_jobs.push(job);
-        id
-    }
-
-    pub fn poll_ready_jobs(&mut self, now_timestamp: u64, current_load: f32) -> Vec<AtJob> {
-        let mut ready = Vec::new();
-        let mut pending = Vec::new();
-
-        for job in self.queued_jobs.drain(..) {
-            let load_ok = match job.max_load_average {
-                Some(max_l) => current_load <= max_l,
-                None => true,
-            };
-
-            if now_timestamp >= job.execute_at && load_ok {
-                ready.push(job);
-            } else {
-                pending.push(job);
-            }
-        }
-
-        self.queued_jobs = pending;
-        ready
-    }
-}
-
-/// Systemd Timer Specification
-#[derive(Debug, Clone)]
-pub struct SystemdTimerSpec {
-    pub name: String,
-    pub unit_to_trigger: String,
-    pub on_calendar: Option<String>,
-    pub on_boot_sec: Option<u64>,
-    pub on_unit_active_sec: Option<u64>,
-    pub persistent: bool,
-    pub accuracy_sec: u64,
-    pub last_trigger_timestamp: u64,
-}
-
-impl SystemdTimerSpec {
-    pub fn is_triggered(
-        &self,
-        now_timestamp: u64,
-        boot_timestamp: u64,
-        unit_active_timestamp: u64,
-    ) -> bool {
-        if let Some(boot_sec) = self.on_boot_sec {
-            if now_timestamp >= boot_timestamp + boot_sec
-                && (self.last_trigger_timestamp == 0
-                    || self.last_trigger_timestamp < boot_timestamp)
-            {
-                return true;
-            }
-        }
-        if let Some(active_sec) = self.on_unit_active_sec {
-            if unit_active_timestamp > 0 && now_timestamp >= unit_active_timestamp + active_sec {
-                if now_timestamp.saturating_sub(self.last_trigger_timestamp) >= active_sec {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-}
-
-/// Systemd OnCalendar Expression Parser
-pub struct SystemdOnCalendarExpressionParser;
-
-impl SystemdOnCalendarExpressionParser {
-    pub fn parse_expression(expr: &str) -> Option<(u32, u32)> {
-        let trimmed = expr.trim();
-        if trimmed == "daily" || trimmed == "*-*-* 00:00:00" {
-            Some((0, 0)) // 00:00
-        } else if trimmed == "weekly" {
-            Some((0, 0))
-        } else if trimmed == "hourly" {
-            Some((0, 0)) // top of hour
-        } else {
-            None
-        }
     }
 }
 
@@ -2135,127 +1943,5 @@ mod tests {
         assert_eq!(pr_id, 5001);
         let diff = gateway.generate_pr_unified_diff(pr_id).unwrap();
         assert!(diff.contains("Add systemd socket activation support"));
-    }
-
-    #[test]
-    fn test_systemd_timer_spec() {
-        let timer = SystemdTimerSpec {
-            name: "backup.timer".to_string(),
-            unit_to_trigger: "backup.service".to_string(),
-            on_calendar: Some("daily".to_string()),
-            on_boot_sec: Some(300),
-            on_unit_active_sec: None,
-            persistent: true,
-            accuracy_sec: 60,
-            last_trigger_timestamp: 0,
-        };
-
-        let timer = SystemdTimerSpec {
-            name: "test.timer".to_string(),
-            unit_to_trigger: "test.service".to_string(),
-            on_calendar: None,
-            on_boot_sec: Some(300),
-            on_unit_active_sec: None,
-            persistent: false,
-            accuracy_sec: 1,
-            last_trigger_timestamp: 0,
-        };
-
-        // At timestamp 100 with boot at 0: boot timer (300s) not reached yet
-        assert!(!timer.is_triggered(100, 0, 0));
-
-        // At timestamp 350 with boot at 0: boot timer (300s) triggered
-        assert!(timer.is_triggered(350, 0, 0));
-    }
-
-    #[test]
-    fn test_openrc_dependency_solver() {
-        let mut scripts = BTreeMap::new();
-        scripts.insert(
-            "net".to_string(),
-            OpenRcHeader {
-                provide: vec!["net".to_string()],
-                need: vec![],
-                use_deps: vec![],
-                before: vec![],
-                after: vec![],
-                keywords: vec![],
-            },
-        );
-        scripts.insert(
-            "sshd".to_string(),
-            OpenRcHeader {
-                provide: vec!["sshd".to_string()],
-                need: vec!["net".to_string()],
-                use_deps: vec![],
-                before: vec![],
-                after: vec![],
-                keywords: vec![],
-            },
-        );
-
-        let order = OpenRcDependencySolverEngine::resolve_order(&scripts).unwrap();
-        assert_eq!(order, vec!["net", "sshd"]);
-
-        let mut ctrl = OpenRcStatusControllerEngine::new(OpenRcRunlevel::SysInit);
-        ctrl.transition_runlevel(OpenRcRunlevel::Default);
-        ctrl.mark_started("sshd");
-        assert!(ctrl.active_services.contains("sshd"));
-    }
-
-    #[test]
-    fn test_runit_s6_supervision_governor() {
-        let mut gov = RunitS6SupervisionTreeGovernor::new();
-        gov.scan_service_directory("/var/service", &[("syslogd", "./run"), ("crond", "./run")]);
-        assert_eq!(gov.active_services.len(), 2);
-
-        gov.process_death("syslogd");
-        assert_eq!(
-            gov.active_services.get("syslogd").unwrap().state,
-            ServiceState::Running
-        );
-
-        assert!(gov.parse_s6_readiness("syslogd", "READY=1"));
-    }
-
-    #[test]
-    fn test_sysv_and_bsd_rc_subr() {
-        let entries = vec![SysVInittabEntry {
-            id: "1".to_string(),
-            runlevels: vec!['2', '3'],
-            action: SysVAction::Respawn,
-            process: "/sbin/getty tty1".to_string(),
-        }];
-        let mut sysv = SysVinitRunlevelStateMachine::new('1', entries);
-        let matching = sysv.set_runlevel('2');
-        assert_eq!(matching.len(), 1);
-        let spawned = sysv.spawn_respawn_processes();
-        assert_eq!(spawned.len(), 1);
-        assert_eq!(spawned[0], "1");
-
-        let mut rc_conf = BTreeMap::new();
-        rc_conf.insert("sshd_enable".to_string(), "YES".to_string());
-        let bsd_rc = BsdRcSubrEngine::new(rc_conf);
-        assert!(bsd_rc.is_service_enabled("sshd"));
-    }
-
-    #[test]
-    fn test_sovereign_core_userland_init_engine() {
-        let mut engine = SovereignCoreUserlandInitEngine::new();
-        engine.register_supervised_service(
-            "cron".to_string(),
-            SupervisedService {
-                service_dir: "/etc/service/cron".to_string(),
-                run_script: "./run".to_string(),
-                finish_script: None,
-                state: ServiceState::Stopped,
-                pid: None,
-                auto_restart: true,
-                notification_fd: None,
-            },
-        );
-
-        let state = engine.dispatch_supervisor_verb("cron", SupervisorControlVerb::Up).unwrap();
-        assert_eq!(state, ServiceState::Running);
     }
 }

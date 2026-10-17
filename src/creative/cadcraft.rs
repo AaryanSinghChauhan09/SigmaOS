@@ -85,16 +85,39 @@ pub struct SketchEntity {
 }
 
 /// Geometric constraint type
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ConstraintType {
-    Coincident,
-    Parallel,
+#[derive(Debug, Clone, PartialEq)]
+pub enum GeometricConstraintType {
+    Coincident {
+        point1_idx: usize,
+        point2_idx: usize,
+    },
+    Parallel {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
     Perpendicular,
-    Concentric,
-    Tangent,
-    EqualLength,
-    Distance,
-    Angle,
+    Concentric {
+        circle1_idx: usize,
+        circle2_idx: usize,
+    },
+    Tangent {
+        line_idx: usize,
+        circle_idx: usize,
+    },
+    EqualLength {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
+    Distance {
+        point1_idx: usize,
+        point2_idx: usize,
+        target_distance: f64,
+    },
+    Angle {
+        line1_idx: usize,
+        line2_idx: usize,
+        target_angle_rad: f64,
+    },
 }
 
 pub type ConstraintType = GeometricConstraintType;
@@ -273,7 +296,11 @@ impl CadCraftEngine {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, points: Vec<[f32; 2]>) -> u32 {
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity {
             id,
@@ -355,6 +382,25 @@ impl CadCraftEngine {
         id
     }
 
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
+        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
+        let toolpath = CamToolpath {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            spindle_speed: 12000.0,
+            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F500\n"),
+        };
+        self.cam_toolpaths.insert(id, toolpath);
+        id
+    }
+
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -368,6 +414,24 @@ impl CadCraftEngine {
         };
         self.fea_meshes.insert(id, mesh);
         id
+    }
+
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        let mut output = Vec::new();
+        match format {
+            ExportFormat::DXF => {
+                output.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n");
+            }
+            ExportFormat::STEP => {
+                output.extend_from_slice(
+                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+                );
+            }
+            _ => {
+                output.extend_from_slice(b"CadCraft Export Data");
+            }
+        }
+        output
     }
 }
 
@@ -448,8 +512,7 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
-/// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
-#[derive(Debug, Clone)]
+// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
 pub struct CadCraft3dSolidModelingPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
@@ -527,8 +590,7 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
     }
 }
 
-/// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
-#[derive(Debug, Clone)]
+// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 pub struct CadCraftAssemblyFemSimulationPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
@@ -685,11 +747,8 @@ mod tests {
         let e1 = engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
         let e2 = engine.add_sketch_entity(SketchEntityType::Line, vec![[10.0, 0.0], [10.0, 10.0]]);
         let c1 = engine.add_geometric_constraint(
-            GeometricConstraintType::Perpendicular {
-                line1_idx: 0,
-                line2_idx: 1,
-            },
-            vec![e1, e2],
+            GeometricConstraintType::Perpendicular,
+            alloc::vec![e1, e2],
             90.0,
         );
 
