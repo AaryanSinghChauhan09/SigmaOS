@@ -44,6 +44,10 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
+    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
+        (allowed_mask & requested_access) == requested_access
+    }
+
     /// Evaluate SELinux access vector decision (Type Enforcement).
     pub fn evaluate_selinux_avc(
         &self,
@@ -410,13 +414,12 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
-    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, id_provider: &str) -> String {
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
-            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nrealm = {}",
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
             domain,
-            id_provider,
-            id_provider,
-            realm
+            provider,
+            uri
         )
     }
 
