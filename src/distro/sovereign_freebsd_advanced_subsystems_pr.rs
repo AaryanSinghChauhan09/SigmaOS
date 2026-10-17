@@ -312,7 +312,14 @@ impl FreeBsdRacctRctlEngine {
         }
     }
 
-    pub fn add_rule(&mut self, subj_type: &str, subj_id: &str, res: &str, act: &str, limit: u64) {
+    pub fn add_rule(
+        &mut self,
+        subj_type: &str,
+        subj_id: &str,
+        res: &str,
+        act: &str,
+        limit: u64,
+    ) {
         self.active_rules.push(RctlRule {
             subject_type: subj_type.to_string(),
             subject_id: subj_id.to_string(),
@@ -322,20 +329,11 @@ impl FreeBsdRacctRctlEngine {
         });
     }
 
-    pub fn check_resource_limit(
-        &self,
-        subj_type: &str,
-        subj_id: &str,
-        res: &str,
-        attempted: u64,
-    ) -> bool {
+    pub fn check_resource_limit(&self, subj_type: &str, subj_id: &str, res: &str, attempted: u64) -> bool {
         let key = format!("{}:{}:{}", subj_type, subj_id, res);
         let current = self.usage_metrics.get(&key).cloned().unwrap_or(0);
         for rule in &self.active_rules {
-            if rule.subject_type == subj_type
-                && rule.subject_id == subj_id
-                && rule.resource_name == res
-            {
+            if rule.subject_type == subj_type && rule.subject_id == subj_id && rule.resource_name == res {
                 if current + attempted > rule.threshold_limit {
                     return false;
                 }
@@ -474,8 +472,7 @@ impl FreeBsdKldSysctlManagerEngine {
     }
 
     pub fn set_sysctl(&mut self, key: &str, val: &str) {
-        self.sysctl_mib_tree
-            .insert(key.to_string(), val.to_string());
+        self.sysctl_mib_tree.insert(key.to_string(), val.to_string());
     }
 }
 
@@ -750,66 +747,16 @@ impl SovereignFreeBsdAdvancedSubsystemsPrGateway {
 
     fn init_proposals(&mut self) {
         let proposals = vec![
-            (
-                "FBSD-ADV-1001",
-                "OpenBSM auditdistd TLS Distributed Audit Trail Stream",
-                "Security & Audit",
-                "DILITHIUM5_SIG_AUDITDISTD_1001",
-            ),
-            (
-                "FBSD-ADV-1002",
-                "GEOM Journal SU+J & geom_raid Software RAID Subsystem",
-                "Storage & File Systems",
-                "DILITHIUM5_SIG_GEOM_RAID_1002",
-            ),
-            (
-                "FBSD-ADV-1003",
-                "lagg LACP Link Aggregation & if_bridge 802.1D RSTP Engine",
-                "Networking Stack",
-                "DILITHIUM5_SIG_LAGG_BRIDGE_1003",
-            ),
-            (
-                "FBSD-ADV-1004",
-                "RACCT Kernel Accounting & RCTL Resource Capping Rules",
-                "Kernel & Jail Governance",
-                "DILITHIUM5_SIG_RACCT_RCTL_1004",
-            ),
-            (
-                "FBSD-ADV-1005",
-                "FreeBSD OSS /dev/dsp Sound Subsystem & virtual_oss Mixer",
-                "Multimedia & Audio",
-                "DILITHIUM5_SIG_OSS_AUDIO_1005",
-            ),
-            (
-                "FBSD-ADV-1006",
-                "kldload Relocating Linker & Dynamic sysctl MIB Tree Navigator",
-                "Kernel & Modules",
-                "DILITHIUM5_SIG_KLD_SYSCTL_1006",
-            ),
-            (
-                "FBSD-ADV-1007",
-                "rc.d Init Dependency Topological Graph Solver",
-                "Userland & Init",
-                "DILITHIUM5_SIG_RCD_SOLVER_1007",
-            ),
-            (
-                "FBSD-ADV-1008",
-                "devmatch Automated Device-to-Driver Matching Engine",
-                "Drivers & Bus",
-                "DILITHIUM5_SIG_DEVMATCH_1008",
-            ),
-            (
-                "FBSD-ADV-1009",
-                "freebsd-update Binary Patch Engine & Ports Options Parser",
-                "System Package Management",
-                "DILITHIUM5_SIG_UPDATE_PORTS_1009",
-            ),
-            (
-                "FBSD-ADV-1010",
-                "gstat/iostat/vmstat Storage & Virtual Memory Metrics Profiler",
-                "Diagnostics & Metrics",
-                "DILITHIUM5_SIG_METRICS_MONITOR_1010",
-            ),
+            ("FBSD-ADV-1001", "OpenBSM auditdistd TLS Distributed Audit Trail Stream", "Security & Audit", "DILITHIUM5_SIG_AUDITDISTD_1001"),
+            ("FBSD-ADV-1002", "GEOM Journal SU+J & geom_raid Software RAID Subsystem", "Storage & File Systems", "DILITHIUM5_SIG_GEOM_RAID_1002"),
+            ("FBSD-ADV-1003", "lagg LACP Link Aggregation & if_bridge 802.1D RSTP Engine", "Networking Stack", "DILITHIUM5_SIG_LAGG_BRIDGE_1003"),
+            ("FBSD-ADV-1004", "RACCT Kernel Accounting & RCTL Resource Capping Rules", "Kernel & Jail Governance", "DILITHIUM5_SIG_RACCT_RCTL_1004"),
+            ("FBSD-ADV-1005", "FreeBSD OSS /dev/dsp Sound Subsystem & virtual_oss Mixer", "Multimedia & Audio", "DILITHIUM5_SIG_OSS_AUDIO_1005"),
+            ("FBSD-ADV-1006", "kldload Relocating Linker & Dynamic sysctl MIB Tree Navigator", "Kernel & Modules", "DILITHIUM5_SIG_KLD_SYSCTL_1006"),
+            ("FBSD-ADV-1007", "rc.d Init Dependency Topological Graph Solver", "Userland & Init", "DILITHIUM5_SIG_RCD_SOLVER_1007"),
+            ("FBSD-ADV-1008", "devmatch Automated Device-to-Driver Matching Engine", "Drivers & Bus", "DILITHIUM5_SIG_DEVMATCH_1008"),
+            ("FBSD-ADV-1009", "freebsd-update Binary Patch Engine & Ports Options Parser", "System Package Management", "DILITHIUM5_SIG_UPDATE_PORTS_1009"),
+            ("FBSD-ADV-1010", "gstat/iostat/vmstat Storage & Virtual Memory Metrics Profiler", "Diagnostics & Metrics", "DILITHIUM5_SIG_METRICS_MONITOR_1010"),
         ];
 
         for (id, title, sub, sig) in proposals {
@@ -825,8 +772,7 @@ impl SovereignFreeBsdAdvancedSubsystemsPrGateway {
     }
 
     pub fn execute_full_verification(&mut self) -> bool {
-        self.auditdistd_engine
-            .append_audit_trail("audit_record_001");
+        self.auditdistd_engine.append_audit_trail("audit_record_001");
         self.auditdistd_engine.sync_stream("audit-primary");
 
         self.geom_raid_engine.create_raid_volume(
@@ -836,31 +782,25 @@ impl SovereignFreeBsdAdvancedSubsystemsPrGateway {
             true,
         );
 
-        self.lagg_bridge_engine
-            .create_lagg("lagg1", LaggProtocol::Failover, vec!["igb2", "igb3"]);
-
-        self.racct_rctl_engine
-            .add_rule("user", "1000", "maxproc", "deny", 500);
-        let allowed = self.racct_rctl_engine.check_resource_limit(
-            "jail",
-            "web_jail",
-            "memoryuse",
-            100 * 1024 * 1024,
+        self.lagg_bridge_engine.create_lagg(
+            "lagg1",
+            LaggProtocol::Failover,
+            vec!["igb2", "igb3"],
         );
+
+        self.racct_rctl_engine.add_rule("user", "1000", "maxproc", "deny", 500);
+        let allowed = self.racct_rctl_engine.check_resource_limit("jail", "web_jail", "memoryuse", 100 * 1024 * 1024);
 
         let dsp = self.oss_audio_engine.register_dsp_channel(44100, 16, 2);
 
         let kld = self.kld_sysctl_engine.kldload("zfs.ko");
-        self.kld_sysctl_engine
-            .set_sysctl("vfs.zfs.arc_max", "8589934592");
+        self.kld_sysctl_engine.set_sysctl("vfs.zfs.arc_max", "8589934592");
 
         let order = self.rcd_solver_engine.solve_start_order();
 
         let mat = self.devmatch_engine.match_device("pci:v00008086d000010D3");
 
-        let configured = self
-            .update_ports_engine
-            .configure_port_option("net/curl", "HTTP2", true);
+        let configured = self.update_ports_engine.configure_port_option("net/curl", "HTTP2", true);
 
         let metrics = self.metrics_engine.capture_metrics();
 
@@ -891,25 +831,13 @@ mod tests {
         let len = engine.append_audit_trail("USER_LOGIN uid=1000");
         assert_eq!(len, 1);
         assert!(engine.sync_stream("audit-primary"));
-        assert_eq!(
-            engine
-                .remote_hosts
-                .get("audit-primary")
-                .unwrap()
-                .queued_audit_records,
-            0
-        );
+        assert_eq!(engine.remote_hosts.get("audit-primary").unwrap().queued_audit_records, 0);
     }
 
     #[test]
     fn test_geom_raid_engine() {
         let mut geom = FreeBsdGeomJournalRaidEngine::new();
-        let raid = geom.create_raid_volume(
-            "mirror0",
-            GeomRaidLevel::Raid1,
-            vec!["/dev/ada0", "/dev/ada1"],
-            true,
-        );
+        let raid = geom.create_raid_volume("mirror0", GeomRaidLevel::Raid1, vec!["/dev/ada0", "/dev/ada1"], true);
         assert_eq!(raid.member_providers.len(), 2);
         assert!(raid.journal_enabled);
     }
@@ -966,10 +894,7 @@ mod tests {
     fn test_update_ports_config() {
         let mut ports = FreeBsdUpdatePortsConfigEngine::new();
         assert!(ports.configure_port_option("net/curl", "HTTP2", false));
-        assert_eq!(
-            ports.port_options.get("net/curl").unwrap()[1].user_value,
-            false
-        );
+        assert_eq!(ports.port_options.get("net/curl").unwrap()[1].user_value, false);
     }
 
     #[test]
