@@ -127,8 +127,8 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// Presenter view state
-#[derive(Debug, Clone, Default)]
+/// Presenter state during presentation
+#[derive(Debug, Clone)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,
@@ -250,7 +250,7 @@ impl SlideExporterEngine {
                 output.extend_from_slice(b"</div></div></body></html>");
             }
             ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_PRESENTATION_SLIDES:");
+                output.extend_from_slice(b"ZENITH_PRESENTATION_HEADER:");
                 output.extend_from_slice(deck.title.as_bytes());
             }
             ExportFormat::Markdown => {

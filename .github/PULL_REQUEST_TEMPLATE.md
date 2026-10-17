@@ -24,10 +24,12 @@
 
 ## Shell component
 
-- [ ] Interactive shell
-- [ ] Parser & grammar
-- [ ] Builtin commands
-- [ ] Scripting engine
+- [ ] Lexer / Parser
+- [ ] Interpreter / AST
+- [ ] Builtin applet
+- [ ] Interactive REPL
+- [ ] Redirection / Pipe
+- [ ] Job control
 
 ## Component
 
@@ -50,7 +52,7 @@
 
 ## Shell component
 
-- Study document:
+- Upstream study:
 - Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
@@ -110,15 +112,13 @@
 
 ## Shell safety review
 
-- [ ] Quoting integrity
-- [ ] Redirection safety
 - [ ] Deterministic script execution
+- [ ] Explicit exit status on error
+- [ ] Quoting and globbing expansion verified
+- [ ] No partial execution on parse error
+- [ ] Signal handling and redirection safe
 
 ## Reviewer checklist
-
-- [ ] Reviewer checklist completed
-
-## Evidence
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
