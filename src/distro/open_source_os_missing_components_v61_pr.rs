@@ -547,16 +547,23 @@ impl SovereignOpenSourceOsMissingComponentsV61PrSuite {
     }
 
     pub fn execute_and_verify_all(&mut self) -> bool {
-        let msg1 = self.landlock_v8.restrict_io_uring_and_net(9090, 0x01FF_0000);
+        let msg1 = self
+            .landlock_v8
+            .restrict_io_uring_and_net(9090, 0x01FF_0000);
         assert!(msg1.contains("9090"));
 
-        let msg2 = self.freebsd_vnet.create_vnet_jail_and_be("web_jail", "v61_release");
+        let msg2 = self
+            .freebsd_vnet
+            .create_vnet_jail_and_be("web_jail", "v61_release");
         assert!(msg2.contains("web_jail"));
 
         assert!(self.openbsd_fine_ibt.unveil_path("/tmp", "rwc"));
         assert!(self.openbsd_fine_ibt.validate_fine_ibt_call(0x1000));
 
-        assert!(self.hammer2_pfs.sync_pfs_replication("pfs_slave").contains("pfs_slave"));
+        assert!(self
+            .hammer2_pfs
+            .sync_pfs_replication("pfs_slave")
+            .contains("pfs_slave"));
         assert!(self
             .portage_eapi11
             .rebuild_subslot_with_pqc("sys-libs/zlib", "1.3")
@@ -570,7 +577,10 @@ impl SovereignOpenSourceOsMissingComponentsV61PrSuite {
             .nix_guix_v61
             .evaluate_flake_v61("github:SigmaOS/v61", "hash61")
             .contains("hash61"));
-        assert!(self.npf_jit_v61.compile_ruleset_v61(100).contains("BPF JIT bytecode"));
+        assert!(self
+            .npf_jit_v61
+            .compile_ruleset_v61(100)
+            .contains("BPF JIT bytecode"));
         assert!(self
             .clear_autotuning
             .set_profile_v61("performance_v61")
