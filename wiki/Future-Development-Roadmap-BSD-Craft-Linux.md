@@ -200,7 +200,6 @@ Below is the verified, standalone `#![no_std]` Rust implementation demonstrating
 #![no_std]
 extern crate alloc;
 
-use alloc::string::String;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
