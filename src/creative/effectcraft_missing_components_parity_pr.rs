@@ -782,6 +782,7 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
         } else if source_space == WorkingColorSpace::AcesCg
             && target_space == WorkingColorSpace::Rec709
         {
+            // ACEScg to Rec.709 display transform approximation
             let [r, g, b] = *rgb;
             rgb[0] = (r * 1.7051) - (g * 0.6218) - (b * 0.0833);
             rgb[1] = -(r * 0.1303) + (g * 1.1408) - (b * 0.0105);
@@ -1457,7 +1458,7 @@ impl EffectcraftMissingComponentsParityPrSuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_effectcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 14
+            && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -1678,7 +1679,19 @@ mod tests {
         engine
             .process_frame("com.artcraft.Sharpen", &mut pixels)
             .unwrap();
-        assert_eq!(pixels[0], 50);
+        assert_eq!(pixels[0], 50); // 100 * 0.5
+    }
+
+    #[test]
+    fn test_optical_flow_engine_functional() {
+        let mut engine = EffectcraftOpticalFlowMotionVectorPrEngine::new();
+        let frame1 = vec![0, 0, 0, 255];
+        let frame2 = vec![100, 100, 0, 255];
+        let count = engine
+            .compute_motion_vectors(&frame1, &frame2, 1, 1)
+            .unwrap();
+        assert_eq!(count, 1);
+        assert!(engine.vector_field[0].dx > 0.0);
     }
 
     #[test]

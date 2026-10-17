@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-#![no_std]
-
 //! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
 //!
 //! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
@@ -1268,6 +1266,18 @@ impl LaunchdJobSupervisorEngine {
             if job.keep_alive {
                 let mock_pid = 5000 + label.len() as u32;
                 self.running_pids.insert(label.to_string(), mock_pid);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
+            } else {
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
+            }
+        }
+    }
+
+    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
+        for job in self.jobs.values() {
+            if job.mach_services.contains(&mach_service.to_string()) {
                 self.job_states
                     .insert(label.to_string(), ServiceState::Running);
             } else {

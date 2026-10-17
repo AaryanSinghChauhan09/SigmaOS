@@ -195,6 +195,18 @@ impl SlideDeck {
 
 pub type PresentationDeck = SlideDeck;
 
+/// Presenter mode state tracking
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u64,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
+
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
@@ -207,25 +219,6 @@ pub enum ExportFormat {
 }
 
 pub type DeckExportFormat = ExportFormat;
-pub type PresentationDeck = SlideDeck;
-
-impl SlideDeck {
-    pub fn get_active_slide(&self) -> Option<&Slide> {
-        self.slides.first()
-    }
-}
-
-/// Presenter view state tracking active deck and timer
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
 
 /// Slide Exporter Engine
 pub struct SlideExporterEngine;
@@ -283,10 +276,9 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
-            ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\"><text>");
+            DeckExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_DECK_PRESET_V1\n");
                 output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"</text></svg>");
             }
         }
 
