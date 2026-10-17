@@ -175,6 +175,7 @@
 ---
 
 ## 📚 Maintenance, Governance & Architecture
+- [Future Development Roadmap: BSD, Linux & Craft Ecosystem](./Future-Development-Roadmap-BSD-Craft-Linux.md) &ndash; Strategic roadmap integrating DragonFly/Free/OpenBSD, Arch/Cachy/Debian Linux, and the 21-pillar Sovereign Craft suite.
 - [AI Development Agent Operating Manual](./AI-Development-Agent-Operating-Manual.md) &ndash; Binding 5-step operational lifecycle, branch & PR merging via 'Theirs', and OOPS/SOLID programming principles.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.
 - [Contributing Guidelines](./CONTRIBUTING.md) &ndash; Submitting patches, test requirements, and coding conventions.
