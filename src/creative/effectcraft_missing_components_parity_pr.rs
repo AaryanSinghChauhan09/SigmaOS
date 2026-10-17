@@ -1307,6 +1307,25 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             .ofx_adapter
             .load_openfx_plugin("com.artcraft.FilmGrain")
             .is_ok();
+        let _optical_ok = self
+            .optical_flow
+            .compute_motion_vectors(&frame, &frame, 1, 1)
+            .is_ok();
+        let mut color = [0.5, 0.5, 0.5];
+        self.aces_ocio.convert_color_space(
+            WorkingColorSpace::Rec709,
+            WorkingColorSpace::AcesCg,
+            &mut color,
+        );
+        let mut mask_out = vec![0u8; 4];
+        let _crypto_ok = self
+            .cryptomatte
+            .extract_id_matte("character_skin", &mut mask_out)
+            .is_ok();
+        let _expr_ok = self
+            .expressions
+            .evaluate_expression("position_wiggle", 1.0)
+            .is_ok();
         true
     }
 

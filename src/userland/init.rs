@@ -2,13 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway
-//!
-//! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-//! - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-//! - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-//! - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
-
+#![no_std]
 extern crate alloc;
 
 use alloc::collections::{BTreeMap, BTreeSet};
@@ -748,6 +742,22 @@ impl OpenRcStatusControllerEngine {
         }
     }
 
+    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
+        self.current_runlevel = target;
+    }
+
+    pub fn mark_started(&mut self, service_name: &str) {
+        self.active_services.insert(service_name.to_string());
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Running);
+    }
+
+    pub fn mark_stopped(&mut self, service_name: &str) {
+        self.active_services.remove(service_name);
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Stopped);
+    }
+
     pub fn update_status(&mut self, service: String, state: ServiceState) {
         self.service_statuses.insert(service, state);
     }
@@ -1347,6 +1357,18 @@ impl LaunchdJobSupervisorEngine {
             }
         }
     }
+
+    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
+        for job in self.jobs.values() {
+            if job.mach_services.contains(&mach_service.to_string()) {
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
+            } else {
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
+            }
+        }
+    }
 }
 
 pub type LaunchdJobSupervisorSpecEngine = LaunchdJobSupervisorEngine;
@@ -1478,28 +1500,6 @@ impl AtSpoolQueueManager {
 
         self.queued_jobs = pending;
         ready
-    }
-}
-
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job.clone());
-        self.queued_jobs.push(job);
-        id
     }
 }
 
@@ -1987,7 +1987,14 @@ impl UserlandInitPrGatewayEngine {
     pub fn generate_pr_unified_diff(&self, pr_id: u64) -> Option<String> {
         if let Some(pr) = self.submissions.get(&pr_id) {
             Some(format!(
-                "--- a/userland/init/{}.conf\n+++ b/userland/init/{}.conf\n@@ -1,3 +1,5 @@\n+# PR #{}: {}\n+# Author: {}\n[Init]\nEngine={}\n",
+                "--- a/userland/init/{}.conf
++++ b/userland/init/{}.conf
+@@ -1,3 +1,5 @@
++# PR #{}: {}
++# Author: {}
++[Init]
++Engine={}
+",
                 pr.target_subsystem,
                 pr.target_subsystem,
                 pr.pr_id,
@@ -2400,7 +2407,7 @@ mod tests {
         assert_eq!(matching.len(), 1);
         let spawned = sysv.spawn_respawn_processes();
         assert_eq!(spawned.len(), 1);
-        assert_eq!(spawned[0], "1");
+        assert_eq!(spawned[0].id, "1");
 
         let mut rc_conf = BTreeMap::new();
         rc_conf.insert("sshd_enable".to_string(), "YES".to_string());
@@ -2443,7 +2450,7 @@ mod tests {
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let gw = UserlandInitPrGatewayEngine::new(
+        let gw = UserlandInitCleanRoomPrGatewayEngine::new(
             4001,
             "feat(init): Complete Init Parity",
             "SovereignAgent",

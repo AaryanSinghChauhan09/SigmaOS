@@ -85,48 +85,18 @@ pub struct SketchEntity {
 }
 
 /// Geometric constraint type
-#[derive(Debug, Clone, PartialEq)]
-pub enum GeometricConstraintType {
-    Coincident {
-        point1_idx: usize,
-        point2_idx: usize,
-    },
-    Parallel {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Perpendicular {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Concentric {
-        circle1_idx: usize,
-        circle2_idx: usize,
-    },
-    Tangent {
-        line_idx: usize,
-        circle_idx: usize,
-    },
-    EqualLength {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Distance {
-        point1_idx: usize,
-        point2_idx: usize,
-        target_distance: f64,
-    },
-    Angle {
-        line1_idx: usize,
-        line2_idx: usize,
-        target_angle_rad: f64,
-    },
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConstraintType {
+    Coincident,
+    Parallel,
+    Perpendicular,
+    Concentric,
+    Tangent,
+    EqualLength,
+    Distance,
+    Angle,
 }
 
-pub type ConstraintType = GeometricConstraintType;
-
-/// Geometric constraint
-#[derive(Debug, Clone)]
 pub struct GeometricConstraint {
     pub id: u32,
     pub constraint_type: GeometricConstraintType,
@@ -427,37 +397,6 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
-        let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
-        let mesh = FeaMesh {
-            id,
-            toolpath_type,
-            tool_diameter,
-            feed_rate,
-            spindle_speed: 12000.0,
-            gcode_output: "G00 Z5.0\nG01 Z-2.0 F500\n".to_string(),
-        };
-        self.cam_toolpaths.insert(id, toolpath);
-        id
-    }
-
-    pub fn add_sketch_entity(
-        &mut self,
-        entity_type: SketchEntityType,
-        points: Vec<[f32; 2]>,
-    ) -> u32 {
-        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
-        let entity = SketchEntity {
-            id,
-            entity_type,
-            points,
-            dimensions: Vec::new(),
-            properties: BTreeMap::new(),
-        };
-        self.sketch_entities.insert(id, entity);
-        id
-    }
-
     pub fn generate_cam_toolpath(
         &mut self,
         toolpath_type: CamToolpathType,
@@ -471,188 +410,11 @@ impl CadCraftEngine {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: String::from("G0 X0 Y0 Z5\nG1 Z-2 F100\nM30"),
+            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F500\n"),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
     }
-
-    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut data = Vec::new();
-        match format {
-            ExportFormat::DXF => {
-                data.extend_from_slice(b"SECTION HEADER ENDSEC SECTION ENTITIES ENDSEC EOF")
-            }
-            ExportFormat::STEP => data.extend_from_slice(
-                b"ISO-10303-21; HEADER; ENDSEC; DATA; ENDSEC; END-ISO-10303-21;",
-            ),
-            _ => data.extend_from_slice(b"CADCRAFT_SOLID_EXPORT"),
-        }
-        data
-    }
-}
-
-impl Default for CadCraftEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// Global CadCraft Instance
-static mut CADCRAFT: Option<CadCraftEngine> = None;
-
-pub fn init_cadcraft() {
-    unsafe {
-        CADCRAFT = Some(CadCraftEngine::new());
-    }
-}
-
-pub fn get_cadcraft() -> Option<&'static mut CadCraftEngine> {
-    unsafe { CADCRAFT.as_mut() }
-}
-
-// ============================================================================
-// 2D Parametric Sketching Engine
-// ============================================================================
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Point2D {
-    pub x: f64,
-    pub y: f64,
-}
-
-/// Geometric constraint type
-#[derive(Debug, Clone, PartialEq)]
-pub enum GeometricConstraintType {
-    Coincident {
-        point1_idx: usize,
-        point2_idx: usize,
-    },
-    Parallel {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Perpendicular {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Concentric {
-        circle1_idx: usize,
-        circle2_idx: usize,
-    },
-    Tangent {
-        line_idx: usize,
-        circle_idx: usize,
-    },
-    EqualLength {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Distance {
-        point1_idx: usize,
-        point2_idx: usize,
-        target_distance: f64,
-    },
-    Angle {
-        line1_idx: usize,
-        line2_idx: usize,
-        target_angle_rad: f64,
-    },
-}
-
-/// 2D Line entity
-#[derive(Debug, Clone, PartialEq)]
-pub struct Line2D {
-    pub start: Point2D,
-    pub end: Point2D,
-}
-
-impl Line2D {
-    pub fn length(&self) -> f64 {
-        let dx = self.end.x - self.start.x;
-        let dy = self.end.y - self.start.y;
-        (dx * dx + dy * dy).sqrt()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Circle2D {
-    pub center: Point2D,
-    pub radius: f64,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub enum Sketch2DEntity {
-    Point(Point2D),
-    Line(Line2D),
-    Circle(Circle2D),
-}
-
-#[derive(Debug, Clone)]
-pub struct ParametricSketch2D {
-    pub name: String,
-    pub entities: Vec<Sketch2DEntity>,
-    pub constraints: Vec<GeometricConstraintType>,
-    pub solved: bool,
-}
-
-impl ParametricSketch2D {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            entities: Vec::new(),
-            constraints: Vec::new(),
-            solved: false,
-        }
-    }
-
-    pub fn add_point(&mut self, x: f64, y: f64) -> usize {
-        self.entities.push(Sketch2DEntity::Point(Point2D { x, y }));
-        self.entities.len() - 1
-    }
-
-    pub fn add_line(&mut self, start_x: f64, start_y: f64, end_x: f64, end_y: f64) -> usize {
-        self.entities.push(Sketch2DEntity::Line(Line2D {
-            start: Point2D { x: start_x, y: start_y },
-            end: Point2D { x: end_x, y: end_y },
-        }));
-        self.entities.len() - 1
-    }
-
-    pub fn add_circle(&mut self, center_x: f64, center_y: f64, radius: f64) -> usize {
-        self.entities.push(SketchEntity::Circle(Circle2D {
-            center: Point2D {
-                x: center_x,
-                y: center_y,
-            },
-            radius,
-        }));
-        self.entities.len() - 1
-    }
-
-    pub fn add_constraint(&mut self, constraint: GeometricConstraintType) {
-        self.constraints.push(constraint);
-    }
-
-    pub fn solve_constraints(&mut self) -> bool {
-        let max_iterations = 50;
-        let tolerance = 1e-6;
-
-        for _ in 0..max_iterations {
-            let mut max_error = 0.0f64;
-
-            for constraint in &self.constraints {
-                match constraint {
-                    GeometricConstraintType::Distance {
-                        point1_idx,
-                        point2_idx,
-                        target_distance,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
 
                         let dx = p2.x - p1.x;
                         let dy = p2.y - p1.y;
@@ -662,80 +424,18 @@ impl ParametricSketch2D {
                             max_error = error;
                         }
 
-                        if current_dist > 1e-9 {
-                            let factor = 0.5 * (1.0 - target_distance / current_dist);
-                            let shift_x = dx * factor;
-                            let shift_y = dy * factor;
-
-                            if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                                p.x += shift_x;
-                                p.y += shift_y;
-                            }
-                            if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                                p.x -= shift_x;
-                                p.y -= shift_y;
-                            }
-                        }
-                    }
-                    GeometricConstraintType::Coincident {
-                        point1_idx,
-                        point2_idx,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
-                        let dx = (p2.x - p1.x).abs();
-                        let dy = (p2.y - p1.y).abs();
-                        let error = dx.max(dy);
-                        if error > max_error {
-                            max_error = error;
-                        }
-
-                        let mid_x = (p1.x + p2.x) * 0.5;
-                        let mid_y = (p1.y + p2.y) * 0.5;
-
-                        if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                        if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                    }
-                    GeometricConstraintType::EqualLength {
-                        line1_idx,
-                        line2_idx,
-                    } => {
-                        let len1 = match &self.entities[*line1_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-                        let len2 = match &self.entities[*line2_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-
-                        let error = (len1 - len2).abs();
-                        if error > max_error {
-                            max_error = error;
-                        }
-                    }
-                    _ => {}
-                }
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        let mut output = Vec::new();
+        match format {
+            ExportFormat::DXF => {
+                output.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n")
             }
-
-            if max_error < tolerance {
-                self.solved = true;
-                return true;
-            }
+            ExportFormat::STEP => output.extend_from_slice(
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+            ),
+            _ => output.extend_from_slice(b"# CadCraft Export Data\n"),
         }
-
-        self.solved = true;
-        true
+        output
     }
 }
 
