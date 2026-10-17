@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS Filmcraft Missing Components Parity PR Proposal Engine
+// SigmaOS - Filmcraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/filmcraft_missing_components_parity_pr.rs`)
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft FilmCraft
