@@ -118,18 +118,6 @@ pub struct SlideAnimation {
     pub order: u32,
 }
 
-/// Presenter view state
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u64,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
-
 /// Speaker notes for presenter view
 #[derive(Debug, Clone)]
 pub struct PresenterNotes {
@@ -139,14 +127,14 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// Presenter state for presentation mode
+/// Presenter view state
 #[derive(Debug, Clone, Default)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,
     pub in_presenter_mode: bool,
     pub timer_running: bool,
-    pub elapsed_secs: u32,
+    pub elapsed_secs: u64,
     pub laser_pointer_active: bool,
     pub black_screen: bool,
 }
@@ -200,12 +188,6 @@ pub struct SlideDeck {
 }
 
 pub type PresentationDeck = SlideDeck;
-
-impl SlideDeck {
-    pub fn get_active_slide(&self) -> Option<&Slide> {
-        self.slides.first()
-    }
-}
 
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

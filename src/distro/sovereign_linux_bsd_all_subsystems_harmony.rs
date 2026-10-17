@@ -45,6 +45,8 @@ pub enum LinuxBsdDistroInspiration {
     HaikuOS,
     QubesOS,
     WhonixOS,
+    OmarchyLinux,
+    BlackArchLinux,
 }
 
 impl LinuxBsdDistroInspiration {
@@ -86,6 +88,8 @@ impl LinuxBsdDistroInspiration {
             Self::HaikuOS => "HaikuOS",
             Self::QubesOS => "QubesOS",
             Self::WhonixOS => "WhonixOS",
+            Self::OmarchyLinux => "OmarchyLinux",
+            Self::BlackArchLinux => "BlackArchLinux",
         }
     }
 }
@@ -124,6 +128,19 @@ pub enum SigmaOsSubsystem {
     CryptographySecurity,
     TelemetryObservability,
     AccessibilityInput,
+    StorageDrive,
+    BluetoothWireless,
+    ThermalCooling,
+    PrintingSpooler,
+    RecoveryBackup,
+    RemoteAccess,
+    ProductivityApplications,
+    DatabaseEmbedded,
+    RoboticsHardware,
+    RealTimeExtension,
+    UserlandPersona,
+    FirmwareMicrocode,
+    NetworkSecurityFirewall,
 }
 
 impl SigmaOsSubsystem {
@@ -160,6 +177,19 @@ impl SigmaOsSubsystem {
             Self::CryptographySecurity => "CryptographySecurity",
             Self::TelemetryObservability => "TelemetryObservability",
             Self::AccessibilityInput => "AccessibilityInput",
+            Self::StorageDrive => "StorageDrive",
+            Self::BluetoothWireless => "BluetoothWireless",
+            Self::ThermalCooling => "ThermalCooling",
+            Self::PrintingSpooler => "PrintingSpooler",
+            Self::RecoveryBackup => "RecoveryBackup",
+            Self::RemoteAccess => "RemoteAccess",
+            Self::ProductivityApplications => "ProductivityApplications",
+            Self::DatabaseEmbedded => "DatabaseEmbedded",
+            Self::RoboticsHardware => "RoboticsHardware",
+            Self::RealTimeExtension => "RealTimeExtension",
+            Self::UserlandPersona => "UserlandPersona",
+            Self::FirmwareMicrocode => "FirmwareMicrocode",
+            Self::NetworkSecurityFirewall => "NetworkSecurityFirewall",
         }
     }
 }
@@ -518,6 +548,58 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     "Braille_Display",
                 ],
             ),
+            (
+                SigmaOsSubsystem::StorageDrive,
+                vec!["NVMe_oF", "SCSI_Target", "SATA_AHCI", "iSCSI_Initiator"],
+            ),
+            (
+                SigmaOsSubsystem::BluetoothWireless,
+                vec!["BlueZ_5", "FreeBSD_Netgraph_Bluetooth", "PQC_Bluetooth_Mesh"],
+            ),
+            (
+                SigmaOsSubsystem::ThermalCooling,
+                vec!["Intel_powerclamp", "thermald", "FreeBSD_acpi_thermal"],
+            ),
+            (
+                SigmaOsSubsystem::PrintingSpooler,
+                vec!["CUPS_IPP", "LPRng", "Ghostscript_Rasterizer"],
+            ),
+            (
+                SigmaOsSubsystem::RecoveryBackup,
+                vec!["BorgBackup", "Restic", "ZFS_Send_Recv", "Timeshift_Btrfs"],
+            ),
+            (
+                SigmaOsSubsystem::RemoteAccess,
+                vec!["OpenSSH_PQC", "WireGuard", "FreeRDP", "VNC_Tiger"],
+            ),
+            (
+                SigmaOsSubsystem::ProductivityApplications,
+                vec!["LibreOffice", "WordCraft", "GridCraft", "DeckCraft"],
+            ),
+            (
+                SigmaOsSubsystem::DatabaseEmbedded,
+                vec!["SQLite3", "DuckDB", "RocksDB", "LMDB"],
+            ),
+            (
+                SigmaOsSubsystem::RoboticsHardware,
+                vec!["ROS2_Humble", "CANbus_SocketCAN", "MicroROS_Serial"],
+            ),
+            (
+                SigmaOsSubsystem::RealTimeExtension,
+                vec!["PREEMPT_RT", "Xenomai_Cobalt", "NuttX_POSIX"],
+            ),
+            (
+                SigmaOsSubsystem::UserlandPersona,
+                vec!["GNU_Coreutils", "BSD_Userland", "BusyBox", "uutils_rust"],
+            ),
+            (
+                SigmaOsSubsystem::FirmwareMicrocode,
+                vec!["Fwupd_LVFS", "Intel_Microcode", "AMD_Ucode", "OpenSBI"],
+            ),
+            (
+                SigmaOsSubsystem::NetworkSecurityFirewall,
+                vec!["pf_OpenBSD", "nftables_Linux", "IPFW_FreeBSD", "NPF_NetBSD"],
+            ),
         ];
 
         for (sub, caps) in subsystems_list {
@@ -689,6 +771,19 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 enforce_strict_isolation: strict,
             });
         }
+    }
+
+    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+        self.audit_all_subsystems_distro_compliance_summary()
+    }
+
+    pub fn translate_subsystem_payload(
+        &self,
+        source_distro: LinuxBsdDistroInspiration,
+        target_distro: LinuxBsdDistroInspiration,
+        payload: &str,
+    ) -> String {
+        self.translate_cross_distro_payload_direct(source_distro, target_distro, payload)
     }
 
     pub fn translate_vfs_path(&self, distro: LinuxBsdDistroInspiration, path: &str) -> String {
@@ -1061,7 +1156,7 @@ mod tests {
     #[test]
     fn test_harmony_engine_initialization_and_verification() {
         let engine = SovereignSubsystemDistroHarmonyEngine::new();
-        assert_eq!(engine.subsystems.len(), 31);
+        assert_eq!(engine.subsystems.len(), 44);
         assert!(engine.verify_all_subsystems_compatibility_matrix());
         assert_eq!(engine.compute_harmony_index(), 100);
     }
@@ -1102,7 +1197,7 @@ mod tests {
         let count = engine
             .harmonize_all_subsystems_and_distros()
             .expect("Harmonization should succeed");
-        assert_eq!(count, 31 * 30);
+        assert_eq!(count, 44 * 43);
         assert_eq!(engine.compute_harmony_index(), 100);
     }
 
@@ -1213,7 +1308,7 @@ mod tests {
         );
 
         let (audits, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 31);
+        assert_eq!(audits.len(), 44);
         assert_eq!(score, 100);
         for (_, compliant) in audits {
             assert!(compliant);
@@ -1249,7 +1344,7 @@ mod tests {
         );
 
         let (audit_map, score) = orchestrator.audit_all_subsystems_distro_compliance();
-        assert_eq!(audit_map.len(), 31);
+        assert_eq!(audit_map.len(), 44);
         assert_eq!(score, 100);
         assert!(audit_map.values().all(|&v| v));
     }
