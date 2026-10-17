@@ -55,9 +55,21 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
-    // Reject URL-encoded path traversal sequences (%2e%2e, %2f, %5c)
+    // Reject URL-encoded and double-URL-encoded path traversal sequences (%2e, %2f, %5c, %25...)
     // to prevent parser differential / decoding bypass attacks (CWE-22).
-    if path.windows(6).any(|w| {
+    if path.windows(5).any(|w| {
+        // Double URL-encoded separators or dots (%252e, %252E, %252f, %252F, %255c, %255C)
+        w[0] == b'%'
+            && w[1] == b'2'
+            && w[2] == b'5'
+            && ((w[3] == b'2' && (w[4] == b'e' || w[4] == b'E' || w[4] == b'f' || w[4] == b'F'))
+                || (w[3] == b'5' && (w[4] == b'c' || w[4] == b'C')))
+    }) || path.windows(4).any(|w| {
+        // Mixed literal dot and URL-encoded dot (.%2e, .%2E, %2e., %2E.)
+        (w[0] == b'.' && w[1] == b'%' && w[2] == b'2' && (w[3] == b'e' || w[3] == b'E'))
+            || (w[0] == b'%' && w[1] == b'2' && (w[2] == b'e' || w[2] == b'E') && w[3] == b'.')
+    }) || path.windows(6).any(|w| {
+        // Double URL-encoded dot pair (%2e%2e, %2E%2E, %2e%2E, %2E%2e)
         w[0] == b'%'
             && w[1] == b'2'
             && (w[2] == b'e' || w[2] == b'E')
@@ -65,6 +77,7 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
             && w[4] == b'2'
             && (w[5] == b'e' || w[5] == b'E')
     }) || path.windows(3).any(|w| {
+        // Single URL-encoded separators (%2f, %2F, %5c, %5C)
         w[0] == b'%'
             && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
                 || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
@@ -612,6 +625,36 @@ mod tests {
         );
         assert_eq!(
             validate_path(b"/var/www/%5Cetc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+
+        // Mixed URL-encoded dot and double-URL-encoded traversal sequence rejection
+        assert_eq!(
+            validate_path(b"/var/www/.%2e/etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%2e./etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/.%2E/etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%2E./etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%252e%252e/etc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%252fetc/passwd"),
+            Err(ValidationError::PathTraversal)
+        );
+        assert_eq!(
+            validate_path(b"/var/www/%255cetc/passwd"),
             Err(ValidationError::PathTraversal)
         );
     }
