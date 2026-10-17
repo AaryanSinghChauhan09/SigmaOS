@@ -1,7 +1,7 @@
 pub mod coreutils;
 pub mod coreutils_pr_gateway;
 pub mod format_runner;
-// pub mod init;
+pub mod init;
 pub mod job_control;
 pub mod libc;
 pub mod pkg;

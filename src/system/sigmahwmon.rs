@@ -189,15 +189,13 @@ impl SigmaHwMon {
         if temp_sensors.is_empty() {
             return None;
         }
-        Some(
-            temp_sensors
-                .iter()
-                .map(|s| s.current_value)
-                .fold(
-                    f64::NEG_INFINITY,
-                    |acc, val| if val > acc { val } else { acc },
-                ),
-        )
+        temp_sensors
+            .iter()
+            .map(|s| s.current_value)
+            .fold(
+                f64::NEG_INFINITY,
+                |acc, &val| if val > acc { val } else { acc },
+            )
     }
 }
 

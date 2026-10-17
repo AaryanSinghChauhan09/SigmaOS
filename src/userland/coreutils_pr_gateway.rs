@@ -170,59 +170,6 @@ impl GnuCoreutilsBsdUserlandEngine {
         output
     }
 
-    pub fn run_sort(
-        &self,
-        items: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            list.sort_by(|a, b| {
-                let na = a.parse::<i64>().unwrap_or(0);
-                let nb = b.parse::<i64>().unwrap_or(0);
-                na.cmp(&nb)
-            });
-        } else {
-            list.sort();
-        }
-        if reverse {
-            list.reverse();
-        }
-        if unique {
-            list.dedup();
-        }
-        list
-    }
-
-    pub fn run_tr(&self, input: &str, from: &str, to: &str, delete: bool) -> String {
-        if delete {
-            let mut s = input.to_string();
-            for c in from.chars() {
-                s = s.replace(c, "");
-            }
-            s
-        } else {
-            let mut s = input.to_string();
-            let from_chars: Vec<char> = from.chars().collect();
-            let to_chars: Vec<char> = to.chars().collect();
-            for (f, t) in from_chars.into_iter().zip(to_chars.into_iter()) {
-                s = s.replace(f, &t.to_string());
-            }
-            s
-        }
-    }
-
-    pub fn run_head_tail_bytes(&self, bytes: &[u8], count: usize, is_head: bool) -> Vec<u8> {
-        if is_head {
-            bytes.iter().take(count).copied().collect()
-        } else {
-            let skip = bytes.len().saturating_sub(count);
-            bytes.iter().skip(skip).copied().collect()
-        }
-    }
-
     pub fn run_ls(
         &self,
         entries: &[CoreUtilityFileInfo],
@@ -1040,29 +987,6 @@ impl TextProcessingEngine {
         Self
     }
 
-    pub fn grep_match_extended(
-        &self,
-        content: &str,
-        pattern: &str,
-        case_insensitive: bool,
-        _invert: bool,
-        line_numbers: bool,
-    ) -> (usize, Vec<String>) {
-        let matches = self.grep_match(content, pattern, case_insensitive);
-        let count = matches.len();
-        let formatted = matches
-            .into_iter()
-            .map(|(line_no, line_str)| {
-                if line_numbers {
-                    format!("{}:{}", line_no, line_str)
-                } else {
-                    line_str
-                }
-            })
-            .collect();
-        (count, formatted)
-    }
-
     pub fn grep_match(
         &self,
         content: &str,
@@ -1089,43 +1013,6 @@ impl TextProcessingEngine {
         }
 
         matches
-    }
-
-    pub fn grep_match_extended(
-        &self,
-        content: &str,
-        pattern: &str,
-        case_insensitive: bool,
-        invert_match: bool,
-        line_number: bool,
-    ) -> (usize, Vec<String>) {
-        let mut lines = Vec::new();
-        let pat_target = if case_insensitive {
-            pattern.to_lowercase()
-        } else {
-            pattern.to_string()
-        };
-
-        for (idx, line) in content.lines().enumerate() {
-            let line_check = if case_insensitive {
-                line.to_lowercase()
-            } else {
-                line.to_string()
-            };
-
-            let is_match = line_check.contains(&pat_target);
-            let keep = if invert_match { !is_match } else { is_match };
-
-            if keep {
-                if line_number {
-                    lines.push(format!("{}:{}", idx + 1, line));
-                } else {
-                    lines.push(line.to_string());
-                }
-            }
-        }
-
-        (lines.len(), lines)
     }
 
     pub fn grep_match_context(

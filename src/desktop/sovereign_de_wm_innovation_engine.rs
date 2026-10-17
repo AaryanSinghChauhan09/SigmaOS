@@ -208,6 +208,8 @@ impl KdePlasmaInnovationEngine {
                 String::from("WorkActivity"),
                 String::from("GamingActivity"),
             ],
+            window_rules: Vec::new(),
+            look_and_feel_theme: String::from("org.kde.breeze.desktop"),
         }
     }
 
@@ -516,6 +518,19 @@ impl LxqtInnovationEngine {
             .insert(service_name.to_string(), enabled);
     }
 
+    pub fn set_session_idle_timeout(&mut self, timeout_sec: u32) {
+        self.session_idle_timeout_sec = timeout_sec;
+    }
+
+    pub fn configure_wallpaper_slideshow(&mut self, interval_sec: u32) {
+        self.wallpaper_slideshow_interval_sec = interval_sec;
+    }
+
+    pub fn configure_qterminal(&mut self, opacity_pct: u8, scrollback_lines: u32) {
+        self.qterminal_opacity_pct = opacity_pct;
+        self.qterminal_scrollback_lines = scrollback_lines;
+    }
+
     pub fn sync_qt_palette(&mut self, dark_mode: bool) -> String {
         if dark_mode {
             self.lxqt_style = String::from("Fusion-Dark");
@@ -532,8 +547,11 @@ impl LxqtInnovationEngine {
 
     pub fn generate_qterminal_color_scheme(&self) -> String {
         format!(
-            "[QTerminalColorScheme]\nStyle={}\nPaletteSync={}\n",
-            self.lxqt_style, self.qt_palette_sync_enabled
+            "[QTerminalColorScheme]\nStyle={}\nPaletteSync={}\nOpacity={}\nScrollback={}\n",
+            self.lxqt_style,
+            self.qt_palette_sync_enabled,
+            self.qterminal_opacity_pct,
+            self.qterminal_scrollback_lines
         )
     }
 }
@@ -680,6 +698,14 @@ impl MateInnovationEngine {
             .insert(script_name.to_string(), script_body.to_string());
     }
 
+    pub fn set_window_button_layout(&mut self, layout: &str) {
+        self.marco_button_layout = layout.to_string();
+    }
+
+    pub fn configure_thumbnail_max_size(&mut self, max_size_mb: u32) {
+        self.caja_thumbnail_max_size_mb = max_size_mb;
+    }
+
     pub fn toggle_marco_vsync(&mut self, enabled: bool) -> bool {
         self.marco_shadows_enabled = enabled;
         self.marco_shadows_enabled
@@ -762,6 +788,22 @@ impl CinnamonInnovationEngine {
     pub fn register_nemo_action(&mut self, action_id: &str, exec_cmd: &str) {
         self.nemo_action_triggers
             .insert(action_id.to_string(), exec_cmd.to_string());
+    }
+
+    pub fn snap_desklet_to_grid(&self, x: i32, y: i32, grid_size: i32) -> (i32, i32) {
+        if !self.desklet_grid_snapping || grid_size <= 0 {
+            return (x, y);
+        }
+        let snapped_x = ((x + grid_size / 2) / grid_size) * grid_size;
+        let snapped_y = ((y + grid_size / 2) / grid_size) * grid_size;
+        (snapped_x, snapped_y)
+    }
+
+    pub fn play_sound_event(&self, event_name: &str) -> String {
+        format!(
+            "Playing theme '{}' sound event: {}",
+            self.sound_event_theme, event_name
+        )
     }
 
     pub fn resolve_spice_dependencies(&self, id: &str) -> bool {
@@ -1369,6 +1411,14 @@ impl OpenboxInnovationEngine {
             .insert(shortcut.to_string(), action.to_string());
     }
 
+    pub fn set_desktop_margins(&mut self, top: u32, bottom: u32, left: u32, right: u32) {
+        self.desktop_margins = (top, bottom, left, right);
+    }
+
+    pub fn set_focus_model(&mut self, model: &str) {
+        self.focus_model = model.to_string();
+    }
+
     pub fn transpile_pipe_menu_to_xml(&self, menu_id: &str) -> Option<String> {
         self.pipe_menus.get(menu_id).map(|cmd| {
             format!(
@@ -1727,6 +1777,20 @@ impl SwayWmInnovationEngine {
             .insert(output.to_string(), config.to_string());
     }
 
+    pub fn register_sway_criteria(&mut self, criteria: &str, action: &str) {
+        self.sway_criteria_rules
+            .insert(criteria.to_string(), action.to_string());
+    }
+
+    pub fn match_sway_criteria(&self, criteria: &str) -> Option<String> {
+        self.sway_criteria_rules.get(criteria).cloned()
+    }
+
+    pub fn set_output_transform(&mut self, output_id: &str, transform: &str) {
+        self.output_transforms
+            .insert(output_id.to_string(), transform.to_string());
+    }
+
     pub fn set_idle_inhibitor(&mut self, active: bool) {
         self.idle_inhibitor_active = active;
     }
@@ -1836,25 +1900,43 @@ impl SovereignDeWmInnovationOrchestrator {
         let mut scores = BTreeMap::new();
         scores.insert(
             String::from("GNOME"),
-            self.gnome.quick_settings_state.len() + self.gnome.gesture_bindings.len(),
+            self.gnome.quick_settings_state.len()
+                + self.gnome.gesture_bindings.len()
+                + self.gnome.window_corner_radius as usize,
         );
         scores.insert(
             String::from("KDE Plasma"),
-            self.kde.plasmoids.len() + self.kde.kwin_script_rules.len() + self.kde.activities.len(),
+            self.kde.plasmoids.len()
+                + self.kde.kwin_script_rules.len()
+                + self.kde.activities.len()
+                + self.kde.window_rules.len(),
         );
         scores.insert(
             String::from("Xfce"),
-            self.xfce.xfconf_channels.len() + self.xfce.panel_profiles.len(),
+            self.xfce.xfconf_channels.len()
+                + self.xfce.panel_profiles.len()
+                + self.xfce.thunar_emblem_map.len(),
         );
-        scores.insert(String::from("LXQt"), self.lxqt.autostart_services.len());
-        scores.insert(String::from("LXDE"), self.lxde.lxpanel_plugins.len());
+        scores.insert(
+            String::from("LXQt"),
+            self.lxqt.autostart_services.len()
+                + self.lxqt.qterminal_scrollback_lines as usize / 1000,
+        );
+        scores.insert(
+            String::from("LXDE"),
+            self.lxde.lxpanel_plugins.len() + self.lxde.openbox_edge_resistance_px as usize,
+        );
         scores.insert(
             String::from("MATE"),
-            self.mate.caja_extensions.len() + self.mate.caja_scripts.len(),
+            self.mate.caja_extensions.len()
+                + self.mate.caja_scripts.len()
+                + self.mate.caja_thumbnail_max_size_mb as usize,
         );
         scores.insert(
             String::from("Cinnamon"),
-            self.cinnamon.hot_corners.len() + self.cinnamon.nemo_action_triggers.len(),
+            self.cinnamon.hot_corners.len()
+                + self.cinnamon.nemo_action_triggers.len()
+                + self.cinnamon.nemo_folder_emblems.len(),
         );
         scores.insert(
             String::from("Budgie"),
@@ -1864,28 +1946,47 @@ impl SovereignDeWmInnovationOrchestrator {
             String::from("Enlightenment"),
             self.enlightenment.moksha_shelves.len() + self.enlightenment.moksha_modules.len(),
         );
-        scores.insert(String::from("i3"), self.i3.scratchpad_windows.len() + 5);
-        scores.insert(String::from("bspwm"), self.bspwm.nodes.len() + 5);
-        scores.insert(String::from("dwm"), self.dwm.client_tag_rules.len() + 5);
+        scores.insert(
+            String::from("i3"),
+            self.i3.scratchpad_windows.len() + self.i3.criteria_rules.len() + 5,
+        );
+        scores.insert(
+            String::from("bspwm"),
+            self.bspwm.nodes.len() + self.bspwm.node_flags.len() + 5,
+        );
+        scores.insert(
+            String::from("dwm"),
+            self.dwm.client_tag_rules.len() + self.dwm.swallowed_windows.len() + 5,
+        );
         scores.insert(
             String::from("Openbox"),
-            self.openbox.menu_items.len() + self.openbox.pipe_menus.len(),
+            self.openbox.menu_items.len()
+                + self.openbox.pipe_menus.len()
+                + self.openbox.keybind_actions.len(),
         );
         scores.insert(
             String::from("Fluxbox"),
-            self.fluxbox.slit_dockapps.len() + self.fluxbox.tab_groups.len(),
+            self.fluxbox.slit_dockapps.len()
+                + self.fluxbox.tab_groups.len()
+                + self.fluxbox.keychain_bindings.len(),
         );
         scores.insert(
             String::from("awesome"),
-            self.awesome.client_rules.len() + self.awesome.wibar_widgets.len(),
+            self.awesome.client_rules.len()
+                + self.awesome.wibar_widgets.len()
+                + self.awesome.naughty_notifications.len(),
         );
         scores.insert(
             String::from("Hyprland"),
-            self.hyprland.window_rules.len() + self.hyprland.animation_curves.len(),
+            self.hyprland.window_rules.len()
+                + self.hyprland.animation_curves.len()
+                + self.hyprland.workspace_rules.len(),
         );
         scores.insert(
             String::from("Sway"),
-            self.sway.layer_shell_surfaces.len() + self.sway.output_configs.len(),
+            self.sway.layer_shell_surfaces.len()
+                + self.sway.output_configs.len()
+                + self.sway.sway_criteria_rules.len(),
         );
         scores
     }
@@ -2058,6 +2159,10 @@ mod tests {
             gnome.check_extension_health("dash-to-dock@micxgx.gmail.com"),
             "Healthy"
         );
+        gnome.set_window_decoration_style(16, 32);
+        assert_eq!(gnome.window_corner_radius, 16);
+        assert_eq!(gnome.shadow_radius, 32);
+        assert_eq!(gnome.check_extension_updates().len(), 2);
     }
 
     #[test]
@@ -2115,6 +2220,15 @@ mod tests {
             xfce.thunar_bulk_renamer_presets.get("number_suffix"),
             Some(&String::from("%f_%n"))
         );
+        xfce.set_xfwm4_vsync("vblank");
+        assert_eq!(xfce.xfwm4_vsync_mode, "vblank");
+        xfce.set_thunar_emblem("/home/user/docs", "favorite");
+        assert_eq!(
+            xfce.thunar_emblem_map.get("/home/user/docs"),
+            Some(&String::from("favorite"))
+        );
+        xfce.set_panel_autohide("always");
+        assert_eq!(xfce.panel_autohide_mode, "always");
     }
 
     #[test]
@@ -2178,6 +2292,10 @@ mod tests {
             mate.caja_scripts.get("Resize JPG"),
             Some(&String::from("mogrify -resize 50% \"$1\""))
         );
+        mate.set_window_button_layout("close,minimize,maximize:");
+        assert_eq!(mate.marco_button_layout, "close,minimize,maximize:");
+        mate.configure_thumbnail_max_size(50);
+        assert_eq!(mate.caja_thumbnail_max_size_mb, 50);
     }
 
     #[test]
@@ -2202,6 +2320,9 @@ mod tests {
             cinn.nemo_action_triggers.get("edit_as_root"),
             Some(&String::from("sudo xed %f"))
         );
+        let (sx, sy) = cinn.snap_desklet_to_grid(103, 198, 20);
+        assert_eq!((sx, sy), (100, 200));
+        assert!(cinn.play_sound_event("login").contains("mint-sounds"));
     }
 
     #[test]
@@ -2338,6 +2459,10 @@ mod tests {
             ob.keybind_actions.get("W-e"),
             Some(&String::from("Execute: thunar"))
         );
+        ob.set_desktop_margins(24, 0, 0, 0);
+        assert_eq!(ob.desktop_margins, (24, 0, 0, 0));
+        ob.set_focus_model("follow_mouse");
+        assert_eq!(ob.focus_model, "follow_mouse");
     }
 
     #[test]

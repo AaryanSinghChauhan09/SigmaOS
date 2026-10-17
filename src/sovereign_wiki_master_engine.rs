@@ -66,7 +66,7 @@ pub struct Sovereign100IdeasSuite {
 impl Sovereign100IdeasSuite {
     pub fn new() -> Self {
         let mut suite = Self {
-            ideas: Vec::with_capacity(100),
+            features: Vec::with_capacity(100),
         };
         suite.seed_100_ideas();
         suite
@@ -241,6 +241,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             2,
             SovereignShardDescriptor {
@@ -251,6 +252,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             3,
             SovereignShardDescriptor {
@@ -261,6 +263,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             4,
             SovereignShardDescriptor {
@@ -271,6 +274,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             5,
             SovereignShardDescriptor {
@@ -281,6 +285,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             6,
             SovereignShardDescriptor {
@@ -291,6 +296,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             7,
             SovereignShardDescriptor {
@@ -301,6 +307,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             8,
             SovereignShardDescriptor {
@@ -311,6 +318,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             9,
             SovereignShardDescriptor {
@@ -321,6 +329,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             10,
             SovereignShardDescriptor {
@@ -331,6 +340,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             11,
             SovereignShardDescriptor {
@@ -341,6 +351,7 @@ impl SovereignShardsMasterRegistry {
                 status_active: true,
             },
         );
+
         self.shards.insert(
             12,
             SovereignShardDescriptor {
@@ -397,23 +408,21 @@ impl SovereignDistroGapClosureEngine {
             sigma_counterpart: "SignstarSigningService & Dilithium5Signer",
             verification_passed: true,
         });
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "Arch Linux",
-            gap_feature_name: "pacman-contrib paccache, checkupdates, updpkgsums",
-            sigma_counterpart: "ArchPacmanContribEngine",
-            verification_passed: true,
+
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "pledge, unveil, KARL, retguard, signify",
+            source_distro: "OpenBSD",
+            target_native_implementation:
+                "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
+            gap_closed: true,
         });
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            verification_passed: true,
-        });
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "FreeBSD",
-            gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
-            verification_passed: true,
+
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
+            source_distro: "FreeBSD",
+            target_native_implementation:
+                "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
+            gap_closed: true,
         });
     }
 

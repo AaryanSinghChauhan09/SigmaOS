@@ -756,11 +756,11 @@ impl CloudInitMultiStageEngineV3 {
 
     /// Request AWS/OpenStack IMDSv2 session token
     pub fn acquire_imdsv2_session_token(&mut self) -> Result<String, String> {
-        let imds_session_tok = "AQAAAH-imds-v2-session-token-sigma-99887766".to_string();
-        self.imdsv2_token = Some(imds_session_tok.clone());
+        let session_auth_token = "mock_imds_v2_session_token_sigma_99887766".to_string();
+        self.imdsv2_token = Some(session_auth_token.clone());
         self.logs
             .push("cloud-init V3: Acquired IMDSv2 metadata session token".to_string());
-        Ok(imds_session_tok)
+        Ok(session_auth_token)
     }
 
     /// Execute early cloud-boothook scripts
@@ -1163,7 +1163,7 @@ mod tests {
     fn test_cloud_init_and_ignition_v3() {
         let mut ci = CloudInitMultiStageEngineV3::new();
         let token = ci.acquire_imdsv2_session_token().unwrap();
-        assert!(token.contains("imds-v2"));
+        assert!(token.contains("imds_v2"));
         assert!(ci
             .execute_cloud_boothooks("#!/bin/sh\necho boothook")
             .is_ok());

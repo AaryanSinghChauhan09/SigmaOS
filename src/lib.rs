@@ -148,15 +148,11 @@ pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
-pub use distro::omarchy_linux_missing_components_v58_pr::*;
-pub use distro::omarchy_linux_missing_components_v59_pr::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::open_source_os_debian_unimplemented_ideas_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
-pub use distro::open_source_os_missing_components_v58_pr::*;
-pub use distro::open_source_os_missing_components_v60_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
@@ -168,8 +164,6 @@ pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
-pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v58_pr::*;
-pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v60_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
@@ -387,6 +381,7 @@ pub use sigpkg::{
 pub use userland::coreutils_pr_gateway::*;
 pub use userland::init::*;
 pub use userland::init::*;
+pub use userland::init::*;
 pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
@@ -495,4 +490,3 @@ pub mod io;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
-pub use crate::distro::openbsd_ultimate_gap_closure_v60_pr::*;

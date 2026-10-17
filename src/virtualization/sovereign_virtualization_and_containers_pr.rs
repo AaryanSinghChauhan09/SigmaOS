@@ -201,15 +201,6 @@ pub struct LibvirtNwFilterRule {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtDomainConfig {
     pub domain_name: String,
     pub hypervisor: HypervisorType,
