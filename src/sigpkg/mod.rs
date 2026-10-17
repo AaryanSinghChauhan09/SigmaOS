@@ -422,3 +422,4 @@ pub use nix_store::{
 
 pub use crate::package::sovereign_distro_package_advancements_v37::*;
 pub use crate::package::sovereign_distro_package_advancements_v47::*;
+pub use crate::package::sovereign_distro_package_advancements_v50::*;
