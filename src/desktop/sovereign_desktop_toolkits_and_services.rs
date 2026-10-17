@@ -418,7 +418,8 @@ impl SovereignDisplayManagerSuiteEngine {
                 || req.biometric_token.is_some()
                 || req.fido2_security_key.is_some());
         let mfa_ok = req.mfa_otp.as_deref() == Some("123456") || req.mfa_otp.is_none();
-        let fido_ok = req.fido2_security_key.is_none() || req.fido2_security_key.as_deref() == Some("fido2_valid");
+        let fido_ok = req.fido2_security_key.is_none()
+            || req.fido2_security_key.as_deref() == Some("fido2_valid");
 
         let final_ok = auth_success && mfa_ok && fido_ok;
         self.pam_auth_history.push((req.username.clone(), final_ok));
