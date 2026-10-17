@@ -665,8 +665,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec",
-                "enforce_racct_rctl_process_resource_limits",
+                "pol_proc_act_sec",
+                "pdfork_pdkill_process_descriptor_capsicum_guard",
                 true,
             ),
         ];
@@ -756,7 +756,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn translate_subsystem_payload(
+    pub fn format_cross_distro_subsystem_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1221,7 +1221,7 @@ mod tests {
             assert!(compliant);
         }
 
-        let translated = engine.translate_subsystem_payload(
+        let translated = engine.format_cross_distro_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",

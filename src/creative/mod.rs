@@ -9,7 +9,6 @@ pub mod deckcraft;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
-pub mod effectcraft_artcraft_parity_pr;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
@@ -68,8 +67,8 @@ pub use effectcraft::{
     BlendMode as EffectBlendMode, CompositingNode, Effect as EffectCraftEffect, EffectCategory,
     EffectCraftMasterPrDeploymentSuite, EffectCraftMotionTrackingKeyingPrDeployer,
     EffectCraftNodeCompositingPrDeployer, EffectCraftParticleShaderPrDeployer,
-    EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
-    NodeGraph, NodeType, Parameter, ParameterType,
+    EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType,
+    Keyframe as EffectKeyframe, NodeGraph, NodeType, Parameter, ParameterType,
 };
 pub use effectcraft::{
     fnv1a_effectcraft_pr_digest, get_effectcraft, init_effectcraft, AnimatedParameter,
@@ -104,14 +103,15 @@ pub use filmcraft::{
 };
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
-    ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
-    TransitionType, VideoCodec, VideoEditor, VideoTrack,
+    ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline as FilmTimeline,
+    Transition, TransitionType, VideoCodec, VideoEditor, VideoTrack,
 };
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
-    ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
-    Material, Photo, PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading,
-    ToneCurve, ToneCurvePoint,
+    ColorSpace, CurveType, Flag, Light as LightcraftLight, LightEngine,
+    LightType as LightcraftLightType, Mask, MaskType as LightMaskType, Material, Photo,
+    PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading, ToneCurve,
+    ToneCurvePoint,
 };
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
@@ -132,9 +132,9 @@ pub use mediacraft::{
     SubtitleTrack, VideoCodec as MediaVideoCodec, VideoSettings, VideoTrack as MediaVideoTrack,
 };
 pub use model3d::{
-    get_model3d, init_model3d, Camera, ExportFormat as Model3DExportFormat, Light, LightType,
-    Material, Mesh, MeshType, Object3D, ObjectType, Scene as Model3DScene, SculptBrush,
-    SculptBrushType, Vertex,
+    get_model3d, init_model3d, Camera, ExportFormat as Model3DExportFormat, Light as Model3DLight,
+    LightType as Model3DLightType, Material as Model3DMaterial, Mesh, MeshType, Object3D,
+    ObjectType, Scene as Model3DScene, SculptBrush, SculptBrushType, Vertex,
 };
 pub use pdfcraft::{
     get_pdfcraft, init_pdfcraft, Annotation, AnnotationType, Bookmark,
@@ -193,7 +193,7 @@ pub use soundcraft::{
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
     AnimationLayerType, AnimationProject as VectorAnimationProject, Bone, InterpolationMode,
-    Keyframe, OnionSkin, Rig, Timeline,
+    Keyframe as VectorKeyframe, OnionSkin, Rig, Timeline as VectorTimeline,
 };
 pub use vectorcraft::{
     get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,

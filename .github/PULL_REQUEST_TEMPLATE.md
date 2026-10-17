@@ -22,6 +22,12 @@
 - [ ] Diagnostics
 - [ ] Build / CI
 
+## Shell component
+
+- [ ] Shell parser
+- [ ] Shell builtins
+- [ ] Shell expansion
+
 ## Component
 
 - [ ] PR-level validation
@@ -36,14 +42,14 @@
 - [ ] Monthly diagnostics rehearsal
 - [ ] Quarterly release/architecture/security review
 
-## Reference study
+## Reference study (Upstream study)
 
 <!-- Required for design-changing kernel PRs -->
 
 - Upstream study:
 - What SigmaOS adopts:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
+- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
 - Reason:
 
 ## Changes
@@ -55,6 +61,11 @@
 - [ ] Upstream study and reference checked
 - [ ] What SigmaOS adopts is clearly stated
 - [ ] Safety and rollback reviewed
+
+## Shell safety review
+
+- [ ] No unbounded inputs
+- [ ] Safe quoting & expansion
 
 ## Kernel safety review
 
@@ -93,3 +104,8 @@
 
 - Risk:
 - Rollback:
+
+## Reviewer checklist
+
+- [ ] Security review requested
+- [ ] Code review completed

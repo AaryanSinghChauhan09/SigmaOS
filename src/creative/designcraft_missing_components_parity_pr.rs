@@ -63,18 +63,10 @@ impl DesigncraftPrCategory {
             Self::CodeExporterMultiFramework => {
                 "design-to-code generator & multi-framework asset exporter"
             }
-            Self::ComponentVariantsStateMachine => {
-                "interactive component variants & state machine manager"
-            }
-            Self::DesignTokensStyleDictionary => {
-                "W3C design tokens & style dictionary multi-platform transformer"
-            }
-            Self::IconSystemPackagingSymbols => {
-                "vector icon library packaging & SVG symbol sprite sheet compiler"
-            }
-            Self::AccessibilityAuditWcagLint => {
-                "WCAG 2.1 AA/AAA accessibility contrast & touch target auditor"
-            }
+            Self::ComponentVariantsStateMachine => "component variants & state transitions",
+            Self::DesignTokensStyleDictionary => "design tokens W3C style dictionary transformer",
+            Self::IconSystemPackagingSymbols => "vector icon library packaging & symbol sprites",
+            Self::AccessibilityAuditWcagLint => "WCAG accessibility audit & contrast linter",
         }
     }
 }
@@ -1282,11 +1274,9 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             handle_out_x: 5.0,
             handle_out_y: 0.0,
         };
-        let p1 = self.geometry_engine.create_path(
-            String::from("PathA"),
-            vec![knot1.clone()],
-            true,
-        );
+        let p1 = self
+            .geometry_engine
+            .create_path(String::from("PathA"), vec![knot1.clone()], true);
         let p2 = self
             .geometry_engine
             .create_path(String::from("PathB"), vec![knot1], true);

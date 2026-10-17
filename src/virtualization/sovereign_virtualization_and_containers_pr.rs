@@ -66,7 +66,7 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// QEMU Disk Image Specification
+/// QEMU disk image specification
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QemuDiskImageSpec {
     pub image_path: String,
@@ -180,6 +180,15 @@ pub struct LibvirtNwFilterRule {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LibvirtStorageVolume {
+    pub volume_name: String,
+    pub pool_name: String,
+    pub capacity_bytes: u64,
+    pub allocation_bytes: u64,
+    pub format: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtDomainConfig {
     pub domain_name: String,
     pub hypervisor: HypervisorType,
@@ -193,6 +202,7 @@ pub struct LibvirtDomainConfig {
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
+    pub storage_pool_type: LibvirtStoragePoolType,
     pub storage_pool_path: String,
     pub virtual_bridges: Vec<String>,
     pub storage_volumes: Vec<LibvirtStorageVolume>,
@@ -206,6 +216,7 @@ impl LibvirtDomainEngine {
         bridges.push("virbr1".to_string());
         Self {
             domains: Vec::new(),
+            storage_pool_type: LibvirtStoragePoolType::Directory,
             storage_pool_path: "/var/lib/libvirt/images".to_string(),
             virtual_bridges: bridges,
             storage_volumes: Vec::new(),
@@ -656,15 +667,15 @@ pub struct KubernetesK3sRancherEngine {
 
 impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
-        let mut handlers = Vec::new();
-        handlers.push("runc".to_string());
-        handlers.push("gvisor".to_string());
-        handlers.push("kata".to_string());
+        let mut crio = Vec::new();
+        crio.push("runc".to_string());
+        crio.push("gvisor".to_string());
+        crio.push("kata".to_string());
         Self {
             pods: Vec::new(),
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: handlers,
+            crio_runtime_handlers: crio,
         }
     }
 

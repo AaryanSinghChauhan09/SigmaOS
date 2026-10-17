@@ -17,8 +17,7 @@
 #![allow(dead_code)]
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-#[macro_use]
-extern crate alloc;
+use alloc::vec;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
