@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
-use std::vec::Vec;
-
 //! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
 //!
 //! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
@@ -611,6 +607,7 @@ impl OpenRcStatusControllerEngine {
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
     }
+}
 
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
@@ -1312,6 +1309,7 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
