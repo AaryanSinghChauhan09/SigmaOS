@@ -395,3 +395,10 @@ files = ["docs/SYSTEM_APPS_DEVELOPMENT_PLAN.md", "wiki/32-System-Apps-Developmen
 description = "SigmaOS System Applications Plan & Architecture, 18-PR implementation roadmap, app catalog audit, versioned manifests, init service lifecycle coordinator, runtime-backed diagnostics, and review merge gates"
 test_evidence = "Architecture specification published in docs/SYSTEM_APPS_DEVELOPMENT_PLAN.md and wiki/32-System-Apps-Development-Plan.md; 6 unit tests pass via rustc --test src/system_apps/sovereign_system_apps_development_and_pr_suite.rs"
 next_milestone = "PR 1: docs(system-apps): define app catalog, lifecycle, and support status & PR 3: feat(init): connect service manager to real process lifecycle"
+
+[net.development_plan]
+status = "integrated"
+files = ["docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/28-Network-Development-And-Maintenance-Plan.md", "src/net/sovereign_network_development_and_pr_suite.rs"]
+description = "SigmaOS Network Development and Maintenance Plan establishing 13-PR implementation sequence, status vocabulary, RFC protocol specs, periodic maintenance cadences, cross-component integration rules, review gates, and master PR suite"
+test_evidence = "Architecture specification published in docs/net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/28-Network-Development-And-Maintenance-Plan.md; 6 unit tests pass via rustc --test src/net/sovereign_network_development_and_pr_suite.rs"
+next_milestone = "PR 1: docs(net): define network architecture, status, and support boundaries & PR 2: test(net): add deterministic packet fixtures and parser fuzz targets"

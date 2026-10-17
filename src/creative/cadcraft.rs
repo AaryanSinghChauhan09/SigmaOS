@@ -607,7 +607,7 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn solve_sketch_constraints(&mut self, _tolerance: f32, _max_iterations: usize) -> bool {
+    pub fn solve_constraints(&mut self) -> bool {
         for constraint in self.constraints.values_mut() {
             constraint.satisfied = true;
         }
@@ -874,9 +874,9 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
 /// Master Deployment Coordinator for CadCraft
 #[derive(Debug, Default)]
 pub struct CadCraftMasterPrDeploymentSuite {
-    pub drafting_2d: CadCraft2dDraftingConstraintPrDeployer,
-    pub solid_modeling_3d: CadCraft3dSolidModelingPrDeployer,
-    pub assembly_cam_fea: CadCraftAssemblyFemSimulationPrDeployer,
+    pub drafting_constraints: CadCraft2dDraftingConstraintPrDeployer,
+    pub solid_modeling: CadCraft3dSolidModelingPrDeployer,
+    pub assembly_fem: CadCraftAssemblyFemSimulationPrDeployer,
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
 }
 
@@ -898,36 +898,28 @@ impl CadCraftMasterPrDeploymentSuite {
         }
 
         Self {
-            drafting_2d: drafting_constraints,
-            solid_modeling_3d: solid_modeling,
-            assembly_cam_fea: assembly_fem,
-            deployed_prs,
+            drafting_constraints: CadCraft2dDraftingConstraintPrDeployer::new(),
+            solid_modeling: CadCraft3dSolidModelingPrDeployer::new(),
+            assembly_fem: CadCraftAssemblyFemSimulationPrDeployer::new(),
+            deployed_prs: BTreeMap::new(),
         }
     }
 
+    pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
+        self.drafting_constraints.get_merged_pr_count()
+            + self.solid_modeling.get_merged_pr_count()
+            + self.assembly_fem.get_merged_pr_count()
+    }
+
     pub fn deploy_all(&mut self) -> Vec<CadCraftPullRequestSpec> {
-        let prs = vec![
-            self.drafting_2d.generate_pr(),
-            self.solid_modeling_3d.generate_pr(),
-            self.assembly_cam_fea.generate_pr(),
-        ];
+        let mut prs = Vec::new();
+        prs.extend(self.drafting_constraints.deployed_prs.values().cloned());
+        prs.extend(self.solid_modeling.deployed_prs.values().cloned());
+        prs.extend(self.assembly_fem.deployed_prs.values().cloned());
 
         for pr in &prs {
             self.deployed_prs.insert(pr.pr_id, pr.clone());
         }
-
-        let mut sample_sketch = self.drafting_2d.create_sketch("Bracket Profile");
-        let p1 = sample_sketch.add_point(0.0, 0.0);
-        let p2 = sample_sketch.add_point(50.0, 0.0);
-        sample_sketch.add_constraint(GeometricConstraintType::Distance);
-        sample_sketch.solve_constraints();
-
-        let mut sample_solid = self.solid_modeling_3d.create_solid("Support Bracket");
-        sample_solid.extrude_sketch(&sample_sketch, 50.0, 0.0);
-
-        let _step_bytes = self
-            .assembly_cam_fea
-            .export_cad_solid(&sample_solid, CadExportFormat::Step);
 
         prs
     }

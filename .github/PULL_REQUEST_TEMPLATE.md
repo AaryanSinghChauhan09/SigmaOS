@@ -2,7 +2,14 @@
 
 <!-- What secondary-memory, shell, or subsystem behavior changed and why? -->
 
-## Storage component
+## Shell component
+
+- [ ] AST / Parser / Lexer
+- [ ] Builtins / Environment
+- [ ] Redirection / Pipelines
+- [ ] Line Editor / History
+
+## Kernel component
 
 - [ ] Boot / arch init
 
@@ -68,11 +75,9 @@
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
 <!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- Upstream study document:
+- Upstream study:
 - Linux/BSD/Redox/xv6 reference:
-- What SigmaOS adopts / adapts / rejects:
-- Decision: Adopt / Adapt / Reject
-- What SigmaOS adopts:
+- What SigmaOS adopts: Adopt / Adapt / Reject
 - Reason:
 
 ## What SigmaOS adopts
@@ -84,19 +89,12 @@
 
 ## Shell safety review
 
-- [ ] Upstream study and reference checked
-- [ ] What SigmaOS adopts is clearly stated
-- [ ] Safety and rollback reviewed
+- [ ] No unbounded input
+- [ ] Quoting integrity maintained
 
-## Shell safety review
+## Kernel safety review and Reviewer checklist
 
-- [ ] Quote-aware lexer & parser safety
-- [ ] Safe environment expansion
-- [ ] Built-in command error handling
-
-## Kernel safety review & Reviewer checklist
-
-- [ ] Safety and rollback plan defined
+- [ ] Safety and rollback plan documented
 - [ ] No unnecessary `unsafe`
 
 ## Shell safety review
