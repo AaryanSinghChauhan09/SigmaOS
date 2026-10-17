@@ -57,7 +57,7 @@ Implement missing components in this order. Each item must be delivered through 
 | **P2** | VFS | Linux, xv6 | Path resolution, FDs, file ops | Filesystem tests |
 | **P2** | RAM-disk filesystem | Linux tmpfs concepts | Simple in-memory FS | QEMU RAM-disk boot |
 | **P2** | Processes and signals | Linux, xv6 | Process lifecycle and signals | Interop tests |
-| **P2** | [Pipes and IPC](./PROCESS_SYNCHRONIZATION_PLAN.md) | Linux, FreeBSD | Pipes, event queues, shared memory | IPC tests |
+| **P2** | [Pipes and IPC](./ipc-handler.md) | Linux, FreeBSD | Pipes, event queues, shared memory | IPC tests |
 | **P2** | Installer | Debian, Mint | Clean QEMU install | Install log |
 | **P2** | Atomic update/rollback | Fedora, Mint | Update manifest and rollback | Failed-update recovery test |
 | **P2** | Security capabilities | OpenBSD, Linux | Capability checks and sandbox policy | Denial tests |
