@@ -46,10 +46,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
     }
 
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
-    pub fn check_landlock_access(allowed_mask: u32, requested_mask: u32) -> bool {
-        (allowed_mask & requested_mask) == requested_mask
-    }
-
     pub fn format_selinux_context(
         user: &str,
         role: &str,

@@ -148,8 +148,9 @@ pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
-pub use distro::omarchy_linux_missing_components_v58_pr::*;
-pub use distro::omarchy_linux_missing_components_v59_pr::*;
+pub use distro::omarchy_omakase_ultimate_parity::*;
+pub use distro::open_source_os_debian_unimplemented_ideas_pr::*;
+pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
@@ -173,6 +174,7 @@ pub use distro::sovereign_mint_omarchy_v32_apex_arsenal::*;
 pub use distro::sovereign_mint_omarchy_v33_apex_vanguard::*;
 pub use distro::sovereign_mint_omarchy_v34_apex_pantheon::*;
 pub use distro::sovereign_open_source_os_gap_closure_v27::*;
+pub use distro::sovereign_openbsd_complete_gap_closure_pr_suite::*;
 pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub use distro::sovereign_thousands_distro_components::*;
@@ -378,6 +380,7 @@ pub use sigpkg::{
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
 pub use userland::coreutils_pr_gateway::*;
+pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::init::*;

@@ -189,7 +189,7 @@ impl SovereignGtkQtToolkitEngine {
         });
         self.qt_style = QtPlatformStyle::Kvantum;
         self.event_log.push(ToolkitEvent::KvantumThemeApplied(
-            theme_name,
+            self.kvantum_spec.theme_name.clone(),
         ));
         true
     }
@@ -1092,7 +1092,6 @@ impl SovereignFontAndTextLayoutEngine {
 
         Self {
             font_match_cache,
-            fontconfig_aliases,
             opentype_features: vec![
                 "liga".to_string(),
                 "kern".to_string(),
@@ -1793,7 +1792,11 @@ mod tests {
             "theme=Catppuccin-Mocha\nblur_radius=20\ntranslucent_windows=true"
         ));
         assert_eq!(engine.qt_style, QtPlatformStyle::Kvantum);
-        assert_eq!(engine.kvantum_spec.theme_name, "Catppuccin-Mocha");
+        let spec = engine.kvantum_spec.as_ref().unwrap();
+        assert_eq!(
+            spec.svg_path,
+            "/usr/share/Kvantum/Catppuccin-Mocha/Catppuccin-Mocha.svg"
+        );
 
         engine.connect_signal("clicked", "btn_handler_1");
         assert_eq!(engine.emit_signal("clicked"), 1);

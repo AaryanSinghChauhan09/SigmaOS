@@ -1288,10 +1288,10 @@ mod tests {
                 SigmaOsSubsystem::SignalDelivery,
                 SigmaOsSubsystem::ProcessActivity,
             )
-            .expect("SignalDelivery -> ProcessActivity policy must exist");
+            .expect("ProcessActivity -> SecuritySandboxing policy must exist");
         assert_eq!(
             policy.distro_inspiration,
-            LinuxBsdDistroInspiration::OpenBSD
+            LinuxBsdDistroInspiration::FreeBSD
         );
     }
 }

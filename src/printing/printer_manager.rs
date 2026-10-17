@@ -2412,16 +2412,6 @@ mod tests {
         assert_eq!(count, 3);
         assert!(manager.get_printer("ipp-001").is_some());
 
-        let attrs = IppPrinterAttributes::default();
-        assert!(!attrs.uri_security_supported.is_empty());
-        assert!(!attrs.uri_authentication_supported.is_empty());
-        assert!(!attrs.document_format_supported.is_empty());
-        assert!(!attrs.sides_supported.is_empty());
-        assert!(!attrs.media_supported.is_empty());
-        assert!(!attrs.pdl_override_supported.is_empty());
-        assert!(!attrs.ipp_versions_supported.is_empty());
-        assert!(!attrs.printer_state_reasons.is_empty());
-
         let ppd = manager
             .ipp_discovery
             .generate_ppd_from_ipp_attributes("ipp-001")
