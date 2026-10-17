@@ -131,9 +131,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Evaluate Landlock ABI access rules (allowed mask vs requested mask).
-    pub fn check_landlock_access(allowed_mask: u32, requested_mask: u32) -> bool {
-        (allowed_mask & requested_mask) == requested_mask
+    /// Check Landlock access rule against requested access rights mask.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
     }
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
@@ -442,6 +442,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
             }
         }
         parts
+    }
+
+    /// Generate SSSD domain configuration section string.
+    pub fn generate_sssd_domain_conf(domain_name: &str, id_provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain_name, id_provider, uri
+        )
     }
 
     /// Simulate Kerberos v5 ticket validation.

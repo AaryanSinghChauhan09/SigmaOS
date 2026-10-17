@@ -24,9 +24,9 @@
 
 ## Shell component
 
-- [ ] Shell parser
-- [ ] Shell builtins
-- [ ] Shell expansion
+- [ ] Interactive shell
+- [ ] Script execution
+- [ ] POSIX compliance
 
 ## Component
 
@@ -47,9 +47,9 @@
 <!-- Required for design-changing kernel PRs -->
 
 - Upstream study:
-- What SigmaOS adopts:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
+- What SigmaOS adopts:
+- Decision: Adopt / Adapt / Reject
 - Reason:
 
 ## Changes
@@ -66,6 +66,13 @@
 
 - [ ] No unbounded inputs
 - [ ] Safe quoting & expansion
+
+## Shell safety review
+
+- [ ] Deterministic script execution
+- [ ] Explicit exit status codes
+- [ ] Safe expansion order
+- [ ] Quoting integrity
 
 ## Kernel safety review
 
@@ -107,5 +114,5 @@
 
 ## Reviewer checklist
 
-- [ ] Security review requested
-- [ ] Code review completed
+- [ ] Safety and rollback reviewed
+- [ ] Evidence provided
