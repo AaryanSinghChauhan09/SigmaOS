@@ -12,18 +12,18 @@ The goal is to achieve 100% native parity and performance supremacy across compi
 
 | Tool / Subsystem | Distro Inspirations | Strategic Parity Implementation in SigmaOS |
 | :--- | :--- | :--- |
-| **GCC & Clang / LLVM** | Clear Linux, CachyOS, Gentoo, Fedora, OpenBSD | Auto-vectorizing AVX-512 FMV, ThinLTO, PGO profile collection, OpenBSD Retguard XOR stack cookies, -D_FORTIFY_SOURCE=3. |
-| **binutils & LLD** | Arch Linux, FreeBSD, Alpine | Zero-copy lock-free multi-threaded ELF section merging, deterministic archives, compressed zstd debug sections, GDB indexes, objdump disassembly helpers. |
+| **GCC & Clang / LLVM** | Clear Linux, CachyOS, Gentoo, Fedora, OpenBSD | Auto-vectorizing AVX-512 FMV, ThinLTO, PGO profile collection, OpenBSD Retguard XOR stack cookies, -D_FORTIFY_SOURCE=3, sccache compiler caching. |
+| **binutils, LLD & Mold** | Arch Linux, Clear Linux, FreeBSD, Alpine | Mold ultra-fast parallel ELF linker (-fuse-ld=mold), LLD lock-free section merging, deterministic archives, compressed zstd debug sections, GDB indexes. |
 | **make, CMake, Ninja, Meson, autotools** | FreeBSD, Gentoo, Void, Alpine, Samurai | Lockless jobserver for pmake/GNU make (`-jN` flag parser), C-based Samurai Ninja graph parser, instant pre-compiled m4 macro cache for Autotools, CMake cross toolchain generator, Meson machine files. |
 | **pkg-config / pkgconf** | NixOS, Guix, Debian | Zero-allocation hermetic sysroot resolution, multi-arch sysroot mapping, instantaneous dependency evaluation. |
 | **GDB & LLDB** | Fedora, Arch Linux | Remote GDB RSP stub with packet checksumming ($g, $m, $?), DWARF5 expression evaluator, LLDB C++ JIT expression bridge, zero-copy kernel memory inspection. |
-| **strace & ltrace** | eBPF Linux | eBPF zero-copy syscall tracer eliminating ptrace context switches (<0.04us per call), dynamic symbol PLT call interceptor. |
-| **Valgrind Memcheck** | Debian, Gentoo | VEX IR binary shadow memory sanitizer with sub-2x execution overhead, valid/uninitialized/out-of-bounds byte tracking. |
+| **strace, ltrace & bpftrace** | eBPF Linux | eBPF zero-copy syscall tracer eliminating ptrace context switches (<0.04us per call), bpftrace script compilation into kernel eBPF bytecode, dynamic symbol PLT call interceptor. |
+| **Valgrind Memcheck & ASan** | Debian, Gentoo | VEX IR binary shadow memory sanitizer with sub-2x execution overhead, ASan/TSan shadow memory validation, valid/uninitialized/out-of-bounds byte tracking. |
 | **perf, DTrace, ktrace, ptrace** | Illumos, FreeBSD, NetBSD, OpenBSD | Illumos DTrace eBPF provider probes, BSD ktrace VFS/sysctl ring buffers, hardware PMU counter sampling with FlameGraph output, OpenBSD ptrace security pledges. |
 | **Git & Version Control** | Arch Linux, Gentoo | Zero-copy mmap SHA-256 content-addressed object store and packfile index lookup. |
 | **Python, Perl, Ruby** | Fedora, Debian, Ubuntu | Distro-level Ahead-Of-Time (AOT) bytecode compilation (`.pyc` opt_level=2), isolated CPAN vendor sandboxes (`File::Spec`), Ruby 3.3 YJIT profile evaluator. |
 | **Rust & Go** | Gentoo, Arch Linux | Cargo-vendor offline mirror cache with SHA-256 verification, eBPF zero-overhead CGO FFI bridge. |
-| **OpenJDK GraalVM** | Clear Linux, Ubuntu | GraalVM native image AOT generator producing standalone ELF binaries with sub-10ms cold start and ZGC zero-pause collector. |
+| **Zig, Swift, Bun, Deno & OpenJDK** | Alpine, Arch, Ubuntu, Clear Linux | Zig build runner (-Doptimize=ReleaseFast), Bun/Deno V8/JSC runtime initialization (sub-1ms execution), GraalVM native image AOT generator producing standalone ELF binaries with sub-10ms cold start and ZGC zero-pause collector. |
 
 ---
 

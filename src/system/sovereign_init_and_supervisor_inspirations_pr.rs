@@ -665,15 +665,15 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
-    /// Merge local `/etc/rc.conf` overrides onto base configuration map.
+    /// Merge local `/etc/rc.conf.local` overrides into base `/etc/rc.conf`.
     pub fn merge_rc_conf_overrides(
         &self,
-        base_conf: &BTreeMap<String, String>,
-        local_conf: &BTreeMap<String, String>,
+        base: &BTreeMap<String, String>,
+        overrides: &BTreeMap<String, String>,
     ) -> BTreeMap<String, String> {
-        let mut merged = base_conf.clone();
-        for (key, val) in local_conf {
-            merged.insert(key.clone(), val.clone());
+        let mut merged = base.clone();
+        for (k, v) in overrides {
+            merged.insert(k.clone(), v.clone());
         }
         merged
     }
