@@ -440,6 +440,9 @@ pub use sovereign_init_and_supervisor_advancements_v52::*;
 pub mod sovereign_init_and_supervisor_advancements_v53;
 pub use sovereign_init_and_supervisor_advancements_v53::*;
 
+pub mod sovereign_init_and_supervisor_advancements_v60;
+pub use sovereign_init_and_supervisor_advancements_v60::*;
+
 pub use mint_tools::{
     get_system_tools, init_system_tools, BackupConfig, BackupJob, BackupStatus, BackupType,
     DiagnosticEntry, DiagnosticTest, Driver, DriverManager, DriverStatus, DriverType, HardwareInfo,
