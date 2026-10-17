@@ -132,6 +132,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
+    /// Check Landlock v5 access rights against rule bitmask.
+    pub fn check_landlock_access(rule_mask: u32, requested_access: u32) -> bool {
+        (rule_mask & requested_access) == requested_access
+    }
+
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
         if limit_str == "max" {
@@ -427,6 +432,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD domain configuration snippet.
+    pub fn generate_sssd_domain_conf(realm: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\nauth_provider = {}\n",
+            realm, provider, uri, provider
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.

@@ -175,18 +175,21 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-pub type PresentationDeck = SlideDeck;
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
+}
 
 pub type PresentationDeck = SlideDeck;
 
-/// Presenter mode state tracking
 #[derive(Debug, Clone, Default)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,
     pub in_presenter_mode: bool,
     pub timer_running: bool,
-    pub elapsed_secs: u64,
+    pub elapsed_secs: u32,
     pub laser_pointer_active: bool,
     pub black_screen: bool,
 }
@@ -200,6 +203,10 @@ pub enum ExportFormat {
     Html5,
     Svg,
     Markdown,
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
 }
 
 pub type DeckExportFormat = ExportFormat;
@@ -256,9 +263,8 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
-            DeckExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_DECK_PRESET_V1\n");
-                output.extend_from_slice(deck.title.as_bytes());
+            _ => {
+                output.extend_from_slice(b"%DECKCRAFT_EXPORT_STREAM\n");
             }
         }
 

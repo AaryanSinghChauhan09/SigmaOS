@@ -620,6 +620,14 @@ impl SovereignSubsystemDistroHarmonyEngine {
     fn bootstrap_default_translations(&mut self) {
         let default_rules = [
             (
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_proc_sec",
+                "pdfork_pdkill_capsicum_process_descriptor_sandbox",
+                true,
+            ),
+            (
                 SigmaOsSubsystem::KernelScheduling,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::OpenBSD,
@@ -853,7 +861,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystems_vector(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_subsystems_compliance_list(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
@@ -863,7 +871,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn format_subsystem_payload(
+    pub fn translate_subsystem_distro_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1338,13 +1346,13 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystems_vector();
+        let audits = engine.audit_subsystems_compliance_list();
         assert_eq!(audits.len(), 31);
         for (_, compliant, score) in audits {
             assert!(compliant);
         }
 
-        let translated = engine.format_subsystem_payload(
+        let translated = engine.translate_subsystem_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",
