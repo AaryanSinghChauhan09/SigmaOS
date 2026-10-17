@@ -234,5 +234,9 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
     WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
 };
-pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::*;
-pub use sovereign_artcraft_craftlibs_pr_engine::*;
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
+    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
+    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
