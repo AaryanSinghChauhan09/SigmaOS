@@ -427,7 +427,12 @@ impl IdentityAndEnterpriseAuthPrEngine {
 
     /// Generate SSSD domain configuration section string.
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!("[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true", domain, provider, uri)
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
+            domain,
+            provider,
+            uri
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
