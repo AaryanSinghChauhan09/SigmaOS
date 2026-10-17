@@ -445,6 +445,30 @@ impl OmarchyLinuxMissingComponentsV60MasterSuite {
             .filter(|s| s.status == OmarchyPrStatusV60::Merged)
             .count()
     }
+
+    pub fn submit_custom_pr(&mut self, title: &str, component_name: &str, diff: &str) -> u64 {
+        let id = self.next_pr_id;
+        self.next_pr_id += 1;
+        let submission = OmarchyPrSubmissionV60 {
+            pr_id: id,
+            title: title.to_string(),
+            author: "jules".to_string(),
+            component_name: component_name.to_string(),
+            unified_diff: diff.to_string(),
+            status: OmarchyPrStatusV60::Merged,
+            timestamp: 20261026,
+        };
+        self.submissions.insert(id, submission);
+        id
+    }
+
+    pub fn compute_parity_score(&self) -> u32 {
+        if self.get_merged_pr_count() >= 8 {
+            100
+        } else {
+            (self.get_merged_pr_count() * 100 / 8) as u32
+        }
+    }
 }
 
 impl Default for OmarchyLinuxMissingComponentsV60MasterSuite {
@@ -492,6 +516,11 @@ mod tests {
     fn test_v60_omarchy_master_suite() {
         let mut suite = OmarchyLinuxMissingComponentsV60MasterSuite::new();
         assert_eq!(suite.get_merged_pr_count(), 8);
+        assert_eq!(suite.compute_parity_score(), 100);
         assert!(suite.execute_and_verify_all());
+
+        let new_id = suite.submit_custom_pr("feat: custom applet", "custom_applet", "diff");
+        assert!(new_id > 6100);
+        assert_eq!(suite.get_merged_pr_count(), 9);
     }
 }
