@@ -187,14 +187,19 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-impl SlideDeck {
-    pub fn get_active_slide(&self) -> Option<&Slide> {
-        self.slides.first()
-    }
-}
-
 pub type PresentationDeck = SlideDeck;
 pub type DeckExportFormat = ExportFormat;
+
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u32,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
 
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -207,31 +212,10 @@ pub enum ExportFormat {
     PPTX,
     Pptx,
     Markdown,
+    Pdf,
+    Pptx,
+    Html5,
     Svg,
-}
-
-/// Presenter View Live State
-#[derive(Debug, Clone)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
-
-/// Presenter state in presentation mode
-#[derive(Debug, Clone)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
 }
 
 /// Slide Exporter Engine
@@ -242,7 +226,12 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            ExportFormat::PDF => {
+            DeckExportFormat::ZenithPresentation | DeckExportFormat::PDF | DeckExportFormat::HTML5Slideshow | DeckExportFormat::PPTX => {
+                output.extend_from_slice(b"# ");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"\n\n");
+            }
+            DeckExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
@@ -265,7 +254,18 @@ impl SlideExporterEngine {
                 }
                 output.extend_from_slice(b"</div></div></body></html>");
             }
-            ExportFormat::ZenithPresentation | ExportFormat::Markdown => {
+            DeckExportFormat::Svg => {
+                output.extend_from_slice(
+                    b"<svg width=\"1920\" height=\"1080\" xmlns=\"http://www.w3.org/2000/svg\">\n",
+                );
+                if let Some(active_slide) = deck.slides.first() {
+                    output.extend_from_slice(b"  <text x=\"100\" y=\"100\" font-size=\"48\">");
+                    output.extend_from_slice(active_slide.title.as_bytes());
+                    output.extend_from_slice(b"</text>\n");
+                }
+                output.extend_from_slice(b"</svg>");
+            }
+            DeckExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\n\n");

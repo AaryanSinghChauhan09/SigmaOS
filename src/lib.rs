@@ -492,4 +492,4 @@ pub mod io;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
-pub use crate::net::sovereign_networking_stack_and_daemons_v61_pr::*;
+pub use crate::distro::openbsd_ultimate_gap_closure_v60_pr::*;

@@ -665,14 +665,14 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
-    /// Merge `/etc/rc.conf.local` overrides onto base `rc.conf` map.
+    /// Merge base `rc.conf` map with `/etc/rc.conf.local` overrides.
     pub fn merge_rc_conf_overrides(
         &self,
         base: &BTreeMap<String, String>,
-        overrides: &BTreeMap<String, String>,
+        local: &BTreeMap<String, String>,
     ) -> BTreeMap<String, String> {
         let mut merged = base.clone();
-        for (k, v) in overrides {
+        for (k, v) in local {
             merged.insert(k.clone(), v.clone());
         }
         merged
@@ -1288,13 +1288,22 @@ mod tests {
         assert!(!engine.should_trigger_timer(&trigger, 100, 120, 0));
 
         // at queue
-        let mut queue = vec![AtJobSpec {
-            job_id: 1,
-            run_at_timestamp: 500,
-            queue_letter: 'a',
-            command: "backup.sh".to_string(),
-            user: "root".to_string(),
-        }];
+        let mut queue = vec![
+            AtJobSpec {
+                job_id: 1,
+                run_at_timestamp: 500,
+                queue_letter: 'a',
+                command: "backup.sh".to_string(),
+                user: "root".to_string(),
+            },
+            AtJobSpec {
+                job_id: 2,
+                run_at_timestamp: 1000,
+                queue_letter: 'a',
+                command: "report.sh".to_string(),
+                user: "root".to_string(),
+            },
+        ];
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
