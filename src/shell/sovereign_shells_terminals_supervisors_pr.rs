@@ -165,7 +165,11 @@ impl InitSupervisorsAndTimersPrEngine {
     pub fn parse_sysvinit_inittab_action(&self, line: &str) -> Option<(u8, String, String)> {
         let parts: Vec<&str> = line.split(':').collect();
         if parts.len() >= 4 {
-            let runlevel = parts[1].chars().next().and_then(|c| c.to_digit(10)).unwrap_or(3) as u8;
+            let runlevel = parts[1]
+                .chars()
+                .next()
+                .and_then(|c| c.to_digit(10))
+                .unwrap_or(3) as u8;
             let action = parts[2].to_string();
             let process = parts[3].to_string();
             Some((runlevel, action, process))
@@ -316,7 +320,10 @@ impl InitSupervisorsAndTimersPrEngine {
     pub fn sort_at_job_spool_queue(&self, jobs: &[(&str, u64)]) -> Vec<String> {
         let mut vec_jobs: Vec<(&str, u64)> = jobs.to_vec();
         vec_jobs.sort_by_key(|&(_, time)| time);
-        vec_jobs.into_iter().map(|(name, _)| name.to_string()).collect()
+        vec_jobs
+            .into_iter()
+            .map(|(name, _)| name.to_string())
+            .collect()
     }
 
     pub fn generate_proposal(&self) -> ShellsTerminalsSupervisorsPrProposalManifest {
@@ -501,7 +508,9 @@ impl PosixAndAdvancedShellsPrEngine {
                 if let Some(dots) = inner.find("..") {
                     let start_str = &inner[..dots];
                     let end_str = &inner[dots + 2..];
-                    if let (Ok(start_num), Ok(end_num)) = (start_str.parse::<i64>(), end_str.parse::<i64>()) {
+                    if let (Ok(start_num), Ok(end_num)) =
+                        (start_str.parse::<i64>(), end_str.parse::<i64>())
+                    {
                         let mut items = Vec::new();
                         let step = if start_num <= end_num { 1 } else { -1 };
                         let mut curr = start_num;
@@ -801,7 +810,9 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         let key = "38;2;";
         if let Some(idx) = esc_seq.find(key) {
             let rest = &esc_seq[idx + key.len()..];
-            let end_idx = rest.find(|c: char| !c.is_ascii_digit() && c != ';').unwrap_or(rest.len());
+            let end_idx = rest
+                .find(|c: char| !c.is_ascii_digit() && c != ';')
+                .unwrap_or(rest.len());
             let numbers_part = &rest[..end_idx];
             let parts: Vec<&str> = numbers_part.split(';').collect();
             if parts.len() >= 3 {
@@ -821,7 +832,9 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         for prefix in &["\x1b]0;", "\x1b]2;"] {
             if let Some(start) = esc_seq.find(prefix) {
                 let rest = &esc_seq[start + prefix.len()..];
-                let end = rest.find(|c: char| c == '\x07' || c == '\x1b').unwrap_or(rest.len());
+                let end = rest
+                    .find(|c: char| c == '\x07' || c == '\x1b')
+                    .unwrap_or(rest.len());
                 return Some(rest[..end].to_string());
             }
         }
@@ -989,20 +1002,29 @@ mod tests {
         assert!(state.is_active);
         assert!(state.socket_activated);
 
-        let (ready, status, watchdog) = engine.parse_systemd_sd_notify("READY=1\nSTATUS=Running\nWATCHDOG=1");
+        let (ready, status, watchdog) =
+            engine.parse_systemd_sd_notify("READY=1\nSTATUS=Running\nWATCHDOG=1");
         assert!(ready);
         assert_eq!(status, Some("Running".to_string()));
         assert!(watchdog);
 
-        let openrc_deps = engine.resolve_openrc_runlevel_dependencies("default", &[("sshd", &["networking"]), ("networking", &[])]);
-        assert_eq!(openrc_deps, vec!["networking".to_string(), "sshd".to_string()]);
+        let openrc_deps = engine.resolve_openrc_runlevel_dependencies(
+            "default",
+            &[("sshd", &["networking"]), ("networking", &[])],
+        );
+        assert_eq!(
+            openrc_deps,
+            vec!["networking".to_string(), "sshd".to_string()]
+        );
 
         let runit_ctl = engine.evaluate_runit_service_control("sshd", "up");
         assert!(runit_ctl.contains("ok: run: sshd"));
 
         assert!(engine.s6_readiness_handshake(3));
 
-        let sysv = engine.parse_sysvinit_inittab_action("id:3:initdefault:").unwrap();
+        let sysv = engine
+            .parse_sysvinit_inittab_action("id:3:initdefault:")
+            .unwrap();
         assert_eq!(sysv.0, 3);
         assert_eq!(sysv.1, "initdefault");
 
@@ -1051,7 +1073,8 @@ mod tests {
         assert_eq!(expansion.expanded_value, "echo root on sigma");
         assert!(expansion.was_expanded);
 
-        let bash_proc = engine.expand_bash_process_substitution("diff <(cat /etc/hosts) >(tee log.txt)");
+        let bash_proc =
+            engine.expand_bash_process_substitution("diff <(cat /etc/hosts) >(tee log.txt)");
         assert_eq!(bash_proc, "diff /dev/fd/63 /dev/fd/62");
 
         let brace_a = engine.expand_bash_brace_expansion("{a,b,c}");
