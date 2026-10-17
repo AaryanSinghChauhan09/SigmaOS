@@ -665,8 +665,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_process_racct_rlimit",
-                "racct_rctl_jail_capability_limit",
+                "pol_process_sec_capsicum",
+                "capsicum_procstat_capability_check",
                 true,
             ),
         ];
@@ -746,24 +746,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystems_list_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
-        self.subsystems
-            .iter()
-            .map(|(&sub, spec)| {
-                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
-                (sub, is_compliant, spec.interop_score)
-            })
-            .collect()
-    }
-
-    pub fn translate_subsystem_distro_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
-    }
 
     pub fn dispatch_event(
         &mut self,
@@ -1214,19 +1196,17 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystems_list_compliance();
-        assert_eq!(audits.len(), 31);
+        let (audit_map, score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audit_map.len(), 31);
         assert_eq!(score, 100);
-        for (_, compliant) in audits {
-            assert!(compliant);
-        }
+        assert!(audit_map.values().all(|&v| v));
 
         let translated = engine.translate_subsystem_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
-            "mac_capsicum_enforce",
+            "jail_vnet",
         );
-        assert!(translated.contains("mac_capsicum_enforce"));
+        assert_eq!(translated, "ebpf_xdp_namespace");
     }
 
     #[test]

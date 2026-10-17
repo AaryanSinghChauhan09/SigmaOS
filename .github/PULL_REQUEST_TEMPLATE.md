@@ -1,57 +1,55 @@
 ## Summary
 
-<!-- What kernel or component behavior changed and why? -->
+<!-- What secondary-memory, shell, or subsystem behavior changed and why? -->
 
-## Kernel component
+## Storage component
 
-- [ ] Boot / arch init
-
-## Shell component
-
-- [ ] Interactive shell
-- [ ] Shell component
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
 - [ ] Security / capabilities
-- [ ] Diagnostics
-- [ ] Build / CI
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Shell component
 
-- [ ] Interactive shell
-- [ ] Command interpreter
+- [ ] Lexer / Parser
+- [ ] Expansion engine
+- [ ] Builtin commands
+- [ ] Redirection / Piping
+- [ ] Job control / Signals
+- [ ] Interactive REPL
+- [ ] Diagnostics / Error formatting
+- [ ] Conformance / POSIX
 
-## Component
+## Recurring task
 
-- [ ] Shell component
-- [ ] PR-level validation
-
-## Shell component
+- [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly subsystem review
+- [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly syscall/ABI review
-- [ ] Biweekly memory/concurrency audit
+- [ ] Biweekly storage audit
+- [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
-- [ ] Monthly driver/hardware audit
-- [ ] Monthly fuzz triage
-- [ ] Monthly diagnostics rehearsal
-- [ ] Quarterly release/architecture/security review
+- [ ] Quarterly architecture/security/release review
 
-## Reference study (Upstream study)
+## Reference behavior
 
-## Shell component
+<!-- Required for lifecycle, ABI, or storage changes -->
+<!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
+<!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- Upstream study:
+- POSIX section:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
-- Reason:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Reviewer checklist
 
@@ -61,23 +59,29 @@
 
 -
 
+## Storage safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+
 ## Shell safety review
 
-- [ ] Quote-aware lexer & parser safety
-- [ ] Safe environment expansion
-- [ ] Built-in command error handling
+<!-- Safety and rollback review checklist -->
+<!-- Reviewer checklist: Verification, lock ordering, memory limits, and runtime evidence -->
 
-## Kernel safety review
-
-- [ ] No unnecessary `unsafe`
-
-## Shell safety review
-
-- [ ] Shell safety review
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] No silent failure introduced
+- [ ] Deterministic script execution
+- [ ] Explicit exit status codes
+- [ ] No partial execution on parse error
+- [ ] Quoting and expansion integrity verified
+- [ ] Redirection and file descriptor limits enforced
 
 ## Shell safety review
 
@@ -95,18 +99,17 @@
 - [ ] `./run_sigma_tests.sh`
 - [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or reason for exemption
-- [ ] QEMU boot evidence, if boot-affecting
-- [ ] Driver/hardware evidence, if driver-affecting
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
+- [ ] Storage documentation
 - [ ] Boot matrix, if applicable
-- [ ] Hardware matrix, if applicable
 
 ## Safety and rollback
 
