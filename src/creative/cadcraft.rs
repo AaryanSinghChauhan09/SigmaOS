@@ -350,20 +350,6 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn generate_cam_toolpath(&mut self, toolpath_type: CamToolpathType, tool_diameter: f32, feed_rate: f32) -> u32 {
-        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
-        let path = CamToolpath {
-            id,
-            toolpath_type,
-            tool_diameter,
-            feed_rate,
-            spindle_speed: 12000.0,
-            gcode_output: String::from("G0 X0 Y0 Z5\nG1 Z-2 F500\nM30"),
-        };
-        self.cam_toolpaths.insert(id, path);
-        id
-    }
-
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -377,10 +363,6 @@ impl CadCraftEngine {
         };
         self.fea_meshes.insert(id, mesh);
         id
-    }
-
-    pub fn export_cad(&self, _format: ExportFormat) -> Vec<u8> {
-        vec![0x89, b'C', b'A', b'D']
     }
 }
 

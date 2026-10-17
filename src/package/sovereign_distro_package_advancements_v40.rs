@@ -741,7 +741,7 @@ impl UniversalPmCliRouterV39 {
 
         let clean_targets: Vec<String> = targets
             .into_iter()
-            .filter(|t| !t.starts_with('-'))
+            .filter(|t: &String| !t.starts_with('-'))
             .collect();
 
         Ok(RoutedPmCommandV39 {

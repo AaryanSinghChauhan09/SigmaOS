@@ -11,10 +11,7 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-/// ---------------------------------------------------------------------------
-/// 0. Feature Source Types and Roadmap Feature Ideas
-/// ---------------------------------------------------------------------------
-
+/// Feature source type for roadmap & wiki feature tracking
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
@@ -23,17 +20,16 @@ pub enum FeatureSourceType {
     ArchitectureDocument,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    UnimplementedIdeas,
-    MediaWikiDoc,
     AppReplacementPr,
     SovereignArchitectureDoc,
+    UnimplementedIdeas,
+    MediaWikiDoc,
     RoadmapIdea,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub id: u32,
+    pub idea_id: u64,
     pub title: String,
     pub category: String,
     pub source_type: FeatureSourceType,
@@ -43,26 +39,7 @@ pub struct RoadmapFeatureIdea {
     pub fulfilled: bool,
 }
 
-impl RoadmapFeatureIdea {
-    pub fn new(id: u32, title: &str, category: &str, source_type: FeatureSourceType) -> Self {
-        Self {
-            idea_id: id,
-            id,
-            title: title.to_string(),
-            category: category.to_string(),
-            source_type,
-            source_file: "wiki/Home.md".to_string(),
-            target_module: "kernel".to_string(),
-            is_fully_implemented: true,
-            fulfilled: true,
-        }
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
-/// ---------------------------------------------------------------------------
-
+/// Category for 100 improvement ideas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
@@ -224,10 +201,7 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
-/// ---------------------------------------------------------------------------
-
+/// Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
@@ -421,10 +395,7 @@ impl Default for SovereignShardsMasterRegistry {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 3. Linux & BSD Distro Gap Closing Parity Engine
-/// ---------------------------------------------------------------------------
-
+/// Linux & BSD Distro Gap Closing Parity Engine
 #[derive(Debug, Clone)]
 pub struct DistroGapFeatureRecord {
     pub distro_name: &'static str,
@@ -461,12 +432,14 @@ impl SovereignDistroGapClosureEngine {
             sigma_counterpart: "ArchPacmanContribEngine",
             verification_passed: true,
         });
+
         self.features.push(DistroGapFeatureRecord {
             distro_name: "OpenBSD",
             gap_feature_name: "pledge, unveil, KARL, retguard, signify",
             sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
+
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
@@ -485,10 +458,6 @@ impl Default for SovereignDistroGapClosureEngine {
         Self::new()
     }
 }
-
-/// ---------------------------------------------------------------------------
-/// 4. Roadmap Feature Parity Verification Engine & Subsystems
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -595,10 +564,7 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 6. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
-
+/// Master Sovereign OS Documentation & Wiki Integration Verification Engine
 #[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,

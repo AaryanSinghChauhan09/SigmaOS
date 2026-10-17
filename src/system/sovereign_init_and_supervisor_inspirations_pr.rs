@@ -665,7 +665,7 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
-    /// Merge local `/etc/rc.conf.local` overrides into base `/etc/rc.conf` map.
+    /// Merge base rc.conf BTreeMap with local overrides BTreeMap.
     pub fn merge_rc_conf_overrides(
         &self,
         base: &BTreeMap<String, String>,

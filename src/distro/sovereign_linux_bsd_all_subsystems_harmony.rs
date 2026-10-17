@@ -666,7 +666,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
                 "pol_proc_sec",
-                "enforce_racct_jail_limits_on_process_activity",
+                "enforce_racct_rctl_process_resource_limits",
                 true,
             ),
         ];
@@ -756,7 +756,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn translate_subsystem_distro_payload(
+    pub fn translate_subsystem_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1214,14 +1214,14 @@ mod tests {
             "rpm"
         );
 
-        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
+        let audits = engine.audit_subsystem_compliance_list();
         assert_eq!(audits.len(), 31);
         assert_eq!(score, 100);
         for compliant in audits.values() {
             assert!(compliant);
         }
 
-        let translated = engine.translate_subsystem_distro_payload(
+        let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",
