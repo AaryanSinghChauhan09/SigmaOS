@@ -127,7 +127,14 @@ pub struct OmarchyWallustColorSyncPrEngine {
 impl OmarchyWallustColorSyncPrEngine {
     pub fn new() -> Self {
         Self {
-            target_templates: alloc::vec!["kitty", "alacritty", "hyprland", "rofi", "waybar", "dunst"],
+            target_templates: alloc::vec![
+                "kitty",
+                "alacritty",
+                "hyprland",
+                "rofi",
+                "waybar",
+                "dunst"
+            ],
         }
     }
 
@@ -213,7 +220,12 @@ pub struct OmarchyQuickshellAppletPrEngine {
 impl OmarchyQuickshellAppletPrEngine {
     pub fn new() -> Self {
         Self {
-            active_applets: alloc::vec!["volume-popup", "brightness-popup", "media-player", "launcher"],
+            active_applets: alloc::vec![
+                "volume-popup",
+                "brightness-popup",
+                "media-player",
+                "launcher"
+            ],
         }
     }
 
@@ -342,7 +354,8 @@ impl OmarchyLinuxMissingComponentsV59PrSuite {
             self.hyprland_engine.generate_layout_rules(),
             self.omakub_engine.verify_bootstrap(),
             self.waybar_engine.generate_bar_config(),
-            self.wallust_engine.sync_palette("/usr/share/backgrounds/omarchy.png"),
+            self.wallust_engine
+                .sync_palette("/usr/share/backgrounds/omarchy.png"),
             self.herdr_engine.verify_scheduler(),
             self.hyprlock_engine.verify_security(),
             self.quickshell_engine.render_overlays(),
