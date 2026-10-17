@@ -283,7 +283,10 @@ pub struct OpenBsdNtpdHttpsConstraintsPrEngine {
 impl OpenBsdNtpdHttpsConstraintsPrEngine {
     pub fn new() -> Self {
         Self {
-            ntp_servers: vec!["pool.ntp.org".to_string(), "time.cloudflare.com".to_string()],
+            ntp_servers: vec![
+                "pool.ntp.org".to_string(),
+                "time.cloudflare.com".to_string(),
+            ],
             constraints: vec![
                 NtpdConstraint {
                     url: "https://www.google.com".to_string(),
@@ -463,10 +466,7 @@ impl OpenBsdSoftraidRaid10CryptoPrEngine {
             status_online: true,
         };
         self.arrays.insert(array_id.to_string(), arr);
-        format!(
-            "bioctl -c 10 -l {} softraid0\n",
-            chunks.join(",")
-        )
+        format!("bioctl -c 10 -l {} softraid0\n", chunks.join(","))
     }
 }
 
@@ -512,10 +512,7 @@ impl OpenBsdPfsyncStateReplicationPrEngine {
             hmac_auth: true,
             synchronized_states: 0,
         });
-        format!(
-            "ifconfig {} syncpeer {} syncdev em1 up\n",
-            sync_if, peer
-        )
+        format!("ifconfig {} syncpeer {} syncdev em1 up\n", sync_if, peer)
     }
 }
 
