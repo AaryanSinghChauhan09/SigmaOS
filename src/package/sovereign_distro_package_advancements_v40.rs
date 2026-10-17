@@ -620,6 +620,7 @@ pub enum UniversalPmActionV39 {
 }
 
 pub type UniversalPmActionV40 = UniversalPmActionV39;
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
 
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV39 {

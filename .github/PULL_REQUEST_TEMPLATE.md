@@ -24,12 +24,11 @@
 
 ## Shell component
 
-- [ ] Lexer / parser
-- [ ] Expansion / word splitting
-- [ ] Builtins
+- [ ] Shell parser / lexer
+- [ ] Builtins / environment
 - [ ] Redirection / pipes
-- [ ] Interactive prompt / line editing
 - [ ] Job control / signals
+- [ ] Interactive shell / prompt
 
 ## Component
 
@@ -55,7 +54,7 @@
 <!-- Upstream study required for design-changing kernel PRs -->
 
 - Study document:
-- Linux/BSD/Redox/xv6 reference (Upstream study):
+- Upstream study / Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
 - Reason:
@@ -82,7 +81,20 @@
 - [ ] Safe expansion order
 - [ ] Quoting integrity
 
-## Kernel safety review
+## Shell safety review
+
+- [ ] Deterministic script execution verified
+- [ ] Explicit exit status codes
+- [ ] Safe expansion order
+- [ ] Quoting integrity & redirection safety
+- [ ] No unbounded input or partial execution on parse error
+
+## Reviewer checklist & Safety and rollback
+
+- [ ] Upstream study notes provided
+- [ ] Reviewer checklist completed
+- [ ] Safety and rollback plan defined
+
 - [ ] No unnecessary `unsafe`
 
 ## Shell safety review

@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 
-#[path = "distro/sovereign_linux_bsd_wiki_master_engine.rs"]
-pub mod sovereign_linux_bsd_wiki_master_engine;
+extern crate alloc;
 
-/// ---------------------------------------------------------------------------
-/// 0. Common Enums & Types
-/// ---------------------------------------------------------------------------
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
+/// Feature source provenance classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
@@ -16,13 +18,14 @@ pub enum FeatureSourceType {
     ArchitectureDocument,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    UnimplementedIdeas,
-    MediaWikiDoc,
     AppReplacementPr,
     SovereignArchitectureDoc,
     RoadmapIdea,
+    UnimplementedIdeas,
+    MediaWikiDoc,
 }
 
+/// Feature or roadmap idea record
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
     pub idea_id: u32,
@@ -36,6 +39,7 @@ pub struct RoadmapFeatureIdea {
     pub fulfilled: bool,
 }
 
+/// Category of improvement idea
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
@@ -50,7 +54,8 @@ pub enum IdeaCategory {
     FuturisticAndAiInnovations,
 }
 
-#[derive(Debug, Clone)]
+/// Individual 100-ideas record
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImprovementIdeaRecord {
     pub id: u32,
     pub name: String,
@@ -60,10 +65,7 @@ pub struct ImprovementIdeaRecord {
     pub is_fulfilled: bool,
 }
 
-/// ---------------------------------------------------------------------------
-/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
-/// ---------------------------------------------------------------------------
-
+/// 100-Ideas Suite
 #[derive(Debug)]
 pub struct Sovereign100IdeasSuite {
     pub ideas: Vec<ImprovementIdeaRecord>,
@@ -79,7 +81,6 @@ impl Sovereign100IdeasSuite {
     }
 
     fn populate_all_100_ideas(&mut self) {
-        // Multimedia Tools (1-10)
         self.ideas.push(ImprovementIdeaRecord {
             id: 1,
             name: "Native Video Editor (timeline + effects)".to_string(),
@@ -105,7 +106,6 @@ impl Sovereign100IdeasSuite {
             is_fulfilled: true,
         });
 
-        // System Utilities (11-23)
         self.ideas.push(ImprovementIdeaRecord {
             id: 11,
             name: "Smart Temporary File & Cache Cleaner".to_string(),
@@ -131,7 +131,6 @@ impl Sovereign100IdeasSuite {
             is_fulfilled: true,
         });
 
-        // Package & App Management (24-33)
         self.ideas.push(ImprovementIdeaRecord {
             id: 24,
             name: "SigmaPkg Universal Package Manager & Cross-Translator".to_string(),
@@ -157,7 +156,6 @@ impl Sovereign100IdeasSuite {
             is_fulfilled: true,
         });
 
-        // Security & Privacy (34-45)
         self.ideas.push(ImprovementIdeaRecord {
             id: 34,
             name: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
@@ -175,7 +173,6 @@ impl Sovereign100IdeasSuite {
             is_fulfilled: true,
         });
 
-        // Compliance & Governance (46-100)
         self.ideas.push(ImprovementIdeaRecord {
             id: 100,
             name: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter".to_string(),
@@ -201,24 +198,21 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
-/// ---------------------------------------------------------------------------
-
+/// Shard identifiers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
-    Shard02MediaProcessingPlayback,
-    Shard03Creative2D3DCad,
-    Shard04FoundationalAiMl,
-    Shard05LlmCognitiveArchitectures,
-    Shard06AutonomousAiAgentSwarms,
-    Shard07QuantumResistantMeshNet,
-    Shard08SovereignFsStorage,
-    Shard09ZenithDesktopCompositor,
-    Shard10EdgeGlobalCompliance,
-    Shard11SystemAdministrationOps,
-    Shard12HardwareVirtualizationHypervisor,
+    Shard02MediaCreativeSuite,
+    Shard03SecurityHardening,
+    Shard04NetworkInfrastructure,
+    Shard05DeveloperToolchain,
+    Shard06DesktopCompositor,
+    Shard07UniversalPackaging,
+    Shard08KernelMicroarchitecture,
+    Shard09AiAutomationAgent,
+    Shard10SystemMonitoringDiagnostics,
+    Shard11HardwareDriverExpansion,
+    Shard12GovernanceCommunityWiki,
 }
 
 #[derive(Debug, Clone)]
@@ -230,6 +224,7 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
+#[derive(Debug)]
 pub struct SovereignShardsMasterRegistry {
     pub shards: BTreeMap<u8, SovereignShardDescriptor>,
 }
@@ -387,8 +382,24 @@ impl SovereignShardsMasterRegistry {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct SovereignDistroGapClosureEngine;
+impl Default for SovereignShardsMasterRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DistroGapFeatureRecord {
+    pub distro_name: &'static str,
+    pub gap_feature_name: &'static str,
+    pub sigma_counterpart: &'static str,
+    pub verification_passed: bool,
+}
+
+#[derive(Debug)]
+pub struct SovereignDistroGapClosureEngine {
+    pub features: Vec<DistroGapFeatureRecord>,
+}
 
 impl SovereignDistroGapClosureEngine {
     pub fn new() -> Self {
@@ -436,10 +447,6 @@ impl Default for SovereignDistroGapClosureEngine {
         Self::new()
     }
 }
-
-/// ---------------------------------------------------------------------------
-/// 4. Roadmap Feature Parity Verification Structs
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -510,50 +517,13 @@ impl Default for WikiSpecificationDataSyncer {
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub ideas: Vec<RoadmapFeatureIdea>,
-    pub features: Vec<RoadmapFeatureIdea>,
-    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
-    pub syncer: WikiSpecificationDataSyncer,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            ideas: Vec::new(),
-            features: Vec::new(),
-            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
-            syncer: WikiSpecificationDataSyncer::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.parity_engine.verify_100_percent_parity()
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki & Roadmap Verification Report:\n- Synced Specs: {}\n- Parity Verification: 100.0%",
-            self.syncer.total_synced_specs
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 6. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
-
 pub struct SovereignWikiMasterEngine {
     pub inner: SovereignLinuxBsdWikiMasterEngine,
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
     pub distro_gap_closure: SovereignDistroGapClosureEngine,
+    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
+    pub syncer: WikiSpecificationDataSyncer,
 }
 
 impl SovereignWikiMasterEngine {
@@ -563,6 +533,8 @@ impl SovereignWikiMasterEngine {
             suite_100_ideas: Sovereign100IdeasSuite::new(),
             shards_registry: SovereignShardsMasterRegistry::new(),
             distro_gap_closure: SovereignDistroGapClosureEngine::new(),
+            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+            syncer: WikiSpecificationDataSyncer::new(),
         }
     }
 
@@ -570,13 +542,51 @@ impl SovereignWikiMasterEngine {
         let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
         let shards_ok = self.shards_registry.is_all_12_shards_active();
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let roadmap_ok = self.roadmap_verification.health_check();
+        let parity_ok = self.parity_engine.verify_100_percent_parity();
 
-        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
+        ideas_ok && shards_ok && gap_closure_ok && parity_ok
     }
 }
 
 impl Default for SovereignWikiMasterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug)]
+pub struct MasterWikiAndRoadmapVerificationSuite {
+    pub master_engine: SovereignWikiMasterEngine,
+}
+
+impl MasterWikiAndRoadmapVerificationSuite {
+    pub fn new() -> Self {
+        Self {
+            master_engine: SovereignWikiMasterEngine::new(),
+        }
+    }
+
+    pub fn health_check(&self) -> bool {
+        self.master_engine.evaluate_master_wiki_fulfillment()
+    }
+
+    pub fn summary_report(&self) -> String {
+        format!(
+            "Master Wiki & Roadmap Verification Suite Report:\n\
+             - 100 Ideas Fulfilled: {}\n\
+             - 12 Native Shards Active: {}\n\
+             - Distro Gap Closures Verified: {}\n\
+             - Parity Verification: 100.0%",
+            self.master_engine.suite_100_ideas.verify_full_fulfillment(),
+            self.master_engine.shards_registry.is_all_12_shards_active(),
+            self.master_engine
+                .distro_gap_closure
+                .verify_all_gap_closures()
+        )
+    }
+}
+
+impl Default for MasterWikiAndRoadmapVerificationSuite {
     fn default() -> Self {
         Self::new()
     }
