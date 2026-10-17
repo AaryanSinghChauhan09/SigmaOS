@@ -227,9 +227,9 @@ pub use wordcraft::{
     WordCraftPullRequestSpec,
 };
 pub use threedcraft_missing_components_parity_pr::{
-    fnv1a_3dcraft_pr_digest, CsgOp, KeyframePose, Ray, ThreeDCraftBvhRayTracerEngine,
-    ThreeDCraftCsgBooleanMeshEngine, ThreeDCraftGltfAnimationParser, ThreeDCraftPbrShaderEngine,
-    ThreeDCraftPrGatewayEngine, ThreeDCraftPrSpec, Triangle, Vector3,
+    Sovereign3DCraftParityPrGateway, ThreeDCraftPbrShadingAndTexturePrEngine,
+    ThreeDCraftPrProposalManifest, ThreeDCraftRaytracingEnginePrEngine,
+    ThreeDCraftRiggingAndAnimationPrEngine, ThreeDCraftSculptingAndTopologyPrEngine,
 };
 pub use wordcraft_missing_components_parity_pr::{
     SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
