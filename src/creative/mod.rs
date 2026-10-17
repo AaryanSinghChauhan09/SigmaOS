@@ -23,6 +23,7 @@ pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
 pub mod vectoranimation;
 pub mod vectorcraft;
+pub mod threedcraft_missing_components_parity_pr;
 pub mod wordcraft;
 
 pub use photocraft::{
@@ -230,6 +231,11 @@ pub use wordcraft::{
     WordCraftCollaborationRevisionPrDeployer, WordCraftDocumentEnginePrDeployer,
     WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
     WordCraftPullRequestSpec,
+};
+pub use threedcraft_missing_components_parity_pr::{
+    fnv1a_3dcraft_pr_digest, CsgOp, KeyframePose, Ray, ThreeDCraftBvhRayTracerEngine,
+    ThreeDCraftCsgBooleanMeshEngine, ThreeDCraftGltfAnimationParser, ThreeDCraftPbrShaderEngine,
+    ThreeDCraftPrGatewayEngine, ThreeDCraftPrSpec, Triangle, Vector3,
 };
 pub use wordcraft_missing_components_parity_pr::{
     SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,

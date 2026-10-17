@@ -332,19 +332,6 @@ impl CadCraftEngine {
         id
     }
 
-            for constraint in &self.constraints {
-                match constraint {
-                    GeometricConstraintType::Distance {
-                        point1_idx,
-                        point2_idx,
-                        target_distance,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -358,82 +345,6 @@ impl CadCraftEngine {
         };
         self.fea_meshes.insert(id, mesh);
         id
-    }
-
-                        if current_dist > 1e-9 {
-                            let factor = 0.5 * (1.0 - target_distance / current_dist);
-                            let shift_x = dx * factor;
-                            let shift_y = dy * factor;
-
-                            if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                                p.x += shift_x;
-                                p.y += shift_y;
-                            }
-                            if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                                p.x -= shift_x;
-                                p.y -= shift_y;
-                            }
-                        }
-                    }
-                    GeometricConstraintType::Coincident {
-                        point1_idx,
-                        point2_idx,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
-                        let dx = (p2.x - p1.x).abs();
-                        let dy = (p2.y - p1.y).abs();
-                        let error = dx.max(dy);
-                        if error > max_error {
-                            max_error = error;
-                        }
-
-                        let mid_x = (p1.x + p2.x) * 0.5;
-                        let mid_y = (p1.y + p2.y) * 0.5;
-
-                        if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                        if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                    }
-                    GeometricConstraintType::EqualLength {
-                        line1_idx,
-                        line2_idx,
-                    } => {
-                        let len1 = match &self.entities[*line1_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-                        let len2 = match &self.entities[*line2_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-
-                        let error = (len1 - len2).abs();
-                        if error > max_error {
-                            max_error = error;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            if max_error < tolerance {
-                self.solved = true;
-                return true;
-            }
-        }
-
-        self.solved = true;
-        true
     }
 }
 
