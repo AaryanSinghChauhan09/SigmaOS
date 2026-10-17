@@ -44,10 +44,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
-    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
-        (allowed_mask & requested_access) == requested_access
-    }
-
     /// Evaluate SELinux access vector decision (Type Enforcement).
     pub fn evaluate_selinux_avc(
         &self,
@@ -133,11 +129,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
             flags |= 0x02000000;
         } // CLONE_NEWCGROUP
         flags
-    }
-
-    /// Check Landlock access rule against requested access rights bitmask.
-    pub fn check_landlock_access(handled_access: u32, access_request: u32) -> bool {
-        (handled_access & access_request) == access_request
     }
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
