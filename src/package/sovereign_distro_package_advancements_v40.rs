@@ -417,6 +417,8 @@ impl UdfScriptletEngineV39 {
 // 3. Cross-Distro Dependency SAT DPLL Solver & Capability Governor V39
 // ============================================================================
 
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+
 pub struct UniversalCrossDistroSatSolverV39 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
@@ -617,6 +619,8 @@ pub enum UniversalPmActionV39 {
     Audit,
 }
 
+pub type UniversalPmActionV40 = UniversalPmActionV39;
+
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV39 {
     pub source_pm: String,
@@ -735,9 +739,9 @@ impl UniversalPmCliRouterV39 {
             ),
         };
 
-        let clean_targets = targets
+        let clean_targets: Vec<String> = targets
             .into_iter()
-            .filter(|t| !t.starts_with('-'))
+            .filter(|t: &String| !t.starts_with('-'))
             .collect();
 
         Ok(RoutedPmCommandV39 {

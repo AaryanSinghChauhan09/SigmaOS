@@ -738,25 +738,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_all_subsystems_distro_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
-        self.subsystems
-            .iter()
-            .map(|(&sub, spec)| {
-                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
-                (sub, is_compliant, spec.interop_score)
-            })
-            .collect()
-    }
-
-    pub fn translate_cross_distro_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
-    }
-
     pub fn dispatch_event(
         &mut self,
         source: SigmaOsSubsystem,
@@ -1207,20 +1188,20 @@ mod tests {
         );
 
         let audits = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 31);
-        for (_, compliant, score) in audits {
+        assert_eq!(audits.0.len(), 31);
+        for (_sub, compliant) in &audits.0 {
             assert!(compliant);
-            assert_eq!(score, 100);
         }
+        assert_eq!(audits.1, 100);
 
         let translated = engine.translate_cross_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
-            SigmaOsSubsystem::SecuritySandboxing,
-            "mac_capsicum_enforce",
+            LinuxBsdDistroInspiration::ArchLinux,
+            "jail_vnet",
         );
         assert_eq!(
             translated,
-            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
+            "ebpf_xdp_namespace"
         );
     }
 
@@ -1278,13 +1259,13 @@ mod tests {
 
         let policy = orchestrator
             .translate_cross_subsystem_policy(
-                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::KernelScheduling,
                 SigmaOsSubsystem::SecuritySandboxing,
             )
-            .expect("ProcessActivity -> SecuritySandboxing policy must exist");
+            .expect("KernelScheduling -> SecuritySandboxing policy must exist");
         assert_eq!(
             policy.distro_inspiration,
-            LinuxBsdDistroInspiration::FreeBSD
+            LinuxBsdDistroInspiration::OpenBSD
         );
     }
 }

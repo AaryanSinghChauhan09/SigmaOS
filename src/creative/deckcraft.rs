@@ -173,7 +173,24 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
+}
+
+pub type PresentationDeck = SlideDeck;
+
 /// Presentation export formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeckExportFormat {
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
+    Markdown,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
     ZenithPresentation,
@@ -181,6 +198,19 @@ pub enum ExportFormat {
     HTML5Slideshow,
     PPTX,
     Markdown,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub is_presenting: bool,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u64,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+    pub timer_seconds: u64,
 }
 
 /// Slide Exporter Engine
@@ -258,11 +288,13 @@ impl DeckCraftEngine {
             presenter_state: PresenterState {
                 active_deck_id: None,
                 current_slide_index: 0,
+                is_presenting: false,
                 in_presenter_mode: false,
                 timer_running: false,
                 elapsed_secs: 0,
                 laser_pointer_active: false,
                 black_screen: false,
+                timer_seconds: 0,
             },
             next_deck_id: AtomicU32::new(1),
             next_slide_id: AtomicU32::new(101),
