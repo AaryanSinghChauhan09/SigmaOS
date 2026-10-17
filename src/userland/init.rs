@@ -293,10 +293,6 @@ pub struct SystemdPathMonitorEngine {
 pub type SystemdPathMonitorUnitEngine = SystemdPathMonitorEngine;
 
 impl SystemdPathMonitorEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn check_trigger(
         &self,
         path: &str,
@@ -555,10 +551,6 @@ pub struct OpenRcDependencySolverSpecEngine {
 pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
 
 impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn resolve_order(
         scripts: &BTreeMap<String, OpenRcHeader>,
     ) -> Result<Vec<String>, &'static str> {
@@ -692,7 +684,40 @@ impl OpenRcStatusControllerEngine {
     }
 }
 
-pub type OpenRcStatusControllerSpecEngine = OpenRcStatusControllerEngine;
+impl OpenRcHeader {
+    pub fn parse(script_content: &str) -> Self {
+        let mut header = OpenRcHeader::default();
+        for line in script_content.lines() {
+            let trimmed = line.trim();
+            if let Some(rest) = trimmed.strip_prefix("provide") {
+                header
+                    .provide
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("need") {
+                header
+                    .need
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("use") {
+                header
+                    .use_deps
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("before") {
+                header
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("after") {
+                header
+                    .after
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
+                header
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            }
+        }
+        header
+    }
+}
 
 pub type OpenRcStatusControllerSpecEngine = OpenRcStatusControllerEngine;
 
@@ -700,7 +725,42 @@ pub type OpenRcStatusControllerSpecEngine = OpenRcStatusControllerEngine;
 // runit & s6 Supervision Subsystem
 // ============================================================================
 
-/// s6 & runit Control Channel Verbs
+    pub fn register_script(&mut self, name: String, header: OpenRcHeader) {
+        self.scripts.insert(name, header);
+    }
+
+    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) -> Vec<String> {
+        self.current_runlevel = target;
+        // Collect scripts for this runlevel order
+        self.scripts.keys().cloned().collect()
+    }
+}
+
+/// OpenRC Status Controller Engine
+pub struct OpenRcStatusControllerEngine {
+    pub service_statuses: BTreeMap<String, ServiceState>,
+}
+
+impl OpenRcStatusControllerEngine {
+    pub fn new() -> Self {
+        Self {
+            service_statuses: BTreeMap::new(),
+        }
+    }
+
+    pub fn update_status(&mut self, service: String, state: ServiceState) {
+        self.service_statuses.insert(service, state);
+    }
+
+    pub fn query_status(&self, service: &str) -> ServiceState {
+        self.service_statuses
+            .get(service)
+            .copied()
+            .unwrap_or(ServiceState::Stopped)
+    }
+}
+
+/// s6 & runit Control Channel Verb Directives
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SupervisorControlVerb {
     Alarm,
@@ -897,6 +957,53 @@ pub struct SysVInittabEntry {
     pub runlevels: Vec<char>,
     pub action: SysVAction,
     pub process: String,
+}
+
+/// SysVinit Runlevel State Machine Engine
+#[derive(Debug, Clone)]
+pub struct SysVinitRunlevelStateMachine {
+    pub current_runlevel: char,
+    pub inittab_entries: Vec<SysVInittabEntry>,
+    pub active_processes: BTreeMap<String, u32>,
+}
+
+impl SysVinitRunlevelStateMachine {
+    pub fn new(initial_runlevel: char, entries: Vec<SysVInittabEntry>) -> Self {
+        Self {
+            current_runlevel: initial_runlevel,
+            inittab_entries: entries,
+            active_processes: BTreeMap::new(),
+        }
+    }
+
+    pub fn set_runlevel(&mut self, new_runlevel: char) -> Vec<&SysVInittabEntry> {
+        self.current_runlevel = new_runlevel;
+        self.inittab_entries
+            .iter()
+            .filter(|e| {
+                e.runlevels.contains(&new_runlevel)
+                    || e.runlevels.contains(&'a')
+                    || e.runlevels.contains(&'b')
+                    || e.runlevels.contains(&'c')
+            })
+            .collect()
+    }
+
+    pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
+        let mut spawned = Vec::new();
+        for entry in &self.inittab_entries {
+            if entry.action == SysVAction::Respawn
+                && entry.runlevels.contains(&self.current_runlevel)
+            {
+                if !self.active_processes.contains_key(&entry.id) {
+                    let mock_pid = 4000 + entry.id.len() as u32;
+                    self.active_processes.insert(entry.id.clone(), mock_pid);
+                    spawned.push(entry.id.clone());
+                }
+            }
+        }
+        spawned
+    }
 }
 
 impl SysVInittabEntry {
@@ -1197,11 +1304,8 @@ impl LaunchdJobSupervisorEngine {
 
     pub fn register_job(&mut self, job: LaunchdJobSpec) {
         if job.run_at_load {
-            let mock_pid = 5000 + job.label.len() as u32;
-            self.running_pids.insert(job.label.clone(), mock_pid);
             self.job_states
                 .insert(job.label.clone(), ServiceState::Running);
-            self.running_pids.insert(job.label.clone(), 5000);
         } else {
             self.job_states
                 .insert(job.label.clone(), ServiceState::Stopped);
@@ -1209,8 +1313,15 @@ impl LaunchdJobSupervisorEngine {
         self.jobs.insert(job.label.clone(), job);
     }
 
-    pub fn load_job(&mut self, job: LaunchdJobSpec) {
-        self.register_job(job);
+    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
+        for job in self.jobs.values() {
+            if job.mach_services.contains(&mach_service.to_string()) {
+                self.job_states
+                    .insert(job.label.clone(), ServiceState::Running);
+                return Some(job.label.clone());
+            }
+        }
+        None
     }
 
 impl LaunchdJobSupervisorEngine {
@@ -1533,6 +1644,74 @@ impl AnacronJob {
             }
         }
         false
+    }
+}
+
+/// Anacron `/var/spool/anacron` Spool Manager
+pub struct AnacronSpoolManager {
+    pub spool_timestamps: BTreeMap<String, u64>, // job_id -> timestamp
+}
+
+impl AnacronSpoolManager {
+    pub fn new() -> Self {
+        Self {
+            spool_timestamps: BTreeMap::new(),
+        }
+    }
+
+    pub fn record_job_run(&mut self, job_id: String, now_timestamp: u64) {
+        self.spool_timestamps.insert(job_id, now_timestamp);
+    }
+
+    pub fn get_last_run(&self, job_id: &str) -> u64 {
+        self.spool_timestamps.get(job_id).copied().unwrap_or(0)
+    }
+}
+
+/// `at` and `batch` Delayed Job Queue Entry
+#[derive(Debug, Clone)]
+pub struct AtJob {
+    pub job_id: u64,
+    pub execute_at: u64,
+    pub command: String,
+    pub queue: char, // 'a'..'z' or 'b' for batch
+    pub max_load_average: Option<f32>,
+}
+
+/// `atd` Queue Spool Manager
+pub struct AtSpoolQueueManager {
+    pub jobs: BTreeMap<u64, AtJob>,
+    pub next_job_id: u64,
+}
+
+impl AtSpoolQueueManager {
+    pub fn new() -> Self {
+        Self {
+            jobs: BTreeMap::new(),
+            next_job_id: 1,
+        }
+    }
+
+    pub fn schedule_at_job(
+        &mut self,
+        execute_at: u64,
+        command: String,
+        queue: char,
+        max_load: Option<f32>,
+    ) -> u64 {
+        let id = self.next_job_id;
+        self.next_job_id += 1;
+        self.jobs.insert(
+            id,
+            AtJob {
+                job_id: id,
+                execute_at,
+                command,
+                queue,
+                max_load_average: max_load,
+            },
+        );
+        id
     }
 }
 
@@ -2120,9 +2299,12 @@ mod tests {
         assert_eq!(envs[0], ("LISTEN_FDS".to_string(), "2".to_string()));
         assert_eq!(envs[1], ("LISTEN_PID".to_string(), "1234".to_string()));
 
-        let mut path_mon = SystemdPathMonitorEngine::new();
-        path_mon.monitored_path = "/var/log/app.log".to_string();
-        path_mon.event_type = Some(SystemdPathEventType::PathModified);
+        let path_mon = SystemdPathMonitorEngine {
+            unit_name: "log.path".to_string(),
+            monitored_path: "/var/log/app.log".to_string(),
+            event_type: SystemdPathEventType::PathModified,
+            unit_to_trigger: "log.service".to_string(),
+        };
         assert!(path_mon.check_trigger(
             "/var/log/app.log",
             SystemdPathEventType::PathModified,
@@ -2199,8 +2381,10 @@ mod tests {
             ServiceState::Running
         );
 
-        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness("READY=1"));
-        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness("ready notification"));
+        assert!(RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("READY=1"));
+        assert!(
+            RunitS6SupervisionTreeGovernor::parse_s6_readiness_notification("ready notification")
+        );
     }
 
     #[test]
@@ -2255,5 +2439,17 @@ mod tests {
         });
         let ready = at_spool.poll_ready_jobs(500, 0.5);
         assert_eq!(ready.len(), 1);
+    }
+
+    #[test]
+    fn test_userland_init_pr_gateway() {
+        let gw = UserlandInitPrGatewayEngine::new(
+            4001,
+            "feat(init): Complete Init Parity",
+            "SovereignAgent",
+        );
+        assert!(gw.run_automated_ci_gate());
+        let diff = gw.generate_unified_diff();
+        assert!(diff.contains("PR #4001"));
     }
 }

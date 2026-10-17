@@ -1234,7 +1234,10 @@ mod tests {
             LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",
         );
-        assert!(translated.contains("mac_capsicum_enforce"));
+        assert_eq!(
+            translated,
+            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
+        );
     }
 
     #[test]

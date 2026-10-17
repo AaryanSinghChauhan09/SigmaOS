@@ -659,23 +659,23 @@ impl UniversalPmCliRouterV40 {
             "apt" | "apt-get" => {
                 if parts.contains(&"install") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect::<Vec<String>>(),
+                            .collect(),
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect::<Vec<String>>(),
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV40::Update, vec![])
@@ -684,23 +684,23 @@ impl UniversalPmCliRouterV40 {
             "pacman" => {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect::<Vec<String>>(),
+                            .collect(),
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect::<Vec<String>>(),
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV40::Query, vec![])
@@ -710,34 +710,34 @@ impl UniversalPmCliRouterV40 {
             | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect::<Vec<String>>(),
+                            .collect(),
                     )
                 } else {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
                             .iter()
                             .map(|s| s.to_string())
-                            .collect::<Vec<String>>(),
+                            .collect(),
                     )
                 }
             }
             _ => (
-                UniversalPmActionV39::Install,
+                UniversalPmActionV40::Install,
                 parts
                     .get(1..)
                     .unwrap_or(&[])
                     .iter()
                     .map(|s| s.to_string())
-                    .collect::<Vec<String>>(),
+                    .collect(),
             ),
         };
 
@@ -953,7 +953,7 @@ mod tests {
 
     #[test]
     fn test_sat_solver_and_sandboxing_v40() {
-        let solver = UniversalCrossDistroSatSolverV39::new();
+        let solver = UniversalCrossDistroSatSolverV40::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
             "glibc".to_string(),

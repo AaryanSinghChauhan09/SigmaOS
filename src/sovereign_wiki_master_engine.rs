@@ -441,26 +441,20 @@ impl SovereignDistroGapClosureEngine {
             verification_passed: true,
         });
 
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart:
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "pledge, unveil, KARL, retguard, signify",
+            source_distro: "OpenBSD",
+            target_native_implementation:
                 "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            verification_passed: true,
+            gap_closed: true,
         });
 
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "OpenBSD",
-            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            verification_passed: true,
-        });
-
-        self.features.push(DistroGapFeatureRecord {
-            distro_name: "FreeBSD",
-            gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
-            verification_passed: true,
+        self.gaps.push(DistroGapFeatureRecord {
+            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
+            source_distro: "FreeBSD",
+            target_native_implementation:
+                "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
+            gap_closed: true,
         });
     }
 
