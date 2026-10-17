@@ -125,9 +125,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Check Landlock access rights bitmask.
-    pub fn check_landlock_access(allowed_rights: u64, requested_rights: u64) -> bool {
-        (allowed_rights & requested_rights) == requested_rights
+    /// Evaluate Landlock access request against handled access bitmask.
+    pub fn check_landlock_access(handled_access: u32, requested_access: u32) -> bool {
+        (handled_access & requested_access) == requested_access
     }
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
@@ -436,7 +436,7 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Generate SSSD domain configuration section string.
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
             domain,
             provider,
             uri
