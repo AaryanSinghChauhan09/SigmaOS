@@ -14,10 +14,6 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-/// ---------------------------------------------------------------------------
-/// 0. Common Declarations & Feature Types
-/// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
@@ -34,10 +30,11 @@ pub enum FeatureSourceType {
     ArchitectureDocument,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    AppReplacementPr,
     UnimplementedIdeas,
     MediaWikiDoc,
+    AppReplacementPr,
     SovereignArchitectureDoc,
+    RoadmapIdea,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -52,11 +49,7 @@ pub struct RoadmapFeatureIdea {
     pub is_fully_implemented: bool,
 }
 
-/// ---------------------------------------------------------------------------
-/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
     SystemUtilities,
@@ -207,10 +200,6 @@ impl Default for Sovereign100IdeasSuite {
         Self::new()
     }
 }
-
-/// ---------------------------------------------------------------------------
-/// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
@@ -442,12 +431,16 @@ impl SovereignDistroGapClosureEngine {
                 "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
-
+        self.features.push(DistroGapFeatureRecord {
+            distro_name: "OpenBSD",
+            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
+            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
+            verification_passed: true,
+        });
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart:
-                "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
+            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
             verification_passed: true,
         });
     }
@@ -462,10 +455,6 @@ impl Default for SovereignDistroGapClosureEngine {
         Self::new()
     }
 }
-
-/// ---------------------------------------------------------------------------
-/// 4. Roadmap Feature Parity Verification Structs
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -531,16 +520,13 @@ impl Default for WikiSpecificationDataSyncer {
     }
 }
 
-/// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
-
 #[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
     pub distro_gap_closure: SovereignDistroGapClosureEngine,
     pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
+    pub syncer: WikiSpecificationDataSyncer,
 }
 
 impl SovereignWikiMasterEngine {
@@ -550,6 +536,7 @@ impl SovereignWikiMasterEngine {
             shards_registry: SovereignShardsMasterRegistry::new(),
             distro_gap_closure: SovereignDistroGapClosureEngine::new(),
             parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+            syncer: WikiSpecificationDataSyncer::new(),
         }
     }
 
@@ -557,9 +544,9 @@ impl SovereignWikiMasterEngine {
         let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
         let shards_ok = self.shards_registry.is_all_12_shards_active();
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let roadmap_ok = self.parity_engine.verify_100_percent_parity();
+        let parity_ok = self.parity_engine.verify_100_percent_parity();
 
-        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
+        ideas_ok && shards_ok && gap_closure_ok && parity_ok
     }
 }
 

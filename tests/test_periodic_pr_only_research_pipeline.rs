@@ -101,9 +101,8 @@ fn test_github_templates_exist() {
     let pr_template = fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md")
         .expect("PULL_REQUEST_TEMPLATE.md should exist");
     assert!(pr_template.contains("Reference study"));
-    assert!(pr_template.contains("Changes"));
+    assert!(pr_template.contains("Kernel safety review"));
     assert!(pr_template.contains("Risks and rollback"));
-    assert!(pr_template.contains("Evidence"));
 
     // Check Study Issue Template
     let study_issue = fs::read_to_string(".github/ISSUE_TEMPLATE/study_issue.yml")

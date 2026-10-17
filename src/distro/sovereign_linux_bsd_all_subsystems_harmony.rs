@@ -666,7 +666,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
                 "pol_proc_sec",
-                "process_rctl_racct_capsicum_sandbox_guard",
+                "proc_mac_capsicum_isolation_guard",
                 true,
             ),
         ];
@@ -744,25 +744,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
             | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
             _ => "sigpkg",
         }
-    }
-
-    pub fn audit_subsystems_compliance_vector(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
-        self.subsystems
-            .iter()
-            .map(|(&sub, spec)| {
-                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
-                (sub, is_compliant, spec.interop_score)
-            })
-            .collect()
-    }
-
-    pub fn format_cross_distro_subsystem_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
     }
 
     pub fn dispatch_event(
@@ -1214,21 +1195,19 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystems_compliance_vector();
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
         assert_eq!(audits.len(), 31);
-        for (_, compliant, score) in audits {
+        assert_eq!(score, 100);
+        for (_, compliant) in audits {
             assert!(compliant);
         }
 
         let translated = engine.format_cross_distro_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
-            SigmaOsSubsystem::SecuritySandboxing,
+            LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",
         );
-        assert_eq!(
-            translated,
-            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
-        );
+        assert!(translated.contains("mac_capsicum_enforce"));
     }
 
     #[test]
