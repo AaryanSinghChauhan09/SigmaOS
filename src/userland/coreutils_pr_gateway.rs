@@ -331,24 +331,14 @@ impl GnuCoreutilsBsdUserlandEngine {
             .collect()
     }
 
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+        let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if unique {
             list.sort();
             list.dedup();
         }
         if numeric {
-            list.sort_by(|a, b| {
-                let na: f64 = a.parse().unwrap_or(0.0);
-                let nb: f64 = b.parse().unwrap_or(0.0);
-                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
-            });
+            list.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
         } else {
             list.sort();
         }
@@ -358,36 +348,20 @@ impl GnuCoreutilsBsdUserlandEngine {
         list
     }
 
-    pub fn run_tr(&self, text: &str, set1: &str, set2: &str, delete_set1: bool) -> String {
-        if delete_set1 {
-            text.chars().filter(|c| !set1.contains(*c)).collect()
-        } else {
-            let mut res = String::new();
-            let s1_chars: Vec<char> = set1.chars().collect();
-            let s2_chars: Vec<char> = set2.chars().collect();
-            for c in text.chars() {
-                if let Some(pos) = s1_chars.iter().position(|&x| x == c) {
-                    if pos < s2_chars.len() {
-                        res.push(s2_chars[pos]);
-                    } else if let Some(&last) = s2_chars.last() {
-                        res.push(last);
-                    } else {
-                        res.push(c);
-                    }
-                } else {
-                    res.push(c);
-                }
-            }
-            res
+    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, _delete: bool) -> String {
+        let mut out = String::from(input);
+        for (c1, c2) in set1.chars().zip(set2.chars()) {
+            out = out.replace(c1, &c2.to_string());
         }
+        out
     }
 
-    pub fn run_head_tail_bytes(&self, data: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
+    pub fn run_head_tail_bytes(&self, content: &[u8], count: usize, is_head: bool) -> Vec<u8> {
         if is_head {
-            data.iter().take(bytes_count).copied().collect()
+            content.iter().take(count).copied().collect()
         } else {
-            let skip = data.len().saturating_sub(bytes_count);
-            data.iter().skip(skip).copied().collect()
+            let skip = content.len().saturating_sub(count);
+            content.iter().skip(skip).copied().collect()
         }
     }
 }
@@ -927,6 +901,19 @@ impl TextProcessingEngine {
         matches
     }
 
+    pub fn grep_match_extended(
+        &self,
+        content: &str,
+        pattern: &str,
+        _extended_regex: bool,
+        _invert: bool,
+        case_insensitive: bool,
+    ) -> (usize, Vec<String>) {
+        let matches = self.grep_match(content, pattern, case_insensitive);
+        let formatted = matches.iter().map(|(num, line)| format!("{}:{}", num, line)).collect();
+        (matches.len(), formatted)
+    }
+
     pub fn grep_match_context(
         &self,
         content: &str,
@@ -1163,15 +1150,13 @@ impl ArchivalCompressionEngine {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
     }
 
-    pub fn parse_pax_header(&self, pax_bytes: &[u8]) -> BTreeMap<String, String> {
+    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
-        if let Ok(text) = core::str::from_utf8(pax_bytes) {
+        if let Ok(text) = core::str::from_utf8(header_bytes) {
             for line in text.lines() {
-                let trimmed = line.trim();
-                if let Some((_len, rest)) = trimmed.split_once(' ') {
-                    if let Some((k, v)) = rest.split_once('=') {
-                        map.insert(k.to_string(), v.to_string());
-                    }
+                if let Some((k, v)) = line.split_once('=') {
+                    let key = k.split_whitespace().last().unwrap_or(k);
+                    map.insert(key.to_string(), v.to_string());
                 }
             }
         }
@@ -1183,7 +1168,7 @@ impl ArchivalCompressionEngine {
         format: CompressionFormat,
         level: u32,
     ) -> Result<String, &'static str> {
-        Ok(format!("{:?} level {} configured", format, level))
+        Ok(format!("Configured {:?} level {}", format, level))
     }
 }
 
@@ -1648,10 +1633,10 @@ impl AuthPrivilegeSessionEngine {
         env_map: &mut BTreeMap<String, String>,
         action: &str,
         key: &str,
-        value: &str,
+        val: &str,
     ) -> bool {
         if action == "set" {
-            env_map.insert(key.to_string(), value.to_string());
+            env_map.insert(key.to_string(), val.to_string());
             true
         } else if action == "unset" {
             env_map.remove(key).is_some()
@@ -1860,28 +1845,16 @@ impl CoreUtilsPullRequestGatewayEngine {
         self.submissions.values().cloned().collect()
     }
 
-    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|s| s.category == category)
-            .cloned()
-            .collect()
+    pub fn get_prs_by_category(&self, cat: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.category == cat).cloned().collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|s| s.status == status)
-            .cloned()
-            .collect()
+        self.submissions.values().filter(|s| s.status == status).cloned().collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|s| s.author == author)
-            .cloned()
-            .collect()
+        self.submissions.values().filter(|s| s.author == author).cloned().collect()
     }
 }
 

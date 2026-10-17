@@ -1470,6 +1470,17 @@ impl AnacronJob {
     }
 }
 
+/// `at` and `batch` Delayed Job Queue Entry
+#[derive(Debug, Clone)]
+pub struct AtJob {
+    pub job_id: u64,
+    pub execute_at: u64,
+    pub command: String,
+    pub queue: char,
+    pub max_load_average: Option<f32>,
+}
+
+
 /// Systemd Timer Specification
 #[derive(Debug, Clone)]
 pub struct SystemdTimerSpec {

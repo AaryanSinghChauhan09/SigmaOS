@@ -249,15 +249,8 @@ impl SlideExporterEngine {
                 output.extend_from_slice(b"</div></div></body></html>");
             }
             ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(
-                    b"<svg width=\"1920\" height=\"1080\" xmlns=\"http://www.w3.org/2000/svg\">\n",
-                );
-                if let Some(active_slide) = deck.slides.first() {
-                    output.extend_from_slice(b"  <text x=\"100\" y=\"100\" font-size=\"48\">");
-                    output.extend_from_slice(active_slide.title.as_bytes());
-                    output.extend_from_slice(b"</text>\n");
-                }
-                output.extend_from_slice(b"</svg>");
+                output.extend_from_slice(b"ZENITH_PRESENTATION_V1:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
             }
             ExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");
@@ -279,8 +272,8 @@ impl SlideExporterEngine {
     }
 }
 
-/// Presenter view state
-#[derive(Debug, Clone, Default)]
+/// Dual-screen presenter view state
+#[derive(Debug, Clone)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,

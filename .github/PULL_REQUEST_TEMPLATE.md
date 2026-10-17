@@ -24,9 +24,12 @@
 
 ## Shell component
 
-- [ ] Interactive shell
-- [ ] Script execution
-- [ ] POSIX compliance
+- [ ] Lexer / parser
+- [ ] Expansion / word splitting
+- [ ] Builtins
+- [ ] Redirection / pipes
+- [ ] Interactive prompt / line editing
+- [ ] Job control / signals
 
 ## Component
 
@@ -49,11 +52,12 @@
 
 - [ ] Shell component
 
-<!-- Required for design-changing kernel PRs -->
+<!-- Upstream study required for design-changing kernel PRs -->
 
 - Study document:
-- Upstream study: Linux/BSD/Redox/xv6 reference
-- What SigmaOS adopts: Adopt / Adapt / Reject
+- Linux/BSD/Redox/xv6 reference (Upstream study):
+- What SigmaOS adopts:
+- Decision: Adopt / Adapt / Reject
 - Reason:
 
 ## Changes
@@ -89,6 +93,20 @@
 - [ ] Error paths tested
 - [ ] No silent failure introduced
 
+## Shell safety review
+
+- [ ] Quoting integrity verified
+- [ ] Safe expansion order
+- [ ] Redirection safety checked
+- [ ] Signal safety checked
+- [ ] Exit status explicit
+
+## Reviewer checklist
+
+- [ ] Upstream study verified
+- [ ] Safety and rollback plan verified
+- [ ] Tests and evidence verified
+
 ## Evidence
 
 - [ ] `cargo check --lib`
@@ -117,6 +135,4 @@
 - [ ] Shell safety review
 
 - Risk:
-- Rollback:
-
-## Reviewer checklist
+- Safety and rollback:
