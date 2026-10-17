@@ -31,7 +31,3 @@
 ## 2025-06-05 - Zero-Allocation Search Matching for Notes & Desktop Applications
 **Learning:** In interactive desktop note search loops, calling `note.title.to_lowercase()` and `note.content.to_lowercase()` per item incurs hundreds of dynamic heap `String` allocations per search query. Utilizing ASCII window byte matching (`contains_ignore_case` & `find_ignore_case`) performs in-place case-insensitive matching without intermediate heap allocations.
 **Action:** Always use window slice matching helpers (`contains_ignore_case` / `find_ignore_case`) for text searching across interactive desktop models.
-
-## 2026-10-17 - Fusing URL-encoded traversal checks into single-pass byte scan
-**Learning:** Combining multi-pass slice window iterations (`windows(6)` and `windows(3)`) directly into a single linear byte scan loop using `for (i, &b) in path.iter().enumerate()` avoids redundant buffer traversal passes and slice iterator allocation overhead on hot input validation paths without compromising security invariants.
-**Action:** When validating byte buffers for multi-byte security patterns or traversal signatures, merge pattern window scans into the primary byte loop using index lookups when encountering trigger bytes (such as `%`).
