@@ -43,6 +43,12 @@ pub mod repository_config;
 pub mod resolver;
 pub mod sandbox;
 pub mod sigma_pkg;
+pub use sigma_pkg::{
+    ForeignRepoIndexParser, PkgConfig, SandboxActionType, SandboxedScriptletResult, SigmaPkg,
+    SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
+    UniversalPackageFormat, UniversalPackageImporter, UniversalPackageTriggerEngine,
+    UniversalPackageTriggerType, UniversalPackageVerificationResult,
+};
 pub mod sigmarepo;
 pub mod signing;
 pub mod sovereign_distro_package_matrix;
