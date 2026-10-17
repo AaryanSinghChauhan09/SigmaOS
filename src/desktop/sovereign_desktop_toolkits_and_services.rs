@@ -441,6 +441,23 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
+    pub fn initiate_xdmcp_remote_handshake(
+        &mut self,
+        client_address: &str,
+        display_number: u32,
+    ) -> usize {
+        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
+        self.xdmcp_sessions.push(XdmcpSessionHandshake {
+            session_id: id,
+            client_address: client_address.to_string(),
+            display_number,
+            status: "Active".to_string(),
+        });
+        self.xdmcp_manager
+            .initiate_handshake(&format!(":{}", display_number), client_address);
+        id
+    }
+
     pub fn create_seat(&mut self, seat_id: &str, vt_number: u32) {
         self.seats.insert(
             seat_id.to_string(),
