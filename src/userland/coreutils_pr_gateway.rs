@@ -63,7 +63,13 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
@@ -1079,8 +1085,15 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
-        Ok(format!("{:?} level {} configured successfully", format, level))
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, String> {
+        Ok(format!(
+            "{:?} level {} configured successfully",
+            format, level
+        ))
     }
 
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
@@ -1325,7 +1338,9 @@ impl DocumentationPagerEngine {
     pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
         match (page_name, section) {
             ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self.man_db_lookup(page_name).map(|s| format!("Section {}: {}", section, s)),
+            _ => self
+                .man_db_lookup(page_name)
+                .map(|s| format!("Section {}: {}", section, s)),
         }
     }
 
@@ -1398,7 +1413,13 @@ impl AuthPrivilegeSessionEngine {
         Self
     }
 
-    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, val: &str) -> bool {
+    pub fn pam_environment_manage(
+        &self,
+        env: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
         if action == "set" {
             env.insert(key.to_string(), val.to_string());
             true
@@ -2090,7 +2111,9 @@ mod tests {
 
         let cfg = arch.configure_compression_level(CompressionFormat::Zstd, 19);
         assert!(cfg.is_ok());
-        assert!(cfg.unwrap().contains("Zstd level 19 configured successfully"));
+        assert!(cfg
+            .unwrap()
+            .contains("Zstd level 19 configured successfully"));
 
         assert!(arch.verify_archive_integrity(b"\x28\xB5\x2F\xFD", b"payload"));
     }

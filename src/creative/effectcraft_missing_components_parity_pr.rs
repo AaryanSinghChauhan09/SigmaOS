@@ -740,7 +740,9 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement ACES Color Management & OpenColorIO (OCIO v2) Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement ACES Color Management & OpenColorIO (OCIO v2) Engine"
+                    .to_string(),
             target_subsystem: "Color Science & ACES Engine".to_string(),
             original_suite: "ArtCraft EffectCraft Color Pipeline".to_string(),
             components_added: vec![
@@ -809,7 +811,9 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Cryptomatte EXR Manifest Parser & ID Matte Extractor".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Cryptomatte EXR Manifest Parser & ID Matte Extractor"
+                    .to_string(),
             target_subsystem: "Cryptomatte AOV Compositing".to_string(),
             original_suite: "ArtCraft Cryptomatte Pipeline".to_string(),
             components_added: vec![
@@ -871,7 +875,9 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Motion Graphics Expression Scripting & Rigging Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Motion Graphics Expression Scripting & Rigging Engine"
+                    .to_string(),
             target_subsystem: "Expression Scripting Rigging Engine".to_string(),
             original_suite: "ArtCraft Motion Graphics Engine".to_string(),
             components_added: vec![
@@ -1432,7 +1438,9 @@ mod tests {
         let frame1 = vec![100u8; 16];
         let frame2 = vec![110u8; 16];
         let mut output = vec![0u8; 16];
-        let processed = engine.process_temporal_denoise(&[&frame1, &frame2], &mut output).unwrap();
+        let processed = engine
+            .process_temporal_denoise(&[&frame1, &frame2], &mut output)
+            .unwrap();
         assert_eq!(processed, 16);
         assert_eq!(output[0], 105);
     }
@@ -1442,7 +1450,9 @@ mod tests {
         let engine = StereoscopicVr360SpatialVideoPrEngine::new();
         let left_eye = vec![255u8, 128u8, 64u8, 255u8];
         let mut right_eye = vec![0u8; 4];
-        let len = engine.generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0).unwrap();
+        let len = engine
+            .generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0)
+            .unwrap();
         assert_eq!(len, 4);
     }
 }
