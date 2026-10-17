@@ -26,6 +26,8 @@ pub use creative::soundcraft_missing_components_parity_pr::*;
 pub use creative::wordcraft::*;
 pub use creative::wordcraft_missing_components_parity_pr::*;
 pub use creative::effectcraft_missing_components_parity_pr::*;
+pub use creative::gridcraft::*;
+pub use creative::gridcraft_missing_components_parity_pr::*;
 pub mod customization;
 pub mod dashboard;
 pub mod database;

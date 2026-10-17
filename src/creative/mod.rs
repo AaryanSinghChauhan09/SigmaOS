@@ -23,6 +23,8 @@ pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
 pub mod vectoranimation;
 pub mod vectorcraft;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
 pub mod wordcraft;
 
 pub use photocraft::{
@@ -230,6 +232,21 @@ pub use wordcraft::{
     WordCraftCollaborationRevisionPrDeployer, WordCraftDocumentEnginePrDeployer,
     WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
     WordCraftPullRequestSpec,
+};
+pub use gridcraft::{
+    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
+    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
+    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
+    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat, PivotFieldOrientation,
+    PivotTable, PivotTableEngine, Workbook, Worksheet,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
+    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
+    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
+    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
+    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
 };
 pub use wordcraft_missing_components_parity_pr::{
     SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
