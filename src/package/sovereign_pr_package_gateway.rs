@@ -312,10 +312,9 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
         return false;
     }
     haystack.as_bytes().windows(needle.len()).any(|window| {
-        window
-            .iter()
-            .zip(needle.bytes())
-            .all(|(&h, n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        window.iter().zip(needle.bytes()).all(|(&h, n)| {
+            h.to_ascii_lowercase() == n.to_ascii_lowercase()
+        })
     })
 }
 

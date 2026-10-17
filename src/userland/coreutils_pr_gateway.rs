@@ -63,13 +63,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
+    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
         let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             sorted.sort_by_key(|a| a.parse::<i64>().unwrap_or(0));
@@ -109,11 +103,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         if is_head {
             data.iter().take(count).copied().collect()
         } else {
-            let start = if data.len() > count {
-                data.len() - count
-            } else {
-                0
-            };
+            let start = if data.len() > count { data.len() - count } else { 0 };
             data[start..].to_vec()
         }
     }
@@ -220,9 +210,7 @@ impl GnuCoreutilsBsdUserlandEngine {
             list.sort_by(|a, b| {
                 let num_a = a.parse::<f64>().unwrap_or(0.0);
                 let num_b = b.parse::<f64>().unwrap_or(0.0);
-                num_a
-                    .partial_cmp(&num_b)
-                    .unwrap_or(core::cmp::Ordering::Equal)
+                num_a.partial_cmp(&num_b).unwrap_or(core::cmp::Ordering::Equal)
             });
         } else {
             list.sort();
@@ -236,9 +224,18 @@ impl GnuCoreutilsBsdUserlandEngine {
         list
     }
 
-    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
+    pub fn run_tr(
+        &self,
+        input: &str,
+        from_set: &str,
+        to_set: &str,
+        delete_mode: bool,
+    ) -> String {
         if delete_mode {
-            input.chars().filter(|c| !from_set.contains(*c)).collect()
+            input
+                .chars()
+                .filter(|c| !from_set.contains(*c))
+                .collect()
         } else {
             let mut out = String::with_capacity(input.len());
             let from_chars: Vec<char> = from_set.chars().collect();
@@ -333,20 +330,10 @@ impl GnuCoreutilsBsdUserlandEngine {
         )
     }
 
-    pub fn run_sort(
-        &self,
-        items: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
+    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
         let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if numeric {
-            vec.sort_by(|a, b| {
-                a.parse::<i64>()
-                    .unwrap_or(0)
-                    .cmp(&b.parse::<i64>().unwrap_or(0))
-            });
+            vec.sort_by(|a, b| a.parse::<i64>().unwrap_or(0).cmp(&b.parse::<i64>().unwrap_or(0)));
         } else {
             vec.sort();
         }
@@ -1309,11 +1296,7 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(
-        &self,
-        format: CompressionFormat,
-        level: u32,
-    ) -> Result<String, String> {
+    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
         Ok(format!("{:?} level {}", format, level))
     }
 
@@ -1353,11 +1336,7 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(
-        &self,
-        format: CompressionFormat,
-        level: u32,
-    ) -> Result<String, String> {
+    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
         Ok(format!("{:?} level {}", format, level))
     }
 
@@ -1696,9 +1675,7 @@ impl DocumentationPagerEngine {
     pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
         match (page_name, section) {
             ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self
-                .man_db_lookup(page_name)
-                .map(|s| format!("Section {}: {}", section, s)),
+            _ => self.man_db_lookup(page_name).map(|s| format!("Section {}: {}", section, s)),
         }
     }
 
@@ -1783,13 +1760,7 @@ impl AuthPrivilegeSessionEngine {
         Self
     }
 
-    pub fn pam_environment_manage(
-        &self,
-        env: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        val: &str,
-    ) -> bool {
+    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, val: &str) -> bool {
         if action == "set" {
             env.insert(key.to_string(), val.to_string());
             true
@@ -1889,7 +1860,9 @@ impl AuthPrivilegeSessionEngine {
                 env_map.insert(key.to_string(), val.to_string());
                 true
             }
-            "unset" => env_map.remove(key).is_some(),
+            "unset" => {
+                env_map.remove(key).is_some()
+            }
             _ => false,
         }
     }
@@ -2202,27 +2175,15 @@ impl CoreUtilsPullRequestGatewayEngine {
     }
 
     pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|pr| pr.category == category)
-            .cloned()
-            .collect()
+        self.submissions.values().filter(|pr| pr.category == category).cloned().collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|pr| pr.status == status)
-            .cloned()
-            .collect()
+        self.submissions.values().filter(|pr| pr.status == status).cloned().collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|pr| pr.author == author)
-            .cloned()
-            .collect()
+        self.submissions.values().filter(|pr| pr.author == author).cloned().collect()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {

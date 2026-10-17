@@ -13090,24 +13090,10 @@ impl SovereignBitrix24OmnichannelLeadScoringRoutingEngine {
 /// Interactive Smart Chip Category Spec
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SmartChipCategory {
-    UserMention {
-        username: String,
-        email: String,
-    },
-    FileLink {
-        file_id: String,
-        filename: String,
-        mime_type: String,
-    },
-    EventReference {
-        event_id: String,
-        title: String,
-        start_timestamp: u64,
-    },
-    StatusTag {
-        tag_text: String,
-        color_hex: String,
-    },
+    UserMention { username: String, email: String },
+    FileLink { file_id: String, filename: String, mime_type: String },
+    EventReference { event_id: String, title: String, start_timestamp: u64 },
+    StatusTag { tag_text: String, color_hex: String },
 }
 
 /// Smart Chip Element Spec
@@ -13850,18 +13836,12 @@ mod tests_phase2 {
         // 45. Sovereign Microsoft 365 Coauthoring Operational Transform Engine
         let ot_engine = SovereignMicrosoft365CoauthoringOperationalTransformEngine::new();
         let op_a = CoauthorOperation {
-            op_kind: CoauthorOpKind::Insert {
-                position: 5,
-                text: "ABC".to_string(),
-            },
+            op_kind: CoauthorOpKind::Insert { position: 5, text: "ABC".to_string() },
             site_id: 1,
             vector_clock: 10,
         };
         let op_b = CoauthorOperation {
-            op_kind: CoauthorOpKind::Insert {
-                position: 10,
-                text: "XYZ".to_string(),
-            },
+            op_kind: CoauthorOpKind::Insert { position: 10, text: "XYZ".to_string() },
             site_id: 2,
             vector_clock: 10,
         };
