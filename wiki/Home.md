@@ -175,8 +175,8 @@
 ---
 
 ## 📚 Maintenance, Governance & Architecture
-- [Future Development Roadmap: BSD, Linux & Craft Ecosystem](./Future-Development-Roadmap-BSD-Craft-Linux.md) &ndash; Strategic roadmap integrating DragonFly/Free/OpenBSD, Arch/Cachy/Debian Linux, and the 21-pillar Sovereign Craft suite.
-- [AI Development Agent Operating Manual](./AI-Development-Agent-Operating-Manual.md) &ndash; Binding 5-step operational lifecycle, branch & PR merging via 'Theirs', and OOPS/SOLID programming principles.
+- [Process Synchronization Plan](./PROCESS_SYNCHRONIZATION_PLAN.md) &ndash; Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR roadmap, maintenance cadences, component rules, PR review template, and completion gates.
+- [Architecture Performance Development Decision Plan](./18-Architecture-Performance-Development-Decision-Plan-PR.md) &ndash; Supreme Performance Architecture Development Decision Plan (ADR-004 to ADR-010) in Pull Request proposal format.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.
 - [Contributing Guidelines](./CONTRIBUTING.md) &ndash; Submitting patches, test requirements, and coding conventions.
 - [Main Repository Codebase](https://github.com/AaryanSinghChauhan09/SigmaOS) &ndash; Official SigmaOS GitHub repository.

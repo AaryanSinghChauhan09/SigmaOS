@@ -159,8 +159,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    pub fn check_landlock_access_u32(allowed_mask: u32, required_mask: u32) -> bool {
-        (allowed_mask & required_mask) == required_mask
+    /// Check if Landlock access rights match expected bitmask.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
     }
 
     /// Generate Linux Access Control & Sandboxing PR proposal.
@@ -455,6 +456,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD domain configuration string.
+    pub fn generate_sssd_domain_conf(domain: &str, id_provider: &str, auth_provider: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nauth_provider = {}\ncache_credentials = true\n",
+            domain, id_provider, auth_provider
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.

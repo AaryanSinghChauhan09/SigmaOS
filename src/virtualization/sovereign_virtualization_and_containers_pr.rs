@@ -200,24 +200,6 @@ pub struct LibvirtStorageVolume {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LibvirtNwFilterRule {
     pub name: String,
     pub action: String,    // "accept", "drop", "reject"
@@ -714,11 +696,11 @@ pub struct KubernetesK3sRancherEngine {
 
 impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
-        let mut crio = Vec::new();
-        crio.push("runc".to_string());
-        crio.push("crun".to_string());
-        crio.push("gvisor".to_string());
-        crio.push("kata".to_string());
+        let mut handlers = Vec::new();
+        handlers.push("runc".to_string());
+        handlers.push("crun".to_string());
+        handlers.push("kata".to_string());
+        handlers.push("gvisor".to_string());
         Self {
             pods: Vec::new(),
             crio_runtime_handlers: crio,
