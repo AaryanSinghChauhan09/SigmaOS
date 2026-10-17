@@ -129,9 +129,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Evaluate Landlock access request against handled access bitmask.
-    pub fn check_landlock_access(handled_access: u32, requested_access: u32) -> bool {
-        (handled_access & requested_access) == requested_access
+    /// Evaluate Landlock ABI access rules (allowed mask vs requested mask).
+    pub fn check_landlock_access(allowed_mask: u32, requested_mask: u32) -> bool {
+        (allowed_mask & requested_mask) == requested_mask
     }
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
@@ -441,15 +441,9 @@ impl IdentityAndEnterpriseAuthPrEngine {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
     }
 
-    /// Generate SSSD domain configuration content for domain, provider, and URI.
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\nauth_provider = {}\n",
-            domain,
-            provider,
-            uri,
-            provider
-        )
+    /// Generate SSSD domain configuration file string.
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
+        alloc::format!("[domain/{}]\nid_provider = ipa\nauth_provider = ipa\nipa_domain = {}\nipa_kdc = {}\n", domain, realm, kdc)
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
