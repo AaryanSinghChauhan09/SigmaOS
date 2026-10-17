@@ -10,7 +10,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// Zoom level
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ZoomLevel {
     Fit,
     FitWidth,

@@ -81,7 +81,7 @@ pub struct Date {
 pub struct CalendarManager {
     pub calendars: BTreeMap<u32, Calendar>,
     pub selected_date: Date,
-    pub view_month: i32,
+    pub view_month: u32,
     pub view_year: i32,
     next_calendar_id: AtomicU32,
     next_event_id: AtomicU32,
