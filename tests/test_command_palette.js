@@ -303,4 +303,37 @@ assert.strictEqual(maxBtn.getAttribute("aria-expanded"), "false", "Expected aria
 assert.strictEqual(maxBtn.getAttribute("aria-label"), "Maximize OmniShell Terminal", "Expected aria-label to revert to 'Maximize OmniShell Terminal'");
 console.log("✓ Window maximize ARIA state and title context preservation verified successfully!");
 
+// Test 13: Interactive Utility Actions (calculateGST, checkLegalCompliance, runSelectedTests, etc.)
+const gstAmt = createMockElement("gst-amount");
+gstAmt.value = "10000"; // 100 Rs in paise
+const gstRate = createMockElement("gst-rate");
+gstRate.value = "18";
+const gstRes = createMockElement("gst-result");
+createMockElement("kernel-logs"); // container for showToast
+
+zenith.calculateGST();
+assert.strictEqual(gstRes.textContent, "> Result: Base ₹100.00 + Tax ₹18.00 (18%) = Total ₹118.00", "Expected GST result text calculation");
+
+const legalQuery = createMockElement("legal-query");
+legalQuery.value = "302";
+const legalRes = createMockElement("legal-result");
+
+zenith.checkLegalCompliance();
+assert.strictEqual(legalRes.textContent, '> Mapping Status: Section "302" mapped to Sovereign Ring-0 Sandbox policy', "Expected BNS legal section mapping text");
+
+const testRes = createMockElement("test-run-result");
+const testCb1 = createMockElement("test-cb-1");
+testCb1.classList.add("test-suite-check");
+testCb1.value = "Memory Allocator";
+testCb1.checked = true;
+
+global.document.querySelectorAll = (selector) => {
+  if (selector === ".test-suite-check:checked") return [testCb1];
+  return [];
+};
+
+zenith.runSelectedTests();
+assert.strictEqual(testRes.textContent, "Completed 1 suite(s): Memory Allocator - 100% PASS", "Expected test suite runner result text");
+console.log("✓ Interactive desktop utility actions verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");

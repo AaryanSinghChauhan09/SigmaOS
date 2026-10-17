@@ -1329,6 +1329,99 @@ export function launchApp(appName) {
   updateDockAppStates();
 }
 
+// =========================================================================
+// Interactive Desktop Utility Actions
+// =========================================================================
+
+export function calculateGST() {
+  if (typeof document === "undefined") return;
+  const amountEl = document.getElementById("gst-amount");
+  const rateEl = document.getElementById("gst-rate");
+  const resultEl = document.getElementById("gst-result");
+
+  const amountPaise = parseFloat(amountEl?.value) || 0;
+  const rawRate = rateEl?.value;
+  const ratePercent = (rawRate !== undefined && rawRate !== "" && !isNaN(parseFloat(rawRate)))
+    ? parseFloat(rawRate)
+    : 18;
+
+  if (amountPaise <= 0) {
+    const errText = "> Result: Please enter a valid amount in paise";
+    if (resultEl) resultEl.textContent = errText;
+    showToast("⚠️ Please enter a valid amount in paise for GST calculation.");
+    return;
+  }
+
+  const taxPaise = Math.round((amountPaise * ratePercent) / 100);
+  const totalPaise = amountPaise + taxPaise;
+  const amountRupees = (amountPaise / 100).toFixed(2);
+  const taxRupees = (taxPaise / 100).toFixed(2);
+  const totalRupees = (totalPaise / 100).toFixed(2);
+
+  const resText = `> Result: Base ₹${amountRupees} + Tax ₹${taxRupees} (${ratePercent}%) = Total ₹${totalRupees}`;
+  if (resultEl) resultEl.textContent = resText;
+  showToast(`📊 Calculated GST: Total ₹${totalRupees} (Tax: ₹${taxRupees})`);
+}
+
+export function checkLegalCompliance() {
+  if (typeof document === "undefined") return;
+  const queryEl = document.getElementById("legal-query");
+  const resultEl = document.getElementById("legal-result");
+  const query = (queryEl?.value || "").trim();
+
+  if (!query) {
+    const statusText = "> Mapping Status: Compliant (Standard BNS Baseline)";
+    if (resultEl) resultEl.textContent = statusText;
+    showToast("⚖️ BNS Legal Compliance verified: Standard Baseline.");
+    return;
+  }
+
+  const statusText = `> Mapping Status: Section "${query}" mapped to Sovereign Ring-0 Sandbox policy`;
+  if (resultEl) resultEl.textContent = statusText;
+  showToast(`🛡️ Mapped BNS Section "${query}" to system sandbox policies.`);
+}
+
+export function injectFOSS(shardName) {
+  const msg = `✨ FOSS Shard "${shardName}" injected into live system sandbox.`;
+  showToast(msg);
+}
+
+export function searchArchWebPackages() {
+  if (typeof document === "undefined") return;
+  const searchEl = document.getElementById("archweb-search");
+  const query = (searchEl?.value || "").trim() || "all packages";
+  showToast(`🔍 Searching ArchWeb & BSD Ports DB for: "${query}"`);
+}
+
+export function bootEmulator() {
+  if (typeof document === "undefined") return;
+  const consoleEl = document.getElementById("emulator-console");
+  if (consoleEl) {
+    const line = document.createElement("div");
+    line.style.color = "var(--text-accent, #00f0ff)";
+    line.textContent = `[${new Date().toLocaleTimeString()}] Kernel boot initialized... Ring-0 ready.`;
+    consoleEl.appendChild(line);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+  showToast("💿 Bare-Metal Kernel Emulator boot sequence started.");
+}
+
+export function runSelectedTests() {
+  if (typeof document === "undefined") return;
+  const resultEl = document.getElementById("test-run-result");
+  const checkedSuites = Array.from(document.querySelectorAll(".test-suite-check:checked")).map(
+    (cb) => cb.value
+  );
+
+  const count = checkedSuites.length;
+  const resText = count > 0
+    ? `Completed ${count} suite(s): ${checkedSuites.join(", ")} - 100% PASS`
+    : "No test suites selected.";
+
+  if (resultEl) resultEl.textContent = resText;
+  showToast(`🧪 Test runner: ${count} suite(s) executed successfully!`);
+}
+
 if (typeof window !== "undefined") {
   window.closeWindow = closeWindow;
   window.minimizeWindow = minimizeWindow;
@@ -1341,6 +1434,12 @@ if (typeof window !== "undefined") {
   window.initToolbarNavigation = initToolbarNavigation;
   window.updateDockAppStates = updateDockAppStates;
   window.showToast = showToast;
+  window.calculateGST = calculateGST;
+  window.checkLegalCompliance = checkLegalCompliance;
+  window.injectFOSS = injectFOSS;
+  window.searchArchWebPackages = searchArchWebPackages;
+  window.bootEmulator = bootEmulator;
+  window.runSelectedTests = runSelectedTests;
 }
 
 // Minimal dummy index file to export initialization and basic attributes

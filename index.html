@@ -200,13 +200,13 @@
                             <input class="cmd-input" type="number" id="gst-rate" placeholder="GST Rate %" aria-label="GST rate percentage">
                         </div>
                         <button type="button" class="wizard-btn" onclick="calculateGST()" aria-label="Compute GST calculation">COMPUTE GST</button>
-                        <div class="" id="gst-result">> Result: Ready</div>
+                        <div class="" id="gst-result" role="status" aria-live="polite">> Result: Ready</div>
                     </div>
                     <div class="settings-group">
                         <h4 class="">BNS Legal Complier</h4>
                         <input class="cmd-input" type="text" id="legal-query" placeholder="Search BNS section..." aria-label="Search BNS legal section">
                         <button type="button" class="wizard-btn" onclick="checkLegalCompliance()" aria-label="Map legal compliance section">MAP COMPLIANCE</button>
-                        <div class="" id="legal-result">> Mapping Status: Active</div>
+                        <div class="" id="legal-result" role="status" aria-live="polite">> Mapping Status: Active</div>
                     </div>
                 </div>
             </div>
