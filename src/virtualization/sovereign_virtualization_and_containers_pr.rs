@@ -90,12 +90,10 @@ pub struct QemuDiskImageSpec {
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
     pub vcpus: Vec<KvmVcpuState>,
-    pub disk_images: Vec<QemuDiskImageSpec>,
     pub memory_mapped_bytes: u64,
     pub thp_hugepages_active: bool,
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
-    pub disk_images: Vec<QemuDiskImageSpec>,
     pub virtio_fs_inodes_cached: u64,
     pub disk_images: Vec<QemuDiskImageSpec>,
 }
@@ -104,12 +102,10 @@ impl KvmQemuEngine {
     pub fn new() -> Self {
         Self {
             vcpus: Vec::new(),
-            disk_images: Vec::new(),
             memory_mapped_bytes: 0,
             thp_hugepages_active: true,
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
-            disk_images: Vec::new(),
             virtio_fs_inodes_cached: 0,
             disk_images: Vec::new(),
         }
@@ -225,15 +221,6 @@ pub struct LibvirtDomainConfig {
     pub disk_path: String,
     pub bridge_interface: String,
     pub is_active: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -697,7 +684,6 @@ pub struct KubernetesPodState {
 #[derive(Debug, Clone, Default)]
 pub struct KubernetesK3sRancherEngine {
     pub pods: Vec<KubernetesPodState>,
-    pub crio_runtime_handlers: Vec<String>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
     pub crio_runtime_handlers: Vec<String>,
@@ -712,7 +698,6 @@ impl KubernetesK3sRancherEngine {
         handlers.push("gvisor".to_string());
         Self {
             pods: Vec::new(),
-            crio_runtime_handlers: crio,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
             crio_runtime_handlers: handlers,
