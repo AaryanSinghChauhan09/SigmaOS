@@ -992,11 +992,8 @@ impl DebianInReleasePqcVerifierPrEngine {
     }
 
     pub fn verify_inrelease(&mut self, suite: &str, content: &str, key_fp: &str) -> bool {
-        if content.contains("-----BEGIN PGP SIGNED MESSAGE-----")
-            || content.contains("DILITHIUM5_SIG")
-        {
-            self.verified_releases
-                .insert(suite.to_string(), key_fp.to_string());
+        if content.contains("-----BEGIN PGP SIGNED MESSAGE-----") || content.contains("DILITHIUM5_SIG") {
+            self.verified_releases.insert(suite.to_string(), key_fp.to_string());
             true
         } else {
             false
@@ -1023,10 +1020,7 @@ impl DebianDebtagsClassifierPrEngine {
         let mut engine = Self {
             package_tags: BTreeMap::new(),
         };
-        engine.add_tags(
-            "bash",
-            &["role::program", "shell::bash", "interface::shell"],
-        );
+        engine.add_tags("bash", &["role::program", "shell::bash", "interface::shell"]);
         engine
     }
 
@@ -1065,11 +1059,7 @@ pub struct FreeBsdCapsicumCasperDaemonPrEngine {
 impl FreeBsdCapsicumCasperDaemonPrEngine {
     pub fn new() -> Self {
         Self {
-            active_services: vec![
-                "casper.dns".to_string(),
-                "casper.pwd".to_string(),
-                "casper.sysctl".to_string(),
-            ],
+            active_services: vec!["casper.dns".to_string(), "casper.pwd".to_string(), "casper.sysctl".to_string()],
         }
     }
 
@@ -1411,13 +1401,8 @@ impl MasterOpenSourceOsDebianIdeasSuite {
         let is_factotum_auth = self.plan9_factotum.authenticate_challenge("pass", "jules");
 
         let chroot_path = self.pbuilder.spawn_chroot("sess_01");
-        let dsc_parsed = self
-            .control_parser
-            .parse_dsc("Source: testpkg\nVersion: 1.0\nMaintainer: Jules\nBuild-Depends: gcc, make")
-            .is_some();
-        let inrelease_ok = self
-            .inrelease_pqc
-            .verify_inrelease("sid", "DILITHIUM5_SIG ok", "fp123");
+        let dsc_parsed = self.control_parser.parse_dsc("Source: testpkg\nVersion: 1.0\nMaintainer: Jules\nBuild-Depends: gcc, make").is_some();
+        let inrelease_ok = self.inrelease_pqc.verify_inrelease("sid", "DILITHIUM5_SIG ok", "fp123");
         let tags_search = !self.debtags.search_by_tag("role::program").is_empty();
 
         let casper_ok = self.freebsd_casper.open_casper_channel("casper.dns");
@@ -1609,10 +1594,7 @@ mod tests {
 
         let mut debtags = DebianDebtagsClassifierPrEngine::new();
         debtags.add_tags("curl", &["role::program", "use::downloading"]);
-        assert_eq!(
-            debtags.search_by_tag("use::downloading"),
-            vec!["curl".to_string()]
-        );
+        assert_eq!(debtags.search_by_tag("use::downloading"), vec!["curl".to_string()]);
 
         let mut casper = FreeBsdCapsicumCasperDaemonPrEngine::new();
         assert!(casper.open_casper_channel("casper.sysctl"));

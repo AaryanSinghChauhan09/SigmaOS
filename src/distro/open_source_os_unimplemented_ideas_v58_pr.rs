@@ -553,9 +553,7 @@ impl OpenSourceOsUnimplementedIdeasV58PrSuite {
     }
 
     pub fn execute_and_verify_all(&mut self) -> bool {
-        let msg = self
-            .sched_ext_v58
-            .set_policy(SchedExtPolicyV58::GamingInteractive);
+        let msg = self.sched_ext_v58.set_policy(SchedExtPolicyV58::GamingInteractive);
         assert!(msg.contains("GamingInteractive"));
 
         let procdesc_fd = self.capsicum_v58.pdfork(9090);
@@ -565,9 +563,7 @@ impl OpenSourceOsUnimplementedIdeasV58PrSuite {
         assert!(self.pinsyscall_v58.validate_callsite(0x1000));
         assert!(!self.pinsyscall_v58.validate_callsite(0x1005));
 
-        assert!(self
-            .rump_veriexec_v58
-            .verify_executable("/usr/bin/tar", "sha256_tar_v58_hash"));
+        assert!(self.rump_veriexec_v58.verify_executable("/usr/bin/tar", "sha256_tar_v58_hash"));
 
         let snaps = self.hammer2_v58.create_pfs_snapshot();
         assert_eq!(snaps, 33);
