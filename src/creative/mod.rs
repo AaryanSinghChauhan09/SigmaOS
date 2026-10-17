@@ -212,12 +212,14 @@ pub use soundcraft::{
     Spatial3DPosition, SynthesizerVoice, Waveform,
 };
 pub use soundcraft_missing_components_parity_pr::{
-    AdsrEnvelope, AmbisonicOrder, AutomationPoint, ClipCrossfadeConfig, DawTrackDelta,
-    FadeCurveShape, GranularGrain, LoudnessMeterResult, MidiNoteEvent, Position3D,
-    SoundcraftAdvancedMultiTrackEnginePrEngine, SoundcraftMasteringLoudnessMeterPrEngine,
-    SoundcraftMidiVst3ClapPluginPrEngine, SoundcraftPrProposalManifest,
-    SoundcraftRealtimeCollabCrdtPrEngine, SoundcraftSpatial3dAmbisonicMasterPrEngine,
-    SoundcraftSpectralSynthesisSamplerPrEngine, SovereignSoundcraftArtcraftParityPrGateway,
+    SoundcraftAdvancedMultiTrackEnginePrEngine,
+    SoundcraftSpectralSynthesisSamplerPrEngine,
+    SoundcraftSpatial3dAmbisonicMasterPrEngine,
+    SoundcraftMidiVst3ClapPluginPrEngine,
+    SoundcraftMasteringLoudnessMeterPrEngine,
+    SoundcraftRealtimeCollabCrdtPrEngine,
+    SoundcraftPrProposalManifest,
+    SovereignSoundcraftArtcraftParityPrGateway,
 };
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
