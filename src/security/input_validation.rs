@@ -55,37 +55,40 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
-    // Reject URL-encoded path traversal sequences (%2e%2e, %2f, %5c)
-    // to prevent parser differential / decoding bypass attacks (CWE-22).
-    if path.windows(6).any(|w| {
-        w[0] == b'%'
-            && w[1] == b'2'
-            && (w[2] == b'e' || w[2] == b'E')
-            && w[3] == b'%'
-            && w[4] == b'2'
-            && (w[5] == b'e' || w[5] == b'E')
-    }) || path.windows(3).any(|w| {
-        w[0] == b'%'
-            && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F'))
-                || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
-    }) {
-        return Err(ValidationError::PathTraversal);
-    }
-
-    // Single-pass byte slice scan combining NUL-byte injection checks,
-    // ASCII control character rejection, and path-traversal detection.
-    // Inspects path segments bounded by directory separators (`/`, `\`, `:`).
-    // Rejects any segment consisting solely of dot (`.`) characters with len >= 2
-    // (e.g. `..`, `...`, `....`) to prevent multi-dot path traversal bypasses.
+    // Single-pass byte slice scan combining NUL-byte injection checks, ASCII control character
+    // rejection, dot segment path-traversal detection, and URL-encoded traversal sequence checks
+    // (%2e%2e, %2f, %5c) to eliminate multi-pass window iterations over the path buffer.
     let mut seg_len = 0usize;
     let mut seg_only_dots = true;
 
-    for &b in path {
+    let mut i = 0;
+    while i < len {
+        let b = path[i];
+
         if b == 0 {
             return Err(ValidationError::NullByte);
         }
         if b < 32 || b == 127 {
             return Err(ValidationError::InvalidChars);
+        }
+
+        // Inline URL-encoded traversal check when encountering '%'
+        if b == b'%' {
+            if i + 5 < len
+                && path[i + 1] == b'2'
+                && (path[i + 2] == b'e' || path[i + 2] == b'E')
+                && path[i + 3] == b'%'
+                && path[i + 4] == b'2'
+                && (path[i + 5] == b'e' || path[i + 5] == b'E')
+            {
+                return Err(ValidationError::PathTraversal);
+            }
+            if i + 2 < len
+                && ((path[i + 1] == b'2' && (path[i + 2] == b'f' || path[i + 2] == b'F'))
+                    || (path[i + 1] == b'5' && (path[i + 2] == b'c' || path[i + 2] == b'C')))
+            {
+                return Err(ValidationError::PathTraversal);
+            }
         }
 
         if b == b'/' || b == b'\\' || b == b':' {
@@ -100,6 +103,8 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
                 seg_only_dots = false;
             }
         }
+
+        i += 1;
     }
 
     if seg_only_dots && seg_len >= 2 {
