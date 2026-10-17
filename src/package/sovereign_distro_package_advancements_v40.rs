@@ -421,6 +421,8 @@ pub struct UniversalCrossDistroSatSolverV40 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
+pub type UniversalCrossDistroSatSolverV39 = UniversalCrossDistroSatSolverV40;
+
 impl UniversalCrossDistroSatSolverV40 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
@@ -616,6 +618,8 @@ pub enum UniversalPmActionV40 {
     Query,
     Audit,
 }
+
+pub type UniversalPmActionV39 = UniversalPmActionV40;
 
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV40 {
