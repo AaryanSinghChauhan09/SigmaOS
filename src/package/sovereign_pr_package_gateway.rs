@@ -288,17 +288,34 @@ impl SovereignUniversalPrGatewayEngine {
     }
 
     /// Search active and merged PRs by package name or author
+    ///
+    /// Performance optimization: uses zero-allocation ASCII substring search (`contains_ignore_case`)
+    /// to eliminate temporary `String` heap allocations during search queries.
     pub fn search_distro_prs(&self, query: &str) -> Vec<DistroPrGatewayEntry> {
-        let q = query.to_lowercase();
         self.pr_gateway_registry
             .values()
             .filter(|entry| {
-                entry.package_name.to_lowercase().contains(&q)
-                    || entry.submitter.to_lowercase().contains(&q)
+                contains_ignore_case(&entry.package_name, query)
+                    || contains_ignore_case(&entry.submitter, query)
             })
             .cloned()
             .collect()
     }
+}
+
+/// Helper function for zero-allocation case-insensitive ASCII substring search
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    haystack.as_bytes().windows(needle.len()).any(|window| {
+        window.iter().zip(needle.bytes()).all(|(&h, n)| {
+            h.to_ascii_lowercase() == n.to_ascii_lowercase()
+        })
+    })
 }
 
 #[cfg(test)]
