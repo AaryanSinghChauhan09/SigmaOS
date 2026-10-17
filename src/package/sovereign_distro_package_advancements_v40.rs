@@ -653,7 +653,7 @@ impl UniversalPmCliRouterV39 {
             "apt" | "apt-get" => {
                 if parts.contains(&"install") {
                     (
-                        UniversalPmActionV40::Install,
+                        UniversalPmActionV39::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -663,7 +663,7 @@ impl UniversalPmCliRouterV39 {
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
-                        UniversalPmActionV40::Remove,
+                        UniversalPmActionV39::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -678,7 +678,7 @@ impl UniversalPmCliRouterV39 {
             "pacman" => {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
-                        UniversalPmActionV40::Install,
+                        UniversalPmActionV39::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -688,7 +688,7 @@ impl UniversalPmCliRouterV39 {
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
-                        UniversalPmActionV40::Remove,
+                        UniversalPmActionV39::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -704,7 +704,7 @@ impl UniversalPmCliRouterV39 {
             | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
-                        UniversalPmActionV40::Install,
+                        UniversalPmActionV39::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -714,7 +714,7 @@ impl UniversalPmCliRouterV39 {
                     )
                 } else {
                     (
-                        UniversalPmActionV40::Remove,
+                        UniversalPmActionV39::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -725,7 +725,7 @@ impl UniversalPmCliRouterV39 {
                 }
             }
             _ => (
-                UniversalPmActionV40::Install,
+                UniversalPmActionV39::Install,
                 parts
                     .get(1..)
                     .unwrap_or(&[])
@@ -737,7 +737,7 @@ impl UniversalPmCliRouterV39 {
 
         let clean_targets = targets
             .into_iter()
-            .filter(|t| !t.starts_with('-'))
+            .filter(|t: &String| !t.starts_with('-'))
             .collect();
 
         Ok(RoutedPmCommandV39 {
@@ -947,7 +947,7 @@ mod tests {
 
     #[test]
     fn test_sat_solver_and_sandboxing_v40() {
-        let solver = UniversalCrossDistroSatSolverV40::new();
+        let solver = UniversalCrossDistroSatSolverV39::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
             "glibc".to_string(),
