@@ -23,6 +23,12 @@
 
 ## Shell component
 
+- [ ] Shell parser
+- [ ] Builtins
+- [ ] Pipeline
+
+## Component
+
 - [ ] Lexer / Parser
 - [ ] Expansion engine
 - [ ] Builtin commands
@@ -49,8 +55,7 @@
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
 <!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- Upstream study:
-- What SigmaOS adopts:
+- Upstream study document:
 - Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
@@ -67,7 +72,12 @@
 - [ ] POSIX compliance
 - [ ] Builtin commands
 
-## Kernel safety review
+## Shell safety review
+
+- [ ] Quoting integrity
+- [ ] Expansion order
+
+## Kernel safety review & Safety and rollback
 
 - [ ] Reviewer checklist completed
 - [ ] No unnecessary `unsafe`
@@ -96,7 +106,7 @@
 - [ ] Signal handling
 - [ ] Memory safety
 
-## Evidence
+## Evidence & Reviewer checklist
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
