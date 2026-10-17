@@ -538,7 +538,6 @@ impl PhotocraftAiSubjectMattingSelectionPrEngine {
         }
 
         for (i, &val) in raw_mask.iter().enumerate() {
-            // Smooth edge alpha transitions for hair detail
             refined_mask[i] = if val > 200 {
                 255
             } else if val < 50 {
