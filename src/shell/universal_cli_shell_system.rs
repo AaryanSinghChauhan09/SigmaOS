@@ -1009,6 +1009,16 @@ impl UniversalCliOptionTranslator {
                 translated_args: vec!["-b".to_string(), "-n".to_string(), "1".to_string()],
             };
         }
+        if (cmd == "kill" || cmd == "pkill") && args.get(0) == Some(&"-9") {
+            let mut tr_args = vec!["-KILL".to_string()];
+            tr_args.extend(args.iter().skip(1).map(|s| s.to_string()));
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: cmd.to_string(),
+                detected_style: OptionStyle::PosixSingleDash,
+                translated_args: tr_args,
+            };
+        }
 
         // 3. PowerShell Cmdlet Translations
         if cmd == "Get-Process" {
@@ -1348,6 +1358,11 @@ impl SovereignUniversalShInterpreterEngine {
         }
     }
 
+    /// Evaluates a line across shell dialects (Bash, Zsh, Fish, Ksh, Tcsh, Nushell, PowerShell, etc.)
+    pub fn execute_cross_dialect_line(&mut self, line: &str) -> Result<String, &'static str> {
+        self.execute_sh_command_string(line)
+    }
+
     /// Evaluates direct `sh -c "code"`, `bash -c "code"`, `fish -c "code"`, etc. CLI commands
     pub fn execute_sh_command_string(&mut self, full_cmd: &str) -> Result<String, &'static str> {
         let trimmed = full_cmd.trim();
@@ -1595,5 +1610,9 @@ mod tests {
         let netstat_an = UniversalCliOptionTranslator::translate_command("netstat -an");
         assert_eq!(netstat_an.canonical_command, "ss");
         assert_eq!(netstat_an.translated_args, vec!["-an"]);
+
+        let kill_9 = UniversalCliOptionTranslator::translate_command("kill -9 1234");
+        assert_eq!(kill_9.canonical_command, "kill");
+        assert_eq!(kill_9.translated_args, vec!["-KILL", "1234"]);
     }
 }
