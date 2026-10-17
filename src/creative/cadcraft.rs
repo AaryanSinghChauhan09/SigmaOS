@@ -7,7 +7,7 @@
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -371,8 +371,8 @@ impl CadCraftEngine {
             toolpath_type,
             tool_diameter,
             feed_rate,
-            spindle_speed: 12000.0,
-            gcode_output: format!("G01 X10 Y10 Z-2 F{:.1}", feed_rate),
+            spindle_speed: 10000.0,
+            gcode_output: format!("G00 Z5.0\nG01 Z-2.0 F{:.1}\n", feed_rate),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -394,18 +394,13 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut out = Vec::new();
         match format {
-            ExportFormat::DXF => {
-                out.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n")
+            ExportFormat::DXF => b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n".to_vec(),
+            ExportFormat::STEP => {
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
             }
-            ExportFormat::STEP => out.extend_from_slice(
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
-            ),
-            ExportFormat::STL => out.extend_from_slice(b"solid cadcraft\nendsolid cadcraft\n"),
-            _ => out.extend_from_slice(b"# CadCraft CAD Export Data\n"),
+            _ => format!("CAD Export format {:?} generated", format).into_bytes(),
         }
-        out
     }
 }
 
@@ -483,6 +478,10 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
+// ============================================================================
+// 2. 3D B-Rep Solid Feature Modeling Engine
+// ============================================================================
+
 /// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
 #[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
@@ -558,6 +557,10 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
         Self::new()
     }
 }
+
+// ============================================================================
+// 3. Assembly Mates, CAM G-code Toolpath & FEA Stress Analysis Engine
+// ============================================================================
 
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Clone)]
@@ -706,7 +709,7 @@ mod tests {
                 line1_idx: 0,
                 line2_idx: 1,
             },
-            vec![e1, e2],
+            alloc::vec![e1, e2],
             90.0,
         );
 
