@@ -597,7 +597,9 @@ impl CachyLinuxMissingComponentsV61PrSuite {
         let modprobe_conf = self.chwd_nvidia_sync.generate_modprobe_config();
         assert!(modprobe_conf.contains("modeset=1"));
 
-        let io_msg = self.ananicy_cgroupsv2.assign_process_io_weight("eldenring.exe", true);
+        let io_msg = self
+            .ananicy_cgroupsv2
+            .assign_process_io_weight("eldenring.exe", true);
         assert!(io_msg.contains("io.weight=800"));
 
         let zstd_lvl = self.btrfs_zstd_engine.adjust_compression(85);
@@ -645,7 +647,9 @@ mod tests {
     #[test]
     fn test_pgo_and_gyro() {
         let pgo = CachyOsKernelPgoProfilePrEngine::new();
-        assert!(pgo.generate_profdata_merge_cmd().contains("vmlinux_v61.profdata"));
+        assert!(pgo
+            .generate_profdata_merge_cmd()
+            .contains("vmlinux_v61.profdata"));
 
         let mut gyro = CachyOsHandheldGyroRemapperPrEngine::new();
         let msg = gyro.configure_gyro_profile(5, 1.8);
