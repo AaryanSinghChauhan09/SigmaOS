@@ -210,6 +210,12 @@ impl SystemdSocketActivationEngine {
 pub struct SystemdTargetDependencyResolver;
 
 impl SystemdTargetDependencyResolver {
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl SystemdTargetDependencyResolverSpec {
     pub fn resolve_target_units(
         &self,
         target_name: &str,
@@ -1248,15 +1254,6 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
-}
-
-/// Userland Init Clean-Room Pull Request Proposal Gateway
-#[derive(Debug, Clone)]
-pub struct UserlandInitCleanRoomPrGatewayEngine {
-    pub pr_id: u32,
-    pub title: String,
-    pub author: String,
-    pub pqc_signature: String,
 }
 
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;

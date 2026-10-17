@@ -154,15 +154,9 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
 };
-pub use figcraft::{
-    fnv1a_figcraft_pr_digest, get_figcraft, init_figcraft,
-    AssetExportFormat as FigCraftAssetExportFormat, AutoLayoutAlign, AutoLayoutDirection,
-    AutoLayoutFrame, AutoLayoutSizing, CollaborativeCursor, ComponentVariantProp,
-    DesignLibraryAsset, DesignToken, DevModeTargetLanguage, EasingCurve,
-    FigCraftCollaborationExportPrDeployer, FigCraftEngine,
-    FigCraftInteractivePrototypingPrDeployer, FigCraftMasterPrDeploymentSuite,
-    FigCraftPullRequestSpec, FigCraftUiUxAutoLayoutPrDeployer,
-    FigCraftVectorCanvasDesignSystemPrDeployer, HorizontalConstraint, PrototypeAction,
-    PrototypeInteraction, PrototypeTrigger, TokenCategory, TransitionType, VariableMode,
-    VectorNetworkPath, VectorNodePoint, VerticalConstraint,
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
+    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
+    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
 };
