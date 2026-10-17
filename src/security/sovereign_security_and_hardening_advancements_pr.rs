@@ -61,6 +61,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         false
     }
 
+    /// Check Landlock access rights mask.
+    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
+        (allowed_mask & requested_access) == requested_access
+    }
+
     /// Construct AppArmor path profile match.
     pub fn matches_apparmor_path_profile(&self, path: &str, profile_pattern: &str) -> bool {
         if profile_pattern.ends_with("/*") {
@@ -413,6 +418,11 @@ impl IdentityAndEnterpriseAuthPrEngine {
             }
         }
         parts
+    }
+
+    /// Generate SSSD domain configuration.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, server: &str) -> String {
+        alloc::format!("[domain/{}]\nid_provider = {}\nldap_uri = ldap://{}\n", domain, provider, server)
     }
 
     /// Simulate Kerberos v5 ticket validation.

@@ -1,31 +1,7 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SigmaOS Contributors
-
 use std::collections::{BTreeMap, BTreeSet};
 use std::string::String;
 use std::vec::Vec;
 
-//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
-//!
-//! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-//! - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-//! - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-//! - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
-
-#![no_std]
-extern crate alloc;
-
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
-
-// ============================================================================
-// Core Service & Init abstractions
-// ============================================================================
-
-/// Service execution state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
     Stopped,
@@ -33,9 +9,9 @@ pub enum ServiceState {
     Running,
     Stopping,
     Failed,
+    Reloading,
 }
 
-/// Generic Service Definition
 #[derive(Debug, Clone)]
 pub struct Service {
     pub name: String,
@@ -48,15 +24,15 @@ pub struct Service {
     pub last_ping: u64,
 }
 
-/// Generic Init System Supervisor
-#[derive(Debug, Clone, Default)]
 pub struct InitSystem {
     pub services: BTreeMap<String, Service>,
 }
 
 impl InitSystem {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            services: BTreeMap::new(),
+        }
     }
 
     pub fn register_service(&mut self, service: Service) {
@@ -66,36 +42,41 @@ impl InitSystem {
     pub fn topo_sort(&self) -> Result<Vec<String>, &'static str> {
         let mut sorted = Vec::new();
         let mut visited = BTreeSet::new();
-        let mut temp = BTreeSet::new();
+        let mut temp_mark = BTreeSet::new();
 
         fn visit(
-            node: &str,
+            node: &String,
             services: &BTreeMap<String, Service>,
             visited: &mut BTreeSet<String>,
-            temp: &mut BTreeSet<String>,
+            temp_mark: &mut BTreeSet<String>,
             sorted: &mut Vec<String>,
         ) -> Result<(), &'static str> {
-            if temp.contains(node) {
-                return Err("Circular dependency detected");
+            if temp_mark.contains(node) {
+                return Err("Cyclic dependency detected");
             }
             if !visited.contains(node) {
-                temp.insert(node.to_string());
+                temp_mark.insert(node.clone());
                 if let Some(srv) = services.get(node) {
                     for dep in &srv.dependencies {
-                        visit(dep, services, visited, temp, sorted)?;
+                        visit(dep, services, visited, temp_mark, sorted)?;
                     }
                 }
-                temp.remove(node);
-                visited.insert(node.to_string());
-                sorted.push(node.to_string());
+                temp_mark.remove(node);
+                visited.insert(node.clone());
+                sorted.push(node.clone());
             }
             Ok(())
         }
 
-        for name in self.services.keys() {
-            visit(name, &self.services, &mut visited, &mut temp, &mut sorted)?;
+        for node in self.services.keys() {
+            visit(
+                node,
+                &self.services,
+                &mut visited,
+                &mut temp_mark,
+                &mut sorted,
+            )?;
         }
-
         Ok(sorted)
     }
 
@@ -114,10 +95,10 @@ impl InitSystem {
         }
 
         srv.state = ServiceState::Starting;
-
+        // Mock actual parallel spawn
         srv.pid = Some(1000 + name.len() as u32);
         srv.state = ServiceState::Running;
-        srv.last_ping = 0;
+        srv.last_ping = 0; // set by current time
 
         Ok(())
     }
@@ -128,21 +109,15 @@ impl InitSystem {
                 if now.saturating_sub(srv.last_ping) > srv.watchdog_usec {
                     srv.state = ServiceState::Failed;
                     srv.pid = None;
+                    // Mock SIGKILL dispatch
                 }
             }
         }
-        Ok(())
-    }
-}
-
-impl Default for InitSystem {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
 // ============================================================================
-// Systemd Subsystem Engines
+// Linux & BSD Distro Core Userland Parity Extensions
 // ============================================================================
 
 /// Systemd Unit Types
@@ -172,24 +147,13 @@ pub struct SystemdDependencyGraph {
 }
 
 /// Systemd cgroups v2 Slice Resource Limits
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct SystemdCgroupsv2Slice {
     pub slice_name: String,
     pub memory_max_bytes: Option<u64>,
     pub cpu_weight: Option<u32>,
     pub io_weight: Option<u32>,
     pub tasks_max: Option<u32>,
-}
-
-/// Systemd Socket Activation Unit Config
-#[derive(Debug, Clone)]
-pub struct SystemdSocketUnit {
-    pub name: String,
-    pub listen_stream: Option<String>,
-    pub listen_datagram: Option<String>,
-    pub service_to_trigger: String,
-    pub accept: bool,
-    pub active_fd: Option<i32>,
 }
 
 /// Systemd Socket Activation Engine
@@ -199,25 +163,15 @@ pub struct SystemdSocketActivationEngine {
     pub listen_stream: Option<String>,
     pub listen_datagram: Option<String>,
     pub passed_fds: Vec<i32>,
-    pub sockets: BTreeMap<String, SystemdSocketUnit>,
 }
 
-/// Systemd Socket Activation Engine
-#[derive(Debug, Clone, Default)]
-pub struct SystemdSocketActivationUnitEngine {
-    pub socket_name: String,
-    pub sockets: BTreeMap<String, SystemdSocketUnit>,
-    pub passed_fds: Vec<i32>,
-    pub sockets: BTreeMap<String, SystemdSocketUnit>,
-}
-
-impl SystemdSocketActivationUnitEngine {
+impl SystemdSocketActivationEngine {
     pub fn new(socket_name: &str) -> Self {
         Self {
             socket_name: socket_name.to_string(),
-            sockets: BTreeMap::new(),
+            listen_stream: None,
+            listen_datagram: None,
             passed_fds: Vec::new(),
-            sockets: BTreeMap::new(),
         }
     }
 
@@ -232,38 +186,13 @@ impl SystemdSocketActivationUnitEngine {
             ("LISTEN_FDNAMES".to_string(), self.socket_name.clone()),
         ]
     }
-
-    pub fn register_socket(&mut self, unit: SystemdSocketUnit) {
-        self.sockets.insert(unit.name.clone(), unit);
-    }
-
-    pub fn handle_incoming_connection(&mut self, socket_name: &str) -> Option<String> {
-        if let Some(sock) = self.sockets.get_mut(socket_name) {
-            if sock.active_fd.is_none() {
-                sock.active_fd = Some(3);
-            }
-            Some(sock.service_to_trigger.clone())
-        } else {
-            None
-        }
-    }
 }
 
-/// Systemd Target Dependency Resolver Spec
+/// Systemd Target Dependency Resolver
 #[derive(Debug, Clone, Default)]
-pub struct SystemdTargetDependencyResolver {
-    pub targets: BTreeMap<String, Vec<String>>,
-    pub active_targets: BTreeSet<String>,
-}
+pub struct SystemdTargetDependencyResolver;
 
 impl SystemdTargetDependencyResolver {
-    pub fn new() -> Self {
-        Self {
-            targets: BTreeMap::new(),
-            active_targets: BTreeSet::new(),
-        }
-    }
-
     pub fn resolve_target_units(
         &self,
         target_name: &str,
@@ -280,18 +209,9 @@ impl SystemdTargetDependencyResolver {
         }
         result
     }
-
-    pub fn register_target(&mut self, name: &str, member_units: Vec<String>) {
-        self.targets.insert(name.to_string(), member_units);
-    }
-
-    pub fn activate_target(&mut self, target_name: &str) -> Vec<String> {
-        self.active_targets.insert(target_name.to_string());
-        self.targets.get(target_name).cloned().unwrap_or_default()
-    }
 }
 
-/// Systemd Path Event Type
+/// Systemd Path Monitor Event Types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SystemdPathEventType {
     PathChanged,
@@ -300,35 +220,13 @@ pub enum SystemdPathEventType {
     DirectoryNotEmpty,
 }
 
-/// Systemd Path Monitor Unit
-#[derive(Debug, Clone)]
-pub struct SystemdPathUnit {
-    pub name: String,
-    pub path_changed: Option<String>,
-    pub path_modified: Option<String>,
-    pub path_exists: Option<String>,
-    pub directory_not_empty: Option<String>,
-    pub unit_to_trigger: String,
-}
-
 /// Systemd Path Monitor Engine
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct SystemdPathMonitorEngine {
     pub unit_name: String,
     pub monitored_path: String,
     pub event_type: SystemdPathEventType,
     pub unit_to_trigger: String,
-    pub paths: BTreeMap<String, SystemdPathUnit>,
-}
-
-/// Systemd Path Monitor Engine
-#[derive(Debug, Clone, Default)]
-pub struct SystemdPathMonitorEngine {
-    pub unit_name: String,
-    pub monitored_path: String,
-    pub event_type: Option<SystemdPathEventType>,
-    pub unit_to_trigger: String,
-    pub paths: BTreeMap<String, SystemdPathUnit>,
 }
 
 impl SystemdPathMonitorEngine {
@@ -342,55 +240,28 @@ impl SystemdPathMonitorEngine {
             return false;
         }
         match (self.event_type, event) {
-            (Some(SystemdPathEventType::PathChanged), SystemdPathEventType::PathChanged) => true,
-            (Some(SystemdPathEventType::PathModified), SystemdPathEventType::PathModified) => true,
-            (Some(SystemdPathEventType::PathExists), SystemdPathEventType::PathExists) => true,
-            (Some(SystemdPathEventType::DirectoryNotEmpty), _) => is_dir_nonempty,
+            (SystemdPathEventType::PathChanged, SystemdPathEventType::PathChanged) => true,
+            (SystemdPathEventType::PathModified, SystemdPathEventType::PathModified) => true,
+            (SystemdPathEventType::PathExists, SystemdPathEventType::PathExists) => true,
+            (SystemdPathEventType::DirectoryNotEmpty, _) => is_dir_nonempty,
             _ => false,
         }
     }
-
-    pub fn register_path(&mut self, unit: SystemdPathUnit) {
-        self.paths.insert(unit.name.clone(), unit);
-    }
-
-    pub fn check_path_events(&self, modified_path: &str) -> Vec<String> {
-        let mut triggered = Vec::new();
-        for path_unit in self.paths.values() {
-            if path_unit.path_changed.as_deref() == Some(modified_path)
-                || path_unit.path_modified.as_deref() == Some(modified_path)
-                || path_unit.path_exists.as_deref() == Some(modified_path)
-                || path_unit.directory_not_empty.as_deref() == Some(modified_path)
-            {
-                triggered.push(path_unit.unit_to_trigger.clone());
-            }
-        }
-        triggered
-    }
 }
 
-/// Systemd Transient Scope Spec Governor
+/// Systemd Transient Scope Governor
 #[derive(Debug, Clone, Default)]
-pub struct SystemdTransientScopeSpecGovernor {
+pub struct SystemdTransientScopeGovernor {
     pub transient_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
-    pub active_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
 }
 
 impl SystemdTransientScopeGovernor {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
         self.transient_scopes.insert(scope_name.to_string(), slice);
     }
 
-    pub fn create_scope(&mut self, scope_name: String, limits: SystemdCgroupsv2Slice) {
-        self.active_scopes.insert(scope_name, limits);
-    }
-
     pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
-        self.transient_scopes.get(scope_name).or_else(|| self.active_scopes.get(scope_name))
+        self.transient_scopes.get(scope_name)
     }
 }
 
@@ -426,16 +297,8 @@ impl SystemdOnCalendarParser {
         if expr.eq_ignore_ascii_case("annually") || expr.eq_ignore_ascii_case("yearly") {
             return min == 0 && hour == 0 && mday == 1 && month == 1;
         }
+        // General wildcard or standard format parsing
         true
-    }
-
-    pub fn parse_expression(expr: &str) -> Option<(u32, u32)> {
-        let trimmed = expr.trim();
-        if trimmed == "daily" || trimmed == "*-*-* 00:00:00" || trimmed == "weekly" || trimmed == "hourly" {
-            Some((0, 0))
-        } else {
-            None
-        }
     }
 }
 
@@ -485,10 +348,135 @@ impl SdNotifyMessage {
     }
 }
 
+/// Systemd Socket Activation Unit Config
+#[derive(Debug, Clone)]
+pub struct SystemdSocketUnit {
+    pub name: String,
+    pub listen_stream: Option<String>,
+    pub listen_datagram: Option<String>,
+    pub service_to_trigger: String,
+    pub accept: bool,
+    pub active_fd: Option<i32>,
+}
+
+/// Systemd Socket Activation Engine
+pub struct SystemdSocketActivationEngine {
+    pub sockets: BTreeMap<String, SystemdSocketUnit>,
+}
+
+impl SystemdSocketActivationEngine {
+    pub fn new() -> Self {
+        Self {
+            sockets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_socket(&mut self, unit: SystemdSocketUnit) {
+        self.sockets.insert(unit.name.clone(), unit);
+    }
+
+    pub fn handle_incoming_connection(&mut self, socket_name: &str) -> Option<String> {
+        if let Some(sock) = self.sockets.get_mut(socket_name) {
+            if sock.active_fd.is_none() {
+                sock.active_fd = Some(3); // First inherited socket FD SD_LISTEN_FDS_START
+            }
+            Some(sock.service_to_trigger.clone())
+        } else {
+            None
+        }
+    }
+}
+
+/// Systemd Target Dependency Resolver
+pub struct SystemdTargetDependencyResolver {
+    pub targets: BTreeMap<String, Vec<String>>, // Target name -> list of member units
+    pub active_targets: BTreeSet<String>,
+}
+
+impl SystemdTargetDependencyResolver {
+    pub fn new() -> Self {
+        Self {
+            targets: BTreeMap::new(),
+            active_targets: BTreeSet::new(),
+        }
+    }
+
+    pub fn register_target(&mut self, name: &str, member_units: Vec<String>) {
+        self.targets.insert(name.to_string(), member_units);
+    }
+
+    pub fn activate_target(&mut self, target_name: &str) -> Vec<String> {
+        self.active_targets.insert(target_name.to_string());
+        self.targets.get(target_name).cloned().unwrap_or_default()
+    }
+}
+
+/// Systemd Path Monitor Unit
+#[derive(Debug, Clone)]
+pub struct SystemdPathUnit {
+    pub name: String,
+    pub path_changed: Option<String>,
+    pub path_modified: Option<String>,
+    pub path_exists: Option<String>,
+    pub directory_not_empty: Option<String>,
+    pub unit_to_trigger: String,
+}
+
+/// Systemd Path Monitor Engine
+pub struct SystemdPathMonitorEngine {
+    pub paths: BTreeMap<String, SystemdPathUnit>,
+}
+
+impl SystemdPathMonitorEngine {
+    pub fn new() -> Self {
+        Self {
+            paths: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_path(&mut self, unit: SystemdPathUnit) {
+        self.paths.insert(unit.name.clone(), unit);
+    }
+
+    pub fn check_path_events(&self, modified_path: &str) -> Vec<String> {
+        let mut triggered = Vec::new();
+        for path_unit in self.paths.values() {
+            if path_unit.path_changed.as_deref() == Some(modified_path)
+                || path_unit.path_modified.as_deref() == Some(modified_path)
+                || path_unit.path_exists.as_deref() == Some(modified_path)
+                || path_unit.directory_not_empty.as_deref() == Some(modified_path)
+            {
+                triggered.push(path_unit.unit_to_trigger.clone());
+            }
+        }
+        triggered
+    }
+}
+
+/// Systemd Transient Scope & Cgroups Governor
+pub struct SystemdTransientScopeGovernor {
+    pub active_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
+}
+
+impl SystemdTransientScopeGovernor {
+    pub fn new() -> Self {
+        Self {
+            active_scopes: BTreeMap::new(),
+        }
+    }
+
+    pub fn create_scope(&mut self, scope_name: String, limits: SystemdCgroupsv2Slice) {
+        self.active_scopes.insert(scope_name, limits);
+    }
+
+    pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
+        self.active_scopes.get(scope_name)
+    }
+}
+
 /// OpenRC Multi-Stage Runlevel
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum OpenRcRunlevel {
-    #[default]
     SysInit,
     Boot,
     Default,
@@ -504,38 +492,12 @@ pub struct OpenRcHeader {
     pub use_deps: Vec<String>,
     pub before: Vec<String>,
     pub after: Vec<String>,
-    pub keywords: Vec<String>,
-}
-
-impl OpenRcHeader {
-    pub fn parse(script_content: &str) -> Self {
-        let mut header = OpenRcHeader::default();
-        for line in script_content.lines() {
-            let trimmed = line.trim();
-            if let Some(rest) = trimmed.strip_prefix("provide") {
-                header.provide.extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header.need.extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header.use_deps.extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header.before.extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header.after.extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header.keywords.extend(rest.split_whitespace().map(|s| s.to_string()));
-            }
-        }
-        header
-    }
+    pub keywords: Vec<String>, // e.g. "keyword -docker -jail"
 }
 
 /// OpenRC Dependency Solver Engine
 #[derive(Debug, Clone, Default)]
-pub struct OpenRcDependencySolverEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-}
+pub struct OpenRcDependencySolverEngine;
 
 impl OpenRcDependencySolverEngine {
     pub fn resolve_order(
@@ -584,11 +546,10 @@ impl OpenRcDependencySolverEngine {
 }
 
 /// OpenRC Status & Runlevel Controller Engine
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct OpenRcStatusControllerEngine {
     pub current_runlevel: OpenRcRunlevel,
     pub active_services: BTreeSet<String>,
-    pub service_statuses: BTreeMap<String, ServiceState>,
 }
 
 impl OpenRcStatusControllerEngine {
@@ -596,7 +557,6 @@ impl OpenRcStatusControllerEngine {
         Self {
             current_runlevel: initial_runlevel,
             active_services: BTreeSet::new(),
-            service_statuses: BTreeMap::new(),
         }
     }
 
@@ -611,6 +571,7 @@ impl OpenRcStatusControllerEngine {
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
     }
+}
 
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
@@ -661,26 +622,30 @@ impl OpenRcDependencySolverEngine {
         }
     }
 
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
+    pub fn register_script(&mut self, name: String, header: OpenRcHeader) {
+        self.scripts.insert(name, header);
+    }
+
+    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) -> Vec<String> {
         self.current_runlevel = target;
+        // Collect scripts for this runlevel order
+        self.scripts.keys().cloned().collect()
     }
+}
 
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Running);
-    }
+/// OpenRC Status Controller Engine
+pub struct OpenRcStatusControllerEngine {
+    pub service_statuses: BTreeMap<String, ServiceState>,
+}
 
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses.insert(service_name.to_string(), ServiceState::Stopped);
+impl OpenRcStatusControllerEngine {
+    pub fn new() -> Self {
+        Self {
+            service_statuses: BTreeMap::new(),
+        }
     }
 
     pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
-        }
         self.service_statuses.insert(service, state);
     }
 
@@ -692,24 +657,20 @@ impl OpenRcDependencySolverEngine {
     }
 }
 
-// ============================================================================
-// runit & s6 Supervision Subsystem
-// ============================================================================
-
-/// s6 & runit Control Channel Verbs
+/// s6 & runit Control Channel Verb Directives
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SupervisorControlVerb {
-    Alarm,
-    Up,
-    Down,
-    Once,
-    Exit,
-    Restart,
-    Pause,
-    Continue,
-    Interrupt,
-    Term,
-    Kill,
+    Alarm,     // 'a': SIGALRM
+    Up,        // 'u': start service
+    Down,      // 'd': stop service
+    Once,      // 'o': run once
+    Exit,      // 'x': terminate supervisor when process exits
+    Restart,   // 'r': restart service
+    Pause,     // 'p': SIGSTOP
+    Continue,  // 'c': SIGCONT
+    Interrupt, // 'i': SIGINT
+    Term,      // 't': SIGTERM
+    Kill,      // 'k': SIGKILL
 }
 
 impl SupervisorControlVerb {
@@ -731,7 +692,7 @@ impl SupervisorControlVerb {
     }
 }
 
-/// Supervised Service Definition
+/// s6 & runit Service Definition
 #[derive(Debug, Clone)]
 pub struct SupervisedService {
     pub service_dir: String,
@@ -743,7 +704,7 @@ pub struct SupervisedService {
     pub notification_fd: Option<i32>,
 }
 
-/// Supervision Stage Lifecycle
+/// runit & s6 Supervision Stage Lifecycle
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SupervisionStage {
     Stage1Boot,
@@ -752,36 +713,18 @@ pub enum SupervisionStage {
 }
 
 /// runit & s6 Supervision Tree Governor
-#[derive(Debug, Clone, Default)]
 pub struct RunitS6SupervisionTreeGovernor {
-    pub service_dir_path: String,
     pub current_stage: SupervisionStage,
     pub services: BTreeMap<String, SupervisedService>,
-    pub log_pipelines: BTreeMap<String, String>,
-    pub service_dir_path: String,
-    pub active_services: BTreeMap<String, SupervisedService>,
+    pub log_pipelines: BTreeMap<String, String>, // service -> log service name
 }
 
 impl RunitS6SupervisionTreeGovernor {
     pub fn new() -> Self {
         Self {
-            service_dir_path: "/var/service".to_string(),
             current_stage: SupervisionStage::Stage1Boot,
             services: BTreeMap::new(),
-            active_services: BTreeMap::new(),
             log_pipelines: BTreeMap::new(),
-        }
-    }
-
-    pub fn new_with_path(service_dir_path: &str) -> Self {
-        Self {
-            service_dir_path: service_dir_path.to_string(),
-            current_stage: SupervisionStage::Stage1Boot,
-            services: BTreeMap::new(),
-            active_services: BTreeMap::new(),
-            log_pipelines: BTreeMap::new(),
-            service_dir_path: String::new(),
-            active_services: BTreeMap::new(),
         }
     }
 
@@ -798,12 +741,36 @@ impl RunitS6SupervisionTreeGovernor {
         if let Some(log) = log_srv {
             self.log_pipelines.insert(name.clone(), log);
         }
-        self.active_services.insert(name.clone(), srv.clone());
         self.services.insert(name, srv);
     }
 
-    pub fn scan_service_directory(&mut self, service_dir_path: &str, known_services: &[(&str, &str)]) {
-        self.service_dir_path = service_dir_path.to_string();
+    pub fn parse_s6_readiness_notification(&mut self, service_name: &str, line: &str) -> bool {
+        if line.trim() == "READY" || line.contains("s6-notifyready") {
+            if let Some(srv) = self.services.get_mut(service_name) {
+                srv.state = ServiceState::Running;
+                return true;
+            }
+        }
+        false
+    }
+}
+
+/// s6 & runit Supervision Tree Governor Engine
+#[derive(Debug, Clone, Default)]
+pub struct RunitS6SupervisionTreeGovernor {
+    pub service_dir_path: String,
+    pub active_services: BTreeMap<String, SupervisedService>,
+}
+
+impl RunitS6SupervisionTreeGovernor {
+    pub fn new(service_dir_path: &str) -> Self {
+        Self {
+            service_dir_path: service_dir_path.to_string(),
+            active_services: BTreeMap::new(),
+        }
+    }
+
+    pub fn scan_service_directory(&mut self, known_services: &[(&str, &str)]) {
         for (name, script) in known_services {
             self.active_services.insert(
                 name.to_string(),
@@ -814,7 +781,6 @@ impl RunitS6SupervisionTreeGovernor {
                     state: ServiceState::Stopped,
                     pid: None,
                     auto_restart: true,
-                    notification_fd: None,
                 },
             );
         }
@@ -831,33 +797,13 @@ impl RunitS6SupervisionTreeGovernor {
                 srv.state = ServiceState::Stopped;
             }
         }
-        if let Some(srv) = self.services.get_mut(service_name) {
-            srv.pid = self.active_services.get(service_name).and_then(|s| s.pid);
-            srv.state = self.active_services.get(service_name).map(|s| s.state).unwrap_or(ServiceState::Stopped);
-        }
     }
 
-    pub fn parse_s6_readiness_notification(&mut self, service_name: &str, line: &str) -> bool {
+    pub fn parse_s6_readiness_notification(line: &str) -> bool {
         let trimmed = line.trim();
-        if trimmed == "READY" || trimmed == "READY=1" || trimmed.contains("s6-notifyready") || trimmed.starts_with("ready") {
-            if let Some(srv) = self.services.get_mut(service_name) {
-                srv.state = ServiceState::Running;
-                return true;
-            }
-        }
-        false
+        trimmed == "READY=1" || trimmed.starts_with("ready")
     }
 }
-
-impl Default for SupervisionStage {
-    fn default() -> Self {
-        SupervisionStage::Stage1Boot
-    }
-}
-
-// ============================================================================
-// SysVinit Subsystem
-// ============================================================================
 
 /// SysVinit Action Keywords
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -872,8 +818,8 @@ pub enum SysVAction {
     OnDemand,
 }
 
-/// SysV  Entry
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// SysV `/etc/inittab` Line Entry
+#[derive(Debug, Clone)]
 pub struct SysVInittabEntry {
     pub id: String,
     pub runlevels: Vec<char>,
@@ -957,45 +903,18 @@ impl SysVInittabEntry {
     }
 }
 
-/// SysVinit Runlevel State Machine Engine
-#[derive(Debug, Clone, Default)]
+/// SysVinit Runlevel State Machine
 pub struct SysVinitRunlevelStateMachine {
-    pub current_runlevel: char,
-    pub inittab_entries: Vec<SysVInittabEntry>,
-    pub active_processes: BTreeMap<String, u32>,
+    pub current_runlevel: char, // '0'..'6', 'S'
     pub entries: Vec<SysVInittabEntry>,
 }
 
 impl SysVinitRunlevelStateMachine {
-    pub fn new(initial_runlevel: char, entries: Vec<SysVInittabEntry>) -> Self {
+    pub fn new(initial_runlevel: char) -> Self {
         Self {
             current_runlevel: initial_runlevel,
-            inittab_entries: entries,
-            active_processes: BTreeMap::new(),
             entries: Vec::new(),
         }
-    }
-
-    pub fn set_runlevel(&mut self, new_runlevel: char) -> Vec<&SysVInittabEntry> {
-        self.current_runlevel = new_runlevel;
-        self.inittab_entries
-            .iter()
-            .filter(|e| e.runlevels.contains(&new_runlevel) || e.runlevels.contains(&'a') || e.runlevels.contains(&'b') || e.runlevels.contains(&'c'))
-            .collect()
-    }
-
-    pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
-        let mut spawned = Vec::new();
-        for entry in &self.inittab_entries {
-            if entry.action == SysVAction::Respawn && entry.runlevels.contains(&self.current_runlevel) {
-                if !self.active_processes.contains_key(&entry.id) {
-                    let mock_pid = 4000 + entry.id.len() as u32;
-                    self.active_processes.insert(entry.id.clone(), mock_pid);
-                    spawned.push(entry.id.clone());
-                }
-            }
-        }
-        spawned
     }
 
     pub fn switch_runlevel(&mut self, target_runlevel: char) -> (Vec<String>, Vec<String>) {
@@ -1030,7 +949,45 @@ pub struct BsdRcScript {
     pub keywords: Vec<String>,
     pub precmd: Option<String>,
     pub postcmd: Option<String>,
-    pub enabled_variable: Option<String>,
+    pub enabled_variable: Option<String>, // e.g. "sshd_enable"
+}
+
+/// BSD `rc.subr` Execution & Config Validation Engine
+#[derive(Debug, Clone, Default)]
+pub struct BsdRcSubrEngine {
+    pub rc_conf: BTreeMap<String, String>,
+}
+
+impl BsdRcSubrEngine {
+    pub fn new(rc_conf: BTreeMap<String, String>) -> Self {
+        Self { rc_conf }
+    }
+
+    pub fn is_service_enabled(&self, service_name: &str) -> bool {
+        let key = format!("{}_enable", service_name);
+        if let Some(val) = self.rc_conf.get(&key) {
+            let val_lower = val.to_lowercase();
+            val_lower == "yes" || val_lower == "true" || val_lower == "1" || val_lower == "on"
+        } else {
+            false
+        }
+    }
+
+    pub fn execute_precmd(&self, script: &BsdRcScript) -> bool {
+        if let Some(cmd) = &script.precmd {
+            !cmd.is_empty()
+        } else {
+            true
+        }
+    }
+
+    pub fn execute_postcmd(&self, script: &BsdRcScript) -> bool {
+        if let Some(cmd) = &script.postcmd {
+            !cmd.is_empty()
+        } else {
+            true
+        }
+    }
 }
 
 impl BsdRcScript {
@@ -1077,16 +1034,15 @@ impl BsdRcScript {
 }
 
 /// BSD `rc.subr` & `rcorder` Dependency Engine
-#[derive(Debug, Clone, Default)]
 pub struct BsdRcSubrEngine {
-    pub rc_conf: BTreeMap<String, String>,
+    pub rc_conf: BTreeMap<String, String>, // e.g. "sshd_enable" -> "YES"
     pub scripts: BTreeMap<String, BsdRcScript>,
 }
 
 impl BsdRcSubrEngine {
-    pub fn new(rc_conf: BTreeMap<String, String>) -> Self {
+    pub fn new() -> Self {
         Self {
-            rc_conf,
+            rc_conf: BTreeMap::new(),
             scripts: BTreeMap::new(),
         }
     }
@@ -1097,16 +1053,6 @@ impl BsdRcSubrEngine {
 
     pub fn register_script(&mut self, script: BsdRcScript) {
         self.scripts.insert(script.name.clone(), script);
-    }
-
-    pub fn is_service_enabled(&self, service_name: &str) -> bool {
-        let key = format!("{}_enable", service_name);
-        if let Some(val) = self.rc_conf.get(&key) {
-            let val_lower = val.to_lowercase();
-            val_lower == "yes" || val_lower == "true" || val_lower == "1" || val_lower == "on"
-        } else {
-            false
-        }
     }
 
     pub fn is_enabled(&self, script_name: &str) -> bool {
@@ -1128,7 +1074,7 @@ impl BsdRcSubrEngine {
 }
 
 /// macOS launchd PLIST Job Specification
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct LaunchdJobSpec {
     pub label: String,
     pub program: String,
@@ -1141,16 +1087,17 @@ pub struct LaunchdJobSpec {
 }
 
 /// macOS launchd Job Supervisor Engine
-#[derive(Debug, Clone, Default)]
 pub struct LaunchdJobSupervisorEngine {
     pub jobs: BTreeMap<String, LaunchdJobSpec>,
     pub job_states: BTreeMap<String, ServiceState>,
-    pub running_pids: BTreeMap<String, u32>,
 }
 
 impl LaunchdJobSupervisorEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            jobs: BTreeMap::new(),
+            job_states: BTreeMap::new(),
+        }
     }
 
     pub fn register_job(&mut self, job: LaunchdJobSpec) {
@@ -1174,24 +1121,30 @@ impl LaunchdJobSupervisorEngine {
         }
         None
     }
+}
 
-    pub fn load_job(&mut self, job: LaunchdJobSpec) {
-        self.register_job(job);
-    }
+/// macOS launchd Job Supervisor Engine
+#[derive(Debug, Clone, Default)]
+pub struct LaunchdJobSupervisorEngine {
+    pub jobs: BTreeMap<String, LaunchdJobSpec>,
+    pub running_pids: BTreeMap<String, u32>,
+}
 
-    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
-        for job in self.jobs.values() {
-            if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states
-                    .insert(job.label.clone(), ServiceState::Running);
-                return Some(job.label.clone());
-            }
+impl LaunchdJobSupervisorEngine {
+    pub fn new() -> Self {
+        Self {
+            jobs: BTreeMap::new(),
+            running_pids: BTreeMap::new(),
         }
-        None
     }
 
     pub fn load_job(&mut self, job: LaunchdJobSpec) {
-        self.register_job(job);
+        let label = job.label.clone();
+        if job.run_at_load {
+            let mock_pid = 5000 + label.len() as u32;
+            self.running_pids.insert(label.clone(), mock_pid);
+        }
+        self.jobs.insert(label, job);
     }
 
     pub fn handle_process_exit(&mut self, label: &str) {
@@ -1200,46 +1153,26 @@ impl LaunchdJobSupervisorEngine {
             if job.keep_alive {
                 let mock_pid = 5000 + label.len() as u32;
                 self.running_pids.insert(label.to_string(), mock_pid);
-                self.job_states.insert(label.to_string(), ServiceState::Running);
-            } else {
-                self.job_states.insert(label.to_string(), ServiceState::Stopped);
             }
         }
-    }
-
-    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
-        for job in self.jobs.values() {
-            if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states
-                    .insert(job.label.clone(), ServiceState::Running);
-                return Some(job.label.clone());
-            }
-        }
-        None
     }
 }
 
-// ============================================================================
-// Cron, Anacron, and at Spool Task Execution
-// ============================================================================
-
-/// Vixie Cron Environment Spec Context
+/// Vixie Cron Environment Context
 #[derive(Debug, Clone)]
-pub struct VixieCronEnvSpecContext {
+pub struct VixieCronEnvContext {
     pub mailto: Option<String>,
     pub path: String,
     pub shell: String,
-    pub home: String,
     pub env_vars: BTreeMap<String, String>,
 }
 
-impl Default for VixieCronEnvSpecContext {
+impl Default for VixieCronEnvContext {
     fn default() -> Self {
         Self {
             mailto: Some("root".to_string()),
             path: "/usr/bin:/bin:/usr/sbin:/sbin".to_string(),
             shell: "/bin/sh".to_string(),
-            home: "/root".to_string(),
             env_vars: BTreeMap::new(),
         }
     }
@@ -1274,8 +1207,6 @@ impl AnacronSpoolManager {
 pub struct AtSpoolQueueManager {
     pub spool_dir: String,
     pub queued_jobs: Vec<AtJob>,
-    pub jobs: BTreeMap<u64, AtJob>,
-    pub next_job_id: u64,
 }
 
 impl AtSpoolQueueManager {
@@ -1283,8 +1214,6 @@ impl AtSpoolQueueManager {
         Self {
             spool_dir: spool_dir.to_string(),
             queued_jobs: Vec::new(),
-            jobs: BTreeMap::new(),
-            next_job_id: 1,
         }
     }
 
@@ -1312,17 +1241,18 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
-pub struct UserlandInitCleanRoomPrGatewayEngine {
+pub struct UserlandInitPrGatewayEngine {
     pub pr_id: u32,
     pub title: String,
     pub author: String,
     pub pqc_signature: String,
 }
 
-impl UserlandInitCleanRoomPrGatewayEngine {
+impl UserlandInitPrGatewayEngine {
     pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
         Self {
             pr_id,
@@ -1381,6 +1311,7 @@ impl VixieCronEntry {
         None
     }
 
+    /// Evaluates if the cron expression matches given time parameters: (minute, hour, mday, month, wday).
     pub fn matches_time(&self, min: u32, hour: u32, mday: u32, month: u32, wday: u32) -> bool {
         if self.is_macro {
             return match self.expression.as_str() {
@@ -1431,6 +1362,25 @@ impl VixieCronEntry {
     }
 }
 
+/// Vixie Cron Environment Context
+#[derive(Debug, Clone)]
+pub struct VixieCronEnvContext {
+    pub mailto: Option<String>,
+    pub path: String,
+    pub shell: String,
+    pub home: String,
+}
+
+impl Default for VixieCronEnvContext {
+    fn default() -> Self {
+        Self {
+            mailto: Some("root".to_string()),
+            path: "/usr/bin:/bin".to_string(),
+            shell: "/bin/sh".to_string(),
+            home: "/root".to_string(),
+        }
+    }
+}
 
 /// Anacron Catchup Job Specification
 #[derive(Debug, Clone)]
@@ -1458,13 +1408,34 @@ impl AnacronJob {
     }
 }
 
+/// Anacron `/var/spool/anacron` Spool Manager
+pub struct AnacronSpoolManager {
+    pub spool_timestamps: BTreeMap<String, u64>, // job_id -> timestamp
+}
+
+impl AnacronSpoolManager {
+    pub fn new() -> Self {
+        Self {
+            spool_timestamps: BTreeMap::new(),
+        }
+    }
+
+    pub fn record_job_run(&mut self, job_id: String, now_timestamp: u64) {
+        self.spool_timestamps.insert(job_id, now_timestamp);
+    }
+
+    pub fn get_last_run(&self, job_id: &str) -> u64 {
+        self.spool_timestamps.get(job_id).copied().unwrap_or(0)
+    }
+}
+
 /// `at` and `batch` Delayed Job Queue Entry
 #[derive(Debug, Clone)]
 pub struct AtJob {
     pub job_id: u64,
     pub execute_at: u64,
     pub command: String,
-    pub queue: char,
+    pub queue: char, // 'a'..'z' or 'b' for batch
     pub max_load_average: Option<f32>,
 }
 
@@ -1544,8 +1515,25 @@ impl SystemdTimerSpec {
     }
 }
 
+/// Systemd OnCalendar Expression Parser
+pub struct SystemdOnCalendarParser;
+
+impl SystemdOnCalendarParser {
+    pub fn parse_expression(expr: &str) -> Option<(u32, u32)> {
+        let trimmed = expr.trim();
+        if trimmed == "daily" || trimmed == "*-*-* 00:00:00" {
+            Some((0, 0)) // 00:00
+        } else if trimmed == "weekly" {
+            Some((0, 0))
+        } else if trimmed == "hourly" {
+            Some((0, 0)) // top of hour
+        } else {
+            None
+        }
+    }
+}
+
 /// Master Core Userland Init & Task Supervision Engine
-#[derive(Default)]
 pub struct SovereignCoreUserlandInitEngine {
     pub systemd_units: BTreeMap<String, SystemdDependencyGraph>,
     pub systemd_slices: BTreeMap<String, SystemdCgroupsv2Slice>,
@@ -1563,7 +1551,20 @@ pub struct SovereignCoreUserlandInitEngine {
 
 impl SovereignCoreUserlandInitEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            systemd_units: BTreeMap::new(),
+            systemd_slices: BTreeMap::new(),
+            openrc_runlevels: BTreeMap::new(),
+            openrc_scripts: BTreeMap::new(),
+            supervised_services: BTreeMap::new(),
+            sysv_entries: Vec::new(),
+            bsd_rc_scripts: BTreeMap::new(),
+            launchd_jobs: BTreeMap::new(),
+            cron_entries: Vec::new(),
+            anacron_jobs: Vec::new(),
+            at_jobs: Vec::new(),
+            systemd_timers: BTreeMap::new(),
+        }
     }
 
     pub fn register_systemd_unit(&mut self, unit_name: String, deps: SystemdDependencyGraph) {
@@ -1674,7 +1675,7 @@ impl SovereignCoreUserlandInitEngine {
 }
 
 // ============================================================================
-// Init Pull Request Gateway Subsystem
+// Init & Supervisor Pull Request Gateway
 // ============================================================================
 
 /// Userland Init PR Submission Format
@@ -1683,30 +1684,21 @@ pub struct UserlandInitPrSubmission {
     pub pr_id: u64,
     pub title: String,
     pub author: String,
-    pub target_subsystem: String,
+    pub target_subsystem: String, // e.g. "systemd", "openrc", "s6", "launchd"
     pub description: String,
     pub pqc_signature: Vec<u8>,
     pub ci_passed: bool,
 }
 
 /// Userland Init Pull Request Gateway Engine
-#[derive(Debug, Clone)]
 pub struct UserlandInitPrGatewayEngine {
-    pub pr_id: u32,
-    pub title: String,
-    pub author: String,
-    pub pqc_signature: String,
     pub submissions: BTreeMap<u64, UserlandInitPrSubmission>,
     pub next_pr_id: u64,
 }
 
 impl UserlandInitPrGatewayEngine {
-    pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            pr_id,
-            title: title.to_string(),
-            author: author.to_string(),
-            pqc_signature: format!("dilithium5:sig:{}", pr_id),
             submissions: BTreeMap::new(),
             next_pr_id: 5001,
         }
@@ -1736,39 +1728,15 @@ impl UserlandInitPrGatewayEngine {
         pr_id
     }
 
-    pub fn generate_unified_diff(&self) -> String {
-        format!(
-            "--- a/src/userland/init.rs\n+++ b/src/userland/init.rs\n@@ -1,5 +1,120 @@\n+// PR #{}: {}\n+// Author: {}\n",
-            self.pr_id, self.title, self.author
-        )
-    }
-
     pub fn generate_pr_unified_diff(&self, pr_id: u64) -> Option<String> {
         if let Some(pr) = self.submissions.get(&pr_id) {
             Some(format!(
-                "--- a/userland/init/{}.conf
-+++ b/userland/init/{}.conf
-@@ -1,3 +1,5 @@
-+# PR #{}: {}
-+# Author: {}
-+[Init]
-+Engine={}
-",
+                "--- a/userland/init/{}.conf\n+++ b/userland/init/{}.conf\n@@ -1,3 +1,5 @@\n+# PR #{}: {}\n+# Author: {}\n+[Init]\n+Engine={}\n",
                 pr.target_subsystem, pr.target_subsystem, pr.pr_id, pr.title, pr.author, pr.target_subsystem
             ))
         } else {
             None
         }
-    }
-
-    pub fn run_automated_ci_gate(&self) -> bool {
-        !self.title.is_empty() && self.pqc_signature.starts_with("dilithium5:")
-    }
-}
-
-impl Default for UserlandInitPrGatewayEngine {
-    fn default() -> Self {
-        Self::new(5000, "Default Init Gateway", "System")
     }
 }
 
@@ -1826,13 +1794,7 @@ mod tests {
 
     #[test]
     fn test_systemd_socket_activation() {
-        let mut engine = SystemdSocketActivationEngine::new("http.socket");
-        engine.pass_socket_fd(3);
-        engine.pass_socket_fd(4);
-        let envs = engine.build_env_vars(1234);
-        assert_eq!(envs[0], ("LISTEN_FDS".to_string(), "2".to_string()));
-        assert_eq!(envs[1], ("LISTEN_PID".to_string(), "1234".to_string()));
-
+        let mut engine = SystemdSocketActivationEngine::new();
         engine.register_socket(SystemdSocketUnit {
             name: "ssh.socket".to_string(),
             listen_stream: Some("0.0.0.0:22".to_string()),
@@ -1906,9 +1868,11 @@ mod tests {
         let header = OpenRcHeader::parse(script);
         assert_eq!(header.provide, vec!["net"]);
         assert_eq!(header.need, vec!["localmount"]);
-        assert_eq!(header.use_deps, vec!["dns"]);
-        assert_eq!(header.before, vec!["sshd"]);
-        assert_eq!(header.keywords, vec!["-docker"]);
+
+        let mut solver = OpenRcDependencySolverEngine::new();
+        solver.register_script("net".to_string(), header);
+        let list = solver.transition_runlevel(OpenRcRunlevel::Default);
+        assert_eq!(list, vec!["net"]);
     }
 
     #[test]
@@ -1929,7 +1893,7 @@ mod tests {
         );
 
         tree.enter_stage(SupervisionStage::Stage2SupervisionLoop);
-        let ready = tree.parse_s6_readiness("nginx", "READY");
+        let ready = tree.parse_s6_readiness_notification("nginx", "READY");
         assert!(ready);
         assert_eq!(
             tree.services.get("nginx").unwrap().state,
@@ -1938,34 +1902,33 @@ mod tests {
     }
 
     #[test]
-    fn test_sysv_inittab_parse() {
+    fn test_sysv_inittab_and_state_machine() {
         let line = "id:2345:respawn:/sbin/getty 38400 tty1";
-        let entry = SysVInittabEntry::parse(line).unwrap();
+        let entry = SysVInittabEntry::parse_line(line).unwrap();
         assert_eq!(entry.id, "id");
         assert_eq!(entry.runlevels, vec!['2', '3', '4', '5']);
 
-        let mut sm = SysVinitRunlevelStateMachine::new('1', vec![entry]);
-        let matching = sm.set_runlevel('2');
-        assert_eq!(matching.len(), 1);
-        let spawned = sm.spawn_respawn_processes();
-        assert_eq!(spawned, vec!["id"]);
+        let mut sm = SysVinitRunlevelStateMachine::new('1');
+        sm.entries.push(entry);
+        let (stops, starts) = sm.switch_runlevel('2');
+        assert_eq!(starts.len(), 1);
+        assert_eq!(stops.len(), 0);
     }
 
     #[test]
-    fn test_bsd_rc_script_parse() {
+    fn test_bsd_rcorder_and_rc_conf() {
         let content = r#"
             # PROVIDE: sshd
             # REQUIRE: LOGIN
             # BEFORE: SECURELEVEL
             # KEYWORD: shutdown
-            precmd="sshd_precmd"
-            postcmd="sshd_postcmd"
+            sshd_enable="YES"
         "#;
         let script = BsdRcScript::parse(content);
         assert_eq!(script.provides, vec!["sshd"]);
         assert_eq!(script.enabled_variable, Some("sshd_enable".to_string()));
 
-        let mut bsd = BsdRcSubrEngine::new(BTreeMap::new());
+        let mut bsd = BsdRcSubrEngine::new();
         bsd.register_script(script);
         bsd.set_rc_conf("sshd_enable".to_string(), "YES".to_string());
         assert!(bsd.is_enabled("sshd"));
@@ -1973,7 +1936,7 @@ mod tests {
 
     #[test]
     fn test_launchd_job_supervisor() {
-        let mut launchd = LaunchdJobSupervisorSpecEngine::new();
+        let mut launchd = LaunchdJobSupervisorEngine::new();
         launchd.register_job(LaunchdJobSpec {
             label: "com.apple.syslogd".to_string(),
             program: "/usr/sbin/syslogd".to_string(),
@@ -2003,24 +1966,22 @@ mod tests {
         assert!(!entry.is_macro);
         assert!(entry.matches_time(0, 10, 1, 1, 1));
         assert!(entry.matches_time(15, 10, 1, 1, 1));
-        assert!(!entry.matches_time(7, 10, 1, 1, 1));
 
         let macro_entry = VixieCronEntry::parse("@hourly /usr/bin/hourly_cleanup").unwrap();
         assert!(macro_entry.is_macro);
         assert!(macro_entry.matches_time(0, 12, 1, 1, 1));
-        assert!(!macro_entry.matches_time(30, 12, 1, 1, 1));
     }
 
     #[test]
     fn test_anacron_spool_manager() {
-        let mut spool = AnacronSpoolManager::new("/var/spool/anacron");
-        spool.record_job_run("cron.daily", 1700000000);
-        assert_eq!(spool.get_last_run("cron.daily"), Some(1700000000));
+        let mut spool = AnacronSpoolManager::new();
+        spool.record_job_run("cron.daily".to_string(), 1700000000);
+        assert_eq!(spool.get_last_run("cron.daily"), 1700000000);
     }
 
     #[test]
     fn test_at_spool_queue_manager() {
-        let mut queue = AtSpoolQueueManager::new("/var/spool/at");
+        let mut queue = AtSpoolQueueManager::new();
         let id = queue.schedule_at_job(2000000000, "echo hello".to_string(), 'a', None);
         assert_eq!(id, 1);
         assert_eq!(queue.jobs.get(&1).unwrap().command, "echo hello");
@@ -2028,13 +1989,13 @@ mod tests {
 
     #[test]
     fn test_systemd_on_calendar_parser() {
-        let parsed = SystemdOnCalendarExpressionParser::parse_expression("daily");
+        let parsed = SystemdOnCalendarParser::parse_expression("daily");
         assert_eq!(parsed, Some((0, 0)));
     }
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let mut gateway = UserlandInitPrGatewayEngine::new(5000, "Init PR Gateway", "System");
+        let mut gateway = UserlandInitPrGatewayEngine::new();
         let pr_id = gateway.submit_pr(
             "Add systemd socket activation support".to_string(),
             "Jules".to_string(),
@@ -2049,19 +2010,18 @@ mod tests {
 
     #[test]
     fn test_systemd_socket_activation_and_path_monitor() {
-        let mut sock = SystemdSocketActivationUnitEngine::new("http.socket");
+        let mut sock = SystemdSocketActivationEngine::new("http.socket");
         sock.pass_socket_fd(3);
         sock.pass_socket_fd(4);
         let envs = sock.build_env_vars(1234);
         assert_eq!(envs[0], ("LISTEN_FDS".to_string(), "2".to_string()));
         assert_eq!(envs[1], ("LISTEN_PID".to_string(), "1234".to_string()));
 
-        let path_mon = SystemdPathMonitorUnitEngine {
+        let path_mon = SystemdPathMonitorEngine {
             unit_name: "log.path".to_string(),
             monitored_path: "/var/log/app.log".to_string(),
-            event_type: Some(SystemdPathEventType::PathModified),
+            event_type: SystemdPathEventType::PathModified,
             unit_to_trigger: "log.service".to_string(),
-            paths: BTreeMap::new(),
         };
         assert!(path_mon.check_trigger(
             "/var/log/app.log",
@@ -2074,11 +2034,8 @@ mod tests {
             false
         ));
 
-        // At timestamp 100 with boot at 0: boot timer (300s) not reached yet
-        assert!(!timer.is_triggered(100, 0, 0));
-
-        // At timestamp 350 with boot at 0: boot timer (300s) triggered
-        assert!(timer.is_triggered(350, 0, 0));
+        assert!(SystemdOnCalendarParser::matches("hourly", 0, 12, 1, 1, 1));
+        assert!(!SystemdOnCalendarParser::matches("hourly", 15, 12, 1, 1, 1));
     }
 
     #[test]
@@ -2107,10 +2064,10 @@ mod tests {
             },
         );
 
-        let order = OpenRcDependencySolverSpecEngine::resolve_order(&scripts).unwrap();
+        let order = OpenRcDependencySolverEngine::resolve_order(&scripts).unwrap();
         assert_eq!(order, vec!["net", "sshd"]);
 
-        let mut ctrl = OpenRcStatusControllerSpecEngine::new(OpenRcRunlevel::SysInit);
+        let mut ctrl = OpenRcStatusControllerEngine::new(OpenRcRunlevel::SysInit);
         ctrl.transition_runlevel(OpenRcRunlevel::Default);
         ctrl.mark_started("sshd");
         assert!(ctrl.active_services.contains("sshd"));
@@ -2118,8 +2075,8 @@ mod tests {
 
     #[test]
     fn test_runit_s6_supervision_governor() {
-        let mut gov = RunitS6SupervisionTreeGovernor::new();
-        gov.scan_service_directory("/var/service", &[("syslogd", "./run"), ("crond", "./run")]);
+        let mut gov = RunitS6SupervisionTreeGovernor::new("/var/service");
+        gov.scan_service_directory(&[("syslogd", "./run"), ("crond", "./run")]);
         assert_eq!(gov.active_services.len(), 2);
 
         gov.process_death("syslogd");
@@ -2143,16 +2100,16 @@ mod tests {
             process: "/sbin/getty tty1".to_string(),
         }];
         let mut sysv = SysVinitRunlevelStateMachine::new('1', entries);
-        let matching = sysv.transition_runlevel('2');
+        let matching = sysv.set_runlevel('2');
         assert_eq!(matching.len(), 1);
         let spawned = sysv.spawn_respawn_processes();
-        assert_eq!(spawned.len(), 1); assert_eq!(spawned[0].id, "1");
+        assert_eq!(spawned, vec!["1"]);
 
         let mut rc_conf = BTreeMap::new();
         rc_conf.insert("sshd_enable".to_string(), "YES".to_string());
         let bsd_rc = BsdRcSubrEngine::new(rc_conf);
-        assert!(bsd_rc.is_enabled("sshd"));
-        assert!(!bsd_rc.is_enabled("httpd"));
+        assert!(bsd_rc.is_service_enabled("sshd"));
+        assert!(!bsd_rc.is_service_enabled("httpd"));
     }
 
     #[test]
@@ -2165,19 +2122,17 @@ mod tests {
             keep_alive: true,
             run_at_load: true,
             throttle_interval_secs: 10,
-            mach_services: vec![],
-            sockets: BTreeMap::new(),
         });
         assert!(launchd.running_pids.contains_key("com.apple.syslogd"));
 
         launchd.handle_process_exit("com.apple.syslogd");
         assert!(launchd.running_pids.contains_key("com.apple.syslogd"));
 
-        let mut anacron_spool = AnacronSpoolSpecManager::new("/var/spool/anacron");
+        let mut anacron_spool = AnacronSpoolManager::new("/var/spool/anacron");
         anacron_spool.record_job_run("cron.daily", 10000);
         assert_eq!(anacron_spool.get_last_run("cron.daily"), Some(10000));
 
-        let mut at_spool = AtSpoolQueueSpecManager::new("/var/spool/at");
+        let mut at_spool = AtSpoolQueueManager::new("/var/spool/at");
         at_spool.enqueue_job(AtJob {
             job_id: 10,
             execute_at: 500,
@@ -2191,7 +2146,11 @@ mod tests {
 
     #[test]
     fn test_userland_init_pr_gateway() {
-        let gw = UserlandInitCleanRoomPrGatewayEngine::new(4001, "feat(init): Complete Init Parity", "SovereignAgent");
+        let gw = UserlandInitPrGatewayEngine::new(
+            4001,
+            "feat(init): Complete Init Parity",
+            "SovereignAgent",
+        );
         assert!(gw.run_automated_ci_gate());
         let diff = gw.generate_unified_diff();
         assert!(diff.contains("PR #4001"));

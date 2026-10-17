@@ -91,7 +91,9 @@ impl SovereignAlpmEngine {
 
     /// Register a sync repository (e.g. "core", "extra", "community")
     pub fn register_repo(&mut self, repo_name: &str) {
-        self.sync_dbs.entry(repo_name.to_string()).or_insert_with(BTreeMap::new);
+        self.sync_dbs
+            .entry(repo_name.to_string())
+            .or_insert_with(BTreeMap::new);
     }
 
     /// Add package to a sync repository database
@@ -137,7 +139,11 @@ impl SovereignAlpmEngine {
     }
 
     /// Install or upgrade package into local database (pacman -S)
-    pub fn install_package(&mut self, pkg: AlpmPackage, _flags: AlpmTransactionFlags) -> Result<(), &'static str> {
+    pub fn install_package(
+        &mut self,
+        pkg: AlpmPackage,
+        _flags: AlpmTransactionFlags,
+    ) -> Result<(), &'static str> {
         // Invariant check: Verify dependency satisfaction
         for dep in &pkg.depends {
             if !self.local_db.contains_key(dep) {
@@ -154,7 +160,11 @@ impl SovereignAlpmEngine {
     }
 
     /// Remove package from local database (pacman -R)
-    pub fn remove_package(&mut self, pkg_name: &str, flags: AlpmTransactionFlags) -> Result<(), &'static str> {
+    pub fn remove_package(
+        &mut self,
+        pkg_name: &str,
+        flags: AlpmTransactionFlags,
+    ) -> Result<(), &'static str> {
         if !self.local_db.contains_key(pkg_name) {
             return Err("Package not installed");
         }
@@ -215,18 +225,28 @@ mod tests {
             conflicts: Vec::new(),
         };
 
-        assert!(alpm.install_package(glibc, AlpmTransactionFlags::default()).is_ok());
+        assert!(alpm
+            .install_package(glibc, AlpmTransactionFlags::default())
+            .is_ok());
         assert_eq!(alpm.installed_count(), 1);
 
-        assert!(alpm.install_package(bash, AlpmTransactionFlags::default()).is_ok());
+        assert!(alpm
+            .install_package(bash, AlpmTransactionFlags::default())
+            .is_ok());
         assert_eq!(alpm.installed_count(), 2);
 
         // Try removing glibc without nodeps: Must fail because bash depends on it
-        assert!(alpm.remove_package("glibc", AlpmTransactionFlags::default()).is_err());
+        assert!(alpm
+            .remove_package("glibc", AlpmTransactionFlags::default())
+            .is_err());
 
         // Remove bash first, then glibc: Should succeed
-        assert!(alpm.remove_package("bash", AlpmTransactionFlags::default()).is_ok());
-        assert!(alpm.remove_package("glibc", AlpmTransactionFlags::default()).is_ok());
+        assert!(alpm
+            .remove_package("bash", AlpmTransactionFlags::default())
+            .is_ok());
+        assert!(alpm
+            .remove_package("glibc", AlpmTransactionFlags::default())
+            .is_ok());
         assert_eq!(alpm.installed_count(), 0);
     }
 }
