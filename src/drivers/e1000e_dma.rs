@@ -251,6 +251,10 @@ impl E1000eDriver {
         // Enable RX descriptor ring
         self.write_reg(REG_RXDCTL, 0x01); // Enable
 
+            // Enable RX descriptor ring
+            self.write_reg(REG_RXDCTL, 0x01); // Enable
+        }
+
         Ok(())
     }
 
@@ -287,6 +291,10 @@ impl E1000eDriver {
 
         // Enable TX descriptor ring
         self.write_reg(REG_TXDCTL, 0x01); // Enable
+
+            // Enable TX descriptor ring
+            self.write_reg(REG_TXDCTL, 0x01); // Enable
+        }
 
         Ok(())
     }

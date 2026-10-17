@@ -39,7 +39,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference behavior
+## Upstream study
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
@@ -47,25 +47,20 @@
 
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
-
-## Reviewer checklist
-
-- [ ] Reviewer checklist completed
+- What SigmaOS adopts:
+- Decision: Adopt / Adapt / Reject
+- Reason:
 
 ## Changes
 
 -
 
-## Storage safety review
+## Kernel safety review and Reviewer checklist
 
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
+- [ ] Reviewer checklist completed
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
+- [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
 - [ ] Signal races considered
 - [ ] Double-completion prevented
