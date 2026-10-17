@@ -11,17 +11,21 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+/// ---------------------------------------------------------------------------
+/// 0. Feature Source Types and Roadmap Feature Ideas
+/// ---------------------------------------------------------------------------
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
     SovereignArchitectureDoc,
     RoadmapIdea,
 }
@@ -29,14 +33,37 @@ pub enum FeatureSourceType {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
     pub idea_id: u32,
+    pub id: u32,
     pub title: String,
+    pub category: String,
     pub source_type: FeatureSourceType,
     pub source_file: String,
     pub target_module: String,
     pub is_fully_implemented: bool,
+    pub fulfilled: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+impl RoadmapFeatureIdea {
+    pub fn new(id: u32, title: &str, category: &str, source_type: FeatureSourceType) -> Self {
+        Self {
+            idea_id: id,
+            id,
+            title: title.to_string(),
+            category: category.to_string(),
+            source_type,
+            source_file: "wiki/Home.md".to_string(),
+            target_module: "kernel".to_string(),
+            is_fully_implemented: true,
+            fulfilled: true,
+        }
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
     SystemUtilities,
@@ -434,21 +461,17 @@ impl SovereignDistroGapClosureEngine {
             sigma_counterpart: "ArchPacmanContribEngine",
             verification_passed: true,
         });
-
-        self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "pledge, unveil, KARL, retguard, signify",
-            source_distro: "OpenBSD",
-            target_native_implementation:
-                "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            gap_closed: true,
+        self.features.push(DistroGapFeatureRecord {
+            distro_name: "OpenBSD",
+            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
+            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
+            verification_passed: true,
         });
-
-        self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            source_distro: "FreeBSD",
-            target_native_implementation:
-                "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
-            gap_closed: true,
+        self.features.push(DistroGapFeatureRecord {
+            distro_name: "FreeBSD",
+            gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
+            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
+            verification_passed: true,
         });
     }
 
@@ -482,11 +505,14 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     fn seed_ideas(&mut self) {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 1,
+            id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
+            category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
+            fulfilled: true,
         });
     }
 
@@ -536,6 +562,7 @@ impl Default for WikiSpecificationDataSyncer {
 pub struct MasterWikiAndRoadmapVerificationSuite {
     pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
     pub syncer: WikiSpecificationDataSyncer,
+    pub ideas: Vec<RoadmapFeatureIdea>,
 }
 
 impl MasterWikiAndRoadmapVerificationSuite {
@@ -543,6 +570,10 @@ impl MasterWikiAndRoadmapVerificationSuite {
         Self {
             parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
             syncer: WikiSpecificationDataSyncer::new(),
+            ideas: vec![
+                RoadmapFeatureIdea::new(101, "Sovereign Browser Engine", "App", FeatureSourceType::AppReplacementPr),
+                RoadmapFeatureIdea::new(102, "Sovereign Email Client", "App", FeatureSourceType::AppReplacementPr),
+            ],
         }
     }
 

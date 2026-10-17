@@ -1,19 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Sovereign DesignCraft from ArtCraft Missing Components Parity PR Gateway Engine
 // (`src/creative/designcraft_missing_components_parity_pr.rs`)
-//
-// Staging, pull request proposal specification, diff patch generation, and automated
-// execution pipeline for DesignCraft (ArtCraft Design Engine) missing components inspired by:
-// 1. Interactive Prototyping & Screen Flow Engine (Triggers, Animations, Overlays, Screen Flow Routing)
-// 2. Auto-Layout & Responsive Flexbox Container Engine (Directions, Gaps, Padding, Hug/Fill Constraints)
-// 3. Design System Tokens & Variable Modes Engine (Color/Number/String/Boolean Tokens, Multi-Theme Modes, Aliasing)
-// 4. Boolean Operations & Complex Path Vector Geometry Engine (Union/Subtract/Intersect/Exclude, Bézier Knots, Stroke Styling)
-// 5. Real-time Collaborative Multi-User State & Multiplayer CRDT Engine (Op-logs, Cursors, Selection Sync, Branch Merging)
-// 6. Design-to-Code & Multi-Framework Asset Exporter Engine (Tailwind CSS, React JSX, Flutter/SwiftUI, SVG/PDF)
-// 7. Component Variants & Interactive State Machine Engine (Variant Sets, State Transitions, Property Overrides)
-// 8. Design Tokens & W3C Style Dictionary Transformation Engine (JSON Token Parser, Alias Resolver, Cross-Platform Exporter)
-// 9. Vector Icon Library Packaging & Symbol Sprite Engine (SVG Sprite Sheet Compiler, Icon Font Packager)
-// 10. Design Accessibility (WCAG 2.1) & Automated Audit Engine (Relative Luminance, Contrast Ratios, Target Sizing, Color Blindness)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -75,6 +62,18 @@ impl DesigncraftPrCategory {
             }
             Self::CodeExporterMultiFramework => {
                 "design-to-code generator & multi-framework asset exporter"
+            }
+            Self::ComponentVariantsStateMachine => {
+                "interactive component variants & state machine manager"
+            }
+            Self::DesignTokensStyleDictionary => {
+                "W3C design tokens & style dictionary multi-platform transformer"
+            }
+            Self::IconSystemPackagingSymbols => {
+                "vector icon library packaging & SVG symbol sprite sheet compiler"
+            }
+            Self::AccessibilityAuditWcagLint => {
+                "WCAG 2.1 AA/AAA accessibility contrast & touch target auditor"
             }
         }
     }
@@ -1285,12 +1284,12 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         };
         let p1 = self.geometry_engine.create_path(
             String::from("PathA"),
-            alloc::vec![knot1.clone()],
+            vec![knot1.clone()],
             true,
         );
         let p2 = self
             .geometry_engine
-            .create_path(String::from("PathB"), alloc::vec![knot1], true);
+            .create_path(String::from("PathB"), vec![knot1], true);
         let merged_p = self
             .geometry_engine
             .perform_boolean_op(p1, p2, BooleanOpType::Union);

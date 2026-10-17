@@ -10,6 +10,7 @@
 
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -151,7 +152,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Check Landlock v5 access rights bitmask against requested rights.
+    /// Evaluate Landlock access rule (e.g. requested access mask vs allowed access mask).
     pub fn check_landlock_access(allowed_mask: u32, requested_mask: u32) -> bool {
         (allowed_mask & requested_mask) == requested_mask
     }
@@ -448,9 +449,12 @@ impl IdentityAndEnterpriseAuthPrEngine {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
     }
 
-    /// Generate SSSD domain configuration file format string.
+    /// Generate SSSD domain configuration snippet.
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!("[domain/{}]\nid_provider = {}\nldap_uri = {}\n", domain, provider, uri)
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nldap_uri = {}\n",
+            domain, provider, provider, uri
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
