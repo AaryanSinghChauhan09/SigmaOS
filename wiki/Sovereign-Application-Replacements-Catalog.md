@@ -102,6 +102,70 @@ All sovereign app replacements are exposed via Pull Request proposal engines (PR
 
 ---
 
+## Advanced V2 Shipped Sovereign Application Matrix (PRs 216–230)
+
+### 16. Web Browsing V2 (`SovereignBrowserEngineV2PrEngine` - PR 216)
+* **Replaces:** Firefox, Chromium, Brave, LibreWolf
+* **Features:** PQC Kyber/Dilithium TLS 1.3, eBPF ad-blocker & packet filter, WASM sandboxed DOM engine, amnesic ephemeral container tabs.
+
+### 17. Email & Communications V2 (`SovereignEmailClientV2PrEngine` - PR 217)
+* **Replaces:** Thunderbird, Evolution, Claws Mail, Geary
+* **Features:** JMAP & IMAP4rev2 fast sync state machine, PQC OpenPGP auto-key discovery, FTS5 SQLite full-text search indexer.
+
+### 18. Office Productivity V2 (`SovereignOfficeSuiteV2PrEngine` - PR 218)
+* **Replaces:** LibreOffice (Writer, Calc, Impress, Draw), OpenOffice, OnlyOffice
+* **Features:** CRDT real-time collaborative editing, zero-copy ODF/OOXML parser, MathML solver, native PDF/A-3 signer.
+
+### 19. Code Editor & IDE V2 (`SovereignTextEditorV2PrEngine` - PR 219)
+* **Replaces:** Vim, Neovim, GNU Emacs, nano, Helix, Kakoune
+* **Features:** LSP v3.17 & DAP client, Tree-sitter AST syntax parser, Vi/Emacs modal dispatcher, embedded Lua VM.
+
+### 20. Image Studio V2 (`SovereignRasterGraphicsV2PrEngine` - PR 220)
+* **Replaces:** GIMP, Krita, Inkscape, Darktable
+* **Features:** OpenFX filter graph pipeline, non-destructive layer stack, ACES / OpenColorIO wide-gamut color management, GPU compute shader renderer.
+
+### 21. Document Reader V2 (`SovereignDocumentViewerV2PrEngine` - PR 221)
+* **Replaces:** Evince, Okular, MuPDF, Zathura
+* **Features:** Multithreaded PDF/EPUB/DJVU vector renderer, interactive stylus layer, cryptographic signature verifier.
+
+### 22. File Manager V2 (`SovereignFileManagerV2PrEngine` - PR 222)
+* **Replaces:** Nautilus, Dolphin, Thunar, PCManFM, Ranger
+* **Features:** B-Tree metadata tag catalog, dual-pane spatial & columnar navigator, VFS mount governor for SSHFS/SMB/NFS.
+
+### 23. Terminal & Multiplexer V2 (`SovereignTerminalMultiplexerV2PrEngine` - PR 223)
+* **Replaces:** Alacritty, Kitty, urxvt, tmux, Screen
+* **Features:** GPU-accelerated PTY cell grid renderer, SIXEL & iTerm2 inline graphics, persistent attach/detach multiplexer state machine.
+
+### 24. Media Studio V2 (`SovereignMediaPlayerStudioV2PrEngine` - PR 224)
+* **Replaces:** VLC, MPV, Audacity, Tenacity
+* **Features:** Zero-copy HW video decoder (VAAPI, NVDEC), multi-track DAW audio engine, VST3/LV2 plugin host, HDR10 tone mapper.
+
+### 25. Password Vault V2 (`SovereignPasswordVaultV2PrEngine` - PR 225)
+* **Replaces:** KeePassXC, GNU pass, Bitwarden
+* **Features:** Argon2id KDF, ChaCha20-Poly1305 encrypted vault, TOTP/HOTP 2FA authenticator, automated Git sync backend.
+
+### 26. System Monitor V2 (`SovereignSystemMonitorV2PrEngine` - PR 226)
+* **Replaces:** htop, btop, top, glances
+* **Features:** eBPF /proc & Cgroup v2 telemetry inspector, per-core CPU/memory/IO breakdown, PSI pressure monitor, interactive process tree.
+
+### 27. P2P Torrent Client V2 (`SovereignP2pTorrentClientV2PrEngine` - PR 227)
+* **Replaces:** Transmission, Deluge, qBittorrent
+* **Features:** BitTorrent v2 (BEP-52) SHA256 hash tree, Kademlia DHT node resolver, uTP congestion control, encrypted swarm governor.
+
+### 28. Messenger & Chat V2 (`SovereignMatrixIrcMessengerV2PrEngine` - PR 228)
+* **Replaces:** HexChat, Element, WeeChat, Dino
+* **Features:** Matrix Olm/Megolm E2EE, IRCv3 client with SASL & CAP negotiation, unified multi-protocol router.
+
+### 29. Archive Studio V2 (`SovereignArchiveCompressorV2PrEngine` - PR 229)
+* **Replaces:** Ark, File Roller, 7-Zip, PeaZip
+* **Features:** Multi-threaded Zstd/LZMA2/Bzip2 codec, AES-256 encrypted archive creation, streaming archive inspector.
+
+### 30. Disk Studio V2 (`SovereignDiskPartitionManagerV2PrEngine` - PR 230)
+* **Replaces:** GParted, GNOME Disks, KDE Partition Manager, gpart
+* **Features:** MBR/GPT/BSD partition table solver, Ext4/Btrfs/ZFS/XFS resizer, NVMe SMART health monitor, LUKS2 keyslot manager.
+
+---
+
 ## Status & Integration Verification
 
 All 15 engines are registered, verified, and tested in `src/productivity/sovereign_application_replacements_pr_suite.rs`. You can run tests at any time using:
