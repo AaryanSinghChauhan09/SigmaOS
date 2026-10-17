@@ -29,6 +29,10 @@ pub struct SecurityPrProposalManifest {
 pub struct LinuxAccessControlAndSandboxingPrEngine;
 
 impl LinuxAccessControlAndSandboxingPrEngine {
+    /// Check Landlock access rights bitmask.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
+    }
     pub fn new() -> Self {
         Self
     }
@@ -400,6 +404,13 @@ impl AntivirusAndCryptoEnginePrEngine {
 pub struct IdentityAndEnterpriseAuthPrEngine;
 
 impl IdentityAndEnterpriseAuthPrEngine {
+    /// Generate SSSD domain configuration.
+    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain_name, provider, uri
+        )
+    }
     pub fn new() -> Self {
         Self
     }
