@@ -74,7 +74,10 @@ impl ArchPacmanDatabaseSyncPrEngine {
             AlpmDbPackageDesc {
                 pkgname: String::from("glibc"),
                 version: String::from("2.39-2"),
-                depends: vec![String::from("linux-api-headers>=4.10"), String::from("tzdata")],
+                depends: vec![
+                    String::from("linux-api-headers>=4.10"),
+                    String::from("tzdata"),
+                ],
                 provides: vec![String::from("sh")],
                 download_size: 10_500_000,
             },
@@ -100,7 +103,14 @@ impl ArchPacmanDatabaseSyncPrEngine {
         let mut reqs = Vec::new();
         if let Some(desc) = self.packages.get(pkgname) {
             for dep in &desc.depends {
-                let clean_name = dep.split('>').next().unwrap_or(dep).split('=').next().unwrap_or(dep).trim();
+                let clean_name = dep
+                    .split('>')
+                    .next()
+                    .unwrap_or(dep)
+                    .split('=')
+                    .next()
+                    .unwrap_or(dep)
+                    .trim();
                 reqs.push(clean_name.to_string());
             }
         }
@@ -110,7 +120,9 @@ impl ArchPacmanDatabaseSyncPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5401,
-            title: String::from("[Arch Gap Closure] ALPM Sync Database Parser & Dependency Graph Evaluator"),
+            title: String::from(
+                "[Arch Gap Closure] ALPM Sync Database Parser & Dependency Graph Evaluator",
+            ),
             branch: String::from("pr/arch-alpm-db-sync-parser"),
             target_component: String::from("src/package/arch_alpm_sync_parser.rs"),
             gap_closure_score: 100,
@@ -175,13 +187,18 @@ impl ArchAurPackageClientPrEngine {
     }
 
     pub fn construct_git_clone_cmd(&self, spec: &AurBuildSpec) -> String {
-        format!("git clone {} {}/{}", spec.aur_url, self.cache_dir, spec.pkgname)
+        format!(
+            "git clone {} {}/{}",
+            spec.aur_url, self.cache_dir, spec.pkgname
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5402,
-            title: String::from("[Arch Gap Closure] AUR v5 RPC Client & Yay/Paru Dependency Resolution Engine"),
+            title: String::from(
+                "[Arch Gap Closure] AUR v5 RPC Client & Yay/Paru Dependency Resolution Engine",
+            ),
             branch: String::from("pr/arch-aur-helper-resolver"),
             target_component: String::from("src/package/arch_aur_resolver.rs"),
             gap_closure_score: 100,
@@ -226,13 +243,11 @@ impl ArchPacmanConflictResolverPrEngine {
     pub fn new() -> Self {
         Self {
             overwrite_patterns: vec![String::from("/usr/lib/node_modules/*")],
-            detected_conflicts: vec![
-                FileConflictSpec {
-                    path: String::from("/usr/bin/python"),
-                    existing_owner: String::from("python311"),
-                    incoming_pkg: String::from("python312"),
-                },
-            ],
+            detected_conflicts: vec![FileConflictSpec {
+                path: String::from("/usr/bin/python"),
+                existing_owner: String::from("python311"),
+                incoming_pkg: String::from("python312"),
+            }],
         }
     }
 
@@ -245,7 +260,9 @@ impl ArchPacmanConflictResolverPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5403,
-            title: String::from("[Arch Gap Closure] File Collision Detection & Conflict Resolver Engine"),
+            title: String::from(
+                "[Arch Gap Closure] File Collision Detection & Conflict Resolver Engine",
+            ),
             branch: String::from("pr/arch-pacman-conflict-resolver"),
             target_component: String::from("src/package/arch_conflict_resolver.rs"),
             gap_closure_score: 100,
@@ -291,14 +308,12 @@ impl ArchMakepkgBuildEnginePrEngine {
     pub fn new() -> Self {
         Self {
             default_compression: String::from(".pkg.tar.zst"),
-            stages: vec![
-                MakepkgStageSpec {
-                    pkgname: String::from("ripgrep"),
-                    src_dir: String::from("/tmp/makepkg/ripgrep/src"),
-                    pkg_dir: String::from("/tmp/makepkg/ripgrep/pkg"),
-                    compression: String::from(".pkg.tar.zst"),
-                },
-            ],
+            stages: vec![MakepkgStageSpec {
+                pkgname: String::from("ripgrep"),
+                src_dir: String::from("/tmp/makepkg/ripgrep/src"),
+                pkg_dir: String::from("/tmp/makepkg/ripgrep/pkg"),
+                compression: String::from(".pkg.tar.zst"),
+            }],
         }
     }
 
@@ -313,7 +328,9 @@ impl ArchMakepkgBuildEnginePrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5404,
-            title: String::from("[Arch Gap Closure] makepkg Build Environment Simulator & Zstd Compression Engine"),
+            title: String::from(
+                "[Arch Gap Closure] makepkg Build Environment Simulator & Zstd Compression Engine",
+            ),
             branch: String::from("pr/arch-makepkg-build-engine"),
             target_component: String::from("src/package/arch_makepkg_engine.rs"),
             gap_closure_score: 100,
@@ -377,13 +394,18 @@ impl ArchBtrfsSnapperPrEngine {
     }
 
     pub fn format_create_snapshot_cmd(&self, snapshot_type: &str, desc: &str) -> String {
-        format!("snapper -c root create -t {} -d \"{}\"", snapshot_type, desc)
+        format!(
+            "snapper -c root create -t {} -d \"{}\"",
+            snapshot_type, desc
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5405,
-            title: String::from("[Arch Gap Closure] Snapper Btrfs Snapshot Manager & Rollback Engine"),
+            title: String::from(
+                "[Arch Gap Closure] Snapper Btrfs Snapshot Manager & Rollback Engine",
+            ),
             branch: String::from("pr/arch-snapper-btrfs-rollback"),
             target_component: String::from("src/system/arch_snapper_btrfs.rs"),
             gap_closure_score: 100,
@@ -430,7 +452,9 @@ impl ArchPacmanHooksRunnerPrEngine {
             hooks: vec![
                 PacmanHookItem {
                     priority: 10,
-                    hook_path: String::from("/usr/share/libalpm/hooks/30-systemd-daemon-reload.hook"),
+                    hook_path: String::from(
+                        "/usr/share/libalpm/hooks/30-systemd-daemon-reload.hook",
+                    ),
                     target_regex: String::from("usr/lib/systemd/system/*"),
                     action_cmd: String::from("systemctl daemon-reload"),
                 },
@@ -453,7 +477,9 @@ impl ArchPacmanHooksRunnerPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5406,
-            title: String::from("[Arch Gap Closure] Pacman Pre/Post Hook DAG Executor & Priority Scheduler"),
+            title: String::from(
+                "[Arch Gap Closure] Pacman Pre/Post Hook DAG Executor & Priority Scheduler",
+            ),
             branch: String::from("pr/arch-pacman-hook-dag-runner"),
             target_component: String::from("src/package/arch_hook_dag_runner.rs"),
             gap_closure_score: 100,
@@ -499,7 +525,9 @@ impl ArchNamcapPkgLinterPrEngine {
                 NamcapLintRule {
                     rule_id: String::from("unused-sitelib"),
                     severity: String::from("Warning"),
-                    description: String::from("Package includes Python sitelib without depending on python"),
+                    description: String::from(
+                        "Package includes Python sitelib without depending on python",
+                    ),
                 },
                 NamcapLintRule {
                     rule_id: String::from("rpath-in-element"),
@@ -522,7 +550,9 @@ impl ArchNamcapPkgLinterPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5407,
-            title: String::from("[Arch Gap Closure] namcap PKGBUILD & Binary Package Linter Engine"),
+            title: String::from(
+                "[Arch Gap Closure] namcap PKGBUILD & Binary Package Linter Engine",
+            ),
             branch: String::from("pr/arch-namcap-linter-engine"),
             target_component: String::from("src/package/arch_namcap_linter.rs"),
             gap_closure_score: 100,
@@ -597,7 +627,9 @@ impl ArchVercmpVersionEnginePrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5408,
-            title: String::from("[Arch Gap Closure] vercmp ALPM Version Comparison Algorithm Engine"),
+            title: String::from(
+                "[Arch Gap Closure] vercmp ALPM Version Comparison Algorithm Engine",
+            ),
             branch: String::from("pr/arch-vercmp-version-engine"),
             target_component: String::from("src/package/arch_vercmp_engine.rs"),
             gap_closure_score: 100,
@@ -734,15 +766,16 @@ impl ArchSystemdUkifySignPrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV54PrSpec {
         ArchLinuxV54PrSpec {
             pr_id: 5410,
-            title: String::from("[Arch Gap Closure] systemd-ukify & SecureBoot Signing Integration Engine"),
+            title: String::from(
+                "[Arch Gap Closure] systemd-ukify & SecureBoot Signing Integration Engine",
+            ),
             branch: String::from("pr/arch-ukify-sbctl-signer"),
             target_component: String::from("src/boot/arch_ukify_signer.rs"),
             gap_closure_score: 100,
             status: ArchPrStatus::Merged,
             summary: format!(
                 "systemd-ukify signer configured with stub '{}' and key '{}'",
-                self.config.efi_stub,
-                self.config.sb_key
+                self.config.efi_stub, self.config.sb_key
             ),
         }
     }
