@@ -159,7 +159,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Check if Landlock access rights match expected bitmask.
+    /// Check Landlock access rights mask.
     pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
         (handled_access & requested_access) == requested_access
     }
@@ -458,12 +458,9 @@ impl IdentityAndEnterpriseAuthPrEngine {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
     }
 
-    /// Generate SSSD domain configuration string.
-    pub fn generate_sssd_domain_conf(domain: &str, id_provider: &str, auth_provider: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nauth_provider = {}\ncache_credentials = true\n",
-            domain, id_provider, auth_provider
-        )
+    /// Generate SSSD domain configuration snippet.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, server_uri: &str) -> String {
+        alloc::format!("[domain/{}]\nid_provider = {}\nauth_provider = {}\nldap_uri = {}\n", domain, provider, provider, server_uri)
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.

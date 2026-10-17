@@ -763,8 +763,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_capsicum",
-                "capsicum_process_sandbox_isolation",
+                "pol_proc_sec_jail",
+                "jail_capsicum_process_sandbox",
                 true,
             ),
         ];
@@ -986,21 +986,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn translate_subsystem_payload(
-        &self,
-        source_distro: LinuxBsdDistroInspiration,
-        target_distro: LinuxBsdDistroInspiration,
-        payload: &str,
-    ) -> String {
-        self.translate_cross_distro_payload_direct(source_distro, target_distro, payload)
-    }
-
-    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
-        self.audit_all_subsystems_distro_compliance_summary()
-    }
-
     /// Audit system-wide distro compliance across all 31 core subsystems.
-    pub fn audit_all_subsystems_distro_compliance_summary(&self) -> (BTreeMap<String, bool>, u32) {
+    pub fn audit_all_subsystems_distro_compliance_map(&self) -> (BTreeMap<String, bool>, u32) {
         let mut audit_map = BTreeMap::new();
         let mut compliant_count = 0;
 
@@ -1143,8 +1130,7 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
 
     /// Perform system-wide distro compliance audit across all core subsystems.
     pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
-        self.harmony_engine
-            .audit_all_subsystems_distro_compliance_summary()
+        self.harmony_engine.audit_all_subsystems_distro_compliance_map()
     }
 
     /// Execute an automated cross-subsystem workflow.

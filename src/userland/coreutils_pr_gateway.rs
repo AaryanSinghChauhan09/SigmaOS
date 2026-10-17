@@ -378,51 +378,34 @@ impl GnuCoreutilsBsdUserlandEngine {
 
     pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
         let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
-        if unique {
-            vec.sort();
-            vec.dedup();
-        }
         if numeric {
             vec.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
-        } else if !unique {
+        } else {
             vec.sort();
         }
         if reverse {
             vec.reverse();
         }
+        if unique {
+            vec.dedup();
+        }
         vec
     }
 
-    pub fn run_tr(&self, input: &str, from: &str, to: &str, delete: bool) -> String {
+    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
         if delete {
-            input.chars().filter(|c| !from.contains(*c)).collect()
-        } else {
-            let mut out = String::new();
-            let from_chars: Vec<char> = from.chars().collect();
-            let to_chars: Vec<char> = to.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = from_chars.iter().position(|&x| x == c) {
-                    if pos < to_chars.len() {
-                        out.push(to_chars[pos]);
-                    } else if let Some(&last) = to_chars.last() {
-                        out.push(last);
-                    } else {
-                        out.push(c);
-                    }
-                } else {
-                    out.push(c);
-                }
-            }
-            out
+            return input.chars().filter(|c| !set1.contains(*c)).collect();
         }
+        let map: BTreeMap<char, char> = set1.chars().zip(set2.chars()).collect();
+        input.chars().map(|c| *map.get(&c).unwrap_or(&c)).collect()
     }
 
-    pub fn run_head_tail_bytes(&self, bytes: &[u8], count: usize, is_head: bool) -> Vec<u8> {
+    pub fn run_head_tail_bytes(&self, content: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
         if is_head {
-            bytes.iter().take(count).copied().collect()
+            content.iter().take(bytes_count).copied().collect()
         } else {
-            let skip = bytes.len().saturating_sub(count);
-            bytes.iter().skip(skip).copied().collect()
+            let start = content.len().saturating_sub(bytes_count);
+            content[start..].to_vec()
         }
     }
 }
@@ -913,23 +896,13 @@ impl TextProcessingEngine {
         content: &str,
         pattern: &str,
         case_insensitive: bool,
-        invert: bool,
-        line_numbers: bool,
+        _word_regexp: bool,
+        _extended_regex: bool,
     ) -> (usize, Vec<String>) {
-        let mut results = Vec::new();
-        let pat = if case_insensitive { pattern.to_lowercase() } else { pattern.to_string() };
-        for (idx, line) in content.lines().enumerate() {
-            let l = if case_insensitive { line.to_lowercase() } else { line.to_string() };
-            let matches = l.contains(&pat);
-            if matches != invert {
-                if line_numbers {
-                    results.push(format!("{}:{}", idx + 1, line));
-                } else {
-                    results.push(line.to_string());
-                }
-            }
-        }
-        (results.len(), results)
+        let matches = self.grep_match(content, pattern, case_insensitive);
+        let count = matches.len();
+        let lines = matches.into_iter().map(|(idx, line)| format!("{}:{}", idx, line)).collect();
+        (count, lines)
     }
 
     pub fn grep_match(
@@ -1181,12 +1154,12 @@ impl ArchivalCompressionEngine {
         Self
     }
 
-    pub fn parse_pax_header(&self, data: &[u8]) -> BTreeMap<String, String> {
+    pub fn parse_pax_header(&self, pax_bytes: &[u8]) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
-        if let Ok(text) = core::str::from_utf8(data) {
-            for line in text.lines() {
-                if let Some((_, kv)) = line.split_once(' ') {
-                    if let Some((k, v)) = kv.split_once('=') {
+        if let Ok(s) = core::str::from_utf8(pax_bytes) {
+            for line in s.lines() {
+                if let Some((_, rest)) = line.split_once(' ') {
+                    if let Some((k, v)) = rest.split_once('=') {
                         map.insert(k.trim().to_string(), v.trim().to_string());
                     }
                 }
@@ -1195,8 +1168,8 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u8) -> Result<String, &'static str> {
-        Ok(format!("Zstd level {}", level))
+    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
+        Ok(format!("configured {:?} with level Zstd level {}", format, level))
     }
 
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
@@ -1327,15 +1300,15 @@ impl ProcpsPsmiscEngine {
         Self
     }
 
-    pub fn killall_signal(&self, process_name: &str, signal: u32) -> (u32, String) {
-        (1, format!("killall sent signal {} to {}", signal, process_name))
+    pub fn killall_signal(&self, name: &str, sig: u32) -> (usize, String) {
+        (1, format!("killall {} with signal {}", name, sig))
     }
 
-    pub fn fuser_lookup_file(&self, _filename: &str) -> Vec<u32> {
+    pub fn fuser_lookup_file(&self, _path: &str) -> Vec<u32> {
         vec![1024]
     }
 
-    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(usize, usize, usize)> {
+    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
         Some((65536, 32768, 16384))
     }
 
@@ -1458,8 +1431,8 @@ impl DocumentationPagerEngine {
         Self
     }
 
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
-        Some(format!("{}({}) File Formats", page_name.to_uppercase(), section))
+    pub fn man_db_lookup_section(&self, page: &str, section: u32) -> Option<String> {
+        Some(format!("{}({}) File Formats", page.to_uppercase(), section))
     }
 
     pub fn render_less_page(&self, text: &str, line_offset: usize, page_height: usize) -> String {
@@ -1569,13 +1542,12 @@ impl AuthPrivilegeSessionEngine {
         Self
     }
 
-    pub fn pam_environment_manage(&self, env_map: &mut BTreeMap<String, String>, action: &str, key: &str, value: &str) -> bool {
+    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, value: &str) -> bool {
         if action == "set" {
-            env_map.insert(key.to_string(), value.to_string());
+            env.insert(key.to_string(), value.to_string());
             true
-        } else if action == "unset" {
-            env_map.remove(key);
-            true
+        } else if action == "delete" {
+            env.remove(key).is_some()
         } else {
             false
         }
@@ -1800,6 +1772,18 @@ pub struct CoreUtilsPullRequestGatewayEngine {
 }
 
 impl CoreUtilsPullRequestGatewayEngine {
+    pub fn get_prs_by_category(&self, cat: CoreUtilsPrCategory) -> Vec<&CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.category == cat).collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<&CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.status == status).collect()
+    }
+
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<&CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.author == author).collect()
+    }
+
     pub fn new() -> Self {
         let mut engine = Self {
             submissions: BTreeMap::new(),

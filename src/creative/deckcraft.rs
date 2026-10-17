@@ -193,29 +193,6 @@ impl SlideDeck {
     }
 }
 
-pub type PresentationDeck = SlideDeck;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeckExportFormat {
-    Pdf,
-    Pptx,
-    Html5,
-    Svg,
-    Markdown,
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub timer_elapsed_secs: u32,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
-
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
@@ -228,6 +205,18 @@ pub enum ExportFormat {
 }
 
 pub type DeckExportFormat = ExportFormat;
+pub type PresentationDeck = SlideDeck;
+
+#[derive(Debug, Clone)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u64,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
 
 /// Slide Exporter Engine
 pub struct SlideExporterEngine;
@@ -237,7 +226,11 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            ExportFormat::Pdf => {
+            ExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_PRESENTATION_V1:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
+            }
+            DeckExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
