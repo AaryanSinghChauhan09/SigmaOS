@@ -94,6 +94,7 @@ pub use crate::package::sovereign_distro_package_advancements_v40::*;
 pub use crate::package::sovereign_distro_package_advancements_v41::*;
 pub use crate::package::sovereign_distro_package_advancements_v42::*;
 pub use crate::package::sovereign_distro_package_advancements_v5::*;
+pub use crate::package::sovereign_distro_package_advancements_v52::*;
 pub use crate::package::sovereign_distro_package_advancements_v6::*;
 pub use crate::package::sovereign_distro_package_advancements_v7::*;
 pub use crate::package::sovereign_package_smp_engine::*;
@@ -423,3 +424,4 @@ pub use nix_store::{
 pub use crate::package::sovereign_distro_package_advancements_v37::*;
 pub use crate::package::sovereign_distro_package_advancements_v47::*;
 pub use crate::package::sovereign_distro_package_advancements_v50::*;
+pub use crate::package::sovereign_distro_package_advancements_v52::*;

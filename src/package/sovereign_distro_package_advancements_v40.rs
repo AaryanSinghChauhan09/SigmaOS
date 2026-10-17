@@ -351,6 +351,12 @@ impl UniversalPackageFormatInspectorV40 {
     }
 }
 
+impl Default for UniversalPackageFormatInspectorV40 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 2. Universal Maintainer Scriptlet Sandbox & UDF Engine V40
 // ============================================================================
@@ -413,6 +419,12 @@ impl UdfScriptletEngineV40 {
     }
 }
 
+impl Default for UdfScriptletEngineV40 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 3. Cross-Distro Dependency SAT DPLL Solver & Capability Governor V40
 // ============================================================================
@@ -466,6 +478,12 @@ impl UniversalCrossDistroSatSolverV39 {
     }
 }
 
+impl Default for UniversalCrossDistroSatSolverV40 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 4. Universal Multi-OS Security Isolation Governor V40
 // ============================================================================
@@ -511,6 +529,12 @@ impl UniversalMultiSandboxGovernorV40 {
     }
 }
 
+impl Default for UniversalMultiSandboxGovernorV40 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 5. CAS Delta Deduplication Engine V40
 // ============================================================================
@@ -549,6 +573,12 @@ impl UniversalCasDeltaStoreGovernorV40 {
             deduplicated_size: 1024,
             compression_savings_ratio: 75,
         })
+    }
+}
+
+impl Default for UniversalCasDeltaStoreGovernorV40 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -607,6 +637,12 @@ impl UniversalBootEnvSnapshotGovernorV40 {
     }
 }
 
+impl Default for UniversalBootEnvSnapshotGovernorV40 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 7. Universal Foreign PM CLI Router V40
 // ============================================================================
@@ -620,8 +656,6 @@ pub enum UniversalPmActionV40 {
     Query,
     Audit,
 }
-
-pub type UniversalPmActionV40 = UniversalPmActionV39;
 
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV40 {
@@ -659,11 +693,11 @@ impl UniversalPmCliRouterV40 {
                 || p == "-p"
         });
 
-        let (action, targets): (UniversalPmActionV39, Vec<String>) = match pm.as_str() {
+        let (action, targets): (UniversalPmActionV40, Vec<String>) = match pm.as_str() {
             "apt" | "apt-get" => {
                 if parts.contains(&"install") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -673,7 +707,7 @@ impl UniversalPmCliRouterV40 {
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -688,7 +722,7 @@ impl UniversalPmCliRouterV40 {
             "pacman" => {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -698,7 +732,7 @@ impl UniversalPmCliRouterV40 {
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -714,7 +748,7 @@ impl UniversalPmCliRouterV40 {
             | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
-                        UniversalPmActionV39::Install,
+                        UniversalPmActionV40::Install,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -724,7 +758,7 @@ impl UniversalPmCliRouterV40 {
                     )
                 } else {
                     (
-                        UniversalPmActionV39::Remove,
+                        UniversalPmActionV40::Remove,
                         parts
                             .get(2..)
                             .unwrap_or(&[])
@@ -735,7 +769,7 @@ impl UniversalPmCliRouterV40 {
                 }
             }
             _ => (
-                UniversalPmActionV39::Install,
+                UniversalPmActionV40::Install,
                 parts
                     .get(1..)
                     .unwrap_or(&[])
@@ -756,6 +790,12 @@ impl UniversalPmCliRouterV40 {
             target_packages: clean_targets,
             dry_run,
         })
+    }
+}
+
+impl Default for UniversalPmCliRouterV40 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -782,33 +822,39 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV40 {
     }
 }
 
+impl Default for UniversalMultiFormatTranspilerAndExecutionEngineV40 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 9. Sovereign Distro Package Advancements Master Suite V40
 // ============================================================================
 
-pub struct SovereignDistroPackageAdvancementsSuiteV39 {
-    pub inspector: UniversalPackageFormatInspectorV39,
-    pub udf_engine: UdfScriptletEngineV39,
+pub struct SovereignDistroPackageAdvancementsSuiteV40 {
+    pub inspector: UniversalPackageFormatInspectorV40,
+    pub udf_engine: UdfScriptletEngineV40,
     pub sat_solver: UniversalCrossDistroSatSolverV40,
-    pub sandbox_governor: UniversalMultiSandboxGovernorV39,
-    pub cas_store: UniversalCasDeltaStoreGovernorV39,
-    pub boot_env_governor: UniversalBootEnvSnapshotGovernorV39,
-    pub cli_router: UniversalPmCliRouterV39,
-    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39,
+    pub sandbox_governor: UniversalMultiSandboxGovernorV40,
+    pub cas_store: UniversalCasDeltaStoreGovernorV40,
+    pub boot_env_governor: UniversalBootEnvSnapshotGovernorV40,
+    pub cli_router: UniversalPmCliRouterV40,
+    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV40,
     pub installed_packages: Vec<String>,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV40 {
     pub fn new() -> Self {
         Self {
-            inspector: UniversalPackageFormatInspectorV39::new(),
-            udf_engine: UdfScriptletEngineV39::new(),
+            inspector: UniversalPackageFormatInspectorV40::new(),
+            udf_engine: UdfScriptletEngineV40::new(),
             sat_solver: UniversalCrossDistroSatSolverV40::new(),
-            sandbox_governor: UniversalMultiSandboxGovernorV39::new(),
-            cas_store: UniversalCasDeltaStoreGovernorV39::new(),
-            boot_env_governor: UniversalBootEnvSnapshotGovernorV39::new(),
-            cli_router: UniversalPmCliRouterV39::new(),
-            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39::new(),
+            sandbox_governor: UniversalMultiSandboxGovernorV40::new(),
+            cas_store: UniversalCasDeltaStoreGovernorV40::new(),
+            boot_env_governor: UniversalBootEnvSnapshotGovernorV40::new(),
+            cli_router: UniversalPmCliRouterV40::new(),
+            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV40::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -854,6 +900,12 @@ impl SovereignDistroPackageAdvancementsSuiteV40 {
         self.installed_packages.push(sigpkg_id.clone());
 
         Ok(sigpkg)
+    }
+}
+
+impl Default for SovereignDistroPackageAdvancementsSuiteV40 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

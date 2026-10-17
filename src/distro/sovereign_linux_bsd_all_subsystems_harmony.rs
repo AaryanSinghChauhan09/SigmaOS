@@ -1306,14 +1306,15 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.0.len(), 31);
-        for (_sub, compliant) in &audits.0 {
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance_summary();
+        assert_eq!(audits.len(), 31);
+        assert_eq!(score, 100);
+        for (_, compliant) in audits {
             assert!(compliant);
         }
         assert_eq!(audits.1, 100);
 
-        let translated = engine.translate_subsystem_payload(
+        let translated = engine.translate_cross_distro_payload_direct(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",

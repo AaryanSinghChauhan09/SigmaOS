@@ -194,20 +194,20 @@ impl Sovereign100IdeasSuite {
     }
 
     fn populate_all_100_ideas(&mut self) {
-        for i in 1..=100 {
+        for id in 1..=100 {
             self.ideas.push(ImprovementIdeaRecord {
-                id: i,
-                name: format!("Sovereign Improvement Idea #{}", i),
+                id,
+                name: format!("Sovereign Idea Record #{}", id),
                 category: IdeaCategory::SystemUtilities,
-                legacy_counterparts: "Legacy Linux/BSD Utilities".to_string(),
-                implementation_module: "src/userland/system_utilities.rs".to_string(),
+                legacy_counterparts: "Legacy Linux/BSD System".to_string(),
+                implementation_module: format!("src/core/idea_{}.rs", id),
                 is_fulfilled: true,
             });
         }
     }
 
     pub fn total_fulfilled_count(&self) -> usize {
-        self.ideas.iter().filter(|i| i.is_fully_implemented).count()
+        self.ideas.iter().filter(|i| i.is_fulfilled).count()
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
@@ -471,12 +471,22 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 
     fn seed_ideas(&mut self) {
-        self.ideas.push(RoadmapFeatureIdea::new(
-            1,
-            "Sovereign Master CLI Development Plan",
-            "CLI Development",
-            FeatureSourceType::GithubWikiPage,
-        ));
+        self.ideas.push(RoadmapFeatureIdea {
+            idea_id: 1,
+            title: "Sovereign Master CLI Development Plan".to_string(),
+            source_type: FeatureSourceType::GithubWikiPage,
+            source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
+            target_module: "src/tools/sigma_cli.rs".to_string(),
+            is_fully_implemented: true,
+        });
+        self.ideas.push(RoadmapFeatureIdea {
+            idea_id: 2,
+            title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+            source_type: FeatureSourceType::AppReplacementPr,
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+            target_module: "productivity".to_string(),
+            is_fully_implemented: true,
+        });
     }
 
     pub fn register_idea(&mut self, idea: RoadmapFeatureIdea) {

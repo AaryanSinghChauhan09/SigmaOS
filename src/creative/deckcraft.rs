@@ -118,15 +118,6 @@ pub struct SlideAnimation {
     pub order: u32,
 }
 
-/// Speaker notes for presenter view
-#[derive(Debug, Clone)]
-pub struct PresenterNotes {
-    pub slide_id: u32,
-    pub text: String,
-    pub estimated_time_secs: u32,
-    pub key_takeaways: Vec<String>,
-}
-
 /// Presenter view state
 #[derive(Debug, Clone, Default)]
 pub struct PresenterState {
@@ -137,6 +128,15 @@ pub struct PresenterState {
     pub elapsed_secs: u64,
     pub laser_pointer_active: bool,
     pub black_screen: bool,
+}
+
+/// Speaker notes for presenter view
+#[derive(Debug, Clone)]
+pub struct PresenterNotes {
+    pub slide_id: u32,
+    pub text: String,
+    pub estimated_time_secs: u32,
+    pub key_takeaways: Vec<String>,
 }
 
 /// Slide deck styling theme
@@ -195,16 +195,6 @@ impl SlideDeck {
 
 pub type PresentationDeck = SlideDeck;
 
-/// Presentation export formats
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DeckExportFormat {
-    Pdf,
-    Pptx,
-    Html5,
-    Svg,
-    Markdown,
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
     ZenithPresentation,
@@ -215,18 +205,7 @@ pub enum ExportFormat {
     Markdown,
 }
 
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub is_presenting: bool,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u64,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-    pub timer_seconds: u64,
-}
+pub type DeckExportFormat = ExportFormat;
 
 /// Slide Exporter Engine
 pub struct SlideExporterEngine;
@@ -236,11 +215,7 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            DeckExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"# ZENITH_PRESENTATION_DECK\nTitle: ");
-                output.extend_from_slice(deck.title.as_bytes());
-            }
-            DeckExportFormat::Pdf => {
+            ExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");

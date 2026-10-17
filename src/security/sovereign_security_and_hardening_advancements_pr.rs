@@ -34,17 +34,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         Self
     }
 
-    pub fn generate_sssd_domain_conf_ipa(domain: &str, realm: &str, kdc: &str) -> String {
-        format!(
-            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
-            domain, domain, kdc, realm
-        )
-    }
-
-    pub fn check_landlock_access_u16(mask: u16, requested: u16) -> bool {
-        (mask & requested) == requested
-    }
-
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
     pub fn format_selinux_context(
         user: &str,
@@ -142,11 +131,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Check Landlock access rights validation.
-    pub fn check_landlock_access(handled_access: u32, requested_access: u32) -> bool {
-        (handled_access & requested_access) == requested_access
-    }
-
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
         if limit_str == "max" {
@@ -197,7 +181,6 @@ impl BsdHardeningAndIsolationPrEngine {
     pub fn new() -> Self {
         Self
     }
-
 
     /// Verify OpenBSD pledge promise mask against required system syscall string.
     pub fn is_syscall_pledged(&self, active_promises: &str, syscall_category: &str) -> bool {
@@ -447,14 +430,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
-    }
-
-    /// Generate SSSD domain configuration string.
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain, provider, uri
-        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
