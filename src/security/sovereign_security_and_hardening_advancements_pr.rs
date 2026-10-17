@@ -410,6 +410,15 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
+            domain,
+            provider,
+            uri
+        )
+    }
+
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
         let estimated_parts = dn.as_bytes().iter().filter(|&&b| b == b',').count() + 1;
