@@ -142,6 +142,4 @@
 - [System Automation](./System-Automation-Component-Guide.md)
 - [AI Maintenance Policy](./AI-Agent-Maintenance-Instructions.md)
 - [Open Source OS Inspiration V58 PR Suite](./36-Open-Source-OS-Inspiration-V58-PR-Suite.md)
-- [Kernel & Hardening Parity Roadmap](./37-Tech-Media-And-Linux-BSD-Distro-Parity-PR-Roadmap.md)
-- [Desktop & Userland Roadmap](./38-Universal-Desktop-And-Userland-Innovations-PR-Roadmap.md)
-- [Enterprise, AI & Network Roadmap](./39-Enterprise-Security-AI-And-Networking-PR-Roadmap.md)
+- [Open Source OS Inspiration V59 PR Suite](./37-Open-Source-OS-Inspiration-V59-PR-Suite.md)
