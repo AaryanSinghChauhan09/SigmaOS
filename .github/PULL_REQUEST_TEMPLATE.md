@@ -1,165 +1,81 @@
 ## Summary
 
-<!-- What secondary-memory, shell, or subsystem behavior changed and why? -->
-
-## Storage component
-
-- [ ] Boot / arch init
-
-## Shell component
-
-- [ ] Interactive shell
-- [ ] Shell component
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
-
-## Shell component
-
-- [ ] Shell parser
-- [ ] Builtins
-- [ ] Pipeline
-
-## Shell component
-
-- [ ] Interactive prompt & signals
-- [ ] Command execution & builtins
-- [ ] Environment & expansion
-- [ ] Resource limits governor
-- [ ] Short circuit && / ||
-
-## Shell component
-
-- [ ] Interactive shell
-- [ ] Command interpreter
-
-## Shell component
-
-- [ ] Interactive prompt & signals
-- [ ] Command execution & builtins
-- [ ] Environment & expansion
-- [ ] Resource limits governor
-- [ ] Short circuit && / ||
+<!-- What changed and why? -->
 
 ## Component
 
-- [ ] Lexer / Parser
-- [ ] Expansion engine
-- [ ] Builtin commands
-- [ ] Redirection / Piping
-- [ ] Job control / Signals
-- [ ] Interactive REPL
-- [ ] Diagnostics / Error formatting
-- [ ] Conformance / POSIX
-
-## Recurring task
-
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly storage audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
-
-## Reference study & Upstream study
-
-<!-- Required for lifecycle, ABI, or storage changes -->
-<!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
-<!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
-
-- Upstream study document:
-- Linux/BSD/Redox/xv6 reference:
-- What SigmaOS adopts / adapts / rejects:
-- Decision: Adopt / Adapt / Reject
-- Reason:
-
-## What SigmaOS adopts
-- Component adaptation:
+- [ ] IPC handler
+- [ ] Pipes / FIFOs
+- [ ] UNIX-domain sockets
+- [ ] Shared memory
+- [ ] Message queues
+- [ ] Event wakeups
+- [ ] Signals
+- [ ] Process/thread management
+- [ ] VFS
+- [ ] Security
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Changes
 
 -
 
-## Reviewer checklist
+## Motivation
 
-- [ ] Upstream study and reference checked
-- [ ] What SigmaOS adopts is clearly stated
-- [ ] Safety and rollback reviewed
+<!-- Link issue, roadmap item, or gap-analysis entry. -->
 
-## Shell safety review
+## IPC semantics
 
-- [ ] Quote-aware lexer & parser safety
-- [ ] Safe environment expansion
-- [ ] Built-in command error handling
+- Blocking behavior:
+- Non-blocking behavior:
+- EOF / closure behavior:
+- Error behavior:
+- Permission model:
+- Resource limits:
+- Backpressure policy:
 
-## Kernel safety review & Reviewer checklist
+## Security review
 
-- [ ] Safety and rollback plan defined
-- [ ] No unnecessary `unsafe`
+- [ ] User input validated
+- [ ] Descriptor lifecycle checked
+- [ ] Capability/namespace checks enforced
+- [ ] No unbounded kernel allocation
+- [ ] `unsafe` justified with SAFETY comments
+- [ ] Threat model updated
 
-## Shell safety review
+## Tests
 
-- [ ] Command injection prevention verified
-- [ ] Environment variable sanitization checked
-- [ ] Signal trap safety verified
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
-
-## Shell component
-
-- [ ] Interactive REPL
-- [ ] Scripting engine
-- [ ] Job control
-- [ ] Builtins
-
-## Shell safety review
-
-- [ ] Input validation
-- [ ] Signal handling
-- [ ] Memory safety
-
-## Evidence & Reviewer checklist
-
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
+- [ ] Unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
+- [ ] Concurrency/stress tests
+- [ ] Timeout tests
+- [ ] Fuzz tests
+- [ ] Resource-exhaustion tests
+- [ ] Regression test for fixed bug
 
-## Status updates
+## Verification
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Storage documentation
-- [ ] Boot matrix, if applicable
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+```
 
-## Safety and rollback
+Paste output below.
 
-- [ ] Quoting integrity
-- [ ] Redirection safety
+## Capability status
 
-## Safety and rollback
+- Previous status:
+- New status:
+- Evidence:
 
-- Safety and rollback:
-- Risk:
-- Safety and rollback:
+## Integration impact
+
+- [ ] Unit-tested only
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
