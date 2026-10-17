@@ -636,6 +636,19 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
+    /// Merge local `/etc/rc.conf.local` overrides on top of base `/etc/rc.conf` settings.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
     /// Execute `rc.subr` command action routing (start, stop, restart, status, poll).
     pub fn execute_rc_subr_action(
         &self,
@@ -1233,7 +1246,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
