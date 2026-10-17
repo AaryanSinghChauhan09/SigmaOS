@@ -226,12 +226,7 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            DeckExportFormat::ZenithPresentation | DeckExportFormat::PDF | DeckExportFormat::HTML5Slideshow | DeckExportFormat::PPTX => {
-                output.extend_from_slice(b"# ");
-                output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"\n\n");
-            }
-            DeckExportFormat::Pdf => {
+            ExportFormat::PDF => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
@@ -254,18 +249,11 @@ impl SlideExporterEngine {
                 }
                 output.extend_from_slice(b"</div></div></body></html>");
             }
-            DeckExportFormat::Svg => {
-                output.extend_from_slice(
-                    b"<svg width=\"1920\" height=\"1080\" xmlns=\"http://www.w3.org/2000/svg\">\n",
-                );
-                if let Some(active_slide) = deck.slides.first() {
-                    output.extend_from_slice(b"  <text x=\"100\" y=\"100\" font-size=\"48\">");
-                    output.extend_from_slice(active_slide.title.as_bytes());
-                    output.extend_from_slice(b"</text>\n");
-                }
-                output.extend_from_slice(b"</svg>");
+            ExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_PRESENTATION_SLIDES:");
+                output.extend_from_slice(deck.title.as_bytes());
             }
-            DeckExportFormat::Markdown => {
+            ExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\n\n");
@@ -284,8 +272,8 @@ impl SlideExporterEngine {
     }
 }
 
-/// Dual-screen presenter view state
-#[derive(Debug, Clone)]
+/// Presenter view runtime state
+#[derive(Debug, Clone, Default)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,
