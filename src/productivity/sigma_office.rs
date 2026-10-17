@@ -13058,11 +13058,20 @@ impl SovereignBitrix24OmnichannelLeadScoringRoutingEngine {
         }
 
         let (tier, action) = if score >= 70 {
-            ("Tier 1 - High Intent".to_string(), "Assign immediately to Senior SDR for direct call".to_string())
+            (
+                "Tier 1 - High Intent".to_string(),
+                "Assign immediately to Senior SDR for direct call".to_string(),
+            )
         } else if score >= 40 {
-            ("Tier 2 - Nurture".to_string(), "Add to 14-day automated email drip campaign".to_string())
+            (
+                "Tier 2 - Nurture".to_string(),
+                "Add to 14-day automated email drip campaign".to_string(),
+            )
         } else {
-            ("Tier 3 - Low Intent".to_string(), "Log in CRM and send monthly newsletter".to_string())
+            (
+                "Tier 3 - Low Intent".to_string(),
+                "Log in CRM and send monthly newsletter".to_string(),
+            )
         };
 
         LeadRoutingResult {
@@ -13643,9 +13652,18 @@ mod tests_phase2 {
         let mut dim2 = HashMap::new();
         dim2.insert("Region".to_string(), "EU".to_string());
         let facts = vec![
-            CubeFactRecord { dimensions: dim1.clone(), measure_value: 100.0 },
-            CubeFactRecord { dimensions: dim1.clone(), measure_value: 200.0 },
-            CubeFactRecord { dimensions: dim2.clone(), measure_value: 300.0 },
+            CubeFactRecord {
+                dimensions: dim1.clone(),
+                measure_value: 100.0,
+            },
+            CubeFactRecord {
+                dimensions: dim1.clone(),
+                measure_value: 200.0,
+            },
+            CubeFactRecord {
+                dimensions: dim2.clone(),
+                measure_value: 300.0,
+            },
         ];
         let slice_res = cube_engine.slice_and_aggregate(&facts, &dim1, CubeAggregationFunc::Sum);
         assert_eq!(slice_res.sliced_records_count, 2);

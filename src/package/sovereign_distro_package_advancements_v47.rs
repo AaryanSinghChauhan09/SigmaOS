@@ -383,7 +383,10 @@ impl UniversalResolutionStrategyV47 for StrictDependencyStrategyV47 {
 pub struct MinimalDeltaStrategyV47;
 impl UniversalResolutionStrategyV47 for MinimalDeltaStrategyV47 {
     fn resolve(&self, dependencies: &[String]) -> Vec<String> {
-        dependencies.iter().map(|d| format!("{}-minimal", d)).collect()
+        dependencies
+            .iter()
+            .map(|d| format!("{}-minimal", d))
+            .collect()
     }
 }
 
@@ -455,7 +458,9 @@ pub struct PackageDatabaseOriginatorV47 {
 
 impl PackageDatabaseOriginatorV47 {
     pub fn new() -> Self {
-        Self { installed: Vec::new() }
+        Self {
+            installed: Vec::new(),
+        }
     }
 
     pub fn save_memento(&self, id: usize) -> PackageStateMementoV47 {
@@ -504,7 +509,10 @@ pub struct ScriptletValidationChainV47 {
 impl ScriptletValidationChainV47 {
     pub fn new() -> Self {
         Self {
-            validators: vec!["SyntaxValidator".to_string(), "PrivilegeValidator".to_string()],
+            validators: vec![
+                "SyntaxValidator".to_string(),
+                "PrivilegeValidator".to_string(),
+            ],
         }
     }
 
@@ -528,7 +536,10 @@ impl UniversalPackageManagerFacadeV47 {
     }
 
     pub fn unified_install(&self, package_name: &str) -> String {
-        format!("Facade: Successfully installed '{}' across all subsystems", package_name)
+        format!(
+            "Facade: Successfully installed '{}' across all subsystems",
+            package_name
+        )
     }
 }
 
@@ -592,10 +603,15 @@ pub struct SharedPackageMetadataFlyweightV47 {
 impl SharedPackageMetadataFlyweightV47 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert("GPLv3".to_string(), "GNU General Public License v3.0".to_string());
+        map.insert(
+            "GPLv3".to_string(),
+            "GNU General Public License v3.0".to_string(),
+        );
         map.insert("MIT".to_string(), "MIT License".to_string());
         map.insert("Apache-2.0".to_string(), "Apache License 2.0".to_string());
-        Self { common_licenses: map }
+        Self {
+            common_licenses: map,
+        }
     }
 
     pub fn get_license_text(&self, code: &str) -> Option<&String> {
@@ -658,7 +674,10 @@ pub struct ForeignDistroToSigmaAdapterV47;
 
 impl ForeignDistroToSigmaAdapterV47 {
     pub fn adapt_foreign_name(foreign_name: &str) -> String {
-        format!("sovereign-{}", foreign_name.to_lowercase().replace('_', "-"))
+        format!(
+            "sovereign-{}",
+            foreign_name.to_lowercase().replace('_', "-")
+        )
     }
 }
 
@@ -1056,12 +1075,22 @@ impl UniversalPmCliRouterV47 {
                 if parts.contains(&"install") {
                     (
                         UniversalPmActionV47::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"remove") || parts.contains(&"purge") {
                     (
                         UniversalPmActionV47::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV47::Update, vec![])
@@ -1071,33 +1100,59 @@ impl UniversalPmCliRouterV47 {
                 if parts.contains(&"-S") || parts.contains(&"-Sy") || parts.contains(&"-Syu") {
                     (
                         UniversalPmActionV47::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else if parts.contains(&"-R") || parts.contains(&"-Rns") {
                     (
                         UniversalPmActionV47::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (UniversalPmActionV47::Query, vec![])
                 }
             }
-            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew" | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
+            "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
+            | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
                 if parts.contains(&"install") || parts.contains(&"add") || parts.contains(&"-i") {
                     (
                         UniversalPmActionV47::Install,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 } else {
                     (
                         UniversalPmActionV47::Remove,
-                        parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                        parts
+                            .get(2..)
+                            .unwrap_or(&[])
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     )
                 }
             }
             _ => (
                 UniversalPmActionV47::Install,
-                parts.get(1..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect(),
+                parts
+                    .get(1..)
+                    .unwrap_or(&[])
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect(),
             ),
         };
 
@@ -1223,14 +1278,19 @@ impl SovereignDistroPackageAdvancementsSuiteV47 {
         let sigpkg_id = format!("sigpkg-v47-{}", manifest.name);
         self.installed_packages.push(sigpkg_id.clone());
 
-        self.pr_gateway.submit_proposal(PackagePrProposalManifestV47 {
-            pr_id: 4701,
-            title: format!("PR Proposal: Auto-integrate foreign package '{}'", manifest.name),
-            source_format: manifest.detected_format,
-            target_native_package: sigpkg_id,
-            changes_summary: "Complete foreign format adaptation and SAT DPLL resolution".to_string(),
-            verification_passed: true,
-        });
+        self.pr_gateway
+            .submit_proposal(PackagePrProposalManifestV47 {
+                pr_id: 4701,
+                title: format!(
+                    "PR Proposal: Auto-integrate foreign package '{}'",
+                    manifest.name
+                ),
+                source_format: manifest.detected_format,
+                target_native_package: sigpkg_id,
+                changes_summary: "Complete foreign format adaptation and SAT DPLL resolution"
+                    .to_string(),
+                verification_passed: true,
+            });
 
         Ok(sigpkg)
     }
@@ -1310,7 +1370,8 @@ mod tests {
         assert_eq!(resolved, vec!["libssl-dev"]);
 
         // Command
-        let mut cmd = PackageTransactionCommandV47::new(CommandKindV47::InstallPackage("curl".to_string()));
+        let mut cmd =
+            PackageTransactionCommandV47::new(CommandKindV47::InstallPackage("curl".to_string()));
         let exec_res = cmd.execute().unwrap();
         assert!(exec_res.contains("InstallPackage"));
 
