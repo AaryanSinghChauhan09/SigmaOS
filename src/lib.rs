@@ -70,8 +70,8 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV40,
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
-    SovereignDistroPackageAdvancementsSuiteV50, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV61,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
@@ -90,9 +90,8 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51,
-    SovereignDistroPackageAdvancementsSuiteV61, SovereignUniversalPackageFormatMasterEngine,
-    UniversalPackageFormatInspectorV61, UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51, SovereignUniversalPackageFormatMasterEngine,
+    UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,

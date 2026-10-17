@@ -819,8 +819,8 @@ fi
 if [ -f "src/package/sovereign_distro_package_advancements_v61.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V61 test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v61.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_v61
-    ./build/test_package_v61
+    rustc --test src/package/sovereign_distro_package_advancements_v61.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v61_test
+    ./build/sovereign_advancements_v61_test
 fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
