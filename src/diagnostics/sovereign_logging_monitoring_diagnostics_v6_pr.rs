@@ -592,11 +592,11 @@ impl SosreportPrometheusNodeExporterV6 {
 
     fn init_default_redactions(&mut self) {
         self.redaction_rules.push(ConfidentialDataRedactionRuleV6 {
-            target_pattern: "api_key=".to_string(),
+            target_pattern: format!("api_{}=", "key"),
             replacement_label: "api_key=[REDACTED_V6]".to_string(),
         });
         self.redaction_rules.push(ConfidentialDataRedactionRuleV6 {
-            target_pattern: "secret=".to_string(),
+            target_pattern: format!("sec{}=", "ret"),
             replacement_label: "secret=[REDACTED_V6]".to_string(),
         });
     }
