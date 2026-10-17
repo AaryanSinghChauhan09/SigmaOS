@@ -236,7 +236,7 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct SovereignShardsMasterRegistry {
     pub shards: BTreeMap<u32, SovereignShardDescriptor>,
 }
@@ -401,7 +401,7 @@ pub struct DistroGapFeatureRecord {
     pub verification_passed: bool,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct SovereignDistroGapClosureEngine {
     pub features: Vec<DistroGapFeatureRecord>,
 }
@@ -474,7 +474,8 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
             category: "Browser".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
-            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
+                .to_string(),
             target_module: "productivity".to_string(),
             is_fully_implemented: true,
         });
@@ -485,7 +486,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
 }

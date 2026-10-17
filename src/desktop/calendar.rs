@@ -208,7 +208,7 @@ impl CalendarManager {
     /// Set view month
     pub fn set_view_month(&mut self, year: i32, month: u32) {
         self.view_year = year;
-        self.view_month = month;
+        self.view_month = month as i32;
     }
 
     /// Navigate to next month

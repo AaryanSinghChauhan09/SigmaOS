@@ -6,10 +6,10 @@
 // and OpenBSD ecosystem:
 // 1. OpenBsdPfsyncCarpPrEngine (pfsync state replication & CARP failover protocol)
 // 2. OpenBsdPledgeUnveilMatrixPrEngine (pledge process promises & unveil path sandboxing)
-// 3. OpenBsdKarlPinSyscallPrEngine (Kernel Address Randomized Link & pinsyscall ROP defense)
-// 4. OpenBsdSignifyVerificationPrEngine (Signify Ed25519 signature & release verification)
+// 3. OpenBsdKarlPinsyscallPrEngine (Kernel Address Randomized Link & pinsyscall ROP defense)
+// 4. OpenBsdSignifyEd25519PrEngine (Signify Ed25519 signature & release verification)
 // 5. OpenBsdBioctlSoftraidPrEngine (bioctl softraid encrypted storage & raid management)
-// 6. OpenBsdDaemonSuitePrEngine (smtpd, doas, and slaacd daemon controllers)
+// 6. OpenBsdDaemonsSmtpdDoasSlaacdPrEngine (smtpd, doas, and slaacd daemon controllers)
 // 7. OpenBsdMissingComponentsParityPrSuite (Master PR Gateway Suite)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -36,20 +36,33 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[derive(Debug, Clone)]
+pub struct OpenBsdCarpInterface {
+    pub vhid: u8,
+    pub interface: String,
+    pub advbase: u8,
+    pub advskew: u8,
+    pub state: String,
+    pub carpdev: String,
+    pub pass: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct OpenBsdPfsyncCarpPrEngine {
     pub vhid: u8,
     pub advskew: u16,
     pub active_state: bool,
     pub synchronized_states: BTreeMap<String, String>,
+    pub carp_interfaces: BTreeMap<u8, OpenBsdCarpInterface>,
 }
 
 impl OpenBsdPfsyncCarpPrEngine {
-    pub fn new(vhid: u8, advskew: u16) -> Self {
+    pub fn new() -> Self {
         Self {
-            vhid,
-            advskew,
+            vhid: 1,
+            advskew: 0,
             active_state: true,
             synchronized_states: BTreeMap::new(),
+            carp_interfaces: BTreeMap::new(),
         }
     }
 
@@ -74,9 +87,25 @@ impl OpenBsdPfsyncCarpPrEngine {
         )
     }
 
+    pub fn sync_pfsync_states(&mut self, count: usize) -> usize {
+        for i in 0..count {
+            self.synchronized_states.insert(
+                format!("state_{}", i),
+                format!("192.168.1.{}:1000 -> 10.0.0.1:80", i + 10),
+            );
+        }
+        self.synchronized_states.len() * 12 + 18
+    }
+
     pub fn failover_carp(&mut self, new_advskew: u16) {
         self.advskew = new_advskew;
         self.active_state = self.advskew < 100;
+    }
+}
+
+impl Default for OpenBsdPfsyncCarpPrEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -88,38 +117,36 @@ pub struct OpenBsdPledgeUnveilMatrixPrEngine {
 
 impl OpenBsdPledgeUnveilMatrixPrEngine {
     pub fn new() -> Self {
+        let mut unveil = BTreeMap::new();
+        unveil.insert("/etc".to_string(), "r".to_string());
+        unveil.insert("/tmp".to_string(), "rwc".to_string());
         Self {
-            promises: vec![
+            pledge_promises: vec![
                 "stdio".to_string(),
                 "rpath".to_string(),
                 "wpath".to_string(),
                 "cpath".to_string(),
                 "inet".to_string(),
             ],
-            execpromises: None,
             unveil_rules: unveil,
-            is_locked: false,
         }
     }
 
-    pub fn apply_pledge(&mut self, promises: &str) -> Result<String, String> {
-        for promise in promises.split_whitespace() {
-            if !self.pledge_promises.contains(&promise.to_string()) {
-                self.pledge_promises.push(promise.to_string());
-            }
-        }
-        let new_promises: Vec<String> = promises_str
-            .split_whitespace()
-            .map(|s| s.to_string())
-            .collect();
-        self.promises = new_promises;
+    pub fn pledge(&mut self, promises: &str) -> Result<String, String> {
+        let new_promises: Vec<String> =
+            promises.split_whitespace().map(|s| s.to_string()).collect();
+        self.pledge_promises = new_promises;
         Ok(format!(
             "PR Proposal: Applied OpenBSD pledge promises: {}",
             promises
         ))
     }
 
-    pub fn apply_unveil(&mut self, path: &str, permissions: &str) -> Result<String, String> {
+    pub fn apply_pledge(&mut self, promises: &str) -> Result<String, String> {
+        self.pledge(promises)
+    }
+
+    pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<String, String> {
         self.unveil_rules
             .insert(path.to_string(), permissions.to_string());
         Ok(format!(
@@ -127,39 +154,17 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
             path, permissions
         ))
     }
-}
 
-#[derive(Debug, Clone)]
-pub struct OpenBsdKarlPinSyscallPrEngine {
-    pub kernel_relinked: bool,
-    pub kernel_seed: u64,
-    pub pinned_syscall_ranges: Vec<(u64, u64)>,
-}
-
-impl OpenBsdKarlPinSyscallPrEngine {
-    pub fn new(seed: u64) -> Self {
-        Self {
-            kernel_relinked: true,
-            kernel_seed: seed,
-            pinned_syscall_ranges: Vec::new(),
-        }
+    pub fn apply_unveil(&mut self, path: &str, permissions: &str) -> Result<String, String> {
+        self.unveil(path, permissions)
     }
 
-    pub fn pin_syscall_range(&mut self, start: u64, end: u64) -> Result<String, String> {
-        if start >= end {
-            return Err("Invalid syscall range: start >= end".to_string());
+    pub fn is_path_allowed(&self, path: &str, req_perm: &str) -> bool {
+        if let Some(perm) = self.unveil_rules.get(path) {
+            perm.contains(req_perm)
+        } else {
+            false
         }
-        self.pinned_syscall_ranges.push((start, end));
-        Ok(format!(
-            "PR Proposal: Pinned system call region 0x{:X} - 0x{:X} under KARL seed 0x{:X}",
-            start, end, self.kernel_seed
-        ))
-    }
-
-    pub fn verify_syscall_invocation(&self, addr: u64) -> bool {
-        self.pinned_syscall_ranges
-            .iter()
-            .any(|&(start, end)| addr >= start && addr < end)
     }
 }
 
@@ -227,18 +232,11 @@ impl Default for OpenBsdKarlPinsyscallPrEngine {
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdSignifyKey {
-    pub key_name: String,
-    pub public_key: String,
-    pub is_trusted: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdSignifyVerificationPrEngine {
+pub struct OpenBsdSignifyEd25519PrEngine {
     pub known_public_keys: BTreeMap<String, String>,
 }
 
-impl OpenBsdSignifyVerificationPrEngine {
+impl OpenBsdSignifyEd25519PrEngine {
     pub fn new() -> Self {
         let mut keys = BTreeMap::new();
         keys.insert(
@@ -250,14 +248,34 @@ impl OpenBsdSignifyVerificationPrEngine {
         }
     }
 
-    pub fn verify_signature(&self, key_id: &str, payload: &[u8]) -> bool {
+    pub fn verify_signature(&self, key_id: &str, payload: &[u8], _comment: &str) -> bool {
         self.known_public_keys.contains_key(key_id) && !payload.is_empty()
     }
 }
 
+impl Default for OpenBsdSignifyEd25519PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 5. Bioctl & Softraid Encrypted Volumes PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdSoftraidVolume {
+    pub device_node: String,
+    pub raid_level: String,
+    pub chunk_disks: Vec<String>,
+    pub cipher: String,
+    pub passphrase_pbkdf2_rounds: u32,
+    pub is_online: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdBioctlSoftraidPrEngine {
-    pub softraid_volumes: BTreeMap<String, String>,
+    pub softraid_volumes: BTreeMap<String, OpenBsdSoftraidVolume>,
 }
 
 impl OpenBsdBioctlSoftraidPrEngine {
@@ -327,80 +345,87 @@ pub struct OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
 impl OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
     pub fn new() -> Self {
         Self {
-            softraid_volumes: BTreeMap::new(),
+            smtpd_listeners: vec!["127.0.0.1:25".to_string()],
+            doas_rules: vec![OpenBsdDoasRule {
+                permit: true,
+                identity: "root".to_string(),
+                target_user: "root".to_string(),
+                cmd: "*".to_string(),
+                nopass: true,
+            }],
+            slaacd_interfaces: vec!["em0".to_string()],
         }
     }
 
-    pub fn create_softraid_crypto(
-        &mut self,
-        volume_id: &str,
-        chunk_dev: &str,
-    ) -> Result<String, String> {
-        self.softraid_volumes
-            .insert(volume_id.to_string(), chunk_dev.to_string());
-        Ok(format!(
-            "PR Proposal: Created softraid CRYPTO volume '{}' attached to '{}'",
-            volume_id, chunk_dev
-        ))
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdDaemonSuitePrEngine {
-    pub smtpd_running: bool,
-    pub doas_configured: bool,
-    pub slaacd_running: bool,
-}
-
-impl OpenBsdDaemonSuitePrEngine {
-    pub fn new() -> Self {
-        Self {
-            smtpd_running: true,
-            doas_configured: true,
-            slaacd_running: true,
-        }
-    }
-
-    pub fn get_daemon_status(&self) -> String {
+    pub fn add_doas_rule(&mut self, identity: &str, cmd: &str, nopass: bool) -> String {
+        let rule = OpenBsdDoasRule {
+            permit: true,
+            identity: identity.to_string(),
+            target_user: "root".to_string(),
+            cmd: cmd.to_string(),
+            nopass,
+        };
+        self.doas_rules.push(rule);
         format!(
-            "OpenBSD Daemons Status - smtpd: {}, doas: {}, slaacd: {}",
-            if self.smtpd_running {
-                "active"
-            } else {
-                "inactive"
-            },
-            if self.doas_configured {
-                "configured"
-            } else {
-                "unconfigured"
-            },
-            if self.slaacd_running {
-                "active"
-            } else {
-                "inactive"
-            }
+            "--- a/etc/doas.conf\n+++ b/etc/doas.conf\n@@ -1,1 +1,2 @@\n+permit {} {} as root cmd {}\n",
+            if nopass { "nopass" } else { "" },
+            identity,
+            cmd
         )
     }
 }
 
+impl Default for OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OpenBsdPrStatus {
+    Submitted,
+    InReview,
+    Merged,
+    Rejected,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdPrProposal {
+    pub pr_id: u64,
+    pub title: String,
+    pub author: String,
+    pub subsystem: String,
+    pub patch_summary: String,
+    pub unified_diff: String,
+    pub status: OpenBsdPrStatus,
+}
+
+// ============================================================================
+// 7. Master PR Gateway Suite
+// ============================================================================
+
 pub struct OpenBsdMissingComponentsParityPrSuite {
     pub pfsync_carp: OpenBsdPfsyncCarpPrEngine,
     pub pledge_unveil: OpenBsdPledgeUnveilMatrixPrEngine,
-    pub karl_pinsyscall: OpenBsdKarlPinSyscallPrEngine,
-    pub signify: OpenBsdSignifyVerificationPrEngine,
+    pub karl_pinsyscall: OpenBsdKarlPinsyscallPrEngine,
+    pub signify: OpenBsdSignifyEd25519PrEngine,
     pub bioctl: OpenBsdBioctlSoftraidPrEngine,
-    pub daemons: OpenBsdDaemonSuitePrEngine,
+    pub daemons: OpenBsdDaemonsSmtpdDoasSlaacdPrEngine,
+    pub proposals: BTreeMap<u64, OpenBsdPrProposal>,
+    pub next_pr_id: u64,
 }
 
 impl OpenBsdMissingComponentsParityPrSuite {
     pub fn new() -> Self {
         Self {
-            pfsync_carp: OpenBsdPfsyncCarpPrEngine::new(1, 0),
+            pfsync_carp: OpenBsdPfsyncCarpPrEngine::new(),
             pledge_unveil: OpenBsdPledgeUnveilMatrixPrEngine::new(),
-            karl_pinsyscall: OpenBsdKarlPinSyscallPrEngine::new(0xDEADBEEF),
-            signify: OpenBsdSignifyVerificationPrEngine::new(),
+            karl_pinsyscall: OpenBsdKarlPinsyscallPrEngine::new(),
+            signify: OpenBsdSignifyEd25519PrEngine::new(),
             bioctl: OpenBsdBioctlSoftraidPrEngine::new(),
-            daemons: OpenBsdDaemonSuitePrEngine::new(),
+            daemons: OpenBsdDaemonsSmtpdDoasSlaacdPrEngine::new(),
+            proposals: BTreeMap::new(),
+            next_pr_id: 8001,
         }
     }
 
@@ -439,7 +464,7 @@ impl OpenBsdMissingComponentsParityPrSuite {
     }
 
     pub fn evaluate_openbsd_parity(&mut self) -> bool {
-        let carp_diff = self.carp_pfsync.configure_carp_vhid(2, "em0", 100);
+        let carp_diff = self.pfsync_carp.configure_carp_vhid(2, "em0", 100);
         let carp_pr = self.submit_pr_proposal(
             "Configure CARP VHID 2 with failover advskew 100",
             "jules",
@@ -459,7 +484,7 @@ impl OpenBsdMissingComponentsParityPrSuite {
         );
         self.validate_and_merge_pr(pledge_pr);
 
-        let (cmd, crypto_diff) = self.softraid.create_crypto_volume("sd2", "/dev/sd0b");
+        let (cmd, crypto_diff) = self.bioctl.create_crypto_volume("sd2", "/dev/sd0b");
         let crypto_pr = self.submit_pr_proposal(
             "Attach softraid CRYPTO volume on sd2",
             "jules",
@@ -472,6 +497,12 @@ impl OpenBsdMissingComponentsParityPrSuite {
         self.proposals
             .values()
             .all(|p| p.status == OpenBsdPrStatus::Merged)
+    }
+}
+
+impl Default for OpenBsdMissingComponentsParityPrSuite {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

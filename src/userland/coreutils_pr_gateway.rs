@@ -179,18 +179,9 @@ impl GnuCoreutilsBsdUserlandEngine {
         list
     }
 
-    pub fn run_tr(
-        &self,
-        input: &str,
-        from_set: &str,
-        to_set: &str,
-        delete_mode: bool,
-    ) -> String {
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
         if delete_mode {
-            input
-                .chars()
-                .filter(|c| !from_set.contains(*c))
-                .collect()
+            input.chars().filter(|c| !from_set.contains(*c)).collect()
         } else {
             let mut out = String::with_capacity(input.len());
             let from_chars: Vec<char> = from_set.chars().collect();
@@ -1339,7 +1330,9 @@ impl DocumentationPagerEngine {
     pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
         match (page_name, section) {
             ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self.man_db_lookup(page_name).map(|s| format!("{}({}) {}", page_name.to_uppercase(), section, s)),
+            _ => self
+                .man_db_lookup(page_name)
+                .map(|s| format!("{}({}) {}", page_name.to_uppercase(), section, s)),
         }
     }
 

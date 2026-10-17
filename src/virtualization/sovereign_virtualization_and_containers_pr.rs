@@ -76,16 +76,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// QEMU Disk Image Specification
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QemuDiskImageSpec {
-    pub image_path: String,
-    pub format: String,
-    pub size_bytes: u64,
-    pub backing_file: Option<String>,
-    pub is_compressed: bool,
-}
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -184,15 +174,6 @@ impl Default for LibvirtStoragePoolType {
     fn default() -> Self {
         Self::Directory
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

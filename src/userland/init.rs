@@ -1937,5 +1937,4 @@ mod tests {
         let parsed = SystemdOnCalendarExpressionParser::parse_expression("daily");
         assert_eq!(parsed, Some((0, 0)));
     }
-
 }
