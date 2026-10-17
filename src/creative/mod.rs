@@ -199,10 +199,13 @@ pub use photocraft::{
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
 pub use photocraft_missing_components_parity_pr::{
-    PhotocraftAiInpaintingPrEngine, PhotocraftBatchActionMacroPrEngine,
-    PhotocraftColorGradingFrequencySeparationPrEngine, PhotocraftHdrExposureStackingPrEngine,
+    PhotocraftAiInpaintingPrEngine, PhotocraftAiSubjectMattingSelectionPrEngine,
+    PhotocraftBatchActionMacroPrEngine, PhotocraftColorGradingFrequencySeparationPrEngine,
+    PhotocraftHdrExposureStackingPrEngine, PhotocraftMissingComponentsParityPrSuite,
+    PhotocraftPanoramaStitchingProjectionPrEngine, PhotocraftPerspectiveWarpMeshDeformPrEngine,
     PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
-    PhotocraftVectorMaskPenPathPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
+    PhotocraftSmartObjectLayerStylePrEngine, PhotocraftVectorMaskPenPathPrEngine,
+    SovereignPhotocraftArtcraftParityPrGateway,
 };
 pub use soundcraft::{
     fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
