@@ -607,9 +607,6 @@ impl UniversalBootEnvSnapshotGovernorV40 {
 // 7. Universal Foreign PM CLI Router V40
 // ============================================================================
 
-pub type UniversalPmActionV40 = UniversalPmActionV39;
-pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UniversalPmActionV40 {
     Install,
@@ -781,29 +778,29 @@ impl UniversalMultiFormatTranspilerAndExecutionEngineV40 {
 // 9. Sovereign Distro Package Advancements Master Suite V40
 // ============================================================================
 
-pub struct SovereignDistroPackageAdvancementsSuiteV39 {
-    pub inspector: UniversalPackageFormatInspectorV39,
-    pub udf_engine: UdfScriptletEngineV39,
+pub struct SovereignDistroPackageAdvancementsSuiteV40 {
+    pub inspector: UniversalPackageFormatInspectorV40,
+    pub udf_engine: UdfScriptletEngineV40,
     pub sat_solver: UniversalCrossDistroSatSolverV40,
-    pub sandbox_governor: UniversalMultiSandboxGovernorV39,
-    pub cas_store: UniversalCasDeltaStoreGovernorV39,
-    pub boot_env_governor: UniversalBootEnvSnapshotGovernorV39,
-    pub cli_router: UniversalPmCliRouterV39,
-    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39,
+    pub sandbox_governor: UniversalMultiSandboxGovernorV40,
+    pub cas_store: UniversalCasDeltaStoreGovernorV40,
+    pub boot_env_governor: UniversalBootEnvSnapshotGovernorV40,
+    pub cli_router: UniversalPmCliRouterV40,
+    pub transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV40,
     pub installed_packages: Vec<String>,
 }
 
 impl SovereignDistroPackageAdvancementsSuiteV40 {
     pub fn new() -> Self {
         Self {
-            inspector: UniversalPackageFormatInspectorV39::new(),
-            udf_engine: UdfScriptletEngineV39::new(),
+            inspector: UniversalPackageFormatInspectorV40::new(),
+            udf_engine: UdfScriptletEngineV40::new(),
             sat_solver: UniversalCrossDistroSatSolverV40::new(),
-            sandbox_governor: UniversalMultiSandboxGovernorV39::new(),
-            cas_store: UniversalCasDeltaStoreGovernorV39::new(),
-            boot_env_governor: UniversalBootEnvSnapshotGovernorV39::new(),
-            cli_router: UniversalPmCliRouterV39::new(),
-            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV39::new(),
+            sandbox_governor: UniversalMultiSandboxGovernorV40::new(),
+            cas_store: UniversalCasDeltaStoreGovernorV40::new(),
+            boot_env_governor: UniversalBootEnvSnapshotGovernorV40::new(),
+            cli_router: UniversalPmCliRouterV40::new(),
+            transpiler: UniversalMultiFormatTranspilerAndExecutionEngineV40::new(),
             installed_packages: Vec::new(),
         }
     }
@@ -952,7 +949,7 @@ mod tests {
 
     #[test]
     fn test_sat_solver_and_sandboxing_v40() {
-        let solver = UniversalCrossDistroSatSolverV39::new();
+        let solver = UniversalCrossDistroSatSolverV40::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
             "glibc".to_string(),
