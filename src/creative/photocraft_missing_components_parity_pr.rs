@@ -113,14 +113,16 @@ impl PhotocraftRawProcessingPrEngine {
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
             pr_id: 101,
-            pr_title: "feat(photocraft): Non-Destructive RAW Bayer Engine & Lens Distortion Pipeline"
-                .to_string(),
+            pr_title:
+                "feat(photocraft): Non-Destructive RAW Bayer Engine & Lens Distortion Pipeline"
+                    .to_string(),
             target_subsystem: "RAW Image Development Subsystem".to_string(),
             artcraft_feature_parity: "ArtCraft PhotoCraft RAW / Darktable Engine".to_string(),
             components_added: vec![
                 "32-bit float ProRAW / DNG / CR3 / NEF Bayer matrix demosaicing".to_string(),
                 "Non-destructive exposure bias (-5EV to +5EV) & highlight recovery".to_string(),
-                "Automatic lens distortion, chromatic aberration & vignette profile matcher".to_string(),
+                "Automatic lens distortion, chromatic aberration & vignette profile matcher"
+                    .to_string(),
             ],
             performance_multiplier: "12x Faster SIMD Demosaicing (<8.5ms 45MP RAW)".to_string(),
             status: "Ready for Merge".to_string(),
@@ -234,8 +236,9 @@ impl PhotocraftColorGradingFrequencySeparationPrEngine {
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
             pr_id: 103,
-            pr_title: "feat(photocraft): High/Low Frequency Separation & 3D LUT Color Grading Matrix"
-                .to_string(),
+            pr_title:
+                "feat(photocraft): High/Low Frequency Separation & 3D LUT Color Grading Matrix"
+                    .to_string(),
             target_subsystem: "Retouching & Color Science Suite".to_string(),
             artcraft_feature_parity: "ArtCraft PhotoCraft Frequency Separator".to_string(),
             components_added: vec![
@@ -389,8 +392,9 @@ impl PhotocraftVectorMaskPenPathPrEngine {
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
             pr_id: 105,
-            pr_title: "feat(photocraft): Vector Masking, Precision Bezier Pen Tool & Clipping Paths"
-                .to_string(),
+            pr_title:
+                "feat(photocraft): Vector Masking, Precision Bezier Pen Tool & Clipping Paths"
+                    .to_string(),
             target_subsystem: "Vector Selection & Clipping Path Pipeline".to_string(),
             artcraft_feature_parity: "ArtCraft PhotoCraft Pen & Vector Engine".to_string(),
             components_added: vec![
@@ -502,8 +506,10 @@ impl PhotocraftSmartObjectLayerStylePrEngine {
             target_subsystem: "Non-Destructive Object & FX Engine".to_string(),
             artcraft_feature_parity: "ArtCraft PhotoCraft Smart Object Studio".to_string(),
             components_added: vec![
-                "Reversible non-destructive smart object vector/raster container scaling".to_string(),
-                "PSD non-destructive layer styles (Bevel & Emboss, Drop Shadow, Glow, Stroke)".to_string(),
+                "Reversible non-destructive smart object vector/raster container scaling"
+                    .to_string(),
+                "PSD non-destructive layer styles (Bevel & Emboss, Drop Shadow, Glow, Stroke)"
+                    .to_string(),
                 "Stackable non-destructive live smart filter pipeline".to_string(),
             ],
             performance_multiplier: "Zero Loss Pixel Quality Reversibility".to_string(),
@@ -559,7 +565,8 @@ impl PhotocraftAiSubjectMattingSelectionPrEngine {
             artcraft_feature_parity: "ArtCraft PhotoCraft Neural Subject Selector".to_string(),
             components_added: vec![
                 "One-click neural subject and main object auto-segmentation".to_string(),
-                "Refine edge brush engine for intricate hair, fur, and glass transparency".to_string(),
+                "Refine edge brush engine for intricate hair, fur, and glass transparency"
+                    .to_string(),
                 "Multi-channel alpha mask storage and quick mask preview modes".to_string(),
             ],
             performance_multiplier: "Sub-20ms Full Frame Neural Segmentation".to_string(),
@@ -713,9 +720,7 @@ impl SovereignPhotocraftArtcraftParityPrGateway {
             control_in: [0.0, 0.0],
             control_out: [0.0, 0.0],
         };
-        let path_id = self
-            .vector_mask
-            .create_pen_path("CropMask", vec![pt], true);
+        let path_id = self.vector_mask.create_pen_path("CropMask", vec![pt], true);
         let mask_ok = self
             .vector_mask
             .rasterize_vector_mask(path_id, 4, 4)
@@ -756,7 +761,8 @@ impl PhotocraftMissingComponentsParityPrSuite {
     }
 
     pub fn verify_suite_completion(&mut self) -> bool {
-        self.gateway.evaluate_photocraft_parity() && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_photocraft_parity()
+            && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -864,7 +870,10 @@ mod tests {
     #[test]
     fn test_photocraft_remaining_engines() {
         let mut smart_engine = PhotocraftSmartObjectLayerStylePrEngine::new();
-        smart_engine.add_style(SmartLayerStyleFx::DropShadow { distance: 5.0, opacity: 0.8 });
+        smart_engine.add_style(SmartLayerStyleFx::DropShadow {
+            distance: 5.0,
+            opacity: 0.8,
+        });
         assert_eq!(smart_engine.generate_proposal().pr_id, 107);
 
         let matting_engine = PhotocraftAiSubjectMattingSelectionPrEngine::new();
@@ -890,7 +899,10 @@ mod tests {
 
         let merge_res = gateway.validate_and_merge(101);
         assert!(merge_res.is_ok());
-        assert_eq!(gateway.get_proposal(101).unwrap().status, "Merged into Sovereign Core");
+        assert_eq!(
+            gateway.get_proposal(101).unwrap().status,
+            "Merged into Sovereign Core"
+        );
     }
 
     #[test]
