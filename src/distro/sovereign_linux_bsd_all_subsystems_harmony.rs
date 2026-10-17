@@ -674,7 +674,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
                 "pol_process_sec",
-                "enforce_process_rlimit_capsicum_guard",
+                "racct_rctl_resource_limit_sandboxing",
                 true,
             ),
         ];
@@ -754,7 +754,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystem_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_all_subsystems_distro_compliance_vec(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
@@ -764,7 +764,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn translate_subsystem_payload(
+    pub fn format_cross_distro_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1222,14 +1222,14 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystem_compliance();
+        let audits = engine.audit_all_subsystems_distro_compliance_vec();
         assert_eq!(audits.len(), 31);
         assert_eq!(score, 100);
         for (_, compliant) in audits {
             assert!(compliant);
         }
 
-        let translated = engine.translate_subsystem_payload(
+        let translated = engine.format_cross_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",

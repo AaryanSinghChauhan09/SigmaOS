@@ -118,6 +118,18 @@ pub struct SlideAnimation {
     pub order: u32,
 }
 
+/// Presenter view state
+#[derive(Debug, Clone)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u32,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
+
 /// Speaker notes for presenter view
 #[derive(Debug, Clone)]
 pub struct PresenterNotes {
@@ -303,15 +315,9 @@ impl SlideExporterEngine {
                 }
                 output.extend_from_slice(b"</div></div></body></html>");
             }
-            DeckExportFormat::Svg => {
-                output.extend_from_slice(
-                    b"<svg width=\"1920\" height=\"1080\" xmlns=\"http://www.w3.org/2000/svg\">\n",
-                );
-                if let Some(active_slide) = deck.get_active_slide() {
-                    output.extend_from_slice(b"  <text x=\"100\" y=\"100\" font-size=\"48\">");
-                    output.extend_from_slice(active_slide.title.as_bytes());
-                    output.extend_from_slice(b"</text>\n");
-                }
+            ExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_DECK_V1:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
             }
             ExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");

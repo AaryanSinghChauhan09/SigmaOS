@@ -412,6 +412,25 @@ impl CadCraftEngine {
     }
 }
 
+impl Default for CadCraftEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// Global CadCraft Instance
+static mut CADCRAFT: Option<CadCraftEngine> = None;
+
+pub fn init_cadcraft() {
+    unsafe {
+        CADCRAFT = Some(CadCraftEngine::new());
+    }
+}
+
+pub fn get_cadcraft() -> Option<&'static mut CadCraftEngine> {
+    unsafe { CADCRAFT.as_mut() }
+}
+
 // ============================================================================
 // PR Deployment Engines for CadCraft
 // ============================================================================
