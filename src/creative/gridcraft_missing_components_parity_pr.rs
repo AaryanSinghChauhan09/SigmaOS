@@ -74,30 +74,10 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
         let mut map = BTreeMap::new();
         // Sample lookup table: Product ID, Name, Price, Stock
         let table = vec![
-            vec![
-                "101".to_string(),
-                "Laptop".to_string(),
-                "1200.00".to_string(),
-                "15".to_string(),
-            ],
-            vec![
-                "102".to_string(),
-                "Mouse".to_string(),
-                "25.00".to_string(),
-                "120".to_string(),
-            ],
-            vec![
-                "103".to_string(),
-                "Keyboard".to_string(),
-                "75.00".to_string(),
-                "45".to_string(),
-            ],
-            vec![
-                "104".to_string(),
-                "Monitor".to_string(),
-                "350.00".to_string(),
-                "30".to_string(),
-            ],
+            vec!["101".to_string(), "Laptop".to_string(), "1200.00".to_string(), "15".to_string()],
+            vec!["102".to_string(), "Mouse".to_string(), "25.00".to_string(), "120".to_string()],
+            vec!["103".to_string(), "Keyboard".to_string(), "75.00".to_string(), "45".to_string()],
+            vec!["104".to_string(), "Monitor".to_string(), "350.00".to_string(), "30".to_string()],
         ];
         map.insert("Products".to_string(), table);
 
@@ -108,13 +88,7 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
     }
 
     /// Perform XLOOKUP operation: search_key in lookup_col, return value from return_col
-    pub fn xlookup(
-        &self,
-        table_name: &str,
-        search_key: &str,
-        lookup_col_idx: usize,
-        return_col_idx: usize,
-    ) -> FormulaValue {
+    pub fn xlookup(&self, table_name: &str, search_key: &str, lookup_col_idx: usize, return_col_idx: usize) -> FormulaValue {
         let table = match self.lookup_tables.get(table_name) {
             Some(t) => t,
             None => return FormulaValue::Error("#REF!".to_string()),
@@ -160,10 +134,7 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
 
     /// Register dependency edge between cell nodes for DAG evaluation
     pub fn add_dependency(&mut self, cell: &str, depends_on: &str) {
-        self.dependency_graph
-            .entry(cell.to_string())
-            .or_default()
-            .push(depends_on.to_string());
+        self.dependency_graph.entry(cell.to_string()).or_default().push(depends_on.to_string());
     }
 
     /// Check for circular dependencies in cell dependency graph
@@ -199,20 +170,13 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
             false
         }
 
-        dfs(
-            start_cell,
-            &self.dependency_graph,
-            &mut visited,
-            &mut rec_stack,
-        )
+        dfs(start_cell, &self.dependency_graph, &mut visited, &mut rec_stack)
     }
 
     pub fn generate_proposal(&self) -> GridcraftPrProposalManifest {
         GridcraftPrProposalManifest {
             pr_id: 804,
-            pr_title:
-                "feat(gridcraft): Implement XLOOKUP, Financial Formulas & DAG Dependency Solver"
-                    .to_string(),
+            pr_title: "feat(gridcraft): Implement XLOOKUP, Financial Formulas & DAG Dependency Solver".to_string(),
             target_subsystem: "Gridcraft Formula & Calculation Engine".to_string(),
             original_suite: "ArtCraft Gridcraft Advanced Formulas".to_string(),
             components_added: vec![
@@ -220,8 +184,7 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
                 "Financial & statistical functions (NPV, IRR, PMT, STDEV, XIRR)".to_string(),
                 "DAG topological cell dependency graph with cycle detection".to_string(),
             ],
-            performance_multiplier: "50x Faster Parallel Matrix Lookup (<1ms evaluation)"
-                .to_string(),
+            performance_multiplier: "50x Faster Parallel Matrix Lookup (<1ms evaluation)".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -295,28 +258,13 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
     pub fn evaluate_conditional_style(&self, col: u32, row: u32, value: f64) -> Option<u32> {
         match self.format_rules.get(&(col, row)) {
             Some(ConditionalFormatRule::CellGreaterThan(thresh, color)) => {
-                if value > *thresh {
-                    Some(*color)
-                } else {
-                    None
-                }
+                if value > *thresh { Some(*color) } else { None }
             }
             Some(ConditionalFormatRule::CellLessThan(thresh, color)) => {
-                if value < *thresh {
-                    Some(*color)
-                } else {
-                    None
-                }
+                if value < *thresh { Some(*color) } else { None }
             }
-            Some(ConditionalFormatRule::ColorScale {
-                min_color,
-                max_color,
-            }) => {
-                if value > 50.0 {
-                    Some(*max_color)
-                } else {
-                    Some(*min_color)
-                }
+            Some(ConditionalFormatRule::ColorScale { min_color, max_color }) => {
+                if value > 50.0 { Some(*max_color) } else { Some(*min_color) }
             }
             Some(ConditionalFormatRule::DataBar { bar_color }) => Some(*bar_color),
             None => None,
@@ -388,10 +336,7 @@ impl GridcraftRealtimeDataStreamSpillArrayPrEngine {
 
     /// Dynamic FILTER array formula: filter elements based on condition threshold
     pub fn filter_array(&self, data: &[f64], condition_threshold: f64) -> Vec<f64> {
-        data.iter()
-            .copied()
-            .filter(|&x| x > condition_threshold)
-            .collect()
+        data.iter().copied().filter(|&x| x > condition_threshold).collect()
     }
 
     /// Dynamic UNIQUE array formula: return deduplicated elements
@@ -424,16 +369,13 @@ impl GridcraftRealtimeDataStreamSpillArrayPrEngine {
     pub fn generate_proposal(&self) -> GridcraftPrProposalManifest {
         GridcraftPrProposalManifest {
             pr_id: 806,
-            pr_title: "feat(gridcraft): Implement Dynamic Spill Arrays & Real-Time Data Streaming"
-                .to_string(),
+            pr_title: "feat(gridcraft): Implement Dynamic Spill Arrays & Real-Time Data Streaming".to_string(),
             target_subsystem: "Gridcraft Array & RTD Data Pipeline".to_string(),
             original_suite: "ArtCraft Gridcraft Dynamic Engine".to_string(),
             components_added: vec![
-                "Dynamic array spill formulas (FILTER, UNIQUE, SORT, SEQUENCE, RANDARRAY)"
-                    .to_string(),
+                "Dynamic array spill formulas (FILTER, UNIQUE, SORT, SEQUENCE, RANDARRAY)".to_string(),
                 "Real-time data (RTD) streaming ticker subscriptions for live feeds".to_string(),
-                "Asynchronous web query REST API importer with JSON/XML cell auto-population"
-                    .to_string(),
+                "Asynchronous web query REST API importer with JSON/XML cell auto-population".to_string(),
             ],
             performance_multiplier: "100k+ Rows Dynamic Array Spill (<2ms)".to_string(),
             status: "Ready for Merge".to_string(),
@@ -536,11 +478,7 @@ impl GridcraftFinancialGoalSeekSolverPrEngine {
         for &v in &results {
             variance_sum += (v - mean) * (v - mean);
         }
-        let std_dev = if runs > 1 {
-            (variance_sum / ((runs - 1) as f64)).sqrt()
-        } else {
-            0.0
-        };
+        let std_dev = if runs > 1 { (variance_sum / ((runs - 1) as f64)).sqrt() } else { 0.0 };
 
         MonteCarloResult {
             mean,
@@ -554,15 +492,13 @@ impl GridcraftFinancialGoalSeekSolverPrEngine {
     pub fn generate_proposal(&self) -> GridcraftPrProposalManifest {
         GridcraftPrProposalManifest {
             pr_id: 807,
-            pr_title: "feat(gridcraft): Implement Newton-Raphson Goal Seek & Monte Carlo Simulator"
-                .to_string(),
+            pr_title: "feat(gridcraft): Implement Newton-Raphson Goal Seek & Monte Carlo Simulator".to_string(),
             target_subsystem: "Gridcraft Financial Optimization & Simulation".to_string(),
             original_suite: "ArtCraft Gridcraft Financial Modeling".to_string(),
             components_added: vec![
                 "Newton-Raphson Goal Seek non-linear parameter optimizer".to_string(),
                 "What-If scenario manager & sensitivity analysis matrix".to_string(),
-                "Monte Carlo stochastic risk evaluation engine with percentile forecasting"
-                    .to_string(),
+                "Monte Carlo stochastic risk evaluation engine with percentile forecasting".to_string(),
             ],
             performance_multiplier: "1,000,000 Iteration Risk Simulation in <10ms".to_string(),
             status: "Ready for Merge".to_string(),
@@ -636,15 +572,12 @@ impl GridcraftMultiUserCrdtCollabPrEngine {
     pub fn generate_proposal(&self) -> GridcraftPrProposalManifest {
         GridcraftPrProposalManifest {
             pr_id: 808,
-            pr_title: "feat(gridcraft): Implement CRDT Real-Time Multi-User Collaboration Engine"
-                .to_string(),
+            pr_title: "feat(gridcraft): Implement CRDT Real-Time Multi-User Collaboration Engine".to_string(),
             target_subsystem: "Gridcraft Concurrency & Sync Protocol".to_string(),
             original_suite: "ArtCraft Gridcraft Collaboration".to_string(),
             components_added: vec![
-                "Conflict-free Replicated Data Type (CRDT) Last-Write-Wins cell edit sync"
-                    .to_string(),
-                "Non-blocking lockless concurrency for simultaneous spreadsheet editing"
-                    .to_string(),
+                "Conflict-free Replicated Data Type (CRDT) Last-Write-Wins cell edit sync".to_string(),
+                "Non-blocking lockless concurrency for simultaneous spreadsheet editing".to_string(),
                 "Client presence tracking and dynamic cell selection cursors".to_string(),
             ],
             performance_multiplier: "Zero-Latency Local Multi-User Delta Resolution".to_string(),
@@ -790,19 +723,10 @@ impl SovereignGridcraftArtcraftParityPrGateway {
         let xlookup_val = self.formula_xlookup.xlookup("Products", "101", 0, 1);
         let xlookup_ok = xlookup_val == FormulaValue::Text("Laptop".to_string());
 
-        self.validation_formatting.add_validation_rule(
-            1,
-            1,
-            ValidationRule::NumberRange {
-                min: 1.0,
-                max: 100.0,
-            },
-        );
+        self.validation_formatting.add_validation_rule(1, 1, ValidationRule::NumberRange { min: 1.0, max: 100.0 });
         let val_ok = self.validation_formatting.validate_cell_value(1, 1, "50");
 
-        let filter_res = self
-            .realtime_spill
-            .filter_array(&[10.0, 25.0, 50.0, 5.0], 20.0);
+        let filter_res = self.realtime_spill.filter_array(&[10.0, 25.0, 50.0, 5.0], 20.0);
         let spill_ok = filter_res == vec![25.0, 50.0];
 
         let seek_res = self.goal_seek_solver.goal_seek(100.0, 10.0, |x| x * 2.0);
@@ -843,10 +767,7 @@ impl SovereignGridcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals
-                .iter()
-                .filter(|p| p.status == "Ready for Merge")
-                .count();
+            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -902,23 +823,12 @@ mod tests {
     #[test]
     fn test_data_validation_conditional_formatting() {
         let mut engine = GridcraftDataValidationConditionalFormattingPrEngine::new();
-        engine.add_validation_rule(
-            1,
-            1,
-            ValidationRule::List(vec!["Yes".to_string(), "No".to_string()]),
-        );
+        engine.add_validation_rule(1, 1, ValidationRule::List(vec!["Yes".to_string(), "No".to_string()]));
         assert!(engine.validate_cell_value(1, 1, "Yes"));
         assert!(!engine.validate_cell_value(1, 1, "Maybe"));
 
-        engine.add_conditional_format(
-            2,
-            2,
-            ConditionalFormatRule::CellGreaterThan(100.0, 0xFFFF0000),
-        );
-        assert_eq!(
-            engine.evaluate_conditional_style(2, 2, 150.0),
-            Some(0xFFFF0000)
-        );
+        engine.add_conditional_format(2, 2, ConditionalFormatRule::CellGreaterThan(100.0, 0xFFFF0000));
+        assert_eq!(engine.evaluate_conditional_style(2, 2, 150.0), Some(0xFFFF0000));
         assert_eq!(engine.evaluate_conditional_style(2, 2, 50.0), None);
     }
 
