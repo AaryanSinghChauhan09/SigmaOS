@@ -162,13 +162,18 @@ pub enum HypervisorType {
     OpenBsdVmm,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LibvirtStoragePoolType {
-    #[default]
     Directory,
     Zfs,
     LvmThin,
     CephRbd,
+}
+
+impl Default for LibvirtStoragePoolType {
+    fn default() -> Self {
+        Self::Directory
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
