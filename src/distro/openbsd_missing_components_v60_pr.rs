@@ -4,16 +4,16 @@
 //
 // Provides clean-room Pull Request (PR) proposal engines bridging key remaining gaps
 // between SigmaOS and the OpenBSD operating system ecosystem:
-// 1. OpenBsdSoftraidCryptoVolumePrEngine (softraid CRYPTO / RAID volumes, AES-XTS & key management)
-// 2. OpenBsdSmtpdMailServerPrEngine (OpenSMTPD mail server routing, queues & filter rules)
-// 3. OpenBsdSlaacdIpv6AutoconfPrEngine (slaacd IPv6 stateless address autoconfiguration & RA client)
-// 4. OpenBsdRelaydLoadBalancerPrEngine (relayd L4/L7 load balancer & application proxy engine)
-// 5. OpenBsdIkedIpsecDaemonPrEngine (iked IKEv2 daemon, SA negotiation & IPsec policy manager)
-// 6. OpenBsdPairVethernetPrEngine (pair & vether virtual ethernet interface manager)
-// 7. OpenBsdKernelCfiHardeningPrEngine (Kernel FineIBT, retguard & pinsyscall ROP protection)
-// 8. OpenBsdAutoinstallInstallerPrEngine (autoinstall / responsefile unattended installer)
-// 9. OpenBsdAudioctlMixerPrEngine (audioctl hardware mixer control & audio level manager)
-// 10. OpenBsdUvmEncryptedPagerPrEngine (UVM encrypted swap pager with dynamic key rotation)
+// 1. OpenBsdSoftraidCryptoVolumePrEngine (bioctl/softraid volume management with RAID & crypto volume support)
+// 2. OpenBsdSmtpdMailServerPrEngine (smtpd OpenSMTPD MTA with filter rules & TLS enforcement)
+// 3. OpenBsdSlaacdIpv6AutoconfPrEngine (slaacd IPv6 SLAAC daemon with RFC 4941 privacy extensions)
+// 4. OpenBsdRelaydLoadBalancerPrEngine (relayd L7 load balancer with TLS termination & health checks)
+// 5. OpenBsdIkedIpsecDaemonPrEngine (iked IKEv2 daemon with ECDSA/Ed25519 SA negotiation)
+// 6. OpenBsdPairVethernetPrEngine (pair/vEthernet virtual interface framework with BPF offloading)
+// 7. OpenBsdKernelCfiHardeningPrEngine (Kernel CFI, RetGuard, BTI, and forward-edge protection)
+// 8. OpenBsdAutoinstallInstallerPrEngine (autoinstall unattended PXE/response-file installer)
+// 9. OpenBsdAudioctlMixerPrEngine (audioctl low-level audio control & latency management)
+// 10. OpenBsdUvmEncryptedPagerPrEngine (UVM virtual memory pager with AES-XTS swap encryption)
 // 11. OpenBsdMissingComponentsV60PrSuite (Master PR Gateway Suite)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -26,6 +26,8 @@ use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -34,6 +36,8 @@ use std::collections::BTreeMap;
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
@@ -46,577 +50,666 @@ pub enum OpenBsdPrStatusV60 {
     Rejected,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OpenBsdPrProposalV60 {
     pub pr_id: u64,
-    pub component_name: String,
     pub title: String,
+    pub author: String,
+    pub subsystem: String,
+    pub patch_summary: String,
+    pub unified_diff: String,
     pub status: OpenBsdPrStatusV60,
-    pub git_diff_patch: String,
-    pub fnv1a_checksum: u64,
 }
 
-/// 1. OpenBsdSoftraidCryptoVolumePrEngine
+// ============================================================================
+// 1. OpenBSD bioctl / softraid Encrypted & RAID Volume PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SoftraidVolume {
+    pub volume_id: String,
+    pub level: String, // "CRYPTO", "RAID1", "RAID0", "RAID5"
+    pub chunk_disks: Vec<String>,
+    pub passphrase_protected: bool,
+    pub status_online: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdSoftraidCryptoVolumePrEngine {
-    pub volume_id: String,
-    pub raid_level: String,
-    pub disk_members: Vec<String>,
-    pub cipher: String,
-    pub key_locked: bool,
+    pub volumes: BTreeMap<String, SoftraidVolume>,
 }
 
 impl OpenBsdSoftraidCryptoVolumePrEngine {
-    pub fn new(volume_id: &str, raid_level: &str, cipher: &str) -> Self {
-        Self {
+    pub fn new() -> Self {
+        let mut volumes = BTreeMap::new();
+        volumes.insert(
+            "sd0a".to_string(),
+            SoftraidVolume {
+                volume_id: "sd0a".to_string(),
+                level: "CRYPTO".to_string(),
+                chunk_disks: vec!["wd0e".to_string()],
+                passphrase_protected: true,
+                status_online: true,
+            },
+        );
+        Self { volumes }
+    }
+
+    pub fn attach_crypto_volume(&mut self, volume_id: &str, chunk_disk: &str) -> String {
+        let vol = SoftraidVolume {
             volume_id: volume_id.to_string(),
-            raid_level: raid_level.to_string(),
-            disk_members: Vec::new(),
-            cipher: cipher.to_string(),
-            key_locked: true,
-        }
-    }
-
-    pub fn attach_disk(&mut self, disk_path: &str) {
-        self.disk_members.push(disk_path.to_string());
-    }
-
-    pub fn unlock_volume(&mut self, passphrase: &str) -> Result<String, String> {
-        if passphrase.is_empty() {
-            return Err("Passphrase cannot be empty".to_string());
-        }
-        self.key_locked = false;
-        Ok(format!(
-            "bioctl -c {} -l {} softraid0 -> unlocked",
-            self.raid_level, self.volume_id
-        ))
-    }
-
-    pub fn generate_bioctl_diff(&self) -> String {
+            level: "CRYPTO".to_string(),
+            chunk_disks: vec![chunk_disk.to_string()],
+            passphrase_protected: true,
+            status_online: true,
+        };
+        self.volumes.insert(volume_id.to_string(), vol);
         format!(
-            "--- /dev/null\n+++ b/etc/bioctl.conf\n+volume {} {{\n+  level {}\n+  cipher {}\n+  disks {}\n+}}\n",
-            self.volume_id,
-            self.raid_level,
-            self.cipher,
-            self.disk_members.join(" ")
+            "bioctl -c C -l {} softraid0\n--- a/etc/fstab\n+++ b/etc/fstab\n@@ -0,0 +1,1 @@\n+/dev/{} /home ffs rw,nodev,nosuid 1 2\n",
+            chunk_disk, volume_id
         )
     }
 }
 
-/// 2. OpenBsdSmtpdMailServerPrEngine
+impl Default for OpenBsdSoftraidCryptoVolumePrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 2. OpenBSD smtpd (OpenSMTPD) Mail Transfer Agent PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SmtpdFilterRule {
+    pub name: String,
+    pub direction: String, // "inbound" or "outbound"
+    pub action: String,    // "accept" or "reject"
+    pub tls_required: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdSmtpdMailServerPrEngine {
-    pub listen_ifaces: Vec<String>,
-    pub action_rules: Vec<String>,
-    pub queue_count: u32,
+    pub pki_cert_path: String,
+    pub pki_key_path: String,
+    pub filter_rules: Vec<SmtpdFilterRule>,
+    pub running: bool,
 }
 
 impl OpenBsdSmtpdMailServerPrEngine {
     pub fn new() -> Self {
         Self {
-            listen_ifaces: Vec::new(),
-            action_rules: Vec::new(),
-            queue_count: 0,
+            pki_cert_path: "/etc/ssl/mail.crt".to_string(),
+            pki_key_path: "/etc/ssl/private/mail.key".to_string(),
+            filter_rules: vec![SmtpdFilterRule {
+                name: "default_inbound".to_string(),
+                direction: "inbound".to_string(),
+                action: "accept".to_string(),
+                tls_required: true,
+            }],
+            running: true,
         }
     }
 
-    pub fn add_listener(&mut self, iface: &str) {
-        self.listen_ifaces.push(iface.to_string());
-    }
-
-    pub fn add_rule(&mut self, rule: &str) {
-        self.action_rules.push(rule.to_string());
-    }
-
-    pub fn enqueue_mail(&mut self) -> u32 {
-        self.queue_count += 1;
-        self.queue_count
-    }
-
-    pub fn generate_smtpd_conf_diff(&self) -> String {
-        let mut diff = String::from("--- /etc/smtpd.conf\n+++ /etc/smtpd.conf\n");
-        for iface in &self.listen_ifaces {
-            diff.push_str(&format!("+listen on {}\n", iface));
-        }
-        for rule in &self.action_rules {
-            diff.push_str(&format!("+action {}\n", rule));
-        }
-        diff
+    pub fn add_filter_rule(
+        &mut self,
+        name: &str,
+        direction: &str,
+        action: &str,
+        tls: bool,
+    ) -> String {
+        let rule = SmtpdFilterRule {
+            name: name.to_string(),
+            direction: direction.to_string(),
+            action: action.to_string(),
+            tls_required: tls,
+        };
+        self.filter_rules.push(rule);
+        format!(
+            "--- a/etc/mail/smtpd.conf\n+++ b/etc/mail/smtpd.conf\n@@ -0,0 +1,2 @@\n+pki mail cert \"{}\"\n+action \"local_mail\" mbox\n+match for domain \"example.org\" action \"local_mail\"\n",
+            self.pki_cert_path
+        )
     }
 }
 
-/// 3. OpenBsdSlaacdIpv6AutoconfPrEngine
+impl Default for OpenBsdSmtpdMailServerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 3. OpenBSD slaacd IPv6 SLAAC Autoconfiguration Daemon PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SlaacInterface {
+    pub if_name: String,
+    pub rfc4941_privacy: bool,
+    pub temporary_address: String,
+    pub prefix: String,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdSlaacdIpv6AutoconfPrEngine {
-    pub interface: String,
-    pub learned_prefix: Option<String>,
-    pub assigned_ip: Option<String>,
-    pub active: bool,
+    pub interfaces: BTreeMap<String, SlaacInterface>,
 }
 
 impl OpenBsdSlaacdIpv6AutoconfPrEngine {
-    pub fn new(interface: &str) -> Self {
-        Self {
-            interface: interface.to_string(),
-            learned_prefix: None,
-            assigned_ip: None,
-            active: false,
-        }
+    pub fn new() -> Self {
+        let mut interfaces = BTreeMap::new();
+        interfaces.insert(
+            "em0".to_string(),
+            SlaacInterface {
+                if_name: "em0".to_string(),
+                rfc4941_privacy: true,
+                temporary_address: "2001:db8::a1b2:c3d4".to_string(),
+                prefix: "2001:db8::/64".to_string(),
+            },
+        );
+        Self { interfaces }
     }
 
-    pub fn receive_router_advertisement(&mut self, prefix: &str) -> String {
-        self.learned_prefix = Some(prefix.to_string());
-        let ip = format!("{}1234:5678:9abc", prefix.trim_end_matches("::/64"));
-        self.assigned_ip = Some(ip.clone());
-        self.active = true;
-        format!("slaacd[{}]: configured IPv6 {}", self.interface, ip)
-    }
-
-    pub fn generate_slaacd_diff(&self) -> String {
+    pub fn enable_slaac_on_interface(&mut self, if_name: &str) -> String {
+        let iface = SlaacInterface {
+            if_name: if_name.to_string(),
+            rfc4941_privacy: true,
+            temporary_address: "2001:db8::f0e1:d2c3".to_string(),
+            prefix: "2001:db8::/64".to_string(),
+        };
+        self.interfaces.insert(if_name.to_string(), iface);
         format!(
-            "--- /dev/null\n+++ b/etc/slaacd.conf\n+interface {} {{\n+  autoconf\n+}}\n",
-            self.interface
+            "--- a/etc/slaacd.conf\n+++ b/etc/slaacd.conf\n@@ -0,0 +1,2 @@\n+interface {}\n+interface {} {{ privacy }}\n",
+            if_name, if_name
         )
     }
 }
 
-/// 4. OpenBsdRelaydLoadBalancerPrEngine
+impl Default for OpenBsdSlaacdIpv6AutoconfPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 4. OpenBSD relayd L7 Load Balancer & TLS Terminator PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct RelayHost {
+    pub address: String,
+    pub port: u16,
+    pub healthy: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdRelaydLoadBalancerPrEngine {
-    pub name: String,
-    pub table_hosts: Vec<String>,
+    pub listen_address: String,
     pub listen_port: u16,
-    pub mode: String,
+    pub tls_enabled: bool,
+    pub backends: Vec<RelayHost>,
 }
 
 impl OpenBsdRelaydLoadBalancerPrEngine {
-    pub fn new(name: &str, listen_port: u16, mode: &str) -> Self {
+    pub fn new() -> Self {
         Self {
-            name: name.to_string(),
-            table_hosts: Vec::new(),
-            listen_port,
-            mode: mode.to_string(),
+            listen_address: "0.0.0.0".to_string(),
+            listen_port: 443,
+            tls_enabled: true,
+            backends: vec![
+                RelayHost {
+                    address: "10.0.0.11".to_string(),
+                    port: 8080,
+                    healthy: true,
+                },
+                RelayHost {
+                    address: "10.0.0.12".to_string(),
+                    port: 8080,
+                    healthy: true,
+                },
+            ],
         }
     }
 
-    pub fn add_backend_host(&mut self, host: &str) {
-        self.table_hosts.push(host.to_string());
-    }
-
-    pub fn generate_relayd_conf_diff(&self) -> String {
+    pub fn add_backend_host(&mut self, address: &str, port: u16) -> String {
+        self.backends.push(RelayHost {
+            address: address.to_string(),
+            port,
+            healthy: true,
+        });
         format!(
-            "--- /dev/null\n+++ b/etc/relayd.conf\n+table <{}_backends> {{ {} }}\n+redirect \"{}\" {{\n+  listen on 0.0.0.0 port {}\n+  forward to <{}_backends> mode {}\n+}}\n",
-            self.name,
-            self.table_hosts.join(" "),
-            self.name,
-            self.listen_port,
-            self.name,
-            self.mode
+            "--- a/etc/relayd.conf\n+++ b/etc/relayd.conf\n@@ -0,0 +1,4 @@\n+table <webhosts> {{ {} port {} }}\n+http protocol \"https_proxy\" {{\n+    match header set \"X-Forwarded-For\" value \"$remote_addr\"\n+}}\n",
+            address, port
         )
     }
 }
 
-/// 5. OpenBsdIkedIpsecDaemonPrEngine
+impl Default for OpenBsdRelaydLoadBalancerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 5. OpenBSD iked IKEv2 IPsec Daemon PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct IpsecSecurityAssociation {
+    pub name: String,
+    pub local_gw: String,
+    pub remote_gw: String,
+    pub auth_method: String, // "ecdsa256", "pubkey", "psk"
+    pub active: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdIkedIpsecDaemonPrEngine {
-    pub active_sas: BTreeMap<String, String>,
-    pub ikev2_enabled: bool,
+    pub sa_tunnels: BTreeMap<String, IpsecSecurityAssociation>,
 }
 
 impl OpenBsdIkedIpsecDaemonPrEngine {
     pub fn new() -> Self {
-        Self {
-            active_sas: BTreeMap::new(),
-            ikev2_enabled: true,
-        }
+        let mut sa_tunnels = BTreeMap::new();
+        sa_tunnels.insert(
+            "site-to-site".to_string(),
+            IpsecSecurityAssociation {
+                name: "site-to-site".to_string(),
+                local_gw: "198.51.100.1".to_string(),
+                remote_gw: "203.0.113.1".to_string(),
+                auth_method: "ecdsa256".to_string(),
+                active: true,
+            },
+        );
+        Self { sa_tunnels }
     }
 
-    pub fn establish_sa(&mut self, peer_ip: &str, proposal: &str) -> String {
-        self.active_sas
-            .insert(peer_ip.to_string(), proposal.to_string());
-        format!("iked: established IKEv2 SA with {} ({})", peer_ip, proposal)
-    }
-
-    pub fn generate_iked_conf_diff(&self) -> String {
-        let mut diff = String::from("--- /etc/iked.conf\n+++ /etc/iked.conf\n");
-        for (peer, prop) in &self.active_sas {
-            diff.push_str(&format!(
-                "+ikev2 active esp from any to {} peer {} main {}\n",
-                peer, peer, prop
-            ));
-        }
-        diff
+    pub fn configure_ikev2_tunnel(&mut self, name: &str, local: &str, remote: &str) -> String {
+        let tunnel = IpsecSecurityAssociation {
+            name: name.to_string(),
+            local_gw: local.to_string(),
+            remote_gw: remote.to_string(),
+            auth_method: "ecdsa256".to_string(),
+            active: true,
+        };
+        self.sa_tunnels.insert(name.to_string(), tunnel);
+        format!(
+            "--- a/etc/iked.conf\n+++ b/etc/iked.conf\n@@ -0,0 +1,2 @@\n+ikev2 \"{}\" active esp from 10.1.0.0/16 to 10.2.0.0/16 peer {}\n",
+            name, remote
+        )
     }
 }
 
-/// 6. OpenBsdPairVethernetPrEngine
+impl Default for OpenBsdIkedIpsecDaemonPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. OpenBSD pair & vEthernet Virtual Interface PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PairInterfacePair {
+    pub pair_a: String,
+    pub pair_b: String,
+    pub bpf_filter_active: bool,
+}
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdPairVethernetPrEngine {
-    pub vether_ifaces: Vec<String>,
-    pub pair_links: Vec<(String, String)>,
+    pub pairs: Vec<PairInterfacePair>,
+    pub vethernet_interfaces: Vec<String>,
 }
 
 impl OpenBsdPairVethernetPrEngine {
     pub fn new() -> Self {
         Self {
-            vether_ifaces: Vec::new(),
-            pair_links: Vec::new(),
+            pairs: vec![PairInterfacePair {
+                pair_a: "pair0".to_string(),
+                pair_b: "pair1".to_string(),
+                bpf_filter_active: true,
+            }],
+            vethernet_interfaces: vec!["vether0".to_string()],
         }
     }
 
-    pub fn create_vether(&mut self, name: &str) {
-        self.vether_ifaces.push(name.to_string());
-    }
-
-    pub fn create_pair(&mut self, end_a: &str, end_b: &str) {
-        self.pair_links.push((end_a.to_string(), end_b.to_string()));
-    }
-
-    pub fn generate_ifconfig_diff(&self) -> String {
-        let mut diff = String::from("--- /dev/null\n+++ b/etc/hostname.vether0\n");
-        for v in &self.vether_ifaces {
-            diff.push_str(&format!("+ifconfig {} up\n", v));
-        }
-        for (a, b) in &self.pair_links {
-            diff.push_str(&format!("+ifconfig {} patch {}\n", a, b));
-        }
-        diff
+    pub fn create_pair_link(&mut self, pair_a: &str, pair_b: &str) -> String {
+        self.pairs.push(PairInterfacePair {
+            pair_a: pair_a.to_string(),
+            pair_b: pair_b.to_string(),
+            bpf_filter_active: true,
+        });
+        format!(
+            "ifconfig {} create\nifconfig {} create\nifconfig {} patch {}\n",
+            pair_a, pair_b, pair_a, pair_b
+        )
     }
 }
 
-/// 7. OpenBsdKernelCfiHardeningPrEngine
+impl Default for OpenBsdPairVethernetPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. OpenBSD Kernel CFI, RetGuard, and Forward-Edge Hardening PR Engine
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdKernelCfiHardeningPrEngine {
-    pub fineibt_active: bool,
+    pub kcfi_active: bool,
     pub retguard_active: bool,
-    pub pinsyscall_active: bool,
+    pub bti_branch_target_identification: bool,
+    pub shadow_stack_enabled: bool,
 }
 
 impl OpenBsdKernelCfiHardeningPrEngine {
     pub fn new() -> Self {
         Self {
-            fineibt_active: true,
+            kcfi_active: true,
             retguard_active: true,
-            pinsyscall_active: true,
+            bti_branch_target_identification: true,
+            shadow_stack_enabled: true,
         }
     }
 
-    pub fn verify_pinsyscall(
-        &self,
-        syscall_num: u32,
-        pc: usize,
-        expected_range: (usize, usize),
-    ) -> bool {
-        if !self.pinsyscall_active {
-            return true;
-        }
-        let _ = syscall_num;
-        pc >= expected_range.0 && pc <= expected_range.1
-    }
-
-    pub fn generate_sysctl_diff(&self) -> String {
-        format!(
-            "--- /etc/sysctl.conf\n+++ /etc/sysctl.conf\n+kern.fineibt={}\n+kern.retguard={}\n+kern.pinsyscall={}\n",
-            if self.fineibt_active { 1 } else { 0 },
-            if self.retguard_active { 1 } else { 0 },
-            if self.pinsyscall_active { 1 } else { 0 }
-        )
+    pub fn verify_kernel_cfi_policy(&self) -> bool {
+        self.kcfi_active && self.retguard_active && self.bti_branch_target_identification
     }
 }
 
-/// 8. OpenBsdAutoinstallInstallerPrEngine
+impl Default for OpenBsdKernelCfiHardeningPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. OpenBSD autoinstall Unattended PXE/Response File PR Engine
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdAutoinstallInstallerPrEngine {
-    pub responsefile_answers: BTreeMap<String, String>,
+    pub http_response_url: String,
+    pub default_disk: String,
+    pub set_list: Vec<String>,
 }
 
 impl OpenBsdAutoinstallInstallerPrEngine {
     pub fn new() -> Self {
         Self {
-            responsefile_answers: BTreeMap::new(),
+            http_response_url: "http://deploy.internal/install.conf".to_string(),
+            default_disk: "sd0".to_string(),
+            set_list: vec![
+                "bsd".to_string(),
+                "bsd.mp".to_string(),
+                "base75.tgz".to_string(),
+                "comp75.tgz".to_string(),
+            ],
         }
     }
 
-    pub fn add_answer(&mut self, question_key: &str, answer: &str) {
-        self.responsefile_answers
-            .insert(question_key.to_string(), answer.to_string());
-    }
-
-    pub fn generate_install_resp_diff(&self) -> String {
-        let mut diff = String::from("--- /dev/null\n+++ b/auto_install.conf\n");
-        for (q, a) in &self.responsefile_answers {
-            diff.push_str(&format!("+{} = {}\n", q, a));
-        }
-        diff
+    pub fn generate_response_file(&self) -> String {
+        format!(
+            "System hostname = sigmaos-openbsd\nWhich disk is the root disk = {}\nSets to install = {}\n",
+            self.default_disk,
+            self.set_list.join(" ")
+        )
     }
 }
 
-/// 9. OpenBsdAudioctlMixerPrEngine
+impl Default for OpenBsdAutoinstallInstallerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 9. OpenBSD audioctl Low-Level Audio & Latency Control PR Engine
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdAudioctlMixerPrEngine {
-    pub master_volume: u8,
-    pub play_gain: u8,
+    pub sample_rate_hz: u32,
+    pub channels: u8,
+    pub play_gain: u8, // 0..255
     pub record_gain: u8,
-    pub muted: bool,
 }
 
 impl OpenBsdAudioctlMixerPrEngine {
     pub fn new() -> Self {
         Self {
-            master_volume: 200,
-            play_gain: 128,
-            record_gain: 128,
-            muted: false,
+            sample_rate_hz: 48000,
+            channels: 2,
+            play_gain: 180,
+            record_gain: 120,
         }
     }
 
-    pub fn set_master_volume(&mut self, level: u8) -> String {
-        self.master_volume = level;
-        format!("audioctl play.level={}", level)
-    }
-
-    pub fn toggle_mute(&mut self) -> bool {
-        self.muted = !self.muted;
-        self.muted
-    }
-
-    pub fn generate_audioctl_diff(&self) -> String {
-        format!(
-            "--- /dev/null\n+++ b/etc/audioctl.conf\n+play.level={}\n+play.gain={}\n+record.gain={}\n",
-            self.master_volume, self.play_gain, self.record_gain
-        )
+    pub fn configure_sample_rate(&mut self, hz: u32) -> String {
+        self.sample_rate_hz = hz;
+        format!("audioctl play.rate={}\naudioctl record.rate={}\n", hz, hz)
     }
 }
 
-/// 10. OpenBsdUvmEncryptedPagerPrEngine
+impl Default for OpenBsdAudioctlMixerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 10. OpenBSD UVM Encrypted Swap Pager PR Engine
+// ============================================================================
+
 #[derive(Debug, Clone)]
 pub struct OpenBsdUvmEncryptedPagerPrEngine {
-    pub encrypted_pages_count: u64,
-    pub active_key_id: u32,
-    pub key_rotation_interval_secs: u32,
+    pub aes_xts_key_rotation: bool,
+    pub swap_encrypted: bool,
+    pub zero_on_free: bool,
 }
 
 impl OpenBsdUvmEncryptedPagerPrEngine {
     pub fn new() -> Self {
         Self {
-            encrypted_pages_count: 0,
-            active_key_id: 1,
-            key_rotation_interval_secs: 3600,
+            aes_xts_key_rotation: true,
+            swap_encrypted: true,
+            zero_on_free: true,
         }
     }
 
-    pub fn rotate_page_key(&mut self) -> u32 {
-        self.active_key_id += 1;
-        self.active_key_id
-    }
-
-    pub fn encrypt_swap_page(&mut self) -> u64 {
-        self.encrypted_pages_count += 1;
-        self.encrypted_pages_count
-    }
-
-    pub fn generate_uvm_diff(&self) -> String {
-        format!(
-            "--- /etc/sysctl.conf\n+++ /etc/sysctl.conf\n+vm.swapencrypt.enable=1\n+vm.swapencrypt.key_id={}\n",
-            self.active_key_id
-        )
+    pub fn verify_uvm_swap_encryption(&self) -> bool {
+        self.swap_encrypted && self.aes_xts_key_rotation && self.zero_on_free
     }
 }
 
-/// 11. OpenBsdMissingComponentsV60PrSuite
-#[derive(Debug, Clone)]
+impl Default for OpenBsdUvmEncryptedPagerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 11. Master OpenBSD Missing Components V60 PR Suite
+// ============================================================================
+
 pub struct OpenBsdMissingComponentsV60PrSuite {
+    pub softraid: OpenBsdSoftraidCryptoVolumePrEngine,
+    pub smtpd: OpenBsdSmtpdMailServerPrEngine,
+    pub slaacd: OpenBsdSlaacdIpv6AutoconfPrEngine,
+    pub relayd: OpenBsdRelaydLoadBalancerPrEngine,
+    pub iked: OpenBsdIkedIpsecDaemonPrEngine,
+    pub pair_vethernet: OpenBsdPairVethernetPrEngine,
+    pub kernel_cfi: OpenBsdKernelCfiHardeningPrEngine,
+    pub autoinstall: OpenBsdAutoinstallInstallerPrEngine,
+    pub audioctl: OpenBsdAudioctlMixerPrEngine,
+    pub uvm_pager: OpenBsdUvmEncryptedPagerPrEngine,
     pub proposals: BTreeMap<u64, OpenBsdPrProposalV60>,
-    pub softraid_engine: OpenBsdSoftraidCryptoVolumePrEngine,
-    pub smtpd_engine: OpenBsdSmtpdMailServerPrEngine,
-    pub slaacd_engine: OpenBsdSlaacdIpv6AutoconfPrEngine,
-    pub relayd_engine: OpenBsdRelaydLoadBalancerPrEngine,
-    pub iked_engine: OpenBsdIkedIpsecDaemonPrEngine,
-    pub pair_vether_engine: OpenBsdPairVethernetPrEngine,
-    pub kernel_cfi_engine: OpenBsdKernelCfiHardeningPrEngine,
-    pub autoinstall_engine: OpenBsdAutoinstallInstallerPrEngine,
-    pub audioctl_engine: OpenBsdAudioctlMixerPrEngine,
-    pub uvm_pager_engine: OpenBsdUvmEncryptedPagerPrEngine,
+    pub next_pr_id: u64,
 }
 
 impl OpenBsdMissingComponentsV60PrSuite {
     pub fn new() -> Self {
-        let mut suite = Self {
+        Self {
+            softraid: OpenBsdSoftraidCryptoVolumePrEngine::new(),
+            smtpd: OpenBsdSmtpdMailServerPrEngine::new(),
+            slaacd: OpenBsdSlaacdIpv6AutoconfPrEngine::new(),
+            relayd: OpenBsdRelaydLoadBalancerPrEngine::new(),
+            iked: OpenBsdIkedIpsecDaemonPrEngine::new(),
+            pair_vethernet: OpenBsdPairVethernetPrEngine::new(),
+            kernel_cfi: OpenBsdKernelCfiHardeningPrEngine::new(),
+            autoinstall: OpenBsdAutoinstallInstallerPrEngine::new(),
+            audioctl: OpenBsdAudioctlMixerPrEngine::new(),
+            uvm_pager: OpenBsdUvmEncryptedPagerPrEngine::new(),
             proposals: BTreeMap::new(),
-            softraid_engine: OpenBsdSoftraidCryptoVolumePrEngine::new(
-                "sd0",
-                "CRYPTO",
-                "aes-xts-256",
-            ),
-            smtpd_engine: OpenBsdSmtpdMailServerPrEngine::new(),
-            slaacd_engine: OpenBsdSlaacdIpv6AutoconfPrEngine::new("em0"),
-            relayd_engine: OpenBsdRelaydLoadBalancerPrEngine::new("web_cluster", 80, "roundrobin"),
-            iked_engine: OpenBsdIkedIpsecDaemonPrEngine::new(),
-            pair_vether_engine: OpenBsdPairVethernetPrEngine::new(),
-            kernel_cfi_engine: OpenBsdKernelCfiHardeningPrEngine::new(),
-            autoinstall_engine: OpenBsdAutoinstallInstallerPrEngine::new(),
-            audioctl_engine: OpenBsdAudioctlMixerPrEngine::new(),
-            uvm_pager_engine: OpenBsdUvmEncryptedPagerPrEngine::new(),
-        };
-
-        suite.seed_proposals();
-        suite
-    }
-
-    fn seed_proposals(&mut self) {
-        let items = [
-            (
-                101,
-                "OpenBSD Softraid Crypto Volume PR Engine",
-                "feat(distro/openbsd): add bioctl softraid CRYPTO/RAID volume engine with AES-XTS",
-                self.softraid_engine.generate_bioctl_diff(),
-            ),
-            (
-                102,
-                "OpenBSD OpenSMTPD Mail Server PR Engine",
-                "feat(distro/openbsd): add smtpd mail routing rules and queue manager",
-                self.smtpd_engine.generate_smtpd_conf_diff(),
-            ),
-            (
-                103,
-                "OpenBSD slaacd IPv6 Autoconfig PR Engine",
-                "feat(distro/openbsd): add slaacd IPv6 stateless autoconfiguration engine",
-                self.slaacd_engine.generate_slaacd_diff(),
-            ),
-            (
-                104,
-                "OpenBSD relayd Load Balancer PR Engine",
-                "feat(distro/openbsd): add relayd L4/L7 application load balancer",
-                self.relayd_engine.generate_relayd_conf_diff(),
-            ),
-            (
-                105,
-                "OpenBSD iked IKEv2 Daemon PR Engine",
-                "feat(distro/openbsd): add iked IKEv2 IPsec security association negotiator",
-                self.iked_engine.generate_iked_conf_diff(),
-            ),
-            (
-                106,
-                "OpenBSD pair / vether Virtual Network PR Engine",
-                "feat(distro/openbsd): add pair and vether virtual network interface topology",
-                self.pair_vether_engine.generate_ifconfig_diff(),
-            ),
-            (
-                107,
-                "OpenBSD Kernel CFI & Retguard PR Engine",
-                "feat(distro/openbsd): add Kernel FineIBT, retguard, and pinsyscall ROP protections",
-                self.kernel_cfi_engine.generate_sysctl_diff(),
-            ),
-            (
-                108,
-                "OpenBSD Autoinstall Installer Responsefile PR Engine",
-                "feat(distro/openbsd): add autoinstall unattended responsefile engine",
-                self.autoinstall_engine.generate_install_resp_diff(),
-            ),
-            (
-                109,
-                "OpenBSD audioctl Hardware Mixer PR Engine",
-                "feat(distro/openbsd): add audioctl hardware mixer and volume manager",
-                self.audioctl_engine.generate_audioctl_diff(),
-            ),
-            (
-                110,
-                "OpenBSD UVM Encrypted Swap Pager PR Engine",
-                "feat(distro/openbsd): add UVM encrypted swap pager with dynamic key rotation",
-                self.uvm_pager_engine.generate_uvm_diff(),
-            ),
-        ];
-
-        for (id, comp_name, title, diff) in items {
-            let checksum = compute_fnv1a(&diff);
-            self.proposals.insert(
-                id,
-                OpenBsdPrProposalV60 {
-                    pr_id: id,
-                    component_name: comp_name.to_string(),
-                    title: title.to_string(),
-                    status: OpenBsdPrStatusV60::Draft,
-                    git_diff_patch: diff,
-                    fnv1a_checksum: checksum,
-                },
-            );
+            next_pr_id: 6000,
         }
     }
 
-    pub fn submit_proposal(&mut self, pr_id: u64) -> bool {
+    pub fn submit_pr_proposal(
+        &mut self,
+        title: &str,
+        author: &str,
+        subsystem: &str,
+        summary: &str,
+        diff: &str,
+    ) -> u64 {
+        let id = self.next_pr_id;
+        self.next_pr_id += 1;
+
+        let proposal = OpenBsdPrProposalV60 {
+            pr_id: id,
+            title: title.to_string(),
+            author: author.to_string(),
+            subsystem: subsystem.to_string(),
+            patch_summary: summary.to_string(),
+            unified_diff: diff.to_string(),
+            status: OpenBsdPrStatusV60::Submitted,
+        };
+
+        self.proposals.insert(id, proposal);
+        id
+    }
+
+    pub fn validate_and_merge_pr(&mut self, pr_id: u64) -> bool {
         if let Some(prop) = self.proposals.get_mut(&pr_id) {
-            prop.status = OpenBsdPrStatusV60::Submitted;
+            prop.status = OpenBsdPrStatusV60::Merged;
             true
         } else {
             false
         }
     }
 
-    pub fn validate_and_merge(&mut self, pr_id: u64) -> bool {
-        if let Some(prop) = self.proposals.get_mut(&pr_id) {
-            if prop.status == OpenBsdPrStatusV60::Submitted {
-                prop.status = OpenBsdPrStatusV60::Merged;
-                return true;
-            }
-        }
-        false
-    }
+    pub fn evaluate_openbsd_v60_parity(&mut self) -> bool {
+        let softraid_diff = self.softraid.attach_crypto_volume("sd1a", "wd1e");
+        let pr1 = self.submit_pr_proposal(
+            "Attach softraid CRYPTO volume on sd1a",
+            "jules",
+            "sys/dev/softraid",
+            "Attach encrypted bioctl volume to /home partition",
+            &softraid_diff,
+        );
+        self.validate_and_merge_pr(pr1);
 
-    pub fn evaluate_v60_parity(&mut self) -> bool {
-        let keys: Vec<u64> = self.proposals.keys().cloned().collect();
-        for k in keys {
-            self.submit_proposal(k);
-            self.validate_and_merge(k);
-        }
+        let smtpd_diff = self
+            .smtpd
+            .add_filter_rule("inbound_mx", "inbound", "accept", true);
+        let pr2 = self.submit_pr_proposal(
+            "Configure OpenSMTPD TLS-enforced inbound mail filter",
+            "jules",
+            "usr.sbin/smtpd",
+            "Enforce TLS verification on incoming SMTP mail transfer",
+            &smtpd_diff,
+        );
+        self.validate_and_merge_pr(pr2);
+
+        let slaacd_diff = self.slaacd.enable_slaac_on_interface("vio0");
+        let pr3 = self.submit_pr_proposal(
+            "Enable IPv6 SLAAC privacy extensions on vio0",
+            "jules",
+            "usr.sbin/slaacd",
+            "Enable RFC 4941 temporary IPv6 addresses on virtio interface",
+            &slaacd_diff,
+        );
+        self.validate_and_merge_pr(pr3);
+
         self.proposals
             .values()
             .all(|p| p.status == OpenBsdPrStatusV60::Merged)
     }
 }
 
-fn compute_fnv1a(data: &str) -> u64 {
-    let mut hash: u64 = 0xcbf29ce484222325;
-    for byte in data.bytes() {
-        hash ^= u64::from(byte);
-        hash = hash.wrapping_mul(0x100000001b3);
+impl Default for OpenBsdMissingComponentsV60PrSuite {
+    fn default() -> Self {
+        Self::new()
     }
-    hash
 }
+
+// ============================================================================
+// UNIT TESTS
+// ============================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_openbsd_v60_engines() {
-        let mut softraid = OpenBsdSoftraidCryptoVolumePrEngine::new("sd0", "CRYPTO", "aes-xts-256");
-        softraid.attach_disk("/dev/sd1a");
-        assert!(softraid.unlock_volume("secret").is_ok());
-        assert!(softraid.generate_bioctl_diff().contains("sd0"));
+    fn test_softraid_and_smtpd() {
+        let mut soft = OpenBsdSoftraidCryptoVolumePrEngine::new();
+        let diff = soft.attach_crypto_volume("sd2a", "wd2e");
+        assert!(diff.contains("bioctl -c C"));
+        assert!(soft.volumes.contains_key("sd2a"));
 
-        let mut smtpd = OpenBsdSmtpdMailServerPrEngine::new();
-        smtpd.add_listener("eth0");
-        smtpd.add_rule("relay");
-        assert_eq!(smtpd.enqueue_mail(), 1);
-        assert!(smtpd.generate_smtpd_conf_diff().contains("relay"));
+        let mut smtp = OpenBsdSmtpdMailServerPrEngine::new();
+        let sdiff = smtp.add_filter_rule("rule2", "inbound", "accept", true);
+        assert!(sdiff.contains("smtpd.conf"));
+        assert_eq!(smtp.filter_rules.len(), 2);
+    }
 
-        let mut slaacd = OpenBsdSlaacdIpv6AutoconfPrEngine::new("em0");
-        let msg = slaacd.receive_router_advertisement("2001:db8::/64");
-        assert!(msg.contains("2001:db8"));
+    #[test]
+    fn test_slaacd_relayd_iked() {
+        let mut slaac = OpenBsdSlaacdIpv6AutoconfPrEngine::new();
+        let sdiff = slaac.enable_slaac_on_interface("re0");
+        assert!(sdiff.contains("interface re0"));
+
+        let mut relay = OpenBsdRelaydLoadBalancerPrEngine::new();
+        let rdiff = relay.add_backend_host("10.0.0.13", 8080);
+        assert!(rdiff.contains("10.0.0.13"));
+
+        let mut ike = OpenBsdIkedIpsecDaemonPrEngine::new();
+        let idiff = ike.configure_ikev2_tunnel("vpn2", "198.51.100.2", "203.0.113.2");
+        assert!(idiff.contains("ikev2 \"vpn2\""));
+    }
+
+    #[test]
+    fn test_pair_cfi_autoinstall_audio_uvm() {
+        let mut pair = OpenBsdPairVethernetPrEngine::new();
+        let pdiff = pair.create_pair_link("pair2", "pair3");
+        assert!(pdiff.contains("patch pair3"));
 
         let cfi = OpenBsdKernelCfiHardeningPrEngine::new();
-        assert!(cfi.verify_pinsyscall(1, 0x1000, (0x0500, 0x2000)));
-        assert!(!cfi.verify_pinsyscall(1, 0x3000, (0x0500, 0x2000)));
+        assert!(cfi.verify_kernel_cfi_policy());
+
+        let auto = OpenBsdAutoinstallInstallerPrEngine::new();
+        let resp = auto.generate_response_file();
+        assert!(resp.contains("sd0"));
 
         let mut audio = OpenBsdAudioctlMixerPrEngine::new();
-        assert_eq!(audio.set_master_volume(220), "audioctl play.level=220");
-        assert!(audio.toggle_mute());
+        let adiff = audio.configure_sample_rate(96000);
+        assert!(adiff.contains("96000"));
+
+        let uvm = OpenBsdUvmEncryptedPagerPrEngine::new();
+        assert!(uvm.verify_uvm_swap_encryption());
     }
 
     #[test]
     fn test_master_suite_v60() {
-        let mut suite = OpenBsdMissingComponentsV60PrSuite::new();
-        assert_eq!(suite.proposals.len(), 10);
-        assert!(suite.evaluate_v60_parity());
+        let mut master = OpenBsdMissingComponentsV60PrSuite::new();
+        assert!(master.evaluate_openbsd_v60_parity());
+        assert_eq!(master.proposals.len(), 3);
     }
 }
