@@ -14,20 +14,13 @@ fn test_v58_pr_suite_staging_and_execution() {
 
     for pr_id in 3801..=3810 {
         let submission = suite.submissions.get(&pr_id);
-        assert!(
-            submission.is_some(),
-            "PR proposal #{} must exist in V58 suite",
-            pr_id
-        );
+        assert!(submission.is_some(), "PR proposal #{} must exist in V58 suite", pr_id);
         let pr = submission.unwrap();
         assert_eq!(pr.status, OsPrStatusV58::Merged);
         assert!(pr.unified_diff.contains(&format!("PR #{}", pr_id)));
     }
 
-    assert!(
-        suite.execute_and_verify_all(),
-        "Execution of all V58 PR proposals failed"
-    );
+    assert!(suite.execute_and_verify_all(), "Execution of all V58 PR proposals failed");
 }
 
 #[test]

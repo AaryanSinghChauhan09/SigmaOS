@@ -138,11 +138,7 @@ impl CadcraftNurbsCurveSurfacePrEngine {
     }
 
     /// Check surface continuity between two NURBS boundary patches
-    pub fn verify_continuity(
-        &self,
-        other_patch: &CadcraftNurbsCurveSurfacePrEngine,
-        level: ContinuityLevel,
-    ) -> bool {
+    pub fn verify_continuity(&self, other_patch: &CadcraftNurbsCurveSurfacePrEngine, level: ContinuityLevel) -> bool {
         let p1 = self.evaluate_curve_point(1.0);
         let p2 = other_patch.evaluate_curve_point(0.0);
 
@@ -151,9 +147,7 @@ impl CadcraftNurbsCurveSurfacePrEngine {
 
         match level {
             ContinuityLevel::G0Position => position_match,
-            ContinuityLevel::G1Tangent
-            | ContinuityLevel::G2Curvature
-            | ContinuityLevel::G3Torsion => position_match,
+            ContinuityLevel::G1Tangent | ContinuityLevel::G2Curvature | ContinuityLevel::G3Torsion => position_match,
         }
     }
 
@@ -188,35 +182,11 @@ impl Default for CadcraftNurbsCurveSurfacePrEngine {
 /// 3D Kinematic Mate Type
 #[derive(Debug, Clone, PartialEq)]
 pub enum KinematicMateType3D {
-    SphericalJoint {
-        part1_id: u32,
-        part2_id: u32,
-        pivot_x: f64,
-        pivot_y: f64,
-        pivot_z: f64,
-    },
-    CylindricalJoint {
-        part1_id: u32,
-        part2_id: u32,
-        axis_dir_x: f64,
-        axis_dir_y: f64,
-        axis_dir_z: f64,
-    },
-    GearRatioJoint {
-        gear1_id: u32,
-        gear2_id: u32,
-        teeth_ratio: f64,
-    },
-    ScrewJoint {
-        bolt_id: u32,
-        nut_id: u32,
-        pitch_mm_rev: f64,
-    },
-    CamFollowerJoint {
-        cam_id: u32,
-        follower_id: u32,
-        stroke_mm: f64,
-    },
+    SphericalJoint { part1_id: u32, part2_id: u32, pivot_x: f64, pivot_y: f64, pivot_z: f64 },
+    CylindricalJoint { part1_id: u32, part2_id: u32, axis_dir_x: f64, axis_dir_y: f64, axis_dir_z: f64 },
+    GearRatioJoint { gear1_id: u32, gear2_id: u32, teeth_ratio: f64 },
+    ScrewJoint { bolt_id: u32, nut_id: u32, pitch_mm_rev: f64 },
+    CamFollowerJoint { cam_id: u32, follower_id: u32, stroke_mm: f64 },
 }
 
 /// 3D Assembly Kinematic Mate & 6-DOF Multidimensional Solver Engine.
@@ -313,12 +283,7 @@ impl CadcraftMultiAxisCncCamToolpathPrEngine {
     }
 
     /// Generate multi-axis G-code with High-Speed Machining (HSM) trochoidal toolpath
-    pub fn generate_post_processed_gcode(
-        &self,
-        dialect: GCodeDialect,
-        tool_num: u32,
-        spindle_rpm: u32,
-    ) -> String {
+    pub fn generate_post_processed_gcode(&self, dialect: GCodeDialect, tool_num: u32, spindle_rpm: u32) -> String {
         let mut output = String::new();
 
         match dialect {
@@ -409,15 +374,10 @@ impl CadcraftNonLinearTransientFeaCaePrEngine {
     }
 
     /// Solve coupled transient thermal-structural FEA analysis with modal vibration frequencies
-    pub fn solve_transient_thermal_structural(
-        &self,
-        force_n: f64,
-        heat_input_w: f64,
-    ) -> TransientFeaResult {
+    pub fn solve_transient_thermal_structural(&self, force_n: f64, heat_input_w: f64) -> TransientFeaResult {
         let max_von_mises_stress_mpa = (force_n / 100.0).min(800.0);
         let temperature_peak_c = 25.0 + (heat_input_w / self.thermal_conductivity_w_mk);
-        let thermal_expansion_mm =
-            (temperature_peak_c - 25.0) * self.thermal_expansion_coeff * 100.0;
+        let thermal_expansion_mm = (temperature_peak_c - 25.0) * self.thermal_expansion_coeff * 100.0;
         let fundamental_frequency_hz = (200e9 / self.density_kg_m3).sqrt() / (2.0 * 3.14159);
 
         TransientFeaResult {
@@ -482,22 +442,15 @@ impl CadcraftSheetMetalSurfaceUnfoldPrEngine {
     /// Calculate bend allowance (BA) and bend deduction (BD)
     pub fn calculate_bend_deduction(&self, bend: &SheetMetalBend) -> (f64, f64) {
         let pi = 3.141592653589793;
-        let bend_allowance =
-            (pi / 180.0) * bend.angle_deg * (bend.radius_mm + bend.k_factor * bend.thickness_mm);
-        let setback =
-            (pi / 180.0 * (bend.angle_deg / 2.0)).tan() * (bend.radius_mm + bend.thickness_mm);
+        let bend_allowance = (pi / 180.0) * bend.angle_deg * (bend.radius_mm + bend.k_factor * bend.thickness_mm);
+        let setback = (pi / 180.0 * (bend.angle_deg / 2.0)).tan() * (bend.radius_mm + bend.thickness_mm);
         let bend_deduction = 2.0 * setback - bend_allowance;
 
         (bend_allowance, bend_deduction)
     }
 
     /// Generate 2D flat pattern DXF outline for laser/plasma cut sheet metal
-    pub fn generate_flat_pattern_dxf(
-        &self,
-        flange_length1_mm: f64,
-        flange_length2_mm: f64,
-        bend: &SheetMetalBend,
-    ) -> String {
+    pub fn generate_flat_pattern_dxf(&self, flange_length1_mm: f64, flange_length2_mm: f64, bend: &SheetMetalBend) -> String {
         let (ba, _) = self.calculate_bend_deduction(bend);
         let total_flat_length = flange_length1_mm + flange_length2_mm + ba;
 
@@ -513,9 +466,7 @@ impl CadcraftSheetMetalSurfaceUnfoldPrEngine {
     pub fn generate_proposal(&self) -> CadcraftPrProposalManifest {
         CadcraftPrProposalManifest {
             pr_id: 820,
-            pr_title:
-                "feat(cadcraft): Implement Sheet Metal K-Factor Bend Deduction & Flat Unfold Engine"
-                    .to_string(),
+            pr_title: "feat(cadcraft): Implement Sheet Metal K-Factor Bend Deduction & Flat Unfold Engine".to_string(),
             target_subsystem: "CadCraft Sheet Metal Engine".to_string(),
             original_suite: "ArtCraft CadCraft Sheet Metal Design".to_string(),
             components_added: vec![
@@ -582,15 +533,9 @@ impl CadcraftEdaPcb3dIntegrationPrEngine {
 
         for comp in &self.components {
             if comp.height_mm > enclosure_height_mm {
-                violations.push(format!(
-                    "Collision: {} (height {:.1}mm > enclosure {:.1}mm)",
-                    comp.designation, comp.height_mm, enclosure_height_mm
-                ));
+                violations.push(format!("Collision: {} (height {:.1}mm > enclosure {:.1}mm)", comp.designation, comp.height_mm, enclosure_height_mm));
             } else if comp.max_clearance_req_mm > enclosure_height_mm {
-                violations.push(format!(
-                    "Clearance Warning: {} (req {:.1}mm > enclosure {:.1}mm)",
-                    comp.designation, comp.max_clearance_req_mm, enclosure_height_mm
-                ));
+                violations.push(format!("Clearance Warning: {} (req {:.1}mm > enclosure {:.1}mm)", comp.designation, comp.max_clearance_req_mm, enclosure_height_mm));
             }
         }
 
@@ -651,24 +596,19 @@ impl SovereignCadcraftArtcraftParityPrGateway {
         let point = self.nurbs_engine.evaluate_curve_point(0.5);
         let nurbs_ok = point.weight > 0.0;
 
-        self.kinematic_solver_3d
-            .add_mate(KinematicMateType3D::SphericalJoint {
-                part1_id: 1,
-                part2_id: 2,
-                pivot_x: 0.0,
-                pivot_y: 0.0,
-                pivot_z: 0.0,
-            });
+        self.kinematic_solver_3d.add_mate(KinematicMateType3D::SphericalJoint {
+            part1_id: 1,
+            part2_id: 2,
+            pivot_x: 0.0,
+            pivot_y: 0.0,
+            pivot_z: 0.0,
+        });
         let solver_ok = self.kinematic_solver_3d.solve_kinematic_assembly();
 
-        let gcode =
-            self.multi_axis_cam
-                .generate_post_processed_gcode(GCodeDialect::Fanuc, 1, 12000);
+        let gcode = self.multi_axis_cam.generate_post_processed_gcode(GCodeDialect::Fanuc, 1, 12000);
         let cam_ok = gcode.contains("G90") && gcode.contains("M30");
 
-        let fea_res = self
-            .transient_fea
-            .solve_transient_thermal_structural(1000.0, 500.0);
+        let fea_res = self.transient_fea.solve_transient_thermal_structural(1000.0, 500.0);
         let fea_ok = fea_res.max_von_mises_stress_mpa > 0.0 && fea_res.temperature_peak_c > 25.0;
 
         let bend = SheetMetalBend {
@@ -702,10 +642,7 @@ impl SovereignCadcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals
-                .iter()
-                .filter(|p| p.status == "Ready for Merge")
-                .count();
+            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -775,8 +712,7 @@ mod tests {
         assert!(fanuc_gcode.contains("S12000 M03"));
         assert!(fanuc_gcode.contains("M30"));
 
-        let heidenhain_code =
-            engine.generate_post_processed_gcode(GCodeDialect::Heidenhain, 2, 8000);
+        let heidenhain_code = engine.generate_post_processed_gcode(GCodeDialect::Heidenhain, 2, 8000);
         assert!(heidenhain_code.contains("BEGIN PGM"));
         assert!(heidenhain_code.contains("END PGM"));
     }
