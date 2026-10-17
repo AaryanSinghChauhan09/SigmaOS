@@ -117,12 +117,13 @@ impl SigmaMQ {
         }
 
         let queue = message.queue.clone();
-        self.messages.insert(message.message_id.clone(), message);
+        let message_id = message.message_id.clone();
+        self.messages.insert(message_id.clone(), message);
 
         self.queue_messages
             .entry(queue)
             .or_insert_with(Vec::new)
-            .push(message.message_id.clone());
+            .push(message_id);
 
         self.message_counter += 1;
         Ok(())

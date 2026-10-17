@@ -5,6 +5,8 @@ extern crate alloc;
 
 extern crate alloc;
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -14,31 +16,48 @@ use alloc::vec::Vec;
 pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
-    ArchitectureDocument,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
     ArticleIdea,
     ArchitectureDocument,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
-    AppReplacementPr,
-    SovereignArchitectureDoc,
-    RoadmapIdea,
     UnimplementedIdeas,
     MediaWikiDoc,
+    AppReplacementPr,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
+    SovereignArchitectureDoc,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct RoadmapFeatureIdea {
-    pub idea_id: u32,
-    pub id: u32,
+    pub idea_id: u64,
     pub title: String,
-    pub category: String,
     pub source_type: FeatureSourceType,
     pub source_file: String,
     pub target_module: String,
     pub is_fully_implemented: bool,
-    pub fulfilled: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum IdeaCategory {
+    MultimediaTools,
+    SystemUtilities,
+    PackageAndAppManagement,
+    SecurityAndPrivacy,
+    PerformanceAndKernel,
+    NetworkingAndMesh,
+    UiAndDesktopExperience,
+    DeveloperAndBuildTools,
+    ComplianceAndGovernance,
+    FuturisticAndAiInnovations,
+}
+
+#[derive(Debug, Clone)]
+pub struct ImprovementIdeaRecord {
+    pub id: u32,
+    pub name: String,
+    pub category: IdeaCategory,
+    pub legacy_counterparts: String,
+    pub implementation_module: String,
+    pub is_fulfilled: bool,
 }
 
 #[derive(Debug)]
@@ -81,12 +100,29 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SovereignShardId {
+    Shard01ProductivityOffice,
+    Shard02MediaCreativeSuite,
+    Shard03SecurityHardening,
+    Shard04NetworkInfrastructure,
+    Shard05DeveloperToolchain,
+    Shard06DesktopCompositor,
+    Shard07UniversalPackaging,
+    Shard08KernelMicroarchitecture,
+    Shard09AiAutomationAgent,
+    Shard10SystemMonitoringDiagnostics,
+    Shard11HardwareDriverExpansion,
+    Shard12GovernanceCommunityWiki,
+}
+
 #[derive(Debug, Clone)]
-pub struct ShardRecord {
-    pub shard_id: u32,
-    pub name: String,
-    pub status_active: bool,
+pub struct SovereignShardDescriptor {
+    pub id: SovereignShardId,
+    pub code_name: &'static str,
+    pub absorbed_legacy_software: Vec<&'static str>,
     pub zero_alloc_rust_native: bool,
+    pub status_active: bool,
 }
 
 #[derive(Debug)]
@@ -161,12 +197,14 @@ impl SovereignDistroGapClosureEngine {
             sigma_counterpart: "ArchPacmanContribEngine",
             verification_passed: true,
         });
+
         self.features.push(DistroGapFeatureRecord {
             distro_name: "OpenBSD",
             gap_feature_name: "pledge, unveil, KARL, retguard, signify",
             sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
+
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
@@ -260,7 +298,7 @@ pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,
     pub shards_registry: SovereignShardsMasterRegistry,
     pub distro_gap_closure: SovereignDistroGapClosureEngine,
-    pub roadmap_parity: SovereignLinuxBsdWikiRoadmapParityEngine,
+    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
     pub syncer: WikiSpecificationDataSyncer,
 }
 
@@ -271,7 +309,7 @@ impl SovereignWikiMasterEngine {
             suite_100_ideas: Sovereign100IdeasSuite::new(),
             shards_registry: SovereignShardsMasterRegistry::new(),
             distro_gap_closure: SovereignDistroGapClosureEngine::new(),
-            roadmap_parity: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
             syncer: WikiSpecificationDataSyncer::new(),
         }
     }
@@ -280,7 +318,7 @@ impl SovereignWikiMasterEngine {
         let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
         let shards_ok = self.shards_registry.is_all_12_shards_active();
         let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let roadmap_ok = self.roadmap_parity.verify_100_percent_parity();
+        let parity_ok = self.parity_engine.verify_100_percent_parity();
 
         ideas_ok && shards_ok && gap_closure_ok && parity_ok
     }
@@ -358,5 +396,14 @@ mod tests {
     fn test_master_wiki_engine_fulfillment() {
         let master = SovereignWikiMasterEngine::new();
         assert!(master.evaluate_master_wiki_fulfillment());
+    }
+
+    #[test]
+    fn test_master_wiki_verification_suite() {
+        let suite = MasterWikiAndRoadmapVerificationSuite::new();
+        assert!(suite.health_check());
+        assert!(suite
+            .summary_report()
+            .contains("Parity Verification: 100.0%"));
     }
 }

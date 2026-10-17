@@ -505,12 +505,12 @@ impl SigmaRepo {
     /// Update all enabled repositories
     pub fn update_all(&mut self, timestamp: u64) -> Vec<String> {
         let mut errors = Vec::new();
-        let names: Vec<String> = self
+        let enabled_names: Vec<String> = self
             .list_enabled_repositories()
             .into_iter()
             .map(|repo| repo.name.clone())
             .collect();
-        for name in names {
+        for name in enabled_names {
             if let Err(e) = self.update_repository(&name, timestamp) {
                 errors.push(e);
             }

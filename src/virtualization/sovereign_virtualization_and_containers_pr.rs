@@ -691,6 +691,7 @@ impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
         let mut handlers = Vec::new();
         handlers.push("runc".to_string());
+        handlers.push("crun".to_string());
         handlers.push("gvisor".to_string());
         handlers.push("kata".to_string());
         Self {
@@ -698,7 +699,7 @@ impl KubernetesK3sRancherEngine {
             crio_runtime_handlers: handlers,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: crio,
+            crio_runtime_handlers: handlers,
         }
     }
 
