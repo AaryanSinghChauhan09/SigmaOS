@@ -4,7 +4,7 @@
 
 The **Sovereign Application Replacements Suite** provides zero-download, built-in, sovereign alternatives to applications commonly shipped across Linux & BSD distributions. These replacements eliminate external package download dependencies for common desktop workflows (web browsing, email, office suite, text editing, graphics studio, document viewing, file management, terminal multiplexing, media playback/audio production, secrets management, process monitoring, P2P torrenting, real-time chat, archive management, and disk partitioning).
 
-Implemented natively in Rust within `src/productivity/sovereign_application_replacements_pr_suite.rs` (PR IDs 201–215) and `src/productivity/sovereign_application_replacements_v2_pr_suite.rs` (PR IDs 216–230), aggregated via `SovereignApplicationReplacementsPrGateway` and `SovereignApplicationReplacementsV2PrGateway`, this PR suite introduces 30 dedicated Pull Request proposal engines.
+Implemented natively in Rust within `src/productivity/sovereign_application_replacements_pr_suite.rs` and aggregated via `SovereignApplicationReplacementsPrGateway`, this PR suite introduces 15 dedicated Pull Request proposal engines (PR IDs 201–215).
 
 ---
 
@@ -17,7 +17,7 @@ Implemented natively in Rust within `src/productivity/sovereign_application_repl
 
 ---
 
-## Detailed PR Proposal Engines Matrix (PR IDs 201–230)
+## Detailed PR Proposal Engines Matrix (PR IDs 201–215)
 
 | PR ID | Feature / Title | Replaced Applications | Inspirations | Core Components Added | Performance Advantage |
 |---|---|---|---|---|---|
@@ -36,31 +36,16 @@ Implemented natively in Rust within `src/productivity/sovereign_application_repl
 | **213** | `feat(chat)`: Sovereign Matrix & IRC Chat Client | HexChat, Element, WeeChat, Irssi, Pidgin, Dino | IRCv3 Client Capabilities, Matrix Olm/Megolm E2EE Specs, WeeChat Headless TUI | Zero-dependency Matrix & IRC client, Olm/Megolm zero-knowledge key store, terminal TUI & GUI split windows, SASL/TLS certificate pinning | <8MB Memory Footprint vs 500MB+ Electron Element, Instant Room Sync |
 | **214** | `feat(archive)`: Sovereign Archive Manager & Compressor | Ark, File Roller, Xarchiver, PeaZip, 7-Zip GUI | GNU tar / BSD tar Zero-Copy Archive Creation, Zstd Multi-Thread Compression, OpenBSD pax Security | Streaming ZIP, TAR, Zstd & 7z codec, AES-256 encrypted archives with obfuscation, drag-and-drop extraction, ISO disc inspector | 3x Faster Zstd Multithreaded Extraction, Sub-1ms Cold Startup |
 | **215** | `feat(disks)`: Sovereign Disk Partitioning & Storage | GParted, GNOME Disks, KDE Partition Manager, gpart | GParted Non-Destructive Resizing & Alignment, FreeBSD GEOM Slicing, NVMe/SATA SMART Self-Test | Zero-dependency GPT/MBR/Disklabel editor, Btrfs/ZFS/Ext4/XFS/FAT32/exFAT/NTFS formatter, NVMe SMART reader, LUKS2/geli encryptor | Direct Kernel IOCTL Execution, Zero Dependency on External Tools |
-| **216** | `feat(browser)`: Sovereign Browser Web Engine V2 | Firefox, Chromium, Brave, Vivaldi, LibreWolf V2 | Firefox Containers V2, Kyber-1024 TLS 1.3 Key Exchange | WASM sandboxed DOM layout engine, uBlock Shields zero-allocation ad blocker | 90% Lower RAM Footprint (14MB vs 450MB/tab), 15x Faster Launch |
-| **217** | `feat(email)`: Sovereign Thunderbird Mail & Communications V2 | Thunderbird, Evolution, Claws Mail V2 | Dilithium5 Signatures, CardDAV, CalDAV | PQC Dilithium5 message encryptor, CardDAV contact book, CalDAV offline scheduler | 92% Memory Reduction (<10MB vs 320MB), Instant Search Indexing |
-| **218** | `feat(office)`: Sovereign LibreOffice Suite V2 | LibreOffice (Writer, Calc, Impress) V2 | ODF 1.3/1.4, CRDT Collaborative Engine | Multi-threaded Calc solver (1024+ functions), CRDT real-time sync | 15x Faster File Load, 98% Reduced Startup Time (<5ms cold boot) |
-| **219** | `feat(editors)`: Sovereign Text Editors V2 | Vim, Neovim, Emacs, nano V2 | Vim Motions, Neovim Lua JIT, Emacs Org-Mode | Modal text engine, Lua JIT async LSP, Org-mode agenda, nano shortcut bar | Sub-0.05ms Typing Latency, Zero CPU Idle Usage |
-| **220** | `feat(gimp)`: Sovereign GIMP Raster Graphics V2 | GIMP, Krita, Pinta V2 | GEGL/OpenFX Node Graph, Krita Brush Engine | SIMD canvas compositor, OpenFX node filter graph, pressure brush | 120 FPS 4K Canvas Zoom/Pan, 75% Less Memory |
-| **221** | `feat(evince)`: Sovereign Evince Document Reader V2 | Evince, Okular, Zathura V2 | Evince PDF/PS/DVI, Okular Annotations | Fast zero-dependency PDF renderer, annotation layer, EPUB/CBR reader | Sub-5ms Page Render, Zero-Lag 4K Continuous Scrolling |
-| **222** | `feat(filemanager)`: Sovereign File Managers Matrix V2 | Nautilus, Dolphin, Thunar, PCManFM V2 | Haiku BFS B-Tree Tags, Dolphin F3 Split View | Dual-pane split, B-tree tag catalog, bulk renamer, Zstd archive VFS | Instant Directory Listing (<0.2ms for 100k files), 92% Less Memory |
-| **223** | `feat(terminal)`: Sovereign Terminal Multiplexer V2 | Alacritty, Kitty, tmux V2 | GPU Direct Framebuffer, Kitty Sixel Protocols | GPU PTY renderer (240+ FPS), Kitty/Sixel decoders, session detach | <0.5ms Input-to-Glass Latency, 99.5% Lower CPU Overhead |
-| **224** | `feat(media)`: Sovereign Media Player & Audio Studio V2 | VLC, MPV, Audacity V2 | VLC Codecs, MPV VAAPI/NVDEC, Audacity DSP | VAAPI/VDPAU zero-copy decoder, 1024-band FFT spectrogram, AV1/AV2 profiles | Zero Frame Drops on 8K 120FPS Video, 85% Lower Power Draw |
-| **225** | `feat(vault)`: Sovereign Password Vault V2 | KeePassXC, pass, Bitwarden V2 | KeePassXC Argon2id, Kyber-1024 Encryption | TPM2/SecureEnclave store, Kyber-1024 + ChaCha20 database, Git sync | TPM2 Hardware Protected Master Keys, Zero Plaintext Leakage |
-| **226** | `feat(sysmon)`: Sovereign System Monitor V2 | htop, btop, top V2 | btop TUI, eBPF Syscall Tracepoints, PSI Stalls | Zero-allocation /proc reader, eBPF disk/socket profiler, PSI monitors | <0.05% CPU Overhead, 100% Lockless Kernel Collection |
-| **227** | `feat(p2p)`: Sovereign BitTorrent P2P Sharing V2 | Transmission, Deluge, qBittorrent V2 | BEP-0005 DHT, PQC Kyber Handshakes | Magnet parser, forced PQC encrypted peer handshake, IP blocklist | Zero CPU Overhead on 10Gbps Swarm Downloads, 90% Memory Reduction |
-| **228** | `feat(chat)`: Sovereign Matrix & IRC Chat Client V2 | HexChat, Element, WeeChat V2 | Matrix Olm/Megolm E2EE, IRCv3 SASL | Olm/Megolm zero-knowledge key store, TUI/GUI split windows, TLS pinning | <6MB Memory Footprint vs 500MB+ Electron Element |
-| **229** | `feat(archive)`: Sovereign Archive Manager & Compressor V2 | Ark, File Roller, 7-Zip V2 | Zstandard Multithreaded, OpenBSD pax | Streaming ZIP/TAR/Zstd/7z/SIG codec, AES-256/Argon2id encryption | 5x Faster Zstd Multithreaded Extraction, Sub-0.5ms Startup |
-| **230** | `feat(disks)`: Sovereign Disk Partitioning & Storage V2 | GParted, GNOME Disks, gpart V2 | GParted Resizing, FreeBSD GEOM, NVMe SMART | GPT/MBR editor, Btrfs/ZFS/Ext4/Bcachefs formatter, LUKS2 encryptor | Direct Kernel IOCTL Execution, Zero Dependency on External Tools |
 
 ---
 
 ## Verification & Testing
 
-All 30 sovereign replacement PR engines are fully validated via automated unit tests in `src/productivity/sovereign_application_replacements_pr_suite.rs` and `src/productivity/sovereign_application_replacements_v2_pr_suite.rs` and integrated into `./run_sigma_tests.sh`.
+All 15 sovereign replacement PR engines are fully validated via automated unit tests in `src/productivity/sovereign_application_replacements_pr_suite.rs` and integrated into `./run_sigma_tests.sh`.
 
 Run standalone tests via:
 ```bash
-rustc --test src/productivity/sovereign_application_replacements_pr_suite.rs --edition=2021 -o build/test_app_replacements_pr_suite && ./build/test_app_replacements_pr_suite
-rustc --test src/productivity/sovereign_application_replacements_v2_pr_suite.rs --edition=2021 -o build/test_app_replacements_v2_pr_suite && ./build/test_app_replacements_v2_pr_suite
+rustc --test src/productivity/sovereign_application_replacements_pr_suite.rs --edition=2021 -o build/test_app_replacements_pr_suite
+./build/test_app_replacements_pr_suite
 ```
 Or execute the master suite via `./run_sigma_tests.sh`.
