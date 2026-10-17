@@ -357,13 +357,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         list
     }
 
-    pub fn run_tr(
-        &self,
-        input: &str,
-        from_chars: &str,
-        to_chars: &str,
-        delete: bool,
-    ) -> String {
+    pub fn run_tr(&self, input: &str, from_chars: &str, to_chars: &str, delete: bool) -> String {
         let mut res = String::new();
         for c in input.chars() {
             if delete {
@@ -385,12 +379,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         res
     }
 
-    pub fn run_head_tail_bytes(
-        &self,
-        bytes: &[u8],
-        bytes_count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
+    pub fn run_head_tail_bytes(&self, bytes: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
         if is_head {
             bytes.iter().take(bytes_count).copied().collect()
         } else {
