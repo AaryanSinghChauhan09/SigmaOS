@@ -20,6 +20,7 @@
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 /// Status of a CachyOS PR Engine operation
@@ -74,7 +75,9 @@ impl CachyOsScxLavdSchedulerPrEngine {
             title: "feat(cachyos): SCX_LAVD BPF Gaming Latency Governor".to_string(),
             component_id: "cachyos-scx-lavd-latency-governor".to_string(),
             status: CachyOsPrStatus::Proposed,
-            patch_description: "Implements SCX_LAVD BPF scheduler tuning for low-latency gaming priority".to_string(),
+            patch_description:
+                "Implements SCX_LAVD BPF scheduler tuning for low-latency gaming priority"
+                    .to_string(),
             diff_summary: "+240 lines: sched_ext LAVD BPF policy hooks".to_string(),
         }
     }
@@ -110,7 +113,9 @@ impl CachyOsKernelPgoProfilePrEngine {
             title: "feat(cachyos): LLVM PGO & ThinLTO Kernel Optimization Engine".to_string(),
             component_id: "cachyos-kernel-llvm-pgo-instrumentation".to_string(),
             status: CachyOsPrStatus::Proposed,
-            patch_description: "Integrates Profile-Guided Optimization passes into kernel build pipelines".to_string(),
+            patch_description:
+                "Integrates Profile-Guided Optimization passes into kernel build pipelines"
+                    .to_string(),
             diff_summary: "+180 lines: PGO profdata ingestion & LLVM LTO directives".to_string(),
         }
     }
@@ -137,17 +142,24 @@ impl CachyOsHandheldGyroRemapperPrEngine {
     }
 
     pub fn calibrate_gyro(&mut self, deadzone: f32) -> String {
-        format!("Gyro calibrated for {}: deadzone={:.2}", self.device_detected, deadzone)
+        format!(
+            "Gyro calibrated for {}: deadzone={:.2}",
+            self.device_detected, deadzone
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
         CachyOsPrManifest {
             pr_number: 6103,
-            title: "feat(cachyos): Handheld Gyro Input Remapper for Steam Deck / ROG Ally".to_string(),
+            title: "feat(cachyos): Handheld Gyro Input Remapper for Steam Deck / ROG Ally"
+                .to_string(),
             component_id: "cachyos-handheld-gyro-input-remapper".to_string(),
             status: CachyOsPrStatus::Proposed,
-            patch_description: "Translates 6-axis IMU gyro motion into high-precision mouse look/gamepad input".to_string(),
-            diff_summary: "+310 lines: evdev IMU parser and motion-to-axis transformation".to_string(),
+            patch_description:
+                "Translates 6-axis IMU gyro motion into high-precision mouse look/gamepad input"
+                    .to_string(),
+            diff_summary: "+310 lines: evdev IMU parser and motion-to-axis transformation"
+                .to_string(),
         }
     }
 }
@@ -287,7 +299,10 @@ impl CachyOsAnanicyCgroupsv2IoPrEngine {
 
     pub fn assign_game_priority(&mut self, pid: u32) -> String {
         self.active_game_pid = Some(pid);
-        format!("PID {} moved to high-priority cgroup v2 io.weight=200 cpu.weight=400", pid)
+        format!(
+            "PID {} moved to high-priority cgroup v2 io.weight=200 cpu.weight=400",
+            pid
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -402,7 +417,10 @@ impl CachyOsKsmZramHybridReclaimerPrEngine {
 
     pub fn reclaim_memory(&mut self) -> String {
         self.ksm_pages_scanned += 50_000;
-        format!("Reclaimed RAM: ZRAM ratio {:.1}x, total KSM pages scanned {}", self.zram_compression_ratio, self.ksm_pages_scanned)
+        format!(
+            "Reclaimed RAM: ZRAM ratio {:.1}x, total KSM pages scanned {}",
+            self.zram_compression_ratio, self.ksm_pages_scanned
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -469,16 +487,46 @@ impl CachyLinuxMissingComponentsV61PrSuite {
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
         map.insert("total_components".to_string(), "10".to_string());
-        map.insert("scx_lavd".to_string(), self.scx_lavd.generate_manifest().title);
-        map.insert("pgo_kernel".to_string(), self.pgo_kernel.generate_manifest().title);
-        map.insert("gyro_remapper".to_string(), self.gyro_remapper.generate_manifest().title);
-        map.insert("futex2_accel".to_string(), self.futex2_accel.generate_manifest().title);
-        map.insert("pacman_router".to_string(), self.pacman_router.generate_manifest().title);
-        map.insert("nvidia_sync".to_string(), self.nvidia_sync.generate_manifest().title);
-        map.insert("ananicy_io".to_string(), self.ananicy_io.generate_manifest().title);
-        map.insert("btrfs_zstd".to_string(), self.btrfs_zstd.generate_manifest().title);
-        map.insert("gamescope_pacer".to_string(), self.gamescope_pacer.generate_manifest().title);
-        map.insert("memory_reclaimer".to_string(), self.memory_reclaimer.generate_manifest().title);
+        map.insert(
+            "scx_lavd".to_string(),
+            self.scx_lavd.generate_manifest().title,
+        );
+        map.insert(
+            "pgo_kernel".to_string(),
+            self.pgo_kernel.generate_manifest().title,
+        );
+        map.insert(
+            "gyro_remapper".to_string(),
+            self.gyro_remapper.generate_manifest().title,
+        );
+        map.insert(
+            "futex2_accel".to_string(),
+            self.futex2_accel.generate_manifest().title,
+        );
+        map.insert(
+            "pacman_router".to_string(),
+            self.pacman_router.generate_manifest().title,
+        );
+        map.insert(
+            "nvidia_sync".to_string(),
+            self.nvidia_sync.generate_manifest().title,
+        );
+        map.insert(
+            "ananicy_io".to_string(),
+            self.ananicy_io.generate_manifest().title,
+        );
+        map.insert(
+            "btrfs_zstd".to_string(),
+            self.btrfs_zstd.generate_manifest().title,
+        );
+        map.insert(
+            "gamescope_pacer".to_string(),
+            self.gamescope_pacer.generate_manifest().title,
+        );
+        map.insert(
+            "memory_reclaimer".to_string(),
+            self.memory_reclaimer.generate_manifest().title,
+        );
         map
     }
 }
