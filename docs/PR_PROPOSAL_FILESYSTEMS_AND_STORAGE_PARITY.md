@@ -133,6 +133,50 @@ This collection of Pull Request proposals introduces native parity and high-perf
   - `sysfs` kobject attribute hierarchy (`/sys/bus/pci`, `/sys/class/net`)
   - `devfs` dynamic node manager with `udev`/`devd` event rule matching
 
+### PR #1012: feat(fs/bcachefs): Implement Bcachefs Multi-Drive Tiered Copy-On-Write Engine
+- **Category**: Filesystems
+- **Inspiration Sources**: Linux Kernel bcachefs, Bcachefs Tiered Storage & Erasure Coding, Bcachefs B-Tree Key-Value Architecture
+- **Performance Impact**: NVMe Speed for Hot Data with HDD Capacity Economy
+- **Resilience Rating**: Self-Healing Multi-Device Erasure Coding Protection
+- **Key Features Implemented**:
+  - Multi-drive SSD/HDD tiering allocator with hot/cold data promotion/demotion
+  - B-tree key-value extent layout for high-density IOPS
+  - Per-extent ChaCha20/AES encryption & LZ4/Zstd real-time compression
+  - Subvolume CoW snapshotting and erasure coding parity engine
+
+### PR #1013: feat(fs/hammer2): Implement DragonFly BSD HAMMER2 PFS Master/Slave Cluster Replication
+- **Category**: Filesystems
+- **Inspiration Sources**: DragonFly BSD HAMMER2, HAMMER2 Pseudo Filesystem (PFS) Clusters, HAMMER2 Zero-Copy Inode Snapshots
+- **Performance Impact**: Instant Multi-Node Clustered Replication & Rollback
+- **Resilience Rating**: Continuous Data Protection via Transid History
+- **Key Features Implemented**:
+  - Pseudo Filesystem (PFS) master/slave active-active replication matrix
+  - Transactional transaction-ID (transid) history tracking
+  - Instant zero-copy snapshot creation and online deduplication
+  - Directory hash-key indexing for constant-time lookups
+
+### PR #1014: feat(fs/erofs): Implement EROFS & SquashFS High-Density Compressed Read-Only Images
+- **Category**: Filesystems
+- **Inspiration Sources**: Linux Kernel EROFS (Enhanced Read-Only File System), Linux SquashFS / squashfs-tools, Fixed-Output Compression (LZ4 / Zstd)
+- **Performance Impact**: 70% Firmware Image Compression with Instant Cold Boot Reads
+- **Resilience Rating**: Cryptographically Sealed Read-Only System Root
+- **Key Features Implemented**:
+  - EROFS fixed-output block decompression engine for zero write-amplification
+  - SquashFS LZMA/XZ/Zstd container image parser
+  - Direct page-cache mapping for embedded firmware rootfs
+  - Inode deduplication and tail-packing optimization
+
+### PR #1015: feat(fs/fscache): Implement FS-Cache & Cachefilesd Network Storage Accelerator
+- **Category**: Filesystems
+- **Inspiration Sources**: Linux Kernel FS-Cache framework, cachefilesd local disk caching daemon, NFS/CIFS local persistent caching
+- **Performance Impact**: Local NVMe Speed for Remote Network Attached Storage
+- **Resilience Rating**: Offline Network Disconnection Cache Continuity
+- **Key Features Implemented**:
+  - Local SSD page cache backing store for remote NFS & CIFS mounts
+  - Coherent cache invalidation & TTL metadata manager
+  - Asynchronous write-behind and read-ahead staging buffer
+  - Cache cookie index and volume rebind engine
+
 ---
 
 ## Storage & Encryption PR Proposals
@@ -253,3 +297,14 @@ This collection of Pull Request proposals introduces native parity and high-perf
   - Background drive self-test runner (Short/Long) with predictive failure analytics
   - `udisks2` D-Bus daemon routing udev hotplug events and spindown policies
   - `autofs` kernel automounter with map parser and dynamic access trigger
+
+### PR #3006: feat(tools/fsck): Implement Universal Filesystem Consistency Repair & Formatting Framework
+- **Category**: Maintenance & Utilities
+- **Inspiration Sources**: Linux fsck wrapper / e2fsck / xfs_repair, FreeBSD fsck_ffs & fsck_ufs, OpenBSD fsck_ffs structural validator
+- **Performance Impact**: 5x Faster System Boot Recovery Scans
+- **Resilience Rating**: Zero-Data-Loss Fail-Safe Repair Safeguards
+- **Key Features Implemented**:
+  - Universal `fsck` auto-dispatcher with pass-1 through pass-5 structural validators
+  - `mkfs` unified parameter builder across ext4, XFS, Btrfs, ZFS, UFS, F2FS, exFAT, and NTFS
+  - Isolated offline repair sandbox with non-destructive dry-run logging
+  - S.M.A.R.T. pre-repair drive telemetry check to prevent repairing dying drives
