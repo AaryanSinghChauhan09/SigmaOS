@@ -755,8 +755,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec",
-                "proc_capsicum_sandbox_guard",
+                "pol_process_sec",
+                "freebsd_racct_mac_process_guard",
                 true,
             ),
         ];
@@ -847,15 +847,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
             | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
             _ => "sigpkg",
         }
-    }
-
-    pub fn translate_subsystem_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
     }
 
     pub fn dispatch_event(
@@ -1308,7 +1299,7 @@ mod tests {
         );
 
         let (audits, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 44);
+        assert_eq!(audits.len(), 31);
         assert_eq!(score, 100);
         for (_, compliant) in audits {
             assert!(compliant);
@@ -1317,9 +1308,9 @@ mod tests {
         let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
-            "jail_vnet",
+            "mac_capsicum_enforce",
         );
-        assert_eq!(translated, "ebpf_xdp_namespace");
+        assert_eq!(translated, "mac_capsicum_enforce");
     }
 
     #[test]

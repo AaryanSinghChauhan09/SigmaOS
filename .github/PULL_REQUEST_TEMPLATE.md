@@ -41,6 +41,14 @@
 - [ ] Interactive shell
 - [ ] Command interpreter
 
+## Shell component
+
+- [ ] Interactive prompt & signals
+- [ ] Command execution & builtins
+- [ ] Environment & expansion
+- [ ] Resource limits governor
+- [ ] Short circuit && / ||
+
 ## Component
 
 - [ ] Lexer / Parser
@@ -63,16 +71,16 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference study (Upstream study)
+## Reference study & Upstream study
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
 <!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- Upstream study:
-- What SigmaOS adopts:
+- Upstream study document:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
+- What SigmaOS adopts / adapts / rejects:
+- Decision: Adopt / Adapt / Reject
 - Reason:
 
 ## What SigmaOS adopts
@@ -94,14 +102,16 @@
 - [ ] Safe environment expansion
 - [ ] Built-in command error handling
 
-## Kernel safety review
+## Kernel safety review & Reviewer checklist
 
 - [ ] Safety and rollback plan defined
 - [ ] No unnecessary `unsafe`
 
 ## Shell safety review
 
-- [ ] Shell safety review
+- [ ] Command injection prevention verified
+- [ ] Environment variable sanitization checked
+- [ ] Signal trap safety verified
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
@@ -152,8 +162,4 @@
 
 - Safety and rollback:
 - Risk:
-- Rollback:
-
-## Reviewer checklist
-
-- [ ] Verification complete
+- Safety and rollback:

@@ -640,6 +640,19 @@ impl BsdRcInspirationsPrEngine {
         map
     }
 
+    /// Merge default rc.conf options with local override map.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base: &BTreeMap<String, String>,
+        local: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base.clone();
+        for (k, v) in local {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
     /// Execute `rc.subr` command action routing (start, stop, restart, status, poll).
     pub fn execute_rc_subr_action(
         &self,
