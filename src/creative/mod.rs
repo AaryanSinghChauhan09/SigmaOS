@@ -6,6 +6,7 @@ pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
 pub mod deckcraft;
+pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod figcraft;
@@ -132,6 +133,16 @@ pub use deckcraft::{
     DeckCraftPresenterZenithPrDeployer, DeckCraftPullRequestSpec,
     DeckCraftSlideLayoutMasterPrDeployer, DeckExportFormat, PresentationDeck, PresenterState,
     Slide, SlideElement, SlideExporterEngine, SlideLayoutType,
+};
+pub use deckcraft_missing_components_parity_pr::{
+    DeckcraftAdvancedVectorAnimationTimelinePrEngine,
+    DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine,
+    DeckcraftInteractivePollAudienceQnaPrEngine,
+    DeckcraftMultiFormatBatchExportRenderPrEngine,
+    DeckcraftPrProposalManifest,
+    DeckcraftRealtimeCrdtMultiUserCollabPrEngine,
+    DeckcraftSmartDiagramDataChartPrEngine,
+    SovereignDeckcraftArtcraftParityPrGateway,
 };
 pub use designcraft::{
     get_designcraft, init_designcraft, Artboard, Canvas, Color, ColorModel, Component,

@@ -41,6 +41,8 @@ pub enum SlideLayout {
     Custom,
 }
 
+pub type SlideLayoutType = SlideLayout;
+
 /// Type of element on a slide
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ElementType {
@@ -173,15 +175,38 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
+}
+
+pub type PresentationDeck = SlideDeck;
+
+/// Presenter view state
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u32,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
+
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ExportFormat {
-    ZenithPresentation,
-    PDF,
-    HTML5Slideshow,
-    PPTX,
+pub enum DeckExportFormat {
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
     Markdown,
+    ZenithPresentation,
 }
+
+pub type ExportFormat = DeckExportFormat;
 
 /// Slide Exporter Engine
 pub struct SlideExporterEngine;
@@ -234,6 +259,10 @@ impl SlideExporterEngine {
                     output.extend_from_slice(slide.title.as_bytes());
                     output.extend_from_slice(b"\n\n");
                 }
+            }
+            DeckExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_PRESENTATION_DECK_V1:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
             }
         }
 
