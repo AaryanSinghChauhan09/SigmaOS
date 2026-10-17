@@ -21,6 +21,7 @@ pub mod pdfcraft_artcraft_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
+pub mod soundcraft_missing_components_parity_pr;
 pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod wordcraft;
@@ -209,6 +210,14 @@ pub use soundcraft::{
     SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,
     SoundCraftPullRequestSpec, SoundCraftSpatialMixingMasteringPrDeployer, SoundTrack,
     Spatial3DPosition, SynthesizerVoice, Waveform,
+};
+pub use soundcraft_missing_components_parity_pr::{
+    AdsrEnvelope, AmbisonicOrder, AutomationPoint, ClipCrossfadeConfig, DawTrackDelta,
+    FadeCurveShape, GranularGrain, LoudnessMeterResult, MidiNoteEvent, Position3D,
+    SoundcraftAdvancedMultiTrackEnginePrEngine, SoundcraftMasteringLoudnessMeterPrEngine,
+    SoundcraftMidiVst3ClapPluginPrEngine, SoundcraftPrProposalManifest,
+    SoundcraftRealtimeCollabCrdtPrEngine, SoundcraftSpatial3dAmbisonicMasterPrEngine,
+    SoundcraftSpectralSynthesisSamplerPrEngine, SovereignSoundcraftArtcraftParityPrGateway,
 };
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,

@@ -30,6 +30,10 @@ pub enum ProjectType {
     Document,
     TextDocument,
     Word,
+    SoundCraft,
+    Audio,
+    Sound,
+    AudioCraft,
 }
 
 /// Project
