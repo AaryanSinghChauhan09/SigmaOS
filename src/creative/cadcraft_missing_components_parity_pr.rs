@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS - CadCraft & ArtCraft Missing Components Parity PR Gateway
+// SigmaOS - CadCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/cadcraft_missing_components_parity_pr.rs`)
 //
 // Provides structured PR proposals and full engine implementations for components

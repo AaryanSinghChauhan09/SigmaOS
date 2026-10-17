@@ -5,6 +5,7 @@
 pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
+pub mod cadcraft_missing_components_parity_pr;
 pub mod deckcraft;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
@@ -236,4 +237,18 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
+};
+pub use cadcraft::{
+    fnv1a_cadcraft_pr_digest, get_cadcraft, init_cadcraft, AssemblyComponent, AssemblyMate,
+    AssemblyMateType, CadCraft2dDraftingConstraintPrDeployer,
+    CadCraft3dSolidModelingPrDeployer, CadCraftAssemblyFemSimulationPrDeployer, CadCraftEngine,
+    CadCraftMasterPrDeploymentSuite, CadCraftPullRequestSpec, CamToolpath, CamToolpathType,
+    ExportFormat as CadExportFormat, FeaElement, FeaMesh, GeometricConstraint,
+    GeometricConstraintType, SketchEntity, SketchEntityType, SolidFeature, SolidFeatureType,
+};
+pub use cadcraft_missing_components_parity_pr::{
+    CadcraftEdaPcb3dIntegrationPrEngine, CadcraftMultiAxisCncCamToolpathPrEngine,
+    CadcraftNonLinearTransientFeaCaePrEngine, CadcraftNurbsCurveSurfacePrEngine,
+    CadcraftParametricConstraintSolver3dPrEngine, CadcraftPrProposalManifest,
+    CadcraftSheetMetalSurfaceUnfoldPrEngine, SovereignCadcraftArtcraftParityPrGateway,
 };
