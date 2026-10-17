@@ -623,19 +623,6 @@ impl BsdRcInspirationsPrEngine {
         Ok(ordered)
     }
 
-    /// Merge base `rc.conf` settings with `/etc/rc.conf.local` overrides.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base: &BTreeMap<String, String>,
-        overrides: &BTreeMap<String, String>,
-    ) -> BTreeMap<String, String> {
-        let mut merged = base.clone();
-        for (k, v) in overrides {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
-    }
-
     /// Parse `/etc/rc.conf` key-value pairs (e.g. `sshd_enable="YES"`, `hostname="sigma"`).
     pub fn parse_rc_conf(&self, content: &str) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
@@ -651,19 +638,6 @@ impl BsdRcInspirationsPrEngine {
             }
         }
         map
-    }
-
-    /// Merge base `/etc/rc.conf` with `/etc/rc.conf.local` overrides.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base: &BTreeMap<String, String>,
-        local: &BTreeMap<String, String>,
-    ) -> BTreeMap<String, String> {
-        let mut merged = base.clone();
-        for (k, v) in local {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
     }
 
     /// Execute `rc.subr` command action routing (start, stop, restart, status, poll).

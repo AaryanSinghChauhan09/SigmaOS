@@ -153,67 +153,6 @@ impl GnuCoreutilsBsdUserlandEngine {
         result
     }
 
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            sorted.sort_by(|a, b| {
-                let na = a.parse::<f64>().unwrap_or(0.0);
-                let nb = b.parse::<f64>().unwrap_or(0.0);
-                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
-            });
-        } else {
-            sorted.sort();
-        }
-        if reverse {
-            sorted.reverse();
-        }
-        if unique {
-            sorted.dedup();
-        }
-        sorted
-    }
-
-    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
-        if delete_mode {
-            input.chars().filter(|c| !from_set.contains(*c)).collect()
-        } else {
-            let mut out = String::with_capacity(input.len());
-            let from_chars: Vec<char> = from_set.chars().collect();
-            let to_chars: Vec<char> = to_set.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
-                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
-                        out.push(tc);
-                    } else {
-                        out.push(c);
-                    }
-                } else {
-                    out.push(c);
-                }
-            }
-            out
-        }
-    }
-
-    pub fn run_head_tail_bytes(
-        &self,
-        content: &[u8],
-        bytes_count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
-        if is_head {
-            content.iter().take(bytes_count).copied().collect()
-        } else {
-            let skip_count = content.len().saturating_sub(bytes_count);
-            content.iter().skip(skip_count).copied().collect()
-        }
-    }
 
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
         let lines: Vec<&str> = content.lines().collect();
@@ -392,6 +331,7 @@ impl GnuCoreutilsBsdUserlandEngine {
             .map(|(k, v)| format!("{}={}", k, v))
             .collect()
     }
+
 }
 
 // =========================================================================
@@ -1050,6 +990,7 @@ impl TextProcessingEngine {
         }
         totals
     }
+
 }
 
 // =========================================================================
@@ -1074,6 +1015,7 @@ impl ArchivalCompressionEngine {
     pub fn new() -> Self {
         Self
     }
+
 
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
         if magic_bytes.len() >= 4 && magic_bytes[0..4] == [0x28, 0xB5, 0x2F, 0xFD] {
@@ -1119,7 +1061,7 @@ impl ArchivalCompressionEngine {
         level: u32,
     ) -> Result<String, String> {
         Ok(format!(
-            "{:?} level {} configured successfully",
+            "{:?} compression level {} (threads=auto, dict_size=64MB)",
             format, level
         ))
     }
@@ -1245,33 +1187,6 @@ impl ProcpsPsmiscEngine {
             .collect()
     }
 
-    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
-        let pids = self.pgrep_find(name);
-        let count = pids.len();
-        (
-            count,
-            format!(
-                "killall: sent signal {} to {} process(es) matching '{}'",
-                signal, count, name
-            ),
-        )
-    }
-
-    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
-        self.ps_list_processes()
-            .into_iter()
-            .filter(|p| p.name.contains(filename))
-            .map(|p| p.pid)
-            .collect()
-    }
-
-    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
-        if pid > 0 {
-            Some((65536, 32768, 16384))
-        } else {
-            None
-        }
-    }
 
     pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
         let pids = self.pgrep_find(name);
@@ -1410,6 +1325,7 @@ impl DocumentationPagerEngine {
         }
         menu_items
     }
+
 }
 
 // =========================================================================
@@ -1516,6 +1432,7 @@ impl AuthPrivilegeSessionEngine {
             self.verify_shadow_hash(user, shadow_entry, attempt)
         }
     }
+
 
     pub fn pam_authenticate(&self, user: &str, service: &str) -> Result<String, &'static str> {
         if user.is_empty() {

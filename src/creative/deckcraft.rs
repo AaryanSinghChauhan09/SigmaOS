@@ -127,18 +127,6 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// Presenter View state
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
-
 /// Slide deck styling theme
 #[derive(Debug, Clone)]
 pub struct SlideTheme {
@@ -187,11 +175,7 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-impl SlideDeck {
-    pub fn get_active_slide(&self) -> Option<&Slide> {
-        self.slides.first()
-    }
-}
+pub type PresentationDeck = SlideDeck;
 
 pub type PresentationDeck = SlideDeck;
 
@@ -228,21 +212,17 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            DeckExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_PRESENTATION_V1:\nTitle: ");
-                output.extend_from_slice(deck.title.as_bytes());
-            }
-            DeckExportFormat::Pdf => {
+            ExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
                 output.extend_from_slice(deck.slides.len().to_string().as_bytes());
             }
-            ExportFormat::PPTX | ExportFormat::Pptx => {
+            ExportFormat::Pptx => {
                 output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
                 output.extend_from_slice(deck.title.as_bytes());
             }
-            ExportFormat::HTML5Slideshow | ExportFormat::Html5 => {
+            ExportFormat::Html5 => {
                 output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(

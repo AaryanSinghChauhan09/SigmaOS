@@ -3,8 +3,6 @@
 // Inspired by Adobe Creative Cloud, Serif Affinity Suite
 // Provides unified creative suite management
 
-#![no_std]
-
 extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
@@ -48,10 +46,9 @@ pub enum ProjectType {
     LightCraft,
     MediaCraft,
     AudioCraft,
-    Figcraft,
-    Fig,
-    UiUx,
-    Prototype,
+    Light,
+    Media,
+    Model3D,
 }
 
 /// Project

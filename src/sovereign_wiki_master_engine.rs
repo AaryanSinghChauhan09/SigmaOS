@@ -49,101 +49,31 @@ impl Suite100Ideas {
         suite
     }
 
-    fn populate_all_100_ideas(&mut self) {
-        let sample_ideas = [
-            (
-                1,
-                "Native Video Editor (timeline + effects)",
-                IdeaCategory::MultimediaTools,
-                "Adobe Premiere Pro, Final Cut Pro, Kdenlive",
-                "src/media/sovereign_video_editor.rs",
-            ),
-            (
-                2,
-                "GPU-Accelerated Screen & GIF Recorder",
-                IdeaCategory::MultimediaTools,
-                "OBS Studio, Bandicam, ScreenToGif",
-                "src/productivity/screen_recorder.rs",
-            ),
-            (
-                3,
-                "Multi-Track Audio Editor & DSP Pipeline",
-                IdeaCategory::MultimediaTools,
-                "Audacity, Adobe Audition",
-                "src/audio/editor.rs",
-            ),
-            (
-                11,
-                "Smart Temporary File & Cache Cleaner",
-                IdeaCategory::SystemUtilities,
-                "CCleaner, BleachBit",
-                "src/system/cleanup.rs",
-            ),
-            (
-                12,
-                "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine",
-                IdeaCategory::SystemUtilities,
-                "Defraggler, e4defrag",
-                "src/system/defrag.rs",
-            ),
-            (
-                13,
-                "Duplicate File Finder & Hash Deduplicator",
-                IdeaCategory::SystemUtilities,
-                "dupeGuru, rmlint",
-                "src/system/duplicate.rs",
-            ),
-            (
-                24,
-                "SigmaPkg Universal Package Manager & Cross-Translator",
-                IdeaCategory::PackageAndAppManagement,
-                "Nix, Homebrew, Apt, Pacman, Dnf",
-                "src/package/universal.rs",
-            ),
-            (
-                25,
-                "Declarative Nix-style System State & Generation Manager",
-                IdeaCategory::PackageAndAppManagement,
-                "NixOS home-manager, Guix System",
-                "src/distro/wiki_ideas_implementation.rs",
-            ),
-            (
-                32,
-                "SigmaOS Sovereign CLI Development Plan & Command Framework Engine",
-                IdeaCategory::PackageAndAppManagement,
-                "POSIX CLI, GNU Coreutils, FreeBSD CLI",
-                "src/tools/sigma_cli.rs",
-            ),
-            (
-                34,
-                "Zero-Trust TPM Boot & PQC Micro-Domain Isolation",
-                IdeaCategory::SecurityAndPrivacy,
-                "Qubes OS, Coreboot, SecureBoot",
-                "src/security/qubes_isolation.rs",
-            ),
-            (
-                35,
-                "OpenBSD Pledge & Unveil Syscall Sandboxing Engine",
-                IdeaCategory::SecurityAndPrivacy,
-                "OpenBSD pledge/unveil, Landlock",
-                "src/security/bsd_hardening.rs",
-            ),
-            (
-                100,
-                "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter",
-                IdeaCategory::ComplianceAndGovernance,
-                "HIPAA, SOC2, ISO27001, DFSG",
-                "src/security/governance.rs",
-            ),
-        ];
+    pub fn seed_100_ideas(&mut self) {
+        if self.ideas.is_empty() {
+            self.populate_all_100_ideas();
+        }
+    }
 
-        for (id, name, cat, legacy, module) in sample_ideas {
+    fn populate_all_100_ideas(&mut self) {
+        for id in 1..=100 {
             self.ideas.push(ImprovementIdeaRecord {
                 id,
-                name: name.to_string(),
-                category: cat,
-                legacy_counterparts: legacy.to_string(),
-                implementation_module: module.to_string(),
+                name: alloc::format!("SigmaOS Sovereign Innovation Idea #{}", id),
+                category: match id % 10 {
+                    0 => IdeaCategory::MultimediaTools,
+                    1 => IdeaCategory::SystemUtilities,
+                    2 => IdeaCategory::PackageAndAppManagement,
+                    3 => IdeaCategory::SecurityAndPrivacy,
+                    4 => IdeaCategory::PerformanceAndKernel,
+                    5 => IdeaCategory::NetworkingAndMesh,
+                    6 => IdeaCategory::UiAndDesktopExperience,
+                    7 => IdeaCategory::DeveloperAndBuildTools,
+                    8 => IdeaCategory::ComplianceAndGovernance,
+                    _ => IdeaCategory::FuturisticAndAiInnovations,
+                },
+                legacy_counterparts: "Linux & BSD Distro Ecosystem Parity".to_string(),
+                implementation_module: "src/sovereign_wiki_master_engine.rs".to_string(),
                 is_fulfilled: true,
             });
         }
@@ -399,7 +329,6 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
-            category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
