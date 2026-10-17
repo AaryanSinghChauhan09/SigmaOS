@@ -280,8 +280,14 @@ impl HaikuBfsRelationalAttributeEngine {
     pub fn execute_attribute_query(&mut self, query_str: &str) -> Vec<String> {
         self.active_queries_count += 1;
         vec![
-            format!("Haiku BFS query result 1 for '{}' on {}", query_str, self.volume_name),
-            format!("Haiku BFS query result 2 for '{}' on {}", query_str, self.volume_name),
+            format!(
+                "Haiku BFS query result 1 for '{}' on {}",
+                query_str, self.volume_name
+            ),
+            format!(
+                "Haiku BFS query result 2 for '{}' on {}",
+                query_str, self.volume_name
+            ),
         ]
     }
 }
@@ -306,7 +312,11 @@ pub struct Plan99P2000SyntheticVfsEngine {
 impl Plan99P2000SyntheticVfsEngine {
     pub fn new() -> Self {
         Self {
-            mounted_namespaces: vec!["/net".to_string(), "/proc".to_string(), "/dev/vfs".to_string()],
+            mounted_namespaces: vec![
+                "/net".to_string(),
+                "/proc".to_string(),
+                "/dev/vfs".to_string(),
+            ],
             rfork_flags: 0x0003_2000,
             synthetic_nodes_count: 128,
         }
@@ -346,7 +356,9 @@ impl NixGuixHermeticMerkleStoreEngine {
     pub fn new() -> Self {
         Self {
             store_generations_count: 92,
-            merkle_root_hash: "blake3:a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e".to_string(),
+            merkle_root_hash:
+                "blake3:a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e"
+                    .to_string(),
             closure_tree_depth: 48,
         }
     }
@@ -535,7 +547,9 @@ impl SovereignOpenSourceOsV59MasterSuite {
         let rump_msg = self.rump_pci.attach_userland_driver("nvme_userland");
         assert!(rump_msg.contains("nvme_userland"));
 
-        let bfs_res = self.haiku_bfs.execute_attribute_query("BEOS:TYPE == 'text/plain'");
+        let bfs_res = self
+            .haiku_bfs
+            .execute_attribute_query("BEOS:TYPE == 'text/plain'");
         assert_eq!(bfs_res.len(), 2);
 
         let p9_msg = self.plan9_vfs.mount_synthetic_path("/proc/synthetic");

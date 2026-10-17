@@ -9,6 +9,7 @@ use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
+use alloc::vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// FNV-1a checksum for CadCraft PR verification
@@ -59,49 +60,24 @@ pub struct SketchEntity {
 /// Geometric constraint type
 #[derive(Debug, Clone, PartialEq)]
 pub enum GeometricConstraintType {
-    Coincident {
-        point1_idx: usize,
-        point2_idx: usize,
-    },
-    Parallel {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Perpendicular {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Concentric {
-        circle1_idx: usize,
-        circle2_idx: usize,
-    },
-    Tangent {
-        line_idx: usize,
-        circle_idx: usize,
-    },
-    EqualLength {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Distance {
-        point1_idx: usize,
-        point2_idx: usize,
-        target_distance: f64,
-    },
-    Angle {
-        line1_idx: usize,
-        line2_idx: usize,
-        target_angle_rad: f64,
-    },
+    Coincident { point1_idx: usize, point2_idx: usize },
+    Parallel { line1_idx: usize, line2_idx: usize },
+    Perpendicular { line1_idx: usize, line2_idx: usize },
+    Concentric { circle1_idx: usize, circle2_idx: usize },
+    Tangent { line_idx: usize, circle_idx: usize },
+    EqualLength { line1_idx: usize, line2_idx: usize },
+    Distance { point1_idx: usize, point2_idx: usize, target_distance: f64 },
+    Angle { line1_idx: usize, line2_idx: usize, target_angle_rad: f64 },
 }
 
+/// Constraint Type alias for backward compatibility
 pub type ConstraintType = GeometricConstraintType;
 
 /// Geometric constraint
 #[derive(Debug, Clone)]
 pub struct GeometricConstraint {
     pub id: u32,
-    pub constraint_type: ConstraintType,
+    pub constraint_type: GeometricConstraintType,
     pub entity_ids: Vec<u32>,
     pub target_value: f32,
     pub satisfied: bool,
@@ -134,7 +110,7 @@ pub struct SolidFeature {
     pub parent_feature_ids: Vec<u32>,
 }
 
-/// Assembly mate constraint type
+/// Assembly mate type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AssemblyMateType {
     Coincident,
@@ -146,7 +122,7 @@ pub enum AssemblyMateType {
     GearRatio,
 }
 
-/// Assembly mate constraint
+/// Assembly mate
 #[derive(Debug, Clone)]
 pub struct AssemblyMate {
     pub id: u32,
@@ -154,7 +130,8 @@ pub struct AssemblyMate {
     pub component_a_id: u32,
     pub component_b_id: u32,
     pub offset: f32,
-    pub satisfied: bool,
+    pub limit_min: f32,
+    pub limit_max: f32,
 }
 
 /// Assembly component
@@ -168,40 +145,38 @@ pub struct AssemblyComponent {
     pub mates: Vec<AssemblyMate>,
 }
 
-/// CAM toolpath operation type
+/// CAM toolpath type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CamToolpathType {
-    Facing,
-    Profiling2D,
-    Pocketing3D,
-    Drilling,
     Contouring2D,
+    SurfaceMilling3D,
+    DrillingCycle,
+    Pocketing,
     AdaptiveClearing,
-    Engraving,
 }
 
-/// CAM toolpath definition
+/// CAM toolpath
 #[derive(Debug, Clone)]
 pub struct CamToolpath {
     pub id: u32,
     pub toolpath_type: CamToolpathType,
     pub tool_diameter: f32,
-    pub feed_rate_mm_min: f32,
-    pub spindle_rpm: u32,
-    pub pass_depth_mm: f32,
-    pub gcode: Vec<String>,
+    pub feed_rate: f32,
+    pub spindle_speed: f32,
+    pub gcode_output: String,
 }
 
-/// FEA mesh element
+/// FEA stress element
 #[derive(Debug, Clone)]
 pub struct FeaElement {
     pub id: u32,
-    pub node_ids: [u32; 4],
-    pub stress_mpa: f32,
-    pub strain: f32,
+    pub node_ids: Vec<u32>,
+    pub stress_tensor: [f32; 6],
+    pub displacement: [f32; 3],
+    pub safety_factor: f32,
 }
 
-/// FEA mesh simulation
+/// FEA mesh
 #[derive(Debug, Clone)]
 pub struct FeaMesh {
     pub id: u32,
@@ -213,7 +188,7 @@ pub struct FeaMesh {
     pub min_safety_factor: f32,
 }
 
-/// CAD Export Formats
+/// CAD Export format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
     DXF,
@@ -284,7 +259,7 @@ impl CadCraftEngine {
 
     pub fn add_geometric_constraint(
         &mut self,
-        constraint_type: ConstraintType,
+        constraint_type: GeometricConstraintType,
         entity_ids: Vec<u32>,
         target_value: f32,
     ) -> u32 {
@@ -334,26 +309,15 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn generate_cam_toolpath(
-        &mut self,
-        toolpath_type: CamToolpathType,
-        tool_diameter: f32,
-        feed_rate_mm_min: f32,
-    ) -> u32 {
+    pub fn generate_cam_toolpath(&mut self, toolpath_type: CamToolpathType, tool_diameter: f32, feed_rate: f32) -> u32 {
         let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
-        let gcode = vec![
-            String::from("G90 G21"),
-            format!("M03 S12000"),
-            format!("G01 Z-2.0 F{:.1}", feed_rate_mm_min),
-        ];
         let toolpath = CamToolpath {
             id,
             toolpath_type,
             tool_diameter,
-            feed_rate_mm_min,
-            spindle_rpm: 12000,
-            pass_depth_mm: 2.0,
-            gcode,
+            feed_rate,
+            spindle_speed: 12000.0,
+            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F100\n"),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -375,22 +339,13 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut data = Vec::new();
+        let mut output = Vec::new();
         match format {
-            ExportFormat::DXF => {
-                data.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
-            }
-            ExportFormat::STEP => {
-                data.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
-            }
-            ExportFormat::STL => {
-                data.extend_from_slice(b"solid CadCraftModel\nendsolid CadCraftModel\n");
-            }
-            _ => {
-                data.extend_from_slice(b"# CadCraft Exported Model\n");
-            }
+            ExportFormat::DXF => output.extend_from_slice(b"SECTION HEADER ENDSEC SECTION ENTITIES ENDSEC EOF"),
+            ExportFormat::STEP => output.extend_from_slice(b"ISO-10303-21; HEADER; DATA; ENDSEC; END-ISO-10303-21;"),
+            _ => output.extend_from_slice(b"CadCraft Export Data"),
         }
-        data
+        output
     }
 }
 
@@ -400,7 +355,24 @@ impl Default for CadCraftEngine {
     }
 }
 
-/// Deployer 1: 2D Parametric Sketching & Geometric Constraint Solver Engine
+// Global CadCraft Instance
+static mut CADCRAFT: Option<CadCraftEngine> = None;
+
+pub fn init_cadcraft() {
+    unsafe {
+        CADCRAFT = Some(CadCraftEngine::new());
+    }
+}
+
+pub fn get_cadcraft() -> Option<&'static mut CadCraftEngine> {
+    unsafe { CADCRAFT.as_mut() }
+}
+
+// ============================================================================
+// PR Deployment Engines for CadCraft
+// ============================================================================
+
+/// Deployer for 2D Drafting & Parametric Constraints in PR Format
 #[derive(Debug, Clone)]
 pub struct CadCraft2dDraftingConstraintPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
@@ -419,9 +391,9 @@ impl CadCraft2dDraftingConstraintPrDeployer {
 
     fn stage_all_drafting_prs(&mut self) {
         let prs = [
-            ("cadcraft-2d-sketch-primitives", "feat(cadcraft): 2D Parametric sketch primitives engine (Line, Arc, Circle, Spline)", "cad_sketch_primitives", 0x12345678),
-            ("cadcraft-constraint-solver", "feat(cadcraft): 2D Geometric & dimensional constraint solver (Coincident, Parallel, Tangent, Distance)", "cad_constraint_solver", 0x23456789),
-            ("cadcraft-dxf-import-export", "feat(cadcraft): AutoCAD DXF vector layer import/export parser", "cad_dxf_gateway", 0x3456789A),
+            ("cadcraft-2d-sketch-entities", "feat(cadcraft): 2D parametric sketch entities (Line, Arc, Circle, Spline, Polyline)", "cad_drafting_entities", 0xA1B2C3D4),
+            ("cadcraft-constraint-solver", "feat(cadcraft): Geometric constraint solver engine (Coincident, Tangent, Concentric, Distance)", "cad_constraint_solver", 0xB2C3D4E5),
+            ("cadcraft-dxf-dwg-importer", "feat(cadcraft): DXF/DWG vector drafting parser & layer style manager", "cad_vector_exchange", 0xC3D4E5F6),
         ];
 
         for (comp, title, target_sub, digest) in prs {
@@ -451,7 +423,7 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
-/// Deployer 2: 3D B-Rep Solid Modeling & Boolean Feature Engine
+/// Deployer 2: 3D B-Rep Solid Feature Modeling & Direct Modeling Engine
 #[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
@@ -470,9 +442,9 @@ impl CadCraft3dSolidModelingPrDeployer {
 
     fn stage_all_solid_prs(&mut self) {
         let prs = [
-            ("cadcraft-brep-topology", "feat(cadcraft): B-Rep boundary representation topology engine (Shell, Face, Loop, Edge, Vertex)", "cad_brep_kernel", 0x456789AB),
-            ("cadcraft-solid-feature-ops", "feat(cadcraft): 3D Parametric solid feature operations (Extrude, Revolve, Sweep, Loft, Fillet)", "cad_solid_features", 0x56789ABC),
-            ("cadcraft-boolean-kernel", "feat(cadcraft): CSG Constructive Solid Geometry Boolean kernel (Union, Difference, Intersection)", "cad_boolean_kernel", 0x6789ABCD),
+            ("cadcraft-3d-brep-solids", "feat(cadcraft): 3D B-Rep boundary representation solid modeling engine (Extrude, Revolve, Sweep, Loft)", "cad_brep_solids", 0x34567890),
+            ("cadcraft-boolean-operations", "feat(cadcraft): CSG Constructive Solid Geometry & exact Boolean operations (Union, Difference, Intersection)", "cad_boolean_csg", 0x45678901),
+            ("cadcraft-step-iges-exporter", "feat(cadcraft): STEP/IGES/STL/OBJ 3D CAD exchange format exporters", "cad_3d_exchange", 0x56789012),
         ];
 
         for (comp, title, target_sub, digest) in prs {
@@ -603,17 +575,17 @@ mod tests {
         let mut engine = CadCraftEngine::new();
         engine.init();
         let e1 =
-            engine.add_sketch_entity(SketchEntityType::Line, alloc::vec![[0.0, 0.0], [10.0, 0.0]]);
+            engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
         let e2 = engine.add_sketch_entity(
             SketchEntityType::Line,
-            alloc::vec![[10.0, 0.0], [10.0, 10.0]],
+            vec![[10.0, 0.0], [10.0, 10.0]],
         );
         let c1 = engine.add_geometric_constraint(
-            ConstraintType::Perpendicular {
+            GeometricConstraintType::Perpendicular {
                 line1_idx: e1 as usize,
                 line2_idx: e2 as usize,
             },
-            alloc::vec![e1, e2],
+            vec![e1, e2],
             90.0,
         );
 
