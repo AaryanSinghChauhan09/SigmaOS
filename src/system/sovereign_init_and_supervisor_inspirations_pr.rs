@@ -287,7 +287,11 @@ impl OpenRcInspirationsPrEngine {
     }
 
     /// Resolve runlevel sequence chain from current to target runlevel.
-    pub fn resolve_runlevel_dependencies(&self, target: OpenRcRunlevel, current: OpenRcRunlevel) -> Vec<OpenRcRunlevel> {
+    pub fn resolve_runlevel_dependencies(
+        &self,
+        target: OpenRcRunlevel,
+        current: OpenRcRunlevel,
+    ) -> Vec<OpenRcRunlevel> {
         let all_levels = [
             OpenRcRunlevel::SysInit,
             OpenRcRunlevel::Boot,
@@ -920,7 +924,16 @@ impl CronAnacronTimersAtPrEngine {
     }
 
     /// Expand Cron shorthand macro alias (`@reboot`, `@daily`, `@weekly`, `@monthly`, `@yearly`).
-    pub fn expand_cron_shorthand_alias(&self, alias: &str) -> Option<(&'static str, &'static str, &'static str, &'static str, &'static str)> {
+    pub fn expand_cron_shorthand_alias(
+        &self,
+        alias: &str,
+    ) -> Option<(
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+        &'static str,
+    )> {
         match alias {
             "@reboot" => Some(("@reboot", "@reboot", "@reboot", "@reboot", "@reboot")),
             "@hourly" => Some(("0", "*", "*", "*", "*")),
@@ -1000,8 +1013,14 @@ impl SovereignInitAndSupervisorParityPrGateway {
         for (idx, p) in proposals.iter().enumerate() {
             md.push_str(&alloc::format!("### PR #{}: {}\n", 4001 + idx, p.pr_title));
             md.push_str(&alloc::format!("- **Category**: {}\n", p.target_subsystem));
-            md.push_str(&alloc::format!("- **Inspiration Sources**: {}\n", p.original_system));
-            md.push_str(&alloc::format!("- **Performance Impact**: {}\n", p.performance_multiplier));
+            md.push_str(&alloc::format!(
+                "- **Inspiration Sources**: {}\n",
+                p.original_system
+            ));
+            md.push_str(&alloc::format!(
+                "- **Performance Impact**: {}\n",
+                p.performance_multiplier
+            ));
             md.push_str(&alloc::format!("- **Status**: {}\n", p.status));
             md.push_str("- **Key Features Implemented**:\n");
             for comp in &p.components_added {
@@ -1095,7 +1114,10 @@ mod tests {
         assert_eq!(msg, Some("Operational".to_string()));
         assert_eq!(pid, Some(1024));
 
-        assert_eq!(engine.parse_watchdog_usec("WATCHDOG_USEC=5000000"), Some(5000000));
+        assert_eq!(
+            engine.parse_watchdog_usec("WATCHDOG_USEC=5000000"),
+            Some(5000000)
+        );
         assert_eq!(engine.calculate_backoff_delay(0, 1, 60), 1);
         assert_eq!(engine.calculate_backoff_delay(2, 2, 60), 8);
         assert_eq!(engine.calculate_backoff_delay(10, 2, 30), 30);
@@ -1134,7 +1156,8 @@ mod tests {
             engine.transition_runlevel(OpenRcRunlevel::SysInit, OpenRcRunlevel::Default, &services);
         assert_eq!(plan, vec!["sshd"]);
 
-        let chain = engine.resolve_runlevel_dependencies(OpenRcRunlevel::Default, OpenRcRunlevel::SysInit);
+        let chain =
+            engine.resolve_runlevel_dependencies(OpenRcRunlevel::Default, OpenRcRunlevel::SysInit);
         assert_eq!(chain.len(), 3);
         assert_eq!(chain[0], OpenRcRunlevel::SysInit);
     }
@@ -1168,7 +1191,8 @@ mod tests {
         let cmds = engine.execute_telinit(3, &[entry]);
         assert_eq!(cmds.len(), 1);
 
-        let (kills, starts) = engine.sort_rc_d_scripts(&["S20sshd", "K10net", "S10network", "K01halt"]);
+        let (kills, starts) =
+            engine.sort_rc_d_scripts(&["S20sshd", "K10net", "S10network", "K01halt"]);
         assert_eq!(kills, vec!["K01halt", "K10net"]);
         assert_eq!(starts, vec!["S10network", "S20sshd"]);
     }
@@ -1224,7 +1248,10 @@ mod tests {
         assert!(!engine.parse_and_match_cron("0", "12", "*", "*", "*", 10, 12, 1, 1, 1));
         assert!(engine.parse_and_match_cron("@daily", "0", "0", "0", "0", 0, 0, 1, 1, 1));
 
-        assert_eq!(engine.expand_cron_shorthand_alias("@daily"), Some(("0", "0", "*", "*", "*")));
+        assert_eq!(
+            engine.expand_cron_shorthand_alias("@daily"),
+            Some(("0", "0", "*", "*", "*"))
+        );
 
         // Anacron catchup
         assert!(engine.evaluate_anacron_job("daily.job", 1, 0, 1000, 1000 + 86400, 0.5, 2.0));
