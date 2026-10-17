@@ -31,3 +31,7 @@
 ## 2025-06-05 - Zero-Allocation Search Matching for Notes & Desktop Applications
 **Learning:** In interactive desktop note search loops, calling `note.title.to_lowercase()` and `note.content.to_lowercase()` per item incurs hundreds of dynamic heap `String` allocations per search query. Utilizing ASCII window byte matching (`contains_ignore_case` & `find_ignore_case`) performs in-place case-insensitive matching without intermediate heap allocations.
 **Action:** Always use window slice matching helpers (`contains_ignore_case` / `find_ignore_case`) for text searching across interactive desktop models.
+
+## 2026-10-17 - Zero-Allocation Matching for CLI Tools Suite
+**Learning:** In CLI power tool search engines (`fd`, `ripgrep`, `zoxide`), invoking `.to_lowercase()` per line or per file path allocates temporary heap `String`s for every candidate item evaluated. Using a zero-allocation ASCII window byte slice matching helper (`contains_ignore_case`) eliminates all heap allocations during search operations on ASCII paths and document lines.
+**Action:** Apply `contains_ignore_case` ASCII window byte matching to file walker and document search engines to avoid per-item heap allocations.
