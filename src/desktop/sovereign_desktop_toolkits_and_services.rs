@@ -414,8 +414,8 @@ impl SovereignDisplayManagerSuiteEngine {
                 || req.biometric_token.is_some()
                 || req.fido2_security_key.is_some());
         let mfa_ok = req.mfa_otp.as_deref() == Some("123456") || req.mfa_otp.is_none();
-        let fido_ok =
-            req.fido2_security_key.as_deref() == Some("fido2_passkey") || req.fido2_security_key.is_none();
+        let fido_ok = req.fido2_security_key.as_deref() == Some("fido2_passkey")
+            || req.fido2_security_key.is_none();
 
         let final_ok = auth_success && mfa_ok && fido_ok;
         self.pam_auth_history.push((req.username.clone(), final_ok));
@@ -487,7 +487,11 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
-    pub fn initiate_xdmcp_remote_handshake(&mut self, remote_addr: &str, display_num: u32) -> usize {
+    pub fn initiate_xdmcp_remote_handshake(
+        &mut self,
+        remote_addr: &str,
+        display_num: u32,
+    ) -> usize {
         let sid = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
             session_id: sid,
