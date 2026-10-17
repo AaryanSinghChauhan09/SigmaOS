@@ -39,11 +39,21 @@ pub struct Column {
 }
 
 /// Table
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Table {
     pub name: String,
     pub columns: Vec<Column>,
     pub next_row_id: AtomicU32,
+}
+
+impl Clone for Table {
+    fn clone(&self) -> Self {
+        Self {
+            name: self.name.clone(),
+            columns: self.columns.clone(),
+            next_row_id: AtomicU32::new(self.next_row_id.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 /// Value

@@ -181,15 +181,16 @@ impl SovereignGtkQtToolkitEngine {
             }
         }
         let svg_path = format!("/usr/share/Kvantum/{}/{}.svg", theme_name, theme_name);
-        self.kvantum_spec = Some(KvantumThemeSpec {
+        let spec = KvantumThemeSpec {
             theme_name: theme_name.clone(),
             blur_background: blur,
             translucent_windows: translucent,
             svg_path,
-        });
+        };
+        self.kvantum_spec = Some(spec);
         self.qt_style = QtPlatformStyle::Kvantum;
         self.event_log.push(ToolkitEvent::KvantumThemeApplied(
-            self.kvantum_spec.theme_name.clone(),
+            self.kvantum_spec.as_ref().unwrap().theme_name.clone(),
         ));
         true
     }
@@ -413,7 +414,8 @@ impl SovereignDisplayManagerSuiteEngine {
                 || req.biometric_token.is_some()
                 || req.fido2_security_key.is_some());
         let mfa_ok = req.mfa_otp.as_deref() == Some("123456") || req.mfa_otp.is_none();
-        let fido_ok = req.fido2_security_key.is_none() || req.fido2_security_key.as_deref() == Some("fido2_valid");
+        let fido_ok = req.fido2_security_key.is_none()
+            || req.fido2_security_key.as_deref() == Some("fido2_valid");
 
         let final_ok = auth_success && mfa_ok && fido_ok;
         self.pam_auth_history.push((req.username.clone(), final_ok));
@@ -453,10 +455,10 @@ impl SovereignDisplayManagerSuiteEngine {
     ) -> usize {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id,
-            client_address: client_address.to_string(),
+            session_id: id as u32,
+            remote_address: client_address.to_string(),
             display_number,
-            status: "Active".to_string(),
+            authenticated: true,
         });
         self.xdmcp_manager
             .initiate_handshake(&format!(":{}", display_number), client_address);
@@ -500,18 +502,6 @@ impl SovereignDisplayManagerSuiteEngine {
         } else {
             false
         }
-    }
-
-    pub fn initiate_xdmcp_remote_handshake(&mut self, client_address: &str, display_number: u32) -> usize {
-        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
-        self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id,
-            client_address: client_address.to_string(),
-            display_number,
-            status: "Active".to_string(),
-        });
-        self.xdmcp_manager.initiate_handshake(&format!(":{}", display_number), client_address);
-        id
     }
 }
 
@@ -1092,6 +1082,7 @@ impl SovereignFontAndTextLayoutEngine {
 
         Self {
             font_match_cache,
+            fontconfig_aliases,
             opentype_features: vec![
                 "liga".to_string(),
                 "kern".to_string(),
