@@ -13,6 +13,7 @@ use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
+/// Feature source type for roadmap & wiki feature tracking
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
@@ -21,22 +22,25 @@ pub enum FeatureSourceType {
     ArchitectureDocument,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    UnimplementedIdeas,
-    MediaWikiDoc,
     AppReplacementPr,
     SovereignArchitectureDoc,
+    UnimplementedIdeas,
+    MediaWikiDoc,
+    RoadmapIdea,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
     pub idea_id: u64,
     pub title: String,
+    pub category: String,
     pub source_type: FeatureSourceType,
     pub source_file: String,
     pub target_module: String,
     pub is_fully_implemented: bool,
 }
 
+/// Category for 100 improvement ideas
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
@@ -189,6 +193,7 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
+/// Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
@@ -367,6 +372,7 @@ impl Default for SovereignShardsMasterRegistry {
     }
 }
 
+/// Linux & BSD Distro Gap Closing Parity Engine
 #[derive(Debug, Clone)]
 pub struct DistroGapFeatureRecord {
     pub distro_name: &'static str,
@@ -402,12 +408,14 @@ impl SovereignDistroGapClosureEngine {
             sigma_counterpart: "ArchPacmanContribEngine",
             verification_passed: true,
         });
+
         self.features.push(DistroGapFeatureRecord {
             distro_name: "OpenBSD",
             gap_feature_name: "pledge, unveil, KARL, retguard, signify",
             sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
+
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
@@ -444,7 +452,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             idea_id: 1,
             id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
-            category: "CLI",
+            category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
@@ -565,6 +573,7 @@ impl Default for MasterWikiAndRoadmapVerificationSuite {
     }
 }
 
+/// Master Sovereign OS Documentation & Wiki Integration Verification Engine
 #[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Sovereign100IdeasSuite,

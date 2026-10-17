@@ -76,6 +76,7 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
+/// QEMU Disk Image Specification
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QemuDiskImageSpec {
     pub image_path: String,

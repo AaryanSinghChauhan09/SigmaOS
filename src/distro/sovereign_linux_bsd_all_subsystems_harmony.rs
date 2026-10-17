@@ -673,8 +673,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec_jail",
-                "freebsd_jail_vnet_mac_capsicum_process_sandbox",
+                "pol_proc_sec",
+                "enforce_racct_rctl_process_resource_limits",
                 true,
             ),
         ];
@@ -752,6 +752,25 @@ impl SovereignSubsystemDistroHarmonyEngine {
             | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
             _ => "sigpkg",
         }
+    }
+
+    pub fn audit_subsystem_compliance_list(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+        self.subsystems
+            .iter()
+            .map(|(&sub, spec)| {
+                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
+                (sub, is_compliant, spec.interop_score)
+            })
+            .collect()
+    }
+
+    pub fn translate_subsystem_payload(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        subsystem: SigmaOsSubsystem,
+        payload: &str,
+    ) -> String {
+        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
     }
 
     pub fn dispatch_event(
@@ -1203,9 +1222,9 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.0.len(), 31);
-        for (_, compliant) in audits.0 {
+        let audits = engine.audit_subsystem_compliance_list();
+        assert_eq!(audits.len(), 31);
+        for (_, compliant, score) in audits {
             assert!(compliant);
         }
 

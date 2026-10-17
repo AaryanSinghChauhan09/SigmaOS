@@ -8,10 +8,8 @@
 
 ## Shell component
 
-- [ ] Interactive REPL
-- [ ] Parser / AST
-- [ ] Builtins
-- [ ] Job control
+- [ ] Interactive shell
+- [ ] Shell component
 - [ ] Interrupts / traps
 - [ ] Memory / paging / swap
 - [ ] Scheduler / processes
@@ -66,7 +64,8 @@
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
 <!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
 
-- Upstream study document:
+- Upstream study:
+- What SigmaOS adopts:
 - Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts / adapts / rejects:
 - Decision: Adopt / Adapt / Reject
@@ -79,15 +78,20 @@
 
 -
 
-## Kernel safety review & Reviewer checklist
+## Reviewer checklist
+
+- [ ] Upstream study and reference checked
+- [ ] What SigmaOS adopts is clearly stated
+- [ ] Safety and rollback reviewed
+
+## Kernel safety review
 
 - [ ] Safety and rollback plan defined
 - [ ] No unnecessary `unsafe`
 
 ## Shell safety review
 
-- [ ] Memory bounds safety
-- [ ] Sanitized input
+- [ ] Shell safety review
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
