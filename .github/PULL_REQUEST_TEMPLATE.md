@@ -4,15 +4,19 @@
 
 ## Storage component
 
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
+- [ ] Boot / arch init
+
+## Shell component
+
+- [ ] Interactive REPL
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
+- [ ] VFS / filesystems
+- [ ] Syscalls / ELF
+- [ ] Drivers
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
 - [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
@@ -47,11 +51,12 @@
 
 - Upstream study:
 - What SigmaOS adopts:
-- Study document:
 - Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts:
 - Decision: Adopt / Adapt / Reject
 - Reason:
+
+## Reviewer checklist
 
 ## Changes
 
@@ -66,6 +71,10 @@
 
 - [ ] Reviewer checklist completed
 - [ ] No unnecessary `unsafe`
+
+## Shell safety review
+
+- [ ] Quoting integrity
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
@@ -114,6 +123,7 @@
 
 ## Safety and rollback
 
+- Safety and rollback:
 - Risk:
 - Rollback:
 

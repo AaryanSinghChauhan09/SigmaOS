@@ -620,8 +620,7 @@ pub enum UniversalPmActionV40 {
     Audit,
 }
 
-pub type UniversalPmActionV40 = UniversalPmActionV39;
-pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+pub type UniversalPmActionV39 = UniversalPmActionV40;
 
 #[derive(Debug, Clone)]
 pub struct RoutedPmCommandV40 {
@@ -952,7 +951,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sat_solver_and_sandboxing_v39() {
+    fn test_sat_solver_and_sandboxing_v40() {
         let solver = UniversalCrossDistroSatSolverV39::new();
         let raw_deps = vec![
             "libssl-dev".to_string(),
