@@ -542,6 +542,14 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 true,
             ),
             (
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_proc_sec",
+                "freebsd_jail_racct_process_limits",
+                true,
+            ),
+            (
                 SigmaOsSubsystem::SecuritySandboxing,
                 SigmaOsSubsystem::FilesystemStorage,
                 LinuxBsdDistroInspiration::FreeBSD,

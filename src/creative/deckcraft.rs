@@ -127,7 +127,7 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// State of presenter mode
+/// State for presenter view
 #[derive(Debug, Clone)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
@@ -217,10 +217,18 @@ pub enum ExportFormat {
     Pptx,
     Svg,
     Markdown,
-    Pdf,
-    Pptx,
-    Html5,
     Svg,
+}
+
+/// Alias for ExportFormat
+pub type DeckExportFormat = ExportFormat;
+/// Alias for SlideDeck
+pub type PresentationDeck = SlideDeck;
+
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
 }
 
 /// Presenter view state
@@ -257,17 +265,17 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            ExportFormat::PDF => {
+            DeckExportFormat::PDF | DeckExportFormat::ZenithPresentation => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
                 output.extend_from_slice(deck.slides.len().to_string().as_bytes());
             }
-            ExportFormat::PPTX => {
+            DeckExportFormat::PPTX => {
                 output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
                 output.extend_from_slice(deck.title.as_bytes());
             }
-            ExportFormat::HTML5Slideshow => {
+            DeckExportFormat::HTML5Slideshow => {
                 output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(
