@@ -178,6 +178,50 @@ impl GnuCoreutilsBsdUserlandEngine {
         (lines, words, bytes)
     }
 
+    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        if numeric {
+            sorted.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
+        } else {
+            sorted.sort();
+        }
+        if reverse {
+            sorted.reverse();
+        }
+        if unique {
+            sorted.dedup();
+        }
+        sorted
+    }
+
+    pub fn run_tr(&self, input: &str, from: &str, to: &str, delete: bool) -> String {
+        let mut out = String::new();
+        let from_chars: Vec<char> = from.chars().collect();
+        let to_chars: Vec<char> = to.chars().collect();
+        for c in input.chars() {
+            if let Some(pos) = from_chars.iter().position(|&x| x == c) {
+                if !delete {
+                    if pos < to_chars.len() {
+                        out.push(to_chars[pos]);
+                    } else if let Some(&last) = to_chars.last() {
+                        out.push(last);
+                    }
+                }
+            } else {
+                out.push(c);
+            }
+        }
+        out
+    }
+
+    pub fn run_head_tail_bytes(&self, data: &[u8], bytes: usize, is_head: bool) -> Vec<u8> {
+        if is_head {
+            data.iter().take(bytes).copied().collect()
+        } else {
+            data.iter().skip(data.len().saturating_sub(bytes)).copied().collect()
+        }
+    }
+
     pub fn run_cp(&self, source: &str, destination: &str, preserve_attrs: bool) -> String {
         format!(
             "cp: copied '{}' -> '{}' (preserve_attrs={})",
@@ -813,6 +857,30 @@ impl TextProcessingEngine {
         Self
     }
 
+    pub fn grep_match_extended(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+        invert: bool,
+        line_numbers: bool,
+    ) -> (usize, Vec<String>) {
+        let mut results = Vec::new();
+        let pat = if case_insensitive { pattern.to_lowercase() } else { pattern.to_string() };
+        for (idx, line) in content.lines().enumerate() {
+            let l = if case_insensitive { line.to_lowercase() } else { line.to_string() };
+            let matches = l.contains(&pat);
+            if matches != invert {
+                if line_numbers {
+                    results.push(format!("{}:{}", idx + 1, line));
+                } else {
+                    results.push(line.to_string());
+                }
+            }
+        }
+        (results.len(), results)
+    }
+
     pub fn grep_match(
         &self,
         content: &str,
@@ -976,6 +1044,24 @@ impl ArchivalCompressionEngine {
         Self
     }
 
+    pub fn parse_pax_header(&self, data: &[u8]) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        if let Ok(text) = core::str::from_utf8(data) {
+            for line in text.lines() {
+                if let Some((_, kv)) = line.split_once(' ') {
+                    if let Some((k, v)) = kv.split_once('=') {
+                        map.insert(k.trim().to_string(), v.trim().to_string());
+                    }
+                }
+            }
+        }
+        map
+    }
+
+    pub fn configure_compression_level(&self, format: CompressionFormat, level: u8) -> Result<String, &'static str> {
+        Ok(format!("Zstd level {}", level))
+    }
+
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
         if magic_bytes.len() >= 4 && magic_bytes[0..4] == [0x28, 0xB5, 0x2F, 0xFD] {
             CompressionFormat::Zstd
@@ -1054,6 +1140,18 @@ pub struct ProcpsPsmiscEngine;
 impl ProcpsPsmiscEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn killall_signal(&self, process_name: &str, signal: u32) -> (u32, String) {
+        (1, format!("killall sent signal {} to {}", signal, process_name))
+    }
+
+    pub fn fuser_lookup_file(&self, _filename: &str) -> Vec<u32> {
+        vec![1024]
+    }
+
+    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(usize, usize, usize)> {
+        Some((65536, 32768, 16384))
     }
 
     pub fn ps_list_processes(&self) -> Vec<ProcessInfo> {
@@ -1157,6 +1255,10 @@ impl DocumentationPagerEngine {
         Self
     }
 
+    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
+        Some(format!("{}({}) File Formats", page_name.to_uppercase(), section))
+    }
+
     pub fn render_less_page(&self, text: &str, line_offset: usize, page_height: usize) -> String {
         let lines: Vec<&str> = text.lines().collect();
         let end = core::cmp::min(line_offset + page_height, lines.len());
@@ -1254,6 +1356,18 @@ pub struct AuthPrivilegeSessionEngine;
 impl AuthPrivilegeSessionEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn pam_environment_manage(&self, env_map: &mut BTreeMap<String, String>, action: &str, key: &str, value: &str) -> bool {
+        if action == "set" {
+            env_map.insert(key.to_string(), value.to_string());
+            true
+        } else if action == "unset" {
+            env_map.remove(key);
+            true
+        } else {
+            false
+        }
     }
 
     pub fn evaluate_sudoers(&self, user: &str, command: &str) -> bool {
@@ -1583,6 +1697,18 @@ impl CoreUtilsPullRequestGatewayEngine {
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
         self.submissions.values().cloned().collect()
+    }
+
+    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|pr| pr.category == category).cloned().collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|pr| pr.status == status).cloned().collect()
+    }
+
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|pr| pr.author == author).cloned().collect()
     }
 }
 
