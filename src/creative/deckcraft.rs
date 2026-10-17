@@ -177,10 +177,32 @@ pub struct SlideDeck {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
     ZenithPresentation,
-    PDF,
-    HTML5Slideshow,
-    PPTX,
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
     Markdown,
+}
+
+pub type DeckExportFormat = ExportFormat;
+pub type PresentationDeck = SlideDeck;
+
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
+}
+
+/// Presenter view state tracking active deck and timer
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u32,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
 }
 
 /// Slide Exporter Engine
@@ -191,6 +213,10 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
+            DeckExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_PRESENTATION_V1:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
+            }
             DeckExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
