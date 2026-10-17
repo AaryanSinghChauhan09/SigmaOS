@@ -40,6 +40,19 @@ pub enum UniversalSubsystemCategory {
     CryptographySecurity,
     TelemetryObservability,
     AccessibilityInput,
+    StorageDrive,
+    BluetoothWireless,
+    ThermalCooling,
+    PrintingSpooler,
+    RecoveryBackup,
+    RemoteAccess,
+    ProductivityApplications,
+    DatabaseEmbedded,
+    RoboticsHardware,
+    RealTimeExtension,
+    UserlandPersona,
+    FirmwareMicrocode,
+    NetworkSecurityFirewall,
 }
 
 impl UniversalSubsystemCategory {
@@ -76,6 +89,19 @@ impl UniversalSubsystemCategory {
             Self::CryptographySecurity => "CryptographySecurity",
             Self::TelemetryObservability => "TelemetryObservability",
             Self::AccessibilityInput => "AccessibilityInput",
+            Self::StorageDrive => "StorageDrive",
+            Self::BluetoothWireless => "BluetoothWireless",
+            Self::ThermalCooling => "ThermalCooling",
+            Self::PrintingSpooler => "PrintingSpooler",
+            Self::RecoveryBackup => "RecoveryBackup",
+            Self::RemoteAccess => "RemoteAccess",
+            Self::ProductivityApplications => "ProductivityApplications",
+            Self::DatabaseEmbedded => "DatabaseEmbedded",
+            Self::RoboticsHardware => "RoboticsHardware",
+            Self::RealTimeExtension => "RealTimeExtension",
+            Self::UserlandPersona => "UserlandPersona",
+            Self::FirmwareMicrocode => "FirmwareMicrocode",
+            Self::NetworkSecurityFirewall => "NetworkSecurityFirewall",
         }
     }
 }
@@ -618,6 +644,149 @@ impl SovereignUniversalSubsystemInteropEngine {
                 6,
             ),
         );
+
+        self.register_subsystem(
+            "storage_drive",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::StorageDrive,
+                true,
+                true,
+                &["nvme_of", "scsi_target", "sata_ahci", "iscsi_initiator"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "bluetooth_wireless",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::BluetoothWireless,
+                true,
+                true,
+                &["bluez_5", "netgraph_bluetooth", "pqc_bluetooth_mesh"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "thermal_cooling",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ThermalCooling,
+                true,
+                true,
+                &["intel_powerclamp", "thermald", "acpi_thermal"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "printing_spooler",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::PrintingSpooler,
+                true,
+                true,
+                &["cups_ipp", "lprng", "ghostscript_rasterizer"],
+                4,
+            ),
+        );
+
+        self.register_subsystem(
+            "recovery_backup",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RecoveryBackup,
+                true,
+                true,
+                &["borgbackup", "restic", "zfs_send_recv", "timeshift_btrfs"],
+                7,
+            ),
+        );
+
+        self.register_subsystem(
+            "remote_access",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RemoteAccess,
+                true,
+                true,
+                &["openssh_pqc", "wireguard", "freerdp", "vnc_tiger"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "productivity_apps",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::ProductivityApplications,
+                true,
+                true,
+                &["libreoffice", "wordcraft", "gridcraft", "deckcraft"],
+                8,
+            ),
+        );
+
+        self.register_subsystem(
+            "database_embedded",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::DatabaseEmbedded,
+                true,
+                true,
+                &["sqlite3", "duckdb", "rocksdb", "lmdb"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "robotics_hardware",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RoboticsHardware,
+                true,
+                true,
+                &["ros2_humble", "socketcan", "microros_serial"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "realtime_extension",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::RealTimeExtension,
+                true,
+                true,
+                &["preempt_rt", "xenomai_cobalt", "nuttx_posix"],
+                5,
+            ),
+        );
+
+        self.register_subsystem(
+            "userland_persona",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::UserlandPersona,
+                true,
+                true,
+                &["gnu_coreutils", "bsd_userland", "busybox", "uutils_rust"],
+                10,
+            ),
+        );
+
+        self.register_subsystem(
+            "firmware_microcode",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::FirmwareMicrocode,
+                true,
+                true,
+                &["fwupd_lvfs", "intel_microcode", "amd_ucode", "opensbi"],
+                6,
+            ),
+        );
+
+        self.register_subsystem(
+            "network_security_firewall",
+            SubsystemAdapterCapabilities::new(
+                UniversalSubsystemCategory::NetworkSecurityFirewall,
+                true,
+                true,
+                &["pf_openbsd", "nftables_linux", "ipfw_freebsd", "npf_netbsd"],
+                8,
+            ),
+        );
     }
 
     /// Establish default cross-subsystem translation and isolation policies.
@@ -923,8 +1092,21 @@ impl SovereignUniversalSubsystemInteropEngine {
             "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => {
                 "crypto_sec"
             }
-            "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry",
-            "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility",
+            "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry_obs",
+            "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility_input",
+            "storage_drive" | "storagedrive" => "storage_drive",
+            "bluetooth_wireless" | "bluetoothwireless" => "bluetooth_wireless",
+            "thermal_cooling" | "thermalcooling" => "thermal_cooling",
+            "printing_spooler" | "printingspooler" => "printing_spooler",
+            "recovery_backup" | "recoverybackup" => "recovery_backup",
+            "remote_access" | "remoteaccess" => "remote_access",
+            "productivity_apps" | "productivityapplications" => "productivity_apps",
+            "database_embedded" | "databaseembedded" => "database_embedded",
+            "robotics_hardware" | "roboticshardware" => "robotics_hardware",
+            "realtime_extension" | "realtimeextension" => "realtime_extension",
+            "userland_persona" | "userlandpersona" => "userland_persona",
+            "firmware_microcode" | "firmwaremicrocode" => "firmware_microcode",
+            "network_security_firewall" | "networksecurityfirewall" => "network_security_firewall",
             _ => return None,
         };
 
@@ -1232,7 +1414,7 @@ mod tests {
     fn test_expanded_subsystem_categories_interop() {
         let mut engine = SovereignUniversalSubsystemInteropEngine::new();
 
-        assert_eq!(engine.subsystem_adapters.len(), 31);
+        assert_eq!(engine.subsystem_adapters.len(), 44);
 
         assert_eq!(
             UniversalSubsystemCategory::ShellTerminal.as_str(),
@@ -1367,7 +1549,7 @@ mod tests {
         let count = engine
             .sync_universal_cross_distro_mesh()
             .expect("Mesh sync should succeed");
-        assert!(count >= 31 * 30);
+        assert!(count >= 44 * 43);
 
         let policy = engine
             .translate_policy(
@@ -1384,5 +1566,49 @@ mod tests {
             )
             .expect("Policy ai_orchestration should exist");
         assert_eq!(ai_policy.policy_id, "policy_ai_orchestration");
+    }
+
+    #[test]
+    fn test_all_44_subsystems_interop_matrix() {
+        let mut engine = SovereignUniversalSubsystemInteropEngine::new();
+        assert_eq!(engine.subsystem_adapters.len(), 44);
+        assert!(engine.verify_all_subsystems_interoperability());
+        assert_eq!(engine.evaluate_system_wide_harmony_score(), 100);
+
+        let count = engine
+            .sync_universal_cross_distro_mesh()
+            .expect("Mesh sync must succeed across all 44 subsystems");
+        assert_eq!(count, 44 * 43);
+    }
+
+    #[test]
+    fn test_universal_category_policy_routing() {
+        let engine = SovereignUniversalSubsystemInteropEngine::new();
+        assert_eq!(UniversalSubsystemCategory::StorageDrive.as_str(), "StorageDrive");
+        assert_eq!(UniversalSubsystemCategory::BluetoothWireless.as_str(), "BluetoothWireless");
+        assert_eq!(UniversalSubsystemCategory::NetworkSecurityFirewall.as_str(), "NetworkSecurityFirewall");
+
+        let policy = engine
+            .translate_policy(
+                UniversalSubsystemCategory::KernelScheduling,
+                UniversalSubsystemCategory::SecuritySandboxing,
+            )
+            .expect("Sched-Sec policy must exist");
+        assert_eq!(policy.policy_id, "policy_sched_sec");
+        assert!(policy.enforce_strict_isolation);
+    }
+
+    #[test]
+    fn test_cross_subsystem_workflow_orchestration() {
+        let mut engine = SovereignUniversalSubsystemInteropEngine::new();
+        let event_id = engine
+            .dispatch_cross_subsystem_operation_all_distros(
+                "storage_drive",
+                "crypto_sec",
+                "ENCRYPT_LUKS2_VOLUME",
+            )
+            .expect("Storage-Crypto cross distro operation must succeed");
+        assert!(event_id > 0);
+        assert_eq!(engine.event_log.len(), 1);
     }
 }

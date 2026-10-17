@@ -294,4 +294,3 @@ Every autonomous AI development agent must understand and follow the complete co
 - **SINGLE RESPONSIBILITY, TRANSPARENCY & OPEN EXCHANGE**: Publish complete documentation, tests, and rationale.
 - **VERSION CONTROL PRACTICES**: Atomic commits, descriptive conventional commit messages, and clean branch management.
 - **THEIRS STRATEGY FOR MERGES**: Prioritize the modern, enhanced SigmaOS codebase when resolving branch conflicts.
-

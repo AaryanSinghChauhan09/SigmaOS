@@ -88,7 +88,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-
     /// Check if Linux capability bit mask contains target capability.
     pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
         if cap_bit >= 64 {

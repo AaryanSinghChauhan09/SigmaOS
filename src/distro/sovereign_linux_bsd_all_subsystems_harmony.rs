@@ -1420,4 +1420,28 @@ mod tests {
             LinuxBsdDistroInspiration::OpenBSD
         );
     }
+
+    #[test]
+    fn test_all_44_subsystems_interop_matrix() {
+        let mut engine = SovereignSubsystemDistroHarmonyEngine::new();
+        assert_eq!(engine.subsystems.len(), 44);
+        assert!(engine.verify_all_subsystems_compatibility_matrix());
+        assert_eq!(engine.compute_harmony_index(), 100);
+
+        let count = engine
+            .harmonize_all_subsystems_and_distros()
+            .expect("Harmonization across 44 subsystems must succeed");
+        assert_eq!(count, 44 * 43);
+    }
+
+    #[test]
+    fn test_universal_category_policy_routing() {
+        let orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
+        assert_eq!(SigmaOsSubsystem::StorageDrive.as_str(), "StorageDrive");
+        assert_eq!(SigmaOsSubsystem::NetworkSecurityFirewall.as_str(), "NetworkSecurityFirewall");
+
+        let (audits, score) = orchestrator.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 44);
+        assert_eq!(score, 100);
+    }
 }

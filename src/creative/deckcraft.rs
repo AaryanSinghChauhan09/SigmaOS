@@ -267,8 +267,10 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
-            _ => {
-                output.extend_from_slice(b"%DECKCRAFT_EXPORT_STREAM\n");
+            ExportFormat::Svg => {
+                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<text>");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"</text>\n</svg>");
             }
         }
 
