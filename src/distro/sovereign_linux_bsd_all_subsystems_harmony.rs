@@ -1233,6 +1233,10 @@ mod tests {
             translated,
             "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
         );
+        assert_eq!(
+            translated,
+            "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
+        );
     }
 
     #[test]
