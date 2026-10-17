@@ -1383,11 +1383,11 @@ if [ -f "src/distro/open_source_os_missing_components_v58_pr.rs" ]; then
     ./build/test_open_source_v58_pr
 fi
 
-if [ -f "src/distro/open_source_os_missing_components_v59_pr.rs" ]; then
-    echo "Running Open Source OS Missing Components V59 PR Suite..."
+if [ -f "src/distro/open_source_os_missing_components_v60_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V60 PR Suite..."
     mkdir -p build
-    rustc --test src/distro/open_source_os_missing_components_v59_pr.rs --edition=2021 -o build/test_open_source_v59_pr
-    ./build/test_open_source_v59_pr
+    rustc --test src/distro/open_source_os_missing_components_v60_pr.rs --edition=2021 -o build/test_open_source_v60_pr
+    ./build/test_open_source_v60_pr
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then

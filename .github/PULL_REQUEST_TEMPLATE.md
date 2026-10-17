@@ -36,6 +36,11 @@
 - [ ] Resource limits governor
 - [ ] Short circuit && / ||
 
+## Shell component
+
+- [ ] Interactive shell
+- [ ] Command interpreter
+
 ## Component
 
 - [ ] Lexer / Parser
@@ -58,7 +63,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Upstream study
+## Reference study (Upstream study)
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
@@ -67,8 +72,7 @@
 - Upstream study:
 - What SigmaOS adopts:
 - Linux/BSD/Redox/xv6 reference:
-- What SigmaOS adopts / adapts / rejects:
-- Decision: Adopt / Adapt / Reject
+- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
 - Reason:
 
 ## What SigmaOS adopts
@@ -83,6 +87,12 @@
 - [ ] Upstream study and reference checked
 - [ ] What SigmaOS adopts is clearly stated
 - [ ] Safety and rollback reviewed
+
+## Shell safety review
+
+- [ ] Quote-aware lexer & parser safety
+- [ ] Safe environment expansion
+- [ ] Built-in command error handling
 
 ## Kernel safety review
 
@@ -145,4 +155,5 @@
 - Rollback:
 
 ## Reviewer checklist
-- [ ] Code safety verified
+
+- [ ] Verification complete

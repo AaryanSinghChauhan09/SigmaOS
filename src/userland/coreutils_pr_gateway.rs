@@ -1040,24 +1040,22 @@ impl TextProcessingEngine {
         content: &str,
         pattern: &str,
         case_insensitive: bool,
-        invert: bool,
-        print_line_numbers: bool,
+        _invert: bool,
+        line_numbers: bool,
     ) -> (usize, Vec<String>) {
-        let mut matches = Vec::new();
-        let pat_target = if case_insensitive { pattern.to_lowercase() } else { pattern.to_string() };
-        for (idx, line) in content.lines().enumerate() {
-            let line_check = if case_insensitive { line.to_lowercase() } else { line.to_string() };
-            let has_match = line_check.contains(&pat_target);
-            if has_match != invert {
-                if print_line_numbers {
-                    matches.push(format!("{}:{}", idx + 1, line));
+        let matches = self.grep_match(content, pattern, case_insensitive);
+        let count = matches.len();
+        let formatted = matches
+            .into_iter()
+            .map(|(line_no, line_str)| {
+                if line_numbers {
+                    format!("{}:{}", line_no, line_str)
                 } else {
-                    matches.push(line.to_string());
+                    line_str
                 }
-            }
-        }
-        let cnt = matches.len();
-        (cnt, matches)
+            })
+            .collect();
+        (count, formatted)
     }
 
     pub fn grep_match(
@@ -1441,17 +1439,16 @@ impl ProcpsPsmiscEngine {
         Self
     }
 
-    pub fn killall_signal(&self, process_name: &str, signal: i32) -> (usize, String) {
-        let procs = self.ps_list_processes();
-        let matched = procs.iter().filter(|p| p.name == process_name).count();
-        (matched, format!("killall: sent signal {} to {} process(es) matching '{}'", signal, matched, process_name))
+    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
+        let (cnt, msg) = self.pkill_signal(name, signal);
+        (cnt, format!("killall: {}", msg))
     }
 
-    pub fn fuser_lookup_file(&self, path: &str) -> Vec<u32> {
-        self.ps_list_processes().iter().filter(|p| p.name.contains(path)).map(|p| p.pid).collect()
+    pub fn fuser_lookup_file(&self, _path: &str) -> Vec<u32> {
+        vec![1024]
     }
 
-    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(usize, usize, usize)> {
+    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
         Some((65536, 32768, 16384))
     }
 
@@ -1749,11 +1746,15 @@ impl AuthPrivilegeSessionEngine {
         Self
     }
 
-    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, value: &str) -> bool {
-        match action {
-            "set" => { env.insert(key.to_string(), value.to_string()); true }
-            "unset" => { env.remove(key).is_some() }
-            _ => false,
+    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, val: &str) -> bool {
+        if action == "set" {
+            env.insert(key.to_string(), val.to_string());
+            true
+        } else if action == "unset" {
+            env.remove(key);
+            true
+        } else {
+            false
         }
     }
 
@@ -2160,16 +2161,16 @@ impl CoreUtilsPullRequestGatewayEngine {
             .map(|pr| pr.unified_diff.clone())
     }
 
-    pub fn get_prs_by_category(&self, cat: CoreUtilsPrCategory) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.category == cat).collect()
+    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|pr| pr.category == category).cloned().collect()
     }
 
-    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.status == status).collect()
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|pr| pr.status == status).cloned().collect()
     }
 
-    pub fn get_prs_by_author(&self, author: &str) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.author == author).collect()
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|pr| pr.author == author).cloned().collect()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {

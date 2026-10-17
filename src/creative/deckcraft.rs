@@ -199,26 +199,13 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-/// Complete presentation deck type alias
-pub type PresentationDeck = SlideDeck;
-
 impl SlideDeck {
     pub fn get_active_slide(&self) -> Option<&Slide> {
         self.slides.first()
     }
 }
 
-/// Presenter State
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u64,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
+pub type PresentationDeck = SlideDeck;
 
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -248,6 +235,18 @@ pub enum DeckExportFormat {
     Html5,
     Svg,
     Markdown,
+}
+
+/// Presenter view state
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u32,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
 }
 
 /// Slide Exporter Engine

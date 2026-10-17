@@ -377,23 +377,6 @@ impl CadCraftEngine {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_sketch_entity(
-        &mut self,
-        entity_type: SketchEntityType,
-        points: Vec<[f32; 2]>,
-    ) -> u32 {
-        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
-        let entity = SketchEntity {
-            id,
-            entity_type,
-            points,
-            dimensions: Vec::new(),
-            properties: BTreeMap::new(),
-        };
-        self.sketch_entities.insert(id, entity);
-        id
-    }
-
     pub fn add_geometric_constraint(
         &mut self,
         constraint_type: GeometricConstraintType,
