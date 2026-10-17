@@ -22,6 +22,7 @@ pub mod screenshot;
 pub mod sigma_office;
 pub mod sigmadev;
 pub mod sovereign_application_replacements_pr_suite;
+pub mod sovereign_application_replacements_v2_pr_suite;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod system_settings;
@@ -60,6 +61,7 @@ pub use sovereign_application_replacements_pr_suite::{
     SovereignTerminalMultiplexerPrEngine, SovereignTextEditorsPrEngine,
     SovereignThunderbirdEmailPrEngine, TerminalGraphicsProtocol, VfsMountProtocol,
 };
+pub use sovereign_application_replacements_v2_pr_suite::*;
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
     TextNode,
