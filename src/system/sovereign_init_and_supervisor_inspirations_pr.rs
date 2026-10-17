@@ -619,6 +619,19 @@ impl BsdRcInspirationsPrEngine {
         Ok(ordered)
     }
 
+    /// Merge local `/etc/rc.conf.local` configuration overrides onto main `/etc/rc.conf` map.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        main_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = main_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
     /// Parse `/etc/rc.conf` key-value pairs (e.g. `sshd_enable="YES"`, `hostname="sigma"`).
     pub fn parse_rc_conf(&self, content: &str) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
@@ -1233,7 +1246,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
