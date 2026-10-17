@@ -63,11 +63,7 @@ impl FilmcraftNleMulticamWaveformSyncPrEngine {
         }
     }
 
-    pub fn sync_multicam_tracks(
-        &mut self,
-        track_a: &[f32],
-        track_b: &[f32],
-    ) -> Result<i32, String> {
+    pub fn sync_multicam_tracks(&mut self, track_a: &[f32], track_b: &[f32]) -> Result<i32, String> {
         if track_a.is_empty() || track_b.is_empty() {
             return Err("Empty audio track provided for multicam sync".to_string());
         }
@@ -103,15 +99,12 @@ impl FilmcraftNleMulticamWaveformSyncPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftPrProposalManifest {
         FilmcraftPrProposalManifest {
             pr_id: 301,
-            pr_title:
-                "feat(filmcraft): Sub-Frame Multicam Waveform Alignment & Live Multi-Angle Switcher"
-                    .to_string(),
+            pr_title: "feat(filmcraft): Sub-Frame Multicam Waveform Alignment & Live Multi-Angle Switcher".to_string(),
             target_subsystem: "Multicam Editing Subsystem".to_string(),
             original_suite: "ArtCraft FilmCraft Multicam Studio".to_string(),
             components_added: vec![
                 "Sub-frame audio cross-correlation waveform auto-alignment engine".to_string(),
-                "Real-time 16-angle camera matrix playback with low-latency hotkey switcher"
-                    .to_string(),
+                "Real-time 16-angle camera matrix playback with low-latency hotkey switcher".to_string(),
                 "Angle-cut sync marker generation and timeline angle flattening".to_string(),
             ],
             performance_multiplier: "16 Synchronized 4K Angles @ 60 FPS".to_string(),
@@ -153,9 +146,7 @@ impl FilmcraftGpuOpticalFlowTimeWarpPrEngine {
         output: &mut [u8],
     ) -> Result<usize, String> {
         if frame_a.len() != frame_b.len() || output.len() != frame_a.len() {
-            return Err(
-                "Frame buffer dimensions mismatch for optical flow interpolation".to_string(),
-            );
+            return Err("Frame buffer dimensions mismatch for optical flow interpolation".to_string());
         }
 
         let alpha = factor.clamp(0.0, 1.0);
@@ -226,11 +217,7 @@ impl FilmcraftAcesColorGradingLutPrEngine {
         }
     }
 
-    pub fn apply_3d_lut_transform(
-        &mut self,
-        rgb_in: &[f32],
-        rgb_out: &mut [f32],
-    ) -> Result<usize, String> {
+    pub fn apply_3d_lut_transform(&mut self, rgb_in: &[f32], rgb_out: &mut [f32]) -> Result<usize, String> {
         if rgb_in.len() != rgb_out.len() {
             return Err("RGB buffer dimensions mismatch for LUT transform".to_string());
         }
@@ -300,21 +287,13 @@ impl FilmcraftProxyBackgroundTranscodePrEngine {
         }
     }
 
-    pub fn queue_background_transcode(
-        &mut self,
-        clip_name: &str,
-        scale: f32,
-    ) -> Result<String, String> {
+    pub fn queue_background_transcode(&mut self, clip_name: &str, scale: f32) -> Result<String, String> {
         if clip_name.is_empty() {
             return Err("Clip name cannot be empty".to_string());
         }
         self.proxy_res_scale = scale.clamp(0.125, 1.0);
         self.bg_queue_count += 1;
-        Ok(format!(
-            "Proxy queued for clip '{}' at {:.0}% scale",
-            clip_name,
-            self.proxy_res_scale * 100.0
-        ))
+        Ok(format!("Proxy queued for clip '{}' at {:.0}% scale", clip_name, self.proxy_res_scale * 100.0))
     }
 
     pub fn toggle_proxy(&mut self, enabled: bool) -> bool {
@@ -366,11 +345,7 @@ impl FilmcraftChromaKeySpillSuppressionPrEngine {
         }
     }
 
-    pub fn execute_chroma_key(
-        &mut self,
-        rgba_in: &[u8],
-        alpha_out: &mut [u8],
-    ) -> Result<usize, String> {
+    pub fn execute_chroma_key(&mut self, rgba_in: &[u8], alpha_out: &mut [u8]) -> Result<usize, String> {
         let pixels_count = rgba_in.len() / 4;
         if alpha_out.len() != pixels_count {
             return Err("Alpha output buffer size mismatch".to_string());
@@ -412,8 +387,7 @@ impl FilmcraftChromaKeySpillSuppressionPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftPrProposalManifest {
         FilmcraftPrProposalManifest {
             pr_id: 305,
-            pr_title: "feat(filmcraft): GPU Chroma Keyer, Spill Suppression & Edge Hair Refiner"
-                .to_string(),
+            pr_title: "feat(filmcraft): GPU Chroma Keyer, Spill Suppression & Edge Hair Refiner".to_string(),
             target_subsystem: "VFX & Keying Subsystem".to_string(),
             original_suite: "ArtCraft FilmCraft Chroma Studio".to_string(),
             components_added: vec![
@@ -452,18 +426,10 @@ impl FilmcraftSpatial3dAudioPanningPrEngine {
         }
     }
 
-    pub fn pan_spatial_audio(
-        &mut self,
-        pcm_mono: &[f32],
-        azimuth_deg: f32,
-        surround_out: &mut [f32],
-    ) -> Result<usize, String> {
+    pub fn pan_spatial_audio(&mut self, pcm_mono: &[f32], azimuth_deg: f32, surround_out: &mut [f32]) -> Result<usize, String> {
         let frame_count = pcm_mono.len();
         if surround_out.len() != frame_count * 8 {
-            return Err(
-                "Surround 7.1 output buffer size mismatch (expected 8 channels per frame)"
-                    .to_string(),
-            );
+            return Err("Surround 7.1 output buffer size mismatch (expected 8 channels per frame)".to_string());
         }
 
         let rad = azimuth_deg * 0.0174532925;
@@ -473,10 +439,10 @@ impl FilmcraftSpatial3dAudioPanningPrEngine {
         for i in 0..frame_count {
             let out_idx = i * 8;
             let sample = pcm_mono[i];
-            surround_out[out_idx] = sample * gain_l; // L
+            surround_out[out_idx] = sample * gain_l;     // L
             surround_out[out_idx + 1] = sample * gain_r; // R
-            surround_out[out_idx + 2] = sample * 0.5; // C
-            surround_out[out_idx + 3] = sample * 0.1; // LFE
+            surround_out[out_idx + 2] = sample * 0.5;    // C
+            surround_out[out_idx + 3] = sample * 0.1;    // LFE
             surround_out[out_idx + 4] = sample * gain_l * 0.7; // Ls
             surround_out[out_idx + 5] = sample * gain_r * 0.7; // Rs
             surround_out[out_idx + 6] = sample * gain_l * 0.5; // Lb
@@ -543,12 +509,7 @@ impl FilmcraftTextTitleMotionGraphicPrEngine {
         }
     }
 
-    pub fn render_motion_title(
-        &mut self,
-        text: &str,
-        time_sec: f32,
-        output_rgba: &mut [u8],
-    ) -> Result<usize, String> {
+    pub fn render_motion_title(&mut self, text: &str, time_sec: f32, output_rgba: &mut [u8]) -> Result<usize, String> {
         if text.is_empty() || output_rgba.is_empty() {
             return Err("Text or output buffer cannot be empty".to_string());
         }
@@ -667,11 +628,7 @@ impl FilmcraftHardwareAcceleratedExportPrEngine {
         }
     }
 
-    pub fn export_rendered_chunk(
-        &mut self,
-        chunk_id: usize,
-        frames: usize,
-    ) -> Result<usize, String> {
+    pub fn export_rendered_chunk(&mut self, chunk_id: usize, frames: usize) -> Result<usize, String> {
         if frames == 0 {
             return Err("Chunk frame count must be greater than zero".to_string());
         }
@@ -682,17 +639,13 @@ impl FilmcraftHardwareAcceleratedExportPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftPrProposalManifest {
         FilmcraftPrProposalManifest {
             pr_id: 309,
-            pr_title:
-                "feat(filmcraft): Hardware-Accelerated Multi-Pass Video Exporter & Render Chunking"
-                    .to_string(),
+            pr_title: "feat(filmcraft): Hardware-Accelerated Multi-Pass Video Exporter & Render Chunking".to_string(),
             target_subsystem: "Export & Render Engine Subsystem".to_string(),
             original_suite: "ArtCraft FilmCraft Render Hub".to_string(),
             components_added: vec![
                 "NVENC, VAAPI, QSV zero-copy GPU video encoder pipeline".to_string(),
-                "Multi-threaded background timeline render chunking with gapless concatenation"
-                    .to_string(),
-                "Mastering export presets for YouTube, Vimeo, ProRes 4444 & DCP cinema packages"
-                    .to_string(),
+                "Multi-threaded background timeline render chunking with gapless concatenation".to_string(),
+                "Mastering export presets for YouTube, Vimeo, ProRes 4444 & DCP cinema packages".to_string(),
             ],
             performance_multiplier: "8x Faster-than-Realtime 4K H.265 Hardware Render".to_string(),
             status: "Ready for Merge".to_string(),
@@ -829,60 +782,36 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
     pub fn evaluate_filmcraft_parity(&mut self) -> bool {
         let audio1 = vec![0.1f32; 100];
         let audio2 = vec![0.1f32; 100];
-        let _sync_ok = self
-            .multicam_sync
-            .sync_multicam_tracks(&audio1, &audio2)
-            .is_ok();
+        let _sync_ok = self.multicam_sync.sync_multicam_tracks(&audio1, &audio2).is_ok();
 
         let frame_a = vec![100u8; 16];
         let frame_b = vec![200u8; 16];
         let mut interp = vec![0u8; 16];
-        let _flow_ok = self
-            .optical_flow
-            .compute_optical_flow_slow_mo(&frame_a, &frame_b, 0.5, &mut interp)
-            .is_ok();
+        let _flow_ok = self.optical_flow.compute_optical_flow_slow_mo(&frame_a, &frame_b, 0.5, &mut interp).is_ok();
 
         let rgb_in = vec![0.5f32; 12];
         let mut rgb_out = vec![0.0f32; 12];
-        let _color_ok = self
-            .aces_color
-            .apply_3d_lut_transform(&rgb_in, &mut rgb_out)
-            .is_ok();
+        let _color_ok = self.aces_color.apply_3d_lut_transform(&rgb_in, &mut rgb_out).is_ok();
 
-        let _proxy_ok = self
-            .proxy_transcode
-            .queue_background_transcode("clip1.mov", 0.5)
-            .is_ok();
+        let _proxy_ok = self.proxy_transcode.queue_background_transcode("clip1.mov", 0.5).is_ok();
 
         let rgba_in = vec![0u8, 255u8, 0u8, 255u8];
         let mut alpha_out = vec![0u8; 1];
-        let _chroma_ok = self
-            .chroma_key
-            .execute_chroma_key(&rgba_in, &mut alpha_out)
-            .is_ok();
+        let _chroma_ok = self.chroma_key.execute_chroma_key(&rgba_in, &mut alpha_out).is_ok();
 
         let pcm = vec![0.5f32; 10];
         let mut surround = vec![0.0f32; 80];
-        let _audio_ok = self
-            .spatial_audio
-            .pan_spatial_audio(&pcm, 0.0, &mut surround)
-            .is_ok();
+        let _audio_ok = self.spatial_audio.pan_spatial_audio(&pcm, 0.0, &mut surround).is_ok();
 
         let mut title_buf = vec![0u8; 16];
-        let _title_ok = self
-            .motion_graphics
-            .render_motion_title("Title", 1.0, &mut title_buf)
-            .is_ok();
+        let _title_ok = self.motion_graphics.render_motion_title("Title", 1.0, &mut title_buf).is_ok();
 
         let luma = vec![0.1f32, 0.9f32, 0.1f32];
         let _cut_ok = self.scene_detection.detect_scene_changes(&luma).is_ok();
 
         let _export_ok = self.hw_export.export_rendered_chunk(1, 100).is_ok();
 
-        let _xml_ok = self
-            .xml_interop
-            .parse_fcpxml_timeline("<fcpxml><clip/></fcpxml>")
-            .is_ok();
+        let _xml_ok = self.xml_interop.parse_fcpxml_timeline("<fcpxml><clip/></fcpxml>").is_ok();
 
         true
     }
@@ -896,10 +825,7 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals
-                .iter()
-                .filter(|p| p.status == "Ready for Merge")
-                .count();
+            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -966,9 +892,7 @@ mod tests {
         let frame_b = vec![200u8; 16];
         let mut output = vec![0u8; 16];
 
-        let count = engine
-            .compute_optical_flow_slow_mo(&frame_a, &frame_b, 0.5, &mut output)
-            .unwrap();
+        let count = engine.compute_optical_flow_slow_mo(&frame_a, &frame_b, 0.5, &mut output).unwrap();
         assert_eq!(count, 16);
         assert_eq!(output[0], 150);
 
@@ -1009,7 +933,7 @@ mod tests {
 
         let res = engine.execute_chroma_key(&rgba, &mut alpha);
         assert!(res.is_ok());
-        assert_eq!(alpha[0], 0); // Green keyed
+        assert_eq!(alpha[0], 0);   // Green keyed
         assert_eq!(alpha[1], 255); // Red kept
 
         let mut spill_rgba = vec![100, 200, 100, 255];
