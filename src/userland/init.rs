@@ -611,6 +611,7 @@ impl OpenRcStatusControllerEngine {
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
     }
+}
 
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
@@ -1312,6 +1313,7 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
@@ -1468,42 +1470,6 @@ pub struct AtJob {
     pub max_load_average: Option<f32>,
 }
 
-/// `atd` Queue Spool Manager
-pub struct AtSpoolQueueManager {
-    pub jobs: BTreeMap<u64, AtJob>,
-    pub next_job_id: u64,
-}
-
-impl AtSpoolQueueManager {
-    pub fn new() -> Self {
-        Self {
-            jobs: BTreeMap::new(),
-            next_job_id: 1,
-        }
-    }
-
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        self.jobs.insert(
-            id,
-            AtJob {
-                job_id: id,
-                execute_at,
-                command,
-                queue,
-                max_load_average: max_load,
-            },
-        );
-        id
-    }
-}
 
 /// Systemd Timer Specification
 #[derive(Debug, Clone)]
