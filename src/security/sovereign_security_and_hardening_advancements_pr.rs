@@ -132,11 +132,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Check Landlock v5 access rights against allowed access bitmask.
-    pub fn check_landlock_access(allowed_mask: u64, requested_access: u64) -> bool {
-        (allowed_mask & requested_access) == requested_access
-    }
-
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
         if limit_str == "max" {
