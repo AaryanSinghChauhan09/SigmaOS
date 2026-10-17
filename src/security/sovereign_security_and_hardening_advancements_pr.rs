@@ -44,10 +44,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
-    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
-        (allowed_mask & requested_access) == requested_access
-    }
-
     /// Evaluate SELinux access vector decision (Type Enforcement).
     pub fn evaluate_selinux_avc(
         &self,
@@ -87,8 +83,8 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Evaluate Landlock v5 access permission.
-    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+    /// Evaluate Landlock v5 access permission (u64 variant).
+    pub fn check_landlock_access_u64(handled_access: u64, requested_access: u64) -> bool {
         (handled_access & requested_access) == requested_access
     }
 
@@ -417,15 +413,6 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
-            domain,
-            provider,
-            uri
-        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
