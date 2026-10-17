@@ -384,10 +384,9 @@ impl SigmaInit {
 
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), String> {
-        let total_services = self.services.len() as u32;
         let service = self
             .services
-            .get(name)
+            .get_mut(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         // Check dependencies
@@ -486,9 +485,10 @@ impl SigmaInit {
 
     /// Switch to a target
     pub fn switch_target(&mut self, target_name: &str) -> Result<(), String> {
-        if !self.targets.contains_key(target_name) {
-            return Err(format!("Target '{}' not found", target_name));
-        }
+        let target = self
+            .targets
+            .get(target_name)
+            .ok_or_else(|| format!("Target '{}' not found", target_name))?;
 
         // Stop current target services
         if let Some(current) = &self.current_target {

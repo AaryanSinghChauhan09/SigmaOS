@@ -1,109 +1,74 @@
 ## Summary
 
-<!-- What kernel or component behavior changed and why? -->
-
-## Kernel component
-
-- [ ] Boot / arch init
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
-- [ ] Security / capabilities
-- [ ] Diagnostics
-- [ ] Build / CI
-
-## Shell component
-
-- [ ] Parser / Lexer
-- [ ] Builtin commands
-- [ ] Environment / Expansion
-- [ ] Job control / Signals
-- [ ] Redirection / Pipes
+<!-- One paragraph: what changed and why. -->
 
 ## Component
 
-- [ ] PR-level validation
-- [ ] Daily CI triage
-- [ ] Weekly subsystem review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly syscall/ABI review
-- [ ] Biweekly memory/concurrency audit
-- [ ] Monthly boot validation
-- [ ] Monthly driver/hardware audit
-- [ ] Monthly fuzz triage
-- [ ] Monthly diagnostics rehearsal
-- [ ] Quarterly release/architecture/security review
-
-## Upstream study
-
-<!-- Required for design-changing kernel PRs -->
-
-- Upstream study document:
-- What SigmaOS adopts:
-- Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
-- Reason:
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## Changes
 
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+-
 
-## Kernel safety review
+## Motivation
 
-- [ ] No unnecessary `unsafe`
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
-- [ ] Interrupt-context safety considered
-- [ ] Allocation limits defined
-- [ ] OOM behavior defined
-- [ ] Error paths tested
-- [ ] No silent failure introduced
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Implementation notes
+
+<!-- Design decisions, data structures, locking, error handling. -->
+
+## Tests
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Shell safety review
 
-- [ ] Deterministic script execution
-- [ ] Explicit exit status codes
-- [ ] Quoting & expansion integrity
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+```
 
-## Evidence
+Paste relevant output below.
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or reason for exemption
-- [ ] QEMU boot evidence, if boot-affecting
-- [ ] Driver/hardware evidence, if driver-affecting
-- [ ] Security review requested, if applicable
+## Capability status
 
-## Status updates
+- Previous status:
+- New status:
+- Evidence:
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Boot matrix, if applicable
-- [ ] Hardware matrix, if applicable
+## Integration impact
+
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
 
 ## Reviewer checklist
 
-- [ ] Security review requested, if applicable
-- [ ] No regression detected
-
-## Safety and rollback
-
-- Risk:
-- Safety and rollback plan:
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim

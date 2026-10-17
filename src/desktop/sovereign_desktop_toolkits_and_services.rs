@@ -182,16 +182,9 @@ impl SovereignGtkQtToolkitEngine {
         let svg_path = format!("/usr/share/Kvantum/{}/{}.svg", theme_name, theme_name);
 
         self.qt_style = QtPlatformStyle::Kvantum;
-        self.kvantum_spec = Some(SovereignKvantumThemeSpec {
-            theme_name: theme_name.clone(),
-            svg_path,
-            blur_background,
-            translucent_windows,
-            blur_radius,
-        });
-
-        self.event_log
-            .push(ToolkitEvent::KvantumThemeApplied(theme_name));
+        self.event_log.push(ToolkitEvent::KvantumThemeApplied(
+            self.kvantum_spec.theme_name.clone(),
+        ));
         true
     }
 
@@ -1082,7 +1075,6 @@ impl SovereignFontAndTextLayoutEngine {
 
         Self {
             font_match_cache,
-            fontconfig_aliases,
             opentype_features: vec![
                 "liga".to_string(),
                 "kern".to_string(),
