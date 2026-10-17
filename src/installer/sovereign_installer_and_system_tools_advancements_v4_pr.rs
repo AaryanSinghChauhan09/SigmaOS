@@ -124,21 +124,32 @@ impl AnacondaKickstartBlivetEngineV4 {
                     }
                     self.partitions.push(spec);
                 }
-                pkg if !pkg.starts_with('%') && !pkg.starts_with('#') => self.package_groups.push(pkg.to_string()),
+                pkg if !pkg.starts_with('%') && !pkg.starts_with('#') => {
+                    self.package_groups.push(pkg.to_string())
+                }
                 _ => {}
             }
         }
-        self.execution_log.push(format!("Anaconda V4: Parsed config with {} partitions & {} package groups",
-            self.partitions.len(), self.package_groups.len()));
+        self.execution_log.push(format!(
+            "Anaconda V4: Parsed config with {} partitions & {} package groups",
+            self.partitions.len(),
+            self.package_groups.len()
+        ));
         Ok(())
     }
 
     /// Process Cockpit DBus remote installation invocation
-    pub fn handle_cockpit_dbus_request(&mut self, req: CockpitDbusInstallRequestV4) -> Result<String, String> {
+    pub fn handle_cockpit_dbus_request(
+        &mut self,
+        req: CockpitDbusInstallRequestV4,
+    ) -> Result<String, String> {
         if req.session_token.is_empty() {
             return Err("Anaconda V4 Cockpit: Missing session authorization token".to_string());
         }
-        let msg = format!("Cockpit DBus install initiated on target '{}' from IP {}", req.target_disk, req.remote_ip);
+        let msg = format!(
+            "Cockpit DBus install initiated on target '{}' from IP {}",
+            req.target_disk, req.remote_ip
+        );
         self.cockpit_requests.push(req);
         self.execution_log.push(msg.clone());
         Ok(msg)
@@ -154,7 +165,10 @@ impl AnacondaKickstartBlivetEngineV4 {
                 count += 1;
             }
         }
-        self.execution_log.push(format!("Anaconda V4: Enrolled TPM2 auto-unlock keyslots for {} volumes", count));
+        self.execution_log.push(format!(
+            "Anaconda V4: Enrolled TPM2 auto-unlock keyslots for {} volumes",
+            count
+        ));
         count
     }
 }
@@ -220,7 +234,10 @@ impl CalamaresModularWizardEngineV4 {
             timestamp_sec: 1700000000 + (self.active_step_index as u64) * 10,
         };
         self.checkpoints.push(checkpoint);
-        self.logs.push(format!("Calamares V4: Completed step '{}' and created checkpoint", step_name));
+        self.logs.push(format!(
+            "Calamares V4: Completed step '{}' and created checkpoint",
+            step_name
+        ));
 
         self.active_step_index += 1;
         if self.active_step_index < self.step_queue.len() {
@@ -235,12 +252,18 @@ impl CalamaresModularWizardEngineV4 {
 
     /// Roll back wizard execution to specified checkpoint
     pub fn rollback_to_checkpoint(&mut self, checkpoint_id: &str) -> Result<String, String> {
-        let pos = self.checkpoints.iter().position(|c| c.checkpoint_id == checkpoint_id)
+        let pos = self
+            .checkpoints
+            .iter()
+            .position(|c| c.checkpoint_id == checkpoint_id)
             .ok_or_else(|| format!("Calamares V4: Checkpoint '{}' not found", checkpoint_id))?;
 
         self.checkpoints.truncate(pos + 1);
         self.active_step_index = pos + 1;
-        let msg = format!("Calamares V4: Rolled back execution to checkpoint '{}'", checkpoint_id);
+        let msg = format!(
+            "Calamares V4: Rolled back execution to checkpoint '{}'",
+            checkpoint_id
+        );
         self.logs.push(msg.clone());
         Ok(msg)
     }
@@ -284,24 +307,39 @@ impl DebianSubiquityInstallerEngineV4 {
                     self.autoinstall_spec.version = v;
                 }
             } else if trimmed.starts_with("locale:") {
-                self.autoinstall_spec.locale = trimmed.trim_start_matches("locale:").trim().to_string();
+                self.autoinstall_spec.locale =
+                    trimmed.trim_start_matches("locale:").trim().to_string();
             } else if trimmed.starts_with("pxe_tftp_url:") {
-                self.autoinstall_spec.pxe_tftp_url = trimmed.trim_start_matches("pxe_tftp_url:").trim().to_string();
+                self.autoinstall_spec.pxe_tftp_url = trimmed
+                    .trim_start_matches("pxe_tftp_url:")
+                    .trim()
+                    .to_string();
             } else if trimmed.starts_with("layout:") {
-                self.autoinstall_spec.storage_layout_name = trimmed.trim_start_matches("layout:").trim().to_string();
+                self.autoinstall_spec.storage_layout_name =
+                    trimmed.trim_start_matches("layout:").trim().to_string();
             }
         }
-        self.logs.push(format!("Subiquity V4: Parsed YAML version {}", self.autoinstall_spec.version));
+        self.logs.push(format!(
+            "Subiquity V4: Parsed YAML version {}",
+            self.autoinstall_spec.version
+        ));
         Ok(())
     }
 
     /// Stage netboot PXE kernel and initrd over TFTP/HTTP
-    pub fn stage_pxe_netboot_resources(&mut self, kernel_image: &str, initrd_image: &str) -> Result<String, String> {
+    pub fn stage_pxe_netboot_resources(
+        &mut self,
+        kernel_image: &str,
+        initrd_image: &str,
+    ) -> Result<String, String> {
         let k_entry = format!("pxe://tftp/{}", kernel_image);
         let i_entry = format!("pxe://tftp/{}", initrd_image);
         self.pxe_staged_kernels.push(k_entry);
         self.pxe_staged_kernels.push(i_entry);
-        let status = format!("Subiquity V4: Staged PXE netboot resources at {}", self.autoinstall_spec.pxe_tftp_url);
+        let status = format!(
+            "Subiquity V4: Staged PXE netboot resources at {}",
+            self.autoinstall_spec.pxe_tftp_url
+        );
         self.logs.push(status.clone());
         Ok(status)
     }
@@ -344,8 +382,13 @@ impl ArchinstallProfileEngineV4 {
         }
         self.profile.profile_name = "desktop-hyprland-v4".to_string();
         self.profile.kernel_packages = vec!["linux".to_string(), "linux-firmware".to_string()];
-        self.profile.subvol_layout = vec!["@".to_string(), "@home".to_string(), "@snapshots".to_string()];
-        self.logs.push("Archinstall V4: Loaded JSON profile v2 spec".to_string());
+        self.profile.subvol_layout = vec![
+            "@".to_string(),
+            "@home".to_string(),
+            "@snapshots".to_string(),
+        ];
+        self.logs
+            .push("Archinstall V4: Loaded JSON profile v2 spec".to_string());
         Ok(())
     }
 
@@ -355,7 +398,10 @@ impl ArchinstallProfileEngineV4 {
             return Err("Archinstall V4: UKI boot generation disabled in profile".to_string());
         }
         self.generated_uki_path = Some(output_efi.to_string());
-        let msg = format!("Archinstall V4: Generated Unified Kernel Image (UKI) at {}", output_efi);
+        let msg = format!(
+            "Archinstall V4: Generated Unified Kernel Image (UKI) at {}",
+            output_efi
+        );
         self.logs.push(msg.clone());
         Ok(msg)
     }
@@ -397,13 +443,17 @@ impl BsdinstallAutoinstallEngineV4 {
 
     /// Provision OpenBSD autoinstall response file parameters
     pub fn set_autoinstall_response(&mut self, question: &str, answer: &str) {
-        self.autoinstall_response_file.insert(question.to_string(), answer.to_string());
+        self.autoinstall_response_file
+            .insert(question.to_string(), answer.to_string());
     }
 
     /// Create new ZFS `bectl` boot environment snapshot
     pub fn create_bectl_boot_environment(&mut self, be_name: &str) -> Result<String, String> {
         self.bectl_boot_environments.push(be_name.to_string());
-        let msg = format!("bsdinstall V4: Created ZFS bectl boot environment '{}'", be_name);
+        let msg = format!(
+            "bsdinstall V4: Created ZFS bectl boot environment '{}'",
+            be_name
+        );
         self.logs.push(msg.clone());
         Ok(msg)
     }
@@ -435,12 +485,18 @@ impl DracutEventDrivenInitramfsEngineV4 {
     /// Register eBPF early boot tracing module in initrd
     pub fn register_ebpf_tracing_module(&mut self, module_name: &str) {
         self.ebpf_tracing_modules.push(module_name.to_string());
-        self.logs.push(format!("dracut V4: Registered eBPF initrd module '{}'", module_name));
+        self.logs.push(format!(
+            "dracut V4: Registered eBPF initrd module '{}'",
+            module_name
+        ));
     }
 
     /// Seal initramfs boot state against TPM2 PCRs
     pub fn seal_boot_state_to_pcr(&mut self) -> Result<String, String> {
-        let msg = format!("dracut V4: Sealed initramfs state against PCRs {:?}", self.tpm2_pcr_measurements);
+        let msg = format!(
+            "dracut V4: Sealed initramfs state against PCRs {:?}",
+            self.tpm2_pcr_measurements
+        );
         self.logs.push(msg.clone());
         Ok(msg)
     }
@@ -466,7 +522,14 @@ impl MkinitcpioHookEngineV4 {
             preset_name: preset.to_string(),
             cpu_microcode_spliced: false,
             zstd_dictionary_enabled: true,
-            build_hooks: vec!["base".to_string(), "systemd".to_string(), "autodetect".to_string(), "sd-vconsole".to_string(), "block".to_string(), "filesystems".to_string()],
+            build_hooks: vec![
+                "base".to_string(),
+                "systemd".to_string(),
+                "autodetect".to_string(),
+                "sd-vconsole".to_string(),
+                "block".to_string(),
+                "filesystems".to_string(),
+            ],
             logs: Vec::new(),
         }
     }
@@ -474,18 +537,26 @@ impl MkinitcpioHookEngineV4 {
     /// Splice CPU microcode payload (intel-ucode / amd-ucode) into initcpio archive
     pub fn splice_cpu_microcode(&mut self, vendor: &str) {
         self.cpu_microcode_spliced = true;
-        self.logs.push(format!("mkinitcpio V4: Spliced {} CPU microcode payload into early initrd", vendor));
+        self.logs.push(format!(
+            "mkinitcpio V4: Spliced {} CPU microcode payload into early initrd",
+            vendor
+        ));
     }
 
     /// Build mkinitcpio initramfs archive with Zstd multi-threaded dictionary compression
     pub fn build_zstd_dictionary_initramfs(&mut self) -> Result<Vec<u8>, String> {
-        let header = format!("MKINITCPIO-V4-PRESET:{}-UCODE:{}-ZSTD-DICT:true\n",
-            self.preset_name, self.cpu_microcode_spliced);
+        let header = format!(
+            "MKINITCPIO-V4-PRESET:{}-UCODE:{}-ZSTD-DICT:true\n",
+            self.preset_name, self.cpu_microcode_spliced
+        );
         let mut data = header.into_bytes();
         for h in &self.build_hooks {
             data.extend_from_slice(format!("HOOK:{}\n", h).as_bytes());
         }
-        self.logs.push(format!("mkinitcpio V4: Built compressed initramfs archive ({} bytes)", data.len()));
+        self.logs.push(format!(
+            "mkinitcpio V4: Built compressed initramfs archive ({} bytes)",
+            data.len()
+        ));
         Ok(data)
     }
 }
@@ -551,7 +622,8 @@ impl AnsibleAgentlessEngineV4 {
             return Err("Ansible V4: Empty Vault password supplied".to_string());
         }
         self.vault_decrypted = true;
-        self.logs.push("Ansible V4: Decrypted Ansible Vault secret store".to_string());
+        self.logs
+            .push("Ansible V4: Decrypted Ansible Vault secret store".to_string());
         Ok(true)
     }
 
@@ -564,7 +636,10 @@ impl AnsibleAgentlessEngineV4 {
         self.task_queue.push("configure_network".to_string());
         self.task_queue.push("deploy_services".to_string());
         let count = self.task_queue.len();
-        self.logs.push(format!("Ansible V4: Executed {} tasks across {} async parallel workers", count, self.async_workers));
+        self.logs.push(format!(
+            "Ansible V4: Executed {} tasks across {} async parallel workers",
+            count, self.async_workers
+        ));
         Ok(count)
     }
 }
@@ -585,9 +660,16 @@ pub struct PuppetRalCatalogCompilerEngineV4 {
 impl PuppetRalCatalogCompilerEngineV4 {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.hiera_v5_hierarchy = vec!["nodes/%{::trusted.certname}.yaml".to_string(), "common.yaml".to_string()];
-        engine.facter_facts.insert("kernel".to_string(), "SigmaOS".to_string());
-        engine.facter_facts.insert("facterversion".to_string(), "4.5.0".to_string());
+        engine.hiera_v5_hierarchy = vec![
+            "nodes/%{::trusted.certname}.yaml".to_string(),
+            "common.yaml".to_string(),
+        ];
+        engine
+            .facter_facts
+            .insert("kernel".to_string(), "SigmaOS".to_string());
+        engine
+            .facter_facts
+            .insert("facterversion".to_string(), "4.5.0".to_string());
         engine
     }
 
@@ -608,7 +690,10 @@ impl PuppetRalCatalogCompilerEngineV4 {
             "Service[nginx]".to_string(),
         ];
         let count = self.compiled_dag_nodes.len();
-        self.logs.push(format!("Puppet RAL V4: Compiled topological DAG with {} resources", count));
+        self.logs.push(format!(
+            "Puppet RAL V4: Compiled topological DAG with {} resources",
+            count
+        ));
         Ok(count)
     }
 }
@@ -634,14 +719,20 @@ impl ChefRecipeConvergenceEngineV4 {
     /// Register custom resource provider (LWRP)
     pub fn register_lwrp_resource(&mut self, name: &str) {
         self.custom_lwrp_resources.push(name.to_string());
-        self.logs.push(format!("Chef V4: Registered LWRP custom resource provider '{}'", name));
+        self.logs.push(format!(
+            "Chef V4: Registered LWRP custom resource provider '{}'",
+            name
+        ));
     }
 
     /// Execute Chef client convergence run and fire report handlers
     pub fn converge_and_report_metrics(&mut self) -> Result<usize, String> {
         let count = self.custom_lwrp_resources.len();
         self.handler_reported = true;
-        self.logs.push(format!("Chef Client V4: Converged {} LWRP resources and sent JSON handler metrics", count));
+        self.logs.push(format!(
+            "Chef Client V4: Converged {} LWRP resources and sent JSON handler metrics",
+            count
+        ));
         Ok(count)
     }
 }
@@ -668,14 +759,18 @@ impl CloudInitMultiStageEngineV4 {
     pub fn acquire_imdsv2_session_token(&mut self) -> Result<String, String> {
         let imdsv2_sess = "AQAAAH-imds-v2-session-token-sigma-v4-99887766".to_string();
         self.imdsv2_token = Some(imdsv2_sess.clone());
-        self.logs.push("cloud-init V4: Acquired IMDSv2 metadata session token".to_string());
+        self.logs
+            .push("cloud-init V4: Acquired IMDSv2 metadata session token".to_string());
         Ok(imdsv2_sess)
     }
 
     /// Execute early cloud-boothook scripts
     pub fn execute_cloud_boothooks(&mut self, hook_script: &str) -> Result<bool, String> {
         self.boothooks_executed.push(hook_script.to_string());
-        self.logs.push(format!("cloud-init V4: Executed cloud-boothook '{}'", hook_script));
+        self.logs.push(format!(
+            "cloud-init V4: Executed cloud-boothook '{}'",
+            hook_script
+        ));
         Ok(true)
     }
 }
@@ -709,7 +804,9 @@ impl CoreOsIgnitionInitramfsEngineV4 {
             return Err("Ignition V4: Invalid TLS certificate chain".to_string());
         }
         self.tls_cert_validated = true;
-        self.logs.push("Ignition V4: Validated TLS attestation chain for remote config payload".to_string());
+        self.logs.push(
+            "Ignition V4: Validated TLS attestation chain for remote config payload".to_string(),
+        );
         Ok(true)
     }
 
@@ -719,7 +816,10 @@ impl CoreOsIgnitionInitramfsEngineV4 {
             return Err("Ignition V4: TLS attestation required before disk formatting".to_string());
         }
         self.luks_formatted_disks.push(device_path.to_string());
-        let msg = format!("Ignition V4: Formatted LUKS encrypted device at {}", device_path);
+        let msg = format!(
+            "Ignition V4: Formatted LUKS encrypted device at {}",
+            device_path
+        );
         self.logs.push(msg.clone());
         Ok(msg)
     }
@@ -767,21 +867,31 @@ impl SovereignInstallerAndSystemToolsMasterSuiteV4 {
     }
 
     /// Execute complete master installation and system automation pipeline V4
-    pub fn execute_master_installation_pipeline_v4(&mut self, target_disk: &str, hostname: &str) -> Result<String, String> {
+    pub fn execute_master_installation_pipeline_v4(
+        &mut self,
+        target_disk: &str,
+        hostname: &str,
+    ) -> Result<String, String> {
         // 1. Storage & Remote Installer setup
-        self.anaconda_engine.handle_cockpit_dbus_request(CockpitDbusInstallRequestV4 {
-            session_token: "tok-cockpit-v4".to_string(),
-            remote_ip: "192.168.1.100".to_string(),
-            target_disk: target_disk.to_string(),
-            is_interactive_gui: true,
-        }).ok();
+        self.anaconda_engine
+            .handle_cockpit_dbus_request(CockpitDbusInstallRequestV4 {
+                session_token: "tok-cockpit-v4".to_string(),
+                remote_ip: "192.168.1.100".to_string(),
+                target_disk: target_disk.to_string(),
+                is_interactive_gui: true,
+            })
+            .ok();
 
         // 2. Wizard & Initramfs prep
         self.calamares_engine.advance_step_with_checkpoint().ok();
         self.dracut_engine.seal_boot_state_to_pcr().ok();
         self.mkinitcpio_engine.splice_cpu_microcode("Intel");
-        self.mkinitcpio_engine.build_zstd_dictionary_initramfs().ok();
-        self.update_initramfs_engine.execute_parallel_kernel_build().ok();
+        self.mkinitcpio_engine
+            .build_zstd_dictionary_initramfs()
+            .ok();
+        self.update_initramfs_engine
+            .execute_parallel_kernel_build()
+            .ok();
 
         // 3. System Automation & Infrastructure-as-Code
         self.ansible_engine.decrypt_ansible_vault("secret").ok();
@@ -792,7 +902,9 @@ impl SovereignInstallerAndSystemToolsMasterSuiteV4 {
 
         // 4. Cloud First-Boot Provisioning
         self.cloud_init_engine.acquire_imdsv2_session_token().ok();
-        self.ignition_engine.validate_tls_attestation_chain("-----BEGIN CERTIFICATE-----...").ok();
+        self.ignition_engine
+            .validate_tls_attestation_chain("-----BEGIN CERTIFICATE-----...")
+            .ok();
         self.ignition_engine.format_luks_device(target_disk).ok();
 
         Ok(format!("Sovereign Installer Master Pipeline V4 executed successfully for host '{}' on device {}", hostname, target_disk))
@@ -833,13 +945,17 @@ impl SovereignInstallerSystemToolsPrGatewayV4 {
     }
 
     fn register_proposals(&mut self) {
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV4 {
-            pr_id: 827,
-            title: "rAnaconda Cockpit DBus API & LUKS2 systemd-cryptenroll TPM2 Auto-Unlock V4".to_string(),
-            target_subsystem: "Installer/rAnaconda".to_string(),
-            description: "Provides remote DBus installation endpoints and TPM2 PCR volume key enrollment".to_string(),
-            status: "Merged".to_string(),
-        });
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV4 {
+                pr_id: 827,
+                title: "rAnaconda Cockpit DBus API & LUKS2 systemd-cryptenroll TPM2 Auto-Unlock V4"
+                    .to_string(),
+                target_subsystem: "Installer/rAnaconda".to_string(),
+                description:
+                    "Provides remote DBus installation endpoints and TPM2 PCR volume key enrollment"
+                        .to_string(),
+                status: "Merged".to_string(),
+            });
         self.proposals.push(SovereignInstallerSystemToolsPrProposalV4 {
             pr_id: 828,
             title: "Calamares QML Execution Rollback Checkpoints & Plymouth UI Hooks V4".to_string(),
@@ -847,11 +963,14 @@ impl SovereignInstallerSystemToolsPrGatewayV4 {
             description: "Supports wizard step checkpoints for execution rollbacks and seamless Plymouth theme transitions".to_string(),
             status: "Merged".to_string(),
         });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV4 {
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV4 {
             pr_id: 829,
             title: "Debian Subiquity Autoinstall YAML Parser & Netboot PXE Staging V4".to_string(),
             target_subsystem: "Installer/debian-subiquity".to_string(),
-            description: "Parses Subiquity YAML configs and stages PXE TFTP/HTTP netboot installation images".to_string(),
+            description:
+                "Parses Subiquity YAML configs and stages PXE TFTP/HTTP netboot installation images"
+                    .to_string(),
             status: "Merged".to_string(),
         });
         self.proposals.push(SovereignInstallerSystemToolsPrProposalV4 {
@@ -903,11 +1022,15 @@ impl SovereignInstallerSystemToolsPrGatewayV4 {
             description: "Resolves Hiera v5 hierarchy data and compiles resource dependency DAGs topologically".to_string(),
             status: "Merged".to_string(),
         });
-        self.proposals.push(SovereignInstallerSystemToolsPrProposalV4 {
+        self.proposals
+            .push(SovereignInstallerSystemToolsPrProposalV4 {
             pr_id: 837,
-            title: "Chef LWRP Custom Resource Provider Engine & Client JSON Handler Metrics V4".to_string(),
+            title: "Chef LWRP Custom Resource Provider Engine & Client JSON Handler Metrics V4"
+                .to_string(),
             target_subsystem: "IaC/Chef".to_string(),
-            description: "Executes custom LWRP providers and reports JSON execution metrics to Chef Server".to_string(),
+            description:
+                "Executes custom LWRP providers and reports JSON execution metrics to Chef Server"
+                    .to_string(),
             status: "Merged".to_string(),
         });
         self.proposals.push(SovereignInstallerSystemToolsPrProposalV4 {
@@ -1023,7 +1146,13 @@ mod tests {
         assert_eq!(ansible.execute_async_parallel_playbook().unwrap(), 3);
 
         let mut puppet = PuppetRalCatalogCompilerEngineV4::new();
-        assert_eq!(puppet.hiera_lookup("system::ntp_servers").unwrap().contains("0.pool.ntp.org"), true);
+        assert_eq!(
+            puppet
+                .hiera_lookup("system::ntp_servers")
+                .unwrap()
+                .contains("0.pool.ntp.org"),
+            true
+        );
         assert_eq!(puppet.sort_dag_and_enforce_catalog().unwrap(), 3);
 
         let mut chef = ChefRecipeConvergenceEngineV4::new();
@@ -1036,7 +1165,9 @@ mod tests {
         let mut ci = CloudInitMultiStageEngineV4::new();
         let token = ci.acquire_imdsv2_session_token().unwrap();
         assert!(token.contains("imds-v2"));
-        assert!(ci.execute_cloud_boothooks("#!/bin/sh\necho boothook").is_ok());
+        assert!(ci
+            .execute_cloud_boothooks("#!/bin/sh\necho boothook")
+            .is_ok());
 
         let mut ig = CoreOsIgnitionInitramfsEngineV4::new();
         assert!(ig.validate_tls_attestation_chain("CERT_DATA").is_ok());
@@ -1047,7 +1178,9 @@ mod tests {
     #[test]
     fn test_sovereign_installer_master_suite_v4() {
         let mut master = SovereignInstallerAndSystemToolsMasterSuiteV4::new();
-        let status = master.execute_master_installation_pipeline_v4("/dev/nvme0n1", "sigmaos-node-v4").unwrap();
+        let status = master
+            .execute_master_installation_pipeline_v4("/dev/nvme0n1", "sigmaos-node-v4")
+            .unwrap();
         assert!(status.contains("executed successfully"));
 
         let gateway = SovereignInstallerSystemToolsPrGatewayV4::new();
