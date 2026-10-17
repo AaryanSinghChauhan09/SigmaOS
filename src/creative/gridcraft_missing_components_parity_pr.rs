@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
+//
 // (`src/creative/gridcraft_missing_components_parity_pr.rs`)
 //
 // Provides structured PR proposals and full engine implementations for components

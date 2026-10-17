@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft (Spreadsheet, Data Analytics & Visualization Engine)
 // Inspired by ArtCraft Gridcraft, Microsoft Excel, Google Sheets, LibreOffice Calc
-// Provides spreadsheet computation, formula evaluation, pivot tables, and data charts in PR format
+// Provides spreadsheet computation, formula evaluation, pivot tables, and data charts in PR format.
 
 #![no_std]
 
