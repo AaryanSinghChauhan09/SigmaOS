@@ -3,7 +3,6 @@
 
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
@@ -13,17 +12,6 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::format;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
@@ -83,121 +71,108 @@ pub struct Sovereign100IdeasSuite {
 impl Sovereign100IdeasSuite {
     pub fn new() -> Self {
         let mut suite = Self {
-            ideas: Vec::with_capacity(100),
+            features: Vec::with_capacity(100),
         };
-        suite.populate_all_100_ideas();
+        suite.seed_100_ideas();
         suite
     }
 
     fn populate_all_100_ideas(&mut self) {
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 1,
-            title: "Native Video Editor (timeline + effects)".to_string(),
-            category: "MultimediaTools".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/media/sovereign_video_editor.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 1,
+            name: "Native Video Editor (timeline + effects)".to_string(),
+            category: IdeaCategory::MultimediaTools,
+            legacy_counterparts: "Adobe Premiere Pro, Final Cut Pro, Kdenlive".to_string(),
+            implementation_module: "src/media/sovereign_video_editor.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 2,
-            title: "GPU-Accelerated Screen & GIF Recorder".to_string(),
-            category: "MultimediaTools".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/productivity/screen_recorder.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 2,
+            name: "GPU-Accelerated Screen & GIF Recorder".to_string(),
+            category: IdeaCategory::MultimediaTools,
+            legacy_counterparts: "OBS Studio, Bandicam, ScreenToGif".to_string(),
+            implementation_module: "src/productivity/screen_recorder.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 3,
-            title: "Multi-Track Audio Editor & DSP Pipeline".to_string(),
-            category: "MultimediaTools".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/audio/editor.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 3,
+            name: "Multi-Track Audio Editor & DSP Pipeline".to_string(),
+            category: IdeaCategory::MultimediaTools,
+            legacy_counterparts: "Audacity, Adobe Audition".to_string(),
+            implementation_module: "src/audio/editor.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 11,
-            title: "Smart Temporary File & Cache Cleaner".to_string(),
-            category: "SystemUtilities".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/system/cleanup.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 11,
+            name: "Smart Temporary File & Cache Cleaner".to_string(),
+            category: IdeaCategory::SystemUtilities,
+            legacy_counterparts: "CCleaner, BleachBit".to_string(),
+            implementation_module: "src/system/cleanup.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 12,
-            title: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine".to_string(),
-            category: "SystemUtilities".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/system/defrag.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 12,
+            name: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine".to_string(),
+            category: IdeaCategory::SystemUtilities,
+            legacy_counterparts: "Defraggler, e4defrag".to_string(),
+            implementation_module: "src/system/defrag.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 13,
-            title: "Duplicate File Finder & Hash Deduplicator".to_string(),
-            category: "SystemUtilities".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/system/duplicate.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 13,
+            name: "Duplicate File Finder & Hash Deduplicator".to_string(),
+            category: IdeaCategory::SystemUtilities,
+            legacy_counterparts: "dupeGuru, rmlint".to_string(),
+            implementation_module: "src/system/duplicate.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 24,
-            title: "SigmaPkg Universal Package Manager & Cross-Translator".to_string(),
-            category: "PackageAndAppManagement".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/package/universal.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 24,
+            name: "SigmaPkg Universal Package Manager & Cross-Translator".to_string(),
+            category: IdeaCategory::PackageAndAppManagement,
+            legacy_counterparts: "Nix, Homebrew, Apt, Pacman, Dnf".to_string(),
+            implementation_module: "src/package/universal.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 25,
-            title: "Declarative Nix-style System State & Generation Manager".to_string(),
-            category: "PackageAndAppManagement".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/distro/wiki_ideas_implementation.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 25,
+            name: "Declarative Nix-style System State & Generation Manager".to_string(),
+            category: IdeaCategory::PackageAndAppManagement,
+            legacy_counterparts: "NixOS home-manager, Guix System".to_string(),
+            implementation_module: "src/distro/wiki_ideas_implementation.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 32,
-            title: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine".to_string(),
-            category: "PackageAndAppManagement".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/tools/sigma_cli.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 32,
+            name: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine".to_string(),
+            category: IdeaCategory::PackageAndAppManagement,
+            legacy_counterparts: "POSIX CLI, GNU Coreutils, FreeBSD CLI".to_string(),
+            implementation_module: "src/tools/sigma_cli.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 34,
-            title: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
-            category: "SecurityAndPrivacy".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/security/qubes_isolation.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 34,
+            name: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
+            category: IdeaCategory::SecurityAndPrivacy,
+            legacy_counterparts: "Qubes OS, Coreboot, SecureBoot".to_string(),
+            implementation_module: "src/security/qubes_isolation.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 35,
-            title: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine".to_string(),
-            category: "SecurityAndPrivacy".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/security/bsd_hardening.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 35,
+            name: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine".to_string(),
+            category: IdeaCategory::SecurityAndPrivacy,
+            legacy_counterparts: "OpenBSD pledge/unveil, Landlock".to_string(),
+            implementation_module: "src/security/bsd_hardening.rs".to_string(),
+            is_fulfilled: true,
         });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 100,
-            title: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter"
-                .to_string(),
-            category: "ComplianceAndGovernance".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "docs/roadmap/AGENT.md".to_string(),
-            target_module: "src/security/governance.rs".to_string(),
-            is_fully_implemented: true,
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 100,
+            name: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter".to_string(),
+            category: IdeaCategory::ComplianceAndGovernance,
+            legacy_counterparts: "HIPAA, SOC2, ISO27001, DFSG".to_string(),
+            implementation_module: "src/security/governance.rs".to_string(),
+            is_fulfilled: true,
         });
     }
 
@@ -206,7 +181,7 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        self.total_fulfilled_count() == self.ideas.len() && !self.ideas.is_empty()
+        self.total_fulfilled_count() == 100
     }
 }
 
@@ -252,9 +227,9 @@ pub struct SovereignShardDescriptor {
     pub status_active: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SovereignShardsMasterRegistry {
-    pub shards: BTreeMap<u32, SovereignShardDescriptor>,
+    pub shards: BTreeMap<u32, ShardComponentSpec>,
 }
 
 impl SovereignShardsMasterRegistry {
@@ -262,11 +237,11 @@ impl SovereignShardsMasterRegistry {
         let mut registry = Self {
             shards: BTreeMap::new(),
         };
-        registry.register_all_12_shards();
+        registry.register_all_shards();
         registry
     }
 
-    pub fn register_all_12_shards(&mut self) {
+    fn register_all_12_shards(&mut self) {
         self.shards.insert(
             1,
             SovereignShardDescriptor {
@@ -417,7 +392,7 @@ pub struct DistroGapFeatureRecord {
     pub verification_passed: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SovereignDistroGapClosureEngine {
     pub features: Vec<DistroGapFeatureRecord>,
 }
@@ -436,6 +411,12 @@ impl SovereignDistroGapClosureEngine {
             distro_name: "Arch Linux",
             gap_feature_name: "Signstar Signing Protocol & YubiHSM Hardware Security",
             sigma_counterpart: "SignstarSigningService & Dilithium5Signer",
+            verification_passed: true,
+        });
+        self.features.push(DistroGapFeatureRecord {
+            distro_name: "OpenBSD",
+            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
+            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
         self.features.push(DistroGapFeatureRecord {
@@ -478,17 +459,18 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     fn seed_ideas(&mut self) {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 1,
+            id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
             category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
+            fulfilled: true,
         });
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-            category: "Browser".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
                 .to_string(),
@@ -502,7 +484,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
 }

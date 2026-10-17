@@ -1,4 +1,3 @@
-#![no_std]
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
@@ -9,13 +8,9 @@
 //! - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
 //! - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-extern crate alloc;
-
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use std::collections::{BTreeMap, BTreeSet};
+use std::string::{String, ToString};
+use std::vec::Vec;
 
 // ============================================================================
 // Core Service & Init Abstractions
@@ -52,7 +47,9 @@ pub struct InitSystem {
 
 impl InitSystem {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            services: BTreeMap::new(),
+        }
     }
 
     pub fn register_service(&mut self, service: Service) {
@@ -131,9 +128,7 @@ impl InitSystem {
 
 impl Default for InitSystem {
     fn default() -> Self {
-        Self {
-            services: BTreeMap::new(),
-        }
+        Self::new()
     }
 }
 
@@ -275,7 +270,7 @@ pub enum SystemdPathEventType {
     DirectoryNotEmpty,
 }
 
-/// Systemd Path Monitor Unit Specification
+/// Systemd Path Monitor Unit Engine
 #[derive(Debug, Clone)]
 pub struct SystemdPathUnit {
     pub name: String,
@@ -354,12 +349,14 @@ impl SystemdTransientScopeGovernor {
         Self::default()
     }
 
-    pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.to_string(), slice);
+    pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
+        self.transient_scopes
+            .insert(scope_name.clone(), slice.clone());
+        self.active_scopes.insert(scope_name, slice);
     }
 
-    pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name, slice);
+    pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
+        self.create_scope(scope_name.to_string(), slice);
     }
 
     pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
@@ -440,7 +437,7 @@ impl SdNotifyMessage {
             let line = line.trim();
             if line == "READY=1" {
                 msgs.push(SdNotifyMessage::Ready);
-            } else if line == "RELOAD=1" || line == "RELOADING=1" {
+            } else if line == "RELOAD=1" {
                 msgs.push(SdNotifyMessage::Reloading);
             } else if line == "STOPPING=1" {
                 msgs.push(SdNotifyMessage::Stopping);
@@ -532,47 +529,16 @@ impl OpenRcHeader {
 pub struct OpenRcDependencySolverEngine {
     pub current_runlevel: OpenRcRunlevel,
     pub scripts: BTreeMap<String, OpenRcHeader>,
-    pub active_services: BTreeSet<String>,
-    pub service_statuses: BTreeMap<String, ServiceState>,
 }
 
 pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
 
 impl OpenRcDependencySolverEngine {
     pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Stopped);
-    }
-
-    pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
+        Self {
+            current_runlevel: OpenRcRunlevel::SysInit,
+            scripts: BTreeMap::new(),
         }
-        self.service_statuses.insert(service, state);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .get(service)
-            .copied()
-            .unwrap_or(ServiceState::Stopped)
     }
 
     pub fn resolve_order(
@@ -653,6 +619,22 @@ impl OpenRcStatusControllerEngine {
         self.service_statuses
             .insert(service_name.to_string(), ServiceState::Stopped);
     }
+
+    pub fn update_status(&mut self, service: String, state: ServiceState) {
+        if state == ServiceState::Running {
+            self.active_services.insert(service.clone());
+        } else {
+            self.active_services.remove(&service);
+        }
+        self.service_statuses.insert(service, state);
+    }
+
+    pub fn query_status(&self, service: &str) -> ServiceState {
+        self.service_statuses
+            .get(service)
+            .copied()
+            .unwrap_or(ServiceState::Stopped)
+    }
 }
 
 // ============================================================================
@@ -721,8 +703,8 @@ pub struct RunitS6SupervisionTreeGovernor {
     pub service_dir_path: String,
     pub current_stage: SupervisionStage,
     pub services: BTreeMap<String, SupervisedService>,
-    pub log_pipelines: BTreeMap<String, String>,
     pub active_services: BTreeMap<String, SupervisedService>,
+    pub log_pipelines: BTreeMap<String, String>,
 }
 
 impl RunitS6SupervisionTreeGovernor {
@@ -806,27 +788,22 @@ impl RunitS6SupervisionTreeGovernor {
         }
     }
 
-    pub fn parse_s6_readiness_notification(&mut self, service_name: &str, line: &str) -> bool {
-        let trimmed = line.trim();
-        if trimmed == "READY"
-            || trimmed == "READY=1"
-            || trimmed.contains("s6-notifyready")
-            || trimmed.starts_with("ready")
-        {
-            if let Some(srv) = self.services.get_mut(service_name) {
-                srv.state = ServiceState::Running;
-                return true;
-            }
-        }
-        false
-    }
-
     pub fn check_s6_readiness(line: &str) -> bool {
         let trimmed = line.trim();
         trimmed == "READY"
             || trimmed == "READY=1"
             || trimmed.contains("s6-notifyready")
             || trimmed.starts_with("ready")
+    }
+
+    pub fn parse_s6_readiness_notification(&mut self, service_name: &str, line: &str) -> bool {
+        if Self::check_s6_readiness(line) {
+            if let Some(srv) = self.services.get_mut(service_name) {
+                srv.state = ServiceState::Running;
+                return true;
+            }
+        }
+        false
     }
 }
 
@@ -847,7 +824,7 @@ pub enum SysVAction {
     OnDemand,
 }
 
-/// SysV Inittab Entry
+/// SysVInittab Entry
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SysVInittabEntry {
     pub id: String,
@@ -915,11 +892,7 @@ impl SysVinitRunlevelStateMachine {
             .collect()
     }
 
-    pub fn transition_runlevel(&mut self, target_runlevel: char) -> Vec<&SysVInittabEntry> {
-        self.set_runlevel(target_runlevel)
-    }
-
-    pub fn spawn_respawn_processes(&mut self) -> Vec<SysVInittabEntry> {
+    pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
             if entry.action == SysVAction::Respawn
@@ -928,37 +901,23 @@ impl SysVinitRunlevelStateMachine {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
-                    spawned.push(entry.clone());
+                    spawned.push(entry.id.clone());
                 }
             }
         }
         spawned
     }
 
-    pub fn switch_runlevel(&mut self, target_runlevel: char) -> (Vec<String>, Vec<String>) {
-        self.current_runlevel = target_runlevel;
-        let mut stop_scripts = Vec::new();
-        let mut start_scripts = Vec::new();
-
-        for entry in &self.inittab_entries {
-            if entry.runlevels.contains(&target_runlevel) {
-                if entry.action == SysVAction::Respawn
-                    || entry.action == SysVAction::Once
-                    || entry.action == SysVAction::Wait
-                {
-                    start_scripts.push(format!("S{:02}{}", start_scripts.len(), entry.id));
-                }
-            } else {
-                stop_scripts.push(format!("K{:02}{}", stop_scripts.len(), entry.id));
-            }
-        }
-
-        (stop_scripts, start_scripts)
+    pub fn transition_runlevel(&mut self, target_runlevel: char) -> Vec<SysVInittabEntry> {
+        self.set_runlevel(target_runlevel)
+            .into_iter()
+            .cloned()
+            .collect()
     }
 }
 
 // ============================================================================
-// BSD rc Subsystem
+// BSD rc.d / rc.subr / rcorder Subsystem
 // ============================================================================
 
 /// BSD `rc.d` / `rc.subr` Directives
@@ -1102,10 +1061,9 @@ impl LaunchdJobSupervisorEngine {
 
     pub fn register_job(&mut self, job: LaunchdJobSpec) {
         if job.run_at_load {
-            let mock_pid = 5000 + job.label.len() as u32;
-            self.running_pids.insert(job.label.clone(), mock_pid);
             self.job_states
                 .insert(job.label.clone(), ServiceState::Running);
+            self.running_pids.insert(job.label.clone(), 5000);
         } else {
             self.job_states
                 .insert(job.label.clone(), ServiceState::Stopped);
@@ -1120,8 +1078,6 @@ impl LaunchdJobSupervisorEngine {
     pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
         for job in self.jobs.values() {
             if job.mach_services.contains(&mach_service.to_string()) {
-                let mock_pid = 5000 + job.label.len() as u32;
-                self.running_pids.insert(job.label.clone(), mock_pid);
                 self.job_states
                     .insert(job.label.clone(), ServiceState::Running);
                 return Some(job.label.clone());
@@ -1835,7 +1791,7 @@ mod tests {
         assert_eq!(matching.len(), 1);
         let spawned = sm.spawn_respawn_processes();
         assert_eq!(spawned.len(), 1);
-        assert_eq!(spawned[0].id, "id");
+        assert_eq!(spawned[0], "id");
     }
 
     #[test]
@@ -2039,11 +1995,11 @@ mod tests {
             process: "/sbin/getty tty1".to_string(),
         }];
         let mut sysv = SysVinitRunlevelStateMachine::new('1', entries);
-        let matching = sysv.transition_runlevel('2');
+        let matching = sysv.set_runlevel('2');
         assert_eq!(matching.len(), 1);
         let spawned = sysv.spawn_respawn_processes();
         assert_eq!(spawned.len(), 1);
-        assert_eq!(spawned[0].id, "1");
+        assert_eq!(spawned[0], "1");
 
         let mut rc_conf = BTreeMap::new();
         rc_conf.insert("sshd_enable".to_string(), "YES".to_string());
