@@ -145,7 +145,7 @@ impl SignalDeliverySystem {
                 .processes
                 .get(&sender_pid)
                 .ok_or(IPCError::NotConnected)?;
-            if !sender.capability.can_send {
+            if !sender.capability.write_allowed {
                 return Err(IPCError::PermissionDenied);
             }
         }
@@ -154,7 +154,7 @@ impl SignalDeliverySystem {
             .processes
             .get_mut(&receiver_pid)
             .ok_or(IPCError::NotConnected)?;
-        if !receiver.capability.can_receive {
+        if !receiver.capability.read_allowed {
             return Err(IPCError::PermissionDenied);
         }
 
