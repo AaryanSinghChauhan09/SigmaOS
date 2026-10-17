@@ -40,7 +40,12 @@ impl LinuxIoUringFutex2V60PrEngine {
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, sq_ring_entries: u32, futex_waitv_count: u32) -> EcosystemGapV60Pr {
+    pub fn process_pr(
+        &mut self,
+        pr_id: &str,
+        sq_ring_entries: u32,
+        futex_waitv_count: u32,
+    ) -> EcosystemGapV60Pr {
         if sq_ring_entries == 0 || sq_ring_entries > 65536 {
             return EcosystemGapV60Pr {
                 pr_id: pr_id.to_string(),
@@ -50,7 +55,8 @@ impl LinuxIoUringFutex2V60PrEngine {
                 payload: String::new(),
             };
         }
-        self.ring_configs.insert(pr_id.to_string(), (sq_ring_entries, futex_waitv_count));
+        self.ring_configs
+            .insert(pr_id.to_string(), (sq_ring_entries, futex_waitv_count));
 
         EcosystemGapV60Pr {
             pr_id: pr_id.to_string(),
@@ -82,13 +88,20 @@ impl FreeBsdCapsicumCasperV60PrEngine {
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, jail_name: &str, casper_service: &str) -> EcosystemGapV60Pr {
+    pub fn process_pr(
+        &mut self,
+        pr_id: &str,
+        jail_name: &str,
+        casper_service: &str,
+    ) -> EcosystemGapV60Pr {
         if jail_name.is_empty() || casper_service.is_empty() {
             return EcosystemGapV60Pr {
                 pr_id: pr_id.to_string(),
                 title: format!("FreeBSD Capsicum Casper PR: {}", jail_name),
                 os_origin: "FreeBSD".to_string(),
-                status: PrStatus::Rejected("Jail or Casper service name cannot be empty".to_string()),
+                status: PrStatus::Rejected(
+                    "Jail or Casper service name cannot be empty".to_string(),
+                ),
                 payload: String::new(),
             };
         }
@@ -113,7 +126,9 @@ impl FreeBsdCapsicumCasperV60PrEngine {
     pub fn is_service_delegated(&self, jail_name: &str, casper_service: &str) -> bool {
         self.jail_casper_services
             .get(jail_name)
-            .map_or(false, |services| services.iter().any(|s| s == casper_service))
+            .map_or(false, |services| {
+                services.iter().any(|s| s == casper_service)
+            })
     }
 }
 
@@ -130,7 +145,12 @@ impl OpenBsdSoftraidBioctlV60PrEngine {
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, volume_label: &str, cipher: &str) -> EcosystemGapV60Pr {
+    pub fn process_pr(
+        &mut self,
+        pr_id: &str,
+        volume_label: &str,
+        cipher: &str,
+    ) -> EcosystemGapV60Pr {
         if volume_label.is_empty() {
             return EcosystemGapV60Pr {
                 pr_id: pr_id.to_string(),
@@ -140,7 +160,8 @@ impl OpenBsdSoftraidBioctlV60PrEngine {
                 payload: String::new(),
             };
         }
-        self.unlocked_volumes.insert(volume_label.to_string(), cipher.to_string());
+        self.unlocked_volumes
+            .insert(volume_label.to_string(), cipher.to_string());
 
         EcosystemGapV60Pr {
             pr_id: pr_id.to_string(),
@@ -206,7 +227,8 @@ impl GentooPortageEapi9V60PrEngine {
     }
 
     pub fn process_pr(&mut self, pr_id: &str, pkg_atom: &str, subslot: &str) -> EcosystemGapV60Pr {
-        self.rebuilt_subslots.insert(pkg_atom.to_string(), subslot.to_string());
+        self.rebuilt_subslots
+            .insert(pkg_atom.to_string(), subslot.to_string());
 
         EcosystemGapV60Pr {
             pr_id: pr_id.to_string(),
@@ -281,8 +303,14 @@ impl NixGuixFlakeStoreV60PrEngine {
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, flake_ref: &str, store_hash: &str) -> EcosystemGapV60Pr {
-        self.evaluated_closures.insert(flake_ref.to_string(), store_hash.to_string());
+    pub fn process_pr(
+        &mut self,
+        pr_id: &str,
+        flake_ref: &str,
+        store_hash: &str,
+    ) -> EcosystemGapV60Pr {
+        self.evaluated_closures
+            .insert(flake_ref.to_string(), store_hash.to_string());
 
         EcosystemGapV60Pr {
             pr_id: pr_id.to_string(),
@@ -314,8 +342,14 @@ impl NetBsdNpfJitFirewallV60PrEngine {
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, rule_set_name: &str, byte_count: usize) -> EcosystemGapV60Pr {
-        self.compiled_rulesets.insert(rule_set_name.to_string(), byte_count);
+    pub fn process_pr(
+        &mut self,
+        pr_id: &str,
+        rule_set_name: &str,
+        byte_count: usize,
+    ) -> EcosystemGapV60Pr {
+        self.compiled_rulesets
+            .insert(rule_set_name.to_string(), byte_count);
 
         EcosystemGapV60Pr {
             pr_id: pr_id.to_string(),
@@ -380,8 +414,14 @@ impl IllumosDtraceCrossbowV60PrEngine {
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, vnic_name: &str, probe_name: &str) -> EcosystemGapV60Pr {
-        self.vnic_probes.insert(vnic_name.to_string(), probe_name.to_string());
+    pub fn process_pr(
+        &mut self,
+        pr_id: &str,
+        vnic_name: &str,
+        probe_name: &str,
+    ) -> EcosystemGapV60Pr {
+        self.vnic_probes
+            .insert(vnic_name.to_string(), probe_name.to_string());
 
         EcosystemGapV60Pr {
             pr_id: pr_id.to_string(),
@@ -433,15 +473,27 @@ impl SovereignLinuxBsdEcosystemGapClosureV60PrSuite {
     pub fn run_all_prs(&mut self) -> Vec<EcosystemGapV60Pr> {
         vec![
             self.io_uring_engine.process_pr("PR-V60-001", 8192, 128),
-            self.capsicum_engine.process_pr("PR-V60-002", "sandboxed_jail_v60", "casper_dns_v60"),
-            self.softraid_engine.process_pr("PR-V60-003", "sd0a_crypto_v60", "AES-XTS-256"),
-            self.hammer2_engine.process_pr("PR-V60-004", "root_pfs_v60", 16384),
-            self.portage_engine.process_pr("PR-V60-005", "sys-libs/zlib", "1.3.1-r1"),
-            self.apk_engine.process_pr("PR-V60-006", "sovereign_v60.apkovl.tar.gz"),
-            self.nix_guix_engine.process_pr("PR-V60-007", "github:SigmaOS/packages#v60", "sha256-v60proof"),
-            self.npf_engine.process_pr("PR-V60-008", "stateful_firewall_v60", 4096),
-            self.clear_engine.process_pr("PR-V60-009", "extreme_performance_v60"),
-            self.illumos_engine.process_pr("PR-V60-010", "vnic_switch_v60", "proc::sys_read"),
+            self.capsicum_engine
+                .process_pr("PR-V60-002", "sandboxed_jail_v60", "casper_dns_v60"),
+            self.softraid_engine
+                .process_pr("PR-V60-003", "sd0a_crypto_v60", "AES-XTS-256"),
+            self.hammer2_engine
+                .process_pr("PR-V60-004", "root_pfs_v60", 16384),
+            self.portage_engine
+                .process_pr("PR-V60-005", "sys-libs/zlib", "1.3.1-r1"),
+            self.apk_engine
+                .process_pr("PR-V60-006", "sovereign_v60.apkovl.tar.gz"),
+            self.nix_guix_engine.process_pr(
+                "PR-V60-007",
+                "github:SigmaOS/packages#v60",
+                "sha256-v60proof",
+            ),
+            self.npf_engine
+                .process_pr("PR-V60-008", "stateful_firewall_v60", 4096),
+            self.clear_engine
+                .process_pr("PR-V60-009", "extreme_performance_v60"),
+            self.illumos_engine
+                .process_pr("PR-V60-010", "vnic_switch_v60", "proc::sys_read"),
         ]
     }
 }
@@ -466,15 +518,42 @@ mod tests {
             assert!(!pr.payload.is_empty());
         }
 
-        assert_eq!(suite.io_uring_engine.get_ring_config("PR-V60-001"), Some(&(8192, 128)));
-        assert!(suite.capsicum_engine.is_service_delegated("sandboxed_jail_v60", "casper_dns_v60"));
-        assert_eq!(suite.softraid_engine.get_volume_cipher("sd0a_crypto_v60"), Some(&"AES-XTS-256".to_string()));
-        assert_eq!(suite.hammer2_engine.get_current_txg("root_pfs_v60"), Some(16384));
+        assert_eq!(
+            suite.io_uring_engine.get_ring_config("PR-V60-001"),
+            Some(&(8192, 128))
+        );
+        assert!(suite
+            .capsicum_engine
+            .is_service_delegated("sandboxed_jail_v60", "casper_dns_v60"));
+        assert_eq!(
+            suite.softraid_engine.get_volume_cipher("sd0a_crypto_v60"),
+            Some(&"AES-XTS-256".to_string())
+        );
+        assert_eq!(
+            suite.hammer2_engine.get_current_txg("root_pfs_v60"),
+            Some(16384)
+        );
         assert!(suite.portage_engine.is_rebuilt("sys-libs/zlib"));
-        assert!(suite.apk_engine.is_overlay_mounted("sovereign_v60.apkovl.tar.gz"));
-        assert_eq!(suite.nix_guix_engine.get_store_hash("github:SigmaOS/packages#v60"), Some(&"sha256-v60proof".to_string()));
-        assert_eq!(suite.npf_engine.get_ruleset_bytes("stateful_firewall_v60"), Some(4096));
-        assert_eq!(suite.clear_engine.current_profile(), "extreme_performance_v60");
-        assert_eq!(suite.illumos_engine.get_attached_probe("vnic_switch_v60"), Some(&"proc::sys_read".to_string()));
+        assert!(suite
+            .apk_engine
+            .is_overlay_mounted("sovereign_v60.apkovl.tar.gz"));
+        assert_eq!(
+            suite
+                .nix_guix_engine
+                .get_store_hash("github:SigmaOS/packages#v60"),
+            Some(&"sha256-v60proof".to_string())
+        );
+        assert_eq!(
+            suite.npf_engine.get_ruleset_bytes("stateful_firewall_v60"),
+            Some(4096)
+        );
+        assert_eq!(
+            suite.clear_engine.current_profile(),
+            "extreme_performance_v60"
+        );
+        assert_eq!(
+            suite.illumos_engine.get_attached_probe("vnic_switch_v60"),
+            Some(&"proc::sys_read".to_string())
+        );
     }
 }

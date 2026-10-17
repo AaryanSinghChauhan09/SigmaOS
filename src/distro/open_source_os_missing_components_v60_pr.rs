@@ -250,7 +250,10 @@ impl AlpineApkV4ApkovlOverlayEngine {
 
     pub fn mount_overlay(&mut self, overlay_file: &str) -> String {
         self.mounted_overlays.push(overlay_file.to_string());
-        format!("Alpine APK v4: Mounted persistence overlay '{}'", overlay_file)
+        format!(
+            "Alpine APK v4: Mounted persistence overlay '{}'",
+            overlay_file
+        )
     }
 }
 
@@ -341,7 +344,10 @@ impl ClearLinuxStatelessPstateEngine {
 
     pub fn set_profile(&mut self, profile: &str) -> String {
         self.active_profile = profile.to_string();
-        format!("Clear Linux Stateless V60: Applied P-state profile '{}'", profile)
+        format!(
+            "Clear Linux Stateless V60: Applied P-state profile '{}'",
+            profile
+        )
     }
 }
 
@@ -388,7 +394,18 @@ pub struct SovereignThousandsMissingComponentsEngineV60 {
 impl SovereignThousandsMissingComponentsEngineV60 {
     pub fn new() -> Self {
         let mut catalog = Vec::with_capacity(10000);
-        let distros = ["Arch Linux", "Debian", "FreeBSD", "OpenBSD", "Gentoo", "Alpine", "NixOS", "Fedora", "Ubuntu", "Void"];
+        let distros = [
+            "Arch Linux",
+            "Debian",
+            "FreeBSD",
+            "OpenBSD",
+            "Gentoo",
+            "Alpine",
+            "NixOS",
+            "Fedora",
+            "Ubuntu",
+            "Void",
+        ];
         let categories = [
             ComponentCategoryV60::KernelScheduler,
             ComponentCategoryV60::FilesystemsStorage,
@@ -424,7 +441,10 @@ impl SovereignThousandsMissingComponentsEngineV60 {
     }
 
     pub fn count_by_category(&self, category: ComponentCategoryV60) -> usize {
-        self.catalog.iter().filter(|c| c.category == category).count()
+        self.catalog
+            .iter()
+            .filter(|c| c.category == category)
+            .count()
     }
 }
 
@@ -520,19 +540,34 @@ impl SovereignOpenSourceOsMissingComponentsV60PrSuite {
         assert!(self.pledge_unveil.validate_syscall("stdio"));
 
         assert_eq!(self.hammer2_pfs.add_cluster_node(1), 5);
-        assert_eq!(self.portage_eapi10.rebuild_subslot("sys-libs/zlib", "1.3"), "Gentoo Portage EAPI 10: Rebuilt package 'sys-libs/zlib' under subslot '1.3'");
+        assert_eq!(
+            self.portage_eapi10.rebuild_subslot("sys-libs/zlib", "1.3"),
+            "Gentoo Portage EAPI 10: Rebuilt package 'sys-libs/zlib' under subslot '1.3'"
+        );
 
-        assert!(self.apk_v4.mount_overlay("sovereign_v60.apkovl").contains("sovereign_v60.apkovl"));
-        assert!(self.nix_guix.evaluate_flake("github:SigmaOS/v60", "hash60").contains("hash60"));
+        assert!(self
+            .apk_v4
+            .mount_overlay("sovereign_v60.apkovl")
+            .contains("sovereign_v60.apkovl"));
+        assert!(self
+            .nix_guix
+            .evaluate_flake("github:SigmaOS/v60", "hash60")
+            .contains("hash60"));
         assert!(self.npf_jit.compile_ruleset(100).contains("bytes bytecode"));
-        assert!(self.clear_pstate.set_profile("performance_v60").contains("performance_v60"));
+        assert!(self
+            .clear_pstate
+            .set_profile("performance_v60")
+            .contains("performance_v60"));
 
         assert_eq!(self.thousands_catalog.total_count(), 10000);
         true
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions.values().filter(|s| s.status == OsPrStatusV60::Merged).count()
+        self.submissions
+            .values()
+            .filter(|s| s.status == OsPrStatusV60::Merged)
+            .count()
     }
 }
 
@@ -552,6 +587,11 @@ mod tests {
         assert_eq!(suite.get_merged_pr_count(), 10);
         assert!(suite.execute_and_verify_all());
         assert_eq!(suite.thousands_catalog.total_count(), 10000);
-        assert_eq!(suite.thousands_catalog.count_by_category(ComponentCategoryV60::KernelScheduler), 1000);
+        assert_eq!(
+            suite
+                .thousands_catalog
+                .count_by_category(ComponentCategoryV60::KernelScheduler),
+            1000
+        );
     }
 }
