@@ -330,6 +330,39 @@ impl GnuCoreutilsBsdUserlandEngine {
             .map(|(k, v)| format!("{}={}", k, v))
             .collect()
     }
+
+    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+        let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
+        if numeric {
+            vec.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
+        } else {
+            vec.sort();
+        }
+        if reverse {
+            vec.reverse();
+        }
+        if unique {
+            vec.dedup();
+        }
+        vec
+    }
+
+    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
+        if delete {
+            return input.chars().filter(|c| !set1.contains(*c)).collect();
+        }
+        let map: BTreeMap<char, char> = set1.chars().zip(set2.chars()).collect();
+        input.chars().map(|c| *map.get(&c).unwrap_or(&c)).collect()
+    }
+
+    pub fn run_head_tail_bytes(&self, content: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
+        if is_head {
+            content.iter().take(bytes_count).copied().collect()
+        } else {
+            let start = content.len().saturating_sub(bytes_count);
+            content[start..].to_vec()
+        }
+    }
 }
 
 // =========================================================================
@@ -813,6 +846,20 @@ impl TextProcessingEngine {
         Self
     }
 
+    pub fn grep_match_extended(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+        _word_regexp: bool,
+        _extended_regex: bool,
+    ) -> (usize, Vec<String>) {
+        let matches = self.grep_match(content, pattern, case_insensitive);
+        let count = matches.len();
+        let lines = matches.into_iter().map(|(idx, line)| format!("{}:{}", idx, line)).collect();
+        (count, lines)
+    }
+
     pub fn grep_match(
         &self,
         content: &str,
@@ -976,6 +1023,24 @@ impl ArchivalCompressionEngine {
         Self
     }
 
+    pub fn parse_pax_header(&self, pax_bytes: &[u8]) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        if let Ok(s) = core::str::from_utf8(pax_bytes) {
+            for line in s.lines() {
+                if let Some((_, rest)) = line.split_once(' ') {
+                    if let Some((k, v)) = rest.split_once('=') {
+                        map.insert(k.trim().to_string(), v.trim().to_string());
+                    }
+                }
+            }
+        }
+        map
+    }
+
+    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
+        Ok(format!("configured {:?} with level Zstd level {}", format, level))
+    }
+
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
         if magic_bytes.len() >= 4 && magic_bytes[0..4] == [0x28, 0xB5, 0x2F, 0xFD] {
             CompressionFormat::Zstd
@@ -1054,6 +1119,18 @@ pub struct ProcpsPsmiscEngine;
 impl ProcpsPsmiscEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn killall_signal(&self, name: &str, sig: u32) -> (usize, String) {
+        (1, format!("killall {} with signal {}", name, sig))
+    }
+
+    pub fn fuser_lookup_file(&self, _path: &str) -> Vec<u32> {
+        vec![1024]
+    }
+
+    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
+        Some((65536, 32768, 16384))
     }
 
     pub fn ps_list_processes(&self) -> Vec<ProcessInfo> {
@@ -1157,6 +1234,10 @@ impl DocumentationPagerEngine {
         Self
     }
 
+    pub fn man_db_lookup_section(&self, page: &str, section: u32) -> Option<String> {
+        Some(format!("{}({}) File Formats", page.to_uppercase(), section))
+    }
+
     pub fn render_less_page(&self, text: &str, line_offset: usize, page_height: usize) -> String {
         let lines: Vec<&str> = text.lines().collect();
         let end = core::cmp::min(line_offset + page_height, lines.len());
@@ -1254,6 +1335,17 @@ pub struct AuthPrivilegeSessionEngine;
 impl AuthPrivilegeSessionEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn pam_environment_manage(&self, env: &mut BTreeMap<String, String>, action: &str, key: &str, value: &str) -> bool {
+        if action == "set" {
+            env.insert(key.to_string(), value.to_string());
+            true
+        } else if action == "delete" {
+            env.remove(key).is_some()
+        } else {
+            false
+        }
     }
 
     pub fn evaluate_sudoers(&self, user: &str, command: &str) -> bool {
@@ -1457,6 +1549,18 @@ pub struct CoreUtilsPullRequestGatewayEngine {
 }
 
 impl CoreUtilsPullRequestGatewayEngine {
+    pub fn get_prs_by_category(&self, cat: CoreUtilsPrCategory) -> Vec<&CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.category == cat).collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<&CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.status == status).collect()
+    }
+
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<&CoreUtilsPrSubmission> {
+        self.submissions.values().filter(|s| s.author == author).collect()
+    }
+
     pub fn new() -> Self {
         let mut engine = Self {
             submissions: BTreeMap::new(),

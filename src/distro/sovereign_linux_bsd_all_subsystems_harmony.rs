@@ -661,6 +661,14 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 "sigreturn_frame_guard_and_uncatchable_signal_bypass",
                 true,
             ),
+            (
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_proc_sec_jail",
+                "jail_capsicum_process_sandbox",
+                true,
+            ),
         ];
 
         for (src, tgt, distro, id, rule, strict) in default_rules {
@@ -748,7 +756,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn translate_cross_distro_payload(
+    pub fn translate_subsystem_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -868,7 +876,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
     }
 
     /// Audit system-wide distro compliance across all 31 core subsystems.
-    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+    pub fn audit_all_subsystems_distro_compliance_map(&self) -> (BTreeMap<String, bool>, u32) {
         let mut audit_map = BTreeMap::new();
         let mut compliant_count = 0;
 
@@ -1008,7 +1016,7 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
 
     /// Perform system-wide distro compliance audit across all core subsystems.
     pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
-        self.harmony_engine.audit_all_subsystems_distro_compliance()
+        self.harmony_engine.audit_all_subsystems_distro_compliance_map()
     }
 
     /// Execute an automated cross-subsystem workflow.
@@ -1213,7 +1221,7 @@ mod tests {
             assert_eq!(score, 100);
         }
 
-        let translated = engine.translate_cross_distro_payload(
+        let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             SigmaOsSubsystem::SecuritySandboxing,
             "mac_capsicum_enforce",
