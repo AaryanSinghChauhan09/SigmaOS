@@ -125,7 +125,9 @@ impl UniversalCrossDistroSatSolverV61 {
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
         map.insert("dbus-daemon".to_string(), "sovereign-dbus".to_string());
-        Self { canonical_mapping: map }
+        Self {
+            canonical_mapping: map,
+        }
     }
 
     pub fn solve_dependencies(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
@@ -186,7 +188,9 @@ pub struct UniversalCasDeltaStoreGovernorV61 {
 
 impl UniversalCasDeltaStoreGovernorV61 {
     pub fn new() -> Self {
-        Self { records: Vec::new() }
+        Self {
+            records: Vec::new(),
+        }
     }
 
     pub fn apply_delta_patch(
@@ -239,7 +243,10 @@ impl UniversalPmCliRouterV61 {
             "snap" => Ok(format!("routed: snap-v61 -> {}", cli_args.join(" "))),
             "nix" | "nix-env" => Ok(format!("routed: nix-v61 -> {}", cli_args.join(" "))),
             "brew" => Ok(format!("routed: brew-bottle-v61 -> {}", cli_args.join(" "))),
-            _ => Ok(format!("routed: sovereign-pm-v61 -> {}", cli_args.join(" "))),
+            _ => Ok(format!(
+                "routed: sovereign-pm-v61 -> {}",
+                cli_args.join(" ")
+            )),
         }
     }
 }
@@ -262,38 +269,111 @@ impl UniversalPackageFormatInspectorV61 {
         let norm = Self::normalize_filename(raw_path);
 
         let (detected_format, signature_kind) = match norm.as_str() {
-            f if f.ends_with(".air") => (PackageFormat::Air, PackageSignatureKindV61::SignifyPqcHybrid),
-            f if f.ends_with(".bottle") => (PackageFormat::HomebrewBottle, PackageSignatureKindV61::CosignSigstore),
-            f if f.ends_with(".ipa") => (PackageFormat::Ipa, PackageSignatureKindV61::X509Certificate),
-            f if f.ends_with(".ports") => (PackageFormat::Ports, PackageSignatureKindV61::SignifyPqcHybrid),
-            f if f.ends_with(".pkg") => (PackageFormat::FreeBsdPkg, PackageSignatureKindV61::SignifyPqcHybrid),
-            f if f.ends_with(".aab") => (PackageFormat::Aab, PackageSignatureKindV61::ApkV2V3Signature),
-            f if f.ends_with(".apk") => (PackageFormat::AlpineApk, PackageSignatureKindV61::ApkV2V3Signature),
-            f if f.ends_with(".appimage") => (PackageFormat::AppImage, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".eopkg") => (PackageFormat::SolusEopkg, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".nixpkg") || f.ends_with(".nix") => (PackageFormat::NixFlake, PackageSignatureKindV61::CosignSigstore),
-            f if f.ends_with(".portage") || f.ends_with(".ebuild") => (PackageFormat::GentooEbuild, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".deb") => (PackageFormat::AptDeb, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".superdeb") => (PackageFormat::AptDeb, PackageSignatureKindV61::PqcKyberDilithium),
-            f if f.ends_with(".rpm") => (PackageFormat::DnfRpm, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".pkg.tar.xz") || f.ends_with(".pkg.tar.zst") => (PackageFormat::ArchPacman, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".flatpak") => (PackageFormat::Flatpak, PackageSignatureKindV61::CosignSigstore),
-            f if f.ends_with(".app") => (PackageFormat::MacApp, PackageSignatureKindV61::X509Certificate),
-            f if f.ends_with(".hap") => (PackageFormat::Hap, PackageSignatureKindV61::X509Certificate),
+            f if f.ends_with(".air") => (
+                PackageFormat::Air,
+                PackageSignatureKindV61::SignifyPqcHybrid,
+            ),
+            f if f.ends_with(".bottle") => (
+                PackageFormat::HomebrewBottle,
+                PackageSignatureKindV61::CosignSigstore,
+            ),
+            f if f.ends_with(".ipa") => {
+                (PackageFormat::Ipa, PackageSignatureKindV61::X509Certificate)
+            }
+            f if f.ends_with(".ports") => (
+                PackageFormat::Ports,
+                PackageSignatureKindV61::SignifyPqcHybrid,
+            ),
+            f if f.ends_with(".pkg") => (
+                PackageFormat::FreeBsdPkg,
+                PackageSignatureKindV61::SignifyPqcHybrid,
+            ),
+            f if f.ends_with(".aab") => (
+                PackageFormat::Aab,
+                PackageSignatureKindV61::ApkV2V3Signature,
+            ),
+            f if f.ends_with(".apk") => (
+                PackageFormat::AlpineApk,
+                PackageSignatureKindV61::ApkV2V3Signature,
+            ),
+            f if f.ends_with(".appimage") => {
+                (PackageFormat::AppImage, PackageSignatureKindV61::GpgOpenPgp)
+            }
+            f if f.ends_with(".eopkg") => (
+                PackageFormat::SolusEopkg,
+                PackageSignatureKindV61::GpgOpenPgp,
+            ),
+            f if f.ends_with(".nixpkg") || f.ends_with(".nix") => (
+                PackageFormat::NixFlake,
+                PackageSignatureKindV61::CosignSigstore,
+            ),
+            f if f.ends_with(".portage") || f.ends_with(".ebuild") => (
+                PackageFormat::GentooEbuild,
+                PackageSignatureKindV61::GpgOpenPgp,
+            ),
+            f if f.ends_with(".deb") => {
+                (PackageFormat::AptDeb, PackageSignatureKindV61::GpgOpenPgp)
+            }
+            f if f.ends_with(".superdeb") => (
+                PackageFormat::AptDeb,
+                PackageSignatureKindV61::PqcKyberDilithium,
+            ),
+            f if f.ends_with(".rpm") => {
+                (PackageFormat::DnfRpm, PackageSignatureKindV61::GpgOpenPgp)
+            }
+            f if f.ends_with(".pkg.tar.xz") || f.ends_with(".pkg.tar.zst") => (
+                PackageFormat::ArchPacman,
+                PackageSignatureKindV61::GpgOpenPgp,
+            ),
+            f if f.ends_with(".flatpak") => (
+                PackageFormat::Flatpak,
+                PackageSignatureKindV61::CosignSigstore,
+            ),
+            f if f.ends_with(".app") => (
+                PackageFormat::MacApp,
+                PackageSignatureKindV61::X509Certificate,
+            ),
+            f if f.ends_with(".hap") => {
+                (PackageFormat::Hap, PackageSignatureKindV61::X509Certificate)
+            }
             f if f.ends_with(".pisi") => (PackageFormat::Pisi, PackageSignatureKindV61::GpgOpenPgp),
             f if f.ends_with(".lzm") => (PackageFormat::Lzm, PackageSignatureKindV61::Unsigned),
             f if f.ends_with(".pup") => (PackageFormat::Pup, PackageSignatureKindV61::Unsigned),
-            f if f.ends_with(".snap") => (PackageFormat::SnapApp, PackageSignatureKindV61::X509Certificate),
-            f if f.ends_with(".pacman") => (PackageFormat::ArchPacman, PackageSignatureKindV61::GpgOpenPgp),
+            f if f.ends_with(".snap") => (
+                PackageFormat::SnapApp,
+                PackageSignatureKindV61::X509Certificate,
+            ),
+            f if f.ends_with(".pacman") => (
+                PackageFormat::ArchPacman,
+                PackageSignatureKindV61::GpgOpenPgp,
+            ),
             f if f.ends_with(".pet") => (PackageFormat::Pet, PackageSignatureKindV61::Unsigned),
-            f if f.ends_with(".xbps") => (PackageFormat::VoidXbps, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".guix") => (PackageFormat::GuixScheme, PackageSignatureKindV61::GpgOpenPgp),
-            f if f.ends_with(".whl") || f.ends_with(".pip") => (PackageFormat::PyPiWheel, PackageSignatureKindV61::CosignSigstore),
-            f if f.ends_with(".crate") => (PackageFormat::CargoCrate, PackageSignatureKindV61::CosignSigstore),
-            f if f.ends_with(".tgz") || f.ends_with(".tar.gz") => (PackageFormat::TarGz, PackageSignatureKindV61::Unsigned),
-            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => (PackageFormat::Xz, PackageSignatureKindV61::Unsigned),
+            f if f.ends_with(".xbps") => {
+                (PackageFormat::VoidXbps, PackageSignatureKindV61::GpgOpenPgp)
+            }
+            f if f.ends_with(".guix") => (
+                PackageFormat::GuixScheme,
+                PackageSignatureKindV61::GpgOpenPgp,
+            ),
+            f if f.ends_with(".whl") || f.ends_with(".pip") => (
+                PackageFormat::PyPiWheel,
+                PackageSignatureKindV61::CosignSigstore,
+            ),
+            f if f.ends_with(".crate") => (
+                PackageFormat::CargoCrate,
+                PackageSignatureKindV61::CosignSigstore,
+            ),
+            f if f.ends_with(".tgz") || f.ends_with(".tar.gz") => {
+                (PackageFormat::TarGz, PackageSignatureKindV61::Unsigned)
+            }
+            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => {
+                (PackageFormat::Xz, PackageSignatureKindV61::Unsigned)
+            }
             f if f.ends_with(".tar") => (PackageFormat::Tar, PackageSignatureKindV61::Unsigned),
-            _ => (PackageFormat::SigmaPkg, PackageSignatureKindV61::PqcKyberDilithium),
+            _ => (
+                PackageFormat::SigmaPkg,
+                PackageSignatureKindV61::PqcKyberDilithium,
+            ),
         };
 
         let is_compressed = norm.contains(".gz")
@@ -413,7 +493,9 @@ impl SovereignDistroPackageAdvancementsSuiteV61 {
         self.udf_engine
             .execute_hooks_for_phase(&manifest.name, UdfHookTypeV61::PreInstall)?;
 
-        let solved_deps = self.sat_solver.solve_dependencies(&manifest.raw_dependencies)?;
+        let solved_deps = self
+            .sat_solver
+            .solve_dependencies(&manifest.raw_dependencies)?;
         let rules = self
             .sandbox_governor
             .generate_sandbox_rules(inspection.detected_format);
@@ -429,14 +511,15 @@ impl SovereignDistroPackageAdvancementsSuiteV61 {
         self.udf_engine
             .execute_hooks_for_phase(&manifest.name, UdfHookTypeV61::PostInstall)?;
 
-        self.pr_gateway.submit_proposal(PackagePrProposalManifestV61 {
-            pr_id: 6101,
-            title: format!("PR: Transpile and Install {}", manifest.name),
-            source_format: manifest.detected_format,
-            target_native_package: format!("sigpkg-v61-{}", manifest.name),
-            changes_summary: format!("Resolved dependencies: {:?}", solved_deps),
-            verification_passed: true,
-        });
+        self.pr_gateway
+            .submit_proposal(PackagePrProposalManifestV61 {
+                pr_id: 6101,
+                title: format!("PR: Transpile and Install {}", manifest.name),
+                source_format: manifest.detected_format,
+                target_native_package: format!("sigpkg-v61-{}", manifest.name),
+                changes_summary: format!("Resolved dependencies: {:?}", solved_deps),
+                verification_passed: true,
+            });
 
         Ok(unified_pkg)
     }
@@ -496,9 +579,16 @@ mod tests {
     #[test]
     fn test_sat_solver_and_sandboxing_v61() {
         let solver = UniversalCrossDistroSatSolverV61::new();
-        let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string(), "dbus".to_string()];
+        let raw_deps = vec![
+            "libssl-dev".to_string(),
+            "glibc".to_string(),
+            "dbus".to_string(),
+        ];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]);
+        assert_eq!(
+            solved,
+            vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]
+        );
 
         let sandbox_gov = UniversalMultiSandboxGovernorV61::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
