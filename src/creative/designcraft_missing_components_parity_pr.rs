@@ -27,7 +27,11 @@ use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// DesignCraft PR Category Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

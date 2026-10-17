@@ -41,7 +41,11 @@ use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use core::sync::atomic::{AtomicU32, Ordering};
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::atomic::{AtomicU32, Ordering};
 
 /// Structured PR proposal manifest descriptor for Designcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
