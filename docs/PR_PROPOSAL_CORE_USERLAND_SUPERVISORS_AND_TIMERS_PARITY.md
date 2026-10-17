@@ -160,3 +160,77 @@ This collection of Pull Request proposals introduces native parity and high-perf
   - Anacron `RANDOM_DELAY` random jitter calculator to prevent thundering herds
   - Persistent `systemd.timer` stamp file state parser and manager (`/var/lib/systemd/timers/stamp-*.timer`)
   - `/var/spool/at/` queue load average monitor
+
+---
+
+## 4. Core Userland Supervisors & Timers Advancements V61 Proposals
+
+### PR #4015: feat(systemd_v61): sd_notify Socket Validator, Cgroup Peak/Swap Controller & Journald Parser
+- **Category**: Core Init & Supervisor (PID 1) (V61)
+- **Inspiration Sources**: `sd_notify` socket validation, cgroups v2 memory peak/swap limits, Journald binary frames
+- **Performance Impact**: Sub-Millisecond Datagram Validation & Zero-Copy Journal Framing
+- **Resilience Rating**: PID 1 Datagram Validation Fault Tolerance
+- **Key Features Implemented**:
+  - `sd_notify` socket protocol validator for `READY`, `WATCHDOG`, `MEMORY_PEAK`, and `SWAP`
+  - Transient cgroup v2 scope path controller with memory peak/swap limits
+  - Journald binary streaming frame decoder and structured field parser
+
+### PR #4016: feat(openrc_v61): Stacked Cascading Runlevel Solver & Dynamic Parallel Governor
+- **Category**: Dependency-Based Init System (V61)
+- **Inspiration Sources**: OpenRC runlevel cascading, `/etc/conf.d/` overrides, multi-core parallel governor
+- **Performance Impact**: Multi-Core Parallel Boot Scalability & Zero-Overhead Cascading
+- **Resilience Rating**: Dynamic Runlevel State Rollback
+- **Key Features Implemented**:
+  - Stacked cascading runlevel solver for `sysinit`, `boot`, `default`, `nonetwork`, and `shutdown`
+  - `/etc/conf.d/` environment variable override merger and parameter sanitizer
+  - Dynamic parallel service execution governor scaled to system CPU core topology
+
+### PR #4017: feat(runit_s6_v61): s6-svscan Supervision Tree & s6-rc Atomic Database Switcher
+- **Category**: Lightweight Process Supervisor (V61)
+- **Inspiration Sources**: `s6-svscan` tree watcher, `runsvdir` log pipe redirector, `s6-rc` compiled database
+- **Performance Impact**: Microsecond Atomic Database State Switching & Lockless Supervision
+- **Resilience Rating**: Atomic State Switch Rollback Guarantee
+- **Key Features Implemented**:
+  - `s6-svscan` supervision tree directory watcher and FIFO pipe engine
+  - `runsvdir` log pipe redirector and size-capped rotation filter
+  - `s6-rc` compiled atomic database state machine switch with rollback protection
+
+### PR #4018: feat(sysvinit_v61): Inittab Action Governor & Parallel Execution Lock Manager
+- **Category**: Legacy Unix Init Compatibility (V61)
+- **Inspiration Sources**: SysVinit `/etc/inittab` action handlers, `/etc/rc.d/` lock manager
+- **Performance Impact**: POSIX Heritage Compatibility & Deterministic Runlevel Locks
+- **Resilience Rating**: Deterministic Boot Sequence Lock Safety
+- **Key Features Implemented**:
+  - `/etc/inittab` action evaluator for `sysinit`, `respawn`, `wait`, `once`, and `ctrlaltdel`
+  - `/etc/rc.d/` parallel script execution lock manager
+  - Clean system shutdown, halt, and reboot script sequencing engine
+
+### PR #4019: feat(bsd_rc_v61): FreeBSD service(8) Router & OpenBSD rc.conf.local Hierarchy Resolver
+- **Category**: BSD Core Init & Service Framework (V61)
+- **Inspiration Sources**: FreeBSD `service(8)`, OpenBSD `/etc/rc.conf.local`
+- **Performance Impact**: Native BSD Administration Interface Parity
+- **Resilience Rating**: Multi-Tier Configuration Isolation
+- **Key Features Implemented**:
+  - FreeBSD `service(8)` command router with topological order resolution
+  - OpenBSD `/etc/rc.conf.local` local configuration hierarchy resolver
+  - `rc.subr` shell subroutine library router with `forcestart`/`forcestop` modes
+
+### PR #4020: feat(launchd_android_v61): Android Property Triggers & launchd PathState Monitor
+- **Category**: Apple launchd & Android Init Supervisor (V61)
+- **Inspiration Sources**: Android `init.rc` property triggers (`on property:key=val`), macOS `launchd` `PathState`
+- **Performance Impact**: Instantaneous Event-Driven Trigger Activation
+- **Resilience Rating**: Event Trigger Lock Safety
+- **Key Features Implemented**:
+  - Android `init.rc` property trigger evaluator (`on property:key=val`)
+  - macOS `launchd` `PathState` file system trigger monitor
+  - Mach port and IPC socket message activation trigger engine
+
+### PR #4021: feat(cron_timers_at_v61): Anacron Jitter Engine & Persistent Timer Stamp File Manager
+- **Category**: Job Scheduling & Timers Subsystem (V61)
+- **Inspiration Sources**: Anacron `RANDOM_DELAY` jitter, `/var/lib/systemd/timers/stamp-*.timer`
+- **Performance Impact**: Thundering Herd Prevention & Zero Missed Timers
+- **Resilience Rating**: Persistent Power-Loss Timer Recovery
+- **Key Features Implemented**:
+  - Anacron `RANDOM_DELAY` random jitter calculator to prevent thundering herds
+  - Persistent `systemd.timer` stamp file state parser and manager
+  - `/var/spool/at/` queue load average monitor and priority job dispatcher
