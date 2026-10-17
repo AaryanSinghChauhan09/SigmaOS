@@ -384,9 +384,10 @@ impl SigmaInit {
 
     /// Start a service
     pub fn start_service(&mut self, name: &str) -> Result<(), String> {
+        let total_services = self.services.len() as u32;
         let service = self
             .services
-            .get_mut(name)
+            .get(name)
             .ok_or_else(|| format!("Service '{}' not found", name))?;
 
         // Check dependencies
