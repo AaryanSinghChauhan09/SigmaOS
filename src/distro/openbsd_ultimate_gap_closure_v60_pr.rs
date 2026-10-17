@@ -95,7 +95,10 @@ impl OpenBsdDhcpleasedEngine {
             rdomain,
         };
         self.active_leases.insert(ifname.to_string(), lease);
-        format!("dhcpleased[privsep]: Bound lease for {} on rdomain {} -> IP {}", ifname, rdomain, ip)
+        format!(
+            "dhcpleased[privsep]: Bound lease for {} on rdomain {} -> IP {}",
+            ifname, rdomain, ip
+        )
     }
 
     pub fn renew_lease(&mut self, ifname: &str) -> bool {
@@ -160,7 +163,10 @@ impl OpenBsdFwUpdateEngine {
                 return Err("Signify Ed25519 verification failed for firmware package");
             }
             pkg.installed = true;
-            Ok(format!("fw_update: Successfully verified and installed firmware {}", pkg_name))
+            Ok(format!(
+                "fw_update: Successfully verified and installed firmware {}",
+                pkg_name
+            ))
         } else {
             Err("Firmware package not found in repository")
         }
@@ -199,7 +205,10 @@ impl OpenBsdLdomctlEngine {
             active: false,
         };
         self.guests.insert(name.to_string(), guest);
-        format!("ldomctl: Created logical domain {} with {} vCPUs and {} MB memory", name, vcpus, memory_mb)
+        format!(
+            "ldomctl: Created logical domain {} with {} vCPUs and {} MB memory",
+            name, vcpus, memory_mb
+        )
     }
 
     pub fn start_domain(&mut self, name: &str) -> bool {
@@ -242,11 +251,17 @@ impl OpenBsdLibTlsEngine {
     }
 
     pub fn configure_client(&self, ca_file: &str) -> String {
-        format!("libtls: Configured TLS client with CA file {} and protocols {}", ca_file, self.config.protocols)
+        format!(
+            "libtls: Configured TLS client with CA file {} and protocols {}",
+            ca_file, self.config.protocols
+        )
     }
 
     pub fn configure_server(&self, cert_file: &str, key_file: &str) -> String {
-        format!("libtls: Configured TLS server with cert {} and key {}", cert_file, key_file)
+        format!(
+            "libtls: Configured TLS server with cert {} and key {}",
+            cert_file, key_file
+        )
     }
 }
 
@@ -281,8 +296,14 @@ impl OpenBsdRdomainRtableEngine {
             gateway: gw.to_string(),
             interface: iface.to_string(),
         };
-        self.tables.entry(rtable_id).or_insert_with(Vec::new).push(entry);
-        format!("rdomain/rtable: Added route {} via {} on {} in rtable {}", dest, gw, iface, rtable_id)
+        self.tables
+            .entry(rtable_id)
+            .or_insert_with(Vec::new)
+            .push(entry);
+        format!(
+            "rdomain/rtable: Added route {} via {} on {} in rtable {}",
+            dest, gw, iface, rtable_id
+        )
     }
 
     pub fn lookup_route(&self, rtable_id: u32, dest: &str) -> Option<&RouteTableEntry> {
@@ -337,7 +358,10 @@ impl OpenBsdSpamdPflogEngine {
 
     pub fn log_pf_packet(&mut self, action: &str, iface: &str, src: &str, dst: &str) -> String {
         self.pflog_packets_count += 1;
-        format!("pflog0: [packet #{}] {} on {} from {} to {}", self.pflog_packets_count, action, iface, src, dst)
+        format!(
+            "pflog0: [packet #{}] {} on {} from {} to {}",
+            self.pflog_packets_count, action, iface, src, dst
+        )
     }
 }
 
@@ -376,20 +400,54 @@ impl SovereignOpenBsdUltimateGapClosureV60PrGateway {
     }
 
     pub fn generate_all_proposals(&mut self) -> Vec<OpenBsdV60PrManifest> {
-        let dhcp_msg = self.dhcpleased.acquire_lease("em0", "192.168.1.50", "255.255.255.0", "192.168.1.1", &["1.1.1.1"], 0);
-        let fw_msg = self.fw_update.install_firmware("intel-firmware").unwrap_or_default();
+        let dhcp_msg = self.dhcpleased.acquire_lease(
+            "em0",
+            "192.168.1.50",
+            "255.255.255.0",
+            "192.168.1.1",
+            &["1.1.1.1"],
+            0,
+        );
+        let fw_msg = self
+            .fw_update
+            .install_firmware("intel-firmware")
+            .unwrap_or_default();
         let ldom_msg = self.ldomctl.create_domain("guest1", 4, 8192);
         let tls_msg = self.libtls.configure_client("/etc/ssl/cert.pem");
         let route_msg = self.rdomain.add_route(1, "0.0.0.0/0", "10.0.0.1", "vio0");
         let spamd_msg = self.spamd_pflog.process_mail_connection("192.0.2.1");
 
         let items = [
-            (6001, "feat(openbsd): dhcpleased(8) privilege-separated DHCP client engine", &dhcp_msg),
-            (6002, "feat(openbsd): fw_update(8) signify Ed25519 firmware installer", &fw_msg),
-            (6003, "feat(openbsd): ldomctl(8) logical domain hypervisor manager", &ldom_msg),
-            (6004, "feat(openbsd): libtls LibreSSL high-level TLS engine", &tls_msg),
-            (6005, "feat(openbsd): rdomain(4)/rtable(4) virtual routing isolation", &route_msg),
-            (6006, "feat(openbsd): spamd(8) greylisting tarpit & pflog(4) logging engine", &spamd_msg),
+            (
+                6001,
+                "feat(openbsd): dhcpleased(8) privilege-separated DHCP client engine",
+                &dhcp_msg,
+            ),
+            (
+                6002,
+                "feat(openbsd): fw_update(8) signify Ed25519 firmware installer",
+                &fw_msg,
+            ),
+            (
+                6003,
+                "feat(openbsd): ldomctl(8) logical domain hypervisor manager",
+                &ldom_msg,
+            ),
+            (
+                6004,
+                "feat(openbsd): libtls LibreSSL high-level TLS engine",
+                &tls_msg,
+            ),
+            (
+                6005,
+                "feat(openbsd): rdomain(4)/rtable(4) virtual routing isolation",
+                &route_msg,
+            ),
+            (
+                6006,
+                "feat(openbsd): spamd(8) greylisting tarpit & pflog(4) logging engine",
+                &spamd_msg,
+            ),
         ];
 
         let mut manifests = Vec::new();
@@ -418,7 +476,14 @@ mod tests {
     #[test]
     fn test_openbsd_dhcpleased_engine() {
         let mut engine = OpenBsdDhcpleasedEngine::new();
-        let msg = engine.acquire_lease("em0", "10.0.0.5", "255.255.255.0", "10.0.0.1", &["1.1.1.1"], 1);
+        let msg = engine.acquire_lease(
+            "em0",
+            "10.0.0.5",
+            "255.255.255.0",
+            "10.0.0.1",
+            &["1.1.1.1"],
+            1,
+        );
         assert!(msg.contains("10.0.0.5"));
         assert!(engine.renew_lease("em0"));
     }
