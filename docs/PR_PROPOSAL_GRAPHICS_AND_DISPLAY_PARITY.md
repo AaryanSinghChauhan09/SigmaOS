@@ -30,6 +30,12 @@ The proposals cover the complete graphics and display stack: core protocols, har
 | **PR #117** | libinput | libinput Gesture Recognition & Accel Curves | libinput, Fedora, Arch | Pointer acceleration curves (adaptive/flat), palm rejection boundary detection, and touch pad gesture recognition (pinch/swipe). |
 | **PR #118** | Console FB | Console Framebuffer / fbdev Double-Buffered FB | Linux fbdev, FreeBSD wscons | Double-buffered ARGB pixel back-buffer, PSF font glyph rendering, RGB primitives, and hardware VSYNC buffer swaps. |
 | **PR #119** | Virtual Terminal | vt / syscons / wscons Virtual Terminal Matrix | FreeBSD vt(4), OpenBSD wscons | Virtual terminal grid matrix (`ttyv0`-`ttyv12`), VT switching ioctls (`VT_ACTIVATE`, `VT_WAITACTIVE`), keymap translations, and ANSI escape sequences. |
+| **PR #120** | Wayland Ext | Presentation Time v1 & dmabuf Modifiers | Fedora, Ubuntu, Arch | `wp_presentation_time` vsync timestamp feedback & `zwp_linux_dmabuf_v1` multi-planar modifier negotiation. |
+| **PR #121** | DRM Planes | DRM/KMS VRR & Multi-Plane Composition | Linux Kernel DRM, SteamOS | DRM CRTC VRR adaptive sync timing, multi-plane zpos blending, pixel blend modes, and alpha rotation. |
+| **PR #122** | Mesa Passes | Mesa NIR IR Optimization & EGLSync Fence | Mesa3D, CachyOS, Gentoo | Mesa NIR IR optimization passes, TGSI-to-NIR shader translation, and EGLSync fences. |
+| **PR #123** | Vulkan 1.3 | Vulkan Mesh Shading & Timeline Semaphores | SteamOS Gamescope, CachyOS | Vulkan 1.3 mesh shading pipeline execution (`vkCmdDrawMeshTasksEXT`), timeline semaphores, and descriptor set layouts. |
+| **PR #124** | wlroots Layout | wlroots Multi-Monitor Output Layout & Seat | SwayWM, Void Linux, Alpine | `wlr_output_layout` multi-monitor alignment, `wlr_seat` pointer/keyboard focus, and damage ring accumulation. |
+| **PR #125** | BSD vt(4) | BSD vt(4) Sysmouse & wscons VT Matrix | FreeBSD, OpenBSD | FreeBSD `vt_sysmouse` cursor overlay, OpenBSD `wscons` VT keymap translation, and ANSI VT100 escape sequence parsing. |
 
 ---
 
@@ -116,7 +122,7 @@ The proposals cover the complete graphics and display stack: core protocols, har
 
 ## PR Gateway, PQC Signatures & CI Gating
 
-All 19 PR proposals are registered in `SovereignGraphicsDisplayPrGatewayEngine` featuring:
+All 25 PR proposals (#101..#125) are registered in `SovereignGraphicsDisplayPrGatewayEngine` featuring:
 1. **Post-Quantum Cryptography (PQC)** signatures (`PQC-SIG-DILITHIUM5-GRAPHICS-PR-*`).
 2. **SAT Dependency Constraint Solver** validation.
 3. **Automated CI Gating Pipeline**: Checks PQC signature validity and SAT constraints before transitioning PR status from `Proposed` -> `CiValidationPass` -> `Merged`.
