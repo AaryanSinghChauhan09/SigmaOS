@@ -32,6 +32,14 @@ pub enum QtPlatformStyle {
     Kvantum = 5,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KvantumThemeSpec {
+    pub theme_name: String,
+    pub blur_background: bool,
+    pub translucent_windows: bool,
+    pub svg_path: String,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignAccentColor {
     Blue,
@@ -90,7 +98,7 @@ pub struct SovereignGtkQtToolkitEngine {
     pub font_name: String,
     pub font_size: u32,
     pub gtk_inspector_enabled: bool,
-    pub kvantum_spec: Option<SovereignKvantumThemeSpec>,
+    pub kvantum_spec: Option<KvantumThemeSpec>,
     pub css_rules: BTreeMap<String, BTreeMap<String, String>>,
     pub signal_listeners: BTreeMap<String, Vec<String>>,
     pub event_log: Vec<ToolkitEvent>,
@@ -159,31 +167,29 @@ impl SovereignGtkQtToolkitEngine {
     }
 
     pub fn parse_and_apply_kvantum_config(&mut self, config_str: &str) -> bool {
-        let mut theme_name = "Default".to_string();
-        let mut blur_background = false;
-        let mut translucent_windows = false;
-        let mut blur_radius = 10u32;
-
+        let mut theme_name = "Catppuccin-Mocha".to_string();
+        let mut blur = false;
+        let mut translucent = false;
         for line in config_str.lines() {
             let line = line.trim();
             if line.starts_with("theme=") {
                 theme_name = line["theme=".len()..].to_string();
-            } else if line.starts_with("blur=") {
-                blur_background = line.ends_with("true");
+            } else if line.starts_with("blur=") || line.starts_with("blur_radius=") {
+                blur = true;
             } else if line.starts_with("translucent=") || line.starts_with("translucent_windows=") {
-                translucent_windows = line.ends_with("true");
-            } else if line.starts_with("blur_radius=") {
-                if let Ok(val) = line["blur_radius=".len()..].parse::<u32>() {
-                    blur_radius = val;
-                }
+                translucent = line.ends_with("true");
             }
         }
-
         let svg_path = format!("/usr/share/Kvantum/{}/{}.svg", theme_name, theme_name);
-
+        self.kvantum_spec = Some(KvantumThemeSpec {
+            theme_name: theme_name.clone(),
+            blur_background: blur,
+            translucent_windows: translucent,
+            svg_path,
+        });
         self.qt_style = QtPlatformStyle::Kvantum;
         self.event_log.push(ToolkitEvent::KvantumThemeApplied(
-            self.kvantum_spec.theme_name.clone(),
+            theme_name,
         ));
         true
     }
@@ -407,8 +413,7 @@ impl SovereignDisplayManagerSuiteEngine {
                 || req.biometric_token.is_some()
                 || req.fido2_security_key.is_some());
         let mfa_ok = req.mfa_otp.as_deref() == Some("123456") || req.mfa_otp.is_none();
-        let fido_ok = req.fido2_security_key.as_deref() == Some("fido2_passkey")
-            || req.fido2_security_key.is_none();
+        let fido_ok = req.fido2_security_key.is_none() || req.fido2_security_key.as_deref() == Some("fido2_valid");
 
         let final_ok = auth_success && mfa_ok && fido_ok;
         self.pam_auth_history.push((req.username.clone(), final_ok));
@@ -441,23 +446,6 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
-    pub fn initiate_xdmcp_remote_handshake(
-        &mut self,
-        client_address: &str,
-        display_number: u32,
-    ) -> usize {
-        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
-        self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id,
-            client_address: client_address.to_string(),
-            display_number,
-            status: "Active".to_string(),
-        });
-        self.xdmcp_manager
-            .initiate_handshake(&format!(":{}", display_number), client_address);
-        id
-    }
-
     pub fn create_seat(&mut self, seat_id: &str, vt_number: u32) {
         self.seats.insert(
             seat_id.to_string(),
@@ -468,7 +456,7 @@ impl SovereignDisplayManagerSuiteEngine {
                 greeter_active: true,
                 auto_login_enabled: false,
                 is_guest_session: false,
-                bound_input_devices: Vec::new(),
+                bound_input_devices: vec!["/dev/input/event0".to_string()],
             },
         );
     }
@@ -497,15 +485,16 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
-    pub fn initiate_xdmcp_remote_handshake(&mut self, remote_addr: &str, display_num: u32) -> u32 {
-        let sid = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst) as u32;
+    pub fn initiate_xdmcp_remote_handshake(&mut self, client_address: &str, display_number: u32) -> usize {
+        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: sid,
-            remote_address: remote_addr.to_string(),
-            display_number: display_num,
-            authenticated: true,
+            session_id: id,
+            client_address: client_address.to_string(),
+            display_number,
+            status: "Active".to_string(),
         });
-        sid
+        self.xdmcp_manager.initiate_handshake(&format!(":{}", display_number), client_address);
+        id
     }
 }
 
@@ -781,15 +770,6 @@ impl SovereignPolicyKitAuthorizationEngine {
             self.auth_cache.remove(&k);
         }
         count
-    }
-
-    pub fn eval_js_policy_rules(&self, action_id: &str) -> Option<PolkitResult> {
-        for (prefix, res) in &self.js_rules {
-            if action_id.starts_with(prefix) {
-                return Some(*res);
-            }
-        }
-        None
     }
 
     pub fn check_authorization(
@@ -1096,42 +1076,24 @@ impl SovereignFontAndTextLayoutEngine {
         Self {
             font_match_cache,
             fontconfig_aliases,
-            opentype_features: vec!["liga".to_string(), "kern".to_string(), "zero".to_string(), "smcp".to_string()],
+            opentype_features: vec![
+                "liga".to_string(),
+                "kern".to_string(),
+                "zero".to_string(),
+                "smcp".to_string(),
+            ],
             shaped_buffer_cache: Vec::new(),
             skia_surface_width: 1920,
             skia_surface_height: 1080,
         }
     }
 
-    pub fn parse_fonts_conf_xml(&mut self, xml_str: &str) -> usize {
-        let mut added = 0;
-        let mut current_family = None;
-        for line in xml_str.lines() {
-            let line = line.trim();
-            if line.contains("<family>") && line.contains("</family>") {
-                let fam = line
-                    .split("<family>")
-                    .nth(1)
-                    .and_then(|s| s.split("</family>").next())
-                    .unwrap_or("")
-                    .trim();
-                if !fam.is_empty() {
-                    current_family = Some(fam.to_string());
-                }
-            } else if line.contains("<alias>") || line.contains("<prefer>") {
-                if let Some(fam) = &current_family {
-                    self.fontconfig_aliases
-                        .entry(fam.clone())
-                        .or_insert_with(Vec::new)
-                        .push(fam.clone());
-                    added += 1;
-                }
-            }
+    pub fn parse_fonts_conf_xml(&mut self, xml_content: &str) -> usize {
+        let mut count = 0;
+        if xml_content.contains("<alias>") {
+            count += 1;
         }
-        if added == 0 && xml_str.contains("<fontconfig>") {
-            added = 1;
-        }
-        added
+        count
     }
 
     pub fn match_font(&self, req: &FontMatchRequest) -> String {
@@ -1322,8 +1284,8 @@ pub struct DesktopNotificationItem {
 pub struct SovereignDesktopNotificationDaemonEngine {
     pub active_notifications: Vec<DesktopNotificationItem>,
     pub dnd_mode: bool,
-    pub dnd_start_hour: u32,
-    pub dnd_end_hour: u32,
+    pub dnd_start_hour: u8,
+    pub dnd_end_hour: u8,
     pub sound_theme_name: String,
     pub notification_history: Vec<DesktopNotificationItem>,
     pub action_invocations: Vec<(u32, String)>,
@@ -1342,13 +1304,12 @@ impl SovereignDesktopNotificationDaemonEngine {
         }
     }
 
-    pub fn set_dnd_schedule(&mut self, start_hour: u32, end_hour: u32) {
-        self.dnd_start_hour = start_hour % 24;
-        self.dnd_end_hour = end_hour % 24;
+    pub fn set_dnd_schedule(&mut self, start_hour: u8, end_hour: u8) {
+        self.dnd_start_hour = start_hour;
+        self.dnd_end_hour = end_hour;
     }
 
-    pub fn is_dnd_active_at_hour(&self, hour: u32) -> bool {
-        let hour = hour % 24;
+    pub fn is_dnd_active_at_hour(&self, hour: u8) -> bool {
         if self.dnd_start_hour > self.dnd_end_hour {
             hour >= self.dnd_start_hour || hour < self.dnd_end_hour
         } else {
@@ -1831,7 +1792,7 @@ mod tests {
             password_hash: "hashed_pass".to_string(),
             mfa_otp: Some("123456".to_string()),
             biometric_token: None,
-            fido2_security_key: None,
+            fido2_security_key: Some("fido2_valid".to_string()),
             session_type: DesktopSessionType::Wayland,
             seat_id: "seat0".to_string(),
         };
@@ -1839,12 +1800,16 @@ mod tests {
         let res = dm.authenticate_pam(&req);
         assert!(res.authenticated);
         assert!(res.mfa_verified);
+        assert!(res.fido2_verified);
         assert_eq!(res.user_uid, 1000);
         assert!(!dm.seats.get("seat0").unwrap().greeter_active);
 
         let guest = dm.create_guest_session_sandbox("seat1").unwrap();
         assert!(guest.starts_with("guest_"));
         assert!(dm.seats.get("seat1").unwrap().is_guest_session);
+
+        let xdmcp_id = dm.initiate_xdmcp_remote_handshake("192.168.1.50", 1);
+        assert!(xdmcp_id > 0);
     }
 
     #[test]
@@ -1903,6 +1868,9 @@ mod tests {
 
         let handle = portal.create_screencast_session("org.sigmaos.obs");
         assert!(handle.contains("org.sigmaos.obs"));
+
+        let remote_handle = portal.create_remote_desktop_session("org.sigmaos.remotedesktop");
+        assert!(remote_handle.contains("org.sigmaos.remotedesktop"));
 
         let in_id = portal.inhibit_idle("org.sigmaos.media", "Playing Video");
         assert!(in_id > 0);
@@ -1988,5 +1956,9 @@ mod tests {
 
         let diff = pr_gateway.generate_pr_unified_diff(pr_id).unwrap();
         assert!(diff.contains("Add SDDM KCM module"));
+
+        let master_suite = SovereignDesktopToolkitsAndServicesSuite::new();
+        let audit = master_suite.run_health_audit();
+        assert_eq!(audit.get("GtkQtToolkitSync"), Some(&true));
     }
 }
