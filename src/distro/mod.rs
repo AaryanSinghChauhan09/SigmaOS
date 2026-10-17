@@ -591,6 +591,8 @@ pub mod sovereign_linux_bsd_ecosystem_gap_closure_v52_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v52_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v58_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v58_pr::*;
+pub mod sovereign_linux_bsd_ecosystem_gap_closure_v60_pr;
+pub use sovereign_linux_bsd_ecosystem_gap_closure_v60_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_pinnacle_suite;
 pub mod sovereign_linux_bsd_gap_closure_v39_pr;
 pub mod sovereign_linux_bsd_master_innovations;
@@ -686,6 +688,8 @@ pub use open_source_os_missing_components_v57_pr::*;
 
 pub mod open_source_os_missing_components_v58_pr;
 pub use open_source_os_missing_components_v58_pr::*;
+pub mod open_source_os_missing_components_v60_pr;
+pub use open_source_os_missing_components_v60_pr::*;
 
 pub mod omarchy_linux_apex_engine;
 pub use omarchy_linux_apex_engine::*;
