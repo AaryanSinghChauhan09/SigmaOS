@@ -661,6 +661,14 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 "sigreturn_frame_guard_and_uncatchable_signal_bypass",
                 true,
             ),
+            (
+                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::SecuritySandboxing,
+                LinuxBsdDistroInspiration::FreeBSD,
+                "pol_proc_sec",
+                "capsicum_pdfork_process_descriptor_isolation",
+                true,
+            ),
         ];
 
         for (src, tgt, distro, id, rule, strict) in default_rules {
@@ -835,7 +843,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
     }
 
     /// Translate cross-subsystem payload specs between different Linux & BSD distro paradigms.
-    pub fn translate_cross_distro_payload(
+    pub fn translate_cross_distro_payload_between_distros(
         &self,
         source_distro: LinuxBsdDistroInspiration,
         target_distro: LinuxBsdDistroInspiration,
@@ -868,7 +876,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
     }
 
     /// Audit system-wide distro compliance across all 31 core subsystems.
-    pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
+    pub fn audit_all_subsystems_distro_compliance_summary(&self) -> (BTreeMap<String, bool>, u32) {
         let mut audit_map = BTreeMap::new();
         let mut compliant_count = 0;
 
@@ -1003,12 +1011,12 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         payload: &str,
     ) -> String {
         self.harmony_engine
-            .translate_cross_distro_payload(source_distro, target_distro, payload)
+            .translate_cross_distro_payload_between_distros(source_distro, target_distro, payload)
     }
 
     /// Perform system-wide distro compliance audit across all core subsystems.
     pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
-        self.harmony_engine.audit_all_subsystems_distro_compliance()
+        self.harmony_engine.audit_all_subsystems_distro_compliance_summary()
     }
 
     /// Execute an automated cross-subsystem workflow.

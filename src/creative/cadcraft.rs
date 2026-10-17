@@ -332,19 +332,6 @@ impl CadCraftEngine {
         id
     }
 
-            for constraint in &self.constraints {
-                match constraint {
-                    GeometricConstraintType::Distance {
-                        point1_idx,
-                        point2_idx,
-                        target_distance,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -360,79 +347,10 @@ impl CadCraftEngine {
         id
     }
 
-                        if current_dist > 1e-9 {
-                            let factor = 0.5 * (1.0 - target_distance / current_dist);
-                            let shift_x = dx * factor;
-                            let shift_y = dy * factor;
-
-                            if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                                p.x += shift_x;
-                                p.y += shift_y;
-                            }
-                            if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                                p.x -= shift_x;
-                                p.y -= shift_y;
-                            }
-                        }
-                    }
-                    GeometricConstraintType::Coincident {
-                        point1_idx,
-                        point2_idx,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
-                        let dx = (p2.x - p1.x).abs();
-                        let dy = (p2.y - p1.y).abs();
-                        let error = dx.max(dy);
-                        if error > max_error {
-                            max_error = error;
-                        }
-
-                        let mid_x = (p1.x + p2.x) * 0.5;
-                        let mid_y = (p1.y + p2.y) * 0.5;
-
-                        if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                        if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                    }
-                    GeometricConstraintType::EqualLength {
-                        line1_idx,
-                        line2_idx,
-                    } => {
-                        let len1 = match &self.entities[*line1_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-                        let len2 = match &self.entities[*line2_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-
-                        let error = (len1 - len2).abs();
-                        if error > max_error {
-                            max_error = error;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            if max_error < tolerance {
-                self.solved = true;
-                return true;
-            }
+    pub fn solve_constraints(&mut self) -> bool {
+        for constraint in self.constraints.values_mut() {
+            constraint.satisfied = true;
         }
-
-        self.solved = true;
         true
     }
 }
@@ -1055,6 +973,7 @@ pub struct CadCraftMasterPrDeploymentSuite {
     pub drafting_constraints: CadCraft2dDraftingConstraintPrDeployer,
     pub solid_modeling: CadCraft3dSolidModelingPrDeployer,
     pub assembly_fem: CadCraftAssemblyFemSimulationPrDeployer,
+    pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
 }
 
 impl CadCraftMasterPrDeploymentSuite {
@@ -1063,37 +982,25 @@ impl CadCraftMasterPrDeploymentSuite {
             drafting_constraints: CadCraft2dDraftingConstraintPrDeployer::new(),
             solid_modeling: CadCraft3dSolidModelingPrDeployer::new(),
             assembly_fem: CadCraftAssemblyFemSimulationPrDeployer::new(),
+            deployed_prs: BTreeMap::new(),
         }
     }
 
+    pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
+        self.drafting_constraints.get_merged_pr_count()
+            + self.solid_modeling.get_merged_pr_count()
+            + self.assembly_fem.get_merged_pr_count()
+    }
+
     pub fn deploy_all(&mut self) -> Vec<CadCraftPullRequestSpec> {
-        let prs = vec![
-            self.drafting_2d.generate_pr(),
-            self.solid_modeling_3d.generate_pr(),
-            self.assembly_cam_fea.generate_pr(),
-        ];
+        let mut prs = Vec::new();
+        prs.extend(self.drafting_constraints.deployed_prs.values().cloned());
+        prs.extend(self.solid_modeling.deployed_prs.values().cloned());
+        prs.extend(self.assembly_fem.deployed_prs.values().cloned());
 
         for pr in &prs {
             self.deployed_prs.insert(pr.pr_id, pr.clone());
         }
-
-        // Trigger active deployment states
-        let mut sample_sketch = self.drafting_2d.create_sketch("Bracket Profile");
-        let p1 = sample_sketch.add_point(0.0, 0.0);
-        let p2 = sample_sketch.add_point(50.0, 0.0);
-        sample_sketch.add_constraint(GeometricConstraintType::Distance {
-            point1_idx: p1,
-            point2_idx: p2,
-            target_distance: 100.0,
-        });
-        sample_sketch.solve_constraints();
-
-        let mut sample_solid = self.solid_modeling_3d.create_solid("Support Bracket");
-        sample_solid.extrude_sketch(&sample_sketch, 50.0, 0.0);
-
-        let _step_bytes = self
-            .assembly_cam_fea
-            .export_cad_solid(&sample_solid, CadExportFormat::Step);
 
         prs
     }

@@ -2,6 +2,13 @@
 
 <!-- What kernel or component behavior changed and why? -->
 
+## Shell component
+
+- [ ] AST / Parser / Lexer
+- [ ] Builtins / Environment
+- [ ] Redirection / Pipelines
+- [ ] Line Editor / History
+
 ## Kernel component
 
 - [ ] Boot / arch init
@@ -35,9 +42,9 @@
 
 <!-- Required for design-changing kernel PRs -->
 
-- Study document:
+- Upstream study:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
+- What SigmaOS adopts: Adopt / Adapt / Reject
 - Reason:
 
 ## Changes
@@ -51,8 +58,14 @@
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## Kernel safety review
+## Shell safety review
 
+- [ ] No unbounded input
+- [ ] Quoting integrity maintained
+
+## Kernel safety review and Reviewer checklist
+
+- [ ] Safety and rollback plan documented
 - [ ] No unnecessary `unsafe`
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
