@@ -231,3 +231,9 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
 };
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
+    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
+    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
