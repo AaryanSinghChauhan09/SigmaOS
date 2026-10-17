@@ -1055,7 +1055,10 @@ impl BsdRcSubrEngine {
             if let Some(var) = &script.enabled_variable {
                 if let Some(val) = self.rc_conf.get(var) {
                     let val_lower = val.to_lowercase();
-                    return val_lower == "yes" || val_lower == "true" || val == "1" || val_lower == "on";
+                    return val_lower == "yes"
+                        || val_lower == "true"
+                        || val == "1"
+                        || val_lower == "on";
                 }
             }
         }
@@ -2019,8 +2022,12 @@ mod tests {
             ServiceState::Running
         );
 
-        assert!(RunitS6SupervisionTreeGovernor::check_s6_readiness("READY=1"));
-        assert!(RunitS6SupervisionTreeGovernor::check_s6_readiness("ready notification"));
+        assert!(RunitS6SupervisionTreeGovernor::check_s6_readiness(
+            "READY=1"
+        ));
+        assert!(RunitS6SupervisionTreeGovernor::check_s6_readiness(
+            "ready notification"
+        ));
     }
 
     #[test]

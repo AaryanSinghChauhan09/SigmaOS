@@ -165,7 +165,9 @@ impl GnuCoreutilsBsdUserlandEngine {
             list.sort_by(|a, b| {
                 let num_a = a.parse::<f64>().unwrap_or(0.0);
                 let num_b = b.parse::<f64>().unwrap_or(0.0);
-                num_a.partial_cmp(&num_b).unwrap_or(core::cmp::Ordering::Equal)
+                num_a
+                    .partial_cmp(&num_b)
+                    .unwrap_or(core::cmp::Ordering::Equal)
             });
         } else {
             list.sort();
@@ -179,18 +181,9 @@ impl GnuCoreutilsBsdUserlandEngine {
         list
     }
 
-    pub fn run_tr(
-        &self,
-        input: &str,
-        from_set: &str,
-        to_set: &str,
-        delete_mode: bool,
-    ) -> String {
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
         if delete_mode {
-            input
-                .chars()
-                .filter(|c| !from_set.contains(*c))
-                .collect()
+            input.chars().filter(|c| !from_set.contains(*c)).collect()
         } else {
             let mut out = String::with_capacity(input.len());
             let from_chars: Vec<char> = from_set.chars().collect();
@@ -1345,7 +1338,9 @@ impl DocumentationPagerEngine {
     pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
         match (page_name, section) {
             ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self.man_db_lookup(page_name).map(|s| format!("Section {}: {}", section, s)),
+            _ => self
+                .man_db_lookup(page_name)
+                .map(|s| format!("Section {}: {}", section, s)),
         }
     }
 
