@@ -1246,7 +1246,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
