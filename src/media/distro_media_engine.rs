@@ -1403,6 +1403,7 @@ impl Default for MpvIpcJsonRpcEngine {
 // 16. AUDIO & VIDEO PULL REQUEST GATEWAY ENGINE
 // =========================================================================
 
+
 // =========================================================================
 // EXPANDED LINUX & BSD AUDIO / VIDEO DISTRO INNOVATION ENGINES
 // =========================================================================
@@ -1429,8 +1430,7 @@ impl AlsaAsoundrcConfigEngine {
     }
 
     pub fn add_plugin_binding(&mut self, plugin_type: &str, slave: &str) {
-        self.pcm_plugins
-            .insert(plugin_type.to_string(), slave.to_string());
+        self.pcm_plugins.insert(plugin_type.to_string(), slave.to_string());
     }
 
     pub fn generate_asoundrc_config(&self) -> String {
@@ -1529,14 +1529,8 @@ pub struct PipeWireWirePlumberLuaEngine {
 impl PipeWireWirePlumberLuaEngine {
     pub fn new() -> Self {
         let mut rules = BTreeMap::new();
-        rules.insert(
-            "app.name:Firefox".to_string(),
-            "sink.name:alsa_output_pci".to_string(),
-        );
-        rules.insert(
-            "app.name:OBS".to_string(),
-            "source.name:alsa_input_pci".to_string(),
-        );
+        rules.insert("app.name:Firefox".to_string(), "sink.name:alsa_output_pci".to_string());
+        rules.insert("app.name:OBS".to_string(), "source.name:alsa_input_pci".to_string());
         Self {
             lua_scripts: vec!["policy-node.lua".to_string(), "policy-dsp.lua".to_string()],
             node_routing_rules: rules,
@@ -1548,8 +1542,7 @@ impl PipeWireWirePlumberLuaEngine {
     }
 
     pub fn add_rule(&mut self, pattern: &str, target: &str) {
-        self.node_routing_rules
-            .insert(pattern.to_string(), target.to_string());
+        self.node_routing_rules.insert(pattern.to_string(), target.to_string());
     }
 
     pub fn resolve_route(&self, app_name: &str) -> Option<&String> {
@@ -1798,8 +1791,7 @@ impl MpvLuaScriptingEngine {
     }
 
     pub fn register_key_binding(&mut self, key: &str, command: &str) {
-        self.key_bindings
-            .insert(key.to_string(), command.to_string());
+        self.key_bindings.insert(key.to_string(), command.to_string());
     }
 
     pub fn show_osd_message(&mut self, message: &str) {
@@ -1961,27 +1953,12 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
             ("mpv Property Observer Event Loop Dispatcher", "mpv"),
             ("ALSA .asoundrc PCM Plugin Graph Parser Engine", "ALSA"),
             ("OSS v4 Resampling & Audio Format Conversion Engine", "OSS"),
-            (
-                "PulseAudio Module-Loopback & Echo Cancellation Engine",
-                "PulseAudio",
-            ),
-            (
-                "PipeWire WirePlumber Lua Policy & Routing Rules Engine",
-                "PipeWire",
-            ),
-            (
-                "JACK MIDI Jitter Buffer Latency Compensation Engine",
-                "JACK",
-            ),
+            ("PulseAudio Module-Loopback & Echo Cancellation Engine", "PulseAudio"),
+            ("PipeWire WirePlumber Lua Policy & Routing Rules Engine", "PipeWire"),
+            ("JACK MIDI Jitter Buffer Latency Compensation Engine", "JACK"),
             ("sndio Dynamic Device Selector & Pool Manager", "sndio"),
-            (
-                "GStreamer V4L2 Hardware Accelerated Encoding Pipeline",
-                "GStreamer",
-            ),
-            (
-                "FFmpeg VAAPI/NVENC Surface Context Governor Engine",
-                "FFmpeg",
-            ),
+            ("GStreamer V4L2 Hardware Accelerated Encoding Pipeline", "GStreamer"),
+            ("FFmpeg VAAPI/NVENC Surface Context Governor Engine", "FFmpeg"),
             ("V4L2 Camera Control Capabilities & PTZ Auto-Tuning", "V4L2"),
             ("VLC Media List Player Playlist & Chapter Navigation", "VLC"),
             ("mpv Lua Script Event Hook Dispatcher & OSD Engine", "mpv"),
@@ -2086,10 +2063,7 @@ impl LinuxBsdDistroMediaSuite {
             jack_midi_latency: JackMidiLatencyCompensationEngine::new(128),
             sndio_device_selector: SndioAudioDeviceSelectorEngine::new("snd/0", "rmidi/0"),
             gstreamer_v4l2_hwaccel: GStreamerV4l2HwAccelPipelineEngine::new("/dev/video0"),
-            ffmpeg_hwaccel_context: FfmpegHwaccelVaapiNvencEngine::new(
-                FfmpegHwEncoderBackend::VaapiIntelGpu,
-                "/dev/dri/renderD128",
-            ),
+            ffmpeg_hwaccel_context: FfmpegHwaccelVaapiNvencEngine::new(FfmpegHwEncoderBackend::VaapiIntelGpu, "/dev/dri/renderD128"),
             v4l2_camera_controls: V4l2CameraControlsCapabilitiesEngine::new(),
             vlc_media_list_player: VlcMediaListPlayerEngine::new(),
             mpv_lua_scripting: MpvLuaScriptingEngine::new(),
@@ -2306,6 +2280,7 @@ mod tests {
         assert_eq!(gap_closure.gateway.submissions.len(), 33);
     }
 
+
     #[test]
     fn test_expanded_audio_video_distro_engines() {
         let mut alsa_cfg = AlsaAsoundrcConfigEngine::new("hw:0,0");
@@ -2339,10 +2314,7 @@ mod tests {
         gst_v4l2.configure("v4l2h264enc", 8000, true);
         assert!(gst_v4l2.build_gst_launch_str().contains("v4l2h264enc"));
 
-        let mut ff_hw = FfmpegHwaccelVaapiNvencEngine::new(
-            FfmpegHwEncoderBackend::NvencNvidia,
-            "/dev/dri/renderD128",
-        );
+        let mut ff_hw = FfmpegHwaccelVaapiNvencEngine::new(FfmpegHwEncoderBackend::NvencNvidia, "/dev/dri/renderD128");
         assert_eq!(ff_hw.allocate_surface_pool(32), 32);
 
         let mut v4l2_ptz = V4l2CameraControlsCapabilitiesEngine::new();

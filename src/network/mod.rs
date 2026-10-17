@@ -15,8 +15,8 @@ pub mod sovereign_remote_sharing;
 pub mod tcp;
 pub mod tcp_complete;
 pub mod tcp_udp;
-pub mod warpinator_engine;
 pub mod wireless_manager;
+pub mod warpinator_engine;
 pub mod zenithnet;
 
 pub use device_discovery::{

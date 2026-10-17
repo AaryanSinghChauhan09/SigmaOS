@@ -1417,17 +1417,13 @@ impl SovereignTechMediaArticleInsightSynthesisEngine {
     }
 
     pub fn generate_domain_tuning_optimization_summary(&self) -> String {
-        let mut summary =
-            String::from("# SigmaOS Tech Media Domain-Specific Tuning Optimization Summary\n\n");
+        let mut summary = String::from("# SigmaOS Tech Media Domain-Specific Tuning Optimization Summary\n\n");
         summary.push_str("- **GPU & Vulkan Shader Caching (TechSpot / TechPowerUp):** DirectStorage fast-path pipelines enabled with 2GB Vulkan shader cache pool.\n");
         summary.push_str("- **Real-Time Audio Latency (9to5Linux / Linux.org):** PREEMPT_RT kernel audio thread priority set to SCHED_FIFO 95 with 64-sample PipeWire buffer size.\n");
         summary.push_str("- **eBPF Security Profiles (Linux.com / TheNewStack):** Automated Landlock V5 process containment and eBPF network LSM auditing active.\n");
         summary.push_str("- **Power & Battery Health (PCWorld / HWBusters):** Smart 80% charge threshold governor and dynamic thermal throttling enabled.\n");
         summary.push_str("- **SLM & AI Inference (MarkTechPost / KDnuggets):** Int8 quantized SLM vector engine accelerated with SIMD / AVX-512 extensions.\n\n");
-        summary.push_str(&format!(
-            "Total Domain Insights Optimized: {}\n",
-            self.insights.len()
-        ));
+        summary.push_str(&format!("Total Domain Insights Optimized: {}\n", self.insights.len()));
         summary
     }
 }

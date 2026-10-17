@@ -31,13 +31,13 @@
 - [ ] Monthly diagnostics rehearsal
 - [ ] Quarterly release/architecture/security review
 
-## Reference study (Upstream study)
+## Reference study
 
 <!-- Required for design-changing kernel PRs -->
 
 - Study document:
 - Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject (What SigmaOS adopts)
+- Decision: Adopt / Adapt / Reject
 - Reason:
 
 ## Changes
@@ -62,7 +62,7 @@
 - [ ] Error paths tested
 - [ ] No silent failure introduced
 
-## Evidence and Reviewer checklist
+## Evidence
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -83,7 +83,7 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks, Safety and rollback
+## Risks and rollback
 
 - Risk:
-- Safety and rollback:
+- Rollback:

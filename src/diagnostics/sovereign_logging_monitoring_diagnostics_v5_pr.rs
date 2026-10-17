@@ -120,8 +120,7 @@ impl SovereignJournaldSyslogEngineV5 {
     }
 
     pub fn add_logrotate_policy(&mut self, policy: LogrotatePolicyV5) {
-        self.logrotate_policies
-            .insert(policy.log_path.clone(), policy);
+        self.logrotate_policies.insert(policy.log_path.clone(), policy);
     }
 
     pub fn get_namespaces(&self) -> &HashMap<String, JournaldNamespaceV5> {
@@ -416,7 +415,7 @@ pub struct SsSocketMemoryV5 {
 pub struct SsTcpSocketDetailsV5 {
     pub local_endpoint: String,
     pub remote_endpoint: String,
-    pub state: String,           // ESTABLISHED, TIME_WAIT, SYN_SENT
+    pub state: String, // ESTABLISHED, TIME_WAIT, SYN_SENT
     pub congestion_algo: String, // cubic, bbr, reno
     pub inode: u64,
     pub pid: u32,
@@ -460,10 +459,7 @@ impl SsLsofIpcInspectorEngineV5 {
     }
 
     pub fn query_sockets_by_algo(&self, algo: &str) -> Vec<&SsTcpSocketDetailsV5> {
-        self.tcp_sockets
-            .iter()
-            .filter(|s| s.congestion_algo == algo)
-            .collect()
+        self.tcp_sockets.iter().filter(|s| s.congestion_algo == algo).collect()
     }
 
     pub fn get_tcp_sockets(&self) -> &[SsTcpSocketDetailsV5] {
@@ -626,11 +622,7 @@ impl VectorPrometheusSosreportSuiteV5 {
         self.prometheus_targets.push(target);
     }
 
-    pub fn create_sosreport_manifest(
-        &mut self,
-        bundle_name: &str,
-        files: BTreeMap<String, String>,
-    ) -> SosreportManifestV5 {
+    pub fn create_sosreport_manifest(&mut self, bundle_name: &str, files: BTreeMap<String, String>) -> SosreportManifestV5 {
         let manifest = SosreportManifestV5 {
             bundle_filename: bundle_name.to_string(),
             creation_epoch_sec: 1774872000,
@@ -698,12 +690,10 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV5 {
     fn seed_presets(&mut self) {
         self.submissions.push(DiagnosticsPrSubmissionV5 {
             pr_id: 501,
-            title: "PR #501: Journald Namespace Isolation & Systemd Catalog Integration"
-                .to_string(),
+            title: "PR #501: Journald Namespace Isolation & Systemd Catalog Integration".to_string(),
             author: "SigmaLoggingTeam".to_string(),
             target_component: "journald_v5".to_string(),
-            description: "Implements isolated journal namespaces and catalog explanations"
-                .to_string(),
+            description: "Implements isolated journal namespaces and catalog explanations".to_string(),
             pqc_signature: "DILITHIUM5_SIG_JOURNAL_NS_501".to_string(),
             status: DiagnosticsPrStatusV5::Merged,
         });
@@ -818,9 +808,7 @@ mod tests {
         });
 
         assert_eq!(engine.get_namespaces().len(), 2);
-        let entry = engine
-            .lookup_catalog("f7701587a5f442d73830cc0b0809b52a")
-            .unwrap();
+        let entry = engine.lookup_catalog("f7701587a5f442d73830cc0b0809b52a").unwrap();
         assert!(entry.subject_template.contains("logged in"));
     }
 

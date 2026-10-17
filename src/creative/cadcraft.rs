@@ -8,14 +8,13 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::String;
-use alloc::vec;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// FNV-1a checksum for CadCraft PR verification
-pub fn fnv1a_cadcraft_pr_digest(data: &[u8]) -> u64 {
+pub fn fnv1a_cadcraft_pr_digest(pr_id: u32, title: &str) -> u64 {
     let mut hash: u64 = 0xcbf29ce484222325;
-    for &byte in data {
+    for &byte in pr_id.to_le_bytes().iter().chain(title.as_bytes()) {
         hash ^= u64::from(byte);
         hash = hash.wrapping_mul(0x100000001b3);
     }
@@ -352,7 +351,7 @@ impl CadCraftEngine {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: String::from("G0 X0 Y0 Z5\nG1 Z-2 F500\n"),
+            gcode_output: format!("G01 X0 Y0 Z-1 F{:.1}", feed_rate),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -374,11 +373,7 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        match format {
-            ExportFormat::DXF => Vec::from("HEADER SECTION DXF"),
-            ExportFormat::STEP => Vec::from("ISO-10303-21 STEP"),
-            _ => Vec::from("CAD DATA"),
-        }
+        format!("cadcraft export format {:?}", format).into_bytes()
     }
 }
 
@@ -456,10 +451,6 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
-// ============================================================================
-// 2. 3D B-Rep Solid Feature Modeling & Direct Modeling Engine
-// ============================================================================
-
 /// 3D Vector / Point
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector3D {
@@ -476,14 +467,21 @@ impl Vector3D {
     pub fn length(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
+}
 
-    pub fn add(&self, other: &Vector3D) -> Vector3D {
-        Vector3D::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-
-    pub fn scale(&self, factor: f64) -> Vector3D {
-        Vector3D::new(self.x * factor, self.y * factor, self.z * factor)
-    }
+/// Solid Feature Operation Type
+#[derive(Debug, Clone, PartialEq)]
+pub enum SolidFeatureOperation {
+    Extrude {
+        depth: f64,
+        draft_angle_deg: f64,
+    },
+    Revolve {
+        angle_deg: f64,
+        axis_start: Vector3D,
+        axis_direction: Vector3D,
+    },
+    BooleanSubtract,
 }
 
 /// Boundary Representation (B-Rep) Solid Model
@@ -495,6 +493,7 @@ pub struct BRepSolidModel {
     pub edges_count: usize,
     pub volume: f64,
     pub surface_area: f64,
+    pub feature_history: Vec<SolidFeatureOperation>,
 }
 
 impl BRepSolidModel {
@@ -506,6 +505,7 @@ impl BRepSolidModel {
             edges_count: 0,
             volume: 0.0,
             surface_area: 0.0,
+            feature_history: Vec::new(),
         }
     }
 }
@@ -560,10 +560,6 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
         Self::new()
     }
 }
-
-// ============================================================================
-// 3. Assembly Mates, CAM G-code Toolpath & FEA Stress Analysis Engine
-// ============================================================================
 
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Clone)]

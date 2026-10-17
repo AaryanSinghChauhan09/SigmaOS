@@ -36,7 +36,7 @@ pub struct MsiVector {
     pub vector: u8,
     pub address: u64,
     pub data: u32,
-    pub device_id: u16,
+    pub device_id: u32,
     pub allocated: bool,
 }
 
@@ -69,8 +69,8 @@ pub struct MsixConfig {
 /// MSI/MSI-X routing engine
 pub struct MsiRoutingEngine {
     pub interrupt_controller: InterruptController,
-    pub msi_vectors: BTreeMap<u16, MsiVector>, // device_id -> vector
-    pub msix_tables: BTreeMap<u16, Vec<MsixTableEntry>>, // device_id -> table entries
+    pub msi_vectors: BTreeMap<u32, MsiVector>, // device_id -> vector
+    pub msix_tables: BTreeMap<u32, Vec<MsixTableEntry>>, // device_id -> table entries
     pub next_msi_vector: u8,
     pub base_msi_address: u64,
 }
@@ -87,7 +87,7 @@ impl MsiRoutingEngine {
     }
 
     /// Configure MSI capability for a device
-    pub fn configure_msi(&mut self, device_id: u16, config: MsiConfig) -> Result<(), &'static str> {
+    pub fn configure_msi(&mut self, device_id: u32, config: MsiConfig) -> Result<(), &'static str> {
         if !config.enable {
             return Ok(());
         }
@@ -123,7 +123,7 @@ impl MsiRoutingEngine {
     /// Configure MSI-X capability for a device
     pub fn configure_msix(
         &mut self,
-        device_id: u16,
+        device_id: u32,
         config: MsixConfig,
         table_size: u16,
     ) -> Result<(), &'static str> {
@@ -165,7 +165,7 @@ impl MsiRoutingEngine {
     /// Register MSI handler for a device
     pub fn register_msi_handler(
         &mut self,
-        device_id: u16,
+        device_id: u32,
         handler: InterruptHandler,
         data: u64,
     ) -> Result<(), &'static str> {
@@ -181,7 +181,7 @@ impl MsiRoutingEngine {
     /// Register MSI-X handler for a device
     pub fn register_msix_handler(
         &mut self,
-        device_id: u16,
+        device_id: u32,
         index: u16,
         handler: InterruptHandler,
         data: u64,
@@ -203,7 +203,7 @@ impl MsiRoutingEngine {
     }
 
     /// Enable MSI for a device
-    pub fn enable_msi(&mut self, device_id: u16) -> Result<(), &'static str> {
+    pub fn enable_msi(&mut self, device_id: u32) -> Result<(), &'static str> {
         let msi_vector = self
             .msi_vectors
             .get_mut(&device_id)
@@ -216,7 +216,7 @@ impl MsiRoutingEngine {
     }
 
     /// Disable MSI for a device
-    pub fn disable_msi(&mut self, device_id: u16) -> Result<(), &'static str> {
+    pub fn disable_msi(&mut self, device_id: u32) -> Result<(), &'static str> {
         let msi_vector = self
             .msi_vectors
             .get(&device_id)
@@ -227,7 +227,7 @@ impl MsiRoutingEngine {
     }
 
     /// Enable MSI-X for a device
-    pub fn enable_msix(&mut self, device_id: u16) -> Result<(), &'static str> {
+    pub fn enable_msix(&mut self, device_id: u32) -> Result<(), &'static str> {
         let table_entries = self
             .msix_tables
             .get(&device_id)
@@ -242,7 +242,7 @@ impl MsiRoutingEngine {
     }
 
     /// Disable MSI-X for a device
-    pub fn disable_msix(&mut self, device_id: u16) -> Result<(), &'static str> {
+    pub fn disable_msix(&mut self, device_id: u32) -> Result<(), &'static str> {
         let table_entries = self
             .msix_tables
             .get(&device_id)
@@ -257,17 +257,17 @@ impl MsiRoutingEngine {
     }
 
     /// Get MSI vector for a device
-    pub fn get_msi_vector(&self, device_id: u16) -> Option<&MsiVector> {
+    pub fn get_msi_vector(&self, device_id: u32) -> Option<&MsiVector> {
         self.msi_vectors.get(&device_id)
     }
 
     /// Get MSI-X table for a device
-    pub fn get_msix_table(&self, device_id: u16) -> Option<&Vec<MsixTableEntry>> {
+    pub fn get_msix_table(&self, device_id: u32) -> Option<&Vec<MsixTableEntry>> {
         self.msix_tables.get(&device_id)
     }
 
     /// Mask MSI-X vector
-    pub fn mask_msix_vector(&mut self, device_id: u16, index: u16) -> Result<(), &'static str> {
+    pub fn mask_msix_vector(&mut self, device_id: u32, index: u16) -> Result<(), &'static str> {
         let table_entries = self
             .msix_tables
             .get_mut(&device_id)
@@ -282,7 +282,7 @@ impl MsiRoutingEngine {
     }
 
     /// Unmask MSI-X vector
-    pub fn unmask_msix_vector(&mut self, device_id: u16, index: u16) -> Result<(), &'static str> {
+    pub fn unmask_msix_vector(&mut self, device_id: u32, index: u16) -> Result<(), &'static str> {
         let table_entries = self
             .msix_tables
             .get_mut(&device_id)
