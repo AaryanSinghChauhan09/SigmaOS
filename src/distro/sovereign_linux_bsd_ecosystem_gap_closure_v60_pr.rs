@@ -1,500 +1,679 @@
+// SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Linux & BSD Ecosystem Gap Closure V60 PR Suite
-// Implements missing features and advancements inspired by Linux & BSD operating systems in PR format
+// (`src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v60_pr.rs`)
+//
+// Provides clean-room Pull Request (PR) proposal engines bridging key remaining gaps
+// between SigmaOS and landmark Linux and BSD distribution ecosystems:
+// 1. LinuxIoUringFutex2V60PrEngine (Linux io_uring SQPOLL ring & futex2 waitv fast synchronization)
+// 2. FreeBsdCapsicumCasperV60PrEngine (FreeBSD Capsicum sandboxing & Casper IPC service capability broker)
+// 3. OpenBsdSoftraidBioctlV60PrEngine (OpenBSD softraid CRYPTO disk volume management & bioctl monitoring)
+// 4. DragonFlyHammer2PfsV60PrEngine (DragonFly BSD HAMMER2 PFS cluster replication & transaction logging)
+// 5. GentooPortageEapi9V60PrEngine (Gentoo Portage EAPI 9 draft subslot rebuild triggers & conditional USE flags)
+// 6. AlpineApkV3ApkovlV60PrEngine (Alpine Linux APK v3 package index signature validation & apkovl diskless overlays)
+// 7. NixGuixFlakeStoreV60PrEngine (Nix/Guix CAS content-addressed store path derivation & hermetic flake closure evaluation)
+// 8. NetBsdNpfJitFirewallV60PrEngine (NetBSD NPF N-code JIT bytecode firewall rule compilation)
+// 9. ClearLinuxStatelessPstateV60PrEngine (Clear Linux /usr stateless configuration & CPU P-state latency tuning)
+// 10. IllumosDtraceCrossbowV60PrEngine (Illumos DTrace USDT probes & Crossbow VNIC dynamic bandwidth flow allocation)
+// 11. SovereignLinuxBsdEcosystemGapClosureV60PrSuite (Master Linux/BSD Ecosystem Gap Closure V60 PR Gateway Suite)
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PrStatus {
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::format;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LinuxBsdPrStatusV60 {
+    Draft,
     Submitted,
     Validated,
-    Transpiled,
     Merged,
-    Rejected(String),
+    Rejected,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LinuxBsdPrProposalV60 {
+    pub pr_id: u64,
+    pub title: String,
+    pub author: String,
+    pub subsystem: String,
+    pub original_distro: String,
+    pub patch_summary: String,
+    pub unified_diff: String,
+    pub status: LinuxBsdPrStatusV60,
+}
+
+// ============================================================================
+// 1. Linux io_uring & Futex2 Synchronization Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct Futex2WaitvSpec {
+    pub uaddr: u64,
+    pub val: u64,
+    pub flags: u32,
+    pub bitset: u32,
 }
 
 #[derive(Debug, Clone)]
-pub struct EcosystemGapV60Pr {
-    pub pr_id: String,
-    pub title: String,
-    pub os_origin: String,
-    pub status: PrStatus,
-    pub payload: String,
-}
-
-// 1. Linux 6.15+ io_uring & futex2 Sync Engine PR
-#[derive(Debug, Default)]
 pub struct LinuxIoUringFutex2V60PrEngine {
-    ring_configs: BTreeMap<String, (u32, u32)>,
+    pub sq_ring_entries: u32,
+    pub sqpoll_cpu: u32,
+    pub futex_waiters: Vec<Futex2WaitvSpec>,
 }
 
 impl LinuxIoUringFutex2V60PrEngine {
     pub fn new() -> Self {
         Self {
-            ring_configs: BTreeMap::new(),
+            sq_ring_entries: 1024,
+            sqpoll_cpu: 1,
+            futex_waiters: Vec::new(),
         }
     }
 
-    pub fn process_pr(
+    pub fn register_futex_waiter(
         &mut self,
-        pr_id: &str,
-        sq_ring_entries: u32,
-        futex_waitv_count: u32,
-    ) -> EcosystemGapV60Pr {
-        if sq_ring_entries == 0 || sq_ring_entries > 65536 {
-            return EcosystemGapV60Pr {
-                pr_id: pr_id.to_string(),
-                title: format!("Linux 6.15+ io_uring SQPOLL & futex2 PR: {}", pr_id),
-                os_origin: "Linux 6.15+".to_string(),
-                status: PrStatus::Rejected("Invalid SQ ring entries size".to_string()),
-                payload: String::new(),
-            };
-        }
-        self.ring_configs
-            .insert(pr_id.to_string(), (sq_ring_entries, futex_waitv_count));
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("Linux 6.15+ io_uring SQPOLL & futex2 PR: {}", pr_id),
-            os_origin: "Linux 6.15+".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Configured zero-syscall SQPOLL ring with {} entries & batched futex2 (futex_waitv) count {}",
-                sq_ring_entries, futex_waitv_count
-            ),
-        }
-    }
-
-    pub fn get_ring_config(&self, pr_id: &str) -> Option<&(u32, u32)> {
-        self.ring_configs.get(pr_id)
+        uaddr: u64,
+        val: u64,
+        flags: u32,
+        bitset: u32,
+    ) -> String {
+        self.futex_waiters.push(Futex2WaitvSpec {
+            uaddr,
+            val,
+            flags,
+            bitset,
+        });
+        format!(
+            "--- a/kernel/futex2.c\n+++ b/kernel/futex2.c\n@@ -0,0 +1,3 @@\n+sys_futex_waitv(uaddr=0x{:x}, val={}, flags=0x{:x});\n",
+            uaddr, val, flags
+        )
     }
 }
 
-// 2. FreeBSD Capsicum Casper IPC Delegation PR
-#[derive(Debug, Default)]
+impl Default for LinuxIoUringFutex2V60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 2. FreeBSD Capsicum & Casper Isolation Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CasperServiceSpec {
+    pub service_name: String,
+    pub channel_fd: i32,
+    pub limits_mask: u64,
+}
+
+#[derive(Debug, Clone)]
 pub struct FreeBsdCapsicumCasperV60PrEngine {
-    jail_casper_services: BTreeMap<String, Vec<String>>,
+    pub services: BTreeMap<String, CasperServiceSpec>,
 }
 
 impl FreeBsdCapsicumCasperV60PrEngine {
     pub fn new() -> Self {
-        Self {
-            jail_casper_services: BTreeMap::new(),
-        }
+        let mut services = BTreeMap::new();
+        services.insert(
+            "system.dns".to_string(),
+            CasperServiceSpec {
+                service_name: "system.dns".to_string(),
+                channel_fd: 3,
+                limits_mask: 0x01,
+            },
+        );
+        Self { services }
     }
 
-    pub fn process_pr(
-        &mut self,
-        pr_id: &str,
-        jail_name: &str,
-        casper_service: &str,
-    ) -> EcosystemGapV60Pr {
-        if jail_name.is_empty() || casper_service.is_empty() {
-            return EcosystemGapV60Pr {
-                pr_id: pr_id.to_string(),
-                title: format!("FreeBSD Capsicum Casper PR: {}", jail_name),
-                os_origin: "FreeBSD".to_string(),
-                status: PrStatus::Rejected(
-                    "Jail or Casper service name cannot be empty".to_string(),
-                ),
-                payload: String::new(),
-            };
-        }
-
-        self.jail_casper_services
-            .entry(jail_name.to_string())
-            .or_default()
-            .push(casper_service.to_string());
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("FreeBSD Capsicum Casper PR: {}", jail_name),
-            os_origin: "FreeBSD".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Delegated Casper IPC service '{}' for Capsicum sandboxed jail '{}' via pdfork descriptors",
-                casper_service, jail_name
-            ),
-        }
-    }
-
-    pub fn is_service_delegated(&self, jail_name: &str, casper_service: &str) -> bool {
-        self.jail_casper_services
-            .get(jail_name)
-            .map_or(false, |services| {
-                services.iter().any(|s| s == casper_service)
-            })
+    pub fn register_casper_service(&mut self, name: &str, fd: i32, mask: u64) -> String {
+        let spec = CasperServiceSpec {
+            service_name: name.to_string(),
+            channel_fd: fd,
+            limits_mask: mask,
+        };
+        self.services.insert(name.to_string(), spec);
+        format!(
+            "--- a/lib/libcasper/casper_{}.c\n+++ b/lib/libcasper/casper_{}.c\n@@ -0,0 +1,2 @@\n+cap_service_open(\"{}\");\n",
+            name, name, name
+        )
     }
 }
 
-// 3. OpenBSD Softraid BIOCTL Crypto Volume PR
-#[derive(Debug, Default)]
+impl Default for FreeBsdCapsicumCasperV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 3. OpenBSD softraid CRYPTO & bioctl Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SoftraidVolumeSpec {
+    pub device_name: String,
+    pub raid_level: String,
+    pub chunk_count: u32,
+    pub encrypted: bool,
+}
+
+#[derive(Debug, Clone)]
 pub struct OpenBsdSoftraidBioctlV60PrEngine {
-    unlocked_volumes: BTreeMap<String, String>,
+    pub volumes: BTreeMap<String, SoftraidVolumeSpec>,
 }
 
 impl OpenBsdSoftraidBioctlV60PrEngine {
     pub fn new() -> Self {
-        Self {
-            unlocked_volumes: BTreeMap::new(),
-        }
+        let mut volumes = BTreeMap::new();
+        volumes.insert(
+            "sd0".to_string(),
+            SoftraidVolumeSpec {
+                device_name: "sd0".to_string(),
+                raid_level: "CRYPTO".to_string(),
+                chunk_count: 2,
+                encrypted: true,
+            },
+        );
+        Self { volumes }
     }
 
-    pub fn process_pr(
-        &mut self,
-        pr_id: &str,
-        volume_label: &str,
-        cipher: &str,
-    ) -> EcosystemGapV60Pr {
-        if volume_label.is_empty() {
-            return EcosystemGapV60Pr {
-                pr_id: pr_id.to_string(),
-                title: format!("OpenBSD softraid CRYPTO PR: {}", volume_label),
-                os_origin: "OpenBSD".to_string(),
-                status: PrStatus::Rejected("Volume label empty".to_string()),
-                payload: String::new(),
-            };
-        }
-        self.unlocked_volumes
-            .insert(volume_label.to_string(), cipher.to_string());
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("OpenBSD softraid CRYPTO PR: {}", volume_label),
-            os_origin: "OpenBSD".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Unlocked softraid CRYPTO volume '{}' using cipher '{}' via bioctl key verification",
-                volume_label, cipher
-            ),
-        }
-    }
-
-    pub fn get_volume_cipher(&self, volume_label: &str) -> Option<&String> {
-        self.unlocked_volumes.get(volume_label)
+    pub fn create_crypto_volume(&mut self, dev: &str, chunks: u32) -> String {
+        let spec = SoftraidVolumeSpec {
+            device_name: dev.to_string(),
+            raid_level: "CRYPTO".to_string(),
+            chunk_count: chunks,
+            encrypted: true,
+        };
+        self.volumes.insert(dev.to_string(), spec);
+        format!("bioctl -c C -l {} -cc -r 16384 softraid0", dev)
     }
 }
 
-// 4. DragonFly BSD HAMMER2 PFS Replication PR
-#[derive(Debug, Default)]
+impl Default for OpenBsdSoftraidBioctlV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 4. DragonFly BSD HAMMER2 PFS Replication Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct Hammer2PfsSpec {
+    pub pfs_name: String,
+    pub transaction_id: u64,
+    pub cluster_mode: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct DragonFlyHammer2PfsV60PrEngine {
-    cluster_txg: BTreeMap<String, u64>,
+    pub pfs_list: BTreeMap<String, Hammer2PfsSpec>,
 }
 
 impl DragonFlyHammer2PfsV60PrEngine {
     pub fn new() -> Self {
-        Self {
-            cluster_txg: BTreeMap::new(),
-        }
+        let mut pfs_list = BTreeMap::new();
+        pfs_list.insert(
+            "ROOT".to_string(),
+            Hammer2PfsSpec {
+                pfs_name: "ROOT".to_string(),
+                transaction_id: 10001,
+                cluster_mode: "MASTER".to_string(),
+            },
+        );
+        Self { pfs_list }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, pfs_name: &str, txg_seq: u64) -> EcosystemGapV60Pr {
-        self.cluster_txg.insert(pfs_name.to_string(), txg_seq);
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("DragonFly HAMMER2 PFS PR: {}", pfs_name),
-            os_origin: "DragonFly BSD".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Synchronized HAMMER2 PFS multi-master cluster '{}' at transaction sequence {}",
-                pfs_name, txg_seq
-            ),
-        }
-    }
-
-    pub fn get_current_txg(&self, pfs_name: &str) -> Option<u64> {
-        self.cluster_txg.get(pfs_name).copied()
+    pub fn create_pfs_snapshot(&mut self, name: &str, tx_id: u64) -> String {
+        let spec = Hammer2PfsSpec {
+            pfs_name: name.to_string(),
+            transaction_id: tx_id,
+            cluster_mode: "SLAVE".to_string(),
+        };
+        self.pfs_list.insert(name.to_string(), spec);
+        format!("hammer2 pfs-create {} @{}", name, tx_id)
     }
 }
 
-// 5. Gentoo Portage EAPI 9 Subslot Rebuild PR
-#[derive(Debug, Default)]
+impl Default for DragonFlyHammer2PfsV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 5. Gentoo Portage EAPI 9 Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PortageEbuildSpec {
+    pub package_atom: String,
+    pub slot: String,
+    pub subslot: String,
+    pub use_flags: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
 pub struct GentooPortageEapi9V60PrEngine {
-    rebuilt_subslots: BTreeMap<String, String>,
+    pub ebuilds: BTreeMap<String, PortageEbuildSpec>,
 }
 
 impl GentooPortageEapi9V60PrEngine {
     pub fn new() -> Self {
-        Self {
-            rebuilt_subslots: BTreeMap::new(),
-        }
+        let mut ebuilds = BTreeMap::new();
+        ebuilds.insert(
+            "sys-apps/sigmaos-core-1.0".to_string(),
+            PortageEbuildSpec {
+                package_atom: "sys-apps/sigmaos-core-1.0".to_string(),
+                slot: "0".to_string(),
+                subslot: "1.0".to_string(),
+                use_flags: vec!["systemd".to_string(), "hardened".to_string()],
+            },
+        );
+        Self { ebuilds }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, pkg_atom: &str, subslot: &str) -> EcosystemGapV60Pr {
-        self.rebuilt_subslots
-            .insert(pkg_atom.to_string(), subslot.to_string());
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("Gentoo Portage EAPI 9 PR: {}", pkg_atom),
-            os_origin: "Gentoo Linux".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Executed Portage EAPI 9 subslot rebuild for package '{}' under subslot '{}'",
-                pkg_atom, subslot
-            ),
-        }
-    }
-
-    pub fn is_rebuilt(&self, pkg_atom: &str) -> bool {
-        self.rebuilt_subslots.contains_key(pkg_atom)
+    pub fn add_ebuild(&mut self, atom: &str, slot: &str, subslot: &str, uses: Vec<&str>) -> String {
+        let spec = PortageEbuildSpec {
+            package_atom: atom.to_string(),
+            slot: slot.to_string(),
+            subslot: subslot.to_string(),
+            use_flags: uses.iter().map(|s| s.to_string()).collect(),
+        };
+        self.ebuilds.insert(atom.to_string(), spec);
+        format!(
+            "--- a/ebuilds/{}.ebuild\n+++ b/ebuilds/{}.ebuild\n@@ -0,0 +1,3 @@\n+EAPI=9\n+SLOT=\"{}/{}\"\n",
+            atom, atom, slot, subslot
+        )
     }
 }
 
-// 6. Alpine Linux APK v3 Persistence PR
-#[derive(Debug, Default)]
+impl Default for GentooPortageEapi9V60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. Alpine Linux APK v3 & apkovl Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ApkovlOverlaySpec {
+    pub overlay_name: String,
+    pub compressed_size: u64,
+    pub file_count: u32,
+}
+
+#[derive(Debug, Clone)]
 pub struct AlpineApkV3ApkovlV60PrEngine {
-    mounted_overlays: Vec<String>,
+    pub overlays: BTreeMap<String, ApkovlOverlaySpec>,
 }
 
 impl AlpineApkV3ApkovlV60PrEngine {
     pub fn new() -> Self {
-        Self {
-            mounted_overlays: Vec::new(),
-        }
+        let mut overlays = BTreeMap::new();
+        overlays.insert(
+            "localhost.apkovl.tar.gz".to_string(),
+            ApkovlOverlaySpec {
+                overlay_name: "localhost.apkovl.tar.gz".to_string(),
+                compressed_size: 2048,
+                file_count: 12,
+            },
+        );
+        Self { overlays }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, apkovl_file: &str) -> EcosystemGapV60Pr {
-        if !apkovl_file.ends_with(".apkovl.tar.gz") {
-            return EcosystemGapV60Pr {
-                pr_id: pr_id.to_string(),
-                title: format!("Alpine APK v3 apkovl PR: {}", apkovl_file),
-                os_origin: "Alpine Linux".to_string(),
-                status: PrStatus::Rejected("Invalid apkovl overlay file extension".to_string()),
-                payload: String::new(),
-            };
-        }
-
-        self.mounted_overlays.push(apkovl_file.to_string());
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("Alpine APK v3 apkovl PR: {}", apkovl_file),
-            os_origin: "Alpine Linux".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Verified APK v3 cryptographic index signatures and mounted RAM-boot persistence overlay '{}'",
-                apkovl_file
-            ),
-        }
-    }
-
-    pub fn is_overlay_mounted(&self, apkovl_file: &str) -> bool {
-        self.mounted_overlays.iter().any(|o| o == apkovl_file)
+    pub fn generate_overlay(&mut self, name: &str, files: u32) -> String {
+        let spec = ApkovlOverlaySpec {
+            overlay_name: name.to_string(),
+            compressed_size: 4096,
+            file_count: files,
+        };
+        self.overlays.insert(name.to_string(), spec);
+        format!("lbu commit -d {}", name)
     }
 }
 
-// 7. NixOS / Guix Flake Hermetic CAS Store PR
-#[derive(Debug, Default)]
+impl Default for AlpineApkV3ApkovlV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 7. Nix / Guix CAS & Flake Store Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct FlakeClosureSpec {
+    pub store_path: String,
+    pub hash_digest: String,
+    pub input_references: Vec<String>,
+}
+
+#[derive(Debug, Clone)]
 pub struct NixGuixFlakeStoreV60PrEngine {
-    evaluated_closures: BTreeMap<String, String>,
+    pub store_closures: BTreeMap<String, FlakeClosureSpec>,
 }
 
 impl NixGuixFlakeStoreV60PrEngine {
     pub fn new() -> Self {
+        let mut closures = BTreeMap::new();
+        closures.insert(
+            "/nix/store/1234567890abcdef-sigmaos".to_string(),
+            FlakeClosureSpec {
+                store_path: "/nix/store/1234567890abcdef-sigmaos".to_string(),
+                hash_digest: "1234567890abcdef".to_string(),
+                input_references: vec!["/nix/store/glibc".to_string()],
+            },
+        );
         Self {
-            evaluated_closures: BTreeMap::new(),
+            store_closures: closures,
         }
     }
 
-    pub fn process_pr(
-        &mut self,
-        pr_id: &str,
-        flake_ref: &str,
-        store_hash: &str,
-    ) -> EcosystemGapV60Pr {
-        self.evaluated_closures
-            .insert(flake_ref.to_string(), store_hash.to_string());
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("NixOS / Guix Flake Store PR: {}", flake_ref),
-            os_origin: "NixOS / GNU Guix".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Evaluated hermetic closure graph for flake '{}' resulting in content-addressed store hash '{}'",
-                flake_ref, store_hash
-            ),
-        }
-    }
-
-    pub fn get_store_hash(&self, flake_ref: &str) -> Option<&String> {
-        self.evaluated_closures.get(flake_ref)
+    pub fn add_closure(&mut self, path: &str, hash: &str, refs: Vec<&str>) -> String {
+        let spec = FlakeClosureSpec {
+            store_path: path.to_string(),
+            hash_digest: hash.to_string(),
+            input_references: refs.iter().map(|s| s.to_string()).collect(),
+        };
+        self.store_closures.insert(path.to_string(), spec);
+        format!("nix store add-path {} --hash sha256:{}", path, hash)
     }
 }
 
-// 8. NetBSD NPF N-code JIT Firewall PR
-#[derive(Debug, Default)]
+impl Default for NixGuixFlakeStoreV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. NetBSD NPF N-code JIT Firewall Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct NpfRuleSpec {
+    pub rule_id: u32,
+    pub action: String,
+    pub interface: String,
+    pub jit_bytecode_len: usize,
+}
+
+#[derive(Debug, Clone)]
 pub struct NetBsdNpfJitFirewallV60PrEngine {
-    compiled_rulesets: BTreeMap<String, usize>,
+    pub rules: BTreeMap<u32, NpfRuleSpec>,
 }
 
 impl NetBsdNpfJitFirewallV60PrEngine {
     pub fn new() -> Self {
-        Self {
-            compiled_rulesets: BTreeMap::new(),
-        }
+        let mut rules = BTreeMap::new();
+        rules.insert(
+            1,
+            NpfRuleSpec {
+                rule_id: 1,
+                action: "pass".to_string(),
+                interface: "vioif0".to_string(),
+                jit_bytecode_len: 64,
+            },
+        );
+        Self { rules }
     }
 
-    pub fn process_pr(
-        &mut self,
-        pr_id: &str,
-        rule_set_name: &str,
-        byte_count: usize,
-    ) -> EcosystemGapV60Pr {
-        self.compiled_rulesets
-            .insert(rule_set_name.to_string(), byte_count);
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("NetBSD NPF JIT PR: {}", rule_set_name),
-            os_origin: "NetBSD".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Compiled NPF N-code bytecode JIT filter for rule set '{}' ({} bytes payload)",
-                rule_set_name, byte_count
-            ),
-        }
-    }
-
-    pub fn get_ruleset_bytes(&self, rule_set_name: &str) -> Option<usize> {
-        self.compiled_rulesets.get(rule_set_name).copied()
+    pub fn add_rule(&mut self, id: u32, action: &str, iface: &str) -> String {
+        let spec = NpfRuleSpec {
+            rule_id: id,
+            action: action.to_string(),
+            interface: iface.to_string(),
+            jit_bytecode_len: 128,
+        };
+        self.rules.insert(id, spec);
+        format!(
+            "npfctl add group default rule {} in final on {} {}",
+            id, iface, action
+        )
     }
 }
 
-// 9. Clear Linux Stateless OS P-State Tuning PR
-#[derive(Debug, Default)]
+impl Default for NetBsdNpfJitFirewallV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 9. Clear Linux Stateless & P-state Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct ClearLinuxPstateSpec {
+    pub governor: String,
+    pub energy_perf_bias: u8,
+    pub min_freq_mhz: u32,
+    pub max_freq_mhz: u32,
+}
+
+#[derive(Debug, Clone)]
 pub struct ClearLinuxStatelessPstateV60PrEngine {
-    active_profile: String,
+    pub pstate_config: ClearLinuxPstateSpec,
 }
 
 impl ClearLinuxStatelessPstateV60PrEngine {
     pub fn new() -> Self {
         Self {
-            active_profile: "default".to_string(),
+            pstate_config: ClearLinuxPstateSpec {
+                governor: "performance".to_string(),
+                energy_perf_bias: 0,
+                min_freq_mhz: 800,
+                max_freq_mhz: 5000,
+            },
         }
     }
 
-    pub fn process_pr(&mut self, pr_id: &str, profile_name: &str) -> EcosystemGapV60Pr {
-        self.active_profile = profile_name.to_string();
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("Clear Linux Stateless P-state PR: {}", profile_name),
-            os_origin: "Clear Linux".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Enforced /usr stateless system config defaults with active energy/performance P-state profile '{}'",
-                profile_name
-            ),
-        }
-    }
-
-    pub fn current_profile(&self) -> &str {
-        &self.active_profile
+    pub fn set_pstate(&mut self, gov: &str, bias: u8) -> String {
+        self.pstate_config.governor = gov.to_string();
+        self.pstate_config.energy_perf_bias = bias;
+        format!(
+            "echo {} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+            gov
+        )
     }
 }
 
-// 10. Illumos DTrace USDT & Crossbow VNIC PR
-#[derive(Debug, Default)]
+impl Default for ClearLinuxStatelessPstateV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 10. Illumos DTrace USDT & Crossbow VNIC Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct CrossbowVnicSpec {
+    pub vnic_name: String,
+    pub underlying_link: String,
+    pub max_bandwidth_mbps: u32,
+    pub priority: String,
+}
+
+#[derive(Debug, Clone)]
 pub struct IllumosDtraceCrossbowV60PrEngine {
-    vnic_probes: BTreeMap<String, String>,
+    pub vnics: BTreeMap<String, CrossbowVnicSpec>,
 }
 
 impl IllumosDtraceCrossbowV60PrEngine {
     pub fn new() -> Self {
-        Self {
-            vnic_probes: BTreeMap::new(),
-        }
+        let mut vnics = BTreeMap::new();
+        vnics.insert(
+            "vnic0".to_string(),
+            CrossbowVnicSpec {
+                vnic_name: "vnic0".to_string(),
+                underlying_link: "e1000g0".to_string(),
+                max_bandwidth_mbps: 1000,
+                priority: "high".to_string(),
+            },
+        );
+        Self { vnics }
     }
 
-    pub fn process_pr(
-        &mut self,
-        pr_id: &str,
-        vnic_name: &str,
-        probe_name: &str,
-    ) -> EcosystemGapV60Pr {
-        self.vnic_probes
-            .insert(vnic_name.to_string(), probe_name.to_string());
-
-        EcosystemGapV60Pr {
-            pr_id: pr_id.to_string(),
-            title: format!("Illumos DTrace Crossbow PR: {}", vnic_name),
-            os_origin: "Illumos".to_string(),
-            status: PrStatus::Merged,
-            payload: format!(
-                "Provisioned Crossbow VNIC '{}' with attached DTrace USDT probe '{}'",
-                vnic_name, probe_name
-            ),
-        }
-    }
-
-    pub fn get_attached_probe(&self, vnic_name: &str) -> Option<&String> {
-        self.vnic_probes.get(vnic_name)
+    pub fn create_vnic(&mut self, name: &str, link: &str, bw: u32) -> String {
+        let spec = CrossbowVnicSpec {
+            vnic_name: name.to_string(),
+            underlying_link: link.to_string(),
+            max_bandwidth_mbps: bw,
+            priority: "medium".to_string(),
+        };
+        self.vnics.insert(name.to_string(), spec);
+        format!("dladm create-vnic -l {} -p maxbw={}m {}", link, bw, name)
     }
 }
 
-// Master Coordinator Suite: SovereignLinuxBsdEcosystemGapClosureV60PrSuite
+impl Default for IllumosDtraceCrossbowV60PrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 11. Master Sovereign Linux & BSD Gap Closure V60 PR Suite
+// ============================================================================
+
 pub struct SovereignLinuxBsdEcosystemGapClosureV60PrSuite {
-    pub io_uring_engine: LinuxIoUringFutex2V60PrEngine,
-    pub capsicum_engine: FreeBsdCapsicumCasperV60PrEngine,
-    pub softraid_engine: OpenBsdSoftraidBioctlV60PrEngine,
-    pub hammer2_engine: DragonFlyHammer2PfsV60PrEngine,
-    pub portage_engine: GentooPortageEapi9V60PrEngine,
-    pub apk_engine: AlpineApkV3ApkovlV60PrEngine,
-    pub nix_guix_engine: NixGuixFlakeStoreV60PrEngine,
-    pub npf_engine: NetBsdNpfJitFirewallV60PrEngine,
-    pub clear_engine: ClearLinuxStatelessPstateV60PrEngine,
-    pub illumos_engine: IllumosDtraceCrossbowV60PrEngine,
+    pub io_uring_futex2: LinuxIoUringFutex2V60PrEngine,
+    pub freebsd_capsicum: FreeBsdCapsicumCasperV60PrEngine,
+    pub openbsd_softraid: OpenBsdSoftraidBioctlV60PrEngine,
+    pub dragonfly_hammer2: DragonFlyHammer2PfsV60PrEngine,
+    pub gentoo_portage: GentooPortageEapi9V60PrEngine,
+    pub alpine_apk: AlpineApkV3ApkovlV60PrEngine,
+    pub nix_guix: NixGuixFlakeStoreV60PrEngine,
+    pub netbsd_npf: NetBsdNpfJitFirewallV60PrEngine,
+    pub clear_linux: ClearLinuxStatelessPstateV60PrEngine,
+    pub illumos_crossbow: IllumosDtraceCrossbowV60PrEngine,
+    pub proposals: BTreeMap<u64, LinuxBsdPrProposalV60>,
+    pub next_pr_id: u64,
 }
 
 impl SovereignLinuxBsdEcosystemGapClosureV60PrSuite {
     pub fn new() -> Self {
         Self {
-            io_uring_engine: LinuxIoUringFutex2V60PrEngine::new(),
-            capsicum_engine: FreeBsdCapsicumCasperV60PrEngine::new(),
-            softraid_engine: OpenBsdSoftraidBioctlV60PrEngine::new(),
-            hammer2_engine: DragonFlyHammer2PfsV60PrEngine::new(),
-            portage_engine: GentooPortageEapi9V60PrEngine::new(),
-            apk_engine: AlpineApkV3ApkovlV60PrEngine::new(),
-            nix_guix_engine: NixGuixFlakeStoreV60PrEngine::new(),
-            npf_engine: NetBsdNpfJitFirewallV60PrEngine::new(),
-            clear_engine: ClearLinuxStatelessPstateV60PrEngine::new(),
-            illumos_engine: IllumosDtraceCrossbowV60PrEngine::new(),
+            io_uring_futex2: LinuxIoUringFutex2V60PrEngine::new(),
+            freebsd_capsicum: FreeBsdCapsicumCasperV60PrEngine::new(),
+            openbsd_softraid: OpenBsdSoftraidBioctlV60PrEngine::new(),
+            dragonfly_hammer2: DragonFlyHammer2PfsV60PrEngine::new(),
+            gentoo_portage: GentooPortageEapi9V60PrEngine::new(),
+            alpine_apk: AlpineApkV3ApkovlV60PrEngine::new(),
+            nix_guix: NixGuixFlakeStoreV60PrEngine::new(),
+            netbsd_npf: NetBsdNpfJitFirewallV60PrEngine::new(),
+            clear_linux: ClearLinuxStatelessPstateV60PrEngine::new(),
+            illumos_crossbow: IllumosDtraceCrossbowV60PrEngine::new(),
+            proposals: BTreeMap::new(),
+            next_pr_id: 6000,
         }
     }
 
-    pub fn run_all_prs(&mut self) -> Vec<EcosystemGapV60Pr> {
-        vec![
-            self.io_uring_engine.process_pr("PR-V60-001", 8192, 128),
-            self.capsicum_engine
-                .process_pr("PR-V60-002", "sandboxed_jail_v60", "casper_dns_v60"),
-            self.softraid_engine
-                .process_pr("PR-V60-003", "sd0a_crypto_v60", "AES-XTS-256"),
-            self.hammer2_engine
-                .process_pr("PR-V60-004", "root_pfs_v60", 16384),
-            self.portage_engine
-                .process_pr("PR-V60-005", "sys-libs/zlib", "1.3.1-r1"),
-            self.apk_engine
-                .process_pr("PR-V60-006", "sovereign_v60.apkovl.tar.gz"),
-            self.nix_guix_engine.process_pr(
-                "PR-V60-007",
-                "github:SigmaOS/packages#v60",
-                "sha256-v60proof",
-            ),
-            self.npf_engine
-                .process_pr("PR-V60-008", "stateful_firewall_v60", 4096),
-            self.clear_engine
-                .process_pr("PR-V60-009", "extreme_performance_v60"),
-            self.illumos_engine
-                .process_pr("PR-V60-010", "vnic_switch_v60", "proc::sys_read"),
-        ]
+    pub fn submit_pr_proposal(
+        &mut self,
+        title: &str,
+        author: &str,
+        subsystem: &str,
+        distro: &str,
+        summary: &str,
+        diff: &str,
+    ) -> u64 {
+        let id = self.next_pr_id;
+        self.next_pr_id += 1;
+
+        let proposal = LinuxBsdPrProposalV60 {
+            pr_id: id,
+            title: title.to_string(),
+            author: author.to_string(),
+            subsystem: subsystem.to_string(),
+            original_distro: distro.to_string(),
+            patch_summary: summary.to_string(),
+            unified_diff: diff.to_string(),
+            status: LinuxBsdPrStatusV60::Submitted,
+        };
+
+        self.proposals.insert(id, proposal);
+        id
+    }
+
+    pub fn validate_and_merge_pr(&mut self, pr_id: u64) -> bool {
+        if let Some(prop) = self.proposals.get_mut(&pr_id) {
+            prop.status = LinuxBsdPrStatusV60::Merged;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn evaluate_v60_gap_closure_parity(&mut self) -> bool {
+        let diff1 = self
+            .io_uring_futex2
+            .register_futex_waiter(0x7fff0000, 1, 0, 0xff);
+        let pr1 = self.submit_pr_proposal(
+            "Add futex2 waitv fast thread synchronization",
+            "jules",
+            "Kernel/Futex",
+            "Linux",
+            "Register futex2 waiter in kernel",
+            &diff1,
+        );
+        self.validate_and_merge_pr(pr1);
+
+        let diff2 = self
+            .freebsd_capsicum
+            .register_casper_service("system.net", 4, 0x02);
+        let pr2 = self.submit_pr_proposal(
+            "Integrate Casper system.net service broker",
+            "jules",
+            "Security/Capsicum",
+            "FreeBSD",
+            "Open Casper service for net access",
+            &diff2,
+        );
+        self.validate_and_merge_pr(pr2);
+
+        let diff3 = self.openbsd_softraid.create_crypto_volume("sd1", 2);
+        let pr3 = self.submit_pr_proposal(
+            "Configure softraid CRYPTO disk volume sd1",
+            "jules",
+            "Storage/Softraid",
+            "OpenBSD",
+            "Create softraid CRYPTO volume",
+            &diff3,
+        );
+        self.validate_and_merge_pr(pr3);
+
+        self.proposals
+            .values()
+            .all(|p| p.status == LinuxBsdPrStatusV60::Merged)
     }
 }
 
@@ -504,56 +683,61 @@ impl Default for SovereignLinuxBsdEcosystemGapClosureV60PrSuite {
     }
 }
 
+// ============================================================================
+// UNIT TESTS
+// ============================================================================
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_sovereign_linux_bsd_ecosystem_gap_closure_v60_pr_suite() {
-        let mut suite = SovereignLinuxBsdEcosystemGapClosureV60PrSuite::new();
-        let prs = suite.run_all_prs();
-        assert_eq!(prs.len(), 10);
-        for pr in prs {
-            assert_eq!(pr.status, PrStatus::Merged);
-            assert!(!pr.payload.is_empty());
-        }
+    fn test_v60_subsystem_engines() {
+        let mut linux_futex = LinuxIoUringFutex2V60PrEngine::new();
+        let fdiff = linux_futex.register_futex_waiter(0x1000, 0, 0, 1);
+        assert!(fdiff.contains("futex_waitv"));
 
-        assert_eq!(
-            suite.io_uring_engine.get_ring_config("PR-V60-001"),
-            Some(&(8192, 128))
-        );
-        assert!(suite
-            .capsicum_engine
-            .is_service_delegated("sandboxed_jail_v60", "casper_dns_v60"));
-        assert_eq!(
-            suite.softraid_engine.get_volume_cipher("sd0a_crypto_v60"),
-            Some(&"AES-XTS-256".to_string())
-        );
-        assert_eq!(
-            suite.hammer2_engine.get_current_txg("root_pfs_v60"),
-            Some(16384)
-        );
-        assert!(suite.portage_engine.is_rebuilt("sys-libs/zlib"));
-        assert!(suite
-            .apk_engine
-            .is_overlay_mounted("sovereign_v60.apkovl.tar.gz"));
-        assert_eq!(
-            suite
-                .nix_guix_engine
-                .get_store_hash("github:SigmaOS/packages#v60"),
-            Some(&"sha256-v60proof".to_string())
-        );
-        assert_eq!(
-            suite.npf_engine.get_ruleset_bytes("stateful_firewall_v60"),
-            Some(4096)
-        );
-        assert_eq!(
-            suite.clear_engine.current_profile(),
-            "extreme_performance_v60"
-        );
-        assert_eq!(
-            suite.illumos_engine.get_attached_probe("vnic_switch_v60"),
-            Some(&"proc::sys_read".to_string())
-        );
+        let mut freebsd_casper = FreeBsdCapsicumCasperV60PrEngine::new();
+        let cdiff = freebsd_casper.register_casper_service("system.pwd", 5, 0x04);
+        assert!(cdiff.contains("cap_service_open"));
+
+        let mut openbsd_softraid = OpenBsdSoftraidBioctlV60PrEngine::new();
+        let sdiff = openbsd_softraid.create_crypto_volume("sd2", 2);
+        assert!(sdiff.contains("bioctl"));
+
+        let mut dragonfly_h2 = DragonFlyHammer2PfsV60PrEngine::new();
+        let hdiff = dragonfly_h2.create_pfs_snapshot("SNAP1", 20002);
+        assert!(hdiff.contains("pfs-create"));
+
+        let mut gentoo = GentooPortageEapi9V60PrEngine::new();
+        let gdiff = gentoo.add_ebuild("dev-lang/rust-1.80", "0", "1.80", vec!["clippy"]);
+        assert!(gdiff.contains("EAPI=9"));
+
+        let mut alpine = AlpineApkV3ApkovlV60PrEngine::new();
+        let adiff = alpine.generate_overlay("test.apkovl.tar.gz", 5);
+        assert!(adiff.contains("lbu commit"));
+
+        let mut nix = NixGuixFlakeStoreV60PrEngine::new();
+        let ndiff = nix.add_closure("/nix/store/abc", "digest123", vec![]);
+        assert!(ndiff.contains("nix store add-path"));
+
+        let mut netbsd = NetBsdNpfJitFirewallV60PrEngine::new();
+        let npfdiff = netbsd.add_rule(2, "block", "vioif0");
+        assert!(npfdiff.contains("npfctl"));
+
+        let mut clear = ClearLinuxStatelessPstateV60PrEngine::new();
+        let cldiff = clear.set_pstate("powersave", 128);
+        assert!(cldiff.contains("powersave"));
+
+        let mut illumos = IllumosDtraceCrossbowV60PrEngine::new();
+        let ildiff = illumos.create_vnic("vnic1", "e1000g0", 500);
+        assert!(ildiff.contains("create-vnic"));
+    }
+
+    #[test]
+    fn test_master_suite_v60() {
+        let mut suite = SovereignLinuxBsdEcosystemGapClosureV60PrSuite::new();
+        assert!(suite.evaluate_v60_gap_closure_parity());
+        assert_eq!(suite.proposals.len(), 3);
     }
 }

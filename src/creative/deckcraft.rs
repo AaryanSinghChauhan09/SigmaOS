@@ -127,7 +127,7 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// Presenter state for active presentation execution
+/// Presenter View state
 #[derive(Debug, Clone, Default)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
@@ -234,7 +234,7 @@ impl SlideExporterEngine {
                 output.extend_from_slice(b"</div></div></body></html>");
             }
             ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_PRESENTATION_STREAM_V1\nTitle: ");
+                output.extend_from_slice(b"ZENITH_PRESENTATION_v1\nTitle: ");
                 output.extend_from_slice(deck.title.as_bytes());
             }
             ExportFormat::Markdown => {

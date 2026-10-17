@@ -96,6 +96,19 @@ pub use effectcraft_missing_components_parity_pr::{
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
     SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
+pub use effectcraft_missing_components_parity_pr::{
+    ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine,
+    EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
+    EffectcraftExpressionScriptingRiggingPrEngine, EffectcraftMissingComponentsParityPrSuite,
+    EffectcraftOpticalFlowMotionVectorPrEngine, EffectcraftPrProposalManifest,
+    NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
+};
+pub use filmcraft::{
+    get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
+    ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
+    TransitionType, VideoCodec, VideoEditor, VideoTrack,
+};
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
