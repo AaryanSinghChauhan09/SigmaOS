@@ -34,6 +34,10 @@ pub enum ProjectType {
     Audio,
     Sound,
     AudioCraft,
+    Figcraft,
+    Fig,
+    UiUx,
+    Prototype,
 }
 
 /// Project
