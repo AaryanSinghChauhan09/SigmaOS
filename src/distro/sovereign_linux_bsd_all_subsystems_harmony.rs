@@ -746,7 +746,17 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn format_subsystem_payload(
+    pub fn audit_all_subsystems_distro_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+        self.subsystems
+            .iter()
+            .map(|(&sub, spec)| {
+                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
+                (sub, is_compliant, spec.interop_score)
+            })
+            .collect()
+    }
+
+    pub fn translate_cross_distro_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1204,18 +1214,20 @@ mod tests {
             "rpm"
         );
 
-        let (audit_map, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audit_map.len(), 31);
-        assert_eq!(score, 100);
-        assert!(audit_map.values().all(|&v| v));
+        let audits = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 31);
+        for (_, compliant, score) in audits {
+            assert!(compliant);
+            assert_eq!(score, 100);
+        }
 
-        let formatted = engine.format_subsystem_payload(
+        let translated = engine.translate_cross_distro_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             SigmaOsSubsystem::SecuritySandboxing,
             "mac_capsicum_enforce",
         );
         assert_eq!(
-            formatted,
+            translated,
             "[FreeBSD:SecuritySandboxing] mac_capsicum_enforce"
         );
     }
