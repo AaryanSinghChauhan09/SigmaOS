@@ -612,6 +612,7 @@ impl OpenRcStatusControllerEngine {
         self.active_services.remove(service_name);
     }
 
+}
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
         let mut header = OpenRcHeader::default();
@@ -1313,6 +1314,7 @@ impl AtSpoolQueueManager {
         ready
     }
 
+}
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
 pub struct UserlandInitCleanRoomPrGatewayEngine {

@@ -41,7 +41,7 @@ Every legacy application, software package, file format, codec, framework, model
 ### S-SHARD 01: Productivity Office, Document Schema, Publishing & Vector Layout Engine
 * **Absorbed Office & Publishing Suites:** Apache OpenOffice (Writer, Calc, Impress, Draw, Math, Base), LibreOffice Suites (Writer, Calc, Impress, Draw, Math, Base), Microsoft Office (Word, Excel, PowerPoint, Access), LaTeX, TeX, Texinfo, Calcpad, VYM (View Your Mind), Compendium.
 * **Absorbed Document & Structured Schemas:** `.adoc` (AsciiDoc), `.epub`, `.latex`, `.md` (Markdown), `.odt`, `.rtf`, `.tex`, `.texinfo`, `.css`, `.html`, `.json`, `.mml`, `.avro`, `.cml`, `.csv`, `.hdf5`, `.ods`, `.orc`, `.parquet`, `.protobuf`, `.shp`, `.sqlite`, `.tsv`, `.xml`, Libxml2.
-* **Native Rust Implementation:** `src/productivity/sovereign_application_replacements_pr_suite.rs` (`SovereignOfficeSuiteEngine`), providing real-time document layout, zero-copy spreadsheet formula evaluation, vector presentation rendering, and native binary schema parser/emitters without external C/C++ libraries.
+* **Native Rust Implementation:** `src/productivity/sovereign_application_replacements_pr_suite.rs` (`SovereignOfficeSuiteEngine`), `src/creative/wordcraft.rs`, `src/creative/gridcraft.rs`, `src/creative/deckcraft.rs`, providing real-time document layout, zero-copy spreadsheet formula evaluation, vector presentation rendering, and native binary schema parser/emitters without external C/C++ libraries.
 
 ---
 
@@ -50,7 +50,7 @@ Every legacy application, software package, file format, codec, framework, model
 * **Absorbed Audio Codecs & Libraries:** Apple Lossless (ALAC), CELT, Codec2, FAAD2, FLAC, Fraunhofer FDK AAC, iLBC, iSAC, LAME, libdca, libopus, libvorbis, Musepack, Speex, TooLAME / TwoLAME, WavPack.
 * **Absorbed Video Codecs & Libraries:** Daala, dav1d, Dirac, FFmpeg, Huffyuv, Lagarith, libaom, libgav1, libtheora, libvpx, OpenH264, rav1e, SVT-AV1, Thor, x264, x265, Xvid.
 * **Absorbed Container Formats:** `.mkv`, `.ogv`, `.webm`, MP4, AVI, MOV, FLV, TS.
-* **Native Rust Implementation:** `src/audio/editor.rs` & `src/media/sovereign_video_editor.rs`, providing zero-copy SIMD AVX-512 / NEON decoding, multi-track audio DSP mixing, spectrogram analysis, and hardware-accelerated NVENC/VA-API zero-copy frame encoding.
+* **Native Rust Implementation:** `src/audio/editor.rs`, `src/media/sovereign_video_editor.rs`, `src/creative/soundcraft.rs`, providing zero-copy SIMD AVX-512 / NEON decoding, multi-track audio DSP mixing, spectrogram analysis, and hardware-accelerated NVENC/VA-API zero-copy frame encoding.
 
 ---
 
@@ -60,7 +60,7 @@ Every legacy application, software package, file format, codec, framework, model
 * **Absorbed Vector Formats:** `.cgm`, `.eps`, `.pdf`, `.pgml`, `.svg`, `.vml`, `.xar`.
 * **Absorbed 3D & CAD Schemas:** `.3mf`, `.amf`, `.blend`, `.dae`, `.dxf`, `.fbx`, `.gltf` / `.glb`, `.hdr`, `.ifc`, `.iges`, `.obj`, `.off`, `.ply`, `.rad`, `.step` / `.stp`, `.stl`, `.usd`, `.vrml`, `.x3d`.
 * **Absorbed Scientific & Engineering Simulators:** Advanced Simulation Library, ASCEND, Calcpad, Calculix, CHEMKIN, COCO simulator, CP2K, DWSIM, General Mission Analysis Tool (GMAT), GNU Octave, GROMACS, JSBSim, LAMMPS, Open Babel, OpenModelica, OpenSees, OpenVSP, Pyomo, QBlade, REFPROP, XFOIL.
-* **Native Rust Implementation:** `src/desktop/omarchy_omakase.rs` & `src/productivity/sovereign_application_replacements_pr_suite.rs`, supplying direct Vulkan/DRM GPU shaders, procedural mesh generation, CSG geometry kernel, boundary representation (B-Rep) CAD engine, and multi-threaded physics solvers.
+* **Native Rust Implementation:** `src/desktop/omarchy_omakase.rs`, `src/creative/effectcraft.rs`, `src/creative/figcraft.rs`, `src/productivity/sovereign_application_replacements_pr_suite.rs`, supplying direct Vulkan/DRM GPU shaders, procedural mesh generation, CSG geometry kernel, boundary representation (B-Rep) CAD engine, and multi-threaded physics solvers.
 
 ---
 
