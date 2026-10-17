@@ -38,6 +38,31 @@ pub struct FdFileSearchEngine {
     pub extension_filter: Option<String>,
 }
 
+/// Fast zero-allocation case-insensitive substring search helper.
+/// Uses window slice byte comparison for ASCII fast-path to avoid creating heap `String`s via `to_lowercase()`.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| {
+                window
+                    .iter()
+                    .zip(needle_bytes.iter())
+                    .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+            })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 impl FdFileSearchEngine {
     pub fn new() -> Self {
         Self {
@@ -54,8 +79,8 @@ impl FdFileSearchEngine {
         query: &str,
         depth: usize,
     ) -> Vec<&'a FdFileEntry> {
-        let query_lower = query.to_lowercase();
-
+        // Performance optimization: avoid per-item heap allocations (`query.to_lowercase()` & `e.path.to_lowercase()`)
+        // using zero-allocation `contains_ignore_case`.
         entries
             .iter()
             .filter(|e| {
@@ -78,7 +103,7 @@ impl FdFileSearchEngine {
                 if query.is_empty() {
                     true
                 } else {
-                    e.path.to_lowercase().contains(&query_lower)
+                    contains_ignore_case(&e.path, query)
                 }
             })
             .collect()
@@ -117,25 +142,41 @@ impl RipgrepSearchEngine {
 
     /// Searches document lines for substring matches and returns line-numbered results
     pub fn search_document(&self, content: &str, pattern: &str) -> Vec<RipgrepMatchResult> {
-        let mut results = Vec::new();
         if pattern.is_empty() {
-            return results;
+            return Vec::new();
         }
 
-        let pat_target = if self.case_insensitive {
-            pattern.to_lowercase()
-        } else {
-            pattern.to_string()
-        };
+        // Pre-allocate estimated result vector capacity based on line count
+        let mut results = Vec::with_capacity(16);
 
         for (idx, line) in content.lines().enumerate() {
-            let line_check = if self.case_insensitive {
-                line.to_lowercase()
+            let matched = if self.case_insensitive {
+                contains_ignore_case(line, pattern)
             } else {
-                line.to_string()
+                line.contains(pattern)
             };
 
-            if let Some(start_pos) = line_check.find(&pat_target) {
+            if matched {
+                // Determine match start position
+                let start_pos = if self.case_insensitive {
+                    if line.is_ascii() && pattern.is_ascii() {
+                        let pat_bytes = pattern.as_bytes();
+                        line.as_bytes()
+                            .windows(pat_bytes.len())
+                            .position(|window| {
+                                window
+                                    .iter()
+                                    .zip(pat_bytes.iter())
+                                    .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+                            })
+                            .unwrap_or(0)
+                    } else {
+                        line.to_lowercase().find(&pattern.to_lowercase()).unwrap_or(0)
+                    }
+                } else {
+                    line.find(pattern).unwrap_or(0)
+                };
+
                 results.push(RipgrepMatchResult {
                     line_number: idx + 1,
                     line_content: line.to_string(),
@@ -193,12 +234,12 @@ impl ZoxideCdEngine {
 
     /// Queries best matching directory using frecency ranking
     pub fn query_best(&self, keyword: &str) -> Option<String> {
-        let kw_lower = keyword.to_lowercase();
-
+        // Performance optimization: avoid per-item heap allocations (`keyword.to_lowercase()` & `e.path.to_lowercase()`)
+        // using zero-allocation `contains_ignore_case`.
         let mut matches: Vec<&ZoxideEntry> = self
             .database
             .values()
-            .filter(|e| e.path.to_lowercase().contains(&kw_lower))
+            .filter(|e| contains_ignore_case(&e.path, keyword))
             .collect();
 
         matches.sort_by(|a, b| {
