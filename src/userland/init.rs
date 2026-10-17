@@ -611,6 +611,7 @@ impl OpenRcStatusControllerEngine {
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
     }
+}
 
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
@@ -1312,6 +1313,7 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
