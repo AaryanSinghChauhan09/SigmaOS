@@ -171,8 +171,14 @@ impl OpenRcAdvancementsV61Engine {
         let mut plan = Vec::new();
 
         let runlevel_order = ["sysinit", "boot", "default", "nonetwork", "shutdown"];
-        let curr_idx = runlevel_order.iter().position(|&r| r == current_runlevel).unwrap_or(0);
-        let target_idx = runlevel_order.iter().position(|&r| r == target_runlevel).unwrap_or(2);
+        let curr_idx = runlevel_order
+            .iter()
+            .position(|&r| r == current_runlevel)
+            .unwrap_or(0);
+        let target_idx = runlevel_order
+            .iter()
+            .position(|&r| r == target_runlevel)
+            .unwrap_or(2);
 
         if target_idx >= curr_idx {
             for (svc, rl) in services {
@@ -256,15 +262,19 @@ impl RunitS6AdvancementsV61Engine {
     pub fn generate_proposal(&self) -> CoreUserlandV61Manifest {
         CoreUserlandV61Manifest {
             pr_id: 4017,
-            pr_title: "feat(runit_s6_v61): s6-svscan Supervision Tree & s6-rc Atomic Database Switcher".to_string(),
+            pr_title:
+                "feat(runit_s6_v61): s6-svscan Supervision Tree & s6-rc Atomic Database Switcher"
+                    .to_string(),
             target_subsystem: "Lightweight Process Supervisor".to_string(),
             original_system: "runit (Void Linux) & s6 (Alpine)".to_string(),
             components_added: vec![
                 "s6-svscan supervision tree directory watcher and FIFO pipe engine".to_string(),
                 "runsvdir log pipe redirector and size-capped rotation filter".to_string(),
-                "s6-rc compiled atomic database state machine switch with rollback protection".to_string(),
+                "s6-rc compiled atomic database state machine switch with rollback protection"
+                    .to_string(),
             ],
-            performance_multiplier: "Microsecond Atomic Database State Switching & Lockless Supervision".to_string(),
+            performance_multiplier:
+                "Microsecond Atomic Database State Switching & Lockless Supervision".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -311,15 +321,19 @@ impl SysVinitAdvancementsV61Engine {
     pub fn generate_proposal(&self) -> CoreUserlandV61Manifest {
         CoreUserlandV61Manifest {
             pr_id: 4018,
-            pr_title: "feat(sysvinit_v61): Inittab Action Governor & Parallel Execution Lock Manager".to_string(),
+            pr_title:
+                "feat(sysvinit_v61): Inittab Action Governor & Parallel Execution Lock Manager"
+                    .to_string(),
             target_subsystem: "Legacy Unix Init Compatibility".to_string(),
             original_system: "System V Init (SysVinit)".to_string(),
             components_added: vec![
-                "/etc/inittab action evaluator for sysinit, respawn, wait, once, and ctrlaltdel".to_string(),
+                "/etc/inittab action evaluator for sysinit, respawn, wait, once, and ctrlaltdel"
+                    .to_string(),
                 "/etc/rc.d/ parallel script execution lock manager".to_string(),
                 "Clean system shutdown, halt, and reboot script sequencing engine".to_string(),
             ],
-            performance_multiplier: "POSIX Heritage Compatibility & Deterministic Runlevel Locks".to_string(),
+            performance_multiplier: "POSIX Heritage Compatibility & Deterministic Runlevel Locks"
+                .to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -365,7 +379,10 @@ impl BsdRcAdvancementsV61Engine {
         if !enabled && command == "start" {
             return format!("service {} is disabled in rc.conf", service_name);
         }
-        format!("service {} {} completed successfully", service_name, command)
+        format!(
+            "service {} {} completed successfully",
+            service_name, command
+        )
     }
 
     /// Generate BSD rc V61 proposal manifest.
@@ -400,11 +417,7 @@ impl LaunchdAndroidInitAdvancementsV61Engine {
     }
 
     /// Evaluate macOS `launchd` `PathState` file system watcher conditions.
-    pub fn evaluate_launchd_path_state(
-        &self,
-        path_exists: bool,
-        required_state: bool,
-    ) -> bool {
+    pub fn evaluate_launchd_path_state(&self, path_exists: bool, required_state: bool) -> bool {
         path_exists == required_state
     }
 
@@ -415,14 +428,18 @@ impl LaunchdAndroidInitAdvancementsV61Engine {
         prop_value: &str,
         system_properties: &BTreeMap<String, String>,
     ) -> bool {
-        system_properties.get(prop_key).map_or(false, |v| v == prop_value)
+        system_properties
+            .get(prop_key)
+            .map_or(false, |v| v == prop_value)
     }
 
     /// Generate launchd & Android init V61 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV61Manifest {
         CoreUserlandV61Manifest {
             pr_id: 4020,
-            pr_title: "feat(launchd_android_v61): Android Property Triggers & launchd PathState Monitor".to_string(),
+            pr_title:
+                "feat(launchd_android_v61): Android Property Triggers & launchd PathState Monitor"
+                    .to_string(),
             target_subsystem: "Apple launchd & Android Init Supervisor".to_string(),
             original_system: "launchd & Android init".to_string(),
             components_added: vec![
@@ -542,7 +559,8 @@ impl SovereignInitAndSupervisorAdvancementsV61Gateway {
     /// Generate Markdown Pull Request proposal documentation.
     pub fn generate_pr_proposal_markdown(&self) -> String {
         let manifests = self.collect_all_manifests();
-        let mut md = String::from("# Core Userland Supervisors & Timers Parity Advancements V61\n\n");
+        let mut md =
+            String::from("# Core Userland Supervisors & Timers Parity Advancements V61\n\n");
         md.push_str("## Overview\n");
         md.push_str("This Pull Request suite introduces zero-dependency `#![no_std]` / `alloc` native parity advancements inspired by landmark Linux, BSD, macOS, and Android service supervisors, init systems, timers, and scheduled job engines.\n\n---\n\n");
 
@@ -550,7 +568,10 @@ impl SovereignInitAndSupervisorAdvancementsV61Gateway {
             md.push_str(&format!("### PR #{}: {}\n", m.pr_id, m.pr_title));
             md.push_str(&format!("- **Category**: {}\n", m.target_subsystem));
             md.push_str(&format!("- **Original System**: {}\n", m.original_system));
-            md.push_str(&format!("- **Performance Multiplier**: {}\n", m.performance_multiplier));
+            md.push_str(&format!(
+                "- **Performance Multiplier**: {}\n",
+                m.performance_multiplier
+            ));
             md.push_str(&format!("- **Status**: {}\n", m.status));
             md.push_str("- **Components Added**:\n");
             for c in &m.components_added {
@@ -565,33 +586,45 @@ impl SovereignInitAndSupervisorAdvancementsV61Gateway {
     /// Execute end-to-end verification across all supervisor V61 engines.
     pub fn run_master_verification(&self) -> bool {
         // 1. systemd payload parse
-        let msgs = self.systemd.parse_sd_notify_payload_v61("READY=1\nMEMORY_PEAK_BYTES=1048576\n");
+        let msgs = self
+            .systemd
+            .parse_sd_notify_payload_v61("READY=1\nMEMORY_PEAK_BYTES=1048576\n");
         let sys_ok = msgs.len() == 2;
 
         // 2. OpenRC cascade
         let services = [("sshd", "default"), ("localmount", "boot")];
-        let openrc_plan = self.openrc.plan_runlevel_cascade("sysinit", "default", &services);
+        let openrc_plan = self
+            .openrc
+            .plan_runlevel_cascade("sysinit", "default", &services);
 
         // 3. runit / s6 tree scan
         let s6_tree = self.runit_s6.scan_s6_supervision_tree(&["nginx"]);
 
         // 4. SysVinit action dispatch
-        let sysv_ok = self.sysvinit.dispatch_inittab_actions(2, "respawn", &[2, 3, 4, 5]);
+        let sysv_ok = self
+            .sysvinit
+            .dispatch_inittab_actions(2, "respawn", &[2, 3, 4, 5]);
 
         // 5. BSD rc conf merge
         let mut defs = BTreeMap::new();
         defs.insert("sshd_enable".to_string(), "NO".to_string());
         let mut overrides = BTreeMap::new();
         overrides.insert("sshd_enable".to_string(), "YES".to_string());
-        let bsd_conf = self.bsd_rc.resolve_bsd_rc_conf(&defs, &overrides, &BTreeMap::new());
+        let bsd_conf = self
+            .bsd_rc
+            .resolve_bsd_rc_conf(&defs, &overrides, &BTreeMap::new());
 
         // 6. Android init property trigger
         let mut props = BTreeMap::new();
         props.insert("ro.debuggable".to_string(), "1".to_string());
-        let android_ok = self.launchd_android.evaluate_android_init_property("ro.debuggable", "1", &props);
+        let android_ok =
+            self.launchd_android
+                .evaluate_android_init_property("ro.debuggable", "1", &props);
 
         // 7. Cron / timer stamp parse
-        let stamp = self.cron_timers_at.parse_timer_stamp_file_v61("TIMER_NAME=hourly.timer\nLAST_TRIGGER_USEC=999\n");
+        let stamp = self
+            .cron_timers_at
+            .parse_timer_stamp_file_v61("TIMER_NAME=hourly.timer\nLAST_TRIGGER_USEC=999\n");
 
         sys_ok
             && !openrc_plan.is_empty()
@@ -614,7 +647,8 @@ mod tests {
     #[test]
     fn test_systemd_v61_engine() {
         let engine = SystemdAdvancementsV61Engine::new();
-        let payload = "READY=1\nSTATUS=Running\nMAINPID=100\nMEMORY_PEAK_BYTES=2048\nSWAP_USAGE_BYTES=0\n";
+        let payload =
+            "READY=1\nSTATUS=Running\nMAINPID=100\nMEMORY_PEAK_BYTES=2048\nSWAP_USAGE_BYTES=0\n";
         let msgs = engine.parse_sd_notify_payload_v61(payload);
         assert_eq!(msgs.len(), 5);
         assert_eq!(msgs[0], SystemdNotifyMessageV61::Ready);
@@ -698,7 +732,8 @@ mod tests {
         let delay = engine.calculate_anacron_delay_with_jitter(10, 5, 12);
         assert_eq!(delay, 12); // 10 + (12 % 5) = 12
 
-        let stamp = engine.parse_timer_stamp_file_v61("TIMER_NAME=weekly.timer\nLAST_TRIGGER_USEC=8888\n");
+        let stamp =
+            engine.parse_timer_stamp_file_v61("TIMER_NAME=weekly.timer\nLAST_TRIGGER_USEC=8888\n");
         assert_eq!(stamp, Some(("weekly.timer".to_string(), 8888)));
     }
 
