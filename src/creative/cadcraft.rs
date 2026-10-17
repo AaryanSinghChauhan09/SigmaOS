@@ -109,6 +109,19 @@ pub enum GeometricConstraintType {
     },
 }
 
+/// Simple constraint type enum
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConstraintType {
+    Coincident,
+    Parallel,
+    Perpendicular,
+    Concentric,
+    Tangent,
+    EqualLength,
+    Distance,
+    Angle,
+}
+
 /// Geometric constraint
 #[derive(Debug, Clone)]
 pub struct GeometricConstraint {
@@ -365,7 +378,7 @@ impl CadCraftEngine {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F500\n"),
+            gcode_output: format!("G01 X10.0 Y10.0 F{feed_rate}"),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -386,16 +399,8 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        match format {
-            ExportFormat::DXF => {
-                Vec::from(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n" as &[u8])
-            }
-            ExportFormat::STEP => Vec::from(
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n" as &[u8],
-            ),
-            _ => Vec::from(b"# CadCraft Export\n" as &[u8]),
-        }
+    pub fn export_cad(&self, format: ExportFormat) -> String {
+        format!("EXPORT_{:?}_NODES_{}", format, self.sketch_entities.len())
     }
 }
 

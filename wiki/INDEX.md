@@ -66,6 +66,9 @@ Implement missing components in this order. Each item must be delivered through 
 | **P3** | Desktop | Redox, Mint, Omarchy | Framebuffer, input, window launch | Graphical smoke test |
 | **P3** | Package manager | Arch, Debian | Metadata parser and dependency resolver | Package corpus tests |
 | **P3** | Distro compatibility | Arch, Debian, Fedora, BSD | Metadata compatibility layer | Compatibility matrix |
+| **P3** | [Kernel & Hardening Parity](./37-Tech-Media-And-Linux-BSD-Distro-Parity-PR-Roadmap.md) | Phoronix, HW Busters, CachyOS, OpenBSD | `sched_ext` BPF BORE v2, ATX 3.1 PSU governor, Landlock V6 | Unit & integration tests |
+| **P3** | [Desktop & Userland Innovations](./38-Universal-Desktop-And-Userland-Innovations-PR-Roadmap.md) | It's FOSS, How-To Geek, Omarchy, Mint | Wayland 1.24 HDR, Sovereign FOSS apps, Omakase themes | Unit & integration tests |
+| **P3** | [Enterprise Security, AI & Network](./39-Enterprise-Security-AI-And-Networking-PR-Roadmap.md) | KDnuggets, The New Stack, Fedora, NixOS | Active Directory SSSD, eBPF PQC WireGuard VPN, SIMD AI | Unit & integration tests |
 
 ---
 
