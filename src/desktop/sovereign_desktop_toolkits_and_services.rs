@@ -188,9 +188,13 @@ impl SovereignGtkQtToolkitEngine {
             svg_path,
         });
         self.qt_style = QtPlatformStyle::Kvantum;
-        self.event_log.push(ToolkitEvent::KvantumThemeApplied(
-            self.kvantum_spec.theme_name.clone(),
-        ));
+        let applied_name = self
+            .kvantum_spec
+            .as_ref()
+            .map(|s| s.theme_name.clone())
+            .unwrap_or_default();
+        self.event_log
+            .push(ToolkitEvent::KvantumThemeApplied(applied_name));
         true
     }
 
@@ -330,10 +334,11 @@ pub struct DMSeatConfig {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct XdmcpSessionHandshake {
-    pub session_id: u32,
-    pub remote_address: String,
+    pub session_id: usize,
+    pub client_address: String,
     pub display_number: u32,
     pub authenticated: bool,
+    pub status: String,
 }
 
 pub struct XdmcpSessionManager {
@@ -456,6 +461,7 @@ impl SovereignDisplayManagerSuiteEngine {
             session_id: id,
             client_address: client_address.to_string(),
             display_number,
+            authenticated: true,
             status: "Active".to_string(),
         });
         self.xdmcp_manager
@@ -500,18 +506,6 @@ impl SovereignDisplayManagerSuiteEngine {
         } else {
             false
         }
-    }
-
-    pub fn initiate_xdmcp_remote_handshake(&mut self, client_address: &str, display_number: u32) -> usize {
-        let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
-        self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id,
-            client_address: client_address.to_string(),
-            display_number,
-            status: "Active".to_string(),
-        });
-        self.xdmcp_manager.initiate_handshake(&format!(":{}", display_number), client_address);
-        id
     }
 }
 
@@ -1092,6 +1086,7 @@ impl SovereignFontAndTextLayoutEngine {
 
         Self {
             font_match_cache,
+            fontconfig_aliases,
             opentype_features: vec![
                 "liga".to_string(),
                 "kern".to_string(),
