@@ -738,8 +738,8 @@ mod tests {
     fn test_sketch_entities_and_constraints() {
         let mut engine = CadCraftEngine::new();
         engine.init();
-        let e1 = engine
-            .add_sketch_entity(SketchEntityType::Line, alloc::vec![[0.0, 0.0], [10.0, 0.0]]);
+        let e1 =
+            engine.add_sketch_entity(SketchEntityType::Line, alloc::vec![[0.0, 0.0], [10.0, 0.0]]);
         let e2 = engine.add_sketch_entity(
             SketchEntityType::Line,
             alloc::vec![[10.0, 0.0], [10.0, 10.0]],

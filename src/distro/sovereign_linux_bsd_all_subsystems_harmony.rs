@@ -746,7 +746,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-
     pub fn dispatch_event(
         &mut self,
         source: SigmaOsSubsystem,
