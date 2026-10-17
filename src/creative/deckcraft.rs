@@ -125,18 +125,6 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// Presenter state for presentation mode
-#[derive(Debug, Clone, Default)]
-pub struct PresenterState {
-    pub active_deck_id: Option<u32>,
-    pub current_slide_index: usize,
-    pub in_presenter_mode: bool,
-    pub timer_running: bool,
-    pub elapsed_secs: u32,
-    pub laser_pointer_active: bool,
-    pub black_screen: bool,
-}
-
 /// Slide deck styling theme
 #[derive(Debug, Clone)]
 pub struct SlideTheme {
@@ -185,26 +173,15 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-pub type PresentationDeck = SlideDeck;
-
-impl SlideDeck {
-    pub fn get_active_slide(&self) -> Option<&Slide> {
-        self.slides.first()
-    }
-}
-
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
     ZenithPresentation,
-    Pdf,
-    Html5,
-    Pptx,
-    Svg,
+    PDF,
+    HTML5Slideshow,
+    PPTX,
     Markdown,
 }
-
-pub type DeckExportFormat = ExportFormat;
 
 /// Slide Exporter Engine
 pub struct SlideExporterEngine;
@@ -257,10 +234,6 @@ impl SlideExporterEngine {
                     output.extend_from_slice(slide.title.as_bytes());
                     output.extend_from_slice(b"\n\n");
                 }
-            }
-            DeckExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_PRESENTATION_v1:");
-                output.extend_from_slice(deck.title.as_bytes());
             }
         }
 
