@@ -421,6 +421,8 @@ pub struct UniversalCrossDistroSatSolverV39 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+
 impl UniversalCrossDistroSatSolverV39 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
@@ -608,7 +610,7 @@ impl UniversalBootEnvSnapshotGovernorV39 {
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UniversalPmActionV39 {
+pub enum UniversalPmActionV40 {
     Install,
     Remove,
     Update,
@@ -617,17 +619,23 @@ pub enum UniversalPmActionV39 {
     Audit,
 }
 
+pub type UniversalPmActionV39 = UniversalPmActionV40;
+
 #[derive(Debug, Clone)]
-pub struct RoutedPmCommandV39 {
+pub struct RoutedPmCommandV40 {
     pub source_pm: String,
-    pub action: UniversalPmActionV39,
+    pub action: UniversalPmActionV40,
     pub target_packages: Vec<String>,
     pub dry_run: bool,
 }
 
-pub struct UniversalPmCliRouterV39;
+pub type RoutedPmCommandV39 = RoutedPmCommandV40;
 
-impl UniversalPmCliRouterV39 {
+pub struct UniversalPmCliRouterV40;
+
+pub type UniversalPmCliRouterV39 = UniversalPmCliRouterV40;
+
+impl UniversalPmCliRouterV40 {
     pub fn new() -> Self {
         Self
     }
@@ -735,7 +743,7 @@ impl UniversalPmCliRouterV39 {
             ),
         };
 
-        let clean_targets = targets
+        let clean_targets: Vec<String> = targets
             .into_iter()
             .filter(|t| !t.starts_with('-'))
             .collect();
