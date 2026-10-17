@@ -732,6 +732,41 @@ impl OpenRcStatusControllerEngine {
     }
 }
 
+impl OpenRcHeader {
+    pub fn parse(script_content: &str) -> Self {
+        let mut header = OpenRcHeader::default();
+        for line in script_content.lines() {
+            let trimmed = line.trim();
+            if let Some(rest) = trimmed.strip_prefix("provide") {
+                header
+                    .provide
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("need") {
+                header
+                    .need
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("use") {
+                header
+                    .use_deps
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("before") {
+                header
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("after") {
+                header
+                    .after
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
+                header
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            }
+        }
+        header
+    }
+}
+
 
 
 // ============================================================================
@@ -1254,6 +1289,15 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
+
+/// Userland Init Clean-Room Pull Request Proposal Gateway
+#[derive(Debug, Clone)]
+pub struct UserlandInitCleanRoomPrGatewayEngine {
+    pub pr_id: u32,
+    pub title: String,
+    pub author: String,
+    pub pqc_signature: String,
 }
 
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;

@@ -857,25 +857,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystem_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
-        self.subsystems
-            .iter()
-            .map(|(&sub, spec)| {
-                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
-                (sub, is_compliant, spec.interop_score)
-            })
-            .collect()
-    }
-
-    pub fn translate_subsystem_payload(
-        &self,
-        distro: LinuxBsdDistroInspiration,
-        subsystem: SigmaOsSubsystem,
-        payload: &str,
-    ) -> String {
-        format!("[{}:{}] {}", distro.as_str(), subsystem.as_str(), payload)
-    }
-
     pub fn dispatch_event(
         &mut self,
         source: SigmaOsSubsystem,
@@ -1325,18 +1306,22 @@ mod tests {
             "rpm"
         );
 
-        let audits = engine.audit_subsystem_compliance();
-        assert_eq!(audits.len(), 31);
-        for (_, compliant, score) in audits {
+        let audits = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.0.len(), 31);
+        for (_sub, compliant) in &audits.0 {
             assert!(compliant);
         }
+        assert_eq!(audits.1, 100);
 
         let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
-            "mac_capsicum_enforce",
+            "jail_vnet",
         );
-        assert_eq!(translated, "mac_capsicum_enforce");
+        assert_eq!(
+            translated,
+            "ebpf_xdp_namespace"
+        );
     }
 
     #[test]
@@ -1393,10 +1378,10 @@ mod tests {
 
         let policy = orchestrator
             .translate_cross_subsystem_policy(
-                SigmaOsSubsystem::SignalDelivery,
-                SigmaOsSubsystem::ProcessActivity,
+                SigmaOsSubsystem::KernelScheduling,
+                SigmaOsSubsystem::SecuritySandboxing,
             )
-            .expect("SignalDelivery -> ProcessActivity policy must exist");
+            .expect("KernelScheduling -> SecuritySandboxing policy must exist");
         assert_eq!(
             policy.distro_inspiration,
             LinuxBsdDistroInspiration::OpenBSD

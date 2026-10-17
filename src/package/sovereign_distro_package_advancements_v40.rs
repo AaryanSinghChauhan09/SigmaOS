@@ -417,7 +417,9 @@ impl UdfScriptletEngineV40 {
 // 3. Cross-Distro Dependency SAT DPLL Solver & Capability Governor V40
 // ============================================================================
 
-pub struct UniversalCrossDistroSatSolverV40 {
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+
+pub struct UniversalCrossDistroSatSolverV39 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
