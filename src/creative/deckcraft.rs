@@ -173,6 +173,28 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
+pub type PresentationDeck = SlideDeck;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeckExportFormat {
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
+    Markdown,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u64,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
+
 /// Presentation export formats
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {

@@ -112,7 +112,7 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
             .split_whitespace()
             .map(|s| s.to_string())
             .collect();
-        self.promises = new_promises;
+        self.pledge_promises = new_promises;
         Ok(format!(
             "PR Proposal: Applied OpenBSD pledge promises: {}",
             promises
@@ -327,21 +327,10 @@ pub struct OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
 impl OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
     pub fn new() -> Self {
         Self {
-            softraid_volumes: BTreeMap::new(),
+            smtpd_listeners: Vec::new(),
+            doas_rules: Vec::new(),
+            slaacd_interfaces: Vec::new(),
         }
-    }
-
-    pub fn create_softraid_crypto(
-        &mut self,
-        volume_id: &str,
-        chunk_dev: &str,
-    ) -> Result<String, String> {
-        self.softraid_volumes
-            .insert(volume_id.to_string(), chunk_dev.to_string());
-        Ok(format!(
-            "PR Proposal: Created softraid CRYPTO volume '{}' attached to '{}'",
-            volume_id, chunk_dev
-        ))
     }
 }
 
@@ -383,6 +372,23 @@ impl OpenBsdDaemonSuitePrEngine {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OpenBsdPrStatus {
+    Submitted,
+    Merged,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdPrProposal {
+    pub pr_id: u64,
+    pub title: String,
+    pub author: String,
+    pub subsystem: String,
+    pub patch_summary: String,
+    pub unified_diff: String,
+    pub status: OpenBsdPrStatus,
+}
+
 pub struct OpenBsdMissingComponentsParityPrSuite {
     pub pfsync_carp: OpenBsdPfsyncCarpPrEngine,
     pub pledge_unveil: OpenBsdPledgeUnveilMatrixPrEngine,
@@ -390,6 +396,8 @@ pub struct OpenBsdMissingComponentsParityPrSuite {
     pub signify: OpenBsdSignifyVerificationPrEngine,
     pub bioctl: OpenBsdBioctlSoftraidPrEngine,
     pub daemons: OpenBsdDaemonSuitePrEngine,
+    pub next_pr_id: u64,
+    pub proposals: BTreeMap<u64, OpenBsdPrProposal>,
 }
 
 impl OpenBsdMissingComponentsParityPrSuite {
@@ -401,6 +409,8 @@ impl OpenBsdMissingComponentsParityPrSuite {
             signify: OpenBsdSignifyVerificationPrEngine::new(),
             bioctl: OpenBsdBioctlSoftraidPrEngine::new(),
             daemons: OpenBsdDaemonSuitePrEngine::new(),
+            next_pr_id: 1,
+            proposals: BTreeMap::new(),
         }
     }
 
@@ -439,7 +449,7 @@ impl OpenBsdMissingComponentsParityPrSuite {
     }
 
     pub fn evaluate_openbsd_parity(&mut self) -> bool {
-        let carp_diff = self.carp_pfsync.configure_carp_vhid(2, "em0", 100);
+        let carp_diff = self.pfsync_carp.configure_carp_vhid(2, "em0", 100);
         let carp_pr = self.submit_pr_proposal(
             "Configure CARP VHID 2 with failover advskew 100",
             "jules",
@@ -449,7 +459,7 @@ impl OpenBsdMissingComponentsParityPrSuite {
         );
         self.validate_and_merge_pr(carp_pr);
 
-        let pledge_diff = self.pledge_unveil.pledge("stdio rpath").unwrap_or_default();
+        let pledge_diff = self.pledge_unveil.apply_pledge("stdio rpath").unwrap_or_default();
         let pledge_pr = self.submit_pr_proposal(
             "Tighten pledge promises to stdio rpath",
             "jules",
@@ -459,7 +469,7 @@ impl OpenBsdMissingComponentsParityPrSuite {
         );
         self.validate_and_merge_pr(pledge_pr);
 
-        let (cmd, crypto_diff) = self.softraid.create_crypto_volume("sd2", "/dev/sd0b");
+        let (cmd, crypto_diff) = self.bioctl.create_crypto_volume("sd2", "/dev/sd0b");
         let crypto_pr = self.submit_pr_proposal(
             "Attach softraid CRYPTO volume on sd2",
             "jules",

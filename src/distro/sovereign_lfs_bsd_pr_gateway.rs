@@ -44,6 +44,12 @@ pub enum LfsBsdPrCategory {
     DragonFlyVkernelSandbox,
     LfsAutomatedReadinessAuditor,
     BsdCrossKernelAbiTranslation,
+    LfsGlibcDynamicLinker,
+    LfsUdevColdplug,
+    LfsPamShadowAuth,
+    LfsPorgCollisionTracker,
+    NetBsdVeriexecSignatures,
+    DragonFlyHammer2PfsReplication,
 }
 
 impl LfsBsdPrCategory {

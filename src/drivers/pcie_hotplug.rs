@@ -179,7 +179,7 @@ impl PcieHotplugManager {
             // Disable MSI for the device
             if let Some(vendor_id) = slot.vendor_id {
                 let device_id = (vendor_id as u32) << 16 | (slot.device_id.unwrap_or(0) as u32);
-                self.msi_routing.disable_msi(device_id)?;
+                self.msi_routing.disable_msi(device_id as u16)?;
             }
         }
 

@@ -697,7 +697,7 @@ impl UniversalPmCliRouterV39 {
                             .collect(),
                     )
                 } else {
-                    (UniversalPmActionV39::Query, vec![])
+                    (UniversalPmActionV40::Query, vec![])
                 }
             }
             "dnf" | "yum" | "zypper" | "apk" | "xbps-install" | "pkg" | "emerge" | "brew"
@@ -735,7 +735,7 @@ impl UniversalPmCliRouterV39 {
             ),
         };
 
-        let clean_targets = targets
+        let clean_targets: Vec<String> = targets
             .into_iter()
             .filter(|t| !t.starts_with('-'))
             .collect();

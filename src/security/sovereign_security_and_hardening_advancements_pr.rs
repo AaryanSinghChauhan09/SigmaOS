@@ -33,6 +33,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         Self
     }
 
+    /// Check Landlock access rule against allowed mask.
+    pub fn check_landlock_access(access_mask: u32, allowed_mask: u32) -> bool {
+        (access_mask & allowed_mask) != 0
+    }
+
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
     pub fn format_selinux_context(
         user: &str,
@@ -402,6 +407,11 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Generate SSSD domain configuration section.
+    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, ldap_uri: &str) -> String {
+        alloc::format!("[domain/{}]\nid_provider = {}\nldap_uri = {}\n", domain_name, provider, ldap_uri)
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").

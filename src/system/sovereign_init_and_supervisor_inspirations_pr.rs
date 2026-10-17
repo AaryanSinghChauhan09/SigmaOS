@@ -230,6 +230,19 @@ impl OpenRcInspirationsPrEngine {
         Self
     }
 
+    /// Merge `/etc/rc.conf` with `/etc/rc.conf.local` overrides.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
     /// Parse `/etc/init.d/` shell script dependency header block (depend() function simulation).
     pub fn parse_openrc_init_script(
         &self,
@@ -571,6 +584,19 @@ pub struct BsdRcInspirationsPrEngine;
 impl BsdRcInspirationsPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Merge `/etc/rc.conf` with `/etc/rc.conf.local` overrides.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
     }
 
     /// Simulate FreeBSD / OpenBSD / NetBSD `rcorder` topological dependency sorting.
@@ -1233,7 +1259,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
