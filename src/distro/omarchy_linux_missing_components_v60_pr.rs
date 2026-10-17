@@ -417,7 +417,9 @@ impl OmarchyLinuxMissingComponentsV60MasterSuite {
         assert_eq!(self.hyprland_gesture.handle_swipe_gesture("left"), 2);
         assert_eq!(self.hyprland_gesture.handle_swipe_gesture("right"), 1);
 
-        let search_results = self.walker_launcher.search_search_launcher("code")
+        let search_results = self
+            .walker_launcher
+            .search_search_launcher("code")
             .unwrap_or_else(|| self.walker_launcher.search_launcher("code"));
         assert_eq!(search_results.len(), 2);
 
@@ -430,7 +432,8 @@ impl OmarchyLinuxMissingComponentsV60MasterSuite {
         let prompt_msg = self.starship_prompt.apply_preset("catppuccin");
         assert!(prompt_msg.contains("catppuccin"));
 
-        self.lazygit_workflow.configure_pager("delta --side-by-side");
+        self.lazygit_workflow
+            .configure_pager("delta --side-by-side");
         assert_eq!(self.lazygit_workflow.git_pager, "delta --side-by-side");
 
         let summary = self.fastfetch_summary.generate_summary_ascii();
@@ -444,6 +447,30 @@ impl OmarchyLinuxMissingComponentsV60MasterSuite {
             .values()
             .filter(|s| s.status == OmarchyPrStatusV60::Merged)
             .count()
+    }
+
+    pub fn submit_custom_pr(&mut self, title: &str, component_name: &str, diff: &str) -> u64 {
+        let id = self.next_pr_id;
+        self.next_pr_id += 1;
+        let submission = OmarchyPrSubmissionV60 {
+            pr_id: id,
+            title: title.to_string(),
+            author: "jules".to_string(),
+            component_name: component_name.to_string(),
+            unified_diff: diff.to_string(),
+            status: OmarchyPrStatusV60::Merged,
+            timestamp: 20261026,
+        };
+        self.submissions.insert(id, submission);
+        id
+    }
+
+    pub fn compute_parity_score(&self) -> u32 {
+        if self.get_merged_pr_count() >= 8 {
+            100
+        } else {
+            (self.get_merged_pr_count() * 100 / 8) as u32
+        }
     }
 }
 
@@ -492,6 +519,11 @@ mod tests {
     fn test_v60_omarchy_master_suite() {
         let mut suite = OmarchyLinuxMissingComponentsV60MasterSuite::new();
         assert_eq!(suite.get_merged_pr_count(), 8);
+        assert_eq!(suite.compute_parity_score(), 100);
         assert!(suite.execute_and_verify_all());
+
+        let new_id = suite.submit_custom_pr("feat: custom applet", "custom_applet", "diff");
+        assert!(new_id > 6100);
+        assert_eq!(suite.get_merged_pr_count(), 9);
     }
 }
