@@ -172,6 +172,20 @@ impl SovereignPredictiveSchedExtEngine {
             }
         }
     }
+
+    /// Calculate quantum scheduler efficiency index across all registered tasks.
+    pub fn compute_quantum_scheduler_efficiency_index(&self) -> u32 {
+        if self.tasks.is_empty() {
+            return 100;
+        }
+        let total_latency: u64 = self.tasks.values().map(|t| t.ewma_latency_us).sum();
+        let avg_latency = total_latency / (self.tasks.len() as u64);
+        if avg_latency < 1000 {
+            100
+        } else {
+            (100u64.saturating_sub(avg_latency / 100)) as u32
+        }
+    }
 }
 
 impl Default for SovereignPredictiveSchedExtEngine {
@@ -834,6 +848,14 @@ mod tests {
 
         let rolled = cas.rollback_package("kernel-core").unwrap();
         assert_eq!(rolled, h1);
+    }
+
+    #[test]
+    fn test_predictive_scheduler_efficiency() {
+        let mut engine = SovereignPredictiveSchedExtEngine::new(PredictiveSchedPolicy::ScxBpfland);
+        engine.register_task(2001, "fast_service", 100, 0);
+        engine.register_task(2002, "interactive_ui", 200, 0);
+        assert_eq!(engine.compute_quantum_scheduler_efficiency_index(), 100);
     }
 
     #[test]

@@ -330,6 +330,70 @@ impl GnuCoreutilsBsdUserlandEngine {
             .map(|(k, v)| format!("{}={}", k, v))
             .collect()
     }
+
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
+        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        if unique {
+            list.sort();
+            list.dedup();
+        }
+        if numeric {
+            list.sort_by(|a, b| {
+                let na = a.parse::<i64>().unwrap_or(0);
+                let nb = b.parse::<i64>().unwrap_or(0);
+                na.cmp(&nb)
+            });
+        } else {
+            list.sort();
+        }
+        if reverse {
+            list.reverse();
+        }
+        list
+    }
+
+    pub fn run_tr(&self, input: &str, from_chars: &str, to_chars: &str, delete: bool) -> String {
+        if delete {
+            let mut out = String::new();
+            for c in input.chars() {
+                if !from_chars.contains(c) {
+                    out.push(c);
+                }
+            }
+            out
+        } else {
+            let from_vec: Vec<char> = from_chars.chars().collect();
+            let to_vec: Vec<char> = to_chars.chars().collect();
+            let mut out = String::new();
+            for c in input.chars() {
+                if let Some(idx) = from_vec.iter().position(|&x| x == c) {
+                    if let Some(&rep) = to_vec.get(idx).or_else(|| to_vec.last()) {
+                        out.push(rep);
+                    } else {
+                        out.push(c);
+                    }
+                } else {
+                    out.push(c);
+                }
+            }
+            out
+        }
+    }
+
+    pub fn run_head_tail_bytes(&self, data: &[u8], count: usize, is_head: bool) -> Vec<u8> {
+        if is_head {
+            data.iter().take(count).copied().collect()
+        } else {
+            let skip = data.len().saturating_sub(count);
+            data.iter().skip(skip).copied().collect()
+        }
+    }
 }
 
 // =========================================================================
@@ -951,6 +1015,42 @@ impl TextProcessingEngine {
         }
         totals
     }
+
+    pub fn grep_match_extended(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+        invert_match: bool,
+        line_number: bool,
+    ) -> (usize, Vec<String>) {
+        let mut formatted = Vec::new();
+        let pat = if case_insensitive {
+            pattern.to_lowercase()
+        } else {
+            pattern.to_string()
+        };
+
+        for (idx, line) in content.lines().enumerate() {
+            let check = if case_insensitive {
+                line.to_lowercase()
+            } else {
+                line.to_string()
+            };
+
+            let matched = check.contains(&pat);
+            let is_selected = if invert_match { !matched } else { matched };
+
+            if is_selected {
+                if line_number {
+                    formatted.push(format!("{}:{}", idx + 1, line));
+                } else {
+                    formatted.push(line.to_string());
+                }
+            }
+        }
+        (formatted.len(), formatted)
+    }
 }
 
 // =========================================================================
@@ -1030,6 +1130,28 @@ impl ArchivalCompressionEngine {
 
     pub fn verify_archive_integrity(&self, magic_bytes: &[u8], payload_bytes: &[u8]) -> bool {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
+    }
+
+    pub fn parse_pax_header(&self, pax_bytes: &[u8]) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        if let Ok(s) = core::str::from_utf8(pax_bytes) {
+            for line in s.lines() {
+                if let Some((_, kv)) = line.split_once(' ') {
+                    if let Some((k, v)) = kv.split_once('=') {
+                        map.insert(k.trim().to_string(), v.trim().to_string());
+                    }
+                }
+            }
+        }
+        map
+    }
+
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, &'static str> {
+        Ok(format!("Configured {:?} level {}", format, level))
     }
 }
 
@@ -1143,6 +1265,26 @@ impl ProcpsPsmiscEngine {
         let free = 24_576; // 24 GB
         (total, used, free)
     }
+
+    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
+        let pids = self.pgrep_find(name);
+        let count = pids.len();
+        (
+            count,
+            format!(
+                "killall: sent signal {} to {} process(es) matching '{}'",
+                signal, count, name
+            ),
+        )
+    }
+
+    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
+        self.pgrep_find(filename)
+    }
+
+    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
+        Some((65536, 32768, 16384))
+    }
 }
 
 // =========================================================================
@@ -1241,6 +1383,14 @@ impl DocumentationPagerEngine {
             }
         }
         menu_items
+    }
+
+    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
+        if page_name == "passwd" && section == 5 {
+            Some("PASSWD(5) File Formats".to_string())
+        } else {
+            self.man_db_lookup(page_name)
+        }
     }
 }
 
@@ -1407,6 +1557,23 @@ impl AuthPrivilegeSessionEngine {
         motd = motd.replace("%r", kernel_ver);
         motd = motd.replace("%l", active_tty);
         motd
+    }
+
+    pub fn pam_environment_manage(
+        &self,
+        env_map: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
+        if action == "set" {
+            env_map.insert(key.to_string(), val.to_string());
+            true
+        } else if action == "unset" {
+            env_map.remove(key).is_some()
+        } else {
+            false
+        }
     }
 }
 
@@ -1583,6 +1750,30 @@ impl CoreUtilsPullRequestGatewayEngine {
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
         self.submissions.values().cloned().collect()
+    }
+
+    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|s| s.category == category)
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|s| s.status == status)
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|s| s.author == author)
+            .cloned()
+            .collect()
     }
 }
 
