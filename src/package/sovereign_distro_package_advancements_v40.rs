@@ -421,7 +421,9 @@ pub struct UniversalCrossDistroSatSolverV40 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
-impl UniversalCrossDistroSatSolverV40 {
+pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
+
+impl UniversalCrossDistroSatSolverV39 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
@@ -627,7 +629,11 @@ pub struct RoutedPmCommandV40 {
     pub dry_run: bool,
 }
 
+pub type RoutedPmCommandV39 = RoutedPmCommandV40;
+
 pub struct UniversalPmCliRouterV40;
+
+pub type UniversalPmCliRouterV39 = UniversalPmCliRouterV40;
 
 impl UniversalPmCliRouterV40 {
     pub fn new() -> Self {

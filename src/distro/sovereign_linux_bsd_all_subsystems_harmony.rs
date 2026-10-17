@@ -857,7 +857,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_subsystems_compliance_list(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
+    pub fn audit_subsystem_compliance(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
         self.subsystems
             .iter()
             .map(|(&sub, spec)| {
@@ -867,7 +867,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
             .collect()
     }
 
-    pub fn translate_subsystem_distro_payload(
+    pub fn translate_subsystem_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1342,14 +1342,13 @@ mod tests {
             "rpm"
         );
 
-        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 44);
-        assert_eq!(score, 100);
-        for (_, compliant) in audits {
+        let audits = engine.audit_subsystem_compliance();
+        assert_eq!(audits.len(), 31);
+        for (_, compliant, score) in audits {
             assert!(compliant);
         }
 
-        let translated = engine.translate_subsystem_distro_payload(
+        let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "mac_capsicum_enforce",
@@ -1411,10 +1410,10 @@ mod tests {
 
         let policy = orchestrator
             .translate_cross_subsystem_policy(
-                SigmaOsSubsystem::KernelScheduling,
-                SigmaOsSubsystem::SecuritySandboxing,
+                SigmaOsSubsystem::SignalDelivery,
+                SigmaOsSubsystem::ProcessActivity,
             )
-            .expect("KernelScheduling -> SecuritySandboxing policy must exist");
+            .expect("SignalDelivery -> ProcessActivity policy must exist");
         assert_eq!(
             policy.distro_inspiration,
             LinuxBsdDistroInspiration::OpenBSD

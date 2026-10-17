@@ -187,14 +187,28 @@ pub struct SlideDeck {
     pub slides: Vec<Slide>,
 }
 
-pub type PresentationDeck = SlideDeck;
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
+}
 
 pub type PresentationDeck = SlideDeck;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeckExportFormat {
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
+    Markdown,
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,
+    pub timer_elapsed_secs: u32,
     pub in_presenter_mode: bool,
     pub timer_running: bool,
     pub elapsed_secs: u32,
@@ -292,15 +306,7 @@ impl DeckCraftEngine {
     pub fn new() -> Self {
         Self {
             decks: BTreeMap::new(),
-            presenter_state: PresenterState {
-                active_deck_id: None,
-                current_slide_index: 0,
-                in_presenter_mode: false,
-                timer_running: false,
-                elapsed_secs: 0,
-                laser_pointer_active: false,
-                black_screen: false,
-            },
+            presenter_state: PresenterState::default(),
             next_deck_id: AtomicU32::new(1),
             next_slide_id: AtomicU32::new(101),
             next_element_id: AtomicU32::new(1001),

@@ -376,6 +376,55 @@ impl GnuCoreutilsBsdUserlandEngine {
             .collect()
     }
 
+    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+        let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
+        if unique {
+            vec.sort();
+            vec.dedup();
+        }
+        if numeric {
+            vec.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
+        } else if !unique {
+            vec.sort();
+        }
+        if reverse {
+            vec.reverse();
+        }
+        vec
+    }
+
+    pub fn run_tr(&self, input: &str, from: &str, to: &str, delete: bool) -> String {
+        if delete {
+            input.chars().filter(|c| !from.contains(*c)).collect()
+        } else {
+            let mut out = String::new();
+            let from_chars: Vec<char> = from.chars().collect();
+            let to_chars: Vec<char> = to.chars().collect();
+            for c in input.chars() {
+                if let Some(pos) = from_chars.iter().position(|&x| x == c) {
+                    if pos < to_chars.len() {
+                        out.push(to_chars[pos]);
+                    } else if let Some(&last) = to_chars.last() {
+                        out.push(last);
+                    } else {
+                        out.push(c);
+                    }
+                } else {
+                    out.push(c);
+                }
+            }
+            out
+        }
+    }
+
+    pub fn run_head_tail_bytes(&self, bytes: &[u8], count: usize, is_head: bool) -> Vec<u8> {
+        if is_head {
+            bytes.iter().take(count).copied().collect()
+        } else {
+            let skip = bytes.len().saturating_sub(count);
+            bytes.iter().skip(skip).copied().collect()
+        }
+    }
 }
 
 // =========================================================================
@@ -889,6 +938,54 @@ impl TextProcessingEngine {
         pattern: &str,
         case_insensitive: bool,
     ) -> Vec<(usize, String)> {
+        let res = self.grep_match_extended(content, pattern, case_insensitive, false, false);
+        res.1.into_iter().enumerate().map(|(idx, line)| (idx + 1, line)).collect()
+    }
+
+    pub fn grep_match_extended(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+        invert: bool,
+        count_only: bool,
+    ) -> (usize, Vec<String>) {
+        let mut matched_lines = Vec::new();
+        let pat_target = if case_insensitive {
+            pattern.to_lowercase()
+        } else {
+            pattern.to_string()
+        };
+
+        for (idx, line) in content.lines().enumerate() {
+            let line_check = if case_insensitive {
+                line.to_lowercase()
+            } else {
+                line.to_string()
+            };
+
+            let matches = line_check.contains(&pat_target);
+            let keep = if invert { !matches } else { matches };
+
+            if keep {
+                matched_lines.push(format!("{}:{}", idx + 1, line));
+            }
+        }
+
+        let count = matched_lines.len();
+        if count_only {
+            (count, Vec::new())
+        } else {
+            (count, matched_lines)
+        }
+    }
+
+    pub fn _grep_match_legacy(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+    ) -> Vec<(usize, String)> {
         let mut matches = Vec::new();
         let pat_target = if case_insensitive {
             pattern.to_lowercase()
@@ -1184,6 +1281,27 @@ impl ArchivalCompressionEngine {
     pub fn verify_archive_integrity(&self, magic_bytes: &[u8], payload_bytes: &[u8]) -> bool {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
     }
+
+    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        if let Ok(text) = core::str::from_utf8(header_bytes) {
+            for line in text.lines() {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                if parts.len() >= 2 {
+                    if let Some(eq_pos) = parts[1].find('=') {
+                        let key = &parts[1][..eq_pos];
+                        let val = &parts[1][eq_pos + 1..];
+                        map.insert(key.to_string(), val.to_string());
+                    }
+                }
+            }
+        }
+        map
+    }
+
+    pub fn configure_compression_level(&self, fmt: CompressionFormat, level: u32) -> Result<String, &'static str> {
+        Ok(format!("{:?} level {}", fmt, level))
+    }
 }
 
 // =========================================================================
@@ -1309,6 +1427,23 @@ impl ProcpsPsmiscEngine {
         let free = 24_576; // 24 GB
         (total, used, free)
     }
+
+    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
+        let (cnt, _msg) = self.pkill_signal(name, signal);
+        (cnt, format!("killall: terminated {} processes", cnt))
+    }
+
+    pub fn fuser_lookup_file(&self, path: &str) -> Vec<u32> {
+        self.pgrep_find(path)
+    }
+
+    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
+        if pid > 0 {
+            Some((65536, 32768, 16384))
+        } else {
+            None
+        }
+    }
 }
 
 // =========================================================================
@@ -1358,16 +1493,9 @@ impl DocumentationPagerEngine {
     }
 
     pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
-        if page_name == "passwd" && section == 5 {
-            Some("PASSWD(5) File Formats".to_string())
-        } else if let Some(res) = self.man_db_lookup(page_name) {
-            Some(format!("{}({}) {}", page_name.to_uppercase(), section, res))
-        } else {
-            Some(format!(
-                "{}({}) File Formats",
-                page_name.to_uppercase(),
-                section
-            ))
+        match (page_name, section) {
+            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
+            _ => self.man_db_lookup(page_name),
         }
     }
 
@@ -1606,6 +1734,23 @@ impl AuthPrivilegeSessionEngine {
         motd = motd.replace("%l", active_tty);
         motd
     }
+
+    pub fn pam_environment_manage(
+        &self,
+        pam_env: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
+        if action == "set" {
+            pam_env.insert(key.to_string(), val.to_string());
+            true
+        } else if action == "unset" {
+            pam_env.remove(key).is_some()
+        } else {
+            false
+        }
+    }
 }
 
 // =========================================================================
@@ -1808,15 +1953,15 @@ impl CoreUtilsPullRequestGatewayEngine {
     }
 
     pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|pr| pr.category == category).cloned().collect()
+        self.submissions.values().filter(|s| s.category == category).cloned().collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|pr| pr.status == status).cloned().collect()
+        self.submissions.values().filter(|s| s.status == status).cloned().collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|pr| pr.author == author).cloned().collect()
+        self.submissions.values().filter(|s| s.author == author).cloned().collect()
     }
 }
 
@@ -2125,8 +2270,10 @@ mod tests {
     #[test]
     fn test_text_processing_expanded_helpers() {
         let text = TextProcessingEngine::new();
-        let matches = text.grep_match("SigmaOS Linux\nBSD userland", "linux", true);
-        assert_eq!(matches.len(), 1);
+        let (cnt, lines) =
+            text.grep_match_extended("apple\nbanana\ncherry", "a", false, false, false);
+        assert_eq!(cnt, 2);
+        assert_eq!(lines[0], "1:apple");
 
         let ctx_matches = text.grep_match_context("alpha\nbeta\ngamma", "beta", 1);
         assert!(!ctx_matches.is_empty());

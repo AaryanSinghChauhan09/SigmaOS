@@ -49,20 +49,11 @@
 - [ ] Resource limits governor
 - [ ] Short circuit && / ||
 
-## Component
+## Shell component
 
-- [ ] Lexer / Parser
-- [ ] Expansion engine
-- [ ] Builtin commands
-- [ ] Redirection / Piping
-- [ ] Job control / Signals
-- [ ] Interactive REPL
-- [ ] Diagnostics / Error formatting
-- [ ] Conformance / POSIX
-
-## Recurring task
-
-- [ ] PR validation
+- [ ] Shell parser & lexer
+- [ ] Shell builtins
+- [ ] PR-level validation
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
@@ -71,7 +62,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference study & Upstream study
+## Upstream study
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
@@ -81,6 +72,7 @@
 - Linux/BSD/Redox/xv6 reference:
 - What SigmaOS adopts / adapts / rejects:
 - Decision: Adopt / Adapt / Reject
+- What SigmaOS adopts:
 - Reason:
 
 ## What SigmaOS adopts
@@ -90,7 +82,7 @@
 
 -
 
-## Reviewer checklist
+## Shell safety review
 
 - [ ] Upstream study and reference checked
 - [ ] What SigmaOS adopts is clearly stated
@@ -163,3 +155,6 @@
 - Safety and rollback:
 - Risk:
 - Safety and rollback:
+- Rollback:
+
+## Reviewer checklist
