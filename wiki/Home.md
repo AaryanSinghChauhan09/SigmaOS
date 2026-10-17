@@ -166,6 +166,14 @@
 
 ---
 
+### 11. PR-Formatted Subsystem Roadmaps
+- [36. Open Source OS Inspiration V58 PR Suite](./36-Open-Source-OS-Inspiration-V58-PR-Suite.md) &ndash; Open source OS capabilities across Linux, FreeBSD, OpenBSD, Haiku, Plan 9, and Illumos.
+- [37. Tech Media & Linux/BSD Distro Kernel & Hardening Parity PR Roadmap](./37-Tech-Media-And-Linux-BSD-Distro-Parity-PR-Roadmap.md) &ndash; Future development roadmap for Kernel `sched_ext` BPF, ATX 3.1 power governors, and Landlock V6 security.
+- [38. Universal Desktop & Userland Innovations PR Roadmap](./38-Universal-Desktop-And-Userland-Innovations-PR-Roadmap.md) &ndash; Future development roadmap for Wayland 1.24 HDR, Sovereign FOSS apps, Omakase themes, and CadCraft.
+- [39. Enterprise Security, AI & High-Performance Networking PR Roadmap](./39-Enterprise-Security-AI-And-Networking-PR-Roadmap.md) &ndash; Future development roadmap for Active Directory SSSD, eBPF PQC WireGuard VPN, SIMD AI inference, and universal package transpilation.
+
+---
+
 ## 📚 Maintenance, Governance & Architecture
 - [Process Synchronization Plan](./PROCESS_SYNCHRONIZATION_PLAN.md) &ndash; Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.

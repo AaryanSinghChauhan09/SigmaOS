@@ -5,6 +5,13 @@
 ## Kernel component
 
 - [ ] Boot / arch init
+
+## Shell component
+
+- [ ] Interactive REPL
+- [ ] Parser / AST
+- [ ] Builtins
+- [ ] Job control
 - [ ] Interrupts / traps
 - [ ] Memory / paging / swap
 - [ ] Scheduler / processes
@@ -31,7 +38,7 @@
 - [ ] Monthly diagnostics rehearsal
 - [ ] Quarterly release/architecture/security review
 
-## Reference study
+## Upstream study
 
 <!-- Required for design-changing kernel PRs -->
 
@@ -39,6 +46,9 @@
 - Linux/BSD/Redox/xv6 reference:
 - Decision: Adopt / Adapt / Reject
 - Reason:
+
+## What SigmaOS adopts
+- Component adaptation:
 
 ## Changes
 
@@ -54,6 +64,11 @@
 ## Kernel safety review
 
 - [ ] No unnecessary `unsafe`
+
+## Shell safety review
+
+- [ ] Memory bounds safety
+- [ ] Sanitized input
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
@@ -83,7 +98,10 @@
 - [ ] Boot matrix, if applicable
 - [ ] Hardware matrix, if applicable
 
-## Risks and rollback
+## Safety and rollback
 
 - Risk:
 - Rollback:
+
+## Reviewer checklist
+- [ ] Code safety verified
