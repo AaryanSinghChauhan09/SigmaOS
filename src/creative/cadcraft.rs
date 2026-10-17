@@ -118,8 +118,18 @@ pub enum ConstraintType {
     Angle,
 }
 
-/// Constraint Type alias for backward compatibility
-pub type ConstraintType = GeometricConstraintType;
+/// Simple constraint type enum
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ConstraintType {
+    Coincident,
+    Parallel,
+    Perpendicular,
+    Concentric,
+    Tangent,
+    EqualLength,
+    Distance,
+    Angle,
+}
 
 /// Geometric constraint
 #[derive(Debug, Clone)]
@@ -424,6 +434,25 @@ impl CadCraftEngine {
         id
     }
 
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
+        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
+        let toolpath = CamToolpath {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            spindle_speed: 12000.0,
+            gcode_output: format!("G01 X10.0 Y10.0 F{feed_rate}"),
+        };
+        self.cam_toolpaths.insert(id, toolpath);
+        id
+    }
+
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh {
@@ -436,6 +465,10 @@ impl CadCraftEngine {
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
+    }
+
+    pub fn export_cad(&self, format: ExportFormat) -> String {
+        format!("EXPORT_{:?}_NODES_{}", format, self.sketch_entities.len())
     }
 }
 

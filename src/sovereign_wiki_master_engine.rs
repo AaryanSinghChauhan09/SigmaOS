@@ -21,10 +21,9 @@ pub enum FeatureSourceType {
     ArchitectureDocument,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    AppReplacementPr,
-    RoadmapIdea,
     UnimplementedIdeas,
     MediaWikiDoc,
+    AppReplacementPr,
     SovereignArchitectureDoc,
 }
 
@@ -38,7 +37,7 @@ pub struct RoadmapFeatureIdea {
     pub is_fully_implemented: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum IdeaCategory {
     MultimediaTools,
     SystemUtilities,
@@ -193,27 +192,16 @@ impl Default for Sovereign100IdeasSuite {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SovereignShardId {
     Shard01ProductivityOffice,
-    Shard02MediaProcessingPlayback,
     Shard02MediaCreativeSuite,
-    Shard03Creative2D3DCad,
     Shard03SecurityHardening,
-    Shard04FoundationalAiMl,
     Shard04NetworkInfrastructure,
-    Shard05LlmCognitiveArchitectures,
     Shard05DeveloperToolchain,
-    Shard06AutonomousAiAgentSwarms,
     Shard06DesktopCompositor,
-    Shard07QuantumResistantMeshNet,
     Shard07UniversalPackaging,
-    Shard08SovereignFsStorage,
     Shard08KernelMicroarchitecture,
-    Shard09ZenithDesktopCompositor,
     Shard09AiAutomationAgent,
-    Shard10EdgeGlobalCompliance,
     Shard10SystemMonitoringDiagnostics,
-    Shard11SystemAdministrationOps,
     Shard11HardwareDriverExpansion,
-    Shard12HardwareVirtualizationHypervisor,
     Shard12GovernanceCommunityWiki,
 }
 
@@ -572,6 +560,40 @@ impl MasterWikiAndRoadmapVerificationSuite {
 }
 
 impl Default for MasterWikiAndRoadmapVerificationSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug)]
+pub struct SovereignWikiMasterEngine {
+    pub suite_100_ideas: Sovereign100IdeasSuite,
+    pub shards_registry: SovereignShardsMasterRegistry,
+    pub distro_gap_closure: SovereignDistroGapClosureEngine,
+    pub roadmap_verification: MasterWikiAndRoadmapVerificationSuite,
+}
+
+impl SovereignWikiMasterEngine {
+    pub fn new() -> Self {
+        Self {
+            suite_100_ideas: Sovereign100IdeasSuite::new(),
+            shards_registry: SovereignShardsMasterRegistry::new(),
+            distro_gap_closure: SovereignDistroGapClosureEngine::new(),
+            roadmap_verification: MasterWikiAndRoadmapVerificationSuite::new(),
+        }
+    }
+
+    pub fn evaluate_master_wiki_fulfillment(&self) -> bool {
+        let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
+        let shards_ok = self.shards_registry.is_all_12_shards_active();
+        let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
+        let roadmap_ok = self.roadmap_verification.health_check();
+
+        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
+    }
+}
+
+impl Default for SovereignWikiMasterEngine {
     fn default() -> Self {
         Self::new()
     }

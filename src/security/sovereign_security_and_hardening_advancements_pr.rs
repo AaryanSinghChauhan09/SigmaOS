@@ -34,15 +34,8 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         Self
     }
 
-    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, kdc: &str) -> String {
-        format!(
-            "[domain/{}]\nid_provider = ipa\nauth_provider = ipa\naccess_provider = ipa\nipa_domain = {}\nipa_server = {}\nkrb5_realm = {}\n",
-            domain, domain, kdc, realm
-        )
-    }
-
-    pub fn check_landlock_access(mask: u16, requested: u16) -> bool {
-        (mask & requested) == requested
+    pub fn check_landlock_access(mask: u32, allowed_mask: u32) -> bool {
+        (mask & allowed_mask) != 0
     }
 
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
@@ -437,17 +430,13 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
-    /// Generate SSSD domain configuration section.
-    pub fn generate_sssd_domain_conf(
-        domain_name: &str,
-        id_provider: &str,
-        ldap_uri: &str,
-    ) -> String {
+    pub fn generate_sssd_domain_conf(domain: &str, realm: &str, id_provider: &str) -> String {
         alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain_name,
+            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nrealm = {}",
+            domain,
             id_provider,
-            ldap_uri
+            id_provider,
+            realm
         )
     }
 

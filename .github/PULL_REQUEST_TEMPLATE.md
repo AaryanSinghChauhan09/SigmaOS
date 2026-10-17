@@ -9,6 +9,9 @@
 ## Shell component
 
 - [ ] Interactive REPL
+- [ ] Parser / AST
+- [ ] Builtins
+- [ ] Job control
 - [ ] Interrupts / traps
 - [ ] Memory / paging / swap
 - [ ] Scheduler / processes
@@ -57,7 +60,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference study & Upstream study
+## Upstream study
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 <!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
@@ -69,7 +72,8 @@
 - Decision: Adopt / Adapt / Reject
 - Reason:
 
-## Reviewer checklist
+## What SigmaOS adopts
+- Component adaptation:
 
 ## Changes
 
@@ -82,9 +86,8 @@
 
 ## Shell safety review
 
-- [ ] Command injection prevention verified
-- [ ] Environment variable sanitization checked
-- [ ] Signal trap safety verified
+- [ ] Memory bounds safety
+- [ ] Sanitized input
 - [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
@@ -135,4 +138,7 @@
 
 - Safety and rollback:
 - Risk:
-- Safety and rollback:
+- Rollback:
+
+## Reviewer checklist
+- [ ] Code safety verified

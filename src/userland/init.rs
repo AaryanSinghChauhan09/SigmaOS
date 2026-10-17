@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway
+//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
 //!
 //! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
 //! - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
@@ -625,6 +625,70 @@ impl OpenRcStatusControllerEngine {
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
+    }
+}
+
+impl OpenRcHeader {
+    pub fn parse(script_content: &str) -> Self {
+        let mut header = OpenRcHeader::default();
+        for line in script_content.lines() {
+            let trimmed = line.trim();
+            if let Some(rest) = trimmed.strip_prefix("provide") {
+                header
+                    .provide
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("need") {
+                header
+                    .need
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("use") {
+                header
+                    .use_deps
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("before") {
+                header
+                    .before
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("after") {
+                header
+                    .after
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
+                header
+                    .keywords
+                    .extend(rest.split_whitespace().map(|s| s.to_string()));
+            }
+        }
+        header
+    }
+}
+
+/// OpenRC Dependency Solver Engine
+pub struct OpenRcDependencySolverEngine {
+    pub current_runlevel: OpenRcRunlevel,
+    pub scripts: BTreeMap<String, OpenRcHeader>,
+}
+
+impl OpenRcDependencySolverEngine {
+    pub fn new() -> Self {
+        Self {
+            current_runlevel: OpenRcRunlevel::SysInit,
+            scripts: BTreeMap::new(),
+        }
+    }
+
+    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
+        self.current_runlevel = target;
+    }
+
+    pub fn mark_started(&mut self, service_name: &str) {
+        self.active_services.insert(service_name.to_string());
+        self.service_statuses
+            .insert(service_name.to_string(), ServiceState::Running);
+    }
+
+    pub fn mark_stopped(&mut self, service_name: &str) {
+        self.active_services.remove(service_name);
         self.service_statuses
             .insert(service_name.to_string(), ServiceState::Stopped);
     }
@@ -1214,6 +1278,18 @@ impl LaunchdJobSupervisorSpecEngine {
             }
         }
     }
+
+    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
+        for job in self.jobs.values() {
+            if job.mach_services.contains(&mach_service.to_string()) {
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
+            } else {
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
+            }
+        }
+    }
 }
 
 pub type LaunchdJobSupervisorSpecEngine = LaunchdJobSupervisorEngine;
@@ -1344,6 +1420,15 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
+
+/// Userland Init Clean-Room Pull Request Proposal Gateway
+#[derive(Debug, Clone)]
+pub struct UserlandInitCleanRoomPrGatewayEngine {
+    pub pr_id: u32,
+    pub title: String,
+    pub author: String,
+    pub pqc_signature: String,
 }
 
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
@@ -1782,8 +1867,20 @@ impl UserlandInitPrGatewayEngine {
     pub fn generate_pr_unified_diff(&self, pr_id: u64) -> Option<String> {
         if let Some(pr) = self.submissions.get(&pr_id) {
             Some(format!(
-                "--- a/userland/init/{}.conf\n+++ b/userland/init/{}.conf\n@@ -1,3 +1,5 @@\n+# PR #{}: {}\n+# Author: {}\n[Init]\nEngine={}\n",
-                pr.target_subsystem, pr.target_subsystem, pr.pr_id, pr.title, pr.author, pr.target_subsystem
+                "--- a/userland/init/{}.conf
++++ b/userland/init/{}.conf
+@@ -1,3 +1,5 @@
++# PR #{}: {}
++# Author: {}
++[Init]
++Engine={}
+",
+                pr.target_subsystem,
+                pr.target_subsystem,
+                pr.pr_id,
+                pr.title,
+                pr.author,
+                pr.target_subsystem
             ))
         } else {
             None
@@ -2191,7 +2288,7 @@ mod tests {
         assert_eq!(matching.len(), 1);
         let spawned = sysv.spawn_respawn_processes();
         assert_eq!(spawned.len(), 1);
-        assert_eq!(spawned[0], "1");
+        assert_eq!(spawned[0].id, "1");
 
         let mut rc_conf = BTreeMap::new();
         rc_conf.insert("sshd_enable".to_string(), "YES".to_string());
@@ -2235,8 +2332,8 @@ mod tests {
     }
 
     #[test]
-    fn test_userland_init_clean_room_pr_gateway() {
-        let gw = UserlandInitPrGatewayEngine::new(
+    fn test_userland_init_pr_gateway() {
+        let gw = UserlandInitCleanRoomPrGatewayEngine::new(
             4001,
             "feat(init): Complete Init Parity",
             "SovereignAgent",

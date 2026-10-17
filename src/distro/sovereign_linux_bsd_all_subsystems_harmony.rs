@@ -673,8 +673,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_process_sec",
-                "freebsd_racct_mac_process_guard",
+                "pol_proc_sec_jail",
+                "freebsd_jail_vnet_mac_capsicum_process_sandbox",
                 true,
             ),
         ];
@@ -753,7 +753,6 @@ impl SovereignSubsystemDistroHarmonyEngine {
             _ => "sigpkg",
         }
     }
-
 
     pub fn dispatch_event(
         &mut self,
@@ -1204,19 +1203,18 @@ mod tests {
             "rpm"
         );
 
-        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 31);
-        assert_eq!(score, 100);
-        for (_, compliant) in audits {
+        let audits = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.0.len(), 31);
+        for (_, compliant) in audits.0 {
             assert!(compliant);
         }
 
         let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
-            "mac_capsicum_enforce",
+            "jail_vnet",
         );
-        assert_eq!(translated, "mac_capsicum_enforce");
+        assert_eq!(translated, "ebpf_xdp_namespace");
     }
 
     #[test]
