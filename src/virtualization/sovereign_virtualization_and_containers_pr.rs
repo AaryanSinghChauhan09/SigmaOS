@@ -76,6 +76,7 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
+/// QEMU Disk Image Spec
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QemuDiskImageSpec {
     pub image_path: String,
@@ -94,6 +95,7 @@ pub struct KvmQemuEngine {
     pub thp_hugepages_active: bool,
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
+    pub disk_images: Vec<QemuDiskImageSpec>,
     pub virtio_fs_inodes_cached: u64,
     pub disk_images: Vec<QemuDiskImageSpec>,
 }
@@ -107,6 +109,7 @@ impl KvmQemuEngine {
             thp_hugepages_active: true,
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
+            disk_images: Vec::new(),
             virtio_fs_inodes_cached: 0,
             disk_images: Vec::new(),
         }
@@ -689,16 +692,14 @@ pub struct KubernetesK3sRancherEngine {
 impl KubernetesK3sRancherEngine {
     pub fn new() -> Self {
         let mut crio = Vec::new();
-        crio.push("runc".to_string());
         crio.push("crun".to_string());
         crio.push("gvisor".to_string());
-        crio.push("kata".to_string());
         Self {
             pods: Vec::new(),
             crio_runtime_handlers: crio,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: handlers,
+            crio_runtime_handlers: crio,
         }
     }
 

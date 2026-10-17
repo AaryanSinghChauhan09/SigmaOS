@@ -15,11 +15,7 @@ use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 /// FNV-1a checksum for CadCraft PR verification
 pub fn fnv1a_cadcraft_pr_digest(pr_id: u32, title: &str) -> u64 {
     let mut hash: u64 = 0xcbf29ce484222325;
-    for &byte in pr_id.to_le_bytes().iter() {
-        hash ^= u64::from(byte);
-        hash = hash.wrapping_mul(0x100000001b3);
-    }
-    for &byte in title.as_bytes() {
+    for &byte in pr_id.to_le_bytes().iter().chain(title.as_bytes()) {
         hash ^= u64::from(byte);
         hash = hash.wrapping_mul(0x100000001b3);
     }
@@ -266,15 +262,21 @@ impl ParametricSketch2D {
         self.active.load(Ordering::Relaxed)
     }
 
-    pub fn add_circle(&mut self, center_x: f64, center_y: f64, radius: f64) -> usize {
-        self.entities.push(SketchEntity::Circle(Circle2D {
-            center: Point2D {
-                x: center_x,
-                y: center_y,
-            },
-            radius,
-        }));
-        self.entities.len() - 1
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
+        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
+        let entity = SketchEntity {
+            id,
+            entity_type,
+            points,
+            dimensions: Vec::new(),
+            properties: BTreeMap::new(),
+        };
+        self.sketch_entities.insert(id, entity);
+        id
     }
 
     pub fn add_sketch_entity(
@@ -360,81 +362,28 @@ impl ParametricSketch2D {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
+            gcode_output: format!("G01 X0 Y0 Z-1 F{:.1}", feed_rate),
+        };
+        self.cam_toolpaths.insert(id, toolpath);
+        id
+    }
+
+    pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
+        let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
+        let mesh = FeaMesh {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            spindle_speed: 12000.0,
             gcode_output: "G00 Z5.0\nG01 Z-2.0 F500\n".to_string(),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
     }
 
-                            if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                                p.x += shift_x;
-                                p.y += shift_y;
-                            }
-                            if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                                p.x -= shift_x;
-                                p.y -= shift_y;
-                            }
-                        }
-                    }
-                    GeometricConstraintType::Coincident {
-                        point1_idx,
-                        point2_idx,
-                    } => {
-                        let (p1, p2) =
-                            match (&self.entities[*point1_idx], &self.entities[*point2_idx]) {
-                                (SketchEntity::Point(a), SketchEntity::Point(b)) => (*a, *b),
-                                _ => continue,
-                            };
-
-                        let dx = (p2.x - p1.x).abs();
-                        let dy = (p2.y - p1.y).abs();
-                        let error = dx.max(dy);
-                        if error > max_error {
-                            max_error = error;
-                        }
-
-                        let mid_x = (p1.x + p2.x) * 0.5;
-                        let mid_y = (p1.y + p2.y) * 0.5;
-
-                        if let SketchEntity::Point(p) = &mut self.entities[*point1_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                        if let SketchEntity::Point(p) = &mut self.entities[*point2_idx] {
-                            p.x = mid_x;
-                            p.y = mid_y;
-                        }
-                    }
-                    GeometricConstraintType::EqualLength {
-                        line1_idx,
-                        line2_idx,
-                    } => {
-                        let len1 = match &self.entities[*line1_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-                        let len2 = match &self.entities[*line2_idx] {
-                            SketchEntity::Line(l) => l.length(),
-                            _ => continue,
-                        };
-
-                        let error = (len1 - len2).abs();
-                        if error > max_error {
-                            max_error = error;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            if max_error < tolerance {
-                self.solved = true;
-                return true;
-            }
-        }
-
-        self.solved = true;
-        true
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        format!("cadcraft export format {:?}", format).into_bytes()
     }
 }
 
@@ -626,20 +575,6 @@ pub struct FeaMesh {
     pub min_safety_factor: f32,
 }
 
-/// CAD Export format
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ExportFormat {
-    DXF,
-    STEP,
-    IGES,
-    STL,
-    OBJ,
-    FCStd,
-    ParasolidXT,
-}
-
-pub type CadExportFormat = ExportFormat;
-
 /// 3D Vector / Point
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vector3D {
@@ -656,14 +591,6 @@ impl Vector3D {
     pub fn length(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
-
-    pub fn add(&self, other: &Vector3D) -> Vector3D {
-        Vector3D::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-
-    pub fn scale(&self, factor: f64) -> Vector3D {
-        Vector3D::new(self.x * factor, self.y * factor, self.z * factor)
-    }
 }
 
 /// Solid Feature Operation Type
@@ -678,27 +605,7 @@ pub enum SolidFeatureOperation {
         axis_start: Vector3D,
         axis_direction: Vector3D,
     },
-    Sweep {
-        path_sketch_name: String,
-    },
-    Loft {
-        section_sketch_names: Vec<String>,
-    },
-    Fillet {
-        radius: f64,
-        edge_indices: Vec<usize>,
-    },
-    Chamfer {
-        distance: f64,
-        edge_indices: Vec<usize>,
-    },
-    Shell {
-        thickness: f64,
-        open_face_indices: Vec<usize>,
-    },
-    BooleanUnion,
     BooleanSubtract,
-    BooleanIntersect,
 }
 
 /// Boundary Representation (B-Rep) Solid Model
@@ -725,77 +632,10 @@ impl BRepSolidModel {
             feature_history: Vec::new(),
         }
     }
-
-    /// Perform extrusion feature from 2D sketch profile
-    pub fn extrude_sketch(
-        &mut self,
-        sketch: &ParametricSketch2D,
-        depth: f64,
-        draft_angle_deg: f64,
-    ) -> bool {
-        let mut base_vertices = Vec::new();
-
-        for entity in entities {
-            for pt in &entity.points {
-                base_vertices.push(Vector3D::new(pt[0] as f64, pt[1] as f64, 0.0));
-            }
-        }
-
-        if base_vertices.is_empty() {
-            base_vertices = vec![
-                Vector3D::new(0.0, 0.0, 0.0),
-                Vector3D::new(100.0, 0.0, 0.0),
-                Vector3D::new(100.0, 100.0, 0.0),
-                Vector3D::new(0.0, 100.0, 0.0),
-            ];
-        }
-
-        let mut top_vertices = Vec::new();
-        let draft_rad = draft_angle_deg.to_radians();
-        let draft_offset = depth * draft_rad.tan();
-
-        for v in &base_vertices {
-            top_vertices.push(Vector3D::new(v.x + draft_offset, v.y + draft_offset, depth));
-        }
-
-        let n = base_vertices.len();
-        self.vertices.clear();
-        self.vertices.extend_from_slice(&base_vertices);
-        self.vertices.extend_from_slice(&top_vertices);
-
-        self.faces_count = n + 2; // n lateral faces + top + bottom
-        self.edges_count = n * 3; // bottom edges + top edges + vertical edges
-
-        let base_area = 100.0 * 100.0;
-        self.volume = base_area * depth;
-        self.surface_area = 2.0 * base_area + 4.0 * (100.0 * depth);
-
-        self.feature_history.push(SolidFeatureOperation::Extrude {
-            depth,
-            draft_angle_deg,
-        });
-        self.volume = 100.0 * 100.0 * depth;
-        self.surface_area = 20000.0 + 400.0 * depth;
-    }
-
-    pub fn revolve_sketch(&mut self, angle_deg: f64) {
-        self.feature_history.push(SolidFeatureOperation::Revolve {
-            angle_deg,
-            axis_start: Vector3D::new(0.0, 0.0, 0.0),
-            axis_direction: Vector3D::new(0.0, 1.0, 0.0),
-        });
-        self.volume = 50000.0;
-        self.surface_area = 12000.0;
-    }
-
-    pub fn boolean_subtract(&mut self, _other_solid: &BRepSolidModel) {
-        self.feature_history
-            .push(SolidFeatureOperation::BooleanSubtract);
-        self.volume = (self.volume * 0.8).max(0.0);
-    }
 }
 
 /// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
+#[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
     pub pr_id: u32,
     pub solids_generated: AtomicU32,
@@ -840,485 +680,7 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
     }
 }
 
-// ============================================================================
-// 3. Assembly Mates, CAM G-code Toolpath & FEA Stress Analysis Engine
-// ============================================================================
-
-/// Assembly Mate Constraint Type
-#[derive(Debug, Clone, PartialEq)]
-pub enum AssemblyMateType {
-    Coincident {
-        part1_id: u32,
-        face1_idx: usize,
-        part2_id: u32,
-        face2_idx: usize,
-    },
-    Concentric {
-        part1_id: u32,
-        axis1_idx: usize,
-        part2_id: u32,
-        axis2_idx: usize,
-    },
-    Distance {
-        part1_id: u32,
-        face1_idx: usize,
-        part2_id: u32,
-        face2_idx: usize,
-        distance: f64,
-    },
-    Parallel {
-        part1_id: u32,
-        face1_idx: usize,
-        part2_id: u32,
-        face2_idx: usize,
-    },
-    Angle {
-        part1_id: u32,
-        face1_idx: usize,
-        part2_id: u32,
-        face2_idx: usize,
-        angle_deg: f64,
-    },
-}
-
-/// CAD Assembly Model
-#[derive(Debug, Clone)]
-pub struct AssemblyModel {
-    pub name: String,
-    pub parts: BTreeMap<u32, BRepSolidModel>,
-    pub mates: Vec<AssemblyMateConstraintType>,
-}
-
-impl AssemblyModel {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            parts: BTreeMap::new(),
-            mates: Vec::new(),
-        }
-    }
-
-    pub fn add_part(&mut self, part_id: u32, solid: BRepSolidModel) {
-        self.parts.insert(part_id, solid);
-    }
-
-    pub fn add_mate(&mut self, mate: AssemblyMateConstraintType) {
-        self.mates.push(mate);
-    }
-}
-
-/// CAM Operation Strategy
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CamStrategy {
-    Facing2D,
-    Contour2D,
-    Pocketing2D,
-    Drilling3D,
-    AdaptiveClearing3D,
-}
-
-/// CAM Tool Definition
-#[derive(Debug, Clone)]
-pub struct CamTool {
-    pub tool_number: u32,
-    pub diameter_mm: f64,
-    pub flute_length_mm: f64,
-    pub feed_rate_mm_min: f64,
-    pub spindle_speed_rpm: u32,
-}
-
-/// CAM G-code Generator
-#[derive(Debug, Clone)]
-pub struct CamToolpathGenerator {
-    pub strategy: CamStrategy,
-    pub tool: CamTool,
-    pub stepdown_mm: f64,
-    pub safe_z_mm: f64,
-}
-
-impl CamToolpathGenerator {
-    pub fn new(strategy: CamStrategy, tool: CamTool) -> Self {
-        Self {
-            strategy,
-            tool,
-            stepdown_mm: 2.0,
-            safe_z_mm: 5.0,
-        }
-    }
-
-    pub fn generate_gcode(&self, depth_mm: f64, width_mm: f64, length_mm: f64) -> String {
-        let mut gcode = String::new();
-        gcode.push_str("%\nO1001 (CADCRAFT CAM TOOLPATH GENERATED)\n");
-        gcode.push_str("G90 G21 G17 G40 G80\n");
-        gcode.push_str(&format!("T{} M06\n", self.tool.tool_number));
-        gcode.push_str(&format!("S{} M03\n", self.tool.spindle_speed_rpm));
-        gcode.push_str(&format!("G00 Z{:.3}\n", self.safe_z_mm));
-
-        let passes = ((depth_mm / self.stepdown_mm).ceil() as usize).max(1);
-        let mut current_z = 0.0f64;
-
-        for pass in 1..=passes {
-            current_z -= self.stepdown_mm;
-            if current_z < -depth_mm {
-                current_z = -depth_mm;
-            }
-
-            gcode.push_str(&format!("(PASS {} AT Z{:.3})\n", pass, current_z));
-            gcode.push_str(&format!("G00 X0.000 Y0.000\n"));
-            gcode.push_str(&format!(
-                "G01 Z{:.3} F{:.1}\n",
-                current_z,
-                self.tool.feed_rate_mm_min * 0.5
-            ));
-            gcode.push_str(&format!(
-                "G01 X{:.3} F{:.1}\n",
-                length_mm, self.tool.feed_rate_mm_min
-            ));
-            gcode.push_str(&format!("G01 Y{:.3}\n", width_mm));
-            gcode.push_str("G01 X0.000\n");
-            gcode.push_str("G01 Y0.000\n");
-        }
-
-        gcode.push_str(&format!("G00 Z{:.3}\n", self.safe_z_mm));
-        gcode.push_str("M05\nM30\n%\n");
-        gcode
-    }
-}
-
-/// FEA Finite Element Stress Solver
-#[derive(Debug, Clone)]
-pub struct FeaStressSolver {
-    pub youngs_modulus_gpa: f64,
-    pub poissons_ratio: f64,
-    pub yield_strength_mpa: f64,
-    pub applied_force_n: Vector3D,
-}
-
-/// FEA Solver Analysis Output
-#[derive(Debug, Clone)]
-pub struct FeaAnalysisResult {
-    pub max_von_mises_stress_mpa: f64,
-    pub max_displacement_mm: f64,
-    pub safety_factor: f64,
-    pub pass: bool,
-}
-
-impl FeaStressSolver {
-    pub fn new_structural_steel() -> Self {
-        Self {
-            youngs_modulus_gpa: 200.0,
-            poissons_ratio: 0.30,
-            yield_strength_mpa: 250.0,
-            applied_force_n: Vector3D::new(0.0, 0.0, -10000.0),
-        }
-    }
-
-    pub fn solve_linear_static(&self, solid: &BRepSolidModel) -> FeaAnalysisResult {
-        let area_m2 = (solid.surface_area * 1e-6).max(1e-4);
-        let force_mag = self.applied_force_n.length();
-
-        let max_von_mises_stress_mpa = (force_mag / (area_m2 * 1e6)).min(1000.0);
-        let safety_factor = if max_von_mises_stress_mpa > 1e-6 {
-            self.yield_strength_mpa / max_von_mises_stress_mpa
-        } else {
-            10.0
-        };
-
-        let max_displacement_mm =
-            (max_von_mises_stress_mpa / (self.youngs_modulus_gpa * 1e3)) * 100.0;
-        let pass = safety_factor >= 1.5;
-
-        FeaAnalysisResult {
-            max_von_mises_stress_mpa,
-            max_displacement_mm,
-            safety_factor,
-            pass,
-        }
-    }
-}
-
-/// CadCraft Main Engine
-pub struct CadCraftEngine {
-    pub sketch_entities: BTreeMap<u32, SketchEntity>,
-    pub constraints: BTreeMap<u32, GeometricConstraint>,
-    pub solid_features: BTreeMap<u32, SolidFeature>,
-    pub assembly_components: BTreeMap<u32, AssemblyComponent>,
-    pub cam_toolpaths: BTreeMap<u32, CamToolpath>,
-    pub fea_meshes: BTreeMap<u32, FeaMesh>,
-    pub next_entity_id: AtomicU32,
-    pub next_constraint_id: AtomicU32,
-    pub next_feature_id: AtomicU32,
-    pub next_component_id: AtomicU32,
-    pub next_toolpath_id: AtomicU32,
-    pub next_fea_id: AtomicU32,
-    pub active: AtomicBool,
-}
-
-impl CadCraftEngine {
-    pub fn new() -> Self {
-        Self {
-            sketch_entities: BTreeMap::new(),
-            constraints: BTreeMap::new(),
-            solid_features: BTreeMap::new(),
-            assembly_components: BTreeMap::new(),
-            cam_toolpaths: BTreeMap::new(),
-            fea_meshes: BTreeMap::new(),
-            next_entity_id: AtomicU32::new(1),
-            next_constraint_id: AtomicU32::new(1),
-            next_feature_id: AtomicU32::new(1),
-            next_component_id: AtomicU32::new(1),
-            next_toolpath_id: AtomicU32::new(1),
-            next_fea_id: AtomicU32::new(1),
-            active: AtomicBool::new(false),
-        }
-    }
-
-    pub fn init(&mut self) {
-        self.active.store(true, Ordering::Relaxed);
-    }
-
-    pub fn is_active(&self) -> bool {
-        self.active.load(Ordering::Relaxed)
-    }
-
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, points: Vec<[f32; 2]>) -> u32 {
-        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
-        let entity = SketchEntity {
-            id,
-            entity_type,
-            points,
-            dimensions: Vec::new(),
-            properties: BTreeMap::new(),
-        };
-        self.sketch_entities.insert(id, entity);
-        id
-    }
-
-    pub fn add_geometric_constraint(
-        &mut self,
-        constraint_type: GeometricConstraintType,
-        entity_ids: Vec<u32>,
-        target_value: f32,
-    ) -> u32 {
-        let id = self.next_constraint_id.fetch_add(1, Ordering::Relaxed);
-        let constraint = GeometricConstraint {
-            id,
-            constraint_type,
-            entity_ids,
-            target_value,
-            satisfied: true,
-        };
-        self.constraints.insert(id, constraint);
-        id
-    }
-
-    pub fn add_solid_feature(
-        &mut self,
-        feature_type: SolidFeatureType,
-        depth: f32,
-        sketch_id: Option<u32>,
-    ) -> u32 {
-        let id = self.next_feature_id.fetch_add(1, Ordering::Relaxed);
-        let feature = SolidFeature {
-            id,
-            feature_type,
-            depth,
-            angle: 0.0,
-            radius: 0.0,
-            sketch_id,
-            parent_feature_ids: Vec::new(),
-        };
-        self.solid_features.insert(id, feature);
-        id
-    }
-
-    pub fn add_assembly_component(&mut self, name: String, location: [f32; 3]) -> u32 {
-        let id = self.next_component_id.fetch_add(1, Ordering::Relaxed);
-        let component = AssemblyComponent {
-            id,
-            name,
-            solid_feature_ids: Vec::new(),
-            location,
-            rotation: [0.0, 0.0, 0.0],
-            mates: Vec::new(),
-        };
-        self.assembly_components.insert(id, component);
-        id
-    }
-
-    pub fn generate_cam_toolpath(
-        &mut self,
-        toolpath_type: CamToolpathType,
-        tool_diameter: f32,
-        feed_rate: f32,
-    ) -> u32 {
-        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
-        let toolpath = CamToolpath {
-            id,
-            toolpath_type,
-            tool_diameter,
-            feed_rate,
-            spindle_speed: 12000.0,
-            gcode_output: String::from("%\nG90 G21\nG00 Z10.0\nM30\n%"),
-        };
-        self.cam_toolpaths.insert(id, toolpath);
-        id
-    }
-
-    pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
-        let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
-        let mesh = FeaMesh {
-            id,
-            name,
-            node_count,
-            element_count,
-            elements: Vec::new(),
-            max_stress: 145.2,
-            min_safety_factor: 2.8,
-        };
-        self.fea_meshes.insert(id, mesh);
-        id
-    }
-
-    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut data = Vec::new();
-        match format {
-            ExportFormat::DXF => {
-                data.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
-            }
-            ExportFormat::STEP => {
-                data.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
-            }
-            ExportFormat::IGES => {
-                data.extend_from_slice(b"S      1\nG      1\nD      1\nP      1\nT      1\n");
-            }
-            ExportFormat::STL => {
-                data.extend_from_slice(b"solid CadCraftModel\nendsolid CadCraftModel\n");
-            }
-            ExportFormat::OBJ => {
-                data.extend_from_slice(b"# CadCraft OBJ Export\nv 0 0 0\n");
-            }
-            ExportFormat::FCStd => {
-                data.extend_from_slice(b"FCStdZipHeader");
-            }
-            ExportFormat::ParasolidXT => {
-                data.extend_from_slice(b"**PARASOLID_XT_HEADER**");
-            }
-        }
-        data
-    }
-}
-
-impl Default for CadCraftEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// Global CadCraft Instance
-static mut CADCRAFT: Option<CadCraftEngine> = None;
-
-pub fn init_cadcraft() {
-    unsafe {
-        CADCRAFT = Some(CadCraftEngine::new());
-    }
-}
-
-pub fn get_cadcraft() -> Option<&'static mut CadCraftEngine> {
-    unsafe { CADCRAFT.as_mut() }
-}
-
-// ============================================================================
-// PR Deployment Engines for CadCraft
-// ============================================================================
-
-/// Deployer for 2D Drafting & Parametric Constraints in PR Format
-#[derive(Debug, Clone)]
-pub struct CadCraft2dDraftingConstraintPrDeployer {
-    pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
-    pub next_pr_id: u32,
-}
-
-impl CadCraft2dDraftingConstraintPrDeployer {
-    pub fn new() -> Self {
-        let mut deployer = Self {
-            deployed_prs: BTreeMap::new(),
-            next_pr_id: 2801,
-        };
-        deployer.stage_all_drafting_prs();
-        deployer
-    }
-
-    fn stage_all_drafting_prs(&mut self) {
-        let prs = [
-            ("cadcraft-2d-sketch-entities", "feat(cadcraft): 2D parametric sketch entities (Line, Arc, Circle, Spline, Polyline)", "cad_drafting_entities", 0xA1B2C3D4),
-            ("cadcraft-constraint-solver", "feat(cadcraft): Geometric constraint solver engine (Coincident, Tangent, Concentric, Distance)", "cad_constraint_solver", 0xB2C3D4E5),
-            ("cadcraft-dxf-dwg-importer", "feat(cadcraft): DXF/DWG vector drafting parser & layer style manager", "cad_vector_exchange", 0xC3D4E5F6),
-        ];
-
-        for (comp, title, target_sub, digest) in prs {
-            let pr_id = self.next_pr_id;
-            self.next_pr_id += 1;
-            let pr = CadCraftPullRequestSpec::new(pr_id, comp, title, target_sub, digest);
-            self.deployed_prs.insert(pr_id, pr);
-        }
-    }
-
-    pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged || pr.status == "Merged").count()
-    }
-}
-
-impl Default for CadCraft2dDraftingConstraintPrDeployer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Deployer for 3D B-Rep Solid Feature Modeling Engine
-#[derive(Debug, Clone)]
-pub struct CadCraft3dSolidModelingPrDeployer {
-    pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
-    pub next_pr_id: u32,
-}
-
-impl CadCraft3dSolidModelingPrDeployer {
-    pub fn new() -> Self {
-        let mut deployer = Self {
-            deployed_prs: BTreeMap::new(),
-            next_pr_id: 2811,
-        };
-        deployer.stage_all_solid_modeling_prs();
-        deployer
-    }
-
-    fn stage_all_solid_modeling_prs(&mut self) {
-        let prs = [
-            ("cadcraft-brep-solid-engine", "feat(cadcraft): 3D Boundary Representation (B-Rep) solid modeling kernel", "cad_brep_kernel", 0xD4E5F678),
-            ("cadcraft-csg-feature-ops", "feat(cadcraft): CSG feature operations (Extrude, Revolve, Sweep, Loft, Fillet, Chamfer)", "cad_solid_features", 0xE5F67890),
-            ("cadcraft-step-iges-exporter", "feat(cadcraft): STEP AP214/AP242 & IGES 3D solid geometry exchanger", "cad_step_iges_io", 0xF67890A1),
-        ];
-
-        for (comp, title, target_sub, digest) in prs {
-            let pr_id = self.next_pr_id;
-            self.next_pr_id += 1;
-            let pr = CadCraftPullRequestSpec::new(pr_id, comp, title, target_sub, digest);
-            self.deployed_prs.insert(pr_id, pr);
-        }
-    }
-
-    pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs.values().filter(|pr| pr.is_merged || pr.status == "Merged").count()
-    }
-}
-
-impl Default for CadCraft3dSolidModelingPrDeployer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Deployer for Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
+/// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Clone)]
 pub struct CadCraftAssemblyFemSimulationPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
@@ -1369,55 +731,8 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
         }
     }
 
-    pub fn generate_pr(&self) -> CadCraftPullRequestSpec {
-        let title = "CadCraft Assembly Mates, CAM G-Code & FEA Stress Analysis";
-        CadCraftPullRequestSpec {
-            pr_id: self.pr_id,
-            title: title.to_string(),
-            description: "Integrates multi-part assembly kinematic mate constraints, 2.5D/3D CAM G-code toolpath generation, FEA linear static stress analysis, and multi-format CAD exports (STEP, IGES, STL, DXF).".to_string(),
-            branch: "feature/cadcraft-assembly-cam-fea".to_string(),
-            status: "Merged".to_string(),
-            target_module: "src/creative/cadcraft.rs".to_string(),
-            verification_digest: fnv1a_cadcraft_pr_digest(self.pr_id, title),
-        }
-    }
-
-    pub fn export_cad_solid(&self, solid: &BRepSolidModel, format: CadExportFormat) -> Vec<u8> {
-        self.assemblies_processed.fetch_add(1, Ordering::Relaxed);
-        self.deployed.store(true, Ordering::Relaxed);
-
-        let mut output = Vec::new();
-        match format {
-            CadExportFormat::Step => {
-                output.extend_from_slice(
-                    b"ISO-10303-21;\nHEADER;\nFILE_DESCRIPTION(('CadCraft STEP Solid'),'2;1');\n",
-                );
-                output.extend_from_slice(format!("FILE_NAME('{}', '2026-01-01', ('CadCraft'), ('SigmaOS'), '', '', '');\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n", solid.name).as_bytes());
-            }
-            CadExportFormat::Stl => {
-                output.extend_from_slice(format!("solid {}\n", solid.name).as_bytes());
-                output.extend_from_slice(b"  facet normal 0 0 1\n    outer loop\n      vertex 0 0 0\n      vertex 100 0 0\n      vertex 100 100 0\n    endloop\n  endfacet\n");
-                output.extend_from_slice(format!("endsolid {}\n", solid.name).as_bytes());
-            }
-            CadExportFormat::Dxf => {
-                output.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n0\nLINE\n8\n0\n10\n0.0\n20\n0.0\n11\n100.0\n21\n100.0\n0\nENDSEC\n0\nEOF\n");
-            }
-            _ => {
-                output.extend_from_slice(
-                    format!(
-                        "# CadCraft Solid Export: {}\nVertices: {}\n",
-                        solid.name,
-                        solid.vertices.len()
-                    )
-                    .as_bytes(),
-                );
-            }
-        }
-        output
-    }
-
-    pub fn is_deployed(&self) -> bool {
-        self.deployed.load(Ordering::Relaxed)
+    pub fn get_merged_pr_count(&self) -> usize {
+        self.deployed_prs.values().filter(|pr| pr.is_merged).count()
     }
 }
 
@@ -1460,36 +775,10 @@ impl CadCraftMasterPrDeploymentSuite {
         }
     }
 
-    pub fn deploy_all(&mut self) -> Vec<CadCraftPullRequestSpec> {
-        let prs = vec![
-            self.drafting_2d.generate_pr(),
-            self.solid_modeling_3d.generate_pr(),
-            self.assembly_cam_fea.generate_pr(),
-        ];
-
-        for pr in &prs {
-            self.deployed_prs.insert(pr.pr_id, pr.clone());
-        }
-
-        // Trigger active deployment states
-        let mut sample_sketch = self.drafting_2d.create_sketch("Bracket Profile");
-        let p1 = sample_sketch.add_point(0.0, 0.0);
-        let p2 = sample_sketch.add_point(50.0, 0.0);
-        sample_sketch.add_constraint(GeometricConstraintType::Distance {
-            point1_idx: p1,
-            point2_idx: p2,
-            target_distance: 100.0,
-        });
-        sample_sketch.solve_constraints();
-
-        let mut sample_solid = self.solid_modeling_3d.create_solid("Support Bracket");
-        sample_solid.extrude_sketch(&sample_sketch, 50.0, 0.0);
-
-        let _step_bytes = self
-            .assembly_cam_fea
-            .export_cad_solid(&sample_solid, CadExportFormat::Step);
-
-        prs
+    pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
+        self.drafting_constraints.get_merged_pr_count()
+            + self.solid_modeling.get_merged_pr_count()
+            + self.assembly_fem.get_merged_pr_count()
     }
 
     pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
@@ -1532,10 +821,10 @@ mod tests {
         );
         let c1 = engine.add_geometric_constraint(
             GeometricConstraintType::Perpendicular {
-                line1_idx: e1 as usize,
-                line2_idx: e2 as usize,
+                line1_idx: 0,
+                line2_idx: 1,
             },
-            vec![e1, e2],
+            alloc::vec![e1, e2],
             90.0,
         );
 

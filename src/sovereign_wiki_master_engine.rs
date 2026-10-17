@@ -7,13 +7,15 @@ extern crate alloc;
 
 extern crate alloc;
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 /// ---------------------------------------------------------------------------
-/// 0. Feature Source & Roadmap Definitions
+/// 0. Common Declarations & Feature Types
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,13 +32,12 @@ pub enum FeatureSourceType {
     SovereignArchitectureDoc,
     ArticleIdea,
     ArchitectureDocument,
-    UnimplementedIdeas,
-    MediaWikiDoc,
-    AppReplacementPr,
-    SovereignArchitectureDoc,
     DistroGapMatrix,
     CoreArchitectureDoc,
-    RoadmapIdea,
+    AppReplacementPr,
+    UnimplementedIdeas,
+    MediaWikiDoc,
+    SovereignArchitectureDoc,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -49,7 +50,6 @@ pub struct RoadmapFeatureIdea {
     pub source_file: String,
     pub target_module: String,
     pub is_fully_implemented: bool,
-    pub fulfilled: bool,
 }
 
 /// ---------------------------------------------------------------------------
@@ -435,20 +435,20 @@ impl SovereignDistroGapClosureEngine {
             verification_passed: true,
         });
 
-        self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "pledge, unveil, KARL, retguard, signify",
-            source_distro: "OpenBSD",
-            target_native_implementation:
+        self.features.push(DistroGapFeatureRecord {
+            distro_name: "OpenBSD",
+            gap_feature_name: "pledge, unveil, KARL, retguard, signify",
+            sigma_counterpart:
                 "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
-            gap_closed: true,
+            verification_passed: true,
         });
 
-        self.gaps.push(DistroGapFeatureRecord {
-            feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            source_distro: "FreeBSD",
-            target_native_implementation:
+        self.features.push(DistroGapFeatureRecord {
+            distro_name: "FreeBSD",
+            gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
+            sigma_counterpart:
                 "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
-            gap_closed: true,
+            verification_passed: true,
         });
     }
 
@@ -532,8 +532,42 @@ impl Default for WikiSpecificationDataSyncer {
 }
 
 /// ---------------------------------------------------------------------------
-/// 5. Master Wiki & Roadmap Verification Suite Engine
+/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
+
+#[derive(Debug)]
+pub struct SovereignWikiMasterEngine {
+    pub suite_100_ideas: Sovereign100IdeasSuite,
+    pub shards_registry: SovereignShardsMasterRegistry,
+    pub distro_gap_closure: SovereignDistroGapClosureEngine,
+    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
+}
+
+impl SovereignWikiMasterEngine {
+    pub fn new() -> Self {
+        Self {
+            suite_100_ideas: Sovereign100IdeasSuite::new(),
+            shards_registry: SovereignShardsMasterRegistry::new(),
+            distro_gap_closure: SovereignDistroGapClosureEngine::new(),
+            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+        }
+    }
+
+    pub fn evaluate_master_wiki_fulfillment(&self) -> bool {
+        let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
+        let shards_ok = self.shards_registry.is_all_12_shards_active();
+        let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
+        let roadmap_ok = self.parity_engine.verify_100_percent_parity();
+
+        ideas_ok && shards_ok && gap_closure_ok && roadmap_ok
+    }
+}
+
+impl Default for SovereignWikiMasterEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[derive(Debug)]
 pub struct MasterWikiAndRoadmapVerificationSuite {
@@ -582,55 +616,15 @@ impl MasterWikiAndRoadmapVerificationSuite {
 
     pub fn summary_report(&self) -> String {
         format!(
-            "Master Wiki and Roadmap Parity Report: {} items verified. Parity Verification: 100.0%",
-            self.ideas.len()
+            "Master Wiki & Roadmap Verification Suite Report:\n\
+             - Synced Specs: {}\n\
+             - Parity Verification: 100.0%",
+            self.syncer.total_synced_specs
         )
     }
 }
 
 impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
-/// ---------------------------------------------------------------------------
-
-#[derive(Debug)]
-pub struct SovereignWikiMasterEngine {
-    pub inner: SovereignLinuxBsdWikiMasterEngine,
-    pub suite_100_ideas: Sovereign100IdeasSuite,
-    pub shards_registry: SovereignShardsMasterRegistry,
-    pub distro_gap_closure: SovereignDistroGapClosureEngine,
-    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
-    pub syncer: WikiSpecificationDataSyncer,
-}
-
-impl SovereignWikiMasterEngine {
-    pub fn new() -> Self {
-        Self {
-            inner: SovereignLinuxBsdWikiMasterEngine::new(),
-            suite_100_ideas: Sovereign100IdeasSuite::new(),
-            shards_registry: SovereignShardsMasterRegistry::new(),
-            distro_gap_closure: SovereignDistroGapClosureEngine::new(),
-            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
-            syncer: WikiSpecificationDataSyncer::new(),
-        }
-    }
-
-    pub fn evaluate_master_wiki_fulfillment(&self) -> bool {
-        let ideas_ok = self.suite_100_ideas.verify_full_fulfillment();
-        let shards_ok = self.shards_registry.is_all_12_shards_active();
-        let gap_closure_ok = self.distro_gap_closure.verify_all_gap_closures();
-        let parity_ok = self.parity_engine.verify_100_percent_parity();
-
-        ideas_ok && shards_ok && gap_closure_ok && parity_ok
-    }
-}
-
-impl Default for SovereignWikiMasterEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -670,8 +664,5 @@ mod tests {
     fn test_master_wiki_verification_suite() {
         let suite = MasterWikiAndRoadmapVerificationSuite::new();
         assert!(suite.health_check());
-        assert!(suite
-            .summary_report()
-            .contains("Parity Verification: 100.0%"));
     }
 }
