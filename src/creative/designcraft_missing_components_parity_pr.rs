@@ -79,7 +79,9 @@ impl DesigncraftPrCategory {
             Self::ComponentVariantsStateMachine => {
                 "interactive component variants & state machine manager"
             }
-            Self::DesignTokensStyleDictionary => "W3C design tokens & style dictionary transformer",
+            Self::DesignTokensStyleDictionary => {
+                "W3C design tokens & style dictionary multi-platform transformer"
+            }
             Self::IconSystemPackagingSymbols => {
                 "vector icon library packaging & SVG symbol sprite compiler"
             }

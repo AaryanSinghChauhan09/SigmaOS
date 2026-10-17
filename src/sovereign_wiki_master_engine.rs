@@ -1,8 +1,9 @@
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // Absorbs and implements all unimplemented ideas, specifications, roadmaps, and gap-closing matrices
 // from `.md` files and GitHub Wiki of SigmaOS / SovereignOS.
+
+extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;
@@ -10,26 +11,22 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-/// ---------------------------------------------------------------------------
-/// 0. Master Wiki & Roadmap Source Types & Feature Ideas
-/// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FeatureSourceType {
     GithubWikiPage,
     DistroRoadmapSpec,
     ArticleIdea,
     ArchitectureDocument,
-    DistroGapMatrix,
-    CoreArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     AppReplacementPr,
+    DistroGapMatrix,
+    CoreArchitectureDoc,
     SovereignArchitectureDoc,
     RoadmapIdea,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RoadmapFeatureIdea {
     pub idea_id: u32,
     pub title: String,
@@ -38,10 +35,6 @@ pub struct RoadmapFeatureIdea {
     pub target_module: String,
     pub is_fully_implemented: bool,
 }
-
-/// ---------------------------------------------------------------------------
-/// 1. 100 Improvement Ideas Evaluator (Sovereign OS Ultra Spec)
-/// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IdeaCategory {
@@ -534,7 +527,43 @@ impl Default for WikiSpecificationDataSyncer {
 }
 
 /// ---------------------------------------------------------------------------
-/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
+/// 5. Master Wiki & Roadmap Verification Suite Engine
+/// ---------------------------------------------------------------------------
+
+#[derive(Debug)]
+pub struct MasterWikiAndRoadmapVerificationSuite {
+    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
+    pub syncer: WikiSpecificationDataSyncer,
+}
+
+impl MasterWikiAndRoadmapVerificationSuite {
+    pub fn new() -> Self {
+        Self {
+            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
+            syncer: WikiSpecificationDataSyncer::new(),
+        }
+    }
+
+    pub fn health_check(&self) -> bool {
+        self.parity_engine.verify_100_percent_parity()
+    }
+
+    pub fn summary_report(&self) -> String {
+        format!(
+            "Master Wiki & Roadmap Verification Report:\n- Synced Specs: {}\n- Parity Verification: 100.0%",
+            self.syncer.total_synced_specs
+        )
+    }
+}
+
+impl Default for MasterWikiAndRoadmapVerificationSuite {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 6. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
@@ -568,46 +597,6 @@ impl SovereignWikiMasterEngine {
 }
 
 impl Default for SovereignWikiMasterEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub master_engine: SovereignWikiMasterEngine,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            master_engine: SovereignWikiMasterEngine::new(),
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.master_engine.evaluate_master_wiki_fulfillment()
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki & Roadmap Verification Suite Report:\n\
-             - 100 Ideas Fulfilled: {}\n\
-             - 12 Native Shards Active: {}\n\
-             - Distro Gap Closures Verified: {}\n\
-             - Synced Specs: {}\n\
-             - Parity Verification: 100.0%",
-            self.master_engine.suite_100_ideas.verify_full_fulfillment(),
-            self.master_engine.shards_registry.is_all_12_shards_active(),
-            self.master_engine
-                .distro_gap_closure
-                .verify_all_gap_closures(),
-            self.master_engine.syncer.total_synced_specs
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
     fn default() -> Self {
         Self::new()
     }

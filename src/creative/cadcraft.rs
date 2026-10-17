@@ -346,15 +346,15 @@ impl CadCraftEngine {
         feed_rate: f32,
     ) -> u32 {
         let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
-        let path = CamToolpath {
+        let toolpath = CamToolpath {
             id,
             toolpath_type,
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: String::from("G0 X0 Y0 Z5\nG1 Z-2 F500\nM3 S12000\nG1 X100 Y50\nG0 Z5\n"),
+            gcode_output: format!("G01 Z-2.0 F{:.1}\n", feed_rate),
         };
-        self.cam_toolpaths.insert(id, path);
+        self.cam_toolpaths.insert(id, toolpath);
         id
     }
 
@@ -374,24 +374,13 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut out = Vec::new();
         match format {
-            ExportFormat::DXF => {
-                out.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
-            }
+            ExportFormat::DXF => b"SECTION\nHEADER\nENDSEC\nEOF\n".to_vec(),
             ExportFormat::STEP => {
-                out.extend_from_slice(
-                    b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
-                );
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
             }
-            ExportFormat::STL => {
-                out.extend_from_slice(b"solid cadcraft_export\nendsolid cadcraft_export\n");
-            }
-            _ => {
-                out.extend_from_slice(b"# CadCraft Export Data\n");
-            }
+            _ => b"CADCRAFT_EXPORT".to_vec(),
         }
-        out
     }
 }
 
@@ -469,52 +458,6 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
-// ============================================================================
-// 2. 3D B-Rep Solid Feature Modeling Engine
-// ============================================================================
-
-/// 3D Vector / Point
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Vector3D {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-}
-
-impl Vector3D {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
-    }
-
-    pub fn length(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
-    }
-}
-
-/// Boundary Representation (B-Rep) Solid Model
-#[derive(Debug, Clone)]
-pub struct BRepSolidModel {
-    pub name: String,
-    pub vertices: Vec<Vector3D>,
-    pub faces_count: usize,
-    pub edges_count: usize,
-    pub volume: f64,
-    pub surface_area: f64,
-}
-
-impl BRepSolidModel {
-    pub fn new(name: &str) -> Self {
-        Self {
-            name: name.to_string(),
-            vertices: Vec::new(),
-            faces_count: 0,
-            edges_count: 0,
-            volume: 0.0,
-            surface_area: 0.0,
-        }
-    }
-}
-
 /// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
 #[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
@@ -565,10 +508,6 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
         Self::new()
     }
 }
-
-// ============================================================================
-// 3. Assembly Mates, CAM G-code Toolpath & FEA Stress Analysis Engine
-// ============================================================================
 
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Clone)]
