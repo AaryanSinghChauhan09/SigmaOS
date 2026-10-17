@@ -1222,6 +1222,13 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v58_pr.rs" ]; then
     ./build/test_gap_closure_v58_pr
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v60_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure PR Suite V60 test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v60_pr.rs --edition=2021 -o build/test_gap_closure_v60_pr
+    ./build/test_gap_closure_v60_pr
+fi
+
 if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
     echo "Running Omarchy Linux Gap Closure & PR Gateway test suite..."
     mkdir -p build
@@ -1332,6 +1339,13 @@ if [ -f "src/distro/open_source_os_missing_components_v58_pr.rs" ]; then
     mkdir -p build
     rustc --test src/distro/open_source_os_missing_components_v58_pr.rs --edition=2021 -o build/test_open_source_v58_pr
     ./build/test_open_source_v58_pr
+fi
+
+if [ -f "src/distro/open_source_os_missing_components_v60_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V60 PR Suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v60_pr.rs --edition=2021 -o build/test_open_source_v60_pr
+    ./build/test_open_source_v60_pr
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then

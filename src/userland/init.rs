@@ -611,6 +611,7 @@ impl OpenRcStatusControllerEngine {
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
     }
+}
 
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
@@ -1312,6 +1313,7 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
 
 /// Userland Init Clean-Room Pull Request Proposal Gateway
 #[derive(Debug, Clone)]
@@ -1469,12 +1471,12 @@ pub struct AtJob {
 }
 
 /// `atd` Queue Spool Manager
-pub struct AtSpoolQueueManager {
+pub struct AtSpoolQueueManagerV2 {
     pub jobs: BTreeMap<u64, AtJob>,
     pub next_job_id: u64,
 }
 
-impl AtSpoolQueueManager {
+impl AtSpoolQueueManagerV2 {
     pub fn new() -> Self {
         Self {
             jobs: BTreeMap::new(),
