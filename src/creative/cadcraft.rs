@@ -314,6 +314,23 @@ impl CadCraftEngine {
         id
     }
 
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
+        let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
+        let entity = SketchEntity {
+            id,
+            entity_type,
+            points,
+            dimensions: Vec::new(),
+            properties: BTreeMap::new(),
+        };
+        self.sketch_entities.insert(id, entity);
+        id
+    }
+
     pub fn add_assembly_component(&mut self, name: String, location: [f32; 3]) -> u32 {
         let id = self.next_component_id.fetch_add(1, Ordering::Relaxed);
         let component = AssemblyComponent {
@@ -341,7 +358,8 @@ impl CadCraftEngine {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F100\nM30"),
+            pass_depth: 1.5,
+            waypoints: Vec::new(),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -363,17 +381,17 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut out = Vec::new();
+        let mut buf = Vec::new();
         match format {
             ExportFormat::DXF => {
-                out.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n")
+                buf.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n")
             }
-            ExportFormat::STEP => out.extend_from_slice(
+            ExportFormat::STEP => buf.extend_from_slice(
                 b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
             ),
-            _ => out.extend_from_slice(b"# CadCraft Export\n"),
+            _ => buf.extend_from_slice(b"CadCraft Export\n"),
         }
-        out
+        buf
     }
 }
 

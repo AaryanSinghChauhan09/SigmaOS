@@ -127,8 +127,8 @@ pub struct PresenterNotes {
     pub key_takeaways: Vec<String>,
 }
 
-/// Presenter view state
-#[derive(Debug, Clone, Default)]
+/// Presenter state for presentation mode
+#[derive(Debug, Clone)]
 pub struct PresenterState {
     pub active_deck_id: Option<u32>,
     pub current_slide_index: usize,

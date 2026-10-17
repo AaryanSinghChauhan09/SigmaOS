@@ -344,8 +344,12 @@ impl GnuCoreutilsBsdUserlandEngine {
             list.dedup();
         }
         if numeric {
-            list.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
-        } else if !unique {
+            list.sort_by(|a, b| {
+                let na: f64 = a.parse().unwrap_or(0.0);
+                let nb: f64 = b.parse().unwrap_or(0.0);
+                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
+            });
+        } else {
             list.sort();
         }
         if reverse {
@@ -354,16 +358,18 @@ impl GnuCoreutilsBsdUserlandEngine {
         list
     }
 
-    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
-        if delete {
-            input.chars().filter(|c| !set1.contains(*c)).collect()
+    pub fn run_tr(&self, text: &str, set1: &str, set2: &str, delete_set1: bool) -> String {
+        if delete_set1 {
+            text.chars().filter(|c| !set1.contains(*c)).collect()
         } else {
             let mut res = String::new();
-            for c in input.chars() {
-                if let Some(pos) = set1.find(c) {
-                    if let Some(repl) = set2.chars().nth(pos) {
-                        res.push(repl);
-                    } else if let Some(last) = set2.chars().last() {
+            let s1_chars: Vec<char> = set1.chars().collect();
+            let s2_chars: Vec<char> = set2.chars().collect();
+            for c in text.chars() {
+                if let Some(pos) = s1_chars.iter().position(|&x| x == c) {
+                    if pos < s2_chars.len() {
+                        res.push(s2_chars[pos]);
+                    } else if let Some(&last) = s2_chars.last() {
                         res.push(last);
                     } else {
                         res.push(c);
@@ -1036,19 +1042,19 @@ impl TextProcessingEngine {
         &self,
         content: &str,
         pattern: &str,
+        _is_regex: bool,
         case_insensitive: bool,
-        _invert_match: bool,
-        line_numbers: bool,
+        show_line_numbers: bool,
     ) -> (usize, Vec<String>) {
         let matches = self.grep_match(content, pattern, case_insensitive);
         let count = matches.len();
         let formatted = matches
             .into_iter()
-            .map(|(idx, line)| {
-                if line_numbers {
-                    format!("{}:{}", idx, line)
+            .map(|(line_no, text)| {
+                if show_line_numbers {
+                    format!("{}:{}", line_no, text)
                 } else {
-                    line
+                    text
                 }
             })
             .collect();
@@ -1157,13 +1163,14 @@ impl ArchivalCompressionEngine {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
     }
 
-    pub fn parse_pax_header(&self, bytes: &[u8]) -> BTreeMap<String, String> {
+    pub fn parse_pax_header(&self, pax_bytes: &[u8]) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
-        if let Ok(s) = core::str::from_utf8(bytes) {
-            for line in s.lines() {
-                if let Some((_, rest)) = line.split_once(' ') {
+        if let Ok(text) = core::str::from_utf8(pax_bytes) {
+            for line in text.lines() {
+                let trimmed = line.trim();
+                if let Some((_len, rest)) = trimmed.split_once(' ') {
                     if let Some((k, v)) = rest.split_once('=') {
-                        map.insert(k.trim().to_string(), v.trim().to_string());
+                        map.insert(k.to_string(), v.to_string());
                     }
                 }
             }
@@ -1174,9 +1181,9 @@ impl ArchivalCompressionEngine {
     pub fn configure_compression_level(
         &self,
         format: CompressionFormat,
-        level: i32,
+        level: u32,
     ) -> Result<String, &'static str> {
-        Ok(format!("{:?} level {}", format, level))
+        Ok(format!("{:?} level {} configured", format, level))
     }
 }
 
@@ -1331,8 +1338,8 @@ impl ProcpsPsmiscEngine {
         )
     }
 
-    pub fn fuser_lookup_file(&self, file_path: &str) -> Vec<u32> {
-        self.pgrep_find(file_path)
+    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
+        self.pgrep_find(filename)
     }
 
     pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
@@ -1446,11 +1453,10 @@ impl DocumentationPagerEngine {
         menu_items
     }
 
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u8) -> Option<String> {
-        if page_name == "passwd" && section == 5 {
-            Some("PASSWD(5) File Formats".to_string())
-        } else {
-            self.man_db_lookup(page_name)
+    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
+        match (page_name, section) {
+            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
+            _ => self.man_db_lookup(page_name),
         }
     }
 }
@@ -1642,11 +1648,13 @@ impl AuthPrivilegeSessionEngine {
         env_map: &mut BTreeMap<String, String>,
         action: &str,
         key: &str,
-        val: &str,
+        value: &str,
     ) -> bool {
         if action == "set" {
-            env_map.insert(key.to_string(), val.to_string());
+            env_map.insert(key.to_string(), value.to_string());
             true
+        } else if action == "unset" {
+            env_map.remove(key).is_some()
         } else {
             false
         }
@@ -1855,7 +1863,7 @@ impl CoreUtilsPullRequestGatewayEngine {
     pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
         self.submissions
             .values()
-            .filter(|pr| pr.category == category)
+            .filter(|s| s.category == category)
             .cloned()
             .collect()
     }
@@ -1863,7 +1871,7 @@ impl CoreUtilsPullRequestGatewayEngine {
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
         self.submissions
             .values()
-            .filter(|pr| pr.status == status)
+            .filter(|s| s.status == status)
             .cloned()
             .collect()
     }
@@ -1871,7 +1879,7 @@ impl CoreUtilsPullRequestGatewayEngine {
     pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
         self.submissions
             .values()
-            .filter(|pr| pr.author == author)
+            .filter(|s| s.author == author)
             .cloned()
             .collect()
     }
