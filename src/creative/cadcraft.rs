@@ -13,10 +13,14 @@ use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// FNV-1a checksum for CadCraft PR verification
-pub fn fnv1a_cadcraft_pr_digest(pr_id: u32, data: &str) -> u64 {
+pub fn fnv1a_cadcraft_pr_digest(pr_id: u32, title: &str) -> u64 {
     let mut hash: u64 = 0xcbf29ce484222325;
-    for &byte in pr_id.to_le_bytes().iter().chain(data.as_bytes().iter()) {
-        hash ^= u64::from(*byte);
+    for &byte in pr_id.to_le_bytes().iter() {
+        hash ^= u64::from(byte);
+        hash = hash.wrapping_mul(0x100000001b3);
+    }
+    for &byte in title.as_bytes() {
+        hash ^= u64::from(byte);
         hash = hash.wrapping_mul(0x100000001b3);
     }
     hash
@@ -368,7 +372,7 @@ impl CadCraftEngine {
             tool_diameter,
             feed_rate,
             spindle_speed: 12000.0,
-            gcode_output: "G0 Z5.0\nG1 Z-2.0 F100\nG1 X100.0 F500\n".to_string(),
+            gcode_output: String::from("G00 X0 Y0 Z5\nG01 Z-2 F100\nG01 X100 F500\n"),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -390,29 +394,11 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut data = Vec::new();
         match format {
-            ExportFormat::DXF => {
-                data.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n");
-            }
-            ExportFormat::STEP => {
-                data.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
-            }
-            _ => {
-                data.extend_from_slice(b"# CadCraft Export Data\n");
-            }
-            _ => {
-                out.extend_from_slice(b"# CadCraft Export\n");
-            }
-            _ => {
-                output.extend_from_slice(b"CAD_EXPORT_STREAM\n");
-            }
-            ExportFormat::STEP => buf.extend_from_slice(
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
-            ),
-            _ => buf.extend_from_slice(b"CadCraft Export\n"),
+            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
+            ExportFormat::STEP => b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec(),
+            _ => b"CADCRAFT_BINARY_MODEL".to_vec(),
         }
-        data
     }
 }
 
@@ -490,7 +476,53 @@ impl Default for CadCraft2dDraftingConstraintPrDeployer {
     }
 }
 
-/// Deployer for 3D B-Rep Solid Feature Modeling Engine
+// ============================================================================
+// 2. 3D B-Rep Solid Feature Modeling & Direct Modeling Engine
+// ============================================================================
+
+/// 3D Vector / Point
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Vector3D {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl Vector3D {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+
+    pub fn length(&self) -> f64 {
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+}
+
+/// Boundary Representation (B-Rep) Solid Model
+#[derive(Debug, Clone)]
+pub struct BRepSolidModel {
+    pub name: String,
+    pub vertices: Vec<Vector3D>,
+    pub faces_count: usize,
+    pub edges_count: usize,
+    pub volume: f64,
+    pub surface_area: f64,
+}
+
+impl BRepSolidModel {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            vertices: Vec::new(),
+            faces_count: 0,
+            edges_count: 0,
+            volume: 0.0,
+            surface_area: 0.0,
+        }
+    }
+}
+
+/// Deployer 2: 3D B-Rep Solid Feature Modeling Engine
 #[derive(Debug, Clone)]
 pub struct CadCraft3dSolidModelingPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
@@ -566,101 +598,11 @@ impl Default for CadCraft3dSolidModelingPrDeployer {
     }
 }
 
-/// Deployer for Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
-#[derive(Debug, Clone)]
-pub struct CadCraftAssemblyFemSimulationPrDeployer {
-    pub pr_id: u32,
-    pub assemblies_processed: AtomicU32,
-    pub deployed: AtomicBool,
-    pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
-    pub next_pr_id: u32,
-    pub pr_id: u32,
-    pub assemblies_processed: AtomicU32,
-    pub deployed: AtomicBool,
-}
+// ============================================================================
+// 3. Assembly Mates, CAM G-code Toolpath & FEA Stress Analysis Engine
+// ============================================================================
 
-impl CadCraftAssemblyFemSimulationPrDeployer {
-    pub fn new() -> Self {
-        let mut deployer = Self {
-            pr_id: 2820,
-            assemblies_processed: AtomicU32::new(0),
-            deployed: AtomicBool::new(false),
-            deployed_prs: BTreeMap::new(),
-            next_pr_id: 2821,
-            pr_id: 2820,
-            assemblies_processed: AtomicU32::new(0),
-            deployed: AtomicBool::new(false),
-        };
-        deployer.stage_all_assembly_sim_prs();
-        deployer
-    }
-
-    fn stage_all_assembly_sim_prs(&mut self) {
-        let prs = [
-            (
-                "cadcraft-assembly-mates",
-                "feat(cadcraft): Multi-body assembly mates",
-                "cad_assembly_kinematics",
-            ),
-            (
-                "cadcraft-cam-gcode-generator",
-                "feat(cadcraft): CAM 2.5D/3D toolpath generator",
-                "cad_cam_gcode",
-            ),
-            (
-                "cadcraft-fea-stress-analysis",
-                "feat(cadcraft): FEA finite element stress solver",
-                "cad_fea_simulation",
-            ),
-        ];
-
-        for (comp, title, target_sub) in prs {
-            let pr_id = self.next_pr_id;
-            self.next_pr_id += 1;
-            let pr = CadCraftPullRequestSpec {
-                pr_id,
-                title: String::from(title),
-                description: String::from(comp),
-                branch: format!("pr/cadcraft-{}-{}", pr_id, target_sub),
-                status: "Merged".to_string(),
-                target_module: "src/creative/cadcraft.rs".to_string(),
-                verification_digest: fnv1a_cadcraft_pr_digest(pr_id, title),
-            };
-            self.deployed_prs.insert(pr_id, pr);
-        }
-    }
-
-    pub fn create_solid(&self, name: &str) -> BRepSolidModel {
-        BRepSolidModel::new(name)
-    }
-
-    pub fn generate_pr(&self) -> CadCraftPullRequestSpec {
-        CadCraftPullRequestSpec {
-            pr_id: 2811,
-            component_name: "cadcraft-brep-solid-engine".to_string(),
-            pr_title: "feat(cadcraft): 3D B-Rep solid modeling kernel".to_string(),
-            pr_branch: "pr/cadcraft-2811".to_string(),
-            target_subsystem: "cad_brep_kernel".to_string(),
-            patch_digest: 0xD4E5F678,
-            is_merged: true,
-        }
-    }
-
-    pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs
-            .values()
-            .filter(|pr| pr.is_merged || pr.status == "Merged")
-            .count()
-    }
-}
-
-impl Default for CadCraft3dSolidModelingPrDeployer {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Deployer for Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
+/// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Clone)]
 pub struct CadCraftAssemblyFemSimulationPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
@@ -708,10 +650,7 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.deployed_prs
-            .values()
-            .filter(|pr| pr.is_merged || pr.status == "Merged")
-            .count()
+        self.deployed_prs.values().filter(|pr| pr.is_merged).count()
     }
 }
 
@@ -760,10 +699,6 @@ impl CadCraftMasterPrDeploymentSuite {
             + self.assembly_fem.get_merged_pr_count()
     }
 
-    pub fn compute_total_cadcraft_pr_deployments(&self) -> usize {
-        self.deployed_prs.len()
-    }
-
     pub fn verify_complete_cadcraft_pr_deployment(&self) -> bool {
         self.compute_total_cadcraft_pr_deployments() >= 9
     }
@@ -807,18 +742,14 @@ mod tests {
     fn test_sketch_entities_and_constraints() {
         let mut engine = CadCraftEngine::new();
         engine.init();
-        let e1 =
-            engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
-        let e2 = engine.add_sketch_entity(
-            SketchEntityType::Line,
-            vec![[10.0, 0.0], [10.0, 10.0]],
-        );
+        let e1 = engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
+        let e2 = engine.add_sketch_entity(SketchEntityType::Line, vec![[10.0, 0.0], [10.0, 10.0]]);
         let c1 = engine.add_geometric_constraint(
             GeometricConstraintType::Perpendicular {
                 line1_idx: 0,
                 line2_idx: 1,
             },
-            alloc::vec![e1, e2],
+            vec![e1, e2],
             90.0,
         );
 
