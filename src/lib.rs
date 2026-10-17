@@ -90,8 +90,8 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51, SovereignUniversalPackageFormatMasterEngine,
-    UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV51, SovereignDistroPackageAdvancementsSuiteV8,
+    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -112,7 +112,8 @@ pub use desktop::{
 pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
     SovereignKernelDistroParityPrGateway, SovereignKernelNextGenDistroInnovationsPrGateway,
-    SovereignKernelOpenSourceInnovationsPrGateway, SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
+    SovereignKernelOpenSourceInnovationsPrGateway,
+    SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };
 pub use process::{

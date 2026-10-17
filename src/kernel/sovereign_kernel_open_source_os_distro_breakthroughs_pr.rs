@@ -121,15 +121,14 @@ impl FreeBsdZfsArcAsyncVdevEngine {
 
     pub fn reclaim_arc_memory(&mut self, target_bytes: usize) -> usize {
         let mut reclaimed = 0;
-        self.arc_buffers
-            .retain(|buf| {
-                if reclaimed < target_bytes && buf.state == ZfsArcState::MostRecentlyUsed {
-                    reclaimed += buf.size_bytes;
-                    false
-                } else {
-                    true
-                }
-            });
+        self.arc_buffers.retain(|buf| {
+            if reclaimed < target_bytes && buf.state == ZfsArcState::MostRecentlyUsed {
+                reclaimed += buf.size_bytes;
+                false
+            } else {
+                true
+            }
+        });
         self.current_arc_bytes = self.current_arc_bytes.saturating_sub(reclaimed);
         reclaimed
     }
@@ -304,7 +303,11 @@ impl SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway {
             pinsyscall_karl: OpenBsdPinsyscallKarlRetguardEngine::new(0xABCD_1234, 0x9876_FEDC),
             hammer2_cow: DragonFlyHammer2LocklessCowEngine::new(),
             rump_veriexec: NetBsdRumpVeriexecEngine::new(),
-            crossbow_zone: IllumosCrossbowZoneLimitsEngine::new("zone-production", 10000, 16 * 1024 * 1024 * 1024),
+            crossbow_zone: IllumosCrossbowZoneLimitsEngine::new(
+                "zone-production",
+                10000,
+                16 * 1024 * 1024 * 1024,
+            ),
         }
     }
 

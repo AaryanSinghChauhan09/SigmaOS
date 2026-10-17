@@ -97,7 +97,10 @@ impl SystemdAdvancementsV60Engine {
     /// Format Journald binary streaming frame (`__REALTIME_TIMESTAMP=...`, `MESSAGE=...`).
     pub fn format_journald_stream_frame(&self, timestamp_usec: u64, message: &str) -> Vec<u8> {
         let mut frame = Vec::new();
-        let header = format!("__REALTIME_TIMESTAMP={}\nMESSAGE={}\n\n", timestamp_usec, message);
+        let header = format!(
+            "__REALTIME_TIMESTAMP={}\nMESSAGE={}\n\n",
+            timestamp_usec, message
+        );
         frame.extend_from_slice(header.as_bytes());
         frame
     }
@@ -187,7 +190,10 @@ impl RunitS6AdvancementsV60Engine {
 
     /// Simulate `s6-svscan` supervision tree directory scan.
     pub fn scan_svscan_dir(&self, services: &[&str]) -> Vec<String> {
-        services.iter().map(|s| format!("supervise:{}", s)).collect()
+        services
+            .iter()
+            .map(|s| format!("supervise:{}", s))
+            .collect()
     }
 
     /// Validate `s6-rc` atomic compiled database transition commit.
@@ -198,7 +204,9 @@ impl RunitS6AdvancementsV60Engine {
     /// Generate runit & s6 V60 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV60Manifest {
         CoreUserlandV60Manifest {
-            pr_title: "feat(runit_s6_v60): s6-svscan Tree Supervisor & s6-rc Atomic Database Committer".to_string(),
+            pr_title:
+                "feat(runit_s6_v60): s6-svscan Tree Supervisor & s6-rc Atomic Database Committer"
+                    .to_string(),
             target_subsystem: "Lightweight Process Supervisor".to_string(),
             original_system: "runit (Void Linux) & s6 (Alpine)".to_string(),
             components_added: vec![
@@ -238,11 +246,14 @@ impl SysVinitAdvancementsV60Engine {
     /// Generate SysVinit V60 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV60Manifest {
         CoreUserlandV60Manifest {
-            pr_title: "feat(sysvinit_v60): Inittab Action Governor & Parallel Execution Lock Manager".to_string(),
+            pr_title:
+                "feat(sysvinit_v60): Inittab Action Governor & Parallel Execution Lock Manager"
+                    .to_string(),
             target_subsystem: "Legacy Unix Init Compatibility".to_string(),
             original_system: "System V Init (SysVinit)".to_string(),
             components_added: vec![
-                "/etc/inittab action evaluator for sysinit, respawn, wait, once, and ctrlaltdel".to_string(),
+                "/etc/inittab action evaluator for sysinit, respawn, wait, once, and ctrlaltdel"
+                    .to_string(),
                 "/etc/rc.d/ parallel script execution lock manager".to_string(),
             ],
             performance_multiplier: "POSIX Heritage Compatibility".to_string(),
@@ -321,14 +332,20 @@ impl LaunchdAndroidInitAdvancementsV60Engine {
     }
 
     /// Evaluate macOS `launchd` path state KeepAlive monitor (`PathState` dictionary).
-    pub fn monitor_launchd_path_state(&self, watched_path_exists: bool, expected_state: bool) -> bool {
+    pub fn monitor_launchd_path_state(
+        &self,
+        watched_path_exists: bool,
+        expected_state: bool,
+    ) -> bool {
         watched_path_exists == expected_state
     }
 
     /// Generate launchd & Android init V60 proposal manifest.
     pub fn generate_proposal(&self) -> CoreUserlandV60Manifest {
         CoreUserlandV60Manifest {
-            pr_title: "feat(launchd_android_v60): Android Property Triggers & launchd PathState Monitor".to_string(),
+            pr_title:
+                "feat(launchd_android_v60): Android Property Triggers & launchd PathState Monitor"
+                    .to_string(),
             target_subsystem: "Apple launchd & Android Init Supervisor".to_string(),
             original_system: "launchd & Android init".to_string(),
             components_added: vec![
@@ -355,7 +372,12 @@ impl CronAnacronTimersAtV60Engine {
     }
 
     /// Evaluate Anacron catchup execution with random delay jitter (`RANDOM_DELAY=30`).
-    pub fn calculate_anacron_total_delay_min(&self, base_delay_min: u32, random_delay_max_min: u32, seed: u32) -> u32 {
+    pub fn calculate_anacron_total_delay_min(
+        &self,
+        base_delay_min: u32,
+        random_delay_max_min: u32,
+        seed: u32,
+    ) -> u32 {
         if random_delay_max_min == 0 {
             base_delay_min
         } else {
@@ -459,16 +481,16 @@ impl SovereignInitAndSupervisorAdvancementsV60Suite {
         let sysinit_ok = self.sysvinit.handle_inittab_action("sysinit", false);
 
         // 5. BSD rc hierarchy
-        let bsd_merged = self
-            .bsd_rc
-            .resolve_rc_conf_hierarchy(&BTreeMap::new(), &base, &override_env);
+        let bsd_merged =
+            self.bsd_rc
+                .resolve_rc_conf_hierarchy(&BTreeMap::new(), &base, &override_env);
 
         // 6. Android property trigger
         let mut props = BTreeMap::new();
         props.insert("ro.debuggable".to_string(), "1".to_string());
-        let prop_ok = self
-            .launchd_android
-            .evaluate_android_property_trigger("ro.debuggable", "1", &props);
+        let prop_ok =
+            self.launchd_android
+                .evaluate_android_property_trigger("ro.debuggable", "1", &props);
 
         // 7. Timer stamp parse
         let stamp = self
@@ -500,7 +522,10 @@ mod tests {
         let dropins = engine.parse_drop_in_override(content);
         assert_eq!(dropins.len(), 1);
         assert_eq!(dropins[0].section_name, "Service");
-        assert_eq!(dropins[0].key_values.get("Restart"), Some(&"always".to_string()));
+        assert_eq!(
+            dropins[0].key_values.get("Restart"),
+            Some(&"always".to_string())
+        );
 
         let slice = engine.calculate_cgroup_slice_path("system.slice", "nginx");
         assert_eq!(slice, "/sys/fs/cgroup/system.slice/nginx.service");
