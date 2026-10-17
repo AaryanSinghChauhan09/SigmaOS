@@ -611,6 +611,7 @@ impl OpenRcStatusControllerEngine {
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
     }
+}
 
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
