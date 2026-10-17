@@ -65,15 +65,15 @@ pub struct ImprovementIdeaRecord {
 
 #[derive(Debug)]
 pub struct Sovereign100IdeasSuite {
-    pub ideas: Vec<RoadmapFeatureIdea>,
+    pub ideas: Vec<ImprovementIdeaRecord>,
 }
 
 impl Sovereign100IdeasSuite {
     pub fn new() -> Self {
         let mut suite = Self {
-            features: Vec::with_capacity(100),
+            ideas: Vec::with_capacity(100),
         };
-        suite.seed_100_ideas();
+        suite.populate_all_100_ideas();
         suite
     }
 
@@ -177,7 +177,7 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn total_fulfilled_count(&self) -> usize {
-        self.ideas.iter().filter(|i| i.is_fully_implemented).count()
+        self.ideas.iter().filter(|i| i.is_fulfilled).count()
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
@@ -237,7 +237,7 @@ impl SovereignShardsMasterRegistry {
         let mut registry = Self {
             shards: BTreeMap::new(),
         };
-        registry.register_all_shards();
+        registry.register_all_12_shards();
         registry
     }
 
@@ -459,20 +459,20 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     fn seed_ideas(&mut self) {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 1,
-            id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
             category: "CLI".to_string(),
             source_type: FeatureSourceType::GithubWikiPage,
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
-            fulfilled: true,
         });
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+            category: "Browser".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
-            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
+                .to_string(),
             target_module: "productivity".to_string(),
             is_fully_implemented: true,
         });

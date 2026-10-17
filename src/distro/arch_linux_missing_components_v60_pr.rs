@@ -154,17 +154,23 @@ impl ArchPacmanConfParserPrEngine {
             repositories: vec![
                 PacmanRepositoryConfig {
                     name: String::from("core"),
-                    servers: vec![String::from("https://geo.mirror.pkgbuild.com/core/os/x86_64")],
+                    servers: vec![String::from(
+                        "https://geo.mirror.pkgbuild.com/core/os/x86_64",
+                    )],
                     sig_level: String::from("PackageRequired DatabaseOptional"),
                 },
                 PacmanRepositoryConfig {
                     name: String::from("extra"),
-                    servers: vec![String::from("https://geo.mirror.pkgbuild.com/extra/os/x86_64")],
+                    servers: vec![String::from(
+                        "https://geo.mirror.pkgbuild.com/extra/os/x86_64",
+                    )],
                     sig_level: String::from("PackageRequired DatabaseOptional"),
                 },
                 PacmanRepositoryConfig {
                     name: String::from("multilib"),
-                    servers: vec![String::from("https://geo.mirror.pkgbuild.com/multilib/os/x86_64")],
+                    servers: vec![String::from(
+                        "https://geo.mirror.pkgbuild.com/multilib/os/x86_64",
+                    )],
                     sig_level: String::from("PackageRequired DatabaseOptional"),
                 },
             ],
@@ -172,7 +178,8 @@ impl ArchPacmanConfParserPrEngine {
     }
 
     pub fn validate_sig_level(&self, sig_level: &str) -> bool {
-        !sig_level.contains("Never") && (sig_level.contains("Required") || sig_level.contains("Optional"))
+        !sig_level.contains("Never")
+            && (sig_level.contains("Required") || sig_level.contains("Optional"))
     }
 
     pub fn format_conf_check_cmd(&self) -> String {

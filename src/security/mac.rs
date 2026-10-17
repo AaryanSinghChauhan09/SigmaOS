@@ -89,7 +89,7 @@ pub trait MACPolicy {
 
 /// Security operation
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SecurityOperation {
     Read = 0,
     Write = 1,

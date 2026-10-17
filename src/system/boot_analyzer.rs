@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn test_boot_analyzer_init() {
-        let analyzer = BootAnalyzer::new();
+        let mut analyzer = BootAnalyzer::new();
         analyzer.init();
         assert!(analyzer.enabled.load(Ordering::Relaxed));
     }

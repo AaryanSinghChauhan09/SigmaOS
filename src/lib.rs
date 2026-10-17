@@ -90,8 +90,8 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51, SovereignUniversalPackageFormatMasterEngine,
-    UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV51, SovereignDistroPackageAdvancementsSuiteV8,
+    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
@@ -146,6 +146,8 @@ pub mod tools;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::arch_linux_missing_components_v53_pr::*;
 pub use distro::arch_linux_missing_components_v54_pr::*;
+pub use distro::arch_linux_missing_components_v60_pr::*;
+pub use distro::arch_linux_missing_components_v61_pr::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
