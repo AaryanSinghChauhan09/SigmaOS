@@ -154,10 +154,7 @@ impl FreeBsdPoudriereBulkOptionsPrEngine {
             custom_options: options.iter().map(|s| s.to_string()).collect(),
         };
         self.builds.insert(port.to_string(), spec);
-        format!(
-            "poudriere bulk -j {} -p default {}\n",
-            jail, port
-        )
+        format!("poudriere bulk -j {} -p default {}\n", jail, port)
     }
 }
 
@@ -207,10 +204,7 @@ impl FreeBsdGgateNetworkBlockPrEngine {
             read_only: false,
         };
         self.devices.insert(unit, spec);
-        format!(
-            "ggatec create -u {} {} {}\n",
-            unit, host, path
-        )
+        format!("ggatec create -u {} {} {}\n", unit, host, path)
     }
 }
 
@@ -355,7 +349,13 @@ impl FreeBsdDevctlDevdRulesPrEngine {
         }
     }
 
-    pub fn add_devd_rule(&mut self, system: &str, subsystem: &str, event_type: &str, action: &str) -> String {
+    pub fn add_devd_rule(
+        &mut self,
+        system: &str,
+        subsystem: &str,
+        event_type: &str,
+        action: &str,
+    ) -> String {
         self.rules.push(DevdRuleV60Spec {
             match_system: system.to_string(),
             match_subsystem: subsystem.to_string(),
@@ -748,7 +748,12 @@ mod tests {
         assert!(gcmd.contains("ggatec create -u 1"));
 
         let mut ctl = FreeBsdCtlIscsiTargetPrEngine::new();
-        let cdiff = ctl.create_iscsi_lun(2, 40960, "/dev/zvol/zroot/lun2", "iqn.2026-03.org.sigmaos:lun2");
+        let cdiff = ctl.create_iscsi_lun(
+            2,
+            40960,
+            "/dev/zvol/zroot/lun2",
+            "iqn.2026-03.org.sigmaos:lun2",
+        );
         assert!(cdiff.contains("lun 2"));
 
         let mut mac = FreeBsdMacBibaLomacFrameworkPrEngine::new();
