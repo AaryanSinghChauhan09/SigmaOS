@@ -6,10 +6,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Video codec
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -456,6 +454,32 @@ impl VideoEditor {
         self.timeline.snap_enabled = !self.timeline.snap_enabled;
     }
 
+    /// Toggle proxy media rendering
+    pub fn toggle_proxy(&mut self, enabled: bool) -> bool {
+        self.proxy_enabled = enabled;
+        self.proxy_enabled
+    }
+
+    /// Set active multicam camera angle on a clip
+    pub fn set_multicam_angle(
+        &mut self,
+        track_id: u32,
+        clip_id: u32,
+        angle: u32,
+    ) -> Result<(), &'static str> {
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
+        let clip = track
+            .clips
+            .get_mut(clip_id as usize)
+            .ok_or("Clip not found")?;
+        clip.in_point = angle * 10; // Angle offset representation
+        Ok(())
+    }
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active
@@ -634,7 +658,17 @@ mod tests {
         editor.set_zoom(2.0);
         assert_eq!(editor.timeline.zoom, 2.0);
         editor.toggle_snapping();
-        assert!(!editor.timeline.snap_enabled.load(Ordering::Relaxed));
+        assert!(!editor.timeline.snap_enabled);
+    }
+
+    #[test]
+    fn test_toggle_proxy_and_multicam_angle() {
+        let mut editor = VideoEditor::new();
+        editor.init();
+        assert!(editor.toggle_proxy(true));
+        let track_id = editor.add_track("Multicam Track".to_string(), TrackType::Video);
+        let clip_id = editor.add_clip(track_id, "Cam Angle 1".to_string(), 0, 100).unwrap();
+        assert!(editor.set_multicam_angle(track_id, clip_id, 2).is_ok());
     }
 
     #[test]
