@@ -724,7 +724,11 @@ impl PdfEditor {
                     if let Some((r, g, b)) = shape.fill_color {
                         // CMYK conversion simulation retaining RGB representation
                         let k = 255 - r.max(g).max(b);
-                        shape.fill_color = Some((r.saturating_sub(k), g.saturating_sub(k), b.saturating_sub(k)));
+                        shape.fill_color = Some((
+                            r.saturating_sub(k),
+                            g.saturating_sub(k),
+                            b.saturating_sub(k),
+                        ));
                     }
                 }
             }
