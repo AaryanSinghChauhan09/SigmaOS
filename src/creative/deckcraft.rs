@@ -92,9 +92,9 @@ impl SlideExporterEngine {
                 }
             }
             ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<title>");
+                output.extend_from_slice(b"<svg viewBox=\"0 0 1920 1080\"><title>");
                 output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"</title>\n</svg>");
+                output.extend_from_slice(b"</title></svg>");
             }
         }
 

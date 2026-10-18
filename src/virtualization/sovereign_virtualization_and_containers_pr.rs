@@ -251,7 +251,8 @@ impl LibvirtDomainEngine {
         }
     }
 
-    pub fn set_storage_pool(&mut self, _pool_type: LibvirtStoragePoolType, path: &str) {
+    pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
+        self.storage_pool_type = pool_type;
         self.storage_pool_path = path.to_string();
     }
 
@@ -1428,6 +1429,7 @@ mod tests {
         engine.create_storage_volume("vol1", "default", 100 * 1024 * 1024 * 1024, "qcow2");
         engine.add_nat_bridge("virbr2");
         engine.add_nwfilter_rule("clean-traffic", "accept", "inout", "ip");
+        engine.set_storage_pool(LibvirtStoragePoolType::Zfs, "/zfs/pool");
         assert!(engine.start_domain("test-vm"));
         assert_eq!(engine.storage_volumes.len(), 1);
         assert_eq!(engine.nwfilter_rules.len(), 1);

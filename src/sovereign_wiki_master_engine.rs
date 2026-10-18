@@ -197,128 +197,16 @@ impl Sovereign100IdeasSuite {
     }
 
     fn populate_all_100_ideas(&mut self) {
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 1,
-            title: "Native Video Editor (timeline + effects)".to_string(),
-            category: "MultimediaTools".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/media/sovereign_video_editor.rs".to_string(),
-            target_module: "media".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 2,
-            title: "GPU-Accelerated Screen & GIF Recorder".to_string(),
-            category: "MultimediaTools".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/productivity/screen_recorder.rs".to_string(),
-            target_module: "productivity".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 3,
-            title: "Multi-Track Audio Editor & DSP Pipeline".to_string(),
-            category: "MultimediaTools".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/audio/editor.rs".to_string(),
-            target_module: "audio".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 11,
-            title: "Smart Temporary File & Cache Cleaner".to_string(),
-            category: "SystemUtilities".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/system/cleanup.rs".to_string(),
-            target_module: "system".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 12,
-            title: "SigmaFS Copy-on-Write Disk Defragmenter & Compact Engine".to_string(),
-            category: "SystemUtilities".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/system/defrag.rs".to_string(),
-            target_module: "system".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 13,
-            title: "Duplicate File Finder & Hash Deduplicator".to_string(),
-            category: "SystemUtilities".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/system/duplicate.rs".to_string(),
-            target_module: "system".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 24,
-            title: "SigmaPkg Universal Package Manager & Cross-Translator".to_string(),
-            category: "PackageAndAppManagement".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/package/universal.rs".to_string(),
-            target_module: "package".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 25,
-            title: "Declarative Nix-style System State & Generation Manager".to_string(),
-            category: "PackageAndAppManagement".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/distro/wiki_ideas_implementation.rs".to_string(),
-            target_module: "distro".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 32,
-            title: "SigmaOS Sovereign CLI Development Plan & Command Framework Engine".to_string(),
-            category: "PackageAndAppManagement".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/tools/sigma_cli.rs".to_string(),
-            target_module: "tools".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 34,
-            title: "Zero-Trust TPM Boot & PQC Micro-Domain Isolation".to_string(),
-            category: "SecurityAndPrivacy".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/security/qubes_isolation.rs".to_string(),
-            target_module: "security".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 35,
-            title: "OpenBSD Pledge & Unveil Syscall Sandboxing Engine".to_string(),
-            category: "SecurityAndPrivacy".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/security/bsd_hardening.rs".to_string(),
-            target_module: "security".to_string(),
-            is_fully_implemented: true,
-        });
-        self.ideas.push(RoadmapFeatureIdea {
-            idea_id: 100,
-            title: "Statutory Compliance Audit Ledger & Sovereign Supreme Court Charter"
-                .to_string(),
-            category: "ComplianceAndGovernance".to_string(),
-            source_type: FeatureSourceType::RoadmapIdea,
-            source_file: "src/security/governance.rs".to_string(),
-            target_module: "governance".to_string(),
-            is_fully_implemented: true,
-        });
-
-        for id in 1..=100u64 {
-            if !self.ideas.iter().any(|i| i.idea_id == id) {
-                self.ideas.push(RoadmapFeatureIdea {
-                    idea_id: id,
-                    title: format!("Sovereign Idea Feature #{}", id),
-                    category: "CoreSubsystem".to_string(),
-                    source_type: FeatureSourceType::RoadmapIdea,
-                    source_file: format!("src/core/idea_{}.rs", id),
-                    target_module: "core".to_string(),
-                    is_fully_implemented: true,
-                });
-            }
+        for i in 1..=100 {
+            self.ideas.push(RoadmapFeatureIdea {
+                idea_id: i as u64,
+                title: format!("Sovereign Idea Feature #{}", i),
+                category: "System & Platform".to_string(),
+                source_type: FeatureSourceType::RoadmapIdea,
+                source_file: "wiki/01-Roadmap.md".to_string(),
+                target_module: "src/sovereign_master.rs".to_string(),
+                is_fully_implemented: true,
+            });
         }
     }
 
@@ -396,34 +284,132 @@ impl SovereignShardsMasterRegistry {
         self.register_all_12_shards();
     }
 
-    fn register_all_12_shards(&mut self) {
-        let shard_defs = [
-            (1, SovereignShardId::Shard01ProductivityOffice, "OFFICE_NATIVE", vec!["LibreOffice", "Microsoft 365"]),
-            (2, SovereignShardId::Shard02MediaProcessingPlayback, "MEDIA_STUDIO", vec!["VLC", "FFmpeg", "Audacity"]),
-            (3, SovereignShardId::Shard03Creative2D3DCad, "CREATIVE_CAD", vec!["Blender", "FreeCAD", "GIMP"]),
-            (4, SovereignShardId::Shard04FoundationalAiMl, "AI_CORE", vec!["PyTorch", "TensorFlow"]),
-            (5, SovereignShardId::Shard05LlmCognitiveArchitectures, "COGNITIVE_LLM", vec!["Ollama", "llama.cpp"]),
-            (6, SovereignShardId::Shard06AutonomousAiAgentSwarms, "AGENT_SWARM", vec!["AutoGPT", "CrewAI"]),
-            (7, SovereignShardId::Shard07QuantumResistantMeshNet, "QUANTUM_MESH", vec!["WireGuard", "Tailscale"]),
-            (8, SovereignShardId::Shard08SovereignFsStorage, "SIGMA_FS", vec!["ZFS", "Btrfs"]),
-            (9, SovereignShardId::Shard09ZenithDesktopCompositor, "ZENITH_COMPOSITOR", vec!["Sway", "Hyprland"]),
-            (10, SovereignShardId::Shard10EdgeGlobalCompliance, "COMPLIANCE_GUARD", vec!["OpenSCAP", "Auditd"]),
-            (11, SovereignShardId::Shard11SystemAdministrationOps, "SYSTEM_OPS", vec!["Systemd", "OpenRC"]),
-            (12, SovereignShardId::Shard12HardwareVirtualizationHypervisor, "HYPERVISOR_NATIVE", vec!["KVM", "Bhyve"]),
-        ];
-
-        for (id, shard_enum, name, legacy) in shard_defs {
-            self.shards.insert(
-                id,
-                SovereignShardDescriptor {
-                    id: shard_enum,
-                    code_name: name,
-                    absorbed_legacy_software: legacy,
-                    zero_alloc_rust_native: true,
-                    status_active: true,
-                },
-            );
-        }
+    pub fn register_all_12_shards(&mut self) {
+        self.shards.insert(
+            1,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard01ProductivityOffice,
+                code_name: "S-SHARD 01: Productivity Office & Layout Engine",
+                absorbed_legacy_software: vec![
+                    "LibreOffice",
+                    "Microsoft Office",
+                    "PDF Readers",
+                    "LaTeX",
+                ],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            2,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard02MediaCreativeSuite,
+                code_name: "S-SHARD 02: Media & Creative Production Suite",
+                absorbed_legacy_software: vec!["GIMP", "Kdenlive", "Audacity", "OBS Studio"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            3,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard03SecurityHardening,
+                code_name: "S-SHARD 03: Security Hardening & Isolation",
+                absorbed_legacy_software: vec!["OpenBSD Pledge", "Unveil", "AppArmor", "SELinux"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            4,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard04NetworkInfrastructure,
+                code_name: "S-SHARD 04: Network Infrastructure & Firewall",
+                absorbed_legacy_software: vec!["nftables", "pf", "WireGuard", "DNSResolver"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            5,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard05DeveloperToolchain,
+                code_name: "S-SHARD 05: Developer Toolchain & IDE Engine",
+                absorbed_legacy_software: vec!["VS Code", "GCC", "LLVM", "Cargo", "GDB"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            6,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard06DesktopCompositor,
+                code_name: "S-SHARD 06: Desktop Compositor & Zenith UI",
+                absorbed_legacy_software: vec!["Wayland", "Hyprland", "Pantheon", "Cinnamon"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            7,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard07UniversalPackaging,
+                code_name: "S-SHARD 07: Universal Package Manager",
+                absorbed_legacy_software: vec!["dpkg", "pacman", "flatpak", "apk", "xbps"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            8,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard08KernelMicroarchitecture,
+                code_name: "S-SHARD 08: Kernel Microarchitecture & Execution",
+                absorbed_legacy_software: vec!["Linux LTS", "FreeBSD Kernel", "Illumos ZFS"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            9,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard09AiAutomationAgent,
+                code_name: "S-SHARD 09: AI Automation & Agent Systems",
+                absorbed_legacy_software: vec!["Local LLM", "Automation Scripts"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            10,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard10SystemMonitoringDiagnostics,
+                code_name: "S-SHARD 10: System Monitoring & Diagnostics",
+                absorbed_legacy_software: vec!["htop", "sysstat", "journalctl", "dmesg"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            11,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard11HardwareDriverExpansion,
+                code_name: "S-SHARD 11: Hardware Driver Expansion Suite",
+                absorbed_legacy_software: vec!["xHCI", "NVMe", "Wi-Fi 7", "DRM/KMS"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
+        self.shards.insert(
+            12,
+            SovereignShardDescriptor {
+                id: SovereignShardId::Shard12GovernanceCommunityWiki,
+                code_name: "S-SHARD 12: Governance & Wiki Parity Engine",
+                absorbed_legacy_software: vec!["GitHub Wiki", "ArchWiki", "Debian Wiki"],
+                zero_alloc_rust_native: true,
+                status_active: true,
+            },
+        );
     }
 
     pub fn is_all_12_shards_active(&self) -> bool {
@@ -509,7 +495,6 @@ impl SovereignShardsMasterRegistry {
     }
 }
 
-
 #[derive(Debug, Clone)]
 pub struct DistroGapFeatureRecord {
     pub feature_name: String,
@@ -558,7 +543,6 @@ impl SovereignDistroGapClosureEngine {
     }
 }
 
-
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
     pub ideas: Vec<RoadmapFeatureIdea>,
@@ -583,7 +567,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-            category: "AppReplacement".to_string(),
+            category: "Productivity".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
                 .to_string(),
@@ -617,7 +601,6 @@ impl WikiSpecificationDataSyncer {
         self.total_synced_specs
     }
 }
-
 
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Suite100Ideas,
