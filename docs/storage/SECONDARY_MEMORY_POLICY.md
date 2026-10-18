@@ -70,7 +70,19 @@ SigmaOS implements a **hybrid buffer cache and page cache engine**:
 - Dirty pages are scheduled for rapid background writeback before page reclamation.
 - Persistent OOM conditions throttle non-critical storage request queues rather than panicking kernel.
 
-### Error & Hotplug Policy
+### NUMA Behavior Policy
+- On multi-socket NUMA systems, block request queues and buffer page cache allocations are preferentially bound to the local NUMA memory node (`NodeId`) associated with the physical PCIe root complex or controller.
+- Device DMA buffers and submission/completion ring queues allocate physical frames from local NUMA memory pools to minimize inter-socket interconnect latency.
+- If local NUMA memory reaches critical watermarks, allocations may fall back to remote NUMA nodes, incrementing diagnostic metrics without causing operational failure.
+
+### Storage Hotplug Policy
+- When a hot-pluggable storage device (NVMe drive removal, USB storage disconnect, VirtIO hypervisor detach) is removed:
+  1. The device driver detaches the controller handle and cancels active DMA and interrupt channels.
+  2. All pending in-flight block I/O requests transition to `RequestState::Failed` returning `BlockError::DeviceDetached`.
+  3. Mount points associated with the detached device are force-unmounted safely without kernel panics, discarding clean cache pages and returning `BlockError::DeviceDetached` for subsequent read/write attempts.
+  4. Device resources and block device IDs are released back to the manager once all active file descriptors are closed.
+
+### Error Policy
 - Unbounded retries are forbidden; I/O operations enforce maximum timeout and retry thresholds.
 - Storage device removal (hot-unplug) invalidates device handles and returns `BlockError::DeviceDetached` to pending waiters.
 - FSCK self-healing mechanisms repair minor metadata corruption automatically upon mount.

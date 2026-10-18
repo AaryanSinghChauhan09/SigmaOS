@@ -2,7 +2,10 @@
 // Comprehensive Integration Test Suite for Cachy Linux Missing Components PR Gateway
 // (`tests/test_cachy_linux_missing_components_pr.rs`)
 
-use sigmaos::distro::cachy_linux_missing_components_pr_gateway::*;
+#[path = "../src/distro/cachy_linux_missing_components_pr_gateway.rs"]
+mod cachy_linux_missing_components_pr_gateway;
+
+use cachy_linux_missing_components_pr_gateway::*;
 
 #[test]
 fn test_cachy_linux_missing_components_pr_gateway_full_lifecycle() {
