@@ -13932,17 +13932,11 @@ mod tests_phase2 {
         let cf_rule = CustomConditionalFormatRule {
             rule_id: "RULE_01".to_string(),
             target_range: "A1:A10".to_string(),
-            format_type: ConditionalFormatType::CellIs {
-                operator: ">".to_string(),
-                threshold: 50.0,
-            },
+            format_type: ConditionalFormatType::CellIs { operator: ">".to_string(), threshold: 50.0 },
             highlight_background_hex: "#FF0000".to_string(),
         };
         let cf_eval = cf_engine.evaluate_rule(&cf_rule, &[("A1", 75.0), ("A2", 30.0)]);
-        assert_eq!(
-            cf_eval[0].applied_background_color,
-            Some("#FF0000".to_string())
-        );
+        assert_eq!(cf_eval[0].applied_background_color, Some("#FF0000".to_string()));
         assert_eq!(cf_eval[1].applied_background_color, None);
 
         // 52. Sovereign Microsoft Power BI Calculated Table Engine
@@ -13965,10 +13959,7 @@ mod tests_phase2 {
         };
         let score_res = lead_scoring_engine.calculate_lead_score(&lead_in);
         assert!(score_res.final_lead_score >= 80);
-        assert_eq!(
-            score_res.recommended_action,
-            "Assign to Enterprise AE immediately"
-        );
+        assert_eq!(score_res.recommended_action, "Assign to Enterprise AE immediately");
 
         // 54. Sovereign Odoo Inventory Batch Serial Tracking Engine
         let batch_engine = SovereignOdooInventoryBatchSerialTrackingEngine::new();
@@ -13979,8 +13970,7 @@ mod tests_phase2 {
             quantity: 50,
             is_expired: false,
         };
-        let transfer_res =
-            batch_engine.process_inventory_transfer(&batch_item, "WH/Stock", "WH/Output", 20);
+        let transfer_res = batch_engine.process_inventory_transfer(&batch_item, "WH/Stock", "WH/Output", 20);
         assert!(transfer_res.is_movement_valid);
         assert_eq!(transfer_res.moved_quantity, 20);
 
@@ -14068,21 +14058,9 @@ impl SovereignGoogleDocsPaginatedHeaderFooterEngine {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConditionalFormatType {
-    CellIs {
-        operator: String,
-        threshold: f64,
-    },
-    ColorScale {
-        min_color_hex: String,
-        max_color_hex: String,
-        min_val: f64,
-        max_val: f64,
-    },
-    DataBar {
-        bar_color_hex: String,
-        min_val: f64,
-        max_val: f64,
-    },
+    CellIs { operator: String, threshold: f64 },
+    ColorScale { min_color_hex: String, max_color_hex: String, min_val: f64, max_val: f64 },
+    DataBar { bar_color_hex: String, min_val: f64, max_val: f64 },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -14119,10 +14097,7 @@ impl SovereignGoogleSheetsCustomConditionalFormattingRuleEngine {
             let mut bar_pct = None;
 
             match &rule.format_type {
-                ConditionalFormatType::CellIs {
-                    operator,
-                    threshold,
-                } => {
+                ConditionalFormatType::CellIs { operator, threshold } => {
                     let matched = match operator.as_str() {
                         ">" => val > *threshold,
                         ">=" => val >= *threshold,
@@ -14135,12 +14110,7 @@ impl SovereignGoogleSheetsCustomConditionalFormattingRuleEngine {
                         bg = Some(rule.highlight_background_hex.clone());
                     }
                 }
-                ConditionalFormatType::ColorScale {
-                    min_val,
-                    max_val,
-                    min_color_hex,
-                    max_color_hex,
-                } => {
+                ConditionalFormatType::ColorScale { min_val, max_val, min_color_hex, max_color_hex } => {
                     if val >= *max_val {
                         bg = Some(max_color_hex.clone());
                     } else if val <= *min_val {
@@ -14149,9 +14119,7 @@ impl SovereignGoogleSheetsCustomConditionalFormattingRuleEngine {
                         bg = Some(rule.highlight_background_hex.clone());
                     }
                 }
-                ConditionalFormatType::DataBar {
-                    min_val, max_val, ..
-                } => {
+                ConditionalFormatType::DataBar { min_val, max_val, .. } => {
                     let clamped = val.clamp(*min_val, *max_val);
                     let range = max_val - min_val;
                     let pct = if range > 0.0 {
@@ -14210,10 +14178,7 @@ impl SovereignMicrosoftPowerBiCalculatedTableEngine {
         }
 
         let mut calculated_columns = HashMap::new();
-        calculated_columns.insert(
-            format!("{}_CALC", source_column.column_name),
-            calc_col.clone(),
-        );
+        calculated_columns.insert(format!("{}_CALC", source_column.column_name), calc_col.clone());
 
         PowerBiCalculatedTableResult {
             table_name: table_name.to_string(),
@@ -14369,17 +14334,12 @@ impl SovereignBitrix24OmnichannelTaskKanbanAutomationEngine {
         Self
     }
 
-    pub fn evaluate_kanban_automation(
-        &self,
-        task: &KanbanTaskItem,
-        target_stage: &str,
-    ) -> KanbanAutomationResult {
-        let (assigned_agent, escalation) =
-            if task.is_overdue || task.priority == TicketPriority::Urgent {
-                ("Tier_2_Lead_Agent".to_string(), true)
-            } else {
-                ("Default_Queue_Worker".to_string(), false)
-            };
+    pub fn evaluate_kanban_automation(&self, task: &KanbanTaskItem, target_stage: &str) -> KanbanAutomationResult {
+        let (assigned_agent, escalation) = if task.is_overdue || task.priority == TicketPriority::Urgent {
+            ("Tier_2_Lead_Agent".to_string(), true)
+        } else {
+            ("Default_Queue_Worker".to_string(), false)
+        };
 
         KanbanAutomationResult {
             task_id: task.task_id.clone(),
