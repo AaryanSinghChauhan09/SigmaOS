@@ -9,6 +9,7 @@ pub mod deckcraft;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
+pub mod effectcraft_artcraft_parity_pr;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
@@ -60,6 +61,20 @@ pub use effectcraft::{
     EffectCraftNodeCompositingPrDeployer, EffectCraftParticleShaderPrDeployer,
     EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
     NodeGraph, NodeType, Parameter, ParameterType,
+};
+pub use effectcraft_artcraft_parity_pr::{
+    EffectcraftArtcraftParityPrSuite, EffectcraftArtcraftPrProposalManifest,
+    EffectcraftCameraTracker3dReconstructionPrEngine,
+    EffectcraftCleanPlateWireRemovalPrEngine, EffectcraftColorMatchPytorchGradePrEngine,
+    EffectcraftDeepCompositingExrChannelPrEngine,
+    EffectcraftGpuFluidDynamicsSimulationPrEngine,
+    EffectcraftProjectionMapping3dMeshPrEngine,
+    EffectcraftStereoscopic3dDepthMapPrEngine,
+    EffectcraftSubsurfaceScatteringSkinShaderPrEngine,
+    EffectcraftTimeWarpRetimingOpticalFlowPrEngine,
+    EffectcraftVolumetricLightingRaymarchingPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftArtcraftParityPrGatewayV2,
+    Stereo3dMode, SubsurfaceProfile, SurveyPointTarget, VolumetricLightParams,
 };
 pub use effectcraft_missing_components_parity_pr::{
     ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine,
