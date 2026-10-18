@@ -40,3 +40,6 @@ pub use vendor_hardware::{
 
 pub mod sovereign_virtualization_and_containers_pr;
 pub use sovereign_virtualization_and_containers_pr::*;
+
+pub mod sovereign_virtualization_and_containers_v61_pr;
+pub use sovereign_virtualization_and_containers_v61_pr::*;
