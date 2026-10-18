@@ -126,8 +126,7 @@ impl UniversalDistroPackageFormat {
     /// to eliminate multi-KB `String` heap allocations on every manifest autodetect call.
     pub fn autodetect_format_from_manifest(manifest_text: &str) -> Self {
         if contains_ignore_case(manifest_text, "package:")
-            && (contains_ignore_case(manifest_text, "depends:")
-                || contains_ignore_case(manifest_text, "architecture:"))
+            && (contains_ignore_case(manifest_text, "depends:") || contains_ignore_case(manifest_text, "architecture:"))
         {
             Self::AptDeb
         } else if contains_ignore_case(manifest_text, "pkgname=")
@@ -141,57 +140,41 @@ impl UniversalDistroPackageFormat {
         {
             Self::DnfRpm
         } else if contains_ignore_case(manifest_text, "# maintainer:")
-            && (contains_ignore_case(manifest_text, "pkgname=")
-                || contains_ignore_case(manifest_text, "subpackages="))
+            && (contains_ignore_case(manifest_text, "pkgname=") || contains_ignore_case(manifest_text, "subpackages="))
         {
             Self::AlpineApk
-        } else if contains_ignore_case(manifest_text, "pkgname=")
-            && contains_ignore_case(manifest_text, "short_desc=")
-        {
+        } else if contains_ignore_case(manifest_text, "pkgname=") && contains_ignore_case(manifest_text, "short_desc=") {
             Self::VoidXbps
         } else if contains_ignore_case(manifest_text, "eapi=")
             || contains_ignore_case(manifest_text, "keywords=")
             || contains_ignore_case(manifest_text, "inherit ")
         {
             Self::GentooEbuild
-        } else if contains_ignore_case(manifest_text, "name = ")
-            && contains_ignore_case(manifest_text, "origin = ")
-        {
+        } else if contains_ignore_case(manifest_text, "name = ") && contains_ignore_case(manifest_text, "origin = ") {
             Self::FreeBsdPkg
-        } else if contains_ignore_case(manifest_text, "@name ")
-            || contains_ignore_case(manifest_text, "@cwd ")
-        {
+        } else if contains_ignore_case(manifest_text, "@name ") || contains_ignore_case(manifest_text, "@cwd ") {
             Self::OpenBsdPkg
         } else if contains_ignore_case(manifest_text, "inputs.nixpkgs")
             || contains_ignore_case(manifest_text, "stdenv.mkderivation")
             || contains_ignore_case(manifest_text, "{ pkgs, ... }")
         {
             Self::NixFlake
-        } else if contains_ignore_case(manifest_text, "define-public")
-            && contains_ignore_case(manifest_text, "package-with-explicit-inputs")
+        } else if contains_ignore_case(manifest_text, "define-public") && contains_ignore_case(manifest_text, "package-with-explicit-inputs")
         {
             Self::GuixScheme
-        } else if contains_ignore_case(manifest_text, "app-id:")
-            || contains_ignore_case(manifest_text, "runtime:")
-            || contains_ignore_case(manifest_text, "sdk:")
+        } else if contains_ignore_case(manifest_text, "app-id:") || contains_ignore_case(manifest_text, "runtime:") || contains_ignore_case(manifest_text, "sdk:")
         {
             Self::FlatpakApp
-        } else if contains_ignore_case(manifest_text, "name:")
-            && contains_ignore_case(manifest_text, "confinement:")
-        {
+        } else if contains_ignore_case(manifest_text, "name:") && contains_ignore_case(manifest_text, "confinement:") {
             Self::SnapApp
         } else if contains_ignore_case(manifest_text, "<eopkg>")
             || contains_ignore_case(manifest_text, "<source>")
             || contains_ignore_case(manifest_text, "<package>")
         {
             Self::SolusEopkg
-        } else if contains_ignore_case(manifest_text, "swupd")
-            || contains_ignore_case(manifest_text, "bundle:")
-        {
+        } else if contains_ignore_case(manifest_text, "swupd") || contains_ignore_case(manifest_text, "bundle:") {
             Self::SwupdBundle
-        } else if contains_ignore_case(manifest_text, "class ")
-            && contains_ignore_case(manifest_text, "< formula")
-        {
+        } else if contains_ignore_case(manifest_text, "class ") && contains_ignore_case(manifest_text, "< formula") {
             Self::HomebrewBottle
         } else if contains_ignore_case(manifest_text, "[package]")
             && contains_ignore_case(manifest_text, "name =")
@@ -213,10 +196,9 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
         return false;
     }
     haystack.as_bytes().windows(needle.len()).any(|window| {
-        window
-            .iter()
-            .zip(needle.bytes())
-            .all(|(&h, n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        window.iter().zip(needle.bytes()).all(|(&h, n)| {
+            h.to_ascii_lowercase() == n.to_ascii_lowercase()
+        })
     })
 }
 

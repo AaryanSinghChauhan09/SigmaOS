@@ -120,7 +120,9 @@ impl GraphicsDisplayPrCategory {
             Self::WaylandPresentationTimeAndDmabufModifiers => {
                 "wayland-presentation-time-and-dmabuf-modifiers"
             }
-            Self::DrmKmsVrrAndAtomicPlaneComposition => "drm-kms-vrr-and-atomic-plane-composition",
+            Self::DrmKmsVrrAndAtomicPlaneComposition => {
+                "drm-kms-vrr-and-atomic-plane-composition"
+            }
             Self::MesaNirOptimizationAndEglSync => "mesa-nir-optimization-and-egl-sync",
             Self::VulkanMeshShadingAndTimelineSemaphores => {
                 "vulkan-mesh-shading-and-timeline-semaphores"
@@ -961,8 +963,7 @@ impl SovereignWlrootsEngine {
     }
 
     pub fn configure_output_layout(&mut self, output_name: &str, x: i32, y: i32) {
-        self.output_positions
-            .insert(output_name.to_string(), (x, y));
+        self.output_positions.insert(output_name.to_string(), (x, y));
     }
 
     pub fn accumulate_damage(&mut self, rect: (i32, i32, u32, u32)) {
@@ -1234,10 +1235,7 @@ impl SovereignEvdevEngine {
     }
 
     pub fn lookup_keycode_name(&self, code: u16) -> String {
-        self.keycode_names
-            .get(&code)
-            .cloned()
-            .unwrap_or_else(|| format!("KEY_UNKNOWN({})", code))
+        self.keycode_names.get(&code).cloned().unwrap_or_else(|| format!("KEY_UNKNOWN({})", code))
     }
 }
 
@@ -1277,13 +1275,7 @@ impl SovereignLibinputEngine {
 
     pub fn parse_gesture(&mut self, fingers: u32, dx: f32, dy: f32) -> String {
         let name = match fingers {
-            3 => {
-                if dx.abs() > dy.abs() {
-                    "SWIPE_HORIZONTAL_3F"
-                } else {
-                    "SWIPE_VERTICAL_3F"
-                }
-            }
+            3 => if dx.abs() > dy.abs() { "SWIPE_HORIZONTAL_3F" } else { "SWIPE_VERTICAL_3F" },
             4 => "SWIPE_WORKSPACE_4F",
             2 => "PINCH_ZOOM_2F",
             _ => "GESTURE_UNKNOWN",
@@ -1341,21 +1333,10 @@ impl SovereignFramebufferEngine {
         self.pixels.copy_from_slice(&self.back_buffer);
     }
 
-    pub fn draw_psf2_glyph_char(
-        &mut self,
-        _ch: char,
-        x: u32,
-        y: u32,
-        fg_color: u32,
-        bg_color: u32,
-    ) {
+    pub fn draw_psf2_glyph_char(&mut self, _ch: char, x: u32, y: u32, fg_color: u32, bg_color: u32) {
         for gy in 0..16 {
             for gx in 0..8 {
-                let color = if (gx + gy) % 2 == 0 {
-                    fg_color
-                } else {
-                    bg_color
-                };
+                let color = if (gx + gy) % 2 == 0 { fg_color } else { bg_color };
                 self.draw_pixel(x + gx, y + gy, color);
             }
         }
@@ -1365,8 +1346,7 @@ impl SovereignFramebufferEngine {
         let offset = (lines * self.width * 16) as usize;
         if offset < self.back_buffer.len() {
             self.back_buffer.drain(0..offset);
-            self.back_buffer
-                .resize((self.width * self.height) as usize, 0x000000);
+            self.back_buffer.resize((self.width * self.height) as usize, 0x000000);
         }
     }
 }
@@ -1824,10 +1804,7 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         // 2. Audit X11 Server
         let win = self.x11_engine.create_window(1, 100, 100, 800, 600);
         let screen_conf = self.x11_engine.set_screen_config(2560, 1440, 144);
-        results.insert(
-            "X11 Server & Window Hierarchy Functional",
-            win.is_ok() && screen_conf,
-        );
+        results.insert("X11 Server & Window Hierarchy Functional", win.is_ok() && screen_conf);
 
         // 3. Audit Wayland Engine
         let surf_id = self.wayland_engine.create_surface();
@@ -1854,10 +1831,7 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         // 6. Audit libdrm
         let cap = self.libdrm_engine.get_cap("DRM_CAP_DUMB_BUFFER");
         let planes = self.libdrm_engine.get_plane_resources();
-        results.insert(
-            "libdrm Ioctl & Plane Capability Query Functional",
-            cap == Some(1) && !planes.is_empty(),
-        );
+        results.insert("libdrm Ioctl & Plane Capability Query Functional", cap == Some(1) && !planes.is_empty());
 
         // 7. Audit Vulkan API
         let vk_img = self.vulkan_engine.submit_command_buffer();
@@ -1869,10 +1843,7 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         // 8. Audit OpenGL API
         let render_ok = self.opengl_engine.render_frame();
         let compute_ok = self.opengl_engine.dispatch_compute(16, 16, 1);
-        results.insert(
-            "OpenGL GLSL Context & Compute Shader Functional",
-            render_ok && compute_ok,
-        );
+        results.insert("OpenGL GLSL Context & Compute Shader Functional", render_ok && compute_ok);
 
         // 9. Audit Weston Compositor
         let views = self.weston_engine.repaint_output();
@@ -1909,18 +1880,12 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         self.compiz_engine.rotate_cube(0.5);
         let disp = self.compiz_engine.step_wobbly_physics(2.0);
         let proj = self.compiz_engine.project_cube_face(0);
-        results.insert(
-            "Compiz 3D Desktop Cube & Physics Projection Functional",
-            disp > 0.0 && proj.0 != 0.0,
-        );
+        results.insert("Compiz 3D Desktop Cube & Physics Projection Functional", disp > 0.0 && proj.0 != 0.0);
 
         // 15. Audit Picom Vsync & Blur
         let passes = self.picom_engine.execute_dual_kawase_passes();
         let rounded_ok = self.picom_engine.render_rounded_corner_clip(12);
-        results.insert(
-            "Picom Dual-Kawase Blur & Rounded Corner Clipping Functional",
-            passes == 10 && rounded_ok,
-        );
+        results.insert("Picom Dual-Kawase Blur & Rounded Corner Clipping Functional", passes == 10 && rounded_ok);
 
         // 16. Audit Xwayland Bridge
         self.xwayland_engine.sync_clipboard("Wayland Selection");
@@ -1949,15 +1914,11 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         // 18. Audit libinput Gesture & Accel
         let is_palm = self.libinput_engine.is_palm_touch(10, 1000);
         let gesture = self.libinput_engine.parse_gesture(3, 10.0, 0.0);
-        results.insert(
-            "libinput Palm Rejection & Multi-finger Gesture Functional",
-            is_palm && !gesture.is_empty(),
-        );
+        results.insert("libinput Palm Rejection & Multi-finger Gesture Functional", is_palm && !gesture.is_empty());
 
         // 19. Audit Console Framebuffer
         self.fbdev_engine.draw_pixel(100, 100, 0xFF00FF00);
-        self.fbdev_engine
-            .draw_psf2_glyph_char('X', 200, 200, 0xFFFFFFFF, 0x00000000);
+        self.fbdev_engine.draw_psf2_glyph_char('X', 200, 200, 0xFFFFFFFF, 0x00000000);
         self.fbdev_engine.swap_framebuffer();
         results.insert(
             "Console Framebuffer fbdev Pixel Drawing Functional",

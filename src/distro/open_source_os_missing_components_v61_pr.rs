@@ -512,16 +512,46 @@ impl SovereignOpenSourceOsMissingComponentsV61PrSuite {
 
     fn stage_all_v61_prs(&mut self) {
         let proposals = [
-            ("feat(landlock_v8) Linux 6.17 IoUring Landlock V8 Advanced Engine", "landlock_v8"),
-            ("feat(freebsd_vnet_v61) FreeBSD 14.4 ZFS VNET Capsicum Engine", "freebsd_vnet_v61"),
-            ("feat(openbsd_ibt_v61) OpenBSD 7.8 Pledge Unveil FineIBT Engine", "openbsd_ibt_v61"),
-            ("feat(hammer2_v61) DragonFly BSD 6.8 HAMMER2 PFS Replication Engine", "hammer2_v61"),
-            ("feat(portage_v61) Gentoo Portage EAPI 11 PQC Engine", "portage_v61"),
-            ("feat(apk_v61) Alpine APK v5 Dilithium-5 apkovl Overlay Engine", "apk_v61"),
-            ("feat(nix_v61) NixOS / Guix Hermetic Flake CAS Engine", "nix_v61"),
-            ("feat(npf_v61) NetBSD 10.1 NPF JIT Acceleration Engine", "npf_v61"),
-            ("feat(clear_v61) Clear Linux Stateless Autotuning Engine", "clear_v61"),
-            ("feat(thousands_v61) Sovereign Thousands Missing Components Engine V61 (10,000 components)", "thousands_v61"),
+            (
+                "feat(landlock_v8) Linux 6.17 IoUring Landlock V8 Advanced Engine",
+                "landlock_v8",
+            ),
+            (
+                "feat(freebsd_vnet_v61) FreeBSD 14.4 ZFS VNET Capsicum Engine",
+                "freebsd_vnet_v61",
+            ),
+            (
+                "feat(openbsd_ibt_v61) OpenBSD 7.8 Pledge Unveil FineIBT Engine",
+                "openbsd_ibt_v61",
+            ),
+            (
+                "feat(hammer2_v61) DragonFly BSD 6.8 HAMMER2 PFS Replication Engine",
+                "hammer2_v61",
+            ),
+            (
+                "feat(portage_v61) Gentoo Portage EAPI 11 PQC Engine",
+                "portage_v61",
+            ),
+            (
+                "feat(apk_v61) Alpine APK v5 Dilithium-5 apkovl Overlay Engine",
+                "apk_v61",
+            ),
+            (
+                "feat(nix_v61) NixOS / Guix Hermetic Flake CAS Engine",
+                "nix_v61",
+            ),
+            (
+                "feat(npf_v61) NetBSD 10.1 NPF JIT Acceleration Engine",
+                "npf_v61",
+            ),
+            (
+                "feat(clear_v61) Clear Linux Stateless Autotuning Engine",
+                "clear_v61",
+            ),
+            (
+                "feat(thousands_v61) Sovereign Thousands Missing Components Engine V61 (10,000 components)",
+                "thousands_v61",
+            ),
         ];
 
         for (title, comp) in proposals {

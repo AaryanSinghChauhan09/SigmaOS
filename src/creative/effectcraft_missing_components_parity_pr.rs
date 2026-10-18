@@ -1003,13 +1003,9 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
         } else {
             Ok(1.0)
         }
-        let cos_theta =
-            view_dir[0] * light_pos[0] + view_dir[1] * light_pos[1] + view_dir[2] * light_pos[2];
+        let cos_theta = view_dir[0] * light_pos[0] + view_dir[1] * light_pos[1] + view_dir[2] * light_pos[2];
         let g2 = self.anisotropy_g * self.anisotropy_g;
-        let phase = (1.0 - g2)
-            / (4.0
-                * core::f32::consts::PI
-                * (1.0 + g2 - 2.0 * self.anisotropy_g * cos_theta).powf(1.5));
+        let phase = (1.0 - g2) / (4.0 * core::f32::consts::PI * (1.0 + g2 - 2.0 * self.anisotropy_g * cos_theta).powf(1.5));
         let total_accumulation = phase * self.fog_density * (self.raymarch_steps as f32) * 0.1;
         Ok(total_accumulation.clamp(0.0, 10.0))
     }
@@ -1490,9 +1486,7 @@ mod tests {
     #[test]
     fn test_volumetric_lighting_engine_functional() {
         let engine = VolumetricLightingAtmosphericRaymarchPrEngine::new();
-        let shafts = engine
-            .compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0])
-            .unwrap();
+        let shafts = engine.compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0]).unwrap();
         assert!(shafts >= 0.0);
     }
 
@@ -1509,9 +1503,7 @@ mod tests {
         let frame1 = vec![100u8; 16];
         let frame2 = vec![110u8; 16];
         let mut output = vec![0u8; 16];
-        let processed = engine
-            .process_temporal_denoise(&[&frame1, &frame2], &mut output)
-            .unwrap();
+        let processed = engine.process_temporal_denoise(&[&frame1, &frame2], &mut output).unwrap();
         assert_eq!(processed, 16);
         assert_eq!(output[0], 105);
     }
@@ -1521,9 +1513,7 @@ mod tests {
         let engine = StereoscopicVr360SpatialVideoPrEngine::new();
         let left_eye = vec![255u8, 128u8, 64u8, 255u8];
         let mut right_eye = vec![0u8; 4];
-        let len = engine
-            .generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0)
-            .unwrap();
+        let len = engine.generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0).unwrap();
         assert_eq!(len, 4);
     }
 
