@@ -58,10 +58,10 @@ pub enum KsmDaemonState {
 
 #[derive(Debug, Clone)]
 pub struct KsmDaemonConfiguration {
-    pub pages_to_scan: u32,      // `/sys/kernel/mm/ksm/pages_to_scan` (default 100)
-    pub sleep_millisecs: u32,    // `/sys/kernel/mm/ksm/sleep_millisecs` (default 20ms)
-    pub max_kernel_pages: u64,   // Cap on maximum merged pages
-    pub run_flag: u8,            // 0: stop, 1: run, 2: unmerge
+    pub pages_to_scan: u32,    // `/sys/kernel/mm/ksm/pages_to_scan` (default 100)
+    pub sleep_millisecs: u32,  // `/sys/kernel/mm/ksm/sleep_millisecs` (default 20ms)
+    pub max_kernel_pages: u64, // Cap on maximum merged pages
+    pub run_flag: u8,          // 0: stop, 1: run, 2: unmerge
 }
 
 impl Default for KsmDaemonConfiguration {

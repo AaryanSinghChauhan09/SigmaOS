@@ -19,7 +19,8 @@ pub enum PowerState {
     FullOn,
     Standby,
     Sleep,
-    Unknown,}
+    Unknown,
+}
 
 #[cfg(feature = "standalone_test")]
 pub trait PeripheralDevice {

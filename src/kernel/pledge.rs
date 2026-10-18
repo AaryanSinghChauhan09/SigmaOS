@@ -207,7 +207,10 @@ impl PledgeManager {
 
     /// Create a new pledge context
     pub fn create_context(&self) -> u64 {
-        let mut next_id = self.next_context_id.lock().unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self
+            .next_context_id
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let context_id = *next_id;
         *next_id += 1;
         drop(next_id);

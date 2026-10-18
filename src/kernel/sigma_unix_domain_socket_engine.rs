@@ -2,7 +2,6 @@
 /// AF_UNIX streams, datagrams, abstract namespace, SCM_RIGHTS.
 ///
 /// Standard library (std, libc) are fully authorized per SigmaOS policy.
-
 use std::collections::HashMap;
 use std::fmt;
 
@@ -74,7 +73,7 @@ impl UnixSocket {
             sock_type,
             local_addr: UnixSocketAddr::Unnamed,
             peer_addr: None,
-            rcvbuf_bytes: 212992,  // kernel default
+            rcvbuf_bytes: 212992, // kernel default
             sndbuf_bytes: 212992,
             connected: false,
             nonblocking: false,
@@ -190,7 +189,8 @@ mod tests {
         let mut mgr = UnixSocketManager::new();
         let fd1 = mgr.create(UnixSocketType::Stream);
         let fd2 = mgr.create(UnixSocketType::Stream);
-        mgr.bind(fd1, UnixSocketAddr::Path("/run/dup.sock".to_string())).unwrap();
+        mgr.bind(fd1, UnixSocketAddr::Path("/run/dup.sock".to_string()))
+            .unwrap();
         let result = mgr.bind(fd2, UnixSocketAddr::Path("/run/dup.sock".to_string()));
         assert!(result.is_err());
     }

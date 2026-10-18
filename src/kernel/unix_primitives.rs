@@ -2075,7 +2075,7 @@ mod tests {
         w.reset(2, Some(3), hit, 0);
         assert_eq!(w.softclock(), 0);
         assert_eq!(w.softclock(), 1); // expires at tick 2
-        // SAFETY: operation is correct given the invariants maintained by the enclosing function.
+                                      // SAFETY: operation is correct given the invariants maintained by the enclosing function.
         unsafe { assert_eq!(HITS, 1) };
         // period 3 → next at 5
         assert_eq!(w.softclock(), 0);

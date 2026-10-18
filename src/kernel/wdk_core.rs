@@ -255,7 +255,11 @@ impl ExpWorkQueueSystem {
             processed += 1;
         }
 
-        if let Some(thread) = self.worker_threads.iter_mut().find(|t| t.thread_id == worker_thread_id) {
+        if let Some(thread) = self
+            .worker_threads
+            .iter_mut()
+            .find(|t| t.thread_id == worker_thread_id)
+        {
             thread.items_processed += processed;
         }
 
@@ -299,7 +303,8 @@ pub type PkernelRoutine = fn(
 
 pub type PrundownRoutine = fn(apc: &Apc);
 
-pub type PnormalRoutine = fn(normal_context: usize, system_argument1: usize, system_argument2: usize);
+pub type PnormalRoutine =
+    fn(normal_context: usize, system_argument1: usize, system_argument2: usize);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ApcEnvironment {
@@ -470,7 +475,8 @@ impl WdkThread {
         for mut apc in pending {
             let can_deliver = match apc.processor_mode {
                 ProcessorMode::KernelMode => {
-                    apc.is_special_kernel_apc || self.active_processor_mode == ProcessorMode::KernelMode
+                    apc.is_special_kernel_apc
+                        || self.active_processor_mode == ProcessorMode::KernelMode
                 }
                 ProcessorMode::UserMode => {
                     self.alertable && self.active_processor_mode == ProcessorMode::UserMode
@@ -854,7 +860,9 @@ impl Prcb {
     }
 
     pub fn queue_dpc(&mut self, dpc: Dpc, importance: DpcImportance) {
-        if importance == DpcImportance::HighImportance || importance == DpcImportance::HighImportanceNotified {
+        if importance == DpcImportance::HighImportance
+            || importance == DpcImportance::HighImportanceNotified
+        {
             self.dpc_queue.insert(0, (dpc, importance));
         } else {
             self.dpc_queue.push((dpc, importance));
@@ -870,7 +878,11 @@ impl Prcb {
         core::mem::swap(&mut self.dpc_queue, &mut pending);
 
         for (dpc, _importance) in pending {
-            (dpc.routine)(dpc.deferred_context, dpc.system_argument1, dpc.system_argument2);
+            (dpc.routine)(
+                dpc.deferred_context,
+                dpc.system_argument1,
+                dpc.system_argument2,
+            );
             count += 1;
             self.dpc_count += 1;
         }
@@ -886,9 +898,9 @@ impl Prcb {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PoolType {
-    NonPagedPool,       // Guaranteed in RAM (safe for high IRQL)
-    PagedPool,          // Can be paged (PASSIVE_LEVEL / APC_LEVEL)
-    NonPagedPoolNx,     // NonPagedPool with No-Execute permission
+    NonPagedPool,   // Guaranteed in RAM (safe for high IRQL)
+    PagedPool,      // Can be paged (PASSIVE_LEVEL / APC_LEVEL)
+    NonPagedPoolNx, // NonPagedPool with No-Execute permission
 }
 
 pub struct PoolAllocation {
@@ -1143,7 +1155,10 @@ impl AlpcZeroCopyPortQueue {
         Ok(())
     }
 
-    pub fn receive_message(&mut self, caller_right: MachPortRight) -> Result<AlpcMessagePayload, &'static str> {
+    pub fn receive_message(
+        &mut self,
+        caller_right: MachPortRight,
+    ) -> Result<AlpcMessagePayload, &'static str> {
         if caller_right != MachPortRight::Receive {
             return Err("ALPC: Caller lacks Receive right for this port");
         }
@@ -1201,7 +1216,8 @@ mod tests {
         wq_sys.worker_threads.push(worker);
 
         let item1 = ExecutiveWorkItem::new(test_work_routine, 10, WorkQueueType::CriticalWorkQueue);
-        let item2 = ExecutiveWorkItem::new(test_work_routine, 20, WorkQueueType::HyperCriticalWorkQueue);
+        let item2 =
+            ExecutiveWorkItem::new(test_work_routine, 20, WorkQueueType::HyperCriticalWorkQueue);
 
         wq_sys.ex_queue_work_item(item1, WorkQueueType::CriticalWorkQueue);
         wq_sys.ex_queue_work_item(item2, WorkQueueType::HyperCriticalWorkQueue);
@@ -1466,7 +1482,9 @@ mod tests {
             .unwrap();
         assert_eq!(pool.active_bytes, 1024);
 
-        assert!(pool.ex_allocate_pool(PoolType::NonPagedPool, 4000, *b"FAIL").is_err());
+        assert!(pool
+            .ex_allocate_pool(PoolType::NonPagedPool, 4000, *b"FAIL")
+            .is_err());
 
         assert!(pool.ex_free_pool(addr).is_ok());
         assert_eq!(pool.active_bytes, 0);

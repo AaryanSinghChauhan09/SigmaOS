@@ -145,7 +145,10 @@ impl LandlockManager {
 
     /// Create a new Landlock domain with a ruleset
     pub fn create_domain(&self, ruleset: LandlockRuleset) -> u64 {
-        let mut next_id = self.next_domain_id.lock().unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self
+            .next_domain_id
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let domain_id = *next_id;
         *next_id += 1;
         drop(next_id);

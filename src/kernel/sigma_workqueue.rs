@@ -424,7 +424,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_priority_ordering() {
         let mut wq = SigmaWorkQueue::new("prio-test", false);

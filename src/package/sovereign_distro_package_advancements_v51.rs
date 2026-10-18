@@ -412,7 +412,9 @@ impl UniversalCanonicalDependencyResolverV51 {
         match clean_final {
             "libssl-dev" | "libssl3" | "openssl-devel" | "openssl-dev" | "security/openssl"
             | "dev-libs/openssl" | "libgnutls-dev" | "gnutls-devel" | "mbedtls-devel"
-            | "libmbedtls-dev" | "libgcrypt-dev" | "libgcrypt-devel" => "sovereign-crypto".to_string(),
+            | "libmbedtls-dev" | "libgcrypt-dev" | "libgcrypt-devel" => {
+                "sovereign-crypto".to_string()
+            }
             "libc6" | "glibc" | "musl" | "musl-dev" | "devel/glibc" | "sys-libs/glibc" | "libc"
             | "freebsd-runtime" | "openbsd-sys" | "dragonfly-runtime" | "bedrock-core"
             | "haiku-libroot" | "pkgsrc-core" | "bionic-libc" => "sovereign-libc".to_string(),
@@ -426,10 +428,14 @@ impl UniversalCanonicalDependencyResolverV51 {
             "node" | "nodejs" | "nodejs-devel" => "sovereign-nodejs".to_string(),
             "curl" | "libcurl" | "libcurl4" | "libcurl-devel" | "libcurl-dev" | "ftp/curl"
             | "net-misc/curl" => "sovereign-curl".to_string(),
-            "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => "sovereign-bash".to_string(),
+            "bash" | "bash-completion" | "shells/bash" | "app-shells/bash" => {
+                "sovereign-bash".to_string()
+            }
             "zsh" | "shells/zsh" | "app-shells/zsh" => "sovereign-zsh".to_string(),
             "fish" | "shells/fish" | "app-shells/fish" => "sovereign-fish".to_string(),
-            "libx11" | "libx11-dev" | "libx11-devel" | "x11-libs/libx11" => "sovereign-libx11".to_string(),
+            "libx11" | "libx11-dev" | "libx11-devel" | "x11-libs/libx11" => {
+                "sovereign-libx11".to_string()
+            }
             "wayland" | "wayland-devel" | "wayland-dev" | "libwayland-client"
             | "libwayland-server" | "wayland-protocols" | "dev-libs/wayland" => {
                 "sovereign-wayland".to_string()
@@ -443,8 +449,12 @@ impl UniversalCanonicalDependencyResolverV51 {
             "systemd" | "systemd-devel" | "systemd-libs" | "sys-apps/systemd" => {
                 "sovereign-init".to_string()
             }
-            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => "sovereign-gtk3".to_string(),
-            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "x11-toolkits/gtk40" => "sovereign-gtk4".to_string(),
+            "gtk3" | "libgtk-3-dev" | "gtk3-devel" | "x11-toolkits/gtk30" => {
+                "sovereign-gtk3".to_string()
+            }
+            "gtk4" | "libgtk-4-dev" | "gtk4-devel" | "x11-toolkits/gtk40" => {
+                "sovereign-gtk4".to_string()
+            }
             "qt5" | "qt5-base" | "qt5-base-devel" | "libqt5core5a" => "sovereign-qt5".to_string(),
             "qt6" | "qt6-base" | "qt6-base-devel" | "libqt6core6" => "sovereign-qt6".to_string(),
             "mesa" | "mesa-libgl" | "mesa-dri-drivers" | "media-libs/mesa" => {
@@ -456,7 +466,9 @@ impl UniversalCanonicalDependencyResolverV51 {
             "ripgrep" | "rg" | "sys-apps/ripgrep" => "sovereign-ripgrep".to_string(),
             "fastfetch" | "neofetch" => "sovereign-fastfetch".to_string(),
             "btop" | "htop" => "sovereign-top".to_string(),
-            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" => "sovereign-sqlite".to_string(),
+            "sqlite" | "sqlite3" | "libsqlite3-dev" | "sqlite-devel" => {
+                "sovereign-sqlite".to_string()
+            }
             other => {
                 if other.starts_with("sovereign-") {
                     other.to_string()
@@ -577,7 +589,10 @@ impl LinuxBsdPackageCommandRouterV51 {
         }
     }
 
-    pub fn dispatch_raw_command(&self, full_command: &str) -> Result<ForeignPmDispatchedCommandV51, &'static str> {
+    pub fn dispatch_raw_command(
+        &self,
+        full_command: &str,
+    ) -> Result<ForeignPmDispatchedCommandV51, &'static str> {
         let tokens: Vec<&str> = full_command.split_whitespace().collect();
         if tokens.is_empty() {
             return Err("Empty foreign PM command string");
@@ -594,9 +609,13 @@ impl LinuxBsdPackageCommandRouterV51 {
                 for arg in args {
                     match *arg {
                         "install" | "add" => action_kind = UniversalPmActionKind::Install,
-                        "remove" | "purge" | "autoremove" => action_kind = UniversalPmActionKind::Remove,
+                        "remove" | "purge" | "autoremove" => {
+                            action_kind = UniversalPmActionKind::Remove
+                        }
                         "search" => action_kind = UniversalPmActionKind::Search,
-                        "update" | "upgrade" | "dist-upgrade" => action_kind = UniversalPmActionKind::Upgrade,
+                        "update" | "upgrade" | "dist-upgrade" => {
+                            action_kind = UniversalPmActionKind::Upgrade
+                        }
                         "show" | "info" => action_kind = UniversalPmActionKind::QueryInfo,
                         "-s" | "--dry-run" | "--simulate" => is_dry_run = true,
                         pkg if !pkg.starts_with('-') => target_packages.push(pkg.to_string()),
@@ -605,13 +624,16 @@ impl LinuxBsdPackageCommandRouterV51 {
                 }
                 "--apt"
             }
-            "dnf" | "dnf5" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos" | "rocky" | "alma" => {
+            "dnf" | "dnf5" | "yum" | "microdnf" | "rpm" | "fedora" | "rhel" | "centos"
+            | "rocky" | "alma" => {
                 for arg in args {
                     match *arg {
                         "install" | "in" => action_kind = UniversalPmActionKind::Install,
                         "remove" | "erase" | "rm" => action_kind = UniversalPmActionKind::Remove,
                         "search" => action_kind = UniversalPmActionKind::Search,
-                        "update" | "upgrade" | "check-update" => action_kind = UniversalPmActionKind::Upgrade,
+                        "update" | "upgrade" | "check-update" => {
+                            action_kind = UniversalPmActionKind::Upgrade
+                        }
                         "info" => action_kind = UniversalPmActionKind::QueryInfo,
                         "--dry-run" | "--assumeno" => is_dry_run = true,
                         pkg if !pkg.starts_with('-') => target_packages.push(pkg.to_string()),
@@ -620,7 +642,8 @@ impl LinuxBsdPackageCommandRouterV51 {
                 }
                 "--dnf"
             }
-            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "arch" | "manjaro" | "cachy" | "cachyos" => {
+            "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "arch" | "manjaro" | "cachy"
+            | "cachyos" => {
                 for arg in args {
                     match *arg {
                         "-S" | "-Sy" | "install" => action_kind = UniversalPmActionKind::Install,
@@ -698,7 +721,9 @@ impl LinuxBsdPackageCommandRouterV51 {
                 for arg in args {
                     match *arg {
                         "-a" | "--ask" | "install" => action_kind = UniversalPmActionKind::Install,
-                        "-C" | "--unmerge" | "remove" => action_kind = UniversalPmActionKind::Remove,
+                        "-C" | "--unmerge" | "remove" => {
+                            action_kind = UniversalPmActionKind::Remove
+                        }
                         "-s" | "--search" => action_kind = UniversalPmActionKind::Search,
                         "-u" | "--update" => action_kind = UniversalPmActionKind::Upgrade,
                         "-p" | "--pretend" => is_dry_run = true,
@@ -744,7 +769,9 @@ impl UniversalSandboxCapabilityMatrixV51 {
 
         for cap in capabilities {
             match cap.to_lowercase().as_str() {
-                "network" | "net" | "--net" => policy.push("capsicum:cap_rights_net_socket".to_string()),
+                "network" | "net" | "--net" => {
+                    policy.push("capsicum:cap_rights_net_socket".to_string())
+                }
                 "filesystem" | "fs" | "--fs" => policy.push("unveil:/usr/lib:r".to_string()),
                 "audio" | "sound" => policy.push("pledge:audio".to_string()),
                 "graphics" | "gpu" | "drm" => policy.push("unveil:/dev/dri:rw".to_string()),
@@ -817,8 +844,12 @@ impl UniversalPackageTriggerEngineV51 {
         for hook in triggered {
             let target_directory = match hook {
                 UniversalTriggerHookKind::Ldconfig => "/etc/ld.so.cache".to_string(),
-                UniversalTriggerHookKind::UpdateDesktopDatabase => "/usr/share/applications".to_string(),
-                UniversalTriggerHookKind::GlibCompileSchemas => "/usr/share/glib-2.0/schemas".to_string(),
+                UniversalTriggerHookKind::UpdateDesktopDatabase => {
+                    "/usr/share/applications".to_string()
+                }
+                UniversalTriggerHookKind::GlibCompileSchemas => {
+                    "/usr/share/glib-2.0/schemas".to_string()
+                }
                 UniversalTriggerHookKind::MimeDatabase => "/usr/share/mime".to_string(),
                 UniversalTriggerHookKind::IconThemeCache => "/usr/share/icons/hicolor".to_string(),
                 UniversalTriggerHookKind::FontconfigCache => "/usr/share/fonts".to_string(),
@@ -866,11 +897,36 @@ impl UniversalPackagePullRequestGatewayV51 {
 
     fn seed_preset_prs(&mut self) {
         let presets = [
-            ("curl", "8.2.1", UniversalPackageFormatType::AptDebian, "maintainer@debian.org"),
-            ("nginx", "1.24.0", UniversalPackageFormatType::DnfFedoraRpm, "packager@fedoraproject.org"),
-            ("ripgrep", "13.0.0", UniversalPackageFormatType::ArchPacmanZst, "arch@archlinux.org"),
-            ("musl", "1.2.4", UniversalPackageFormatType::AlpineApkTar, "alpine@alpinelinux.org"),
-            ("postgresql", "15.3", UniversalPackageFormatType::FreeBsdPkgUcl, "ports@freebsd.org"),
+            (
+                "curl",
+                "8.2.1",
+                UniversalPackageFormatType::AptDebian,
+                "maintainer@debian.org",
+            ),
+            (
+                "nginx",
+                "1.24.0",
+                UniversalPackageFormatType::DnfFedoraRpm,
+                "packager@fedoraproject.org",
+            ),
+            (
+                "ripgrep",
+                "13.0.0",
+                UniversalPackageFormatType::ArchPacmanZst,
+                "arch@archlinux.org",
+            ),
+            (
+                "musl",
+                "1.2.4",
+                UniversalPackageFormatType::AlpineApkTar,
+                "alpine@alpinelinux.org",
+            ),
+            (
+                "postgresql",
+                "15.3",
+                UniversalPackageFormatType::FreeBsdPkgUcl,
+                "ports@freebsd.org",
+            ),
         ];
 
         for (name, ver, fmt, author) in presets {
@@ -901,7 +957,8 @@ impl UniversalPackagePullRequestGatewayV51 {
     ) -> u32 {
         let id = self.next_pr_id;
         self.next_pr_id += 1;
-        let digest = fnv1a_64_digest(format!("{}-{}-{:?}", package_name, version, source_format).as_bytes());
+        let digest =
+            fnv1a_64_digest(format!("{}-{}-{:?}", package_name, version, source_format).as_bytes());
         self.pull_requests.insert(
             id,
             UniversalPackagePullRequestSpecV51 {
@@ -947,7 +1004,11 @@ impl SovereignDistroPackageSuiteV51 {
         }
     }
 
-    pub fn execute_universal_package_pipeline(&mut self, raw_command: &str, files: &[String]) -> bool {
+    pub fn execute_universal_package_pipeline(
+        &mut self,
+        raw_command: &str,
+        files: &[String],
+    ) -> bool {
         let dispatched = match self.router.dispatch_raw_command(raw_command) {
             Ok(cmd) => cmd,
             Err(_) => return false,
@@ -958,7 +1019,9 @@ impl SovereignDistroPackageSuiteV51 {
             canonical_targets.push(self.resolver.to_canonical_name(pkg));
         }
 
-        let _sandbox_policy = self.sandbox.derive_sandbox_policy(&["network".to_string(), "filesystem".to_string()]);
+        let _sandbox_policy = self
+            .sandbox
+            .derive_sandbox_policy(&["network".to_string(), "filesystem".to_string()]);
         let _triggers = self.trigger_engine.execute_triggers(files);
 
         self.udf_engine
@@ -1012,16 +1075,24 @@ mod tests {
         let resolver = UniversalCanonicalDependencyResolverV51::new();
         assert_eq!(resolver.to_canonical_name("libssl-dev"), "sovereign-crypto");
         assert_eq!(resolver.to_canonical_name("libc6"), "sovereign-libc");
-        assert_eq!(resolver.to_canonical_name("python3-devel"), "sovereign-python");
+        assert_eq!(
+            resolver.to_canonical_name("python3-devel"),
+            "sovereign-python"
+        );
         assert_eq!(resolver.to_canonical_name("libx11-dev"), "sovereign-libx11");
-        assert_eq!(resolver.to_canonical_name("ffmpeg-devel"), "sovereign-ffmpeg");
+        assert_eq!(
+            resolver.to_canonical_name("ffmpeg-devel"),
+            "sovereign-ffmpeg"
+        );
     }
 
     #[test]
     fn test_linux_bsd_command_router_v51() {
         let router = LinuxBsdPackageCommandRouterV51::new();
 
-        let apt = router.dispatch_raw_command("apt-get install curl -y").unwrap();
+        let apt = router
+            .dispatch_raw_command("apt-get install curl -y")
+            .unwrap();
         assert_eq!(apt.source_pm, "apt-get");
         assert_eq!(apt.action_kind, UniversalPmActionKind::Install);
         assert_eq!(apt.target_packages, vec!["curl"]);
@@ -1031,7 +1102,9 @@ mod tests {
         assert_eq!(pacman.action_kind, UniversalPmActionKind::Upgrade);
         assert!(pacman.is_dry_run);
 
-        let pkg = router.dispatch_raw_command("pkg install postgresql").unwrap();
+        let pkg = router
+            .dispatch_raw_command("pkg install postgresql")
+            .unwrap();
         assert_eq!(pkg.format_flag, "--pkg");
         assert_eq!(pkg.target_packages, vec!["postgresql"]);
     }

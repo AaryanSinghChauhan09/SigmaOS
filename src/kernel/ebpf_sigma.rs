@@ -95,9 +95,15 @@ impl BpfJit for X86_64Jit {
 pub struct BpfHelpers;
 
 impl BpfHelpers {
-    pub fn map_lookup_elem() -> usize { 1 }
-    pub fn map_update_elem() -> usize { 2 }
-    pub fn map_delete_elem() -> usize { 3 }
+    pub fn map_lookup_elem() -> usize {
+        1
+    }
+    pub fn map_update_elem() -> usize {
+        2
+    }
+    pub fn map_delete_elem() -> usize {
+        3
+    }
 }
 
 #[cfg(test)]
@@ -130,7 +136,13 @@ mod tests {
     #[test]
     fn test_bpf_verifier_ok() {
         let mut prog = BpfProgram::new(BpfProgType::Xdp);
-        prog.instructions.push(BpfInstruction { opcode: 0, dst_reg: 0, src_reg: 0, off: 0, imm: 0 });
+        prog.instructions.push(BpfInstruction {
+            opcode: 0,
+            dst_reg: 0,
+            src_reg: 0,
+            off: 0,
+            imm: 0,
+        });
         let res = BpfVerifier::verify(&prog);
         assert!(res.is_ok());
     }

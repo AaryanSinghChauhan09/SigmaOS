@@ -175,14 +175,20 @@ impl TimeManager {
         }
         drop(clock_sources);
 
-        let mut current_clock_id = self.current_clock_id.lock().unwrap_or_else(|e| e.into_inner());
+        let mut current_clock_id = self
+            .current_clock_id
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         *current_clock_id = Some(clock_id);
         Ok(())
     }
 
     /// Get current clock source
     pub fn get_current_clock_source(&self) -> Option<ClockSourceStats> {
-        let current_clock_id = self.current_clock_id.lock().unwrap_or_else(|e| e.into_inner());
+        let current_clock_id = self
+            .current_clock_id
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         match *current_clock_id {
             Some(id) => {
                 let clock_sources = self.clock_sources.lock().unwrap_or_else(|e| e.into_inner());

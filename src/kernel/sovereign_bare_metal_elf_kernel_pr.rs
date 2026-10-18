@@ -25,10 +25,10 @@ pub enum ElfClass {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SegmentPermission {
-    ReadOnly,          // PF_R
-    ReadExecute,       // PF_R | PF_X (.text)
-    ReadWrite,         // PF_R | PF_W (.data / .bss)
-    ReadWriteExecute,  // Prohibited by W^X
+    ReadOnly,         // PF_R
+    ReadExecute,      // PF_R | PF_X (.text)
+    ReadWrite,        // PF_R | PF_W (.data / .bss)
+    ReadWriteExecute, // Prohibited by W^X
 }
 
 #[derive(Debug, Clone)]
@@ -80,7 +80,9 @@ pub struct SovereignElfSegmentAllocator {
 
 impl SovereignElfSegmentAllocator {
     pub fn new() -> Self {
-        Self { segments: Vec::new() }
+        Self {
+            segments: Vec::new(),
+        }
     }
 
     pub fn map_segment(
@@ -92,7 +94,9 @@ impl SovereignElfSegmentAllocator {
         is_exec: bool,
     ) -> Result<(), &'static str> {
         if is_write && is_exec {
-            return Err("W^X Violation: Bare metal kernel segment cannot be both writable and executable");
+            return Err(
+                "W^X Violation: Bare metal kernel segment cannot be both writable and executable",
+            );
         }
 
         let perm = if is_exec {
@@ -142,7 +146,9 @@ pub struct SovereignKernelSymbolResolver {
 
 impl SovereignKernelSymbolResolver {
     pub fn new() -> Self {
-        Self { symbols: Vec::new() }
+        Self {
+            symbols: Vec::new(),
+        }
     }
 
     pub fn add_symbol(&mut self, name: &str, address: u64, size: u64) {
@@ -184,12 +190,20 @@ impl SovereignBareMetalElfKernelPrGateway {
     }
 
     pub fn generate_elf_kernel_pr_proposal(&mut self) -> BareMetalElfPrDescriptor {
-        let _ = self.segment_allocator.map_segment(0x0010_0000, 0x0010_0000, 0x40000, false, true);  // .text
-        let _ = self.segment_allocator.map_segment(0x0014_0000, 0x0014_0000, 0x10000, false, false); // .rodata
-        let _ = self.segment_allocator.map_segment(0x0015_0000, 0x0015_0000, 0x20000, true, false);  // .data
+        let _ = self
+            .segment_allocator
+            .map_segment(0x0010_0000, 0x0010_0000, 0x40000, false, true); // .text
+        let _ = self
+            .segment_allocator
+            .map_segment(0x0014_0000, 0x0014_0000, 0x10000, false, false); // .rodata
+        let _ = self
+            .segment_allocator
+            .map_segment(0x0015_0000, 0x0015_0000, 0x20000, true, false); // .data
 
-        self.symbol_resolver.add_symbol("kernel_main", 0x0010_0100, 0x200);
-        self.symbol_resolver.add_symbol("panic_handler", 0x0010_0300, 0x100);
+        self.symbol_resolver
+            .add_symbol("kernel_main", 0x0010_0100, 0x200);
+        self.symbol_resolver
+            .add_symbol("panic_handler", 0x0010_0300, 0x100);
 
         let title = String::from("feat(kernel): Implement Sovereign Bare Metal ELF64 Kernel Binary Engine & Multiboot2 Gateway");
         let desc = format!(
@@ -197,7 +211,9 @@ impl SovereignBareMetalElfKernelPrGateway {
             self.segment_allocator.segments.len()
         );
 
-        let pqc_sig = String::from("DILITHIUM5_SIG_7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8d7c6b");
+        let pqc_sig = String::from(
+            "DILITHIUM5_SIG_7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8d7c6b",
+        );
 
         BareMetalElfPrDescriptor {
             pr_id: String::from("PR-KERNEL-ELF64-2026-V4"),
@@ -233,8 +249,8 @@ mod tests {
     #[test]
     fn test_elf_wx_segment_allocation() {
         let mut alloc = SovereignElfSegmentAllocator::new();
-        assert!(alloc.map_segment(0x1000, 0x1000, 4096, false, true).is_ok());  // Text
-        assert!(alloc.map_segment(0x2000, 0x2000, 4096, true, false).is_ok());  // Data
+        assert!(alloc.map_segment(0x1000, 0x1000, 4096, false, true).is_ok()); // Text
+        assert!(alloc.map_segment(0x2000, 0x2000, 4096, true, false).is_ok()); // Data
         assert!(alloc.map_segment(0x3000, 0x3000, 4096, true, true).is_err()); // W^X Violation
     }
 
@@ -242,7 +258,8 @@ mod tests {
     fn test_multiboot2_header_generation() {
         let mb2 = SovereignMultiboot2HeaderEngine::generate_header(0x0010_0000);
         assert_eq!(mb2.header_length, 16);
-        let sum = (MULTIBOOT2_HEADER_MAGIC as u64) + (mb2.header_length as u64) + (mb2.checksum as u64);
+        let sum =
+            (MULTIBOOT2_HEADER_MAGIC as u64) + (mb2.header_length as u64) + (mb2.checksum as u64);
         assert_eq!(sum % 0x1_0000_0000, 0);
     }
 

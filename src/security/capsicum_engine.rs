@@ -112,13 +112,19 @@ impl CapsicumEngine {
 
     /// Restrict the rights on an existing descriptor (`cap_rights_limit(2)`)
     pub fn cap_rights_limit(&mut self, fd: u32, new_rights_mask: u64) -> Result<(), &'static str> {
-        let desc = self.descriptors.get_mut(&fd).ok_or("Invalid file descriptor")?;
+        let desc = self
+            .descriptors
+            .get_mut(&fd)
+            .ok_or("Invalid file descriptor")?;
         desc.rights.limit(new_rights_mask)
     }
 
     /// Verify if a descriptor has the required right to perform an operation
     pub fn check_right(&self, fd: u32, required_op: u64) -> Result<u64, &'static str> {
-        let desc = self.descriptors.get(&fd).ok_or("Bad file descriptor (EBADF)")?;
+        let desc = self
+            .descriptors
+            .get(&fd)
+            .ok_or("Bad file descriptor (EBADF)")?;
         if desc.rights.contains(required_op) {
             Ok(desc.target_resource_id)
         } else {

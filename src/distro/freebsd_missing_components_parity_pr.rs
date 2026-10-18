@@ -88,7 +88,9 @@ impl FreeBsdJailsVnetPrEngine {
                 isolated_bridge: "bridge0".to_string(),
             },
         );
-        Self { active_jails: jails }
+        Self {
+            active_jails: jails,
+        }
     }
 
     pub fn spawn_vnet_jail(&mut self, name: &str, ip: &str) -> FreeBsdPrSpec {
@@ -535,11 +537,10 @@ impl SovereignFreeBsdMissingComponentsParityPrGateway {
             "1.21.3",
             vec!["DOCS=off"],
         ));
-        specs.push(self.devfs_kqueue.register_devfs_kqueue_node(
-            "/dev/crypto",
-            0o666,
-            true,
-        ));
+        specs.push(
+            self.devfs_kqueue
+                .register_devfs_kqueue_node("/dev/crypto", 0o666, true),
+        );
 
         specs
     }

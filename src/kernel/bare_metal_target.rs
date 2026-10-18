@@ -149,12 +149,12 @@ pub const PF_R: u32 = 4;
 #[derive(Debug, Clone, Copy)]
 pub struct BareMetalElf64Header {
     pub e_ident: [u8; 16],
-    pub e_type: u16,      // 2 = ET_EXEC, 3 = ET_DYN
-    pub e_machine: u16,   // 0x3E = x86_64, 0xB7 = AArch64, 0xF3 = RISC-V
-    pub e_version: u32,   // 1
-    pub e_entry: u64,     // Kernel Virtual Entry Address
-    pub e_phoff: u64,     // Program Header Offset
-    pub e_shoff: u64,     // Section Header Offset
+    pub e_type: u16,    // 2 = ET_EXEC, 3 = ET_DYN
+    pub e_machine: u16, // 0x3E = x86_64, 0xB7 = AArch64, 0xF3 = RISC-V
+    pub e_version: u32, // 1
+    pub e_entry: u64,   // Kernel Virtual Entry Address
+    pub e_phoff: u64,   // Program Header Offset
+    pub e_shoff: u64,   // Section Header Offset
     pub e_flags: u32,
     pub e_ehsize: u16,    // Header size (64 bytes)
     pub e_phentsize: u16, // Program Header size (56 bytes)
@@ -407,7 +407,9 @@ mod tests {
         assert!(binary.len() >= 0x7000);
         assert_eq!(&binary[0..4], &ELF_MAGIC);
 
-        assert!(BareMetalElfKernelBuilder::verify_bare_metal_elf_header(&binary));
+        assert!(BareMetalElfKernelBuilder::verify_bare_metal_elf_header(
+            &binary
+        ));
 
         let mb2_hdr = BareMetalMultiboot2Header::new(24);
         let magic = mb2_hdr.magic;

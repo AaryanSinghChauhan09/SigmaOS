@@ -694,7 +694,10 @@ impl Ring3TransitionManager {
     }
 
     /// Prepare user-space memory mapping for Ring 3 transition
-    pub fn prepare_user_memory(&self, mem_mgr: &mut AddressSpaceSeparationManager) -> Result<(), &'static str> {
+    pub fn prepare_user_memory(
+        &self,
+        mem_mgr: &mut AddressSpaceSeparationManager,
+    ) -> Result<(), &'static str> {
         // Map user stack as user-accessible
         for offset in (0..self.user_stack_size).step_by(4096) {
             let vaddr = self.user_stack_base + offset;
@@ -718,9 +721,9 @@ impl Ring3TransitionManager {
 
         // Use the TSS module to perform the transition
         use crate::arch::x86_64::tss_ring3_user_mode::{setup_user_mode, UserModeContext};
-        
+
         setup_user_mode(self.user_stack_base, self.user_stack_size, self.entry_point);
-        
+
         if let Some(ctx) = crate::arch::x86_64::tss_ring3_user_mode::get_user_context_mut() {
             let result = ctx.transition_to_ring3_iretq();
             if result.is_ok() {

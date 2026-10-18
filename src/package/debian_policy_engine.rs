@@ -124,7 +124,11 @@ impl DebianPolicyEngine {
     }
 
     /// Advance package through the policy lifecycle
-    pub fn transition_state(&mut self, pkg_name: &str, next_state: PackageState) -> Result<(), &'static str> {
+    pub fn transition_state(
+        &mut self,
+        pkg_name: &str,
+        next_state: PackageState,
+    ) -> Result<(), &'static str> {
         let pkg = self.packages.get_mut(pkg_name).ok_or("Package not found")?;
 
         match (pkg.state, next_state) {
@@ -148,8 +152,12 @@ mod tests {
         let deps = alloc::vec![String::from("libc"), String::from("libzstd")];
         engine.register_package("sigma-core", "1.0.0", "amd64", MultiArchType::Same, deps);
 
-        engine.add_file_entry("sigma-core", "/usr/bin/sigma", b"ELF BINARY CONTENT", true).unwrap();
-        engine.add_file_entry("sigma-core", "/etc/sigma.conf", b"config=true", false).unwrap();
+        engine
+            .add_file_entry("sigma-core", "/usr/bin/sigma", b"ELF BINARY CONTENT", true)
+            .unwrap();
+        engine
+            .add_file_entry("sigma-core", "/etc/sigma.conf", b"config=true", false)
+            .unwrap();
 
         let pkg = engine.packages.get("sigma-core").unwrap();
         assert_eq!(pkg.files.len(), 2);
@@ -166,14 +174,28 @@ mod tests {
         let mut engine = DebianPolicyEngine::new(1700000000);
         engine.register_package("curl", "8.0.0", "amd64", MultiArchType::Foreign, Vec::new());
 
-        assert_eq!(engine.packages.get("curl").unwrap().state, PackageState::NotInstalled);
+        assert_eq!(
+            engine.packages.get("curl").unwrap().state,
+            PackageState::NotInstalled
+        );
 
-        engine.transition_state("curl", PackageState::Unpacked).unwrap();
-        engine.transition_state("curl", PackageState::Configured).unwrap();
-        engine.transition_state("curl", PackageState::Installed).unwrap();
-        assert_eq!(engine.packages.get("curl").unwrap().state, PackageState::Installed);
+        engine
+            .transition_state("curl", PackageState::Unpacked)
+            .unwrap();
+        engine
+            .transition_state("curl", PackageState::Configured)
+            .unwrap();
+        engine
+            .transition_state("curl", PackageState::Installed)
+            .unwrap();
+        assert_eq!(
+            engine.packages.get("curl").unwrap().state,
+            PackageState::Installed
+        );
 
         // Disallowed jump
-        assert!(engine.transition_state("curl", PackageState::Unpacked).is_err());
+        assert!(engine
+            .transition_state("curl", PackageState::Unpacked)
+            .is_err());
     }
 }

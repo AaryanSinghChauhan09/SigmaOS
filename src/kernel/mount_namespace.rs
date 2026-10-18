@@ -160,7 +160,10 @@ impl MountNamespaceManager {
 
     /// Create a new mount namespace
     pub fn create_namespace(&self, parent_id: Option<u64>) -> u64 {
-        let mut next_id = self.next_namespace_id.lock().unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self
+            .next_namespace_id
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let namespace_id = *next_id;
         *next_id += 1;
         drop(next_id);

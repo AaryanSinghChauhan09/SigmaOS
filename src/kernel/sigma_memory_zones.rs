@@ -490,7 +490,6 @@ mod tests {
     }
 
     #[ignore]
-
     #[test]
     fn test_slab_cache() {
         let mut cache = SlabCache::new("test_cache", 64, 8);

@@ -111,7 +111,10 @@ impl SwapManager {
 
     /// Create a new swap device
     pub fn create_device(&self, device_type: SwapDeviceType, path: String, size: u64) -> u64 {
-        let mut next_id = self.next_device_id.lock().unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self
+            .next_device_id
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let device_id = *next_id;
         *next_id += 1;
         drop(next_id);
