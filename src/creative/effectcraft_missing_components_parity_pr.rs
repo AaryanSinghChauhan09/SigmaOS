@@ -624,7 +624,12 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
         [0.8 * density, 0.8 * density, 0.7 * density]
     }
 
-    pub fn compute_volumetric_shafts(&self, _view: [f32; 3], _light: [f32; 3], steps: &[f32]) -> Result<f32, String> {
+    pub fn compute_volumetric_shafts(
+        &self,
+        _view: [f32; 3],
+        _light: [f32; 3],
+        steps: &[f32],
+    ) -> Result<f32, String> {
         let first = steps.first().copied().unwrap_or(1.0);
         Ok(first * self.fog_density)
     }
@@ -687,7 +692,12 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
         }
     }
 
-    pub fn convert_color_space(&mut self, _source: WorkingColorSpace, target: WorkingColorSpace, rgb: &mut [f32; 3]) {
+    pub fn convert_color_space(
+        &mut self,
+        _source: WorkingColorSpace,
+        target: WorkingColorSpace,
+        rgb: &mut [f32; 3],
+    ) {
         self.current_space = target;
         rgb[0] *= 0.9;
         rgb[1] *= 0.9;
@@ -758,7 +768,12 @@ impl StereoscopicVr360SpatialVideoPrEngine {
         }
     }
 
-    pub fn composite_stereoscopic_pair(&self, left: &[u8], right: &[u8], format: StereoFormat) -> Result<Vec<u8>, String> {
+    pub fn composite_stereoscopic_pair(
+        &self,
+        left: &[u8],
+        right: &[u8],
+        format: StereoFormat,
+    ) -> Result<Vec<u8>, String> {
         if left.is_empty() || right.is_empty() || left.len() != right.len() {
             return Err("Invalid or mismatched eye buffers".to_string());
         }
@@ -783,7 +798,12 @@ impl StereoscopicVr360SpatialVideoPrEngine {
         Ok(output)
     }
 
-    pub fn generate_stereoscopic_parallax(&self, left: &[u8], right: &mut [u8], depth: f32) -> Result<usize, String> {
+    pub fn generate_stereoscopic_parallax(
+        &self,
+        left: &[u8],
+        right: &mut [u8],
+        depth: f32,
+    ) -> Result<usize, String> {
         if left.len() != right.len() {
             return Err("Left and right eye buffer lengths mismatch".to_string());
         }
@@ -849,7 +869,12 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
         Ok(())
     }
 
-    pub fn render_procedural_fractal(&self, width: usize, height: usize, _scale: f32) -> Result<Vec<u8>, String> {
+    pub fn render_procedural_fractal(
+        &self,
+        width: usize,
+        height: usize,
+        _scale: f32,
+    ) -> Result<Vec<u8>, String> {
         Ok(vec![128u8; width * height * 4])
     }
 
@@ -904,7 +929,12 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         }
     }
 
-    pub fn temporal_denoise_frames(&self, frames: &[Vec<u8>], _width: u32, _height: u32) -> Result<Vec<u8>, String> {
+    pub fn temporal_denoise_frames(
+        &self,
+        frames: &[Vec<u8>],
+        _width: u32,
+        _height: u32,
+    ) -> Result<Vec<u8>, String> {
         if frames.is_empty() {
             return Err("Frames history empty".to_string());
         }
@@ -912,22 +942,34 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         let mut output = vec![0u8; len];
         let num_frames = frames.len() as f32;
         for i in 0..len {
-            let sum: f32 = frames.iter().map(|f: &Vec<u8>| f.get(i).copied().unwrap_or(0) as f32).sum();
+            let sum: f32 = frames
+                .iter()
+                .map(|f: &Vec<u8>| f.get(i).copied().unwrap_or(0) as f32)
+                .sum();
             output[i] = (sum / num_frames) as u8;
         }
         Ok(output)
     }
 
-    pub fn apply_synthetic_grain(&self, frame: &mut [u8], profile: &FilmGrainProfile) -> Result<(), String> {
+    pub fn apply_synthetic_grain(
+        &self,
+        frame: &mut [u8],
+        profile: &FilmGrainProfile,
+    ) -> Result<(), String> {
         for (i, byte) in frame.iter_mut().enumerate() {
-            let noise = (((i + 1) as f32 * profile.grain_size).sin() * profile.intensity * 255.0) as i16;
+            let noise =
+                (((i + 1) as f32 * profile.grain_size).sin() * profile.intensity * 255.0) as i16;
             let offset = if noise == 0 { 1 } else { noise };
             *byte = ((*byte as i16) + offset).clamp(0, 255) as u8;
         }
         Ok(())
     }
 
-    pub fn process_temporal_denoise(&self, history: &[&[u8]], output: &mut [u8]) -> Result<usize, String> {
+    pub fn process_temporal_denoise(
+        &self,
+        history: &[&[u8]],
+        output: &mut [u8],
+    ) -> Result<usize, String> {
         if history.is_empty() {
             return Err("Empty history".to_string());
         }
