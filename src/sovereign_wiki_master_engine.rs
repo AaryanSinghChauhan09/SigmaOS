@@ -268,7 +268,11 @@ impl SovereignShardsMasterRegistry {
         registry
     }
 
-    fn register_all_12_shards(&mut self) {
+    pub fn register_all_shards(&mut self) {
+        self.register_all_12_shards();
+    }
+
+    pub fn register_all_12_shards(&mut self) {
         self.shards.insert(
             1,
             SovereignShardDescriptor {

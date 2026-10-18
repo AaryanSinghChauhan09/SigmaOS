@@ -1326,7 +1326,7 @@ impl EffectcraftMissingComponentsParityPrSuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_effectcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 10
+            && self.gateway.collect_all_proposals().len() == 14
     }
 }
 
