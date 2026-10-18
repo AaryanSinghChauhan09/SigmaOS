@@ -6,8 +6,8 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
 
 /// Status of PR Proposal.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,12 +66,7 @@ impl DragonFlyHammer2DedupCompressionPrEngine {
         }
     }
 
-    pub fn insert_extent(
-        &mut self,
-        hash: [u8; 32],
-        data_len: usize,
-        comp: Hammer2CompressionType,
-    ) -> u64 {
+    pub fn insert_extent(&mut self, hash: [u8; 32], data_len: usize, comp: Hammer2CompressionType) -> u64 {
         if let Some(&existing_id) = self.dedup_index.get(&hash) {
             if let Some(block) = self.blocks.get_mut(&existing_id) {
                 block.ref_count += 1;
@@ -132,13 +127,7 @@ impl DragonFlyLwktCpuTokenRingPrEngine {
         }
     }
 
-    pub fn schedule_thread(
-        &mut self,
-        tid: u64,
-        priority: u8,
-        target_cpu: u32,
-        token_mask: u64,
-    ) -> bool {
+    pub fn schedule_thread(&mut self, tid: u64, priority: u8, target_cpu: u32, token_mask: u64) -> bool {
         let cpu = target_cpu % self.total_cpus;
         if let Some(queue) = self.per_cpu_queues.get_mut(&cpu) {
             queue.push(LwktThreadContext {
@@ -155,15 +144,13 @@ impl DragonFlyLwktCpuTokenRingPrEngine {
     }
 
     pub fn pop_next_thread(&mut self, cpu: u32) -> Option<LwktThreadContext> {
-        self.per_cpu_queues
-            .get_mut(&cpu)
-            .and_then(|q: &mut Vec<LwktThreadContext>| {
-                if q.is_empty() {
-                    None
-                } else {
-                    Some(q.remove(0))
-                }
-            })
+        self.per_cpu_queues.get_mut(&cpu).and_then(|q: &mut Vec<LwktThreadContext>| {
+            if q.is_empty() {
+                None
+            } else {
+                Some(q.remove(0))
+            }
+        })
     }
 }
 
@@ -255,10 +242,9 @@ impl DragonFlyDsynthParallelBuildPrEngine {
         let mut buildable = Vec::new();
         for (name, task) in &self.tasks {
             if !task.is_built {
-                let deps_satisfied = task
-                    .dependencies
-                    .iter()
-                    .all(|dep| self.tasks.get(dep).map_or(false, |t| t.is_built));
+                let deps_satisfied = task.dependencies.iter().all(|dep| {
+                    self.tasks.get(dep).map_or(false, |t| t.is_built)
+                });
                 if deps_satisfied {
                     buildable.push(name.clone());
                 }
@@ -339,11 +325,7 @@ impl DragonFlySwapcacheSsdTierPrEngine {
 
         if self.ssd_cache.len() >= self.max_cache_blocks {
             // Evict lowest access count
-            if let Some((&evict_id, _)) = self
-                .ssd_cache
-                .iter()
-                .min_by_key(|(_, meta)| meta.access_count)
-            {
+            if let Some((&evict_id, _)) = self.ssd_cache.iter().min_by_key(|(_, meta)| meta.access_count) {
                 self.ssd_cache.remove(&evict_id);
             }
         }
@@ -403,9 +385,7 @@ impl DragonFlyLocklessVfsNamecachePrEngine {
     }
 
     pub fn lookup(&self, parent_id: u64, name: &str) -> Option<u64> {
-        self.cache
-            .get(&(parent_id, name.to_string()))
-            .map(|n| n.inode)
+        self.cache.get(&(parent_id, name.to_string())).map(|n| n.inode)
     }
 }
 
@@ -469,8 +449,7 @@ impl DragonFlyFirmlinkMountIsolationPrEngine {
     }
 
     pub fn add_firmlink(&mut self, source: &str, target: &str) {
-        self.firmlinks
-            .insert(source.to_string(), target.to_string());
+        self.firmlinks.insert(source.to_string(), target.to_string());
     }
 
     pub fn resolve(&self, path: &str) -> String {
@@ -567,50 +546,36 @@ impl DragonFlyBsdMissingComponentsV60PrSuite {
             pr_id: 6001,
             title: "HAMMER2 Zero-Copy Deduplication & Compression Engine".to_string(),
             target_component: "filesystem/hammer2".to_string(),
-            description: "Zero-copy block extent deduplication and LZ4/ZSTD extent compression."
-                .to_string(),
+            description: "Zero-copy block extent deduplication and LZ4/ZSTD extent compression.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff:
-                "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn dedup_compression_sync()"
-                    .to_string(),
+            unified_diff: "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn dedup_compression_sync()".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6002,
             title: "LWKT Per-CPU Lockless Token Ring Queue Engine".to_string(),
             target_component: "kernel/scheduler/lwkt".to_string(),
-            description:
-                "Lightweight Kernel Threads per-CPU message ring and lockless priority scheduler."
-                    .to_string(),
+            description: "Lightweight Kernel Threads per-CPU message ring and lockless priority scheduler.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff:
-                "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn schedule_lwkt_thread()"
-                    .to_string(),
+            unified_diff: "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn schedule_lwkt_thread()".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6003,
             title: "vkernel Userland Virtual Kernel Process Context".to_string(),
             target_component: "virtualization/vkernel".to_string(),
-            description: "Userland virtual kernel context execution and trap interception."
-                .to_string(),
+            description: "Userland virtual kernel context execution and trap interception.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff:
-                "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn handle_vkernel_trap()"
-                    .to_string(),
+            unified_diff: "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn handle_vkernel_trap()".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6004,
             title: "dsynth Clean-Room Parallel Build & Worker Matrix".to_string(),
             target_component: "package/dsynth".to_string(),
-            description:
-                "dsynth clean-room dports parallel package builder and dependency resolver."
-                    .to_string(),
+            description: "dsynth clean-room dports parallel package builder and dependency resolver.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff:
-                "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn get_buildable_packages()"
-                    .to_string(),
+            unified_diff: "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn get_buildable_packages()".to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -619,8 +584,7 @@ impl DragonFlyBsdMissingComponentsV60PrSuite {
             target_component: "vfs/varsyms".to_string(),
             description: "Dynamic path macro resolution for $SYS, $ARCH, and $USER.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn resolve_path()"
-                .to_string(),
+            unified_diff: "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn resolve_path()".to_string(),
         });
 
         prs
@@ -662,10 +626,7 @@ mod tests {
         assert_eq!(dsynth.get_buildable_packages(), vec!["rust"]);
 
         let varsyms = DragonFlyVarsymsResolverPrEngine::new("SigmaOS", "x86_64", "jules");
-        assert_eq!(
-            varsyms.resolve_path("/usr/lib/$ARCH/$SYS"),
-            "/usr/lib/x86_64/SigmaOS"
-        );
+        assert_eq!(varsyms.resolve_path("/usr/lib/$ARCH/$SYS"), "/usr/lib/x86_64/SigmaOS");
     }
 
     #[test]

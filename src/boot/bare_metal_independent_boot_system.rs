@@ -107,14 +107,10 @@ impl UefiEspBootloaderGenerator {
 
     pub fn discover_memory_map(&mut self) -> usize {
         self.memory_regions.clear();
-        self.memory_regions
-            .push((0x0000_0000, 0x000A_0000, UefiMemoryType::ConventionalMemory)); // 0-640KB
-        self.memory_regions
-            .push((0x0010_0000, 0x0100_0000, UefiMemoryType::LoaderCode)); // Kernel code
-        self.memory_regions
-            .push((0x0100_0000, 0x7F00_0000, UefiMemoryType::ConventionalMemory)); // RAM
-        self.memory_regions
-            .push((0x7F00_0000, 0x0100_0000, UefiMemoryType::AcpiReclaim)); // ACPI
+        self.memory_regions.push((0x0000_0000, 0x000A_0000, UefiMemoryType::ConventionalMemory)); // 0-640KB
+        self.memory_regions.push((0x0010_0000, 0x0100_0000, UefiMemoryType::LoaderCode));         // Kernel code
+        self.memory_regions.push((0x0100_0000, 0x7F00_0000, UefiMemoryType::ConventionalMemory)); // RAM
+        self.memory_regions.push((0x7F00_0000, 0x0100_0000, UefiMemoryType::AcpiReclaim));        // ACPI
         self.memory_regions.len()
     }
 
@@ -268,7 +264,7 @@ impl BareMetalAcpiMadtEngine {
         // 1. Discover MADT
         // 2. Enumerate Local APICs (cores)
         self.cpu_cores_discovered = 8; // Simulated 8-core CPU
-                                       // 3. Disable legacy 8259 PIC (mask all IRQs via port 0x21 and 0xA1 to 0xFF)
+        // 3. Disable legacy 8259 PIC (mask all IRQs via port 0x21 and 0xA1 to 0xFF)
         self.pic_8259_disabled = true;
         // 4. Calibrate Local APIC timer using ACPI PM Timer
         self.apic_timer_calibrated = true;
@@ -301,7 +297,7 @@ pub struct GopTextConsoleDriver {
 
 impl GopTextConsoleDriver {
     pub fn new(fb: GopFramebufferHandoff) -> Self {
-        let cols = fb.width / 8; // 8px font width
+        let cols = fb.width / 8;   // 8px font width
         let rows = fb.height / 16; // 16px font height
         Self {
             fb,

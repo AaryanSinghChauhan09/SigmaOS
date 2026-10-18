@@ -1115,8 +1115,11 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         target_distro: LinuxBsdDistroInspiration,
         payload: &str,
     ) -> String {
-        self.harmony_engine
-            .translate_subsystem_payload(source_distro, target_distro, payload)
+        self.harmony_engine.translate_subsystem_payload(
+            source_distro,
+            target_distro,
+            payload,
+        )
     }
 
     /// Perform system-wide distro compliance audit across all core subsystems.
