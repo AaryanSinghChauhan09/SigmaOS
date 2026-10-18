@@ -23,6 +23,7 @@ pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_missing_components_parity_pr;
 pub mod gridcraft;
+pub mod wordcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
@@ -516,11 +517,29 @@ pub use wordcraft::{
     WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
     WordCraftPullRequestSpec,
 };
+pub use wordcraft_artcraft_parity_pr::{
+    SovereignWordcraftArtcraftParityPrGateway as SovereignWordcraftArtcraftParityPrGatewayV3,
+    WordcraftArtcraftParityPrSuite, WordcraftArtcraftPrProposalManifest,
+    WordcraftChapterManifestEntry, WordcraftCitationBibliographyCrossReferencePrEngine,
+    WordcraftCitationSource, WordcraftCitationStyle, WordcraftColumnLayoutConfig,
+    WordcraftCrdtMultiUserCoAuthoringPrEngine, WordcraftDocumentSecurityWatermarkPrEngine,
+    WordcraftDocumentStyle, WordcraftDocumentTextDelta, WordcraftDocumentTheme,
+    WordcraftEpubPdfBookPublisherPrEngine, WordcraftFormFieldEntry,
+    WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftLinguisticIssue,
+    WordcraftMailMergeAutomationPrEngine, WordcraftMasterTemplateThemeCascadePrEngine,
+    WordcraftOpenTypeTypographyLayoutPrEngine, WordcraftSelectionCursor,
+    WordcraftStyleHierarchyThemeCascadePrEngine, WordcraftTableFormula,
+    WordcraftTableFormulaChartPrEngine, WordcraftTocEntry,
+};
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine,
-    WordcraftEpubPdfBookPublisherPrEngine, WordcraftLinguisticAiSpellGrammarPrEngine,
-    WordcraftMailMergeAutomationPrEngine, WordcraftMissingComponentsParityPrSuite,
-    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
-    WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
-    WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine as WordcraftDocumentSecurityWatermarkPrEngineLegacy,
+    WordcraftEpubPdfBookPublisherPrEngine as WordcraftEpubPdfBookPublisherPrEngineLegacy,
+    WordcraftLinguisticAiSpellGrammarPrEngine as WordcraftLinguisticAiSpellGrammarPrEngineLegacy,
+    WordcraftMailMergeAutomationPrEngine as WordcraftMailMergeAutomationPrEngineLegacy,
+    WordcraftMissingComponentsParityPrSuite,
+    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine as WordcraftRealtimeCrdtCollabPrEngineLegacy,
+    WordcraftReferenceCitationBibliographyPrEngine as WordcraftReferenceCitationBibliographyPrEngineLegacy,
+    WordcraftStylesTemplatesThemesPrEngine,
+    WordcraftTableFormulaChartPrEngine as WordcraftTableFormulaChartPrEngineLegacy,
+    WordcraftTypographyLayoutPrEngine,
 };
