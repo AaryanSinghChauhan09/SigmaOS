@@ -74,8 +74,7 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV50, SovereignUniversalPackageVerifier,
     UniversalDistroPackageOrchestrator, UniversalForeignPackageFormat,
     UniversalForeignPackageFormatConverter, UniversalPackageFormat, UniversalPackageImporter,
-    UniversalPackageTriggerEngine, UniversalPackageTriggerType,
-    UniversalPackageVerificationResult,
+    UniversalPackageTriggerEngine, UniversalPackageTriggerType, UniversalPackageVerificationResult,
 };
 pub mod process;
 pub mod productivity;
@@ -94,8 +93,8 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV8, SovereignDistroPackageAdvancementsSuiteV51, SovereignUniversalPackageFormatMasterEngine,
-    UniversalPackageFormatKind,
+    SovereignDistroPackageAdvancementsSuiteV51, SovereignDistroPackageAdvancementsSuiteV8,
+    SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
     SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,

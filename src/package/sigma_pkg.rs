@@ -2337,13 +2337,34 @@ impl SovereignUniversalPackageVerifier {
         _raw_data: &[u8],
     ) -> UniversalPackageVerificationResult {
         let (sig_type, identity) = match format {
-            UniversalPackageFormat::DebianDeb => ("GPG/dpkg-sig", "Debian Archive Automatic Signing Key <ftpmaster@debian.org>"),
-            UniversalPackageFormat::ArchPacman => ("GPG/ArchALPM", "Arch Linux Package Build Key <master-key@archlinux.org>"),
-            UniversalPackageFormat::FedoraRpm => ("GPG/RPM-v4", "Fedora Project (39) <fedora-39-primary@fedoraproject.org>"),
-            UniversalPackageFormat::AlpineApk => ("APK-v3/RSA-2048", "Alpine Linux Build Key <alpine@alpinelinux.org>"),
-            UniversalPackageFormat::OpenBsdPkg => ("Signify/Ed25519", "OpenBSD 7.5 Base Key <pkg-add@openbsd.org>"),
-            UniversalPackageFormat::FreeBsdPkg => ("X509/Ed25519", "FreeBSD Ports Repository Signing CA <pkg@freebsd.org>"),
-            _ => ("PQC-Dilithium5", "Sovereign OS Universal Trust Root <security@sigmaos.org>"),
+            UniversalPackageFormat::DebianDeb => (
+                "GPG/dpkg-sig",
+                "Debian Archive Automatic Signing Key <ftpmaster@debian.org>",
+            ),
+            UniversalPackageFormat::ArchPacman => (
+                "GPG/ArchALPM",
+                "Arch Linux Package Build Key <master-key@archlinux.org>",
+            ),
+            UniversalPackageFormat::FedoraRpm => (
+                "GPG/RPM-v4",
+                "Fedora Project (39) <fedora-39-primary@fedoraproject.org>",
+            ),
+            UniversalPackageFormat::AlpineApk => (
+                "APK-v3/RSA-2048",
+                "Alpine Linux Build Key <alpine@alpinelinux.org>",
+            ),
+            UniversalPackageFormat::OpenBsdPkg => (
+                "Signify/Ed25519",
+                "OpenBSD 7.5 Base Key <pkg-add@openbsd.org>",
+            ),
+            UniversalPackageFormat::FreeBsdPkg => (
+                "X509/Ed25519",
+                "FreeBSD Ports Repository Signing CA <pkg@freebsd.org>",
+            ),
+            _ => (
+                "PQC-Dilithium5",
+                "Sovereign OS Universal Trust Root <security@sigmaos.org>",
+            ),
         };
 
         UniversalPackageVerificationResult {
