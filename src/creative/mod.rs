@@ -5,6 +5,8 @@
 pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
+pub mod cadcraft_artcraft_parity_pr;
+pub mod cadcraft_missing_components_parity_pr;
 pub mod deckcraft;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
@@ -26,6 +28,9 @@ pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod wordcraft;
+
+pub use cadcraft_artcraft_parity_pr::*;
+pub use cadcraft_missing_components_parity_pr::*;
 
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
@@ -65,7 +70,7 @@ pub use effectcraft_missing_components_parity_pr::{
     EffectcraftExpressionScriptingRiggingPrEngine, EffectcraftMissingComponentsParityPrSuite,
     EffectcraftOpticalFlowMotionVectorPrEngine, EffectcraftPrProposalManifest,
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftMissingComponentsParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
