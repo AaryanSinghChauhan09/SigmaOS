@@ -1636,6 +1636,8 @@ impl Default for UserlandInitPrGatewayEngine {
     }
 }
 
+}
+}
 #[cfg(test)]
 mod tests {
     use super::*;

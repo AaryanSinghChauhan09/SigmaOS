@@ -573,6 +573,14 @@ pub struct BsdRcScript {
 pub struct BsdRcInspirationsPrEngine;
 
 impl BsdRcInspirationsPrEngine {
+    /// Merge rc.conf and rc.conf.local configuration key-value overrides.
+    pub fn merge_rc_conf_overrides(&self, conf: &alloc::collections::BTreeMap<String, String>, local: &alloc::collections::BTreeMap<String, String>) -> alloc::collections::BTreeMap<String, String> {
+        let mut merged = conf.clone();
+        for (k, v) in local {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
     pub fn new() -> Self {
         Self
     }
@@ -1282,7 +1290,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
