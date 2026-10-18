@@ -42,13 +42,13 @@ pub mod linux_bsd_innovations;
 pub mod linux_parity;
 pub mod missing_linux_kernel_components;
 pub mod process_monitor;
-pub mod sysfs_manager;
 pub mod sysctl;
-pub use sysctl::*;
+pub mod sysfs_manager;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
     LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,
 };
+pub use sysctl::*;
 pub mod memory;
 pub mod meta;
 pub mod module_loader;
