@@ -63,7 +63,17 @@ pub struct E1000Driver {
     pub capabilities: CapabilityToken,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DeviceId {
+    pub vendor: u16,
+    pub device: u16,
+}
+
 impl E1000Driver {
+    pub fn probe(device_id: &DeviceId) -> bool {
+        device_id.vendor == 0x8086 && (device_id.device == 0x100E || device_id.device == 0x100F || device_id.device == 0x1539)
+    }
+
     pub fn new(mmio_base: usize, capabilities: CapabilityToken) -> Self {
         let empty_rx = RxDescriptor {
             buffer_addr: 0,

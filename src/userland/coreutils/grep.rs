@@ -87,7 +87,6 @@ fn match_reader<R: BufRead>(
             line.contains(pattern)
         };
 
-        let is_match = check_line.contains(pattern);
         let passes = if options.invert_match {
             !is_match
         } else {

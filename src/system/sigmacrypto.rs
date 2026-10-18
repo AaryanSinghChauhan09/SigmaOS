@@ -291,7 +291,7 @@ mod tests {
 
         assert_eq!(key.key_id, "key1");
         assert_eq!(key.key_name, "main_key");
-        assert_eq!(key.encryption_type, EncryptionType::AES256);
+        assert_eq!(key.key_type, EncryptionType::AES256);
         assert_eq!(key.key_size, 256);
         assert!(key.is_key_active());
     }

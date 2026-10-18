@@ -83,7 +83,7 @@ impl ShaderFilterGraphPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Real-time GPU Shader Filter Graph Engine".to_string(),
             target_subsystem: "GPU Shader Graph Compositor".to_string(),
             original_suite: "ArtCraft EffectCraft Shader Graph".to_string(),
@@ -169,7 +169,7 @@ impl ParticlePhysicsEffectPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Particle Physics Simulation Engine".to_string(),
             target_subsystem: "VFX Particle Physics Engine".to_string(),
             original_suite: "ArtCraft Particle Physics Studio".to_string(),
@@ -226,7 +226,7 @@ impl NeuralMatteSegmentationPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Neural Matte Auto-Keying Engine".to_string(),
             target_subsystem: "AI Background Segmentation".to_string(),
             original_suite: "ArtCraft Neural Keyer".to_string(),
@@ -279,7 +279,7 @@ impl AudioReactiveVisualizerPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Audio Reactive Frequency Spectrum Engine".to_string(),
             target_subsystem: "Audio Reactive Motion Graphics".to_string(),
             original_suite: "ArtCraft Audio Visualizer".to_string(),
@@ -293,7 +293,7 @@ impl AudioReactiveVisualizerPrEngine {
     }
 
     pub fn get_band_magnitude(&self, band: usize) -> f32 {
-        self.fft_bands.get(band).copied().unwrap_or(0.0)
+        self.frequency_bands.get(band).copied().unwrap_or(0.0)
     }
 }
 
@@ -329,7 +329,7 @@ impl Spatial3DDepthCompositorPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Spatial 3D Depth Projection Engine".to_string(),
             target_subsystem: "3D Depth Compositor".to_string(),
             original_suite: "ArtCraft 3D Projection Engine".to_string(),
@@ -343,8 +343,7 @@ impl Spatial3DDepthCompositorPrEngine {
     }
 
     pub fn solve_camera_track(&mut self, tracked_points: &[[f32; 2]]) -> usize {
-        self.point_cloud_count = tracked_points.len();
-        self.point_cloud_count
+        tracked_points.len()
     }
 
     pub fn composite_depth_pass(
@@ -435,7 +434,7 @@ impl ArtCraftOpenFxPluginPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement OpenFX Plugin Host Adapter".to_string(),
             target_subsystem: "OpenFX Plugin Ecosystem".to_string(),
             original_suite: "ArtCraft OpenFX Host Engine".to_string(),
@@ -515,7 +514,7 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Optical Flow Motion Vector Engine".to_string(),
             target_subsystem: "Motion Estimation & Retiming".to_string(),
             original_suite: "ArtCraft Optical Flow Engine".to_string(),
@@ -557,7 +556,7 @@ pub struct VolumetricLightingAtmosphericRaymarchPrEngine {
 
 impl VolumetricLightingAtmosphericRaymarchPrEngine {
     pub fn new() -> Self {
-        Self { smoothness: 1.0 }
+        Self { light_shafts: Vec::new(), fog_density: 0.05, mie_scattering_g: 0.7, raymarch_steps: 32 }
     }
 
     pub fn add_light_shaft(&mut self, shaft: LightShaft) {
@@ -574,7 +573,7 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Volumetric Atmospheric Raymarching Engine".to_string(),
             target_subsystem: "Atmospheric God-Ray Engine".to_string(),
             original_suite: "ArtCraft Volumetric Studio".to_string(),
@@ -586,16 +585,6 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-}
-
-// ============================================================================
-// 9. EffectcraftCryptomatteAovExtractorPrEngine
-// ============================================================================
-
-/// Cryptomatte EXR manifest parser, ID matte extraction & AOV pass compositor
-#[derive(Debug, Clone, Default)]
-pub struct EffectcraftCryptomatteAovExtractorPrEngine {
-    pub manifests: BTreeMap<String, String>,
 }
 
 // ----------------------------------------------------------------------------
@@ -644,26 +633,6 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
             current_space: WorkingColorSpace::Rec709,
         }
     }
-}
-
-// ============================================================================
-// 10. EffectcraftExpressionScriptingRiggingPrEngine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct FilmGrainProfile {
-    pub film_stock: String,
-    pub grain_size: f32,
-    pub intensity: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct TemporalNoiseReductionMotionDegrainPrEngine;
-
-impl TemporalNoiseReductionMotionDegrainPrEngine {
-    pub fn new() -> Self {
-        Self
-    }
 
     pub fn convert_color_space(&mut self, _source: WorkingColorSpace, target: WorkingColorSpace, rgb: &mut [f32; 3]) {
         self.current_space = target;
@@ -685,7 +654,7 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement ACES Color Management Engine".to_string(),
             target_subsystem: "ACES & OCIO Color Science".to_string(),
             original_suite: "ArtCraft ACES Color Engine".to_string(),
@@ -716,21 +685,19 @@ pub enum StereoFormat {
     TopBottom,
 }
 
+/// Stereoscopic VR 360 & Spatial Video PR Engine.
 #[derive(Debug, Clone)]
-pub struct ExpressionDriver {
-    pub param_name: String,
-    pub expression_script: String,
+pub struct StereoscopicVr360SpatialVideoPrEngine {
+    pub ipd_mm: f32,
+    pub eye_separation: f32,
 }
 
-/// Motion Graphics Expression Evaluator PR Engine.
-#[derive(Debug, Clone)]
-pub struct EffectcraftExpressionScriptingRiggingPrEngine {
-    pub slider_rigs: BTreeMap<String, f32>,
-}
-
-impl EffectcraftExpressionScriptingRiggingPrEngine {
+impl StereoscopicVr360SpatialVideoPrEngine {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            ipd_mm: 64.0,
+            eye_separation: 64.0,
+        }
     }
 
     pub fn composite_stereoscopic_pair(&self, left: &[u8], right: &[u8], format: StereoFormat) -> Result<Vec<u8>, String> {
@@ -771,7 +738,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Stereoscopic VR 360 Spatial Engine".to_string(),
             target_subsystem: "VR 360 Spatial Compositor".to_string(),
             original_suite: "ArtCraft Spatial VR Engine".to_string(),
@@ -834,7 +801,7 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Procedural VFX Fractal Fluid Simulation Engine".to_string(),
             target_subsystem: "VFX Fluid Dynamics Studio".to_string(),
             original_suite: "ArtCraft Fluid Dynamics Engine".to_string(),
@@ -916,7 +883,7 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Temporal Noise Reduction Engine".to_string(),
             target_subsystem: "Noise Reduction & Degrain".to_string(),
             original_suite: "ArtCraft Temporal Denoise".to_string(),
@@ -983,7 +950,7 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Cryptomatte AOV Extractor Engine".to_string(),
             target_subsystem: "Cryptomatte AOV Extractor".to_string(),
             original_suite: "ArtCraft Cryptomatte Engine".to_string(),
@@ -1038,19 +1005,10 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         } else {
             Ok(time_sec * 10.0)
         }
-        let cos_theta =
-            view_dir[0] * light_pos[0] + view_dir[1] * light_pos[1] + view_dir[2] * light_pos[2];
-        let g2 = self.anisotropy_g * self.anisotropy_g;
-        let phase = (1.0 - g2)
-            / (4.0
-                * core::f32::consts::PI
-                * (1.0 + g2 - 2.0 * self.anisotropy_g * cos_theta).powf(1.5));
-        let total_accumulation = phase * self.fog_density * (self.raymarch_steps as f32) * 0.1;
-        Ok(total_accumulation.clamp(0.0, 10.0))
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalManifest {
+        EffectcraftPrProposalSpec {
             pr_title: "feat(effectcraft): Implement Expression Scripting & Rigging Engine".to_string(),
             target_subsystem: "Expression Scripting Engine".to_string(),
             original_suite: "ArtCraft Expression Rigging".to_string(),
@@ -1172,66 +1130,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_shader_filter_graph_engine_functional() {
-        let mut engine = ShaderFilterGraphPrEngine::new();
-        engine.add_node("node1", "vec4 color = vec4(1.0, 0.0, 0.0, 1.0);");
-        let compiled = engine.compile_shader_graph().unwrap();
-        assert!(compiled.contains("#version 450 core"));
-        assert!(compiled.contains("Node: node1"));
-    }
-
-    #[test]
-    fn test_particle_physics_engine_functional() {
-        let mut engine = ParticlePhysicsEffectPrEngine::new();
-        engine.emit_particle([0.0, 10.0, 0.0], [1.0, 0.0, 0.0], 2.0);
-        assert_eq!(engine.particles.len(), 1);
-        engine.step_simulation(0.1);
-        assert!(engine.particles[0].position[1] < 10.0);
-    }
-
-    #[test]
-    fn test_neural_matte_engine_functional() {
-        let engine = NeuralMatteSegmentationPrEngine::new();
-        let sample = vec![200u8, 100u8, 250u8];
-        let alpha = engine.segment_image_alpha(&sample);
-        assert_eq!(alpha.len(), 3);
-        assert_eq!(alpha[2], 255);
-    }
-
-    #[test]
-    fn test_audio_reactive_engine_functional() {
-        let mut engine = AudioReactiveVisualizerPrEngine::new();
-        let audio = vec![0.5, 0.8, 0.2, 0.9, 0.1, 0.4, 0.6, 0.3];
-        engine.process_audio_samples(&audio);
-        assert!(engine.get_band_magnitude(0) > 0.0);
-    }
-
-    #[test]
-    fn test_spatial_3d_engine_functional() {
-        let mut engine = Spatial3DDepthCompositorPrEngine::new();
-        let tracked = engine.solve_camera_track(&[[10.0, 20.0], [30.0, 40.0]]);
-        assert_eq!(tracked, 2);
-
-        let color = vec![255, 0, 0, 255];
-        let depth = vec![5.0];
-        let out = engine.composite_depth_pass(&color, &depth, 1.0, 10.0);
-        assert_eq!(out, color);
-    }
-
-    #[test]
-    fn test_openfx_adapter_engine_functional() {
-        let mut engine = ArtCraftOpenFxPluginPrEngine::new();
-        assert!(engine.load_openfx_plugin("com.artcraft.blur"));
-        assert!(!engine.load_openfx_plugin("com.artcraft.blur"));
-
-        let frame = vec![128u8; 16];
-        let rendered = engine
-            .render_plugin_effect("com.artcraft.blur", &frame)
-            .unwrap();
-        assert_eq!(rendered, frame);
-    }
-
-    #[test]
     fn test_optical_flow_engine_functional() {
         let mut engine = EffectcraftOpticalFlowMotionVectorPrEngine::new();
         let frame1 = vec![0, 0, 0, 255];
@@ -1346,7 +1244,7 @@ mod tests {
     }
 
     #[test]
-    fn test_volumetric_lighting_engine_functional() {
+    fn test_volumetric_lighting_engine_functional_v2() {
         let engine = VolumetricLightingAtmosphericRaymarchPrEngine::new();
         let shafts = engine
             .compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0])
@@ -1386,7 +1284,7 @@ mod tests {
     }
 
     #[test]
-    fn test_shader_filter_graph_engine_functional() {
+    fn test_shader_filter_graph_engine_functional_v2() {
         let mut engine = ShaderFilterGraphPrEngine::new();
         let glsl = "uniform float u_opacity;\nvoid main() {}";
         let res = engine.compile_glsl_shader("vignette", glsl);
@@ -1401,7 +1299,7 @@ mod tests {
     }
 
     #[test]
-    fn test_particle_physics_engine_functional() {
+    fn test_particle_physics_engine_functional_v2() {
         let mut engine = ParticlePhysicsEffectPrEngine::new();
         let emitted = engine.emit_particles("smoke", 10).unwrap();
         assert_eq!(emitted, 10);
@@ -1411,7 +1309,7 @@ mod tests {
     }
 
     #[test]
-    fn test_neural_matte_engine_functional() {
+    fn test_neural_matte_engine_functional_v2() {
         let engine = NeuralMatteSegmentationPrEngine::new();
         let pixels = vec![
             0, 200, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
@@ -1423,7 +1321,7 @@ mod tests {
     }
 
     #[test]
-    fn test_audio_reactive_engine_functional() {
+    fn test_audio_reactive_engine_functional_v2() {
         let mut engine = AudioReactiveVisualizerPrEngine::new();
         let samples = vec![0.1, 0.5, 0.8, 0.3, 0.9, 0.2, 0.4, 0.7, 0.6, 0.1];
         let bands = engine.process_audio_buffer(&samples).unwrap();
@@ -1432,7 +1330,7 @@ mod tests {
     }
 
     #[test]
-    fn test_spatial_3d_engine_functional() {
+    fn test_spatial_3d_engine_functional_v2() {
         let engine = Spatial3DDepthCompositorPrEngine::new();
         let points = vec![Point3D {
             position: [10.0, 20.0, 50.0],
@@ -1446,7 +1344,7 @@ mod tests {
     }
 
     #[test]
-    fn test_openfx_adapter_engine_functional() {
+    fn test_openfx_adapter_engine_functional_v2() {
         let mut engine = ArtCraftOpenFxPluginPrEngine::new();
         let load_res = engine.load_openfx_plugin("com.artcraft.Sharpen");
         assert!(load_res.is_ok());

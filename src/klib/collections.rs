@@ -212,14 +212,14 @@ mod tests {
 
     #[test]
     fn test_hashset_basic() {
-        let mut set = HashSet::<u32>::new();
+        let set: HashSet<u32> = HashSet::new();
         assert!(set.is_empty());
         assert_eq!(set.len(), 0);
     }
 
     #[test]
     fn test_vecdeque_basic() {
-        let deque = VecDeque::<u32>::new();
+        let deque: VecDeque<u32> = VecDeque::new();
         assert!(deque.is_empty());
         assert_eq!(deque.len(), 0);
     }

@@ -58,6 +58,9 @@ pub enum ContainerFormat {
     FLV,
     OGG,
     TS,
+    MP3,
+    WAV,
+    FLAC,
 }
 
 /// Playback state

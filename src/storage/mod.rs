@@ -18,6 +18,7 @@
 // Database engines, block storage systems, and data management
 
 pub mod block;
+pub mod block_device_extended;
 pub mod geom;
 pub mod nosql_engine;
 pub mod search;

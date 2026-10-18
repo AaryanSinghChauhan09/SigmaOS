@@ -6,7 +6,7 @@ use sigmaos::compatibility::{
     APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
     AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, BinaryCompatMatrix,
     BrailleMatrix, BsdJailSandbox, BundleType, CloudOrchestrator, CloudProvider, CompatBinary,
-    CompatBinaryFormat, CompatibilityLayer, ContinuityCoordinator, DesktopMode,
+    CompatBinaryFormat, CompatibilityLayer, ContinuityCoordinator,
     DesktopProfile as AntixDesktopProfile, DesktopTheme, DiscontinuedFS, DistroReleaseChannel,
     DriverBridge, EcosystemSnapshot, FSRevival, FlatpakApp, GraphicsBridge, HandoffTask,
     InstallerStep, KapudanAssistant, KernelPersona, KernelPersonaVM, LanguageTranslationCatalog,
@@ -41,22 +41,33 @@ use sigmaos::performance::{
     GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
 use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
+use std::collections::BTreeMap;
+use sigmaos::productivity::utility_suite::*;
+use sigmaos::productivity::media::*;
+use sigmaos::compatibility::gap_closure;
+use sigmaos::compatibility::gap_closure::*;
+use sigmaos::compatibility::gap_closure::{SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, DesktopMode};
+use sigmaos::graphics::paint::ColorRgba;
+use sigmaos::logging::rotation::*;
+use sigmaos::logging::*;
+use sigmaos::filesystem::sovereign_link_engine::SovereignLinkEngine;
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
-use sigmaos::security::parrot::SandboxPolicy;
+use sigmaos::security::forensics::{AnonSurfShunt, AppSandboxEngine, SandboxPolicy, RoutingMode};
 use sigmaos::security::{
-    AnonSurfShunt, AppSandboxEngine, CapabilityToken, DefensiveAuditSystem, ForensicBlock,
-    ForensicStorageFilter, MaliciousSignature, Permission, RoutingMode, GLOBAL_ANONSURF,
-    GLOBAL_FORENSIC, GLOBAL_SANDBOX, MAX_AUDIT_BLOCKS, MAX_SIGNATURES, SIGNATURE_LEN,
+    CapabilityToken, DefensiveAuditSystem,
+    ForensicStorageFilter, Permission, GLOBAL_ANONSURF,
+    GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
 
+use sigmaos::kernel::process::ProcessState;
 use sigmaos::kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcMode, ApcQueue, ArchitectureEngine,
+    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcQueue, ArchitectureEngine,
     AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, EdfTask,
     HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase,
     InterruptClass, IoWaitProfile, Irql, KernelMechanism, KernelPolicy, LcgRandom, LookasideList,
     LotteryTask, MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType, Priority,
-    Process, ProcessState, ProcessorInitState, SequencedSinglyLinkedList, SinglyLinkedList,
-    SovereignMechanism, SystemThread, Tcb, ThreadState, WorkItem,
+    Process, ProcessorInitState, SequencedSinglyLinkedList, SinglyLinkedList,
+    SovereignMechanism, SystemThread, Tcb, WorkItem,
 };
 
 #[cfg(test)]
@@ -66,18 +77,21 @@ mod tests {
     #[test]
     fn test_system_integration() {
         // Linux-conforming Hard Link reference counting
-        let mut vfs = VirtualFilesystem::new();
-        let inode_id = vfs.create_file(FileType::Regular, 100).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+        let mut link_engine = SovereignLinkEngine::new();
+        let ino = link_engine.create_file("/var/log/syslog", b"log_data");
+        assert_eq!(link_engine.inodes.get(&ino).unwrap().hard_link_count, 1);
 
-        vfs.create_hard_link(inode_id).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 2);
+        link_engine
+            .create_hard_link("/var/log/syslog", "/var/log/syslog.hard")
+            .unwrap();
+        assert_eq!(link_engine.inodes.get(&ino).unwrap().hard_link_count, 2);
 
-        vfs.delete_file(inode_id).unwrap();
-        assert_eq!(vfs.get_inode(inode_id).unwrap().link_count, 1);
+        link_engine.unlink("/var/log/syslog").unwrap();
+        assert_eq!(link_engine.inodes.get(&ino).unwrap().hard_link_count, 1);
+        assert!(link_engine.inodes.contains_key(&ino));
 
-        vfs.delete_file(inode_id).unwrap();
-        assert!(vfs.get_inode(inode_id).is_none()); // fully freed
+        link_engine.unlink("/var/log/syslog.hard").unwrap();
+        assert!(!link_engine.inodes.contains_key(&ino));
 
         // 3. Syslog-parity multi-generation rotations, facilities, and RLE compression
         let log_file = SimpleLogFile::new(10, b"/var/log/cron")
@@ -336,7 +350,7 @@ mod tests {
 
     #[test]
     fn test_defensive_audit_and_anomaly_detection() {
-        let audit = DefensiveAuditSystem::new(75);
+        let mut audit = DefensiveAuditSystem::new(75);
 
         // Log simple safe event
         assert!(audit.log_event(1716000000, 1000, 4, b"ls -la").is_ok());
@@ -517,15 +531,15 @@ mod tests {
     fn test_smart_resource_optimizer() {
         // Test CPU Priority Optimizer
         let cpu_optimizer = CpuPriorityOptimizer::new();
-        let mut proc1 = Process::new(1, "proc1".to_string(), Priority::Normal);
+        let mut proc1 = Process::new(1, 0, "proc1".to_string());
         proc1.state = ProcessState::Running;
-        let mut proc2 = Process::new(2, "proc2".to_string(), Priority::Normal);
-        proc2.state = ProcessState::Blocked;
+        let mut proc2 = Process::new(2, 0, "proc2".to_string());
+        proc2.state = ProcessState::Sleeping;
         let mut processes = [proc1, proc2];
 
         cpu_optimizer.optimize_process_priorities(&mut processes);
-        assert_eq!(processes[0].priority, Priority::High);
-        assert_eq!(processes[1].priority, Priority::Low);
+        assert_eq!(processes[0].scheduling.static_priority, Priority::High.value);
+        assert_eq!(processes[1].scheduling.static_priority, Priority::Low.value);
 
         // Test RAM Defragmenter
         let defragmenter = RamDefragmenter::new();

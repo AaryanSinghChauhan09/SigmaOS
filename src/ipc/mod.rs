@@ -13,6 +13,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+pub mod alpc;
 pub mod async_io;
 pub mod bus;
 pub mod futex;
@@ -22,6 +23,7 @@ pub mod ipc_namespace;
 pub mod mechanism;
 pub mod message;
 pub mod pipe;
+pub mod pipes;
 pub mod sigmabus;
 pub mod signals;
 pub mod socket;

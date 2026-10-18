@@ -162,6 +162,10 @@ impl SecurityIdentifier {
             sid_str: sid_str.to_string(),
         }
     }
+
+    pub fn local_system() -> Self {
+        Self::new("S-1-5-18")
+    }
 }
 
 pub mod ntfs_rights {
@@ -188,9 +192,30 @@ pub struct NtfsAce {
     pub inherits_to_children: bool,
 }
 
-#[derive(Debug, Clone)]
+impl NtfsAce {
+    pub fn allow(sid: SecurityIdentifier, mask: u32, _flags: u32) -> Self {
+        Self {
+            ace_type: AceType::AccessAllowed,
+            sid,
+            mask,
+            inherits_to_children: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct NtfsDacl {
     pub aces: Vec<NtfsAce>,
+}
+
+impl NtfsDacl {
+    pub fn new() -> Self {
+        Self { aces: Vec::new() }
+    }
+
+    pub fn add_ace(&mut self, ace: NtfsAce) {
+        self.aces.push(ace);
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -3,10 +3,10 @@ extern crate alloc;
 use alloc::vec::Vec;
 
 use sigmaos::arch_kernel_inspirations::{
-    AdvisorySeverity, AlpmPackage, AlpmResolutionError, AlpmTransactionEngine, Expectation,
-    ExpectationKind, HookAction, KUnitEngine, MkinitcpioHookFramework, PackageSignoff,
-    RebuildOrderSolver, ReproducibleBuildVerdict, ReproducibleStatus, SecurityAdvisory,
-    SecurityAdvisoryTracker, SignerPolicy, SignstarService,
+    AdvisorySeverity, AdvisoryStatus, AdvisoryType, AlpmPackage, AlpmResolutionError,
+    AlpmTransactionEngine, DistroOrigin, Expectation, ExpectationKind, HookAction, KUnitEngine,
+    MkinitcpioHookFramework, PackageSignoff, RebuildOrderSolver, ReproducibleBuildVerdict,
+    ReproducibleStatus, SecurityAdvisory, SecurityAdvisoryTracker, SignerPolicy, SignstarService,
 };
 
 type KUnitTestCaseClosure = Box<dyn FnOnce(&mut Vec<Expectation>) + Send>;
@@ -122,6 +122,11 @@ fn security_tracker_flags_cves_and_upgrades() {
         affected_versions: vec!["1.1.1".into(), "3.0.0".into()],
         fixed_version: Some("3.0.1".into()),
         severity: AdvisorySeverity::Critical,
+        cvss_score: 98,
+        advisory_type: AdvisoryType::Vulnerability,
+        status: AdvisoryStatus::Vulnerable,
+        origin: DistroOrigin::ArchLinux,
+        workaround: None,
         description: "remote buffer overflow".into(),
     });
     t.add(SecurityAdvisory {
@@ -130,6 +135,11 @@ fn security_tracker_flags_cves_and_upgrades() {
         affected_versions: vec!["5.1".into()],
         fixed_version: Some("5.2".into()),
         severity: AdvisorySeverity::High,
+        cvss_score: 85,
+        advisory_type: AdvisoryType::Vulnerability,
+        status: AdvisoryStatus::Vulnerable,
+        origin: DistroOrigin::ArchLinux,
+        workaround: None,
         description: "arbitrary command injection".into(),
     });
     assert_eq!(t.affected("openssl", "1.1.1").len(), 1);

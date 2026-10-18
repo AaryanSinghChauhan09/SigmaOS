@@ -21,15 +21,7 @@ use std::format;
 #[cfg(target_os = "none")]
 use std::vec::Vec;
 
-#[cfg(not(test))]
 use crate::distro::fedora_pagure_exporter::FedoraPagureExporterEngine;
-
-#[cfg(test_disabled)]
-#[path = "fedora_pagure_exporter.rs"]
-mod fedora_pagure_exporter;
-
-#[cfg(test)]
-use fedora_pagure_exporter::FedoraPagureExporterEngine;
 
 // ============================================================================
 // 1. Anitya Release Monitoring Provider Types & Project Spec

@@ -141,6 +141,43 @@ impl DamageRegion {
     }
 }
 
+/// Wayland surface damage tracker
+#[derive(Debug, Clone, Default)]
+pub struct WaylandSurfaceDamageTracker {
+    pub surface_damage: alloc::collections::BTreeMap<u64, DamageRegion>,
+}
+
+impl WaylandSurfaceDamageTracker {
+    pub fn new() -> Self {
+        Self {
+            surface_damage: alloc::collections::BTreeMap::new(),
+        }
+    }
+
+    pub fn add_damage(&mut self, surface_id: u64, damage: DamageRegion) {
+        if let Some(existing) = self.surface_damage.get_mut(&surface_id) {
+            let min_x = existing.x.min(damage.x);
+            let min_y = existing.y.min(damage.y);
+            let max_x = (existing.x + existing.width as i32).max(damage.x + damage.width as i32);
+            let max_y = (existing.y + existing.height as i32).max(damage.y + damage.height as i32);
+            existing.x = min_x;
+            existing.y = min_y;
+            existing.width = (max_x - min_x).max(0) as u32;
+            existing.height = (max_y - min_y).max(0) as u32;
+        } else {
+            self.surface_damage.insert(surface_id, damage);
+        }
+    }
+
+    pub fn get_accumulated_damage(&self, surface_id: u64) -> Option<DamageRegion> {
+        self.surface_damage.get(&surface_id).copied()
+    }
+
+    pub fn clear_surface_damage(&mut self, surface_id: u64) {
+        self.surface_damage.remove(&surface_id);
+    }
+}
+
 /// Zenith window representation
 #[derive(Debug, Clone)]
 pub struct ZenithWindow {

@@ -3,7 +3,7 @@
 
 use sigmaos::boot::{BootType, KernelCmdlineOptions, UefiBootloader};
 use sigmaos::filesystem::{FileType, VirtualFilesystem};
-use sigmaos::kernel::{BuddyAllocator, Priority, Process, ProcessState};
+use sigmaos::kernel::BuddyAllocator;
 use sigmaos::network::{DhcpClient, DhcpState, DnsResolver};
 use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
 

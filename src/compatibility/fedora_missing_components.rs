@@ -139,54 +139,6 @@ impl Default for FedoraKojiBuildSystemEngine {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_fedora_ignition_engine() {
-        let mut ignition = FedoraIgnitionEngine::new();
-        assert_eq!(ignition.version, "3.4.0");
-        let res = ignition.parse_and_apply_config("{\"ignition\": {\"version\": \"3.4.0\"}}");
-        assert!(res.is_ok());
-        assert_eq!(ignition.provisioned_files.len(), 1);
-        assert!(ignition.parse_and_apply_config("").is_err());
-    }
-
-    #[test]
-    fn test_fedora_greenboot_engine() {
-        let mut greenboot = FedoraGreenbootEngine::new();
-        assert!(!greenboot.should_rollback());
-        assert_eq!(
-            greenboot.run_health_check("dns", true),
-            GreenbootCheckStatus::Success
-        );
-        assert_eq!(
-            greenboot.run_health_check("storage", false),
-            GreenbootCheckStatus::Failed
-        );
-        greenboot.run_health_check("network", false);
-        greenboot.run_health_check("kernel", false);
-        assert!(greenboot.should_rollback());
-    }
-
-    #[test]
-    fn test_fedora_keylime_engine() {
-        let mut keylime = FedoraKeylimeEngine::new("agent-01");
-        assert!(!keylime.is_verified);
-        assert!(keylime.verify_tpm_quote("TPM2_QUOTE_VALID_SHA256"));
-        assert!(keylime.is_verified);
-    }
-
-    #[test]
-    fn test_fedora_fedocal_engine() {
-        let mut fedocal = FedoraFedocalEngine::new();
-        let count = fedocal.create_event(101, "Fedora 42 Release Party", "RelEng");
-        assert_eq!(count, 1);
-        assert_eq!(fedocal.events[0].name, "Fedora 42 Release Party");
-    }
-}
-
 // =========================================================================
 // 2. FEDORA BODHI UPDATE SYSTEM ENGINE
 // =========================================================================

@@ -18,6 +18,8 @@ pub mod tcp_udp;
 pub mod warpinator_engine;
 pub mod wireless_manager;
 pub mod zenithnet;
+pub mod commands;
+pub use commands::*;
 
 pub use device_discovery::{
     DeviceDiscoverySyncEngine, DeviceType, DiscoveredPeerDevice, DiscoveryProtocol,
@@ -58,8 +60,9 @@ pub use icmp::{
     IcmpUnreachableCode,
 };
 pub use sigmafirewall::{
-    add_firewall_rule, get_sigmafirewall, init_sigmafirewall, FirewallAction, FirewallProtocol,
-    FirewallRule, SigmaFirewall,
+    add_firewall_rule, get_sigmafirewall, init_sigmafirewall,
+    FirewallAction as SigmaFirewallAction, FirewallProtocol,
+    FirewallRule as SigmaFirewallRule, SigmaFirewall,
 };
 pub use sigmanet::{
     bring_up_interface, connect_interface, get_sigmanet, init_sigmanet, InterfaceStatus,
@@ -113,6 +116,11 @@ pub use ebpf_jit::{EbpfInstruction, EbpfJitCompiler};
 pub use netlink::{
     NetlinkSocketRouter, NlMsgHdr, NETLINK_KOBJECT_UEVENT, NETLINK_ROUTE, NLM_F_REQUEST,
 };
+
+pub mod dhcp_dns;
+pub use dhcp_dns::*;
+
+pub mod protocols;
 
 // Re-export network stubs
 pub use crate::stubs::network_stubs::*;

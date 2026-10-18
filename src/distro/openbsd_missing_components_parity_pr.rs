@@ -138,7 +138,7 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
                 self.pledge_promises.push(promise.to_string());
             }
         }
-        let new_promises: Vec<String> = promises_str
+        let new_promises: Vec<String> = promises
             .split_whitespace()
             .map(|s| s.to_string())
             .collect();
@@ -149,8 +149,8 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
         ))
     }
 
-    pub fn apply_pledge(&mut self, promises: &str) -> Result<String, String> {
-        self.pledge(promises)
+    pub fn pledge(&mut self, promises: &str) -> Result<String, String> {
+        self.apply_pledge(promises)
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<String, String> {
@@ -357,6 +357,21 @@ impl OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
             slaacd_interfaces: Vec::new(),
         }
     }
+
+    pub fn add_doas_rule(&mut self, identity: &str, cmd: &str, nopass: bool) -> String {
+        self.doas_rules.push(OpenBsdDoasRule {
+            permit: true,
+            identity: identity.to_string(),
+            target_user: "root".to_string(),
+            cmd: cmd.to_string(),
+            nopass,
+        });
+        if nopass {
+            format!("permit nopass {} as root cmd {}", identity, cmd)
+        } else {
+            format!("permit {} as root cmd {}", identity, cmd)
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -377,10 +392,8 @@ impl OpenBsdDaemonSuitePrEngine {
 
     pub fn get_daemon_status(&self) -> String {
         format!(
-            "--- a/etc/doas.conf\n+++ b/etc/doas.conf\n@@ -1,1 +1,2 @@\n+permit {} {} as root cmd {}\n",
-            if nopass { "nopass" } else { "" },
-            identity,
-            cmd
+            "smtpd={} doas_configured={} slaacd={}",
+            self.smtpd_running, self.doas_configured, self.slaacd_running
         )
     }
 }

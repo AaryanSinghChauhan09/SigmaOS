@@ -530,10 +530,11 @@ impl SovereignDisplayManagerSuiteEngine {
     ) -> usize {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id as u32,
+            session_id: id,
             remote_address: client_address.to_string(),
             display_number,
             authenticated: true,
+            status: "Pending".to_string(),
         });
         self.xdmcp_manager
             .initiate_handshake(&format!(":{}", display_number), client_address);
@@ -586,10 +587,11 @@ impl SovereignDisplayManagerSuiteEngine {
     ) -> usize {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id as u32,
+            session_id: id,
             remote_address: client_address.to_string(),
             display_number,
             authenticated: true,
+            status: "Pending".to_string(),
         });
         self.xdmcp_manager
             .initiate_handshake(&format!(":{}", display_number), client_address);

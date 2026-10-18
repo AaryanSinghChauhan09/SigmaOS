@@ -11,6 +11,7 @@
 
 pub mod acpi_slit;
 pub mod allocator;
+pub mod bitmap_pmm;
 pub mod cgroups;
 pub mod compaction;
 pub mod ioremap;

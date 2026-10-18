@@ -27,6 +27,7 @@ pub mod dtrace_compat;
 pub mod ebpf;
 pub mod ebpf_verification;
 pub mod ebpf_vm;
+pub mod epoll;
 pub mod exports;
 pub mod gap_closing;
 pub mod gap_filling;
@@ -42,6 +43,8 @@ pub mod linux_parity;
 pub mod missing_linux_kernel_components;
 pub mod process_monitor;
 pub mod sysfs_manager;
+pub mod sysctl;
+pub use sysctl::*;
 pub use linux_parity::{
     CmaRegion, KernelTimer, LinuxCmaAllocatorEngine, LinuxKernelTimerWheel,
     LinuxKernelWorkqueueEngine, LinuxRcuSynchronizationEngine, RcuCallback, WorkItem,

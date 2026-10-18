@@ -76,19 +76,12 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// QEMU Disk Image Specification
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QemuDiskImageSpec {
-    pub image_path: String,
-    pub format: String,
-    pub size_bytes: u64,
-    pub backing_file: Option<String>,
-    pub is_compressed: bool,
-}
+
 
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
+    pub disk_images: Vec<QemuDiskImageSpec>,
     pub vcpus: Vec<KvmVcpuState>,
     pub memory_mapped_bytes: u64,
     pub thp_hugepages_active: bool,
@@ -100,6 +93,7 @@ pub struct KvmQemuEngine {
 impl KvmQemuEngine {
     pub fn new() -> Self {
         Self {
+            disk_images: Vec::new(),
             vcpus: Vec::new(),
             memory_mapped_bytes: 0,
             thp_hugepages_active: true,
@@ -212,14 +206,7 @@ pub struct LibvirtDomainConfig {
     pub is_active: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
-}
+
 
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
@@ -420,6 +407,7 @@ impl XenHypervisorEngine {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BhyveVmConfig {
     pub name: String,
+    pub disk_images: Vec<QemuDiskImageSpec>,
     pub vcpus: u32,
     pub ram_size_mb: u64,
     pub wire_memory: bool,
@@ -455,6 +443,7 @@ impl VirtualBoxBhyveVmmEngine {
     pub fn launch_bhyve_vm(&mut self, name: &str, vcpus: u32, ram: u64) {
         self.bhyve_vms.push(BhyveVmConfig {
             name: name.to_string(),
+            disk_images: Vec::new(),
             vcpus,
             ram_size_mb: ram,
             wire_memory: true,
@@ -685,6 +674,7 @@ pub struct KubernetesK3sRancherEngine {
     pub pods: Vec<KubernetesPodState>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
+    pub crio_runtime_handlers: Vec<String>,
 }
 
 impl KubernetesK3sRancherEngine {
@@ -698,6 +688,7 @@ impl KubernetesK3sRancherEngine {
             pods: Vec::new(),
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
+            crio_runtime_handlers: handlers,
         }
     }
 

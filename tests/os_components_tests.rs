@@ -2,126 +2,36 @@
 // Verifies sovereign subsystem capabilities, compatibility layers, drivers, security, and tools.
 
 extern crate alloc;
-#[path = "../src/audio/editor.rs"]
-mod audio_editor;
-#[path = "../src/compatibility/bsd.rs"]
-mod bsd;
-#[path = "../src/compatibility/cachy_os.rs"]
-mod cachy_os;
-#[path = "../src/compatibility/chimera_linux.rs"]
-mod chimera_linux;
-#[path = "../src/compatibility/debian.rs"]
-mod debian_compat;
-#[path = "../src/distro/mod.rs"]
-pub mod distro;
-#[path = "../src/storage/geom.rs"]
-mod geom;
-#[path = "../src/ipc/pipes.rs"]
-mod pipes;
-#[path = "../src/security/unveil.rs"]
-mod unveil;
-#[path = "../src/graphics/video_editor.rs"]
-mod video_editor;
-use distro::linux_bsd_inspirations as distro_inspirations;
-#[path = "../src/access/control.rs"]
-mod access_control;
-#[path = "../src/ipc/alpc.rs"]
-mod alpc;
-#[path = "../src/memory/bitmap_pmm.rs"]
-mod bitmap_pmm;
-#[path = "../src/filesystem/ext4_ntfs_security.rs"]
-mod ext4_ntfs_security;
-#[path = "../src/memory/low_level.rs"]
-mod low_level_memory;
-pub enum AclTag {
-    User(u32),
-    Group(u32),
-    Other,
-}
-#[path = "../src/dashboard/statutory_compliance.rs"]
-mod statutory_compliance;
-pub enum BreachSeverity {
-    Minor,
-    Major,
-    Critical,
-}
-pub enum StatutoryAuthority {
-    Gdpr,
-    Hipaa,
-    ISO27001,
-}
-#[path = "../src/community/toolkit.rs"]
-mod community_toolkit;
-#[path = "../src/memory/segmentation_paging.rs"]
-mod segmentation_paging;
-#[path = "../src/tools/sigmatools.rs"]
-mod sigmatools;
-#[path = "../src/system/user.rs"]
-mod system_user;
-pub enum CpuPrivilegeMode {
-    KernelRing0,
-    UserRing3,
-}
-pub struct GlobalDescriptorTable;
-impl GlobalDescriptorTable {
-    pub fn new() -> Self {
-        Self
-    }
-    pub fn insert_descriptor(
-        &mut self,
-        _desc: segmentation_paging::SegmentDescriptor,
-    ) -> SegmentSelector {
-        SegmentSelector {
-            index: 1,
-            rpl: segmentation_paging::CpuRing::Ring0Kernel,
-            is_ldt: false,
-        }
-    }
-    pub fn translate_address(
-        &self,
-        seg_addr: SegmentedAddress,
-        _mode: CpuPrivilegeMode,
-    ) -> Result<u64, &'static str> {
-        Ok(seg_addr.offset)
-    }
-}
-pub struct MultiLevelPagingEngine;
-impl MultiLevelPagingEngine {
-    pub fn map_page(_v: u64, _p: u64, _r: bool, _w: bool, _x: bool) -> Result<(), &'static str> {
-        Ok(())
-    }
-    pub fn walk_page_table(&self, _v: u64) -> Result<PageTableEntry, &'static str> {
-        Ok(PageTableEntry)
-    }
-}
-pub struct PageTableEntry;
-impl PageTableEntry {
-    pub fn get_physical_address(&self) -> u64 {
-        0x0000000100000000
-    }
-}
-pub enum ProtectionLevel {
-    Normal,
-    High,
-}
-pub enum ProtectionViolationType {
-    ReadViolation,
-    WriteViolation,
-}
-pub enum SegmentType {
-    Code,
-    Data,
-}
-pub struct SegmentedAddress {
-    pub selector: SegmentSelector,
-    pub offset: u64,
-}
-#[path = "../src/process/activity_manager.rs"]
-mod process_activity_manager;
-pub type ProcessActivityManager = ActivityManager;
-pub struct ResourceUsageMetrics;
-#[path = "../src/device/manager.rs"]
-mod device_manager;
+use sigmaos::access::control as access_control;
+use sigmaos::audio::editor as audio_editor;
+use sigmaos::community::toolkit as community_toolkit;
+use sigmaos::compatibility::bsd as bsd;
+use sigmaos::compatibility::cachy_os as cachy_os;
+use sigmaos::compatibility::chimera_linux as chimera_linux;
+use sigmaos::compatibility::debian as debian_compat;
+use sigmaos::compatibility::fedora as fedora_compat;
+use sigmaos::dashboard::statutory_compliance as statutory_compliance;
+use sigmaos::device::manager as device_manager;
+use sigmaos::distro as distro;
+use sigmaos::distro::endeavour_os as endeavour_os;
+use sigmaos::distro::linux_bsd_inspirations as distro_inspirations;
+use sigmaos::filesystem::ext4_ntfs_security as ext4_ntfs_security;
+use sigmaos::filesystem::sigma_fs as sigma_fs_extended;
+use sigmaos::graphics::video_editor as video_editor;
+use sigmaos::ipc::alpc as alpc;
+use sigmaos::ipc::pipes as pipes;
+use sigmaos::kernel::epoll as epoll;
+use sigmaos::loader::elf::relocation as elf_relocation;
+use sigmaos::memory::bitmap_pmm as bitmap_pmm;
+use sigmaos::memory::low_level as low_level_memory;
+use sigmaos::memory::segmentation_paging as segmentation_paging;
+use sigmaos::process::activity_manager as process_activity_manager;
+use sigmaos::scheduler::scheduler as task_scheduler;
+use sigmaos::security::unveil as unveil;
+use sigmaos::storage::geom as geom;
+use sigmaos::system::user as system_user;
+use sigmaos::tools::sigmatools as sigmatools;
+
 use alpc::{alpc_flags, AlpcFacility, AlpcManager, AlpcMessage};
 use audio_editor::{AudioEffect, AudioTrack, MultiTrackSession, SpectralNoiseSuppressionEffect};
 use bitmap_pmm::{
@@ -133,8 +43,8 @@ use chimera_linux::{
     ApkPackageMetadata, ApkPackageStore, BsdUserlandCompat, DinitService, DinitServiceManager,
 };
 use community_toolkit::{
-    CommunityHandbookCatalog, PackageRecipe, RecipeSourceFormat, ReproduciblePackageRecipeManager,
-    SecurityProfileTemplateStore,
+    CommunityHandbookCatalog, HybridFirewallTemplateStore, PackageRecipe, RecipeSourceFormat,
+    ReproduciblePackageRecipeManager, SecurityProfileTemplateStore, VirtualizationBlueprintStore,
 };
 use pipes::Pipe;
 use process_activity_manager::{
@@ -146,7 +56,6 @@ use statutory_compliance::{
     ComplianceRuleStatus, DisputeAuditRollbackEngine, PenaltyBreachNotifier, StatutoryFramework,
     StatutoryGovernanceLayer, StatutoryGovernanceRule,
 };
-use system_user::UserManager as TestUserManager;
 use task_scheduler::{
     Priority, PriorityScheduler, Scheduler, Task, TaskCapability, TaskWorkloadType,
 };
@@ -154,22 +63,15 @@ use unveil::{UnveilManager, UnveilPermission};
 use video_editor::{ExportFormat, ExportProfile, VideoClip, VideoTimeline, VideoTrack};
 
 use access_control::{NtfsAce, NtfsDacl, PosixAclTable, SecurityIdentifier};
-use community_toolkit::{HybridFirewallTemplateStore, VirtualizationBlueprintStore};
 use debian_compat::{AptRepositorySync, DebianAlternativesSystem, DebianChannel};
 use elf_relocation::{ElfRelaEntry, ElfRelocator, ElfSymbol, R_X86_64_GLOB_DAT, R_X86_64_RELATIVE};
 use endeavour_os::{AurPackageSpec, PacmanMirror, ReflectorMirrorManager, YayParuHelper};
-use epoll::{EpollEvent, EpollInstance, EpollOp, EPOLLET, EPOLLIN};
+use epoll::{EpollEvent, EpollEvents, EpollInstance, EpollOp};
 use fedora_compat::{DnfPackageResolver, SeLinuxContext, SeLinuxEngine};
 use geom::{BioRequest, GeomProvider, GeomTopology};
 use low_level_memory::{
     posix_syscall_nr, CopyOnWriteForkEngine, FastSyscallDispatcher, MinimalPosixSyscallMatrix,
     RecursivePageTableEngine, SlabObjectType, TrapRegisterFrame, TwoTierMemoryAllocator,
-};
-
-use sigma_fs_extended::{Blake3BlockDeduplicationEngine, PfsType, PseudoFilesystemNamespace};
-
-use segmentation_paging::{
-    AddressBindingMode, AslrEntropyConfig, RandomizedAddressSpace, SegmentDescriptor,
 };
 
 use segmentation_paging::{
@@ -483,17 +385,16 @@ fn test_fedora_rpm_and_selinux() {
 
 #[test]
 fn test_epoll_event_loop_multiplexing() {
-    let mut epoll = EpollInstance::new(1, 10);
-    let ev1 = EpollEvent::new(EPOLLIN | EPOLLET, 4);
-    assert!(epoll.ctl(EpollOp::CtlAdd, 4, Some(ev1)).is_ok());
+    let mut epoll = EpollInstance::new(1);
+    let ev1 = EpollEvent::new(EpollEvents::new().with_in(), 4);
+    assert!(epoll.ctl(EpollOp::Add, 4, ev1).is_ok());
 
-    epoll.trigger_event(4, EPOLLIN);
+    epoll.add_ready_event(EpollEvent::new(EpollEvents::new().with_in(), 4));
 
-    let mut ready = [EpollEvent::new(0, 0); 4];
-    let n = epoll.wait(&mut ready);
-    assert_eq!(n, 1);
-    assert_eq!(ready[0].data.fd, 4);
-    assert_eq!(ready[0].events & EPOLLIN, EPOLLIN);
+    let ready = epoll.wait(4);
+    assert_eq!(ready.len(), 1);
+    assert_eq!(ready[0].data, 4);
+    assert!(ready[0].is_in());
 }
 
 #[test]

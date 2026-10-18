@@ -406,7 +406,7 @@ mod tests {
         let mut token_auth_nl = generate_test_credential(10, 10);
         token_auth_nl.push('\r');
         token_auth_nl.push('\n');
-        let _token_dummy = generate_test_credential(11, 12);
+        let token_dummy = generate_test_credential(11, 12);
 
         manager
             .register_user("jules", &token_user, "wheel")

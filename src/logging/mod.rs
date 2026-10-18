@@ -9,7 +9,8 @@ pub use rotation::{
     RotationError, RotationPolicy, SimpleLogCompressor, SimpleLogFile, SimpleLogRotator,
 };
 pub use sigmalog::{
-    get_sigmalog, init_sigmalog, init_sigmalog_default, log_message, LogEntry, LogFacility,
+    get_sigmalog, init_sigmalog, init_sigmalog_default, log_message, LogEntry,
+    LogFacility as SigmaLogFacility,
     LogFilter, LogLevel, LogStorage, SigmaLog, SigmaLogConfig,
 };
 pub use unified::{

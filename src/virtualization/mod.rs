@@ -8,6 +8,7 @@ pub mod orchestration;
 pub mod rancher;
 pub mod virtiofsd;
 pub mod virtualization_pr_gateway;
+pub mod vm_manager;
 
 pub use virtiofsd::{VirtioFsConfig, VirtioFsDaemon, VirtioFsInodeMap};
 pub use virtualization_pr_gateway::{

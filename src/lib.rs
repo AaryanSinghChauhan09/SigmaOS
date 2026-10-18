@@ -8,6 +8,7 @@ extern crate alloc;
 pub mod stubs;
 
 pub mod ai;
+pub mod arch_kernel_inspirations;
 pub mod auth;
 pub mod compositor;
 pub mod graphics;
@@ -101,7 +102,7 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV51, SovereignDistroPackageAdvancementsSuiteV8,
+    SovereignDistroPackageAdvancementsSuiteV5, SovereignDistroPackageAdvancementsSuiteV8,
     SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
 };
 pub use sigpkg::{
@@ -359,7 +360,7 @@ pub use kernel::{
     IpcManager, KernelAccessController, KernelFastPacketEngine, LandlockAccessRight,
     LandlockPathRule, MemoryBlock, MemoryCompactionSuperpagesAllocator, Message,
     PhysicalFrameBlock, PolicyError, PolicyManager, Priority, PrivacyFirstSandbox, PrivilegeLevel,
-    Process, ProcessState, ProtectionDomain, ResourceAllocationGraph, ResourceBroker,
+    Process, ProtectionDomain, ResourceAllocationGraph, ResourceBroker,
     RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel,
     SigmaFsPlusPlus, SoftIrqType, SolidDesignValidator, SovereignCgroupGovernor,
     SovereignCleanCodeAndOsPrinciplesEngine, SubmissionQueueEntry, UniversalAbiTranslator,

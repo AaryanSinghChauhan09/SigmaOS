@@ -2,42 +2,10 @@
 extern crate alloc;
 extern crate core;
 
-pub mod klib {
-    pub mod collections {
-        pub use alloc::collections::BTreeMap as HashMap;
-    }
-}
-
-#[path = "../src/package/universal.rs"]
-pub mod universal;
-
-pub mod package {
-    pub use crate::universal;
-    pub use crate::universal::*;
-}
-
-#[path = "../src/security/capability.rs"]
-pub mod capability;
-
-pub mod security {
-    pub use super::capability::*;
-}
-
-#[path = "../src/sigpkg/universal_engine.rs"]
-pub mod universal_engine;
-
-#[path = "../src/sigpkg/universal_oop_system.rs"]
-pub mod universal_oop_system;
-
-pub mod sigpkg {
-    pub use crate::security;
-    pub use crate::universal_engine;
-    pub use crate::universal_engine::PackageFormat;
-    pub use crate::universal_oop_system::*;
-}
-
-#[path = "../src/sigpkg/universal_adapter.rs"]
-pub mod universal_adapter;
+pub use sigmaos::package::universal;
+pub use sigmaos::sigpkg;
+pub use sigmaos::sigpkg::universal_adapter;
+pub use sigmaos::sigpkg::universal_engine;
 
 #[test]
 fn test_universal_adapter_all_formats() {

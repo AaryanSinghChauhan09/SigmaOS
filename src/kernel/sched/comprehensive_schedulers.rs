@@ -377,6 +377,10 @@ impl AnticipatoryIoScheduler {
         self.current_tick += 1;
     }
 
+    pub fn enqueue_request(&mut self, req: DiskIoRequest) {
+        self.submit_request(req);
+    }
+
     pub fn submit_request(&mut self, mut req: DiskIoRequest) {
         if req.arrival_tick == 0 {
             req.arrival_tick = self.current_tick;

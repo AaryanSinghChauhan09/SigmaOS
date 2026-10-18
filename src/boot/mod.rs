@@ -31,6 +31,7 @@ pub mod uefi_gop_framebuffer;
 pub mod verified;
 
 pub use initramfs::*;
+pub use bootloader::*;
 pub use initramfs_builder::{InitramfsBuilder, InitramfsEntry, CPIO_NEWC_MAGIC};
 pub use kernel_ld_script::{KernelLinkerScriptConfig, DEFAULT_KERNEL_LD};
 pub use smp_apic_calibration::{ApCpuInfo, ApCpuState, ApicCalibrator};

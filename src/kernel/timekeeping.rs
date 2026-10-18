@@ -369,7 +369,7 @@ mod tests {
         let mut tm = TimerManager::new();
         let id = tm.create_timer(1_000_000);
         static mut CALLED: bool = false;
-        extern "C" fn test_callback() {
+        fn test_callback() {
             unsafe {
                 CALLED = true;
             }

@@ -162,7 +162,7 @@ impl LogEntry {
 fn generate_log_id() -> String {
     // In a real implementation, this would use a proper UUID generator
     // For now, use a simple counter-based approach
-    alloc::format!("LOG-{:016x}", 0xDEAD_BEEF) // Placeholder
+    alloc::format!("LOG-{:016x}", 0xDEAD_BEEFu64) // Placeholder
 }
 
 /// Log storage backend

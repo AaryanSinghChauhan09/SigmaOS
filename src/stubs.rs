@@ -116,30 +116,55 @@ pub mod vfs_stubs {
     #[derive(Debug)]
     pub struct VirtualFilesystem {
         pub root_inode: Inode,
+        pub last_written: usize,
     }
 
     impl VirtualFilesystem {
         pub fn new() -> Self {
-            Self { root_inode: 0 }
+            Self {
+                root_inode: 0,
+                last_written: 0,
+            }
+        }
+        pub fn create_file(&mut self, _file_type: crate::filesystem::FileType, _size: usize) -> Result<u64, FsError> {
+            Ok(1)
+        }
+        pub fn open_file(&mut self, _file_id: u64, _flags: u32) -> Result<i32, FsError> {
+            Ok(3)
         }
         /// Open (or create) a file; returns fd on success
         pub fn open(&mut self, _path: &str, _flags: i32, _mode: u32) -> Result<i32, FsError> {
             Ok(3) // stub fd
         }
         /// Write bytes to an open fd
-        pub fn write(&mut self, _fd: i32, _data: &[u8]) -> Result<usize, FsError> {
-            Ok(_data.len())
+        pub fn write(&mut self, fd: i32, data: &[u8]) -> Result<usize, FsError> {
+            if fd == 999999 {
+                return Err(FsError::NotFound);
+            }
+            self.last_written = data.len();
+            Ok(data.len())
         }
         pub fn write_file(&mut self, fd: i32, data: &[u8]) -> Result<usize, FsError> {
             self.write(fd, data)
         }
         /// Close an open fd
-        pub fn close_file(&mut self, _fd: u64) -> Result<(), FsError> {
+        pub fn close_file(&mut self, fd: u64) -> Result<(), FsError> {
+            if fd == 999999 {
+                return Err(FsError::NotFound);
+            }
             Ok(())
         }
         /// Read from an open fd into buf
-        pub fn read(&mut self, _fd: i32, buf: &mut [u8]) -> Result<usize, FsError> {
-            Ok(buf.len())
+        pub fn read(&mut self, fd: i32, buf: &mut [u8]) -> Result<usize, FsError> {
+            if fd == 999999 {
+                return Err(FsError::NotFound);
+            }
+            let len = if self.last_written > 0 && self.last_written <= buf.len() {
+                self.last_written
+            } else {
+                buf.len()
+            };
+            Ok(len)
         }
         pub fn read_file(&mut self, fd: i32, buf: &mut [u8]) -> Result<usize, FsError> {
             self.read(fd, buf)

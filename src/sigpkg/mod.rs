@@ -67,9 +67,21 @@ pub mod universal_adapter;
 pub mod universal_engine;
 pub mod universal_oop_system;
 pub use universal_engine::{
-    SovereignUniversalPackageManagerInteropEngine, SovereignUniversalPackageTranslationBridge,
+    PackageFormat, SovereignUniversalPackageManagerInteropEngine,
+    SovereignUniversalPackageTranslationBridge,
 };
-pub use universal_oop_system::*;
+pub use universal_oop_system::{
+    ApkAdapter, AppImageAdapter, BaseAdapter,
+    EbuildAdapter, EopkgAdapter, FlatpakAdapter, GuixAdapter,
+    HookError, IPackage, IPackageDeltaStrategy, IPackageParser, IPathTrigger,
+    NixAdapter, PackageDeltaEngine, PackageDeltaPatch, PackageMetadata,
+    PackageParserFactory, SnapAdapter,
+    SovereignBinaryDeltaStrategy, TxzAdapter, UniversalFormatAdapterRouter,
+    UniversalPackageManager, UserDefinedHook,
+    XbpsAdapter, ZstdChunkedDeltaStrategy, ZypperAdapter,
+    DependencyIntegrityHandler, DnfDeltaRpmStrategy, GpgPqcVerifierAdapter,
+    SigmaAdapter,
+};
 pub mod verifier;
 pub mod zero_alloc_resolver;
 

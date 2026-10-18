@@ -5,7 +5,7 @@ use sigmaos::hardware::tech_powerup_hardware_monitors::*;
 fn main() {
     println!("=== Testing Tech Media Inspired Innovations ===");
 
-    let mut distro_suite = SovereignTechMediaDistroInnovationsSuite::new();
+    let distro_suite = SovereignTechMediaDistroInnovationsSuite::new();
     assert!(
         distro_suite.verify_suite(),
         "Distro suite verification failed"
@@ -15,15 +15,15 @@ fn main() {
         distro_suite.rank_tracker.get_top_ranked_distro()
     );
     assert!(
-        distro_suite.itdaily_cloud.audit_hybrid_cloud(),
+        distro_suite.itdaily.is_sla_met(),
         "ITDaily cloud audit failed"
     );
     assert!(
-        distro_suite.infoworld_tech.evaluate_architecture(),
+        distro_suite.infoworld.verify_enterprise_readiness(),
         "InfoWorld architecture evaluation failed"
     );
     assert!(
-        distro_suite.phoronix_benchmark.run_phoronix_benchmark(),
+        distro_suite.phoronix.verify_benchmark_results(),
         "Phoronix benchmark failed"
     );
 

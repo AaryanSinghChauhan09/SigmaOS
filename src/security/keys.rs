@@ -362,7 +362,7 @@ mod tests {
         };
 
         manager
-            .add_key(1, KeyType::User, 0, 0, 0o600, description, None)
+            .add_key(1, KeyType::User, 0, 0, 0o600, description.clone(), None)
             .unwrap();
         manager
             .add_key(1, KeyType::Session, 0, 0, 0o600, description.clone(), None)

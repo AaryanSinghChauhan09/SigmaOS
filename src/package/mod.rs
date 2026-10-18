@@ -228,7 +228,8 @@ pub use dependency_graph::{
     DependencyConstraint, DependencyGraph, PackageNode, PackageVersion, VersionConstraint,
 };
 pub use fedora_dnf::{
-    DnfError, DnfPackage, Repository, SigmaDNF, Transaction, TransactionOperation,
+    DnfError, DnfPackage, Repository as DnfRepository, SigmaDNF, Transaction,
+    TransactionOperation,
 };
 pub use gentoo_portage::{
     Ebuild, PackageDatabase, PortageError, PortageTree, ProfileManager, SigmaPortage, UseFlag,
@@ -257,7 +258,7 @@ pub use repository::{
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
     TransactionJournalEntry,
 };
-pub use repository_config::{RepoConfig, RepositoryConfigManager};
+pub use repository_config::{RepoConfig as RepoManagerConfig, RepositoryConfigManager};
 pub use store::{
     SigmaSoftwareStore,
     SoftwareRegistryEntry, /* StoreApp, StoreError, */

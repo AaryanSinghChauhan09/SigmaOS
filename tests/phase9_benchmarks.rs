@@ -4,7 +4,7 @@
 #[cfg(test)]
 mod phase9_benchmarks {
     use sigmaos::kernel::cgroup_controllers::{
-        HugepageSize, HugetlbController, PidsController, RdmaController,
+        Controller, HugepageSize, HugetlbController, PidsController, RdmaController,
     };
     use sigmaos::kernel::ebpf_vm::BpfInstruction;
     use sigmaos::syscall::bpf_syscalls::{BpfProgType, BpfProgramRegistry};

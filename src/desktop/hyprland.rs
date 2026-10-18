@@ -320,14 +320,14 @@ mod tests {
 
     #[test]
     fn test_hyprland_init() {
-        let mut hyprland = HyprandInstance::new();
+        let mut hyprland = HyprlandInstance::new();
         hyprland.init();
         assert!(hyprland.is_active());
     }
 
     #[test]
     fn test_create_window() {
-        let mut hyprland = HyprandInstance::new();
+        let mut hyprland = HyprlandInstance::new();
         hyprland.init();
         let id = hyprland.create_window("Test".to_string(), "test_app".to_string());
         assert!(hyprland.get_window(id).is_some());
@@ -335,45 +335,45 @@ mod tests {
 
     #[test]
     fn test_close_window() {
-        let mut hyprland = HyprandInstance::new();
+        let mut hyprland = HyprlandInstance::new();
         hyprland.init();
-        let id = hyprand.create_window("Test".to_string(), "test_app".to_string());
-        hyprand.close_window(id).unwrap();
-        assert!(hyprand.get_window(id).is_none());
+        let id = hyprland.create_window("Test".to_string(), "test_app".to_string());
+        hyprland.close_window(id).unwrap();
+        assert!(hyprland.get_window(id).is_none());
     }
 
     #[test]
     fn test_create_workspace() {
-        let mut hyprland = HyprandInstance::new();
-        hyprand.init();
-        let id = hyprand.create_workspace("2".to_string());
-        assert!(hyprand.workspaces.contains_key(&id));
+        let mut hyprland = HyprlandInstance::new();
+        hyprland.init();
+        let id = hyprland.create_workspace("2".to_string());
+        assert!(hyprland.workspaces.contains_key(&id));
     }
 
     #[test]
     fn test_switch_workspace() {
-        let mut hyprland = HyprandInstance::new();
-        hyprand.init();
-        hyprand.create_workspace("2".to_string());
-        hyprand.switch_workspace(2).unwrap();
-        assert_eq!(hyprand.current_workspace.load(Ordering::Relaxed), 2);
+        let mut hyprland = HyprlandInstance::new();
+        hyprland.init();
+        hyprland.create_workspace("2".to_string());
+        hyprland.switch_workspace(2).unwrap();
+        assert_eq!(hyprland.current_workspace.load(Ordering::Relaxed), 2);
     }
 
     #[test]
     fn test_toggle_floating() {
-        let mut hyprland = HyprandInstance::new();
-        hyprand.init();
+        let mut hyprland = HyprlandInstance::new();
+        hyprland.init();
         let id = hyprland.create_window("Test".to_string(), "test_app".to_string());
-        hyprand.toggle_floating(id).unwrap();
-        assert!(hyprand.get_window(id).unwrap().is_floating());
+        hyprland.toggle_floating(id).unwrap();
+        assert!(hyprland.get_window(id).unwrap().is_floating());
     }
 
     #[test]
     fn test_toggle_fullscreen() {
-        let mut hyprand = HyprandInstance::new();
-        hyprand.init();
-        let id = hyprand.create_window("Test".to_string(), "test_app".to_string());
+        let mut hyprland = HyprlandInstance::new();
+        hyprland.init();
+        let id = hyprland.create_window("Test".to_string(), "test_app".to_string());
         hyprland.toggle_fullscreen(id).unwrap();
-        assert!(hyprand.get_window(id).unwrap().is_fullscreen());
+        assert!(hyprland.get_window(id).unwrap().is_fullscreen());
     }
 }

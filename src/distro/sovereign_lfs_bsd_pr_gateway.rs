@@ -50,12 +50,6 @@ pub enum LfsBsdPrCategory {
     DragonFlyVkernelSandbox,
     LfsAutomatedReadinessAuditor,
     BsdCrossKernelAbiTranslation,
-    LfsGlibcDynamicLinker,
-    LfsUdevColdplug,
-    LfsPamShadowAuth,
-    LfsPorgCollisionTracker,
-    NetBsdVeriexecSignatures,
-    DragonFlyHammer2PfsReplication,
 }
 
 impl LfsBsdPrCategory {
@@ -287,7 +281,7 @@ impl SovereignLfsBsdPrGateway {
 
         // 2. Verify LFS bootscripts init runlevel switch
         let activated = self.master_harmony.lfs_bootscripts.set_runlevel(
-            sovereign_linux_bsd_lfs_master_harmony::LfsRunlevel::Runlevel3MultiUserNet,
+            crate::distro::LfsRunlevel::Runlevel3MultiUserNet,
         );
         assert!(activated >= 1);
 

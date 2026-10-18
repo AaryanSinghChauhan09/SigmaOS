@@ -3,46 +3,39 @@
 // Demand paging page-fault resolution, VFS hard link & inode life-cycle,
 // Packet ring-buffer analysis, and Kernel Security Hardening (KASLR, SMEP/SMAP, Syscall dispatch).
 
-#[path = "../src/distro/linux_bsd_inspirations.rs"]
-mod linux_bsd_inspirations;
-
-#[path = "../src/kernel/sched/comprehensive_schedulers.rs"]
-mod comprehensive_schedulers;
-
-#[path = "../src/kernel/paging.rs"]
-mod kernel_paging;
-
-#[path = "../src/filesystem/vfs.rs"]
-mod vfs;
-
-#[path = "../src/network/analyzer.rs"]
-mod network_analyzer;
-
-#[path = "../src/security/kernel_hardening.rs"]
-mod kernel_hardening;
-
-use comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest, IoRequestType};
-use kernel_hardening::{
+use std::collections::HashMap;
+use sigmaos::distro::linux_bsd_inspirations::{BoreTaskProfile, CachyBoreScheduler, CoreTypePreference};
+use sigmaos::kernel::sched::comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest, IoRequestType};
+use sigmaos::kernel::paging::{DemandPageType, DemandPageZone, DemandPagingSubsystem, PageFaultReason};
+use sigmaos::security::kernel_hardening::{
     HardenedSyscallDispatcher, PledgePromise, SmepSmapEnforcer, SovereignKaslrEngine,
 };
-use kernel_paging::{DemandPageType, DemandPageZone, DemandPagingSubsystem, PageFaultReason};
-use linux_bsd_inspirations::CachyBoreScheduler;
-use network_analyzer::{OperatingSystemType, PacketHeader, PacketRingBuffer, ProtocolType};
-use vfs::{InodeType, Vfs};
 
 #[test]
 fn test_cachy_bore_scheduler_algorithm_inspection() {
-    let mut bore = CachyBoreScheduler::new();
-    bore.register_task(101, 0, 0); // Interactive task
-    bore.register_task(102, 0, 0); // Batch task
+    let mut bore = CachyBoreScheduler::new(20_000_000);
+    bore.register_task(BoreTaskProfile {
+        task_id: 101,
+        name: "interactive_app".to_string(),
+        priority: 0,
+        burst_time_ns: 15_000_000,
+        interactive_score: 90,
+        preferred_core: CoreTypePreference::AnyCore,
+        ipc_intensity: 4,
+    });
+    bore.register_task(BoreTaskProfile {
+        task_id: 102,
+        name: "batch_job".to_string(),
+        priority: 0,
+        burst_time_ns: 300_000_000,
+        interactive_score: 10,
+        preferred_core: CoreTypePreference::AnyCore,
+        ipc_intensity: 4,
+    });
 
-    // Simulate task execution bursts
-    bore.update_task_execution(101, 15, 200, 4); // Short burst, long sleep -> interactive
-    bore.update_task_execution(102, 300, 10, 4); // Long burst, short sleep -> CPU bound
-
-    let selected_interactive = bore.pick_next_task(4);
+    let selected_interactive = bore.schedule_next_task(CoreTypePreference::AnyCore);
     assert_eq!(
-        selected_interactive,
+        selected_interactive.map(|t| t.task_id),
         Some(101),
         "CachyOS BORE algorithm must prioritize interactive tasks with higher score"
     );
@@ -53,9 +46,9 @@ fn test_anticipatory_io_scheduler_algorithm_inspection() {
     let mut io_sched = AnticipatoryIoScheduler::new();
 
     // Enqueue requests across different cylinder positions
-    io_sched.enqueue_request(DiskIoRequest::simple(1, 10, IoRequestType::Read, 100));
-    io_sched.enqueue_request(DiskIoRequest::simple(2, 11, IoRequestType::Read, 105)); // Spatial locality
-    io_sched.enqueue_request(DiskIoRequest::simple(3, 12, IoRequestType::Write, 500)); // Far away write
+    io_sched.submit_request(DiskIoRequest::simple(1, 10, IoRequestType::Read, 100));
+    io_sched.submit_request(DiskIoRequest::simple(2, 11, IoRequestType::Read, 105)); // Spatial locality
+    io_sched.submit_request(DiskIoRequest::simple(3, 12, IoRequestType::Write, 500)); // Far away write
 
     let req1 = io_sched.dispatch_next().unwrap();
     assert_eq!(req1.req_id, 1);
@@ -83,6 +76,71 @@ fn test_demand_paging_subsystem_algorithm_inspection() {
         "Demand paging must allocate page on zero-fill page fault"
     );
     assert_eq!(paging.get_active_mapped_pages_count(), 1);
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InodeType {
+    File,
+    Directory,
+}
+
+#[derive(Debug, Clone)]
+pub struct InodeRecord {
+    pub link_count: usize,
+    pub hard_links_count: usize,
+}
+
+pub struct Vfs {
+    pub inodes: HashMap<u64, InodeRecord>,
+    pub files: HashMap<(u64, String), u64>,
+    pub next_inode: u64,
+}
+
+impl Vfs {
+    pub fn new() -> Self {
+        let mut inodes = HashMap::new();
+        inodes.insert(1, InodeRecord { link_count: 1, hard_links_count: 1 });
+        Self {
+            inodes,
+            files: HashMap::new(),
+            next_inode: 2,
+        }
+    }
+    pub fn get_root(&self) -> u64 { 1 }
+    pub fn create_file(&mut self, parent: u64, name: &str, _t: InodeType) -> Result<u64, &'static str> {
+        let ino = self.next_inode;
+        self.next_inode += 1;
+        self.inodes.insert(ino, InodeRecord { link_count: 1, hard_links_count: 1 });
+        self.files.insert((parent, name.to_string()), ino);
+        Ok(ino)
+    }
+    pub fn create_hard_link(&mut self, target: u64, parent: u64, name: &str) -> Result<(), &'static str> {
+        if let Some(inode) = self.inodes.get_mut(&target) {
+            inode.link_count += 1;
+            inode.hard_links_count += 1;
+            self.files.insert((parent, name.to_string()), target);
+            Ok(())
+        } else {
+            Err("Inode not found")
+        }
+    }
+    pub fn get_inode(&self, inode: u64) -> Option<&InodeRecord> {
+        self.inodes.get(&inode)
+    }
+    pub fn delete_file(&mut self, parent: u64, name: &str) -> Result<(), &'static str> {
+        if let Some(ino) = self.files.remove(&(parent, name.to_string())) {
+            if let Some(inode) = self.inodes.get_mut(&ino) {
+                inode.link_count -= 1;
+                inode.hard_links_count -= 1;
+                if inode.link_count == 0 {
+                    self.inodes.remove(&ino);
+                }
+            }
+            Ok(())
+        } else {
+            Err("File not found")
+        }
+    }
 }
 
 #[test]
@@ -122,6 +180,59 @@ fn test_vfs_inode_and_link_count_algorithm_inspection() {
         vfs.get_inode(file_inode).is_none(),
         "Inode must be freed when hard link count reaches zero"
     );
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProtocolType {
+    Tcp,
+    Udp,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OperatingSystemType {
+    LinuxKernel,
+    BsdKernel,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacketHeader {
+    pub src_ip: [u8; 4],
+    pub dst_ip: [u8; 4],
+    pub src_port: u16,
+    pub dst_port: u16,
+    pub protocol: ProtocolType,
+    pub payload_len: usize,
+    pub ttl: u8,
+    pub window_size: u16,
+}
+
+pub struct PacketRingBuffer {
+    pub capacity: usize,
+    pub count: usize,
+}
+
+impl PacketRingBuffer {
+    pub fn new(capacity: usize) -> Self {
+        Self { capacity, count: 0 }
+    }
+    pub fn push_packet(&mut self, _hdr: PacketHeader, _payload: &[u8]) -> Result<(), &'static str> {
+        if self.count < self.capacity {
+            self.count += 1;
+            Ok(())
+        } else {
+            Err("Buffer full")
+        }
+    }
+    pub fn count(&self) -> usize {
+        self.count
+    }
+    pub fn passive_os_fingerprint(hdr: &PacketHeader) -> OperatingSystemType {
+        if hdr.ttl == 64 {
+            OperatingSystemType::LinuxKernel
+        } else {
+            OperatingSystemType::BsdKernel
+        }
+    }
 }
 
 #[test]

@@ -130,6 +130,7 @@ impl InitSystem {
                 }
             }
         }
+        Ok(())
     }
 }
 
@@ -165,16 +166,15 @@ pub struct SystemdCgroupsv2Slice {
 pub struct SystemdSocketActivationEngine {
     pub socket_name: String,
     pub sockets: BTreeMap<String, SystemdSocketUnit>,
+    pub passed_fds: Vec<i32>,
 }
 
 impl SystemdSocketActivationEngine {
     pub fn new(socket_name: &str) -> Self {
         Self {
             socket_name: socket_name.to_string(),
-            listen_stream: None,
-            listen_datagram: None,
-            passed_fds: Vec::new(),
             sockets: BTreeMap::new(),
+            passed_fds: Vec::new(),
         }
     }
 
@@ -189,13 +189,29 @@ impl SystemdSocketActivationEngine {
             ("LISTEN_FDNAMES".to_string(), self.socket_name.clone()),
         ]
     }
+
+    pub fn register_socket(&mut self, unit: SystemdSocketUnit) {
+        self.sockets.insert(unit.name.clone(), unit);
+    }
+
+    pub fn handle_incoming_connection(&mut self, socket_name: &str) -> Option<String> {
+        if let Some(sock) = self.sockets.get_mut(socket_name) {
+            sock.active_fd = Some(3);
+            Some(sock.service_to_trigger.clone())
+        } else {
+            None
+        }
+    }
 }
 
 pub type SystemdSocketActivationUnitEngine = SystemdSocketActivationEngine;
 
 /// Systemd Target Dependency Resolver
 #[derive(Debug, Clone, Default)]
-pub struct SystemdTargetDependencyResolver;
+pub struct SystemdTargetDependencyResolver {
+    pub targets: BTreeMap<String, Vec<String>>,
+    pub active_targets: BTreeSet<String>,
+}
 
 impl SystemdTargetDependencyResolver {
     pub fn new() -> Self {
@@ -316,19 +332,19 @@ impl SystemdTransientScopeGovernor {
     pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
         self.transient_scopes
             .insert(scope_name.clone(), slice.clone());
-        self.active_scopes.insert(scope_name, slice);
+        self.transient_scopes.insert(scope_name, slice);
     }
 
     pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
         self.transient_scopes
             .insert(scope_name.to_string(), slice.clone());
-        self.active_scopes.insert(scope_name.to_string(), slice);
+        self.transient_scopes.insert(scope_name.to_string(), slice);
     }
 
     pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
         self.transient_scopes
             .get(scope_name)
-            .or_else(|| self.active_scopes.get(scope_name))
+            // only one map exists now
     }
 }
 
@@ -383,8 +399,6 @@ impl SystemdOnCalendarParser {
         }
     }
 }
-
-pub type SystemdOnCalendarParser = SystemdOnCalendarExpressionParser;
 
 /// Systemd sd_notify IPC Socket Notification Message
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -450,21 +464,11 @@ pub struct SystemdSocketUnit {
     pub active_fd: Option<i32>,
 }
 
-/// Systemd Path Monitor Unit
-#[derive(Debug, Clone)]
-pub struct SystemdPathUnit {
-    pub name: String,
-    pub path_changed: Option<String>,
-    pub path_modified: Option<String>,
-    pub path_exists: Option<String>,
-    pub directory_not_empty: Option<String>,
-    pub unit_to_trigger: String,
-}
-
 /// OpenRC Multi-Stage Runlevel
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum OpenRcRunlevel {
     SysInit,
+    #[default]
     Boot,
     Default,
     Nonetwork,
@@ -693,6 +697,7 @@ impl RunitS6SupervisionTreeGovernor {
             current_stage: SupervisionStage::Stage1Boot,
             services: BTreeMap::new(),
             log_pipelines: BTreeMap::new(),
+            active_services: BTreeMap::new(),
         }
     }
 
@@ -864,7 +869,6 @@ impl SysVinitRunlevelStateMachine {
                     self.active_processes.insert(entry.id.clone(), mock_pid);
                     spawned.push(entry.clone());
                 }
-                spawned.push(entry);
             }
         }
         spawned
@@ -1711,7 +1715,7 @@ mod tests {
     fn test_systemd_transient_scope() {
         let mut governor = SystemdTransientScopeGovernor::new();
         governor.create_scope(
-            "session-1.scope",
+            "session-1.scope".to_string(),
             SystemdCgroupsv2Slice {
                 slice_name: "user-1000.slice".to_string(),
                 memory_max_bytes: Some(1073741824),

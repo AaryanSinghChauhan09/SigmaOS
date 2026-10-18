@@ -256,7 +256,7 @@ mod tests {
     use super::*;
 
     fn pid(n: u64) -> ProcessId {
-        ProcessId(n)
+        n as ProcessId
     }
 
     #[test]

@@ -1,16 +1,9 @@
 // Standalone Test Suite for SigmaOS Distro-Inspired Tasks & Reminders Subsystem
 
-pub mod klib {
-    pub use std::collections::BTreeMap;
-}
-
-#[path = "../src/productivity/tasks.rs"]
-pub mod tasks;
+use sigmaos::productivity::tasks::*;
 
 #[test]
 fn test_distro_inspired_reminders_standalone() {
-    use tasks::*;
-
     let mut manager = TaskManager::default();
     let task_id = "task_cron_1";
 

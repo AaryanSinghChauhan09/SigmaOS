@@ -23,6 +23,8 @@ pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_missing_components_parity_pr;
+pub mod fontcraft;
+pub mod fontcraft_missing_components_parity_pr;
 pub mod gridcraft;
 pub mod wordcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
@@ -35,10 +37,14 @@ pub mod pdfcraft_missing_components_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
+pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod vectoranimation;
 pub mod vectorcraft;
+pub mod voicecraft;
+pub mod voicecraft_missing_components_parity_pr;
 pub mod wordcraft;
+pub mod wordcraft_missing_components_parity_pr;
 
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
@@ -77,18 +83,6 @@ pub use designcraft::{
     DesignBlendMode, DesignEditor, Element, ElementType, ExportFormat as DesignExportFormat,
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
-};
-pub use designcraft::{
-    get_designcraft, init_designcraft, Artboard, Canvas, Color, ColorModel, Component,
-    DesignBlendMode, DesignEditor, Element, ElementType, ExportFormat as DesignExportFormat,
-    FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
-    TextElement,
-};
-pub use designcraft_missing_components_parity_pr::{
-    DesigncraftAutoLayoutFlexEngine, DesigncraftCodeExportEngine,
-    DesigncraftDesignSystemVariablesEngine, DesigncraftInteractivePrototypingPrEngine,
-    DesigncraftMultiplayerCrdtEngine, DesigncraftPrCategory, DesigncraftPrProposalSpec,
-    DesigncraftVectorGeometryEngine, SovereignDesigncraftArtcraftParityPrGateway,
 };
 pub use designcraft_missing_components_parity_pr::{
     DesigncraftAutoLayoutFlexEngine, DesigncraftCodeExportEngine,
@@ -133,41 +127,6 @@ pub use filmcraft::{
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
     TransitionType, VideoCodec, VideoEditor, VideoTrack,
 };
-pub use filmcraft::{
-    get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
-    ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
-    TransitionType, VideoCodec, VideoEditor, VideoTrack,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
     DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
@@ -193,143 +152,11 @@ pub use fontcraft_missing_components_parity_pr::{
     OpenTypeFeatureTag, ShapedGlyph, SovereignFontcraftArtcraftParityPrGateway, VariableFontAxis,
     Woff2Header,
 };
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
-pub use gridcraft::{
-    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
-    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
-    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
-    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
-    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
-};
-pub use gridcraft_missing_components_parity_pr::{
-    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
-    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
-    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
-    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
-    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
-    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
-};
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
     ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
     Material, Photo, PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading,
     ToneCurve, ToneCurvePoint,
-};
-pub use lightcraft::{
-    get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
-    ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
-    Material, Photo, PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading,
-    ToneCurve, ToneCurvePoint,
-};
-pub use mediacraft::{
-    get_mediacraft, init_mediacraft, AudioCodec as MediaAudioCodec, AudioSettings, AudioTrack,
-    ContainerFormat, EqualizerBand, EqualizerPreset, MediaItem, MediaLibrary, MediaPlayer,
-    MediaType, PlaybackState, Playlist, RepeatMode, ShuffleMode, StreamProtocol, StreamSource,
-    SubtitleTrack, VideoCodec as MediaVideoCodec, VideoSettings, VideoTrack as MediaVideoTrack,
 };
 pub use mediacraft::{
     get_mediacraft, init_mediacraft, AudioCodec as MediaAudioCodec, AudioSettings, AudioTrack,
@@ -338,29 +165,15 @@ pub use mediacraft::{
     SubtitleTrack, VideoCodec as MediaVideoCodec, VideoSettings, VideoTrack as MediaVideoTrack,
 };
 pub use model3d::{
-    get_model3d, init_model3d, Camera, ExportFormat as Model3DExportFormat, Light, LightType,
-    Material, Mesh, MeshType, Object3D, ObjectType, Scene as Model3DScene, SculptBrush,
-    SculptBrushType, Vertex,
+    get_model3d, init_model3d, Camera, ExportFormat as Model3DExportFormat, Light as Model3DLight,
+    LightType as Model3DLightType, Material as Model3DMaterial, Mesh, MeshType, Object3D,
+    ObjectType, Scene as Model3DScene, SculptBrush, SculptBrushType, Vertex,
 };
 pub use pdfcraft::{
     get_pdfcraft, init_pdfcraft, Annotation, AnnotationType, Bookmark,
     ExportFormat as PdfExportFormat, FontFamily as PdfFontFamily, FontSize, FormField,
     FormFieldType, Hyperlink, ImageObject, PdfEditor, PdfElement, PdfMetadata, PdfPage,
     SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
-};
-pub use pdfcraft::{
-    get_pdfcraft, init_pdfcraft, Annotation, AnnotationType, Bookmark,
-    ExportFormat as PdfExportFormat, FontFamily as PdfFontFamily, FontSize, FormField,
-    FormFieldType, Hyperlink, ImageObject, PdfEditor, PdfElement, PdfMetadata, PdfPage,
-    SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
-};
-pub use pdfcraft_artcraft_parity_pr::{
-    PdfcraftArchivalValidationPrEngine, PdfcraftArtcraftPrProposalManifest,
-    PdfcraftBatchExportRenderPrEngine, PdfcraftColorPreflightCmykPrEngine,
-    PdfcraftDigitalSignatureWatermarkPrEngine, PdfcraftInteractiveFormsXfaPrEngine,
-    PdfcraftMultiWorkspaceProjectPrEngine, PdfcraftOcrTextRecognitionPrEngine,
-    PdfcraftPageImpositionBookletPrEngine, PdfcraftRedactionSanitizationPrEngine,
-    PdfcraftVectorArtImportPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
 };
 pub use pdfcraft_artcraft_parity_pr::{
     PdfcraftArchivalValidationPrEngine, PdfcraftArtcraftPrProposalManifest,
@@ -378,16 +191,6 @@ pub use pdfcraft_missing_components_parity_pr::{
 pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
-};
-pub use photocraft::{
-    get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
-    LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
-};
-pub use photocraft_missing_components_parity_pr::{
-    PhotocraftAiInpaintingPrEngine, PhotocraftBatchActionMacroPrEngine,
-    PhotocraftColorGradingFrequencySeparationPrEngine, PhotocraftHdrExposureStackingPrEngine,
-    PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
-    PhotocraftVectorMaskPenPathPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
 };
 pub use photocraft_missing_components_parity_pr::{
     PhotocraftAiInpaintingPrEngine, PhotocraftAiSubjectMattingSelectionPrEngine,
@@ -415,11 +218,7 @@ pub use soundcraft_missing_components_parity_pr::{
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
     AnimationLayerType, AnimationProject as VectorAnimationProject, Bone, InterpolationMode,
-    Keyframe, OnionSkin, Rig, Timeline,
-};
-pub use vectorcraft::{
-    get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,
-    Shape, ShapeProperties, VectorEditor, VectorLayer,
+    Keyframe as VectorAnimationKeyframe, OnionSkin, Rig, Timeline as VectorAnimationTimeline,
 };
 pub use vectorcraft::{
     get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,

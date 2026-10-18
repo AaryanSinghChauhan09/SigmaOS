@@ -38,6 +38,7 @@ pub use vfs_hardening::{VfsHardeningConfig, VfsHardeningEnforcer};
 
 // SigmaOS Security Subsystem
 pub mod defensive_audit;
+pub use defensive_audit::DefensiveAuditSystem;
 pub mod hardening;
 pub mod kernel_hardening;
 pub mod seccomp;

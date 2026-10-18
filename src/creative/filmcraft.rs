@@ -634,7 +634,7 @@ mod tests {
         editor.set_zoom(2.0);
         assert_eq!(editor.timeline.zoom, 2.0);
         editor.toggle_snapping();
-        assert!(!editor.timeline.snap_enabled.load(Ordering::Relaxed));
+        assert!(!editor.timeline.snap_enabled);
     }
 
     #[test]
