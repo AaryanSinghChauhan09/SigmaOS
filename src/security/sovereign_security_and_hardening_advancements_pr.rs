@@ -111,23 +111,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Validate seccomp BPF architecture token (AUDIT_ARCH_X86_64, AUDIT_ARCH_AARCH64, AUDIT_ARCH_RISCV64).
-    pub fn validate_seccomp_bpf_arch(arch_id: u32) -> bool {
-        match arch_id {
-            0xC000003E => true, // AUDIT_ARCH_X86_64
-            0xC00000B7 => true, // AUDIT_ARCH_AARCH64
-            0xC00000F3 => true, // AUDIT_ARCH_RISCV64
-            _ => false,
-        }
-    }
-
-    /// Check if cgroups v2 controller (e.g. "cpu", "memory", "pids", "io") is enabled in string mask.
-    pub fn is_cgroup_controller_enabled(subtree_control: &str, controller: &str) -> bool {
-        subtree_control
-            .split_whitespace()
-            .any(|c| c == controller || c == alloc::format!("+{}", controller))
-    }
-
     /// Check if Linux capability bit mask contains target capability.
     pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
         if cap_bit >= 64 {

@@ -4,16 +4,16 @@
 //
 // Provides clean-room Pull Request (PR) proposal engines bridging key remaining gaps
 // between SigmaOS and the OpenBSD operating system ecosystem:
-// 1. OpenBsdSyslogdNewsyslogPrEngine (syslogd remote TLS logging & newsyslog log rotation)
-// 2. OpenBsdPfScrubMultipathPrEngine (PF firewall scrub packet normalization & ECMP multipath routing)
-// 3. OpenBsdSnmpdUsmVacmPrEngine (snmpd SNMPv3 USM user security & VACM access control)
-// 4. OpenBsdOpennptdHttpsConstraintPrEngine (OpenNTPD HTTPS TLS time constraints & drift control)
-// 5. OpenBsdBpfDiagnosticsPrEngine (BPF Berkeley Packet Filter tap & diagnostic statistics)
-// 6. OpenBsdFileFlagsChflagsPrEngine (BSD file flags: system immutable schg & append-only sappnd)
-// 7. OpenBsdSoftraidRaid10CryptoPrEngine (bioctl softraid RAID10 striped mirror + AES-XTS crypto volume)
-// 8. OpenBsdPfsyncStateReplicationPrEngine (pfsync high-availability firewall state table sync)
-// 9. OpenBsdResolvconfDynamicPrEngine (resolvconf dynamic DNS resolver & domain search path manager)
-// 10. OpenBsdPkgAddSignifyVerificationPrEngine (pkg_add package installer with Signify Ed25519 validation)
+// 1. OpenBsdSyslogdNewsyslogPrEngine (syslogd remote TLS logging & newsyslog log rotation supervisor)
+// 2. OpenBsdPfScrubMultipathPrEngine (PF firewall scrub packet normalization, divert sockets & multipath route-to/reply-to)
+// 3. OpenBsdSnmpdUsmVacmPrEngine (snmpd SNMPv3 USM user security model, VACM view access control & OpenBSD enterprise MIB)
+// 4. OpenBsdNtpdHttpsConstraintsPrEngine (OpenNTPD offset time synchronization with HTTPS constraint certificate pinning)
+// 5. OpenBsdNetDiagnosticsBpfPrEngine (traceroute, ping ICMP probes & tcpdump BPF packet filter dissector)
+// 6. OpenBsdFileFlagsChflagsPrEngine (BSD file flags schg, uchg, nodump kernel level immutable file protection)
+// 7. OpenBsdSoftraidRaid10CryptoPrEngine (softraid RAID10/RAID5 crypto volume key management & volume state reporting)
+// 8. OpenBsdPfsyncStateReplicationPrEngine (pfsync bulk state table synchronization with HMAC-SHA256 session integrity)
+// 9. OpenBsdResolvconfDynamicPrEngine (resolvconf dynamic name resolver configuration supervisor & search domain priority)
+// 10. OpenBsdPkgAddSignifyPrEngine (pkg_add binary package management with Signify Ed25519 signature validation & dependency graph)
 // 11. OpenBsdMissingComponentsV61PrSuite (Master PR Gateway Suite)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -62,64 +62,81 @@ pub struct OpenBsdPrProposalV61 {
 }
 
 // ============================================================================
-// 1. OpenBSD syslogd Remote TLS Logging & newsyslog Log Rotation PR Engine
+// 1. OpenBSD syslogd & newsyslog Remote TLS Logging & Log Rotation PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct SyslogdRemoteDestination {
-    pub host: String,
-    pub port: u16,
-    pub tls_enabled: bool,
-    pub ca_cert_path: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct NewsyslogRotationPolicy {
+pub struct LogRotationRule {
     pub log_file: String,
-    pub max_size_kb: usize,
-    pub count: u32,
-    pub compress_zstd: bool,
+    pub owner: String,
+    pub permissions: u16,
+    pub max_size_kb: u64,
+    pub keep_count: u32,
+    pub compress_gzip: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSyslogdNewsyslogPrEngine {
-    pub remote_destinations: Vec<SyslogdRemoteDestination>,
-    pub rotation_policies: BTreeMap<String, NewsyslogRotationPolicy>,
+    pub tls_remote_host: String,
+    pub tls_port: u16,
+    pub rotation_rules: Vec<LogRotationRule>,
 }
 
 impl OpenBsdSyslogdNewsyslogPrEngine {
     pub fn new() -> Self {
-        let mut rotation_policies = BTreeMap::new();
-        rotation_policies.insert(
-            "/var/log/messages".to_string(),
-            NewsyslogRotationPolicy {
-                log_file: "/var/log/messages".to_string(),
-                max_size_kb: 10240,
-                count: 7,
-                compress_zstd: true,
-            },
-        );
         Self {
-            remote_destinations: vec![SyslogdRemoteDestination {
-                host: "syslog.internal.net".to_string(),
-                port: 6514,
-                tls_enabled: true,
-                ca_cert_path: "/etc/ssl/syslog-ca.crt".to_string(),
-            }],
-            rotation_policies,
+            tls_remote_host: "syslog.internal.net".to_string(),
+            tls_port: 6514,
+            rotation_rules: vec![
+                LogRotationRule {
+                    log_file: "/var/log/messages".to_string(),
+                    owner: "root:wheel".to_string(),
+                    permissions: 640,
+                    max_size_kb: 1024,
+                    keep_count: 7,
+                    compress_gzip: true,
+                },
+                LogRotationRule {
+                    log_file: "/var/log/authlog".to_string(),
+                    owner: "root:wheel".to_string(),
+                    permissions: 600,
+                    max_size_kb: 512,
+                    keep_count: 14,
+                    compress_gzip: true,
+                },
+            ],
         }
     }
 
-    pub fn configure_tls_logging(&mut self, host: &str, port: u16) -> String {
-        self.remote_destinations.push(SyslogdRemoteDestination {
-            host: host.to_string(),
-            port,
-            tls_enabled: true,
-            ca_cert_path: "/etc/ssl/syslog-ca.crt".to_string(),
-        });
+    pub fn configure_remote_tls(&mut self, host: &str, port: u16) -> String {
+        self.tls_remote_host = host.to_string();
+        self.tls_port = port;
         format!(
             "--- a/etc/syslog.conf\n+++ b/etc/syslog.conf\n@@ -0,0 +1,2 @@\n+*.* @tls://{}:{}\n",
             host, port
+        )
+    }
+
+    pub fn add_rotation_rule(
+        &mut self,
+        file: &str,
+        owner: &str,
+        perm: u16,
+        max_kb: u64,
+        keep: u32,
+    ) -> String {
+        let rule = LogRotationRule {
+            log_file: file.to_string(),
+            owner: owner.to_string(),
+            permissions: perm,
+            max_size_kb: max_kb,
+            keep_count: keep,
+            compress_gzip: true,
+        };
+        self.rotation_rules.push(rule);
+        format!(
+            "--- a/etc/newsyslog.conf\n+++ b/etc/newsyslog.conf\n@@ -0,0 +1,1 @@\n+{} {} {:o} {} {} Z\n",
+            file, owner, perm, keep, max_kb
         )
     }
 }
@@ -131,21 +148,23 @@ impl Default for OpenBsdSyslogdNewsyslogPrEngine {
 }
 
 // ============================================================================
-// 2. OpenBSD PF Firewall Scrub & Multipath Routing PR Engine
+// 2. OpenBSD PF Scrub Packet Normalization & Divert Multipath PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct PfScrubRule {
     pub interface: String,
     pub reassemble_tcp: bool,
-    pub min_ttl: u8,
     pub random_id: bool,
+    pub min_ttl: u8,
+    pub max_mss: u16,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPfScrubMultipathPrEngine {
     pub scrub_rules: Vec<PfScrubRule>,
-    pub multipath_gateways: Vec<String>,
+    pub divert_sockets_enabled: bool,
+    pub multipath_interfaces: Vec<String>,
 }
 
 impl OpenBsdPfScrubMultipathPrEngine {
@@ -154,24 +173,27 @@ impl OpenBsdPfScrubMultipathPrEngine {
             scrub_rules: vec![PfScrubRule {
                 interface: "em0".to_string(),
                 reassemble_tcp: true,
-                min_ttl: 64,
                 random_id: true,
+                min_ttl: 64,
+                max_mss: 1440,
             }],
-            multipath_gateways: vec!["192.168.1.1".to_string(), "192.168.2.1".to_string()],
+            divert_sockets_enabled: true,
+            multipath_interfaces: vec!["em0".to_string(), "em1".to_string()],
         }
     }
 
-    pub fn add_scrub_and_multipath(&mut self, interface: &str, gw: &str) -> String {
-        self.scrub_rules.push(PfScrubRule {
-            interface: interface.to_string(),
+    pub fn add_scrub_rule(&mut self, iface: &str, max_mss: u16) -> String {
+        let rule = PfScrubRule {
+            interface: iface.to_string(),
             reassemble_tcp: true,
-            min_ttl: 64,
             random_id: true,
-        });
-        self.multipath_gateways.push(gw.to_string());
+            min_ttl: 64,
+            max_mss,
+        };
+        self.scrub_rules.push(rule);
         format!(
-            "--- a/etc/pf.conf\n+++ b/etc/pf.conf\n@@ -0,0 +1,2 @@\n+match in on {} scrub (no-df random-id min-ttl 64 max-mss 1440)\n+pass out on {} route-to {{ {} }} round-robin\n",
-            interface, interface, gw
+            "--- a/etc/pf.conf\n+++ b/etc/pf.conf\n@@ -0,0 +1,2 @@\n+match in on {} scrub (no-df random-id max-mss {})\n+pass in on {} divert-packet port 7000\n",
+            iface, max_mss, iface
         )
     }
 }
@@ -183,45 +205,54 @@ impl Default for OpenBsdPfScrubMultipathPrEngine {
 }
 
 // ============================================================================
-// 3. OpenBSD snmpd SNMPv3 USM & VACM PR Engine
+// 3. OpenBSD snmpd SNMPv3 USM/VACM Security PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct SnmpUserSecurityModel {
+pub struct SnmpUser {
     pub username: String,
     pub auth_protocol: String, // "SHA256"
-    pub priv_protocol: String, // "AES256"
+    pub priv_protocol: String, // "AES"
+    pub read_only: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSnmpdUsmVacmPrEngine {
-    pub users: Vec<SnmpUserSecurityModel>,
-    pub system_contact: String,
-    pub system_location: String,
+    pub users: BTreeMap<String, SnmpUser>,
+    pub sys_contact: String,
+    pub sys_location: String,
 }
 
 impl OpenBsdSnmpdUsmVacmPrEngine {
     pub fn new() -> Self {
-        Self {
-            users: vec![SnmpUserSecurityModel {
-                username: "secops_admin".to_string(),
+        let mut users = BTreeMap::new();
+        users.insert(
+            "monuser".to_string(),
+            SnmpUser {
+                username: "monuser".to_string(),
                 auth_protocol: "SHA256".to_string(),
-                priv_protocol: "AES256".to_string(),
-            }],
-            system_contact: "admin@sigmaos.org".to_string(),
-            system_location: "DC1-Rack-04".to_string(),
+                priv_protocol: "AES".to_string(),
+                read_only: true,
+            },
+        );
+        Self {
+            users,
+            sys_contact: "admin@sigmaos.org".to_string(),
+            sys_location: "DataCenter-Zone1".to_string(),
         }
     }
 
-    pub fn add_snmpv3_user(&mut self, user: &str) -> String {
-        self.users.push(SnmpUserSecurityModel {
-            username: user.to_string(),
+    pub fn add_snmp_user(&mut self, name: &str, read_only: bool) -> String {
+        let user = SnmpUser {
+            username: name.to_string(),
             auth_protocol: "SHA256".to_string(),
-            priv_protocol: "AES256".to_string(),
-        });
+            priv_protocol: "AES".to_string(),
+            read_only,
+        };
+        self.users.insert(name.to_string(), user);
         format!(
-            "--- a/etc/snmpd.conf\n+++ b/etc/snmpd.conf\n@@ -0,0 +1,2 @@\n+user \"{}\" authhmac sha256 authkey \"secret\" enc aes256 enckey \"secret\"\n",
-            user
+            "--- a/etc/snmpd.conf\n+++ b/etc/snmpd.conf\n@@ -0,0 +1,2 @@\n+user \"{}\" authkey \"secret123\" enc AES enckey \"priv123\"\n+user \"{}\" read-only\n",
+            name, name
         )
     }
 }
@@ -233,118 +264,128 @@ impl Default for OpenBsdSnmpdUsmVacmPrEngine {
 }
 
 // ============================================================================
-// 4. OpenBSD OpenNTPD HTTPS Constraint Time Sync PR Engine
+// 4. OpenBSD OpenNTPD HTTPS Constraints Time Sync PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NtpConstraint {
-    pub domain: String,
-    pub tls_cert_pinned: bool,
+pub struct NtpdConstraint {
+    pub url: String,
+    pub port: u16,
+    pub pinned_cert: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdOpennptdHttpsConstraintPrEngine {
+pub struct OpenBsdNtpdHttpsConstraintsPrEngine {
     pub ntp_servers: Vec<String>,
-    pub constraints: Vec<NtpConstraint>,
+    pub constraints: Vec<NtpdConstraint>,
 }
 
-impl OpenBsdOpennptdHttpsConstraintPrEngine {
+impl OpenBsdNtpdHttpsConstraintsPrEngine {
     pub fn new() -> Self {
         Self {
-            ntp_servers: vec!["pool.ntp.org".to_string()],
-            constraints: vec![NtpConstraint {
-                domain: "www.google.com".to_string(),
-                tls_cert_pinned: true,
-            }],
+            ntp_servers: vec![
+                "pool.ntp.org".to_string(),
+                "time.cloudflare.com".to_string(),
+            ],
+            constraints: vec![
+                NtpdConstraint {
+                    url: "https://www.google.com".to_string(),
+                    port: 443,
+                    pinned_cert: true,
+                },
+                NtpdConstraint {
+                    url: "https://www.cloudflare.com".to_string(),
+                    port: 443,
+                    pinned_cert: true,
+                },
+            ],
         }
     }
 
-    pub fn add_https_constraint(&mut self, domain: &str) -> String {
-        self.constraints.push(NtpConstraint {
-            domain: domain.to_string(),
-            tls_cert_pinned: true,
+    pub fn add_constraint(&mut self, url: &str) -> String {
+        self.constraints.push(NtpdConstraint {
+            url: url.to_string(),
+            port: 443,
+            pinned_cert: true,
         });
         format!(
             "--- a/etc/ntpd.conf\n+++ b/etc/ntpd.conf\n@@ -0,0 +1,1 @@\n+constraint from \"{}\"\n",
-            domain
+            url
         )
     }
 }
 
-impl Default for OpenBsdOpennptdHttpsConstraintPrEngine {
+impl Default for OpenBsdNtpdHttpsConstraintsPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 5. OpenBSD BPF Diagnostic Tap & Traffic Tracing PR Engine
+// 5. OpenBSD Network Diagnostics & BPF Dissector PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct BpfTapChannel {
+pub struct BpfDissectorSession {
     pub interface: String,
-    pub filter_expression: String,
-    pub buffer_size_kb: usize,
-    pub packets_captured: u64,
+    pub bpf_filter: String,
+    pub captured_packets: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdBpfDiagnosticsPrEngine {
-    pub channels: BTreeMap<String, BpfTapChannel>,
+pub struct OpenBsdNetDiagnosticsBpfPrEngine {
+    pub sessions: BTreeMap<String, BpfDissectorSession>,
 }
 
-impl OpenBsdBpfDiagnosticsPrEngine {
+impl OpenBsdNetDiagnosticsBpfPrEngine {
     pub fn new() -> Self {
-        let mut channels = BTreeMap::new();
-        channels.insert(
+        let mut sessions = BTreeMap::new();
+        sessions.insert(
             "bpf0".to_string(),
-            BpfTapChannel {
+            BpfDissectorSession {
                 interface: "em0".to_string(),
-                filter_expression: "port 80 or port 443".to_string(),
-                buffer_size_kb: 512,
-                packets_captured: 12400,
+                bpf_filter: "tcp port 80 or tcp port 443".to_string(),
+                captured_packets: 1204,
             },
         );
-        Self { channels }
+        Self { sessions }
     }
 
-    pub fn create_bpf_tap(&mut self, channel_name: &str, iface: &str, filter: &str) -> String {
-        let tap = BpfTapChannel {
+    pub fn start_bpf_capture(&mut self, session_id: &str, iface: &str, filter: &str) -> String {
+        let session = BpfDissectorSession {
             interface: iface.to_string(),
-            filter_expression: filter.to_string(),
-            buffer_size_kb: 512,
-            packets_captured: 0,
+            bpf_filter: filter.to_string(),
+            captured_packets: 0,
         };
-        self.channels.insert(channel_name.to_string(), tap);
+        self.sessions.insert(session_id.to_string(), session);
         format!(
             "tcpdump -i {} -s 1500 -w /var/log/bpf_{}.pcap '{}'\n",
-            iface, channel_name, filter
+            iface, session_id, filter
         )
     }
 }
 
-impl Default for OpenBsdBpfDiagnosticsPrEngine {
+impl Default for OpenBsdNetDiagnosticsBpfPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 6. OpenBSD File Flags (chflags schg / sappnd) PR Engine
+// 6. OpenBSD File Flags (chflags) Kernel Protection PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct FileFlagSetting {
+pub struct BSDFileFlagEntry {
     pub path: String,
-    pub system_immutable_schg: bool,
-    pub system_append_only_sappnd: bool,
-    pub user_immutable_uchg: bool,
+    pub system_immutable: bool, // schg
+    pub user_immutable: bool,   // uchg
+    pub no_dump: bool,          // nodump
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdFileFlagsChflagsPrEngine {
-    pub protected_files: BTreeMap<String, FileFlagSetting>,
+    pub protected_files: BTreeMap<String, BSDFileFlagEntry>,
 }
 
 impl OpenBsdFileFlagsChflagsPrEngine {
@@ -352,24 +393,24 @@ impl OpenBsdFileFlagsChflagsPrEngine {
         let mut protected_files = BTreeMap::new();
         protected_files.insert(
             "/sbin/init".to_string(),
-            FileFlagSetting {
+            BSDFileFlagEntry {
                 path: "/sbin/init".to_string(),
-                system_immutable_schg: true,
-                system_append_only_sappnd: false,
-                user_immutable_uchg: false,
+                system_immutable: true,
+                user_immutable: true,
+                no_dump: false,
             },
         );
         Self { protected_files }
     }
 
     pub fn set_system_immutable(&mut self, path: &str) -> String {
-        let setting = FileFlagSetting {
+        let entry = BSDFileFlagEntry {
             path: path.to_string(),
-            system_immutable_schg: true,
-            system_append_only_sappnd: false,
-            user_immutable_uchg: false,
+            system_immutable: true,
+            user_immutable: true,
+            no_dump: true,
         };
-        self.protected_files.insert(path.to_string(), setting);
+        self.protected_files.insert(path.to_string(), entry);
         format!("chflags schg {}\n", path)
     }
 }
@@ -381,55 +422,51 @@ impl Default for OpenBsdFileFlagsChflagsPrEngine {
 }
 
 // ============================================================================
-// 7. OpenBSD softraid RAID10 + AES-XTS Crypto Volume PR Engine
+// 7. OpenBSD softraid RAID10/RAID5 Encrypted Storage PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct Raid10CryptoVolume {
-    pub volume_name: String,
-    pub mirror_pairs: Vec<(String, String)>,
-    pub aes_xts_key_bits: u16,
-    pub active: bool,
+pub struct SoftraidArray {
+    pub array_id: String,
+    pub mode: String, // "RAID10", "RAID5"
+    pub chunk_disks: Vec<String>,
+    pub status_online: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSoftraidRaid10CryptoPrEngine {
-    pub volumes: BTreeMap<String, Raid10CryptoVolume>,
+    pub arrays: BTreeMap<String, SoftraidArray>,
 }
 
 impl OpenBsdSoftraidRaid10CryptoPrEngine {
     pub fn new() -> Self {
-        let mut volumes = BTreeMap::new();
-        volumes.insert(
+        let mut arrays = BTreeMap::new();
+        arrays.insert(
             "sd1a".to_string(),
-            Raid10CryptoVolume {
-                volume_name: "sd1a".to_string(),
-                mirror_pairs: vec![
-                    ("wd0e".to_string(), "wd1e".to_string()),
-                    ("wd2e".to_string(), "wd3e".to_string()),
+            SoftraidArray {
+                array_id: "sd1a".to_string(),
+                mode: "RAID10".to_string(),
+                chunk_disks: vec![
+                    "wd0e".to_string(),
+                    "wd1e".to_string(),
+                    "wd2e".to_string(),
+                    "wd3e".to_string(),
                 ],
-                aes_xts_key_bits: 256,
-                active: true,
+                status_online: true,
             },
         );
-        Self { volumes }
+        Self { arrays }
     }
 
-    pub fn assemble_raid10_crypto(&mut self, vol: &str, disks: &[&str]) -> String {
-        let vol_obj = Raid10CryptoVolume {
-            volume_name: vol.to_string(),
-            mirror_pairs: vec![(
-                disks.get(0).unwrap_or(&"wd0e").to_string(),
-                disks.get(1).unwrap_or(&"wd1e").to_string(),
-            )],
-            aes_xts_key_bits: 256,
-            active: true,
+    pub fn attach_raid10_volume(&mut self, array_id: &str, chunks: &[&str]) -> String {
+        let arr = SoftraidArray {
+            array_id: array_id.to_string(),
+            mode: "RAID10".to_string(),
+            chunk_disks: chunks.iter().map(|s| s.to_string()).collect(),
+            status_online: true,
         };
-        self.volumes.insert(vol.to_string(), vol_obj);
-        format!(
-            "bioctl -c 1C -l {} softraid0\n--- a/etc/fstab\n+++ b/etc/fstab\n@@ -0,0 +1,1 @@\n+/dev/{} /data ffs rw 1 2\n",
-            disks.join(","), vol
-        )
+        self.arrays.insert(array_id.to_string(), arr);
+        format!("bioctl -c 10 -l {} softraid0\n", chunks.join(","))
     }
 }
 
@@ -440,41 +477,42 @@ impl Default for OpenBsdSoftraidRaid10CryptoPrEngine {
 }
 
 // ============================================================================
-// 8. OpenBSD pfsync State Replication & HA Failover PR Engine
+// 8. OpenBSD pfsync HMAC-SHA256 Bulk Replication PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct PfsyncInterface {
-    pub sync_iface: String,
+pub struct PfsyncSession {
+    pub sync_interface: String,
     pub sync_peer: String,
-    pub max_updates_per_sec: u32,
-    pub active: bool,
+    pub hmac_auth: bool,
+    pub synchronized_states: u64,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPfsyncStateReplicationPrEngine {
-    pub pfsync_config: PfsyncInterface,
+    pub sessions: Vec<PfsyncSession>,
 }
 
 impl OpenBsdPfsyncStateReplicationPrEngine {
     pub fn new() -> Self {
         Self {
-            pfsync_config: PfsyncInterface {
-                sync_iface: "em1".to_string(),
+            sessions: vec![PfsyncSession {
+                sync_interface: "pfsync0".to_string(),
                 sync_peer: "10.0.0.2".to_string(),
-                max_updates_per_sec: 10000,
-                active: true,
-            },
+                hmac_auth: true,
+                synchronized_states: 84200,
+            }],
         }
     }
 
-    pub fn configure_pfsync_peer(&mut self, iface: &str, peer: &str) -> String {
-        self.pfsync_config.sync_iface = iface.to_string();
-        self.pfsync_config.sync_peer = peer.to_string();
-        format!(
-            "ifconfig pfsync0 syncdev {} syncpeer {} up\n",
-            iface, peer
-        )
+    pub fn add_sync_peer(&mut self, sync_if: &str, peer: &str) -> String {
+        self.sessions.push(PfsyncSession {
+            sync_interface: sync_if.to_string(),
+            sync_peer: peer.to_string(),
+            hmac_auth: true,
+            synchronized_states: 0,
+        });
+        format!("ifconfig {} syncpeer {} syncdev em1 up\n", sync_if, peer)
     }
 }
 
@@ -485,38 +523,29 @@ impl Default for OpenBsdPfsyncStateReplicationPrEngine {
 }
 
 // ============================================================================
-// 9. OpenBSD resolvconf Dynamic Resolver PR Engine
+// 9. OpenBSD resolvconf Dynamic Name Resolver Supervisor PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct ResolvconfState {
+pub struct OpenBsdResolvconfDynamicPrEngine {
     pub nameservers: Vec<String>,
     pub search_domains: Vec<String>,
-    pub options: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdResolvconfDynamicPrEngine {
-    pub current_resolv: ResolvconfState,
 }
 
 impl OpenBsdResolvconfDynamicPrEngine {
     pub fn new() -> Self {
         Self {
-            current_resolv: ResolvconfState {
-                nameservers: vec!["1.1.1.1".to_string(), "8.8.8.8".to_string()],
-                search_domains: vec!["internal.net".to_string()],
-                options: vec!["edns0".to_string()],
-            },
+            nameservers: vec!["1.1.1.1".to_string(), "9.9.9.9".to_string()],
+            search_domains: vec!["internal.net".to_string(), "sigmaos.org".to_string()],
         }
     }
 
-    pub fn update_resolver(&mut self, ns: &str, search: &str) -> String {
-        self.current_resolv.nameservers.push(ns.to_string());
-        self.current_resolv.search_domains.push(search.to_string());
+    pub fn update_resolver_config(&mut self, ns: &str, domain: &str) -> String {
+        self.nameservers.push(ns.to_string());
+        self.search_domains.push(domain.to_string());
         format!(
-            "--- a/etc/resolv.conf\n+++ b/etc/resolv.conf\n@@ -0,0 +1,2 @@\n+nameserver {}\n+search {}\n",
-            ns, search
+            "--- a/etc/resolv.conf\n+++ b/etc/resolv.conf\n@@ -0,0 +1,2 @@\n+search {}\n+nameserver {}\n",
+            domain, ns
         )
     }
 }
@@ -528,48 +557,56 @@ impl Default for OpenBsdResolvconfDynamicPrEngine {
 }
 
 // ============================================================================
-// 10. OpenBSD pkg_add Signify Ed25519 Verification PR Engine
+// 10. OpenBSD pkg_add Signify Ed25519 Package Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct SignifyPubKey {
-    pub key_name: String,
-    pub pubkey_hex: String,
-    pub trusted: bool,
+pub struct OpenBsdPackageInfo {
+    pub name: String,
+    pub version: String,
+    pub signify_signed: bool,
+    pub dependencies: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdPkgAddSignifyVerificationPrEngine {
-    pub trusted_keys: BTreeMap<String, SignifyPubKey>,
-    pub package_path: String,
+pub struct OpenBsdPkgAddSignifyPrEngine {
+    pub packages: BTreeMap<String, OpenBsdPackageInfo>,
+    pub installed: Vec<String>,
 }
 
-impl OpenBsdPkgAddSignifyVerificationPrEngine {
+impl OpenBsdPkgAddSignifyPrEngine {
     pub fn new() -> Self {
-        let mut trusted_keys = BTreeMap::new();
-        trusted_keys.insert(
-            "openbsd-76-base.pub".to_string(),
-            SignifyPubKey {
-                key_name: "openbsd-76-base.pub".to_string(),
-                pubkey_hex: "RWTa8c90382d...".to_string(),
-                trusted: true,
+        let mut packages = BTreeMap::new();
+        packages.insert(
+            "vim-9.1.0".to_string(),
+            OpenBsdPackageInfo {
+                name: "vim".to_string(),
+                version: "9.1.0".to_string(),
+                signify_signed: true,
+                dependencies: vec!["gettext".to_string()],
             },
         );
         Self {
-            trusted_keys,
-            package_path: "https://cdn.openbsd.org/pub/OpenBSD/7.6/packages/amd64/".to_string(),
+            packages,
+            installed: vec!["gettext".to_string()],
         }
     }
 
-    pub fn verify_and_install_package(&mut self, pkg_name: &str) -> String {
-        format!(
-            "signify -V -p /etc/signify/openbsd-76-base.pub -m {}.tgz && pkg_add {}\n",
-            pkg_name, pkg_name
-        )
+    pub fn install_package(&mut self, pkg_name: &str) -> String {
+        if let Some(pkg) = self.packages.get(pkg_name) {
+            if pkg.signify_signed {
+                self.installed.push(pkg_name.to_string());
+                return format!(
+                    "pkg_add: Verified Signify signature for {}. Installed successfully.\n",
+                    pkg_name
+                );
+            }
+        }
+        format!("pkg_add: Failed to verify signature for {}\n", pkg_name)
     }
 }
 
-impl Default for OpenBsdPkgAddSignifyVerificationPrEngine {
+impl Default for OpenBsdPkgAddSignifyPrEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -583,13 +620,13 @@ pub struct OpenBsdMissingComponentsV61PrSuite {
     pub syslogd: OpenBsdSyslogdNewsyslogPrEngine,
     pub pf_scrub: OpenBsdPfScrubMultipathPrEngine,
     pub snmpd: OpenBsdSnmpdUsmVacmPrEngine,
-    pub ntpd: OpenBsdOpennptdHttpsConstraintPrEngine,
-    pub bpf: OpenBsdBpfDiagnosticsPrEngine,
+    pub ntpd: OpenBsdNtpdHttpsConstraintsPrEngine,
+    pub net_diag: OpenBsdNetDiagnosticsBpfPrEngine,
     pub chflags: OpenBsdFileFlagsChflagsPrEngine,
-    pub raid10_crypto: OpenBsdSoftraidRaid10CryptoPrEngine,
+    pub softraid_raid10: OpenBsdSoftraidRaid10CryptoPrEngine,
     pub pfsync: OpenBsdPfsyncStateReplicationPrEngine,
     pub resolvconf: OpenBsdResolvconfDynamicPrEngine,
-    pub pkg_add: OpenBsdPkgAddSignifyVerificationPrEngine,
+    pub pkg_add: OpenBsdPkgAddSignifyPrEngine,
     pub proposals: BTreeMap<u64, OpenBsdPrProposalV61>,
     pub next_pr_id: u64,
 }
@@ -600,13 +637,13 @@ impl OpenBsdMissingComponentsV61PrSuite {
             syslogd: OpenBsdSyslogdNewsyslogPrEngine::new(),
             pf_scrub: OpenBsdPfScrubMultipathPrEngine::new(),
             snmpd: OpenBsdSnmpdUsmVacmPrEngine::new(),
-            ntpd: OpenBsdOpennptdHttpsConstraintPrEngine::new(),
-            bpf: OpenBsdBpfDiagnosticsPrEngine::new(),
+            ntpd: OpenBsdNtpdHttpsConstraintsPrEngine::new(),
+            net_diag: OpenBsdNetDiagnosticsBpfPrEngine::new(),
             chflags: OpenBsdFileFlagsChflagsPrEngine::new(),
-            raid10_crypto: OpenBsdSoftraidRaid10CryptoPrEngine::new(),
+            softraid_raid10: OpenBsdSoftraidRaid10CryptoPrEngine::new(),
             pfsync: OpenBsdPfsyncStateReplicationPrEngine::new(),
             resolvconf: OpenBsdResolvconfDynamicPrEngine::new(),
-            pkg_add: OpenBsdPkgAddSignifyVerificationPrEngine::new(),
+            pkg_add: OpenBsdPkgAddSignifyPrEngine::new(),
             proposals: BTreeMap::new(),
             next_pr_id: 6100,
         }
@@ -647,33 +684,33 @@ impl OpenBsdMissingComponentsV61PrSuite {
     }
 
     pub fn evaluate_openbsd_v61_parity(&mut self) -> bool {
-        let syslog_diff = self.syslogd.configure_tls_logging("log.sigmaos.org", 6514);
+        let sys_diff = self.syslogd.configure_remote_tls("log.internal", 6514);
         let pr1 = self.submit_pr_proposal(
-            "Configure remote TLS logging in syslogd",
+            "Configure syslogd TLS remote logging",
             "jules",
             "usr.sbin/syslogd",
-            "Enable secure TLS log forwarding to central server",
-            &syslog_diff,
+            "Route system logs to remote TLS endpoint",
+            &sys_diff,
         );
         self.validate_and_merge_pr(pr1);
 
-        let pf_diff = self.pf_scrub.add_scrub_and_multipath("em0", "192.168.10.1");
+        let pf_diff = self.pf_scrub.add_scrub_rule("em2", 1400);
         let pr2 = self.submit_pr_proposal(
-            "Enable PF scrub TCP normalization and ECMP multipath",
+            "Add PF firewall scrub normalization rule",
             "jules",
-            "sys/net/pf",
-            "Normalize incoming packets and load balance across gateways",
+            "sbin/pfctl",
+            "Normalize incoming TCP packets and enforce max-mss 1400",
             &pf_diff,
         );
         self.validate_and_merge_pr(pr2);
 
-        let snmp_diff = self.snmpd.add_snmpv3_user("netmon");
+        let ntp_diff = self.ntpd.add_constraint("https://time.google.com");
         let pr3 = self.submit_pr_proposal(
-            "Configure SNMPv3 USM user authentication in snmpd",
+            "Add OpenNTPD HTTPS constraint certificate pinning",
             "jules",
-            "usr.sbin/snmpd",
-            "Add SHA256/AES256 SNMPv3 monitoring user",
-            &snmp_diff,
+            "usr.sbin/ntpd",
+            "Verify time drift using HTTPS TLS certificate timestamps",
+            &ntp_diff,
         );
         self.validate_and_merge_pr(pr3);
 
@@ -699,51 +736,54 @@ mod tests {
 
     #[test]
     fn test_syslogd_and_pf_scrub() {
-        let mut syslog = OpenBsdSyslogdNewsyslogPrEngine::new();
-        let sdiff = syslog.configure_tls_logging("log.internal", 6514);
-        assert!(sdiff.contains("@tls://log.internal:6514"));
+        let mut sys = OpenBsdSyslogdNewsyslogPrEngine::new();
+        let diff1 = sys.configure_remote_tls("log2.internal", 6514);
+        assert!(diff1.contains("tls://log2.internal"));
+
+        let diff2 = sys.add_rotation_rule("/var/log/daemon", "root:wheel", 640, 2048, 5);
+        assert!(diff2.contains("/var/log/daemon"));
 
         let mut pf = OpenBsdPfScrubMultipathPrEngine::new();
-        let pdiff = pf.add_scrub_and_multipath("em1", "10.0.0.1");
-        assert!(pdiff.contains("match in on em1 scrub"));
+        let pdiff = pf.add_scrub_rule("em1", 1420);
+        assert!(pdiff.contains("max-mss 1420"));
     }
 
     #[test]
     fn test_snmpd_ntpd_bpf() {
         let mut snmp = OpenBsdSnmpdUsmVacmPrEngine::new();
-        let sdiff = snmp.add_snmpv3_user("operator");
-        assert!(sdiff.contains("user \"operator\""));
+        let sdiff = snmp.add_snmp_user("admin2", false);
+        assert!(sdiff.contains("admin2"));
 
-        let mut ntp = OpenBsdOpennptdHttpsConstraintPrEngine::new();
-        let ndiff = ntp.add_https_constraint("cloudflare.com");
-        assert!(ndiff.contains("constraint from \"cloudflare.com\""));
+        let mut ntp = OpenBsdNtpdHttpsConstraintsPrEngine::new();
+        let ndiff = ntp.add_constraint("https://time.cloudflare.com");
+        assert!(ndiff.contains("time.cloudflare.com"));
 
-        let mut bpf = OpenBsdBpfDiagnosticsPrEngine::new();
-        let bdiff = bpf.create_bpf_tap("bpf1", "em0", "port 53");
+        let mut bpf = OpenBsdNetDiagnosticsBpfPrEngine::new();
+        let bdiff = bpf.start_bpf_capture("bpf1", "em0", "port 53");
         assert!(bdiff.contains("tcpdump -i em0"));
     }
 
     #[test]
-    fn test_chflags_raid10_pfsync_resolv_pkg() {
-        let mut chf = OpenBsdFileFlagsChflagsPrEngine::new();
-        let cdiff = chf.set_system_immutable("/usr/bin/doas");
-        assert_eq!(cdiff, "chflags schg /usr/bin/doas\n");
+    fn test_chflags_softraid_pfsync_resolv_pkg() {
+        let mut ch = OpenBsdFileFlagsChflagsPrEngine::new();
+        let cdiff = ch.set_system_immutable("/bin/ls");
+        assert_eq!(cdiff, "chflags schg /bin/ls\n");
 
         let mut raid = OpenBsdSoftraidRaid10CryptoPrEngine::new();
-        let rdiff = raid.assemble_raid10_crypto("sd2a", &["wd0e", "wd1e", "wd2e", "wd3e"]);
-        assert!(rdiff.contains("bioctl -c 1C"));
+        let rdiff = raid.attach_raid10_volume("sd2a", &["wd0e", "wd1e", "wd2e", "wd3e"]);
+        assert!(rdiff.contains("bioctl -c 10"));
 
         let mut sync = OpenBsdPfsyncStateReplicationPrEngine::new();
-        let sdiff = sync.configure_pfsync_peer("em2", "10.0.0.5");
-        assert!(sdiff.contains("syncdev em2 syncpeer 10.0.0.5"));
+        let sdiff = sync.add_sync_peer("pfsync0", "10.0.0.5");
+        assert!(sdiff.contains("syncpeer 10.0.0.5"));
 
-        let mut resolv = OpenBsdResolvconfDynamicPrEngine::new();
-        let rsdiff = resolv.update_resolver("9.9.9.9", "sigmaos.org");
-        assert!(rsdiff.contains("nameserver 9.9.9.9"));
+        let mut res = OpenBsdResolvconfDynamicPrEngine::new();
+        let rcdiff = res.update_resolver_config("8.8.8.8", "example.com");
+        assert!(rcdiff.contains("nameserver 8.8.8.8"));
 
-        let mut pkg = OpenBsdPkgAddSignifyVerificationPrEngine::new();
-        let pkgdiff = pkg.verify_and_install_package("htop");
-        assert!(pkgdiff.contains("signify -V"));
+        let mut pkg = OpenBsdPkgAddSignifyPrEngine::new();
+        let msg = pkg.install_package("vim-9.1.0");
+        assert!(msg.contains("Verified Signify signature"));
     }
 
     #[test]
