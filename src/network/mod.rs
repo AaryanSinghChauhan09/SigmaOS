@@ -1,6 +1,7 @@
 // SigmaOS Network Stack Module
 pub mod arp;
 pub mod bluetooth;
+pub mod commands;
 pub mod device_discovery;
 pub mod discovery;
 pub mod icmp;
@@ -18,7 +19,6 @@ pub mod tcp_udp;
 pub mod warpinator_engine;
 pub mod wireless_manager;
 pub mod zenithnet;
-pub mod commands;
 pub use commands::*;
 
 pub use device_discovery::{
@@ -61,8 +61,8 @@ pub use icmp::{
 };
 pub use sigmafirewall::{
     add_firewall_rule, get_sigmafirewall, init_sigmafirewall,
-    FirewallAction as SigmaFirewallAction, FirewallProtocol,
-    FirewallRule as SigmaFirewallRule, SigmaFirewall,
+    FirewallAction as SigmaFirewallAction, FirewallProtocol, FirewallRule as SigmaFirewallRule,
+    SigmaFirewall,
 };
 pub use sigmanet::{
     bring_up_interface, connect_interface, get_sigmanet, init_sigmanet, InterfaceStatus,
