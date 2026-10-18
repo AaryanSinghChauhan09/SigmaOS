@@ -241,7 +241,10 @@ impl OpenSourceOsComparisonMatrixV58Engine {
         if other_profiles.is_empty() {
             0
         } else {
-            let sum: u32 = other_profiles.iter().map(|p| p.parity_score_vs_sigmaos).sum();
+            let sum: u32 = other_profiles
+                .iter()
+                .map(|p| p.parity_score_vs_sigmaos)
+                .sum();
             sum / (other_profiles.len() as u32)
         }
     }
@@ -813,7 +816,11 @@ pub struct SigpkgBuildFarmAutoSnapshotV58PrEngine {
 impl SigpkgBuildFarmAutoSnapshotV58PrEngine {
     pub fn new() -> Self {
         Self {
-            build_farm_targets: vec!["x86_64".to_string(), "aarch64".to_string(), "riscv64".to_string()],
+            build_farm_targets: vec![
+                "x86_64".to_string(),
+                "aarch64".to_string(),
+                "riscv64".to_string(),
+            ],
             snapshot_policy: "pre-transaction-auto-rollback".to_string(),
         }
     }
