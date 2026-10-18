@@ -41,9 +41,7 @@ pub struct MasterWikiAndRoadmapVerificationSuite {
 
 impl MasterWikiAndRoadmapVerificationSuite {
     pub fn new() -> Self {
-        Self {
-            ideas: Vec::new(),
-        }
+        Self { ideas: Vec::new() }
     }
 
     pub fn health_check(&self) -> bool {

@@ -600,7 +600,8 @@ mod tests {
         // Act
         let danger_write = engine.prepare_iso_burn("mint.iso", "/dev/sda");
         let safe_write = engine.prepare_iso_burn("mint.iso", "/dev/sdb");
-        let danger_format = engine.format_stick("/dev/nvme0n1", UsbFilesystemType::ExFat, "USB_KEY");
+        let danger_format =
+            engine.format_stick("/dev/nvme0n1", UsbFilesystemType::ExFat, "USB_KEY");
         let safe_format = engine.format_stick("/dev/sdc1", UsbFilesystemType::Fat32, "SIGMA_BOOT");
 
         // Assert
@@ -639,7 +640,8 @@ mod tests {
         let blocked = notif_engine.post_notification("Mail", "New mail", NotificationUrgency::Low);
         assert!(blocked.is_none());
 
-        let crit = notif_engine.post_notification("Power", "Battery 2%", NotificationUrgency::Critical);
+        let crit =
+            notif_engine.post_notification("Power", "Battery 2%", NotificationUrgency::Critical);
         assert!(crit.is_some());
         assert_eq!(notif_engine.pending_count(), 2);
 

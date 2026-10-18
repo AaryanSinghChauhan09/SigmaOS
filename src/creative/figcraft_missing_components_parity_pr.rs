@@ -355,7 +355,11 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
         let mut entries = Vec::new();
 
         for (name, tok) in &self.tokens {
-            if let Some(val) = tok.mode_values.get(mode).or_else(|| tok.mode_values.values().next()) {
+            if let Some(val) = tok
+                .mode_values
+                .get(mode)
+                .or_else(|| tok.mode_values.values().next())
+            {
                 let val_str = match val {
                     DesignTokenValue::Color(hex) => format!("\"{}\"", hex),
                     DesignTokenValue::Number(num) => format!("\"{}px\"", num),
@@ -375,11 +379,14 @@ impl FigcraftDesignSystemTokensVariablesPrEngine {
     pub fn generate_proposal(&self) -> FigcraftPrProposalManifest {
         FigcraftPrProposalManifest {
             pr_id: 811,
-            pr_title: "feat(figcraft): Implement Design Tokens, Multi-Mode Variables & Component Variants".to_string(),
+            pr_title:
+                "feat(figcraft): Implement Design Tokens, Multi-Mode Variables & Component Variants"
+                    .to_string(),
             target_subsystem: "Figcraft Design System & Token Management".to_string(),
             original_suite: "ArtCraft Figcraft Design Tokens".to_string(),
             components_added: vec![
-                "Design tokens & multi-theme variable modes (Light, Dark, HighContrast)".to_string(),
+                "Design tokens & multi-theme variable modes (Light, Dark, HighContrast)"
+                    .to_string(),
                 "Token variable aliasing and cascading inheritance".to_string(),
                 "Component variant property definitions & DTCG Style Dictionary export".to_string(),
             ],
@@ -1091,9 +1098,7 @@ impl SovereignFigcraftArtcraftParityPrGateway {
         let token_val = self.tokens_variables.resolve_token("color/brand/primary");
         let token_ok = token_val.is_some();
 
-        let spring_pos = self
-            .prototyping
-            .evaluate_spring_position(0.5, 0.0, 100.0);
+        let spring_pos = self.prototyping.evaluate_spring_position(0.5, 0.0, 100.0);
         let prototyping_ok = spring_pos > 0.0;
 
         let proto_ok = self
@@ -1164,8 +1169,7 @@ impl FigcraftMissingComponentsParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_figcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 6
+        self.gateway.evaluate_figcraft_parity() && self.gateway.collect_all_proposals().len() == 6
     }
 }
 
