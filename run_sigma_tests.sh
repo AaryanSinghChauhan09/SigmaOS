@@ -1720,6 +1720,20 @@ if [ -f "src/boot/sovereign_kernel_and_boot_innovations_v53_pr.rs" ]; then
     ./build/test_kernel_boot_v53_pr
 fi
 
+if [ -f "src/boot/sovereign_kernel_and_boot_innovations_v61_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V61 Suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_boot_innovations_v61_pr.rs --edition=2021 -o build/test_kernel_boot_v61_pr
+    ./build/test_kernel_boot_v61_pr
+fi
+
+if [ -f "tests/test_kernel_and_boot_v61.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V61 Integration Suite..."
+    mkdir -p build
+    rustc --test tests/test_kernel_and_boot_v61.rs --edition=2021 -o build/test_kernel_boot_v61_integration
+    ./build/test_kernel_boot_v61_integration
+fi
+
 if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; then
     echo "Running Sovereign Documentation & GitHub Wiki Consolidation Engine test suite..."
     mkdir -p build
