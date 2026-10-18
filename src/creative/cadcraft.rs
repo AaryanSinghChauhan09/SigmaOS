@@ -618,12 +618,21 @@ impl CadCraftEngine {
         target_value: f32,
     ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
-        let entity = SketchEntity { id, entity_type, coordinates };
+        let entity = SketchEntity {
+            id,
+            entity_type,
+            coordinates,
+        };
         self.sketch_entities.insert(id, entity);
         id
     }
 
-    pub fn add_geometric_constraint(&mut self, constraint_type: GeometricConstraintType, entity_ids: Vec<u32>, value: f32) -> u32 {
+    pub fn add_geometric_constraint(
+        &mut self,
+        constraint_type: GeometricConstraintType,
+        entity_ids: Vec<u32>,
+        value: f32,
+    ) -> u32 {
         let id = self.next_constraint_id.fetch_add(1, Ordering::Relaxed);
         let constraint = GeometricConstraint {
             id,
@@ -647,7 +656,12 @@ impl CadCraftEngine {
         sketch_id: Option<u32>,
     ) -> u32 {
         let id = self.next_feature_id.fetch_add(1, Ordering::Relaxed);
-        let feature = SolidFeature { id, feature_type, depth, sketch_id };
+        let feature = SolidFeature {
+            id,
+            feature_type,
+            depth,
+            sketch_id,
+        };
         self.solid_features.insert(id, feature);
         id
     }
@@ -690,7 +704,12 @@ impl CadCraftEngine {
 
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
-        let mesh = FeaMesh { id, name, node_count, element_count };
+        let mesh = FeaMesh {
+            id,
+            name,
+            node_count,
+            element_count,
+        };
         self.fea_meshes.insert(id, mesh);
         id
     }
@@ -1239,7 +1258,11 @@ impl CadCraftMasterPrDeploymentSuite {
         let p2 = sample_sketch.add_point(50.0, 0.0);
         sample_sketch.add_constraint(GeometricConstraint {
             id: 1,
-            constraint_type: GeometricConstraintType::Distance { point1_idx: p1, point2_idx: p2, target_distance: 100.0 },
+            constraint_type: GeometricConstraintType::Distance {
+                point1_idx: p1,
+                point2_idx: p2,
+                target_distance: 100.0,
+            },
             entity_ids: vec![p1 as u32, p2 as u32],
             target_value: 100.0,
             satisfied: true,
@@ -1334,7 +1357,10 @@ mod tests {
         solid.surface_area = 50000.0;
         let solver = FeaStressSolver::new_structural_steel();
 
-        assert_eq!(engine.assembly_components.get(&comp).unwrap().name, "Bracket");
+        assert_eq!(
+            engine.assembly_components.get(&comp).unwrap().name,
+            "Bracket"
+        );
         assert_eq!(engine.cam_toolpaths.get(&cam).unwrap().tool_diameter, 6.0);
         assert_eq!(engine.fea_meshes.get(&fea).unwrap().node_count, 1000);
     }
