@@ -1,25 +1,25 @@
 ## Summary
 
-<!-- What behavior changed and why? -->
+<!-- What secondary-memory behavior changed and why? -->
 
-## Component
+## Storage component
 
-- [ ] Shell component
-- [ ] Memory policy
-- [ ] Physical memory manager
-- [ ] Buddy allocator
-- [ ] Slab allocator
-- [ ] Paging
-- [ ] Page tables
-- [ ] Virtual memory
-- [ ] Protection
-- [ ] Swap
-- [ ] Reclaim
-- [ ] OOM
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Component
+
+- [ ] Shell component
 
 ## Recurring task
 
@@ -32,7 +32,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference study (Upstream study)
+## Reference behavior (Upstream study)
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 
@@ -47,9 +47,9 @@
 -
 -
 
-## Shell safety review
+## Storage safety review
 
-- [ ] Shell safety review
+- [ ] Storage safety review
 - [ ] Kernel safety review
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
@@ -61,6 +61,11 @@
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
+
+## Kernel safety review
+
+- [ ] Shell safety review
+- [ ] Lock ordering documented
 
 ## Evidence
 
