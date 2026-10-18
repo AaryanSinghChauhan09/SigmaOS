@@ -561,6 +561,24 @@ impl SovereignPdfcraftMissingComponentsParityPrGateway {
     }
 }
 
+/// Master Parity Suite for Pdfcraft & ArtCraft Parity PR Proposals.
+#[derive(Debug, Clone, Default)]
+pub struct PdfcraftMissingComponentsParityPrSuite {
+    pub gateway: SovereignPdfcraftMissingComponentsParityPrGateway,
+}
+
+impl PdfcraftMissingComponentsParityPrSuite {
+    pub fn new() -> Self {
+        Self {
+            gateway: SovereignPdfcraftMissingComponentsParityPrGateway::new(),
+        }
+    }
+
+    pub fn verify_complete_parity(&mut self) -> bool {
+        self.gateway.evaluate_pdfcraft_parity() && self.gateway.collect_all_proposals().len() == 10
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -618,5 +636,11 @@ mod tests {
         let diff_str = diff.unwrap();
         assert!(diff_str.contains("PR #820"));
         assert!(diff_str.contains("vector art & bezier curve import"));
+    }
+
+    #[test]
+    fn test_pdfcraft_missing_components_parity_pr_suite() {
+        let mut suite = PdfcraftMissingComponentsParityPrSuite::new();
+        assert!(suite.verify_complete_parity());
     }
 }
