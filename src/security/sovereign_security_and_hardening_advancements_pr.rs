@@ -70,6 +70,31 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         false
     }
 
+    /// Check Landlock access rights mask.
+    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
+        (allowed_mask & requested_access) == requested_access
+    }
+
+    /// Check Landlock access rights mask (u32 variant).
+    pub fn check_landlock_access_u32(allowed_mask: u32, requested_access: u32) -> bool {
+        Self::check_landlock_access(allowed_mask, requested_access)
+    }
+
+    /// Check Landlock v8 network TCP bind/connect port access rights.
+    pub fn check_landlock_net_port_access(
+        allowed_ports: &[u16],
+        target_port: u16,
+        is_bind: bool,
+        allowed_mask: u32,
+    ) -> bool {
+        // Bit 0 = LANDLOCK_ACCESS_NET_BIND_TCP, Bit 1 = LANDLOCK_ACCESS_NET_CONNECT_TCP
+        let req_bit = if is_bind { 1u32 } else { 2u32 };
+        if (allowed_mask & req_bit) == 0 {
+            return false;
+        }
+        allowed_ports.contains(&target_port)
+    }
+
     /// Construct AppArmor path profile match.
     pub fn matches_apparmor_path_profile(&self, path: &str, profile_pattern: &str) -> bool {
         if profile_pattern.ends_with("/*") {
@@ -485,6 +510,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
             }
         }
         parts
+    }
+
+    /// Generate SSSD domain configuration section string with custom provider.
+    pub fn generate_sssd_provider_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
+        )
     }
 
     /// Simulate Kerberos v5 ticket validation.
