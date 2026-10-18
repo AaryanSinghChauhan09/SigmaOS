@@ -262,6 +262,7 @@ pub use automation::{
     SystemAction, SystemAutomationManager, SystemAutomationRule, SystemEventType, SystemPrediction,
     SystemState,
 };
+pub use compatibility::general_purpose_os_transformation_suite::*;
 pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use compatibility::mint_omarchy_complete_gap_closure::*;
 pub use compatibility::mint_omarchy_coexistence_interop_engine::*;

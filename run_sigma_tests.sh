@@ -1955,4 +1955,11 @@ if [ -f "src/compatibility/mint_omarchy_vanguard_subsystem_suite.rs" ]; then
     ./build/test_vanguard
 fi
 
+if [ -f "src/compatibility/general_purpose_os_transformation_suite.rs" ]; then
+    echo "Running SigmaOS General-Purpose OS Transformation Suite test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/general_purpose_os_transformation_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_transform
+    ./build/test_transform
+fi
+
 echo "All SigmaOS test suites completed."
