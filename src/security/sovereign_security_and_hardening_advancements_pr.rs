@@ -62,8 +62,13 @@ impl LinuxAccessControlAndSandboxingPrEngine {
     }
 
     /// Check Landlock access rights mask.
-    pub fn check_landlock_access_u32(allowed_mask: u32, requested_access: u32) -> bool {
+    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
         (allowed_mask & requested_access) == requested_access
+    }
+
+    /// Check Landlock access rights mask (u32 variant).
+    pub fn check_landlock_access_u32(allowed_mask: u32, requested_access: u32) -> bool {
+        Self::check_landlock_access(allowed_mask, requested_access)
     }
 
     /// Check Landlock v8 network TCP bind/connect port access rights.
@@ -504,8 +509,8 @@ impl IdentityAndEnterpriseAuthPrEngine {
         parts
     }
 
-    /// Generate SSSD domain configuration section string.
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+    /// Generate SSSD domain configuration section string with custom provider.
+    pub fn generate_sssd_provider_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
             domain, provider, uri
