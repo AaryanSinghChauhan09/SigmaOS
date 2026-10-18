@@ -603,11 +603,40 @@ impl CadCraftEngine {
         id
     }
 
+    pub fn generate_cam_toolpath(&mut self, toolpath_type: CamToolpathType, tool_diameter: f32, feed_rate: f32) -> u32 {
+        let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
+        let toolpath = CamToolpath {
+            id,
+            toolpath_type,
+            tool_diameter,
+            feed_rate,
+            gcode: String::from("G21 G90 G0 Z5\nG1 Z-2 F100\nG1 X10 Y10 F500\nG0 Z5\n"),
+        };
+        self.cam_toolpaths.insert(id, toolpath);
+        id
+    }
+
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
         let mesh = FeaMesh { id, name, node_count, element_count };
         self.fea_meshes.insert(id, mesh);
         id
+    }
+
+    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
+        let mut output = Vec::new();
+        match format {
+            ExportFormat::DXF => {
+                output.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n");
+            }
+            ExportFormat::STEP => {
+                output.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
+            }
+            _ => {
+                output.extend_from_slice(b"CAD_EXPORT_STREAM");
+            }
+        }
+        output
     }
 }
 

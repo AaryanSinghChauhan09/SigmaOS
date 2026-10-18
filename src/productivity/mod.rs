@@ -61,7 +61,17 @@ pub use sovereign_application_replacements_pr_suite::{
     SovereignTerminalMultiplexerPrEngine, SovereignTextEditorsPrEngine,
     SovereignThunderbirdEmailPrEngine, TerminalGraphicsProtocol, VfsMountProtocol,
 };
-pub use sovereign_application_replacements_v2_pr_suite::*;
+pub use sovereign_application_replacements_v2_pr_suite::{
+    BrowserV2SecurityFeature, SovereignAppV2PrProposalManifest,
+    SovereignApplicationReplacementsV2PrGateway, SovereignArchiveCompressorV2PrEngine,
+    SovereignBrowserEngineV2PrEngine, SovereignDiskPartitionManagerV2PrEngine,
+    SovereignDocumentViewerV2PrEngine, SovereignEmailClientV2PrEngine,
+    SovereignFileManagerV2PrEngine, SovereignMatrixIrcMessengerV2PrEngine,
+    SovereignMediaPlayerStudioV2PrEngine, SovereignOfficeSuiteV2PrEngine,
+    SovereignP2pTorrentClientV2PrEngine, SovereignPasswordVaultV2PrEngine,
+    SovereignRasterGraphicsV2PrEngine, SovereignSystemMonitorV2PrEngine,
+    SovereignTerminalMultiplexerV2PrEngine, SovereignTextEditorV2PrEngine,
+};
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
     TextNode,

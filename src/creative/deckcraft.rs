@@ -131,10 +131,39 @@ pub struct PresentationDeck {
     pub slides: Vec<Slide>,
 }
 
+impl SlideDeck {
+    pub fn get_active_slide(&self) -> Option<&Slide> {
+        self.slides.first()
+    }
+}
+
+pub type PresentationDeck = SlideDeck;
+
+/// Presentation export formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ExportFormat {
+    ZenithPresentation,
+    PDF,
+    HTML5Slideshow,
+    PPTX,
+    Markdown,
+    Pdf,
+    Pptx,
+    Html5,
+    Svg,
+}
+
+pub type DeckExportFormat = ExportFormat;
+
 #[derive(Debug, Clone)]
-pub struct PresenterNotes {
-    pub current_slide: usize,
-    pub active: bool,
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u64,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
 }
 
 pub type DeckExportFormat = ExportFormat;
@@ -147,17 +176,17 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            ExportFormat::Pdf => {
+            DeckExportFormat::Pdf | DeckExportFormat::PDF => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
                 output.extend_from_slice(deck.slides.len().to_string().as_bytes());
             }
-            ExportFormat::Pptx => {
+            DeckExportFormat::Pptx | DeckExportFormat::PPTX => {
                 output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
                 output.extend_from_slice(deck.title.as_bytes());
             }
-            ExportFormat::Html5 => {
+            DeckExportFormat::Html5 | DeckExportFormat::HTML5Slideshow => {
                 output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(
@@ -180,16 +209,11 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n");
                 }
             }
-            ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\nTitle: ");
+            DeckExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_PRESENTATION_STREAM:");
                 output.extend_from_slice(deck.title.as_bytes());
             }
-            ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<title>");
-                output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"</title>\n</svg>");
-            }
-            ExportFormat::Markdown => {
+            DeckExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\n\n");
