@@ -1,81 +1,85 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What memory-management behavior changed and why? -->
 
-## Shell component
+## Memory component
 
-- [ ] IPC handler
-- [ ] Pipes / FIFOs
-- [ ] UNIX-domain sockets
-- [ ] Shared memory
-- [ ] Message queues
-- [ ] Event wakeups
-- [ ] Signals
-- [ ] Process/thread management
-- [ ] VFS
-- [ ] Security
+- [ ] Memory policy
+- [ ] Physical memory manager
+- [ ] Buddy allocator
+- [ ] Slab allocator
+- [ ] Paging
+- [ ] Page tables
+- [ ] Virtual memory
+- [ ] Protection
+- [ ] Swap
+- [ ] Reclaim
+- [ ] OOM
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly memory audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or memory changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
+-
 
-## Motivation
+## Memory safety review
 
-<!-- Link issue, roadmap item, or gap-analysis entry. -->
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-free prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
-## IPC semantics
+## Evidence
 
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-- Error behavior:
-- Permission model:
-- Resource limits:
-- Backpressure policy:
-
-## Security review
-
-- [ ] User input validated
-- [ ] Descriptor lifecycle checked
-- [ ] Capability/namespace checks enforced
-- [ ] No unbounded kernel allocation
-- [ ] `unsafe` justified with SAFETY comments
-- [ ] Threat model updated
-
-## Tests
-
-- [ ] Unit tests
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Concurrency/stress tests
-- [ ] Timeout tests
-- [ ] Fuzz tests
-- [ ] Resource-exhaustion tests
-- [ ] Regression test for fixed bug
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Memory benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
 ## Verification
 
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Memory documentation
+- [ ] Boot matrix, if applicable
 
-Paste output below.
+## Risks and rollback
 
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] Unit-tested only
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
+- Risk:
+- Rollback:
