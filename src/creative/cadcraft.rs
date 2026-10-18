@@ -120,24 +120,6 @@ pub struct GeometricConstraint {
     pub satisfied: bool,
 }
 
-/// 3D Vector
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Vector3D {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-}
-
-impl Vector3D {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
-    }
-
-    pub fn length(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
-    }
-}
-
 /// Solid Feature Operation
 #[derive(Debug, Clone)]
 pub enum SolidFeatureOperation {
@@ -241,14 +223,6 @@ pub enum SolidFeatureType {
     BooleanUnion,
     BooleanDifference,
     BooleanIntersection,
-}
-
-/// Solid Feature Operation history entry
-#[derive(Debug, Clone)]
-pub enum SolidFeatureOperation {
-    Extrude { depth: f64, draft_angle_deg: f64 },
-    Revolve { angle_deg: f64, axis_start: Vector3D, axis_direction: Vector3D },
-    BooleanSubtract,
 }
 
 /// 3D B-Rep Solid Model
