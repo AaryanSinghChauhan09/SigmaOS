@@ -90,7 +90,9 @@ impl SovereignSudoEngine {
             || user.bytes().any(|b| b < 32 || b == 127)
             || target_user.bytes().any(|b| b < 32 || b == 127)
             || command.bytes().any(|b| b < 32 || b == 127)
-            || groups.iter().any(|g| g.as_bytes().contains(&0) || g.bytes().any(|b| b < 32 || b == 127))
+            || groups
+                .iter()
+                .any(|g| g.as_bytes().contains(&0) || g.bytes().any(|b| b < 32 || b == 127))
         {
             return SudoAuthResult::PermissionDenied;
         }

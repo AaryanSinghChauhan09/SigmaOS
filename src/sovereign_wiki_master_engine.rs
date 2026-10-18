@@ -225,7 +225,6 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
-
 /// ---------------------------------------------------------------------------
 /// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 /// ---------------------------------------------------------------------------
@@ -280,9 +279,81 @@ impl SovereignShardsMasterRegistry {
         registry
     }
 
-    pub fn register_all_shards(&mut self) {
-        self.register_all_12_shards();
-    }
+    fn register_all_12_shards(&mut self) {
+        let shard_defs = [
+            (
+                1,
+                SovereignShardId::Shard01ProductivityOffice,
+                "OFFICE_NATIVE",
+                vec!["LibreOffice", "Microsoft 365"],
+            ),
+            (
+                2,
+                SovereignShardId::Shard02MediaProcessingPlayback,
+                "MEDIA_STUDIO",
+                vec!["VLC", "FFmpeg", "Audacity"],
+            ),
+            (
+                3,
+                SovereignShardId::Shard03Creative2D3DCad,
+                "CREATIVE_CAD",
+                vec!["Blender", "FreeCAD", "GIMP"],
+            ),
+            (
+                4,
+                SovereignShardId::Shard04FoundationalAiMl,
+                "AI_CORE",
+                vec!["PyTorch", "TensorFlow"],
+            ),
+            (
+                5,
+                SovereignShardId::Shard05LlmCognitiveArchitectures,
+                "COGNITIVE_LLM",
+                vec!["Ollama", "llama.cpp"],
+            ),
+            (
+                6,
+                SovereignShardId::Shard06AutonomousAiAgentSwarms,
+                "AGENT_SWARM",
+                vec!["AutoGPT", "CrewAI"],
+            ),
+            (
+                7,
+                SovereignShardId::Shard07QuantumResistantMeshNet,
+                "QUANTUM_MESH",
+                vec!["WireGuard", "Tailscale"],
+            ),
+            (
+                8,
+                SovereignShardId::Shard08SovereignFsStorage,
+                "SIGMA_FS",
+                vec!["ZFS", "Btrfs"],
+            ),
+            (
+                9,
+                SovereignShardId::Shard09ZenithDesktopCompositor,
+                "ZENITH_COMPOSITOR",
+                vec!["Sway", "Hyprland"],
+            ),
+            (
+                10,
+                SovereignShardId::Shard10EdgeGlobalCompliance,
+                "COMPLIANCE_GUARD",
+                vec!["OpenSCAP", "Auditd"],
+            ),
+            (
+                11,
+                SovereignShardId::Shard11SystemAdministrationOps,
+                "SYSTEM_OPS",
+                vec!["Systemd", "OpenRC"],
+            ),
+            (
+                12,
+                SovereignShardId::Shard12HardwareVirtualizationHypervisor,
+                "HYPERVISOR_NATIVE",
+                vec!["KVM", "Bhyve"],
+            ),
+        ];
 
     pub fn register_all_12_shards(&mut self) {
         self.shards.insert(
@@ -532,8 +603,7 @@ impl SovereignDistroGapClosureEngine {
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart:
-                "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
+            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
             verification_passed: true,
         });
     }
@@ -542,6 +612,14 @@ impl SovereignDistroGapClosureEngine {
         !self.gap_records.is_empty() && self.gap_records.iter().all(|r| r.is_closed)
     }
 }
+
+// ---------------------------------------------------------------------------
+// Sovereign Wiki Parity Engine & Data Syncer
+// ---------------------------------------------------------------------------
+
+/// ---------------------------------------------------------------------------
+/// 4. Roadmap Feature Parity Verification Structs
+/// ---------------------------------------------------------------------------
 
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -602,6 +680,16 @@ impl WikiSpecificationDataSyncer {
     }
 }
 
+impl Default for WikiSpecificationDataSyncer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// ---------------------------------------------------------------------------
+/// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
+/// ---------------------------------------------------------------------------
+
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Suite100Ideas,
     pub shards_registry: SovereignShardsMasterRegistry,
@@ -634,7 +722,6 @@ impl Default for SovereignWikiMasterEngine {
         Self::new()
     }
 }
-
 
 #[cfg(test)]
 mod tests {

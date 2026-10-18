@@ -711,7 +711,8 @@ impl SovereignTaskAndWikiGovernanceSuite {
         self.governor.validate_guideline(3);
         self.governor.validate_guideline(4);
 
-        if !self.governor.is_governance_compliant() || !self.addp_engine.evaluate_addp_compliance() {
+        if !self.governor.is_governance_compliant() || !self.addp_engine.evaluate_addp_compliance()
+        {
             return false;
         }
 

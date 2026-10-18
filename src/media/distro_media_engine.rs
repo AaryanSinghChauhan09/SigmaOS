@@ -2041,7 +2041,8 @@ impl V4l2SubdeviceMediaControllerEngine {
     }
 
     pub fn setup_link(&mut self, source_pad: &str, sink_pad: &str) {
-        self.active_links.push((source_pad.to_string(), sink_pad.to_string()));
+        self.active_links
+            .push((source_pad.to_string(), sink_pad.to_string()));
     }
 }
 
@@ -2065,7 +2066,8 @@ impl VlcPluginModuleRegistryEngine {
     }
 
     pub fn register_plugin(&mut self, name: &str, capability: &str) {
-        self.loaded_plugins.insert(name.to_string(), capability.to_string());
+        self.loaded_plugins
+            .insert(name.to_string(), capability.to_string());
     }
 }
 

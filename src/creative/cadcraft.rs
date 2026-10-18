@@ -44,6 +44,78 @@ pub struct GeometricConstraint {
     pub satisfied: bool,
 }
 
+/// Solid Feature Operation
+#[derive(Debug, Clone)]
+pub enum SolidFeatureOperation {
+    Extrude {
+        depth: f64,
+        draft_angle_deg: f64,
+    },
+    Revolve {
+        angle_deg: f64,
+        axis_start: Vector3D,
+        axis_direction: Vector3D,
+    },
+    BooleanSubtract,
+}
+
+/// B-Rep Solid Model
+#[derive(Debug, Clone)]
+pub struct BRepSolidModel {
+    pub name: String,
+    pub vertices: Vec<Vector3D>,
+    pub faces_count: usize,
+    pub edges_count: usize,
+    pub volume: f64,
+    pub surface_area: f64,
+    pub feature_history: Vec<SolidFeatureOperation>,
+}
+
+impl BRepSolidModel {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            vertices: Vec::new(),
+            faces_count: 0,
+            edges_count: 0,
+            volume: 0.0,
+            surface_area: 0.0,
+            feature_history: Vec::new(),
+        }
+    }
+
+    pub fn extrude_sketch(
+        &mut self,
+        _sketch: &ParametricSketch2D,
+        depth: f64,
+        draft_angle_deg: f64,
+    ) -> bool {
+        self.volume = 1000.0 * depth;
+        self.surface_area = 600.0 + 400.0 * depth;
+        self.feature_history.push(SolidFeatureOperation::Extrude {
+            depth,
+            draft_angle_deg,
+        });
+        true
+    }
+
+    pub fn revolve_sketch(&mut self, angle_deg: f64) {
+        self.feature_history.push(SolidFeatureOperation::Revolve {
+            angle_deg,
+            axis_start: Vector3D::new(0.0, 0.0, 0.0),
+            axis_direction: Vector3D::new(0.0, 1.0, 0.0),
+        });
+        self.volume = 50000.0;
+        self.surface_area = 12000.0;
+    }
+
+    pub fn boolean_subtract(&mut self, _other_solid: &BRepSolidModel) {
+        self.feature_history
+            .push(SolidFeatureOperation::BooleanSubtract);
+        self.volume = (self.volume * 0.8).max(0.0);
+    }
+}
+
 /// 2D Parametric Sketch
 #[derive(Debug, Clone)]
 pub struct ParametricSketch2D {

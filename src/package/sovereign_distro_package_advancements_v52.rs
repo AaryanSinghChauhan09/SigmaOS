@@ -397,7 +397,8 @@ impl UniversalPackageFormatStrategyV52 for PacmanFormatStrategyV52 {
         "Arch Linux ALPM 15 / Pacman 7"
     }
     fn transpile_manifest(&self, raw: &InspectedPackageManifestV52) -> UnifiedPackage {
-        UnifiedPackage::new(raw.name.clone(), raw.version.clone()).with_format(PackageFormat::Pacman)
+        UnifiedPackage::new(raw.name.clone(), raw.version.clone())
+            .with_format(PackageFormat::Pacman)
     }
 }
 
@@ -522,7 +523,10 @@ impl UniversalPackageMetadataFlyweightV52 {
         let mut map = BTreeMap::new();
         map.insert(
             "core".to_string(),
-            vec!["sovereign-libc".to_string(), "sovereign-openssl".to_string()],
+            vec![
+                "sovereign-libc".to_string(),
+                "sovereign-openssl".to_string(),
+            ],
         );
         Self {
             common_dependencies: map,
@@ -1193,10 +1197,7 @@ mod tests {
         assert_eq!(rpm_strat.format_name(), "RedHat / Fedora DNF5 RPM");
 
         let pacman_strat = PacmanFormatStrategyV52;
-        assert_eq!(
-            pacman_strat.format_name(),
-            "Arch Linux ALPM 15 / Pacman 7"
-        );
+        assert_eq!(pacman_strat.format_name(), "Arch Linux ALPM 15 / Pacman 7");
 
         let strategies = UniversalPackageAdapterFactoryV52::create_strategy(PackageFormat::Deb);
         assert_eq!(strategies.len(), 3);

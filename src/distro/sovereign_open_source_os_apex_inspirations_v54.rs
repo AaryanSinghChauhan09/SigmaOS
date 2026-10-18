@@ -61,7 +61,11 @@ impl LinuxMptcpSocketSpliceEngine {
     }
 
     pub fn splice_data(&mut self, subflow_id: u32, len: u64) -> bool {
-        if let Some(subflow) = self.subflows.iter_mut().find(|s| s.subflow_id == subflow_id) {
+        if let Some(subflow) = self
+            .subflows
+            .iter_mut()
+            .find(|s| s.subflow_id == subflow_id)
+        {
             if subflow.state != MptcpSubflowState::Closed {
                 subflow.bytes_sent += len;
                 self.spliced_bytes_total += len;
@@ -72,7 +76,11 @@ impl LinuxMptcpSocketSpliceEngine {
     }
 
     pub fn set_subflow_state(&mut self, subflow_id: u32, state: MptcpSubflowState) -> bool {
-        if let Some(subflow) = self.subflows.iter_mut().find(|s| s.subflow_id == subflow_id) {
+        if let Some(subflow) = self
+            .subflows
+            .iter_mut()
+            .find(|s| s.subflow_id == subflow_id)
+        {
             subflow.state = state;
             return true;
         }
@@ -266,7 +274,9 @@ impl NixGuixMerkleCasStoreEngine {
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),
-            flake_lock_sha256: String::from("sha256:0000000000000000000000000000000000000000000000000000000000000000"),
+            flake_lock_sha256: String::from(
+                "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            ),
         }
     }
 

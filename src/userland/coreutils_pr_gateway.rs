@@ -218,70 +218,6 @@ impl GnuCoreutilsBsdUserlandEngine {
         result
     }
 
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            list.sort_by(|a, b| {
-                let num_a = a.parse::<f64>().unwrap_or(0.0);
-                let num_b = b.parse::<f64>().unwrap_or(0.0);
-                num_a
-                    .partial_cmp(&num_b)
-                    .unwrap_or(core::cmp::Ordering::Equal)
-            });
-        } else {
-            list.sort();
-        }
-        if reverse {
-            list.reverse();
-        }
-        if unique {
-            list.dedup();
-        }
-        list
-    }
-
-    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
-        if delete_mode {
-            input.chars().filter(|c| !from_set.contains(*c)).collect()
-        } else {
-            let mut out = String::with_capacity(input.len());
-            let from_chars: Vec<char> = from_set.chars().collect();
-            let to_chars: Vec<char> = to_set.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
-                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
-                        out.push(tc);
-                    } else {
-                        out.push(c);
-                    }
-                } else {
-                    out.push(c);
-                }
-            }
-            out
-        }
-    }
-
-    pub fn run_head_tail_bytes(
-        &self,
-        content: &[u8],
-        bytes_count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
-        if is_head {
-            content.iter().take(bytes_count).copied().collect()
-        } else {
-            let skip_count = content.len().saturating_sub(bytes_count);
-            content.iter().skip(skip_count).copied().collect()
-        }
-    }
-
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
         let lines: Vec<&str> = content.lines().collect();
         if is_head {
@@ -300,7 +236,13 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
@@ -356,7 +298,13 @@ impl GnuCoreutilsBsdUserlandEngine {
         (lines, words, bytes)
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             sorted.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
@@ -396,7 +344,10 @@ impl GnuCoreutilsBsdUserlandEngine {
         if is_head {
             data.iter().take(bytes).copied().collect()
         } else {
-            data.iter().skip(data.len().saturating_sub(bytes)).copied().collect()
+            data.iter()
+                .skip(data.len().saturating_sub(bytes))
+                .copied()
+                .collect()
         }
     }
 
@@ -1101,7 +1052,11 @@ impl TextProcessingEngine {
         case_insensitive: bool,
     ) -> Vec<(usize, String)> {
         let res = self.grep_match_extended(content, pattern, case_insensitive, false, false);
-        res.1.into_iter().enumerate().map(|(idx, line)| (idx + 1, line)).collect()
+        res.1
+            .into_iter()
+            .enumerate()
+            .map(|(idx, line)| (idx + 1, line))
+            .collect()
     }
 
     pub fn grep_match_extended(
@@ -1178,12 +1133,13 @@ impl TextProcessingEngine {
         invert: bool,
         line_numbers: bool,
     ) -> (usize, Vec<String>) {
-        let mut matched_lines = Vec::new();
+        let mut lines = Vec::new();
         let pat = if case_insensitive {
             pattern.to_lowercase()
         } else {
             pattern.to_string()
         };
+        let mut count = 0;
 
         for (idx, line) in content.lines().enumerate() {
             let line_cmp = if case_insensitive {
@@ -1191,8 +1147,8 @@ impl TextProcessingEngine {
             } else {
                 line.to_string()
             };
-            let is_match = line_cmp.contains(&pat);
-            let keep = if invert { !is_match } else { is_match };
+            let matches = line_cmp.contains(&pat);
+            let keep = if invert { !matches } else { matches };
             if keep {
                 if line_numbers {
                     matched_lines.push(format!("{}:{}", idx + 1, line));
@@ -1935,15 +1891,24 @@ pub struct CoreUtilsPullRequestGatewayEngine {
 
 impl CoreUtilsPullRequestGatewayEngine {
     pub fn get_prs_by_category(&self, cat: CoreUtilsPrCategory) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.category == cat).collect()
+        self.submissions
+            .values()
+            .filter(|s| s.category == cat)
+            .collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.status == status).collect()
+        self.submissions
+            .values()
+            .filter(|s| s.status == status)
+            .collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.author == author).collect()
+        self.submissions
+            .values()
+            .filter(|s| s.author == author)
+            .collect()
     }
 
     pub fn new() -> Self {
