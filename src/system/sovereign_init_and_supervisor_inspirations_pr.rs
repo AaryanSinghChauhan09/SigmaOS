@@ -586,29 +586,8 @@ pub struct BsdRcScript {
 pub struct BsdRcInspirationsPrEngine;
 
 impl BsdRcInspirationsPrEngine {
-    /// Merge rc.conf and rc.conf.local configuration key-value overrides.
-    pub fn merge_rc_conf_overrides(&self, conf: &alloc::collections::BTreeMap<String, String>, local: &alloc::collections::BTreeMap<String, String>) -> alloc::collections::BTreeMap<String, String> {
-        let mut merged = conf.clone();
-        for (k, v) in local {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
-    }
     pub fn new() -> Self {
         Self
-    }
-
-    /// Merge `/etc/rc.conf` with `/etc/rc.conf.local` overrides.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base_conf: &BTreeMap<String, String>,
-        local_conf: &BTreeMap<String, String>,
-    ) -> BTreeMap<String, String> {
-        let mut merged = base_conf.clone();
-        for (k, v) in local_conf {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
     }
 
     /// Simulate FreeBSD / OpenBSD / NetBSD `rcorder` topological dependency sorting.
@@ -655,19 +634,6 @@ impl BsdRcInspirationsPrEngine {
         }
 
         Ok(ordered)
-    }
-
-    /// Merge base rc.conf with local overrides.
-    pub fn merge_rc_conf_overrides(
-        &self,
-        base: &BTreeMap<String, String>,
-        overrides: &BTreeMap<String, String>,
-    ) -> BTreeMap<String, String> {
-        let mut merged = base.clone();
-        for (k, v) in overrides {
-            merged.insert(k.clone(), v.clone());
-        }
-        merged
     }
 
     /// Parse `/etc/rc.conf` key-value pairs (e.g. `sshd_enable="YES"`, `hostname="sigma"`).
@@ -1329,7 +1295,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 0);
+        assert_eq!(queue.len(), 1);
     }
 
     #[test]

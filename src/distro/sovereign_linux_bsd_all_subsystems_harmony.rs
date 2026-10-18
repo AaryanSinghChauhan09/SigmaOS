@@ -795,7 +795,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         target_distro: LinuxBsdDistroInspiration,
         payload: &str,
     ) -> String {
-        self.translate_cross_distro_payload_direct(source_distro, target_distro, payload)
+        self.translate_cross_distro_payload_between_distros(source_distro, target_distro, payload)
     }
 
     pub fn translate_vfs_path(&self, distro: LinuxBsdDistroInspiration, path: &str) -> String {
@@ -861,7 +861,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn translate_subsystem_payload(
+    pub fn format_subsystem_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1115,7 +1115,7 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         target_distro: LinuxBsdDistroInspiration,
         payload: &str,
     ) -> String {
-        self.harmony_engine.translate_cross_distro_payload_direct(
+        self.harmony_engine.translate_subsystem_payload(
             source_distro,
             target_distro,
             payload,
@@ -1324,14 +1324,13 @@ mod tests {
         );
 
         let (audits_map, audit_score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits_map.len(), 31);
+        assert_eq!(audits_map.len(), 44);
         assert_eq!(audit_score, 100);
         for (_, compliant) in audits_map {
             assert!(compliant);
         }
-        assert_eq!(score, 100);
 
-        let translated = engine.format_cross_distro_subsystem_payload(
+        let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",

@@ -1,9 +1,10 @@
 ## Summary
 
-<!-- What memory-management behavior changed and why? -->
+<!-- What behavior changed and why? -->
 
-## Memory component
+## Component
 
+- [ ] Shell component
 - [ ] Memory policy
 - [ ] Physical memory manager
 - [ ] Buddy allocator
@@ -46,8 +47,10 @@
 -
 -
 
-## Memory safety review
+## Shell safety review
 
+- [ ] Shell safety review
+- [ ] Kernel safety review
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
 - [ ] Orphans are adopted
