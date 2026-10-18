@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: MIT
 /// SigmaOS: Network Routing Engine
 /// Implements packet routing, forwarding, and network lookup
+#![no_std]
+
+extern crate alloc;
+use alloc::string::String;
+use alloc::vec::Vec;
 use super::zenithnet::{Ipv4Addr, NetworkError};
-use std::string::String;
-use std::vec::Vec;
 
 /// Routing Table Entry
 #[derive(Debug, Clone)]
