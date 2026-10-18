@@ -11,6 +11,7 @@ pub mod deckcraft;
 pub mod deckcraft_artcraft_parity_pr;
 pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
+pub mod designcraft_artcraft_parity_pr;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
 pub mod effectcraft_missing_components_parity_pr;
@@ -77,6 +78,20 @@ pub use designcraft::{
     DesignBlendMode, DesignEditor, Element, ElementType, ExportFormat as DesignExportFormat,
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
+};
+pub use designcraft_artcraft_parity_pr::{
+    DesigncraftArtcraftParityPrSuite, DesigncraftArtcraftPrProposalManifest,
+    DesigncraftAutoLayoutFlexboxPrEngine as DesigncraftArtcraftAutoLayoutFlexboxPrEngine,
+    DesigncraftCodeExportFrameworkPrEngine as DesigncraftArtcraftCodeExportFrameworkPrEngine,
+    DesigncraftComponentVariantsPrEngine as DesigncraftArtcraftComponentVariantsPrEngine,
+    DesigncraftDesignSystemTokensPrEngine as DesigncraftArtcraftDesignSystemTokensPrEngine,
+    DesigncraftDesignTokensStyleDictionaryPrEngine as DesigncraftArtcraftDesignTokensStyleDictionaryPrEngine,
+    DesigncraftIconSystemPackagingPrEngine as DesigncraftArtcraftIconSystemPackagingPrEngine,
+    DesigncraftInteractivePrototypingPrEngine as DesigncraftArtcraftInteractivePrototypingPrEngine,
+    DesigncraftMultiplayerCrdtSyncPrEngine as DesigncraftArtcraftMultiplayerCrdtSyncPrEngine,
+    DesigncraftVectorBooleanGeometryPrEngine as DesigncraftArtcraftVectorBooleanGeometryPrEngine,
+    DesigncraftWcagAccessibilityAuditPrEngine as DesigncraftArtcraftWcagAccessibilityAuditPrEngine,
+    SovereignDesigncraftArtcraftParityPrGateway as SovereignDesigncraftArtcraftParityPrGatewayV2,
 };
 pub use designcraft_missing_components_parity_pr::{
     DesigncraftAutoLayoutFlexEngine, DesigncraftCodeExportEngine,

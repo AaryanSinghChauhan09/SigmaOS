@@ -27,7 +27,11 @@ use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// DesignCraft PR Category Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -1282,12 +1286,12 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         };
         let p1 = self.geometry_engine.create_path(
             String::from("PathA"),
-            alloc::vec![knot1.clone()],
+            vec![knot1.clone()],
             true,
         );
         let p2 = self
             .geometry_engine
-            .create_path(String::from("PathB"), alloc::vec![knot1], true);
+            .create_path(String::from("PathB"), vec![knot1], true);
         let merged_p = self
             .geometry_engine
             .perform_boolean_op(p1, p2, BooleanOpType::Union);

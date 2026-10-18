@@ -102,6 +102,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+    /// Evaluate Landlock v5 access permission (64-bit).
+    pub fn check_landlock_access_u64(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
+    }
+
     /// Check if Linux capability bit mask contains target capability.
     pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
         if cap_bit >= 64 {
@@ -144,6 +149,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } // CLONE_NEWCGROUP
         flags
     }
+
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
@@ -469,6 +475,7 @@ impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
     }
+
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
