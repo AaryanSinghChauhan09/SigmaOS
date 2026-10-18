@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-/// SigmaOS: Network Routing Engine
-/// Implements packet routing, forwarding, and network lookup
+// SigmaOS: Network Routing Engine
+// Implements packet routing, forwarding, and network lookup
 #![no_std]
 
 extern crate alloc;

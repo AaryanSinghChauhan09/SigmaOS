@@ -7,6 +7,16 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct EffectcraftPrProposalSpec {
+    pub pr_title: String,
+    pub target_subsystem: String,
+    pub original_suite: String,
+    pub components_added: Vec<String>,
+    pub performance_multiplier: String,
+    pub status: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct EffectcraftPrProposalManifest {
     pub total_proposals: usize,
     pub verified_components: usize,
@@ -72,7 +82,7 @@ impl ShaderFilterGraphPrEngine {
         Ok(())
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Real-time GPU Shader Filter Graph Engine".to_string(),
             target_subsystem: "GPU Shader Graph Compositor".to_string(),
@@ -158,7 +168,7 @@ impl ParticlePhysicsEffectPrEngine {
         total_active
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Particle Physics Simulation Engine".to_string(),
             target_subsystem: "VFX Particle Physics Engine".to_string(),
@@ -215,7 +225,7 @@ impl NeuralMatteSegmentationPrEngine {
         Ok(SegmentationMask { width, height, alpha_map })
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Neural Matte Auto-Keying Engine".to_string(),
             target_subsystem: "AI Background Segmentation".to_string(),
@@ -268,7 +278,7 @@ impl AudioReactiveVisualizerPrEngine {
         self.frequency_bands.get(band_idx).copied().unwrap_or(0.0)
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Audio Reactive Frequency Spectrum Engine".to_string(),
             target_subsystem: "Audio Reactive Motion Graphics".to_string(),
@@ -318,7 +328,7 @@ impl Spatial3DDepthCompositorPrEngine {
         Ok(projected)
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Spatial 3D Depth Projection Engine".to_string(),
             target_subsystem: "3D Depth Compositor".to_string(),
@@ -424,7 +434,7 @@ impl ArtCraftOpenFxPluginPrEngine {
         Ok(())
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement OpenFX Plugin Host Adapter".to_string(),
             target_subsystem: "OpenFX Plugin Ecosystem".to_string(),
@@ -504,7 +514,7 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
         Ok(output)
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Optical Flow Motion Vector Engine".to_string(),
             target_subsystem: "Motion Estimation & Retiming".to_string(),
@@ -563,7 +573,7 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
         Ok(first * self.fog_density)
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Volumetric Atmospheric Raymarching Engine".to_string(),
             target_subsystem: "Atmospheric God-Ray Engine".to_string(),
@@ -633,7 +643,6 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
             },
             current_space: WorkingColorSpace::Rec709,
         }
-        matte
     }
 }
 
@@ -675,7 +684,7 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         ]
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement ACES Color Management Engine".to_string(),
             target_subsystem: "ACES & OCIO Color Science".to_string(),
@@ -761,7 +770,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         Ok(len)
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Stereoscopic VR 360 Spatial Engine".to_string(),
             target_subsystem: "VR 360 Spatial Compositor".to_string(),
@@ -824,7 +833,7 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
         Ok((initial_density * dissipation + self.vorticity * dt).clamp(0.0, 100.0))
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Procedural VFX Fractal Fluid Simulation Engine".to_string(),
             target_subsystem: "VFX Fluid Dynamics Studio".to_string(),
@@ -906,7 +915,7 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         Ok(len)
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Temporal Noise Reduction Engine".to_string(),
             target_subsystem: "Noise Reduction & Degrain".to_string(),
@@ -973,7 +982,7 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
         Ok(())
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Cryptomatte AOV Extractor Engine".to_string(),
             target_subsystem: "Cryptomatte AOV Extractor".to_string(),
@@ -1040,7 +1049,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         Ok(total_accumulation.clamp(0.0, 10.0))
     }
 
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
+    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
             pr_title: "feat(effectcraft): Implement Expression Scripting & Rigging Engine".to_string(),
             target_subsystem: "Expression Scripting Engine".to_string(),
@@ -1100,14 +1109,31 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
         let _particle_ok = self.particle_physics.emit_particles("smoke", 100).is_ok();
         let frame = vec![0u8, 200u8, 0u8, 255u8];
         let _matte_ok = self.neural_matte.execute_auto_keying(&frame, 1, 1).is_ok();
-        let _audio_ok = self.audio_reactive.process_audio_buffer(&[0.5, 0.8, 0.2, 0.9, 0.1]).is_ok();
+        let _audio_ok = self.audio_visualizer.process_audio_buffer(&[0.5, 0.8, 0.2, 0.9, 0.1]).is_ok();
         let pts = vec![Point3D { position: [1.0, 2.0, 5.0], color: [1.0, 0.0, 0.0] }];
         let _spatial_ok = self.spatial_3d.project_points(&pts).is_ok();
-        let _ofx_ok = self.ofx_adapter.load_openfx_plugin("com.artcraft.FilmGrain").is_ok();
+        let _ofx_ok = self.openfx_adapter.load_openfx_plugin("com.artcraft.FilmGrain").is_ok();
         let _optical_ok = self.optical_flow.compute_motion_vectors(&[0u8; 4], &[10u8; 4], 1, 1).is_ok();
         true
     }
 
+    pub fn collect_all_proposals(&self) -> Vec<EffectcraftPrProposalSpec> {
+        vec![
+            self.shader_graph.generate_proposal(),
+            self.particle_physics.generate_proposal(),
+            self.neural_matte.generate_proposal(),
+            self.audio_visualizer.generate_proposal(),
+            self.spatial_3d.generate_proposal(),
+            self.openfx_adapter.generate_proposal(),
+            self.optical_flow.generate_proposal(),
+            self.aces_ocio.generate_proposal(),
+            self.cryptomatte.generate_proposal(),
+            self.expression_scripting.generate_proposal(),
+        ]
+    }
+
+    pub fn generate_manifest(&self) -> EffectcraftPrProposalManifest {
+        let proposals = self.collect_all_proposals();
         EffectcraftPrProposalManifest {
             total_proposals: proposals.len(),
             verified_components: proposals.len(),
@@ -1317,6 +1343,7 @@ mod tests {
 
         let fractal = engine.render_procedural_fractal(4, 4, 1.0).unwrap();
         assert_eq!(fractal.len(), 4 * 4 * 4);
+    }
 
     #[test]
     fn test_volumetric_lighting_engine_functional() {
