@@ -28,6 +28,7 @@
 - [Kernel Scheduler Component Guide](./Kernel-Scheduler-Component-Guide.md) &ndash; CFS / EEVDF fair scheduling, real-time deadlines, and Linux/BSD comparisons.
 - [Scheduler Component Guide](./Scheduler-Component-Guide.md) &ndash; Multi-queue CFS / BORE low-latency preemptive task scheduler.
 - [Process Management Component Guide](./Process-Management-Component-Guide.md) &ndash; Process lifecycle, PCB state machine, cloning, and zombie reaping.
+- [Process Manager Plan](./PROCESS_MANAGER_PLAN.md) &ndash; Master Architecture, 18-PR sequence roadmap, child reaping, stable process references, and service supervision.
 - [Memory Management Component Guide](./Memory-Management-Component-Guide.md) &ndash; Paging, slab allocator, NUMA memory tiers, and page cache.
 - [Virtual Memory Manager Component Guide](./Virtual-Memory-Manager-Component-Guide.md) &ndash; Demand paging, Copy-on-Write fork, ASLR, and mmap sealing.
 - [Concurrency & Deadlocks Component Guide](./Concurrency-And-Deadlocks-Component-Guide.md) &ndash; Hierarchical spinlocks, witness cycle detection, and lockless RCU.
