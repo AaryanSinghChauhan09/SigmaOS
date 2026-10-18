@@ -221,11 +221,14 @@ impl HaikuBfsLiveQueryIndexingEngine {
         let mut attrs = BTreeMap::new();
         attrs.insert("META:title".to_string(), "string".to_string());
         attrs.insert("BEOS:type".to_string(), "mime_type".to_string());
-        Self { indexed_attributes: attrs }
+        Self {
+            indexed_attributes: attrs,
+        }
     }
 
     pub fn add_live_index(&mut self, attr: &str, attr_type: &str) -> String {
-        self.indexed_attributes.insert(attr.to_string(), attr_type.to_string());
+        self.indexed_attributes
+            .insert(attr.to_string(), attr_type.to_string());
         format!("Haiku BFS V61: Created live attribute index for '{}'", attr)
     }
 }
@@ -286,7 +289,8 @@ impl NixGuixHermeticCasStoreEngineV61 {
     }
 
     pub fn evaluate_flake(&mut self, flake_ref: &str, store_hash: &str) -> String {
-        self.store_closures.insert(flake_ref.to_string(), store_hash.to_string());
+        self.store_closures
+            .insert(flake_ref.to_string(), store_hash.to_string());
         format!(
             "NixOS / Guix Hermetic Store V61: Evaluated flake '{}' -> '{}'",
             flake_ref, store_hash
