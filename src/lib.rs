@@ -131,8 +131,8 @@ pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
     JobControlLifecycleEngine, JobState, Pid, PidAllocator, PidError, PosixMessage,
     PosixMessageQueue, ProcessCancelState, ProcessCancellationAndTerminationManager,
-    ProcessControlError, ProcessEntry, ProcessJobEntry, ProcessLifecycleTracker,
-    ProcessState, ProcessStateError, ProcessTable, ProcessTableError, ProcessVmReadWriteEngine,
+    ProcessControlError, ProcessEntry, ProcessJobEntry, ProcessLifecycleTracker, ProcessState,
+    ProcessStateError, ProcessTable, ProcessTableError, ProcessVmReadWriteEngine,
     ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess, SovereignProcessManager,
     SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
 };
@@ -264,10 +264,10 @@ pub use automation::{
     SystemState,
 };
 pub use compatibility::general_purpose_os_transformation_suite::*;
-pub use compatibility::mint_omarchy_migration_bridge::*;
-pub use compatibility::mint_omarchy_complete_gap_closure::*;
 pub use compatibility::mint_omarchy_coexistence_interop_engine::*;
+pub use compatibility::mint_omarchy_complete_gap_closure::*;
 pub use compatibility::mint_omarchy_federated_desktop_engine::*;
+pub use compatibility::mint_omarchy_migration_bridge::*;
 pub use compatibility::mint_omarchy_pinnacle_ecosystem_suite::*;
 pub use compatibility::mint_omarchy_vanguard_subsystem_suite::*;
 pub use compatibility::{
