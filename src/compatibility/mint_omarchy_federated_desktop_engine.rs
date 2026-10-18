@@ -103,7 +103,8 @@ impl MintWarpinatorProtocolEngine {
         if !self.auth_pin_verified {
             return false;
         }
-        self.transmitted_bytes = (self.transmitted_bytes + chunk_bytes as u64).min(self.total_transfer_bytes);
+        self.transmitted_bytes =
+            (self.transmitted_bytes + chunk_bytes as u64).min(self.total_transfer_bytes);
         true
     }
 
@@ -160,8 +161,15 @@ impl MintBackupSelectionsEngine {
     pub fn export_selections_manifest(&self) -> String {
         let mut manifest = String::from("# Linux Mint / SigmaOS Package Selection Manifest\n");
         for pkg in &self.package_list {
-            let status = if pkg.is_installed { "install" } else { "deinstall" };
-            manifest.push_str(&format!("{}:{}\t{}\n", pkg.package_name, pkg.architecture, status));
+            let status = if pkg.is_installed {
+                "install"
+            } else {
+                "deinstall"
+            };
+            manifest.push_str(&format!(
+                "{}:{}\t{}\n",
+                pkg.package_name, pkg.architecture, status
+            ));
         }
         manifest
     }
@@ -223,7 +231,8 @@ impl OmarchyHyprlandLayoutMasterEngine {
         }
 
         // Master window on the left
-        let master_w = ((usable_w as f32 * self.master_factor) as u32).saturating_sub(self.inner_gap / 2);
+        let master_w =
+            ((usable_w as f32 * self.master_factor) as u32).saturating_sub(self.inner_gap / 2);
         results.push(WindowGeometry {
             x: self.outer_gap as i32,
             y: self.outer_gap as i32,
@@ -277,7 +286,14 @@ impl OmarchyWaybarJsonStreamEngine {
         }
     }
 
-    pub fn update_module(&mut self, module_id: &str, text: &str, tooltip: &str, class_name: &str, pct: u8) {
+    pub fn update_module(
+        &mut self,
+        module_id: &str,
+        text: &str,
+        tooltip: &str,
+        class_name: &str,
+        pct: u8,
+    ) {
         self.active_modules.insert(
             module_id.to_string(),
             WaybarModulePacket {
@@ -497,7 +513,10 @@ mod tests {
         assert!(json.contains("\"text\":\"28%\""));
         assert!(json.contains("\"percentage\":28"));
         assert!(dispatched);
-        assert_eq!(swww.last_dispatched_packet.as_ref().unwrap().output_name, "DP-1");
+        assert_eq!(
+            swww.last_dispatched_packet.as_ref().unwrap().output_name,
+            "DP-1"
+        );
     }
 
     #[test]
