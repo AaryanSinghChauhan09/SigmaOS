@@ -236,11 +236,20 @@ impl DesigncraftAutoLayoutFlexboxPrEngine {
         self.frames.insert(frame.frame_id, frame);
     }
 
-    pub fn compute_frame_dimensions(&self, frame_id: u32, parent_width: f32, parent_height: f32) -> (f32, f32) {
+    pub fn compute_frame_dimensions(
+        &self,
+        frame_id: u32,
+        parent_width: f32,
+        parent_height: f32,
+    ) -> (f32, f32) {
         if let Some(f) = self.frames.get(&frame_id) {
             let w = match f.width_constraint {
                 SizingConstraint::Fixed(val) => val,
-                SizingConstraint::HugContents => (f.children_count as f32 * 50.0) + f.padding * 2.0 + f.gap * (f.children_count.saturating_sub(1) as f32),
+                SizingConstraint::HugContents => {
+                    (f.children_count as f32 * 50.0)
+                        + f.padding * 2.0
+                        + f.gap * (f.children_count.saturating_sub(1) as f32)
+                }
                 SizingConstraint::FillContainer => parent_width - f.padding * 2.0,
             };
             let h = match f.height_constraint {
@@ -337,11 +346,17 @@ impl DesigncraftDesignSystemTokensPrEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftArtcraftPrProposalManifest {
         DesigncraftArtcraftPrProposalManifest {
-            pr_title: "feat(designcraft): Implement Design System Tokens, Theme Variable Modes & Aliasing".to_string(),
+            pr_title:
+                "feat(designcraft): Implement Design System Tokens, Theme Variable Modes & Aliasing"
+                    .to_string(),
             target_subsystem: "Designcraft Token Management System".to_string(),
             original_suite: "Artcraft DesignCraft System Variables".to_string(),
             components_added: vec![
-                format!("Active theme mode: {}, Total tokens: {}", self.current_mode, self.tokens.len()),
+                format!(
+                    "Active theme mode: {}, Total tokens: {}",
+                    self.current_mode,
+                    self.tokens.len()
+                ),
                 "Token primitive types: Color, Number, String, and Boolean".to_string(),
                 "Variable mode switching: Light/Dark theme, High-Contrast, Density".to_string(),
             ],
@@ -412,7 +427,12 @@ impl DesigncraftVectorBooleanGeometryPrEngine {
         id
     }
 
-    pub fn perform_boolean_op(&mut self, path_a_id: u32, path_b_id: u32, op: BooleanOpType) -> Option<u32> {
+    pub fn perform_boolean_op(
+        &mut self,
+        path_a_id: u32,
+        path_b_id: u32,
+        op: BooleanOpType,
+    ) -> Option<u32> {
         let p_a = self.paths.get(&path_a_id)?;
         let p_b = self.paths.get(&path_b_id)?;
         let mut combined_knots = p_a.knots.clone();
@@ -558,14 +578,25 @@ impl DesigncraftCodeExportFrameworkPrEngine {
     pub fn export_component_code(&self, component_name: &str, frame: &AutoLayoutFrame) -> String {
         match self.target {
             CodeFrameworkTarget::TailwindCss => {
-                let dir = if frame.direction == FlexDirection::Row { "flex-row" } else { "flex-col" };
-                format!("<div className=\"flex {} gap-{} p-{}\">\n  <!-- {} children -->\n</div>", dir, frame.gap as u32, frame.padding as u32, component_name)
+                let dir = if frame.direction == FlexDirection::Row {
+                    "flex-row"
+                } else {
+                    "flex-col"
+                };
+                format!(
+                    "<div className=\"flex {} gap-{} p-{}\">\n  <!-- {} children -->\n</div>",
+                    dir, frame.gap as u32, frame.padding as u32, component_name
+                )
             }
             CodeFrameworkTarget::ReactJsx => {
                 format!("export const {} = () => (\n  <div style={{{{ display: 'flex', gap: '{}px', padding: '{}px' }}}}>\n    <span>{}</span>\n  </div>\n);", component_name, frame.gap, frame.padding, component_name)
             }
             CodeFrameworkTarget::FlutterDart => {
-                let widget = if frame.direction == FlexDirection::Row { "Row" } else { "Column" };
+                let widget = if frame.direction == FlexDirection::Row {
+                    "Row"
+                } else {
+                    "Column"
+                };
                 format!("class {} extends StatelessWidget {{\n  @override\n  Widget build(BuildContext context) => {}(\n    children: [],\n  );\n}}", component_name, widget)
             }
             CodeFrameworkTarget::VueSfc => {
@@ -576,13 +607,16 @@ impl DesigncraftCodeExportFrameworkPrEngine {
 
     pub fn generate_proposal(&self) -> DesigncraftArtcraftPrProposalManifest {
         DesigncraftArtcraftPrProposalManifest {
-            pr_title: "feat(designcraft): Implement Multi-Framework Design-to-Code Exporter Engine".to_string(),
+            pr_title: "feat(designcraft): Implement Multi-Framework Design-to-Code Exporter Engine"
+                .to_string(),
             target_subsystem: "Designcraft Code Exporter".to_string(),
             original_suite: "Artcraft DesignCraft CodeGen Engine".to_string(),
             components_added: vec![
                 format!("Target framework: {:?}", self.target),
-                "Target framework transpilers: Tailwind CSS, React JSX, Flutter Dart, Vue SFC".to_string(),
-                "Semantic component token mapping and responsive utility class generation".to_string(),
+                "Target framework transpilers: Tailwind CSS, React JSX, Flutter Dart, Vue SFC"
+                    .to_string(),
+                "Semantic component token mapping and responsive utility class generation"
+                    .to_string(),
             ],
             performance_multiplier: "10x Faster Code Generation Throughput".to_string(),
             status: "Ready for Merge".to_string(),
@@ -753,7 +787,8 @@ impl DesigncraftIconSystemPackagingPrEngine {
     }
 
     pub fn compile_svg_sprite_sheet(&self) -> String {
-        let mut sprite = String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" style=\"display:none;\">\n");
+        let mut sprite =
+            String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" style=\"display:none;\">\n");
         for icon in self.icons.values() {
             sprite.push_str(&format!(
                 "  <symbol id=\"{}\" viewBox=\"{}\">\n    <path d=\"{}\" />\n  </symbol>\n",
@@ -796,12 +831,18 @@ impl RgbColor {
         #[cfg(feature = "std")]
         let channel_lum = |c: u8| -> f32 {
             let s = c as f32 / 255.0;
-            if s <= 0.03928 { s / 12.92 } else { ((s + 0.055) / 1.055).powf(2.4) }
+            if s <= 0.03928 {
+                s / 12.92
+            } else {
+                ((s + 0.055) / 1.055).powf(2.4)
+            }
         };
         #[cfg(not(feature = "std"))]
         let channel_lum = |c: u8| -> f32 {
             let s = c as f32 / 255.0;
-            if s <= 0.03928 { s / 12.92 } else {
+            if s <= 0.03928 {
+                s / 12.92
+            } else {
                 let x = (s + 0.055) / 1.055;
                 x * x * x
             }
@@ -961,13 +1002,26 @@ mod tests {
         assert_eq!(h, 72.0);
 
         let mut tokens = DesigncraftDesignSystemTokensPrEngine::new();
-        tokens.register_token("color.primary", "Light", TokenValue::Color(0, 100, 200, 255));
-        tokens.register_token("color.brand", "Light", TokenValue::Alias("color.primary".to_string()));
+        tokens.register_token(
+            "color.primary",
+            "Light",
+            TokenValue::Color(0, 100, 200, 255),
+        );
+        tokens.register_token(
+            "color.brand",
+            "Light",
+            TokenValue::Alias("color.primary".to_string()),
+        );
         let res = tokens.resolve_token("color.brand");
         assert_eq!(res, Some(TokenValue::Color(0, 100, 200, 255)));
 
         let mut geom = DesigncraftVectorBooleanGeometryPrEngine::new();
-        let k1 = BezierKnot { x: 0.0, y: 0.0, handle_in: (0.0, 0.0), handle_out: (5.0, 0.0) };
+        let k1 = BezierKnot {
+            x: 0.0,
+            y: 0.0,
+            handle_in: (0.0, 0.0),
+            handle_out: (5.0, 0.0),
+        };
         let p1 = geom.create_path("Box1".to_string(), vec![k1.clone()], true);
         let p2 = geom.create_path("Box2".to_string(), vec![k1], true);
         let merged = geom.perform_boolean_op(p1, p2, BooleanOpType::Union);
@@ -979,16 +1033,19 @@ mod tests {
         assert_eq!(op_id, 1);
 
         let exporter = DesigncraftCodeExportFrameworkPrEngine::new(CodeFrameworkTarget::ReactJsx);
-        let code = exporter.export_component_code("Button", &AutoLayoutFrame {
-            frame_id: 1,
-            direction: FlexDirection::Row,
-            align: FlexAlign::Center,
-            gap: 8.0,
-            padding: 12.0,
-            width_constraint: SizingConstraint::HugContents,
-            height_constraint: SizingConstraint::HugContents,
-            children_count: 1,
-        });
+        let code = exporter.export_component_code(
+            "Button",
+            &AutoLayoutFrame {
+                frame_id: 1,
+                direction: FlexDirection::Row,
+                align: FlexAlign::Center,
+                gap: 8.0,
+                padding: 12.0,
+                width_constraint: SizingConstraint::HugContents,
+                height_constraint: SizingConstraint::HugContents,
+                children_count: 1,
+            },
+        );
         assert!(code.contains("export const Button"));
 
         let mut variants = DesigncraftComponentVariantsPrEngine::new();
@@ -1007,7 +1064,11 @@ mod tests {
 
         let wcag = DesigncraftWcagAccessibilityAuditPrEngine::new();
         let fg = RgbColor { r: 0, g: 0, b: 0 };
-        let bg = RgbColor { r: 255, g: 255, b: 255 };
+        let bg = RgbColor {
+            r: 255,
+            g: 255,
+            b: 255,
+        };
         let (ratio, aa, aaa) = wcag.audit_contrast(fg, bg);
         assert!(ratio > 20.0);
         assert!(aa && aaa);
