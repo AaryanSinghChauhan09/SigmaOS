@@ -336,4 +336,31 @@ zenith.runSelectedTests();
 assert.strictEqual(testRes.textContent, "Completed 1 suite(s): Memory Allocator - 100% PASS", "Expected test suite runner result text");
 console.log("✓ Interactive desktop utility actions verified successfully!");
 
+// Test 14: Developer Portal & File Manager / Emulator Actions
+const cicdLog = createMockElement("cicd-log-output");
+zenith.triggerCIBuild();
+assert.strictEqual(cicdLog.textContent.includes("CI/CD build pipeline"), true, "Expected CI/CD trigger to update log output");
+
+const stepBtn = createMockElement("step-btn", "button");
+stepBtn.textContent = "VERIFY INSTALLATION";
+zenith.verifyStep(1, stepBtn);
+assert.strictEqual(stepBtn.textContent, "✓ VERIFIED", "Expected verifyStep to update button text");
+
+const syscallSearch = createMockElement("syscall-search");
+syscallSearch.value = "write";
+const syscallContainer = createMockElement("syscall-list-container");
+zenith.searchSyscalls();
+assert.strictEqual(syscallContainer.children.length, 1, "Expected searchSyscalls to filter 1 matching syscall");
+
+const fmCrumbs = createMockElement("fm-breadcrumbs");
+zenith.fmBack();
+assert.strictEqual(fmCrumbs.textContent, "/home", "Expected fmBack to update breadcrumb");
+
+const emulatorConsole = createMockElement("emulator-console");
+const emulatorInput = createMockElement("emulator-input");
+emulatorInput.value = "boot";
+zenith.handleEmulatorCommand({ key: "Enter", target: emulatorInput });
+assert.strictEqual(emulatorConsole.children.length, 2, "Expected handleEmulatorCommand to append 2 console lines");
+console.log("✓ Developer Portal & System Action handlers verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");

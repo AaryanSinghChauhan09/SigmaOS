@@ -1077,6 +1077,29 @@ export function initLiveTelemetry() {
   perfScheduleFrame();
 }
 
+const APP_WIN_MAP = {
+  "file manager": "file-manager-win",
+  "omnishell": "terminal-win",
+  "sigma browser": "browser-win",
+  "observability matrix": "browser-win",
+  "ai assistant": "ai-assistant-win",
+  "neural core": "ai-assistant-win",
+  "lattice settings": "lattice-settings-win",
+  "utility nexus": "utility-nexus-win",
+  "pro tools": "utility-nexus-win",
+  "marketplace": "sigma-market-win",
+  "markup forge": "markup-forge-win",
+  "zenith installer": "markup-forge-win",
+  "dev portal": "dev-portal-win",
+  "developer portal": "dev-portal-win",
+  "emulator": "emulator-win",
+  "kernel emulator": "emulator-win",
+  "analytics": "analytics-win",
+  "build analytics": "analytics-win"
+};
+
+let topZIndex = 100;
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   const autoInit = () => {
@@ -1193,29 +1216,6 @@ export function sanitizeUrl(urlStr) {
 // =========================================================================
 // Window Management & Accessibility State Handlers
 // =========================================================================
-
-const APP_WIN_MAP = {
-  "file manager": "file-manager-win",
-  "omnishell": "terminal-win",
-  "sigma browser": "browser-win",
-  "observability matrix": "browser-win",
-  "ai assistant": "ai-assistant-win",
-  "neural core": "ai-assistant-win",
-  "lattice settings": "lattice-settings-win",
-  "utility nexus": "utility-nexus-win",
-  "pro tools": "utility-nexus-win",
-  "marketplace": "sigma-market-win",
-  "markup forge": "markup-forge-win",
-  "zenith installer": "markup-forge-win",
-  "dev portal": "dev-portal-win",
-  "developer portal": "dev-portal-win",
-  "emulator": "emulator-win",
-  "kernel emulator": "emulator-win",
-  "analytics": "analytics-win",
-  "build analytics": "analytics-win"
-};
-
-let topZIndex = 100;
 
 /**
  * Synchronizes dock icon launcher buttons with aria-pressed="true|false" and visual indicators (.app-open, .app-active)
@@ -1422,6 +1422,81 @@ export function runSelectedTests() {
   showToast(`🧪 Test runner: ${count} suite(s) executed successfully!`);
 }
 
+export function triggerCIBuild() {
+  if (typeof document === "undefined") return;
+  const logEl = document.getElementById("cicd-log-output");
+  const timeStr = new Date().toLocaleTimeString();
+  const buildLogs = `[${timeStr}] [INFO] Initializing CI/CD build pipeline...
+[${timeStr}] [INFO] Target architectures: x86_64, aarch64, riscv64
+[${timeStr}] [INFO] Compiling sovereign-kernel v15.0.0 (#![no_std])...
+[${timeStr}] [SUCCESS] Mainline integration build passed with 0 errors!`;
+  if (logEl) logEl.textContent = buildLogs;
+  showToast("🚀 CI/CD Build triggered: Integration test matrix passing!");
+}
+
+export function verifyStep(stepNum, btnEl) {
+  if (btnEl && btnEl.textContent) {
+    btnEl.textContent = "✓ VERIFIED";
+    btnEl.classList.add("verified");
+  }
+  showToast(`✅ Setup Wizard Step ${stepNum} toolchain verified.`);
+}
+
+export function searchSyscalls() {
+  if (typeof document === "undefined") return;
+  const inputEl = document.getElementById("syscall-search");
+  const containerEl = document.getElementById("syscall-list-container");
+  const query = (inputEl?.value || "").trim().toLowerCase();
+  const syscalls = [
+    { name: "sys_write", desc: "Write buffer to file descriptor" },
+    { name: "sys_read", desc: "Read buffer from file descriptor" },
+    { name: "sys_exit", desc: "Terminate calling process ring" },
+    { name: "sys_fork", desc: "Create child process context" },
+    { name: "sys_execve", desc: "Execute binary ELF image" },
+  ];
+  const filtered = syscalls.filter((s) => s.name.includes(query) || s.desc.toLowerCase().includes(query));
+  if (containerEl) {
+    containerEl.textContent = "";
+    filtered.forEach((s) => {
+      const card = document.createElement("div");
+      card.className = "syscall-list-card";
+      card.textContent = `${s.name}: ${s.desc}`;
+      containerEl.appendChild(card);
+    });
+  }
+}
+
+export function fmBack() {
+  if (typeof document === "undefined") return;
+  const breadcrumbEl = document.getElementById("fm-breadcrumbs");
+  if (breadcrumbEl) breadcrumbEl.textContent = "/home";
+  showToast("📂 Navigated back in folder hierarchy.");
+}
+
+export function handleEmulatorCommand(event) {
+  if (event && (event.key === "Enter" || event.keyCode === 13)) {
+    const inputEl = event.target || document.getElementById("emulator-input");
+    const cmd = (inputEl?.value || "").trim();
+    if (!cmd) return;
+    const consoleEl = document.getElementById("emulator-console");
+    if (consoleEl) {
+      const line = document.createElement("div");
+      line.textContent = `> ${cmd}`;
+      consoleEl.appendChild(line);
+      const resp = document.createElement("div");
+      resp.style.color = "var(--text-accent, #00f0ff)";
+      resp.textContent = cmd === "neofetch"
+        ? "Σ SigmaOS Zenith v15.0 (Sovereign Lattice Ring-0 Kernel)"
+        : cmd === "boot"
+        ? "Kernel boot sequence initiated..."
+        : `Executed command: ${cmd}`;
+      consoleEl.appendChild(resp);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+    if (inputEl) inputEl.value = "";
+  }
+}
+
 if (typeof window !== "undefined") {
   window.closeWindow = closeWindow;
   window.minimizeWindow = minimizeWindow;
@@ -1440,6 +1515,11 @@ if (typeof window !== "undefined") {
   window.searchArchWebPackages = searchArchWebPackages;
   window.bootEmulator = bootEmulator;
   window.runSelectedTests = runSelectedTests;
+  window.triggerCIBuild = triggerCIBuild;
+  window.verifyStep = verifyStep;
+  window.searchSyscalls = searchSyscalls;
+  window.fmBack = fmBack;
+  window.handleEmulatorCommand = handleEmulatorCommand;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
