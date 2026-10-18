@@ -369,7 +369,7 @@ pub mod notification;
 pub mod sigmanotify;
 pub use sigmanotify::{
     get_sigmanotify, init_sigmanotify, show_notification, Notification as SystemNotification,
-    NotificationCategory, NotificationUrgency, SigmaNotify,
+    NotificationCategory, NotificationUrgency as SigmaNotifyUrgency, SigmaNotify,
 };
 pub mod omarchy_dynamic_workspace_suite;
 pub use omarchy_dynamic_workspace_suite::*;
@@ -415,8 +415,8 @@ pub use audio_editor::{
     AudioTool, AudioTrack, BitDepth, ChannelCount, SampleRate,
 };
 pub use audio_recorder::{
-    get_audio_recorder, init_audio_recorder, AudioFormat, AudioRecorder, BitDepth, Recording,
-    RecordingState, SampleRate,
+    get_audio_recorder, init_audio_recorder, AudioFormat as RecorderAudioFormat, AudioRecorder, BitDepth as RecorderBitDepth, Recording,
+    RecordingState, SampleRate as RecorderSampleRate,
 };
 pub use bluetooth_manager::{
     get_bluetooth_manager, init_bluetooth_manager, BluetoothAdapter, BluetoothDevice,
@@ -456,14 +456,14 @@ pub use email_client::{
     EmailClient, EmailFolder, EmailPriority, EncryptionType,
 };
 pub use file_manager::{
-    get_file_manager, init_file_manager, File, FileManager, FileMetadata, FilePermission, FileType,
+    get_file_manager, init_file_manager, File, FileManager, FileMetadata, FilePermission, FileType as ManagerFileType,
     SelectionMode, SortOrder, ViewMode,
 };
 pub use font_manager::{
     get_font_manager, init_font_manager, Font, FontFamily, FontManager, FontStyle,
 };
 pub use image_editor::{
-    get_image_editor, init_image_editor, BlendMode, ColorMode, ImageEditor, ImageFormat, Layer,
+    get_image_editor, init_image_editor, BlendMode, ColorMode, ImageEditor, ImageFormat, Layer as ImageLayer,
     Selection, ToolType,
 };
 pub use image_viewer::{
@@ -471,12 +471,12 @@ pub use image_viewer::{
     Rotation, SlideshowMode, ZoomMode,
 };
 pub use keyboard_shortcuts::{
-    get_keyboard_shortcuts_manager, init_keyboard_shortcuts_manager, KeyModifier, KeyboardShortcut,
-    KeyboardShortcutsManager, ShortcutAction, ShortcutCategory,
+    get_keyboard_shortcuts_manager, init_keyboard_shortcuts_manager, KeyModifier as AppKeyModifier, KeyboardShortcut as AppKeyboardShortcut,
+    KeyboardShortcutsManager as AppShortcutsManager, ShortcutAction, ShortcutCategory as AppShortcutCategory,
 };
 pub use media_player::{
-    get_media_player, init_media_player, AudioTrack, EqualizerBand, MediaItem, MediaPlayer,
-    PlaybackState, Playlist, RepeatMode, ShuffleMode, SubtitleTrack, VideoTrack,
+    get_media_player, init_media_player, AudioTrack as PlayerAudioTrack, EqualizerBand, MediaItem, MediaPlayer,
+    PlaybackState, Playlist, RepeatMode as PlayerRepeatMode, ShuffleMode, SubtitleTrack, VideoTrack,
 };
 pub use news_reader::{get_news_reader, init_news_reader, Feed, FeedItem, FeedType, NewsReader};
 pub use notes_app::{get_notes_app, init_notes_app, Note, NoteColor, NoteFolder, NotesApp};
@@ -488,20 +488,20 @@ pub use pdf_viewer::{
     get_pdf_viewer, init_pdf_viewer, PageMode, PdfDocument, PdfViewer, ZoomLevel,
 };
 pub use printer_manager::{
-    get_printer_manager, init_printer_manager, ConnectionType, PaperSize, PrintJob, PrintQuality,
-    Printer, PrinterManager, PrinterStatus,
+    get_printer_manager, init_printer_manager, ConnectionType, PaperSize, PrintJob as AppPrintJob, PrintQuality,
+    Printer as AppPrinter, PrinterManager, PrinterStatus as AppPrinterStatus,
 };
 pub use screen_recorder::{
-    get_screen_recorder, init_screen_recorder, AudioCodec, ContainerFormat, RecordingArea,
-    RecordingConfig, RecordingQuality, RecordingState, ScreenRecorder, VideoCodec,
+    get_screen_recorder, init_screen_recorder, AudioCodec as RecorderAudioCodec, ContainerFormat as RecorderContainerFormat, RecordingArea,
+    RecordingConfig, RecordingQuality, RecordingState as ScreenRecordingState, ScreenRecorder, VideoCodec as RecorderVideoCodec,
 };
 pub use screenshot_tool::{
-    get_screenshot_tool, init_screenshot_tool, CaptureDelay, CaptureMode, ImageFormat,
+    get_screenshot_tool, init_screenshot_tool, CaptureDelay, CaptureMode, ImageFormat as ScreenshotImageFormat,
     IncludeCursor, Screenshot, ScreenshotOptions, ScreenshotTool,
 };
 pub use search_app::{
-    get_search_app, init_search_app, FileTypeFilter, SearchApp, SearchIndex, SearchResult,
-    SearchType, SortOrder,
+    get_search_app, init_search_app, FileTypeFilter, SearchApp, SearchIndex, SearchResult as AppSearchResult,
+    SearchType, SortOrder as SearchSortOrder,
 };
 pub use sigma_ghostty::{
     CellAttrs, CursorStyle, GhosttyConfig, SigmaGhostty, TermCell, TermColor, TermGrid, VtAction,
@@ -517,15 +517,15 @@ pub use system_info::{
 };
 pub use task_manager::{get_task_manager, init_task_manager, Process, ProcessState, TaskManager};
 pub use terminal::{
-    get_terminal, init_terminal, BellMode, ColorScheme, CursorShape, ScrollbarPosition,
+    get_terminal, init_terminal, BellMode, ColorScheme as TerminalColorScheme, CursorShape, ScrollbarPosition,
     TerminalEmulator, TerminalProfile, TerminalSession, TerminalTab,
 };
 pub use text_editor::{
     get_text_editor, init_text_editor, CursorPosition, Document, EditorState, Encoding, Language,
-    LineEnding, Selection, TabSize, TextEditor, Theme,
+    LineEnding, Selection as TextEditorSelection, TabSize, TextEditor, Theme as TextEditorTheme,
 };
 pub use themes_manager::{
-    get_themes_manager, init_themes_manager, AccentColor, AppearanceSettings, ColorScheme, Theme,
+    get_themes_manager, init_themes_manager, AccentColor, AppearanceSettings, ColorScheme as ThemesColorScheme, Theme as ThemesTheme,
     ThemeType, ThemesManager,
 };
 pub use timer_app::{
@@ -533,12 +533,12 @@ pub use timer_app::{
     TimerApp, TimerState,
 };
 pub use video_editor::{
-    get_video_editor, init_video_editor, AudioCodec, Clip, ClipType, Effect, FrameRate, Resolution,
-    Track, Transition, VideoCodec, VideoEditor,
+    get_video_editor, init_video_editor, AudioCodec as EditorAudioCodec, Clip, ClipType, Effect as VideoEffect, FrameRate as VideoFrameRate, Resolution as VideoResolution,
+    Track, Transition as VideoTransition, VideoCodec as EditorVideoCodec, VideoEditor,
 };
 pub use weather_app::{
     get_weather_app, init_weather_app, CurrentWeather, ForecastDay, TemperatureUnit, WeatherApp,
-    WeatherCondition, WeatherLocation, WindDirection,
+    WeatherCondition as AppWeatherCondition,
 };
 pub use weather_map::{
     get_weather_map, init_weather_map, MapLayer, MapLocation, MapZoom, WeatherMap,

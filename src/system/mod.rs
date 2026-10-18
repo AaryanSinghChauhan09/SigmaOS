@@ -179,18 +179,18 @@ pub use sigmaacpi::{
     AcpiActionType, AcpiEvent, AcpiEventType, SigmaACPI,
 };
 pub use sigmabackup::{
-    get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
+    get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob as SigmaBackupJob, BackupStatus as SigmaBackupStatus, BackupType as SigmaBackupType,
     CompressionLevel, SigmaBackup,
 };
 pub use sigmacache::{
     get_sigmacache, init_sigmacache, set_cache_entry, CacheEntry, CacheEntryState, SigmaCache,
 };
 pub use sigmaconfig::{
-    get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry, ConfigValue, SigmaConfig,
+    get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry as SigmaConfigEntry, ConfigValue, SigmaConfig,
 };
 pub use sigmacron::{
-    add_cron_job, disable_cron_job, enable_cron_job, get_sigmacron, init_sigmacron, CronField,
-    CronJob, CronSchedule, JobResult, JobStatus, SigmaCron,
+    add_cron_job, disable_cron_job, enable_cron_job, get_sigmacron, init_sigmacron, CronField as SigmaCronField,
+    CronJob as SigmaCronJob, CronSchedule as SigmaCronSchedule, JobResult, JobStatus, SigmaCron,
 };
 pub use sigmacrypto::{
     add_encryption_key, get_sigmacrypto, init_sigmacrypto, EncryptedVolume, EncryptionKey,
@@ -201,7 +201,7 @@ pub use sigmadb::{
 };
 pub use sigmadefrag::{
     get_defrag_status, get_sigmadefrag, init_sigmadefrag, start_defrag_job, DefragJob, DefragMode,
-    DefragStatus, FragmentationReport, SigmaDefrag,
+    DefragStatus, FragmentationReport as SigmaFragmentationReport, SigmaDefrag,
 };
 pub use sigmadevice::{
     add_device, get_sigmadevice, init_sigmadevice, Device, DeviceEvent, DeviceEventType,
@@ -243,7 +243,7 @@ pub use sigmahwmon::{
 };
 pub use sigmaintegrity::{
     check_file_integrity, get_sigmaintegrity, init_sigmaintegrity, FileIntegrityRecord, FileStatus,
-    HashAlgorithm, SigmaIntegrity,
+    HashAlgorithm as SigmaHashAlgorithm, SigmaIntegrity,
 };
 pub use sigmait::{
     get_sigmait, init_sigmait, log_audit_event, AuditEvent, AuditEventType, AuditSeverity,
@@ -269,7 +269,7 @@ pub use sigmamonitor::{
     NetworkStats, SigmaMonitor, SystemStats,
 };
 pub use sigmamount::{
-    add_mount_entry, get_sigmamount, init_sigmamount, MountEntry, MountOption, MountState,
+    add_mount_entry, get_sigmamount, init_sigmamount, MountEntry, MountOption, MountState as SigmaMountState,
     SigmaMount,
 };
 pub use sigmamq::{get_sigmamq, init_sigmamq, publish_message, Message, MessageState, SigmaMQ};
@@ -278,10 +278,10 @@ pub use sigmanfs::{
     NFSExportAccess, NFSMount, NFSVersion, RootSquashPolicy, SigmaNFS,
 };
 pub use sigmanic::{
-    bring_up_interface, get_sigmanic, init_sigmanic, InterfaceState, NetworkInterface, SigmaNIC,
+    bring_up_interface, get_sigmanic, init_sigmanic, InterfaceState, NetworkInterface as SigmaNICInterface, SigmaNIC,
 };
 pub use sigmantp::{
-    get_sigmantp, init_sigmantp, sync_ntp_time, NtpServer, NtpServerState, SigmaNTP,
+    get_sigmantp, init_sigmantp, sync_ntp_time, NtpServer as SigmaNtpServer, NtpServerState, SigmaNTP,
 };
 pub use sigmaparted::{
     create_partition_table, get_sigmaparted, init_sigmaparted, Disk, Partition, PartitionFlag,
@@ -296,7 +296,7 @@ pub use sigmapower::{
     PowerProfile as SigmaPowerProfile, PowerState, PowerStats, SigmaPower,
 };
 pub use sigmaprocess::{
-    get_sigmaprocess, init_sigmaprocess, send_process_signal, ProcessInfo, ProcessState,
+    get_sigmaprocess, init_sigmaprocess, send_process_signal, ProcessInfo, ProcessState as SigmaProcessState,
     SigmaProcess, Signal,
 };
 pub use sigmaproxy::{
@@ -393,7 +393,7 @@ pub use system_manager::{
     SystemSummary,
 };
 pub use system_monitor::{
-    CpuCore, DiskPartition, NetworkInterface, RamMemoryInfo, SystemMonitor, SystemMonitorStatistics,
+    CPUCore, DiskInfo as SystemMonitorDiskInfo, MemoryInfo as SystemMonitorMemoryInfo, NetworkInterface as SystemMonitorNetworkInterface, Process, ProcessState as SystemMonitorProcessState, SystemMonitor,
 };
 pub use task_manager::{
     ProcessTaskManager, ProcessTaskStatistics, TaskProcessEntry, TaskProcessState,
@@ -420,7 +420,7 @@ pub use boot_analyzer::{
     init_boot_analyzer, BootAnalysis, BootAnalyzer, ServiceBootTime, ServiceStatus,
 };
 pub use monitor::{
-    get_system_monitor, init_system_monitor, CpuStats, DiskStats, MemoryStats, NetworkStats,
+    get_system_monitor, init_system_monitor, CpuStats, DiskStats as MonitorDiskStats, MemoryStats as MonitorMemoryStats, NetworkStats as MonitorNetworkStats,
     ProcessState as MonitorProcessState, ProcessStats, SystemMonitor as SystemMonitorNew,
 };
 pub use preload::{
@@ -444,10 +444,10 @@ pub mod sovereign_init_and_supervisor_advancements_v60;
 pub use sovereign_init_and_supervisor_advancements_v60::*;
 
 pub use mint_tools::{
-    get_system_tools, init_system_tools, BackupConfig, BackupJob, BackupStatus, BackupType,
+    get_system_tools, init_system_tools, BackupConfig, BackupJob as MintBackupJob, BackupStatus as MintBackupStatus, BackupType as MintBackupType,
     DiagnosticEntry, DiagnosticTest, Driver, DriverManager, DriverStatus, DriverType, HardwareInfo,
     MintUpdateManager, PackageUpdate, SoftwareCategory, SoftwareInfo, SoftwareManager,
-    SoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity, UpdateType,
+    SoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity, UpdateType as MintUpdateType,
 };
 pub use network_manager::{
     get_network_manager, init_network_manager, Connection, ConnectionState, ConnectionType,
@@ -455,6 +455,5 @@ pub use network_manager::{
 };
 pub use system_monitor::{
     get_system_monitor as get_new_system_monitor, init_system_monitor as init_new_system_monitor,
-    CPUCore, DiskInfo, MemoryInfo, NetworkInterface, Process, ProcessState,
     SystemMonitor as NewSystemMonitor,
 };

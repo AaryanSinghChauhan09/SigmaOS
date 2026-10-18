@@ -227,8 +227,9 @@ impl NotesApp {
         Ok(())
     }
 
-    /// Search notes using zero-allocation case-insensitive substring matching
+    /// Search notes using case-insensitive substring matching
     pub fn search_notes(&self, query: &str) -> Vec<&Note> {
+        let query_lower = query.to_lowercase();
         self.notes
             .values()
             .filter(|n| {

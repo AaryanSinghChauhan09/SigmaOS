@@ -288,7 +288,7 @@ impl Default for OpenBsdSyssigtrampPinsyscallEngine {
 // 4. OpenBSD kqueue(2) & kevent(2) Subsystem Engine
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum KeventFilter {
     Read,
     Write,

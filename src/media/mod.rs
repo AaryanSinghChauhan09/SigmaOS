@@ -17,22 +17,22 @@ pub use pix_image_organizer::{
 };
 
 pub use distro_media_engine::{
-    AlsaHardwarePluginIoplugEngine, AlsaMixerElement, AlsaPcmHwConfigEngine, AlsaPcmState,
+    AlsaAsoundrcConfigEngine, AlsaMixerElement, AlsaPcmHwConfigEngine, AlsaPcmState,
     AlsaSampleFormat, AlsaSoundEngine, AudioSinkBackend, AudioVideoPrStatus,
-    AudioVideoPrSubmission, BluetoothAudioCodec, EncodingSessionSpec, FfmpegCustomIoBufferEngine,
-    FfmpegEngine, FfmpegFiltergraphAccelEngine, FfmpegHwEncoderBackend, FfmpegZeroCopyEncoder,
+    AudioVideoPrSubmission, BluetoothAudioCodec, EncodingSessionSpec,
+    FfmpegEngine, FfmpegFiltergraphAccelEngine, FfmpegHwEncoderBackend, FfmpegHwaccelVaapiNvencEngine, FfmpegZeroCopyEncoder,
     GStreamerDynamicPipelineEngine, GStreamerEngine, GStreamerPulseAudioPipeline,
-    GStreamerRtpRtspStreamEngine, GstHardwareDecoder, JackProAudioEngine, JackRealtimeGraphEngine,
-    JackSessionControlEngine, JackTransportState, LinuxBsdAudioVideoGapClosurePrGateway,
+    GStreamerV4l2HwAccelPipelineEngine, GstHardwareDecoder, JackMidiLatencyCompensationEngine, JackProAudioEngine, JackRealtimeGraphEngine,
+    JackTransportState, LinuxBsdAudioVideoGapClosurePrGateway,
     LinuxBsdAudioVideoPrGatewayEngine, LinuxBsdDistroMediaSuite, MediaStreamPipeline,
-    MpvAudioTrack, MpvFreeBsdSndioEngine, MpvIpcJsonRpcEngine, MpvPlayerEngine,
-    MpvPropertyObserverEngine, Oss4MixerDeviceControlEngine, OssDspDevice, OssIoctlCmd,
-    OssMixerPeakMeterEngine, OssSoundEngine, PipeWireEngine, PipeWireFilterChainEngine,
-    PipeWireNodeState, PipeWireSpaBufferEngine, PulseAudioEngine, PulseAudioModuleRouterEngine,
-    PulseAudioNetworkAudioEngine, PulseAudioSink, SndPcmHwParams, SndioEngine,
-    SndioMidiPcmMultiplexerEngine, SndioRawMTCClockEngine, SubtitleTrackEntry, V4l2CaptureEngine,
-    V4l2DeviceControl, V4l2DmaBufExporterEngine, V4l2SubdeviceMediaControllerEngine,
-    VlcLibvlcCoreEngine, VlcPlayerEngine, VlcPluginModuleRegistryEngine, VlcSubtitleManager,
+    MpvAudioTrack, MpvFreeBsdSndioEngine, MpvIpcJsonRpcEngine, MpvLuaScriptingEngine, MpvPlayerEngine,
+    Oss4AudioFormatConversionEngine, OssDspDevice, OssIoctlCmd,
+    OssMixerPeakMeterEngine, OssSoundEngine, PipeWireEngine, PipeWireSpaBufferEngine, PipeWireWirePlumberLuaEngine,
+    PipeWireNodeState, PulseAudioEngine, PulseAudioModuleLoopbackEngine, PulseAudioModuleRouterEngine,
+    PulseAudioSink, SndPcmHwParams, SndioAudioDeviceSelectorEngine, SndioEngine,
+    SndioMidiPcmMultiplexerEngine, SubtitleTrackEntry, V4l2CameraControlsCapabilitiesEngine, V4l2CaptureEngine,
+    V4l2DeviceControl, V4l2DmaBufExporterEngine, VlcLibvlcCoreEngine, VlcMediaListPlayerEngine, VlcPlayerEngine,
+    VlcSubtitleManager,
 };
 
 pub use sovereign_screen_recorder::{

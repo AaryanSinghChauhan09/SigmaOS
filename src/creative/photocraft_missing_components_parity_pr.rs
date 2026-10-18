@@ -316,57 +316,7 @@ impl PhotocraftColorGradingFrequencySeparationPrEngine {
     }
 }
 
-// ============================================================================
-// 3. Multi-Channel Color Grading & Frequency Separation PR Engine
-// ============================================================================
 
-#[derive(Debug, Default, Clone)]
-pub struct PhotocraftColorGradingFrequencySeparationPrEngine;
-
-impl PhotocraftColorGradingFrequencySeparationPrEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn perform_frequency_separation(
-        &self,
-        input_rgb: &[u8],
-        low_freq_rgb: &mut [u8],
-        high_freq_rgb: &mut [u8],
-    ) -> Result<(), String> {
-        if input_rgb.len() != low_freq_rgb.len() || input_rgb.len() != high_freq_rgb.len() {
-            return Err("Buffer size mismatch".to_string());
-        }
-
-        for i in 0..input_rgb.len() {
-            let val = input_rgb[i];
-            low_freq_rgb[i] = val.saturating_add(5);
-            high_freq_rgb[i] = val.saturating_sub(low_freq_rgb[i]).saturating_add(128);
-        }
-
-        Ok(())
-    }
-
-    pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
-        PhotocraftPrProposalManifest {
-            pr_id: 103,
-            pr_title:
-                "feat(photocraft): High/Low Frequency Separation & 3D LUT Color Grading Matrix"
-                    .to_string(),
-            target_subsystem: "Retouching & Color Science Suite".to_string(),
-            original_suite: "ArtCraft PhotoCraft Frequency Separator".to_string(),
-            artcraft_feature_parity: "Pro Retouching Frequency Separation & 3D LUT Parity".to_string(),
-            components_added: vec![
-                "Non-destructive high/low frequency layer separation for skin smoothing"
-                    .to_string(),
-                "32x32x32 3D LUT cubic interpolation color space converter".to_string(),
-                "Split toning, shadow/highlight luminance wheels & CMYK curve mapping".to_string(),
-            ],
-            performance_multiplier: "Zero Quality Loss 32-bit Gamut Precision".to_string(),
-            status: "Ready for Merge".to_string(),
-        }
-    }
-}
 
 // ============================================================================
 // 4. HDR Merging & Exposure Stacking Suite PR Engine
@@ -458,7 +408,8 @@ impl PhotocraftHdrExposureStackingPrEngine {
                 .to_string(),
             target_subsystem: "Multi-Exposure & Depth Compositor".to_string(),
             original_suite: "ArtCraft PhotoCraft HDR & Focus Stack Studio".to_string(),
-            artcraft_feature_parity: "Lightroom HDR Merge & Helicon Focus Stacking Parity".to_string(),
+            artcraft_feature_parity: "Lightroom HDR Merge & Helicon Focus Stacking Parity"
+                .to_string(),
             components_added: vec![
                 "Multi-bracket exposure alignment with sub-pixel ghost removal".to_string(),
                 "Reinhard, Mantiuk & Drago local contrast tone mapping operators".to_string(),

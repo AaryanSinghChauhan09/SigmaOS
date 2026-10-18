@@ -1,33 +1,20 @@
-#![no_std]
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
+// Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
+//
+// Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
+// - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
+// - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
+// - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
+
 use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
+use std::format;
+use std::string::{String, ToString};
+use std::vec;
 use std::vec::Vec;
 
-// Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
-//
-// Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-// - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-// - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-// - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
-
-#![no_std]
-extern crate alloc;
-
-// Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
-//
-// Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-// - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-// - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-// - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
-
-use alloc::collections::{BTreeMap, BTreeSet};
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+pub type SystemdPathMonitorUnitEngine = SystemdPathMonitorEngine;
 
 // ============================================================================
 // Core Service & Init Abstractions
@@ -195,18 +182,14 @@ pub struct SystemdSocketActivationEngine {
     pub sockets: BTreeMap<String, SystemdSocketUnit>,
 }
 
-/// Systemd Socket Activation Engine
-#[derive(Debug, Clone, Default)]
-pub struct SystemdSocketActivationUnitEngine {
-    pub socket_name: String,
-    pub passed_fds: Vec<i32>,
-}
-
 impl SystemdSocketActivationEngine {
     pub fn new(socket_name: &str) -> Self {
         Self {
             socket_name: socket_name.to_string(),
+            listen_stream: None,
+            listen_datagram: None,
             passed_fds: Vec::new(),
+            sockets: BTreeMap::new(),
         }
     }
 
@@ -310,7 +293,6 @@ pub struct SystemdPathMonitorEngine {
     pub paths: BTreeMap<String, SystemdPathUnit>,
 }
 
-pub type SystemdPathMonitorUnitEngine = SystemdPathMonitorEngine;
 
 impl SystemdPathMonitorEngine {
     pub fn new() -> Self {
@@ -353,26 +335,8 @@ impl SystemdPathMonitorEngine {
         triggered
     }
 
-    pub fn check_trigger(
-        &self,
-        path: &str,
-        event: SystemdPathEventType,
-        is_dir_nonempty: bool,
-    ) -> bool {
-        if self.monitored_path != path {
-            return false;
-        }
-        match (self.event_type, event) {
-            (Some(SystemdPathEventType::PathChanged), SystemdPathEventType::PathChanged) => true,
-            (Some(SystemdPathEventType::PathModified), SystemdPathEventType::PathModified) => true,
-            (Some(SystemdPathEventType::PathExists), SystemdPathEventType::PathExists) => true,
-            (Some(SystemdPathEventType::DirectoryNotEmpty), _) => is_dir_nonempty,
-            _ => false,
-        }
-    }
 }
 
-pub type SystemdPathMonitorUnitEngine = SystemdPathMonitorEngine;
 
 /// Systemd Transient Scope Governor
 #[derive(Debug, Clone, Default)]
@@ -381,9 +345,10 @@ pub struct SystemdTransientScopeGovernor {
     pub active_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
 }
 
-pub type SystemdTransientScopeGovernor = SystemdTransientScopeSpecGovernor;
 
-impl SystemdTransientScopeSpecGovernor {
+pub type SystemdTransientScopeSpecGovernor = SystemdTransientScopeGovernor;
+
+impl SystemdTransientScopeGovernor {
     pub fn new() -> Self {
         Self::default()
     }
@@ -399,7 +364,6 @@ impl SystemdTransientScopeSpecGovernor {
     }
 }
 
-pub type SystemdTransientScopeSpecGovernor = SystemdTransientScopeGovernor;
 
 /// Systemd OnCalendar Event Specification Parser
 #[derive(Debug, Clone, Default)]
@@ -450,7 +414,6 @@ impl SystemdOnCalendarExpressionParser {
     }
 }
 
-pub type SystemdOnCalendarExpressionParser = SystemdOnCalendarParser;
 
 /// Systemd sd_notify IPC Socket Notification Message
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -561,7 +524,7 @@ impl OpenRcHeader {
 
 /// OpenRC Dependency Solver Spec Engine
 #[derive(Debug, Clone, Default)]
-pub struct OpenRcDependencySolverSpecEngine {
+pub struct OpenRcDependencySolverEngine {
     pub current_runlevel: OpenRcRunlevel,
     pub scripts: BTreeMap<String, OpenRcHeader>,
     pub active_services: BTreeSet<String>,
@@ -651,7 +614,6 @@ impl OpenRcStatusControllerEngine {
     }
 }
 
-}
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
         let mut header = OpenRcHeader::default();
@@ -687,54 +649,7 @@ impl OpenRcHeader {
     }
 }
 
-/// OpenRC Dependency Solver Engine
-pub struct OpenRcDependencySolverEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-}
 
-impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self {
-            current_runlevel: OpenRcRunlevel::SysInit,
-            scripts: BTreeMap::new(),
-        }
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Stopped);
-    }
-
-    pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
-        }
-        self.service_statuses.insert(service, state);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-    }
-}
 
 // ============================================================================
 // runit & s6 Supervision Subsystem
@@ -802,7 +717,6 @@ pub struct RunitS6SupervisionTreeGovernor {
     pub current_stage: SupervisionStage,
     pub services: BTreeMap<String, SupervisedService>,
     pub log_pipelines: BTreeMap<String, String>,
-    pub service_dir_path: String,
     pub active_services: BTreeMap<String, SupervisedService>,
 }
 
@@ -824,8 +738,6 @@ impl RunitS6SupervisionTreeGovernor {
             services: BTreeMap::new(),
             active_services: BTreeMap::new(),
             log_pipelines: BTreeMap::new(),
-            service_dir_path: String::new(),
-            active_services: BTreeMap::new(),
         }
     }
 
@@ -1013,76 +925,6 @@ impl SysVInittabEntry {
     }
 }
 
-/// SysVinit Runlevel State Machine Engine
-#[derive(Debug, Clone, Default)]
-pub struct SysVinitRunlevelStateMachine {
-    pub current_runlevel: char,
-    pub inittab_entries: Vec<SysVInittabEntry>,
-    pub active_processes: BTreeMap<String, u32>,
-    pub entries: Vec<SysVInittabEntry>,
-}
-
-impl SysVinitRunlevelStateMachine {
-    pub fn new(initial_runlevel: char, entries: Vec<SysVInittabEntry>) -> Self {
-        Self {
-            current_runlevel: initial_runlevel,
-            inittab_entries: entries,
-            active_processes: BTreeMap::new(),
-            entries: Vec::new(),
-        }
-    }
-
-    pub fn set_runlevel(&mut self, new_runlevel: char) -> Vec<&SysVInittabEntry> {
-        self.current_runlevel = new_runlevel;
-        self.inittab_entries
-            .iter()
-            .filter(|e| {
-                e.runlevels.contains(&new_runlevel)
-                    || e.runlevels.contains(&'a')
-                    || e.runlevels.contains(&'b')
-                    || e.runlevels.contains(&'c')
-            })
-            .collect()
-    }
-
-    pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
-        let mut spawned = Vec::new();
-        for entry in &self.inittab_entries {
-            if entry.action == SysVAction::Respawn
-                && entry.runlevels.contains(&self.current_runlevel)
-            {
-                if !self.active_processes.contains_key(&entry.id) {
-                    let mock_pid = 4000 + entry.id.len() as u32;
-                    self.active_processes.insert(entry.id.clone(), mock_pid);
-                    spawned.push(entry.id.clone());
-                }
-            }
-        }
-        spawned
-    }
-
-    pub fn switch_runlevel(&mut self, target_runlevel: char) -> (Vec<String>, Vec<String>) {
-        self.current_runlevel = target_runlevel;
-        let mut stop_scripts = Vec::new();
-        let mut start_scripts = Vec::new();
-
-        for entry in &self.entries {
-            if entry.runlevels.contains(&target_runlevel) {
-                if entry.action == SysVAction::Respawn
-                    || entry.action == SysVAction::Once
-                    || entry.action == SysVAction::Wait
-                {
-                    start_scripts.push(format!("S{:02}{}", start_scripts.len(), entry.id));
-                }
-            } else {
-                stop_scripts.push(format!("K{:02}{}", stop_scripts.len(), entry.id));
-            }
-        }
-
-        (stop_scripts, start_scripts)
-    }
-}
-
 /// BSD `rc.d` / `rc.subr` Directives
 #[derive(Debug, Clone, Default)]
 pub struct BsdRcScript {
@@ -1242,21 +1084,6 @@ impl LaunchdJobSupervisorEngine {
         self.register_job(job);
     }
 
-    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
-        for job in self.jobs.values() {
-            if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states
-                    .insert(job.label.clone(), ServiceState::Running);
-                return Some(job.label.clone());
-            }
-        }
-        None
-    }
-
-    pub fn load_job(&mut self, job: LaunchdJobSpec) {
-        self.register_job(job);
-    }
-
     pub fn handle_process_exit(&mut self, label: &str) {
         self.running_pids.remove(label);
         if let Some(job) = self.jobs.get(label) {
@@ -1379,14 +1206,7 @@ impl AtSpoolQueueManager {
     }
 }
 
-/// Userland Init Clean-Room Pull Request Proposal Gateway
-#[derive(Debug, Clone)]
-pub struct UserlandInitCleanRoomPrGatewayEngine {
-    pub pr_id: u32,
-    pub title: String,
-    pub author: String,
-    pub pqc_signature: String,
-}
+
 
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
 
@@ -1853,7 +1673,6 @@ impl Default for UserlandInitPrGatewayEngine {
     }
 }
 
-pub type UserlandInitCleanRoomPrGatewayEngine = UserlandInitPrGatewayEngine;
 
 #[cfg(test)]
 mod tests {

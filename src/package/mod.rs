@@ -150,6 +150,8 @@ pub mod sovereign_distro_package_advancements_v42;
 pub use sovereign_distro_package_advancements_v42::*;
 pub mod sovereign_distro_package_advancements_v48;
 pub use sovereign_distro_package_advancements_v48::*;
+pub mod sovereign_distro_package_advancements_v50;
+pub use sovereign_distro_package_advancements_v50::*;
 pub mod sovereign_distro_package_advancements_v51;
 pub use sovereign_distro_package_advancements_v51::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
@@ -214,7 +216,7 @@ pub use dependency_graph::{
     DependencyConstraint, DependencyGraph, PackageNode, PackageVersion, VersionConstraint,
 };
 pub use fedora_dnf::{
-    DnfError, DnfPackage, Repository, SigmaDNF, Transaction, TransactionOperation,
+    DnfError, DnfPackage, Repository as DnfRepository, SigmaDNF, Transaction, TransactionOperation,
 };
 pub use gentoo_portage::{
     Ebuild, PackageDatabase, PortageError, PortageTree, ProfileManager, SigmaPortage, UseFlag,
@@ -243,7 +245,7 @@ pub use repository::{
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
     TransactionJournalEntry,
 };
-pub use repository_config::{RepoConfig, RepositoryConfigManager};
+pub use repository_config::{RepoConfig as ConfigRepoConfig, RepositoryConfigManager};
 pub use store::{
     SigmaSoftwareStore,
     SoftwareRegistryEntry, /* StoreApp, StoreError, */

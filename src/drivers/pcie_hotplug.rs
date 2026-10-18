@@ -142,7 +142,7 @@ impl PcieHotplugManager {
             return Err("Device not identified");
         }
 
-        let device_id = slot_id;
+        let device_id = slot_id as u32;
 
         // Configure MSI for the device
         let config = MsiConfig {
@@ -178,7 +178,7 @@ impl PcieHotplugManager {
 
             // Disable MSI for the device
             if slot.vendor_id.is_some() {
-                let device_id = slot_id;
+                let device_id = slot_id as u32;
                 self.msi_routing.disable_msi(device_id)?;
             }
         }
