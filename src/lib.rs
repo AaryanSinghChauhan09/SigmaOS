@@ -259,6 +259,7 @@ pub use automation::{
     SystemState,
 };
 pub use compatibility::mint_omarchy_migration_bridge::*;
+pub use compatibility::mint_omarchy_complete_gap_closure::*;
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite, TargetPlatform,

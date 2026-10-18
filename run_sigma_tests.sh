@@ -1895,4 +1895,11 @@ if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
     ./build/omarchy_v60_test
 fi
 
+if [ -f "src/compatibility/mint_omarchy_complete_gap_closure.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Complete Gap Closure test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_complete_gap_closure.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_mint_omarchy
+    ./build/test_mint_omarchy
+fi
+
 echo "All SigmaOS test suites completed."

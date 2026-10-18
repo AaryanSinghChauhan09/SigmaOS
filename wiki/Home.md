@@ -28,7 +28,6 @@
 - [Kernel Scheduler Component Guide](./Kernel-Scheduler-Component-Guide.md) &ndash; CFS / EEVDF fair scheduling, real-time deadlines, and Linux/BSD comparisons.
 - [Scheduler Component Guide](./Scheduler-Component-Guide.md) &ndash; Multi-queue CFS / BORE low-latency preemptive task scheduler.
 - [Process Management Component Guide](./Process-Management-Component-Guide.md) &ndash; Process lifecycle, PCB state machine, cloning, and zombie reaping.
-- [Process Manager Plan](./PROCESS_MANAGER_PLAN.md) &ndash; Master Architecture, 18-PR sequence roadmap, child reaping, stable process references, and service supervision.
 - [Memory Management Component Guide](./Memory-Management-Component-Guide.md) &ndash; Paging, slab allocator, NUMA memory tiers, and page cache.
 - [Virtual Memory Manager Component Guide](./Virtual-Memory-Manager-Component-Guide.md) &ndash; Demand paging, Copy-on-Write fork, ASLR, and mmap sealing.
 - [Concurrency & Deadlocks Component Guide](./Concurrency-And-Deadlocks-Component-Guide.md) &ndash; Hierarchical spinlocks, witness cycle detection, and lockless RCU.
@@ -47,6 +46,7 @@
 - [Sysctl Kernel Tunables Component Guide](./Sysctl-Kernel-Tunables-Component-Guide.md) &ndash; Runtime kernel parameter tuning, /proc/sys hierarchy, and network buffers.
 - [Udev & Devd Hotplug Device Component Guide](./Udev-Devd-Hotplug-Device-Component-Guide.md) &ndash; Dynamic /dev node synthesizer, netlink uevent dispatcher, and persistent symlinks.
 - [Watchdog Hardware Recovery Component Guide](./Watchdog-Hardware-Recovery-Component-Guide.md) &ndash; Hardware watchdog timers, ping heartbeat daemon, and panic recovery reset.
+- [CachyOS BORE Scheduler Component Guide](./Cachyos-Bore-Component-Guide.md) &ndash; Interactive desktop responsiveness and low-latency scheduling.
 
 ---
 
@@ -86,6 +86,7 @@
 - [Firewall Security Component Guide](./Firewall-Security-Component-Guide.md) &ndash; Stateful packet filtering, NAT, connection tracking, and nftables/pf parity.
 - [System Security Audit Component Guide](./System-Security-Audit-Component-Guide.md) &ndash; Real-time audit events, syscall logging, and file integrity validation.
 - [System Tracing (eBPF) Component Guide](./System-Tracing-Ebpf-Component-Guide.md) &ndash; In-kernel verified bytecode filters, kprobes, and dynamic tracepoints.
+- [FreeBSD Capsicum Sandboxing Component Guide](./Freebsd-Capsicum-Component-Guide.md) &ndash; Object-capability rights masks and capability mode sandbox.
 
 ---
 
@@ -172,13 +173,12 @@
 - [Power Management Component Guide](./Power-Management-Component-Guide.md) &ndash; Sleep state transitions, suspend-to-idle, and battery saver profiles.
 - [Printing (CUPS) Component Guide](./Printing-Cups-Component-Guide.md) &ndash; IPP printing daemon, raster filters, and driverless AirPrint discovery.
 - [System Automation Component Guide](./System-Automation-Component-Guide.md) &ndash; Cron scheduler, system event listeners, and unattended maintenance triggers.
+- [Linux Mint & Omarchy Complete Gap Closure](./Mint-and-Omarchy-Complete-Gap-Closure-Components.md) &ndash; 14-subsystem parity engine achieving 100% gap closure against Linux Mint 22 (X-Apps, Hypnotix, WebApps, Drivers) and Omarchy Linux (Swww, Wallust, Quickshell, Ananicy, Walker).
 
 ---
 
 ## 📚 Maintenance, Governance & Architecture
 - [Future Development Roadmap: BSD, Linux & Craft Ecosystem](./Future-Development-Roadmap-BSD-Craft-Linux.md) &ndash; Strategic roadmap integrating DragonFly/Free/OpenBSD, Arch/Cachy/Debian Linux, and the 21-pillar Sovereign Craft suite.
-- [Omarchy Linux & Sovereign Desktop Parity AI Agent Roadmap](./40-Omarchy-Linux-And-Sovereign-Desktop-Parity-AI-Agent-Roadmap.md) &ndash; Desktop, compositing, terminal, and local AI agent workflow roadmap in PR format.
-- [Linux & BSD Kernel, Security & Virtualization AI Agent Roadmap](./41-Linux-BSD-Kernel-Security-And-Virtualization-AI-Agent-Roadmap.md) &ndash; SchedExt BPF, Landlock V6, VNET, MicroVM, and PREEMPT_RT kernel roadmap in PR format.
 - [AI Development Agent Operating Manual](./AI-Development-Agent-Operating-Manual.md) &ndash; Binding 5-step operational lifecycle, branch & PR merging via 'Theirs', and OOPS/SOLID programming principles.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.
 - [Contributing Guidelines](./CONTRIBUTING.md) &ndash; Submitting patches, test requirements, and coding conventions.
