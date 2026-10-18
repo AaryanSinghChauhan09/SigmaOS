@@ -22,10 +22,30 @@ pub struct CubicBezier {
 }
 
 impl CubicBezier {
-    pub const LINEAR: Self = Self { x1: 0.0, y1: 0.0, x2: 1.0, y2: 1.0 };
-    pub const EASE_IN: Self = Self { x1: 0.42, y1: 0.0, x2: 1.0, y2: 1.0 };
-    pub const EASE_OUT: Self = Self { x1: 0.0, y1: 0.0, x2: 0.58, y2: 1.0 };
-    pub const EASE_IN_OUT: Self = Self { x1: 0.42, y1: 0.0, x2: 0.58, y2: 1.0 };
+    pub const LINEAR: Self = Self {
+        x1: 0.0,
+        y1: 0.0,
+        x2: 1.0,
+        y2: 1.0,
+    };
+    pub const EASE_IN: Self = Self {
+        x1: 0.42,
+        y1: 0.0,
+        x2: 1.0,
+        y2: 1.0,
+    };
+    pub const EASE_OUT: Self = Self {
+        x1: 0.0,
+        y1: 0.0,
+        x2: 0.58,
+        y2: 1.0,
+    };
+    pub const EASE_IN_OUT: Self = Self {
+        x1: 0.42,
+        y1: 0.0,
+        x2: 0.58,
+        y2: 1.0,
+    };
 
     /// Evaluate cubic Bézier curve at parameter t (0.0 ..= 1.0)
     pub fn evaluate(&self, t: f32) -> f32 {
@@ -61,7 +81,11 @@ impl AnimationTrack {
 
     pub fn insert_keyframe(&mut self, frame: u32, value: f32, easing: CubicBezier) {
         self.keyframes.retain(|k| k.frame != frame);
-        self.keyframes.push(Keyframe { frame, value, easing });
+        self.keyframes.push(Keyframe {
+            frame,
+            value,
+            easing,
+        });
         self.keyframes.sort_by_key(|k| k.frame);
     }
 
@@ -129,7 +153,11 @@ impl SovereignAnimationEngine {
             let (parent_x, parent_y, parent_angle) = match bone.parent_id {
                 Some(pid) => {
                     let (px, py) = self.compute_bone_end_position(pid);
-                    let pa = self.bones.get(&pid).map(|b| b.local_angle_rad).unwrap_or(0.0);
+                    let pa = self
+                        .bones
+                        .get(&pid)
+                        .map(|b| b.local_angle_rad)
+                        .unwrap_or(0.0);
                     (px, py, pa)
                 }
                 None => (0.0, 0.0, 0.0),

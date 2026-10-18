@@ -72,7 +72,11 @@ impl AnicraftFabrikInverseKinematicsPrEngine {
     }
 
     /// Solve IK chain for a target end-effector coordinate
-    pub fn solve_ik_chain(&self, initial_joints: &[IkJoint2D], target: IkJoint2D) -> Vec<IkJoint2D> {
+    pub fn solve_ik_chain(
+        &self,
+        initial_joints: &[IkJoint2D],
+        target: IkJoint2D,
+    ) -> Vec<IkJoint2D> {
         if initial_joints.len() < 2 {
             return initial_joints.to_vec();
         }
@@ -146,7 +150,9 @@ impl AnicraftFabrikInverseKinematicsPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 850,
-            pr_title: "feat(anicraft): Implement FABRIK Inverse Kinematics (IK) Multi-Bone Chain Solver".to_string(),
+            pr_title:
+                "feat(anicraft): Implement FABRIK Inverse Kinematics (IK) Multi-Bone Chain Solver"
+                    .to_string(),
             target_subsystem: "AniCraft Skeletal Rigging Engine".to_string(),
             original_suite: "ArtCraft AniCraft IK Solver".to_string(),
             components_added: vec![
@@ -318,7 +324,8 @@ impl AnicraftOnionSkinningPrEngine {
         for i in 1..=self.past_frames_count {
             if current_frame >= i {
                 let frame_idx = current_frame - i;
-                let opacity = (self.base_opacity - (i as f32 - 1.0) * self.opacity_falloff).max(0.05);
+                let opacity =
+                    (self.base_opacity - (i as f32 - 1.0) * self.opacity_falloff).max(0.05);
                 ghosts.push(OnionSkinGhost {
                     frame_index: frame_idx,
                     opacity,
@@ -344,12 +351,15 @@ impl AnicraftOnionSkinningPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 852,
-            pr_title: "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-Frame Ghosts Engine".to_string(),
+            pr_title:
+                "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-Frame Ghosts Engine"
+                    .to_string(),
             target_subsystem: "AniCraft Timeline & Frame Preview".to_string(),
             original_suite: "ArtCraft AniCraft Onion Skinning".to_string(),
             components_added: vec![
                 "Multi-layer onion skinning with past/future frame ghosting".to_string(),
-                "Directional color tinting (retro-red / ahead-green) and opacity falloff".to_string(),
+                "Directional color tinting (retro-red / ahead-green) and opacity falloff"
+                    .to_string(),
                 "Sub-frame vector contour preview for frame-by-frame animators".to_string(),
             ],
             performance_multiplier: "Instant Zero-Allocation Ghost Contour Rendering".to_string(),
@@ -372,12 +382,12 @@ impl Default for AnicraftOnionSkinningPrEngine {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VisemeCategory {
     Rest,
-    AE,    // A, E vowels
-    IO,    // I, O vowels
-    UW,    // U, W rounded
-    MPB,   // M, P, B bilabials
-    FV,    // F, V labiodentals
-    LNT,   // L, N, T dentals
+    AE,  // A, E vowels
+    IO,  // I, O vowels
+    UW,  // U, W rounded
+    MPB, // M, P, B bilabials
+    FV,  // F, V labiodentals
+    LNT, // L, N, T dentals
 }
 
 /// Audio Keyframe LipSync Marker
@@ -397,11 +407,31 @@ pub struct AnicraftAudioLipSyncTimelinePrEngine {
 impl AnicraftAudioLipSyncTimelinePrEngine {
     pub fn new() -> Self {
         let mut markers = Vec::new();
-        markers.push(LipSyncMarker { timestamp_ms: 0, viseme: VisemeCategory::Rest, intensity: 0.0 });
-        markers.push(LipSyncMarker { timestamp_ms: 200, viseme: VisemeCategory::MPB, intensity: 1.0 });
-        markers.push(LipSyncMarker { timestamp_ms: 400, viseme: VisemeCategory::AE, intensity: 0.9 });
-        markers.push(LipSyncMarker { timestamp_ms: 700, viseme: VisemeCategory::LNT, intensity: 0.8 });
-        markers.push(LipSyncMarker { timestamp_ms: 1000, viseme: VisemeCategory::Rest, intensity: 0.0 });
+        markers.push(LipSyncMarker {
+            timestamp_ms: 0,
+            viseme: VisemeCategory::Rest,
+            intensity: 0.0,
+        });
+        markers.push(LipSyncMarker {
+            timestamp_ms: 200,
+            viseme: VisemeCategory::MPB,
+            intensity: 1.0,
+        });
+        markers.push(LipSyncMarker {
+            timestamp_ms: 400,
+            viseme: VisemeCategory::AE,
+            intensity: 0.9,
+        });
+        markers.push(LipSyncMarker {
+            timestamp_ms: 700,
+            viseme: VisemeCategory::LNT,
+            intensity: 0.8,
+        });
+        markers.push(LipSyncMarker {
+            timestamp_ms: 1000,
+            viseme: VisemeCategory::Rest,
+            intensity: 0.0,
+        });
 
         Self { markers }
     }
@@ -416,7 +446,10 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
         }
 
         if timestamp_ms >= self.markers.last().unwrap().timestamp_ms {
-            return (self.markers.last().unwrap().viseme, self.markers.last().unwrap().intensity);
+            return (
+                self.markers.last().unwrap().viseme,
+                self.markers.last().unwrap().intensity,
+            );
         }
 
         for i in 0..self.markers.len() - 1 {
@@ -429,7 +462,11 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
                 let blended_intensity = m0.intensity + (m1.intensity - m0.intensity) * progress;
 
                 // Return dominant viseme based on progress threshold
-                let active_viseme = if progress <= 0.5 { m0.viseme } else { m1.viseme };
+                let active_viseme = if progress <= 0.5 {
+                    m0.viseme
+                } else {
+                    m1.viseme
+                };
                 return (active_viseme, blended_intensity);
             }
         }
@@ -440,7 +477,9 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 853,
-            pr_title: "feat(anicraft): Implement Audio-Driven Phoneme/Viseme LipSync Timeline Engine".to_string(),
+            pr_title:
+                "feat(anicraft): Implement Audio-Driven Phoneme/Viseme LipSync Timeline Engine"
+                    .to_string(),
             target_subsystem: "AniCraft Audio & LipSync Timeline".to_string(),
             original_suite: "ArtCraft AniCraft LipSync Studio".to_string(),
             components_added: vec![
@@ -448,7 +487,8 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
                 "7-category viseme classification (Rest, AE, IO, UW, MPB, FV, LNT)".to_string(),
                 "Sub-frame smooth intensity interpolation and morph transition".to_string(),
             ],
-            performance_multiplier: "Sub-millisecond Real-Time Audio LipSync Evaluation".to_string(),
+            performance_multiplier: "Sub-millisecond Real-Time Audio LipSync Evaluation"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -585,7 +625,9 @@ impl SovereignAnicraftArtcraftParityPrGateway {
     pub fn evaluate_anicraft_parity(&mut self) -> bool {
         // Test IK solver
         let joints = vec![IkJoint2D { x: 0.0, y: 0.0 }, IkJoint2D { x: 10.0, y: 0.0 }];
-        let solved = self.fabrik_ik.solve_ik_chain(&joints, IkJoint2D { x: 5.0, y: 5.0 });
+        let solved = self
+            .fabrik_ik
+            .solve_ik_chain(&joints, IkJoint2D { x: 5.0, y: 5.0 });
         let ik_ok = !solved.is_empty();
 
         // Test NLA blending
@@ -622,7 +664,10 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
