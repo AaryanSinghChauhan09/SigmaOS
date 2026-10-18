@@ -218,6 +218,7 @@ pub use distro::sovereign_tech_media_wiki_ultimate_parity_pr::*;
 pub use distro::sovereign_thousands_distro_components::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::sovereign_universal_subsystem_interop::*;
+pub use distro::sovereign_lfs_bsd_nextgen_advancements_pr::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;

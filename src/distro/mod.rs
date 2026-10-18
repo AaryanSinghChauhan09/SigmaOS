@@ -651,6 +651,9 @@ pub use sovereign_linux_bsd_lfs_master_harmony::*;
 pub mod sovereign_lfs_bsd_pr_gateway;
 pub use sovereign_lfs_bsd_pr_gateway::*;
 
+pub mod sovereign_lfs_bsd_nextgen_advancements_pr;
+pub use sovereign_lfs_bsd_nextgen_advancements_pr::*;
+
 pub mod bootable_vertical_slices_missing_components_pr;
 pub mod sigmaos_gap_closing_evidence_gated_roadmap_pr;
 pub use bootable_vertical_slices_missing_components_pr::*;
