@@ -48,7 +48,7 @@ Implement missing components in this order. Each item must be delivered through 
 | **P0** | QEMU boot validator | OSDev, xv6 | Boot script and boot matrix | QEMU boot-to-shell log |
 | **P0** | Bootloader integration | OSDev, GRUB/systemd-boot concepts | UEFI boot path | QEMU UEFI boot |
 | **P0** | Kernel entry and serial logging | xv6, Linux | Early console and kernel entry | Serial trace |
-| **P1** | Physical memory manager | xv6, Linux | Frame allocator | Allocation tests |
+| **P1** | [Physical memory manager](./PHYSICAL_MEMORY_MANAGER_PLAN.md) | xv6, Linux | Frame allocator | Allocation tests |
 | **P1** | Virtual memory/paging | xv6, Linux | Page tables and address spaces | Boot and memory tests |
 | **P1** | Interrupts and timer | xv6, OSDev | IDT, exception handlers, timer | Interrupt trace |
 | **P1** | [Scheduler](./SCHEDULER_DEVELOPMENT_PLAN.md) / [Dispatcher](./DISPATCHER_PLAN.md) | Linux, xv6 | Minimal round-robin scheduler & task context handoff | Process-switch test |

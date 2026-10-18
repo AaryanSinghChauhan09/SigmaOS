@@ -175,6 +175,7 @@
 ---
 
 ## 📚 Maintenance, Governance & Architecture
+- [Physical Memory Manager Plan](./PHYSICAL_MEMORY_MANAGER_PLAN.md) &ndash; Master Architecture, Support Matrix, 11 PMM rules & invariants, 20-PR sequence roadmap, maintenance cadences, cross-component rules, PR template, and completion gates.
 - [Process Synchronization Plan](./PROCESS_SYNCHRONIZATION_PLAN.md) &ndash; Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [Architecture Performance Development Decision Plan](./18-Architecture-Performance-Development-Decision-Plan-PR.md) &ndash; Supreme Performance Architecture Development Decision Plan (ADR-004 to ADR-010) in Pull Request proposal format.
 - [AI Agent Maintenance Instructions](./AI-Agent-Maintenance-Instructions.md) &ndash; Canonical rules, standard library authorization, and One-File-Per-Component invariant.
