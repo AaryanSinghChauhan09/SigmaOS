@@ -114,8 +114,7 @@ impl MintCoexistenceBridge {
     }
 
     pub fn set_dconf_key(&mut self, key: &str, val: &str) {
-        self.dconf_overrides
-            .insert(key.to_string(), val.to_string());
+        self.dconf_overrides.insert(key.to_string(), val.to_string());
     }
 
     pub fn get_dconf_key(&self, key: &str) -> Option<&String> {
@@ -192,11 +191,7 @@ impl OmarchyCoexistenceBridge {
     }
 
     pub fn add_workspace_rule(&mut self, rule: HyprlandWorkspaceRule) {
-        if !self
-            .workspace_rules
-            .iter()
-            .any(|r| r.workspace_id == rule.workspace_id)
-        {
+        if !self.workspace_rules.iter().any(|r| r.workspace_id == rule.workspace_id) {
             self.workspace_rules.push(rule);
         }
     }
@@ -266,11 +261,7 @@ impl HighAssuranceNicheGovernor {
     }
 
     pub fn terminate_enclave(&mut self, task_id: u64) -> bool {
-        if let Some(pos) = self
-            .active_enclaves
-            .iter()
-            .position(|t| t.task_id == task_id)
-        {
+        if let Some(pos) = self.active_enclaves.iter().position(|t| t.task_id == task_id) {
             self.active_enclaves.remove(pos);
             true
         } else {
@@ -392,8 +383,7 @@ mod tests {
         let mut governor = HighAssuranceNicheGovernor::new();
 
         // Act
-        let enclave_id =
-            governor.spawn_enclave("CryptoSigner", EnclaveSecurityLevel::HardwareRootOfTrust);
+        let enclave_id = governor.spawn_enclave("CryptoSigner", EnclaveSecurityLevel::HardwareRootOfTrust);
         let active_count = governor.active_enclaves.len();
         let is_sealed = governor.active_enclaves[0].hardware_key_sealed;
         let terminated = governor.terminate_enclave(enclave_id);
@@ -412,9 +402,10 @@ mod tests {
         let mut engine = MintOmarchyCoexistenceInteropEngine::new();
 
         // Act
-        let _ = engine
-            .high_assurance_governor
-            .spawn_enclave("FinancialLedger", EnclaveSecurityLevel::FormalZeroTrust);
+        let _ = engine.high_assurance_governor.spawn_enclave(
+            "FinancialLedger",
+            EnclaveSecurityLevel::FormalZeroTrust,
+        );
         let telemetry = engine.generate_strategic_telemetry();
 
         // Assert

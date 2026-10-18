@@ -225,10 +225,7 @@ impl UniversalPackageStrategyV63 for DebPackageStrategyV63 {
         PackageFormat::Deb
     }
     fn execute_stage(&self, stage: &str) -> Result<String, String> {
-        Ok(alloc::format!(
-            "DEB Stage '{}' executed via dpkg-deb",
-            stage
-        ))
+        Ok(alloc::format!("DEB Stage '{}' executed via dpkg-deb", stage))
     }
 }
 
@@ -258,9 +255,7 @@ impl UniversalPackageStrategyV63 for ArchPackageStrategyV63 {
 /// Factory Pattern V63
 pub struct UniversalPackageAdapterFactoryV63;
 impl UniversalPackageAdapterFactoryV63 {
-    pub fn create_strategy(
-        format: PackageFormat,
-    ) -> Vec<alloc::boxed::Box<dyn UniversalPackageStrategyV63>> {
+    pub fn create_strategy(format: PackageFormat) -> Vec<alloc::boxed::Box<dyn UniversalPackageStrategyV63>> {
         let mut list: Vec<alloc::boxed::Box<dyn UniversalPackageStrategyV63>> = Vec::new();
         match format {
             PackageFormat::Deb => list.push(alloc::boxed::Box::new(DebPackageStrategyV63)),
@@ -316,8 +311,7 @@ pub struct LoggingLifecycleObserverV63 {
 
 impl PackageLifecycleObserverV63 for LoggingLifecycleObserverV63 {
     fn on_package_event(&mut self, event: &str, package_name: &str) {
-        self.events
-            .push(alloc::format!("{}: {}", event, package_name));
+        self.events.push(alloc::format!("{}: {}", event, package_name));
     }
 }
 
@@ -370,13 +364,8 @@ pub struct UniversalPackageMetadataFlyweightV63 {
 impl UniversalPackageMetadataFlyweightV63 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert(
-            "core".to_string(),
-            vec!["glibc".to_string(), "openssl".to_string()],
-        );
-        Self {
-            common_dependencies: map,
-        }
+        map.insert("core".to_string(), vec!["glibc".to_string(), "openssl".to_string()]);
+        Self { common_dependencies: map }
     }
 }
 
@@ -460,16 +449,11 @@ impl UniversalCrossDistroSatSolverV63 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert(
-            "dev-libs/openssl".to_string(),
-            "sovereign-openssl".to_string(),
-        );
+        map.insert("dev-libs/openssl".to_string(), "sovereign-openssl".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("libc-bin".to_string(), "sovereign-libc".to_string());
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
-        Self {
-            canonical_mappings: map,
-        }
+        Self { canonical_mappings: map }
     }
 
     pub fn solve_dependencies(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
@@ -542,9 +526,7 @@ pub struct UniversalCasDeltaStoreGovernorV63 {
 
 impl UniversalCasDeltaStoreGovernorV63 {
     pub fn new() -> Self {
-        Self {
-            records: Vec::new(),
-        }
+        Self { records: Vec::new() }
     }
 
     pub fn apply_delta_patch(
@@ -598,9 +580,7 @@ impl UniversalBootEnvSnapshotGovernorV63 {
         if let Some((kind, label)) = self.snapshots.get(&snapshot_id) {
             Ok(alloc::format!(
                 "Successfully rolled back boot environment to snapshot #{}: {:?} ({})",
-                snapshot_id,
-                kind,
-                label
+                snapshot_id, kind, label
             ))
         } else {
             Err("Snapshot ID not found".to_string())

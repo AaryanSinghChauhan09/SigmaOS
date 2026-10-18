@@ -996,8 +996,9 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV8 {
     fn seed_presets(&mut self) {
         self.submissions.push(DiagnosticsPrSubmissionV8 {
             pr_id: 801,
-            title: "PR #801: Journald FSS Dilithium5 Sealing, RELP Multi-Destination Queues & Collectd Exporters"
-                .to_string(),
+            title:
+                "PR #801: Journald FSS Dilithium5 Sealing, RELP Multi-Destination Queues & Collectd Exporters"
+                    .to_string(),
             author: "SigmaLoggingTeam".to_string(),
             target_component: "journald_v8".to_string(),
             description:
@@ -1009,8 +1010,9 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV8 {
 
         self.submissions.push(DiagnosticsPrSubmissionV8 {
             pr_id: 802,
-            title: "PR #802: PCIe 6.0 Link Telemetry, USB4 40Gbps, Fuser Resolution & OpenMetrics OTLP Exporters"
-                .to_string(),
+            title:
+                "PR #802: PCIe 6.0 Link Telemetry, USB4 40Gbps, Fuser Resolution & OpenMetrics OTLP Exporters"
+                    .to_string(),
             author: "SigmaHardwareTeam".to_string(),
             target_component: "hardware_discovery_v8".to_string(),
             description:

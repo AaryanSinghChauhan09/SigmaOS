@@ -1284,9 +1284,11 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             handle_out_x: 5.0,
             handle_out_y: 0.0,
         };
-        let p1 = self
-            .geometry_engine
-            .create_path(String::from("PathA"), vec![knot1.clone()], true);
+        let p1 = self.geometry_engine.create_path(
+            String::from("PathA"),
+            vec![knot1.clone()],
+            true,
+        );
         let p2 = self
             .geometry_engine
             .create_path(String::from("PathB"), vec![knot1], true);
