@@ -180,15 +180,14 @@ impl PasswordManager {
         self.entries.get(&id)
     }
 
-    /// Search entries
+    /// Search entries with zero-allocation ASCII case-insensitive substring matching
     pub fn search_entries(&self, query: &str) -> Vec<&PasswordEntry> {
-        let query_lower = query.to_lowercase();
         self.entries
             .values()
             .filter(|e| {
-                e.title.to_lowercase().contains(&query_lower)
-                    || e.username.to_lowercase().contains(&query_lower)
-                    || e.url.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&e.title, query)
+                    || contains_ignore_case(&e.username, query)
+                    || contains_ignore_case(&e.url, query)
             })
             .collect()
     }
@@ -291,6 +290,24 @@ impl PasswordManager {
     pub fn folder_count(&self) -> usize {
         self.folders.len()
     }
+}
+
+/// Helper function for zero-allocation ASCII case-insensitive substring matching
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    let needle_bytes = needle.as_bytes();
+    let haystack_bytes = haystack.as_bytes();
+    if needle_bytes.len() > haystack_bytes.len() {
+        return false;
+    }
+    haystack_bytes.windows(needle_bytes.len()).any(|window| {
+        window
+            .iter()
+            .zip(needle_bytes.iter())
+            .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+    })
 }
 
 /// Global password manager
