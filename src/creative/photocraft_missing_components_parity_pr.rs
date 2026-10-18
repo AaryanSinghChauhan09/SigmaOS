@@ -355,8 +355,7 @@ impl PhotocraftColorGradingFrequencySeparationPrEngine {
                     .to_string(),
             target_subsystem: "Retouching & Color Science Suite".to_string(),
             original_suite: "ArtCraft PhotoCraft Frequency Separator".to_string(),
-            artcraft_feature_parity: "Pro Retouching Frequency Separation & 3D LUT Parity"
-                .to_string(),
+            artcraft_feature_parity: "Pro Retouching Frequency Separation & 3D LUT Parity".to_string(),
             components_added: vec![
                 "Non-destructive high/low frequency layer separation for skin smoothing"
                     .to_string(),
@@ -459,8 +458,7 @@ impl PhotocraftHdrExposureStackingPrEngine {
                 .to_string(),
             target_subsystem: "Multi-Exposure & Depth Compositor".to_string(),
             original_suite: "ArtCraft PhotoCraft HDR & Focus Stack Studio".to_string(),
-            artcraft_feature_parity: "Lightroom HDR Merge & Helicon Focus Stacking Parity"
-                .to_string(),
+            artcraft_feature_parity: "Lightroom HDR Merge & Helicon Focus Stacking Parity".to_string(),
             components_added: vec![
                 "Multi-bracket exposure alignment with sub-pixel ghost removal".to_string(),
                 "Reinhard, Mantiuk & Drago local contrast tone mapping operators".to_string(),
