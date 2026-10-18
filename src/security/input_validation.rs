@@ -109,11 +109,42 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// Check whether a filename stem (before the first dot) matches an MS-DOS reserved device name
+/// (`CON`, `PRN`, `AUX`, `NUL`, `COM1`..`COM9`, `LPT1`..`LPT9`, `CLOCK$`).
+/// Rejects reserved device names case-insensitively to prevent file system hijacking,
+/// denial-of-service, and arbitrary device I/O vulnerabilities (CWE-667 / CWE-706).
+fn is_reserved_dos_device(stem: &[u8]) -> bool {
+    if stem.is_empty() {
+        return false;
+    }
+    if stem.len() == 3 {
+        if stem.eq_ignore_ascii_case(b"CON")
+            || stem.eq_ignore_ascii_case(b"PRN")
+            || stem.eq_ignore_ascii_case(b"AUX")
+            || stem.eq_ignore_ascii_case(b"NUL")
+        {
+            return true;
+        }
+    } else if stem.len() == 4 {
+        let prefix = &stem[..3];
+        let digit = stem[3];
+        if (prefix.eq_ignore_ascii_case(b"COM") || prefix.eq_ignore_ascii_case(b"LPT"))
+            && (b'1'..=b'9').contains(&digit)
+        {
+            return true;
+        }
+    } else if stem.len() == 6 && stem.eq_ignore_ascii_case(b"CLOCK$") {
+        return true;
+    }
+    false
+}
+
 /// Validate a filename (single component — no directory separators).
 ///
 /// Rules:
 /// - Non-empty, ≤ `MAX_FILENAME_LEN` bytes
 /// - Not `.` or `..`
+/// - No MS-DOS reserved device names (`CON`, `PRN`, `AUX`, `NUL`, `COM1`..`9`, `LPT1`..`9`, `CLOCK$`)
 /// - No directory separators (`/` or `\`)
 /// - No embedded NUL bytes (returns `NullByte`)
 /// - No ASCII control characters (`b < 32` or `b == 127`) to prevent log injection (CWE-117),
@@ -127,6 +158,10 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
     }
     if name == b"." || name == b".." {
         return Err(ValidationError::PathTraversal);
+    }
+    let stem = name.split(|&b| b == b'.').next().unwrap_or(name);
+    if is_reserved_dos_device(stem) {
+        return Err(ValidationError::InvalidChars);
     }
     for &b in name {
         if b == 0 {
@@ -668,6 +703,20 @@ mod tests {
             validate_filename(b"file\x7f.txt"),
             Err(ValidationError::InvalidChars)
         );
+
+        // MS-DOS reserved device name rejection (CWE-667 / CWE-706)
+        assert_eq!(validate_filename(b"CON"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"con"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"aux.json"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"COM1.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"lpt9.log"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"CLOCK$"), Err(ValidationError::InvalidChars));
+
+        // Legitimate filenames containing reserved words as substrings or prefixes
+        assert_eq!(validate_filename(b"concept.txt"), Ok(()));
+        assert_eq!(validate_filename(b"console.log"), Ok(()));
+        assert_eq!(validate_filename(b"auxiliary.c"), Ok(()));
+        assert_eq!(validate_filename(b"computer.png"), Ok(()));
 
         let long_name = [b'a'; MAX_FILENAME_LEN + 1];
         assert_eq!(validate_filename(&long_name), Err(ValidationError::TooLong));
