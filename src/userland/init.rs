@@ -601,23 +601,6 @@ impl OpenRcStatusControllerEngine {
     }
 }
 
-    pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
-        }
-        self.service_statuses.insert(service, state);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .get(service)
-            .copied()
-            .unwrap_or(ServiceState::Stopped)
-    }
-}
-
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
         let mut header = OpenRcHeader::default();

@@ -644,13 +644,11 @@ impl CadCraftEngine {
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
         let mut buf = Vec::new();
         match format {
-            ExportFormat::DXF => {
-                buf.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n")
+            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
+            ExportFormat::STEP => {
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
             }
-            ExportFormat::STEP => buf.extend_from_slice(
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
-            ),
-            _ => buf.extend_from_slice(b"CADCRAFT_EXPORT"),
+            _ => b"CAD_EXPORT_DATA".to_vec(),
         }
         buf
     }
