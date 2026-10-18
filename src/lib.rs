@@ -126,11 +126,12 @@ pub use kernel::{
 };
 pub use process::{
     AdvancedIpcHub, BsdRusage, CancellationType, CoreDumpMetadata, EventFd,
-    JobControlLifecycleEngine, JobState, PosixMessage, PosixMessageQueue, ProcessCancelState,
-    ProcessCancellationAndTerminationManager, ProcessControlError, ProcessJobEntry,
-    ProcessVmReadWriteEngine, ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess,
-    SovereignProcessManager, SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED,
-    WNOHANG, WUNTRACED,
+    JobControlLifecycleEngine, JobState, Pid, PidAllocator, PidError, PosixMessage,
+    PosixMessageQueue, ProcessCancelState, ProcessCancellationAndTerminationManager,
+    ProcessControlError, ProcessEntry, ProcessJobEntry, ProcessLifecycleTracker,
+    ProcessState, ProcessStateError, ProcessTable, ProcessTableError, ProcessVmReadWriteEngine,
+    ProcessWaiterAndRusageCollector, SigQueuePayload, SovereignProcess, SovereignProcessManager,
+    SovereignProcessState, WaitStatus, ZeroCopyIpcChannel, WCONTINUED, WNOHANG, WUNTRACED,
 };
 pub mod linuxmint_inspirations;
 pub use linuxmint_inspirations::{
