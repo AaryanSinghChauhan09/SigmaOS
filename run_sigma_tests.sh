@@ -310,6 +310,13 @@ if [ -f "src/creative/soundcraft.rs" ]; then
     ./build/test_soundcraft
 fi
 
+if [ -f "src/creative/soundcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Soundcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/soundcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_soundcraft_missing
+    ./build/test_soundcraft_missing
+fi
+
 if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Sovereign EffectCraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
