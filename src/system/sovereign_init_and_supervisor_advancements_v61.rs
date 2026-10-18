@@ -136,7 +136,11 @@ impl OpenRcAdvancementsV61Engine {
     }
 
     /// Calculate parallel startup concurrency limit based on CPU core count and max limit.
-    pub fn calculate_concurrency_limit(&self, cpu_cores: usize, configured_limit: Option<usize>) -> usize {
+    pub fn calculate_concurrency_limit(
+        &self,
+        cpu_cores: usize,
+        configured_limit: Option<usize>,
+    ) -> usize {
         match configured_limit {
             Some(limit) if limit > 0 => limit,
             _ => cpu_cores * 2,
@@ -272,7 +276,12 @@ impl CronAnacronTimersAtV61Engine {
     }
 
     /// Calculate total delay minutes for Anacron job execution with random jitter.
-    pub fn calculate_anacron_total_delay_min(&self, base_delay_min: u32, max_jitter: u32, seed: u64) -> u32 {
+    pub fn calculate_anacron_total_delay_min(
+        &self,
+        base_delay_min: u32,
+        max_jitter: u32,
+        seed: u64,
+    ) -> u32 {
         let jitter = if max_jitter > 0 {
             (seed % (max_jitter as u64)) as u32
         } else {
@@ -435,7 +444,9 @@ impl SovereignInitAndSupervisorAdvancementsV61Suite {
         let rc = BTreeMap::new();
         let mut rc_local = BTreeMap::new();
         rc_local.insert("ntpd_enable".to_string(), "YES".to_string());
-        let final_rc = self.bsd_rc_engine.resolve_rc_conf_hierarchy(&def, &rc, &rc_local);
+        let final_rc = self
+            .bsd_rc_engine
+            .resolve_rc_conf_hierarchy(&def, &rc, &rc_local);
         if final_rc.get("ntpd_enable") != Some(&"YES".to_string()) {
             return false;
         }
@@ -443,12 +454,17 @@ impl SovereignInitAndSupervisorAdvancementsV61Suite {
         // 6. Verify launchd / Android
         let mut props = BTreeMap::new();
         props.insert("ro.debuggable".to_string(), "1".to_string());
-        if !self.launchd_android_engine.evaluate_android_property_trigger("ro.debuggable", "1", &props) {
+        if !self
+            .launchd_android_engine
+            .evaluate_android_property_trigger("ro.debuggable", "1", &props)
+        {
             return false;
         }
 
         // 7. Verify Cron / Timers
-        let parsed = self.cron_timers_engine.parse_timer_stamp_file("TIMER_NAME=daily.timer\nLAST_TRIGGER_USEC=999\n");
+        let parsed = self
+            .cron_timers_engine
+            .parse_timer_stamp_file("TIMER_NAME=daily.timer\nLAST_TRIGGER_USEC=999\n");
         if parsed != Some(("daily.timer".to_string(), 999)) {
             return false;
         }
@@ -472,7 +488,10 @@ mod tests {
         let dropins = engine.parse_drop_in_override(content);
         assert_eq!(dropins.len(), 1);
         assert_eq!(dropins[0].section_name, "Service");
-        assert_eq!(dropins[0].key_values.get("Restart"), Some(&"always".to_string()));
+        assert_eq!(
+            dropins[0].key_values.get("Restart"),
+            Some(&"always".to_string())
+        );
 
         let slice = engine.calculate_cgroup_slice_path("system.slice", "nginx");
         assert_eq!(slice, "/sys/fs/cgroup/system.slice/nginx.service");
