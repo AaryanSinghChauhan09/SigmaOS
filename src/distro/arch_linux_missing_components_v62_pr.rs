@@ -352,7 +352,10 @@ impl ArchPacmanKeyMasterKeysPrEngine {
     }
 
     pub fn format_populate_cmd(&self) -> String {
-        format!("pacman-key --populate archlinux --keyserver {}", self.keyserver)
+        format!(
+            "pacman-key --populate archlinux --keyserver {}",
+            self.keyserver
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV62PrSpec {
