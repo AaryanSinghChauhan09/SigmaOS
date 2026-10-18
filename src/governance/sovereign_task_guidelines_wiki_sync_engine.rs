@@ -482,30 +482,6 @@ impl Default for SupremePerformanceAddpEngine {
     }
 }
 
-// =========================================================================
-// 3. MASTER GOVERNANCE & WIKI SYNC SUITE
-// =========================================================================
-
-// =========================================================================
-// 4. SUPREME PERFORMANCE ADDP ENGINE & PR PROPOSAL GENERATOR
-// =========================================================================
-
-impl SupremePerformanceAddpEngine {
-    pub fn new() -> Self {
-        Self { is_active: true }
-    }
-
-    pub fn is_addp_compliant(&self) -> bool {
-        self.is_active
-    }
-}
-
-impl Default for SupremePerformanceAddpEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 pub struct AddpWikiPrProposalGenerator;
 
 impl AddpWikiPrProposalGenerator {
@@ -694,6 +670,7 @@ pub struct SovereignTaskAndWikiGovernanceSuite {
     pub governor: TaskGuidelinesAndRulesGovernor,
     pub wiki_engine: WikiDataTransferEngine,
     pub addp_engine: SupremePerformanceAddpEngine,
+    pub periodic_governor: PeriodicImprovementGovernor,
 }
 
 impl SovereignTaskAndWikiGovernanceSuite {
@@ -702,6 +679,7 @@ impl SovereignTaskAndWikiGovernanceSuite {
             governor: TaskGuidelinesAndRulesGovernor::new(),
             wiki_engine: WikiDataTransferEngine::new(),
             addp_engine: SupremePerformanceAddpEngine::new(),
+            periodic_governor: PeriodicImprovementGovernor::new(),
         }
     }
 
@@ -825,7 +803,7 @@ mod tests {
     }
 
     #[test]
-    fn test_supreme_performance_addp_engine() {
+    fn test_addp_wiki_pr_proposal() {
         let addp = SupremePerformanceAddpEngine::new();
         assert!(addp.evaluate_addp_compliance());
 

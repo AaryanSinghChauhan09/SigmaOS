@@ -29,17 +29,13 @@ pub struct SecurityPrProposalManifest {
 pub struct LinuxAccessControlAndSandboxingPrEngine;
 
 impl LinuxAccessControlAndSandboxingPrEngine {
-    /// Check Landlock access rights bitmask.
-    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
-        (handled_access & requested_access) == requested_access
-    }
     pub fn new() -> Self {
         Self
     }
 
-    /// Check Landlock access rule against allowed mask.
-    pub fn check_landlock_access(access_mask: u32, allowed_mask: u32) -> bool {
-        (access_mask & allowed_mask) != 0
+    /// Check Landlock access rights bitmask.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
     }
 
     /// Parse and format SELinux security context string (user:role:type:sensitivity:categories).
@@ -68,16 +64,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
             return true;
         }
         false
-    }
-
-    /// Check Landlock access rights mask.
-    pub fn check_landlock_access(allowed_mask: u32, requested_access: u32) -> bool {
-        (allowed_mask & requested_access) == requested_access
-    }
-
-    /// Check Landlock access rights mask (u32 alias).
-    pub fn check_landlock_access_u32(allowed_mask: u32, requested_access: u32) -> bool {
-        Self::check_landlock_access(allowed_mask, requested_access)
     }
 
     /// Check Landlock v8 network TCP bind/connect port access rights.
@@ -114,6 +100,16 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } else {
             0 // SECCOMP_RET_KILL_PROCESS
         }
+    }
+
+    /// Validate seccomp BPF architecture (e.g., AUDIT_ARCH_X86_64 = 0xC000003E).
+    pub fn validate_seccomp_bpf_arch(arch_nr: u32) -> bool {
+        arch_nr == 0xC000003E || arch_nr == 0x40000028
+    }
+
+    /// Check if cgroup v2 controller (e.g. "memory", "cpu", "pids") is enabled in active controller string.
+    pub fn is_cgroup_controller_enabled(active_controllers: &str, target_controller: &str) -> bool {
+        active_controllers.split_whitespace().any(|c| c == target_controller)
     }
 
     /// Check if Linux capability bit mask contains target capability.
@@ -173,11 +169,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } else {
             limit_str.parse::<u64>().unwrap_or(0)
         }
-    }
-
-    /// Check if Landlock ruleset allows requested access bitmask.
-    pub fn check_landlock_access(handled_access: u32, requested_access: u32) -> bool {
-        (handled_access & requested_access) == requested_access
     }
 
     /// Generate Linux Access Control & Sandboxing PR proposal.
@@ -490,13 +481,6 @@ impl AntivirusAndCryptoEnginePrEngine {
 pub struct IdentityAndEnterpriseAuthPrEngine;
 
 impl IdentityAndEnterpriseAuthPrEngine {
-    /// Generate SSSD domain configuration.
-    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain_name, provider, uri
-        )
-    }
     pub fn new() -> Self {
         Self
     }
@@ -521,14 +505,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
         parts
     }
 
-    /// Generate SSSD domain configuration section string with custom provider.
-    pub fn generate_sssd_provider_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain, provider, uri
-        )
-    }
-
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
@@ -537,8 +513,23 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Generate SSSD domain configuration block string.
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
             domain, provider, uri
+        )
+    }
+
+    /// Generate SSSD PAM / NSS cached user query response.
+    pub fn generate_sssd_pam_nss_response(
+        &self,
+        username: &str,
+        uid: u32,
+        gid: u32,
+    ) -> (String, u32, u32, String) {
+        (
+            username.to_string(),
+            uid,
+            gid,
+            alloc::format!("/home/{}", username),
         )
     }
 

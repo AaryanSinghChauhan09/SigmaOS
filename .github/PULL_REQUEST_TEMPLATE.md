@@ -1,17 +1,21 @@
 ## Summary
 
-<!-- What secondary-memory behavior changed and why? -->
+<!-- What behavior changed and why? -->
 
-## Storage component
+## Component
 
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
+- [ ] Shell component
+- [ ] Memory policy
+- [ ] Physical memory manager
+- [ ] Buddy allocator
+- [ ] Slab allocator
+- [ ] Paging
+- [ ] Page tables
+- [ ] Virtual memory
+- [ ] Protection
+- [ ] Swap
+- [ ] Reclaim
+- [ ] OOM
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
 - [ ] Documentation
@@ -43,8 +47,10 @@
 -
 -
 
-## Storage safety review
+## Shell safety review
 
+- [ ] Shell safety review
+- [ ] Kernel safety review
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
 - [ ] Orphans are adopted

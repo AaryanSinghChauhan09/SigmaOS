@@ -1090,7 +1090,7 @@ impl SovereignUniversalSubsystemInteropEngine {
             "signal" | "signaldelivery" | "signal_delivery" => "signal_delivery",
             "device" | "devicehotplug" | "device_hotplug" => "device_hotplug",
             "crypto" | "cryptographysecurity" | "crypto_sec" | "cryptography_security" => {
-                "crypto_sec"
+                "crypto_security"
             }
             "telemetry" | "telemetryobservability" | "telemetry_observability" => "telemetry_obs",
             "accessibility" | "accessibilityinput" | "accessibility_input" => "accessibility_input",
@@ -1219,12 +1219,12 @@ impl SovereignUniversalSubsystemInteropEngine {
             .ok_or("Unknown target subsystem")?;
         let origin_adapter = self
             .subsystem_adapters
-            .get(origin)
+            .get(&resolved_origin)
             .ok_or("Unknown origin subsystem")?
             .clone();
         let target_adapter = self
             .subsystem_adapters
-            .get(target)
+            .get(&resolved_target)
             .ok_or("Unknown target subsystem")?
             .clone();
 
