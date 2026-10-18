@@ -1427,122 +1427,6 @@ impl Default for AdfUltrasonicDoubleFeedEngine {
 }
 
 // ============================================================================
-// SANE Hardware Lock & USB/IP Remote Scanner Bridge Engine
-// ============================================================================
-
-/// SANE Hardware Lock & USB/IP Remote Scanner Bridge Engine
-#[derive(Debug, Clone)]
-pub struct SaneUsbIpRemoteScannerBridgeEngine {
-    pub locked_devices: HashMap<String, String>, // device_id -> lock_owner
-    pub usb_vendor_whitelist: Vec<u16>,
-    pub remote_usbip_hosts: Vec<String>,
-}
-
-impl SaneUsbIpRemoteScannerBridgeEngine {
-    pub fn new() -> Self {
-        Self {
-            locked_devices: HashMap::new(),
-            usb_vendor_whitelist: vec![0x04b8, 0x03f0, 0x04a9, 0x04f9], // Epson, HP, Canon, Brother
-            remote_usbip_hosts: vec!["192.168.1.150:3240".to_string()],
-        }
-    }
-
-    /// Acquire exclusive lock on SANE device (sane_lock)
-    pub fn sane_lock_device(&mut self, device_id: &str, owner: &str) -> Result<bool, String> {
-        if let Some(existing_owner) = self.locked_devices.get(device_id) {
-            if existing_owner != owner {
-                return Err(format!("Device {} already locked by {}", device_id, existing_owner));
-            }
-        }
-        self.locked_devices.insert(device_id.to_string(), owner.to_string());
-        Ok(true)
-    }
-
-    /// Release lock on SANE device (sane_unlock)
-    pub fn sane_unlock_device(&mut self, device_id: &str, owner: &str) -> Result<bool, String> {
-        if let Some(existing_owner) = self.locked_devices.get(device_id) {
-            if existing_owner == owner {
-                self.locked_devices.remove(device_id);
-                return Ok(true);
-            }
-            return Err(format!("Cannot unlock device {}: owned by {}", device_id, existing_owner));
-        }
-        Ok(false)
-    }
-
-    /// Check if USB vendor ID is whitelisted for SANE driver attachment
-    pub fn is_vendor_supported(&self, vendor_id: u16) -> bool {
-        self.usb_vendor_whitelist.contains(&vendor_id)
-    }
-}
-
-impl Default for SaneUsbIpRemoteScannerBridgeEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// Driverless eSCL / AirScan Streaming ADF Feeder Engine
-// ============================================================================
-
-/// eSCL Scanner Status Info
-#[derive(Debug, Clone)]
-pub struct EsclScannerStatus {
-    pub state: String,
-    pub adf_state: String,
-    pub jobs_in_queue: u32,
-}
-
-/// Driverless eSCL / AirScan PDF/JPEG Chunked Streaming Feeder Engine
-#[derive(Debug, Clone)]
-pub struct AirScanEsclStreamingFeederEngine {
-    pub active_state: String,
-    pub adf_status: String,
-}
-
-impl AirScanEsclStreamingFeederEngine {
-    pub fn new() -> Self {
-        Self {
-            active_state: "Idle".to_string(),
-            adf_status: "ScannerAdfLoaded".to_string(),
-        }
-    }
-
-    /// Query eSCL ScannerStatus XML string
-    pub fn generate_scanner_status_xml(&self) -> String {
-        format!(
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
-             <scan:ScannerStatus xmlns:scan=\"http://schemas.hp.com/imaging/escl/2011/05/03\">\n\
-               <scan:State>{}</scan:State>\n\
-               <scan:AdfState>{}</scan:AdfState>\n\
-             </scan:ScannerStatus>",
-            self.active_state, self.adf_status
-        )
-    }
-
-    /// Generate HTTP Chunked Transfer payload stream for multi-page scan job
-    pub fn generate_chunked_stream_payload(&self, page_bytes_list: &[Vec<u8>]) -> Vec<u8> {
-        let mut stream = Vec::new();
-        for (idx, page) in page_bytes_list.iter().enumerate() {
-            let chunk_header = format!("{:X}\r\n", page.len() + 16);
-            stream.extend_from_slice(chunk_header.as_bytes());
-            stream.extend_from_slice(format!("%%eSCL-PAGE-{:03}\n", idx + 1).as_bytes());
-            stream.extend_from_slice(page);
-            stream.extend_from_slice(b"\r\n");
-        }
-        stream.extend_from_slice(b"0\r\n\r\n"); // End of HTTP Chunked stream
-        stream
-    }
-}
-
-impl Default for AirScanEsclStreamingFeederEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
 // Sovereign Print & Scan Unified Ecosystem Orchestrator
 // ============================================================================
 
@@ -1634,8 +1518,6 @@ pub struct ScannerManager {
     pub sane_net_multiplexer: SaneNetProtocolV2MultiplexerEngine,
     pub airscan_auto_orient: DriverlessAirScanAutoOrientationEngine,
     pub adf_ultrasonic_double_feed: AdfUltrasonicDoubleFeedEngine,
-    pub sane_usbip_bridge: SaneUsbIpRemoteScannerBridgeEngine,
-    pub airscan_streaming_feeder: AirScanEsclStreamingFeederEngine,
 }
 
 impl ScannerManager {
@@ -1664,8 +1546,6 @@ impl ScannerManager {
             sane_net_multiplexer: SaneNetProtocolV2MultiplexerEngine::default(),
             airscan_auto_orient: DriverlessAirScanAutoOrientationEngine::default(),
             adf_ultrasonic_double_feed: AdfUltrasonicDoubleFeedEngine::default(),
-            sane_usbip_bridge: SaneUsbIpRemoteScannerBridgeEngine::default(),
-            airscan_streaming_feeder: AirScanEsclStreamingFeederEngine::default(),
         };
 
         // Add default scanner
@@ -2180,36 +2060,5 @@ mod tests {
 
         let (no_double, _) = adf_us.evaluate_wave_attenuation(-12.0);
         assert!(!no_double);
-    }
-
-    #[test]
-    fn test_sane_usb_ip_remote_scanner_bridge_engine() {
-        let mut bridge = SaneUsbIpRemoteScannerBridgeEngine::new();
-        assert!(bridge.is_vendor_supported(0x04b8)); // Epson
-        assert!(!bridge.is_vendor_supported(0x1234));
-
-        let lock_res = bridge.sane_lock_device("genesys:usb:001", "user1");
-        assert!(lock_res.is_ok());
-
-        let conflict = bridge.sane_lock_device("genesys:usb:001", "user2");
-        assert!(conflict.is_err());
-
-        let unlock_res = bridge.sane_unlock_device("genesys:usb:001", "user1");
-        assert!(unlock_res.unwrap());
-    }
-
-    #[test]
-    fn test_airscan_escl_streaming_feeder_engine() {
-        let feeder = AirScanEsclStreamingFeederEngine::new();
-        let xml = feeder.generate_scanner_status_xml();
-        assert!(xml.contains("ScannerStatus"));
-        assert!(xml.contains("ScannerAdfLoaded"));
-
-        let pages = vec![b"PAGE 1 RAW".to_vec(), b"PAGE 2 RAW".to_vec()];
-        let chunked = feeder.generate_chunked_stream_payload(&pages);
-        let stream_str = String::from_utf8_lossy(&chunked);
-        assert!(stream_str.contains("%%eSCL-PAGE-001"));
-        assert!(stream_str.contains("%%eSCL-PAGE-002"));
-        assert!(stream_str.ends_with("0\r\n\r\n"));
     }
 }
