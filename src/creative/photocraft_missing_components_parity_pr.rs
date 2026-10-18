@@ -634,8 +634,7 @@ impl PhotocraftAiSubjectMattingSelectionPrEngine {
         let mut alpha_mask = vec![0u8; size];
         for (i, val) in alpha_mask.iter_mut().enumerate() {
             let px = i * 4;
-            let lum =
-                (image_rgba[px] as u32 + image_rgba[px + 1] as u32 + image_rgba[px + 2] as u32) / 3;
+            let lum = (image_rgba[px] as u32 + image_rgba[px + 1] as u32 + image_rgba[px + 2] as u32) / 3;
             *val = if lum > 50 { 255 } else { 0 };
         }
 
@@ -661,8 +660,7 @@ impl PhotocraftAiSubjectMattingSelectionPrEngine {
             original_suite: "ArtCraft PhotoCraft Neural Selection Studio".to_string(),
             artcraft_feature_parity: "Photoshop Select Subject & Refine Hair Parity".to_string(),
             components_added: vec![
-                "One-click deep neural subject detection and portrait foreground isolate"
-                    .to_string(),
+                "One-click deep neural subject detection and portrait foreground isolate".to_string(),
                 "Sub-pixel hair strands, fur & transparent object trimap alpha matting".to_string(),
                 "De-contaminate fringe colors and edge spill auto-correction".to_string(),
             ],
@@ -683,7 +681,9 @@ pub struct PhotocraftPanoramaStitchingProjectionPrEngine {
 
 impl PhotocraftPanoramaStitchingProjectionPrEngine {
     pub fn new() -> Self {
-        Self { stitched_count: 0 }
+        Self {
+            stitched_count: 0,
+        }
     }
 
     pub fn stitch_panorama_frames(
@@ -720,12 +720,10 @@ impl PhotocraftPanoramaStitchingProjectionPrEngine {
                     .to_string(),
             target_subsystem: "Panorama & Spherical Projection Subsystem".to_string(),
             original_suite: "ArtCraft PhotoCraft Panorama Stitcher".to_string(),
-            artcraft_feature_parity: "Lightroom Panorama Stitching & Hugin Alignment Parity"
-                .to_string(),
+            artcraft_feature_parity: "Lightroom Panorama Stitching & Hugin Alignment Parity".to_string(),
             components_added: vec![
                 "Automatic feature-point matching (SIFT/ORB) multi-image alignment".to_string(),
-                "Spherical, Cylindrical & Perspective equirectangular projection blender"
-                    .to_string(),
+                "Spherical, Cylindrical & Perspective equirectangular projection blender".to_string(),
                 "Seam line multi-band blending & vignette exposure compensation".to_string(),
             ],
             performance_multiplier: "10x Multithreaded Panorama Alignment".to_string(),
@@ -775,8 +773,9 @@ impl PhotocraftPerspectiveWarpMeshDeformPrEngine {
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
             pr_id: 110,
-            pr_title: "feat(photocraft): Perspective Warp Quad Grid & Puppet Mesh Deformer"
-                .to_string(),
+            pr_title:
+                "feat(photocraft): Perspective Warp Quad Grid & Puppet Mesh Deformer"
+                    .to_string(),
             target_subsystem: "Geometry Transformation & Mesh Deform Subsystem".to_string(),
             original_suite: "ArtCraft PhotoCraft Perspective Warper".to_string(),
             artcraft_feature_parity: "Photoshop Perspective Warp & Puppet Warp Parity".to_string(),
@@ -991,9 +990,7 @@ mod tests {
         assert!(proposal.pr_title.contains("Panorama Stitching"));
         let frame1 = vec![10u8; 12];
         let frame2 = vec![20u8; 12];
-        let panorama = engine
-            .stitch_panorama_frames(&[frame1, frame2], 2, 2)
-            .unwrap();
+        let panorama = engine.stitch_panorama_frames(&[frame1, frame2], 2, 2).unwrap();
         assert_eq!(panorama.len(), 12);
     }
 
@@ -1021,10 +1018,7 @@ mod tests {
 
         let res = gateway.validate_and_merge(101);
         assert!(res.is_ok());
-        assert_eq!(
-            gateway.get_proposal(101).unwrap().status,
-            "Merged into Sovereign Core"
-        );
+        assert_eq!(gateway.get_proposal(101).unwrap().status, "Merged into Sovereign Core");
     }
 
     #[test]

@@ -748,30 +748,12 @@ mod tests {
         );
 
         // MS-DOS reserved device name rejection (CWE-667 / CWE-706)
-        assert_eq!(
-            validate_filename(b"CON"),
-            Err(ValidationError::InvalidChars)
-        );
-        assert_eq!(
-            validate_filename(b"con"),
-            Err(ValidationError::InvalidChars)
-        );
-        assert_eq!(
-            validate_filename(b"aux.json"),
-            Err(ValidationError::InvalidChars)
-        );
-        assert_eq!(
-            validate_filename(b"COM1.txt"),
-            Err(ValidationError::InvalidChars)
-        );
-        assert_eq!(
-            validate_filename(b"lpt9.log"),
-            Err(ValidationError::InvalidChars)
-        );
-        assert_eq!(
-            validate_filename(b"CLOCK$"),
-            Err(ValidationError::InvalidChars)
-        );
+        assert_eq!(validate_filename(b"CON"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"con"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"aux.json"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"COM1.txt"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"lpt9.log"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_filename(b"CLOCK$"), Err(ValidationError::InvalidChars));
 
         // Legitimate filenames containing reserved words as substrings or prefixes
         assert_eq!(validate_filename(b"concept.txt"), Ok(()));

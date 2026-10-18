@@ -164,15 +164,14 @@ impl RipgrepSearchEngine {
                         line.as_bytes()
                             .windows(pat_bytes.len())
                             .position(|window| {
-                                window.iter().zip(pat_bytes.iter()).all(|(&h, &n)| {
-                                    h.to_ascii_lowercase() == n.to_ascii_lowercase()
-                                })
+                                window
+                                    .iter()
+                                    .zip(pat_bytes.iter())
+                                    .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
                             })
                             .unwrap_or(0)
                     } else {
-                        line.to_lowercase()
-                            .find(&pattern.to_lowercase())
-                            .unwrap_or(0)
+                        line.to_lowercase().find(&pattern.to_lowercase()).unwrap_or(0)
                     }
                 } else {
                     line.find(pattern).unwrap_or(0)

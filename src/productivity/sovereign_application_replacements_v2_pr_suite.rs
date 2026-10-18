@@ -77,12 +77,7 @@ impl SovereignBrowserEngineV2PrEngine {
         engine
     }
 
-    pub fn open_tab(
-        &mut self,
-        url: &str,
-        title: &str,
-        security: Vec<BrowserV2SecurityFeature>,
-    ) -> u64 {
+    pub fn open_tab(&mut self, url: &str, title: &str, security: Vec<BrowserV2SecurityFeature>) -> u64 {
         let id = self.next_tab_id;
         self.next_tab_id += 1;
 
@@ -103,9 +98,7 @@ impl SovereignBrowserEngineV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 216,
-            pr_title:
-                "feat(browser_v2): Sovereign Web Engine V2 with PQC Kyber TLS & eBPF Filtering"
-                    .to_string(),
+            pr_title: "feat(browser_v2): Sovereign Web Engine V2 with PQC Kyber TLS & eBPF Filtering".to_string(),
             target_app_category: "Web Browsers & Layout Engines".to_string(),
             replaced_applications: vec![
                 "Mozilla Firefox".to_string(),
@@ -124,8 +117,7 @@ impl SovereignBrowserEngineV2PrEngine {
                 "WebAssembly Sandboxed DOM & Layout Parser".to_string(),
                 "Amnesic Ephemeral Tab Container Isolation".to_string(),
             ],
-            performance_advantage: "70% lower RAM footprint vs Chromium; instant cold startup"
-                .to_string(),
+            performance_advantage: "70% lower RAM footprint vs Chromium; instant cold startup".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Hardware-accelerated CSS Grid layout without V8 overhead".to_string(),
@@ -177,9 +169,7 @@ impl SovereignEmailClientV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 217,
-            pr_title:
-                "feat(email_v2): Sovereign Mail Suite V2 with JMAP, PQC-PGP & SQLite Offline Search"
-                    .to_string(),
+            pr_title: "feat(email_v2): Sovereign Mail Suite V2 with JMAP, PQC-PGP & SQLite Offline Search".to_string(),
             target_app_category: "Email & Calendar Clients".to_string(),
             replaced_applications: vec![
                 "Mozilla Thunderbird".to_string(),
@@ -198,8 +188,7 @@ impl SovereignEmailClientV2PrEngine {
                 "FTS5 SQLite full-text offline mail indexer".to_string(),
                 "CalDAV / CardDAV event & contact sync engine".to_string(),
             ],
-            performance_advantage: "Sub-millisecond mail search across 100k emails; 15MB RAM idle"
-                .to_string(),
+            performance_advantage: "Sub-millisecond mail search across 100k emails; 15MB RAM idle".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Threaded conversation view with automatic mailing list classification".to_string(),
@@ -229,11 +218,8 @@ impl SovereignOfficeSuiteV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 218,
-            pr_title:
-                "feat(office_v2): Sovereign Office V2 with Real-Time CRDT Collaboration & MathML"
-                    .to_string(),
-            target_app_category: "Office Productivity (Word, Spreadsheet, Slides, Draw)"
-                .to_string(),
+            pr_title: "feat(office_v2): Sovereign Office V2 with Real-Time CRDT Collaboration & MathML".to_string(),
+            target_app_category: "Office Productivity (Word, Spreadsheet, Slides, Draw)".to_string(),
             replaced_applications: vec![
                 "LibreOffice (Writer, Calc, Impress, Draw)".to_string(),
                 "Apache OpenOffice".to_string(),
@@ -250,9 +236,7 @@ impl SovereignOfficeSuiteV2PrEngine {
                 "Native PDF/A-3 Cryptographic Document Signer".to_string(),
                 "MathML & High-Precision Financial Calculation Engine".to_string(),
             ],
-            performance_advantage:
-                "10x faster file loading than LibreOffice; zero Java/UNO runtime overhead"
-                    .to_string(),
+            performance_advantage: "10x faster file loading than LibreOffice; zero Java/UNO runtime overhead".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "GPU-accelerated typography layout solver".to_string(),
@@ -282,9 +266,7 @@ impl SovereignTextEditorV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 219,
-            pr_title:
-                "feat(editor_v2): Sovereign Code Editor V2 with LSP v3.17, Tree-sitter & Lua VM"
-                    .to_string(),
+            pr_title: "feat(editor_v2): Sovereign Code Editor V2 with LSP v3.17, Tree-sitter & Lua VM".to_string(),
             target_app_category: "Text Editors & IDEs".to_string(),
             replaced_applications: vec![
                 "Vim".to_string(),
@@ -335,8 +317,7 @@ impl SovereignRasterGraphicsV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 220,
-            pr_title: "feat(graphics_v2): Sovereign Image Studio V2 with OpenFX & GPU Layer Stack"
-                .to_string(),
+            pr_title: "feat(graphics_v2): Sovereign Image Studio V2 with OpenFX & GPU Layer Stack".to_string(),
             target_app_category: "Raster & Vector Image Processing".to_string(),
             replaced_applications: vec![
                 "GIMP".to_string(),
@@ -354,8 +335,7 @@ impl SovereignRasterGraphicsV2PrEngine {
                 "ACES / OpenColorIO Wide-Gamut Color Management Engine".to_string(),
                 "GPU Compute Shader Accelerated Canvas Renderer".to_string(),
             ],
-            performance_advantage:
-                "60 FPS canvas panning on 8K images; zero GTK2 legacy dependencies".to_string(),
+            performance_advantage: "60 FPS canvas panning on 8K images; zero GTK2 legacy dependencies".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Vector-bezier path engine integrated with raster layer masks".to_string(),
@@ -431,8 +411,7 @@ impl SovereignFileManagerV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 222,
-            pr_title: "feat(fm_v2): Sovereign File Manager V2 with Spatial Views & B-Tree Tags"
-                .to_string(),
+            pr_title: "feat(fm_v2): Sovereign File Manager V2 with Spatial Views & B-Tree Tags".to_string(),
             target_app_category: "File Managers & VFS Browsers".to_string(),
             replaced_applications: vec![
                 "GNOME Nautilus".to_string(),
@@ -451,8 +430,7 @@ impl SovereignFileManagerV2PrEngine {
                 "Inotify / Kqueue Real-Time Filesystem Monitor".to_string(),
                 "Virtual Filesystem (VFS) Mount Governor for SSHFS/SMB/NFS".to_string(),
             ],
-            performance_advantage: "Renders 100,000 files in <5ms; zero GUI freeze on slow mounts"
-                .to_string(),
+            performance_advantage: "Renders 100,000 files in <5ms; zero GUI freeze on slow mounts".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Batch file renaming engine with regex & sequence macro support".to_string(),
@@ -482,9 +460,7 @@ impl SovereignTerminalMultiplexerV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 223,
-            pr_title:
-                "feat(term_v2): Sovereign Terminal V2 with SIXEL Graphics & tmux Multiplexing"
-                    .to_string(),
+            pr_title: "feat(term_v2): Sovereign Terminal V2 with SIXEL Graphics & tmux Multiplexing".to_string(),
             target_app_category: "Terminal Emulators & Multiplexers".to_string(),
             replaced_applications: vec![
                 "Alacritty".to_string(),
@@ -503,8 +479,7 @@ impl SovereignTerminalMultiplexerV2PrEngine {
                 "Session Persistent Attach / Detach Multiplexer State Machine".to_string(),
                 "Infinite Scrollback Compression Buffer with RegEx Search".to_string(),
             ],
-            performance_advantage: "Over 120 FPS render rate; 2ms latency on 4K displays"
-                .to_string(),
+            performance_advantage: "Over 120 FPS render rate; 2ms latency on 4K displays".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Native split-pane layout manager with mouse resize support".to_string(),
@@ -532,9 +507,7 @@ impl SovereignMediaPlayerStudioV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 224,
-            pr_title:
-                "feat(media_v2): Sovereign Media Studio V2 with VAAPI/NVDEC & VST3 DAW Engine"
-                    .to_string(),
+            pr_title: "feat(media_v2): Sovereign Media Studio V2 with VAAPI/NVDEC & VST3 DAW Engine".to_string(),
             target_app_category: "Audio/Video Players & DAW Editors".to_string(),
             replaced_applications: vec![
                 "VLC Media Player".to_string(),
@@ -580,9 +553,7 @@ impl SovereignPasswordVaultV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 225,
-            pr_title:
-                "feat(pass_v2): Sovereign Password Vault V2 with Argon2id & TOTP Authenticator"
-                    .to_string(),
+            pr_title: "feat(pass_v2): Sovereign Password Vault V2 with Argon2id & TOTP Authenticator".to_string(),
             target_app_category: "Password Vaults & Authenticators".to_string(),
             replaced_applications: vec![
                 "KeePassXC".to_string(),
@@ -599,9 +570,7 @@ impl SovereignPasswordVaultV2PrEngine {
                 "TOTP / HOTP Two-Factor Authenticator Code Generator".to_string(),
                 "Automated Git Sync Backend for Encrypted Vault Snapshots".to_string(),
             ],
-            performance_advantage:
-                "Instant vault unlock; constant-time memory protection against side-channels"
-                    .to_string(),
+            performance_advantage: "Instant vault unlock; constant-time memory protection against side-channels".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Clipboard auto-clear after 15 seconds to prevent keylogging".to_string(),
@@ -629,9 +598,7 @@ impl SovereignSystemMonitorV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 226,
-            pr_title:
-                "feat(monitor_v2): Sovereign System Monitor V2 with eBPF & PSI Pressure Metrics"
-                    .to_string(),
+            pr_title: "feat(monitor_v2): Sovereign System Monitor V2 with eBPF & PSI Pressure Metrics".to_string(),
             target_app_category: "System Monitors & Diagnostics".to_string(),
             replaced_applications: vec![
                 "htop".to_string(),
@@ -677,8 +644,7 @@ impl SovereignP2pTorrentClientV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 227,
-            pr_title: "feat(p2p_v2): Sovereign P2P Torrent Engine V2 with BitTorrent v2 & DHT"
-                .to_string(),
+            pr_title: "feat(p2p_v2): Sovereign P2P Torrent Engine V2 with BitTorrent v2 & DHT".to_string(),
             target_app_category: "P2P File Transfer Clients".to_string(),
             replaced_applications: vec![
                 "Transmission".to_string(),
@@ -723,8 +689,7 @@ impl SovereignMatrixIrcMessengerV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 228,
-            pr_title: "feat(chat_v2): Sovereign Messenger V2 with Matrix Megolm E2EE & IRCv3"
-                .to_string(),
+            pr_title: "feat(chat_v2): Sovereign Messenger V2 with Matrix Megolm E2EE & IRCv3".to_string(),
             target_app_category: "IRC & Matrix Chat Clients".to_string(),
             replaced_applications: vec![
                 "HexChat".to_string(),
@@ -742,8 +707,7 @@ impl SovereignMatrixIrcMessengerV2PrEngine {
                 "Unified Multi-Protocol Message Router & Search Index".to_string(),
                 "Markdown & Inline Media Preview Generator".to_string(),
             ],
-            performance_advantage:
-                "Loads 100 rooms instantly; 20MB RAM vs 300MB+ for Electron Element".to_string(),
+            performance_advantage: "Loads 100 rooms instantly; 20MB RAM vs 300MB+ for Electron Element".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Cryptographic key backup and cross-signing verification".to_string(),
@@ -771,8 +735,7 @@ impl SovereignArchiveCompressorV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 229,
-            pr_title: "feat(archive_v2): Sovereign Archive Studio V2 with Multi-Threaded Zstd & 7z"
-                .to_string(),
+            pr_title: "feat(archive_v2): Sovereign Archive Studio V2 with Multi-Threaded Zstd & 7z".to_string(),
             target_app_category: "Archive Compression & Unpacking Utility".to_string(),
             replaced_applications: vec![
                 "KDE Ark".to_string(),
@@ -790,8 +753,7 @@ impl SovereignArchiveCompressorV2PrEngine {
                 "Streaming Archive Inspector & In-Memory Extractor".to_string(),
                 "Multi-Volume Archive Spanning Engine".to_string(),
             ],
-            performance_advantage:
-                "5x faster compression using multi-threaded Zstd dictionary engine".to_string(),
+            performance_advantage: "5x faster compression using multi-threaded Zstd dictionary engine".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Integrity check runner for corrupted archive repair".to_string(),
@@ -819,8 +781,7 @@ impl SovereignDiskPartitionManagerV2PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV2PrProposalManifest {
         SovereignAppV2PrProposalManifest {
             pr_id: 230,
-            pr_title: "feat(disk_v2): Sovereign Disk Studio V2 with GPT/BSD Partitioning & SMART"
-                .to_string(),
+            pr_title: "feat(disk_v2): Sovereign Disk Studio V2 with GPT/BSD Partitioning & SMART".to_string(),
             target_app_category: "Disk Partitioning & Storage Management".to_string(),
             replaced_applications: vec![
                 "GParted".to_string(),
@@ -838,9 +799,7 @@ impl SovereignDiskPartitionManagerV2PrEngine {
                 "NVMe & SATA SMART Health Telemetry Monitor".to_string(),
                 "LUKS2 Encrypted Volume Creation & Key Management Engine".to_string(),
             ],
-            performance_advantage:
-                "Instant drive scanning; zero risk of GUI freeze during partition alignment"
-                    .to_string(),
+            performance_advantage: "Instant drive scanning; zero risk of GUI freeze during partition alignment".to_string(),
             zero_download_status: "100% Built-In (No downloads required)".to_string(),
             v2_advancements: vec![
                 "Bad sector detection scan with GNU ddrescue mapfile export".to_string(),
@@ -937,9 +896,7 @@ mod tests {
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 216);
-        assert!(proposal
-            .replaced_applications
-            .contains(&"Mozilla Firefox".to_string()));
+        assert!(proposal.replaced_applications.contains(&"Mozilla Firefox".to_string()));
     }
 
     #[test]
@@ -947,9 +904,7 @@ mod tests {
         let engine = SovereignEmailClientV2PrEngine::new();
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 217);
-        assert!(proposal
-            .replaced_applications
-            .contains(&"Mozilla Thunderbird".to_string()));
+        assert!(proposal.replaced_applications.contains(&"Mozilla Thunderbird".to_string()));
     }
 
     #[test]
