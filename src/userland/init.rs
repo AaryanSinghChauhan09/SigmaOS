@@ -651,6 +651,7 @@ impl OpenRcStatusControllerEngine {
     }
 }
 
+}
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
         let mut header = OpenRcHeader::default();
