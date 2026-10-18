@@ -1,129 +1,65 @@
 ## Summary
 
-<!-- What secondary-memory, shell, or subsystem behavior changed and why? -->
+<!-- What scheduler behavior changed and why? -->
 
-## Shell component
+## Scheduler component
 
-- [ ] AST / Parser / Lexer
-- [ ] Builtins / Environment
-- [ ] Redirection / Pipelines
-- [ ] Line Editor / History
-
-## Kernel component
-
-- [ ] Boot / arch init
-
-## Shell component
-
-- [ ] Interactive shell
-- [ ] Shell component
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
+- [ ] Scheduler core
+- [ ] Run queue / PID allocation
+- [ ] fork / clone
+- [ ] exec
+- [ ] Scheduler / run queue
+- [ ] Context switch
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
+- [ ] procfs / diagnostics
 - [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Shell component
+## Recurring task
 
-- [ ] Shell parser
-- [ ] Builtins
-- [ ] Pipeline
-
-## Shell component
-
-- [ ] Interactive prompt & signals
-- [ ] Command execution & builtins
-- [ ] Environment & expansion
-- [ ] Resource limits governor
-- [ ] Short circuit && / ||
-
-## Shell component
-
-- [ ] Interactive shell
-- [ ] Command interpreter
-
-## Shell component
-
-- [ ] Interactive prompt & signals
-- [ ] Command execution & builtins
-- [ ] Environment & expansion
-- [ ] Resource limits governor
-- [ ] Short circuit && / ||
-
-## Shell component
-
-- [ ] Shell parser & lexer
-- [ ] Shell builtins
-- [ ] PR-level validation
+- [ ] PR validation
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly storage audit
+- [ ] Biweekly scheduler audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Upstream study
+## Reference behavior
 
-<!-- Required for lifecycle, ABI, or storage changes -->
-<!-- Upstream study: Open-source OS references and Linux/BSD/Redox/xv6 study notes -->
-<!-- What SigmaOS adopts: Subsystem architecture and component improvements -->
+<!-- Required for lifecycle, ABI, or scheduler changes -->
 
-- Upstream study:
+- POSIX section:
 - Linux/BSD/Redox/xv6 reference:
-- What SigmaOS adopts: Adopt / Adapt / Reject
-- Reason:
-
-## What SigmaOS adopts
-- Component adaptation:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
+-
 
-## Shell safety review
+## Scheduler safety review
 
-- [ ] No unbounded input
-- [ ] Quoting integrity maintained
-
-## Kernel safety review and Reviewer checklist
-
-- [ ] Safety and rollback plan documented
-- [ ] No unnecessary `unsafe`
-
-## Shell safety review
-
-- [ ] Command injection prevention verified
-- [ ] Environment variable sanitization checked
-- [ ] Signal trap safety verified
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
 - [ ] Signal races considered
-- [ ] Double-completion prevented
+- [ ] Double-reap prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Shell component
-
-- [ ] Interactive REPL
-- [ ] Scripting engine
-- [ ] Job control
-- [ ] Builtins
-
-## Shell safety review
-
-- [ ] Input validation
-- [ ] Signal handling
-- [ ] Memory safety
-
-## Evidence & Reviewer checklist
+## Evidence
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -133,26 +69,17 @@
 - [ ] Integration tests
 - [ ] Fuzz target or documented exemption
 - [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
+- [ ] Scheduler benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Storage documentation
+- [ ] Process documentation
 - [ ] Boot matrix, if applicable
 
-## Safety and rollback
+## Risks and rollback
 
-- [ ] Quoting integrity
-- [ ] Redirection safety
-
-## Safety and rollback
-
-- Safety and rollback:
 - Risk:
-- Safety and rollback:
 - Rollback:
-
-## Reviewer checklist
