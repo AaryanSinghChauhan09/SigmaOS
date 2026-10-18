@@ -603,7 +603,12 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn generate_cam_toolpath(&mut self, toolpath_type: CamToolpathType, tool_diameter: f32, feed_rate: f32) -> u32 {
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
         let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
         let toolpath = CamToolpath {
             id,
@@ -626,15 +631,11 @@ impl CadCraftEngine {
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
         let mut output = Vec::new();
         match format {
-            ExportFormat::DXF => {
-                output.extend_from_slice(b"0\nSECTION\n2\nENTITIES\n0\nENDSEC\n0\nEOF\n");
-            }
+            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
             ExportFormat::STEP => {
-                output.extend_from_slice(b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n");
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
             }
-            _ => {
-                output.extend_from_slice(b"CAD_EXPORT_STREAM");
-            }
+            _ => b"CAD_EXPORT_DATA".to_vec(),
         }
         output
     }

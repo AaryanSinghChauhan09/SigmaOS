@@ -1314,9 +1314,10 @@ mod tests {
             "rpm"
         );
 
-        let (audit_map, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audit_map.len(), 31);
-        for (_, compliant) in audit_map {
+        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits.len(), 44);
+        assert_eq!(score, 100);
+        for (_, compliant) in audits {
             assert!(compliant);
         }
         assert_eq!(score, 100);

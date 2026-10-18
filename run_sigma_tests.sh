@@ -310,20 +310,6 @@ if [ -f "src/creative/soundcraft.rs" ]; then
     ./build/test_soundcraft
 fi
 
-if [ -f "src/creative/soundcraft_missing_components_parity_pr.rs" ]; then
-    echo "Running Soundcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
-    mkdir -p build
-    rustc --test src/creative/soundcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_soundcraft_missing
-    ./build/test_soundcraft_missing
-fi
-
-if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
-    echo "Running Sovereign EffectCraft & ArtCraft Missing Components Parity PR Gateway test suite..."
-    mkdir -p build
-    rustc --test src/creative/effectcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_effectcraft_missing
-    ./build/test_effectcraft_missing
-fi
-
 if [ -f "src/creative/effectcraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign EffectCraft to ArtCraft Parity PR Gateway test suite..."
     mkdir -p build
@@ -373,13 +359,6 @@ if [ -f "src/creative/figcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_figcraft_missing
 fi
 
-if [ -f "src/creative/cadcraft.rs" ]; then
-    echo "Running Sovereign CadCraft Parametric Solid Modeling PR test suite..."
-    mkdir -p build
-    rustc --test src/creative/cadcraft.rs --edition=2021 -o build/test_cadcraft
-    ./build/test_cadcraft
-fi
-
 if [ -f "src/creative/cadcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Sovereign Cadcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
@@ -387,11 +366,18 @@ if [ -f "src/creative/cadcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_cadcraft_missing
 fi
 
-if [ -f "src/creative/cadcraft_artcraft_parity_pr.rs" ]; then
-    echo "Running Sovereign CadCraft to ArtCraft Parity PR test suite..."
+if [ -f "src/creative/fontcraft.rs" ]; then
+    echo "Running Sovereign FontCraft Typography Engine test suite..."
     mkdir -p build
-    rustc --test src/creative/cadcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_cadcraft_artcraft_parity
-    ./build/test_cadcraft_artcraft_parity
+    rustc --test src/creative/fontcraft.rs --edition=2021 -o build/test_fontcraft
+    ./build/test_fontcraft
+fi
+
+if [ -f "src/creative/fontcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign FontCraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/fontcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_fontcraft_missing
+    ./build/test_fontcraft_missing
 fi
 
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then

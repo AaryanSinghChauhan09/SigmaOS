@@ -425,10 +425,20 @@ impl GnuCoreutilsBsdUserlandEngine {
         )
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
-        let mut vec: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
+        let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if numeric {
-            vec.sort_by(|a, b| a.parse::<i64>().unwrap_or(0).cmp(&b.parse::<i64>().unwrap_or(0)));
+            vec.sort_by(|a, b| {
+                a.parse::<i64>()
+                    .unwrap_or(0)
+                    .cmp(&b.parse::<i64>().unwrap_or(0))
+            });
         } else {
             vec.sort();
         }
@@ -1449,7 +1459,11 @@ impl ArchivalCompressionEngine {
         map
     }
 
-    pub fn configure_compression_level(&self, format: CompressionFormat, level: u32) -> Result<String, String> {
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, String> {
         Ok(format!("{:?} level {}", format, level))
     }
 

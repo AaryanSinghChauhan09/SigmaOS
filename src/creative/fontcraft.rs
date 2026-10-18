@@ -138,9 +138,21 @@ mod tests {
         let mut engine = SovereignFontEngine::new("SigmaSans", 1000, 800, -200);
 
         let mut contour = GlyphContour { points: Vec::new() };
-        contour.points.push(GlyphPoint { x: 0.0, y: 0.0, on_curve: true });
-        contour.points.push(GlyphPoint { x: 50.0, y: 100.0, on_curve: false });
-        contour.points.push(GlyphPoint { x: 100.0, y: 0.0, on_curve: true });
+        contour.points.push(GlyphPoint {
+            x: 0.0,
+            y: 0.0,
+            on_curve: true,
+        });
+        contour.points.push(GlyphPoint {
+            x: 50.0,
+            y: 100.0,
+            on_curve: false,
+        });
+        contour.points.push(GlyphPoint {
+            x: 100.0,
+            y: 0.0,
+            on_curve: true,
+        });
 
         let glyph_a = GlyphData {
             glyph_index: 65,
