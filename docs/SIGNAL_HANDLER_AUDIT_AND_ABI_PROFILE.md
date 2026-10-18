@@ -89,7 +89,9 @@ pub struct sigaction_t {
 ```
 
 ### `siginfo_t` Layout (56 Bytes)
-```repr(C)
+```rust
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct siginfo_t {
     pub si_signo: i32,        // Signal number
     pub si_errno: i32,        // An errno value (if applicable)
@@ -110,7 +112,7 @@ pub struct siginfo_t {
 When delivering a signal to a Ring 3 process on x86_64, the kernel constructs a frame on the user stack (aligned to 16 bytes):
 
 ### x86_64 User Signal Frame Layout
-```
+```text
 +-------------------------------------------------------+
 |  Padding (16-byte stack alignment)                    |
 +-------------------------------------------------------+

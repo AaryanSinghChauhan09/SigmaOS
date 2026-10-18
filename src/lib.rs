@@ -82,10 +82,10 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV40,
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV64,
-    SovereignUniversalPackageVerifier,
-    UniversalDistroPackageOrchestrator, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter, UniversalPackageFormat, UniversalPackageImporter,
-    UniversalPackageTriggerEngine, UniversalPackageTriggerType, UniversalPackageVerificationResult,
+    SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter, UniversalPackageFormat,
+    UniversalPackageImporter, UniversalPackageTriggerEngine, UniversalPackageTriggerType,
+    UniversalPackageVerificationResult,
 };
 pub mod process;
 pub mod productivity;
@@ -368,9 +368,9 @@ pub use kernel::{
     IpcManager, KernelAccessController, KernelFastPacketEngine, LandlockAccessRight,
     LandlockPathRule, MemoryBlock, MemoryCompactionSuperpagesAllocator, Message,
     PhysicalFrameBlock, PolicyError, PolicyManager, Priority, PrivacyFirstSandbox, PrivilegeLevel,
-    Process, ProtectionDomain, ResourceAllocationGraph, ResourceBroker,
-    RoundRobinConfig, RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel,
-    SigmaFsPlusPlus, SoftIrqType, SolidDesignValidator, SovereignCgroupGovernor,
+    Process, ProtectionDomain, ResourceAllocationGraph, ResourceBroker, RoundRobinConfig,
+    RoundRobinScheduler, Scheduler, SchedulerError, SelfHealingKernel, SigmaFsPlusPlus,
+    SoftIrqType, SolidDesignValidator, SovereignCgroupGovernor,
     SovereignCleanCodeAndOsPrinciplesEngine, SubmissionQueueEntry, UniversalAbiTranslator,
     UserDefinedKernelFunctions, VirtualCpu, XdpAction, PAGE_SIZE,
 };

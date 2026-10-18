@@ -341,9 +341,8 @@ impl SystemdTransientScopeGovernor {
     }
 
     pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
-        self.transient_scopes
-            .get(scope_name)
-            // only one map exists now
+        self.transient_scopes.get(scope_name)
+        // only one map exists now
     }
 }
 
