@@ -333,6 +333,7 @@ impl Default for SignalDispositionTable {
 #[derive(Debug, Clone)]
 pub struct ThreadSignalMask {
     current: SignalMask,
+    #[allow(dead_code)]
     blocked: SignalMask,
 }
 
