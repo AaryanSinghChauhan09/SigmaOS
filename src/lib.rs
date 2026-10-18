@@ -112,6 +112,7 @@ pub use sigpkg::{
 };
 pub mod hardware;
 pub mod installer;
+pub use installer::*;
 pub mod interrupt;
 pub mod ml;
 pub mod thread;
