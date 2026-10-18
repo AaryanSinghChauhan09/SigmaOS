@@ -51,14 +51,10 @@ impl ShaderFilterGraphPrEngine {
             "default_passthrough".to_string(),
             CompiledShaderNode {
                 node_id: "default_passthrough".to_string(),
-                glsl_source:
-                    "void main() { vec4 col = texture2D(u_src, v_uv); gl_FragColor = col; }"
-                        .to_string(),
+                glsl_source: "void main() { vec4 col = texture2D(u_src, v_uv); gl_FragColor = col; }".to_string(),
             },
         );
-        Self {
-            compiled_shaders: map,
-        }
+        Self { compiled_shaders: map }
     }
 
     pub fn compile_glsl_shader(&mut self, name: &str, glsl: &str) -> Result<(), String> {
@@ -75,12 +71,7 @@ impl ShaderFilterGraphPrEngine {
         Ok(())
     }
 
-    pub fn execute_shader_pass(
-        &self,
-        pass_name: &str,
-        input_rgba: &[u8],
-        output_rgba: &mut [u8],
-    ) -> Result<(), String> {
+    pub fn execute_shader_pass(&self, pass_name: &str, input_rgba: &[u8], output_rgba: &mut [u8]) -> Result<(), String> {
         if !self.compiled_shaders.contains_key(pass_name) {
             return Err("Shader pass not found in compiled graph".to_string());
         }
@@ -93,8 +84,7 @@ impl ShaderFilterGraphPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-time GPU Shader Filter Graph Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Real-time GPU Shader Filter Graph Engine".to_string(),
             target_subsystem: "GPU Shader Graph Compositor".to_string(),
             original_suite: "ArtCraft EffectCraft Shader Graph".to_string(),
             components_added: vec![
@@ -218,12 +208,7 @@ impl NeuralMatteSegmentationPrEngine {
         Self
     }
 
-    pub fn execute_auto_keying(
-        &self,
-        rgba_pixels: &[u8],
-        width: u32,
-        height: u32,
-    ) -> Result<SegmentationMask, String> {
+    pub fn execute_auto_keying(&self, rgba_pixels: &[u8], width: u32, height: u32) -> Result<SegmentationMask, String> {
         let pixel_count = (width * height) as usize;
         if rgba_pixels.len() != pixel_count * 4 {
             return Err("Invalid RGBA buffer length".to_string());
@@ -237,11 +222,7 @@ impl NeuralMatteSegmentationPrEngine {
                 alpha_map[i] = 0; // Key out green screen background
             }
         }
-        Ok(SegmentationMask {
-            width,
-            height,
-            alpha_map,
-        })
+        Ok(SegmentationMask { width, height, alpha_map })
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
@@ -276,9 +257,7 @@ pub struct AudioReactiveVisualizerPrEngine {
 
 impl AudioReactiveVisualizerPrEngine {
     pub fn new() -> Self {
-        Self {
-            frequency_bands: vec![0.0; 5],
-        }
+        Self { frequency_bands: vec![0.0; 5] }
     }
 
     pub fn process_audio_buffer(&mut self, samples: &[f32]) -> Result<&[f32], String> {
@@ -288,11 +267,7 @@ impl AudioReactiveVisualizerPrEngine {
         let chunk_size = samples.len() / 5;
         for b in 0..5 {
             let start = b * chunk_size;
-            let end = if b == 4 {
-                samples.len()
-            } else {
-                (b + 1) * chunk_size
-            };
+            let end = if b == 4 { samples.len() } else { (b + 1) * chunk_size };
             let sum: f32 = samples[start..end].iter().map(|s| s.abs()).sum();
             self.frequency_bands[b] = sum / (end - start) as f32;
         }
@@ -305,8 +280,7 @@ impl AudioReactiveVisualizerPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Audio Reactive Frequency Spectrum Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Audio Reactive Frequency Spectrum Engine".to_string(),
             target_subsystem: "Audio Reactive Motion Graphics".to_string(),
             original_suite: "ArtCraft Audio Visualizer".to_string(),
             components_added: vec![
@@ -427,9 +401,7 @@ impl ArtCraftOpenFxPluginPrEngine {
                 }],
             },
         );
-        Self {
-            loaded_plugins: map,
-        }
+        Self { loaded_plugins: map }
     }
 
     pub fn load_openfx_plugin(&mut self, plugin_id: &str) -> Result<(), String> {
@@ -443,38 +415,19 @@ impl ArtCraftOpenFxPluginPrEngine {
         Ok(())
     }
 
-    pub fn set_plugin_parameter(
-        &mut self,
-        plugin_id: &str,
-        param_name: &str,
-        val: f32,
-    ) -> Result<(), String> {
-        let plugin = self
-            .loaded_plugins
-            .get_mut(plugin_id)
-            .ok_or("Plugin not found")?;
+    pub fn set_plugin_parameter(&mut self, plugin_id: &str, param_name: &str, val: f32) -> Result<(), String> {
+        let plugin = self.loaded_plugins.get_mut(plugin_id).ok_or("Plugin not found")?;
         if let Some(param) = plugin.parameters.iter_mut().find(|p| p.name == param_name) {
             param.value_f32 = val;
         } else {
-            plugin.parameters.push(OfxParam {
-                name: param_name.to_string(),
-                value_f32: val,
-            });
+            plugin.parameters.push(OfxParam { name: param_name.to_string(), value_f32: val });
         }
         Ok(())
     }
 
     pub fn process_frame(&self, plugin_id: &str, pixels: &mut [u8]) -> Result<(), String> {
-        let plugin = self
-            .loaded_plugins
-            .get(plugin_id)
-            .ok_or("Plugin not found")?;
-        let intensity = plugin
-            .parameters
-            .iter()
-            .find(|p| p.name == "intensity")
-            .map(|p| p.value_f32)
-            .unwrap_or(1.0);
+        let plugin = self.loaded_plugins.get(plugin_id).ok_or("Plugin not found")?;
+        let intensity = plugin.parameters.iter().find(|p| p.name == "intensity").map(|p| p.value_f32).unwrap_or(1.0);
         for byte in pixels.iter_mut() {
             *byte = ((*byte as f32) * intensity).clamp(0.0, 255.0) as u8;
         }
@@ -531,13 +484,7 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
         }
     }
 
-    pub fn compute_motion_vectors(
-        &mut self,
-        prev_frame: &[u8],
-        curr_frame: &[u8],
-        width: u32,
-        height: u32,
-    ) -> Result<usize, String> {
+    pub fn compute_motion_vectors(&mut self, prev_frame: &[u8], curr_frame: &[u8], width: u32, height: u32) -> Result<usize, String> {
         let pixel_count = (width * height) as usize;
         let mut vectors = Vec::with_capacity(pixel_count);
         for i in 0..pixel_count {
@@ -555,13 +502,7 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
         Ok(len)
     }
 
-    pub fn interpolate_intermediate_frame(
-        &self,
-        frame1: &[u8],
-        frame2: &[u8],
-        vectors: &[MotionVector],
-        alpha: f32,
-    ) -> Result<Vec<u8>, String> {
+    pub fn interpolate_intermediate_frame(&self, frame1: &[u8], frame2: &[u8], vectors: &[MotionVector], alpha: f32) -> Result<Vec<u8>, String> {
         let mut output = Vec::with_capacity(frame1.len());
         for i in 0..frame1.len() {
             let p1 = frame1[i] as f32;
@@ -627,20 +568,14 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
         [0.8 * density, 0.8 * density, 0.7 * density]
     }
 
-    pub fn compute_volumetric_shafts(
-        &self,
-        _view: [f32; 3],
-        _light: [f32; 3],
-        steps: &[f32],
-    ) -> Result<f32, String> {
+    pub fn compute_volumetric_shafts(&self, _view: [f32; 3], _light: [f32; 3], steps: &[f32]) -> Result<f32, String> {
         let first = steps.first().copied().unwrap_or(1.0);
         Ok(first * self.fog_density)
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Volumetric Atmospheric Raymarching Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Volumetric Atmospheric Raymarching Engine".to_string(),
             target_subsystem: "Atmospheric God-Ray Engine".to_string(),
             original_suite: "ArtCraft Volumetric Studio".to_string(),
             components_added: vec![
@@ -730,24 +665,14 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         Self
     }
 
-    pub fn convert_color_space(
-        &mut self,
-        _source: WorkingColorSpace,
-        target: WorkingColorSpace,
-        rgb: &mut [f32; 3],
-    ) {
+    pub fn convert_color_space(&mut self, _source: WorkingColorSpace, target: WorkingColorSpace, rgb: &mut [f32; 3]) {
         self.current_space = target;
         rgb[0] *= 0.9;
         rgb[1] *= 0.9;
         rgb[2] *= 0.9;
     }
 
-    pub fn apply_aces_transform(
-        &self,
-        rgb: [f32; 3],
-        _src: WorkingColorSpace,
-        _dst: WorkingColorSpace,
-    ) -> [f32; 3] {
+    pub fn apply_aces_transform(&self, rgb: [f32; 3], _src: WorkingColorSpace, _dst: WorkingColorSpace) -> [f32; 3] {
         [rgb[0] * 1.1, rgb[1] * 1.05, rgb[2] * 0.95]
     }
 
@@ -808,12 +733,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         Self::default()
     }
 
-    pub fn composite_stereoscopic_pair(
-        &self,
-        left: &[u8],
-        right: &[u8],
-        format: StereoFormat,
-    ) -> Result<Vec<u8>, String> {
+    pub fn composite_stereoscopic_pair(&self, left: &[u8], right: &[u8], format: StereoFormat) -> Result<Vec<u8>, String> {
         if left.is_empty() || right.is_empty() || left.len() != right.len() {
             return Err("Invalid or mismatched eye buffers".to_string());
         }
@@ -838,12 +758,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         Ok(output)
     }
 
-    pub fn generate_stereoscopic_parallax(
-        &self,
-        left: &[u8],
-        right: &mut [u8],
-        depth: f32,
-    ) -> Result<usize, String> {
+    pub fn generate_stereoscopic_parallax(&self, left: &[u8], right: &mut [u8], depth: f32) -> Result<usize, String> {
         if left.len() != right.len() {
             return Err("Left and right eye buffer lengths mismatch".to_string());
         }
@@ -909,12 +824,7 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
         Ok(())
     }
 
-    pub fn render_procedural_fractal(
-        &self,
-        width: usize,
-        height: usize,
-        _scale: f32,
-    ) -> Result<Vec<u8>, String> {
+    pub fn render_procedural_fractal(&self, width: usize, height: usize, _scale: f32) -> Result<Vec<u8>, String> {
         Ok(vec![128u8; width * height * 4])
     }
 
@@ -925,8 +835,7 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Procedural VFX Fractal Fluid Simulation Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Procedural VFX Fractal Fluid Simulation Engine".to_string(),
             target_subsystem: "VFX Fluid Dynamics Studio".to_string(),
             original_suite: "ArtCraft Fluid Dynamics Engine".to_string(),
             components_added: vec![
@@ -970,12 +879,7 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         }
     }
 
-    pub fn temporal_denoise_frames(
-        &self,
-        frames: &[Vec<u8>],
-        _width: u32,
-        _height: u32,
-    ) -> Result<Vec<u8>, String> {
+    pub fn temporal_denoise_frames(&self, frames: &[Vec<u8>], _width: u32, _height: u32) -> Result<Vec<u8>, String> {
         if frames.is_empty() {
             return Err("Frames history empty".to_string());
         }
@@ -983,34 +887,22 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
         let mut output = vec![0u8; len];
         let num_frames = frames.len() as f32;
         for i in 0..len {
-            let sum: f32 = frames
-                .iter()
-                .map(|f: &Vec<u8>| f.get(i).copied().unwrap_or(0) as f32)
-                .sum();
+            let sum: f32 = frames.iter().map(|f: &Vec<u8>| f.get(i).copied().unwrap_or(0) as f32).sum();
             output[i] = (sum / num_frames) as u8;
         }
         Ok(output)
     }
 
-    pub fn apply_synthetic_grain(
-        &self,
-        frame: &mut [u8],
-        profile: &FilmGrainProfile,
-    ) -> Result<(), String> {
+    pub fn apply_synthetic_grain(&self, frame: &mut [u8], profile: &FilmGrainProfile) -> Result<(), String> {
         for (i, byte) in frame.iter_mut().enumerate() {
-            let noise =
-                (((i + 1) as f32 * profile.grain_size).sin() * profile.intensity * 255.0) as i16;
+            let noise = (((i + 1) as f32 * profile.grain_size).sin() * profile.intensity * 255.0) as i16;
             let offset = if noise == 0 { 1 } else { noise };
             *byte = ((*byte as i16) + offset).clamp(0, 255) as u8;
         }
         Ok(())
     }
 
-    pub fn process_temporal_denoise(
-        &self,
-        history: &[&[u8]],
-        output: &mut [u8],
-    ) -> Result<usize, String> {
+    pub fn process_temporal_denoise(&self, history: &[&[u8]], output: &mut [u8]) -> Result<usize, String> {
         if history.is_empty() {
             return Err("Empty history".to_string());
         }
@@ -1082,10 +974,7 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
     }
 
     pub fn extract_id_matte(&self, layer_name: &str, output: &mut [u8]) -> Result<(), String> {
-        let layer = self
-            .layers
-            .get(layer_name)
-            .ok_or("Cryptomatte layer missing")?;
+        let layer = self.layers.get(layer_name).ok_or("Cryptomatte layer missing")?;
         let val = (layer.coverage * 255.0) as u8;
         for byte in output.iter_mut() {
             *byte = val;
@@ -1162,8 +1051,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Expression Scripting & Rigging Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Expression Scripting & Rigging Engine".to_string(),
             target_subsystem: "Expression Scripting Engine".to_string(),
             original_suite: "ArtCraft Expression Rigging".to_string(),
             components_added: vec![
@@ -1217,30 +1105,15 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
     }
 
     pub fn evaluate_effectcraft_parity(&mut self) -> bool {
-        let _shader_ok = self
-            .shader_graph
-            .compile_glsl_shader("chroma_distort", "void main(){}")
-            .is_ok();
+        let _shader_ok = self.shader_graph.compile_glsl_shader("chroma_distort", "void main(){}").is_ok();
         let _particle_ok = self.particle_physics.emit_particles("smoke", 100).is_ok();
         let frame = vec![0u8, 200u8, 0u8, 255u8];
         let _matte_ok = self.neural_matte.execute_auto_keying(&frame, 1, 1).is_ok();
-        let _audio_ok = self
-            .audio_visualizer
-            .process_audio_buffer(&[0.5, 0.8, 0.2, 0.9, 0.1])
-            .is_ok();
-        let pts = vec![Point3D {
-            position: [1.0, 2.0, 5.0],
-            color: [1.0, 0.0, 0.0],
-        }];
+        let _audio_ok = self.audio_visualizer.process_audio_buffer(&[0.5, 0.8, 0.2, 0.9, 0.1]).is_ok();
+        let pts = vec![Point3D { position: [1.0, 2.0, 5.0], color: [1.0, 0.0, 0.0] }];
         let _spatial_ok = self.spatial_3d.project_points(&pts).is_ok();
-        let _ofx_ok = self
-            .openfx_adapter
-            .load_openfx_plugin("com.artcraft.FilmGrain")
-            .is_ok();
-        let _optical_ok = self
-            .optical_flow
-            .compute_motion_vectors(&[0u8; 4], &[10u8; 4], 1, 1)
-            .is_ok();
+        let _ofx_ok = self.openfx_adapter.load_openfx_plugin("com.artcraft.FilmGrain").is_ok();
+        let _optical_ok = self.optical_flow.compute_motion_vectors(&[0u8; 4], &[10u8; 4], 1, 1).is_ok();
         true
     }
 
@@ -1282,14 +1155,11 @@ pub struct EffectcraftMissingComponentsParityPrSuite {
 
 impl EffectcraftMissingComponentsParityPrSuite {
     pub fn new() -> Self {
-        Self {
-            gateway: SovereignEffectcraftArtcraftParityPrGateway::new(),
-        }
+        Self { gateway: SovereignEffectcraftArtcraftParityPrGateway::new() }
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_effectcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 14
+        self.gateway.evaluate_effectcraft_parity() && self.gateway.collect_all_proposals().len() == 14
     }
 }
 

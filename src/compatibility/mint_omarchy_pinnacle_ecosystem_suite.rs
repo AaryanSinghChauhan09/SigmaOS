@@ -92,30 +92,22 @@ impl MintSoftwareSourcesPpaEngine {
         if key_id.is_empty() || fingerprint.len() < 16 {
             return false;
         }
-        self.trusted_keys
-            .insert(key_id.to_string(), fingerprint.to_string());
+        self.trusted_keys.insert(key_id.to_string(), fingerprint.to_string());
         true
     }
 
     pub fn export_deb822_file(&self, repo_name: &str) -> Option<String> {
-        self.sources
-            .iter()
-            .find(|s| s.repo_name == repo_name)
-            .map(|s| {
-                format!(
-                    "Types: deb\n\
+        self.sources.iter().find(|s| s.repo_name == repo_name).map(|s| {
+            format!(
+                "Types: deb\n\
                  URIs: {}\n\
                  Suites: {}\n\
                  Components: {}\n\
                  Signed-By: {}\n\
                  Enabled: {}\n",
-                    s.uris,
-                    s.suites,
-                    s.components,
-                    s.signed_by,
-                    if s.is_enabled { "yes" } else { "no" }
-                )
-            })
+                s.uris, s.suites, s.components, s.signed_by, if s.is_enabled { "yes" } else { "no" }
+            )
+        })
     }
 }
 
@@ -191,21 +183,14 @@ impl MintUpdateKernelLifecycleEngine {
     }
 
     pub fn can_safely_remove(&self, version: &str) -> Result<(), &'static str> {
-        let kernel = self
-            .available_kernels
-            .iter()
-            .find(|k| k.version == version)
+        let kernel = self.available_kernels.iter().find(|k| k.version == version)
             .ok_or("Kernel not found")?;
 
         if kernel.is_active_booted {
             return Err("Cannot remove currently active booted kernel");
         }
 
-        let installed_count = self
-            .available_kernels
-            .iter()
-            .filter(|k| k.is_installed)
-            .count();
+        let installed_count = self.available_kernels.iter().filter(|k| k.is_installed).count();
         if installed_count <= 1 {
             return Err("Cannot remove only installed fallback kernel");
         }
@@ -280,11 +265,7 @@ impl MintDesktopSpicesCatalogEngine {
     }
 
     pub fn query_by_type(&self, st: SpiceType) -> Vec<SpiceMetadata> {
-        self.spices
-            .values()
-            .filter(|s| s.spice_type == st)
-            .cloned()
-            .collect()
+        self.spices.values().filter(|s| s.spice_type == st).cloned().collect()
     }
 }
 
@@ -394,14 +375,7 @@ impl OmarchyFastfetchAsciiLogoEngine {
              ╚════██║██║██║   ██║██║╚██╔╝██║██╔══██║ Uptime: {} hours, {} mins\n\
              ███████║██║╚██████╔╝██║ ╚═╝ ██║██║  ██║ Memory: {}MB / {}MB\n\
              ╚══════╝╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝ WM: {} | Terminal: {}\n",
-            t.os_name,
-            t.kernel_version,
-            uptime_hours,
-            uptime_mins,
-            t.memory_used_mb,
-            t.memory_total_mb,
-            t.wm_name,
-            t.terminal_name
+            t.os_name, t.kernel_version, uptime_hours, uptime_mins, t.memory_used_mb, t.memory_total_mb, t.wm_name, t.terminal_name
         )
     }
 }
@@ -444,7 +418,9 @@ impl OmarchyLazygitKeybindEngine {
              \x20\x20\x20\x20colorArg: always\n\
              \x20\x20\x20\x20pager: {}\n\
              \x20\x20\x20\x20sideBySide: {}\n",
-            self.theme_selected_line_bg, self.paging_tool, self.side_by_side
+            self.theme_selected_line_bg,
+            self.paging_tool,
+            self.side_by_side
         )
     }
 }
@@ -547,10 +523,7 @@ mod tests {
 
         // Assert
         assert!(remove_active.is_err());
-        assert_eq!(
-            remove_active.err().unwrap(),
-            "Cannot remove currently active booted kernel"
-        );
+        assert_eq!(remove_active.err().unwrap(), "Cannot remove currently active booted kernel");
         assert!(remove_fallback.is_ok());
     }
 
