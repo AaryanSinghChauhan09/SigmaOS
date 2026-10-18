@@ -2,6 +2,8 @@
 // SigmaOS - Creative Suite Module
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
+pub mod anicraft;
+pub mod anicraft_missing_components_parity_pr;
 pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
@@ -178,4 +180,14 @@ pub use figcraft_missing_components_parity_pr::{
     FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
     FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
     FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use anicraft::{
+    AnimationTrack, CubicBezier, Keyframe as AnicraftKeyframe, SkeletalBone, SovereignAnimationEngine,
+};
+pub use anicraft_missing_components_parity_pr::{
+    AnicraftAudioLipSyncTimelinePrEngine, AnicraftFabrikInverseKinematicsPrEngine,
+    AnicraftMeshDeformationShapeKeysPrEngine, AnicraftNlaTrackClipBlendingPrEngine,
+    AnicraftOnionSkinningPrEngine, AnicraftPrProposalManifest, IkJoint2D, LipSyncMarker, NlaBlendMode,
+    NlaClip, OnionSkinGhost, ShapeKey2D, SovereignAnicraftArtcraftParityPrGateway, VertexDelta2D,
+    VisemeCategory,
 };
