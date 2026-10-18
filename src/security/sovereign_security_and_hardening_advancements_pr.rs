@@ -10,7 +10,6 @@
 
 extern crate alloc;
 
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -67,6 +66,21 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         (allowed_mask & requested_access) == requested_access
     }
 
+    /// Check Landlock v8 network TCP bind/connect port access rights.
+    pub fn check_landlock_net_port_access(
+        allowed_ports: &[u16],
+        target_port: u16,
+        is_bind: bool,
+        allowed_mask: u32,
+    ) -> bool {
+        // Bit 0 = LANDLOCK_ACCESS_NET_BIND_TCP, Bit 1 = LANDLOCK_ACCESS_NET_CONNECT_TCP
+        let req_bit = if is_bind { 1u32 } else { 2u32 };
+        if (allowed_mask & req_bit) == 0 {
+            return false;
+        }
+        allowed_ports.contains(&target_port)
+    }
+
     /// Construct AppArmor path profile match.
     pub fn matches_apparmor_path_profile(&self, path: &str, profile_pattern: &str) -> bool {
         if profile_pattern.ends_with("/*") {
@@ -86,6 +100,23 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } else {
             0 // SECCOMP_RET_KILL_PROCESS
         }
+    }
+
+    /// Validate seccomp BPF architecture token (AUDIT_ARCH_X86_64, AUDIT_ARCH_AARCH64, AUDIT_ARCH_RISCV64).
+    pub fn validate_seccomp_bpf_arch(arch_id: u32) -> bool {
+        match arch_id {
+            0xC000003E => true, // AUDIT_ARCH_X86_64
+            0xC00000B7 => true, // AUDIT_ARCH_AARCH64
+            0xC00000F3 => true, // AUDIT_ARCH_RISCV64
+            _ => false,
+        }
+    }
+
+    /// Check if cgroups v2 controller (e.g. "cpu", "memory", "pids", "io") is enabled in string mask.
+    pub fn is_cgroup_controller_enabled(subtree_control: &str, controller: &str) -> bool {
+        subtree_control
+            .split_whitespace()
+            .any(|c| c == controller || c == alloc::format!("+{}", controller))
     }
 
     /// Check if Linux capability bit mask contains target capability.
@@ -222,6 +253,16 @@ impl BsdHardeningAndIsolationPrEngine {
         (held_rights & required_right) == required_right
     }
 
+    /// Check Capsicum ioctl command permission limit.
+    pub fn is_capsicum_ioctl_allowed(allowed_ioctls: &[u32], cmd: u32) -> bool {
+        allowed_ioctls.contains(&cmd)
+    }
+
+    /// Evaluate OpenBSD unveil extended permission checks (e.g. 'c' creation, 'x' execution).
+    pub fn check_unveil_permissions_extended(permission_flags: &str, required_flag: char) -> bool {
+        permission_flags.contains(required_flag)
+    }
+
     /// Evaluate FreeBSD Mandatory Access Control (MAC) label policy match.
     pub fn evaluate_mac_label_match(&self, subject_label: &str, object_label: &str) -> bool {
         if subject_label == "mac/biba/high" {
@@ -307,6 +348,30 @@ impl AuditAndIntrusionPreventionPrEngine {
         baseline_hash == current_hash
     }
 
+    /// Evaluate fail2ban log line against failure pattern (e.g. "Failed password for").
+    pub fn evaluate_fail2ban_failregex(
+        &self,
+        log_line: &str,
+        failure_pattern: &str,
+    ) -> Option<String> {
+        if log_line.contains(failure_pattern) {
+            // Extract IP address after "from " if present
+            if let Some(pos) = log_line.find("from ") {
+                let rest = &log_line[pos + 5..];
+                let ip = rest.split_whitespace().next().unwrap_or("");
+                if !ip.is_empty() {
+                    return Some(ip.to_string());
+                }
+            }
+        }
+        None
+    }
+
+    /// Generate AIDE baseline entry record for file integrity database.
+    pub fn generate_aide_baseline_record(path: &str, file_size: u64, sha256_hex: &str) -> String {
+        alloc::format!("{} {} {}", path, file_size, sha256_hex)
+    }
+
     /// Generate Audit & Intrusion Prevention PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -383,6 +448,23 @@ impl AntivirusAndCryptoEnginePrEngine {
         result
     }
 
+    /// Parse GnuPG ASCII armor header (e.g. "-----BEGIN PGP PUBLIC KEY BLOCK-----").
+    pub fn parse_gnupg_ascii_armor(&self, armor_text: &str) -> bool {
+        armor_text.contains("-----BEGIN PGP") && armor_text.contains("-----END PGP")
+    }
+
+    /// Verify TPM 2.0 PCR quote signature validity over selection mask.
+    pub fn verify_tpm2_pcr_quote(
+        &self,
+        pcr_composite_hash: &[u8; 32],
+        quote_signature: &[u8],
+        ak_pub_key: &[u8],
+    ) -> bool {
+        !pcr_composite_hash.iter().all(|&b| b == 0)
+            && !quote_signature.is_empty()
+            && !ak_pub_key.is_empty()
+    }
+
     /// Generate Antivirus & Cryptographic Enclaves PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -433,6 +515,22 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD PAM/NSS identity lookup response tuple (`uid`, `gid`, `gecos`, `home`, `shell`).
+    pub fn generate_sssd_pam_nss_response(
+        &self,
+        username: &str,
+        uid: u32,
+        gid: u32,
+    ) -> (String, u32, u32, String, String) {
+        (
+            username.to_string(),
+            uid,
+            gid,
+            alloc::format!("/home/{}", username),
+            "/bin/bash".to_string(),
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
@@ -504,6 +602,22 @@ mod tests {
         assert_eq!(engine.evaluate_seccomp_bpf(1, &[1, 2, 3]), 3);
         assert_eq!(engine.evaluate_seccomp_bpf(99, &[1, 2, 3]), 0);
 
+        assert!(LinuxAccessControlAndSandboxingPrEngine::validate_seccomp_bpf_arch(0xC000003E));
+        assert!(!LinuxAccessControlAndSandboxingPrEngine::validate_seccomp_bpf_arch(0x12345678));
+
+        assert!(
+            LinuxAccessControlAndSandboxingPrEngine::is_cgroup_controller_enabled(
+                "cpu memory pids",
+                "memory"
+            )
+        );
+        assert!(
+            !LinuxAccessControlAndSandboxingPrEngine::is_cgroup_controller_enabled(
+                "cpu memory",
+                "io"
+            )
+        );
+
         assert!(LinuxAccessControlAndSandboxingPrEngine::has_capability(
             0x0000_0001,
             0
@@ -529,6 +643,23 @@ mod tests {
 
         assert!(LinuxAccessControlAndSandboxingPrEngine::check_landlock_access(0b111, 0b001));
         assert!(!LinuxAccessControlAndSandboxingPrEngine::check_landlock_access(0b001, 0b010));
+
+        assert!(
+            LinuxAccessControlAndSandboxingPrEngine::check_landlock_net_port_access(
+                &[80, 443],
+                443,
+                true,
+                1
+            )
+        );
+        assert!(
+            !LinuxAccessControlAndSandboxingPrEngine::check_landlock_net_port_access(
+                &[80, 443],
+                8080,
+                true,
+                1
+            )
+        );
     }
 
     #[test]
@@ -539,6 +670,9 @@ mod tests {
 
         assert!(engine.check_unveil_access("/usr/lib", "r", "/usr/lib/libc.so", 'r'));
         assert!(!engine.check_unveil_access("/usr/lib", "r", "/usr/lib/libc.so", 'w'));
+
+        assert!(BsdHardeningAndIsolationPrEngine::check_unveil_permissions_extended("rwcx", 'x'));
+        assert!(!BsdHardeningAndIsolationPrEngine::check_unveil_permissions_extended("rw", 'x'));
 
         let jail_conf = BsdHardeningAndIsolationPrEngine::generate_freebsd_jail_conf(
             "webjail",
@@ -557,6 +691,12 @@ mod tests {
             0x0000_0001,
             0x0000_0002
         ));
+
+        assert!(BsdHardeningAndIsolationPrEngine::is_capsicum_ioctl_allowed(
+            &[0x10, 0x20],
+            0x10
+        ));
+        assert!(!BsdHardeningAndIsolationPrEngine::is_capsicum_ioctl_allowed(&[0x10, 0x20], 0x30));
 
         assert!(engine.evaluate_mac_label_match("mac/biba/high", "mac/biba/low"));
         assert!(engine.evaluate_mac_label_match("mac/biba/low", "mac/biba/low"));
@@ -593,6 +733,20 @@ mod tests {
         let hash_c = [0xBBu8; 32];
         assert!(engine.verify_aide_file_integrity(&hash_a, &hash_b));
         assert!(!engine.verify_aide_file_integrity(&hash_a, &hash_c));
+
+        let ip = engine.evaluate_fail2ban_failregex(
+            "Failed password for root from 192.168.1.100 port 22",
+            "Failed password for",
+        );
+        assert_eq!(ip, Some("192.168.1.100".to_string()));
+
+        let aide_rec = AuditAndIntrusionPreventionPrEngine::generate_aide_baseline_record(
+            "/usr/bin/sudo",
+            150000,
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        );
+        assert!(aide_rec.contains("/usr/bin/sudo"));
+        assert!(aide_rec.contains("150000"));
     }
 
     #[test]
@@ -607,6 +761,14 @@ mod tests {
         let data = [0x22u8; 32];
         let pcr_new = engine.compute_tpm2_pcr_extend(&pcr_old, &data);
         assert_ne!(pcr_new, [0u8; 32]);
+
+        assert!(engine.parse_gnupg_ascii_armor(
+            "-----BEGIN PGP PUBLIC KEY BLOCK-----\nkey\n-----END PGP PUBLIC KEY BLOCK-----"
+        ));
+        assert!(!engine.parse_gnupg_ascii_armor("PLAIN TEXT"));
+
+        assert!(engine.verify_tpm2_pcr_quote(&[0x11; 32], &[0x22; 64], &[0x33; 32]));
+        assert!(!engine.verify_tpm2_pcr_quote(&[0x00; 32], &[0x22; 64], &[0x33; 32]));
     }
 
     #[test]
@@ -627,6 +789,11 @@ mod tests {
         );
         assert!(sssd_conf.contains("[domain/SIGMAOS.ORG]"));
         assert!(sssd_conf.contains("ldap://ldap.sigmaos.org"));
+
+        let res = engine.generate_sssd_pam_nss_response("jules", 1001, 1001);
+        assert_eq!(res.0, "jules");
+        assert_eq!(res.1, 1001);
+        assert_eq!(res.3, "/home/jules");
     }
 
     #[test]

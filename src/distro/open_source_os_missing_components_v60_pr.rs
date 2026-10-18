@@ -77,11 +77,13 @@ impl Linux616SchedExtBcachefsV60Engine {
     }
 
     pub fn register_sched_policy(&mut self, name: &str, ebpf_bytecode_hash: &str) {
-        self.sched_policies.insert(name.to_string(), ebpf_bytecode_hash.to_string());
+        self.sched_policies
+            .insert(name.to_string(), ebpf_bytecode_hash.to_string());
     }
 
     pub fn register_storage_tier(&mut self, mount_path: &str, capacity_bytes: u64) {
-        self.bcachefs_tiers.insert(mount_path.to_string(), capacity_bytes);
+        self.bcachefs_tiers
+            .insert(mount_path.to_string(), capacity_bytes);
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV60 {
@@ -408,20 +410,28 @@ impl SovereignOpenSourceOsV60MasterSuite {
     pub fn collect_all_proposals(&self) -> Vec<OpenSourceOsPrProposalV60> {
         vec![
             self.linux_engine.generate_pr_proposal("PR-V60-LINUX-01"),
-            self.freebsd_engine.generate_pr_proposal("PR-V60-FREEBSD-02"),
-            self.openbsd_engine.generate_pr_proposal("PR-V60-OPENBSD-03"),
-            self.dragonfly_engine.generate_pr_proposal("PR-V60-DRAGONFLY-04"),
+            self.freebsd_engine
+                .generate_pr_proposal("PR-V60-FREEBSD-02"),
+            self.openbsd_engine
+                .generate_pr_proposal("PR-V60-OPENBSD-03"),
+            self.dragonfly_engine
+                .generate_pr_proposal("PR-V60-DRAGONFLY-04"),
             self.netbsd_engine.generate_pr_proposal("PR-V60-NETBSD-05"),
             self.haiku_engine.generate_pr_proposal("PR-V60-HAIKU-06"),
             self.plan9_engine.generate_pr_proposal("PR-V60-PLAN9-07"),
-            self.nix_guix_engine.generate_pr_proposal("PR-V60-NIXGUIX-08"),
-            self.illumos_engine.generate_pr_proposal("PR-V60-ILLUMOS-09"),
+            self.nix_guix_engine
+                .generate_pr_proposal("PR-V60-NIXGUIX-08"),
+            self.illumos_engine
+                .generate_pr_proposal("PR-V60-ILLUMOS-09"),
         ]
     }
 
     pub fn compute_v60_parity_score(&self) -> u32 {
         let proposals = self.collect_all_proposals();
-        if proposals.iter().all(|p| p.status == OsPrStatusV60::Validated) {
+        if proposals
+            .iter()
+            .all(|p| p.status == OsPrStatusV60::Validated)
+        {
             100
         } else {
             0
@@ -437,16 +447,28 @@ mod tests {
     fn test_v60_engines_and_proposals() {
         let mut master = SovereignOpenSourceOsV60MasterSuite::new();
 
-        master.linux_engine.register_sched_policy("scx_ai_governor", "0xdeadbeef");
-        master.linux_engine.register_storage_tier("/mnt/photonic", 1_000_000_000_000);
+        master
+            .linux_engine
+            .register_sched_policy("scx_ai_governor", "0xdeadbeef");
+        master
+            .linux_engine
+            .register_storage_tier("/mnt/photonic", 1_000_000_000_000);
 
-        master.freebsd_engine.spawn_vnet_jail("jail01", vec!["CAP_READ", "CAP_WRITE"]);
+        master
+            .freebsd_engine
+            .spawn_vnet_jail("jail01", vec!["CAP_READ", "CAP_WRITE"]);
         master.openbsd_engine.configure_security(1024, 64);
-        master.dragonfly_engine.record_pfs_snapshot("pfs_data", 1700000000);
+        master
+            .dragonfly_engine
+            .record_pfs_snapshot("pfs_data", 1700000000);
         master.netbsd_engine.register_rump_driver("rumpuser_audio");
-        master.haiku_engine.add_attribute_index("BEOS:TYPE", "string");
+        master
+            .haiku_engine
+            .add_attribute_index("BEOS:TYPE", "string");
         master.plan9_engine.mount_synthetic_namespace("#s/proc");
-        master.nix_guix_engine.register_closure_hash("/nix/store/pkg1", "hash_abc");
+        master
+            .nix_guix_engine
+            .register_closure_hash("/nix/store/pkg1", "hash_abc");
         master.illumos_engine.configure_vnic_mesh("vnic0", 128);
 
         let proposals = master.collect_all_proposals();

@@ -67,6 +67,13 @@ pub use effectcraft_missing_components_parity_pr::{
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
     SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine, FigcraftMultiUserCrdtCollaborationPrEngine,
+    FigcraftPrProposalManifest, FigcraftVectorNetworkBooleanOpsPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
+};
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
@@ -153,10 +160,4 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
-};
-pub use figcraft_missing_components_parity_pr::{
-    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
-    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
-    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
-    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
 };
