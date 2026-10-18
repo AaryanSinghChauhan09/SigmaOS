@@ -724,6 +724,9 @@ pub use arch_linux_missing_components_v60_pr::*;
 pub mod arch_linux_missing_components_v61_pr;
 pub use arch_linux_missing_components_v61_pr::*;
 
+pub mod sovereign_global_tech_media_wiki_distro_parity_pr;
+pub use sovereign_global_tech_media_wiki_distro_parity_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
