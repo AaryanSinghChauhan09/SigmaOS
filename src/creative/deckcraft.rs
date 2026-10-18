@@ -215,10 +215,6 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"DECKCRAFT_ZENITH_PRESENTATION_STREAM:\nTitle: ");
-                output.extend_from_slice(deck.title.as_bytes());
-            }
             ExportFormat::Pdf => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
@@ -257,6 +253,11 @@ impl SlideExporterEngine {
                 output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\"><text>");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"</text></svg>");
+            }
+            ExportFormat::Svg => {
+                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<text>");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"</text>\n</svg>");
             }
             ExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");
