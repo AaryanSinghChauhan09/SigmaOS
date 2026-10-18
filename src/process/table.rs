@@ -83,7 +83,11 @@ impl ProcessTable {
         Pid(self.orphan_reaper_pid.load(Ordering::SeqCst))
     }
 
-    pub fn create_process(&self, ppid: Pid, name: &str) -> Result<Arc<ProcessEntry>, ProcessTableError> {
+    pub fn create_process(
+        &self,
+        ppid: Pid,
+        name: &str,
+    ) -> Result<Arc<ProcessEntry>, ProcessTableError> {
         let mut entries = self.entries.lock().unwrap();
         if entries.len() >= self.max_entries {
             return Err(ProcessTableError::TableFull);
@@ -93,7 +97,11 @@ impl ProcessTable {
         let pid = allocator.allocate()?;
 
         let entry = Arc::new(ProcessEntry::new(pid, ppid, name));
-        entry.tracker.lock().unwrap().transition_to(ProcessState::Ready)?;
+        entry
+            .tracker
+            .lock()
+            .unwrap()
+            .transition_to(ProcessState::Ready)?;
 
         entries.insert(pid.0, entry.clone());
         Ok(entry)
