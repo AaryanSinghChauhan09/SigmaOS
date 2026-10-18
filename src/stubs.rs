@@ -126,11 +126,7 @@ pub mod vfs_stubs {
                 last_written: 0,
             }
         }
-        pub fn create_file(
-            &mut self,
-            _file_type: crate::filesystem::FileType,
-            _size: usize,
-        ) -> Result<u64, FsError> {
+        pub fn create_file(&mut self, _file_type: crate::filesystem::FileType, _size: usize) -> Result<u64, FsError> {
             Ok(1)
         }
         pub fn open_file(&mut self, _file_id: u64, _flags: u32) -> Result<i32, FsError> {
