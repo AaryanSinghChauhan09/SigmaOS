@@ -485,10 +485,6 @@ impl Default for SupremePerformanceAddpEngine {
 // 4. SUPREME PERFORMANCE ADDP ENGINE & PR PROPOSAL GENERATOR
 // =========================================================================
 
-pub struct SupremePerformanceAddpEngine {
-    pub is_active: bool,
-}
-
 impl SupremePerformanceAddpEngine {
     pub fn new() -> Self {
         Self { is_active: true }
