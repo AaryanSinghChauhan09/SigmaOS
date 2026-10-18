@@ -1136,8 +1136,8 @@ impl SovereignUniversalSubsystemInteropEngine {
         let event = SubsystemInteropEvent {
             event_id: self.event_counter,
             timestamp: self.event_counter * 1000,
-            origin_subsystem: String::from(origin),
-            target_subsystem: String::from(target),
+            origin_subsystem: resolved_origin,
+            target_subsystem: resolved_target,
             event_kind: String::from(kind),
             payload: String::from(payload),
             handled: true,

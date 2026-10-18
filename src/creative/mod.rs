@@ -27,7 +27,6 @@ pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
 pub mod fontcraft_missing_components_parity_pr;
 pub mod gridcraft;
-pub mod wordcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
@@ -101,13 +100,10 @@ pub use effectcraft::{
 };
 pub use effectcraft_artcraft_parity_pr::{
     EffectcraftArtcraftParityPrSuite, EffectcraftArtcraftPrProposalManifest,
-    EffectcraftCameraTracker3dReconstructionPrEngine,
-    EffectcraftCleanPlateWireRemovalPrEngine, EffectcraftColorMatchPytorchGradePrEngine,
-    EffectcraftDeepCompositingExrChannelPrEngine,
-    EffectcraftGpuFluidDynamicsSimulationPrEngine,
-    EffectcraftProjectionMapping3dMeshPrEngine,
-    EffectcraftStereoscopic3dDepthMapPrEngine,
-    EffectcraftSubsurfaceScatteringSkinShaderPrEngine,
+    EffectcraftCameraTracker3dReconstructionPrEngine, EffectcraftCleanPlateWireRemovalPrEngine,
+    EffectcraftColorMatchPytorchGradePrEngine, EffectcraftDeepCompositingExrChannelPrEngine,
+    EffectcraftGpuFluidDynamicsSimulationPrEngine, EffectcraftProjectionMapping3dMeshPrEngine,
+    EffectcraftStereoscopic3dDepthMapPrEngine, EffectcraftSubsurfaceScatteringSkinShaderPrEngine,
     EffectcraftTimeWarpRetimingOpticalFlowPrEngine,
     EffectcraftVolumetricLightingRaymarchingPrEngine,
     SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftArtcraftParityPrGatewayV2,
@@ -204,6 +200,12 @@ pub use photocraft_missing_components_parity_pr::{
     PhotocraftSmartObjectLayerStylePrEngine, PhotocraftVectorMaskPenPathPrEngine,
     SovereignPhotocraftArtcraftParityPrGateway,
 };
+pub use photocraft_missing_components_parity_pr::{
+    PhotocraftAiInpaintingPrEngine, PhotocraftBatchActionMacroPrEngine,
+    PhotocraftColorGradingFrequencySeparationPrEngine, PhotocraftHdrExposureStackingPrEngine,
+    PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
+    PhotocraftVectorMaskPenPathPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
+};
 pub use soundcraft::{
     fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
     SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,
@@ -253,12 +255,13 @@ pub use wordcraft_artcraft_parity_pr::{
     WordcraftTableFormulaChartPrEngine, WordcraftTocEntry,
 };
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine as WordcraftDocumentSecurityWatermarkPrEngineLegacy,
+    SovereignWordcraftArtcraftParityPrGateway,
+    WordcraftDocumentSecurityWatermarkPrEngine as WordcraftDocumentSecurityWatermarkPrEngineLegacy,
     WordcraftEpubPdfBookPublisherPrEngine as WordcraftEpubPdfBookPublisherPrEngineLegacy,
     WordcraftLinguisticAiSpellGrammarPrEngine as WordcraftLinguisticAiSpellGrammarPrEngineLegacy,
     WordcraftMailMergeAutomationPrEngine as WordcraftMailMergeAutomationPrEngineLegacy,
-    WordcraftMissingComponentsParityPrSuite,
-    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine as WordcraftRealtimeCrdtCollabPrEngineLegacy,
+    WordcraftMissingComponentsParityPrSuite, WordcraftPrProposalManifest,
+    WordcraftRealtimeCrdtCollabPrEngine as WordcraftRealtimeCrdtCollabPrEngineLegacy,
     WordcraftReferenceCitationBibliographyPrEngine as WordcraftReferenceCitationBibliographyPrEngineLegacy,
     WordcraftStylesTemplatesThemesPrEngine,
     WordcraftTableFormulaChartPrEngine as WordcraftTableFormulaChartPrEngineLegacy,

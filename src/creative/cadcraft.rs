@@ -1063,7 +1063,11 @@ impl CadCraftMasterPrDeploymentSuite {
         let p2 = sample_sketch.add_point(50.0, 0.0);
         sample_sketch.add_constraint(GeometricConstraint {
             id: 1,
-            constraint_type: GeometricConstraintType::Distance { point1_idx: p1, point2_idx: p2, target_distance: 100.0 },
+            constraint_type: GeometricConstraintType::Distance {
+                point1_idx: p1,
+                point2_idx: p2,
+                target_distance: 100.0,
+            },
             entity_ids: vec![p1 as u32, p2 as u32],
             target_value: 100.0,
             satisfied: true,

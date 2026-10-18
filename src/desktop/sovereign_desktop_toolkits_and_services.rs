@@ -424,7 +424,10 @@ impl SovereignDisplayManagerSuiteEngine {
         );
 
         let mut avatars = BTreeMap::new();
-        avatars.insert("sigma_user".to_string(), "/var/lib/AccountsService/icons/sigma_user.png".to_string());
+        avatars.insert(
+            "sigma_user".to_string(),
+            "/var/lib/AccountsService/icons/sigma_user.png".to_string(),
+        );
 
         Self {
             active_backend: backend,
@@ -462,13 +465,20 @@ impl SovereignDisplayManagerSuiteEngine {
         env.insert("SHELL".to_string(), "/bin/bash".to_string());
 
         match session_type {
-            DesktopSessionType::Wayland | DesktopSessionType::Hyprland | DesktopSessionType::Zenith => {
+            DesktopSessionType::Wayland
+            | DesktopSessionType::Hyprland
+            | DesktopSessionType::Zenith => {
                 env.insert("XDG_SESSION_TYPE".to_string(), "wayland".to_string());
                 env.insert("WAYLAND_DISPLAY".to_string(), "wayland-0".to_string());
-                env.insert("XDG_CURRENT_DESKTOP".to_string(), "SigmaOS:Wayland".to_string());
+                env.insert(
+                    "XDG_CURRENT_DESKTOP".to_string(),
+                    "SigmaOS:Wayland".to_string(),
+                );
                 env.insert("DESKTOP_SESSION".to_string(), "wayland".to_string());
             }
-            DesktopSessionType::X11 | DesktopSessionType::KdePlasma | DesktopSessionType::GnomeShell => {
+            DesktopSessionType::X11
+            | DesktopSessionType::KdePlasma
+            | DesktopSessionType::GnomeShell => {
                 env.insert("XDG_SESSION_TYPE".to_string(), "x11".to_string());
                 env.insert("DISPLAY".to_string(), ":0".to_string());
                 env.insert("XDG_CURRENT_DESKTOP".to_string(), "SigmaOS:X11".to_string());
@@ -677,7 +687,9 @@ impl SovereignGvfsGioEngine {
             volume_events: Vec::new(),
             async_copy_operations: Vec::new(),
         };
-        engine.volume_events.push(GvfsVolumeEvent::DriveConnected("TrashDrive".to_string()));
+        engine
+            .volume_events
+            .push(GvfsVolumeEvent::DriveConnected("TrashDrive".to_string()));
         // Default virtual mount: Trash
         engine
             .mount_uri("trash:///", "/run/user/1000/gvfs/trash")
@@ -729,7 +741,8 @@ impl SovereignGvfsGioEngine {
     pub fn unmount(&mut self, mount_id: usize) -> bool {
         if let Some(m) = self.mounts.iter_mut().find(|m| m.mount_id == mount_id) {
             m.is_mounted = false;
-            self.volume_events.push(GvfsVolumeEvent::MountRemoved(mount_id));
+            self.volume_events
+                .push(GvfsVolumeEvent::MountRemoved(mount_id));
             true
         } else {
             false
@@ -1063,24 +1076,44 @@ impl SovereignXdgDesktopPortalEngine {
     }
 
     pub fn set_mime_association(&mut self, mime_type: &str, app_id: &str) {
-        self.mime_apps.insert(mime_type.to_string(), app_id.to_string());
+        self.mime_apps
+            .insert(mime_type.to_string(), app_id.to_string());
     }
 
     pub fn handle_portal_open_uri(&mut self, app_id: &str, uri: &str) -> Result<String, String> {
-        let key = (app_id.to_string(), "org.freedesktop.portal.OpenURI".to_string());
-        self.portal_permissions.insert(key, PortalPermissionState::Granted);
+        let key = (
+            app_id.to_string(),
+            "org.freedesktop.portal.OpenURI".to_string(),
+        );
+        self.portal_permissions
+            .insert(key, PortalPermissionState::Granted);
         self.xdg_open(uri)
     }
 
-    pub fn handle_portal_screenshot(&mut self, app_id: &str, interactive: bool) -> Result<String, String> {
-        let key = (app_id.to_string(), "org.freedesktop.portal.Screenshot".to_string());
-        self.portal_permissions.insert(key, PortalPermissionState::Granted);
-        Ok(format!("Portal Screenshot captured for '{}' (interactive={})", app_id, interactive))
+    pub fn handle_portal_screenshot(
+        &mut self,
+        app_id: &str,
+        interactive: bool,
+    ) -> Result<String, String> {
+        let key = (
+            app_id.to_string(),
+            "org.freedesktop.portal.Screenshot".to_string(),
+        );
+        self.portal_permissions
+            .insert(key, PortalPermissionState::Granted);
+        Ok(format!(
+            "Portal Screenshot captured for '{}' (interactive={})",
+            app_id, interactive
+        ))
     }
 
     pub fn handle_portal_location(&mut self, app_id: &str) -> Result<(f64, f64), String> {
-        let key = (app_id.to_string(), "org.freedesktop.portal.Location".to_string());
-        self.portal_permissions.insert(key, PortalPermissionState::Granted);
+        let key = (
+            app_id.to_string(),
+            "org.freedesktop.portal.Location".to_string(),
+        );
+        self.portal_permissions
+            .insert(key, PortalPermissionState::Granted);
         Ok((37.7749, -122.4194)) // Mock lat, lon
     }
 
@@ -1306,7 +1339,9 @@ impl SovereignFontAndTextLayoutEngine {
     }
 
     pub fn harfbuzz_shape_text_bidi(&mut self, text: &str) -> usize {
-        let is_rtl = text.chars().any(|c| (c as u32) >= 0x0590 && (c as u32) <= 0x08FF);
+        let is_rtl = text
+            .chars()
+            .any(|c| (c as u32) >= 0x0590 && (c as u32) <= 0x08FF);
         self.harfbuzz_shape_text(text, is_rtl)
     }
 
@@ -1588,7 +1623,10 @@ impl SovereignDesktopNotificationDaemonEngine {
     }
 
     pub fn resolve_canberra_sound_event(&self, sound_event: &str) -> String {
-        format!("/usr/share/sounds/{}/stereo/{}.ogg", self.sound_theme_name, sound_event)
+        format!(
+            "/usr/share/sounds/{}/stereo/{}.ogg",
+            self.sound_theme_name, sound_event
+        )
     }
 
     pub fn close_notification(&mut self, id: u32) -> bool {
@@ -1790,9 +1828,9 @@ impl SovereignClipboardManagerEngine {
             .iter()
             .filter(|e| {
                 !e.is_secret
-                    && e.mime_map.values().any(|v| {
-                        String::from_utf8_lossy(v).contains(query)
-                    })
+                    && e.mime_map
+                        .values()
+                        .any(|v| String::from_utf8_lossy(v).contains(query))
             })
             .collect()
     }
@@ -2105,8 +2143,12 @@ mod tests {
         let res_js = polkit.check_authorization("sigma_user", &[], "org.sigmaos.device.drive");
         assert_eq!(res_js, PolkitResult::Yes);
 
-        let subj = PolkitSubject::UnixProcess { pid: 1234, start_time: 5000 };
-        let res_subj = polkit.check_authorization_subject(&subj, "org.freedesktop.accounts.user-administration");
+        let subj = PolkitSubject::UnixProcess {
+            pid: 1234,
+            start_time: 5000,
+        };
+        let res_subj = polkit
+            .check_authorization_subject(&subj, "org.freedesktop.accounts.user-administration");
         assert_eq!(res_subj, PolkitResult::Yes);
 
         let res = polkit.check_authorization(
@@ -2118,7 +2160,10 @@ mod tests {
 
         let mut portal = SovereignXdgDesktopPortalEngine::new();
         portal.set_mime_association("image/png", "org.sigmaos.pix.desktop");
-        assert_eq!(portal.query_mime_association("image/png"), Some("org.sigmaos.pix.desktop".to_string()));
+        assert_eq!(
+            portal.query_mime_association("image/png"),
+            Some("org.sigmaos.pix.desktop".to_string())
+        );
 
         let app_res = portal.handle_portal_open_uri("org.sigmaos.browser", "https://sigmaos.org");
         assert!(app_res.unwrap().contains("browser"));
