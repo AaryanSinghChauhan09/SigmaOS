@@ -31,7 +31,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference behavior
+## Reference study (Upstream study)
 
 <!-- Required for lifecycle, ABI, or memory changes -->
 
@@ -41,7 +41,7 @@
 - New behavior:
 - Compatibility impact:
 
-## Changes
+## Changes (What SigmaOS adopts)
 
 -
 -
@@ -59,7 +59,7 @@
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Evidence
+## Evidence (Reviewer checklist)
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -79,7 +79,7 @@
 - [ ] Memory documentation
 - [ ] Boot matrix, if applicable
 
-## Risks and rollback
+## Risks and rollback (Safety and rollback)
 
 - Risk:
 - Rollback:
