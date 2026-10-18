@@ -113,8 +113,7 @@ impl ShaderFilterGraphPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalSpec {
-            pr_title: "feat(effectcraft): Implement Real-time GPU Shader Filter Graph Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Real-time GPU Shader Filter Graph Engine".to_string(),
             target_subsystem: "GPU Shader Graph Compositor".to_string(),
             original_suite: "ArtCraft EffectCraft Shader Graph".to_string(),
             components_added: vec![
@@ -353,8 +352,7 @@ impl AudioReactiveVisualizerPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalSpec {
-            pr_title: "feat(effectcraft): Implement Audio Reactive Frequency Spectrum Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Audio Reactive Frequency Spectrum Engine".to_string(),
             target_subsystem: "Audio Reactive Motion Graphics".to_string(),
             original_suite: "ArtCraft Audio Visualizer".to_string(),
             components_added: vec![
@@ -520,11 +518,7 @@ impl ArtCraftOpenFxPluginPrEngine {
         Ok(())
     }
 
-    pub fn render_plugin_effect(
-        &self,
-        _plugin_id: &str,
-        input_frame: &[u8],
-    ) -> Result<Vec<u8>, String> {
+    pub fn render_plugin_effect(&self, _plugin_id: &str, input_frame: &[u8]) -> Result<Vec<u8>, String> {
         Ok(input_frame.to_vec())
     }
 
@@ -678,12 +672,7 @@ pub struct VolumetricLightingAtmosphericRaymarchPrEngine {
 
 impl VolumetricLightingAtmosphericRaymarchPrEngine {
     pub fn new() -> Self {
-        Self {
-            light_shafts: Vec::new(),
-            fog_density: 0.05,
-            mie_scattering_g: 0.7,
-            raymarch_steps: 32,
-        }
+        Self { light_shafts: Vec::new(), fog_density: 0.05, mie_scattering_g: 0.7, raymarch_steps: 32 }
     }
 
     pub fn add_light_shaft(&mut self, shaft: LightShaft) {
@@ -706,8 +695,7 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalSpec {
-            pr_title: "feat(effectcraft): Implement Volumetric Atmospheric Raymarching Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Volumetric Atmospheric Raymarching Engine".to_string(),
             target_subsystem: "Atmospheric God-Ray Engine".to_string(),
             original_suite: "ArtCraft Volumetric Studio".to_string(),
             components_added: vec![
@@ -956,8 +944,7 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalSpec {
-            pr_title: "feat(effectcraft): Implement Procedural VFX Fractal Fluid Simulation Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Procedural VFX Fractal Fluid Simulation Engine".to_string(),
             target_subsystem: "VFX Fluid Dynamics Studio".to_string(),
             original_suite: "ArtCraft Fluid Dynamics Engine".to_string(),
             components_added: vec![
@@ -1194,8 +1181,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
         EffectcraftPrProposalSpec {
-            pr_title: "feat(effectcraft): Implement Expression Scripting & Rigging Engine"
-                .to_string(),
+            pr_title: "feat(effectcraft): Implement Expression Scripting & Rigging Engine".to_string(),
             target_subsystem: "Expression Scripting Engine".to_string(),
             original_suite: "ArtCraft Expression Rigging".to_string(),
             components_added: vec![

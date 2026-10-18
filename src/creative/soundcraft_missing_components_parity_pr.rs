@@ -86,7 +86,7 @@ impl SoundcraftAdvancedMultiTrackEnginePrEngine {
             time_stretch_ratio: 1.0,
             pitch_shift_semitones: 0.0,
             crossfade_config: ClipCrossfadeConfig {
-                fade_in_samples: 2400, // 50ms at 48kHz
+                fade_in_samples: 2400,  // 50ms at 48kHz
                 fade_out_samples: 2400,
                 shape: FadeCurveShape::SCurve,
             },
@@ -114,12 +114,7 @@ impl SoundcraftAdvancedMultiTrackEnginePrEngine {
     }
 
     /// Apply linear crossfade between two audio clips
-    pub fn apply_crossfade(
-        &self,
-        clip_a: &[f32],
-        clip_b: &[f32],
-        crossfade_samples: usize,
-    ) -> Vec<f32> {
+    pub fn apply_crossfade(&self, clip_a: &[f32], clip_b: &[f32], crossfade_samples: usize) -> Vec<f32> {
         let len_a = clip_a.len();
         let overlap = crossfade_samples.min(len_a).min(clip_b.len());
         let mut result = Vec::from(&clip_a[..len_a - overlap]);
@@ -138,14 +133,11 @@ impl SoundcraftAdvancedMultiTrackEnginePrEngine {
     pub fn generate_proposal(&self) -> SoundcraftPrProposalManifest {
         SoundcraftPrProposalManifest {
             pr_id: 816,
-            pr_title:
-                "feat(soundcraft): Implement Advanced Multi-Track DAW Timeline & Elastic Resampling"
-                    .to_string(),
+            pr_title: "feat(soundcraft): Implement Advanced Multi-Track DAW Timeline & Elastic Resampling".to_string(),
             target_subsystem: "Soundcraft Multi-Track Audio Engine".to_string(),
             original_suite: "ArtCraft SoundCraft DAW Core".to_string(),
             components_added: vec![
-                "Non-destructive clip editing with sub-millisecond timeline sample snapping"
-                    .to_string(),
+                "Non-destructive clip editing with sub-millisecond timeline sample snapping".to_string(),
                 "Equal-power crossfade curves (Linear, Exponential, S-Curve)".to_string(),
                 "Elastic time-stretching & pitch-shifting phase vocoder engine".to_string(),
                 "Flexible multi-bus track routing & sidechain control channels".to_string(),
@@ -226,11 +218,7 @@ impl SoundcraftSpectralSynthesisSamplerPrEngine {
 
         if is_key_down {
             if time_sec < att {
-                if att > 0.0 {
-                    time_sec / att
-                } else {
-                    1.0
-                }
+                if att > 0.0 { time_sec / att } else { 1.0 }
             } else if time_sec < att + dec {
                 let t_dec = (time_sec - att) / dec;
                 1.0 - (1.0 - self.adsr.sustain_level) * t_dec
@@ -279,8 +267,8 @@ impl Default for SoundcraftSpectralSynthesisSamplerPrEngine {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AmbisonicOrder {
     FirstOrderBFormat, // 4 channels (W, X, Y, Z)
-    SecondOrder,       // 9 channels
-    ThirdOrder,        // 16 channels
+    SecondOrder,        // 9 channels
+    ThirdOrder,         // 16 channels
 }
 
 /// 3D Spatial Position Coordinates
@@ -310,17 +298,15 @@ impl SoundcraftSpatial3dAmbisonicMasterPrEngine {
 
     /// Encode mono signal into First-Order Ambisonics (W, X, Y, Z)
     pub fn encode_foa_bformat(&self, mono_sample: f32, pos: Position3D) -> (f32, f32, f32, f32) {
-        let norm = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
-            .sqrt()
-            .max(1e-4);
+        let norm = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z).sqrt().max(1e-4);
         let x_dir = pos.x / norm;
         let y_dir = pos.y / norm;
         let z_dir = pos.z / norm;
 
         let w = mono_sample * 0.7071; // Omni channel W
-        let x = mono_sample * x_dir; // Front-back X
-        let y = mono_sample * y_dir; // Left-right Y
-        let z = mono_sample * z_dir; // Up-down Z
+        let x = mono_sample * x_dir;  // Front-back X
+        let y = mono_sample * y_dir;  // Left-right Y
+        let z = mono_sample * z_dir;  // Up-down Z
 
         (w, x, y, z)
     }
@@ -335,8 +321,7 @@ impl SoundcraftSpatial3dAmbisonicMasterPrEngine {
     pub fn generate_proposal(&self) -> SoundcraftPrProposalManifest {
         SoundcraftPrProposalManifest {
             pr_id: 818,
-            pr_title: "feat(soundcraft): Implement 3D HRTF Ambisonic & Acoustic Reverb Convolution"
-                .to_string(),
+            pr_title: "feat(soundcraft): Implement 3D HRTF Ambisonic & Acoustic Reverb Convolution".to_string(),
             target_subsystem: "Soundcraft 3D Spatial Audio & Surround".to_string(),
             original_suite: "ArtCraft SoundCraft Spatial Mixing".to_string(),
             components_added: vec![
@@ -400,10 +385,7 @@ impl SoundcraftMidiVst3ClapPluginPrEngine {
 
     /// Add automation point to named parameter lane
     pub fn add_automation_point(&mut self, parameter_name: &str, point: AutomationPoint) {
-        self.automation_lanes
-            .entry(parameter_name.to_string())
-            .or_default()
-            .push(point);
+        self.automation_lanes.entry(parameter_name.to_string()).or_default().push(point);
     }
 
     /// Evaluate linearly interpolated automation parameter value at target sample
@@ -424,8 +406,7 @@ impl SoundcraftMidiVst3ClapPluginPrEngine {
             let p0 = &lane[i];
             let p1 = &lane[i + 1];
             if target_sample >= p0.sample_offset && target_sample <= p1.sample_offset {
-                let frac = (target_sample - p0.sample_offset) as f32
-                    / (p1.sample_offset - p0.sample_offset) as f32;
+                let frac = (target_sample - p0.sample_offset) as f32 / (p1.sample_offset - p0.sample_offset) as f32;
                 return Some(p0.value + frac * (p1.value - p0.value));
             }
         }
@@ -435,14 +416,11 @@ impl SoundcraftMidiVst3ClapPluginPrEngine {
     pub fn generate_proposal(&self) -> SoundcraftPrProposalManifest {
         SoundcraftPrProposalManifest {
             pr_id: 819,
-            pr_title:
-                "feat(soundcraft): Implement MIDI 2.0 / MPE Control, Piano Roll & VST3/CLAP Host"
-                    .to_string(),
+            pr_title: "feat(soundcraft): Implement MIDI 2.0 / MPE Control, Piano Roll & VST3/CLAP Host".to_string(),
             target_subsystem: "Soundcraft MIDI & Plugin Interoperability".to_string(),
             original_suite: "ArtCraft SoundCraft Plugin Host".to_string(),
             components_added: vec![
-                "MIDI 2.0 high-resolution velocity & MPE per-note expressive pitch/pressure"
-                    .to_string(),
+                "MIDI 2.0 high-resolution velocity & MPE per-note expressive pitch/pressure".to_string(),
                 "Piano roll event editor with grid snapping & velocity quantization".to_string(),
                 "VST3 and CLAP (Clever Audio Plugin) sandboxed hosting framework".to_string(),
                 "Parameter automation curves with Bezier interpolation lanes".to_string(),
@@ -476,7 +454,7 @@ pub struct LoudnessMeterResult {
 /// Mastering Loudness Metering & Multiband Engine
 #[derive(Debug, Clone)]
 pub struct SoundcraftMasteringLoudnessMeterPrEngine {
-    pub target_lufs: f32,            // e.g. -14.0 LUFS for streaming standards
+    pub target_lufs: f32, // e.g. -14.0 LUFS for streaming standards
     pub ceiling_true_peak_dbfs: f32, // e.g. -1.0 dBFS
 }
 
@@ -535,17 +513,13 @@ impl SoundcraftMasteringLoudnessMeterPrEngine {
     pub fn generate_proposal(&self) -> SoundcraftPrProposalManifest {
         SoundcraftPrProposalManifest {
             pr_id: 820,
-            pr_title:
-                "feat(soundcraft): Implement EBU R128 LUFS Loudness Metering & True-Peak Limiter"
-                    .to_string(),
+            pr_title: "feat(soundcraft): Implement EBU R128 LUFS Loudness Metering & True-Peak Limiter".to_string(),
             target_subsystem: "Soundcraft Mastering & Metering Engine".to_string(),
             original_suite: "ArtCraft SoundCraft Mastering Chain".to_string(),
             components_added: vec![
-                "EBU R128 compliant Integrated, Short-Term & Momentary LUFS loudness meter"
-                    .to_string(),
+                "EBU R128 compliant Integrated, Short-Term & Momentary LUFS loudness meter".to_string(),
                 "True-Peak oversampled inter-sample clipping detector".to_string(),
-                "4-band mastering crossover compressor with lookahead brickwall limiter"
-                    .to_string(),
+                "4-band mastering crossover compressor with lookahead brickwall limiter".to_string(),
                 "Linear-phase dynamic EQ with dynamic frequency sidechain ducking".to_string(),
             ],
             performance_multiplier: "Compliant EBU R128 Broadcast Loudness Metering".to_string(),
@@ -622,16 +596,13 @@ impl SoundcraftRealtimeCollabCrdtPrEngine {
     pub fn generate_proposal(&self) -> SoundcraftPrProposalManifest {
         SoundcraftPrProposalManifest {
             pr_id: 821,
-            pr_title: "feat(soundcraft): Implement CRDT Multi-User DAW Collaboration & Stem Sync"
-                .to_string(),
+            pr_title: "feat(soundcraft): Implement CRDT Multi-User DAW Collaboration & Stem Sync".to_string(),
             target_subsystem: "Soundcraft Collaboration & Session Sync".to_string(),
             original_suite: "ArtCraft SoundCraft Co-Authoring".to_string(),
             components_added: vec![
-                "Conflict-free Replicated Data Type (CRDT) operational audio clip delta sync"
-                    .to_string(),
+                "Conflict-free Replicated Data Type (CRDT) operational audio clip delta sync".to_string(),
                 "Track & region lock matrix for real-time conflict prevention".to_string(),
-                "Peer-to-peer audio stem delta streaming with dynamic bitrate compression"
-                    .to_string(),
+                "Peer-to-peer audio stem delta streaming with dynamic bitrate compression".to_string(),
                 "Point-in-time session snapshot recovery & revision diff visualizer".to_string(),
             ],
             performance_multiplier: "Zero-Latency DAW Co-Editing & Session Sync".to_string(),
@@ -674,9 +645,7 @@ impl SovereignSoundcraftArtcraftParityPrGateway {
     }
 
     pub fn evaluate_soundcraft_parity(&mut self) -> bool {
-        let stretch_res = self
-            .multitrack_engine
-            .time_stretch_buffer(&[0.1, 0.2, 0.3, 0.4], 1.0);
+        let stretch_res = self.multitrack_engine.time_stretch_buffer(&[0.1, 0.2, 0.3, 0.4], 1.0);
         let multitrack_ok = stretch_res.len() == 4;
 
         let grain = GranularGrain {
@@ -688,36 +657,15 @@ impl SovereignSoundcraftArtcraftParityPrGateway {
         let cloud = self.spectral_synth.generate_grain_cloud(&grain, 10);
         let synth_ok = cloud.len() == 10;
 
-        let foa = self.spatial_ambisonic.encode_foa_bformat(
-            0.5,
-            Position3D {
-                x: 0.0,
-                y: 1.0,
-                z: 0.0,
-            },
-        );
+        let foa = self.spatial_ambisonic.encode_foa_bformat(0.5, Position3D { x: 0.0, y: 1.0, z: 0.0 });
         let spatial_ok = (foa.0 - 0.35355).abs() < 1e-3;
 
-        self.midi_plugin_host.add_automation_point(
-            "volume",
-            AutomationPoint {
-                sample_offset: 0,
-                value: 0.0,
-            },
-        );
-        self.midi_plugin_host.add_automation_point(
-            "volume",
-            AutomationPoint {
-                sample_offset: 100,
-                value: 1.0,
-            },
-        );
+        self.midi_plugin_host.add_automation_point("volume", AutomationPoint { sample_offset: 0, value: 0.0 });
+        self.midi_plugin_host.add_automation_point("volume", AutomationPoint { sample_offset: 100, value: 1.0 });
         let auto_val = self.midi_plugin_host.evaluate_automation("volume", 50);
         let midi_ok = auto_val == Some(0.5);
 
-        let meter = self
-            .mastering_meter
-            .measure_loudness(&[0.1, -0.1, 0.1, -0.1]);
+        let meter = self.mastering_meter.measure_loudness(&[0.1, -0.1, 0.1, -0.1]);
         let meter_ok = meter.integrated_lufs < 0.0;
 
         self.crdt_collab.register_user(1);
@@ -742,10 +690,7 @@ impl SovereignSoundcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals
-                .iter()
-                .filter(|p| p.status == "Ready for Merge")
-                .count();
+            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -807,24 +752,13 @@ mod tests {
     #[test]
     fn test_spatial_3d_ambisonic_engine() {
         let engine = SoundcraftSpatial3dAmbisonicMasterPrEngine::new();
-        let (w, x, y, z) = engine.encode_foa_bformat(
-            1.0,
-            Position3D {
-                x: 1.0,
-                y: 0.0,
-                z: 0.0,
-            },
-        );
+        let (w, x, y, z) = engine.encode_foa_bformat(1.0, Position3D { x: 1.0, y: 0.0, z: 0.0 });
         assert!((w - 0.7071).abs() < 1e-3);
         assert_eq!(x, 1.0);
         assert_eq!(y, 0.0);
         assert_eq!(z, 0.0);
 
-        let (left, right) = engine.hrtf_binaural_pan(Position3D {
-            x: 0.5,
-            y: 0.0,
-            z: 0.0,
-        });
+        let (left, right) = engine.hrtf_binaural_pan(Position3D { x: 0.5, y: 0.0, z: 0.0 });
         assert_eq!(left, 0.25);
         assert_eq!(right, 0.75);
     }
@@ -832,20 +766,8 @@ mod tests {
     #[test]
     fn test_midi_vst3_clap_host_engine() {
         let mut engine = SoundcraftMidiVst3ClapPluginPrEngine::new();
-        engine.add_automation_point(
-            "cutoff",
-            AutomationPoint {
-                sample_offset: 10,
-                value: 100.0,
-            },
-        );
-        engine.add_automation_point(
-            "cutoff",
-            AutomationPoint {
-                sample_offset: 20,
-                value: 200.0,
-            },
-        );
+        engine.add_automation_point("cutoff", AutomationPoint { sample_offset: 10, value: 100.0 });
+        engine.add_automation_point("cutoff", AutomationPoint { sample_offset: 20, value: 200.0 });
 
         assert_eq!(engine.evaluate_automation("cutoff", 5), Some(100.0));
         assert_eq!(engine.evaluate_automation("cutoff", 15), Some(150.0));

@@ -406,15 +406,9 @@ impl ArchPaccacheRetentionCleanerPrEngine {
 
     pub fn format_clean_cmd(&self) -> String {
         if self.dry_run {
-            format!(
-                "paccache -rk{} -u -k{} --dryrun",
-                self.keep_versions, self.uninstalled_keep_versions
-            )
+            format!("paccache -rk{} -u -k{} --dryrun", self.keep_versions, self.uninstalled_keep_versions)
         } else {
-            format!(
-                "paccache -rk{} -u -k{}",
-                self.keep_versions, self.uninstalled_keep_versions
-            )
+            format!("paccache -rk{} -u -k{}", self.keep_versions, self.uninstalled_keep_versions)
         }
     }
 
@@ -520,20 +514,11 @@ impl ArchGenfstabLabelUuidGeneratorPrEngine {
 
     pub fn format_genfstab_cmd(&self) -> String {
         if self.use_uuid {
-            format!(
-                "genfstab -U {} >> {}/etc/fstab",
-                self.target_mount, self.target_mount
-            )
+            format!("genfstab -U {} >> {}/etc/fstab", self.target_mount, self.target_mount)
         } else if self.use_partuuid {
-            format!(
-                "genfstab -t PARTUUID {} >> {}/etc/fstab",
-                self.target_mount, self.target_mount
-            )
+            format!("genfstab -t PARTUUID {} >> {}/etc/fstab", self.target_mount, self.target_mount)
         } else {
-            format!(
-                "genfstab -L {} >> {}/etc/fstab",
-                self.target_mount, self.target_mount
-            )
+            format!("genfstab -L {} >> {}/etc/fstab", self.target_mount, self.target_mount)
         }
     }
 

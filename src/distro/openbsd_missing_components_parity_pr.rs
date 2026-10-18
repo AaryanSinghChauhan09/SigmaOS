@@ -138,8 +138,10 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
                 self.pledge_promises.push(promise.to_string());
             }
         }
-        let new_promises: Vec<String> =
-            promises.split_whitespace().map(|s| s.to_string()).collect();
+        let new_promises: Vec<String> = promises
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         self.pledge_promises = new_promises;
         Ok(format!(
             "PR Proposal: Applied OpenBSD pledge promises: {}",
