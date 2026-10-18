@@ -123,7 +123,11 @@ impl FormulaEngine {
                 return None;
             }
         }
-        if index == 0 { None } else { Some(index) }
+        if index == 0 {
+            None
+        } else {
+            Some(index)
+        }
     }
 
     /// Parse cell reference like "A1", "C10" into (col, row) 1-based tuple
@@ -351,7 +355,9 @@ impl Worksheet {
     }
 
     pub fn get_cell_numeric(&self, col: u32, row: u32) -> Option<f64> {
-        self.cells.get(&(col, row)).and_then(|c| c.get_numeric_value())
+        self.cells
+            .get(&(col, row))
+            .and_then(|c| c.get_numeric_value())
     }
 
     /// Evaluate all formulas in the worksheet
@@ -369,7 +375,10 @@ impl Worksheet {
 
     pub fn compute_range_sum(&self, range_ref: &str) -> f64 {
         if let Some(coords) = FormulaEngine::parse_cell_range(range_ref) {
-            coords.iter().filter_map(|c| self.get_cell_numeric(c.0, c.1)).sum()
+            coords
+                .iter()
+                .filter_map(|c| self.get_cell_numeric(c.0, c.1))
+                .sum()
         } else {
             0.0
         }
@@ -447,7 +456,13 @@ pub struct PivotTable {
 }
 
 impl PivotTable {
-    pub fn new(id: u32, name: String, source_range: String, value_field: String, aggregation: AggregationType) -> Self {
+    pub fn new(
+        id: u32,
+        name: String,
+        source_range: String,
+        value_field: String,
+        aggregation: AggregationType,
+    ) -> Self {
         Self {
             id,
             name,
@@ -487,13 +502,32 @@ impl PivotTable {
 
             let result = match self.aggregation {
                 AggregationType::Sum => sum,
-                AggregationType::Average => if count > 0 { sum / count as f64 } else { 0.0 },
+                AggregationType::Average => {
+                    if count > 0 {
+                        sum / count as f64
+                    } else {
+                        0.0
+                    }
+                }
                 AggregationType::Count => count as f64,
-                AggregationType::Min => if count > 0 { min_val } else { 0.0 },
-                AggregationType::Max => if count > 0 { max_val } else { 0.0 },
+                AggregationType::Min => {
+                    if count > 0 {
+                        min_val
+                    } else {
+                        0.0
+                    }
+                }
+                AggregationType::Max => {
+                    if count > 0 {
+                        max_val
+                    } else {
+                        0.0
+                    }
+                }
             };
 
-            self.summary_matrix.insert("Grand Total".to_string(), result);
+            self.summary_matrix
+                .insert("Grand Total".to_string(), result);
         }
     }
 }
@@ -512,7 +546,13 @@ impl PivotTableEngine {
         }
     }
 
-    pub fn create_pivot_table(&mut self, name: String, source_range: String, value_field: String, aggregation: AggregationType) -> u32 {
+    pub fn create_pivot_table(
+        &mut self,
+        name: String,
+        source_range: String,
+        value_field: String,
+        aggregation: AggregationType,
+    ) -> u32 {
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let pt = PivotTable::new(id, name, source_range, value_field, aggregation);
         self.pivot_tables.insert(id, pt);
@@ -552,7 +592,12 @@ pub struct Chart {
 pub struct DataVisualizationEngine;
 
 impl DataVisualizationEngine {
-    pub fn create_chart(id: u32, title: String, chart_type: ChartType, data_range: String) -> Chart {
+    pub fn create_chart(
+        id: u32,
+        title: String,
+        chart_type: ChartType,
+        data_range: String,
+    ) -> Chart {
         Chart {
             id,
             title,
@@ -576,7 +621,9 @@ impl DataVisualizationEngine {
                     match cell_val {
                         CellValue::Number(n) => row_str.push_str(&format!("{}", n)),
                         CellValue::Text(t) => row_str.push_str(t),
-                        CellValue::Boolean(b) => row_str.push_str(if *b { "TRUE" } else { "FALSE" }),
+                        CellValue::Boolean(b) => {
+                            row_str.push_str(if *b { "TRUE" } else { "FALSE" })
+                        }
                         CellValue::Error(err) => row_str.push_str(err),
                         _ => {}
                     }
@@ -628,8 +675,13 @@ impl DataVisualizationEngine {
 
     /// Render chart as SVG representation
     pub fn render_svg_chart(chart: &Chart, values: &[f64]) -> String {
-        let mut svg = String::from("<svg width=\"400\" height=\"300\" xmlns=\"http://www.w3.org/2000/svg\">\n");
-        svg.push_str(&format!("  <text x=\"20\" y=\"30\" font-size=\"16\">{}</text>\n", chart.title));
+        let mut svg = String::from(
+            "<svg width=\"400\" height=\"300\" xmlns=\"http://www.w3.org/2000/svg\">\n",
+        );
+        svg.push_str(&format!(
+            "  <text x=\"20\" y=\"30\" font-size=\"16\">{}</text>\n",
+            chart.title
+        ));
 
         match chart.chart_type {
             ChartType::Bar | ChartType::Column => {
@@ -725,7 +777,12 @@ impl GridcraftPivotTableAnalyticsPrDeployer {
         sheet.set_number(1, 2, 300.0);
 
         let mut pt_engine = PivotTableEngine::new();
-        let pt_id = pt_engine.create_pivot_table("SalesSummary".to_string(), "A1:A2".to_string(), "Sales".to_string(), AggregationType::Sum);
+        let pt_id = pt_engine.create_pivot_table(
+            "SalesSummary".to_string(),
+            "A1:A2".to_string(),
+            "Sales".to_string(),
+            AggregationType::Sum,
+        );
         let pt = pt_engine.pivot_tables.get_mut(&pt_id).unwrap();
         pt.compute_summary(&sheet);
 
@@ -767,7 +824,12 @@ impl GridcraftChartVisualizationPrDeployer {
         sheet.set_number(2, 1, 20.0);
 
         let csv = DataVisualizationEngine::export_to_csv(&sheet);
-        let chart = DataVisualizationEngine::create_chart(1, "Revenue Growth".to_string(), ChartType::Bar, "A1:B1".to_string());
+        let chart = DataVisualizationEngine::create_chart(
+            1,
+            "Revenue Growth".to_string(),
+            ChartType::Bar,
+            "A1:B1".to_string(),
+        );
         let svg = DataVisualizationEngine::render_svg_chart(&chart, &[10.0, 20.0]);
 
         let verified = csv.contains("10,20") && svg.contains("Revenue Growth");
@@ -888,9 +950,7 @@ pub fn init_gridcraft() {
 
 /// Get global Gridcraft engine reference
 pub fn get_gridcraft() -> Option<&'static mut GridcraftEngine> {
-    unsafe {
-        GRIDCRAFT.as_mut()
-    }
+    unsafe { GRIDCRAFT.as_mut() }
 }
 
 #[cfg(test)]
@@ -915,7 +975,7 @@ mod tests {
         assert_eq!(coords.len(), 4);
 
         let mut sheet = Worksheet::new("TestSheet".to_string());
-        sheet.set_number(1, 1, 50.0);  // A1
+        sheet.set_number(1, 1, 50.0); // A1
         sheet.set_number(1, 2, 150.0); // A2
         sheet.set_formula(1, 3, "=SUM(A1:A2)"); // A3
 
@@ -932,7 +992,12 @@ mod tests {
         sheet.set_number(1, 3, 30.0);
 
         let mut pt_engine = PivotTableEngine::new();
-        let pt_id = pt_engine.create_pivot_table("TestPivot".to_string(), "A1:A3".to_string(), "Val".to_string(), AggregationType::Average);
+        let pt_id = pt_engine.create_pivot_table(
+            "TestPivot".to_string(),
+            "A1:A3".to_string(),
+            "Val".to_string(),
+            AggregationType::Average,
+        );
         let pt = pt_engine.pivot_tables.get_mut(&pt_id).unwrap();
         pt.compute_summary(&sheet);
 
@@ -951,7 +1016,12 @@ mod tests {
         let json = DataVisualizationEngine::export_to_json(&sheet);
         assert!(json.contains("100, 200"));
 
-        let chart = DataVisualizationEngine::create_chart(1, "Test Chart".to_string(), ChartType::Bar, "A1:B1".to_string());
+        let chart = DataVisualizationEngine::create_chart(
+            1,
+            "Test Chart".to_string(),
+            ChartType::Bar,
+            "A1:B1".to_string(),
+        );
         let svg = DataVisualizationEngine::render_svg_chart(&chart, &[100.0, 200.0]);
         assert!(svg.contains("<rect"));
     }
