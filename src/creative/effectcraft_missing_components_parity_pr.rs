@@ -1155,12 +1155,6 @@ impl Default for ProceduralVfxFractalFluidSimulationPrEngine {
 }
 
 
-/// Temporal noise reduction & spatial degrain PR engine.
-#[derive(Debug, Clone)]
-pub struct TemporalNoiseReductionMotionDegrainPrEngine {
-    pub spatial_sigma: f32,
-    pub temporal_sigma: f32,
-}
 
 impl TemporalNoiseReductionMotionDegrainPrEngine {
     pub fn new() -> Self {
