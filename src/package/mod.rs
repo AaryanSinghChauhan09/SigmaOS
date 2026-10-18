@@ -230,7 +230,8 @@ pub use dependency_graph::{
     DependencyConstraint, DependencyGraph, PackageNode, PackageVersion, VersionConstraint,
 };
 pub use fedora_dnf::{
-    DnfError, DnfPackage, Repository as DnfRepository, SigmaDNF, Transaction, TransactionOperation,
+    DnfError, DnfPackage, Repository as DnfRepository, SigmaDNF, Transaction,
+    TransactionOperation,
 };
 pub use gentoo_portage::{
     Ebuild, PackageDatabase, PortageError, PortageTree, ProfileManager, SigmaPortage, UseFlag,
