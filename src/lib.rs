@@ -267,6 +267,7 @@ pub use compatibility::mint_omarchy_complete_gap_closure::*;
 pub use compatibility::mint_omarchy_coexistence_interop_engine::*;
 pub use compatibility::mint_omarchy_federated_desktop_engine::*;
 pub use compatibility::mint_omarchy_pinnacle_ecosystem_suite::*;
+pub use compatibility::mint_omarchy_vanguard_subsystem_suite::*;
 pub use compatibility::{
     ApplicationBinary, BinaryFormat, CompatibilityError, CompatibilityManager, CompatibilityMode,
     ContainerRuntime, FedoraMasterPrDeploymentSuite, MintMasterPrDeploymentSuite, TargetPlatform,

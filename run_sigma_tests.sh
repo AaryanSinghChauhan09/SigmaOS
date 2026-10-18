@@ -1948,4 +1948,11 @@ if [ -f "src/compatibility/mint_omarchy_pinnacle_ecosystem_suite.rs" ]; then
     ./build/test_pinnacle
 fi
 
+if [ -f "src/compatibility/mint_omarchy_vanguard_subsystem_suite.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Vanguard Subsystem Suite test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_vanguard_subsystem_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_vanguard
+    ./build/test_vanguard
+fi
+
 echo "All SigmaOS test suites completed."
