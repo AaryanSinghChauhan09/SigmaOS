@@ -46,9 +46,6 @@ pub enum ProjectType {
     LightCraft,
     MediaCraft,
     AudioCraft,
-    Light,
-    Media,
-    Model3D,
 }
 
 /// Project

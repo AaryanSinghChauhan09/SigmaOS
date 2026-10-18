@@ -10,7 +10,6 @@
 
 extern crate alloc;
 
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -147,10 +146,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Check if Landlock access mask is allowed under rule restriction.
-    pub fn check_landlock_access(rule_access: u64, requested_access: u64) -> bool {
-        (requested_access & !rule_access) == 0
-    }
 
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
@@ -430,6 +425,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD domain configuration string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
+            domain, provider, uri
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
