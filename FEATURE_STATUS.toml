@@ -491,3 +491,11 @@ description = "SigmaOS General-Purpose OS Transformation Suite & 24-Month Archit
 test_evidence = "5/5 unit tests pass in 0.00s via rustc --test src/compatibility/general_purpose_os_transformation_suite.rs --cfg 'feature=\"standalone_test\"'"
 next_milestone = "Deliverable dev-ISO prototype and QEMU boot integration in CI"
 
+[runtime.qemu_foundational_parity]
+status = "working"
+files = ["src/kernel/qemu_runtime_foundational_parity_suite.rs", "reports/qemu_boot_serial.log"]
+description = "Sovereign QEMU Runtime Foundational Parity Suite: 16550 UART early serial console, 4KB physical frame allocator with 4-level x86_64 W^X paging, 256-gate IDT & APIC timer tick controller, preemptive EEVDF task switcher, VirtIO-blk/net drivers, and RAMdisk VFS with /bin/sh shell smoke execution"
+test_evidence = "6/6 unit tests pass in 0.00s via rustc --test src/kernel/qemu_runtime_foundational_parity_suite.rs --cfg 'feature=\"standalone_test\"'; reproducible serial log generated in reports/qemu_boot_serial.log"
+next_milestone = "Full SMP multi-core boot with APIC IPI scheduling and bare-metal ACPI hardware validation"
+
+

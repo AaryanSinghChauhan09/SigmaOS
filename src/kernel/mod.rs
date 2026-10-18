@@ -273,3 +273,5 @@ pub mod serial_console;
 pub mod smp_load_balancer;
 pub mod sovereign_parity_apex_v100;
 pub mod wx_pte_hardening;
+pub mod qemu_runtime_foundational_parity_suite;
+pub use qemu_runtime_foundational_parity_suite::*;

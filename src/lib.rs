@@ -348,6 +348,7 @@ pub use drivers::{
 pub use filesystem::{
     FileDescriptor, FilePermissions, FileType, FsError, Inode, VirtualFilesystem,
 };
+pub use kernel::qemu_runtime_foundational_parity_suite::*;
 pub use kernel::roundrobin::SchedulerError as RoundRobinSchedulerError;
 pub use kernel::{
     AiNativeRuntime, AndroidBroadcastReceiverRegistry, BottomHalfKernelThread,

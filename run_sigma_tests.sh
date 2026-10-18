@@ -1962,4 +1962,11 @@ if [ -f "src/compatibility/general_purpose_os_transformation_suite.rs" ]; then
     ./build/test_transform
 fi
 
+if [ -f "src/kernel/qemu_runtime_foundational_parity_suite.rs" ]; then
+    echo "Running Sovereign QEMU Runtime Foundational Parity Suite test suite..."
+    mkdir -p build
+    rustc --test src/kernel/qemu_runtime_foundational_parity_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_qemu_runtime
+    ./build/test_qemu_runtime
+fi
+
 echo "All SigmaOS test suites completed."
