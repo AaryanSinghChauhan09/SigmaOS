@@ -167,13 +167,19 @@ impl SovereignNetworkConfigDaemonsV61Engine {
     pub fn new() -> Self {
         let mut engine = Self {
             interfaces: Vec::new(),
-            netplan_yaml_config: "network:\n  version: 2\n  ethernets:\n    eth0:\n      dhcp4: true\n".to_string(),
-            systemd_networkd_profiles: vec!["[Match]\nName=eth0\n\n[Network]\nDHCP=ipv4\n".to_string()],
+            netplan_yaml_config:
+                "network:\n  version: 2\n  ethernets:\n    eth0:\n      dhcp4: true\n".to_string(),
+            systemd_networkd_profiles: vec![
+                "[Match]\nName=eth0\n\n[Network]\nDHCP=ipv4\n".to_string()
+            ],
         };
         engine.interfaces.push(NetworkInterfaceStateV61 {
             name: "eth0".to_string(),
             mac_address: "02:00:00:A1:B2:C3".to_string(),
-            ip_addresses: vec!["10.0.0.100/24".to_string(), "fe80::a00:27ff:fe00:1/64".to_string()],
+            ip_addresses: vec![
+                "10.0.0.100/24".to_string(),
+                "fe80::a00:27ff:fe00:1/64".to_string(),
+            ],
             mtu: 1500,
             is_up: true,
             managed_by: NetConfigDaemonTypeV61::NetworkManager,
@@ -463,7 +469,8 @@ impl SovereignCryptoTunnelsAndVpnV61Engine {
     pub fn new() -> Self {
         let mut engine = Self {
             tunnels: Vec::new(),
-            crypto_lib_flavor: "Sovereign Unified Crypto (OpenSSL / LibreSSL / GnuTLS Parity)".to_string(),
+            crypto_lib_flavor: "Sovereign Unified Crypto (OpenSSL / LibreSSL / GnuTLS Parity)"
+                .to_string(),
             pqc_handshake_enabled: true,
         };
         engine.tunnels.push(SecurityTunnelV61 {
@@ -627,9 +634,18 @@ mod tests {
     #[test]
     fn test_core_tcpip_stack_v61() {
         let mut engine = SovereignCoreTcpIpStackV61Engine::new();
-        engine.establish_connection("10.0.0.1", "10.0.0.2", 8080, 443, CongestionControlAlgoV61::Bbrv3);
+        engine.establish_connection(
+            "10.0.0.1",
+            "10.0.0.2",
+            8080,
+            443,
+            CongestionControlAlgoV61::Bbrv3,
+        );
         assert_eq!(engine.connections.len(), 1);
-        assert_eq!(engine.connections[0].congestion_algo, CongestionControlAlgoV61::Bbrv3);
+        assert_eq!(
+            engine.connections[0].congestion_algo,
+            CongestionControlAlgoV61::Bbrv3
+        );
 
         let pr = engine.generate_pr_proposal();
         assert_eq!(pr.pr_id, 8008);
