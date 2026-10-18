@@ -67,21 +67,9 @@ impl DefensiveAuditSystem {
         }
     }
 
-    pub fn log_event(
-        &mut self,
-        timestamp: u64,
-        pid: u32,
-        event_type: u32,
-        payload: &[u8],
-    ) -> Result<(), &'static str> {
+    pub fn log_event(&mut self, timestamp: u64, pid: u32, event_type: u32, payload: &[u8]) -> Result<(), &'static str> {
         let payload_str = std::string::String::from_utf8_lossy(payload);
-        self.log.log_event(
-            timestamp,
-            &event_type.to_string(),
-            &pid.to_string(),
-            &payload_str,
-            true,
-        );
+        self.log.log_event(timestamp, &event_type.to_string(), &pid.to_string(), &payload_str, true);
         Ok(())
     }
 

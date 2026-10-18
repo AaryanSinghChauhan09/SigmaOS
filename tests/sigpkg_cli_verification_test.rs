@@ -6,8 +6,8 @@ pub use sigmaos::sigpkg;
 pub use sigmaos::sigpkg::universal_adapter;
 pub use sigmaos::sigpkg::universal_engine;
 
-use sigmaos::sigpkg::universal_adapter::*;
 use sigmaos::sigpkg::*;
+use sigmaos::sigpkg::universal_adapter::*;
 
 #[test]
 fn test_bsd_and_linux_manifest_parsers() {
