@@ -132,15 +132,10 @@ impl ThreeDCraftPbrShaderEngine {
             [0.0, 1.0, 0.0]
         };
 
-        let n_dot_v =
-            (normal[0] * view_dir[0] + normal[1] * view_dir[1] + normal[2] * view_dir[2]).max(0.0);
-        let n_dot_l =
-            (normal[0] * light_dir[0] + normal[1] * light_dir[1] + normal[2] * light_dir[2])
-                .max(0.0);
-        let n_dot_h =
-            (normal[0] * h_norm[0] + normal[1] * h_norm[1] + normal[2] * h_norm[2]).max(0.0);
-        let h_dot_v =
-            (h_norm[0] * view_dir[0] + h_norm[1] * view_dir[1] + h_norm[2] * view_dir[2]).max(0.0);
+        let n_dot_v = (normal[0] * view_dir[0] + normal[1] * view_dir[1] + normal[2] * view_dir[2]).max(0.0);
+        let n_dot_l = (normal[0] * light_dir[0] + normal[1] * light_dir[1] + normal[2] * light_dir[2]).max(0.0);
+        let n_dot_h = (normal[0] * h_norm[0] + normal[1] * h_norm[1] + normal[2] * h_norm[2]).max(0.0);
+        let h_dot_v = (h_norm[0] * view_dir[0] + h_norm[1] * view_dir[1] + h_norm[2] * view_dir[2]).max(0.0);
 
         let dielectric_f0 = [0.04, 0.04, 0.04];
         let f0 = [
@@ -434,9 +429,7 @@ impl ThreeDCraftGltfAnimationParser {
     pub fn generate_proposal(&self) -> ThreeDCraftPrProposalManifest {
         ThreeDCraftPrProposalManifest {
             pr_id: 882,
-            pr_title:
-                "feat(threedcraft): Implement glTF 2.0 Asset & Skeletal Keyframe Animation Parser"
-                    .to_string(),
+            pr_title: "feat(threedcraft): Implement glTF 2.0 Asset & Skeletal Keyframe Animation Parser".to_string(),
             target_subsystem: "3DCraft Animation Engine".to_string(),
             original_suite: "ArtCraft 3DCraft glTF 2.0 Skeletal Rigging".to_string(),
             components_added: vec![
@@ -485,12 +478,7 @@ impl ThreeDCraftCsgBooleanMeshEngine {
         Self
     }
 
-    pub fn evaluate_boolean_operation(
-        &self,
-        mesh_a: &CsgMesh,
-        mesh_b: &CsgMesh,
-        op: CsgBooleanOp,
-    ) -> CsgMesh {
+    pub fn evaluate_boolean_operation(&self, mesh_a: &CsgMesh, mesh_b: &CsgMesh, op: CsgBooleanOp) -> CsgMesh {
         let mut combined_verts = mesh_a.vertex_positions.clone();
         let vertex_offset = combined_verts.len() as u32;
 
@@ -511,16 +499,20 @@ impl ThreeDCraftCsgBooleanMeshEngine {
                     polygon_indices: combined_indices,
                 }
             }
-            CsgBooleanOp::Difference => CsgMesh {
-                name: format!("{} DIFFERENCE {}", mesh_a.name, mesh_b.name),
-                vertex_positions: mesh_a.vertex_positions.clone(),
-                polygon_indices: mesh_a.polygon_indices.clone(),
-            },
-            CsgBooleanOp::Intersection => CsgMesh {
-                name: format!("{} INTERSECTION {}", mesh_a.name, mesh_b.name),
-                vertex_positions: mesh_a.vertex_positions.clone(),
-                polygon_indices: mesh_a.polygon_indices.clone(),
-            },
+            CsgBooleanOp::Difference => {
+                CsgMesh {
+                    name: format!("{} DIFFERENCE {}", mesh_a.name, mesh_b.name),
+                    vertex_positions: mesh_a.vertex_positions.clone(),
+                    polygon_indices: mesh_a.polygon_indices.clone(),
+                }
+            }
+            CsgBooleanOp::Intersection => {
+                CsgMesh {
+                    name: format!("{} INTERSECTION {}", mesh_a.name, mesh_b.name),
+                    vertex_positions: mesh_a.vertex_positions.clone(),
+                    polygon_indices: mesh_a.polygon_indices.clone(),
+                }
+            }
         }
     }
 
@@ -611,9 +603,7 @@ impl ThreeDCraftPrGatewayEngine {
             vertex_positions: vec![[0.5, 0.0, 0.0], [1.5, 0.0, 0.0], [0.5, 1.0, 0.0]],
             polygon_indices: vec![[0, 1, 2]],
         };
-        let csg_res =
-            self.csg_booleans
-                .evaluate_boolean_operation(&box_a, &box_b, CsgBooleanOp::Union);
+        let csg_res = self.csg_booleans.evaluate_boolean_operation(&box_a, &box_b, CsgBooleanOp::Union);
         let csg_ok = csg_res.vertex_positions.len() == 6;
 
         bsdf_ok && bvh_ok && gltf_ok && csg_ok
@@ -633,10 +623,7 @@ impl ThreeDCraftPrGatewayEngine {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals
-                .iter()
-                .filter(|p| p.status == "Ready for Merge")
-                .count();
+            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }

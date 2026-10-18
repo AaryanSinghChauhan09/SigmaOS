@@ -94,8 +94,7 @@ impl VoicecraftNeuralTtsInferencePrEngine {
             let t = frame as f32 * self.hop_length as f32 / self.sample_rate as f32;
             for bin in 0..self.num_mel_bins {
                 let freq = (bin as f32 / self.num_mel_bins as f32) * 8000.0;
-                let val =
-                    ((t * 10.0 + bin as f32 * 0.1).sin() * 0.5 + 0.5) * (-freq / 4000.0).exp();
+                let val = ((t * 10.0 + bin as f32 * 0.1).sin() * 0.5 + 0.5) * (-freq / 4000.0).exp();
                 mel_spec[bin][frame] = val;
             }
         }
@@ -112,13 +111,11 @@ impl VoicecraftNeuralTtsInferencePrEngine {
         let mut pcm = vec![0.0f32; total_samples];
 
         for frame in 0..num_frames {
-            let frame_energy: f32 =
-                mel_spec.iter().map(|bin| bin[frame]).sum::<f32>() / self.num_mel_bins as f32;
+            let frame_energy: f32 = mel_spec.iter().map(|bin| bin[frame]).sum::<f32>() / self.num_mel_bins as f32;
             let start_idx = frame * self.hop_length;
             for i in 0..self.hop_length {
                 if start_idx + i < total_samples {
-                    let phase = (i as f32 / self.hop_length as f32) * 2.0 * 3.14159265 * 440.0
-                        / self.sample_rate as f32;
+                    let phase = (i as f32 / self.hop_length as f32) * 2.0 * 3.14159265 * 440.0 / self.sample_rate as f32;
                     pcm[start_idx + i] = phase.sin() * frame_energy;
                 }
             }
@@ -129,9 +126,7 @@ impl VoicecraftNeuralTtsInferencePrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrProposalManifest {
         VoicecraftPrProposalManifest {
             pr_id: 801,
-            pr_title: String::from(
-                "VoiceCraft FastSpeech2 Neural Acoustic Model & HiFi-GAN Vocoder",
-            ),
+            pr_title: String::from("VoiceCraft FastSpeech2 Neural Acoustic Model & HiFi-GAN Vocoder"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Speech Synthesis Parity"),
             components_added: vec![
@@ -229,9 +224,7 @@ impl VoicecraftAcousticPhonemizerG2pPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrProposalManifest {
         VoicecraftPrProposalManifest {
             pr_id: 802,
-            pr_title: String::from(
-                "VoiceCraft Grapheme-to-Phoneme (G2P) Acoustic Phonemizer Engine",
-            ),
+            pr_title: String::from("VoiceCraft Grapheme-to-Phoneme (G2P) Acoustic Phonemizer Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Phoneme Tokenization Parity"),
             components_added: vec![
@@ -336,9 +329,7 @@ impl VoicecraftRealtimeStreamingDenoiserPrEngine {
             return clean_frame; // Silent noise frame gate
         }
 
-        let gain = (1.0 - (self.noise_floor_energy / frame_energy))
-            .max(0.0)
-            .sqrt();
+        let gain = (1.0 - (self.noise_floor_energy / frame_energy)).max(0.0).sqrt();
         for i in 0..frame.len() {
             clean_frame[i] = frame[i] * gain;
         }
@@ -348,9 +339,7 @@ impl VoicecraftRealtimeStreamingDenoiserPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrProposalManifest {
         VoicecraftPrProposalManifest {
             pr_id: 804,
-            pr_title: String::from(
-                "VoiceCraft Realtime Streaming Denoiser & Spectral Wiener Filter",
-            ),
+            pr_title: String::from("VoiceCraft Realtime Streaming Denoiser & Spectral Wiener Filter"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Audio DSP & Denoising Parity"),
             components_added: vec![
@@ -411,9 +400,7 @@ impl VoicecraftWaylandAccessibilityVoiceControlPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrProposalManifest {
         VoicecraftPrProposalManifest {
             pr_id: 805,
-            pr_title: String::from(
-                "VoiceCraft Wayland Accessibility Voice Control & Intent Parser",
-            ),
+            pr_title: String::from("VoiceCraft Wayland Accessibility Voice Control & Intent Parser"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Wayland Accessibility Parity"),
             components_added: vec![
@@ -421,9 +408,7 @@ impl VoicecraftWaylandAccessibilityVoiceControlPrEngine {
                 String::from("WaylandActionDispatcher"),
                 String::from("VoiceAccessibilityNavigator"),
             ],
-            performance_multiplier: String::from(
-                "10.0x (Zero-Latency Wayland Voice Command Dispatch)",
-            ),
+            performance_multiplier: String::from("10.0x (Zero-Latency Wayland Voice Command Dispatch)"),
             status: String::from("PR_READY"),
         }
     }
@@ -467,20 +452,13 @@ impl SovereignVoicecraftArtcraftParityPrGateway {
     /// Export aggregated PR proposals formatted as Markdown documentation
     pub fn export_pr_manifest_markdown(&self) -> String {
         let manifests = self.generate_all_pr_manifests();
-        let mut md =
-            String::from("# VoiceCraft & ArtCraft Missing Components Parity PR Proposal\n\n");
+        let mut md = String::from("# VoiceCraft & ArtCraft Missing Components Parity PR Proposal\n\n");
 
         for m in manifests {
             md.push_str(&format!("## PR #{}: {}\n", m.pr_id, m.pr_title));
-            md.push_str(&format!(
-                "- **Target Subsystem:** `{}`\n",
-                m.target_subsystem
-            ));
+            md.push_str(&format!("- **Target Subsystem:** `{}`\n", m.target_subsystem));
             md.push_str(&format!("- **Original Suite:** {}\n", m.original_suite));
-            md.push_str(&format!(
-                "- **Performance Multiplier:** {}\n",
-                m.performance_multiplier
-            ));
+            md.push_str(&format!("- **Performance Multiplier:** {}\n", m.performance_multiplier));
             md.push_str(&format!("- **Status:** {}\n", m.status));
             md.push_str("- **Components Added:**\n");
             for c in m.components_added {
@@ -556,10 +534,7 @@ mod tests {
     fn test_wayland_accessibility_voice_control_engine() {
         let mut engine = VoicecraftWaylandAccessibilityVoiceControlPrEngine::new();
         let intent = engine.parse_intent("open terminal");
-        assert_eq!(
-            intent,
-            WaylandVoiceIntent::LaunchApp(String::from("ghostty"))
-        );
+        assert_eq!(intent, WaylandVoiceIntent::LaunchApp(String::from("ghostty")));
     }
 
     #[test]
