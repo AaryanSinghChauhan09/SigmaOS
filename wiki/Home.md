@@ -47,7 +47,6 @@
 - [Udev & Devd Hotplug Device Component Guide](./Udev-Devd-Hotplug-Device-Component-Guide.md) &ndash; Dynamic /dev node synthesizer, netlink uevent dispatcher, and persistent symlinks.
 - [Watchdog Hardware Recovery Component Guide](./Watchdog-Hardware-Recovery-Component-Guide.md) &ndash; Hardware watchdog timers, ping heartbeat daemon, and panic recovery reset.
 - [CachyOS BORE Scheduler Component Guide](./Cachyos-Bore-Component-Guide.md) &ndash; Interactive desktop responsiveness and low-latency scheduling.
-- [Rust OSDev Ecosystem Synthesis & Parity](./42-Rust-OSDev-Ecosystem-Synthesis-And-Parity.md) &ndash; Bare-metal Safe-Rust abstractions synthesizing 11 landmark `rust-osdev` crates.
 
 ---
 

@@ -4,7 +4,7 @@
 
 This Pull Request proposal introduces native, zero-dependency `#![no_std]` Safe-Rust abstractions for key kernel, bootloader, memory management, and hardware driver paradigms inspired by the landmark open-source [`rust-osdev`](https://github.com/rust-osdev) ecosystem.
 
-By synthesizing core architectural patterns from `bootloader`, `x86_64`, `volatile`, `uart_16550`, `linked_list_allocator`, `pic8259`, `acpi`, `uefi-rs`, `spin`, `pci_types`, `vga`, and `raw-cpuid`, SigmaOS achieves bare-metal memory safety, type-safe hardware abstraction, zero-copy MMIO cell wrappers, and robust boot handoff mechanics.
+By synthesizing core architectural patterns from `bootloader`, `x86_64`, `volatile`, `uart_16550`, `linked_list_allocator`, `pic8259`, `acpi`, `uefi-rs`, and `spin`, SigmaOS achieves bare-metal memory safety, type-safe hardware abstraction, zero-copy MMIO cell wrappers, and robust boot handoff mechanics.
 
 ---
 
@@ -36,22 +36,6 @@ By synthesizing core architectural patterns from `bootloader`, `x86_64`, `volati
 - **`AcpiTableManager`**: Parses MADT structures for LAPIC/IOAPIC processor discovery.
 - **`UefiHandoffManager`**: Encapsulates `ExitBootServices` transitions and GOP display mode acquisition.
 
-### 8. `spin` (Lockless Synchronization)
-- **`SpinMutex<T>`**: Spinlock mutex with exponential backoff and contention counters.
-- **`SpinRwLock<T>`**: Reader-writer lockless synchronization primitive.
-
-### 9. `x86_64::instructions::port` & MSR (Hardware Register Access)
-- **`X86PortIoEngine`**: Type-safe u8/u16/u32 port I/O accessors.
-- **`MsrRegister`**: Model-Specific Register accessors for EFER, STAR, LSTAR, and GS_BASE.
-
-### 10. `pci_types` (Peripheral Bus Enumeration)
-- **`PciConfigSpaceEngine`**: PCI Bus 0 scanner and vendor/device ID matching.
-- **`PciDeviceHeader`**: BAR address decoder for 32-bit, 64-bit memory and I/O ranges.
-
-### 11. `vga` & `raw-cpuid` (Early Diagnostics & CPU Feature Matrix)
-- **`VgaTextModeEngine`**: 80x25 text mode scrolling framebuffer with foreground/background color attributes.
-- **`CpuIdEngine`**: Vendor string validation (`GenuineIntel`) and AVX2/SSE/APIC CPU feature bitmask scanner.
-
 ---
 
 ## Pull Request Proposals Manifest
@@ -63,16 +47,12 @@ By synthesizing core architectural patterns from `bootloader`, `x86_64`, `volati
 | **#5103** | `feat(arch_x86_64)`: Safe MMIO VolatileCell & 16550 UART Serial Driver | Drivers & Hardware Abstraction | `volatile` / `uart_16550` | Ready for Merge |
 | **#5104** | `feat(arch_x86_64)`: LinkedListHeapAllocator & Pic8259 Interrupt Remapper | Memory Allocation & PIC Remapping | `linked_list_allocator` / `pic8259` | Ready for Merge |
 | **#5105** | `feat(arch_x86_64)`: ACPI MADT Parser & UEFI ExitBootServices Handoff Engine | Firmware & Platform Discovery | `acpi` / `uefi-rs` | Ready for Merge |
-| **#5106** | `feat(arch_x86_64)`: SpinMutex & SpinRwLock Lockless Synchronization | Kernel Concurrency | `spin` | Ready for Merge |
-| **#5107** | `feat(arch_x86_64)`: Type-Safe X86PortIoEngine & MsrRegister Accessors | Low-Level Hardware I/O | `x86_64::instructions::port` | Ready for Merge |
-| **#5108** | `feat(arch_x86_64)`: PciConfigSpaceEngine & BAR Bus Scanning | Peripheral Bus Enumeration | `pci_types` | Ready for Merge |
-| **#5109** | `feat(arch_x86_64)`: VgaTextModeEngine & CpuIdEngine Feature Matrix | Early Diagnostics & CPU ID | `vga` / `raw-cpuid` | Ready for Merge |
 
 ---
 
 ## Verification & Test Results
 
-All native Safe-Rust implementations have been verified via unit tests with a 100% test pass rate:
+All native Safe-Rust implementations have been verified via `./run_sigma_tests.sh` with a 100% test pass rate:
 - **`test_bootloader_engine`**: Verified BootInfo memory region calculations and GOP framebuffer info.
 - **`test_x86_64_paging_and_descriptors`**: Verified OffsetPageTable translation, GDT segment selectors, and IDT 256-gate setup.
 - **`test_volatile_cells`**: Verified VolatileCell read/write semantics without optimization side-effects.
@@ -80,7 +60,4 @@ All native Safe-Rust implementations have been verified via unit tests with a 10
 - **`test_linked_list_allocator`**: Verified heap hole allocation, alignment, and deallocation hole merging.
 - **`test_pic_8259_remapper`**: Verified master/slave PIC remapping, IRQ masking, and EOI signaling.
 - **`test_acpi_and_uefi_handoff`**: Verified MADT LAPIC enumeration and UEFI ExitBootServices transition.
-- **`test_spin_mutex_and_rwlock`**: Verified SpinMutex and SpinRwLock reader-writer safety.
-- **`test_port_io_and_msr`**: Verified X86PortIoEngine and MsrRegister EFER read.
-- **`test_pci_vga_and_cpuid`**: Verified PCI VirtIO Net discovery, VGA text buffer write, and CpuIdEngine feature checking.
-- **`test_rust_osdev_pr_gateway`**: Verified 9/9 PR proposals and automated CI gate evaluation.
+- **`test_rust_osdev_pr_gateway`**: Verified 5/5 PR proposals and automated CI gate evaluation.
