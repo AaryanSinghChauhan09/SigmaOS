@@ -56,6 +56,22 @@ pub use deckcraft::{
     DeckCraftSlideLayoutMasterPrDeployer, DeckExportFormat, PresentationDeck, PresenterState,
     Slide, SlideElement, SlideExporterEngine, SlideLayoutType,
 };
+pub use deckcraft_artcraft_parity_pr::{
+    DeckcraftAiSlideGeneratorLayoutAutoBalancePrEngine, DeckcraftArtcraftParityPrSuite,
+    DeckcraftArtcraftPrProposalManifest, DeckcraftCrdtMultiUserCoAuthoringPrEngine,
+    DeckcraftLiveAudienceQnaPollingPrEngine, DeckcraftLiveDataDrivenChartsPrEngine,
+    DeckcraftMasterTemplateThemeCascadePrEngine, DeckcraftMultiFormat4kVideoRendererPrEngine,
+    DeckcraftPresenterZenithDualScreenPrEngine, DeckcraftRevealJsHtml5ExporterPrEngine,
+    DeckcraftSmartDiagramConnectorFlowPrEngine, DeckcraftVectorMorphingKeyframeAnimationPrEngine,
+    SovereignDeckcraftArtcraftParityPrGateway as SovereignDeckcraftArtcraftParityPrGatewayV2,
+};
+pub use deckcraft_missing_components_parity_pr::{
+    DeckcraftAdvancedVectorAnimationTimelinePrEngine,
+    DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine,
+    DeckcraftInteractivePollAudienceQnaPrEngine, DeckcraftMultiFormatBatchExportRenderPrEngine,
+    DeckcraftPrProposalManifest, DeckcraftRealtimeCrdtMultiUserCollabPrEngine,
+    DeckcraftSmartDiagramDataChartPrEngine, SovereignDeckcraftArtcraftParityPrGateway,
+};
 pub use designcraft::{
     get_designcraft, init_designcraft, Artboard, Canvas, Color, ColorModel, Component,
     DesignBlendMode, DesignEditor, Element, ElementType, ExportFormat as DesignExportFormat,
@@ -199,10 +215,8 @@ pub use wordcraft::{
     WordCraftPullRequestSpec,
 };
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine,
-    WordcraftEpubPdfBookPublisherPrEngine, WordcraftLinguisticAiSpellGrammarPrEngine,
-    WordcraftMailMergeAutomationPrEngine, WordcraftMissingComponentsParityPrSuite,
-    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
-    WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
-    WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
+    WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
+    WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
 };

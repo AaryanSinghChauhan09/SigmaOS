@@ -47,7 +47,9 @@ impl ShaderFilterGraphPrEngine {
             nodes: BTreeMap::new(),
         };
         map.insert("default_passthrough".to_string(), default_node);
-        Self { compiled_nodes: map }
+        Self {
+            compiled_nodes: map,
+        }
     }
 
     pub fn compile_glsl_shader(&mut self, name: &str, glsl_source: &str) -> Result<(), String> {
@@ -117,7 +119,9 @@ impl ShaderFilterGraphPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-Time Custom GLSL Shader Node Graph Compiler".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Real-Time Custom GLSL Shader Node Graph Compiler"
+                    .to_string(),
             target_subsystem: "GPU Shader Graph Renderer".to_string(),
             original_suite: "ArtCraft EffectCraft / Blender Compositor".to_string(),
             components_added: vec![
@@ -209,7 +213,9 @@ impl ParticlePhysicsEffectPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-Time GPU Particle Physics Simulation Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Real-Time GPU Particle Physics Simulation Engine"
+                    .to_string(),
             target_subsystem: "Particle & Fluid Simulator".to_string(),
             original_suite: "ArtCraft EffectCraft Particle System".to_string(),
             components_added: vec![
@@ -283,7 +289,8 @@ impl NeuralMatteSegmentationPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement AI Neural Matte & Auto-Segmentation Keyer".to_string(),
+            pr_title: "feat(effectcraft): Implement AI Neural Matte & Auto-Segmentation Keyer"
+                .to_string(),
             target_subsystem: "AI Keying & Isolation Engine".to_string(),
             original_suite: "ArtCraft EffectCraft AI Studio".to_string(),
             components_added: vec![
@@ -339,7 +346,8 @@ impl AudioReactiveVisualizerPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Real-Time FFT Audio-Reactive Effect Modulator".to_string(),
+            pr_title: "feat(effectcraft): Implement Real-Time FFT Audio-Reactive Effect Modulator"
+                .to_string(),
             target_subsystem: "Audio-Visual Modulation Matrix".to_string(),
             original_suite: "ArtCraft EffectCraft Audio-Visualizer".to_string(),
             components_added: vec![
@@ -391,7 +399,9 @@ impl Spatial3DDepthCompositorPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement 3D Spatial Camera Tracking & Z-Depth Compositor".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement 3D Spatial Camera Tracking & Z-Depth Compositor"
+                    .to_string(),
             target_subsystem: "3D Spatial Compositing Pipeline".to_string(),
             original_suite: "ArtCraft EffectCraft 3D Spatial Studio".to_string(),
             components_added: vec![
@@ -498,7 +508,8 @@ impl ArtCraftOpenFxPluginPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement OpenFX (OFX) & ArtCraft Preset Host Adapter".to_string(),
+            pr_title: "feat(effectcraft): Implement OpenFX (OFX) & ArtCraft Preset Host Adapter"
+                .to_string(),
             target_subsystem: "Plugin Interoperability Layer".to_string(),
             original_suite: "ArtCraft OpenFX / Preset Ecosystem".to_string(),
             components_added: vec![
@@ -879,7 +890,9 @@ impl ProceduralVfxFractalFluidSimulationPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement ACES Color Management & OpenColorIO (OCIO v2) Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement ACES Color Management & OpenColorIO (OCIO v2) Engine"
+                    .to_string(),
             target_subsystem: "Color Science & ACES Engine".to_string(),
             original_suite: "ArtCraft EffectCraft Color Pipeline".to_string(),
             components_added: vec![
@@ -1088,7 +1101,9 @@ impl TemporalNoiseReductionMotionDegrainPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Cryptomatte EXR Manifest Parser & AOV Pass Compositor".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Cryptomatte EXR Manifest Parser & AOV Pass Compositor"
+                    .to_string(),
             target_subsystem: "Cryptomatte & AOV Compositor".to_string(),
             original_suite: "ArtCraft Cryptomatte Pipeline".to_string(),
             components_added: vec![
@@ -1160,7 +1175,9 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Motion Graphics Expression Scripting & Rigging Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Motion Graphics Expression Scripting & Rigging Engine"
+                    .to_string(),
             target_subsystem: "Expression Scripting Engine".to_string(),
             original_suite: "ArtCraft Expression Engine".to_string(),
             components_added: vec![
@@ -1439,7 +1456,8 @@ impl StereoscopicVr360SpatialVideoPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Stereoscopic 3D & 360-Degree VR Engine".to_string(),
+            pr_title: "feat(effectcraft): Implement Stereoscopic 3D & 360-Degree VR Engine"
+                .to_string(),
             target_subsystem: "Stereoscopic VR Engine".to_string(),
             original_suite: "ArtCraft VR Studio".to_string(),
             components_added: vec!["Anaglyph and Side-by-side stereoscopic compositor".to_string()],
@@ -1811,10 +1829,7 @@ mod tests {
     fn test_neural_matte_engine_functional() {
         let mut engine = NeuralMatteSegmentationPrEngine::new();
         let pixels = vec![
-            0, 200, 0, 255,
-            255, 0, 0, 255,
-            255, 0, 0, 255,
-            255, 0, 0, 255,
+            0, 200, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255, 255, 0, 0, 255,
         ];
 
         let mask = engine.execute_auto_keying(&pixels, 2, 2).unwrap();
@@ -1867,7 +1882,9 @@ mod tests {
         let mut engine = EffectcraftOpticalFlowMotionVectorPrEngine::new();
         let frame1 = vec![0, 0, 0, 255];
         let frame2 = vec![100, 100, 0, 255];
-        let vectors = engine.compute_motion_vectors(&frame1, &frame2, 1, 1).unwrap();
+        let vectors = engine
+            .compute_motion_vectors(&frame1, &frame2, 1, 1)
+            .unwrap();
         assert_eq!(vectors.len(), 1);
         assert!(engine.vector_field[0].dx > 0.0);
     }

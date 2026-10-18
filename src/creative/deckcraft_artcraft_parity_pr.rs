@@ -85,12 +85,32 @@ pub struct DeckcraftVectorMorphingKeyframeAnimationPrEngine {
 impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
     pub fn new() -> Self {
         let path0 = vec![
-            VectorMorphPoint { x: 0.0, y: 0.0, handle_in: (0.0, 0.0), handle_out: (5.0, 0.0) },
-            VectorMorphPoint { x: 100.0, y: 100.0, handle_in: (95.0, 100.0), handle_out: (100.0, 100.0) },
+            VectorMorphPoint {
+                x: 0.0,
+                y: 0.0,
+                handle_in: (0.0, 0.0),
+                handle_out: (5.0, 0.0),
+            },
+            VectorMorphPoint {
+                x: 100.0,
+                y: 100.0,
+                handle_in: (95.0, 100.0),
+                handle_out: (100.0, 100.0),
+            },
         ];
         let path1 = vec![
-            VectorMorphPoint { x: 50.0, y: 0.0, handle_in: (50.0, 0.0), handle_out: (55.0, 0.0) },
-            VectorMorphPoint { x: 150.0, y: 200.0, handle_in: (145.0, 200.0), handle_out: (150.0, 200.0) },
+            VectorMorphPoint {
+                x: 50.0,
+                y: 0.0,
+                handle_in: (50.0, 0.0),
+                handle_out: (55.0, 0.0),
+            },
+            VectorMorphPoint {
+                x: 150.0,
+                y: 200.0,
+                handle_in: (145.0, 200.0),
+                handle_out: (150.0, 200.0),
+            },
         ];
 
         Self {
@@ -146,7 +166,9 @@ impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
 
     pub fn generate_proposal(&self) -> DeckcraftArtcraftPrProposalManifest {
         DeckcraftArtcraftPrProposalManifest {
-            pr_title: "feat(deckcraft): Implement Vector Morphing Keyframe Animation & Audio Sync Engine".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement Vector Morphing Keyframe Animation & Audio Sync Engine"
+                    .to_string(),
             target_subsystem: "Deckcraft Motion & Keyframe Animation Engine".to_string(),
             original_suite: "ArtCraft Deckcraft Vector Motion".to_string(),
             components_added: vec![
@@ -154,7 +176,8 @@ impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
                 "Sub-millisecond audio timecode sync trigger for animated elements".to_string(),
                 "Kinetic typography text-path morphing & kinetic layout reveals".to_string(),
             ],
-            performance_multiplier: "60 FPS Hardware-Accelerated Path Morphing (<0.5ms)".to_string(),
+            performance_multiplier: "60 FPS Hardware-Accelerated Path Morphing (<0.5ms)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -198,14 +221,29 @@ impl DeckcraftSmartDiagramConnectorFlowPrEngine {
     pub fn new() -> Self {
         Self {
             nodes: vec![
-                DiagramNode { id: 1, title: "Executive Board".to_string(), parent_id: None },
-                DiagramNode { id: 2, title: "Engineering".to_string(), parent_id: Some(1) },
-                DiagramNode { id: 3, title: "Design Studio".to_string(), parent_id: Some(1) },
+                DiagramNode {
+                    id: 1,
+                    title: "Executive Board".to_string(),
+                    parent_id: None,
+                },
+                DiagramNode {
+                    id: 2,
+                    title: "Engineering".to_string(),
+                    parent_id: Some(1),
+                },
+                DiagramNode {
+                    id: 3,
+                    title: "Design Studio".to_string(),
+                    parent_id: Some(1),
+                },
             ],
         }
     }
 
-    pub fn compute_connector_routes(&self, diagram_type: DiagramType) -> Vec<(u32, u32, (f32, f32), (f32, f32))> {
+    pub fn compute_connector_routes(
+        &self,
+        diagram_type: DiagramType,
+    ) -> Vec<(u32, u32, (f32, f32), (f32, f32))> {
         let mut routes = Vec::new();
         match diagram_type {
             DiagramType::OrgChart => {
@@ -230,12 +268,15 @@ impl DeckcraftSmartDiagramConnectorFlowPrEngine {
 
     pub fn generate_proposal(&self) -> DeckcraftArtcraftPrProposalManifest {
         DeckcraftArtcraftPrProposalManifest {
-            pr_title: "feat(deckcraft): Implement Smart Diagram Generator & Auto Connector Line Router".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement Smart Diagram Generator & Auto Connector Line Router"
+                    .to_string(),
             target_subsystem: "Deckcraft Diagram & Vector Connector Subsystem".to_string(),
             original_suite: "ArtCraft Deckcraft Smart Diagrams".to_string(),
             components_added: vec![
                 "Org chart, process flow & cycle diagram automated layout engine".to_string(),
-                "Orthogonal & Bezier automatic connector line routing with gap jump bypass".to_string(),
+                "Orthogonal & Bezier automatic connector line routing with gap jump bypass"
+                    .to_string(),
                 "Dynamic node expansion & collision-free layout auto-balancing".to_string(),
             ],
             performance_multiplier: "Instant Diagram Auto-Layout Solves (<1ms)".to_string(),
@@ -275,12 +316,19 @@ impl DeckcraftLiveDataDrivenChartsPrEngine {
             "FY2026 Growth".to_string(),
             DataChartSeries {
                 name: "FY2026 Growth".to_string(),
-                categories: vec!["Q1".to_string(), "Q2".to_string(), "Q3".to_string(), "Q4".to_string()],
+                categories: vec![
+                    "Q1".to_string(),
+                    "Q2".to_string(),
+                    "Q3".to_string(),
+                    "Q4".to_string(),
+                ],
                 values: vec![12.5, 18.2, 25.0, 34.8],
             },
         );
 
-        Self { chart_series: series }
+        Self {
+            chart_series: series,
+        }
     }
 
     pub fn update_linked_data(&mut self, series_name: &str, new_values: Vec<f64>) -> bool {
@@ -294,7 +342,9 @@ impl DeckcraftLiveDataDrivenChartsPrEngine {
 
     pub fn generate_proposal(&self) -> DeckcraftArtcraftPrProposalManifest {
         DeckcraftArtcraftPrProposalManifest {
-            pr_title: "feat(deckcraft): Implement Live Spreadsheet-Linked Data Charts & Animated Reveals".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement Live Spreadsheet-Linked Data Charts & Animated Reveals"
+                    .to_string(),
             target_subsystem: "Deckcraft Data Visualization & Chart Engine".to_string(),
             original_suite: "ArtCraft Deckcraft Live Data Charts".to_string(),
             components_added: vec![
@@ -375,7 +425,9 @@ impl DeckcraftLiveAudienceQnaPollingPrEngine {
 
     pub fn generate_proposal(&self) -> DeckcraftArtcraftPrProposalManifest {
         DeckcraftArtcraftPrProposalManifest {
-            pr_title: "feat(deckcraft): Implement Live Audience Polling, Moderated Q&A & Reaction Engine".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement Live Audience Polling, Moderated Q&A & Reaction Engine"
+                    .to_string(),
             target_subsystem: "Deckcraft Presenter & Audience Engagement Subsystem".to_string(),
             original_suite: "ArtCraft Deckcraft Interactive Engagement".to_string(),
             components_added: vec![
@@ -417,7 +469,9 @@ pub struct DeckcraftCrdtMultiUserCoAuthoringPrEngine {
 
 impl DeckcraftCrdtMultiUserCoAuthoringPrEngine {
     pub fn new() -> Self {
-        Self { delta_log: Vec::new() }
+        Self {
+            delta_log: Vec::new(),
+        }
     }
 
     pub fn apply_delta(&mut self, delta: SlideDeltaRecord) -> bool {
@@ -443,7 +497,9 @@ impl DeckcraftCrdtMultiUserCoAuthoringPrEngine {
 
     pub fn generate_proposal(&self) -> DeckcraftArtcraftPrProposalManifest {
         DeckcraftArtcraftPrProposalManifest {
-            pr_title: "feat(deckcraft): Implement CRDT Lockless Real-Time Multi-User Co-Authoring Engine".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement CRDT Lockless Real-Time Multi-User Co-Authoring Engine"
+                    .to_string(),
             target_subsystem: "Deckcraft Collaboration & Synchronization Subsystem".to_string(),
             original_suite: "ArtCraft Deckcraft Multi-User Collaboration".to_string(),
             components_added: vec![
@@ -538,7 +594,10 @@ impl DeckcraftMultiFormat4kVideoRendererPrEngine {
 
     pub fn render_video_timeline(&self, slide_count: usize, fps: u32) -> Vec<u8> {
         let mut stream = Vec::new();
-        let header = format!("DECKCRAFT_4K_VIDEO_TIMELINE:slides={},fps={}\n", slide_count, fps);
+        let header = format!(
+            "DECKCRAFT_4K_VIDEO_TIMELINE:slides={},fps={}\n",
+            slide_count, fps
+        );
         stream.extend_from_slice(header.as_bytes());
         stream
     }
@@ -744,13 +803,19 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
     }
 
     pub fn evaluate_deckcraft_artcraft_parity(&mut self) -> bool {
-        let morphed = self.vector_morphing.interpolate_path_at_time(500, BezierEasing::EaseInOut);
+        let morphed = self
+            .vector_morphing
+            .interpolate_path_at_time(500, BezierEasing::EaseInOut);
         let morph_ok = !morphed.is_empty();
 
-        let routes = self.smart_diagram.compute_connector_routes(DiagramType::OrgChart);
+        let routes = self
+            .smart_diagram
+            .compute_connector_routes(DiagramType::OrgChart);
         let diag_ok = !routes.is_empty();
 
-        let chart_ok = self.live_charts.update_linked_data("FY2026 Growth", vec![15.0, 20.0, 30.0, 40.0]);
+        let chart_ok = self
+            .live_charts
+            .update_linked_data("FY2026 Growth", vec![15.0, 20.0, 30.0, 40.0]);
 
         let vote_count = self.audience_qna.register_vote(1);
         let vote_ok = vote_count > 0;
@@ -763,22 +828,36 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
             lamport_ts: 100,
         });
 
-        let ai_deck = self.ai_slide.synthesize_outline_from_topic("SigmaOS Platform");
+        let ai_deck = self
+            .ai_slide
+            .synthesize_outline_from_topic("SigmaOS Platform");
         let ai_ok = !ai_deck.is_empty();
 
         let video_buf = self.video_render.render_video_timeline(5, 60);
         let video_ok = !video_buf.is_empty();
 
-        let html = self.html5_export.export_reveal_js("SigmaOS Keynote", &["Intro", "Body"]);
+        let html = self
+            .html5_export
+            .export_reveal_js("SigmaOS Keynote", &["Intro", "Body"]);
         let html_ok = html.contains("SigmaOS Keynote");
 
         let laser = self.presenter_zenith.toggle_laser();
         let presenter_ok = laser;
 
-        self.master_theme.apply_theme_tokens(0xFF00FF00, "Inter Display");
+        self.master_theme
+            .apply_theme_tokens(0xFF00FF00, "Inter Display");
         let theme_ok = self.master_theme.font_family == "Inter Display";
 
-        morph_ok && diag_ok && chart_ok && vote_ok && delta_ok && ai_ok && video_ok && html_ok && presenter_ok && theme_ok
+        morph_ok
+            && diag_ok
+            && chart_ok
+            && vote_ok
+            && delta_ok
+            && ai_ok
+            && video_ok
+            && html_ok
+            && presenter_ok
+            && theme_ok
     }
 
     pub fn collect_all_proposals(&self) -> Vec<DeckcraftArtcraftPrProposalManifest> {
@@ -871,7 +950,10 @@ mod tests {
     fn test_live_charts_engine() {
         let mut engine = DeckcraftLiveDataDrivenChartsPrEngine::new();
         assert!(engine.update_linked_data("FY2026 Growth", vec![10.0, 20.0, 30.0, 40.0]));
-        assert_eq!(engine.chart_series.get("FY2026 Growth").unwrap().values[0], 10.0);
+        assert_eq!(
+            engine.chart_series.get("FY2026 Growth").unwrap().values[0],
+            10.0
+        );
     }
 
     #[test]

@@ -1327,10 +1327,7 @@ mod tests {
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",
         );
-        assert_eq!(
-            translated,
-            "ebpf_xdp_namespace"
-        );
+        assert_eq!(translated, "ebpf_xdp_namespace");
     }
 
     #[test]
@@ -1414,7 +1411,10 @@ mod tests {
     fn test_universal_category_policy_routing() {
         let orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
         assert_eq!(SigmaOsSubsystem::StorageDrive.as_str(), "StorageDrive");
-        assert_eq!(SigmaOsSubsystem::NetworkSecurityFirewall.as_str(), "NetworkSecurityFirewall");
+        assert_eq!(
+            SigmaOsSubsystem::NetworkSecurityFirewall.as_str(),
+            "NetworkSecurityFirewall"
+        );
 
         let (audits, score) = orchestrator.audit_all_subsystems_distro_compliance();
         assert_eq!(audits.len(), 44);

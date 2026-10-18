@@ -136,8 +136,15 @@ pub struct GeometricConstraint {
 /// Solid Feature Operation
 #[derive(Debug, Clone)]
 pub enum SolidFeatureOperation {
-    Extrude { depth: f64, draft_angle_deg: f64 },
-    Revolve { angle_deg: f64, axis_start: Vector3D, axis_direction: Vector3D },
+    Extrude {
+        depth: f64,
+        draft_angle_deg: f64,
+    },
+    Revolve {
+        angle_deg: f64,
+        axis_start: Vector3D,
+        axis_direction: Vector3D,
+    },
     BooleanSubtract,
 }
 
@@ -166,10 +173,18 @@ impl BRepSolidModel {
         }
     }
 
-    pub fn extrude_sketch(&mut self, _sketch: &ParametricSketch2D, depth: f64, draft_angle_deg: f64) -> bool {
+    pub fn extrude_sketch(
+        &mut self,
+        _sketch: &ParametricSketch2D,
+        depth: f64,
+        draft_angle_deg: f64,
+    ) -> bool {
         self.volume = 1000.0 * depth;
         self.surface_area = 600.0 + 400.0 * depth;
-        self.feature_history.push(SolidFeatureOperation::Extrude { depth, draft_angle_deg });
+        self.feature_history.push(SolidFeatureOperation::Extrude {
+            depth,
+            draft_angle_deg,
+        });
         true
     }
 
@@ -184,7 +199,8 @@ impl BRepSolidModel {
     }
 
     pub fn boolean_subtract(&mut self, _other_solid: &BRepSolidModel) {
-        self.feature_history.push(SolidFeatureOperation::BooleanSubtract);
+        self.feature_history
+            .push(SolidFeatureOperation::BooleanSubtract);
         self.volume = (self.volume * 0.8).max(0.0);
     }
 }
@@ -549,7 +565,9 @@ impl CadCraftEngine {
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
         match format {
             ExportFormat::DXF => b"SECTION\nHEADER\nENDSEC\nEOF\n".to_vec(),
-            ExportFormat::STEP => b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec(),
+            ExportFormat::STEP => {
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
+            }
             _ => b"CAD_EXPORT_DATA".to_vec(),
         }
     }
