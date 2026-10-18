@@ -8,7 +8,6 @@
 // - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
 // - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-#![no_std]
 extern crate alloc;
 
 use alloc::collections::{BTreeMap, BTreeSet};
@@ -175,6 +174,7 @@ impl SystemdSocketActivationEngine {
             socket_name: socket_name.to_string(),
             sockets: BTreeMap::new(),
             passed_fds: Vec::new(),
+            sockets: BTreeMap::new(),
         }
     }
 
@@ -203,8 +203,6 @@ impl SystemdSocketActivationEngine {
         }
     }
 }
-
-pub type SystemdSocketActivationUnitEngine = SystemdSocketActivationEngine;
 
 /// Systemd Target Dependency Resolver
 #[derive(Debug, Clone, Default)]
@@ -347,8 +345,6 @@ impl SystemdTransientScopeGovernor {
             // only one map exists now
     }
 }
-
-pub type SystemdTransientScopeSpecGovernor = SystemdTransientScopeGovernor;
 
 /// Systemd OnCalendar Event Specification Parser
 #[derive(Debug, Clone, Default)]
@@ -528,6 +524,8 @@ pub struct OpenRcDependencySolverEngine {
     pub scripts: BTreeMap<String, OpenRcHeader>,
 }
 
+pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
+
 impl OpenRcDependencySolverEngine {
     pub fn resolve_order(
         scripts: &BTreeMap<String, OpenRcHeader>,
@@ -573,8 +571,6 @@ impl OpenRcDependencySolverEngine {
         Ok(sorted)
     }
 }
-
-pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
 
 /// OpenRC Status & Runlevel Controller Engine
 #[derive(Debug, Clone, Default)]
@@ -836,7 +832,7 @@ impl SysVinitRunlevelStateMachine {
     pub fn new(initial_runlevel: char, entries: Vec<SysVInittabEntry>) -> Self {
         Self {
             current_runlevel: initial_runlevel,
-            inittab_entries: entries,
+            inittab_entries: entries.clone(),
             active_processes: BTreeMap::new(),
         }
     }
@@ -993,6 +989,9 @@ impl BsdRcSubrEngine {
     }
 
     pub fn is_enabled(&self, script_name: &str) -> bool {
+        if self.is_service_enabled(script_name) {
+            return true;
+        }
         if let Some(script) = self.scripts.get(script_name) {
             if let Some(var) = &script.enabled_variable {
                 if let Some(val) = self.rc_conf.get(var) {
@@ -1158,6 +1157,8 @@ pub struct AtSpoolQueueManager {
     pub next_job_id: u64,
 }
 
+pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
+
 impl AtSpoolQueueManager {
     pub fn new(spool_dir: &str) -> Self {
         Self {
@@ -1166,6 +1167,27 @@ impl AtSpoolQueueManager {
             jobs: BTreeMap::new(),
             next_job_id: 1,
         }
+    }
+
+    pub fn schedule_at_job(
+        &mut self,
+        execute_at: u64,
+        command: String,
+        queue: char,
+        max_load: Option<f32>,
+    ) -> u64 {
+        let id = self.next_job_id;
+        self.next_job_id += 1;
+        let job = AtJob {
+            job_id: id,
+            execute_at,
+            command,
+            queue,
+            max_load_average: max_load,
+        };
+        self.jobs.insert(id, job.clone());
+        self.queued_jobs.push(job);
+        id
     }
 
     pub fn enqueue_job(&mut self, job: AtJob) {

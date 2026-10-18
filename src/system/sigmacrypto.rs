@@ -6,8 +6,11 @@
 
 #![no_std]
 
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::String;
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
 /// Encryption type enumeration
@@ -283,8 +286,8 @@ mod tests {
     #[test]
     fn test_encryption_key_creation() {
         let key = EncryptionKey::new(
-            "key1".to_string(),
-            "main_key".to_string(),
+            String::from("key1"),
+            String::from("main_key"),
             EncryptionType::AES256,
             256,
         );
@@ -299,8 +302,8 @@ mod tests {
     #[test]
     fn test_encryption_key_active() {
         let mut key = EncryptionKey::new(
-            "key1".to_string(),
-            "main_key".to_string(),
+            String::from("key1"),
+            String::from("main_key"),
             EncryptionType::AES256,
             256,
         );
@@ -315,11 +318,11 @@ mod tests {
     #[test]
     fn test_encrypted_volume_creation() {
         let volume = EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         );
 
@@ -332,11 +335,11 @@ mod tests {
     #[test]
     fn test_encrypted_volume_state() {
         let mut volume = EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         );
 
@@ -368,8 +371,8 @@ mod tests {
     fn test_sigmacrypto_add_key() {
         let mut crypto = SigmaCrypto::new();
         let key = EncryptionKey::new(
-            "key1".to_string(),
-            "main_key".to_string(),
+            String::from("key1"),
+            String::from("main_key"),
             EncryptionType::AES256,
             256,
         );
@@ -383,8 +386,8 @@ mod tests {
     fn test_sigmacrypto_remove_key() {
         let mut crypto = SigmaCrypto::new();
         let key = EncryptionKey::new(
-            "key1".to_string(),
-            "main_key".to_string(),
+            String::from("key1"),
+            String::from("main_key"),
             EncryptionType::AES256,
             256,
         );
@@ -401,11 +404,11 @@ mod tests {
     fn test_sigmacrypto_add_volume() {
         let mut crypto = SigmaCrypto::new();
         let volume = EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         );
 
@@ -418,11 +421,11 @@ mod tests {
     fn test_sigmacrypto_lock_unlock() {
         let mut crypto = SigmaCrypto::new();
         let volume = EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         );
 
@@ -445,29 +448,29 @@ mod tests {
         let mut crypto = SigmaCrypto::new();
 
         crypto.add_volume(EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data1".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data1"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         ));
 
         crypto.add_volume(EncryptedVolume::new(
-            "vol2".to_string(),
-            "encrypted_data2".to_string(),
-            "/dev/sda2".to_string(),
+            String::from("vol2"),
+            String::from("encrypted_data2"),
+            String::from("/dev/sda2"),
             EncryptionType::AES256,
-            "key2".to_string(),
+            String::from("key2"),
             1024 * 1024 * 1024,
         ));
 
         crypto.add_volume(EncryptedVolume::new(
-            "vol3".to_string(),
-            "encrypted_data3".to_string(),
-            "/dev/sda3".to_string(),
+            String::from("vol3"),
+            String::from("encrypted_data3"),
+            String::from("/dev/sda3"),
             EncryptionType::AES512,
-            "key3".to_string(),
+            String::from("key3"),
             1024 * 1024 * 1024,
         ));
 
@@ -483,22 +486,22 @@ mod tests {
         let mut crypto = SigmaCrypto::new();
 
         let mut vol1 = EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data1".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data1"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         );
         vol1.set_state(EncryptionState::Unlocked);
         crypto.add_volume(vol1);
 
         let vol2 = EncryptedVolume::new(
-            "vol2".to_string(),
-            "encrypted_data2".to_string(),
-            "/dev/sda2".to_string(),
+            String::from("vol2"),
+            String::from("encrypted_data2"),
+            String::from("/dev/sda2"),
             EncryptionType::AES256,
-            "key2".to_string(),
+            String::from("key2"),
             1024 * 1024 * 1024,
         );
         crypto.add_volume(vol2);
@@ -531,8 +534,8 @@ mod tests {
         init_sigmacrypto();
 
         let key = EncryptionKey::new(
-            "key1".to_string(),
-            "main_key".to_string(),
+            String::from("key1"),
+            String::from("main_key"),
             EncryptionType::AES256,
             256,
         );
@@ -548,11 +551,11 @@ mod tests {
         init_sigmacrypto();
 
         let volume = EncryptedVolume::new(
-            "vol1".to_string(),
-            "encrypted_data".to_string(),
-            "/dev/sda1".to_string(),
+            String::from("vol1"),
+            String::from("encrypted_data"),
+            String::from("/dev/sda1"),
             EncryptionType::AES256,
-            "key1".to_string(),
+            String::from("key1"),
             1024 * 1024 * 1024,
         );
 

@@ -514,7 +514,6 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
-            fulfilled: true,
         });
         self.ideas.push(RoadmapFeatureIdea {
             id: 2,
