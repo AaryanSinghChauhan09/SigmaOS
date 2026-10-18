@@ -14,6 +14,9 @@ pub mod audiocraft;
 pub mod vectoranimation;
 pub mod model3d;
 pub mod artcraft;
+pub mod sovereign_artcraft_craftlibs_pr_engine;
+
+pub use sovereign_artcraft_craftlibs_pr_engine::*;
 
 pub use photocraft::{
     PhotoEditor, ImageLayer, Filter, Adjustment, LayerType, LayerMask, AdjustmentType,
