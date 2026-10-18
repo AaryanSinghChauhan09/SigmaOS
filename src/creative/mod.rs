@@ -14,6 +14,8 @@ pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_missing_components_parity_pr;
+pub mod fontcraft;
+pub mod fontcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod mediacraft;
@@ -178,4 +180,12 @@ pub use figcraft_missing_components_parity_pr::{
     FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
     FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
     FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use fontcraft::{FontMetrics, FontTableTag, GlyphContour, GlyphData, GlyphPoint, SovereignFontEngine};
+pub use fontcraft_missing_components_parity_pr::{
+    FontcraftColorVectorEmojiEnginePrEngine, FontcraftComplexScriptHarfbuzzShapingPrEngine,
+    FontcraftMsdfGpuVectorRasterizerPrEngine, FontcraftPrProposalManifest,
+    FontcraftVariableFontInterpolationPrEngine, FontcraftWoff2BrotliCompressionPrEngine,
+    MsdfTexel, OpenTypeFeatureTag, ShapedGlyph, SovereignFontcraftArtcraftParityPrGateway,
+    VariableFontAxis, Woff2Header,
 };
