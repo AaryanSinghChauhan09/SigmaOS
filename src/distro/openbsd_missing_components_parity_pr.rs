@@ -150,7 +150,9 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
     }
 
     pub fn apply_pledge(&mut self, promises: &str) -> Result<String, String> {
-        self.pledge(promises)
+        let active = promises.to_string();
+        self.pledges.push(active.clone());
+        Ok(format!("Pledge updated: {}", active))
     }
 
     pub fn unveil(&mut self, path: &str, permissions: &str) -> Result<String, String> {
@@ -472,7 +474,10 @@ impl OpenBsdMissingComponentsParityPrSuite {
         );
         self.validate_and_merge_pr(carp_pr);
 
-        let pledge_diff = self.pledge_unveil.apply_pledge("stdio rpath").unwrap_or_default();
+        let pledge_diff = self
+            .pledge_unveil
+            .apply_pledge("stdio rpath")
+            .unwrap_or_default();
         let pledge_pr = self.submit_pr_proposal(
             "Tighten pledge promises to stdio rpath",
             "jules",
