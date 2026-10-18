@@ -76,7 +76,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -86,9 +85,7 @@ pub struct KvmQemuEngine {
     pub thp_hugepages_active: bool,
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
-    pub disk_images: Vec<QemuDiskImageSpec>,
     pub virtio_fs_inodes_cached: u64,
-    pub disk_images: Vec<QemuDiskImageSpec>,
 }
 
 impl KvmQemuEngine {
@@ -100,9 +97,7 @@ impl KvmQemuEngine {
             thp_hugepages_active: true,
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
-            disk_images: Vec::new(),
             virtio_fs_inodes_cached: 0,
-            disk_images: Vec::new(),
         }
     }
 
@@ -209,7 +204,6 @@ pub struct LibvirtDomainConfig {
     pub is_active: bool,
 }
 
-
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
     pub domains: Vec<LibvirtDomainConfig>,
@@ -258,6 +252,7 @@ impl LibvirtDomainEngine {
     }
 
     pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
+        self.storage_pool_type = pool_type;
         self.storage_pool_path = path.to_string();
     }
 
@@ -674,7 +669,6 @@ pub struct KubernetesK3sRancherEngine {
     pub crio_runtime_handlers: Vec<String>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
-    pub crio_runtime_handlers: Vec<String>,
 }
 
 impl KubernetesK3sRancherEngine {
@@ -686,10 +680,9 @@ impl KubernetesK3sRancherEngine {
         handlers.push("gvisor".to_string());
         Self {
             pods: Vec::new(),
-            crio_runtime_handlers: crio,
+            crio_runtime_handlers: handlers,
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
-            crio_runtime_handlers: handlers,
         }
     }
 
@@ -1354,7 +1347,7 @@ impl SovereignVirtualizationAndContainersParityPrGateway {
             title: "feat(cloud): Incus cluster OVN virtual switches and Ceph RBD distributed storage".to_string(),
             category: "Clustered Orchestration".to_string(),
             inspiration_sources: alloc::vec!["Incus".to_string(), "LXD".to_string(), "Ubuntu".to_string()],
-            components_implemented: alloc::vec!["IncusClusteredOrchestrationEngine".to_string(), "IncusClusterNode".to_string()],
+            components_implemented: alloc::vec!["IncusClusterNode".to_string()],
             performance_impact: "High-availability multi-node container & VM cluster failover".to_string(),
             isolation_level: "OVN chassis network segmentation and Ceph RBD storage encryption".to_string(),
             pr_markdown_summary: "Integrates Incus cluster multi-node orchestration with OVN distributed virtual switches and Ceph RBD pools.".to_string(),

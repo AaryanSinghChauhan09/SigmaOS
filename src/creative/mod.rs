@@ -16,6 +16,8 @@ pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_missing_components_parity_pr;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod model3d;
@@ -24,7 +26,6 @@ pub mod pdfcraft_artcraft_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
-pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod vectoranimation;
 pub mod vectorcraft;
@@ -70,6 +71,13 @@ pub use effectcraft_missing_components_parity_pr::{
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
     SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine, FigcraftMultiUserCrdtCollaborationPrEngine,
+    FigcraftPrProposalManifest, FigcraftVectorNetworkBooleanOpsPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
+};
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
@@ -83,6 +91,21 @@ pub use filmcraft_missing_components_parity_pr::{
     FilmcraftSmartCutSceneDetectionPrEngine, FilmcraftSpatial3dAudioPanningPrEngine,
     FilmcraftTextTitleMotionGraphicPrEngine, FilmcraftXmlFcpxmlEdlInteroperabilityPrEngine,
     SovereignFilmcraftArtcraftParityPrGateway,
+};
+pub use gridcraft::{
+    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
+    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
+    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
+    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
+    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
+    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
+    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
+    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
+    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
 };
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
@@ -167,26 +190,4 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
-};
-pub use figcraft_missing_components_parity_pr::{
-    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
-    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
-    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
-    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
-};
-pub use deckcraft_artcraft_parity_pr::{
-    DeckcraftAiSlideGeneratorLayoutAutoBalancePrEngine, DeckcraftArtcraftParityPrSuite,
-    DeckcraftArtcraftPrProposalManifest, DeckcraftCrdtMultiUserCoAuthoringPrEngine,
-    DeckcraftLiveAudienceQnaPollingPrEngine, DeckcraftLiveDataDrivenChartsPrEngine,
-    DeckcraftMasterTemplateThemeCascadePrEngine, DeckcraftMultiFormat4kVideoRendererPrEngine,
-    DeckcraftPresenterZenithDualScreenPrEngine, DeckcraftRevealJsHtml5ExporterPrEngine,
-    DeckcraftSmartDiagramConnectorFlowPrEngine, DeckcraftVectorMorphingKeyframeAnimationPrEngine,
-    SovereignDeckcraftArtcraftParityPrGateway as SovereignDeckcraftArtcraftParityPrGatewayV2,
-};
-pub use deckcraft_missing_components_parity_pr::{
-    DeckcraftAdvancedVectorAnimationTimelinePrEngine,
-    DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine, DeckcraftInteractivePollAudienceQnaPrEngine,
-    DeckcraftMultiFormatBatchExportRenderPrEngine, DeckcraftPrProposalManifest,
-    DeckcraftRealtimeCrdtMultiUserCollabPrEngine, DeckcraftSmartDiagramDataChartPrEngine,
-    SovereignDeckcraftArtcraftParityPrGateway,
 };
