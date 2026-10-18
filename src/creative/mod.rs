@@ -36,6 +36,10 @@ pub mod soundcraft;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod vectoranimation;
 pub mod vectorcraft;
+pub mod gridcraft;
+pub mod gridcraft_missing_components_parity_pr;
+pub mod voicecraft;
+pub mod voicecraft_missing_components_parity_pr;
 pub mod wordcraft;
 
 pub use cadcraft_artcraft_parity_pr::*;
@@ -435,4 +439,18 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
     WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
     WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
+};
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
+    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
+    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use voicecraft::{Phoneme, PhonemeType, SovereignVoiceEngine, VoiceActivityDetector};
+pub use voicecraft_missing_components_parity_pr::{
+    SovereignVoicecraftArtcraftParityPrGateway, VoicecraftAcousticPhonemizerG2pPrEngine,
+    VoicecraftNeuralTtsInferencePrEngine, VoicecraftPrProposalManifest,
+    VoicecraftRealtimeStreamingDenoiserPrEngine,
+    VoicecraftWaylandAccessibilityVoiceControlPrEngine, VoicecraftZeroShotVoiceCloningPrEngine,
+    WaylandVoiceIntent,
 };
