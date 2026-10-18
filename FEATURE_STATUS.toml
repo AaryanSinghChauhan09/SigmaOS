@@ -38,6 +38,28 @@ status = "partial"
 files = ["src/arch/x86_64/"]
 description = "CPU init, GDT, IDT, paging, interrupt stubs created"
 test_evidence = "Structural — needs QEMU boot validation"
+
+[subsystem.secondary_memory]
+status = "unit-tested"
+files = [
+    "docs/storage/SECONDARY_MEMORY_POLICY.md",
+    "docs/storage/SECONDARY_MEMORY_ADR.md",
+    "docs/storage/BLOCK_POLICY.md",
+    "docs/filesystem/CACHE_POLICY.md",
+    "docs/filesystem/MOUNT_POLICY.md",
+    "STORAGE_RULES.toml",
+    "src/storage/block.rs",
+    "src/storage/virtio.rs",
+    "src/fs/cache.rs",
+    "src/filesystem/core.rs",
+    "src/filesystem/mount.rs",
+    "tests/storage/block.rs",
+    "tests/filesystem/cache.rs",
+    "tests/filesystem/core.rs"
+]
+description = "SigmaOS secondary memory lifecycle subsystem managing block devices, caches, mount trees, and filesystems with strict bounds and typed error handling"
+test_evidence = "15 standalone unit tests pass cleanly across tests/storage/block.rs, tests/filesystem/cache.rs, and tests/filesystem/core.rs"
+next_milestone = "Connect storage drivers to boot-to-shell smoke test path"
 next_milestone = "Real hardware register writes via inline asm"
 
 [arch.aarch64]

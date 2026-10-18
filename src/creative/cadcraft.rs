@@ -1174,7 +1174,6 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
             verification_digest: fnv1a_cadcraft_pr_digest(self.pr_id, title),
         }
     }
-}
 
     pub fn is_deployed(&self) -> bool {
         !self.deployed_prs.is_empty()
