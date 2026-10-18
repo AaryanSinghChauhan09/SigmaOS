@@ -41,13 +41,13 @@ pub struct FontcraftPrProposalManifest {
 /// Text shaping feature tags (e.g. `liga`, `rlig`, `init`, `medi`, `fina`, `kern`)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OpenTypeFeatureTag {
-    StandardLigatures,     // "liga"
-    RequiredLigatures,     // "rlig"
-    InitialForm,           // "init"
-    MedialForm,            // "medi"
-    FinalForm,             // "fina"
-    MarkPositioning,       // "mark"
-    Kerning,               // "kern"
+    StandardLigatures, // "liga"
+    RequiredLigatures, // "rlig"
+    InitialForm,       // "init"
+    MedialForm,        // "medi"
+    FinalForm,         // "fina"
+    MarkPositioning,   // "mark"
+    Kerning,           // "kern"
 }
 
 /// Shaped Glyph Glyph Position & Offset
@@ -88,7 +88,10 @@ impl FontcraftComplexScriptHarfbuzzShapingPrEngine {
         self.active_language = String::from(language);
 
         if script == "arab" || script == "hebr" {
-            if !self.enabled_features.contains(&OpenTypeFeatureTag::InitialForm) {
+            if !self
+                .enabled_features
+                .contains(&OpenTypeFeatureTag::InitialForm)
+            {
                 self.enabled_features.push(OpenTypeFeatureTag::InitialForm);
                 self.enabled_features.push(OpenTypeFeatureTag::MedialForm);
                 self.enabled_features.push(OpenTypeFeatureTag::FinalForm);
@@ -107,7 +110,11 @@ impl FontcraftComplexScriptHarfbuzzShapingPrEngine {
             let cp = ch as u32;
 
             // Ligature substitution check (e.g., "fi" -> single ligature glyph 0xFB01)
-            if self.enabled_features.contains(&OpenTypeFeatureTag::StandardLigatures) && idx + 1 < chars.len() {
+            if self
+                .enabled_features
+                .contains(&OpenTypeFeatureTag::StandardLigatures)
+                && idx + 1 < chars.len()
+            {
                 let next_ch = chars[idx + 1];
                 if ch == 'f' && next_ch == 'i' {
                     glyphs.push(ShapedGlyph {
@@ -138,7 +145,8 @@ impl FontcraftComplexScriptHarfbuzzShapingPrEngine {
 
             // Kerning offset adjustment for "AV" or "VA"
             let mut kern_adj = 0.0f32;
-            if self.enabled_features.contains(&OpenTypeFeatureTag::Kerning) && idx + 1 < chars.len() {
+            if self.enabled_features.contains(&OpenTypeFeatureTag::Kerning) && idx + 1 < chars.len()
+            {
                 let next_ch = chars[idx + 1];
                 if (ch == 'A' && next_ch == 'V') || (ch == 'V' && next_ch == 'A') {
                     kern_adj = -1.5;
@@ -242,7 +250,11 @@ impl FontcraftMsdfGpuVectorRasterizerPrEngine {
                 let g = (0.5 - dist).clamp(0.0, 1.0);
                 let b = (0.5 - dist - (glyph_code % 7) as f32 * 0.01).clamp(0.0, 1.0);
 
-                buffer.push(MsdfTexel { r_dist: r, g_dist: g, b_dist: b });
+                buffer.push(MsdfTexel {
+                    r_dist: r,
+                    g_dist: g,
+                    b_dist: b,
+                });
             }
         }
 
@@ -321,13 +333,17 @@ impl FontcraftVariableFontInterpolationPrEngine {
         current_coordinates.insert(String::from("wght"), 400.0);
         current_coordinates.insert(String::from("wdth"), 100.0);
 
-        Self { axes, current_coordinates }
+        Self {
+            axes,
+            current_coordinates,
+        }
     }
 
     pub fn set_axis_coordinate(&mut self, axis_tag: &str, value: f32) -> Result<(), &'static str> {
         if let Some(axis) = self.axes.get(axis_tag) {
             let clamped = value.clamp(axis.min_value, axis.max_value);
-            self.current_coordinates.insert(String::from(axis_tag), clamped);
+            self.current_coordinates
+                .insert(String::from(axis_tag), clamped);
             Ok(())
         } else {
             Err("Variable font axis tag not found")
@@ -336,7 +352,10 @@ impl FontcraftVariableFontInterpolationPrEngine {
 
     /// Compute normalized design space coordinate in [-1.0, +1.0] for an axis
     pub fn get_normalized_coordinate(&self, axis_tag: &str) -> f32 {
-        if let (Some(axis), Some(&user_val)) = (self.axes.get(axis_tag), self.current_coordinates.get(axis_tag)) {
+        if let (Some(axis), Some(&user_val)) = (
+            self.axes.get(axis_tag),
+            self.current_coordinates.get(axis_tag),
+        ) {
             if user_val < axis.default_value {
                 (user_val - axis.default_value) / (axis.default_value - axis.min_value)
             } else if user_val > axis.default_value {
@@ -350,7 +369,13 @@ impl FontcraftVariableFontInterpolationPrEngine {
     }
 
     /// Interpolate glyph outline point coordinate based on active design axis deltas
-    pub fn interpolate_point(&self, base_x: f32, base_y: f32, weight_delta_x: f32, weight_delta_y: f32) -> (f32, f32) {
+    pub fn interpolate_point(
+        &self,
+        base_x: f32,
+        base_y: f32,
+        weight_delta_x: f32,
+        weight_delta_y: f32,
+    ) -> (f32, f32) {
         let norm_weight = self.get_normalized_coordinate("wght");
         let interpolated_x = base_x + weight_delta_x * norm_weight;
         let interpolated_y = base_y + weight_delta_y * norm_weight;
@@ -413,18 +438,50 @@ pub struct FontcraftColorVectorEmojiEnginePrEngine {
 impl FontcraftColorVectorEmojiEnginePrEngine {
     pub fn new() -> Self {
         let default_palette = vec![
-            ColorRgba { r: 255, g: 204, b: 0, a: 255 },  // Gold / Yellow face
-            ColorRgba { r: 0, g: 0, b: 0, a: 255 },        // Black outline / eyes
-            ColorRgba { r: 255, g: 255, b: 255, a: 255 },  // White highlights
-            ColorRgba { r: 230, g: 50, b: 50, a: 255 },    // Red mouth / accents
+            ColorRgba {
+                r: 255,
+                g: 204,
+                b: 0,
+                a: 255,
+            }, // Gold / Yellow face
+            ColorRgba {
+                r: 0,
+                g: 0,
+                b: 0,
+                a: 255,
+            }, // Black outline / eyes
+            ColorRgba {
+                r: 255,
+                g: 255,
+                b: 255,
+                a: 255,
+            }, // White highlights
+            ColorRgba {
+                r: 230,
+                g: 50,
+                b: 50,
+                a: 255,
+            }, // Red mouth / accents
         ];
 
         let mut emoji_layers = BTreeMap::new();
         // Emoji '😀' (U+1F600) multi-layer glyph composition
         let smile_layers = vec![
-            EmojiColorLayer { glyph_index: 1001, palette_index: 0, color: default_palette[0] },
-            EmojiColorLayer { glyph_index: 1002, palette_index: 1, color: default_palette[1] },
-            EmojiColorLayer { glyph_index: 1003, palette_index: 2, color: default_palette[2] },
+            EmojiColorLayer {
+                glyph_index: 1001,
+                palette_index: 0,
+                color: default_palette[0],
+            },
+            EmojiColorLayer {
+                glyph_index: 1002,
+                palette_index: 1,
+                color: default_palette[1],
+            },
+            EmojiColorLayer {
+                glyph_index: 1003,
+                palette_index: 2,
+                color: default_palette[2],
+            },
         ];
         emoji_layers.insert(0x1F600, smile_layers);
 
@@ -434,12 +491,19 @@ impl FontcraftColorVectorEmojiEnginePrEngine {
         }
     }
 
-    pub fn get_emoji_color_layers(&self, codepoint: u32, palette_id: usize) -> Option<Vec<EmojiColorLayer>> {
+    pub fn get_emoji_color_layers(
+        &self,
+        codepoint: u32,
+        palette_id: usize,
+    ) -> Option<Vec<EmojiColorLayer>> {
         let palette = self.palettes.get(palette_id)?;
         if let Some(layers) = self.emoji_layers.get(&codepoint) {
             let mut resolved = Vec::new();
             for layer in layers {
-                let color = palette.get(layer.palette_index as usize).copied().unwrap_or(layer.color);
+                let color = palette
+                    .get(layer.palette_index as usize)
+                    .copied()
+                    .unwrap_or(layer.color);
                 resolved.push(EmojiColorLayer {
                     glyph_index: layer.glyph_index,
                     palette_index: layer.palette_index,
@@ -484,9 +548,9 @@ impl Default for FontcraftColorVectorEmojiEnginePrEngine {
 /// WOFF2 Font Header Structure
 #[derive(Debug, Clone)]
 pub struct Woff2Header {
-    pub signature: u32,       // 'wOF2' (0x774F4632)
-    pub flavor: u32,          // TrueType or OpenType tag
-    pub length: u32,          // Total compressed size
+    pub signature: u32, // 'wOF2' (0x774F4632)
+    pub flavor: u32,    // TrueType or OpenType tag
+    pub length: u32,    // Total compressed size
     pub num_tables: u16,
     pub total_sfnt_size: u32, // Decompressed size
 }
@@ -499,7 +563,9 @@ pub struct FontcraftWoff2BrotliCompressionPrEngine {
 
 impl FontcraftWoff2BrotliCompressionPrEngine {
     pub fn new() -> Self {
-        Self { loaded_fonts_count: 0 }
+        Self {
+            loaded_fonts_count: 0,
+        }
     }
 
     /// Parse WOFF2 header magic bytes and table directory metadata
@@ -606,13 +672,11 @@ impl SovereignFontcraftArtcraftParityPrGateway {
             0x77, 0x4F, 0x46, 0x32, // 'wOF2' magic
             0x00, 0x01, 0x00, 0x00, // TrueType flavor
             0x00, 0x00, 0x01, 0x00, // length = 256
-            0x00, 0x0C,             // num_tables = 12
+            0x00, 0x0C, // num_tables = 12
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, // total_sfnt_size = 1024
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x04, 0x00, // total_sfnt_size = 1024
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
         let woff2_res = self.woff2_engine.parse_woff2_header(&dummy_woff2);
         let woff2_ok = woff2_res.is_ok();
@@ -635,13 +699,17 @@ impl SovereignFontcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
 
     pub fn export_pr_manifest_markdown(&self) -> String {
-        let mut md = String::from("# FontCraft & Sovereign Typography Parity Pull Request Manifest\n\n");
+        let mut md =
+            String::from("# FontCraft & Sovereign Typography Parity Pull Request Manifest\n\n");
         md.push_str("| PR ID | Proposal Title | Target Subsystem | Parity Benchmark | Status |\n");
         md.push_str("|-------|----------------|------------------|------------------|--------|\n");
 
@@ -678,7 +746,9 @@ mod tests {
         assert!((shaped_av[0].x_advance - 8.5).abs() < 1e-3);
 
         engine.set_script_language("arab", "ARA");
-        assert!(engine.enabled_features.contains(&OpenTypeFeatureTag::InitialForm));
+        assert!(engine
+            .enabled_features
+            .contains(&OpenTypeFeatureTag::InitialForm));
     }
 
     #[test]
@@ -720,13 +790,11 @@ mod tests {
             0x77, 0x4F, 0x46, 0x32, // 'wOF2'
             0x00, 0x01, 0x00, 0x00, // TrueType
             0x00, 0x00, 0x01, 0x00, // 256
-            0x00, 0x04,             // 4 tables
+            0x00, 0x04, // 4 tables
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, // 512 total
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x02, 0x00, // 512 total
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
         let header = engine.parse_woff2_header(&header_data).unwrap();
