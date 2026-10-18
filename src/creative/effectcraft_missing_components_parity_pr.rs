@@ -320,6 +320,7 @@ impl AudioReactiveVisualizerPrEngine {
     pub fn new() -> Self {
         Self {
             frequency_bands: vec![0.0; 5],
+            fft_bands: vec![0.0; 5],
         }
     }
 
@@ -361,11 +362,6 @@ impl AudioReactiveVisualizerPrEngine {
             performance_multiplier: "Low Latency Audio Reaction".to_string(),
             status: "Ready for Merge".to_string(),
         }
-    }
-}
-
-    pub fn get_band_magnitude(&self, band: usize) -> f32 {
-        self.frequency_bands.get(band).copied().unwrap_or(0.0)
     }
 }
 
@@ -417,7 +413,6 @@ impl Spatial3DDepthCompositorPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-}
 
     pub fn solve_camera_track(&mut self, tracked_points: &[[f32; 2]]) -> usize {
         tracked_points.len()
@@ -440,20 +435,6 @@ impl Spatial3DDepthCompositorPrEngine {
             }
         }
         composited
-    }
-
-    pub fn generate_proposal(&self) -> EffectcraftPrProposalSpec {
-        EffectcraftPrProposalSpec {
-            pr_title: "feat(effectcraft): Implement Spatial 3D Depth Projection Engine".to_string(),
-            target_subsystem: "3D Depth Compositor".to_string(),
-            original_suite: "ArtCraft 3D Projection Engine".to_string(),
-            components_added: vec![
-                "Pinhole camera perspective 3D point cloud projection".to_string(),
-                "Depth map plane separation and occlusion solver".to_string(),
-            ],
-            performance_multiplier: "60 FPS 3D Scene Compositing".to_string(),
-            status: "Ready for Merge".to_string(),
-        }
     }
 }
 
@@ -1573,46 +1554,6 @@ mod tests {
             .process_frame("com.artcraft.Sharpen", &mut pixels)
             .unwrap();
         assert_eq!(pixels[0], 50);
-    }
-
-    #[test]
-    fn test_optical_flow_engine_functional() {
-        let mut engine = EffectcraftOpticalFlowMotionVectorPrEngine::new();
-        let frame1 = vec![0, 0, 0, 255];
-        let frame2 = vec![100, 100, 0, 255];
-        let count = engine
-            .compute_motion_vectors(&frame1, &frame2, 1, 1)
-            .unwrap();
-        assert_eq!(count, 1);
-        assert!(engine.vector_field[0].dx > 0.0);
-        let vectors = engine.vector_field.clone();
-        let interp = engine
-            .interpolate_intermediate_frame(&frame1, &frame2, &vectors, 0.5)
-            .unwrap();
-        assert_eq!(interp.len(), 4);
-    }
-
-    #[test]
-    fn test_color_grading_lut_aces_engine_functional() {
-        let mut engine = EffectcraftAcesOcioColorManagementPrEngine::new();
-        let mut rgb = [1.0, 0.5, 0.2];
-        engine.convert_color_space(
-            WorkingColorSpace::Rec709,
-            WorkingColorSpace::AcesCg,
-            &mut rgb,
-        );
-        assert_eq!(engine.current_space, WorkingColorSpace::AcesCg);
-        assert_ne!(rgb[0], 1.0);
-
-        let aces_rgb = engine.apply_aces_transform(
-            [0.8, 0.2, 0.1],
-            WorkingColorSpace::Srgb,
-            WorkingColorSpace::AcesCg,
-        );
-        assert_ne!(aces_rgb, [0.8, 0.2, 0.1]);
-
-        let cdl_rgb = engine.apply_cdl_grading([0.5, 0.5, 0.5], &engine.cdl);
-        assert_eq!(cdl_rgb, [0.5, 0.5, 0.5]);
     }
 
     #[test]

@@ -174,7 +174,6 @@ impl SystemdSocketActivationEngine {
             socket_name: socket_name.to_string(),
             sockets: BTreeMap::new(),
             passed_fds: Vec::new(),
-            sockets: BTreeMap::new(),
         }
     }
 
@@ -203,6 +202,8 @@ impl SystemdSocketActivationEngine {
         }
     }
 }
+
+pub type SystemdSocketActivationUnitEngine = SystemdSocketActivationEngine;
 
 /// Systemd Target Dependency Resolver
 #[derive(Debug, Clone, Default)]
@@ -1195,26 +1196,6 @@ impl AtSpoolQueueManager {
         self.queued_jobs.push(job);
     }
 
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job);
-        id
-    }
-
     pub fn poll_ready_jobs(&mut self, now_timestamp: u64, current_load: f32) -> Vec<AtJob> {
         let mut ready = Vec::new();
         let mut pending = Vec::new();
@@ -1237,7 +1218,6 @@ impl AtSpoolQueueManager {
     }
 }
 
-pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
 pub type AtSpoolQueueManagerV2 = AtSpoolQueueManager;
 
 /// Vixie Cron 5/6-Field Expression and Macros

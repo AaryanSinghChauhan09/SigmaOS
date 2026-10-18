@@ -427,7 +427,6 @@ pub struct CadCraftEngine {
 impl CadCraftEngine {
     pub fn new() -> Self {
         Self {
-            entities: Vec::new(),
             sketch_entities: BTreeMap::new(),
             constraints: BTreeMap::new(),
             solid_features: BTreeMap::new(),
@@ -1006,7 +1005,7 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
 }
 
 /// Master Deployment Coordinator for CadCraft
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default)]
 pub struct CadCraftMasterPrDeploymentSuite {
     pub drafting_constraints: CadCraft2dDraftingConstraintPrDeployer,
     pub solid_modeling: CadCraft3dSolidModelingPrDeployer,
@@ -1051,9 +1050,9 @@ impl CadCraftMasterPrDeploymentSuite {
 
     pub fn deploy_all(&mut self) -> Vec<CadCraftPullRequestSpec> {
         let mut prs = Vec::new();
-        prs.extend(self.drafting_2d.deployed_prs.values().cloned());
-        prs.extend(self.solid_modeling_3d.deployed_prs.values().cloned());
-        prs.extend(self.assembly_cam_fea.deployed_prs.values().cloned());
+        prs.extend(self.drafting_constraints.deployed_prs.values().cloned());
+        prs.extend(self.solid_modeling.deployed_prs.values().cloned());
+        prs.extend(self.assembly_fem.deployed_prs.values().cloned());
 
         for pr in &prs {
             self.deployed_prs.insert(pr.pr_id, pr.clone());
@@ -1064,18 +1063,14 @@ impl CadCraftMasterPrDeploymentSuite {
         let p2 = sample_sketch.add_point(50.0, 0.0);
         sample_sketch.add_constraint(GeometricConstraint {
             id: 1,
-            constraint_type: GeometricConstraintType::Distance {
-                point1_idx: p1,
-                point2_idx: p2,
-                target_distance: 100.0,
-            },
+            constraint_type: GeometricConstraintType::Distance { point1_idx: p1, point2_idx: p2, target_distance: 100.0 },
             entity_ids: vec![p1 as u32, p2 as u32],
             target_value: 100.0,
             satisfied: true,
         });
         sample_sketch.solve_constraints();
 
-        let mut sample_solid = self.solid_modeling_3d.create_solid("Support Bracket");
+        let mut sample_solid = self.solid_modeling.create_solid("Support Bracket");
         sample_solid.extrude_sketch(&sample_sketch, 50.0, 0.0);
 
         let _step_bytes = self
