@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+// Copyright (c) 2026 SigmaOS Contributors
+
 #![no_std]
 extern crate alloc;
 
@@ -74,7 +77,9 @@ impl InitSystem {
                 temp_mark.insert(node.clone());
                 if let Some(srv) = services.get(node) {
                     for dep in &srv.dependencies {
-                        visit(dep, services, visited, temp_mark, sorted)?;
+                        if services.contains_key(dep) {
+                            visit(dep, services, visited, temp, sorted)?;
+                        }
                     }
                 }
                 temp_mark.remove(node);
@@ -177,7 +182,6 @@ pub struct SystemdSocketActivationEngine {
     pub sockets: BTreeMap<String, SystemdSocketUnit>,
 }
 
-
 impl SystemdSocketActivationEngine {
     pub fn new(socket_name: &str) -> Self {
         Self {
@@ -273,16 +277,15 @@ impl SystemdPathMonitorEngine {
         }
         triggered
     }
-
 }
 
 /// Systemd Transient Scope Governor
 #[derive(Debug, Clone, Default)]
-pub struct SystemdTransientScopeGovernor {
+pub struct SystemdTransientScopeSpecGovernor {
     pub transient_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
 }
 
-impl SystemdTransientScopeGovernor {
+impl SystemdTransientScopeSpecGovernor {
     pub fn new() -> Self {
         Self::default()
     }
@@ -305,12 +308,18 @@ impl SystemdTransientScopeGovernor {
         self.register_transient_scope(scope_name, slice);
     }
 
+    pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
+        self.transient_scopes.insert(scope_name, slice);
+    }
+
     pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
         self.transient_scopes
             .get(scope_name)
             .or_else(|| self.active_scopes.get(scope_name))
     }
 }
+
+pub type SystemdTransientScopeGovernor = SystemdTransientScopeSpecGovernor;
 
 /// Systemd OnCalendar Event Specification Parser
 #[derive(Debug, Clone, Default)]
@@ -590,120 +599,6 @@ impl OpenRcStatusControllerEngine {
     }
 }
 
-impl OpenRcHeader {
-    pub fn parse(script_content: &str) -> Self {
-        let mut header = OpenRcHeader::default();
-        for line in script_content.lines() {
-            let trimmed = line.trim();
-            if let Some(rest) = trimmed.strip_prefix("provide") {
-                header
-                    .provide
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header
-                    .need
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header
-                    .use_deps
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header
-                    .before
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header
-                    .after
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header
-                    .keywords
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            }
-        }
-        header
-    }
-}
-
-/// OpenRC Dependency Solver Engine
-pub struct OpenRcDependencySolverEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-}
-
-impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self {
-            current_runlevel: OpenRcRunlevel::SysInit,
-            scripts: BTreeMap::new(),
-        }
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Stopped);
-    }
-
-    pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
-        }
-        self.service_statuses.insert(service, state);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .get(service)
-            .cloned()
-            .unwrap_or(ServiceState::Stopped)
-    }
-}
-
-pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
-
-/// OpenRC Status & Runlevel Controller Engine
-#[derive(Debug, Clone, Default)]
-pub struct OpenRcStatusControllerEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub active_services: BTreeSet<String>,
-    pub service_statuses: BTreeMap<String, ServiceState>,
-}
-
-impl OpenRcStatusControllerEngine {
-    pub fn new(initial_runlevel: OpenRcRunlevel) -> Self {
-        Self {
-            current_runlevel: initial_runlevel,
-            active_services: BTreeSet::new(),
-            service_statuses: BTreeMap::new(),
-        }
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-    }
-}
-
 // ============================================================================
 // runit & s6 Supervision Subsystem
 // ============================================================================
@@ -867,6 +762,10 @@ impl RunitS6SupervisionTreeGovernor {
             if let Some(srv) = self.services.get_mut(service_name) {
                 srv.state = ServiceState::Running;
             }
+            if let Some(srv) = self.active_services.get_mut(service_name) {
+                srv.state = ServiceState::Running;
+                return true;
+            }
             return true;
         }
         false
@@ -905,6 +804,7 @@ pub struct SysVinitRunlevelStateMachine {
     pub current_runlevel: char,
     pub inittab_entries: Vec<SysVInittabEntry>,
     pub active_processes: BTreeMap<String, u32>,
+    pub entries: Vec<SysVInittabEntry>,
 }
 
 impl SysVinitRunlevelStateMachine {
@@ -913,6 +813,7 @@ impl SysVinitRunlevelStateMachine {
             current_runlevel: initial_runlevel,
             inittab_entries: entries.clone(),
             active_processes: BTreeMap::new(),
+            entries,
         }
     }
 
@@ -929,11 +830,7 @@ impl SysVinitRunlevelStateMachine {
             .collect()
     }
 
-    pub fn transition_runlevel(&mut self, new_runlevel: char) -> Vec<&SysVInittabEntry> {
-        self.set_runlevel(new_runlevel)
-    }
-
-    pub fn spawn_respawn_processes(&mut self) -> Vec<&SysVInittabEntry> {
+    pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
             if entry.action == SysVAction::Respawn
@@ -942,7 +839,7 @@ impl SysVinitRunlevelStateMachine {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
-                    spawned.push(entry);
+                    spawned.push(entry.id.clone());
                 }
             }
         }
@@ -954,7 +851,7 @@ impl SysVinitRunlevelStateMachine {
         let mut stop_scripts = Vec::new();
         let mut start_scripts = Vec::new();
 
-        for entry in &self.inittab_entries {
+        for entry in &self.entries {
             if entry.runlevels.contains(&target_runlevel) {
                 if entry.action == SysVAction::Respawn
                     || entry.action == SysVAction::Once
@@ -1311,7 +1208,6 @@ impl AtSpoolQueueManager {
     }
 }
 
-
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
 
 /// Vixie Cron 5/6-Field Expression and Macros
@@ -1610,7 +1506,6 @@ pub struct UserlandInitPrSubmission {
     pub pqc_signature: Vec<u8>,
     pub ci_passed: bool,
 }
-
 
 /// Userland Init Pull Request Gateway Engine
 #[derive(Debug, Clone)]
@@ -1949,7 +1844,7 @@ mod tests {
 
     #[test]
     fn test_at_spool_queue_manager() {
-        let mut queue = AtSpoolQueueManager::new("/var/spool/at");
+        let mut queue = AtSpoolQueueManagerV2::new();
         let id = queue.schedule_at_job(2000000000, "echo hello".to_string(), 'a', None);
         assert_eq!(id, 1);
         assert_eq!(queue.jobs.get(&1).unwrap().command, "echo hello");
@@ -1957,7 +1852,7 @@ mod tests {
 
     #[test]
     fn test_systemd_on_calendar_parser() {
-        let parsed = SystemdOnCalendarParser::parse_expression("daily");
+        let parsed = SystemdOnCalendarExpressionParser::parse_expression("daily");
         assert_eq!(parsed, Some((0, 0)));
     }
 
@@ -2067,9 +1962,7 @@ mod tests {
         );
 
         assert!(gov.parse_s6_readiness_notification("syslogd", "READY=1"));
-        assert!(
-            gov.parse_s6_readiness_notification("syslogd", "ready notification")
-        );
+        assert!(gov.parse_s6_readiness_notification("syslogd", "ready notification"));
     }
 
     #[test]
@@ -2139,7 +2032,7 @@ mod tests {
     }
 
     #[test]
-    fn test_userland_init_clean_room_pr_gateway() {
+    fn test_userland_init_pr_gateway_clean_room() {
         let gw = UserlandInitCleanRoomPrGatewayEngine::new(
             4001,
             "feat(init): Complete Init Parity",

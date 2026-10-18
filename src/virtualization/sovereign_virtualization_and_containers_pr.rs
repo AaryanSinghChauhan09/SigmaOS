@@ -251,8 +251,7 @@ impl LibvirtDomainEngine {
         }
     }
 
-    pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
-        self.storage_pool_type = pool_type;
+    pub fn set_storage_pool(&mut self, _pool_type: LibvirtStoragePoolType, path: &str) {
         self.storage_pool_path = path.to_string();
     }
 
