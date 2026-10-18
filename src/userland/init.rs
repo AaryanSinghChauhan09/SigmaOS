@@ -450,9 +450,27 @@ impl SdNotifyMessage {
     }
 }
 
-// ============================================================================
-// OpenRC Subsystem
-// ============================================================================
+/// Systemd Socket Activation Unit Config
+#[derive(Debug, Clone)]
+pub struct SystemdSocketUnit {
+    pub name: String,
+    pub listen_stream: Option<String>,
+    pub listen_datagram: Option<String>,
+    pub service_to_trigger: String,
+    pub accept: bool,
+    pub active_fd: Option<i32>,
+}
+
+/// Systemd Path Monitor Unit
+#[derive(Debug, Clone)]
+pub struct SystemdPathUnit {
+    pub name: String,
+    pub path_changed: Option<String>,
+    pub path_modified: Option<String>,
+    pub path_exists: Option<String>,
+    pub directory_not_empty: Option<String>,
+    pub unit_to_trigger: String,
+}
 
 /// OpenRC Multi-Stage Runlevel
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -635,9 +653,6 @@ impl OpenRcHeader {
         header
     }
 }
-
-
-pub type OpenRcStatusControllerSpecEngine = OpenRcStatusControllerEngine;
 
 // ============================================================================
 // runit & s6 Supervision Subsystem
@@ -997,63 +1012,6 @@ impl BsdRcScript {
     }
 }
 
-/// BSD `rc.subr` & `rcorder` Dependency Engine
-#[derive(Debug, Clone, Default)]
-pub struct BsdRcSubrEngine {
-    pub rc_conf: BTreeMap<String, String>,
-    pub scripts: BTreeMap<String, BsdRcScript>,
-}
-
-impl BsdRcSubrEngine {
-    pub fn new(rc_conf: BTreeMap<String, String>) -> Self {
-        Self {
-            rc_conf,
-            scripts: BTreeMap::new(),
-        }
-    }
-
-    pub fn set_rc_conf(&mut self, key: String, val: String) {
-        self.rc_conf.insert(key, val);
-    }
-
-    pub fn register_script(&mut self, script: BsdRcScript) {
-        self.scripts.insert(script.name.clone(), script);
-    }
-
-    pub fn is_service_enabled(&self, service_name: &str) -> bool {
-        let key = format!("{}_enable", service_name);
-        if let Some(val) = self.rc_conf.get(&key) {
-            let val_lower = val.to_lowercase();
-            val_lower == "yes" || val_lower == "true" || val_lower == "1" || val_lower == "on"
-        } else {
-            false
-        }
-    }
-
-    pub fn is_enabled(&self, script_name: &str) -> bool {
-        if let Some(script) = self.scripts.get(script_name) {
-            if let Some(var) = &script.enabled_variable {
-                if let Some(val) = self.rc_conf.get(var) {
-                    let val_lower = val.to_lowercase();
-                    return val_lower == "yes"
-                        || val == "1"
-                        || val_lower == "true"
-                        || val_lower == "on";
-                }
-            }
-        }
-        self.is_service_enabled(script_name)
-    }
-
-    pub fn compute_rcorder(&self) -> Vec<String> {
-        self.scripts.keys().cloned().collect()
-    }
-}
-
-// ============================================================================
-// macOS launchd Subsystem
-// ============================================================================
-
 /// macOS launchd PLIST Job Specification
 #[derive(Debug, Clone, Default)]
 pub struct LaunchdJobSpec {
@@ -1369,32 +1327,6 @@ impl AnacronJob {
     }
 }
 
-/// Anacron Spool Manager
-#[derive(Debug, Clone, Default)]
-pub struct AnacronSpoolManager {
-    pub spool_path: String,
-    pub timestamps: BTreeMap<String, u64>,
-}
-
-impl AnacronSpoolManager {
-    pub fn new(spool_path: &str) -> Self {
-        Self {
-            spool_path: spool_path.to_string(),
-            timestamps: BTreeMap::new(),
-        }
-    }
-
-    pub fn record_job_run(&mut self, job_id: &str, timestamp: u64) {
-        self.timestamps.insert(job_id.to_string(), timestamp);
-    }
-
-    pub fn get_last_run(&self, job_id: &str) -> Option<u64> {
-        self.timestamps.get(job_id).copied()
-    }
-}
-
-pub type AnacronSpoolSpecManager = AnacronSpoolManager;
-
 /// `at` and `batch` Delayed Job Queue Entry
 #[derive(Debug, Clone)]
 pub struct AtJob {
@@ -1404,104 +1336,6 @@ pub struct AtJob {
     pub queue: char, // 'a'..'z' or 'b' for batch
     pub max_load_average: Option<f32>,
 }
-
-/// `atd` Queue Spool Manager
-#[derive(Debug, Clone, Default)]
-pub struct AtSpoolQueueManager {
-    pub spool_dir: String,
-    pub queued_jobs: Vec<AtJob>,
-    pub jobs: BTreeMap<u64, AtJob>,
-    pub next_job_id: u64,
-}
-
-impl AtSpoolQueueManager {
-    pub fn new(spool_dir: &str) -> Self {
-        Self {
-            spool_dir: "/var/spool/at".to_string(),
-            queued_jobs: Vec::new(),
-            jobs: BTreeMap::new(),
-            next_job_id: 1,
-        }
-    }
-
-    pub fn new_with_spool(spool_dir: &str) -> Self {
-        Self {
-            spool_dir: spool_dir.to_string(),
-            queued_jobs: Vec::new(),
-            jobs: BTreeMap::new(),
-            next_job_id: 1,
-        }
-    }
-
-    pub fn enqueue_job(&mut self, job: AtJob) {
-        self.queued_jobs.push(job);
-    }
-
-    pub fn poll_ready_jobs(&mut self, now_timestamp: u64, current_load: f32) -> Vec<AtJob> {
-        let mut ready = Vec::new();
-        let mut pending = Vec::new();
-
-        for job in self.queued_jobs.drain(..) {
-            let load_ok = match job.max_load_average {
-                Some(max_l) => current_load <= max_l,
-                None => true,
-            };
-
-            if now_timestamp >= job.execute_at && load_ok {
-                ready.push(job);
-            } else {
-                pending.push(job);
-            }
-        }
-
-        self.queued_jobs = pending;
-        ready
-    }
-
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job.clone());
-        self.queued_jobs.push(job);
-        id
-    }
-
-    pub fn poll_ready_jobs(&mut self, now_timestamp: u64, current_load: f32) -> Vec<AtJob> {
-        let mut ready = Vec::new();
-        let mut pending = Vec::new();
-
-        for job in self.queued_jobs.drain(..) {
-            let load_ok = match job.max_load_average {
-                Some(max_l) => current_load <= max_l,
-                None => true,
-            };
-
-            if now_timestamp >= job.execute_at && load_ok {
-                ready.push(job);
-            } else {
-                pending.push(job);
-            }
-        }
-
-        self.queued_jobs = pending;
-        ready
-    }
-}
-
-pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
 
 /// Systemd Timer Specification
 #[derive(Debug, Clone)]
@@ -2211,22 +2045,5 @@ mod tests {
             "SovereignAgent",
         );
         assert!(clean_room_gw.run_automated_ci_gate());
-    }
-
-    #[test]
-    fn test_systemd_timer_spec() {
-        let timer = SystemdTimerSpec {
-            name: "backup.timer".to_string(),
-            unit_to_trigger: "backup.service".to_string(),
-            on_calendar: None,
-            on_boot_sec: Some(300),
-            on_unit_active_sec: None,
-            persistent: true,
-            accuracy_sec: 1,
-            last_trigger_timestamp: 0,
-        };
-
-        assert!(!timer.is_triggered(100, 0, 0));
-        assert!(timer.is_triggered(350, 0, 0));
     }
 }

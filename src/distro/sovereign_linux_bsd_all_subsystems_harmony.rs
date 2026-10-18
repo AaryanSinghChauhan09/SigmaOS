@@ -1327,10 +1327,6 @@ mod tests {
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",
         );
-        assert_eq!(
-            translated,
-            "ebpf_xdp_namespace"
-        );
         assert_eq!(translated, "ebpf_xdp_namespace");
     }
 

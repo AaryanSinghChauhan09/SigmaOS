@@ -512,8 +512,6 @@ pub struct EffectcraftOpticalFlowMotionVectorPrEngine {
     pub vector_field: Vec<MotionVector>,
 }
 
-pub type EffectcraftOpticalFlowMotionVectorPrEngine = OpticalFlowSlowMotionTimeWarpPrEngine;
-
 impl OpticalFlowSlowMotionTimeWarpPrEngine {
     pub fn new() -> Self {
         Self {
@@ -931,14 +929,6 @@ impl Default for ProceduralVfxFractalFluidSimulationPrEngine {
     fn default() -> Self {
         Self::new()
     }
-}
-
-/// Film grain profile parameters.
-#[derive(Debug, Clone)]
-pub struct FilmGrainProfile {
-    pub film_stock: String,
-    pub grain_size: f32,
-    pub intensity: f32,
 }
 
 /// Temporal noise reduction & spatial degrain PR engine.

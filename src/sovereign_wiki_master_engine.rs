@@ -232,19 +232,6 @@ impl Default for Sovereign100IdeasSuite {
     }
 }
 
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// ---------------------------------------------------------------------------
 /// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
 /// ---------------------------------------------------------------------------
@@ -310,21 +297,80 @@ impl SovereignShardsMasterRegistry {
     }
 
     fn register_all_12_shards(&mut self) {
-        self.shards.insert(
-            1,
-            SovereignShardDescriptor {
-                id: SovereignShardId::Shard01ProductivityOffice,
-                code_name: "S-SHARD 01: Productivity Office & Layout Engine",
-                absorbed_legacy_software: vec![
-                    "LibreOffice",
-                    "Microsoft Office",
-                    "PDF Readers",
-                    "LaTeX",
-                ],
-                zero_alloc_rust_native: true,
-                status_active: true,
-            },
-        );
+        let shard_defs = [
+            (
+                1,
+                SovereignShardId::Shard01ProductivityOffice,
+                "OFFICE_NATIVE",
+                vec!["LibreOffice", "Microsoft 365"],
+            ),
+            (
+                2,
+                SovereignShardId::Shard02MediaProcessingPlayback,
+                "MEDIA_STUDIO",
+                vec!["VLC", "FFmpeg", "Audacity"],
+            ),
+            (
+                3,
+                SovereignShardId::Shard03Creative2D3DCad,
+                "CREATIVE_CAD",
+                vec!["Blender", "FreeCAD", "GIMP"],
+            ),
+            (
+                4,
+                SovereignShardId::Shard04FoundationalAiMl,
+                "AI_CORE",
+                vec!["PyTorch", "TensorFlow"],
+            ),
+            (
+                5,
+                SovereignShardId::Shard05LlmCognitiveArchitectures,
+                "COGNITIVE_LLM",
+                vec!["Ollama", "llama.cpp"],
+            ),
+            (
+                6,
+                SovereignShardId::Shard06AutonomousAiAgentSwarms,
+                "AGENT_SWARM",
+                vec!["AutoGPT", "CrewAI"],
+            ),
+            (
+                7,
+                SovereignShardId::Shard07QuantumResistantMeshNet,
+                "QUANTUM_MESH",
+                vec!["WireGuard", "Tailscale"],
+            ),
+            (
+                8,
+                SovereignShardId::Shard08SovereignFsStorage,
+                "SIGMA_FS",
+                vec!["ZFS", "Btrfs"],
+            ),
+            (
+                9,
+                SovereignShardId::Shard09ZenithDesktopCompositor,
+                "ZENITH_COMPOSITOR",
+                vec!["Sway", "Hyprland"],
+            ),
+            (
+                10,
+                SovereignShardId::Shard10EdgeGlobalCompliance,
+                "COMPLIANCE_GUARD",
+                vec!["OpenSCAP", "Auditd"],
+            ),
+            (
+                11,
+                SovereignShardId::Shard11SystemAdministrationOps,
+                "SYSTEM_OPS",
+                vec!["Systemd", "OpenRC"],
+            ),
+            (
+                12,
+                SovereignShardId::Shard12HardwareVirtualizationHypervisor,
+                "HYPERVISOR_NATIVE",
+                vec!["KVM", "Bhyve"],
+            ),
+        ];
 
         self.shards.insert(
             2,
@@ -507,14 +553,14 @@ impl SovereignDistroGapClosureEngine {
         self.features.push(DistroGapFeatureRecord {
             distro_name: "OpenBSD",
             gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine",
+            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
 
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine",
+            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
             verification_passed: true,
         });
     }
@@ -605,7 +651,6 @@ impl Default for WikiSpecificationDataSyncer {
 /// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Suite100Ideas,
     pub shards_registry: SovereignShardsMasterRegistry,

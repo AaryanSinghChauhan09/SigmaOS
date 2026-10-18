@@ -73,9 +73,7 @@ impl DesigncraftPrCategory {
             Self::DesignTokensStyleDictionary => {
                 "design tokens style dictionary & cross-platform token exporter"
             }
-            Self::IconSystemPackagingSymbols => {
-                "icon system packaging & vector symbol instance manager"
-            }
+            Self::IconSystemPackagingSymbols => "icon system packaging & symbol library manager",
             Self::AccessibilityAuditWcagLint => {
                 "accessibility WCAG 2.2 audit, contrast checker & ARIA linter"
             }
