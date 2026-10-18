@@ -81,14 +81,7 @@ impl FilmcraftNleTimelineRippleRollEditPrEngine {
         }
     }
 
-    pub fn apply_trim(
-        &mut self,
-        mode: TrimMode,
-        delta: i32,
-        clip_in: &mut u32,
-        clip_out: &mut u32,
-        clip_start: &mut u32,
-    ) -> Result<(), String> {
+    pub fn apply_trim(&mut self, mode: TrimMode, delta: i32, clip_in: &mut u32, clip_out: &mut u32, clip_start: &mut u32) -> Result<(), String> {
         self.current_mode = mode;
         self.delta_frames = delta;
 
@@ -158,11 +151,7 @@ impl FilmcraftColorWheelHslSecondaryGradingPrEngine {
         }
     }
 
-    pub fn isolate_hsl_secondary(
-        &self,
-        rgb_in: &[f32],
-        mask_out: &mut [f32],
-    ) -> Result<usize, String> {
+    pub fn isolate_hsl_secondary(&self, rgb_in: &[f32], mask_out: &mut [f32]) -> Result<usize, String> {
         let count = rgb_in.len() / 3;
         if mask_out.len() != count {
             return Err("Output mask size mismatch with RGB frame buffer".to_string());
@@ -178,11 +167,7 @@ impl FilmcraftColorWheelHslSecondaryGradingPrEngine {
             let min_val = r.min(g).min(b);
             let delta = max_val - min_val;
 
-            let sat = if max_val > 0.001 {
-                delta / max_val
-            } else {
-                0.0
-            };
+            let sat = if max_val > 0.001 { delta / max_val } else { 0.0 };
 
             let mut hue = 0.0f32;
             if delta > 0.001 {
@@ -338,12 +323,7 @@ impl FilmcraftSubframeAudioSampleAlignerPrEngine {
         }
     }
 
-    pub fn apply_equal_power_crossfade(
-        &self,
-        samples_a: &[f32],
-        samples_b: &[f32],
-        output: &mut [f32],
-    ) -> Result<usize, String> {
+    pub fn apply_equal_power_crossfade(&self, samples_a: &[f32], samples_b: &[f32], output: &mut [f32]) -> Result<usize, String> {
         if samples_a.len() != samples_b.len() || output.len() != samples_a.len() {
             return Err("Crossfade buffer length mismatch".to_string());
         }
@@ -353,8 +333,8 @@ impl FilmcraftSubframeAudioSampleAlignerPrEngine {
 
         for i in 0..samples_a.len() {
             let t = (i as f32) / total;
-            let gain_a = ((1.0 - t) * half_pi).sin();
-            let gain_b = (t * half_pi).sin();
+            let gain_a = ( (1.0 - t) * half_pi ).sin();
+            let gain_b = ( t * half_pi ).sin();
             output[i] = samples_a[i] * gain_a + samples_b[i] * gain_b;
         }
 
@@ -413,10 +393,7 @@ impl FilmcraftMultiFormatGpuHardwareEncoderPrEngine {
         if !self.supported_codecs.iter().any(|c| c.contains(codec)) {
             return Err(format!("Unsupported video codec: '{}'", codec));
         }
-        Ok(format!(
-            "Configured GPU Encoder for {} @ {} kbps",
-            codec, bitrate_kbps
-        ))
+        Ok(format!("Configured GPU Encoder for {} @ {} kbps", codec, bitrate_kbps))
     }
 
     pub fn generate_proposal(&self) -> FilmcraftArtcraftPrProposalManifest {
@@ -464,12 +441,7 @@ impl FilmcraftVfxNodeGraphCompositorPrEngine {
         self.node_count
     }
 
-    pub fn execute_alpha_over(
-        &self,
-        fg_rgba: &[u8],
-        bg_rgba: &[u8],
-        out_rgba: &mut [u8],
-    ) -> Result<usize, String> {
+    pub fn execute_alpha_over(&self, fg_rgba: &[u8], bg_rgba: &[u8], out_rgba: &mut [u8]) -> Result<usize, String> {
         if fg_rgba.len() != bg_rgba.len() || out_rgba.len() != fg_rgba.len() {
             return Err("Compositing buffer size mismatch".to_string());
         }
@@ -484,8 +456,7 @@ impl FilmcraftVfxNodeGraphCompositorPrEngine {
             for c in 0..3 {
                 let fg_c = fg_rgba[px + c] as f32;
                 let bg_c = bg_rgba[px + c] as f32;
-                let blended =
-                    (fg_c * alpha_fg + bg_c * alpha_bg * (1.0 - alpha_fg)) / out_a.max(0.001);
+                let blended = (fg_c * alpha_fg + bg_c * alpha_bg * (1.0 - alpha_fg)) / out_a.max(0.001);
                 out_rgba[px + c] = blended.clamp(0.0, 255.0) as u8;
             }
             out_rgba[px + 3] = (out_a * 255.0).clamp(0.0, 255.0) as u8;
@@ -497,17 +468,13 @@ impl FilmcraftVfxNodeGraphCompositorPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftArtcraftPrProposalManifest {
         FilmcraftArtcraftPrProposalManifest {
             pr_id: 316,
-            pr_title:
-                "feat(filmcraft): Implement Node-Based VFX Video Compositor & Alpha Matte Pipeline"
-                    .to_string(),
+            pr_title: "feat(filmcraft): Implement Node-Based VFX Video Compositor & Alpha Matte Pipeline".to_string(),
             target_subsystem: "NLE VFX Node Graph Subsystem".to_string(),
             original_suite: "ArtCraft FilmCraft Node Compositor".to_string(),
             components_added: vec![
-                "Nuke-compatible DAG node graph pipeline for non-destructive visual effects"
-                    .to_string(),
+                "Nuke-compatible DAG node graph pipeline for non-destructive visual effects".to_string(),
                 "Porter-Duff alpha-over, inside, outside, holdout matte blend modes".to_string(),
-                "GPU accelerated blur, glow, transformation matrix & lens flare node library"
-                    .to_string(),
+                "GPU accelerated blur, glow, transformation matrix & lens flare node library".to_string(),
             ],
             performance_multiplier: "Real-Time 4K Node Graph Compositing Evaluation".to_string(),
             status: "Ready for Merge".to_string(),
@@ -557,14 +524,8 @@ impl FilmcraftAiAutoCaptionSubtitleGeneratorPrEngine {
             srt.push_str(&format!("{}\n", idx + 1));
             srt.push_str(&format!(
                 "{:02}:{:02}:{:02},{:03} --> {:02}:{:02}:{:02},{:03}\n",
-                s_sec / 3600,
-                (s_sec % 3600) / 60,
-                s_sec % 60,
-                s_ms,
-                e_sec / 3600,
-                (e_sec % 3600) / 60,
-                e_sec % 60,
-                e_ms
+                s_sec / 3600, (s_sec % 3600) / 60, s_sec % 60, s_ms,
+                e_sec / 3600, (e_sec % 3600) / 60, e_sec % 60, e_ms
             ));
             srt.push_str(&format!("{}\n\n", cue.text));
         }
@@ -804,17 +765,11 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         let mut in_pt = 0u32;
         let mut out_pt = 100u32;
         let mut start_pt = 0u32;
-        let trim_ok = self
-            .trim_engine
-            .apply_trim(TrimMode::Ripple, 10, &mut in_pt, &mut out_pt, &mut start_pt)
-            .is_ok();
+        let trim_ok = self.trim_engine.apply_trim(TrimMode::Ripple, 10, &mut in_pt, &mut out_pt, &mut start_pt).is_ok();
 
         let rgb = vec![0.8f32, 0.4f32, 0.2f32];
         let mut mask = vec![0.0f32; 1];
-        let color_ok = self
-            .color_engine
-            .isolate_hsl_secondary(&rgb, &mut mask)
-            .is_ok();
+        let color_ok = self.color_engine.isolate_hsl_secondary(&rgb, &mut mask).is_ok();
 
         self.keyframe_engine.add_keyframe(0, 0.0);
         self.keyframe_engine.add_keyframe(100, 1.0);
@@ -824,29 +779,16 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         let audio_a = vec![0.5f32; 10];
         let audio_b = vec![0.5f32; 10];
         let mut audio_out = vec![0.0f32; 10];
-        let audio_ok = self
-            .audio_subframe_engine
-            .apply_equal_power_crossfade(&audio_a, &audio_b, &mut audio_out)
-            .is_ok();
+        let audio_ok = self.audio_subframe_engine.apply_equal_power_crossfade(&audio_a, &audio_b, &mut audio_out).is_ok();
 
-        let enc_ok = self
-            .gpu_encoder_engine
-            .configure_encoder("AV1", 10000)
-            .is_ok();
+        let enc_ok = self.gpu_encoder_engine.configure_encoder("AV1", 10000).is_ok();
 
         let fg = vec![255, 0, 0, 128];
         let bg = vec![0, 0, 255, 255];
         let mut vfx_out = vec![0u8; 4];
-        let vfx_ok = self
-            .vfx_compositor_engine
-            .execute_alpha_over(&fg, &bg, &mut vfx_out)
-            .is_ok();
+        let vfx_ok = self.vfx_compositor_engine.execute_alpha_over(&fg, &bg, &mut vfx_out).is_ok();
 
-        let cues = vec![SubtitleCue {
-            start_ms: 0,
-            end_ms: 2000,
-            text: "Hello World".to_string(),
-        }];
+        let cues = vec![SubtitleCue { start_ms: 0, end_ms: 2000, text: "Hello World".to_string() }];
         let caption_str = self.caption_engine.export_srt(&cues);
         let caption_ok = !caption_str.is_empty();
 
@@ -854,21 +796,9 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         let proxy_jobs = self.proxy_transcoder_engine.enqueue_proxy_job("file1.mov");
         let proxy_ok = proxy_jobs > 0;
 
-        let xml_ok = self
-            .interchange_engine
-            .parse_premiere_xml("<xmeml><sequence><track></track></sequence></xmeml>")
-            .is_ok();
+        let xml_ok = self.interchange_engine.parse_premiere_xml("<xmeml><sequence><track></track></sequence></xmeml>").is_ok();
 
-        trim_ok
-            && color_ok
-            && keyframe_ok
-            && audio_ok
-            && enc_ok
-            && vfx_ok
-            && caption_ok
-            && multicam_ok
-            && proxy_ok
-            && xml_ok
+        trim_ok && color_ok && keyframe_ok && audio_ok && enc_ok && vfx_ok && caption_ok && multicam_ok && proxy_ok && xml_ok
     }
 
     pub fn collect_all_proposals(&self) -> Vec<FilmcraftArtcraftPrProposalManifest> {
@@ -880,10 +810,7 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals
-                .iter()
-                .filter(|p| p.status == "Ready for Merge")
-                .count();
+            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -909,8 +836,7 @@ impl FilmcraftArtcraftParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_filmcraft_artcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_filmcraft_artcraft_parity() && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -935,13 +861,7 @@ mod tests {
         let mut clip_out = 100;
         let mut clip_start = 0;
 
-        let res = engine.apply_trim(
-            TrimMode::Ripple,
-            10,
-            &mut clip_in,
-            &mut clip_out,
-            &mut clip_start,
-        );
+        let res = engine.apply_trim(TrimMode::Ripple, 10, &mut clip_in, &mut clip_out, &mut clip_start);
         assert!(res.is_ok());
         assert_eq!(clip_out, 110);
 
@@ -1021,11 +941,9 @@ mod tests {
     #[test]
     fn test_filmcraft_caption_engine() {
         let engine = FilmcraftAiAutoCaptionSubtitleGeneratorPrEngine::new();
-        let cues = vec![SubtitleCue {
-            start_ms: 1000,
-            end_ms: 3000,
-            text: "First subtitle line".to_string(),
-        }];
+        let cues = vec![
+            SubtitleCue { start_ms: 1000, end_ms: 3000, text: "First subtitle line".to_string() }
+        ];
         let srt = engine.export_srt(&cues);
         assert!(srt.contains("First subtitle line"));
 
