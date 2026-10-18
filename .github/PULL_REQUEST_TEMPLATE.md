@@ -32,7 +32,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference behavior
+## Reference study (Upstream study)
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 
@@ -42,7 +42,7 @@
 - New behavior:
 - Compatibility impact:
 
-## Changes
+## Changes (What SigmaOS adopts)
 
 -
 -
@@ -82,7 +82,7 @@
 - [ ] Storage documentation
 - [ ] Boot matrix, if applicable
 
-## Risks and rollback
+## Risks and rollback (Safety and rollback)
 
 - Risk:
 - Rollback:
