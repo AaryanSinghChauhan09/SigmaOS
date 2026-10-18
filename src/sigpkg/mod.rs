@@ -425,3 +425,5 @@ pub use crate::package::sovereign_distro_package_advancements_v37::*;
 pub use crate::package::sovereign_distro_package_advancements_v47::*;
 pub use crate::package::sovereign_distro_package_advancements_v50::*;
 pub use crate::package::sovereign_distro_package_advancements_v52::*;
+pub use crate::package::sovereign_distro_package_advancements_v61::*;
+pub use crate::package::sovereign_distro_package_advancements_v62::*;
