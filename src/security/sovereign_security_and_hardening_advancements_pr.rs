@@ -40,7 +40,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         domain_type: &str,
         level: &str,
     ) -> String {
-        alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
+        format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
     /// Evaluate SELinux access vector decision (Type Enforcement).
@@ -484,14 +484,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
-    /// Generate SSSD domain configuration.
-    pub fn generate_sssd_domain_conf(domain_name: &str, ldap_uri: &str, krb_realm: &str) -> String {
-        alloc::format!(
-            "[sssd]\ndomains = {}\n\n[domain/{}]\nid_provider = ldap\nauth_provider = krb5\nldap_uri = {}\nkrb5_realm = {}\nldap_search_base = dc=example,dc=org\ncache_credentials = true\n",
-            domain_name, domain_name, ldap_uri, krb_realm
-        )
-    }
-
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
         let estimated_parts = dn.as_bytes().iter().filter(|&&b| b == b',').count() + 1;
@@ -517,19 +509,13 @@ impl IdentityAndEnterpriseAuthPrEngine {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
     }
 
-    /// Generate SSSD PAM/NSS identity lookup response tuple (`uid`, `gid`, `gecos`, `home`, `shell`).
-    pub fn generate_sssd_pam_nss_response(
-        &self,
-        username: &str,
-        uid: u32,
-        gid: u32,
-    ) -> (String, u32, u32, String, String) {
-        (
-            username.to_string(),
-            uid,
-            gid,
-            alloc::format!("/home/{}", username),
-            "/bin/bash".to_string(),
+    /// Generate SSSD domain config file string.
+    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
+        format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
+            domain_name,
+            provider,
+            uri
         )
     }
 
