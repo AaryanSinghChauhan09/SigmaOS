@@ -193,9 +193,9 @@ impl XfsOperationalState {
     }
 
     pub fn lookup_reverse_mapping(&self, physical_block: u64) -> Option<&XfsReflinkExtent> {
-        self.reflink_map
-            .iter()
-            .find(|ext| physical_block >= ext.physical_block && physical_block < ext.physical_block + ext.length)
+        self.reflink_map.iter().find(|ext| {
+            physical_block >= ext.physical_block && physical_block < ext.physical_block + ext.length
+        })
     }
 
     pub fn reserve_speculative_prealloc(&mut self, ag_id: u32, len: u32) -> bool {
@@ -294,7 +294,12 @@ impl BtrfsOperationalState {
         }
     }
 
-    pub fn enforce_qgroup_limit(&self, _qgroup_id: u64, requested_bytes: u64, limit_bytes: u64) -> bool {
+    pub fn enforce_qgroup_limit(
+        &self,
+        _qgroup_id: u64,
+        requested_bytes: u64,
+        limit_bytes: u64,
+    ) -> bool {
         self.qgroup_usage_bytes + requested_bytes <= limit_bytes
     }
 
@@ -489,7 +494,11 @@ impl F2fsOperationalState {
     }
 
     pub fn reset_zone_and_append(&mut self, segment_id: u32) -> bool {
-        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
+        if let Some(seg) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.segment_id == segment_id)
+        {
             seg.written_blocks = 0;
             seg.zoned_append_offset = 0;
             return true;
@@ -525,8 +534,16 @@ impl ExFatOperationalState {
         }
     }
 
-    pub fn allocate_aligned_flash_cluster(&mut self, count: u32, boundary_align: u32) -> Option<u32> {
-        let align = if boundary_align == 0 { 1 } else { boundary_align };
+    pub fn allocate_aligned_flash_cluster(
+        &mut self,
+        count: u32,
+        boundary_align: u32,
+    ) -> Option<u32> {
+        let align = if boundary_align == 0 {
+            1
+        } else {
+            boundary_align
+        };
         let remainder = self.allocated_clusters % align;
         let padding = if remainder == 0 { 0 } else { align - remainder };
         let needed = padding + count;
@@ -605,7 +622,8 @@ impl NfsOperationalState {
     }
 
     pub fn acquire_nfs_delegation(&mut self, file_handle: u64, write_delegation: bool) -> bool {
-        self.active_delegations.insert(file_handle, write_delegation);
+        self.active_delegations
+            .insert(file_handle, write_delegation);
         true
     }
 }
@@ -732,7 +750,7 @@ impl BcachefsOperationalState {
 
     pub fn calculate_erasure_coding_parity(&self, data_blocks: &[&[u8]]) -> Vec<u8> {
         let len = data_blocks.iter().map(|b| b.len()).max().unwrap_or(0);
-        let mut parity = vec![0u8; len];
+        let mut parity = alloc::vec![0u8; len];
         for block in data_blocks {
             for (i, &byte) in block.iter().enumerate() {
                 parity[i] ^= byte;
@@ -772,7 +790,11 @@ impl Hammer2OperationalState {
     }
 
     pub fn rollback_transid(&mut self, target_transid: u64) -> bool {
-        if let Some(pos) = self.snapshot_transids.iter().position(|&t| t == target_transid) {
+        if let Some(pos) = self
+            .snapshot_transids
+            .iter()
+            .position(|&t| t == target_transid)
+        {
             self.snapshot_transids.truncate(pos + 1);
             true
         } else {
@@ -783,7 +805,10 @@ impl Hammer2OperationalState {
     pub fn lookup_directory_hash(&self, name: &str) -> u64 {
         let mut hash = 5381u64;
         for &b in name.as_bytes() {
-            hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(b as u64);
+            hash = hash
+                .wrapping_shl(5)
+                .wrapping_add(hash)
+                .wrapping_add(b as u64);
         }
         hash
     }
@@ -1103,12 +1128,18 @@ impl DeviceMapperOperationalState {
         }
     }
 
-    pub fn calculate_dm_stripe_range(&self, logical_block: u64, stripe_count: u32, stripe_size: u32) -> (u32, u64) {
+    pub fn calculate_dm_stripe_range(
+        &self,
+        logical_block: u64,
+        stripe_count: u32,
+        stripe_size: u32,
+    ) -> (u32, u64) {
         if stripe_count == 0 || stripe_size == 0 {
             return (0, logical_block);
         }
         let stripe_idx = ((logical_block / stripe_size as u64) % stripe_count as u64) as u32;
-        let phys_offset = ((logical_block / (stripe_count as u64 * stripe_size as u64)) * stripe_size as u64)
+        let phys_offset = ((logical_block / (stripe_count as u64 * stripe_size as u64))
+            * stripe_size as u64)
             + (logical_block % stripe_size as u64);
         (stripe_idx, phys_offset)
     }
@@ -1148,7 +1179,7 @@ impl GeomGeliOperationalState {
     }
 
     pub fn build_geom_class_stack(&self) -> Vec<String> {
-        vec![
+        alloc::vec![
             "GEOM_PART".to_string(),
             "GEOM_ELI".to_string(),
             "GEOM_MIRROR".to_string(),
@@ -1228,7 +1259,11 @@ impl StorageUtilitiesEngine {
         )
     }
 
-    pub fn simulate_resize2fs_expansion(&self, current_blocks: u64, target_blocks: u64) -> (bool, u64) {
+    pub fn simulate_resize2fs_expansion(
+        &self,
+        current_blocks: u64,
+        target_blocks: u64,
+    ) -> (bool, u64) {
         if target_blocks >= current_blocks {
             (true, target_blocks)
         } else {
@@ -1242,10 +1277,17 @@ impl StorageUtilitiesEngine {
     }
 
     pub fn report_btrfs_balance_status(&self, relocated_extents: u64) -> String {
-        format!("Btrfs Balance: {} extents relocated successfully", relocated_extents)
+        format!(
+            "Btrfs Balance: {} extents relocated successfully",
+            relocated_extents
+        )
     }
 
-    pub fn validate_gdisk_gpt_secondary_sync(&self, primary_valid: bool, secondary_valid: bool) -> bool {
+    pub fn validate_gdisk_gpt_secondary_sync(
+        &self,
+        primary_valid: bool,
+        secondary_valid: bool,
+    ) -> bool {
         primary_valid && secondary_valid
     }
 
@@ -2108,7 +2150,10 @@ mod tests {
         assert!(utils.report_btrfs_balance_status(10).contains("10 extents"));
         assert!(utils.validate_gdisk_gpt_secondary_sync(true, true));
         let parsed = utils.parse_autofs_map_entry("/net /etc/auto.net");
-        assert_eq!(parsed, Some(("/net".to_string(), "/etc/auto.net".to_string())));
+        assert_eq!(
+            parsed,
+            Some(("/net".to_string(), "/etc/auto.net".to_string()))
+        );
     }
 
     #[test]
@@ -2133,7 +2178,9 @@ mod tests {
         let mut cifs = CifsOperationalState::new();
         assert!(cifs.negotiate_smb311());
         assert!(cifs.consume_rdma_credit());
-        assert!(!cifs.encode_posix_mode_and_symlink(0o755, "/usr/bin").is_empty());
+        assert!(!cifs
+            .encode_posix_mode_and_symlink(0o755, "/usr/bin")
+            .is_empty());
 
         let mut pseudo = PseudoFsOperationalState::new(100000);
         assert!(pseudo.tmpfs_allocate(1000));

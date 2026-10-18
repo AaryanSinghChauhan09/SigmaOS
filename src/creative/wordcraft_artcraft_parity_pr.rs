@@ -109,13 +109,18 @@ impl WordcraftOpenTypeTypographyLayoutPrEngine {
     }
 
     pub fn shape_opentype_text(&self, input: &str) -> String {
-        input.replace("ffi", "ﬃ").replace("fi", "ﬁ").replace("fl", "ﬂ")
+        input
+            .replace("ffi", "ﬃ")
+            .replace("fi", "ﬁ")
+            .replace("fl", "ﬂ")
     }
 
     pub fn calculate_column_widths(&self, page_width_mm: f32, margins_mm: f32) -> Vec<f32> {
         let printable_width = page_width_mm - (2.0 * margins_mm);
-        let total_gaps = (self.active_column_config.column_count as f32 - 1.0) * self.active_column_config.column_gap_mm;
-        let single_width = (printable_width - total_gaps) / self.active_column_config.column_count as f32;
+        let total_gaps = (self.active_column_config.column_count as f32 - 1.0)
+            * self.active_column_config.column_gap_mm;
+        let single_width =
+            (printable_width - total_gaps) / self.active_column_config.column_count as f32;
         vec![single_width; self.active_column_config.column_count as usize]
     }
 }
@@ -285,7 +290,9 @@ impl WordcraftCitationBibliographyCrossReferencePrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement Citations, Footnotes, Bibliography & Dynamic TOC Engine".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement Citations, Footnotes, Bibliography & Dynamic TOC Engine"
+                    .to_string(),
             target_subsystem: "Wordcraft Reference & Citation Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Scholarly Publishing Suite".to_string(),
             components_added: vec![
@@ -302,10 +309,16 @@ impl WordcraftCitationBibliographyCrossReferencePrEngine {
     pub fn format_citation(&self, key: &str, style: WordcraftCitationStyle) -> Option<String> {
         let source = self.sources.get(key)?;
         match style {
-            WordcraftCitationStyle::APA => Some(format!("({}, {})", source.author.split(' ').last().unwrap_or(&source.author), source.year)),
+            WordcraftCitationStyle::APA => Some(format!(
+                "({}, {})",
+                source.author.split(' ').last().unwrap_or(&source.author),
+                source.year
+            )),
             WordcraftCitationStyle::IEEE => Some(format!("[{}]", key)),
             WordcraftCitationStyle::MLA => Some(format!("({})", source.author)),
-            WordcraftCitationStyle::Chicago => Some(format!("{}, {}.", source.author, source.title)),
+            WordcraftCitationStyle::Chicago => {
+                Some(format!("{}, {}.", source.author, source.title))
+            }
         }
     }
 
@@ -600,7 +613,9 @@ impl WordcraftTableFormulaChartPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement Embedded Tables, Cell Formulas & SVG Chart Generator".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement Embedded Tables, Cell Formulas & SVG Chart Generator"
+                    .to_string(),
             target_subsystem: "Wordcraft Table & Chart Engine".to_string(),
             original_suite: "ArtCraft WordCraft Dynamic Tables".to_string(),
             components_added: vec![
@@ -621,7 +636,9 @@ impl WordcraftTableFormulaChartPrEngine {
             WordcraftTableFormula::SumAbove => values.iter().sum(),
             WordcraftTableFormula::AverageAbove => values.iter().sum::<f32>() / values.len() as f32,
             WordcraftTableFormula::CountAbove => values.len() as f32,
-            WordcraftTableFormula::MaxAbove => values.iter().copied().fold(f32::NEG_INFINITY, f32::max),
+            WordcraftTableFormula::MaxAbove => {
+                values.iter().copied().fold(f32::NEG_INFINITY, f32::max)
+            }
             WordcraftTableFormula::MinAbove => values.iter().copied().fold(f32::INFINITY, f32::min),
         }
     }
@@ -671,7 +688,8 @@ impl WordcraftDocumentSecurityWatermarkPrEngine {
     }
 
     pub fn redact_content(&self, text: &str) -> String {
-        text.replace("secret", "██████").replace("Confidential", "████████████")
+        text.replace("secret", "██████")
+            .replace("Confidential", "████████████")
     }
 }
 
@@ -696,7 +714,9 @@ impl WordcraftMasterTemplateThemeCascadePrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement Master Template Hierarchy & Brand Theme Synchronization".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement Master Template Hierarchy & Brand Theme Synchronization"
+                    .to_string(),
             target_subsystem: "Wordcraft Template Cascade Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Brand Suite".to_string(),
             components_added: vec![
@@ -783,39 +803,70 @@ impl SovereignWordcraftArtcraftParityPrGateway {
         let shaped = self.suite.typography_layout.shape_opentype_text("office");
         let typography_ok = shaped == "oﬃce";
 
-        let style = self.suite.style_hierarchy.resolve_computed_style("Heading 1");
+        let style = self
+            .suite
+            .style_hierarchy
+            .resolve_computed_style("Heading 1");
         let style_ok = style.is_some();
 
-        let citation = self.suite.references_citations.format_citation("Knuth1984", WordcraftCitationStyle::APA);
+        let citation = self
+            .suite
+            .references_citations
+            .format_citation("Knuth1984", WordcraftCitationStyle::APA);
         let citation_ok = citation == Some("(Knuth, 1984)".to_string());
 
-        let readability = self.suite.linguistic_ai.calculate_readability_score("The quick brown fox jumps over the lazy dog.");
+        let readability = self
+            .suite
+            .linguistic_ai
+            .calculate_readability_score("The quick brown fox jumps over the lazy dog.");
         let ai_ok = readability > 0.0;
 
-        self.suite.crdt_collab.update_cursor_presence(WordcraftSelectionCursor {
-            client_id: 1,
-            client_name: "Author 1".to_string(),
-            cursor_color_hex: "#FF0000".to_string(),
-            paragraph_id: 1,
-            selection_start: 0,
-            selection_end: 10,
-        });
+        self.suite
+            .crdt_collab
+            .update_cursor_presence(WordcraftSelectionCursor {
+                client_id: 1,
+                client_name: "Author 1".to_string(),
+                cursor_color_hex: "#FF0000".to_string(),
+                paragraph_id: 1,
+                selection_start: 0,
+                selection_end: 10,
+            });
         let crdt_ok = self.suite.crdt_collab.active_cursors.contains_key(&1);
 
-        let merged = self.suite.mail_merge.merge_template("Hello {{FirstName}} {{LastName}}", 0);
+        let merged = self
+            .suite
+            .mail_merge
+            .merge_template("Hello {{FirstName}} {{LastName}}", 0);
         let merge_ok = merged == Some("Hello John Doe".to_string());
 
         let preflight_ok = self.suite.book_publisher.run_print_preflight();
-        let formula_eval = self.suite.table_formula_chart.evaluate_table_formula(WordcraftTableFormula::SumAbove, &[10.0, 20.0, 30.0]);
+        let formula_eval = self
+            .suite
+            .table_formula_chart
+            .evaluate_table_formula(WordcraftTableFormula::SumAbove, &[10.0, 20.0, 30.0]);
         let math_ok = formula_eval == 60.0;
 
-        let redacted = self.suite.security_watermark.redact_content("Keep this secret text");
+        let redacted = self
+            .suite
+            .security_watermark
+            .redact_content("Keep this secret text");
         let sec_ok = redacted.contains("██████");
 
-        self.suite.master_theme.update_brand_tokens("#003366", "Arial");
+        self.suite
+            .master_theme
+            .update_brand_tokens("#003366", "Arial");
         let theme_ok = self.suite.master_theme.primary_brand_color == "#003366";
 
-        typography_ok && style_ok && citation_ok && ai_ok && crdt_ok && merge_ok && preflight_ok && math_ok && sec_ok && theme_ok
+        typography_ok
+            && style_ok
+            && citation_ok
+            && ai_ok
+            && crdt_ok
+            && merge_ok
+            && preflight_ok
+            && math_ok
+            && sec_ok
+            && theme_ok
     }
 
     pub fn collect_all_proposals(&self) -> Vec<WordcraftArtcraftPrProposalManifest> {
@@ -851,7 +902,9 @@ mod tests {
     #[test]
     fn test_citation_bibliography_engine() {
         let engine = WordcraftCitationBibliographyCrossReferencePrEngine::new();
-        let citation = engine.format_citation("Knuth1984", WordcraftCitationStyle::APA).unwrap();
+        let citation = engine
+            .format_citation("Knuth1984", WordcraftCitationStyle::APA)
+            .unwrap();
         assert_eq!(citation, "(Knuth, 1984)");
 
         let toc = engine.generate_toc(&[("Introduction", 1, 1), ("Architecture", 2, 5)]);
@@ -891,7 +944,9 @@ mod tests {
     #[test]
     fn test_mail_merge_engine() {
         let mut engine = WordcraftMailMergeAutomationPrEngine::new();
-        let merged = engine.merge_template("Hello {{FirstName}} {{LastName}} from {{Company}}", 0).unwrap();
+        let merged = engine
+            .merge_template("Hello {{FirstName}} {{LastName}} from {{Company}}", 0)
+            .unwrap();
         assert_eq!(merged, "Hello John Doe from SigmaOS Corp");
 
         engine.register_form_field(WordcraftFormFieldEntry {
@@ -912,7 +967,8 @@ mod tests {
     #[test]
     fn test_table_formula_chart_engine() {
         let engine = WordcraftTableFormulaChartPrEngine::new();
-        let sum = engine.evaluate_table_formula(WordcraftTableFormula::SumAbove, &[10.0, 20.0, 30.0]);
+        let sum =
+            engine.evaluate_table_formula(WordcraftTableFormula::SumAbove, &[10.0, 20.0, 30.0]);
         assert_eq!(sum, 60.0);
 
         let svg = engine.render_inline_bar_chart_svg("Revenue", &[100.0, 200.0]);
