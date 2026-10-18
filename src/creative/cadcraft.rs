@@ -225,18 +225,6 @@ pub enum SolidFeatureType {
     BooleanIntersection,
 }
 
-/// 3D B-Rep Solid Model
-#[derive(Debug, Clone)]
-pub struct BRepSolidModel {
-    pub name: String,
-    pub vertices: Vec<Vector3D>,
-    pub faces_count: usize,
-    pub edges_count: usize,
-    pub volume: f64,
-    pub surface_area: f64,
-    pub feature_history: Vec<SolidFeatureOperation>,
-}
-
 impl BRepSolidModel {
     pub fn new(name: &str) -> Self {
         Self {
