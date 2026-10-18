@@ -7,6 +7,8 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
 /// Clock source type
@@ -369,7 +371,7 @@ mod tests {
         let mut tm = TimerManager::new();
         let id = tm.create_timer(1_000_000);
         static mut CALLED: bool = false;
-        extern "C" fn test_callback() {
+        fn test_callback() {
             unsafe {
                 CALLED = true;
             }

@@ -469,7 +469,7 @@ mod tests {
         );
 
         let nchanges = manager.kevent(kq, &[event], 10, 100).unwrap();
-        assert_eq!(nchanges, 0);
+        assert_eq!(nchanges.len(), 0);
     }
 
     #[test]
@@ -494,7 +494,7 @@ mod tests {
         );
 
         let nchanges = manager.kevent(kq, &[event2], 10, 100).unwrap();
-        assert_eq!(nchanges, 0);
+        assert_eq!(nchanges.len(), 0);
     }
 
     #[test]
