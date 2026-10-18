@@ -40,7 +40,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         domain_type: &str,
         level: &str,
     ) -> String {
-        format!("{}:{}:{}:{}", user, role, domain_type, level)
+        alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
     /// Evaluate SELinux access vector decision (Type Enforcement).
