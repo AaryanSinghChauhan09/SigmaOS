@@ -605,7 +605,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-            category: "Productivity".to_string(),
+            category: "Browser".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
                 .to_string(),

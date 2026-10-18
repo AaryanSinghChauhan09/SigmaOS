@@ -111,7 +111,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Evaluate Landlock v5 access permission (u64).
+    /// Evaluate Landlock v5 access permission.
     pub fn check_landlock_access_u64(handled_access: u64, requested_access: u64) -> bool {
         (handled_access & requested_access) == requested_access
     }

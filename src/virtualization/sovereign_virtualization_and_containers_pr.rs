@@ -95,7 +95,6 @@ pub struct KvmQemuEngine {
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
     pub virtio_fs_inodes_cached: u64,
-    pub disk_images: Vec<QemuDiskImageSpec>,
 }
 
 impl KvmQemuEngine {
@@ -107,7 +106,6 @@ impl KvmQemuEngine {
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
             virtio_fs_inodes_cached: 0,
-            disk_images: Vec::new(),
         }
     }
 
