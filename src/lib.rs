@@ -24,6 +24,7 @@ pub mod contributing;
 pub mod creative;
 pub use creative::effectcraft_missing_components_parity_pr::*;
 pub use creative::filmcraft_missing_components_parity_pr::*;
+pub use creative::photocraft_missing_components_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
 pub use creative::wordcraft::*;
 pub use creative::threedcraft_missing_components_parity_pr::*;
