@@ -143,3 +143,4 @@
 - [Future Development Roadmap](./Future-Development-Roadmap-BSD-Craft-Linux.md)
 - [AI Operating Manual](./AI-Development-Agent-Operating-Manual.md)
 - [AI Maintenance Policy](./AI-Agent-Maintenance-Instructions.md)
+- [Open Source OS Inspiration V61 PR Suite](./38-Open-Source-OS-Inspiration-V61-PR-Suite.md)
