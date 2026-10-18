@@ -361,13 +361,11 @@ impl DebianSubiquityInstallerEngineV6 {
                     .trim()
                     .to_string();
             } else if trimmed.starts_with("iscsi_iqn:") {
-                self.autoinstall_spec.iscsi_target_iqn = Some(
-                    trimmed.trim_start_matches("iscsi_iqn:").trim().to_string(),
-                );
+                self.autoinstall_spec.iscsi_target_iqn =
+                    Some(trimmed.trim_start_matches("iscsi_iqn:").trim().to_string());
             } else if trimmed.starts_with("nfs_export:") {
-                self.autoinstall_spec.nfs_root_export = Some(
-                    trimmed.trim_start_matches("nfs_export:").trim().to_string(),
-                );
+                self.autoinstall_spec.nfs_root_export =
+                    Some(trimmed.trim_start_matches("nfs_export:").trim().to_string());
             } else if trimmed.starts_with("layout:") {
                 self.autoinstall_spec.storage_layout_name =
                     trimmed.trim_start_matches("layout:").trim().to_string();
@@ -518,7 +516,11 @@ impl BsdinstallAutoinstallEngineV6 {
     }
 
     /// Create new FreeBSD VNET jail container
-    pub fn provision_vnet_jail(&mut self, jail_name: &str, ip_addr: &str) -> Result<String, String> {
+    pub fn provision_vnet_jail(
+        &mut self,
+        jail_name: &str,
+        ip_addr: &str,
+    ) -> Result<String, String> {
         let entry = format!("{}:{}", jail_name, ip_addr);
         self.vnet_jails_provisioned.push(entry.clone());
         let msg = format!(
@@ -718,9 +720,8 @@ impl AnsibleAgentlessEngineV6 {
             return Err("Ansible V6: Empty Vault password supplied".to_string());
         }
         self.vault_decrypted = true;
-        self.logs.push(
-            "Ansible V6: Decrypted Argon2id/AES-256-GCM Vault secret store".to_string(),
-        );
+        self.logs
+            .push("Ansible V6: Decrypted Argon2id/AES-256-GCM Vault secret store".to_string());
         Ok(true)
     }
 
@@ -731,7 +732,8 @@ impl AnsibleAgentlessEngineV6 {
         }
         self.task_queue.push("setup_facts".to_string());
         self.task_queue.push("configure_network_v6".to_string());
-        self.task_queue.push("deploy_container_runtimes".to_string());
+        self.task_queue
+            .push("deploy_container_runtimes".to_string());
         self.task_queue.push("audit_cis_compliance".to_string());
         let count = self.task_queue.len();
         self.logs.push(format!(
