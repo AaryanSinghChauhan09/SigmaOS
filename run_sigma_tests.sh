@@ -1712,6 +1712,13 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_and_arch_github_prs.rs" ]
     ./build/test_open_source_os_arch_prs
 fi
 
+if [ -f "tests/test_open_source_os_and_arch_missing_components_v64_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas & Arch GitHub PRs V63/V64 test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_and_arch_missing_components_v64_pr.rs --edition=2021 -o build/test_v63_v64_os_arch_prs
+    ./build/test_v63_v64_os_arch_prs
+fi
+
 
 if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
     echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
