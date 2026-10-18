@@ -230,11 +230,9 @@ impl UniversalPackageFormatInspectorV64 {
                 PackageSignatureKindV64::Unsigned,
                 "gzip",
             ),
-            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => (
-                PackageFormat::Xz,
-                PackageSignatureKindV64::Unsigned,
-                "xz",
-            ),
+            f if f.ends_with(".xz") || f.ends_with(".tar.xz") => {
+                (PackageFormat::Xz, PackageSignatureKindV64::Unsigned, "xz")
+            }
             f if f.ends_with(".tar") => (
                 PackageFormat::Tar,
                 PackageSignatureKindV64::Unsigned,
@@ -290,7 +288,10 @@ impl UniversalPackageStrategyV64 for DebPackageStrategyV64 {
         PackageFormat::Deb
     }
     fn execute_stage(&self, stage: &str) -> Result<String, String> {
-        Ok(alloc::format!("DEB Stage '{}' executed via dpkg-deb", stage))
+        Ok(alloc::format!(
+            "DEB Stage '{}' executed via dpkg-deb",
+            stage
+        ))
     }
 }
 
@@ -320,7 +321,9 @@ impl UniversalPackageStrategyV64 for ArchPackageStrategyV64 {
 /// Factory Pattern V64
 pub struct UniversalPackageAdapterFactoryV64;
 impl UniversalPackageAdapterFactoryV64 {
-    pub fn create_strategy(format: PackageFormat) -> Vec<alloc::boxed::Box<dyn UniversalPackageStrategyV64>> {
+    pub fn create_strategy(
+        format: PackageFormat,
+    ) -> Vec<alloc::boxed::Box<dyn UniversalPackageStrategyV64>> {
         let mut list: Vec<alloc::boxed::Box<dyn UniversalPackageStrategyV64>> = Vec::new();
         match format {
             PackageFormat::Deb => list.push(alloc::boxed::Box::new(DebPackageStrategyV64)),
@@ -376,7 +379,8 @@ pub struct LoggingLifecycleObserverV64 {
 
 impl PackageLifecycleObserverV64 for LoggingLifecycleObserverV64 {
     fn on_package_event(&mut self, event: &str, package_name: &str) {
-        self.events.push(alloc::format!("{}: {}", event, package_name));
+        self.events
+            .push(alloc::format!("{}: {}", event, package_name));
     }
 }
 
@@ -429,8 +433,13 @@ pub struct UniversalPackageMetadataFlyweightV64 {
 impl UniversalPackageMetadataFlyweightV64 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert("core".to_string(), vec!["glibc".to_string(), "openssl".to_string()]);
-        Self { common_dependencies: map }
+        map.insert(
+            "core".to_string(),
+            vec!["glibc".to_string(), "openssl".to_string()],
+        );
+        Self {
+            common_dependencies: map,
+        }
     }
 }
 
@@ -514,11 +523,16 @@ impl UniversalCrossDistroSatSolverV64 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("dev-libs/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "dev-libs/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("libc-bin".to_string(), "sovereign-libc".to_string());
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
-        Self { canonical_mappings: map }
+        Self {
+            canonical_mappings: map,
+        }
     }
 
     pub fn solve_dependencies(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
@@ -591,7 +605,9 @@ pub struct UniversalCasDeltaStoreGovernorV64 {
 
 impl UniversalCasDeltaStoreGovernorV64 {
     pub fn new() -> Self {
-        Self { records: Vec::new() }
+        Self {
+            records: Vec::new(),
+        }
     }
 
     pub fn apply_delta_patch(
@@ -645,7 +661,9 @@ impl UniversalBootEnvSnapshotGovernorV64 {
         if let Some((kind, label)) = self.snapshots.get(&snapshot_id) {
             Ok(alloc::format!(
                 "Successfully rolled back boot environment to snapshot #{}: {:?} ({})",
-                snapshot_id, kind, label
+                snapshot_id,
+                kind,
+                label
             ))
         } else {
             Err("Snapshot ID not found".to_string())

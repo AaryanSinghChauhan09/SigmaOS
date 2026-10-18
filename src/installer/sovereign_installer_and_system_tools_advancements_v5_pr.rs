@@ -119,7 +119,8 @@ impl AnacondaKickstartBlivetEngineV5 {
                             spec.grow = true;
                         } else if *token == "--encrypted" {
                             spec.encrypted = true;
-                            spec.storage_type = KickstartStorageTypeV5::Luks2Tpm2Fido2EncryptedVolume;
+                            spec.storage_type =
+                                KickstartStorageTypeV5::Luks2Tpm2Fido2EncryptedVolume;
                         } else if *token == "--tpm2" {
                             spec.tpm2_auto_unlock = true;
                         } else if *token == "--fido2" {
