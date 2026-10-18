@@ -108,7 +108,8 @@ impl FreeBsd150ZfsBootEnvEngine {
 
     pub fn create_boot_env(&mut self, name: &str) -> String {
         let dataset = format!("zroot/ROOT/{}", name);
-        self.boot_environments.insert(name.to_string(), dataset.clone());
+        self.boot_environments
+            .insert(name.to_string(), dataset.clone());
         dataset
     }
 
@@ -164,7 +165,8 @@ impl OpenBsd78PledgeUnveilAuditEngine {
         if self.locked {
             return false;
         }
-        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
         true
     }
 
@@ -229,7 +231,10 @@ impl GentooPortageEapi11Engine {
     }
 
     pub fn rebuild_subslot(&self, pkg: &str, subslot: &str) -> String {
-        format!("Gentoo Portage EAPI 11: Rebuilt package '{}' under subslot '{}'", pkg, subslot)
+        format!(
+            "Gentoo Portage EAPI 11: Rebuilt package '{}' under subslot '{}'",
+            pkg, subslot
+        )
     }
 }
 
@@ -275,7 +280,10 @@ impl NixGuixFlakeStoreV61Engine {
     }
 
     pub fn evaluate_flake(&self, flake_uri: &str, hash: &str) -> String {
-        format!("Nix/Guix Flake v61: Evaluated '{}' with CAS hash '{}'", flake_uri, hash)
+        format!(
+            "Nix/Guix Flake v61: Evaluated '{}' with CAS hash '{}'",
+            flake_uri, hash
+        )
     }
 }
 
@@ -298,7 +306,10 @@ impl NetBsd101NpfJitFirewallEngine {
     }
 
     pub fn compile_ruleset(&self, rule_count: usize) -> String {
-        format!("NetBSD 10.1 NPF JIT: Compiled {} rules into high-speed bytecode", rule_count)
+        format!(
+            "NetBSD 10.1 NPF JIT: Compiled {} rules into high-speed bytecode",
+            rule_count
+        )
     }
 }
 
@@ -367,7 +378,9 @@ impl SovereignThousandsMissingComponentsEngineV61 {
         counts.insert(ComponentCategoryV61::DesktopAndMedia, 1000);
         counts.insert(ComponentCategoryV61::DriversHardware, 1000);
         counts.insert(ComponentCategoryV61::VirtualizationContainers, 1000);
-        Self { component_counts: counts }
+        Self {
+            component_counts: counts,
+        }
     }
 
     pub fn total_count(&self) -> usize {
@@ -434,7 +447,11 @@ impl SovereignOpenSourceOsMissingComponentsV61PrSuite {
             (6107, "Nix/Guix Flake v61 Store Graph", "NixOS"),
             (6108, "NetBSD 10.1 NPF JIT Bytecode Compiler", "NetBSD"),
             (6109, "Clear Linux V61 Stateless Governor", "ClearLinux"),
-            (6110, "10,000 Distro Missing Components V61", "UniversalDistro"),
+            (
+                6110,
+                "10,000 Distro Missing Components V61",
+                "UniversalDistro",
+            ),
         ];
 
         for (id, title, distro) in items {
