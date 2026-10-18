@@ -76,16 +76,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// QEMU Disk Image Specification
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QemuDiskImageSpec {
-    pub image_path: String,
-    pub format: String,
-    pub size_bytes: u64,
-    pub backing_file: Option<String>,
-    pub is_compressed: bool,
-}
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -95,6 +85,7 @@ pub struct KvmQemuEngine {
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
     pub virtio_fs_inodes_cached: u64,
+    pub disk_images: Vec<QemuDiskImageSpec>,
 }
 
 impl KvmQemuEngine {
@@ -210,15 +201,6 @@ pub struct LibvirtDomainConfig {
     pub disk_path: String,
     pub bridge_interface: String,
     pub is_active: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LibvirtStorageVolume {
-    pub volume_name: String,
-    pub pool_name: String,
-    pub capacity_bytes: u64,
-    pub allocation_bytes: u64,
-    pub format: String,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -685,6 +667,7 @@ pub struct KubernetesK3sRancherEngine {
     pub pods: Vec<KubernetesPodState>,
     pub k3s_embedded_datastore: String,
     pub harvester_vm_mappings: BTreeMap<String, String>,
+    pub crio_runtime_handlers: Vec<String>,
 }
 
 impl KubernetesK3sRancherEngine {
@@ -698,6 +681,7 @@ impl KubernetesK3sRancherEngine {
             pods: Vec::new(),
             k3s_embedded_datastore: "sqlite3:///var/lib/rancher/k3s/server/db/state.db".to_string(),
             harvester_vm_mappings: BTreeMap::new(),
+            crio_runtime_handlers: handlers,
         }
     }
 

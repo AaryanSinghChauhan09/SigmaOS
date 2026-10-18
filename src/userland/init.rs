@@ -130,6 +130,7 @@ impl InitSystem {
                 }
             }
         }
+        Ok(())
     }
 }
 
@@ -164,6 +165,9 @@ pub struct SystemdCgroupsv2Slice {
 #[derive(Debug, Clone, Default)]
 pub struct SystemdSocketActivationEngine {
     pub socket_name: String,
+    pub listen_stream: Option<String>,
+    pub listen_datagram: Option<String>,
+    pub passed_fds: Vec<i32>,
     pub sockets: BTreeMap<String, SystemdSocketUnit>,
 }
 
@@ -175,6 +179,19 @@ impl SystemdSocketActivationEngine {
             listen_datagram: None,
             passed_fds: Vec::new(),
             sockets: BTreeMap::new(),
+        }
+    }
+
+    pub fn register_socket(&mut self, socket: SystemdSocketUnit) {
+        self.sockets.insert(socket.name.clone(), socket);
+    }
+
+    pub fn handle_incoming_connection(&mut self, socket_name: &str) -> Option<String> {
+        if let Some(sock) = self.sockets.get_mut(socket_name) {
+            sock.active_fd = Some(3);
+            Some(sock.service_to_trigger.clone())
+        } else {
+            None
         }
     }
 
@@ -195,7 +212,10 @@ pub type SystemdSocketActivationUnitEngine = SystemdSocketActivationEngine;
 
 /// Systemd Target Dependency Resolver
 #[derive(Debug, Clone, Default)]
-pub struct SystemdTargetDependencyResolver;
+pub struct SystemdTargetDependencyResolver {
+    pub targets: BTreeMap<String, Vec<String>>,
+    pub active_targets: BTreeSet<String>,
+}
 
 impl SystemdTargetDependencyResolver {
     pub fn new() -> Self {
@@ -306,6 +326,7 @@ impl SystemdPathMonitorEngine {
 #[derive(Debug, Clone, Default)]
 pub struct SystemdTransientScopeGovernor {
     pub transient_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
+    pub active_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
 }
 
 impl SystemdTransientScopeGovernor {
@@ -462,8 +483,9 @@ pub struct SystemdPathUnit {
 }
 
 /// OpenRC Multi-Stage Runlevel
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum OpenRcRunlevel {
+    #[default]
     SysInit,
     Boot,
     Default,
@@ -862,9 +884,8 @@ impl SysVinitRunlevelStateMachine {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
-                    spawned.push(entry.clone());
                 }
-                spawned.push(entry);
+                spawned.push(entry.clone());
             }
         }
         spawned
