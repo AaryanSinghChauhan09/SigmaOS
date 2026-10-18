@@ -7,6 +7,7 @@
 
 extern crate alloc;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -191,7 +192,9 @@ pub struct Sovereign100IdeasSuite {
 
 impl Sovereign100IdeasSuite {
     pub fn new() -> Self {
-        let mut suite = Self { ideas: Vec::new() };
+        let mut suite = Self {
+            ideas: Vec::with_capacity(100),
+        };
         suite.populate_all_100_ideas();
         suite
     }
@@ -215,7 +218,7 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        self.total_fulfilled_count() == self.ideas.len()
+        self.total_fulfilled_count() == self.ideas.len() && !self.ideas.is_empty()
     }
 }
 

@@ -63,6 +63,63 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
+        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        if numeric {
+            list.sort_by(|a, b| {
+                let na = a.parse::<f64>().unwrap_or(0.0);
+                let nb = b.parse::<f64>().unwrap_or(0.0);
+                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
+            });
+        } else {
+            list.sort();
+        }
+        if reverse {
+            list.reverse();
+        }
+        if unique {
+            list.dedup();
+        }
+        list
+    }
+
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete: bool) -> String {
+        if delete {
+            input.chars().filter(|c| !from_set.contains(*c)).collect()
+        } else {
+            let mut out = String::with_capacity(input.len());
+            let from_chars: Vec<char> = from_set.chars().collect();
+            let to_chars: Vec<char> = to_set.chars().collect();
+            for c in input.chars() {
+                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
+                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
+                        out.push(tc);
+                    } else {
+                        out.push(c);
+                    }
+                } else {
+                    out.push(c);
+                }
+            }
+            out
+        }
+    }
+
+    pub fn run_head_tail_bytes(&self, data: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
+        if is_head {
+            data.iter().take(bytes_count).copied().collect()
+        } else {
+            let skip_count = data.len().saturating_sub(bytes_count);
+            data.iter().skip(skip_count).copied().collect()
+        }
+    }
+
     pub fn octal_to_symbolic_mode(mode: u32, is_dir: bool) -> String {
         let type_char = if is_dir { 'd' } else { '-' };
         let perms = [
@@ -151,68 +208,6 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
 
         result
-    }
-
-    pub fn run_sort(
-        &self,
-        lines: &[&str],
-        numeric: bool,
-        reverse: bool,
-        unique: bool,
-    ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
-        if numeric {
-            list.sort_by(|a, b| {
-                let na = a.parse::<f64>().unwrap_or(0.0);
-                let nb = b.parse::<f64>().unwrap_or(0.0);
-                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
-            });
-        } else {
-            list.sort();
-        }
-        if reverse {
-            list.reverse();
-        }
-        if unique {
-            list.dedup();
-        }
-        list
-    }
-
-    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
-        if delete_mode {
-            input.chars().filter(|c| !from_set.contains(*c)).collect()
-        } else {
-            let mut out = String::with_capacity(input.len());
-            let from_chars: Vec<char> = from_set.chars().collect();
-            let to_chars: Vec<char> = to_set.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
-                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
-                        out.push(tc);
-                    } else {
-                        out.push(c);
-                    }
-                } else {
-                    out.push(c);
-                }
-            }
-            out
-        }
-    }
-
-    pub fn run_head_tail_bytes(
-        &self,
-        content: &[u8],
-        bytes_count: usize,
-        is_head: bool,
-    ) -> Vec<u8> {
-        if is_head {
-            content.iter().take(bytes_count).copied().collect()
-        } else {
-            let skip_count = content.len().saturating_sub(bytes_count);
-            content.iter().skip(skip_count).copied().collect()
-        }
     }
 
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
@@ -1183,6 +1178,32 @@ impl ArchivalCompressionEngine {
         Self
     }
 
+    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        let text = String::from_utf8_lossy(header_bytes);
+        for line in text.lines() {
+            let trimmed = line.trim();
+            if let Some(space_idx) = trimmed.find(' ') {
+                let record = &trimmed[space_idx + 1..];
+                if let Some((k, v)) = record.split_once('=') {
+                    map.insert(k.to_string(), v.to_string());
+                }
+            }
+        }
+        map
+    }
+
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, String> {
+        Ok(format!(
+            "{:?} level {} configured successfully",
+            format, level
+        ))
+    }
+
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
         if magic_bytes.len() >= 4 && magic_bytes[0..4] == [0x28, 0xB5, 0x2F, 0xFD] {
             CompressionFormat::Zstd
@@ -1203,35 +1224,6 @@ impl ArchivalCompressionEngine {
         } else {
             CompressionFormat::Tar
         }
-    }
-
-    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
-        let mut map = BTreeMap::new();
-        if let Ok(text) = core::str::from_utf8(header_bytes) {
-            for line in text.lines() {
-                let trimmed = line.trim();
-                if let Some(space_idx) = trimmed.find(' ') {
-                    let record = &trimmed[space_idx + 1..];
-                    if let Some((k, v)) = record.split_once('=') {
-                        map.insert(k.trim().to_string(), v.trim().to_string());
-                    }
-                } else if let Some((k, v)) = trimmed.split_once('=') {
-                    map.insert(k.trim().to_string(), v.trim().to_string());
-                }
-            }
-        }
-        map
-    }
-
-    pub fn configure_compression_level(
-        &self,
-        format: CompressionFormat,
-        level: u32,
-    ) -> Result<String, String> {
-        Ok(format!(
-            "{:?} compression level {} configured successfully",
-            format, level
-        ))
     }
 
     pub fn parse_ustar_header(&self, header_bytes: &[u8]) -> Option<String> {
@@ -1355,18 +1347,6 @@ impl ProcpsPsmiscEngine {
             .collect()
     }
 
-    pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
-        let pids = self.pgrep_find(name);
-        let count = pids.len();
-        (
-            count,
-            format!(
-                "pkill: sent signal {} to {} process(es) matching '{}'",
-                signal, count, name
-            ),
-        )
-    }
-
     pub fn killall_signal(&self, process_name: &str, signal: i32) -> (usize, String) {
         let pids = self.pgrep_find(process_name);
         let count = pids.len();
@@ -1395,6 +1375,18 @@ impl ProcpsPsmiscEngine {
         }
     }
 
+    pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
+        let pids = self.pgrep_find(name);
+        let count = pids.len();
+        (
+            count,
+            format!(
+                "pkill: sent signal {} to {} process(es) matching '{}'",
+                signal, count, name
+            ),
+        )
+    }
+
     pub fn pstree_hierarchy(&self) -> String {
         let mut tree = String::new();
         tree.push_str("systemd(1)---zenith_desktop(420)---terminal(1024)\n");
@@ -1402,9 +1394,9 @@ impl ProcpsPsmiscEngine {
     }
 
     pub fn free_memory_summary(&self) -> (u64, u64, u64) {
-        let total = 32_768; // 32 GB
-        let used = 8_192; // 8 GB
-        let free = 24_576; // 24 GB
+        let total = 32_768;
+        let used = 8_192;
+        let free = 24_576;
         (total, used, free)
     }
 }
@@ -1419,29 +1411,6 @@ pub struct DocumentationPagerEngine;
 impl DocumentationPagerEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn man_db_lookup(&self, page_name: &str) -> Option<String> {
-        match page_name {
-            "ls" => Some("LS(1) User Commands - List directory contents".to_string()),
-            "grep" => Some("GREP(1) User Commands - Print lines matching a pattern".to_string()),
-            "sudo" => Some(
-                "SUDO(8) System Administration - Execute a command as another user".to_string(),
-            ),
-            "btrfs" => {
-                Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string())
-            }
-            _ => None,
-        }
-    }
-
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
-        match (page_name, section) {
-            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self
-                .man_db_lookup(page_name)
-                .map(|s| format!("{}({}) {}", page_name.to_uppercase(), section, s)),
-        }
     }
 
     pub fn render_less_page(&self, text: &str, line_offset: usize, page_height: usize) -> String {
@@ -1472,6 +1441,29 @@ impl DocumentationPagerEngine {
             }
         }
         None
+    }
+
+    pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
+        match (page_name, section) {
+            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
+            _ => self
+                .man_db_lookup(page_name)
+                .map(|s| format!("Section {}: {}", section, s)),
+        }
+    }
+
+    pub fn man_db_lookup(&self, page_name: &str) -> Option<String> {
+        match page_name {
+            "ls" => Some("LS(1) User Commands - List directory contents".to_string()),
+            "grep" => Some("GREP(1) User Commands - Print lines matching a pattern".to_string()),
+            "sudo" => Some(
+                "SUDO(8) System Administration - Execute a command as another user".to_string(),
+            ),
+            "btrfs" => {
+                Some("BTRFS(8) System Administration - Btrfs filesystem utilities".to_string())
+            }
+            _ => None,
+        }
     }
 
     pub fn mandoc_render_roff(&self, roff_input: &str) -> String {
@@ -1527,6 +1519,23 @@ pub struct AuthPrivilegeSessionEngine;
 impl AuthPrivilegeSessionEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn pam_environment_manage(
+        &self,
+        env: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
+        if action == "set" {
+            env.insert(key.to_string(), val.to_string());
+            true
+        } else if action == "unset" {
+            env.remove(key).is_some()
+        } else {
+            false
+        }
     }
 
     pub fn evaluate_sudoers(&self, user: &str, command: &str) -> bool {
@@ -1602,23 +1611,6 @@ impl AuthPrivilegeSessionEngine {
             shadow_entry.contains(attempt) || attempt == "sovereign_pass"
         } else {
             self.verify_shadow_hash(user, shadow_entry, attempt)
-        }
-    }
-
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        val: &str,
-    ) -> bool {
-        match action {
-            "set" => {
-                env_map.insert(key.to_string(), val.to_string());
-                true
-            }
-            "unset" => env_map.remove(key).is_some(),
-            _ => false,
         }
     }
 
@@ -2250,6 +2242,9 @@ mod tests {
 
         let cfg = arch.configure_compression_level(CompressionFormat::Zstd, 19);
         assert!(cfg.is_ok());
+        assert!(cfg
+            .unwrap()
+            .contains("Zstd level 19 configured successfully"));
 
         let (ratio, desc) = arch.parallel_zstd_compression_ratio(1000, 250, 8);
         assert_eq!(ratio, 0.25);
