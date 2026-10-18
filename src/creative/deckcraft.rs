@@ -242,6 +242,9 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
+            ExportFormat::Svg => {
+                output.extend_from_slice(b"<svg>");
+            }
         }
 
         output
