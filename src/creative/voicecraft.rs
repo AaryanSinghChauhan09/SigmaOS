@@ -14,7 +14,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 pub const SAMPLE_RATE: usize = 16000; // 16kHz voice standard
-pub const FRAME_SIZE: usize = 320;    // 20ms frames at 16kHz
+pub const FRAME_SIZE: usize = 320; // 20ms frames at 16kHz
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PhonemeType {

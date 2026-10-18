@@ -2,6 +2,11 @@
 // Verifies core system legacy compatibility, multi-persona VMs, and driver bridge layers
 #![allow(unused, clippy::all)]
 
+use sigmaos::compatibility::gap_closure;
+use sigmaos::compatibility::gap_closure::*;
+use sigmaos::compatibility::gap_closure::{
+    DesktopMode, SigmaSupportSubtitleEdit, SigmaSupportSubtitleSync,
+};
 use sigmaos::compatibility::{
     APITimelineManager, AiResourceScheduler, AkabeiBundle, AkabeiPackageEngine, AntixControlCenter,
     AntixDesktopProfiler, AntixInitManager, AppSuiteBundle, AppSuiteType, BinaryCompatMatrix,
@@ -23,7 +28,11 @@ use sigmaos::drivers::{
     Ch340Driver, E1000Driver, GpuCommand, GpuCommandBuffer, GpuDriver, GpuPipeline, GpuShader,
     IntelHdaDriver, NvmeDriver, PeripheralDevice, PowerState, ShaderStage,
 };
+use sigmaos::filesystem::sovereign_link_engine::SovereignLinkEngine;
 use sigmaos::filesystem::{LegacyLinuxRule, LinuxPersonaRule, SmartSymlink, SymlinkResolverRule};
+use sigmaos::graphics::paint::ColorRgba;
+use sigmaos::logging::rotation::*;
+use sigmaos::logging::*;
 use sigmaos::network::{
     FirewallAction, FirewallCommand, FirewallFilterRule, IpRoute2Command, LinkState, PingCommand,
     SocketStatsCommand, SocketStatsEntry, TcpConnection, TcpError, TcpSegment, TcpStack, TcpState,
@@ -40,34 +49,26 @@ use sigmaos::performance::{
     PerformanceProfileRule, RamDefragmenter, SmartPerformanceProfile, SmartResourceOptimizer,
     GLOBAL_GLARY_RULE, GLOBAL_SMART_OPTIMIZER,
 };
-use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
-use std::collections::BTreeMap;
-use sigmaos::productivity::utility_suite::*;
 use sigmaos::productivity::media::*;
-use sigmaos::compatibility::gap_closure;
-use sigmaos::compatibility::gap_closure::*;
-use sigmaos::compatibility::gap_closure::{SigmaSupportSubtitleSync, SigmaSupportSubtitleEdit, DesktopMode};
-use sigmaos::graphics::paint::ColorRgba;
-use sigmaos::logging::rotation::*;
-use sigmaos::logging::*;
-use sigmaos::filesystem::sovereign_link_engine::SovereignLinkEngine;
+use sigmaos::productivity::utility_suite::*;
+use sigmaos::productivity::{AudioChannel, SigmaMediaEngine, GLOBAL_MEDIA_ENGINE};
 use sigmaos::resilience::{FsSnapshot, SigmaTimeshift, GLOBAL_TIMESHIFT};
-use sigmaos::security::forensics::{AnonSurfShunt, AppSandboxEngine, SandboxPolicy, RoutingMode};
+use sigmaos::security::forensics::{AnonSurfShunt, AppSandboxEngine, RoutingMode, SandboxPolicy};
 use sigmaos::security::{
-    CapabilityToken, DefensiveAuditSystem,
-    ForensicStorageFilter, Permission, GLOBAL_ANONSURF,
+    CapabilityToken, DefensiveAuditSystem, ForensicStorageFilter, Permission, GLOBAL_ANONSURF,
     GLOBAL_FORENSIC, GLOBAL_SANDBOX,
 };
+use std::collections::BTreeMap;
 
 use sigmaos::kernel::process::ProcessState;
 use sigmaos::kernel::{
-    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcQueue, ArchitectureEngine,
-    AuditBlock, CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, EdfTask,
-    HardwareException, InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase,
-    InterruptClass, IoWaitProfile, Irql, KernelMechanism, KernelPolicy, LcgRandom, LookasideList,
-    LotteryTask, MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType, Priority,
-    Process, ProcessorInitState, SequencedSinglyLinkedList, SinglyLinkedList,
-    SovereignMechanism, SystemThread, Tcb, WorkItem,
+    AdaptivePolicy, AdvancedAlgorithmsManager, Apc, ApcQueue, ArchitectureEngine, AuditBlock,
+    CircularDoublyLinkedList, CpuArchitectureClass, CpuRegisters, EdfTask, HardwareException,
+    InstructionCyclePhase as ArchInstructionCyclePhase, InstructionCyclePhase, InterruptClass,
+    IoWaitProfile, Irql, KernelMechanism, KernelPolicy, LcgRandom, LookasideList, LotteryTask,
+    MemoryDescriptorList, Pcb, PolicyMechanismCoordinator, PoolType, Priority, Process,
+    ProcessorInitState, SequencedSinglyLinkedList, SinglyLinkedList, SovereignMechanism,
+    SystemThread, Tcb, WorkItem,
 };
 
 #[cfg(test)]
@@ -538,7 +539,10 @@ mod tests {
         let mut processes = [proc1, proc2];
 
         cpu_optimizer.optimize_process_priorities(&mut processes);
-        assert_eq!(processes[0].scheduling.static_priority, Priority::High.value);
+        assert_eq!(
+            processes[0].scheduling.static_priority,
+            Priority::High.value
+        );
         assert_eq!(processes[1].scheduling.static_priority, Priority::Low.value);
 
         // Test RAM Defragmenter

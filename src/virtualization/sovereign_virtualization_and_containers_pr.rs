@@ -76,8 +76,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -205,8 +203,6 @@ pub struct LibvirtDomainConfig {
     pub bridge_interface: String,
     pub is_active: bool,
 }
-
-
 
 #[derive(Debug, Clone, Default)]
 pub struct LibvirtDomainEngine {
