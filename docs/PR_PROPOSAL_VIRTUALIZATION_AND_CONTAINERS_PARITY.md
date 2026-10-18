@@ -113,5 +113,21 @@ The implementation covers full functionality across Type-1 and Type-2 Hypervisor
     - `vmmdev` shared guest memory regions and `unveil` file path isolation.
     - *Inspiration:* OpenBSD vmd, OpenBSD 7.5.
 
-18. **Sovereign Virtualization & Containers Parity Gateway** (`SovereignVirtualizationAndContainersParityPrGateway`)
-    - Central gateway coordinator consolidating all 17 sub-engines into structured PR manifests (PR #4001 through PR #4018).
+18. **NetBSD Rump Kernel Driver Isolation Engine** (`NetBsdRumpVirtEngine`)
+    - NetBSD userland rump kernel driver isolation via `rumpuser` hypercalls and sysproxy socket wrappers.
+    - *Inspiration:* NetBSD, NetBSD 10.
+
+19. **DragonFly BSD VKernel Sandbox Engine** (`DragonFlyVkernelEngine`)
+    - DragonFly BSD virtual kernel (`vkernel`) unprivileged userland process execution and virtual memory sandboxing.
+    - *Inspiration:* DragonFly BSD, DragonFly BSD 6.4.
+
+20. **VMware ESXi VMX Spec Transpiler Engine** (`VmwareVmxTranspilerEngine`)
+    - Automatic transpilation of VMware ESXi `.vmx` virtual machine specifications and `pvscsi` controller flags into native QEMU/KVM parameters.
+    - *Inspiration:* VMware ESXi, QEMU/KVM.
+
+21. **Proxmox VE Cluster HA Manager Engine** (`ProxmoxVeClusterEngine`)
+    - Proxmox VE cluster high-availability manager with automated IPMI fence devices and local ZFS storage synchronization.
+    - *Inspiration:* Proxmox VE, Debian.
+
+22. **Sovereign Virtualization & Containers Parity Gateway** (`SovereignVirtualizationAndContainersParityPrGateway`)
+    - Central gateway coordinator consolidating all 21 sub-engines into structured PR manifests (PR #4001 through PR #4022).
