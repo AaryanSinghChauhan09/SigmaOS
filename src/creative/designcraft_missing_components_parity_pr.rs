@@ -69,9 +69,7 @@ impl DesigncraftPrCategory {
             Self::DesignTokensStyleDictionary => {
                 "design token style dictionary export & W3C token pipeline"
             }
-            Self::IconSystemPackagingSymbols => {
-                "icon system packaging & symbol library manager"
-            }
+            Self::IconSystemPackagingSymbols => "icon system packaging & symbol library manager",
             Self::AccessibilityAuditWcagLint => {
                 "accessibility WCAG contrast audit & automated linter"
             }

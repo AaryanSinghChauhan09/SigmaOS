@@ -124,7 +124,11 @@ impl DeckcraftAdvancedVectorAnimationTimelinePrEngine {
     }
 
     /// Interpolate element state at given playback timestamp using Bezier/Easing math
-    pub fn sample_element_state(&self, element_id: u32, timestamp_ms: u32) -> Option<(f32, f32, f32, f32)> {
+    pub fn sample_element_state(
+        &self,
+        element_id: u32,
+        timestamp_ms: u32,
+    ) -> Option<(f32, f32, f32, f32)> {
         let track = self.tracks.get(&element_id)?;
         if track.keyframes.is_empty() {
             return None;
@@ -409,9 +413,21 @@ impl DeckcraftInteractivePollAudienceQnaPrEngine {
         Self {
             session_pin: "7890".to_string(),
             poll_options: vec![
-                PollOption { option_id: 1, option_text: "Architecture".to_string(), vote_count: 50 },
-                PollOption { option_id: 2, option_text: "Performance".to_string(), vote_count: 75 },
-                PollOption { option_id: 3, option_text: "Security".to_string(), vote_count: 60 },
+                PollOption {
+                    option_id: 1,
+                    option_text: "Architecture".to_string(),
+                    vote_count: 50,
+                },
+                PollOption {
+                    option_id: 2,
+                    option_text: "Performance".to_string(),
+                    vote_count: 75,
+                },
+                PollOption {
+                    option_id: 3,
+                    option_text: "Security".to_string(),
+                    vote_count: 60,
+                },
             ],
             questions,
             emoji_reaction_counts: emoji_counts,
@@ -438,7 +454,10 @@ impl DeckcraftInteractivePollAudienceQnaPrEngine {
 
     /// Send live emoji reaction
     pub fn trigger_emoji_reaction(&mut self, emoji: &str) -> u32 {
-        let count = self.emoji_reaction_counts.entry(emoji.to_string()).or_insert(0);
+        let count = self
+            .emoji_reaction_counts
+            .entry(emoji.to_string())
+            .or_insert(0);
         *count += 1;
         *count
     }
@@ -569,7 +588,7 @@ impl Default for DeckcraftRealtimeCrdtMultiUserCollabPrEngine {
 pub struct DesignRecommendation {
     pub slide_id: u32,
     pub recommended_layout: String,
-    pub recommended_palette: Vec<u32>, // ARGB colors
+    pub recommended_palette: Vec<u32>,     // ARGB colors
     pub typography_pair: (String, String), // (heading_font, body_font)
     pub contrast_ratio_ok: bool,
 }
@@ -586,7 +605,9 @@ impl DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine {
     /// Synthesize slide outline from topic prompt string
     pub fn generate_deck_from_prompt(&self, topic_prompt: &str) -> Vec<(String, Vec<String>)> {
         let mut slides = Vec::new();
-        if topic_prompt.to_lowercase().contains("os") || topic_prompt.to_lowercase().contains("operating system") {
+        if topic_prompt.to_lowercase().contains("os")
+            || topic_prompt.to_lowercase().contains("operating system")
+        {
             slides.push((
                 "SigmaOS Platform Overview".to_string(),
                 vec![
@@ -673,14 +694,22 @@ impl DeckcraftMultiFormatBatchExportRenderPrEngine {
     }
 
     /// Render slide deck into 4K 60FPS MP4 video frames (simulated)
-    pub fn render_presentation_video(&self, slide_count: usize, fps: u32, resolution: RenderResolution) -> Vec<u8> {
+    pub fn render_presentation_video(
+        &self,
+        slide_count: usize,
+        fps: u32,
+        resolution: RenderResolution,
+    ) -> Vec<u8> {
         let mut buffer = Vec::new();
         let res_str = match resolution {
             RenderResolution::Fhd1080p => "1920x1080",
             RenderResolution::Uhd4K => "3840x2160",
             RenderResolution::Vector8K => "7680x4320",
         };
-        let header = format!("DECKCRAFT_MP4_RENDER_STREAM:slides={},fps={},resolution={}\n", slide_count, fps, res_str);
+        let header = format!(
+            "DECKCRAFT_MP4_RENDER_STREAM:slides={},fps={},resolution={}\n",
+            slide_count, fps, res_str
+        );
         buffer.extend_from_slice(header.as_bytes());
         buffer
     }
@@ -764,10 +793,14 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
         });
         let crdt_ok = self.crdt_collab.presences.contains_key(&1);
 
-        let ai_deck = self.ai_assistant.generate_deck_from_prompt("SigmaOS Operating System");
+        let ai_deck = self
+            .ai_assistant
+            .generate_deck_from_prompt("SigmaOS Operating System");
         let ai_ok = !ai_deck.is_empty();
 
-        let html = self.export_render.export_reveal_js_bundle("SigmaOS Keynote", &["Slide 1", "Slide 2"]);
+        let html = self
+            .export_render
+            .export_reveal_js_bundle("SigmaOS Keynote", &["Slide 1", "Slide 2"]);
         let export_ok = html.contains("<title>SigmaOS Keynote</title>");
 
         anim_ok && diagram_ok && vote_ok && crdt_ok && ai_ok && export_ok
@@ -789,7 +822,10 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -916,7 +952,8 @@ mod tests {
         let video_bytes = engine.render_presentation_video(5, 60, RenderResolution::Uhd4K);
         assert!(video_bytes.starts_with(b"DECKCRAFT_MP4_RENDER_STREAM"));
 
-        let reveal_html = engine.export_reveal_js_bundle("Keynote Presentation", &["Intro", "Body", "Outro"]);
+        let reveal_html =
+            engine.export_reveal_js_bundle("Keynote Presentation", &["Intro", "Body", "Outro"]);
         assert!(reveal_html.contains("<title>Keynote Presentation</title>"));
         assert!(reveal_html.contains("<section><h2>Intro</h2></section>"));
     }
