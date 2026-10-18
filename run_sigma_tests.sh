@@ -128,6 +128,13 @@ if [ -f "src/system/sovereign_init_and_supervisor_advancements_v53.rs" ]; then
     ./build/test_init_advancements_v53
 fi
 
+if [ -f "src/system/sovereign_init_and_supervisor_advancements_v61.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Advancements V61 test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_advancements_v61.rs --edition=2021 -o build/test_init_advancements_v61
+    ./build/test_init_advancements_v61
+fi
+
 if [ -f "src/memory/huge_pages.rs" ]; then
     echo "Running huge pages & transparent huge pages (THP) test suite..."
     mkdir -p build

@@ -1,16 +1,20 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
-//! Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway
-//!
-//! Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-//! - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-//! - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-//! - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
+// Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway
+//
+// Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
+// - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
+// - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
+// - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
-use std::vec::Vec;
+extern crate alloc;
+
+use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ============================================================================
 // Core Service & Init abstractions
@@ -305,7 +309,7 @@ pub struct SystemdTransientScopeGovernor {
     pub transient_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
 }
 
-impl SystemdTransientScopeGovernor {
+impl SystemdTransientScopeSpecGovernor {
     pub fn new() -> Self {
         Self::default()
     }
@@ -514,37 +518,7 @@ impl OpenRcHeader {
     }
 }
 
-/// OpenRC Dependency Solver Engine
-#[derive(Debug, Clone, Default)]
-pub struct OpenRcDependencySolverEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-}
-
 impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Stopped);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .get(service)
-            .copied()
-            .unwrap_or(ServiceState::Stopped)
-    }
-
     pub fn resolve_order(
         scripts: &BTreeMap<String, OpenRcHeader>,
     ) -> Result<Vec<String>, &'static str> {
@@ -661,6 +635,8 @@ impl OpenRcHeader {
 pub struct OpenRcDependencySolverEngine {
     pub current_runlevel: OpenRcRunlevel,
     pub scripts: BTreeMap<String, OpenRcHeader>,
+    pub active_services: BTreeSet<String>,
+    pub service_statuses: BTreeMap<String, ServiceState>,
 }
 
 impl OpenRcDependencySolverEngine {
@@ -668,6 +644,8 @@ impl OpenRcDependencySolverEngine {
         Self {
             current_runlevel: OpenRcRunlevel::SysInit,
             scripts: BTreeMap::new(),
+            active_services: BTreeSet::new(),
+            service_statuses: BTreeMap::new(),
         }
     }
 

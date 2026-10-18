@@ -230,14 +230,8 @@ impl ParametricSketch2D {
     }
 
     pub fn add_point(&mut self, x: f64, y: f64) -> usize {
-        let id = (self.entities.len() + 1) as u32;
-        self.entities.push(SketchEntity {
-            id,
-            entity_type: SketchEntityType::Point,
-            points: vec![[x as f32, y as f32]],
-            dimensions: Vec::new(),
-            properties: BTreeMap::new(),
-        });
+        self.entities
+            .push(SketchEntityEnum::Point(Point2D { x, y }));
         self.entities.len() - 1
     }
 

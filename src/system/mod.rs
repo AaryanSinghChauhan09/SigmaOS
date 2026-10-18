@@ -447,10 +447,11 @@ pub mod sovereign_init_and_supervisor_advancements_v61;
 pub use sovereign_init_and_supervisor_advancements_v61::*;
 
 pub use mint_tools::{
-    get_system_tools, init_system_tools, BackupConfig, BackupJob, BackupStatus, BackupType,
-    DiagnosticEntry, DiagnosticTest, Driver, DriverManager, DriverStatus, DriverType, HardwareInfo,
-    MintUpdateManager, PackageUpdate, SoftwareCategory, SoftwareInfo, SoftwareManager,
-    SoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity, UpdateType,
+    get_system_tools, init_system_tools, BackupConfig, BackupJob, BackupStatus,
+    BackupType as MintBackupType, DiagnosticEntry, DiagnosticTest, Driver, DriverManager,
+    DriverStatus, DriverType, HardwareInfo, MintUpdateManager, PackageUpdate, SoftwareCategory,
+    SoftwareInfo, SoftwareManager, SoftwarePackage, SystemReport, SystemToolsEngine, TestResult,
+    UpdateSeverity, UpdateType as MintUpdateType,
 };
 pub use network_manager::{
     get_network_manager, init_network_manager, Connection, ConnectionState, ConnectionType,
@@ -458,6 +459,7 @@ pub use network_manager::{
 };
 pub use system_monitor::{
     get_system_monitor as get_new_system_monitor, init_system_monitor as init_new_system_monitor,
-    CPUCore, DiskInfo, MemoryInfo, NetworkInterface, Process, ProcessState,
-    SystemMonitor as NewSystemMonitor,
+    CPUCore, DiskInfo as SystemMonitorDiskInfo, MemoryInfo as SystemMonitorMemoryInfo,
+    NetworkInterface as SystemMonitorNetworkInterface, Process,
+    ProcessState as SystemMonitorProcessState, SystemMonitor as NewSystemMonitor,
 };
