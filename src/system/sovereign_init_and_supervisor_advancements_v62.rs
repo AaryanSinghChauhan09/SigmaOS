@@ -115,7 +115,9 @@ impl SystemdAdvancementsV62Engine {
     ) -> Vec<i32> {
         sockets
             .iter()
-            .filter(|s| s.socket_name == target_service || target_service.starts_with(&s.socket_name))
+            .filter(|s| {
+                s.socket_name == target_service || target_service.starts_with(&s.socket_name)
+            })
             .map(|s| s.file_descriptor)
             .collect()
     }
@@ -655,13 +657,18 @@ impl SovereignInitAndSupervisorAdvancementsV62Suite {
         }
 
         // 2. Verify OpenRC
-        let status = self.openrc_engine.evaluate_service_transition(OpenRcServiceStatusV62::Stopped, "start");
+        let status = self
+            .openrc_engine
+            .evaluate_service_transition(OpenRcServiceStatusV62::Stopped, "start");
         if status != OpenRcServiceStatusV62::Starting {
             return false;
         }
 
         // 3. Verify Runit / s6
-        if !self.runit_s6_engine.parse_s6_readiness_notification("READY=1\n") {
+        if !self
+            .runit_s6_engine
+            .parse_s6_readiness_notification("READY=1\n")
+        {
             return false;
         }
 
@@ -671,13 +678,18 @@ impl SovereignInitAndSupervisorAdvancementsV62Suite {
         }
 
         // 5. Verify BSD rc
-        let seq = self.bsd_rc_engine.evaluate_rc_subr_sequence(true, true, true);
+        let seq = self
+            .bsd_rc_engine
+            .evaluate_rc_subr_sequence(true, true, true);
         if seq.len() != 3 {
             return false;
         }
 
         // 6. Verify launchd / Android
-        if !self.launchd_android_engine.evaluate_throttle_interval(100, 115, 10) {
+        if !self
+            .launchd_android_engine
+            .evaluate_throttle_interval(100, 115, 10)
+        {
             return false;
         }
 
@@ -701,7 +713,8 @@ mod tests {
     #[test]
     fn test_systemd_v62_engine() {
         let engine = SystemdAdvancementsV62Engine::new();
-        let raw = "INTERFACE=org.freedesktop.systemd1.Manager\nMEMBER=StartUnit\nPARAM_1=sshd.service\n";
+        let raw =
+            "INTERFACE=org.freedesktop.systemd1.Manager\nMEMBER=StartUnit\nPARAM_1=sshd.service\n";
         let (iface, member, params) = engine.parse_sd_bus_method_call(raw).unwrap();
         assert_eq!(iface, "org.freedesktop.systemd1.Manager");
         assert_eq!(member, "StartUnit");
