@@ -70,7 +70,7 @@ impl GnuCoreutilsBsdUserlandEngine {
         reverse: bool,
         unique: bool,
     ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
                 let na = a.parse::<f64>().unwrap_or(0.0);
@@ -93,30 +93,12 @@ impl GnuCoreutilsBsdUserlandEngine {
         if delete {
             input.chars().filter(|c| !from_set.contains(*c)).collect()
         } else {
-            let mut out = String::with_capacity(input.len());
-            let from_chars: Vec<char> = from_set.chars().collect();
-            let to_chars: Vec<char> = to_set.chars().collect();
-            for c in input.chars() {
-                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
-                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
-                        out.push(tc);
-                    } else {
-                        out.push(c);
-                    }
-                } else {
-                    out.push(c);
-                }
-            }
-            out
-        }
-    }
-
-    pub fn run_head_tail_bytes(&self, data: &[u8], bytes_count: usize, is_head: bool) -> Vec<u8> {
-        if is_head {
-            data.iter().take(bytes_count).copied().collect()
-        } else {
-            let skip_count = data.len().saturating_sub(bytes_count);
-            data.iter().skip(skip_count).copied().collect()
+            let start = if data.len() > count {
+                data.len() - count
+            } else {
+                0
+            };
+            data[start..].to_vec()
         }
     }
 
@@ -208,6 +190,70 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
 
         result
+    }
+
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
+        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        if numeric {
+            list.sort_by(|a, b| {
+                let num_a = a.parse::<f64>().unwrap_or(0.0);
+                let num_b = b.parse::<f64>().unwrap_or(0.0);
+                num_a
+                    .partial_cmp(&num_b)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            });
+        } else {
+            list.sort();
+        }
+        if reverse {
+            list.reverse();
+        }
+        if unique {
+            list.dedup();
+        }
+        list
+    }
+
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
+        if delete_mode {
+            input.chars().filter(|c| !from_set.contains(*c)).collect()
+        } else {
+            let mut out = String::with_capacity(input.len());
+            let from_chars: Vec<char> = from_set.chars().collect();
+            let to_chars: Vec<char> = to_set.chars().collect();
+            for c in input.chars() {
+                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
+                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
+                        out.push(tc);
+                    } else {
+                        out.push(c);
+                    }
+                } else {
+                    out.push(c);
+                }
+            }
+            out
+        }
+    }
+
+    pub fn run_head_tail_bytes(
+        &self,
+        content: &[u8],
+        bytes_count: usize,
+        is_head: bool,
+    ) -> Vec<u8> {
+        if is_head {
+            content.iter().take(bytes_count).copied().collect()
+        } else {
+            let skip_count = content.len().saturating_sub(bytes_count);
+            content.iter().skip(skip_count).copied().collect()
+        }
     }
 
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
@@ -377,6 +423,65 @@ impl GnuCoreutilsBsdUserlandEngine {
             1000,
             file_info.group
         )
+    }
+
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
+        let mut vec: Vec<String> = items.iter().map(|s| s.to_string()).collect();
+        if numeric {
+            vec.sort_by(|a, b| {
+                a.parse::<i64>()
+                    .unwrap_or(0)
+                    .cmp(&b.parse::<i64>().unwrap_or(0))
+            });
+        } else {
+            vec.sort();
+        }
+        if reverse {
+            vec.reverse();
+        }
+        if unique {
+            vec.dedup();
+        }
+        vec
+    }
+
+    pub fn run_tr(&self, input: &str, set1: &str, set2: &str, delete: bool) -> String {
+        if delete {
+            input.chars().filter(|c| !set1.contains(*c)).collect()
+        } else {
+            let mut res = String::new();
+            let s1_chars: Vec<char> = set1.chars().collect();
+            let s2_chars: Vec<char> = set2.chars().collect();
+            for c in input.chars() {
+                if let Some(pos) = s1_chars.iter().position(|&x| x == c) {
+                    if pos < s2_chars.len() {
+                        res.push(s2_chars[pos]);
+                    } else if let Some(&last) = s2_chars.last() {
+                        res.push(last);
+                    } else {
+                        res.push(c);
+                    }
+                } else {
+                    res.push(c);
+                }
+            }
+            res
+        }
+    }
+
+    pub fn run_head_tail_bytes(&self, data: &[u8], bytes: usize, is_head: bool) -> Vec<u8> {
+        if is_head {
+            data.iter().take(bytes).copied().collect()
+        } else {
+            let skip = data.len().saturating_sub(bytes);
+            data.iter().skip(skip).copied().collect()
+        }
     }
 
     pub fn run_stat_custom(&self, file_info: &CoreUtilityFileInfo, format_str: &str) -> String {
@@ -1303,10 +1408,7 @@ impl ArchivalCompressionEngine {
         format: CompressionFormat,
         level: u32,
     ) -> Result<String, String> {
-        Ok(format!(
-            "{:?} level {} configured successfully",
-            format, level
-        ))
+        Ok(format!("{:?} level {}", format, level))
     }
 
     pub fn detect_format(&self, magic_bytes: &[u8]) -> CompressionFormat {
@@ -1329,6 +1431,28 @@ impl ArchivalCompressionEngine {
         } else {
             CompressionFormat::Tar
         }
+    }
+
+    pub fn parse_pax_header(&self, header_bytes: &[u8]) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        if let Ok(s) = core::str::from_utf8(header_bytes) {
+            for line in s.lines() {
+                if let Some((_, kv)) = line.split_once(' ') {
+                    if let Some((k, v)) = kv.split_once('=') {
+                        map.insert(k.trim().to_string(), v.trim().to_string());
+                    }
+                }
+            }
+        }
+        map
+    }
+
+    pub fn configure_compression_level(
+        &self,
+        format: CompressionFormat,
+        level: u32,
+    ) -> Result<String, String> {
+        Ok(format!("{:?} level {}", format, level))
     }
 
     pub fn parse_ustar_header(&self, header_bytes: &[u8]) -> Option<String> {
@@ -1779,6 +1903,23 @@ impl AuthPrivilegeSessionEngine {
         }
     }
 
+    pub fn pam_environment_manage(
+        &self,
+        env_map: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
+        match action {
+            "set" => {
+                env_map.insert(key.to_string(), val.to_string());
+                true
+            }
+            "unset" => env_map.remove(key).is_some(),
+            _ => false,
+        }
+    }
+
     pub fn pam_authenticate(&self, user: &str, service: &str) -> Result<String, &'static str> {
         if user.is_empty() {
             Err("PAM: Empty username provided")
@@ -2088,6 +2229,30 @@ impl CoreUtilsPullRequestGatewayEngine {
         self.submissions
             .get(&pr_id)
             .map(|pr| pr.unified_diff.clone())
+    }
+
+    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|pr| pr.category == category)
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|pr| pr.status == status)
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|pr| pr.author == author)
+            .cloned()
+            .collect()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {

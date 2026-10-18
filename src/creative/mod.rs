@@ -111,14 +111,6 @@ pub use effectcraft_missing_components_parity_pr::{
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
     SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
 };
-pub use effectcraft_missing_components_parity_pr::{
-    ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine,
-    EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
-    EffectcraftExpressionScriptingRiggingPrEngine, EffectcraftMissingComponentsParityPrSuite,
-    EffectcraftOpticalFlowMotionVectorPrEngine, EffectcraftPrProposalManifest,
-    NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
-};
 pub use figcraft_missing_components_parity_pr::{
     FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
     FigcraftDevModeMultiFrameworkExporterPrEngine,
@@ -135,6 +127,21 @@ pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
     TransitionType, VideoCodec, VideoEditor, VideoTrack,
+};
+pub use gridcraft::{
+    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
+    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
+    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
+    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
+    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
+    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
+    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
+    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
+    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
 };
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
