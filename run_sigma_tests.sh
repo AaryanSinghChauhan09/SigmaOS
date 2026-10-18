@@ -1927,4 +1927,11 @@ if [ -f "src/compatibility/mint_omarchy_complete_gap_closure.rs" ]; then
     ./build/test_mint_omarchy
 fi
 
+if [ -f "src/compatibility/mint_omarchy_coexistence_interop_engine.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Coexistence & Interoperability test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_coexistence_interop_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_coexistence
+    ./build/test_coexistence
+fi
+
 echo "All SigmaOS test suites completed."
