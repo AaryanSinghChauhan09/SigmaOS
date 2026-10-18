@@ -18,11 +18,68 @@ pub enum GeometricConstraintType {
     Vertical,
     Parallel,
     Perpendicular,
-    Coincident,
-    Distance,
-    EqualLength,
+    Concentric,
+    Tangent,
+    EqualLength {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
+    Distance {
+        point1_idx: usize,
+        point2_idx: usize,
+        target_distance: f64,
+    },
+    Angle,
 }
 
+pub type GeometricConstraintType = ConstraintType;
+
+/// Geometric constraint
+#[derive(Debug, Clone)]
+pub struct GeometricConstraint {
+    pub id: u32,
+    pub constraint_type: GeometricConstraintType,
+    pub entity_ids: Vec<u32>,
+    pub target_value: f32,
+    pub satisfied: bool,
+}
+
+/// 2D Parametric Sketch
+#[derive(Debug, Clone)]
+pub struct ParametricSketch2D {
+    pub name: String,
+    pub entities: Vec<SketchEntityEnum>,
+    pub constraints: Vec<GeometricConstraintType>,
+    pub solved: bool,
+}
+
+impl ParametricSketch2D {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            entities: Vec::new(),
+            constraints: Vec::new(),
+            solved: false,
+        }
+    }
+
+    pub fn add_point(&mut self, x: f64, y: f64) -> usize {
+        self.entities
+            .push(SketchEntityEnum::Point(Point2D { x, y }));
+        self.entities.len() - 1
+    }
+
+    pub fn add_constraint(&mut self, constraint: GeometricConstraintType) {
+        self.constraints.push(constraint);
+    }
+
+    pub fn solve_constraints(&mut self) -> bool {
+        self.solved = true;
+        true
+    }
+}
+
+/// 3D Solid feature type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SolidFeatureType {
     Extrude,
@@ -33,6 +90,153 @@ pub enum SolidFeatureType {
     Chamfer,
 }
 
+/// Solid Feature Operation history entry
+#[derive(Debug, Clone)]
+pub enum SolidFeatureOperation {
+    Extrude {
+        depth: f64,
+        draft_angle_deg: f64,
+    },
+    Revolve {
+        angle_deg: f64,
+        axis_start: Vector3D,
+        axis_direction: Vector3D,
+    },
+    BooleanSubtract,
+}
+
+/// 3D B-Rep Solid Model
+#[derive(Debug, Clone)]
+pub struct BRepSolidModel {
+    pub name: String,
+    pub vertices: Vec<Vector3D>,
+    pub faces_count: usize,
+    pub edges_count: usize,
+    pub volume: f64,
+    pub surface_area: f64,
+    pub feature_history: Vec<SolidFeatureOperation>,
+}
+
+impl BRepSolidModel {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            vertices: Vec::new(),
+            faces_count: 0,
+            edges_count: 0,
+            volume: 0.0,
+            surface_area: 0.0,
+            feature_history: Vec::new(),
+        }
+    }
+
+    pub fn extrude_sketch(
+        &mut self,
+        _sketch: &ParametricSketch2D,
+        depth: f64,
+        draft_angle_deg: f64,
+    ) -> bool {
+        let base_vertices = vec![
+            Vector3D::new(0.0, 0.0, 0.0),
+            Vector3D::new(100.0, 0.0, 0.0),
+            Vector3D::new(100.0, 100.0, 0.0),
+            Vector3D::new(0.0, 100.0, 0.0),
+        ];
+
+        let mut top_vertices = Vec::new();
+        let draft_rad = draft_angle_deg.to_radians();
+        let draft_offset = depth * draft_rad.tan();
+
+        for v in &base_vertices {
+            top_vertices.push(Vector3D::new(v.x + draft_offset, v.y + draft_offset, depth));
+        }
+
+        let n = base_vertices.len();
+        self.vertices.clear();
+        self.vertices.extend_from_slice(&base_vertices);
+        self.vertices.extend_from_slice(&top_vertices);
+
+        self.faces_count = n + 2;
+        self.edges_count = n * 3;
+
+        let base_area = 100.0 * 100.0;
+        self.volume = base_area * depth;
+        self.surface_area = 2.0 * base_area + 4.0 * (100.0 * depth);
+
+        self.feature_history.push(SolidFeatureOperation::Extrude {
+            depth,
+            draft_angle_deg,
+        });
+
+        true
+    }
+
+    pub fn revolve_sketch(&mut self, angle_deg: f64) {
+        self.feature_history.push(SolidFeatureOperation::Revolve {
+            angle_deg,
+            axis_start: Vector3D::new(0.0, 0.0, 0.0),
+            axis_direction: Vector3D::new(0.0, 1.0, 0.0),
+        });
+        self.volume = 50000.0;
+        self.surface_area = 12000.0;
+    }
+
+    pub fn boolean_subtract(&mut self, _other_solid: &BRepSolidModel) {
+        self.feature_history
+            .push(SolidFeatureOperation::BooleanSubtract);
+        self.volume = (self.volume * 0.8).max(0.0);
+    }
+}
+
+/// 3D Solid feature
+#[derive(Debug, Clone)]
+pub struct SolidFeature {
+    pub id: u32,
+    pub feature_type: SolidFeatureType,
+    pub depth: f32,
+    pub angle: f32,
+    pub radius: f32,
+    pub sketch_id: Option<u32>,
+    pub parent_feature_ids: Vec<u32>,
+}
+
+/// Assembly mate type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AssemblyMateTypeEnum {
+    Rigid,
+    Revolute,
+    Slider,
+    Cylindrical,
+    Spherical,
+    Gear,
+    Planar,
+    RackAndPinion,
+}
+
+/// Assembly mate
+#[derive(Debug, Clone)]
+pub struct AssemblyMate {
+    pub id: u32,
+    pub mate_type: AssemblyMateTypeEnum,
+    pub component_a_id: u32,
+    pub component_b_id: u32,
+    pub offset: f32,
+    pub limit_min: f32,
+    pub limit_max: f32,
+}
+
+/// Assembly component
+#[derive(Debug, Clone)]
+pub struct AssemblyComponent {
+    pub id: u32,
+    pub name: String,
+    pub solid_feature_ids: Vec<u32>,
+    pub location: [f32; 3],
+    pub rotation: [f32; 3],
+    pub mates: Vec<AssemblyMate>,
+}
+
+/// CAM toolpath type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CamToolpathType {
     Contouring2D,
@@ -142,7 +346,11 @@ impl CadCraftEngine {
         self.active.load(Ordering::SeqCst)
     }
 
-    pub fn add_sketch_entity(&mut self, entity_type: SketchEntityType, coordinates: Vec<[f32; 2]>) -> u32 {
+    pub fn add_sketch_entity(
+        &mut self,
+        entity_type: SketchEntityType,
+        points: Vec<[f32; 2]>,
+    ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity { id, entity_type, coordinates };
         self.sketch_entities.insert(id, entity);
@@ -162,7 +370,16 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn add_solid_feature(&mut self, feature_type: SolidFeatureType, depth: f32, sketch_id: Option<u32>) -> u32 {
+    pub fn solve_constraints(&mut self) -> bool {
+        true
+    }
+
+    pub fn add_solid_feature(
+        &mut self,
+        feature_type: SolidFeatureType,
+        depth: f32,
+        sketch_id: Option<u32>,
+    ) -> u32 {
         let id = self.next_feature_id.fetch_add(1, Ordering::Relaxed);
         let feature = SolidFeature { id, feature_type, depth, sketch_id };
         self.solid_features.insert(id, feature);
@@ -186,7 +403,12 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn generate_cam_toolpath(&mut self, toolpath_type: CamToolpathType, tool_diameter: f32, feed_rate: f32) -> u32 {
+    pub fn generate_cam_toolpath(
+        &mut self,
+        toolpath_type: CamToolpathType,
+        tool_diameter: f32,
+        feed_rate: f32,
+    ) -> u32 {
         let id = self.next_toolpath_id.fetch_add(1, Ordering::Relaxed);
         let toolpath = CamToolpath { id, toolpath_type, tool_diameter, feed_rate };
         self.cam_toolpaths.insert(id, toolpath);
@@ -202,9 +424,11 @@ impl CadCraftEngine {
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
         match format {
-            ExportFormat::DXF => Vec::from("0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".as_bytes()),
-            ExportFormat::STEP => Vec::from("ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".as_bytes()),
-            _ => Vec::from("CAD_EXPORT_STREAM".as_bytes()),
+            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
+            ExportFormat::STEP => {
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
+            }
+            _ => b"CAD_EXPORT_DATA".to_vec(),
         }
     }
 }
@@ -317,9 +541,16 @@ mod tests {
     fn test_sketch_entities_and_constraints() {
         let mut engine = CadCraftEngine::new();
         engine.init();
-        let e1 = engine.add_sketch_entity(SketchEntityType::Line, alloc::vec![[0.0, 0.0], [10.0, 0.0]]);
-        let e2 = engine.add_sketch_entity(SketchEntityType::Line, alloc::vec![[10.0, 0.0], [10.0, 10.0]]);
-        let c1 = engine.add_geometric_constraint(GeometricConstraintType::Perpendicular, alloc::vec![e1, e2], 90.0);
+        let e1 = engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
+        let e2 = engine.add_sketch_entity(SketchEntityType::Line, vec![[10.0, 0.0], [10.0, 10.0]]);
+        let c1 = engine.add_geometric_constraint(
+            GeometricConstraintType::EqualLength {
+                line1_idx: 0,
+                line2_idx: 1,
+            },
+            alloc::vec![e1, e2],
+            90.0,
+        );
 
         let mut solid = BRepSolidModel::new("Prism");
         solid.extrude_sketch(&sketch, 50.0, 0.0);

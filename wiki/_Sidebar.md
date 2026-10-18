@@ -145,3 +145,4 @@
 - [Linux/BSD Kernel AI Roadmap](./41-Linux-BSD-Kernel-Security-And-Virtualization-AI-Agent-Roadmap.md)
 - [AI Operating Manual](./AI-Development-Agent-Operating-Manual.md)
 - [AI Maintenance Policy](./AI-Agent-Maintenance-Instructions.md)
+- [Open Source OS Inspiration V61 PR Suite](./38-Open-Source-OS-Inspiration-V61-PR-Suite.md)

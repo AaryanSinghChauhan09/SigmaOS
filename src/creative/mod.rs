@@ -230,8 +230,10 @@ pub use wordcraft::{
     WordCraftPullRequestSpec,
 };
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
-    WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
-    WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
-    WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine,
+    WordcraftEpubPdfBookPublisherPrEngine, WordcraftLinguisticAiSpellGrammarPrEngine,
+    WordcraftMailMergeAutomationPrEngine, WordcraftMissingComponentsParityPrSuite,
+    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
+    WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
 };
