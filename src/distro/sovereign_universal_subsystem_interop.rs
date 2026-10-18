@@ -32,14 +32,6 @@ pub enum UniversalSubsystemCategory {
     SystemAudit,
     AiWorkflowAgent,
     VirtualizationHypervisor,
-    ProcessActivity,
-    MemoryVirtualization,
-    TimeSynchronization,
-    SignalDelivery,
-    DeviceHotplug,
-    CryptographySecurity,
-    TelemetryObservability,
-    AccessibilityInput,
     StorageDrive,
     BluetoothWireless,
     ThermalCooling,
@@ -53,6 +45,11 @@ pub enum UniversalSubsystemCategory {
     UserlandPersona,
     FirmwareMicrocode,
     NetworkSecurityFirewall,
+    TimeSynchronization,
+    DeviceHotplug,
+    CryptographySecurity,
+    TelemetryObservability,
+    AccessibilityInput,
 }
 
 impl UniversalSubsystemCategory {
@@ -81,14 +78,6 @@ impl UniversalSubsystemCategory {
             Self::SystemAudit => "SystemAudit",
             Self::AiWorkflowAgent => "AiWorkflowAgent",
             Self::VirtualizationHypervisor => "VirtualizationHypervisor",
-            Self::ProcessActivity => "ProcessActivity",
-            Self::MemoryVirtualization => "MemoryVirtualization",
-            Self::TimeSynchronization => "TimeSynchronization",
-            Self::SignalDelivery => "SignalDelivery",
-            Self::DeviceHotplug => "DeviceHotplug",
-            Self::CryptographySecurity => "CryptographySecurity",
-            Self::TelemetryObservability => "TelemetryObservability",
-            Self::AccessibilityInput => "AccessibilityInput",
             Self::StorageDrive => "StorageDrive",
             Self::BluetoothWireless => "BluetoothWireless",
             Self::ThermalCooling => "ThermalCooling",
@@ -102,6 +91,11 @@ impl UniversalSubsystemCategory {
             Self::UserlandPersona => "UserlandPersona",
             Self::FirmwareMicrocode => "FirmwareMicrocode",
             Self::NetworkSecurityFirewall => "NetworkSecurityFirewall",
+            Self::TimeSynchronization => "TimeSynchronization",
+            Self::DeviceHotplug => "DeviceHotplug",
+            Self::CryptographySecurity => "CryptographySecurity",
+            Self::TelemetryObservability => "TelemetryObservability",
+            Self::AccessibilityInput => "AccessibilityInput",
         }
     }
 }
@@ -535,124 +529,13 @@ impl SovereignUniversalSubsystemInteropEngine {
         );
 
         self.register_subsystem(
-            "process_activity",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::ProcessActivity,
-                true,
-                true,
-                &[
-                    "cgroup_v2",
-                    "freebsd_racct",
-                    "rusage_collector",
-                    "pidfd_signals",
-                ],
-                6,
-            ),
-        );
-
-        self.register_subsystem(
-            "memory_virt",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::MemoryVirtualization,
-                true,
-                true,
-                &[
-                    "mglru_reclaim",
-                    "damon_harvest",
-                    "zram_zstd",
-                    "cxl_photonic",
-                ],
-                7,
-            ),
-        );
-
-        self.register_subsystem(
-            "time_sync",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::TimeSynchronization,
-                true,
-                true,
-                &["chrony_ntp", "ptp_hardware_clock", "bsd_secure_time"],
-                5,
-            ),
-        );
-
-        self.register_subsystem(
-            "signal_delivery",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::SignalDelivery,
-                true,
-                true,
-                &[
-                    "realtime_sigqueue",
-                    "sigreturn_frame_guard",
-                    "uncatchable_bypass",
-                ],
-                5,
-            ),
-        );
-
-        self.register_subsystem(
-            "device_hotplug",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::DeviceHotplug,
-                true,
-                true,
-                &["udev_devd_bridge", "xhci_hotplug", "evdev_multitouch"],
-                9,
-            ),
-        );
-
-        self.register_subsystem(
-            "crypto_security",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::CryptographySecurity,
-                true,
-                true,
-                &["pqc_dilithium", "falcon_1024", "kyber_1024", "luks2_geli"],
-                12,
-            ),
-        );
-
-        self.register_subsystem(
-            "telemetry_obs",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::TelemetryObservability,
-                true,
-                true,
-                &[
-                    "prometheus_exporter",
-                    "privacy_telemetry_filter",
-                    "crashdump_pstore",
-                ],
-                7,
-            ),
-        );
-
-        self.register_subsystem(
-            "accessibility_input",
-            SubsystemAdapterCapabilities::new(
-                UniversalSubsystemCategory::AccessibilityInput,
-                true,
-                true,
-                &[
-                    "orca_screenreader",
-                    "fcitx5_ime",
-                    "libinput_gestures",
-                    "braille_display",
-                ],
-                6,
-            ),
-        );
-
-        self.register_subsystem(
             "storage_drive",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::StorageDrive,
                 true,
                 true,
-                &["nvme_of", "scsi_target", "sata_ahci", "iscsi_initiator"],
-                8,
+                &["nvme_express", "ahci_sata", "ufs_bsd", "scsi_sg"],
+                9,
             ),
         );
 
@@ -662,7 +545,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::BluetoothWireless,
                 true,
                 true,
-                &["bluez_5", "netgraph_bluetooth", "pqc_bluetooth_mesh"],
+                &["bluez5_stack", "netgraph_bluetooth", "iwlwifi_mac"],
                 6,
             ),
         );
@@ -673,8 +556,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ThermalCooling,
                 true,
                 true,
-                &["intel_powerclamp", "thermald", "acpi_thermal"],
-                5,
+                &["intel_dptf", "k10temp_amd", "bsd_envsys"],
+                4,
             ),
         );
 
@@ -684,8 +567,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::PrintingSpooler,
                 true,
                 true,
-                &["cups_ipp", "lprng", "ghostscript_rasterizer"],
-                4,
+                &["cups_ipp", "lpr_bsd_spool"],
+                5,
             ),
         );
 
@@ -695,8 +578,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::RecoveryBackup,
                 true,
                 true,
-                &["borgbackup", "restic", "zfs_send_recv", "timeshift_btrfs"],
-                7,
+                &["snapper_btrfs", "zfs_send_recv", "restic_pqc"],
+                8,
             ),
         );
 
@@ -706,7 +589,7 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::RemoteAccess,
                 true,
                 true,
-                &["openssh_pqc", "wireguard", "freerdp", "vnc_tiger"],
+                &["openssh_pqc", "mosh_udp", "rdp_freerdp"],
                 6,
             ),
         );
@@ -717,8 +600,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::ProductivityApplications,
                 true,
                 true,
-                &["libreoffice", "wordcraft", "gridcraft", "deckcraft"],
-                8,
+                &["wordcraft_layout", "gridcraft_calc", "deckcraft_slides"],
+                12,
             ),
         );
 
@@ -728,8 +611,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::DatabaseEmbedded,
                 true,
                 true,
-                &["sqlite3", "duckdb", "rocksdb", "lmdb"],
-                5,
+                &["sqlite3_wal", "rocksdb_kv", "haiku_bfs_attr"],
+                7,
             ),
         );
 
@@ -739,8 +622,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::RoboticsHardware,
                 true,
                 true,
-                &["ros2_humble", "socketcan", "microros_serial"],
-                6,
+                &["ros2_dds", "canbus_socketcan", "uavcan"],
+                8,
             ),
         );
 
@@ -750,8 +633,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::RealTimeExtension,
                 true,
                 true,
-                &["preempt_rt", "xenomai_cobalt", "nuttx_posix"],
-                5,
+                &["rt_preempt", "xenomai3", "nuttx_sched"],
+                10,
             ),
         );
 
@@ -761,8 +644,8 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::UserlandPersona,
                 true,
                 true,
-                &["gnu_coreutils", "bsd_userland", "busybox", "uutils_rust"],
-                10,
+                &["glibc_abi", "musl_abi", "freebsd_libc", "openbsd_libc"],
+                11,
             ),
         );
 
@@ -772,19 +655,19 @@ impl SovereignUniversalSubsystemInteropEngine {
                 UniversalSubsystemCategory::FirmwareMicrocode,
                 true,
                 true,
-                &["fwupd_lvfs", "intel_microcode", "amd_ucode", "opensbi"],
+                &["fwupd_uefi", "intel_ucode", "amd_sev_snp"],
                 6,
             ),
         );
 
         self.register_subsystem(
-            "network_security_firewall",
+            "net_sec_firewall",
             SubsystemAdapterCapabilities::new(
                 UniversalSubsystemCategory::NetworkSecurityFirewall,
                 true,
                 true,
-                &["pf_openbsd", "nftables_linux", "ipfw_freebsd", "npf_netbsd"],
-                8,
+                &["openbsd_pf", "nftables_bpf", "ipfw_freebsd"],
+                9,
             ),
         );
     }

@@ -31,22 +31,10 @@ pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod model3d;
-pub mod pdfcraft;
-pub mod pdfcraft_artcraft_parity_pr;
-pub mod pdfcraft_missing_components_parity_pr;
-pub mod photocraft;
-pub mod photocraft_missing_components_parity_pr;
-pub mod soundcraft;
-pub mod soundcraft_missing_components_parity_pr;
+pub mod artcraft;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
-pub mod threedcraft_missing_components_parity_pr;
-pub mod vectoranimation;
-pub mod vectorcraft;
-pub mod voicecraft;
-pub mod voicecraft_missing_components_parity_pr;
-pub mod wordcraft;
-pub mod wordcraft_artcraft_parity_pr;
-pub mod wordcraft_missing_components_parity_pr;
+
+pub use sovereign_artcraft_craftlibs_pr_engine::*;
 
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
