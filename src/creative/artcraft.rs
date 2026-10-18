@@ -5,6 +5,7 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -135,6 +136,46 @@ impl ArtSuite {
         workspace.projects.iter().find(|p| p.id == project_id)
     }
 
+    /// Close / remove workspace by ID
+    pub fn close_workspace(&mut self, workspace_id: u32) -> bool {
+        self.workspaces.remove(&workspace_id).is_some()
+    }
+
+    /// Get all projects in a workspace of a specific type
+    pub fn get_projects_by_type(&self, workspace_id: u32, project_type: ProjectType) -> Vec<&Project> {
+        if let Some(workspace) = self.workspaces.get(&workspace_id) {
+            workspace
+                .projects
+                .iter()
+                .filter(|p| p.project_type == project_type)
+                .collect()
+        } else {
+            Vec::new()
+        }
+    }
+
+    /// Export PR proposal manifest for a given workspace
+    pub fn export_workspace_pr_manifest(&self, workspace_id: u32) -> Result<String, &'static str> {
+        let workspace = self
+            .workspaces
+            .get(&workspace_id)
+            .ok_or("Workspace not found")?;
+
+        let mut manifest = format!(
+            "### ArtCraft Workspace PR Manifest: {}\n- **Workspace ID**: {}\n- **Total Projects**: {}\n\n#### Included Projects:\n",
+            workspace.name, workspace.id, workspace.projects.len()
+        );
+
+        for proj in &workspace.projects {
+            manifest.push_str(&format!(
+                "- **ID**: {} | **Name**: {} | **Type**: {:?}\n",
+                proj.id, proj.name, proj.project_type
+            ));
+        }
+
+        Ok(manifest)
+    }
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -194,5 +235,49 @@ mod tests {
             )
             .unwrap();
         assert_eq!(suite.get_workspace(workspace_id).unwrap().projects.len(), 1);
+    }
+
+    #[test]
+    fn test_close_workspace() {
+        let mut suite = ArtSuite::new();
+        suite.init();
+        let id = suite.create_workspace("Workspace1".to_string());
+        assert!(suite.close_workspace(id));
+        assert!(suite.get_workspace(id).is_none());
+        assert!(!suite.close_workspace(id));
+    }
+
+    #[test]
+    fn test_get_projects_by_type() {
+        let mut suite = ArtSuite::new();
+        suite.init();
+        let w_id = suite.create_workspace("Workspace1".to_string());
+        suite
+            .create_project(w_id, "Photo 1".to_string(), ProjectType::Photo)
+            .unwrap();
+        suite
+            .create_project(w_id, "Video 1".to_string(), ProjectType::Video)
+            .unwrap();
+        suite
+            .create_project(w_id, "Photo 2".to_string(), ProjectType::Photo)
+            .unwrap();
+
+        let photos = suite.get_projects_by_type(w_id, ProjectType::Photo);
+        assert_eq!(photos.len(), 2);
+    }
+
+    #[test]
+    fn test_export_workspace_pr_manifest() {
+        let mut suite = ArtSuite::new();
+        suite.init();
+        let w_id = suite.create_workspace("Design Studio".to_string());
+        suite
+            .create_project(w_id, "Icon Set".to_string(), ProjectType::Vector)
+            .unwrap();
+
+        let manifest = suite.export_workspace_pr_manifest(w_id).unwrap();
+        assert!(manifest.contains("Design Studio"));
+        assert!(manifest.contains("Icon Set"));
+        assert!(manifest.contains("Vector"));
     }
 }
