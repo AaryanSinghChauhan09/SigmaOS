@@ -127,6 +127,7 @@ pub use kernel::{
     CfiFunctionSignature, KptrRestrictLevel, SovereignHardenedSecurityMitigationsEngine,
     SovereignKernelDistroParityPrGateway, SovereignKernelNextGenDistroInnovationsPrGateway,
     SovereignKernelOpenSourceInnovationsPrGateway,
+    SovereignKernelOpenSourceOsDistroAdvancementsV65PrGateway,
     SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };

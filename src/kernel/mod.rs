@@ -192,6 +192,9 @@ pub use sovereign_kernel_nextgen_distro_innovations_pr::*;
 pub mod sovereign_kernel_open_source_os_distro_breakthroughs_pr;
 pub use sovereign_kernel_open_source_os_distro_breakthroughs_pr::*;
 
+pub mod sovereign_kernel_open_source_os_distro_advancements_v65_pr;
+pub use sovereign_kernel_open_source_os_distro_advancements_v65_pr::*;
+
 pub mod sovereign_clean_code_and_os_principles_engine;
 pub use sovereign_clean_code_and_os_principles_engine::{
     CleanCodeMetricsEvaluator, ResourceAllocationGraph, SolidDesignValidator,
