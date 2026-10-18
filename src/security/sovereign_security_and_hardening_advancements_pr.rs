@@ -33,7 +33,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         Self
     }
 
-    /// Check Landlock access rights bitmask.
     pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
         (handled_access & requested_access) == requested_access
     }
@@ -201,6 +200,13 @@ pub struct BsdHardeningAndIsolationPrEngine;
 impl BsdHardeningAndIsolationPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
+        )
     }
 
     /// Verify OpenBSD pledge promise mask against required system syscall string.
@@ -487,15 +493,11 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
-    /// Generate full SSSD domain configuration with Kerberos realm.
-    pub fn generate_sssd_domain_conf_full(
-        domain_name: &str,
-        ldap_uri: &str,
-        krb_realm: &str,
-    ) -> String {
+    /// Generate SSSD domain configuration section.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
-            "[sssd]\ndomains = {}\n\n[domain/{}]\nid_provider = ldap\nauth_provider = krb5\nldap_uri = {}\nkrb5_realm = {}\nldap_search_base = dc=example,dc=org\ncache_credentials = true\n",
-            domain_name, domain_name, ldap_uri, krb_realm
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
         )
     }
 
