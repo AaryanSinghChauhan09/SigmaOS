@@ -167,7 +167,8 @@ impl ParametricSketch2D {
     }
 
     pub fn add_point(&mut self, x: f64, y: f64) -> usize {
-        self.entities.push(SketchEntity::Point(Point2D { x, y }));
+        self.entities
+            .push(SketchEntityEnum::Point(Point2D { x, y }));
         self.entities.len() - 1
     }
 
@@ -1213,7 +1214,7 @@ mod tests {
         engine.init();
         let e1 = engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
         let e2 = engine.add_sketch_entity(SketchEntityType::Line, vec![[10.0, 0.0], [10.0, 10.0]]);
-        let _c1 = engine.add_geometric_constraint(
+        let c1 = engine.add_geometric_constraint(
             GeometricConstraintType::EqualLength {
                 line1_idx: e1 as usize,
                 line2_idx: e2 as usize,

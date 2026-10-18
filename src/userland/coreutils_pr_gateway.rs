@@ -192,6 +192,70 @@ impl GnuCoreutilsBsdUserlandEngine {
         result
     }
 
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
+        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        if numeric {
+            list.sort_by(|a, b| {
+                let num_a = a.parse::<f64>().unwrap_or(0.0);
+                let num_b = b.parse::<f64>().unwrap_or(0.0);
+                num_a
+                    .partial_cmp(&num_b)
+                    .unwrap_or(core::cmp::Ordering::Equal)
+            });
+        } else {
+            list.sort();
+        }
+        if reverse {
+            list.reverse();
+        }
+        if unique {
+            list.dedup();
+        }
+        list
+    }
+
+    pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
+        if delete_mode {
+            input.chars().filter(|c| !from_set.contains(*c)).collect()
+        } else {
+            let mut out = String::with_capacity(input.len());
+            let from_chars: Vec<char> = from_set.chars().collect();
+            let to_chars: Vec<char> = to_set.chars().collect();
+            for c in input.chars() {
+                if let Some(pos) = from_chars.iter().position(|&fc| fc == c) {
+                    if let Some(&tc) = to_chars.get(pos).or_else(|| to_chars.last()) {
+                        out.push(tc);
+                    } else {
+                        out.push(c);
+                    }
+                } else {
+                    out.push(c);
+                }
+            }
+            out
+        }
+    }
+
+    pub fn run_head_tail_bytes(
+        &self,
+        content: &[u8],
+        bytes_count: usize,
+        is_head: bool,
+    ) -> Vec<u8> {
+        if is_head {
+            content.iter().take(bytes_count).copied().collect()
+        } else {
+            let skip_count = content.len().saturating_sub(bytes_count);
+            content.iter().skip(skip_count).copied().collect()
+        }
+    }
+
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
         let lines: Vec<&str> = content.lines().collect();
         if is_head {

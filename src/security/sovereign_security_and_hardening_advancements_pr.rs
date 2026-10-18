@@ -86,6 +86,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+    /// Evaluate Landlock v5 access permission.
+    pub fn check_landlock_access_u64(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
+    }
+
     /// Check if Linux capability bit mask contains target capability.
     pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
         if cap_bit >= 64 {

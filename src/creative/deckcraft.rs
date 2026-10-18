@@ -1,8 +1,14 @@
-// DeckCraft - Presentation & Slide Deck Engine
-use std::collections::BTreeMap;
-use std::string::String;
-use std::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+// SPDX-License-Identifier: MIT
+// SigmaOS - Deckcraft (Presentation & Slide Deck Engine)
+// Inspired by Apple Keynote, Microsoft PowerPoint, Pitch, Google Slides, Marp
+// Provides professional presentation design, slide layouts, animations, transitions, and presenter view
+
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExportFormat {
@@ -193,9 +199,10 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
-            ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"#ZENITH_PRESENTATION_FORMAT_STREAM\n");
+            ExportFormat::Svg => {
+                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<title>");
                 output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"</title>\n</svg>");
             }
         }
 

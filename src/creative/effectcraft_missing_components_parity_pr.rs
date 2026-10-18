@@ -817,6 +817,15 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         } else {
             0.0
         }
+        let cos_theta =
+            view_dir[0] * light_pos[0] + view_dir[1] * light_pos[1] + view_dir[2] * light_pos[2];
+        let g2 = self.anisotropy_g * self.anisotropy_g;
+        let phase = (1.0 - g2)
+            / (4.0
+                * core::f32::consts::PI
+                * (1.0 + g2 - 2.0 * self.anisotropy_g * cos_theta).powf(1.5));
+        let total_accumulation = phase * self.fog_density * (self.raymarch_steps as f32) * 0.1;
+        Ok(total_accumulation.clamp(0.0, 10.0))
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
@@ -1410,9 +1419,23 @@ mod tests {
     }
 
     #[test]
-    fn test_master_parity_suite() {
-        let suite = EffectcraftMissingComponentsParityPrSuite::new();
-        assert!(suite.run_parity_benchmark_suite());
+    fn test_procedural_fluid_fractal_engine_functional() {
+        let mut engine = ProceduralVfxFractalFluidSimulationPrEngine::new();
+        engine.add_fluid_density(5, 5, 10.0);
+        let res = engine.step_fluid_dynamics(0.1);
+        assert!(res.is_ok());
+
+        let fractal = engine.render_procedural_fractal(4, 4, 1.0).unwrap();
+        assert_eq!(fractal.len(), 4 * 4 * 4);
+    }
+
+    #[test]
+    fn test_volumetric_lighting_engine_functional() {
+        let engine = VolumetricLightingAtmosphericRaymarchPrEngine::new();
+        let shafts = engine
+            .compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0])
+            .unwrap();
+        assert!(shafts >= 0.0);
     }
 
     #[test]

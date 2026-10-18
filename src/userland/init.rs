@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2026 SigmaOS Contributors
 
+extern crate alloc;
+
 // Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
 //
 // Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
@@ -8,8 +10,7 @@
 // - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
 // - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-extern crate alloc;
-
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::{BTreeMap, BTreeSet};
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -469,15 +470,10 @@ impl OpenRcHeader {
 }
 
 /// OpenRC Dependency Solver Engine
-#[derive(Debug, Clone, Default)]
 pub struct OpenRcDependencySolverEngine {
     pub current_runlevel: OpenRcRunlevel,
     pub scripts: BTreeMap<String, OpenRcHeader>,
-    pub active_services: BTreeSet<String>,
-    pub service_statuses: BTreeMap<String, ServiceState>,
 }
-
-pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
 
 impl OpenRcDependencySolverEngine {
     pub fn new() -> Self {
@@ -485,51 +481,6 @@ impl OpenRcDependencySolverEngine {
             current_runlevel: OpenRcRunlevel::SysInit,
             scripts: BTreeMap::new(),
         }
-    }
-
-    pub fn resolve_order(
-        scripts: &BTreeMap<String, OpenRcHeader>,
-    ) -> Result<Vec<String>, &'static str> {
-        let mut sorted = Vec::new();
-        let mut visited = BTreeSet::new();
-        let mut temp_mark = BTreeSet::new();
-
-        fn visit(
-            node: &String,
-            scripts: &BTreeMap<String, OpenRcHeader>,
-            visited: &mut BTreeSet<String>,
-            temp_mark: &mut BTreeSet<String>,
-            sorted: &mut Vec<String>,
-        ) -> Result<(), &'static str> {
-            if temp_mark.contains(node) {
-                return Err("Cyclic dependency in OpenRC scripts");
-            }
-            if !visited.contains(node) {
-                temp_mark.insert(node.clone());
-                if let Some(header) = scripts.get(node) {
-                    for dep in &header.need {
-                        if scripts.contains_key(dep) {
-                            visit(dep, scripts, visited, temp_mark, sorted)?;
-                        }
-                    }
-                    for dep in &header.use_deps {
-                        if scripts.contains_key(dep) {
-                            visit(dep, scripts, visited, temp_mark, sorted)?;
-                        }
-                    }
-                }
-                temp_mark.remove(node);
-                visited.insert(node.clone());
-                sorted.push(node.clone());
-            }
-            Ok(())
-        }
-
-        for node in scripts.keys() {
-            visit(node, scripts, &mut visited, &mut temp_mark, &mut sorted)?;
-        }
-
-        Ok(sorted)
     }
 
     pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
@@ -559,76 +510,11 @@ impl OpenRcDependencySolverEngine {
 
     pub fn query_status(&self, service: &str) -> ServiceState {
         self.service_statuses
-            .get(service)
-            .copied()
-            .unwrap_or(ServiceState::Stopped)
-    }
-}
-
-pub type OpenRcDependencySolverSpecEngine = OpenRcDependencySolverEngine;
-
-/// OpenRC Status & Runlevel Controller Engine
-#[derive(Debug, Clone, Default)]
-pub struct OpenRcStatusControllerEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub active_services: BTreeSet<String>,
-    pub service_statuses: BTreeMap<String, ServiceState>,
-}
-
-impl OpenRcStatusControllerEngine {
-    pub fn new(initial_runlevel: OpenRcRunlevel) -> Self {
-        Self {
-            current_runlevel: initial_runlevel,
-            active_services: BTreeSet::new(),
-            service_statuses: BTreeMap::new(),
-        }
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
+            .insert(service_name.to_string(), ServiceState::Running);
     }
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
-    }
-}
-
-impl OpenRcHeader {
-    pub fn parse(script_content: &str) -> Self {
-        let mut header = OpenRcHeader::default();
-        for line in script_content.lines() {
-            let trimmed = line.trim();
-            if let Some(rest) = trimmed.strip_prefix("provide") {
-                header
-                    .provide
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("need") {
-                header
-                    .need
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("use") {
-                header
-                    .use_deps
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("before") {
-                header
-                    .before
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("after") {
-                header
-                    .after
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            } else if let Some(rest) = trimmed.strip_prefix("keyword") {
-                header
-                    .keywords
-                    .extend(rest.split_whitespace().map(|s| s.to_string()));
-            }
-        }
-        header
     }
 }
 
@@ -698,6 +584,7 @@ pub struct RunitS6SupervisionTreeGovernor {
     pub service_dir_path: String,
     pub current_stage: SupervisionStage,
     pub services: BTreeMap<String, SupervisedService>,
+    pub log_pipelines: BTreeMap<String, String>,
     pub active_services: BTreeMap<String, SupervisedService>,
     pub log_pipelines: BTreeMap<String, String>,
 }
@@ -1161,6 +1048,7 @@ impl AtSpoolQueueManager {
         self.queued_jobs = pending;
         ready
     }
+}
 
 pub type AtSpoolQueueSpecManager = AtSpoolQueueManager;
 
