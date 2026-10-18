@@ -723,7 +723,9 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Optical Flow Motion Estimation & Velocity Blur Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Implement Optical Flow Motion Estimation & Velocity Blur Engine"
+                    .to_string(),
             target_subsystem: "Time Warp & Motion Vectors".to_string(),
             original_suite: "ArtCraft Optical Flow Ecosystem".to_string(),
             components_added: vec![
@@ -870,7 +872,8 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Cryptomatte EXR Manifest & AOV Pass Extractor".to_string(),
+            pr_title: "feat(effectcraft): Implement Cryptomatte EXR Manifest & AOV Pass Extractor"
+                .to_string(),
             target_subsystem: "EXR Cryptomatte & AOV Compositor".to_string(),
             original_suite: "ArtCraft Cryptomatte Studio".to_string(),
             components_added: vec![
