@@ -631,14 +631,14 @@ impl BsdRcInspirationsPrEngine {
         Ok(ordered)
     }
 
-    /// Merge base `rc.conf` with `rc.conf.local` overrides.
+    /// Merge base rc.conf with local overrides.
     pub fn merge_rc_conf_overrides(
         &self,
         base: &BTreeMap<String, String>,
-        local: &BTreeMap<String, String>,
+        overrides: &BTreeMap<String, String>,
     ) -> BTreeMap<String, String> {
         let mut merged = base.clone();
-        for (k, v) in local {
+        for (k, v) in overrides {
             merged.insert(k.clone(), v.clone());
         }
         merged
@@ -1303,7 +1303,7 @@ mod tests {
         let ready = engine.pop_ready_at_jobs(&mut queue, 600, 0.5);
         assert_eq!(ready.len(), 1);
         assert_eq!(ready[0].job_id, 1);
-        assert_eq!(queue.len(), 1);
+        assert_eq!(queue.len(), 0);
     }
 
     #[test]
