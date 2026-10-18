@@ -826,6 +826,569 @@ impl SovereignMacroAutomationSandbox {
     }
 }
 
+// ============================================================================
+// GOOGLE WORKSPACE INSPIRED ADVANCED SUITE ENGINES
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct FormulaNodeEvaluation {
+    pub cell_id: String,
+    pub formula_expression: String,
+    pub dependencies: Vec<String>,
+    pub execution_order: usize,
+    pub has_circular_dependency: bool,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct FormulaGraphEvaluationResult {
+    pub evaluated_nodes: Vec<FormulaNodeEvaluation>,
+    pub has_cycle: bool,
+    pub cycle_node_ids: Vec<String>,
+}
+
+pub struct SovereignGoogleSheetsFormulaGraphEvaluatorEngine;
+
+impl SovereignGoogleSheetsFormulaGraphEvaluatorEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_formula_dag(
+        &self,
+        nodes: HashMap<String, (String, Vec<String>)>,
+    ) -> FormulaGraphEvaluationResult {
+        let mut in_degree: HashMap<String, usize> = HashMap::new();
+        let mut adj: HashMap<String, Vec<String>> = HashMap::new();
+
+        for (node, (_, deps)) in &nodes {
+            in_degree.entry(node.clone()).or_insert(0);
+            for dep in deps {
+                adj.entry(dep.clone()).or_insert_with(Vec::new).push(node.clone());
+                *in_degree.entry(node.clone()).or_insert(0) += 1;
+            }
+        }
+
+        let mut queue: Vec<String> = Vec::new();
+        for (node, deg) in &in_degree {
+            if *deg == 0 {
+                queue.push(node.clone());
+            }
+        }
+
+        let mut execution_order = 0;
+        let mut evaluated_nodes = Vec::new();
+        let mut visited_set = HashSet::new();
+
+        while !queue.is_empty() {
+            let curr = queue.remove(0);
+            visited_set.insert(curr.clone());
+
+            if let Some((expr, deps)) = nodes.get(&curr) {
+                evaluated_nodes.push(FormulaNodeEvaluation {
+                    cell_id: curr.clone(),
+                    formula_expression: expr.clone(),
+                    dependencies: deps.clone(),
+                    execution_order,
+                    has_circular_dependency: false,
+                });
+                execution_order += 1;
+            }
+
+            if let Some(neighbors) = adj.get(&curr) {
+                for neighbor in neighbors {
+                    if let Some(deg) = in_degree.get_mut(neighbor) {
+                        *deg -= 1;
+                        if *deg == 0 {
+                            queue.push(neighbor.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        let has_cycle = visited_set.len() < nodes.len();
+        let mut cycle_nodes = Vec::new();
+
+        if has_cycle {
+            for node in nodes.keys() {
+                if !visited_set.contains(node) {
+                    cycle_nodes.push(node.clone());
+                }
+            }
+        }
+
+        FormulaGraphEvaluationResult {
+            evaluated_nodes,
+            has_cycle,
+            cycle_node_ids: cycle_nodes,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum SovereignSmartChipSpec {
+    UserMention { email: String, display_name: String },
+    FileLink { doc_id: String, title: String, mime_type: String },
+    DateRef { iso_date: String, timestamp: u64 },
+    VariableTag { var_name: String, value: String },
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct FormattedSmartChip {
+    pub chip_spec: SovereignSmartChipSpec,
+    pub rendered_html: String,
+    pub interactive_data_attribute: String,
+}
+
+pub struct SovereignGoogleDocsRealtimeSmartChipsComposerEngine;
+
+impl SovereignGoogleDocsRealtimeSmartChipsComposerEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compose_smart_chip(&self, chip: SovereignSmartChipSpec) -> FormattedSmartChip {
+        match &chip {
+            SovereignSmartChipSpec::UserMention { email, display_name } => FormattedSmartChip {
+                chip_spec: chip.clone(),
+                rendered_html: format!("<span class=\"smart-chip chip-user\">@{}</span>", display_name),
+                interactive_data_attribute: format!("data-user-email=\"{}\"", email),
+            },
+            SovereignSmartChipSpec::FileLink { doc_id, title, mime_type } => FormattedSmartChip {
+                chip_spec: chip.clone(),
+                rendered_html: format!("<span class=\"smart-chip chip-file\">📄 {}</span>", title),
+                interactive_data_attribute: format!("data-doc-id=\"{}\" data-mime=\"{}\"", doc_id, mime_type),
+            },
+            SovereignSmartChipSpec::DateRef { iso_date, timestamp } => FormattedSmartChip {
+                chip_spec: chip.clone(),
+                rendered_html: format!("<span class=\"smart-chip chip-date\">📅 {}</span>", iso_date),
+                interactive_data_attribute: format!("data-timestamp=\"{}\"", timestamp),
+            },
+            SovereignSmartChipSpec::VariableTag { var_name, value } => FormattedSmartChip {
+                chip_spec: chip.clone(),
+                rendered_html: format!("<span class=\"smart-chip chip-var\">{{{}: {}}}</span>", var_name, value),
+                interactive_data_attribute: format!("data-var-name=\"{}\"", var_name),
+            },
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DataTableRow {
+    pub join_key: String,
+    pub dimensions: HashMap<String, String>,
+    pub metrics: HashMap<String, f64>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BlendedPivotRow {
+    pub join_key: String,
+    pub primary_dimensions: HashMap<String, String>,
+    pub secondary_dimensions: HashMap<String, String>,
+    pub aggregated_metrics: HashMap<String, f64>,
+}
+
+pub struct SovereignGoogleLookerStudioDataBlendingPivotEngine;
+
+impl SovereignGoogleLookerStudioDataBlendingPivotEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn blend_and_aggregate(
+        &self,
+        primary_source: &[DataTableRow],
+        secondary_source: &[DataTableRow],
+    ) -> Vec<BlendedPivotRow> {
+        let mut secondary_map: HashMap<String, &DataTableRow> = HashMap::new();
+        for row in secondary_source {
+            secondary_map.insert(row.join_key.clone(), row);
+        }
+
+        let mut blended_rows = Vec::new();
+
+        for p_row in primary_source {
+            let mut agg_metrics = p_row.metrics.clone();
+            let mut s_dims = HashMap::new();
+
+            if let Some(s_row) = secondary_map.get(&p_row.join_key) {
+                s_dims = s_row.dimensions.clone();
+                for (k, v) in &s_row.metrics {
+                    let metric_key = format!("sec_{}", k);
+                    agg_metrics.insert(metric_key, *v);
+                }
+            }
+
+            blended_rows.push(BlendedPivotRow {
+                join_key: p_row.join_key.clone(),
+                primary_dimensions: p_row.dimensions.clone(),
+                secondary_dimensions: s_dims,
+                aggregated_metrics: agg_metrics,
+            });
+        }
+
+        blended_rows
+    }
+}
+
+// ============================================================================
+// MICROSOFT 365, POWER BI, AND SALESFORCE INSPIRED ADVANCED ENGINES
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct VectorClockVersion {
+    pub client_id: String,
+    pub sequence_number: u64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CoAuthoringDeltaOp {
+    pub op_id: String,
+    pub author: String,
+    pub vector_clock: Vec<VectorClockVersion>,
+    pub delta_content: String,
+    pub parent_op_id: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BranchMergeResult {
+    pub merged_op_ids: Vec<String>,
+    pub conflict_detected: bool,
+    pub conflict_summary: Option<String>,
+    pub combined_delta_text: String,
+}
+
+pub struct SovereignMicrosoft365VersionBranchingEngine;
+
+impl SovereignMicrosoft365VersionBranchingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn merge_coauthoring_branches(
+        &self,
+        base_ops: &[CoAuthoringDeltaOp],
+        incoming_branch_ops: &[CoAuthoringDeltaOp],
+    ) -> BranchMergeResult {
+        let mut merged_ids = Vec::new();
+        let mut combined_text = String::new();
+        let mut conflict = false;
+
+        for op in base_ops {
+            merged_ids.push(op.op_id.clone());
+            combined_text.push_str(&op.delta_content);
+            combined_text.push(' ');
+        }
+
+        for op in incoming_branch_ops {
+            if !merged_ids.contains(&op.op_id) {
+                merged_ids.push(op.op_id.clone());
+                combined_text.push_str(&op.delta_content);
+                combined_text.push(' ');
+            } else {
+                conflict = true;
+            }
+        }
+
+        BranchMergeResult {
+            merged_op_ids: merged_ids,
+            conflict_detected: conflict,
+            conflict_summary: if conflict {
+                Some("Duplicate op IDs detected in co-authoring branch merge".to_string())
+            } else {
+                None
+            },
+            combined_delta_text: combined_text.trim_end().to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DaxRecord {
+    pub category: String,
+    pub value: f64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DaxEvaluationResult {
+    pub measure_name: String,
+    pub evaluated_value: f64,
+    pub filter_context_applied: String,
+    pub record_count: usize,
+}
+
+pub struct SovereignMicrosoftPowerBiDaxCalculatorEngine;
+
+impl SovereignMicrosoftPowerBiDaxCalculatorEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_dax_measure(
+        &self,
+        measure_name: &str,
+        expression: &str, // e.g., "SUM", "AVERAGE", "COUNT"
+        category_filter: Option<&str>,
+        records: &[DaxRecord],
+    ) -> DaxEvaluationResult {
+        let filtered: Vec<&DaxRecord> = match category_filter {
+            Some(cat) => records.iter().filter(|r| r.category == cat).collect(),
+            None => records.iter().collect(),
+        };
+
+        let val = match expression {
+            "AVERAGE" => {
+                if filtered.is_empty() {
+                    0.0
+                } else {
+                    let sum: f64 = filtered.iter().map(|r| r.value).sum();
+                    sum / filtered.len() as f64
+                }
+            }
+            "COUNT" => filtered.len() as f64,
+            _ => filtered.iter().map(|r| r.value).sum(), // Default SUM
+        };
+
+        DaxEvaluationResult {
+            measure_name: measure_name.to_string(),
+            evaluated_value: val,
+            filter_context_applied: category_filter.unwrap_or("ALL").to_string(),
+            record_count: filtered.len(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct PricingTierBracket {
+    pub min_units: u32,
+    pub max_units: u32, // 0 for unlimited
+    pub unit_price: f64,
+    pub tier_discount_percentage: f64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CpqPricingResult {
+    pub total_list_price: f64,
+    pub total_discounted_price: f64,
+    pub applied_tier_discount_percent: f64,
+    pub requires_executive_approval: bool,
+}
+
+pub struct SovereignSalesforceCpqPricingTierEngine;
+
+impl SovereignSalesforceCpqPricingTierEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_quote_pricing(
+        &self,
+        quantity: u32,
+        base_unit_price: f64,
+        tiers: &[PricingTierBracket],
+    ) -> CpqPricingResult {
+        let list_price = quantity as f64 * base_unit_price;
+        let mut applicable_discount = 0.0;
+
+        for tier in tiers {
+            if quantity >= tier.min_units && (tier.max_units == 0 || quantity <= tier.max_units) {
+                applicable_discount = tier.tier_discount_percentage;
+                break;
+            }
+        }
+
+        let discounted_price = list_price * (1.0 - (applicable_discount / 100.0));
+        let requires_approval = applicable_discount >= 25.0 || discounted_price >= 100000.0;
+
+        CpqPricingResult {
+            total_list_price: list_price,
+            total_discounted_price: discounted_price,
+            applied_tier_discount_percent: applicable_discount,
+            requires_executive_approval: requires_approval,
+        }
+    }
+}
+
+// ============================================================================
+// ZOHO, ODOO, AND BITRIX24 INSPIRED ADVANCED ENGINES
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct FxAccountBalanceSpec {
+    pub account_id: String,
+    pub currency_code: String,
+    pub foreign_amount: f64,
+    pub historical_exchange_rate: f64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct FxRevaluationResultSpec {
+    pub account_id: String,
+    pub original_local_amount: f64,
+    pub revalued_local_amount: f64,
+    pub unrealized_gain_loss: f64,
+    pub is_gain: bool,
+}
+
+pub struct SovereignZohoBooksMultiCurrencyFxRevaluationEngineSpec;
+
+impl SovereignZohoBooksMultiCurrencyFxRevaluationEngineSpec {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn revalue_foreign_balances(
+        &self,
+        balances: &[FxAccountBalanceSpec],
+        closing_exchange_rate: f64,
+    ) -> Vec<FxRevaluationResultSpec> {
+        let mut results = Vec::new();
+
+        for bal in balances {
+            let orig_local = bal.foreign_amount * bal.historical_exchange_rate;
+            let revalued_local = bal.foreign_amount * closing_exchange_rate;
+            let diff = revalued_local - orig_local;
+
+            results.push(FxRevaluationResultSpec {
+                account_id: bal.account_id.clone(),
+                original_local_amount: orig_local,
+                revalued_local_amount: revalued_local,
+                unrealized_gain_loss: diff.abs(),
+                is_gain: diff >= 0.0,
+            });
+        }
+
+        results
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BomCostingNode {
+    pub item_id: String,
+    pub quantity_required: f64,
+    pub unit_cost: f64,
+    pub sub_components: Vec<BomCostingNode>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BomCostRollupResult {
+    pub total_material_cost: f64,
+    pub total_sub_component_count: usize,
+    pub cost_breakdown_by_item: HashMap<String, f64>,
+}
+
+pub struct SovereignOdooInventoryMrpBomCostingEngine;
+
+impl SovereignOdooInventoryMrpBomCostingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_bom_cost(&self, root_components: &[BomCostingNode]) -> BomCostRollupResult {
+        let mut total_cost = 0.0;
+        let mut sub_count = 0;
+        let mut breakdown = HashMap::new();
+
+        for comp in root_components {
+            let (c_cost, c_count) = Self::recursive_bom_cost(comp, &mut breakdown);
+            total_cost += c_cost;
+            sub_count += c_count;
+        }
+
+        BomCostRollupResult {
+            total_material_cost: total_cost,
+            total_sub_component_count: sub_count,
+            cost_breakdown_by_item: breakdown,
+        }
+    }
+
+    fn recursive_bom_cost(
+        comp: &BomCostingNode,
+        breakdown: &mut HashMap<String, f64>,
+    ) -> (f64, usize) {
+        let mut item_cost = comp.quantity_required * comp.unit_cost;
+        let mut total_child_count = 1;
+
+        for child in &comp.sub_components {
+            let (child_cost, child_count) = Self::recursive_bom_cost(child, breakdown);
+            item_cost += child_cost * comp.quantity_required;
+            total_child_count += child_count;
+        }
+
+        *breakdown.entry(comp.item_id.clone()).or_insert(0.0) += item_cost;
+        (item_cost, total_child_count)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct OmnichannelInboundTicket {
+    pub ticket_id: String,
+    pub channel: String, // e.g. "Email", "SMS", "LiveChat", "VoicePBX"
+    pub required_skills: Vec<String>,
+    pub priority: TicketPriority,
+    pub wait_time_seconds: u64,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct AgentSkillProfile {
+    pub agent_id: String,
+    pub skills: Vec<String>,
+    pub active_ticket_count: usize,
+    pub max_capacity: usize,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct OmnichannelRoutingResult {
+    pub ticket_id: String,
+    pub assigned_agent_id: Option<String>,
+    pub routed_queue: String,
+    pub sla_breach_warning: bool,
+}
+
+pub struct SovereignBitrix24OmnichannelRoutingAndSlaEngine;
+
+impl SovereignBitrix24OmnichannelRoutingAndSlaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn route_inbound_ticket(
+        &self,
+        ticket: &OmnichannelInboundTicket,
+        agents: &[AgentSkillProfile],
+    ) -> OmnichannelRoutingResult {
+        let sla_warning = ticket.wait_time_seconds > 300 || ticket.priority == TicketPriority::Urgent;
+
+        let mut best_agent: Option<String> = None;
+        let mut min_workload = usize::MAX;
+
+        for agent in agents {
+            if agent.active_ticket_count < agent.max_capacity {
+                let matches_skills = ticket.required_skills.iter().all(|s| agent.skills.contains(s));
+                if matches_skills && agent.active_ticket_count < min_workload {
+                    min_workload = agent.active_ticket_count;
+                    best_agent = Some(agent.agent_id.clone());
+                }
+            }
+        }
+
+        let queue = if best_agent.is_some() {
+            format!("{}_Assigned_Queue", ticket.channel)
+        } else if sla_warning {
+            "Escalated_High_Priority_Overflow_Queue".to_string()
+        } else {
+            format!("{}_Default_Unassigned_Queue", ticket.channel)
+        };
+
+        OmnichannelRoutingResult {
+            ticket_id: ticket.ticket_id.clone(),
+            assigned_agent_id: best_agent,
+            routed_queue: queue,
+            sla_breach_warning: sla_warning,
+        }
+    }
+}
+
 impl Default for SovereignMacroAutomationSandbox {
     fn default() -> Self {
         Self::new()
@@ -10722,6 +11285,159 @@ mod tests {
         );
         let auto_lead = bitrix_call.auto_create_lead_from_missed_call("+15550199");
         assert!(auto_lead.contains("CRM Lead Auto-Created"));
+    }
+
+    #[test]
+    fn test_google_workspace_advanced_engines() {
+        // 1. Formula Graph Evaluator
+        let formula_engine = SovereignGoogleSheetsFormulaGraphEvaluatorEngine::new();
+        let mut nodes = HashMap::new();
+        nodes.insert("A1".to_string(), ("10".to_string(), vec![]));
+        nodes.insert("A2".to_string(), ("20".to_string(), vec![]));
+        nodes.insert("A3".to_string(), ("SUM(A1, A2)".to_string(), vec!["A1".to_string(), "A2".to_string()]));
+
+        let res = formula_engine.evaluate_formula_dag(nodes);
+        assert!(!res.has_cycle);
+        assert_eq!(res.evaluated_nodes.len(), 3);
+
+        // 2. Smart Chips Composer
+        let chips_engine = SovereignGoogleDocsRealtimeSmartChipsComposerEngine::new();
+        let chip_spec = SovereignSmartChipSpec::UserMention {
+            email: "alice@example.com".to_string(),
+            display_name: "Alice Smith".to_string(),
+        };
+        let formatted = chips_engine.compose_smart_chip(chip_spec);
+        assert!(formatted.rendered_html.contains("@Alice Smith"));
+        assert!(formatted.interactive_data_attribute.contains("alice@example.com"));
+
+        // 3. Looker Studio Data Blending Pivot Engine
+        let looker_engine = SovereignGoogleLookerStudioDataBlendingPivotEngine::new();
+        let mut p_dims = HashMap::new();
+        p_dims.insert("Region".to_string(), "US-East".to_string());
+        let mut p_metrics = HashMap::new();
+        p_metrics.insert("Sales".to_string(), 5000.0);
+
+        let primary = vec![DataTableRow {
+            join_key: "KEY_101".to_string(),
+            dimensions: p_dims,
+            metrics: p_metrics,
+        }];
+
+        let mut s_dims = HashMap::new();
+        s_dims.insert("Manager".to_string(), "John Doe".to_string());
+        let mut s_metrics = HashMap::new();
+        s_metrics.insert("Budget".to_string(), 4000.0);
+
+        let secondary = vec![DataTableRow {
+            join_key: "KEY_101".to_string(),
+            dimensions: s_dims,
+            metrics: s_metrics,
+        }];
+
+        let blended = looker_engine.blend_and_aggregate(&primary, &secondary);
+        assert_eq!(blended.len(), 1);
+        assert_eq!(blended[0].aggregated_metrics.get("Sales"), Some(&5000.0));
+        assert_eq!(blended[0].aggregated_metrics.get("sec_Budget"), Some(&4000.0));
+    }
+
+    #[test]
+    fn test_ms_powerbi_salesforce_advanced_engines() {
+        // 1. MS 365 Version Branching
+        let ms_engine = SovereignMicrosoft365VersionBranchingEngine::new();
+        let base_ops = vec![CoAuthoringDeltaOp {
+            op_id: "op1".to_string(),
+            author: "UserA".to_string(),
+            vector_clock: vec![],
+            delta_content: "Hello".to_string(),
+            parent_op_id: None,
+        }];
+        let branch_ops = vec![CoAuthoringDeltaOp {
+            op_id: "op2".to_string(),
+            author: "UserB".to_string(),
+            vector_clock: vec![],
+            delta_content: "World".to_string(),
+            parent_op_id: Some("op1".to_string()),
+        }];
+
+        let merged = ms_engine.merge_coauthoring_branches(&base_ops, &branch_ops);
+        assert!(!merged.conflict_detected);
+        assert_eq!(merged.combined_delta_text, "Hello World");
+
+        // 2. Power BI DAX Calculator
+        let dax_engine = SovereignMicrosoftPowerBiDaxCalculatorEngine::new();
+        let records = vec![
+            DaxRecord { category: "Tech".to_string(), value: 100.0 },
+            DaxRecord { category: "Tech".to_string(), value: 300.0 },
+            DaxRecord { category: "Retail".to_string(), value: 50.0 },
+        ];
+        let dax_res = dax_engine.evaluate_dax_measure("TotalTechSales", "SUM", Some("Tech"), &records);
+        assert_eq!(dax_res.evaluated_value, 400.0);
+        assert_eq!(dax_res.record_count, 2);
+
+        // 3. Salesforce CPQ Pricing Tier
+        let cpq_engine = SovereignSalesforceCpqPricingTierEngine::new();
+        let tiers = vec![
+            PricingTierBracket { min_units: 1, max_units: 10, unit_price: 100.0, tier_discount_percentage: 0.0 },
+            PricingTierBracket { min_units: 11, max_units: 100, unit_price: 100.0, tier_discount_percentage: 15.0 },
+        ];
+        let cpq_res = cpq_engine.calculate_quote_pricing(50, 100.0, &tiers);
+        assert_eq!(cpq_res.total_list_price, 5000.0);
+        assert_eq!(cpq_res.applied_tier_discount_percent, 15.0);
+        assert_eq!(cpq_res.total_discounted_price, 4250.0);
+    }
+
+    #[test]
+    fn test_zoho_odoo_bitrix_advanced_engines() {
+        // 1. Zoho Books FX Revaluation
+        let zoho_engine = SovereignZohoBooksMultiCurrencyFxRevaluationEngineSpec::new();
+        let balances = vec![FxAccountBalanceSpec {
+            account_id: "ACC_EUR".to_string(),
+            currency_code: "EUR".to_string(),
+            foreign_amount: 1000.0,
+            historical_exchange_rate: 1.10,
+        }];
+        let reval = zoho_engine.revalue_foreign_balances(&balances, 1.20);
+        assert_eq!(reval.len(), 1);
+        assert_eq!(reval[0].original_local_amount, 1100.0);
+        assert_eq!(reval[0].revalued_local_amount, 1200.0);
+        assert!(reval[0].is_gain);
+
+        // 2. Odoo MRP BOM Costing
+        let odoo_engine = SovereignOdooInventoryMrpBomCostingEngine::new();
+        let sub_comp = BomCostingNode {
+            item_id: "ITEM_RAM".to_string(),
+            quantity_required: 2.0,
+            unit_cost: 50.0,
+            sub_components: vec![],
+        };
+        let root = vec![BomCostingNode {
+            item_id: "ITEM_LAPTOP".to_string(),
+            quantity_required: 1.0,
+            unit_cost: 500.0,
+            sub_components: vec![sub_comp],
+        }];
+        let bom_res = odoo_engine.calculate_bom_cost(&root);
+        assert_eq!(bom_res.total_material_cost, 600.0);
+
+        // 3. Bitrix24 Omnichannel Routing and SLA
+        let bitrix_engine = SovereignBitrix24OmnichannelRoutingAndSlaEngine::new();
+        let ticket = OmnichannelInboundTicket {
+            ticket_id: "TICK_001".to_string(),
+            channel: "LiveChat".to_string(),
+            required_skills: vec!["Sales".to_string()],
+            priority: TicketPriority::Medium,
+            wait_time_seconds: 120,
+        };
+        let agents = vec![AgentSkillProfile {
+            agent_id: "AGENT_SMITH".to_string(),
+            skills: vec!["Sales".to_string(), "Support".to_string()],
+            active_ticket_count: 1,
+            max_capacity: 5,
+        }];
+        let route_res = bitrix_engine.route_inbound_ticket(&ticket, &agents);
+        assert_eq!(route_res.assigned_agent_id, Some("AGENT_SMITH".to_string()));
+        assert_eq!(route_res.routed_queue, "LiveChat_Assigned_Queue");
+        assert!(!route_res.sla_breach_warning);
     }
 
     #[test]
