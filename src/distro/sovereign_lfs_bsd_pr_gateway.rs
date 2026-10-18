@@ -20,7 +20,9 @@ use std::format;
 use std::string::String;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::distro::sovereign_linux_bsd_lfs_master_harmony::SovereignLinuxBsdLfsMasterHarmonyEngine;
+use crate::distro::sovereign_linux_bsd_lfs_master_harmony::{
+    self, SovereignLinuxBsdLfsMasterHarmonyEngine,
+};
 
 #[cfg(feature = "standalone_test")]
 #[path = "sovereign_linux_bsd_lfs_master_harmony.rs"]
@@ -281,7 +283,7 @@ impl SovereignLfsBsdPrGateway {
 
         // 2. Verify LFS bootscripts init runlevel switch
         let activated = self.master_harmony.lfs_bootscripts.set_runlevel(
-            crate::distro::LfsRunlevel::Runlevel3MultiUserNet,
+            sovereign_linux_bsd_lfs_master_harmony::LfsRunlevel::Runlevel3MultiUserNet,
         );
         assert!(activated >= 1);
 

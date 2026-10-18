@@ -125,7 +125,12 @@ impl WordcraftTypographyLayoutPrEngine {
     }
 
     /// Calculate wrapping offset around floating shape bounding box
-    pub fn calculate_text_wrap(&self, wrap_mode: TextWrapMode, shape_width: f32, margin: f32) -> f32 {
+    pub fn calculate_text_wrap(
+        &self,
+        wrap_mode: TextWrapMode,
+        shape_width: f32,
+        margin: f32,
+    ) -> f32 {
         match wrap_mode {
             TextWrapMode::InlineWithText => 0.0,
             TextWrapMode::Square | TextWrapMode::Tight => shape_width + margin * 2.0,
@@ -363,8 +368,15 @@ impl WordcraftReferenceCitationBibliographyPrEngine {
     pub fn format_citation(&self, source_id: &str, style: CitationStyle) -> Option<String> {
         let src = self.sources.get(source_id)?;
         match style {
-            CitationStyle::APA => Some(format!("({}, {})", src.author.split_whitespace().last().unwrap_or(""), src.year)),
-            CitationStyle::MLA => Some(format!("({})", src.author.split_whitespace().last().unwrap_or(""))),
+            CitationStyle::APA => Some(format!(
+                "({}, {})",
+                src.author.split_whitespace().last().unwrap_or(""),
+                src.year
+            )),
+            CitationStyle::MLA => Some(format!(
+                "({})",
+                src.author.split_whitespace().last().unwrap_or("")
+            )),
             CitationStyle::IEEE => Some(format!("[1]")),
             CitationStyle::Chicago => Some(format!("{}, {}.", src.author, src.title)),
         }
@@ -375,10 +387,22 @@ impl WordcraftReferenceCitationBibliographyPrEngine {
         let mut output = Vec::new();
         for src in self.sources.values() {
             let entry = match style {
-                CitationStyle::APA => format!("{}, ({}). {}. {}.", src.author, src.year, src.title, src.publisher),
-                CitationStyle::MLA => format!("{}. {}. {}, {}.", src.author, src.title, src.publisher, src.year),
-                CitationStyle::IEEE => format!("[1] {}, \"{},\" {}: {}, {}.", src.author, src.title, src.source_type, src.publisher, src.year),
-                CitationStyle::Chicago => format!("{}, {}. {}: {}, {}.", src.author, src.title, src.publisher, src.publisher, src.year),
+                CitationStyle::APA => format!(
+                    "{}, ({}). {}. {}.",
+                    src.author, src.year, src.title, src.publisher
+                ),
+                CitationStyle::MLA => format!(
+                    "{}. {}. {}, {}.",
+                    src.author, src.title, src.publisher, src.year
+                ),
+                CitationStyle::IEEE => format!(
+                    "[1] {}, \"{},\" {}: {}, {}.",
+                    src.author, src.title, src.source_type, src.publisher, src.year
+                ),
+                CitationStyle::Chicago => format!(
+                    "{}, {}. {}: {}, {}.",
+                    src.author, src.title, src.publisher, src.publisher, src.year
+                ),
             };
             output.push(entry);
         }
@@ -455,9 +479,18 @@ pub struct WordcraftLinguisticAiSpellGrammarPrEngine {
 impl WordcraftLinguisticAiSpellGrammarPrEngine {
     pub fn new() -> Self {
         let dictionary = vec![
-            "the".to_string(), "quick".to_string(), "brown".to_string(), "fox".to_string(),
-            "jumps".to_string(), "over".to_string(), "lazy".to_string(), "dog".to_string(),
-            "sigmaos".to_string(), "wordcraft".to_string(), "document".to_string(), "editor".to_string(),
+            "the".to_string(),
+            "quick".to_string(),
+            "brown".to_string(),
+            "fox".to_string(),
+            "jumps".to_string(),
+            "over".to_string(),
+            "lazy".to_string(),
+            "dog".to_string(),
+            "sigmaos".to_string(),
+            "wordcraft".to_string(),
+            "document".to_string(),
+            "editor".to_string(),
         ];
         Self { dictionary }
     }
@@ -466,7 +499,9 @@ impl WordcraftLinguisticAiSpellGrammarPrEngine {
     pub fn check_spelling(&self, text: &str) -> Vec<LinguisticIssue> {
         let mut issues = Vec::new();
         for (i, word) in text.split_whitespace().enumerate() {
-            let clean = word.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+            let clean = word
+                .trim_matches(|c: char| !c.is_alphanumeric())
+                .to_lowercase();
             if !clean.is_empty() && !self.dictionary.contains(&clean) {
                 issues.push(LinguisticIssue {
                     word: word.to_string(),
@@ -486,10 +521,20 @@ impl WordcraftLinguisticAiSpellGrammarPrEngine {
         if words == 0 {
             return 100.0;
         }
-        let sentences = text.split(&['.', '!', '?'][..]).filter(|s| !s.trim().is_empty()).count().max(1);
-        let syllables = text.chars().filter(|c| "aeiouyAEIOUY".contains(*c)).count().max(1);
+        let sentences = text
+            .split(&['.', '!', '?'][..])
+            .filter(|s| !s.trim().is_empty())
+            .count()
+            .max(1);
+        let syllables = text
+            .chars()
+            .filter(|c| "aeiouyAEIOUY".contains(*c))
+            .count()
+            .max(1);
 
-        206.835 - (1.015 * (words as f32 / sentences as f32)) - (84.6 * (syllables as f32 / words as f32))
+        206.835
+            - (1.015 * (words as f32 / sentences as f32))
+            - (84.6 * (syllables as f32 / words as f32))
     }
 
     /// AI Next-Word Text Autocomplete completion suggestion
@@ -774,12 +819,15 @@ impl WordcraftEpubPdfBookPublisherPrEngine {
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 816,
-            pr_title: "feat(wordcraft): Implement EPUB3 Ebook Packaging & PDF/X-4 Print Preflight Engine".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement EPUB3 Ebook Packaging & PDF/X-4 Print Preflight Engine"
+                    .to_string(),
             target_subsystem: "Wordcraft Book Publisher & Preflight Engine".to_string(),
             original_suite: "ArtCraft WordCraft Publishing".to_string(),
             components_added: vec![
                 "EPUB3 open ebook packaging container generator".to_string(),
-                "PDF/X-4 ISO print preflight validator with CMYK color space verification".to_string(),
+                "PDF/X-4 ISO print preflight validator with CMYK color space verification"
+                    .to_string(),
                 "Book cover designer, spine thickness calculator & page imposition".to_string(),
                 "Chapter TOC manifest builder with ISBN/DOI metadata embedding".to_string(),
             ],
@@ -846,7 +894,12 @@ impl WordcraftTableFormulaChartPrEngine {
     }
 
     /// Render SVG vector chart from table series data
-    pub fn render_vector_chart(&self, chart_type: DocumentChartType, title: &str, data: &[f64]) -> String {
+    pub fn render_vector_chart(
+        &self,
+        chart_type: DocumentChartType,
+        title: &str,
+        data: &[f64],
+    ) -> String {
         format!(
             "<svg width=\"400\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\">\n  <title>{}</title>\n  <!-- Chart Type: {:?}, Data Points: {} -->\n</svg>",
             title, chart_type, data.len()
@@ -856,13 +909,16 @@ impl WordcraftTableFormulaChartPrEngine {
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 817,
-            pr_title: "feat(wordcraft): Implement In-Table Formula Evaluation & Vector Chart Generator".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement In-Table Formula Evaluation & Vector Chart Generator"
+                    .to_string(),
             target_subsystem: "Wordcraft Table Math & Graphics Engine".to_string(),
             original_suite: "ArtCraft WordCraft Tables & Charts".to_string(),
             components_added: vec![
                 "In-table formula calculator (=SUM, =AVERAGE, =COUNT, =MIN, =MAX)".to_string(),
                 "Numeric cell formatting (Currency, Percentage, Accounting, Date/Time)".to_string(),
-                "Embedded vector chart renderer (Bar, Line, Pie, Scatter) with live data binding".to_string(),
+                "Embedded vector chart renderer (Bar, Line, Pie, Scatter) with live data binding"
+                    .to_string(),
                 "Auto-fit table column resizing & split-row cell pagination".to_string(),
             ],
             performance_multiplier: "Instant Formula Evaluation (<0.05ms)".to_string(),
@@ -997,7 +1053,10 @@ impl WordcraftMissingComponentsParityPrSuite {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
@@ -1030,36 +1089,64 @@ impl SovereignWordcraftArtcraftParityPrGateway {
         let shaped = self.suite.typography_layout.shape_text("office");
         let typography_ok = shaped == "oﬃce";
 
-        let style = self.suite.styles_templates.resolve_computed_style("Heading 1");
+        let style = self
+            .suite
+            .styles_templates
+            .resolve_computed_style("Heading 1");
         let style_ok = style.is_some();
 
-        let citation = self.suite.references_citations.format_citation("Knuth1984", CitationStyle::APA);
+        let citation = self
+            .suite
+            .references_citations
+            .format_citation("Knuth1984", CitationStyle::APA);
         let citation_ok = citation == Some("(Knuth, 1984)".to_string());
 
-        let readability = self.suite.linguistic_ai.calculate_readability_score("The quick brown fox jumps over the lazy dog.");
+        let readability = self
+            .suite
+            .linguistic_ai
+            .calculate_readability_score("The quick brown fox jumps over the lazy dog.");
         let ai_ok = readability > 0.0;
 
-        self.suite.crdt_collab.update_cursor_presence(SelectionCursor {
-            client_id: 1,
-            client_name: "Author 1".to_string(),
-            cursor_color_hex: "#FF0000".to_string(),
-            paragraph_id: 1,
-            selection_start: 0,
-            selection_end: 10,
-        });
+        self.suite
+            .crdt_collab
+            .update_cursor_presence(SelectionCursor {
+                client_id: 1,
+                client_name: "Author 1".to_string(),
+                cursor_color_hex: "#FF0000".to_string(),
+                paragraph_id: 1,
+                selection_start: 0,
+                selection_end: 10,
+            });
         let crdt_ok = self.suite.crdt_collab.active_cursors.contains_key(&1);
 
-        let merged = self.suite.mail_merge.merge_template("Hello {{FirstName}} {{LastName}}", 0);
+        let merged = self
+            .suite
+            .mail_merge
+            .merge_template("Hello {{FirstName}} {{LastName}}", 0);
         let merge_ok = merged == Some("Hello John Doe".to_string());
 
         let preflight_ok = self.suite.book_publisher.run_print_preflight();
-        let formula_eval = self.suite.table_formula_chart.evaluate_table_formula(TableFormula::SumAbove, &[10.0, 20.0, 30.0]);
+        let formula_eval = self
+            .suite
+            .table_formula_chart
+            .evaluate_table_formula(TableFormula::SumAbove, &[10.0, 20.0, 30.0]);
         let math_ok = formula_eval == 60.0;
 
-        let redacted = self.suite.security_watermark.redact_content("Keep this secret text");
+        let redacted = self
+            .suite
+            .security_watermark
+            .redact_content("Keep this secret text");
         let sec_ok = redacted.contains("██████");
 
-        typography_ok && style_ok && citation_ok && ai_ok && crdt_ok && merge_ok && preflight_ok && math_ok && sec_ok
+        typography_ok
+            && style_ok
+            && citation_ok
+            && ai_ok
+            && crdt_ok
+            && merge_ok
+            && preflight_ok
+            && math_ok
+            && sec_ok
     }
 
     pub fn collect_all_proposals(&self) -> Vec<WordcraftPrProposalManifest> {
@@ -1174,10 +1261,14 @@ mod tests {
     #[test]
     fn test_reference_citation_bibliography_engine() {
         let engine = WordcraftReferenceCitationBibliographyPrEngine::new();
-        let apa = engine.format_citation("Knuth1984", CitationStyle::APA).unwrap();
+        let apa = engine
+            .format_citation("Knuth1984", CitationStyle::APA)
+            .unwrap();
         assert_eq!(apa, "(Knuth, 1984)");
 
-        let ieee = engine.format_citation("Knuth1984", CitationStyle::IEEE).unwrap();
+        let ieee = engine
+            .format_citation("Knuth1984", CitationStyle::IEEE)
+            .unwrap();
         assert_eq!(ieee, "[1]");
 
         let bib = engine.generate_bibliography(CitationStyle::APA);
@@ -1200,7 +1291,8 @@ mod tests {
         assert_eq!(issues.len(), 1);
         assert_eq!(issues[0].word, "xyzfox");
 
-        let score = engine.calculate_readability_score("The quick brown fox jumps over the lazy dog.");
+        let score =
+            engine.calculate_readability_score("The quick brown fox jumps over the lazy dog.");
         assert!(score > 0.0);
 
         let completion = engine.ai_autocomplete_next("SigmaOS editing");
@@ -1229,7 +1321,9 @@ mod tests {
     #[test]
     fn test_mail_merge_automation_engine() {
         let mut engine = WordcraftMailMergeAutomationPrEngine::new();
-        let merged = engine.merge_template("Dear {{FirstName}} {{LastName}} from {{Company}}", 0).unwrap();
+        let merged = engine
+            .merge_template("Dear {{FirstName}} {{LastName}} from {{Company}}", 0)
+            .unwrap();
         assert_eq!(merged, "Dear John Doe from SigmaOS Corp");
 
         engine.register_form_field(FormFieldEntry {
