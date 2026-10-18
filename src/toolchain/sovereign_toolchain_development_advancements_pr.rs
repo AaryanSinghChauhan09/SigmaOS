@@ -676,7 +676,10 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
-    pub fn generate_ebpf_syscall_latency_histogram(&self, latencies_ns: &[u64]) -> Vec<(String, u32)> {
+    pub fn generate_ebpf_syscall_latency_histogram(
+        &self,
+        latencies_ns: &[u64],
+    ) -> Vec<(String, u32)> {
         let mut buckets = vec![
             ("<1us".to_string(), 0u32),
             ("1us-10us".to_string(), 0u32),
