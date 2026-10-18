@@ -1969,4 +1969,11 @@ if [ -f "src/kernel/qemu_runtime_foundational_parity_suite.rs" ]; then
     ./build/test_qemu_runtime
 fi
 
+if [ -f "src/boot/bare_metal_independent_boot_system.rs" ]; then
+    echo "Running Sovereign Bare-Metal Independent Boot System test suite..."
+    mkdir -p build
+    rustc --test src/boot/bare_metal_independent_boot_system.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_bare_metal
+    ./build/test_bare_metal
+fi
+
 echo "All SigmaOS test suites completed."
