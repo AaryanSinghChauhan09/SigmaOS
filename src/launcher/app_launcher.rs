@@ -14,8 +14,7 @@
 
 extern crate alloc;
 use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt;
@@ -89,8 +88,19 @@ impl AppEntry {
     }
 
     fn generate_id(name: &str) -> String {
-        // Simple ID generation from name
-        name.to_lowercase().replace(" ", "-")
+        // Performance optimization: Single-pass ID generation with pre-allocated capacity
+        // avoids double heap String allocations (`name.to_lowercase().replace(...)`).
+        let mut id = String::with_capacity(name.len());
+        for ch in name.chars() {
+            if ch == ' ' {
+                id.push('-');
+            } else {
+                for lc in ch.to_lowercase() {
+                    id.push(lc);
+                }
+            }
+        }
+        id
     }
 
     pub fn matches_query(&self, query: &str) -> bool {
@@ -230,7 +240,8 @@ impl AppLauncher {
     }
 
     pub fn search(&self, query: &str) -> Vec<SearchResult> {
-        let mut results = Vec::new();
+        // Pre-allocate capacity to eliminate dynamic vector re-allocations
+        let mut results = Vec::with_capacity(self.apps.len());
 
         // Search apps
         for app in self.apps.values() {
@@ -259,7 +270,7 @@ impl AppLauncher {
     }
 
     pub fn get_recent_apps(&self) -> Vec<AppEntry> {
-        let mut recent = Vec::new();
+        let mut recent = Vec::with_capacity(self.recent_apps.len());
 
         for app_id in &self.recent_apps {
             if let Some(app) = self.apps.get(app_id) {
@@ -271,7 +282,7 @@ impl AppLauncher {
     }
 
     pub fn get_pinned_apps(&self) -> Vec<AppEntry> {
-        let mut pinned = Vec::new();
+        let mut pinned = Vec::with_capacity(self.pinned_apps.len());
 
         for app_id in &self.pinned_apps {
             if let Some(app) = self.apps.get(app_id) {
@@ -283,7 +294,8 @@ impl AppLauncher {
     }
 
     pub fn get_suggested_apps(&self) -> Vec<AppEntry> {
-        let mut suggested = Vec::new();
+        let count = self.apps.len().min(5);
+        let mut suggested = Vec::with_capacity(count);
 
         // Get most frequently used apps
         let mut sorted_apps: Vec<&AppEntry> = self.apps.values().collect();
@@ -338,7 +350,7 @@ impl AppLauncher {
     }
 
     pub fn search_commands(&self, query: &str) -> Vec<Command> {
-        let mut results = Vec::new();
+        let mut results = Vec::with_capacity(self.commands.len());
 
         for command in &self.commands {
             if contains_ignore_case(&command.name, query)
