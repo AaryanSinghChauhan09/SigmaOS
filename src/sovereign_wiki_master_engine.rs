@@ -26,7 +26,6 @@ pub enum FeatureSourceType {
     DistroGapMatrix,
     CoreArchitectureDoc,
     AppReplacementPr,
-    SovereignArchitectureDoc,
     UnimplementedIdeas,
     MediaWikiDoc,
     RoadmapIdea,
