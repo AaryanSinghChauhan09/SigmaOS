@@ -176,6 +176,7 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -509,13 +510,11 @@ impl IdentityAndEnterpriseAuthPrEngine {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
     }
 
-    /// Generate SSSD domain config file string.
-    pub fn generate_sssd_domain_conf(domain_name: &str, provider: &str, uri: &str) -> String {
-        format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
-            domain_name,
-            provider,
-            uri
+    /// Generate SSSD domain configuration string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
+            domain, provider, uri
         )
     }
 
