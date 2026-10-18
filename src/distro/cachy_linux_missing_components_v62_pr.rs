@@ -139,9 +139,15 @@ impl CachyOsHardwareDetectionGpuDriverPrEngine {
 
     pub fn configure_hybrid_graphics(&mut self, prime_active: bool) -> String {
         if prime_active {
-            format!("CHWD configured PRIME render offload for {}", self.detected_vendor)
+            format!(
+                "CHWD configured PRIME render offload for {}",
+                self.detected_vendor
+            )
         } else {
-            format!("CHWD configured direct GPU pass-through for {}", self.detected_vendor)
+            format!(
+                "CHWD configured direct GPU pass-through for {}",
+                self.detected_vendor
+            )
         }
     }
 
@@ -258,7 +264,10 @@ impl CachyOsAnanicyCppAutoPriorityRulesPrEngine {
 
     pub fn apply_rules_for_process(&mut self, pid: u32, proc_name: &str) -> String {
         self.tracked_pids.insert(pid, proc_name.to_string());
-        format!("Ananicy-cpp applied latency rules to PID {} ({})", pid, proc_name)
+        format!(
+            "Ananicy-cpp applied latency rules to PID {} ({})",
+            pid, proc_name
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -337,7 +346,10 @@ impl CachyOsGamescopeVulkanWsiPacerPrEngine {
     pub fn configure_pacing(&mut self, hz: u32) -> String {
         self.refresh_rate_hz = hz;
         self.frame_time_limit_ms = 1000.0 / (hz as f32);
-        format!("Gamescope WSI frame pacer target set to {} Hz ({:.2} ms)", hz, self.frame_time_limit_ms)
+        format!(
+            "Gamescope WSI frame pacer target set to {} Hz ({:.2} ms)",
+            hz, self.frame_time_limit_ms
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -374,7 +386,10 @@ impl CachyOsKsmZramHybridAllocatorPrEngine {
 
     pub fn optimize_memory(&mut self) -> String {
         self.zstd_comp_ratio += 0.1;
-        format!("Hybrid allocator optimized memory: ZRAM pool {}MB at {:.1}x ratio", self.zram_size_mb, self.zstd_comp_ratio)
+        format!(
+            "Hybrid allocator optimized memory: ZRAM pool {}MB at {:.1}x ratio",
+            self.zram_size_mb, self.zstd_comp_ratio
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -411,7 +426,10 @@ impl CachyOsHandheldGyroGamepadMapperPrEngine {
 
     pub fn calibrate_sensor(&mut self, deadzone: f32) -> String {
         self.gyro_deadzone = deadzone;
-        format!("Gyro sensor calibrated for {}: deadzone={:.3}", self.device_name, deadzone)
+        format!(
+            "Gyro sensor calibrated for {}: deadzone={:.3}",
+            self.device_name, deadzone
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -478,16 +496,46 @@ impl CachyLinuxMissingComponentsV62PrSuite {
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
         map.insert("total_components".to_string(), "10".to_string());
-        map.insert("scx_central".to_string(), self.scx_central.generate_manifest().title);
-        map.insert("lto_tuning".to_string(), self.lto_tuning.generate_manifest().title);
-        map.insert("chwd_gpu".to_string(), self.chwd_gpu.generate_manifest().title);
-        map.insert("pacman_v4".to_string(), self.pacman_v4.generate_manifest().title);
-        map.insert("proton_ntsync".to_string(), self.proton_ntsync.generate_manifest().title);
-        map.insert("ananicy_cpp".to_string(), self.ananicy_cpp.generate_manifest().title);
-        map.insert("btrfs_zstd".to_string(), self.btrfs_zstd.generate_manifest().title);
-        map.insert("gamescope_pacer".to_string(), self.gamescope_pacer.generate_manifest().title);
-        map.insert("ksm_zram".to_string(), self.ksm_zram.generate_manifest().title);
-        map.insert("gyro_mapper".to_string(), self.gyro_mapper.generate_manifest().title);
+        map.insert(
+            "scx_central".to_string(),
+            self.scx_central.generate_manifest().title,
+        );
+        map.insert(
+            "lto_tuning".to_string(),
+            self.lto_tuning.generate_manifest().title,
+        );
+        map.insert(
+            "chwd_gpu".to_string(),
+            self.chwd_gpu.generate_manifest().title,
+        );
+        map.insert(
+            "pacman_v4".to_string(),
+            self.pacman_v4.generate_manifest().title,
+        );
+        map.insert(
+            "proton_ntsync".to_string(),
+            self.proton_ntsync.generate_manifest().title,
+        );
+        map.insert(
+            "ananicy_cpp".to_string(),
+            self.ananicy_cpp.generate_manifest().title,
+        );
+        map.insert(
+            "btrfs_zstd".to_string(),
+            self.btrfs_zstd.generate_manifest().title,
+        );
+        map.insert(
+            "gamescope_pacer".to_string(),
+            self.gamescope_pacer.generate_manifest().title,
+        );
+        map.insert(
+            "ksm_zram".to_string(),
+            self.ksm_zram.generate_manifest().title,
+        );
+        map.insert(
+            "gyro_mapper".to_string(),
+            self.gyro_mapper.generate_manifest().title,
+        );
         map
     }
 }
