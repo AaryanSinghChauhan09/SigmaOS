@@ -215,7 +215,7 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        !self.ideas.is_empty() && self.ideas.iter().all(|i| i.is_fully_implemented)
+        !self.ideas.is_empty() && self.ideas.iter().all(|i| i.is_fulfilled)
     }
 }
 
@@ -567,7 +567,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-            category: "Productivity".to_string(),
+            category: "Browser".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
                 .to_string(),

@@ -53,10 +53,10 @@ impl TaskManager {
     /// Refresh process list
     pub fn refresh(&mut self) {
         // Simplified - in real implementation would read from /proc
-        self.processs.clear();
+        self.processes.clear();
 
         // Add sample processes
-        self.processs.push(Process {
+        self.processes.push(Process {
             pid: 1,
             name: "init".to_string(),
             state: ProcessState::Sleeping,
