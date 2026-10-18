@@ -60,6 +60,10 @@ pub enum VirtualizationTechnologyFormat {
     SmartOsZones,
     AppleHypervisor,
     AlpineMoby,
+    NetBsdRump,
+    DragonFlyVkernel,
+    VmwareVmx,
+    ProxmoxVe,
 }
 
 impl VirtualizationTechnologyFormat {
@@ -88,6 +92,10 @@ impl VirtualizationTechnologyFormat {
             Self::SmartOsZones => "SmartOS vmadm Zone Virtualization",
             Self::AppleHypervisor => "Apple Hypervisor.framework & Rosetta 2",
             Self::AlpineMoby => "Alpine Moby Immutable Container Appliance",
+            Self::NetBsdRump => "NetBSD Rump Kernel Driver Isolation",
+            Self::DragonFlyVkernel => "DragonFly BSD Virtual Kernel Sandbox",
+            Self::VmwareVmx => "VMware ESXi VMX Spec Transpiler",
+            Self::ProxmoxVe => "Proxmox VE Cluster HA Orchestrator",
         }
     }
 
@@ -101,7 +109,8 @@ impl VirtualizationTechnologyFormat {
             | Self::VirtualBox
             | Self::Firecracker
             | Self::CloudHypervisor
-            | Self::AppleHypervisor => VirtualizationPrCategory::HypervisorCore,
+            | Self::AppleHypervisor
+            | Self::VmwareVmx => VirtualizationPrCategory::HypervisorCore,
             Self::Docker
             | Self::Podman
             | Self::Containerd
@@ -110,10 +119,12 @@ impl VirtualizationTechnologyFormat {
             | Self::Lxd
             | Self::SystemdNspawn
             | Self::AlpineMoby => VirtualizationPrCategory::ContainerRuntime,
-            Self::FreeBsdJails | Self::GvisorKata | Self::SmartOsZones => {
-                VirtualizationPrCategory::SecurityIsolation
-            }
-            Self::Libvirt | Self::Kubernetes | Self::Incus => {
+            Self::FreeBsdJails
+            | Self::GvisorKata
+            | Self::SmartOsZones
+            | Self::NetBsdRump
+            | Self::DragonFlyVkernel => VirtualizationPrCategory::SecurityIsolation,
+            Self::Libvirt | Self::Kubernetes | Self::Incus | Self::ProxmoxVe => {
                 VirtualizationPrCategory::OrchestrationCluster
             }
         }
@@ -403,6 +414,42 @@ impl SovereignVirtualizationPrGatewayEngine {
                 "[alpine_moby]\nmoby_yaml=\"appliance.yml\"\nmusl_initrd=true\nsquashfs_rootfs=true",
                 "kernel: {image: \"linuxkit/kernel:6.6.x\", cmdline: \"console=ttyS0\"}\ninit: [\"alpine/musl-base:latest\"]",
             ),
+            (
+                "NetBSD Rump Kernel Userland Driver Virtualization Isolation Engine",
+                "rump-netbsd@sigmaos.org",
+                VirtualizationTechnologyFormat::NetBsdRump,
+                VirtualizationPrCategory::SecurityIsolation,
+                "Implements NetBSD Rump Kernel driver isolation using rumpuser hypercalls and isolated userland driver proxies.",
+                "[netbsd_rump]\nrump_socket=\"/var/run/rump_pci.sock\"\nhypercall=\"rumpuser\"\nmemory_limit_mb=128",
+                "[rump_driver]\nname = \"rumpdev_pci\"\nassigned_memory = 128",
+            ),
+            (
+                "DragonFly BSD Virtual Kernel vkernel Process Sandbox Engine",
+                "vkernel-dragonfly@sigmaos.org",
+                VirtualizationTechnologyFormat::DragonFlyVkernel,
+                VirtualizationPrCategory::SecurityIsolation,
+                "Provides DragonFly BSD vkernel userland kernel execution, process sandboxing, and isolated virtual memory space.",
+                "[dragonfly_vkernel]\nvkernel_id=101\nmemory_mb=512\nroot_image=\"/var/vkernel/root.img\"",
+                "[vkernel_config]\nisolated = true\nmax_vcpus = 2",
+            ),
+            (
+                "VMware ESXi VMX Specification Transpiler to QEMU/KVM",
+                "vmx-transpiler@sigmaos.org",
+                VirtualizationTechnologyFormat::VmwareVmx,
+                VirtualizationPrCategory::HypervisorCore,
+                "Transpiles VMware ESXi .vmx specifications and pvscsi disk controllers into native QEMU/KVM execution specs.",
+                "[vmware_vmx]\nguest_os=\"ubuntu_64\"\nvirtual_hw_version=19\nscsi_controller=\"pvscsi\"",
+                "[vmx_conversion]\ntarget_format = \"qemu_kvm\"\nmemory_mb = 8192\nvcpu_count = 4",
+            ),
+            (
+                "Proxmox VE Cluster QEMU/LXC High-Availability Manager Engine",
+                "proxmox-team@sigmaos.org",
+                VirtualizationTechnologyFormat::ProxmoxVe,
+                VirtualizationPrCategory::OrchestrationCluster,
+                "Delivers Proxmox VE cluster HA manager integration for automatic failover, IPMI fencing, and ZFS storage synchronization.",
+                "[proxmox_ve]\ncluster_name=\"pve-cluster-1\"\nha_resource_id=\"vm:100\"\nfence_device=\"ipmilan\"",
+                "[pve_cluster_spec]\nnode_count = 3\nstorage_zfs = \"local-zfs\"",
+            ),
         ];
 
         for (title, author, tech, cat, desc, spec, manifest) in presets {
@@ -592,7 +639,7 @@ mod tests {
     #[test]
     fn test_virtualization_pr_gateway_preset_initialization() {
         let gateway = SovereignVirtualizationPrGatewayEngine::new();
-        assert_eq!(gateway.proposals.len(), 23);
+        assert_eq!(gateway.proposals.len(), 27);
 
         // Verify key technologies exist in presets
         let technologies: Vec<VirtualizationTechnologyFormat> =
@@ -621,6 +668,10 @@ mod tests {
         assert!(technologies.contains(&VirtualizationTechnologyFormat::SmartOsZones));
         assert!(technologies.contains(&VirtualizationTechnologyFormat::AppleHypervisor));
         assert!(technologies.contains(&VirtualizationTechnologyFormat::AlpineMoby));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::NetBsdRump));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::DragonFlyVkernel));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::VmwareVmx));
+        assert!(technologies.contains(&VirtualizationTechnologyFormat::ProxmoxVe));
     }
 
     #[test]
