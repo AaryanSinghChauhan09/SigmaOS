@@ -3,41 +3,43 @@
 
 extern crate alloc;
 
-pub use sigmaos::klib;
+pub use sigmaos::boot::firmware;
+pub use sigmaos::boot::sigma_boot;
 pub use sigmaos::compatibility::abi_extended;
-pub use sigmaos::process::advanced_process_control;
-pub use sigmaos::kernel::bore;
 pub use sigmaos::compatibility::community_foundation;
 pub use sigmaos::compatibility::distro_bridge;
-pub use sigmaos::boot::firmware;
-pub use sigmaos::filesystem::bsd_linux_innovations as fs_bsd_linux_innovations;
 pub use sigmaos::compatibility::gap_closure;
 pub use sigmaos::compatibility::garuda_zen;
-pub use sigmaos::security::hardening;
-pub use sigmaos::drivers::legacy_keyboard as keyboard_driver;
-pub use sigmaos::virtualization::kvm_vcpu;
-pub use sigmaos::kernel::linux_bsd_innovations;
+pub use sigmaos::compatibility::zorin;
 pub use sigmaos::distro::linux_bsd_inspirations;
 pub use sigmaos::distro::linux_bsd_parity;
 pub use sigmaos::distro::missing_distro_innovations;
-pub use sigmaos::kernel::module_loader;
-pub use sigmaos::package::repository as package_repository;
-pub use sigmaos::network::protocols;
 pub use sigmaos::distro::ready_to_use;
-pub use sigmaos::security::root_improvement;
-pub use sigmaos::boot::sigma_boot;
 pub use sigmaos::distro::sovereign_distro_dominance;
+pub use sigmaos::drivers::legacy_keyboard as keyboard_driver;
+pub use sigmaos::filesystem::bsd_linux_innovations as fs_bsd_linux_innovations;
+pub use sigmaos::kernel::bore;
+pub use sigmaos::kernel::linux_bsd_innovations;
+pub use sigmaos::kernel::module_loader;
+pub use sigmaos::klib;
+pub use sigmaos::network::protocols;
+pub use sigmaos::package::repository as package_repository;
+pub use sigmaos::process::advanced_process_control;
 pub use sigmaos::process::sovereign_process_engine;
+pub use sigmaos::security::hardening;
+pub use sigmaos::security::root_improvement;
 pub use sigmaos::shell::sovereign_shell_parity;
-pub use sigmaos::virtualization::vm_manager;
-pub use sigmaos::compatibility::zorin;
 pub use sigmaos::unimplemented_features;
+pub use sigmaos::virtualization::kvm_vcpu;
+pub use sigmaos::virtualization::vm_manager;
 
 pub use sigmaos::compatibility::bsd::*;
 pub use sigmaos::compatibility::gap_closure::{ZorinAppearanceSwitcher, ZorinLayoutPreset};
-pub use sigmaos::virtualization::kvm_vcpu::{KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL};
-pub use sigmaos::unimplemented_features::*;
 pub use sigmaos::security::unveil::{UnveilManager, UnveilPermission};
+pub use sigmaos::unimplemented_features::*;
+pub use sigmaos::virtualization::kvm_vcpu::{
+    KvmExitCode, KvmVcpu, VirtioDeviceBackend, VirtioDeviceType, RAX_HLT_SIGNAL,
+};
 
 #[test]
 fn test_freebsd_jail_manager_inspection() {
