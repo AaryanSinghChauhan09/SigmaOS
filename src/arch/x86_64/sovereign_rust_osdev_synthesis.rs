@@ -5,7 +5,6 @@
 
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -253,8 +252,8 @@ impl OffsetPageTableManager {
     /// Map a virtual page to a physical frame with specified flags
     pub fn map_page(
         &mut self,
-        page: Page,
-        frame: PhysFrame,
+        _page: Page,
+        _frame: PhysFrame,
         flags: u64,
     ) -> Result<(), &'static str> {
         if (flags & PageTableFlags::PRESENT) == 0 {
@@ -493,7 +492,7 @@ impl Uart16550Port {
     }
 
     /// Transmit byte over serial port
-    pub fn send_byte(&self, byte: u8) -> bool {
+    pub fn send_byte(&self, _byte: u8) -> bool {
         self.is_initialized
     }
 
@@ -1049,7 +1048,11 @@ impl PciConfigSpaceEngine {
         });
     }
 
-    pub fn find_by_vendor_device(&self, vendor_id: u16, device_id: u16) -> Option<&PciDeviceHeader> {
+    pub fn find_by_vendor_device(
+        &self,
+        vendor_id: u16,
+        device_id: u16,
+    ) -> Option<&PciDeviceHeader> {
         self.discovered_devices
             .iter()
             .find(|d| d.vendor_id == vendor_id && d.device_id == device_id)
