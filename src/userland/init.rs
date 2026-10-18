@@ -193,7 +193,10 @@ impl SystemdSocketActivationEngine {
     pub fn new(socket_name: &str) -> Self {
         Self {
             socket_name: socket_name.to_string(),
+            listen_stream: None,
+            listen_datagram: None,
             passed_fds: Vec::new(),
+            sockets: BTreeMap::new(),
         }
     }
 
@@ -367,8 +370,6 @@ pub struct SystemdTransientScopeGovernor {
     pub transient_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
     pub active_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
 }
-
-pub type SystemdTransientScopeGovernor = SystemdTransientScopeSpecGovernor;
 
 impl SystemdTransientScopeSpecGovernor {
     pub fn new() -> Self {
@@ -546,19 +547,7 @@ impl OpenRcHeader {
     }
 }
 
-/// OpenRC Dependency Solver Spec Engine
-#[derive(Debug, Clone, Default)]
-pub struct OpenRcDependencySolverSpecEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-    pub active_services: BTreeSet<String>,
-    pub service_statuses: BTreeMap<String, ServiceState>,
-}
-
 impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self::default()
-    }
 
     pub fn resolve_order(
         scripts: &BTreeMap<String, OpenRcHeader>,
@@ -677,6 +666,8 @@ impl OpenRcHeader {
 pub struct OpenRcDependencySolverEngine {
     pub current_runlevel: OpenRcRunlevel,
     pub scripts: BTreeMap<String, OpenRcHeader>,
+    pub active_services: BTreeSet<String>,
+    pub service_statuses: BTreeMap<String, ServiceState>,
 }
 
 impl OpenRcDependencySolverEngine {
@@ -684,6 +675,8 @@ impl OpenRcDependencySolverEngine {
         Self {
             current_runlevel: OpenRcRunlevel::SysInit,
             scripts: BTreeMap::new(),
+            active_services: BTreeSet::new(),
+            service_statuses: BTreeMap::new(),
         }
     }
 
@@ -714,11 +707,9 @@ impl OpenRcDependencySolverEngine {
 
     pub fn query_status(&self, service: &str) -> ServiceState {
         self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
+            .get(service)
+            .copied()
+            .unwrap_or(ServiceState::Stopped)
     }
 }
 
@@ -787,9 +778,8 @@ pub struct RunitS6SupervisionTreeGovernor {
     pub service_dir_path: String,
     pub current_stage: SupervisionStage,
     pub services: BTreeMap<String, SupervisedService>,
-    pub log_pipelines: BTreeMap<String, String>,
-    pub service_dir_path: String,
     pub active_services: BTreeMap<String, SupervisedService>,
+    pub log_pipelines: BTreeMap<String, String>,
 }
 
 impl RunitS6SupervisionTreeGovernor {
@@ -810,8 +800,6 @@ impl RunitS6SupervisionTreeGovernor {
             services: BTreeMap::new(),
             active_services: BTreeMap::new(),
             log_pipelines: BTreeMap::new(),
-            service_dir_path: String::new(),
-            active_services: BTreeMap::new(),
         }
     }
 
@@ -1005,7 +993,6 @@ pub struct SysVinitRunlevelStateMachine {
     pub current_runlevel: char,
     pub inittab_entries: Vec<SysVInittabEntry>,
     pub active_processes: BTreeMap<String, u32>,
-    pub entries: Vec<SysVInittabEntry>,
 }
 
 impl SysVinitRunlevelStateMachine {
@@ -1014,7 +1001,6 @@ impl SysVinitRunlevelStateMachine {
             current_runlevel: initial_runlevel,
             inittab_entries: entries,
             active_processes: BTreeMap::new(),
-            entries: Vec::new(),
         }
     }
 
@@ -1052,7 +1038,7 @@ impl SysVinitRunlevelStateMachine {
         let mut stop_scripts = Vec::new();
         let mut start_scripts = Vec::new();
 
-        for entry in &self.entries {
+        for entry in &self.inittab_entries {
             if entry.runlevels.contains(&target_runlevel) {
                 if entry.action == SysVAction::Respawn
                     || entry.action == SysVAction::Once
@@ -1838,8 +1824,6 @@ impl Default for UserlandInitPrGatewayEngine {
         Self::new(5000, "Default Init Gateway", "System")
     }
 }
-
-pub type UserlandInitCleanRoomPrGatewayEngine = UserlandInitPrGatewayEngine;
 
 #[cfg(test)]
 mod tests {
