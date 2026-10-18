@@ -291,10 +291,7 @@ impl DeckCraftAnimationTransitionPrDeployer {
     }
 
     pub fn generate_pr(&self) -> DeckCraftPullRequestSpec {
-        let spec = format!(
-            "PR #{}: DeckCraft Animation & Transitions Engine",
-            self.pr_id
-        );
+        let spec = format!("PR #{}: DeckCraft Animation & Transitions Engine", self.pr_id);
         let digest = fnv1a_deckcraft_pr_digest(&spec);
 
         DeckCraftPullRequestSpec {

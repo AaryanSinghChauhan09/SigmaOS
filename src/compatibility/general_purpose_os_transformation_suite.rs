@@ -124,11 +124,7 @@ impl UserspaceCompatibilityEngine {
         }
     }
 
-    pub fn dispatch_syscall(
-        &self,
-        syscall_nr: u32,
-        caller_cap_mask: u64,
-    ) -> Result<String, &'static str> {
+    pub fn dispatch_syscall(&self, syscall_nr: u32, caller_cap_mask: u64) -> Result<String, &'static str> {
         match self.syscall_table.get(&syscall_nr) {
             Some(rule) => {
                 if !rule.supported {
@@ -220,11 +216,7 @@ impl InstallerLiveImageUpgradeEngine {
 
     pub fn trigger_atomic_upgrade_slot_swap(&mut self) -> String {
         let old = self.active_slot.clone();
-        self.active_slot = if self.active_slot == "A" {
-            "B".to_string()
-        } else {
-            "A".to_string()
-        };
+        self.active_slot = if self.active_slot == "A" { "B".to_string() } else { "A".to_string() };
         format!("Atomic A/B Slot Swapped: {} -> {}", old, self.active_slot)
     }
 
@@ -305,30 +297,10 @@ impl HardwareWdmDriverArchitectureEngine {
         self.register_driver("acpi_battery_thermal_driver", std_funcs);
 
         // Attach default device objects
-        self.create_device(
-            1,
-            "pci0:01:0.0-nvme0",
-            DeviceClass::BlockStorageNvme,
-            "nvme_controller_driver",
-        );
-        self.create_device(
-            2,
-            "pci0:02:0.0-eth0",
-            DeviceClass::NetworkInterfaceCard,
-            "intel_e1000e_nic_driver",
-        );
-        self.create_device(
-            3,
-            "pci0:03:0.0-wlan0",
-            DeviceClass::Wireless80211,
-            "intel_iwlwifi_wireless_driver",
-        );
-        self.create_device(
-            4,
-            "pci0:04:0.0-snd0",
-            DeviceClass::AudioDsp,
-            "hda_pipewire_audio_driver",
-        );
+        self.create_device(1, "pci0:01:0.0-nvme0", DeviceClass::BlockStorageNvme, "nvme_controller_driver");
+        self.create_device(2, "pci0:02:0.0-eth0", DeviceClass::NetworkInterfaceCard, "intel_e1000e_nic_driver");
+        self.create_device(3, "pci0:03:0.0-wlan0", DeviceClass::Wireless80211, "intel_iwlwifi_wireless_driver");
+        self.create_device(4, "pci0:04:0.0-snd0", DeviceClass::AudioDsp, "hda_pipewire_audio_driver");
     }
 
     pub fn register_driver(&mut self, driver_name: &str, dispatches: Vec<IrpMajorFunction>) {
@@ -345,11 +317,7 @@ impl HardwareWdmDriverArchitectureEngine {
         });
     }
 
-    pub fn dispatch_irp(
-        &mut self,
-        device_id: u32,
-        func: IrpMajorFunction,
-    ) -> Result<String, &'static str> {
+    pub fn dispatch_irp(&mut self, device_id: u32, func: IrpMajorFunction) -> Result<String, &'static str> {
         let dev = match self.devices.iter().find(|d| d.device_id == device_id) {
             Some(d) => d,
             None => return Err("Device not found"),
@@ -424,18 +392,11 @@ impl AtomicSoftwareUpdatePackagingEngine {
             is_current_boot: false,
             signature_verified: true,
         });
-        Ok(format!(
-            "Staged deployment [{}] version {}",
-            commit_hash, version
-        ))
+        Ok(format!("Staged deployment [{}] version {}", commit_hash, version))
     }
 
     pub fn activate_deployment(&mut self, commit_hash: &str) -> Result<String, &'static str> {
-        let idx = match self
-            .deployments
-            .iter()
-            .position(|d| d.commit_hash == commit_hash)
-        {
+        let idx = match self.deployments.iter().position(|d| d.commit_hash == commit_hash) {
             Some(i) => i,
             None => return Err("Deployment commit not found in repository"),
         };
@@ -541,9 +502,7 @@ pub struct GeneralPurposeOsTransformationSuite {
 impl GeneralPurposeOsTransformationSuite {
     pub fn new() -> Self {
         Self {
-            userspace_compat: UserspaceCompatibilityEngine::new(
-                UserspaceCompatStrategy::HybridDynamicRouting,
-            ),
+            userspace_compat: UserspaceCompatibilityEngine::new(UserspaceCompatStrategy::HybridDynamicRouting),
             installer_upgrade: InstallerLiveImageUpgradeEngine::new(),
             hardware_wdm: HardwareWdmDriverArchitectureEngine::new(),
             atomic_packaging: AtomicSoftwareUpdatePackagingEngine::new(),
@@ -583,8 +542,7 @@ mod tests {
     #[test]
     fn test_userspace_syscall_dispatch_and_capabilities() {
         // Arrange
-        let engine =
-            UserspaceCompatibilityEngine::new(UserspaceCompatStrategy::HybridDynamicRouting);
+        let engine = UserspaceCompatibilityEngine::new(UserspaceCompatStrategy::HybridDynamicRouting);
 
         // Act
         let ok_read = engine.dispatch_syscall(0, 0x01); // read with capability 0x01
@@ -595,10 +553,7 @@ mod tests {
         assert!(ok_read.is_ok());
         assert!(ok_read.unwrap().contains("read"));
         assert!(fail_cap.is_err());
-        assert_eq!(
-            fail_cap.err().unwrap(),
-            "Capability check failed: missing required token capability"
-        );
+        assert_eq!(fail_cap.err().unwrap(), "Capability check failed: missing required token capability");
         assert!(unknown.is_err());
     }
 
@@ -609,10 +564,7 @@ mod tests {
 
         // Act
         installer.select_target_disk("/dev/nvme0n1").unwrap();
-        assert_eq!(
-            installer.current_stage,
-            InstallStage::PartitionTableCreation
-        );
+        assert_eq!(installer.current_stage, InstallStage::PartitionTableCreation);
 
         installer.advance_stage(); // Luks2
         installer.advance_stage(); // Filesystem

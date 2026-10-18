@@ -142,11 +142,7 @@ impl ArtSuite {
     }
 
     /// Get all projects in a workspace of a specific type
-    pub fn get_projects_by_type(
-        &self,
-        workspace_id: u32,
-        project_type: ProjectType,
-    ) -> Vec<&Project> {
+    pub fn get_projects_by_type(&self, workspace_id: u32, project_type: ProjectType) -> Vec<&Project> {
         if let Some(workspace) = self.workspaces.get(&workspace_id) {
             workspace
                 .projects

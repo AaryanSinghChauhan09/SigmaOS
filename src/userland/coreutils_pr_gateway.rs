@@ -1105,10 +1105,7 @@ impl ArchivalCompressionEngine {
         format: CompressionFormat,
         level: u32,
     ) -> Result<String, String> {
-        Ok(format!(
-            "{:?} level {} configured successfully",
-            format, level
-        ))
+        Ok(format!("{:?} level {} configured successfully", format, level))
     }
 
     pub fn parse_ustar_header(&self, header_bytes: &[u8]) -> Option<String> {

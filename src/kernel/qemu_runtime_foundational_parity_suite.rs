@@ -535,19 +535,13 @@ impl SovereignQemuRuntimeFoundationalSuite {
 
         // 1. Memory Initialization
         let frame0 = self.memory.allocate_frame().unwrap();
-        self.memory
-            .map_page(0x1000, frame0, PageFlags::kernel_data())
-            .unwrap();
-        log.push_str(
-            "[BOOT_STAGE_OK] memory_init: 512MB registered, 4KB paging enabled (W^X active)\n",
-        );
+        self.memory.map_page(0x1000, frame0, PageFlags::kernel_data()).unwrap();
+        log.push_str("[BOOT_STAGE_OK] memory_init: 512MB registered, 4KB paging enabled (W^X active)\n");
 
         // 2. IDT and Interrupt Enable
         self.idt.enable_interrupts();
         self.idt.trigger_timer_tick();
-        log.push_str(
-            "[BOOT_STAGE_OK] interrupt_init: 256 IDT vectors registered, APIC timer online\n",
-        );
+        log.push_str("[BOOT_STAGE_OK] interrupt_init: 256 IDT vectors registered, APIC timer online\n");
 
         // 3. Scheduler Context Switch
         self.scheduler.schedule_next();
@@ -570,9 +564,7 @@ impl SovereignQemuRuntimeFoundationalSuite {
             self.vfs.inode_count()
         ));
         log.push_str(&format!("[BOOT_STAGE_OK] userspace_start: {}\n", shell_res));
-        log.push_str(
-            "[BOOT_STAGE_OK] shell_ready: All 11 Boot State Machine Stages Complete (100% PASS)\n",
-        );
+        log.push_str("[BOOT_STAGE_OK] shell_ready: All 11 Boot State Machine Stages Complete (100% PASS)\n");
 
         self.serial.write_line(&log);
         log

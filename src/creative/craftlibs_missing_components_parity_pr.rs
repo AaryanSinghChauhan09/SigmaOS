@@ -93,21 +93,9 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             let a = rgba_in[idx + 3];
 
             // Linearize gamma
-            let r_lin = if r <= 0.04045 {
-                r / 12.92
-            } else {
-                ((r + 0.055) / 1.055).powf(2.4)
-            };
-            let g_lin = if g <= 0.04045 {
-                g / 12.92
-            } else {
-                ((g + 0.055) / 1.055).powf(2.4)
-            };
-            let b_lin = if b <= 0.04045 {
-                b / 12.92
-            } else {
-                ((b + 0.055) / 1.055).powf(2.4)
-            };
+            let r_lin = if r <= 0.04045 { r / 12.92 } else { ((r + 0.055) / 1.055).powf(2.4) };
+            let g_lin = if g <= 0.04045 { g / 12.92 } else { ((g + 0.055) / 1.055).powf(2.4) };
+            let b_lin = if b <= 0.04045 { b / 12.92 } else { ((b + 0.055) / 1.055).powf(2.4) };
 
             // Apply matrix transform
             let r_out = (r_lin * r_scale).clamp(0.0, 1.0);
@@ -115,21 +103,9 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             let b_out = (b_lin * b_scale).clamp(0.0, 1.0);
 
             // Re-apply gamma
-            let r_gam = if r_out <= 0.0031308 {
-                r_out * 12.92
-            } else {
-                1.055 * r_out.powf(1.0 / 2.4) - 0.055
-            };
-            let g_gam = if g_out <= 0.0031308 {
-                g_out * 12.92
-            } else {
-                1.055 * g_out.powf(1.0 / 2.4) - 0.055
-            };
-            let b_gam = if b_out <= 0.0031308 {
-                b_out * 12.92
-            } else {
-                1.055 * b_out.powf(1.0 / 2.4) - 0.055
-            };
+            let r_gam = if r_out <= 0.0031308 { r_out * 12.92 } else { 1.055 * r_out.powf(1.0 / 2.4) - 0.055 };
+            let g_gam = if g_out <= 0.0031308 { g_out * 12.92 } else { 1.055 * g_out.powf(1.0 / 2.4) - 0.055 };
+            let b_gam = if b_out <= 0.0031308 { b_out * 12.92 } else { 1.055 * b_out.powf(1.0 / 2.4) - 0.055 };
 
             rgba_out[idx] = (r_gam * 255.0).clamp(0.0, 255.0) as u8;
             rgba_out[idx + 1] = (g_gam * 255.0).clamp(0.0, 255.0) as u8;
@@ -199,10 +175,7 @@ impl CraftlibsIccProfileColorManagementPrEngine {
             return Err("Invalid ICC profile header size".to_string());
         }
         self.loaded_profiles_count += 1;
-        Ok(format!(
-            "ICC Profile loaded (Size: {} bytes)",
-            profile_bytes.len()
-        ))
+        Ok(format!("ICC Profile loaded (Size: {} bytes)", profile_bytes.len()))
     }
 
     pub fn apply_icc_transform(
@@ -301,13 +274,7 @@ impl CraftlibsLayerBlendModesPrEngine {
         }
     }
 
-    pub fn blend_pixels(
-        &self,
-        backdrop: [u8; 4],
-        source: [u8; 4],
-        mode: BlendMode,
-        opacity: f32,
-    ) -> [u8; 4] {
+    pub fn blend_pixels(&self, backdrop: [u8; 4], source: [u8; 4], mode: BlendMode, opacity: f32) -> [u8; 4] {
         let opacity_clamped = opacity.clamp(0.0, 1.0);
         let src_a = (source[3] as f32 / 255.0) * opacity_clamped;
         let dst_a = backdrop[3] as f32 / 255.0;
@@ -326,91 +293,26 @@ impl CraftlibsLayerBlendModesPrEngine {
                 BlendMode::Normal => s,
                 BlendMode::Multiply => b * s,
                 BlendMode::Screen => 1.0 - (1.0 - b) * (1.0 - s),
-                BlendMode::Overlay => {
-                    if b < 0.5 {
-                        2.0 * b * s
-                    } else {
-                        1.0 - 2.0 * (1.0 - b) * (1.0 - s)
-                    }
-                }
+                BlendMode::Overlay => if b < 0.5 { 2.0 * b * s } else { 1.0 - 2.0 * (1.0 - b) * (1.0 - s) },
                 BlendMode::Darken => b.min(s),
                 BlendMode::Lighten => b.max(s),
-                BlendMode::ColorDodge => {
-                    if s >= 1.0 {
-                        1.0
-                    } else {
-                        (b / (1.0 - s)).min(1.0)
-                    }
-                }
-                BlendMode::ColorBurn => {
-                    if s <= 0.0 {
-                        0.0
-                    } else {
-                        (1.0 - (1.0 - b) / s).max(0.0)
-                    }
-                }
-                BlendMode::HardLight => {
-                    if s < 0.5 {
-                        2.0 * b * s
-                    } else {
-                        1.0 - 2.0 * (1.0 - b) * (1.0 - s)
-                    }
-                }
-                BlendMode::SoftLight => {
-                    if s < 0.5 {
-                        b - (1.0 - 2.0 * s) * b * (1.0 - b)
-                    } else {
-                        b + (2.0 * s - 1.0) * (b.sqrt() - b)
-                    }
-                }
+                BlendMode::ColorDodge => if s >= 1.0 { 1.0 } else { (b / (1.0 - s)).min(1.0) },
+                BlendMode::ColorBurn => if s <= 0.0 { 0.0 } else { (1.0 - (1.0 - b) / s).max(0.0) },
+                BlendMode::HardLight => if s < 0.5 { 2.0 * b * s } else { 1.0 - 2.0 * (1.0 - b) * (1.0 - s) },
+                BlendMode::SoftLight => if s < 0.5 { b - (1.0 - 2.0 * s) * b * (1.0 - b) } else { b + (2.0 * s - 1.0) * (b.sqrt() - b) },
                 BlendMode::Difference => (b - s).abs(),
                 BlendMode::Exclusion => b + s - 2.0 * b * s,
                 BlendMode::Subtract => (b - s).max(0.0),
-                BlendMode::Divide => {
-                    if s == 0.0 {
-                        1.0
-                    } else {
-                        (b / s).min(1.0)
-                    }
-                }
+                BlendMode::Divide => if s == 0.0 { 1.0 } else { (b / s).min(1.0) },
                 BlendMode::LinearBurn => (b + s - 1.0).max(0.0),
                 BlendMode::LinearDodge => (b + s).min(1.0),
-                BlendMode::VividLight => {
-                    if s < 0.5 {
-                        if s <= 0.0 {
-                            0.0
-                        } else {
-                            (1.0 - (1.0 - b) / (2.0 * s)).max(0.0)
-                        }
-                    } else {
-                        if s >= 1.0 {
-                            1.0
-                        } else {
-                            (b / (2.0 * (1.0 - s))).min(1.0)
-                        }
-                    }
-                }
+                BlendMode::VividLight => if s < 0.5 { if s <= 0.0 { 0.0 } else { (1.0 - (1.0 - b) / (2.0 * s)).max(0.0) } } else { if s >= 1.0 { 1.0 } else { (b / (2.0 * (1.0 - s))).min(1.0) } },
                 BlendMode::LinearLight => (b + 2.0 * s - 1.0).clamp(0.0, 1.0),
-                BlendMode::PinLight => {
-                    if s < 0.5 {
-                        b.min(2.0 * s)
-                    } else {
-                        b.max(2.0 * s - 1.0)
-                    }
-                }
-                BlendMode::HardMix => {
-                    if (b + s) >= 1.0 {
-                        1.0
-                    } else {
-                        0.0
-                    }
-                }
+                BlendMode::PinLight => if s < 0.5 { b.min(2.0 * s) } else { b.max(2.0 * s - 1.0) },
+                BlendMode::HardMix => if (b + s) >= 1.0 { 1.0 } else { 0.0 },
                 BlendMode::GrainExtract => (b - s + 0.5).clamp(0.0, 1.0),
                 BlendMode::GrainMerge => (b + s - 0.5).clamp(0.0, 1.0),
-                BlendMode::Hue
-                | BlendMode::Saturation
-                | BlendMode::Color
-                | BlendMode::Luminosity => {
+                BlendMode::Hue | BlendMode::Saturation | BlendMode::Color | BlendMode::Luminosity => {
                     // Luminance retention fallback
                     b * 0.3 + s * 0.7
                 }
@@ -443,18 +345,8 @@ impl CraftlibsLayerBlendModesPrEngine {
         let pixel_count = backdrop_rgba.len() / 4;
         for i in 0..pixel_count {
             let idx = i * 4;
-            let bg = [
-                backdrop_rgba[idx],
-                backdrop_rgba[idx + 1],
-                backdrop_rgba[idx + 2],
-                backdrop_rgba[idx + 3],
-            ];
-            let src = [
-                source_rgba[idx],
-                source_rgba[idx + 1],
-                source_rgba[idx + 2],
-                source_rgba[idx + 3],
-            ];
+            let bg = [backdrop_rgba[idx], backdrop_rgba[idx + 1], backdrop_rgba[idx + 2], backdrop_rgba[idx + 3]];
+            let src = [source_rgba[idx], source_rgba[idx + 1], source_rgba[idx + 2], source_rgba[idx + 3]];
             let res = self.blend_pixels(bg, src, mode, opacity);
             output_rgba[idx..idx + 4].copy_from_slice(&res);
         }
@@ -620,9 +512,7 @@ impl CraftlibsVectorPathGeometryPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 605,
-            pr_title:
-                "feat(craftlibs): Skia Vector Path Geometry, Cubic Bezier Flattening & Fill Rules"
-                    .to_string(),
+            pr_title: "feat(craftlibs): Skia Vector Path Geometry, Cubic Bezier Flattening & Fill Rules".to_string(),
             target_subsystem: "CraftLibs Vector Geometry Kernel".to_string(),
             original_suite: "ArtCraft CraftLibs Skia Geometry".to_string(),
             artcraft_feature_parity: "Skia Vector Bezier & Path Geometry Solver Parity".to_string(),
@@ -695,20 +585,16 @@ impl CraftlibsSkiaCanvasRendererPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 606,
-            pr_title:
-                "feat(craftlibs): Skia Anti-Aliased Vector Canvas Renderer & Gradient Shaders"
-                    .to_string(),
+            pr_title: "feat(craftlibs): Skia Anti-Aliased Vector Canvas Renderer & Gradient Shaders".to_string(),
             target_subsystem: "CraftLibs 2D Vector Rendering Canvas".to_string(),
             original_suite: "ArtCraft CraftLibs Skia Renderer".to_string(),
             artcraft_feature_parity: "Skia 2D Vector Canvas & Gradient Shader Parity".to_string(),
             components_added: vec![
                 "Sub-pixel analytical anti-aliased edge rasterizer".to_string(),
                 "Linear, Radial & Conic multi-stop gradient color shaders".to_string(),
-                "Hierarchical clip mask stacks and transformation matrix stack (Save/Restore)"
-                    .to_string(),
+                "Hierarchical clip mask stacks and transformation matrix stack (Save/Restore)".to_string(),
             ],
-            performance_multiplier: "Zero-Latency Sub-Pixel Anti-Aliased Vector Rasterization"
-                .to_string(),
+            performance_multiplier: "Zero-Latency Sub-Pixel Anti-Aliased Vector Rasterization".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -849,11 +735,7 @@ impl SovereignCraftlibsMissingComponentsParityPrGateway {
         let mut rgb_out = vec![0.0f32; 3];
         let _icc_ok = self
             .icc_profile
-            .apply_icc_transform(
-                &rgb_float,
-                RenderingIntent::RelativeColorimetric,
-                &mut rgb_out,
-            )
+            .apply_icc_transform(&rgb_float, RenderingIntent::RelativeColorimetric, &mut rgb_out)
             .is_ok();
 
         let mut blend_out = vec![0u8; 16];
@@ -862,12 +744,7 @@ impl SovereignCraftlibsMissingComponentsParityPrGateway {
             .blend_image_buffers(&in_rgba, &in_rgba, BlendMode::Multiply, 1.0, &mut blend_out)
             .is_ok();
 
-        let roi = TileRoi {
-            x: 0,
-            y: 0,
-            width: 256,
-            height: 256,
-        };
+        let roi = TileRoi { x: 0, y: 0, width: 256, height: 256 };
         let mut tile_buf = vec![0u8; 256 * 256 * 4];
         let _tile_ok = self
             .tile_pipeline
@@ -885,10 +762,7 @@ impl SovereignCraftlibsMissingComponentsParityPrGateway {
             .is_ok();
 
         let mut sdf_buf = vec![0u8; 32 * 32];
-        let _sdf_ok = self
-            .sdf_typography
-            .generate_sdf_glyph(65, &mut sdf_buf)
-            .is_ok();
+        let _sdf_ok = self.sdf_typography.generate_sdf_glyph(65, &mut sdf_buf).is_ok();
 
         true
     }
@@ -999,12 +873,7 @@ mod tests {
     #[test]
     fn test_libvips_tile_pipeline_engine() {
         let mut engine = CraftlibsLibvipsTilePipelinePrEngine::new();
-        let roi = TileRoi {
-            x: 0,
-            y: 0,
-            width: 256,
-            height: 256,
-        };
+        let roi = TileRoi { x: 0, y: 0, width: 256, height: 256 };
         let mut buf = vec![0u8; 256 * 256 * 4];
         let bytes = engine.process_tile_roi(1920, 1080, roi, &mut buf).unwrap();
         assert_eq!(bytes, 256 * 256 * 4);

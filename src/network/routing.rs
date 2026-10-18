@@ -4,9 +4,9 @@
 #![no_std]
 
 extern crate alloc;
-use super::zenithnet::{Ipv4Addr, NetworkError};
 use alloc::string::String;
 use alloc::vec::Vec;
+use super::zenithnet::{Ipv4Addr, NetworkError};
 
 /// Routing Table Entry
 #[derive(Debug, Clone)]
