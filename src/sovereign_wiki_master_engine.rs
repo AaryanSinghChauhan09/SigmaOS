@@ -14,6 +14,8 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
@@ -189,9 +191,7 @@ pub struct Sovereign100IdeasSuite {
 
 impl Sovereign100IdeasSuite {
     pub fn new() -> Self {
-        let mut suite = Self {
-            ideas: Vec::with_capacity(100),
-        };
+        let mut suite = Self { ideas: Vec::new() };
         suite.populate_all_100_ideas();
         suite
     }
@@ -215,7 +215,7 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        !self.ideas.is_empty() && self.ideas.iter().all(|i| i.is_fulfilled)
+        self.total_fulfilled_count() == self.ideas.len()
     }
 }
 

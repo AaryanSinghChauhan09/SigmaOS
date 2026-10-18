@@ -181,20 +181,17 @@ impl SovereignGtkQtToolkitEngine {
             }
         }
         let svg_path = format!("/usr/share/Kvantum/{}/{}.svg", theme_name, theme_name);
-        self.kvantum_spec = Some(KvantumThemeSpec {
+        let spec = KvantumThemeSpec {
             theme_name: theme_name.clone(),
             blur_background: blur,
             translucent_windows: translucent,
             svg_path,
-        });
+        };
+        self.kvantum_spec = Some(spec);
         self.qt_style = QtPlatformStyle::Kvantum;
-        let applied_name = self
-            .kvantum_spec
-            .as_ref()
-            .map(|s| s.theme_name.clone())
-            .unwrap_or_default();
-        self.event_log
-            .push(ToolkitEvent::KvantumThemeApplied(applied_name));
+        self.event_log.push(ToolkitEvent::KvantumThemeApplied(
+            self.kvantum_spec.as_ref().unwrap().theme_name.clone(),
+        ));
         true
     }
 
@@ -459,11 +456,10 @@ impl SovereignDisplayManagerSuiteEngine {
     ) -> usize {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         self.xdmcp_sessions.push(XdmcpSessionHandshake {
-            session_id: id,
-            client_address: client_address.to_string(),
+            session_id: id as u32,
+            remote_address: client_address.to_string(),
             display_number,
             authenticated: true,
-            status: "Active".to_string(),
         });
         self.xdmcp_manager
             .initiate_handshake(&format!(":{}", display_number), client_address);

@@ -209,7 +209,7 @@ impl KdePlasmaInnovationEngine {
                 String::from("GamingActivity"),
             ],
             window_rules: Vec::new(),
-            look_and_feel_theme: String::from("org.kde.breezedark.desktop"),
+            look_and_feel_theme: String::from("org.kde.breeze.desktop"),
         }
     }
 

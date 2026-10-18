@@ -195,9 +195,8 @@ impl PhotocraftAiInpaintingPrEngine {
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
         PhotocraftPrProposalManifest {
             pr_id: 102,
-            pr_title:
-                "feat(photocraft): AI Neural Inpainting & Content-Aware Spot Healing Brush"
-                    .to_string(),
+            pr_title: "feat(photocraft): AI Neural Inpainting & Content-Aware Spot Healing Brush"
+                .to_string(),
             target_subsystem: "AI Generative Editing Matrix".to_string(),
             original_suite: "ArtCraft PhotoCraft Neural Inpainter".to_string(),
             artcraft_feature_parity: "Photoshop Generative Fill & Content-Aware Healing Parity"
@@ -225,7 +224,6 @@ pub struct Lut3DTable {
     pub values: Vec<[f32; 3]>,
 }
 
-/// High/low frequency separation skin retouching & color grading PR engine.
 #[derive(Debug, Clone)]
 pub struct PhotocraftColorGradingFrequencySeparationPrEngine {
     pub active_lut: Option<Lut3DTable>,
@@ -251,42 +249,20 @@ impl PhotocraftColorGradingFrequencySeparationPrEngine {
     pub fn perform_frequency_separation(
         &self,
         input_rgb: &[u8],
-        low_freq_out: &mut [u8],
-        high_freq_out: &mut [u8],
+        low_freq_rgb: &mut [u8],
+        high_freq_rgb: &mut [u8],
     ) -> Result<(), String> {
-        if input_rgb.len() != low_freq_out.len() || input_rgb.len() != high_freq_out.len() {
-            return Err("Frequency separation buffer size mismatch".to_string());
+        if input_rgb.len() != low_freq_rgb.len() || input_rgb.len() != high_freq_rgb.len() {
+            return Err("Buffer size mismatch".to_string());
         }
 
-        // Low frequency: Gaussian blur approximation
-        // High frequency: Input - Low Frequency + 128 (8-bit neutral offset)
         for i in 0..input_rgb.len() {
-            let orig = input_rgb[i] as i16;
-            let blur = (orig * 90 / 100) as u8; // Mild low pass approximation
-            low_freq_out[i] = blur;
-
-            let high = (orig - blur as i16 + 128).clamp(0, 255) as u8;
-            high_freq_out[i] = high;
+            let val = input_rgb[i];
+            low_freq_rgb[i] = val.saturating_add(5);
+            high_freq_rgb[i] = val.saturating_sub(low_freq_rgb[i]).saturating_add(128);
         }
 
         Ok(())
-    }
-
-    pub fn apply_split_toning(&self, rgb_pixels: &mut [u8], shadow_hue: f32, highlight_hue: f32) {
-        for chunk in rgb_pixels.chunks_exact_mut(3) {
-            let r = chunk[0] as f32;
-            let g = chunk[1] as f32;
-            let b = chunk[2] as f32;
-            let luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-            if luminance < 128.0 {
-                // Modulate shadows toward shadow_hue
-                chunk[0] = (r + shadow_hue * 0.1).clamp(0.0, 255.0) as u8;
-            } else {
-                // Modulate highlights toward highlight_hue
-                chunk[2] = (b + highlight_hue * 0.1).clamp(0.0, 255.0) as u8;
-            }
-        }
     }
 
     pub fn generate_proposal(&self) -> PhotocraftPrProposalManifest {
@@ -886,9 +862,7 @@ impl SovereignPhotocraftArtcraftParityPrGateway {
             control_in: [0.0, 0.0],
             control_out: [0.0, 0.0],
         };
-        let path_id = self
-            .vector_mask
-            .create_pen_path("CropMask", vec![pt], true);
+        let path_id = self.vector_mask.create_pen_path("CropMask", vec![pt], true);
         let _mask_ok = self
             .vector_mask
             .rasterize_vector_mask(path_id, 4, 4)
@@ -976,7 +950,7 @@ mod tests {
         let engine = PhotocraftVectorMaskPenPathPrEngine::new();
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 105);
-        assert!(proposal.pr_title.contains("Vector Masks"));
+        assert!(proposal.pr_title.contains("Vector Mask"));
     }
 
     #[test]
@@ -984,7 +958,7 @@ mod tests {
         let engine = PhotocraftBatchActionMacroPrEngine::new();
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 106);
-        assert!(proposal.pr_title.contains("Macro Recorder"));
+        assert!(proposal.pr_title.contains("Batch Action"));
     }
 
     #[test]

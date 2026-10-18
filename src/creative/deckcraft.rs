@@ -77,9 +77,9 @@ impl SlideExporterEngine {
                 output.extend_from_slice(deck.title.as_bytes());
             }
             ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\"><text>");
+                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<title>");
                 output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"</text></svg>");
+                output.extend_from_slice(b"</title>\n</svg>");
             }
             ExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");

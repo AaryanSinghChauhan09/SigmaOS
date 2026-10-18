@@ -47,6 +47,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
+    /// Check Landlock access rule against requested access rights bitmask.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
+    }
+
     /// Evaluate SELinux access vector decision (Type Enforcement).
     pub fn evaluate_selinux_avc(
         &self,
@@ -148,7 +153,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } // CLONE_NEWCGROUP
         flags
     }
-
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
@@ -482,6 +486,16 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
+    /// Generate SSSD domain config file string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true",
+            domain,
+            provider,
+            uri
+        )
+    }
+
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
     pub fn parse_ldap_dn(&self, dn: &str) -> Vec<(String, String)> {
         let estimated_parts = dn.as_bytes().iter().filter(|&&b| b == b',').count() + 1;
@@ -492,16 +506,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
             }
         }
         parts
-    }
-
-    /// Generate SSSD domain configuration section string.
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain,
-            provider,
-            uri
-        )
     }
 
     /// Simulate Kerberos v5 ticket validation.

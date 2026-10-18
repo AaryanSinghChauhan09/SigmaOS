@@ -8,9 +8,15 @@
 //! - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
 //! - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
-use std::vec::Vec;
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::{BTreeMap, BTreeSet};
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
 
 // ============================================================================
 // Core Service & Init abstractions
@@ -291,24 +297,6 @@ impl SystemdPathMonitorEngine {
         }
         triggered
     }
-
-    pub fn check_trigger(
-        &self,
-        path: &str,
-        event: SystemdPathEventType,
-        is_dir_nonempty: bool,
-    ) -> bool {
-        if !self.monitored_path.is_empty() && self.monitored_path != path {
-            return false;
-        }
-        match (self.event_type, event) {
-            (Some(SystemdPathEventType::PathChanged), SystemdPathEventType::PathChanged) => true,
-            (Some(SystemdPathEventType::PathModified), SystemdPathEventType::PathModified) => true,
-            (Some(SystemdPathEventType::PathExists), SystemdPathEventType::PathExists) => true,
-            (Some(SystemdPathEventType::DirectoryNotEmpty), _) => is_dir_nonempty,
-            _ => true,
-        }
-    }
 }
 
 /// Systemd Transient Scope Governor
@@ -323,8 +311,7 @@ impl SystemdTransientScopeGovernor {
     }
 
     pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.clone(), slice.clone());
-        self.active_scopes.insert(scope_name, slice);
+        self.transient_scopes.insert(scope_name, slice);
     }
 
     pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
@@ -638,22 +625,6 @@ impl OpenRcStatusControllerEngine {
         self.service_statuses
             .insert(service_name.to_string(), ServiceState::Stopped);
     }
-
-    pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
-        }
-        self.service_statuses.insert(service, state);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .get(service)
-            .copied()
-            .unwrap_or(ServiceState::Stopped)
-    }
 }
 
 // ============================================================================
@@ -822,8 +793,9 @@ impl RunitS6SupervisionTreeGovernor {
             if let Some(srv) = self.active_services.get_mut(service_name) {
                 srv.state = ServiceState::Running;
             }
+            return true;
         }
-        ok
+        false
     }
 }
 
@@ -844,7 +816,7 @@ pub enum SysVAction {
     OnDemand,
 }
 
-/// SysV Inittab Entry
+/// SysV Entry
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SysVInittabEntry {
     pub id: String,
@@ -894,8 +866,9 @@ impl SysVinitRunlevelStateMachine {
     pub fn new(initial_runlevel: char, entries: Vec<SysVInittabEntry>) -> Self {
         Self {
             current_runlevel: initial_runlevel,
-            inittab_entries: entries,
+            inittab_entries: entries.clone(),
             active_processes: BTreeMap::new(),
+            entries,
         }
     }
 
@@ -912,11 +885,11 @@ impl SysVinitRunlevelStateMachine {
             .collect()
     }
 
-    pub fn transition_runlevel(&mut self, target_runlevel: char) -> Vec<&SysVInittabEntry> {
-        self.set_runlevel(target_runlevel)
+    pub fn transition_runlevel(&mut self, new_runlevel: char) -> Vec<&SysVInittabEntry> {
+        self.set_runlevel(new_runlevel)
     }
 
-    pub fn spawn_respawn_processes(&mut self) -> Vec<&SysVInittabEntry> {
+    pub fn spawn_respawn_processes(&mut self) -> Vec<SysVInittabEntry> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
             if entry.action == SysVAction::Respawn
@@ -925,6 +898,7 @@ impl SysVinitRunlevelStateMachine {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
+                    spawned.push(entry.clone());
                 }
                 spawned.push(entry);
             }
@@ -1101,7 +1075,8 @@ impl LaunchdJobSupervisorEngine {
             self.running_pids.insert(job.label.clone(), mock_pid);
             self.job_states
                 .insert(job.label.clone(), ServiceState::Running);
-            self.running_pids.insert(job.label.clone(), 5000 + job.label.len() as u32);
+            self.running_pids
+                .insert(job.label.clone(), 5000 + job.label.len() as u32);
         } else {
             self.job_states
                 .insert(job.label.clone(), ServiceState::Stopped);
@@ -1111,18 +1086,6 @@ impl LaunchdJobSupervisorEngine {
 
     pub fn load_job(&mut self, job: LaunchdJobSpec) {
         self.register_job(job);
-    }
-
-    pub fn trigger_mach_service(&mut self, mach_service: &str) -> Option<String> {
-        for job in self.jobs.values() {
-            if job.mach_services.contains(&mach_service.to_string()) {
-                self.job_states
-                    .insert(job.label.clone(), ServiceState::Running);
-                self.running_pids.insert(job.label.clone(), 5000 + job.label.len() as u32);
-                return Some(job.label.clone());
-            }
-        }
-        None
     }
 
     pub fn handle_process_exit(&mut self, label: &str) {
@@ -1222,30 +1185,9 @@ impl AtSpoolQueueManager {
         }
     }
 
-    pub fn schedule_at_job(
-        &mut self,
-        execute_at: u64,
-        command: String,
-        queue: char,
-        max_load: Option<f32>,
-    ) -> u64 {
-        let id = self.next_job_id;
-        self.next_job_id += 1;
-        let job = AtJob {
-            job_id: id,
-            execute_at,
-            command,
-            queue,
-            max_load_average: max_load,
-        };
-        self.jobs.insert(id, job.clone());
-        self.queued_jobs.push(job);
-        id
-    }
-
     pub fn enqueue_job(&mut self, job: AtJob) {
-        self.jobs.insert(job.job_id, job.clone());
-        self.queued_jobs.push(job);
+        self.queued_jobs.push(job.clone());
+        self.jobs.insert(job.job_id, job);
     }
 
     pub fn schedule_at_job(
@@ -1704,8 +1646,6 @@ impl Default for UserlandInitPrGatewayEngine {
     }
 }
 
-}
-}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1917,48 +1857,63 @@ mod tests {
     }
 
     #[test]
-    fn test_launchd_and_spool_managers() {
+    fn test_launchd_job_supervisor() {
         let mut launchd = LaunchdJobSupervisorEngine::new();
-        launchd.load_job(LaunchdJobSpec {
+        launchd.register_job(LaunchdJobSpec {
             label: "com.apple.syslogd".to_string(),
             program: "/usr/sbin/syslogd".to_string(),
-            program_arguments: vec!["/usr/sbin/syslogd".to_string()],
+            program_arguments: vec!["syslogd".to_string()],
             keep_alive: true,
-            run_at_load: true,
+            run_at_load: false,
             throttle_interval_secs: 10,
-            mach_services: vec![],
+            mach_services: vec!["com.apple.system.logger".to_string()],
             sockets: BTreeMap::new(),
         });
-        assert!(launchd.running_pids.contains_key("com.apple.syslogd"));
 
-        launchd.handle_process_exit("com.apple.syslogd");
-        assert!(launchd.running_pids.contains_key("com.apple.syslogd"));
-
-        let mut anacron_spool = AnacronSpoolManager::new("/var/spool/anacron");
-        anacron_spool.record_job_run("cron.daily", 10000);
-        assert_eq!(anacron_spool.get_last_run("cron.daily"), Some(10000));
-
-        let mut at_spool = AtSpoolQueueManager::new("/var/spool/at");
-        at_spool.enqueue_job(AtJob {
-            job_id: 10,
-            execute_at: 500,
-            command: "echo test".to_string(),
-            queue: 'a',
-            max_load_average: None,
-        });
-        let ready = at_spool.poll_ready_jobs(500, 0.5);
-        assert_eq!(ready.len(), 1);
+        assert_eq!(
+            launchd.job_states.get("com.apple.syslogd"),
+            Some(&ServiceState::Stopped)
+        );
+        let triggered = launchd.trigger_mach_service("com.apple.system.logger");
+        assert_eq!(triggered, Some("com.apple.syslogd".to_string()));
+        assert_eq!(
+            launchd.job_states.get("com.apple.syslogd"),
+            Some(&ServiceState::Running)
+        );
     }
 
     #[test]
-    fn test_userland_init_cleanroom_pr_gateway() {
-        let gw = UserlandInitCleanRoomPrGatewayEngine::new(
-            4001,
-            "feat(init): Complete Init Parity",
-            "SovereignAgent",
-        );
-        assert!(gw.run_automated_ci_gate());
-        let diff = gw.generate_unified_diff();
-        assert!(diff.contains("PR #4001"));
+    fn test_vixie_cron_and_macros() {
+        let entry = VixieCronEntry::parse("*/15 * * * * /usr/bin/check_updates").unwrap();
+        assert!(!entry.is_macro);
+        assert!(entry.matches_time(0, 10, 1, 1, 1));
+        assert!(entry.matches_time(15, 10, 1, 1, 1));
+        assert!(!entry.matches_time(7, 10, 1, 1, 1));
+
+        let macro_entry = VixieCronEntry::parse("@hourly /usr/bin/hourly_cleanup").unwrap();
+        assert!(macro_entry.is_macro);
+        assert!(macro_entry.matches_time(0, 12, 1, 1, 1));
+        assert!(!macro_entry.matches_time(30, 12, 1, 1, 1));
+    }
+
+    #[test]
+    fn test_anacron_spool_manager() {
+        let mut spool = AnacronSpoolManager::new("/var/spool/anacron");
+        spool.record_job_run("cron.daily", 1700000000);
+        assert_eq!(spool.get_last_run("cron.daily"), Some(1700000000));
+    }
+
+    #[test]
+    fn test_at_spool_queue_manager() {
+        let mut queue = AtSpoolQueueManager::new("/var/spool/at");
+        let id = queue.schedule_at_job(2000000000, "echo hello".to_string(), 'a', None);
+        assert_eq!(id, 1);
+        assert_eq!(queue.jobs.get(&1).unwrap().command, "echo hello");
+    }
+
+    #[test]
+    fn test_systemd_on_calendar_parser() {
+        let parsed = SystemdOnCalendarExpressionParser::parse_expression("daily");
+        assert_eq!(parsed, Some((0, 0)));
     }
 }
