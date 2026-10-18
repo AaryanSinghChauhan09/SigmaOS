@@ -457,7 +457,7 @@ impl UniversalCrossDistroSatSolverV40 {
 
     /// Resolves foreign package dependency queries into canonical `sovereign-*` dependencies V40
     pub fn solve_dependencies(&self, raw_deps: &[String]) -> Result<Vec<String>, String> {
-        let mut resolved = Vec::new();
+        let mut resolved: Vec<String> = Vec::new();
         for dep in raw_deps {
             if let Some(mapped) = self.canonical_mapping.get(dep) {
                 if !resolved.contains(mapped) {

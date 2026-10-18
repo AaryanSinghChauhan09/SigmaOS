@@ -222,7 +222,7 @@ impl Sovereign100IdeasSuite {
     }
 
     pub fn verify_full_fulfillment(&self) -> bool {
-        !self.ideas.is_empty() && self.ideas.iter().all(|i| i.is_fulfilled)
+        self.total_fulfilled_count() > 0 && self.ideas.iter().all(|i| i.is_fulfilled)
     }
 }
 
@@ -284,7 +284,7 @@ pub struct SovereignShardDescriptor {
 
 #[derive(Debug)]
 pub struct SovereignShardsMasterRegistry {
-    pub shards: BTreeMap<u8, SovereignShardDescriptor>,
+    pub shards: BTreeMap<u32, SovereignShardDescriptor>,
 }
 
 impl SovereignShardsMasterRegistry {
@@ -594,7 +594,6 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
 
     fn seed_ideas(&mut self) {
         self.ideas.push(RoadmapFeatureIdea {
-            id: 1,
             idea_id: 1,
             title: "Sovereign Master CLI Development Plan".to_string(),
             category: "CLI Tools".to_string(),
@@ -602,11 +601,11 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             source_file: "wiki/27-SigmaOS-CLI-Development-Plan.md".to_string(),
             target_module: "src/tools/sigma_cli.rs".to_string(),
             is_fully_implemented: true,
-            fulfilled: true,
         });
         self.ideas.push(RoadmapFeatureIdea {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+            category: "Productivity".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
             source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
                 .to_string(),
@@ -620,7 +619,7 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug)]
 pub struct WikiSpecificationDataSyncer {
     pub total_synced_specs: usize,
 }
