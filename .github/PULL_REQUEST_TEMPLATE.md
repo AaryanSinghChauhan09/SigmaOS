@@ -1,20 +1,20 @@
 ## Summary
 
-<!-- What memory-management behavior changed and why? -->
+<!-- What scheduler behavior changed and why? -->
 
-## Memory component
+## Scheduler component
 
-- [ ] Memory policy
-- [ ] Physical memory manager
-- [ ] Buddy allocator
-- [ ] Slab allocator
-- [ ] Paging
-- [ ] Page tables
-- [ ] Virtual memory
-- [ ] Protection
-- [ ] Swap
-- [ ] Reclaim
-- [ ] OOM
+- [ ] Scheduler core
+- [ ] Run queue / PID allocation
+- [ ] fork / clone
+- [ ] exec
+- [ ] Scheduler / run queue
+- [ ] Context switch
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
 - [ ] Documentation
@@ -26,14 +26,14 @@
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
+- [ ] Biweekly scheduler audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference study (Upstream study)
+## Reference behavior
 
-<!-- Required for lifecycle, ABI, or memory changes -->
+<!-- Required for lifecycle, ABI, or scheduler changes -->
 
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
@@ -41,12 +41,12 @@
 - New behavior:
 - Compatibility impact:
 
-## Changes (What SigmaOS adopts)
+## Changes
 
 -
 -
 
-## Memory safety review
+## Scheduler safety review
 
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
@@ -55,11 +55,11 @@
 - [ ] Lock ordering is documented
 - [ ] Interrupt-context safety considered
 - [ ] Signal races considered
-- [ ] Double-free prevented
+- [ ] Double-reap prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Evidence (Reviewer checklist)
+## Evidence
 
 - [ ] `cargo check --lib`
 - [ ] `cargo fmt --check`
@@ -69,17 +69,17 @@
 - [ ] Integration tests
 - [ ] Fuzz target or documented exemption
 - [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Memory benchmark, if performance-affecting
+- [ ] Scheduler benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Verification
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Memory documentation
+- [ ] Process documentation
 - [ ] Boot matrix, if applicable
 
-## Risks and rollback (Safety and rollback)
+## Risks and rollback
 
 - Risk:
 - Rollback:

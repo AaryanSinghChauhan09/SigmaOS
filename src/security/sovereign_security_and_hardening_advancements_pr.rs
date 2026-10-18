@@ -75,6 +75,11 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         (allowed_mask & requested_access) == requested_access
     }
 
+    /// Check Landlock access rights mask (u32 alias).
+    pub fn check_landlock_access_u32(allowed_mask: u32, requested_access: u32) -> bool {
+        Self::check_landlock_access(allowed_mask, requested_access)
+    }
+
     /// Check Landlock v8 network TCP bind/connect port access rights.
     pub fn check_landlock_net_port_access(
         allowed_ports: &[u16],
@@ -494,6 +499,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
     }
     pub fn new() -> Self {
         Self
+    }
+
+    /// Generate full SSSD domain configuration with Kerberos realm.
+    pub fn generate_sssd_domain_conf_full(domain_name: &str, ldap_uri: &str, krb_realm: &str) -> String {
+        alloc::format!(
+            "[sssd]\ndomains = {}\n\n[domain/{}]\nid_provider = ldap\nauth_provider = krb5\nldap_uri = {}\nkrb5_realm = {}\nldap_search_base = dc=example,dc=org\ncache_credentials = true\n",
+            domain_name, domain_name, ldap_uri, krb_realm
+        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
