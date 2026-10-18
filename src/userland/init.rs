@@ -1,17 +1,4 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SigmaOS Contributors
-
-use std::collections::{BTreeMap, BTreeSet};
-use std::string::String;
-use std::vec::Vec;
-
-// Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
-//
-// Clean-room Rust implementation of core userland init, supervisors, and task execution engines:
-// - **Init Systems**: Systemd, OpenRC, runit/s6 supervision trees, SysVinit state machines, BSD rc.d/rc.subr/rcorder, macOS launchd
-// - **Task Execution**: Vixie Cron 5/6-field parser, Anacron missed-job catchup, at/batch spool queue manager, Systemd timers/OnCalendar
-// - **Pull Request Gateway**: Clean-room PR submissions with PQC Dilithium-5 digital signatures, automated CI gating, and unified diff output.
-
+#![no_std]
 extern crate alloc;
 
 // Sovereign Core Userland Init, Task Execution Suite & Pull Request Gateway ()
@@ -602,6 +589,7 @@ impl OpenRcStatusControllerEngine {
         self.active_services.remove(service_name);
     }
 }
+
 impl OpenRcHeader {
     pub fn parse(script_content: &str) -> Self {
         let mut header = OpenRcHeader::default();
