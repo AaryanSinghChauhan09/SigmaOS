@@ -104,7 +104,7 @@ pub use filesystem::{
     SyntheticProcSysfsProvider,
 };
 pub use package::{
-    SovereignDistroPackageAdvancementsSuiteV5, SovereignDistroPackageAdvancementsSuiteV8,
+    SovereignDistroPackageAdvancementsSuiteV51, SovereignDistroPackageAdvancementsSuiteV8,
     SovereignUniversalPackageFormatMasterEngine, UniversalPackageFormatKind,
 };
 pub use sigpkg::{

@@ -24,21 +24,20 @@ pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_artcraft_parity_pr;
 pub mod filmcraft_missing_components_parity_pr;
-pub mod fontcraft;
-pub mod fontcraft_missing_components_parity_pr;
 pub mod gridcraft;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod model3d;
-pub mod artcraft;
+pub mod pdfcraft;
+pub mod pdfcraft_artcraft_parity_pr;
+pub mod photocraft;
+pub mod photocraft_missing_components_parity_pr;
+pub mod soundcraft;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
-
-pub use sovereign_artcraft_craftlibs_pr_engine::*;
-
-pub use cadcraft_artcraft_parity_pr::*;
-pub use cadcraft_missing_components_parity_pr::*;
-pub use craftlibs_missing_components_parity_pr::*;
+pub mod vectoranimation;
+pub mod vectorcraft;
+pub mod wordcraft;
 
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
@@ -108,7 +107,13 @@ pub use effectcraft_missing_components_parity_pr::{
     SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftMissingComponentsParityPrGateway,
     Spatial3DDepthCompositorPrEngine,
 };
-pub use figcraft_missing_components_parity_pr::*;
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine, FigcraftMultiUserCrdtCollaborationPrEngine,
+    FigcraftPrProposalManifest, FigcraftVectorNetworkBooleanOpsPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
+};
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
@@ -125,6 +130,21 @@ pub use fontcraft_missing_components_parity_pr::{
     FontcraftVariableFontInterpolationPrEngine, FontcraftWoff2BrotliCompressionPrEngine, MsdfTexel,
     OpenTypeFeatureTag, ShapedGlyph, SovereignFontcraftArtcraftParityPrGateway, VariableFontAxis,
     Woff2Header,
+};
+pub use gridcraft::{
+    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
+    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
+    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
+    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
+    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
+    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
+    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
+    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
+    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
 };
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
@@ -230,30 +250,11 @@ pub use wordcraft::{
     WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
     WordCraftPullRequestSpec,
 };
-pub use wordcraft_artcraft_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway as SovereignWordcraftArtcraftParityPrGatewayV3,
-    WordcraftArtcraftParityPrSuite, WordcraftArtcraftPrProposalManifest,
-    WordcraftChapterManifestEntry, WordcraftCitationBibliographyCrossReferencePrEngine,
-    WordcraftCitationSource, WordcraftCitationStyle, WordcraftColumnLayoutConfig,
-    WordcraftCrdtMultiUserCoAuthoringPrEngine, WordcraftDocumentSecurityWatermarkPrEngine,
-    WordcraftDocumentStyle, WordcraftDocumentTextDelta, WordcraftDocumentTheme,
-    WordcraftEpubPdfBookPublisherPrEngine, WordcraftFormFieldEntry,
-    WordcraftLinguisticAiSpellGrammarPrEngine, WordcraftLinguisticIssue,
-    WordcraftMailMergeAutomationPrEngine, WordcraftMasterTemplateThemeCascadePrEngine,
-    WordcraftOpenTypeTypographyLayoutPrEngine, WordcraftSelectionCursor,
-    WordcraftStyleHierarchyThemeCascadePrEngine, WordcraftTableFormula,
-    WordcraftTableFormulaChartPrEngine, WordcraftTocEntry,
-};
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway,
-    WordcraftDocumentSecurityWatermarkPrEngine as WordcraftDocumentSecurityWatermarkPrEngineLegacy,
-    WordcraftEpubPdfBookPublisherPrEngine as WordcraftEpubPdfBookPublisherPrEngineLegacy,
-    WordcraftLinguisticAiSpellGrammarPrEngine as WordcraftLinguisticAiSpellGrammarPrEngineLegacy,
-    WordcraftMailMergeAutomationPrEngine as WordcraftMailMergeAutomationPrEngineLegacy,
-    WordcraftMissingComponentsParityPrSuite, WordcraftPrProposalManifest,
-    WordcraftRealtimeCrdtCollabPrEngine as WordcraftRealtimeCrdtCollabPrEngineLegacy,
-    WordcraftReferenceCitationBibliographyPrEngine as WordcraftReferenceCitationBibliographyPrEngineLegacy,
-    WordcraftStylesTemplatesThemesPrEngine,
-    WordcraftTableFormulaChartPrEngine as WordcraftTableFormulaChartPrEngineLegacy,
-    WordcraftTypographyLayoutPrEngine,
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine,
+    WordcraftEpubPdfBookPublisherPrEngine, WordcraftLinguisticAiSpellGrammarPrEngine,
+    WordcraftMailMergeAutomationPrEngine, WordcraftMissingComponentsParityPrSuite,
+    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
+    WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
 };

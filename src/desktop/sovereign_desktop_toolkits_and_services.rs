@@ -590,7 +590,7 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
-    pub fn initiate_xdmcp_remote_handshake_v2(
+    pub fn initiate_xdmcp_remote_handshake(
         &mut self,
         client_address: &str,
         display_number: u32,

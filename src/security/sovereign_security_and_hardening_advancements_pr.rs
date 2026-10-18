@@ -101,18 +101,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Validate seccomp BPF architecture (e.g., AUDIT_ARCH_X86_64 = 0xC000003E).
-    pub fn validate_seccomp_bpf_arch(arch_nr: u32) -> bool {
-        arch_nr == 0xC000003E || arch_nr == 0x40000028
-    }
-
-    /// Check if cgroup v2 controller (e.g. "memory", "cpu", "pids") is enabled in active controller string.
-    pub fn is_cgroup_controller_enabled(active_controllers: &str, target_controller: &str) -> bool {
-        active_controllers
-            .split_whitespace()
-            .any(|c| c == target_controller)
-    }
-
     /// Check if Linux capability bit mask contains target capability.
     pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
         if cap_bit >= 64 {
@@ -516,31 +504,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
-    }
-
-    /// Generate SSSD domain configuration block string.
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain,
-            provider,
-            uri
-        )
-    }
-
-    /// Generate SSSD PAM / NSS cached user query response.
-    pub fn generate_sssd_pam_nss_response(
-        &self,
-        username: &str,
-        uid: u32,
-        gid: u32,
-    ) -> (String, u32, u32, String) {
-        (
-            username.to_string(),
-            uid,
-            gid,
-            alloc::format!("/home/{}", username),
-        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.
