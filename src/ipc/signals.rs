@@ -145,18 +145,14 @@ impl SignalDeliverySystem {
                 .processes
                 .get(&sender_pid)
                 .ok_or(IPCError::NotConnected)?;
-            if !sender.capability.write_allowed {
-                return Err(IPCError::PermissionDenied);
-            }
+            sender.capability.check_write()?;
         }
 
         let receiver = self
             .processes
             .get_mut(&receiver_pid)
             .ok_or(IPCError::NotConnected)?;
-        if !receiver.capability.read_allowed {
-            return Err(IPCError::PermissionDenied);
-        }
+        receiver.capability.check_read()?;
 
         let pending = PendingSignal {
             signal_type,
@@ -263,13 +259,13 @@ mod tests {
     #[test]
     fn test_signal_delivery_permissions() {
         let mut sds = SignalDeliverySystem::new();
-        let cap_sender = IPCCapability::new(1, IPCCapability::READ); // No write_allowed permission
-        let cap_receiver = IPCCapability::new(1, IPCCapability::READ | IPCCapability::WRITE);
+        let cap_no_write = IPCCapability::new(1, IPCCapability::READ);
+        let cap_full = IPCCapability::new(2, IPCCapability::READ | IPCCapability::WRITE);
 
-        sds.register_process(400, cap_sender);
-        sds.register_process(401, cap_receiver);
+        sds.register_process(400, cap_no_write);
+        sds.register_process(401, cap_full);
 
-        // Should fail because sender lacks send permission
+        // Should fail because sender lacks write permission
         assert!(sds.send_signal(400, 401, SignalType::SigInt, None).is_err());
     }
 }

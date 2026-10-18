@@ -19,6 +19,98 @@ pub struct SlideElement {
     pub content: String,
 }
 
+/// Transition effect between slides
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TransitionType {
+    None,
+    Fade,
+    Dissolve,
+    Push,
+    Wipe,
+    Zoom,
+    Flip,
+    Morph,
+    Cube,
+}
+
+/// Slide transition configuration
+#[derive(Debug, Clone)]
+pub struct SlideTransition {
+    pub transition_type: TransitionType,
+    pub duration_ms: u32,
+    pub auto_advance_ms: Option<u32>,
+}
+
+/// Object animation type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AnimationType {
+    EntranceFade,
+    EntranceFlyIn,
+    EntranceZoom,
+    ExitFade,
+    ExitFlyOut,
+    EmphasisPulse,
+    EmphasisSpin,
+    MotionPath,
+}
+
+/// Element animation configuration
+#[derive(Debug, Clone)]
+pub struct SlideAnimation {
+    pub id: u32,
+    pub element_id: u32,
+    pub anim_type: AnimationType,
+    pub duration_ms: u32,
+    pub trigger_delay_ms: u32,
+    pub order: u32,
+}
+
+/// Speaker notes for presenter view
+#[derive(Debug, Clone)]
+pub struct PresenterNotes {
+    pub slide_id: u32,
+    pub text: String,
+    pub estimated_time_secs: u32,
+    pub key_takeaways: Vec<String>,
+}
+
+/// State of presenter mode
+#[derive(Debug, Clone)]
+pub struct PresenterState {
+    pub active_deck_id: Option<u32>,
+    pub current_slide_index: usize,
+    pub in_presenter_mode: bool,
+    pub timer_running: bool,
+    pub elapsed_secs: u32,
+    pub laser_pointer_active: bool,
+    pub black_screen: bool,
+}
+
+/// Slide deck styling theme
+#[derive(Debug, Clone)]
+pub struct SlideTheme {
+    pub name: String,
+    pub primary_color: (u8, u8, u8),
+    pub secondary_color: (u8, u8, u8),
+    pub background_color: (u8, u8, u8),
+    pub font_family: String,
+    pub dark_mode: bool,
+}
+
+impl Default for SlideTheme {
+    fn default() -> Self {
+        Self {
+            name: String::from("Zenith Dark"),
+            primary_color: (0, 210, 255),
+            secondary_color: (160, 160, 255),
+            background_color: (18, 18, 28),
+            font_family: String::from("Inter"),
+            dark_mode: true,
+        }
+    }
+}
+
+/// Single slide definition
 #[derive(Debug, Clone)]
 pub struct Slide {
     pub id: u32,
@@ -49,17 +141,17 @@ impl SlideExporterEngine {
         let mut output = Vec::new();
 
         match format {
-            ExportFormat::Pdf => {
+            ExportFormat::PDF => {
                 output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(b"\nSlides Count: ");
                 output.extend_from_slice(deck.slides.len().to_string().as_bytes());
             }
-            ExportFormat::Pptx => {
+            ExportFormat::PPTX => {
                 output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
                 output.extend_from_slice(deck.title.as_bytes());
             }
-            ExportFormat::Html5 => {
+            ExportFormat::HTML5Slideshow => {
                 output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
                 output.extend_from_slice(deck.title.as_bytes());
                 output.extend_from_slice(
@@ -73,13 +165,14 @@ impl SlideExporterEngine {
                 output.extend_from_slice(b"</div></div></body></html>");
             }
             ExportFormat::ZenithPresentation => {
-                output.extend_from_slice(b"ZENITH_PRESENTATION_STREAM_V1\nTitle: ");
+                output.extend_from_slice(b"# ZENITH_PRESENTATION_DECK\n");
                 output.extend_from_slice(deck.title.as_bytes());
-            }
-            ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<title>");
-                output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"</title>\n</svg>");
+                output.extend_from_slice(b"\n");
+                for slide in &deck.slides {
+                    output.extend_from_slice(b"---\n## ");
+                    output.extend_from_slice(slide.title.as_bytes());
+                    output.extend_from_slice(b"\n");
+                }
             }
             ExportFormat::Markdown => {
                 output.extend_from_slice(b"# ");

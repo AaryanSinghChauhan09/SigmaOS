@@ -165,6 +165,10 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+    /// Check Landlock v5 unprivileged file/network access rights.
+    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+        (handled_access & requested_access) == requested_access
+    }
 
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
@@ -496,6 +500,14 @@ impl IdentityAndEnterpriseAuthPrEngine {
     /// Simulate Kerberos v5 ticket validation.
     pub fn validate_kerberos_tgt(&self, realm: &str, principal: &str, ticket_bytes: &[u8]) -> bool {
         !realm.is_empty() && !principal.is_empty() && ticket_bytes.len() >= 16
+    }
+
+    /// Generate SSSD domain configuration file string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nauth_provider = {}\nldap_uri = {}\ncache_credentials = true",
+            domain, provider, provider, uri
+        )
     }
 
     /// Generate Identity & Enterprise Authentication PR proposal.

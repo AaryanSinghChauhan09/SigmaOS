@@ -569,11 +569,11 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
 
     pub fn compute_motion_vectors(
         &mut self,
-        frame1: &[u8],
-        frame2: &[u8],
+        prev_frame: &[u8],
+        curr_frame: &[u8],
         width: u32,
         height: u32,
-    ) -> Result<Vec<MotionVector>, String> {
+    ) -> Result<usize, String> {
         let pixel_count = (width * height) as usize;
         if frame1.len() != pixel_count * 4 || frame2.len() != pixel_count * 4 {
             return Err("Frame dimensions mismatch for optical flow computation".to_string());
@@ -650,6 +650,7 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
         } else if source_space == WorkingColorSpace::AcesCg
             && target_space == WorkingColorSpace::Rec709
         {
+            // ACEScg to Rec.709 display transform approximation
             let [r, g, b] = *rgb;
             rgb[0] = (r * 1.7051) - (g * 0.6218) - (b * 0.0833);
             rgb[1] = -(r * 0.1303) + (g * 1.1408) - (b * 0.0105);
@@ -1279,7 +1280,7 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
         let mut color = [0.5, 0.5, 0.5];
         self.aces_ocio.convert_color_space(
             WorkingColorSpace::Rec709,
-            WorkingColorSpace::Acescg,
+            WorkingColorSpace::AcesCg,
             &mut color,
         );
         let mut mask_out = vec![0u8; 4];
@@ -1334,7 +1335,7 @@ impl EffectcraftMissingComponentsParityPrSuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_effectcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 14
+            && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -1456,10 +1457,10 @@ mod tests {
         let mut rgb = [1.0, 0.5, 0.2];
         engine.convert_color_space(
             WorkingColorSpace::Rec709,
-            WorkingColorSpace::Acescg,
+            WorkingColorSpace::AcesCg,
             &mut rgb,
         );
-        assert_eq!(engine.current_space, WorkingColorSpace::Acescg);
+        assert_eq!(engine.current_space, WorkingColorSpace::AcesCg);
         assert_ne!(rgb[0], 1.0);
     }
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Sovereign Distro Package Advancements Suite V40
-// (`src/package/sovereign_distro_package_advancements_v39.rs`)
+// (`src/package/sovereign_distro_package_advancements_v40.rs`)
 //
 // Inspired by Linux & BSD distributions, this suite provides complete universal
 // multi-format package inspection, zero-copy classification, scriptlet sandboxing,
@@ -433,7 +433,7 @@ pub struct UniversalCrossDistroSatSolverV40 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
-impl UniversalCrossDistroSatSolverV39 {
+impl UniversalCrossDistroSatSolverV40 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
@@ -661,11 +661,7 @@ pub struct RoutedPmCommandV40 {
     pub dry_run: bool,
 }
 
-pub type RoutedPmCommandV39 = RoutedPmCommandV40;
-
 pub struct UniversalPmCliRouterV40;
-
-pub type UniversalPmCliRouterV39 = UniversalPmCliRouterV40;
 
 impl UniversalPmCliRouterV40 {
     pub fn new() -> Self {
@@ -914,7 +910,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_all_prompt_package_formats_v39() {
+    fn test_all_prompt_package_formats_v40() {
         let mut inspector = UniversalPackageFormatInspectorV40::new();
         let payload = b"\x7FELF_UNIVERSAL_DATA";
 
@@ -978,7 +974,7 @@ mod tests {
     }
 
     #[test]
-    fn test_inspector_and_classification_v39() {
+    fn test_inspector_and_classification_v40() {
         let mut inspector = UniversalPackageFormatInspectorV40::new();
 
         let deb_payload = b"DEB_BINARY_DATA";
@@ -1024,7 +1020,7 @@ mod tests {
     }
 
     #[test]
-    fn test_cas_delta_udf_and_boot_env_snapshot_v39() {
+    fn test_cas_delta_udf_and_boot_env_snapshot_v40() {
         let mut cas_store = UniversalCasDeltaStoreGovernorV40::new();
         let delta_rec = cas_store
             .apply_delta_patch("base_hash_v40", "delta_hash_v40")
@@ -1032,7 +1028,7 @@ mod tests {
         assert_eq!(delta_rec.compression_savings_ratio, 75);
 
         let mut boot_env = UniversalBootEnvSnapshotGovernorV40::new();
-        let snap_id = boot_env.create_snapshot(BootEnvKindV40::FreeBsdBectl, "Pre-Update-v39");
+        let snap_id = boot_env.create_snapshot(BootEnvKindV40::FreeBsdBectl, "Pre-Update-v40");
         assert_eq!(snap_id, 1);
         let res = boot_env.rollback(snap_id).unwrap();
         assert!(res.contains("Pre-Update-v40"));
@@ -1051,7 +1047,7 @@ mod tests {
     }
 
     #[test]
-    fn test_cli_router_and_master_coordinator_v39() {
+    fn test_cli_router_and_master_coordinator_v40() {
         let mut suite = SovereignDistroPackageAdvancementsSuiteV40::new();
 
         let cmd = suite
