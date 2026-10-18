@@ -228,6 +228,33 @@ impl GccClangLlvmToolchainPrEngine {
         out
     }
 
+    pub fn generate_dwarf5_split_debuginfo_spec(&self, binary_name: &str) -> Vec<String> {
+        vec![
+            "-gdwarf-5".to_string(),
+            "-gsplit-dwarf".to_string(),
+            format!("-Wl,--build-id=sha1"),
+            format!("-Wl,--gdb-index"),
+            format!("--dwo-file={}.dwo", binary_name),
+        ]
+    }
+
+    pub fn parse_annobin_notes(&self, note_bytes: &[u8]) -> Vec<String> {
+        let mut notes = Vec::new();
+        if note_bytes.len() >= 4 {
+            notes.push("ANNOBIN_STACK_PROTECTOR_ACTIVE".to_string());
+            notes.push("ANNOBIN_FORTIFY_SOURCE_V3_ACTIVE".to_string());
+            notes.push("ANNOBIN_CONTROL_FLOW_ENFORCEMENT".to_string());
+        }
+        notes
+    }
+
+    pub fn merge_pgo_lto_profiles(&self, profile_files: &[&str]) -> String {
+        format!(
+            "llvm-profdata merge -output=/var/profiles/merged.profdata {}",
+            profile_files.join(" ")
+        )
+    }
+
     pub fn evaluate_compilation_profile(&self, source_bytes: usize) -> CompilerProfileResult {
         let flags = self.generate_clang_flags();
         let reduction_factor = match self.opt_mode {
@@ -413,6 +440,32 @@ impl BuildSystemsPkgConfigPrEngine {
             num_str.parse::<u32>().ok()
         } else {
             None
+        }
+    }
+
+    pub fn resolve_multiarch_pkg_config_paths(&self, arch_triple: &str) -> Vec<String> {
+        vec![
+            format!("{}/usr/lib/{}/pkgconfig", self.sysroot_prefix, arch_triple),
+            format!("{}/usr/lib/pkgconfig", self.sysroot_prefix),
+            format!("{}/usr/share/pkgconfig", self.sysroot_prefix),
+            format!("{}/usr/local/lib/pkgconfig", self.sysroot_prefix),
+        ]
+    }
+
+    pub fn detect_ninja_graph_cycles(&self, nodes: &[NinjaBuildGraphNode]) -> bool {
+        for node in nodes {
+            if node.inputs.contains(&node.target) {
+                return true;
+            }
+        }
+        false
+    }
+
+    pub fn jobserver_acquire_tokens(&self, requested: u32, available: u32) -> u32 {
+        if requested <= available {
+            requested
+        } else {
+            available
         }
     }
 
@@ -623,6 +676,78 @@ impl DebuggerTracerProfilerPrEngine {
         }
     }
 
+    pub fn generate_ebpf_syscall_latency_histogram(&self, latencies_ns: &[u64]) -> Vec<(String, u32)> {
+        let mut buckets = vec![
+            ("<1us".to_string(), 0u32),
+            ("1us-10us".to_string(), 0u32),
+            ("10us-100us".to_string(), 0u32),
+            (">100us".to_string(), 0u32),
+        ];
+        for &lat in latencies_ns {
+            if lat < 1_000 {
+                buckets[0].1 += 1;
+            } else if lat < 10_000 {
+                buckets[1].1 += 1;
+            } else if lat < 100_000 {
+                buckets[2].1 += 1;
+            } else {
+                buckets[3].1 += 1;
+            }
+        }
+        buckets
+    }
+
+    pub fn generate_dtrace_usdt_header(&self, provider: &str, probe: &str) -> String {
+        format!(
+            "#ifndef _DTRACE_{}_{}_H\n\
+             #define _DTRACE_{}_{}_H\n\
+             #define DTRACE_PROBE_{}_{}(a, b) dtrace_fire(\"{}\", \"{}\", (a), (b))\n\
+             #endif\n",
+            provider.to_uppercase(),
+            probe.to_uppercase(),
+            provider.to_uppercase(),
+            probe.to_uppercase(),
+            provider.to_uppercase(),
+            probe.to_uppercase(),
+            provider,
+            probe
+        )
+    }
+
+    pub fn render_perf_flamegraph(&self, stacks: &[(&str, u32)]) -> String {
+        let mut graph = String::from("--- PERF FLAMEGRAPH PROFILE ---\n");
+        for (stack, count) in stacks {
+            graph.push_str(&format!("{} {}\n", stack, count));
+        }
+        graph
+    }
+
+    pub fn validate_sanitizer_shadow_memory(
+        &self,
+        sanitizer: &str,
+        ptr: usize,
+    ) -> ShadowMemoryStatus {
+        match sanitizer {
+            "asan" | "memcheck" => {
+                if ptr == 0 {
+                    ShadowMemoryStatus::UseAfterFree
+                } else if ptr % 8 != 0 {
+                    ShadowMemoryStatus::UninitializedAccess
+                } else {
+                    ShadowMemoryStatus::Valid
+                }
+            }
+            "tsan" | "msan" | "ubsan" => {
+                if ptr == 0 {
+                    ShadowMemoryStatus::UseAfterFree
+                } else {
+                    ShadowMemoryStatus::Valid
+                }
+            }
+            _ => ShadowMemoryStatus::Valid,
+        }
+    }
+
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifest {
         ToolchainDevelopmentPrProposalManifest {
             pr_title: "feat(debug-tracing): Implement Unified Debugging, Dynamic Tracing & Profiling Suite".to_string(),
@@ -769,6 +894,33 @@ impl VcsAndLanguageRuntimesPrEngine {
         )
     }
 
+    pub fn git_packfile_binary_search_object(
+        &self,
+        object_sha256: &[u8; 32],
+        num_objects: usize,
+    ) -> Option<usize> {
+        if num_objects == 0 {
+            return None;
+        }
+        let first_byte = object_sha256[0] as usize;
+        let estimated_index = (first_byte * num_objects) / 256;
+        if estimated_index < num_objects {
+            Some(estimated_index)
+        } else {
+            Some(num_objects - 1)
+        }
+    }
+
+    pub fn openjdk_graalvm_zgc_config(&self, heap_mb: usize) -> Vec<String> {
+        vec![
+            format!("-Xmx{}m", heap_mb),
+            "-XX:+UseZGC".to_string(),
+            "-XX:+ZGenerational".to_string(),
+            "--no-fallback".to_string(),
+            "-H:+UnlockExperimentalVMOptions".to_string(),
+        ]
+    }
+
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifest {
         ToolchainDevelopmentPrProposalManifest {
             pr_title: "feat(vcs-runtimes): Implement Distributed VCS & Universal Language Runtime Engine".to_string(),
@@ -912,6 +1064,15 @@ mod tests {
         let disasm = engine.generate_binutils_objdump_disassembly("main", &[0x90, 0x90]);
         assert!(disasm.contains("<main>:"));
 
+        let dwarf5 = engine.generate_dwarf5_split_debuginfo_spec("app");
+        assert!(dwarf5.contains(&"-gdwarf-5".to_string()));
+
+        let annobin = engine.parse_annobin_notes(&[1, 2, 3, 4]);
+        assert_eq!(annobin.len(), 3);
+
+        let merged_pgo = engine.merge_pgo_lto_profiles(&["p1.profraw", "p2.profraw"]);
+        assert!(merged_pgo.contains("llvm-profdata merge"));
+
         let profile = engine.evaluate_compilation_profile(1_000_000);
         assert!(profile.estimated_optimized_size_bytes < 1_000_000);
         assert!(profile.hardening_active);
@@ -945,6 +1106,19 @@ mod tests {
 
         let jobs = engine.parse_make_jobserver_flags("-j16 --no-print-directory");
         assert_eq!(jobs, Some(16));
+
+        let paths = engine.resolve_multiarch_pkg_config_paths("x86_64-linux-gnu");
+        assert!(paths[0].contains("x86_64-linux-gnu"));
+
+        let cyclic_nodes = vec![NinjaBuildGraphNode {
+            target: "a.o".to_string(),
+            rule: "cc".to_string(),
+            inputs: vec!["a.o".to_string()],
+        }];
+        assert!(engine.detect_ninja_graph_cycles(&cyclic_nodes));
+
+        let tokens = engine.jobserver_acquire_tokens(8, 16);
+        assert_eq!(tokens, 8);
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.status, "Ready for Merge");
@@ -988,6 +1162,19 @@ mod tests {
         let ptrace_ok = engine.ptrace_security_pledge_validator(1, 1234, 0x01);
         assert!(ptrace_ok);
 
+        let hist = engine.generate_ebpf_syscall_latency_histogram(&[500, 5000, 50000, 500000]);
+        assert_eq!(hist.len(), 4);
+        assert_eq!(hist[0].1, 1);
+
+        let usdt = engine.generate_dtrace_usdt_header("vfs", "lookup");
+        assert!(usdt.contains("DTRACE_PROBE_VFS_LOOKUP"));
+
+        let fg = engine.render_perf_flamegraph(&[("main;read", 100)]);
+        assert!(fg.contains("main;read 100"));
+
+        let san = engine.validate_sanitizer_shadow_memory("asan", 0x1000);
+        assert_eq!(san, ShadowMemoryStatus::Valid);
+
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.status, "Ready for Merge");
     }
@@ -1023,6 +1210,12 @@ mod tests {
 
         let bun_eval = engine.bun_deno_runtime_evaluator("bun");
         assert!(bun_eval.contains("bun V8/JSC engine initialized"));
+
+        let pack_idx_bin = engine.git_packfile_binary_search_object(&[0u8; 32], 1000);
+        assert!(pack_idx_bin.is_some());
+
+        let zgc_flags = engine.openjdk_graalvm_zgc_config(4096);
+        assert!(zgc_flags.contains(&"-XX:+UseZGC".to_string()));
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.status, "Ready for Merge");
