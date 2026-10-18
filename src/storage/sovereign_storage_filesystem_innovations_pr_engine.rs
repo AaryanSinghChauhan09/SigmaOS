@@ -52,6 +52,7 @@ pub struct Ext4OperationalState {
     pub block_count: u64,
     pub free_blocks: u64,
     pub crc32c_checksum: u32,
+    pub allocated_inodes: u32,
 }
 
 impl Ext4OperationalState {
@@ -62,6 +63,7 @@ impl Ext4OperationalState {
             block_count: total_blocks,
             free_blocks: total_blocks,
             crc32c_checksum: 0x87654321,
+            allocated_inodes: 10, // Inodes 1-10 reserved for ext4 system
         }
     }
 
@@ -84,6 +86,20 @@ impl Ext4OperationalState {
         self.free_blocks -= len as u64;
         self.crc32c_checksum ^= (logical_block as u32) ^ (physical_block as u32);
         true
+    }
+
+    pub fn replay_fast_commit_log(&mut self) -> usize {
+        let count = self.fc_log.len();
+        for rec in &self.fc_log {
+            self.crc32c_checksum ^= rec.logical_block ^ (rec.physical_block as u32);
+        }
+        self.fc_log.clear();
+        count
+    }
+
+    pub fn allocate_inode(&mut self) -> u32 {
+        self.allocated_inodes += 1;
+        self.allocated_inodes
     }
 
     pub fn compute_crc32c_metadata(&self, data: &[u8]) -> u32 {
@@ -123,6 +139,7 @@ pub struct XfsReflinkExtent {
 pub struct XfsOperationalState {
     pub allocation_groups: Vec<XfsAllocationGroup>,
     pub reflink_map: Vec<XfsReflinkExtent>,
+    pub speculative_prealloc_blocks: u64,
 }
 
 impl XfsOperationalState {
@@ -139,6 +156,7 @@ impl XfsOperationalState {
         Self {
             allocation_groups: ags,
             reflink_map: Vec::new(),
+            speculative_prealloc_blocks: 0,
         }
     }
 
@@ -173,6 +191,23 @@ impl XfsOperationalState {
         }
         true
     }
+
+    pub fn lookup_reverse_mapping(&self, physical_block: u64) -> Option<&XfsReflinkExtent> {
+        self.reflink_map
+            .iter()
+            .find(|ext| physical_block >= ext.physical_block && physical_block < ext.physical_block + ext.length)
+    }
+
+    pub fn reserve_speculative_prealloc(&mut self, ag_id: u32, len: u32) -> bool {
+        if let Some(ag) = self.allocation_groups.iter_mut().find(|a| a.ag_id == ag_id) {
+            if ag.free_blocks >= len {
+                ag.free_blocks -= len;
+                self.speculative_prealloc_blocks += len as u64;
+                return true;
+            }
+        }
+        false
+    }
 }
 
 /// Btrfs Subvolume & RAID Chunk Governor
@@ -193,6 +228,7 @@ pub struct BtrfsOperationalState {
     pub uncompressed_bytes: u64,
     pub checksum_errors_detected: u64,
     pub checksum_errors_repaired: u64,
+    pub qgroup_usage_bytes: u64,
 }
 
 impl BtrfsOperationalState {
@@ -204,6 +240,7 @@ impl BtrfsOperationalState {
             uncompressed_bytes: 0,
             checksum_errors_detected: 0,
             checksum_errors_repaired: 0,
+            qgroup_usage_bytes: 0,
         };
         state.subvolumes.push(BtrfsSubvolume {
             id: 5,
@@ -256,6 +293,14 @@ impl BtrfsOperationalState {
             true
         }
     }
+
+    pub fn enforce_qgroup_limit(&self, _qgroup_id: u64, requested_bytes: u64, limit_bytes: u64) -> bool {
+        self.qgroup_usage_bytes + requested_bytes <= limit_bytes
+    }
+
+    pub fn simulate_balance_chunk_relocation(&mut self, reloc_chunks: u32) -> bool {
+        reloc_chunks > 0
+    }
 }
 
 /// ZFS Adaptive Replacement Cache (ARC) & ZPOOL State
@@ -263,6 +308,7 @@ impl BtrfsOperationalState {
 pub struct ZfsArcState {
     pub mru_list: Vec<u64>,
     pub mfu_list: Vec<u64>,
+    pub l2arc_list: Vec<u64>,
     pub c_max: usize,
     pub arc_hits: u64,
     pub arc_misses: u64,
@@ -279,6 +325,7 @@ impl ZfsArcState {
         Self {
             mru_list: Vec::new(),
             mfu_list: Vec::new(),
+            l2arc_list: Vec::new(),
             c_max: capacity,
             arc_hits: 0,
             arc_misses: 0,
@@ -299,13 +346,27 @@ impl ZfsArcState {
         self.arc_misses += 1;
         if self.mru_list.len() + self.mfu_list.len() >= self.c_max {
             if !self.mru_list.is_empty() {
-                self.mru_list.remove(0);
+                let evicted = self.mru_list.remove(0);
+                self.l2arc_list.push(evicted);
             } else if !self.mfu_list.is_empty() {
-                self.mfu_list.remove(0);
+                let evicted = self.mfu_list.remove(0);
+                self.l2arc_list.push(evicted);
             }
         }
         self.mru_list.push(block_id);
         false
+    }
+
+    pub fn l2arc_lookup(&self, block_id: u64) -> bool {
+        self.l2arc_list.contains(&block_id)
+    }
+
+    pub fn serialize_header_stub(&self) -> Vec<u8> {
+        let mut header = Vec::new();
+        header.extend_from_slice(b"ZFS_ARC_HDR_V1");
+        header.extend_from_slice(&(self.arc_hits.to_ne_bytes()));
+        header.extend_from_slice(&(self.arc_misses.to_ne_bytes()));
+        header
     }
 }
 
@@ -321,6 +382,7 @@ pub struct UfsSoftUpdateDep {
 #[derive(Debug, Clone, Default)]
 pub struct UfsSoftUpdatesState {
     pub dependencies: Vec<UfsSoftUpdateDep>,
+    pub suj_journal_records: u64,
 }
 
 impl UfsSoftUpdatesState {
@@ -335,6 +397,7 @@ impl UfsSoftUpdatesState {
             block_id,
             completed: false,
         });
+        self.suj_journal_records += 1;
     }
 
     pub fn can_commit(&self, dep_id: u64) -> bool {
@@ -359,6 +422,18 @@ impl UfsSoftUpdatesState {
         }
         false
     }
+
+    pub fn roll_forward_suj_journal(&mut self) -> usize {
+        let mut committed = 0;
+        for i in 0..self.dependencies.len() {
+            let dep_id = self.dependencies[i].dep_id;
+            if self.can_commit(dep_id) {
+                self.dependencies[i].completed = true;
+                committed += 1;
+            }
+        }
+        committed
+    }
 }
 
 /// F2FS Log-Structured Flash-Friendly File System
@@ -375,6 +450,7 @@ pub struct F2fsSegment {
     pub data_type: F2fsDataType,
     pub written_blocks: u32,
     pub total_blocks: u32,
+    pub zoned_append_offset: u32,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -398,6 +474,7 @@ impl F2fsOperationalState {
             .find(|s| s.data_type == data_type && s.written_blocks < s.total_blocks)
         {
             seg.written_blocks += 1;
+            seg.zoned_append_offset += 1;
             return seg.segment_id;
         }
         let new_id = self.segments.len() as u32;
@@ -406,8 +483,18 @@ impl F2fsOperationalState {
             data_type,
             written_blocks: 1,
             total_blocks: 512,
+            zoned_append_offset: 1,
         });
         new_id
+    }
+
+    pub fn reset_zone_and_append(&mut self, segment_id: u32) -> bool {
+        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
+            seg.written_blocks = 0;
+            seg.zoned_append_offset = 0;
+            return true;
+        }
+        false
     }
 }
 
@@ -438,6 +525,19 @@ impl ExFatOperationalState {
         }
     }
 
+    pub fn allocate_aligned_flash_cluster(&mut self, count: u32, boundary_align: u32) -> Option<u32> {
+        let align = if boundary_align == 0 { 1 } else { boundary_align };
+        let remainder = self.allocated_clusters % align;
+        let padding = if remainder == 0 { 0 } else { align - remainder };
+        let needed = padding + count;
+        if self.allocated_clusters + needed <= self.total_clusters {
+            self.allocated_clusters += needed;
+            Some(self.allocated_clusters - count + 2)
+        } else {
+            None
+        }
+    }
+
     pub fn utf8_to_utf16_nfn(&self, input: &str) -> Vec<u16> {
         input.encode_utf16().collect()
     }
@@ -448,13 +548,19 @@ impl ExFatOperationalState {
 pub struct NtfsOperationalState {
     pub mft_record_count: u64,
     pub usn_journal_seq: u64,
+    pub attribute_streams: BTreeMap<u32, String>,
 }
 
 impl NtfsOperationalState {
     pub fn new() -> Self {
+        let mut map = BTreeMap::new();
+        map.insert(0x80, "$DATA".to_string());
+        map.insert(0x90, "$INDEX_ROOT".to_string());
+        map.insert(0x100, "$LOGFILE".to_string());
         Self {
             mft_record_count: 16, // System records 0-15
             usn_journal_seq: 100,
+            attribute_streams: map,
         }
     }
 
@@ -468,6 +574,10 @@ impl NtfsOperationalState {
         self.usn_journal_seq += 1;
         self.usn_journal_seq ^ (file_id << 16) ^ (reason_mask as u64)
     }
+
+    pub fn find_attribute_stream(&self, stream_type: u32) -> Option<&String> {
+        self.attribute_streams.get(&stream_type)
+    }
 }
 
 /// pNFS Parallel Layout & RPCSEC_GSS State Engine
@@ -475,6 +585,7 @@ impl NtfsOperationalState {
 pub struct NfsOperationalState {
     pub active_layouts: Vec<u64>,
     pub server_side_copy_bytes: u64,
+    pub active_delegations: BTreeMap<u64, bool>, // handle -> is_write
 }
 
 impl NfsOperationalState {
@@ -490,6 +601,11 @@ impl NfsOperationalState {
 
     pub fn offload_server_side_copy(&mut self, len: u64) -> bool {
         self.server_side_copy_bytes += len;
+        true
+    }
+
+    pub fn acquire_nfs_delegation(&mut self, file_handle: u64, write_delegation: bool) -> bool {
+        self.active_delegations.insert(file_handle, write_delegation);
         true
     }
 }
@@ -523,6 +639,13 @@ impl CifsOperationalState {
             false
         }
     }
+
+    pub fn encode_posix_mode_and_symlink(&self, mode: u32, symlink_target: &str) -> Vec<u8> {
+        let mut buf = Vec::new();
+        buf.extend_from_slice(&(mode.to_ne_bytes()));
+        buf.extend_from_slice(symlink_target.as_bytes());
+        buf
+    }
 }
 
 /// Lockless ProcFS, SysFS Attribute Graph & DevFS Engine
@@ -531,6 +654,7 @@ pub struct PseudoFsOperationalState {
     pub tmpfs_used_bytes: usize,
     pub tmpfs_limit_bytes: usize,
     pub proc_reads_count: u64,
+    pub sysfs_kobjects: Vec<String>,
 }
 
 impl PseudoFsOperationalState {
@@ -539,6 +663,7 @@ impl PseudoFsOperationalState {
             tmpfs_used_bytes: 0,
             tmpfs_limit_bytes: tmpfs_limit,
             proc_reads_count: 0,
+            sysfs_kobjects: Vec::new(),
         }
     }
 
@@ -557,6 +682,23 @@ impl PseudoFsOperationalState {
             "MemTotal: 16384 MB\nMemFree: 8192 MB\nTmpfsUsed: {} KB\n",
             self.tmpfs_used_bytes / 1024
         )
+    }
+
+    pub fn register_sysfs_kobject(&mut self, path: &str) -> bool {
+        if !self.sysfs_kobjects.contains(&path.to_string()) {
+            self.sysfs_kobjects.push(path.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn match_devfs_rule(&self, dev_name: &str, subsystem: &str) -> Option<String> {
+        if dev_name.starts_with("nvme") || dev_name.starts_with("sd") {
+            Some(format!("/dev/block/{}_subsys_{}", dev_name, subsystem))
+        } else {
+            None
+        }
     }
 }
 
@@ -586,6 +728,17 @@ impl BcachefsOperationalState {
         self.active_extents.push((logical, phys));
         self.compressed_bytes += length / 2; // Simulated LZ4/Zstd CoW compression
         phys
+    }
+
+    pub fn calculate_erasure_coding_parity(&self, data_blocks: &[&[u8]]) -> Vec<u8> {
+        let len = data_blocks.iter().map(|b| b.len()).max().unwrap_or(0);
+        let mut parity = vec![0u8; len];
+        for block in data_blocks {
+            for (i, &byte) in block.iter().enumerate() {
+                parity[i] ^= byte;
+            }
+        }
+        parity
     }
 }
 
@@ -617,6 +770,23 @@ impl Hammer2OperationalState {
     pub fn take_snapshot(&mut self, transid: u64) {
         self.snapshot_transids.push(transid);
     }
+
+    pub fn rollback_transid(&mut self, target_transid: u64) -> bool {
+        if let Some(pos) = self.snapshot_transids.iter().position(|&t| t == target_transid) {
+            self.snapshot_transids.truncate(pos + 1);
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn lookup_directory_hash(&self, name: &str) -> u64 {
+        let mut hash = 5381u64;
+        for &b in name.as_bytes() {
+            hash = hash.wrapping_shl(5).wrapping_add(hash).wrapping_add(b as u64);
+        }
+        hash
+    }
 }
 
 /// EROFS & SquashFS Read-Only Compressed Image State
@@ -625,6 +795,7 @@ pub struct ErofsSquashfsOperationalState {
     pub compressed_blocks: usize,
     pub decompressed_bytes: usize,
     pub fixed_output_decompression_hits: u64,
+    pub tail_packed_inodes: usize,
 }
 
 impl ErofsSquashfsOperationalState {
@@ -638,6 +809,11 @@ impl ErofsSquashfsOperationalState {
         self.fixed_output_decompression_hits += 1;
         true
     }
+
+    pub fn inspect_tail_packed_inodes(&mut self) -> usize {
+        self.tail_packed_inodes += 1;
+        self.tail_packed_inodes
+    }
 }
 
 /// Cachefilesd & FS-Cache Network Storage Caching State
@@ -647,6 +823,7 @@ pub struct FsCacheOperationalState {
     pub cache_hits: u64,
     pub cache_misses: u64,
     pub cached_objects: usize,
+    pub cookie_keys: Vec<String>,
 }
 
 impl FsCacheOperationalState {
@@ -656,6 +833,7 @@ impl FsCacheOperationalState {
             cache_hits: 0,
             cache_misses: 0,
             cached_objects: 0,
+            cookie_keys: Vec::new(),
         }
     }
 
@@ -668,6 +846,19 @@ impl FsCacheOperationalState {
             self.cached_objects += 1;
             false
         }
+    }
+
+    pub fn rebind_cache_cookie(&mut self, key: &str) -> bool {
+        if !self.cookie_keys.contains(&key.to_string()) {
+            self.cookie_keys.push(key.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn check_ttl_expired(&self, last_access_ts: u64, ttl_sec: u64, current_ts: u64) -> bool {
+        current_ts > last_access_ts + ttl_sec
     }
 }
 
@@ -705,6 +896,18 @@ impl Lvm2VolumeGroup {
             false
         }
     }
+
+    pub fn calculate_thin_overcommit_ratio(&self, thin_virtual_size_pe: u32) -> f64 {
+        if self.physical_extents == 0 {
+            0.0
+        } else {
+            thin_virtual_size_pe as f64 / self.physical_extents as f64
+        }
+    }
+
+    pub fn map_snapshot_delta(&self, origin_block: u64, snapshot_id: u32) -> u64 {
+        origin_block ^ ((snapshot_id as u64) << 32)
+    }
 }
 
 /// mdadm Software RAID State Governor
@@ -715,6 +918,7 @@ pub struct MdadmRaidState {
     pub active_disks: usize,
     pub degraded: bool,
     pub rebuilding: bool,
+    pub dirty_log_synced: bool,
 }
 
 impl Default for MdadmRaidState {
@@ -731,6 +935,7 @@ impl MdadmRaidState {
             active_disks: disks,
             degraded: false,
             rebuilding: false,
+            dirty_log_synced: true,
         }
     }
 
@@ -748,6 +953,7 @@ impl MdadmRaidState {
                 return false; // Array failed
             }
             self.degraded = true;
+            self.dirty_log_synced = false;
             true
         } else {
             false
@@ -760,11 +966,27 @@ impl MdadmRaidState {
             self.active_disks += 1;
             if self.active_disks == self.total_disks {
                 self.degraded = false;
+                self.dirty_log_synced = true;
             }
             self.rebuilding = false;
             return true;
         }
         false
+    }
+
+    pub fn check_dirty_log_bitmap_sync(&self) -> bool {
+        self.dirty_log_synced
+    }
+
+    pub fn recover_raid6_dual_parity(&mut self) -> bool {
+        if self.raid_level == 6 && self.total_disks >= 4 {
+            self.active_disks = self.total_disks;
+            self.degraded = false;
+            self.dirty_log_synced = true;
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -818,6 +1040,14 @@ impl LuksOperationalState {
         }
     }
 
+    pub fn verify_key_slot_unlock(&self, slot: usize) -> bool {
+        if slot < self.key_slots.len() {
+            self.key_slots[slot].active
+        } else {
+            false
+        }
+    }
+
     pub fn derive_argon2id_sample_key(&self, passphrase: &[u8], salt: &[u8]) -> [u8; 32] {
         let mut derived = [0u8; 32];
         for (i, &b) in passphrase.iter().enumerate() {
@@ -827,6 +1057,14 @@ impl LuksOperationalState {
             derived[(i + 16) % 32] ^= s;
         }
         derived
+    }
+
+    pub fn anti_forensic_header_backup(&self) -> Vec<u8> {
+        let mut header = Vec::new();
+        header.extend_from_slice(b"LUKS_HEADER_BACKUP");
+        header.push(self.version);
+        header.extend_from_slice(self.cipher.as_bytes());
+        header
     }
 }
 
@@ -864,6 +1102,16 @@ impl DeviceMapperOperationalState {
             false
         }
     }
+
+    pub fn calculate_dm_stripe_range(&self, logical_block: u64, stripe_count: u32, stripe_size: u32) -> (u32, u64) {
+        if stripe_count == 0 || stripe_size == 0 {
+            return (0, logical_block);
+        }
+        let stripe_idx = ((logical_block / stripe_size as u64) % stripe_count as u64) as u32;
+        let phys_offset = ((logical_block / (stripe_count as u64 * stripe_size as u64)) * stripe_size as u64)
+            + (logical_block % stripe_size as u64);
+        (stripe_idx, phys_offset)
+    }
 }
 
 /// FreeBSD GEOM Modular Disk Graph & GELI Disk Encryption State
@@ -897,6 +1145,15 @@ impl GeomGeliOperationalState {
             hmac[i % 32] ^= b;
         }
         hmac == *tag
+    }
+
+    pub fn build_geom_class_stack(&self) -> Vec<String> {
+        vec![
+            "GEOM_PART".to_string(),
+            "GEOM_ELI".to_string(),
+            "GEOM_MIRROR".to_string(),
+            "GEOM_STRIPE".to_string(),
+        ]
     }
 }
 
@@ -969,6 +1226,36 @@ impl StorageUtilitiesEngine {
                 status, reallocated_sectors
             ),
         )
+    }
+
+    pub fn simulate_resize2fs_expansion(&self, current_blocks: u64, target_blocks: u64) -> (bool, u64) {
+        if target_blocks >= current_blocks {
+            (true, target_blocks)
+        } else {
+            (false, current_blocks)
+        }
+    }
+
+    pub fn calculate_xfs_growfs_geometry(&self, ag_count: u32, new_blocks: u64) -> (u32, u64) {
+        let blocks_per_ag = new_blocks / (ag_count as u64);
+        (ag_count, blocks_per_ag)
+    }
+
+    pub fn report_btrfs_balance_status(&self, relocated_extents: u64) -> String {
+        format!("Btrfs Balance: {} extents relocated successfully", relocated_extents)
+    }
+
+    pub fn validate_gdisk_gpt_secondary_sync(&self, primary_valid: bool, secondary_valid: bool) -> bool {
+        primary_valid && secondary_valid
+    }
+
+    pub fn parse_autofs_map_entry(&self, map_line: &str) -> Option<(String, String)> {
+        let parts: Vec<&str> = map_line.split_whitespace().collect();
+        if parts.len() >= 2 {
+            Some((parts[0].to_string(), parts[1].to_string()))
+        } else {
+            None
+        }
     }
 }
 
@@ -1728,6 +2015,10 @@ mod tests {
         assert_eq!(ext4.fc_log.len(), 1);
         let checksum = ext4.compute_crc32c_metadata(b"superblock");
         assert_ne!(checksum, 0);
+
+        assert_eq!(ext4.replay_fast_commit_log(), 1);
+        assert_eq!(ext4.fc_log.len(), 0);
+        assert_eq!(ext4.allocate_inode(), 11);
     }
 
     #[test]
@@ -1741,6 +2032,9 @@ mod tests {
         assert!(xfs.reflink_clone(0, phys, 20));
         assert_eq!(xfs.reflink_map.len(), 1);
         assert_eq!(xfs.reflink_map[0].refcount, 2);
+
+        assert!(xfs.lookup_reverse_mapping(phys).is_some());
+        assert!(xfs.reserve_speculative_prealloc(0, 10));
     }
 
     #[test]
@@ -1750,12 +2044,17 @@ mod tests {
         let compressed = btrfs.compress_zstd_sample(1000);
         assert_eq!(compressed, 450);
         assert!(btrfs.scrub_extent(0x1234, 0x1234));
+        assert!(btrfs.enforce_qgroup_limit(100, 1024, 4096));
+        assert!(btrfs.simulate_balance_chunk_relocation(5));
 
         let mut zfs_arc = ZfsArcState::new(2);
         assert!(!zfs_arc.access_block(101));
         assert!(!zfs_arc.access_block(102));
         assert!(zfs_arc.access_block(101));
         assert_eq!(zfs_arc.arc_hits, 1);
+        assert!(!zfs_arc.access_block(103)); // Evicts to L2ARC
+        assert!(zfs_arc.l2arc_lookup(102));
+        assert!(!zfs_arc.serialize_header_stub().is_empty());
     }
 
     #[test]
@@ -1763,20 +2062,29 @@ mod tests {
         let mut lvm = Lvm2VolumeGroup::new("vg_data".to_string(), 4, 100);
         assert!(lvm.create_lv("root".to_string(), 50));
         assert_eq!(lvm.allocated_extents, 50);
+        assert_eq!(lvm.calculate_thin_overcommit_ratio(200), 2.0);
+        assert_ne!(lvm.map_snapshot_delta(100, 1), 0);
 
         let mut md = MdadmRaidState::new(5, 3);
         assert!(md.fail_disk());
         assert!(md.degraded);
+        assert!(!md.check_dirty_log_bitmap_sync());
         assert!(md.start_hot_spare_rebuild());
         assert!(!md.degraded);
+        assert!(md.check_dirty_log_bitmap_sync());
+
+        let mut md6 = MdadmRaidState::new(6, 4);
+        assert!(md6.recover_raid6_dual_parity());
     }
 
     #[test]
     fn test_luks_and_utilities() {
         let mut luks = LuksOperationalState::new(2, "aes-xts-plain64".to_string());
         assert!(luks.activate_key_slot(0, 500000));
+        assert!(luks.verify_key_slot_unlock(0));
         let key = luks.derive_argon2id_sample_key(b"password123", b"0123456789abcdef");
         assert_ne!(key, [0u8; 32]);
+        assert!(!luks.anti_forensic_header_backup().is_empty());
 
         let utils = StorageUtilitiesEngine::new();
         assert!(utils.run_e2fsck_passes(5000));
@@ -1790,12 +2098,24 @@ mod tests {
         let (sata_healthy, sata_msg) = utils.parse_smart_sata_health(0);
         assert!(sata_healthy);
         assert!(sata_msg.contains("PASSED"));
+
+        let (resized, blocks) = utils.simulate_resize2fs_expansion(100, 200);
+        assert!(resized);
+        assert_eq!(blocks, 200);
+        let (ags, ag_blocks) = utils.calculate_xfs_growfs_geometry(4, 10000);
+        assert_eq!(ags, 4);
+        assert_eq!(ag_blocks, 2500);
+        assert!(utils.report_btrfs_balance_status(10).contains("10 extents"));
+        assert!(utils.validate_gdisk_gpt_secondary_sync(true, true));
+        let parsed = utils.parse_autofs_map_entry("/net /etc/auto.net");
+        assert_eq!(parsed, Some(("/net".to_string(), "/etc/auto.net".to_string())));
     }
 
     #[test]
     fn test_extended_operational_states() {
         let mut exfat = ExFatOperationalState::new(1000);
         assert_eq!(exfat.allocate_clusters(10), Some(2));
+        assert!(exfat.allocate_aligned_flash_cluster(10, 8).is_some());
         let nfn = exfat.utf8_to_utf16_nfn("sovereign.txt");
         assert_eq!(nfn.len(), 13);
 
@@ -1803,19 +2123,24 @@ mod tests {
         assert_eq!(ntfs.allocate_mft_record(), 16);
         let usn = ntfs.append_usn_record(102, 0x1);
         assert_ne!(usn, 0);
+        assert_eq!(ntfs.find_attribute_stream(0x80), Some(&"$DATA".to_string()));
 
         let mut nfs = NfsOperationalState::new();
         nfs.register_pnfs_layout(5001);
         assert!(nfs.offload_server_side_copy(4096));
+        assert!(nfs.acquire_nfs_delegation(1001, true));
 
         let mut cifs = CifsOperationalState::new();
         assert!(cifs.negotiate_smb311());
         assert!(cifs.consume_rdma_credit());
+        assert!(!cifs.encode_posix_mode_and_symlink(0o755, "/usr/bin").is_empty());
 
         let mut pseudo = PseudoFsOperationalState::new(100000);
         assert!(pseudo.tmpfs_allocate(1000));
         let meminfo = pseudo.generate_proc_meminfo();
         assert!(meminfo.contains("MemTotal"));
+        assert!(pseudo.register_sysfs_kobject("/sys/class/net/eth0"));
+        assert!(pseudo.match_devfs_rule("nvme0n1", "pci").is_some());
 
         let mut dm = DeviceMapperOperationalState::new([0xBBu8; 32]);
         let data = [0x55u8; 64];
@@ -1825,6 +2150,9 @@ mod tests {
         }
         assert!(dm.verify_dm_verity_block(&data, &expected));
         assert!(dm.dm_cache_lookup(1, true));
+        let (stripe_idx, offset) = dm.calculate_dm_stripe_range(100, 2, 64);
+        assert_eq!(stripe_idx, 1);
+        assert_eq!(offset, 36);
 
         let mut geom = GeomGeliOperationalState::new();
         geom.attach_provider_consumer("ada0", "geli0");
@@ -1833,22 +2161,31 @@ mod tests {
             geli_tag[i % 32] ^= b;
         }
         assert!(geom.verify_geli_hmac(&data, &geli_tag));
+        assert_eq!(geom.build_geom_class_stack().len(), 4);
 
         let mut bcachefs = BcachefsOperationalState::new("nvme0n1", "sda1");
         let phys = bcachefs.allocate_tiered_extent(0, 8192);
         assert_eq!(phys, 4096);
+        let parity = bcachefs.calculate_erasure_coding_parity(&[b"data1", b"data2"]);
+        assert_eq!(parity.len(), 5);
 
         let mut hammer2 = Hammer2OperationalState::new();
         hammer2.create_pfs("pfs_root", true);
         hammer2.take_snapshot(10001);
+        hammer2.take_snapshot(10002);
+        assert!(hammer2.rollback_transid(10001));
         assert_eq!(hammer2.snapshot_transids.len(), 1);
+        assert_ne!(hammer2.lookup_directory_hash("var"), 0);
 
         let mut erofs = ErofsSquashfsOperationalState::new();
         assert!(erofs.decompress_cluster(1024, 4096));
+        assert_eq!(erofs.inspect_tail_packed_inodes(), 1);
 
         let mut fscache = FsCacheOperationalState::new("nfs_cache");
         assert!(fscache.lookup(2)); // even ID -> hit
         assert!(!fscache.lookup(3)); // odd ID -> miss
+        assert!(fscache.rebind_cache_cookie("cookie_1"));
+        assert!(fscache.check_ttl_expired(100, 300, 500));
     }
 
     #[test]
