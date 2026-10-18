@@ -28,6 +28,7 @@ pub mod vectorcraft;
 pub mod gridcraft;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod wordcraft;
+pub mod threedcraft_missing_components_parity_pr;
 
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
@@ -178,4 +179,10 @@ pub use figcraft_missing_components_parity_pr::{
     FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
     FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
     FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use threedcraft_missing_components_parity_pr::{
+    AnimationChannelType, Aabb3D, CsgBooleanOp, CsgMesh, KeyframeSample, PbrMaterialParams,
+    Ray3D, SkeletalJoint, ThreeDCraftBvhRayTracerEngine, ThreeDCraftCsgBooleanMeshEngine,
+    ThreeDCraftGltfAnimationParser, ThreeDCraftPbrShaderEngine, ThreeDCraftPrGatewayEngine,
+    ThreeDCraftPrProposalManifest,
 };

@@ -1776,4 +1776,11 @@ if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; 
     ./build/test_artcraft_parity
 fi
 
+if [ -f "src/creative/threedcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running 3DCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/threedcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_threedcraft_pr
+    ./build/test_threedcraft_pr
+fi
+
 echo "All SigmaOS test suites completed."
