@@ -12,18 +12,18 @@ The goal is to achieve 100% native parity and performance supremacy across compi
 
 | Tool / Subsystem | Distro Inspirations | Strategic Parity Implementation in SigmaOS |
 | :--- | :--- | :--- |
-| **GCC & Clang / LLVM** | Clear Linux, CachyOS, Gentoo, Fedora, OpenBSD | Auto-vectorizing AVX-512 FMV, ThinLTO, PGO profile collection, OpenBSD Retguard XOR stack cookies, -D_FORTIFY_SOURCE=3, sccache compiler caching. |
-| **binutils, LLD & Mold** | Arch Linux, Clear Linux, FreeBSD, Alpine | Mold ultra-fast parallel ELF linker (-fuse-ld=mold), LLD lock-free section merging, deterministic archives, compressed zstd debug sections, GDB indexes. |
-| **make, CMake, Ninja, Meson, autotools** | FreeBSD, Gentoo, Void, Alpine, Samurai | Lockless jobserver for pmake/GNU make (`-jN` flag parser), C-based Samurai Ninja graph parser, instant pre-compiled m4 macro cache for Autotools, CMake cross toolchain generator, Meson machine files. |
-| **pkg-config / pkgconf** | NixOS, Guix, Debian | Zero-allocation hermetic sysroot resolution, multi-arch sysroot mapping, instantaneous dependency evaluation. |
+| **GCC & Clang / LLVM** | Clear Linux, CachyOS, Gentoo, Fedora, OpenBSD | Auto-vectorizing AVX-512 FMV, ThinLTO, PGO profile merging (`llvm-profdata`), OpenBSD Retguard XOR stack cookies, Fedora `-D_FORTIFY_SOURCE=3`, Annobin security note parsing, DWARF5 split debuginfo (`.dwo`/`.dwp`), sccache compiler caching. |
+| **binutils, LLD & Mold** | Arch Linux, Clear Linux, FreeBSD, Alpine | Mold ultra-fast parallel ELF linker (`-fuse-ld=mold`), LLD lock-free section merging, deterministic archives, compressed zstd debug sections, GDB indexes. |
+| **make, CMake, Ninja, Meson, autotools** | FreeBSD, Gentoo, Void, Alpine, Samurai | Lockless jobserver token-bucket for pmake/GNU make (`-jN` flag parser), Samurai-inspired Ninja graph parser with circular dependency detection, instant pre-compiled m4 macro cache for Autotools, CMake cross toolchain generator, Meson machine files. |
+| **pkg-config / pkgconf** | NixOS, Guix, Debian, Ubuntu | Zero-allocation hermetic sysroot resolution, Debian/Ubuntu multi-arch sysroot path mapping (`/usr/lib/<arch>/pkgconfig`), instantaneous dependency evaluation. |
 | **GDB & LLDB** | Fedora, Arch Linux | Remote GDB RSP stub with packet checksumming ($g, $m, $?), DWARF5 expression evaluator, LLDB C++ JIT expression bridge, zero-copy kernel memory inspection. |
-| **strace, ltrace & bpftrace** | eBPF Linux | eBPF zero-copy syscall tracer eliminating ptrace context switches (<0.04us per call), bpftrace script compilation into kernel eBPF bytecode, dynamic symbol PLT call interceptor. |
-| **Valgrind Memcheck & ASan** | Debian, Gentoo | VEX IR binary shadow memory sanitizer with sub-2x execution overhead, ASan/TSan shadow memory validation, valid/uninitialized/out-of-bounds byte tracking. |
-| **perf, DTrace, ktrace, ptrace** | Illumos, FreeBSD, NetBSD, OpenBSD | Illumos DTrace eBPF provider probes, BSD ktrace VFS/sysctl ring buffers, hardware PMU counter sampling with FlameGraph output, OpenBSD ptrace security pledges. |
-| **Git & Version Control** | Arch Linux, Gentoo | Zero-copy mmap SHA-256 content-addressed object store and packfile index lookup. |
+| **strace, ltrace & bpftrace** | eBPF Linux | eBPF zero-copy syscall tracer eliminating ptrace context switches (<0.04us per call), eBPF syscall latency histogram generation, bpftrace script compilation into kernel eBPF bytecode, dynamic symbol PLT call interceptor. |
+| **Valgrind Memcheck, ASan, TSan, MSan, UBSan** | Debian, Gentoo | VEX IR binary shadow memory sanitizer with sub-2x execution overhead, unified ASan/TSan/MSan/UBSan shadow memory validation, valid/uninitialized/out-of-bounds byte tracking. |
+| **perf, DTrace, ktrace, ptrace** | Illumos, FreeBSD, NetBSD, OpenBSD | Illumos DTrace eBPF provider probes & USDT header generators (`DTRACE_PROBE`), BSD ktrace VFS/sysctl ring buffers, hardware PMU counter sampling with FlameGraph profile rendering, OpenBSD ptrace security pledges. |
+| **Git & Version Control** | Arch Linux, Gentoo | Zero-copy mmap SHA-256 content-addressed object store and binary search O(1) packfile index lookup. |
 | **Python, Perl, Ruby** | Fedora, Debian, Ubuntu | Distro-level Ahead-Of-Time (AOT) bytecode compilation (`.pyc` opt_level=2), isolated CPAN vendor sandboxes (`File::Spec`), Ruby 3.3 YJIT profile evaluator. |
-| **Rust & Go** | Gentoo, Arch Linux | Cargo-vendor offline mirror cache with SHA-256 verification, eBPF zero-overhead CGO FFI bridge. |
-| **Zig, Swift, Bun, Deno & OpenJDK** | Alpine, Arch, Ubuntu, Clear Linux | Zig build runner (-Doptimize=ReleaseFast), Bun/Deno V8/JSC runtime initialization (sub-1ms execution), GraalVM native image AOT generator producing standalone ELF binaries with sub-10ms cold start and ZGC zero-pause collector. |
+| **Rust & Go** | Gentoo, Arch Linux | Cargo-vendor offline mirror cache with SHA-256 verification, eBPF zero-overhead CGO FFI bridge into native kernel ring buffers. |
+| **Zig, Swift, Bun, Deno & OpenJDK** | Alpine, Arch, Ubuntu, Clear Linux | Zig build runner (-Doptimize=ReleaseFast), Bun/Deno V8/JSC runtime initialization (sub-1ms execution), GraalVM native image AOT generator producing standalone ELF binaries with sub-10ms cold start and ZGC zero-pause collector configuration. |
 
 ---
 
@@ -31,25 +31,25 @@ The goal is to achieve 100% native parity and performance supremacy across compi
 
 ### 1. Compiler & Linker Engine (`GccClangLlvmToolchainPrEngine`)
 - **FMV & Vectorization Matrix**: Clear Linux inspired Function Multi-Versioning (`-O3 -march=native -ffast-math -ftree-vectorize`) for AVX-512, AVX2, and SSE4.2 hardware targets.
-- **Security Hardening**: Fedora Fortify Level 3 (`-D_FORTIFY_SOURCE=3 -fstack-clash-protection -fstack-protector-strong -fPIE -pie`) combined with OpenBSD Retguard return address XOR cookies (`-mretguard`).
+- **Security Hardening & Annotations**: Fedora Fortify Level 3 (`-D_FORTIFY_SOURCE=3 -fstack-clash-protection -fstack-protector-strong -fPIE -pie`), Annobin ELF `.note.gnu.property` security annotation parsing, combined with OpenBSD Retguard return address XOR cookies (`-mretguard`).
 - **Parallel Linker (LLD)**: Lock-free parallel section merging, thread-pool allocation (`--threads=0`), and RELRO/BIND_NOW link flags (`-z relro -z now`).
-- **GDB RSP & Binutils**: GDB remote serial protocol packet formatter with checksum verification and binutils objdump disassembly helpers.
+- **GDB RSP & Binutils**: GDB remote serial protocol packet formatter with checksum verification, DWARF5 split debuginfo specification generation (`.dwo`/`.dwp`), and binutils objdump disassembly helpers.
 
 ### 2. Build Orchestration Engine (`BuildSystemsPkgConfigPrEngine`)
-- **Ninja / Samurai Graph Parser**: High-performance zero-allocation build spec parser parsing `build target: rule inputs` in sub-microseconds.
-- **Make Jobserver**: GNU Make and FreeBSD bmake parallel jobserver parser for `-jN` concurrency flags.
-- **Sysroot Pkg-Config**: Hermetic prefix resolution ensuring zero host-path leakage for cross-compilation environments.
+- **Ninja / Samurai Graph Parser**: High-performance zero-allocation build spec parser parsing `build target: rule inputs` in sub-microseconds with cycle detection.
+- **Make Jobserver**: GNU Make and FreeBSD bmake parallel jobserver token bucket simulator for `-jN` concurrency flags.
+- **Multi-Arch Pkg-Config**: Hermetic prefix resolution and Debian/Ubuntu multi-arch library path mapping (`/usr/lib/<triple>/pkgconfig`) ensuring zero host-path leakage for cross-compilation environments.
 - **Toolchain Specification Generators**: Automated emission of CMake `toolchain.cmake`, Meson `cross_file.txt`, and Autotools m4 macro caches.
 
 ### 3. Debugging, Tracing & Profiling Suite (`DebuggerTracerProfilerPrEngine`)
-- **Zero-Switch Syscall Tracing**: Replaces legacy ptrace-based strace loops with kernel eBPF ring buffer probes, dropping tracing latency from 1.2us to <0.04us.
-- **Illumos DTrace Engine**: D language provider probes (`dtrace_probe_fire`) transpiling into kernel eBPF tracepoints.
-- **Valgrind Shadow Memory Emulator**: Dual-bit shadow map checking validity and alignment on every memory load/store.
-- **LLDB & Dynamic Tracing**: LLDB DWARF5 stack expression evaluator, ltrace PLT symbol interceptor, BSD ktrace event logger, and OpenBSD ptrace pledge validator.
+- **Zero-Switch Syscall Tracing**: Replaces legacy ptrace-based strace loops with kernel eBPF ring buffer probes, dropping tracing latency from 1.2us to <0.04us with log2 latency histogram generation.
+- **Illumos DTrace Engine**: D language provider probes (`dtrace_probe_fire`) and USDT C header macro generators (`DTRACE_PROBE`) transpiling into kernel eBPF tracepoints.
+- **Valgrind & Sanitizer Shadow Memory Emulator**: Dual-bit shadow map checking validity and alignment on every memory load/store for Memcheck, ASan, TSan, MSan, and UBSan.
+- **LLDB & Dynamic Tracing**: LLDB DWARF5 stack expression evaluator, ltrace PLT symbol interceptor, BSD ktrace event logger, OpenBSD ptrace pledge validator, and Linux perf hardware PMU counter sampler with FlameGraph profile rendering.
 
 ### 4. Version Control & Language Runtime Engine (`VcsAndLanguageRuntimesPrEngine`)
-- **Git Packfile Indexing**: O(1) fanout table indexing for zero-copy packfile object queries.
-- **Polyglot Runtimes**: CPython AOT bytecode compilation (`.pyc`), Perl CPAN vendor module verification, Ruby YJIT compilation thresholds, Cargo vendor mirror verification, Go cgo zero-copy bridge, and OpenJDK GraalVM native image optimization.
+- **Git Packfile Indexing**: O(1) fanout table indexing and binary search for zero-copy packfile object queries.
+- **Polyglot Runtimes**: CPython AOT bytecode compilation (`.pyc`), Perl CPAN vendor module verification, Ruby YJIT compilation thresholds, Cargo vendor mirror verification, Go cgo zero-copy bridge, and OpenJDK GraalVM native image optimization with ZGC zero-pause collector configuration.
 
 ---
 
