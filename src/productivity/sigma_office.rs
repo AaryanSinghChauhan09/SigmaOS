@@ -13910,5 +13910,442 @@ mod tests_phase2 {
         let sla_status = sla_engine.evaluate_ticket_sla(TicketPriority::High, 20, 50, &rules);
         assert!(sla_status.is_response_breached);
         assert!(!sla_status.is_resolution_breached);
+
+        // 50. Sovereign Google Docs Paginated Header Footer Engine
+        let page_engine = SovereignGoogleDocsPaginatedHeaderFooterEngine::new();
+        let section_cfg = SectionHeaderFooterConfig {
+            section_index: 1,
+            header_text: "Q3 Report - Page {PAGE}".to_string(),
+            footer_text: "Confidential - Page {PAGE}".to_string(),
+            first_page_different: true,
+            even_odd_different: true,
+            top_margin_pt: 72.0,
+            bottom_margin_pt: 72.0,
+        };
+        let page_res = page_engine.render_headers_footers(&section_cfg, 3, 0);
+        assert_eq!(page_res.len(), 3);
+        assert_eq!(page_res[0].header_content, ""); // first page different
+        assert!(page_res[1].header_content.contains("[EVEN]"));
+
+        // 51. Sovereign Google Sheets Custom Conditional Formatting Rule Engine
+        let cf_engine = SovereignGoogleSheetsCustomConditionalFormattingRuleEngine::new();
+        let cf_rule = CustomConditionalFormatRule {
+            rule_id: "RULE_01".to_string(),
+            target_range: "A1:A10".to_string(),
+            format_type: ConditionalFormatType::CellIs { operator: ">".to_string(), threshold: 50.0 },
+            highlight_background_hex: "#FF0000".to_string(),
+        };
+        let cf_eval = cf_engine.evaluate_rule(&cf_rule, &[("A1", 75.0), ("A2", 30.0)]);
+        assert_eq!(cf_eval[0].applied_background_color, Some("#FF0000".to_string()));
+        assert_eq!(cf_eval[1].applied_background_color, None);
+
+        // 52. Sovereign Microsoft Power BI Calculated Table Engine
+        let pbi_engine = SovereignMicrosoftPowerBiCalculatedTableEngine::new();
+        let src_col = SourceTableColumnSpec {
+            column_name: "Revenue".to_string(),
+            values: vec![100.0, 200.0, 50.0],
+        };
+        let pbi_res = pbi_engine.generate_calculated_table("TaxedRevenue", &src_col, 1.1, 100.0);
+        assert_eq!(pbi_res.row_count, 2);
+
+        // 53. Sovereign Salesforce Einstein Lead Scoring Engine
+        let lead_scoring_engine = SovereignSalesforceEinsteinLeadScoringEngine::new();
+        let lead_in = LeadScoringInput {
+            lead_id: "LEAD_EINSTEIN_01".to_string(),
+            email_opens: 5,
+            website_visits: 8,
+            company_size_headcount: 1200,
+            days_since_last_interaction: 2,
+        };
+        let score_res = lead_scoring_engine.calculate_lead_score(&lead_in);
+        assert!(score_res.final_lead_score >= 80);
+        assert_eq!(score_res.recommended_action, "Assign to Enterprise AE immediately");
+
+        // 54. Sovereign Odoo Inventory Batch Serial Tracking Engine
+        let batch_engine = SovereignOdooInventoryBatchSerialTrackingEngine::new();
+        let batch_item = BatchSerialItem {
+            serial_or_batch_number: "LOT-2025-001".to_string(),
+            product_id: "PROD-MED".to_string(),
+            location_id: "WH/Stock".to_string(),
+            quantity: 50,
+            is_expired: false,
+        };
+        let transfer_res = batch_engine.process_inventory_transfer(&batch_item, "WH/Stock", "WH/Output", 20);
+        assert!(transfer_res.is_movement_valid);
+        assert_eq!(transfer_res.moved_quantity, 20);
+
+        // 55. Sovereign Bitrix24 Omnichannel Task Kanban Automation Engine
+        let kanban_engine = SovereignBitrix24OmnichannelTaskKanbanAutomationEngine::new();
+        let task_item = KanbanTaskItem {
+            task_id: "TASK_101".to_string(),
+            current_stage: "New".to_string(),
+            priority: TicketPriority::Urgent,
+            is_overdue: true,
+        };
+        let kanban_res = kanban_engine.evaluate_kanban_automation(&task_item, "In Progress");
+        assert_eq!(kanban_res.new_stage, "In Progress");
+        assert!(kanban_res.escalation_flagged);
+    }
+}
+// New suite engines implementation for Google Workspace, Microsoft 365, Zoho, Salesforce, Odoo, and Bitrix24 inspirations
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SectionHeaderFooterConfig {
+    pub section_index: usize,
+    pub header_text: String,
+    pub footer_text: String,
+    pub first_page_different: bool,
+    pub even_odd_different: bool,
+    pub top_margin_pt: f32,
+    pub bottom_margin_pt: f32,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct RenderedPageHeaderFooter {
+    pub page_number: usize,
+    pub header_content: String,
+    pub footer_content: String,
+    pub page_number_text: String,
+}
+
+pub struct SovereignGoogleDocsPaginatedHeaderFooterEngine;
+
+impl SovereignGoogleDocsPaginatedHeaderFooterEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn render_headers_footers(
+        &self,
+        config: &SectionHeaderFooterConfig,
+        total_pages_in_section: usize,
+        global_page_offset: usize,
+    ) -> Vec<RenderedPageHeaderFooter> {
+        let mut results = Vec::new();
+        for i in 1..=total_pages_in_section {
+            let current_global_page = global_page_offset + i;
+            let is_first = i == 1;
+            let is_even = i % 2 == 0;
+
+            let header = if is_first && config.first_page_different {
+                String::new()
+            } else if config.even_odd_different && is_even {
+                format!("[EVEN] {}", config.header_text)
+            } else {
+                config.header_text.clone()
+            };
+
+            let footer = if is_first && config.first_page_different {
+                String::new()
+            } else if config.even_odd_different && is_even {
+                format!("[EVEN] {}", config.footer_text)
+            } else {
+                config.footer_text.clone()
+            };
+
+            let page_text = format!("Page {}", current_global_page);
+
+            results.push(RenderedPageHeaderFooter {
+                page_number: current_global_page,
+                header_content: header.replace("{PAGE}", &current_global_page.to_string()),
+                footer_content: footer.replace("{PAGE}", &current_global_page.to_string()),
+                page_number_text: page_text,
+            });
+        }
+        results
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ConditionalFormatType {
+    CellIs { operator: String, threshold: f64 },
+    ColorScale { min_color_hex: String, max_color_hex: String, min_val: f64, max_val: f64 },
+    DataBar { bar_color_hex: String, min_val: f64, max_val: f64 },
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CustomConditionalFormatRule {
+    pub rule_id: String,
+    pub target_range: String,
+    pub format_type: ConditionalFormatType,
+    pub highlight_background_hex: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct EvaluatedCellFormatting {
+    pub cell_ref: String,
+    pub cell_value: f64,
+    pub applied_background_color: Option<String>,
+    pub data_bar_fill_pct: Option<f64>,
+}
+
+pub struct SovereignGoogleSheetsCustomConditionalFormattingRuleEngine;
+
+impl SovereignGoogleSheetsCustomConditionalFormattingRuleEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_rule(
+        &self,
+        rule: &CustomConditionalFormatRule,
+        cell_values: &[(&str, f64)],
+    ) -> Vec<EvaluatedCellFormatting> {
+        let mut res = Vec::new();
+        for &(cell_ref, val) in cell_values {
+            let mut bg = None;
+            let mut bar_pct = None;
+
+            match &rule.format_type {
+                ConditionalFormatType::CellIs { operator, threshold } => {
+                    let matched = match operator.as_str() {
+                        ">" => val > *threshold,
+                        ">=" => val >= *threshold,
+                        "<" => val < *threshold,
+                        "<=" => val <= *threshold,
+                        "==" => (val - *threshold).abs() < 1e-6,
+                        _ => false,
+                    };
+                    if matched {
+                        bg = Some(rule.highlight_background_hex.clone());
+                    }
+                }
+                ConditionalFormatType::ColorScale { min_val, max_val, min_color_hex, max_color_hex } => {
+                    if val >= *max_val {
+                        bg = Some(max_color_hex.clone());
+                    } else if val <= *min_val {
+                        bg = Some(min_color_hex.clone());
+                    } else {
+                        bg = Some(rule.highlight_background_hex.clone());
+                    }
+                }
+                ConditionalFormatType::DataBar { min_val, max_val, .. } => {
+                    let clamped = val.clamp(*min_val, *max_val);
+                    let range = max_val - min_val;
+                    let pct = if range > 0.0 {
+                        ((clamped - min_val) / range) * 100.0
+                    } else {
+                        0.0
+                    };
+                    bar_pct = Some(pct);
+                    bg = Some(rule.highlight_background_hex.clone());
+                }
+            }
+
+            res.push(EvaluatedCellFormatting {
+                cell_ref: cell_ref.to_string(),
+                cell_value: val,
+                applied_background_color: bg,
+                data_bar_fill_pct: bar_pct,
+            });
+        }
+        res
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SourceTableColumnSpec {
+    pub column_name: String,
+    pub values: Vec<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct PowerBiCalculatedTableResult {
+    pub table_name: String,
+    pub row_count: usize,
+    pub calculated_columns: HashMap<String, Vec<f64>>,
+}
+
+pub struct SovereignMicrosoftPowerBiCalculatedTableEngine;
+
+impl SovereignMicrosoftPowerBiCalculatedTableEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_calculated_table(
+        &self,
+        table_name: &str,
+        source_column: &SourceTableColumnSpec,
+        multiplier_expression: f64,
+        threshold_filter: f64,
+    ) -> PowerBiCalculatedTableResult {
+        let mut calc_col = Vec::new();
+        for &val in &source_column.values {
+            if val >= threshold_filter {
+                calc_col.push(val * multiplier_expression);
+            }
+        }
+
+        let mut calculated_columns = HashMap::new();
+        calculated_columns.insert(format!("{}_CALC", source_column.column_name), calc_col.clone());
+
+        PowerBiCalculatedTableResult {
+            table_name: table_name.to_string(),
+            row_count: calc_col.len(),
+            calculated_columns,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct LeadScoringInput {
+    pub lead_id: String,
+    pub email_opens: u32,
+    pub website_visits: u32,
+    pub company_size_headcount: u32,
+    pub days_since_last_interaction: u32,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct EinsteinLeadScoreResult {
+    pub lead_id: String,
+    pub final_lead_score: u32,
+    pub conversion_probability: f64,
+    pub recommended_action: String,
+}
+
+pub struct SovereignSalesforceEinsteinLeadScoringEngine;
+
+impl SovereignSalesforceEinsteinLeadScoringEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_lead_score(&self, input: &LeadScoringInput) -> EinsteinLeadScoreResult {
+        let engagement = (input.email_opens * 5 + input.website_visits * 10) as f64;
+        let firmographic = if input.company_size_headcount > 1000 {
+            40.0
+        } else if input.company_size_headcount > 100 {
+            25.0
+        } else {
+            10.0
+        };
+
+        let decay = (input.days_since_last_interaction as f64 * 1.5).min(50.0);
+        let raw_score = (engagement + firmographic - decay).clamp(0.0, 100.0);
+        let final_score = raw_score.round() as u32;
+
+        let probability = (final_score as f64 / 100.0) * 0.85;
+
+        let action = if final_score >= 75 {
+            "Assign to Enterprise AE immediately".to_string()
+        } else if final_score >= 40 {
+            "Enroll in Nurture Campaign".to_string()
+        } else {
+            "Low Priority - Archive".to_string()
+        };
+
+        EinsteinLeadScoreResult {
+            lead_id: input.lead_id.clone(),
+            final_lead_score: final_score,
+            conversion_probability: (probability * 100.0).round() / 100.0,
+            recommended_action: action,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BatchSerialItem {
+    pub serial_or_batch_number: String,
+    pub product_id: String,
+    pub location_id: String,
+    pub quantity: u32,
+    pub is_expired: bool,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct InventoryMovementResult {
+    pub serial_or_batch_number: String,
+    pub from_location: String,
+    pub to_location: String,
+    pub moved_quantity: u32,
+    pub is_movement_valid: bool,
+    pub validation_message: String,
+}
+
+pub struct SovereignOdooInventoryBatchSerialTrackingEngine;
+
+impl SovereignOdooInventoryBatchSerialTrackingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn process_inventory_transfer(
+        &self,
+        item: &BatchSerialItem,
+        from_loc: &str,
+        to_loc: &str,
+        transfer_qty: u32,
+    ) -> InventoryMovementResult {
+        if item.is_expired {
+            return InventoryMovementResult {
+                serial_or_batch_number: item.serial_or_batch_number.clone(),
+                from_location: from_loc.to_string(),
+                to_location: to_loc.to_string(),
+                moved_quantity: 0,
+                is_movement_valid: false,
+                validation_message: "Cannot transfer expired batch or serial number".to_string(),
+            };
+        }
+
+        if item.quantity < transfer_qty {
+            return InventoryMovementResult {
+                serial_or_batch_number: item.serial_or_batch_number.clone(),
+                from_location: from_loc.to_string(),
+                to_location: to_loc.to_string(),
+                moved_quantity: 0,
+                is_movement_valid: false,
+                validation_message: "Insufficient quantity in source batch location".to_string(),
+            };
+        }
+
+        InventoryMovementResult {
+            serial_or_batch_number: item.serial_or_batch_number.clone(),
+            from_location: from_loc.to_string(),
+            to_location: to_loc.to_string(),
+            moved_quantity: transfer_qty,
+            is_movement_valid: true,
+            validation_message: "Inventory transfer completed successfully".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct KanbanTaskItem {
+    pub task_id: String,
+    pub current_stage: String,
+    pub priority: TicketPriority,
+    pub is_overdue: bool,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct KanbanAutomationResult {
+    pub task_id: String,
+    pub new_stage: String,
+    pub assigned_agent: String,
+    pub escalation_flagged: bool,
+}
+
+pub struct SovereignBitrix24OmnichannelTaskKanbanAutomationEngine;
+
+impl SovereignBitrix24OmnichannelTaskKanbanAutomationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_kanban_automation(&self, task: &KanbanTaskItem, target_stage: &str) -> KanbanAutomationResult {
+        let (assigned_agent, escalation) = if task.is_overdue || task.priority == TicketPriority::Urgent {
+            ("Tier_2_Lead_Agent".to_string(), true)
+        } else {
+            ("Default_Queue_Worker".to_string(), false)
+        };
+
+        KanbanAutomationResult {
+            task_id: task.task_id.clone(),
+            new_stage: target_stage.to_string(),
+            assigned_agent,
+            escalation_flagged: escalation,
+        }
     }
 }
