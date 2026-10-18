@@ -86,10 +86,28 @@ pub use designcraft::{
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
 };
+pub use designcraft_artcraft_parity_pr::{
+    DesigncraftArtcraftParityPrSuite,
+    DesigncraftArtcraftPrProposalManifest as DesigncraftArtcraftParityPrProposalManifest,
+    DesigncraftAutoLayoutFlexboxPrEngine,
+    DesigncraftCodeExportFrameworkPrEngine,
+    DesigncraftComponentVariantsPrEngine,
+    DesigncraftDesignSystemTokensPrEngine,
+    DesigncraftDesignTokensStyleDictionaryPrEngine,
+    DesigncraftIconSystemPackagingPrEngine,
+    DesigncraftInteractivePrototypingPrEngine as DesigncraftInteractivePrototypingPrEngineParity,
+    DesigncraftMultiplayerCrdtSyncPrEngine,
+    DesigncraftVectorBooleanGeometryPrEngine,
+    DesigncraftWcagAccessibilityAuditPrEngine,
+    SovereignDesigncraftArtcraftParityPrGateway as SovereignDesigncraftArtcraftParityPrGatewayV2,
+};
 pub use designcraft_missing_components_parity_pr::{
-    DesigncraftAutoLayoutFlexEngine, DesigncraftCodeExportEngine,
-    DesigncraftDesignSystemVariablesEngine, DesigncraftInteractivePrototypingPrEngine,
-    DesigncraftMultiplayerCrdtEngine, DesigncraftPrCategory, DesigncraftPrProposalSpec,
+    DesigncraftAccessibilityAuditLintPrEngine, DesigncraftAutoLayoutFlexEngine,
+    DesigncraftCodeExportEngine, DesigncraftComponentVariantsPrEngine as DesigncraftComponentVariantsPrEngineLegacy,
+    DesigncraftDesignSystemVariablesEngine, DesigncraftDesignTokensStyleDictionaryPrEngine as DesigncraftDesignTokensStyleDictionaryPrEngineLegacy,
+    DesigncraftIconSystemPackagingPrEngine as DesigncraftIconSystemPackagingPrEngineLegacy,
+    DesigncraftInteractivePrototypingPrEngine, DesigncraftMultiplayerCrdtEngine,
+    DesigncraftPrCategory, DesigncraftPrProposalManifest, DesigncraftPrProposalSpec,
     DesigncraftVectorGeometryEngine, SovereignDesigncraftArtcraftParityPrGateway,
 };
 pub use effectcraft::{
