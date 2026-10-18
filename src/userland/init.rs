@@ -1488,10 +1488,7 @@ impl SystemdTimerSpec {
     }
 }
 
-/// Systemd OnCalendar Expression Parser
-pub struct SystemdOnCalendarParser;
-
-impl SystemdOnCalendarParser {
+impl SystemdOnCalendarExpressionParser {
     pub fn parse_expression(expr: &str) -> Option<(u32, u32)> {
         let trimmed = expr.trim();
         if trimmed == "daily" || trimmed == "*-*-* 00:00:00" {

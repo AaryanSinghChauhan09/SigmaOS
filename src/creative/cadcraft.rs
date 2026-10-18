@@ -64,24 +64,6 @@ impl Vector3D {
     }
 }
 
-/// 3D Vector / Point
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Vector3D {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-}
-
-impl Vector3D {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
-        Self { x, y, z }
-    }
-
-    pub fn length(&self) -> f64 {
-        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
-    }
-}
-
 /// 2D Line
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Line2D {
@@ -110,16 +92,6 @@ pub enum SketchEntity {
         dimensions: Vec<f32>,
         properties: BTreeMap<String, String>,
     },
-}
-
-/// 2D Sketch entity
-#[derive(Debug, Clone)]
-pub struct SketchEntity {
-    pub id: u32,
-    pub entity_type: SketchEntityType,
-    pub points: Vec<[f32; 2]>,
-    pub dimensions: Vec<f32>,
-    pub properties: BTreeMap<String, String>,
 }
 
 /// Geometric constraint type

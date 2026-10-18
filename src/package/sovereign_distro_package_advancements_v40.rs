@@ -435,8 +435,6 @@ pub struct UniversalCrossDistroSatSolverV39 {
     pub canonical_mapping: BTreeMap<String, String>,
 }
 
-pub type UniversalCrossDistroSatSolverV40 = UniversalCrossDistroSatSolverV39;
-
 impl UniversalCrossDistroSatSolverV39 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();

@@ -614,8 +614,6 @@ impl Default for EffectcraftOpticalFlowMotionVectorPrEngine {
     }
 }
 
-pub type EffectcraftOpticalFlowMotionVectorPrEngine = OpticalFlowSlowMotionTimeWarpPrEngine;
-
 /// Light shaft parameters for 3D volumetric raymarching.
 #[derive(Debug, Clone, PartialEq)]
 pub struct LightShaft {
