@@ -4,6 +4,10 @@
 
 extern crate alloc;
 
+#[allow(non_camel_case_types)]
+#[allow(dead_code)]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -576,70 +580,10 @@ impl Default for WikiSpecificationDataSyncer {
     }
 }
 
-#[derive(Debug)]
-pub struct MasterWikiAndRoadmapVerificationSuite {
-    pub parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine,
-    pub syncer: WikiSpecificationDataSyncer,
-    pub ideas: Vec<RoadmapFeatureIdea>,
-}
-
-impl MasterWikiAndRoadmapVerificationSuite {
-    pub fn new() -> Self {
-        Self {
-            parity_engine: SovereignLinuxBsdWikiRoadmapParityEngine::new(),
-            syncer: WikiSpecificationDataSyncer::new(),
-            ideas: vec![
-                RoadmapFeatureIdea {
-                    idea_id: 101,
-                    id: 101,
-                    title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
-                    category: "Productivity",
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
-                        .to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                    fulfilled: true,
-                },
-                RoadmapFeatureIdea {
-                    idea_id: 102,
-                    id: 102,
-                    title: "Sovereign Thunderbird Email Client".to_string(),
-                    category: "Productivity",
-                    source_type: FeatureSourceType::AppReplacementPr,
-                    source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
-                        .to_string(),
-                    target_module: "productivity".to_string(),
-                    is_fully_implemented: true,
-                    fulfilled: true,
-                },
-            ],
-        }
-    }
-
-    pub fn health_check(&self) -> bool {
-        self.parity_engine.verify_100_percent_parity()
-    }
-
-    pub fn summary_report(&self) -> String {
-        format!(
-            "Master Wiki and Roadmap Parity Report: {} items verified. Parity Verification: 100.0%",
-            self.ideas.len()
-        )
-    }
-}
-
-impl Default for MasterWikiAndRoadmapVerificationSuite {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 /// ---------------------------------------------------------------------------
 /// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
 
-#[derive(Debug)]
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Suite100Ideas,
     pub shards_registry: SovereignShardsMasterRegistry,

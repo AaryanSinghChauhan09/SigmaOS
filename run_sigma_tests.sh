@@ -387,6 +387,13 @@ if [ -f "src/creative/cadcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_cadcraft_missing
 fi
 
+if [ -f "src/creative/cadcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign CadCraft to ArtCraft Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/cadcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_cadcraft_artcraft_parity
+    ./build/test_cadcraft_artcraft_parity
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build

@@ -193,6 +193,10 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
+            ExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"#ZENITH_PRESENTATION_FORMAT_STREAM\n");
+                output.extend_from_slice(deck.title.as_bytes());
+            }
         }
 
         output
@@ -211,7 +215,15 @@ impl DeckCraftEngine {
     pub fn new() -> Self {
         Self {
             decks: BTreeMap::new(),
-            presenter_state: PresenterNotes { current_slide: 0, active: false },
+            presenter_state: PresenterState {
+                active_deck_id: None,
+                current_slide_index: 0,
+                in_presenter_mode: false,
+                timer_running: false,
+                elapsed_secs: 0,
+                laser_pointer_active: false,
+                black_screen: false,
+            },
             next_deck_id: AtomicU32::new(1),
             active: AtomicBool::new(false),
         }

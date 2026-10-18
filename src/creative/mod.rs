@@ -7,6 +7,8 @@ pub mod anicraft_missing_components_parity_pr;
 pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
+pub mod cadcraft_artcraft_parity_pr;
+pub mod cadcraft_missing_components_parity_pr;
 pub mod deckcraft;
 pub mod deckcraft_artcraft_parity_pr;
 pub mod deckcraft_missing_components_parity_pr;
@@ -34,6 +36,9 @@ pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod wordcraft;
+
+pub use cadcraft_artcraft_parity_pr::*;
+pub use cadcraft_missing_components_parity_pr::*;
 
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
@@ -109,7 +114,15 @@ pub use effectcraft_missing_components_parity_pr::{
     EffectcraftExpressionScriptingRiggingPrEngine, EffectcraftMissingComponentsParityPrSuite,
     EffectcraftOpticalFlowMotionVectorPrEngine, EffectcraftPrProposalManifest,
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway, Spatial3DDepthCompositorPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftMissingComponentsParityPrGateway,
+    Spatial3DDepthCompositorPrEngine,
+};
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine, FigcraftMultiUserCrdtCollaborationPrEngine,
+    FigcraftPrProposalManifest, FigcraftVectorNetworkBooleanOpsPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
 };
 pub use figcraft_missing_components_parity_pr::{
     FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
@@ -282,10 +295,8 @@ pub use wordcraft::{
     WordCraftPullRequestSpec,
 };
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine,
-    WordcraftEpubPdfBookPublisherPrEngine, WordcraftLinguisticAiSpellGrammarPrEngine,
-    WordcraftMailMergeAutomationPrEngine, WordcraftMissingComponentsParityPrSuite,
-    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
-    WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
-    WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
+    WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
+    WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
+    WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
 };

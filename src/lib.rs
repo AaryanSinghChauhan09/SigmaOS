@@ -22,6 +22,8 @@ pub mod compatibility;
 pub mod container;
 pub mod contributing;
 pub mod creative;
+pub use creative::cadcraft_artcraft_parity_pr::*;
+pub use creative::cadcraft_missing_components_parity_pr::*;
 pub use creative::effectcraft_missing_components_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
 pub use creative::threedcraft_missing_components_parity_pr::*;

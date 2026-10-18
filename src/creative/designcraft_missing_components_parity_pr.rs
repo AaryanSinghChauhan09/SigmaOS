@@ -73,9 +73,7 @@ impl DesigncraftPrCategory {
             Self::DesignTokensStyleDictionary => {
                 "W3C design tokens & style dictionary multi-platform transformer"
             }
-            Self::IconSystemPackagingSymbols => {
-                "vector icon library packaging & SVG symbol sprite sheet compiler"
-            }
+            Self::IconSystemPackagingSymbols => "icon system packaging & symbol library manager",
             Self::AccessibilityAuditWcagLint => {
                 "WCAG 2.1 AA/AAA accessibility contrast & touch target auditor"
             }
