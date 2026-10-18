@@ -102,8 +102,12 @@ fn test_github_templates_exist() {
         .expect("PULL_REQUEST_TEMPLATE.md should exist");
     assert!(pr_template.contains("Study document") || pr_template.contains("Upstream study"));
     assert!(pr_template.contains("Reference study") || pr_template.contains("What SigmaOS adopts"));
-    assert!(pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback"));
-    assert!(pr_template.contains("Kernel safety review") || pr_template.contains("Reviewer checklist"));
+    assert!(
+        pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback")
+    );
+    assert!(
+        pr_template.contains("Kernel safety review") || pr_template.contains("Reviewer checklist")
+    );
 
     // Check Study Issue Template
     let study_issue = fs::read_to_string(".github/ISSUE_TEMPLATE/study_issue.yml")

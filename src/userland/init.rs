@@ -136,7 +136,6 @@ impl InitSystem {
     }
 }
 
-
 // ============================================================================
 // Linux & BSD Distro Core Userland Parity Extensions
 // ============================================================================
@@ -310,12 +309,14 @@ impl SystemdTransientScopeGovernor {
     }
 
     pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.clone(), slice.clone());
+        self.transient_scopes
+            .insert(scope_name.clone(), slice.clone());
         self.active_scopes.insert(scope_name, slice);
     }
 
     pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.to_string(), slice.clone());
+        self.transient_scopes
+            .insert(scope_name.to_string(), slice.clone());
         self.active_scopes.insert(scope_name.to_string(), slice);
     }
 
@@ -768,8 +769,6 @@ impl OpenRcHeader {
     }
 }
 
-
-
 // ============================================================================
 // runit & s6 Supervision Subsystem
 // ============================================================================
@@ -990,7 +989,6 @@ impl SysVInittabEntry {
     }
 }
 
-
 /// BSD `rc.d` / `rc.subr` Directives
 #[derive(Debug, Clone, Default)]
 pub struct BsdRcScript {
@@ -1177,9 +1175,11 @@ impl LaunchdJobSupervisorEngine {
             if job.keep_alive {
                 let mock_pid = 5000 + label.len() as u32;
                 self.running_pids.insert(label.to_string(), mock_pid);
-                self.job_states.insert(label.to_string(), ServiceState::Running);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Running);
             } else {
-                self.job_states.insert(label.to_string(), ServiceState::Stopped);
+                self.job_states
+                    .insert(label.to_string(), ServiceState::Stopped);
             }
         }
     }
@@ -1447,7 +1447,6 @@ pub struct AtJob {
     pub queue: char, // 'a'..'z' or 'b' for batch
     pub max_load_average: Option<f32>,
 }
-
 
 /// Systemd Timer Specification
 #[derive(Debug, Clone)]
@@ -1992,5 +1991,4 @@ mod tests {
         let diff = gateway.generate_pr_unified_diff(pr_id).unwrap();
         assert!(diff.contains("Add systemd socket activation support"));
     }
-
 }

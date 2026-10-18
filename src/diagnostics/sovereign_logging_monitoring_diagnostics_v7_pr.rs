@@ -914,8 +914,9 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV7 {
                 .to_string(),
             author: "SigmaLoggingTeam".to_string(),
             target_component: "journald_v7".to_string(),
-            description: "Implements FSS Dilithium5 PQC sealing and RELP syslog-ng destination queues"
-                .to_string(),
+            description:
+                "Implements FSS Dilithium5 PQC sealing and RELP syslog-ng destination queues"
+                    .to_string(),
             pqc_signature: "DILITHIUM5_SIG_JOURNAL_NS_701".to_string(),
             status: DiagnosticsPrStatusV7::Merged,
         });
@@ -926,8 +927,9 @@ impl LoggingMonitoringDiagnosticsPullRequestGatewayV7 {
                 .to_string(),
             author: "SigmaHardwareTeam".to_string(),
             target_component: "hardware_discovery_v7".to_string(),
-            description: "Implements PCIe 5.0/6.0 telemetry, USB4 40Gbps discovery, and OTLP exporters"
-                .to_string(),
+            description:
+                "Implements PCIe 5.0/6.0 telemetry, USB4 40Gbps discovery, and OTLP exporters"
+                    .to_string(),
             pqc_signature: "DILITHIUM5_SIG_HW_HEALTH_702".to_string(),
             status: DiagnosticsPrStatusV7::CiGated,
         });
@@ -1052,7 +1054,10 @@ mod tests {
             facility: "kern".to_string(),
             message: "Kernel panic - not syncing: Fatal Exception".to_string(),
             is_panic_or_oops: true,
-            call_stack: vec!["sys_execve+0x42".to_string(), "do_page_fault+0x18".to_string()],
+            call_stack: vec![
+                "sys_execve+0x42".to_string(),
+                "do_page_fault+0x18".to_string(),
+            ],
         });
 
         let summary = dmesg.format_boot_summary();

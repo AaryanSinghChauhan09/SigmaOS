@@ -211,7 +211,8 @@ impl GlibcInspirationsPrEngine {
             target_subsystem: "C Library Core Runtime".to_string(),
             original_runtime: "GNU C Library (glibc)".to_string(),
             components_added: alloc::vec![
-                "STT_GNU_IFUNC dynamic SIMD dispatcher (memcpy/memset/strlen/strchr/memcmp)".to_string(),
+                "STT_GNU_IFUNC dynamic SIMD dispatcher (memcpy/memset/strlen/strchr/memcmp)"
+                    .to_string(),
                 "O(1) DT_GNU_HASH Bloom filter & symbol lookup table indexing".to_string(),
                 "GLIBC_TUNABLES & mallopt runtime environment configuration parser".to_string(),
                 "TLS Variant I / Variant II DTV & TCB allocation manager".to_string(),
@@ -319,7 +320,8 @@ impl MuslLibcInspirationsPrEngine {
             original_runtime: "musl libc".to_string(),
             components_added: alloc::vec![
                 "Zero-overhead pthread_create with static TLS stack guard layout".to_string(),
-                "malloc-ng slot & slab allocator with guard pages & double-free hardening".to_string(),
+                "malloc-ng slot & slab allocator with guard pages & double-free hardening"
+                    .to_string(),
                 "__synccall lockless multi-thread signal/syscall barrier engine".to_string(),
                 "__unmapself thread stack unmapping & __res_msend DNS resolver".to_string(),
                 "FILE stdio stream buffer lock optimization for high concurrency".to_string(),
@@ -783,7 +785,10 @@ impl LibstdcxxInspirationsPrEngine {
     }
 
     /// Resolve std::variant type-index position.
-    pub fn resolve_variant_type_index(type_id: usize, max_types: usize) -> Result<usize, &'static str> {
+    pub fn resolve_variant_type_index(
+        type_id: usize,
+        max_types: usize,
+    ) -> Result<usize, &'static str> {
         if type_id < max_types {
             Ok(type_id)
         } else {
@@ -905,7 +910,11 @@ impl LibcxxInspirationsPrEngine {
     }
 
     /// Simulate std::shared_ptr control block reference counting state machine.
-    pub fn update_shared_ptr_ref_count(use_count: usize, weak_count: usize, action: &str) -> (usize, usize) {
+    pub fn update_shared_ptr_ref_count(
+        use_count: usize,
+        weak_count: usize,
+        action: &str,
+    ) -> (usize, usize) {
         match action {
             "retain_shared" => (use_count + 1, weak_count),
             "release_shared" => (use_count.saturating_sub(1), weak_count),
@@ -1193,7 +1202,11 @@ mod tests {
         let hash = GlibcInspirationsPrEngine::compute_gnu_hash("memcpy");
         assert_ne!(hash, 0);
 
-        assert!(GlibcInspirationsPrEngine::gnu_hash_bloom_check(hash, 0xFFFF_FFFF_FFFF_FFFF, 6));
+        assert!(GlibcInspirationsPrEngine::gnu_hash_bloom_check(
+            hash,
+            0xFFFF_FFFF_FFFF_FFFF,
+            6
+        ));
 
         let resolved = engine.resolve_ifunc_symbol("memcpy", true, true);
         assert_eq!(resolved, "memcpy_avx512_unaligned_erms");
@@ -1214,7 +1227,10 @@ mod tests {
         assert_eq!(tunables[0].1, "8");
 
         assert_eq!(engine.mallopt_tune("M_MMAP_THRESHOLD", 65536), Ok(65536));
-        assert_eq!(engine.mallopt_tune("M_MMAP_THRESHOLD", 100), Err("invalid_mmap_threshold"));
+        assert_eq!(
+            engine.mallopt_tune("M_MMAP_THRESHOLD", 100),
+            Err("invalid_mmap_threshold")
+        );
 
         assert!(engine.gnu_symbol_version_match("GLIBC_2.34", &["GLIBC_2.2.5", "GLIBC_2.34"]));
         assert!(!engine.gnu_symbol_version_match("GLIBC_2.35", &["GLIBC_2.2.5", "GLIBC_2.34"]));
@@ -1247,11 +1263,16 @@ mod tests {
             8192
         );
 
-        assert!(MuslLibcInspirationsPrEngine::verify_malloc_ng_slab_meta(0x1234, 0x1234));
+        assert!(MuslLibcInspirationsPrEngine::verify_malloc_ng_slab_meta(
+            0x1234, 0x1234
+        ));
 
         let engine = MuslLibcInspirationsPrEngine::new();
         assert!(engine.simulate_unmapself(0x7fff_0000, 8192));
-        assert_eq!(engine.simulate_res_msend("test.sovereign"), Some("127.0.0.1"));
+        assert_eq!(
+            engine.simulate_res_msend("test.sovereign"),
+            Some("127.0.0.1")
+        );
         assert!(engine.execute_synccall_barrier(4));
         assert!(engine.simulate_lockless_stdio_flush("stdout"));
         assert_eq!(engine.execute_syscall_cp(1), Ok(1));
@@ -1270,7 +1291,10 @@ mod tests {
         assert!(engine.is_mmu_less_fdpic(0x00000008));
         assert!(!engine.is_mmu_less_fdpic(0x00000001));
 
-        assert_eq!(UclibcInspirationsPrEngine::calculate_fdpic_got_reloc(0x1000, 0x200), 0x1200);
+        assert_eq!(
+            UclibcInspirationsPrEngine::calculate_fdpic_got_reloc(0x1000, 0x200),
+            0x1200
+        );
         assert_eq!(engine.evaluate_posix_profile("embedded"), 64);
 
         let features = engine.parse_feature_mask(0x05);
@@ -1340,7 +1364,9 @@ mod tests {
         assert!(bionic.verify_pac_bti_integrity(0x1234, 0x5678));
         assert!(bionic.verify_scudo_chunk_tag(0x0A, 0x0A));
         assert!(!bionic.verify_scudo_chunk_tag(0x0A, 0x0B));
-        assert!(BionicInspirationsPrEngine::check_fdsan_owner_tag(3, 0x100, 0x100));
+        assert!(BionicInspirationsPrEngine::check_fdsan_owner_tag(
+            3, 0x100, 0x100
+        ));
         let log_str = bionic.async_safe_format_log(4, "Bionic", "Test Message");
         assert_eq!(log_str, "[P4]<Bionic>: Test Message");
         assert_eq!(
@@ -1358,7 +1384,9 @@ mod tests {
         assert_eq!(tid, 42);
         assert_eq!(ctx, "global_reent_struct");
         assert_eq!(newlib.resolve_impure_ptr(0x2000), 0x2000);
-        assert!(NewlibInspirationsPrEngine::validate_nano_malloc_header(16, true));
+        assert!(NewlibInspirationsPrEngine::validate_nano_malloc_header(
+            16, true
+        ));
         assert_eq!(newlib.simulate_sbrk(1024, 0x1000, 0x4000), Ok(0x1400));
         assert_eq!(
             newlib.simulate_sbrk(0x5000, 0x1000, 0x4000),
@@ -1366,9 +1394,14 @@ mod tests {
         );
 
         let cosmo = CosmopolitanInspirationsPrEngine::new();
-        assert!(CosmopolitanInspirationsPrEngine::verify_ape_magic_header(b"MZqF1234"));
+        assert!(CosmopolitanInspirationsPrEngine::verify_ape_magic_header(
+            b"MZqF1234"
+        ));
         assert_eq!(cosmo.dispatch_ape_syscall(1, "linux"), "linux_sys_entry");
-        assert_eq!(cosmo.dispatch_ape_syscall(1, "freebsd"), "freebsd_sys_entry");
+        assert_eq!(
+            cosmo.dispatch_ape_syscall(1, "freebsd"),
+            "freebsd_sys_entry"
+        );
     }
 
     #[test]
@@ -1385,9 +1418,18 @@ mod tests {
         assert_eq!(mode_heap, "Heap Allocation");
         assert_eq!(capacity_heap, 32);
 
-        assert_eq!(LibstdcxxInspirationsPrEngine::resolve_variant_type_index(1, 3), Ok(1));
-        assert_eq!(LibstdcxxInspirationsPrEngine::resolve_variant_type_index(5, 3), Err("variant_bad_index"));
-        assert_eq!(engine.handle_cxa_pure_virtual(), "pure_virtual_method_called_abort");
+        assert_eq!(
+            LibstdcxxInspirationsPrEngine::resolve_variant_type_index(1, 3),
+            Ok(1)
+        );
+        assert_eq!(
+            LibstdcxxInspirationsPrEngine::resolve_variant_type_index(5, 3),
+            Err("variant_bad_index")
+        );
+        assert_eq!(
+            engine.handle_cxa_pure_virtual(),
+            "pure_virtual_method_called_abort"
+        );
 
         assert_eq!(engine.allocate_pmr_buffer(64, 128), Ok(64));
         assert_eq!(
@@ -1413,7 +1455,8 @@ mod tests {
         let parsed = engine.fast_from_chars_u64(b"987654321xyz");
         assert_eq!(parsed, Some((987654321, 9)));
 
-        let (use_c, weak_c) = LibcxxInspirationsPrEngine::update_shared_ptr_ref_count(1, 1, "retain_shared");
+        let (use_c, weak_c) =
+            LibcxxInspirationsPrEngine::update_shared_ptr_ref_count(1, 1, "retain_shared");
         assert_eq!(use_c, 2);
         assert_eq!(weak_c, 1);
 

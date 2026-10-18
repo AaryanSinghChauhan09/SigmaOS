@@ -1584,9 +1584,18 @@ mod tests {
     #[test]
     fn test_universal_category_policy_routing() {
         let engine = SovereignUniversalSubsystemInteropEngine::new();
-        assert_eq!(UniversalSubsystemCategory::StorageDrive.as_str(), "StorageDrive");
-        assert_eq!(UniversalSubsystemCategory::BluetoothWireless.as_str(), "BluetoothWireless");
-        assert_eq!(UniversalSubsystemCategory::NetworkSecurityFirewall.as_str(), "NetworkSecurityFirewall");
+        assert_eq!(
+            UniversalSubsystemCategory::StorageDrive.as_str(),
+            "StorageDrive"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::BluetoothWireless.as_str(),
+            "BluetoothWireless"
+        );
+        assert_eq!(
+            UniversalSubsystemCategory::NetworkSecurityFirewall.as_str(),
+            "NetworkSecurityFirewall"
+        );
 
         let policy = engine
             .translate_policy(
