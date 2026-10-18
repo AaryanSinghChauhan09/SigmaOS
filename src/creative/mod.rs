@@ -9,6 +9,7 @@ pub mod audiocraft;
 pub mod cadcraft;
 pub mod cadcraft_artcraft_parity_pr;
 pub mod cadcraft_missing_components_parity_pr;
+pub mod craftlibs_missing_components_parity_pr;
 pub mod deckcraft;
 pub mod deckcraft_artcraft_parity_pr;
 pub mod deckcraft_missing_components_parity_pr;
@@ -40,6 +41,7 @@ pub mod wordcraft;
 
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
+pub use craftlibs_missing_components_parity_pr::*;
 
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,

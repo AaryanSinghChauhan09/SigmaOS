@@ -1881,6 +1881,13 @@ if [ -f "src/creative/sovereign_artcraft_craftlibs_pr_engine.rs" ]; then
     ./build/test_artcraft_pr
 fi
 
+if [ -f "src/creative/craftlibs_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign CraftLibs Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/craftlibs_missing_components_parity_pr.rs --edition=2021 -o build/test_craftlibs_missing
+    ./build/test_craftlibs_missing
+fi
+
 if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign Artcraft Craftlibs Parity PR Gateway test suite..."
     mkdir -p build
