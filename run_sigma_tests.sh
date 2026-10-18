@@ -1569,6 +1569,13 @@ if [ -f "src/installer/sovereign_installer_and_system_tools_advancements_v4_pr.r
     ./build/test_installer_advancements_v4
 fi
 
+if [ -f "src/installer/sovereign_installer_and_system_tools_advancements_v5_pr.rs" ]; then
+    echo "Running Sovereign Installer and System Tools Advancements V5 PR test suite..."
+    mkdir -p build
+    rustc --test src/installer/sovereign_installer_and_system_tools_advancements_v5_pr.rs --edition=2021 -o build/test_installer_advancements_v5
+    ./build/test_installer_advancements_v5
+fi
+
 if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
     echo "Running Mint & Omarchy Migration Bridge test suite..."
     mkdir -p build
