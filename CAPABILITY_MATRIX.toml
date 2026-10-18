@@ -130,6 +130,12 @@ description = "Ethernet functional; Wi-Fi 802.11 stack in hardware testing phase
 # 5. Storage Drivers & Hardware Support (Gap Closure: Bootability)
 # -----------------------------------------------------------------------------
 
+[feature.secondary_memory_subsystem]
+status = "partial"
+tested_on = ["unit-test"]
+required_for_release = true
+description = "Bounded block device manager, LRU page cache, filesystem core, and failure-safe mount manager enforcing exact-once completion and lost-update prevention."
+
 [feature.nvme_driver_mmio]
 status = "partial"
 tested_on = ["unit-test"]

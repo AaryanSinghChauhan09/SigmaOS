@@ -1740,6 +1740,7 @@ mod tests {
         assert_eq!(header.use_deps, vec!["dns"]);
         assert_eq!(header.before, vec!["sshd"]);
         assert_eq!(header.keywords, vec!["-docker"]);
+    }
 
     #[test]
     fn test_runit_s6_supervision_tree() {
