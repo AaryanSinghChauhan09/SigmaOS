@@ -78,7 +78,8 @@ impl Linux617SchedExtEnergyGovernorEngine {
     }
 
     pub fn register_sched_policy(&mut self, name: &str, ebpf_bytecode_hash: &str) {
-        self.sched_policies.insert(name.to_string(), ebpf_bytecode_hash.to_string());
+        self.sched_policies
+            .insert(name.to_string(), ebpf_bytecode_hash.to_string());
     }
 
     pub fn register_energy_core(&mut self, core_id: &str, power_mw: u64) {
@@ -443,21 +444,30 @@ impl SovereignOpenSourceOsMissingComponentsV61PrSuite {
     pub fn collect_all_proposals(&self) -> Vec<OpenSourceOsPrProposalV61> {
         vec![
             self.linux_engine.generate_pr_proposal("PR-V61-LINUX-01"),
-            self.freebsd_engine.generate_pr_proposal("PR-V61-FREEBSD-02"),
-            self.openbsd_engine.generate_pr_proposal("PR-V61-OPENBSD-03"),
-            self.dragonfly_engine.generate_pr_proposal("PR-V61-DRAGONFLY-04"),
+            self.freebsd_engine
+                .generate_pr_proposal("PR-V61-FREEBSD-02"),
+            self.openbsd_engine
+                .generate_pr_proposal("PR-V61-OPENBSD-03"),
+            self.dragonfly_engine
+                .generate_pr_proposal("PR-V61-DRAGONFLY-04"),
             self.netbsd_engine.generate_pr_proposal("PR-V61-NETBSD-05"),
             self.haiku_engine.generate_pr_proposal("PR-V61-HAIKU-06"),
             self.plan9_engine.generate_pr_proposal("PR-V61-PLAN9-07"),
-            self.nix_guix_engine.generate_pr_proposal("PR-V61-NIXGUIX-08"),
-            self.illumos_engine.generate_pr_proposal("PR-V61-ILLUMOS-09"),
-            self.thousands_engine.generate_pr_proposal("PR-V61-THOUSANDS-10"),
+            self.nix_guix_engine
+                .generate_pr_proposal("PR-V61-NIXGUIX-08"),
+            self.illumos_engine
+                .generate_pr_proposal("PR-V61-ILLUMOS-09"),
+            self.thousands_engine
+                .generate_pr_proposal("PR-V61-THOUSANDS-10"),
         ]
     }
 
     pub fn compute_v61_parity_score(&self) -> u32 {
         let proposals = self.collect_all_proposals();
-        if proposals.iter().all(|p| p.status == OsPrStatusV61::Validated) {
+        if proposals
+            .iter()
+            .all(|p| p.status == OsPrStatusV61::Validated)
+        {
             100
         } else {
             0
@@ -473,18 +483,32 @@ mod tests {
     fn test_v61_engines_and_proposals() {
         let mut master = SovereignOpenSourceOsMissingComponentsV61PrSuite::new();
 
-        master.linux_engine.register_sched_policy("scx_energy_governor", "0xabc123");
+        master
+            .linux_engine
+            .register_sched_policy("scx_energy_governor", "0xabc123");
         master.linux_engine.register_energy_core("core_0", 15000);
 
-        master.freebsd_engine.spawn_pqc_vnet_jail("jail01", vec!["CAP_READ", "CAP_WRITE"]);
+        master
+            .freebsd_engine
+            .spawn_pqc_vnet_jail("jail01", vec!["CAP_READ", "CAP_WRITE"]);
         master.openbsd_engine.configure_security(2048, 128);
-        master.dragonfly_engine.record_pfs_snapshot("pfs_data", 1710000000);
-        master.netbsd_engine.register_rump_driver("rumpuser_hypercall_audio");
-        master.haiku_engine.add_attribute_index("BEOS:TYPE", "string");
+        master
+            .dragonfly_engine
+            .record_pfs_snapshot("pfs_data", 1710000000);
+        master
+            .netbsd_engine
+            .register_rump_driver("rumpuser_hypercall_audio");
+        master
+            .haiku_engine
+            .add_attribute_index("BEOS:TYPE", "string");
         master.plan9_engine.mount_synthetic_namespace("#s/proc");
-        master.nix_guix_engine.register_closure_hash("/nix/store/pkg1", "hash_xyz");
+        master
+            .nix_guix_engine
+            .register_closure_hash("/nix/store/pkg1", "hash_xyz");
         master.illumos_engine.configure_vnic_mesh("vnic0", 256);
-        master.thousands_engine.register_component("subsystem_v61_mod");
+        master
+            .thousands_engine
+            .register_component("subsystem_v61_mod");
 
         let proposals = master.collect_all_proposals();
         assert_eq!(proposals.len(), 10);
