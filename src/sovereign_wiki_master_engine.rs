@@ -4,9 +4,8 @@
 
 extern crate alloc;
 
-#![allow(non_camel_case_types)]
-#![allow(dead_code)]
-
+#[allow(non_camel_case_types)]
+#[allow(dead_code)]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -213,13 +212,13 @@ impl Sovereign100IdeasSuite {
     pub fn verify_full_fulfillment(&self) -> bool {
         self.total_fulfilled_count() == 100
     }
+}
 
 impl Default for Sovereign100IdeasSuite {
     fn default() -> Self {
         Self::new()
     }
 }
-
 
 /// ---------------------------------------------------------------------------
 /// 2. Twelve Sovereign Native System Shards (`S-SHARDS`) Engine
@@ -277,18 +276,78 @@ impl SovereignShardsMasterRegistry {
 
     fn register_all_12_shards(&mut self) {
         let shard_defs = [
-            (1, SovereignShardId::Shard01ProductivityOffice, "OFFICE_NATIVE", vec!["LibreOffice", "Microsoft 365"]),
-            (2, SovereignShardId::Shard02MediaProcessingPlayback, "MEDIA_STUDIO", vec!["VLC", "FFmpeg", "Audacity"]),
-            (3, SovereignShardId::Shard03Creative2D3DCad, "CREATIVE_CAD", vec!["Blender", "FreeCAD", "GIMP"]),
-            (4, SovereignShardId::Shard04FoundationalAiMl, "AI_CORE", vec!["PyTorch", "TensorFlow"]),
-            (5, SovereignShardId::Shard05LlmCognitiveArchitectures, "COGNITIVE_LLM", vec!["Ollama", "llama.cpp"]),
-            (6, SovereignShardId::Shard06AutonomousAiAgentSwarms, "AGENT_SWARM", vec!["AutoGPT", "CrewAI"]),
-            (7, SovereignShardId::Shard07QuantumResistantMeshNet, "QUANTUM_MESH", vec!["WireGuard", "Tailscale"]),
-            (8, SovereignShardId::Shard08SovereignFsStorage, "SIGMA_FS", vec!["ZFS", "Btrfs"]),
-            (9, SovereignShardId::Shard09ZenithDesktopCompositor, "ZENITH_COMPOSITOR", vec!["Sway", "Hyprland"]),
-            (10, SovereignShardId::Shard10EdgeGlobalCompliance, "COMPLIANCE_GUARD", vec!["OpenSCAP", "Auditd"]),
-            (11, SovereignShardId::Shard11SystemAdministrationOps, "SYSTEM_OPS", vec!["Systemd", "OpenRC"]),
-            (12, SovereignShardId::Shard12HardwareVirtualizationHypervisor, "HYPERVISOR_NATIVE", vec!["KVM", "Bhyve"]),
+            (
+                1,
+                SovereignShardId::Shard01ProductivityOffice,
+                "OFFICE_NATIVE",
+                vec!["LibreOffice", "Microsoft 365"],
+            ),
+            (
+                2,
+                SovereignShardId::Shard02MediaProcessingPlayback,
+                "MEDIA_STUDIO",
+                vec!["VLC", "FFmpeg", "Audacity"],
+            ),
+            (
+                3,
+                SovereignShardId::Shard03Creative2D3DCad,
+                "CREATIVE_CAD",
+                vec!["Blender", "FreeCAD", "GIMP"],
+            ),
+            (
+                4,
+                SovereignShardId::Shard04FoundationalAiMl,
+                "AI_CORE",
+                vec!["PyTorch", "TensorFlow"],
+            ),
+            (
+                5,
+                SovereignShardId::Shard05LlmCognitiveArchitectures,
+                "COGNITIVE_LLM",
+                vec!["Ollama", "llama.cpp"],
+            ),
+            (
+                6,
+                SovereignShardId::Shard06AutonomousAiAgentSwarms,
+                "AGENT_SWARM",
+                vec!["AutoGPT", "CrewAI"],
+            ),
+            (
+                7,
+                SovereignShardId::Shard07QuantumResistantMeshNet,
+                "QUANTUM_MESH",
+                vec!["WireGuard", "Tailscale"],
+            ),
+            (
+                8,
+                SovereignShardId::Shard08SovereignFsStorage,
+                "SIGMA_FS",
+                vec!["ZFS", "Btrfs"],
+            ),
+            (
+                9,
+                SovereignShardId::Shard09ZenithDesktopCompositor,
+                "ZENITH_COMPOSITOR",
+                vec!["Sway", "Hyprland"],
+            ),
+            (
+                10,
+                SovereignShardId::Shard10EdgeGlobalCompliance,
+                "COMPLIANCE_GUARD",
+                vec!["OpenSCAP", "Auditd"],
+            ),
+            (
+                11,
+                SovereignShardId::Shard11SystemAdministrationOps,
+                "SYSTEM_OPS",
+                vec!["Systemd", "OpenRC"],
+            ),
+            (
+                12,
+                SovereignShardId::Shard12HardwareVirtualizationHypervisor,
+                "HYPERVISOR_NATIVE",
+                vec!["KVM", "Bhyve"],
+            ),
         ];
 
         for (id, shard_enum, name, legacy) in shard_defs {
@@ -430,16 +489,14 @@ impl SovereignDistroGapClosureEngine {
         self.features.push(DistroGapFeatureRecord {
             distro_name: "OpenBSD",
             gap_feature_name: "pledge, unveil, KARL, retguard, signify",
-            sigma_counterpart:
-                "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
+            sigma_counterpart: "OpenBsdPledgeUnveilEnforcementEngine & OpenBsdKarlRetguardEngine",
             verification_passed: true,
         });
 
         self.features.push(DistroGapFeatureRecord {
             distro_name: "FreeBSD",
             gap_feature_name: "bectl, MAC framework, GEOM, netgraph, poudriere",
-            sigma_counterpart:
-                "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
+            sigma_counterpart: "FreeBsdBectlBootEnvironmentEngine & FreeBsdMacFrameworkEngine",
             verification_passed: true,
         });
     }
@@ -456,7 +513,6 @@ impl SovereignDistroGapClosureEngine {
 /// ---------------------------------------------------------------------------
 /// 4. Roadmap Feature Parity Verification Structs
 /// ---------------------------------------------------------------------------
-
 
 #[derive(Debug)]
 pub struct SovereignLinuxBsdWikiRoadmapParityEngine {
@@ -483,7 +539,8 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             idea_id: 2,
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
-            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
+                .to_string(),
             target_module: "productivity".to_string(),
             is_fully_implemented: true,
         });
@@ -521,11 +578,9 @@ impl Default for WikiSpecificationDataSyncer {
     }
 }
 
-
 /// ---------------------------------------------------------------------------
 /// 5. Master Sovereign OS Documentation & Wiki Integration Verification Engine
 /// ---------------------------------------------------------------------------
-
 
 pub struct SovereignWikiMasterEngine {
     pub suite_100_ideas: Suite100Ideas,
@@ -559,7 +614,6 @@ impl Default for SovereignWikiMasterEngine {
         Self::new()
     }
 }
-
 
 #[cfg(test)]
 mod tests {

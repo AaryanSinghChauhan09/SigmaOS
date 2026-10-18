@@ -70,7 +70,15 @@ pub use effectcraft_missing_components_parity_pr::{
     EffectcraftExpressionScriptingRiggingPrEngine, EffectcraftMissingComponentsParityPrSuite,
     EffectcraftOpticalFlowMotionVectorPrEngine, EffectcraftPrProposalManifest,
     NeuralMatteSegmentationPrEngine, ParticlePhysicsEffectPrEngine, ShaderFilterGraphPrEngine,
-    SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftMissingComponentsParityPrGateway, Spatial3DDepthCompositorPrEngine,
+    SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftMissingComponentsParityPrGateway,
+    Spatial3DDepthCompositorPrEngine,
+};
+pub use figcraft_missing_components_parity_pr::{
+    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
+    FigcraftDevModeMultiFrameworkExporterPrEngine,
+    FigcraftInteractivePrototypingSmartAnimatePrEngine, FigcraftMultiUserCrdtCollaborationPrEngine,
+    FigcraftPrProposalManifest, FigcraftVectorNetworkBooleanOpsPrEngine,
+    SovereignFigcraftArtcraftParityPrGateway,
 };
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
@@ -158,10 +166,4 @@ pub use wordcraft_missing_components_parity_pr::{
     WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
     WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
     WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
-};
-pub use figcraft_missing_components_parity_pr::{
-    FigcraftAdvancedAutoLayoutConstraintPrEngine, FigcraftDesignSystemTokensVariablesPrEngine,
-    FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
-    FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
-    FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
 };

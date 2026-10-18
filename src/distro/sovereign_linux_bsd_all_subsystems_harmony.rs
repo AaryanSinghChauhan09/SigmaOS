@@ -554,7 +554,11 @@ impl SovereignSubsystemDistroHarmonyEngine {
             ),
             (
                 SigmaOsSubsystem::BluetoothWireless,
-                vec!["BlueZ_5", "FreeBSD_Netgraph_Bluetooth", "PQC_Bluetooth_Mesh"],
+                vec![
+                    "BlueZ_5",
+                    "FreeBSD_Netgraph_Bluetooth",
+                    "PQC_Bluetooth_Mesh",
+                ],
             ),
             (
                 SigmaOsSubsystem::ThermalCooling,
@@ -1108,7 +1112,8 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
 
     /// Perform system-wide distro compliance audit across all core subsystems.
     pub fn audit_all_subsystems_distro_compliance(&self) -> (BTreeMap<String, bool>, u32) {
-        self.harmony_engine.audit_all_subsystems_distro_compliance_summary()
+        self.harmony_engine
+            .audit_all_subsystems_distro_compliance_summary()
     }
 
     /// Execute an automated cross-subsystem workflow.
@@ -1319,10 +1324,7 @@ mod tests {
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",
         );
-        assert_eq!(
-            translated,
-            "ebpf_xdp_namespace"
-        );
+        assert_eq!(translated, "ebpf_xdp_namespace");
     }
 
     #[test]
@@ -1406,7 +1408,10 @@ mod tests {
     fn test_universal_category_policy_routing() {
         let orchestrator = SovereignUniversalCrossDistroSubsystemOrchestrator::new();
         assert_eq!(SigmaOsSubsystem::StorageDrive.as_str(), "StorageDrive");
-        assert_eq!(SigmaOsSubsystem::NetworkSecurityFirewall.as_str(), "NetworkSecurityFirewall");
+        assert_eq!(
+            SigmaOsSubsystem::NetworkSecurityFirewall.as_str(),
+            "NetworkSecurityFirewall"
+        );
 
         let (audits, score) = orchestrator.audit_all_subsystems_distro_compliance();
         assert_eq!(audits.len(), 44);

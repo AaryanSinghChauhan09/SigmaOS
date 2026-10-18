@@ -962,7 +962,13 @@ impl StorageUtilitiesEngine {
     pub fn parse_smart_sata_health(&self, reallocated_sectors: u32) -> (bool, String) {
         let healthy = reallocated_sectors < 50;
         let status = if healthy { "PASSED" } else { "FAILED" };
-        (healthy, format!("SATA Health: {}, Reallocated Sectors: {}", status, reallocated_sectors))
+        (
+            healthy,
+            format!(
+                "SATA Health: {}, Reallocated Sectors: {}",
+                status, reallocated_sectors
+            ),
+        )
     }
 }
 

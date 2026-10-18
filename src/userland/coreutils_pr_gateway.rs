@@ -153,7 +153,6 @@ impl GnuCoreutilsBsdUserlandEngine {
         result
     }
 
-
     pub fn run_head_tail(&self, content: &str, lines_count: usize, is_head: bool) -> Vec<String> {
         let lines: Vec<&str> = content.lines().collect();
         if is_head {
@@ -172,7 +171,13 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_sort(&self, items: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        items: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut list: Vec<String> = items.iter().map(|s| s.to_string()).collect();
         if numeric {
             list.sort_by(|a, b| {
@@ -228,7 +233,13 @@ impl GnuCoreutilsBsdUserlandEngine {
         (lines, words, bytes)
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             sorted.sort_by_key(|s| s.parse::<i64>().unwrap_or(0));
@@ -268,7 +279,10 @@ impl GnuCoreutilsBsdUserlandEngine {
         if is_head {
             data.iter().take(bytes).copied().collect()
         } else {
-            data.iter().skip(data.len().saturating_sub(bytes)).copied().collect()
+            data.iter()
+                .skip(data.len().saturating_sub(bytes))
+                .copied()
+                .collect()
         }
     }
 
@@ -952,7 +966,11 @@ impl TextProcessingEngine {
         case_insensitive: bool,
     ) -> Vec<(usize, String)> {
         let res = self.grep_match_extended(content, pattern, case_insensitive, false, false);
-        res.1.into_iter().enumerate().map(|(idx, line)| (idx + 1, line)).collect()
+        res.1
+            .into_iter()
+            .enumerate()
+            .map(|(idx, line)| (idx + 1, line))
+            .collect()
     }
 
     pub fn grep_match_extended(
@@ -1030,11 +1048,19 @@ impl TextProcessingEngine {
         count_lines: bool,
     ) -> (usize, Vec<String>) {
         let mut lines = Vec::new();
-        let pat = if case_insensitive { pattern.to_lowercase() } else { pattern.to_string() };
+        let pat = if case_insensitive {
+            pattern.to_lowercase()
+        } else {
+            pattern.to_string()
+        };
         let mut count = 0;
 
         for (idx, line) in content.lines().enumerate() {
-            let line_cmp = if case_insensitive { line.to_lowercase() } else { line.to_string() };
+            let line_cmp = if case_insensitive {
+                line.to_lowercase()
+            } else {
+                line.to_string()
+            };
             let matches = line_cmp.contains(&pat);
             let keep = if invert { !matches } else { matches };
             if keep {
@@ -1740,15 +1766,24 @@ pub struct CoreUtilsPullRequestGatewayEngine {
 
 impl CoreUtilsPullRequestGatewayEngine {
     pub fn get_prs_by_category(&self, cat: CoreUtilsPrCategory) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.category == cat).collect()
+        self.submissions
+            .values()
+            .filter(|s| s.category == cat)
+            .collect()
     }
 
     pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.status == status).collect()
+        self.submissions
+            .values()
+            .filter(|s| s.status == status)
+            .collect()
     }
 
     pub fn get_prs_by_author(&self, author: &str) -> Vec<&CoreUtilsPrSubmission> {
-        self.submissions.values().filter(|s| s.author == author).collect()
+        self.submissions
+            .values()
+            .filter(|s| s.author == author)
+            .collect()
     }
 
     pub fn new() -> Self {

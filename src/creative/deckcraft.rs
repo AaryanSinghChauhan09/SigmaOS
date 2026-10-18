@@ -259,10 +259,9 @@ impl SlideExporterEngine {
                     output.extend_from_slice(b"\n\n");
                 }
             }
-            ExportFormat::Svg => {
-                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<text>");
+            ExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"#ZENITH_PRESENTATION_FORMAT_STREAM\n");
                 output.extend_from_slice(deck.title.as_bytes());
-                output.extend_from_slice(b"</text>\n</svg>");
             }
         }
 
@@ -287,13 +286,11 @@ impl DeckCraftEngine {
             presenter_state: PresenterState {
                 active_deck_id: None,
                 current_slide_index: 0,
-                is_presenting: false,
                 in_presenter_mode: false,
                 timer_running: false,
                 elapsed_secs: 0,
                 laser_pointer_active: false,
                 black_screen: false,
-                timer_seconds: 0,
             },
             next_deck_id: AtomicU32::new(1),
             next_slide_id: AtomicU32::new(101),
