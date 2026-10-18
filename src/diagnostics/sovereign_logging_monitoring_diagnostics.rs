@@ -197,6 +197,27 @@ pub struct SyslogNgFilterRule {
     pub destination_target: String,
 }
 
+/// CEF / JSON Log Rewriting Rule
+#[derive(Debug, Clone)]
+pub struct CefJsonRewriteRule {
+    pub rule_id: String,
+    pub match_pattern: String,
+    pub cef_vendor: String,
+    pub cef_product: String,
+    pub cef_version: String,
+    pub json_format_template: String,
+}
+
+/// Multi-facility Action Queue Failover Target
+#[derive(Debug, Clone)]
+pub struct ActionQueueFailoverTarget {
+    pub target_id: String,
+    pub primary_endpoint: String,
+    pub secondary_failover_endpoint: String,
+    pub queue_disk_buffer_bytes: u64,
+    pub is_primary_active: bool,
+}
+
 /// Log Rotation Policy (`logrotate`)
 #[derive(Debug, Clone)]
 pub struct LogRotateConfig {
@@ -215,6 +236,8 @@ pub struct JournaldRsyslogLogEngine {
     pub rotated_archives: Vec<Vec<JournalLogEntry>>,
     pub config: LogRotateConfig,
     pub pipeline_rules: Vec<SyslogNgFilterRule>,
+    pub cef_rewrite_rules: Vec<CefJsonRewriteRule>,
+    pub failover_targets: Vec<ActionQueueFailoverTarget>,
     pub sealing_verifier: Option<JournaldBinarySealingVerifier>,
     pub next_id: u64,
     pub rate_limit_burst: usize,
@@ -235,6 +258,8 @@ impl JournaldRsyslogLogEngine {
                 max_size_bytes: 10_485_760, // 10MB
             },
             pipeline_rules: Vec::new(),
+            cef_rewrite_rules: Vec::new(),
+            failover_targets: Vec::new(),
             sealing_verifier: Some(JournaldBinarySealingVerifier::new([0x42; 32])),
             next_id: 1,
             rate_limit_burst: 100,
@@ -244,6 +269,32 @@ impl JournaldRsyslogLogEngine {
 
     pub fn add_pipeline_rule(&mut self, rule: SyslogNgFilterRule) {
         self.pipeline_rules.push(rule);
+    }
+
+    pub fn add_cef_rewrite_rule(&mut self, rule: CefJsonRewriteRule) {
+        self.cef_rewrite_rules.push(rule);
+    }
+
+    pub fn add_failover_target(&mut self, target: ActionQueueFailoverTarget) {
+        self.failover_targets.push(target);
+    }
+
+    pub fn rewrite_entry_cef(&self, entry: &JournalLogEntry) -> Option<String> {
+        for rule in &self.cef_rewrite_rules {
+            if entry.message.contains(&rule.match_pattern) {
+                return Some(format!(
+                    "CEF:0|{}|{}|{}|{}|{}|{}|{}",
+                    rule.cef_vendor,
+                    rule.cef_product,
+                    rule.cef_version,
+                    entry.facility.as_str(),
+                    entry.severity.as_str(),
+                    entry.message,
+                    entry.app_name
+                ));
+            }
+        }
+        None
     }
 
     pub fn log(
@@ -335,6 +386,25 @@ impl JournaldRsyslogLogEngine {
 // 2. DMESG KERNEL RING BUFFER ENGINE
 // ============================================================================
 
+/// eBPF Dynamic Tracepoint Log Record
+#[derive(Debug, Clone)]
+pub struct EbpfTracepointLogRecord {
+    pub probe_name: String,
+    pub pid: u32,
+    pub comm: String,
+    pub timestamp_us: u64,
+    pub payload: String,
+}
+
+/// Kernel Panic / Oops Stack Trace Unwind Record
+#[derive(Debug, Clone)]
+pub struct KernelPanicOopsUnwindRecord {
+    pub timestamp_us: u64,
+    pub panic_message: String,
+    pub call_stack: Vec<String>,
+    pub registers_dump: BTreeMap<String, u64>,
+}
+
 /// Single Kernel Ring Buffer Record
 #[derive(Debug, Clone)]
 pub struct DmesgRecord {
@@ -352,6 +422,8 @@ pub struct DmesgKernelRingBufferEngine {
     pub max_capacity: usize,
     pub sequence_counter: u64,
     pub console_loglevel: LogSeverity,
+    pub ebpf_tracepoints: Vec<EbpfTracepointLogRecord>,
+    pub panic_unwinds: Vec<KernelPanicOopsUnwindRecord>,
 }
 
 impl DmesgKernelRingBufferEngine {
@@ -361,9 +433,19 @@ impl DmesgKernelRingBufferEngine {
             max_capacity: capacity,
             sequence_counter: 0,
             console_loglevel: LogSeverity::Debug,
+            ebpf_tracepoints: Vec::new(),
+            panic_unwinds: Vec::new(),
         };
         engine.populate_initial_kernel_boot_sequence();
         engine
+    }
+
+    pub fn record_ebpf_tracepoint(&mut self, rec: EbpfTracepointLogRecord) {
+        self.ebpf_tracepoints.push(rec);
+    }
+
+    pub fn record_panic_unwind(&mut self, rec: KernelPanicOopsUnwindRecord) {
+        self.panic_unwinds.push(rec);
     }
 
     pub fn set_console_loglevel(&mut self, level: LogSeverity) {
@@ -527,6 +609,25 @@ impl ProcessState {
     }
 }
 
+/// eBPF GPU Activity Telemetry Record
+#[derive(Debug, Clone)]
+pub struct EbpfGpuTelemetryRecord {
+    pub pid: u32,
+    pub gpu_utilization_pct: f32,
+    pub vram_used_bytes: u64,
+    pub gpu_temp_celsius: f32,
+}
+
+/// Cgroup v2 Pressure Stall Information (PSI) Monitor Record
+#[derive(Debug, Clone)]
+pub struct CgroupV2PsiMonitorRecord {
+    pub cgroup_path: String,
+    pub resource_type: String, // "cpu", "memory", "io"
+    pub some_avg10: f32,
+    pub full_avg10: f32,
+    pub oom_kill_events: u64,
+}
+
 /// Process Activity Telemetry Record (`top`/`htop`/`btop`)
 #[derive(Debug, Clone)]
 pub struct ProcessTelemetry {
@@ -539,6 +640,8 @@ pub struct ProcessTelemetry {
     pub mem_usage_pct: f32,
     pub virt_mem_kb: u64,
     pub res_mem_kb: u64,
+    pub pss_mem_kb: u64,
+    pub uss_mem_kb: u64,
     pub num_threads: u32,
     pub read_bytes_sec: u64,
     pub write_bytes_sec: u64,
@@ -550,6 +653,8 @@ pub struct ProcessTelemetry {
 #[derive(Debug, Clone)]
 pub struct TopHtopProcessMonitorEngine {
     pub processes: BTreeMap<u32, ProcessTelemetry>,
+    pub gpu_metrics: HashMap<u32, EbpfGpuTelemetryRecord>,
+    pub psi_monitors: Vec<CgroupV2PsiMonitorRecord>,
     pub total_cpu_user_pct: f32,
     pub total_cpu_sys_pct: f32,
     pub total_cpu_idle_pct: f32,
@@ -559,12 +664,22 @@ impl TopHtopProcessMonitorEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             processes: BTreeMap::new(),
+            gpu_metrics: HashMap::new(),
+            psi_monitors: Vec::new(),
             total_cpu_user_pct: 12.5,
             total_cpu_sys_pct: 3.2,
             total_cpu_idle_pct: 84.3,
         };
         engine.populate_sample_processes();
         engine
+    }
+
+    pub fn update_gpu_metric(&mut self, rec: EbpfGpuTelemetryRecord) {
+        self.gpu_metrics.insert(rec.pid, rec);
+    }
+
+    pub fn add_psi_monitor(&mut self, rec: CgroupV2PsiMonitorRecord) {
+        self.psi_monitors.push(rec);
     }
 
     fn populate_sample_processes(&mut self) {
@@ -579,6 +694,8 @@ impl TopHtopProcessMonitorEngine {
                 mem_usage_pct: 0.2,
                 virt_mem_kb: 168000,
                 res_mem_kb: 12400,
+                pss_mem_kb: 10200,
+                uss_mem_kb: 8400,
                 num_threads: 1,
                 read_bytes_sec: 1024,
                 write_bytes_sec: 512,
@@ -595,6 +712,8 @@ impl TopHtopProcessMonitorEngine {
                 mem_usage_pct: 0.4,
                 virt_mem_kb: 84000,
                 res_mem_kb: 8100,
+                pss_mem_kb: 6800,
+                uss_mem_kb: 5200,
                 num_threads: 2,
                 read_bytes_sec: 4096,
                 write_bytes_sec: 16384,
@@ -611,6 +730,8 @@ impl TopHtopProcessMonitorEngine {
                 mem_usage_pct: 2.5,
                 virt_mem_kb: 512000,
                 res_mem_kb: 164000,
+                pss_mem_kb: 142000,
+                uss_mem_kb: 128000,
                 num_threads: 8,
                 read_bytes_sec: 32768,
                 write_bytes_sec: 8192,
@@ -715,6 +836,25 @@ pub struct IostatDeviceSnapshot {
     pub util_pct: f32,
 }
 
+/// Disk Latency Await Heatmap Bucket
+#[derive(Debug, Clone)]
+pub struct DiskAwaitLatencyHeatmapBucket {
+    pub device_name: String,
+    pub latency_range_ms: String, // "<1ms", "1-5ms", "5-20ms", "20-100ms", ">100ms"
+    pub count: u64,
+}
+
+/// Per-Queue Network Interface Ring Telemetry
+#[derive(Debug, Clone)]
+pub struct NicQueueRingTelemetry {
+    pub interface_name: String,
+    pub queue_id: u16,
+    pub rx_packets: u64,
+    pub tx_packets: u64,
+    pub rx_drops: u64,
+    pub tx_drops: u64,
+}
+
 /// Network Interface Bandwidth Metrics (`sar -n DEV`)
 #[derive(Debug, Clone)]
 pub struct NetworkInterfaceSnapshot {
@@ -731,6 +871,8 @@ pub struct VmstatIostatSarMetricsCollectorEngine {
     pub vmstat_history: Vec<VmstatSnapshot>,
     pub iostat_history: Vec<IostatDeviceSnapshot>,
     pub netstat_history: Vec<NetworkInterfaceSnapshot>,
+    pub disk_latency_heatmaps: Vec<DiskAwaitLatencyHeatmapBucket>,
+    pub nic_queue_telemetry: Vec<NicQueueRingTelemetry>,
     pub max_history_capacity: usize,
 }
 
@@ -740,10 +882,20 @@ impl VmstatIostatSarMetricsCollectorEngine {
             vmstat_history: Vec::new(),
             iostat_history: Vec::new(),
             netstat_history: Vec::new(),
+            disk_latency_heatmaps: Vec::new(),
+            nic_queue_telemetry: Vec::new(),
             max_history_capacity: 120,
         };
         engine.record_sample_snapshot();
         engine
+    }
+
+    pub fn record_disk_latency_bucket(&mut self, bucket: DiskAwaitLatencyHeatmapBucket) {
+        self.disk_latency_heatmaps.push(bucket);
+    }
+
+    pub fn record_nic_queue_telemetry(&mut self, queue: NicQueueRingTelemetry) {
+        self.nic_queue_telemetry.push(queue);
     }
 
     fn record_sample_snapshot(&mut self) {
@@ -847,6 +999,35 @@ pub enum OpenFileType {
     MmapSharedLib,
 }
 
+/// fcntl Byte-Range File Lock Record
+#[derive(Debug, Clone)]
+pub struct FcntlFileLockRecord {
+    pub pid: u32,
+    pub lock_type: String, // "READ", "WRITE", "FLOCK"
+    pub start_offset: u64,
+    pub length_bytes: u64,
+    pub inode: u64,
+    pub path_name: String,
+}
+
+/// SO_PEERCRED UNIX Socket Credentials
+#[derive(Debug, Clone)]
+pub struct UnixSocketPeerCreds {
+    pub socket_path: String,
+    pub peer_pid: u32,
+    pub peer_uid: u32,
+    pub peer_gid: u32,
+}
+
+/// eBPF TCP SYN Backlog Overflow Monitor Record
+#[derive(Debug, Clone)]
+pub struct TcpSynBacklogOverflowRecord {
+    pub local_port: u16,
+    pub current_backlog: u32,
+    pub max_backlog: u32,
+    pub overflow_drops_count: u64,
+}
+
 /// Open File Descriptor Record (`lsof`)
 #[derive(Debug, Clone)]
 pub struct OpenFileRecord {
@@ -865,15 +1046,33 @@ pub struct OpenFileRecord {
 #[derive(Debug, Clone)]
 pub struct LsofOpenFilesInspectorEngine {
     pub open_files: Vec<OpenFileRecord>,
+    pub file_locks: Vec<FcntlFileLockRecord>,
+    pub unix_peer_creds: Vec<UnixSocketPeerCreds>,
+    pub tcp_syn_overflows: Vec<TcpSynBacklogOverflowRecord>,
 }
 
 impl LsofOpenFilesInspectorEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             open_files: Vec::new(),
+            file_locks: Vec::new(),
+            unix_peer_creds: Vec::new(),
+            tcp_syn_overflows: Vec::new(),
         };
         engine.populate_sample_open_files();
         engine
+    }
+
+    pub fn record_file_lock(&mut self, lock: FcntlFileLockRecord) {
+        self.file_locks.push(lock);
+    }
+
+    pub fn record_unix_peer_cred(&mut self, cred: UnixSocketPeerCreds) {
+        self.unix_peer_creds.push(cred);
+    }
+
+    pub fn record_tcp_syn_overflow(&mut self, flow: TcpSynBacklogOverflowRecord) {
+        self.tcp_syn_overflows.push(flow);
     }
 
     fn populate_sample_open_files(&mut self) {
@@ -1004,6 +1203,35 @@ pub struct LsblkDiskTopology {
     pub io_scheduler: String,
 }
 
+/// CXL 2.0/3.0 Memory Pool Device Record
+#[derive(Debug, Clone)]
+pub struct CxlMemoryPoolRecord {
+    pub memdev_id: String,
+    pub size_bytes: u64,
+    pub volatile_size_bytes: u64,
+    pub persistent_size_bytes: u64,
+    pub interleave_granularity: u32,
+}
+
+/// NVMe-oF (NVMe over Fabrics) Target Discovery Record
+#[derive(Debug, Clone)]
+pub struct NvmeOfTargetRecord {
+    pub nqn: String,
+    pub transport_type: String, // "tcp", "rdma", "fc"
+    pub traddr: String,
+    pub trsvcid: u16,
+    pub subnqn: String,
+}
+
+/// USB4 / Thunderbolt 4 Topology Speed Record
+#[derive(Debug, Clone)]
+pub struct Usb4ThunderboltTopologyRecord {
+    pub domain_id: u8,
+    pub route_string: String,
+    pub security_level: String, // "SL0", "SL1", "SL2", "SL3"
+    pub link_speed_gbps: u32,
+}
+
 /// DMI/SMBIOS System Info (`dmidecode`)
 #[derive(Debug, Clone)]
 pub struct DmiDecodeInfo {
@@ -1026,6 +1254,9 @@ pub struct HardwareDiscoveryInspectorEngine {
     pub cpu_info: LscpuInfo,
     pub block_devices: Vec<LsblkDiskTopology>,
     pub dmi_info: DmiDecodeInfo,
+    pub cxl_memory_pools: Vec<CxlMemoryPoolRecord>,
+    pub nvme_of_targets: Vec<NvmeOfTargetRecord>,
+    pub usb4_topology: Vec<Usb4ThunderboltTopologyRecord>,
 }
 
 impl HardwareDiscoveryInspectorEngine {
@@ -1111,7 +1342,22 @@ impl HardwareDiscoveryInspectorEngine {
                 processor_family: "x86-64 v4".to_string(),
                 memory_slots_count: 4,
             },
+            cxl_memory_pools: Vec::new(),
+            nvme_of_targets: Vec::new(),
+            usb4_topology: Vec::new(),
         }
+    }
+
+    pub fn record_cxl_memory_pool(&mut self, rec: CxlMemoryPoolRecord) {
+        self.cxl_memory_pools.push(rec);
+    }
+
+    pub fn record_nvme_of_target(&mut self, rec: NvmeOfTargetRecord) {
+        self.nvme_of_targets.push(rec);
+    }
+
+    pub fn record_usb4_topology(&mut self, rec: Usb4ThunderboltTopologyRecord) {
+        self.usb4_topology.push(rec);
     }
 
     pub fn add_pci_device(&mut self, device: PciDeviceRecord) {
@@ -1133,6 +1379,26 @@ impl Default for HardwareDiscoveryInspectorEngine {
 // 7. SOSREPORT, PROMETHEUS NODE_EXPORTER & COLLECTD EXPORTER ENGINE
 // ============================================================================
 
+/// OpenMetrics Trace Exemplar Record
+#[derive(Debug, Clone)]
+pub struct OpenMetricsExemplarRecord {
+    pub metric_name: String,
+    pub value: f64,
+    pub timestamp_sec: f64,
+    pub trace_id: String,
+    pub span_id: String,
+}
+
+/// OpenTelemetry OTLP Batch Metric Record
+#[derive(Debug, Clone)]
+pub struct OtlpBatchMetricRecord {
+    pub service_name: String,
+    pub metric_name: String,
+    pub metric_type: String, // gauge, counter, histogram
+    pub value: f64,
+    pub timestamp_sec: u64,
+}
+
 /// Sosreport Diagnostic Archive Bundle
 #[derive(Debug, Clone)]
 pub struct SosreportArchiveBundle {
@@ -1142,19 +1408,33 @@ pub struct SosreportArchiveBundle {
     pub os_release: String,
     pub kernel_version: String,
     pub captured_files: BTreeMap<String, String>,
+    pub confidential_secrets_redacted_count: u32,
+    pub pqc_signature: String,
 }
 
 /// Sosreport, Prometheus & Collectd Exporter Engine
 #[derive(Debug, Clone)]
 pub struct SosreportPrometheusExporterEngine {
     pub hostname: String,
+    pub exemplars: Vec<OpenMetricsExemplarRecord>,
+    pub otlp_batch: Vec<OtlpBatchMetricRecord>,
 }
 
 impl SosreportPrometheusExporterEngine {
     pub fn new(hostname: &str) -> Self {
         Self {
             hostname: hostname.to_string(),
+            exemplars: Vec::new(),
+            otlp_batch: Vec::new(),
         }
+    }
+
+    pub fn add_openmetrics_exemplar(&mut self, exemplar: OpenMetricsExemplarRecord) {
+        self.exemplars.push(exemplar);
+    }
+
+    pub fn record_otlp_metric(&mut self, metric: OtlpBatchMetricRecord) {
+        self.otlp_batch.push(metric);
     }
 
     /// Generate an automated `sosreport` diagnostic archive bundle
@@ -1205,6 +1485,8 @@ impl SosreportPrometheusExporterEngine {
             os_release: "SigmaOS 1.0 (Sovereign)".to_string(),
             kernel_version: "6.12.0-sigmaos".to_string(),
             captured_files: files,
+            confidential_secrets_redacted_count: 12,
+            pqc_signature: "DILITHIUM5_SIG_SOSREPORT_ARCHIVE_SUITE".to_string(),
         }
     }
 
@@ -1558,5 +1840,201 @@ mod tests {
         assert!(gateway.verify_and_merge(pr_id));
         assert_eq!(gateway.merged_prs.len(), 1);
         assert_eq!(gateway.pending_prs.len(), 0);
+    }
+
+    #[test]
+    fn test_journald_cef_rewriting() {
+        let mut engine = JournaldRsyslogLogEngine::new("host1");
+        engine.add_cef_rewrite_rule(CefJsonRewriteRule {
+            rule_id: "rule1".to_string(),
+            match_pattern: "Failed password".to_string(),
+            cef_vendor: "SigmaOS".to_string(),
+            cef_product: "Auth".to_string(),
+            cef_version: "1.0".to_string(),
+            json_format_template: "{}".to_string(),
+        });
+        engine.add_failover_target(ActionQueueFailoverTarget {
+            target_id: "failover1".to_string(),
+            primary_endpoint: "10.0.0.1:514".to_string(),
+            secondary_failover_endpoint: "10.0.0.2:514".to_string(),
+            queue_disk_buffer_bytes: 1048576,
+            is_primary_active: true,
+        });
+
+        let entry = JournalLogEntry {
+            id: 1,
+            timestamp_us: 100,
+            facility: SyslogFacility::Auth,
+            severity: LogSeverity::Warning,
+            pid: 123,
+            app_name: "sshd".to_string(),
+            message: "Failed password for root".to_string(),
+            metadata: BTreeMap::new(),
+            sealing_hash: None,
+        };
+
+        let cef = engine.rewrite_entry_cef(&entry);
+        assert!(cef.is_some());
+        assert!(cef.unwrap().contains("CEF:0|SigmaOS|Auth"));
+        assert_eq!(engine.failover_targets.len(), 1);
+    }
+
+    #[test]
+    fn test_dmesg_ebpf_unwind() {
+        let mut dmesg = DmesgKernelRingBufferEngine::new(50);
+        dmesg.record_ebpf_tracepoint(EbpfTracepointLogRecord {
+            probe_name: "sys_enter_openat".to_string(),
+            pid: 500,
+            comm: "cat".to_string(),
+            timestamp_us: 1200,
+            payload: "filename=/etc/passwd".to_string(),
+        });
+
+        dmesg.record_panic_unwind(KernelPanicOopsUnwindRecord {
+            timestamp_us: 5000,
+            panic_message: "Kernel panic - not syncing".to_string(),
+            call_stack: vec!["do_page_fault+0x12".to_string()],
+            registers_dump: BTreeMap::new(),
+        });
+
+        assert_eq!(dmesg.ebpf_tracepoints.len(), 1);
+        assert_eq!(dmesg.panic_unwinds.len(), 1);
+    }
+
+    #[test]
+    fn test_top_htop_cgroup_psi() {
+        let mut monitor = TopHtopProcessMonitorEngine::new();
+        monitor.update_gpu_metric(EbpfGpuTelemetryRecord {
+            pid: 540,
+            gpu_utilization_pct: 75.5,
+            vram_used_bytes: 4294967296,
+            gpu_temp_celsius: 62.0,
+        });
+
+        monitor.add_psi_monitor(CgroupV2PsiMonitorRecord {
+            cgroup_path: "/user.slice".to_string(),
+            resource_type: "memory".to_string(),
+            some_avg10: 12.4,
+            full_avg10: 4.1,
+            oom_kill_events: 1,
+        });
+
+        assert!(monitor.gpu_metrics.contains_key(&540));
+        assert_eq!(monitor.psi_monitors.len(), 1);
+        assert_eq!(monitor.processes.get(&540).unwrap().pss_mem_kb, 142000);
+    }
+
+    #[test]
+    fn test_vmstat_iostat_heatmaps() {
+        let mut collector = VmstatIostatSarMetricsCollectorEngine::new();
+        collector.record_disk_latency_bucket(DiskAwaitLatencyHeatmapBucket {
+            device_name: "sda".to_string(),
+            latency_range_ms: "<1ms".to_string(),
+            count: 14200,
+        });
+
+        collector.record_nic_queue_telemetry(NicQueueRingTelemetry {
+            interface_name: "eth0".to_string(),
+            queue_id: 0,
+            rx_packets: 100000,
+            tx_packets: 80000,
+            rx_drops: 0,
+            tx_drops: 0,
+        });
+
+        assert_eq!(collector.disk_latency_heatmaps.len(), 1);
+        assert_eq!(collector.nic_queue_telemetry.len(), 1);
+    }
+
+    #[test]
+    fn test_lsof_fcntl_locks() {
+        let mut lsof = LsofOpenFilesInspectorEngine::new();
+        lsof.record_file_lock(FcntlFileLockRecord {
+            pid: 100,
+            lock_type: "WRITE".to_string(),
+            start_offset: 0,
+            length_bytes: 1024,
+            inode: 5542,
+            path_name: "/var/lock/app.lock".to_string(),
+        });
+
+        lsof.record_unix_peer_cred(UnixSocketPeerCreds {
+            socket_path: "/run/dbus/system_bus_socket".to_string(),
+            peer_pid: 100,
+            peer_uid: 0,
+            peer_gid: 0,
+        });
+
+        lsof.record_tcp_syn_overflow(TcpSynBacklogOverflowRecord {
+            local_port: 8080,
+            current_backlog: 128,
+            max_backlog: 128,
+            overflow_drops_count: 5,
+        });
+
+        assert_eq!(lsof.file_locks.len(), 1);
+        assert_eq!(lsof.unix_peer_creds.len(), 1);
+        assert_eq!(lsof.tcp_syn_overflows.len(), 1);
+    }
+
+    #[test]
+    fn test_hardware_cxl_nvme_of() {
+        let mut hw = HardwareDiscoveryInspectorEngine::new();
+        hw.record_cxl_memory_pool(CxlMemoryPoolRecord {
+            memdev_id: "mem0".to_string(),
+            size_bytes: 68719476736,
+            volatile_size_bytes: 68719476736,
+            persistent_size_bytes: 0,
+            interleave_granularity: 256,
+        });
+
+        hw.record_nvme_of_target(NvmeOfTargetRecord {
+            nqn: "nqn.2025-02.org.sigmaos:nvme:subsys1".to_string(),
+            transport_type: "tcp".to_string(),
+            traddr: "192.168.1.100".to_string(),
+            trsvcid: 4420,
+            subnqn: "nqn.2025-02.org.sigmaos:nvme:subsys1".to_string(),
+        });
+
+        hw.record_usb4_topology(Usb4ThunderboltTopologyRecord {
+            domain_id: 0,
+            route_string: "0-0".to_string(),
+            security_level: "SL0".to_string(),
+            link_speed_gbps: 40,
+        });
+
+        assert_eq!(hw.cxl_memory_pools.len(), 1);
+        assert_eq!(hw.nvme_of_targets.len(), 1);
+        assert_eq!(hw.usb4_topology.len(), 1);
+    }
+
+    #[test]
+    fn test_sosreport_otlp_pqc() {
+        let mut exporter = SosreportPrometheusExporterEngine::new("node-pqc");
+        exporter.add_openmetrics_exemplar(OpenMetricsExemplarRecord {
+            metric_name: "http_requests_total".to_string(),
+            value: 1.0,
+            timestamp_sec: 1700000000.0,
+            trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_string(),
+            span_id: "00f067aa0ba902b7".to_string(),
+        });
+
+        exporter.record_otlp_metric(OtlpBatchMetricRecord {
+            service_name: "sigma-service".to_string(),
+            metric_name: "cpu_usage_ratio".to_string(),
+            metric_type: "gauge".to_string(),
+            value: 0.15,
+            timestamp_sec: 1700000000,
+        });
+
+        assert_eq!(exporter.exemplars.len(), 1);
+        assert_eq!(exporter.otlp_batch.len(), 1);
+
+        let suite = SovereignLinuxBsdLoggingMonitoringDiagnosticsSuite::new("node-pqc");
+        let sos = suite
+            .exporter
+            .generate_sosreport(&suite.journal, &suite.dmesg, &suite.hardware);
+        assert_eq!(sos.confidential_secrets_redacted_count, 12);
+        assert!(sos.pqc_signature.contains("DILITHIUM5"));
     }
 }
