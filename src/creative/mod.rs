@@ -27,6 +27,8 @@ pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod gridcraft;
 pub mod gridcraft_missing_components_parity_pr;
+pub mod voicecraft;
+pub mod voicecraft_missing_components_parity_pr;
 pub mod wordcraft;
 
 pub use audiocraft::{
@@ -178,4 +180,12 @@ pub use figcraft_missing_components_parity_pr::{
     FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
     FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
     FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use voicecraft::{Phoneme, PhonemeType, SovereignVoiceEngine, VoiceActivityDetector};
+pub use voicecraft_missing_components_parity_pr::{
+    SovereignVoicecraftArtcraftParityPrGateway, VoicecraftAcousticPhonemizerG2pPrEngine,
+    VoicecraftNeuralTtsInferencePrEngine, VoicecraftPrProposalManifest,
+    VoicecraftRealtimeStreamingDenoiserPrEngine,
+    VoicecraftWaylandAccessibilityVoiceControlPrEngine, VoicecraftZeroShotVoiceCloningPrEngine,
+    WaylandVoiceIntent,
 };
