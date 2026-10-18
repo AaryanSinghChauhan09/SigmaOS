@@ -340,7 +340,11 @@ impl MintProprietaryDriverManager {
     }
 
     pub fn activate_driver(&mut self, pci_id: &str) -> bool {
-        if let Some(d) = self.detected_devices.iter_mut().find(|d| d.pci_id == pci_id) {
+        if let Some(d) = self
+            .detected_devices
+            .iter_mut()
+            .find(|d| d.pci_id == pci_id)
+        {
             d.is_installed = true;
             d.is_active = true;
             true
@@ -452,10 +456,22 @@ pub struct OmarchyWallustPaletteSynthesizer {
 impl OmarchyWallustPaletteSynthesizer {
     pub fn new() -> Self {
         let default_ansi = [
-            "#1e1e2e".to_string(), "#f38ba8".to_string(), "#a6e3a1".to_string(), "#f9e2af".to_string(),
-            "#89b4fa".to_string(), "#f5c2e7".to_string(), "#94e2d5".to_string(), "#bac2de".to_string(),
-            "#585b70".to_string(), "#f38ba8".to_string(), "#a6e3a1".to_string(), "#f9e2af".to_string(),
-            "#89b4fa".to_string(), "#f5c2e7".to_string(), "#94e2d5".to_string(), "#a6adc8".to_string(),
+            "#1e1e2e".to_string(),
+            "#f38ba8".to_string(),
+            "#a6e3a1".to_string(),
+            "#f9e2af".to_string(),
+            "#89b4fa".to_string(),
+            "#f5c2e7".to_string(),
+            "#94e2d5".to_string(),
+            "#bac2de".to_string(),
+            "#585b70".to_string(),
+            "#f38ba8".to_string(),
+            "#a6e3a1".to_string(),
+            "#f9e2af".to_string(),
+            "#89b4fa".to_string(),
+            "#f5c2e7".to_string(),
+            "#94e2d5".to_string(),
+            "#a6adc8".to_string(),
         ];
         Self {
             background: "#1e1e2e".to_string(),
@@ -532,7 +548,7 @@ impl Default for OmarchyQuickshellWidgetEngine {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReniceRule {
     pub process_pattern: String,
-    pub nice_priority: i8, // -20 to 19
+    pub nice_priority: i8,     // -20 to 19
     pub io_priority_class: u8, // 1: Realtime, 2: Best Effort, 3: Idle
     pub latency_sensitive: bool,
 }
@@ -571,7 +587,9 @@ impl OmarchyAnanicyCppScheduler {
     }
 
     pub fn match_process(&self, proc_name: &str) -> Option<&ReniceRule> {
-        self.rules.iter().find(|r| proc_name.contains(&r.process_pattern))
+        self.rules
+            .iter()
+            .find(|r| proc_name.contains(&r.process_pattern))
     }
 }
 
@@ -676,7 +694,11 @@ impl OmarchyWalkerLauncherEngine {
     pub fn query(&mut self, query: &str) -> Vec<String> {
         self.last_query_latency_us = 95;
         if query.is_empty() {
-            vec!["Terminal".to_string(), "Files".to_string(), "Browser".to_string()]
+            vec![
+                "Terminal".to_string(),
+                "Files".to_string(),
+                "Browser".to_string(),
+            ]
         } else {
             vec![format!("App matching '{}'", query)]
         }

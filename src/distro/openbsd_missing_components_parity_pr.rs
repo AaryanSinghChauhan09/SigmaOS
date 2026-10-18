@@ -472,7 +472,10 @@ impl OpenBsdMissingComponentsParityPrSuite {
         );
         self.validate_and_merge_pr(carp_pr);
 
-        let pledge_diff = self.pledge_unveil.apply_pledge("stdio rpath").unwrap_or_default();
+        let pledge_diff = self
+            .pledge_unveil
+            .apply_pledge("stdio rpath")
+            .unwrap_or_default();
         let pledge_pr = self.submit_pr_proposal(
             "Tighten pledge promises to stdio rpath",
             "jules",
