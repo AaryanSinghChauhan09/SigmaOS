@@ -638,10 +638,15 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             is_fully_implemented: true,
             fulfilled: true,
         });
-    }
-
-    pub fn register_idea(&mut self, idea: RoadmapFeatureIdea) {
-        self.ideas.push(idea);
+        self.ideas.push(RoadmapFeatureIdea {
+            idea_id: 2,
+            title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
+            source_type: FeatureSourceType::AppReplacementPr,
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
+                .to_string(),
+            target_module: "productivity".to_string(),
+            is_fully_implemented: true,
+        });
     }
 
     pub fn verify_100_percent_parity(&self) -> bool {
