@@ -678,6 +678,7 @@ impl OpenRcDependencySolverEngine {
     }
 }
 
+impl OpenRcStatusControllerEngine {
     pub fn mark_started(&mut self, service_name: &str) {
         self.active_services.insert(service_name.to_string());
         self.service_statuses

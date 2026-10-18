@@ -2,8 +2,6 @@
 // Sovereign OS Wiki & Documentation Master Absorption Engine
 // (`src/sovereign_wiki_master_engine.rs`)
 
-extern crate alloc;
-
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
 
@@ -213,6 +211,7 @@ impl Sovereign100IdeasSuite {
     pub fn verify_full_fulfillment(&self) -> bool {
         self.total_fulfilled_count() == 100
     }
+}
 
 impl Default for Sovereign100IdeasSuite {
     fn default() -> Self {
