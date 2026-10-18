@@ -147,11 +147,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Check if Landlock access mask is allowed under rule restriction.
-    pub fn check_landlock_access(rule_access: u64, requested_access: u64) -> bool {
-        (requested_access & !rule_access) == 0
-    }
-
     /// Generate Linux Access Control & Sandboxing PR proposal.
     pub fn generate_proposal(&self) -> SecurityPrProposalManifest {
         SecurityPrProposalManifest {
@@ -413,6 +408,14 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    /// Generate SSSD domain configuration.
+    pub fn generate_sssd_domain_conf(domain_name: &str, ldap_uri: &str, krb_realm: &str) -> String {
+        alloc::format!(
+            "[sssd]\ndomains = {}\n\n[domain/{}]\nid_provider = ldap\nauth_provider = krb5\nldap_uri = {}\nkrb5_realm = {}\nldap_search_base = dc=example,dc=org\ncache_credentials = true\n",
+            domain_name, domain_name, ldap_uri, krb_realm
+        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
