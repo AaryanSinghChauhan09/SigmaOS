@@ -358,7 +358,8 @@ impl OmarchyLinuxMissingComponentsV60PrSuite {
             self.pty_engine.generate_config(),
             self.compositor_engine.generate_rules(),
             self.walker_engine.execute_search("terminal"),
-            self.wallust_engine.sync_theme("/usr/share/backgrounds/omarchy.png"),
+            self.wallust_engine
+                .sync_theme("/usr/share/backgrounds/omarchy.png"),
             self.waybar_engine.render_bar(),
             self.lock_engine.verify_governor(),
             self.herdr_engine.verify_scheduler(),
