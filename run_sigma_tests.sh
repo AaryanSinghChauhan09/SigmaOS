@@ -1860,6 +1860,17 @@ if [ -f "tests/scheduler/core.rs" ]; then
     rustc --test tests/scheduler/affinity/affinity_test.rs --edition=2021 -o build/test_sched_affinity && ./build/test_sched_affinity
 fi
 
+if [ -f "tests/process/pid_allocator.rs" ]; then
+    echo "Running Process Management Lifecycle & Isolation test suites..."
+    mkdir -p build
+    rustc --test tests/process/pid_allocator.rs --edition=2021 -o build/test_proc_pid && ./build/test_proc_pid
+    rustc --test tests/process/lifecycle/lifecycle_test.rs --edition=2021 -o build/test_proc_lifecycle && ./build/test_proc_lifecycle
+    rustc --test tests/process/fork_exec/fork_exec_test.rs --edition=2021 -o build/test_proc_fork && ./build/test_proc_fork
+    rustc --test tests/process/wait_reap/wait_reap_test.rs --edition=2021 -o build/test_proc_wait && ./build/test_proc_wait
+    rustc --test tests/process/rlimits/rlimit_test.rs --edition=2021 -o build/test_proc_rlimit && ./build/test_proc_rlimit
+    rustc --test tests/process/namespaces/namespace_test.rs --edition=2021 -o build/test_proc_ns && ./build/test_proc_ns
+fi
+
 if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build

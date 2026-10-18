@@ -22,9 +22,9 @@ fn test_pid_allocation_basic() {
 #[test]
 fn test_pid_exhaustion_and_reuse() {
     let mut allocator = PidAllocator::new(1, 3);
-    let p1 = allocator.allocate().unwrap();
+    let _p1 = allocator.allocate().unwrap();
     let p2 = allocator.allocate().unwrap();
-    let p3 = allocator.allocate().unwrap();
+    let _p3 = allocator.allocate().unwrap();
 
     assert_eq!(allocator.allocate(), Err(PidError::PidExhausted));
 
