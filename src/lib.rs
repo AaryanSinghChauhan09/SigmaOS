@@ -443,6 +443,12 @@ pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, KubernetesPod, ResourcePool, VirtualMachine, VirtualizationError,
     VirtualizationOrchestrator, VirtualizationTech, VmState,
+    SovereignVirtualizationAndContainersParityV61Gateway,
+    KvmQemuV61Engine, LibvirtDomainV61Engine, XenHypervisorV61Engine,
+    VirtualBoxBhyveVmmV61Engine, OciDockerPodmanRuncV61Engine,
+    LxcLxdNspawnV61Engine, FreeBsdJailsZonesV61Engine,
+    KubernetesK3sRancherV61Engine, FirecrackerCloudHypervisorV61Engine,
+    GvisorKataAppleHvV61Engine,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
