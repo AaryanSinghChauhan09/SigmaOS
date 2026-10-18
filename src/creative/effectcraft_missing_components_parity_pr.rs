@@ -685,7 +685,11 @@ impl EffectcraftOpticalFlowMotionVectorPrEngine {
         for i in 0..frame1.len() {
             let p1 = frame1[i] as f32;
             let p2 = frame2[i] as f32;
-            let vec_shift = if let Some(v) = vectors.get(i / 4) { v.dx * alpha } else { 0.0 };
+            let vec_shift = if let Some(v) = vectors.get(i / 4) {
+                v.dx * alpha
+            } else {
+                0.0
+            };
             let blended = (p1 * (1.0 - alpha) + p2 * alpha + vec_shift).clamp(0.0, 255.0);
             interpolated.push(blended as u8);
         }
@@ -748,7 +752,9 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
             rgb[0] = (r * 0.6131) + (g * 0.3395) + (b * 0.0474);
             rgb[1] = (r * 0.0702) + (g * 0.9164) + (b * 0.0134);
             rgb[2] = (r * 0.0206) + (g * 0.1096) + (b * 0.8698);
-        } else if source_space == WorkingColorSpace::AcesCg && target_space == WorkingColorSpace::Rec709 {
+        } else if source_space == WorkingColorSpace::AcesCg
+            && target_space == WorkingColorSpace::Rec709
+        {
             let [r, g, b] = *rgb;
             rgb[0] = (r * 1.7051) - (g * 0.6218) - (b * 0.0833);
             rgb[1] = -(r * 0.1303) + (g * 1.1408) - (b * 0.0105);
@@ -761,9 +767,7 @@ impl EffectcraftAcesOcioColorManagementPrEngine {
             pr_title: "feat(effectcraft): Implement ACES Color Management Engine".to_string(),
             target_subsystem: "Color Science & ACES Engine".to_string(),
             original_suite: "ArtCraft EffectCraft Color Pipeline".to_string(),
-            components_added: vec![
-                "ACEScg and Rec.709 color space conversions".to_string(),
-            ],
+            components_added: vec!["ACEScg and Rec.709 color space conversions".to_string()],
             performance_multiplier: "120 FPS Real-time ACES Transformations".to_string(),
             status: "Ready for Merge".to_string(),
         }
@@ -825,12 +829,11 @@ impl EffectcraftCryptomatteAovExtractorPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Cryptomatte EXR Manifest AOV Extractor".to_string(),
+            pr_title: "feat(effectcraft): Implement Cryptomatte EXR Manifest AOV Extractor"
+                .to_string(),
             target_subsystem: "AOV & Matte Extraction Engine".to_string(),
             original_suite: "ArtCraft Cryptomatte Ecosystem".to_string(),
-            components_added: vec![
-                "Cryptomatte EXR ID matte extractor".to_string(),
-            ],
+            components_added: vec!["Cryptomatte EXR ID matte extractor".to_string()],
             performance_multiplier: "Instant ID Matte Extraction".to_string(),
             status: "Ready for Merge".to_string(),
         }
@@ -885,12 +888,11 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
         EffectcraftPrProposalManifest {
-            pr_title: "feat(effectcraft): Implement Expression Scripting Rigging Engine".to_string(),
+            pr_title: "feat(effectcraft): Implement Expression Scripting Rigging Engine"
+                .to_string(),
             target_subsystem: "Motion Graphics Scripting".to_string(),
             original_suite: "ArtCraft Expression Studio".to_string(),
-            components_added: vec![
-                "Wiggle and time expression evaluator".to_string(),
-            ],
+            components_added: vec!["Wiggle and time expression evaluator".to_string()],
             performance_multiplier: "Zero-Overhead Expression Evaluation".to_string(),
             status: "Ready for Merge".to_string(),
         }
@@ -1128,7 +1130,12 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
         }
     }
 
-    pub fn compute_volumetric_shafts(&self, _light_dir: [f32; 3], _view_dir: [f32; 3], _depths: &[f32]) -> Result<f32, String> {
+    pub fn compute_volumetric_shafts(
+        &self,
+        _light_dir: [f32; 3],
+        _view_dir: [f32; 3],
+        _depths: &[f32],
+    ) -> Result<f32, String> {
         Ok(self.fog_density * (self.raymarch_steps as f32) * 0.1)
     }
 
@@ -1137,9 +1144,7 @@ impl VolumetricLightingAtmosphericRaymarchPrEngine {
             pr_title: "feat(effectcraft): Implement Volumetric Lighting Engine".to_string(),
             target_subsystem: "Volumetric Atmospheric Lighting Engine".to_string(),
             original_suite: "ArtCraft Volumetric Studio".to_string(),
-            components_added: vec![
-                "64-step depth-buffered camera raymarching".to_string(),
-            ],
+            components_added: vec!["64-step depth-buffered camera raymarching".to_string()],
             performance_multiplier: "120 FPS Real-Time Volumetric Raymarching".to_string(),
             status: "Ready for Merge".to_string(),
         }
@@ -1309,7 +1314,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn test_fluid_vfx_engine_functional() {
         let engine = ProceduralVfxFractalFluidSimulationPrEngine::new();
@@ -1323,7 +1327,9 @@ mod tests {
         let frame1 = vec![100u8; 16];
         let frame2 = vec![110u8; 16];
         let mut output = vec![0u8; 16];
-        let processed = engine.process_temporal_denoise(&[&frame1, &frame2], &mut output).unwrap();
+        let processed = engine
+            .process_temporal_denoise(&[&frame1, &frame2], &mut output)
+            .unwrap();
         assert_eq!(processed, 16);
         assert_eq!(output[0], 105);
     }
@@ -1333,7 +1339,9 @@ mod tests {
         let engine = StereoscopicVr360SpatialVideoPrEngine::new();
         let left_eye = vec![255u8, 128u8, 64u8, 255u8];
         let mut right_eye = vec![0u8; 4];
-        let len = engine.generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0).unwrap();
+        let len = engine
+            .generate_stereoscopic_parallax(&left_eye, &mut right_eye, 2.0)
+            .unwrap();
         assert_eq!(len, 4);
     }
 

@@ -478,7 +478,8 @@ impl SovereignLinuxBsdWikiRoadmapParityEngine {
             title: "Sovereign Browser Engine (Firefox/Chromium)".to_string(),
             category: "Productivity".to_string(),
             source_type: FeatureSourceType::AppReplacementPr,
-            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs".to_string(),
+            source_file: "src/productivity/sovereign_application_replacements_pr_suite.rs"
+                .to_string(),
             target_module: "productivity".to_string(),
             is_fully_implemented: true,
         });

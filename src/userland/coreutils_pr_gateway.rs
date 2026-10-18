@@ -63,13 +63,21 @@ impl GnuCoreutilsBsdUserlandEngine {
         }
     }
 
-    pub fn run_sort(&self, lines: &[&str], numeric: bool, reverse: bool, unique: bool) -> Vec<String> {
+    pub fn run_sort(
+        &self,
+        lines: &[&str],
+        numeric: bool,
+        reverse: bool,
+        unique: bool,
+    ) -> Vec<String> {
         let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
             sorted.sort_by(|a, b| {
                 let num_a = a.parse::<f64>().unwrap_or(0.0);
                 let num_b = b.parse::<f64>().unwrap_or(0.0);
-                num_a.partial_cmp(&num_b).unwrap_or(core::cmp::Ordering::Equal)
+                num_a
+                    .partial_cmp(&num_b)
+                    .unwrap_or(core::cmp::Ordering::Equal)
             });
         } else {
             sorted.sort();
@@ -1329,7 +1337,9 @@ impl DocumentationPagerEngine {
     pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
         match (page_name, section) {
             ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self.man_db_lookup(page_name).map(|s| format!("{}({}) {}", page_name.to_uppercase(), section, s)),
+            _ => self
+                .man_db_lookup(page_name)
+                .map(|s| format!("{}({}) {}", page_name.to_uppercase(), section, s)),
         }
     }
 
@@ -1490,9 +1500,7 @@ impl AuthPrivilegeSessionEngine {
                 env_map.insert(key.to_string(), val.to_string());
                 true
             }
-            "unset" => {
-                env_map.remove(key).is_some()
-            }
+            "unset" => env_map.remove(key).is_some(),
             _ => false,
         }
     }
