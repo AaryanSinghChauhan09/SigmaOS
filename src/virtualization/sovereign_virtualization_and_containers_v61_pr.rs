@@ -86,7 +86,10 @@ impl KvmQemuV61Engine {
     }
 
     pub fn format_qemu_img_command(&self, image_path: &str, size_gb: u32, fmt: &str) -> String {
-        format!("qemu-img create -f {} -o cluster_size=65536,preallocation=metadata {} {}G", fmt, image_path, size_gb)
+        format!(
+            "qemu-img create -f {} -o cluster_size=65536,preallocation=metadata {} {}G",
+            fmt, image_path, size_gb
+        )
     }
 
     pub fn generate_pr_manifest(&self) -> VirtualizationV61PrProposalManifest {
@@ -128,7 +131,13 @@ impl LibvirtDomainV61Engine {
         Self::default()
     }
 
-    pub fn define_domain(&mut self, name: &str, driver: &str, mem_mb: u64, vcpus: u32) -> LibvirtDomainSpecV61 {
+    pub fn define_domain(
+        &mut self,
+        name: &str,
+        driver: &str,
+        mem_mb: u64,
+        vcpus: u32,
+    ) -> LibvirtDomainSpecV61 {
         let spec = LibvirtDomainSpecV61 {
             domain_name: name.to_string(),
             driver_type: driver.to_string(),
@@ -192,14 +201,26 @@ pub struct XenHypervisorV61Engine {
 impl XenHypervisorV61Engine {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.xenstore_tree.insert("/local/domain/0/name".to_string(), "Dom0".to_string());
+        engine
+            .xenstore_tree
+            .insert("/local/domain/0/name".to_string(), "Dom0".to_string());
         engine
     }
 
-    pub fn create_domu_guest(&mut self, domid: u32, name: &str, mode: XenGuestModeV61, mem_mb: u64) -> XenGuestSpecV61 {
+    pub fn create_domu_guest(
+        &mut self,
+        domid: u32,
+        name: &str,
+        mode: XenGuestModeV61,
+        mem_mb: u64,
+    ) -> XenGuestSpecV61 {
         let xs_path = format!("/local/domain/{}", domid);
-        self.xenstore_tree.insert(format!("{}/name", xs_path), name.to_string());
-        self.xenstore_tree.insert(format!("{}/memory/target", xs_path), format!("{}", mem_mb * 1024));
+        self.xenstore_tree
+            .insert(format!("{}/name", xs_path), name.to_string());
+        self.xenstore_tree.insert(
+            format!("{}/memory/target", xs_path),
+            format!("{}", mem_mb * 1024),
+        );
 
         let guest = XenGuestSpecV61 {
             domid,
@@ -213,7 +234,10 @@ impl XenHypervisorV61Engine {
     }
 
     pub fn apply_qubes_dispvm_netvm_policy(&mut self, disp_domid: u32, net_domid: u32) -> String {
-        format!("QubesOS Policy: DispVM DomID {} routed through NetVM DomID {}", disp_domid, net_domid)
+        format!(
+            "QubesOS Policy: DispVM DomID {} routed through NetVM DomID {}",
+            disp_domid, net_domid
+        )
     }
 
     pub fn generate_pr_manifest(&self) -> VirtualizationV61PrProposalManifest {
@@ -326,7 +350,12 @@ impl OciDockerPodmanRuncV61Engine {
         Self::default()
     }
 
-    pub fn run_podman_rootless(&mut self, id: &str, image: &str, mem_mb: u64) -> OciContainerSpecV61 {
+    pub fn run_podman_rootless(
+        &mut self,
+        id: &str,
+        image: &str,
+        mem_mb: u64,
+    ) -> OciContainerSpecV61 {
         let spec = OciContainerSpecV61 {
             container_id: id.to_string(),
             image: image.to_string(),
@@ -468,7 +497,12 @@ impl FreeBsdJailsZonesV61Engine {
         spec
     }
 
-    pub fn create_illumos_zone(&mut self, name: &str, brand: &str, mem_mb: u64) -> IllumosZoneSpecV61 {
+    pub fn create_illumos_zone(
+        &mut self,
+        name: &str,
+        brand: &str,
+        mem_mb: u64,
+    ) -> IllumosZoneSpecV61 {
         let spec = IllumosZoneSpecV61 {
             zone_name: name.to_string(),
             brand: brand.to_string(),
@@ -529,7 +563,8 @@ impl KubernetesK3sRancherV61Engine {
     }
 
     pub fn map_harvester_vm(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 
     pub fn generate_pr_manifest(&self) -> VirtualizationV61PrProposalManifest {
@@ -570,7 +605,12 @@ impl FirecrackerCloudHypervisorV61Engine {
         Self::default()
     }
 
-    pub fn spawn_firecracker_microvm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV61 {
+    pub fn spawn_firecracker_microvm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV61 {
         let spec = MicroVmSpecV61 {
             instance_id: id.to_string(),
             vcpus,
@@ -582,7 +622,12 @@ impl FirecrackerCloudHypervisorV61Engine {
         spec
     }
 
-    pub fn spawn_cloud_hypervisor_vm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV61 {
+    pub fn spawn_cloud_hypervisor_vm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV61 {
         let spec = MicroVmSpecV61 {
             instance_id: id.to_string(),
             vcpus,
@@ -653,7 +698,12 @@ impl GvisorKataAppleHvV61Engine {
         spec
     }
 
-    pub fn launch_apple_hv_guest(&mut self, id: &str, mem_mb: u64, rosetta: bool) -> SecureSandboxSpecV61 {
+    pub fn launch_apple_hv_guest(
+        &mut self,
+        id: &str,
+        mem_mb: u64,
+        rosetta: bool,
+    ) -> SecureSandboxSpecV61 {
         let spec = SecureSandboxSpecV61 {
             sandbox_id: id.to_string(),
             technology: "apple_hv".to_string(),
@@ -821,7 +871,10 @@ mod tests {
         let pod = engine.deploy_pod("default", "nginx", "runc");
         assert_eq!(pod.pod_name, "nginx");
         engine.map_harvester_vm("vm-core", "pod-core");
-        assert_eq!(engine.harvester_vm_mappings.get("vm-core").unwrap(), "pod-core");
+        assert_eq!(
+            engine.harvester_vm_mappings.get("vm-core").unwrap(),
+            "pod-core"
+        );
     }
 
     #[test]
