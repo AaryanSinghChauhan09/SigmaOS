@@ -711,6 +711,13 @@ if [ -f "src/distro/arch_missing_components.rs" ]; then
     ./build/arch_missing_test
 fi
 
+if [ -f "src/distro/arch_linux_missing_components_v63_pr.rs" ]; then
+    echo "Running Arch Linux missing components v63 PR suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_missing_components_v63_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/arch_missing_v63_test
+    ./build/arch_missing_v63_test
+fi
+
 if [ -f "src/package/universal.rs" ]; then
     echo "Running Universal Package Manager multi-distro test suite..."
     mkdir -p build
