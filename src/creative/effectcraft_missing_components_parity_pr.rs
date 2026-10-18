@@ -1147,6 +1147,15 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         } else {
             Ok(1.0)
         }
+        let cos_theta =
+            view_dir[0] * light_pos[0] + view_dir[1] * light_pos[1] + view_dir[2] * light_pos[2];
+        let g2 = self.anisotropy_g * self.anisotropy_g;
+        let phase = (1.0 - g2)
+            / (4.0
+                * core::f32::consts::PI
+                * (1.0 + g2 - 2.0 * self.anisotropy_g * cos_theta).powf(1.5));
+        let total_accumulation = phase * self.fog_density * (self.raymarch_steps as f32) * 0.1;
+        Ok(total_accumulation.clamp(0.0, 10.0))
     }
 
     pub fn generate_proposal(&self) -> EffectcraftPrProposalManifest {
@@ -1645,6 +1654,101 @@ mod tests {
             assert!(!manifest.pr_title.is_empty());
             assert_eq!(manifest.status, "Ready for Merge");
         }
+    }
+
+    #[test]
+    fn test_optical_flow_engine_functional() {
+        let engine = OpticalFlowSlowMotionTimeWarpPrEngine::new();
+        let f1 = vec![100, 150, 200, 250];
+        let f2 = vec![110, 160, 210, 255];
+        let vectors = engine.compute_motion_vectors(&f1, &f2, 2, 2).unwrap();
+        assert_eq!(vectors.len(), 4);
+
+        let interp = engine
+            .interpolate_intermediate_frame(&f1, &f2, &vectors, 0.5)
+            .unwrap();
+        assert_eq!(interp.len(), 4);
+    }
+
+    #[test]
+    fn test_volumetric_lighting_engine_functional() {
+        let mut engine = VolumetricLightingAtmosphericRaymarchPrEngine::new();
+        engine.add_light_shaft(LightShaft {
+            origin: [0.0, 0.0, 0.0],
+            color: [1.0, 1.0, 1.0],
+            intensity: 2.0,
+            decay: 0.1,
+        });
+
+        let color = engine.raymarch_volumetric_lighting([1.0, 1.0, 1.0], 0.8);
+        assert!(color[0] > 0.0);
+    }
+
+    #[test]
+    fn test_color_grading_lut_aces_engine_functional() {
+        let engine = ColorGradingLutAcesColorSpacePrEngine::new();
+        let aces_rgb = engine.apply_aces_transform(
+            [0.8, 0.2, 0.1],
+            AcesColorSpace::Srgb,
+            AcesColorSpace::Acescg,
+        );
+        assert_ne!(aces_rgb, [0.8, 0.2, 0.1]);
+
+        let cdl_rgb = engine.apply_cdl_grading([0.5, 0.5, 0.5], &engine.cdl);
+        assert_eq!(cdl_rgb, [0.5, 0.5, 0.5]);
+    }
+
+    #[test]
+    fn test_temporal_denoise_grain_engine_functional() {
+        let engine = TemporalNoiseReductionMotionDegrainPrEngine::new();
+        let frame1 = vec![100, 110, 120, 130];
+        let frame2 = vec![102, 108, 122, 128];
+        let denoised = engine
+            .temporal_denoise_frames(&[frame1, frame2], 2, 2)
+            .unwrap();
+        assert_eq!(denoised, vec![101, 109, 121, 129]);
+
+        let mut sample_frame = vec![128; 10];
+        let profile = FilmGrainProfile {
+            film_stock: "Kodak_Vision3_500T".to_string(),
+            grain_size: 1.0,
+            intensity: 0.05,
+        };
+        engine
+            .apply_synthetic_grain(&mut sample_frame, &profile)
+            .unwrap();
+        assert_ne!(sample_frame[0], 128);
+    }
+
+    #[test]
+    fn test_stereoscopic_vr360_engine_functional() {
+        let engine = StereoscopicVr360SpatialVideoPrEngine::new();
+        let left = vec![255, 0, 0, 255];
+        let right = vec![0, 255, 0, 255];
+        let stereo = engine
+            .composite_stereoscopic_pair(&left, &right, StereoFormat::AnaglyphRedCyan)
+            .unwrap();
+        assert_eq!(stereo, vec![255, 255, 0, 255]);
+    }
+
+    #[test]
+    fn test_procedural_fluid_fractal_engine_functional() {
+        let mut engine = ProceduralVfxFractalFluidSimulationPrEngine::new();
+        engine.add_fluid_density(5, 5, 10.0);
+        let res = engine.step_fluid_dynamics(0.1);
+        assert!(res.is_ok());
+
+        let fractal = engine.render_procedural_fractal(4, 4, 1.0).unwrap();
+        assert_eq!(fractal.len(), 4 * 4 * 4);
+    }
+
+    #[test]
+    fn test_volumetric_lighting_engine_functional() {
+        let engine = VolumetricLightingAtmosphericRaymarchPrEngine::new();
+        let shafts = engine
+            .compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0])
+            .unwrap();
+        assert!(shafts >= 0.0);
     }
 
     #[test]

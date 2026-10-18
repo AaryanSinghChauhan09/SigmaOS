@@ -2,6 +2,8 @@
 // SigmaOS - Creative Suite Module
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
+pub mod anicraft;
+pub mod anicraft_missing_components_parity_pr;
 pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
@@ -31,6 +33,17 @@ pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod wordcraft;
 
+pub use anicraft::{
+    AnimationTrack, CubicBezier, Keyframe as AnicraftKeyframe, SkeletalBone,
+    SovereignAnimationEngine,
+};
+pub use anicraft_missing_components_parity_pr::{
+    AnicraftAudioLipSyncTimelinePrEngine, AnicraftFabrikInverseKinematicsPrEngine,
+    AnicraftMeshDeformationShapeKeysPrEngine, AnicraftNlaTrackClipBlendingPrEngine,
+    AnicraftOnionSkinningPrEngine, AnicraftPrProposalManifest, IkJoint2D, LipSyncMarker,
+    NlaBlendMode, NlaClip, OnionSkinGhost, ShapeKey2D, SovereignAnicraftArtcraftParityPrGateway,
+    VertexDelta2D, VisemeCategory,
+};
 pub use audiocraft::{
     get_audiocraft, init_audiocraft, AudioClip, AudioEditor, AudioEffect, AudioEffectType,
     AudioExportFormat, AudioTrack as AudioCraftTrack, AutomationInterpolation, AutomationLane,
@@ -186,8 +199,10 @@ pub use wordcraft::{
     WordCraftPullRequestSpec,
 };
 pub use wordcraft_missing_components_parity_pr::{
-    SovereignWordcraftArtcraftParityPrGateway, WordcraftLinguisticAiSpellGrammarPrEngine,
-    WordcraftMailMergeAutomationPrEngine, WordcraftPrProposalManifest,
-    WordcraftRealtimeCrdtCollabPrEngine, WordcraftReferenceCitationBibliographyPrEngine,
-    WordcraftStylesTemplatesThemesPrEngine, WordcraftTypographyLayoutPrEngine,
+    SovereignWordcraftArtcraftParityPrGateway, WordcraftDocumentSecurityWatermarkPrEngine,
+    WordcraftEpubPdfBookPublisherPrEngine, WordcraftLinguisticAiSpellGrammarPrEngine,
+    WordcraftMailMergeAutomationPrEngine, WordcraftMissingComponentsParityPrSuite,
+    WordcraftPrProposalManifest, WordcraftRealtimeCrdtCollabPrEngine,
+    WordcraftReferenceCitationBibliographyPrEngine, WordcraftStylesTemplatesThemesPrEngine,
+    WordcraftTableFormulaChartPrEngine, WordcraftTypographyLayoutPrEngine,
 };

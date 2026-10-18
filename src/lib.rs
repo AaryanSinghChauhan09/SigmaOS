@@ -22,6 +22,8 @@ pub mod compatibility;
 pub mod container;
 pub mod contributing;
 pub mod creative;
+pub use creative::anicraft::*;
+pub use creative::anicraft_missing_components_parity_pr::*;
 pub use creative::effectcraft_missing_components_parity_pr::*;
 pub use creative::filmcraft_missing_components_parity_pr::*;
 pub use creative::photocraft_missing_components_parity_pr::*;

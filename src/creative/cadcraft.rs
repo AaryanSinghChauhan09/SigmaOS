@@ -209,7 +209,8 @@ impl ParametricSketch2D {
     }
 
     pub fn add_point(&mut self, x: f64, y: f64) -> usize {
-        self.entities.push(SketchEntity::Point(Point2D { x, y }));
+        self.entities
+            .push(SketchEntityEnum::Point(Point2D { x, y }));
         self.entities.len() - 1
     }
 

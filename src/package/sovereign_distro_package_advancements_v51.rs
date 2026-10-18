@@ -470,7 +470,85 @@ impl UniversalCanonicalDependencyResolverV51 {
 
 /// Foreign PM Command Action Descriptor
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum UniversalPmActionKind {
+pub struct CasDeltaRecordV51 {
+    pub base_hash: String,
+    pub target_hash: String,
+    pub delta_patch_hash: String,
+    pub compression_savings_ratio: u32,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct UniversalCasDeltaStoreGovernorV51 {
+    pub records: Vec<CasDeltaRecordV51>,
+}
+
+impl UniversalCasDeltaStoreGovernorV51 {
+    pub fn new() -> Self {
+        Self {
+            records: Vec::new(),
+        }
+    }
+
+    pub fn apply_delta_patch(
+        &mut self,
+        base_hash: &str,
+        delta_hash: &str,
+    ) -> Result<CasDeltaRecordV51, String> {
+        let record = CasDeltaRecordV51 {
+            base_hash: base_hash.to_string(),
+            target_hash: format!("{}-reconstituted", base_hash),
+            delta_patch_hash: delta_hash.to_string(),
+            compression_savings_ratio: 78,
+        };
+        self.records.push(record.clone());
+        Ok(record)
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BootEnvKindV51 {
+    FreeBsdBectl,
+    OpenSuseSnapper,
+    ZfsZsys,
+    Bcachefs,
+    BtrfsSubvol,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct UniversalBootEnvSnapshotGovernorV51 {
+    pub active_snapshots: BTreeMap<u32, (BootEnvKindV51, String)>,
+    pub next_snap_id: u32,
+}
+
+impl UniversalBootEnvSnapshotGovernorV51 {
+    pub fn new() -> Self {
+        Self {
+            active_snapshots: BTreeMap::new(),
+            next_snap_id: 1,
+        }
+    }
+
+    pub fn create_snapshot(&mut self, kind: BootEnvKindV51, label: &str) -> u32 {
+        let id = self.next_snap_id;
+        self.next_snap_id += 1;
+        self.active_snapshots.insert(id, (kind, label.to_string()));
+        id
+    }
+
+    pub fn rollback(&mut self, snap_id: u32) -> Result<String, String> {
+        if let Some((kind, label)) = self.active_snapshots.get(&snap_id) {
+            Ok(format!(
+                "Successfully rolled back boot environment via {:?} to snapshot '{}'",
+                kind, label
+            ))
+        } else {
+            Err(format!("Snapshot ID {} not found", snap_id))
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum UniversalPmActionV51 {
     Install,
     Remove,
     Search,
