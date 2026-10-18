@@ -109,7 +109,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
 
     /// Check if cgroup v2 controller (e.g. "memory", "cpu", "pids") is enabled in active controller string.
     pub fn is_cgroup_controller_enabled(active_controllers: &str, target_controller: &str) -> bool {
-        active_controllers.split_whitespace().any(|c| c == target_controller)
+        active_controllers
+            .split_whitespace()
+            .any(|c| c == target_controller)
     }
 
     /// Check if Linux capability bit mask contains target capability.
@@ -486,7 +488,11 @@ impl IdentityAndEnterpriseAuthPrEngine {
     }
 
     /// Generate full SSSD domain configuration with Kerberos realm.
-    pub fn generate_sssd_domain_conf_full(domain_name: &str, ldap_uri: &str, krb_realm: &str) -> String {
+    pub fn generate_sssd_domain_conf_full(
+        domain_name: &str,
+        ldap_uri: &str,
+        krb_realm: &str,
+    ) -> String {
         alloc::format!(
             "[sssd]\ndomains = {}\n\n[domain/{}]\nid_provider = ldap\nauth_provider = krb5\nldap_uri = {}\nkrb5_realm = {}\nldap_search_base = dc=example,dc=org\ncache_credentials = true\n",
             domain_name, domain_name, ldap_uri, krb_realm
@@ -514,7 +520,9 @@ impl IdentityAndEnterpriseAuthPrEngine {
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain, provider, uri
+            domain,
+            provider,
+            uri
         )
     }
 

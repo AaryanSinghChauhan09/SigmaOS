@@ -398,7 +398,8 @@ impl UniversalPackageFormatStrategyV62 for PacmanFormatStrategyV62 {
         "Arch Linux ALPM 15 / Pacman 7"
     }
     fn transpile_manifest(&self, raw: &InspectedPackageManifestV62) -> UnifiedPackage {
-        UnifiedPackage::new(raw.name.clone(), raw.version.clone()).with_format(PackageFormat::Pacman)
+        UnifiedPackage::new(raw.name.clone(), raw.version.clone())
+            .with_format(PackageFormat::Pacman)
     }
 }
 
@@ -418,7 +419,8 @@ impl UniversalPackageFormatStrategyV62 for PortageFormatStrategyV62 {
         "Gentoo Portage Ebuild"
     }
     fn transpile_manifest(&self, raw: &InspectedPackageManifestV62) -> UnifiedPackage {
-        UnifiedPackage::new(raw.name.clone(), raw.version.clone()).with_format(PackageFormat::Ebuild)
+        UnifiedPackage::new(raw.name.clone(), raw.version.clone())
+            .with_format(PackageFormat::Ebuild)
     }
 }
 
@@ -559,7 +561,10 @@ impl UniversalPackageMetadataFlyweightV62 {
         let mut map = BTreeMap::new();
         map.insert(
             "core".to_string(),
-            vec!["sovereign-libc".to_string(), "sovereign-openssl".to_string()],
+            vec![
+                "sovereign-libc".to_string(),
+                "sovereign-openssl".to_string(),
+            ],
         );
         Self {
             common_dependencies: map,
@@ -657,8 +662,14 @@ impl UniversalCrossDistroSatSolverV62 {
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-dev".to_string(), "sovereign-openssl".to_string());
-        map.insert("dev-libs/openssl".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "dev-libs/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("pkgs.openssl".to_string(), "sovereign-openssl".to_string());
         map.insert("zlib1g".to_string(), "sovereign-zlib".to_string());
         map.insert("zlib-devel".to_string(), "sovereign-zlib".to_string());
@@ -917,7 +928,10 @@ impl UniversalPmCliRouterV62 {
                             .map(|s| s.to_string())
                             .collect(),
                     )
-                } else if parts.contains(&"remove") || parts.contains(&"purge") || parts.contains(&"-r") {
+                } else if parts.contains(&"remove")
+                    || parts.contains(&"purge")
+                    || parts.contains(&"-r")
+                {
                     (
                         UniversalPmActionV62::Remove,
                         parts
@@ -956,9 +970,10 @@ impl UniversalPmCliRouterV62 {
                     (UniversalPmActionV62::Query, vec![])
                 }
             }
-            "dnf" | "yum" | "rpm" | "zypper" | "apk" | "xbps-install" | "pkg" | "ports" | "pkgsrc"
-            | "pkg_add" | "emerge" | "portage" | "nix" | "guix" | "flatpak" | "snap" | "brew"
-            | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig" | "swift" => {
+            "dnf" | "yum" | "rpm" | "zypper" | "apk" | "xbps-install" | "pkg" | "ports"
+            | "pkgsrc" | "pkg_add" | "emerge" | "portage" | "nix" | "guix" | "flatpak" | "snap"
+            | "brew" | "cargo" | "pip" | "npm" | "pnpm" | "yarn" | "gem" | "luarocks" | "zig"
+            | "swift" => {
                 if parts.contains(&"install")
                     || parts.contains(&"add")
                     || parts.contains(&"-i")
@@ -1157,14 +1172,15 @@ impl SovereignDistroPackageAdvancementsSuiteV62 {
         let sigpkg_id = format!("sigpkg-v62-{}", manifest.name);
         self.installed_packages.push(sigpkg_id.clone());
 
-        self.pr_gateway.submit_proposal(PackagePrProposalManifestV62 {
-            pr_id: 6201,
-            title: format!("PR: Transpile and Install {}", manifest.name),
-            source_format: manifest.detected_format,
-            target_native_package: sigpkg_id,
-            changes_summary: format!("Resolved dependencies: {:?}", solved_deps),
-            verification_passed: true,
-        });
+        self.pr_gateway
+            .submit_proposal(PackagePrProposalManifestV62 {
+                pr_id: 6201,
+                title: format!("PR: Transpile and Install {}", manifest.name),
+                source_format: manifest.detected_format,
+                target_native_package: sigpkg_id,
+                changes_summary: format!("Resolved dependencies: {:?}", solved_deps),
+                verification_passed: true,
+            });
 
         Ok(sigpkg)
     }
@@ -1281,10 +1297,7 @@ mod tests {
         assert_eq!(rpm_strat.format_name(), "RedHat / Fedora DNF5 RPM");
 
         let pacman_strat = PacmanFormatStrategyV62;
-        assert_eq!(
-            pacman_strat.format_name(),
-            "Arch Linux ALPM 15 / Pacman 7"
-        );
+        assert_eq!(pacman_strat.format_name(), "Arch Linux ALPM 15 / Pacman 7");
 
         let strategies = UniversalPackageAdapterFactoryV62::create_strategy(PackageFormat::Deb);
         assert_eq!(strategies.len(), 3);
