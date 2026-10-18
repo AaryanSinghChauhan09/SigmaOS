@@ -39,7 +39,65 @@ pub struct PresenterNotes {
     pub active: bool,
 }
 
-#[derive(Debug)]
+pub type DeckExportFormat = ExportFormat;
+
+/// Slide Exporter Engine
+pub struct SlideExporterEngine;
+
+impl SlideExporterEngine {
+    pub fn export_deck(deck: &SlideDeck, format: ExportFormat) -> Vec<u8> {
+        let mut output = Vec::new();
+
+        match format {
+            ExportFormat::Pdf => {
+                output.extend_from_slice(b"%PDF-1.7\n%DECKCRAFT_SLIDE_PRESENTATION_PDF\n");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"\nSlides Count: ");
+                output.extend_from_slice(deck.slides.len().to_string().as_bytes());
+            }
+            ExportFormat::Pptx => {
+                output.extend_from_slice(b"PK\x03\x04_DECKCRAFT_PPTX_STREAM:\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
+            }
+            ExportFormat::Html5 => {
+                output.extend_from_slice(b"<!DOCTYPE html>\n<html><head><title>");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(
+                    b"</title></head><body>\n<div class=\"reveal\">\n<div class=\"slides\">\n",
+                );
+                for slide in &deck.slides {
+                    output.extend_from_slice(b"<section><h2>");
+                    output.extend_from_slice(slide.title.as_bytes());
+                    output.extend_from_slice(b"</h2></section>\n");
+                }
+                output.extend_from_slice(b"</div></div></body></html>");
+            }
+            ExportFormat::ZenithPresentation => {
+                output.extend_from_slice(b"ZENITH_PRESENTATION_STREAM_V1\nTitle: ");
+                output.extend_from_slice(deck.title.as_bytes());
+            }
+            ExportFormat::Markdown => {
+                output.extend_from_slice(b"# ");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"\n\n");
+                for slide in &deck.slides {
+                    output.extend_from_slice(b"---\n\n## ");
+                    output.extend_from_slice(slide.title.as_bytes());
+                    output.extend_from_slice(b"\n\n");
+                }
+            }
+            ExportFormat::Svg => {
+                output.extend_from_slice(b"<svg xmlns=\"http://www.w3.org/2000/svg\">\n<title>");
+                output.extend_from_slice(deck.title.as_bytes());
+                output.extend_from_slice(b"</title></svg>");
+            }
+        }
+
+        output
+    }
+}
+
+/// Core Deckcraft Engine
 pub struct DeckCraftEngine {
     pub decks: BTreeMap<u32, PresentationDeck>,
     pub presenter_state: PresenterNotes,
