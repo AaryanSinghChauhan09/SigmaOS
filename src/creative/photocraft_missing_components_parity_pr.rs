@@ -320,9 +320,6 @@ impl PhotocraftColorGradingFrequencySeparationPrEngine {
 // 3. Multi-Channel Color Grading & Frequency Separation PR Engine
 // ============================================================================
 
-#[derive(Debug, Default, Clone)]
-pub struct PhotocraftColorGradingFrequencySeparationPrEngine;
-
 impl PhotocraftColorGradingFrequencySeparationPrEngine {
     pub fn new() -> Self {
         Self
