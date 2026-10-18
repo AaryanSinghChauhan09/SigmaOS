@@ -340,12 +340,14 @@ impl SystemdTransientScopeGovernor {
     }
 
     pub fn create_scope(&mut self, scope_name: String, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.clone(), slice.clone());
+        self.transient_scopes
+            .insert(scope_name.clone(), slice.clone());
         self.active_scopes.insert(scope_name, slice);
     }
 
     pub fn register_transient_scope(&mut self, scope_name: &str, slice: SystemdCgroupsv2Slice) {
-        self.transient_scopes.insert(scope_name.to_string(), slice.clone());
+        self.transient_scopes
+            .insert(scope_name.to_string(), slice.clone());
         self.active_scopes.insert(scope_name.to_string(), slice);
     }
 
@@ -1091,7 +1093,8 @@ impl LaunchdJobSupervisorEngine {
         if job.run_at_load {
             self.job_states
                 .insert(job.label.clone(), ServiceState::Running);
-            self.running_pids.insert(job.label.clone(), 5000 + job.label.len() as u32);
+            self.running_pids
+                .insert(job.label.clone(), 5000 + job.label.len() as u32);
         } else {
             self.job_states
                 .insert(job.label.clone(), ServiceState::Stopped);
@@ -1108,7 +1111,8 @@ impl LaunchdJobSupervisorEngine {
             if job.mach_services.contains(&mach_service.to_string()) {
                 self.job_states
                     .insert(job.label.clone(), ServiceState::Running);
-                self.running_pids.insert(job.label.clone(), 5000 + job.label.len() as u32);
+                self.running_pids
+                    .insert(job.label.clone(), 5000 + job.label.len() as u32);
                 return Some(job.label.clone());
             }
         }
