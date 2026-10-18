@@ -22,6 +22,7 @@ pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
+pub mod filmcraft_artcraft_parity_pr;
 pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
 pub mod fontcraft_missing_components_parity_pr;
@@ -122,6 +123,8 @@ pub use effectcraft_missing_components_parity_pr::{
     Spatial3DDepthCompositorPrEngine,
 };
 pub use figcraft_missing_components_parity_pr::*;
+pub use filmcraft_artcraft_parity_pr::*;
+pub use filmcraft_missing_components_parity_pr::*;
 pub use filmcraft::{
     get_filmcraft, init_filmcraft, AudioChannel, AudioCodec, AudioMixer, Clip, ColorGrading,
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,

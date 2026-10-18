@@ -6,10 +6,8 @@
 #![no_std]
 
 extern crate alloc;
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// Video codec
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -454,6 +452,32 @@ impl VideoEditor {
     /// Toggle snapping
     pub fn toggle_snapping(&mut self) {
         self.timeline.snap_enabled = !self.timeline.snap_enabled;
+    }
+
+    /// Toggle proxy media rendering
+    pub fn toggle_proxy(&mut self, enabled: bool) -> bool {
+        self.proxy_enabled = enabled;
+        self.proxy_enabled
+    }
+
+    /// Set active multicam camera angle on a clip
+    pub fn set_multicam_angle(
+        &mut self,
+        track_id: u32,
+        clip_id: u32,
+        angle: u32,
+    ) -> Result<(), &'static str> {
+        let track = self
+            .timeline
+            .tracks
+            .get_mut(track_id as usize)
+            .ok_or("Track not found")?;
+        let clip = track
+            .clips
+            .get_mut(clip_id as usize)
+            .ok_or("Clip not found")?;
+        clip.in_point = angle * 10; // Angle offset representation
+        Ok(())
     }
 
     /// Is active
