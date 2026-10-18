@@ -71,14 +71,16 @@ pub mod observability;
 pub mod orchestration;
 pub mod package;
 pub use package::{
+    ForeignRepoIndexParser, PkgConfig, SandboxActionType, SandboxedScriptletResult, SigmaPkg,
     SovereignDistroPackageAdvancementsSuiteV10, SovereignDistroPackageAdvancementsSuiteV11,
     SovereignDistroPackageAdvancementsSuiteV14, SovereignDistroPackageAdvancementsSuiteV19,
     SovereignDistroPackageAdvancementsSuiteV20, SovereignDistroPackageAdvancementsSuiteV32,
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV40,
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
-    SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV61,
-    SovereignDistroPackageAdvancementsSuiteV62, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV50, SovereignUniversalPackageVerifier,
+    UniversalDistroPackageOrchestrator, UniversalForeignPackageFormat,
+    UniversalForeignPackageFormatConverter, UniversalPackageFormat, UniversalPackageImporter,
+    UniversalPackageTriggerEngine, UniversalPackageTriggerType, UniversalPackageVerificationResult,
 };
 pub mod process;
 pub mod productivity;
