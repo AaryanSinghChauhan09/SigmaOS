@@ -173,6 +173,13 @@ description = "Notification policy/data model; no verified service or graphical 
 test_evidence = "Module tests only; no user-session integration"
 next_milestone = "Connect notifications to the session and test delivery, dismissal, and persistence"
 
+[desktop.gui_development_plan]
+status = "integrated"
+files = ["docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md", "wiki/30-SigmaOS-GUI-Development-Plan.md", "src/desktop/sovereign_gui_development_and_pr_suite.rs"]
+description = "SigmaOS GUI Development Plan defining Wayland protocol model, DRM/KMS atomic modesetting, freedesktop desktop interfaces, WCAG 2.2 accessibility guidance, 19 proposed PR sequence, periodic maintenance cadences, component rules, PR review/merge gates, and rollout criteria"
+test_evidence = "Architecture specification published in docs/SIGMAOS_GUI_DEVELOPMENT_PLAN.md and wiki/30-SigmaOS-GUI-Development-Plan.md; 6 unit tests pass via rustc --test src/desktop/sovereign_gui_development_and_pr_suite.rs"
+next_milestone = "PR 1: docs(desktop): define GUI scope, session architecture, and support status & PR 3: feat(display): establish framebuffer and output discovery contract"
+
 [package.signing]
 status = "working"
 files = ["src/package/signing.rs"]
