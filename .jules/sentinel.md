@@ -1,10 +1,9 @@
-# Sentinel Agent Journal 🛡️
+## 2026-10-16 - Case-Insensitive URL Scheme & Backslash Parser Differential Security
+**Vulnerability:** `validate_url` rejected uppercase schemes (e.g. `HTTP://` / `Https://`) while allowing backslashes (`\`) which WHATWG URL parsers normalize to slashes (`/`), leading to URL parser differential, open redirect, and SSRF vulnerabilities (CWE-601 / CWE-918).
+**Learning:** Strict RFC 3986 scheme comparison requires ASCII case-insensitivity (`eq_ignore_ascii_case`). Furthermore, backslashes in URL paths allow host-path confusion when downstream components decode or parse URLs differently (WHATWG vs RFC 3986).
+**Prevention:** Always parse scheme prefixes case-insensitively and explicitly reject backslash characters in web input validation to prevent parser differential attacks.
 
-## 2025-05-18 - OpenBSD Pledge/Unveil Isolation & Hardened Memory Protections
-**Learning:** Combining OpenBSD pledge/unveil syscall restrictors with seL4 memory protection boundaries in userland services prevents arbitrary privilege escalation and protects against zero-day exploit chains in package management UDF execution environments.
-**Action:** Enforce strict pledge sandbox capabilities (`stdio rpath wpath cpath inet`) on all distro package transpilers and scriptlet engines.
-
-## 2025-05-18 - Privilege Escalation Group Parameter Sanitization
-**Vulnerability:** Group membership slices (`groups: &[&str]`) in privilege authorization (`SovereignSudoEngine::authorize`) lacked validation for embedded NUL bytes and ASCII control characters, creating risks of C-ABI string truncation and CWE-150 / CWE-117 log/command injection.
-**Learning:** All string slices passed into privilege escalation and authentication routines—including indirect parameters like group membership lists—must be checked for NUL bytes (`\0`) and control characters (`b < 32 || b == 127`).
-**Prevention:** Enforce byte-slice iteration checks (`g.as_bytes().contains(&0) || g.bytes().any(|b| b < 32 || b == 127)`) on all slice collections across security enforcement interfaces.
+## 2026-10-17 - MS-DOS Reserved Device Name Bypass in Filename Input Validation
+**Vulnerability:** `validate_filename` allowed MS-DOS reserved device names (`CON`, `PRN`, `AUX`, `NUL`, `COM1`..`COM9`, `LPT1`..`LPT9`, `CLOCK$`) with or without file extensions (e.g., `CON`, `aux.json`, `COM1.txt`), leading to special device file access, file system hijacking, denial-of-service, and arbitrary device I/O vulnerabilities (CWE-667 / CWE-706).
+**Learning:** Windows and compatibility subsystems map filenames whose stems (up to the first dot) match reserved device names directly to physical or virtual hardware devices regardless of extension or directory structure.
+**Prevention:** Always extract the filename stem and perform case-insensitive comparison against reserved device names (`eq_ignore_ascii_case`) in filename validation functions.
