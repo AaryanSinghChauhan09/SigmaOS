@@ -47,11 +47,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         alloc::format!("{}:{}:{}:{}", user, role, domain_type, level)
     }
 
-    /// Evaluate Landlock access permission.
-    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
-        (handled_access & requested_access) == requested_access
-    }
-
     /// Evaluate SELinux access vector decision (Type Enforcement).
     pub fn evaluate_selinux_avc(
         &self,
