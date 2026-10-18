@@ -363,4 +363,18 @@ zenith.handleEmulatorCommand({ key: "Enter", target: emulatorInput });
 assert.strictEqual(emulatorConsole.children.length, 2, "Expected handleEmulatorCommand to append 2 console lines");
 console.log("✓ Developer Portal & System Action handlers verified successfully!");
 
+// Test 15: OmniShell Terminal Interactive Command Handler & ARIA Log Output
+const termOutput = createMockElement("terminal-output");
+const termInput = createMockElement("terminal-input");
+
+zenith.handleTerminalCommand("neofetch");
+assert.strictEqual(termOutput.children.length, 2, "Expected handleTerminalCommand('neofetch') to append prompt line and response line");
+assert.strictEqual(termOutput.children[0].textContent, "sovereign@sigma:~$ neofetch", "Expected prompt line text");
+assert.strictEqual(termOutput.children[1].textContent.includes("SigmaOS Zenith v15.0"), true, "Expected neofetch response text");
+
+zenith.handleTerminalCommand("clear");
+assert.strictEqual(termOutput.children.length, 0, "Expected clear command to clear terminal output");
+
+console.log("✓ OmniShell Terminal interactive command execution and ARIA log output verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");
