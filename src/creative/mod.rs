@@ -6,6 +6,8 @@ pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
 pub mod deckcraft;
+pub mod deckcraft_artcraft_parity_pr;
+pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -171,4 +173,20 @@ pub use figcraft_missing_components_parity_pr::{
     FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
     FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
     FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use deckcraft_artcraft_parity_pr::{
+    DeckcraftAiSlideGeneratorLayoutAutoBalancePrEngine, DeckcraftArtcraftParityPrSuite,
+    DeckcraftArtcraftPrProposalManifest, DeckcraftCrdtMultiUserCoAuthoringPrEngine,
+    DeckcraftLiveAudienceQnaPollingPrEngine, DeckcraftLiveDataDrivenChartsPrEngine,
+    DeckcraftMasterTemplateThemeCascadePrEngine, DeckcraftMultiFormat4kVideoRendererPrEngine,
+    DeckcraftPresenterZenithDualScreenPrEngine, DeckcraftRevealJsHtml5ExporterPrEngine,
+    DeckcraftSmartDiagramConnectorFlowPrEngine, DeckcraftVectorMorphingKeyframeAnimationPrEngine,
+    SovereignDeckcraftArtcraftParityPrGateway as SovereignDeckcraftArtcraftParityPrGatewayV2,
+};
+pub use deckcraft_missing_components_parity_pr::{
+    DeckcraftAdvancedVectorAnimationTimelinePrEngine,
+    DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine, DeckcraftInteractivePollAudienceQnaPrEngine,
+    DeckcraftMultiFormatBatchExportRenderPrEngine, DeckcraftPrProposalManifest,
+    DeckcraftRealtimeCrdtMultiUserCollabPrEngine, DeckcraftSmartDiagramDataChartPrEngine,
+    SovereignDeckcraftArtcraftParityPrGateway,
 };
