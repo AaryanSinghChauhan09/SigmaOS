@@ -151,6 +151,21 @@ pub use fontcraft_missing_components_parity_pr::{
     OpenTypeFeatureTag, ShapedGlyph, SovereignFontcraftArtcraftParityPrGateway, VariableFontAxis,
     Woff2Header,
 };
+pub use gridcraft::{
+    get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
+    DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
+    GridcraftEngine, GridcraftFormulaSpreadsheetPrDeployer, GridcraftMasterPrDeploymentSuite,
+    GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
+    PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
+};
+pub use gridcraft_missing_components_parity_pr::{
+    CellEditDelta, ConditionalFormatRule, FormulaValue, GoalSeekResult,
+    GridcraftAdvancedFormulaXlookupPrEngine, GridcraftDataValidationConditionalFormattingPrEngine,
+    GridcraftFinancialGoalSeekSolverPrEngine, GridcraftMacroScriptingUdfPrEngine,
+    GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
+    GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
+    SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
+};
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
     ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
