@@ -26,6 +26,7 @@ pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
 pub mod pdfcraft_artcraft_parity_pr;
+pub mod pdfcraft_missing_components_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
@@ -181,6 +182,11 @@ pub use pdfcraft_artcraft_parity_pr::{
     PdfcraftMultiWorkspaceProjectPrEngine, PdfcraftOcrTextRecognitionPrEngine,
     PdfcraftPageImpositionBookletPrEngine, PdfcraftRedactionSanitizationPrEngine,
     PdfcraftVectorArtImportPrEngine, SovereignPdfcraftArtcraftParityPrGateway,
+};
+pub use pdfcraft_missing_components_parity_pr::{
+    PdfcraftMissingComponentsParityPrSuite, PdfcraftPrCategory,
+    PdfcraftPrProposalManifest as PdfcraftMissingComponentsPrProposalManifest,
+    SovereignPdfcraftMissingComponentsParityPrGateway,
 };
 pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
