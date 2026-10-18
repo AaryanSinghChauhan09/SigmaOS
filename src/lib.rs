@@ -506,4 +506,5 @@ pub mod io;
 
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
+pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
