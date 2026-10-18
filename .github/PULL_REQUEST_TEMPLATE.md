@@ -1,40 +1,32 @@
 ## Summary
 
-<!-- What secondary-memory behavior changed and why? -->
-
-## Storage component
-
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
+<!-- One paragraph: what changed and why. -->
 
 ## Component
 
-- [ ] Shell component
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Recurring task
+## Changes (What SigmaOS adopts)
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly storage audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+-
 
-## Reference behavior (Upstream study)
+## Motivation
 
-<!-- Required for lifecycle, ABI, or storage changes -->
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Reference study (Upstream study)
+
+<!-- Required for lifecycle, ABI, storage, or scheduling changes -->
 
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
@@ -42,52 +34,65 @@
 - New behavior:
 - Compatibility impact:
 
-## Changes (What SigmaOS adopts)
+## Implementation notes
 
--
--
+<!-- Design decisions, data structures, locking, error handling. -->
 
-## Storage safety review
+## Tests
 
-- [ ] Storage safety review
-- [ ] Kernel safety review
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
+
+## Verification
+
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+```
+
+Paste relevant output below.
+
+## Capability status
+
+- Previous status:
+- New status:
+- Evidence:
+
+## Integration impact
+
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim
+
+## Kernel safety review
+
+- [ ] Lock ordering documented
 - [ ] Interrupt-context safety considered
 - [ ] Signal races considered
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
 
-## Kernel safety review
-
-- [ ] Shell safety review
-- [ ] Lock ordering documented
-
-## Evidence
-
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
-
-## Status updates
-
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Storage documentation
-- [ ] Boot matrix, if applicable
-
-## Risks and rollback (Safety and rollback)
+## Safety and rollback
 
 - Risk:
 - Rollback:
