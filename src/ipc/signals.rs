@@ -145,14 +145,18 @@ impl SignalDeliverySystem {
                 .processes
                 .get(&sender_pid)
                 .ok_or(IPCError::NotConnected)?;
-            sender.capability.check_write()?;
+            if !sender.capability.write_allowed {
+                return Err(IPCError::PermissionDenied);
+            }
         }
 
         let receiver = self
             .processes
             .get_mut(&receiver_pid)
             .ok_or(IPCError::NotConnected)?;
-        receiver.capability.check_read()?;
+        if !receiver.capability.read_allowed {
+            return Err(IPCError::PermissionDenied);
+        }
 
         let pending = PendingSignal {
             signal_type,

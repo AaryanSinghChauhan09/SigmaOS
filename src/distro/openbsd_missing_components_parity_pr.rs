@@ -132,9 +132,16 @@ impl OpenBsdPledgeUnveilMatrixPrEngine {
         }
     }
 
-    pub fn pledge(&mut self, promises: &str) -> Result<String, String> {
-        let new_promises: Vec<String> =
-            promises.split_whitespace().map(|s| s.to_string()).collect();
+    pub fn apply_pledge(&mut self, promises: &str) -> Result<String, String> {
+        for promise in promises.split_whitespace() {
+            if !self.pledge_promises.contains(&promise.to_string()) {
+                self.pledge_promises.push(promise.to_string());
+            }
+        }
+        let new_promises: Vec<String> = promises_str
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect();
         self.pledge_promises = new_promises;
         Ok(format!(
             "PR Proposal: Applied OpenBSD pledge promises: {}",
@@ -345,27 +352,30 @@ pub struct OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
 impl OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
     pub fn new() -> Self {
         Self {
-            smtpd_listeners: vec!["127.0.0.1:25".to_string()],
-            doas_rules: vec![OpenBsdDoasRule {
-                permit: true,
-                identity: "root".to_string(),
-                target_user: "root".to_string(),
-                cmd: "*".to_string(),
-                nopass: true,
-            }],
-            slaacd_interfaces: vec!["em0".to_string()],
+            smtpd_listeners: Vec::new(),
+            doas_rules: Vec::new(),
+            slaacd_interfaces: Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdDaemonSuitePrEngine {
+    pub smtpd_running: bool,
+    pub doas_configured: bool,
+    pub slaacd_running: bool,
+}
+
+impl OpenBsdDaemonSuitePrEngine {
+    pub fn new() -> Self {
+        Self {
+            smtpd_running: true,
+            doas_configured: true,
+            slaacd_running: true,
         }
     }
 
-    pub fn add_doas_rule(&mut self, identity: &str, cmd: &str, nopass: bool) -> String {
-        let rule = OpenBsdDoasRule {
-            permit: true,
-            identity: identity.to_string(),
-            target_user: "root".to_string(),
-            cmd: cmd.to_string(),
-            nopass,
-        };
-        self.doas_rules.push(rule);
+    pub fn get_daemon_status(&self) -> String {
         format!(
             "--- a/etc/doas.conf\n+++ b/etc/doas.conf\n@@ -1,1 +1,2 @@\n+permit {} {} as root cmd {}\n",
             if nopass { "nopass" } else { "" },
@@ -375,18 +385,10 @@ impl OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
     }
 }
 
-impl Default for OpenBsdDaemonsSmtpdDoasSlaacdPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OpenBsdPrStatus {
     Submitted,
-    InReview,
     Merged,
-    Rejected,
 }
 
 #[derive(Debug, Clone)]
@@ -400,19 +402,15 @@ pub struct OpenBsdPrProposal {
     pub status: OpenBsdPrStatus,
 }
 
-// ============================================================================
-// 7. Master PR Gateway Suite
-// ============================================================================
-
 pub struct OpenBsdMissingComponentsParityPrSuite {
     pub pfsync_carp: OpenBsdPfsyncCarpPrEngine,
     pub pledge_unveil: OpenBsdPledgeUnveilMatrixPrEngine,
     pub karl_pinsyscall: OpenBsdKarlPinsyscallPrEngine,
     pub signify: OpenBsdSignifyEd25519PrEngine,
     pub bioctl: OpenBsdBioctlSoftraidPrEngine,
-    pub daemons: OpenBsdDaemonsSmtpdDoasSlaacdPrEngine,
-    pub proposals: BTreeMap<u64, OpenBsdPrProposal>,
+    pub daemons: OpenBsdDaemonSuitePrEngine,
     pub next_pr_id: u64,
+    pub proposals: BTreeMap<u64, OpenBsdPrProposal>,
 }
 
 impl OpenBsdMissingComponentsParityPrSuite {
@@ -423,9 +421,9 @@ impl OpenBsdMissingComponentsParityPrSuite {
             karl_pinsyscall: OpenBsdKarlPinsyscallPrEngine::new(),
             signify: OpenBsdSignifyEd25519PrEngine::new(),
             bioctl: OpenBsdBioctlSoftraidPrEngine::new(),
-            daemons: OpenBsdDaemonsSmtpdDoasSlaacdPrEngine::new(),
+            daemons: OpenBsdDaemonSuitePrEngine::new(),
+            next_pr_id: 1,
             proposals: BTreeMap::new(),
-            next_pr_id: 8001,
         }
     }
 
@@ -474,7 +472,7 @@ impl OpenBsdMissingComponentsParityPrSuite {
         );
         self.validate_and_merge_pr(carp_pr);
 
-        let pledge_diff = self.pledge_unveil.pledge("stdio rpath").unwrap_or_default();
+        let pledge_diff = self.pledge_unveil.apply_pledge("stdio rpath").unwrap_or_default();
         let pledge_pr = self.submit_pr_proposal(
             "Tighten pledge promises to stdio rpath",
             "jules",

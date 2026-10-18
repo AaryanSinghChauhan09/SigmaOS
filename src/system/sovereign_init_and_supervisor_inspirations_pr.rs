@@ -230,6 +230,19 @@ impl OpenRcInspirationsPrEngine {
         Self
     }
 
+    /// Merge `/etc/rc.conf` with `/etc/rc.conf.local` overrides.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
+    }
+
     /// Parse `/etc/init.d/` shell script dependency header block (depend() function simulation).
     pub fn parse_openrc_init_script(
         &self,
@@ -583,6 +596,19 @@ impl BsdRcInspirationsPrEngine {
     }
     pub fn new() -> Self {
         Self
+    }
+
+    /// Merge `/etc/rc.conf` with `/etc/rc.conf.local` overrides.
+    pub fn merge_rc_conf_overrides(
+        &self,
+        base_conf: &BTreeMap<String, String>,
+        local_conf: &BTreeMap<String, String>,
+    ) -> BTreeMap<String, String> {
+        let mut merged = base_conf.clone();
+        for (k, v) in local_conf {
+            merged.insert(k.clone(), v.clone());
+        }
+        merged
     }
 
     /// Simulate FreeBSD / OpenBSD / NetBSD `rcorder` topological dependency sorting.

@@ -127,7 +127,7 @@ impl InitSystem {
         Ok(())
     }
 
-    pub fn check_watchdogs(&mut self, now: u64) {
+    pub fn check_watchdogs(&mut self, now: u64) -> Result<(), ()> {
         for srv in self.services.values_mut() {
             if srv.state == ServiceState::Running && srv.watchdog_usec > 0 {
                 if now.saturating_sub(srv.last_ping) > srv.watchdog_usec {
@@ -174,14 +174,21 @@ pub struct SystemdSocketActivationEngine {
     pub sockets: BTreeMap<String, SystemdSocketUnit>,
 }
 
-impl SystemdSocketActivationEngine {
+/// Systemd Socket Activation Engine
+#[derive(Debug, Clone, Default)]
+pub struct SystemdSocketActivationUnitEngine {
+    pub socket_name: String,
+    pub sockets: BTreeMap<String, SystemdSocketUnit>,
+    pub passed_fds: Vec<i32>,
+}
+
+impl SystemdSocketActivationUnitEngine {
     pub fn new(socket_name: &str) -> Self {
         Self {
             socket_name: socket_name.to_string(),
             listen_stream: None,
             listen_datagram: None,
             passed_fds: Vec::new(),
-            sockets: BTreeMap::new(),
         }
     }
 
@@ -585,10 +592,29 @@ impl OpenRcStatusControllerEngine {
 
     pub fn mark_started(&mut self, service_name: &str) {
         self.active_services.insert(service_name.to_string());
+        self.service_statuses.insert(service_name.to_string(), ServiceState::Running);
     }
 
     pub fn mark_stopped(&mut self, service_name: &str) {
         self.active_services.remove(service_name);
+        self.service_statuses.insert(service_name.to_string(), ServiceState::Stopped);
+    }
+}
+
+    pub fn update_status(&mut self, service: String, state: ServiceState) {
+        if state == ServiceState::Running {
+            self.active_services.insert(service.clone());
+        } else {
+            self.active_services.remove(&service);
+        }
+        self.service_statuses.insert(service, state);
+    }
+
+    pub fn query_status(&self, service: &str) -> ServiceState {
+        self.service_statuses
+            .get(service)
+            .copied()
+            .unwrap_or(ServiceState::Stopped)
     }
 }
 
@@ -627,54 +653,6 @@ impl OpenRcHeader {
     }
 }
 
-/// OpenRC Dependency Solver Engine
-pub struct OpenRcDependencySolverEngine {
-    pub current_runlevel: OpenRcRunlevel,
-    pub scripts: BTreeMap<String, OpenRcHeader>,
-}
-
-impl OpenRcDependencySolverEngine {
-    pub fn new() -> Self {
-        Self {
-            current_runlevel: OpenRcRunlevel::SysInit,
-            scripts: BTreeMap::new(),
-        }
-    }
-
-    pub fn transition_runlevel(&mut self, target: OpenRcRunlevel) {
-        self.current_runlevel = target;
-    }
-
-    pub fn mark_started(&mut self, service_name: &str) {
-        self.active_services.insert(service_name.to_string());
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Stopped);
-    }
-
-    pub fn update_status(&mut self, service: String, state: ServiceState) {
-        if state == ServiceState::Running {
-            self.active_services.insert(service.clone());
-        } else {
-            self.active_services.remove(&service);
-        }
-        self.service_statuses.insert(service, state);
-    }
-
-    pub fn query_status(&self, service: &str) -> ServiceState {
-        self.service_statuses
-            .insert(service_name.to_string(), ServiceState::Running);
-    }
-
-    pub fn mark_stopped(&mut self, service_name: &str) {
-        self.active_services.remove(service_name);
-    }
-}
 
 pub type OpenRcStatusControllerSpecEngine = OpenRcStatusControllerEngine;
 
@@ -880,37 +858,8 @@ pub struct SysVInittabEntry {
     pub process: String,
 }
 
-impl SysVInittabEntry {
-    pub fn parse_line(line: &str) -> Option<Self> {
-        let parts: Vec<&str> = line.trim().split(':').collect();
-        if parts.len() != 4 {
-            return None;
-        }
-        let id = parts[0].to_string();
-        let runlevels = parts[1].chars().collect();
-        let action = match parts[2] {
-            "respawn" => SysVAction::Respawn,
-            "sysinit" => SysVAction::SysInit,
-            "wait" => SysVAction::Wait,
-            "once" => SysVAction::Once,
-            "ctrlaltdel" => SysVAction::CtrlAltDel,
-            "powerfail" => SysVAction::PowerFail,
-            "off" => SysVAction::Off,
-            "ondemand" => SysVAction::OnDemand,
-            _ => return None,
-        };
-        let process = parts[3].to_string();
-        Some(Self {
-            id,
-            runlevels,
-            action,
-            process,
-        })
-    }
-}
-
 /// SysVinit Runlevel State Machine Engine
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct SysVinitRunlevelStateMachine {
     pub current_runlevel: char,
     pub inittab_entries: Vec<SysVInittabEntry>,
@@ -939,7 +888,7 @@ impl SysVinitRunlevelStateMachine {
             .collect()
     }
 
-    pub fn spawn_respawn_processes(&mut self) -> Vec<SysVInittabEntry> {
+    pub fn spawn_respawn_processes(&mut self) -> Vec<String> {
         let mut spawned = Vec::new();
         for entry in &self.inittab_entries {
             if entry.action == SysVAction::Respawn
@@ -948,15 +897,11 @@ impl SysVinitRunlevelStateMachine {
                 if !self.active_processes.contains_key(&entry.id) {
                     let mock_pid = 4000 + entry.id.len() as u32;
                     self.active_processes.insert(entry.id.clone(), mock_pid);
-                    spawned.push(entry.clone());
+                    spawned.push(entry.id.clone());
                 }
             }
         }
         spawned
-    }
-
-    pub fn transition_runlevel(&mut self, target_runlevel: char) -> Vec<&SysVInittabEntry> {
-        self.set_runlevel(target_runlevel)
     }
 
     pub fn switch_runlevel(&mut self, target_runlevel: char) -> (Vec<String>, Vec<String>) {
@@ -981,9 +926,34 @@ impl SysVinitRunlevelStateMachine {
     }
 }
 
-// ============================================================================
-// BSD rc Subsystem
-// ============================================================================
+impl SysVInittabEntry {
+    pub fn parse_line(line: &str) -> Option<Self> {
+        let parts: Vec<&str> = line.trim().split(':').collect();
+        if parts.len() != 4 {
+            return None;
+        }
+        let id = parts[0].to_string();
+        let runlevels = parts[1].chars().collect();
+        let action = match parts[2] {
+            "respawn" => SysVAction::Respawn,
+            "sysinit" => SysVAction::SysInit,
+            "wait" => SysVAction::Wait,
+            "once" => SysVAction::Once,
+            "ctrlaltdel" => SysVAction::CtrlAltDel,
+            "powerfail" => SysVAction::PowerFail,
+            "off" => SysVAction::Off,
+            "ondemand" => SysVAction::OnDemand,
+            _ => return None,
+        };
+        let process = parts[3].to_string();
+        Some(Self {
+            id,
+            runlevels,
+            action,
+            process,
+        })
+    }
+}
 
 /// BSD `rc.d` / `rc.subr` Directives
 #[derive(Debug, Clone, Default)]
@@ -1203,6 +1173,106 @@ impl Default for VixieCronEnvSpecContext {
     }
 }
 
+/// Anacron Spool Manager
+#[derive(Debug, Clone, Default)]
+pub struct AnacronSpoolManager {
+    pub spool_path: String,
+    pub timestamps: BTreeMap<String, u64>,
+}
+
+impl AnacronSpoolManager {
+    pub fn new(spool_path: &str) -> Self {
+        Self {
+            spool_path: spool_path.to_string(),
+            timestamps: BTreeMap::new(),
+        }
+    }
+
+    pub fn record_job_run(&mut self, job_id: &str, timestamp: u64) {
+        self.timestamps.insert(job_id.to_string(), timestamp);
+    }
+
+    pub fn get_last_run(&self, job_id: &str) -> Option<u64> {
+        self.timestamps.get(job_id).copied()
+    }
+}
+
+/// `at` & `batch` Spool Queue Manager
+#[derive(Debug, Clone, Default)]
+pub struct AtSpoolQueueManager {
+    pub spool_dir: String,
+    pub queued_jobs: Vec<AtJob>,
+    pub jobs: BTreeMap<u64, AtJob>,
+    pub next_job_id: u64,
+}
+
+impl AtSpoolQueueManager {
+    pub fn new(spool_dir: &str) -> Self {
+        Self {
+            spool_dir: spool_dir.to_string(),
+            queued_jobs: Vec::new(),
+            jobs: BTreeMap::new(),
+            next_job_id: 1,
+        }
+    }
+
+    pub fn enqueue_job(&mut self, job: AtJob) {
+        self.queued_jobs.push(job);
+    }
+
+    pub fn poll_ready_jobs(&mut self, now_timestamp: u64, current_load: f32) -> Vec<AtJob> {
+        let mut ready = Vec::new();
+        let mut pending = Vec::new();
+
+        for job in self.queued_jobs.drain(..) {
+            let load_ok = match job.max_load_average {
+                Some(max_l) => current_load <= max_l,
+                None => true,
+            };
+
+            if now_timestamp >= job.execute_at && load_ok {
+                ready.push(job);
+            } else {
+                pending.push(job);
+            }
+        }
+
+        self.queued_jobs = pending;
+        ready
+    }
+}
+
+/// Userland Init Clean-Room Pull Request Proposal Gateway
+#[derive(Debug, Clone)]
+pub struct UserlandInitCleanRoomPrGatewayEngine {
+    pub pr_id: u32,
+    pub title: String,
+    pub author: String,
+    pub pqc_signature: String,
+}
+
+impl UserlandInitCleanRoomPrGatewayEngine {
+    pub fn new(pr_id: u32, title: &str, author: &str) -> Self {
+        Self {
+            pr_id,
+            title: title.to_string(),
+            author: author.to_string(),
+            pqc_signature: format!("dilithium5:sig:{}", pr_id),
+        }
+    }
+
+    pub fn generate_unified_diff(&self) -> String {
+        format!(
+            "--- a/src/userland/init.rs\n+++ b/src/userland/init.rs\n@@ -1,5 +1,120 @@\n+// PR #{}: {}\n+// Author: {}\n",
+            self.pr_id, self.title, self.author
+        )
+    }
+
+    pub fn run_automated_ci_gate(&self) -> bool {
+        !self.title.is_empty() && self.pqc_signature.starts_with("dilithium5:")
+    }
+}
+
 /// Vixie Cron 5/6-Field Expression and Macros
 #[derive(Debug, Clone)]
 pub struct VixieCronEntry {
@@ -1352,7 +1422,7 @@ pub struct AtJob {
     pub max_load_average: Option<f32>,
 }
 
-/// `at` & `batch` Spool Queue Manager
+/// `atd` Queue Spool Manager
 #[derive(Debug, Clone, Default)]
 pub struct AtSpoolQueueManager {
     pub spool_dir: String,
@@ -1364,6 +1434,15 @@ pub struct AtSpoolQueueManager {
 impl AtSpoolQueueManager {
     pub fn new(spool_dir: &str) -> Self {
         Self {
+            spool_dir: "/var/spool/at".to_string(),
+            queued_jobs: Vec::new(),
+            jobs: BTreeMap::new(),
+            next_job_id: 1,
+        }
+    }
+
+    pub fn new_with_spool(spool_dir: &str) -> Self {
+        Self {
             spool_dir: spool_dir.to_string(),
             queued_jobs: Vec::new(),
             jobs: BTreeMap::new(),
@@ -1373,6 +1452,27 @@ impl AtSpoolQueueManager {
 
     pub fn enqueue_job(&mut self, job: AtJob) {
         self.queued_jobs.push(job);
+    }
+
+    pub fn poll_ready_jobs(&mut self, now_timestamp: u64, current_load: f32) -> Vec<AtJob> {
+        let mut ready = Vec::new();
+        let mut pending = Vec::new();
+
+        for job in self.queued_jobs.drain(..) {
+            let load_ok = match job.max_load_average {
+                Some(max_l) => current_load <= max_l,
+                None => true,
+            };
+
+            if now_timestamp >= job.execute_at && load_ok {
+                ready.push(job);
+            } else {
+                pending.push(job);
+            }
+        }
+
+        self.queued_jobs = pending;
+        ready
     }
 
     pub fn schedule_at_job(

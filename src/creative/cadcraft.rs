@@ -99,12 +99,23 @@ pub enum SketchEntity {
 /// Geometric constraint type
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GeometricConstraintType {
-    Horizontal,
-    Vertical,
-    Parallel,
+    Coincident {
+        point1_idx: usize,
+        point2_idx: usize,
+    },
+    Parallel {
+        line1_idx: usize,
+        line2_idx: usize,
+    },
     Perpendicular,
-    Concentric,
-    Tangent,
+    Concentric {
+        circle1_idx: usize,
+        circle2_idx: usize,
+    },
+    Tangent {
+        line_idx: usize,
+        circle_idx: usize,
+    },
     EqualLength {
         line1_idx: usize,
         line2_idx: usize,
@@ -535,7 +546,7 @@ impl CadCraftEngine {
         points: Vec<[f32; 2]>,
     ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
-        let entity = SketchEntity::Generic {
+        let entity = SketchEntity {
             id,
             entity_type,
             points,
@@ -548,8 +559,9 @@ impl CadCraftEngine {
 
     pub fn add_geometric_constraint(
         &mut self,
-        entity_type: SketchEntityType,
-        points: Vec<[f32; 2]>,
+        constraint_type: GeometricConstraintType,
+        entity_ids: Vec<u32>,
+        target_value: f32,
     ) -> u32 {
         let id = self.next_entity_id.fetch_add(1, Ordering::Relaxed);
         let entity = SketchEntity { id, entity_type, coordinates };
@@ -615,7 +627,8 @@ impl CadCraftEngine {
             toolpath_type,
             tool_diameter,
             feed_rate,
-            gcode: String::from("G21 G90 G0 Z5\nG1 Z-2 F100\nG1 X10 Y10 F500\nG0 Z5\n"),
+            spindle_speed: 12000.0,
+            gcode_output: String::from("G00 X0 Y0 Z5"),
         };
         self.cam_toolpaths.insert(id, toolpath);
         id
@@ -629,15 +642,17 @@ impl CadCraftEngine {
     }
 
     pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        let mut output = Vec::new();
+        let mut buf = Vec::new();
         match format {
-            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
-            ExportFormat::STEP => {
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
+            ExportFormat::DXF => {
+                buf.extend_from_slice(b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n")
             }
-            _ => b"CAD_EXPORT_DATA".to_vec(),
+            ExportFormat::STEP => buf.extend_from_slice(
+                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n",
+            ),
+            _ => buf.extend_from_slice(b"CADCRAFT_EXPORT"),
         }
-        output
+        buf
     }
 }
 
@@ -778,6 +793,13 @@ impl Vector3D {
     }
 }
 
+/// Parametric Sketch 2D
+#[derive(Debug, Clone, Default)]
+pub struct ParametricSketch2D {
+    pub name: String,
+    pub entities: Vec<SketchEntity>,
+}
+
 /// Solid Feature Operation Type
 #[derive(Debug, Clone, PartialEq)]
 pub enum SolidFeatureOperation {
@@ -847,7 +869,7 @@ impl BRepSolidModel {
     ) -> bool {
         let mut base_vertices = Vec::new();
 
-        for entity in entities {
+        for entity in &sketch.entities {
             for pt in &entity.points {
                 base_vertices.push(Vector3D::new(pt[0] as f64, pt[1] as f64, 0.0));
             }
@@ -990,11 +1012,187 @@ impl CadCraft3dSolidModelingPrDeployer {
     }
 }
 
+// ============================================================================
+// 3. Assembly Mates, CAM G-code Toolpath & FEA Stress Analysis Engine
+// ============================================================================
+
+/// Assembly Model
+#[derive(Debug, Clone)]
+pub struct AssemblyModel {
+    pub name: String,
+    pub parts: BTreeMap<u32, BRepSolidModel>,
+    pub mates: Vec<AssemblyMate>,
+}
+
+impl AssemblyModel {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            parts: BTreeMap::new(),
+            mates: Vec::new(),
+        }
+    }
+
+    pub fn add_part(&mut self, part_id: u32, solid: BRepSolidModel) {
+        self.parts.insert(part_id, solid);
+    }
+
+    pub fn add_mate(&mut self, mate: AssemblyMate) {
+        self.mates.push(mate);
+    }
+}
+
+/// CAM Operation Strategy
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CamStrategy {
+    Facing2D,
+    Contour2D,
+    Pocketing2D,
+    Drilling3D,
+    AdaptiveClearing3D,
+}
+
+/// CAM Tool Definition
+#[derive(Debug, Clone)]
+pub struct CamTool {
+    pub tool_number: u32,
+    pub diameter_mm: f64,
+    pub flute_length_mm: f64,
+    pub feed_rate_mm_min: f64,
+    pub spindle_speed_rpm: u32,
+}
+
+/// CAM G-code Generator
+#[derive(Debug, Clone)]
+pub struct CamToolpathGenerator {
+    pub strategy: CamStrategy,
+    pub tool: CamTool,
+    pub stepdown_mm: f64,
+    pub safe_z_mm: f64,
+}
+
+impl CamToolpathGenerator {
+    pub fn new(strategy: CamStrategy, tool: CamTool) -> Self {
+        Self {
+            strategy,
+            tool,
+            stepdown_mm: 2.0,
+            safe_z_mm: 5.0,
+        }
+    }
+
+    pub fn generate_gcode(&self, depth_mm: f64, width_mm: f64, length_mm: f64) -> String {
+        let mut gcode = String::new();
+        gcode.push_str("%\nO1001 (CADCRAFT CAM TOOLPATH GENERATED)\n");
+        gcode.push_str("G90 G21 G17 G40 G80\n");
+        gcode.push_str(&format!("T{} M06\n", self.tool.tool_number));
+        gcode.push_str(&format!("S{} M03\n", self.tool.spindle_speed_rpm));
+        gcode.push_str(&format!("G00 Z{:.3}\n", self.safe_z_mm));
+
+        let passes = ((depth_mm / self.stepdown_mm).ceil() as usize).max(1);
+        let mut current_z = 0.0f64;
+
+        for pass in 1..=passes {
+            current_z -= self.stepdown_mm;
+            if current_z < -depth_mm {
+                current_z = -depth_mm;
+            }
+
+            gcode.push_str(&format!("(PASS {} AT Z{:.3})\n", pass, current_z));
+            gcode.push_str("G00 X0.000 Y0.000\n");
+            gcode.push_str(&format!(
+                "G01 Z{:.3} F{:.1}\n",
+                current_z,
+                self.tool.feed_rate_mm_min * 0.5
+            ));
+            gcode.push_str(&format!(
+                "G01 X{:.3} F{:.1}\n",
+                length_mm, self.tool.feed_rate_mm_min
+            ));
+            gcode.push_str(&format!("G01 Y{:.3}\n", width_mm));
+            gcode.push_str("G01 X0.000\n");
+            gcode.push_str("G01 Y0.000\n");
+        }
+
+        gcode.push_str(&format!("G00 Z{:.3}\n", self.safe_z_mm));
+        gcode.push_str("M05\nM30\n%\n");
+        gcode
+    }
+}
+
+/// FEA Finite Element Stress Solver
+#[derive(Debug, Clone)]
+pub struct FeaStressSolver {
+    pub youngs_modulus_gpa: f64,
+    pub poissons_ratio: f64,
+    pub yield_strength_mpa: f64,
+    pub applied_force_n: Vector3D,
+}
+
+/// FEA Solver Analysis Output
+#[derive(Debug, Clone)]
+pub struct FeaAnalysisResult {
+    pub max_von_mises_stress_mpa: f64,
+    pub max_displacement_mm: f64,
+    pub safety_factor: f64,
+    pub pass: bool,
+}
+
+impl FeaStressSolver {
+    pub fn new_structural_steel() -> Self {
+        Self {
+            youngs_modulus_gpa: 200.0,
+            poissons_ratio: 0.30,
+            yield_strength_mpa: 250.0,
+            applied_force_n: Vector3D::new(0.0, 0.0, -10000.0), // 10 kN load
+        }
+    }
+
+    /// Execute FEA linear static stress evaluation
+    pub fn solve_linear_static(&self, solid: &BRepSolidModel) -> FeaAnalysisResult {
+        let area_m2 = (solid.surface_area * 1e-6).max(1e-4);
+        let force_mag = self.applied_force_n.length();
+
+        // Estimated von Mises stress: Force / Area in MPa
+        let max_von_mises_stress_mpa = (force_mag / (area_m2 * 1e6)).min(1000.0);
+        let safety_factor = if max_von_mises_stress_mpa > 1e-6 {
+            self.yield_strength_mpa / max_von_mises_stress_mpa
+        } else {
+            10.0
+        };
+
+        let max_displacement_mm =
+            (max_von_mises_stress_mpa / (self.youngs_modulus_gpa * 1e3)) * 100.0;
+        let pass = safety_factor >= 1.5;
+
+        FeaAnalysisResult {
+            max_von_mises_stress_mpa,
+            max_displacement_mm,
+            safety_factor,
+            pass,
+        }
+    }
+}
+
+/// CAD Export Formats
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CadExportFormat {
+    Dxf,
+    Step,
+    Iges,
+    Stl,
+    Obj,
+    FcStd,
+    ParasolidXt,
+}
+
 /// Deployer 3: Assembly Mates, CAM Toolpath & FEA Stress Analysis Engine
 #[derive(Debug, Default, Clone)]
 pub struct CadCraftAssemblyFemSimulationPrDeployer {
     pub deployed_prs: BTreeMap<u32, CadCraftPullRequestSpec>,
     pub next_pr_id: u32,
+    pub assemblies_processed: AtomicU32,
+    pub deployed: AtomicBool,
 }
 
 impl CadCraftAssemblyFemSimulationPrDeployer {
@@ -1002,6 +1200,8 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
         let mut deployer = Self {
             deployed_prs: BTreeMap::new(),
             next_pr_id: 2821,
+            assemblies_processed: AtomicU32::new(0),
+            deployed: AtomicBool::new(false),
         };
         deployer.stage_all_assembly_sim_prs();
         deployer
@@ -1051,24 +1251,8 @@ impl CadCraftAssemblyFemSimulationPrDeployer {
         }
     }
 
-    pub fn generate_pr(&self) -> CadCraftPullRequestSpec {
-        let title = "CadCraft Assembly Mates, CAM G-Code & FEA Stress Analysis";
-        let pr_id = self.deployed_prs.keys().next().copied().unwrap_or(2821);
-        CadCraftPullRequestSpec {
-            pr_id,
-            component_name: String::from("cadcraft-assembly-sim"),
-            pr_title: title.to_string(),
-            pr_branch: "feature/cadcraft-assembly-cam-fea".to_string(),
-            target_subsystem: "src/creative/cadcraft.rs".to_string(),
-            patch_digest: fnv1a_cadcraft_pr_digest(pr_id, title),
-            is_merged: true,
-            title: title.to_string(),
-            description: title.to_string(),
-            branch: "feature/cadcraft-assembly-cam-fea".to_string(),
-            status: "Merged".to_string(),
-            target_module: "src/creative/cadcraft.rs".to_string(),
-            verification_digest: fnv1a_cadcraft_pr_digest(pr_id, title),
-        }
+    pub fn get_merged_pr_count(&self) -> usize {
+        self.deployed_prs.values().filter(|pr| pr.is_merged).count()
     }
 }
 
@@ -1152,14 +1336,6 @@ impl CadCraftMasterPrDeploymentSuite {
             + self.assembly_fem.get_merged_pr_count()
     }
 
-    pub fn verify_cadcraft_parity_score(&self) -> f64 {
-        if self.compute_total_cadcraft_pr_deployments() >= 9 {
-            100.0
-        } else {
-            (self.compute_total_cadcraft_pr_deployments() as f64 / 9.0) * 100.0
-        }
-    }
-
     pub fn verify_complete_cadcraft_pr_deployment(&self) -> bool {
         self.compute_total_cadcraft_pr_deployments() >= 9
     }
@@ -1216,11 +1392,8 @@ mod tests {
         let e1 = engine.add_sketch_entity(SketchEntityType::Line, vec![[0.0, 0.0], [10.0, 0.0]]);
         let e2 = engine.add_sketch_entity(SketchEntityType::Line, vec![[10.0, 0.0], [10.0, 10.0]]);
         let c1 = engine.add_geometric_constraint(
-            GeometricConstraintType::EqualLength {
-                line1_idx: e1 as usize,
-                line2_idx: e2 as usize,
-            },
-            vec![e1, e2],
+            GeometricConstraintType::Perpendicular,
+            alloc::vec![e1, e2],
             90.0,
         );
 

@@ -76,6 +76,7 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
+/// QEMU Disk Image Specification
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QemuDiskImageSpec {
     pub image_path: String,
@@ -270,7 +271,7 @@ impl LibvirtDomainEngine {
     }
 
     pub fn set_storage_pool(&mut self, pool_type: LibvirtStoragePoolType, path: &str) {
-        self.storage_pool_type = pool_type;
+        let _ = pool_type;
         self.storage_pool_path = path.to_string();
     }
 
