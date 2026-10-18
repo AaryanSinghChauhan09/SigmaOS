@@ -435,57 +435,9 @@ pub struct SystemdSocketUnit {
     pub active_fd: Option<i32>,
 }
 
-/// Systemd Socket Activation Engine
-pub struct SystemdSocketActivationEngine {
-    pub sockets: BTreeMap<String, SystemdSocketUnit>,
-}
 
-impl SystemdSocketActivationEngine {
-    pub fn new() -> Self {
-        Self {
-            sockets: BTreeMap::new(),
-        }
-    }
 
-    pub fn register_socket(&mut self, unit: SystemdSocketUnit) {
-        self.sockets.insert(unit.name.clone(), unit);
-    }
 
-    pub fn handle_incoming_connection(&mut self, socket_name: &str) -> Option<String> {
-        if let Some(sock) = self.sockets.get_mut(socket_name) {
-            if sock.active_fd.is_none() {
-                sock.active_fd = Some(3); // First inherited socket FD SD_LISTEN_FDS_START
-            }
-            Some(sock.service_to_trigger.clone())
-        } else {
-            None
-        }
-    }
-}
-
-/// Systemd Target Dependency Resolver
-pub struct SystemdTargetDependencyResolver {
-    pub targets: BTreeMap<String, Vec<String>>, // Target name -> list of member units
-    pub active_targets: BTreeSet<String>,
-}
-
-impl SystemdTargetDependencyResolver {
-    pub fn new() -> Self {
-        Self {
-            targets: BTreeMap::new(),
-            active_targets: BTreeSet::new(),
-        }
-    }
-
-    pub fn register_target(&mut self, name: &str, member_units: Vec<String>) {
-        self.targets.insert(name.to_string(), member_units);
-    }
-
-    pub fn activate_target(&mut self, target_name: &str) -> Vec<String> {
-        self.active_targets.insert(target_name.to_string());
-        self.targets.get(target_name).cloned().unwrap_or_default()
-    }
-}
 
 /// Systemd Path Monitor Unit
 #[derive(Debug, Clone)]
@@ -498,57 +450,9 @@ pub struct SystemdPathUnit {
     pub unit_to_trigger: String,
 }
 
-/// Systemd Path Monitor Engine
-pub struct SystemdPathMonitorEngine {
-    pub paths: BTreeMap<String, SystemdPathUnit>,
-}
 
-impl SystemdPathMonitorEngine {
-    pub fn new() -> Self {
-        Self {
-            paths: BTreeMap::new(),
-        }
-    }
 
-    pub fn register_path(&mut self, unit: SystemdPathUnit) {
-        self.paths.insert(unit.name.clone(), unit);
-    }
 
-    pub fn check_path_events(&self, modified_path: &str) -> Vec<String> {
-        let mut triggered = Vec::new();
-        for path_unit in self.paths.values() {
-            if path_unit.path_changed.as_deref() == Some(modified_path)
-                || path_unit.path_modified.as_deref() == Some(modified_path)
-                || path_unit.path_exists.as_deref() == Some(modified_path)
-                || path_unit.directory_not_empty.as_deref() == Some(modified_path)
-            {
-                triggered.push(path_unit.unit_to_trigger.clone());
-            }
-        }
-        triggered
-    }
-}
-
-/// Systemd Transient Scope & Cgroups Governor
-pub struct SystemdTransientScopeGovernor {
-    pub active_scopes: BTreeMap<String, SystemdCgroupsv2Slice>,
-}
-
-impl SystemdTransientScopeGovernor {
-    pub fn new() -> Self {
-        Self {
-            active_scopes: BTreeMap::new(),
-        }
-    }
-
-    pub fn create_scope(&mut self, scope_name: String, limits: SystemdCgroupsv2Slice) {
-        self.active_scopes.insert(scope_name, limits);
-    }
-
-    pub fn get_scope_limit(&self, scope_name: &str) -> Option<&SystemdCgroupsv2Slice> {
-        self.active_scopes.get(scope_name)
-    }
-}
 
 /// OpenRC Multi-Stage Runlevel
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -1088,45 +992,7 @@ impl BsdRcScript {
     }
 }
 
-/// BSD `rc.subr` & `rcorder` Dependency Engine
-pub struct BsdRcSubrEngine {
-    pub rc_conf: BTreeMap<String, String>, // e.g. "sshd_enable" -> "YES"
-    pub scripts: BTreeMap<String, BsdRcScript>,
-}
 
-impl BsdRcSubrEngine {
-    pub fn new() -> Self {
-        Self {
-            rc_conf: BTreeMap::new(),
-            scripts: BTreeMap::new(),
-        }
-    }
-
-    pub fn set_rc_conf(&mut self, key: String, val: String) {
-        self.rc_conf.insert(key, val);
-    }
-
-    pub fn register_script(&mut self, script: BsdRcScript) {
-        self.scripts.insert(script.name.clone(), script);
-    }
-
-    pub fn is_enabled(&self, script_name: &str) -> bool {
-        if let Some(script) = self.scripts.get(script_name) {
-            if let Some(var) = &script.enabled_variable {
-                if let Some(val) = self.rc_conf.get(var) {
-                    return val.eq_ignore_ascii_case("YES")
-                        || val == "1"
-                        || val.eq_ignore_ascii_case("TRUE");
-                }
-            }
-        }
-        self.is_service_enabled(script_name)
-    }
-
-    pub fn compute_rcorder(&self) -> Vec<String> {
-        self.scripts.keys().cloned().collect()
-    }
-}
 
 /// macOS launchd PLIST Job Specification
 #[derive(Debug, Clone)]
@@ -1417,26 +1283,7 @@ impl AnacronJob {
     }
 }
 
-/// Anacron `/var/spool/anacron` Spool Manager
-pub struct AnacronSpoolManager {
-    pub spool_timestamps: BTreeMap<String, u64>, // job_id -> timestamp
-}
 
-impl AnacronSpoolManager {
-    pub fn new() -> Self {
-        Self {
-            spool_timestamps: BTreeMap::new(),
-        }
-    }
-
-    pub fn record_job_run(&mut self, job_id: String, now_timestamp: u64) {
-        self.spool_timestamps.insert(job_id, now_timestamp);
-    }
-
-    pub fn get_last_run(&self, job_id: &str) -> u64 {
-        self.spool_timestamps.get(job_id).copied().unwrap_or(0)
-    }
-}
 
 /// `at` and `batch` Delayed Job Queue Entry
 #[derive(Debug, Clone)]
@@ -1721,8 +1568,6 @@ impl UserlandInitPrGatewayEngine {
         }
     }
 }
-
-pub type UserlandInitCleanRoomPrGatewayEngine = UserlandInitPrGatewayEngine;
 
 #[cfg(test)]
 mod tests {
