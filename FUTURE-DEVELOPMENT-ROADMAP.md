@@ -28,12 +28,6 @@ SigmaOS is engineered as a unified, bare-metal operating system constructed with
 +-----------------------------------------------------------------------------------+
 ```
 
-### 1.2 Universal Hardware Adaptation Strategy
-SigmaOS supports hardware across all generations:
-* **Ancient 16-Bit / 32-Bit Systems**: Real-Mode BIOS interrupt handoffs (`INT 10h` VBE, `INT 13h` LBA), legacy 8259A PIC, 8254 PIT, CMOS RTC, and IDE/ATA disk controllers via raw port I/O (`inb`/`outb`).
-* **Modern 64-Bit Systems**: UEFI GOP linear framebuffer initialization, ACPI 6.5 table discovery, PCIe 6.0 enumeration, APIC/x2APIC vector allocation, MSI-X handling, and NVMe 2.0 queue processing.
-* **Future Computing Engines**: Hardware-coherent CXL 3.0 memory pooling inside `SovereignVMM` and direct Ring 0 Kyber-1024 / Dilithium-5 Post-Quantum Cryptography co-processor register maps.
-
 ---
 
 ## 2. THE DISTRO-CRUSHING EXECUTION STRATEGY
@@ -232,72 +226,64 @@ pub const SovereignVMM = struct {
 };
 ```
 
-### 4.3 Bare-Metal TCP/IP Ring Buffer Ingestion Engine in Nim (Zero-Dependency)
+---
 
-```nim
-# Custom Bare-Metal TCP/IP Packet Processor in Nim (no_std / freestanding)
-type
-  MacAddress = array[6, uint8]
-  IpAddress = array[4, uint8]
+## 5. UNIVERSAL HARDWARE ADAPTATION ENGINE (16-BIT ANCIENT TO 2026+ CXL 3.0/QPU)
 
-  EthernetHeader {.packed.} = object
-    dest_mac: MacAddress
-    src_mac: MacAddress
-    ethertype: uint16
-
-  IPv4Header {.packed.} = object
-    version_ihl: uint8
-    tos: uint8
-    total_length: uint16
-    id: uint16
-    flags_fragment: uint16
-    ttl: uint8
-    protocol: uint8
-    checksum: uint16
-    src_ip: IpAddress
-    dest_ip: IpAddress
-
-  TcpPacketProcessor = object
-    local_ip: IpAddress
-    processed_packets: uint64
-
-proc initProcessor(ip: IpAddress): TcpPacketProcessor =
-  result.local_ip = ip
-  result.processed_packets = 0
-
-proc processEthernetFrame(processor: var TcpPacketProcessor, frame_ptr: ptr uint8, len: uint32): bool =
-  if len < uint32(sizeof(EthernetHeader) + sizeof(IPv4Header)):
-    return false
-
-  let eth_hdr = cast[ptr EthernetHeader](frame_ptr)
-  if eth_hdr.ethertype != 0x0008: # IPv4 EtherType (Big Endian 0x0800)
-    return false
-
-  let ip_ptr = cast[ptr uint8](cast[uint](frame_ptr) + uint(sizeof(EthernetHeader)))
-  let ip_hdr = cast[ptr IPv4Header](ip_ptr)
-
-  if ip_hdr.protocol == 6: # TCP Protocol
-    processor.processed_packets += 1
-    return true
-
-  return false
-```
-
-### 4.4 Ext4 & JBD2 Journal Consistency Engine
-* **JBD2 Descriptor Blocks**: Tracks transaction IDs (`sequence_number`), block revocation hashes, and CRC32C checksums across block writes.
-* **Crash Replay Protocol**: During system boot, scans the JBD2 log partition from `head` to `tail`. If an uncommitted transaction is detected, it is safely rolled back; committed transactions are replayed into Ext4 inodes.
-
-### 4.5 Post-Quantum Capability Ring Security Gateway
-* **Kyber-1024 Key Exchange**: Bare-metal KEM execution generating 256-bit symmetric session keys directly in Ring 0 without stdlib heap allocators.
-* **Dilithium-5 Signature Verification**: Validates executable ELF headers and SigmaPkg manifest signatures before granting Ring 3 capability execution tokens.
+SigmaOS provides zero-downtime, universal hardware scaling:
+1. **16-Bit Ancient Legacy Handoff**: Real-Mode BIOS interrupt vector tables, `INT 10h` VBE framebuffer setup, `INT 13h` disk I/O, legacy 8259 PIC remap, and 8254 PIT tick timer handling.
+2. **Modern 64-Bit x86_64 / ARM64 Layer**: UEFI GOP linear framebuffer, ACPI 6.5 table parser, APIC/x2APIC interrupt vector routing, PCIe Gen6 bus topology enumeration, and NVMe 2.0 multi-queue DMA engines.
+3. **2026+ Next-Gen Heterogeneous Compute**: Hardware-coherent CXL 3.0 memory tiering inside `SovereignVMM` and Quantum Processing Unit (QPU) co-processor register maps for Ring 0 Kyber-1024 / Dilithium-5 Post-Quantum Cryptography acceleration.
 
 ---
 
-## 5. DAILY SIGMA UPDATER & DISTRO CRUSHER AUTOMATION
+## 6. SIGMAPKG UNIVERSAL PACKAGE ABSORPTION & COMPATIBILITY ENGINE
 
-To maintain technical supremacy, SigmaOS incorporates automated intelligence routines:
-1. **Upstream Intelligence Harvester**: Daily scans of Linux Kernel 6.x+, FreeBSD, OpenBSD, and Illumos release trees to extract novel system calls and driver patterns.
-2. **SigmaPkg Multi-Format Ingestion**: Automatic parsing and execution of `.deb`, `.pkg.tar.zst`, `.rpm`, and `.nix` packages inside zero-trust microservice sandboxing containers.
+SigmaPkg is the declarative, reproducible, and sandboxed package ingestion manager:
+* **Multi-Format Format Ingestion**: Translates and absorbs packages from `.deb` (Debian/Ubuntu), `.pkg.tar.zst` (Arch Linux), `.rpm` (Fedora), and `.nix` (NixOS) into native SigmaOS sandboxed execution formats.
+* **Deterministic Isolation**: Executes imported Linux packages inside zero-trust microservice sandboxes managed by capability tokens without host system pollution.
+* **Atomic Rollbacks**: Supports sub-millisecond B-tree transactional snapshots for instantaneous package rollback.
+
+---
+
+## 7. COMPOSITE AI AGENT SPECIALIST FRAMEWORK & GOVERNANCE
+
+SigmaOS features an autonomous, multi-agent development and maintenance orchestration engine composed of ten specialized roles:
+1. **System / Architecture Designer**: Subsystem boundary and interface governor.
+2. **Kernel / Systems Engineer**: Scheduler, syscall gate, VMM page table, and IPC engineer.
+3. **Device Driver Engineer**: Hardware DMA, NVMe, xHCI, E1000/RTL8139, and KMS/DRM engineer.
+4. **OS Security Engineer / Bug Bounty Responder**: Zero-trust capability ring threat modeling and PQC maintainer.
+5. **Filesystem & Storage Engineer**: Ext4/JBD2 journal consistency and crash-replay auditor.
+6. **Build / Release / QA Engineer**: Profile target build, QEMU boot test, and CI pipeline release manager.
+7. **UI/UX Developer**: Zenith compositor, declarative settings, and tiling WM engineer.
+8. **Maintainer**: Issues/PR triager and CHANGELOG/Wiki documentation orchestrator.
+9. **Sigma Updater Agent**: Daily upstream Linux/BSD intelligence harvester.
+10. **Sigma Linux Distro Crusher Agent**: Daily distro benchmark and feature absorption analyst.
+
+---
+
+## 8. MULTI-TIER COMPLIANCE & GOVERNANCE FRAMEWORK
+
+SigmaOS enforces enterprise and regulatory compliance natively inside the OS core:
+* **Security & Privacy**: GDPR, CCPA, HIPAA, and ISO/IEC 27001 data isolation and encryption rules (AES-256-GCM / Kyber-1024).
+* **Accessibility Standards**: WCAG 2.1 AAA and Section 508 accessibility compliance integrated into Zenith Compositor rendering.
+* **Hardening Standards**: CIS Benchmarks for Linux/BSD kernel configurations, SELinux/AppArmor policy parity, and OpenBSD pledge/unveil sandboxing.
+
+---
+
+## 9. LOW-LEVEL PURITY, BARE-METAL OOP & ZERO-DEPENDENCY DESIGN RULES
+
+* **Zero Standard Library (`no_std`)**: All modules must be compiled freestanding without `std::`, `libc`, or high-level runtime wrappers.
+* **Bare-Metal OOP**: Object-Oriented design patterns (Encapsulation, Inheritance, Polymorphism, Singleton, Factory, Observer) implemented strictly via low-level user-defined primitives and direct MMIO/register mappings.
+* **Zero-Trust Capability Ring**: System calls pass through capability token verification before ring 0 privilege escalation.
+
+---
+
+## 10. DAILY SIGMA UPDATER & DISTRO CRUSHER AUTOMATION ROUTINES
+
+Automated daily maintenance routines run autonomously to guarantee SigmaOS technical supremacy:
+1. **Upstream Intelligence Harvesting**: Continuous monitoring of Linux 6.x+, FreeBSD, OpenBSD, and Illumos repositories to extract novel kernel features.
+2. **Automated Wiki & Documentation Synchronization**: Synchronization of all documentation, specifications, and roadmap updates across `docs/`, `wiki/`, and `wiki_repo/`.
 
 ---
 
