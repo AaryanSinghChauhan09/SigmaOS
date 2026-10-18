@@ -381,6 +381,37 @@ impl ArtcraftCraftlibsMasterPrDeploymentSuite {
     pub fn verify_complete_craftlibs_parity(&self) -> bool {
         self.compute_total_merged_prs() >= 12
     }
+
+    /// Export all PR proposals across all deployers as a formatted Markdown document
+    pub fn export_all_pr_manifests_markdown(&self) -> String {
+        let mut markdown = String::from("# ArtCraft Craftlibs PR Parity Manifest\n\n");
+        markdown.push_str("## Staged Pull Request Proposals\n\n");
+
+        let all_deployers = [
+            &self.photo_design.deployed_prs,
+            &self.film_effect_light.deployed_prs,
+            &self.audio_media_3d.deployed_prs,
+            &self.suite_integration.deployed_prs,
+        ];
+
+        for deployer in all_deployers {
+            for pr in deployer.values() {
+                markdown.push_str(&format!(
+                    "### PR #{}: {}\n- **Component**: {}\n- **Branch**: `{}`\n- **Target Subsystem**: {}\n- **Project Type**: {:?}\n- **Patch Digest**: `0x{:08X}`\n- **Status**: {}\n\n",
+                    pr.pr_id,
+                    pr.pr_title,
+                    pr.component_name,
+                    pr.pr_branch,
+                    pr.target_subsystem,
+                    pr.project_type,
+                    pr.patch_digest,
+                    if pr.is_merged { "Merged" } else { "Pending" }
+                ));
+            }
+        }
+
+        markdown
+    }
 }
 
 impl Default for ArtcraftCraftlibsMasterPrDeploymentSuite {
@@ -429,5 +460,17 @@ mod tests {
         assert_eq!(master.compute_total_merged_prs(), 12);
         assert!(master.verify_complete_craftlibs_parity());
         assert!(master.is_active.load(Ordering::Relaxed));
+    }
+
+    #[test]
+    fn test_export_all_pr_manifests_markdown() {
+        let master = ArtcraftCraftlibsMasterPrDeploymentSuite::new();
+        let markdown = master.export_all_pr_manifests_markdown();
+        assert!(markdown.contains("# ArtCraft Craftlibs PR Parity Manifest"));
+        assert!(markdown.contains("photocraft-raw-developer"));
+        assert!(markdown.contains("filmcraft-nle-timeline"));
+        assert!(markdown.contains("audiocraft-daw-synthesizer"));
+        assert!(markdown.contains("artsuite-workspace-binder"));
+        assert!(markdown.contains("PR #3401"));
     }
 }
