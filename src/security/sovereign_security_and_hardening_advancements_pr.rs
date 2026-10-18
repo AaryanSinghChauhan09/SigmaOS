@@ -135,10 +135,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Check Landlock access rule against requested access rights bitmask.
-    pub fn check_landlock_access(handled_access: u32, access_request: u32) -> bool {
-        (handled_access & access_request) == access_request
-    }
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
@@ -417,15 +413,6 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
-            domain,
-            provider,
-            uri
-        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
