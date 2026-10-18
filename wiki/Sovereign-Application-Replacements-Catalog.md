@@ -166,9 +166,73 @@ All sovereign app replacements are exposed via Pull Request proposal engines (PR
 
 ---
 
+## Next-Generation V3 Sovereign Application Matrix (PRs 231–245)
+
+### 31. Web Browsing V3 (`SovereignBrowserEngineV3PrEngine` - PR 231)
+* **Replaces:** Firefox, Chromium, Brave, LibreWolf, Vivaldi
+* **Features:** WebGPU zero-copy rasterizer, PQC Kyber TLS 1.3, eBPF ad-blocker & packet filter, WASM sandboxed DOM engine, pledge/unveil + Capsicum tab sandboxing.
+
+### 32. Email & Communications V3 (`SovereignEmailClientV3PrEngine` - PR 232)
+* **Replaces:** Thunderbird, Evolution, Claws Mail, Geary, KMail
+* **Features:** JMAP & IMAP4rev2 fast sync state engine, Dilithium OpenPGP key exchange, FTS5 SQLite full-text search indexer, CalDAV/CardDAV offline delta queue.
+
+### 33. Office Productivity V3 (`SovereignOfficeSuiteV3PrEngine` - PR 233)
+* **Replaces:** LibreOffice (Writer, Calc, Impress, Draw), OpenOffice, OnlyOffice
+* **Features:** CRDT real-time collaborative document editing, zero-copy ODF/OOXML parsers, MathML solver, native PDF/A-3 crypto signer, subpixel GPU typography solver.
+
+### 34. Code Editor & IDE V3 (`SovereignTextEditorV3PrEngine` - PR 234)
+* **Replaces:** Vim, Neovim, GNU Emacs, nano, Helix, Kakoune
+* **Features:** LSP v3.17 & DAP adapters, Tree-sitter AST syntax parser, Vi/Emacs modal dispatchers, Org-mode agenda, embedded Lua & Lisp execution runtime.
+
+### 35. Image Studio V3 (`SovereignRasterGraphicsV3PrEngine` - PR 235)
+* **Replaces:** GIMP, Krita, Inkscape, Darktable, Pinta
+* **Features:** OpenFX filter graph pipeline, non-destructive layer stack, ACES / OpenColorIO wide-gamut color management, GPU compute shader canvas renderer.
+
+### 36. Document Reader V3 (`SovereignDocumentViewerV3PrEngine` - PR 236)
+* **Replaces:** Evince, Okular, MuPDF, Zathura, Atril
+* **Features:** Multithreaded PDF/EPUB/DJVU vector renderer, interactive stylus layer, AI OCR text extraction, cryptographic signature verifier.
+
+### 37. File Manager V3 (`SovereignFileManagerV3PrEngine` - PR 237)
+* **Replaces:** Nautilus, Dolphin, Thunar, PCManFM, Ranger, Nemo
+* **Features:** B-Tree metadata tag catalog, dual-pane spatial & columnar navigator, inotify/kqueue monitor, VFS mount governor for SSHFS/SMB/NFS/archives.
+
+### 38. Terminal & Multiplexer V3 (`SovereignTerminalMultiplexerV3PrEngine` - PR 238)
+* **Replaces:** Alacritty, Kitty, urxvt, tmux, Screen, Zellij
+* **Features:** GPU-accelerated PTY cell grid renderer, SIXEL & iTerm2 inline graphics, persistent attach/detach multiplexer state machine, asciinema export engine.
+
+### 39. Media Studio V3 (`SovereignMediaPlayerStudioV3PrEngine` - PR 239)
+* **Replaces:** VLC, MPV, Audacity, Tenacity, HandBrake
+* **Features:** Zero-copy HW video decoder (VAAPI, NVDEC), multi-track DAW audio engine, VST3/LV2 plugin host, HDR10 tone mapper, ASS/SSA subtitle composite renderer.
+
+### 40. Password Vault V3 (`SovereignPasswordVaultV3PrEngine` - PR 240)
+* **Replaces:** KeePassXC, GNU pass, Bitwarden, 1Password
+* **Features:** Argon2id KDF, ChaCha20-Poly1305 encrypted vault, TPM2 hardware key binding, TOTP/HOTP authenticator, automated Git sync backend.
+
+### 41. System Monitor V3 (`SovereignSystemMonitorV3PrEngine` - PR 241)
+* **Replaces:** htop, btop, top, glances, GNOME System Monitor
+* **Features:** eBPF /proc & Cgroup v2 telemetry inspector, per-core CPU/memory/IO breakdown, PSI pressure monitor, interactive process tree controller.
+
+### 42. P2P Torrent Client V3 (`SovereignP2pTorrentClientV3PrEngine` - PR 242)
+* **Replaces:** Transmission, Deluge, qBittorrent, KTorrent
+* **Features:** BitTorrent v2 (BEP-52) SHA256 hash tree, Kademlia DHT node resolver, uTP congestion control, encrypted swarm governor, sequential piece streaming preview.
+
+### 43. Messenger & Chat V3 (`SovereignMatrixIrcMessengerV3PrEngine` - PR 243)
+* **Replaces:** HexChat, Element, WeeChat, Irssi, Dino
+* **Features:** Matrix Olm/Megolm E2EE, IRCv3 client with SASL & CAP negotiation, unified multi-protocol router, post-quantum key pinning.
+
+### 44. Archive Studio V3 (`SovereignArchiveCompressorV3PrEngine` - PR 244)
+* **Replaces:** Ark, File Roller, 7-Zip, PeaZip, Xarchiver
+* **Features:** Multi-threaded Zstd/LZMA2/Bzip2 codecs, AES-256 encrypted Zip/7z creation, streaming in-memory archive inspector & integrity check runner.
+
+### 45. Disk Studio V3 (`SovereignDiskPartitionManagerV3PrEngine` - PR 245)
+* **Replaces:** GParted, GNOME Disks, KDE Partition Manager, gpart
+* **Features:** MBR/GPT/BSD partition table solver, Ext4/Btrfs/ZFS/XFS resizer, NVMe SMART health monitor, LUKS2 keyslot manager, ddrescue bad sector mapfile export.
+
+---
+
 ## Status & Integration Verification
 
-All 15 engines are registered, verified, and tested in `src/productivity/sovereign_application_replacements_pr_suite.rs`. You can run tests at any time using:
+All 45 engines (V1, V2, V3) are registered, verified, and tested in `src/productivity/sovereign_application_replacements_v3_pr_suite.rs` and `run_sigma_tests.sh`. You can run tests at any time using:
 ```bash
 ./run_sigma_tests.sh
 ```
