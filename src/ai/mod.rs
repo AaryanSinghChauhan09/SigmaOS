@@ -71,7 +71,9 @@ pub use marktechpost_kdnuggets_data_science::{
     MarkTechPostVectorIndexEngine, SovereignAiDataSciencePipelineSuite,
 };
 
-pub use local_llm::{LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText};
+pub use local_llm::{
+    LocalLlmWrapper, QuantizationType as LocalQuantizationType, WhisperSpeechToText,
+};
 
 pub mod omarchy_multi_agent_provider;
 pub use omarchy_multi_agent_provider::*;
