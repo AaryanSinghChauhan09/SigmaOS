@@ -85,10 +85,24 @@ fn validate_kernel_token(token: &[u8]) -> bool {
     }
 }
 
+/// Constant-time string equality check to mitigate timing side-channel attacks during token validation
+pub fn constant_time_eq_str(a: &str, b: &str) -> bool {
+    let a_bytes = a.as_bytes();
+    let b_bytes = b.as_bytes();
+    if a_bytes.len() != b_bytes.len() {
+        return false;
+    }
+    let mut diff = 0u8;
+    for (x, y) in a_bytes.iter().zip(b_bytes.iter()) {
+        diff |= x ^ y;
+    }
+    diff == 0
+}
+
 /// Validate kernel escalation token (test only)
 #[cfg(test)]
 fn validate_kernel_token_str(token: &str) -> bool {
-    token == KERNEL_ESCALATION_TOKEN
+    constant_time_eq_str(token, KERNEL_ESCALATION_TOKEN)
 }
 
 /// Type-safe Capability Context wrapper with a phantom parameter representing privilege level.
@@ -154,7 +168,7 @@ impl CapabilityContext<KernelLevel> {
         self,
         token: &str,
     ) -> Result<CapabilityContext<SecurityAdminLevel>, SigmaError> {
-        if token == MASTER_ADMIN_TOKEN {
+        if constant_time_eq_str(token, MASTER_ADMIN_TOKEN) {
             Ok(CapabilityContext {
                 _marker: PhantomData,
             })

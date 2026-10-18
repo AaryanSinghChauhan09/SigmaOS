@@ -148,7 +148,8 @@ impl SovereignLinuxulator {
             return Err(LinuxulatorError::InvalidElfMagic);
         }
 
-        let ehdr = unsafe { &*(binary.as_ptr() as *const Elf64Ehdr) };
+        let ehdr: Elf64Ehdr =
+            unsafe { core::ptr::read_unaligned(binary.as_ptr() as *const Elf64Ehdr) };
 
         // 1. Validate ELF magic signature
         if ehdr.e_ident[..4] != [0x7F, b'E', b'L', b'F'] {
@@ -177,7 +178,9 @@ impl SovereignLinuxulator {
                 return Err(LinuxulatorError::SegmentMappingFailed);
             }
 
-            let phdr = unsafe { &*(binary.as_ptr().add(offset) as *const Elf64Phdr) };
+            let phdr: Elf64Phdr = unsafe {
+                core::ptr::read_unaligned(binary.as_ptr().add(offset) as *const Elf64Phdr)
+            };
 
             if phdr.p_type == PT_LOAD {
                 let dest_vaddr = phdr.p_vaddr;
