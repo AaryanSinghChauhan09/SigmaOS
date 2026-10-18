@@ -13,7 +13,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) - Two-stage physical memory management architecture, 11 PMM rules & invariants, 20-PR sequence roadmap, periodic maintenance schedule, cross-component implementation rules, and merge gates.
 - [CPU Scheduler Architecture & Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) - Multi-class scheduling architecture (CFS, BORE, EEVDF, Real-Time FIFO/RR, SchedExt), 9 core invariants, 18-PR sequence roadmap, periodic maintenance schedule, component rules, PR review template, and merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
-- [Process Manager Plan](PROCESS_MANAGER_PLAN.md) - Master Architecture & Support Matrix Plan establishing design and safety rules, 18-PR sequence roadmap with recommended first milestone (PRs 1–7), periodic maintenance PR cadence, component-specific rules, PR template and merge gates, and completion gates.
+- [IPC Handler Master Architecture & Development Plan](ipc-handler.md) - Formally specified IPC handler subsystem covering scope, periodic task cadence, 5 development phases, missing components deliverable matrix, correctness/security/Rust/testing rules, PR template, example PR, and 10-PR roadmap.
 - [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR sequence roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) - Master Architecture & Development Roadmap Plan for SigmaOS GUI and Compositor Stack; Wayland protocol model, DRM/KMS atomic modesetting, freedesktop desktop interfaces, WCAG 2.2 accessibility guidance, 19-PR roadmap, maintenance cadences, component rules, PR review template, and rollout criteria.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
@@ -36,6 +36,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Process Lifecycle & Subreaper](../wiki/Process-Lifecycle-and-Subreaper-Components.md)
 - [Physical Memory Manager Plan Mirror](../wiki/PHYSICAL_MEMORY_MANAGER_PLAN.md)
 - [Process Manager Plan Mirror](../wiki/PROCESS_MANAGER_PLAN.md)
+- [IPC Handler Plan Mirror](../wiki/ipc-handler.md)
 - [Process Synchronization Plan Mirror](../wiki/PROCESS_SYNCHRONIZATION_PLAN.md)
 - [Resource Governor & Cgroups](../wiki/Resource-Governor-and-Cgroups-Components.md)
 - [Sigma Boot & Secure Enclave](../wiki/Sigma-Boot-Components.md)
