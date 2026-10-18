@@ -6,6 +6,8 @@ pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
 pub mod deckcraft;
+pub mod deckcraft_artcraft_parity_pr;
+pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -22,6 +24,7 @@ pub mod pdfcraft_artcraft_parity_pr;
 pub mod photocraft;
 pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
+pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod vectoranimation;
 pub mod vectorcraft;
@@ -117,16 +120,27 @@ pub use photocraft::{
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
 pub use photocraft_missing_components_parity_pr::{
-    PhotocraftAiInpaintingPrEngine, PhotocraftBatchActionMacroPrEngine,
-    PhotocraftColorGradingFrequencySeparationPrEngine, PhotocraftHdrExposureStackingPrEngine,
+    PhotocraftAiInpaintingPrEngine, PhotocraftAiSubjectMattingSelectionPrEngine,
+    PhotocraftBatchActionMacroPrEngine, PhotocraftColorGradingFrequencySeparationPrEngine,
+    PhotocraftHdrExposureStackingPrEngine, PhotocraftMissingComponentsParityPrSuite,
+    PhotocraftPanoramaStitchingProjectionPrEngine, PhotocraftPerspectiveWarpMeshDeformPrEngine,
     PhotocraftPrProposalManifest, PhotocraftRawProcessingPrEngine,
-    PhotocraftVectorMaskPenPathPrEngine, SovereignPhotocraftArtcraftParityPrGateway,
+    PhotocraftSmartObjectLayerStylePrEngine, PhotocraftVectorMaskPenPathPrEngine,
+    SovereignPhotocraftArtcraftParityPrGateway,
 };
 pub use soundcraft::{
     fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
     SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,
     SoundCraftPullRequestSpec, SoundCraftSpatialMixingMasteringPrDeployer, SoundTrack,
     Spatial3DPosition, SynthesizerVoice, Waveform,
+};
+pub use soundcraft_missing_components_parity_pr::{
+    ClipCrossfadeConfig, DawTrackDelta, FadeCurveShape, GranularGrain, LoudnessMeterResult,
+    Position3D as SoundcraftPosition3D, SoundcraftAdvancedMultiTrackEnginePrEngine,
+    SoundcraftMasteringLoudnessMeterPrEngine, SoundcraftMidiVst3ClapPluginPrEngine,
+    SoundcraftPrProposalManifest, SoundcraftRealtimeCollabCrdtPrEngine,
+    SoundcraftSpatial3dAmbisonicMasterPrEngine, SoundcraftSpectralSynthesisSamplerPrEngine,
+    SovereignSoundcraftArtcraftParityPrGateway,
 };
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
@@ -159,4 +173,20 @@ pub use figcraft_missing_components_parity_pr::{
     FigcraftDevModeMultiFrameworkExporterPrEngine, FigcraftInteractivePrototypingSmartAnimatePrEngine,
     FigcraftMultiUserCrdtCollaborationPrEngine, FigcraftPrProposalManifest,
     FigcraftVectorNetworkBooleanOpsPrEngine, SovereignFigcraftArtcraftParityPrGateway,
+};
+pub use deckcraft_artcraft_parity_pr::{
+    DeckcraftAiSlideGeneratorLayoutAutoBalancePrEngine, DeckcraftArtcraftParityPrSuite,
+    DeckcraftArtcraftPrProposalManifest, DeckcraftCrdtMultiUserCoAuthoringPrEngine,
+    DeckcraftLiveAudienceQnaPollingPrEngine, DeckcraftLiveDataDrivenChartsPrEngine,
+    DeckcraftMasterTemplateThemeCascadePrEngine, DeckcraftMultiFormat4kVideoRendererPrEngine,
+    DeckcraftPresenterZenithDualScreenPrEngine, DeckcraftRevealJsHtml5ExporterPrEngine,
+    DeckcraftSmartDiagramConnectorFlowPrEngine, DeckcraftVectorMorphingKeyframeAnimationPrEngine,
+    SovereignDeckcraftArtcraftParityPrGateway as SovereignDeckcraftArtcraftParityPrGatewayV2,
+};
+pub use deckcraft_missing_components_parity_pr::{
+    DeckcraftAdvancedVectorAnimationTimelinePrEngine,
+    DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine, DeckcraftInteractivePollAudienceQnaPrEngine,
+    DeckcraftMultiFormatBatchExportRenderPrEngine, DeckcraftPrProposalManifest,
+    DeckcraftRealtimeCrdtMultiUserCollabPrEngine, DeckcraftSmartDiagramDataChartPrEngine,
+    SovereignDeckcraftArtcraftParityPrGateway,
 };

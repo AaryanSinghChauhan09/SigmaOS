@@ -500,8 +500,13 @@ pub mod openbsd_missing_components_v55_pr;
 pub use openbsd_missing_components_v55_pr::*;
 pub mod openbsd_missing_components_v59_pr;
 pub use openbsd_missing_components_v59_pr::*;
+
+pub mod freebsd_missing_components_v60_pr;
+pub use freebsd_missing_components_v60_pr::*;
 pub mod openbsd_missing_components_v60_pr;
 pub use openbsd_missing_components_v60_pr::*;
+pub mod openbsd_missing_components_v61_pr;
+pub use openbsd_missing_components_v61_pr::*;
 pub mod cachy;
 pub mod cachy_linux_missing_components_engine;
 pub mod cachy_linux_missing_components_parity_pr;
@@ -663,6 +668,9 @@ pub use sovereign_open_source_os_apex_inspirations_v52::*;
 pub mod sovereign_open_source_os_apex_inspirations_v53;
 pub use sovereign_open_source_os_apex_inspirations_v53::*;
 
+pub mod sovereign_open_source_os_apex_inspirations_v54;
+pub use sovereign_open_source_os_apex_inspirations_v54::*;
+
 pub mod omarchy_linux_missing_components_v52_pr;
 pub use omarchy_linux_missing_components_v52_pr::*;
 
@@ -691,6 +699,9 @@ pub mod open_source_os_missing_components_v58_pr;
 pub use open_source_os_missing_components_v58_pr::*;
 pub mod open_source_os_missing_components_v60_pr;
 pub use open_source_os_missing_components_v60_pr::*;
+
+pub mod open_source_os_missing_components_v61_pr;
+pub use open_source_os_missing_components_v61_pr::*;
 
 pub mod omarchy_linux_apex_engine;
 pub use omarchy_linux_apex_engine::*;

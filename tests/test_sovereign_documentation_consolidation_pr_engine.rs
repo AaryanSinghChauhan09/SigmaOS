@@ -119,4 +119,9 @@ fn test_pr_gateway_generation_standalone() {
         .export_all_wiki_pages("wiki")
         .expect("Project wiki export failed");
     assert_eq!(wiki_files.len(), 4);
+
+    let _ = fs::write(
+        "docs/PR_PROPOSAL_CONSOLIDATED_DOCUMENTATION_AND_WIKI_SYSTEM.md",
+        gateway.generate_consolidated_pr_markdown(),
+    );
 }

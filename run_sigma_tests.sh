@@ -310,6 +310,13 @@ if [ -f "src/creative/soundcraft.rs" ]; then
     ./build/test_soundcraft
 fi
 
+if [ -f "src/creative/soundcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Soundcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/soundcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_soundcraft_missing
+    ./build/test_soundcraft_missing
+fi
+
 if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Sovereign EffectCraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
@@ -835,6 +842,13 @@ if [ -f "src/package/sovereign_distro_package_advancements_v52.rs" ]; then
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v52.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v52_test
     ./build/sovereign_advancements_v52_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v62.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V62 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v62.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v62_test
+    ./build/sovereign_advancements_v62_test
 fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
@@ -1555,6 +1569,13 @@ if [ -f "src/installer/sovereign_installer_and_system_tools_advancements_v4_pr.r
     ./build/test_installer_advancements_v4
 fi
 
+if [ -f "src/installer/sovereign_installer_and_system_tools_advancements_v5_pr.rs" ]; then
+    echo "Running Sovereign Installer and System Tools Advancements V5 PR test suite..."
+    mkdir -p build
+    rustc --test src/installer/sovereign_installer_and_system_tools_advancements_v5_pr.rs --edition=2021 -o build/test_installer_advancements_v5
+    ./build/test_installer_advancements_v5
+fi
+
 if [ -f "src/compatibility/mint_omarchy_migration_bridge.rs" ]; then
     echo "Running Mint & Omarchy Migration Bridge test suite..."
     mkdir -p build
@@ -1781,6 +1802,13 @@ if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
     mkdir -p build
     rustc --test src/creative/deckcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_deckcraft_missing
     ./build/test_deckcraft_missing
+fi
+
+if [ -f "src/creative/deckcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Deckcraft to Artcraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_deckcraft_artcraft_parity
+    ./build/test_deckcraft_artcraft_parity
 fi
 
 if [ -f "src/creative/sovereign_artcraft_craftlibs_pr_engine.rs" ]; then

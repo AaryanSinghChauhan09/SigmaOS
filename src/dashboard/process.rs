@@ -228,6 +228,27 @@ impl ProcessManager {
         self.monitor.get_process(pid)
     }
 
+    /// Zero-allocation ASCII case-insensitive substring search helper.
+    /// Performs in-place comparison without allocating temporary heap `String` instances.
+    fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+        if needle.is_empty() {
+            return true;
+        }
+        if haystack.len() < needle.len() {
+            return false;
+        }
+
+        let haystack_bytes = haystack.as_bytes();
+        let needle_bytes = needle.as_bytes();
+
+        haystack_bytes.windows(needle_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(needle_bytes.iter())
+                .all(|(h, n)| h.eq_ignore_ascii_case(n))
+        })
+    }
+
     /// Filter processes
     pub fn filter_processes(
         &mut self,
@@ -239,7 +260,9 @@ impl ProcessManager {
             .into_iter()
             .filter(|p| {
                 if let Some(ref name) = filter.name_contains {
-                    if !p.name.to_lowercase().contains(name) {
+                    // Bolt Optimization: Zero-allocation case-insensitive substring search.
+                    // Avoids heap String allocation for p.name.to_lowercase() during process filtering.
+                    if !Self::contains_ignore_case(&p.name, name) {
                         return false;
                     }
                 }
@@ -271,7 +294,7 @@ impl ProcessManager {
     /// Search processes by name
     pub fn search_by_name(&mut self, name: &str) -> Result<Vec<ProcessInfo>, ProcessError> {
         let filter = ProcessFilter {
-            name_contains: Some(name.to_lowercase()),
+            name_contains: Some(name.to_string()),
             user: None,
             state: None,
             min_cpu_percent: None,

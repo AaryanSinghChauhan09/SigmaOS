@@ -24,6 +24,7 @@ pub mod contributing;
 pub mod creative;
 pub use creative::effectcraft_missing_components_parity_pr::*;
 pub use creative::filmcraft_missing_components_parity_pr::*;
+pub use creative::photocraft_missing_components_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
 pub use creative::wordcraft::*;
 pub use creative::threedcraft_missing_components_parity_pr::*;
@@ -72,7 +73,8 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV40,
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV61,
-    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter,
+    SovereignDistroPackageAdvancementsSuiteV62, UniversalForeignPackageFormat,
+    UniversalForeignPackageFormatConverter,
 };
 pub mod process;
 pub mod productivity;
@@ -158,6 +160,7 @@ pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
 pub use distro::open_source_os_missing_components_v60_pr::*;
+pub use distro::open_source_os_missing_components_v61_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
@@ -165,6 +168,7 @@ pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
+pub use distro::freebsd_missing_components_v60_pr::*;
 pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
@@ -191,6 +195,7 @@ pub use distro::sovereign_freebsd_advanced_subsystems_pr::*;
 pub use distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
+pub use distro::openbsd_missing_components_v61_pr::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
@@ -505,4 +510,5 @@ pub mod io;
 
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
+pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;

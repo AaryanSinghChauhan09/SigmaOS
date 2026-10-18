@@ -365,6 +365,11 @@ impl WikiDataTransferEngine {
             true,
         );
         self.register_spec_file(
+            "30-SigmaOS-GUI-Development-Plan.md",
+            "SigmaOS GUI Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
             "27-Arch-Linux-Gap-Closure-V43-PR.md",
             "Arch Linux Gap Closure V43 PR",
             true,
