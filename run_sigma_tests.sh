@@ -1934,4 +1934,11 @@ if [ -f "src/compatibility/mint_omarchy_coexistence_interop_engine.rs" ]; then
     ./build/test_coexistence
 fi
 
+if [ -f "src/compatibility/mint_omarchy_federated_desktop_engine.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Federated Desktop Engine test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_federated_desktop_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_federated
+    ./build/test_federated
+fi
+
 echo "All SigmaOS test suites completed."
