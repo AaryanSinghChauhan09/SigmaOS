@@ -1776,4 +1776,11 @@ if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; 
     ./build/test_artcraft_parity
 fi
 
+if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
+    echo "Running Omarchy Linux Missing Components Parity PR Gateway V60 test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_missing_components_v60_pr.rs --edition=2021 -o build/omarchy_v60_test
+    ./build/omarchy_v60_test
+fi
+
 echo "All SigmaOS test suites completed."

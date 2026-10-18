@@ -141,5 +141,7 @@
 - [Printing (CUPS)](./Printing-Cups-Component-Guide.md)
 - [System Automation](./System-Automation-Component-Guide.md)
 - [Future Development Roadmap](./Future-Development-Roadmap-BSD-Craft-Linux.md)
+- [Omarchy Desktop AI Roadmap](./40-Omarchy-Linux-And-Sovereign-Desktop-Parity-AI-Agent-Roadmap.md)
+- [Linux/BSD Kernel AI Roadmap](./41-Linux-BSD-Kernel-Security-And-Virtualization-AI-Agent-Roadmap.md)
 - [AI Operating Manual](./AI-Development-Agent-Operating-Manual.md)
 - [AI Maintenance Policy](./AI-Agent-Maintenance-Instructions.md)
