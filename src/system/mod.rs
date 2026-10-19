@@ -81,6 +81,7 @@ pub mod sigmatrim;
 pub mod sigmatimeshift;
 pub mod sigmathemeinstaller;
 pub mod sigmainstaller;
+pub mod sigmawallpaper;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -412,6 +413,10 @@ pub use sigmainstaller::{
 pub use sigmatimeshift::{
     SigmaTimeshift, TimeshiftSnapshot, SnapshotSchedule, SnapshotLevel, SnapshotType, SnapshotState,
     init_sigmatimeshift, get_sigmatimeshift, create_timeshift_snapshot, restore_timeshift_snapshot,
+};
+pub use sigmawallpaper::{
+    SigmaWallpaper, Wallpaper, DisplayOutput, TransitionType,
+    init_sigmawallpaper, get_sigmawallpaper, add_wallpaper, set_wallpaper_all,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
