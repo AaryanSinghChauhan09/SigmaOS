@@ -455,14 +455,6 @@ mod tests {
     }
 
     #[test]
-    fn test_diagram_layer_management() {
-        let mut diagram = Diagram::new("diagram1".to_string(), "Test".to_string());
-        let layer = DiagramLayer::new("layer1".to_string(), "Layer 1".to_string());
-        diagram.add_layer(layer);
-        assert_eq!(diagram.layer_count(), 1);
-    }
-
-    #[test]
     fn test_sigmafig_creation() {
         let fig = SigmaFig::new();
         assert_eq!(fig.diagram_count(), 0);

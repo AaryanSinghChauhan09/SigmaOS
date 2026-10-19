@@ -489,9 +489,6 @@ pub use sigmaphoto::{
     add_photo, get_sigmaphoto, get_sigmaphoto_mut, init_sigmaphoto, AdjustmentType, ColorSpace,
     ImageFormat, Photo, PhotoAdjustment, PhotoAlbum, PhotoFilter, SigmaPhoto,
 };
-pub use sigmapkg::{
-    get_sigmapkg, init_sigmapkg, install_package, Package, PackageAction, PackageState, SigmaPkg,
-};
 pub use sigmapower::{
     get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerProfile, PowerSettings,
     SigmaPower,
@@ -526,9 +523,6 @@ pub use sigmaraid::{
 pub use sigmarecovery::{
     boot_to_recovery, get_sigmarecovery, init_sigmarecovery, RecoveryAction, RecoveryMode,
     RecoverySnapshot, SigmaRecovery,
-};
-pub use sigmarecovery2::{
-    get_sigmarecovery, init_sigmarecovery, RecoveryState, RecoveryTask, RecoveryType, SigmaRecovery,
 };
 pub use sigmaresource::{
     get_sigmaresource, init_sigmaresource, set_resource_limit, ResourceLimit, ResourceType,

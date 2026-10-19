@@ -240,8 +240,11 @@ impl SigmaDeck {
         self.current_deck
             .as_ref()
             .and_then(|deck_id| self.decks.get(deck_id))
-            .and_then(|deck| self.current_slide.as_ref())
-            .and_then(|slide_id| deck.slides.get(slide_id))
+            .and_then(|deck| {
+                self.current_slide
+                    .as_ref()
+                    .and_then(|slide_id| deck.slides.get(slide_id))
+            })
     }
 
     pub fn next_slide(&mut self) -> bool {
