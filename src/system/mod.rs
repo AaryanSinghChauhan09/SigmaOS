@@ -96,6 +96,7 @@ pub mod sigmasystemmonitor2;
 pub mod sigmaservicemanager2;
 pub mod sigmausbwriter;
 pub mod sigmafirewall;
+pub mod sigmalogmanager;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -484,6 +485,11 @@ pub use sigmafirewall {
     FirewallChain, RuleState,
     init_sigmafirewall, get_sigmafirewall, get_sigmafirewall_mut,
     create_rule,
+};
+pub use sigmalogmanager {
+    SigmaLogManager, LogEntry, LogLevel, LogSource, RotationPolicy,
+    init_sigmalogmanager, get_sigmalogmanager, get_sigmalogmanager_mut,
+    log_message,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
