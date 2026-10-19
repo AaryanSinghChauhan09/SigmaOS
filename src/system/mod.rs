@@ -112,6 +112,7 @@ pub mod sigmasound;
 pub mod sigmanetwork;
 pub mod sigmaprinter;
 pub mod sigmascanner;
+pub mod sigmawebcam;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -590,6 +591,13 @@ pub use sigmascanner {
     init_sigmascanner, get_sigmascanner, get_sigmascanner_mut,
     add_scanner,
 };
+
+pub use sigmawebcam {
+    SigmaWebcam, Webcam, WebcamState, Resolution, FrameFormat,
+    init_sigmawebcam, get_sigmawebcam, get_sigmawebcam_mut,
+    add_webcam,
+};
+
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
     UpdatePolicy, UpdateStatus, UpdateType,
