@@ -14,6 +14,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) - Two-stage physical memory management architecture, 11 PMM rules & invariants, 20-PR sequence roadmap, periodic maintenance schedule, cross-component implementation rules, and merge gates.
 - [CPU Scheduler Architecture & Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) - Multi-class scheduling architecture (CFS, BORE, EEVDF, Real-Time FIFO/RR, SchedExt), 9 core invariants, 18-PR sequence roadmap, periodic maintenance schedule, component rules, PR review template, and merge gates.
 - [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - Baseline rules, POSIX compatibility, 18-PR roadmap, component rules, periodic maintenance framework, and merge gates.
+- [CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md) - Two-layer CLI architecture (system CLI utilities vs shell engine), POSIX compatibility baseline, CLI rules, 18-PR roadmap sequence, maintenance cadence, rules for command families, PR template/merge gates, and rollout/exit criteria.
 - [IPC Handler Master Architecture & Development Plan](ipc-handler.md) - Formally specified IPC handler subsystem covering scope, periodic task cadence, 5 development phases, missing components deliverable matrix, correctness/security/Rust/testing rules, PR template, example PR, and 10-PR roadmap.
 - [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR sequence roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) - Master Architecture & Development Roadmap Plan for SigmaOS GUI and Compositor Stack; Wayland protocol model, DRM/KMS atomic modesetting, freedesktop desktop interfaces, WCAG 2.2 accessibility guidance, 19-PR roadmap, maintenance cadences, component rules, PR review template, and rollout criteria.
@@ -29,6 +30,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [Signal Path Audit & ABI Profile](../wiki/SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md)
 - [Interrupt Handler Plan Mirror](../wiki/INTERRUPT_HANDLER_PLAN.md)
 - [System Utilities Plan](../wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
+- [CLI Development Plan Mirror](../wiki/27-SigmaOS-CLI-Development-Plan.md)
 - [GUI Development Plan Mirror](../wiki/30-SigmaOS-GUI-Development-Plan.md)
 - [Architectural Pillars](../wiki/Architectural-Pillars-Components.md)
 - [Kernel Functions & ABI](../wiki/Kernel-Functions-and-ABI-Components.md)
