@@ -88,6 +88,7 @@ pub mod sigmawalker;
 pub mod sigmaquickshell;
 pub mod sigmapackagemanager;
 pub mod sigmaupdatemanager;
+pub mod sigmaflatpak;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -447,6 +448,10 @@ pub use sigmapackagemanager::{
 pub use sigmaupdatemanager::{
     SigmaUpdateManager, Update, UpdateSchedule, UpdateType, UpdateState,
     init_sigmaupdatemanager, get_sigmaupdatemanager, add_update, install_update,
+};
+pub use sigmaflatpak::{
+    SigmaFlatpak, Flatpak, FlatpakRemote, FlatpakType, FlatpakState,
+    init_sigmaflatpak, get_sigmaflatpak, add_flatpak, install_flatpak,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
