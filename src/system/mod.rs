@@ -87,6 +87,7 @@ pub mod sigmanetwork;
 pub mod sigmanfs;
 pub mod sigmanic;
 pub mod sigmanotifyenhanced;
+pub mod sigmanotificationmanager;
 pub mod sigmantp;
 pub mod sigmapackagemanager;
 pub mod sigmaparted;
@@ -877,4 +878,9 @@ pub use sigmadisplaymanager::{
 pub use sigmathememanager::{
     AppearanceSettings, ColorScheme, FontConfig, Theme, ThemeType, SigmaThemeManager,
     add_theme, get_sigmathememanager, get_sigmathememanager_mut, init_sigmathememanager,
+};
+
+pub use sigmanotificationmanager::{
+    Notification, NotificationCategory, NotificationRule, NotificationUrgency, SigmaNotificationManager,
+    add_notification, get_sigmanotificationmanager, get_sigmanotificationmanager_mut, init_sigmanotificationmanager,
 };
