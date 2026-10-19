@@ -7,7 +7,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 
 ## Device Management & Hotplug PR Proposals
 
-### PR #1001: feat(udev_devd): Implement Universal KOBJ_UEVENT Processing, FreeBSD devd & Devfs Jail Sandbox
+### PR #1001: feat(udev_devd): Implement Universal KOBJ_UEVENT Processing, Predictable Net Names & FreeBSD Devfs Jail Sandbox
 - **Category**: Device Management & Devfs Kernel Ring
 - **Inspiration Sources**: Linux systemd-udevd / eudev, BusyBox mdev, FreeBSD devd (`/dev/devctl`) & devfs rules (`/etc/devfs.rules`)
 - **Performance Impact**: O(1) Zero-Copy Dispatch
@@ -15,6 +15,8 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Key Features Implemented**:
   - Netlink `KOBJ_UEVENT` hotplug event ring parser & rule matcher
   - `udev` / `eudev` `rules.d` parser with dynamic `/dev/disk/by-id` symlink creation
+  - `udev` `hwdb` modalias database matcher for PCI/USB hardware properties (`ID_MODEL_FROM_DATABASE`, `ID_VENDOR_FROM_DATABASE`)
+  - Predictable network interface naming engine (`enp3s0`, `wlp2s0`, `wwan0`)
   - BusyBox `mdev` regex match table for lightweight micro-containers
   - FreeBSD `devd` `/dev/devctl` socket event router & script runner
   - FreeBSD `devfs.rules` node hiding & Jail device isolation filter
@@ -24,7 +26,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 
 ## Power Daemons PR Proposals
 
-### PR #1002: feat(acpid): Implement ACPI Ring Parser & Thermal/Lid/Power Event Dispatcher
+### PR #1002: feat(acpid): Implement ACPI Ring Parser & Thermal/Lid/Power/Jack Event Dispatcher
 - **Category**: ACPI Power Subsystem & Thermal Daemon
 - **Inspiration Sources**: Linux `acpid`, FreeBSD `powerd`, OpenBSD `apmd`
 - **Performance Impact**: O(1) ACPI Dispatch
@@ -33,6 +35,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
   - ACPI event string parser (`/proc/acpi/event` & Netlink socket)
   - `/etc/acpi/events/` rule configuration pattern matcher
   - Power button, lid switch, and AC adapter hot-toggle dispatcher
+  - Audio jack and display brightness hotkey ACPI event triggers
   - Critical thermal trip point emergency mitigation engine
 
 ### PR #1003: feat(upower): Implement Power Supply Enumerator, Battery Health & Runtime Estimator
@@ -42,9 +45,10 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Status**: Ready for Merge
 - **Key Features Implemented**:
   - `/sys/class/power_supply` device enumerator & state parser
+  - Peripheral battery tracking (wireless mice, keyboards, UPS units)
   - Battery wear degree & health capacity degradation calculator
   - Time-to-empty / Time-to-full discharge rate algorithm
-  - Power profile policy hint governor (`PowerSaver`, `Balanced`, `Performance`)
+  - Power profile policy hint governor (`PowerSaver`, `Balanced`, `Performance`, `LowBatterySaver`)
 
 ---
 
@@ -85,4 +89,5 @@ This collection of Pull Request proposals introduces native parity and high-perf
   - Zero-copy D-Bus wire protocol serializer & header parser
   - Well-known bus name ownership & service activation registry
   - `MethodCall` request router & `Signal` broadcast dispatcher
+  - Introspection XML schema generator engine
   - Strict access control security policy match engine

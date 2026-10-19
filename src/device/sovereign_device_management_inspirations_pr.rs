@@ -3,7 +3,8 @@
 //! Implements zero-dependency `#![no_std]` / `alloc` native parity engines and Pull Request
 //! proposal structures inspired by landmark Linux and BSD device management, power, session,
 //! permission, and IPC sub-daemons:
-//! - **udev / eudev / mdev / devd / devfs / hotplug**: Linux udev & eudev rules, BusyBox mdev regex matching,
+//! - **udev / eudev / mdev / devd / devfs / hotplug**: Linux udev & eudev rules, hwdb hardware database lookup,
+//!   predictable network interface naming (`enp3s0`, `wlp2s0`), BusyBox mdev regex matching,
 //!   FreeBSD devd `/dev/devctl` listener, FreeBSD devfs rule sets & FreeBSD Jail device isolation filters, dynamic `/dev` symlinks.
 //! - **acpid**: ACPI event ring buffer parser, power/lid/AC adapter event matching against `/etc/acpi/events/` rules.
 //! - **UPower**: Power supply device enumeration, battery charge & health estimation, time-to-empty/full algorithms, power profile hints.
@@ -13,18 +14,20 @@
 
 extern crate alloc;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 #[path = "udev_devd_rules.rs"]
 pub mod udev_devd_rules;
 
-#[cfg(feature = "standalone_test")]
+#[cfg(any(feature = "standalone_test", test))]
 pub use udev_devd_rules as udev_devd_rules_mod;
 
-#[cfg(not(feature = "standalone_test"))]
-pub use super::udev_devd_rules as udev_devd_rules_mod;
+#[cfg(not(any(feature = "standalone_test", test)))]
+pub use crate::device::udev_devd_rules as udev_devd_rules_mod;
 
+use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 /// Structured PR proposal manifest for Device Management enhancements.
@@ -52,6 +55,14 @@ pub enum DynamicDeviceAction {
     Unbind,
 }
 
+/// Network Interface Type for Predictable Naming.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PredictableNetIfType {
+    Ethernet,
+    Wireless,
+    Wwan,
+}
+
 /// Parsed Kernel Hotplug Uevent (`KOBJ_UEVENT`).
 #[derive(Debug, Clone)]
 pub struct KernelUeventRecord {
@@ -77,6 +88,13 @@ pub struct UdevEudevRule {
     pub owner_user: String,
     pub owner_group: String,
     pub run_command: Option<String>,
+}
+
+/// udev Hardware Database (`hwdb`) entry (`/lib/udev/hwdb.d/`).
+#[derive(Debug, Clone)]
+pub struct UdevHwdbEntry {
+    pub modalias_pattern: String,
+    pub properties: BTreeMap<String, String>,
 }
 
 /// BusyBox mdev regex match rule.
@@ -113,6 +131,7 @@ pub struct FreeBSDDevfsRule {
 #[derive(Debug, Default)]
 pub struct UdevEudevMdevDevdDevfsEngine {
     pub udev_rules: Vec<UdevEudevRule>,
+    pub hwdb_entries: Vec<UdevHwdbEntry>,
     pub mdev_rules: Vec<MdevRegexRule>,
     pub devd_rules: Vec<FreeBSDDevdRule>,
     pub devfs_rules: Vec<FreeBSDDevfsRule>,
@@ -154,6 +173,22 @@ impl UdevEudevMdevDevdDevfsEngine {
             run_command: None,
         });
 
+        // udev hwdb lookup entries
+        let mut e1000e_props = BTreeMap::new();
+        e1000e_props.insert("ID_MODEL_FROM_DATABASE".to_string(), "Ethernet Connection I219-LM".to_string());
+        e1000e_props.insert("ID_VENDOR_FROM_DATABASE".to_string(), "Intel Corporation".to_string());
+        self.hwdb_entries.push(UdevHwdbEntry {
+            modalias_pattern: "pci:v00008086d000015F3*".to_string(),
+            properties: e1000e_props,
+        });
+
+        let mut nvme_props = BTreeMap::new();
+        nvme_props.insert("ID_MODEL_FROM_DATABASE".to_string(), "Express NVMe Controller".to_string());
+        self.hwdb_entries.push(UdevHwdbEntry {
+            modalias_pattern: "pci:v0000144Dd0000A808*".to_string(),
+            properties: nvme_props,
+        });
+
         // mdev rules (BusyBox / Alpine)
         self.mdev_rules.push(MdevRegexRule {
             device_regex: "sd[a-z][0-9]*".to_string(),
@@ -189,6 +224,38 @@ impl UdevEudevMdevDevdDevfsEngine {
             group: "wheel".to_string(),
             mode: 0o600,
         });
+    }
+
+    /// Lookup hardware metadata properties from `hwdb` using PCI/USB modalias string.
+    pub fn lookup_hwdb(&self, modalias: &str) -> Option<BTreeMap<String, String>> {
+        for entry in &self.hwdb_entries {
+            let pat = entry.modalias_pattern.replace('*', "");
+            if modalias.contains(&pat) {
+                return Some(entry.properties.clone());
+            }
+        }
+        None
+    }
+
+    /// Generate predictable network interface name (e.g. `enp3s0`, `wlp2s0`, `wwan0`).
+    pub fn generate_predictable_net_ifname(
+        &self,
+        if_type: PredictableNetIfType,
+        pci_bus: u32,
+        pci_slot: u32,
+        pci_func: u32,
+    ) -> String {
+        let prefix = match if_type {
+            PredictableNetIfType::Ethernet => "enp",
+            PredictableNetIfType::Wireless => "wlp",
+            PredictableNetIfType::Wwan => "wwan",
+        };
+
+        if pci_func == 0 {
+            format!("{}{}s{}", prefix, pci_bus, pci_slot)
+        } else {
+            format!("{}{}s{}f{}", prefix, pci_bus, pci_slot, pci_func)
+        }
     }
 
     /// Process incoming Netlink `KOBJ_UEVENT` or `/dev/devctl` event.
@@ -304,7 +371,7 @@ impl UdevEudevMdevDevdDevfsEngine {
 
     /// Simulate `udevadm trigger` coldplug replay.
     pub fn simulate_coldplug_trigger(&mut self) -> usize {
-        let mock_devices = alloc::vec![
+        let mock_devices = vec![
             KernelUeventRecord {
                 action: DynamicDeviceAction::Add,
                 devpath: "/devices/pci0000:00/0000:00:01.0/nvme/nvme0/nvme0n1".to_string(),
@@ -313,7 +380,7 @@ impl UdevEudevMdevDevdDevfsEngine {
                 major: 259,
                 minor: 0,
                 seqnum: 1001,
-                env_vars: alloc::vec![("DEVTYPE".to_string(), "disk".to_string())],
+                env_vars: vec![("DEVTYPE".to_string(), "disk".to_string())],
             },
             KernelUeventRecord {
                 action: DynamicDeviceAction::Add,
@@ -323,7 +390,7 @@ impl UdevEudevMdevDevdDevfsEngine {
                 major: 13,
                 minor: 0,
                 seqnum: 1002,
-                env_vars: alloc::vec![("ID_INPUT_JOYSTICK".to_string(), "1".to_string())],
+                env_vars: vec![("ID_INPUT_JOYSTICK".to_string(), "1".to_string())],
             },
         ];
 
@@ -337,12 +404,14 @@ impl UdevEudevMdevDevdDevfsEngine {
     /// Generate udev/mdev/devd PR proposal.
     pub fn generate_proposal(&self) -> DeviceManagementPrProposalManifest {
         DeviceManagementPrProposalManifest {
-            pr_title: "feat(udev_devd): Implement Universal KOBJ_UEVENT Processing, FreeBSD devd & Devfs Jail Sandbox".to_string(),
+            pr_title: "feat(udev_devd): Implement Universal KOBJ_UEVENT Processing, Predictable Net Names & FreeBSD Devfs Jail Sandbox".to_string(),
             target_subsystem: "Device Management & Devfs Kernel Ring".to_string(),
             original_distros: "Linux systemd-udevd / eudev, BusyBox mdev, FreeBSD devd & devfs".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "Netlink KOBJ_UEVENT hotplug event ring parser & matcher".to_string(),
                 "udev / eudev rules.d parser with dynamic /dev/disk/by-id symlink creation".to_string(),
+                "udev hwdb modalias database matcher for PCI/USB hardware properties".to_string(),
+                "Predictable network interface naming engine (enp3s0, wlp2s0)".to_string(),
                 "BusyBox mdev regex match table for lightweight micro-containers".to_string(),
                 "FreeBSD devd /dev/devctl socket event router & script runner".to_string(),
                 "FreeBSD devfs.rules node hiding & Jail device isolation filter".to_string(),
@@ -366,6 +435,8 @@ pub enum AcpiEventKind {
     LidSwitch,
     AcAdapter,
     ThermalTrip,
+    BrightnessToggle,
+    HeadphoneJack,
 }
 
 /// Parsed ACPI event line from `/proc/acpi/event` or ACPI Netlink socket.
@@ -419,6 +490,12 @@ impl AcpidPowerDaemonEngine {
             event_pattern: "ac_adapter".to_string(),
             action_command: "/etc/acpi/power_profile_toggle.sh".to_string(),
         });
+
+        self.rules.push(AcpiRule {
+            rule_name: "jack_headphone".to_string(),
+            event_pattern: "jack/headphone".to_string(),
+            action_command: "/etc/acpi/audio_jack.sh".to_string(),
+        });
     }
 
     /// Parse ACPI event string (e.g. `button/power PWRF 00000080 00000000`).
@@ -435,6 +512,8 @@ impl AcpidPowerDaemonEngine {
             "button/lid" | "LID0" => AcpiEventKind::LidSwitch,
             "ac_adapter" | "AC0" | "AC" => AcpiEventKind::AcAdapter,
             "thermal" | "THRM" => AcpiEventKind::ThermalTrip,
+            "video/brightness" => AcpiEventKind::BrightnessToggle,
+            "jack/headphone" => AcpiEventKind::HeadphoneJack,
             _ => AcpiEventKind::PowerButton,
         };
 
@@ -469,14 +548,15 @@ impl AcpidPowerDaemonEngine {
     pub fn generate_proposal(&self) -> DeviceManagementPrProposalManifest {
         DeviceManagementPrProposalManifest {
             pr_title:
-                "feat(acpid): Implement ACPI Ring Parser & Thermal/Lid/Power Event Dispatcher"
+                "feat(acpid): Implement ACPI Ring Parser & Thermal/Lid/Power/Jack Event Dispatcher"
                     .to_string(),
             target_subsystem: "ACPI Power Subsystem & Thermal Daemon".to_string(),
             original_distros: "Linux acpid, FreeBSD powerd, OpenBSD apmd".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "ACPI event string parser (/proc/acpi/event & netlink)".to_string(),
                 "/etc/acpi/events/ rule configuration pattern matcher".to_string(),
                 "Power button, lid switch, and AC adapter hot-toggle dispatcher".to_string(),
+                "Audio jack and display brightness hotkey ACPI event triggers".to_string(),
                 "Critical thermal trip point emergency mitigation engine".to_string(),
             ],
             performance_multiplier: "O(1) ACPI Dispatch".to_string(),
@@ -495,6 +575,7 @@ pub enum PowerSupplyType {
     Battery,
     LinePower,
     Ups,
+    Peripheral,
 }
 
 /// Power Supply Charging State.
@@ -514,6 +595,7 @@ pub enum PowerProfile {
     #[default]
     Balanced,
     Performance,
+    LowBatterySaver,
 }
 
 /// Power Supply Device Record (corresponds to `/sys/class/power_supply/BAT0`).
@@ -569,6 +651,18 @@ impl UpowerBatteryPowerEngine {
             power_rate_w: 0.0,
         });
 
+        self.devices.push(PowerSupplyDevice {
+            name: "hidpp_mouse0".to_string(),
+            supply_type: PowerSupplyType::Peripheral,
+            online: true,
+            state: BatteryState::Discharging,
+            percentage: 90.0,
+            energy_now_wh: 2.0,
+            energy_full_wh: 2.2,
+            energy_full_design_wh: 2.2,
+            power_rate_w: 0.05,
+        });
+
         self.current_profile = PowerProfile::Balanced;
     }
 
@@ -614,6 +708,8 @@ impl UpowerBatteryPowerEngine {
 
         let new_profile = if is_ac_online {
             PowerProfile::Performance
+        } else if bat_percentage < 10.0 {
+            PowerProfile::LowBatterySaver
         } else if bat_percentage < 20.0 {
             PowerProfile::PowerSaver
         } else {
@@ -630,11 +726,12 @@ impl UpowerBatteryPowerEngine {
             pr_title: "feat(upower): Implement Power Supply Enumerator, Battery Health & Runtime Estimator".to_string(),
             target_subsystem: "UPower Power Management Framework".to_string(),
             original_distros: "FreeDesktop UPower, Linux sysfs power_supply, FreeBSD powerd".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "/sys/class/power_supply device enumerator & parser".to_string(),
+                "Peripheral battery tracking (wireless mice, keyboards, UPS)".to_string(),
                 "Battery wear degree & health capacity degradation calculator".to_string(),
                 "Time-to-empty / Time-to-full discharge rate algorithm".to_string(),
-                "Power profile policy hint governor (PowerSaver, Balanced, Performance)".to_string(),
+                "Power profile policy hint governor (PowerSaver, Balanced, Performance, LowBatterySaver)".to_string(),
             ],
             performance_multiplier: "Dynamic Power Governor".to_string(),
             status: "Ready for Merge".to_string(),
@@ -788,7 +885,7 @@ impl LogindElogindSessionEngine {
             pr_title: "feat(logind): Implement User Session Manager, Seat0 Multiseat, DRI/Evdev FD Delegate & Inhibitors".to_string(),
             target_subsystem: "User Session & Seat Governor (logind / elogind)".to_string(),
             original_distros: "Linux systemd-logind, elogind, FreeBSD seatd / ConsoleKit2".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "User session lifecycle & multiseat allocation engine (seat0)".to_string(),
                 "Unprivileged DRI / dev/input FD passing bridge for Wayland compositors".to_string(),
                 "System sleep & shutdown inhibitor lock registry".to_string(),
@@ -895,8 +992,8 @@ impl PolkitAuthorizationEngine {
         DeviceManagementPrProposalManifest {
             pr_title: "feat(polkit): Implement PolicyKit Action Evaluator, Subject Verification & Privilege Policy Rules".to_string(),
             target_subsystem: "Desktop Policy & Authorization Framework".to_string(),
-            original_distros: "FreeDesktop PolicyKit (polkit), FreeBSD Mac framework".to_string(),
-            components_added: alloc::vec![
+            original_distros: "FreeDesktop PolicyKit (polkit), FreeBSD MAC framework".to_string(),
+            components_added: vec![
                 "PolicyKit action rule parser & authorization evaluator".to_string(),
                 "Subject caller identification (PID, UID, Session ID)".to_string(),
                 "Interactive authentication challenge fallback dispatcher".to_string(),
@@ -1013,6 +1110,14 @@ impl DbusSystemBusBrokerEngine {
         Ok(())
     }
 
+    /// Introspect service interface XML.
+    pub fn generate_introspection_xml(&self, interface_name: &str) -> String {
+        format!(
+            "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n<node>\n  <interface name=\"{}\">\n    <method name=\"GetProperties\"/>\n  </interface>\n</node>",
+            interface_name
+        )
+    }
+
     /// Dispatch incoming D-Bus message.
     pub fn route_dbus_message(&mut self, msg: DbusMessageHeader) -> bool {
         let routed = match msg.msg_type {
@@ -1044,10 +1149,11 @@ impl DbusSystemBusBrokerEngine {
             pr_title: "feat(dbus_broker): Implement Zero-Copy D-Bus Wire Protocol Router, Service Activation & Name Registry".to_string(),
             target_subsystem: "D-Bus System Bus Broker (dbus-broker)".to_string(),
             original_distros: "FreeDesktop D-Bus, dbus-broker, Linux/BSD IPC".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "Zero-copy D-Bus wire protocol serializer & header parser".to_string(),
                 "Well-known bus name ownership & service activation registry".to_string(),
                 "MethodCall request router & Signal broadcast dispatcher".to_string(),
+                "Introspection XML schema generator engine".to_string(),
                 "Strict access control security policy match engine".to_string(),
             ],
             performance_multiplier: "Zero-Copy IPC Router".to_string(),
@@ -1085,7 +1191,7 @@ impl SovereignDeviceManagementParityPrGateway {
 
     /// Collect all PR proposal manifests across device management, power, session, and IPC sub-engines.
     pub fn collect_all_proposals(&self) -> Vec<DeviceManagementPrProposalManifest> {
-        alloc::vec![
+        vec![
             self.udev_devd.generate_proposal(),
             self.acpid.generate_proposal(),
             self.upower.generate_proposal(),
@@ -1093,6 +1199,62 @@ impl SovereignDeviceManagementParityPrGateway {
             self.polkit.generate_proposal(),
             self.dbus_broker.generate_proposal(),
         ]
+    }
+
+    /// Perform master end-to-end verification across all sub-engines.
+    pub fn run_master_verification(&mut self) -> bool {
+        // 1. Verify udev / hwdb / net names
+        let net_if = self.udev_devd.generate_predictable_net_ifname(
+            PredictableNetIfType::Ethernet,
+            3,
+            0,
+            0,
+        );
+        if net_if != "enp3s0" {
+            return false;
+        }
+
+        let hwdb_res = self.udev_devd.lookup_hwdb("pci:v00008086d000015F3s0000");
+        if hwdb_res.is_none() {
+            return false;
+        }
+
+        // 2. Verify acpid
+        let acpi_evt = self.acpid.parse_acpi_event_line("button/power PWRF 00000080 00000000");
+        if acpi_evt.is_none() || !self.acpid.dispatch_event(&acpi_evt.unwrap()) {
+            return false;
+        }
+
+        // 3. Verify upower
+        let prof = self.upower.evaluate_power_profile_hint();
+        if prof != PowerProfile::Balanced && prof != PowerProfile::Performance {
+            return false;
+        }
+
+        // 4. Verify logind
+        let fd_res = self.logind.take_device_fd("session-1", "/dev/dri/card0", 1000);
+        if fd_res.is_err() {
+            return false;
+        }
+
+        // 5. Verify polkit
+        let subj = PolkitSubject {
+            pid: 123,
+            uid: 1000,
+            session_id: "session-1".to_string(),
+        };
+        let auth = self.polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
+        if auth != PolkitAuthResult::Yes {
+            return false;
+        }
+
+        // 6. Verify dbus broker
+        let intro = self.dbus_broker.generate_introspection_xml("org.freedesktop.UPower");
+        if !intro.contains("org.freedesktop.UPower") {
+            return false;
+        }
+
+        true
     }
 
     /// Generate full Pull Request Proposal documentation report in Markdown format.
@@ -1154,6 +1316,20 @@ mod tests {
             .active_symlinks
             .iter()
             .any(|(s, _)| s.contains("disk/by-id/nvme-drive-nvme0n1")));
+
+        // Test hwdb modalias lookup
+        let hwdb_props = engine.lookup_hwdb("pci:v00008086d000015F3s0000").unwrap();
+        assert_eq!(
+            hwdb_props.get("ID_MODEL_FROM_DATABASE"),
+            Some(&"Ethernet Connection I219-LM".to_string())
+        );
+
+        // Test predictable network interface naming
+        let ifname_eth = engine.generate_predictable_net_ifname(PredictableNetIfType::Ethernet, 3, 0, 0);
+        assert_eq!(ifname_eth, "enp3s0");
+
+        let ifname_wifi = engine.generate_predictable_net_ifname(PredictableNetIfType::Wireless, 2, 0, 0);
+        assert_eq!(ifname_wifi, "wlp2s0");
 
         // Test legacy hotplug bridge
         let legacy_evt = udev_devd_rules_mod::HotplugDeviceEvent {
@@ -1269,11 +1445,14 @@ mod tests {
         let routed = broker.route_dbus_message(msg);
         assert!(routed);
         assert_eq!(broker.routed_messages.len(), 1);
+
+        let xml = broker.generate_introspection_xml("org.freedesktop.UPower");
+        assert!(xml.contains("org.freedesktop.UPower"));
     }
 
     #[test]
     fn test_master_device_management_pr_gateway() {
-        let gateway = SovereignDeviceManagementParityPrGateway::new();
+        let mut gateway = SovereignDeviceManagementParityPrGateway::new();
         let proposals = gateway.collect_all_proposals();
         assert_eq!(proposals.len(), 6);
 
@@ -1282,6 +1461,8 @@ mod tests {
             assert_eq!(manifest.status, "Ready for Merge");
             assert!(!manifest.components_added.is_empty());
         }
+
+        assert!(gateway.run_master_verification());
 
         let markdown = gateway.generate_pr_proposal_markdown();
         assert!(markdown.contains("Pull Request Proposals: Linux & BSD Unified Device Management"));
