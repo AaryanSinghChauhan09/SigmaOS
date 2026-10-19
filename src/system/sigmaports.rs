@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Build state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,7 +99,10 @@ impl SigmaPorts {
     }
 
     pub fn list_ports_by_category(&self, category: &str) -> Vec<&Port> {
-        self.ports.values().filter(|p| p.category == category).collect()
+        self.ports
+            .values()
+            .filter(|p| p.category == category)
+            .collect()
     }
 
     pub fn remove_port(&mut self, id: &str) -> bool {
@@ -111,7 +114,10 @@ impl SigmaPorts {
     }
 
     pub fn installed_count(&self) -> usize {
-        self.ports.values().filter(|p| p.state == BuildState::Installed).count()
+        self.ports
+            .values()
+            .filter(|p| p.state == BuildState::Installed)
+            .count()
     }
 }
 
@@ -121,7 +127,7 @@ impl Default for SigmaPorts {
     }
 }
 
-static_mut SIGMAPORTS_INSTANCE: Option<SigmaPorts> = None;
+static mut SIGMAPORTS_INSTANCE: Option<SigmaPorts> = None;
 
 pub fn init_sigmaports() {
     unsafe {
@@ -156,7 +162,12 @@ mod tests {
 
     #[test]
     fn test_port_creation() {
-        let port = Port::new("port-1".to_string(), "nginx".to_string(), "1.24.0".to_string(), "www".to_string());
+        let port = Port::new(
+            "port-1".to_string(),
+            "nginx".to_string(),
+            "1.24.0".to_string(),
+            "www".to_string(),
+        );
         assert_eq!(port.name, "nginx");
         assert_eq!(port.version, "1.24.0");
         assert_eq!(port.category, "www");
@@ -165,7 +176,12 @@ mod tests {
 
     #[test]
     fn test_port_state() {
-        let mut port = Port::new("port-1".to_string(), "nginx".to_string(), "1.24.0".to_string(), "www".to_string());
+        let mut port = Port::new(
+            "port-1".to_string(),
+            "nginx".to_string(),
+            "1.24.0".to_string(),
+            "www".to_string(),
+        );
         port.build();
         assert_eq!(port.state, BuildState::Building);
 
@@ -191,8 +207,16 @@ mod tests {
     fn test_list_ports_by_category() {
         let mut manager = SigmaPorts::new();
         manager.add_port("nginx".to_string(), "1.24.0".to_string(), "www".to_string());
-        manager.add_port("postgresql".to_string(), "15.0".to_string(), "databases".to_string());
-        manager.add_port("redis".to_string(), "7.0".to_string(), "databases".to_string());
+        manager.add_port(
+            "postgresql".to_string(),
+            "15.0".to_string(),
+            "databases".to_string(),
+        );
+        manager.add_port(
+            "redis".to_string(),
+            "7.0".to_string(),
+            "databases".to_string(),
+        );
 
         let db_ports = manager.list_ports_by_category("databases");
         assert_eq!(db_ports.len(), 2);

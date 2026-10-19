@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Jail state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -101,7 +101,10 @@ impl SigmaJails {
     }
 
     pub fn list_running_jails(&self) -> Vec<&Jail> {
-        self.jails.values().filter(|j| j.state == JailState::Running).collect()
+        self.jails
+            .values()
+            .filter(|j| j.state == JailState::Running)
+            .collect()
     }
 
     pub fn remove_jail(&mut self, id: &str) -> bool {
@@ -113,7 +116,10 @@ impl SigmaJails {
     }
 
     pub fn running_jail_count(&self) -> usize {
-        self.jails.values().filter(|j| j.state == JailState::Running).count()
+        self.jails
+            .values()
+            .filter(|j| j.state == JailState::Running)
+            .count()
     }
 }
 
@@ -123,7 +129,7 @@ impl Default for SigmaJails {
     }
 }
 
-static_mut SIGMAJAILS_INSTANCE: Option<SigmaJails> = None;
+static mut SIGMAJAILS_INSTANCE: Option<SigmaJails> = None;
 
 pub fn init_sigmajails() {
     unsafe {
@@ -158,7 +164,11 @@ mod tests {
 
     #[test]
     fn test_jail_creation() {
-        let jail = Jail::new("jail-1".to_string(), "webserver".to_string(), "/jails/webserver".to_string());
+        let jail = Jail::new(
+            "jail-1".to_string(),
+            "webserver".to_string(),
+            "/jails/webserver".to_string(),
+        );
         assert_eq!(jail.name, "webserver");
         assert_eq!(jail.path, "/jails/webserver");
         assert_eq!(jail.state, JailState::Stopped);
@@ -166,7 +176,11 @@ mod tests {
 
     #[test]
     fn test_jail_state() {
-        let mut jail = Jail::new("jail-1".to_string(), "webserver".to_string(), "/jails/webserver".to_string());
+        let mut jail = Jail::new(
+            "jail-1".to_string(),
+            "webserver".to_string(),
+            "/jails/webserver".to_string(),
+        );
         jail.start();
         assert_eq!(jail.state, JailState::Running);
 
