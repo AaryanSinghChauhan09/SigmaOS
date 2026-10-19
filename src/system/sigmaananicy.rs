@@ -213,7 +213,11 @@ impl SigmaAnanicy {
     }
 
     /// Auto-classify process using rules
-    pub fn auto_classify(&mut self, process_id: &str, process_name: &str) -> Option<ProcessCategory> {
+    pub fn auto_classify(
+        &mut self,
+        process_id: &str,
+        process_name: &str,
+    ) -> Option<ProcessCategory> {
         for rule in self.rules.values() {
             if rule.is_enabled() && rule.matches(process_name) {
                 return Some(rule.category);
@@ -257,10 +261,7 @@ impl SigmaAnanicy {
 
     /// List enabled rules
     pub fn list_enabled_rules(&self) -> Vec<&NiceRule> {
-        self.rules
-            .values()
-            .filter(|r| r.is_enabled())
-            .collect()
+        self.rules.values().filter(|r| r.is_enabled()).collect()
     }
 
     /// Get process count
@@ -281,7 +282,7 @@ impl Default for SigmaAnanicy {
 }
 
 /// Global SigmaAnanicy instance (placeholder for actual global state)
-static unsafe mutable SIGMAANANICY_INSTANCE: Option<SigmaAnanicy> = None;
+static mut SIGMAANANICY_INSTANCE: Option<SigmaAnanicy> = None;
 
 /// Initialize the global SigmaAnanicy instance
 pub fn init_sigmaananicy() {
@@ -292,16 +293,12 @@ pub fn init_sigmaananicy() {
 
 /// Get the global SigmaAnanicy instance
 pub fn get_sigmaananicy() -> Option<&'static SigmaAnanicy> {
-    unsafe {
-        SIGMAANANICY_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAANANICY_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaAnanicy instance
 pub fn get_sigmaananicy_mut() -> Option<&'static mut SigmaAnanicy> {
-    unsafe {
-        SIGMAANANICY_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAANANICY_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a process

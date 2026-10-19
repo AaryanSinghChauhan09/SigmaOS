@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Archive format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -118,7 +118,10 @@ impl SigmaArchiveManager {
     }
 
     pub fn list_archives_by_format(&self, format: ArchiveFormat) -> Vec<&Archive> {
-        self.archives.values().filter(|a| a.format == format).collect()
+        self.archives
+            .values()
+            .filter(|a| a.format == format)
+            .collect()
     }
 
     pub fn remove_archive(&mut self, id: &str) -> bool {
@@ -175,7 +178,11 @@ mod tests {
 
     #[test]
     fn test_archive_creation() {
-        let archive = Archive::new("archive-1".to_string(), "/backup.tar.gz".to_string(), ArchiveFormat::TarGz);
+        let archive = Archive::new(
+            "archive-1".to_string(),
+            "/backup.tar.gz".to_string(),
+            ArchiveFormat::TarGz,
+        );
         assert_eq!(archive.id, "archive-1");
         assert_eq!(archive.format, ArchiveFormat::TarGz);
         assert_eq!(archive.state, ArchiveState::Idle);
@@ -183,7 +190,11 @@ mod tests {
 
     #[test]
     fn test_archive_state() {
-        let mut archive = Archive::new("archive-1".to_string(), "/backup.tar.gz".to_string(), ArchiveFormat::TarGz);
+        let mut archive = Archive::new(
+            "archive-1".to_string(),
+            "/backup.tar.gz".to_string(),
+            ArchiveFormat::TarGz,
+        );
         archive.set_creating();
         assert_eq!(archive.state, ArchiveState::Creating);
 
@@ -193,9 +204,13 @@ mod tests {
 
     #[test]
     fn test_archive_builder() {
-        let archive = Archive::new("archive-1".to_string(), "/backup.tar.gz".to_string(), ArchiveFormat::TarGz)
-            .with_file_count(100)
-            .with_size(1000000);
+        let archive = Archive::new(
+            "archive-1".to_string(),
+            "/backup.tar.gz".to_string(),
+            ArchiveFormat::TarGz,
+        )
+        .with_file_count(100)
+        .with_size(1000000);
         assert_eq!(archive.file_count, 100);
         assert_eq!(archive.size, 1000000);
     }

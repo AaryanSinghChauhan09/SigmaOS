@@ -816,7 +816,9 @@ impl DeckcraftSpatial3dCameraTransitionPrEngine {
     pub fn generate_proposal(&self) -> DeckcraftPrProposalManifest {
         DeckcraftPrProposalManifest {
             pr_id: 822,
-            pr_title: "feat(deckcraft): Implement Spatial 3D Camera Orbit & Depth Transition Engine".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement Spatial 3D Camera Orbit & Depth Transition Engine"
+                    .to_string(),
             target_subsystem: "Deckcraft 3D Graphics & Spatial Compositing Subsystem".to_string(),
             original_suite: "ArtCraft Deckcraft Spatial 3D".to_string(),
             components_added: vec![
@@ -868,7 +870,11 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsPrEngine {
     }
 
     /// Analyze spoken speech segment & compute pacing feedback
-    pub fn analyze_speech_segment(&mut self, text: &str, duration_secs: f32) -> SpeechPacingMetrics {
+    pub fn analyze_speech_segment(
+        &mut self,
+        text: &str,
+        duration_secs: f32,
+    ) -> SpeechPacingMetrics {
         let words = text.split_whitespace().count();
         let current_wpm = if duration_secs > 0.0 {
             (words as f32 / duration_secs) * 60.0
@@ -877,7 +883,9 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsPrEngine {
         };
 
         for word in text.split_whitespace() {
-            let clean = word.trim_matches(|c: char| !c.is_alphanumeric()).to_lowercase();
+            let clean = word
+                .trim_matches(|c: char| !c.is_alphanumeric())
+                .to_lowercase();
             if clean == "um" || clean == "uh" || clean == "like" || clean == "basically" {
                 self.filler_words_detected.push(clean);
             }
@@ -1073,7 +1081,10 @@ impl DeckcraftDataDrivenMatrixInfographicPrEngine {
     }
 
     /// Layout SWOT analysis matrix or Kanban slide grid
-    pub fn compute_matrix_grid(&self, matrix_type: MatrixLayoutType) -> Vec<(String, f32, f32, f32, f32)> {
+    pub fn compute_matrix_grid(
+        &self,
+        matrix_type: MatrixLayoutType,
+    ) -> Vec<(String, f32, f32, f32, f32)> {
         let mut boxes = Vec::new();
         match matrix_type {
             MatrixLayoutType::SwotMatrix => {
@@ -1097,11 +1108,14 @@ impl DeckcraftDataDrivenMatrixInfographicPrEngine {
     pub fn generate_proposal(&self) -> DeckcraftPrProposalManifest {
         DeckcraftPrProposalManifest {
             pr_id: 826,
-            pr_title: "feat(deckcraft): Implement Dynamic Infographic Matrix Layout & Auto-Grid Generator".to_string(),
+            pr_title:
+                "feat(deckcraft): Implement Dynamic Infographic Matrix Layout & Auto-Grid Generator"
+                    .to_string(),
             target_subsystem: "Deckcraft Infographics & Matrix Subsystem".to_string(),
             original_suite: "ArtCraft Deckcraft Infographics".to_string(),
             components_added: vec![
-                "SWOT matrix, Kanban board, Timeline roadmap, and Comparison grid auto-layouts".to_string(),
+                "SWOT matrix, Kanban board, Timeline roadmap, and Comparison grid auto-layouts"
+                    .to_string(),
                 "Automatic icon-association matching & visual proportion scaling".to_string(),
                 "Collision-free matrix cell expansion and dynamic alignment solver".to_string(),
             ],
@@ -1327,18 +1341,23 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
         let sample_state = self.suite.vector_animation.sample_element_state(101, 250);
         let anim_ok = sample_state.is_some();
 
-        let diagram_layout = self.suite.smart_diagram.layout_diagram(DiagramType::OrgChart);
+        let diagram_layout = self
+            .suite
+            .smart_diagram
+            .layout_diagram(DiagramType::OrgChart);
         let diagram_ok = !diagram_layout.is_empty();
 
         let vote_ok = self.suite.audience_qna.vote_poll_option(1);
 
-        self.suite.crdt_collab.update_presence(PresenterCursorPresence {
-            client_id: 1,
-            client_name: "Presenter 1".to_string(),
-            active_slide_id: 1,
-            selected_element_id: Some(101),
-            cursor_color_argb: 0xFFFF0000,
-        });
+        self.suite
+            .crdt_collab
+            .update_presence(PresenterCursorPresence {
+                client_id: 1,
+                client_name: "Presenter 1".to_string(),
+                active_slide_id: 1,
+                selected_element_id: Some(101),
+                cursor_color_argb: 0xFFFF0000,
+            });
         let crdt_ok = self.suite.crdt_collab.presences.contains_key(&1);
 
         let ai_deck = self
@@ -1355,19 +1374,35 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
 
         let spatial_transform = self.suite.spatial_3d.compute_spatial_camera_transform(
             Spatial3dTransform {
-                pos_x: 0.0, pos_y: 0.0, pos_z: 0.0, rot_x_deg: 0.0, rot_y_deg: 0.0, rot_z_deg: 0.0,
+                pos_x: 0.0,
+                pos_y: 0.0,
+                pos_z: 0.0,
+                rot_x_deg: 0.0,
+                rot_y_deg: 0.0,
+                rot_z_deg: 0.0,
             },
             Spatial3dTransform {
-                pos_x: 100.0, pos_y: 50.0, pos_z: -200.0, rot_x_deg: 10.0, rot_y_deg: 45.0, rot_z_deg: 0.0,
+                pos_x: 100.0,
+                pos_y: 50.0,
+                pos_z: -200.0,
+                rot_x_deg: 10.0,
+                rot_y_deg: 45.0,
+                rot_z_deg: 0.0,
             },
             0.5,
         );
         let spatial_ok = spatial_transform.pos_x == 50.0;
 
-        let pacing = self.suite.ai_teleprompter.analyze_speech_segment("Welcome to SigmaOS", 1.0);
+        let pacing = self
+            .suite
+            .ai_teleprompter
+            .analyze_speech_segment("Welcome to SigmaOS", 1.0);
         let teleprompter_ok = pacing.current_wpm > 0.0;
 
-        let remote_ok = self.suite.mobile_remote.process_remote_command(RemoteCommand::ToggleLaser(0.5, 0.5));
+        let remote_ok = self
+            .suite
+            .mobile_remote
+            .process_remote_command(RemoteCommand::ToggleLaser(0.5, 0.5));
 
         self.suite.web_widget.embed_widget(EmbedWebWidget {
             widget_id: 2,
@@ -1377,7 +1412,10 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
         });
         let widget_ok = self.suite.web_widget.widgets.contains_key(&2);
 
-        let matrix_boxes = self.suite.matrix_infographic.compute_matrix_grid(MatrixLayoutType::SwotMatrix);
+        let matrix_boxes = self
+            .suite
+            .matrix_infographic
+            .compute_matrix_grid(MatrixLayoutType::SwotMatrix);
         let matrix_ok = matrix_boxes.len() == 4;
 
         self.suite.master_style.apply_variant(MasterStyleVariant {
@@ -1389,7 +1427,10 @@ impl SovereignDeckcraftArtcraftParityPrGateway {
         });
         let style_ok = self.suite.master_style.active_variant.variant_name == "Light Minimal";
 
-        let pdfa_ok = self.suite.pdfa_epub.validate_pdfa_compliance("SigmaOS Archival Keynote", true);
+        let pdfa_ok = self
+            .suite
+            .pdfa_epub
+            .validate_pdfa_compliance("SigmaOS Archival Keynote", true);
 
         anim_ok
             && diagram_ok
@@ -1546,10 +1587,20 @@ mod tests {
     fn test_spatial_3d_camera_transition_engine() {
         let engine = DeckcraftSpatial3dCameraTransitionPrEngine::new();
         let from = Spatial3dTransform {
-            pos_x: 0.0, pos_y: 0.0, pos_z: 0.0, rot_x_deg: 0.0, rot_y_deg: 0.0, rot_z_deg: 0.0,
+            pos_x: 0.0,
+            pos_y: 0.0,
+            pos_z: 0.0,
+            rot_x_deg: 0.0,
+            rot_y_deg: 0.0,
+            rot_z_deg: 0.0,
         };
         let to = Spatial3dTransform {
-            pos_x: 200.0, pos_y: 100.0, pos_z: -400.0, rot_x_deg: 20.0, rot_y_deg: 90.0, rot_z_deg: 0.0,
+            pos_x: 200.0,
+            pos_y: 100.0,
+            pos_z: -400.0,
+            rot_x_deg: 20.0,
+            rot_y_deg: 90.0,
+            rot_z_deg: 0.0,
         };
         let mid = engine.compute_spatial_camera_transform(from, to, 0.5);
         assert_eq!(mid.pos_x, 100.0);
@@ -1560,7 +1611,8 @@ mod tests {
     #[test]
     fn test_ai_teleprompter_speech_analytics_engine() {
         let mut engine = DeckcraftAiTeleprompterSpeechAnalyticsPrEngine::new();
-        let metrics = engine.analyze_speech_segment("Welcome to SigmaOS and um basically this is fast", 2.0);
+        let metrics =
+            engine.analyze_speech_segment("Welcome to SigmaOS and um basically this is fast", 2.0);
         assert!(metrics.current_wpm > 0.0);
         assert_eq!(metrics.filler_word_count, 2);
     }

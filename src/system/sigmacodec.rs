@@ -182,10 +182,7 @@ impl SigmaCodec {
 
     /// List enabled codecs
     pub fn list_enabled_codecs(&self) -> Vec<&Codec> {
-        self.codecs
-            .values()
-            .filter(|c| c.enabled)
-            .collect()
+        self.codecs.values().filter(|c| c.enabled).collect()
     }
 
     /// Enable a codec
@@ -259,7 +256,7 @@ impl Default for SigmaCodec {
 }
 
 /// Global SigmaCodec instance (placeholder for actual global state)
-static unsafe mutable SIGMACODEC_INSTANCE: Option<SigmaCodec> = None;
+static mut SIGMACODEC_INSTANCE: Option<SigmaCodec> = None;
 
 /// Initialize the global SigmaCodec instance
 pub fn init_sigmacodec() {
@@ -270,16 +267,12 @@ pub fn init_sigmacodec() {
 
 /// Get the global SigmaCodec instance
 pub fn get_sigmacodec() -> Option<&'static SigmaCodec> {
-    unsafe {
-        SIGMACODEC_INSTANCE.as_ref()
-    }
+    unsafe { SIGMACODEC_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaCodec instance
 pub fn get_sigmacodec_mut() -> Option<&'static mut SigmaCodec> {
-    unsafe {
-        SIGMACODEC_INSTANCE.as_mut()
-    }
+    unsafe { SIGMACODEC_INSTANCE.as_mut() }
 }
 
 /// Convenience function to register a codec

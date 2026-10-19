@@ -330,7 +330,7 @@ impl AnicraftOnionSkinningSubframePreviewPrEngine {
             prev_frames: 3,
             next_frames: 3,
             tint: OnionSkinTint {
-                past_rgba: (1.0, 0.0, 0.0, 0.4),  // Red ghosting for past
+                past_rgba: (1.0, 0.0, 0.0, 0.4),   // Red ghosting for past
                 future_rgba: (0.0, 1.0, 0.0, 0.4), // Green ghosting for future
             },
         }
@@ -495,7 +495,9 @@ impl AnicraftMeshDeformationShapeKeyMorphingPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 865,
-            pr_title: "feat(anicraft): Implement Mesh Vertex Deformation & Shape Key Morphing Engine".to_string(),
+            pr_title:
+                "feat(anicraft): Implement Mesh Vertex Deformation & Shape Key Morphing Engine"
+                    .to_string(),
             target_subsystem: "AniCraft Mesh Deformation Subsystem".to_string(),
             original_suite: "ArtCraft AniCraft Shape Key Morpher".to_string(),
             components_added: vec![
@@ -607,13 +609,17 @@ impl AnicraftRiggingWeightPaintingInfluencePrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 867,
-            pr_title: "feat(anicraft): Implement Vertex Skinning Weight Painting Influence Map Engine".to_string(),
+            pr_title:
+                "feat(anicraft): Implement Vertex Skinning Weight Painting Influence Map Engine"
+                    .to_string(),
             target_subsystem: "AniCraft Skinning & Mesh Rigging Subsystem".to_string(),
             original_suite: "ArtCraft AniCraft Weight Painting".to_string(),
             components_added: vec![
-                "Vertex bone skinning influence weight normalization (max 4 bones per vertex)".to_string(),
+                "Vertex bone skinning influence weight normalization (max 4 bones per vertex)"
+                    .to_string(),
                 "Interactive brush-based weight painting & heat map visualization".to_string(),
-                "Linear Blend Skinning (LBS) and Dual Quaternion Skinning (DQS) solvers".to_string(),
+                "Linear Blend Skinning (LBS) and Dual Quaternion Skinning (DQS) solvers"
+                    .to_string(),
             ],
             performance_multiplier: "50,000 Vertex Weight Skinning Evaluation (<0.4ms)".to_string(),
             status: "Ready for Merge".to_string(),
@@ -794,15 +800,19 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         let render_ok = dt > 0.0;
 
         let mut weights = vec![
-            BoneWeight { bone_id: 1, weight: 2.0 },
-            BoneWeight { bone_id: 2, weight: 2.0 },
+            BoneWeight {
+                bone_id: 1,
+                weight: 2.0,
+            },
+            BoneWeight {
+                bone_id: 2,
+                weight: 2.0,
+            },
         ];
         self.weight_engine.normalize_weights(&mut weights);
         let weight_ok = (weights[0].weight - 0.5).abs() < 1e-4;
 
-        let bvh_ok = self
-            .mocap_engine
-            .parse_bvh_header("HIERARCHY\nROOT Hips\n");
+        let bvh_ok = self.mocap_engine.parse_bvh_header("HIERARCHY\nROOT Hips\n");
 
         let json = self.atlas_engine.generate_atlas_json(&[SpriteCell {
             name: "frame0".to_string(),
@@ -874,8 +884,7 @@ impl AnicraftArtcraftParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_anicraft_parity()
-            && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_anicraft_parity() && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -972,8 +981,14 @@ mod tests {
     fn test_weight_painting_engine() {
         let engine = AnicraftRiggingWeightPaintingInfluencePrEngine::new();
         let mut weights = vec![
-            BoneWeight { bone_id: 1, weight: 3.0 },
-            BoneWeight { bone_id: 2, weight: 1.0 },
+            BoneWeight {
+                bone_id: 1,
+                weight: 3.0,
+            },
+            BoneWeight {
+                bone_id: 2,
+                weight: 1.0,
+            },
         ];
         engine.normalize_weights(&mut weights);
         assert_eq!(weights[0].weight, 0.75);

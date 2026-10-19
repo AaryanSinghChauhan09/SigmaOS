@@ -32,8 +32,20 @@ pub struct Metric {
 }
 
 impl Metric {
-    pub fn new(metric_id: String, name: String, monitor_type: MonitorType, value: u64, unit: String) -> Self {
-        Self { metric_id, name, monitor_type, value, unit }
+    pub fn new(
+        metric_id: String,
+        name: String,
+        monitor_type: MonitorType,
+        value: u64,
+        unit: String,
+    ) -> Self {
+        Self {
+            metric_id,
+            name,
+            monitor_type,
+            value,
+            unit,
+        }
     }
 }
 
@@ -55,49 +67,63 @@ impl SigmaSystemMonitor {
         }
     }
 
-    pub fn start(&mut self) { self.running.store(true, Ordering::SeqCst); }
-    pub fn stop(&mut self) { self.running.store(false, Ordering::SeqCst); }
-    pub fn is_running(&self) -> bool { self.running.load(Ordering::SeqCst) }
-    
-    pub fn add_metric(&mut self, metric: Metric) -> bool {
-        self.metrics.insert(metric.metric_id.clone(), metric).is_some()
+    pub fn start(&mut self) {
+        self.running.store(true, Ordering::SeqCst);
     }
-    
+    pub fn stop(&mut self) {
+        self.running.store(false, Ordering::SeqCst);
+    }
+    pub fn is_running(&self) -> bool {
+        self.running.load(Ordering::SeqCst)
+    }
+
+    pub fn add_metric(&mut self, metric: Metric) -> bool {
+        self.metrics
+            .insert(metric.metric_id.clone(), metric)
+            .is_some()
+    }
+
     pub fn get_metric(&self, metric_id: &str) -> Option<&Metric> {
         self.metrics.get(metric_id)
     }
-    
+
     pub fn list_metrics(&self) -> Vec<&Metric> {
         self.metrics.values().collect()
     }
-    
+
     pub fn update_cpu_usage(&self, usage: u64) {
         self.cpu_usage.store(usage, Ordering::SeqCst);
     }
-    
+
     pub fn get_cpu_usage(&self) -> u64 {
         self.cpu_usage.load(Ordering::SeqCst)
     }
-    
+
     pub fn update_memory_usage(&self, usage: u64) {
         self.memory_usage.store(usage, Ordering::SeqCst);
     }
-    
+
     pub fn get_memory_usage(&self) -> u64 {
         self.memory_usage.load(Ordering::SeqCst)
     }
-    
+
     pub fn metric_count(&self) -> usize {
         self.metrics.len()
     }
 }
 
-impl Default for SigmaSystemMonitor { fn default() -> Self { Self::new() } }
+impl Default for SigmaSystemMonitor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-static unsafe mutable SIGMASYSTEMMONITOR_INSTANCE: Option<SigmaSystemMonitor> = None;
+static mut SIGMASYSTEMMONITOR_INSTANCE: Option<SigmaSystemMonitor> = None;
 
 pub fn init_sigmasystemmonitor() {
-    unsafe { SIGMASYSTEMMONITOR_INSTANCE = Some(SigmaSystemMonitor::new()); }
+    unsafe {
+        SIGMASYSTEMMONITOR_INSTANCE = Some(SigmaSystemMonitor::new());
+    }
 }
 
 pub fn get_sigmasystemmonitor() -> Option<&'static SigmaSystemMonitor> {

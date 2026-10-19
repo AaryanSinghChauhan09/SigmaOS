@@ -457,15 +457,15 @@ pub use email_client::{
     EmailClient, EmailFolder, EmailPriority, EncryptionType,
 };
 pub use file_manager::{
-    get_file_manager, init_file_manager, File, FileManager, FileMetadata, FilePermission, FileType as ManagerFileType,
-    SelectionMode, SortOrder, ViewMode,
+    get_file_manager, init_file_manager, File, FileManager, FileMetadata, FilePermission,
+    FileType as ManagerFileType, SelectionMode, SortOrder, ViewMode,
 };
 pub use font_manager::{
     get_font_manager, init_font_manager, Font, FontFamily, FontManager, FontStyle,
 };
 pub use image_editor::{
-    get_image_editor, init_image_editor, BlendMode, ColorMode, ImageEditor, ImageFormat, Layer as ImageLayer,
-    Selection, ToolType,
+    get_image_editor, init_image_editor, BlendMode, ColorMode, ImageEditor, ImageFormat,
+    Layer as ImageLayer, Selection, ToolType,
 };
 pub use image_viewer::{
     get_image_viewer, init_image_viewer, FlipDirection, Image, ImageMetadata, ImageViewer,
@@ -478,8 +478,9 @@ pub use keyboard_shortcuts::{
     ShortcutCategory as SysShortcutCategory,
 };
 pub use media_player::{
-    get_media_player, init_media_player, AudioTrack as PlayerAudioTrack, EqualizerBand, MediaItem, MediaPlayer,
-    PlaybackState, Playlist, RepeatMode as PlayerRepeatMode, ShuffleMode, SubtitleTrack, VideoTrack,
+    get_media_player, init_media_player, AudioTrack as PlayerAudioTrack, EqualizerBand, MediaItem,
+    MediaPlayer, PlaybackState, Playlist, RepeatMode as PlayerRepeatMode, ShuffleMode,
+    SubtitleTrack, VideoTrack,
 };
 pub use news_reader::{get_news_reader, init_news_reader, Feed, FeedItem, FeedType, NewsReader};
 pub use notes_app::{get_notes_app, init_notes_app, Note, NoteColor, NoteFolder, NotesApp};
@@ -495,16 +496,18 @@ pub use printer_manager::{
     PrintQuality, Printer as SysPrinter, PrinterManager, PrinterStatus as SysPrinterStatus,
 };
 pub use screen_recorder::{
-    get_screen_recorder, init_screen_recorder, AudioCodec as RecorderAudioCodec, ContainerFormat as RecorderContainerFormat, RecordingArea,
-    RecordingConfig, RecordingQuality, RecordingState as ScreenRecordingState, ScreenRecorder, VideoCodec as RecorderVideoCodec,
+    get_screen_recorder, init_screen_recorder, AudioCodec as RecorderAudioCodec,
+    ContainerFormat as RecorderContainerFormat, RecordingArea, RecordingConfig, RecordingQuality,
+    RecordingState as ScreenRecordingState, ScreenRecorder, VideoCodec as RecorderVideoCodec,
 };
 pub use screenshot_tool::{
-    get_screenshot_tool, init_screenshot_tool, CaptureDelay, CaptureMode, ImageFormat as ScreenshotImageFormat,
-    IncludeCursor, Screenshot, ScreenshotOptions, ScreenshotTool,
+    get_screenshot_tool, init_screenshot_tool, CaptureDelay, CaptureMode,
+    ImageFormat as ScreenshotImageFormat, IncludeCursor, Screenshot, ScreenshotOptions,
+    ScreenshotTool,
 };
 pub use search_app::{
-    get_search_app, init_search_app, FileTypeFilter, SearchApp, SearchIndex, SearchResult as AppSearchResult,
-    SearchType, SortOrder as SearchSortOrder,
+    get_search_app, init_search_app, FileTypeFilter, SearchApp, SearchIndex,
+    SearchResult as AppSearchResult, SearchType, SortOrder as SearchSortOrder,
 };
 pub use sigma_ghostty::{
     CellAttrs, CursorStyle, GhosttyConfig, SigmaGhostty, TermCell, TermColor, TermGrid, VtAction,
@@ -520,24 +523,25 @@ pub use system_info::{
 };
 pub use task_manager::{get_task_manager, init_task_manager, Process, ProcessState, TaskManager};
 pub use terminal::{
-    get_terminal, init_terminal, BellMode, ColorScheme as TerminalColorScheme, CursorShape, ScrollbarPosition,
-    TerminalEmulator, TerminalProfile, TerminalSession, TerminalTab,
+    get_terminal, init_terminal, BellMode, ColorScheme as TerminalColorScheme, CursorShape,
+    ScrollbarPosition, TerminalEmulator, TerminalProfile, TerminalSession, TerminalTab,
 };
 pub use text_editor::{
     get_text_editor, init_text_editor, CursorPosition, Document, EditorState, Encoding, Language,
     LineEnding, Selection as TextEditorSelection, TabSize, TextEditor, Theme as TextEditorTheme,
 };
 pub use themes_manager::{
-    get_themes_manager, init_themes_manager, AccentColor, AppearanceSettings, ColorScheme as ThemesColorScheme, Theme as ThemesTheme,
-    ThemeType, ThemesManager,
+    get_themes_manager, init_themes_manager, AccentColor, AppearanceSettings,
+    ColorScheme as ThemesColorScheme, Theme as ThemesTheme, ThemeType, ThemesManager,
 };
 pub use timer_app::{
     get_timer_app, init_timer_app, Alarm, AlarmState, Lap, Stopwatch, StopwatchState, Timer,
     TimerApp, TimerState,
 };
 pub use video_editor::{
-    get_video_editor, init_video_editor, AudioCodec as EditorAudioCodec, Clip, ClipType, Effect as VideoEffect, FrameRate as VideoFrameRate, Resolution as VideoResolution,
-    Track, Transition as VideoTransition, VideoCodec as EditorVideoCodec, VideoEditor,
+    get_video_editor, init_video_editor, AudioCodec as EditorAudioCodec, Clip, ClipType,
+    Effect as VideoEffect, FrameRate as VideoFrameRate, Resolution as VideoResolution, Track,
+    Transition as VideoTransition, VideoCodec as EditorVideoCodec, VideoEditor,
 };
 pub use weather_app::{
     get_weather_app, init_weather_app, CurrentWeather, ForecastDay, TemperatureUnit, WeatherApp,

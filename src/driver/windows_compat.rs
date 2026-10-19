@@ -445,7 +445,7 @@ impl PeDriverLoader {
         let opt_header_offset = file_header_offset + core::mem::size_of::<ImageFileHeader>();
         let opt_header: ImageOptionalHeader64 = unsafe {
             core::ptr::read_unaligned(
-                binary.as_ptr().add(opt_header_offset) as *const ImageOptionalHeader64,
+                binary.as_ptr().add(opt_header_offset) as *const ImageOptionalHeader64
             )
         };
 
@@ -472,9 +472,7 @@ impl PeDriverLoader {
                 return Err("Section header overflow");
             }
             let section: ImageSectionHeader = unsafe {
-                core::ptr::read_unaligned(
-                    binary.as_ptr().add(offset) as *const ImageSectionHeader,
-                )
+                core::ptr::read_unaligned(binary.as_ptr().add(offset) as *const ImageSectionHeader)
             };
 
             let dest_start = section.virtual_address as usize;

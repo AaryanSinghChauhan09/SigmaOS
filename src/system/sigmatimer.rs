@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Timer state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -152,7 +152,10 @@ impl SigmaTimer {
     }
 
     pub fn list_running_timers(&self) -> Vec<&Timer> {
-        self.timers.values().filter(|t| t.state == TimerState::Running).collect()
+        self.timers
+            .values()
+            .filter(|t| t.state == TimerState::Running)
+            .collect()
     }
 
     pub fn remove_timer(&mut self, id: &str) -> bool {

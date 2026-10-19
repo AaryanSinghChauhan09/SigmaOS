@@ -89,7 +89,12 @@ pub struct Rect {
 
 impl Rect {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
-        Self { x, y, width, height }
+        Self {
+            x,
+            y,
+            width,
+            height,
+        }
     }
 
     pub fn contains(&self, point: Point) -> bool {
@@ -122,7 +127,13 @@ pub struct Shape {
 }
 
 impl Shape {
-    pub fn new(id: String, shape_type: ShapeType, position: Point, size: Size, color: Color) -> Self {
+    pub fn new(
+        id: String,
+        shape_type: ShapeType,
+        position: Point,
+        size: Size,
+        color: Color,
+    ) -> Self {
         Self {
             id,
             shape_type,
@@ -248,12 +259,14 @@ impl Canvas {
     }
 
     pub fn get_active_layer(&self) -> Option<&Layer> {
-        self.active_layer.as_ref()
+        self.active_layer
+            .as_ref()
             .and_then(|id| self.layers.get(id))
     }
 
     pub fn get_active_layer_mut(&mut self) -> Option<&mut Layer> {
-        self.active_layer.as_ref()
+        self.active_layer
+            .as_ref()
             .and_then(|id| self.layers.get_mut(id.as_str()))
     }
 
@@ -318,12 +331,14 @@ impl SigmaArt {
     }
 
     pub fn get_current_canvas(&self) -> Option<&Canvas> {
-        self.current_canvas.as_ref()
+        self.current_canvas
+            .as_ref()
             .and_then(|id| self.canvases.get(id))
     }
 
     pub fn get_current_canvas_mut(&mut self) -> Option<&mut Canvas> {
-        self.current_canvas.as_ref()
+        self.current_canvas
+            .as_ref()
             .and_then(|id| self.canvases.get_mut(id.as_str()))
     }
 
@@ -354,16 +369,12 @@ pub fn init_sigmaart() {
 
 /// Get the global SigmaArt instance
 pub fn get_sigmaart() -> Option<&'static SigmaArt> {
-    unsafe {
-        SIGMAART_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAART_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaArt instance (mutable)
 pub fn get_sigmaart_mut() -> Option<&'static mut SigmaArt> {
-    unsafe {
-        SIGMAART_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAART_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a canvas

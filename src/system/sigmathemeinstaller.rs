@@ -154,14 +154,15 @@ impl SigmaThemeInstaller {
 
     /// List installed themes
     pub fn list_installed_themes(&self) -> Vec<&Theme> {
-        self.themes
-            .values()
-            .filter(|t| t.is_installed())
-            .collect()
+        self.themes.values().filter(|t| t.is_installed()).collect()
     }
 
     /// List themes by type and state
-    pub fn list_themes_by_type_and_state(&self, theme_type: ThemeType, state: ThemeState) -> Vec<&Theme> {
+    pub fn list_themes_by_type_and_state(
+        &self,
+        theme_type: ThemeType,
+        state: ThemeState,
+    ) -> Vec<&Theme> {
         self.themes
             .values()
             .filter(|t| t.theme_type == theme_type && t.state == state)
@@ -228,7 +229,7 @@ impl Default for SigmaThemeInstaller {
 }
 
 /// Global SigmaThemeInstaller instance (placeholder for actual global state)
-static unsafe mutable SIGMATHEMEINSTALLER_INSTANCE: Option<SigmaThemeInstaller> = None;
+static mut SIGMATHEMEINSTALLER_INSTANCE: Option<SigmaThemeInstaller> = None;
 
 /// Initialize the global SigmaThemeInstaller instance
 pub fn init_sigmathemeinstaller() {
@@ -239,16 +240,12 @@ pub fn init_sigmathemeinstaller() {
 
 /// Get the global SigmaThemeInstaller instance
 pub fn get_sigmathemeinstaller() -> Option<&'static SigmaThemeInstaller> {
-    unsafe {
-        SIGMATHEMEINSTALLER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMATHEMEINSTALLER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaThemeInstaller instance
 pub fn get_sigmathemeinstaller_mut() -> Option<&'static mut SigmaThemeInstaller> {
-    unsafe {
-        SIGMATHEMEINSTALLER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMATHEMEINSTALLER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a theme

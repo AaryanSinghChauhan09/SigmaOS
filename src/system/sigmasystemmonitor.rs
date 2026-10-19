@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// CPU core
 #[derive(Debug, Clone)]
@@ -253,8 +253,7 @@ mod tests {
 
     #[test]
     fn test_network_stats() {
-        let stats = NetworkStats::new("eth0".to_string())
-            .with_traffic(1000000, 2000000);
+        let stats = NetworkStats::new("eth0".to_string()).with_traffic(1000000, 2000000);
         assert_eq!(stats.interface, "eth0");
         assert_eq!(stats.bytes_sent, 1000000);
         assert_eq!(stats.bytes_received, 2000000);

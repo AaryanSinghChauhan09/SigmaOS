@@ -72,7 +72,11 @@ impl Filmcraft3dCameraTrackingPlanarMeshPrEngine {
         }
     }
 
-    pub fn add_feature_point(&mut self, screen_pos: (f32, f32), world_pos: (f32, f32, f32)) -> usize {
+    pub fn add_feature_point(
+        &mut self,
+        screen_pos: (f32, f32),
+        world_pos: (f32, f32, f32),
+    ) -> usize {
         let id = self.tracked_points.len();
         self.tracked_points.push(TrackingFeaturePoint {
             id,
@@ -85,7 +89,9 @@ impl Filmcraft3dCameraTrackingPlanarMeshPrEngine {
 
     pub fn solve_camera_motion(&mut self) -> Result<f32, String> {
         if self.tracked_points.len() < 8 {
-            return Err("At least 8 feature points required for 3D camera reconstruction".to_string());
+            return Err(
+                "At least 8 feature points required for 3D camera reconstruction".to_string(),
+            );
         }
         let mut total_error = 0.0f32;
         for pt in &self.tracked_points {
@@ -97,7 +103,9 @@ impl Filmcraft3dCameraTrackingPlanarMeshPrEngine {
 
     pub fn fit_planar_mesh(&self, point_indices: &[usize]) -> Result<(f32, f32, f32, f32), String> {
         if point_indices.len() < 3 {
-            return Err("At least 3 point indices required to construct a 3D planar mesh".to_string());
+            return Err(
+                "At least 3 point indices required to construct a 3D planar mesh".to_string(),
+            );
         }
         // Plane equation coefficients Ax + By + Cz + D = 0
         Ok((0.0, 1.0, 0.0, 0.0))
@@ -149,7 +157,11 @@ impl FilmcraftNeuralDepthMapBokehRelightingPrEngine {
         }
     }
 
-    pub fn generate_depth_map(&self, rgb_in: &[u8], depth_out: &mut [f32]) -> Result<usize, String> {
+    pub fn generate_depth_map(
+        &self,
+        rgb_in: &[u8],
+        depth_out: &mut [f32],
+    ) -> Result<usize, String> {
         let pixels = rgb_in.len() / 3;
         if depth_out.len() != pixels {
             return Err("Depth map buffer size mismatch with input RGB buffer".to_string());
@@ -157,20 +169,30 @@ impl FilmcraftNeuralDepthMapBokehRelightingPrEngine {
 
         for i in 0..pixels {
             let px = i * 3;
-            let luma = (rgb_in[px] as f32 * 0.299 + rgb_in[px + 1] as f32 * 0.587 + rgb_in[px + 2] as f32 * 0.114) / 255.0;
+            let luma = (rgb_in[px] as f32 * 0.299
+                + rgb_in[px + 1] as f32 * 0.587
+                + rgb_in[px + 2] as f32 * 0.114)
+                / 255.0;
             depth_out[i] = luma * 5.0; // Simulated depth in meters
         }
         Ok(pixels)
     }
 
-    pub fn apply_optical_bokeh(&self, depth_map: &[f32], rgb_in: &[u8], rgb_out: &mut [u8]) -> Result<usize, String> {
+    pub fn apply_optical_bokeh(
+        &self,
+        depth_map: &[f32],
+        rgb_in: &[u8],
+        rgb_out: &mut [u8],
+    ) -> Result<usize, String> {
         if depth_map.len() * 3 != rgb_in.len() || rgb_out.len() != rgb_in.len() {
             return Err("Buffer dimensions mismatch for bokeh blur rendering".to_string());
         }
 
         for i in 0..depth_map.len() {
             let depth = depth_map[i];
-            let coc = ((depth - self.focal_plane_depth) / self.aperture_f_number).abs().clamp(0.0, 1.0);
+            let coc = ((depth - self.focal_plane_depth) / self.aperture_f_number)
+                .abs()
+                .clamp(0.0, 1.0);
             let px = i * 3;
 
             for c in 0..3 {
@@ -235,7 +257,10 @@ impl FilmcraftTemporalDenoiseGrainMatchingPrEngine {
         next_frame: &[u8],
         out_frame: &mut [u8],
     ) -> Result<usize, String> {
-        if curr_frame.len() != prev_frame.len() || curr_frame.len() != next_frame.len() || out_frame.len() != curr_frame.len() {
+        if curr_frame.len() != prev_frame.len()
+            || curr_frame.len() != next_frame.len()
+            || out_frame.len() != curr_frame.len()
+        {
             return Err("Spatio-temporal denoise frame buffer length mismatch".to_string());
         }
 
@@ -341,7 +366,11 @@ impl FilmcraftLoudnessNormalizationDuckingPrEngine {
         Ok(ducked_music_out.len())
     }
 
-    pub fn normalize_to_target_lufs(&self, pcm_in: &[f32], pcm_out: &mut [f32]) -> Result<f32, String> {
+    pub fn normalize_to_target_lufs(
+        &self,
+        pcm_in: &[f32],
+        pcm_out: &mut [f32],
+    ) -> Result<f32, String> {
         if pcm_in.len() != pcm_out.len() || pcm_in.is_empty() {
             return Err("Invalid buffer dimensions for LUFS normalization".to_string());
         }
@@ -427,7 +456,10 @@ impl FilmcraftDynamicNestedSequenceCompoundClipPrEngine {
         id
     }
 
-    pub fn trigger_background_smart_render(&mut self, compound_clip_id: usize) -> Result<bool, String> {
+    pub fn trigger_background_smart_render(
+        &mut self,
+        compound_clip_id: usize,
+    ) -> Result<bool, String> {
         let clip = self
             .compound_clips
             .get_mut(compound_clip_id)
@@ -481,9 +513,15 @@ impl FilmcraftColorSpaceOcioV2GamutCompressPrEngine {
         }
     }
 
-    pub fn compress_out_of_gamut_colors(&self, rgb_in: &[f32], rgb_out: &mut [f32]) -> Result<usize, String> {
+    pub fn compress_out_of_gamut_colors(
+        &self,
+        rgb_in: &[f32],
+        rgb_out: &mut [f32],
+    ) -> Result<usize, String> {
         if rgb_in.len() != rgb_out.len() {
-            return Err("RGB floating point buffer dimensions mismatch for Gamut Compress".to_string());
+            return Err(
+                "RGB floating point buffer dimensions mismatch for Gamut Compress".to_string(),
+            );
         }
 
         for i in (0..rgb_in.len()).step_by(3) {
@@ -571,7 +609,12 @@ impl FilmcraftRotoscopingVectorMaskTrackingPrEngine {
         id
     }
 
-    pub fn track_mask_motion_vectors(&mut self, flow_vectors_u: &[f32], flow_vectors_v: &[f32], width: usize) -> Result<(), String> {
+    pub fn track_mask_motion_vectors(
+        &mut self,
+        flow_vectors_u: &[f32],
+        flow_vectors_v: &[f32],
+        width: usize,
+    ) -> Result<(), String> {
         if flow_vectors_u.len() != flow_vectors_v.len() {
             return Err("Optical flow motion vector dimension mismatch".to_string());
         }
@@ -663,7 +706,12 @@ impl FilmcraftInteractiveSpeedRampingCurvePrEngine {
         1.0
     }
 
-    pub fn wsola_audio_timestretch(&self, pcm_in: &[f32], speed: f32, pcm_out: &mut Vec<f32>) -> Result<usize, String> {
+    pub fn wsola_audio_timestretch(
+        &self,
+        pcm_in: &[f32],
+        speed: f32,
+        pcm_out: &mut Vec<f32>,
+    ) -> Result<usize, String> {
         if pcm_in.is_empty() || speed <= 0.0 {
             return Err("Invalid audio buffer or speed multiplier".to_string());
         }
@@ -732,7 +780,10 @@ impl FilmcraftLiveBroadcastStreamingSrtNdiPrEngine {
         }
         self.ndi_source_name = source_name.to_string();
         self.active_stream_count += 1;
-        Ok(format!("NDI 6.0 Program stream active: '{}'", self.ndi_source_name))
+        Ok(format!(
+            "NDI 6.0 Program stream active: '{}'",
+            self.ndi_source_name
+        ))
     }
 
     pub fn start_srt_stream(&mut self, endpoint: &str, passphrase: &str) -> Result<String, String> {
@@ -741,19 +792,28 @@ impl FilmcraftLiveBroadcastStreamingSrtNdiPrEngine {
         }
         self.srt_endpoint_url = endpoint.to_string();
         self.active_stream_count += 1;
-        Ok(format!("SRT Secure Stream connected to '{}' (Encrypted: {})", self.srt_endpoint_url, !passphrase.is_empty()))
+        Ok(format!(
+            "SRT Secure Stream connected to '{}' (Encrypted: {})",
+            self.srt_endpoint_url,
+            !passphrase.is_empty()
+        ))
     }
 
     pub fn generate_proposal(&self) -> FilmcraftV64PrProposalManifest {
         FilmcraftV64PrProposalManifest {
             pr_id: 329,
-            pr_title: "feat(filmcraft): Low-Latency NDI 6.0 & SRT Live Video Broadcast Streaming Router".to_string(),
+            pr_title:
+                "feat(filmcraft): Low-Latency NDI 6.0 & SRT Live Video Broadcast Streaming Router"
+                    .to_string(),
             target_subsystem: "Broadcast & Network I/O Subsystem".to_string(),
             original_suite: "ArtCraft FilmCraft Broadcast Hub".to_string(),
             components_added: vec![
-                "NDI 6.0 full-bandwidth & NDI|HX2 low-latency network video input/output".to_string(),
-                "SRT (Secure Reliable Transport) caller/listener mode IP video stream router".to_string(),
-                "Genlock IP frame synchronization & sub-frame tally light protocol listener".to_string(),
+                "NDI 6.0 full-bandwidth & NDI|HX2 low-latency network video input/output"
+                    .to_string(),
+                "SRT (Secure Reliable Transport) caller/listener mode IP video stream router"
+                    .to_string(),
+                "Genlock IP frame synchronization & sub-frame tally light protocol listener"
+                    .to_string(),
             ],
             performance_multiplier: "Sub-15ms Live Broadcast Video Streaming Latency".to_string(),
             status: "Ready for Merge".to_string(),
@@ -905,40 +965,62 @@ impl SovereignFilmcraftArtcraftMissingComponentsV64PrGateway {
 
     pub fn evaluate_filmcraft_v64_parity(&mut self) -> bool {
         for i in 0..8 {
-            self.camera_tracking.add_feature_point((i as f32 * 10.0, 10.0), (i as f32, 0.0, 0.0));
+            self.camera_tracking
+                .add_feature_point((i as f32 * 10.0, 10.0), (i as f32, 0.0, 0.0));
         }
         let tracking_ok = self.camera_tracking.solve_camera_motion().is_ok();
 
         let rgb_in = vec![128u8; 12];
         let mut depth_out = vec![0.0f32; 4];
-        let depth_ok = self.neural_depth.generate_depth_map(&rgb_in, &mut depth_out).is_ok();
+        let depth_ok = self
+            .neural_depth
+            .generate_depth_map(&rgb_in, &mut depth_out)
+            .is_ok();
 
         let curr = vec![100u8; 8];
         let prev = vec![90u8; 8];
         let next = vec![110u8; 8];
         let mut out = vec![0u8; 8];
-        let denoise_ok = self.temporal_denoise.process_3d_denoise(&curr, &prev, &next, &mut out).is_ok();
+        let denoise_ok = self
+            .temporal_denoise
+            .process_3d_denoise(&curr, &prev, &next, &mut out)
+            .is_ok();
 
         let voice = vec![0.5f32; 8];
         let music = vec![0.8f32; 8];
         let mut ducked = vec![0.0f32; 8];
-        let ducking_ok = self.loudness_ducking.apply_sidechain_ducking(&voice, &music, &mut ducked).is_ok();
+        let ducking_ok = self
+            .loudness_ducking
+            .apply_sidechain_ducking(&voice, &music, &mut ducked)
+            .is_ok();
 
         let comp_id = self.nested_sequence.create_compound_clip("Scene 1", 4, 300);
-        let nested_ok = self.nested_sequence.trigger_background_smart_render(comp_id).is_ok();
+        let nested_ok = self
+            .nested_sequence
+            .trigger_background_smart_render(comp_id)
+            .is_ok();
 
         let rgb_f32 = vec![1.2f32; 6];
         let mut rgb_comp = vec![0.0f32; 6];
-        let ocio_ok = self.ocio_gamut.compress_out_of_gamut_colors(&rgb_f32, &mut rgb_comp).is_ok();
+        let ocio_ok = self
+            .ocio_gamut
+            .compress_out_of_gamut_colors(&rgb_f32, &mut rgb_comp)
+            .is_ok();
 
         self.rotoscoping_mask.add_spline_point((10.0, 10.0));
-        let roto_ok = self.rotoscoping_mask.track_mask_motion_vectors(&[1.0], &[1.0], 1).is_ok();
+        let roto_ok = self
+            .rotoscoping_mask
+            .track_mask_motion_vectors(&[1.0], &[1.0], 1)
+            .is_ok();
 
         self.speed_ramping.add_speed_keyframe(0, 1.0);
         self.speed_ramping.add_speed_keyframe(100, 2.0);
         let speed_ok = self.speed_ramping.evaluate_speed_at_frame(50) > 1.0;
 
-        let ndi_ok = self.broadcast_stream.start_ndi_program_output("Main-PGM").is_ok();
+        let ndi_ok = self
+            .broadcast_stream
+            .start_ndi_program_output("Main-PGM")
+            .is_ok();
 
         self.crdt_collab.join_session(1001);
         let collab_ok = self.crdt_collab.acquire_track_lock(1, 1001);
@@ -993,7 +1075,8 @@ impl FilmcraftArtcraftMissingComponentsV64PrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_filmcraft_v64_parity() && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_filmcraft_v64_parity()
+            && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -1035,7 +1118,9 @@ mod tests {
         assert_eq!(count, 4);
 
         let mut rgb_out = vec![0u8; 12];
-        assert!(engine.apply_optical_bokeh(&depth, &rgb_in, &mut rgb_out).is_ok());
+        assert!(engine
+            .apply_optical_bokeh(&depth, &rgb_in, &mut rgb_out)
+            .is_ok());
 
         let proposal = engine.generate_proposal();
         assert_eq!(proposal.pr_id, 322);
@@ -1071,7 +1156,9 @@ mod tests {
 
         let pcm_in = vec![0.1f32; 10];
         let mut pcm_out = vec![0.0f32; 10];
-        let gain_db = engine.normalize_to_target_lufs(&pcm_in, &mut pcm_out).unwrap();
+        let gain_db = engine
+            .normalize_to_target_lufs(&pcm_in, &mut pcm_out)
+            .unwrap();
         assert!(gain_db > 0.0);
 
         let proposal = engine.generate_proposal();
@@ -1097,7 +1184,9 @@ mod tests {
         let rgb_in = vec![1.5f32; 6];
         let mut rgb_out = vec![0.0f32; 6];
 
-        let count = engine.compress_out_of_gamut_colors(&rgb_in, &mut rgb_out).unwrap();
+        let count = engine
+            .compress_out_of_gamut_colors(&rgb_in, &mut rgb_out)
+            .unwrap();
         assert_eq!(count, 6);
         assert!(rgb_out[0] <= 1.0);
 
@@ -1131,7 +1220,9 @@ mod tests {
 
         let pcm_in = vec![0.5f32; 100];
         let mut pcm_out = Vec::new();
-        let count = engine.wsola_audio_timestretch(&pcm_in, 2.0, &mut pcm_out).unwrap();
+        let count = engine
+            .wsola_audio_timestretch(&pcm_in, 2.0, &mut pcm_out)
+            .unwrap();
         assert_eq!(count, 50);
 
         let proposal = engine.generate_proposal();
@@ -1144,7 +1235,9 @@ mod tests {
         let ndi_msg = engine.start_ndi_program_output("Main-Feed").unwrap();
         assert!(ndi_msg.contains("Main-Feed"));
 
-        let srt_msg = engine.start_srt_stream("srt://1.2.3.4:9000", "pass123").unwrap();
+        let srt_msg = engine
+            .start_srt_stream("srt://1.2.3.4:9000", "pass123")
+            .unwrap();
         assert!(srt_msg.contains("srt://1.2.3.4:9000"));
 
         let proposal = engine.generate_proposal();

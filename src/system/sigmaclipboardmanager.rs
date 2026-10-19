@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Clipboard item format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -73,11 +73,11 @@ impl SigmaClipboardManager {
         let id = format!("clipboard-{}", self.next_item_id);
         self.next_item_id += 1;
         let item = ClipboardItem::new(id.clone(), format, content);
-        
+
         if self.items.len() >= self.max_history {
             self.items.remove(0);
         }
-        
+
         self.items.push(item);
         self.current_item = Some(id.clone());
         id
@@ -163,7 +163,11 @@ mod tests {
 
     #[test]
     fn test_clipboard_item_creation() {
-        let item = ClipboardItem::new("clipboard-1".to_string(), ClipboardFormat::Text, "Hello, World!".to_string());
+        let item = ClipboardItem::new(
+            "clipboard-1".to_string(),
+            ClipboardFormat::Text,
+            "Hello, World!".to_string(),
+        );
         assert_eq!(item.id, "clipboard-1");
         assert_eq!(item.format, ClipboardFormat::Text);
         assert_eq!(item.content, "Hello, World!");
@@ -171,8 +175,12 @@ mod tests {
 
     #[test]
     fn test_clipboard_item_with_timestamp() {
-        let item = ClipboardItem::new("clipboard-1".to_string(), ClipboardFormat::Text, "Hello".to_string())
-            .with_timestamp(1234567890);
+        let item = ClipboardItem::new(
+            "clipboard-1".to_string(),
+            ClipboardFormat::Text,
+            "Hello".to_string(),
+        )
+        .with_timestamp(1234567890);
         assert_eq!(item.timestamp, 1234567890);
     }
 
@@ -194,7 +202,7 @@ mod tests {
     fn test_get_current_item() {
         let mut manager = SigmaClipboardManager::new(10);
         manager.add_item(ClipboardFormat::Text, "Hello".to_string());
-        
+
         let current = manager.get_current_item();
         assert!(current.is_some());
         assert_eq!(current.unwrap().content, "Hello");
@@ -216,7 +224,7 @@ mod tests {
         let mut manager = SigmaClipboardManager::new(10);
         manager.add_item(ClipboardFormat::Text, "Hello".to_string());
         manager.add_item(ClipboardFormat::Text, "World".to_string());
-        
+
         manager.clear_history();
         assert_eq!(manager.item_count(), 0);
     }

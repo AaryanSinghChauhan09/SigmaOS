@@ -192,7 +192,11 @@ mod tests {
 
     #[test]
     fn test_microphone_creation() {
-        let mic = Microphone::new("mic-1".to_string(), "Blue Yeti".to_string(), "/dev/snd/controlC0".to_string());
+        let mic = Microphone::new(
+            "mic-1".to_string(),
+            "Blue Yeti".to_string(),
+            "/dev/snd/controlC0".to_string(),
+        );
         assert_eq!(mic.id, "mic-1");
         assert_eq!(mic.name, "Blue Yeti");
         assert_eq!(mic.state, MicrophoneState::Idle);
@@ -200,7 +204,11 @@ mod tests {
 
     #[test]
     fn test_microphone_state() {
-        let mut mic = Microphone::new("mic-1".to_string(), "Blue Yeti".to_string(), "/dev/snd/controlC0".to_string());
+        let mut mic = Microphone::new(
+            "mic-1".to_string(),
+            "Blue Yeti".to_string(),
+            "/dev/snd/controlC0".to_string(),
+        );
         assert_eq!(mic.state, MicrophoneState::Idle);
 
         mic.start_recording();
@@ -212,25 +220,37 @@ mod tests {
 
     #[test]
     fn test_microphone_with_sample_rate() {
-        let mic = Microphone::new("mic-1".to_string(), "Blue Yeti".to_string(), "/dev/snd/controlC0".to_string())
-            .with_sample_rate(SampleRate::Hz48000)
-            .with_sample_rate(SampleRate::Hz44100);
+        let mic = Microphone::new(
+            "mic-1".to_string(),
+            "Blue Yeti".to_string(),
+            "/dev/snd/controlC0".to_string(),
+        )
+        .with_sample_rate(SampleRate::Hz48000)
+        .with_sample_rate(SampleRate::Hz44100);
         assert_eq!(mic.sample_rates.len(), 2);
     }
 
     #[test]
     fn test_microphone_with_format() {
-        let mic = Microphone::new("mic-1".to_string(), "Blue Yeti".to_string(), "/dev/snd/controlC0".to_string())
-            .with_format(SampleFormat::S16LE)
-            .with_format(SampleFormat::Float32LE);
+        let mic = Microphone::new(
+            "mic-1".to_string(),
+            "Blue Yeti".to_string(),
+            "/dev/snd/controlC0".to_string(),
+        )
+        .with_format(SampleFormat::S16LE)
+        .with_format(SampleFormat::Float32LE);
         assert_eq!(mic.formats.len(), 2);
     }
 
     #[test]
     fn test_microphone_with_channels() {
-        let mic = Microphone::new("mic-1".to_string(), "Blue Yeti".to_string(), "/dev/snd/controlC0".to_string())
-            .with_channels(ChannelCount::Mono)
-            .with_channels(ChannelCount::Stereo);
+        let mic = Microphone::new(
+            "mic-1".to_string(),
+            "Blue Yeti".to_string(),
+            "/dev/snd/controlC0".to_string(),
+        )
+        .with_channels(ChannelCount::Mono)
+        .with_channels(ChannelCount::Stereo);
         assert_eq!(mic.channels.len(), 2);
     }
 
@@ -252,7 +272,10 @@ mod tests {
     fn test_list_microphones() {
         let mut manager = SigmaMicrophone::new();
         manager.add_microphone("Blue Yeti".to_string(), "/dev/snd/controlC0".to_string());
-        manager.add_microphone("Audio-Technica".to_string(), "/dev/snd/controlC1".to_string());
+        manager.add_microphone(
+            "Audio-Technica".to_string(),
+            "/dev/snd/controlC1".to_string(),
+        );
 
         let mics = manager.list_microphones();
         assert_eq!(mics.len(), 2);

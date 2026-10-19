@@ -69,8 +69,9 @@ pub use sigmanet::{
     InterfaceType, IpMethod, IpType, NetworkInterface as SigmaNetInterface, SigmaNet,
 };
 pub use zenithnet::{
-    EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface as ZenithNetworkInterface,
-    PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
+    EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError,
+    NetworkInterface as ZenithNetworkInterface, PacketType, TcpHeader, TcpState as ZenithTcpState,
+    UdpHeader, ZenithNet,
 };
 
 #[path = "sovereign_async_io.rs"]

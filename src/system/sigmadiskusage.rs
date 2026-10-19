@@ -101,7 +101,12 @@ impl SigmaDiskUsage {
         }
     }
 
-    pub fn add_filesystem(&mut self, mount_point: String, device: String, total_size: u64) -> String {
+    pub fn add_filesystem(
+        &mut self,
+        mount_point: String,
+        device: String,
+        total_size: u64,
+    ) -> String {
         let id = format!("fs-{}", self.next_filesystem_id);
         self.next_filesystem_id += 1;
         let fs = Filesystem::new(id.clone(), mount_point, device, total_size);
@@ -207,7 +212,12 @@ mod tests {
 
     #[test]
     fn test_filesystem_creation() {
-        let fs = Filesystem::new("fs-1".to_string(), "/".to_string(), "/dev/sda1".to_string(), 1000000000000);
+        let fs = Filesystem::new(
+            "fs-1".to_string(),
+            "/".to_string(),
+            "/dev/sda1".to_string(),
+            1000000000000,
+        );
         assert_eq!(fs.id, "fs-1");
         assert_eq!(fs.mount_point, "/");
         assert_eq!(fs.total_size, 1000000000000);
@@ -216,16 +226,26 @@ mod tests {
 
     #[test]
     fn test_filesystem_with_usage() {
-        let fs = Filesystem::new("fs-1".to_string(), "/".to_string(), "/dev/sda1".to_string(), 1000000000000)
-            .with_usage(500000000000);
+        let fs = Filesystem::new(
+            "fs-1".to_string(),
+            "/".to_string(),
+            "/dev/sda1".to_string(),
+            1000000000000,
+        )
+        .with_usage(500000000000);
         assert_eq!(fs.used_size, 500000000000);
         assert_eq!(fs.available_size, 500000000000);
     }
 
     #[test]
     fn test_usage_percentage() {
-        let fs = Filesystem::new("fs-1".to_string(), "/".to_string(), "/dev/sda1".to_string(), 1000000000000)
-            .with_usage(500000000000);
+        let fs = Filesystem::new(
+            "fs-1".to_string(),
+            "/".to_string(),
+            "/dev/sda1".to_string(),
+            1000000000000,
+        )
+        .with_usage(500000000000);
         assert_eq!(fs.usage_percentage(), 50);
     }
 
@@ -274,10 +294,17 @@ mod tests {
     fn test_total_used_space() {
         let mut manager = SigmaDiskUsage::new();
         let fs1 = manager.add_filesystem("/".to_string(), "/dev/sda1".to_string(), 1000000000000);
-        let fs2 = manager.add_filesystem("/home".to_string(), "/dev/sda2".to_string(), 500000000000);
+        let fs2 =
+            manager.add_filesystem("/home".to_string(), "/dev/sda2".to_string(), 500000000000);
 
-        manager.get_filesystem_mut(&fs1).unwrap().with_usage(500000000000);
-        manager.get_filesystem_mut(&fs2).unwrap().with_usage(250000000000);
+        manager
+            .get_filesystem_mut(&fs1)
+            .unwrap()
+            .with_usage(500000000000);
+        manager
+            .get_filesystem_mut(&fs2)
+            .unwrap()
+            .with_usage(250000000000);
 
         assert_eq!(manager.total_used_space(), 750000000000);
     }

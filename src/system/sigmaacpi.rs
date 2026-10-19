@@ -295,8 +295,7 @@ mod tests {
 
     #[test]
     fn test_battery_percentage() {
-        let battery = BatteryInfo::new("battery-1".to_string(), 5000)
-            .with_remaining(2500);
+        let battery = BatteryInfo::new("battery-1".to_string(), 5000).with_remaining(2500);
         assert_eq!(battery.percentage(), 50);
     }
 

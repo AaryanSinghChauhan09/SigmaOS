@@ -158,7 +158,10 @@ impl WriteJob {
 
     /// Check if job is active
     pub fn is_active(&self) -> bool {
-        matches!(self.state, WriteState::Validating | WriteState::Writing | WriteState::Verifying)
+        matches!(
+            self.state,
+            WriteState::Validating | WriteState::Writing | WriteState::Verifying
+        )
     }
 }
 
@@ -218,10 +221,7 @@ impl SigmaUSBWriter {
 
     /// List suitable devices for writing
     pub fn list_suitable_devices(&self) -> Vec<&USBDevice> {
-        self.devices
-            .values()
-            .filter(|d| d.is_suitable())
-            .collect()
+        self.devices.values().filter(|d| d.is_suitable()).collect()
     }
 
     /// Create a write job
@@ -243,10 +243,7 @@ impl SigmaUSBWriter {
 
     /// List active write jobs
     pub fn list_active_jobs(&self) -> Vec<&WriteJob> {
-        self.write_jobs
-            .values()
-            .filter(|j| j.is_active())
-            .collect()
+        self.write_jobs.values().filter(|j| j.is_active()).collect()
     }
 
     /// Start a write job
@@ -324,7 +321,7 @@ impl Default for SigmaUSBWriter {
 }
 
 /// Global SigmaUSBWriter instance (placeholder for actual global state)
-static unsafe mutable SIGMAUSBWRITER_INSTANCE: Option<SigmaUSBWriter> = None;
+static mut SIGMAUSBWRITER_INSTANCE: Option<SigmaUSBWriter> = None;
 
 /// Initialize the global SigmaUSBWriter instance
 pub fn init_sigmausbwriter() {
@@ -335,16 +332,12 @@ pub fn init_sigmausbwriter() {
 
 /// Get the global SigmaUSBWriter instance
 pub fn get_sigmausbwriter() -> Option<&'static SigmaUSBWriter> {
-    unsafe {
-        SIGMAUSBWRITER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAUSBWRITER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaUSBWriter instance
 pub fn get_sigmausbwriter_mut() -> Option<&'static mut SigmaUSBWriter> {
-    unsafe {
-        SIGMAUSBWRITER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAUSBWRITER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a write job

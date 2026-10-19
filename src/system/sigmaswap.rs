@@ -113,7 +113,10 @@ impl SigmaSwap {
     }
 
     pub fn list_swaps_by_type(&self, swap_type: SwapType) -> Vec<&SwapEntry> {
-        self.swaps.values().filter(|s| s.swap_type == swap_type).collect()
+        self.swaps
+            .values()
+            .filter(|s| s.swap_type == swap_type)
+            .collect()
     }
 
     pub fn list_swaps_by_state(&self, state: SwapState) -> Vec<&SwapEntry> {
@@ -354,9 +357,21 @@ mod tests {
     #[test]
     fn test_list_swaps_by_type() {
         let mut manager = SigmaSwap::new();
-        manager.add_swap(SwapType::Partition, "/dev/sda1".to_string(), 2 * 1024 * 1024 * 1024);
-        manager.add_swap(SwapType::File, "/swapfile".to_string(), 1 * 1024 * 1024 * 1024);
-        manager.add_swap(SwapType::Partition, "/dev/sda2".to_string(), 2 * 1024 * 1024 * 1024);
+        manager.add_swap(
+            SwapType::Partition,
+            "/dev/sda1".to_string(),
+            2 * 1024 * 1024 * 1024,
+        );
+        manager.add_swap(
+            SwapType::File,
+            "/swapfile".to_string(),
+            1 * 1024 * 1024 * 1024,
+        );
+        manager.add_swap(
+            SwapType::Partition,
+            "/dev/sda2".to_string(),
+            2 * 1024 * 1024 * 1024,
+        );
 
         let partitions = manager.list_swaps_by_type(SwapType::Partition);
         assert_eq!(partitions.len(), 2);
@@ -368,8 +383,16 @@ mod tests {
     #[test]
     fn test_list_swaps_by_state() {
         let mut manager = SigmaSwap::new();
-        let id1 = manager.add_swap(SwapType::Partition, "/dev/sda1".to_string(), 2 * 1024 * 1024 * 1024);
-        let id2 = manager.add_swap(SwapType::File, "/swapfile".to_string(), 1 * 1024 * 1024 * 1024);
+        let id1 = manager.add_swap(
+            SwapType::Partition,
+            "/dev/sda1".to_string(),
+            2 * 1024 * 1024 * 1024,
+        );
+        let id2 = manager.add_swap(
+            SwapType::File,
+            "/swapfile".to_string(),
+            1 * 1024 * 1024 * 1024,
+        );
         manager.activate_swap(&id1);
 
         let active = manager.list_swaps_by_state(SwapState::Active);
@@ -399,8 +422,16 @@ mod tests {
     #[test]
     fn test_swap_counts() {
         let mut manager = SigmaSwap::new();
-        let id1 = manager.add_swap(SwapType::Partition, "/dev/sda1".to_string(), 2 * 1024 * 1024 * 1024);
-        let id2 = manager.add_swap(SwapType::File, "/swapfile".to_string(), 1 * 1024 * 1024 * 1024);
+        let id1 = manager.add_swap(
+            SwapType::Partition,
+            "/dev/sda1".to_string(),
+            2 * 1024 * 1024 * 1024,
+        );
+        let id2 = manager.add_swap(
+            SwapType::File,
+            "/swapfile".to_string(),
+            1 * 1024 * 1024 * 1024,
+        );
         manager.activate_swap(&id1);
         manager.activate_swap(&id2);
 
@@ -430,14 +461,22 @@ mod tests {
         assert_eq!(manager.swap_count(), 0);
 
         let manager_mut = get_sigmaswap_mut();
-        manager_mut.add_swap(SwapType::Partition, "/dev/sda1".to_string(), 2 * 1024 * 1024 * 1024);
+        manager_mut.add_swap(
+            SwapType::Partition,
+            "/dev/sda1".to_string(),
+            2 * 1024 * 1024 * 1024,
+        );
         assert_eq!(manager.swap_count(), 1);
     }
 
     #[test]
     fn test_add_swap_convenience() {
         init_sigmaswap();
-        let id = add_swap(SwapType::Partition, "/dev/sda1".to_string(), 2 * 1024 * 1024 * 1024);
+        let id = add_swap(
+            SwapType::Partition,
+            "/dev/sda1".to_string(),
+            2 * 1024 * 1024 * 1024,
+        );
         assert_eq!(id, "swap-1");
 
         let manager = get_sigmaswap();

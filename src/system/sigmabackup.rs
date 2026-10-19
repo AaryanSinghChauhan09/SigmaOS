@@ -146,7 +146,7 @@ impl Default for SigmaBackup {
 }
 
 /// Global SigmaBackup instance
-static unsafe mutable SIGMABACKUP_INSTANCE: Option<SigmaBackup> = None;
+static mut SIGMABACKUP_INSTANCE: Option<SigmaBackup> = None;
 
 /// Initialize the global SigmaBackup instance
 pub fn init_sigmabackup() {
@@ -157,16 +157,12 @@ pub fn init_sigmabackup() {
 
 /// Get the global SigmaBackup instance
 pub fn get_sigmabackup() -> Option<&'static SigmaBackup> {
-    unsafe {
-        SIGMABACKUP_INSTANCE.as_ref()
-    }
+    unsafe { SIGMABACKUP_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaBackup instance
 pub fn get_sigmabackup_mut() -> Option<&'static mut SigmaBackup> {
-    unsafe {
-        SIGMABACKUP_INSTANCE.as_mut()
-    }
+    unsafe { SIGMABACKUP_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a backup
@@ -184,7 +180,11 @@ mod tests {
 
     #[test]
     fn test_backup_creation() {
-        let backup = Backup::new("backup1".to_string(), "Full Backup".to_string(), BackupType::Full);
+        let backup = Backup::new(
+            "backup1".to_string(),
+            "Full Backup".to_string(),
+            BackupType::Full,
+        );
         assert_eq!(backup.backup_id, "backup1");
         assert_eq!(backup.backup_type, BackupType::Full);
     }

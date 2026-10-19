@@ -471,7 +471,9 @@ mod tests {
         master
             .linux_engine
             .register_sched_policy("scx_optical_governor", "0xopt123");
-        master.linux_engine.register_optical_core("core_opt_0", 1200);
+        master
+            .linux_engine
+            .register_optical_core("core_opt_0", 1200);
 
         master
             .freebsd_engine
@@ -490,7 +492,9 @@ mod tests {
         master
             .nix_guix_engine
             .register_closure_hash("/nix/store/pkg_v64", "hash_v64_xyz");
-        master.illumos_engine.configure_vnic_mesh("vnic_v64_0", 1000);
+        master
+            .illumos_engine
+            .configure_vnic_mesh("vnic_v64_0", 1000);
         master
             .thousands_engine
             .register_component("subsystem_v64_mod");

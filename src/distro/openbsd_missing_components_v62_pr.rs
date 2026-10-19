@@ -697,9 +697,9 @@ impl OpenBsdMissingComponentsV62PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let patch_msg = self
-            .syspatch
-            .apply_syspatch("002_kernel", "002", "UVM kernel pager lock fix");
+        let patch_msg =
+            self.syspatch
+                .apply_syspatch("002_kernel", "002", "UVM kernel pager lock fix");
         let pr2 = self.submit_pr_proposal(
             "Apply OpenBSD syspatch errata 002_kernel",
             "jules",

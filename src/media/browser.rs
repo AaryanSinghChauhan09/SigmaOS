@@ -3563,7 +3563,11 @@ impl FirefoxGeckoCssGridSubgridEngine {
             .collect()
     }
 
-    pub fn allocate_subgrid_fr_spans(&self, parent_track_width: f32, span_count: usize) -> Vec<f32> {
+    pub fn allocate_subgrid_fr_spans(
+        &self,
+        parent_track_width: f32,
+        span_count: usize,
+    ) -> Vec<f32> {
         if span_count == 0 {
             return Vec::new();
         }

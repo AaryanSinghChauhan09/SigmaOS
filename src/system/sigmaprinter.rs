@@ -174,7 +174,10 @@ impl SigmaPrinter {
     }
 
     pub fn list_jobs_by_printer(&self, printer_id: &str) -> Vec<&PrintJob> {
-        self.jobs.values().filter(|j| j.printer_id == printer_id).collect()
+        self.jobs
+            .values()
+            .filter(|j| j.printer_id == printer_id)
+            .collect()
     }
 
     pub fn remove_job(&mut self, id: &str) -> bool {
@@ -231,7 +234,11 @@ mod tests {
 
     #[test]
     fn test_printer_creation() {
-        let printer = Printer::new("printer-1".to_string(), "HP LaserJet".to_string(), "Office".to_string());
+        let printer = Printer::new(
+            "printer-1".to_string(),
+            "HP LaserJet".to_string(),
+            "Office".to_string(),
+        );
         assert_eq!(printer.id, "printer-1");
         assert_eq!(printer.name, "HP LaserJet");
         assert_eq!(printer.state, PrinterState::Idle);
@@ -239,7 +246,11 @@ mod tests {
 
     #[test]
     fn test_printer_state() {
-        let mut printer = Printer::new("printer-1".to_string(), "HP LaserJet".to_string(), "Office".to_string());
+        let mut printer = Printer::new(
+            "printer-1".to_string(),
+            "HP LaserJet".to_string(),
+            "Office".to_string(),
+        );
         assert_eq!(printer.state, PrinterState::Idle);
 
         printer.print();
@@ -251,7 +262,12 @@ mod tests {
 
     #[test]
     fn test_print_job_creation() {
-        let job = PrintJob::new("job-1".to_string(), "printer-1".to_string(), "document.pdf".to_string(), 5);
+        let job = PrintJob::new(
+            "job-1".to_string(),
+            "printer-1".to_string(),
+            "document.pdf".to_string(),
+            5,
+        );
         assert_eq!(job.id, "job-1");
         assert_eq!(job.state, JobState::Pending);
         assert_eq!(job.pages, 5);
@@ -259,7 +275,12 @@ mod tests {
 
     #[test]
     fn test_print_job_state() {
-        let mut job = PrintJob::new("job-1".to_string(), "printer-1".to_string(), "document.pdf".to_string(), 5);
+        let mut job = PrintJob::new(
+            "job-1".to_string(),
+            "printer-1".to_string(),
+            "document.pdf".to_string(),
+            5,
+        );
         job.process();
         assert_eq!(job.state, JobState::Processing);
 

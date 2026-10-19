@@ -225,7 +225,10 @@ impl SigmaNotifyEnhanced {
     }
 
     /// List notifications by category
-    pub fn list_notifications_by_category(&self, category: NotificationCategory) -> Vec<&Notification> {
+    pub fn list_notifications_by_category(
+        &self,
+        category: NotificationCategory,
+    ) -> Vec<&Notification> {
         self.notifications
             .values()
             .filter(|n| n.category == category)
@@ -233,7 +236,10 @@ impl SigmaNotifyEnhanced {
     }
 
     /// List notifications by urgency
-    pub fn list_notifications_by_urgency(&self, urgency: NotificationUrgency) -> Vec<&Notification> {
+    pub fn list_notifications_by_urgency(
+        &self,
+        urgency: NotificationUrgency,
+    ) -> Vec<&Notification> {
         self.notifications
             .values()
             .filter(|n| n.urgency == urgency)
@@ -255,10 +261,7 @@ impl SigmaNotifyEnhanced {
 
     /// List resident notifications
     pub fn list_resident(&self) -> Vec<&Notification> {
-        self.notifications
-            .values()
-            .filter(|n| n.resident)
-            .collect()
+        self.notifications.values().filter(|n| n.resident).collect()
     }
 
     /// List critical notifications
@@ -274,17 +277,17 @@ impl SigmaNotifyEnhanced {
     /// Clean up expired notifications
     pub fn cleanup_expired(&mut self, current_time: u64) -> usize {
         let mut expired_ids = Vec::new();
-        
+
         for (id, notif) in &self.notifications {
             if notif.is_expired(current_time) {
                 expired_ids.push(id.clone());
             }
         }
-        
+
         for id in expired_ids {
             self.notifications.remove(&id);
         }
-        
+
         expired_ids.len()
     }
 
@@ -301,7 +304,7 @@ impl Default for SigmaNotifyEnhanced {
 }
 
 /// Global SigmaNotifyEnhanced instance (placeholder for actual global state)
-static unsafe mutable SIGMANOTIFYENHANCED_INSTANCE: Option<SigmaNotifyEnhanced> = None;
+static mut SIGMANOTIFYENHANCED_INSTANCE: Option<SigmaNotifyEnhanced> = None;
 
 /// Initialize the global SigmaNotifyEnhanced instance
 pub fn init_sigmanotifyenhanced() {
@@ -312,16 +315,12 @@ pub fn init_sigmanotifyenhanced() {
 
 /// Get the global SigmaNotifyEnhanced instance
 pub fn get_sigmanotifyenhanced() -> Option<&'static SigmaNotifyEnhanced> {
-    unsafe {
-        SIGMANOTIFYENHANCED_INSTANCE.as_ref()
-    }
+    unsafe { SIGMANOTIFYENHANCED_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaNotifyEnhanced instance
 pub fn get_sigmanotifyenhanced_mut() -> Option<&'static mut SigmaNotifyEnhanced> {
-    unsafe {
-        SIGMANOTIFYENHANCED_INSTANCE.as_mut()
-    }
+    unsafe { SIGMANOTIFYENHANCED_INSTANCE.as_mut() }
 }
 
 /// Convenience function to post a notification
@@ -468,7 +467,8 @@ mod tests {
             NotificationCategory::System,
         ));
 
-        let app_notifs = notify_mgr.list_notifications_by_category(NotificationCategory::Application);
+        let app_notifs =
+            notify_mgr.list_notifications_by_category(NotificationCategory::Application);
         assert_eq!(app_notifs.len(), 1);
 
         let sys_notifs = notify_mgr.list_notifications_by_category(NotificationCategory::System);

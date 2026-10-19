@@ -115,7 +115,12 @@ impl VoicecraftNeuralPitchProsodyContourPrEngine {
     }
 
     /// Scale pitch contour for expressive prosody modulation (e.g. pitch shift, emotion rise)
-    pub fn apply_prosody_scale(&self, contour: &mut [ProsodyPoint], pitch_factor: f32, energy_factor: f32) {
+    pub fn apply_prosody_scale(
+        &self,
+        contour: &mut [ProsodyPoint],
+        pitch_factor: f32,
+        energy_factor: f32,
+    ) {
         for pt in contour.iter_mut() {
             if pt.pitch_hz > 0.0 {
                 pt.pitch_hz = (pt.pitch_hz * pitch_factor).clamp(50.0, 600.0);
@@ -127,7 +132,9 @@ impl VoicecraftNeuralPitchProsodyContourPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftArtcraftPrProposalManifest {
         VoicecraftArtcraftPrProposalManifest {
             pr_id: 806,
-            pr_title: String::from("VoiceCraft F0 Neural Pitch Prosody Contour & Expressive Pitch Scaler"),
+            pr_title: String::from(
+                "VoiceCraft F0 Neural Pitch Prosody Contour & Expressive Pitch Scaler",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Pitch & Prosody Parity"),
             components_added: vec![
@@ -171,7 +178,12 @@ impl VoicecraftMultiSpeakerStyleMorphingPrEngine {
     }
 
     /// Morph two speaker embedding vectors with alpha weight (0.0 = speaker_a, 1.0 = speaker_b)
-    pub fn interpolate_speaker_embeddings(&self, speaker_a: &[f32], speaker_b: &[f32], alpha: f32) -> Vec<f32> {
+    pub fn interpolate_speaker_embeddings(
+        &self,
+        speaker_a: &[f32],
+        speaker_b: &[f32],
+        alpha: f32,
+    ) -> Vec<f32> {
         let mut morphed = vec![0.0f32; self.embedding_dim];
         let clamped_alpha = alpha.clamp(0.0, 1.0);
 
@@ -187,7 +199,7 @@ impl VoicecraftMultiSpeakerStyleMorphingPrEngine {
     pub fn apply_vocal_style(&self, phonemes: &mut [Phoneme], style: VocalStyleMode) {
         for p in phonemes.iter_mut() {
             match style {
-                VocalStyleMode::Neutral => {},
+                VocalStyleMode::Neutral => {}
                 VocalStyleMode::Happy => {
                     p.pitch_hz *= 1.2;
                     p.duration_ms = (p.duration_ms as f32 * 0.9) as u32;
@@ -207,7 +219,9 @@ impl VoicecraftMultiSpeakerStyleMorphingPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftArtcraftPrProposalManifest {
         VoicecraftArtcraftPrProposalManifest {
             pr_id: 807,
-            pr_title: String::from("VoiceCraft Multi-Speaker Style Morphing & Emotional Timbre Engine"),
+            pr_title: String::from(
+                "VoiceCraft Multi-Speaker Style Morphing & Emotional Timbre Engine",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Multi-Speaker Style Parity"),
             components_added: vec![
@@ -266,7 +280,9 @@ impl VoicecraftFormantShifterAcousticResonancePrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftArtcraftPrProposalManifest {
         VoicecraftArtcraftPrProposalManifest {
             pr_id: 808,
-            pr_title: String::from("VoiceCraft Formant Shifter & Vocal Tract Acoustic Resonance Engine"),
+            pr_title: String::from(
+                "VoiceCraft Formant Shifter & Vocal Tract Acoustic Resonance Engine",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Acoustic Formant DSP"),
             components_added: vec![
@@ -348,7 +364,9 @@ impl VoicecraftSubframeAudioPacketStreamerPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftArtcraftPrProposalManifest {
         VoicecraftArtcraftPrProposalManifest {
             pr_id: 809,
-            pr_title: String::from("VoiceCraft Realtime Subframe Audio Packet Streamer & Jitter Buffer"),
+            pr_title: String::from(
+                "VoiceCraft Realtime Subframe Audio Packet Streamer & Jitter Buffer",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Realtime Low-Latency Audio Streaming"),
             components_added: vec![
@@ -434,7 +452,9 @@ impl VoicecraftSpeechToTextWordTimestampAlignerPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftArtcraftPrProposalManifest {
         VoicecraftArtcraftPrProposalManifest {
             pr_id: 810,
-            pr_title: String::from("VoiceCraft Speech-to-Text Forced Word Timestamp Aligner & Subtitle Generator"),
+            pr_title: String::from(
+                "VoiceCraft Speech-to-Text Forced Word Timestamp Aligner & Subtitle Generator",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Speech Alignment Parity"),
             components_added: vec![

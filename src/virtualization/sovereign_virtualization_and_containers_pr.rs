@@ -576,7 +576,12 @@ impl OciDockerPodmanRuncEngine {
         unit
     }
 
-    pub fn transpile_docker_compose_to_quadlet(&mut self, compose_service: &str, image: &str, port: &str) -> String {
+    pub fn transpile_docker_compose_to_quadlet(
+        &mut self,
+        compose_service: &str,
+        image: &str,
+        port: &str,
+    ) -> String {
         let quadlet = format!(
             "[Unit]\nDescription=Transpiled Compose Service {}\n[Container]\nImage={}\nPublishPort={}\n[Install]\nWantedBy=multi-user.target\n",
             compose_service, image, port
@@ -1686,7 +1691,10 @@ mod tests {
         engine.plug_virtio_mem(1024);
         assert_eq!(engine.vcpus.len(), 1);
         assert_eq!(engine.vfio_passthrough_devices.len(), 1);
-        assert_eq!(engine.confidential_mode, Some(ConfidentialComputingMode::IntelTdx));
+        assert_eq!(
+            engine.confidential_mode,
+            Some(ConfidentialComputingMode::IntelTdx)
+        );
         assert!(engine.live_migration.is_some());
         assert_eq!(engine.virtio_mem_balloon_size_mb, 1024);
         let sync = engine.simulate_dirty_page_ring_sync();

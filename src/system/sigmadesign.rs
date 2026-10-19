@@ -227,12 +227,14 @@ impl SigmaDesign {
     }
 
     pub fn get_current_system(&self) -> Option<&DesignSystem> {
-        self.current_system.as_ref()
+        self.current_system
+            .as_ref()
             .and_then(|id| self.design_systems.get(id))
     }
 
     pub fn get_current_system_mut(&mut self) -> Option<&mut DesignSystem> {
-        self.current_system.as_ref()
+        self.current_system
+            .as_ref()
             .and_then(|id| self.design_systems.get_mut(id.as_str()))
     }
 
@@ -263,16 +265,12 @@ pub fn init_sigmadesign() {
 
 /// Get the global SigmaDesign instance
 pub fn get_sigmadesign() -> Option<&'static SigmaDesign> {
-    unsafe {
-        SIGMADESIGN_INSTANCE.as_ref()
-    }
+    unsafe { SIGMADESIGN_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaDesign instance (mutable)
 pub fn get_sigmadesign_mut() -> Option<&'static mut SigmaDesign> {
-    unsafe {
-        SIGMADESIGN_INSTANCE.as_mut()
-    }
+    unsafe { SIGMADESIGN_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a design system
@@ -303,7 +301,11 @@ mod tests {
 
     #[test]
     fn test_ui_component_creation() {
-        let component = UIComponent::new("btn1".to_string(), "Button".to_string(), "button".to_string());
+        let component = UIComponent::new(
+            "btn1".to_string(),
+            "Button".to_string(),
+            "button".to_string(),
+        );
         assert_eq!(component.id, "btn1");
         assert_eq!(component.component_type, "button");
         assert_eq!(component.variant, ComponentVariant::Primary);
@@ -311,7 +313,11 @@ mod tests {
 
     #[test]
     fn test_ui_component_modification() {
-        let mut component = UIComponent::new("btn1".to_string(), "Button".to_string(), "button".to_string());
+        let mut component = UIComponent::new(
+            "btn1".to_string(),
+            "Button".to_string(),
+            "button".to_string(),
+        );
         component.set_variant(ComponentVariant::Secondary);
         component.set_size(ComponentSize::Large);
         component.add_property("radius".to_string(), "8px".to_string());
@@ -345,7 +351,11 @@ mod tests {
     #[test]
     fn test_design_system_component_management() {
         let mut system = DesignSystem::new("system1".to_string(), "Test".to_string());
-        let component = UIComponent::new("btn1".to_string(), "Button".to_string(), "button".to_string());
+        let component = UIComponent::new(
+            "btn1".to_string(),
+            "Button".to_string(),
+            "button".to_string(),
+        );
         system.add_component(component);
         assert_eq!(system.component_count(), 1);
     }

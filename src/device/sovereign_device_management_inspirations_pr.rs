@@ -175,15 +175,24 @@ impl UdevEudevMdevDevdDevfsEngine {
 
         // udev hwdb lookup entries
         let mut e1000e_props = BTreeMap::new();
-        e1000e_props.insert("ID_MODEL_FROM_DATABASE".to_string(), "Ethernet Connection I219-LM".to_string());
-        e1000e_props.insert("ID_VENDOR_FROM_DATABASE".to_string(), "Intel Corporation".to_string());
+        e1000e_props.insert(
+            "ID_MODEL_FROM_DATABASE".to_string(),
+            "Ethernet Connection I219-LM".to_string(),
+        );
+        e1000e_props.insert(
+            "ID_VENDOR_FROM_DATABASE".to_string(),
+            "Intel Corporation".to_string(),
+        );
         self.hwdb_entries.push(UdevHwdbEntry {
             modalias_pattern: "pci:v00008086d000015F3*".to_string(),
             properties: e1000e_props,
         });
 
         let mut nvme_props = BTreeMap::new();
-        nvme_props.insert("ID_MODEL_FROM_DATABASE".to_string(), "Express NVMe Controller".to_string());
+        nvme_props.insert(
+            "ID_MODEL_FROM_DATABASE".to_string(),
+            "Express NVMe Controller".to_string(),
+        );
         self.hwdb_entries.push(UdevHwdbEntry {
             modalias_pattern: "pci:v0000144Dd0000A808*".to_string(),
             properties: nvme_props,
@@ -1204,12 +1213,9 @@ impl SovereignDeviceManagementParityPrGateway {
     /// Perform master end-to-end verification across all sub-engines.
     pub fn run_master_verification(&mut self) -> bool {
         // 1. Verify udev / hwdb / net names
-        let net_if = self.udev_devd.generate_predictable_net_ifname(
-            PredictableNetIfType::Ethernet,
-            3,
-            0,
-            0,
-        );
+        let net_if =
+            self.udev_devd
+                .generate_predictable_net_ifname(PredictableNetIfType::Ethernet, 3, 0, 0);
         if net_if != "enp3s0" {
             return false;
         }
@@ -1220,7 +1226,9 @@ impl SovereignDeviceManagementParityPrGateway {
         }
 
         // 2. Verify acpid
-        let acpi_evt = self.acpid.parse_acpi_event_line("button/power PWRF 00000080 00000000");
+        let acpi_evt = self
+            .acpid
+            .parse_acpi_event_line("button/power PWRF 00000080 00000000");
         if acpi_evt.is_none() || !self.acpid.dispatch_event(&acpi_evt.unwrap()) {
             return false;
         }
@@ -1232,7 +1240,9 @@ impl SovereignDeviceManagementParityPrGateway {
         }
 
         // 4. Verify logind
-        let fd_res = self.logind.take_device_fd("session-1", "/dev/dri/card0", 1000);
+        let fd_res = self
+            .logind
+            .take_device_fd("session-1", "/dev/dri/card0", 1000);
         if fd_res.is_err() {
             return false;
         }
@@ -1243,13 +1253,19 @@ impl SovereignDeviceManagementParityPrGateway {
             uid: 1000,
             session_id: "session-1".to_string(),
         };
-        let auth = self.polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
+        let auth = self.polkit.check_authorization(
+            "org.freedesktop.udisks2.filesystem-mount",
+            &subj,
+            true,
+        );
         if auth != PolkitAuthResult::Yes {
             return false;
         }
 
         // 6. Verify dbus broker
-        let intro = self.dbus_broker.generate_introspection_xml("org.freedesktop.UPower");
+        let intro = self
+            .dbus_broker
+            .generate_introspection_xml("org.freedesktop.UPower");
         if !intro.contains("org.freedesktop.UPower") {
             return false;
         }
@@ -1325,10 +1341,12 @@ mod tests {
         );
 
         // Test predictable network interface naming
-        let ifname_eth = engine.generate_predictable_net_ifname(PredictableNetIfType::Ethernet, 3, 0, 0);
+        let ifname_eth =
+            engine.generate_predictable_net_ifname(PredictableNetIfType::Ethernet, 3, 0, 0);
         assert_eq!(ifname_eth, "enp3s0");
 
-        let ifname_wifi = engine.generate_predictable_net_ifname(PredictableNetIfType::Wireless, 2, 0, 0);
+        let ifname_wifi =
+            engine.generate_predictable_net_ifname(PredictableNetIfType::Wireless, 2, 0, 0);
         assert_eq!(ifname_wifi, "wlp2s0");
 
         // Test legacy hotplug bridge

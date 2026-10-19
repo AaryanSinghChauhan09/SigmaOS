@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Keyboard layout
 #[derive(Debug, Clone)]
@@ -232,7 +232,7 @@ impl Default for SigmaKeyboardManager {
 }
 
 /// Global SigmaKeyboardManager instance
-static_mut SIGMAKEYBOARDMANAGER_INSTANCE: Option<SigmaKeyboardManager> = None;
+static mut SIGMAKEYBOARDMANAGER_INSTANCE: Option<SigmaKeyboardManager> = None;
 
 /// Initialize the global SigmaKeyboardManager instance
 pub fn init_sigmakeyboardmanager() {

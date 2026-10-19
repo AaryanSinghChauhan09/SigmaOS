@@ -40,7 +40,12 @@ pub struct RecoveryTask {
 
 impl RecoveryTask {
     pub fn new(task_id: String, name: String, recovery_type: RecoveryType) -> Self {
-        Self { task_id, name, recovery_type, state: RecoveryState::Pending }
+        Self {
+            task_id,
+            name,
+            recovery_type,
+            state: RecoveryState::Pending,
+        }
     }
 }
 
@@ -52,30 +57,57 @@ pub struct SigmaRecovery {
 
 impl SigmaRecovery {
     pub fn new() -> Self {
-        Self { tasks: BTreeMap::new(), running: AtomicBool::new(false) }
+        Self {
+            tasks: BTreeMap::new(),
+            running: AtomicBool::new(false),
+        }
     }
 
-    pub fn start(&mut self) { self.running.store(true, Ordering::SeqCst); }
-    pub fn stop(&mut self) { self.running.store(false, Ordering::SeqCst); }
-    pub fn is_running(&self) -> bool { self.running.load(Ordering::SeqCst) }
-    pub fn add_task(&mut self, task: RecoveryTask) -> bool { self.tasks.insert(task.task_id.clone(), task).is_some() }
+    pub fn start(&mut self) {
+        self.running.store(true, Ordering::SeqCst);
+    }
+    pub fn stop(&mut self) {
+        self.running.store(false, Ordering::SeqCst);
+    }
+    pub fn is_running(&self) -> bool {
+        self.running.load(Ordering::SeqCst)
+    }
+    pub fn add_task(&mut self, task: RecoveryTask) -> bool {
+        self.tasks.insert(task.task_id.clone(), task).is_some()
+    }
     pub fn run_task(&mut self, task_id: &str) -> bool {
         if let Some(task) = self.tasks.get_mut(task_id) {
             task.state = RecoveryState::Running;
             task.state = RecoveryState::Completed;
             true
-        } else { false }
+        } else {
+            false
+        }
     }
-    pub fn task_count(&self) -> usize { self.tasks.len() }
+    pub fn task_count(&self) -> usize {
+        self.tasks.len()
+    }
 }
 
-impl Default for SigmaRecovery { fn default() -> Self { Self::new() } }
+impl Default for SigmaRecovery {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-static unsafe mutable SIGMARECOVERY_INSTANCE: Option<SigmaRecovery> = None;
+static mut SIGMARECOVERY_INSTANCE: Option<SigmaRecovery> = None;
 
-pub fn init_sigmarecovery() { unsafe { SIGMARECOVERY_INSTANCE = Some(SigmaRecovery::new()); } }
-pub fn get_sigmarecovery() -> Option<&'static SigmaRecovery> { unsafe { SIGMARECOVERY_INSTANCE.as_ref() } }
-pub fn get_sigmarecovery_mut() -> Option<&'static mut SigmaRecovery> { unsafe { SIGMARECOVERY_INSTANCE.as_mut() } }
+pub fn init_sigmarecovery() {
+    unsafe {
+        SIGMARECOVERY_INSTANCE = Some(SigmaRecovery::new());
+    }
+}
+pub fn get_sigmarecovery() -> Option<&'static SigmaRecovery> {
+    unsafe { SIGMARECOVERY_INSTANCE.as_ref() }
+}
+pub fn get_sigmarecovery_mut() -> Option<&'static mut SigmaRecovery> {
+    unsafe { SIGMARECOVERY_INSTANCE.as_mut() }
+}
 
 #[cfg(test)]
 mod tests {

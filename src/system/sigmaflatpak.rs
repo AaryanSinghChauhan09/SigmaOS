@@ -244,10 +244,7 @@ impl SigmaFlatpak {
 
     /// List enabled remotes
     pub fn list_enabled_remotes(&self) -> Vec<&FlatpakRemote> {
-        self.remotes
-            .values()
-            .filter(|r| r.is_enabled())
-            .collect()
+        self.remotes.values().filter(|r| r.is_enabled()).collect()
     }
 
     /// Get Flatpak count
@@ -268,7 +265,7 @@ impl Default for SigmaFlatpak {
 }
 
 /// Global SigmaFlatpak instance
-static unsafe mutable SIGMAFLATPAK_INSTANCE: Option<SigmaFlatpak> = None;
+static mut SIGMAFLATPAK_INSTANCE: Option<SigmaFlatpak> = None;
 
 /// Initialize the global SigmaFlatpak instance
 pub fn init_sigmaflatpak() {
@@ -279,16 +276,12 @@ pub fn init_sigmaflatpak() {
 
 /// Get the global SigmaFlatpak instance
 pub fn get_sigmaflatpak() -> Option<&'static SigmaFlatpak> {
-    unsafe {
-        SIGMAFLATPAK_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAFLATPAK_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaFlatpak instance
 pub fn get_sigmaflatpak_mut() -> Option<&'static mut SigmaFlatpak> {
-    unsafe {
-        SIGMAFLATPAK_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAFLATPAK_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a Flatpak

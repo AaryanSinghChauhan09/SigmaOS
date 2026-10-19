@@ -248,7 +248,7 @@ impl Default for SigmaNetworkManager {
 }
 
 /// Global SigmaNetworkManager instance
-static_mut SIGMANETWORKMANAGER_INSTANCE: Option<SigmaNetworkManager> = None;
+static mut SIGMANETWORKMANAGER_INSTANCE: Option<SigmaNetworkManager> = None;
 
 /// Initialize the global SigmaNetworkManager instance
 pub fn init_sigmanetworkmanager() {

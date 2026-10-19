@@ -78,7 +78,10 @@ impl Effect {
     }
 
     pub fn get_parameter(&self, name: &str) -> Option<f32> {
-        self.parameters.iter().find(|p| p.name == name).map(|p| p.value)
+        self.parameters
+            .iter()
+            .find(|p| p.name == name)
+            .map(|p| p.value)
     }
 
     pub fn set_enabled(&mut self, enabled: bool) {
@@ -259,16 +262,12 @@ pub fn init_sigmaeffect() {
 
 /// Get the global SigmaEffect instance
 pub fn get_sigmaeffect() -> Option<&'static SigmaEffect> {
-    unsafe {
-        SIGMAEFFECT_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAEFFECT_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaEffect instance (mutable)
 pub fn get_sigmaeffect_mut() -> Option<&'static mut SigmaEffect> {
-    unsafe {
-        SIGMAEFFECT_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAEFFECT_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an effect
@@ -295,7 +294,11 @@ mod tests {
 
     #[test]
     fn test_effect_parameter_management() {
-        let mut effect = Effect::new("effect1".to_string(), "Brightness".to_string(), EffectType::Brightness);
+        let mut effect = Effect::new(
+            "effect1".to_string(),
+            "Brightness".to_string(),
+            EffectType::Brightness,
+        );
         effect.add_parameter(EffectParameter::new("intensity".to_string(), 0.5));
         assert_eq!(effect.parameters.len(), 1);
         assert!(effect.set_parameter("intensity", 0.8));

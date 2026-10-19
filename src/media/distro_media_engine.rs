@@ -279,7 +279,8 @@ impl AlsaDmixPluginEngine {
         let len = stream_a.len().min(stream_b.len());
         let mut result = Vec::with_capacity(len);
         for i in 0..len {
-            let mixed = (stream_a[i] as i32 + stream_b[i] as i32).clamp(i16::MIN as i32, i16::MAX as i32);
+            let mixed =
+                (stream_a[i] as i32 + stream_b[i] as i32).clamp(i16::MIN as i32, i16::MAX as i32);
             result.push(mixed as i16);
         }
         result
@@ -314,7 +315,8 @@ impl AlsaUcm2VerbProfileEngine {
     }
 
     pub fn set_jack_state(&mut self, jack_name: &str, plugged: bool) {
-        self.jack_plugged_state.insert(jack_name.to_string(), plugged);
+        self.jack_plugged_state
+            .insert(jack_name.to_string(), plugged);
         if jack_name == "Headphone Jack" && plugged {
             self.active_use_case = "Headphones".to_string();
         } else if jack_name == "Headphone Jack" && !plugged {
@@ -351,7 +353,8 @@ impl Oss4SndstatParserEngine {
             if line.starts_with("pcm") {
                 if let Some(id_part) = line.split(':').next() {
                     let dev_num = id_part.trim_start_matches("pcm");
-                    self.detected_audio_nodes.push(format!("/dev/dsp{}", dev_num));
+                    self.detected_audio_nodes
+                        .push(format!("/dev/dsp{}", dev_num));
                 }
             }
         }
@@ -418,7 +421,8 @@ impl PipeWireGraphManagerEngine {
     }
 
     pub fn unlink_nodes(&mut self, src_node: u32, dst_node: u32) {
-        self.active_links.retain(|&(s, d)| !(s == src_node && d == dst_node));
+        self.active_links
+            .retain(|&(s, d)| !(s == src_node && d == dst_node));
     }
 
     pub fn update_quantum_rate(&mut self, quantum: u32, rate: u32) {
@@ -626,7 +630,10 @@ impl MpvScriptHookEngine {
     pub fn new() -> Self {
         let mut hooks = BTreeMap::new();
         hooks.insert("on_load".to_string(), "script_on_load_callback".to_string());
-        hooks.insert("on_preload".to_string(), "script_on_preload_callback".to_string());
+        hooks.insert(
+            "on_preload".to_string(),
+            "script_on_preload_callback".to_string(),
+        );
         Self {
             registered_hooks: hooks,
             custom_properties: BTreeMap::new(),
@@ -634,11 +641,13 @@ impl MpvScriptHookEngine {
     }
 
     pub fn register_hook(&mut self, hook_type: &str, function_name: &str) {
-        self.registered_hooks.insert(hook_type.to_string(), function_name.to_string());
+        self.registered_hooks
+            .insert(hook_type.to_string(), function_name.to_string());
     }
 
     pub fn set_property(&mut self, prop_name: &str, value: &str) {
-        self.custom_properties.insert(prop_name.to_string(), value.to_string());
+        self.custom_properties
+            .insert(prop_name.to_string(), value.to_string());
     }
 }
 
@@ -2722,7 +2731,10 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
             ("ALSA dmix Ring Buffer Software Mixer Engine", "ALSA"),
             ("ALSA UCM2 Jack State Profile Switcher", "ALSA"),
             ("OSS v4 /dev/sndstat Multi-Channel Device Parser", "OSS"),
-            ("PulseAudio Network RTP Multi-Room Sync Engine", "PulseAudio"),
+            (
+                "PulseAudio Network RTP Multi-Room Sync Engine",
+                "PulseAudio",
+            ),
             ("PipeWire Dynamic Graph Topology Manager Engine", "PipeWire"),
             ("JACK Realtime SysEx MIDI Ring Buffer Engine", "JACK"),
             ("sndio Full-Duplex Play/Record Stream Engine", "sndio"),
@@ -2858,7 +2870,9 @@ impl LinuxBsdDistroMediaSuite {
             pipewire_graph_manager: PipeWireGraphManagerEngine::new(),
             jack_midi_sysex: JackMidiSysexEngine::new(1024),
             sndio_duplex_stream: SndioPlayRecDuplexEngine::new("snd/0"),
-            gstreamer_pipeline_factory: GStreamerPipelineFactoryEngine::new("videotestsrc ! autovideosink"),
+            gstreamer_pipeline_factory: GStreamerPipelineFactoryEngine::new(
+                "videotestsrc ! autovideosink",
+            ),
             ffmpeg_avcodec_context: FfmpegAVCodecContextEngine::new("h264", "vaapi"),
             v4l2_multiplanar_buffer: V4l2MultiPlanarBufferEngine::new("/dev/video0", 2),
             vlc_media_discoverer: VlcLibvlcMediaDiscovererEngine::new("upnp"),
@@ -3105,7 +3119,9 @@ mod tests {
 
         // JACK SysEx
         let mut jack_sysex = JackMidiSysexEngine::new(512);
-        assert!(jack_sysex.push_sysex_message(&[0xF0, 0x41, 0x10, 0xF7]).is_ok());
+        assert!(jack_sysex
+            .push_sysex_message(&[0xF0, 0x41, 0x10, 0xF7])
+            .is_ok());
 
         // sndio Duplex
         let mut sndio_dup = SndioPlayRecDuplexEngine::new("snd/0");

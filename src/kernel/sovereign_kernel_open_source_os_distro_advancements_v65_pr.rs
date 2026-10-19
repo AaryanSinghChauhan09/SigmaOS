@@ -267,7 +267,10 @@ impl NetBsdRumpVeriexecEngine {
 
     pub fn verify_and_exec_hypercall(&mut self, server_name: &str, hash: &[u8; 32]) -> bool {
         self.rpc_hypercalls += 1;
-        let driver_ok = self.isolated_driver_servers.iter().any(|s| s == server_name);
+        let driver_ok = self
+            .isolated_driver_servers
+            .iter()
+            .any(|s| s == server_name);
         let hash_ok = self.veriexec_signatures.iter().any(|(h, _)| h == hash);
         driver_ok && hash_ok
     }
@@ -402,15 +405,20 @@ impl SovereignKernelOpenSourceOsDistroAdvancementsV65PrGateway {
         self.pinsyscall_karl.pin_syscall_entry(0xFFFFFFFF81001000);
         let ret_addr = 0xFFFFFFFF81002000;
         let canary = ret_addr ^ 0x1337_8008_5000_1001;
-        let _ = self.pinsyscall_karl.verify_retguard_canary(ret_addr, canary);
+        let _ = self
+            .pinsyscall_karl
+            .verify_retguard_canary(ret_addr, canary);
 
         let snap_gen = self.hammer2_cow.create_pfs_snapshot(1, "root_pfs", 10001);
         let _ = self.hammer2_cow.perform_atomic_rollback(1, snap_gen);
 
         let dummy_hash = [0x77u8; 32];
         self.rump_veriexec.register_rump_driver("rumpdev_pci");
-        self.rump_veriexec.register_veriexec_hash("/usr/bin/sigmainit", dummy_hash);
-        let _ = self.rump_veriexec.verify_and_exec_hypercall("rumpdev_pci", &dummy_hash);
+        self.rump_veriexec
+            .register_veriexec_hash("/usr/bin/sigmainit", dummy_hash);
+        let _ = self
+            .rump_veriexec
+            .verify_and_exec_hypercall("rumpdev_pci", &dummy_hash);
 
         self.crossbow_zone.register_dtrace_probe();
         let _ = self.crossbow_zone.evaluate_quota(1024 * 1024, 1000);

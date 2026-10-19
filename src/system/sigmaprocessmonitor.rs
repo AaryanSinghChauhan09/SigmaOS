@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -101,7 +101,10 @@ impl SigmaProcessMonitor {
     }
 
     pub fn list_processes_by_state(&self, state: ProcessState) -> Vec<&Process> {
-        self.processes.values().filter(|p| p.state == state).collect()
+        self.processes
+            .values()
+            .filter(|p| p.state == state)
+            .collect()
     }
 
     pub fn remove_process(&mut self, pid: u32) -> bool {
@@ -197,8 +200,12 @@ mod tests {
     #[test]
     fn test_list_processes_by_state() {
         let mut monitor = SigmaProcessMonitor::new();
-        monitor.add_process(Process::new(1000, "bash".to_string(), 999).with_state(ProcessState::Running));
-        monitor.add_process(Process::new(1001, "vim".to_string(), 1000).with_state(ProcessState::Sleeping));
+        monitor.add_process(
+            Process::new(1000, "bash".to_string(), 999).with_state(ProcessState::Running),
+        );
+        monitor.add_process(
+            Process::new(1001, "vim".to_string(), 1000).with_state(ProcessState::Sleeping),
+        );
 
         let running = monitor.list_processes_by_state(ProcessState::Running);
         assert_eq!(running.len(), 1);

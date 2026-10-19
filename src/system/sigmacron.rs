@@ -385,7 +385,9 @@ mod tests {
 
     #[test]
     fn test_scheduled_job_builder() {
-        let cron_spec = CronSpec::new().with_minute("0".to_string()).with_hour("2".to_string());
+        let cron_spec = CronSpec::new()
+            .with_minute("0".to_string())
+            .with_hour("2".to_string());
         let job = ScheduledJob::new(
             "job-1".to_string(),
             "backup".to_string(),
@@ -503,8 +505,16 @@ mod tests {
     #[test]
     fn test_list_jobs_by_status() {
         let mut manager = SigmaCron::new();
-        let id1 = manager.create_job("job1".to_string(), "/bin/test1".to_string(), ScheduleType::Daily);
-        let id2 = manager.create_job("job2".to_string(), "/bin/test2".to_string(), ScheduleType::Hourly);
+        let id1 = manager.create_job(
+            "job1".to_string(),
+            "/bin/test1".to_string(),
+            ScheduleType::Daily,
+        );
+        let id2 = manager.create_job(
+            "job2".to_string(),
+            "/bin/test2".to_string(),
+            ScheduleType::Hourly,
+        );
         manager.run_job(&id1);
         manager.run_job(&id2);
         manager.complete_job(&id1);
@@ -519,8 +529,16 @@ mod tests {
     #[test]
     fn test_list_enabled_disabled_jobs() {
         let mut manager = SigmaCron::new();
-        let id1 = manager.create_job("job1".to_string(), "/bin/test1".to_string(), ScheduleType::Daily);
-        let id2 = manager.create_job("job2".to_string(), "/bin/test2".to_string(), ScheduleType::Hourly);
+        let id1 = manager.create_job(
+            "job1".to_string(),
+            "/bin/test1".to_string(),
+            ScheduleType::Daily,
+        );
+        let id2 = manager.create_job(
+            "job2".to_string(),
+            "/bin/test2".to_string(),
+            ScheduleType::Hourly,
+        );
         manager.disable_job(&id2);
 
         let enabled = manager.list_enabled_jobs();
@@ -539,7 +557,9 @@ mod tests {
             ScheduleType::CronExpression,
         );
 
-        let spec = CronSpec::new().with_minute("0".to_string()).with_hour("2".to_string());
+        let spec = CronSpec::new()
+            .with_minute("0".to_string())
+            .with_hour("2".to_string());
         assert!(manager.set_cron_spec(&id, spec));
         assert!(manager.get_job(&id).unwrap().cron_spec.is_some());
     }
@@ -547,9 +567,21 @@ mod tests {
     #[test]
     fn test_job_counts() {
         let mut manager = SigmaCron::new();
-        let id1 = manager.create_job("job1".to_string(), "/bin/test1".to_string(), ScheduleType::Daily);
-        let id2 = manager.create_job("job2".to_string(), "/bin/test2".to_string(), ScheduleType::Hourly);
-        let id3 = manager.create_job("job3".to_string(), "/bin/test3".to_string(), ScheduleType::Weekly);
+        let id1 = manager.create_job(
+            "job1".to_string(),
+            "/bin/test1".to_string(),
+            ScheduleType::Daily,
+        );
+        let id2 = manager.create_job(
+            "job2".to_string(),
+            "/bin/test2".to_string(),
+            ScheduleType::Hourly,
+        );
+        let id3 = manager.create_job(
+            "job3".to_string(),
+            "/bin/test3".to_string(),
+            ScheduleType::Weekly,
+        );
         manager.disable_job(&id3);
         manager.run_job(&id1);
         manager.run_job(&id2);
@@ -568,14 +600,22 @@ mod tests {
         assert_eq!(manager.job_count(), 0);
 
         let manager_mut = get_sigmacron_mut();
-        manager_mut.create_job("test".to_string(), "/bin/test".to_string(), ScheduleType::Daily);
+        manager_mut.create_job(
+            "test".to_string(),
+            "/bin/test".to_string(),
+            ScheduleType::Daily,
+        );
         assert_eq!(manager.job_count(), 1);
     }
 
     #[test]
     fn test_create_job_convenience() {
         init_sigmacron();
-        let id = create_job("test".to_string(), "/bin/test".to_string(), ScheduleType::Daily);
+        let id = create_job(
+            "test".to_string(),
+            "/bin/test".to_string(),
+            ScheduleType::Daily,
+        );
         assert_eq!(id, "job-1");
 
         let manager = get_sigmacron();

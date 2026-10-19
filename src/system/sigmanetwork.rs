@@ -272,7 +272,11 @@ mod tests {
 
     #[test]
     fn test_connection_creation() {
-        let conn = NetworkConnection::new("conn-1".to_string(), "HomeWiFi".to_string(), ConnectionType::WiFi);
+        let conn = NetworkConnection::new(
+            "conn-1".to_string(),
+            "HomeWiFi".to_string(),
+            ConnectionType::WiFi,
+        );
         assert_eq!(conn.id, "conn-1");
         assert_eq!(conn.name, "HomeWiFi");
         assert_eq!(conn.connection_type, ConnectionType::WiFi);
@@ -280,7 +284,11 @@ mod tests {
 
     #[test]
     fn test_connection_state() {
-        let mut conn = NetworkConnection::new("conn-1".to_string(), "HomeWiFi".to_string(), ConnectionType::WiFi);
+        let mut conn = NetworkConnection::new(
+            "conn-1".to_string(),
+            "HomeWiFi".to_string(),
+            ConnectionType::WiFi,
+        );
         assert!(!conn.active);
 
         conn.activate();

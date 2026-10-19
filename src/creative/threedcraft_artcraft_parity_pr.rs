@@ -402,7 +402,8 @@ impl SdfBoxCollider {
         let outside_dx = dx.max(0.0);
         let outside_dy = dy.max(0.0);
         let outside_dz = dz.max(0.0);
-        let outside_dist = (outside_dx * outside_dx + outside_dy * outside_dy + outside_dz * outside_dz).sqrt();
+        let outside_dist =
+            (outside_dx * outside_dx + outside_dy * outside_dy + outside_dz * outside_dz).sqrt();
 
         if max_d < 0.0 {
             max_d
@@ -431,7 +432,13 @@ impl ThreeDCraftRealtimeParticlePhysicsPrEngine {
         }
     }
 
-    pub fn emit_particle(&mut self, position: [f32; 3], initial_velocity: [f32; 3], mass: f32, lifetime_sec: f32) {
+    pub fn emit_particle(
+        &mut self,
+        position: [f32; 3],
+        initial_velocity: [f32; 3],
+        mass: f32,
+        lifetime_sec: f32,
+    ) {
         self.particles.push(PhysicsParticle {
             position,
             prev_position: position,
@@ -543,14 +550,20 @@ impl ThreeDCraftWayland3dSpatialCompositorPrEngine {
     }
 
     pub fn register_spatial_window(&mut self, window_id: u32, pose: SpatialPose3D) {
-        if let Some(existing) = self.spatial_windows.iter_mut().find(|(id, _)| *id == window_id) {
+        if let Some(existing) = self
+            .spatial_windows
+            .iter_mut()
+            .find(|(id, _)| *id == window_id)
+        {
             existing.1 = pose;
         } else {
             self.spatial_windows.push((window_id, pose));
         }
     }
 
-    pub fn compute_stereoscopic_eye_matrices(&self) -> (StereoscopicEyeMatrix, StereoscopicEyeMatrix) {
+    pub fn compute_stereoscopic_eye_matrices(
+        &self,
+    ) -> (StereoscopicEyeMatrix, StereoscopicEyeMatrix) {
         let half_ipd_m = (self.interpupillary_distance_mm / 1000.0) * 0.5;
 
         let left_eye = StereoscopicEyeMatrix {
@@ -628,14 +641,19 @@ impl SovereignThreeDCraftArtcraftParityPrGateway {
         let bssrdf = self.subsurface_scattering.evaluate_bssrdf_diffusion(2.0);
         let sss_ok = bssrdf[0] >= 0.0 && bssrdf[1] >= 0.0 && bssrdf[2] >= 0.0;
 
-        self.openusd_scenegraph.create_prim("/Root/RobotMesh", UsdPrimType::Mesh, Some("robot.usd"));
+        self.openusd_scenegraph.create_prim(
+            "/Root/RobotMesh",
+            UsdPrimType::Mesh,
+            Some("robot.usd"),
+        );
         let usd_ok = self.openusd_scenegraph.compose_stage() >= 2;
 
         let uvs = self.automatic_uv.unwrap_lscm_mesh(10, &[[0, 1, 2]]);
         let metric = self.automatic_uv.compute_conformal_distortion_metric(&uvs);
         let uv_ok = uvs.len() == 10 && metric >= 0.85;
 
-        self.particle_physics.emit_particle([0.0, 5.0, 0.0], [0.0, 0.0, 0.0], 1.0, 2.0);
+        self.particle_physics
+            .emit_particle([0.0, 5.0, 0.0], [0.0, 0.0, 0.0], 1.0, 2.0);
         self.particle_physics.step_simulation(0.1);
         let phys_ok = !self.particle_physics.particles.is_empty();
 
@@ -667,13 +685,17 @@ impl SovereignThreeDCraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
-            let ready_count = proposals.iter().filter(|p| p.status == "Ready for Merge").count();
+            let ready_count = proposals
+                .iter()
+                .filter(|p| p.status == "Ready for Merge")
+                .count();
             (ready_count as f64 / proposals.len() as f64) * 100.0
         }
     }
 
     pub fn export_all_pr_manifests_markdown(&self) -> String {
-        let mut markdown = String::from("# 3DCraft to ArtCraft Parity & Spatial Innovations PR Manifest\n\n");
+        let mut markdown =
+            String::from("# 3DCraft to ArtCraft Parity & Spatial Innovations PR Manifest\n\n");
         markdown.push_str("## Staged Pull Request Proposals\n\n");
 
         for pr in self.collect_all_proposals() {
@@ -758,7 +780,8 @@ mod tests {
 
     #[test]
     fn test_subsurface_scattering_engine() {
-        let engine = ThreeDCraftSubsurfaceScatteringPrEngine::for_material(SubsurfaceMaterialProfile::Skin);
+        let engine =
+            ThreeDCraftSubsurfaceScatteringPrEngine::for_material(SubsurfaceMaterialProfile::Skin);
         let radiance = engine.evaluate_bssrdf_diffusion(1.0);
         assert!(radiance[0] >= 0.0);
         assert!(radiance[1] >= 0.0);

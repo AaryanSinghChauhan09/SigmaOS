@@ -277,33 +277,31 @@ impl SigmaTimeshift {
 
     /// List enabled schedules
     pub fn list_enabled_schedules(&self) -> Vec<&SnapshotSchedule> {
-        self.schedules
-            .values()
-            .filter(|s| s.is_enabled())
-            .collect()
+        self.schedules.values().filter(|s| s.is_enabled()).collect()
     }
 
     /// Clean up old snapshots based on retention policy
     pub fn cleanup_old_snapshots(&mut self, level: SnapshotLevel, retain_count: u32) -> usize {
         let mut to_remove = Vec::new();
-        
-        let mut level_snapshots: Vec<_> = self.snapshots
+
+        let mut level_snapshots: Vec<_> = self
+            .snapshots
             .values()
             .filter(|s| s.level == level && s.is_completed())
             .collect();
-        
+
         // Sort by creation time (oldest first)
         level_snapshots.sort_by(|a, b| a.creation_time.cmp(&b.creation_time));
-        
+
         // Remove excess snapshots
         for snap in level_snapshots.iter().skip(retain_count as usize) {
             to_remove.push(snap.snapshot_id.clone());
         }
-        
+
         for id in to_remove {
             self.snapshots.remove(&id);
         }
-        
+
         to_remove.len()
     }
 
@@ -325,7 +323,7 @@ impl Default for SigmaTimeshift {
 }
 
 /// Global SigmaTimeshift instance (placeholder for actual global state)
-static unsafe mutable SIGMATIMESHIFT_INSTANCE: Option<SigmaTimeshift> = None;
+static mut SIGMATIMESHIFT_INSTANCE: Option<SigmaTimeshift> = None;
 
 /// Initialize the global SigmaTimeshift instance
 pub fn init_sigmatimeshift() {
@@ -336,16 +334,12 @@ pub fn init_sigmatimeshift() {
 
 /// Get the global SigmaTimeshift instance
 pub fn get_sigmatimeshift() -> Option<&'static SigmaTimeshift> {
-    unsafe {
-        SIGMATIMESHIFT_INSTANCE.as_ref()
-    }
+    unsafe { SIGMATIMESHIFT_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaTimeshift instance
 pub fn get_sigmatimeshift_mut() -> Option<&'static mut SigmaTimeshift> {
-    unsafe {
-        SIGMATIMESHIFT_INSTANCE.as_mut()
-    }
+    unsafe { SIGMATIMESHIFT_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a snapshot

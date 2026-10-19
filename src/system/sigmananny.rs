@@ -54,18 +54,13 @@ pub struct UsageRecord {
 
 impl UsageRecord {
     /// Create a new usage record
-    pub fn new(
-        user_id: String,
-        application: String,
-        start_time: u64,
-        end_time: u64,
-    ) -> Self {
+    pub fn new(user_id: String, application: String, start_time: u64, end_time: u64) -> Self {
         let duration = if end_time > start_time {
             end_time - start_time
         } else {
             0
         };
-        
+
         Self {
             user_id,
             application,
@@ -260,10 +255,7 @@ impl SigmaNanny {
 
     /// List enabled filter rules
     pub fn list_enabled_filter_rules(&self) -> Vec<&FilterRule> {
-        self.filter_rules
-            .values()
-            .filter(|r| r.enabled)
-            .collect()
+        self.filter_rules.values().filter(|r| r.enabled).collect()
     }
 
     /// Enable a filter rule
@@ -292,12 +284,12 @@ impl SigmaNanny {
             if !rule.enabled {
                 continue;
             }
-            
+
             if content.contains(&rule.pattern) {
                 return rule.action;
             }
         }
-        
+
         FilterAction::Allow
     }
 
@@ -421,7 +413,7 @@ impl Default for SigmaNanny {
 }
 
 /// Global SigmaNanny instance (placeholder for actual global state)
-static unsafe mutable SIGMANANNY_INSTANCE: Option<SigmaNanny> = None;
+static mut SIGMANANNY_INSTANCE: Option<SigmaNanny> = None;
 
 /// Initialize the global SigmaNanny instance
 pub fn init_sigmananny() {
@@ -432,16 +424,12 @@ pub fn init_sigmananny() {
 
 /// Get the global SigmaNanny instance
 pub fn get_sigmananny() -> Option<&'static SigmaNanny> {
-    unsafe {
-        SIGMANANNY_INSTANCE.as_ref()
-    }
+    unsafe { SIGMANANNY_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaNanny instance
 pub fn get_sigmananny_mut() -> Option<&'static mut SigmaNanny> {
-    unsafe {
-        SIGMANANNY_INSTANCE.as_mut()
-    }
+    unsafe { SIGMANANNY_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a filter rule
@@ -553,12 +541,7 @@ mod tests {
 
     #[test]
     fn test_usage_record_creation() {
-        let record = UsageRecord::new(
-            "user1".to_string(),
-            "browser".to_string(),
-            1000,
-            2000,
-        );
+        let record = UsageRecord::new("user1".to_string(), "browser".to_string(), 1000, 2000);
 
         assert_eq!(record.user_id, "user1");
         assert_eq!(record.application, "browser");
@@ -653,12 +636,7 @@ mod tests {
     #[test]
     fn test_sigmananny_record_usage() {
         let mut nanny = SigmaNanny::new();
-        let record = UsageRecord::new(
-            "user1".to_string(),
-            "browser".to_string(),
-            1000,
-            2000,
-        );
+        let record = UsageRecord::new("user1".to_string(), "browser".to_string(), 1000, 2000);
 
         nanny.record_usage(record);
         assert_eq!(nanny.usage_record_count(), 1);

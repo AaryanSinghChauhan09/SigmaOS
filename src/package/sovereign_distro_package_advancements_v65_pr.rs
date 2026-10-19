@@ -156,7 +156,11 @@ impl DeterministicBuildMicroarchAutoTunerEngineV65 {
                 compiler_flags: "-O3 -march=x86-64-v4 -flto -fno-plt".to_string(),
                 enable_lto: true,
                 enable_pgo: true,
-                portage_use_flags: vec!["custom-cflags".to_string(), "lto".to_string(), "pgo".to_string()],
+                portage_use_flags: vec![
+                    "custom-cflags".to_string(),
+                    "lto".to_string(),
+                    "pgo".to_string(),
+                ],
                 freebsd_ports_flavours: vec!["optimized".to_string()],
             }
         } else if host_cpu_flags.contains("avx2") || host_cpu_flags.contains("v3") {
@@ -278,7 +282,9 @@ impl CrossDistroSatDpllSolverWithVulnerabilityAuditorV65 {
                 vuxml_id: "freebsd-vuxml-webp-1.3.1".to_string(),
             },
         ];
-        Self { advisory_database: advisories }
+        Self {
+            advisory_database: advisories,
+        }
     }
 
     pub fn audit_and_solve_dependencies(
@@ -289,7 +295,8 @@ impl CrossDistroSatDpllSolverWithVulnerabilityAuditorV65 {
         let mut detected_advisories = Vec::new();
 
         for pkg in requested_packages {
-            let canonical = alloc::format!("sovereign-{}", pkg.replace("lib", "").replace("-dev", ""));
+            let canonical =
+                alloc::format!("sovereign-{}", pkg.replace("lib", "").replace("-dev", ""));
             solved.push(canonical);
 
             for adv in &self.advisory_database {
@@ -372,7 +379,11 @@ impl CasFastCdcChunkingAndDeltaReconstitutionEngineV65 {
 
     pub fn process_binary_payload(&mut self, payload: &[u8]) -> Vec<FastCdcChunkManifestV65> {
         let chunk_size = 64 * 1024;
-        let num_chunks = if payload.is_empty() { 1 } else { (payload.len() + chunk_size - 1) / chunk_size };
+        let num_chunks = if payload.is_empty() {
+            1
+        } else {
+            (payload.len() + chunk_size - 1) / chunk_size
+        };
 
         let mut manifests = Vec::new();
         for i in 0..num_chunks {
@@ -453,7 +464,10 @@ impl UniversalBootEnvSnapshotRollbackGovernorV65 {
     pub fn perform_rollback(&mut self, snapshot_id: u64) -> Result<String, String> {
         if self.snapshots.contains_key(&snapshot_id) {
             self.active_snapshot_id = snapshot_id;
-            Ok(alloc::format!("Successfully activated boot environment snapshot #{}", snapshot_id))
+            Ok(alloc::format!(
+                "Successfully activated boot environment snapshot #{}",
+                snapshot_id
+            ))
         } else {
             Err("Snapshot ID not found".to_string())
         }
@@ -508,7 +522,10 @@ impl ForeignPmCliRouterAndCommandInterpreterV65 {
             || tokens.contains(&"uninstall")
         {
             ForeignPmActionV65::Remove
-        } else if tokens.contains(&"upgrade") || tokens.contains(&"update") || tokens.contains(&"-Syu") {
+        } else if tokens.contains(&"upgrade")
+            || tokens.contains(&"update")
+            || tokens.contains(&"-Syu")
+        {
             ForeignPmActionV65::Upgrade
         } else if tokens.contains(&"search") || tokens.contains(&"-Ss") {
             ForeignPmActionV65::Search
@@ -648,7 +665,8 @@ impl SovereignDistroPackageAdvancementsMasterSuiteV65 {
             .staging_governor
             .begin_atomic_staging("/", &[package_name.to_string()]);
 
-        self.staging_governor.commit_atomic_staging(tx.transaction_id)?;
+        self.staging_governor
+            .commit_atomic_staging(tx.transaction_id)?;
 
         let mut pkg = UnifiedPackage::new(package_name.to_string(), "1.0.0-v65".to_string())
             .with_format(PackageFormat::SigmaPkg);
@@ -738,10 +756,8 @@ mod tests {
         assert_eq!(chunks.len(), 2);
 
         let mut boot_env = UniversalBootEnvSnapshotRollbackGovernorV65::new();
-        let snap_id = boot_env.create_pre_update_snapshot(
-            BootEnvironmentSystemV65::FreeBsdBectl,
-            "Pre-V65-Upgrade",
-        );
+        let snap_id = boot_env
+            .create_pre_update_snapshot(BootEnvironmentSystemV65::FreeBsdBectl, "Pre-V65-Upgrade");
         let res = boot_env.perform_rollback(snap_id).unwrap();
         assert!(res.contains("activated boot environment snapshot"));
     }

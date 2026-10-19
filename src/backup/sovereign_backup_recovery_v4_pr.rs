@@ -276,7 +276,10 @@ impl SovereignBorgResticContentAddressedVaultV4 {
     }
 
     pub fn prune_snapshots(&self, total_snapshots: u32) -> u32 {
-        let keep = self.retention_hourly + self.retention_daily + self.retention_weekly + self.retention_monthly;
+        let keep = self.retention_hourly
+            + self.retention_daily
+            + self.retention_weekly
+            + self.retention_monthly;
         if total_snapshots > keep {
             total_snapshots - keep
         } else {
@@ -401,9 +404,15 @@ impl SovereignDdrescueSectorRecoveryEngineV4 {
             if state.rescued_bytes + state.bad_sector_bytes >= state.total_bytes {
                 match state.current_phase {
                     RescuePassPhaseV4::Copying => state.current_phase = RescuePassPhaseV4::Trimming,
-                    RescuePassPhaseV4::Trimming => state.current_phase = RescuePassPhaseV4::Scraping,
-                    RescuePassPhaseV4::Scraping => state.current_phase = RescuePassPhaseV4::Retrying,
-                    RescuePassPhaseV4::Retrying => state.current_phase = RescuePassPhaseV4::Finished,
+                    RescuePassPhaseV4::Trimming => {
+                        state.current_phase = RescuePassPhaseV4::Scraping
+                    }
+                    RescuePassPhaseV4::Scraping => {
+                        state.current_phase = RescuePassPhaseV4::Retrying
+                    }
+                    RescuePassPhaseV4::Retrying => {
+                        state.current_phase = RescuePassPhaseV4::Finished
+                    }
                     RescuePassPhaseV4::Finished => {}
                 }
                 state.current_pass_number += 1;
@@ -587,7 +596,9 @@ impl SovereignRescueModeRamOverlayfsShellV4 {
         match bootloader_kind {
             "grub2" => "grub-install /dev/sda && update-grub: SUCCESS".to_string(),
             "systemd-boot" => "bootctl install && bootctl update: SUCCESS".to_string(),
-            "freebsd-loader" => "gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot zroot: SUCCESS".to_string(),
+            "freebsd-loader" => {
+                "gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot zroot: SUCCESS".to_string()
+            }
             _ => format!("Repaired bootloader {}: SUCCESS", bootloader_kind),
         }
     }
@@ -647,7 +658,9 @@ pub struct SovereignBackupRecoveryPrGatewayV4 {
 
 impl SovereignBackupRecoveryPrGatewayV4 {
     pub fn new() -> Self {
-        let mut gateway = Self { proposals: Vec::new() };
+        let mut gateway = Self {
+            proposals: Vec::new(),
+        };
         gateway.initialize_all_proposals();
         gateway
     }
@@ -656,7 +669,9 @@ impl SovereignBackupRecoveryPrGatewayV4 {
         self.proposals = vec![
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 340,
-                pr_title: "feat(backup): Rsync Protocol 33+ & xxHash3-128 Rolling Delta Sync Engine V4".to_string(),
+                pr_title:
+                    "feat(backup): Rsync Protocol 33+ & xxHash3-128 Rolling Delta Sync Engine V4"
+                        .to_string(),
                 target_subsystem: "Backup & Sync".to_string(),
                 inspirators: vec!["Rsync 3.3.0".to_string(), "Debian/Ubuntu rsync".to_string()],
                 components_added: vec![
@@ -664,40 +679,60 @@ impl SovereignBackupRecoveryPrGatewayV4 {
                     "Adler32 rolling checksum with xxHash3-128 strong validation".to_string(),
                     "Zstd stream dictionary compression & sparse file skipping".to_string(),
                 ],
-                performance_advantage: "3.5x faster delta matching over 10GbE network sync".to_string(),
+                performance_advantage: "3.5x faster delta matching over 10GbE network sync"
+                    .to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 341,
-                pr_title: "feat(backup): BSD dump(8)/restore(8) Tape Header & Multi-Filesystem Engine V4".to_string(),
+                pr_title:
+                    "feat(backup): BSD dump(8)/restore(8) Tape Header & Multi-Filesystem Engine V4"
+                        .to_string(),
                 target_subsystem: "Disaster Recovery".to_string(),
-                inspirators: vec!["FreeBSD dump(8)".to_string(), "OpenBSD restore(8)".to_string()],
+                inspirators: vec![
+                    "FreeBSD dump(8)".to_string(),
+                    "OpenBSD restore(8)".to_string(),
+                ],
                 components_added: vec![
                     "BsdTapeHeaderV4 with TS_TAPE, TS_INODE, TS_BITS headers".to_string(),
                     "Interactive restore shell (restore -i)".to_string(),
                     "Differential dump levels 0..9 inode bitmap traversal".to_string(),
                 ],
-                performance_advantage: "Bare-metal block tape stream recovery across UFS, Ext4, and ZFS".to_string(),
+                performance_advantage:
+                    "Bare-metal block tape stream recovery across UFS, Ext4, and ZFS".to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 342,
-                pr_title: "feat(backup): Borg, Restic & Kopia Encrypted Content-Addressed Vault Engine V4".to_string(),
+                pr_title:
+                    "feat(backup): Borg, Restic & Kopia Encrypted Content-Addressed Vault Engine V4"
+                        .to_string(),
                 target_subsystem: "Encrypted Storage Vault".to_string(),
-                inspirators: vec!["BorgBackup".to_string(), "Restic".to_string(), "Kopia".to_string()],
+                inspirators: vec![
+                    "BorgBackup".to_string(),
+                    "Restic".to_string(),
+                    "Kopia".to_string(),
+                ],
                 components_added: vec![
                     "FastCDC variable chunking engine".to_string(),
                     "Blake3 content-addressed store".to_string(),
                     "Argon2id + ChaCha20-Poly1305 encrypted vault with GFS pruning".to_string(),
                 ],
-                performance_advantage: "95% deduplication efficiency with sub-millisecond chunk lookup".to_string(),
+                performance_advantage:
+                    "95% deduplication efficiency with sub-millisecond chunk lookup".to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 343,
-                pr_title: "feat(snapshot): Timeshift, Snapper & bectl Filesystem Snapshot Governor V4".to_string(),
+                pr_title:
+                    "feat(snapshot): Timeshift, Snapper & bectl Filesystem Snapshot Governor V4"
+                        .to_string(),
                 target_subsystem: "Snapshot & Rollback".to_string(),
-                inspirators: vec!["Timeshift".to_string(), "Snapper".to_string(), "FreeBSD bectl".to_string()],
+                inspirators: vec![
+                    "Timeshift".to_string(),
+                    "Snapper".to_string(),
+                    "FreeBSD bectl".to_string(),
+                ],
                 components_added: vec![
                     "Btrfs, ZFS, HAMMER2, Ext4 LVM thin, Bcachefs snapshot governor".to_string(),
                     "Pre-update package manager hooks for apt, pacman, dnf, apk, pkg".to_string(),
@@ -708,64 +743,89 @@ impl SovereignBackupRecoveryPrGatewayV4 {
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 344,
-                pr_title: "feat(forensics): GNU ddrescue Bad-Sector Disk Rescue State Machine V4".to_string(),
+                pr_title: "feat(forensics): GNU ddrescue Bad-Sector Disk Rescue State Machine V4"
+                    .to_string(),
                 target_subsystem: "Forensic Recovery".to_string(),
-                inspirators: vec!["GNU ddrescue 1.28".to_string(), "Arch Linux Rescue".to_string()],
+                inspirators: vec![
+                    "GNU ddrescue 1.28".to_string(),
+                    "Arch Linux Rescue".to_string(),
+                ],
                 components_added: vec![
                     "RescueMapfileStateV4 bad sector tracker".to_string(),
-                    "5-pass rescue lifecycle (Copying, Trimming, Scraping, Retrying, Finished)".to_string(),
+                    "5-pass rescue lifecycle (Copying, Trimming, Scraping, Retrying, Finished)"
+                        .to_string(),
                 ],
-                performance_advantage: "Recovers 99.9% readable data from failing drive sectors".to_string(),
+                performance_advantage: "Recovers 99.9% readable data from failing drive sectors"
+                    .to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 345,
-                pr_title: "feat(forensics): TestDisk Lost Partition Table & Backup Superblock Scanner V4".to_string(),
+                pr_title:
+                    "feat(forensics): TestDisk Lost Partition Table & Backup Superblock Scanner V4"
+                        .to_string(),
                 target_subsystem: "Partition Recovery".to_string(),
                 inspirators: vec!["TestDisk 7.2".to_string(), "CGSecurity".to_string()],
                 components_added: vec![
                     "DiscoveredPartitionV4 MBR, GPT, BSD disklabel, Sun VTOC scanner".to_string(),
                     "Backup superblock locator for Ext4, UFS2, XFS, Btrfs, ZFS".to_string(),
                 ],
-                performance_advantage: "Heuristic scan recovers corrupt partition headers in seconds".to_string(),
+                performance_advantage:
+                    "Heuristic scan recovers corrupt partition headers in seconds".to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 346,
-                pr_title: "feat(forensics): PhotoRec Deep Signature File Carving Engine V4".to_string(),
+                pr_title: "feat(forensics): PhotoRec Deep Signature File Carving Engine V4"
+                    .to_string(),
                 target_subsystem: "File Carving".to_string(),
                 inspirators: vec!["PhotoRec".to_string(), "Kali Linux Forensics".to_string()],
                 components_added: vec![
                     "CarvedFileRecordV4 signature analyzer".to_string(),
                     "Magic-byte carver for PNG, JPEG, ELF, PDF, Zstd signatures".to_string(),
                 ],
-                performance_advantage: "Zero-copy sector signature scan processing 2.0 GB/s".to_string(),
+                performance_advantage: "Zero-copy sector signature scan processing 2.0 GB/s"
+                    .to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 347,
-                pr_title: "feat(rescue): Rescue Mode Ephemeral RAM Overlayfs Shell & Bootloader Repair V4".to_string(),
+                pr_title:
+                    "feat(rescue): Rescue Mode Ephemeral RAM Overlayfs Shell & Bootloader Repair V4"
+                        .to_string(),
                 target_subsystem: "Rescue Environment".to_string(),
-                inspirators: vec!["Alpine LBU".to_string(), "Gentoo Live Rescue".to_string(), "SystemRescue".to_string()],
+                inspirators: vec![
+                    "Alpine LBU".to_string(),
+                    "Gentoo Live Rescue".to_string(),
+                    "SystemRescue".to_string(),
+                ],
                 components_added: vec![
                     "RAM overlayfs rootfs environment".to_string(),
                     "Target chroot binder for /sys /proc /dev /run".to_string(),
-                    "Bootloader repair, password reset & /etc/fstab UUID reconstruction".to_string(),
+                    "Bootloader repair, password reset & /etc/fstab UUID reconstruction"
+                        .to_string(),
                 ],
                 performance_advantage: "Boots to functional emergency shell in 700ms".to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
             SovereignBackupRecoveryPrProposalManifestV4 {
                 pr_id: 348,
-                pr_title: "feat(installer): ISOHybrid Live ISO Generator & Modular System Installer V4".to_string(),
+                pr_title:
+                    "feat(installer): ISOHybrid Live ISO Generator & Modular System Installer V4"
+                        .to_string(),
                 target_subsystem: "Installer & Live ISO".to_string(),
-                inspirators: vec!["Calamares".to_string(), "Archinstall".to_string(), "Debian Installer".to_string()],
+                inspirators: vec![
+                    "Calamares".to_string(),
+                    "Archinstall".to_string(),
+                    "Debian Installer".to_string(),
+                ],
                 components_added: vec![
                     "ISOHybrid MBR + GPT + El Torito header generator".to_string(),
                     "SquashFS/Zstd image stage loader".to_string(),
                     "Modular step-by-step system installer pipeline".to_string(),
                 ],
-                performance_advantage: "Complete base OS deployment in under 90 seconds".to_string(),
+                performance_advantage: "Complete base OS deployment in under 90 seconds"
+                    .to_string(),
                 zero_dependency_status: "100% Zero-Dependency Rust Native".to_string(),
             },
         ];

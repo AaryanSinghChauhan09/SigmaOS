@@ -222,7 +222,7 @@ impl Default for SigmaSecurityManager {
 }
 
 /// Global SigmaSecurityManager instance
-static_mut SIGMASECURITYMANAGER_INSTANCE: Option<SigmaSecurityManager> = None;
+static mut SIGMASECURITYMANAGER_INSTANCE: Option<SigmaSecurityManager> = None;
 
 /// Initialize the global SigmaSecurityManager instance
 pub fn init_sigmasecuritymanager() {

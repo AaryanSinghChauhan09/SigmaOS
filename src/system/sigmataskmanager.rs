@@ -123,7 +123,10 @@ impl SigmaTaskManager {
     }
 
     pub fn list_tasks_by_priority(&self, priority: TaskPriority) -> Vec<&Task> {
-        self.tasks.values().filter(|t| t.priority == priority).collect()
+        self.tasks
+            .values()
+            .filter(|t| t.priority == priority)
+            .collect()
     }
 
     pub fn remove_task(&mut self, id: &str) -> bool {
@@ -244,7 +247,8 @@ mod tests {
     fn test_list_tasks_by_priority() {
         let mut manager = SigmaTaskManager::new();
         manager.add_task("bash".to_string(), 1000, 999);
-        manager.add_task("vim".to_string(), 1001, 1000)
+        manager
+            .add_task("vim".to_string(), 1001, 1000)
             .with_priority(TaskPriority::High);
 
         let high = manager.list_tasks_by_priority(TaskPriority::High);

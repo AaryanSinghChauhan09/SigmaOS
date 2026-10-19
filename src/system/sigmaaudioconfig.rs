@@ -66,11 +66,7 @@ pub struct AudioDevice {
 
 impl AudioDevice {
     /// Create a new audio device
-    pub fn new(
-        device_id: String,
-        device_name: String,
-        device_type: AudioDeviceType,
-    ) -> Self {
+    pub fn new(device_id: String, device_name: String, device_type: AudioDeviceType) -> Self {
         Self {
             device_id,
             device_name,
@@ -221,10 +217,7 @@ impl SigmaAudioConfig {
 
     /// List enabled devices
     pub fn list_enabled_devices(&self) -> Vec<&AudioDevice> {
-        self.devices
-            .values()
-            .filter(|d| d.enabled)
-            .collect()
+        self.devices.values().filter(|d| d.enabled).collect()
     }
 
     /// Get default device by type
@@ -301,7 +294,7 @@ impl Default for SigmaAudioConfig {
 }
 
 /// Global SigmaAudioConfig instance (placeholder for actual global state)
-static unsafe mutable SIGMAAUDIOCONFIG_INSTANCE: Option<SigmaAudioConfig> = None;
+static mut SIGMAAUDIOCONFIG_INSTANCE: Option<SigmaAudioConfig> = None;
 
 /// Initialize the global SigmaAudioConfig instance
 pub fn init_sigmaaudioconfig() {
@@ -312,16 +305,12 @@ pub fn init_sigmaaudioconfig() {
 
 /// Get the global SigmaAudioConfig instance
 pub fn get_sigmaaudioconfig() -> Option<&'static SigmaAudioConfig> {
-    unsafe {
-        SIGMAAUDIOCONFIG_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAAUDIOCONFIG_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaAudioConfig instance
 pub fn get_sigmaaudioconfig_mut() -> Option<&'static mut SigmaAudioConfig> {
-    unsafe {
-        SIGMAAUDIOCONFIG_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAAUDIOCONFIG_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a device

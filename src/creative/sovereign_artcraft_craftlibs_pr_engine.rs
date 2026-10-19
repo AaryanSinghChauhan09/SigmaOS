@@ -224,7 +224,10 @@ impl ArtcraftCraftlibsMasterPrDeploymentSuite {
         for (title, target) in pr_definitions {
             let pr_id = self.next_pr_id;
             self.next_pr_id += 1;
-            let patch_body = format!("PR #{}: {}\nTarget: {}\nStatus: Merged\n", pr_id, title, target);
+            let patch_body = format!(
+                "PR #{}: {}\nTarget: {}\nStatus: Merged\n",
+                pr_id, title, target
+            );
             let digest = fnv1a_artcraft_pr_digest(patch_body.as_bytes());
 
             let spec = ArtcraftCraftlibsPrPullRequestSpec {
@@ -242,16 +245,26 @@ impl ArtcraftCraftlibsMasterPrDeploymentSuite {
     }
 
     pub fn execute_and_verify_all_prs(&mut self) -> bool {
-        let photo_ok = self.photo_design_deployer.deploy_photo_design_enhancements();
-        let film_ok = self.film_effect_light_deployer.deploy_video_vfx_lighting_enhancements();
-        let audio_ok = self.audio_media_3d_deployer.deploy_audio_3d_animation_enhancements();
+        let photo_ok = self
+            .photo_design_deployer
+            .deploy_photo_design_enhancements();
+        let film_ok = self
+            .film_effect_light_deployer
+            .deploy_video_vfx_lighting_enhancements();
+        let audio_ok = self
+            .audio_media_3d_deployer
+            .deploy_audio_3d_animation_enhancements();
         let integration_ok = self.integration_deployer.deploy_suite_integration();
 
         photo_ok && film_ok && audio_ok && integration_ok
     }
 
     pub fn compute_artcraft_parity_score(&self) -> u32 {
-        if self.proposals.values().all(|pr| pr.is_merged && pr.is_validated) {
+        if self
+            .proposals
+            .values()
+            .all(|pr| pr.is_merged && pr.is_validated)
+        {
             100
         } else {
             0

@@ -78,10 +78,30 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
         let mut map = BTreeMap::new();
         // Sample lookup table: Item ID, Title, Price, Units
         let table = vec![
-            vec!["A101".to_string(), "Server Node".to_string(), "2500.00".to_string(), "10".to_string()],
-            vec!["A102".to_string(), "Switch 100G".to_string(), "1200.00".to_string(), "25".to_string()],
-            vec!["A103".to_string(), "Storage Array".to_string(), "4500.00".to_string(), "8".to_string()],
-            vec!["A104".to_string(), "Photonic Transceiver".to_string(), "350.00".to_string(), "100".to_string()],
+            vec![
+                "A101".to_string(),
+                "Server Node".to_string(),
+                "2500.00".to_string(),
+                "10".to_string(),
+            ],
+            vec![
+                "A102".to_string(),
+                "Switch 100G".to_string(),
+                "1200.00".to_string(),
+                "25".to_string(),
+            ],
+            vec![
+                "A103".to_string(),
+                "Storage Array".to_string(),
+                "4500.00".to_string(),
+                "8".to_string(),
+            ],
+            vec![
+                "A104".to_string(),
+                "Photonic Transceiver".to_string(),
+                "350.00".to_string(),
+                "100".to_string(),
+            ],
         ];
         map.insert("Inventory".to_string(), table);
 
@@ -120,7 +140,12 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
     }
 
     /// Perform VLOOKUP operation: search key in column 0, return col_index value
-    pub fn vlookup(&self, table_name: &str, search_key: &str, col_idx: usize) -> FormulaValueResult {
+    pub fn vlookup(
+        &self,
+        table_name: &str,
+        search_key: &str,
+        col_idx: usize,
+    ) -> FormulaValueResult {
         self.xlookup(table_name, search_key, 0, col_idx.saturating_sub(1))
     }
 
@@ -183,7 +208,12 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
             false
         }
 
-        dfs(start_cell, &self.dependency_graph, &mut visited, &mut rec_stack)
+        dfs(
+            start_cell,
+            &self.dependency_graph,
+            &mut visited,
+            &mut rec_stack,
+        )
     }
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
@@ -299,11 +329,14 @@ impl GridcraftPivotTableCubeAggregationPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement Pivot Table Multi-Dimensional Cube Aggregator & Slicer".to_string(),
+            pr_title:
+                "feat(gridcraft): Implement Pivot Table Multi-Dimensional Cube Aggregator & Slicer"
+                    .to_string(),
             target_subsystem: "Gridcraft Analytics & Data Cube Engine".to_string(),
             original_suite: "ArtCraft Gridcraft Pivot Engine".to_string(),
             components_added: vec![
-                "Multi-dimensional pivot table field slicing (rows, columns, values, filters)".to_string(),
+                "Multi-dimensional pivot table field slicing (rows, columns, values, filters)"
+                    .to_string(),
                 "Aggregators: SUM, AVERAGE, COUNT, MAX, MIN, DISTINCT COUNT, VARIANCE".to_string(),
                 "Calculated pivot fields & dynamic grouping by time/date intervals".to_string(),
             ],
@@ -394,7 +427,10 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                     None
                 }
             }
-            Some(ConditionalFormatRuleType::ColorScale { min_color, max_color }) => {
+            Some(ConditionalFormatRuleType::ColorScale {
+                min_color,
+                max_color,
+            }) => {
                 if value > 50.0 {
                     Some(*max_color)
                 } else {
@@ -558,7 +594,12 @@ impl GridcraftFinancialGoalSeekMonteCarloPrEngine {
     }
 
     /// Newton-Raphson Goal Seek solver: find input value x such that f(x) == target
-    pub fn goal_seek<F>(&self, target: f64, initial_guess: f64, formula_fn: F) -> FinancialGoalSeekResult
+    pub fn goal_seek<F>(
+        &self,
+        target: f64,
+        initial_guess: f64,
+        formula_fn: F,
+    ) -> FinancialGoalSeekResult
     where
         F: Fn(f64) -> f64,
     {
@@ -596,7 +637,11 @@ impl GridcraftFinancialGoalSeekMonteCarloPrEngine {
     }
 
     /// Run Monte Carlo simulation over stochastic input function
-    pub fn run_monte_carlo_simulation<F>(&self, runs: u32, sample_fn: F) -> MonteCarloSimulationResult
+    pub fn run_monte_carlo_simulation<F>(
+        &self,
+        runs: u32,
+        sample_fn: F,
+    ) -> MonteCarloSimulationResult
     where
         F: Fn(u32) -> f64,
     {
@@ -631,13 +676,15 @@ impl GridcraftFinancialGoalSeekMonteCarloPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement Newton-Raphson Goal Seek & Monte Carlo Simulator".to_string(),
+            pr_title: "feat(gridcraft): Implement Newton-Raphson Goal Seek & Monte Carlo Simulator"
+                .to_string(),
             target_subsystem: "Gridcraft Financial Optimization & Simulation".to_string(),
             original_suite: "ArtCraft Gridcraft Financial Modeling".to_string(),
             components_added: vec![
                 "Newton-Raphson Goal Seek non-linear parameter optimizer".to_string(),
                 "What-If scenario manager & sensitivity analysis matrix".to_string(),
-                "Monte Carlo stochastic risk evaluation engine with percentile forecasting".to_string(),
+                "Monte Carlo stochastic risk evaluation engine with percentile forecasting"
+                    .to_string(),
             ],
             performance_multiplier: "1,000,000 Iteration Risk Simulation in <10ms".to_string(),
             status: "Ready for Merge".to_string(),
@@ -710,12 +757,15 @@ impl GridcraftRealtimeCrdtCoAuthoringPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement CRDT Real-Time Multi-User Collaboration Engine".to_string(),
+            pr_title: "feat(gridcraft): Implement CRDT Real-Time Multi-User Collaboration Engine"
+                .to_string(),
             target_subsystem: "Gridcraft Concurrency & Sync Protocol".to_string(),
             original_suite: "ArtCraft Gridcraft Collaboration".to_string(),
             components_added: vec![
-                "Conflict-free Replicated Data Type (CRDT) Last-Write-Wins cell edit sync".to_string(),
-                "Non-blocking lockless concurrency for simultaneous spreadsheet editing".to_string(),
+                "Conflict-free Replicated Data Type (CRDT) Last-Write-Wins cell edit sync"
+                    .to_string(),
+                "Non-blocking lockless concurrency for simultaneous spreadsheet editing"
+                    .to_string(),
                 "Client presence tracking and dynamic cell selection cursors".to_string(),
             ],
             performance_multiplier: "Zero-Latency Local Multi-User Delta Resolution".to_string(),
@@ -854,7 +904,12 @@ impl GridcraftVectorChartExporterPrEngine {
         Self
     }
 
-    pub fn render_chart_svg(&self, chart_type: VectorChartCategory, title: &str, values: &[f64]) -> String {
+    pub fn render_chart_svg(
+        &self,
+        chart_type: VectorChartCategory,
+        title: &str,
+        values: &[f64],
+    ) -> String {
         let mut svg = format!(
             "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"800\" height=\"600\"><title>{}</title>",
             title
@@ -875,7 +930,9 @@ impl GridcraftVectorChartExporterPrEngine {
                 }
             }
             _ => {
-                svg.push_str("<text x=\"100\" y=\"100\" font-family=\"Inter\">Chart Graphic</text>");
+                svg.push_str(
+                    "<text x=\"100\" y=\"100\" font-family=\"Inter\">Chart Graphic</text>",
+                );
             }
         }
 
@@ -885,12 +942,16 @@ impl GridcraftVectorChartExporterPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement Dynamic Vector SVG Chart Generator & Trendline Engine".to_string(),
+            pr_title:
+                "feat(gridcraft): Implement Dynamic Vector SVG Chart Generator & Trendline Engine"
+                    .to_string(),
             target_subsystem: "Gridcraft Charting & Visualization Engine".to_string(),
             original_suite: "ArtCraft Gridcraft Vector Exporter".to_string(),
             components_added: vec![
-                "2D/3D vector SVG/PNG chart generator (Bar, Line, Pie, Donut, Scatter, Waterfall)".to_string(),
-                "Dynamic chart legends, axis auto-scaling & animated data entry reveals".to_string(),
+                "2D/3D vector SVG/PNG chart generator (Bar, Line, Pie, Donut, Scatter, Waterfall)"
+                    .to_string(),
+                "Dynamic chart legends, axis auto-scaling & animated data entry reveals"
+                    .to_string(),
                 "Statistical trendline calculation (Linear, Polynomial, Exponential)".to_string(),
             ],
             performance_multiplier: "Instant Vector SVG Chart Generation (<1ms)".to_string(),
@@ -930,7 +991,13 @@ impl GridcraftMultiFormatSpreadsheetConverterPrEngine {
         Self
     }
 
-    pub fn export_spreadsheet(&self, sheet_name: &str, headers: &[&str], rows: &[Vec<&str>], format_type: SpreadsheetFormat) -> String {
+    pub fn export_spreadsheet(
+        &self,
+        sheet_name: &str,
+        headers: &[&str],
+        rows: &[Vec<&str>],
+        format_type: SpreadsheetFormat,
+    ) -> String {
         match format_type {
             SpreadsheetFormat::Csv => {
                 let mut csv = headers.join(",") + "\n";
@@ -941,7 +1008,11 @@ impl GridcraftMultiFormatSpreadsheetConverterPrEngine {
                 csv
             }
             SpreadsheetFormat::Json => {
-                format!("{{\"sheet\": \"{}\", \"rows_count\": {}}}", sheet_name, rows.len())
+                format!(
+                    "{{\"sheet\": \"{}\", \"rows_count\": {}}}",
+                    sheet_name,
+                    rows.len()
+                )
             }
             _ => format!("SPREADSHEET_EXPORT:{}:{}", sheet_name, rows.len()),
         }
@@ -949,12 +1020,15 @@ impl GridcraftMultiFormatSpreadsheetConverterPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement Lossless Multi-Format Spreadsheet Converter Engine".to_string(),
+            pr_title:
+                "feat(gridcraft): Implement Lossless Multi-Format Spreadsheet Converter Engine"
+                    .to_string(),
             target_subsystem: "Gridcraft Import & Export Pipeline".to_string(),
             original_suite: "ArtCraft Gridcraft Multi-Format Exporter".to_string(),
             components_added: vec![
                 "Lossless XLSX, ODS, CSV, TSV, JSON, HTML, PDF spreadsheet conversion".to_string(),
-                "Preservation of cell styling, formulas, number formats & conditional formatting".to_string(),
+                "Preservation of cell styling, formulas, number formats & conditional formatting"
+                    .to_string(),
                 "Batch workbook conversion & background file streaming engine".to_string(),
             ],
             performance_multiplier: "10x Faster Lossless File Conversion Speed".to_string(),
@@ -1054,7 +1128,9 @@ impl SovereignGridcraftArtcraftParityPrGateway {
         let xlookup_val = self.formula_xlookup.xlookup("Inventory", "A101", 0, 1);
         let xlookup_ok = xlookup_val == FormulaValueResult::Text("Server Node".to_string());
 
-        let pivot = self.pivot_cube.compute_pivot_cube("Region", "Revenue", PivotAggType::Sum);
+        let pivot = self
+            .pivot_cube
+            .compute_pivot_cube("Region", "Revenue", PivotAggType::Sum);
         let pivot_ok = pivot.contains_key("North");
 
         self.validation_formatting.add_validation_rule(
@@ -1091,13 +1167,21 @@ impl SovereignGridcraftArtcraftParityPrGateway {
         });
         let udf_ok = self.macro_udf.execute_udf("DOUBLE", &[15.0]) == Some(30.0);
 
-        let svg = self.vector_chart.render_chart_svg(VectorChartCategory::Bar, "Revenue", &[10.0, 20.0]);
+        let svg =
+            self.vector_chart
+                .render_chart_svg(VectorChartCategory::Bar, "Revenue", &[10.0, 20.0]);
         let chart_ok = svg.contains("<svg");
 
-        let csv = self.format_converter.export_spreadsheet("Sheet1", &["ColA", "ColB"], &[vec!["Val1", "Val2"]], SpreadsheetFormat::Csv);
+        let csv = self.format_converter.export_spreadsheet(
+            "Sheet1",
+            &["ColA", "ColB"],
+            &[vec!["Val1", "Val2"]],
+            SpreadsheetFormat::Csv,
+        );
         let csv_ok = csv.contains("ColA,ColB");
 
-        self.master_theme.apply_theme_tokens(0xFF00FF00, "Inter Display");
+        self.master_theme
+            .apply_theme_tokens(0xFF00FF00, "Inter Display");
         let theme_ok = self.master_theme.font_family == "Inter Display";
 
         xlookup_ok
@@ -1310,14 +1394,20 @@ mod tests {
     #[test]
     fn test_vector_chart_exporter_engine() {
         let engine = GridcraftVectorChartExporterPrEngine::new();
-        let svg = engine.render_chart_svg(VectorChartCategory::Bar, "Q1 Sales", &[10.0, 20.0, 30.0]);
+        let svg =
+            engine.render_chart_svg(VectorChartCategory::Bar, "Q1 Sales", &[10.0, 20.0, 30.0]);
         assert!(svg.contains("<title>Q1 Sales</title>"));
     }
 
     #[test]
     fn test_multi_format_converter_engine() {
         let engine = GridcraftMultiFormatSpreadsheetConverterPrEngine::new();
-        let csv = engine.export_spreadsheet("Sheet1", &["ColA", "ColB"], &[vec!["V1", "V2"]], SpreadsheetFormat::Csv);
+        let csv = engine.export_spreadsheet(
+            "Sheet1",
+            &["ColA", "ColB"],
+            &[vec!["V1", "V2"]],
+            SpreadsheetFormat::Csv,
+        );
         assert!(csv.contains("ColA,ColB\nV1,V2\n"));
     }
 

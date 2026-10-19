@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// File type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,15 +57,33 @@ impl FilePermissions {
 
     pub fn mode(&self) -> u32 {
         let mut mode = 0u32;
-        if self.owner_read { mode |= 0o400; }
-        if self.owner_write { mode |= 0o200; }
-        if self.owner_execute { mode |= 0o100; }
-        if self.group_read { mode |= 0o040; }
-        if self.group_write { mode |= 0o020; }
-        if self.group_execute { mode |= 0o010; }
-        if self.other_read { mode |= 0o004; }
-        if self.other_write { mode |= 0o002; }
-        if self.other_execute { mode |= 0o001; }
+        if self.owner_read {
+            mode |= 0o400;
+        }
+        if self.owner_write {
+            mode |= 0o200;
+        }
+        if self.owner_execute {
+            mode |= 0o100;
+        }
+        if self.group_read {
+            mode |= 0o040;
+        }
+        if self.group_write {
+            mode |= 0o020;
+        }
+        if self.group_execute {
+            mode |= 0o010;
+        }
+        if self.other_read {
+            mode |= 0o004;
+        }
+        if self.other_write {
+            mode |= 0o002;
+        }
+        if self.other_execute {
+            mode |= 0o001;
+        }
         mode
     }
 }
@@ -149,7 +167,10 @@ impl SigmaFileManager {
     }
 
     pub fn list_files_by_type(&self, file_type: FileType) -> Vec<&FileEntry> {
-        self.files.values().filter(|f| f.file_type == file_type).collect()
+        self.files
+            .values()
+            .filter(|f| f.file_type == file_type)
+            .collect()
     }
 
     pub fn remove_file(&mut self, path: &str) -> bool {
@@ -243,9 +264,18 @@ mod tests {
     #[test]
     fn test_list_files_by_type() {
         let mut manager = SigmaFileManager::new();
-        manager.add_file(FileEntry::new("/home/user/file.txt".to_string(), FileType::Regular));
-        manager.add_file(FileEntry::new("/home/user".to_string(), FileType::Directory));
-        manager.add_file(FileEntry::new("/home/user/link".to_string(), FileType::Symlink));
+        manager.add_file(FileEntry::new(
+            "/home/user/file.txt".to_string(),
+            FileType::Regular,
+        ));
+        manager.add_file(FileEntry::new(
+            "/home/user".to_string(),
+            FileType::Directory,
+        ));
+        manager.add_file(FileEntry::new(
+            "/home/user/link".to_string(),
+            FileType::Symlink,
+        ));
 
         let dirs = manager.list_files_by_type(FileType::Directory);
         assert_eq!(dirs.len(), 1);
@@ -254,8 +284,12 @@ mod tests {
     #[test]
     fn test_total_size() {
         let mut manager = SigmaFileManager::new();
-        manager.add_file(FileEntry::new("/home/user/file1.txt".to_string(), FileType::Regular).with_size(1024));
-        manager.add_file(FileEntry::new("/home/user/file2.txt".to_string(), FileType::Regular).with_size(2048));
+        manager.add_file(
+            FileEntry::new("/home/user/file1.txt".to_string(), FileType::Regular).with_size(1024),
+        );
+        manager.add_file(
+            FileEntry::new("/home/user/file2.txt".to_string(), FileType::Regular).with_size(2048),
+        );
 
         assert_eq!(manager.total_size(), 3072);
     }
@@ -267,7 +301,10 @@ mod tests {
         assert_eq!(manager.file_count(), 0);
 
         let manager_mut = get_sigmafilemanager_mut();
-        manager_mut.add_file(FileEntry::new("/home/user/file.txt".to_string(), FileType::Regular));
+        manager_mut.add_file(FileEntry::new(
+            "/home/user/file.txt".to_string(),
+            FileType::Regular,
+        ));
         assert_eq!(manager.file_count(), 1);
     }
 }

@@ -298,7 +298,9 @@ impl SovereignTextEditorV3PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV3PrProposalManifest {
         SovereignAppV3PrProposalManifest {
             pr_id: 234,
-            pr_title: "feat(editor_v3): Sovereign Code Editor V3 with LSP v3.17, Tree-sitter & Org-Mode".to_string(),
+            pr_title:
+                "feat(editor_v3): Sovereign Code Editor V3 with LSP v3.17, Tree-sitter & Org-Mode"
+                    .to_string(),
             target_app_category: "Text Editors & IDEs".to_string(),
             replaced_applications: vec![
                 "Vim".to_string(),
@@ -322,7 +324,8 @@ impl SovereignTextEditorV3PrEngine {
                 "Embedded Lua & Lisp Plugin Execution Runtime".to_string(),
             ],
             performance_advantage: "<0.1ms buffer open time; 6MB RAM consumption".to_string(),
-            zero_download_status: "100% Built-In Sovereign Replacement (No external downloads required)".to_string(),
+            zero_download_status:
+                "100% Built-In Sovereign Replacement (No external downloads required)".to_string(),
             v3_advancements: vec![
                 "Multi-cursor parallel editing with instant AST filtering".to_string(),
                 "Built-in diff engine with 3-way merge conflict resolver".to_string(),
@@ -740,7 +743,9 @@ impl SovereignP2pTorrentClientV3PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV3PrProposalManifest {
         SovereignAppV3PrProposalManifest {
             pr_id: 242,
-            pr_title: "feat(p2p_v3): Sovereign P2P Torrent Engine V3 with BitTorrent v2 (BEP-52) & DHT".to_string(),
+            pr_title:
+                "feat(p2p_v3): Sovereign P2P Torrent Engine V3 with BitTorrent v2 (BEP-52) & DHT"
+                    .to_string(),
             target_app_category: "P2P File Transfer Clients".to_string(),
             replaced_applications: vec![
                 "Transmission".to_string(),
@@ -759,7 +764,8 @@ impl SovereignP2pTorrentClientV3PrEngine {
                 "Encrypted P2P Swarm Connection Governor".to_string(),
             ],
             performance_advantage: "Saturates 10 Gbps networking; 10MB RAM idle".to_string(),
-            zero_download_status: "100% Built-In Sovereign Replacement (No external downloads required)".to_string(),
+            zero_download_status:
+                "100% Built-In Sovereign Replacement (No external downloads required)".to_string(),
             v3_advancements: vec![
                 "Sequential piece downloading for instant video streaming preview".to_string(),
                 "IP filtering & blocklist auto-update manager".to_string(),
@@ -792,7 +798,8 @@ impl SovereignMatrixIrcMessengerV3PrEngine {
     pub fn generate_proposal(&self) -> SovereignAppV3PrProposalManifest {
         SovereignAppV3PrProposalManifest {
             pr_id: 243,
-            pr_title: "feat(chat_v3): Sovereign Messenger V3 with Matrix Megolm E2EE & IRCv3 SASL".to_string(),
+            pr_title: "feat(chat_v3): Sovereign Messenger V3 with Matrix Megolm E2EE & IRCv3 SASL"
+                .to_string(),
             target_app_category: "IRC & Matrix Chat Clients".to_string(),
             replaced_applications: vec![
                 "HexChat".to_string(),
@@ -811,8 +818,10 @@ impl SovereignMatrixIrcMessengerV3PrEngine {
                 "Unified Multi-Protocol Message Router & Search Index".to_string(),
                 "Markdown & Inline Media Preview Generator".to_string(),
             ],
-            performance_advantage: "Loads 100 rooms instantly; 18MB RAM vs 300MB+ for Electron Element".to_string(),
-            zero_download_status: "100% Built-In Sovereign Replacement (No external downloads required)".to_string(),
+            performance_advantage:
+                "Loads 100 rooms instantly; 18MB RAM vs 300MB+ for Electron Element".to_string(),
+            zero_download_status:
+                "100% Built-In Sovereign Replacement (No external downloads required)".to_string(),
             v3_advancements: vec![
                 "Cryptographic key backup and cross-signing verification".to_string(),
                 "Notification daemon integration with silent notification filters".to_string(),

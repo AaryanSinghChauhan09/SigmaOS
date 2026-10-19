@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Search result
 #[derive(Debug, Clone)]
@@ -192,7 +192,11 @@ mod tests {
 
     #[test]
     fn test_search_index_creation() {
-        let index = SearchIndex::new("index-1".to_string(), "Home".to_string(), "/home".to_string());
+        let index = SearchIndex::new(
+            "index-1".to_string(),
+            "Home".to_string(),
+            "/home".to_string(),
+        );
         assert_eq!(index.id, "index-1");
         assert_eq!(index.name, "Home");
         assert_eq!(index.path, "/home");
@@ -200,9 +204,13 @@ mod tests {
 
     #[test]
     fn test_search_index_builder() {
-        let index = SearchIndex::new("index-1".to_string(), "Home".to_string(), "/home".to_string())
-            .with_indexed_files(1000)
-            .with_last_updated(1234567890);
+        let index = SearchIndex::new(
+            "index-1".to_string(),
+            "Home".to_string(),
+            "/home".to_string(),
+        )
+        .with_indexed_files(1000)
+        .with_last_updated(1234567890);
         assert_eq!(index.indexed_files, 1000);
         assert_eq!(index.last_updated, 1234567890);
     }
@@ -233,9 +241,15 @@ mod tests {
     #[test]
     fn test_clear_results() {
         let mut manager = SigmaSearch::new();
-        manager.add_result(SearchResult::new("/home/user/file1.txt".to_string(), "file1.txt".to_string()));
-        manager.add_result(SearchResult::new("/home/user/file2.txt".to_string(), "file2.txt".to_string()));
-        
+        manager.add_result(SearchResult::new(
+            "/home/user/file1.txt".to_string(),
+            "file1.txt".to_string(),
+        ));
+        manager.add_result(SearchResult::new(
+            "/home/user/file2.txt".to_string(),
+            "file2.txt".to_string(),
+        ));
+
         manager.clear_results();
         assert_eq!(manager.result_count(), 0);
     }
@@ -246,7 +260,10 @@ mod tests {
         let id1 = manager.add_index("Home".to_string(), "/home".to_string());
         let id2 = manager.add_index("Documents".to_string(), "/home/user/Documents".to_string());
 
-        manager.get_index_mut(&id1).unwrap().with_indexed_files(1000);
+        manager
+            .get_index_mut(&id1)
+            .unwrap()
+            .with_indexed_files(1000);
         manager.get_index_mut(&id2).unwrap().with_indexed_files(500);
 
         assert_eq!(manager.total_indexed_files(), 1500);

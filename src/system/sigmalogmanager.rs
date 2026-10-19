@@ -345,9 +345,21 @@ mod tests {
     #[test]
     fn test_list_logs_by_level() {
         let mut manager = SigmaLogManager::new();
-        manager.log(LogLevel::Info, LogSource::System, "Info message".to_string());
-        manager.log(LogLevel::Error, LogSource::Kernel, "Error message".to_string());
-        manager.log(LogLevel::Warning, LogSource::System, "Warning message".to_string());
+        manager.log(
+            LogLevel::Info,
+            LogSource::System,
+            "Info message".to_string(),
+        );
+        manager.log(
+            LogLevel::Error,
+            LogSource::Kernel,
+            "Error message".to_string(),
+        );
+        manager.log(
+            LogLevel::Warning,
+            LogSource::System,
+            "Warning message".to_string(),
+        );
 
         let error_logs = manager.list_logs_by_level(LogLevel::Error);
         assert_eq!(error_logs.len(), 1);
@@ -356,9 +368,21 @@ mod tests {
     #[test]
     fn test_list_logs_by_source() {
         let mut manager = SigmaLogManager::new();
-        manager.log(LogLevel::Info, LogSource::System, "System message".to_string());
-        manager.log(LogLevel::Error, LogSource::Kernel, "Kernel message".to_string());
-        manager.log(LogLevel::Warning, LogSource::System, "Another system message".to_string());
+        manager.log(
+            LogLevel::Info,
+            LogSource::System,
+            "System message".to_string(),
+        );
+        manager.log(
+            LogLevel::Error,
+            LogSource::Kernel,
+            "Kernel message".to_string(),
+        );
+        manager.log(
+            LogLevel::Warning,
+            LogSource::System,
+            "Another system message".to_string(),
+        );
 
         let system_logs = manager.list_logs_by_source(&LogSource::System);
         assert_eq!(system_logs.len(), 2);
@@ -367,9 +391,19 @@ mod tests {
     #[test]
     fn test_list_logs_by_component() {
         let mut manager = SigmaLogManager::new();
-        let mut entry1 = LogEntry::new(1, LogLevel::Info, LogSource::System, "Message 1".to_string());
+        let mut entry1 = LogEntry::new(
+            1,
+            LogLevel::Info,
+            LogSource::System,
+            "Message 1".to_string(),
+        );
         entry1.component = "ComponentA".to_string();
-        let mut entry2 = LogEntry::new(2, LogLevel::Error, LogSource::Kernel, "Message 2".to_string());
+        let mut entry2 = LogEntry::new(
+            2,
+            LogLevel::Error,
+            LogSource::Kernel,
+            "Message 2".to_string(),
+        );
         entry2.component = "ComponentB".to_string();
         manager.logs.insert(1, entry1);
         manager.logs.insert(2, entry2);
@@ -381,9 +415,21 @@ mod tests {
     #[test]
     fn test_list_logs_with_level_min() {
         let mut manager = SigmaLogManager::new();
-        manager.log(LogLevel::Debug, LogSource::System, "Debug message".to_string());
-        manager.log(LogLevel::Info, LogSource::System, "Info message".to_string());
-        manager.log(LogLevel::Error, LogSource::Kernel, "Error message".to_string());
+        manager.log(
+            LogLevel::Debug,
+            LogSource::System,
+            "Debug message".to_string(),
+        );
+        manager.log(
+            LogLevel::Info,
+            LogSource::System,
+            "Info message".to_string(),
+        );
+        manager.log(
+            LogLevel::Error,
+            LogSource::Kernel,
+            "Error message".to_string(),
+        );
 
         let min_info_logs = manager.list_logs_with_level_min(LogLevel::Info);
         assert_eq!(min_info_logs.len(), 2);
@@ -433,9 +479,21 @@ mod tests {
     #[test]
     fn test_search_logs() {
         let mut manager = SigmaLogManager::new();
-        manager.log(LogLevel::Info, LogSource::System, "Error occurred".to_string());
-        manager.log(LogLevel::Error, LogSource::Kernel, "Warning message".to_string());
-        manager.log(LogLevel::Warning, LogSource::System, "Another error".to_string());
+        manager.log(
+            LogLevel::Info,
+            LogSource::System,
+            "Error occurred".to_string(),
+        );
+        manager.log(
+            LogLevel::Error,
+            LogSource::Kernel,
+            "Warning message".to_string(),
+        );
+        manager.log(
+            LogLevel::Warning,
+            LogSource::System,
+            "Another error".to_string(),
+        );
 
         let results = manager.search_logs("error");
         assert_eq!(results.len(), 2);

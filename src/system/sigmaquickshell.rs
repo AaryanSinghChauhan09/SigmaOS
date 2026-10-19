@@ -44,12 +44,7 @@ pub struct ShellModule {
 
 impl ShellModule {
     /// Create a new shell module
-    pub fn new(
-        module_id: String,
-        name: String,
-        module_type: ModuleType,
-        content: String,
-    ) -> Self {
+    pub fn new(module_id: String, name: String, module_type: ModuleType, content: String) -> Self {
         Self {
             module_id,
             name,
@@ -183,10 +178,7 @@ impl SigmaQuickshell {
 
     /// List enabled modules
     pub fn list_enabled_modules(&self) -> Vec<&ShellModule> {
-        self.modules
-            .values()
-            .filter(|m| m.is_enabled())
-            .collect()
+        self.modules.values().filter(|m| m.is_enabled()).collect()
     }
 
     /// Enable a module
@@ -259,7 +251,7 @@ impl SigmaQuickshell {
     pub fn generate_config(&self, config_id: &str) -> Option<String> {
         if let Some(config) = self.configs.get(config_id) {
             let mut output = String::new();
-            
+
             for module_id in &config.modules {
                 if let Some(module) = self.modules.get(module_id) {
                     if module.is_enabled() {
@@ -268,7 +260,7 @@ impl SigmaQuickshell {
                     }
                 }
             }
-            
+
             Some(output)
         } else {
             None
@@ -302,7 +294,7 @@ impl Default for SigmaQuickshell {
 }
 
 /// Global SigmaQuickshell instance (placeholder for actual global state)
-static unsafe mutable SIGMAQUICKSHELL_INSTANCE: Option<SigmaQuickshell> = None;
+static mut SIGMAQUICKSHELL_INSTANCE: Option<SigmaQuickshell> = None;
 
 /// Initialize the global SigmaQuickshell instance
 pub fn init_sigmaquickshell() {
@@ -313,16 +305,12 @@ pub fn init_sigmaquickshell() {
 
 /// Get the global SigmaQuickshell instance
 pub fn get_sigmaquickshell() -> Option<&'static SigmaQuickshell> {
-    unsafe {
-        SIGMAQUICKSHELL_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAQUICKSHELL_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaQuickshell instance
 pub fn get_sigmaquickshell_mut() -> Option<&'static mut SigmaQuickshell> {
-    unsafe {
-        SIGMAQUICKSHELL_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAQUICKSHELL_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a module

@@ -216,7 +216,10 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
                 || (w[1] == b'1' && (w[2] == b'b' || w[2] == b'B'))
                 || (w[1] == b'7' && (w[2] == b'f' || w[2] == b'F')))
     }) {
-        if url.windows(3).any(|w| w[0] == b'%' && w[1] == b'0' && w[2] == b'0') {
+        if url
+            .windows(3)
+            .any(|w| w[0] == b'%' && w[1] == b'0' && w[2] == b'0')
+        {
             return Err(ValidationError::NullByte);
         }
         return Err(ValidationError::InvalidChars);

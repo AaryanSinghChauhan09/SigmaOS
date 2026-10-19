@@ -169,7 +169,10 @@ impl SigmaScanner {
     }
 
     pub fn list_jobs_by_scanner(&self, scanner_id: &str) -> Vec<&ScanJob> {
-        self.jobs.values().filter(|j| j.scanner_id == scanner_id).collect()
+        self.jobs
+            .values()
+            .filter(|j| j.scanner_id == scanner_id)
+            .collect()
     }
 
     pub fn remove_job(&mut self, id: &str) -> bool {
@@ -226,7 +229,11 @@ mod tests {
 
     #[test]
     fn test_scanner_creation() {
-        let scanner = Scanner::new("scanner-1".to_string(), "Epson Perfection".to_string(), "/dev/usb/scanner".to_string());
+        let scanner = Scanner::new(
+            "scanner-1".to_string(),
+            "Epson Perfection".to_string(),
+            "/dev/usb/scanner".to_string(),
+        );
         assert_eq!(scanner.id, "scanner-1");
         assert_eq!(scanner.name, "Epson Perfection");
         assert_eq!(scanner.state, ScannerState::Idle);
@@ -234,7 +241,11 @@ mod tests {
 
     #[test]
     fn test_scanner_state() {
-        let mut scanner = Scanner::new("scanner-1".to_string(), "Epson".to_string(), "/dev/usb/scanner".to_string());
+        let mut scanner = Scanner::new(
+            "scanner-1".to_string(),
+            "Epson".to_string(),
+            "/dev/usb/scanner".to_string(),
+        );
         assert_eq!(scanner.state, ScannerState::Idle);
 
         scanner.scan();
@@ -272,7 +283,10 @@ mod tests {
     #[test]
     fn test_add_scanner() {
         let mut manager = SigmaScanner::new();
-        let id = manager.add_scanner("Epson Perfection".to_string(), "/dev/usb/scanner".to_string());
+        let id = manager.add_scanner(
+            "Epson Perfection".to_string(),
+            "/dev/usb/scanner".to_string(),
+        );
         assert_eq!(id, "scanner-1");
         assert_eq!(manager.scanner_count(), 1);
     }

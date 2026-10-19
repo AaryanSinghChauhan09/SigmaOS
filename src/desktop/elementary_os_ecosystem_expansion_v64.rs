@@ -68,11 +68,19 @@ impl ElementaryFeedbackEngine {
         self.telemetry_opt_in = enabled;
     }
 
-    pub fn submit_crash_report(&mut self, proc_name: &str, reason: &str, raw_logs: &[&str]) -> String {
+    pub fn submit_crash_report(
+        &mut self,
+        proc_name: &str,
+        reason: &str,
+        raw_logs: &[&str],
+    ) -> String {
         let report_id = format!("CRASH-{}-{}", proc_name, self.reports.len() + 1);
         let sanitized: Vec<String> = raw_logs
             .iter()
-            .map(|l| l.replace("user_password", "[REDACTED]").replace("secret", "[REDACTED]"))
+            .map(|l| {
+                l.replace("user_password", "[REDACTED]")
+                    .replace("secret", "[REDACTED]")
+            })
             .collect();
 
         let report = CrashReport {
@@ -131,7 +139,11 @@ impl ElementaryCaptivePortalEngine {
         }
     }
 
-    pub fn probe_connectivity(&mut self, http_response_code: u16, redirect_target: Option<&str>) -> CaptiveState {
+    pub fn probe_connectivity(
+        &mut self,
+        http_response_code: u16,
+        redirect_target: Option<&str>,
+    ) -> CaptiveState {
         self.state = match (http_response_code, redirect_target) {
             (204, _) => CaptiveState::Online,
             (200, Some(url)) | (302, Some(url)) => CaptiveState::CaptiveDetected(url.to_string()),
@@ -348,11 +360,17 @@ impl ElementaryPrintAppletEngine {
     }
 
     pub fn process_next_job(&mut self) -> Option<&PrintJob> {
-        if let Some(job) = self.jobs.iter_mut().find(|j| j.status == PrintJobStatus::Queued) {
+        if let Some(job) = self
+            .jobs
+            .iter_mut()
+            .find(|j| j.status == PrintJobStatus::Queued)
+        {
             job.status = PrintJobStatus::Printing;
             self.ink_level_percent = self.ink_level_percent.saturating_sub(1);
         }
-        self.jobs.iter().find(|j| j.status == PrintJobStatus::Printing)
+        self.jobs
+            .iter()
+            .find(|j| j.status == PrintJobStatus::Printing)
     }
 
     pub fn generate_pr_spec(&self) -> ElementaryEcosystemV64PrSpec {
@@ -423,13 +441,25 @@ mod tests {
         let mut suite = ElementaryOsEcosystemExpansionV64Suite::new();
 
         // 1. Feedback Engine
-        let report_id = suite.feedback.submit_crash_report("gala", "SIGSEGV", &["user_password = secret123", "normal log entry"]);
+        let report_id = suite.feedback.submit_crash_report(
+            "gala",
+            "SIGSEGV",
+            &["user_password = secret123", "normal log entry"],
+        );
         assert!(report_id.contains("gala"));
-        assert_eq!(suite.feedback.reports[0].sanitized_logs[0], "[REDACTED] = [REDACTED]123");
+        assert_eq!(
+            suite.feedback.reports[0].sanitized_logs[0],
+            "[REDACTED] = [REDACTED]123"
+        );
 
         // 2. Captive Portal
-        let state = suite.captive_portal.probe_connectivity(302, Some("http://hotel-wifi.com/login"));
-        assert_eq!(state, CaptiveState::CaptiveDetected("http://hotel-wifi.com/login".to_string()));
+        let state = suite
+            .captive_portal
+            .probe_connectivity(302, Some("http://hotel-wifi.com/login"));
+        assert_eq!(
+            state,
+            CaptiveState::CaptiveDetected("http://hotel-wifi.com/login".to_string())
+        );
 
         // 3. Wallpaper Engine
         let wp = suite.wallpaper.update_solar_time(14); // 2 PM (Day)

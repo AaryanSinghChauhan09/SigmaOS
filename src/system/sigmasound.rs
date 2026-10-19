@@ -120,7 +120,10 @@ impl SigmaSound {
     }
 
     pub fn list_devices_by_type(&self, device_type: AudioDeviceType) -> Vec<&AudioDevice> {
-        self.devices.values().filter(|d| d.device_type == device_type).collect()
+        self.devices
+            .values()
+            .filter(|d| d.device_type == device_type)
+            .collect()
     }
 
     pub fn remove_device(&mut self, id: &str) -> bool {
@@ -189,7 +192,11 @@ mod tests {
 
     #[test]
     fn test_audio_device_creation() {
-        let device = AudioDevice::new("device-1".to_string(), "Speakers".to_string(), AudioDeviceType::Sink);
+        let device = AudioDevice::new(
+            "device-1".to_string(),
+            "Speakers".to_string(),
+            AudioDeviceType::Sink,
+        );
         assert_eq!(device.id, "device-1");
         assert_eq!(device.name, "Speakers");
         assert_eq!(device.device_type, AudioDeviceType::Sink);
@@ -198,7 +205,11 @@ mod tests {
 
     #[test]
     fn test_audio_device_volume() {
-        let mut device = AudioDevice::new("device-1".to_string(), "Speakers".to_string(), AudioDeviceType::Sink);
+        let mut device = AudioDevice::new(
+            "device-1".to_string(),
+            "Speakers".to_string(),
+            AudioDeviceType::Sink,
+        );
         device.set_volume(80);
         assert_eq!(device.volume, 80);
 
@@ -208,7 +219,11 @@ mod tests {
 
     #[test]
     fn test_audio_device_mute() {
-        let mut device = AudioDevice::new("device-1".to_string(), "Speakers".to_string(), AudioDeviceType::Sink);
+        let mut device = AudioDevice::new(
+            "device-1".to_string(),
+            "Speakers".to_string(),
+            AudioDeviceType::Sink,
+        );
         assert!(!device.muted);
 
         device.mute();
@@ -220,7 +235,11 @@ mod tests {
 
     #[test]
     fn test_audio_device_state() {
-        let mut device = AudioDevice::new("device-1".to_string(), "Speakers".to_string(), AudioDeviceType::Sink);
+        let mut device = AudioDevice::new(
+            "device-1".to_string(),
+            "Speakers".to_string(),
+            AudioDeviceType::Sink,
+        );
         assert_eq!(device.state, AudioDeviceState::Idle);
 
         device.run();

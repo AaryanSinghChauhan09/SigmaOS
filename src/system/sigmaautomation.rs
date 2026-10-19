@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Task automation
 #[derive(Debug, Clone)]
@@ -154,7 +154,11 @@ mod tests {
 
     #[test]
     fn test_automation_task_creation() {
-        let task = AutomationTask::new("task-1".to_string(), "Backup".to_string(), "rsync -av /home /backup".to_string());
+        let task = AutomationTask::new(
+            "task-1".to_string(),
+            "Backup".to_string(),
+            "rsync -av /home /backup".to_string(),
+        );
         assert_eq!(task.id, "task-1");
         assert_eq!(task.name, "Backup");
         assert!(task.enabled);
@@ -162,7 +166,11 @@ mod tests {
 
     #[test]
     fn test_automation_task_enable_disable() {
-        let mut task = AutomationTask::new("task-1".to_string(), "Backup".to_string(), "rsync".to_string());
+        let mut task = AutomationTask::new(
+            "task-1".to_string(),
+            "Backup".to_string(),
+            "rsync".to_string(),
+        );
         task.disable();
         assert!(!task.enabled);
 
@@ -172,7 +180,11 @@ mod tests {
 
     #[test]
     fn test_automation_task_run_count() {
-        let mut task = AutomationTask::new("task-1".to_string(), "Backup".to_string(), "rsync".to_string());
+        let mut task = AutomationTask::new(
+            "task-1".to_string(),
+            "Backup".to_string(),
+            "rsync".to_string(),
+        );
         task.increment_run_count();
         task.increment_run_count();
         assert_eq!(task.run_count, 2);

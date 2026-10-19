@@ -109,7 +109,10 @@ impl InstallConfig {
 
     /// Check if installation is active
     pub fn is_active(&self) -> bool {
-        matches!(self.state, InstallState::Language | InstallState::Partitioning | InstallState::Installation)
+        matches!(
+            self.state,
+            InstallState::Language | InstallState::Partitioning | InstallState::Installation
+        )
     }
 }
 
@@ -162,10 +165,7 @@ impl SigmaInstaller {
 
     /// List active installations
     pub fn list_active(&self) -> Vec<&InstallConfig> {
-        self.configs
-            .values()
-            .filter(|c| c.is_active())
-            .collect()
+        self.configs.values().filter(|c| c.is_active()).collect()
     }
 
     /// Start installation
@@ -254,7 +254,7 @@ impl Default for SigmaInstaller {
 }
 
 /// Global SigmaInstaller instance (placeholder for actual global state)
-static unsafe mutable SIGMAINSTALLER_INSTANCE: Option<SigmaInstaller> = None;
+static mut SIGMAINSTALLER_INSTANCE: Option<SigmaInstaller> = None;
 
 /// Initialize the global SigmaInstaller instance
 pub fn init_sigmainstaller() {
@@ -265,16 +265,12 @@ pub fn init_sigmainstaller() {
 
 /// Get the global SigmaInstaller instance
 pub fn get_sigmainstaller() -> Option<&'static SigmaInstaller> {
-    unsafe {
-        SIGMAINSTALLER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAINSTALLER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaInstaller instance
 pub fn get_sigmainstaller_mut() -> Option<&'static mut SigmaInstaller> {
-    unsafe {
-        SIGMAINSTALLER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAINSTALLER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to create a configuration
@@ -356,7 +352,7 @@ mod tests {
 
         installer.create_config(config);
         installer.start_installation("install1");
-        
+
         let advanced = installer.advance_step("install1");
         assert!(advanced);
 

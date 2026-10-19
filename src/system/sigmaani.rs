@@ -53,11 +53,7 @@ pub struct Keyframe {
 
 impl Keyframe {
     pub fn new(time: u64, value: f32, tween: TweenType) -> Self {
-        Self {
-            time,
-            value,
-            tween,
-        }
+        Self { time, value, tween }
     }
 }
 
@@ -97,7 +93,8 @@ impl AnimationTrack {
             return self.keyframes.last().map(|k| k.value);
         }
 
-        let (prev, next) = self.keyframes
+        let (prev, next) = self
+            .keyframes
             .windows(2)
             .find(|w| time >= w[0].time && time < w[1].time)?;
 
@@ -106,11 +103,13 @@ impl AnimationTrack {
             TweenType::Linear => t,
             TweenType::EaseIn => t * t,
             TweenType::EaseOut => 1.0 - (1.0 - t) * (1.0 - t),
-            TweenType::EaseInOut => if t < 0.5 {
-                2.0 * t * t
-            } else {
-                1.0 - 2.0 * (1.0 - t) * (1.0 - t)
-            },
+            TweenType::EaseInOut => {
+                if t < 0.5 {
+                    2.0 * t * t
+                } else {
+                    1.0 - 2.0 * (1.0 - t) * (1.0 - t)
+                }
+            }
             TweenType::Bounce => {
                 let n1 = 7.5625;
                 let d1 = 2.75;
@@ -126,7 +125,7 @@ impl AnimationTrack {
                     let t = t - 2.625 / d1;
                     n1 * t * t + 0.984375
                 }
-            },
+            }
             TweenType::Elastic => {
                 let c4 = (2.0 * core::f32::consts::PI) / 3.0;
                 if t == 0.0 {
@@ -136,7 +135,7 @@ impl AnimationTrack {
                 } else {
                     -(2.0_f32).powf(10.0 * t - 10.0) * ((t * 10.0 - 10.75) * c4).sin()
                 }
-            },
+            }
         };
 
         Some(prev.value + (next.value - prev.value) * eased)
@@ -188,10 +187,7 @@ impl Animation {
             return;
         }
 
-        let max_duration = self.tracks.values()
-            .map(|t| t.duration)
-            .max()
-            .unwrap_or(0);
+        let max_duration = self.tracks.values().map(|t| t.duration).max().unwrap_or(0);
 
         self.current_time += delta_time;
 
@@ -210,10 +206,7 @@ impl Animation {
     }
 
     pub fn get_duration(&self) -> u64 {
-        self.tracks.values()
-            .map(|t| t.duration)
-            .max()
-            .unwrap_or(0)
+        self.tracks.values().map(|t| t.duration).max().unwrap_or(0)
     }
 }
 
@@ -258,12 +251,14 @@ impl SigmaAni {
     }
 
     pub fn get_current_animation(&self) -> Option<&Animation> {
-        self.current_animation.as_ref()
+        self.current_animation
+            .as_ref()
             .and_then(|id| self.animations.get(id))
     }
 
     pub fn get_current_animation_mut(&mut self) -> Option<&mut Animation> {
-        self.current_animation.as_ref()
+        self.current_animation
+            .as_ref()
             .and_then(|id| self.animations.get_mut(id.as_str()))
     }
 
@@ -327,16 +322,12 @@ pub fn init_sigmaani() {
 
 /// Get the global SigmaAni instance
 pub fn get_sigmaani() -> Option<&'static SigmaAni> {
-    unsafe {
-        SIGMAANI_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAANI_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaAni instance (mutable)
 pub fn get_sigmaani_mut() -> Option<&'static mut SigmaAni> {
-    unsafe {
-        SIGMAANI_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAANI_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an animation
@@ -374,7 +365,7 @@ mod tests {
         let mut track = AnimationTrack::new("track1".to_string(), TrackType::Position);
         track.add_keyframe(Keyframe::new(0, 0.0, TweenType::Linear));
         track.add_keyframe(Keyframe::new(100, 1.0, TweenType::Linear));
-        
+
         let value = track.evaluate(50);
         assert!(value.is_some());
         assert!((value.unwrap() - 0.5).abs() < 0.01);
@@ -393,10 +384,10 @@ mod tests {
         let mut animation = Animation::new("anim1".to_string(), "Test".to_string());
         animation.play();
         assert_eq!(animation.state, AnimationState::Playing);
-        
+
         animation.pause();
         assert_eq!(animation.state, AnimationState::Paused);
-        
+
         animation.stop();
         assert_eq!(animation.state, AnimationState::Stopped);
         assert_eq!(animation.current_time, 0);
@@ -430,7 +421,7 @@ mod tests {
         let mut track = AnimationTrack::new("track1".to_string(), TrackType::Position);
         track.add_keyframe(Keyframe::new(0, 0.0, TweenType::EaseIn));
         track.add_keyframe(Keyframe::new(100, 1.0, TweenType::EaseIn));
-        
+
         let value = track.evaluate(50);
         assert!(value.is_some());
     }

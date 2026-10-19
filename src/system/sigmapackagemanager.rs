@@ -95,12 +95,7 @@ pub struct Repository {
 
 impl Repository {
     /// Create a new repository
-    pub fn new(
-        repo_id: String,
-        name: String,
-        url: String,
-        format: PackageFormat,
-    ) -> Self {
+    pub fn new(repo_id: String, name: String, url: String, format: PackageFormat) -> Self {
         Self {
             repo_id,
             name,
@@ -198,10 +193,7 @@ impl SigmaPackageManager {
 
     /// List packages with updates
     pub fn list_updatable_packages(&self) -> Vec<&Package> {
-        self.packages
-            .values()
-            .filter(|p| p.has_update())
-            .collect()
+        self.packages.values().filter(|p| p.has_update()).collect()
     }
 
     /// Install a package
@@ -294,7 +286,7 @@ impl Default for SigmaPackageManager {
 }
 
 /// Global SigmaPackageManager instance (placeholder for actual global state)
-static unsafe mutable SIGMAPACKAGEMANAGER_INSTANCE: Option<SigmaPackageManager> = None;
+static mut SIGMAPACKAGEMANAGER_INSTANCE: Option<SigmaPackageManager> = None;
 
 /// Initialize the global SigmaPackageManager instance
 pub fn init_sigmapackagemanager() {
@@ -305,16 +297,12 @@ pub fn init_sigmapackagemanager() {
 
 /// Get the global SigmaPackageManager instance
 pub fn get_sigmapackagemanager() -> Option<&'static SigmaPackageManager> {
-    unsafe {
-        SIGMAPACKAGEMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPACKAGEMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaPackageManager instance
 pub fn get_sigmapackagemanager_mut() -> Option<&'static mut SigmaPackageManager> {
-    unsafe {
-        SIGMAPACKAGEMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPACKAGEMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a package

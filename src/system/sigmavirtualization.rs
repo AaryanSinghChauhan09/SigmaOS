@@ -150,7 +150,12 @@ pub struct VirtualMachine {
 }
 
 impl VirtualMachine {
-    pub fn new(id: String, name: String, architecture: Architecture, resources: VMResources) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        architecture: Architecture,
+        resources: VMResources,
+    ) -> Self {
         Self {
             id,
             name,

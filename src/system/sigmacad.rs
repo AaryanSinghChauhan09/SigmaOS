@@ -99,10 +99,10 @@ impl Entity {
         match self.entity_type {
             EntityType::Line if self.points.len() >= 2 => {
                 Some(self.points[0].distance_to(&self.points[1]))
-            },
+            }
             EntityType::Circle if !self.parameters.is_empty() => {
                 Some(self.parameters[0]) // radius
-            },
+            }
             _ => None,
         }
     }
@@ -143,7 +143,13 @@ pub struct Dimension {
 }
 
 impl Dimension {
-    pub fn new(id: String, dimension_type: DimensionType, entity_id: String, value: f64, position: Point3D) -> Self {
+    pub fn new(
+        id: String,
+        dimension_type: DimensionType,
+        entity_id: String,
+        value: f64,
+        position: Point3D,
+    ) -> Self {
         Self {
             id,
             dimension_type,
@@ -258,12 +264,14 @@ impl Drawing {
     }
 
     pub fn get_active_layer(&self) -> Option<&DrawingLayer> {
-        self.active_layer.as_ref()
+        self.active_layer
+            .as_ref()
             .and_then(|id| self.layers.get(id))
     }
 
     pub fn get_active_layer_mut(&mut self) -> Option<&mut DrawingLayer> {
-        self.active_layer.as_ref()
+        self.active_layer
+            .as_ref()
             .and_then(|id| self.layers.get_mut(id.as_str()))
     }
 
@@ -344,12 +352,14 @@ impl SigmaCAD {
     }
 
     pub fn get_current_drawing(&self) -> Option<&Drawing> {
-        self.current_drawing.as_ref()
+        self.current_drawing
+            .as_ref()
             .and_then(|id| self.drawings.get(id))
     }
 
     pub fn get_current_drawing_mut(&mut self) -> Option<&mut Drawing> {
-        self.current_drawing.as_ref()
+        self.current_drawing
+            .as_ref()
             .and_then(|id| self.drawings.get_mut(id.as_str()))
     }
 
@@ -380,16 +390,12 @@ pub fn init_sigmacad() {
 
 /// Get the global SigmaCAD instance
 pub fn get_sigmacad() -> Option<&'static SigmaCAD> {
-    unsafe {
-        SIGMACAD_INSTANCE.as_ref()
-    }
+    unsafe { SIGMACAD_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaCAD instance (mutable)
 pub fn get_sigmacad_mut() -> Option<&'static mut SigmaCAD> {
-    unsafe {
-        SIGMACAD_INSTANCE.as_mut()
-    }
+    unsafe { SIGMACAD_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a drawing
@@ -483,14 +489,19 @@ mod tests {
 
     #[test]
     fn test_drawing_creation() {
-        let drawing = Drawing::new("drawing1".to_string(), "Test Drawing".to_string(), "mm".to_string());
+        let drawing = Drawing::new(
+            "drawing1".to_string(),
+            "Test Drawing".to_string(),
+            "mm".to_string(),
+        );
         assert_eq!(drawing.id, "drawing1");
         assert_eq!(drawing.units, "mm");
     }
 
     #[test]
     fn test_drawing_layer_management() {
-        let mut drawing = Drawing::new("drawing1".to_string(), "Test".to_string(), "mm".to_string());
+        let mut drawing =
+            Drawing::new("drawing1".to_string(), "Test".to_string(), "mm".to_string());
         let layer = DrawingLayer::new("layer1".to_string(), "Layer 1".to_string());
         drawing.add_layer(layer);
         assert_eq!(drawing.total_entity_count(), 0);

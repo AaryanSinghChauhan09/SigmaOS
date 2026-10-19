@@ -301,7 +301,10 @@ impl UniversalPackageStrategyV65 for RpmPackageStrategyV65 {
         PackageFormat::Rpm
     }
     fn execute_stage(&self, stage: &str) -> Result<String, String> {
-        Ok(alloc::format!("RPM Stage '{}' executed via librpm V65", stage))
+        Ok(alloc::format!(
+            "RPM Stage '{}' executed via librpm V65",
+            stage
+        ))
     }
 }
 

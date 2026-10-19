@@ -138,10 +138,7 @@ impl SigmaSnap {
 
     /// List installed Snaps
     pub fn list_installed_snaps(&self) -> Vec<&Snap> {
-        self.snaps
-            .values()
-            .filter(|s| s.is_installed())
-            .collect()
+        self.snaps.values().filter(|s| s.is_installed()).collect()
     }
 
     /// Install a Snap
@@ -177,7 +174,7 @@ impl Default for SigmaSnap {
 }
 
 /// Global SigmaSnap instance
-static unsafe mutable SIGMASNAP_INSTANCE: Option<SigmaSnap> = None;
+static mut SIGMASNAP_INSTANCE: Option<SigmaSnap> = None;
 
 /// Initialize the global SigmaSnap instance
 pub fn init_sigmasnap() {
@@ -188,16 +185,12 @@ pub fn init_sigmasnap() {
 
 /// Get the global SigmaSnap instance
 pub fn get_sigmasnap() -> Option<&'static SigmaSnap> {
-    unsafe {
-        SIGMASNAP_INSTANCE.as_ref()
-    }
+    unsafe { SIGMASNAP_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaSnap instance
 pub fn get_sigmasnap_mut() -> Option<&'static mut SigmaSnap> {
-    unsafe {
-        SIGMASNAP_INSTANCE.as_mut()
-    }
+    unsafe { SIGMASNAP_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a Snap

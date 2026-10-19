@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Render state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -170,19 +170,11 @@ pub fn init_sigma3d() {
 }
 
 pub fn get_sigma3d() -> &'static Sigma3D {
-    unsafe {
-        SIGMA3D_INSTANCE
-            .as_ref()
-            .expect("Sigma3D not initialized")
-    }
+    unsafe { SIGMA3D_INSTANCE.as_ref().expect("Sigma3D not initialized") }
 }
 
 pub fn get_sigma3d_mut() -> &'static mut Sigma3D {
-    unsafe {
-        SIGMA3D_INSTANCE
-            .as_mut()
-            .expect("Sigma3D not initialized")
-    }
+    unsafe { SIGMA3D_INSTANCE.as_mut().expect("Sigma3D not initialized") }
 }
 
 pub fn add_model(name: String, format: String) -> String {

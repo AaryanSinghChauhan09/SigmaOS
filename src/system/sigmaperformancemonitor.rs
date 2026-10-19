@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Performance metric
 #[derive(Debug, Clone)]
@@ -118,8 +118,14 @@ impl SigmaPerformanceMonitor {
         self.profiles.values().collect()
     }
 
-    pub fn list_profiles_by_category(&self, category: PerformanceCategory) -> Vec<&PerformanceProfile> {
-        self.profiles.values().filter(|p| p.category == category).collect()
+    pub fn list_profiles_by_category(
+        &self,
+        category: PerformanceCategory,
+    ) -> Vec<&PerformanceProfile> {
+        self.profiles
+            .values()
+            .filter(|p| p.category == category)
+            .collect()
     }
 
     pub fn remove_profile(&mut self, id: &str) -> bool {
@@ -131,7 +137,10 @@ impl SigmaPerformanceMonitor {
     }
 
     pub fn total_critical_metrics(&self) -> usize {
-        self.profiles.values().map(|p| p.critical_metric_count()).sum()
+        self.profiles
+            .values()
+            .map(|p| p.critical_metric_count())
+            .sum()
     }
 }
 
@@ -171,29 +180,52 @@ mod tests {
 
     #[test]
     fn test_performance_metric_creation() {
-        let metric = PerformanceMetric::new("metric-1".to_string(), "CPU Usage".to_string(), 75.5, "%".to_string());
+        let metric = PerformanceMetric::new(
+            "metric-1".to_string(),
+            "CPU Usage".to_string(),
+            75.5,
+            "%".to_string(),
+        );
         assert_eq!(metric.name, "CPU Usage");
         assert_eq!(metric.value, 75.5);
     }
 
     #[test]
     fn test_performance_metric_critical() {
-        let metric = PerformanceMetric::new("metric-1".to_string(), "CPU Usage".to_string(), 95.0, "%".to_string())
-            .with_threshold(90.0);
+        let metric = PerformanceMetric::new(
+            "metric-1".to_string(),
+            "CPU Usage".to_string(),
+            95.0,
+            "%".to_string(),
+        )
+        .with_threshold(90.0);
         assert!(metric.is_critical());
     }
 
     #[test]
     fn test_performance_profile_creation() {
-        let profile = PerformanceProfile::new("profile-1".to_string(), "CPU Profile".to_string(), PerformanceCategory::CPU);
+        let profile = PerformanceProfile::new(
+            "profile-1".to_string(),
+            "CPU Profile".to_string(),
+            PerformanceCategory::CPU,
+        );
         assert_eq!(profile.name, "CPU Profile");
         assert_eq!(profile.category, PerformanceCategory::CPU);
     }
 
     #[test]
     fn test_performance_profile_with_metric() {
-        let profile = PerformanceProfile::new("profile-1".to_string(), "CPU Profile".to_string(), PerformanceCategory::CPU)
-            .with_metric(PerformanceMetric::new("metric-1".to_string(), "Usage".to_string(), 75.0, "%".to_string()));
+        let profile = PerformanceProfile::new(
+            "profile-1".to_string(),
+            "CPU Profile".to_string(),
+            PerformanceCategory::CPU,
+        )
+        .with_metric(PerformanceMetric::new(
+            "metric-1".to_string(),
+            "Usage".to_string(),
+            75.0,
+            "%".to_string(),
+        ));
         assert_eq!(profile.metrics.len(), 1);
     }
 
@@ -226,10 +258,16 @@ mod tests {
     fn test_total_critical_metrics() {
         let mut monitor = SigmaPerformanceMonitor::new();
         let id = monitor.add_profile("CPU Profile".to_string(), PerformanceCategory::CPU);
-        
+
         let profile = monitor.get_profile_mut(&id).unwrap();
-        profile.metrics.push(PerformanceMetric::new("m1".to_string(), "Usage".to_string(), 95.0, "%".to_string()).with_threshold(90.0));
-        profile.metrics.push(PerformanceMetric::new("m2".to_string(), "Load".to_string(), 85.0, "%".to_string()).with_threshold(90.0));
+        profile.metrics.push(
+            PerformanceMetric::new("m1".to_string(), "Usage".to_string(), 95.0, "%".to_string())
+                .with_threshold(90.0),
+        );
+        profile.metrics.push(
+            PerformanceMetric::new("m2".to_string(), "Load".to_string(), 85.0, "%".to_string())
+                .with_threshold(90.0),
+        );
 
         assert_eq!(monitor.total_critical_metrics(), 1);
     }

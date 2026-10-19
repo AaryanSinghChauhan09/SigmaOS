@@ -171,7 +171,11 @@ mod tests {
 
     #[test]
     fn test_webcam_creation() {
-        let webcam = Webcam::new("webcam-1".to_string(), "Logitech C920".to_string(), "/dev/video0".to_string());
+        let webcam = Webcam::new(
+            "webcam-1".to_string(),
+            "Logitech C920".to_string(),
+            "/dev/video0".to_string(),
+        );
         assert_eq!(webcam.id, "webcam-1");
         assert_eq!(webcam.name, "Logitech C920");
         assert_eq!(webcam.state, WebcamState::Idle);
@@ -179,7 +183,11 @@ mod tests {
 
     #[test]
     fn test_webcam_state() {
-        let mut webcam = Webcam::new("webcam-1".to_string(), "Logitech".to_string(), "/dev/video0".to_string());
+        let mut webcam = Webcam::new(
+            "webcam-1".to_string(),
+            "Logitech".to_string(),
+            "/dev/video0".to_string(),
+        );
         assert_eq!(webcam.state, WebcamState::Idle);
 
         webcam.start_stream();
@@ -198,17 +206,25 @@ mod tests {
 
     #[test]
     fn test_webcam_with_resolution() {
-        let webcam = Webcam::new("webcam-1".to_string(), "Logitech".to_string(), "/dev/video0".to_string())
-            .with_resolution(Resolution::new(1920, 1080))
-            .with_resolution(Resolution::new(1280, 720));
+        let webcam = Webcam::new(
+            "webcam-1".to_string(),
+            "Logitech".to_string(),
+            "/dev/video0".to_string(),
+        )
+        .with_resolution(Resolution::new(1920, 1080))
+        .with_resolution(Resolution::new(1280, 720));
         assert_eq!(webcam.resolutions.len(), 2);
     }
 
     #[test]
     fn test_webcam_with_format() {
-        let webcam = Webcam::new("webcam-1".to_string(), "Logitech".to_string(), "/dev/video0".to_string())
-            .with_format(FrameFormat::MJPEG)
-            .with_format(FrameFormat::YUYV);
+        let webcam = Webcam::new(
+            "webcam-1".to_string(),
+            "Logitech".to_string(),
+            "/dev/video0".to_string(),
+        )
+        .with_format(FrameFormat::MJPEG)
+        .with_format(FrameFormat::YUYV);
         assert_eq!(webcam.formats.len(), 2);
     }
 

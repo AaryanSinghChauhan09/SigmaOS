@@ -152,7 +152,10 @@ impl SovereignInitSupervisor {
     }
 
     /// Recursively resolve dependencies and start required units before spawning target
-    pub fn start_service_with_dependencies(&mut self, name: &str) -> Result<Vec<u32>, &'static str> {
+    pub fn start_service_with_dependencies(
+        &mut self,
+        name: &str,
+    ) -> Result<Vec<u32>, &'static str> {
         let deps = match self.services.get(name) {
             Some(u) => u.dependencies.clone(),
             None => return Err("Service not found"),
@@ -181,7 +184,11 @@ impl SovereignInitSupervisor {
     }
 
     /// Dynamically update cgroups v2 resource limits for a service unit
-    pub fn update_service_limits(&mut self, name: &str, limits: ServiceResourceLimits) -> Result<(), &'static str> {
+    pub fn update_service_limits(
+        &mut self,
+        name: &str,
+        limits: ServiceResourceLimits,
+    ) -> Result<(), &'static str> {
         let unit = self.services.get_mut(name).ok_or("Service not found")?;
         unit.limits = limits;
         Ok(())
@@ -360,19 +367,35 @@ mod tests {
 
         let pids = supervisor.start_service_with_dependencies("app").unwrap();
         assert_eq!(pids.len(), 2);
-        assert_eq!(supervisor.services.get("db").unwrap().state, ServiceState::Starting);
-        assert_eq!(supervisor.services.get("app").unwrap().state, ServiceState::Starting);
+        assert_eq!(
+            supervisor.services.get("db").unwrap().state,
+            ServiceState::Starting
+        );
+        assert_eq!(
+            supervisor.services.get("app").unwrap().state,
+            ServiceState::Starting
+        );
 
         // Reload app
         supervisor.services.get_mut("app").unwrap().state = ServiceState::Running;
         assert!(supervisor.reload_service("app").is_ok());
-        assert_eq!(supervisor.services.get("app").unwrap().state, ServiceState::Reloading);
+        assert_eq!(
+            supervisor.services.get("app").unwrap().state,
+            ServiceState::Reloading
+        );
 
         // Check watchdog timeout
         supervisor.services.get_mut("app").unwrap().state = ServiceState::Running;
-        supervisor.services.get_mut("app").unwrap().last_watchdog_ping = 100;
+        supervisor
+            .services
+            .get_mut("app")
+            .unwrap()
+            .last_watchdog_ping = 100;
         let timed_out = supervisor.check_watchdog_timeouts(2000);
         assert_eq!(timed_out, vec!["app"]);
-        assert_eq!(supervisor.services.get("app").unwrap().state, ServiceState::Failed);
+        assert_eq!(
+            supervisor.services.get("app").unwrap().state,
+            ServiceState::Failed
+        );
     }
 }

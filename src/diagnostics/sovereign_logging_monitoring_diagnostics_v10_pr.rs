@@ -76,7 +76,7 @@ pub struct SyslogBrokerPipelineV10 {
 pub struct BsdSyslogRuleV10 {
     pub facility_selector: String, // e.g. "auth.info", "*.err", "daemon.*"
     pub action_target: String,     // e.g. "/var/log/auth.log", "@loghost:514", "/dev/console"
-    pub log_flags: Vec<String>,     // "no_sync", "mark"
+    pub log_flags: Vec<String>,    // "no_sync", "mark"
 }
 
 /// Logrotate Lifecycle Policy V10

@@ -253,8 +253,7 @@ mod tests {
 
     #[test]
     fn test_namespace_builder() {
-        let namespace = Namespace::new("ns-1".to_string(), NamespaceType::Mount)
-            .with_inode(12345);
+        let namespace = Namespace::new("ns-1".to_string(), NamespaceType::Mount).with_inode(12345);
 
         assert_eq!(namespace.inode, Some(12345));
     }

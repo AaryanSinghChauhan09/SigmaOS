@@ -198,7 +198,7 @@ impl Default for SigmaServiceManager {
 }
 
 /// Global SigmaServiceManager instance
-static_mut SIGMASERVICEMANAGER_INSTANCE: Option<SigmaServiceManager> = None;
+static mut SIGMASERVICEMANAGER_INSTANCE: Option<SigmaServiceManager> = None;
 
 /// Initialize the global SigmaServiceManager instance
 pub fn init_sigmaservicemanager() {

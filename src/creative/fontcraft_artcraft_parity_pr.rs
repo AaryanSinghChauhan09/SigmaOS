@@ -690,7 +690,8 @@ impl FontcraftFontMetricsBaselineKerningPrEngine {
     pub fn generate_proposal(&self) -> FontcraftArtcraftPrProposalManifest {
         FontcraftArtcraftPrProposalManifest {
             pr_id: 915,
-            pr_title: "feat(fontcraft): Implement Font Metrics Baseline Alignment & Kerning Engine".to_string(),
+            pr_title: "feat(fontcraft): Implement Font Metrics Baseline Alignment & Kerning Engine"
+                .to_string(),
             target_subsystem: "FontCraft Metrics & Kerning Core".to_string(),
             original_suite: "ArtCraft FontCraft Metrics Engine".to_string(),
             components_added: vec![
@@ -741,7 +742,9 @@ impl FontcraftOpenTypeFeatureTagRegistryPrEngine {
     pub fn generate_proposal(&self) -> FontcraftArtcraftPrProposalManifest {
         FontcraftArtcraftPrProposalManifest {
             pr_id: 916,
-            pr_title: "feat(fontcraft): Implement OpenType Feature Tag Registry & Stylistic Set Engine".to_string(),
+            pr_title:
+                "feat(fontcraft): Implement OpenType Feature Tag Registry & Stylistic Set Engine"
+                    .to_string(),
             target_subsystem: "FontCraft Feature Tag Registry".to_string(),
             original_suite: "ArtCraft FontCraft OpenType Registry".to_string(),
             components_added: vec![
@@ -805,7 +808,9 @@ impl FontcraftSdfTextRenderingPipelinePrEngine {
     pub fn generate_proposal(&self) -> FontcraftArtcraftPrProposalManifest {
         FontcraftArtcraftPrProposalManifest {
             pr_id: 917,
-            pr_title: "feat(fontcraft): Implement SDF Text Rendering Shader Pipeline for Wayland UI".to_string(),
+            pr_title:
+                "feat(fontcraft): Implement SDF Text Rendering Shader Pipeline for Wayland UI"
+                    .to_string(),
             target_subsystem: "Wayland UI SDF Shader Pipeline".to_string(),
             original_suite: "ArtCraft FontCraft SDF Shader Studio".to_string(),
             components_added: vec![
@@ -910,7 +915,9 @@ impl FontcraftMasterTypographyThemeCascadePrEngine {
     pub fn generate_proposal(&self) -> FontcraftArtcraftPrProposalManifest {
         FontcraftArtcraftPrProposalManifest {
             pr_id: 919,
-            pr_title: "feat(fontcraft): Implement Master Typography Theme Cascade & Fallback Engine".to_string(),
+            pr_title:
+                "feat(fontcraft): Implement Master Typography Theme Cascade & Fallback Engine"
+                    .to_string(),
             target_subsystem: "FontCraft Typography Theme System".to_string(),
             original_suite: "ArtCraft FontCraft Theme Cascade".to_string(),
             components_added: vec![
@@ -992,7 +999,9 @@ impl SovereignFontcraftArtcraftParityPrGateway {
         let woff2_res = self.woff2_brotli.parse_woff2_header(&dummy_woff2);
         let woff2_ok = woff2_res.is_ok();
 
-        let kern = self.font_metrics.get_kerning_adjustment('A' as u32, 'V' as u32);
+        let kern = self
+            .font_metrics
+            .get_kerning_adjustment('A' as u32, 'V' as u32);
         let kern_ok = kern == -40;
 
         self.opentype_tags.enable_feature_tag("ss02");
@@ -1085,8 +1094,7 @@ impl FontcraftArtcraftParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_fontcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_fontcraft_parity() && self.gateway.collect_all_proposals().len() == 10
     }
 }
 

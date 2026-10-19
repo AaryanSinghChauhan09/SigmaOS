@@ -168,10 +168,7 @@ impl SigmaWallpaper {
 
     /// List favorite wallpapers
     pub fn list_favorite_wallpapers(&self) -> Vec<&Wallpaper> {
-        self.wallpapers
-            .values()
-            .filter(|w| w.is_favorite)
-            .collect()
+        self.wallpapers.values().filter(|w| w.is_favorite).collect()
     }
 
     /// Add a display output
@@ -200,15 +197,15 @@ impl SigmaWallpaper {
     pub fn set_wallpaper_all(&mut self, wallpaper_id: &str) -> bool {
         if let Some(wallpaper) = self.wallpapers.get(wallpaper_id) {
             let path = wallpaper.image_path.clone();
-            
+
             for output in self.outputs.values_mut() {
                 output.set_wallpaper(path.clone());
             }
-            
+
             if let Some(wp) = self.wallpapers.get_mut(wallpaper_id) {
                 wp.set_active(true);
             }
-            
+
             true
         } else {
             false
@@ -220,11 +217,11 @@ impl SigmaWallpaper {
         if let Some(wallpaper) = self.wallpapers.get(wallpaper_id) {
             if let Some(output) = self.outputs.get_mut(output_id) {
                 output.set_wallpaper(wallpaper.image_path.clone());
-                
+
                 if let Some(wp) = self.wallpapers.get_mut(wallpaper_id) {
                     wp.set_active(true);
                 }
-                
+
                 true
             } else {
                 false
@@ -274,7 +271,7 @@ impl Default for SigmaWallpaper {
 }
 
 /// Global SigmaWallpaper instance (placeholder for actual global state)
-static unsafe mutable SIGMAWALLPAPER_INSTANCE: Option<SigmaWallpaper> = None;
+static mut SIGMAWALLPAPER_INSTANCE: Option<SigmaWallpaper> = None;
 
 /// Initialize the global SigmaWallpaper instance
 pub fn init_sigmawallpaper() {
@@ -285,16 +282,12 @@ pub fn init_sigmawallpaper() {
 
 /// Get the global SigmaWallpaper instance
 pub fn get_sigmawallpaper() -> Option<&'static SigmaWallpaper> {
-    unsafe {
-        SIGMAWALLPAPER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAWALLPAPER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaWallpaper instance
 pub fn get_sigmawallpaper_mut() -> Option<&'static mut SigmaWallpaper> {
-    unsafe {
-        SIGMAWALLPAPER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAWALLPAPER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a wallpaper
@@ -349,13 +342,8 @@ mod tests {
 
     #[test]
     fn test_display_output_creation() {
-        let output = DisplayOutput::new(
-            "output1".to_string(),
-            "HDMI-1".to_string(),
-            1920,
-            1080,
-            1.0,
-        );
+        let output =
+            DisplayOutput::new("output1".to_string(), "HDMI-1".to_string(), 1920, 1080, 1.0);
 
         assert_eq!(output.output_id, "output1");
         assert_eq!(output.resolution(), (1920, 1080));
@@ -395,13 +383,8 @@ mod tests {
     #[test]
     fn test_sigmawallpaper_add_output() {
         let mut wallpaper_mgr = SigmaWallpaper::new();
-        let output = DisplayOutput::new(
-            "output1".to_string(),
-            "HDMI-1".to_string(),
-            1920,
-            1080,
-            1.0,
-        );
+        let output =
+            DisplayOutput::new("output1".to_string(), "HDMI-1".to_string(), 1920, 1080, 1.0);
 
         let added = wallpaper_mgr.add_output(output);
         assert!(added);
@@ -526,14 +509,9 @@ mod tests {
         );
 
         add_wallpaper(wallpaper);
-        
-        let output = DisplayOutput::new(
-            "output1".to_string(),
-            "HDMI-1".to_string(),
-            1920,
-            1080,
-            1.0,
-        );
+
+        let output =
+            DisplayOutput::new("output1".to_string(), "HDMI-1".to_string(), 1920, 1080, 1.0);
 
         if let Some(wallpaper_mgr) = get_sigmawallpaper_mut() {
             wallpaper_mgr.add_output(output);

@@ -317,7 +317,10 @@ mod tests {
     fn test_hibernation_method() {
         let mut manager = SigmaHibernation::new();
         manager.set_hibernation_method(HibernationMethod::Shutdown);
-        assert_eq!(manager.get_hibernation_method(), HibernationMethod::Shutdown);
+        assert_eq!(
+            manager.get_hibernation_method(),
+            HibernationMethod::Shutdown
+        );
     }
 
     #[test]

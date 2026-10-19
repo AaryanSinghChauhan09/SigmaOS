@@ -10,7 +10,7 @@ extern crate alloc;
 use alloc::{
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// System information
 #[derive(Debug, Clone)]

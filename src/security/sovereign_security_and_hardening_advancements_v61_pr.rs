@@ -106,7 +106,9 @@ impl LinuxAccessControlAndSandboxingV61Engine {
 
     /// Check if cgroups v2 controller is enabled.
     pub fn is_cgroup_controller_enabled(active_controllers: &str, controller: &str) -> bool {
-        active_controllers.split_whitespace().any(|c| c == controller)
+        active_controllers
+            .split_whitespace()
+            .any(|c| c == controller)
     }
 
     /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW, 4 = USER_NOTIF).
@@ -695,8 +697,12 @@ mod tests {
             )
         );
 
-        assert!(LinuxAccessControlAndSandboxingV61Engine::has_capability(0x0001, 0));
-        assert!(!LinuxAccessControlAndSandboxingV61Engine::has_capability(0x0001, 1));
+        assert!(LinuxAccessControlAndSandboxingV61Engine::has_capability(
+            0x0001, 0
+        ));
+        assert!(!LinuxAccessControlAndSandboxingV61Engine::has_capability(
+            0x0001, 1
+        ));
 
         let ns_flags = LinuxAccessControlAndSandboxingV61Engine::build_namespace_flags(
             true, true, true, false, false, false, false,
@@ -736,7 +742,9 @@ mod tests {
         );
         assert!(jail_conf.contains("192.168.1.50"));
 
-        assert!(BsdHardeningAndIsolationV61Engine::check_capsicum_rights(0x0F, 0x01));
+        assert!(BsdHardeningAndIsolationV61Engine::check_capsicum_rights(
+            0x0F, 0x01
+        ));
         assert!(BsdHardeningAndIsolationV61Engine::is_capsicum_ioctl_allowed(&[0x10, 0x20], 0x10));
 
         assert!(engine.evaluate_mac_label_match("mac/biba/high", "mac/biba/low"));

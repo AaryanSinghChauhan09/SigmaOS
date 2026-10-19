@@ -303,7 +303,7 @@ impl Default for SigmaColorScheme {
 }
 
 /// Global SigmaColorScheme instance (placeholder for actual global state)
-static unsafe mutable SIGMACOLORSCHEME_INSTANCE: Option<SigmaColorScheme> = None;
+static mut SIGMACOLORSCHEME_INSTANCE: Option<SigmaColorScheme> = None;
 
 /// Initialize the global SigmaColorScheme instance
 pub fn init_sigmacolorscheme() {
@@ -314,16 +314,12 @@ pub fn init_sigmacolorscheme() {
 
 /// Get the global SigmaColorScheme instance
 pub fn get_sigmacolorscheme() -> Option<&'static SigmaColorScheme> {
-    unsafe {
-        SIGMACOLORSCHEME_INSTANCE.as_ref()
-    }
+    unsafe { SIGMACOLORSCHEME_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaColorScheme instance
 pub fn get_sigmacolorscheme_mut() -> Option<&'static mut SigmaColorScheme> {
-    unsafe {
-        SIGMACOLORSCHEME_INSTANCE.as_mut()
-    }
+    unsafe { SIGMACOLORSCHEME_INSTANCE.as_mut() }
 }
 
 /// Convenience function to generate a scheme

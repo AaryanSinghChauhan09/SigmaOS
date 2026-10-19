@@ -49,12 +49,7 @@ pub struct Window {
 
 impl Window {
     /// Create a new window
-    pub fn new(
-        window_id: String,
-        app_id: String,
-        title: String,
-        window_type: WindowType,
-    ) -> Self {
+    pub fn new(window_id: String, app_id: String, title: String, window_type: WindowType) -> Self {
         Self {
             window_id,
             app_id,
@@ -356,7 +351,7 @@ impl Default for SigmaWalker {
 }
 
 /// Global SigmaWalker instance (placeholder for actual global state)
-static unsafe mutable SIGMAWALKER_INSTANCE: Option<SigmaWalker> = None;
+static mut SIGMAWALKER_INSTANCE: Option<SigmaWalker> = None;
 
 /// Initialize the global SigmaWalker instance
 pub fn init_sigmawalker() {
@@ -367,16 +362,12 @@ pub fn init_sigmawalker() {
 
 /// Get the global SigmaWalker instance
 pub fn get_sigmawalker() -> Option<&'static SigmaWalker> {
-    unsafe {
-        SIGMAWALKER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAWALKER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaWalker instance
 pub fn get_sigmawalker_mut() -> Option<&'static mut SigmaWalker> {
-    unsafe {
-        SIGMAWALKER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAWALKER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a window

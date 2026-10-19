@@ -863,7 +863,9 @@ impl SovereignGoogleSheetsFormulaGraphEvaluatorEngine {
         for (node, (_, deps)) in &nodes {
             in_degree.entry(node.clone()).or_insert(0);
             for dep in deps {
-                adj.entry(dep.clone()).or_insert_with(Vec::new).push(node.clone());
+                adj.entry(dep.clone())
+                    .or_insert_with(Vec::new)
+                    .push(node.clone());
                 *in_degree.entry(node.clone()).or_insert(0) += 1;
             }
         }
@@ -927,10 +929,23 @@ impl SovereignGoogleSheetsFormulaGraphEvaluatorEngine {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum SovereignSmartChipSpec {
-    UserMention { email: String, display_name: String },
-    FileLink { doc_id: String, title: String, mime_type: String },
-    DateRef { iso_date: String, timestamp: u64 },
-    VariableTag { var_name: String, value: String },
+    UserMention {
+        email: String,
+        display_name: String,
+    },
+    FileLink {
+        doc_id: String,
+        title: String,
+        mime_type: String,
+    },
+    DateRef {
+        iso_date: String,
+        timestamp: u64,
+    },
+    VariableTag {
+        var_name: String,
+        value: String,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -949,24 +964,46 @@ impl SovereignGoogleDocsRealtimeSmartChipsComposerEngine {
 
     pub fn compose_smart_chip(&self, chip: SovereignSmartChipSpec) -> FormattedSmartChip {
         match &chip {
-            SovereignSmartChipSpec::UserMention { email, display_name } => FormattedSmartChip {
+            SovereignSmartChipSpec::UserMention {
+                email,
+                display_name,
+            } => FormattedSmartChip {
                 chip_spec: chip.clone(),
-                rendered_html: format!("<span class=\"smart-chip chip-user\">@{}</span>", display_name),
+                rendered_html: format!(
+                    "<span class=\"smart-chip chip-user\">@{}</span>",
+                    display_name
+                ),
                 interactive_data_attribute: format!("data-user-email=\"{}\"", email),
             },
-            SovereignSmartChipSpec::FileLink { doc_id, title, mime_type } => FormattedSmartChip {
+            SovereignSmartChipSpec::FileLink {
+                doc_id,
+                title,
+                mime_type,
+            } => FormattedSmartChip {
                 chip_spec: chip.clone(),
                 rendered_html: format!("<span class=\"smart-chip chip-file\">📄 {}</span>", title),
-                interactive_data_attribute: format!("data-doc-id=\"{}\" data-mime=\"{}\"", doc_id, mime_type),
+                interactive_data_attribute: format!(
+                    "data-doc-id=\"{}\" data-mime=\"{}\"",
+                    doc_id, mime_type
+                ),
             },
-            SovereignSmartChipSpec::DateRef { iso_date, timestamp } => FormattedSmartChip {
+            SovereignSmartChipSpec::DateRef {
+                iso_date,
+                timestamp,
+            } => FormattedSmartChip {
                 chip_spec: chip.clone(),
-                rendered_html: format!("<span class=\"smart-chip chip-date\">📅 {}</span>", iso_date),
+                rendered_html: format!(
+                    "<span class=\"smart-chip chip-date\">📅 {}</span>",
+                    iso_date
+                ),
                 interactive_data_attribute: format!("data-timestamp=\"{}\"", timestamp),
             },
             SovereignSmartChipSpec::VariableTag { var_name, value } => FormattedSmartChip {
                 chip_spec: chip.clone(),
-                rendered_html: format!("<span class=\"smart-chip chip-var\">{{{}: {}}}</span>", var_name, value),
+                rendered_html: format!(
+                    "<span class=\"smart-chip chip-var\">{{{}: {}}}</span>",
+                    var_name, value
+                ),
                 interactive_data_attribute: format!("data-var-name=\"{}\"", var_name),
             },
         }
@@ -1357,14 +1394,18 @@ impl SovereignBitrix24OmnichannelRoutingAndSlaEngine {
         ticket: &OmnichannelInboundTicket,
         agents: &[AgentSkillProfile],
     ) -> OmnichannelRoutingResult {
-        let sla_warning = ticket.wait_time_seconds > 300 || ticket.priority == TicketPriority::Urgent;
+        let sla_warning =
+            ticket.wait_time_seconds > 300 || ticket.priority == TicketPriority::Urgent;
 
         let mut best_agent: Option<String> = None;
         let mut min_workload = usize::MAX;
 
         for agent in agents {
             if agent.active_ticket_count < agent.max_capacity {
-                let matches_skills = ticket.required_skills.iter().all(|s| agent.skills.contains(s));
+                let matches_skills = ticket
+                    .required_skills
+                    .iter()
+                    .all(|s| agent.skills.contains(s));
                 if matches_skills && agent.active_ticket_count < min_workload {
                     min_workload = agent.active_ticket_count;
                     best_agent = Some(agent.agent_id.clone());
@@ -11294,7 +11335,13 @@ mod tests {
         let mut nodes = HashMap::new();
         nodes.insert("A1".to_string(), ("10".to_string(), vec![]));
         nodes.insert("A2".to_string(), ("20".to_string(), vec![]));
-        nodes.insert("A3".to_string(), ("SUM(A1, A2)".to_string(), vec!["A1".to_string(), "A2".to_string()]));
+        nodes.insert(
+            "A3".to_string(),
+            (
+                "SUM(A1, A2)".to_string(),
+                vec!["A1".to_string(), "A2".to_string()],
+            ),
+        );
 
         let res = formula_engine.evaluate_formula_dag(nodes);
         assert!(!res.has_cycle);
@@ -11308,7 +11355,9 @@ mod tests {
         };
         let formatted = chips_engine.compose_smart_chip(chip_spec);
         assert!(formatted.rendered_html.contains("@Alice Smith"));
-        assert!(formatted.interactive_data_attribute.contains("alice@example.com"));
+        assert!(formatted
+            .interactive_data_attribute
+            .contains("alice@example.com"));
 
         // 3. Looker Studio Data Blending Pivot Engine
         let looker_engine = SovereignGoogleLookerStudioDataBlendingPivotEngine::new();
@@ -11337,7 +11386,10 @@ mod tests {
         let blended = looker_engine.blend_and_aggregate(&primary, &secondary);
         assert_eq!(blended.len(), 1);
         assert_eq!(blended[0].aggregated_metrics.get("Sales"), Some(&5000.0));
-        assert_eq!(blended[0].aggregated_metrics.get("sec_Budget"), Some(&4000.0));
+        assert_eq!(
+            blended[0].aggregated_metrics.get("sec_Budget"),
+            Some(&4000.0)
+        );
     }
 
     #[test]
@@ -11366,19 +11418,39 @@ mod tests {
         // 2. Power BI DAX Calculator
         let dax_engine = SovereignMicrosoftPowerBiDaxCalculatorEngine::new();
         let records = vec![
-            DaxRecord { category: "Tech".to_string(), value: 100.0 },
-            DaxRecord { category: "Tech".to_string(), value: 300.0 },
-            DaxRecord { category: "Retail".to_string(), value: 50.0 },
+            DaxRecord {
+                category: "Tech".to_string(),
+                value: 100.0,
+            },
+            DaxRecord {
+                category: "Tech".to_string(),
+                value: 300.0,
+            },
+            DaxRecord {
+                category: "Retail".to_string(),
+                value: 50.0,
+            },
         ];
-        let dax_res = dax_engine.evaluate_dax_measure("TotalTechSales", "SUM", Some("Tech"), &records);
+        let dax_res =
+            dax_engine.evaluate_dax_measure("TotalTechSales", "SUM", Some("Tech"), &records);
         assert_eq!(dax_res.evaluated_value, 400.0);
         assert_eq!(dax_res.record_count, 2);
 
         // 3. Salesforce CPQ Pricing Tier
         let cpq_engine = SovereignSalesforceCpqPricingTierEngine::new();
         let tiers = vec![
-            PricingTierBracket { min_units: 1, max_units: 10, unit_price: 100.0, tier_discount_percentage: 0.0 },
-            PricingTierBracket { min_units: 11, max_units: 100, unit_price: 100.0, tier_discount_percentage: 15.0 },
+            PricingTierBracket {
+                min_units: 1,
+                max_units: 10,
+                unit_price: 100.0,
+                tier_discount_percentage: 0.0,
+            },
+            PricingTierBracket {
+                min_units: 11,
+                max_units: 100,
+                unit_price: 100.0,
+                tier_discount_percentage: 15.0,
+            },
         ];
         let cpq_res = cpq_engine.calculate_quote_pricing(50, 100.0, &tiers);
         assert_eq!(cpq_res.total_list_price, 5000.0);

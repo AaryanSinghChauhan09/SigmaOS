@@ -117,7 +117,12 @@ impl SoundcraftAdvancedMultiTrackElasticTimePitchPrEngine {
         output
     }
 
-    pub fn apply_crossfade(&self, clip_a: &[f32], clip_b: &[f32], crossfade_samples: usize) -> Vec<f32> {
+    pub fn apply_crossfade(
+        &self,
+        clip_a: &[f32],
+        clip_b: &[f32],
+        crossfade_samples: usize,
+    ) -> Vec<f32> {
         let fade_len = crossfade_samples.min(clip_a.len()).min(clip_b.len());
         let total_len = clip_a.len() + clip_b.len() - fade_len;
         let mut output = Vec::with_capacity(total_len);
@@ -187,7 +192,11 @@ impl SoundcraftSpectralSynthesisGranularSamplerPrEngine {
         }
     }
 
-    pub fn generate_grain_cloud(&self, base_grain: &SoundcraftGranularGrain, grain_count: usize) -> Vec<f32> {
+    pub fn generate_grain_cloud(
+        &self,
+        base_grain: &SoundcraftGranularGrain,
+        grain_count: usize,
+    ) -> Vec<f32> {
         let samples_per_grain = (base_grain.duration_sec * 48000.0) as usize;
         let mut cloud = Vec::with_capacity(grain_count * samples_per_grain);
         for g in 0..grain_count {
@@ -201,7 +210,15 @@ impl SoundcraftSpectralSynthesisGranularSamplerPrEngine {
         cloud
     }
 
-    pub fn evaluate_adsr(&self, time_sec: f32, attack: f32, decay: f32, sustain: f32, release: f32, note_off: bool) -> f32 {
+    pub fn evaluate_adsr(
+        &self,
+        time_sec: f32,
+        attack: f32,
+        decay: f32,
+        sustain: f32,
+        release: f32,
+        note_off: bool,
+    ) -> f32 {
         if !note_off {
             if time_sec < attack {
                 time_sec / attack
@@ -260,8 +277,14 @@ impl SoundcraftSpatial3dAmbisonicHrtfReverbPrEngine {
         }
     }
 
-    pub fn encode_foa_bformat(&self, sample: f32, pos: SoundcraftPosition3D) -> (f32, f32, f32, f32) {
-        let norm = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z).sqrt().max(0.001);
+    pub fn encode_foa_bformat(
+        &self,
+        sample: f32,
+        pos: SoundcraftPosition3D,
+    ) -> (f32, f32, f32, f32) {
+        let norm = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
+            .sqrt()
+            .max(0.001);
         let x = pos.x / norm;
         let y = pos.y / norm;
         let z = pos.z / norm;
@@ -274,7 +297,9 @@ impl SoundcraftSpatial3dAmbisonicHrtfReverbPrEngine {
     }
 
     pub fn hrtf_binaural_pan(&self, pos: SoundcraftPosition3D) -> (f32, f32) {
-        let norm = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z).sqrt().max(0.001);
+        let norm = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
+            .sqrt()
+            .max(0.001);
         let pan = (pos.x / norm).clamp(-1.0, 1.0);
         let left_gain = ((1.0 - pan) * 0.5).sqrt();
         let right_gain = ((1.0 + pan) * 0.5).sqrt();
@@ -599,13 +624,7 @@ impl SoundcraftNeuralStemSeparationAiDenoisePrEngine {
         let threshold = 10.0f32.powf(noise_floor_db / 20.0);
         input
             .iter()
-            .map(|&s| {
-                if s.abs() < threshold {
-                    s * 0.1
-                } else {
-                    s
-                }
-            })
+            .map(|&s| if s.abs() < threshold { s * 0.1 } else { s })
             .collect()
     }
 }
@@ -859,7 +878,6 @@ impl SoundcraftArtcraftParityPrSuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_soundcraft_artcraft_parity()
-
     }
 }
 

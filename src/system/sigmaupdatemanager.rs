@@ -271,10 +271,7 @@ impl SigmaUpdateManager {
 
     /// List enabled schedules
     pub fn list_enabled_schedules(&self) -> Vec<&UpdateSchedule> {
-        self.schedules
-            .values()
-            .filter(|s| s.is_enabled())
-            .collect()
+        self.schedules.values().filter(|s| s.is_enabled()).collect()
     }
 
     /// Get update count
@@ -295,7 +292,7 @@ impl Default for SigmaUpdateManager {
 }
 
 /// Global SigmaUpdateManager instance (placeholder for actual global state)
-static unsafe mutable SIGMAUPDATEMANAGER_INSTANCE: Option<SigmaUpdateManager> = None;
+static mut SIGMAUPDATEMANAGER_INSTANCE: Option<SigmaUpdateManager> = None;
 
 /// Initialize the global SigmaUpdateManager instance
 pub fn init_sigmaupdatemanager() {
@@ -306,16 +303,12 @@ pub fn init_sigmaupdatemanager() {
 
 /// Get the global SigmaUpdateManager instance
 pub fn get_sigmaupdatemanager() -> Option<&'static SigmaUpdateManager> {
-    unsafe {
-        SIGMAUPDATEMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAUPDATEMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get mutable global SigmaUpdateManager instance
 pub fn get_sigmaupdatemanager_mut() -> Option<&'static mut SigmaUpdateManager> {
-    unsafe {
-        SIGMAUPDATEMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAUPDATEMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an update

@@ -283,9 +283,8 @@ impl DynamicLinker {
                 return Err("Program header out of bounds");
             }
 
-            let phdr: Elf64Phdr = unsafe {
-                core::ptr::read_unaligned(data.as_ptr().add(offset) as *const Elf64Phdr)
-            };
+            let phdr: Elf64Phdr =
+                unsafe { core::ptr::read_unaligned(data.as_ptr().add(offset) as *const Elf64Phdr) };
             phdrs.push(phdr);
         }
 

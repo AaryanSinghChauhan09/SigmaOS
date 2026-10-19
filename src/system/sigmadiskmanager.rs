@@ -92,7 +92,13 @@ impl SigmaDiskManager {
         }
     }
 
-    pub fn add_disk(&mut self, name: String, device: String, size: u64, disk_type: DiskType) -> String {
+    pub fn add_disk(
+        &mut self,
+        name: String,
+        device: String,
+        size: u64,
+        disk_type: DiskType,
+    ) -> String {
         let id = format!("disk-{}", self.next_disk_id);
         self.next_disk_id += 1;
         let disk = Disk::new(id.clone(), name, device, size, disk_type);
@@ -113,7 +119,10 @@ impl SigmaDiskManager {
     }
 
     pub fn list_disks_by_type(&self, disk_type: DiskType) -> Vec<&Disk> {
-        self.disks.values().filter(|d| d.disk_type == disk_type).collect()
+        self.disks
+            .values()
+            .filter(|d| d.disk_type == disk_type)
+            .collect()
     }
 
     pub fn remove_disk(&mut self, id: &str) -> bool {
@@ -170,7 +179,13 @@ mod tests {
 
     #[test]
     fn test_disk_creation() {
-        let disk = Disk::new("disk-1".to_string(), "sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
+        let disk = Disk::new(
+            "disk-1".to_string(),
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
         assert_eq!(disk.id, "disk-1");
         assert_eq!(disk.name, "sda");
         assert_eq!(disk.size, 1000000000000);
@@ -179,7 +194,13 @@ mod tests {
 
     #[test]
     fn test_disk_state() {
-        let mut disk = Disk::new("disk-1".to_string(), "sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
+        let mut disk = Disk::new(
+            "disk-1".to_string(),
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
         assert_eq!(disk.state, DiskState::Online);
 
         disk.set_offline();
@@ -191,9 +212,15 @@ mod tests {
 
     #[test]
     fn test_disk_with_model() {
-        let disk = Disk::new("disk-1".to_string(), "sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD)
-            .with_model("Samsung EVO".to_string())
-            .with_serial("ABC123".to_string());
+        let disk = Disk::new(
+            "disk-1".to_string(),
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        )
+        .with_model("Samsung EVO".to_string())
+        .with_serial("ABC123".to_string());
         assert_eq!(disk.model, "Samsung EVO");
         assert_eq!(disk.serial, "ABC123");
     }
@@ -207,7 +234,12 @@ mod tests {
     #[test]
     fn test_add_disk() {
         let mut manager = SigmaDiskManager::new();
-        let id = manager.add_disk("sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
+        let id = manager.add_disk(
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
         assert_eq!(id, "disk-1");
         assert_eq!(manager.disk_count(), 1);
     }
@@ -215,9 +247,24 @@ mod tests {
     #[test]
     fn test_list_disks_by_type() {
         let mut manager = SigmaDiskManager::new();
-        manager.add_disk("sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
-        manager.add_disk("sdb".to_string(), "/dev/sdb".to_string(), 2000000000000, DiskType::HDD);
-        manager.add_disk("nvme0n1".to_string(), "/dev/nvme0n1".to_string(), 500000000000, DiskType::NVMe);
+        manager.add_disk(
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
+        manager.add_disk(
+            "sdb".to_string(),
+            "/dev/sdb".to_string(),
+            2000000000000,
+            DiskType::HDD,
+        );
+        manager.add_disk(
+            "nvme0n1".to_string(),
+            "/dev/nvme0n1".to_string(),
+            500000000000,
+            DiskType::NVMe,
+        );
 
         let ssds = manager.list_disks_by_type(DiskType::SSD);
         assert_eq!(ssds.len(), 1);
@@ -226,8 +273,18 @@ mod tests {
     #[test]
     fn test_total_capacity() {
         let mut manager = SigmaDiskManager::new();
-        manager.add_disk("sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
-        manager.add_disk("sdb".to_string(), "/dev/sdb".to_string(), 2000000000000, DiskType::HDD);
+        manager.add_disk(
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
+        manager.add_disk(
+            "sdb".to_string(),
+            "/dev/sdb".to_string(),
+            2000000000000,
+            DiskType::HDD,
+        );
 
         assert_eq!(manager.total_capacity(), 3000000000000);
     }
@@ -239,14 +296,24 @@ mod tests {
         assert_eq!(manager.disk_count(), 0);
 
         let manager_mut = get_sigmadiskmanager_mut();
-        manager_mut.add_disk("sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
+        manager_mut.add_disk(
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
         assert_eq!(manager.disk_count(), 1);
     }
 
     #[test]
     fn test_add_disk_convenience() {
         init_sigmadiskmanager();
-        let id = add_disk("sda".to_string(), "/dev/sda".to_string(), 1000000000000, DiskType::SSD);
+        let id = add_disk(
+            "sda".to_string(),
+            "/dev/sda".to_string(),
+            1000000000000,
+            DiskType::SSD,
+        );
         assert_eq!(id, "disk-1");
 
         let manager = get_sigmadiskmanager();

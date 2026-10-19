@@ -223,7 +223,10 @@ impl SigmaBluetooth {
     }
 
     pub fn list_devices_by_type(&self, device_type: DeviceType) -> Vec<&BluetoothDevice> {
-        self.devices.values().filter(|d| d.device_type == device_type).collect()
+        self.devices
+            .values()
+            .filter(|d| d.device_type == device_type)
+            .collect()
     }
 
     pub fn list_devices_by_state(&self, state: DeviceState) -> Vec<&BluetoothDevice> {
@@ -467,7 +470,11 @@ mod tests {
     #[test]
     fn test_add_device() {
         let mut manager = SigmaBluetooth::new();
-        let id = manager.add_device("Headset".to_string(), "AA:BB:CC:DD:EE:FF".to_string(), DeviceType::Headset);
+        let id = manager.add_device(
+            "Headset".to_string(),
+            "AA:BB:CC:DD:EE:FF".to_string(),
+            DeviceType::Headset,
+        );
         assert_eq!(id, "device-1");
         assert_eq!(manager.device_count(), 1);
     }
@@ -475,7 +482,11 @@ mod tests {
     #[test]
     fn test_pair_connect_device() {
         let mut manager = SigmaBluetooth::new();
-        let id = manager.add_device("Keyboard".to_string(), "AA:BB:CC:DD:EE:FF".to_string(), DeviceType::Keyboard);
+        let id = manager.add_device(
+            "Keyboard".to_string(),
+            "AA:BB:CC:DD:EE:FF".to_string(),
+            DeviceType::Keyboard,
+        );
 
         assert!(manager.pair_device(&id));
         assert!(manager.get_device(&id).unwrap().paired);
@@ -487,9 +498,21 @@ mod tests {
     #[test]
     fn test_list_devices_by_type() {
         let mut manager = SigmaBluetooth::new();
-        manager.add_device("Headset".to_string(), "AA:BB:CC:DD:EE:FF".to_string(), DeviceType::Headset);
-        manager.add_device("Keyboard".to_string(), "BB:CC:DD:EE:FF:00".to_string(), DeviceType::Keyboard);
-        manager.add_device("Speaker".to_string(), "CC:DD:EE:FF:00:11".to_string(), DeviceType::Speaker);
+        manager.add_device(
+            "Headset".to_string(),
+            "AA:BB:CC:DD:EE:FF".to_string(),
+            DeviceType::Headset,
+        );
+        manager.add_device(
+            "Keyboard".to_string(),
+            "BB:CC:DD:EE:FF:00".to_string(),
+            DeviceType::Keyboard,
+        );
+        manager.add_device(
+            "Speaker".to_string(),
+            "CC:DD:EE:FF:00:11".to_string(),
+            DeviceType::Speaker,
+        );
 
         let audio_devices = manager.list_devices_by_type(DeviceType::Headset);
         assert_eq!(audio_devices.len(), 1);
@@ -498,8 +521,16 @@ mod tests {
     #[test]
     fn test_list_devices_by_state() {
         let mut manager = SigmaBluetooth::new();
-        let id1 = manager.add_device("Device1".to_string(), "AA:BB:CC:DD:EE:FF".to_string(), DeviceType::Mouse);
-        let id2 = manager.add_device("Device2".to_string(), "BB:CC:DD:EE:FF:00".to_string(), DeviceType::Keyboard);
+        let id1 = manager.add_device(
+            "Device1".to_string(),
+            "AA:BB:CC:DD:EE:FF".to_string(),
+            DeviceType::Mouse,
+        );
+        let id2 = manager.add_device(
+            "Device2".to_string(),
+            "BB:CC:DD:EE:FF:00".to_string(),
+            DeviceType::Keyboard,
+        );
         manager.pair_device(&id1);
         manager.connect_device(&id1);
 
@@ -510,8 +541,16 @@ mod tests {
     #[test]
     fn test_connected_device_count() {
         let mut manager = SigmaBluetooth::new();
-        let id1 = manager.add_device("Device1".to_string(), "AA:BB:CC:DD:EE:FF".to_string(), DeviceType::Mouse);
-        let id2 = manager.add_device("Device2".to_string(), "BB:CC:DD:EE:FF:00".to_string(), DeviceType::Keyboard);
+        let id1 = manager.add_device(
+            "Device1".to_string(),
+            "AA:BB:CC:DD:EE:FF".to_string(),
+            DeviceType::Mouse,
+        );
+        let id2 = manager.add_device(
+            "Device2".to_string(),
+            "BB:CC:DD:EE:FF:00".to_string(),
+            DeviceType::Keyboard,
+        );
         manager.pair_device(&id1);
         manager.pair_device(&id2);
         manager.connect_device(&id1);

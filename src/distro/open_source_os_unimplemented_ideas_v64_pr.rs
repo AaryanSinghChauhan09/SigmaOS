@@ -334,7 +334,8 @@ impl Plan99P2000LPlumberRouterEngine {
     }
 
     pub fn add_rule(&mut self, pattern: &str, target_port: &str) {
-        self.routes.insert(pattern.to_string(), target_port.to_string());
+        self.routes
+            .insert(pattern.to_string(), target_port.to_string());
     }
 
     pub fn route_message(&mut self, text: &str) -> Option<String> {
@@ -515,7 +516,9 @@ mod tests {
         assert_eq!(suite.linux_futex.submit_futex_wake(0x1000, 1), 1);
 
         // 2. FreeBSD Crypto
-        assert!(suite.freebsd_crypto.establish_tls_session("192.168.1.100", 4420));
+        assert!(suite
+            .freebsd_crypto
+            .establish_tls_session("192.168.1.100", 4420));
         assert!(suite.freebsd_crypto.process_nvme_frame(4096));
 
         // 3. OpenBSD Pinning
@@ -525,7 +528,9 @@ mod tests {
 
         // 4. NetBSD VirtIO
         assert!(suite.netbsd_virtio.mount_tag("host_share"));
-        assert!(suite.netbsd_virtio.perform_zero_copy_read("host_share", 8192));
+        assert!(suite
+            .netbsd_virtio
+            .perform_zero_copy_read("host_share", 8192));
 
         // 5. DragonFly Scrub
         suite.dragonfly_scrub.start_scrub();
@@ -533,16 +538,22 @@ mod tests {
         assert_eq!(suite.dragonfly_scrub.corrupted_blocks_repaired, 1);
 
         // 6. Haiku BeFS
-        suite.haiku_bfs.index_attribute("/boot/home/Doc.txt", "META:title", "My Document");
+        suite
+            .haiku_bfs
+            .index_attribute("/boot/home/Doc.txt", "META:title", "My Document");
         assert_eq!(
-            suite.haiku_bfs.query_attribute("/boot/home/Doc.txt", "META:title"),
+            suite
+                .haiku_bfs
+                .query_attribute("/boot/home/Doc.txt", "META:title"),
             Some(&"My Document".to_string())
         );
 
         // 7. Plan 9 Plumber
         suite.plan9_plumber.add_rule("http://", "webbrowser");
         assert_eq!(
-            suite.plan9_plumber.route_message("visit http://example.org"),
+            suite
+                .plan9_plumber
+                .route_message("visit http://example.org"),
             Some("webbrowser".to_string())
         );
 

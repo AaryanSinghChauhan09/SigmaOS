@@ -218,7 +218,10 @@ impl SigmaSystemd {
     }
 
     pub fn list_units_by_type(&self, unit_type: UnitType) -> Vec<&Unit> {
-        self.units.values().filter(|u| u.unit_type == unit_type).collect()
+        self.units
+            .values()
+            .filter(|u| u.unit_type == unit_type)
+            .collect()
     }
 
     pub fn list_units_by_state(&self, state: UnitState) -> Vec<&Unit> {
@@ -276,7 +279,12 @@ impl SigmaSystemd {
         }
     }
 
-    pub fn add_dependency(&mut self, unit_id: &str, dep_id: String, dep_type: DependencyType) -> bool {
+    pub fn add_dependency(
+        &mut self,
+        unit_id: &str,
+        dep_id: String,
+        dep_type: DependencyType,
+    ) -> bool {
         if let Some(unit) = self.units.get_mut(unit_id) {
             unit.add_dependency(dep_id, dep_type);
             true

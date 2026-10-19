@@ -99,7 +99,9 @@ impl LinuxAccessControlAndSandboxingPrEngine {
 
     /// Check if cgroup controller is enabled.
     pub fn is_cgroup_controller_enabled(active_controllers: &str, controller: &str) -> bool {
-        active_controllers.split_whitespace().any(|c| c == controller)
+        active_controllers
+            .split_whitespace()
+            .any(|c| c == controller)
     }
 
     /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW).
@@ -153,7 +155,6 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         } // CLONE_NEWCGROUP
         flags
     }
-
 
     /// Calculate cgroups v2 memory limit in bytes from string (e.g., "512M", "2G").
     pub fn parse_cgroup_memory_limit(limit_str: &str) -> u64 {
@@ -488,7 +489,9 @@ impl IdentityAndEnterpriseAuthPrEngine {
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
-            domain, provider, uri
+            domain,
+            provider,
+            uri
         )
     }
 

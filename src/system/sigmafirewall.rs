@@ -169,17 +169,11 @@ impl SigmaFirewall {
     }
 
     pub fn list_rules_by_chain(&self, chain: FirewallChain) -> Vec<&FirewallRule> {
-        self.rules
-            .values()
-            .filter(|r| r.chain == chain)
-            .collect()
+        self.rules.values().filter(|r| r.chain == chain).collect()
     }
 
     pub fn list_rules_by_state(&self, state: RuleState) -> Vec<&FirewallRule> {
-        self.rules
-            .values()
-            .filter(|r| r.state == state)
-            .collect()
+        self.rules.values().filter(|r| r.state == state).collect()
     }
 
     pub fn enable(&mut self) {
@@ -243,7 +237,10 @@ impl SigmaFirewall {
     }
 
     pub fn active_rule_count(&self) -> usize {
-        self.rules.values().filter(|r| r.state == RuleState::Active).count()
+        self.rules
+            .values()
+            .filter(|r| r.state == RuleState::Active)
+            .count()
     }
 }
 
@@ -355,9 +352,21 @@ mod tests {
     #[test]
     fn test_list_rules_by_chain() {
         let mut firewall = SigmaFirewall::new();
-        firewall.add_rule(FirewallRule::new(1, FirewallChain::Input, FirewallAction::Accept));
-        firewall.add_rule(FirewallRule::new(2, FirewallChain::Output, FirewallAction::Drop));
-        firewall.add_rule(FirewallRule::new(3, FirewallChain::Input, FirewallAction::Reject));
+        firewall.add_rule(FirewallRule::new(
+            1,
+            FirewallChain::Input,
+            FirewallAction::Accept,
+        ));
+        firewall.add_rule(FirewallRule::new(
+            2,
+            FirewallChain::Output,
+            FirewallAction::Drop,
+        ));
+        firewall.add_rule(FirewallRule::new(
+            3,
+            FirewallChain::Input,
+            FirewallAction::Reject,
+        ));
 
         let input_rules = firewall.list_rules_by_chain(FirewallChain::Input);
         assert_eq!(input_rules.len(), 2);
@@ -416,27 +425,37 @@ mod tests {
     #[test]
     fn test_activate_deactivate_rule() {
         let mut firewall = SigmaFirewall::new();
-        firewall.add_rule(FirewallRule::new(1, FirewallChain::Input, FirewallAction::Accept));
+        firewall.add_rule(FirewallRule::new(
+            1,
+            FirewallChain::Input,
+            FirewallAction::Accept,
+        ));
 
         assert!(firewall.activate_rule(1));
-        assert_eq!(
-            firewall.get_rule(1).unwrap().state,
-            RuleState::Active
-        );
+        assert_eq!(firewall.get_rule(1).unwrap().state, RuleState::Active);
 
         assert!(firewall.deactivate_rule(1));
-        assert_eq!(
-            firewall.get_rule(1).unwrap().state,
-            RuleState::Inactive
-        );
+        assert_eq!(firewall.get_rule(1).unwrap().state, RuleState::Inactive);
     }
 
     #[test]
     fn test_flush_chain() {
         let mut firewall = SigmaFirewall::new();
-        firewall.add_rule(FirewallRule::new(1, FirewallChain::Input, FirewallAction::Accept));
-        firewall.add_rule(FirewallRule::new(2, FirewallChain::Output, FirewallAction::Drop));
-        firewall.add_rule(FirewallRule::new(3, FirewallChain::Input, FirewallAction::Reject));
+        firewall.add_rule(FirewallRule::new(
+            1,
+            FirewallChain::Input,
+            FirewallAction::Accept,
+        ));
+        firewall.add_rule(FirewallRule::new(
+            2,
+            FirewallChain::Output,
+            FirewallAction::Drop,
+        ));
+        firewall.add_rule(FirewallRule::new(
+            3,
+            FirewallChain::Input,
+            FirewallAction::Reject,
+        ));
 
         firewall.flush_chain(FirewallChain::Input);
         assert_eq!(firewall.rule_count(), 1);
@@ -446,8 +465,16 @@ mod tests {
     #[test]
     fn test_flush_all() {
         let mut firewall = SigmaFirewall::new();
-        firewall.add_rule(FirewallRule::new(1, FirewallChain::Input, FirewallAction::Accept));
-        firewall.add_rule(FirewallRule::new(2, FirewallChain::Output, FirewallAction::Drop));
+        firewall.add_rule(FirewallRule::new(
+            1,
+            FirewallChain::Input,
+            FirewallAction::Accept,
+        ));
+        firewall.add_rule(FirewallRule::new(
+            2,
+            FirewallChain::Output,
+            FirewallAction::Drop,
+        ));
 
         firewall.flush_all();
         assert_eq!(firewall.rule_count(), 0);

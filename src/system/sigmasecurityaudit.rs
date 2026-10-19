@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Security issue severity
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,7 +35,13 @@ pub struct SecurityIssue {
 }
 
 impl SecurityIssue {
-    pub fn new(id: String, title: String, description: String, severity: SecuritySeverity, category: String) -> Self {
+    pub fn new(
+        id: String,
+        title: String,
+        description: String,
+        severity: SecuritySeverity,
+        category: String,
+    ) -> Self {
         Self {
             id,
             title,
@@ -85,11 +91,17 @@ impl SecurityReport {
     }
 
     pub fn critical_issue_count(&self) -> usize {
-        self.issues.iter().filter(|i| i.severity == SecuritySeverity::Critical && !i.resolved).count()
+        self.issues
+            .iter()
+            .filter(|i| i.severity == SecuritySeverity::Critical && !i.resolved)
+            .count()
     }
 
     pub fn high_issue_count(&self) -> usize {
-        self.issues.iter().filter(|i| i.severity == SecuritySeverity::High && !i.resolved).count()
+        self.issues
+            .iter()
+            .filter(|i| i.severity == SecuritySeverity::High && !i.resolved)
+            .count()
     }
 
     pub fn total_unresolved(&self) -> usize {
@@ -140,7 +152,10 @@ impl SigmaSecurityAudit {
     }
 
     pub fn total_critical_issues(&self) -> usize {
-        self.reports.values().map(|r| r.critical_issue_count()).sum()
+        self.reports
+            .values()
+            .map(|r| r.critical_issue_count())
+            .sum()
     }
 
     pub fn total_high_issues(&self) -> usize {
@@ -188,7 +203,13 @@ mod tests {
 
     #[test]
     fn test_security_issue_creation() {
-        let issue = SecurityIssue::new("issue-1".to_string(), "Outdated Package".to_string(), "Package has known vulnerabilities".to_string(), SecuritySeverity::High, "Software".to_string());
+        let issue = SecurityIssue::new(
+            "issue-1".to_string(),
+            "Outdated Package".to_string(),
+            "Package has known vulnerabilities".to_string(),
+            SecuritySeverity::High,
+            "Software".to_string(),
+        );
         assert_eq!(issue.title, "Outdated Package");
         assert_eq!(issue.severity, SecuritySeverity::High);
         assert!(!issue.resolved);
@@ -196,7 +217,13 @@ mod tests {
 
     #[test]
     fn test_security_issue_resolve() {
-        let mut issue = SecurityIssue::new("issue-1".to_string(), "Outdated Package".to_string(), "Vulnerability".to_string(), SecuritySeverity::High, "Software".to_string());
+        let mut issue = SecurityIssue::new(
+            "issue-1".to_string(),
+            "Outdated Package".to_string(),
+            "Vulnerability".to_string(),
+            SecuritySeverity::High,
+            "Software".to_string(),
+        );
         issue.resolve();
         assert!(issue.resolved);
 
@@ -214,7 +241,13 @@ mod tests {
     #[test]
     fn test_security_report_with_issue() {
         let report = SecurityReport::new("report-1".to_string(), "Monthly Audit".to_string())
-            .with_issue(SecurityIssue::new("issue-1".to_string(), "Vulnerability".to_string(), "Description".to_string(), SecuritySeverity::Critical, "Software".to_string()));
+            .with_issue(SecurityIssue::new(
+                "issue-1".to_string(),
+                "Vulnerability".to_string(),
+                "Description".to_string(),
+                SecuritySeverity::Critical,
+                "Software".to_string(),
+            ));
         assert_eq!(report.issues.len(), 1);
     }
 
@@ -236,10 +269,22 @@ mod tests {
     fn test_total_critical_issues() {
         let mut manager = SigmaSecurityAudit::new();
         let id = manager.add_report("Audit".to_string());
-        
+
         let report = manager.get_report_mut(&id).unwrap();
-        report.issues.push(SecurityIssue::new("i1".to_string(), "Vuln1".to_string(), "Desc".to_string(), SecuritySeverity::Critical, "Cat".to_string()));
-        report.issues.push(SecurityIssue::new("i2".to_string(), "Vuln2".to_string(), "Desc".to_string(), SecuritySeverity::High, "Cat".to_string()));
+        report.issues.push(SecurityIssue::new(
+            "i1".to_string(),
+            "Vuln1".to_string(),
+            "Desc".to_string(),
+            SecuritySeverity::Critical,
+            "Cat".to_string(),
+        ));
+        report.issues.push(SecurityIssue::new(
+            "i2".to_string(),
+            "Vuln2".to_string(),
+            "Desc".to_string(),
+            SecuritySeverity::High,
+            "Cat".to_string(),
+        ));
 
         assert_eq!(manager.total_critical_issues(), 1);
     }
@@ -248,12 +293,24 @@ mod tests {
     fn test_total_unresolved() {
         let mut manager = SigmaSecurityAudit::new();
         let id = manager.add_report("Audit".to_string());
-        
+
         let report = manager.get_report_mut(&id).unwrap();
-        let mut issue = SecurityIssue::new("i1".to_string(), "Vuln".to_string(), "Desc".to_string(), SecuritySeverity::High, "Cat".to_string());
+        let mut issue = SecurityIssue::new(
+            "i1".to_string(),
+            "Vuln".to_string(),
+            "Desc".to_string(),
+            SecuritySeverity::High,
+            "Cat".to_string(),
+        );
         issue.resolve();
         report.issues.push(issue);
-        report.issues.push(SecurityIssue::new("i2".to_string(), "Vuln2".to_string(), "Desc".to_string(), SecuritySeverity::High, "Cat".to_string()));
+        report.issues.push(SecurityIssue::new(
+            "i2".to_string(),
+            "Vuln2".to_string(),
+            "Desc".to_string(),
+            SecuritySeverity::High,
+            "Cat".to_string(),
+        ));
 
         assert_eq!(manager.total_unresolved(), 1);
     }
