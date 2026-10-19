@@ -26,6 +26,7 @@ pub mod sigmaani;
 pub mod sigmaart;
 pub mod sigmacad;
 pub mod sigmadesign;
+pub mod sigmaeffect;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -255,6 +256,10 @@ pub use sigmadesign::{
     ComponentSize, ComponentVariant, DesignSystem, DesignToken, SigmaDesign, TokenValue, TokenType,
     UIComponent,
     add_design_system, get_sigmadesign, get_sigmadesign_mut, init_sigmadesign,
+};
+pub use sigmaeffect::{
+    Effect, EffectChain, EffectParameter, EffectPreset, EffectType, SigmaEffect,
+    add_effect, get_sigmaeffect, get_sigmaeffect_mut, init_sigmaeffect,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
