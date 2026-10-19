@@ -584,10 +584,6 @@ pub use sigmatime::{
     sync_time, NtpServer as SigmaNtpServer, SigmaTime, SyncStats, SyncStatus, TimeConfig,
     TimeSource,
 };
-pub use sigmatimer::{
-    add_timer, get_sigmatimer, get_sigmatimer_mut, init_sigmatimer, Alarm, SigmaTimer, Timer,
-    TimerState,
-};
 pub use sigmatimeshift::{
     create_timeshift_snapshot, get_sigmatimeshift, init_sigmatimeshift, restore_timeshift_snapshot,
     SigmaTimeshift, SnapshotLevel, SnapshotSchedule, SnapshotState, SnapshotType,
