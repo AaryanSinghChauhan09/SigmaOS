@@ -120,6 +120,7 @@ pub mod sigmasearch;
 pub mod sigmasecurityaudit;
 pub mod sigmaservice;
 pub mod sigmaservicemanager2;
+pub mod sigmaservicemanager3;
 pub mod sigmasession;
 pub mod sigmasmb;
 pub mod sigmasnap;
@@ -913,4 +914,9 @@ pub use sigmafilesystemmanager::{
 pub use sigmanetworkmanager2::{
     ConnectionState, ConnectionType, DNSServer, NetworkInterface, NetworkProfile, SigmaNetworkManager,
     add_interface, get_sigmanetworkmanager, get_sigmanetworkmanager_mut, init_sigmanetworkmanager,
+};
+
+pub use sigmaservicemanager3::{
+    Service, ServiceState, ServiceType, SigmaServiceManager,
+    add_service, get_sigmaservicemanager, get_sigmaservicemanager_mut, init_sigmaservicemanager,
 };
