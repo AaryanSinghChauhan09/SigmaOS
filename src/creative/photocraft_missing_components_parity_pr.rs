@@ -4,6 +4,11 @@ use alloc::string::{String, ToString};
 // (`src/creative/photocraft_missing_components_parity_pr.rs`)
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft PhotoCraft
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 // photo editing ecosystem components in Pull Request proposal format.
 
 #![no_std]

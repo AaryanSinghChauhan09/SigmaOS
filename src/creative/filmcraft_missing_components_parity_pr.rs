@@ -4,6 +4,11 @@ use alloc::string::{String, ToString};
 // (`src/creative/filmcraft_missing_components_parity_pr.rs`)
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft FilmCraft
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 // professional video editing ecosystem components in Pull Request proposal format.
 
 #[cfg(not(any(feature = "standalone_test", test)))]

@@ -4,6 +4,11 @@ use alloc::string::{String, ToString};
 // (`src/creative/craftlibs_missing_components_parity_pr.rs`)
 //
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft CraftLibs
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 // foundational creative core components in Pull Request proposal format:
 // 1. CraftlibsSimdColorSpaceTransformPrEngine (Display P3, Rec.2020, ACEScg, Adobe RGB & Bradford adaptation)
 // 2. CraftlibsIccProfileColorManagementPrEngine (LittleCMS ICC profile parsing, rendering intents & 3D CLUTs)
