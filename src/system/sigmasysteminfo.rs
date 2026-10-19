@@ -40,6 +40,10 @@ impl SystemInfo {
         self
     }
 
+    pub fn set_os_name(&mut self, os_name: String) {
+        self.os_name = os_name;
+    }
+
     pub fn with_os_version(mut self, os_version: String) -> Self {
         self.os_version = os_version;
         self
@@ -132,7 +136,7 @@ mod tests {
         assert_eq!(info.os_name, "");
 
         let info_mut = get_sigmasysteminfo_mut();
-        info_mut.with_os_name("SigmaOS".to_string());
+        info_mut.set_os_name("SigmaOS".to_string());
         assert_eq!(info.os_name, "SigmaOS");
     }
 }

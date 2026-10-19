@@ -70,9 +70,17 @@ impl Task {
         self
     }
 
+    pub fn set_cpu_usage(&mut self, cpu_usage: u32) {
+        self.cpu_usage = cpu_usage;
+    }
+
     pub fn with_memory_usage(mut self, memory_usage: u64) -> Self {
         self.memory_usage = memory_usage;
         self
+    }
+
+    pub fn set_memory_usage(&mut self, memory_usage: u64) {
+        self.memory_usage = memory_usage;
     }
 
     pub fn stop(&mut self) {
@@ -269,8 +277,8 @@ mod tests {
         let id1 = manager.add_task("bash".to_string(), 1000, 999);
         let id2 = manager.add_task("vim".to_string(), 1001, 1000);
 
-        manager.get_task_mut(&id1).unwrap().with_cpu_usage(50);
-        manager.get_task_mut(&id2).unwrap().with_cpu_usage(30);
+        manager.get_task_mut(&id1).unwrap().set_cpu_usage(50);
+        manager.get_task_mut(&id2).unwrap().set_cpu_usage(30);
 
         assert_eq!(manager.total_cpu_usage(), 80);
     }

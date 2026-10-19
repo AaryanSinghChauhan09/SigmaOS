@@ -69,9 +69,17 @@ impl SearchIndex {
         self
     }
 
+    pub fn set_indexed_files(&mut self, indexed_files: u32) {
+        self.indexed_files = indexed_files;
+    }
+
     pub fn with_last_updated(mut self, last_updated: u64) -> Self {
         self.last_updated = last_updated;
         self
+    }
+
+    pub fn set_last_updated(&mut self, last_updated: u64) {
+        self.last_updated = last_updated;
     }
 }
 
@@ -263,8 +271,8 @@ mod tests {
         manager
             .get_index_mut(&id1)
             .unwrap()
-            .with_indexed_files(1000);
-        manager.get_index_mut(&id2).unwrap().with_indexed_files(500);
+            .set_indexed_files(1000);
+        manager.get_index_mut(&id2).unwrap().set_indexed_files(500);
 
         assert_eq!(manager.total_indexed_files(), 1500);
     }

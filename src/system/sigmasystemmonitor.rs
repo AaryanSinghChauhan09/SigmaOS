@@ -37,6 +37,10 @@ impl CpuCore {
         self
     }
 
+    pub fn set_usage(&mut self, usage_percent: f32) {
+        self.usage_percent = usage_percent;
+    }
+
     pub fn with_frequency(mut self, frequency_mhz: u32) -> Self {
         self.frequency_mhz = frequency_mhz;
         self
@@ -268,10 +272,10 @@ mod tests {
     #[test]
     fn test_total_cpu_usage() {
         let mut monitor = SigmaSystemMonitor::new(4);
-        monitor.get_cpu_core_mut(0).unwrap().with_usage(25.0);
-        monitor.get_cpu_core_mut(1).unwrap().with_usage(50.0);
-        monitor.get_cpu_core_mut(2).unwrap().with_usage(75.0);
-        monitor.get_cpu_core_mut(3).unwrap().with_usage(100.0);
+        monitor.get_cpu_core_mut(0).unwrap().set_usage(25.0);
+        monitor.get_cpu_core_mut(1).unwrap().set_usage(50.0);
+        monitor.get_cpu_core_mut(2).unwrap().set_usage(75.0);
+        monitor.get_cpu_core_mut(3).unwrap().set_usage(100.0);
 
         assert_eq!(monitor.total_cpu_usage(), 250.0);
     }
@@ -279,10 +283,10 @@ mod tests {
     #[test]
     fn test_average_cpu_usage() {
         let mut monitor = SigmaSystemMonitor::new(4);
-        monitor.get_cpu_core_mut(0).unwrap().with_usage(25.0);
-        monitor.get_cpu_core_mut(1).unwrap().with_usage(50.0);
-        monitor.get_cpu_core_mut(2).unwrap().with_usage(75.0);
-        monitor.get_cpu_core_mut(3).unwrap().with_usage(100.0);
+        monitor.get_cpu_core_mut(0).unwrap().set_usage(25.0);
+        monitor.get_cpu_core_mut(1).unwrap().set_usage(50.0);
+        monitor.get_cpu_core_mut(2).unwrap().set_usage(75.0);
+        monitor.get_cpu_core_mut(3).unwrap().set_usage(100.0);
 
         assert_eq!(monitor.average_cpu_usage(), 62.5);
     }
