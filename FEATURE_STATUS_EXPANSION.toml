@@ -1,0 +1,23 @@
+# Feature Status - Expansion Additions
+
+## Init Supervisor
+- **init-supervisor**: Planned
+  - Status: Planning
+  - Description: PID 1 init supervisor with dependency DAG and service management
+  - Evidence: Will be updated upon implementation
+  - Tests: Unit tests planned
+  - Integration: Will integrate with shell and VFS
+
+## Multi-Architecture Support
+- **cross-compilation**: Planned
+  - Status: Implemented
+  - Description: Support for x86_64, aarch64, riscv64 targets
+  - Evidence: .cargo/config.toml, GitHub Actions workflow
+  - Tests: CI pipeline builds all targets
+
+## Cross-Compilation
+- **cross-compilation-support**: Completed
+  - Status: Completed
+  - Description: Multi-architecture CI pipeline
+  - Evidence: .github/workflows/multi-arch.yml
+  - Tests: CI pipeline validation
