@@ -841,11 +841,6 @@ pub use sigmasoftwaremanager::{
     init_sigmasoftwaremanager, AppCategory, AppStatus, Application, Rating, SigmaSoftwareManager,
 };
 
-pub use sigmaupdatemanager2::{
-    add_update, get_sigmaupdatemanager, get_sigmaupdatemanager_mut, init_sigmaupdatemanager,
-    SigmaUpdateManager, SystemUpdate, UpdatePriority, UpdateSchedule, UpdateStatus, UpdateType,
-};
-
 pub use sigmabackupmanager::{
     add_backup, get_sigmabackupmanager, get_sigmabackupmanager_mut, init_sigmabackupmanager,
     BackupJob, BackupSchedule, BackupStatus, BackupType, CompressionType, SigmaBackupManager,
