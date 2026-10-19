@@ -60,7 +60,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Performance Impact**: Zero-Root Display Delegation
 - **Status**: Ready for Merge
 - **Key Features Implemented**:
-  - User session lifecycle & multiseat allocation engine (`seat0`)
+  - User session lifecycle & multiseat allocation engine (`seat0`, `seat-workstation1`)
   - Unprivileged DRI / `dev/input` FD passing bridge for Wayland compositors
   - System sleep & shutdown inhibitor lock registry
   - VT allocation & session active switching manager

@@ -1175,6 +1175,16 @@ impl DbusSystemBusBrokerEngine {
 // 7. MASTER COORDINATOR GATEWAY
 // ============================================================================
 
+/// V63 Advanced Multi-Seat Session & Display Controller record.
+#[derive(Debug, Clone)]
+pub struct MultiseatControllerRecord {
+    pub seat_id: String,
+    pub primary_display_gpu: String,
+    pub attached_usb_hubs: Vec<String>,
+    pub active_vt: u32,
+    pub allow_unauthenticated_inputs: bool,
+}
+
 /// Master Coordinator Gateway for Linux & BSD Inspired Device Management Parity PR Proposals.
 #[derive(Debug, Default)]
 pub struct SovereignDeviceManagementParityPrGateway {
@@ -1184,18 +1194,40 @@ pub struct SovereignDeviceManagementParityPrGateway {
     pub logind: LogindElogindSessionEngine,
     pub polkit: PolkitAuthorizationEngine,
     pub dbus_broker: DbusSystemBusBrokerEngine,
+    pub seat_controllers: Vec<MultiseatControllerRecord>,
 }
 
 impl SovereignDeviceManagementParityPrGateway {
     pub fn new() -> Self {
-        Self {
+        let mut gateway = Self {
             udev_devd: UdevEudevMdevDevdDevfsEngine::new(),
             acpid: AcpidPowerDaemonEngine::new(),
             upower: UpowerBatteryPowerEngine::new(),
             logind: LogindElogindSessionEngine::new(),
             polkit: PolkitAuthorizationEngine::new(),
             dbus_broker: DbusSystemBusBrokerEngine::new(),
-        }
+            seat_controllers: Vec::new(),
+        };
+        gateway.initialize_v63_seats();
+        gateway
+    }
+
+    pub fn initialize_v63_seats(&mut self) {
+        self.seat_controllers.push(MultiseatControllerRecord {
+            seat_id: "seat0".to_string(),
+            primary_display_gpu: "/dev/dri/card0".to_string(),
+            attached_usb_hubs: vec!["usb-0000:00:14.0-1".to_string()],
+            active_vt: 1,
+            allow_unauthenticated_inputs: false,
+        });
+
+        self.seat_controllers.push(MultiseatControllerRecord {
+            seat_id: "seat-workstation1".to_string(),
+            primary_display_gpu: "/dev/dri/card1".to_string(),
+            attached_usb_hubs: vec!["usb-0000:00:14.0-2".to_string()],
+            active_vt: 2,
+            allow_unauthenticated_inputs: true,
+        });
     }
 
     /// Collect all PR proposal manifests across device management, power, session, and IPC sub-engines.
