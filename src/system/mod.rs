@@ -842,13 +842,12 @@ pub use sigmausermanager::{
 
 pub use sigmadisplaymanager::{
     add_output, get_sigmadisplaymanager, get_sigmadisplaymanager_mut, init_sigmadisplaymanager,
-    DisplayOutput, LoginSettings, Resolution, SigmaDisplayManager,
+    SigmaDisplayManager,
 };
 
-pub use sigmanotificationmanager::{
+pub use sigmanotificationmanager{
     add_notification, get_sigmanotificationmanager, get_sigmanotificationmanager_mut,
-    init_sigmanotificationmanager, Notification, NotificationCategory, NotificationRule,
-    NotificationUrgency, SigmaNotificationManager,
+    init_sigmanotificationmanager, SigmaNotificationManager,
 };
 
 pub use sigmapowermanager::{
