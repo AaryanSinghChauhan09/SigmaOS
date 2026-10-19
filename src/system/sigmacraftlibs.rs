@@ -75,7 +75,13 @@ pub struct SharedLibrary {
 }
 
 impl SharedLibrary {
-    pub fn new(id: String, name: String, library_type: LibraryType, version: LibraryVersion, file_path: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        library_type: LibraryType,
+        version: LibraryVersion,
+        file_path: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -191,7 +197,8 @@ impl SigmaCraftLibs {
     }
 
     pub fn list_loaded(&self) -> Vec<&SharedLibrary> {
-        self.loaded_libraries.iter()
+        self.loaded_libraries
+            .iter()
             .filter_map(|id| self.libraries.get(id))
             .collect()
     }
@@ -223,16 +230,12 @@ pub fn init_sigmacraftlibs() {
 
 /// Get the global SigmaCraftLibs instance
 pub fn get_sigmacraftlibs() -> Option<&'static SigmaCraftLibs> {
-    unsafe {
-        SIGMACRAFTLIBS_INSTANCE.as_ref()
-    }
+    unsafe { SIGMACRAFTLIBS_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaCraftLibs instance (mutable)
 pub fn get_sigmacraftlibs_mut() -> Option<&'static mut SigmaCraftLibs> {
-    unsafe {
-        SIGMACRAFTLIBS_INSTANCE.as_mut()
-    }
+    unsafe { SIGMACRAFTLIBS_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a library
@@ -266,7 +269,13 @@ mod tests {
     #[test]
     fn test_shared_library_creation() {
         let version = LibraryVersion::new(1, 0, 0);
-        let lib = SharedLibrary::new("lib1".to_string(), "TestLib".to_string(), LibraryType::Dynamic, version, "/path/lib.so".to_string());
+        let lib = SharedLibrary::new(
+            "lib1".to_string(),
+            "TestLib".to_string(),
+            LibraryType::Dynamic,
+            version,
+            "/path/lib.so".to_string(),
+        );
         assert_eq!(lib.id, "lib1");
         assert!(!lib.loaded);
     }
@@ -274,8 +283,18 @@ mod tests {
     #[test]
     fn test_shared_library_modification() {
         let version = LibraryVersion::new(1, 0, 0);
-        let mut lib = SharedLibrary::new("lib1".to_string(), "Test".to_string(), LibraryType::Dynamic, version, "/path".to_string());
-        lib.add_dependency(LibraryDependency::new("dep1".to_string(), LibraryVersion::new(1, 0, 0), true));
+        let mut lib = SharedLibrary::new(
+            "lib1".to_string(),
+            "Test".to_string(),
+            LibraryType::Dynamic,
+            version,
+            "/path".to_string(),
+        );
+        lib.add_dependency(LibraryDependency::new(
+            "dep1".to_string(),
+            LibraryVersion::new(1, 0, 0),
+            true,
+        ));
         lib.set_loaded(true);
         assert_eq!(lib.dependency_count(), 1);
         assert!(lib.loaded);
@@ -292,7 +311,13 @@ mod tests {
     fn test_sigmacraftlibs_management() {
         let mut craftlibs = SigmaCraftLibs::new();
         let version = LibraryVersion::new(1, 0, 0);
-        let lib = SharedLibrary::new("lib1".to_string(), "Test".to_string(), LibraryType::Dynamic, version, "/path".to_string());
+        let lib = SharedLibrary::new(
+            "lib1".to_string(),
+            "Test".to_string(),
+            LibraryType::Dynamic,
+            version,
+            "/path".to_string(),
+        );
         craftlibs.add_library(lib);
         assert_eq!(craftlibs.library_count(), 1);
     }
@@ -301,7 +326,13 @@ mod tests {
     fn test_library_loading() {
         let mut craftlibs = SigmaCraftLibs::new();
         let version = LibraryVersion::new(1, 0, 0);
-        let lib = SharedLibrary::new("lib1".to_string(), "Test".to_string(), LibraryType::Dynamic, version, "/path".to_string());
+        let lib = SharedLibrary::new(
+            "lib1".to_string(),
+            "Test".to_string(),
+            LibraryType::Dynamic,
+            version,
+            "/path".to_string(),
+        );
         craftlibs.add_library(lib);
         assert!(craftlibs.load_library("lib1"));
         assert_eq!(craftlibs.loaded_count(), 1);

@@ -46,7 +46,12 @@ pub struct FirewallRule {
 }
 
 impl FirewallRule {
-    pub fn new(id: String, name: String, action: FirewallAction, protocol: FirewallProtocol) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        action: FirewallAction,
+        protocol: FirewallProtocol,
+    ) -> Self {
         Self {
             id,
             name,
@@ -81,7 +86,7 @@ pub struct SecurityPolicy {
     pub id: String,
     pub name: String,
     pub policy_type: String, // SELinux, AppArmor
-    pub mode: String, // Enforcing, Permissive, Disabled
+    pub mode: String,        // Enforcing, Permissive, Disabled
     pub enabled: bool,
 }
 
@@ -179,25 +184,29 @@ impl SigmaSecurityManager {
     }
 
     pub fn list_enabled_firewall_rules(&self) -> Vec<&FirewallRule> {
-        self.firewall_rules.values()
+        self.firewall_rules
+            .values()
             .filter(|rule| rule.enabled)
             .collect()
     }
 
     pub fn list_firewall_rules_by_action(&self, action: FirewallAction) -> Vec<&FirewallRule> {
-        self.firewall_rules.values()
+        self.firewall_rules
+            .values()
             .filter(|rule| rule.action == action)
             .collect()
     }
 
     pub fn list_enforcing_policies(&self) -> Vec<&SecurityPolicy> {
-        self.security_policies.values()
+        self.security_policies
+            .values()
             .filter(|policy| policy.enabled && policy.mode == "Enforcing")
             .collect()
     }
 
     pub fn list_access_by_resource(&self, resource: &str) -> Vec<&AccessControlEntry> {
-        self.access_controls.values()
+        self.access_controls
+            .values()
             .filter(|ace| ace.resource == resource)
             .collect()
     }
@@ -233,16 +242,12 @@ pub fn init_sigmasecuritymanager() {
 
 /// Get the global SigmaSecurityManager instance
 pub fn get_sigmasecuritymanager() -> Option<&'static SigmaSecurityManager> {
-    unsafe {
-        SIGMASECURITYMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMASECURITYMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaSecurityManager instance (mutable)
 pub fn get_sigmasecuritymanager_mut() -> Option<&'static mut SigmaSecurityManager> {
-    unsafe {
-        SIGMASECURITYMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMASECURITYMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a firewall rule

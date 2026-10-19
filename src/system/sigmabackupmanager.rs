@@ -59,7 +59,14 @@ pub struct BackupJob {
 }
 
 impl BackupJob {
-    pub fn new(id: String, name: String, source_path: String, destination_path: String, backup_type: BackupType, compression: CompressionType) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        source_path: String,
+        destination_path: String,
+        backup_type: BackupType,
+        compression: CompressionType,
+    ) -> Self {
         Self {
             id,
             name,
@@ -130,7 +137,17 @@ pub struct BackupSchedule {
 }
 
 impl BackupSchedule {
-    pub fn new(id: String, name: String, source_path: String, destination_path: String, backup_type: BackupType, compression: CompressionType, schedule_type: String, time: String, retention_count: u32) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        source_path: String,
+        destination_path: String,
+        backup_type: BackupType,
+        compression: CompressionType,
+        schedule_type: String,
+        time: String,
+        retention_count: u32,
+    ) -> Self {
         Self {
             id,
             name,
@@ -199,31 +216,33 @@ impl SigmaBackupManager {
     }
 
     pub fn list_by_type(&self, backup_type: BackupType) -> Vec<&BackupJob> {
-        self.backups.values()
+        self.backups
+            .values()
             .filter(|backup| backup.backup_type == backup_type)
             .collect()
     }
 
     pub fn list_completed(&self) -> Vec<&BackupJob> {
-        self.backups.values()
+        self.backups
+            .values()
             .filter(|backup| backup.is_complete())
             .collect()
     }
 
     pub fn list_failed(&self) -> Vec<&BackupJob> {
-        self.backups.values()
+        self.backups
+            .values()
             .filter(|backup| backup.status == BackupStatus::Failed)
             .collect()
     }
 
     pub fn total_backup_size(&self) -> u64 {
-        self.backups.values()
-            .map(|backup| backup.size)
-            .sum()
+        self.backups.values().map(|backup| backup.size).sum()
     }
 
     pub fn total_compressed_size(&self) -> u64 {
-        self.backups.values()
+        self.backups
+            .values()
             .map(|backup| backup.compressed_size)
             .sum()
     }
@@ -255,16 +274,12 @@ pub fn init_sigmabackupmanager() {
 
 /// Get the global SigmaBackupManager instance
 pub fn get_sigmabackupmanager() -> Option<&'static SigmaBackupManager> {
-    unsafe {
-        SIGMABACKUPMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMABACKUPMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaBackupManager instance (mutable)
 pub fn get_sigmabackupmanager_mut() -> Option<&'static mut SigmaBackupManager> {
-    unsafe {
-        SIGMABACKUPMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMABACKUPMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a backup

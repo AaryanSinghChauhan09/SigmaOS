@@ -62,7 +62,15 @@ pub struct SystemUpdate {
 }
 
 impl SystemUpdate {
-    pub fn new(id: String, name: String, description: String, update_type: UpdateType, priority: UpdatePriority, version: String, current_version: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        description: String,
+        update_type: UpdateType,
+        priority: UpdatePriority,
+        version: String,
+        current_version: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -115,14 +123,21 @@ pub struct UpdateSchedule {
     pub name: String,
     pub auto_update: bool,
     pub auto_download: bool,
-    pub schedule_type: String, // daily, weekly, monthly
+    pub schedule_type: String,       // daily, weekly, monthly
     pub day_of_week: Option<String>, // Monday, Tuesday, etc.
-    pub time: String, // HH:MM
+    pub time: String,                // HH:MM
     pub enabled: bool,
 }
 
 impl UpdateSchedule {
-    pub fn new(id: String, name: String, auto_update: bool, auto_download: bool, schedule_type: String, time: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        auto_update: bool,
+        auto_download: bool,
+        schedule_type: String,
+        time: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -192,37 +207,43 @@ impl SigmaUpdateManager {
     }
 
     pub fn list_security_updates(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|update| update.is_security())
             .collect()
     }
 
     pub fn list_critical_updates(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|update| update.is_critical())
             .collect()
     }
 
     pub fn list_by_priority(&self, priority: UpdatePriority) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|update| update.priority == priority)
             .collect()
     }
 
     pub fn list_by_type(&self, update_type: UpdateType) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|update| update.update_type == update_type)
             .collect()
     }
 
     pub fn list_available(&self) -> Vec<&SystemUpdate> {
-        self.updates.values()
+        self.updates
+            .values()
             .filter(|update| update.status == UpdateStatus::Available)
             .collect()
     }
 
     pub fn total_download_size(&self) -> u64 {
-        self.updates.values()
+        self.updates
+            .values()
             .map(|update| update.download_size)
             .sum()
     }
@@ -262,16 +283,12 @@ pub fn init_sigmaupdatemanager() {
 
 /// Get the global SigmaUpdateManager instance
 pub fn get_sigmaupdatemanager() -> Option<&'static SigmaUpdateManager> {
-    unsafe {
-        SIGMAUPDATEMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAUPDATEMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaUpdateManager instance (mutable)
 pub fn get_sigmaupdatemanager_mut() -> Option<&'static mut SigmaUpdateManager> {
-    unsafe {
-        SIGMAUPDATEMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAUPDATEMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an update

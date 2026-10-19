@@ -116,7 +116,14 @@ pub struct Photo {
 }
 
 impl Photo {
-    pub fn new(id: String, name: String, file_path: String, format: ImageFormat, width: u32, height: u32) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        file_path: String,
+        format: ImageFormat,
+        width: u32,
+        height: u32,
+    ) -> Self {
         Self {
             id,
             name,
@@ -283,7 +290,8 @@ impl SigmaPhoto {
     }
 
     pub fn get_current_album(&self) -> Option<&PhotoAlbum> {
-        self.current_album.as_ref()
+        self.current_album
+            .as_ref()
             .and_then(|id| self.albums.get(id))
     }
 
@@ -330,16 +338,12 @@ pub fn init_sigmaphoto() {
 
 /// Get the global SigmaPhoto instance
 pub fn get_sigmaphoto() -> Option<&'static SigmaPhoto> {
-    unsafe {
-        SIGMAPHOTO_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPHOTO_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaPhoto instance (mutable)
 pub fn get_sigmaphoto_mut() -> Option<&'static mut SigmaPhoto> {
-    unsafe {
-        SIGMAPHOTO_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPHOTO_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a photo
@@ -372,7 +376,14 @@ mod tests {
 
     #[test]
     fn test_photo_creation() {
-        let photo = Photo::new("photo1".to_string(), "Sunset".to_string(), "/path/to/image.jpg".to_string(), ImageFormat::JPEG, 1920, 1080);
+        let photo = Photo::new(
+            "photo1".to_string(),
+            "Sunset".to_string(),
+            "/path/to/image.jpg".to_string(),
+            ImageFormat::JPEG,
+            1920,
+            1080,
+        );
         assert_eq!(photo.id, "photo1");
         assert_eq!(photo.format, ImageFormat::JPEG);
         assert_eq!(photo.get_aspect_ratio(), 1920.0 / 1080.0);
@@ -380,7 +391,14 @@ mod tests {
 
     #[test]
     fn test_photo_modification() {
-        let mut photo = Photo::new("photo1".to_string(), "Test".to_string(), "/path".to_string(), ImageFormat::JPEG, 1920, 1080);
+        let mut photo = Photo::new(
+            "photo1".to_string(),
+            "Test".to_string(),
+            "/path".to_string(),
+            ImageFormat::JPEG,
+            1920,
+            1080,
+        );
         photo.add_adjustment(PhotoAdjustment::new(AdjustmentType::Brightness, 30));
         photo.add_filter("filter1".to_string());
         assert_eq!(photo.adjustment_count(), 1);
@@ -404,7 +422,14 @@ mod tests {
     #[test]
     fn test_sigmaphoto_management() {
         let mut photo_sys = SigmaPhoto::new();
-        let photo = Photo::new("photo1".to_string(), "Test".to_string(), "/path".to_string(), ImageFormat::JPEG, 1920, 1080);
+        let photo = Photo::new(
+            "photo1".to_string(),
+            "Test".to_string(),
+            "/path".to_string(),
+            ImageFormat::JPEG,
+            1920,
+            1080,
+        );
         photo_sys.add_photo(photo);
         assert_eq!(photo_sys.photo_count(), 1);
     }

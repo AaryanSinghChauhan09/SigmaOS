@@ -37,9 +37,9 @@ pub struct PowerProfile {
     pub name: String,
     pub power_mode: PowerMode,
     pub cpu_governor: String,
-    pub screen_brightness: u8, // 0-100
+    pub screen_brightness: u8,  // 0-100
     pub disk_idle_timeout: u32, // seconds
-    pub sleep_timeout: u32, // seconds
+    pub sleep_timeout: u32,     // seconds
     pub hibernate_timeout: u32, // seconds
     pub wifi_power_save: bool,
     pub bluetooth_power_save: bool,
@@ -84,11 +84,11 @@ pub struct BatteryInfo {
     pub id: String,
     pub capacity: u32, // percentage
     pub status: BatteryStatus,
-    pub voltage: f32, // volts
-    pub energy: f32, // watt-hours
-    pub energy_rate: f32, // watts
+    pub voltage: f32,               // volts
+    pub energy: f32,                // watt-hours
+    pub energy_rate: f32,           // watts
     pub time_to_empty: Option<u32>, // seconds
-    pub time_to_full: Option<u32>, // seconds
+    pub time_to_full: Option<u32>,  // seconds
 }
 
 impl BatteryInfo {
@@ -205,18 +205,21 @@ impl SigmaPowerManager {
     }
 
     pub fn get_active_profile(&self) -> Option<&PowerProfile> {
-        self.active_profile.as_ref()
+        self.active_profile
+            .as_ref()
             .and_then(|id| self.profiles.get(id))
     }
 
     pub fn list_low_batteries(&self) -> Vec<&BatteryInfo> {
-        self.batteries.values()
+        self.batteries
+            .values()
             .filter(|battery| battery.is_low())
             .collect()
     }
 
     pub fn list_critical_batteries(&self) -> Vec<&BatteryInfo> {
-        self.batteries.values()
+        self.batteries
+            .values()
             .filter(|battery| battery.is_critical())
             .collect()
     }
@@ -248,16 +251,12 @@ pub fn init_sigmapowermanager() {
 
 /// Get the global SigmaPowerManager instance
 pub fn get_sigmapowermanager() -> Option<&'static SigmaPowerManager> {
-    unsafe {
-        SIGMAPOWERMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPOWERMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaPowerManager instance (mutable)
 pub fn get_sigmapowermanager_mut() -> Option<&'static mut SigmaPowerManager> {
-    unsafe {
-        SIGMAPOWERMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPOWERMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a profile

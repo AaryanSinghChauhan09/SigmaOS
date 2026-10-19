@@ -221,8 +221,7 @@ impl SigmaDeck {
     }
 
     pub fn get_current_deck(&self) -> Option<&PresentationDeck> {
-        self.current_deck.as_ref()
-            .and_then(|id| self.decks.get(id))
+        self.current_deck.as_ref().and_then(|id| self.decks.get(id))
     }
 
     pub fn set_current_slide(&mut self, slide_id: String) -> bool {
@@ -238,7 +237,8 @@ impl SigmaDeck {
     }
 
     pub fn get_current_slide(&self) -> Option<&Slide> {
-        self.current_deck.as_ref()
+        self.current_deck
+            .as_ref()
             .and_then(|deck_id| self.decks.get(deck_id))
             .and_then(|deck| self.current_slide.as_ref())
             .and_then(|slide_id| deck.slides.get(slide_id))
@@ -331,16 +331,12 @@ pub fn init_sigmadeck() {
 
 /// Get the global SigmaDeck instance
 pub fn get_sigmadeck() -> Option<&'static SigmaDeck> {
-    unsafe {
-        SIGMADECK_INSTANCE.as_ref()
-    }
+    unsafe { SIGMADECK_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaDeck instance (mutable)
 pub fn get_sigmadeck_mut() -> Option<&'static mut SigmaDeck> {
-    unsafe {
-        SIGMADECK_INSTANCE.as_mut()
-    }
+    unsafe { SIGMADECK_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a deck
@@ -359,14 +355,22 @@ mod tests {
 
     #[test]
     fn test_slide_element_creation() {
-        let element = SlideElement::new("elem1".to_string(), SlideElementType::Text, "Hello".to_string());
+        let element = SlideElement::new(
+            "elem1".to_string(),
+            SlideElementType::Text,
+            "Hello".to_string(),
+        );
         assert_eq!(element.id, "elem1");
         assert_eq!(element.element_type, SlideElementType::Text);
     }
 
     #[test]
     fn test_slide_element_modification() {
-        let mut element = SlideElement::new("elem1".to_string(), SlideElementType::Text, "Test".to_string());
+        let mut element = SlideElement::new(
+            "elem1".to_string(),
+            SlideElementType::Text,
+            "Test".to_string(),
+        );
         element.set_position(50.0, 100.0);
         element.set_size(200.0, 150.0);
         assert_eq!(element.position_x, 50.0);

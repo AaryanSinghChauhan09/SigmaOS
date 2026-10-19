@@ -51,7 +51,14 @@ pub struct HardwareDevice {
 }
 
 impl HardwareDevice {
-    pub fn new(id: String, vendor_id: String, device_id: String, name: String, device_type: DriverType, bus: String) -> Self {
+    pub fn new(
+        id: String,
+        vendor_id: String,
+        device_id: String,
+        name: String,
+        device_type: DriverType,
+        bus: String,
+    ) -> Self {
         Self {
             id,
             vendor_id,
@@ -84,7 +91,14 @@ pub struct DriverPackage {
 }
 
 impl DriverPackage {
-    pub fn new(id: String, name: String, driver_type: DriverType, version: String, vendor: String, description: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        driver_type: DriverType,
+        version: String,
+        vendor: String,
+        description: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -164,38 +178,44 @@ impl SigmaDriverManager {
     }
 
     pub fn find_compatible_drivers(&self, device_id: &str) -> Vec<&DriverPackage> {
-        self.drivers.values()
+        self.drivers
+            .values()
             .filter(|driver| driver.is_compatible_with(device_id))
             .collect()
     }
 
     pub fn find_drivers_for_device(&self, device: &HardwareDevice) -> Vec<&DriverPackage> {
-        self.drivers.values()
+        self.drivers
+            .values()
             .filter(|driver| driver.driver_type == device.device_type)
             .filter(|driver| driver.is_compatible_with(&device.id))
             .collect()
     }
 
     pub fn list_missing_drivers(&self) -> Vec<&HardwareDevice> {
-        self.devices.values()
+        self.devices
+            .values()
             .filter(|device| device.needs_driver)
             .collect()
     }
 
     pub fn list_available_updates(&self) -> Vec<&DriverPackage> {
-        self.drivers.values()
+        self.drivers
+            .values()
             .filter(|driver| driver.needs_update())
             .collect()
     }
 
     pub fn list_devices_by_type(&self, device_type: DriverType) -> Vec<&HardwareDevice> {
-        self.devices.values()
+        self.devices
+            .values()
             .filter(|device| device.device_type == device_type)
             .collect()
     }
 
     pub fn list_drivers_by_type(&self, driver_type: DriverType) -> Vec<&DriverPackage> {
-        self.drivers.values()
+        self.drivers
+            .values()
             .filter(|driver| driver.driver_type == driver_type)
             .collect()
     }
@@ -227,16 +247,12 @@ pub fn init_sigmadrivermanager() {
 
 /// Get the global SigmaDriverManager instance
 pub fn get_sigmadrivermanager() -> Option<&'static SigmaDriverManager> {
-    unsafe {
-        SIGMADRIVERMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMADRIVERMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaDriverManager instance (mutable)
 pub fn get_sigmadrivermanager_mut() -> Option<&'static mut SigmaDriverManager> {
-    unsafe {
-        SIGMADRIVERMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMADRIVERMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a device

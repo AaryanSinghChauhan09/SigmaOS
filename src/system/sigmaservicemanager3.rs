@@ -43,7 +43,7 @@ pub struct Service {
     pub enabled: bool,
     pub pid: Option<u32>,
     pub memory_usage: u64, // in bytes
-    pub cpu_usage: f32, // percentage
+    pub cpu_usage: f32,    // percentage
     pub dependencies: Vec<String>,
 }
 
@@ -126,25 +126,26 @@ impl SigmaServiceManager {
     }
 
     pub fn list_running(&self) -> Vec<&Service> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|svc| svc.is_running())
             .collect()
     }
 
     pub fn list_failed(&self) -> Vec<&Service> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|svc| svc.is_failed())
             .collect()
     }
 
     pub fn list_enabled(&self) -> Vec<&Service> {
-        self.services.values()
-            .filter(|svc| svc.enabled)
-            .collect()
+        self.services.values().filter(|svc| svc.enabled).collect()
     }
 
     pub fn list_by_type(&self, service_type: ServiceType) -> Vec<&Service> {
-        self.services.values()
+        self.services
+            .values()
             .filter(|svc| svc.service_type == service_type)
             .collect()
     }
@@ -209,16 +210,12 @@ pub fn init_sigmaservicemanager() {
 
 /// Get the global SigmaServiceManager instance
 pub fn get_sigmaservicemanager() -> Option<&'static SigmaServiceManager> {
-    unsafe {
-        SIGMASERVICEMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMASERVICEMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaServiceManager instance (mutable)
 pub fn get_sigmaservicemanager_mut() -> Option<&'static mut SigmaServiceManager> {
-    unsafe {
-        SIGMASERVICEMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMASERVICEMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a service

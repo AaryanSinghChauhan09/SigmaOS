@@ -108,7 +108,13 @@ pub struct PrintJob {
 }
 
 impl PrintJob {
-    pub fn new(id: String, name: String, file_path: String, printer_id: String, options: PrintOptions) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        file_path: String,
+        printer_id: String,
+        options: PrintOptions,
+    ) -> Self {
         Self {
             id,
             name,
@@ -167,7 +173,8 @@ impl SigmaPrint {
     }
 
     pub fn get_next_job(&self) -> Option<&PrintJob> {
-        self.print_queue.first()
+        self.print_queue
+            .first()
             .and_then(|id| self.print_jobs.get(id))
     }
 
@@ -196,7 +203,8 @@ impl SigmaPrint {
     }
 
     pub fn list_queue(&self) -> Vec<&PrintJob> {
-        self.print_queue.iter()
+        self.print_queue
+            .iter()
             .filter_map(|id| self.print_jobs.get(id))
             .collect()
     }
@@ -228,16 +236,12 @@ pub fn init_sigmaprint() {
 
 /// Get the global SigmaPrint instance
 pub fn get_sigmaprint() -> Option<&'static SigmaPrint> {
-    unsafe {
-        SIGMAPRINT_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPRINT_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaPrint instance (mutable)
 pub fn get_sigmaprint_mut() -> Option<&'static mut SigmaPrint> {
-    unsafe {
-        SIGMAPRINT_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPRINT_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a print job
@@ -276,7 +280,13 @@ mod tests {
     #[test]
     fn test_print_job_creation() {
         let options = PrintOptions::new();
-        let job = PrintJob::new("job1".to_string(), "Document".to_string(), "/path/doc.pdf".to_string(), "printer1".to_string(), options);
+        let job = PrintJob::new(
+            "job1".to_string(),
+            "Document".to_string(),
+            "/path/doc.pdf".to_string(),
+            "printer1".to_string(),
+            options,
+        );
         assert_eq!(job.id, "job1");
         assert_eq!(job.status, "Pending");
     }
@@ -284,7 +294,13 @@ mod tests {
     #[test]
     fn test_print_job_modification() {
         let options = PrintOptions::new();
-        let mut job = PrintJob::new("job1".to_string(), "Test".to_string(), "/path".to_string(), "printer1".to_string(), options);
+        let mut job = PrintJob::new(
+            "job1".to_string(),
+            "Test".to_string(),
+            "/path".to_string(),
+            "printer1".to_string(),
+            options,
+        );
         job.set_status("Printing".to_string());
         job.set_pages(5);
         assert_eq!(job.status, "Printing");
@@ -302,7 +318,13 @@ mod tests {
     fn test_sigmaprint_management() {
         let mut print_sys = SigmaPrint::new();
         let options = PrintOptions::new();
-        let job = PrintJob::new("job1".to_string(), "Test".to_string(), "/path".to_string(), "printer1".to_string(), options);
+        let job = PrintJob::new(
+            "job1".to_string(),
+            "Test".to_string(),
+            "/path".to_string(),
+            "printer1".to_string(),
+            options,
+        );
         print_sys.add_print_job(job);
         assert_eq!(print_sys.job_count(), 1);
         assert_eq!(print_sys.queue_size(), 1);
@@ -312,7 +334,13 @@ mod tests {
     fn test_job_completion() {
         let mut print_sys = SigmaPrint::new();
         let options = PrintOptions::new();
-        let job = PrintJob::new("job1".to_string(), "Test".to_string(), "/path".to_string(), "printer1".to_string(), options);
+        let job = PrintJob::new(
+            "job1".to_string(),
+            "Test".to_string(),
+            "/path".to_string(),
+            "printer1".to_string(),
+            options,
+        );
         print_sys.add_print_job(job);
         assert!(print_sys.complete_job("job1"));
         assert_eq!(print_sys.queue_size(), 0);

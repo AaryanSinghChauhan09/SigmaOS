@@ -54,7 +54,14 @@ pub struct Notification {
 }
 
 impl Notification {
-    pub fn new(id: String, app_name: String, title: String, body: String, category: NotificationCategory, urgency: NotificationUrgency) -> Self {
+    pub fn new(
+        id: String,
+        app_name: String,
+        title: String,
+        body: String,
+        category: NotificationCategory,
+        urgency: NotificationUrgency,
+    ) -> Self {
         Self {
             id,
             app_name,
@@ -158,7 +165,8 @@ impl SigmaNotificationManager {
     }
 
     pub fn add_notification(&mut self, notification: Notification) {
-        self.notifications.insert(notification.id.clone(), notification);
+        self.notifications
+            .insert(notification.id.clone(), notification);
         // Enforce history limit
         while self.notifications.len() > self.history_limit {
             if let Some(first_key) = self.notifications.keys().next().cloned() {
@@ -202,19 +210,22 @@ impl SigmaNotificationManager {
     }
 
     pub fn list_critical(&self) -> Vec<&Notification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|notif| notif.is_critical())
             .collect()
     }
 
     pub fn list_by_category(&self, category: NotificationCategory) -> Vec<&Notification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|notif| notif.category == category)
             .collect()
     }
 
     pub fn list_by_app(&self, app_name: &str) -> Vec<&Notification> {
-        self.notifications.values()
+        self.notifications
+            .values()
             .filter(|notif| notif.app_name == app_name)
             .collect()
     }
@@ -261,16 +272,12 @@ pub fn init_sigmanotificationmanager() {
 
 /// Get the global SigmaNotificationManager instance
 pub fn get_sigmanotificationmanager() -> Option<&'static SigmaNotificationManager> {
-    unsafe {
-        SIGMANOTIFICATIONMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMANOTIFICATIONMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaNotificationManager instance (mutable)
 pub fn get_sigmanotificationmanager_mut() -> Option<&'static mut SigmaNotificationManager> {
-    unsafe {
-        SIGMANOTIFICATIONMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMANOTIFICATIONMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a notification

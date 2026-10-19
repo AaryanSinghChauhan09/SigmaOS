@@ -191,13 +191,15 @@ impl SigmaDisplayManager {
     }
 
     pub fn list_connected(&self) -> Vec<&DisplayOutput> {
-        self.outputs.values()
+        self.outputs
+            .values()
             .filter(|output| output.is_connected)
             .collect()
     }
 
     pub fn list_enabled(&self) -> Vec<&DisplayOutput> {
-        self.outputs.values()
+        self.outputs
+            .values()
             .filter(|output| output.enabled)
             .collect()
     }
@@ -233,16 +235,12 @@ pub fn init_sigmadisplaymanager() {
 
 /// Get the global SigmaDisplayManager instance
 pub fn get_sigmadisplaymanager() -> Option<&'static SigmaDisplayManager> {
-    unsafe {
-        SIGMADISPLAYMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMADISPLAYMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaDisplayManager instance (mutable)
 pub fn get_sigmadisplaymanager_mut() -> Option<&'static mut SigmaDisplayManager> {
-    unsafe {
-        SIGMADISPLAYMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMADISPLAYMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an output

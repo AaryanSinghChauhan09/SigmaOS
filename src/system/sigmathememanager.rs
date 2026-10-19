@@ -38,7 +38,13 @@ pub struct ColorScheme {
 }
 
 impl ColorScheme {
-    pub fn new(id: String, name: String, background: String, foreground: String, accent: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        background: String,
+        foreground: String,
+        accent: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -77,7 +83,13 @@ pub struct Theme {
 }
 
 impl Theme {
-    pub fn new(id: String, name: String, theme_type: ThemeType, path: String, is_dark: bool) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        theme_type: ThemeType,
+        path: String,
+        is_dark: bool,
+    ) -> Self {
         Self {
             id,
             name,
@@ -104,9 +116,9 @@ pub struct FontConfig {
     pub id: String,
     pub name: String,
     pub font_family: String,
-    pub size: u32, // in points
+    pub size: u32,      // in points
     pub weight: String, // normal, bold, light
-    pub style: String, // normal, italic
+    pub style: String,  // normal, italic
     pub antialiasing: bool,
     pub hinting: bool,
 }
@@ -230,19 +242,19 @@ impl SigmaThemeManager {
     }
 
     pub fn list_by_type(&self, theme_type: ThemeType) -> Vec<&Theme> {
-        self.themes.values()
+        self.themes
+            .values()
             .filter(|theme| theme.theme_type == theme_type)
             .collect()
     }
 
     pub fn list_dark(&self) -> Vec<&Theme> {
-        self.themes.values()
-            .filter(|theme| theme.is_dark)
-            .collect()
+        self.themes.values().filter(|theme| theme.is_dark).collect()
     }
 
     pub fn list_light(&self) -> Vec<&Theme> {
-        self.themes.values()
+        self.themes
+            .values()
             .filter(|theme| !theme.is_dark)
             .collect()
     }
@@ -278,16 +290,12 @@ pub fn init_sigmathememanager() {
 
 /// Get the global SigmaThemeManager instance
 pub fn get_sigmathememanager() -> Option<&'static SigmaThemeManager> {
-    unsafe {
-        SIGMATHEMEMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMATHEMEMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaThemeManager instance (mutable)
 pub fn get_sigmathememanager_mut() -> Option<&'static mut SigmaThemeManager> {
-    unsafe {
-        SIGMATHEMEMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMATHEMEMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a theme

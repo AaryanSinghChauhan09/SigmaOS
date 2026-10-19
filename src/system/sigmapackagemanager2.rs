@@ -73,7 +73,14 @@ pub struct Package {
 }
 
 impl Package {
-    pub fn new(id: String, name: String, version: String, description: String, package_type: PackageType, repository: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        version: String,
+        description: String,
+        package_type: PackageType,
+        repository: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -159,7 +166,8 @@ impl SigmaPackageManager {
 
     pub fn search_packages(&self, query: &str) -> Vec<&Package> {
         let query_lower = query.to_lowercase();
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|pkg| {
                 pkg.name.to_lowercase().contains(&query_lower)
                     || pkg.description.to_lowercase().contains(&query_lower)
@@ -168,31 +176,36 @@ impl SigmaPackageManager {
     }
 
     pub fn list_installed(&self) -> Vec<&Package> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|pkg| pkg.is_installed())
             .collect()
     }
 
     pub fn list_updates(&self) -> Vec<&Package> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|pkg| pkg.needs_update())
             .collect()
     }
 
     pub fn list_by_repository(&self, repo_name: &str) -> Vec<&Package> {
-        self.packages.values()
+        self.packages
+            .values()
             .filter(|pkg| pkg.repository == repo_name)
             .collect()
     }
 
     pub fn list_enabled_repositories(&self) -> Vec<&Repository> {
-        self.repositories.values()
+        self.repositories
+            .values()
             .filter(|repo| repo.enabled)
             .collect()
     }
 
     pub fn total_download_size(&self, package_ids: &[String]) -> u64 {
-        package_ids.iter()
+        package_ids
+            .iter()
             .filter_map(|id| self.packages.get(id))
             .map(|pkg| pkg.size)
             .sum()
@@ -225,16 +238,12 @@ pub fn init_sigmapackagemanager() {
 
 /// Get the global SigmaPackageManager instance
 pub fn get_sigmapackagemanager() -> Option<&'static SigmaPackageManager> {
-    unsafe {
-        SIGMAPACKAGEMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPACKAGEMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaPackageManager instance (mutable)
 pub fn get_sigmapackagemanager_mut() -> Option<&'static mut SigmaPackageManager> {
-    unsafe {
-        SIGMAPACKAGEMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPACKAGEMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a package

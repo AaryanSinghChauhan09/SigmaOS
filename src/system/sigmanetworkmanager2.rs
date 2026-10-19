@@ -47,7 +47,12 @@ pub struct NetworkInterface {
 }
 
 impl NetworkInterface {
-    pub fn new(id: String, name: String, connection_type: ConnectionType, mac_address: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        connection_type: ConnectionType,
+        mac_address: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -205,25 +210,29 @@ impl SigmaNetworkManager {
     }
 
     pub fn list_connected(&self) -> Vec<&NetworkInterface> {
-        self.interfaces.values()
+        self.interfaces
+            .values()
             .filter(|iface| iface.is_connected())
             .collect()
     }
 
     pub fn list_by_type(&self, conn_type: ConnectionType) -> Vec<&NetworkInterface> {
-        self.interfaces.values()
+        self.interfaces
+            .values()
             .filter(|iface| iface.connection_type == conn_type)
             .collect()
     }
 
     pub fn list_primary_dns(&self) -> Vec<&DNSServer> {
-        self.dns_servers.values()
+        self.dns_servers
+            .values()
             .filter(|dns| dns.is_primary)
             .collect()
     }
 
     pub fn list_auto_connect_profiles(&self) -> Vec<&NetworkProfile> {
-        self.profiles.values()
+        self.profiles
+            .values()
             .filter(|profile| profile.auto_connect)
             .collect()
     }
@@ -259,16 +268,12 @@ pub fn init_sigmanetworkmanager() {
 
 /// Get the global SigmaNetworkManager instance
 pub fn get_sigmanetworkmanager() -> Option<&'static SigmaNetworkManager> {
-    unsafe {
-        SIGMANETWORKMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMANETWORKMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaNetworkManager instance (mutable)
 pub fn get_sigmanetworkmanager_mut() -> Option<&'static mut SigmaNetworkManager> {
-    unsafe {
-        SIGMANETWORKMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMANETWORKMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an interface
@@ -314,11 +319,7 @@ mod tests {
 
     #[test]
     fn test_dns_server_creation() {
-        let dns = DNSServer::new(
-            "dns1".to_string(),
-            "8.8.8.8".to_string(),
-            true,
-        );
+        let dns = DNSServer::new("dns1".to_string(), "8.8.8.8".to_string(), true);
         assert_eq!(dns.id, "dns1");
         assert!(dns.is_primary);
     }
@@ -342,7 +343,11 @@ mod tests {
             ConnectionType::Ethernet,
         );
         profile.set_auto_connect(true);
-        profile.set_static_config("192.168.1.50".to_string(), "255.255.255.0".to_string(), "192.168.1.1".to_string());
+        profile.set_static_config(
+            "192.168.1.50".to_string(),
+            "255.255.255.0".to_string(),
+            "192.168.1.1".to_string(),
+        );
         assert!(profile.auto_connect);
         assert!(!profile.use_dhcp);
     }

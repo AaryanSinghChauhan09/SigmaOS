@@ -24,7 +24,13 @@ pub struct KeyboardLayout {
 }
 
 impl KeyboardLayout {
-    pub fn new(id: String, name: String, language: String, variant: String, short_name: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        language: String,
+        variant: String,
+        short_name: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -92,7 +98,7 @@ impl InputMethod {
 pub struct KeyboardSettings {
     pub id: String,
     pub repeat_delay: u32, // milliseconds
-    pub repeat_rate: u32, // characters per second
+    pub repeat_rate: u32,  // characters per second
     pub numlock_on_startup: bool,
     pub capslock_indicator: bool,
 }
@@ -192,7 +198,8 @@ impl SigmaKeyboardManager {
     }
 
     pub fn get_active_layout(&self) -> Option<&KeyboardLayout> {
-        self.active_layout.as_ref()
+        self.active_layout
+            .as_ref()
             .and_then(|id| self.layouts.get(id))
     }
 
@@ -205,13 +212,12 @@ impl SigmaKeyboardManager {
     }
 
     pub fn list_enabled_keybindings(&self) -> Vec<&Keybinding> {
-        self.keybindings.values()
-            .filter(|kb| kb.enabled)
-            .collect()
+        self.keybindings.values().filter(|kb| kb.enabled).collect()
     }
 
     pub fn list_enabled_input_methods(&self) -> Vec<&InputMethod> {
-        self.input_methods.values()
+        self.input_methods
+            .values()
             .filter(|im| im.enabled)
             .collect()
     }
@@ -243,16 +249,12 @@ pub fn init_sigmakeyboardmanager() {
 
 /// Get the global SigmaKeyboardManager instance
 pub fn get_sigmakeyboardmanager() -> Option<&'static SigmaKeyboardManager> {
-    unsafe {
-        SIGMAKEYBOARDMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAKEYBOARDMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaKeyboardManager instance (mutable)
 pub fn get_sigmakeyboardmanager_mut() -> Option<&'static mut SigmaKeyboardManager> {
-    unsafe {
-        SIGMAKEYBOARDMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAKEYBOARDMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a layout
@@ -310,11 +312,7 @@ mod tests {
 
     #[test]
     fn test_input_method_creation() {
-        let im = InputMethod::new(
-            "ibus".to_string(),
-            "IBus".to_string(),
-            "en".to_string(),
-        );
+        let im = InputMethod::new("ibus".to_string(), "IBus".to_string(), "en".to_string());
         assert_eq!(im.id, "ibus");
         assert!(!im.enabled);
     }

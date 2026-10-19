@@ -137,8 +137,7 @@ impl SigmaVoice {
     }
 
     pub fn match_command(&self, input: &str) -> Option<&VoiceCommand> {
-        self.voice_commands.values()
-            .find(|cmd| cmd.matches(input))
+        self.voice_commands.values().find(|cmd| cmd.matches(input))
     }
 
     pub fn add_speech_result(&mut self, result: SpeechResult) {
@@ -178,7 +177,8 @@ impl SigmaVoice {
     }
 
     pub fn get_current_profile(&self) -> Option<&VoiceProfile> {
-        self.current_profile.as_ref()
+        self.current_profile
+            .as_ref()
             .and_then(|id| self.voice_profiles.get(id))
     }
 
@@ -221,16 +221,12 @@ pub fn init_sigmavoice() {
 
 /// Get the global SigmaVoice instance
 pub fn get_sigmavoice() -> Option<&'static SigmaVoice> {
-    unsafe {
-        SIGMAVOICE_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAVOICE_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaVoice instance (mutable)
 pub fn get_sigmavoice_mut() -> Option<&'static mut SigmaVoice> {
-    unsafe {
-        SIGMAVOICE_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAVOICE_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a voice command
@@ -249,35 +245,52 @@ mod tests {
 
     #[test]
     fn test_voice_command_creation() {
-        let command = VoiceCommand::new("cmd1".to_string(), "hello".to_string(), "greet".to_string());
+        let command =
+            VoiceCommand::new("cmd1".to_string(), "hello".to_string(), "greet".to_string());
         assert_eq!(command.id, "cmd1");
         assert!(command.enabled);
     }
 
     #[test]
     fn test_voice_command_matching() {
-        let command = VoiceCommand::new("cmd1".to_string(), "hello".to_string(), "greet".to_string());
+        let command =
+            VoiceCommand::new("cmd1".to_string(), "hello".to_string(), "greet".to_string());
         assert!(command.matches("hello world"));
         assert!(!command.matches("goodbye"));
     }
 
     #[test]
     fn test_speech_result_creation() {
-        let result = SpeechResult::new("result1".to_string(), "Hello world".to_string(), 0.95, "en-US".to_string());
+        let result = SpeechResult::new(
+            "result1".to_string(),
+            "Hello world".to_string(),
+            0.95,
+            "en-US".to_string(),
+        );
         assert_eq!(result.text, "Hello world");
         assert!(result.is_confident());
     }
 
     #[test]
     fn test_voice_profile_creation() {
-        let profile = VoiceProfile::new("profile1".to_string(), "Default".to_string(), "en-US".to_string(), "voice1".to_string());
+        let profile = VoiceProfile::new(
+            "profile1".to_string(),
+            "Default".to_string(),
+            "en-US".to_string(),
+            "voice1".to_string(),
+        );
         assert_eq!(profile.id, "profile1");
         assert_eq!(profile.pitch, 1.0);
     }
 
     #[test]
     fn test_voice_profile_modification() {
-        let mut profile = VoiceProfile::new("profile1".to_string(), "Test".to_string(), "en-US".to_string(), "voice1".to_string());
+        let mut profile = VoiceProfile::new(
+            "profile1".to_string(),
+            "Test".to_string(),
+            "en-US".to_string(),
+            "voice1".to_string(),
+        );
         profile.set_pitch(1.2);
         profile.set_rate(1.5);
         assert_eq!(profile.pitch, 1.2);
@@ -294,7 +307,8 @@ mod tests {
     #[test]
     fn test_sigmavoice_management() {
         let mut voice = SigmaVoice::new();
-        let command = VoiceCommand::new("cmd1".to_string(), "hello".to_string(), "greet".to_string());
+        let command =
+            VoiceCommand::new("cmd1".to_string(), "hello".to_string(), "greet".to_string());
         voice.add_voice_command(command);
         assert_eq!(voice.command_count(), 1);
     }

@@ -65,8 +65,15 @@ impl VectorPoint {
 pub enum PathSegment {
     MoveTo(VectorPoint),
     LineTo(VectorPoint),
-    BezierCurveTo { control1: VectorPoint, control2: VectorPoint, end: VectorPoint },
-    QuadraticCurveTo { control: VectorPoint, end: VectorPoint },
+    BezierCurveTo {
+        control1: VectorPoint,
+        control2: VectorPoint,
+        end: VectorPoint,
+    },
+    QuadraticCurveTo {
+        control: VectorPoint,
+        end: VectorPoint,
+    },
     ClosePath,
 }
 
@@ -226,12 +233,14 @@ impl SigmaVector {
     }
 
     pub fn get_current_layer(&self) -> Option<&VectorLayer> {
-        self.current_layer.as_ref()
+        self.current_layer
+            .as_ref()
             .and_then(|id| self.layers.get(id))
     }
 
     pub fn get_current_layer_mut(&mut self) -> Option<&mut VectorLayer> {
-        self.current_layer.as_ref()
+        self.current_layer
+            .as_ref()
             .and_then(|id| self.layers.get_mut(id.as_str()))
     }
 
@@ -262,16 +271,12 @@ pub fn init_sigmavector() {
 
 /// Get the global SigmaVector instance
 pub fn get_sigmavector() -> Option<&'static SigmaVector> {
-    unsafe {
-        SIGMAVECTOR_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAVECTOR_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaVector instance (mutable)
 pub fn get_sigmavector_mut() -> Option<&'static mut SigmaVector> {
-    unsafe {
-        SIGMAVECTOR_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAVECTOR_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a layer

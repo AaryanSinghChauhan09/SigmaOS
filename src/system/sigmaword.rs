@@ -190,12 +190,14 @@ impl SigmaWord {
     }
 
     pub fn get_current_document(&self) -> Option<&Document> {
-        self.current_document.as_ref()
+        self.current_document
+            .as_ref()
             .and_then(|id| self.documents.get(id))
     }
 
     pub fn get_current_document_mut(&mut self) -> Option<&mut Document> {
-        self.current_document.as_ref()
+        self.current_document
+            .as_ref()
             .and_then(|id| self.documents.get_mut(id.as_str()))
     }
 
@@ -226,16 +228,12 @@ pub fn init_sigmaword() {
 
 /// Get the global SigmaWord instance
 pub fn get_sigmaword() -> Option<&'static SigmaWord> {
-    unsafe {
-        SIGMAWORD_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAWORD_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaWord instance (mutable)
 pub fn get_sigmaword_mut() -> Option<&'static mut SigmaWord> {
-    unsafe {
-        SIGMAWORD_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAWORD_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a document

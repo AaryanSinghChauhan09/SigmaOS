@@ -37,7 +37,13 @@ pub struct SystemTool {
 }
 
 impl SystemTool {
-    pub fn new(id: String, name: String, category: ToolCategory, description: String, executable_path: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        category: ToolCategory,
+        description: String,
+        executable_path: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -75,7 +81,13 @@ pub struct MaintenanceTask {
 }
 
 impl MaintenanceTask {
-    pub fn new(id: String, name: String, description: String, frequency: String, next_run: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        description: String,
+        frequency: String,
+        next_run: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -184,7 +196,8 @@ impl SigmaSystemTools {
     }
 
     pub fn get_due_tasks(&self, current_time: &str) -> Vec<&MaintenanceTask> {
-        self.maintenance_tasks.values()
+        self.maintenance_tasks
+            .values()
             .filter(|task| task.is_due(current_time))
             .collect()
     }
@@ -194,13 +207,15 @@ impl SigmaSystemTools {
     }
 
     pub fn list_tools_by_category(&self, category: ToolCategory) -> Vec<&SystemTool> {
-        self.tools.values()
+        self.tools
+            .values()
             .filter(|tool| tool.category == category)
             .collect()
     }
 
     pub fn list_available_tools(&self) -> Vec<&SystemTool> {
-        self.tools.values()
+        self.tools
+            .values()
             .filter(|tool| tool.is_available())
             .collect()
     }
@@ -214,7 +229,10 @@ impl SigmaSystemTools {
     }
 
     pub fn cleanup_size(&self) -> u64 {
-        self.cleanup_actions.iter().map(|action| action.size_freed).sum()
+        self.cleanup_actions
+            .iter()
+            .map(|action| action.size_freed)
+            .sum()
     }
 }
 
@@ -236,16 +254,12 @@ pub fn init_sigmasystemtools() {
 
 /// Get the global SigmaSystemTools instance
 pub fn get_sigmasystemtools() -> Option<&'static SigmaSystemTools> {
-    unsafe {
-        SIGMASYSTEMTOOLS_INSTANCE.as_ref()
-    }
+    unsafe { SIGMASYSTEMTOOLS_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaSystemTools instance (mutable)
 pub fn get_sigmasystemtools_mut() -> Option<&'static mut SigmaSystemTools> {
-    unsafe {
-        SIGMASYSTEMTOOLS_INSTANCE.as_mut()
-    }
+    unsafe { SIGMASYSTEMTOOLS_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a tool

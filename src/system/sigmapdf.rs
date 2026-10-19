@@ -42,7 +42,12 @@ pub struct PDFPage {
 }
 
 impl PDFPage {
-    pub fn new(id: String, page_number: u32, page_size: PageSize, orientation: PageOrientation) -> Self {
+    pub fn new(
+        id: String,
+        page_number: u32,
+        page_size: PageSize,
+        orientation: PageOrientation,
+    ) -> Self {
         Self {
             id,
             page_number,
@@ -112,7 +117,13 @@ impl PDFDocument {
         self.pages.get_mut(id)
     }
 
-    pub fn set_metadata(&mut self, author: String, title: String, subject: String, keywords: String) {
+    pub fn set_metadata(
+        &mut self,
+        author: String,
+        title: String,
+        subject: String,
+        keywords: String,
+    ) {
         self.author = author;
         self.title = title;
         self.subject = subject;
@@ -168,12 +179,14 @@ impl SigmaPDF {
     }
 
     pub fn get_current_document(&self) -> Option<&PDFDocument> {
-        self.current_document.as_ref()
+        self.current_document
+            .as_ref()
             .and_then(|id| self.documents.get(id))
     }
 
     pub fn get_current_document_mut(&mut self) -> Option<&mut PDFDocument> {
-        self.current_document.as_ref()
+        self.current_document
+            .as_ref()
             .and_then(|id| self.documents.get_mut(id.as_str()))
     }
 
@@ -204,16 +217,12 @@ pub fn init_sigmapdf() {
 
 /// Get the global SigmaPDF instance
 pub fn get_sigmapdf() -> Option<&'static SigmaPDF> {
-    unsafe {
-        SIGMAPDF_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAPDF_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaPDF instance (mutable)
 pub fn get_sigmapdf_mut() -> Option<&'static mut SigmaPDF> {
-    unsafe {
-        SIGMAPDF_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAPDF_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a document
@@ -232,7 +241,12 @@ mod tests {
 
     #[test]
     fn test_pdf_page_creation() {
-        let page = PDFPage::new("page1".to_string(), 1, PageSize::A4, PageOrientation::Portrait);
+        let page = PDFPage::new(
+            "page1".to_string(),
+            1,
+            PageSize::A4,
+            PageOrientation::Portrait,
+        );
         assert_eq!(page.id, "page1");
         assert_eq!(page.page_number, 1);
         assert_eq!(page.page_size, PageSize::A4);
@@ -241,7 +255,12 @@ mod tests {
 
     #[test]
     fn test_pdf_page_modification() {
-        let mut page = PDFPage::new("page1".to_string(), 1, PageSize::A4, PageOrientation::Portrait);
+        let mut page = PDFPage::new(
+            "page1".to_string(),
+            1,
+            PageSize::A4,
+            PageOrientation::Portrait,
+        );
         page.set_rotation(90);
         page.set_orientation(PageOrientation::Landscape);
         assert_eq!(page.rotation, 90);
@@ -259,7 +278,12 @@ mod tests {
     #[test]
     fn test_pdf_document_management() {
         let mut doc = PDFDocument::new("doc1".to_string(), "Test".to_string());
-        let page = PDFPage::new("page1".to_string(), 1, PageSize::A4, PageOrientation::Portrait);
+        let page = PDFPage::new(
+            "page1".to_string(),
+            1,
+            PageSize::A4,
+            PageOrientation::Portrait,
+        );
         doc.add_page(page);
         assert_eq!(doc.page_count, 1);
         assert!(doc.remove_page("page1"));

@@ -69,7 +69,16 @@ pub struct UserAccount {
 }
 
 impl UserAccount {
-    pub fn new(id: String, username: String, real_name: String, home_directory: String, shell: ShellType, user_type: UserType, uid: u32, gid: u32) -> Self {
+    pub fn new(
+        id: String,
+        username: String,
+        real_name: String,
+        home_directory: String,
+        shell: ShellType,
+        user_type: UserType,
+        uid: u32,
+        gid: u32,
+    ) -> Self {
         Self {
             id,
             username,
@@ -213,19 +222,19 @@ impl SigmaUserManager {
     }
 
     pub fn list_admins(&self) -> Vec<&UserAccount> {
-        self.users.values()
-            .filter(|user| user.is_admin())
-            .collect()
+        self.users.values().filter(|user| user.is_admin()).collect()
     }
 
     pub fn list_active(&self) -> Vec<&UserAccount> {
-        self.users.values()
+        self.users
+            .values()
             .filter(|user| user.is_active())
             .collect()
     }
 
     pub fn list_by_type(&self, user_type: UserType) -> Vec<&UserAccount> {
-        self.users.values()
+        self.users
+            .values()
             .filter(|user| user.user_type == user_type)
             .collect()
     }
@@ -269,16 +278,12 @@ pub fn init_sigmausermanager() {
 
 /// Get the global SigmaUserManager instance
 pub fn get_sigmausermanager() -> Option<&'static SigmaUserManager> {
-    unsafe {
-        SIGMAUSERMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAUSERMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaUserManager instance (mutable)
 pub fn get_sigmausermanager_mut() -> Option<&'static mut SigmaUserManager> {
-    unsafe {
-        SIGMAUSERMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAUSERMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a user

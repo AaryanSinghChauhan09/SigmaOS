@@ -170,39 +170,39 @@ impl SigmaFileSystemManager {
     }
 
     pub fn list_mounted(&self) -> Vec<&Filesystem> {
-        self.filesystems.values()
+        self.filesystems
+            .values()
             .filter(|fs| fs.is_mounted())
             .collect()
     }
 
     pub fn list_by_type(&self, fs_type: FilesystemType) -> Vec<&Filesystem> {
-        self.filesystems.values()
+        self.filesystems
+            .values()
             .filter(|fs| fs.fs_type == fs_type)
             .collect()
     }
 
     pub fn list_full(&self) -> Vec<&Filesystem> {
-        self.filesystems.values()
+        self.filesystems
+            .values()
             .filter(|fs| fs.is_full())
             .collect()
     }
 
     pub fn list_auto_mount(&self) -> Vec<&MountPoint> {
-        self.mount_points.values()
+        self.mount_points
+            .values()
             .filter(|mount| mount.auto_mount)
             .collect()
     }
 
     pub fn total_size(&self) -> u64 {
-        self.filesystems.values()
-            .map(|fs| fs.size)
-            .sum()
+        self.filesystems.values().map(|fs| fs.size).sum()
     }
 
     pub fn total_used(&self) -> u64 {
-        self.filesystems.values()
-            .map(|fs| fs.used)
-            .sum()
+        self.filesystems.values().map(|fs| fs.used).sum()
     }
 
     pub fn filesystem_count(&self) -> usize {
@@ -232,16 +232,12 @@ pub fn init_sigmafilesystemmanager() {
 
 /// Get the global SigmaFileSystemManager instance
 pub fn get_sigmafilesystemmanager() -> Option<&'static SigmaFileSystemManager> {
-    unsafe {
-        SIGMAFILESYSTEMMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAFILESYSTEMMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaFileSystemManager instance (mutable)
 pub fn get_sigmafilesystemmanager_mut() -> Option<&'static mut SigmaFileSystemManager> {
-    unsafe {
-        SIGMAFILESYSTEMMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAFILESYSTEMMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a filesystem

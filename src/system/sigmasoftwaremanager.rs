@@ -74,7 +74,14 @@ pub struct Application {
 }
 
 impl Application {
-    pub fn new(id: String, name: String, summary: String, description: String, category: AppCategory, version: String) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        summary: String,
+        description: String,
+        category: AppCategory,
+        version: String,
+    ) -> Self {
         Self {
             id,
             name,
@@ -144,7 +151,10 @@ impl SigmaSoftwareManager {
         let category = app.category;
         let id = app.id.clone();
         self.applications.insert(id.clone(), app);
-        self.categories.entry(category).or_insert_with(Vec::new).push(id);
+        self.categories
+            .entry(category)
+            .or_insert_with(Vec::new)
+            .push(id);
     }
 
     pub fn remove_application(&mut self, id: &str) -> bool {
@@ -168,7 +178,8 @@ impl SigmaSoftwareManager {
 
     pub fn search_applications(&self, query: &str) -> Vec<&Application> {
         let query_lower = query.to_lowercase();
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| {
                 app.name.to_lowercase().contains(&query_lower)
                     || app.summary.to_lowercase().contains(&query_lower)
@@ -178,27 +189,33 @@ impl SigmaSoftwareManager {
     }
 
     pub fn list_by_category(&self, category: AppCategory) -> Vec<&Application> {
-        self.categories.get(&category)
-            .map(|ids| ids.iter()
-                .filter_map(|id| self.applications.get(id))
-                .collect())
+        self.categories
+            .get(&category)
+            .map(|ids| {
+                ids.iter()
+                    .filter_map(|id| self.applications.get(id))
+                    .collect()
+            })
             .unwrap_or_default()
     }
 
     pub fn list_installed(&self) -> Vec<&Application> {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.is_installed())
             .collect()
     }
 
     pub fn list_updates(&self) -> Vec<&Application> {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.needs_update())
             .collect()
     }
 
     pub fn list_by_rating(&self, min_score: u8) -> Vec<&Application> {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.rating.score >= min_score)
             .collect()
     }
@@ -208,13 +225,15 @@ impl SigmaSoftwareManager {
     }
 
     pub fn installed_count(&self) -> usize {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.is_installed())
             .count()
     }
 
     pub fn update_count(&self) -> usize {
-        self.applications.values()
+        self.applications
+            .values()
             .filter(|app| app.needs_update())
             .count()
     }
@@ -238,16 +257,12 @@ pub fn init_sigmasoftwaremanager() {
 
 /// Get the global SigmaSoftwareManager instance
 pub fn get_sigmasoftwaremanager() -> Option<&'static SigmaSoftwareManager> {
-    unsafe {
-        SIGMASOFTWAREMANAGER_INSTANCE.as_ref()
-    }
+    unsafe { SIGMASOFTWAREMANAGER_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaSoftwareManager instance (mutable)
 pub fn get_sigmasoftwaremanager_mut() -> Option<&'static mut SigmaSoftwareManager> {
-    unsafe {
-        SIGMASOFTWAREMANAGER_INSTANCE.as_mut()
-    }
+    unsafe { SIGMASOFTWAREMANAGER_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add an application
