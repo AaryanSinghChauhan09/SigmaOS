@@ -709,11 +709,6 @@ pub use sigmasecurityaudit::{
     SecurityReport, SecuritySeverity, SigmaSecurityAudit,
 };
 
-pub use sigmatimer::{
-    add_timer, get_sigmatimer, get_sigmatimer_mut, init_sigmatimer, Alarm, SigmaTimer, Timer,
-    TimerState,
-};
-
 pub use sigmajails::{
     add_jail, get_sigmajails, get_sigmajails_mut, init_sigmajails, Jail, JailState, SigmaJails,
 };
