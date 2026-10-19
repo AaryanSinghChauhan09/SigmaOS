@@ -24,6 +24,7 @@ pub mod settings_manager;
 pub mod sigmaacpi;
 pub mod sigmabackup;
 pub mod sigmacache;
+pub mod sigmacodec;
 pub mod sigmaconfig;
 pub mod sigmacron;
 pub mod sigmacrypto;
@@ -184,6 +185,10 @@ pub use sigmabackup::{
 };
 pub use sigmacache::{
     get_sigmacache, init_sigmacache, set_cache_entry, CacheEntry, CacheEntryState, SigmaCache,
+};
+pub use sigmacodec::{
+    SigmaCodec, Codec, CodecType, CodecFormat, CodecState,
+    init_sigmacodec, get_sigmacodec, register_codec, enable_codec,
 };
 pub use sigmaconfig::{
     get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry as SigmaConfigEntry,
