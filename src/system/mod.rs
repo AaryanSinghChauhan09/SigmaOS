@@ -57,6 +57,7 @@ pub mod sigmaeffect;
 pub mod sigmaevent;
 pub mod sigmafig;
 pub mod sigmafilemanager;
+pub mod sigmafilesystemmanager;
 pub mod sigmafilm;
 pub mod sigmafirewall;
 pub mod sigmaflatpak;
@@ -901,4 +902,9 @@ pub use sigmakeyboardmanager::{
 pub use sigmapackagemanager2::{
     Package, PackageStatus, PackageType, Repository, SigmaPackageManager,
     add_package, get_sigmapackagemanager, get_sigmapackagemanager_mut, init_sigmapackagemanager,
+};
+
+pub use sigmafilesystemmanager::{
+    Filesystem, FilesystemType, MountPoint, MountStatus, SigmaFileSystemManager,
+    add_filesystem, get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut, init_sigmafilesystemmanager,
 };
