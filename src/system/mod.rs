@@ -25,6 +25,7 @@ pub mod sigmaacpi;
 pub mod sigmaani;
 pub mod sigmaart;
 pub mod sigmacad;
+pub mod sigmadesign;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -249,6 +250,11 @@ pub use sigmacad::{
     Constraint, ConstraintType, Dimension, DimensionType, Drawing, DrawingLayer, Entity,
     EntityType, Point3D, SigmaCAD,
     add_drawing, get_sigmacad, get_sigmacad_mut, init_sigmacad,
+};
+pub use sigmadesign::{
+    ComponentSize, ComponentVariant, DesignSystem, DesignToken, SigmaDesign, TokenValue, TokenType,
+    UIComponent,
+    add_design_system, get_sigmadesign, get_sigmadesign_mut, init_sigmadesign,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
