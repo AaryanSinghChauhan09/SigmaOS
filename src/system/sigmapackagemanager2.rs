@@ -84,7 +84,7 @@ impl Package {
         Self {
             id,
             name,
-            version,
+            version: version.clone(),
             description,
             package_type,
             status: PackageStatus::NotInstalled,

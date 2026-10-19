@@ -298,8 +298,8 @@ impl SigmaTimeshift {
             to_remove.push(snap.snapshot_id.clone());
         }
 
-        for id in to_remove {
-            self.snapshots.remove(&id);
+        for id in &to_remove {
+            self.snapshots.remove(id);
         }
 
         to_remove.len()

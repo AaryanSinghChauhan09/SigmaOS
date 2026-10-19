@@ -284,8 +284,8 @@ impl SigmaNotifyEnhanced {
             }
         }
 
-        for id in expired_ids {
-            self.notifications.remove(&id);
+        for id in &expired_ids {
+            self.notifications.remove(id);
         }
 
         expired_ids.len()

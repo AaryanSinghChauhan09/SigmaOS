@@ -25,13 +25,24 @@ pub enum LightType {
 
 /// Color temperature (in Kelvin)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
 pub enum ColorTemperature {
-    Warm = 2700,
-    Neutral = 4000,
-    Cool = 5000,
-    Daylight = 6500,
+    Warm,
+    Neutral,
+    Cool,
+    Daylight,
     Custom(u32),
+}
+
+impl ColorTemperature {
+    pub fn to_kelvin(&self) -> u32 {
+        match self {
+            ColorTemperature::Warm => 2700,
+            ColorTemperature::Neutral => 4000,
+            ColorTemperature::Cool => 5000,
+            ColorTemperature::Daylight => 6500,
+            ColorTemperature::Custom(k) => *k,
+        }
+    }
 }
 
 /// Light source
@@ -53,7 +64,7 @@ impl LightSource {
             name,
             light_type,
             brightness: 255,
-            color_temperature: ColorTemperature::Neutral(4000),
+            color_temperature: ColorTemperature::Neutral,
             color_rgb: (255, 255, 255),
             enabled: true,
         }
@@ -274,7 +285,7 @@ mod tests {
         let mut light =
             LightSource::new("light1".to_string(), "Test".to_string(), LightType::Point);
         light.set_brightness(128);
-        light.set_color_temperature(ColorTemperature::Warm(2700));
+        light.set_color_temperature(ColorTemperature::Warm);
         light.set_color_rgb(255, 200, 150);
         assert_eq!(light.brightness, 128);
         assert_eq!(light.get_normalized_brightness(), 128.0 / 255.0);
@@ -293,7 +304,7 @@ mod tests {
         scene.add_light_state(
             "light1".to_string(),
             200,
-            ColorTemperature::Warm(2700),
+            ColorTemperature::Warm,
             (255, 200, 150),
         );
         assert_eq!(scene.light_count(), 1);
@@ -328,7 +339,7 @@ mod tests {
         scene.add_light_state(
             "light1".to_string(),
             50,
-            ColorTemperature::Warm(2700),
+            ColorTemperature::Warm,
             (255, 200, 150),
         );
         light_sys.add_scene(scene);

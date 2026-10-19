@@ -48,12 +48,12 @@ impl ColorScheme {
         Self {
             id,
             name,
-            background,
-            foreground,
-            accent,
-            selection: accent.clone(),
-            window_bg: background.clone(),
-            window_fg: foreground.clone(),
+            background: background.clone(),
+            foreground: foreground.clone(),
+            accent: accent.clone(),
+            selection: accent,
+            window_bg: background,
+            window_fg: foreground,
         }
     }
 

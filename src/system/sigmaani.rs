@@ -93,10 +93,12 @@ impl AnimationTrack {
             return self.keyframes.last().map(|k| k.value);
         }
 
-        let (prev, next) = self
+        let window = self
             .keyframes
             .windows(2)
             .find(|w| time >= w[0].time && time < w[1].time)?;
+        let prev = &window[0];
+        let next = &window[1];
 
         let t = (time - prev.time) as f32 / (next.time - prev.time) as f32;
         let eased = match prev.tween {

@@ -103,12 +103,12 @@ impl DriverPackage {
             id,
             name,
             driver_type,
-            version,
+            version: version.clone(),
             vendor,
             description,
             status: DriverStatus::NotInstalled,
             installed_version: None,
-            latest_version: version.clone(),
+            latest_version: version,
             compatible_devices: Vec::new(),
         }
     }
