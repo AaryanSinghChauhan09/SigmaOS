@@ -556,7 +556,7 @@ pub use sigmasnapshot::{
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
-    add_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
+    add_audio_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
     AudioDeviceType, SigmaSound,
 };
 pub use sigmassh::{
@@ -623,7 +623,7 @@ pub use sigmawallpaper::{
     SigmaWallpaper, TransitionType, Wallpaper,
 };
 pub use sigmaword::{
-    add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
+    add_word_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
     SigmaWord, TextAlignment,
 };
 pub use signamespaces::{
@@ -863,12 +863,11 @@ pub use sigmakeyboardmanager::{
 
 pub use sigmafilesystemmanager::{
     add_filesystem, get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut,
-    init_sigmafilesystemmanager, Filesystem, FilesystemType, MountPoint, MountStatus,
+    init_sigmafilesystemmanager, FilesystemType, MountPoint, MountStatus,
     SigmaFileSystemManager,
 };
 
 pub use sigmasecuritymanager::{
     add_firewall_rule, get_sigmasecuritymanager, get_sigmasecuritymanager_mut,
-    init_sigmasecuritymanager, AccessControlEntry, FirewallAction, FirewallProtocol, FirewallRule,
-    SecurityPolicy, SigmaSecurityManager,
+    init_sigmasecuritymanager, AccessControlEntry, SecurityPolicy, SigmaSecurityManager,
 };

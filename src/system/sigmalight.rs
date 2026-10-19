@@ -25,6 +25,7 @@ pub enum LightType {
 
 /// Color temperature (in Kelvin)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u32)]
 pub enum ColorTemperature {
     Warm = 2700,
     Neutral = 4000,
