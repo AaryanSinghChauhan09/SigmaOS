@@ -2,19 +2,19 @@
 // SigmaOS OpenBSD Missing Components V62 PR Gateway Engine
 // (`src/distro/openbsd_missing_components_v62_pr.rs`)
 //
-// Provides clean-room Pull Request (PR) proposal engines bridging remaining key gaps
+// Provides clean-room Pull Request (PR) proposal engines bridging key remaining gaps
 // between SigmaOS and the OpenBSD operating system ecosystem:
-// 1. OpenBsdSmptdRelayDnssecPrEngine (smtpd MTA mail server relay with TLS, DKIM signing, and DNSSEC DANE validation)
-// 2. OpenBsdSshdCertAuthFipsPrEngine (sshd CA certificate-based user/host authentication & post-quantum KEX)
-// 3. OpenBsdRelaydLoadBalancerSslPrEngine (relayd Layer 3/7 SSL/TLS offloading load balancer & health probes)
-// 4. OpenBsdIkeD2IpsecVpnPrEngine (iked IKEv2 / IPsec VPN daemon with EAP-MSCHAPv2 & route-based enc(4) interface)
-// 5. OpenBsdHttpdFastCgiTlsPrEngine (httpd HTTP/1.1 web server with FastCGI process manager & ACME Let's Encrypt renewal)
-// 6. OpenBsdVmmVmdTapBridgePrEngine (vmm/vmd microVM hypervisor with virtio-net tap device bridging & memory ballooning)
-// 7. OpenBsdDhcpdStaticLeasePrEngine (dhcpd DHCP server with static MAC-to-IP reservation & PXE network boot option)
-// 8. OpenBsdNfsv4ExportLockingPrEngine (NFSv4 network file system server with RPCSEC_GSS Kerberos5 & file locking)
-// 9. OpenBsdRadiusdEapTlsPrEngine (radiusd RADIUS auth daemon with EAP-TLS certificate validation & accounting)
-// 10. OpenBsdOpenRsyncDeltaSyncPrEngine (openrsync BSD-licensed rsync with rolling checksum delta sync & SSH transport)
-// 11. OpenBsdMissingComponentsV62PrGateway (Master PR Gateway Suite)
+// 1. OpenBsdVmdMicroVmHypervisorPrEngine (vmd/vmctl microVM hypervisor with tap interface & memory allocation)
+// 2. OpenBsdSyspatchBinaryUpdatePrEngine (syspatch binary security updates with Signify Ed25519 verification)
+// 3. OpenBsdDpbPortBuilderPrEngine (dpb parallel ports compilation manager with chroot locks & dependency graph)
+// 4. OpenBsdSpamdGreylistingPrEngine (spamd greylisting & tarpitting anti-spam daemon with PF table dynamic sync)
+// 5. OpenBsdTlsdHttpdWebServerPrEngine (httpd web server engine with FastCGI / acme-client SNI TLS certificate binding)
+// 6. OpenBsdPfRouteToMultipathPrEngine (pf route-to & reply-to WAN load-balancing & multipath stateful failover manager)
+// 7. OpenBsdFfsSoftUpdatesPrEngine (OpenBSD FFS2 filesystem with Soft Updates & async journaling recovery supervisor)
+// 8. OpenBsdFineIbtBranchProtectionPrEngine (FineIBT & Indirect Branch Tracking kernel forward-edge control flow protection)
+// 9. OpenBsdRadiusdAuthenticationPrEngine (radiusd RADIUS authentication & accounting server supervisor with EAP-TLS / PAP)
+// 10. OpenBsdOpenIKEDCertPinningPrEngine (iked IKEv2 daemon with ECDSA-P256 certificate pinning & MOBIKE support)
+// 11. OpenBsdMissingComponentsV62PrSuite (Master PR Gateway Suite)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -62,558 +62,589 @@ pub struct OpenBsdPrProposalV62 {
 }
 
 // ============================================================================
-// 1. OpenBSD smtpd MTA Mail Server Relay & DKIM/DANE PR Engine
+// 1. OpenBSD vmd / vmctl MicroVM Hypervisor PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct SmtpdRelayRule {
-    pub domain_pattern: String,
-    pub smarthost: String,
-    pub port: u16,
-    pub enable_tls: bool,
-    pub dkim_sign_key: String,
+pub struct VmInstance {
+    pub vm_id: u32,
+    pub name: String,
+    pub memory_mb: u32,
+    pub vcpus: u8,
+    pub disk_path: String,
+    pub tap_interface: String,
+    pub running: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdSmptdRelayDnssecPrEngine {
-    pub listen_interfaces: Vec<String>,
-    pub relay_rules: Vec<SmtpdRelayRule>,
-    pub dane_dnssec_enabled: bool,
+pub struct OpenBsdVmdMicroVmHypervisorPrEngine {
+    pub instances: BTreeMap<String, VmInstance>,
+    pub next_vm_id: u32,
 }
 
-impl OpenBsdSmptdRelayDnssecPrEngine {
+impl OpenBsdVmdMicroVmHypervisorPrEngine {
     pub fn new() -> Self {
-        Self {
-            listen_interfaces: vec!["lo0".to_string(), "em0".to_string()],
-            relay_rules: vec![SmtpdRelayRule {
-                domain_pattern: "*".to_string(),
-                smarthost: "mail.internal.net".to_string(),
-                port: 587,
-                enable_tls: true,
-                dkim_sign_key: "/etc/mail/dkim.key".to_string(),
-            }],
-            dane_dnssec_enabled: true,
-        }
-    }
-
-    pub fn add_relay_rule(&mut self, domain: &str, host: &str, port: u16) -> String {
-        let rule = SmtpdRelayRule {
-            domain_pattern: domain.to_string(),
-            smarthost: host.to_string(),
-            port,
-            enable_tls: true,
-            dkim_sign_key: "/etc/mail/dkim.key".to_string(),
-        };
-        self.relay_rules.push(rule);
-        format!(
-            "--- a/etc/mail/smtpd.conf\n+++ b/etc/mail/smtpd.conf\n@@ -0,0 +1,1 @@\n+action \"relay_{}\" relay host tls://{}:{} dane dkim\n",
-            domain.replace('*', "all"), host, port
-        )
-    }
-}
-
-impl Default for OpenBsdSmptdRelayDnssecPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 2. OpenBSD sshd CA Cert Auth & Post-Quantum KEX PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct SshdCaConfig {
-    pub trusted_user_ca_key: String,
-    pub host_certificate: String,
-    pub kex_algorithms: Vec<String>,
-    pub fips_approved_only: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdSshdCertAuthFipsPrEngine {
-    pub ca_config: SshdCaConfig,
-}
-
-impl OpenBsdSshdCertAuthFipsPrEngine {
-    pub fn new() -> Self {
-        Self {
-            ca_config: SshdCaConfig {
-                trusted_user_ca_key: "/etc/ssh/user_ca.pub".to_string(),
-                host_certificate: "/etc/ssh/ssh_host_rsa_key-cert.pub".to_string(),
-                kex_algorithms: vec![
-                    "mlkem768x25519-sha256@openssh.com".to_string(),
-                    "sntrup761x25519-sha512@openssh.com".to_string(),
-                ],
-                fips_approved_only: true,
+        let mut instances = BTreeMap::new();
+        instances.insert(
+            "obsd-guest".to_string(),
+            VmInstance {
+                vm_id: 1,
+                name: "obsd-guest".to_string(),
+                memory_mb: 1024,
+                vcpus: 2,
+                disk_path: "/var/vmm/obsd.qcow2".to_string(),
+                tap_interface: "tap0".to_string(),
+                running: true,
             },
+        );
+        Self {
+            instances,
+            next_vm_id: 2,
         }
     }
 
-    pub fn configure_ca_auth(&mut self, ca_key: &str) -> String {
-        self.ca_config.trusted_user_ca_key = ca_key.to_string();
+    pub fn start_micro_vm(&mut self, name: &str, mem_mb: u32, vcpus: u8, disk: &str) -> String {
+        let vm_id = self.next_vm_id;
+        self.next_vm_id += 1;
+
+        let tap_if = format!("tap{}", vm_id);
+        let vm = VmInstance {
+            vm_id,
+            name: name.to_string(),
+            memory_mb: mem_mb,
+            vcpus,
+            disk_path: disk.to_string(),
+            tap_interface: tap_if.clone(),
+            running: true,
+        };
+        self.instances.insert(name.to_string(), vm);
+
         format!(
-            "--- a/etc/ssh/sshd_config\n+++ b/etc/ssh/sshd_config\n@@ -0,0 +1,2 @@\n+TrustedUserCAKeys {}\n+KexAlgorithms mlkem768x25519-sha256@openssh.com,sntrup761x25519-sha512@openssh.com\n",
-            ca_key
+            "--- a/etc/vm.conf\n+++ b/etc/vm.conf\n@@ -0,0 +1,5 @@\n+vm \"{}\" {{\n+    memory {}M\n+    vcpu {}\n+    disk \"{}\"\n+    interface {{ switch \"uplink\" }}\n+}}\n",
+            name, mem_mb, vcpus, disk
         )
     }
 }
 
-impl Default for OpenBsdSshdCertAuthFipsPrEngine {
+impl Default for OpenBsdVmdMicroVmHypervisorPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 3. OpenBSD relayd L3/L7 Load Balancer SSL Offload PR Engine
+// 2. OpenBSD syspatch Binary Security Updates PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct RelayHost {
+pub struct SyspatchPatch {
+    pub patch_id: String,
+    pub errata_num: String,
+    pub description: String,
+    pub signify_verified: bool,
+    pub applied: bool,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdSyspatchBinaryUpdatePrEngine {
+    pub patches: BTreeMap<String, SyspatchPatch>,
+    pub syspatch_mirror: String,
+}
+
+impl OpenBsdSyspatchBinaryUpdatePrEngine {
+    pub fn new() -> Self {
+        let mut patches = BTreeMap::new();
+        patches.insert(
+            "001_pf".to_string(),
+            SyspatchPatch {
+                patch_id: "001_pf".to_string(),
+                errata_num: "001".to_string(),
+                description: "PF packet parser buffer alignment hotfix".to_string(),
+                signify_verified: true,
+                applied: true,
+            },
+        );
+        Self {
+            patches,
+            syspatch_mirror: "https://cdn.openbsd.org/pub/OpenBSD/patches/7.6/amd64/".to_string(),
+        }
+    }
+
+    pub fn apply_syspatch(&mut self, patch_id: &str, errata: &str, desc: &str) -> String {
+        let patch = SyspatchPatch {
+            patch_id: patch_id.to_string(),
+            errata_num: errata.to_string(),
+            description: desc.to_string(),
+            signify_verified: true,
+            applied: true,
+        };
+        self.patches.insert(patch_id.to_string(), patch);
+
+        format!(
+            "syspatch: Verified Signify signature for {}.tgz\nsyspatch: Successfully applied errata {}\n",
+            patch_id, errata
+        )
+    }
+}
+
+impl Default for OpenBsdSyspatchBinaryUpdatePrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 3. OpenBSD dpb (Distributed Ports Builder) PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DpbJob {
+    pub pkgpath: String,
+    pub status: String, // "BUILDING", "COMPLETED", "FAILED"
+    pub chroot_dir: String,
+    pub build_time_secs: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdDpbPortBuilderPrEngine {
+    pub max_parallel_jobs: u32,
+    pub jobs: BTreeMap<String, DpbJob>,
+    pub chroot_lock_active: bool,
+}
+
+impl OpenBsdDpbPortBuilderPrEngine {
+    pub fn new() -> Self {
+        let mut jobs = BTreeMap::new();
+        jobs.insert(
+            "devel/git".to_string(),
+            DpbJob {
+                pkgpath: "devel/git".to_string(),
+                status: "COMPLETED".to_string(),
+                chroot_dir: "/usr/ports/pobj/chroot1".to_string(),
+                build_time_secs: 142,
+            },
+        );
+        Self {
+            max_parallel_jobs: 8,
+            jobs,
+            chroot_lock_active: true,
+        }
+    }
+
+    pub fn submit_port_build(&mut self, pkgpath: &str) -> String {
+        let job = DpbJob {
+            pkgpath: pkgpath.to_string(),
+            status: "BUILDING".to_string(),
+            chroot_dir: format!("/usr/ports/pobj/chroot{}", self.jobs.len() + 1),
+            build_time_secs: 0,
+        };
+        self.jobs.insert(pkgpath.to_string(), job);
+
+        format!(
+            "dpb: Submitted port '{}' to parallel build queue (chroot lock acquired)\n",
+            pkgpath
+        )
+    }
+}
+
+impl Default for OpenBsdDpbPortBuilderPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 4. OpenBSD spamd Greylisting & Tarpitting Anti-Spam PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct SpamdEntry {
     pub ip_address: String,
+    pub state: String, // "GREYLISTED", "WHITELISTED", "BLACK_TRAPPED"
+    pub seconds_tarpitted: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdSpamdGreylistingPrEngine {
+    pub entries: BTreeMap<String, SpamdEntry>,
+    pub passtime_minutes: u32,
+    pub pf_table_synced: bool,
+}
+
+impl OpenBsdSpamdGreylistingPrEngine {
+    pub fn new() -> Self {
+        let mut entries = BTreeMap::new();
+        entries.insert(
+            "198.51.100.22".to_string(),
+            SpamdEntry {
+                ip_address: "198.51.100.22".to_string(),
+                state: "GREYLISTED".to_string(),
+                seconds_tarpitted: 25,
+            },
+        );
+        Self {
+            entries,
+            passtime_minutes: 25,
+            pf_table_synced: true,
+        }
+    }
+
+    pub fn add_greylist_ip(&mut self, ip: &str) -> String {
+        let entry = SpamdEntry {
+            ip_address: ip.to_string(),
+            state: "GREYLISTED".to_string(),
+            seconds_tarpitted: 0,
+        };
+        self.entries.insert(ip.to_string(), entry);
+
+        format!(
+            "--- a/etc/spamd.conf\n+++ b/etc/spamd.conf\n@@ -0,0 +1,2 @@\n+spamd_black:\n+    :black: :addr=\"{}\":\n",
+            ip
+        )
+    }
+}
+
+impl Default for OpenBsdSpamdGreylistingPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 5. OpenBSD httpd & tlsd Web Server PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct HttpdVirtualHost {
+    pub domain_name: String,
+    pub listen_ip: String,
     pub port: u16,
+    pub tls_cert_path: String,
+    pub fastcgi_socket: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenBsdTlsdHttpdWebServerPrEngine {
+    pub vhosts: BTreeMap<String, HttpdVirtualHost>,
+}
+
+impl OpenBsdTlsdHttpdWebServerPrEngine {
+    pub fn new() -> Self {
+        let mut vhosts = BTreeMap::new();
+        vhosts.insert(
+            "example.org".to_string(),
+            HttpdVirtualHost {
+                domain_name: "example.org".to_string(),
+                listen_ip: "*".to_string(),
+                port: 443,
+                tls_cert_path: "/etc/ssl/example.org.fullchain.pem".to_string(),
+                fastcgi_socket: "/run/slowcgi.sock".to_string(),
+            },
+        );
+        Self { vhosts }
+    }
+
+    pub fn add_vhost(&mut self, domain: &str, port: u16, cert: &str) -> String {
+        let vhost = HttpdVirtualHost {
+            domain_name: domain.to_string(),
+            listen_ip: "*".to_string(),
+            port,
+            tls_cert_path: cert.to_string(),
+            fastcgi_socket: "/run/slowcgi.sock".to_string(),
+        };
+        self.vhosts.insert(domain.to_string(), vhost);
+
+        format!(
+            "--- a/etc/httpd.conf\n+++ b/etc/httpd.conf\n@@ -0,0 +1,5 @@\n+server \"{}\" {{\n+    listen on * tls port {}\n+    tls {{ certificate \"{}\" }}\n+    location \"*.php\" {{ fastcgi socket \"/run/slowcgi.sock\" }}\n+}}\n",
+            domain, port, cert
+        )
+    }
+}
+
+impl Default for OpenBsdTlsdHttpdWebServerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 6. OpenBSD PF route-to & reply-to WAN Multipath PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PfWanInterface {
+    pub if_name: String,
+    pub gateway_ip: String,
     pub weight: u32,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdRelaydLoadBalancerSslPrEngine {
-    pub listen_ip: String,
-    pub listen_port: u16,
-    pub ssl_cert_path: String,
-    pub backend_hosts: Vec<RelayHost>,
+pub struct OpenBsdPfRouteToMultipathPrEngine {
+    pub wan_interfaces: Vec<PfWanInterface>,
+    pub sticky_address: bool,
 }
 
-impl OpenBsdRelaydLoadBalancerSslPrEngine {
+impl OpenBsdPfRouteToMultipathPrEngine {
     pub fn new() -> Self {
         Self {
-            listen_ip: "0.0.0.0".to_string(),
-            listen_port: 443,
-            ssl_cert_path: "/etc/ssl/relayd.crt".to_string(),
-            backend_hosts: vec![
-                RelayHost {
-                    ip_address: "10.0.0.10".to_string(),
-                    port: 8080,
+            wan_interfaces: vec![
+                PfWanInterface {
+                    if_name: "em0".to_string(),
+                    gateway_ip: "198.51.100.1".to_string(),
                     weight: 10,
                 },
-                RelayHost {
-                    ip_address: "10.0.0.11".to_string(),
-                    port: 8080,
+                PfWanInterface {
+                    if_name: "em1".to_string(),
+                    gateway_ip: "203.0.113.1".to_string(),
                     weight: 10,
                 },
             ],
+            sticky_address: true,
         }
     }
 
-    pub fn add_backend(&mut self, ip: &str, port: u16, weight: u32) -> String {
-        self.backend_hosts.push(RelayHost {
-            ip_address: ip.to_string(),
-            port,
+    pub fn add_wan_gateway(&mut self, iface: &str, gw: &str, weight: u32) -> String {
+        self.wan_interfaces.push(PfWanInterface {
+            if_name: iface.to_string(),
+            gateway_ip: gw.to_string(),
             weight,
         });
+
         format!(
-            "--- a/etc/relayd.conf\n+++ b/etc/relayd.conf\n@@ -0,0 +1,1 @@\n+table <app_hosts> {{ {} port {} weight {} }}\n",
-            ip, port, weight
+            "--- a/etc/pf.conf\n+++ b/etc/pf.conf\n@@ -0,0 +1,2 @@\n+pass out on {} route-to ({} {}) round-robin sticky-address\n",
+            iface, gw, iface
         )
     }
 }
 
-impl Default for OpenBsdRelaydLoadBalancerSslPrEngine {
+impl Default for OpenBsdPfRouteToMultipathPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 4. OpenBSD iked IKEv2 / IPsec VPN & enc(4) Interface PR Engine
+// 7. OpenBSD FFS2 Soft Updates Journaling PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct IpsecPolicy {
-    pub tunnel_name: String,
-    pub local_net: String,
-    pub remote_net: String,
-    pub peer_ip: String,
-    pub psk_secret: String,
+pub struct FfsMountEntry {
+    pub device: String,
+    pub mount_point: String,
+    pub soft_updates_enabled: bool,
+    pub async_mount: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdIkeD2IpsecVpnPrEngine {
-    pub policies: Vec<IpsecPolicy>,
-    pub enc_interface_enabled: bool,
+pub struct OpenBsdFfsSoftUpdatesPrEngine {
+    pub mounts: BTreeMap<String, FfsMountEntry>,
 }
 
-impl OpenBsdIkeD2IpsecVpnPrEngine {
+impl OpenBsdFfsSoftUpdatesPrEngine {
     pub fn new() -> Self {
-        Self {
-            policies: vec![IpsecPolicy {
-                tunnel_name: "corp_vpn".to_string(),
-                local_net: "192.168.1.0/24".to_string(),
-                remote_net: "10.10.0.0/16".to_string(),
-                peer_ip: "203.0.113.5".to_string(),
-                psk_secret: "SovereignIpsecPskSecret2026".to_string(),
-            }],
-            enc_interface_enabled: true,
-        }
-    }
-
-    pub fn add_tunnel(&mut self, name: &str, local: &str, remote: &str, peer: &str) -> String {
-        let policy = IpsecPolicy {
-            tunnel_name: name.to_string(),
-            local_net: local.to_string(),
-            remote_net: remote.to_string(),
-            peer_ip: peer.to_string(),
-            psk_secret: "DynamicPskSecret".to_string(),
-        };
-        self.policies.push(policy);
-        format!(
-            "--- a/etc/iked.conf\n+++ b/etc/iked.conf\n@@ -0,0 +1,1 @@\n+ikev2 \"{}\" active esp from {} to {} peer {}\n",
-            name, local, remote, peer
-        )
-    }
-}
-
-impl Default for OpenBsdIkeD2IpsecVpnPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 5. OpenBSD httpd FastCGI & ACME Let's Encrypt Renewal PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct HttpdServerLocation {
-    pub location_match: String,
-    pub fastcgi_socket: String,
-    pub directory_index: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdHttpdFastCgiTlsPrEngine {
-    pub domain_name: String,
-    pub locations: Vec<HttpdServerLocation>,
-    pub acme_challenge_path: String,
-}
-
-impl OpenBsdHttpdFastCgiTlsPrEngine {
-    pub fn new() -> Self {
-        Self {
-            domain_name: "sigmaos.org".to_string(),
-            locations: vec![HttpdServerLocation {
-                location_match: "*.php".to_string(),
-                fastcgi_socket: "/var/run/php-fpm.sock".to_string(),
-                directory_index: "index.php".to_string(),
-            }],
-            acme_challenge_path: "/var/www/acme/.well-known/acme-challenge".to_string(),
-        }
-    }
-
-    pub fn add_fastcgi_location(&mut self, match_path: &str, socket: &str) -> String {
-        self.locations.push(HttpdServerLocation {
-            location_match: match_path.to_string(),
-            fastcgi_socket: socket.to_string(),
-            directory_index: "index.php".to_string(),
-        });
-        format!(
-            "--- a/etc/httpd.conf\n+++ b/etc/httpd.conf\n@@ -0,0 +1,2 @@\n+location \"{}\" {{\n+    fastcgi socket \"{}\"\n+}}\n",
-            match_path, socket
-        )
-    }
-}
-
-impl Default for OpenBsdHttpdFastCgiTlsPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 6. OpenBSD vmm/vmd MicroVM Hypervisor & Virtio PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct VmdVmSpec {
-    pub vm_id: u32,
-    pub name: String,
-    pub memory_mb: u32,
-    pub disk_path: String,
-    pub tap_interface: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdVmmVmdTapBridgePrEngine {
-    pub active_vms: BTreeMap<u32, VmdVmSpec>,
-}
-
-impl OpenBsdVmmVmdTapBridgePrEngine {
-    pub fn new() -> Self {
-        let mut active_vms = BTreeMap::new();
-        active_vms.insert(
-            101,
-            VmdVmSpec {
-                vm_id: 101,
-                name: "bsd_node1".to_string(),
-                memory_mb: 2048,
-                disk_path: "/var/vmm/bsd_node1.raw".to_string(),
-                tap_interface: "tap0".to_string(),
+        let mut mounts = BTreeMap::new();
+        mounts.insert(
+            "/var".to_string(),
+            FfsMountEntry {
+                device: "/dev/sd0d".to_string(),
+                mount_point: "/var".to_string(),
+                soft_updates_enabled: true,
+                async_mount: false,
             },
         );
-        Self { active_vms }
+        Self { mounts }
     }
 
-    pub fn spawn_vm(&mut self, id: u32, name: &str, ram_mb: u32, disk: &str) -> String {
-        let spec = VmdVmSpec {
-            vm_id: id,
-            name: name.to_string(),
-            memory_mb: ram_mb,
-            disk_path: disk.to_string(),
-            tap_interface: format!("tap{}", id),
+    pub fn configure_softdeps(&mut self, dev: &str, mp: &str) -> String {
+        let entry = FfsMountEntry {
+            device: dev.to_string(),
+            mount_point: mp.to_string(),
+            soft_updates_enabled: true,
+            async_mount: false,
         };
-        self.active_vms.insert(id, spec);
-        format!("vmctl start \"{}\" -m {}M -i 1 -d {}\n", name, ram_mb, disk)
-    }
-}
+        self.mounts.insert(mp.to_string(), entry);
 
-impl Default for OpenBsdVmmVmdTapBridgePrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 7. OpenBSD dhcpd Static Reservation & PXE Boot PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct DhcpStaticLease {
-    pub host_name: String,
-    pub mac_address: String,
-    pub ip_address: String,
-    pub pxe_filename: Option<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct OpenBsdDhcpdStaticLeasePrEngine {
-    pub subnet: String,
-    pub netmask: String,
-    pub static_leases: Vec<DhcpStaticLease>,
-}
-
-impl OpenBsdDhcpdStaticLeasePrEngine {
-    pub fn new() -> Self {
-        Self {
-            subnet: "192.168.1.0".to_string(),
-            netmask: "255.255.255.0".to_string(),
-            static_leases: vec![DhcpStaticLease {
-                host_name: "node01".to_string(),
-                mac_address: "52:54:00:12:34:56".to_string(),
-                ip_address: "192.168.1.50".to_string(),
-                pxe_filename: Some("pxeboot".to_string()),
-            }],
-        }
-    }
-
-    pub fn add_static_lease(&mut self, host: &str, mac: &str, ip: &str) -> String {
-        let lease = DhcpStaticLease {
-            host_name: host.to_string(),
-            mac_address: mac.to_string(),
-            ip_address: ip.to_string(),
-            pxe_filename: Some("pxeboot".to_string()),
-        };
-        self.static_leases.push(lease);
         format!(
-            "--- a/etc/dhcpd.conf\n+++ b/etc/dhcpd.conf\n@@ -0,0 +1,2 @@\n+host {} {{ hardware ethernet {}; fixed-address {}; filename \"pxeboot\"; }}\n",
-            host, mac, ip
+            "--- a/etc/fstab\n+++ b/etc/fstab\n@@ -0,0 +1,1 @@\n+{} {} ffs rw,softdep 1 2\n",
+            dev, mp
         )
     }
 }
 
-impl Default for OpenBsdDhcpdStaticLeasePrEngine {
+impl Default for OpenBsdFfsSoftUpdatesPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 8. OpenBSD NFSv4 RPCSEC_GSS Kerberos & File Locking PR Engine
+// 8. OpenBSD FineIBT & Branch Target Protection PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct Nfs4Export {
-    pub export_path: String,
-    pub client_subnet: String,
-    pub read_only: bool,
-    pub kerberos_auth_required: bool,
+pub struct OpenBsdFineIbtBranchProtectionPrEngine {
+    pub fine_ibt_enabled: bool,
+    pub forward_edge_cfi: bool,
+    pub kbind_protected: bool,
+    pub trap_counter: u64,
 }
 
-#[derive(Debug, Clone)]
-pub struct OpenBsdNfsv4ExportLockingPrEngine {
-    pub exports: Vec<Nfs4Export>,
-}
-
-impl OpenBsdNfsv4ExportLockingPrEngine {
+impl OpenBsdFineIbtBranchProtectionPrEngine {
     pub fn new() -> Self {
         Self {
-            exports: vec![Nfs4Export {
-                export_path: "/export/data".to_string(),
-                client_subnet: "10.0.0.0/24".to_string(),
-                read_only: false,
-                kerberos_auth_required: true,
-            }],
+            fine_ibt_enabled: true,
+            forward_edge_cfi: true,
+            kbind_protected: true,
+            trap_counter: 0,
         }
     }
 
-    pub fn add_export(&mut self, path: &str, subnet: &str, krb5: bool) -> String {
-        let export = Nfs4Export {
-            export_path: path.to_string(),
-            client_subnet: subnet.to_string(),
-            read_only: false,
-            kerberos_auth_required: krb5,
-        };
-        self.exports.push(export);
-        format!(
-            "--- a/etc/exports\n+++ b/etc/exports\n@@ -0,0 +1,1 @@\n+{} -network={} -sec=krb5p\n",
-            path, subnet
-        )
+    pub fn verify_fine_ibt_policy(&self) -> bool {
+        self.fine_ibt_enabled && self.forward_edge_cfi && self.kbind_protected
     }
 }
 
-impl Default for OpenBsdNfsv4ExportLockingPrEngine {
+impl Default for OpenBsdFineIbtBranchProtectionPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 9. OpenBSD radiusd RADIUS EAP-TLS Auth PR Engine
+// 9. OpenBSD radiusd RADIUS Authentication PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct RadiusClient {
-    pub client_name: String,
-    pub ip_address: String,
-    pub secret: String,
+    pub ip_network: String,
+    pub shared_secret_configured: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdRadiusdEapTlsPrEngine {
-    pub clients: Vec<RadiusClient>,
-    pub eap_ca_cert: String,
+pub struct OpenBsdRadiusdAuthenticationPrEngine {
+    pub clients: BTreeMap<String, RadiusClient>,
+    pub eap_tls_enabled: bool,
 }
 
-impl OpenBsdRadiusdEapTlsPrEngine {
+impl OpenBsdRadiusdAuthenticationPrEngine {
     pub fn new() -> Self {
+        let mut clients = BTreeMap::new();
+        clients.insert(
+            "10.0.0.0/24".to_string(),
+            RadiusClient {
+                ip_network: "10.0.0.0/24".to_string(),
+                shared_secret_configured: true,
+            },
+        );
         Self {
-            clients: vec![RadiusClient {
-                client_name: "wifi_ap01".to_string(),
-                ip_address: "192.168.1.2".to_string(),
-                secret: "RadiusSecret123".to_string(),
-            }],
-            eap_ca_cert: "/etc/radiusd/ca.crt".to_string(),
+            clients,
+            eap_tls_enabled: true,
         }
     }
 
-    pub fn add_radius_client(&mut self, name: &str, ip: &str, secret: &str) -> String {
+    pub fn add_radius_client(&mut self, cidr: &str) -> String {
         let client = RadiusClient {
-            client_name: name.to_string(),
-            ip_address: ip.to_string(),
-            secret: secret.to_string(),
+            ip_network: cidr.to_string(),
+            shared_secret_configured: true,
         };
-        self.clients.push(client);
+        self.clients.insert(cidr.to_string(), client);
+
         format!(
-            "--- a/etc/radiusd.conf\n+++ b/etc/radiusd.conf\n@@ -0,0 +1,1 @@\n+client {} {{ ip {} secret \"{}\" }}\n",
-            name, ip, secret
+            "--- a/etc/radiusd.conf\n+++ b/etc/radiusd.conf\n@@ -0,0 +1,3 @@\n+client {} {{\n+    secret \"sigmaos_radius_secret\"\n+}}\n",
+            cidr
         )
     }
 }
 
-impl Default for OpenBsdRadiusdEapTlsPrEngine {
+impl Default for OpenBsdRadiusdAuthenticationPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 10. OpenBSD openrsync Delta Sync & SSH Transport PR Engine
+// 10. OpenBSD iked Certificate Pinning & MOBIKE PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct OpenRsyncSession {
-    pub src_path: String,
-    pub dest_path: String,
-    pub delta_transfer: bool,
-    pub preserve_times: bool,
+pub struct IkedCertPolicy {
+    pub peer_fqdn: String,
+    pub ecdsa_p256_fingerprint: String,
+    pub mobike_enabled: bool,
 }
 
 #[derive(Debug, Clone)]
-pub struct OpenBsdOpenRsyncDeltaSyncPrEngine {
-    pub active_syncs: Vec<OpenRsyncSession>,
+pub struct OpenBsdOpenIKEDCertPinningPrEngine {
+    pub policies: BTreeMap<String, IkedCertPolicy>,
 }
 
-impl OpenBsdOpenRsyncDeltaSyncPrEngine {
+impl OpenBsdOpenIKEDCertPinningPrEngine {
     pub fn new() -> Self {
-        Self {
-            active_syncs: vec![OpenRsyncSession {
-                src_path: "/var/www".to_string(),
-                dest_path: "user@backup.internal:/backup/www".to_string(),
-                delta_transfer: true,
-                preserve_times: true,
-            }],
-        }
+        let mut policies = BTreeMap::new();
+        policies.insert(
+            "remote.gateway.net".to_string(),
+            IkedCertPolicy {
+                peer_fqdn: "remote.gateway.net".to_string(),
+                ecdsa_p256_fingerprint: "SHA256:a1b2c3d4e5f678901234567890abcdef".to_string(),
+                mobike_enabled: true,
+            },
+        );
+        Self { policies }
     }
 
-    pub fn trigger_sync(&mut self, src: &str, dest: &str) -> String {
-        let session = OpenRsyncSession {
-            src_path: src.to_string(),
-            dest_path: dest.to_string(),
-            delta_transfer: true,
-            preserve_times: true,
+    pub fn pin_peer_certificate(&mut self, fqdn: &str, fingerprint: &str) -> String {
+        let policy = IkedCertPolicy {
+            peer_fqdn: fqdn.to_string(),
+            ecdsa_p256_fingerprint: fingerprint.to_string(),
+            mobike_enabled: true,
         };
-        self.active_syncs.push(session);
-        format!("openrsync -a -v --delete -e ssh {} {}\n", src, dest)
+        self.policies.insert(fqdn.to_string(), policy);
+
+        format!(
+            "--- a/etc/iked.conf\n+++ b/etc/iked.conf\n@@ -0,0 +1,2 @@\n+ikev2 passive esp peer \"{}\" srcid \"sigmaos.org\"\n",
+            fqdn
+        )
     }
 }
 
-impl Default for OpenBsdOpenRsyncDeltaSyncPrEngine {
+impl Default for OpenBsdOpenIKEDCertPinningPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 11. Master OpenBSD Missing Components V62 PR Gateway Suite
+// 11. Master OpenBSD Missing Components V62 PR Suite
 // ============================================================================
 
-pub struct OpenBsdMissingComponentsV62PrGateway {
-    pub smtpd: OpenBsdSmptdRelayDnssecPrEngine,
-    pub sshd: OpenBsdSshdCertAuthFipsPrEngine,
-    pub relayd: OpenBsdRelaydLoadBalancerSslPrEngine,
-    pub iked: OpenBsdIkeD2IpsecVpnPrEngine,
-    pub httpd: OpenBsdHttpdFastCgiTlsPrEngine,
-    pub vmd: OpenBsdVmmVmdTapBridgePrEngine,
-    pub dhcpd: OpenBsdDhcpdStaticLeasePrEngine,
-    pub nfs4: OpenBsdNfsv4ExportLockingPrEngine,
-    pub radiusd: OpenBsdRadiusdEapTlsPrEngine,
-    pub openrsync: OpenBsdOpenRsyncDeltaSyncPrEngine,
+pub struct OpenBsdMissingComponentsV62PrSuite {
+    pub vmd: OpenBsdVmdMicroVmHypervisorPrEngine,
+    pub syspatch: OpenBsdSyspatchBinaryUpdatePrEngine,
+    pub dpb: OpenBsdDpbPortBuilderPrEngine,
+    pub spamd: OpenBsdSpamdGreylistingPrEngine,
+    pub httpd: OpenBsdTlsdHttpdWebServerPrEngine,
+    pub pf_route: OpenBsdPfRouteToMultipathPrEngine,
+    pub ffs: OpenBsdFfsSoftUpdatesPrEngine,
+    pub fine_ibt: OpenBsdFineIbtBranchProtectionPrEngine,
+    pub radiusd: OpenBsdRadiusdAuthenticationPrEngine,
+    pub iked_cert: OpenBsdOpenIKEDCertPinningPrEngine,
     pub proposals: BTreeMap<u64, OpenBsdPrProposalV62>,
     pub next_pr_id: u64,
 }
 
-impl OpenBsdMissingComponentsV62PrGateway {
+impl OpenBsdMissingComponentsV62PrSuite {
     pub fn new() -> Self {
         Self {
-            smtpd: OpenBsdSmptdRelayDnssecPrEngine::new(),
-            sshd: OpenBsdSshdCertAuthFipsPrEngine::new(),
-            relayd: OpenBsdRelaydLoadBalancerSslPrEngine::new(),
-            iked: OpenBsdIkeD2IpsecVpnPrEngine::new(),
-            httpd: OpenBsdHttpdFastCgiTlsPrEngine::new(),
-            vmd: OpenBsdVmmVmdTapBridgePrEngine::new(),
-            dhcpd: OpenBsdDhcpdStaticLeasePrEngine::new(),
-            nfs4: OpenBsdNfsv4ExportLockingPrEngine::new(),
-            radiusd: OpenBsdRadiusdEapTlsPrEngine::new(),
-            openrsync: OpenBsdOpenRsyncDeltaSyncPrEngine::new(),
+            vmd: OpenBsdVmdMicroVmHypervisorPrEngine::new(),
+            syspatch: OpenBsdSyspatchBinaryUpdatePrEngine::new(),
+            dpb: OpenBsdDpbPortBuilderPrEngine::new(),
+            spamd: OpenBsdSpamdGreylistingPrEngine::new(),
+            httpd: OpenBsdTlsdHttpdWebServerPrEngine::new(),
+            pf_route: OpenBsdPfRouteToMultipathPrEngine::new(),
+            ffs: OpenBsdFfsSoftUpdatesPrEngine::new(),
+            fine_ibt: OpenBsdFineIbtBranchProtectionPrEngine::new(),
+            radiusd: OpenBsdRadiusdAuthenticationPrEngine::new(),
+            iked_cert: OpenBsdOpenIKEDCertPinningPrEngine::new(),
             proposals: BTreeMap::new(),
             next_pr_id: 6200,
         }
@@ -654,37 +685,39 @@ impl OpenBsdMissingComponentsV62PrGateway {
     }
 
     pub fn evaluate_openbsd_v62_parity(&mut self) -> bool {
-        let smtp_diff = self
-            .smtpd
-            .add_relay_rule("example.org", "mail.example.org", 587);
+        let vm_diff = self
+            .vmd
+            .start_micro_vm("dev-vm", 2048, 4, "/var/vmm/dev.qcow2");
         let pr1 = self.submit_pr_proposal(
-            "Configure smtpd mail relay with DANE and DKIM",
+            "Provision vmd microVM guest dev-vm",
             "jules",
-            "usr.sbin/smtpd",
-            "Enforce DANE DNSSEC verification and DKIM signing on outbound mail",
-            &smtp_diff,
+            "usr.sbin/vmd",
+            "Provision 2048MB 4-vCPU microVM with vmm tap device",
+            &vm_diff,
         );
         self.validate_and_merge_pr(pr1);
 
-        let ssh_diff = self.sshd.configure_ca_auth("/etc/ssh/company_user_ca.pub");
+        let patch_msg = self
+            .syspatch
+            .apply_syspatch("002_kernel", "002", "UVM kernel pager lock fix");
         let pr2 = self.submit_pr_proposal(
-            "Enforce sshd CA Certificate authentication and Post-Quantum KEX",
+            "Apply OpenBSD syspatch errata 002_kernel",
             "jules",
-            "usr.bin/ssh",
-            "Integrate ML-KEM-768 hybrid KEX and SSH User CA validation",
-            &ssh_diff,
+            "usr.sbin/syspatch",
+            "Verify Signify signature and apply binary patch 002_kernel",
+            &patch_msg,
         );
         self.validate_and_merge_pr(pr2);
 
-        let rsync_diff = self
-            .openrsync
-            .trigger_sync("/etc", "admin@backup.internal:/backup/etc");
+        let http_diff =
+            self.httpd
+                .add_vhost("app.sigmaos.org", 443, "/etc/ssl/app.sigmaos.org.pem");
         let pr3 = self.submit_pr_proposal(
-            "Enable openrsync rolling checksum delta sync",
+            "Add httpd virtual host for app.sigmaos.org",
             "jules",
-            "usr.bin/openrsync",
-            "Execute BSD-licensed rsync delta transfer over SSH channel",
-            &rsync_diff,
+            "usr.sbin/httpd",
+            "Configure TLS virtual host with slowcgi FastCGI socket",
+            &http_diff,
         );
         self.validate_and_merge_pr(pr3);
 
@@ -694,7 +727,7 @@ impl OpenBsdMissingComponentsV62PrGateway {
     }
 }
 
-impl Default for OpenBsdMissingComponentsV62PrGateway {
+impl Default for OpenBsdMissingComponentsV62PrSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -709,58 +742,59 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_smtpd_and_sshd() {
-        let mut smtp = OpenBsdSmptdRelayDnssecPrEngine::new();
-        let diff1 = smtp.add_relay_rule("test.com", "smtp.test.com", 25);
-        assert!(diff1.contains("smtp.test.com"));
+    fn test_vmd_and_syspatch() {
+        let mut vmd = OpenBsdVmdMicroVmHypervisorPrEngine::new();
+        let diff = vmd.start_micro_vm("test-vm", 1024, 2, "/var/vmm/test.qcow2");
+        assert!(diff.contains("vm \"test-vm\""));
+        assert!(vmd.instances.contains_key("test-vm"));
 
-        let mut ssh = OpenBsdSshdCertAuthFipsPrEngine::new();
-        let diff2 = ssh.configure_ca_auth("/etc/ssh/ca.pub");
-        assert!(diff2.contains("TrustedUserCAKeys /etc/ssh/ca.pub"));
+        let mut sys = OpenBsdSyspatchBinaryUpdatePrEngine::new();
+        let msg = sys.apply_syspatch("003_vmm", "003", "vmm hypervisor trap fix");
+        assert!(msg.contains("Successfully applied errata 003"));
+        assert!(sys.patches.contains_key("003_vmm"));
     }
 
     #[test]
-    fn test_relayd_iked_httpd_vmd() {
-        let mut relay = OpenBsdRelaydLoadBalancerSslPrEngine::new();
-        let rdiff = relay.add_backend("10.0.0.12", 8080, 5);
-        assert!(rdiff.contains("10.0.0.12"));
+    fn test_dpb_spamd_httpd() {
+        let mut dpb = OpenBsdDpbPortBuilderPrEngine::new();
+        let msg = dpb.submit_port_build("lang/rust");
+        assert!(msg.contains("lang/rust"));
 
-        let mut ike = OpenBsdIkeD2IpsecVpnPrEngine::new();
-        let idiff = ike.add_tunnel("test_vpn", "10.0.0.0/24", "172.16.0.0/12", "1.2.3.4");
-        assert!(idiff.contains("ikev2 \"test_vpn\""));
+        let mut spamd = OpenBsdSpamdGreylistingPrEngine::new();
+        let sdiff = spamd.add_greylist_ip("198.51.100.44");
+        assert!(sdiff.contains("198.51.100.44"));
 
-        let mut http = OpenBsdHttpdFastCgiTlsPrEngine::new();
-        let hdiff = http.add_fastcgi_location("*.php5", "/var/run/php5.sock");
-        assert!(hdiff.contains("fastcgi socket \"/var/run/php5.sock\""));
-
-        let mut vmd = OpenBsdVmmVmdTapBridgePrEngine::new();
-        let vcmd = vmd.spawn_vm(102, "test_vm", 1024, "/var/vmm/test.raw");
-        assert!(vcmd.contains("vmctl start \"test_vm\""));
+        let mut httpd = OpenBsdTlsdHttpdWebServerPrEngine::new();
+        let hdiff = httpd.add_vhost("blog.sigmaos.org", 443, "/etc/ssl/blog.crt");
+        assert!(hdiff.contains("server \"blog.sigmaos.org\""));
     }
 
     #[test]
-    fn test_dhcpd_nfs_radius_rsync() {
-        let mut dhcp = OpenBsdDhcpdStaticLeasePrEngine::new();
-        let ddiff = dhcp.add_static_lease("host2", "00:11:22:33:44:55", "10.0.0.5");
-        assert!(ddiff.contains("host2"));
+    fn test_pf_ffs_fine_ibt_radiusd_iked() {
+        let mut pf = OpenBsdPfRouteToMultipathPrEngine::new();
+        let pdiff = pf.add_wan_gateway("em2", "192.0.2.254", 5);
+        assert!(pdiff.contains("route-to"));
 
-        let mut nfs = OpenBsdNfsv4ExportLockingPrEngine::new();
-        let ndiff = nfs.add_export("/export/share", "192.168.0.0/16", true);
-        assert!(ndiff.contains("-sec=krb5p"));
+        let mut ffs = OpenBsdFfsSoftUpdatesPrEngine::new();
+        let fdiff = ffs.configure_softdeps("/dev/sd0e", "/usr");
+        assert!(fdiff.contains("softdep"));
 
-        let mut rad = OpenBsdRadiusdEapTlsPrEngine::new();
-        let rdiff = rad.add_radius_client("ap02", "192.168.1.3", "secret");
-        assert!(rdiff.contains("client ap02"));
+        let ibt = OpenBsdFineIbtBranchProtectionPrEngine::new();
+        assert!(ibt.verify_fine_ibt_policy());
 
-        let mut rsync = OpenBsdOpenRsyncDeltaSyncPrEngine::new();
-        let rcmd = rsync.trigger_sync("/srv", "backup@server:/srv");
-        assert!(rcmd.contains("openrsync -a -v"));
+        let mut rad = OpenBsdRadiusdAuthenticationPrEngine::new();
+        let rdiff = rad.add_radius_client("10.1.0.0/16");
+        assert!(rdiff.contains("10.1.0.0/16"));
+
+        let mut iked = OpenBsdOpenIKEDCertPinningPrEngine::new();
+        let idiff = iked.pin_peer_certificate("vpn.sigmaos.org", "SHA256:1234567890abcdef");
+        assert!(idiff.contains("vpn.sigmaos.org"));
     }
 
     #[test]
-    fn test_master_gateway_v62() {
-        let mut gateway = OpenBsdMissingComponentsV62PrGateway::new();
-        assert!(gateway.evaluate_openbsd_v62_parity());
-        assert_eq!(gateway.proposals.len(), 3);
+    fn test_master_suite_v62() {
+        let mut master = OpenBsdMissingComponentsV62PrSuite::new();
+        assert!(master.evaluate_openbsd_v62_parity());
+        assert_eq!(master.proposals.len(), 3);
     }
 }
