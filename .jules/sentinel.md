@@ -7,3 +7,8 @@
 **Vulnerability:** `validate_path` checked for double URL-encoded dot pairs (`%2e%2e`) and single URL-encoded separators (`%2f`, `%5c`), but missed mixed literal and URL-encoded dot sequences (`.%2e`, `%2e.`) and double-encoded entities (`%252e`, `%252f`, `%255c`), allowing path traversal bypasses (CWE-22).
 **Learning:** Checking only uniform URL encoding sequences allows attacker bypasses using mixed encoding (`.%2e`) or double percent encoding (`%252e`).
 **Prevention:** Always inspect byte slices for mixed URL-encoded representations and double-percent hex sequences (`%25..`) in input validation filters.
+
+## 2026-10-18 - Percent-Encoded NUL and CRLF HTTP Injection Security
+**Vulnerability:** `validate_url` checked literal NUL bytes and control characters (`b <= 32`), but missed percent-encoded NUL bytes (`%00`) and percent-encoded CRLF/control sequences (`%0d`, `%0a`, `%1b`, `%7f`), enabling HTTP request smuggling, response header injection, and C-ABI string truncation (CWE-113 / CWE-626 / CWE-918).
+**Learning:** Checking only literal raw bytes leaves applications vulnerable when downstream network components decode percent-encoded control sequences or C-ABI string handlers truncate at `%00`.
+**Prevention:** Always scan URL byte slices for percent-encoded NUL bytes (`%00`), CRLF sequences (`%0d`/`%0a`), and encoded userinfo credentials (`%40`) in input validation routines before URL processing or forwarding.
