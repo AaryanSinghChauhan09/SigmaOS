@@ -27,7 +27,7 @@ pub struct SystemGeneration {
     pub packages_hash: [u8; 32],
     /// Rollback pointer (which generation to roll back to)
     pub previous_generation: Option<u32>,
-;
+}
 
 impl SystemGeneration {
     pub fn new(id: u32, description: &str, kernel_version: &str) -> Self {
@@ -48,7 +48,7 @@ impl SystemGeneration {
             previous_generation: None,
         }
     }
-;
+}
 
 /// Upgrade transaction state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,7 +61,7 @@ pub enum UpgradeState {
     Complete,
     RolledBack,
     Failed,
-;
+}
 
 /// Atomic upgrade manager — manages system generations and upgrades
 pub struct AtomicUpgradeManager {
@@ -75,7 +75,7 @@ pub struct AtomicUpgradeManager {
     pub upgrades_applied: u32,
     /// Total rollbacks performed
     pub rollbacks_performed: u32,
-;
+}
 
 impl AtomicUpgradeManager {
     /// Initialize with a base generation.
@@ -184,7 +184,7 @@ impl AtomicUpgradeManager {
             }
         }
     }
-;
+}
 
 #[cfg(test)]
 #[cfg(test)]
@@ -230,4 +230,4 @@ mod tests {
         assert_eq!(list.len(), 3);
         assert_eq!(list[0].id, 3); // newest first
     }
-;
+}

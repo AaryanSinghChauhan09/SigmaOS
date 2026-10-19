@@ -21,7 +21,7 @@ pub enum FilterCategory {
     Gaming,
     Custom,
     Unknown,
-;
+}
 
 /// Filter action enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum FilterAction {
     Allow,
     LogOnly,
     Unknown,
-;
+}
 
 /// Time limit type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,7 +40,7 @@ pub enum TimeLimitType {
     Weekly,
     Monthly,
     Unknown,
-;
+}
 
 /// Usage record data structure
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ pub struct UsageRecord {
     pub start_time: u64,
     pub end_time: u64,
     pub duration_seconds: u64,
-;
+}
 
 impl UsageRecord {
     /// Create a new usage record
@@ -69,7 +69,7 @@ impl UsageRecord {
             duration_seconds: duration,
         }
     }
-;
+}
 
 /// Content filter rule data structure
 #[derive(Debug, Clone)]
@@ -80,7 +80,7 @@ pub struct FilterRule {
     pub action: FilterAction,
     pub enabled: bool,
     pub description: String,
-;
+}
 
 impl FilterRule {
     /// Create a new filter rule
@@ -115,7 +115,7 @@ impl FilterRule {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-;
+}
 
 /// Time limit data structure
 #[derive(Debug, Clone)]
@@ -127,7 +127,7 @@ pub struct TimeLimit {
     pub limit_seconds: u64,
     pub used_seconds: u64,
     pub enabled: bool,
-;
+}
 
 impl TimeLimit {
     /// Create a new time limit
@@ -187,7 +187,7 @@ impl TimeLimit {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-;
+}
 
 /// Parental controls manager
 pub struct SigmaNanny {
@@ -195,7 +195,7 @@ pub struct SigmaNanny {
     time_limits: BTreeMap<String, TimeLimit>,
     usage_records: Vec<UsageRecord>,
     running: AtomicBool,
-;
+}
 
 impl SigmaNanny {
     /// Create a new parental controls manager
@@ -404,13 +404,13 @@ impl SigmaNanny {
     pub fn usage_record_count(&self) -> usize {
         self.usage_records.len()
     }
-;
+}
 
 impl Default for SigmaNanny {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaNanny instance (placeholder for actual global state)
 static mut SIGMANANNY_INSTANCE: Option<SigmaNanny> = None;
@@ -420,17 +420,17 @@ pub fn init_sigmananny() {
     unsafe {
         SIGMANANNY_INSTANCE = Some(SigmaNanny::new());
     }
-;
+}
 
 /// Get the global SigmaNanny instance
 pub fn get_sigmananny() -> Option<&'static SigmaNanny> {
     unsafe { SIGMANANNY_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaNanny instance
 pub fn get_sigmananny_mut() -> Option<&'static mut SigmaNanny> {
     unsafe { SIGMANANNY_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a filter rule
 pub fn add_filter_rule(rule: FilterRule) -> bool {
@@ -439,7 +439,7 @@ pub fn add_filter_rule(rule: FilterRule) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to check content
 pub fn check_content(content: &str) -> FilterAction {
@@ -448,7 +448,7 @@ pub fn check_content(content: &str) -> FilterAction {
     } else {
         FilterAction::Allow
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -724,4 +724,4 @@ mod tests {
         let action = check_content("adult site");
         assert_eq!(action, FilterAction::Block);
     }
-;
+}

@@ -19,7 +19,7 @@ pub enum KernelLogLevel {
     Notice = 5,  // Normal but significant condition
     Info = 6,    // Informational
     Debug = 7,   // Debug-level messages
-;
+}
 
 impl KernelLogLevel {
     pub fn prefix(&self) -> &'static str {
@@ -34,7 +34,7 @@ impl KernelLogLevel {
             Self::Debug => "<7>",
         }
     }
-;
+}
 
 /// Structured Kernel Log Record
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub struct KernelLogRecord {
     pub level: KernelLogLevel,
     pub facility: u8,
     pub message: String,
-;
+}
 
 /// Dmesg Circular Ring Buffer
 pub struct DmesgRingBuffer {
@@ -52,7 +52,7 @@ pub struct DmesgRingBuffer {
     buffer: VecDeque<KernelLogRecord>,
     next_seqnum: u64,
     min_console_level: KernelLogLevel,
-;
+}
 
 impl DmesgRingBuffer {
     pub fn new(capacity: usize) -> Self {
@@ -116,4 +116,4 @@ impl DmesgRingBuffer {
     pub fn count(&self) -> usize {
         self.buffer.len()
     }
-;
+}

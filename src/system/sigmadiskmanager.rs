@@ -21,7 +21,7 @@ pub enum DiskType {
     NVMe,
     USB,
     Unknown,
-;
+}
 
 /// Disk state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,7 +30,7 @@ pub enum DiskState {
     Offline,
     Error,
     Unknown,
-;
+}
 
 /// Disk
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct Disk {
     pub disk_type: DiskType,
     pub model: String,
     pub serial: String,
-;
+}
 
 impl Disk {
     pub fn new(id: String, name: String, device: String, size: u64, disk_type: DiskType) -> Self {
@@ -76,13 +76,13 @@ impl Disk {
     pub fn set_online(&mut self) {
         self.state = DiskState::Online;
     }
-;
+}
 
 /// Disk manager
 pub struct SigmaDiskManager {
     disks: BTreeMap<String, Disk>,
     next_disk_id: u64,
-;
+}
 
 impl SigmaDiskManager {
     pub fn new() -> Self {
@@ -136,13 +136,13 @@ impl SigmaDiskManager {
     pub fn total_capacity(&self) -> u64 {
         self.disks.values().map(|d| d.size).sum()
     }
-;
+}
 
 impl Default for SigmaDiskManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMADISKMANAGER_INSTANCE: Option<SigmaDiskManager> = None;
 
@@ -150,7 +150,7 @@ pub fn init_sigmadiskmanager() {
     unsafe {
         SIGMADISKMANAGER_INSTANCE = Some(SigmaDiskManager::new());
     }
-;
+}
 
 pub fn get_sigmadiskmanager() -> &'static SigmaDiskManager {
     unsafe {
@@ -158,7 +158,7 @@ pub fn get_sigmadiskmanager() -> &'static SigmaDiskManager {
             .as_ref()
             .expect("SigmaDiskManager not initialized")
     }
-;
+}
 
 pub fn get_sigmadiskmanager_mut() -> &'static mut SigmaDiskManager {
     unsafe {
@@ -166,12 +166,12 @@ pub fn get_sigmadiskmanager_mut() -> &'static mut SigmaDiskManager {
             .as_mut()
             .expect("SigmaDiskManager not initialized")
     }
-;
+}
 
 pub fn add_disk(name: String, device: String, size: u64, disk_type: DiskType) -> String {
     let manager = get_sigmadiskmanager_mut();
     manager.add_disk(name, device, size, disk_type)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -319,4 +319,4 @@ mod tests {
         let manager = get_sigmadiskmanager();
         assert!(manager.get_disk(&id).is_some());
     }
-;
+}

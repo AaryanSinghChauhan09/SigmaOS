@@ -22,7 +22,7 @@ pub enum InterfaceState {
     Up,
     /// Unknown
     Unknown,
-;
+}
 
 impl fmt::Display for InterfaceState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,7 +32,7 @@ impl fmt::Display for InterfaceState {
             InterfaceState::Unknown => write!(f, "unknown"),
         }
     }
-;
+}
 
 /// Network interface
 #[derive(Debug, Clone)]
@@ -49,7 +49,7 @@ pub struct NetworkInterface {
     pub state: InterfaceState,
     /// MTU
     pub mtu: u32,
-;
+}
 
 impl NetworkInterface {
     /// Create a new network interface
@@ -75,7 +75,7 @@ impl NetworkInterface {
         self.mtu = mtu;
         self
     }
-;
+}
 
 /// SigmaNIC - Network Interface Manager
 pub struct SigmaNIC {
@@ -85,7 +85,7 @@ pub struct SigmaNIC {
     running: bool,
     /// Interface counter
     interface_counter: u32,
-;
+}
 
 impl SigmaNIC {
     /// Create a new SigmaNIC instance
@@ -217,13 +217,13 @@ impl SigmaNIC {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaNIC {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaNIC instance (placeholder for actual global state)
 static mut SIGMANIC_INSTANCE: Option<SigmaNIC> = None;
@@ -233,12 +233,12 @@ pub fn init_sigmanic() {
     unsafe {
         SIGMANIC_INSTANCE = Some(SigmaNIC::new());
     }
-;
+}
 
 /// Get the global SigmaNIC instance
 pub fn get_sigmanic() -> Option<&'static mut SigmaNIC> {
     unsafe { SIGMANIC_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to bring up an interface
 pub fn bring_up_interface(name: &str) -> Result<(), String> {
@@ -247,7 +247,7 @@ pub fn bring_up_interface(name: &str) -> Result<(), String> {
     } else {
         Err("SigmaNIC not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -414,4 +414,4 @@ mod tests {
         let result = bring_up_interface("eth0");
         assert!(result.is_ok());
     }
-;
+}

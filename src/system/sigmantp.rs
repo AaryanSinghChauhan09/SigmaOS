@@ -22,7 +22,7 @@ pub enum NtpServerState {
     Peer,
     /// Server
     Server,
-;
+}
 
 impl fmt::Display for NtpServerState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,7 +32,7 @@ impl fmt::Display for NtpServerState {
             NtpServerState::Server => write!(f, "server"),
         }
     }
-;
+}
 
 /// NTP server
 #[derive(Debug, Clone)]
@@ -49,7 +49,7 @@ pub struct NtpServer {
     pub offset: i64,
     /// Stratum level
     pub stratum: u8,
-;
+}
 
 impl NtpServer {
     /// Create a new NTP server
@@ -81,7 +81,7 @@ impl NtpServer {
         self.stratum = stratum;
         self
     }
-;
+}
 
 /// SigmaNTP - System NTP Client
 pub struct SigmaNTP {
@@ -91,7 +91,7 @@ pub struct SigmaNTP {
     running: bool,
     /// Server counter
     server_counter: u32,
-;
+}
 
 impl SigmaNTP {
     /// Create a new SigmaNTP instance
@@ -182,13 +182,13 @@ impl SigmaNTP {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaNTP {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaNTP instance (placeholder for actual global state)
 static mut SIGMANTP_INSTANCE: Option<SigmaNTP> = None;
@@ -198,12 +198,12 @@ pub fn init_sigmantp() {
     unsafe {
         SIGMANTP_INSTANCE = Some(SigmaNTP::new());
     }
-;
+}
 
 /// Get the global SigmaNTP instance
 pub fn get_sigmantp() -> Option<&'static mut SigmaNTP> {
     unsafe { SIGMANTP_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to sync time
 pub fn sync_ntp_time() -> Result<(), String> {
@@ -212,7 +212,7 @@ pub fn sync_ntp_time() -> Result<(), String> {
     } else {
         Err("SigmaNTP not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -308,4 +308,4 @@ mod tests {
         let result = sync_ntp_time();
         assert!(result.is_ok());
     }
-;
+}

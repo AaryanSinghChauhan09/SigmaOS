@@ -22,7 +22,7 @@ pub enum WindowType {
     Tooltip,
     Notification,
     Unknown,
-;
+}
 
 /// Window state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum WindowState {
     Maximized,
     Minimized,
     Unknown,
-;
+}
 
 /// Window data structure
 #[derive(Debug, Clone)]
@@ -45,7 +45,7 @@ pub struct Window {
     pub state: WindowState,
     pub workspace: u32,
     pub is_focused: bool,
-;
+}
 
 impl Window {
     /// Create a new window
@@ -80,7 +80,7 @@ impl Window {
     pub fn is_window_focused(&self) -> bool {
         self.is_focused
     }
-;
+}
 
 /// Keybinding data structure
 #[derive(Debug, Clone)]
@@ -90,7 +90,7 @@ pub struct Keybinding {
     pub modifiers: String,
     pub command: String,
     pub enabled: bool,
-;
+}
 
 impl Keybinding {
     /// Create a new keybinding
@@ -118,7 +118,7 @@ impl Keybinding {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-;
+}
 
 /// Workspace data structure
 #[derive(Debug, Clone)]
@@ -126,7 +126,7 @@ pub struct Workspace {
     pub workspace_id: u32,
     pub name: String,
     pub is_active: bool,
-;
+}
 
 impl Workspace {
     /// Create a new workspace
@@ -147,7 +147,7 @@ impl Workspace {
     pub fn is_workspace_active(&self) -> bool {
         self.is_active
     }
-;
+}
 
 /// Compositor manager
 pub struct SigmaWalker {
@@ -156,7 +156,7 @@ pub struct SigmaWalker {
     workspaces: BTreeMap<u32, Workspace>,
     active_workspace: u32,
     running: AtomicBool,
-;
+}
 
 impl SigmaWalker {
     /// Create a new compositor manager
@@ -342,13 +342,13 @@ impl SigmaWalker {
     pub fn workspace_count(&self) -> usize {
         self.workspaces.len()
     }
-;
+}
 
 impl Default for SigmaWalker {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaWalker instance (placeholder for actual global state)
 static mut SIGMAWALKER_INSTANCE: Option<SigmaWalker> = None;
@@ -358,17 +358,17 @@ pub fn init_sigmawalker() {
     unsafe {
         SIGMAWALKER_INSTANCE = Some(SigmaWalker::new());
     }
-;
+}
 
 /// Get the global SigmaWalker instance
 pub fn get_sigmawalker() -> Option<&'static SigmaWalker> {
     unsafe { SIGMAWALKER_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaWalker instance
 pub fn get_sigmawalker_mut() -> Option<&'static mut SigmaWalker> {
     unsafe { SIGMAWALKER_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a window
 pub fn add_window(window: Window) -> bool {
@@ -377,7 +377,7 @@ pub fn add_window(window: Window) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to switch workspace
 pub fn switch_workspace(workspace_id: u32) -> bool {
@@ -386,7 +386,7 @@ pub fn switch_workspace(workspace_id: u32) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -590,4 +590,4 @@ mod tests {
         let walker = get_sigmawalker().unwrap();
         assert_eq!(walker.get_active_workspace(), 2);
     }
-;
+}

@@ -21,7 +21,7 @@ pub enum WriteState {
     Failed,
     Cancelled,
     Unknown,
-;
+}
 
 /// Image format enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum ImageFormat {
     Raw,
     Compressed,
     Unknown,
-;
+}
 
 /// USB device data structure
 #[derive(Debug, Clone)]
@@ -42,7 +42,7 @@ pub struct USBDevice {
     pub size_bytes: u64,
     pub is_removable: bool,
     pub is_busy: bool,
-;
+}
 
 impl USBDevice {
     /// Create a new USB device
@@ -77,7 +77,7 @@ impl USBDevice {
     pub fn is_suitable(&self) -> bool {
         self.is_removable && !self.is_busy
     }
-;
+}
 
 /// Write job data structure
 #[derive(Debug, Clone)]
@@ -92,7 +92,7 @@ pub struct WriteJob {
     pub state: WriteState,
     pub progress_percent: u8,
     pub error_message: String,
-;
+}
 
 impl WriteJob {
     /// Create a new write job
@@ -163,14 +163,14 @@ impl WriteJob {
             WriteState::Validating | WriteState::Writing | WriteState::Verifying
         )
     }
-;
+}
 
 /// USB writer manager
 pub struct SigmaUSBWriter {
     devices: BTreeMap<String, USBDevice>,
     write_jobs: BTreeMap<String, WriteJob>,
     running: AtomicBool,
-;
+}
 
 impl SigmaUSBWriter {
     /// Create a new USB writer manager
@@ -312,13 +312,13 @@ impl SigmaUSBWriter {
     pub fn write_job_count(&self) -> usize {
         self.write_jobs.len()
     }
-;
+}
 
 impl Default for SigmaUSBWriter {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaUSBWriter instance (placeholder for actual global state)
 static mut SIGMAUSBWRITER_INSTANCE: Option<SigmaUSBWriter> = None;
@@ -328,17 +328,17 @@ pub fn init_sigmausbwriter() {
     unsafe {
         SIGMAUSBWRITER_INSTANCE = Some(SigmaUSBWriter::new());
     }
-;
+}
 
 /// Get the global SigmaUSBWriter instance
 pub fn get_sigmausbwriter() -> Option<&'static SigmaUSBWriter> {
     unsafe { SIGMAUSBWRITER_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaUSBWriter instance
 pub fn get_sigmausbwriter_mut() -> Option<&'static mut SigmaUSBWriter> {
     unsafe { SIGMAUSBWRITER_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to create a write job
 pub fn create_write_job(job: WriteJob) -> bool {
@@ -347,7 +347,7 @@ pub fn create_write_job(job: WriteJob) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -605,4 +605,4 @@ mod tests {
         let writer = get_sigmausbwriter().unwrap();
         assert_eq!(writer.write_job_count(), 1);
     }
-;
+}

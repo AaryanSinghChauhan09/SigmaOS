@@ -22,7 +22,7 @@ pub enum ProcessState {
     Zombie,
     Dead,
     Unknown,
-;
+}
 
 /// Process
 #[derive(Debug, Clone)]
@@ -35,7 +35,7 @@ pub struct Process {
     pub memory_mb: f32,
     pub threads: u32,
     pub start_time: u64,
-;
+}
 
 impl Process {
     pub fn new(pid: u32, name: String, parent_pid: u32) -> Self {
@@ -70,12 +70,12 @@ impl Process {
         self.threads = threads;
         self
     }
-;
+}
 
 /// Process monitor
 pub struct SigmaProcessMonitor {
     processes: BTreeMap<u32, Process>,
-;
+}
 
 impl SigmaProcessMonitor {
     pub fn new() -> Self {
@@ -126,13 +126,13 @@ impl SigmaProcessMonitor {
     pub fn find_by_name(&self, name: &str) -> Vec<&Process> {
         self.processes.values().filter(|p| p.name == name).collect()
     }
-;
+}
 
 impl Default for SigmaProcessMonitor {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAPROCESSMONITOR_INSTANCE: Option<SigmaProcessMonitor> = None;
 
@@ -140,7 +140,7 @@ pub fn init_sigmaprocessmonitor() {
     unsafe {
         SIGMAPROCESSMONITOR_INSTANCE = Some(SigmaProcessMonitor::new());
     }
-;
+}
 
 pub fn get_sigmaprocessmonitor() -> &'static SigmaProcessMonitor {
     unsafe {
@@ -148,7 +148,7 @@ pub fn get_sigmaprocessmonitor() -> &'static SigmaProcessMonitor {
             .as_ref()
             .expect("SigmaProcessMonitor not initialized")
     }
-;
+}
 
 pub fn get_sigmaprocessmonitor_mut() -> &'static mut SigmaProcessMonitor {
     unsafe {
@@ -156,7 +156,7 @@ pub fn get_sigmaprocessmonitor_mut() -> &'static mut SigmaProcessMonitor {
             .as_mut()
             .expect("SigmaProcessMonitor not initialized")
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -241,4 +241,4 @@ mod tests {
         monitor_mut.add_process(Process::new(1000, "bash".to_string(), 999));
         assert_eq!(monitor.process_count(), 1);
     }
-;
+}

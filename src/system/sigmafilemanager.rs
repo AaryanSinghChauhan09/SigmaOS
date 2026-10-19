@@ -24,7 +24,7 @@ pub enum FileType {
     Socket,
     FIFO,
     Unknown,
-;
+}
 
 /// File permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,7 +38,7 @@ pub struct FilePermissions {
     pub other_read: bool,
     pub other_write: bool,
     pub other_execute: bool,
-;
+}
 
 impl FilePermissions {
     pub fn new() -> Self {
@@ -86,13 +86,13 @@ impl FilePermissions {
         }
         mode
     }
-;
+}
 
 impl Default for FilePermissions {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// File entry
 #[derive(Debug, Clone)]
@@ -103,7 +103,7 @@ pub struct FileEntry {
     pub permissions: FilePermissions,
     pub owner: String,
     pub group: String,
-;
+}
 
 impl FileEntry {
     pub fn new(path: String, file_type: FileType) -> Self {
@@ -136,12 +136,12 @@ impl FileEntry {
         self.group = group;
         self
     }
-;
+}
 
 /// File manager
 pub struct SigmaFileManager {
     files: BTreeMap<String, FileEntry>,
-;
+}
 
 impl SigmaFileManager {
     pub fn new() -> Self {
@@ -184,13 +184,13 @@ impl SigmaFileManager {
     pub fn total_size(&self) -> u64 {
         self.files.values().map(|f| f.size).sum()
     }
-;
+}
 
 impl Default for SigmaFileManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAFILEMANAGER_INSTANCE: Option<SigmaFileManager> = None;
 
@@ -198,7 +198,7 @@ pub fn init_sigmafilemanager() {
     unsafe {
         SIGMAFILEMANAGER_INSTANCE = Some(SigmaFileManager::new());
     }
-;
+}
 
 pub fn get_sigmafilemanager() -> &'static SigmaFileManager {
     unsafe {
@@ -206,7 +206,7 @@ pub fn get_sigmafilemanager() -> &'static SigmaFileManager {
             .as_ref()
             .expect("SigmaFileManager not initialized")
     }
-;
+}
 
 pub fn get_sigmafilemanager_mut() -> &'static mut SigmaFileManager {
     unsafe {
@@ -214,7 +214,7 @@ pub fn get_sigmafilemanager_mut() -> &'static mut SigmaFileManager {
             .as_mut()
             .expect("SigmaFileManager not initialized")
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -307,4 +307,4 @@ mod tests {
         ));
         assert_eq!(manager.file_count(), 1);
     }
-;
+}

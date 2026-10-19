@@ -22,7 +22,7 @@ pub enum ToolCategory {
     Security,
     Maintenance,
     Backup,
-;
+}
 
 /// System tool
 #[derive(Debug, Clone)]
@@ -34,7 +34,7 @@ pub struct SystemTool {
     pub executable_path: String,
     pub installed: bool,
     pub enabled: bool,
-;
+}
 
 impl SystemTool {
     pub fn new(id: String, name: String, category: ToolCategory, description: String, executable_path: String) -> Self {
@@ -60,7 +60,7 @@ impl SystemTool {
     pub fn is_available(&self) -> bool {
         self.installed && self.enabled
     }
-;
+}
 
 /// Maintenance task
 #[derive(Debug, Clone)]
@@ -72,7 +72,7 @@ pub struct MaintenanceTask {
     pub last_run: Option<String>,
     pub next_run: String,
     pub enabled: bool,
-;
+}
 
 impl MaintenanceTask {
     pub fn new(id: String, name: String, description: String, frequency: String, next_run: String) -> Self {
@@ -102,7 +102,7 @@ impl MaintenanceTask {
     pub fn is_due(&self, current_time: &str) -> bool {
         self.enabled && current_time >= &self.next_run
     }
-;
+}
 
 /// System cleanup action
 #[derive(Debug, Clone)]
@@ -112,7 +112,7 @@ pub struct CleanupAction {
     pub target_path: String,
     pub action_type: String, // cache, temp, logs, thumbnails
     pub size_freed: u64,
-;
+}
 
 impl CleanupAction {
     pub fn new(id: String, name: String, target_path: String, action_type: String) -> Self {
@@ -128,7 +128,7 @@ impl CleanupAction {
     pub fn set_size_freed(&mut self, size: u64) {
         self.size_freed = size;
     }
-;
+}
 
 /// SigmaSystemTools - System utilities manager
 #[derive(Debug)]
@@ -136,7 +136,7 @@ pub struct SigmaSystemTools {
     tools: BTreeMap<String, SystemTool>,
     maintenance_tasks: BTreeMap<String, MaintenanceTask>,
     cleanup_actions: Vec<CleanupAction>,
-;
+}
 
 impl SigmaSystemTools {
     pub fn new() -> Self {
@@ -216,13 +216,13 @@ impl SigmaSystemTools {
     pub fn cleanup_size(&self) -> u64 {
         self.cleanup_actions.iter().map(|action| action.size_freed).sum()
     }
-;
+}
 
 impl Default for SigmaSystemTools {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaSystemTools instance
 static mut SIGMASYSTEMTOOLS_INSTANCE: Option<SigmaSystemTools> = None;
@@ -232,21 +232,21 @@ pub fn init_sigmasystemtools() {
     unsafe {
         SIGMASYSTEMTOOLS_INSTANCE = Some(SigmaSystemTools::new());
     }
-;
+}
 
 /// Get the global SigmaSystemTools instance
 pub fn get_sigmasystemtools() -> Option<&'static SigmaSystemTools> {
     unsafe {
         SIGMASYSTEMTOOLS_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaSystemTools instance (mutable)
 pub fn get_sigmasystemtools_mut() -> Option<&'static mut SigmaSystemTools> {
     unsafe {
         SIGMASYSTEMTOOLS_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a tool
 pub fn add_tool(tool: SystemTool) -> bool {
@@ -256,7 +256,7 @@ pub fn add_tool(tool: SystemTool) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -348,4 +348,4 @@ mod tests {
         tools.add_tool(tool);
         assert_eq!(tools.tool_count(), 1);
     }
-;
+}

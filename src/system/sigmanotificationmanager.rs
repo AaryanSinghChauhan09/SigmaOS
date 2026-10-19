@@ -19,7 +19,7 @@ pub enum NotificationUrgency {
     Low,
     Normal,
     Critical,
-;
+}
 
 /// Notification category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,7 +34,7 @@ pub enum NotificationCategory {
     Calendar,
     Media,
     Other,
-;
+}
 
 /// Notification
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct Notification {
     pub action_label: Option<String>,
     pub expires: bool,
     pub timeout: u32, // seconds
-;
+}
 
 impl Notification {
     pub fn new(id: String, app_name: String, title: String, body: String, category: NotificationCategory, urgency: NotificationUrgency) -> Self {
@@ -96,7 +96,7 @@ impl Notification {
     pub fn is_critical(&self) -> bool {
         self.urgency == NotificationUrgency::Critical
     }
-;
+}
 
 /// Notification rule
 #[derive(Debug, Clone)]
@@ -107,7 +107,7 @@ pub struct NotificationRule {
     pub show_popups: bool,
     pub play_sound: bool,
     pub urgency_threshold: NotificationUrgency,
-;
+}
 
 impl NotificationRule {
     pub fn new(id: String, app_name: String) -> Self {
@@ -136,7 +136,7 @@ impl NotificationRule {
     pub fn set_urgency_threshold(&mut self, threshold: NotificationUrgency) {
         self.urgency_threshold = threshold;
     }
-;
+}
 
 /// SigmaNotificationManager - Notification management
 #[derive(Debug)]
@@ -145,7 +145,7 @@ pub struct SigmaNotificationManager {
     rules: BTreeMap<String, NotificationRule>,
     do_not_disturb: bool,
     history_limit: usize,
-;
+}
 
 impl SigmaNotificationManager {
     pub fn new() -> Self {
@@ -241,13 +241,13 @@ impl SigmaNotificationManager {
     pub fn rule_count(&self) -> usize {
         self.rules.len()
     }
-;
+}
 
 impl Default for SigmaNotificationManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaNotificationManager instance
 static mut SIGMANOTIFICATIONMANAGER_INSTANCE: Option<SigmaNotificationManager> = None;
@@ -257,21 +257,21 @@ pub fn init_sigmanotificationmanager() {
     unsafe {
         SIGMANOTIFICATIONMANAGER_INSTANCE = Some(SigmaNotificationManager::new());
     }
-;
+}
 
 /// Get the global SigmaNotificationManager instance
 pub fn get_sigmanotificationmanager() -> Option<&'static SigmaNotificationManager> {
     unsafe {
         SIGMANOTIFICATIONMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaNotificationManager instance (mutable)
 pub fn get_sigmanotificationmanager_mut() -> Option<&'static mut SigmaNotificationManager> {
     unsafe {
         SIGMANOTIFICATIONMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a notification
 pub fn add_notification(notification: Notification) -> bool {
@@ -281,7 +281,7 @@ pub fn add_notification(notification: Notification) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -384,4 +384,4 @@ mod tests {
         );
         assert!(manager.should_show(&notif));
     }
-;
+}

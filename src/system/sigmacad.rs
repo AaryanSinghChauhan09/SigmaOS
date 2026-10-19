@@ -23,7 +23,7 @@ pub enum EntityType {
     Polyline,
     Rectangle,
     Polygon,
-;
+}
 
 /// Constraint type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub enum ConstraintType {
     Coincident,
     EqualLength,
     Fixed,
-;
+}
 
 /// Dimension type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,7 +45,7 @@ pub enum DimensionType {
     Angular,
     Radial,
     Diameter,
-;
+}
 
 /// 3D point
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -53,7 +53,7 @@ pub struct Point3D {
     pub x: f64,
     pub y: f64,
     pub z: f64,
-;
+}
 
 impl Point3D {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
@@ -66,7 +66,7 @@ impl Point3D {
         let dz = self.z - other.z;
         (dx * dx + dy * dy + dz * dz).sqrt()
     }
-;
+}
 
 /// Geometric entity
 #[derive(Debug, Clone)]
@@ -75,7 +75,7 @@ pub struct Entity {
     pub entity_type: EntityType,
     pub points: Vec<Point3D>,
     pub parameters: Vec<f64>,
-;
+}
 
 impl Entity {
     pub fn new(id: String, entity_type: EntityType) -> Self {
@@ -106,7 +106,7 @@ impl Entity {
             _ => None,
         }
     }
-;
+}
 
 /// Constraint between entities
 #[derive(Debug, Clone)]
@@ -115,7 +115,7 @@ pub struct Constraint {
     pub constraint_type: ConstraintType,
     pub entity_ids: Vec<String>,
     pub parameters: Vec<f64>,
-;
+}
 
 impl Constraint {
     pub fn new(id: String, constraint_type: ConstraintType, entity_ids: Vec<String>) -> Self {
@@ -130,7 +130,7 @@ impl Constraint {
     pub fn add_parameter(&mut self, param: f64) {
         self.parameters.push(param);
     }
-;
+}
 
 /// Dimension annotation
 #[derive(Debug, Clone)]
@@ -140,7 +140,7 @@ pub struct Dimension {
     pub entity_id: String,
     pub value: f64,
     pub position: Point3D,
-;
+}
 
 impl Dimension {
     pub fn new(
@@ -158,7 +158,7 @@ impl Dimension {
             position,
         }
     }
-;
+}
 
 /// CAD drawing layer
 #[derive(Debug, Clone)]
@@ -168,7 +168,7 @@ pub struct DrawingLayer {
     pub entities: BTreeMap<String, Entity>,
     pub visible: bool,
     pub locked: bool,
-;
+}
 
 impl DrawingLayer {
     pub fn new(id: String, name: String) -> Self {
@@ -208,7 +208,7 @@ impl DrawingLayer {
     pub fn entity_count(&self) -> usize {
         self.entities.len()
     }
-;
+}
 
 /// CAD drawing
 #[derive(Debug, Clone)]
@@ -220,7 +220,7 @@ pub struct Drawing {
     pub dimensions: BTreeMap<String, Dimension>,
     pub active_layer: Option<String>,
     pub units: String,
-;
+}
 
 impl Drawing {
     pub fn new(id: String, name: String, units: String) -> Self {
@@ -306,14 +306,14 @@ impl Drawing {
     pub fn dimension_count(&self) -> usize {
         self.dimensions.len()
     }
-;
+}
 
 /// SigmaCAD - CAD system manager
 #[derive(Debug)]
 pub struct SigmaCAD {
     drawings: BTreeMap<String, Drawing>,
     current_drawing: Option<String>,
-;
+}
 
 impl SigmaCAD {
     pub fn new() -> Self {
@@ -370,13 +370,13 @@ impl SigmaCAD {
     pub fn drawing_count(&self) -> usize {
         self.drawings.len()
     }
-;
+}
 
 impl Default for SigmaCAD {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaCAD instance
 static mut SIGMACAD_INSTANCE: Option<SigmaCAD> = None;
@@ -386,17 +386,17 @@ pub fn init_sigmacad() {
     unsafe {
         SIGMACAD_INSTANCE = Some(SigmaCAD::new());
     }
-;
+}
 
 /// Get the global SigmaCAD instance
 pub fn get_sigmacad() -> Option<&'static SigmaCAD> {
     unsafe { SIGMACAD_INSTANCE.as_ref() }
-;
+}
 
 /// Get the global SigmaCAD instance (mutable)
 pub fn get_sigmacad_mut() -> Option<&'static mut SigmaCAD> {
     unsafe { SIGMACAD_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a drawing
 pub fn add_drawing(drawing: Drawing) -> bool {
@@ -406,7 +406,7 @@ pub fn add_drawing(drawing: Drawing) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -520,4 +520,4 @@ mod tests {
         cad.add_drawing(drawing);
         assert_eq!(cad.drawing_count(), 1);
     }
-;
+}

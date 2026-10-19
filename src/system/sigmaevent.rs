@@ -24,7 +24,7 @@ pub enum EventType {
     Network,
     /// System event
     System,
-;
+}
 
 impl fmt::Display for EventType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for EventType {
             EventType::System => write!(f, "system"),
         }
     }
-;
+}
 
 /// Event action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +46,7 @@ pub enum EventAction {
     Remove,
     /// Change
     Change,
-;
+}
 
 impl fmt::Display for EventAction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for EventAction {
             EventAction::Change => write!(f, "change"),
         }
     }
-;
+}
 
 /// System event
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct SystemEvent {
     pub data: String,
     /// Timestamp
     pub timestamp: u64,
-;
+}
 
 impl SystemEvent {
     /// Create a new system event
@@ -99,7 +99,7 @@ impl SystemEvent {
         self.timestamp = timestamp;
         self
     }
-;
+}
 
 /// SigmaEvent - System Event Manager
 pub struct SigmaEvent {
@@ -109,7 +109,7 @@ pub struct SigmaEvent {
     running: bool,
     /// Event counter
     event_counter: u32,
-;
+}
 
 impl SigmaEvent {
     /// Create a new SigmaEvent instance
@@ -205,13 +205,13 @@ impl SigmaEvent {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaEvent {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaEvent instance (placeholder for actual global state)
 static mut SIGMAEVENT_INSTANCE: Option<SigmaEvent> = None;
@@ -221,12 +221,12 @@ pub fn init_sigmaevent() {
     unsafe {
         SIGMAEVENT_INSTANCE = Some(SigmaEvent::new());
     }
-;
+}
 
 /// Get the global SigmaEvent instance
 pub fn get_sigmaevent() -> Option<&'static mut SigmaEvent> {
     unsafe { SIGMAEVENT_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to emit a system event
 pub fn emit_system_event(event: SystemEvent) -> Result<(), String> {
@@ -235,7 +235,7 @@ pub fn emit_system_event(event: SystemEvent) -> Result<(), String> {
     } else {
         Err("SigmaEvent not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -371,4 +371,4 @@ mod tests {
         let result = emit_system_event(sys_event);
         assert!(result.is_ok());
     }
-;
+}

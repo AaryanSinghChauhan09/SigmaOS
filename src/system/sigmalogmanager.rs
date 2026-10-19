@@ -25,7 +25,7 @@ pub enum LogLevel {
     Info,
     Debug,
     Unknown,
-;
+}
 
 /// Log source
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -36,7 +36,7 @@ pub enum LogSource {
     Network,
     Security,
     Unknown,
-;
+}
 
 /// Log entry
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct LogEntry {
     pub message: String,
     pub component: String,
     pub process_id: Option<u32>,
-;
+}
 
 impl LogEntry {
     pub fn new(id: u64, level: LogLevel, source: LogSource, message: String) -> Self {
@@ -77,7 +77,7 @@ impl LogEntry {
         self.process_id = Some(pid);
         self
     }
-;
+}
 
 /// Log rotation policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -86,7 +86,7 @@ pub enum RotationPolicy {
     TimeBased(u64),
     CountBased(u32),
     Disabled,
-;
+}
 
 /// Log manager
 pub struct SigmaLogManager {
@@ -97,7 +97,7 @@ pub struct SigmaLogManager {
     current_size: u64,
     log_count: u32,
     enabled: bool,
-;
+}
 
 impl SigmaLogManager {
     pub fn new() -> Self {
@@ -251,13 +251,13 @@ impl SigmaLogManager {
             .filter(|l| l.message.contains(pattern))
             .collect()
     }
-;
+}
 
 impl Default for SigmaLogManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMALOGMANAGER_INSTANCE: Option<SigmaLogManager> = None;
 
@@ -265,7 +265,7 @@ pub fn init_sigmalogmanager() {
     unsafe {
         SIGMALOGMANAGER_INSTANCE = Some(SigmaLogManager::new());
     }
-;
+}
 
 pub fn get_sigmalogmanager() -> &'static SigmaLogManager {
     unsafe {
@@ -273,7 +273,7 @@ pub fn get_sigmalogmanager() -> &'static SigmaLogManager {
             .as_ref()
             .expect("SigmaLogManager not initialized")
     }
-;
+}
 
 pub fn get_sigmalogmanager_mut() -> &'static mut SigmaLogManager {
     unsafe {
@@ -281,12 +281,12 @@ pub fn get_sigmalogmanager_mut() -> &'static mut SigmaLogManager {
             .as_mut()
             .expect("SigmaLogManager not initialized")
     }
-;
+}
 
 pub fn log_message(level: LogLevel, source: LogSource, message: String) -> u64 {
     let manager = get_sigmalogmanager_mut();
     manager.log(level, source, message)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -523,4 +523,4 @@ mod tests {
         let manager = get_sigmalogmanager();
         assert_eq!(manager.log_count(), 1);
     }
-;
+}

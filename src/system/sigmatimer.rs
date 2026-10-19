@@ -21,7 +21,7 @@ pub enum TimerState {
     Paused,
     Completed,
     Cancelled,
-;
+}
 
 /// Timer
 #[derive(Debug, Clone)]
@@ -31,7 +31,7 @@ pub struct Timer {
     pub duration_seconds: u64,
     pub remaining_seconds: u64,
     pub state: TimerState,
-;
+}
 
 impl Timer {
     pub fn new(id: String, name: String, duration_seconds: u64) -> Self {
@@ -73,7 +73,7 @@ impl Timer {
             }
         }
     }
-;
+}
 
 /// Alarm
 #[derive(Debug, Clone)]
@@ -83,7 +83,7 @@ pub struct Alarm {
     pub time_seconds: u64,
     pub enabled: bool,
     pub triggered: bool,
-;
+}
 
 impl Alarm {
     pub fn new(id: String, name: String, time_seconds: u64) -> Self {
@@ -111,7 +111,7 @@ impl Alarm {
     pub fn reset(&mut self) {
         self.triggered = false;
     }
-;
+}
 
 /// Timer manager
 pub struct SigmaTimer {
@@ -119,7 +119,7 @@ pub struct SigmaTimer {
     alarms: BTreeMap<String, Alarm>,
     next_timer_id: u64,
     next_alarm_id: u64,
-;
+}
 
 impl SigmaTimer {
     pub fn new() -> Self {
@@ -197,13 +197,13 @@ impl SigmaTimer {
     pub fn alarm_count(&self) -> usize {
         self.alarms.len()
     }
-;
+}
 
 impl Default for SigmaTimer {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMATIMER_INSTANCE: Option<SigmaTimer> = None;
 
@@ -211,7 +211,7 @@ pub fn init_sigmatimer() {
     unsafe {
         SIGMATIMER_INSTANCE = Some(SigmaTimer::new());
     }
-;
+}
 
 pub fn get_sigmatimer() -> &'static SigmaTimer {
     unsafe {
@@ -219,7 +219,7 @@ pub fn get_sigmatimer() -> &'static SigmaTimer {
             .as_ref()
             .expect("SigmaTimer not initialized")
     }
-;
+}
 
 pub fn get_sigmatimer_mut() -> &'static mut SigmaTimer {
     unsafe {
@@ -227,12 +227,12 @@ pub fn get_sigmatimer_mut() -> &'static mut SigmaTimer {
             .as_mut()
             .expect("SigmaTimer not initialized")
     }
-;
+}
 
 pub fn add_timer(name: String, duration_seconds: u64) -> String {
     let manager = get_sigmatimer_mut();
     manager.add_timer(name, duration_seconds)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -357,4 +357,4 @@ mod tests {
         let manager = get_sigmatimer();
         assert!(manager.get_timer(&id).is_some());
     }
-;
+}

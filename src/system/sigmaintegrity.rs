@@ -22,7 +22,7 @@ pub enum HashAlgorithm {
     Sha512,
     /// MD5
     Md5,
-;
+}
 
 impl fmt::Display for HashAlgorithm {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,7 +32,7 @@ impl fmt::Display for HashAlgorithm {
             HashAlgorithm::Md5 => write!(f, "md5"),
         }
     }
-;
+}
 
 /// File status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,7 +45,7 @@ pub enum FileStatus {
     Deleted,
     /// New
     New,
-;
+}
 
 impl fmt::Display for FileStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for FileStatus {
             FileStatus::New => write!(f, "new"),
         }
     }
-;
+}
 
 /// File integrity record
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct FileIntegrityRecord {
     pub status: FileStatus,
     /// Last modified timestamp
     pub timestamp: u64,
-;
+}
 
 impl FileIntegrityRecord {
     /// Create a new file integrity record
@@ -99,7 +99,7 @@ impl FileIntegrityRecord {
         self.timestamp = timestamp;
         self
     }
-;
+}
 
 /// SigmaIntegrity - File Integrity Daemon
 pub struct SigmaIntegrity {
@@ -109,7 +109,7 @@ pub struct SigmaIntegrity {
     running: bool,
     /// Record counter
     record_counter: u32,
-;
+}
 
 impl SigmaIntegrity {
     /// Create a new SigmaIntegrity instance
@@ -254,13 +254,13 @@ impl SigmaIntegrity {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaIntegrity {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaIntegrity instance (placeholder for actual global state)
 static mut SIGMAINTEGRITY_INSTANCE: Option<SigmaIntegrity> = None;
@@ -270,12 +270,12 @@ pub fn init_sigmaintegrity() {
     unsafe {
         SIGMAINTEGRITY_INSTANCE = Some(SigmaIntegrity::new());
     }
-;
+}
 
 /// Get the global SigmaIntegrity instance
 pub fn get_sigmaintegrity() -> Option<&'static mut SigmaIntegrity> {
     unsafe { SIGMAINTEGRITY_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to check file integrity
 pub fn check_file_integrity(
@@ -288,7 +288,7 @@ pub fn check_file_integrity(
     } else {
         Err("SigmaIntegrity not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -460,4 +460,4 @@ mod tests {
         let result = check_file_integrity("/etc/passwd", "abc123".to_string(), 1024);
         assert!(result.is_ok());
     }
-;
+}

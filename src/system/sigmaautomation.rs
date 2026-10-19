@@ -22,7 +22,7 @@ pub struct AutomationTask {
     pub enabled: bool,
     pub run_count: u32,
     pub last_run: u64,
-;
+}
 
 impl AutomationTask {
     pub fn new(id: String, name: String, command: String) -> Self {
@@ -56,13 +56,13 @@ impl AutomationTask {
     pub fn set_last_run(&mut self, timestamp: u64) {
         self.last_run = timestamp;
     }
-;
+}
 
 /// Automation manager
 pub struct SigmaAutomation {
     tasks: BTreeMap<String, AutomationTask>,
     next_task_id: u64,
-;
+}
 
 impl SigmaAutomation {
     pub fn new() -> Self {
@@ -111,13 +111,13 @@ impl SigmaAutomation {
     pub fn total_run_count(&self) -> u32 {
         self.tasks.values().map(|t| t.run_count).sum()
     }
-;
+}
 
 impl Default for SigmaAutomation {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAAUTOMATION_INSTANCE: Option<SigmaAutomation> = None;
 
@@ -125,7 +125,7 @@ pub fn init_sigmaautomation() {
     unsafe {
         SIGMAAUTOMATION_INSTANCE = Some(SigmaAutomation::new());
     }
-;
+}
 
 pub fn get_sigmaautomation() -> &'static SigmaAutomation {
     unsafe {
@@ -133,7 +133,7 @@ pub fn get_sigmaautomation() -> &'static SigmaAutomation {
             .as_ref()
             .expect("SigmaAutomation not initialized")
     }
-;
+}
 
 pub fn get_sigmaautomation_mut() -> &'static mut SigmaAutomation {
     unsafe {
@@ -141,12 +141,12 @@ pub fn get_sigmaautomation_mut() -> &'static mut SigmaAutomation {
             .as_mut()
             .expect("SigmaAutomation not initialized")
     }
-;
+}
 
 pub fn add_task(name: String, command: String) -> String {
     let manager = get_sigmaautomation_mut();
     manager.add_task(name, command)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -249,4 +249,4 @@ mod tests {
         let manager = get_sigmaautomation();
         assert!(manager.get_task(&id).is_some());
     }
-;
+}

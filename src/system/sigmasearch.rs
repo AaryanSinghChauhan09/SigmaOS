@@ -20,7 +20,7 @@ pub struct SearchResult {
     pub name: String,
     pub content_preview: String,
     pub relevance_score: f32,
-;
+}
 
 impl SearchResult {
     pub fn new(path: String, name: String) -> Self {
@@ -41,7 +41,7 @@ impl SearchResult {
         self.relevance_score = relevance_score;
         self
     }
-;
+}
 
 /// Search index
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct SearchIndex {
     pub path: String,
     pub indexed_files: u32,
     pub last_updated: u64,
-;
+}
 
 impl SearchIndex {
     pub fn new(id: String, name: String, path: String) -> Self {
@@ -73,14 +73,14 @@ impl SearchIndex {
         self.last_updated = last_updated;
         self
     }
-;
+}
 
 /// Search manager
 pub struct SigmaSearch {
     indexes: BTreeMap<String, SearchIndex>,
     results: Vec<SearchResult>,
     next_index_id: u64,
-;
+}
 
 impl SigmaSearch {
     pub fn new() -> Self {
@@ -138,13 +138,13 @@ impl SigmaSearch {
     pub fn total_indexed_files(&self) -> u32 {
         self.indexes.values().map(|i| i.indexed_files).sum()
     }
-;
+}
 
 impl Default for SigmaSearch {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMASEARCH_INSTANCE: Option<SigmaSearch> = None;
 
@@ -152,7 +152,7 @@ pub fn init_sigmasearch() {
     unsafe {
         SIGMASEARCH_INSTANCE = Some(SigmaSearch::new());
     }
-;
+}
 
 pub fn get_sigmasearch() -> &'static SigmaSearch {
     unsafe {
@@ -160,7 +160,7 @@ pub fn get_sigmasearch() -> &'static SigmaSearch {
             .as_ref()
             .expect("SigmaSearch not initialized")
     }
-;
+}
 
 pub fn get_sigmasearch_mut() -> &'static mut SigmaSearch {
     unsafe {
@@ -168,7 +168,7 @@ pub fn get_sigmasearch_mut() -> &'static mut SigmaSearch {
             .as_mut()
             .expect("SigmaSearch not initialized")
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -279,4 +279,4 @@ mod tests {
         manager_mut.add_index("Home".to_string(), "/home".to_string());
         assert_eq!(manager.index_count(), 1);
     }
-;
+}

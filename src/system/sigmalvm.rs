@@ -16,7 +16,7 @@ pub enum PVState {
     InUse,
     Removed,
     Unknown,
-;
+}
 
 /// Volume group state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,7 +26,7 @@ pub enum VGState {
     Partial,
     Removed,
     Unknown,
-;
+}
 
 /// Logical volume state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub enum LVState {
     Suspended,
     Removed,
     Unknown,
-;
+}
 
 /// Physical volume data structure
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct PhysicalVolume {
     pub free: u64,
     pub state: PVState,
     pub vg_name: String,
-;
+}
 
 impl PhysicalVolume {
     /// Create a new physical volume
@@ -97,7 +97,7 @@ impl PhysicalVolume {
     pub fn used(&self) -> u64 {
         self.size - self.free
     }
-;
+}
 
 /// Volume group data structure
 #[derive(Debug, Clone)]
@@ -109,7 +109,7 @@ pub struct VolumeGroup {
     pub state: VGState,
     pub pv_count: usize,
     pub lv_count: usize,
-;
+}
 
 impl VolumeGroup {
     /// Create a new volume group
@@ -141,7 +141,7 @@ impl VolumeGroup {
         self.pv_count = pv_count;
         self.lv_count = lv_count;
     }
-;
+}
 
 /// Logical volume data structure
 #[derive(Debug, Clone)]
@@ -153,7 +153,7 @@ pub struct LogicalVolume {
     pub state: LVState,
     pub filesystem: String,
     pub mount_point: String,
-;
+}
 
 impl LogicalVolume {
     /// Create a new logical volume
@@ -189,7 +189,7 @@ impl LogicalVolume {
     pub fn is_active(&self) -> bool {
         self.state == LVState::Active
     }
-;
+}
 
 /// LVM manager
 pub struct SigmaLVM {
@@ -197,7 +197,7 @@ pub struct SigmaLVM {
     volume_groups: BTreeMap<String, VolumeGroup>,
     logical_volumes: BTreeMap<String, LogicalVolume>,
     running: AtomicBool,
-;
+}
 
 impl SigmaLVM {
     /// Create a new LVM manager
@@ -350,13 +350,13 @@ impl SigmaLVM {
     pub fn lv_count(&self) -> usize {
         self.logical_volumes.len()
     }
-;
+}
 
 impl Default for SigmaLVM {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaLVM instance (placeholder for actual global state)
 static mut SIGMALVM_INSTANCE: Option<SigmaLVM> = None;
@@ -366,31 +366,31 @@ pub fn init_sigmalvm() {
     unsafe {
         SIGMALVM_INSTANCE = Some(SigmaLVM::new());
     }
-;
+}
 
 /// Get the global SigmaLVM instance
 pub fn get_sigmalvm() -> Option<&'static SigmaLVM> {
     unsafe { SIGMALVM_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaLVM instance
 pub fn get_sigmalvm_mut() -> Option<&'static mut SigmaLVM> {
     unsafe { SIGMALVM_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to create a volume group
 pub fn create_volume_group(vg: VolumeGroup) {
     if let Some(lvm) = get_sigmalvm_mut() {
         lvm.create_vg(vg);
     }
-;
+}
 
 /// Convenience function to create a logical volume
 pub fn create_logical_volume(lv: LogicalVolume) {
     if let Some(lvm) = get_sigmalvm_mut() {
         lvm.create_lv(lv);
     }
-;
+}
 
 /// Convenience function to activate a logical volume
 pub fn activate_logical_volume(lv_id: &str) -> bool {
@@ -399,7 +399,7 @@ pub fn activate_logical_volume(lv_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -743,4 +743,4 @@ mod tests {
         let lv = lvm.get_lv("lv1").unwrap();
         assert!(lv.is_active());
     }
-;
+}

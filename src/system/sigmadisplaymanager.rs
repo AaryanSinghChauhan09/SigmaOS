@@ -19,7 +19,7 @@ pub struct Resolution {
     pub width: u32,
     pub height: u32,
     pub refresh_rate: u32, // Hz
-;
+}
 
 impl Resolution {
     pub fn new(width: u32, height: u32, refresh_rate: u32) -> Self {
@@ -33,7 +33,7 @@ impl Resolution {
     pub fn to_string(&self) -> String {
         format!("{}x{}@{}Hz", self.width, self.height, self.refresh_rate)
     }
-;
+}
 
 /// Display output
 #[derive(Debug, Clone)]
@@ -46,7 +46,7 @@ pub struct DisplayOutput {
     pub current_resolution: Option<Resolution>,
     pub supported_resolutions: Vec<Resolution>,
     pub brightness: u8, // 0-100
-;
+}
 
 impl DisplayOutput {
     pub fn new(id: String, name: String) -> Self {
@@ -85,7 +85,7 @@ impl DisplayOutput {
     pub fn add_supported_resolution(&mut self, resolution: Resolution) {
         self.supported_resolutions.push(resolution);
     }
-;
+}
 
 /// Login screen settings
 #[derive(Debug, Clone)]
@@ -98,7 +98,7 @@ pub struct LoginSettings {
     pub theme: String,
     pub background_image: String,
     pub logo_image: String,
-;
+}
 
 impl LoginSettings {
     pub fn new(id: String) -> Self {
@@ -138,14 +138,14 @@ impl LoginSettings {
     pub fn set_logo(&mut self, image: String) {
         self.logo_image = image;
     }
-;
+}
 
 /// SigmaDisplayManager - Display and login management
 #[derive(Debug)]
 pub struct SigmaDisplayManager {
     outputs: BTreeMap<String, DisplayOutput>,
     login_settings: LoginSettings,
-;
+}
 
 impl SigmaDisplayManager {
     pub fn new() -> Self {
@@ -213,13 +213,13 @@ impl SigmaDisplayManager {
     pub fn output_count(&self) -> usize {
         self.outputs.len()
     }
-;
+}
 
 impl Default for SigmaDisplayManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaDisplayManager instance
 static mut SIGMADISPLAYMANAGER_INSTANCE: Option<SigmaDisplayManager> = None;
@@ -229,21 +229,21 @@ pub fn init_sigmadisplaymanager() {
     unsafe {
         SIGMADISPLAYMANAGER_INSTANCE = Some(SigmaDisplayManager::new());
     }
-;
+}
 
 /// Get the global SigmaDisplayManager instance
 pub fn get_sigmadisplaymanager() -> Option<&'static SigmaDisplayManager> {
     unsafe {
         SIGMADISPLAYMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaDisplayManager instance (mutable)
 pub fn get_sigmadisplaymanager_mut() -> Option<&'static mut SigmaDisplayManager> {
     unsafe {
         SIGMADISPLAYMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add an output
 pub fn add_output(output: DisplayOutput) -> bool {
@@ -253,7 +253,7 @@ pub fn add_output(output: DisplayOutput) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -327,4 +327,4 @@ mod tests {
         let primary = manager.get_primary_output();
         assert_eq!(primary.unwrap().id, "DP-1");
     }
-;
+}

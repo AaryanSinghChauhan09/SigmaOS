@@ -24,7 +24,7 @@ pub struct NtpServer {
     pub priority: u32,
     /// Enabled flag
     pub enabled: bool,
-;
+}
 
 impl NtpServer {
     /// Create a new NTP server
@@ -54,7 +54,7 @@ impl NtpServer {
         self.enabled = enabled;
         self
     }
-;
+}
 
 /// Time synchronization status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,7 +67,7 @@ pub enum SyncStatus {
     Synced,
     /// Error
     Error,
-;
+}
 
 impl fmt::Display for SyncStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -78,7 +78,7 @@ impl fmt::Display for SyncStatus {
             SyncStatus::Error => write!(f, "error"),
         }
     }
-;
+}
 
 /// Time source
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -91,7 +91,7 @@ pub enum TimeSource {
     Manual,
     /// Unknown
     Unknown,
-;
+}
 
 impl fmt::Display for TimeSource {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -102,7 +102,7 @@ impl fmt::Display for TimeSource {
             TimeSource::Unknown => write!(f, "unknown"),
         }
     }
-;
+}
 
 /// Time synchronization statistics
 #[derive(Debug, Clone)]
@@ -123,7 +123,7 @@ pub struct SyncStats {
     pub root_delay: u64,
     /// Root dispersion (milliseconds)
     pub root_dispersion: u64,
-;
+}
 
 impl SyncStats {
     /// Create new sync statistics
@@ -175,13 +175,13 @@ impl SyncStats {
     pub fn set_root_dispersion(&mut self, dispersion: u64) {
         self.root_dispersion = dispersion;
     }
-;
+}
 
 impl Default for SyncStats {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Time synchronization configuration
 #[derive(Debug, Clone)]
@@ -200,7 +200,7 @@ pub struct TimeConfig {
     pub enable_drift_correction: bool,
     /// Maximum drift threshold (milliseconds)
     pub max_drift_threshold: i64,
-;
+}
 
 impl TimeConfig {
     /// Create new time configuration
@@ -239,13 +239,13 @@ impl TimeConfig {
         self.enable_drift_correction = enable;
         self
     }
-;
+}
 
 impl Default for TimeConfig {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// SigmaTime - Time Synchronization Service
 pub struct SigmaTime {
@@ -263,7 +263,7 @@ pub struct SigmaTime {
     running: bool,
     /// Current system time (seconds since epoch)
     current_time: u64,
-;
+}
 
 impl SigmaTime {
     /// Create a new SigmaTime instance
@@ -462,13 +462,13 @@ impl SigmaTime {
         }
         stats
     }
-;
+}
 
 impl Default for SigmaTime {
     fn default() -> Self {
         Self::with_default_config()
     }
-;
+}
 
 /// Global SigmaTime instance (placeholder for actual global state)
 static mut SIGMATIME_INSTANCE: Option<SigmaTime> = None;
@@ -478,17 +478,17 @@ pub fn init_sigmatime(config: TimeConfig) {
     unsafe {
         SIGMATIME_INSTANCE = Some(SigmaTime::new(config));
     }
-;
+}
 
 /// Initialize SigmaTime with default configuration
 pub fn init_sigmatime_default() {
     init_sigmatime(TimeConfig::default());
-;
+}
 
 /// Get the global SigmaTime instance
 pub fn get_sigmatime() -> Option<&'static mut SigmaTime> {
     unsafe { SIGMATIME_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add an NTP server
 pub fn add_ntp_server(address: String, port: u16, priority: u32) {
@@ -498,7 +498,7 @@ pub fn add_ntp_server(address: String, port: u16, priority: u32) {
             .with_priority(priority);
         time.add_ntp_server(server);
     }
-;
+}
 
 /// Convenience function to synchronize time
 pub fn sync_time(current_timestamp: u64) -> Result<String, String> {
@@ -507,12 +507,12 @@ pub fn sync_time(current_timestamp: u64) -> Result<String, String> {
     } else {
         Err("SigmaTime not initialized".to_string())
     }
-;
+}
 
 /// Convenience function to get current time
 pub fn get_current_time() -> Option<u64> {
     get_sigmatime().map(|t| t.current_time())
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -699,4 +699,4 @@ mod tests {
         let current = get_current_time();
         assert_eq!(current, Some(1000));
     }
-;
+}

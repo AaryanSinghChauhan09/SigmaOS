@@ -21,7 +21,7 @@ pub struct KeyboardLayout {
     pub language: String,
     pub variant: String,
     pub short_name: String,
-;
+}
 
 impl KeyboardLayout {
     pub fn new(id: String, name: String, language: String, variant: String, short_name: String) -> Self {
@@ -33,7 +33,7 @@ impl KeyboardLayout {
             short_name,
         }
     }
-;
+}
 
 /// Keybinding
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct Keybinding {
     pub action: String,
     pub command: String,
     pub enabled: bool,
-;
+}
 
 impl Keybinding {
     pub fn new(id: String, name: String, keys: String, action: String, command: String) -> Self {
@@ -61,7 +61,7 @@ impl Keybinding {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-;
+}
 
 /// Input method
 #[derive(Debug, Clone)]
@@ -70,7 +70,7 @@ pub struct InputMethod {
     pub name: String,
     pub language: String,
     pub enabled: bool,
-;
+}
 
 impl InputMethod {
     pub fn new(id: String, name: String, language: String) -> Self {
@@ -85,7 +85,7 @@ impl InputMethod {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-;
+}
 
 /// Keyboard settings
 #[derive(Debug, Clone)]
@@ -95,7 +95,7 @@ pub struct KeyboardSettings {
     pub repeat_rate: u32, // characters per second
     pub numlock_on_startup: bool,
     pub capslock_indicator: bool,
-;
+}
 
 impl KeyboardSettings {
     pub fn new(id: String) -> Self {
@@ -123,7 +123,7 @@ impl KeyboardSettings {
     pub fn set_capslock_indicator(&mut self, enabled: bool) {
         self.capslock_indicator = enabled;
     }
-;
+}
 
 /// SigmaKeyboardManager - Keyboard and input management
 #[derive(Debug)]
@@ -133,7 +133,7 @@ pub struct SigmaKeyboardManager {
     input_methods: BTreeMap<String, InputMethod>,
     settings: KeyboardSettings,
     active_layout: Option<String>,
-;
+}
 
 impl SigmaKeyboardManager {
     pub fn new() -> Self {
@@ -223,13 +223,13 @@ impl SigmaKeyboardManager {
     pub fn keybinding_count(&self) -> usize {
         self.keybindings.len()
     }
-;
+}
 
 impl Default for SigmaKeyboardManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaKeyboardManager instance
 static mut SIGMAKEYBOARDMANAGER_INSTANCE: Option<SigmaKeyboardManager> = None;
@@ -239,21 +239,21 @@ pub fn init_sigmakeyboardmanager() {
     unsafe {
         SIGMAKEYBOARDMANAGER_INSTANCE = Some(SigmaKeyboardManager::new());
     }
-;
+}
 
 /// Get the global SigmaKeyboardManager instance
 pub fn get_sigmakeyboardmanager() -> Option<&'static SigmaKeyboardManager> {
     unsafe {
         SIGMAKEYBOARDMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaKeyboardManager instance (mutable)
 pub fn get_sigmakeyboardmanager_mut() -> Option<&'static mut SigmaKeyboardManager> {
     unsafe {
         SIGMAKEYBOARDMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a layout
 pub fn add_layout(layout: KeyboardLayout) -> bool {
@@ -263,7 +263,7 @@ pub fn add_layout(layout: KeyboardLayout) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -372,4 +372,4 @@ mod tests {
         let active = manager.get_active_layout();
         assert_eq!(active.unwrap().id, "us");
     }
-;
+}

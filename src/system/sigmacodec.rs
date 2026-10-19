@@ -16,7 +16,7 @@ pub enum CodecType {
     Video,
     Subtitle,
     Unknown,
-;
+}
 
 /// Codec format enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,7 +35,7 @@ pub enum CodecFormat {
     SubRip,
     WebVTT,
     Unknown,
-;
+}
 
 /// Codec state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,7 +45,7 @@ pub enum CodecState {
     Encoding,
     Error,
     Unknown,
-;
+}
 
 /// Codec data structure
 #[derive(Debug, Clone)]
@@ -58,7 +58,7 @@ pub struct Codec {
     pub enabled: bool,
     pub priority: u32,
     pub description: String,
-;
+}
 
 impl Codec {
     /// Create a new codec
@@ -110,13 +110,13 @@ impl Codec {
     pub fn is_active(&self) -> bool {
         self.state == CodecState::Decoding || self.state == CodecState::Encoding
     }
-;
+}
 
 /// Codec manager
 pub struct SigmaCodec {
     codecs: BTreeMap<String, Codec>,
     running: AtomicBool,
-;
+}
 
 impl SigmaCodec {
     /// Create a new codec manager
@@ -247,13 +247,13 @@ impl SigmaCodec {
     pub fn codec_count(&self) -> usize {
         self.codecs.len()
     }
-;
+}
 
 impl Default for SigmaCodec {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaCodec instance (placeholder for actual global state)
 static mut SIGMACODEC_INSTANCE: Option<SigmaCodec> = None;
@@ -263,17 +263,17 @@ pub fn init_sigmacodec() {
     unsafe {
         SIGMACODEC_INSTANCE = Some(SigmaCodec::new());
     }
-;
+}
 
 /// Get the global SigmaCodec instance
 pub fn get_sigmacodec() -> Option<&'static SigmaCodec> {
     unsafe { SIGMACODEC_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaCodec instance
 pub fn get_sigmacodec_mut() -> Option<&'static mut SigmaCodec> {
     unsafe { SIGMACODEC_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to register a codec
 pub fn register_codec(codec: Codec) -> bool {
@@ -282,7 +282,7 @@ pub fn register_codec(codec: Codec) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to enable a codec
 pub fn enable_codec(codec_id: &str) -> bool {
@@ -291,7 +291,7 @@ pub fn enable_codec(codec_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -524,4 +524,4 @@ mod tests {
         let codec = codec_mgr.get_codec("h264").unwrap();
         assert!(codec.is_enabled());
     }
-;
+}

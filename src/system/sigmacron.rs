@@ -22,7 +22,7 @@ pub enum JobStatus {
     Failed,
     Skipped,
     Unknown,
-;
+}
 
 /// Job schedule type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub enum ScheduleType {
     Yearly,
     CronExpression,
     Unknown,
-;
+}
 
 /// Cron time specification
 #[derive(Debug, Clone)]
@@ -46,7 +46,7 @@ pub struct CronSpec {
     pub day_of_month: Option<String>,
     pub month: Option<String>,
     pub day_of_week: Option<String>,
-;
+}
 
 impl CronSpec {
     pub fn new() -> Self {
@@ -83,13 +83,13 @@ impl CronSpec {
         self.day_of_week = Some(day);
         self
     }
-;
+}
 
 impl Default for CronSpec {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Scheduled job
 #[derive(Debug, Clone)]
@@ -107,7 +107,7 @@ pub struct ScheduledJob {
     pub fail_count: u32,
     pub environment: Vec<String>,
     pub working_directory: Option<String>,
-;
+}
 
 impl ScheduledJob {
     pub fn new(id: String, name: String, command: String, schedule_type: ScheduleType) -> Self {
@@ -168,13 +168,13 @@ impl ScheduledJob {
     pub fn mark_skipped(&mut self) {
         self.status = JobStatus::Skipped;
     }
-;
+}
 
 /// Cron manager
 pub struct SigmaCron {
     jobs: BTreeMap<String, ScheduledJob>,
     next_job_id: u64,
-;
+}
 
 impl SigmaCron {
     pub fn new() -> Self {
@@ -313,13 +313,13 @@ impl SigmaCron {
             .filter(|j| j.status == JobStatus::Failed)
             .count()
     }
-;
+}
 
 impl Default for SigmaCron {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMACRON_INSTANCE: Option<SigmaCron> = None;
 
@@ -327,7 +327,7 @@ pub fn init_sigmacron() {
     unsafe {
         SIGMACRON_INSTANCE = Some(SigmaCron::new());
     }
-;
+}
 
 pub fn get_sigmacron() -> &'static SigmaCron {
     unsafe {
@@ -335,7 +335,7 @@ pub fn get_sigmacron() -> &'static SigmaCron {
             .as_ref()
             .expect("SigmaCron not initialized")
     }
-;
+}
 
 pub fn get_sigmacron_mut() -> &'static mut SigmaCron {
     unsafe {
@@ -343,12 +343,12 @@ pub fn get_sigmacron_mut() -> &'static mut SigmaCron {
             .as_mut()
             .expect("SigmaCron not initialized")
     }
-;
+}
 
 pub fn create_job(name: String, command: String, schedule_type: ScheduleType) -> String {
     let manager = get_sigmacron_mut();
     manager.create_job(name, command, schedule_type)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -621,4 +621,4 @@ mod tests {
         let manager = get_sigmacron();
         assert!(manager.get_job(&id).is_some());
     }
-;
+}

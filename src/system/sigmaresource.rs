@@ -25,7 +25,7 @@ pub enum ResourceType {
     DiskIO,
     /// Network bandwidth limit
     Network,
-;
+}
 
 impl fmt::Display for ResourceType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -36,7 +36,7 @@ impl fmt::Display for ResourceType {
             ResourceType::Network => write!(f, "network"),
         }
     }
-;
+}
 
 /// Resource limit
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct ResourceLimit {
     pub current: u64,
     /// Enabled
     pub enabled: bool,
-;
+}
 
 impl ResourceLimit {
     /// Create a new resource limit
@@ -76,7 +76,7 @@ impl ResourceLimit {
         self.enabled = enabled;
         self
     }
-;
+}
 
 /// SigmaResource - System Resource Manager
 pub struct SigmaResource {
@@ -86,7 +86,7 @@ pub struct SigmaResource {
     running: bool,
     /// Limit counter
     limit_counter: u32,
-;
+}
 
 impl SigmaResource {
     /// Create a new SigmaResource instance
@@ -256,13 +256,13 @@ impl SigmaResource {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaResource {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaResource instance (placeholder for actual global state)
 static mut SIGMARESOURCE_INSTANCE: Option<SigmaResource> = None;
@@ -272,12 +272,12 @@ pub fn init_sigmaresource() {
     unsafe {
         SIGMARESOURCE_INSTANCE = Some(SigmaResource::new());
     }
-;
+}
 
 /// Get the global SigmaResource instance
 pub fn get_sigmaresource() -> Option<&'static mut SigmaResource> {
     unsafe { SIGMARESOURCE_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to set a resource limit
 pub fn set_resource_limit(pid: u32, resource_type: ResourceType, limit: u64) -> Result<(), String> {
@@ -286,7 +286,7 @@ pub fn set_resource_limit(pid: u32, resource_type: ResourceType, limit: u64) -> 
     } else {
         Err("SigmaResource not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -418,4 +418,4 @@ mod tests {
         let result = set_resource_limit(1234, ResourceType::Cpu, 90);
         assert!(result.is_ok());
     }
-;
+}

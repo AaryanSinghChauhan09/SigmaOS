@@ -16,7 +16,7 @@ pub enum ServiceState {
     Running,
     Failed,
     Unknown,
-;
+}
 
 /// Service data structure
 #[derive(Debug, Clone)]
@@ -25,7 +25,7 @@ pub struct Service {
     pub name: String,
     pub state: ServiceState,
     pub enabled: bool,
-;
+}
 
 impl Service {
     pub fn new(service_id: String, name: String) -> Self {
@@ -36,13 +36,13 @@ impl Service {
             enabled: false,
         }
     }
-;
+}
 
 /// Service manager
 pub struct SigmaServiceManager {
     services: BTreeMap<String, Service>,
     running: AtomicBool,
-;
+}
 
 impl SigmaServiceManager {
     pub fn new() -> Self {
@@ -98,13 +98,13 @@ impl SigmaServiceManager {
     pub fn service_count(&self) -> usize {
         self.services.len()
     }
-;
+}
 
 impl Default for SigmaServiceManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMASERVICEMANAGER_INSTANCE: Option<SigmaServiceManager> = None;
 
@@ -112,15 +112,15 @@ pub fn init_sigmaservicemanager() {
     unsafe {
         SIGMASERVICEMANAGER_INSTANCE = Some(SigmaServiceManager::new());
     }
-;
+}
 
 pub fn get_sigmaservicemanager() -> Option<&'static SigmaServiceManager> {
     unsafe { SIGMASERVICEMANAGER_INSTANCE.as_ref() }
-;
+}
 
 pub fn get_sigmaservicemanager_mut() -> Option<&'static mut SigmaServiceManager> {
     unsafe { SIGMASERVICEMANAGER_INSTANCE.as_mut() }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -130,4 +130,4 @@ mod tests {
         let mgr = SigmaServiceManager::new();
         assert!(!mgr.is_running());
     }
-;
+}

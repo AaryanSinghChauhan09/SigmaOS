@@ -24,7 +24,7 @@ pub enum UnitType {
     Path,
     Device,
     Unknown,
-;
+}
 
 /// Unit state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,7 +35,7 @@ pub enum UnitState {
     Deactivating,
     Failed,
     Unknown,
-;
+}
 
 /// Dependency type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub enum DependencyType {
     Before,
     After,
     Unknown,
-;
+}
 
 /// Service restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +57,7 @@ pub enum RestartPolicy {
     OnFailure,
     Always,
     Unknown,
-;
+}
 
 /// Unit
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct Unit {
     pub exec_start: Option<String>,
     pub exec_stop: Option<String>,
     pub pid: Option<u32>,
-;
+}
 
 impl Unit {
     pub fn new(id: String, name: String, unit_type: UnitType) -> Self {
@@ -143,7 +143,7 @@ impl Unit {
     pub fn fail(&mut self) {
         self.state = UnitState::Failed;
     }
-;
+}
 
 /// System target
 #[derive(Debug, Clone)]
@@ -152,7 +152,7 @@ pub struct Target {
     pub name: String,
     pub state: UnitState,
     pub units: Vec<String>,
-;
+}
 
 impl Target {
     pub fn new(id: String, name: String) -> Self {
@@ -175,7 +175,7 @@ impl Target {
     pub fn deactivate(&mut self) {
         self.state = UnitState::Inactive;
     }
-;
+}
 
 /// Systemd manager
 pub struct SigmaSystemd {
@@ -184,7 +184,7 @@ pub struct SigmaSystemd {
     next_unit_id: u64,
     next_target_id: u64,
     default_target: Option<String>,
-;
+}
 
 impl SigmaSystemd {
     pub fn new() -> Self {
@@ -365,13 +365,13 @@ impl SigmaSystemd {
             .filter(|u| u.state == UnitState::Failed)
             .count()
     }
-;
+}
 
 impl Default for SigmaSystemd {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMASYSTEMD_INSTANCE: Option<SigmaSystemd> = None;
 
@@ -379,7 +379,7 @@ pub fn init_sigmasystemd() {
     unsafe {
         SIGMASYSTEMD_INSTANCE = Some(SigmaSystemd::new());
     }
-;
+}
 
 pub fn get_sigmasystemd() -> &'static SigmaSystemd {
     unsafe {
@@ -387,7 +387,7 @@ pub fn get_sigmasystemd() -> &'static SigmaSystemd {
             .as_ref()
             .expect("SigmaSystemd not initialized")
     }
-;
+}
 
 pub fn get_sigmasystemd_mut() -> &'static mut SigmaSystemd {
     unsafe {
@@ -395,12 +395,12 @@ pub fn get_sigmasystemd_mut() -> &'static mut SigmaSystemd {
             .as_mut()
             .expect("SigmaSystemd not initialized")
     }
-;
+}
 
 pub fn create_unit(name: String, unit_type: UnitType) -> String {
     let manager = get_sigmasystemd_mut();
     manager.create_unit(name, unit_type)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -623,4 +623,4 @@ mod tests {
         let manager = get_sigmasystemd();
         assert!(manager.get_unit(&id).is_some());
     }
-;
+}

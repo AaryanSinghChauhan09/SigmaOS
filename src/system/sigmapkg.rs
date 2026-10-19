@@ -26,7 +26,7 @@ pub enum PackageState {
     HalfInstalled,
     /// Unpacked
     Unpacked,
-;
+}
 
 impl fmt::Display for PackageState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for PackageState {
             PackageState::Unpacked => write!(f, "unpacked"),
         }
     }
-;
+}
 
 /// Package action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,7 +53,7 @@ pub enum PackageAction {
     Downgrade,
     /// Purge
     Purge,
-;
+}
 
 impl fmt::Display for PackageAction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -65,7 +65,7 @@ impl fmt::Display for PackageAction {
             PackageAction::Purge => write!(f, "purge"),
         }
     }
-;
+}
 
 /// Package
 #[derive(Debug, Clone)]
@@ -82,7 +82,7 @@ pub struct Package {
     pub size: u64,
     /// Dependencies
     pub dependencies: Vec<String>,
-;
+}
 
 impl Package {
     /// Create a new package
@@ -114,7 +114,7 @@ impl Package {
         self.dependencies = dependencies;
         self
     }
-;
+}
 
 /// SigmaPkg - Package Manager
 pub struct SigmaPkg {
@@ -124,7 +124,7 @@ pub struct SigmaPkg {
     running: bool,
     /// Action counter
     action_counter: u32,
-;
+}
 
 impl SigmaPkg {
     /// Create a new SigmaPkg instance
@@ -271,13 +271,13 @@ impl SigmaPkg {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaPkg {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaPkg instance (placeholder for actual global state)
 static mut SIGMAPKG_INSTANCE: Option<SigmaPkg> = None;
@@ -287,12 +287,12 @@ pub fn init_sigmapkg() {
     unsafe {
         SIGMAPKG_INSTANCE = Some(SigmaPkg::new());
     }
-;
+}
 
 /// Get the global SigmaPkg instance
 pub fn get_sigmapkg() -> Option<&'static mut SigmaPkg> {
     unsafe { SIGMAPKG_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to install a package
 pub fn install_package(name: &str) -> Result<(), String> {
@@ -301,7 +301,7 @@ pub fn install_package(name: &str) -> Result<(), String> {
     } else {
         Err("SigmaPkg not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -467,4 +467,4 @@ mod tests {
         let result = install_package("vim");
         assert!(result.is_ok());
     }
-;
+}

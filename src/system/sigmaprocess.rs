@@ -24,7 +24,7 @@ pub enum ProcessState {
     Stopped,
     /// Zombie
     Zombie,
-;
+}
 
 impl fmt::Display for ProcessState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for ProcessState {
             ProcessState::Zombie => write!(f, "zombie"),
         }
     }
-;
+}
 
 /// Signal type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,7 +50,7 @@ pub enum Signal {
     Stop,
     /// Continue
     Cont,
-;
+}
 
 impl fmt::Display for Signal {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,7 +62,7 @@ impl fmt::Display for Signal {
             Signal::Cont => write!(f, "CONT"),
         }
     }
-;
+}
 
 /// Process information
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct ProcessInfo {
     pub cpu_usage: f32,
     /// Memory usage in bytes
     pub memory_usage: u64,
-;
+}
 
 impl ProcessInfo {
     /// Create a new process info
@@ -108,7 +108,7 @@ impl ProcessInfo {
         self.memory_usage = memory_usage;
         self
     }
-;
+}
 
 /// SigmaProcess - System Process Manager
 pub struct SigmaProcess {
@@ -118,7 +118,7 @@ pub struct SigmaProcess {
     running: bool,
     /// Process counter
     process_counter: u32,
-;
+}
 
 impl SigmaProcess {
     /// Create a new SigmaProcess instance
@@ -239,13 +239,13 @@ impl SigmaProcess {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaProcess {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaProcess instance (placeholder for actual global state)
 static mut SIGMAPROCESS_INSTANCE: Option<SigmaProcess> = None;
@@ -255,12 +255,12 @@ pub fn init_sigmaprocess() {
     unsafe {
         SIGMAPROCESS_INSTANCE = Some(SigmaProcess::new());
     }
-;
+}
 
 /// Get the global SigmaProcess instance
 pub fn get_sigmaprocess() -> Option<&'static mut SigmaProcess> {
     unsafe { SIGMAPROCESS_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to send a signal to a process
 pub fn send_process_signal(pid: u32, signal: Signal) -> Result<(), String> {
@@ -269,7 +269,7 @@ pub fn send_process_signal(pid: u32, signal: Signal) -> Result<(), String> {
     } else {
         Err("SigmaProcess not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -383,4 +383,4 @@ mod tests {
         let result = send_process_signal(1234, Signal::Term);
         assert!(result.is_ok());
     }
-;
+}

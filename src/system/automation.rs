@@ -16,7 +16,7 @@ pub enum AutomationTaskKind {
     TestOrchestration,
     SecurityAudit,
     BinaryPackaging,
-;
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskStatus {
@@ -24,7 +24,7 @@ pub enum TaskStatus {
     Running,
     Passed,
     Failed,
-;
+}
 
 #[derive(Debug, Clone)]
 pub struct AutomationTask {
@@ -33,13 +33,13 @@ pub struct AutomationTask {
     pub kind: AutomationTaskKind,
     pub status: TaskStatus,
     pub output_log: String,
-;
+}
 
 pub struct SovereignAutomationEngine {
     pub tasks: Vec<AutomationTask>,
     pub total_executed: u32,
     pub total_passed: u32,
-;
+}
 
 impl SovereignAutomationEngine {
     pub fn new() -> Self {
@@ -135,13 +135,13 @@ impl SovereignAutomationEngine {
     pub fn is_all_passed(&self) -> bool {
         self.total_executed > 0 && self.total_executed == self.total_passed
     }
-;
+}
 
 impl Default for SovereignAutomationEngine {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 #[cfg(test)]
 #[cfg(test)]
@@ -160,4 +160,4 @@ mod tests {
         assert!(engine.is_all_passed());
         assert_eq!(engine.total_passed, 3);
     }
-;
+}

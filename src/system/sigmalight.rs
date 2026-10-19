@@ -21,7 +21,7 @@ pub enum LightType {
     Point,
     Spot,
     Area,
-;
+}
 
 /// Color temperature (in Kelvin)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum ColorTemperature {
     Cool = 5000,
     Daylight = 6500,
     Custom(u32),
-;
+}
 
 /// Light source
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct LightSource {
     pub color_temperature: ColorTemperature,
     pub color_rgb: (u8, u8, u8),
     pub enabled: bool,
-;
+}
 
 impl LightSource {
     pub fn new(id: String, name: String, light_type: LightType) -> Self {
@@ -77,7 +77,7 @@ impl LightSource {
     pub fn get_normalized_brightness(&self) -> f32 {
         self.brightness as f32 / 255.0
     }
-;
+}
 
 /// Lighting scene
 #[derive(Debug, Clone)]
@@ -85,7 +85,7 @@ pub struct LightingScene {
     pub id: String,
     pub name: String,
     pub light_states: BTreeMap<String, (u8, ColorTemperature, (u8, u8, u8))>,
-;
+}
 
 impl LightingScene {
     pub fn new(id: String, name: String) -> Self {
@@ -111,7 +111,7 @@ impl LightingScene {
     pub fn light_count(&self) -> usize {
         self.light_states.len()
     }
-;
+}
 
 /// SigmaLight - Lighting system manager
 #[derive(Debug)]
@@ -119,7 +119,7 @@ pub struct SigmaLight {
     lights: BTreeMap<String, LightSource>,
     scenes: BTreeMap<String, LightingScene>,
     current_scene: Option<String>,
-;
+}
 
 impl SigmaLight {
     pub fn new() -> Self {
@@ -206,13 +206,13 @@ impl SigmaLight {
     pub fn scene_count(&self) -> usize {
         self.scenes.len()
     }
-;
+}
 
 impl Default for SigmaLight {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaLight instance
 static mut SIGMALIGHT_INSTANCE: Option<SigmaLight> = None;
@@ -222,21 +222,21 @@ pub fn init_sigmalight() {
     unsafe {
         SIGMALIGHT_INSTANCE = Some(SigmaLight::new());
     }
-;
+}
 
 /// Get the global SigmaLight instance
 pub fn get_sigmalight() -> Option<&'static SigmaLight> {
     unsafe {
         SIGMALIGHT_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaLight instance (mutable)
 pub fn get_sigmalight_mut() -> Option<&'static mut SigmaLight> {
     unsafe {
         SIGMALIGHT_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a light
 pub fn add_light(light: LightSource) -> bool {
@@ -246,7 +246,7 @@ pub fn add_light(light: LightSource) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -316,4 +316,4 @@ mod tests {
         assert!(light_sys.apply_scene("scene1"));
         assert_eq!(light_sys.get_light("light1").unwrap().brightness, 50);
     }
-;
+}

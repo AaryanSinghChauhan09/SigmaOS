@@ -26,7 +26,7 @@ pub enum FSCKSchedulePolicy {
     TimeInterval,
     MountCountOrTime,
     ManualOnly,
-;
+}
 
 /// Status of scheduled filesystem check
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub enum ScheduledCheckStatus {
     Postponed,
     Skipped,
     Failed,
-;
+}
 
 /// Filesystem schedule configuration and counters
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ pub struct FSCKScheduleTarget {
     pub last_checked_timestamp: u64,
     pub check_interval_seconds: u64,
     pub force_next_check: bool,
-;
+}
 
 impl FSCKScheduleTarget {
     /// Create a new schedule target
@@ -113,7 +113,7 @@ impl FSCKScheduleTarget {
         self.last_checked_timestamp = timestamp;
         self.force_next_check = false;
     }
-;
+}
 
 /// Record of an executed filesystem check
 #[derive(Debug, Clone)]
@@ -125,7 +125,7 @@ pub struct ScheduledCheckRecord {
     pub errors_fixed: u32,
     pub duration_ms: u32,
     pub timestamp: u64,
-;
+}
 
 /// Main SigmaScheduledFSCK manager struct
 pub struct SigmaScheduledFSCK {
@@ -133,7 +133,7 @@ pub struct SigmaScheduledFSCK {
     records: Vec<ScheduledCheckRecord>,
     running: AtomicBool,
     next_record_id: u64,
-;
+}
 
 impl SigmaScheduledFSCK {
     /// Create a new SigmaScheduledFSCK manager
@@ -234,13 +234,13 @@ impl SigmaScheduledFSCK {
     pub fn records(&self) -> &[ScheduledCheckRecord] {
         &self.records
     }
-;
+}
 
 impl Default for SigmaScheduledFSCK {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaScheduledFSCK instance
 static mut SIGMA_SCHEDULED_FSCK_INSTANCE: Option<SigmaScheduledFSCK> = None;
@@ -250,17 +250,17 @@ pub fn init_sigmascheduledfsck() {
     unsafe {
         SIGMA_SCHEDULED_FSCK_INSTANCE = Some(SigmaScheduledFSCK::new());
     }
-;
+}
 
 /// Get global SigmaScheduledFSCK instance
 pub fn get_sigmascheduledfsck() -> Option<&'static SigmaScheduledFSCK> {
     unsafe { SIGMA_SCHEDULED_FSCK_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaScheduledFSCK instance
 pub fn get_sigmascheduledfsck_mut() -> Option<&'static mut SigmaScheduledFSCK> {
     unsafe { SIGMA_SCHEDULED_FSCK_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to check if a device is due for check
 pub fn is_fsck_due(device_path: &str, current_timestamp: u64) -> bool {
@@ -269,7 +269,7 @@ pub fn is_fsck_due(device_path: &str, current_timestamp: u64) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to execute a scheduled check
 pub fn execute_scheduled_fsck(
@@ -281,7 +281,7 @@ pub fn execute_scheduled_fsck(
     } else {
         None
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -383,4 +383,4 @@ mod tests {
         let record = execute_scheduled_fsck("/dev/sdb1", 600);
         assert!(record.is_some());
     }
-;
+}

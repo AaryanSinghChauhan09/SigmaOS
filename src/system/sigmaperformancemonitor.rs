@@ -21,7 +21,7 @@ pub struct PerformanceMetric {
     pub value: f32,
     pub unit: String,
     pub threshold: f32,
-;
+}
 
 impl PerformanceMetric {
     pub fn new(id: String, name: String, value: f32, unit: String) -> Self {
@@ -42,7 +42,7 @@ impl PerformanceMetric {
     pub fn is_critical(&self) -> bool {
         self.threshold > 0.0 && self.value > self.threshold
     }
-;
+}
 
 /// Performance category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,7 +53,7 @@ pub enum PerformanceCategory {
     Network,
     GPU,
     Unknown,
-;
+}
 
 /// Performance profile
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ pub struct PerformanceProfile {
     pub name: String,
     pub category: PerformanceCategory,
     pub metrics: Vec<PerformanceMetric>,
-;
+}
 
 impl PerformanceProfile {
     pub fn new(id: String, name: String, category: PerformanceCategory) -> Self {
@@ -82,13 +82,13 @@ impl PerformanceProfile {
     pub fn critical_metric_count(&self) -> usize {
         self.metrics.iter().filter(|m| m.is_critical()).count()
     }
-;
+}
 
 /// Performance monitor
 pub struct SigmaPerformanceMonitor {
     profiles: BTreeMap<String, PerformanceProfile>,
     next_profile_id: u64,
-;
+}
 
 impl SigmaPerformanceMonitor {
     pub fn new() -> Self {
@@ -142,13 +142,13 @@ impl SigmaPerformanceMonitor {
             .map(|p| p.critical_metric_count())
             .sum()
     }
-;
+}
 
 impl Default for SigmaPerformanceMonitor {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAPERFORMANCEMONITOR_INSTANCE: Option<SigmaPerformanceMonitor> = None;
 
@@ -156,7 +156,7 @@ pub fn init_sigmaperformancemonitor() {
     unsafe {
         SIGMAPERFORMANCEMONITOR_INSTANCE = Some(SigmaPerformanceMonitor::new());
     }
-;
+}
 
 pub fn get_sigmaperformancemonitor() -> &'static SigmaPerformanceMonitor {
     unsafe {
@@ -164,7 +164,7 @@ pub fn get_sigmaperformancemonitor() -> &'static SigmaPerformanceMonitor {
             .as_ref()
             .expect("SigmaPerformanceMonitor not initialized")
     }
-;
+}
 
 pub fn get_sigmaperformancemonitor_mut() -> &'static mut SigmaPerformanceMonitor {
     unsafe {
@@ -172,7 +172,7 @@ pub fn get_sigmaperformancemonitor_mut() -> &'static mut SigmaPerformanceMonitor
             .as_mut()
             .expect("SigmaPerformanceMonitor not initialized")
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -282,4 +282,4 @@ mod tests {
         monitor_mut.add_profile("CPU Profile".to_string(), PerformanceCategory::CPU);
         assert_eq!(monitor.profile_count(), 1);
     }
-;
+}

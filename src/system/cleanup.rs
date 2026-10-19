@@ -27,7 +27,7 @@ impl Path {
     pub fn new<'a>(s: &'a str) -> &'a str {
         s
     }
-;
+}
 
 /// OOP trait for cleanup strategies
 pub trait CleanupStrategy {
@@ -35,7 +35,7 @@ pub trait CleanupStrategy {
     fn should_clean(&self, path: &str) -> bool;
     /// Get the strategy name
     fn name(&self) -> &str;
-;
+}
 
 /// Temporary file cleanup strategy
 pub struct TempFileStrategy {
@@ -43,7 +43,7 @@ pub struct TempFileStrategy {
     patterns: Vec<String>,
     /// Minimum age in seconds before cleaning
     min_age_seconds: u64,
-;
+}
 
 impl TempFileStrategy {
     #[allow(clippy::new_without_default)]
@@ -71,7 +71,7 @@ impl TempFileStrategy {
         self.patterns.push(pattern);
         self
     }
-;
+}
 
 impl CleanupStrategy for TempFileStrategy {
     fn should_clean(&self, path: &str) -> bool {
@@ -86,7 +86,7 @@ impl CleanupStrategy for TempFileStrategy {
     fn name(&self) -> &str {
         "TempFileStrategy"
     }
-;
+}
 
 impl TempFileStrategy {
     fn matches_pattern(&self, filename: &str, pattern: &str) -> bool {
@@ -100,13 +100,13 @@ impl TempFileStrategy {
         }
         filename == pattern
     }
-;
+}
 
 /// Log file cleanup strategy
 pub struct LogFileStrategy {
     max_size_mb: u64,
     min_age_seconds: u64,
-;
+}
 
 impl LogFileStrategy {
     #[allow(clippy::new_without_default)]
@@ -121,7 +121,7 @@ impl LogFileStrategy {
         self.max_size_mb = size_mb;
         self
     }
-;
+}
 
 impl CleanupStrategy for LogFileStrategy {
     fn should_clean(&self, path: &str) -> bool {
@@ -131,12 +131,12 @@ impl CleanupStrategy for LogFileStrategy {
     fn name(&self) -> &str {
         "LogFileStrategy"
     }
-;
+}
 
 /// Cache file cleanup strategy
 pub struct CacheStrategy {
     max_age_seconds: u64,
-;
+}
 
 impl CacheStrategy {
     #[allow(clippy::new_without_default)]
@@ -145,7 +145,7 @@ impl CacheStrategy {
             max_age_seconds: 604800, // 7 days
         }
     }
-;
+}
 
 impl CleanupStrategy for CacheStrategy {
     fn should_clean(&self, path: &str) -> bool {
@@ -155,7 +155,7 @@ impl CleanupStrategy for CacheStrategy {
     fn name(&self) -> &str {
         "CacheStrategy"
     }
-;
+}
 
 /// Cleanup statistics
 #[derive(Debug, Clone, Default)]
@@ -164,14 +164,14 @@ pub struct CleanupStats {
     pub files_cleaned: usize,
     pub bytes_freed: u64,
     pub errors: usize,
-;
+}
 
 /// OOP-based System Cleanup Manager
 pub struct SystemCleanupManager {
     strategies: Vec<Box<dyn CleanupStrategy>>,
     dry_run: bool,
     stats: CleanupStats,
-;
+}
 
 impl SystemCleanupManager {
     #[allow(clippy::new_without_default)]
@@ -240,13 +240,13 @@ impl SystemCleanupManager {
     pub fn stats(&self) -> &CleanupStats {
         &self.stats
     }
-;
+}
 
 impl Default for SystemCleanupManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Cleanup errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -254,7 +254,7 @@ pub enum CleanupError {
     PathNotFound(PathBuf),
     IoError(String),
     PermissionDenied(String),
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -299,4 +299,4 @@ mod tests {
             .with_dry_run(true);
         assert!(manager.dry_run);
     }
-;
+}

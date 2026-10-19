@@ -22,7 +22,7 @@ pub enum ImageFormat {
     TIFF,
     BMP,
     RAW,
-;
+}
 
 /// Color space
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum ColorSpace {
     CMYK,
     Grayscale,
     Lab,
-;
+}
 
 /// Adjustment type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,14 +44,14 @@ pub enum AdjustmentType {
     Shadows,
     Temperature,
     Tint,
-;
+}
 
 /// Photo adjustment
 #[derive(Debug, Clone)]
 pub struct PhotoAdjustment {
     pub adjustment_type: AdjustmentType,
     pub value: i32, // -100 to 100
-;
+}
 
 impl PhotoAdjustment {
     pub fn new(adjustment_type: AdjustmentType, value: i32) -> Self {
@@ -64,7 +64,7 @@ impl PhotoAdjustment {
     pub fn set_value(&mut self, value: i32) {
         self.value = value;
     }
-;
+}
 
 /// Photo filter
 #[derive(Debug, Clone)]
@@ -72,7 +72,7 @@ pub struct PhotoFilter {
     pub id: String,
     pub name: String,
     pub adjustments: Vec<PhotoAdjustment>,
-;
+}
 
 impl PhotoFilter {
     pub fn new(id: String, name: String) -> Self {
@@ -99,7 +99,7 @@ impl PhotoFilter {
     pub fn adjustment_count(&self) -> usize {
         self.adjustments.len()
     }
-;
+}
 
 /// Photo
 #[derive(Debug, Clone)]
@@ -113,7 +113,7 @@ pub struct Photo {
     pub height: u32,
     pub adjustments: Vec<PhotoAdjustment>,
     pub filters: Vec<String>, // filter IDs
-;
+}
 
 impl Photo {
     pub fn new(id: String, name: String, file_path: String, format: ImageFormat, width: u32, height: u32) -> Self {
@@ -171,7 +171,7 @@ impl Photo {
     pub fn filter_count(&self) -> usize {
         self.filters.len()
     }
-;
+}
 
 /// Photo album
 #[derive(Debug, Clone)]
@@ -179,7 +179,7 @@ pub struct PhotoAlbum {
     pub id: String,
     pub name: String,
     pub photos: BTreeMap<String, Photo>,
-;
+}
 
 impl PhotoAlbum {
     pub fn new(id: String, name: String) -> Self {
@@ -209,7 +209,7 @@ impl PhotoAlbum {
     pub fn photo_count(&self) -> usize {
         self.photos.len()
     }
-;
+}
 
 /// SigmaPhoto - Photo editing and management system
 #[derive(Debug)]
@@ -218,7 +218,7 @@ pub struct SigmaPhoto {
     albums: BTreeMap<String, PhotoAlbum>,
     filters: BTreeMap<String, PhotoFilter>,
     current_album: Option<String>,
-;
+}
 
 impl SigmaPhoto {
     pub fn new() -> Self {
@@ -310,13 +310,13 @@ impl SigmaPhoto {
     pub fn filter_count(&self) -> usize {
         self.filters.len()
     }
-;
+}
 
 impl Default for SigmaPhoto {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaPhoto instance
 static mut SIGMAPHOTO_INSTANCE: Option<SigmaPhoto> = None;
@@ -326,21 +326,21 @@ pub fn init_sigmaphoto() {
     unsafe {
         SIGMAPHOTO_INSTANCE = Some(SigmaPhoto::new());
     }
-;
+}
 
 /// Get the global SigmaPhoto instance
 pub fn get_sigmaphoto() -> Option<&'static SigmaPhoto> {
     unsafe {
         SIGMAPHOTO_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaPhoto instance (mutable)
 pub fn get_sigmaphoto_mut() -> Option<&'static mut SigmaPhoto> {
     unsafe {
         SIGMAPHOTO_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a photo
 pub fn add_photo(photo: Photo) -> bool {
@@ -350,7 +350,7 @@ pub fn add_photo(photo: Photo) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -408,4 +408,4 @@ mod tests {
         photo_sys.add_photo(photo);
         assert_eq!(photo_sys.photo_count(), 1);
     }
-;
+}

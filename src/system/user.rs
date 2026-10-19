@@ -23,7 +23,7 @@ pub struct User {
     pub password_hash: Option<String>,
     pub is_root: bool,
     pub is_locked: bool,
-;
+}
 
 /// Shadow password entry (/etc/shadow compatibility)
 #[derive(Debug, Clone)]
@@ -36,7 +36,7 @@ pub struct ShadowEntry {
     pub warn_days: u32,
     pub inactive_days: i32,
     pub expire_days: i32,
-;
+}
 
 /// Group information
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct Group {
     pub groupname: String,
     pub gid: u32,
     pub members: Vec<String>,
-;
+}
 
 /// Sudoers rule specification (/etc/sudoers and BSD doas.conf parity)
 #[derive(Debug, Clone)]
@@ -54,13 +54,13 @@ pub struct SudoersRule {
     pub run_as: String,  // "ALL" or "root"
     pub command: String, // "ALL" or "/usr/bin/apt"
     pub nopasswd: bool,
-;
+}
 
 /// Sudo Policy Engine
 #[derive(Debug, Clone)]
 pub struct SudoPolicyEngine {
     pub rules: Vec<SudoersRule>,
-;
+}
 
 impl SudoPolicyEngine {
     pub fn new() -> Self {
@@ -116,13 +116,13 @@ impl SudoPolicyEngine {
             target_cmd.to_string(),
         ))
     }
-;
+}
 
 impl Default for SudoPolicyEngine {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// User manager
 pub struct UserManager {
@@ -133,7 +133,7 @@ pub struct UserManager {
     pub etc_dir: String,
     pub next_uid: u32,
     pub next_gid: u32,
-;
+}
 
 impl UserManager {
     pub fn new(etc_dir: &str) -> Self {
@@ -600,7 +600,7 @@ impl UserManager {
         }
         format!("{:x}", hash)
     }
-;
+}
 
 /// User management errors
 #[derive(Debug)]
@@ -614,7 +614,7 @@ pub enum UserError {
     InitError(String, std::io::Error),
     ReadError(String, std::io::Error),
     WriteError(String, std::io::Error),
-;
+}
 
 #[cfg(test_disabled)]
 #[cfg(test_disabled)]
@@ -684,4 +684,4 @@ mod tests {
                 .evaluate_sudo_privilege("bob", &groups, "/usr/bin/systemctl");
         assert!(sudo_res.is_ok());
     }
-;
+}

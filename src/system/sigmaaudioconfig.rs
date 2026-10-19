@@ -17,7 +17,7 @@ pub enum AudioDeviceType {
     Output,
     Duplex,
     Unknown,
-;
+}
 
 /// Audio profile enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub enum AudioProfile {
     HighQuality,
     ProAudio,
     Unknown,
-;
+}
 
 /// Audio sample rate enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub enum SampleRate {
     Hz96000,
     Hz192000,
     Unknown,
-;
+}
 
 /// Audio bit depth enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub enum BitDepth {
     Bit32,
     Float32,
     Unknown,
-;
+}
 
 /// Audio device data structure
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ pub struct AudioDevice {
     pub buffer_size: u32,
     pub enabled: bool,
     pub default_device: bool,
-;
+}
 
 impl AudioDevice {
     /// Create a new audio device
@@ -153,13 +153,13 @@ impl AudioDevice {
     pub fn is_default(&self) -> bool {
         self.default_device
     }
-;
+}
 
 /// Audio configuration manager
 pub struct SigmaAudioConfig {
     devices: BTreeMap<String, AudioDevice>,
     running: AtomicBool,
-;
+}
 
 impl SigmaAudioConfig {
     /// Create a new audio configuration manager
@@ -285,13 +285,13 @@ impl SigmaAudioConfig {
     pub fn device_count(&self) -> usize {
         self.devices.len()
     }
-;
+}
 
 impl Default for SigmaAudioConfig {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaAudioConfig instance (placeholder for actual global state)
 static mut SIGMAAUDIOCONFIG_INSTANCE: Option<SigmaAudioConfig> = None;
@@ -301,17 +301,17 @@ pub fn init_sigmaaudioconfig() {
     unsafe {
         SIGMAAUDIOCONFIG_INSTANCE = Some(SigmaAudioConfig::new());
     }
-;
+}
 
 /// Get the global SigmaAudioConfig instance
 pub fn get_sigmaaudioconfig() -> Option<&'static SigmaAudioConfig> {
     unsafe { SIGMAAUDIOCONFIG_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaAudioConfig instance
 pub fn get_sigmaaudioconfig_mut() -> Option<&'static mut SigmaAudioConfig> {
     unsafe { SIGMAAUDIOCONFIG_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a device
 pub fn add_audio_device(device: AudioDevice) -> bool {
@@ -320,7 +320,7 @@ pub fn add_audio_device(device: AudioDevice) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to set default device
 pub fn set_default_audio_device(device_id: &str) -> bool {
@@ -329,7 +329,7 @@ pub fn set_default_audio_device(device_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -546,4 +546,4 @@ mod tests {
         let default = audio_mgr.get_default_device(AudioDeviceType::Output);
         assert!(default.is_some());
     }
-;
+}

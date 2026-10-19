@@ -21,7 +21,7 @@ pub enum EncryptionType {
     Twofish,
     Serpent,
     Unknown,
-;
+}
 
 /// Encryption state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum EncryptionState {
     DecryptionInProgress,
     Failed,
     Unknown,
-;
+}
 
 /// Encrypted volume data structure
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct EncryptedVolume {
     pub state: EncryptionState,
     pub key_id: String,
     pub size: u64,
-;
+}
 
 impl EncryptedVolume {
     /// Create a new encrypted volume
@@ -81,7 +81,7 @@ impl EncryptedVolume {
     pub fn is_locked(&self) -> bool {
         self.state == EncryptionState::Locked
     }
-;
+}
 
 /// Encryption key data structure
 #[derive(Debug, Clone)]
@@ -91,7 +91,7 @@ pub struct EncryptionKey {
     pub key_type: EncryptionType,
     pub key_size: u32,
     pub is_active: bool,
-;
+}
 
 impl EncryptionKey {
     /// Create a new encryption key
@@ -114,14 +114,14 @@ impl EncryptionKey {
     pub fn is_key_active(&self) -> bool {
         self.is_active
     }
-;
+}
 
 /// Encryption manager
 pub struct SigmaCrypto {
     volumes: BTreeMap<String, EncryptedVolume>,
     keys: BTreeMap<String, EncryptionKey>,
     running: AtomicBool,
-;
+}
 
 impl SigmaCrypto {
     /// Create a new encryption manager
@@ -235,13 +235,13 @@ impl SigmaCrypto {
     pub fn key_count(&self) -> usize {
         self.keys.len()
     }
-;
+}
 
 impl Default for SigmaCrypto {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaCrypto instance (placeholder for actual global state)
 static mut SIGMACRYPTO_INSTANCE: Option<SigmaCrypto> = None;
@@ -251,24 +251,24 @@ pub fn init_sigmacrypto() {
     unsafe {
         SIGMACRYPTO_INSTANCE = Some(SigmaCrypto::new());
     }
-;
+}
 
 /// Get the global SigmaCrypto instance
 pub fn get_sigmacrypto() -> Option<&'static SigmaCrypto> {
     unsafe { SIGMACRYPTO_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaCrypto instance
 pub fn get_sigmacrypto_mut() -> Option<&'static mut SigmaCrypto> {
     unsafe { SIGMACRYPTO_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add an encryption key
 pub fn add_encryption_key(key: EncryptionKey) {
     if let Some(crypto) = get_sigmacrypto_mut() {
         crypto.add_key(key);
     }
-;
+}
 
 /// Convenience function to unlock a volume
 pub fn unlock_volume(volume_id: &str) -> bool {
@@ -277,7 +277,7 @@ pub fn unlock_volume(volume_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -569,4 +569,4 @@ mod tests {
         let volume = crypto.get_volume("vol1").unwrap();
         assert!(volume.is_unlocked());
     }
-;
+}

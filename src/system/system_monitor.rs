@@ -19,7 +19,7 @@ pub enum ProcessState {
     Waiting,
     Stopped,
     Zombie,
-;
+}
 
 /// Process
 #[derive(Debug, Clone)]
@@ -34,7 +34,7 @@ pub struct Process {
     pub priority: i32,
     pub threads: u32,
     pub command: String,
-;
+}
 
 /// CPU core info
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct CPUCore {
     pub usage_percent: f32,
     pub frequency_mhz: u32,
     pub temperature: Option<f32>,
-;
+}
 
 /// Memory info
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ pub struct MemoryInfo {
     pub buffers: u64,
     pub swap_total: u64,
     pub swap_used: u64,
-;
+}
 
 /// Disk info
 #[derive(Debug, Clone)]
@@ -69,7 +69,7 @@ pub struct DiskInfo {
     pub free_bytes: u64,
     pub read_bytes_per_sec: u64,
     pub write_bytes_per_sec: u64,
-;
+}
 
 /// Network interface
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct NetworkInterface {
     pub packets_recv: u64,
     pub bytes_sent_per_sec: u64,
     pub bytes_recv_per_sec: u64,
-;
+}
 
 /// System monitor
 pub struct SystemMonitor {
@@ -95,7 +95,7 @@ pub struct SystemMonitor {
     sort_by: String,
     sort_descending: bool,
     filter: String,
-;
+}
 
 impl SystemMonitor {
     pub fn new() -> Self {
@@ -326,7 +326,7 @@ impl SystemMonitor {
     pub fn thread_count(&self) -> u32 {
         self.processes.iter().map(|p| p.threads).sum()
     }
-;
+}
 
 /// Global system monitor
 static mut SYSTEM_MONITOR: Option<SystemMonitor> = None;
@@ -336,7 +336,7 @@ pub fn init_system_monitor() {
     unsafe {
         SYSTEM_MONITOR = Some(SystemMonitor::new());
     }
-;
+}
 
 /// Get system monitor
 pub fn get_system_monitor() -> &'static mut SystemMonitor {
@@ -345,7 +345,7 @@ pub fn get_system_monitor() -> &'static mut SystemMonitor {
             .as_mut()
             .expect("System monitor not initialized")
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -398,4 +398,4 @@ mod tests {
         let usage = sm.get_memory_usage_percent();
         assert!(usage >= 0.0 && usage <= 100.0);
     }
-;
+}

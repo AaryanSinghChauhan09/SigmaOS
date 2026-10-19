@@ -19,7 +19,7 @@ pub enum UserType {
     System,
     Regular,
     Administrator,
-;
+}
 
 /// User account status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub enum UserStatus {
     Active,
     Disabled,
     Locked,
-;
+}
 
 /// Shell type
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub enum ShellType {
     Fish,
     Dash,
     Custom(String),
-;
+}
 
 impl ShellType {
     pub fn to_string(&self) -> String {
@@ -49,7 +49,7 @@ impl ShellType {
             ShellType::Custom(s) => s.clone(),
         }
     }
-;
+}
 
 /// User account
 #[derive(Debug, Clone)]
@@ -66,7 +66,7 @@ pub struct UserAccount {
     pub groups: Vec<String>,
     pub last_login: Option<String>,
     pub created_at: String,
-;
+}
 
 impl UserAccount {
     pub fn new(id: String, username: String, real_name: String, home_directory: String, shell: ShellType, user_type: UserType, uid: u32, gid: u32) -> Self {
@@ -120,7 +120,7 @@ impl UserAccount {
     pub fn is_active(&self) -> bool {
         self.status == UserStatus::Active
     }
-;
+}
 
 /// User group
 #[derive(Debug, Clone)]
@@ -129,7 +129,7 @@ pub struct UserGroup {
     pub name: String,
     pub gid: u32,
     pub members: Vec<String>, // usernames
-;
+}
 
 impl UserGroup {
     pub fn new(id: String, name: String, gid: u32) -> Self {
@@ -159,7 +159,7 @@ impl UserGroup {
     pub fn has_member(&self, username: &str) -> bool {
         self.members.contains(&username.to_string())
     }
-;
+}
 
 /// SigmaUserManager - User account management
 #[derive(Debug)]
@@ -168,7 +168,7 @@ pub struct SigmaUserManager {
     groups: BTreeMap<String, UserGroup>,
     next_uid: u32,
     next_gid: u32,
-;
+}
 
 impl SigmaUserManager {
     pub fn new() -> Self {
@@ -249,13 +249,13 @@ impl SigmaUserManager {
     pub fn group_count(&self) -> usize {
         self.groups.len()
     }
-;
+}
 
 impl Default for SigmaUserManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaUserManager instance
 static mut SIGMAUSERMANAGER_INSTANCE: Option<SigmaUserManager> = None;
@@ -265,21 +265,21 @@ pub fn init_sigmausermanager() {
     unsafe {
         SIGMAUSERMANAGER_INSTANCE = Some(SigmaUserManager::new());
     }
-;
+}
 
 /// Get the global SigmaUserManager instance
 pub fn get_sigmausermanager() -> Option<&'static SigmaUserManager> {
     unsafe {
         SIGMAUSERMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaUserManager instance (mutable)
 pub fn get_sigmausermanager_mut() -> Option<&'static mut SigmaUserManager> {
     unsafe {
         SIGMAUSERMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a user
 pub fn add_user(user: UserAccount) -> bool {
@@ -289,7 +289,7 @@ pub fn add_user(user: UserAccount) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -380,4 +380,4 @@ mod tests {
         assert_eq!(uid1, 1000);
         assert_eq!(uid2, 1001);
     }
-;
+}

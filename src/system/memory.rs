@@ -33,7 +33,7 @@ impl Instant {
     pub fn duration_since(&self, _earlier: Instant) -> Duration {
         Duration::from_secs(0)
     }
-;
+}
 
 /// Memory allocation record
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct AllocationRecord {
     pub timestamp: Instant,
     pub stack_trace: Vec<String>,
     pub allocation_type: AllocationType,
-;
+}
 
 /// Allocation type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,7 +52,7 @@ pub enum AllocationType {
     Stack,
     Mapped,
     Shared,
-;
+}
 
 /// Memory leak report
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ pub struct LeakReport {
     pub total_leaked_bytes: u64,
     pub leak_locations: Vec<LeakLocation>,
     pub analysis_duration: Duration,
-;
+}
 
 /// Leak location information
 #[derive(Debug, Clone)]
@@ -71,7 +71,7 @@ pub struct LeakLocation {
     pub leak_count: usize,
     pub total_bytes: u64,
     pub average_size: u64,
-;
+}
 
 /// OOP trait for leak detection strategies
 pub trait LeakDetectionStrategy {
@@ -83,13 +83,13 @@ pub trait LeakDetectionStrategy {
     fn analyze(&self) -> LeakReport;
     /// Get strategy name
     fn name(&self) -> &str;
-;
+}
 
 /// Reference counting leak detector
 pub struct ReferenceCountingDetector {
     allocations: BTreeMap<usize, AllocationRecord>,
     reference_counts: BTreeMap<usize, usize>,
-;
+}
 
 impl ReferenceCountingDetector {
     #[allow(clippy::new_without_default)]
@@ -99,7 +99,7 @@ impl ReferenceCountingDetector {
             reference_counts: BTreeMap::new(),
         }
     }
-;
+}
 
 impl LeakDetectionStrategy for ReferenceCountingDetector {
     fn track_allocation(&mut self, record: AllocationRecord) {
@@ -158,13 +158,13 @@ impl LeakDetectionStrategy for ReferenceCountingDetector {
     fn name(&self) -> &str {
         "ReferenceCountingDetector"
     }
-;
+}
 
 /// Time-based leak detector
 pub struct TimeBasedDetector {
     allocations: BTreeMap<usize, AllocationRecord>,
     leak_threshold: Duration,
-;
+}
 
 impl TimeBasedDetector {
     #[allow(clippy::new_without_default)]
@@ -179,7 +179,7 @@ impl TimeBasedDetector {
         self.leak_threshold = threshold;
         self
     }
-;
+}
 
 impl LeakDetectionStrategy for TimeBasedDetector {
     fn track_allocation(&mut self, record: AllocationRecord) {
@@ -239,7 +239,7 @@ impl LeakDetectionStrategy for TimeBasedDetector {
     fn name(&self) -> &str {
         "TimeBasedDetector"
     }
-;
+}
 
 /// OOP-based Memory Leak Detector Manager
 pub struct MemoryLeakDetector {
@@ -248,7 +248,7 @@ pub struct MemoryLeakDetector {
     analyze_interval: Duration,
     last_analysis: Option<Instant>,
     current_report: Option<LeakReport>,
-;
+}
 
 impl MemoryLeakDetector {
     pub fn new(strategy: Box<dyn LeakDetectionStrategy>) -> Self {
@@ -321,13 +321,13 @@ impl MemoryLeakDetector {
             .map(|r| r.total_leaked_bytes)
             .unwrap_or(0)
     }
-;
+}
 
 impl Default for MemoryLeakDetector {
     fn default() -> Self {
         Self::new(Box::new(ReferenceCountingDetector::new()))
     }
-;
+}
 
 /// LeakSanitizer Reachability Status for deep pointer graph analysis
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -335,13 +335,13 @@ pub enum ReachabilityStatus {
     StillReachable, // Pointed to by a valid stack/register pointer in the root set
     DefinitelyLost, // Zero pointers in existence point to this block
     IndirectlyLost, // Reachable only from other definitely lost blocks
-;
+}
 
 /// LeakSanitizer (LSan) Parity Pointer Reachability Detector
 pub struct LeakSanitizerDetector {
     pub allocations: BTreeMap<usize, AllocationRecord>,
     pub root_pointers: HashSet<usize>, // Active root pointer set
-;
+}
 
 impl LeakSanitizerDetector {
     pub fn new() -> Self {
@@ -414,14 +414,14 @@ impl LeakSanitizerDetector {
             }
         }
     }
-;
+}
 
 /// AddressSanitizer-grade redzone guard zone violation detector
 pub struct AsanGuardZoneDetector {
     pub allocations: BTreeMap<usize, AllocationRecord>,
     pub redzone_size: usize,
     pub redzones: BTreeMap<usize, Vec<u8>>, // address -> redzone magic bytes pattern
-;
+}
 
 impl AsanGuardZoneDetector {
     pub fn new(redzone_size: usize) -> Self {
@@ -456,14 +456,14 @@ impl AsanGuardZoneDetector {
         }
         false
     }
-;
+}
 
 /// Valgrind & AddressSanitizer Use-After-Free (UAF) Quarantine queue
 pub struct UseAfterFreeQuarantine {
     pub quarantine_queue: Vec<usize>,
     pub allocations: BTreeMap<usize, AllocationRecord>,
     pub limit: usize,
-;
+}
 
 impl UseAfterFreeQuarantine {
     pub fn new(limit: usize) -> Self {
@@ -500,7 +500,7 @@ impl UseAfterFreeQuarantine {
     pub fn verify_use_after_free(&self, address: usize) -> bool {
         self.quarantine_queue.contains(&address)
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -656,7 +656,7 @@ mod tests {
             Err("Double Free detected!")
         );
     }
-;
+}
 
 // =========================================================================
 // Linux & BSD Inspired 50% Physical RAM Limit Rule Engine
@@ -668,7 +668,7 @@ pub enum FiftyPercentRamTargetPool {
     TmpfsSharedMemory,   // Linux /dev/shm & BSD tmpfs
     ZramSwapCompressor,  // Linux zram compressed swap pool
     CgroupMemoryCeiling, // cgroups v2 default process group memory ceiling
-;
+}
 
 /// Sovereign 50% System RAM Limit Rule Engine
 /// Enforces the universal Linux (/dev/shm) and BSD (tmpfs/zram) rule:
@@ -678,7 +678,7 @@ pub struct SovereignFiftyPercentRamRuleEngine {
     pub total_physical_ram_bytes: u64,
     pub max_allowed_50_percent_limit: u64,
     pub active_allocations: BTreeMap<FiftyPercentRamTargetPool, u64>,
-;
+}
 
 impl SovereignFiftyPercentRamRuleEngine {
     pub fn new(total_ram_bytes: u64) -> Self {
@@ -725,13 +725,13 @@ impl SovereignFiftyPercentRamRuleEngine {
             *current = current.saturating_sub(released_bytes);
         }
     }
-;
+}
 
 impl Default for SovereignFiftyPercentRamRuleEngine {
     fn default() -> Self {
         Self::new(16 * 1024 * 1024 * 1024) // Default 16 GB physical RAM -> 8 GB limit
     }
-;
+}
 
 #[cfg(test)]
 #[cfg(test)]
@@ -781,4 +781,4 @@ mod tests_50_percent_ram {
             6 * 1024 * 1024 * 1024
         );
     }
-;
+}

@@ -21,7 +21,7 @@ pub enum PrinterState {
     Stopped,
     Error,
     Unknown,
-;
+}
 
 /// Print job state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum JobState {
     Cancelled,
     Failed,
     Unknown,
-;
+}
 
 /// Printer
 #[derive(Debug, Clone)]
@@ -42,7 +42,7 @@ pub struct Printer {
     pub state: PrinterState,
     pub location: String,
     pub description: String,
-;
+}
 
 impl Printer {
     pub fn new(id: String, name: String, location: String) -> Self {
@@ -71,7 +71,7 @@ impl Printer {
     pub fn set_idle(&mut self) {
         self.state = PrinterState::Idle;
     }
-;
+}
 
 /// Print job
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct PrintJob {
     pub document: String,
     pub state: JobState,
     pub pages: u32,
-;
+}
 
 impl PrintJob {
     pub fn new(id: String, printer_id: String, document: String, pages: u32) -> Self {
@@ -109,7 +109,7 @@ impl PrintJob {
     pub fn fail(&mut self) {
         self.state = JobState::Failed;
     }
-;
+}
 
 /// Printer manager
 pub struct SigmaPrinter {
@@ -117,7 +117,7 @@ pub struct SigmaPrinter {
     jobs: BTreeMap<String, PrintJob>,
     next_printer_id: u64,
     next_job_id: u64,
-;
+}
 
 impl SigmaPrinter {
     pub fn new() -> Self {
@@ -191,13 +191,13 @@ impl SigmaPrinter {
     pub fn job_count(&self) -> usize {
         self.jobs.len()
     }
-;
+}
 
 impl Default for SigmaPrinter {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAPRINTER_INSTANCE: Option<SigmaPrinter> = None;
 
@@ -205,7 +205,7 @@ pub fn init_sigmaprinter() {
     unsafe {
         SIGMAPRINTER_INSTANCE = Some(SigmaPrinter::new());
     }
-;
+}
 
 pub fn get_sigmaprinter() -> &'static SigmaPrinter {
     unsafe {
@@ -213,7 +213,7 @@ pub fn get_sigmaprinter() -> &'static SigmaPrinter {
             .as_ref()
             .expect("SigmaPrinter not initialized")
     }
-;
+}
 
 pub fn get_sigmaprinter_mut() -> &'static mut SigmaPrinter {
     unsafe {
@@ -221,12 +221,12 @@ pub fn get_sigmaprinter_mut() -> &'static mut SigmaPrinter {
             .as_mut()
             .expect("SigmaPrinter not initialized")
     }
-;
+}
 
 pub fn add_printer(name: String, location: String) -> String {
     let manager = get_sigmaprinter_mut();
     manager.add_printer(name, location)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -343,4 +343,4 @@ mod tests {
         let manager = get_sigmaprinter();
         assert!(manager.get_printer(&id).is_some());
     }
-;
+}

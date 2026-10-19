@@ -22,7 +22,7 @@ pub enum InstallState {
     Failed,
     Cancelled,
     Unknown,
-;
+}
 
 /// Partitioning mode enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum PartitioningMode {
     Alongside,
     EraseDisk,
     Unknown,
-;
+}
 
 /// Filesystem type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,7 +43,7 @@ pub enum FilesystemType {
     Swap,
     LVM,
     Unknown,
-;
+}
 
 /// Installation configuration
 #[derive(Debug, Clone)]
@@ -60,7 +60,7 @@ pub struct InstallConfig {
     pub state: InstallState,
     pub progress_percent: u8,
     pub error_message: String,
-;
+}
 
 impl InstallConfig {
     /// Create a new installation configuration
@@ -114,13 +114,13 @@ impl InstallConfig {
             InstallState::Language | InstallState::Partitioning | InstallState::Installation
         )
     }
-;
+}
 
 /// Installer manager
 pub struct SigmaInstaller {
     configs: BTreeMap<String, InstallConfig>,
     running: AtomicBool,
-;
+}
 
 impl SigmaInstaller {
     /// Create a new installer manager
@@ -245,13 +245,13 @@ impl SigmaInstaller {
     pub fn config_count(&self) -> usize {
         self.configs.len()
     }
-;
+}
 
 impl Default for SigmaInstaller {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaInstaller instance (placeholder for actual global state)
 static mut SIGMAINSTALLER_INSTANCE: Option<SigmaInstaller> = None;
@@ -261,17 +261,17 @@ pub fn init_sigmainstaller() {
     unsafe {
         SIGMAINSTALLER_INSTANCE = Some(SigmaInstaller::new());
     }
-;
+}
 
 /// Get the global SigmaInstaller instance
 pub fn get_sigmainstaller() -> Option<&'static SigmaInstaller> {
     unsafe { SIGMAINSTALLER_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaInstaller instance
 pub fn get_sigmainstaller_mut() -> Option<&'static mut SigmaInstaller> {
     unsafe { SIGMAINSTALLER_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to create a configuration
 pub fn create_install_config(config: InstallConfig) -> bool {
@@ -280,7 +280,7 @@ pub fn create_install_config(config: InstallConfig) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -427,4 +427,4 @@ mod tests {
         let installer = get_sigmainstaller().unwrap();
         assert_eq!(installer.config_count(), 1);
     }
-;
+}

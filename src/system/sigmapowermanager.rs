@@ -19,7 +19,7 @@ pub enum PowerMode {
     Performance,
     Balanced,
     PowerSaver,
-;
+}
 
 /// Battery status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum BatteryStatus {
     Discharging,
     Full,
     NotPresent,
-;
+}
 
 /// Power profile
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct PowerProfile {
     pub hibernate_timeout: u32, // seconds
     pub wifi_power_save: bool,
     pub bluetooth_power_save: bool,
-;
+}
 
 impl PowerProfile {
     pub fn new(id: String, name: String, power_mode: PowerMode) -> Self {
@@ -76,7 +76,7 @@ impl PowerProfile {
     pub fn set_hibernate_timeout(&mut self, timeout: u32) {
         self.hibernate_timeout = timeout;
     }
-;
+}
 
 /// Battery information
 #[derive(Debug, Clone)]
@@ -89,7 +89,7 @@ pub struct BatteryInfo {
     pub energy_rate: f32, // watts
     pub time_to_empty: Option<u32>, // seconds
     pub time_to_full: Option<u32>, // seconds
-;
+}
 
 impl BatteryInfo {
     pub fn new(id: String) -> Self {
@@ -144,7 +144,7 @@ impl BatteryInfo {
     pub fn is_critical(&self) -> bool {
         self.capacity < 10
     }
-;
+}
 
 /// SigmaPowerManager - Power management
 #[derive(Debug)]
@@ -152,7 +152,7 @@ pub struct SigmaPowerManager {
     profiles: BTreeMap<String, PowerProfile>,
     batteries: BTreeMap<String, BatteryInfo>,
     active_profile: Option<String>,
-;
+}
 
 impl SigmaPowerManager {
     pub fn new() -> Self {
@@ -228,13 +228,13 @@ impl SigmaPowerManager {
     pub fn battery_count(&self) -> usize {
         self.batteries.len()
     }
-;
+}
 
 impl Default for SigmaPowerManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaPowerManager instance
 static mut SIGMAPOWERMANAGER_INSTANCE: Option<SigmaPowerManager> = None;
@@ -244,21 +244,21 @@ pub fn init_sigmapowermanager() {
     unsafe {
         SIGMAPOWERMANAGER_INSTANCE = Some(SigmaPowerManager::new());
     }
-;
+}
 
 /// Get the global SigmaPowerManager instance
 pub fn get_sigmapowermanager() -> Option<&'static SigmaPowerManager> {
     unsafe {
         SIGMAPOWERMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaPowerManager instance (mutable)
 pub fn get_sigmapowermanager_mut() -> Option<&'static mut SigmaPowerManager> {
     unsafe {
         SIGMAPOWERMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a profile
 pub fn add_profile(profile: PowerProfile) -> bool {
@@ -268,7 +268,7 @@ pub fn add_profile(profile: PowerProfile) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -358,4 +358,4 @@ mod tests {
         let active = manager.get_active_profile();
         assert_eq!(active.unwrap().id, "perf");
     }
-;
+}
