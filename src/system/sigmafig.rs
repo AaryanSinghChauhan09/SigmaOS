@@ -23,7 +23,7 @@ pub enum NodeType {
     Text,
     Image,
     Container,
-;
+}
 
 /// Connector type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,14 +33,14 @@ pub enum ConnectorType {
     Dashed,
     Curved,
     Orthogonal,
-;
+}
 
 /// 2D position
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Position {
     pub x: f64,
     pub y: f64,
-;
+}
 
 impl Position {
     pub fn new(x: f64, y: f64) -> Self {
@@ -52,20 +52,20 @@ impl Position {
         let dy = self.y - other.y;
         (dx * dx + dy * dy).sqrt()
     }
-;
+}
 
 /// Size
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FigSize {
     pub width: f64,
     pub height: f64,
-;
+}
 
 impl FigSize {
     pub fn new(width: f64, height: f64) -> Self {
         Self { width, height }
     }
-;
+}
 
 /// Diagram node
 #[derive(Debug, Clone)]
@@ -76,7 +76,7 @@ pub struct DiagramNode {
     pub size: FigSize,
     pub text: String,
     pub color: String,
-;
+}
 
 impl DiagramNode {
     pub fn new(id: String, node_type: NodeType, position: Position, size: FigSize) -> Self {
@@ -105,7 +105,7 @@ impl DiagramNode {
     pub fn set_size(&mut self, size: FigSize) {
         self.size = size;
     }
-;
+}
 
 /// Connector between nodes
 #[derive(Debug, Clone)]
@@ -115,7 +115,7 @@ pub struct Connector {
     pub from_node: String,
     pub to_node: String,
     pub label: String,
-;
+}
 
 impl Connector {
     pub fn new(
@@ -136,7 +136,7 @@ impl Connector {
     pub fn set_label(&mut self, label: String) {
         self.label = label;
     }
-;
+}
 
 /// Diagram layer
 #[derive(Debug, Clone)]
@@ -146,7 +146,7 @@ pub struct DiagramLayer {
     pub nodes: BTreeMap<String, DiagramNode>,
     pub connectors: BTreeMap<String, Connector>,
     pub visible: bool,
-;
+}
 
 impl DiagramLayer {
     pub fn new(id: String, name: String) -> Self {
@@ -194,7 +194,7 @@ impl DiagramLayer {
     pub fn connector_count(&self) -> usize {
         self.connectors.len()
     }
-;
+}
 
 /// Diagram
 #[derive(Debug, Clone)]
@@ -203,7 +203,7 @@ pub struct Diagram {
     pub name: String,
     pub layers: BTreeMap<String, DiagramLayer>,
     pub active_layer: Option<String>,
-;
+}
 
 impl Diagram {
     pub fn new(id: String, name: String) -> Self {
@@ -266,14 +266,14 @@ impl Diagram {
     pub fn layer_count(&self) -> usize {
         self.layers.len()
     }
-;
+}
 
 /// SigmaFig - Figure and diagram system manager
 #[derive(Debug)]
 pub struct SigmaFig {
     diagrams: BTreeMap<String, Diagram>,
     current_diagram: Option<String>,
-;
+}
 
 impl SigmaFig {
     pub fn new() -> Self {
@@ -330,13 +330,13 @@ impl SigmaFig {
     pub fn diagram_count(&self) -> usize {
         self.diagrams.len()
     }
-;
+}
 
 impl Default for SigmaFig {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaFig instance
 static mut SIGMAFIG_INSTANCE: Option<SigmaFig> = None;
@@ -346,17 +346,17 @@ pub fn init_sigmafig() {
     unsafe {
         SIGMAFIG_INSTANCE = Some(SigmaFig::new());
     }
-;
+}
 
 /// Get the global SigmaFig instance
 pub fn get_sigmafig() -> Option<&'static SigmaFig> {
     unsafe { SIGMAFIG_INSTANCE.as_ref() }
-;
+}
 
 /// Get the global SigmaFig instance (mutable)
 pub fn get_sigmafig_mut() -> Option<&'static mut SigmaFig> {
     unsafe { SIGMAFIG_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a diagram
 pub fn add_diagram(diagram: Diagram) -> bool {
@@ -366,7 +366,7 @@ pub fn add_diagram(diagram: Diagram) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -475,4 +475,4 @@ mod tests {
         fig.add_diagram(diagram);
         assert_eq!(fig.diagram_count(), 1);
     }
-;
+}
