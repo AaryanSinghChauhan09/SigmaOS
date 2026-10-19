@@ -1117,6 +1117,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initSmoothWindowDragging();
     initAmbientMouseGlow();
     initLiveTelemetry();
+    initOmniShellTerminal();
     updateDockAppStates();
   };
   if (document.readyState === "loading") {
@@ -1124,6 +1125,80 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
   } else {
     autoInit();
   }
+}
+
+/**
+ * Executes terminal commands in OmniShell and updates the terminal output with ARIA live log announcements.
+ */
+export function handleTerminalCommand(cmdRaw) {
+  if (typeof document === "undefined") return;
+  const output = document.getElementById("terminal-output");
+  const input = document.getElementById("terminal-input");
+  if (!output) return;
+
+  const cmd = (cmdRaw || "").trim();
+  const promptLine = document.createElement("div");
+  promptLine.className = "term-line";
+  promptLine.textContent = `sovereign@sigma:~$ ${cmd}`;
+  output.appendChild(promptLine);
+
+  if (cmd) {
+    const clean = cmd.toLowerCase();
+    const responseLine = document.createElement("div");
+    responseLine.className = "term-line";
+
+    if (clean === "help") {
+      responseLine.textContent = "Available commands: help, neofetch, clear, ls, status, uname, whoami, date";
+      responseLine.classList.add("success");
+    } else if (clean === "neofetch" || clean === "info") {
+      responseLine.textContent = "Σ SigmaOS Zenith v15.0 | Kernel: Ring-0 Lattice | Attestation: Kyber-1024 | Shell: OmniShell 5.1";
+      responseLine.classList.add("success");
+    } else if (clean === "clear") {
+      output.textContent = "";
+      while (output.firstChild) {
+        output.removeChild(output.firstChild);
+      }
+      if (output.children && Array.isArray(output.children)) {
+        output.children.length = 0;
+      }
+      if (input) input.value = "";
+      return;
+    } else if (clean === "ls") {
+      responseLine.textContent = "documents/  downloads/  system/  zenith.conf  kernel.log";
+    } else if (clean === "status") {
+      responseLine.textContent = "● System Status: Optimal | Subsystems: 100% Attested | Kyber-1024 Quantum Shield Active";
+      responseLine.classList.add("success");
+    } else if (clean === "uname") {
+      responseLine.textContent = "SigmaOS Zenith 15.0.0-sovereign x86_64";
+    } else if (clean === "whoami") {
+      responseLine.textContent = "sovereign";
+    } else if (clean === "date") {
+      responseLine.textContent = new Date().toUTCString();
+    } else {
+      responseLine.textContent = `Command not found: ${cmd}. Type 'help' for available commands.`;
+      responseLine.classList.add("error");
+    }
+    output.appendChild(responseLine);
+  }
+
+  output.scrollTop = output.scrollHeight;
+  if (input) input.value = "";
+}
+
+/**
+ * Initializes keyboard navigation and Enter key listener for OmniShell Terminal input.
+ */
+export function initOmniShellTerminal() {
+  if (typeof document === "undefined") return;
+  const input = document.getElementById("terminal-input");
+  if (!input) return;
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleTerminalCommand(input.value);
+    }
+  });
 }
 
 // =========================================================================
@@ -1520,6 +1595,8 @@ if (typeof window !== "undefined") {
   window.searchSyscalls = searchSyscalls;
   window.fmBack = fmBack;
   window.handleEmulatorCommand = handleEmulatorCommand;
+  window.handleTerminalCommand = handleTerminalCommand;
+  window.initOmniShellTerminal = initOmniShellTerminal;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
