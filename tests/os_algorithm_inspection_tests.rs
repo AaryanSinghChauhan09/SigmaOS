@@ -3,19 +3,13 @@
 // Demand paging page-fault resolution, VFS hard link & inode life-cycle,
 // Packet ring-buffer analysis, and Kernel Security Hardening (KASLR, SMEP/SMAP, Syscall dispatch).
 
-use sigmaos::distro::linux_bsd_inspirations::{
-    BoreTaskProfile, CachyBoreScheduler, CoreTypePreference,
-};
-use sigmaos::kernel::paging::{
-    DemandPageType, DemandPageZone, DemandPagingSubsystem, PageFaultReason,
-};
-use sigmaos::kernel::sched::comprehensive_schedulers::{
-    AnticipatoryIoScheduler, DiskIoRequest, IoRequestType,
-};
+use std::collections::HashMap;
+use sigmaos::distro::linux_bsd_inspirations::{BoreTaskProfile, CachyBoreScheduler, CoreTypePreference};
+use sigmaos::kernel::sched::comprehensive_schedulers::{AnticipatoryIoScheduler, DiskIoRequest, IoRequestType};
+use sigmaos::kernel::paging::{DemandPageType, DemandPageZone, DemandPagingSubsystem, PageFaultReason};
 use sigmaos::security::kernel_hardening::{
     HardenedSyscallDispatcher, PledgePromise, SmepSmapEnforcer, SovereignKaslrEngine,
 };
-use std::collections::HashMap;
 
 #[test]
 fn test_cachy_bore_scheduler_algorithm_inspection() {
@@ -105,46 +99,22 @@ pub struct Vfs {
 impl Vfs {
     pub fn new() -> Self {
         let mut inodes = HashMap::new();
-        inodes.insert(
-            1,
-            InodeRecord {
-                link_count: 1,
-                hard_links_count: 1,
-            },
-        );
+        inodes.insert(1, InodeRecord { link_count: 1, hard_links_count: 1 });
         Self {
             inodes,
             files: HashMap::new(),
             next_inode: 2,
         }
     }
-    pub fn get_root(&self) -> u64 {
-        1
-    }
-    pub fn create_file(
-        &mut self,
-        parent: u64,
-        name: &str,
-        _t: InodeType,
-    ) -> Result<u64, &'static str> {
+    pub fn get_root(&self) -> u64 { 1 }
+    pub fn create_file(&mut self, parent: u64, name: &str, _t: InodeType) -> Result<u64, &'static str> {
         let ino = self.next_inode;
         self.next_inode += 1;
-        self.inodes.insert(
-            ino,
-            InodeRecord {
-                link_count: 1,
-                hard_links_count: 1,
-            },
-        );
+        self.inodes.insert(ino, InodeRecord { link_count: 1, hard_links_count: 1 });
         self.files.insert((parent, name.to_string()), ino);
         Ok(ino)
     }
-    pub fn create_hard_link(
-        &mut self,
-        target: u64,
-        parent: u64,
-        name: &str,
-    ) -> Result<(), &'static str> {
+    pub fn create_hard_link(&mut self, target: u64, parent: u64, name: &str) -> Result<(), &'static str> {
         if let Some(inode) = self.inodes.get_mut(&target) {
             inode.link_count += 1;
             inode.hard_links_count += 1;

@@ -71,10 +71,7 @@ pub struct DeviceId {
 
 impl E1000Driver {
     pub fn probe(device_id: &DeviceId) -> bool {
-        device_id.vendor == 0x8086
-            && (device_id.device == 0x100E
-                || device_id.device == 0x100F
-                || device_id.device == 0x1539)
+        device_id.vendor == 0x8086 && (device_id.device == 0x100E || device_id.device == 0x100F || device_id.device == 0x1539)
     }
 
     pub fn new(mmio_base: usize, capabilities: CapabilityToken) -> Self {
