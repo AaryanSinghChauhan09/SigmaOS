@@ -2,7 +2,26 @@
 
 ## Summary
 
-This Pull Request proposal establishes the strategic roadmap, wedge prioritization framework, 8-step execution guide with explicit outputs, study area matrix across reference ecosystems, recurring AI-agent maintenance plan with 7 mandatory guardrails, and a detailed 12-role operating model for SigmaOS in Pull Request format.
+This Pull Request proposal establishes the strategic roadmap, wedge prioritization framework, 8-step execution guide with explicit outputs, reference subsystem study matrix, recurring AI-agent maintenance plan with 7 mandatory guardrails, and a comprehensive 12-role operating model for SigmaOS in Pull Request format.
+
+---
+
+## Component
+
+- [ ] Kernel component
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
+- [ ] Governance / Operating Model
+
+## Recurring Task
+
+- [x] PR validation
+- [x] Daily CI triage
+- [x] Weekly lifecycle review
+- [x] Weekly Linux/BSD study
+- [x] Monthly boot validation
+- [x] Quarterly architecture/security/release review
 
 ---
 
@@ -18,9 +37,7 @@ This Pull Request proposal establishes the strategic roadmap, wedge prioritizati
 
 ---
 
-## Part 1: Learning from Linux and BSD Ecosystems
-
-### Subsystem Study Matrix
+## Reference Behavior (Upstream Subsystem Study)
 
 | Area | Study Targets | Core Architectural Takeaways |
 | :--- | :--- | :--- |
@@ -35,7 +52,7 @@ This Pull Request proposal establishes the strategic roadmap, wedge prioritizati
 | **Quality & Verification** | Linux (`syzkaller`, `KUnit`, `kselftest`), OpenBSD review culture, reproducible-builds.org | Continuous syscall fuzzing, regression test ratchets, bit-for-bit build reproducibility |
 
 ### Rules for Borrowing
-- **Non-GPL Pollution**: Study designs and read code, but do not copy GPL code (Linux, GNOME) into non-GPL project components. Permissively licensed code (BSD, MIT, Apache 2.0) is reusable with attribution. Decide licensing boundaries upfront.
+- **Non-GPL Copying Restrictions**: Study designs and read code, but do not copy GPL code (Linux, GNOME) into non-GPL project components. Permissively licensed code (BSD, MIT, Apache 2.0) is reusable with attribution. Decide licensing boundaries upfront.
 - **Design Notes Requirement**: For each target project subsystem, an agent or researcher summarizes the architecture, release process, bug tracker themes, and CVE history, then writes a 1-page design note covering what it does, why it works, and the simplest Rust implementation for SigmaOS with measurable acceptance criteria.
 
 ---
@@ -179,73 +196,85 @@ Assign each team member/agent one area and reference projects:
 
 ### 1. Maintainer
 - **Mission**: Owns subsystem health, architectural standards, and merge authority.
+- **Handle**: `@sigmaos-devs/maintainers`
 - **Recurring Tasks**: Daily PR reviews, weekly backlog grooming, monthly subsystem health reports, quarterly deprecation decisions.
 - **Outputs**: Merged PRs, updated CODEOWNERS file, subsystem health reports.
 - **Limits**: No maintainer merges their own PR without secondary approval.
 
 ### 2. Updater
 - **Mission**: Keeps toolchains, crates, CI base images, and upstream knowledge current.
+- **Handle**: `@sigmaos-devs/updaters`
 - **Recurring Tasks**: Daily dependency scan, weekly Rust toolchain & crate updates, weekly upstream Linux/BSD digests, monthly compatibility table updates.
 - **Outputs**: Dependency PRs with changelog links, upstream digests.
 - **Limits**: One dependency per PR; no auto-merge for kernel/crypto/bootloader dependencies.
 
 ### 3. Reviewer
 - **Mission**: Checks every PR for correctness, capability security, safety comments, and performance impact.
+- **Handle**: `@sigmaos-devs/reviewers`
 - **Recurring Tasks**: Stage 1 automated checks, Stage 2 code audit, Stage 3 approval.
 - **Outputs**: Review comments with pass/fail checklist.
 - **Limits**: Agent reviewer can comment or block but never merge. 48-hour review SLA.
 
 ### 4. Consolidator
 - **Mission**: Eliminates code duplication, dead modules, and doc sprawl.
+- **Handle**: `@sigmaos-devs/consolidators`
 - **Recurring Tasks**: Weekly duplicate code/doc scan & cleanup PRs, monthly removal of untested features, status audit against CI evidence.
 - **Outputs**: Cleanup PRs, shrinking docs folder, "removed this month" log.
 - **Limits**: Must link CI evidence proving code/doc is obsolete before removal.
 
 ### 5. Researcher
 - **Mission**: Studies reference OS architectures (Linux, BSDs) and produces actionable 1-page design notes.
+- **Handle**: `@sigmaos-devs/researchers`
 - **Recurring Tasks**: Weekly subsystem analysis, scanning mailing lists/CVEs, monthly design notes and gap entries.
 - **Outputs**: Design notes, single gap file, prioritized backlog issues.
 - **Limits**: Respect non-GPL copying rules; cite sources for all claims.
 
 ### 6. Triager
 - **Mission**: Sorts issues, reproduces bugs, sets severity ratings (S0–S3).
+- **Handle**: `@sigmaos-devs/triagers`
 - **Recurring Tasks**: Daily issue labeling and deduplication, weekly stale issue sweeps.
 - **Outputs**: Labeled issues, reproduction steps, ranked bug list.
 
 ### 7. Tester/Fuzzer
 - **Mission**: Operates test pipelines, continuous kernel fuzzers, and hardware test checklists.
+- **Handle**: `@sigmaos-devs/testers-fuzzers`
 - **Recurring Tasks**: Nightly full test suites, QEMU multi-arch boot validation, continuous fuzzing campaigns, crash minimization into regression tests.
 - **Outputs**: Crash reports, regression tests, HCL test matrix.
 
 ### 8. Security Officer
 - **Mission**: Oversees vulnerability disclosure, `unsafe` Rust audits, capability boundaries, and key management.
+- **Handle**: `@sigmaos-devs/security-officers`
 - **Recurring Tasks**: Daily advisory monitoring, weekly `unsafe` diff reviews, monthly key rotation & signature validation, quarterly audits.
 - **Outputs**: Security advisories, SECURITY.md updates, fix-time metrics.
 - **Limits**: Release signing keys remain strictly in human possession.
 
 ### 9. Release Manager
 - **Mission**: Coordinates release freezes, ISO builds, reproducible build checks, and release publishing.
+- **Handle**: `@sigmaos-devs/release-managers`
 - **Recurring Tasks**: Release freezes, candidate builds, reproducible verification, changelog generation, post-release monitoring.
 - **Outputs**: Signed ISO releases, release notes, rollback plan.
 
 ### 10. Docs Steward
 - **Mission**: Keeps documentation, API manuals, and `README.md` synchronized with verified code state.
+- **Handle**: `@sigmaos-devs/docs-stewards`
 - **Recurring Tasks**: Weekly doc compile checks, updating README "what works today" section from CI evidence, monthly contributor guide refresh.
 - **Outputs**: Updated manuals, accurate README status sections.
 
 ### 11. Benchmarker
 - **Mission**: Operates performance tracking pipelines and publishes competitive scoreboards.
+- **Handle**: `@sigmaos-devs/benchmark-officers`
 - **Recurring Tasks**: Weekly performance regression tracking, monthly multi-OS benchmark runs against Debian, Arch, Alpine, FreeBSD, OpenBSD.
 - **Outputs**: Benchmark delta reports, monthly public scoreboard.
 
 ### 12. Community Manager
 - **Mission**: Welcomes contributors, manages onboarding guides, and maintains community communication.
+- **Handle**: `@sigmaos-devs/community-managers`
 - **Recurring Tasks**: Daily Q&A, weekly "good first issue" labeling, monthly progress updates.
 - **Outputs**: Onboarding guides, monthly community progress notes.
 
 ---
 
-## Workflows, Calendar, and Bootstrap Plan
+## Inter-Role Workflows, Weekly Operational Calendar, and Bootstrap Plan
 
 ### Inter-Role Workflows
 
@@ -276,26 +305,36 @@ After four weeks, evaluate workload metrics and scale out the remaining eight ro
 
 ---
 
-## Verification & Pre-Commit Checklist
+## Safety & Guardrails Review
 
-```bash
-# Verify code formatting and linting
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
+- [x] Human approval required for kernel, crypto, bootloader, installer, and signing keys
+- [x] Evidence requirement enforced (CI boot log / test run)
+- [x] Least privilege & scoped tokens for AI agents
+- [x] Daily PR caps and regression ratchets active
+- [x] Audit trail and one-command rollback enabled
 
-# Core compilation and test verification
-cargo check --lib
-cargo test --lib
+---
 
-# Native test suite execution
-./run_sigma_tests.sh
-```
+## Evidence
 
-- [x] Strategic reality check and wedge differentiators codified
-- [x] 8-step execution guide with explicit outputs defined
-- [x] 9 study areas matrix and non-GPL borrowing rules established
-- [x] 4-phase roadmap and monthly scoreboard metrics specified
-- [x] 12-role operating plan (missions, tasks, outputs, limits) detailed
-- [x] 7 mandatory AI-agent guardrails enforced
-- [x] 4-role bootstrap rollout and weekly operational calendar set
-- [x] Verified via `./run_sigma_tests.sh`
+- [x] `cargo check --lib`
+- [x] `cargo fmt --check`
+- [x] `cargo test --lib`
+- [x] `./run_sigma_tests.sh`
+- [x] Strategic reality check & wedge differentiators documented
+- [x] 12-role operating plan and AI guardrails codified
+
+---
+
+## Status Updates
+
+- [x] `docs/PR_PROPOSAL_ROLE_BASED_GOVERNANCE_AND_OPERATING_PLAN.md`
+- [x] `GOVERNANCE.md`
+
+---
+
+## Risks and Rollback
+
+- **Risk**: Over-reliance on synthetic unit tests creating status drift.
+- **Mitigation**: Strict enforcement of evidence-linked statuses in `FEATURE_STATUS.toml` and multi-arch QEMU serial log validation.
+- **Rollback**: Revert governance doc changes via git if role assignments require restructuring.

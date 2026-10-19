@@ -1,13 +1,13 @@
-# SigmaOS Governance & Role-Based Operating Plan
+# SigmaOS Governance Framework & Role-Based Operating Plan
 
-Welcome to the **SigmaOS Governance Framework**. This document defines the governance rules, strategic reality check, wedge prioritization, 8-step execution guide, study area matrix, recurring AI-agent maintenance plan, and 12-role operating model for the SigmaOS project.
+Welcome to the **SigmaOS Governance Framework**. This document defines the governance rules, strategic reality check, wedge prioritization, 8-step execution guide, reference subsystem study matrix, recurring AI-agent maintenance plan, and 12-role operating model for the SigmaOS project.
 
 ---
 
 ## Reality Check & Strategic Differentiator Wedges
 
 1. **Strategic Focus Over Total Domination**: Winning in every aspect against Linux, FreeBSD, and OpenBSD simultaneously is unachievable due to decades of ecosystem momentum. SigmaOS wins by establishing provable technical superiority in specific, strategic "wedges":
-   - **Memory-Safe Kernel & Userland**: A native `#![no_std]` Rust microkernel and userland eliminating C memory safety risks.
+   - **Memory-Safe Rust Kernel & Userland**: A native `#![no_std]` Rust microkernel and userland eliminating C memory safety risks.
    - **Atomic & Rollbackable Updates**: Generation-based A/B system updates with zero-downtime transactional rollback by default (inspired by NixOS, Fedora Silverblue/bootc, and FreeBSD boot environments).
    - **Capability Security by Default**: Process sandboxing enforcing minimal privileges via `pledge`/`unveil`, FreeBSD Capsicum capability rights, and Linux Landlock LSM policies.
    - **AI Agent Maintainability**: Machine-readable telemetry, TOML task schemas, strict CI test gates, and automated regression ratchets enabling safe maintenance by AI agents.
