@@ -19,7 +19,7 @@ pub enum InterfaceState {
     Up,
     Down,
     Unknown,
-;
+}
 
 /// Connection type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum ConnectionType {
     WiFi,
     VPN,
     Unknown,
-;
+}
 
 /// Network interface
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub struct NetworkInterface {
     pub netmask: Option<String>,
     pub gateway: Option<String>,
     pub mac_address: Option<String>,
-;
+}
 
 impl NetworkInterface {
     pub fn new(id: String, name: String) -> Self {
@@ -78,7 +78,7 @@ impl NetworkInterface {
     pub fn down(&mut self) {
         self.state = InterfaceState::Down;
     }
-;
+}
 
 /// Network connection
 #[derive(Debug, Clone)]
@@ -88,7 +88,7 @@ pub struct NetworkConnection {
     pub connection_type: ConnectionType,
     pub auto_connect: bool,
     pub active: bool,
-;
+}
 
 impl NetworkConnection {
     pub fn new(id: String, name: String, connection_type: ConnectionType) -> Self {
@@ -113,7 +113,7 @@ impl NetworkConnection {
     pub fn deactivate(&mut self) {
         self.active = false;
     }
-;
+}
 
 /// Network manager
 pub struct SigmaNetwork {
@@ -122,7 +122,7 @@ pub struct SigmaNetwork {
     next_interface_id: u64,
     next_connection_id: u64,
     dns_servers: Vec<String>,
-;
+}
 
 impl SigmaNetwork {
     pub fn new() -> Self {
@@ -198,13 +198,13 @@ impl SigmaNetwork {
     pub fn connection_count(&self) -> usize {
         self.connections.len()
     }
-;
+}
 
 impl Default for SigmaNetwork {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMANETWORK_INSTANCE: Option<SigmaNetwork> = None;
 
@@ -212,7 +212,7 @@ pub fn init_sigmanetwork() {
     unsafe {
         SIGMANETWORK_INSTANCE = Some(SigmaNetwork::new());
     }
-;
+}
 
 pub fn get_sigmanetwork() -> &'static SigmaNetwork {
     unsafe {
@@ -220,7 +220,7 @@ pub fn get_sigmanetwork() -> &'static SigmaNetwork {
             .as_ref()
             .expect("SigmaNetwork not initialized")
     }
-;
+}
 
 pub fn get_sigmanetwork_mut() -> &'static mut SigmaNetwork {
     unsafe {
@@ -228,12 +228,12 @@ pub fn get_sigmanetwork_mut() -> &'static mut SigmaNetwork {
             .as_mut()
             .expect("SigmaNetwork not initialized")
     }
-;
+}
 
 pub fn add_interface(name: String) -> String {
     let manager = get_sigmanetwork_mut();
     manager.add_interface(name)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -350,4 +350,4 @@ mod tests {
         let manager = get_sigmanetwork();
         assert!(manager.get_interface(&id).is_some());
     }
-;
+}

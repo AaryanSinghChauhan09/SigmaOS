@@ -13,7 +13,7 @@ pub enum SettingValue {
     Boolean(bool),
     Float(f64),
     StringList(Vec<String>),
-;
+}
 
 impl SettingValue {
     pub fn as_string(&self) -> Option<&str> {
@@ -50,7 +50,7 @@ impl SettingValue {
             _ => None,
         }
     }
-;
+}
 
 /// Setting category
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -64,7 +64,7 @@ pub enum SettingCategory {
     Accessibility,
     Input,
     System,
-;
+}
 
 impl SettingCategory {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -95,7 +95,7 @@ impl SettingCategory {
             SettingCategory::System => "System",
         }
     }
-;
+}
 
 /// Setting entry
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ pub struct SettingEntry {
     pub category: SettingCategory,
     pub description: String,
     pub is_readonly: bool,
-;
+}
 
 impl SettingEntry {
     pub fn new(
@@ -134,13 +134,13 @@ impl SettingEntry {
         self.value = value;
         Ok(())
     }
-;
+}
 
 /// Settings manager
 #[derive(Debug)]
 pub struct SettingsManager {
     settings: HashMap<String, SettingEntry>,
-;
+}
 
 impl SettingsManager {
     pub fn new() -> Self {
@@ -410,13 +410,13 @@ impl SettingsManager {
             by_category,
         }
     }
-;
+}
 
 impl Default for SettingsManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Settings statistics
 #[derive(Debug, Clone)]
@@ -424,7 +424,7 @@ pub struct SettingsStatistics {
     pub total_settings: usize,
     pub readonly_count: usize,
     pub by_category: HashMap<SettingCategory, usize>,
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -524,4 +524,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert!(stats.total_settings >= 15);
     }
-;
+}

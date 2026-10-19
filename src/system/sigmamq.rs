@@ -24,7 +24,7 @@ pub enum MessageState {
     Acknowledged,
     /// Failed
     Failed,
-;
+}
 
 impl fmt::Display for MessageState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for MessageState {
             MessageState::Failed => write!(f, "failed"),
         }
     }
-;
+}
 
 /// Message
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct Message {
     pub payload: String,
     /// State
     pub state: MessageState,
-;
+}
 
 impl Message {
     /// Create a new message
@@ -66,7 +66,7 @@ impl Message {
         self.state = state;
         self
     }
-;
+}
 
 /// SigmaMQ - System Message Queue
 pub struct SigmaMQ {
@@ -78,7 +78,7 @@ pub struct SigmaMQ {
     running: bool,
     /// Message counter
     message_counter: u32,
-;
+}
 
 impl SigmaMQ {
     /// Create a new SigmaMQ instance
@@ -258,13 +258,13 @@ impl SigmaMQ {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaMQ {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaMQ instance (placeholder for actual global state)
 static mut SIGMAMQ_INSTANCE: Option<SigmaMQ> = None;
@@ -274,12 +274,12 @@ pub fn init_sigmamq() {
     unsafe {
         SIGMAMQ_INSTANCE = Some(SigmaMQ::new());
     }
-;
+}
 
 /// Get the global SigmaMQ instance
 pub fn get_sigmamq() -> Option<&'static mut SigmaMQ> {
     unsafe { SIGMAMQ_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to publish a message
 pub fn publish_message(message: Message) -> Result<(), String> {
@@ -288,7 +288,7 @@ pub fn publish_message(message: Message) -> Result<(), String> {
     } else {
         Err("SigmaMQ not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -445,4 +445,4 @@ mod tests {
         let result = publish_message(message);
         assert!(result.is_ok());
     }
-;
+}

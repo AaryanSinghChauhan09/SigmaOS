@@ -25,7 +25,7 @@ pub enum DiscardType {
     NvmeDeallocate,
     ScsiUnmap,
     Unsupported,
-;
+}
 
 /// Operational TRIM mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum TrimMode {
     BatchPeriodic,
     OnlineContinuous,
     Manual,
-;
+}
 
 /// Status of TRIM operation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,14 +44,14 @@ pub enum TrimStatus {
     Completed,
     Failed,
     Unsupported,
-;
+}
 
 /// Discard range definition
 #[derive(Debug, Clone)]
 pub struct DiscardRange {
     pub start_offset: u64,
     pub length_bytes: u64,
-;
+}
 
 /// Solid-state drive device TRIM capability record
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ pub struct TrimDevice {
     pub max_discard_bytes: u64,
     pub discard_granularity: u32,
     pub is_ssd: bool,
-;
+}
 
 impl TrimDevice {
     /// Create a new TRIM device record
@@ -88,7 +88,7 @@ impl TrimDevice {
     pub fn supports_trim(&self) -> bool {
         self.is_ssd && self.discard_type != DiscardType::Unsupported
     }
-;
+}
 
 /// Result of a completed or ongoing TRIM execution
 #[derive(Debug, Clone)]
@@ -99,7 +99,7 @@ pub struct TrimResult {
     pub blocks_freed: u64,
     pub duration_ms: u32,
     pub timestamp: u64,
-;
+}
 
 impl TrimResult {
     /// Create a successful TRIM result
@@ -130,7 +130,7 @@ impl TrimResult {
             timestamp,
         }
     }
-;
+}
 
 /// Main SigmaTRIM manager struct
 pub struct SigmaTRIM {
@@ -139,7 +139,7 @@ pub struct SigmaTRIM {
     running: AtomicBool,
     mode: TrimMode,
     min_trim_bytes: u64,
-;
+}
 
 impl SigmaTRIM {
     /// Create a new SigmaTRIM manager
@@ -256,13 +256,13 @@ impl SigmaTRIM {
     pub fn device_count(&self) -> usize {
         self.devices.len()
     }
-;
+}
 
 impl Default for SigmaTRIM {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaTRIM instance (placeholder for global state)
 static mut SIGMA_TRIM_INSTANCE: Option<SigmaTRIM> = None;
@@ -272,17 +272,17 @@ pub fn init_sigmatrim() {
     unsafe {
         SIGMA_TRIM_INSTANCE = Some(SigmaTRIM::new());
     }
-;
+}
 
 /// Get global SigmaTRIM instance
 pub fn get_sigmatrim() -> Option<&'static SigmaTRIM> {
     unsafe { SIGMA_TRIM_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaTRIM instance
 pub fn get_sigmatrim_mut() -> Option<&'static mut SigmaTRIM> {
     unsafe { SIGMA_TRIM_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to execute a TRIM on a mount point
 pub fn trim_mount(mount_point: &str, timestamp: u64) -> Option<TrimResult> {
@@ -291,7 +291,7 @@ pub fn trim_mount(mount_point: &str, timestamp: u64) -> Option<TrimResult> {
     } else {
         None
     }
-;
+}
 
 /// Convenience function to test if TRIM is supported
 pub fn is_trim_supported(mount_point: &str) -> bool {
@@ -300,7 +300,7 @@ pub fn is_trim_supported(mount_point: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -388,4 +388,4 @@ mod tests {
         assert!(res.is_some());
         assert_eq!(res.unwrap().status, TrimStatus::Completed);
     }
-;
+}

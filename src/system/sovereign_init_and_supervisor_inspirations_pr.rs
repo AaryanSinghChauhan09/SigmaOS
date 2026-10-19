@@ -29,7 +29,7 @@ pub struct CoreUserlandPrProposalManifest {
     pub components_added: Vec<String>,
     pub performance_multiplier: String,
     pub status: String,
-;
+}
 
 // ============================================================================
 // 1. SYSTEMD INSPIRATIONS ENGINE
@@ -44,7 +44,7 @@ pub enum SystemdServiceStatus {
     Deactivating,
     Failed,
     Reloading,
-;
+}
 
 /// systemd Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -206,7 +206,7 @@ impl SystemdInspirationsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 2. OPENRC INSPIRATIONS ENGINE
@@ -219,7 +219,7 @@ pub enum OpenRcRunlevel {
     Boot,
     Default,
     Shutdown,
-;
+}
 
 /// OpenRC Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -344,7 +344,7 @@ impl OpenRcInspirationsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 3. RUNIT & S6 INSPIRATIONS ENGINE
@@ -358,7 +358,7 @@ pub enum RunitS6State {
     Up,
     Finishing,
     Dead,
-;
+}
 
 /// runit & s6 Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -442,7 +442,7 @@ impl RunitS6InspirationsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 4. SYSVINIT INSPIRATIONS ENGINE
@@ -457,7 +457,7 @@ pub enum SysVInittabAction {
     SysInit,
     CtrlAltDel,
     PowerFail,
-;
+}
 
 /// SysVinit Inittab Entry
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -466,7 +466,7 @@ pub struct SysVInittabEntry {
     pub runlevels: Vec<u8>,
     pub action: SysVInittabAction,
     pub process: String,
-;
+}
 
 /// SysVinit Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -565,7 +565,7 @@ impl SysVinitInspirationsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 5. BSD RC INSPIRATIONS ENGINE
@@ -579,7 +579,7 @@ pub struct BsdRcScript {
     pub require: Vec<String>,
     pub before: Vec<String>,
     pub keyword: Vec<String>,
-;
+}
 
 /// BSD rc Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -705,7 +705,7 @@ impl BsdRcInspirationsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 6. LAUNCHD INSPIRATIONS ENGINE
@@ -719,7 +719,7 @@ pub struct LaunchdJobConfig {
     pub keep_alive: bool,
     pub throttle_interval_sec: u32,
     pub sockets: Vec<(String, u16)>, // (socket_family, port)
-;
+}
 
 /// launchd Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -795,7 +795,7 @@ impl LaunchdInspirationsPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 7. CRON, ANACRON, TIMERS & AT INSPIRATIONS ENGINE
@@ -808,7 +808,7 @@ pub enum SystemdTimerTrigger {
     OnBootSec(u64),
     OnUnitActiveSec(u64),
     OnCalendar(String),
-;
+}
 
 /// `at` / `batch` Job Specification
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -818,7 +818,7 @@ pub struct AtJobSpec {
     pub queue_letter: char, // 'a'..'z' ('b' = batch)
     pub command: String,
     pub user: String,
-;
+}
 
 /// Cron, Anacron, Timers & At Parity & PR Engine.
 #[derive(Debug, Default)]
@@ -980,7 +980,7 @@ impl CronAnacronTimersAtPrEngine {
             status: "Ready for Merge".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 8. MASTER COORDINATOR GATEWAY
@@ -996,7 +996,7 @@ pub struct SovereignInitAndSupervisorParityPrGateway {
     pub bsd_rc: BsdRcInspirationsPrEngine,
     pub launchd: LaunchdInspirationsPrEngine,
     pub cron_timers_at: CronAnacronTimersAtPrEngine,
-;
+}
 
 impl SovereignInitAndSupervisorParityPrGateway {
     pub fn new() -> Self {
@@ -1096,7 +1096,7 @@ impl SovereignInitAndSupervisorParityPrGateway {
             && launchd_ok
             && cron_ok
     }
-;
+}
 
 // ============================================================================
 // UNIT TESTS
@@ -1315,4 +1315,4 @@ mod tests {
 
         assert!(gateway.run_master_verification());
     }
-;
+}

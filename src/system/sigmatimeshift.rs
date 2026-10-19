@@ -19,7 +19,7 @@ pub enum SnapshotLevel {
     Monthly,
     Manual,
     Unknown,
-;
+}
 
 /// Snapshot type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum SnapshotType {
     Application,
     Configuration,
     Unknown,
-;
+}
 
 /// Snapshot state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,7 +40,7 @@ pub enum SnapshotState {
     Deleting,
     Restoring,
     Unknown,
-;
+}
 
 /// Snapshot data structure
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct TimeshiftSnapshot {
     pub description: String,
     pub uuid: String,
     pub is_bootable: bool,
-;
+}
 
 impl TimeshiftSnapshot {
     /// Create a new Timeshift snapshot
@@ -114,7 +114,7 @@ impl TimeshiftSnapshot {
     pub fn is_snapshot_bootable(&self) -> bool {
         self.is_bootable
     }
-;
+}
 
 /// Snapshot schedule configuration
 #[derive(Debug, Clone)]
@@ -124,7 +124,7 @@ pub struct SnapshotSchedule {
     pub enabled: bool,
     pub retain_count: u32,
     pub cron_expression: String,
-;
+}
 
 impl SnapshotSchedule {
     /// Create a new snapshot schedule
@@ -157,14 +157,14 @@ impl SnapshotSchedule {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-;
+}
 
 /// Timeshift manager
 pub struct SigmaTimeshift {
     snapshots: BTreeMap<String, TimeshiftSnapshot>,
     schedules: BTreeMap<String, SnapshotSchedule>,
     running: AtomicBool,
-;
+}
 
 impl SigmaTimeshift {
     /// Create a new Timeshift manager
@@ -314,13 +314,13 @@ impl SigmaTimeshift {
     pub fn schedule_count(&self) -> usize {
         self.schedules.len()
     }
-;
+}
 
 impl Default for SigmaTimeshift {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaTimeshift instance (placeholder for actual global state)
 static mut SIGMATIMESHIFT_INSTANCE: Option<SigmaTimeshift> = None;
@@ -330,17 +330,17 @@ pub fn init_sigmatimeshift() {
     unsafe {
         SIGMATIMESHIFT_INSTANCE = Some(SigmaTimeshift::new());
     }
-;
+}
 
 /// Get the global SigmaTimeshift instance
 pub fn get_sigmatimeshift() -> Option<&'static SigmaTimeshift> {
     unsafe { SIGMATIMESHIFT_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaTimeshift instance
 pub fn get_sigmatimeshift_mut() -> Option<&'static mut SigmaTimeshift> {
     unsafe { SIGMATIMESHIFT_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to create a snapshot
 pub fn create_timeshift_snapshot(snapshot: TimeshiftSnapshot) -> bool {
@@ -349,7 +349,7 @@ pub fn create_timeshift_snapshot(snapshot: TimeshiftSnapshot) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to restore a snapshot
 pub fn restore_timeshift_snapshot(snapshot_id: &str) -> bool {
@@ -358,7 +358,7 @@ pub fn restore_timeshift_snapshot(snapshot_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -600,4 +600,4 @@ mod tests {
         let snap = timeshift.get_snapshot("snap1").unwrap();
         assert!(snap.is_completed());
     }
-;
+}

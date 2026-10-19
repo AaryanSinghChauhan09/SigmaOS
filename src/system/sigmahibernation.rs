@@ -20,7 +20,7 @@ pub enum PowerState {
     Suspend,
     Hibernation,
     Unknown,
-;
+}
 
 /// Hibernation method
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum HibernationMethod {
     Shutdown,
     Reboot,
     Unknown,
-;
+}
 
 /// Hibernation state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,7 +40,7 @@ pub enum HibernationState {
     Resuming,
     Failed,
     Unknown,
-;
+}
 
 /// Hibernation image
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct HibernationImage {
     pub image_size: u64,
     pub compression: bool,
     pub checksum: Option<String>,
-;
+}
 
 impl HibernationImage {
     pub fn new(id: String, swap_device: String, size: u64) -> Self {
@@ -78,7 +78,7 @@ impl HibernationImage {
     pub fn set_image_size(&mut self, size: u64) {
         self.image_size = size;
     }
-;
+}
 
 /// Hibernation manager
 pub struct SigmaHibernation {
@@ -88,7 +88,7 @@ pub struct SigmaHibernation {
     hibernation_state: HibernationState,
     hibernation_method: HibernationMethod,
     resume_device: Option<String>,
-;
+}
 
 impl SigmaHibernation {
     pub fn new() -> Self {
@@ -201,13 +201,13 @@ impl SigmaHibernation {
     pub fn image_count(&self) -> usize {
         self.images.len()
     }
-;
+}
 
 impl Default for SigmaHibernation {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAHIBERNATION_INSTANCE: Option<SigmaHibernation> = None;
 
@@ -215,7 +215,7 @@ pub fn init_sigmahibernation() {
     unsafe {
         SIGMAHIBERNATION_INSTANCE = Some(SigmaHibernation::new());
     }
-;
+}
 
 pub fn get_sigmahibernation() -> &'static SigmaHibernation {
     unsafe {
@@ -223,7 +223,7 @@ pub fn get_sigmahibernation() -> &'static SigmaHibernation {
             .as_ref()
             .expect("SigmaHibernation not initialized")
     }
-;
+}
 
 pub fn get_sigmahibernation_mut() -> &'static mut SigmaHibernation {
     unsafe {
@@ -231,12 +231,12 @@ pub fn get_sigmahibernation_mut() -> &'static mut SigmaHibernation {
             .as_mut()
             .expect("SigmaHibernation not initialized")
     }
-;
+}
 
 pub fn create_image(swap_device: String, size: u64) -> String {
     let manager = get_sigmahibernation_mut();
     manager.create_image(swap_device, size)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -372,4 +372,4 @@ mod tests {
         let manager = get_sigmahibernation();
         assert!(manager.get_image(&id).is_some());
     }
-;
+}

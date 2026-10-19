@@ -28,20 +28,20 @@ pub enum EffectType {
     Noise,
     Emboss,
     EdgeDetect,
-;
+}
 
 /// Effect parameter
 #[derive(Debug, Clone)]
 pub struct EffectParameter {
     pub name: String,
     pub value: f32,
-;
+}
 
 impl EffectParameter {
     pub fn new(name: String, value: f32) -> Self {
         Self { name, value }
     }
-;
+}
 
 /// Effect
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct Effect {
     pub effect_type: EffectType,
     pub parameters: Vec<EffectParameter>,
     pub enabled: bool,
-;
+}
 
 impl Effect {
     pub fn new(id: String, name: String, effect_type: EffectType) -> Self {
@@ -87,7 +87,7 @@ impl Effect {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-;
+}
 
 /// Effect chain
 #[derive(Debug, Clone)]
@@ -96,7 +96,7 @@ pub struct EffectChain {
     pub name: String,
     pub effects: Vec<String>,
     pub blend_mode: String,
-;
+}
 
 impl EffectChain {
     pub fn new(id: String, name: String) -> Self {
@@ -128,7 +128,7 @@ impl EffectChain {
     pub fn effect_count(&self) -> usize {
         self.effects.len()
     }
-;
+}
 
 /// Effect preset
 #[derive(Debug, Clone)]
@@ -137,7 +137,7 @@ pub struct EffectPreset {
     pub name: String,
     pub description: String,
     pub effect_ids: Vec<String>,
-;
+}
 
 impl EffectPreset {
     pub fn new(id: String, name: String, description: String) -> Self {
@@ -156,7 +156,7 @@ impl EffectPreset {
     pub fn effect_count(&self) -> usize {
         self.effect_ids.len()
     }
-;
+}
 
 /// SigmaEffect - Effects system manager
 #[derive(Debug)]
@@ -164,7 +164,7 @@ pub struct SigmaEffect {
     effects: BTreeMap<String, Effect>,
     chains: BTreeMap<String, EffectChain>,
     presets: BTreeMap<String, EffectPreset>,
-;
+}
 
 impl SigmaEffect {
     pub fn new() -> Self {
@@ -242,13 +242,13 @@ impl SigmaEffect {
     pub fn preset_count(&self) -> usize {
         self.presets.len()
     }
-;
+}
 
 impl Default for SigmaEffect {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaEffect instance
 static mut SIGMAEFFECT_INSTANCE: Option<SigmaEffect> = None;
@@ -258,17 +258,17 @@ pub fn init_sigmaeffect() {
     unsafe {
         SIGMAEFFECT_INSTANCE = Some(SigmaEffect::new());
     }
-;
+}
 
 /// Get the global SigmaEffect instance
 pub fn get_sigmaeffect() -> Option<&'static SigmaEffect> {
     unsafe { SIGMAEFFECT_INSTANCE.as_ref() }
-;
+}
 
 /// Get the global SigmaEffect instance (mutable)
 pub fn get_sigmaeffect_mut() -> Option<&'static mut SigmaEffect> {
     unsafe { SIGMAEFFECT_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add an effect
 pub fn add_effect(effect: Effect) -> bool {
@@ -278,7 +278,7 @@ pub fn add_effect(effect: Effect) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -348,4 +348,4 @@ mod tests {
         fx.add_effect(effect);
         assert_eq!(fx.effect_count(), 1);
     }
-;
+}

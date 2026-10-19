@@ -31,7 +31,7 @@ pub trait DefragStrategy {
     fn defragment(&mut self, path: &Path) -> Result<DefragResult, DefragError>;
     /// Get strategy name
     fn name(&self) -> &str;
-;
+}
 
 /// Fragmentation report
 #[derive(Debug, Clone)]
@@ -42,7 +42,7 @@ pub struct FragmentationReport {
     pub total_size_bytes: u64,
     pub fragmented_size_bytes: u64,
     pub potential_improvement_percent: f64,
-;
+}
 
 /// Defragmentation result
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct DefragResult {
     pub fragmentation_before: f64,
     pub fragmentation_after: f64,
     pub message: String,
-;
+}
 
 /// File block information
 #[derive(Debug, Clone)]
@@ -65,7 +65,7 @@ pub struct FileBlockInfo {
     pub block_count: usize,
     pub contiguous_blocks: usize,
     pub is_fragmented: bool,
-;
+}
 
 impl FileBlockInfo {
     pub fn new(path: PathBuf, size: u64, block_count: usize, contiguous_blocks: usize) -> Self {
@@ -86,14 +86,14 @@ impl FileBlockInfo {
             (1.0 - (self.contiguous_blocks as f64 / self.block_count as f64)) * 100.0
         }
     }
-;
+}
 
 /// SigmaFS-specific defragmentation strategy
 pub struct SigmaFsDefragStrategy {
     block_size: u64,
     aggressive: bool,
     preserve_merkle_trees: bool,
-;
+}
 
 impl SigmaFsDefragStrategy {
     #[allow(clippy::new_without_default)]
@@ -119,7 +119,7 @@ impl SigmaFsDefragStrategy {
         self.preserve_merkle_trees = preserve;
         self
     }
-;
+}
 
 impl DefragStrategy for SigmaFsDefragStrategy {
     fn analyze(&self, path: &Path) -> Result<FragmentationReport, DefragError> {
@@ -209,7 +209,7 @@ impl DefragStrategy for SigmaFsDefragStrategy {
     fn name(&self) -> &str {
         "SigmaFsDefragStrategy"
     }
-;
+}
 
 impl SigmaFsDefragStrategy {
     fn collect_file_info(
@@ -236,7 +236,7 @@ impl SigmaFsDefragStrategy {
         // Simulate updating Merkle trees after defragmentation
         // This ensures crash-consistency is maintained
     }
-;
+}
 
 /// OOP-based Disk Defragmenter Manager
 pub struct DiskDefragmenter {
@@ -244,7 +244,7 @@ pub struct DiskDefragmenter {
     dry_run: bool,
     report: Option<FragmentationReport>,
     result: Option<DefragResult>,
-;
+}
 
 impl DiskDefragmenter {
     pub fn new(strategy: Box<dyn DefragStrategy>) -> Self {
@@ -301,13 +301,13 @@ impl DiskDefragmenter {
     pub fn result(&self) -> Option<&DefragResult> {
         self.result.as_ref()
     }
-;
+}
 
 impl Default for DiskDefragmenter {
     fn default() -> Self {
         Self::new(Box::new(SigmaFsDefragStrategy::new()))
     }
-;
+}
 
 /// Defragmentation errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -317,7 +317,7 @@ pub enum DefragError {
     PermissionDenied(String),
     DiskFull,
     FileSystemNotSupported(String),
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -355,4 +355,4 @@ mod tests {
         let defragger = DiskDefragmenter::default();
         assert!(!defragger.dry_run);
     }
-;
+}

@@ -18,7 +18,7 @@ pub enum ThemeType {
     WindowBorder,
     Metacity,
     Unknown,
-;
+}
 
 /// Theme state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub enum ThemeState {
     NotInstalled,
     PartiallyInstalled,
     Unknown,
-;
+}
 
 /// Theme data structure
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct Theme {
     pub state: ThemeState,
     pub path: String,
     pub preview_image: String,
-;
+}
 
 impl Theme {
     /// Create a new theme
@@ -90,13 +90,13 @@ impl Theme {
     pub fn is_partially_installed(&self) -> bool {
         self.state == ThemeState::PartiallyInstalled
     }
-;
+}
 
 /// Theme manager
 pub struct SigmaThemeInstaller {
     themes: BTreeMap<String, Theme>,
     running: AtomicBool,
-;
+}
 
 impl SigmaThemeInstaller {
     /// Create a new theme installer manager
@@ -220,13 +220,13 @@ impl SigmaThemeInstaller {
     pub fn installed_count(&self) -> usize {
         self.list_installed_themes().len()
     }
-;
+}
 
 impl Default for SigmaThemeInstaller {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaThemeInstaller instance (placeholder for actual global state)
 static mut SIGMATHEMEINSTALLER_INSTANCE: Option<SigmaThemeInstaller> = None;
@@ -236,17 +236,17 @@ pub fn init_sigmathemeinstaller() {
     unsafe {
         SIGMATHEMEINSTALLER_INSTANCE = Some(SigmaThemeInstaller::new());
     }
-;
+}
 
 /// Get the global SigmaThemeInstaller instance
 pub fn get_sigmathemeinstaller() -> Option<&'static SigmaThemeInstaller> {
     unsafe { SIGMATHEMEINSTALLER_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaThemeInstaller instance
 pub fn get_sigmathemeinstaller_mut() -> Option<&'static mut SigmaThemeInstaller> {
     unsafe { SIGMATHEMEINSTALLER_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a theme
 pub fn add_theme(theme: Theme) -> bool {
@@ -255,7 +255,7 @@ pub fn add_theme(theme: Theme) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to install a theme
 pub fn install_theme(theme_id: &str) -> bool {
@@ -264,7 +264,7 @@ pub fn install_theme(theme_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -491,4 +491,4 @@ mod tests {
         let theme = theme_mgr.get_theme("theme1").unwrap();
         assert!(theme.is_installed());
     }
-;
+}

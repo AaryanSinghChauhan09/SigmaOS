@@ -11,7 +11,7 @@ pub enum PowerSource {
     Battery,
     AC,
     UPS,
-;
+}
 
 impl PowerSource {
     pub fn as_str(&self) -> &str {
@@ -21,7 +21,7 @@ impl PowerSource {
             PowerSource::UPS => "UPS",
         }
     }
-;
+}
 
 /// Battery status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum PowerBatteryStatus {
     Full,
     NotCharging,
     Unknown,
-;
+}
 
 impl PowerBatteryStatus {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -53,7 +53,7 @@ impl PowerBatteryStatus {
             PowerBatteryStatus::Unknown => "Unknown",
         }
     }
-;
+}
 
 /// Power profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,7 +61,7 @@ pub enum PowerProfile {
     Performance,
     Balanced,
     PowerSaver,
-;
+}
 
 impl PowerProfile {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -80,7 +80,7 @@ impl PowerProfile {
             PowerProfile::PowerSaver => "Power Saver",
         }
     }
-;
+}
 
 /// Sleep action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -89,7 +89,7 @@ pub enum SleepAction {
     Hibernate,
     HybridSleep,
     Shutdown,
-;
+}
 
 impl SleepAction {
     pub fn as_str(&self) -> &str {
@@ -100,7 +100,7 @@ impl SleepAction {
             SleepAction::Shutdown => "Shutdown",
         }
     }
-;
+}
 
 /// Battery information
 #[derive(Debug, Clone)]
@@ -113,7 +113,7 @@ pub struct BatteryInfo {
     pub voltage_v: f64,
     pub time_to_empty_minutes: Option<u32>,
     pub time_to_full_minutes: Option<u32>,
-;
+}
 
 impl BatteryInfo {
     pub fn new() -> Self {
@@ -142,13 +142,13 @@ impl BatteryInfo {
     pub fn is_critical(&self, threshold: f64) -> bool {
         self.percentage < threshold && self.status == PowerBatteryStatus::Discharging
     }
-;
+}
 
 impl Default for BatteryInfo {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Power configuration
 #[derive(Debug, Clone)]
@@ -163,7 +163,7 @@ pub struct PowerConfig {
     pub critical_battery_threshold: f64,
     pub suspend_on_low_battery: bool,
     pub suspend_on_lid_close: bool,
-;
+}
 
 impl Default for PowerConfig {
     fn default() -> Self {
@@ -180,7 +180,7 @@ impl Default for PowerConfig {
             suspend_on_lid_close: true,
         }
     }
-;
+}
 
 /// Power manager
 #[derive(Debug)]
@@ -188,7 +188,7 @@ pub struct PowerManager {
     battery: BatteryInfo,
     config: PowerConfig,
     last_update: u64,
-;
+}
 
 impl PowerManager {
     pub fn new() -> Self {
@@ -290,13 +290,13 @@ impl PowerManager {
             last_update: self.last_update,
         }
     }
-;
+}
 
 impl Default for PowerManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Power statistics
 #[derive(Debug, Clone)]
@@ -308,7 +308,7 @@ pub struct PowerStatistics {
     pub is_low: bool,
     pub is_critical: bool,
     pub last_update: u64,
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -400,4 +400,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert_eq!(stats.battery_percentage, 100.0);
     }
-;
+}

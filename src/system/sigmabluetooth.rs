@@ -20,7 +20,7 @@ pub enum AdapterState {
     On,
     Discovering,
     Unknown,
-;
+}
 
 /// Device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum DeviceState {
     Connected,
     Paired,
     Unknown,
-;
+}
 
 /// Device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum DeviceType {
     Joystick,
     Headset,
     Speaker,
-;
+}
 
 /// Bluetooth adapter
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct BluetoothAdapter {
     pub state: AdapterState,
     pub discovering: bool,
     pub powered: bool,
-;
+}
 
 impl BluetoothAdapter {
     pub fn new(id: String, name: String, address: String) -> Self {
@@ -93,7 +93,7 @@ impl BluetoothAdapter {
             self.state = AdapterState::On;
         }
     }
-;
+}
 
 /// Bluetooth device
 #[derive(Debug, Clone)]
@@ -107,7 +107,7 @@ pub struct BluetoothDevice {
     pub trusted: bool,
     pub connected: bool,
     pub rssi: Option<i32>,
-;
+}
 
 impl BluetoothDevice {
     pub fn new(id: String, name: String, address: String, device_type: DeviceType) -> Self {
@@ -158,7 +158,7 @@ impl BluetoothDevice {
     pub fn set_rssi(&mut self, rssi: i32) {
         self.rssi = Some(rssi);
     }
-;
+}
 
 /// Bluetooth manager
 pub struct SigmaBluetooth {
@@ -166,7 +166,7 @@ pub struct SigmaBluetooth {
     devices: BTreeMap<String, BluetoothDevice>,
     next_adapter_id: u64,
     next_device_id: u64,
-;
+}
 
 impl SigmaBluetooth {
     pub fn new() -> Self {
@@ -293,13 +293,13 @@ impl SigmaBluetooth {
     pub fn connected_device_count(&self) -> usize {
         self.devices.values().filter(|d| d.connected).count()
     }
-;
+}
 
 impl Default for SigmaBluetooth {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMABLUETOOTH_INSTANCE: Option<SigmaBluetooth> = None;
 
@@ -307,7 +307,7 @@ pub fn init_sigmabluetooth() {
     unsafe {
         SIGMABLUETOOTH_INSTANCE = Some(SigmaBluetooth::new());
     }
-;
+}
 
 pub fn get_sigmabluetooth() -> &'static SigmaBluetooth {
     unsafe {
@@ -315,7 +315,7 @@ pub fn get_sigmabluetooth() -> &'static SigmaBluetooth {
             .as_ref()
             .expect("SigmaBluetooth not initialized")
     }
-;
+}
 
 pub fn get_sigmabluetooth_mut() -> &'static mut SigmaBluetooth {
     unsafe {
@@ -323,12 +323,12 @@ pub fn get_sigmabluetooth_mut() -> &'static mut SigmaBluetooth {
             .as_mut()
             .expect("SigmaBluetooth not initialized")
     }
-;
+}
 
 pub fn add_adapter(name: String, address: String) -> String {
     let manager = get_sigmabluetooth_mut();
     manager.add_adapter(name, address)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -579,4 +579,4 @@ mod tests {
         let manager = get_sigmabluetooth();
         assert!(manager.get_adapter(&id).is_some());
     }
-;
+}

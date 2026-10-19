@@ -19,7 +19,7 @@ pub enum RAIDLevel {
     RAID10,
     Linear,
     Unknown,
-;
+}
 
 /// RAID array state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum RAIDState {
     Resyncing,
     Recovering,
     Unknown,
-;
+}
 
 /// RAID device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,7 +42,7 @@ pub enum RAIDDeviceState {
     Rebuilding,
     Removed,
     Unknown,
-;
+}
 
 /// RAID device data structure
 #[derive(Debug, Clone)]
@@ -52,7 +52,7 @@ pub struct RAIDDevice {
     pub state: RAIDDeviceState,
     pub size: u64,
     pub array_id: String,
-;
+}
 
 impl RAIDDevice {
     /// Create a new RAID device
@@ -80,7 +80,7 @@ impl RAIDDevice {
     pub fn is_failed(&self) -> bool {
         self.state == RAIDDeviceState::Failed
     }
-;
+}
 
 /// RAID array data structure
 #[derive(Debug, Clone)]
@@ -94,7 +94,7 @@ pub struct RAIDArray {
     pub active_devices: usize,
     pub spare_devices: usize,
     pub chunk_size: u64,
-;
+}
 
 impl RAIDArray {
     /// Create a new RAID array
@@ -153,14 +153,14 @@ impl RAIDArray {
     pub fn is_failed(&self) -> bool {
         self.state == RAIDState::Failed
     }
-;
+}
 
 /// RAID manager
 pub struct SigmaRAID {
     arrays: BTreeMap<String, RAIDArray>,
     devices: BTreeMap<String, RAIDDevice>,
     running: AtomicBool,
-;
+}
 
 impl SigmaRAID {
     /// Create a new RAID manager
@@ -302,13 +302,13 @@ impl SigmaRAID {
     pub fn device_count(&self) -> usize {
         self.devices.len()
     }
-;
+}
 
 impl Default for SigmaRAID {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaRAID instance (placeholder for actual global state)
 static mut SIGMARAD_INSTANCE: Option<SigmaRAID> = None;
@@ -318,24 +318,24 @@ pub fn init_sigmaraid() {
     unsafe {
         SIGMARAD_INSTANCE = Some(SigmaRAID::new());
     }
-;
+}
 
 /// Get the global SigmaRAID instance
 pub fn get_sigmaraid() -> Option<&'static SigmaRAID> {
     unsafe { SIGMARAD_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaRAID instance
 pub fn get_sigmaraid_mut() -> Option<&'static mut SigmaRAID> {
     unsafe { SIGMARAD_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to create a RAID array
 pub fn create_raid_array(array: RAIDArray) {
     if let Some(raid) = get_sigmaraid_mut() {
         raid.create_array(array);
     }
-;
+}
 
 /// Convenience function to activate a RAID array
 pub fn activate_raid_array(array_id: &str) -> bool {
@@ -344,7 +344,7 @@ pub fn activate_raid_array(array_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -710,4 +710,4 @@ mod tests {
         let array = raid.get_array("array1").unwrap();
         assert!(array.is_active());
     }
-;
+}

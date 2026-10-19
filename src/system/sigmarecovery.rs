@@ -24,7 +24,7 @@ pub enum RecoveryMode {
     Safe,
     /// Emergency mode
     Emergency,
-;
+}
 
 impl fmt::Display for RecoveryMode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for RecoveryMode {
             RecoveryMode::Emergency => write!(f, "emergency"),
         }
     }
-;
+}
 
 /// Recovery action
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,7 +50,7 @@ pub enum RecoveryAction {
     BootRecoveryShell,
     /// Boot to diagnostic mode
     BootDiagnostic,
-;
+}
 
 impl fmt::Display for RecoveryAction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,7 +62,7 @@ impl fmt::Display for RecoveryAction {
             RecoveryAction::BootDiagnostic => write!(f, "boot_diagnostic"),
         }
     }
-;
+}
 
 /// Recovery snapshot
 #[derive(Debug, Clone)]
@@ -79,7 +79,7 @@ pub struct RecoverySnapshot {
     pub size_mb: u64,
     /// Is bootable
     pub bootable: bool,
-;
+}
 
 impl RecoverySnapshot {
     /// Create a new recovery snapshot
@@ -111,7 +111,7 @@ impl RecoverySnapshot {
         self.bootable = bootable;
         self
     }
-;
+}
 
 /// SigmaRecovery - System Recovery Daemon
 pub struct SigmaRecovery {
@@ -123,7 +123,7 @@ pub struct SigmaRecovery {
     running: bool,
     /// Snapshot counter
     snapshot_counter: u32,
-;
+}
 
 impl SigmaRecovery {
     /// Create a new SigmaRecovery instance
@@ -239,13 +239,13 @@ impl SigmaRecovery {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaRecovery {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaRecovery instance (placeholder for actual global state)
 static mut SIGMARECOVERY_INSTANCE: Option<SigmaRecovery> = None;
@@ -255,12 +255,12 @@ pub fn init_sigmarecovery() {
     unsafe {
         SIGMARECOVERY_INSTANCE = Some(SigmaRecovery::new());
     }
-;
+}
 
 /// Get the global SigmaRecovery instance
 pub fn get_sigmarecovery() -> Option<&'static mut SigmaRecovery> {
     unsafe { SIGMARECOVERY_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to boot to recovery
 pub fn boot_to_recovery(action: RecoveryAction) -> Result<(), String> {
@@ -269,7 +269,7 @@ pub fn boot_to_recovery(action: RecoveryAction) -> Result<(), String> {
     } else {
         Err("SigmaRecovery not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -400,4 +400,4 @@ mod tests {
         let result = boot_to_recovery(RecoveryAction::BootShell);
         assert!(result.is_ok());
     }
-;
+}

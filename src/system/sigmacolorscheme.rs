@@ -16,7 +16,7 @@ pub struct Color {
     pub g: u8,
     pub b: u8,
     pub hex: String,
-;
+}
 
 impl Color {
     /// Create a new color from RGB values
@@ -46,7 +46,7 @@ impl Color {
     pub fn is_light(&self) -> bool {
         self.luminance() > 0.5
     }
-;
+}
 
 /// Color palette type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,7 +55,7 @@ pub enum PaletteType {
     Light,
     Auto,
     Unknown,
-;
+}
 
 /// Color scheme data structure
 #[derive(Debug, Clone)]
@@ -68,7 +68,7 @@ pub struct ColorScheme {
     pub cursor: Color,
     pub colors: BTreeMap<String, Color>,
     pub source_image: String,
-;
+}
 
 impl ColorScheme {
     /// Create a new color scheme
@@ -114,7 +114,7 @@ impl ColorScheme {
     pub fn get_color(&self, name: &str) -> Option<&Color> {
         self.colors.get(name)
     }
-;
+}
 
 /// Template type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -127,7 +127,7 @@ pub enum TemplateType {
     Qt,
     Custom,
     Unknown,
-;
+}
 
 /// Template data structure
 #[derive(Debug, Clone)]
@@ -136,7 +136,7 @@ pub struct Template {
     pub template_type: TemplateType,
     pub content: String,
     pub enabled: bool,
-;
+}
 
 impl Template {
     /// Create a new template
@@ -163,14 +163,14 @@ impl Template {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-;
+}
 
 /// Color scheme manager
 pub struct SigmaColorScheme {
     schemes: BTreeMap<String, ColorScheme>,
     templates: BTreeMap<String, Template>,
     running: AtomicBool,
-;
+}
 
 impl SigmaColorScheme {
     /// Create a new color scheme manager
@@ -294,13 +294,13 @@ impl SigmaColorScheme {
     pub fn template_count(&self) -> usize {
         self.templates.len()
     }
-;
+}
 
 impl Default for SigmaColorScheme {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaColorScheme instance (placeholder for actual global state)
 static mut SIGMACOLORSCHEME_INSTANCE: Option<SigmaColorScheme> = None;
@@ -310,17 +310,17 @@ pub fn init_sigmacolorscheme() {
     unsafe {
         SIGMACOLORSCHEME_INSTANCE = Some(SigmaColorScheme::new());
     }
-;
+}
 
 /// Get the global SigmaColorScheme instance
 pub fn get_sigmacolorscheme() -> Option<&'static SigmaColorScheme> {
     unsafe { SIGMACOLORSCHEME_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaColorScheme instance
 pub fn get_sigmacolorscheme_mut() -> Option<&'static mut SigmaColorScheme> {
     unsafe { SIGMACOLORSCHEME_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to generate a scheme
 pub fn generate_color_scheme(scheme: ColorScheme) -> bool {
@@ -329,7 +329,7 @@ pub fn generate_color_scheme(scheme: ColorScheme) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -488,4 +488,4 @@ mod tests {
         let color_mgr = get_sigmacolorscheme().unwrap();
         assert_eq!(color_mgr.scheme_count(), 1);
     }
-;
+}

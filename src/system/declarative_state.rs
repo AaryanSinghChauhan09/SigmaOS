@@ -20,7 +20,7 @@ pub struct PackageDeclaration {
     pub version: String,
     pub channel: String,
     pub pinned: bool,
-;
+}
 
 /// Service Declaration
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub struct ServiceDeclaration {
     pub enabled: bool,
     pub auto_restart: bool,
     pub environment_vars: BTreeMap<String, String>,
-;
+}
 
 /// Generation Snapshot Metadata
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ pub struct StateGeneration {
     pub timestamp_sec: u64,
     pub config_sha256: [u8; 32],
     pub state_snapshot_path: String,
-;
+}
 
 /// Core Declarative System State
 #[derive(Debug, Clone)]
@@ -49,7 +49,7 @@ pub struct SystemState {
     pub services: Vec<ServiceDeclaration>,
     pub generation_history: Vec<StateGeneration>,
     pub raw_toml: String,
-;
+}
 
 impl SystemState {
     pub fn new() -> Self {
@@ -174,13 +174,13 @@ impl SystemState {
     pub fn generation_count(&self) -> usize {
         self.generation_history.len()
     }
-;
+}
 
 impl Default for SystemState {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 #[cfg(test)]
 #[cfg(test)]
@@ -272,4 +272,4 @@ sshd = "disabled"
         assert_eq!(gen_meta.generation_id, gen2);
         assert!(gen_meta.state_snapshot_path.contains("generation_2.cow"));
     }
-;
+}

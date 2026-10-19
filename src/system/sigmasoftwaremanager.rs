@@ -28,7 +28,7 @@ pub enum AppCategory {
     Utilities,
     Accessories,
     Other,
-;
+}
 
 /// Application status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,14 +37,14 @@ pub enum AppStatus {
     NotInstalled,
     UpdateAvailable,
     Broken,
-;
+}
 
 /// Rating score
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Rating {
     pub score: u8, // 0-5
     pub count: u32,
-;
+}
 
 impl Rating {
     pub fn new(score: u8, count: u32) -> Self {
@@ -53,7 +53,7 @@ impl Rating {
             count,
         }
     }
-;
+}
 
 /// Application
 #[derive(Debug, Clone)]
@@ -71,7 +71,7 @@ pub struct Application {
     pub rating: Rating,
     pub icon: String,
     pub screenshots: Vec<String>,
-;
+}
 
 impl Application {
     pub fn new(id: String, name: String, summary: String, description: String, category: AppCategory, version: String) -> Self {
@@ -123,14 +123,14 @@ impl Application {
     pub fn is_installed(&self) -> bool {
         self.status == AppStatus::Installed || self.status == AppStatus::UpdateAvailable
     }
-;
+}
 
 /// SigmaSoftwareManager - Software management system
 #[derive(Debug)]
 pub struct SigmaSoftwareManager {
     applications: BTreeMap<String, Application>,
     categories: BTreeMap<AppCategory, Vec<String>>, // category -> app IDs
-;
+}
 
 impl SigmaSoftwareManager {
     pub fn new() -> Self {
@@ -218,13 +218,13 @@ impl SigmaSoftwareManager {
             .filter(|app| app.needs_update())
             .count()
     }
-;
+}
 
 impl Default for SigmaSoftwareManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaSoftwareManager instance
 static mut SIGMASOFTWAREMANAGER_INSTANCE: Option<SigmaSoftwareManager> = None;
@@ -234,21 +234,21 @@ pub fn init_sigmasoftwaremanager() {
     unsafe {
         SIGMASOFTWAREMANAGER_INSTANCE = Some(SigmaSoftwareManager::new());
     }
-;
+}
 
 /// Get the global SigmaSoftwareManager instance
 pub fn get_sigmasoftwaremanager() -> Option<&'static SigmaSoftwareManager> {
     unsafe {
         SIGMASOFTWAREMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaSoftwareManager instance (mutable)
 pub fn get_sigmasoftwaremanager_mut() -> Option<&'static mut SigmaSoftwareManager> {
     unsafe {
         SIGMASOFTWAREMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add an application
 pub fn add_application(app: Application) -> bool {
@@ -258,7 +258,7 @@ pub fn add_application(app: Application) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -345,4 +345,4 @@ mod tests {
         let results = manager.search_applications("browser");
         assert_eq!(results.len(), 1);
     }
-;
+}

@@ -13,7 +13,7 @@ pub enum UpdateLevel {
     Recommended = 2,
     Feature = 3,
     Unstable = 4,
-;
+}
 
 impl UpdateLevel {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -34,7 +34,7 @@ impl UpdateLevel {
             UpdateLevel::Unstable => "Unstable",
         }
     }
-;
+}
 
 /// Update category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum UpdateCategory {
     Bugfix,
     Feature,
     Dependency,
-;
+}
 
 impl UpdateCategory {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -67,7 +67,7 @@ impl UpdateCategory {
             UpdateCategory::Dependency => "Dependency",
         }
     }
-;
+}
 
 /// Update package information
 #[derive(Debug, Clone)]
@@ -82,7 +82,7 @@ pub struct UpdatePackage {
     pub source: String,
     pub is_security: bool,
     pub timestamp: u64,
-;
+}
 
 impl UpdatePackage {
     pub fn new(
@@ -126,7 +126,7 @@ impl UpdatePackage {
     pub fn mark_security(&mut self) {
         self.is_security = true;
     }
-;
+}
 
 /// Update manager configuration
 #[derive(Debug, Clone)]
@@ -138,7 +138,7 @@ pub struct UpdateConfig {
     pub check_interval_hours: u32,
     pub notify_updates: bool,
     pub blacklist: Vec<String>,
-;
+}
 
 impl Default for UpdateConfig {
     fn default() -> Self {
@@ -152,7 +152,7 @@ impl Default for UpdateConfig {
             blacklist: Vec::new(),
         }
     }
-;
+}
 
 /// Update manager
 #[derive(Debug)]
@@ -162,7 +162,7 @@ pub struct UpdateManager {
     config: UpdateConfig,
     update_count: u32,
     security_count: u32,
-;
+}
 
 impl UpdateManager {
     pub fn new() -> Self {
@@ -378,13 +378,13 @@ impl UpdateManager {
             installed_count: self.installed_updates.len(),
         }
     }
-;
+}
 
 impl Default for UpdateManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Update statistics
 #[derive(Debug, Clone)]
@@ -398,7 +398,7 @@ pub struct UpdateStatistics {
     pub total_size: u64,
     pub blacklist_count: usize,
     pub installed_count: usize,
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -482,4 +482,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert!(stats.total_updates > 0);
     }
-;
+}

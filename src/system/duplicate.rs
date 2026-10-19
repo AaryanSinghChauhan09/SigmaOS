@@ -29,7 +29,7 @@ pub trait HashAlgorithm {
     fn compute_hash(&self, path: &Path) -> Result<String, DuplicateError>;
     /// Get algorithm name
     fn name(&self) -> &str;
-;
+}
 
 /// SHA-256 hash algorithm
 pub struct Sha256Algorithm;
@@ -49,7 +49,7 @@ impl HashAlgorithm for Sha256Algorithm {
     fn name(&self) -> &str {
         "SHA256"
     }
-;
+}
 
 /// File metadata for comparison
 #[derive(Debug, Clone)]
@@ -57,7 +57,7 @@ pub struct FileMetadata {
     pub path: PathBuf,
     pub size: u64,
     pub hash: Option<String>,
-;
+}
 
 impl FileMetadata {
     pub fn new(path: PathBuf, size: u64) -> Self {
@@ -67,7 +67,7 @@ impl FileMetadata {
             hash: None,
         }
     }
-;
+}
 
 /// Duplicate file group
 #[derive(Debug, Clone)]
@@ -75,7 +75,7 @@ pub struct DuplicateGroup {
     pub hash: String,
     pub files: Vec<FileMetadata>,
     pub total_size: u64,
-;
+}
 
 impl DuplicateGroup {
     pub fn new(hash: String) -> Self {
@@ -102,7 +102,7 @@ impl DuplicateGroup {
             0
         }
     }
-;
+}
 
 /// Scan statistics
 #[derive(Debug, Clone, Default)]
@@ -112,7 +112,7 @@ pub struct ScanStats {
     pub duplicates_found: usize,
     pub total_duplicate_size: u64,
     pub potential_savings: u64,
-;
+}
 
 /// OOP-based Duplicate File Finder
 pub struct DuplicateFinder {
@@ -120,7 +120,7 @@ pub struct DuplicateFinder {
     min_file_size: u64,
     scan_stats: ScanStats,
     duplicate_groups: Vec<DuplicateGroup>,
-;
+}
 
 impl DuplicateFinder {
     pub fn new(algorithm: Box<dyn HashAlgorithm>) -> Self {
@@ -216,13 +216,13 @@ impl DuplicateFinder {
     pub fn total_savings(&self) -> u64 {
         self.scan_stats.potential_savings
     }
-;
+}
 
 impl Default for DuplicateFinder {
     fn default() -> Self {
         Self::new(Box::new(Sha256Algorithm))
     }
-;
+}
 
 /// Duplicate file errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -231,7 +231,7 @@ pub enum DuplicateError {
     IoError(String),
     PermissionDenied(String),
     HashError(String),
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -270,4 +270,4 @@ mod tests {
         let finder = DuplicateFinder::default();
         assert_eq!(finder.min_file_size, 1024);
     }
-;
+}

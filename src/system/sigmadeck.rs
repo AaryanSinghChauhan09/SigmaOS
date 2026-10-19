@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-;
+}
 
 /// Slide transition type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,7 +22,7 @@ pub enum SlideTransition {
     Zoom,
     Flip,
     Rotate,
-;
+}
 
 /// Slide element type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum SlideElementType {
     Chart,
     Video,
     Table,
-;
+}
 
 /// Slide element
 #[derive(Debug, Clone)]
@@ -45,7 +45,7 @@ pub struct SlideElement {
     pub position_y: f32,
     pub width: f32,
     pub height: f32,
-;
+}
 
 impl SlideElement {
     pub fn new(id: String, element_type: SlideElementType, content: String) -> Self {
@@ -69,7 +69,7 @@ impl SlideElement {
         self.width = width;
         self.height = height;
     }
-;
+}
 
 /// Slide
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct Slide {
     pub elements: BTreeMap<String, SlideElement>,
     pub transition: SlideTransition,
     pub duration: u32, // in seconds
-;
+}
 
 impl Slide {
     pub fn new(id: String, number: u32, title: String) -> Self {
@@ -123,7 +123,7 @@ impl Slide {
     pub fn element_count(&self) -> usize {
         self.elements.len()
     }
-;
+}
 
 /// Presentation deck
 #[derive(Debug, Clone)]
@@ -133,7 +133,7 @@ pub struct PresentationDeck {
     pub author: String,
     pub slides: BTreeMap<String, Slide>,
     pub slide_count: u32,
-;
+}
 
 impl PresentationDeck {
     pub fn new(id: String, name: String) -> Self {
@@ -171,7 +171,7 @@ impl PresentationDeck {
     pub fn set_author(&mut self, author: String) {
         self.author = author;
     }
-;
+}
 
 /// SigmaDeck - Deck and presentation system
 #[derive(Debug)]
@@ -179,7 +179,7 @@ pub struct SigmaDeck {
     decks: BTreeMap<String, PresentationDeck>,
     current_deck: Option<String>,
     current_slide: Option<String>,
-;
+}
 
 impl SigmaDeck {
     pub fn new() -> Self {
@@ -311,13 +311,13 @@ impl SigmaDeck {
     pub fn deck_count(&self) -> usize {
         self.decks.len()
     }
-;
+}
 
 impl Default for SigmaDeck {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaDeck instance
 static mut SIGMADECK_INSTANCE: Option<SigmaDeck> = None;
@@ -327,21 +327,21 @@ pub fn init_sigmadeck() {
     unsafe {
         SIGMADECK_INSTANCE = Some(SigmaDeck::new());
     }
-;
+}
 
 /// Get the global SigmaDeck instance
 pub fn get_sigmadeck() -> Option<&'static SigmaDeck> {
     unsafe {
         SIGMADECK_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaDeck instance (mutable)
 pub fn get_sigmadeck_mut() -> Option<&'static mut SigmaDeck> {
     unsafe {
         SIGMADECK_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a deck
 pub fn add_deck(deck: PresentationDeck) -> bool {
@@ -351,7 +351,7 @@ pub fn add_deck(deck: PresentationDeck) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -432,4 +432,4 @@ mod tests {
         assert!(deck_sys.next_slide());
         assert!(!deck_sys.next_slide());
     }
-;
+}

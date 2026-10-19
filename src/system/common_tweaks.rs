@@ -17,11 +17,11 @@ pub enum SysctlCategory {
     Networking,
     Kernel,
     FileSystem,
-;
+}
 
 pub struct DistroSysctlTweaksEngine {
     pub active_sysctls: BTreeMap<String, String>,
-;
+}
 
 impl DistroSysctlTweaksEngine {
     pub fn new() -> Self {
@@ -69,7 +69,7 @@ impl DistroSysctlTweaksEngine {
             _ => Err("Unknown sysctl preset name"),
         }
     }
-;
+}
 
 // ============================================================================
 // CachyOS ZRAM & Swappiness Memory Tweaks
@@ -80,13 +80,13 @@ pub enum ZramCompressionAlgorithm {
     Zstd,
     Lz4,
     Lzo,
-;
+}
 
 pub struct CachyOsMemorySchedulerTweaks {
     pub zram_size_ratio_percent: u32,
     pub compression_algo: ZramCompressionAlgorithm,
     pub thp_madvise_enabled: bool,
-;
+}
 
 impl CachyOsMemorySchedulerTweaks {
     pub fn new() -> Self {
@@ -104,7 +104,7 @@ impl CachyOsMemorySchedulerTweaks {
             zram_gb, self.compression_algo
         )
     }
-;
+}
 
 // ============================================================================
 // FreeBSD Network Stack Scaling Tweaks
@@ -114,7 +114,7 @@ pub struct BsdNetworkStackTweaks {
     pub is_bbr_enabled: bool,
     pub max_socket_backlog: u32,
     pub syn_flood_cookie_protection: bool,
-;
+}
 
 impl BsdNetworkStackTweaks {
     pub fn new() -> Self {
@@ -131,7 +131,7 @@ impl BsdNetworkStackTweaks {
             self.max_socket_backlog
         )
     }
-;
+}
 
 // ============================================================================
 // Low-Latency Gaming & Audio Tweaks
@@ -142,13 +142,13 @@ pub enum NVmeIoScheduler {
     None,
     Kyber,
     Bfq,
-;
+}
 
 pub struct GamingAndLowLatencyTweaks {
     pub io_scheduler: NVmeIoScheduler,
     pub real_time_audio_priority: u32,
     pub power_governor: String,
-;
+}
 
 impl GamingAndLowLatencyTweaks {
     pub fn new() -> Self {
@@ -165,31 +165,31 @@ impl GamingAndLowLatencyTweaks {
             self.io_scheduler, self.real_time_audio_priority, self.power_governor
         )
     }
-;
+}
 
 impl Default for DistroSysctlTweaksEngine {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 impl Default for CachyOsMemorySchedulerTweaks {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 impl Default for BsdNetworkStackTweaks {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 impl Default for GamingAndLowLatencyTweaks {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 #[cfg(test)]
 #[cfg(test)]
@@ -231,4 +231,4 @@ mod tests {
         assert!(status.contains("NVMe scheduler set to None"));
         assert!(status.contains("Audio RT priority 95"));
     }
-;
+}

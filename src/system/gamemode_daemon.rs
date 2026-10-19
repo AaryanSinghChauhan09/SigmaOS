@@ -3,26 +3,26 @@ pub enum CpuGovernor {
     Performance,
     Powersave,
     Schedutil,
-;
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum GpuProfile {
     Auto,
     HighPerformance,
-;
+}
 
 pub struct GameModeClient {
     pub pid: u32,
     pub original_governor: CpuGovernor,
     pub original_priority: i32,
-;
+}
 
 pub struct GameModeDaemon {
     pub active_clients: Vec<GameModeClient>,
     pub current_governor: CpuGovernor,
     pub current_gpu_profile: GpuProfile,
     pub compositor_unredirect: bool,
-;
+}
 
 impl GameModeDaemon {
     pub fn new() -> Self {
@@ -63,7 +63,7 @@ impl GameModeDaemon {
         self.current_gpu_profile = GpuProfile::Auto;
         self.compositor_unredirect = false;
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -112,4 +112,4 @@ mod tests {
         assert_eq!(daemon.active_clients.len(), 1);
         assert_eq!(daemon.current_governor, CpuGovernor::Performance); // Still in gamemode
     }
-;
+}

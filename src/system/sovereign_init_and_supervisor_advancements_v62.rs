@@ -28,7 +28,7 @@ pub struct CoreUserlandV62Manifest {
     pub components_added: Vec<String>,
     pub performance_multiplier: String,
     pub status: String,
-;
+}
 
 // ============================================================================
 // 1. SYSTEMD ADVANCEMENTS V62 ENGINE
@@ -42,7 +42,7 @@ pub struct SystemdUnitSpecV62 {
     pub wants: Vec<String>,
     pub after: Vec<String>,
     pub before: Vec<String>,
-;
+}
 
 /// systemd Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -149,7 +149,7 @@ impl SystemdAdvancementsV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 2. OPENRC ADVANCEMENTS V62 ENGINE
@@ -162,7 +162,7 @@ pub enum OpenRcRunlevel {
     Boot,
     Default,
     Shutdown,
-;
+}
 
 /// OpenRC Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -210,7 +210,7 @@ impl OpenRcAdvancementsV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 3. RUNIT & S6 ADVANCEMENTS V62 ENGINE
@@ -224,7 +224,7 @@ pub struct RunsvServiceState {
     pub pid: Option<u32>,
     pub restart_count: u32,
     pub backoff_delay_sec: u32,
-;
+}
 
 /// Runit & s6 Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -272,7 +272,7 @@ impl RunitS6AdvancementsV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 4. SYSVINIT ADVANCEMENTS V62 ENGINE
@@ -287,7 +287,7 @@ pub struct LsbInitHeaderSpec {
     pub default_start: Vec<u8>,
     pub default_stop: Vec<u8>,
     pub short_description: String,
-;
+}
 
 /// SysVinit Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -374,7 +374,7 @@ impl SysVinitAdvancementsV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V62 ENGINE
@@ -388,7 +388,7 @@ pub struct BsdRcorderSpec {
     pub require: Vec<String>,
     pub before: Vec<String>,
     pub keywords: Vec<String>,
-;
+}
 
 /// BSD rc Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -463,7 +463,7 @@ impl BsdRcAdvancementsV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V62 ENGINE
@@ -475,7 +475,7 @@ pub struct LaunchdKeepAliveSpec {
     pub successful_exit: Option<bool>,
     pub network_state: Option<bool>,
     pub path_state: BTreeMap<String, bool>,
-;
+}
 
 /// launchd & Android init Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -526,7 +526,7 @@ impl LaunchdAndroidInitAdvancementsV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 7. CRON, ANACRON, TIMERS & AT ADVANCEMENTS V62 ENGINE
@@ -542,7 +542,7 @@ pub enum CronScheduleSpec {
     MacroMonthly,
     StepInterval { minutes_step: u8 },
     Custom { minute: String, hour: String, dom: String, month: String, dow: String },
-;
+}
 
 /// Cron, Anacron, Timers & At Advancements V62 Engine.
 #[derive(Debug, Default)]
@@ -624,7 +624,7 @@ impl CronAnacronTimersAtV62Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // MASTER SUITE
@@ -640,7 +640,7 @@ pub struct SovereignInitAndSupervisorAdvancementsV62Suite {
     pub bsd_rc_engine: BsdRcAdvancementsV62Engine,
     pub launchd_android_engine: LaunchdAndroidInitAdvancementsV62Engine,
     pub cron_timers_engine: CronAnacronTimersAtV62Engine,
-;
+}
 
 impl SovereignInitAndSupervisorAdvancementsV62Suite {
     pub fn new() -> Self {
@@ -709,7 +709,7 @@ impl SovereignInitAndSupervisorAdvancementsV62Suite {
 
         true
     }
-;
+}
 
 // ============================================================================
 // TESTS
@@ -847,4 +847,4 @@ mod tests {
 
         assert!(suite.run_master_verification());
     }
-;
+}

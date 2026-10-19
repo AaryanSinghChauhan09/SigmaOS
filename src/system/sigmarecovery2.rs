@@ -17,7 +17,7 @@ pub enum RecoveryType {
     FsckRepair,
     ConfigRestore,
     Unknown,
-;
+}
 
 /// Recovery state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub enum RecoveryState {
     Completed,
     Failed,
     Unknown,
-;
+}
 
 /// Recovery task data structure
 #[derive(Debug, Clone)]
@@ -36,7 +36,7 @@ pub struct RecoveryTask {
     pub name: String,
     pub recovery_type: RecoveryType,
     pub state: RecoveryState,
-;
+}
 
 impl RecoveryTask {
     pub fn new(task_id: String, name: String, recovery_type: RecoveryType) -> Self {
@@ -47,13 +47,13 @@ impl RecoveryTask {
             state: RecoveryState::Pending,
         }
     }
-;
+}
 
 /// Recovery manager
 pub struct SigmaRecovery {
     tasks: BTreeMap<String, RecoveryTask>,
     running: AtomicBool,
-;
+}
 
 impl SigmaRecovery {
     pub fn new() -> Self {
@@ -87,13 +87,13 @@ impl SigmaRecovery {
     pub fn task_count(&self) -> usize {
         self.tasks.len()
     }
-;
+}
 
 impl Default for SigmaRecovery {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMARECOVERY_INSTANCE: Option<SigmaRecovery> = None;
 
@@ -101,13 +101,13 @@ pub fn init_sigmarecovery() {
     unsafe {
         SIGMARECOVERY_INSTANCE = Some(SigmaRecovery::new());
     }
-;
+}
 pub fn get_sigmarecovery() -> Option<&'static SigmaRecovery> {
     unsafe { SIGMARECOVERY_INSTANCE.as_ref() }
-;
+}
 pub fn get_sigmarecovery_mut() -> Option<&'static mut SigmaRecovery> {
     unsafe { SIGMARECOVERY_INSTANCE.as_mut() }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -117,4 +117,4 @@ mod tests {
         let recovery = SigmaRecovery::new();
         assert!(!recovery.is_running());
     }
-;
+}

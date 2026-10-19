@@ -26,7 +26,7 @@ pub enum AuditEventType {
     Network,
     /// Authentication
     Auth,
-;
+}
 
 impl fmt::Display for AuditEventType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for AuditEventType {
             AuditEventType::Auth => write!(f, "auth"),
         }
     }
-;
+}
 
 /// Audit severity
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,7 +51,7 @@ pub enum AuditSeverity {
     Error,
     /// Critical
     Critical,
-;
+}
 
 impl fmt::Display for AuditSeverity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,7 +62,7 @@ impl fmt::Display for AuditSeverity {
             AuditSeverity::Critical => write!(f, "critical"),
         }
     }
-;
+}
 
 /// Audit event
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct AuditEvent {
     pub message: String,
     /// Timestamp
     pub timestamp: u64,
-;
+}
 
 impl AuditEvent {
     /// Create a new audit event
@@ -109,7 +109,7 @@ impl AuditEvent {
         self.timestamp = timestamp;
         self
     }
-;
+}
 
 /// SigmaAudit - System Audit Daemon
 pub struct SigmaAudit {
@@ -119,7 +119,7 @@ pub struct SigmaAudit {
     running: bool,
     /// Event counter
     event_counter: u32,
-;
+}
 
 impl SigmaAudit {
     /// Create a new SigmaAudit instance
@@ -224,13 +224,13 @@ impl SigmaAudit {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaAudit {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaAudit instance (placeholder for actual global state)
 static mut SIGMAAUDIT_INSTANCE: Option<SigmaAudit> = None;
@@ -240,12 +240,12 @@ pub fn init_sigmait() {
     unsafe {
         SIGMAAUDIT_INSTANCE = Some(SigmaAudit::new());
     }
-;
+}
 
 /// Get the global SigmaAudit instance
 pub fn get_sigmait() -> Option<&'static mut SigmaAudit> {
     unsafe { SIGMAAUDIT_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to log an audit event
 pub fn log_audit_event(event: AuditEvent) -> Result<(), String> {
@@ -254,7 +254,7 @@ pub fn log_audit_event(event: AuditEvent) -> Result<(), String> {
     } else {
         Err("SigmaAudit not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -416,4 +416,4 @@ mod tests {
         let result = log_audit_event(event);
         assert!(result.is_ok());
     }
-;
+}

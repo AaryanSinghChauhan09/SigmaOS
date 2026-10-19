@@ -20,7 +20,7 @@ pub struct PreloadEntry {
     pub loaded: AtomicBool,
     pub last_loaded: AtomicU64, // timestamp
     pub load_count: AtomicU32,
-;
+}
 
 impl PreloadEntry {
     pub fn new(name: String, path: String, priority: u32) -> Self {
@@ -56,7 +56,7 @@ impl PreloadEntry {
     pub fn get_load_count(&self) -> u32 {
         self.load_count.load(Ordering::Relaxed)
     }
-;
+}
 
 /// Preload manager
 pub struct PreloadManager {
@@ -64,7 +64,7 @@ pub struct PreloadManager {
     pub enabled: AtomicBool,
     pub max_memory: u64,           // bytes
     pub current_memory: AtomicU64, // bytes
-;
+}
 
 impl PreloadManager {
     pub fn new() -> Self {
@@ -202,13 +202,13 @@ impl PreloadManager {
     pub fn get_total_count(&self) -> u32 {
         self.entries.len() as u32
     }
-;
+}
 
 impl Default for PreloadManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global preload manager
 static mut PRELOAD_MANAGER: Option<PreloadManager> = None;
@@ -218,12 +218,12 @@ pub fn init_preload_manager() {
     unsafe {
         PRELOAD_MANAGER = Some(PreloadManager::new());
     }
-;
+}
 
 /// Get global preload manager
 pub fn get_preload_manager() -> Option<&'static mut PreloadManager> {
     unsafe { PRELOAD_MANAGER.as_mut() }
-;
+}
 
 /// Add common applications to preload
 pub fn add_common_preloads() {
@@ -250,7 +250,7 @@ pub fn add_common_preloads() {
             85,
         ));
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -337,4 +337,4 @@ mod tests {
         manager.load_entry("test").unwrap(); // Should fail on second load
         assert!(manager.load_entry("test").is_err());
     }
-;
+}

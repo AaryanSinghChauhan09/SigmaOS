@@ -17,7 +17,7 @@ pub enum SnapType {
     Gadget,
     Kernel,
     Unknown,
-;
+}
 
 /// Snap state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,7 +26,7 @@ pub enum SnapState {
     NotInstalled,
     UpdateAvailable,
     Unknown,
-;
+}
 
 /// Snap data structure
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ pub struct Snap {
     pub state: SnapState,
     pub channel: String,
     pub size: u64,
-;
+}
 
 impl Snap {
     /// Create a new Snap
@@ -74,13 +74,13 @@ impl Snap {
     pub fn is_installed(&self) -> bool {
         self.state == SnapState::Installed
     }
-;
+}
 
 /// Snap manager
 pub struct SigmaSnap {
     snaps: BTreeMap<String, Snap>,
     running: AtomicBool,
-;
+}
 
 impl SigmaSnap {
     /// Create a new Snap manager
@@ -165,13 +165,13 @@ impl SigmaSnap {
     pub fn snap_count(&self) -> usize {
         self.snaps.len()
     }
-;
+}
 
 impl Default for SigmaSnap {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaSnap instance
 static mut SIGMASNAP_INSTANCE: Option<SigmaSnap> = None;
@@ -181,17 +181,17 @@ pub fn init_sigmasnap() {
     unsafe {
         SIGMASNAP_INSTANCE = Some(SigmaSnap::new());
     }
-;
+}
 
 /// Get the global SigmaSnap instance
 pub fn get_sigmasnap() -> Option<&'static SigmaSnap> {
     unsafe { SIGMASNAP_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaSnap instance
 pub fn get_sigmasnap_mut() -> Option<&'static mut SigmaSnap> {
     unsafe { SIGMASNAP_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a Snap
 pub fn add_snap(snap: Snap) -> bool {
@@ -200,7 +200,7 @@ pub fn add_snap(snap: Snap) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to install a Snap
 pub fn install_snap(snap_id: &str) -> bool {
@@ -209,7 +209,7 @@ pub fn install_snap(snap_id: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -296,4 +296,4 @@ mod tests {
         let snap_mgr = get_sigmasnap().unwrap();
         assert_eq!(snap_mgr.snap_count(), 1);
     }
-;
+}

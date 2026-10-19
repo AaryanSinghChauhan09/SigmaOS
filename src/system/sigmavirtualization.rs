@@ -23,7 +23,7 @@ pub enum VMState {
     Suspended,
     Error,
     Unknown,
-;
+}
 
 /// VM architecture
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum Architecture {
     ARM64,
     RISCV64,
     Unknown,
-;
+}
 
 /// Disk interface type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,7 +43,7 @@ pub enum DiskInterface {
     NVMe,
     VirtIO,
     Unknown,
-;
+}
 
 /// Network interface type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,7 +52,7 @@ pub enum NetworkInterface {
     VirtIO,
     RTL8139,
     Unknown,
-;
+}
 
 /// Virtual disk
 #[derive(Debug, Clone)]
@@ -62,7 +62,7 @@ pub struct VirtualDisk {
     pub size: u64,
     pub interface: DiskInterface,
     pub bootable: bool,
-;
+}
 
 impl VirtualDisk {
     pub fn new(id: String, path: String, size: u64, interface: DiskInterface) -> Self {
@@ -79,7 +79,7 @@ impl VirtualDisk {
         self.bootable = bootable;
         self
     }
-;
+}
 
 /// Virtual network adapter
 #[derive(Debug, Clone)]
@@ -88,7 +88,7 @@ pub struct VirtualNetwork {
     pub interface_type: NetworkInterface,
     pub mac_address: Option<String>,
     pub bridge: Option<String>,
-;
+}
 
 impl VirtualNetwork {
     pub fn new(id: String, interface_type: NetworkInterface) -> Self {
@@ -109,7 +109,7 @@ impl VirtualNetwork {
         self.bridge = Some(bridge);
         self
     }
-;
+}
 
 /// VM resource allocation
 #[derive(Debug, Clone)]
@@ -117,7 +117,7 @@ pub struct VMResources {
     pub cpu_cores: u32,
     pub memory_mb: u64,
     pub vcpus: u32,
-;
+}
 
 impl VMResources {
     pub fn new(cpu_cores: u32, memory_mb: u64) -> Self {
@@ -132,7 +132,7 @@ impl VMResources {
         self.vcpus = vcpus;
         self
     }
-;
+}
 
 /// Virtual machine
 #[derive(Debug, Clone)]
@@ -147,7 +147,7 @@ pub struct VirtualMachine {
     pub created_at: u64,
     pub started_at: Option<u64>,
     pub stopped_at: Option<u64>,
-;
+}
 
 impl VirtualMachine {
     pub fn new(
@@ -214,13 +214,13 @@ impl VirtualMachine {
     pub fn suspend(&mut self) {
         self.state = VMState::Suspended;
     }
-;
+}
 
 /// Virtualization manager
 pub struct SigmaVirtualization {
     vms: BTreeMap<String, VirtualMachine>,
     next_vm_id: u64,
-;
+}
 
 impl SigmaVirtualization {
     pub fn new() -> Self {
@@ -345,13 +345,13 @@ impl SigmaVirtualization {
             .filter(|v| v.state == VMState::Running)
             .count()
     }
-;
+}
 
 impl Default for SigmaVirtualization {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAVIRTUALIZATION_INSTANCE: Option<SigmaVirtualization> = None;
 
@@ -359,7 +359,7 @@ pub fn init_sigmavirtualization() {
     unsafe {
         SIGMAVIRTUALIZATION_INSTANCE = Some(SigmaVirtualization::new());
     }
-;
+}
 
 pub fn get_sigmavirtualization() -> &'static SigmaVirtualization {
     unsafe {
@@ -367,7 +367,7 @@ pub fn get_sigmavirtualization() -> &'static SigmaVirtualization {
             .as_ref()
             .expect("SigmaVirtualization not initialized")
     }
-;
+}
 
 pub fn get_sigmavirtualization_mut() -> &'static mut SigmaVirtualization {
     unsafe {
@@ -375,12 +375,12 @@ pub fn get_sigmavirtualization_mut() -> &'static mut SigmaVirtualization {
             .as_mut()
             .expect("SigmaVirtualization not initialized")
     }
-;
+}
 
 pub fn create_vm(name: String, architecture: Architecture, resources: VMResources) -> String {
     let manager = get_sigmavirtualization_mut();
     manager.create_vm(name, architecture, resources)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -597,4 +597,4 @@ mod tests {
         let manager = get_sigmavirtualization();
         assert!(manager.get_vm(&id).is_some());
     }
-;
+}

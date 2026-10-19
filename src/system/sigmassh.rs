@@ -24,7 +24,7 @@ pub enum SshConnectionState {
     Established,
     /// Closed
     Closed,
-;
+}
 
 impl fmt::Display for SshConnectionState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for SshConnectionState {
             SshConnectionState::Closed => write!(f, "closed"),
         }
     }
-;
+}
 
 /// SSH authentication method
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +46,7 @@ pub enum SshAuthMethod {
     PublicKey,
     /// Keyboard-interactive
     KeyboardInteractive,
-;
+}
 
 impl fmt::Display for SshAuthMethod {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for SshAuthMethod {
             SshAuthMethod::KeyboardInteractive => write!(f, "keyboard-interactive"),
         }
     }
-;
+}
 
 /// SSH connection
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct SshConnection {
     pub auth_method: SshAuthMethod,
     /// State
     pub state: SshConnectionState,
-;
+}
 
 impl SshConnection {
     /// Create a new SSH connection
@@ -104,7 +104,7 @@ impl SshConnection {
         self.state = state;
         self
     }
-;
+}
 
 /// SigmaSSH - System SSH Server
 pub struct SigmaSSH {
@@ -114,7 +114,7 @@ pub struct SigmaSSH {
     running: bool,
     /// Connection counter
     connection_counter: u32,
-;
+}
 
 impl SigmaSSH {
     /// Create a new SigmaSSH instance
@@ -253,13 +253,13 @@ impl SigmaSSH {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-;
+}
 
 impl Default for SigmaSSH {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaSSH instance (placeholder for actual global state)
 static mut SIGMASSH_INSTANCE: Option<SigmaSSH> = None;
@@ -269,12 +269,12 @@ pub fn init_sigmassh() {
     unsafe {
         SIGMASSH_INSTANCE = Some(SigmaSSH::new());
     }
-;
+}
 
 /// Get the global SigmaSSH instance
 pub fn get_sigmassh() -> Option<&'static mut SigmaSSH> {
     unsafe { SIGMASSH_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to authenticate a connection
 pub fn authenticate_ssh_connection(
@@ -286,7 +286,7 @@ pub fn authenticate_ssh_connection(
     } else {
         Err("SigmaSSH not initialized".to_string())
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -445,4 +445,4 @@ mod tests {
         let result = authenticate_ssh_connection("conn1", SshAuthMethod::PublicKey);
         assert!(result.is_ok());
     }
-;
+}

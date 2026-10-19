@@ -12,7 +12,7 @@ pub enum TaskProcessState {
     Sleeping,
     Stopped,
     Zombie,
-;
+}
 
 impl TaskProcessState {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -33,7 +33,7 @@ impl TaskProcessState {
             TaskProcessState::Zombie => "Zombie",
         }
     }
-;
+}
 
 /// Process entry
 #[derive(Debug, Clone)]
@@ -46,7 +46,7 @@ pub struct TaskProcessEntry {
     pub memory_mb: f32,
     pub user: String,
     pub threads: u32,
-;
+}
 
 impl TaskProcessEntry {
     pub fn new(pid: u32, name: String, command: String) -> Self {
@@ -73,14 +73,14 @@ impl TaskProcessEntry {
     pub fn set_memory(&mut self, memory: f32) {
         self.memory_mb = memory;
     }
-;
+}
 
 /// Task manager
 #[derive(Debug)]
 pub struct ProcessTaskManager {
     processes: HashMap<u32, TaskProcessEntry>,
     next_pid: u32,
-;
+}
 
 impl ProcessTaskManager {
     pub fn new() -> Self {
@@ -261,13 +261,13 @@ impl ProcessTaskManager {
             total_memory,
         }
     }
-;
+}
 
 impl Default for ProcessTaskManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Task manager statistics
 #[derive(Debug, Clone)]
@@ -278,7 +278,7 @@ pub struct ProcessTaskStatistics {
     pub zombie_count: usize,
     pub total_cpu: f32,
     pub total_memory: f32,
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -356,4 +356,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert!(stats.total_processes >= 5);
     }
-;
+}

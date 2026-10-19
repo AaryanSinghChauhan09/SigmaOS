@@ -19,7 +19,7 @@ pub enum AudioDeviceType {
     Sink,
     Source,
     Unknown,
-;
+}
 
 /// Audio device state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum AudioDeviceState {
     Idle,
     Suspended,
     Unknown,
-;
+}
 
 /// Audio device
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub struct AudioDevice {
     pub volume: u8,
     pub muted: bool,
     pub description: String,
-;
+}
 
 impl AudioDevice {
     pub fn new(id: String, name: String, device_type: AudioDeviceType) -> Self {
@@ -79,7 +79,7 @@ impl AudioDevice {
     pub fn suspend(&mut self) {
         self.state = AudioDeviceState::Suspended;
     }
-;
+}
 
 /// Audio manager
 pub struct SigmaSound {
@@ -87,7 +87,7 @@ pub struct SigmaSound {
     next_device_id: u64,
     default_sink: Option<String>,
     default_source: Option<String>,
-;
+}
 
 impl SigmaSound {
     pub fn new() -> Self {
@@ -149,13 +149,13 @@ impl SigmaSound {
     pub fn device_count(&self) -> usize {
         self.devices.len()
     }
-;
+}
 
 impl Default for SigmaSound {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMASOUND_INSTANCE: Option<SigmaSound> = None;
 
@@ -163,7 +163,7 @@ pub fn init_sigmasound() {
     unsafe {
         SIGMASOUND_INSTANCE = Some(SigmaSound::new());
     }
-;
+}
 
 pub fn get_sigmasound() -> &'static SigmaSound {
     unsafe {
@@ -171,7 +171,7 @@ pub fn get_sigmasound() -> &'static SigmaSound {
             .as_ref()
             .expect("SigmaSound not initialized")
     }
-;
+}
 
 pub fn get_sigmasound_mut() -> &'static mut SigmaSound {
     unsafe {
@@ -179,12 +179,12 @@ pub fn get_sigmasound_mut() -> &'static mut SigmaSound {
             .as_mut()
             .expect("SigmaSound not initialized")
     }
-;
+}
 
 pub fn add_device(name: String, device_type: AudioDeviceType) -> String {
     let manager = get_sigmasound_mut();
     manager.add_device(name, device_type)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -307,4 +307,4 @@ mod tests {
         let manager = get_sigmasound();
         assert!(manager.get_device(&id).is_some());
     }
-;
+}

@@ -20,7 +20,7 @@ pub enum TextAlignment {
     Center,
     Right,
     Justify,
-;
+}
 
 /// Font style
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum FontStyle {
     Bold,
     Italic,
     BoldItalic,
-;
+}
 
 /// Paragraph
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct Paragraph {
     pub font_style: FontStyle,
     pub indent: u32,
     pub line_spacing: f32,
-;
+}
 
 impl Paragraph {
     pub fn new(id: String, text: String) -> Self {
@@ -83,7 +83,7 @@ impl Paragraph {
     pub fn char_count(&self) -> usize {
         self.text.chars().count()
     }
-;
+}
 
 /// Document
 #[derive(Debug, Clone)]
@@ -95,7 +95,7 @@ pub struct Document {
     pub paragraphs: BTreeMap<String, Paragraph>,
     pub word_count: usize,
     pub char_count: usize,
-;
+}
 
 impl Document {
     pub fn new(id: String, name: String) -> Self {
@@ -144,14 +144,14 @@ impl Document {
     pub fn paragraph_count(&self) -> usize {
         self.paragraphs.len()
     }
-;
+}
 
 /// SigmaWord - Word processing system
 #[derive(Debug)]
 pub struct SigmaWord {
     documents: BTreeMap<String, Document>,
     current_document: Option<String>,
-;
+}
 
 impl SigmaWord {
     pub fn new() -> Self {
@@ -206,13 +206,13 @@ impl SigmaWord {
     pub fn document_count(&self) -> usize {
         self.documents.len()
     }
-;
+}
 
 impl Default for SigmaWord {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaWord instance
 static mut SIGMAWORD_INSTANCE: Option<SigmaWord> = None;
@@ -222,21 +222,21 @@ pub fn init_sigmaword() {
     unsafe {
         SIGMAWORD_INSTANCE = Some(SigmaWord::new());
     }
-;
+}
 
 /// Get the global SigmaWord instance
 pub fn get_sigmaword() -> Option<&'static SigmaWord> {
     unsafe {
         SIGMAWORD_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaWord instance (mutable)
 pub fn get_sigmaword_mut() -> Option<&'static mut SigmaWord> {
     unsafe {
         SIGMAWORD_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a document
 pub fn add_document(document: Document) -> bool {
@@ -246,7 +246,7 @@ pub fn add_document(document: Document) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -302,4 +302,4 @@ mod tests {
         word.add_document(doc);
         assert_eq!(word.document_count(), 1);
     }
-;
+}

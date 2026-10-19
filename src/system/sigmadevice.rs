@@ -22,7 +22,7 @@ pub enum DeviceType {
     Audio,
     Video,
     Unknown,
-;
+}
 
 /// Device state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum DeviceState {
     Configured,
     Failed,
     Unknown,
-;
+}
 
 /// Device event type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum DeviceEventType {
     Bind,
     Unbind,
     Unknown,
-;
+}
 
 /// Device data structure
 #[derive(Debug, Clone)]
@@ -58,7 +58,7 @@ pub struct Device {
     pub device_path: String,
     pub driver: String,
     pub subsystem: String,
-;
+}
 
 impl Device {
     /// Create a new device
@@ -99,7 +99,7 @@ impl Device {
     pub fn is_configured(&self) -> bool {
         self.device_state == DeviceState::Configured
     }
-;
+}
 
 /// Device event data structure
 #[derive(Debug, Clone)]
@@ -109,7 +109,7 @@ pub struct DeviceEvent {
     pub device_id: String,
     pub timestamp: u64,
     pub event_data: String,
-;
+}
 
 impl DeviceEvent {
     /// Create a new device event
@@ -128,14 +128,14 @@ impl DeviceEvent {
             event_data,
         }
     }
-;
+}
 
 /// Device manager
 pub struct SigmaDevice {
     devices: BTreeMap<String, Device>,
     events: BTreeMap<String, DeviceEvent>,
     running: AtomicBool,
-;
+}
 
 impl SigmaDevice {
     /// Create a new device manager
@@ -277,13 +277,13 @@ impl SigmaDevice {
             .filter(|d| d.vendor_id == vendor_id && d.product_id == product_id)
             .collect()
     }
-;
+}
 
 impl Default for SigmaDevice {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaDevice instance (placeholder for actual global state)
 static mut SIGMADEVICE_INSTANCE: Option<SigmaDevice> = None;
@@ -293,24 +293,24 @@ pub fn init_sigmadevice() {
     unsafe {
         SIGMADEVICE_INSTANCE = Some(SigmaDevice::new());
     }
-;
+}
 
 /// Get the global SigmaDevice instance
 pub fn get_sigmadevice() -> Option<&'static SigmaDevice> {
     unsafe { SIGMADEVICE_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaDevice instance
 pub fn get_sigmadevice_mut() -> Option<&'static mut SigmaDevice> {
     unsafe { SIGMADEVICE_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a device
 pub fn add_device(device: Device) {
     if let Some(dev) = get_sigmadevice_mut() {
         dev.add_device(device);
     }
-;
+}
 
 /// Convenience function to remove a device
 pub fn remove_device(device_id: &str) -> Option<Device> {
@@ -319,14 +319,14 @@ pub fn remove_device(device_id: &str) -> Option<Device> {
     } else {
         None
     }
-;
+}
 
 /// Convenience function to add a device event
 pub fn add_device_event(event: DeviceEvent) {
     if let Some(dev) = get_sigmadevice_mut() {
         dev.add_event(event);
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -815,4 +815,4 @@ mod tests {
         let dev = get_sigmadevice().unwrap();
         assert_eq!(dev.event_count(), 1);
     }
-;
+}

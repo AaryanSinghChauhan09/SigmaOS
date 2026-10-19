@@ -30,7 +30,7 @@ pub struct CoreUserlandV53Manifest {
     pub components_added: Vec<String>,
     pub performance_multiplier: String,
     pub status: String,
-;
+}
 
 // ============================================================================
 // 1. SYSTEMD ADVANCEMENTS V53 ENGINE
@@ -44,7 +44,7 @@ pub enum SystemdDBusMethodV53 {
     RestartUnit(String, String), // (unit_name, mode)
     ReloadUnit(String, String),  // (unit_name, mode)
     GetUnitState(String),
-;
+}
 
 /// systemd Advancements V53 Engine.
 #[derive(Debug, Default)]
@@ -149,7 +149,7 @@ impl SystemdAdvancementsV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 2. OPENRC ADVANCEMENTS V53 ENGINE
@@ -221,7 +221,7 @@ impl OpenRcAdvancementsV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 3. RUNIT & S6 ADVANCEMENTS V53 ENGINE
@@ -294,7 +294,7 @@ impl RunitS6AdvancementsV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 4. SYSVINIT ADVANCEMENTS V53 ENGINE
@@ -343,7 +343,7 @@ impl SysVinitAdvancementsV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V53 ENGINE
@@ -394,7 +394,7 @@ impl BsdRcAdvancementsV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V53 ENGINE
@@ -406,7 +406,7 @@ pub struct AndroidInitBlockV53 {
     pub trigger_or_name: String,
     pub is_service: bool,
     pub commands_or_args: Vec<String>,
-;
+}
 
 /// launchd & Android Init Advancements V53 Engine.
 #[derive(Debug, Default)]
@@ -486,17 +486,17 @@ impl LaunchdAndroidInitAdvancementsV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // Helper method extension to keep return type string allocation uniform
 trait ToSubsystemString {
     fn to_system(&self) -> String;
-;
+}
 impl ToSubsystemString for &str {
     fn to_system(&self) -> String {
         self.to_string()
     }
-;
+}
 
 // ============================================================================
 // 7. CRON, ANACRON, TIMERS & AT ADVANCEMENTS V53 ENGINE
@@ -508,7 +508,7 @@ pub struct CrontabRecordV53 {
     pub schedule: String,
     pub user: String,
     pub command: String,
-;
+}
 
 /// Cron, Anacron, Timers & At Advancements V53 Engine.
 #[derive(Debug, Default)]
@@ -582,7 +582,7 @@ impl CronAnacronTimersAtV53Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 8. MASTER COORDINATOR SUITE V53
@@ -598,7 +598,7 @@ pub struct SovereignInitAndSupervisorAdvancementsV53Suite {
     pub bsd_rc: BsdRcAdvancementsV53Engine,
     pub launchd_android: LaunchdAndroidInitAdvancementsV53Engine,
     pub cron_timers_at: CronAnacronTimersAtV53Engine,
-;
+}
 
 impl SovereignInitAndSupervisorAdvancementsV53Suite {
     pub fn new() -> Self {
@@ -658,7 +658,7 @@ impl SovereignInitAndSupervisorAdvancementsV53Suite {
             && cron_env.get("SHELL").map_or(false, |v| v == "/bin/bash")
             && cron_recs.len() == 1
     }
-;
+}
 
 // ============================================================================
 // UNIT TESTS
@@ -777,4 +777,4 @@ mod tests {
 
         assert!(suite.run_master_verification());
     }
-;
+}

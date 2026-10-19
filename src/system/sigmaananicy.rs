@@ -20,7 +20,7 @@ pub enum PriorityClass {
     Low,
     Idle,
     Unknown,
-;
+}
 
 /// Process category enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum ProcessCategory {
     System,
     Custom,
     Unknown,
-;
+}
 
 /// Process nice data structure
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct ProcessNice {
     pub priority_class: PriorityClass,
     pub nice_value: i32,
     pub is_managed: bool,
-;
+}
 
 impl ProcessNice {
     /// Create a new process nice entry
@@ -92,7 +92,7 @@ impl ProcessNice {
     pub fn is_process_managed(&self) -> bool {
         self.is_managed
     }
-;
+}
 
 /// Nice rule for automatic process classification
 #[derive(Debug, Clone)]
@@ -102,7 +102,7 @@ pub struct NiceRule {
     pub category: ProcessCategory,
     pub priority_class: PriorityClass,
     pub enabled: bool,
-;
+}
 
 impl NiceRule {
     /// Create a new nice rule
@@ -140,14 +140,14 @@ impl NiceRule {
     pub fn matches(&self, process_name: &str) -> bool {
         process_name.contains(&self.pattern)
     }
-;
+}
 
 /// Ananicy manager
 pub struct SigmaAnanicy {
     processes: BTreeMap<String, ProcessNice>,
     rules: BTreeMap<String, NiceRule>,
     running: AtomicBool,
-;
+}
 
 impl SigmaAnanicy {
     /// Create a new Ananicy manager
@@ -273,13 +273,13 @@ impl SigmaAnanicy {
     pub fn rule_count(&self) -> usize {
         self.rules.len()
     }
-;
+}
 
 impl Default for SigmaAnanicy {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaAnanicy instance (placeholder for actual global state)
 static mut SIGMAANANICY_INSTANCE: Option<SigmaAnanicy> = None;
@@ -289,17 +289,17 @@ pub fn init_sigmaananicy() {
     unsafe {
         SIGMAANANICY_INSTANCE = Some(SigmaAnanicy::new());
     }
-;
+}
 
 /// Get the global SigmaAnanicy instance
 pub fn get_sigmaananicy() -> Option<&'static SigmaAnanicy> {
     unsafe { SIGMAANANICY_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaAnanicy instance
 pub fn get_sigmaananicy_mut() -> Option<&'static mut SigmaAnanicy> {
     unsafe { SIGMAANANICY_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to add a process
 pub fn add_process(process: ProcessNice) -> bool {
@@ -308,7 +308,7 @@ pub fn add_process(process: ProcessNice) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Convenience function to set process nice
 pub fn set_process_nice(process_id: &str, nice: i32) -> bool {
@@ -317,7 +317,7 @@ pub fn set_process_nice(process_id: &str, nice: i32) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -529,4 +529,4 @@ mod tests {
         let proc = ananicy.get_process("proc1").unwrap();
         assert_eq!(proc.nice_value, -5);
     }
-;
+}

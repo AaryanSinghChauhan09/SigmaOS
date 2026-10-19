@@ -31,7 +31,7 @@ pub struct CoreUserlandV52Manifest {
     pub components_added: Vec<String>,
     pub performance_multiplier: String,
     pub status: String,
-;
+}
 
 // ============================================================================
 // 1. SYSTEMD ADVANCEMENTS V52 ENGINE
@@ -46,7 +46,7 @@ pub enum SystemdServiceStatusV52 {
     Deactivating,
     Failed,
     Reloading,
-;
+}
 
 /// systemd Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -193,7 +193,7 @@ impl SystemdAdvancementsV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 2. OPENRC ADVANCEMENTS V52 ENGINE
@@ -207,7 +207,7 @@ pub enum OpenRcRunlevelV52 {
     Default,
     Nonetwork,
     Shutdown,
-;
+}
 
 /// OpenRC Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -298,7 +298,7 @@ impl OpenRcAdvancementsV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 3. RUNIT & S6 ADVANCEMENTS V52 ENGINE
@@ -312,7 +312,7 @@ pub enum RunitS6StateV52 {
     Up,
     Finishing,
     Dead,
-;
+}
 
 /// runit & s6 Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -387,7 +387,7 @@ impl RunitS6AdvancementsV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 4. SYSVINIT ADVANCEMENTS V52 ENGINE
@@ -403,7 +403,7 @@ pub enum SysVInittabActionV52 {
     CtrlAltDel,
     PowerFail,
     BootWait,
-;
+}
 
 /// SysVinit Inittab Entry V52
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -412,7 +412,7 @@ pub struct SysVInittabEntryV52 {
     pub runlevels: Vec<u8>,
     pub action: SysVInittabActionV52,
     pub process: String,
-;
+}
 
 /// SysVinit Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -493,7 +493,7 @@ impl SysVinitAdvancementsV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V52 ENGINE
@@ -507,7 +507,7 @@ pub struct BsdRcScriptV52 {
     pub require: Vec<String>,
     pub before: Vec<String>,
     pub keyword: Vec<String>,
-;
+}
 
 /// BSD rc Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -621,7 +621,7 @@ impl BsdRcAdvancementsV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 6. LAUNCHD ADVANCEMENTS V52 ENGINE
@@ -635,7 +635,7 @@ pub struct LaunchdJobConfigV52 {
     pub keep_alive: bool,
     pub throttle_interval_sec: u32,
     pub sockets: Vec<(String, u16)>,
-;
+}
 
 /// launchd Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -690,7 +690,7 @@ impl LaunchdAdvancementsV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 7. CRON, ANACRON, TIMERS & AT ADVANCEMENTS V52 ENGINE
@@ -703,7 +703,7 @@ pub enum SystemdTimerTriggerV52 {
     OnBootSec(u64),
     OnUnitActiveSec(u64),
     OnCalendar(String),
-;
+}
 
 /// `at` / `batch` Job Specification V52
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -713,7 +713,7 @@ pub struct AtJobSpecV52 {
     pub queue_letter: char,
     pub command: String,
     pub user: String,
-;
+}
 
 /// Cron, Anacron, Timers & At Advancements V52 Engine.
 #[derive(Debug, Default)]
@@ -856,7 +856,7 @@ impl CronAnacronTimersAtV52Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-;
+}
 
 // ============================================================================
 // 8. MASTER COORDINATOR SUITE V52
@@ -872,7 +872,7 @@ pub struct SovereignInitAndSupervisorAdvancementsV52Suite {
     pub bsd_rc: BsdRcAdvancementsV52Engine,
     pub launchd: LaunchdAdvancementsV52Engine,
     pub cron_timers_at: CronAnacronTimersAtV52Engine,
-;
+}
 
 impl SovereignInitAndSupervisorAdvancementsV52Suite {
     pub fn new() -> Self {
@@ -943,7 +943,7 @@ impl SovereignInitAndSupervisorAdvancementsV52Suite {
             && launchd_ok
             && cron_ok
     }
-;
+}
 
 // ============================================================================
 // UNIT TESTS
@@ -1118,4 +1118,4 @@ mod tests {
 
         assert!(suite.run_master_verification());
     }
-;
+}

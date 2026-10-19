@@ -20,7 +20,7 @@ pub enum LibraryType {
     Dynamic,
     SharedObject,
     Framework,
-;
+}
 
 /// Library version
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub struct LibraryVersion {
     pub major: u32,
     pub minor: u32,
     pub patch: u32,
-;
+}
 
 impl LibraryVersion {
     pub fn new(major: u32, minor: u32, patch: u32) -> Self {
@@ -42,7 +42,7 @@ impl LibraryVersion {
     pub fn to_string(&self) -> String {
         format!("{}.{}.{}", self.major, self.minor, self.patch)
     }
-;
+}
 
 /// Library dependency
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ pub struct LibraryDependency {
     pub name: String,
     pub version: LibraryVersion,
     pub required: bool,
-;
+}
 
 impl LibraryDependency {
     pub fn new(name: String, version: LibraryVersion, required: bool) -> Self {
@@ -60,7 +60,7 @@ impl LibraryDependency {
             required,
         }
     }
-;
+}
 
 /// Shared library
 #[derive(Debug, Clone)]
@@ -72,7 +72,7 @@ pub struct SharedLibrary {
     pub file_path: String,
     pub dependencies: Vec<LibraryDependency>,
     pub loaded: bool,
-;
+}
 
 impl SharedLibrary {
     pub fn new(id: String, name: String, library_type: LibraryType, version: LibraryVersion, file_path: String) -> Self {
@@ -107,14 +107,14 @@ impl SharedLibrary {
     pub fn dependency_count(&self) -> usize {
         self.dependencies.len()
     }
-;
+}
 
 /// SigmaCraftLibs - Shared libraries system
 #[derive(Debug)]
 pub struct SigmaCraftLibs {
     libraries: BTreeMap<String, SharedLibrary>,
     loaded_libraries: Vec<String>, // library IDs in load order
-;
+}
 
 impl SigmaCraftLibs {
     pub fn new() -> Self {
@@ -203,13 +203,13 @@ impl SigmaCraftLibs {
     pub fn loaded_count(&self) -> usize {
         self.loaded_libraries.len()
     }
-;
+}
 
 impl Default for SigmaCraftLibs {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaCraftLibs instance
 static mut SIGMACRAFTLIBS_INSTANCE: Option<SigmaCraftLibs> = None;
@@ -219,21 +219,21 @@ pub fn init_sigmacraftlibs() {
     unsafe {
         SIGMACRAFTLIBS_INSTANCE = Some(SigmaCraftLibs::new());
     }
-;
+}
 
 /// Get the global SigmaCraftLibs instance
 pub fn get_sigmacraftlibs() -> Option<&'static SigmaCraftLibs> {
     unsafe {
         SIGMACRAFTLIBS_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaCraftLibs instance (mutable)
 pub fn get_sigmacraftlibs_mut() -> Option<&'static mut SigmaCraftLibs> {
     unsafe {
         SIGMACRAFTLIBS_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a library
 pub fn add_library(library: SharedLibrary) -> bool {
@@ -243,7 +243,7 @@ pub fn add_library(library: SharedLibrary) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -306,4 +306,4 @@ mod tests {
         assert!(craftlibs.load_library("lib1"));
         assert_eq!(craftlibs.loaded_count(), 1);
     }
-;
+}

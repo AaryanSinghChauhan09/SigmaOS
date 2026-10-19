@@ -23,7 +23,7 @@ pub enum VectorElementType {
     Line,
     Polygon,
     Text,
-;
+}
 
 /// Line cap style
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum LineCap {
     Butt,
     Round,
     Square,
-;
+}
 
 /// Line join style
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,14 +39,14 @@ pub enum LineJoin {
     Miter,
     Round,
     Bevel,
-;
+}
 
 /// Point
 #[derive(Debug, Clone, Copy)]
 pub struct VectorPoint {
     pub x: f32,
     pub y: f32,
-;
+}
 
 impl VectorPoint {
     pub fn new(x: f32, y: f32) -> Self {
@@ -58,7 +58,7 @@ impl VectorPoint {
         let dy = self.y - other.y;
         (dx * dx + dy * dy).sqrt()
     }
-;
+}
 
 /// Vector path segment
 #[derive(Debug, Clone)]
@@ -68,7 +68,7 @@ pub enum PathSegment {
     BezierCurveTo { control1: VectorPoint, control2: VectorPoint, end: VectorPoint },
     QuadraticCurveTo { control: VectorPoint, end: VectorPoint },
     ClosePath,
-;
+}
 
 /// Vector element
 #[derive(Debug, Clone)]
@@ -82,7 +82,7 @@ pub struct VectorElement {
     pub line_cap: LineCap,
     pub line_join: LineJoin,
     pub visible: bool,
-;
+}
 
 impl VectorElement {
     pub fn new(id: String, element_type: VectorElementType) -> Self {
@@ -130,7 +130,7 @@ impl VectorElement {
     pub fn segment_count(&self) -> usize {
         self.segments.len()
     }
-;
+}
 
 /// Vector layer
 #[derive(Debug, Clone)]
@@ -140,7 +140,7 @@ pub struct VectorLayer {
     pub elements: BTreeMap<String, VectorElement>,
     pub visible: bool,
     pub locked: bool,
-;
+}
 
 impl VectorLayer {
     pub fn new(id: String, name: String) -> Self {
@@ -180,14 +180,14 @@ impl VectorLayer {
     pub fn element_count(&self) -> usize {
         self.elements.len()
     }
-;
+}
 
 /// SigmaVector - Vector graphics system
 #[derive(Debug)]
 pub struct SigmaVector {
     layers: BTreeMap<String, VectorLayer>,
     current_layer: Option<String>,
-;
+}
 
 impl SigmaVector {
     pub fn new() -> Self {
@@ -242,13 +242,13 @@ impl SigmaVector {
     pub fn layer_count(&self) -> usize {
         self.layers.len()
     }
-;
+}
 
 impl Default for SigmaVector {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaVector instance
 static mut SIGMAVECTOR_INSTANCE: Option<SigmaVector> = None;
@@ -258,21 +258,21 @@ pub fn init_sigmavector() {
     unsafe {
         SIGMAVECTOR_INSTANCE = Some(SigmaVector::new());
     }
-;
+}
 
 /// Get the global SigmaVector instance
 pub fn get_sigmavector() -> Option<&'static SigmaVector> {
     unsafe {
         SIGMAVECTOR_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaVector instance (mutable)
 pub fn get_sigmavector_mut() -> Option<&'static mut SigmaVector> {
     unsafe {
         SIGMAVECTOR_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a layer
 pub fn add_layer(layer: VectorLayer) -> bool {
@@ -282,7 +282,7 @@ pub fn add_layer(layer: VectorLayer) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -350,4 +350,4 @@ mod tests {
         vector.add_layer(layer);
         assert_eq!(vector.layer_count(), 1);
     }
-;
+}

@@ -23,7 +23,7 @@ pub enum DistFSType {
     MooseFSLike,
     /// Peer-to-peer block storage
     P2PBlock,
-;
+}
 
 /// Replication strategy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,7 +34,7 @@ pub enum ReplicationStrategy {
     ErasureCoded { data_chunks: u8, parity_chunks: u8 },
     /// Single copy (no redundancy)
     None,
-;
+}
 
 /// Node state in the cluster
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum NodeState {
     Down,
     Recovering,
     Maintenance,
-;
+}
 
 /// Cluster health state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,7 +53,7 @@ pub enum ClusterHealth {
     Degraded,
     Critical,
     Offline,
-;
+}
 
 /// Volume state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -65,7 +65,7 @@ pub enum VolumeState {
     Stopped,
     Degraded,
     Error,
-;
+}
 
 /// Volume type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -78,7 +78,7 @@ pub enum VolumeType {
     DistributedReplicated,
     /// Erasure coded across nodes
     ErasureCoded,
-;
+}
 
 // ============================================================
 // Structs
@@ -95,7 +95,7 @@ pub struct DistNode {
     pub used_bytes: u64,
     pub state: NodeState,
     pub weight: u32, // Relative storage weight for data placement
-;
+}
 
 impl DistNode {
     pub fn new(
@@ -131,7 +131,7 @@ impl DistNode {
     pub fn is_available(&self) -> bool {
         self.state == NodeState::Active || self.state == NodeState::Degraded
     }
-;
+}
 
 /// A distributed volume (logical storage unit)
 #[derive(Debug, Clone)]
@@ -145,7 +145,7 @@ pub struct DistVolume {
     pub state: VolumeState,
     pub mount_point: String,
     pub node_ids: Vec<String>, // Nodes hosting this volume
-;
+}
 
 impl DistVolume {
     pub fn new(
@@ -188,7 +188,7 @@ impl DistVolume {
     pub fn stop(&mut self) {
         self.state = VolumeState::Stopped;
     }
-;
+}
 
 /// Overall cluster statistics
 #[derive(Debug, Clone, Default)]
@@ -202,7 +202,7 @@ pub struct ClusterStats {
     pub write_iops: u64,
     pub read_bandwidth_bps: u64,
     pub write_bandwidth_bps: u64,
-;
+}
 
 impl ClusterStats {
     pub fn free_bytes(&self) -> u64 {
@@ -215,7 +215,7 @@ impl ClusterStats {
         }
         ((self.used_bytes * 100) / self.total_bytes) as u8
     }
-;
+}
 
 /// Distributed Filesystem Manager
 #[derive(Debug)]
@@ -226,7 +226,7 @@ pub struct SigmaDistFS {
     cluster_name: String,
     health: ClusterHealth,
     running: bool,
-;
+}
 
 impl SigmaDistFS {
     pub fn new(cluster_name: String, fs_type: DistFSType) -> Self {
@@ -398,7 +398,7 @@ impl SigmaDistFS {
             _ => ClusterHealth::Offline,
         };
     }
-;
+}
 
 // ============================================================
 // Global Singleton
@@ -413,15 +413,15 @@ pub fn init_sigmadistfs(cluster_name: &str, fs_type: DistFSType) {
             mgr.start();
         }
     }
-;
+}
 
 pub fn get_sigmadistfs() -> Option<&'static SigmaDistFS> {
     unsafe { DISTFS_INSTANCE.as_ref() }
-;
+}
 
 pub fn get_sigmadistfs_mut() -> Option<&'static mut SigmaDistFS> {
     unsafe { DISTFS_INSTANCE.as_mut() }
-;
+}
 
 // ============================================================
 // Convenience API
@@ -434,7 +434,7 @@ pub fn add_distfs_node(node: DistNode) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Create a distributed volume in the global cluster
 pub fn create_distfs_volume(volume: DistVolume) -> bool {
@@ -443,7 +443,7 @@ pub fn create_distfs_volume(volume: DistVolume) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Start a volume by name
 pub fn start_distfs_volume(name: &str) -> bool {
@@ -452,7 +452,7 @@ pub fn start_distfs_volume(name: &str) -> bool {
     } else {
         false
     }
-;
+}
 
 /// Get cluster health
 pub fn distfs_cluster_health() -> ClusterHealth {
@@ -461,7 +461,7 @@ pub fn distfs_cluster_health() -> ClusterHealth {
     } else {
         ClusterHealth::Offline
     }
-;
+}
 
 // ============================================================
 // Tests
@@ -595,4 +595,4 @@ mod tests {
         assert_eq!(mgr.node_count(), 1);
         assert_eq!(mgr.cluster_name(), "sigma-cluster");
     }
-;
+}

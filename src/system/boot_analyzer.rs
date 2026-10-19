@@ -19,7 +19,7 @@ pub struct ServiceBootTime {
     pub end_time: u64,   // milliseconds
     pub duration: u64,   // milliseconds
     pub status: ServiceStatus,
-;
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceStatus {
@@ -27,7 +27,7 @@ pub enum ServiceStatus {
     Failed,
     Timeout,
     Skipped,
-;
+}
 
 /// Boot analysis result
 #[derive(Debug, Clone)]
@@ -38,14 +38,14 @@ pub struct BootAnalysis {
     pub userspace_time: u64,  // milliseconds
     pub services: Vec<ServiceBootTime>,
     pub slowest_services: Vec<ServiceBootTime>,
-;
+}
 
 /// Boot analyzer
 pub struct BootAnalyzer {
     pub boot_time: AtomicU64,
     pub service_times: BTreeMap<String, ServiceBootTime>,
     pub enabled: AtomicBool,
-;
+}
 
 impl BootAnalyzer {
     pub fn new() -> Self {
@@ -135,13 +135,13 @@ impl BootAnalyzer {
     pub fn set_enabled(&self, enabled: bool) {
         self.enabled.store(enabled, Ordering::Relaxed);
     }
-;
+}
 
 impl Default for BootAnalyzer {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global boot analyzer
 static mut BOOT_ANALYZER: Option<BootAnalyzer> = None;
@@ -151,12 +151,12 @@ pub fn init_boot_analyzer() {
     unsafe {
         BOOT_ANALYZER = Some(BootAnalyzer::new());
     }
-;
+}
 
 /// Get global boot analyzer
 pub fn get_boot_analyzer() -> Option<&'static mut BootAnalyzer> {
     unsafe { BOOT_ANALYZER.as_mut() }
-;
+}
 
 /// Get boot time (equivalent to systemd-analyze time)
 pub fn analyze_boot_time() -> String {
@@ -172,7 +172,7 @@ pub fn analyze_boot_time() -> String {
     } else {
         "Boot analyzer not initialized".to_string()
     }
-;
+}
 
 /// Get blame (equivalent to systemd-analyze blame)
 pub fn analyze_blame() -> String {
@@ -187,7 +187,7 @@ pub fn analyze_blame() -> String {
     } else {
         "Boot analyzer not initialized".to_string()
     }
-;
+}
 
 /// Get critical path (equivalent to systemd-analyze critical-chain)
 pub fn analyze_critical_chain() -> String {
@@ -205,7 +205,7 @@ pub fn analyze_critical_chain() -> String {
     } else {
         "Boot analyzer not initialized".to_string()
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -273,4 +273,4 @@ mod tests {
         let result = analyze_critical_chain();
         assert!(result.contains("Critical path"));
     }
-;
+}

@@ -24,7 +24,7 @@ pub enum NamespaceType {
     IPC,
     Cgroup,
     Unknown,
-;
+}
 
 /// Namespace state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum NamespaceState {
     Inactive,
     Destroyed,
     Unknown,
-;
+}
 
 /// Namespace
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct Namespace {
     pub processes: Vec<u32>,
     pub inode: Option<u64>,
     pub created_at: u64,
-;
+}
 
 impl Namespace {
     pub fn new(id: String, ns_type: NamespaceType) -> Self {
@@ -87,13 +87,13 @@ impl Namespace {
     pub fn destroy(&mut self) {
         self.state = NamespaceState::Destroyed;
     }
-;
+}
 
 /// Namespace manager
 pub struct SigmaNamespaces {
     namespaces: BTreeMap<String, Namespace>,
     next_namespace_id: u64,
-;
+}
 
 impl SigmaNamespaces {
     pub fn new() -> Self {
@@ -202,13 +202,13 @@ impl SigmaNamespaces {
             .filter(|n| n.processes.contains(&pid))
             .collect()
     }
-;
+}
 
 impl Default for SigmaNamespaces {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMANAMESPACES_INSTANCE: Option<SigmaNamespaces> = None;
 
@@ -216,7 +216,7 @@ pub fn init_signamespaces() {
     unsafe {
         SIGMANAMESPACES_INSTANCE = Some(SigmaNamespaces::new());
     }
-;
+}
 
 pub fn get_signamespaces() -> &'static SigmaNamespaces {
     unsafe {
@@ -224,7 +224,7 @@ pub fn get_signamespaces() -> &'static SigmaNamespaces {
             .as_ref()
             .expect("SigmaNamespaces not initialized")
     }
-;
+}
 
 pub fn get_signamespaces_mut() -> &'static mut SigmaNamespaces {
     unsafe {
@@ -232,12 +232,12 @@ pub fn get_signamespaces_mut() -> &'static mut SigmaNamespaces {
             .as_mut()
             .expect("SigmaNamespaces not initialized")
     }
-;
+}
 
 pub fn create_namespace(ns_type: NamespaceType) -> String {
     let manager = get_signamespaces_mut();
     manager.create_namespace(ns_type)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -411,4 +411,4 @@ mod tests {
         let manager = get_signamespaces();
         assert!(manager.get_namespace(&id).is_some());
     }
-;
+}

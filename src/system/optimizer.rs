@@ -17,7 +17,7 @@ pub trait OptimizationStrategy {
     fn name(&self) -> &str;
     /// Check if optimization is applicable
     fn is_applicable(&self) -> bool;
-;
+}
 
 /// Optimization result
 #[derive(Debug, Clone)]
@@ -27,13 +27,13 @@ pub struct OptimizationResult {
     pub memory_freed_mb: u64,
     pub cpu_saved_percent: f64,
     pub message: String,
-;
+}
 
 /// Memory optimization strategy
 pub struct MemoryOptimization {
     target_free_percent: f64,
     aggressive: bool,
-;
+}
 
 impl MemoryOptimization {
     pub fn new() -> Self {
@@ -52,7 +52,7 @@ impl MemoryOptimization {
         self.aggressive = true;
         self
     }
-;
+}
 
 impl OptimizationStrategy for MemoryOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
@@ -87,7 +87,7 @@ impl OptimizationStrategy for MemoryOptimization {
         let used_percent = (current_usage as f64 / total_memory as f64) * 100.0;
         used_percent > (100.0 - self.target_free_percent)
     }
-;
+}
 
 impl MemoryOptimization {
     fn get_memory_usage_mb() -> u64 {
@@ -103,13 +103,13 @@ impl MemoryOptimization {
     fn clear_caches(&self) {}
 
     fn compact_memory(&self) {}
-;
+}
 
 /// CPU optimization strategy
 pub struct CpuOptimization {
     target_idle_percent: f64,
     reduce_background_processes: bool,
-;
+}
 
 impl CpuOptimization {
     pub fn new() -> Self {
@@ -123,7 +123,7 @@ impl CpuOptimization {
         self.target_idle_percent = percent;
         self
     }
-;
+}
 
 impl OptimizationStrategy for CpuOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
@@ -157,7 +157,7 @@ impl OptimizationStrategy for CpuOptimization {
         let idle_percent = 100.0 - current_usage;
         idle_percent < self.target_idle_percent
     }
-;
+}
 
 impl CpuOptimization {
     fn get_cpu_usage_percent() -> f64 {
@@ -168,13 +168,13 @@ impl CpuOptimization {
     fn throttle_background_processes(&self) {}
 
     fn adjust_cpu_governor(&self) {}
-;
+}
 
 /// I/O optimization strategy
 pub struct IoOptimization {
     enable_write_caching: bool,
     increase_queue_depth: bool,
-;
+}
 
 impl IoOptimization {
     pub fn new() -> Self {
@@ -183,7 +183,7 @@ impl IoOptimization {
             increase_queue_depth: true,
         }
     }
-;
+}
 
 impl OptimizationStrategy for IoOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
@@ -211,19 +211,19 @@ impl OptimizationStrategy for IoOptimization {
     fn is_applicable(&self) -> bool {
         true // Always applicable
     }
-;
+}
 
 impl IoOptimization {
     fn enable_write_back_cache(&self) {}
 
     fn increase_io_queue_depth(&self) {}
-;
+}
 
 /// Network optimization strategy
 pub struct NetworkOptimization {
     enable_tcp_fast_open: bool,
     optimize_mtu: bool,
-;
+}
 
 impl NetworkOptimization {
     pub fn new() -> Self {
@@ -232,7 +232,7 @@ impl NetworkOptimization {
             optimize_mtu: true,
         }
     }
-;
+}
 
 impl OptimizationStrategy for NetworkOptimization {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
@@ -260,13 +260,13 @@ impl OptimizationStrategy for NetworkOptimization {
     fn is_applicable(&self) -> bool {
         true // Always applicable
     }
-;
+}
 
 impl NetworkOptimization {
     fn enable_tcp_fast_open_setting(&self) {}
 
     fn optimize_mtu_size(&self) {}
-;
+}
 
 // ==========================================================
 // Fedora/Linux-inspired Autoruns & Soluto Startup Optimizer
@@ -277,7 +277,7 @@ pub enum StartupImpact {
     Low,
     Medium,
     High,
-;
+}
 
 #[derive(Debug, Clone)]
 pub struct SovereignStartupEntry {
@@ -287,7 +287,7 @@ pub struct SovereignStartupEntry {
     pub memory_footprint_mb: u64, // RAM consumed by background daemon
     pub impact: StartupImpact,
     pub postponed_delay_sec: u32, // Delay configured before launching daemon (Soluto-style)
-;
+}
 
 impl SovereignStartupEntry {
     pub fn new(name: &str, boot_delay_ms: u32, mem_mb: u64) -> Self {
@@ -308,7 +308,7 @@ impl SovereignStartupEntry {
             postponed_delay_sec: 0,
         }
     }
-;
+}
 
 /// SovereignStartupOptimizer manages startup entries.
 /// - Calculates cumulative boot delay penalties (like Fedora's systemd-analyze blame).
@@ -316,7 +316,7 @@ impl SovereignStartupEntry {
 /// - Safely disables unneeded diagnostic tasks or background daemons (Sysinternals Autoruns-style).
 pub struct SovereignStartupOptimizer {
     pub entries: Vec<SovereignStartupEntry>,
-;
+}
 
 impl SovereignStartupOptimizer {
     pub fn new() -> Self {
@@ -395,13 +395,13 @@ impl SovereignStartupOptimizer {
 
         (total_delay_saved_ms, recommendations)
     }
-;
+}
 
 impl Default for SovereignStartupOptimizer {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 impl OptimizationStrategy for SovereignStartupOptimizer {
     fn apply(&mut self) -> Result<OptimizationResult, OptimizationError> {
@@ -442,7 +442,7 @@ impl OptimizationStrategy for SovereignStartupOptimizer {
         // Always applicable to trim boot lag
         true
     }
-;
+}
 
 /// Performance profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -451,7 +451,7 @@ pub enum PerformanceProfile {
     Performance,
     PowerSaver,
     Extreme,
-;
+}
 
 /// OOP-based Performance Enhancer Manager
 pub struct PerformanceEnhancer {
@@ -461,7 +461,7 @@ pub struct PerformanceEnhancer {
     optimization_interval: Duration,
     last_optimization: Option<u64>,
     results: Vec<OptimizationResult>,
-;
+}
 
 impl PerformanceEnhancer {
     pub fn new() -> Self {
@@ -544,13 +544,13 @@ impl PerformanceEnhancer {
     pub fn total_cpu_saved(&self) -> f64 {
         self.results.iter().map(|r| r.cpu_saved_percent).sum()
     }
-;
+}
 
 impl Default for PerformanceEnhancer {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Optimization errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -559,7 +559,7 @@ pub enum OptimizationError {
     ResourceBusy(String),
     InvalidConfiguration(String),
     SystemError(String),
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -631,4 +631,4 @@ mod tests {
         assert!(res.success);
         assert!(res.message.contains("Optimized startup times"));
     }
-;
+}

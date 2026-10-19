@@ -34,7 +34,7 @@ pub struct SandboxProfile {
     pub network_access: NetworkPolicy,
     pub resource_limits: ResourceLimits,
     pub capabilities: Vec<String>,
-;
+}
 
 /// Network policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,7 +43,7 @@ pub enum NetworkPolicy {
     OutboundOnly,
     InboundOnly,
     FullAccess,
-;
+}
 
 /// Resource limits
 #[derive(Debug, Clone)]
@@ -52,7 +52,7 @@ pub struct ResourceLimits {
     pub max_cpu_percent: Option<u8>,
     pub max_file_handles: Option<usize>,
     pub max_processes: Option<usize>,
-;
+}
 
 impl Default for ResourceLimits {
     fn default() -> Self {
@@ -63,7 +63,7 @@ impl Default for ResourceLimits {
             max_processes: None,
         }
     }
-;
+}
 
 /// Sandbox process
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct SandboxProcess {
     pub start_time: u64,
     pub is_active: bool,
     pub resource_usage: ResourceUsage,
-;
+}
 
 /// Resource usage
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct ResourceUsage {
     pub memory_mb: u64,
     pub cpu_percent: f64,
     pub file_handles: usize,
-;
+}
 
 /// OOP trait for sandbox enforcement strategies
 pub trait SandboxEnforcement {
@@ -95,7 +95,7 @@ pub trait SandboxEnforcement {
     fn check_operation(&self, pid: u64, operation: SandboxOperation) -> bool;
     /// Get strategy name
     fn name(&self) -> &str;
-;
+}
 
 /// Sandbox operation
 #[derive(Debug, Clone)]
@@ -104,7 +104,7 @@ pub enum SandboxOperation {
     NetworkAccess(String),
     ProcessCreation,
     SystemCall(String),
-;
+}
 
 /// Sandbox result
 #[derive(Debug, Clone)]
@@ -113,12 +113,12 @@ pub struct SandboxResult {
     pub success: bool,
     pub pid: u64,
     pub message: String,
-;
+}
 
 /// Capability-based sandbox enforcer
 pub struct CapabilitySandboxEnforcer {
     active_sandboxes: BTreeMap<u64, SandboxProfile>,
-;
+}
 
 impl CapabilitySandboxEnforcer {
     #[allow(clippy::new_without_default)]
@@ -127,7 +127,7 @@ impl CapabilitySandboxEnforcer {
             active_sandboxes: BTreeMap::new(),
         }
     }
-;
+}
 
 impl SandboxEnforcement for CapabilitySandboxEnforcer {
     fn apply_sandbox(
@@ -188,7 +188,7 @@ impl SandboxEnforcement for CapabilitySandboxEnforcer {
     fn name(&self) -> &str {
         "CapabilitySandboxEnforcer"
     }
-;
+}
 
 impl CapabilitySandboxEnforcer {
     fn apply_path_restrictions(&self, _pid: u64, _profile: &SandboxProfile) {
@@ -202,12 +202,12 @@ impl CapabilitySandboxEnforcer {
     fn apply_resource_limits(&self, _pid: u64, _profile: &SandboxProfile) {
         // Simulate applying resource limits
     }
-;
+}
 
 /// Namespace-based sandbox enforcer
 pub struct NamespaceSandboxEnforcer {
     active_sandboxes: BTreeMap<u64, SandboxProfile>,
-;
+}
 
 impl NamespaceSandboxEnforcer {
     #[allow(clippy::new_without_default)]
@@ -216,7 +216,7 @@ impl NamespaceSandboxEnforcer {
             active_sandboxes: BTreeMap::new(),
         }
     }
-;
+}
 
 impl SandboxEnforcement for NamespaceSandboxEnforcer {
     fn apply_sandbox(
@@ -257,7 +257,7 @@ impl SandboxEnforcement for NamespaceSandboxEnforcer {
     fn name(&self) -> &str {
         "NamespaceSandboxEnforcer"
     }
-;
+}
 
 impl NamespaceSandboxEnforcer {
     fn create_mount_namespace(&self, _pid: u64) {
@@ -271,14 +271,14 @@ impl NamespaceSandboxEnforcer {
     fn create_pid_namespace(&self, _pid: u64) {
         // Simulate creating PID namespace
     }
-;
+}
 
 /// OOP-based Process Sandbox Manager
 pub struct ProcessSandboxManager {
     enforcer: Box<dyn SandboxEnforcement>,
     profiles: BTreeMap<String, SandboxProfile>,
     active_processes: Vec<SandboxProcess>,
-;
+}
 
 impl ProcessSandboxManager {
     pub fn new(enforcer: Box<dyn SandboxEnforcement>) -> Self {
@@ -380,7 +380,7 @@ impl ProcessSandboxManager {
         self.add_profile(strict_profile);
         self.add_profile(balanced_profile);
     }
-;
+}
 
 impl Default for ProcessSandboxManager {
     fn default() -> Self {
@@ -388,7 +388,7 @@ impl Default for ProcessSandboxManager {
         manager.create_default_profiles();
         manager
     }
-;
+}
 
 /// Sandbox errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -398,7 +398,7 @@ pub enum SandboxError {
     PermissionDenied(String),
     ResourceLimitExceeded(String),
     SystemError(String),
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -442,4 +442,4 @@ mod tests {
         assert!(result.success);
         assert_eq!(result.pid, 1234);
     }
-;
+}

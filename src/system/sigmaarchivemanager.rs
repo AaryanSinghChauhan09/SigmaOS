@@ -24,7 +24,7 @@ pub enum ArchiveFormat {
     Rar,
     SevenZ,
     Unknown,
-;
+}
 
 /// Archive state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,7 +35,7 @@ pub enum ArchiveState {
     Completed,
     Failed,
     Unknown,
-;
+}
 
 /// Archive
 #[derive(Debug, Clone)]
@@ -46,7 +46,7 @@ pub struct Archive {
     pub state: ArchiveState,
     pub file_count: u32,
     pub size: u64,
-;
+}
 
 impl Archive {
     pub fn new(id: String, path: String, format: ArchiveFormat) -> Self {
@@ -81,13 +81,13 @@ impl Archive {
     pub fn set_completed(&mut self) {
         self.state = ArchiveState::Completed;
     }
-;
+}
 
 /// Archive manager
 pub struct SigmaArchiveManager {
     archives: BTreeMap<String, Archive>,
     next_archive_id: u64,
-;
+}
 
 impl SigmaArchiveManager {
     pub fn new() -> Self {
@@ -135,13 +135,13 @@ impl SigmaArchiveManager {
     pub fn total_size(&self) -> u64 {
         self.archives.values().map(|a| a.size).sum()
     }
-;
+}
 
 impl Default for SigmaArchiveManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAARCHIVEMANAGER_INSTANCE: Option<SigmaArchiveManager> = None;
 
@@ -149,7 +149,7 @@ pub fn init_sigmaarchivemanager() {
     unsafe {
         SIGMAARCHIVEMANAGER_INSTANCE = Some(SigmaArchiveManager::new());
     }
-;
+}
 
 pub fn get_sigmaarchivemanager() -> &'static SigmaArchiveManager {
     unsafe {
@@ -157,7 +157,7 @@ pub fn get_sigmaarchivemanager() -> &'static SigmaArchiveManager {
             .as_ref()
             .expect("SigmaArchiveManager not initialized")
     }
-;
+}
 
 pub fn get_sigmaarchivemanager_mut() -> &'static mut SigmaArchiveManager {
     unsafe {
@@ -165,12 +165,12 @@ pub fn get_sigmaarchivemanager_mut() -> &'static mut SigmaArchiveManager {
             .as_mut()
             .expect("SigmaArchiveManager not initialized")
     }
-;
+}
 
 pub fn add_archive(path: String, format: ArchiveFormat) -> String {
     let manager = get_sigmaarchivemanager_mut();
     manager.add_archive(path, format)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -272,4 +272,4 @@ mod tests {
         let manager = get_sigmaarchivemanager();
         assert!(manager.get_archive(&id).is_some());
     }
-;
+}

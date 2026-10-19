@@ -20,7 +20,7 @@ pub enum MicrophoneState {
     Recording,
     Error,
     Unknown,
-;
+}
 
 /// Sample rate
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum SampleRate {
     Hz96000,
     Hz192000,
     Unknown,
-;
+}
 
 /// Sample format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub enum SampleFormat {
     Float32LE,
     Float32BE,
     Unknown,
-;
+}
 
 /// Channel count
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +57,7 @@ pub enum ChannelCount {
     Surround51,
     Surround71,
     Unknown,
-;
+}
 
 /// Microphone
 #[derive(Debug, Clone)]
@@ -69,7 +69,7 @@ pub struct Microphone {
     pub sample_rates: Vec<SampleRate>,
     pub formats: Vec<SampleFormat>,
     pub channels: Vec<ChannelCount>,
-;
+}
 
 impl Microphone {
     pub fn new(id: String, name: String, device: String) -> Self {
@@ -106,13 +106,13 @@ impl Microphone {
     pub fn stop_recording(&mut self) {
         self.state = MicrophoneState::Idle;
     }
-;
+}
 
 /// Microphone manager
 pub struct SigmaMicrophone {
     microphones: BTreeMap<String, Microphone>,
     next_microphone_id: u64,
-;
+}
 
 impl SigmaMicrophone {
     pub fn new() -> Self {
@@ -149,13 +149,13 @@ impl SigmaMicrophone {
     pub fn microphone_count(&self) -> usize {
         self.microphones.len()
     }
-;
+}
 
 impl Default for SigmaMicrophone {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAMICROPHONE_INSTANCE: Option<SigmaMicrophone> = None;
 
@@ -163,7 +163,7 @@ pub fn init_sigmamicrophone() {
     unsafe {
         SIGMAMICROPHONE_INSTANCE = Some(SigmaMicrophone::new());
     }
-;
+}
 
 pub fn get_sigmamicrophone() -> &'static SigmaMicrophone {
     unsafe {
@@ -171,7 +171,7 @@ pub fn get_sigmamicrophone() -> &'static SigmaMicrophone {
             .as_ref()
             .expect("SigmaMicrophone not initialized")
     }
-;
+}
 
 pub fn get_sigmamicrophone_mut() -> &'static mut SigmaMicrophone {
     unsafe {
@@ -179,12 +179,12 @@ pub fn get_sigmamicrophone_mut() -> &'static mut SigmaMicrophone {
             .as_mut()
             .expect("SigmaMicrophone not initialized")
     }
-;
+}
 
 pub fn add_microphone(name: String, device: String) -> String {
     let manager = get_sigmamicrophone_mut();
     manager.add_microphone(name, device)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -311,4 +311,4 @@ mod tests {
         let manager = get_sigmamicrophone();
         assert!(manager.get_microphone(&id).is_some());
     }
-;
+}

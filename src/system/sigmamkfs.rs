@@ -20,7 +20,7 @@ pub enum FilesystemType {
     Ntfs,
     Swap,
     Unknown,
-;
+}
 
 /// Filesystem state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum FilesystemState {
     Formatting,
     Failed,
     Unknown,
-;
+}
 
 /// Filesystem configuration
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub struct FilesystemConfig {
     pub inode_size: u64,
     pub reserved_blocks: u64,
     pub journaling: bool,
-;
+}
 
 impl FilesystemConfig {
     /// Create a new filesystem configuration
@@ -74,7 +74,7 @@ impl FilesystemConfig {
     pub fn set_journaling(&mut self, journaling: bool) {
         self.journaling = journaling;
     }
-;
+}
 
 /// Filesystem data structure
 #[derive(Debug, Clone)]
@@ -86,7 +86,7 @@ pub struct Filesystem {
     pub config: FilesystemConfig,
     pub size: u64,
     pub used: u64,
-;
+}
 
 impl Filesystem {
     /// Create a new filesystem
@@ -127,13 +127,13 @@ impl Filesystem {
     pub fn is_created(&self) -> bool {
         self.state == FilesystemState::Created
     }
-;
+}
 
 /// Filesystem creation tool
 pub struct SigmaMkfs {
     filesystems: BTreeMap<String, Filesystem>,
     running: AtomicBool,
-;
+}
 
 impl SigmaMkfs {
     /// Create a new filesystem creation tool
@@ -206,13 +206,13 @@ impl SigmaMkfs {
     pub fn filesystem_count(&self) -> usize {
         self.filesystems.len()
     }
-;
+}
 
 impl Default for SigmaMkfs {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaMkfs instance (placeholder for actual global state)
 static mut SIGMAMKFS_INSTANCE: Option<SigmaMkfs> = None;
@@ -222,17 +222,17 @@ pub fn init_sigmamkfs() {
     unsafe {
         SIGMAMKFS_INSTANCE = Some(SigmaMkfs::new());
     }
-;
+}
 
 /// Get the global SigmaMkfs instance
 pub fn get_sigmamkfs() -> Option<&'static SigmaMkfs> {
     unsafe { SIGMAMKFS_INSTANCE.as_ref() }
-;
+}
 
 /// Get mutable global SigmaMkfs instance
 pub fn get_sigmamkfs_mut() -> Option<&'static mut SigmaMkfs> {
     unsafe { SIGMAMKFS_INSTANCE.as_mut() }
-;
+}
 
 /// Convenience function to create a filesystem
 pub fn create_filesystem(filesystem: Filesystem) -> bool {
@@ -241,7 +241,7 @@ pub fn create_filesystem(filesystem: Filesystem) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -488,4 +488,4 @@ mod tests {
         let mkfs = get_sigmamkfs().unwrap();
         assert_eq!(mkfs.filesystem_count(), 1);
     }
-;
+}

@@ -20,20 +20,20 @@ pub enum WebcamState {
     Streaming,
     Error,
     Unknown,
-;
+}
 
 /// Resolution
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Resolution {
     pub width: u32,
     pub height: u32,
-;
+}
 
 impl Resolution {
     pub fn new(width: u32, height: u32) -> Self {
         Self { width, height }
     }
-;
+}
 
 /// Frame format
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,7 +43,7 @@ pub enum FrameFormat {
     RGB24,
     NV12,
     Unknown,
-;
+}
 
 /// Webcam
 #[derive(Debug, Clone)]
@@ -54,7 +54,7 @@ pub struct Webcam {
     pub device: String,
     pub resolutions: Vec<Resolution>,
     pub formats: Vec<FrameFormat>,
-;
+}
 
 impl Webcam {
     pub fn new(id: String, name: String, device: String) -> Self {
@@ -85,13 +85,13 @@ impl Webcam {
     pub fn stop_stream(&mut self) {
         self.state = WebcamState::Idle;
     }
-;
+}
 
 /// Webcam manager
 pub struct SigmaWebcam {
     webcams: BTreeMap<String, Webcam>,
     next_webcam_id: u64,
-;
+}
 
 impl SigmaWebcam {
     pub fn new() -> Self {
@@ -128,13 +128,13 @@ impl SigmaWebcam {
     pub fn webcam_count(&self) -> usize {
         self.webcams.len()
     }
-;
+}
 
 impl Default for SigmaWebcam {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 static mut SIGMAWEBCAM_INSTANCE: Option<SigmaWebcam> = None;
 
@@ -142,7 +142,7 @@ pub fn init_sigmawebcam() {
     unsafe {
         SIGMAWEBCAM_INSTANCE = Some(SigmaWebcam::new());
     }
-;
+}
 
 pub fn get_sigmawebcam() -> &'static SigmaWebcam {
     unsafe {
@@ -150,7 +150,7 @@ pub fn get_sigmawebcam() -> &'static SigmaWebcam {
             .as_ref()
             .expect("SigmaWebcam not initialized")
     }
-;
+}
 
 pub fn get_sigmawebcam_mut() -> &'static mut SigmaWebcam {
     unsafe {
@@ -158,12 +158,12 @@ pub fn get_sigmawebcam_mut() -> &'static mut SigmaWebcam {
             .as_mut()
             .expect("SigmaWebcam not initialized")
     }
-;
+}
 
 pub fn add_webcam(name: String, device: String) -> String {
     let manager = get_sigmawebcam_mut();
     manager.add_webcam(name, device)
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -282,4 +282,4 @@ mod tests {
         let manager = get_sigmawebcam();
         assert!(manager.get_webcam(&id).is_some());
     }
-;
+}
