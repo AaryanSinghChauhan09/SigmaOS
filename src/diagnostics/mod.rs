@@ -7,6 +7,7 @@ pub mod sovereign_logging_monitoring_diagnostics_v6_pr;
 pub mod sovereign_logging_monitoring_diagnostics_v7_pr;
 pub mod sovereign_logging_monitoring_diagnostics_v8_pr;
 pub mod sovereign_logging_monitoring_diagnostics_v9_pr;
+pub mod sovereign_logging_monitoring_diagnostics_v10_pr;
 
 pub use crash::*;
 pub use kernel_report::*;
@@ -17,3 +18,4 @@ pub use sovereign_logging_monitoring_diagnostics_v6_pr::*;
 pub use sovereign_logging_monitoring_diagnostics_v7_pr::*;
 pub use sovereign_logging_monitoring_diagnostics_v8_pr::*;
 pub use sovereign_logging_monitoring_diagnostics_v9_pr::*;
+pub use sovereign_logging_monitoring_diagnostics_v10_pr::*;
