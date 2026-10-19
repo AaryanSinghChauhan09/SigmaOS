@@ -749,8 +749,29 @@ mod tests {
         let mut controller = AhciController::new(0x40000000);
 
         // Manually add a port for testing
-        let port_ptr = (0x40000000 + 0x100) as *mut AhciPort;
-        controller.ports.insert(0, port_ptr);
+        let mut fake_port = AhciPort {
+            clb: 0,
+            clbu: 0,
+            fb: 0,
+            fbu: 0,
+            is: 0,
+            ie: 0,
+            cmd: 0,
+            rsvd1: [0; 1],
+            tfd: 0,
+            sig: 0,
+            ssts: 0,
+            sctl: 0,
+            serr: 0,
+            sact: 0,
+            ci: 0,
+            sntf: 0,
+            fbs: 0,
+            devslp: 0,
+            rsvd2: [0; 11],
+            vendor: [0; 4],
+        };
+        controller.ports.insert(0, &mut fake_port as *mut AhciPort);
 
         let result = controller.allocate_port_dma_buffers(0);
         assert!(result.is_ok());
@@ -770,8 +791,29 @@ mod tests {
         let mut controller = AhciController::new(0x40000000);
 
         // Add port and allocate buffers
-        let port_ptr = (0x40000000 + 0x100) as *mut AhciPort;
-        controller.ports.insert(0, port_ptr);
+        let mut fake_port = AhciPort {
+            clb: 0,
+            clbu: 0,
+            fb: 0,
+            fbu: 0,
+            is: 0,
+            ie: 0,
+            cmd: 0,
+            rsvd1: [0; 1],
+            tfd: 0,
+            sig: 0,
+            ssts: 0,
+            sctl: 0,
+            serr: 0,
+            sact: 0,
+            ci: 0,
+            sntf: 0,
+            fbs: 0,
+            devslp: 0,
+            rsvd2: [0; 11],
+            vendor: [0; 4],
+        };
+        controller.ports.insert(0, &mut fake_port as *mut AhciPort);
         controller.allocate_port_dma_buffers(0).unwrap();
 
         // Build command for small transfer
