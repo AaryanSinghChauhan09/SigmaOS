@@ -19,7 +19,7 @@ pub enum PackageFormat {
     Snap,
     AppImage,
     Unknown,
-}
+;
 
 /// Package state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum PackageState {
     NotInstalled,
     UpdateAvailable,
     Unknown,
-}
+;
 
 /// Package data structure
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub struct Package {
     pub state: PackageState,
     pub description: String,
     pub size: u64,
-}
+;
 
 impl Package {
     /// Create a new package
@@ -81,7 +81,7 @@ impl Package {
     pub fn has_update(&self) -> bool {
         self.state == PackageState::UpdateAvailable
     }
-}
+;
 
 /// Repository data structure
 #[derive(Debug, Clone)]
@@ -91,7 +91,7 @@ pub struct Repository {
     pub url: String,
     pub format: PackageFormat,
     pub enabled: bool,
-}
+;
 
 impl Repository {
     /// Create a new repository
@@ -119,14 +119,14 @@ impl Repository {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-}
+;
 
 /// Package manager
 pub struct SigmaPackageManager {
     packages: BTreeMap<String, Package>,
     repositories: BTreeMap<String, Repository>,
     running: AtomicBool,
-}
+;
 
 impl SigmaPackageManager {
     /// Create a new package manager
@@ -277,13 +277,13 @@ impl SigmaPackageManager {
     pub fn repository_count(&self) -> usize {
         self.repositories.len()
     }
-}
+;
 
 impl Default for SigmaPackageManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaPackageManager instance (placeholder for actual global state)
 static mut SIGMAPACKAGEMANAGER_INSTANCE: Option<SigmaPackageManager> = None;
@@ -293,17 +293,17 @@ pub fn init_sigmapackagemanager() {
     unsafe {
         SIGMAPACKAGEMANAGER_INSTANCE = Some(SigmaPackageManager::new());
     }
-}
+;
 
 /// Get the global SigmaPackageManager instance
 pub fn get_sigmapackagemanager() -> Option<&'static SigmaPackageManager> {
     unsafe { SIGMAPACKAGEMANAGER_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaPackageManager instance
 pub fn get_sigmapackagemanager_mut() -> Option<&'static mut SigmaPackageManager> {
     unsafe { SIGMAPACKAGEMANAGER_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a package
 pub fn add_package(package: Package) -> bool {
@@ -312,7 +312,7 @@ pub fn add_package(package: Package) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to install a package
 pub fn install_package(package_id: &str) -> bool {
@@ -321,7 +321,7 @@ pub fn install_package(package_id: &str) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -518,4 +518,4 @@ mod tests {
         let pkg = pkg_mgr.get_package("pkg1").unwrap();
         assert!(pkg.is_installed());
     }
-}
+;

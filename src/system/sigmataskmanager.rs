@@ -21,7 +21,7 @@ pub enum TaskState {
     Stopped,
     Zombie,
     Unknown,
-}
+;
 
 /// Task priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum TaskPriority {
     Normal,
     Low,
     Idle,
-}
+;
 
 /// Task
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct Task {
     pub parent_pid: u32,
     pub cpu_usage: u32,
     pub memory_usage: u64,
-}
+;
 
 impl Task {
     pub fn new(id: String, name: String, pid: u32, parent_pid: u32) -> Self {
@@ -82,13 +82,13 @@ impl Task {
     pub fn resume(&mut self) {
         self.state = TaskState::Running;
     }
-}
+;
 
 /// Task manager
 pub struct SigmaTaskManager {
     tasks: BTreeMap<String, Task>,
     next_task_id: u64,
-}
+;
 
 impl SigmaTaskManager {
     pub fn new() -> Self {
@@ -144,13 +144,13 @@ impl SigmaTaskManager {
     pub fn total_memory_usage(&self) -> u64 {
         self.tasks.values().map(|t| t.memory_usage).sum()
     }
-}
+;
 
 impl Default for SigmaTaskManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMATASKMANAGER_INSTANCE: Option<SigmaTaskManager> = None;
 
@@ -158,7 +158,7 @@ pub fn init_sigmataskmanager() {
     unsafe {
         SIGMATASKMANAGER_INSTANCE = Some(SigmaTaskManager::new());
     }
-}
+;
 
 pub fn get_sigmataskmanager() -> &'static SigmaTaskManager {
     unsafe {
@@ -166,7 +166,7 @@ pub fn get_sigmataskmanager() -> &'static SigmaTaskManager {
             .as_ref()
             .expect("SigmaTaskManager not initialized")
     }
-}
+;
 
 pub fn get_sigmataskmanager_mut() -> &'static mut SigmaTaskManager {
     unsafe {
@@ -174,12 +174,12 @@ pub fn get_sigmataskmanager_mut() -> &'static mut SigmaTaskManager {
             .as_mut()
             .expect("SigmaTaskManager not initialized")
     }
-}
+;
 
 pub fn add_task(name: String, pid: u32, parent_pid: u32) -> String {
     let manager = get_sigmataskmanager_mut();
     manager.add_task(name, pid, parent_pid)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -287,4 +287,4 @@ mod tests {
         let manager = get_sigmataskmanager();
         assert!(manager.get_task(&id).is_some());
     }
-}
+;

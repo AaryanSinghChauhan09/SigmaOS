@@ -24,7 +24,7 @@ pub enum RotationPolicy {
     Monthly,
     /// Rotate by size
     Size,
-}
+;
 
 impl fmt::Display for RotationPolicy {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for RotationPolicy {
             RotationPolicy::Size => write!(f, "size"),
         }
     }
-}
+;
 
 /// Compression method
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +46,7 @@ pub enum CompressionMethod {
     Gzip,
     /// Bzip2 compression
     Bzip2,
-}
+;
 
 impl fmt::Display for CompressionMethod {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for CompressionMethod {
             CompressionMethod::Bzip2 => write!(f, "bzip2"),
         }
     }
-}
+;
 
 /// Log file configuration
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct LogFileConfig {
     pub compression: CompressionMethod,
     /// Enabled
     pub enabled: bool,
-}
+;
 
 impl LogFileConfig {
     /// Create a new log file configuration
@@ -105,7 +105,7 @@ impl LogFileConfig {
         self.enabled = enabled;
         self
     }
-}
+;
 
 /// SigmaLogRotate - Log Rotation Daemon
 pub struct SigmaLogRotate {
@@ -115,7 +115,7 @@ pub struct SigmaLogRotate {
     running: bool,
     /// Rotation counter
     rotation_counter: u32,
-}
+;
 
 impl SigmaLogRotate {
     /// Create a new SigmaLogRotate instance
@@ -249,13 +249,13 @@ impl SigmaLogRotate {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaLogRotate {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaLogRotate instance (placeholder for actual global state)
 static mut SIGMALOGROTATE_INSTANCE: Option<SigmaLogRotate> = None;
@@ -265,12 +265,12 @@ pub fn init_sigmalogrotate() {
     unsafe {
         SIGMALOGROTATE_INSTANCE = Some(SigmaLogRotate::new());
     }
-}
+;
 
 /// Get the global SigmaLogRotate instance
 pub fn get_sigmalogrotate() -> Option<&'static mut SigmaLogRotate> {
     unsafe { SIGMALOGROTATE_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to rotate a log file
 pub fn rotate_log_file(path: &str) -> Result<(), String> {
@@ -279,7 +279,7 @@ pub fn rotate_log_file(path: &str) -> Result<(), String> {
     } else {
         Err("SigmaLogRotate not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -417,4 +417,4 @@ mod tests {
         let result = rotate_log_file("/var/log/syslog");
         assert!(result.is_ok());
     }
-}
+;

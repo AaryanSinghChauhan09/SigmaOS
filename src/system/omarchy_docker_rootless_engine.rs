@@ -21,7 +21,7 @@ pub enum DockerMode {
     Rootless,
     /// Podman-compatible rootless (OCI)
     PodmanRootless,
-}
+;
 
 /// Container namespace isolation level
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -32,7 +32,7 @@ pub enum NamespaceLevel {
     NetworkOnly,
     /// User + PID (minimal)
     UserPid,
-}
+;
 
 /// A rootless container configuration record
 #[derive(Debug, Clone)]
@@ -44,14 +44,14 @@ pub struct RootlessContainerConfig {
     pub uid_map: String, // "0 100000 65536"
     pub gid_map: String,
     pub network_mode: String,
-}
+;
 
 /// SigmaOS Docker Rootless Engine — surpasses Omarchy docker-no-group
 pub struct OmarchyDockerRootlessEngine {
     mode: DockerMode,
     containers: Vec<RootlessContainerConfig>,
     uid_base: u32,
-}
+;
 
 impl OmarchyDockerRootlessEngine {
     pub fn new() -> Self {
@@ -125,7 +125,7 @@ impl OmarchyDockerRootlessEngine {
     pub fn container_count(&self) -> usize {
         self.containers.len()
     }
-}
+;
 
 #[cfg(test)]
 #[cfg(test)]
@@ -165,4 +165,4 @@ mod tests {
         let json2 = engine.generate_daemon_json();
         assert!(json2.contains("crun"));
     }
-}
+;

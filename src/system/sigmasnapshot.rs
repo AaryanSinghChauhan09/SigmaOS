@@ -26,7 +26,7 @@ pub enum SnapshotType {
     Differential,
     Full,
     Unknown,
-}
+;
 
 /// Snapshot state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub enum SnapshotState {
     Restoring,
     Failed,
     Unknown,
-}
+;
 
 /// Snapshot schedule / trigger frequency
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,7 +48,7 @@ pub enum SnapshotSchedule {
     Weekly,
     Monthly,
     Boot,
-}
+;
 
 /// Snapshot data structure
 #[derive(Debug, Clone)]
@@ -63,7 +63,7 @@ pub struct Snapshot {
     pub parent_snapshot_id: Option<String>,
     pub size_bytes: u64,
     pub created_timestamp: u64,
-}
+;
 
 impl Snapshot {
     /// Create a new snapshot instance
@@ -109,7 +109,7 @@ impl Snapshot {
     pub fn is_read_only(&self) -> bool {
         self.snapshot_type == SnapshotType::ReadOnly
     }
-}
+;
 
 /// Automated snapshot policy
 #[derive(Debug, Clone)]
@@ -120,7 +120,7 @@ pub struct SnapshotPolicy {
     pub auto_cleanup: bool,
     pub schedule: SnapshotSchedule,
     pub enabled: bool,
-}
+;
 
 impl SnapshotPolicy {
     /// Create a new snapshot policy
@@ -145,14 +145,14 @@ impl SnapshotPolicy {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Main SigmaSnapshot manager struct
 pub struct SigmaSnapshot {
     snapshots: BTreeMap<String, Snapshot>,
     policies: BTreeMap<String, SnapshotPolicy>,
     running: AtomicBool,
-}
+;
 
 impl SigmaSnapshot {
     /// Create a new SigmaSnapshot manager
@@ -302,13 +302,13 @@ impl SigmaSnapshot {
         }
         removed
     }
-}
+;
 
 impl Default for SigmaSnapshot {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaSnapshot instance (placeholder for global state)
 static mut SIGMASNAPSHOT_INSTANCE: Option<SigmaSnapshot> = None;
@@ -318,24 +318,24 @@ pub fn init_sigmasnapshot() {
     unsafe {
         SIGMASNAPSHOT_INSTANCE = Some(SigmaSnapshot::new());
     }
-}
+;
 
 /// Get the global SigmaSnapshot instance
 pub fn get_sigmasnapshot() -> Option<&'static SigmaSnapshot> {
     unsafe { SIGMASNAPSHOT_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaSnapshot instance
 pub fn get_sigmasnapshot_mut() -> Option<&'static mut SigmaSnapshot> {
     unsafe { SIGMASNAPSHOT_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a snapshot
 pub fn add_snapshot(snapshot: Snapshot) {
     if let Some(mgr) = get_sigmasnapshot_mut() {
         mgr.add_snapshot(snapshot);
     }
-}
+;
 
 /// Convenience function to restore a snapshot
 pub fn restore_snapshot(snapshot_id: &str) -> bool {
@@ -344,7 +344,7 @@ pub fn restore_snapshot(snapshot_id: &str) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -497,4 +497,4 @@ mod tests {
         assert_eq!(mgr.snapshot_count(), 1);
         assert!(restore_snapshot("global-snap"));
     }
-}
+;

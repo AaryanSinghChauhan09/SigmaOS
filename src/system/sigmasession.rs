@@ -26,7 +26,7 @@ pub enum SessionType {
     Web,
     /// Unknown
     Unknown,
-}
+;
 
 impl fmt::Display for SessionType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for SessionType {
             SessionType::Unknown => write!(f, "unknown"),
         }
     }
-}
+;
 
 /// Session state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,7 +51,7 @@ pub enum SessionState {
     Closing,
     /// Closed
     Closed,
-}
+;
 
 impl fmt::Display for SessionState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,7 +62,7 @@ impl fmt::Display for SessionState {
             SessionState::Closed => write!(f, "closed"),
         }
     }
-}
+;
 
 /// User session
 #[derive(Debug, Clone)]
@@ -85,7 +85,7 @@ pub struct UserSession {
     pub remote_host: Option<String>,
     /// Leader PID
     pub leader_pid: Option<u32>,
-}
+;
 
 impl UserSession {
     /// Create a new user session
@@ -137,7 +137,7 @@ impl UserSession {
         self.leader_pid = Some(leader_pid);
         self
     }
-}
+;
 
 /// SigmaSession - User Session Manager
 pub struct SigmaSession {
@@ -147,7 +147,7 @@ pub struct SigmaSession {
     running: bool,
     /// Session counter
     session_counter: u32,
-}
+;
 
 impl SigmaSession {
     /// Create a new SigmaSession instance
@@ -279,13 +279,13 @@ impl SigmaSession {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaSession {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaSession instance (placeholder for actual global state)
 static mut SIGMASESSION_INSTANCE: Option<SigmaSession> = None;
@@ -295,12 +295,12 @@ pub fn init_sigmasession() {
     unsafe {
         SIGMASESSION_INSTANCE = Some(SigmaSession::new());
     }
-}
+;
 
 /// Get the global SigmaSession instance
 pub fn get_sigmasession() -> Option<&'static mut SigmaSession> {
     unsafe { SIGMASESSION_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a session
 pub fn add_user_session(session: UserSession) -> Result<(), String> {
@@ -309,7 +309,7 @@ pub fn add_user_session(session: UserSession) -> Result<(), String> {
     } else {
         Err("SigmaSession not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -473,4 +473,4 @@ mod tests {
         let result = add_user_session(session);
         assert!(result.is_ok());
     }
-}
+;

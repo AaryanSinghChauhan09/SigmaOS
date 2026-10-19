@@ -29,7 +29,7 @@ pub enum PowerMode {
     Balanced,
     PowerSaver,
     UltraPowerSaver,
-}
+;
 
 /// OOP trait for power management strategies
 pub trait PowerStrategy {
@@ -39,7 +39,7 @@ pub trait PowerStrategy {
     fn name(&self) -> &str;
     /// Check if strategy is applicable
     fn is_applicable(&self) -> bool;
-}
+;
 
 /// Power management result
 #[derive(Debug, Clone)]
@@ -49,14 +49,14 @@ pub struct PowerResult {
     pub power_saved_percent: f64,
     pub battery_life_extended_minutes: u64,
     pub message: String,
-}
+;
 
 /// CPU power strategy
 pub struct CpuPowerStrategy {
     max_cpu_frequency_percent: u8,
     enable_c_states: bool,
     reduce_background_activity: bool,
-}
+;
 
 impl CpuPowerStrategy {
     pub fn new(mode: PowerMode) -> Self {
@@ -72,7 +72,7 @@ impl CpuPowerStrategy {
             reduce_background_activity: background,
         }
     }
-}
+;
 
 impl PowerStrategy for CpuPowerStrategy {
     fn apply(&mut self) -> Result<PowerResult, PowerError> {
@@ -112,7 +112,7 @@ impl PowerStrategy for CpuPowerStrategy {
     fn is_applicable(&self) -> bool {
         true
     }
-}
+;
 
 impl CpuPowerStrategy {
     fn set_cpu_frequency(&self) {
@@ -126,14 +126,14 @@ impl CpuPowerStrategy {
     fn throttle_background_processes(&self) {
         // Simulate throttling background processes
     }
-}
+;
 
 /// Display power strategy
 pub struct DisplayPowerStrategy {
     brightness_percent: u8,
     auto_dim_enabled: bool,
     timeout_seconds: u64,
-}
+;
 
 impl DisplayPowerStrategy {
     pub fn new(mode: PowerMode) -> Self {
@@ -149,7 +149,7 @@ impl DisplayPowerStrategy {
             timeout_seconds: timeout,
         }
     }
-}
+;
 
 impl PowerStrategy for DisplayPowerStrategy {
     fn apply(&mut self) -> Result<PowerResult, PowerError> {
@@ -186,7 +186,7 @@ impl PowerStrategy for DisplayPowerStrategy {
     fn is_applicable(&self) -> bool {
         true
     }
-}
+;
 
 impl DisplayPowerStrategy {
     fn set_brightness(&self) {
@@ -200,14 +200,14 @@ impl DisplayPowerStrategy {
     fn set_screen_timeout(&self) {
         // Simulate setting screen timeout
     }
-}
+;
 
 /// Network power strategy
 pub struct NetworkPowerStrategy {
     wifi_power_save: bool,
     bluetooth_power_save: bool,
     disable_unused_adapters: bool,
-}
+;
 
 impl NetworkPowerStrategy {
     pub fn new(mode: PowerMode) -> Self {
@@ -223,7 +223,7 @@ impl NetworkPowerStrategy {
             disable_unused_adapters: disable,
         }
     }
-}
+;
 
 impl PowerStrategy for NetworkPowerStrategy {
     fn apply(&mut self) -> Result<PowerResult, PowerError> {
@@ -259,7 +259,7 @@ impl PowerStrategy for NetworkPowerStrategy {
     fn is_applicable(&self) -> bool {
         true
     }
-}
+;
 
 impl NetworkPowerStrategy {
     fn enable_wifi_power_save(&self) {
@@ -273,7 +273,7 @@ impl NetworkPowerStrategy {
     fn disable_unused_network_adapters(&self) {
         // Simulate disabling unused network adapters
     }
-}
+;
 
 /// Battery status
 #[derive(Debug, Clone)]
@@ -282,7 +282,7 @@ pub struct BatteryStatus {
     pub is_charging: bool,
     pub time_remaining_minutes: Option<u64>,
     pub health_percent: u8,
-}
+;
 
 /// OOP-based Battery Saver Manager
 pub struct BatterySaverManager {
@@ -292,7 +292,7 @@ pub struct BatterySaverManager {
     low_battery_threshold: u8,
     battery_status: BatteryStatus,
     results: Vec<PowerResult>,
-}
+;
 
 impl BatterySaverManager {
     #[allow(clippy::new_without_default)]
@@ -410,13 +410,13 @@ impl BatterySaverManager {
             .map(|r| r.battery_life_extended_minutes)
             .sum()
     }
-}
+;
 
 impl Default for BatterySaverManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Power management errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -425,7 +425,7 @@ pub enum PowerError {
     HardwareNotSupported(String),
     InvalidConfiguration(String),
     SystemError(String),
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -465,4 +465,4 @@ mod tests {
         let new_mode = manager.auto_switch_if_needed();
         assert_eq!(new_mode, Some(PowerMode::PowerSaver));
     }
-}
+;

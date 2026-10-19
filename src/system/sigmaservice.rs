@@ -30,7 +30,7 @@ pub enum ServiceState {
     Failed,
     /// Reloading
     Reloading,
-}
+;
 impl fmt::Display for ServiceState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -42,7 +42,7 @@ impl fmt::Display for ServiceState {
             ServiceState::Reloading => write!(f, "reloading"),
         }
     }
-}
+;
 
 /// Service type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,7 +55,7 @@ pub enum ServiceType {
     Oneshot,
     /// Notify service
     Notify,
-}
+;
 
 impl fmt::Display for ServiceType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -66,7 +66,7 @@ impl fmt::Display for ServiceType {
             ServiceType::Notify => write!(f, "notify"),
         }
     }
-}
+;
 
 /// Service
 #[derive(Debug, Clone)]
@@ -87,7 +87,7 @@ pub struct Service {
     pub dependencies: Vec<String>,
     /// PID
     pub pid: u32,
-}
+;
 
 impl Service {
     /// Create a new service
@@ -132,7 +132,7 @@ impl Service {
         self.pid = pid;
         self
     }
-}
+;
 
 /// SigmaService - System Service Manager
 pub struct SigmaService {
@@ -142,7 +142,7 @@ pub struct SigmaService {
     running: bool,
     /// Service counter
     service_counter: u32,
-}
+;
 
 impl SigmaService {
     /// Create a new SigmaService instance
@@ -302,13 +302,13 @@ impl SigmaService {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaService {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaService instance (placeholder for actual global state)
 static mut SIGMASERVICE_INSTANCE: Option<SigmaService> = None;
@@ -318,12 +318,12 @@ pub fn init_sigmaservice() {
     unsafe {
         SIGMASERVICE_INSTANCE = Some(SigmaService::new());
     }
-}
+;
 
 /// Get the global SigmaService instance
 pub fn get_sigmaservice() -> Option<&'static mut SigmaService> {
     unsafe { SIGMASERVICE_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to start a service
 pub fn start_service(name: &str) -> Result<(), String> {
@@ -332,7 +332,7 @@ pub fn start_service(name: &str) -> Result<(), String> {
     } else {
         Err("SigmaService not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -507,4 +507,4 @@ mod tests {
         let result = start_service("nginx");
         assert!(result.is_ok());
     }
-}
+;

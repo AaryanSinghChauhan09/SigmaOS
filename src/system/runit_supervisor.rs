@@ -18,7 +18,7 @@ pub enum ServiceState {
     Exited(i32),
     Paused,
     Waiting,
-}
+;
 
 /// Service restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub enum RestartPolicy {
     OnFailure,
     Always,
     BackoffExponential,
-}
+;
 
 /// A supervised service definition
 #[derive(Debug, Clone)]
@@ -42,7 +42,7 @@ pub struct ServiceDef {
     pub state: ServiceState,
     pub pid: Option<u32>,
     pub uptime_secs: u64,
-}
+;
 
 impl ServiceDef {
     pub fn new(name: &str, cmd: &str) -> Self {
@@ -59,7 +59,7 @@ impl ServiceDef {
             uptime_secs: 0,
         }
     }
-}
+;
 
 /// Service supervision tree (like /etc/sv/ in Void Linux)
 pub struct RunitSupervisor {
@@ -67,7 +67,7 @@ pub struct RunitSupervisor {
     pub total_starts: u64,
     pub total_restarts: u64,
     pub total_failures: u64,
-}
+;
 
 impl RunitSupervisor {
     pub fn new() -> Self {
@@ -154,13 +154,13 @@ impl RunitSupervisor {
         r.sort_by_key(|s| s.0);
         r
     }
-}
+;
 
 impl Default for RunitSupervisor {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 #[cfg(test)]
 #[cfg(test)]
@@ -214,4 +214,4 @@ mod tests {
         sup.start("nginx").unwrap();
         assert_eq!(sup.running_count(), 2);
     }
-}
+;

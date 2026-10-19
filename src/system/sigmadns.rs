@@ -26,7 +26,7 @@ pub enum DnsRecordType {
     MX,
     /// TXT record
     TXT,
-}
+;
 
 impl fmt::Display for DnsRecordType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for DnsRecordType {
             DnsRecordType::TXT => write!(f, "TXT"),
         }
     }
-}
+;
 
 /// DNS resolver state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub enum ResolverState {
     Active,
     /// Inactive
     Inactive,
-}
+;
 
 impl fmt::Display for ResolverState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for ResolverState {
             ResolverState::Inactive => write!(f, "inactive"),
         }
     }
-}
+;
 
 /// DNS server
 #[derive(Debug, Clone)]
@@ -69,7 +69,7 @@ pub struct DnsServer {
     pub port: u16,
     /// State
     pub state: ResolverState,
-}
+;
 
 impl DnsServer {
     /// Create a new DNS server
@@ -87,7 +87,7 @@ impl DnsServer {
         self.state = state;
         self
     }
-}
+;
 
 /// DNS cache entry
 #[derive(Debug, Clone)]
@@ -100,7 +100,7 @@ pub struct DnsCacheEntry {
     pub value: String,
     /// TTL (time to live)
     pub ttl: u32,
-}
+;
 
 impl DnsCacheEntry {
     /// Create a new DNS cache entry
@@ -112,7 +112,7 @@ impl DnsCacheEntry {
             ttl,
         }
     }
-}
+;
 
 /// SigmaDNS - System DNS Manager
 pub struct SigmaDNS {
@@ -124,7 +124,7 @@ pub struct SigmaDNS {
     running: bool,
     /// Server counter
     server_counter: u32,
-}
+;
 
 impl SigmaDNS {
     /// Create a new SigmaDNS instance
@@ -262,13 +262,13 @@ impl SigmaDNS {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaDNS {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaDNS instance (placeholder for actual global state)
 static mut SIGMADNS_INSTANCE: Option<SigmaDNS> = None;
@@ -278,12 +278,12 @@ pub fn init_sigmadns() {
     unsafe {
         SIGMADNS_INSTANCE = Some(SigmaDNS::new());
     }
-}
+;
 
 /// Get the global SigmaDNS instance
 pub fn get_sigmadns() -> Option<&'static mut SigmaDNS> {
     unsafe { SIGMADNS_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to activate a DNS server
 pub fn activate_dns_server(server_id: &str) -> Result<(), String> {
@@ -292,7 +292,7 @@ pub fn activate_dns_server(server_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaDNS not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -423,4 +423,4 @@ mod tests {
         let result = activate_dns_server("server1");
         assert!(result.is_ok());
     }
-}
+;

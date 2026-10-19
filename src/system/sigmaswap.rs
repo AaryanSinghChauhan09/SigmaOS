@@ -19,7 +19,7 @@ pub enum SwapType {
     Partition,
     File,
     Unknown,
-}
+;
 
 /// Swap state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum SwapState {
     Inactive,
     Error,
     Unknown,
-}
+;
 
 /// Swap entry
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub struct SwapEntry {
     pub priority: i32,
     pub state: SwapState,
     pub used: u64,
-}
+;
 
 impl SwapEntry {
     pub fn new(id: String, swap_type: SwapType, device_path: String, size: u64) -> Self {
@@ -71,7 +71,7 @@ impl SwapEntry {
     pub fn set_used(&mut self, used: u64) {
         self.used = used;
     }
-}
+;
 
 /// Swap manager
 pub struct SigmaSwap {
@@ -79,7 +79,7 @@ pub struct SigmaSwap {
     next_swap_id: u64,
     total_swap: u64,
     total_used: u64,
-}
+;
 
 impl SigmaSwap {
     pub fn new() -> Self {
@@ -204,13 +204,13 @@ impl SigmaSwap {
             (self.total_used as f64 / self.total_swap as f64) * 100.0
         }
     }
-}
+;
 
 impl Default for SigmaSwap {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMASWAP_INSTANCE: Option<SigmaSwap> = None;
 
@@ -218,7 +218,7 @@ pub fn init_sigmaswap() {
     unsafe {
         SIGMASWAP_INSTANCE = Some(SigmaSwap::new());
     }
-}
+;
 
 pub fn get_sigmaswap() -> &'static SigmaSwap {
     unsafe {
@@ -226,7 +226,7 @@ pub fn get_sigmaswap() -> &'static SigmaSwap {
             .as_ref()
             .expect("SigmaSwap not initialized")
     }
-}
+;
 
 pub fn get_sigmaswap_mut() -> &'static mut SigmaSwap {
     unsafe {
@@ -234,12 +234,12 @@ pub fn get_sigmaswap_mut() -> &'static mut SigmaSwap {
             .as_mut()
             .expect("SigmaSwap not initialized")
     }
-}
+;
 
 pub fn add_swap(swap_type: SwapType, device_path: String, size: u64) -> String {
     let manager = get_sigmaswap_mut();
     manager.add_swap(swap_type, device_path, size)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -482,4 +482,4 @@ mod tests {
         let manager = get_sigmaswap();
         assert!(manager.get_swap(&id).is_some());
     }
-}
+;

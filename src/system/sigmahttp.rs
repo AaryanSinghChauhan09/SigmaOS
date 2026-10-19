@@ -26,7 +26,7 @@ pub enum HttpConnectionState {
     Responding,
     /// Closed
     Closed,
-}
+;
 
 impl fmt::Display for HttpConnectionState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for HttpConnectionState {
             HttpConnectionState::Closed => write!(f, "closed"),
         }
     }
-}
+;
 
 /// HTTP method
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,7 +55,7 @@ pub enum HttpMethod {
     Head,
     /// OPTIONS
     Options,
-}
+;
 
 impl fmt::Display for HttpMethod {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -68,7 +68,7 @@ impl fmt::Display for HttpMethod {
             HttpMethod::Options => write!(f, "OPTIONS"),
         }
     }
-}
+;
 
 /// HTTP connection
 #[derive(Debug, Clone)]
@@ -87,7 +87,7 @@ pub struct HttpConnection {
     pub version: String,
     /// State
     pub state: HttpConnectionState,
-}
+;
 
 impl HttpConnection {
     /// Create a new HTTP connection
@@ -126,7 +126,7 @@ impl HttpConnection {
         self.state = state;
         self
     }
-}
+;
 
 /// SigmaHTTP - System HTTP Server
 pub struct SigmaHTTP {
@@ -136,7 +136,7 @@ pub struct SigmaHTTP {
     running: bool,
     /// Connection counter
     connection_counter: u32,
-}
+;
 
 impl SigmaHTTP {
     /// Create a new SigmaHTTP instance
@@ -292,13 +292,13 @@ impl SigmaHTTP {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaHTTP {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaHTTP instance (placeholder for actual global state)
 static mut SIGMAHTTP_INSTANCE: Option<SigmaHTTP> = None;
@@ -308,12 +308,12 @@ pub fn init_sigmahttp() {
     unsafe {
         SIGMAHTTP_INSTANCE = Some(SigmaHTTP::new());
     }
-}
+;
 
 /// Get the global SigmaHTTP instance
 pub fn get_sigmahttp() -> Option<&'static mut SigmaHTTP> {
     unsafe { SIGMAHTTP_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to process a request
 pub fn process_http_request(connection_id: &str) -> Result<(), String> {
@@ -322,7 +322,7 @@ pub fn process_http_request(connection_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaHTTP not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -467,4 +467,4 @@ mod tests {
         let result = process_http_request("conn1");
         assert!(result.is_ok());
     }
-}
+;

@@ -29,7 +29,7 @@ pub struct StateNode {
     value: StateValue,
     dependencies: [usize; 8], // Up to 8 dependencies
     dependency_count: AtomicUsize,
-}
+;
 
 impl Clone for StateNode {
     fn clone(&self) -> Self {
@@ -41,7 +41,7 @@ impl Clone for StateNode {
             dependency_count: AtomicUsize::new(self.dependency_count.load(Ordering::SeqCst)),
         }
     }
-}
+;
 
 #[derive(Debug, Clone)]
 pub enum StateValue {
@@ -49,7 +49,7 @@ pub enum StateValue {
     Integer(i64),
     String(&'static str),
     Array([Box<StateValue>; 16]),
-}
+;
 
 /// Immutable state graph for declarative configuration
 pub struct DeclarativeStateGraph {
@@ -58,7 +58,7 @@ pub struct DeclarativeStateGraph {
     current_generation: AtomicUsize,
     generations: [usize; 32], // Track up to 32 generations for rollback
     generation_count: AtomicUsize,
-}
+;
 
 const NONE_NODE: Option<StateNode> = None;
 
@@ -204,7 +204,7 @@ impl DeclarativeStateGraph {
     pub fn node_count(&self) -> usize {
         self.node_count.load(Ordering::SeqCst)
     }
-}
+;
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum StateError {
@@ -215,12 +215,12 @@ pub enum StateError {
     DependencyNotFound,
     TooManyGenerations,
     NoGenerationsAvailable,
-}
+;
 
 /// System configuration manager using declarative state
 pub struct SystemConfiguration {
     state_graph: DeclarativeStateGraph,
-}
+;
 
 impl SystemConfiguration {
     pub const fn new() -> Self {
@@ -262,7 +262,7 @@ impl SystemConfiguration {
     pub fn state_graph_mut(&mut self) -> &mut DeclarativeStateGraph {
         &mut self.state_graph
     }
-}
+;
 
 /// Global system configuration — protected by a spinlock to prevent data races
 /// on SMP kernels.  All access goes through `init_system_config()`,
@@ -272,7 +272,7 @@ use core::sync::atomic::{AtomicBool, Ordering as AOrdering};
 struct SpinMutex<T> {
     locked: AtomicBool,
     inner: core::cell::UnsafeCell<T>,
-}
+;
 
 // SAFETY: `SpinMutex` ensures exclusive access via a spinlock before
 // dereferencing the inner value.
@@ -303,7 +303,7 @@ impl<T> SpinMutex<T> {
     fn unlock(&self) {
         self.locked.store(false, AOrdering::Release);
     }
-}
+;
 
 static GLOBAL_CONFIG: SpinMutex<Option<SystemConfiguration>> = SpinMutex::new(None);
 
@@ -322,7 +322,7 @@ pub fn init_system_config() -> Result<(), StateError> {
         GLOBAL_CONFIG.unlock();
     }
     Ok(())
-}
+;
 
 /// Get a reference to the global system configuration.
 ///
@@ -343,7 +343,7 @@ pub fn get_system_config() -> &'static SystemConfiguration {
         GLOBAL_CONFIG.unlock();
         config_ref
     }
-}
+;
 
 /// Get a mutable reference to the global system configuration.
 ///
@@ -359,7 +359,7 @@ pub fn get_system_config_mut() -> &'static mut SystemConfiguration {
         GLOBAL_CONFIG.unlock();
         config_mut
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -416,4 +416,4 @@ mod tests {
         config.init_default().unwrap();
         assert_eq!(config.state_graph().node_count(), 5);
     }
-}
+;

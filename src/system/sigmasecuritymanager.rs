@@ -20,7 +20,7 @@ pub enum FirewallAction {
     Deny,
     Reject,
     Log,
-}
+;
 
 /// Firewall protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum FirewallProtocol {
     UDP,
     ICMP,
     All,
-}
+;
 
 /// Firewall rule
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct FirewallRule {
     pub destination_address: String,
     pub destination_port: Option<u16>,
     pub enabled: bool,
-}
+;
 
 impl FirewallRule {
     pub fn new(id: String, name: String, action: FirewallAction, protocol: FirewallProtocol) -> Self {
@@ -73,7 +73,7 @@ impl FirewallRule {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Security policy
 #[derive(Debug, Clone)]
@@ -83,7 +83,7 @@ pub struct SecurityPolicy {
     pub policy_type: String, // SELinux, AppArmor
     pub mode: String, // Enforcing, Permissive, Disabled
     pub enabled: bool,
-}
+;
 
 impl SecurityPolicy {
     pub fn new(id: String, name: String, policy_type: String, mode: String) -> Self {
@@ -103,7 +103,7 @@ impl SecurityPolicy {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Access control entry
 #[derive(Debug, Clone)]
@@ -112,7 +112,7 @@ pub struct AccessControlEntry {
     pub resource: String,
     pub user: String,
     pub permissions: String, // rwx, etc.
-}
+;
 
 impl AccessControlEntry {
     pub fn new(id: String, resource: String, user: String, permissions: String) -> Self {
@@ -123,7 +123,7 @@ impl AccessControlEntry {
             permissions,
         }
     }
-}
+;
 
 /// SigmaSecurityManager - Security management
 #[derive(Debug)]
@@ -131,7 +131,7 @@ pub struct SigmaSecurityManager {
     firewall_rules: BTreeMap<String, FirewallRule>,
     security_policies: BTreeMap<String, SecurityPolicy>,
     access_controls: BTreeMap<String, AccessControlEntry>,
-}
+;
 
 impl SigmaSecurityManager {
     pub fn new() -> Self {
@@ -213,13 +213,13 @@ impl SigmaSecurityManager {
     pub fn access_control_count(&self) -> usize {
         self.access_controls.len()
     }
-}
+;
 
 impl Default for SigmaSecurityManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaSecurityManager instance
 static mut SIGMASECURITYMANAGER_INSTANCE: Option<SigmaSecurityManager> = None;
@@ -229,21 +229,21 @@ pub fn init_sigmasecuritymanager() {
     unsafe {
         SIGMASECURITYMANAGER_INSTANCE = Some(SigmaSecurityManager::new());
     }
-}
+;
 
 /// Get the global SigmaSecurityManager instance
 pub fn get_sigmasecuritymanager() -> Option<&'static SigmaSecurityManager> {
     unsafe {
         SIGMASECURITYMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaSecurityManager instance (mutable)
 pub fn get_sigmasecuritymanager_mut() -> Option<&'static mut SigmaSecurityManager> {
     unsafe {
         SIGMASECURITYMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a firewall rule
 pub fn add_firewall_rule(rule: FirewallRule) -> bool {
@@ -253,7 +253,7 @@ pub fn add_firewall_rule(rule: FirewallRule) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -343,4 +343,4 @@ mod tests {
         let deny_rules = manager.list_firewall_rules_by_action(FirewallAction::Deny);
         assert_eq!(deny_rules.len(), 1);
     }
-}
+;

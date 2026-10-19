@@ -21,7 +21,7 @@ pub enum ClipboardFormat {
     HTML,
     RTF,
     Unknown,
-}
+;
 
 /// Clipboard item
 #[derive(Debug, Clone)]
@@ -31,7 +31,7 @@ pub struct ClipboardItem {
     pub content: String,
     pub size: u64,
     pub timestamp: u64,
-}
+;
 
 impl ClipboardItem {
     pub fn new(id: String, format: ClipboardFormat, content: String) -> Self {
@@ -49,7 +49,7 @@ impl ClipboardItem {
         self.timestamp = timestamp;
         self
     }
-}
+;
 
 /// Clipboard manager
 pub struct SigmaClipboardManager {
@@ -57,7 +57,7 @@ pub struct SigmaClipboardManager {
     current_item: Option<String>,
     max_history: usize,
     next_item_id: u64,
-}
+;
 
 impl SigmaClipboardManager {
     pub fn new(max_history: usize) -> Self {
@@ -120,13 +120,13 @@ impl SigmaClipboardManager {
     pub fn total_size(&self) -> u64 {
         self.items.iter().map(|i| i.size).sum()
     }
-}
+;
 
 impl Default for SigmaClipboardManager {
     fn default() -> Self {
         Self::new(50)
     }
-}
+;
 
 static mut SIGMACLIPBOARDMANAGER_INSTANCE: Option<SigmaClipboardManager> = None;
 
@@ -134,7 +134,7 @@ pub fn init_sigmaclipboardmanager(max_history: usize) {
     unsafe {
         SIGMACLIPBOARDMANAGER_INSTANCE = Some(SigmaClipboardManager::new(max_history));
     }
-}
+;
 
 pub fn get_sigmaclipboardmanager() -> &'static SigmaClipboardManager {
     unsafe {
@@ -142,7 +142,7 @@ pub fn get_sigmaclipboardmanager() -> &'static SigmaClipboardManager {
             .as_ref()
             .expect("SigmaClipboardManager not initialized")
     }
-}
+;
 
 pub fn get_sigmaclipboardmanager_mut() -> &'static mut SigmaClipboardManager {
     unsafe {
@@ -150,12 +150,12 @@ pub fn get_sigmaclipboardmanager_mut() -> &'static mut SigmaClipboardManager {
             .as_mut()
             .expect("SigmaClipboardManager not initialized")
     }
-}
+;
 
 pub fn add_item(format: ClipboardFormat, content: String) -> String {
     let manager = get_sigmaclipboardmanager_mut();
     manager.add_item(format, content)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -259,4 +259,4 @@ mod tests {
         let manager = get_sigmaclipboardmanager();
         assert!(manager.get_item(&id).is_some());
     }
-}
+;

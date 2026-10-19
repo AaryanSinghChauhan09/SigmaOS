@@ -20,7 +20,7 @@ pub enum PackageStatus {
     NotInstalled,
     UpdateAvailable,
     Broken,
-}
+;
 
 /// Package type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum PackageType {
     Binary,
     Source,
     Meta,
-}
+;
 
 /// Repository
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ pub struct Repository {
     pub url: String,
     pub enabled: bool,
     pub priority: u32,
-}
+;
 
 impl Repository {
     pub fn new(id: String, name: String, url: String, priority: u32) -> Self {
@@ -54,7 +54,7 @@ impl Repository {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Package
 #[derive(Debug, Clone)]
@@ -70,7 +70,7 @@ pub struct Package {
     pub size: u64, // in bytes
     pub dependencies: Vec<String>,
     pub repository: String,
-}
+;
 
 impl Package {
     pub fn new(id: String, name: String, version: String, description: String, package_type: PackageType, repository: String) -> Self {
@@ -112,14 +112,14 @@ impl Package {
     pub fn is_installed(&self) -> bool {
         self.status == PackageStatus::Installed || self.status == PackageStatus::UpdateAvailable
     }
-}
+;
 
 /// SigmaPackageManager - Package management
 #[derive(Debug)]
 pub struct SigmaPackageManager {
     packages: BTreeMap<String, Package>,
     repositories: BTreeMap<String, Repository>,
-}
+;
 
 impl SigmaPackageManager {
     pub fn new() -> Self {
@@ -205,13 +205,13 @@ impl SigmaPackageManager {
     pub fn repository_count(&self) -> usize {
         self.repositories.len()
     }
-}
+;
 
 impl Default for SigmaPackageManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaPackageManager instance
 static mut SIGMAPACKAGEMANAGER_INSTANCE: Option<SigmaPackageManager> = None;
@@ -221,21 +221,21 @@ pub fn init_sigmapackagemanager() {
     unsafe {
         SIGMAPACKAGEMANAGER_INSTANCE = Some(SigmaPackageManager::new());
     }
-}
+;
 
 /// Get the global SigmaPackageManager instance
 pub fn get_sigmapackagemanager() -> Option<&'static SigmaPackageManager> {
     unsafe {
         SIGMAPACKAGEMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaPackageManager instance (mutable)
 pub fn get_sigmapackagemanager_mut() -> Option<&'static mut SigmaPackageManager> {
     unsafe {
         SIGMAPACKAGEMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a package
 pub fn add_package(package: Package) -> bool {
@@ -245,7 +245,7 @@ pub fn add_package(package: Package) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -343,4 +343,4 @@ mod tests {
         let results = manager.search_packages("shell");
         assert_eq!(results.len(), 1);
     }
-}
+;

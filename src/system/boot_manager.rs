@@ -11,7 +11,7 @@ pub enum StartupType {
     Auto,
     Manual,
     Disabled,
-}
+;
 
 impl StartupType {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -30,7 +30,7 @@ impl StartupType {
             StartupType::Disabled => "Disabled",
         }
     }
-}
+;
 
 /// Startup entry
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct StartupEntry {
     pub startup_type: StartupType,
     pub delay_seconds: u32,
     pub is_enabled: bool,
-}
+;
 
 impl StartupEntry {
     pub fn new(name: String, command: String, description: String) -> Self {
@@ -70,14 +70,14 @@ impl StartupEntry {
     pub fn should_start(&self) -> bool {
         self.is_enabled && self.startup_type == StartupType::Auto
     }
-}
+;
 
 /// Startup manager
 #[derive(Debug)]
 pub struct BootManager {
     entries: HashMap<String, StartupEntry>,
     boot_time: u64,
-}
+;
 
 impl BootManager {
     pub fn new() -> Self {
@@ -257,13 +257,13 @@ impl BootManager {
             boot_time: self.boot_time,
         }
     }
-}
+;
 
 impl Default for BootManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Startup statistics
 #[derive(Debug, Clone)]
@@ -274,7 +274,7 @@ pub struct StartupStatistics {
     pub manual_start: usize,
     pub disabled: usize,
     pub boot_time: u64,
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -348,4 +348,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert!(stats.total_entries >= 5);
     }
-}
+;

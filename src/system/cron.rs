@@ -17,7 +17,7 @@ pub struct CronJob {
     pub enabled: bool,
     pub last_run: Option<u64>,
     pub next_run: u64,
-}
+;
 
 /// Cron schedule specification
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub struct CronSchedule {
     pub day_of_month: CronField,
     pub month: CronField,
     pub day_of_week: CronField,
-}
+;
 
 /// Cron field specification
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub enum CronField {
     Range(u32, u32),       // 1-5
     List([u32; 8], usize), // 1,3,5 - fixed-size array with length
     Step(u32, u32),        // */5 or 1-10/2
-}
+;
 
 impl CronSchedule {
     /// Parse cron schedule string (e.g., "0 0 * * *" or "@daily", "@weekly", "@reboot")
@@ -132,7 +132,7 @@ impl CronSchedule {
             && self.month.matches(month)
             && self.day_of_week.matches(day_of_week)
     }
-}
+;
 
 impl CronField {
     /// Parse a cron field string
@@ -209,7 +209,7 @@ impl CronField {
             CronField::Step(base, step) => (value - base) % step == 0,
         }
     }
-}
+;
 
 /// Cron daemon error types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -218,13 +218,13 @@ pub enum CronError {
     InvalidField,
     JobNotFound,
     ExecutionError,
-}
+;
 
 /// Cron daemon - manages scheduled tasks
 pub struct CronDaemon {
     jobs: BTreeMap<String, CronJob>,
     running: bool,
-}
+;
 
 impl CronDaemon {
     /// Create new cron daemon
@@ -313,13 +313,13 @@ impl CronDaemon {
         job.enabled = false;
         Ok(())
     }
-}
+;
 
 impl Default for CronDaemon {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 // =========================================================================
 // Post-Quantum Secure SSH Daemon (SovereignSshDaemon) - OpenSSH & Dropbear Inspired
@@ -330,7 +330,7 @@ pub enum KeyExchangeAlgorithm {
     Kyber1024Ed25519,
     Dilithium5Ed25519,
     Curve25519Sha256,
-}
+;
 
 #[derive(Debug, Clone)]
 pub struct SshSession {
@@ -341,7 +341,7 @@ pub struct SshSession {
     pub authenticated: bool,
     pub pty_allocated: bool,
     pub chroot_dir: Option<String>,
-}
+;
 
 #[derive(Debug, Clone)]
 pub struct SshDaemonConfig {
@@ -359,7 +359,7 @@ pub struct SshDaemonConfig {
     pub agent_forwarding: bool,               // SSH Agent forwarding
     pub tcp_keep_alive: bool,                 // TCP keep-alive probe heartbeat
     pub idle_timeout_seconds: u32,            // ClientAliveInterval / ClientAliveCountMax
-}
+;
 
 impl Default for SshDaemonConfig {
     fn default() -> Self {
@@ -384,7 +384,7 @@ impl Default for SshDaemonConfig {
             idle_timeout_seconds: 300,
         }
     }
-}
+;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SshChannelType {
@@ -395,7 +395,7 @@ pub enum SshChannelType {
         target_host: String,
         target_port: u16,
     },
-}
+;
 
 pub struct SovereignSshDaemon {
     pub port: u16,
@@ -407,7 +407,7 @@ pub struct SovereignSshDaemon {
     pub failed_auth_attempts: BTreeMap<String, u32>, // Fail2ban: IP -> failed attempt count
     pub banned_ips: Vec<String>,                     // Fail2ban locked IPs
     pub privileged_child_pids: BTreeMap<u64, u32>,   // Privilege Separation child tracker
-}
+;
 
 impl SovereignSshDaemon {
     pub fn new(port: u16, host_key_fingerprint: &str) -> Self {
@@ -575,7 +575,7 @@ impl SovereignSshDaemon {
             )),
         }
     }
-}
+;
 
 // =========================================================================
 // Enhanced Sovereign Cron Daemon (Anacron & Cronie Inspired)
@@ -591,7 +591,7 @@ pub struct SovereignCronDaemon {
     pub max_load_average_threshold: f32, // Cronie / batch mode max load average guard
     pub mail_to_user: Option<String>, // MAILTO routing for cron job output
     pub job_outputs: BTreeMap<String, String>, // Job ID -> Captured output
-}
+;
 
 impl SovereignCronDaemon {
     pub fn new() -> Self {
@@ -691,13 +691,13 @@ impl SovereignCronDaemon {
         self.executed_catchup_count += ran;
         ran
     }
-}
+;
 
 impl Default for SovereignCronDaemon {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -887,4 +887,4 @@ mod tests {
             .unwrap()
             .contains("MAILTO"));
     }
-}
+;

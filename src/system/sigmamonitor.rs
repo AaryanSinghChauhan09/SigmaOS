@@ -24,7 +24,7 @@ pub struct CpuCoreStats {
     pub system_percent: f32,
     /// Idle time percentage
     pub idle_percent: f32,
-}
+;
 
 impl CpuCoreStats {
     /// Create new CPU core stats
@@ -36,7 +36,7 @@ impl CpuCoreStats {
             idle_percent: 100.0,
         }
     }
-}
+;
 
 /// Memory statistics
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct MemoryStats {
     pub available_mb: u64,
     /// Used percentage
     pub used_percent: f32,
-}
+;
 
 impl MemoryStats {
     /// Create new memory stats
@@ -64,7 +64,7 @@ impl MemoryStats {
             used_percent: 0.0,
         }
     }
-}
+;
 
 /// Disk statistics
 #[derive(Debug, Clone)]
@@ -79,7 +79,7 @@ pub struct DiskStats {
     pub free_gb: u64,
     /// Used percentage
     pub used_percent: f32,
-}
+;
 
 impl DiskStats {
     /// Create new disk stats
@@ -92,7 +92,7 @@ impl DiskStats {
             used_percent: 0.0,
         }
     }
-}
+;
 
 /// Network statistics
 #[derive(Debug, Clone)]
@@ -107,7 +107,7 @@ pub struct NetworkStats {
     pub packets_rx: u64,
     /// Packets transmitted
     pub packets_tx: u64,
-}
+;
 
 impl NetworkStats {
     /// Create new network stats
@@ -120,7 +120,7 @@ impl NetworkStats {
             packets_tx: 0,
         }
     }
-}
+;
 
 /// System statistics
 #[derive(Debug, Clone)]
@@ -137,7 +137,7 @@ pub struct SystemStats {
     pub load_avg: (f32, f32, f32),
     /// Uptime in seconds
     pub uptime_seconds: u64,
-}
+;
 
 impl SystemStats {
     /// Create new system stats
@@ -151,7 +151,7 @@ impl SystemStats {
             uptime_seconds: 0,
         }
     }
-}
+;
 
 /// SigmaMonitor - System Monitor Daemon
 pub struct SigmaMonitor {
@@ -161,7 +161,7 @@ pub struct SigmaMonitor {
     running: bool,
     /// Update interval in seconds
     update_interval: u32,
-}
+;
 
 impl SigmaMonitor {
     /// Create a new SigmaMonitor instance
@@ -304,13 +304,13 @@ impl SigmaMonitor {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaMonitor {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaMonitor instance (placeholder for actual global state)
 static mut SIGMAMONITOR_INSTANCE: Option<SigmaMonitor> = None;
@@ -320,12 +320,12 @@ pub fn init_sigmamonitor() {
     unsafe {
         SIGMAMONITOR_INSTANCE = Some(SigmaMonitor::new());
     }
-}
+;
 
 /// Get the global SigmaMonitor instance
 pub fn get_sigmamonitor() -> Option<&'static mut SigmaMonitor> {
     unsafe { SIGMAMONITOR_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to update statistics
 pub fn update_system_stats() -> Result<(), String> {
@@ -335,7 +335,7 @@ pub fn update_system_stats() -> Result<(), String> {
     } else {
         Err("SigmaMonitor not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -456,4 +456,4 @@ mod tests {
         let result = update_system_stats();
         assert!(result.is_ok());
     }
-}
+;

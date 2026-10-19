@@ -20,7 +20,7 @@ pub enum GridUnit {
     Percent,
     Fraction,
     Auto,
-}
+;
 
 /// Grid alignment
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum GridAlignment {
     Center,
     End,
     Stretch,
-}
+;
 
 /// Grid item
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct GridItem {
     pub column_end: u32,
     pub row_span: u32,
     pub column_span: u32,
-}
+;
 
 impl GridItem {
     pub fn new(id: String, row: u32, column: u32) -> Self {
@@ -72,7 +72,7 @@ impl GridItem {
         self.row_end = row_start + self.row_span;
         self.column_end = column_start + self.column_span;
     }
-}
+;
 
 /// Grid row
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct GridRow {
     pub height: f32,
     pub min_height: f32,
     pub max_height: f32,
-}
+;
 
 impl GridRow {
     pub fn new(id: String, height: f32) -> Self {
@@ -104,7 +104,7 @@ impl GridRow {
     pub fn set_max_height(&mut self, max_height: f32) {
         self.max_height = max_height;
     }
-}
+;
 
 /// Grid column
 #[derive(Debug, Clone)]
@@ -114,7 +114,7 @@ pub struct GridColumn {
     pub min_width: f32,
     pub max_width: f32,
     pub unit: GridUnit,
-}
+;
 
 impl GridColumn {
     pub fn new(id: String, width: f32, unit: GridUnit) -> Self {
@@ -142,7 +142,7 @@ impl GridColumn {
     pub fn set_unit(&mut self, unit: GridUnit) {
         self.unit = unit;
     }
-}
+;
 
 /// Grid area
 #[derive(Debug, Clone)]
@@ -158,7 +158,7 @@ pub struct GridArea {
     pub items: BTreeMap<String, GridItem>,
     pub grid_rows: BTreeMap<String, GridRow>,
     pub grid_columns: BTreeMap<String, GridColumn>,
-}
+;
 
 impl GridArea {
     pub fn new(id: String, name: String, rows: u32, columns: u32) -> Self {
@@ -235,14 +235,14 @@ impl GridArea {
     pub fn column_count(&self) -> usize {
         self.grid_columns.len()
     }
-}
+;
 
 /// SigmaGrid - Grid layout system manager
 #[derive(Debug)]
 pub struct SigmaGrid {
     grid_areas: BTreeMap<String, GridArea>,
     current_area: Option<String>,
-}
+;
 
 impl SigmaGrid {
     pub fn new() -> Self {
@@ -299,13 +299,13 @@ impl SigmaGrid {
     pub fn grid_area_count(&self) -> usize {
         self.grid_areas.len()
     }
-}
+;
 
 impl Default for SigmaGrid {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaGrid instance
 static mut SIGMAGRID_INSTANCE: Option<SigmaGrid> = None;
@@ -315,17 +315,17 @@ pub fn init_sigmagrid() {
     unsafe {
         SIGMAGRID_INSTANCE = Some(SigmaGrid::new());
     }
-}
+;
 
 /// Get the global SigmaGrid instance
 pub fn get_sigmagrid() -> Option<&'static SigmaGrid> {
     unsafe { SIGMAGRID_INSTANCE.as_ref() }
-}
+;
 
 /// Get the global SigmaGrid instance (mutable)
 pub fn get_sigmagrid_mut() -> Option<&'static mut SigmaGrid> {
     unsafe { SIGMAGRID_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a grid area
 pub fn add_grid_area(area: GridArea) -> bool {
@@ -335,7 +335,7 @@ pub fn add_grid_area(area: GridArea) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -408,4 +408,4 @@ mod tests {
         grid.add_grid_area(area);
         assert_eq!(grid.grid_area_count(), 1);
     }
-}
+;

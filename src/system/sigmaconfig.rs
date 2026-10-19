@@ -24,7 +24,7 @@ pub enum ConfigValue {
     Boolean(bool),
     /// Float value
     Float(f64),
-}
+;
 
 impl fmt::Display for ConfigValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for ConfigValue {
             ConfigValue::Float(fl) => write!(f, "{}", fl),
         }
     }
-}
+;
 
 /// Configuration entry
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct ConfigEntry {
     pub description: String,
     /// Read-only
     pub read_only: bool,
-}
+;
 
 impl ConfigEntry {
     /// Create a new configuration entry
@@ -66,7 +66,7 @@ impl ConfigEntry {
         self.read_only = read_only;
         self
     }
-}
+;
 
 /// SigmaConfig - System Configuration Manager
 pub struct SigmaConfig {
@@ -76,7 +76,7 @@ pub struct SigmaConfig {
     running: bool,
     /// Entry counter
     entry_counter: u32,
-}
+;
 
 impl SigmaConfig {
     /// Create a new SigmaConfig instance
@@ -190,13 +190,13 @@ impl SigmaConfig {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaConfig {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaConfig instance (placeholder for actual global state)
 static mut SIGMACONFIG_INSTANCE: Option<SigmaConfig> = None;
@@ -206,12 +206,12 @@ pub fn init_sigmaconfig() {
     unsafe {
         SIGMACONFIG_INSTANCE = Some(SigmaConfig::new());
     }
-}
+;
 
 /// Get the global SigmaConfig instance
 pub fn get_sigmaconfig() -> Option<&'static mut SigmaConfig> {
     unsafe { SIGMACONFIG_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to set a configuration value
 pub fn set_config_value(key: &str, value: ConfigValue) -> Result<(), String> {
@@ -220,7 +220,7 @@ pub fn set_config_value(key: &str, value: ConfigValue) -> Result<(), String> {
     } else {
         Err("SigmaConfig not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -380,4 +380,4 @@ mod tests {
         );
         assert!(result.is_ok());
     }
-}
+;

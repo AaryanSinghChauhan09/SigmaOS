@@ -16,7 +16,7 @@ pub enum BackupType {
     Incremental,
     Differential,
     Unknown,
-}
+;
 
 /// Backup state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,7 +26,7 @@ pub enum BackupState {
     Failed,
     Restoring,
     Unknown,
-}
+;
 
 /// Backup data structure
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ pub struct Backup {
     pub creation_time: u64,
     pub size: u64,
     pub is_encrypted: bool,
-}
+;
 
 impl Backup {
     /// Create a new backup
@@ -68,13 +68,13 @@ impl Backup {
     pub fn is_complete(&self) -> bool {
         self.state == BackupState::Completed
     }
-}
+;
 
 /// Backup manager
 pub struct SigmaBackup {
     backups: BTreeMap<String, Backup>,
     running: AtomicBool,
-}
+;
 
 impl SigmaBackup {
     /// Create a new backup manager
@@ -137,13 +137,13 @@ impl SigmaBackup {
     pub fn backup_count(&self) -> usize {
         self.backups.len()
     }
-}
+;
 
 impl Default for SigmaBackup {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaBackup instance
 static mut SIGMABACKUP_INSTANCE: Option<SigmaBackup> = None;
@@ -153,17 +153,17 @@ pub fn init_sigmabackup() {
     unsafe {
         SIGMABACKUP_INSTANCE = Some(SigmaBackup::new());
     }
-}
+;
 
 /// Get the global SigmaBackup instance
 pub fn get_sigmabackup() -> Option<&'static SigmaBackup> {
     unsafe { SIGMABACKUP_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaBackup instance
 pub fn get_sigmabackup_mut() -> Option<&'static mut SigmaBackup> {
     unsafe { SIGMABACKUP_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to create a backup
 pub fn create_backup(backup: Backup) -> bool {
@@ -172,7 +172,7 @@ pub fn create_backup(backup: Backup) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -202,4 +202,4 @@ mod tests {
         let backup_mgr = get_sigmabackup();
         assert!(backup_mgr.is_some());
     }
-}
+;

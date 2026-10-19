@@ -21,7 +21,7 @@ pub enum ConnectionType {
     VPN,
     Bluetooth,
     Other,
-}
+;
 
 /// Connection state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,7 +30,7 @@ pub enum ConnectionState {
     Disconnected,
     Connecting,
     Failed,
-}
+;
 
 /// Network interface
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct NetworkInterface {
     pub gateway: Option<String>,
     pub mac_address: String,
     pub is_up: bool,
-}
+;
 
 impl NetworkInterface {
     pub fn new(id: String, name: String, connection_type: ConnectionType, mac_address: String) -> Self {
@@ -84,7 +84,7 @@ impl NetworkInterface {
     pub fn is_connected(&self) -> bool {
         self.state == ConnectionState::Connected
     }
-}
+;
 
 /// DNS server
 #[derive(Debug, Clone)]
@@ -92,7 +92,7 @@ pub struct DNSServer {
     pub id: String,
     pub address: String,
     pub is_primary: bool,
-}
+;
 
 impl DNSServer {
     pub fn new(id: String, address: String, is_primary: bool) -> Self {
@@ -102,7 +102,7 @@ impl DNSServer {
             is_primary,
         }
     }
-}
+;
 
 /// Network profile
 #[derive(Debug, Clone)]
@@ -115,7 +115,7 @@ pub struct NetworkProfile {
     pub static_ip: Option<String>,
     pub static_netmask: Option<String>,
     pub static_gateway: Option<String>,
-}
+;
 
 impl NetworkProfile {
     pub fn new(id: String, name: String, connection_type: ConnectionType) -> Self {
@@ -145,7 +145,7 @@ impl NetworkProfile {
         self.static_gateway = Some(gateway);
         self.use_dhcp = false;
     }
-}
+;
 
 /// SigmaNetworkManager - Network configuration management
 #[derive(Debug)]
@@ -153,7 +153,7 @@ pub struct SigmaNetworkManager {
     interfaces: BTreeMap<String, NetworkInterface>,
     dns_servers: BTreeMap<String, DNSServer>,
     profiles: BTreeMap<String, NetworkProfile>,
-}
+;
 
 impl SigmaNetworkManager {
     pub fn new() -> Self {
@@ -239,13 +239,13 @@ impl SigmaNetworkManager {
     pub fn profile_count(&self) -> usize {
         self.profiles.len()
     }
-}
+;
 
 impl Default for SigmaNetworkManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaNetworkManager instance
 static mut SIGMANETWORKMANAGER_INSTANCE: Option<SigmaNetworkManager> = None;
@@ -255,21 +255,21 @@ pub fn init_sigmanetworkmanager() {
     unsafe {
         SIGMANETWORKMANAGER_INSTANCE = Some(SigmaNetworkManager::new());
     }
-}
+;
 
 /// Get the global SigmaNetworkManager instance
 pub fn get_sigmanetworkmanager() -> Option<&'static SigmaNetworkManager> {
     unsafe {
         SIGMANETWORKMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaNetworkManager instance (mutable)
 pub fn get_sigmanetworkmanager_mut() -> Option<&'static mut SigmaNetworkManager> {
     unsafe {
         SIGMANETWORKMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add an interface
 pub fn add_interface(interface: NetworkInterface) -> bool {
@@ -279,7 +279,7 @@ pub fn add_interface(interface: NetworkInterface) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -381,4 +381,4 @@ mod tests {
         let connected = manager.list_connected();
         assert_eq!(connected.len(), 1);
     }
-}
+;

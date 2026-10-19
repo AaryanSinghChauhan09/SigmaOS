@@ -19,7 +19,7 @@ pub enum TransitionType {
     Grow,
     Wipe,
     Unknown,
-}
+;
 
 /// Display output data structure
 #[derive(Debug, Clone)]
@@ -30,7 +30,7 @@ pub struct DisplayOutput {
     pub height: u32,
     pub scale: f32,
     pub current_wallpaper: String,
-}
+;
 
 impl DisplayOutput {
     /// Create a new display output
@@ -60,7 +60,7 @@ impl DisplayOutput {
     pub fn resolution(&self) -> (u32, u32) {
         (self.width, self.height)
     }
-}
+;
 
 /// Wallpaper data structure
 #[derive(Debug, Clone)]
@@ -70,7 +70,7 @@ pub struct Wallpaper {
     pub name: String,
     pub is_active: bool,
     pub is_favorite: bool,
-}
+;
 
 impl Wallpaper {
     /// Create a new wallpaper
@@ -98,7 +98,7 @@ impl Wallpaper {
     pub fn is_wallpaper_active(&self) -> bool {
         self.is_active
     }
-}
+;
 
 /// Wallpaper manager
 pub struct SigmaWallpaper {
@@ -107,7 +107,7 @@ pub struct SigmaWallpaper {
     default_transition: TransitionType,
     transition_duration: u32,
     running: AtomicBool,
-}
+;
 
 impl SigmaWallpaper {
     /// Create a new wallpaper manager
@@ -262,13 +262,13 @@ impl SigmaWallpaper {
     pub fn output_count(&self) -> usize {
         self.outputs.len()
     }
-}
+;
 
 impl Default for SigmaWallpaper {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaWallpaper instance (placeholder for actual global state)
 static mut SIGMAWALLPAPER_INSTANCE: Option<SigmaWallpaper> = None;
@@ -278,17 +278,17 @@ pub fn init_sigmawallpaper() {
     unsafe {
         SIGMAWALLPAPER_INSTANCE = Some(SigmaWallpaper::new());
     }
-}
+;
 
 /// Get the global SigmaWallpaper instance
 pub fn get_sigmawallpaper() -> Option<&'static SigmaWallpaper> {
     unsafe { SIGMAWALLPAPER_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaWallpaper instance
 pub fn get_sigmawallpaper_mut() -> Option<&'static mut SigmaWallpaper> {
     unsafe { SIGMAWALLPAPER_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a wallpaper
 pub fn add_wallpaper(wallpaper: Wallpaper) -> bool {
@@ -297,7 +297,7 @@ pub fn add_wallpaper(wallpaper: Wallpaper) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to set wallpaper on all outputs
 pub fn set_wallpaper_all(wallpaper_id: &str) -> bool {
@@ -306,7 +306,7 @@ pub fn set_wallpaper_all(wallpaper_id: &str) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -520,4 +520,4 @@ mod tests {
         let set = set_wallpaper_all("wp1");
         assert!(set);
     }
-}
+;

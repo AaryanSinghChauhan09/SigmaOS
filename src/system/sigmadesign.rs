@@ -22,7 +22,7 @@ pub enum TokenType {
     Shadow,
     BorderRadius,
     Transition,
-}
+;
 
 /// Design token value
 #[derive(Debug, Clone)]
@@ -33,7 +33,7 @@ pub enum TokenValue {
     Shadow(String),
     BorderRadius(u32),
     Transition(u32),
-}
+;
 
 /// Design token
 #[derive(Debug, Clone)]
@@ -42,7 +42,7 @@ pub struct DesignToken {
     pub name: String,
     pub token_type: TokenType,
     pub value: TokenValue,
-}
+;
 
 impl DesignToken {
     pub fn new(id: String, name: String, token_type: TokenType, value: TokenValue) -> Self {
@@ -53,7 +53,7 @@ impl DesignToken {
             value,
         }
     }
-}
+;
 
 /// Component variant
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,7 +64,7 @@ pub enum ComponentVariant {
     Warning,
     Danger,
     Info,
-}
+;
 
 /// Component size
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -73,7 +73,7 @@ pub enum ComponentSize {
     Medium,
     Large,
     ExtraLarge,
-}
+;
 
 /// UI component
 #[derive(Debug, Clone)]
@@ -84,7 +84,7 @@ pub struct UIComponent {
     pub variant: ComponentVariant,
     pub size: ComponentSize,
     pub properties: BTreeMap<String, String>,
-}
+;
 
 impl UIComponent {
     pub fn new(id: String, name: String, component_type: String) -> Self {
@@ -113,7 +113,7 @@ impl UIComponent {
     pub fn get_property(&self, key: &str) -> Option<&String> {
         self.properties.get(key)
     }
-}
+;
 
 /// Design system
 #[derive(Debug, Clone)]
@@ -122,7 +122,7 @@ pub struct DesignSystem {
     pub name: String,
     pub tokens: BTreeMap<String, DesignToken>,
     pub components: BTreeMap<String, UIComponent>,
-}
+;
 
 impl DesignSystem {
     pub fn new(id: String, name: String) -> Self {
@@ -181,14 +181,14 @@ impl DesignSystem {
     pub fn component_count(&self) -> usize {
         self.components.len()
     }
-}
+;
 
 /// SigmaDesign - Design system manager
 #[derive(Debug)]
 pub struct SigmaDesign {
     design_systems: BTreeMap<String, DesignSystem>,
     current_system: Option<String>,
-}
+;
 
 impl SigmaDesign {
     pub fn new() -> Self {
@@ -245,13 +245,13 @@ impl SigmaDesign {
     pub fn design_system_count(&self) -> usize {
         self.design_systems.len()
     }
-}
+;
 
 impl Default for SigmaDesign {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaDesign instance
 static mut SIGMADESIGN_INSTANCE: Option<SigmaDesign> = None;
@@ -261,17 +261,17 @@ pub fn init_sigmadesign() {
     unsafe {
         SIGMADESIGN_INSTANCE = Some(SigmaDesign::new());
     }
-}
+;
 
 /// Get the global SigmaDesign instance
 pub fn get_sigmadesign() -> Option<&'static SigmaDesign> {
     unsafe { SIGMADESIGN_INSTANCE.as_ref() }
-}
+;
 
 /// Get the global SigmaDesign instance (mutable)
 pub fn get_sigmadesign_mut() -> Option<&'static mut SigmaDesign> {
     unsafe { SIGMADESIGN_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a design system
 pub fn add_design_system(system: DesignSystem) -> bool {
@@ -281,7 +281,7 @@ pub fn add_design_system(system: DesignSystem) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -373,4 +373,4 @@ mod tests {
         design.add_design_system(system);
         assert_eq!(design.design_system_count(), 1);
     }
-}
+;

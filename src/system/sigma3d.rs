@@ -21,7 +21,7 @@ pub enum RenderState {
     Completed,
     Error,
     Unknown,
-}
+;
 
 /// 3D Model
 #[derive(Debug, Clone)]
@@ -31,7 +31,7 @@ pub struct Model3D {
     pub format: String,
     pub vertex_count: u32,
     pub face_count: u32,
-}
+;
 
 impl Model3D {
     pub fn new(id: String, name: String, format: String) -> Self {
@@ -49,7 +49,7 @@ impl Model3D {
         self.face_count = face_count;
         self
     }
-}
+;
 
 /// Scene
 #[derive(Debug, Clone)]
@@ -58,7 +58,7 @@ pub struct Scene {
     pub name: String,
     pub models: Vec<String>,
     pub render_state: RenderState,
-}
+;
 
 impl Scene {
     pub fn new(id: String, name: String) -> Self {
@@ -82,7 +82,7 @@ impl Scene {
     pub fn complete_render(&mut self) {
         self.render_state = RenderState::Completed;
     }
-}
+;
 
 /// 3D manager
 pub struct Sigma3D {
@@ -90,7 +90,7 @@ pub struct Sigma3D {
     scenes: BTreeMap<String, Scene>,
     next_model_id: u64,
     next_scene_id: u64,
-}
+;
 
 impl Sigma3D {
     pub fn new() -> Self {
@@ -153,13 +153,13 @@ impl Sigma3D {
     pub fn scene_count(&self) -> usize {
         self.scenes.len()
     }
-}
+;
 
 impl Default for Sigma3D {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMA3D_INSTANCE: Option<Sigma3D> = None;
 
@@ -167,20 +167,20 @@ pub fn init_sigma3d() {
     unsafe {
         SIGMA3D_INSTANCE = Some(Sigma3D::new());
     }
-}
+;
 
 pub fn get_sigma3d() -> &'static Sigma3D {
     unsafe { SIGMA3D_INSTANCE.as_ref().expect("Sigma3D not initialized") }
-}
+;
 
 pub fn get_sigma3d_mut() -> &'static mut Sigma3D {
     unsafe { SIGMA3D_INSTANCE.as_mut().expect("Sigma3D not initialized") }
-}
+;
 
 pub fn add_model(name: String, format: String) -> String {
     let manager = get_sigma3d_mut();
     manager.add_model(name, format)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -261,4 +261,4 @@ mod tests {
         let manager = get_sigma3d();
         assert!(manager.get_model(&id).is_some());
     }
-}
+;

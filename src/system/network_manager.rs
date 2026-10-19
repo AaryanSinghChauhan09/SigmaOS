@@ -21,7 +21,7 @@ pub enum ConnectionType {
     Bridge,
     Bond,
     VLAN,
-}
+;
 
 /// Connection state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum ConnectionState {
     Deactivating,
     Deactivated,
     Failed,
-}
+;
 
 /// IP configuration method
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,7 +41,7 @@ pub enum IPMethod {
     Manual,
     LinkLocal,
     Disabled,
-}
+;
 
 /// WiFi security type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -54,7 +54,7 @@ pub enum WiFiSecurity {
     WPA2_EAP,
     WPA3_PSK,
     WPA3_EAP,
-}
+;
 
 /// IP address
 #[derive(Debug, Clone)]
@@ -62,14 +62,14 @@ pub struct IPAddress {
     pub address: String,
     pub prefix: u8,
     pub gateway: Option<String>,
-}
+;
 
 /// DNS server
 #[derive(Debug, Clone)]
 pub struct DNSServer {
     pub address: String,
     pub search_domains: Vec<String>,
-}
+;
 
 /// Connection
 #[derive(Debug, Clone)]
@@ -84,7 +84,7 @@ pub struct Connection {
     pub dns_servers: Vec<DNSServer>,
     pub wifi_security: Option<WiFiSecurity>,
     pub wifi_ssid: Option<String>,
-}
+;
 
 /// Network device
 #[derive(Debug, Clone)]
@@ -96,7 +96,7 @@ pub struct NetworkDevice {
     pub mac_address: String,
     pub is_up: bool,
     pub mtu: u32,
-}
+;
 
 /// Network Manager
 pub struct NetworkManager {
@@ -105,7 +105,7 @@ pub struct NetworkManager {
     pub active_connection: Option<u32>,
     next_connection_id: AtomicU32,
     next_device_id: AtomicU32,
-}
+;
 
 impl NetworkManager {
     pub fn new() -> Self {
@@ -291,7 +291,7 @@ impl NetworkManager {
         let connection = self.connections.get(&id).ok_or("Connection not found")?;
         Ok(connection.state)
     }
-}
+;
 
 /// Global network manager
 static mut NETWORK_MANAGER: Option<NetworkManager> = None;
@@ -301,7 +301,7 @@ pub fn init_network_manager() {
     unsafe {
         NETWORK_MANAGER = Some(NetworkManager::new());
     }
-}
+;
 
 /// Get network manager
 pub fn get_network_manager() -> &'static mut NetworkManager {
@@ -310,7 +310,7 @@ pub fn get_network_manager() -> &'static mut NetworkManager {
             .as_mut()
             .expect("Network manager not initialized")
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -368,4 +368,4 @@ mod tests {
         );
         assert!(nm.devices.contains_key(&id));
     }
-}
+;

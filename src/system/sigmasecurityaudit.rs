@@ -21,7 +21,7 @@ pub enum SecuritySeverity {
     Medium,
     Low,
     Info,
-}
+;
 
 /// Security issue
 #[derive(Debug, Clone)]
@@ -32,7 +32,7 @@ pub struct SecurityIssue {
     pub severity: SecuritySeverity,
     pub category: String,
     pub resolved: bool,
-}
+;
 
 impl SecurityIssue {
     pub fn new(
@@ -59,7 +59,7 @@ impl SecurityIssue {
     pub fn reopen(&mut self) {
         self.resolved = false;
     }
-}
+;
 
 /// Security report
 #[derive(Debug, Clone)]
@@ -68,7 +68,7 @@ pub struct SecurityReport {
     pub name: String,
     pub issues: Vec<SecurityIssue>,
     pub timestamp: u64,
-}
+;
 
 impl SecurityReport {
     pub fn new(id: String, name: String) -> Self {
@@ -107,13 +107,13 @@ impl SecurityReport {
     pub fn total_unresolved(&self) -> usize {
         self.issues.iter().filter(|i| !i.resolved).count()
     }
-}
+;
 
 /// Security audit manager
 pub struct SigmaSecurityAudit {
     reports: BTreeMap<String, SecurityReport>,
     next_report_id: u64,
-}
+;
 
 impl SigmaSecurityAudit {
     pub fn new() -> Self {
@@ -165,13 +165,13 @@ impl SigmaSecurityAudit {
     pub fn total_unresolved(&self) -> usize {
         self.reports.values().map(|r| r.total_unresolved()).sum()
     }
-}
+;
 
 impl Default for SigmaSecurityAudit {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMASECURITYAUDIT_INSTANCE: Option<SigmaSecurityAudit> = None;
 
@@ -179,7 +179,7 @@ pub fn init_sigmasecurityaudit() {
     unsafe {
         SIGMASECURITYAUDIT_INSTANCE = Some(SigmaSecurityAudit::new());
     }
-}
+;
 
 pub fn get_sigmasecurityaudit() -> &'static SigmaSecurityAudit {
     unsafe {
@@ -187,7 +187,7 @@ pub fn get_sigmasecurityaudit() -> &'static SigmaSecurityAudit {
             .as_ref()
             .expect("SigmaSecurityAudit not initialized")
     }
-}
+;
 
 pub fn get_sigmasecurityaudit_mut() -> &'static mut SigmaSecurityAudit {
     unsafe {
@@ -195,7 +195,7 @@ pub fn get_sigmasecurityaudit_mut() -> &'static mut SigmaSecurityAudit {
             .as_mut()
             .expect("SigmaSecurityAudit not initialized")
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -325,4 +325,4 @@ mod tests {
         manager_mut.add_report("Audit".to_string());
         assert_eq!(manager.report_count(), 1);
     }
-}
+;

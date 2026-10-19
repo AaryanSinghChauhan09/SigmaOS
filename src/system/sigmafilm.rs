@@ -22,7 +22,7 @@ pub enum VideoResolution {
     QHD1440,
     UHD2160,
     UHD4320,
-}
+;
 
 /// Video frame rate
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum FrameRate {
     Fps30,
     Fps60,
     Fps120,
-}
+;
 
 /// Video codec
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,7 +41,7 @@ pub enum VideoCodec {
     VP9,
     AV1,
     ProRes,
-}
+;
 
 /// Audio codec
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -51,7 +51,7 @@ pub enum AudioCodec {
     Opus,
     FLAC,
     PCM,
-}
+;
 
 /// Media clip
 #[derive(Debug, Clone)]
@@ -65,7 +65,7 @@ pub struct MediaClip {
     pub audio_codec: Option<AudioCodec>,
     pub resolution: Option<VideoResolution>,
     pub frame_rate: Option<FrameRate>,
-}
+;
 
 impl MediaClip {
     pub fn new(id: String, name: String, duration: u64) -> Self {
@@ -106,7 +106,7 @@ impl MediaClip {
     pub fn get_trimmed_duration(&self) -> u64 {
         self.end_time - self.start_time
     }
-}
+;
 
 /// Timeline track
 #[derive(Debug, Clone)]
@@ -117,7 +117,7 @@ pub struct TimelineTrack {
     pub clips: Vec<String>, // clip IDs
     pub locked: bool,
     pub muted: bool,
-}
+;
 
 impl TimelineTrack {
     pub fn new(id: String, name: String, track_type: String) -> Self {
@@ -155,7 +155,7 @@ impl TimelineTrack {
     pub fn clip_count(&self) -> usize {
         self.clips.len()
     }
-}
+;
 
 /// Video project
 #[derive(Debug, Clone)]
@@ -167,7 +167,7 @@ pub struct VideoProject {
     pub resolution: VideoResolution,
     pub frame_rate: FrameRate,
     pub output_codec: VideoCodec,
-}
+;
 
 impl VideoProject {
     pub fn new(
@@ -230,14 +230,14 @@ impl VideoProject {
     pub fn track_count(&self) -> usize {
         self.tracks.len()
     }
-}
+;
 
 /// SigmaFilm - Film and video editing system manager
 #[derive(Debug)]
 pub struct SigmaFilm {
     projects: BTreeMap<String, VideoProject>,
     current_project: Option<String>,
-}
+;
 
 impl SigmaFilm {
     pub fn new() -> Self {
@@ -294,13 +294,13 @@ impl SigmaFilm {
     pub fn project_count(&self) -> usize {
         self.projects.len()
     }
-}
+;
 
 impl Default for SigmaFilm {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFilm instance
 static mut SIGMAFILM_INSTANCE: Option<SigmaFilm> = None;
@@ -310,17 +310,17 @@ pub fn init_sigmafilm() {
     unsafe {
         SIGMAFILM_INSTANCE = Some(SigmaFilm::new());
     }
-}
+;
 
 /// Get the global SigmaFilm instance
 pub fn get_sigmafilm() -> Option<&'static SigmaFilm> {
     unsafe { SIGMAFILM_INSTANCE.as_ref() }
-}
+;
 
 /// Get the global SigmaFilm instance (mutable)
 pub fn get_sigmafilm_mut() -> Option<&'static mut SigmaFilm> {
     unsafe { SIGMAFILM_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a project
 pub fn add_project(project: VideoProject) -> bool {
@@ -330,7 +330,7 @@ pub fn add_project(project: VideoProject) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -426,4 +426,4 @@ mod tests {
         film.add_project(project);
         assert_eq!(film.project_count(), 1);
     }
-}
+;

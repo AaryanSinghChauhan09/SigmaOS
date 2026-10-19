@@ -18,7 +18,7 @@ pub enum ShellType {
     Nushell,
     Custom,
     Unknown,
-}
+;
 
 /// Module type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum ModuleType {
     Variable,
     Plugin,
     Unknown,
-}
+;
 
 /// Shell module data structure
 #[derive(Debug, Clone)]
@@ -40,7 +40,7 @@ pub struct ShellModule {
     pub content: String,
     pub enabled: bool,
     pub priority: u32,
-}
+;
 
 impl ShellModule {
     /// Create a new shell module
@@ -74,7 +74,7 @@ impl ShellModule {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-}
+;
 
 /// Shell configuration data structure
 #[derive(Debug, Clone)]
@@ -84,7 +84,7 @@ pub struct ShellConfig {
     pub path: String,
     pub modules: Vec<String>,
     pub is_active: bool,
-}
+;
 
 impl ShellConfig {
     /// Create a new shell configuration
@@ -112,14 +112,14 @@ impl ShellConfig {
     pub fn is_config_active(&self) -> bool {
         self.is_active
     }
-}
+;
 
 /// Quickshell manager
 pub struct SigmaQuickshell {
     modules: BTreeMap<String, ShellModule>,
     configs: BTreeMap<String, ShellConfig>,
     running: AtomicBool,
-}
+;
 
 impl SigmaQuickshell {
     /// Create a new Quickshell manager
@@ -285,13 +285,13 @@ impl SigmaQuickshell {
     pub fn config_count(&self) -> usize {
         self.configs.len()
     }
-}
+;
 
 impl Default for SigmaQuickshell {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaQuickshell instance (placeholder for actual global state)
 static mut SIGMAQUICKSHELL_INSTANCE: Option<SigmaQuickshell> = None;
@@ -301,17 +301,17 @@ pub fn init_sigmaquickshell() {
     unsafe {
         SIGMAQUICKSHELL_INSTANCE = Some(SigmaQuickshell::new());
     }
-}
+;
 
 /// Get the global SigmaQuickshell instance
 pub fn get_sigmaquickshell() -> Option<&'static SigmaQuickshell> {
     unsafe { SIGMAQUICKSHELL_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaQuickshell instance
 pub fn get_sigmaquickshell_mut() -> Option<&'static mut SigmaQuickshell> {
     unsafe { SIGMAQUICKSHELL_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a module
 pub fn add_shell_module(module: ShellModule) -> bool {
@@ -320,7 +320,7 @@ pub fn add_shell_module(module: ShellModule) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to generate config
 pub fn generate_shell_config(config_id: &str) -> Option<String> {
@@ -329,7 +329,7 @@ pub fn generate_shell_config(config_id: &str) -> Option<String> {
     } else {
         None
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -544,4 +544,4 @@ mod tests {
         let generated = generate_shell_config("config1");
         assert!(generated.is_some());
     }
-}
+;

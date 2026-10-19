@@ -29,7 +29,7 @@ pub enum ThermalZoneType {
     Battery,
     /// Unknown thermal zone
     Unknown,
-}
+;
 
 impl fmt::Display for ThermalZoneType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -42,7 +42,7 @@ impl fmt::Display for ThermalZoneType {
             ThermalZoneType::Unknown => write!(f, "unknown"),
         }
     }
-}
+;
 
 /// Cooling device type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -57,7 +57,7 @@ pub enum CoolingDeviceType {
     Battery,
     /// Unknown
     Unknown,
-}
+;
 
 impl fmt::Display for CoolingDeviceType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -69,7 +69,7 @@ impl fmt::Display for CoolingDeviceType {
             CoolingDeviceType::Unknown => write!(f, "unknown"),
         }
     }
-}
+;
 
 /// Thermal trip point type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -82,7 +82,7 @@ pub enum TripPointType {
     Passive,
     /// Active trip point
     Active,
-}
+;
 
 impl fmt::Display for TripPointType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -93,7 +93,7 @@ impl fmt::Display for TripPointType {
             TripPointType::Active => write!(f, "active"),
         }
     }
-}
+;
 
 /// Thermal zone
 #[derive(Debug, Clone)]
@@ -108,7 +108,7 @@ pub struct ThermalZone {
     pub trip_points: BTreeMap<TripPointType, i32>,
     /// Cooling devices
     pub cooling_devices: Vec<String>,
-}
+;
 
 impl ThermalZone {
     /// Create a new thermal zone
@@ -139,7 +139,7 @@ impl ThermalZone {
         self.cooling_devices.push(device);
         self
     }
-}
+;
 
 /// Cooling device
 #[derive(Debug, Clone)]
@@ -152,7 +152,7 @@ pub struct CoolingDevice {
     pub state: u8,
     /// Max state
     pub max_state: u8,
-}
+;
 
 impl CoolingDevice {
     /// Create a new cooling device
@@ -176,7 +176,7 @@ impl CoolingDevice {
         self.max_state = max;
         self
     }
-}
+;
 
 /// Thermal policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -187,7 +187,7 @@ pub enum ThermalPolicy {
     Balanced,
     /// Power saver policy
     PowerSaver,
-}
+;
 
 impl fmt::Display for ThermalPolicy {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -197,7 +197,7 @@ impl fmt::Display for ThermalPolicy {
             ThermalPolicy::PowerSaver => write!(f, "power_saver"),
         }
     }
-}
+;
 
 /// SigmaThermal - Thermal Management Daemon
 pub struct SigmaThermal {
@@ -211,7 +211,7 @@ pub struct SigmaThermal {
     running: bool,
     /// Trip point trigger count
     trip_triggers: u32,
-}
+;
 
 impl SigmaThermal {
     /// Create a new SigmaThermal instance
@@ -417,13 +417,13 @@ impl SigmaThermal {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaThermal {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaThermal instance (placeholder for actual global state)
 static mut SIGMATHERMAL_INSTANCE: Option<SigmaThermal> = None;
@@ -433,12 +433,12 @@ pub fn init_sigmathernal() {
     unsafe {
         SIGMATHERMAL_INSTANCE = Some(SigmaThermal::new());
     }
-}
+;
 
 /// Get the global SigmaThermal instance
 pub fn get_sigmathernal() -> Option<&'static mut SigmaThermal> {
     unsafe { SIGMATHERMAL_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to set thermal policy
 pub fn set_thermal_policy(policy: ThermalPolicy) -> Result<(), String> {
@@ -447,7 +447,7 @@ pub fn set_thermal_policy(policy: ThermalPolicy) -> Result<(), String> {
     } else {
         Err("SigmaThermal not initialized".to_string())
     }
-}
+;
 
 /// Convenience function to update temperature
 pub fn update_temperature(zone_id: &str, temperature: i32) -> Result<(), String> {
@@ -456,7 +456,7 @@ pub fn update_temperature(zone_id: &str, temperature: i32) -> Result<(), String>
     } else {
         Err("SigmaThermal not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -619,4 +619,4 @@ mod tests {
         let result = update_temperature("cpu0", 50000);
         assert!(result.is_ok());
     }
-}
+;

@@ -20,7 +20,7 @@ mod fs {
     pub fn create_dir_all<P: AsRef<str>>(_path: P) -> Result<(), std::io::Error> {
         Ok(())
     }
-}
+;
 
 /// System configuration file types
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -30,7 +30,7 @@ pub enum ConfigType {
     Environment,
     InitScript,
     Sysconfig,
-}
+;
 
 /// Configuration file entry
 #[derive(Debug, Clone)]
@@ -38,14 +38,14 @@ pub struct ConfigEntry {
     pub key: String,
     pub value: String,
     pub comment: Option<String>,
-}
+;
 
 /// System configuration manager
 pub struct SystemConfigManager {
     pub config_dir: PathBuf,
     pub configs: HashMap<String, Vec<ConfigEntry>>,
     pub config_type: ConfigType,
-}
+;
 
 impl SystemConfigManager {
     pub fn new(config_dir: &str, config_type: ConfigType) -> Self {
@@ -212,7 +212,7 @@ impl SystemConfigManager {
     pub fn initialize(&self) -> Result<(), ConfigError> {
         Ok(())
     }
-}
+;
 
 /// Configuration errors
 #[derive(Debug)]
@@ -221,7 +221,7 @@ pub enum ConfigError {
     WriteError(String, String),
     NotFound(String),
     ParseError(String),
-}
+;
 
 /// Systemd-style service unit
 #[derive(Debug, Clone)]
@@ -235,7 +235,7 @@ pub struct ServiceUnit {
     pub exec_stop: Option<String>,
     pub restart: String,
     pub wanted_by: Vec<String>,
-}
+;
 
 impl ServiceUnit {
     pub fn new(name: &str) -> Self {
@@ -285,13 +285,13 @@ impl ServiceUnit {
 
         content
     }
-}
+;
 
 /// Service manager for managing system services
 pub struct ServiceManager {
     pub services: HashMap<String, ServiceUnit>,
     pub service_dir: PathBuf,
-}
+;
 
 impl ServiceManager {
     pub fn new(service_dir: &str) -> Self {
@@ -403,7 +403,7 @@ impl ServiceManager {
     pub fn initialize(&self) -> Result<(), ConfigError> {
         Ok(())
     }
-}
+;
 
 #[cfg(test_disabled)]
 #[cfg(test_disabled)]
@@ -453,4 +453,4 @@ mod tests {
         manager.add_service(service);
         manager.save_service("test-service").unwrap();
     }
-}
+;

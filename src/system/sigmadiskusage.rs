@@ -22,7 +22,7 @@ pub struct Filesystem {
     pub total_size: u64,
     pub used_size: u64,
     pub available_size: u64,
-}
+;
 
 impl Filesystem {
     pub fn new(id: String, mount_point: String, device: String, total_size: u64) -> Self {
@@ -48,7 +48,7 @@ impl Filesystem {
         }
         ((self.used_size as u64) * 100 / self.total_size) as u32
     }
-}
+;
 
 /// Directory entry
 #[derive(Debug, Clone)]
@@ -58,7 +58,7 @@ pub struct Directory {
     pub size: u64,
     pub file_count: u32,
     pub directory_count: u32,
-}
+;
 
 impl Directory {
     pub fn new(id: String, path: String) -> Self {
@@ -81,7 +81,7 @@ impl Directory {
         self.directory_count = directory_count;
         self
     }
-}
+;
 
 /// Disk usage manager
 pub struct SigmaDiskUsage {
@@ -89,7 +89,7 @@ pub struct SigmaDiskUsage {
     directories: BTreeMap<String, Directory>,
     next_filesystem_id: u64,
     next_directory_id: u64,
-}
+;
 
 impl SigmaDiskUsage {
     pub fn new() -> Self {
@@ -169,13 +169,13 @@ impl SigmaDiskUsage {
     pub fn total_available_space(&self) -> u64 {
         self.filesystems.values().map(|fs| fs.available_size).sum()
     }
-}
+;
 
 impl Default for SigmaDiskUsage {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMADISKUSAGE_INSTANCE: Option<SigmaDiskUsage> = None;
 
@@ -183,7 +183,7 @@ pub fn init_sigmadiskusage() {
     unsafe {
         SIGMADISKUSAGE_INSTANCE = Some(SigmaDiskUsage::new());
     }
-}
+;
 
 pub fn get_sigmadiskusage() -> &'static SigmaDiskUsage {
     unsafe {
@@ -191,7 +191,7 @@ pub fn get_sigmadiskusage() -> &'static SigmaDiskUsage {
             .as_ref()
             .expect("SigmaDiskUsage not initialized")
     }
-}
+;
 
 pub fn get_sigmadiskusage_mut() -> &'static mut SigmaDiskUsage {
     unsafe {
@@ -199,12 +199,12 @@ pub fn get_sigmadiskusage_mut() -> &'static mut SigmaDiskUsage {
             .as_mut()
             .expect("SigmaDiskUsage not initialized")
     }
-}
+;
 
 pub fn add_filesystem(mount_point: String, device: String, total_size: u64) -> String {
     let manager = get_sigmadiskusage_mut();
     manager.add_filesystem(mount_point, device, total_size)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -329,4 +329,4 @@ mod tests {
         let manager = get_sigmadiskusage();
         assert!(manager.get_filesystem(&id).is_some());
     }
-}
+;

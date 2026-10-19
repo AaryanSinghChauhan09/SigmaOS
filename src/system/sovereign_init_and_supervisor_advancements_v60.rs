@@ -31,7 +31,7 @@ pub struct CoreUserlandV60Manifest {
     pub components_added: Vec<String>,
     pub performance_multiplier: String,
     pub status: String,
-}
+;
 
 // ============================================================================
 // 1. SYSTEMD ADVANCEMENTS V60 ENGINE
@@ -42,7 +42,7 @@ pub struct CoreUserlandV60Manifest {
 pub struct SystemdDropInSectionV60 {
     pub section_name: String,
     pub key_values: BTreeMap<String, String>,
-}
+;
 
 /// systemd Advancements V60 Engine.
 #[derive(Debug, Default)]
@@ -120,7 +120,7 @@ impl SystemdAdvancementsV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 2. OPENRC ADVANCEMENTS V60 ENGINE
@@ -173,7 +173,7 @@ impl OpenRcAdvancementsV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 3. RUNIT & S6 ADVANCEMENTS V60 ENGINE
@@ -218,7 +218,7 @@ impl RunitS6AdvancementsV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 4. SYSVINIT ADVANCEMENTS V60 ENGINE
@@ -260,7 +260,7 @@ impl SysVinitAdvancementsV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V60 ENGINE
@@ -306,7 +306,7 @@ impl BsdRcAdvancementsV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V60 ENGINE
@@ -356,7 +356,7 @@ impl LaunchdAndroidInitAdvancementsV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 7. CRON, ANACRON, TIMERS & AT ADVANCEMENTS V60 ENGINE
@@ -424,7 +424,7 @@ impl CronAnacronTimersAtV60Engine {
             status: "Ready for Integration".to_string(),
         }
     }
-}
+;
 
 // ============================================================================
 // 8. MASTER COORDINATOR SUITE V60
@@ -440,7 +440,7 @@ pub struct SovereignInitAndSupervisorAdvancementsV60Suite {
     pub bsd_rc: BsdRcAdvancementsV60Engine,
     pub launchd_android: LaunchdAndroidInitAdvancementsV60Engine,
     pub cron_timers_at: CronAnacronTimersAtV60Engine,
-}
+;
 
 impl SovereignInitAndSupervisorAdvancementsV60Suite {
     pub fn new() -> Self {
@@ -505,7 +505,7 @@ impl SovereignInitAndSupervisorAdvancementsV60Suite {
             && prop_ok
             && stamp.is_some()
     }
-}
+;
 
 // ============================================================================
 // UNIT TESTS
@@ -620,4 +620,4 @@ mod tests {
 
         assert!(suite.run_master_verification());
     }
-}
+;

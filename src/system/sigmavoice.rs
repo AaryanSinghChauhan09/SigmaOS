@@ -20,7 +20,7 @@ pub struct VoiceCommand {
     pub phrase: String,
     pub action: String,
     pub enabled: bool,
-}
+;
 
 impl VoiceCommand {
     pub fn new(id: String, phrase: String, action: String) -> Self {
@@ -39,7 +39,7 @@ impl VoiceCommand {
     pub fn matches(&self, input: &str) -> bool {
         self.enabled && input.to_lowercase().contains(&self.phrase.to_lowercase())
     }
-}
+;
 
 /// Speech recognition result
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct SpeechResult {
     pub text: String,
     pub confidence: f32,
     pub language: String,
-}
+;
 
 impl SpeechResult {
     pub fn new(id: String, text: String, confidence: f32, language: String) -> Self {
@@ -63,7 +63,7 @@ impl SpeechResult {
     pub fn is_confident(&self) -> bool {
         self.confidence >= 0.7
     }
-}
+;
 
 /// Voice profile
 #[derive(Debug, Clone)]
@@ -75,7 +75,7 @@ pub struct VoiceProfile {
     pub pitch: f32,
     pub rate: f32,
     pub volume: f32,
-}
+;
 
 impl VoiceProfile {
     pub fn new(id: String, name: String, language: String, voice_id: String) -> Self {
@@ -101,7 +101,7 @@ impl VoiceProfile {
     pub fn set_volume(&mut self, volume: f32) {
         self.volume = volume;
     }
-}
+;
 
 /// SigmaVoice - Voice and speech system
 #[derive(Debug)]
@@ -111,7 +111,7 @@ pub struct SigmaVoice {
     voice_profiles: BTreeMap<String, VoiceProfile>,
     current_profile: Option<String>,
     listening: bool,
-}
+;
 
 impl SigmaVoice {
     pub fn new() -> Self {
@@ -201,13 +201,13 @@ impl SigmaVoice {
     pub fn profile_count(&self) -> usize {
         self.voice_profiles.len()
     }
-}
+;
 
 impl Default for SigmaVoice {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaVoice instance
 static mut SIGMAVOICE_INSTANCE: Option<SigmaVoice> = None;
@@ -217,21 +217,21 @@ pub fn init_sigmavoice() {
     unsafe {
         SIGMAVOICE_INSTANCE = Some(SigmaVoice::new());
     }
-}
+;
 
 /// Get the global SigmaVoice instance
 pub fn get_sigmavoice() -> Option<&'static SigmaVoice> {
     unsafe {
         SIGMAVOICE_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaVoice instance (mutable)
 pub fn get_sigmavoice_mut() -> Option<&'static mut SigmaVoice> {
     unsafe {
         SIGMAVOICE_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a voice command
 pub fn add_voice_command(command: VoiceCommand) -> bool {
@@ -241,7 +241,7 @@ pub fn add_voice_command(command: VoiceCommand) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -307,4 +307,4 @@ mod tests {
         voice.stop_listening();
         assert!(!voice.is_listening());
     }
-}
+;

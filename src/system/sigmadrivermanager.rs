@@ -21,7 +21,7 @@ pub enum DriverStatus {
     UpdateAvailable,
     Incompatible,
     Blacklisted,
-}
+;
 
 /// Driver type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub enum DriverType {
     Camera,
     Printer,
     Other,
-}
+;
 
 /// Hardware device
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct HardwareDevice {
     pub device_type: DriverType,
     pub bus: String, // pci, usb, platform
     pub needs_driver: bool,
-}
+;
 
 impl HardwareDevice {
     pub fn new(id: String, vendor_id: String, device_id: String, name: String, device_type: DriverType, bus: String) -> Self {
@@ -66,7 +66,7 @@ impl HardwareDevice {
     pub fn set_needs_driver(&mut self, needs: bool) {
         self.needs_driver = needs;
     }
-}
+;
 
 /// Driver package
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct DriverPackage {
     pub installed_version: Option<String>,
     pub latest_version: String,
     pub compatible_devices: Vec<String>, // device IDs
-}
+;
 
 impl DriverPackage {
     pub fn new(id: String, name: String, driver_type: DriverType, version: String, vendor: String, description: String) -> Self {
@@ -118,14 +118,14 @@ impl DriverPackage {
     pub fn needs_update(&self) -> bool {
         self.status == DriverStatus::UpdateAvailable
     }
-}
+;
 
 /// SigmaDriverManager - Driver management system
 #[derive(Debug)]
 pub struct SigmaDriverManager {
     devices: BTreeMap<String, HardwareDevice>,
     drivers: BTreeMap<String, DriverPackage>,
-}
+;
 
 impl SigmaDriverManager {
     pub fn new() -> Self {
@@ -207,13 +207,13 @@ impl SigmaDriverManager {
     pub fn driver_count(&self) -> usize {
         self.drivers.len()
     }
-}
+;
 
 impl Default for SigmaDriverManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaDriverManager instance
 static mut SIGMADRIVERMANAGER_INSTANCE: Option<SigmaDriverManager> = None;
@@ -223,21 +223,21 @@ pub fn init_sigmadrivermanager() {
     unsafe {
         SIGMADRIVERMANAGER_INSTANCE = Some(SigmaDriverManager::new());
     }
-}
+;
 
 /// Get the global SigmaDriverManager instance
 pub fn get_sigmadrivermanager() -> Option<&'static SigmaDriverManager> {
     unsafe {
         SIGMADRIVERMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaDriverManager instance (mutable)
 pub fn get_sigmadrivermanager_mut() -> Option<&'static mut SigmaDriverManager> {
     unsafe {
         SIGMADRIVERMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a device
 pub fn add_device(device: HardwareDevice) -> bool {
@@ -247,7 +247,7 @@ pub fn add_device(device: HardwareDevice) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to add a driver
 pub fn add_driver(driver: DriverPackage) -> bool {
@@ -257,7 +257,7 @@ pub fn add_driver(driver: DriverPackage) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -358,4 +358,4 @@ mod tests {
         let compatible = manager.find_compatible_drivers("dev1");
         assert_eq!(compatible.len(), 1);
     }
-}
+;

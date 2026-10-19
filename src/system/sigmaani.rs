@@ -20,7 +20,7 @@ pub enum AnimationState {
     Playing,
     Paused,
     Completed,
-}
+;
 
 /// Tweening function type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum TweenType {
     EaseInOut,
     Bounce,
     Elastic,
-}
+;
 
 /// Animation track type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,7 +41,7 @@ pub enum TrackType {
     Scale,
     Color,
     Opacity,
-}
+;
 
 /// Keyframe for animation
 #[derive(Debug, Clone)]
@@ -49,13 +49,13 @@ pub struct Keyframe {
     pub time: u64,
     pub value: f32,
     pub tween: TweenType,
-}
+;
 
 impl Keyframe {
     pub fn new(time: u64, value: f32, tween: TweenType) -> Self {
         Self { time, value, tween }
     }
-}
+;
 
 /// Animation track
 #[derive(Debug, Clone)]
@@ -64,7 +64,7 @@ pub struct AnimationTrack {
     pub track_type: TrackType,
     pub keyframes: Vec<Keyframe>,
     pub duration: u64,
-}
+;
 
 impl AnimationTrack {
     pub fn new(id: String, track_type: TrackType) -> Self {
@@ -140,7 +140,7 @@ impl AnimationTrack {
 
         Some(prev.value + (next.value - prev.value) * eased)
     }
-}
+;
 
 /// Animation
 #[derive(Debug, Clone)]
@@ -151,7 +151,7 @@ pub struct Animation {
     pub tracks: BTreeMap<String, AnimationTrack>,
     pub current_time: u64,
     pub loop_animation: bool,
-}
+;
 
 impl Animation {
     pub fn new(id: String, name: String) -> Self {
@@ -208,14 +208,14 @@ impl Animation {
     pub fn get_duration(&self) -> u64 {
         self.tracks.values().map(|t| t.duration).max().unwrap_or(0)
     }
-}
+;
 
 /// SigmaAni - Animation system manager
 #[derive(Debug)]
 pub struct SigmaAni {
     animations: BTreeMap<String, Animation>,
     current_animation: Option<String>,
-}
+;
 
 impl SigmaAni {
     pub fn new() -> Self {
@@ -302,13 +302,13 @@ impl SigmaAni {
     pub fn animation_count(&self) -> usize {
         self.animations.len()
     }
-}
+;
 
 impl Default for SigmaAni {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaAni instance
 static mut SIGMAANI_INSTANCE: Option<SigmaAni> = None;
@@ -318,17 +318,17 @@ pub fn init_sigmaani() {
     unsafe {
         SIGMAANI_INSTANCE = Some(SigmaAni::new());
     }
-}
+;
 
 /// Get the global SigmaAni instance
 pub fn get_sigmaani() -> Option<&'static SigmaAni> {
     unsafe { SIGMAANI_INSTANCE.as_ref() }
-}
+;
 
 /// Get the global SigmaAni instance (mutable)
 pub fn get_sigmaani_mut() -> Option<&'static mut SigmaAni> {
     unsafe { SIGMAANI_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add an animation
 pub fn add_animation(animation: Animation) -> bool {
@@ -338,7 +338,7 @@ pub fn add_animation(animation: Animation) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -425,4 +425,4 @@ mod tests {
         let value = track.evaluate(50);
         assert!(value.is_some());
     }
-}
+;

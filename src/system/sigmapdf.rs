@@ -22,14 +22,14 @@ pub enum PageSize {
     A3,
     A5,
     Custom { width: u32, height: u32 },
-}
+;
 
 /// Page orientation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PageOrientation {
     Portrait,
     Landscape,
-}
+;
 
 /// PDF page
 #[derive(Debug, Clone)]
@@ -39,7 +39,7 @@ pub struct PDFPage {
     pub page_size: PageSize,
     pub orientation: PageOrientation,
     pub rotation: u8, // 0, 90, 180, 270
-}
+;
 
 impl PDFPage {
     pub fn new(id: String, page_number: u32, page_size: PageSize, orientation: PageOrientation) -> Self {
@@ -59,7 +59,7 @@ impl PDFPage {
     pub fn set_orientation(&mut self, orientation: PageOrientation) {
         self.orientation = orientation;
     }
-}
+;
 
 /// PDF document
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct PDFDocument {
     pub creator: String,
     pub pages: BTreeMap<String, PDFPage>,
     pub page_count: u32,
-}
+;
 
 impl PDFDocument {
     pub fn new(id: String, name: String) -> Self {
@@ -122,14 +122,14 @@ impl PDFDocument {
     pub fn set_creator(&mut self, creator: String) {
         self.creator = creator;
     }
-}
+;
 
 /// SigmaPDF - PDF document management system
 #[derive(Debug)]
 pub struct SigmaPDF {
     documents: BTreeMap<String, PDFDocument>,
     current_document: Option<String>,
-}
+;
 
 impl SigmaPDF {
     pub fn new() -> Self {
@@ -184,13 +184,13 @@ impl SigmaPDF {
     pub fn document_count(&self) -> usize {
         self.documents.len()
     }
-}
+;
 
 impl Default for SigmaPDF {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaPDF instance
 static mut SIGMAPDF_INSTANCE: Option<SigmaPDF> = None;
@@ -200,21 +200,21 @@ pub fn init_sigmapdf() {
     unsafe {
         SIGMAPDF_INSTANCE = Some(SigmaPDF::new());
     }
-}
+;
 
 /// Get the global SigmaPDF instance
 pub fn get_sigmapdf() -> Option<&'static SigmaPDF> {
     unsafe {
         SIGMAPDF_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaPDF instance (mutable)
 pub fn get_sigmapdf_mut() -> Option<&'static mut SigmaPDF> {
     unsafe {
         SIGMAPDF_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a document
 pub fn add_document(document: PDFDocument) -> bool {
@@ -224,7 +224,7 @@ pub fn add_document(document: PDFDocument) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -279,4 +279,4 @@ mod tests {
         pdf.add_document(doc);
         assert_eq!(pdf.document_count(), 1);
     }
-}
+;

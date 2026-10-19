@@ -16,7 +16,7 @@ pub enum PartitionTableType {
     MBR,
     GPT,
     Unknown,
-}
+;
 
 /// Partition type enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,7 +25,7 @@ pub enum PartitionType {
     Logical,
     Extended,
     Unknown,
-}
+;
 
 /// Partition flags enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -36,7 +36,7 @@ pub enum PartitionFlag {
     LBA,
     Hidden,
     Unknown,
-}
+;
 
 /// Partition state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum PartitionState {
     Active,
     Inactive,
     Unknown,
-}
+;
 
 /// Partition data structure
 #[derive(Debug, Clone)]
@@ -59,7 +59,7 @@ pub struct Partition {
     pub flags: Vec<PartitionFlag>,
     pub state: PartitionState,
     pub disk_id: String,
-}
+;
 
 impl Partition {
     /// Create a new partition
@@ -118,7 +118,7 @@ impl Partition {
     pub fn is_active(&self) -> bool {
         self.state == PartitionState::Active
     }
-}
+;
 
 /// Disk data structure
 #[derive(Debug, Clone)]
@@ -130,7 +130,7 @@ pub struct Disk {
     pub sector_size: u64,
     pub table_type: PartitionTableType,
     pub partitions: BTreeMap<u32, Partition>,
-}
+;
 
 impl Disk {
     /// Create a new disk
@@ -192,13 +192,13 @@ impl Disk {
         }
         self.size - used
     }
-}
+;
 
 /// Partitioning tool manager
 pub struct SigmaParted {
     disks: BTreeMap<String, Disk>,
     running: AtomicBool,
-}
+;
 
 impl SigmaParted {
     /// Create a new partitioning tool
@@ -320,13 +320,13 @@ impl SigmaParted {
     pub fn disk_count(&self) -> usize {
         self.disks.len()
     }
-}
+;
 
 impl Default for SigmaParted {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaParted instance (placeholder for actual global state)
 static mut SIGMAPARTED_INSTANCE: Option<SigmaParted> = None;
@@ -336,17 +336,17 @@ pub fn init_sigmaparted() {
     unsafe {
         SIGMAPARTED_INSTANCE = Some(SigmaParted::new());
     }
-}
+;
 
 /// Get the global SigmaParted instance
 pub fn get_sigmaparted() -> Option<&'static SigmaParted> {
     unsafe { SIGMAPARTED_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaParted instance
 pub fn get_sigmaparted_mut() -> Option<&'static mut SigmaParted> {
     unsafe { SIGMAPARTED_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to create a partition table
 pub fn create_partition_table(disk_id: String, table_type: PartitionTableType) -> bool {
@@ -355,7 +355,7 @@ pub fn create_partition_table(disk_id: String, table_type: PartitionTableType) -
     } else {
         false
     }
-}
+;
 
 /// Convenience function to create a partition
 pub fn create_partition(disk_id: String, partition: Partition) -> bool {
@@ -364,7 +364,7 @@ pub fn create_partition(disk_id: String, partition: Partition) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -718,4 +718,4 @@ mod tests {
         let created = create_partition("disk1".to_string(), partition);
         assert!(created);
     }
-}
+;

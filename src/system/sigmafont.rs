@@ -25,7 +25,7 @@ pub enum FontWeight {
     Bold,
     ExtraBold,
     Black,
-}
+;
 
 /// Font style
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum FontStyle {
     Normal,
     Italic,
     Oblique,
-}
+;
 
 /// Glyph
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct Glyph {
     pub bearing_x: i32,
     pub bearing_y: i32,
     pub advance: u32,
-}
+;
 
 impl Glyph {
     pub fn new(codepoint: u32, width: u32, height: u32) -> Self {
@@ -66,7 +66,7 @@ impl Glyph {
     pub fn set_advance(&mut self, advance: u32) {
         self.advance = advance;
     }
-}
+;
 
 /// Font
 #[derive(Debug, Clone)]
@@ -78,7 +78,7 @@ pub struct Font {
     pub style: FontStyle,
     pub size: u32, // in points
     pub glyphs: BTreeMap<u32, Glyph>,
-}
+;
 
 impl Font {
     pub fn new(
@@ -127,7 +127,7 @@ impl Font {
     pub fn glyph_count(&self) -> usize {
         self.glyphs.len()
     }
-}
+;
 
 /// Text run
 #[derive(Debug, Clone)]
@@ -137,7 +137,7 @@ pub struct TextRun {
     pub font_id: String,
     pub font_size: u32,
     pub color: String,
-}
+;
 
 impl TextRun {
     pub fn new(id: String, text: String, font_id: String, font_size: u32) -> Self {
@@ -153,7 +153,7 @@ impl TextRun {
     pub fn set_color(&mut self, color: String) {
         self.color = color;
     }
-}
+;
 
 /// SigmaFont - Font system manager
 #[derive(Debug)]
@@ -161,7 +161,7 @@ pub struct SigmaFont {
     fonts: BTreeMap<String, Font>,
     text_runs: BTreeMap<String, TextRun>,
     default_font: Option<String>,
-}
+;
 
 impl SigmaFont {
     pub fn new() -> Self {
@@ -231,13 +231,13 @@ impl SigmaFont {
     pub fn text_run_count(&self) -> usize {
         self.text_runs.len()
     }
-}
+;
 
 impl Default for SigmaFont {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFont instance
 static mut SIGMAFONT_INSTANCE: Option<SigmaFont> = None;
@@ -247,17 +247,17 @@ pub fn init_sigmafont() {
     unsafe {
         SIGMAFONT_INSTANCE = Some(SigmaFont::new());
     }
-}
+;
 
 /// Get the global SigmaFont instance
 pub fn get_sigmafont() -> Option<&'static SigmaFont> {
     unsafe { SIGMAFONT_INSTANCE.as_ref() }
-}
+;
 
 /// Get the global SigmaFont instance (mutable)
 pub fn get_sigmafont_mut() -> Option<&'static mut SigmaFont> {
     unsafe { SIGMAFONT_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a font
 pub fn add_font(font: Font) -> bool {
@@ -267,7 +267,7 @@ pub fn add_font(font: Font) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -356,4 +356,4 @@ mod tests {
         font_sys.add_font(font);
         assert_eq!(font_sys.font_count(), 1);
     }
-}
+;

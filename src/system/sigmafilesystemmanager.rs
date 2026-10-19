@@ -24,7 +24,7 @@ pub enum FilesystemType {
     FAT32,
     ExFAT,
     Swap,
-}
+;
 
 /// Mount status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum MountStatus {
     Mounted,
     Unmounted,
     Error,
-}
+;
 
 /// Filesystem
 #[derive(Debug, Clone)]
@@ -46,7 +46,7 @@ pub struct Filesystem {
     pub used: u64,
     pub available: u64,
     pub options: String, // mount options
-}
+;
 
 impl Filesystem {
     pub fn new(id: String, device: String, mount_point: String, fs_type: FilesystemType) -> Self {
@@ -98,7 +98,7 @@ impl Filesystem {
     pub fn is_full(&self) -> bool {
         self.usage_percentage() > 95.0
     }
-}
+;
 
 /// Mount point
 #[derive(Debug, Clone)]
@@ -108,7 +108,7 @@ pub struct MountPoint {
     pub device: String,
     pub fs_type: FilesystemType,
     pub auto_mount: bool,
-}
+;
 
 impl MountPoint {
     pub fn new(id: String, path: String, device: String, fs_type: FilesystemType) -> Self {
@@ -124,14 +124,14 @@ impl MountPoint {
     pub fn set_auto_mount(&mut self, auto: bool) {
         self.auto_mount = auto;
     }
-}
+;
 
 /// SigmaFileSystemManager - Filesystem management
 #[derive(Debug)]
 pub struct SigmaFileSystemManager {
     filesystems: BTreeMap<String, Filesystem>,
     mount_points: BTreeMap<String, MountPoint>,
-}
+;
 
 impl SigmaFileSystemManager {
     pub fn new() -> Self {
@@ -212,13 +212,13 @@ impl SigmaFileSystemManager {
     pub fn mount_point_count(&self) -> usize {
         self.mount_points.len()
     }
-}
+;
 
 impl Default for SigmaFileSystemManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFileSystemManager instance
 static mut SIGMAFILESYSTEMMANAGER_INSTANCE: Option<SigmaFileSystemManager> = None;
@@ -228,21 +228,21 @@ pub fn init_sigmafilesystemmanager() {
     unsafe {
         SIGMAFILESYSTEMMANAGER_INSTANCE = Some(SigmaFileSystemManager::new());
     }
-}
+;
 
 /// Get the global SigmaFileSystemManager instance
 pub fn get_sigmafilesystemmanager() -> Option<&'static SigmaFileSystemManager> {
     unsafe {
         SIGMAFILESYSTEMMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaFileSystemManager instance (mutable)
 pub fn get_sigmafilesystemmanager_mut() -> Option<&'static mut SigmaFileSystemManager> {
     unsafe {
         SIGMAFILESYSTEMMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a filesystem
 pub fn add_filesystem(fs: Filesystem) -> bool {
@@ -252,7 +252,7 @@ pub fn add_filesystem(fs: Filesystem) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -332,4 +332,4 @@ mod tests {
         let full = manager.list_full();
         assert_eq!(full.len(), 1);
     }
-}
+;

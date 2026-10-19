@@ -22,7 +22,7 @@ pub enum AcousticProfile {
     SilentWhisper,
     BalancedDaily,
     ExtremeGaming,
-}
+;
 
 #[derive(Debug, Clone)]
 pub struct ThermalSensorReading {
@@ -30,7 +30,7 @@ pub struct ThermalSensorReading {
     pub temperature_celsius: f32,
     pub critical_temp_celsius: f32,
     pub is_throttling: bool,
-}
+;
 
 /// Sovereign Atreyu System Plugin Daemon
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct OmarchyAtreyuSystemPlugin {
     pub package_power_watts: f32,
     pub sensors: Vec<ThermalSensorReading>,
     pub power_save_active: bool,
-}
+;
 
 impl OmarchyAtreyuSystemPlugin {
     pub fn new() -> Self {
@@ -89,13 +89,13 @@ impl OmarchyAtreyuSystemPlugin {
     pub fn set_charge_limit(&mut self, limit: u8) {
         self.battery_charge_limit_percent = limit.clamp(40, 100);
     }
-}
+;
 
 impl Default for OmarchyAtreyuSystemPlugin {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 #[cfg(test)]
 #[cfg(test)]
@@ -114,4 +114,4 @@ mod tests {
         plugin.set_charge_limit(85);
         assert_eq!(plugin.battery_charge_limit_percent, 85);
     }
-}
+;

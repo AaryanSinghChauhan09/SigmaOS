@@ -21,7 +21,7 @@ pub enum BuildState {
     Installed,
     Failed,
     Unknown,
-}
+;
 
 /// Port/Package
 #[derive(Debug, Clone)]
@@ -32,7 +32,7 @@ pub struct Port {
     pub category: String,
     pub state: BuildState,
     pub dependencies: Vec<String>,
-}
+;
 
 impl Port {
     pub fn new(id: String, name: String, version: String, category: String) -> Self {
@@ -62,13 +62,13 @@ impl Port {
     pub fn fail(&mut self) {
         self.state = BuildState::Failed;
     }
-}
+;
 
 /// Ports manager
 pub struct SigmaPorts {
     ports: BTreeMap<String, Port>,
     next_port_id: u64,
-}
+;
 
 impl SigmaPorts {
     pub fn new() -> Self {
@@ -119,13 +119,13 @@ impl SigmaPorts {
             .filter(|p| p.state == BuildState::Installed)
             .count()
     }
-}
+;
 
 impl Default for SigmaPorts {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMAPORTS_INSTANCE: Option<SigmaPorts> = None;
 
@@ -133,7 +133,7 @@ pub fn init_sigmaports() {
     unsafe {
         SIGMAPORTS_INSTANCE = Some(SigmaPorts::new());
     }
-}
+;
 
 pub fn get_sigmaports() -> &'static SigmaPorts {
     unsafe {
@@ -141,7 +141,7 @@ pub fn get_sigmaports() -> &'static SigmaPorts {
             .as_ref()
             .expect("SigmaPorts not initialized")
     }
-}
+;
 
 pub fn get_sigmaports_mut() -> &'static mut SigmaPorts {
     unsafe {
@@ -149,12 +149,12 @@ pub fn get_sigmaports_mut() -> &'static mut SigmaPorts {
             .as_mut()
             .expect("SigmaPorts not initialized")
     }
-}
+;
 
 pub fn add_port(name: String, version: String, category: String) -> String {
     let manager = get_sigmaports_mut();
     manager.add_port(name, version, category)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -242,4 +242,4 @@ mod tests {
         let manager = get_sigmaports();
         assert!(manager.get_port(&id).is_some());
     }
-}
+;
