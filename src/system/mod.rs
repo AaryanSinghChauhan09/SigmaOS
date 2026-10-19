@@ -73,6 +73,7 @@ pub mod sigmainstaller;
 pub mod sigmaintegrity;
 pub mod sigmait;
 pub mod sigmajails;
+pub mod sigmakeyboardmanager;
 pub mod sigmalogmanager;
 pub mod sigmalogrotate;
 pub mod sigmalvm;
@@ -889,4 +890,9 @@ pub use sigmanotificationmanager::{
 pub use sigmapowermanager::{
     BatteryInfo, BatteryStatus, PowerMode, PowerProfile, SigmaPowerManager,
     add_profile, get_sigmapowermanager, get_sigmapowermanager_mut, init_sigmapowermanager,
+};
+
+pub use sigmakeyboardmanager::{
+    InputMethod, Keybinding, KeyboardLayout, KeyboardSettings, SigmaKeyboardManager,
+    add_layout, get_sigmakeyboardmanager, get_sigmakeyboardmanager_mut, init_sigmakeyboardmanager,
 };
