@@ -119,6 +119,7 @@ pub mod sigmadiskusage;
 pub mod sigmataskmanager;
 pub mod sigmaprocessmonitor;
 pub mod sigmasystemmonitor;
+pub mod sigmasysteminfo;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -636,6 +637,11 @@ pub use sigmaprocessmonitor {
 pub use sigmasystemmonitor {
     SigmaSystemMonitor, CpuCore, MemoryInfo, NetworkStats,
     init_sigmasystemmonitor, get_sigmasystemmonitor, get_sigmasystemmonitor_mut,
+};
+
+pub use sigmasysteminfo {
+    SystemInfo,
+    init_sigmasysteminfo, get_sigmasysteminfo, get_sigmasysteminfo_mut,
 };
 
 pub use sigmaupdate::{
