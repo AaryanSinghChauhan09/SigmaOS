@@ -395,6 +395,61 @@ impl SovereignPeriodicResearchEngine {
         self.adrs.iter().find(|a| a.id == id)
     }
 
+    pub fn get_weekly_task_template(&self) -> &'static str {
+        r#"id = "STUDY-2026-W42"
+title = "Study Linux VFS path resolution"
+cycle = "weekly"
+theme = "filesystem"
+upstream = ["linux", "xv6"]
+deliverables = [
+  "research/upstream/linux/vfs-path-resolution.md",
+  "research/decisions/ADR-008-vfs-path-resolution.md",
+  "implementation PR",
+  "test report"
+]
+
+success = [
+  "design note explains upstream model",
+  "SigmaOS adaptation is defined",
+  "unit tests pass",
+  "runtime path is identified",
+  "capability status updated only with evidence"
+]"#
+    }
+
+    pub fn get_monthly_task_template(&self) -> &'static str {
+        r#"id = "CAP-2026-M10"
+title = "Deliver QEMU x86_64 boot-to-shell"
+cycle = "monthly"
+priority = "P0"
+owner = "boot-runtime-agent"
+
+required_evidence = [
+  "reports/build/build-manifest.json",
+  "reports/test/test-report.json",
+  "reports/boot/qemu-x86_64.log",
+  "reports/boot/boot-matrix.json"
+]
+
+definition_of_done = [
+  "clean build succeeds",
+  "unit and integration tests pass",
+  "QEMU reaches shell",
+  "smoke command succeeds",
+  "no kernel panic",
+  "rollback or recovery path documented"
+]"#
+    }
+
+    pub fn get_first_30_days_schedule(&self) -> Vec<(&'static str, &'static str)> {
+        vec![
+            ("Week 1", "Create research/ structure, templates, study xv6 boot / OSDev bootloader patterns, implement QEMU x86_64 UEFI boot with serial logging, produce first boot trace"),
+            ("Week 2", "Study xv6 memory management and Linux paging, implement frame allocation, paging, early memory init, add memory tests and boot validation"),
+            ("Week 3", "Study xv6 processes and Linux scheduling, implement minimal scheduler and context switching, add two-process alternation test"),
+            ("Week 4", "Study Linux syscalls and xv6 filesystem, implement minimal syscall table and RAM-disk VFS, add boot-to-shell and file-operation tests, publish monthly report"),
+        ]
+    }
+
     pub fn generate_summary_report(&self) -> String {
         let mut report = String::from("# Sovereign Periodic Research Program Status\n\n");
         report.push_str("## Program Metrics\n");
@@ -432,6 +487,22 @@ impl SovereignPeriodicResearchEngine {
         }
 
         report
+    }
+
+    pub fn generate_pr_proposal_summary(&self) -> String {
+        let mut pr = String::from("# PR Proposal: Establish Periodic Research-and-Implementation Program\n\n");
+        pr.push_str("## Cadence Overview\n");
+        pr.push_str("- Daily (30-60m): Health checks & status\n");
+        pr.push_str("- Weekly (3-5h): Focused mechanism study + small PR\n");
+        pr.push_str("- Monthly (2-4w): Complete vertical capability\n");
+        pr.push_str("- Quarterly (1w): Strategic reset & roadmap consolidation\n");
+
+        pr.push_str("\n## 14 Mandatory Industry Rules\n");
+        for rule in &INDUSTRY_RULES {
+            pr.push_str(&format!("{}. **{}**: {}\n", rule.id, rule.title, rule.description));
+        }
+
+        pr
     }
 }
 
