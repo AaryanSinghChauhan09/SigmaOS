@@ -170,7 +170,12 @@ pub struct VideoProject {
 }
 
 impl VideoProject {
-    pub fn new(id: String, name: String, resolution: VideoResolution, frame_rate: FrameRate) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        resolution: VideoResolution,
+        frame_rate: FrameRate,
+    ) -> Self {
         Self {
             id,
             name,
@@ -271,12 +276,14 @@ impl SigmaFilm {
     }
 
     pub fn get_current_project(&self) -> Option<&VideoProject> {
-        self.current_project.as_ref()
+        self.current_project
+            .as_ref()
             .and_then(|id| self.projects.get(id))
     }
 
     pub fn get_current_project_mut(&mut self) -> Option<&mut VideoProject> {
-        self.current_project.as_ref()
+        self.current_project
+            .as_ref()
             .and_then(|id| self.projects.get_mut(id.as_str()))
     }
 
@@ -307,16 +314,12 @@ pub fn init_sigmafilm() {
 
 /// Get the global SigmaFilm instance
 pub fn get_sigmafilm() -> Option<&'static SigmaFilm> {
-    unsafe {
-        SIGMAFILM_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAFILM_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaFilm instance (mutable)
 pub fn get_sigmafilm_mut() -> Option<&'static mut SigmaFilm> {
-    unsafe {
-        SIGMAFILM_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAFILM_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a project
@@ -355,7 +358,11 @@ mod tests {
 
     #[test]
     fn test_timeline_track_creation() {
-        let track = TimelineTrack::new("track1".to_string(), "Video Track".to_string(), "video".to_string());
+        let track = TimelineTrack::new(
+            "track1".to_string(),
+            "Video Track".to_string(),
+            "video".to_string(),
+        );
         assert_eq!(track.id, "track1");
         assert_eq!(track.track_type, "video");
         assert!(!track.locked);
@@ -364,7 +371,11 @@ mod tests {
 
     #[test]
     fn test_timeline_track_management() {
-        let mut track = TimelineTrack::new("track1".to_string(), "Test".to_string(), "video".to_string());
+        let mut track = TimelineTrack::new(
+            "track1".to_string(),
+            "Test".to_string(),
+            "video".to_string(),
+        );
         track.add_clip("clip1".to_string());
         track.add_clip("clip2".to_string());
         assert_eq!(track.clip_count(), 2);

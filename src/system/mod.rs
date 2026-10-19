@@ -21,123 +21,123 @@ pub mod preload;
 pub mod scheduler_manager;
 pub mod service_manager;
 pub mod settings_manager;
+pub mod sigma3d;
 pub mod sigmaacpi;
+pub mod sigmaacpi;
+pub mod sigmaananicy;
 pub mod sigmaani;
+pub mod sigmaarchivemanager;
 pub mod sigmaart;
-pub mod sigmacad;
-pub mod sigmadesign;
-pub mod sigmaeffect;
-pub mod sigmafig;
-pub mod sigmafilm;
-pub mod sigmafont;
-pub mod sigmagrid;
-pub mod sigmabackup;
-pub mod sigmacache;
-pub mod sigmacodec;
 pub mod sigmaaudioconfig;
+pub mod sigmaautomation;
+pub mod sigmabackup;
+pub mod sigmabackup;
+pub mod sigmabluetooth;
+pub mod sigmacache;
+pub mod sigmacad;
+pub mod sigmacgroup;
+pub mod sigmaclipboardmanager;
+pub mod sigmacodec;
+pub mod sigmacolorscheme;
 pub mod sigmaconfig;
+pub mod sigmacontainer;
+pub mod sigmacron;
 pub mod sigmacron;
 pub mod sigmacrypto;
 pub mod sigmadb;
 pub mod sigmadefrag;
+pub mod sigmadesign;
 pub mod sigmadevice;
 pub mod sigmadhcp;
+pub mod sigmadiskmanager;
+pub mod sigmadiskusage;
 pub mod sigmadns;
+pub mod sigmaeffect;
 pub mod sigmaevent;
+pub mod sigmafig;
+pub mod sigmafilemanager;
+pub mod sigmafilm;
+pub mod sigmafirewall;
+pub mod sigmaflatpak;
+pub mod sigmafont;
 pub mod sigmafs;
 pub mod sigmafsck;
 pub mod sigmafsmon;
 pub mod sigmaftp;
+pub mod sigmagrid;
+pub mod sigmahibernation;
 pub mod sigmahttp;
 pub mod sigmahwmon;
+pub mod sigmainstaller;
 pub mod sigmaintegrity;
 pub mod sigmait;
+pub mod sigmajails;
+pub mod sigmalogmanager;
 pub mod sigmalogrotate;
 pub mod sigmalvm;
 pub mod sigmamail;
+pub mod sigmamicrophone;
 pub mod sigmamkfs;
 pub mod sigmamonitor;
 pub mod sigmamount;
-pub mod sigmananny;
 pub mod sigmamq;
-pub mod sigmanotifyenhanced;
+pub mod sigmananny;
+pub mod sigmanetwork;
 pub mod sigmanfs;
 pub mod sigmanic;
+pub mod sigmanotifyenhanced;
 pub mod sigmantp;
+pub mod sigmapackagemanager;
 pub mod sigmaparted;
+pub mod sigmaperformancemonitor;
 pub mod sigmapkg;
+pub mod sigmaports;
 pub mod sigmapower;
+pub mod sigmapower;
+pub mod sigmaprinter;
 pub mod sigmaprocess;
+pub mod sigmaprocessmonitor;
 pub mod sigmaproxy;
+pub mod sigmaquickshell;
 pub mod sigmaquota;
 pub mod sigmaraid;
 pub mod sigmarecovery;
+pub mod sigmarecovery2;
 pub mod sigmaresource;
+pub mod sigmascanner;
 pub mod sigmascheduledfsck;
+pub mod sigmasearch;
+pub mod sigmasecurityaudit;
 pub mod sigmaservice;
+pub mod sigmaservicemanager2;
 pub mod sigmasession;
 pub mod sigmasmb;
+pub mod sigmasnap;
 pub mod sigmasnapshot;
+pub mod sigmasound;
 pub mod sigmassh;
 pub mod sigmastorage;
 pub mod sigmaswap;
+pub mod sigmaswap;
+pub mod sigmasystemd;
+pub mod sigmasysteminfo;
+pub mod sigmasystemmonitor;
+pub mod sigmasystemmonitor2;
+pub mod sigmataskmanager;
+pub mod sigmathemeinstaller;
 pub mod sigmatime;
 pub mod sigmatimer;
-pub mod sigmatrim;
-pub mod sigmatimeshift;
-pub mod sigmathemeinstaller;
-pub mod sigmainstaller;
-pub mod sigmawallpaper;
-pub mod sigmaananicy;
-pub mod sigmacolorscheme;
-pub mod sigmawalker;
-pub mod sigmaquickshell;
-pub mod sigmapackagemanager;
-pub mod sigmaupdatemanager;
-pub mod sigmaflatpak;
-pub mod sigmasnap;
-pub mod sigmabackup;
-pub mod sigmarecovery2;
-pub mod sigmasystemmonitor2;
-pub mod sigmaservicemanager2;
-pub mod sigmausbwriter;
-pub mod sigmafirewall;
-pub mod sigmalogmanager;
-pub mod sigmacontainer;
-pub mod sigmavirtualization;
-pub mod sigmacgroup;
-pub mod signamespaces;
-pub mod sigmacron;
-pub mod sigmasystemd;
-pub mod sigmaswap;
-pub mod sigmahibernation;
-pub mod sigmabluetooth;
-pub mod sigmaacpi;
-pub mod sigmapower;
-pub mod sigmasound;
-pub mod sigmanetwork;
-pub mod sigmaprinter;
-pub mod sigmascanner;
-pub mod sigmawebcam;
-pub mod sigmamicrophone;
-pub mod sigmadiskmanager;
-pub mod sigmadiskusage;
-pub mod sigmataskmanager;
-pub mod sigmaprocessmonitor;
-pub mod sigmasystemmonitor;
-pub mod sigmasysteminfo;
-pub mod sigmafilemanager;
-pub mod sigmaarchivemanager;
-pub mod sigmaclipboardmanager;
-pub mod sigmasearch;
-pub mod sigmaautomation;
-pub mod sigmaperformancemonitor;
-pub mod sigmasecurityaudit;
 pub mod sigmatimer;
-pub mod sigmajails;
-pub mod sigmaports;
-pub mod sigma3d;
+pub mod sigmatimeshift;
+pub mod sigmatrim;
 pub mod sigmaupdate;
+pub mod sigmaupdatemanager;
+pub mod sigmausbwriter;
+pub mod sigmavirtualization;
+pub mod sigmawalker;
+pub mod sigmawallpaper;
+pub mod sigmawebcam;
+pub mod signamespaces;
 pub mod system_manager;
 pub mod system_monitor;
 pub mod task_manager;
@@ -243,69 +243,73 @@ pub use sigmaacpi::{
     add_acpi_event, get_sigmaacpi, init_sigmaacpi, register_acpi_action, AcpiAction,
     AcpiActionType, AcpiEvent, AcpiEventType, SigmaACPI,
 };
+pub use sigmaacpi::{
+    add_battery, get_sigmaacpi, get_sigmaacpi_mut, init_sigmaacpi, BatteryInfo, BatteryState,
+    PowerEvent, SigmaACPI, ThermalState, ThermalZone,
+};
+pub use sigmaananicy::{
+    add_process, get_sigmaananicy, init_sigmaananicy, set_process_nice, NiceRule, PriorityClass,
+    ProcessCategory, ProcessNice, SigmaAnanicy,
+};
 pub use sigmaani::{
-    Animation, AnimationState, AnimationTrack, Keyframe, SigmaAni, TrackType, TweenType,
-    add_animation, get_sigmaani, get_sigmaani_mut, init_sigmaani,
+    add_animation, get_sigmaani, get_sigmaani_mut, init_sigmaani, Animation, AnimationState,
+    AnimationTrack, Keyframe, SigmaAni, TrackType, TweenType,
 };
 pub use sigmaart::{
-    Canvas, Color, Layer, Point, Rect, Shape, ShapeType, SigmaArt, Size,
-    add_canvas, get_sigmaart, get_sigmaart_mut, init_sigmaart,
+    add_canvas, get_sigmaart, get_sigmaart_mut, init_sigmaart, Canvas, Color, Layer, Point, Rect,
+    Shape, ShapeType, SigmaArt, Size,
 };
-pub use sigmacad::{
-    Constraint, ConstraintType, Dimension, DimensionType, Drawing, DrawingLayer, Entity,
-    EntityType, Point3D, SigmaCAD,
-    add_drawing, get_sigmacad, get_sigmacad_mut, init_sigmacad,
+pub use sigmaaudioconfig::{
+    add_audio_device, get_sigmaaudioconfig, init_sigmaaudioconfig, set_default_audio_device,
+    AudioDevice, AudioDeviceType, AudioProfile, BitDepth, SampleRate, SigmaAudioConfig,
 };
-pub use sigmadesign::{
-    ComponentSize, ComponentVariant, DesignSystem, DesignToken, SigmaDesign, TokenValue, TokenType,
-    UIComponent,
-    add_design_system, get_sigmadesign, get_sigmadesign_mut, init_sigmadesign,
-};
-pub use sigmaeffect::{
-    Effect, EffectChain, EffectParameter, EffectPreset, EffectType, SigmaEffect,
-    add_effect, get_sigmaeffect, get_sigmaeffect_mut, init_sigmaeffect,
-};
-pub use sigmafig::{
-    Connector, ConnectorType, Diagram, DiagramLayer, DiagramNode, FigSize, NodeType, Position,
-    SigmaFig,
-    add_diagram, get_sigmafig, get_sigmafig_mut, init_sigmafig,
-};
-pub use sigmafilm::{
-    AudioCodec, FrameRate, MediaClip, TimelineTrack, VideoCodec, VideoProject, VideoResolution,
-    SigmaFilm,
-    add_project, get_sigmafilm, get_sigmafilm_mut, init_sigmafilm,
-};
-pub use sigmafont::{
-    Font, FontStyle, FontWeight, Glyph, SigmaFont, TextRun,
-    add_font, get_sigmafont, get_sigmafont_mut, init_sigmafont,
-};
-pub use sigmagrid::{
-    GridArea, GridAlignment, GridColumn, GridItem, GridRow, GridUnit, SigmaGrid,
-    add_grid_area, get_sigmagrid, get_sigmagrid_mut, init_sigmagrid,
+pub use sigmabackup::{
+    create_backup, get_sigmabackup, init_sigmabackup, Backup, BackupState, BackupType, SigmaBackup,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
     CompressionLevel, SigmaBackup,
 };
+pub use sigmabluetooth::{
+    add_adapter, get_sigmabluetooth, get_sigmabluetooth_mut, init_sigmabluetooth, AdapterState,
+    BluetoothAdapter, BluetoothDevice, DeviceState, DeviceType, SigmaBluetooth,
+};
 pub use sigmacache::{
     get_sigmacache, init_sigmacache, set_cache_entry, CacheEntry, CacheEntryState, SigmaCache,
 };
-pub use sigmacodec::{
-    SigmaCodec, Codec, CodecType, CodecFormat, CodecState,
-    init_sigmacodec, get_sigmacodec, register_codec, enable_codec,
+pub use sigmacad::{
+    add_drawing, get_sigmacad, get_sigmacad_mut, init_sigmacad, Constraint, ConstraintType,
+    Dimension, DimensionType, Drawing, DrawingLayer, Entity, EntityType, Point3D, SigmaCAD,
 };
-pub use sigmaaudioconfig::{
-    SigmaAudioConfig, AudioDevice, AudioDeviceType, AudioProfile, SampleRate, BitDepth,
-    init_sigmaaudioconfig, get_sigmaaudioconfig, add_audio_device, set_default_audio_device,
+pub use sigmacgroup::{
+    create_cgroup, get_sigmacgroup, get_sigmacgroup_mut, init_sigmacgroup, Cgroup,
+    CgroupController, CgroupState, CpuControllerConfig, MemoryControllerConfig,
+    PidsControllerConfig, SigmaCgroup,
+};
+pub use sigmacodec::{
+    enable_codec, get_sigmacodec, init_sigmacodec, register_codec, Codec, CodecFormat, CodecState,
+    CodecType, SigmaCodec,
+};
+pub use sigmacolorscheme::{
+    generate_color_scheme, get_sigmacolorscheme, init_sigmacolorscheme, Color, ColorScheme,
+    PaletteType, SigmaColorScheme, Template, TemplateType,
 };
 pub use sigmaconfig::{
     get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry as SigmaConfigEntry,
     ConfigValue, SigmaConfig,
 };
+pub use sigmacontainer::{
+    create_container, get_sigmacontainer, get_sigmacontainer_mut, init_sigmacontainer, Container,
+    ContainerState, NetworkMode, ResourceLimits, RestartPolicy, SigmaContainer,
+};
 pub use sigmacron::{
     add_cron_job, disable_cron_job, enable_cron_job, get_sigmacron, init_sigmacron,
     CronField as SigmaCronField, CronJob as SigmaCronJob, CronSchedule as SigmaCronSchedule,
     JobResult, JobStatus, SigmaCron,
+};
+pub use sigmacron::{
+    create_job, get_sigmacron, get_sigmacron_mut, init_sigmacron, CronSpec, JobStatus,
+    ScheduleType, ScheduledJob, SigmaCron,
 };
 pub use sigmacrypto::{
     add_encryption_key, get_sigmacrypto, init_sigmacrypto, EncryptedVolume, EncryptionKey,
@@ -318,6 +322,10 @@ pub use sigmadefrag::{
     get_defrag_status, get_sigmadefrag, init_sigmadefrag, start_defrag_job, DefragJob, DefragMode,
     DefragStatus, FragmentationReport as SigmaFragmentationReport, SigmaDefrag,
 };
+pub use sigmadesign::{
+    add_design_system, get_sigmadesign, get_sigmadesign_mut, init_sigmadesign, ComponentSize,
+    ComponentVariant, DesignSystem, DesignToken, SigmaDesign, TokenType, TokenValue, UIComponent,
+};
 pub use sigmadevice::{
     add_device, get_sigmadevice, init_sigmadevice, Device, DeviceEvent, DeviceEventType,
     DeviceState, DeviceType, SigmaDevice,
@@ -329,9 +337,33 @@ pub use sigmadns::{
     activate_dns_server, get_sigmadns, init_sigmadns, DnsCacheEntry, DnsRecordType, DnsServer,
     ResolverState, SigmaDNS,
 };
+pub use sigmaeffect::{
+    add_effect, get_sigmaeffect, get_sigmaeffect_mut, init_sigmaeffect, Effect, EffectChain,
+    EffectParameter, EffectPreset, EffectType, SigmaEffect,
+};
 pub use sigmaevent::{
     emit_system_event, get_sigmaevent, init_sigmaevent, EventAction, EventType, SigmaEvent,
     SystemEvent,
+};
+pub use sigmafig::{
+    add_diagram, get_sigmafig, get_sigmafig_mut, init_sigmafig, Connector, ConnectorType, Diagram,
+    DiagramLayer, DiagramNode, FigSize, NodeType, Position, SigmaFig,
+};
+pub use sigmafilm::{
+    add_project, get_sigmafilm, get_sigmafilm_mut, init_sigmafilm, AudioCodec, FrameRate,
+    MediaClip, SigmaFilm, TimelineTrack, VideoCodec, VideoProject, VideoResolution,
+};
+pub use sigmafirewall::{
+    create_rule, get_sigmafirewall, get_sigmafirewall_mut, init_sigmafirewall, FirewallAction,
+    FirewallChain, FirewallProtocol, FirewallRule, RuleState, SigmaFirewall,
+};
+pub use sigmaflatpak::{
+    add_flatpak, get_sigmaflatpak, init_sigmaflatpak, install_flatpak, Flatpak, FlatpakRemote,
+    FlatpakState, FlatpakType, SigmaFlatpak,
+};
+pub use sigmafont::{
+    add_font, get_sigmafont, get_sigmafont_mut, init_sigmafont, Font, FontStyle, FontWeight, Glyph,
+    SigmaFont, TextRun,
 };
 pub use sigmafs::{
     get_sigmafs, init_sigmafs, mount_filesystem, FsMount, FsType, MountState, SigmaFS,
@@ -348,6 +380,14 @@ pub use sigmaftp::{
     authenticate_ftp_connection, get_sigmaftp, init_sigmaftp, FtpConnection, FtpConnectionState,
     FtpTransferMode, SigmaFTP,
 };
+pub use sigmagrid::{
+    add_grid_area, get_sigmagrid, get_sigmagrid_mut, init_sigmagrid, GridAlignment, GridArea,
+    GridColumn, GridItem, GridRow, GridUnit, SigmaGrid,
+};
+pub use sigmahibernation::{
+    create_image, get_sigmahibernation, get_sigmahibernation_mut, init_sigmahibernation,
+    HibernationImage, HibernationMethod, HibernationState, PowerState, SigmaHibernation,
+};
 pub use sigmahttp::{
     get_sigmahttp, init_sigmahttp, process_http_request, HttpConnection, HttpConnectionState,
     HttpMethod, SigmaHTTP,
@@ -356,6 +396,10 @@ pub use sigmahwmon::{
     add_hw_sensor, get_sigmahwmon, init_sigmahwmon, HardwareSensor, SensorState, SensorType,
     SigmaHwMon,
 };
+pub use sigmainstaller::{
+    create_install_config, get_sigmainstaller, init_sigmainstaller, FilesystemType, InstallConfig,
+    InstallState, PartitioningMode, SigmaInstaller,
+};
 pub use sigmaintegrity::{
     check_file_integrity, get_sigmaintegrity, init_sigmaintegrity, FileIntegrityRecord, FileStatus,
     HashAlgorithm as SigmaHashAlgorithm, SigmaIntegrity,
@@ -363,6 +407,10 @@ pub use sigmaintegrity::{
 pub use sigmait::{
     get_sigmait, init_sigmait, log_audit_event, AuditEvent, AuditEventType, AuditSeverity,
     SigmaAudit,
+};
+pub use sigmalogmanager::{
+    get_sigmalogmanager, get_sigmalogmanager_mut, init_sigmalogmanager, log_message, LogEntry,
+    LogLevel, LogSource, RotationPolicy, SigmaLogManager,
 };
 pub use sigmalogrotate::{
     get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig,
@@ -387,15 +435,14 @@ pub use sigmamount::{
     add_mount_entry, get_sigmamount, init_sigmamount, MountEntry, MountOption,
     MountState as MountEntryState, SigmaMount,
 };
-pub use sigmananny::{
-    SigmaNanny, FilterRule, FilterCategory, FilterAction, TimeLimit, TimeLimitType, UsageRecord,
-    init_sigmananny, get_sigmananny, add_filter_rule, check_content,
-};
 pub use sigmamq::{get_sigmamq, init_sigmamq, publish_message, Message, MessageState, SigmaMQ};
-pub use sigmanotifyenhanced::{
-    SigmaNotifyEnhanced, Notification, NotificationAction, ActionType,
-    NotificationCategory, NotificationUrgency, NotificationState,
-    init_sigmanotifyenhanced, get_sigmanotifyenhanced, post_notification,
+pub use sigmananny::{
+    add_filter_rule, check_content, get_sigmananny, init_sigmananny, FilterAction, FilterCategory,
+    FilterRule, SigmaNanny, TimeLimit, TimeLimitType, UsageRecord,
+};
+pub use sigmanetwork::{
+    add_interface, get_sigmanetwork, get_sigmanetwork_mut, init_sigmanetwork, ConnectionType,
+    InterfaceState, NetworkConnection, NetworkInterface, SigmaNetwork,
 };
 pub use sigmanfs::{
     export_nfs_share, get_sigmanfs, init_sigmanfs, mount_nfs, NFSConnectionState, NFSExport,
@@ -404,8 +451,17 @@ pub use sigmanfs::{
 pub use sigmanic::{
     bring_up_interface, get_sigmanic, init_sigmanic, InterfaceState, NetworkInterface, SigmaNIC,
 };
+pub use sigmanotifyenhanced::{
+    get_sigmanotifyenhanced, init_sigmanotifyenhanced, post_notification, ActionType, Notification,
+    NotificationAction, NotificationCategory, NotificationState, NotificationUrgency,
+    SigmaNotifyEnhanced,
+};
 pub use sigmantp::{
     get_sigmantp, init_sigmantp, sync_ntp_time, NtpServer, NtpServerState, SigmaNTP,
+};
+pub use sigmapackagemanager::{
+    add_package, get_sigmapackagemanager, init_sigmapackagemanager, install_package, Package,
+    PackageFormat, PackageState, Repository, SigmaPackageManager,
 };
 pub use sigmaparted::{
     create_partition_table, get_sigmaparted, init_sigmaparted, Disk, Partition, PartitionFlag,
@@ -415,9 +471,17 @@ pub use sigmapkg::{
     get_sigmapkg, init_sigmapkg, install_package, Package, PackageAction, PackageState, SigmaPkg,
 };
 pub use sigmapower::{
+    get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerProfile, PowerSettings,
+    SigmaPower,
+};
+pub use sigmapower::{
     get_sigmapower, init_sigmapower, set_power_profile, shutdown_system, suspend_system,
     BatteryInfo as SigmaBatteryInfo, BatteryStatus as SigmaBatteryStatus,
     PowerProfile as SigmaPowerProfile, PowerState, PowerStats, SigmaPower,
+};
+pub use sigmaprinter::{
+    add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState, PrintJob,
+    Printer, PrinterState, SigmaPrinter,
 };
 pub use sigmaprocess::{
     get_sigmaprocess, init_sigmaprocess, send_process_signal, ProcessInfo,
@@ -426,6 +490,10 @@ pub use sigmaprocess::{
 pub use sigmaproxy::{
     forward_proxy_request, get_sigmaproxy, init_sigmaproxy, ProxyConnection, ProxyConnectionState,
     ProxyProtocol, SigmaProxy,
+};
+pub use sigmaquickshell::{
+    add_shell_module, generate_shell_config, get_sigmaquickshell, init_sigmaquickshell, ModuleType,
+    ShellConfig, ShellModule, ShellType, SigmaQuickshell,
 };
 pub use sigmaquota::{
     add_quota, get_sigmaquota, init_sigmaquota, Quota, QuotaState, QuotaType, SigmaQuota,
@@ -437,6 +505,9 @@ pub use sigmaraid::{
 pub use sigmarecovery::{
     boot_to_recovery, get_sigmarecovery, init_sigmarecovery, RecoveryAction, RecoveryMode,
     RecoverySnapshot, SigmaRecovery,
+};
+pub use sigmarecovery2::{
+    get_sigmarecovery, init_sigmarecovery, RecoveryState, RecoveryTask, RecoveryType, SigmaRecovery,
 };
 pub use sigmaresource::{
     get_sigmaresource, init_sigmaresource, set_resource_limit, ResourceLimit, ResourceType,
@@ -451,6 +522,9 @@ pub use sigmaservice::{
     get_sigmaservice, init_sigmaservice, start_service, Service, ServiceState, ServiceType,
     SigmaService,
 };
+pub use sigmaservicemanager2::{
+    get_sigmaservicemanager, init_sigmaservicemanager, Service, ServiceState, SigmaServiceManager,
+};
 pub use sigmasession::{
     add_user_session, get_sigmasession, init_sigmasession, SessionState, SessionType, SigmaSession,
     UserSession,
@@ -459,9 +533,16 @@ pub use sigmasmb::{
     export_smb_share, get_sigmasmb, init_sigmasmb, mount_smb, SMBConnectionState, SMBDialect,
     SMBMount, SMBShare, SMBShareAccess, SigmaSMB,
 };
+pub use sigmasnap::{
+    add_snap, get_sigmasnap, init_sigmasnap, install_snap, SigmaSnap, Snap, SnapState, SnapType,
+};
 pub use sigmasnapshot::{
     add_snapshot, get_sigmasnapshot, init_sigmasnapshot, restore_snapshot, SigmaSnapshot, Snapshot,
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
+};
+pub use sigmasound::{
+    add_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
+    AudioDeviceType, SigmaSound,
 };
 pub use sigmassh::{
     authenticate_ssh_connection, get_sigmassh, init_sigmassh, SigmaSSH, SshAuthMethod,
@@ -474,6 +555,21 @@ pub use sigmastorage::{
 pub use sigmaswap::{
     activate_swap_space, get_sigmaswap, init_sigmaswap, SigmaSwap, SwapPriority, SwapSpace,
     SwapState,
+};
+pub use sigmaswap::{
+    add_swap, get_sigmaswap, get_sigmaswap_mut, init_sigmaswap, SigmaSwap, SwapEntry, SwapState,
+    SwapType,
+};
+pub use sigmasystemd::{
+    create_unit, get_sigmasystemd, get_sigmasystemd_mut, init_sigmasystemd, DependencyType,
+    RestartPolicy, SigmaSystemd, Target, Unit, UnitState, UnitType,
+};
+pub use sigmasystemmonitor2::{
+    get_sigmasystemmonitor, init_sigmasystemmonitor, Metric, MonitorType, SigmaSystemMonitor,
+};
+pub use sigmathemeinstaller::{
+    add_theme, get_sigmathemeinstaller, init_sigmathemeinstaller, install_theme,
+    SigmaThemeInstaller, Theme, ThemeState, ThemeType,
 };
 pub use sigmathernal::{
     get_sigmathernal, init_sigmathernal, set_thermal_policy, update_temperature, CoolingDevice,
@@ -488,279 +584,134 @@ pub use sigmatimer::{
     add_timer_unit, disable_timer_unit, enable_timer_unit, get_sigmatimer, init_sigmatimer,
     SigmaTimer, TimerAccuracy, TimerStatus, TimerUnit, TriggerType,
 };
+pub use sigmatimeshift::{
+    create_timeshift_snapshot, get_sigmatimeshift, init_sigmatimeshift, restore_timeshift_snapshot,
+    SigmaTimeshift, SnapshotLevel, SnapshotSchedule, SnapshotState, SnapshotType,
+    TimeshiftSnapshot,
+};
 pub use sigmatrim::{
     get_sigmatrim, init_sigmatrim, is_trim_supported, trim_mount, DiscardRange, DiscardType,
     SigmaTRIM, TrimDevice, TrimMode, TrimResult, TrimStatus,
 };
+pub use sigmaupdatemanager::{
+    add_update, get_sigmaupdatemanager, init_sigmaupdatemanager, install_update,
+    SigmaUpdateManager, Update, UpdateSchedule, UpdateState, UpdateType,
+};
 pub use sigmausbwriter::{
-    SigmaUSBWriter, USBDevice, WriteJob, WriteState, ImageFormat,
-    init_sigmausbwriter, get_sigmausbwriter, create_write_job,
+    create_write_job, get_sigmausbwriter, init_sigmausbwriter, ImageFormat, SigmaUSBWriter,
+    USBDevice, WriteJob, WriteState,
 };
-pub use sigmathemeinstaller::{
-    SigmaThemeInstaller, Theme, ThemeType, ThemeState,
-    init_sigmathemeinstaller, get_sigmathemeinstaller, add_theme, install_theme,
-};
-pub use sigmainstaller::{
-    SigmaInstaller, InstallConfig, InstallState, PartitioningMode, FilesystemType,
-    init_sigmainstaller, get_sigmainstaller, create_install_config,
-};
-pub use sigmatimeshift::{
-    SigmaTimeshift, TimeshiftSnapshot, SnapshotSchedule, SnapshotLevel, SnapshotType, SnapshotState,
-    init_sigmatimeshift, get_sigmatimeshift, create_timeshift_snapshot, restore_timeshift_snapshot,
-};
-pub use sigmawallpaper::{
-    SigmaWallpaper, Wallpaper, DisplayOutput, TransitionType,
-    init_sigmawallpaper, get_sigmawallpaper, add_wallpaper, set_wallpaper_all,
-};
-pub use sigmaananicy::{
-    SigmaAnanicy, ProcessNice, NiceRule, PriorityClass, ProcessCategory,
-    init_sigmaananicy, get_sigmaananicy, add_process, set_process_nice,
-};
-pub use sigmacolorscheme::{
-    SigmaColorScheme, ColorScheme, Color, Template, PaletteType, TemplateType,
-    init_sigmacolorscheme, get_sigmacolorscheme, generate_color_scheme,
+pub use sigmavirtualization::{
+    create_vm, get_sigmavirtualization, get_sigmavirtualization_mut, init_sigmavirtualization,
+    Architecture, DiskInterface, NetworkInterface, SigmaVirtualization, VMResources, VMState,
+    VirtualDisk, VirtualMachine, VirtualNetwork,
 };
 pub use sigmawalker::{
-    SigmaWalker, Window, Keybinding, Workspace, WindowType, WindowState,
-    init_sigmawalker, get_sigmawalker, add_window, switch_workspace,
+    add_window, get_sigmawalker, init_sigmawalker, switch_workspace, Keybinding, SigmaWalker,
+    Window, WindowState, WindowType, Workspace,
 };
-pub use sigmaquickshell::{
-    SigmaQuickshell, ShellModule, ShellConfig, ShellType, ModuleType,
-    init_sigmaquickshell, get_sigmaquickshell, add_shell_module, generate_shell_config,
+pub use sigmawallpaper::{
+    add_wallpaper, get_sigmawallpaper, init_sigmawallpaper, set_wallpaper_all, DisplayOutput,
+    SigmaWallpaper, TransitionType, Wallpaper,
 };
-pub use sigmapackagemanager::{
-    SigmaPackageManager, Package, Repository, PackageFormat, PackageState,
-    init_sigmapackagemanager, get_sigmapackagemanager, add_package, install_package,
-};
-pub use sigmaupdatemanager::{
-    SigmaUpdateManager, Update, UpdateSchedule, UpdateType, UpdateState,
-    init_sigmaupdatemanager, get_sigmaupdatemanager, add_update, install_update,
-};
-pub use sigmaflatpak::{
-    SigmaFlatpak, Flatpak, FlatpakRemote, FlatpakType, FlatpakState,
-    init_sigmaflatpak, get_sigmaflatpak, add_flatpak, install_flatpak,
-};
-pub use sigmasnap::{
-    SigmaSnap, Snap, SnapType, SnapState,
-    init_sigmasnap, get_sigmasnap, add_snap, install_snap,
-};
-pub use sigmabackup {
-    SigmaBackup, Backup, BackupType, BackupState,
-    init_sigmabackup, get_sigmabackup, create_backup,
-};
-pub use sigmarecovery2 {
-    SigmaRecovery, RecoveryTask, RecoveryType, RecoveryState,
-    init_sigmarecovery, get_sigmarecovery,
-};
-pub use sigmasystemmonitor2 {
-    SigmaSystemMonitor, Metric, MonitorType,
-    init_sigmasystemmonitor, get_sigmasystemmonitor,
-};
-pub use sigmaservicemanager2 {
-    SigmaServiceManager, Service, ServiceState,
-    init_sigmaservicemanager, get_sigmaservicemanager,
-};
-pub use sigmafirewall {
-    SigmaFirewall, FirewallRule, FirewallAction, FirewallProtocol,
-    FirewallChain, RuleState,
-    init_sigmafirewall, get_sigmafirewall, get_sigmafirewall_mut,
-    create_rule,
-};
-pub use sigmalogmanager {
-    SigmaLogManager, LogEntry, LogLevel, LogSource, RotationPolicy,
-    init_sigmalogmanager, get_sigmalogmanager, get_sigmalogmanager_mut,
-    log_message,
-};
-pub use sigmacontainer {
-    SigmaContainer, Container, ContainerState, NetworkMode,
-    RestartPolicy, ResourceLimits,
-    init_sigmacontainer, get_sigmacontainer, get_sigmacontainer_mut,
-    create_container,
-};
-pub use sigmavirtualization {
-    SigmaVirtualization, VirtualMachine, VMState, Architecture,
-    VirtualDisk, DiskInterface, VirtualNetwork, NetworkInterface,
-    VMResources,
-    init_sigmavirtualization, get_sigmavirtualization, get_sigmavirtualization_mut,
-    create_vm,
-};
-pub use sigmacgroup {
-    SigmaCgroup, Cgroup, CgroupState, CgroupController,
-    CpuControllerConfig, MemoryControllerConfig, PidsControllerConfig,
-    init_sigmacgroup, get_sigmacgroup, get_sigmacgroup_mut,
-    create_cgroup,
-};
-pub use signamespaces {
-    SigmaNamespaces, Namespace, NamespaceType, NamespaceState,
-    init_signamespaces, get_signamespaces, get_signamespaces_mut,
-    create_namespace,
-};
-pub use sigmacron {
-    SigmaCron, ScheduledJob, JobStatus, ScheduleType, CronSpec,
-    init_sigmacron, get_sigmacron, get_sigmacron_mut,
-    create_job,
-};
-pub use sigmasystemd {
-    SigmaSystemd, Unit, Target, UnitType, UnitState, DependencyType,
-    RestartPolicy,
-    init_sigmasystemd, get_sigmasystemd, get_sigmasystemd_mut,
-    create_unit,
-};
-pub use sigmaswap {
-    SigmaSwap, SwapEntry, SwapType, SwapState,
-    init_sigmaswap, get_sigmaswap, get_sigmaswap_mut,
-    add_swap,
-};
-pub use sigmahibernation {
-    SigmaHibernation, HibernationImage, PowerState, HibernationMethod,
-    HibernationState,
-    init_sigmahibernation, get_sigmahibernation, get_sigmahibernation_mut,
-    create_image,
-};
-pub use sigmabluetooth {
-    SigmaBluetooth, BluetoothAdapter, BluetoothDevice, AdapterState,
-    DeviceState, DeviceType,
-    init_sigmabluetooth, get_sigmabluetooth, get_sigmabluetooth_mut,
-    add_adapter,
-};
-pub use sigmaacpi {
-    SigmaACPI, BatteryInfo, ThermalZone, PowerEvent, BatteryState,
-    ThermalState,
-    init_sigmaacpi, get_sigmaacpi, get_sigmaacpi_mut,
-    add_battery,
-};
-pub use sigmapower {
-    SigmaPower, PowerSettings, Brightness, PowerProfile,
-    init_sigmapower, get_sigmapower, get_sigmapower_mut,
-};
-pub use sigmasound {
-    SigmaSound, AudioDevice, AudioDeviceType, AudioDeviceState,
-    init_sigmasound, get_sigmasound, get_sigmasound_mut,
-    add_device,
-};
-pub use sigmanetwork {
-    SigmaNetwork, NetworkInterface, NetworkConnection, InterfaceState,
-    ConnectionType,
-    init_sigmanetwork, get_sigmanetwork, get_sigmanetwork_mut,
-    add_interface,
-};
-pub use sigmaprinter {
-    SigmaPrinter, Printer, PrintJob, PrinterState, JobState,
-    init_sigmaprinter, get_sigmaprinter, get_sigmaprinter_mut,
-    add_printer,
+pub use signamespaces::{
+    create_namespace, get_signamespaces, get_signamespaces_mut, init_signamespaces, Namespace,
+    NamespaceState, NamespaceType, SigmaNamespaces,
 };
 
-pub use sigmascanner {
-    SigmaScanner, Scanner, ScanJob, ScannerState, ScanJobState,
-    init_sigmascanner, get_sigmascanner, get_sigmascanner_mut,
-    add_scanner,
+pub use sigmascanner::{
+    add_scanner, get_sigmascanner, get_sigmascanner_mut, init_sigmascanner, ScanJob, ScanJobState,
+    Scanner, ScannerState, SigmaScanner,
 };
 
-pub use sigmawebcam {
-    SigmaWebcam, Webcam, WebcamState, Resolution, FrameFormat,
-    init_sigmawebcam, get_sigmawebcam, get_sigmawebcam_mut,
-    add_webcam,
+pub use sigmawebcam::{
+    add_webcam, get_sigmawebcam, get_sigmawebcam_mut, init_sigmawebcam, FrameFormat, Resolution,
+    SigmaWebcam, Webcam, WebcamState,
 };
 
-pub use sigmamicrophone {
-    SigmaMicrophone, Microphone, MicrophoneState, SampleRate, SampleFormat, ChannelCount,
-    init_sigmamicrophone, get_sigmamicrophone, get_sigmamicrophone_mut,
-    add_microphone,
+pub use sigmamicrophone::{
+    add_microphone, get_sigmamicrophone, get_sigmamicrophone_mut, init_sigmamicrophone,
+    ChannelCount, Microphone, MicrophoneState, SampleFormat, SampleRate, SigmaMicrophone,
 };
 
-pub use sigmadiskmanager {
-    SigmaDiskManager, Disk, DiskType, DiskState,
-    init_sigmadiskmanager, get_sigmadiskmanager, get_sigmadiskmanager_mut,
-    add_disk,
+pub use sigmadiskmanager::{
+    add_disk, get_sigmadiskmanager, get_sigmadiskmanager_mut, init_sigmadiskmanager, Disk,
+    DiskState, DiskType, SigmaDiskManager,
 };
 
-pub use sigmadiskusage {
-    SigmaDiskUsage, Filesystem, Directory,
-    init_sigmadiskusage, get_sigmadiskusage, get_sigmadiskusage_mut,
-    add_filesystem,
+pub use sigmadiskusage::{
+    add_filesystem, get_sigmadiskusage, get_sigmadiskusage_mut, init_sigmadiskusage, Directory,
+    Filesystem, SigmaDiskUsage,
 };
 
-pub use sigmataskmanager {
-    SigmaTaskManager, Task, TaskState, TaskPriority,
-    init_sigmataskmanager, get_sigmataskmanager, get_sigmataskmanager_mut,
-    add_task,
+pub use sigmataskmanager::{
+    add_task, get_sigmataskmanager, get_sigmataskmanager_mut, init_sigmataskmanager,
+    SigmaTaskManager, Task, TaskPriority, TaskState,
 };
 
-pub use sigmaprocessmonitor {
-    SigmaProcessMonitor, Process, ProcessState,
-    init_sigmaprocessmonitor, get_sigmaprocessmonitor, get_sigmaprocessmonitor_mut,
+pub use sigmaprocessmonitor::{
+    get_sigmaprocessmonitor, get_sigmaprocessmonitor_mut, init_sigmaprocessmonitor, Process,
+    ProcessState, SigmaProcessMonitor,
 };
 
-pub use sigmasystemmonitor {
-    SigmaSystemMonitor, CpuCore, MemoryInfo, NetworkStats,
-    init_sigmasystemmonitor, get_sigmasystemmonitor, get_sigmasystemmonitor_mut,
+pub use sigmasystemmonitor::{
+    get_sigmasystemmonitor, get_sigmasystemmonitor_mut, init_sigmasystemmonitor, CpuCore,
+    MemoryInfo, NetworkStats, SigmaSystemMonitor,
 };
 
-pub use sigmasysteminfo {
-    SystemInfo,
-    init_sigmasysteminfo, get_sigmasysteminfo, get_sigmasysteminfo_mut,
+pub use sigmasysteminfo::{
+    get_sigmasysteminfo, get_sigmasysteminfo_mut, init_sigmasysteminfo, SystemInfo,
 };
 
-pub use sigmafilemanager {
-    SigmaFileManager, FileEntry, FileType, FilePermissions,
-    init_sigmafilemanager, get_sigmafilemanager, get_sigmafilemanager_mut,
+pub use sigmafilemanager::{
+    get_sigmafilemanager, get_sigmafilemanager_mut, init_sigmafilemanager, FileEntry,
+    FilePermissions, FileType, SigmaFileManager,
 };
 
-pub use sigmaarchivemanager {
-    SigmaArchiveManager, Archive, ArchiveFormat, ArchiveState,
-    init_sigmaarchivemanager, get_sigmaarchivemanager, get_sigmaarchivemanager_mut,
-    add_archive,
+pub use sigmaarchivemanager::{
+    add_archive, get_sigmaarchivemanager, get_sigmaarchivemanager_mut, init_sigmaarchivemanager,
+    Archive, ArchiveFormat, ArchiveState, SigmaArchiveManager,
 };
 
-pub use sigmaclipboardmanager {
-    SigmaClipboardManager, ClipboardItem, ClipboardFormat,
-    init_sigmaclipboardmanager, get_sigmaclipboardmanager, get_sigmaclipboardmanager_mut,
-    add_item,
+pub use sigmaclipboardmanager::{
+    add_item, get_sigmaclipboardmanager, get_sigmaclipboardmanager_mut, init_sigmaclipboardmanager,
+    ClipboardFormat, ClipboardItem, SigmaClipboardManager,
 };
 
-pub use sigmasearch {
-    SigmaSearch, SearchResult, SearchIndex,
-    init_sigmasearch, get_sigmasearch, get_sigmasearch_mut,
+pub use sigmasearch::{
+    get_sigmasearch, get_sigmasearch_mut, init_sigmasearch, SearchIndex, SearchResult, SigmaSearch,
 };
 
-pub use sigmaautomation {
-    SigmaAutomation, AutomationTask,
-    init_sigmaautomation, get_sigmaautomation, get_sigmaautomation_mut,
-    add_task,
+pub use sigmaautomation::{
+    add_task, get_sigmaautomation, get_sigmaautomation_mut, init_sigmaautomation, AutomationTask,
+    SigmaAutomation,
 };
 
-pub use sigmaperformancemonitor {
-    SigmaPerformanceMonitor, PerformanceProfile, PerformanceMetric, PerformanceCategory,
-    init_sigmaperformancemonitor, get_sigmaperformancemonitor, get_sigmaperformancemonitor_mut,
+pub use sigmaperformancemonitor::{
+    get_sigmaperformancemonitor, get_sigmaperformancemonitor_mut, init_sigmaperformancemonitor,
+    PerformanceCategory, PerformanceMetric, PerformanceProfile, SigmaPerformanceMonitor,
 };
 
-pub use sigmasecurityaudit {
-    SigmaSecurityAudit, SecurityReport, SecurityIssue, SecuritySeverity,
-    init_sigmasecurityaudit, get_sigmasecurityaudit, get_sigmasecurityaudit_mut,
+pub use sigmasecurityaudit::{
+    get_sigmasecurityaudit, get_sigmasecurityaudit_mut, init_sigmasecurityaudit, SecurityIssue,
+    SecurityReport, SecuritySeverity, SigmaSecurityAudit,
 };
 
-pub use sigmatimer {
-    SigmaTimer, Timer, TimerState, Alarm,
-    init_sigmatimer, get_sigmatimer, get_sigmatimer_mut,
-    add_timer,
+pub use sigmatimer::{
+    add_timer, get_sigmatimer, get_sigmatimer_mut, init_sigmatimer, Alarm, SigmaTimer, Timer,
+    TimerState,
 };
 
-pub use sigmajails {
-    SigmaJails, Jail, JailState,
-    init_sigmajails, get_sigmajails, get_sigmajails_mut,
-    add_jail,
+pub use sigmajails::{
+    add_jail, get_sigmajails, get_sigmajails_mut, init_sigmajails, Jail, JailState, SigmaJails,
 };
 
-pub use sigmaports {
-    SigmaPorts, Port, BuildState,
-    init_sigmaports, get_sigmaports, get_sigmaports_mut,
-    add_port,
+pub use sigmaports::{
+    add_port, get_sigmaports, get_sigmaports_mut, init_sigmaports, BuildState, Port, SigmaPorts,
 };
 
-pub use sigma3d {
-    Sigma3D, Model3D, Scene, RenderState,
-    init_sigma3d, get_sigma3d, get_sigma3d_mut,
-    add_model,
+pub use sigma3d::{
+    add_model, get_sigma3d, get_sigma3d_mut, init_sigma3d, Model3D, RenderState, Scene, Sigma3D,
 };
 
 pub use sigmaupdate::{

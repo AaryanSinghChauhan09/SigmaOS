@@ -281,12 +281,14 @@ impl SigmaGrid {
     }
 
     pub fn get_current_area(&self) -> Option<&GridArea> {
-        self.current_area.as_ref()
+        self.current_area
+            .as_ref()
             .and_then(|id| self.grid_areas.get(id))
     }
 
     pub fn get_current_area_mut(&mut self) -> Option<&mut GridArea> {
-        self.current_area.as_ref()
+        self.current_area
+            .as_ref()
             .and_then(|id| self.grid_areas.get_mut(id.as_str()))
     }
 
@@ -317,16 +319,12 @@ pub fn init_sigmagrid() {
 
 /// Get the global SigmaGrid instance
 pub fn get_sigmagrid() -> Option<&'static SigmaGrid> {
-    unsafe {
-        SIGMAGRID_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAGRID_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaGrid instance (mutable)
 pub fn get_sigmagrid_mut() -> Option<&'static mut SigmaGrid> {
-    unsafe {
-        SIGMAGRID_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAGRID_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a grid area

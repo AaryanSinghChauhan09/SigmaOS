@@ -81,7 +81,14 @@ pub struct Font {
 }
 
 impl Font {
-    pub fn new(id: String, name: String, family: String, weight: FontWeight, style: FontStyle, size: u32) -> Self {
+    pub fn new(
+        id: String,
+        name: String,
+        family: String,
+        weight: FontWeight,
+        style: FontStyle,
+        size: u32,
+    ) -> Self {
         Self {
             id,
             name,
@@ -194,8 +201,7 @@ impl SigmaFont {
     }
 
     pub fn get_default_font(&self) -> Option<&Font> {
-        self.default_font.as_ref()
-            .and_then(|id| self.fonts.get(id))
+        self.default_font.as_ref().and_then(|id| self.fonts.get(id))
     }
 
     pub fn add_text_run(&mut self, run: TextRun) {
@@ -245,16 +251,12 @@ pub fn init_sigmafont() {
 
 /// Get the global SigmaFont instance
 pub fn get_sigmafont() -> Option<&'static SigmaFont> {
-    unsafe {
-        SIGMAFONT_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAFONT_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaFont instance (mutable)
 pub fn get_sigmafont_mut() -> Option<&'static mut SigmaFont> {
-    unsafe {
-        SIGMAFONT_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAFONT_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a font
@@ -322,7 +324,12 @@ mod tests {
 
     #[test]
     fn test_text_run_creation() {
-        let run = TextRun::new("run1".to_string(), "Hello".to_string(), "font1".to_string(), 12);
+        let run = TextRun::new(
+            "run1".to_string(),
+            "Hello".to_string(),
+            "font1".to_string(),
+            12,
+        );
         assert_eq!(run.id, "run1");
         assert_eq!(run.text, "Hello");
         assert_eq!(run.font_size, 12);

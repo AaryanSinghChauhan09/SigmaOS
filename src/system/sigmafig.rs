@@ -118,7 +118,12 @@ pub struct Connector {
 }
 
 impl Connector {
-    pub fn new(id: String, connector_type: ConnectorType, from_node: String, to_node: String) -> Self {
+    pub fn new(
+        id: String,
+        connector_type: ConnectorType,
+        from_node: String,
+        to_node: String,
+    ) -> Self {
         Self {
             id,
             connector_type,
@@ -239,12 +244,14 @@ impl Diagram {
     }
 
     pub fn get_active_layer(&self) -> Option<&DiagramLayer> {
-        self.active_layer.as_ref()
+        self.active_layer
+            .as_ref()
             .and_then(|id| self.layers.get(id))
     }
 
     pub fn get_active_layer_mut(&mut self) -> Option<&mut DiagramLayer> {
-        self.active_layer.as_ref()
+        self.active_layer
+            .as_ref()
             .and_then(|id| self.layers.get_mut(id.as_str()))
     }
 
@@ -305,12 +312,14 @@ impl SigmaFig {
     }
 
     pub fn get_current_diagram(&self) -> Option<&Diagram> {
-        self.current_diagram.as_ref()
+        self.current_diagram
+            .as_ref()
             .and_then(|id| self.diagrams.get(id))
     }
 
     pub fn get_current_diagram_mut(&mut self) -> Option<&mut Diagram> {
-        self.current_diagram.as_ref()
+        self.current_diagram
+            .as_ref()
             .and_then(|id| self.diagrams.get_mut(id.as_str()))
     }
 
@@ -341,16 +350,12 @@ pub fn init_sigmafig() {
 
 /// Get the global SigmaFig instance
 pub fn get_sigmafig() -> Option<&'static SigmaFig> {
-    unsafe {
-        SIGMAFIG_INSTANCE.as_ref()
-    }
+    unsafe { SIGMAFIG_INSTANCE.as_ref() }
 }
 
 /// Get the global SigmaFig instance (mutable)
 pub fn get_sigmafig_mut() -> Option<&'static mut SigmaFig> {
-    unsafe {
-        SIGMAFIG_INSTANCE.as_mut()
-    }
+    unsafe { SIGMAFIG_INSTANCE.as_mut() }
 }
 
 /// Convenience function to add a diagram
