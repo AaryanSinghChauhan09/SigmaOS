@@ -16,6 +16,7 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use core::f32::consts::PI;
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};

@@ -6,7 +6,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

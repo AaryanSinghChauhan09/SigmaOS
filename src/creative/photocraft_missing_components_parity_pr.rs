@@ -9,6 +9,7 @@
 
 extern crate alloc;
 
+use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
