@@ -2,7 +2,7 @@
 // Bounded, race-free physical frame manager with typed error handling and double-free prevention.
 
 use super::frame::{Frame, FrameDescriptor, FrameState, PAGE_SIZE_4K};
-use core::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::vec::Vec;
 

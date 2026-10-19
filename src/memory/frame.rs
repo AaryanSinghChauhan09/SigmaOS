@@ -1,7 +1,7 @@
 // SigmaOS Physical Frame Management
 // Represents physical 4KB RAM frames and frame metadata descriptors.
 
-use core::sync::atomic::{AtomicU32, AtomicU8, Ordering};
+use std::sync::atomic::{AtomicU32, AtomicU8, Ordering};
 
 pub const PAGE_SIZE_4K: u64 = 4096;
 
