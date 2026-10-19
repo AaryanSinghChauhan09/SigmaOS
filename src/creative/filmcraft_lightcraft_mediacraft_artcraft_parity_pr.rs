@@ -291,8 +291,8 @@ impl MediacraftLowLatencyPipelineEqualizerPrEngine {
         }
 
         let rad = azimuth_deg * 0.0174532925; // deg to rad
-        let pan_l = (0.785398163 - rad * 0.5).cos();
-        let pan_r = (0.785398163 + rad * 0.5).sin();
+        let pan_l = (core::f32::consts::FRAC_PI_4 - rad * 0.5).cos();
+        let pan_r = (core::f32::consts::FRAC_PI_4 + rad * 0.5).sin();
 
         for i in 0..pcm_mono.len() {
             pcm_left[i] = pcm_mono[i] * pan_l;

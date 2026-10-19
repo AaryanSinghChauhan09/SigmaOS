@@ -8,6 +8,7 @@
 
 #![no_std]
 extern crate alloc;
+use core::f32::consts::PI;
 
 use alloc::collections::BTreeMap;
 use alloc::string::String;
@@ -131,7 +132,7 @@ impl SovereignVoiceEngine {
             for i in 0..num_samples {
                 let t = i as f32 / sample_rate;
                 // Harmonic synthesis based on phoneme pitch
-                let sample = (2.0 * 3.14159265 * p.pitch_hz * t).sin() * 0.5;
+                let sample = (2.0 * PI * p.pitch_hz * t).sin() * 0.5;
                 pcm.push(sample);
             }
         }

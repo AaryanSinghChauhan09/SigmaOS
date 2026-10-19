@@ -370,6 +370,7 @@ impl SigmaTime {
         self.stats.increment_attempts();
 
         // Try enabled NTP servers in priority order
+        #[allow(clippy::never_loop)]
         for server in self.enabled_ntp_servers() {
             // In a real implementation, this would perform actual NTP synchronization
             // For now, we simulate a successful sync

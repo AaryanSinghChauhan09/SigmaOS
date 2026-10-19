@@ -90,7 +90,7 @@ impl PhotocraftRawProcessingPrEngine {
         let exposure_factor = if self.active_params.exposure_ev == 0.0 {
             1.0f32
         } else {
-            (1.0f32 + self.active_params.exposure_ev * 0.693147).max(0.1)
+            (1.0f32 + self.active_params.exposure_ev * core::f32::consts::LN_2).max(0.1)
         };
 
         let temp_gain = self.active_params.color_temperature as f32 / 5500.0;

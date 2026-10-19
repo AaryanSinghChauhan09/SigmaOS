@@ -481,7 +481,7 @@ impl CadcraftSheetMetalSurfaceUnfoldPrEngine {
 
     /// Calculate bend allowance (BA) and bend deduction (BD)
     pub fn calculate_bend_deduction(&self, bend: &SheetMetalBend) -> (f64, f64) {
-        let pi = 3.141592653589793;
+        let pi = PI;
         let bend_allowance =
             (pi / 180.0) * bend.angle_deg * (bend.radius_mm + bend.k_factor * bend.thickness_mm);
         let setback =

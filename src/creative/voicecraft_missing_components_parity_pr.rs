@@ -117,7 +117,7 @@ impl VoicecraftNeuralTtsInferencePrEngine {
             let start_idx = frame * self.hop_length;
             for i in 0..self.hop_length {
                 if start_idx + i < total_samples {
-                    let phase = (i as f32 / self.hop_length as f32) * 2.0 * 3.14159265 * 440.0
+                    let phase = (i as f32 / self.hop_length as f32) * 2.0 * PI * 440.0
                         / self.sample_rate as f32;
                     pcm[start_idx + i] = phase.sin() * frame_energy;
                 }
@@ -271,7 +271,7 @@ impl VoicecraftZeroShotVoiceCloningPrEngine {
         let zcr = VoiceActivityDetector::compute_zcr(reference_pcm);
 
         for i in 0..self.embedding_dim {
-            let factor = (i as f32 / self.embedding_dim as f32) * 3.14159265;
+            let factor = (i as f32 / self.embedding_dim as f32) * PI;
             embedding[i] = (mean_energy * factor.cos() + zcr * factor.sin()).tanh();
         }
         embedding

@@ -6,6 +6,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
+use core::f32::consts::PI;
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -250,7 +251,7 @@ impl BRepSolidModel {
         ];
 
         let mut top_vertices = Vec::new();
-        let draft_rad = draft_angle_deg * 3.141592653589793 / 180.0;
+        let draft_rad = draft_angle_deg * PI / 180.0;
         let draft_offset = depth * draft_rad.tan();
 
         for v in &base_vertices {

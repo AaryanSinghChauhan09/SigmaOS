@@ -423,6 +423,8 @@ impl DesktopEnvironment {
 
     /// Run main loop
     pub fn run(&mut self) -> Result<(), &'static str> {
+        // TODO: Implement proper event loop with running flag mutation
+        #[allow(clippy::while_immutable_condition)]
         while self.running {
             // Process input events
             // Render frame

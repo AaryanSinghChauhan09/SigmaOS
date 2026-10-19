@@ -467,8 +467,8 @@ impl FilmcraftSpatial3dAudioPanningPrEngine {
         }
 
         let rad = azimuth_deg * 0.0174532925;
-        let gain_l = (0.785398163 - rad * 0.5).cos();
-        let gain_r = (0.785398163 + rad * 0.5).sin();
+        let gain_l = (core::f32::consts::FRAC_PI_4 - rad * 0.5).cos();
+        let gain_r = (core::f32::consts::FRAC_PI_4 + rad * 0.5).sin();
 
         for i in 0..frame_count {
             let out_idx = i * 8;

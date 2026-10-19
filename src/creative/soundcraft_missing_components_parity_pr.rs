@@ -317,7 +317,7 @@ impl SoundcraftSpatial3dAmbisonicMasterPrEngine {
         let y_dir = pos.y / norm;
         let z_dir = pos.z / norm;
 
-        let w = mono_sample * 0.7071; // Omni channel W
+        let w = mono_sample * core::f32::consts::FRAC_1_SQRT_2; // Omni channel W
         let x = mono_sample * x_dir; // Front-back X
         let y = mono_sample * y_dir; // Left-right Y
         let z = mono_sample * z_dir; // Up-down Z
@@ -815,7 +815,7 @@ mod tests {
                 z: 0.0,
             },
         );
-        assert!((w - 0.7071).abs() < 1e-3);
+        assert!((w - core::f32::consts::FRAC_1_SQRT_2).abs() < 1e-3);
         assert_eq!(x, 1.0);
         assert_eq!(y, 0.0);
         assert_eq!(z, 0.0);

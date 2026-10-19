@@ -91,7 +91,7 @@ impl ThreeDCraftPbrShaderEngine {
 
         let num = a2;
         let mut denom = n_dot_h2 * (a2 - 1.0) + 1.0;
-        denom = 3.141592653589793 * denom * denom;
+        denom = PI * denom * denom;
 
         if denom == 0.0 {
             1.0
@@ -160,9 +160,9 @@ impl ThreeDCraftPbrShaderEngine {
         ];
 
         let diffuse = [
-            k_d[0] * material.albedo[0] / 3.14159265,
-            k_d[1] * material.albedo[1] / 3.14159265,
-            k_d[2] * material.albedo[2] / 3.14159265,
+            k_d[0] * material.albedo[0] / PI,
+            k_d[1] * material.albedo[1] / PI,
+            k_d[2] * material.albedo[2] / PI,
         ];
 
         let specular = [

@@ -289,7 +289,7 @@ impl SoundcraftSpatial3dAmbisonicHrtfReverbPrEngine {
         let y = pos.y / norm;
         let z = pos.z / norm;
 
-        let w = sample * 0.7071;
+        let w = sample * core::f32::consts::FRAC_1_SQRT_2;
         let bx = sample * x;
         let by = sample * y;
         let bz = sample * z;
@@ -947,7 +947,7 @@ mod tests {
             z: 0.0,
         };
         let (w, bx, _by, _bz) = engine.encode_foa_bformat(1.0, pos);
-        assert!((w - 0.7071).abs() < 1e-3);
+        assert!((w - core::f32::consts::FRAC_1_SQRT_2).abs() < 1e-3);
         assert_eq!(bx, 1.0);
 
         let (left, right) = engine.hrtf_binaural_pan(pos);
