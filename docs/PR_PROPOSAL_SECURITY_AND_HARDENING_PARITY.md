@@ -77,4 +77,28 @@ All components are verified via standalone Rust unit tests (`rustc --test --edit
 - `test_identity_and_enterprise_auth_engine`
 - `test_master_security_pr_gateway`
 
+## Pull Request Proposals (v61 Parity Suite: PRs #9001–#9005)
+
+The v61 Security & Hardening Parity Suite (`SovereignSecurityAndHardeningParityV61Gateway`) extends the framework with 5 specialized PR proposal generators:
+
+1. **PR #9001**: `feat(security_linux_v61)` – SELinux v33/MLS context engine, AppArmor v4 profile matcher, seccomp BPF `USER_NOTIF` socket notification, Linux capabilities ambient/bounding sets, cgroups v2 PSI governor, and Landlock v8 net/fs sandboxing.
+2. **PR #9002**: `feat(security_bsd_v61)` – OpenBSD `pledge()` & `unveil()` isolation, FreeBSD 14+ Jails VNET networking, Capsicum fd capability limits, FreeBSD MAC Framework, and BSD `securelevel` state machine.
+3. **PR #9003**: `feat(security_audit_v61)` – Linux `auditd` syscall/watch rule compiler, `fail2ban` exponential ban duration calculator & log regex matcher, Lynis CIS/STIG compliance index evaluator, and AIDE cryptographic baseline diff engine.
+4. **PR #9004**: `feat(security_crypto_v61)` – ClamAV CVD signature scanner, GnuPG OpenPGP Ed25519 keyring validator, UEFI Secure Boot db/dbx validator, and TPM 2.0 PCR extend/quote attestation.
+5. **PR #9005**: `feat(security_identity_v61)` – Kerberos v5 TGT ticket exchange validator, LDAP v3 BER/DN filter parser, and SSSD offline cached PAM/NSS identity bridge.
+
+---
+
+## Verification & Status
+
+All components are verified via standalone Rust unit tests:
+- Original suite (`rustc --test --edition=2021 src/security/sovereign_security_and_hardening_advancements_pr.rs -o build/test_security_pr && ./build/test_security_pr`)
+- V61 Parity Suite (`rustc --test --edition=2021 src/security/sovereign_security_and_hardening_advancements_v61_pr.rs -o build/test_security_v61 && ./build/test_security_v61`):
+  - `test_linux_access_control_v61`
+  - `test_bsd_hardening_v61`
+  - `test_audit_and_intrusion_v61`
+  - `test_antivirus_and_crypto_v61`
+  - `test_identity_and_enterprise_auth_v61`
+  - `test_master_gateway_v61`
+
 Status: **Ready for Merge**.
