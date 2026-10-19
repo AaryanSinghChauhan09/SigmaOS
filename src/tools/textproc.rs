@@ -78,14 +78,19 @@ impl StreamEditor {
     }
 
     pub fn delete_line(&self, text: &str, line_number: usize) -> String {
-        let lines: Vec<&str> = text.lines().collect();
-        let result: Vec<&str> = lines
-            .iter()
-            .enumerate()
-            .filter(|(i, _)| *i != line_number - 1)
-            .map(|(_, line)| *line)
-            .collect();
-        result.join("\n")
+        // Optimization: build string directly with pre-allocated capacity instead of collecting into intermediate Vec<&str> vectors
+        let mut result = String::with_capacity(text.len());
+        let mut first = true;
+        for (i, line) in text.lines().enumerate() {
+            if i + 1 != line_number {
+                if !first {
+                    result.push('\n');
+                }
+                result.push_str(line);
+                first = false;
+            }
+        }
+        result
     }
 }
 
@@ -154,8 +159,10 @@ impl TextProcessor {
     }
 
     pub fn print_field(&self, line: &str, field: usize) -> Option<String> {
-        let fields = self.process_line(line);
-        fields.get(field).cloned()
+        // Optimization: avoid allocating a Vec<String> containing all split fields when only requesting field `field`
+        line.split(&self.field_separator)
+            .nth(field)
+            .map(|s| s.to_string())
     }
 }
 
@@ -189,6 +196,31 @@ impl GrepOptions {
     }
 }
 
+/// Zero-allocation case-insensitive substring search helper.
+/// Uses window slice byte comparison for ASCII fast-path to avoid heap String allocations via `to_lowercase()`.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(needle_bytes.len())
+            .any(|window| {
+                window
+                    .iter()
+                    .zip(needle_bytes.iter())
+                    .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+            })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Pattern search
 pub struct PatternSearch {
     pub patterns: Vec<String>,
@@ -208,25 +240,23 @@ impl PatternSearch {
     }
 
     pub fn search(&self, text: &str) -> Vec<GrepMatch> {
-        let mut matches = Vec::new();
+        // Pre-allocate match buffer capacity to reduce vector growth reallocation overhead
+        let mut matches = Vec::with_capacity(16);
         for (line_num, line) in text.lines().enumerate() {
             for pattern in &self.patterns {
-                if self.options.ignore_case {
-                    if line.to_lowercase().contains(&pattern.to_lowercase()) {
-                        matches.push(GrepMatch {
-                            line_number: line_num + 1,
-                            line: line.to_string(),
-                            pattern: pattern.clone(),
-                        });
-                    }
+                let matched = if self.options.ignore_case {
+                    // Optimization: avoid allocating heap Strings via `to_lowercase()` per line/pattern check
+                    contains_ignore_case(line, pattern)
                 } else {
-                    if line.contains(pattern) {
-                        matches.push(GrepMatch {
-                            line_number: line_num + 1,
-                            line: line.to_string(),
-                            pattern: pattern.clone(),
-                        });
-                    }
+                    line.contains(pattern)
+                };
+
+                if matched {
+                    matches.push(GrepMatch {
+                        line_number: line_num + 1,
+                        line: line.to_string(),
+                        pattern: pattern.clone(),
+                    });
                 }
             }
         }
@@ -287,7 +317,7 @@ mod tests {
 
     #[test]
     fn test_text_processor() {
-        let mut processor = TextProcessor::new();
+        let processor = TextProcessor::new();
         let fields = processor.process_line("hello world");
         assert_eq!(fields.len(), 2);
     }
@@ -297,5 +327,29 @@ mod tests {
         let grep = PatternSearch::new("test");
         let matches = grep.search("test line\ntest2 line");
         assert_eq!(matches.len(), 2);
+    }
+
+    #[test]
+    fn test_contains_ignore_case_and_ignore_case_search() {
+        assert!(contains_ignore_case("SIGMAOS LINUX", "sigmaos"));
+        assert!(!contains_ignore_case("Alpha Beta", "gamma"));
+
+        let mut grep = PatternSearch::new("SIGMA");
+        grep.options.set_ignore_case(true);
+        let matches = grep.search("sigma line\nOTHER LINE\nSigma2 line");
+        assert_eq!(matches.len(), 2);
+    }
+
+    #[test]
+    fn test_print_field_and_delete_line() {
+        let processor = TextProcessor::new();
+        assert_eq!(
+            processor.print_field("hello world test", 1),
+            Some("world".to_string())
+        );
+
+        let editor = StreamEditor::new();
+        let result = editor.delete_line("line1\nline2\nline3", 2);
+        assert_eq!(result, "line1\nline3");
     }
 }
