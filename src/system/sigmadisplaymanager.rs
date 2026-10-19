@@ -138,14 +138,14 @@ impl LoginSettings {
     pub fn set_logo(&mut self, image: String) {
         self.logo_image = image;
     }
-;
+}
 
 /// SigmaDisplayManager - Display and login management
 #[derive(Debug)]
 pub struct SigmaDisplayManager {
     outputs: BTreeMap<String, DisplayOutput>,
     login_settings: LoginSettings,
-;
+}
 
 impl SigmaDisplayManager {
     pub fn new() -> Self {
