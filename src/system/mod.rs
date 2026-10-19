@@ -130,6 +130,7 @@ pub mod sigmasystemmonitor2;
 pub mod sigmasystemtools;
 pub mod sigmataskmanager;
 pub mod sigmathemeinstaller;
+pub mod sigmathememanager;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod sigmatimeshift;
@@ -871,4 +872,9 @@ pub use sigmausermanager::{
 pub use sigmadisplaymanager::{
     DisplayOutput, LoginSettings, Resolution, SigmaDisplayManager,
     add_output, get_sigmadisplaymanager, get_sigmadisplaymanager_mut, init_sigmadisplaymanager,
+};
+
+pub use sigmathememanager::{
+    AppearanceSettings, ColorScheme, FontConfig, Theme, ThemeType, SigmaThemeManager,
+    add_theme, get_sigmathememanager, get_sigmathememanager_mut, init_sigmathememanager,
 };
