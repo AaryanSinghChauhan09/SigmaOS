@@ -144,6 +144,7 @@
 - [Why SigmaOS Cannot Defeat Mint & Omarchy](./Why-SigmaOS-Cannot-Defeat-Linux-Mint-and-Omarchy.md)
 - [Mint & Omarchy Coexistence & Interop](./Mint-and-Omarchy-Coexistence-and-Interoperability-Components.md)
 - [Mint & Omarchy Federated Desktop](./Mint-and-Omarchy-Federated-Desktop-Components.md)
+- [Open Source OS Inspiration V63 PR Suite](./40-Open-Source-OS-Inspiration-V63-PR-Suite.md)
 - [Future Development Roadmap](./Future-Development-Roadmap-BSD-Craft-Linux.md)
 - [AI Operating Manual](./AI-Development-Agent-Operating-Manual.md)
 - [AI Maintenance Policy](./AI-Agent-Maintenance-Instructions.md)
