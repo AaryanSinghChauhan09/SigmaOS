@@ -185,13 +185,15 @@ impl ProcessTaskManager {
     }
 
     /// Search processes
+    ///
+    /// Performance optimization: uses zero-allocation ASCII substring search (`contains_ignore_case`)
+    /// to eliminate temporary `String` heap allocations per process entry during search query filtering.
     pub fn search(&self, query: &str) -> Vec<&TaskProcessEntry> {
-        let query_lower = query.to_lowercase();
         self.processes
             .values()
             .filter(|p| {
-                p.name.to_lowercase().contains(&query_lower)
-                    || p.command.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&p.name, query)
+                    || contains_ignore_case(&p.command, query)
             })
             .collect()
     }
@@ -280,6 +282,22 @@ pub struct ProcessTaskStatistics {
     pub total_memory: f32,
 }
 
+/// Helper function for zero-allocation case-insensitive ASCII substring search
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.len() > haystack.len() {
+        return false;
+    }
+
+    let needle_bytes = needle.as_bytes();
+    haystack
+        .as_bytes()
+        .windows(needle_bytes.len())
+        .any(|window| window.eq_ignore_ascii_case(needle_bytes))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -335,6 +353,16 @@ mod tests {
         let manager = ProcessTaskManager::new();
         let results = manager.search("sigma");
         assert!(results.len() > 0);
+        let results_upper = manager.search("SIGMA");
+        assert_eq!(results.len(), results_upper.len());
+    }
+
+    #[test]
+    fn test_contains_ignore_case() {
+        assert!(contains_ignore_case("ProcessTaskManager", "task"));
+        assert!(contains_ignore_case("ProcessTaskManager", "TASK"));
+        assert!(!contains_ignore_case("ProcessTaskManager", "nonexistent"));
+        assert!(contains_ignore_case("sigma-shell", "SHELL"));
     }
 
     #[test]
