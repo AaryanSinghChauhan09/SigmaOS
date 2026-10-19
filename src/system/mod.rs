@@ -129,6 +129,7 @@ pub mod sigmaperformancemonitor;
 pub mod sigmasecurityaudit;
 pub mod sigmatimer;
 pub mod sigmajails;
+pub mod sigmaports;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -701,6 +702,12 @@ pub use sigmajails {
     SigmaJails, Jail, JailState,
     init_sigmajails, get_sigmajails, get_sigmajails_mut,
     add_jail,
+};
+
+pub use sigmaports {
+    SigmaPorts, Port, BuildState,
+    init_sigmaports, get_sigmaports, get_sigmaports_mut,
+    add_port,
 };
 
 pub use sigmaupdate::{
