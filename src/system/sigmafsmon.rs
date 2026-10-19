@@ -30,7 +30,7 @@ pub enum FSEventType {
     Unmount,
     Overflow,
     Unknown,
-}
+;
 
 /// Filesystem monitor status enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,7 +41,7 @@ pub enum FSMonState {
     Warning,
     Critical,
     Unknown,
-}
+;
 
 /// Alert severity level
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +49,7 @@ pub enum AlertSeverity {
     Info,
     Warning,
     Critical,
-}
+;
 
 /// Tracked filesystem event
 #[derive(Debug, Clone)]
@@ -60,7 +60,7 @@ pub struct FSEvent {
     pub timestamp: u64,
     pub process_id: u32,
     pub is_directory: bool,
-}
+;
 
 impl FSEvent {
     /// Create a new filesystem event
@@ -81,7 +81,7 @@ impl FSEvent {
             is_directory,
         }
     }
-}
+;
 
 /// Watch descriptor for monitoring paths
 #[derive(Debug, Clone)]
@@ -91,7 +91,7 @@ pub struct FSWatch {
     pub recursive: bool,
     pub mask: u32,
     pub is_active: bool,
-}
+;
 
 impl FSWatch {
     /// Create a new watch descriptor
@@ -109,7 +109,7 @@ impl FSWatch {
     pub fn set_active(&mut self, active: bool) {
         self.is_active = active;
     }
-}
+;
 
 /// Filesystem I/O performance and capacity metrics
 #[derive(Debug, Clone)]
@@ -122,7 +122,7 @@ pub struct FSMetrics {
     pub bytes_read: u64,
     pub bytes_written: u64,
     pub average_latency_us: u32,
-}
+;
 
 impl FSMetrics {
     /// Create a new filesystem metrics record
@@ -170,7 +170,7 @@ impl FSMetrics {
                 / total_ops) as u32;
         }
     }
-}
+;
 
 /// Filesystem capacity or performance alert
 #[derive(Debug, Clone)]
@@ -180,7 +180,7 @@ pub struct FSAlert {
     pub severity: AlertSeverity,
     pub message: String,
     pub timestamp: u64,
-}
+;
 
 /// Main SigmaFSMon manager struct
 pub struct SigmaFSMon {
@@ -193,7 +193,7 @@ pub struct SigmaFSMon {
     max_event_history: usize,
     warning_threshold_pct: u8,
     critical_threshold_pct: u8,
-}
+;
 
 impl SigmaFSMon {
     /// Create a new SigmaFSMon instance
@@ -348,13 +348,13 @@ impl SigmaFSMon {
     pub fn event_count(&self) -> usize {
         self.events.len()
     }
-}
+;
 
 impl Default for SigmaFSMon {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFSMon instance (placeholder for global state)
 static mut SIGMA_FSMON_INSTANCE: Option<SigmaFSMon> = None;
@@ -364,31 +364,31 @@ pub fn init_sigmafsmon() {
     unsafe {
         SIGMA_FSMON_INSTANCE = Some(SigmaFSMon::new());
     }
-}
+;
 
 /// Get global SigmaFSMon reference
 pub fn get_sigmafsmon() -> Option<&'static SigmaFSMon> {
     unsafe { SIGMA_FSMON_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaFSMon reference
 pub fn get_sigmafsmon_mut() -> Option<&'static mut SigmaFSMon> {
     unsafe { SIGMA_FSMON_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a filesystem watch
 pub fn add_fs_watch(watch: FSWatch) {
     if let Some(mon) = get_sigmafsmon_mut() {
         mon.add_watch(watch);
     }
-}
+;
 
 /// Convenience function to record an event
 pub fn record_fs_event(event: FSEvent) {
     if let Some(mon) = get_sigmafsmon_mut() {
         mon.record_event(event);
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -480,4 +480,4 @@ mod tests {
         let mon = get_sigmafsmon().unwrap();
         assert_eq!(mon.watch_count(), 1);
     }
-}
+;

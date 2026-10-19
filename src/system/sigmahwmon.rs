@@ -19,7 +19,7 @@ pub enum SensorType {
     Power,
     Current,
     Unknown,
-}
+;
 
 /// Sensor state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum SensorState {
     Warning,
     Critical,
     Unknown,
-}
+;
 
 /// Hardware sensor data structure
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct HardwareSensor {
     pub max_value: f64,
     pub unit: String,
     pub state: SensorState,
-}
+;
 
 impl HardwareSensor {
     /// Create a new hardware sensor
@@ -88,13 +88,13 @@ impl HardwareSensor {
     pub fn is_alert(&self) -> bool {
         self.state == SensorState::Warning || self.state == SensorState::Critical
     }
-}
+;
 
 /// Hardware monitor manager
 pub struct SigmaHwMon {
     sensors: BTreeMap<String, HardwareSensor>,
     running: AtomicBool,
-}
+;
 
 impl SigmaHwMon {
     /// Create a new hardware monitor
@@ -199,13 +199,13 @@ impl SigmaHwMon {
                 ),
         )
     }
-}
+;
 
 impl Default for SigmaHwMon {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaHwMon instance (placeholder for actual global state)
 static mut SIGMAHWMON_INSTANCE: Option<SigmaHwMon> = None;
@@ -215,24 +215,24 @@ pub fn init_sigmahwmon() {
     unsafe {
         SIGMAHWMON_INSTANCE = Some(SigmaHwMon::new());
     }
-}
+;
 
 /// Get the global SigmaHwMon instance
 pub fn get_sigmahwmon() -> Option<&'static SigmaHwMon> {
     unsafe { SIGMAHWMON_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaHwMon instance
 pub fn get_sigmahwmon_mut() -> Option<&'static mut SigmaHwMon> {
     unsafe { SIGMAHWMON_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a sensor
 pub fn add_hw_sensor(sensor: HardwareSensor) {
     if let Some(hwmon) = get_sigmahwmon_mut() {
         hwmon.add_sensor(sensor);
     }
-}
+;
 
 /// Convenience function to update a sensor value
 pub fn update_hw_sensor(sensor_id: &str, new_value: f64) -> bool {
@@ -241,7 +241,7 @@ pub fn update_hw_sensor(sensor_id: &str, new_value: f64) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -669,4 +669,4 @@ mod tests {
         let sensor = hwmon.get_sensor("cpu_temp").unwrap();
         assert_eq!(sensor.current_value, 55.0);
     }
-}
+;

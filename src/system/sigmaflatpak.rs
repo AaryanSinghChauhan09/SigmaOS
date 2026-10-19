@@ -17,7 +17,7 @@ pub enum FlatpakType {
     Sdk,
     Extension,
     Unknown,
-}
+;
 
 /// Flatpak state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -26,7 +26,7 @@ pub enum FlatpakState {
     NotInstalled,
     UpdateAvailable,
     Unknown,
-}
+;
 
 /// Flatpak data structure
 #[derive(Debug, Clone)]
@@ -39,7 +39,7 @@ pub struct Flatpak {
     pub flatpak_type: FlatpakType,
     pub state: FlatpakState,
     pub size: u64,
-}
+;
 
 impl Flatpak {
     /// Create a new Flatpak
@@ -82,7 +82,7 @@ impl Flatpak {
     pub fn has_update(&self) -> bool {
         self.state == FlatpakState::UpdateAvailable
     }
-}
+;
 
 /// Flatpak remote repository
 #[derive(Debug, Clone)]
@@ -91,7 +91,7 @@ pub struct FlatpakRemote {
     pub name: String,
     pub url: String,
     pub enabled: bool,
-}
+;
 
 impl FlatpakRemote {
     /// Create a new Flatpak remote
@@ -118,14 +118,14 @@ impl FlatpakRemote {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-}
+;
 
 /// Flatpak manager
 pub struct SigmaFlatpak {
     flatpaks: BTreeMap<String, Flatpak>,
     remotes: BTreeMap<String, FlatpakRemote>,
     running: AtomicBool,
-}
+;
 
 impl SigmaFlatpak {
     /// Create a new Flatpak manager
@@ -256,13 +256,13 @@ impl SigmaFlatpak {
     pub fn remote_count(&self) -> usize {
         self.remotes.len()
     }
-}
+;
 
 impl Default for SigmaFlatpak {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFlatpak instance
 static mut SIGMAFLATPAK_INSTANCE: Option<SigmaFlatpak> = None;
@@ -272,17 +272,17 @@ pub fn init_sigmaflatpak() {
     unsafe {
         SIGMAFLATPAK_INSTANCE = Some(SigmaFlatpak::new());
     }
-}
+;
 
 /// Get the global SigmaFlatpak instance
 pub fn get_sigmaflatpak() -> Option<&'static SigmaFlatpak> {
     unsafe { SIGMAFLATPAK_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaFlatpak instance
 pub fn get_sigmaflatpak_mut() -> Option<&'static mut SigmaFlatpak> {
     unsafe { SIGMAFLATPAK_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a Flatpak
 pub fn add_flatpak(flatpak: Flatpak) -> bool {
@@ -291,7 +291,7 @@ pub fn add_flatpak(flatpak: Flatpak) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to install a Flatpak
 pub fn install_flatpak(flatpak_id: &str) -> bool {
@@ -300,7 +300,7 @@ pub fn install_flatpak(flatpak_id: &str) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -405,4 +405,4 @@ mod tests {
         let flatpak_mgr = get_sigmaflatpak().unwrap();
         assert_eq!(flatpak_mgr.flatpak_count(), 1);
     }
-}
+;

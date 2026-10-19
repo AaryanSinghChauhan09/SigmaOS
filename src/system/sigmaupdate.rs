@@ -24,7 +24,7 @@ pub enum UpdateType {
     Feature,
     /// Dependency update
     Dependency,
-}
+;
 
 impl fmt::Display for UpdateType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -35,7 +35,7 @@ impl fmt::Display for UpdateType {
             UpdateType::Dependency => write!(f, "dependency"),
         }
     }
-}
+;
 
 /// Update status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,7 +50,7 @@ pub enum UpdateStatus {
     Completed,
     /// Failed
     Failed,
-}
+;
 
 impl fmt::Display for UpdateStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,7 +62,7 @@ impl fmt::Display for UpdateStatus {
             UpdateStatus::Failed => write!(f, "failed"),
         }
     }
-}
+;
 
 /// Update policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -73,7 +73,7 @@ pub enum UpdatePolicy {
     DownloadOnly,
     /// Manual only
     ManualOnly,
-}
+;
 
 impl fmt::Display for UpdatePolicy {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -83,7 +83,7 @@ impl fmt::Display for UpdatePolicy {
             UpdatePolicy::ManualOnly => write!(f, "manual_only"),
         }
     }
-}
+;
 
 /// System update
 #[derive(Debug, Clone)]
@@ -102,7 +102,7 @@ pub struct SystemUpdate {
     pub status: UpdateStatus,
     /// Size in bytes
     pub size: u64,
-}
+;
 
 impl SystemUpdate {
     /// Create a new system update
@@ -135,7 +135,7 @@ impl SystemUpdate {
         self.size = size;
         self
     }
-}
+;
 
 /// SigmaUpdate - System Update Daemon
 pub struct SigmaUpdate {
@@ -147,7 +147,7 @@ pub struct SigmaUpdate {
     running: bool,
     /// Update counter
     update_counter: u32,
-}
+;
 
 impl SigmaUpdate {
     /// Create a new SigmaUpdate instance
@@ -271,13 +271,13 @@ impl SigmaUpdate {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaUpdate {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaUpdate instance (placeholder for actual global state)
 static mut SIGMAUPDATE_INSTANCE: Option<SigmaUpdate> = None;
@@ -287,12 +287,12 @@ pub fn init_sigmaupdate() {
     unsafe {
         SIGMAUPDATE_INSTANCE = Some(SigmaUpdate::new());
     }
-}
+;
 
 /// Get the global SigmaUpdate instance
 pub fn get_sigmaupdate() -> Option<&'static mut SigmaUpdate> {
     unsafe { SIGMAUPDATE_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to apply an update
 pub fn apply_system_update(update_id: &str) -> Result<(), String> {
@@ -301,7 +301,7 @@ pub fn apply_system_update(update_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaUpdate not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -472,4 +472,4 @@ mod tests {
         let result = apply_system_update("update1");
         assert!(result.is_ok());
     }
-}
+;

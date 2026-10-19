@@ -20,7 +20,7 @@ pub struct CpuCore {
     pub usage_percent: f32,
     pub frequency_mhz: u32,
     pub temperature_celsius: f32,
-}
+;
 
 impl CpuCore {
     pub fn new(id: u32) -> Self {
@@ -46,7 +46,7 @@ impl CpuCore {
         self.temperature_celsius = temperature_celsius;
         self
     }
-}
+;
 
 /// Memory info
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ pub struct MemoryInfo {
     pub available_mb: u64,
     pub swap_total_mb: u64,
     pub swap_used_mb: u64,
-}
+;
 
 impl MemoryInfo {
     pub fn new(total_mb: u64) -> Self {
@@ -81,7 +81,7 @@ impl MemoryInfo {
         }
         ((self.used_mb * 100) / self.total_mb) as u32
     }
-}
+;
 
 /// Network interface stats
 #[derive(Debug, Clone)]
@@ -91,7 +91,7 @@ pub struct NetworkStats {
     pub bytes_received: u64,
     pub packets_sent: u64,
     pub packets_received: u64,
-}
+;
 
 impl NetworkStats {
     pub fn new(interface: String) -> Self {
@@ -109,7 +109,7 @@ impl NetworkStats {
         self.bytes_received = bytes_received;
         self
     }
-}
+;
 
 /// System monitor
 pub struct SigmaSystemMonitor {
@@ -117,7 +117,7 @@ pub struct SigmaSystemMonitor {
     memory: Option<MemoryInfo>,
     network_stats: BTreeMap<String, NetworkStats>,
     uptime_seconds: u64,
-}
+;
 
 impl SigmaSystemMonitor {
     pub fn new(core_count: u32) -> Self {
@@ -188,13 +188,13 @@ impl SigmaSystemMonitor {
     pub fn cpu_count(&self) -> usize {
         self.cpu_cores.len()
     }
-}
+;
 
 impl Default for SigmaSystemMonitor {
     fn default() -> Self {
         Self::new(1)
     }
-}
+;
 
 static mut SIGMASYSTEMMONITOR_INSTANCE: Option<SigmaSystemMonitor> = None;
 
@@ -202,7 +202,7 @@ pub fn init_sigmasystemmonitor(core_count: u32) {
     unsafe {
         SIGMASYSTEMMONITOR_INSTANCE = Some(SigmaSystemMonitor::new(core_count));
     }
-}
+;
 
 pub fn get_sigmasystemmonitor() -> &'static SigmaSystemMonitor {
     unsafe {
@@ -210,7 +210,7 @@ pub fn get_sigmasystemmonitor() -> &'static SigmaSystemMonitor {
             .as_ref()
             .expect("SigmaSystemMonitor not initialized")
     }
-}
+;
 
 pub fn get_sigmasystemmonitor_mut() -> &'static mut SigmaSystemMonitor {
     unsafe {
@@ -218,7 +218,7 @@ pub fn get_sigmasystemmonitor_mut() -> &'static mut SigmaSystemMonitor {
             .as_mut()
             .expect("SigmaSystemMonitor not initialized")
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -297,4 +297,4 @@ mod tests {
         monitor_mut.set_uptime(3600);
         assert_eq!(monitor.get_uptime(), 3600);
     }
-}
+;

@@ -21,7 +21,7 @@ pub enum PowerEvent {
     LidOpen,
     LidClose,
     Unknown,
-}
+;
 
 /// Battery state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,7 +30,7 @@ pub enum BatteryState {
     Discharging,
     Full,
     Unknown,
-}
+;
 
 /// Thermal state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,7 +39,7 @@ pub enum ThermalState {
     Warning,
     Critical,
     Unknown,
-}
+;
 
 /// Battery information
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ pub struct BatteryInfo {
     pub state: BatteryState,
     pub voltage: Option<u32>,
     pub temperature: Option<i32>,
-}
+;
 
 impl BatteryInfo {
     pub fn new(id: String, capacity: u32) -> Self {
@@ -91,7 +91,7 @@ impl BatteryInfo {
             (self.remaining * 100) / self.capacity
         }
     }
-}
+;
 
 /// Thermal zone
 #[derive(Debug, Clone)]
@@ -101,7 +101,7 @@ pub struct ThermalZone {
     pub temperature: i32,
     pub trip_points: Vec<i32>,
     pub state: ThermalState,
-}
+;
 
 impl ThermalZone {
     pub fn new(id: String, name: String) -> Self {
@@ -135,7 +135,7 @@ impl ThermalZone {
             self.state = ThermalState::Normal;
         }
     }
-}
+;
 
 /// ACPI manager
 pub struct SigmaACPI {
@@ -145,7 +145,7 @@ pub struct SigmaACPI {
     next_thermal_id: u64,
     ac_power: bool,
     lid_state: bool,
-}
+;
 
 impl SigmaACPI {
     pub fn new() -> Self {
@@ -230,13 +230,13 @@ impl SigmaACPI {
     pub fn thermal_zone_count(&self) -> usize {
         self.thermal_zones.len()
     }
-}
+;
 
 impl Default for SigmaACPI {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMAACPI_INSTANCE: Option<SigmaACPI> = None;
 
@@ -244,7 +244,7 @@ pub fn init_sigmaacpi() {
     unsafe {
         SIGMAACPI_INSTANCE = Some(SigmaACPI::new());
     }
-}
+;
 
 pub fn get_sigmaacpi() -> &'static SigmaACPI {
     unsafe {
@@ -252,7 +252,7 @@ pub fn get_sigmaacpi() -> &'static SigmaACPI {
             .as_ref()
             .expect("SigmaACPI not initialized")
     }
-}
+;
 
 pub fn get_sigmaacpi_mut() -> &'static mut SigmaACPI {
     unsafe {
@@ -260,12 +260,12 @@ pub fn get_sigmaacpi_mut() -> &'static mut SigmaACPI {
             .as_mut()
             .expect("SigmaACPI not initialized")
     }
-}
+;
 
 pub fn add_battery(capacity: u32) -> String {
     let manager = get_sigmaacpi_mut();
     manager.add_battery(capacity)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -387,4 +387,4 @@ mod tests {
         let manager = get_sigmaacpi();
         assert!(manager.get_battery(&id).is_some());
     }
-}
+;

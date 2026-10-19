@@ -11,7 +11,7 @@ pub enum UserType {
     System,
     Normal,
     Administrator,
-}
+;
 
 impl UserType {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -30,7 +30,7 @@ impl UserType {
             UserType::Administrator => "Administrator",
         }
     }
-}
+;
 
 /// User account
 #[derive(Debug, Clone)]
@@ -44,7 +44,7 @@ pub struct UserAccount {
     pub user_type: UserType,
     pub is_active: bool,
     pub created_at: u64,
-}
+;
 
 impl UserAccount {
     pub fn new(username: String, user_id: u32, group_id: u32, user_type: UserType) -> Self {
@@ -85,14 +85,14 @@ impl UserAccount {
     pub fn is_admin(&self) -> bool {
         self.user_type == UserType::Administrator
     }
-}
+;
 
 /// User manager
 #[derive(Debug)]
 pub struct UserManager {
     users: HashMap<String, UserAccount>,
     next_uid: u32,
-}
+;
 
 impl UserManager {
     pub fn new() -> Self {
@@ -259,13 +259,13 @@ impl UserManager {
             next_uid: self.next_uid,
         }
     }
-}
+;
 
 impl Default for UserManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// User statistics
 #[derive(Debug, Clone)]
@@ -276,7 +276,7 @@ pub struct UserStatistics {
     pub normal_users: usize,
     pub system_users: usize,
     pub next_uid: u32,
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -358,4 +358,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert!(stats.total_users >= 1);
     }
-}
+;

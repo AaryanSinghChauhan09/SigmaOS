@@ -20,7 +20,7 @@ pub enum JailState {
     Stopped,
     Error,
     Unknown,
-}
+;
 
 /// Jail
 #[derive(Debug, Clone)]
@@ -32,7 +32,7 @@ pub struct Jail {
     pub hostname: String,
     pub ip_address: String,
     pub process_count: u32,
-}
+;
 
 impl Jail {
     pub fn new(id: String, name: String, path: String) -> Self {
@@ -64,13 +64,13 @@ impl Jail {
     pub fn stop(&mut self) {
         self.state = JailState::Stopped;
     }
-}
+;
 
 /// Jails manager
 pub struct SigmaJails {
     jails: BTreeMap<String, Jail>,
     next_jail_id: u64,
-}
+;
 
 impl SigmaJails {
     pub fn new() -> Self {
@@ -121,13 +121,13 @@ impl SigmaJails {
             .filter(|j| j.state == JailState::Running)
             .count()
     }
-}
+;
 
 impl Default for SigmaJails {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMAJAILS_INSTANCE: Option<SigmaJails> = None;
 
@@ -135,7 +135,7 @@ pub fn init_sigmajails() {
     unsafe {
         SIGMAJAILS_INSTANCE = Some(SigmaJails::new());
     }
-}
+;
 
 pub fn get_sigmajails() -> &'static SigmaJails {
     unsafe {
@@ -143,7 +143,7 @@ pub fn get_sigmajails() -> &'static SigmaJails {
             .as_ref()
             .expect("SigmaJails not initialized")
     }
-}
+;
 
 pub fn get_sigmajails_mut() -> &'static mut SigmaJails {
     unsafe {
@@ -151,12 +151,12 @@ pub fn get_sigmajails_mut() -> &'static mut SigmaJails {
             .as_mut()
             .expect("SigmaJails not initialized")
     }
-}
+;
 
 pub fn add_jail(name: String, path: String) -> String {
     let manager = get_sigmajails_mut();
     manager.add_jail(name, path)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -235,4 +235,4 @@ mod tests {
         let manager = get_sigmajails();
         assert!(manager.get_jail(&id).is_some());
     }
-}
+;

@@ -11,7 +11,7 @@ pub enum SystemHealth {
     Healthy,
     Warning,
     Critical,
-}
+;
 
 impl SystemHealth {
     pub fn from_load(load: f64) -> Self {
@@ -31,7 +31,7 @@ impl SystemHealth {
             SystemHealth::Critical => "Critical",
         }
     }
-}
+;
 
 /// System information
 #[derive(Debug, Clone)]
@@ -42,7 +42,7 @@ pub struct SystemInfo {
     pub architecture: String,
     pub uptime_seconds: u64,
     pub boot_time: u64,
-}
+;
 
 impl SystemInfo {
     pub fn new() -> Self {
@@ -69,13 +69,13 @@ impl SystemInfo {
         let minutes = (self.uptime_seconds % 3600) / 60;
         format!("{}h {}m", hours, minutes)
     }
-}
+;
 
 impl Default for SystemInfo {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// CPU information
 #[derive(Debug, Clone)]
@@ -86,7 +86,7 @@ pub struct CpuInfo {
     pub frequency_mhz: u32,
     pub usage_percent: f64,
     pub temperature_celsius: f64,
-}
+;
 
 impl CpuInfo {
     pub fn new() -> Self {
@@ -107,13 +107,13 @@ impl CpuInfo {
     pub fn set_temperature(&mut self, temp: f64) {
         self.temperature_celsius = temp;
     }
-}
+;
 
 impl Default for CpuInfo {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Memory information
 #[derive(Debug, Clone)]
@@ -124,7 +124,7 @@ pub struct MemoryInfo {
     pub cached_bytes: u64,
     pub swap_total: u64,
     pub swap_used: u64,
-}
+;
 
 impl MemoryInfo {
     pub fn new() -> Self {
@@ -165,13 +165,13 @@ impl MemoryInfo {
             format!("{} KB", bytes / 1024)
         }
     }
-}
+;
 
 impl Default for MemoryInfo {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Disk information
 #[derive(Debug, Clone)]
@@ -182,7 +182,7 @@ pub struct DiskInfo {
     pub total_bytes: u64,
     pub used_bytes: u64,
     pub available_bytes: u64,
-}
+;
 
 impl DiskInfo {
     pub fn new(mount_point: String) -> Self {
@@ -210,7 +210,7 @@ impl DiskInfo {
     pub fn total_human(&self) -> String {
         MemoryInfo::bytes_to_human(self.total_bytes)
     }
-}
+;
 
 /// Network information
 #[derive(Debug, Clone)]
@@ -221,7 +221,7 @@ pub struct NetworkInfo {
     pub bytes_sent: u64,
     pub bytes_received: u64,
     pub is_up: bool,
-}
+;
 
 impl NetworkInfo {
     pub fn new(interface: String) -> Self {
@@ -239,7 +239,7 @@ impl NetworkInfo {
         self.bytes_sent += sent;
         self.bytes_received += received;
     }
-}
+;
 
 /// System manager
 #[derive(Debug)]
@@ -250,7 +250,7 @@ pub struct SystemManager {
     disks: HashMap<String, DiskInfo>,
     networks: HashMap<String, NetworkInfo>,
     health: SystemHealth,
-}
+;
 
 impl SystemManager {
     pub fn new() -> Self {
@@ -371,13 +371,13 @@ impl SystemManager {
             health: self.health,
         }
     }
-}
+;
 
 impl Default for SystemManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// System summary
 #[derive(Debug, Clone)]
@@ -388,7 +388,7 @@ pub struct SystemSummary {
     pub memory_usage: f64,
     pub disk_usage: f64,
     pub health: SystemHealth,
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -468,4 +468,4 @@ mod tests {
         let summary = manager.get_summary();
         assert_eq!(summary.hostname, "sigmaos");
     }
-}
+;

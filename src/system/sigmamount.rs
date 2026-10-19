@@ -17,7 +17,7 @@ pub enum MountState {
     Unmounted,
     Failed,
     Unknown,
-}
+;
 
 /// Mount option enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -34,7 +34,7 @@ pub enum MountOption {
     User,
     Users,
     Unknown,
-}
+;
 
 /// Mount entry data structure
 #[derive(Debug, Clone)]
@@ -47,7 +47,7 @@ pub struct MountEntry {
     pub dump: u32,
     pub fsck_order: u32,
     pub state: MountState,
-}
+;
 
 impl MountEntry {
     /// Create a new mount entry
@@ -102,13 +102,13 @@ impl MountEntry {
     pub fn is_auto(&self) -> bool {
         self.has_option(MountOption::Auto)
     }
-}
+;
 
 /// Mount manager
 pub struct SigmaMount {
     mount_entries: BTreeMap<String, MountEntry>,
     running: AtomicBool,
-}
+;
 
 impl SigmaMount {
     /// Create a new mount manager
@@ -221,13 +221,13 @@ impl SigmaMount {
     pub fn entry_count(&self) -> usize {
         self.mount_entries.len()
     }
-}
+;
 
 impl Default for SigmaMount {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaMount instance (placeholder for actual global state)
 static mut SIGMAMOUNT_INSTANCE: Option<SigmaMount> = None;
@@ -237,24 +237,24 @@ pub fn init_sigmamount() {
     unsafe {
         SIGMAMOUNT_INSTANCE = Some(SigmaMount::new());
     }
-}
+;
 
 /// Get the global SigmaMount instance
 pub fn get_sigmamount() -> Option<&'static SigmaMount> {
     unsafe { SIGMAMOUNT_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaMount instance
 pub fn get_sigmamount_mut() -> Option<&'static mut SigmaMount> {
     unsafe { SIGMAMOUNT_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a mount entry
 pub fn add_mount_entry(entry: MountEntry) {
     if let Some(mount) = get_sigmamount_mut() {
         mount.add_entry(entry);
     }
-}
+;
 
 /// Convenience function to mount an entry
 pub fn mount_entry(entry_id: &str) -> bool {
@@ -263,7 +263,7 @@ pub fn mount_entry(entry_id: &str) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -553,4 +553,4 @@ mod tests {
         let entry = mount.get_entry("entry1").unwrap();
         assert!(entry.is_mounted());
     }
-}
+;

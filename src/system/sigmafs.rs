@@ -26,7 +26,7 @@ pub enum FsType {
     Fat32,
     /// NTFS
     Ntfs,
-}
+;
 
 impl fmt::Display for FsType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for FsType {
             FsType::Ntfs => write!(f, "ntfs"),
         }
     }
-}
+;
 
 /// Mount state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub enum MountState {
     Mounted,
     /// Unmounted
     Unmounted,
-}
+;
 
 impl fmt::Display for MountState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for MountState {
             MountState::Unmounted => write!(f, "unmounted"),
         }
     }
-}
+;
 
 /// Filesystem mount
 #[derive(Debug, Clone)]
@@ -73,7 +73,7 @@ pub struct FsMount {
     pub state: MountState,
     /// Mount options
     pub options: String,
-}
+;
 
 impl FsMount {
     /// Create a new filesystem mount
@@ -104,7 +104,7 @@ impl FsMount {
         self.options = options;
         self
     }
-}
+;
 
 /// SigmaFS - System Filesystem Manager
 pub struct SigmaFS {
@@ -114,7 +114,7 @@ pub struct SigmaFS {
     running: bool,
     /// Mount counter
     mount_counter: u32,
-}
+;
 
 impl SigmaFS {
     /// Create a new SigmaFS instance
@@ -224,13 +224,13 @@ impl SigmaFS {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaFS {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFS instance (placeholder for actual global state)
 static mut SIGMAFS_INSTANCE: Option<SigmaFS> = None;
@@ -240,12 +240,12 @@ pub fn init_sigmafs() {
     unsafe {
         SIGMAFS_INSTANCE = Some(SigmaFS::new());
     }
-}
+;
 
 /// Get the global SigmaFS instance
 pub fn get_sigmafs() -> Option<&'static mut SigmaFS> {
     unsafe { SIGMAFS_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to mount a filesystem
 pub fn mount_filesystem(mount_id: &str) -> Result<(), String> {
@@ -254,7 +254,7 @@ pub fn mount_filesystem(mount_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaFS not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -408,4 +408,4 @@ mod tests {
         let result = mount_filesystem("mount1");
         assert!(result.is_ok());
     }
-}
+;

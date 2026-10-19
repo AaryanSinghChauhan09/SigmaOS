@@ -26,7 +26,7 @@ pub enum MailMessageState {
     Failed,
     /// Bounced
     Bounced,
-}
+;
 
 impl fmt::Display for MailMessageState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for MailMessageState {
             MailMessageState::Bounced => write!(f, "bounced"),
         }
     }
-}
+;
 
 /// Mail message
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct MailMessage {
     pub state: MailMessageState,
     /// Size in bytes
     pub size: u64,
-}
+;
 
 impl MailMessage {
     /// Create a new mail message
@@ -86,7 +86,7 @@ impl MailMessage {
         self.size = size;
         self
     }
-}
+;
 
 /// SigmaMail - System Mail Server
 pub struct SigmaMail {
@@ -96,7 +96,7 @@ pub struct SigmaMail {
     running: bool,
     /// Message counter
     message_counter: u32,
-}
+;
 
 impl SigmaMail {
     /// Create a new SigmaMail instance
@@ -271,13 +271,13 @@ impl SigmaMail {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaMail {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaMail instance (placeholder for actual global state)
 static mut SIGMAMAIL_INSTANCE: Option<SigmaMail> = None;
@@ -287,12 +287,12 @@ pub fn init_sigmamail() {
     unsafe {
         SIGMAMAIL_INSTANCE = Some(SigmaMail::new());
     }
-}
+;
 
 /// Get the global SigmaMail instance
 pub fn get_sigmamail() -> Option<&'static mut SigmaMail> {
     unsafe { SIGMAMAIL_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to send a message
 pub fn send_mail_message(message_id: &str) -> Result<(), String> {
@@ -301,7 +301,7 @@ pub fn send_mail_message(message_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaMail not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -485,4 +485,4 @@ mod tests {
         let result = send_mail_message("msg1");
         assert!(result.is_ok());
     }
-}
+;

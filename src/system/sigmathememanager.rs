@@ -22,7 +22,7 @@ pub enum ThemeType {
     Icon,
     Cursor,
     Font,
-}
+;
 
 /// Color scheme
 #[derive(Debug, Clone)]
@@ -35,7 +35,7 @@ pub struct ColorScheme {
     pub selection: String,
     pub window_bg: String,
     pub window_fg: String,
-}
+;
 
 impl ColorScheme {
     pub fn new(id: String, name: String, background: String, foreground: String, accent: String) -> Self {
@@ -62,7 +62,7 @@ impl ColorScheme {
     pub fn set_window_fg(&mut self, color: String) {
         self.window_fg = color;
     }
-}
+;
 
 /// Theme
 #[derive(Debug, Clone)]
@@ -74,7 +74,7 @@ pub struct Theme {
     pub is_dark: bool,
     pub color_scheme: Option<ColorScheme>,
     pub enabled: bool,
-}
+;
 
 impl Theme {
     pub fn new(id: String, name: String, theme_type: ThemeType, path: String, is_dark: bool) -> Self {
@@ -96,7 +96,7 @@ impl Theme {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Font configuration
 #[derive(Debug, Clone)]
@@ -109,7 +109,7 @@ pub struct FontConfig {
     pub style: String, // normal, italic
     pub antialiasing: bool,
     pub hinting: bool,
-}
+;
 
 impl FontConfig {
     pub fn new(id: String, name: String, font_family: String, size: u32) -> Self {
@@ -140,7 +140,7 @@ impl FontConfig {
     pub fn set_hinting(&mut self, enabled: bool) {
         self.hinting = enabled;
     }
-}
+;
 
 /// Appearance settings
 #[derive(Debug, Clone)]
@@ -153,7 +153,7 @@ pub struct AppearanceSettings {
     pub font_config: Option<FontConfig>,
     pub dark_mode: bool,
     pub accent_color: String,
-}
+;
 
 impl AppearanceSettings {
     pub fn new(id: String) -> Self {
@@ -196,14 +196,14 @@ impl AppearanceSettings {
     pub fn set_accent_color(&mut self, color: String) {
         self.accent_color = color;
     }
-}
+;
 
 /// SigmaThemeManager - Theme and appearance management
 #[derive(Debug)]
 pub struct SigmaThemeManager {
     themes: BTreeMap<String, Theme>,
     appearance: AppearanceSettings,
-}
+;
 
 impl SigmaThemeManager {
     pub fn new() -> Self {
@@ -258,13 +258,13 @@ impl SigmaThemeManager {
     pub fn theme_count(&self) -> usize {
         self.themes.len()
     }
-}
+;
 
 impl Default for SigmaThemeManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaThemeManager instance
 static mut SIGMATHEMEMANAGER_INSTANCE: Option<SigmaThemeManager> = None;
@@ -274,21 +274,21 @@ pub fn init_sigmathememanager() {
     unsafe {
         SIGMATHEMEMANAGER_INSTANCE = Some(SigmaThemeManager::new());
     }
-}
+;
 
 /// Get the global SigmaThemeManager instance
 pub fn get_sigmathememanager() -> Option<&'static SigmaThemeManager> {
     unsafe {
         SIGMATHEMEMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaThemeManager instance (mutable)
 pub fn get_sigmathememanager_mut() -> Option<&'static mut SigmaThemeManager> {
     unsafe {
         SIGMATHEMEMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a theme
 pub fn add_theme(theme: Theme) -> bool {
@@ -298,7 +298,7 @@ pub fn add_theme(theme: Theme) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -401,4 +401,4 @@ mod tests {
         let dark = manager.list_dark();
         assert_eq!(dark.len(), 1);
     }
-}
+;

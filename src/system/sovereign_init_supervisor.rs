@@ -20,7 +20,7 @@ pub enum RestartPolicy {
     Always,
     OnFailure,
     Never,
-}
+;
 
 /// Service Execution State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -33,7 +33,7 @@ pub enum ServiceState {
     Stopping,
     Failed,
     Restarting,
-}
+;
 
 /// Cgroups v2 Resource Limits for Service
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -41,7 +41,7 @@ pub struct ServiceResourceLimits {
     pub max_memory_bytes: u64,
     pub cpu_quota_pct: u32,
     pub max_tasks: u32,
-}
+;
 
 impl Default for ServiceResourceLimits {
     fn default() -> Self {
@@ -51,7 +51,7 @@ impl Default for ServiceResourceLimits {
             max_tasks: 256,
         }
     }
-}
+;
 
 /// Supervised Service Unit
 #[derive(Debug, Clone)]
@@ -70,7 +70,7 @@ pub struct SovereignServiceUnit {
     pub last_watchdog_ping: u64,
     pub dependencies: Vec<String>,
     pub env_vars: BTreeMap<String, String>,
-}
+;
 
 impl SovereignServiceUnit {
     pub fn new(name: &str, command: &str, policy: RestartPolicy) -> Self {
@@ -106,7 +106,7 @@ impl SovereignServiceUnit {
         self.watchdog_usec = watchdog_usec;
         self
     }
-}
+;
 
 /// Sovereign PID 1 Supervisor
 pub struct SovereignInitSupervisor {
@@ -115,7 +115,7 @@ pub struct SovereignInitSupervisor {
     pub pid_map: BTreeMap<u32, String>,
     pub total_spawned_processes: AtomicU64,
     pub total_reaped_zombies: AtomicU64,
-}
+;
 
 impl SovereignInitSupervisor {
     pub fn new() -> Self {
@@ -303,7 +303,7 @@ impl SovereignInitSupervisor {
         unit.status_message = String::from("Stopped by administrator");
         Ok(())
     }
-}
+;
 
 // ============================================================================
 // UNIT TESTS & STANDALONE HARNESS
@@ -398,4 +398,4 @@ mod tests {
             ServiceState::Failed
         );
     }
-}
+;

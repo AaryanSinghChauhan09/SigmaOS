@@ -22,7 +22,7 @@ pub enum CacheEntryState {
     Expired,
     /// Evicted
     Evicted,
-}
+;
 
 impl fmt::Display for CacheEntryState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,7 +32,7 @@ impl fmt::Display for CacheEntryState {
             CacheEntryState::Evicted => write!(f, "evicted"),
         }
     }
-}
+;
 
 /// Cache entry
 #[derive(Debug, Clone)]
@@ -45,7 +45,7 @@ pub struct CacheEntry {
     pub ttl: u64,
     /// State
     pub state: CacheEntryState,
-}
+;
 
 impl CacheEntry {
     /// Create a new cache entry
@@ -63,7 +63,7 @@ impl CacheEntry {
         self.state = state;
         self
     }
-}
+;
 
 /// SigmaCache - System Cache Daemon
 pub struct SigmaCache {
@@ -73,7 +73,7 @@ pub struct SigmaCache {
     running: bool,
     /// Entry counter
     entry_counter: u32,
-}
+;
 
 impl SigmaCache {
     /// Create a new SigmaCache instance
@@ -209,13 +209,13 @@ impl SigmaCache {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaCache {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaCache instance (placeholder for actual global state)
 static mut SIGMACACHE_INSTANCE: Option<SigmaCache> = None;
@@ -225,12 +225,12 @@ pub fn init_sigmacache() {
     unsafe {
         SIGMACACHE_INSTANCE = Some(SigmaCache::new());
     }
-}
+;
 
 /// Get the global SigmaCache instance
 pub fn get_sigmacache() -> Option<&'static mut SigmaCache> {
     unsafe { SIGMACACHE_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to set a cache entry
 pub fn set_cache_entry(entry: CacheEntry) -> Result<(), String> {
@@ -239,7 +239,7 @@ pub fn set_cache_entry(entry: CacheEntry) -> Result<(), String> {
     } else {
         Err("SigmaCache not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -388,4 +388,4 @@ mod tests {
         let result = set_cache_entry(entry);
         assert!(result.is_ok());
     }
-}
+;

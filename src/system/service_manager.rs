@@ -13,7 +13,7 @@ pub enum SystemServiceState {
     Running,
     Stopping,
     Failed,
-}
+;
 
 impl SystemServiceState {
     pub fn as_str(&self) -> &str {
@@ -36,7 +36,7 @@ impl SystemServiceState {
             _ => None,
         }
     }
-}
+;
 
 /// Service type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum SystemServiceType {
     System,
     User,
     Socket,
-}
+;
 
 impl SystemServiceType {
     pub fn as_str(&self) -> &str {
@@ -54,7 +54,7 @@ impl SystemServiceType {
             SystemServiceType::Socket => "socket",
         }
     }
-}
+;
 
 /// Service restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,7 +62,7 @@ pub enum SystemRestartPolicy {
     Never,
     OnFailure,
     Always,
-}
+;
 
 impl SystemRestartPolicy {
     pub fn as_str(&self) -> &str {
@@ -72,7 +72,7 @@ impl SystemRestartPolicy {
             SystemRestartPolicy::Always => "always",
         }
     }
-}
+;
 
 /// Service configuration
 #[derive(Debug, Clone)]
@@ -85,7 +85,7 @@ pub struct SystemServiceConfig {
     pub restart_policy: SystemRestartPolicy,
     pub auto_start: bool,
     pub depends_on: Vec<String>,
-}
+;
 
 impl SystemServiceConfig {
     pub fn new(name: String, description: String, exec_start: String) -> Self {
@@ -116,7 +116,7 @@ impl SystemServiceConfig {
     pub fn add_dependency(&mut self, dependency: String) {
         self.depends_on.push(dependency);
     }
-}
+;
 
 /// Service instance
 #[derive(Debug, Clone)]
@@ -126,7 +126,7 @@ pub struct SystemService {
     pub pid: Option<u32>,
     pub start_time: Option<u64>,
     pub restart_count: u32,
-}
+;
 
 impl SystemService {
     pub fn new(config: SystemServiceConfig) -> Self {
@@ -162,13 +162,13 @@ impl SystemService {
             None
         }
     }
-}
+;
 
 /// Service manager
 #[derive(Debug, Clone)]
 pub struct SystemServiceManager {
     pub services: Vec<SystemService>,
-}
+;
 
 impl Default for SystemServiceManager {
     fn default() -> Self {
@@ -176,7 +176,7 @@ impl Default for SystemServiceManager {
             services: Vec::new(),
         }
     }
-}
+;
 
 impl SystemServiceManager {
     pub fn new() -> Self {
@@ -435,7 +435,7 @@ impl SystemServiceManager {
         config.set_auto_start(true);
         self.add_service(config)
     }
-}
+;
 
 #[cfg(test)]
 #[cfg(test)]
@@ -649,4 +649,4 @@ mod tests {
         assert!(manager.add_firewall_service().is_ok());
         assert_eq!(manager.services.len(), 1);
     }
-}
+;

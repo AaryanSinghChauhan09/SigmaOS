@@ -19,7 +19,7 @@ pub enum FilesystemType {
     Fat32,
     Ntfs,
     Unknown,
-}
+;
 
 /// Check mode enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -28,7 +28,7 @@ pub enum CheckMode {
     Repair,
     Force,
     BadBlocks,
-}
+;
 
 /// Error severity enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub enum ErrorSeverity {
     Warning,
     Error,
     Critical,
-}
+;
 
 /// Filesystem error data structure
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ pub struct FilesystemError {
     pub block: Option<u64>,
     pub description: String,
     pub fixed: bool,
-}
+;
 
 impl FilesystemError {
     /// Create a new filesystem error
@@ -92,7 +92,7 @@ impl FilesystemError {
     pub fn is_critical(&self) -> bool {
         self.severity == ErrorSeverity::Critical
     }
-}
+;
 
 /// Filesystem check result data structure
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ pub struct CheckResult {
     pub warnings: usize,
     pub clean: bool,
     pub errors: Vec<FilesystemError>,
-}
+;
 
 impl CheckResult {
     /// Create a new check result
@@ -149,13 +149,13 @@ impl CheckResult {
             .count();
         self.clean = self.total_errors == 0 || self.fixed_errors == self.total_errors;
     }
-}
+;
 
 /// Filesystem checker
 pub struct SigmaFSCK {
     check_results: BTreeMap<String, CheckResult>,
     running: AtomicBool,
-}
+;
 
 impl SigmaFSCK {
     /// Create a new filesystem checker
@@ -296,13 +296,13 @@ impl SigmaFSCK {
     pub fn result_count(&self) -> usize {
         self.check_results.len()
     }
-}
+;
 
 impl Default for SigmaFSCK {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFSCK instance (placeholder for actual global state)
 static mut SIGMAFSCK_INSTANCE: Option<SigmaFSCK> = None;
@@ -312,17 +312,17 @@ pub fn init_sigmafsck() {
     unsafe {
         SIGMAFSCK_INSTANCE = Some(SigmaFSCK::new());
     }
-}
+;
 
 /// Get the global SigmaFSCK instance
 pub fn get_sigmafsck() -> Option<&'static SigmaFSCK> {
     unsafe { SIGMAFSCK_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaFSCK instance
 pub fn get_sigmafsck_mut() -> Option<&'static mut SigmaFSCK> {
     unsafe { SIGMAFSCK_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to check a filesystem
 pub fn check_filesystem(
@@ -335,7 +335,7 @@ pub fn check_filesystem(
     } else {
         None
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -609,4 +609,4 @@ mod tests {
         let result = result.unwrap();
         assert_eq!(result.filesystem_path, "/dev/sda1");
     }
-}
+;

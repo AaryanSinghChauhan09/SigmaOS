@@ -31,7 +31,7 @@ pub struct CoreUserlandV61Manifest {
     pub components_added: Vec<String>,
     pub performance_multiplier: String,
     pub status: String,
-}
+;
 
 // ============================================================================
 // 1. SYSTEMD ADVANCEMENTS V61 ENGINE
@@ -42,7 +42,7 @@ pub struct CoreUserlandV61Manifest {
 pub struct SystemdDropInSectionV61 {
     pub section_name: String,
     pub key_values: BTreeMap<String, String>,
-}
+;
 
 /// systemd Advancements V61 Engine.
 #[derive(Debug, Default)]
@@ -107,7 +107,7 @@ impl SystemdAdvancementsV61Engine {
         let header = format!("TIMESTAMP={}\nMESSAGE={}\nEOF\n", timestamp_us, message);
         header.into_bytes()
     }
-}
+;
 
 // ============================================================================
 // 2. OPENRC ADVANCEMENTS V61 ENGINE
@@ -146,7 +146,7 @@ impl OpenRcAdvancementsV61Engine {
             _ => cpu_cores * 2,
         }
     }
-}
+;
 
 // ============================================================================
 // 3. RUNIT & S6 ADVANCEMENTS V61 ENGINE
@@ -173,7 +173,7 @@ impl RunitS6AdvancementsV61Engine {
     pub fn commit_s6_rc_compiled_db(&self, old_version: u32, new_version: u32) -> bool {
         new_version > old_version
     }
-}
+;
 
 // ============================================================================
 // 4. SYSVINIT ADVANCEMENTS V61 ENGINE
@@ -197,7 +197,7 @@ impl SysVinitAdvancementsV61Engine {
             _ => false,
         }
     }
-}
+;
 
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V61 ENGINE
@@ -228,7 +228,7 @@ impl BsdRcAdvancementsV61Engine {
         }
         final_conf
     }
-}
+;
 
 // ============================================================================
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V61 ENGINE
@@ -260,7 +260,7 @@ impl LaunchdAndroidInitAdvancementsV61Engine {
     pub fn monitor_launchd_path_state(&self, path_exists: bool, expected_state: bool) -> bool {
         path_exists == expected_state
     }
-}
+;
 
 // ============================================================================
 // 7. CRON, ANACRON, TIMERS & AT ADVANCEMENTS V61 ENGINE
@@ -312,7 +312,7 @@ impl CronAnacronTimersAtV61Engine {
             None
         }
     }
-}
+;
 
 // ============================================================================
 // 8. MASTER COORDINATOR: SOVEREIGN INIT AND SUPERVISOR ADVANCEMENTS V61 SUITE
@@ -327,13 +327,13 @@ pub struct SovereignInitAndSupervisorAdvancementsV61Suite {
     pub bsd_rc_engine: BsdRcAdvancementsV61Engine,
     pub launchd_android_engine: LaunchdAndroidInitAdvancementsV61Engine,
     pub cron_timers_engine: CronAnacronTimersAtV61Engine,
-}
+;
 
 impl Default for SovereignInitAndSupervisorAdvancementsV61Suite {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 impl SovereignInitAndSupervisorAdvancementsV61Suite {
     pub fn new() -> Self {
@@ -471,7 +471,7 @@ impl SovereignInitAndSupervisorAdvancementsV61Suite {
 
         true
     }
-}
+;
 
 // ============================================================================
 // TESTS
@@ -586,4 +586,4 @@ mod tests {
 
         assert!(suite.run_master_verification());
     }
-}
+;

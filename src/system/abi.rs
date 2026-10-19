@@ -19,7 +19,7 @@ pub enum AbiType {
     OpenBsdX86_64,
     NetBsdX86_64,
     SigmaOSNative,
-}
+;
 
 impl AbiType {
     pub fn name(&self) -> &'static str {
@@ -31,7 +31,7 @@ impl AbiType {
             Self::SigmaOSNative => "SigmaOS Native Capability ABI",
         }
     }
-}
+;
 
 /// x86_64 Syscall Machine Registers state representation
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -47,7 +47,7 @@ pub struct SyscallRegisters64 {
     pub r11: u64, // RFLAGS on syscall
     pub rsp: u64, // User Stack Pointer
     pub rip: u64, // User Instruction Pointer
-}
+;
 
 /// Result produced by ABI syscall dispatching
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -55,7 +55,7 @@ pub struct SyscallAbiResult {
     pub success: bool,
     pub return_value: u64,
     pub errno: i32,
-}
+;
 
 impl SyscallAbiResult {
     pub fn ok(val: u64) -> Self {
@@ -73,20 +73,20 @@ impl SyscallAbiResult {
             errno,
         }
     }
-}
+;
 
 /// Sovereign Syscall ABI Compatibility Engine
 #[derive(Debug)]
 pub struct SovereignSyscallAbiCompatibilityEngine {
     pub enabled_abis: Vec<AbiType>,
     pub syscall_counts: BTreeMap<AbiType, u64>,
-}
+;
 
 impl Default for SovereignSyscallAbiCompatibilityEngine {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 impl SovereignSyscallAbiCompatibilityEngine {
     pub fn new() -> Self {
@@ -202,7 +202,7 @@ impl SovereignSyscallAbiCompatibilityEngine {
             AbiType::SigmaOSNative => is_user_canonical(regs.rsi) && regs.rdi != 0,
         }
     }
-}
+;
 
 #[cfg(test)]
 #[cfg(test)]
@@ -255,4 +255,4 @@ mod tests {
         };
         assert!(!engine.audit_abi_security_policy(AbiType::LinuxX86_64, &bad_regs));
     }
-}
+;

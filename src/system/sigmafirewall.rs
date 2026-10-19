@@ -21,7 +21,7 @@ pub enum FirewallAction {
     Reject,
     Log,
     Unknown,
-}
+;
 
 /// Firewall protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -31,7 +31,7 @@ pub enum FirewallProtocol {
     Icmp,
     All,
     Unknown,
-}
+;
 
 /// Firewall chain
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -40,7 +40,7 @@ pub enum FirewallChain {
     Output,
     Forward,
     Unknown,
-}
+;
 
 /// Firewall rule state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +49,7 @@ pub enum RuleState {
     Inactive,
     Expired,
     Unknown,
-}
+;
 
 /// Firewall rule
 #[derive(Debug, Clone)]
@@ -65,7 +65,7 @@ pub struct FirewallRule {
     pub state: RuleState,
     pub priority: i32,
     pub description: String,
-}
+;
 
 impl FirewallRule {
     pub fn new(id: u64, chain: FirewallChain, action: FirewallAction) -> Self {
@@ -122,7 +122,7 @@ impl FirewallRule {
     pub fn expire(&mut self) {
         self.state = RuleState::Expired;
     }
-}
+;
 
 /// Firewall manager
 pub struct SigmaFirewall {
@@ -132,7 +132,7 @@ pub struct SigmaFirewall {
     default_output_policy: FirewallAction,
     default_forward_policy: FirewallAction,
     enabled: bool,
-}
+;
 
 impl SigmaFirewall {
     pub fn new() -> Self {
@@ -242,13 +242,13 @@ impl SigmaFirewall {
             .filter(|r| r.state == RuleState::Active)
             .count()
     }
-}
+;
 
 impl Default for SigmaFirewall {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMAFIREWALL_INSTANCE: Option<SigmaFirewall> = None;
 
@@ -256,7 +256,7 @@ pub fn init_sigmafirewall() {
     unsafe {
         SIGMAFIREWALL_INSTANCE = Some(SigmaFirewall::new());
     }
-}
+;
 
 pub fn get_sigmafirewall() -> &'static SigmaFirewall {
     unsafe {
@@ -264,7 +264,7 @@ pub fn get_sigmafirewall() -> &'static SigmaFirewall {
             .as_ref()
             .expect("SigmaFirewall not initialized")
     }
-}
+;
 
 pub fn get_sigmafirewall_mut() -> &'static mut SigmaFirewall {
     unsafe {
@@ -272,7 +272,7 @@ pub fn get_sigmafirewall_mut() -> &'static mut SigmaFirewall {
             .as_mut()
             .expect("SigmaFirewall not initialized")
     }
-}
+;
 
 pub fn create_rule(chain: FirewallChain, action: FirewallAction) -> u64 {
     let firewall = get_sigmafirewall_mut();
@@ -281,7 +281,7 @@ pub fn create_rule(chain: FirewallChain, action: FirewallAction) -> u64 {
     let rule = FirewallRule::new(id, chain, action);
     firewall.add_rule(rule);
     id
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -512,4 +512,4 @@ mod tests {
         let firewall = get_sigmafirewall();
         assert!(firewall.get_rule(id).is_some());
     }
-}
+;

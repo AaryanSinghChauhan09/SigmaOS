@@ -22,7 +22,7 @@ pub enum PaperSize {
     A3,
     A5,
     Tabloid,
-}
+;
 
 /// Print quality
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,21 +31,21 @@ pub enum PrintQuality {
     Normal,
     High,
     Photo,
-}
+;
 
 /// Print orientation
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PrintOrientation {
     Portrait,
     Landscape,
-}
+;
 
 /// Color mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ColorMode {
     Grayscale,
     Color,
-}
+;
 
 /// Print options
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ pub struct PrintOptions {
     pub color_mode: ColorMode,
     pub copies: u32,
     pub duplex: bool,
-}
+;
 
 impl PrintOptions {
     pub fn new() -> Self {
@@ -93,7 +93,7 @@ impl PrintOptions {
     pub fn set_duplex(&mut self, duplex: bool) {
         self.duplex = duplex;
     }
-}
+;
 
 /// Print job
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ pub struct PrintJob {
     pub options: PrintOptions,
     pub status: String,
     pub pages: u32,
-}
+;
 
 impl PrintJob {
     pub fn new(id: String, name: String, file_path: String, printer_id: String, options: PrintOptions) -> Self {
@@ -127,14 +127,14 @@ impl PrintJob {
     pub fn set_pages(&mut self, pages: u32) {
         self.pages = pages;
     }
-}
+;
 
 /// SigmaPrint - Print management system
 #[derive(Debug)]
 pub struct SigmaPrint {
     print_jobs: BTreeMap<String, PrintJob>,
     print_queue: Vec<String>, // job IDs in order
-}
+;
 
 impl SigmaPrint {
     pub fn new() -> Self {
@@ -208,13 +208,13 @@ impl SigmaPrint {
     pub fn queue_size(&self) -> usize {
         self.print_queue.len()
     }
-}
+;
 
 impl Default for SigmaPrint {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaPrint instance
 static mut SIGMAPRINT_INSTANCE: Option<SigmaPrint> = None;
@@ -224,21 +224,21 @@ pub fn init_sigmaprint() {
     unsafe {
         SIGMAPRINT_INSTANCE = Some(SigmaPrint::new());
     }
-}
+;
 
 /// Get the global SigmaPrint instance
 pub fn get_sigmaprint() -> Option<&'static SigmaPrint> {
     unsafe {
         SIGMAPRINT_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaPrint instance (mutable)
 pub fn get_sigmaprint_mut() -> Option<&'static mut SigmaPrint> {
     unsafe {
         SIGMAPRINT_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a print job
 pub fn add_print_job(job: PrintJob) -> bool {
@@ -248,7 +248,7 @@ pub fn add_print_job(job: PrintJob) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -317,4 +317,4 @@ mod tests {
         assert!(print_sys.complete_job("job1"));
         assert_eq!(print_sys.queue_size(), 0);
     }
-}
+;

@@ -26,7 +26,7 @@ pub enum ProxyConnectionState {
     Responding,
     /// Closed
     Closed,
-}
+;
 
 impl fmt::Display for ProxyConnectionState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for ProxyConnectionState {
             ProxyConnectionState::Closed => write!(f, "closed"),
         }
     }
-}
+;
 
 /// Proxy protocol
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +49,7 @@ pub enum ProxyProtocol {
     Https,
     /// FTP
     Ftp,
-}
+;
 
 impl fmt::Display for ProxyProtocol {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -59,7 +59,7 @@ impl fmt::Display for ProxyProtocol {
             ProxyProtocol::Ftp => write!(f, "FTP"),
         }
     }
-}
+;
 
 /// Proxy connection
 #[derive(Debug, Clone)]
@@ -78,7 +78,7 @@ pub struct ProxyConnection {
     pub target_port: u16,
     /// State
     pub state: ProxyConnectionState,
-}
+;
 
 impl ProxyConnection {
     /// Create a new proxy connection
@@ -117,7 +117,7 @@ impl ProxyConnection {
         self.state = state;
         self
     }
-}
+;
 
 /// SigmaProxy - System Proxy Server
 pub struct SigmaProxy {
@@ -127,7 +127,7 @@ pub struct SigmaProxy {
     running: bool,
     /// Connection counter
     connection_counter: u32,
-}
+;
 
 impl SigmaProxy {
     /// Create a new SigmaProxy instance
@@ -285,13 +285,13 @@ impl SigmaProxy {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaProxy {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaProxy instance (placeholder for actual global state)
 static mut SIGMAPROXY_INSTANCE: Option<SigmaProxy> = None;
@@ -301,12 +301,12 @@ pub fn init_sigmaproxy() {
     unsafe {
         SIGMAPROXY_INSTANCE = Some(SigmaProxy::new());
     }
-}
+;
 
 /// Get the global SigmaProxy instance
 pub fn get_sigmaproxy() -> Option<&'static mut SigmaProxy> {
     unsafe { SIGMAPROXY_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to forward a request
 pub fn forward_proxy_request(connection_id: &str) -> Result<(), String> {
@@ -315,7 +315,7 @@ pub fn forward_proxy_request(connection_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaProxy not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -460,4 +460,4 @@ mod tests {
         let result = forward_proxy_request("conn1");
         assert!(result.is_ok());
     }
-}
+;

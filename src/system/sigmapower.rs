@@ -20,7 +20,7 @@ pub enum PowerProfile {
     Balanced,
     PowerSaver,
     Unknown,
-}
+;
 
 /// Screen brightness
 #[derive(Debug, Clone)]
@@ -28,7 +28,7 @@ pub struct Brightness {
     pub level: u8,
     pub min: u8,
     pub max: u8,
-}
+;
 
 impl Brightness {
     pub fn new(level: u8) -> Self {
@@ -56,7 +56,7 @@ impl Brightness {
             ((self.level - self.min) * 100) / (self.max - self.min)
         }
     }
-}
+;
 
 /// Power settings
 #[derive(Debug, Clone)]
@@ -67,7 +67,7 @@ pub struct PowerSettings {
     pub sleep_timeout: Option<u32>,
     pub hibernate_timeout: Option<u32>,
     pub screen_off_timeout: Option<u32>,
-}
+;
 
 impl PowerSettings {
     pub fn new() -> Self {
@@ -114,18 +114,18 @@ impl PowerSettings {
     pub fn set_screen_off_timeout(&mut self, timeout: u32) {
         self.screen_off_timeout = Some(timeout);
     }
-}
+;
 
 impl Default for PowerSettings {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Power manager
 pub struct SigmaPower {
     settings: PowerSettings,
-}
+;
 
 impl SigmaPower {
     pub fn new() -> Self {
@@ -177,13 +177,13 @@ impl SigmaPower {
     pub fn get_brightness_percentage(&self) -> u8 {
         self.settings.screen_brightness.percentage()
     }
-}
+;
 
 impl Default for SigmaPower {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMAPOWER_INSTANCE: Option<SigmaPower> = None;
 
@@ -191,7 +191,7 @@ pub fn init_sigmapower() {
     unsafe {
         SIGMAPOWER_INSTANCE = Some(SigmaPower::new());
     }
-}
+;
 
 pub fn get_sigmapower() -> &'static SigmaPower {
     unsafe {
@@ -199,7 +199,7 @@ pub fn get_sigmapower() -> &'static SigmaPower {
             .as_ref()
             .expect("SigmaPower not initialized")
     }
-}
+;
 
 pub fn get_sigmapower_mut() -> &'static mut SigmaPower {
     unsafe {
@@ -207,7 +207,7 @@ pub fn get_sigmapower_mut() -> &'static mut SigmaPower {
             .as_mut()
             .expect("SigmaPower not initialized")
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -302,4 +302,4 @@ mod tests {
         manager_mut.set_profile(PowerProfile::Performance);
         assert_eq!(manager.get_profile(), PowerProfile::Performance);
     }
-}
+;

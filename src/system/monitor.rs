@@ -18,7 +18,7 @@ pub struct CpuStats {
     pub system: f32,
     pub idle: f32,
     pub iowait: f32,
-}
+;
 
 /// Memory statistics
 #[derive(Debug, Clone, Copy)]
@@ -29,7 +29,7 @@ pub struct MemoryStats {
     pub cached: u64,
     pub swap_total: u64,
     pub swap_used: u64,
-}
+;
 
 /// Process statistics
 #[derive(Debug, Clone)]
@@ -39,7 +39,7 @@ pub struct ProcessStats {
     pub cpu_usage: f32,
     pub memory_usage: u64,
     pub state: ProcessState,
-}
+;
 
 /// Process state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -49,7 +49,7 @@ pub enum ProcessState {
     Waiting,
     Stopped,
     Zombie,
-}
+;
 
 /// Network statistics
 #[derive(Debug, Clone)]
@@ -59,7 +59,7 @@ pub struct NetworkStats {
     pub bytes_recv: u64,
     pub packets_sent: u64,
     pub packets_recv: u64,
-}
+;
 
 /// Disk statistics
 #[derive(Debug, Clone)]
@@ -69,7 +69,7 @@ pub struct DiskStats {
     pub writes: u64,
     pub read_bytes: u64,
     pub write_bytes: u64,
-}
+;
 
 /// System monitor
 pub struct SystemMonitor {
@@ -79,7 +79,7 @@ pub struct SystemMonitor {
     pub network_stats: BTreeMap<String, NetworkStats>,
     pub disk_stats: BTreeMap<String, DiskStats>,
     pub active: AtomicBool,
-}
+;
 
 impl SystemMonitor {
     pub fn new() -> Self {
@@ -246,13 +246,13 @@ impl SystemMonitor {
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
     }
-}
+;
 
 impl Default for SystemMonitor {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global system monitor
 static mut SYSTEM_MONITOR: Option<SystemMonitor> = None;
@@ -262,12 +262,12 @@ pub fn init_system_monitor() {
     unsafe {
         SYSTEM_MONITOR = Some(SystemMonitor::new());
     }
-}
+;
 
 /// Get global system monitor
 pub fn get_system_monitor() -> Option<&'static mut SystemMonitor> {
     unsafe { SYSTEM_MONITOR.as_mut() }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -314,4 +314,4 @@ mod tests {
         assert_eq!(top[0].pid, 2);
         assert_eq!(top[1].pid, 3);
     }
-}
+;

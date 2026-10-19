@@ -19,7 +19,7 @@ pub enum MonitorType {
     Process,
     Temperature,
     Unknown,
-}
+;
 
 /// Metric data structure
 #[derive(Debug, Clone)]
@@ -29,7 +29,7 @@ pub struct Metric {
     pub monitor_type: MonitorType,
     pub value: u64,
     pub unit: String,
-}
+;
 
 impl Metric {
     pub fn new(
@@ -47,7 +47,7 @@ impl Metric {
             unit,
         }
     }
-}
+;
 
 /// System monitor
 pub struct SigmaSystemMonitor {
@@ -55,7 +55,7 @@ pub struct SigmaSystemMonitor {
     cpu_usage: AtomicU64,
     memory_usage: AtomicU64,
     running: AtomicBool,
-}
+;
 
 impl SigmaSystemMonitor {
     pub fn new() -> Self {
@@ -110,13 +110,13 @@ impl SigmaSystemMonitor {
     pub fn metric_count(&self) -> usize {
         self.metrics.len()
     }
-}
+;
 
 impl Default for SigmaSystemMonitor {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMASYSTEMMONITOR_INSTANCE: Option<SigmaSystemMonitor> = None;
 
@@ -124,15 +124,15 @@ pub fn init_sigmasystemmonitor() {
     unsafe {
         SIGMASYSTEMMONITOR_INSTANCE = Some(SigmaSystemMonitor::new());
     }
-}
+;
 
 pub fn get_sigmasystemmonitor() -> Option<&'static SigmaSystemMonitor> {
     unsafe { SIGMASYSTEMMONITOR_INSTANCE.as_ref() }
-}
+;
 
 pub fn get_sigmasystemmonitor_mut() -> Option<&'static mut SigmaSystemMonitor> {
     unsafe { SIGMASYSTEMMONITOR_INSTANCE.as_mut() }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -142,4 +142,4 @@ mod tests {
         let monitor = SigmaSystemMonitor::new();
         assert!(!monitor.is_running());
     }
-}
+;

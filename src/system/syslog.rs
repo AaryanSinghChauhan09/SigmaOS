@@ -17,7 +17,7 @@ pub enum LogLevel {
     Notice,    // 5
     Info,      // 6
     Debug,     // 7
-}
+;
 
 impl LogLevel {
     pub fn from_u8(level: u8) -> Option<Self> {
@@ -59,7 +59,7 @@ impl LogLevel {
             LogLevel::Debug => "DEBUG",
         }
     }
-}
+;
 
 /// Log facility
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -88,7 +88,7 @@ pub enum LogFacility {
     Local5,   // 21
     Local6,   // 22
     Local7,   // 23
-}
+;
 
 impl LogFacility {
     pub fn from_u8(facility: u8) -> Option<Self> {
@@ -149,7 +149,7 @@ impl LogFacility {
             LogFacility::Local7 => 23,
         }
     }
-}
+;
 
 /// Log entry
 #[derive(Debug, Clone)]
@@ -161,7 +161,7 @@ pub struct LogEntry {
     pub pid: u32,
     pub message: String,
     pub hostname: String,
-}
+;
 
 /// Syslog manager
 pub struct SyslogManager {
@@ -171,7 +171,7 @@ pub struct SyslogManager {
     pub log_entries: Vec<LogEntry>,
     pub log_rules: Vec<LogRule>,
     pub max_entries: usize,
-}
+;
 
 impl SyslogManager {
     pub fn new(log_file: &str) -> Self {
@@ -310,7 +310,7 @@ impl SyslogManager {
         // In real implementation, load from log file
         Ok(())
     }
-}
+;
 
 /// Log rule
 #[derive(Debug, Clone)]
@@ -318,7 +318,7 @@ pub struct LogRule {
     pub facility: LogFacility,
     pub level: LogLevel,
     pub action: LogAction,
-}
+;
 
 /// Log action
 #[derive(Debug, Clone)]
@@ -327,7 +327,7 @@ pub enum LogAction {
     Console,
     Remote(String),
     Discard,
-}
+;
 
 /// Syslog errors
 #[derive(Debug)]
@@ -335,7 +335,7 @@ pub enum SyslogError {
     LogFileError(String),
     ConfigurationError(String),
     RotationError(String),
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -410,4 +410,4 @@ mod tests {
         let auth_entries = manager.get_entries_by_facility(LogFacility::Auth);
         assert_eq!(auth_entries.len(), 1);
     }
-}
+;

@@ -14,7 +14,7 @@ pub enum SnapshotFrequency {
     Monthly,
     OnBoot,
     CustomIntervalSeconds(u64),
-}
+;
 
 impl SnapshotFrequency {
     pub fn interval_seconds(&self) -> u64 {
@@ -27,7 +27,7 @@ impl SnapshotFrequency {
             SnapshotFrequency::CustomIntervalSeconds(sec) => *sec,
         }
     }
-}
+;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RetentionPolicy {
@@ -36,7 +36,7 @@ pub struct RetentionPolicy {
     pub max_weekly: usize,
     pub max_monthly: usize,
     pub min_free_disk_space_mb: u64,
-}
+;
 
 impl Default for RetentionPolicy {
     fn default() -> Self {
@@ -48,7 +48,7 @@ impl Default for RetentionPolicy {
             min_free_disk_space_mb: 1024,
         }
     }
-}
+;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SnapshotJob {
@@ -60,7 +60,7 @@ pub struct SnapshotJob {
     pub next_run_timestamp: u64,
     pub retention: RetentionPolicy,
     pub active: bool,
-}
+;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CreatedSnapshotRecord {
@@ -69,13 +69,13 @@ pub struct CreatedSnapshotRecord {
     pub volume: String,
     pub timestamp: u64,
     pub size_bytes: u64,
-}
+;
 
 pub struct ScheduledSnapshotEngine {
     jobs: Vec<SnapshotJob>,
     history: Vec<CreatedSnapshotRecord>,
     next_job_id: u64,
-}
+;
 
 impl ScheduledSnapshotEngine {
     pub fn new() -> Self {
@@ -201,7 +201,7 @@ impl ScheduledSnapshotEngine {
     pub fn snapshot_history(&self) -> &[CreatedSnapshotRecord] {
         &self.history
     }
-}
+;
 
 #[cfg(test)]
 #[cfg(test)]
@@ -231,4 +231,4 @@ mod tests {
         assert_eq!(created[0].job_id, job_id);
         assert_eq!(engine.snapshot_history().len(), 1);
     }
-}
+;

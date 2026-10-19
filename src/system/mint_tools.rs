@@ -18,7 +18,7 @@ pub enum BackupType {
     Full,
     Incremental,
     Differential,
-}
+;
 
 /// Backup status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,7 +27,7 @@ pub enum BackupStatus {
     InProgress,
     Completed,
     Failed,
-}
+;
 
 /// Backup configuration
 #[derive(Debug, Clone)]
@@ -39,7 +39,7 @@ pub struct BackupConfig {
     pub compression: bool,
     pub encryption: bool,
     pub include_hidden: bool,
-}
+;
 
 /// Backup job
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct BackupJob {
     pub end_time: Option<u64>,
     pub size_bytes: u64,
     pub error_message: Option<String>,
-}
+;
 
 /// Restore configuration
 #[derive(Debug, Clone)]
@@ -60,7 +60,7 @@ pub struct RestoreConfig {
     pub destination_path: String,
     pub overwrite_existing: bool,
     pub restore_permissions: bool,
-}
+;
 
 /// Restore status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -69,7 +69,7 @@ pub enum RestoreStatus {
     InProgress,
     Completed,
     Failed,
-}
+;
 
 /// Restore job
 #[derive(Debug, Clone)]
@@ -81,7 +81,7 @@ pub struct RestoreJob {
     pub end_time: Option<u64>,
     pub restored_bytes: u64,
     pub error_message: Option<String>,
-}
+;
 
 /// Rollback record for installed package updates
 #[derive(Debug, Clone)]
@@ -90,7 +90,7 @@ pub struct RollbackRecord {
     pub version_before: String,
     pub version_after: String,
     pub installed_at: u64,
-}
+;
 
 /// Update type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -99,7 +99,7 @@ pub enum UpdateType {
     BugFix,
     Feature,
     Dependency,
-}
+;
 
 /// Update severity
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -108,7 +108,7 @@ pub enum UpdateSeverity {
     High,
     Medium,
     Low,
-}
+;
 
 /// Package update
 #[derive(Debug, Clone)]
@@ -120,7 +120,7 @@ pub struct PackageUpdate {
     pub severity: UpdateSeverity,
     pub size_bytes: u64,
     pub description: String,
-}
+;
 
 /// Update manager with rollback support
 #[derive(Debug, Clone)]
@@ -130,7 +130,7 @@ pub struct MintUpdateManager {
     pub auto_update_enabled: bool,
     pub last_check_time: u64,
     pub auto_update_time: String, // cron-style
-}
+;
 
 /// Software category
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -145,7 +145,7 @@ pub enum SoftwareCategory {
     Science,
     System,
     Utility,
-}
+;
 
 /// Software package
 #[derive(Debug, Clone)]
@@ -157,7 +157,7 @@ pub struct SoftwarePackage {
     pub installed: bool,
     pub size_bytes: u64,
     pub rating: f32,
-}
+;
 
 /// Software manager
 #[derive(Debug, Clone)]
@@ -165,7 +165,7 @@ pub struct SoftwareManager {
     pub packages: BTreeMap<String, SoftwarePackage>,
     pub search_query: String,
     pub categories: Vec<SoftwareCategory>,
-}
+;
 
 /// Driver type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -177,7 +177,7 @@ pub enum DriverType {
     Scanner,
     Input,
     Storage,
-}
+;
 
 /// Driver status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -187,7 +187,7 @@ pub enum DriverStatus {
     Proprietary,
     OpenSource,
     Missing,
-}
+;
 
 /// Driver
 #[derive(Debug, Clone)]
@@ -198,14 +198,14 @@ pub struct Driver {
     pub status: DriverStatus,
     pub recommended: bool,
     pub proprietary: bool,
-}
+;
 
 /// Driver manager
 #[derive(Debug, Clone)]
 pub struct DriverManager {
     pub drivers: Vec<Driver>,
     pub auto_install: bool,
-}
+;
 
 /// Diagnostic test
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -217,7 +217,7 @@ pub enum DiagnosticTest {
     GPU,
     Battery,
     Thermal,
-}
+;
 
 /// Test result
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -226,7 +226,7 @@ pub enum TestResult {
     Fail,
     Warning,
     Skipped,
-}
+;
 
 /// Diagnostic entry
 #[derive(Debug, Clone)]
@@ -235,7 +235,7 @@ pub struct DiagnosticEntry {
     pub result: TestResult,
     pub message: String,
     pub timestamp: u64,
-}
+;
 
 /// System report
 #[derive(Debug, Clone)]
@@ -245,7 +245,7 @@ pub struct SystemReport {
     pub diagnostics: Vec<DiagnosticEntry>,
     pub hardware_info: HardwareInfo,
     pub software_info: SoftwareInfo,
-}
+;
 
 /// Hardware info
 #[derive(Debug, Clone)]
@@ -257,7 +257,7 @@ pub struct HardwareInfo {
     pub disk_total: u64,
     pub disk_free: u64,
     pub gpu_model: String,
-}
+;
 
 /// Software info
 #[derive(Debug, Clone)]
@@ -266,7 +266,7 @@ pub struct SoftwareInfo {
     pub kernel_version: String,
     pub installed_packages: u32,
     pub uptime_seconds: u64,
-}
+;
 
 /// System tools engine
 pub struct SystemToolsEngine {
@@ -280,7 +280,7 @@ pub struct SystemToolsEngine {
     pub next_restore_id: AtomicU32,
     pub next_report_id: AtomicU32,
     pub active: AtomicBool,
-}
+;
 
 impl SystemToolsEngine {
     pub fn new() -> Self {
@@ -598,13 +598,13 @@ impl SystemToolsEngine {
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
     }
-}
+;
 
 impl Default for SystemToolsEngine {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global system tools
 static mut SYSTEM_TOOLS: Option<SystemToolsEngine> = None;
@@ -614,12 +614,12 @@ pub fn init_system_tools() {
     unsafe {
         SYSTEM_TOOLS = Some(SystemToolsEngine::new());
     }
-}
+;
 
 /// Get global system tools
 pub fn get_system_tools() -> Option<&'static mut SystemToolsEngine> {
     unsafe { SYSTEM_TOOLS.as_mut() }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -801,4 +801,4 @@ mod tests {
             "1.0.0"
         );
     }
-}
+;

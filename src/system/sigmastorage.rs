@@ -22,7 +22,7 @@ pub enum VolumeState {
     InUse,
     /// Offline
     Offline,
-}
+;
 
 impl fmt::Display for VolumeState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -32,7 +32,7 @@ impl fmt::Display for VolumeState {
             VolumeState::Offline => write!(f, "offline"),
         }
     }
-}
+;
 
 /// Storage volume
 #[derive(Debug, Clone)]
@@ -47,7 +47,7 @@ pub struct StorageVolume {
     pub state: VolumeState,
     /// Filesystem type
     pub filesystem: String,
-}
+;
 
 impl StorageVolume {
     /// Create a new storage volume
@@ -66,7 +66,7 @@ impl StorageVolume {
         self.state = state;
         self
     }
-}
+;
 
 /// SigmaStorage - Storage Manager
 pub struct SigmaStorage {
@@ -76,7 +76,7 @@ pub struct SigmaStorage {
     running: bool,
     /// Volume counter
     volume_counter: u32,
-}
+;
 
 impl SigmaStorage {
     /// Create a new SigmaStorage instance
@@ -191,13 +191,13 @@ impl SigmaStorage {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaStorage {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaStorage instance (placeholder for actual global state)
 static mut SIGMASTORAGE_INSTANCE: Option<SigmaStorage> = None;
@@ -207,12 +207,12 @@ pub fn init_sigmastorage() {
     unsafe {
         SIGMASTORAGE_INSTANCE = Some(SigmaStorage::new());
     }
-}
+;
 
 /// Get the global SigmaStorage instance
 pub fn get_sigmastorage() -> Option<&'static mut SigmaStorage> {
     unsafe { SIGMASTORAGE_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to mount a volume
 pub fn mount_storage_volume(name: &str) -> Result<(), String> {
@@ -221,7 +221,7 @@ pub fn mount_storage_volume(name: &str) -> Result<(), String> {
     } else {
         Err("SigmaStorage not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -367,4 +367,4 @@ mod tests {
         let result = mount_storage_volume("vol1");
         assert!(result.is_ok());
     }
-}
+;

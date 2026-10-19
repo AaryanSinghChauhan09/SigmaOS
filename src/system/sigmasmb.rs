@@ -27,7 +27,7 @@ pub enum SMBDialect {
     Smb3_0,
     Smb3_1_1,
     Unknown,
-}
+;
 
 /// SMB Connection State
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,14 +38,14 @@ pub enum SMBConnectionState {
     AuthFailed,
     Timeout,
     Failed,
-}
+;
 
 /// SMB Share Permissions
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SMBShareAccess {
     ReadOnly,
     ReadWrite,
-}
+;
 
 /// Server-side SMB Share Descriptor
 #[derive(Debug, Clone)]
@@ -58,7 +58,7 @@ pub struct SMBShare {
     pub browseable: bool,
     pub require_encryption: bool,
     pub enabled: bool,
-}
+;
 
 impl SMBShare {
     /// Create a new SMB share definition
@@ -86,7 +86,7 @@ impl SMBShare {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Client-side remote SMB Mount Descriptor
 #[derive(Debug, Clone)]
@@ -100,7 +100,7 @@ pub struct SMBMount {
     pub dialect: SMBDialect,
     pub state: SMBConnectionState,
     pub encrypted: bool,
-}
+;
 
 impl SMBMount {
     /// Create a new SMB mount definition
@@ -133,14 +133,14 @@ impl SMBMount {
     pub fn is_connected(&self) -> bool {
         self.state == SMBConnectionState::Connected
     }
-}
+;
 
 /// Main SigmaSMB manager struct
 pub struct SigmaSMB {
     shares: BTreeMap<String, SMBShare>,
     mounts: BTreeMap<String, SMBMount>,
     running: AtomicBool,
-}
+;
 
 impl SigmaSMB {
     /// Create a new SigmaSMB manager instance
@@ -241,13 +241,13 @@ impl SigmaSMB {
     pub fn mount_count(&self) -> usize {
         self.mounts.len()
     }
-}
+;
 
 impl Default for SigmaSMB {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaSMB instance
 static mut SIGMA_SMB_INSTANCE: Option<SigmaSMB> = None;
@@ -257,17 +257,17 @@ pub fn init_sigmasmb() {
     unsafe {
         SIGMA_SMB_INSTANCE = Some(SigmaSMB::new());
     }
-}
+;
 
 /// Get global SigmaSMB reference
 pub fn get_sigmasmb() -> Option<&'static SigmaSMB> {
     unsafe { SIGMA_SMB_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaSMB reference
 pub fn get_sigmasmb_mut() -> Option<&'static mut SigmaSMB> {
     unsafe { SIGMA_SMB_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to mount a remote SMB share
 pub fn mount_smb(mount: SMBMount) -> bool {
@@ -278,14 +278,14 @@ pub fn mount_smb(mount: SMBMount) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to export an SMB share
 pub fn export_smb_share(share: SMBShare) {
     if let Some(mgr) = get_sigmasmb_mut() {
         mgr.add_share(share);
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -380,4 +380,4 @@ mod tests {
         assert_eq!(mgr.mount_count(), 1);
         assert_eq!(mgr.list_connected_mounts().len(), 1);
     }
-}
+;

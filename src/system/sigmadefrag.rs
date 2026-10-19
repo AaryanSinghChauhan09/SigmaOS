@@ -26,7 +26,7 @@ pub enum DefragMode {
     Filesystem,
     FreeSpace,
     Unknown,
-}
+;
 
 /// Defragmentation job status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -38,7 +38,7 @@ pub enum DefragStatus {
     Completed,
     Failed,
     Aborted,
-}
+;
 
 /// Extent and fragmentation analysis report
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ pub struct FragmentationReport {
     pub ideal_extents: u64,
     pub fragmentation_score_pct: u8,
     pub free_space_fragmentation_pct: u8,
-}
+;
 
 impl FragmentationReport {
     /// Create a new fragmentation report
@@ -86,7 +86,7 @@ impl FragmentationReport {
     pub fn needs_defragmentation(&self, threshold_pct: u8) -> bool {
         self.fragmentation_score_pct >= threshold_pct
     }
-}
+;
 
 /// Defragmentation task / job
 #[derive(Debug, Clone)]
@@ -100,7 +100,7 @@ pub struct DefragJob {
     pub bytes_relocated: u64,
     pub error_count: u32,
     pub start_timestamp: u64,
-}
+;
 
 impl DefragJob {
     /// Create a new defragmentation job
@@ -137,7 +137,7 @@ impl DefragJob {
             DefragStatus::Scanning | DefragStatus::Defragmenting
         )
     }
-}
+;
 
 /// Main SigmaDefrag manager struct
 pub struct SigmaDefrag {
@@ -145,7 +145,7 @@ pub struct SigmaDefrag {
     reports: BTreeMap<String, FragmentationReport>,
     running: AtomicBool,
     recommended_threshold_pct: u8,
-}
+;
 
 impl SigmaDefrag {
     /// Create a new SigmaDefrag manager instance
@@ -254,13 +254,13 @@ impl SigmaDefrag {
     pub fn job_count(&self) -> usize {
         self.jobs.len()
     }
-}
+;
 
 impl Default for SigmaDefrag {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaDefrag instance (placeholder for global state)
 static mut SIGMA_DEFRAG_INSTANCE: Option<SigmaDefrag> = None;
@@ -270,17 +270,17 @@ pub fn init_sigmadefrag() {
     unsafe {
         SIGMA_DEFRAG_INSTANCE = Some(SigmaDefrag::new());
     }
-}
+;
 
 /// Get global SigmaDefrag instance
 pub fn get_sigmadefrag() -> Option<&'static SigmaDefrag> {
     unsafe { SIGMA_DEFRAG_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaDefrag instance
 pub fn get_sigmadefrag_mut() -> Option<&'static mut SigmaDefrag> {
     unsafe { SIGMA_DEFRAG_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to start a defragmentation job
 pub fn start_defrag_job(job: DefragJob) -> bool {
@@ -289,7 +289,7 @@ pub fn start_defrag_job(job: DefragJob) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to inspect job status
 pub fn get_defrag_status(job_id: &str) -> Option<DefragStatus> {
@@ -298,7 +298,7 @@ pub fn get_defrag_status(job_id: &str) -> Option<DefragStatus> {
     } else {
         None
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -386,4 +386,4 @@ mod tests {
         assert!(start_defrag_job(job));
         assert_eq!(get_defrag_status("global-j"), Some(DefragStatus::Idle));
     }
-}
+;

@@ -21,7 +21,7 @@ pub enum ScheduleFrequency {
     Weekly,
     Monthly,
     Custom,
-}
+;
 
 /// Task status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum TaskStatus {
     Completed,
     Failed,
     Disabled,
-}
+;
 
 /// Scheduled task
 #[derive(Debug)]
@@ -44,14 +44,14 @@ pub struct ScheduledTask {
     pub last_run: Option<u64>,
     pub next_run: u64,
     pub enabled: AtomicBool,
-}
+;
 
 /// Task scheduler
 pub struct TaskScheduler {
     pub tasks: BTreeMap<u32, ScheduledTask>,
     pub next_task_id: AtomicU32,
     pub active: AtomicBool,
-}
+;
 
 impl TaskScheduler {
     pub fn new() -> Self {
@@ -147,13 +147,13 @@ impl TaskScheduler {
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
     }
-}
+;
 
 impl Default for TaskScheduler {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global task scheduler
 static mut TASK_SCHEDULER: Option<TaskScheduler> = None;
@@ -163,12 +163,12 @@ pub fn init_task_scheduler() {
     unsafe {
         TASK_SCHEDULER = Some(TaskScheduler::new());
     }
-}
+;
 
 /// Get global task scheduler
 pub fn get_task_scheduler() -> Option<&'static mut TaskScheduler> {
     unsafe { TASK_SCHEDULER.as_mut() }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -236,4 +236,4 @@ mod tests {
         assert_eq!(pending.len(), 1);
         assert_eq!(pending[0].name, "pending");
     }
-}
+;

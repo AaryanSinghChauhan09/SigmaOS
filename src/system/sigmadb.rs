@@ -26,7 +26,7 @@ pub enum DbConnectionState {
     Querying,
     /// Closed
     Closed,
-}
+;
 
 impl fmt::Display for DbConnectionState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for DbConnectionState {
             DbConnectionState::Closed => write!(f, "closed"),
         }
     }
-}
+;
 
 /// Database connection
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct DbConnection {
     pub database: String,
     /// State
     pub state: DbConnectionState,
-}
+;
 
 impl DbConnection {
     /// Create a new database connection
@@ -81,7 +81,7 @@ impl DbConnection {
         self.state = state;
         self
     }
-}
+;
 
 /// SigmaDB - System Database Server
 pub struct SigmaDB {
@@ -91,7 +91,7 @@ pub struct SigmaDB {
     running: bool,
     /// Connection counter
     connection_counter: u32,
-}
+;
 
 impl SigmaDB {
     /// Create a new SigmaDB instance
@@ -239,13 +239,13 @@ impl SigmaDB {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaDB {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaDB instance (placeholder for actual global state)
 static mut SIGMADB_INSTANCE: Option<SigmaDB> = None;
@@ -255,12 +255,12 @@ pub fn init_sigmadb() {
     unsafe {
         SIGMADB_INSTANCE = Some(SigmaDB::new());
     }
-}
+;
 
 /// Get the global SigmaDB instance
 pub fn get_sigmadb() -> Option<&'static mut SigmaDB> {
     unsafe { SIGMADB_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to execute a query
 pub fn execute_db_query(connection_id: &str) -> Result<(), String> {
@@ -269,7 +269,7 @@ pub fn execute_db_query(connection_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaDB not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -445,4 +445,4 @@ mod tests {
         let result = execute_db_query("conn1");
         assert!(result.is_ok());
     }
-}
+;

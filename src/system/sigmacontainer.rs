@@ -25,7 +25,7 @@ pub enum ContainerState {
     Exited,
     Dead,
     Unknown,
-}
+;
 
 /// Container networking mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -35,7 +35,7 @@ pub enum NetworkMode {
     None,
     Container,
     Unknown,
-}
+;
 
 /// Container restart policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -45,7 +45,7 @@ pub enum RestartPolicy {
     Always,
     UnlessStopped,
     Unknown,
-}
+;
 
 /// Resource limits
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct ResourceLimits {
     pub memory_reservation: Option<u64>,
     pub memory_swap: Option<u64>,
     pub pids_limit: Option<u64>,
-}
+;
 
 impl ResourceLimits {
     pub fn new() -> Self {
@@ -87,13 +87,13 @@ impl ResourceLimits {
         self.pids_limit = Some(limit);
         self
     }
-}
+;
 
 impl Default for ResourceLimits {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Container
 #[derive(Debug, Clone)]
@@ -113,7 +113,7 @@ pub struct Container {
     pub environment: Vec<String>,
     pub volumes: Vec<String>,
     pub ports: Vec<String>,
-}
+;
 
 impl Container {
     pub fn new(id: String, name: String, image: String) -> Self {
@@ -197,13 +197,13 @@ impl Container {
     pub fn remove(&mut self) {
         self.state = ContainerState::Removing;
     }
-}
+;
 
 /// Container manager
 pub struct SigmaContainer {
     containers: BTreeMap<String, Container>,
     next_container_id: u64,
-}
+;
 
 impl SigmaContainer {
     pub fn new() -> Self {
@@ -304,13 +304,13 @@ impl SigmaContainer {
             .filter(|c| c.state == ContainerState::Running)
             .count()
     }
-}
+;
 
 impl Default for SigmaContainer {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMACONTAINER_INSTANCE: Option<SigmaContainer> = None;
 
@@ -318,7 +318,7 @@ pub fn init_sigmacontainer() {
     unsafe {
         SIGMACONTAINER_INSTANCE = Some(SigmaContainer::new());
     }
-}
+;
 
 pub fn get_sigmacontainer() -> &'static SigmaContainer {
     unsafe {
@@ -326,7 +326,7 @@ pub fn get_sigmacontainer() -> &'static SigmaContainer {
             .as_ref()
             .expect("SigmaContainer not initialized")
     }
-}
+;
 
 pub fn get_sigmacontainer_mut() -> &'static mut SigmaContainer {
     unsafe {
@@ -334,12 +334,12 @@ pub fn get_sigmacontainer_mut() -> &'static mut SigmaContainer {
             .as_mut()
             .expect("SigmaContainer not initialized")
     }
-}
+;
 
 pub fn create_container(name: String, image: String) -> String {
     let manager = get_sigmacontainer_mut();
     manager.create_container(name, image)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -535,4 +535,4 @@ mod tests {
         let manager = get_sigmacontainer();
         assert!(manager.get_container(&id).is_some());
     }
-}
+;

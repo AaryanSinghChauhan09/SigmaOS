@@ -34,7 +34,7 @@ pub enum StartupType {
     Task,
     Services,
     ExplorerExtension,
-}
+;
 
 /// Soluto-inspired user choice classification for boot reduction
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,7 +42,7 @@ pub enum SolutoCategory {
     NoBrainer,  // System/Critical services that must run immediately
     Delayable,  // Non-critical items that can run later in background
     Removeable, // Third-party bloat that can be disabled entirely
-}
+;
 
 /// Startup service
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ pub struct StartupService {
     pub priority: ServicePriority,
     pub startup_type: StartupType,
     pub publisher_verified: bool,
-}
+;
 
 /// Service priority
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -65,7 +65,7 @@ pub enum ServicePriority {
     High,
     Normal,
     Low,
-}
+;
 
 /// Startup optimization result
 #[derive(Debug, Clone)]
@@ -75,7 +75,7 @@ pub struct StartupOptimizationResult {
     pub services_delayed: Vec<String>,
     pub services_parallelized: Vec<String>,
     pub message: String,
-}
+;
 
 /// OOP trait for startup optimization strategies
 pub trait StartupOptimizationStrategy {
@@ -85,7 +85,7 @@ pub trait StartupOptimizationStrategy {
     fn optimize(&mut self, services: &mut [StartupService]) -> StartupOptimizationResult;
     /// Get strategy name
     fn name(&self) -> &str;
-}
+;
 
 /// Startup analysis
 #[derive(Debug, Clone)]
@@ -96,13 +96,13 @@ pub struct StartupAnalysis {
     pub critical_path_time_ms: u64,
     pub parallelizable_services: Vec<String>,
     pub delayable_services: Vec<String>,
-}
+;
 
 /// Dependency-based startup optimizer
 pub struct DependencyBasedOptimizer {
     max_parallel: usize,
     delay_threshold_ms: u64,
-}
+;
 
 impl DependencyBasedOptimizer {
     #[allow(clippy::new_without_default)]
@@ -122,7 +122,7 @@ impl DependencyBasedOptimizer {
         self.delay_threshold_ms = threshold_ms;
         self
     }
-}
+;
 
 impl StartupOptimizationStrategy for DependencyBasedOptimizer {
     fn analyze(&self, services: &[StartupService]) -> StartupAnalysis {
@@ -212,12 +212,12 @@ impl StartupOptimizationStrategy for DependencyBasedOptimizer {
     fn name(&self) -> &str {
         "DependencyBasedOptimizer"
     }
-}
+;
 
 /// Profile-based startup optimizer
 pub struct ProfileBasedOptimizer {
     profile: StartupProfile,
-}
+;
 
 /// Startup profile
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -225,13 +225,13 @@ pub enum StartupProfile {
     FastBoot,
     Balanced,
     Reliable,
-}
+;
 
 impl ProfileBasedOptimizer {
     pub fn new(profile: StartupProfile) -> Self {
         Self { profile }
     }
-}
+;
 
 impl StartupOptimizationStrategy for ProfileBasedOptimizer {
     fn analyze(&self, services: &[StartupService]) -> StartupAnalysis {
@@ -330,7 +330,7 @@ impl StartupOptimizationStrategy for ProfileBasedOptimizer {
     fn name(&self) -> &str {
         "ProfileBasedOptimizer"
     }
-}
+;
 
 /// Void Linux / FreeBSD rc.d Init Boot Stage Profiler
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -338,11 +338,11 @@ pub enum InitBootStage {
     EarlyStage1,   // Sysinit / devtmpfs / hostname
     ServiceStage2, // Runit / rc.d supervised daemons
     UserStage3,    // Login display manager & session
-}
+;
 
 pub struct InitStageBootProfiler {
     pub stage_durations_ms: [(InitBootStage, u64); 3],
-}
+;
 
 impl InitStageBootProfiler {
     pub fn new() -> Self {
@@ -358,12 +358,12 @@ impl InitStageBootProfiler {
     pub fn total_boot_time_ms(&self) -> u64 {
         self.stage_durations_ms.iter().map(|(_, dur)| dur).sum()
     }
-}
+;
 
 /// Alpine Linux OpenRC Parallel Dependency Graph Resolver
 pub struct OpenRcDependencyGraph {
     pub services: Vec<String>,
-}
+;
 
 impl OpenRcDependencyGraph {
     pub fn new() -> Self {
@@ -380,14 +380,14 @@ impl OpenRcDependencyGraph {
         // Simplified parallel execution batching
         vec![self.services.clone()]
     }
-}
+;
 
 /// Arch Linux `systemd-analyze` Boot Telemetry Diagnostic Tracker
 pub struct SystemdAnalyzeTelemetry {
     pub kernel_time_ms: u64,
     pub initrd_time_ms: u64,
     pub userspace_time_ms: u64,
-}
+;
 
 impl SystemdAnalyzeTelemetry {
     pub fn new(kernel_ms: u64, initrd_ms: u64, userspace_ms: u64) -> Self {
@@ -401,7 +401,7 @@ impl SystemdAnalyzeTelemetry {
     pub fn total_time_ms(&self) -> u64 {
         self.kernel_time_ms + self.initrd_time_ms + self.userspace_time_ms
     }
-}
+;
 
 /// openSUSE / NixOS Read-Only Immutable Boot Validation Check
 pub struct ImmutableBootValidator;
@@ -410,12 +410,12 @@ impl ImmutableBootValidator {
     pub fn is_root_read_only(mount_flags: &str) -> bool {
         mount_flags.contains("ro") || mount_flags.contains("read-only")
     }
-}
+;
 
 /// Advanced Startup Optimizer taking inspiration from Autoruns and Soluto
 pub struct AdvancedStartupOptimizer {
     pub delay_duration_sec: u64,
-}
+;
 
 impl AdvancedStartupOptimizer {
     pub fn new() -> Self {
@@ -436,7 +436,7 @@ impl AdvancedStartupOptimizer {
             SolutoCategory::Delayable
         }
     }
-}
+;
 
 impl StartupOptimizationStrategy for AdvancedStartupOptimizer {
     fn analyze(&self, services: &[StartupService]) -> StartupAnalysis {
@@ -537,14 +537,14 @@ impl StartupOptimizationStrategy for AdvancedStartupOptimizer {
     fn name(&self) -> &str {
         "AdvancedStartupOptimizer"
     }
-}
+;
 
 /// OOP-based Startup Optimizer Manager
 pub struct StartupOptimizer {
     strategy: Box<dyn StartupOptimizationStrategy>,
     services: Vec<StartupService>,
     optimization_result: Option<StartupOptimizationResult>,
-}
+;
 
 impl StartupOptimizer {
     pub fn new(strategy: Box<dyn StartupOptimizationStrategy>) -> Self {
@@ -635,13 +635,13 @@ impl StartupOptimizer {
             self.add_service(service);
         }
     }
-}
+;
 
 impl Default for StartupOptimizer {
     fn default() -> Self {
         Self::new(Box::new(DependencyBasedOptimizer::new()))
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -751,4 +751,4 @@ mod tests {
         ));
         assert!(!ImmutableBootValidator::is_root_read_only("rw,relatime"));
     }
-}
+;

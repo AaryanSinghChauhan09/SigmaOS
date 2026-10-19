@@ -23,7 +23,7 @@ pub enum NotificationCategory {
     Calendar,
     Battery,
     Unknown,
-}
+;
 
 /// Notification urgency enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub enum NotificationUrgency {
     Normal,
     Critical,
     Unknown,
-}
+;
 
 /// Notification state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -43,7 +43,7 @@ pub enum NotificationState {
     Expired,
     ActionTaken,
     Unknown,
-}
+;
 
 /// Notification action data structure
 #[derive(Debug, Clone)]
@@ -51,7 +51,7 @@ pub struct NotificationAction {
     pub action_id: String,
     pub label: String,
     pub action_type: ActionType,
-}
+;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ActionType {
@@ -59,7 +59,7 @@ pub enum ActionType {
     Reply,
     Custom,
     Unknown,
-}
+;
 
 /// Notification data structure
 #[derive(Debug, Clone)]
@@ -77,7 +77,7 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
     pub creation_time: u64,
     pub expire_time: u64,
-}
+;
 
 impl Notification {
     /// Create a new notification
@@ -155,13 +155,13 @@ impl Notification {
             false
         }
     }
-}
+;
 
 /// Enhanced notification manager
 pub struct SigmaNotifyEnhanced {
     notifications: BTreeMap<String, Notification>,
     running: AtomicBool,
-}
+;
 
 impl SigmaNotifyEnhanced {
     /// Create a new enhanced notification manager
@@ -295,13 +295,13 @@ impl SigmaNotifyEnhanced {
     pub fn notification_count(&self) -> usize {
         self.notifications.len()
     }
-}
+;
 
 impl Default for SigmaNotifyEnhanced {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaNotifyEnhanced instance (placeholder for actual global state)
 static mut SIGMANOTIFYENHANCED_INSTANCE: Option<SigmaNotifyEnhanced> = None;
@@ -311,17 +311,17 @@ pub fn init_sigmanotifyenhanced() {
     unsafe {
         SIGMANOTIFYENHANCED_INSTANCE = Some(SigmaNotifyEnhanced::new());
     }
-}
+;
 
 /// Get the global SigmaNotifyEnhanced instance
 pub fn get_sigmanotifyenhanced() -> Option<&'static SigmaNotifyEnhanced> {
     unsafe { SIGMANOTIFYENHANCED_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaNotifyEnhanced instance
 pub fn get_sigmanotifyenhanced_mut() -> Option<&'static mut SigmaNotifyEnhanced> {
     unsafe { SIGMANOTIFYENHANCED_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to post a notification
 pub fn post_notification(notification: Notification) -> bool {
@@ -330,7 +330,7 @@ pub fn post_notification(notification: Notification) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -561,4 +561,4 @@ mod tests {
         let notify_mgr = get_sigmanotifyenhanced().unwrap();
         assert_eq!(notify_mgr.notification_count(), 1);
     }
-}
+;

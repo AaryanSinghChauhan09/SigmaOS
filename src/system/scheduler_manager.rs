@@ -13,7 +13,7 @@ pub enum ScheduleFrequency {
     Daily,
     Weekly,
     Monthly,
-}
+;
 
 impl ScheduleFrequency {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -36,7 +36,7 @@ impl ScheduleFrequency {
             ScheduleFrequency::Monthly => "Monthly",
         }
     }
-}
+;
 
 /// Schedule status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -46,7 +46,7 @@ pub enum ScheduleStatus {
     Completed,
     Failed,
     Disabled,
-}
+;
 
 impl ScheduleStatus {
     pub fn from_str(s: &str) -> Option<Self> {
@@ -69,7 +69,7 @@ impl ScheduleStatus {
             ScheduleStatus::Disabled => "Disabled",
         }
     }
-}
+;
 
 /// Scheduled task
 #[derive(Debug, Clone)]
@@ -82,7 +82,7 @@ pub struct ScheduledTask {
     pub next_run: u64,
     pub last_run: Option<u64>,
     pub is_enabled: bool,
-}
+;
 
 impl ScheduledTask {
     pub fn new(id: String, name: String, command: String, frequency: ScheduleFrequency) -> Self {
@@ -108,14 +108,14 @@ impl ScheduledTask {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.is_enabled = enabled;
     }
-}
+;
 
 /// Scheduler manager
 #[derive(Debug)]
 pub struct SchedulerManager {
     tasks: HashMap<String, ScheduledTask>,
     next_task_id: u64,
-}
+;
 
 impl SchedulerManager {
     pub fn new() -> Self {
@@ -291,13 +291,13 @@ impl SchedulerManager {
             failed_count,
         }
     }
-}
+;
 
 impl Default for SchedulerManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Scheduler statistics
 #[derive(Debug, Clone)]
@@ -306,7 +306,7 @@ pub struct SchedulerStatistics {
     pub enabled_count: usize,
     pub pending_count: usize,
     pub failed_count: usize,
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -396,4 +396,4 @@ mod tests {
         let stats = manager.get_statistics();
         assert!(stats.total_tasks >= 4);
     }
-}
+;

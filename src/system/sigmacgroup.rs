@@ -22,7 +22,7 @@ pub enum CgroupController {
     Pids,
     CpuSet,
     Unknown,
-}
+;
 
 /// Cgroup state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum CgroupState {
     Inactive,
     Throttled,
     Unknown,
-}
+;
 
 /// CPU controller configuration
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct CpuControllerConfig {
     pub cpu_period: Option<u64>,
     pub rt_runtime: Option<i64>,
     pub rt_period: Option<u64>,
-}
+;
 
 impl CpuControllerConfig {
     pub fn new() -> Self {
@@ -68,13 +68,13 @@ impl CpuControllerConfig {
         self.cpu_period = Some(period);
         self
     }
-}
+;
 
 impl Default for CpuControllerConfig {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Memory controller configuration
 #[derive(Debug, Clone)]
@@ -83,7 +83,7 @@ pub struct MemoryControllerConfig {
     pub memory_swap_limit: Option<u64>,
     pub memory_soft_limit: Option<u64>,
     pub oom_control: Option<bool>,
-}
+;
 
 impl MemoryControllerConfig {
     pub fn new() -> Self {
@@ -114,19 +114,19 @@ impl MemoryControllerConfig {
         self.oom_control = Some(enabled);
         self
     }
-}
+;
 
 impl Default for MemoryControllerConfig {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// PIDs controller configuration
 #[derive(Debug, Clone)]
 pub struct PidsControllerConfig {
     pub pids_max: Option<i64>,
-}
+;
 
 impl PidsControllerConfig {
     pub fn new() -> Self {
@@ -137,13 +137,13 @@ impl PidsControllerConfig {
         self.pids_max = Some(max);
         self
     }
-}
+;
 
 impl Default for PidsControllerConfig {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Cgroup
 #[derive(Debug, Clone)]
@@ -156,7 +156,7 @@ pub struct Cgroup {
     pub cpu_config: Option<CpuControllerConfig>,
     pub memory_config: Option<MemoryControllerConfig>,
     pub pids_config: Option<PidsControllerConfig>,
-}
+;
 
 impl Cgroup {
     pub fn new(id: String, name: String) -> Self {
@@ -216,13 +216,13 @@ impl Cgroup {
     pub fn throttle(&mut self) {
         self.state = CgroupState::Throttled;
     }
-}
+;
 
 /// Cgroup manager
 pub struct SigmaCgroup {
     cgroups: BTreeMap<String, Cgroup>,
     next_cgroup_id: u64,
-}
+;
 
 impl SigmaCgroup {
     pub fn new() -> Self {
@@ -342,13 +342,13 @@ impl SigmaCgroup {
             .filter(|c| c.state == CgroupState::Active)
             .count()
     }
-}
+;
 
 impl Default for SigmaCgroup {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMACGROUP_INSTANCE: Option<SigmaCgroup> = None;
 
@@ -356,7 +356,7 @@ pub fn init_sigmacgroup() {
     unsafe {
         SIGMACGROUP_INSTANCE = Some(SigmaCgroup::new());
     }
-}
+;
 
 pub fn get_sigmacgroup() -> &'static SigmaCgroup {
     unsafe {
@@ -364,7 +364,7 @@ pub fn get_sigmacgroup() -> &'static SigmaCgroup {
             .as_ref()
             .expect("SigmaCgroup not initialized")
     }
-}
+;
 
 pub fn get_sigmacgroup_mut() -> &'static mut SigmaCgroup {
     unsafe {
@@ -372,12 +372,12 @@ pub fn get_sigmacgroup_mut() -> &'static mut SigmaCgroup {
             .as_mut()
             .expect("SigmaCgroup not initialized")
     }
-}
+;
 
 pub fn create_cgroup(name: String, parent: Option<String>) -> String {
     let manager = get_sigmacgroup_mut();
     manager.create_cgroup(name, parent)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -571,4 +571,4 @@ mod tests {
         let manager = get_sigmacgroup();
         assert!(manager.get_cgroup(&id).is_some());
     }
-}
+;

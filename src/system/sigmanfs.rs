@@ -26,7 +26,7 @@ pub enum NFSVersion {
     V4_1,
     V4_2,
     Unknown,
-}
+;
 
 /// NFS mount connection state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -37,14 +37,14 @@ pub enum NFSConnectionState {
     StaleHandle,
     Timeout,
     Failed,
-}
+;
 
 /// Export permission policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NFSExportAccess {
     ReadOnly,
     ReadWrite,
-}
+;
 
 /// Root squash security policy
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,7 +52,7 @@ pub enum RootSquashPolicy {
     RootSquash,
     NoRootSquash,
     AllSquash,
-}
+;
 
 /// NFS Server Export descriptor
 #[derive(Debug, Clone)]
@@ -64,7 +64,7 @@ pub struct NFSExport {
     pub root_squash: RootSquashPolicy,
     pub sync: bool,
     pub enabled: bool,
-}
+;
 
 impl NFSExport {
     /// Create a new NFS export definition
@@ -91,7 +91,7 @@ impl NFSExport {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// Remote NFS mount point descriptor
 #[derive(Debug, Clone)]
@@ -105,7 +105,7 @@ pub struct NFSMount {
     pub rsize_bytes: u32,
     pub wsize_bytes: u32,
     pub hard_mount: bool,
-}
+;
 
 impl NFSMount {
     /// Create a new NFS mount definition
@@ -138,14 +138,14 @@ impl NFSMount {
     pub fn is_connected(&self) -> bool {
         self.state == NFSConnectionState::Connected
     }
-}
+;
 
 /// Main SigmaNFS manager struct
 pub struct SigmaNFS {
     exports: BTreeMap<String, NFSExport>,
     mounts: BTreeMap<String, NFSMount>,
     running: AtomicBool,
-}
+;
 
 impl SigmaNFS {
     /// Create a new SigmaNFS manager instance
@@ -251,13 +251,13 @@ impl SigmaNFS {
     pub fn mount_count(&self) -> usize {
         self.mounts.len()
     }
-}
+;
 
 impl Default for SigmaNFS {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaNFS instance
 static mut SIGMA_NFS_INSTANCE: Option<SigmaNFS> = None;
@@ -267,17 +267,17 @@ pub fn init_sigmanfs() {
     unsafe {
         SIGMA_NFS_INSTANCE = Some(SigmaNFS::new());
     }
-}
+;
 
 /// Get global SigmaNFS instance
 pub fn get_sigmanfs() -> Option<&'static SigmaNFS> {
     unsafe { SIGMA_NFS_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaNFS instance
 pub fn get_sigmanfs_mut() -> Option<&'static mut SigmaNFS> {
     unsafe { SIGMA_NFS_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add and connect a remote NFS mount
 pub fn mount_nfs(mount: NFSMount) -> bool {
@@ -288,14 +288,14 @@ pub fn mount_nfs(mount: NFSMount) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to add an NFS share export
 pub fn export_nfs_share(export: NFSExport) {
     if let Some(mgr) = get_sigmanfs_mut() {
         mgr.add_export(export);
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -389,4 +389,4 @@ mod tests {
         assert_eq!(mgr.mount_count(), 1);
         assert_eq!(mgr.list_connected_mounts().len(), 1);
     }
-}
+;

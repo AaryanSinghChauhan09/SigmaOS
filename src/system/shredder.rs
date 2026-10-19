@@ -37,7 +37,7 @@ pub enum ShreddingAlgorithm {
     Gutmann,
     /// Schneier (7 passes: random, random, ones, zeros, random, random, random)
     Schneier,
-}
+;
 
 /// Shredding result
 #[derive(Debug, Clone)]
@@ -48,7 +48,7 @@ pub struct ShreddingResult {
     pub bytes_overwritten: u64,
     pub algorithm: ShreddingAlgorithm,
     pub message: String,
-}
+;
 
 /// OOP trait for shredding strategies
 pub trait ShreddingStrategy {
@@ -58,7 +58,7 @@ pub trait ShreddingStrategy {
     fn name(&self) -> &str;
     /// Get number of passes
     fn passes(&self) -> usize;
-}
+;
 
 /// Zero pass shredder
 pub struct ZeroPassShredder;
@@ -82,7 +82,7 @@ impl ShreddingStrategy for ZeroPassShredder {
     fn passes(&self) -> usize {
         1
     }
-}
+;
 
 /// Random pass shredder
 pub struct RandomPassShredder;
@@ -106,7 +106,7 @@ impl ShreddingStrategy for RandomPassShredder {
     fn passes(&self) -> usize {
         1
     }
-}
+;
 
 /// DoD 5220.22-M shredder
 pub struct Dod5220Shredder;
@@ -130,7 +130,7 @@ impl ShreddingStrategy for Dod5220Shredder {
     fn passes(&self) -> usize {
         3
     }
-}
+;
 
 /// Gutmann shredder (simplified 7-pass version for efficiency)
 pub struct GutmannShredder;
@@ -154,13 +154,13 @@ impl ShreddingStrategy for GutmannShredder {
     fn passes(&self) -> usize {
         7
     }
-}
+;
 
 /// OOP-based File Shredder Manager
 pub struct FileShredder {
     strategy: Box<dyn ShreddingStrategy>,
     delete_after_shred: bool,
-}
+;
 
 impl FileShredder {
     pub fn new(strategy: Box<dyn ShreddingStrategy>) -> Self {
@@ -204,13 +204,13 @@ impl FileShredder {
     pub fn passes(&self) -> usize {
         self.strategy.passes()
     }
-}
+;
 
 impl Default for FileShredder {
     fn default() -> Self {
         Self::new(Box::new(Dod5220Shredder))
     }
-}
+;
 
 /// Shredder errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -219,7 +219,7 @@ pub enum ShredderError {
     PermissionDenied(String),
     IoError(String),
     FileTooLarge,
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -259,4 +259,4 @@ mod tests {
         assert_eq!(shredder.strategy_name(), "Dod5220Shredder");
         assert_eq!(shredder.passes(), 3);
     }
-}
+;

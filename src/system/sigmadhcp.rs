@@ -28,7 +28,7 @@ pub enum DhcpState {
     Renewing,
     /// Rebinding
     Rebinding,
-}
+;
 
 impl fmt::Display for DhcpState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -41,7 +41,7 @@ impl fmt::Display for DhcpState {
             DhcpState::Rebinding => write!(f, "rebinding"),
         }
     }
-}
+;
 
 /// DHCP lease
 #[derive(Debug, Clone)]
@@ -60,7 +60,7 @@ pub struct DhcpLease {
     pub lease_time: u32,
     /// State
     pub state: DhcpState,
-}
+;
 
 impl DhcpLease {
     /// Create a new DHCP lease
@@ -98,7 +98,7 @@ impl DhcpLease {
         self.state = state;
         self
     }
-}
+;
 
 /// SigmaDHCP - System DHCP Client
 pub struct SigmaDHCP {
@@ -108,7 +108,7 @@ pub struct SigmaDHCP {
     running: bool,
     /// Lease counter
     lease_counter: u32,
-}
+;
 
 impl SigmaDHCP {
     /// Create a new SigmaDHCP instance
@@ -236,13 +236,13 @@ impl SigmaDHCP {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaDHCP {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaDHCP instance (placeholder for actual global state)
 static mut SIGMADHCP_INSTANCE: Option<SigmaDHCP> = None;
@@ -252,12 +252,12 @@ pub fn init_sigmadhcp() {
     unsafe {
         SIGMADHCP_INSTANCE = Some(SigmaDHCP::new());
     }
-}
+;
 
 /// Get the global SigmaDHCP instance
 pub fn get_sigmadhcp() -> Option<&'static mut SigmaDHCP> {
     unsafe { SIGMADHCP_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to request a DHCP lease
 pub fn request_dhcp_lease(interface: &str) -> Result<(), String> {
@@ -266,7 +266,7 @@ pub fn request_dhcp_lease(interface: &str) -> Result<(), String> {
     } else {
         Err("SigmaDHCP not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -414,4 +414,4 @@ mod tests {
         let result = request_dhcp_lease("eth0");
         assert!(result.is_ok());
     }
-}
+;

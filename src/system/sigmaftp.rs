@@ -26,7 +26,7 @@ pub enum FtpConnectionState {
     Active,
     /// Closed
     Closed,
-}
+;
 
 impl fmt::Display for FtpConnectionState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -38,7 +38,7 @@ impl fmt::Display for FtpConnectionState {
             FtpConnectionState::Closed => write!(f, "closed"),
         }
     }
-}
+;
 
 /// FTP transfer mode
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -47,7 +47,7 @@ pub enum FtpTransferMode {
     Ascii,
     /// Binary mode
     Binary,
-}
+;
 
 impl fmt::Display for FtpTransferMode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -56,7 +56,7 @@ impl fmt::Display for FtpTransferMode {
             FtpTransferMode::Binary => write!(f, "binary"),
         }
     }
-}
+;
 
 /// FTP connection
 #[derive(Debug, Clone)]
@@ -75,7 +75,7 @@ pub struct FtpConnection {
     pub transfer_mode: FtpTransferMode,
     /// State
     pub state: FtpConnectionState,
-}
+;
 
 impl FtpConnection {
     /// Create a new FTP connection
@@ -113,7 +113,7 @@ impl FtpConnection {
         self.current_directory = directory;
         self
     }
-}
+;
 
 /// SigmaFTP - System FTP Server
 pub struct SigmaFTP {
@@ -123,7 +123,7 @@ pub struct SigmaFTP {
     running: bool,
     /// Connection counter
     connection_counter: u32,
-}
+;
 
 impl SigmaFTP {
     /// Create a new SigmaFTP instance
@@ -295,13 +295,13 @@ impl SigmaFTP {
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }
-}
+;
 
 impl Default for SigmaFTP {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaFTP instance (placeholder for actual global state)
 static mut SIGMAFTP_INSTANCE: Option<SigmaFTP> = None;
@@ -311,12 +311,12 @@ pub fn init_sigmaftp() {
     unsafe {
         SIGMAFTP_INSTANCE = Some(SigmaFTP::new());
     }
-}
+;
 
 /// Get the global SigmaFTP instance
 pub fn get_sigmaftp() -> Option<&'static mut SigmaFTP> {
     unsafe { SIGMAFTP_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to authenticate a connection
 pub fn authenticate_ftp_connection(connection_id: &str) -> Result<(), String> {
@@ -325,7 +325,7 @@ pub fn authenticate_ftp_connection(connection_id: &str) -> Result<(), String> {
     } else {
         Err("SigmaFTP not initialized".to_string())
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -523,4 +523,4 @@ mod tests {
         let result = authenticate_ftp_connection("conn1");
         assert!(result.is_ok());
     }
-}
+;

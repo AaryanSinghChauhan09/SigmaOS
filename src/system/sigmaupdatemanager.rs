@@ -19,7 +19,7 @@ pub enum UpdateType {
     Driver,
     Kernel,
     Unknown,
-}
+;
 
 /// Update state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,7 +30,7 @@ pub enum UpdateState {
     Installed,
     Failed,
     Unknown,
-}
+;
 
 /// Update data structure
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct Update {
     pub size: u64,
     pub description: String,
     pub is_critical: bool,
-}
+;
 
 impl Update {
     /// Create a new update
@@ -90,7 +90,7 @@ impl Update {
     pub fn is_update_critical(&self) -> bool {
         self.is_critical
     }
-}
+;
 
 /// Update schedule data structure
 #[derive(Debug, Clone)]
@@ -99,7 +99,7 @@ pub struct UpdateSchedule {
     pub enabled: bool,
     pub auto_install: bool,
     pub check_interval_hours: u32,
-}
+;
 
 impl UpdateSchedule {
     /// Create a new update schedule
@@ -131,14 +131,14 @@ impl UpdateSchedule {
     pub fn is_enabled(&self) -> bool {
         self.enabled
     }
-}
+;
 
 /// Update manager
 pub struct SigmaUpdateManager {
     updates: BTreeMap<String, Update>,
     schedules: BTreeMap<String, UpdateSchedule>,
     running: AtomicBool,
-}
+;
 
 impl SigmaUpdateManager {
     /// Create a new update manager
@@ -283,13 +283,13 @@ impl SigmaUpdateManager {
     pub fn schedule_count(&self) -> usize {
         self.schedules.len()
     }
-}
+;
 
 impl Default for SigmaUpdateManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaUpdateManager instance (placeholder for actual global state)
 static mut SIGMAUPDATEMANAGER_INSTANCE: Option<SigmaUpdateManager> = None;
@@ -299,17 +299,17 @@ pub fn init_sigmaupdatemanager() {
     unsafe {
         SIGMAUPDATEMANAGER_INSTANCE = Some(SigmaUpdateManager::new());
     }
-}
+;
 
 /// Get the global SigmaUpdateManager instance
 pub fn get_sigmaupdatemanager() -> Option<&'static SigmaUpdateManager> {
     unsafe { SIGMAUPDATEMANAGER_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaUpdateManager instance
 pub fn get_sigmaupdatemanager_mut() -> Option<&'static mut SigmaUpdateManager> {
     unsafe { SIGMAUPDATEMANAGER_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add an update
 pub fn add_update(update: Update) -> bool {
@@ -318,7 +318,7 @@ pub fn add_update(update: Update) -> bool {
     } else {
         false
     }
-}
+;
 
 /// Convenience function to install an update
 pub fn install_update(update_id: &str) -> bool {
@@ -327,7 +327,7 @@ pub fn install_update(update_id: &str) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -503,4 +503,4 @@ mod tests {
         let upd = update_mgr.get_update("update1").unwrap();
         assert!(upd.is_installed());
     }
-}
+;

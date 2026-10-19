@@ -21,7 +21,7 @@ pub struct SystemInfo {
     pub architecture: String,
     pub hostname: String,
     pub uptime_seconds: u64,
-}
+;
 
 impl SystemInfo {
     pub fn new() -> Self {
@@ -64,13 +64,13 @@ impl SystemInfo {
         self.uptime_seconds = uptime_seconds;
         self
     }
-}
+;
 
 impl Default for SystemInfo {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMASYSTEMINFO_INSTANCE: Option<SystemInfo> = None;
 
@@ -78,7 +78,7 @@ pub fn init_sigmasysteminfo() {
     unsafe {
         SIGMASYSTEMINFO_INSTANCE = Some(SystemInfo::new());
     }
-}
+;
 
 pub fn get_sigmasysteminfo() -> &'static SystemInfo {
     unsafe {
@@ -86,7 +86,7 @@ pub fn get_sigmasysteminfo() -> &'static SystemInfo {
             .as_ref()
             .expect("SigmaSystemInfo not initialized")
     }
-}
+;
 
 pub fn get_sigmasysteminfo_mut() -> &'static mut SystemInfo {
     unsafe {
@@ -94,7 +94,7 @@ pub fn get_sigmasysteminfo_mut() -> &'static mut SystemInfo {
             .as_mut()
             .expect("SigmaSystemInfo not initialized")
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -135,4 +135,4 @@ mod tests {
         info_mut.with_os_name("SigmaOS".to_string());
         assert_eq!(info.os_name, "SigmaOS");
     }
-}
+;

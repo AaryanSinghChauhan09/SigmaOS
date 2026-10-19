@@ -19,7 +19,7 @@ pub enum BackupType {
     Full,
     Incremental,
     Differential,
-}
+;
 
 /// Backup status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum BackupStatus {
     Completed,
     Failed,
     Restoring,
-}
+;
 
 /// Compression type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -39,7 +39,7 @@ pub enum CompressionType {
     Bzip2,
     Xz,
     Zstd,
-}
+;
 
 /// Backup job
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ pub struct BackupJob {
     pub created_at: String,
     pub completed_at: Option<String>,
     pub file_count: u32,
-}
+;
 
 impl BackupJob {
     pub fn new(id: String, name: String, source_path: String, destination_path: String, backup_type: BackupType, compression: CompressionType) -> Self {
@@ -111,7 +111,7 @@ impl BackupJob {
     pub fn is_complete(&self) -> bool {
         self.status == BackupStatus::Completed
     }
-}
+;
 
 /// Backup schedule
 #[derive(Debug, Clone)]
@@ -127,7 +127,7 @@ pub struct BackupSchedule {
     pub time: String,
     pub retention_count: u32, // number of backups to keep
     pub enabled: bool,
-}
+;
 
 impl BackupSchedule {
     pub fn new(id: String, name: String, source_path: String, destination_path: String, backup_type: BackupType, compression: CompressionType, schedule_type: String, time: String, retention_count: u32) -> Self {
@@ -153,14 +153,14 @@ impl BackupSchedule {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// SigmaBackupManager - Backup management system
 #[derive(Debug)]
 pub struct SigmaBackupManager {
     backups: BTreeMap<String, BackupJob>,
     schedules: BTreeMap<String, BackupSchedule>,
-}
+;
 
 impl SigmaBackupManager {
     pub fn new() -> Self {
@@ -235,13 +235,13 @@ impl SigmaBackupManager {
     pub fn schedule_count(&self) -> usize {
         self.schedules.len()
     }
-}
+;
 
 impl Default for SigmaBackupManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaBackupManager instance
 static mut SIGMABACKUPMANAGER_INSTANCE: Option<SigmaBackupManager> = None;
@@ -251,21 +251,21 @@ pub fn init_sigmabackupmanager() {
     unsafe {
         SIGMABACKUPMANAGER_INSTANCE = Some(SigmaBackupManager::new());
     }
-}
+;
 
 /// Get the global SigmaBackupManager instance
 pub fn get_sigmabackupmanager() -> Option<&'static SigmaBackupManager> {
     unsafe {
         SIGMABACKUPMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaBackupManager instance (mutable)
 pub fn get_sigmabackupmanager_mut() -> Option<&'static mut SigmaBackupManager> {
     unsafe {
         SIGMABACKUPMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add a backup
 pub fn add_backup(backup: BackupJob) -> bool {
@@ -275,7 +275,7 @@ pub fn add_backup(backup: BackupJob) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -351,4 +351,4 @@ mod tests {
         manager.add_backup(backup);
         assert_eq!(manager.backup_count(), 1);
     }
-}
+;

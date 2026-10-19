@@ -16,7 +16,7 @@ pub enum ProcessState {
     Failed,
     Restarting,
     Sleeping,
-}
+;
 
 /// Process supervisor configuration
 #[derive(Debug, Clone)]
@@ -31,7 +31,7 @@ pub struct ProcessConfig {
     pub stdout_log: String,
     pub stderr_log: String,
     pub environment: BTreeMap<String, String>,
-}
+;
 
 /// Process status
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct ProcessStatus {
     pub last_exit_code: Option<i32>,
     pub memory_usage: u64,
     pub cpu_usage: f32,
-}
+;
 
 /// Process supervisor
 pub struct ProcessSupervisor {
@@ -51,7 +51,7 @@ pub struct ProcessSupervisor {
     pub process_status: BTreeMap<String, ProcessStatus>,
     pub config_dir: String,
     pub run_dir: String,
-}
+;
 
 impl ProcessSupervisor {
     pub fn new(config_dir: &str, run_dir: &str) -> Self {
@@ -239,7 +239,7 @@ impl ProcessSupervisor {
     pub fn load_configs(&mut self) -> Result<(), SupervisorError> {
         Ok(())
     }
-}
+;
 
 /// Supervisor errors
 #[derive(Debug)]
@@ -249,7 +249,7 @@ pub enum SupervisorError {
     StopError(String),
     ConfigError(String),
     MonitorError(String),
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -298,4 +298,4 @@ mod tests {
         let running = supervisor.get_running_processes();
         assert_eq!(running.len(), 2);
     }
-}
+;

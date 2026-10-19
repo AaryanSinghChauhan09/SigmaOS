@@ -19,7 +19,7 @@ pub enum RotationSchedule {
     Monthly,
     Yearly,
     Size(u64), // Rotate when size exceeds bytes
-}
+;
 
 /// Compression type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -29,7 +29,7 @@ pub enum CompressionType {
     Bzip2,
     Xz,
     Zstd,
-}
+;
 
 /// Log file configuration
 #[derive(Debug, Clone)]
@@ -43,7 +43,7 @@ pub struct LogFileConfig {
     pub missingok: bool, // Don't error if file is missing
     pub notifempty: bool, // Don't rotate if empty
     pub sharedscripts: bool, // Run scripts once per rotation
-}
+;
 
 /// Log rotation entry
 #[derive(Debug, Clone)]
@@ -53,7 +53,7 @@ pub struct LogRotationEntry {
     pub rotation_number: u32,
     pub timestamp: u64,
     pub compressed: bool,
-}
+;
 
 /// Log rotation manager
 pub struct LogRotateManager {
@@ -61,7 +61,7 @@ pub struct LogRotateManager {
     pub rotated_logs: Vec<LogRotationEntry>,
     pub next_config_id: AtomicU32,
     pub active: AtomicBool,
-}
+;
 
 impl LogRotateManager {
     pub fn new() -> Self {
@@ -175,13 +175,13 @@ impl LogRotateManager {
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
     }
-}
+;
 
 impl Default for LogRotateManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global log rotation manager
 static mut LOG_ROTATE: Option<LogRotateManager> = None;
@@ -191,14 +191,14 @@ pub fn init_log_rotate() {
     unsafe {
         LOG_ROTATE = Some(LogRotateManager::new());
     }
-}
+;
 
 /// Get global log rotation manager
 pub fn get_log_rotate() -> Option<&'static mut LogRotateManager> {
     unsafe {
         LOG_ROTATE.as_mut()
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -294,4 +294,4 @@ mod tests {
         // Should only keep 3 rotations
         assert_eq!(manager.rotated_logs.len(), 3);
     }
-}
+;

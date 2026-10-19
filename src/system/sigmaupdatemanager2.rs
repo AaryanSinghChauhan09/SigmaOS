@@ -20,7 +20,7 @@ pub enum UpdatePriority {
     High,
     Normal,
     Low,
-}
+;
 
 /// Update type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum UpdateType {
     Kernel,
     Driver,
     Application,
-}
+;
 
 /// Update status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -42,7 +42,7 @@ pub enum UpdateStatus {
     Installing,
     Installed,
     Failed,
-}
+;
 
 /// System update
 #[derive(Debug, Clone)]
@@ -59,7 +59,7 @@ pub struct SystemUpdate {
     pub download_size: u64,
     pub changelog: String,
     pub security_advisory: Option<String>,
-}
+;
 
 impl SystemUpdate {
     pub fn new(id: String, name: String, description: String, update_type: UpdateType, priority: UpdatePriority, version: String, current_version: String) -> Self {
@@ -106,7 +106,7 @@ impl SystemUpdate {
     pub fn is_critical(&self) -> bool {
         self.priority == UpdatePriority::Critical
     }
-}
+;
 
 /// Update schedule
 #[derive(Debug, Clone)]
@@ -119,7 +119,7 @@ pub struct UpdateSchedule {
     pub day_of_week: Option<String>, // Monday, Tuesday, etc.
     pub time: String, // HH:MM
     pub enabled: bool,
-}
+;
 
 impl UpdateSchedule {
     pub fn new(id: String, name: String, auto_update: bool, auto_download: bool, schedule_type: String, time: String) -> Self {
@@ -142,7 +142,7 @@ impl UpdateSchedule {
     pub fn set_enabled(&mut self, enabled: bool) {
         self.enabled = enabled;
     }
-}
+;
 
 /// SigmaUpdateManager - System update management
 #[derive(Debug)]
@@ -151,7 +151,7 @@ pub struct SigmaUpdateManager {
     schedules: BTreeMap<String, UpdateSchedule>,
     last_check: Option<String>,
     last_update: Option<String>,
-}
+;
 
 impl SigmaUpdateManager {
     pub fn new() -> Self {
@@ -242,13 +242,13 @@ impl SigmaUpdateManager {
     pub fn schedule_count(&self) -> usize {
         self.schedules.len()
     }
-}
+;
 
 impl Default for SigmaUpdateManager {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaUpdateManager instance
 static mut SIGMAUPDATEMANAGER_INSTANCE: Option<SigmaUpdateManager> = None;
@@ -258,21 +258,21 @@ pub fn init_sigmaupdatemanager() {
     unsafe {
         SIGMAUPDATEMANAGER_INSTANCE = Some(SigmaUpdateManager::new());
     }
-}
+;
 
 /// Get the global SigmaUpdateManager instance
 pub fn get_sigmaupdatemanager() -> Option<&'static SigmaUpdateManager> {
     unsafe {
         SIGMAUPDATEMANAGER_INSTANCE.as_ref()
     }
-}
+;
 
 /// Get the global SigmaUpdateManager instance (mutable)
 pub fn get_sigmaupdatemanager_mut() -> Option<&'static mut SigmaUpdateManager> {
     unsafe {
         SIGMAUPDATEMANAGER_INSTANCE.as_mut()
     }
-}
+;
 
 /// Convenience function to add an update
 pub fn add_update(update: SystemUpdate) -> bool {
@@ -282,7 +282,7 @@ pub fn add_update(update: SystemUpdate) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -374,4 +374,4 @@ mod tests {
         let security = manager.list_security_updates();
         assert_eq!(security.len(), 1);
     }
-}
+;

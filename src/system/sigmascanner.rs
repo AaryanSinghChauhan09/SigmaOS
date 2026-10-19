@@ -20,7 +20,7 @@ pub enum ScannerState {
     Scanning,
     Error,
     Unknown,
-}
+;
 
 /// Scan job state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -31,7 +31,7 @@ pub enum ScanJobState {
     Cancelled,
     Failed,
     Unknown,
-}
+;
 
 /// Scanner
 #[derive(Debug, Clone)]
@@ -41,7 +41,7 @@ pub struct Scanner {
     pub state: ScannerState,
     pub device: String,
     pub description: String,
-}
+;
 
 impl Scanner {
     pub fn new(id: String, name: String, device: String) -> Self {
@@ -66,7 +66,7 @@ impl Scanner {
     pub fn set_idle(&mut self) {
         self.state = ScannerState::Idle;
     }
-}
+;
 
 /// Scan job
 #[derive(Debug, Clone)]
@@ -76,7 +76,7 @@ pub struct ScanJob {
     pub resolution: u32,
     pub color_mode: bool,
     pub state: ScanJobState,
-}
+;
 
 impl ScanJob {
     pub fn new(id: String, scanner_id: String, resolution: u32, color_mode: bool) -> Self {
@@ -104,7 +104,7 @@ impl ScanJob {
     pub fn fail(&mut self) {
         self.state = ScanJobState::Failed;
     }
-}
+;
 
 /// Scanner manager
 pub struct SigmaScanner {
@@ -112,7 +112,7 @@ pub struct SigmaScanner {
     jobs: BTreeMap<String, ScanJob>,
     next_scanner_id: u64,
     next_job_id: u64,
-}
+;
 
 impl SigmaScanner {
     pub fn new() -> Self {
@@ -186,13 +186,13 @@ impl SigmaScanner {
     pub fn job_count(&self) -> usize {
         self.jobs.len()
     }
-}
+;
 
 impl Default for SigmaScanner {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 static mut SIGMASCANNER_INSTANCE: Option<SigmaScanner> = None;
 
@@ -200,7 +200,7 @@ pub fn init_sigmascanner() {
     unsafe {
         SIGMASCANNER_INSTANCE = Some(SigmaScanner::new());
     }
-}
+;
 
 pub fn get_sigmascanner() -> &'static SigmaScanner {
     unsafe {
@@ -208,7 +208,7 @@ pub fn get_sigmascanner() -> &'static SigmaScanner {
             .as_ref()
             .expect("SigmaScanner not initialized")
     }
-}
+;
 
 pub fn get_sigmascanner_mut() -> &'static mut SigmaScanner {
     unsafe {
@@ -216,12 +216,12 @@ pub fn get_sigmascanner_mut() -> &'static mut SigmaScanner {
             .as_mut()
             .expect("SigmaScanner not initialized")
     }
-}
+;
 
 pub fn add_scanner(name: String, device: String) -> String {
     let manager = get_sigmascanner_mut();
     manager.add_scanner(name, device)
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -331,4 +331,4 @@ mod tests {
         let manager = get_sigmascanner();
         assert!(manager.get_scanner(&id).is_some());
     }
-}
+;

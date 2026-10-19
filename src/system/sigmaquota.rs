@@ -15,7 +15,7 @@ pub enum QuotaType {
     User,
     Group,
     Unknown,
-}
+;
 
 /// Quota state enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -25,7 +25,7 @@ pub enum QuotaState {
     Exceeded,
     Warning,
     Unknown,
-}
+;
 
 /// Quota data structure
 #[derive(Debug, Clone)]
@@ -38,7 +38,7 @@ pub struct Quota {
     pub hard_limit: u64,
     pub used_space: u64,
     pub state: QuotaState,
-}
+;
 
 impl Quota {
     /// Create a new quota
@@ -107,13 +107,13 @@ impl Quota {
     pub fn is_active(&self) -> bool {
         self.state == QuotaState::Active
     }
-}
+;
 
 /// Quota manager
 pub struct SigmaQuota {
     quotas: BTreeMap<String, Quota>,
     running: AtomicBool,
-}
+;
 
 impl SigmaQuota {
     /// Create a new quota manager
@@ -211,13 +211,13 @@ impl SigmaQuota {
     pub fn quota_count(&self) -> usize {
         self.quotas.len()
     }
-}
+;
 
 impl Default for SigmaQuota {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaQuota instance (placeholder for actual global state)
 static mut SIGMAQUOTA_INSTANCE: Option<SigmaQuota> = None;
@@ -227,24 +227,24 @@ pub fn init_sigmaquota() {
     unsafe {
         SIGMAQUOTA_INSTANCE = Some(SigmaQuota::new());
     }
-}
+;
 
 /// Get the global SigmaQuota instance
 pub fn get_sigmaquota() -> Option<&'static SigmaQuota> {
     unsafe { SIGMAQUOTA_INSTANCE.as_ref() }
-}
+;
 
 /// Get mutable global SigmaQuota instance
 pub fn get_sigmaquota_mut() -> Option<&'static mut SigmaQuota> {
     unsafe { SIGMAQUOTA_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a quota
 pub fn add_quota(quota: Quota) {
     if let Some(quota_mgr) = get_sigmaquota_mut() {
         quota_mgr.add_quota(quota);
     }
-}
+;
 
 /// Convenience function to update quota usage
 pub fn update_quota_usage(quota_id: &str, used_space: u64) -> bool {
@@ -253,7 +253,7 @@ pub fn update_quota_usage(quota_id: &str, used_space: u64) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -532,4 +532,4 @@ mod tests {
         let quota = quota_mgr.get_quota("quota1").unwrap();
         assert_eq!(quota.used_space, 512 * 1024 * 1024);
     }
-}
+;

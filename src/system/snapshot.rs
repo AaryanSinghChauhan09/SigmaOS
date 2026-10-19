@@ -34,7 +34,7 @@ impl SystemTime {
     pub fn duration_since(&self, _earlier: u64) -> Result<Duration, ()> {
         Ok(Duration::from_secs(0))
     }
-}
+;
 
 pub struct Duration;
 impl Duration {
@@ -44,7 +44,7 @@ impl Duration {
     pub fn as_secs(&self) -> u64 {
         0
     }
-}
+;
 
 /// Snapshot metadata
 #[derive(Debug, Clone)]
@@ -55,7 +55,7 @@ pub struct SnapshotMetadata {
     pub description: String,
     pub size_bytes: u64,
     pub is_bootable: bool,
-}
+;
 
 /// Snapshot configuration
 #[derive(Debug, Clone)]
@@ -65,7 +65,7 @@ pub struct SnapshotConfig {
     pub auto_snapshot_interval_hours: u64,
     pub include_system_files: bool,
     pub include_user_data: bool,
-}
+;
 
 impl Default for SnapshotConfig {
     fn default() -> Self {
@@ -77,7 +77,7 @@ impl Default for SnapshotConfig {
             include_user_data: false,
         }
     }
-}
+;
 
 /// Snapshot result
 #[derive(Debug, Clone)]
@@ -87,7 +87,7 @@ pub struct SnapshotResult {
     pub bytes_written: u64,
     pub duration_seconds: u64,
     pub message: String,
-}
+;
 
 /// Restore result
 #[derive(Debug, Clone)]
@@ -97,7 +97,7 @@ pub struct RestoreResult {
     pub files_restored: usize,
     pub duration_seconds: u64,
     pub message: String,
-}
+;
 
 /// OOP trait for snapshot storage strategies
 pub trait SnapshotStorage {
@@ -115,14 +115,14 @@ pub trait SnapshotStorage {
     fn delete_snapshot(&mut self, snapshot_id: &str) -> Result<(), SnapshotError>;
     /// Get strategy name
     fn name(&self) -> &str;
-}
+;
 
 /// File-based snapshot storage
 pub struct FileSnapshotStorage {
     base_path: PathBuf,
     snapshots: BTreeMap<String, SnapshotMetadata>,
     config: SnapshotConfig,
-}
+;
 
 impl FileSnapshotStorage {
     pub fn new(base_path: PathBuf, config: SnapshotConfig) -> Self {
@@ -132,7 +132,7 @@ impl FileSnapshotStorage {
             config,
         }
     }
-}
+;
 
 impl SnapshotStorage for FileSnapshotStorage {
     fn create_snapshot(
@@ -228,7 +228,7 @@ impl SnapshotStorage for FileSnapshotStorage {
     fn name(&self) -> &str {
         "FileSnapshotStorage"
     }
-}
+;
 
 impl FileSnapshotStorage {
     fn find_oldest_snapshot(&self) -> Option<String> {
@@ -237,14 +237,14 @@ impl FileSnapshotStorage {
             .min_by_key(|(_, metadata)| metadata.timestamp)
             .map(|(id, _)| id.clone())
     }
-}
+;
 
 /// Merkle tree-based snapshot storage (SigmaFS optimized)
 pub struct MerkleSnapshotStorage {
     base_path: PathBuf,
     snapshots: BTreeMap<String, SnapshotMetadata>,
     config: SnapshotConfig,
-}
+;
 
 impl MerkleSnapshotStorage {
     pub fn new(base_path: PathBuf, config: SnapshotConfig) -> Self {
@@ -254,7 +254,7 @@ impl MerkleSnapshotStorage {
             config,
         }
     }
-}
+;
 
 impl SnapshotStorage for MerkleSnapshotStorage {
     fn create_snapshot(
@@ -369,7 +369,7 @@ impl SnapshotStorage for MerkleSnapshotStorage {
     fn name(&self) -> &str {
         "MerkleSnapshotStorage"
     }
-}
+;
 
 impl MerkleSnapshotStorage {
     fn compute_merkle_root(&self, data: &[u8]) -> String {
@@ -387,13 +387,13 @@ impl MerkleSnapshotStorage {
             .min_by_key(|(_, metadata)| metadata.timestamp)
             .map(|(id, _)| id.clone())
     }
-}
+;
 
 /// OOP-based System Snapshot Manager
 pub struct SystemSnapshotManager {
     storage: Box<dyn SnapshotStorage>,
     config: SnapshotConfig,
-}
+;
 
 impl SystemSnapshotManager {
     pub fn new(storage: Box<dyn SnapshotStorage>, config: SnapshotConfig) -> Self {
@@ -454,7 +454,7 @@ impl SystemSnapshotManager {
         // including filesystem, registry, configuration, etc.
         vec![0u8; 1024 * 1024] // 1MB simulated data
     }
-}
+;
 
 impl Default for SystemSnapshotManager {
     fn default() -> Self {
@@ -463,7 +463,7 @@ impl Default for SystemSnapshotManager {
         let storage = Box::new(MerkleSnapshotStorage::new(base_path, config.clone()));
         Self::new(storage, config)
     }
-}
+;
 
 /// Snapshot errors
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -475,7 +475,7 @@ pub enum SnapshotError {
     IntegrityError(String),
     PermissionDenied(String),
     StorageFull,
-}
+;
 
 /// Profile Generation state representing an atomic state checkpoint
 #[derive(Debug, Clone)]
@@ -485,14 +485,14 @@ pub struct ProfileGeneration {
     pub store_path: String,
     pub timestamp: u64,
     pub active: bool,
-}
+;
 
 /// Sovereign Profile Manager for NixOS-style generational rollbacks
 pub struct SovereignProfileManager {
     pub profile_name: String,
     pub generations: Vec<ProfileGeneration>,
     pub active_generation: Option<usize>,
-}
+;
 
 impl SovereignProfileManager {
     pub fn new(profile_name: &str) -> Self {
@@ -544,7 +544,7 @@ impl SovereignProfileManager {
             Err("Target profile generation not found")
         }
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -598,4 +598,4 @@ mod tests {
         let manager = SystemSnapshotManager::default();
         assert_eq!(manager.storage_name(), "MerkleSnapshotStorage");
     }
-}
+;

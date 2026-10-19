@@ -20,7 +20,7 @@ pub struct Color {
     pub g: u8,
     pub b: u8,
     pub a: u8,
-}
+;
 
 impl Color {
     pub fn new(r: u8, g: u8, b: u8, a: u8) -> Self {
@@ -50,33 +50,33 @@ impl Color {
     pub fn blue() -> Self {
         Self::rgb(0, 0, 255)
     }
-}
+;
 
 /// Point in 2D space
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
-}
+;
 
 impl Point {
     pub fn new(x: i32, y: i32) -> Self {
         Self { x, y }
     }
-}
+;
 
 /// Size in 2D space
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Size {
     pub width: u32,
     pub height: u32,
-}
+;
 
 impl Size {
     pub fn new(width: u32, height: u32) -> Self {
         Self { width, height }
     }
-}
+;
 
 /// Rectangle
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -85,7 +85,7 @@ pub struct Rect {
     pub y: i32,
     pub width: u32,
     pub height: u32,
-}
+;
 
 impl Rect {
     pub fn new(x: i32, y: i32, width: u32, height: u32) -> Self {
@@ -103,7 +103,7 @@ impl Rect {
             && point.y >= self.y
             && point.y < (self.y + self.height as i32)
     }
-}
+;
 
 /// Shape type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -113,7 +113,7 @@ pub enum ShapeType {
     Line,
     Triangle,
     Polygon,
-}
+;
 
 /// Shape primitive
 #[derive(Debug, Clone)]
@@ -124,7 +124,7 @@ pub struct Shape {
     pub size: Size,
     pub color: Color,
     pub rotation: f32,
-}
+;
 
 impl Shape {
     pub fn new(
@@ -155,7 +155,7 @@ impl Shape {
     pub fn set_position(&mut self, position: Point) {
         self.position = position;
     }
-}
+;
 
 /// Layer for organizing shapes
 #[derive(Debug, Clone)]
@@ -165,7 +165,7 @@ pub struct Layer {
     pub shapes: BTreeMap<String, Shape>,
     pub visible: bool,
     pub opacity: f32,
-}
+;
 
 impl Layer {
     pub fn new(id: String, name: String) -> Self {
@@ -205,7 +205,7 @@ impl Layer {
     pub fn shape_count(&self) -> usize {
         self.shapes.len()
     }
-}
+;
 
 /// Canvas for drawing
 #[derive(Debug, Clone)]
@@ -216,7 +216,7 @@ pub struct Canvas {
     pub background_color: Color,
     pub layers: BTreeMap<String, Layer>,
     pub active_layer: Option<String>,
-}
+;
 
 impl Canvas {
     pub fn new(id: String, name: String, size: Size, background_color: Color) -> Self {
@@ -285,14 +285,14 @@ impl Canvas {
     pub fn total_shape_count(&self) -> usize {
         self.layers.values().map(|l| l.shape_count()).sum()
     }
-}
+;
 
 /// SigmaArt - Art system manager
 #[derive(Debug)]
 pub struct SigmaArt {
     canvases: BTreeMap<String, Canvas>,
     current_canvas: Option<String>,
-}
+;
 
 impl SigmaArt {
     pub fn new() -> Self {
@@ -349,13 +349,13 @@ impl SigmaArt {
     pub fn canvas_count(&self) -> usize {
         self.canvases.len()
     }
-}
+;
 
 impl Default for SigmaArt {
     fn default() -> Self {
         Self::new()
     }
-}
+;
 
 /// Global SigmaArt instance
 static mut SIGMAART_INSTANCE: Option<SigmaArt> = None;
@@ -365,17 +365,17 @@ pub fn init_sigmaart() {
     unsafe {
         SIGMAART_INSTANCE = Some(SigmaArt::new());
     }
-}
+;
 
 /// Get the global SigmaArt instance
 pub fn get_sigmaart() -> Option<&'static SigmaArt> {
     unsafe { SIGMAART_INSTANCE.as_ref() }
-}
+;
 
 /// Get the global SigmaArt instance (mutable)
 pub fn get_sigmaart_mut() -> Option<&'static mut SigmaArt> {
     unsafe { SIGMAART_INSTANCE.as_mut() }
-}
+;
 
 /// Convenience function to add a canvas
 pub fn add_canvas(canvas: Canvas) -> bool {
@@ -385,7 +385,7 @@ pub fn add_canvas(canvas: Canvas) -> bool {
     } else {
         false
     }
-}
+;
 
 #[cfg(test)]
 mod tests {
@@ -524,4 +524,4 @@ mod tests {
         art.add_canvas(canvas);
         assert_eq!(art.canvas_count(), 1);
     }
-}
+;
