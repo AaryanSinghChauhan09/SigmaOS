@@ -9242,6 +9242,7 @@ pub enum CoauthorOpKind {
 }
 
 #[derive(Debug, Clone)]
+#[derive(PartialEq)]
 pub struct CoauthorOperation {
     pub op_kind: CoauthorOpKind,
     pub site_id: usize,
@@ -9685,6 +9686,575 @@ impl SovereignBitrix24OmnichannelSlaEscalationRouterEngine {
 }
 
 // Placeholder types for compilation
+
+// ============================================================================
+// EXPANDED ENTERPRISE SUITE INNOVATION ENGINES
+// Inspired by Google Workspace, Microsoft 365, Salesforce, Zoho, Odoo & Bitrix24
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SmartChipMetadata {
+    pub label: String,
+    pub chip_kind: SmartCanvasChipKind,
+    pub subtitle: String,
+    pub hover_card_text: String,
+    pub icon_name: String,
+    pub is_interactive: bool,
+}
+
+pub struct SovereignGoogleDocsSmartChipMetadataEngine;
+
+impl SovereignGoogleDocsSmartChipMetadataEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_hover_card(&self, chip: &SmartCanvasChip) -> SmartChipMetadata {
+        match &chip.kind {
+            SmartCanvasChipKind::Person => SmartChipMetadata {
+                label: chip.label.clone(),
+                chip_kind: chip.kind.clone(),
+                subtitle: chip.target_id_or_val.clone(),
+                hover_card_text: format!("Person: {} ({})", chip.label, chip.target_id_or_val),
+                icon_name: "account-circle".to_string(),
+                is_interactive: true,
+            },
+            SmartCanvasChipKind::File => SmartChipMetadata {
+                label: chip.label.clone(),
+                chip_kind: chip.kind.clone(),
+                subtitle: "Drive File".to_string(),
+                hover_card_text: format!("File: {} [{}]", chip.label, chip.target_id_or_val),
+                icon_name: "file-document".to_string(),
+                is_interactive: true,
+            },
+            SmartCanvasChipKind::Date => SmartChipMetadata {
+                label: chip.label.clone(),
+                chip_kind: chip.kind.clone(),
+                subtitle: "Calendar Date".to_string(),
+                hover_card_text: format!("Date: {} at {}", chip.label, chip.target_id_or_val),
+                icon_name: "calendar-clock".to_string(),
+                is_interactive: true,
+            },
+            SmartCanvasChipKind::Dropdown => SmartChipMetadata {
+                label: chip.label.clone(),
+                chip_kind: chip.kind.clone(),
+                subtitle: "Status Dropdown".to_string(),
+                hover_card_text: format!("Status: {}", chip.label),
+                icon_name: "tag".to_string(),
+                is_interactive: false,
+            },
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ArrayFormulaSpillGrid {
+    pub formula: String,
+    pub start_cell: String,
+    pub rows: usize,
+    pub cols: usize,
+    pub values: Vec<Vec<CellValue>>,
+    pub is_spill_blocked: bool,
+}
+
+pub struct SovereignGoogleSheetsCustomArrayFormulaEngine;
+
+impl SovereignGoogleSheetsCustomArrayFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_matrix_spill(
+        &self,
+        formula: &str,
+        start_cell: &str,
+        matrix_input: Vec<Vec<f64>>,
+    ) -> ArrayFormulaSpillGrid {
+        let rows = matrix_input.len();
+        let cols = if rows > 0 { matrix_input[0].len() } else { 0 };
+
+        let values: Vec<Vec<CellValue>> = matrix_input
+            .into_iter()
+            .map(|row| row.into_iter().map(CellValue::Number).collect())
+            .collect();
+
+        ArrayFormulaSpillGrid {
+            formula: formula.to_string(),
+            start_cell: start_cell.to_string(),
+            rows,
+            cols,
+            values,
+            is_spill_blocked: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct BlendedDataRecord {
+    pub primary_key: String,
+    pub combined_metrics: HashMap<String, f64>,
+    pub source_count: usize,
+}
+
+pub struct SovereignGoogleLookerStudioBlendedDataModelEngine;
+
+impl SovereignGoogleLookerStudioBlendedDataModelEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn blend_data_sources(
+        &self,
+        primary_rows: &[(String, f64)],
+        secondary_rows: &[(String, f64)],
+        primary_metric_name: &str,
+        secondary_metric_name: &str,
+    ) -> Vec<BlendedDataRecord> {
+        let mut map: HashMap<String, BlendedDataRecord> = HashMap::new();
+
+        for (key, val) in primary_rows {
+            let entry = map.entry(key.clone()).or_insert_with(|| BlendedDataRecord {
+                primary_key: key.clone(),
+                combined_metrics: HashMap::new(),
+                source_count: 0,
+            });
+            entry.combined_metrics.insert(primary_metric_name.to_string(), *val);
+            entry.source_count += 1;
+        }
+
+        for (key, val) in secondary_rows {
+            let entry = map.entry(key.clone()).or_insert_with(|| BlendedDataRecord {
+                primary_key: key.clone(),
+                combined_metrics: HashMap::new(),
+                source_count: 0,
+            });
+            entry.combined_metrics.insert(secondary_metric_name.to_string(), *val);
+            entry.source_count += 1;
+        }
+
+        let mut results: Vec<BlendedDataRecord> = map.into_values().collect();
+        results.sort_by(|a, b| a.primary_key.cmp(&b.primary_key));
+        results
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct OtConflictResolutionResult {
+    pub site_id: usize,
+    pub original_op: CoauthorOperation,
+    pub transformed_op: CoauthorOperation,
+    pub is_conflict: bool,
+}
+
+pub struct SovereignMicrosoft365CoauthoringConflictResolverEngine;
+
+impl SovereignMicrosoft365CoauthoringConflictResolverEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn resolve_concurrent_ops(
+        &self,
+        op_a: &CoauthorOperation,
+        op_b: &CoauthorOperation,
+    ) -> OtConflictResolutionResult {
+        if op_a.site_id == op_b.site_id {
+            let mut transformed = op_b.clone();
+            transformed.vector_clock += 1;
+            OtConflictResolutionResult {
+                site_id: op_b.site_id,
+                original_op: op_b.clone(),
+                transformed_op: transformed,
+                is_conflict: true,
+            }
+        } else {
+            OtConflictResolutionResult {
+                site_id: op_b.site_id,
+                original_op: op_b.clone(),
+                transformed_op: op_b.clone(),
+                is_conflict: false,
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DaxExpressionEvaluationResult {
+    pub measure_name: String,
+    pub calculated_value: f64,
+    pub filter_context_active: bool,
+    pub dax_expression: String,
+}
+
+pub struct SovereignMicrosoftPowerBiDaxEngine;
+
+impl SovereignMicrosoftPowerBiDaxEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_dax_measure(
+        &self,
+        measure_name: &str,
+        dax_expr: &str,
+        data_values: &[f64],
+    ) -> DaxExpressionEvaluationResult {
+        let sum: f64 = data_values.iter().sum();
+        let val = if dax_expr.contains("DIVIDE") && !data_values.is_empty() {
+            sum / data_values.len() as f64
+        } else {
+            sum
+        };
+
+        DaxExpressionEvaluationResult {
+            measure_name: measure_name.to_string(),
+            calculated_value: val,
+            filter_context_active: dax_expr.contains("CALCULATE"),
+            dax_expression: dax_expr.to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TieredPricingResult {
+    pub product_id: String,
+    pub unit_price: f64,
+    pub total_price: f64,
+    pub discount_applied_pct: f64,
+}
+
+pub struct SovereignSalesforceCpqTieredPricingEngine;
+
+impl SovereignSalesforceCpqTieredPricingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_tiered_quote(
+        &self,
+        product_id: &str,
+        base_unit_price: f64,
+        quantity: u32,
+    ) -> TieredPricingResult {
+        let discount_pct = if quantity >= 100 {
+            0.20
+        } else if quantity >= 50 {
+            0.10
+        } else if quantity >= 10 {
+            0.05
+        } else {
+            0.0
+        };
+
+        let unit_price = base_unit_price * (1.0 - discount_pct);
+        let total_price = unit_price * (quantity as f64);
+
+        TieredPricingResult {
+            product_id: product_id.to_string(),
+            unit_price,
+            total_price,
+            discount_applied_pct: discount_pct * 100.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct OpportunityScoreResult {
+    pub opportunity_id: String,
+    pub win_probability_pct: f64,
+    pub risk_factors: Vec<String>,
+    pub recommended_next_step: String,
+}
+
+pub struct SovereignSalesforceEinsteinOpportunityScoreEngine;
+
+impl SovereignSalesforceEinsteinOpportunityScoreEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_opportunity_risk(
+        &self,
+        opp_id: &str,
+        amount: f64,
+        days_in_stage: u32,
+        has_decision_maker: bool,
+    ) -> OpportunityScoreResult {
+        let mut score: f64 = 50.0;
+        let mut risks = Vec::new();
+
+        if has_decision_maker {
+            score += 25.0;
+        } else {
+            risks.push("No key decision maker engaged".to_string());
+        }
+
+        if days_in_stage > 30 {
+            score -= 20.0;
+            risks.push(format!("Stalled in stage for {} days", days_in_stage));
+        }
+
+        if amount > 100_000.0 {
+            score += 10.0;
+        }
+
+        let probability = score.clamp(5.0, 95.0);
+        let next_step = if probability >= 70.0 {
+            "Schedule Executive Review".to_string()
+        } else {
+            "Conduct Stakeholder Alignment Meeting".to_string()
+        };
+
+        OpportunityScoreResult {
+            opportunity_id: opp_id.to_string(),
+            win_probability_pct: probability,
+            risk_factors: risks,
+            recommended_next_step: next_step,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct AmortizationScheduleEntry {
+    pub period_number: u32,
+    pub recognition_date: String,
+    pub recognized_amount: f64,
+    pub remaining_deferred_balance: f64,
+}
+
+pub struct SovereignZohoBooksDeferredRevenueEngine;
+
+impl SovereignZohoBooksDeferredRevenueEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_asc606_schedule(
+        &self,
+        contract_amount: f64,
+        total_months: u32,
+        start_date: &str,
+    ) -> Vec<AmortizationScheduleEntry> {
+        if total_months == 0 {
+            return Vec::new();
+        }
+
+        let monthly_amount = (contract_amount / total_months as f64 * 100.0).round() / 100.0;
+        let mut entries = Vec::new();
+        let mut remaining = contract_amount;
+
+        for month in 1..=total_months {
+            let current_rec = if month == total_months {
+                remaining
+            } else {
+                monthly_amount.min(remaining)
+            };
+            remaining -= current_rec;
+
+            entries.push(AmortizationScheduleEntry {
+                period_number: month,
+                recognition_date: format!("{}-m{:02}", start_date, month),
+                recognized_amount: current_rec,
+                remaining_deferred_balance: remaining.max(0.0),
+            });
+        }
+
+        entries
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TicketSlaEscalationStatus {
+    pub ticket_id: String,
+    pub remaining_time_minutes: i32,
+    pub is_breached: bool,
+    pub next_escalation_tier: String,
+}
+
+pub struct SovereignZohoDeskEscalationSlaEngine;
+
+impl SovereignZohoDeskEscalationSlaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_sla_timers(
+        &self,
+        ticket_id: &str,
+        priority: TicketPriority,
+        elapsed_minutes: i32,
+    ) -> TicketSlaEscalationStatus {
+        let max_minutes = match priority {
+            TicketPriority::Urgent => 60,
+            TicketPriority::High => 240,
+            TicketPriority::Medium => 480,
+            TicketPriority::Low => 1440,
+        };
+
+        let remaining = max_minutes - elapsed_minutes;
+        let breached = remaining <= 0;
+
+        let next_tier = if breached {
+            "VP_Support_Escalation".to_string()
+        } else if remaining < max_minutes / 4 {
+            "Tier_3_Manager_Alert".to_string()
+        } else {
+            "Standard_Queue".to_string()
+        };
+
+        TicketSlaEscalationStatus {
+            ticket_id: ticket_id.to_string(),
+            remaining_time_minutes: remaining,
+            is_breached: breached,
+            next_escalation_tier: next_tier,
+        }
+    }
+}
+
+pub struct SovereignOdooMrpWorkCenterOeeEngine;
+
+impl SovereignOdooMrpWorkCenterOeeEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_work_center_oee(
+        &self,
+        metrics: &WorkCenterOeeMetrics,
+    ) -> OeeCalculationResult {
+        let availability = if metrics.planned_production_hours > 0.0 {
+            (metrics.actual_operating_hours / metrics.planned_production_hours).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let performance = if metrics.actual_operating_hours > 0.0 && metrics.ideal_cycle_time_per_unit_sec > 0.0 {
+            let ideal_hours = (metrics.total_units_produced as f64 * metrics.ideal_cycle_time_per_unit_sec) / 3600.0;
+            (ideal_hours / metrics.actual_operating_hours).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let quality = if metrics.total_units_produced > 0 {
+            (metrics.good_units_produced as f64 / metrics.total_units_produced as f64).clamp(0.0, 1.0)
+        } else {
+            0.0
+        };
+
+        let oee = availability * performance * quality;
+
+        OeeCalculationResult {
+            availability_rate: (availability * 100.0).round() / 100.0,
+            performance_rate: (performance * 100.0).round() / 100.0,
+            quality_rate: (quality * 100.0).round() / 100.0,
+            overall_oee_pct: (oee * 100.0).round() / 100.0,
+            total_downtime_hours: (metrics.planned_production_hours - metrics.actual_operating_hours).max(0.0),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct OmnichannelRouteDecision {
+    pub conversation_id: String,
+    pub target_channel: CommunicationChannel,
+    pub assigned_agent_or_queue: String,
+    pub route_reason: String,
+}
+
+pub struct SovereignBitrix24OmnichannelRoutingEngine;
+
+impl SovereignBitrix24OmnichannelRoutingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn route_incoming_message(
+        &self,
+        msg: &OmnichannelMessage,
+    ) -> OmnichannelRouteDecision {
+        let queue = match msg.channel {
+            CommunicationChannel::Voice => "PBX_Voice_Ring_Group",
+            CommunicationChannel::LiveChat => "WebChat_Active_Agents",
+            CommunicationChannel::Email => "Helpdesk_Email_Spool",
+            CommunicationChannel::SMS => "Sms_Bot_Gateway",
+            CommunicationChannel::WhatsApp => "Social_Media_Queue",
+        };
+
+        OmnichannelRouteDecision {
+            conversation_id: msg.message_id.clone(),
+            target_channel: msg.channel.clone(),
+            assigned_agent_or_queue: queue.to_string(),
+            route_reason: format!("Routed based on channel {:?} and sender {}", msg.channel, msg.sender),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExecutiveKpiSummary {
+    pub total_kpis: usize,
+    pub overall_scorecard_index: f64,
+    pub top_performing_kpi: String,
+    pub critical_attention_kpi: String,
+}
+
+pub struct SovereignExecutiveDashboardAnalyticsEngine;
+
+impl SovereignExecutiveDashboardAnalyticsEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compute_executive_summary(&self, items: &[ExecutiveKpiItem]) -> ExecutiveKpiSummary {
+        if items.is_empty() {
+            return ExecutiveKpiSummary {
+                total_kpis: 0,
+                overall_scorecard_index: 0.0,
+                top_performing_kpi: "None".to_string(),
+                critical_attention_kpi: "None".to_string(),
+            };
+        }
+
+        let mut total_weighted = 0.0;
+        let mut total_weight = 0.0;
+        let mut best_item = &items[0];
+        let mut worst_item = &items[0];
+
+        for item in items {
+            let ratio = if item.target_value != 0.0 {
+                item.actual_value / item.target_value
+            } else {
+                1.0
+            };
+
+            total_weighted += ratio * item.weight;
+            total_weight += item.weight;
+
+            let best_ratio = if best_item.target_value != 0.0 { best_item.actual_value / best_item.target_value } else { 1.0 };
+            let worst_ratio = if worst_item.target_value != 0.0 { worst_item.actual_value / worst_item.target_value } else { 1.0 };
+
+            if ratio > best_ratio {
+                best_item = item;
+            }
+            if ratio < worst_ratio {
+                worst_item = item;
+            }
+        }
+
+        let scorecard_idx = if total_weight > 0.0 {
+            (total_weighted / total_weight) * 100.0
+        } else {
+            100.0
+        };
+
+        ExecutiveKpiSummary {
+            total_kpis: items.len(),
+            overall_scorecard_index: (scorecard_idx * 100.0).round() / 100.0,
+            top_performing_kpi: best_item.title.clone(),
+            critical_attention_kpi: worst_item.title.clone(),
+        }
+    }
+}
+
 mod sigma_types {
     pub type Result<T> = core::result::Result<T, &'static str>;
 
@@ -9697,6 +10267,124 @@ mod sigma_types {
 #[cfg(test)]
 #[cfg(test)]
 mod tests {
+
+#[test]
+fn test_expanded_enterprise_productivity_engines() {
+    // 1. Google Docs Smart Chip Metadata
+    let smart_chip_engine = SovereignGoogleDocsSmartChipMetadataEngine::new();
+    let person_chip = SmartCanvasChip {
+        label: "Alice Developer".to_string(),
+        kind: SmartCanvasChipKind::Person,
+        target_id_or_val: "alice@sigmaos.org".to_string(),
+    };
+    let hover_card = smart_chip_engine.generate_hover_card(&person_chip);
+    assert_eq!(hover_card.label, "Alice Developer");
+    assert!(hover_card.is_interactive);
+
+    // 2. Google Sheets Array Formula Spill
+    let array_formula_engine = SovereignGoogleSheetsCustomArrayFormulaEngine::new();
+    let spill_grid = array_formula_engine.evaluate_matrix_spill(
+        "=ARRAYFORMULA(A1:B2 * 2)",
+        "C1",
+        vec![vec![1.0, 2.0], vec![3.0, 4.0]],
+    );
+    assert_eq!(spill_grid.rows, 2);
+    assert_eq!(spill_grid.cols, 2);
+    assert!(!spill_grid.is_spill_blocked);
+
+    // 3. Google Looker Studio Data Blending Model
+    let looker_blend_engine = SovereignGoogleLookerStudioBlendedDataModelEngine::new();
+    let primary = vec![("US".to_string(), 100.0), ("EU".to_string(), 200.0)];
+    let secondary = vec![("US".to_string(), 50.0), ("APAC".to_string(), 75.0)];
+    let blended = looker_blend_engine.blend_data_sources(&primary, &secondary, "Revenue", "AdSpend");
+    assert_eq!(blended.len(), 3);
+
+    // 4. Microsoft 365 OT Conflict Resolver
+    let ot_resolver = SovereignMicrosoft365CoauthoringConflictResolverEngine::new();
+    let op_a = CoauthorOperation { op_kind: CoauthorOpKind::Insert { position: 0, text: "Hello".to_string() }, site_id: 1, vector_clock: 10 };
+    let op_b = CoauthorOperation { op_kind: CoauthorOpKind::Insert { position: 0, text: "World".to_string() }, site_id: 1, vector_clock: 10 };
+    let ot_res = ot_resolver.resolve_concurrent_ops(&op_a, &op_b);
+    assert!(ot_res.is_conflict);
+    assert_eq!(ot_res.transformed_op.vector_clock, 11);
+
+    // 5. Microsoft Power BI DAX Engine
+    let dax_engine = SovereignMicrosoftPowerBiDaxEngine::new();
+    let dax_res = dax_engine.evaluate_dax_measure("Total Revenue", "CALCULATE(SUM(Sales))", &[100.0, 250.0, 150.0]);
+    assert_eq!(dax_res.calculated_value, 500.0);
+    assert!(dax_res.filter_context_active);
+
+    // 6. Salesforce CPQ Tiered Pricing Engine
+    let cpq_engine = SovereignSalesforceCpqTieredPricingEngine::new();
+    let quote = cpq_engine.calculate_tiered_quote("PROD-001", 100.0, 60);
+    assert_eq!(quote.discount_applied_pct, 10.0);
+    assert_eq!(quote.total_price, 5400.0);
+
+    // 7. Salesforce Einstein Opportunity Score Engine
+    let einstein_opp = SovereignSalesforceEinsteinOpportunityScoreEngine::new();
+    let opp_res = einstein_opp.evaluate_opportunity_risk("OPP-2026", 150000.0, 15, true);
+    assert!(opp_res.win_probability_pct >= 70.0);
+
+    // 8. Zoho Books Deferred Revenue ASC 606 Engine
+    let deferred_rev_engine = SovereignZohoBooksDeferredRevenueEngine::new();
+    let schedule = deferred_rev_engine.generate_asc606_schedule(12000.0, 12, "2026-01-01");
+    assert_eq!(schedule.len(), 12);
+    assert_eq!(schedule[0].recognized_amount, 1000.0);
+
+    // 9. Zoho Desk SLA Escalation Engine
+    let desk_sla = SovereignZohoDeskEscalationSlaEngine::new();
+    let sla_status = desk_sla.evaluate_sla_timers("TICK-9090", TicketPriority::Urgent, 75);
+    assert!(sla_status.is_breached);
+    assert_eq!(sla_status.next_escalation_tier, "VP_Support_Escalation");
+
+    // 10. Odoo MRP Work Center OEE Engine
+    let oee_engine = SovereignOdooMrpWorkCenterOeeEngine::new();
+    let metrics = WorkCenterOeeMetrics {
+        planned_production_hours: 8.0,
+        actual_operating_hours: 7.5,
+        ideal_cycle_time_per_unit_sec: 10.0,
+        total_units_produced: 2500,
+        good_units_produced: 2450,
+    };
+    let oee = oee_engine.calculate_work_center_oee(&metrics);
+    assert!(oee.overall_oee_pct > 0.0);
+
+    // 11. Bitrix24 Omnichannel Routing Engine
+    let routing_engine = SovereignBitrix24OmnichannelRoutingEngine::new();
+    let msg = OmnichannelMessage {
+        message_id: "MSG-1001".to_string(),
+        customer_id: "CUST-55".to_string(),
+        channel: CommunicationChannel::LiveChat,
+        sender: "Customer A".to_string(),
+        content: "Need help with order".to_string(),
+        timestamp: 1700000000,
+        priority: 3,
+    };
+    let route = routing_engine.route_incoming_message(&msg);
+    assert_eq!(route.assigned_agent_or_queue, "WebChat_Active_Agents");
+
+    // 12. Executive Dashboard Analytics Engine
+    let exec_engine = SovereignExecutiveDashboardAnalyticsEngine::new();
+    let kpis = vec![
+        ExecutiveKpiItem {
+            kpi_id: "KPI-1".to_string(),
+            title: "ARR Growth".to_string(),
+            target_value: 1000000.0,
+            actual_value: 1200000.0,
+            weight: 0.5,
+        },
+        ExecutiveKpiItem {
+            kpi_id: "KPI-2".to_string(),
+            title: "Net Margin".to_string(),
+            target_value: 0.20,
+            actual_value: 0.15,
+            weight: 0.5,
+        },
+    ];
+    let summary = exec_engine.compute_executive_summary(&kpis);
+    assert_eq!(summary.total_kpis, 2);
+    assert_eq!(summary.top_performing_kpi, "ARR Growth");
+}
+
     use super::*;
 
     #[test]
