@@ -50,6 +50,7 @@ pub mod sigmadevice;
 pub mod sigmadhcp;
 pub mod sigmadiskmanager;
 pub mod sigmadiskusage;
+pub mod sigmadisplaymanager;
 pub mod sigmadns;
 pub mod sigmadrivermanager;
 pub mod sigmaeffect;
@@ -152,6 +153,7 @@ pub mod task_manager;
 pub mod task_scheduler;
 pub mod update_manager;
 pub mod user_manager;
+pub mod sigmausermanager;
 
 // SigmaOS System Utilities Module
 // System-level utilities and tools
@@ -859,4 +861,14 @@ pub use sigmaupdatemanager2::{
 pub use sigmabackupmanager::{
     BackupJob, BackupSchedule, BackupStatus, BackupType, CompressionType, SigmaBackupManager,
     add_backup, get_sigmabackupmanager, get_sigmabackupmanager_mut, init_sigmabackupmanager,
+};
+
+pub use sigmausermanager::{
+    ShellType, UserAccount, UserGroup, UserStatus, UserType, SigmaUserManager,
+    add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager,
+};
+
+pub use sigmadisplaymanager::{
+    DisplayOutput, LoginSettings, Resolution, SigmaDisplayManager,
+    add_output, get_sigmadisplaymanager, get_sigmadisplaymanager_mut, init_sigmadisplaymanager,
 };
