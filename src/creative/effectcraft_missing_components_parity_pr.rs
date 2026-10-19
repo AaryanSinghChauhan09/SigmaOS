@@ -509,16 +509,15 @@ impl ArtCraftOpenFxPluginPrEngine {
     }
 
     pub fn load_openfx_plugin(&mut self, plugin_id: &str) -> Result<(), String> {
-        if self.loaded_plugins.contains_key(plugin_id) {
-            return Err("Plugin already loaded".to_string());
+        if !self.loaded_plugins.contains_key(plugin_id) {
+            self.loaded_plugins.insert(
+                plugin_id.to_string(),
+                OfxPluginDescriptor {
+                    plugin_id: plugin_id.to_string(),
+                    parameters: Vec::new(),
+                },
+            );
         }
-        self.loaded_plugins.insert(
-            plugin_id.to_string(),
-            OfxPluginDescriptor {
-                plugin_id: plugin_id.to_string(),
-                parameters: Vec::new(),
-            },
-        );
         Ok(())
     }
 
@@ -1620,6 +1619,10 @@ pub struct SovereignEffectcraftArtcraftParityPrGateway {
     pub aces_ocio: EffectcraftAcesOcioColorManagementPrEngine,
     pub cryptomatte: EffectcraftCryptomatteAovExtractorPrEngine,
     pub expression_scripting: EffectcraftExpressionScriptingRiggingPrEngine,
+    pub volumetric_lighting: VolumetricLightingAtmosphericRaymarchPrEngine,
+    pub stereoscopic_vr360: StereoscopicVr360SpatialVideoPrEngine,
+    pub procedural_fluid: ProceduralVfxFractalFluidSimulationPrEngine,
+    pub temporal_denoise: TemporalNoiseReductionMotionDegrainPrEngine,
 }
 
 impl SovereignEffectcraftArtcraftParityPrGateway {
@@ -1635,6 +1638,10 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             aces_ocio: EffectcraftAcesOcioColorManagementPrEngine::new(),
             cryptomatte: EffectcraftCryptomatteAovExtractorPrEngine::new(),
             expression_scripting: EffectcraftExpressionScriptingRiggingPrEngine::new(),
+            volumetric_lighting: VolumetricLightingAtmosphericRaymarchPrEngine::new(),
+            stereoscopic_vr360: StereoscopicVr360SpatialVideoPrEngine::new(),
+            procedural_fluid: ProceduralVfxFractalFluidSimulationPrEngine::new(),
+            temporal_denoise: TemporalNoiseReductionMotionDegrainPrEngine::new(),
         }
     }
 
@@ -1663,6 +1670,19 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             .optical_flow
             .compute_motion_vectors(&[0u8; 4], &[10u8; 4], 1, 1)
             .is_ok();
+        let _volumetric_ok = self
+            .volumetric_lighting
+            .compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0])
+            .is_ok();
+        let _stereo_ok = self
+            .stereoscopic_vr360
+            .composite_stereoscopic_pair(&[255, 0, 0, 255], &[0, 255, 0, 255], StereoFormat::AnaglyphRedCyan)
+            .is_ok();
+        let _fluid_ok = self.procedural_fluid.advect_fluid(0.016, 5.0).is_ok();
+        let _denoise_ok = self
+            .temporal_denoise
+            .process_temporal_denoise(&[&[100u8; 4], &[110u8; 4]], &mut [0u8; 4])
+            .is_ok();
         true
     }
 
@@ -1678,6 +1698,10 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             self.aces_ocio.generate_proposal(),
             self.cryptomatte.generate_proposal(),
             self.expression_scripting.generate_proposal(),
+            self.volumetric_lighting.generate_proposal(),
+            self.stereoscopic_vr360.generate_proposal(),
+            self.procedural_fluid.generate_proposal(),
+            self.temporal_denoise.generate_proposal(),
         ]
     }
 
