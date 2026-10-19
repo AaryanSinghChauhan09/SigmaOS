@@ -1,73 +1,65 @@
 ## Summary
 
-<!-- One paragraph: what changed and why. -->
+<!-- What scheduler behavior changed and why? -->
 
-## Component
+## Scheduler component
 
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
+- [ ] Scheduler core
+- [ ] Run queue / PID allocation
+- [ ] fork / clone
+- [ ] exec
+- [ ] Scheduler / run queue
+- [ ] Context switch
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Changes (What SigmaOS adopts)
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly scheduler audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- Reference study (Upstream study) -->
+<!-- What SigmaOS adopts -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
+
+## Changes
 
 -
+-
 
-## Motivation
+## Scheduler safety review
 
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
-
-## Reference study (Upstream study)
-
-<!-- Required for lifecycle, ABI, storage, or scheduling changes -->
-
-## What SigmaOS adopts
-
-## Implementation notes
-
-<!-- Design decisions, data structures, locking, error handling. -->
-
-## Tests
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
-
-## Verification
-
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
-
-Paste relevant output below.
-
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] No runtime integration yet
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-reap prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Reviewer checklist
 
@@ -79,37 +71,27 @@ Paste relevant output below.
 - [ ] Feature status updated
 - [ ] No unsupported compatibility claim
 
-## Kernel safety review
+## Evidence
 
-- [ ] Lock ordering documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Scheduler benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
-## Safety and rollback
+## Status updates
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Process documentation
+- [ ] Boot matrix, if applicable
 
-## Safety and rollback
+## Risks and rollback
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Package scripts sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Component rules are enforceable
-- [ ] Tests cover the rules
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported Linux/BSD parity claims
+- Risk:
+- Rollback:
