@@ -845,7 +845,7 @@ pub use sigmadisplaymanager::{
     SigmaDisplayManager,
 };
 
-pub use sigmanotificationmanager {
+pub use sigmanotificationmanager::{
     add_notification, get_sigmanotificationmanager, get_sigmanotificationmanager_mut,
     init_sigmanotificationmanager, SigmaNotificationManager,
 };
@@ -865,7 +865,7 @@ pub use sigmafilesystemmanager::{
     init_sigmafilesystemmanager, SigmaFileSystemManager,
 };
 
-pub use sigmasecuritymanager {
+pub use sigmasecuritymanager::{
     add_firewall_rule, get_sigmasecuritymanager, get_sigmasecuritymanager_mut,
     init_sigmasecuritymanager, SigmaSecurityManager,
 };
