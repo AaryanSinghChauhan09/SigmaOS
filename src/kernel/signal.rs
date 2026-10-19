@@ -28,37 +28,37 @@ use core::sync::atomic::{AtomicU64, Ordering};
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum Signal {
-    SIGHUP = 1,     // Hangup
-    SIGINT = 2,     // Interrupt (Ctrl+C)
-    SIGQUIT = 3,    // Quit
-    SIGILL = 4,     // Illegal instruction
-    SIGTRAP = 5,    // Trace trap
-    SIGABRT = 6,    // Abort
-    SIGBUS = 7,     // Bus error
-    SIGFPE = 8,     // Floating point exception
-    SIGKILL = 9,    // Kill (cannot be caught)
-    SIGUSR1 = 10,   // User-defined signal 1
-    SIGSEGV = 11,   // Segmentation fault
-    SIGUSR2 = 12,   // User-defined signal 2
-    SIGPIPE = 13,   // Broken pipe
-    SIGALRM = 14,   // Alarm clock
-    SIGTERM = 15,   // Termination
+    SIGHUP = 1,    // Hangup
+    SIGINT = 2,    // Interrupt (Ctrl+C)
+    SIGQUIT = 3,   // Quit
+    SIGILL = 4,    // Illegal instruction
+    SIGTRAP = 5,   // Trace trap
+    SIGABRT = 6,   // Abort
+    SIGBUS = 7,    // Bus error
+    SIGFPE = 8,    // Floating point exception
+    SIGKILL = 9,   // Kill (cannot be caught)
+    SIGUSR1 = 10,  // User-defined signal 1
+    SIGSEGV = 11,  // Segmentation fault
+    SIGUSR2 = 12,  // User-defined signal 2
+    SIGPIPE = 13,  // Broken pipe
+    SIGALRM = 14,  // Alarm clock
+    SIGTERM = 15,  // Termination
     SIGSTKFLT = 16, // Stack fault
-    SIGCHLD = 17,   // Child stopped or terminated
-    SIGCONT = 18,   // Continue if stopped
-    SIGSTOP = 19,   // Stop (cannot be caught)
-    SIGTSTP = 20,   // Terminal stop (Ctrl+Z)
-    SIGTTIN = 21,   // Background read from terminal
-    SIGTTOU = 22,   // Background write to terminal
-    SIGURG = 23,    // Urgent condition on socket
-    SIGXCPU = 24,   // CPU time limit exceeded
-    SIGXFSZ = 25,   // File size limit exceeded
+    SIGCHLD = 17,  // Child stopped or terminated
+    SIGCONT = 18,  // Continue if stopped
+    SIGSTOP = 19,  // Stop (cannot be caught)
+    SIGTSTP = 20,  // Terminal stop (Ctrl+Z)
+    SIGTTIN = 21,  // Background read from terminal
+    SIGTTOU = 22,  // Background write to terminal
+    SIGURG = 23,   // Urgent condition on socket
+    SIGXCPU = 24,  // CPU time limit exceeded
+    SIGXFSZ = 25,  // File size limit exceeded
     SIGVTALRM = 26, // Virtual alarm clock
-    SIGPROF = 27,   // Profiling alarm clock
-    SIGWINCH = 28,  // Window size change
-    SIGIO = 29,     // I/O now possible
-    SIGPWR = 30,    // Power failure
-    SIGSYS = 31,    // Bad system call
+    SIGPROF = 27,  // Profiling alarm clock
+    SIGWINCH = 28, // Window size change
+    SIGIO = 29,    // I/O now possible
+    SIGPWR = 30,   // Power failure
+    SIGSYS = 31,   // Bad system call
 }
 
 impl Signal {

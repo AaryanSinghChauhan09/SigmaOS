@@ -2,6 +2,7 @@
 /// Manages insmod/modprobe, symbol resolution, alias DB, and module signing.
 ///
 /// Standard library (std, libc) are fully authorized per SigmaOS policy.
+
 use std::collections::{HashMap, HashSet};
 use std::fmt;
 
@@ -97,9 +98,7 @@ pub struct AliasDatabase {
 
 impl AliasDatabase {
     pub fn new() -> Self {
-        let mut db = AliasDatabase {
-            entries: HashMap::new(),
-        };
+        let mut db = AliasDatabase { entries: HashMap::new() };
         // Pre-populate with common aliases (simplified)
         db.add_alias("pci:v00008086d*", "e1000e");
         db.add_alias("pci:v00001022d*", "amd_iommu");
@@ -109,10 +108,7 @@ impl AliasDatabase {
     }
 
     pub fn add_alias(&mut self, pattern: &str, module: &str) {
-        self.entries
-            .entry(pattern.to_string())
-            .or_default()
-            .push(module.to_string());
+        self.entries.entry(pattern.to_string()).or_default().push(module.to_string());
     }
 
     pub fn lookup(&self, modalias: &str) -> Vec<String> {
@@ -142,12 +138,7 @@ impl SigmaKmodLoader {
     }
 
     /// Load a module (simulated insmod)
-    pub fn insmod(
-        &mut self,
-        name: &str,
-        size_bytes: u64,
-        signature: ModuleSignature,
-    ) -> Result<(), String> {
+    pub fn insmod(&mut self, name: &str, size_bytes: u64, signature: ModuleSignature) -> Result<(), String> {
         if self.config.is_blacklisted(name) {
             return Err(format!("module '{}' is blacklisted", name));
         }
@@ -157,10 +148,7 @@ impl SigmaKmodLoader {
         if self.loaded.contains_key(name) {
             return Err(format!("module '{}' already loaded", name));
         }
-        let mut module = KernelModule::new(
-            name,
-            &format!("{}/{}.ko", self.config.module_base_path, name),
-        );
+        let mut module = KernelModule::new(name, &format!("{}/{}.ko", self.config.module_base_path, name));
         module.size_bytes = size_bytes;
         module.state = ModuleState::Live;
         module.signature = signature;
@@ -170,15 +158,9 @@ impl SigmaKmodLoader {
 
     /// Remove a module (simulated rmmod)
     pub fn rmmod(&mut self, name: &str) -> Result<(), String> {
-        let module = self
-            .loaded
-            .get(name)
-            .ok_or(format!("module '{}' not loaded", name))?;
+        let module = self.loaded.get(name).ok_or(format!("module '{}' not loaded", name))?;
         if module.use_count > 0 {
-            return Err(format!(
-                "module '{}' is in use (refcount={})",
-                name, module.use_count
-            ));
+            return Err(format!("module '{}' is in use (refcount={})", name, module.use_count));
         }
         self.loaded.remove(name);
         Ok(())
@@ -225,9 +207,7 @@ mod tests {
     #[test]
     fn test_double_insmod_fails() {
         let mut loader = SigmaKmodLoader::new();
-        loader
-            .insmod("kvm", 262144, ModuleSignature::Unsigned)
-            .unwrap();
+        loader.insmod("kvm", 262144, ModuleSignature::Unsigned).unwrap();
         let result = loader.insmod("kvm", 262144, ModuleSignature::Unsigned);
         assert!(result.is_err());
     }
@@ -235,9 +215,7 @@ mod tests {
     #[test]
     fn test_rmmod_success() {
         let mut loader = SigmaKmodLoader::new();
-        loader
-            .insmod("loop", 32768, ModuleSignature::Unsigned)
-            .unwrap();
+        loader.insmod("loop", 32768, ModuleSignature::Unsigned).unwrap();
         let result = loader.rmmod("loop");
         assert!(result.is_ok());
         assert!(!loader.loaded.contains_key("loop"));

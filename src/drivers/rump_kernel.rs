@@ -4,10 +4,7 @@
 // Also includes BFS (BeOS File System) live attribute queries.
 
 use std::collections::HashMap;
-use std::sync::{
-    atomic::{AtomicU32, AtomicU64, Ordering},
-    Arc, Mutex,
-};
+use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicU64, Ordering}};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Rump Kernel ABI (minimal kernel interface exposed to userland drivers)
@@ -17,7 +14,7 @@ pub trait RumpKernelAbi: Send + Sync {
     fn kmem_alloc(&self, size: usize) -> Option<u64>; // returns virtual address
     fn kmem_free(&self, addr: u64, size: usize);
     fn kprintf(&self, msg: &str);
-    fn mutex_init(&self) -> u32; // returns mutex handle
+    fn mutex_init(&self) -> u32;  // returns mutex handle
     fn mutex_lock(&self, handle: u32) -> bool;
     fn mutex_unlock(&self, handle: u32);
     fn cv_signal(&self, handle: u32);
@@ -45,16 +42,12 @@ impl RumpKernelSim {
         }
     }
 
-    pub fn alloc_log(&self) -> Vec<String> {
-        self.log.lock().unwrap().clone()
-    }
+    pub fn alloc_log(&self) -> Vec<String> { self.log.lock().unwrap().clone() }
 }
 
 impl RumpKernelAbi for RumpKernelSim {
     fn kmem_alloc(&self, size: usize) -> Option<u64> {
-        let addr = self
-            .next_addr
-            .fetch_add((size + 0xF & !0xF) as u64, Ordering::SeqCst);
+        let addr = self.next_addr.fetch_add((size + 0xF & !0xF) as u64, Ordering::SeqCst);
         self.heap.lock().unwrap().insert(addr, size);
         Some(addr)
     }
@@ -67,12 +60,8 @@ impl RumpKernelAbi for RumpKernelSim {
         self.log.lock().unwrap().push(msg.into());
     }
 
-    fn mutex_init(&self) -> u32 {
-        self.next_mutex.fetch_add(1, Ordering::SeqCst)
-    }
-    fn mutex_lock(&self, _: u32) -> bool {
-        true
-    }
+    fn mutex_init(&self) -> u32 { self.next_mutex.fetch_add(1, Ordering::SeqCst) }
+    fn mutex_lock(&self, _: u32) -> bool { true }
     fn mutex_unlock(&self, _: u32) {}
     fn cv_signal(&self, _: u32) {}
     fn cv_wait(&self, _: u32) {}
@@ -89,10 +78,7 @@ impl RumpKernelAbi for RumpKernelSim {
     fn pci_write_config(&self, _: u8, _: u8, _: u8, _: u8, _: u32) {}
 
     fn intr_establish(&self, irq: u32, handler: &str) -> bool {
-        self.log
-            .lock()
-            .unwrap()
-            .push(format!("irq {} → {}", irq, handler));
+        self.log.lock().unwrap().push(format!("irq {} → {}", irq, handler));
         true
     }
 }
@@ -102,13 +88,7 @@ impl RumpKernelAbi for RumpKernelSim {
 // ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum RumpDriverState {
-    Loaded,
-    Init,
-    Running,
-    Faulted,
-    Unloaded,
-}
+pub enum RumpDriverState { Loaded, Init, Running, Faulted, Unloaded }
 
 pub struct RumpDriverProcess {
     pub name: String,
@@ -138,27 +118,21 @@ impl RumpDriverProcess {
 
     /// Initialize the driver (calls driver_attach equivalent)
     pub fn init(&mut self) -> Result<(), &'static str> {
-        self.kernel
-            .kprintf(&format!("rump: loading driver {}", self.name));
+        self.kernel.kprintf(&format!("rump: loading driver {}", self.name));
 
         // Probe PCI (simulated)
         let vendor_device = self.kernel.pci_read_config(0, 0, 0, 0);
-        self.kernel
-            .kprintf(&format!("rump: pci probe 0x{:08X}", vendor_device));
+        self.kernel.kprintf(&format!("rump: pci probe 0x{:08X}", vendor_device));
 
         // Allocate DMA-capable memory
         if let Some(addr) = self.kernel.kmem_alloc(65536) {
             self.mem_allocations.push(addr);
-            self.kernel
-                .kprintf(&format!("rump: dma buf @ 0x{:016X}", addr));
+            self.kernel.kprintf(&format!("rump: dma buf @ 0x{:016X}", addr));
         }
 
         // Establish IRQ handler
         let irq = 11;
-        if self
-            .kernel
-            .intr_establish(irq, &format!("{}_intr", self.name))
-        {
+        if self.kernel.intr_establish(irq, &format!("{}_intr", self.name)) {
             self.irq = Some(irq);
         }
 
@@ -172,15 +146,13 @@ impl RumpDriverProcess {
             self.kernel.kmem_free(addr, 65536);
         }
         self.state = RumpDriverState::Unloaded;
-        self.kernel
-            .kprintf(&format!("rump: driver {} detached", self.name));
+        self.kernel.kprintf(&format!("rump: driver {} detached", self.name));
     }
 
     /// Simulate a driver fault (triggers rump sandbox crash isolation)
     pub fn simulate_fault(&mut self) {
         self.state = RumpDriverState::Faulted;
-        self.kernel
-            .kprintf(&format!("rump: driver {} faulted (isolated)", self.name));
+        self.kernel.kprintf(&format!("rump: driver {} faulted (isolated)", self.name));
     }
 }
 
@@ -195,10 +167,7 @@ pub struct RumpHostBridge {
 
 impl RumpHostBridge {
     pub fn new(kernel: Arc<dyn RumpKernelAbi>) -> Self {
-        RumpHostBridge {
-            drivers: Vec::new(),
-            kernel,
-        }
+        RumpHostBridge { drivers: Vec::new(), kernel }
     }
 
     pub fn load_driver(&mut self, name: &str, class: &str) -> usize {
@@ -215,10 +184,7 @@ impl RumpHostBridge {
     }
 
     pub fn running_count(&self) -> usize {
-        self.drivers
-            .iter()
-            .filter(|d| d.state == RumpDriverState::Running)
-            .count()
+        self.drivers.iter().filter(|d| d.state == RumpDriverState::Running).count()
     }
 }
 
@@ -238,27 +204,9 @@ pub enum AttrValue {
 }
 
 impl AttrValue {
-    pub fn as_str(&self) -> Option<&str> {
-        if let AttrValue::Str(s) = self {
-            Some(s)
-        } else {
-            None
-        }
-    }
-    pub fn as_int64(&self) -> Option<i64> {
-        if let AttrValue::Int64(n) = self {
-            Some(*n)
-        } else {
-            None
-        }
-    }
-    pub fn as_float(&self) -> Option<f64> {
-        if let AttrValue::Float(f) = self {
-            Some(*f)
-        } else {
-            None
-        }
-    }
+    pub fn as_str(&self) -> Option<&str> { if let AttrValue::Str(s) = self { Some(s) } else { None } }
+    pub fn as_int64(&self) -> Option<i64> { if let AttrValue::Int64(n) = self { Some(*n) } else { None } }
+    pub fn as_float(&self) -> Option<f64> { if let AttrValue::Float(f) = self { Some(*f) } else { None } }
 }
 
 #[derive(Debug, Clone)]
@@ -273,24 +221,12 @@ pub struct BfsInode {
 
 impl BfsInode {
     pub fn new(ino: u64, name: &str) -> Self {
-        BfsInode {
-            ino,
-            name: name.into(),
-            size: 0,
-            mime_type: "application/octet-stream".into(),
-            attrs: HashMap::new(),
-        }
+        BfsInode { ino, name: name.into(), size: 0, mime_type: "application/octet-stream".into(), attrs: HashMap::new() }
     }
 
-    pub fn set_attr(&mut self, key: &str, val: AttrValue) {
-        self.attrs.insert(key.into(), val);
-    }
-    pub fn get_attr(&self, key: &str) -> Option<&AttrValue> {
-        self.attrs.get(key)
-    }
-    pub fn remove_attr(&mut self, key: &str) {
-        self.attrs.remove(key);
-    }
+    pub fn set_attr(&mut self, key: &str, val: AttrValue) { self.attrs.insert(key.into(), val); }
+    pub fn get_attr(&self, key: &str) -> Option<&AttrValue> { self.attrs.get(key) }
+    pub fn remove_attr(&mut self, key: &str) { self.attrs.remove(key); }
 }
 
 /// BFS query predicate
@@ -299,39 +235,40 @@ pub enum QueryPredicate {
     Eq(String, AttrValue),
     Gt(String, AttrValue),
     Lt(String, AttrValue),
-    Contains(String, String), // attr_name, substring
+    Contains(String, String),   // attr_name, substring
     HasAttr(String),
     And(Box<QueryPredicate>, Box<QueryPredicate>),
-    Or(Box<QueryPredicate>, Box<QueryPredicate>),
+    Or(Box<QueryPredicate>,  Box<QueryPredicate>),
     Not(Box<QueryPredicate>),
 }
 
 impl QueryPredicate {
     pub fn matches(&self, inode: &BfsInode) -> bool {
         match self {
-            QueryPredicate::Eq(attr, val) => inode
-                .get_attr(attr)
-                .map(|v| format!("{:?}", v) == format!("{:?}", val))
-                .unwrap_or(false),
-            QueryPredicate::Gt(attr, val) => match (inode.get_attr(attr), val) {
-                (Some(AttrValue::Int64(a)), AttrValue::Int64(b)) => a > b,
-                (Some(AttrValue::Float(a)), AttrValue::Float(b)) => a > b,
-                _ => false,
-            },
-            QueryPredicate::Lt(attr, val) => match (inode.get_attr(attr), val) {
-                (Some(AttrValue::Int64(a)), AttrValue::Int64(b)) => a < b,
-                (Some(AttrValue::Float(a)), AttrValue::Float(b)) => a < b,
-                _ => false,
-            },
-            QueryPredicate::Contains(attr, substr) => inode
-                .get_attr(attr)
-                .and_then(|v| v.as_str())
-                .map(|s| s.contains(substr.as_str()))
-                .unwrap_or(false),
+            QueryPredicate::Eq(attr, val) => {
+                inode.get_attr(attr).map(|v| format!("{:?}", v) == format!("{:?}", val)).unwrap_or(false)
+            }
+            QueryPredicate::Gt(attr, val) => {
+                match (inode.get_attr(attr), val) {
+                    (Some(AttrValue::Int64(a)), AttrValue::Int64(b)) => a > b,
+                    (Some(AttrValue::Float(a)), AttrValue::Float(b)) => a > b,
+                    _ => false,
+                }
+            }
+            QueryPredicate::Lt(attr, val) => {
+                match (inode.get_attr(attr), val) {
+                    (Some(AttrValue::Int64(a)), AttrValue::Int64(b)) => a < b,
+                    (Some(AttrValue::Float(a)), AttrValue::Float(b)) => a < b,
+                    _ => false,
+                }
+            }
+            QueryPredicate::Contains(attr, substr) => {
+                inode.get_attr(attr).and_then(|v| v.as_str()).map(|s| s.contains(substr.as_str())).unwrap_or(false)
+            }
             QueryPredicate::HasAttr(attr) => inode.attrs.contains_key(attr),
             QueryPredicate::And(a, b) => a.matches(inode) && b.matches(inode),
-            QueryPredicate::Or(a, b) => a.matches(inode) || b.matches(inode),
-            QueryPredicate::Not(p) => !p.matches(inode),
+            QueryPredicate::Or(a, b)  => a.matches(inode) || b.matches(inode),
+            QueryPredicate::Not(p)    => !p.matches(inode),
         }
     }
 }
@@ -344,11 +281,7 @@ pub struct BfsVolume {
 
 impl BfsVolume {
     pub fn new(name: &str) -> Self {
-        BfsVolume {
-            name: name.into(),
-            inodes: HashMap::new(),
-            next_ino: AtomicU64::new(2),
-        }
+        BfsVolume { name: name.into(), inodes: HashMap::new(), next_ino: AtomicU64::new(2) }
     }
 
     pub fn create_file(&mut self, name: &str) -> u64 {
@@ -358,26 +291,17 @@ impl BfsVolume {
     }
 
     pub fn set_attr(&mut self, ino: u64, key: &str, val: AttrValue) -> bool {
-        self.inodes
-            .get_mut(&ino)
-            .map(|i| i.set_attr(key, val))
-            .is_some()
+        self.inodes.get_mut(&ino).map(|i| i.set_attr(key, val)).is_some()
     }
 
     /// Live query: find all files matching the predicate
     /// In real BFS, attributes are indexed in a separate B-Tree for O(log n) queries
     pub fn query(&self, predicate: &QueryPredicate) -> Vec<&BfsInode> {
-        self.inodes
-            .values()
-            .filter(|i| predicate.matches(i))
-            .collect()
+        self.inodes.values().filter(|i| predicate.matches(i)).collect()
     }
 
     pub fn query_count(&self, predicate: &QueryPredicate) -> usize {
-        self.inodes
-            .values()
-            .filter(|i| predicate.matches(i))
-            .count()
+        self.inodes.values().filter(|i| predicate.matches(i)).count()
     }
 }
 
@@ -436,14 +360,8 @@ mod tests {
         vol.set_attr(ino, "META:author", AttrValue::Str("Alice".into()));
 
         let inode = vol.inodes.get(&ino).unwrap();
-        assert_eq!(
-            inode.get_attr("META:rating").and_then(|v| v.as_int64()),
-            Some(5)
-        );
-        assert_eq!(
-            inode.get_attr("META:author").and_then(|v| v.as_str()),
-            Some("Alice")
-        );
+        assert_eq!(inode.get_attr("META:rating").and_then(|v| v.as_int64()), Some(5));
+        assert_eq!(inode.get_attr("META:author").and_then(|v| v.as_str()), Some("Alice"));
     }
 
     #[test]
@@ -474,14 +392,8 @@ mod tests {
 
         // Query: lang == "Rust" AND size > 3000
         let q = QueryPredicate::And(
-            Box::new(QueryPredicate::Eq(
-                "META:lang".into(),
-                AttrValue::Str("Rust".into()),
-            )),
-            Box::new(QueryPredicate::Gt(
-                "META:size".into(),
-                AttrValue::Int64(3000),
-            )),
+            Box::new(QueryPredicate::Eq("META:lang".into(), AttrValue::Str("Rust".into()))),
+            Box::new(QueryPredicate::Gt("META:size".into(), AttrValue::Int64(3000))),
         );
         let count = vol.query_count(&q);
         assert_eq!(count, 2); // files 4 and 5 (4000, 5000)
@@ -491,11 +403,7 @@ mod tests {
     fn test_bfs_contains_query() {
         let mut vol = BfsVolume::new("email");
         let ino = vol.create_file("email001.eml");
-        vol.set_attr(
-            ino,
-            "MAIL:subject",
-            AttrValue::Str("Meeting notes for Q4".into()),
-        );
+        vol.set_attr(ino, "MAIL:subject", AttrValue::Str("Meeting notes for Q4".into()));
         let q = QueryPredicate::Contains("MAIL:subject".into(), "Q4".into());
         assert_eq!(vol.query_count(&q), 1);
     }

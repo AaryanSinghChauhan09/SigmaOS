@@ -44,12 +44,7 @@ impl LinuxAdvancedSchedulerMemoryPrEngine {
     }
 
     /// Evaluate MGLRU (Multi-Generational LRU) page generation progression.
-    pub fn step_mglru_generation(
-        &self,
-        current_gen: u8,
-        max_gens: u8,
-        memory_pressure: bool,
-    ) -> u8 {
+    pub fn step_mglru_generation(&self, current_gen: u8, max_gens: u8, memory_pressure: bool) -> u8 {
         if memory_pressure {
             (current_gen + 1) % max_gens
         } else {
@@ -58,12 +53,7 @@ impl LinuxAdvancedSchedulerMemoryPrEngine {
     }
 
     /// Validate `io_uring 3.0` zero-copy Submission Queue (SQ) & Completion Queue (CQ) ring buffers.
-    pub fn validate_io_uring_sqpoll_ring(
-        &self,
-        sq_entries: u32,
-        cq_entries: u32,
-        flags: u32,
-    ) -> bool {
+    pub fn validate_io_uring_sqpoll_ring(&self, sq_entries: u32, cq_entries: u32, flags: u32) -> bool {
         sq_entries.is_power_of_two() && cq_entries >= sq_entries && (flags & 0x0002) != 0
     }
 
@@ -101,11 +91,7 @@ impl FreeBsdCapabilitiesVnetPrEngine {
     }
 
     /// Validate Capsicum rights bitmask restriction derivation.
-    pub fn derive_sub_capability(
-        &self,
-        parent_rights: u64,
-        requested_rights: u64,
-    ) -> Result<u64, &'static str> {
+    pub fn derive_sub_capability(&self, parent_rights: u64, requested_rights: u64) -> Result<u64, &'static str> {
         if (parent_rights & requested_rights) == requested_rights {
             Ok(requested_rights)
         } else {
@@ -199,11 +185,7 @@ impl DragonFlyNetBsdSubsystemsPrEngine {
     }
 
     /// Validate NetBSD Veriexec cryptographic file signature match (SHA256).
-    pub fn verify_veriexec_signature(
-        &self,
-        file_hash: &[u8; 32],
-        expected_hash: &[u8; 32],
-    ) -> bool {
+    pub fn verify_veriexec_signature(&self, file_hash: &[u8; 32], expected_hash: &[u8; 32]) -> bool {
         file_hash == expected_hash
     }
 
@@ -241,11 +223,7 @@ impl IllumosCrossbowZonePrEngine {
     }
 
     /// Calculate Crossbow VNIC bandwidth allocation token bucket rate in Mbps.
-    pub fn calculate_crossbow_flow_rate(
-        &self,
-        bandwidth_limit_mbps: u32,
-        current_tokens: u32,
-    ) -> u32 {
+    pub fn calculate_crossbow_flow_rate(&self, bandwidth_limit_mbps: u32, current_tokens: u32) -> u32 {
         bandwidth_limit_mbps.min(current_tokens)
     }
 
@@ -324,22 +302,10 @@ impl SovereignKernelOpenSourceDistroInnovationsPrGateway {
 
         for p in self.pr_database.values() {
             md.push_str(&alloc::format!("### PR #{}: {}\n", p.pr_id, p.pr_title));
-            md.push_str(&alloc::format!(
-                "- **Target Subsystem**: {}\n",
-                p.target_subsystem
-            ));
-            md.push_str(&alloc::format!(
-                "- **Inspiration Source**: {}\n",
-                p.source_os_inspiration
-            ));
-            md.push_str(&alloc::format!(
-                "- **Security Level**: {}\n",
-                p.security_isolation_level
-            ));
-            md.push_str(&alloc::format!(
-                "- **Performance Impact**: {}\n",
-                p.performance_impact
-            ));
+            md.push_str(&alloc::format!("- **Target Subsystem**: {}\n", p.target_subsystem));
+            md.push_str(&alloc::format!("- **Inspiration Source**: {}\n", p.source_os_inspiration));
+            md.push_str(&alloc::format!("- **Security Level**: {}\n", p.security_isolation_level));
+            md.push_str(&alloc::format!("- **Performance Impact**: {}\n", p.performance_impact));
             md.push_str(&alloc::format!("- **PQC Signed**: {}\n", p.is_pqc_signed));
             md.push_str("- **Components Implemented**:\n");
             for c in &p.components_implemented {

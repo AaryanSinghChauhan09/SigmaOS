@@ -436,33 +436,15 @@ impl OpenSourceOsMissingComponentsV48PrSuite {
 
     pub fn calculate_v48_deployment_score(&self) -> u32 {
         let mut score = 0;
-        if self.eevdf_rt.verify_rt_bandwidth() {
-            score += 11;
-        }
-        if self.capsicum_tls.verify_security_posture() {
-            score += 11;
-        }
-        if self.fineibt_kmsan.verify_cfi_integrity() {
-            score += 11;
-        }
-        if self.rump_pci.verify_rump_isolation() {
-            score += 11;
-        }
-        if self.hammer2_cluster.verify_cluster_quorum() {
-            score += 11;
-        }
-        if self.zfs_dtrace.verify_zfs_dtrace_health() {
-            score += 11;
-        }
-        if self.befs_query.verify_query_engine() {
-            score += 11;
-        }
-        if self.plan9_plumber.verify_plumber_router() {
-            score += 11;
-        }
-        if self.redox_scheme.verify_scheme_broker() {
-            score += 12;
-        }
+        if self.eevdf_rt.verify_rt_bandwidth() { score += 11; }
+        if self.capsicum_tls.verify_security_posture() { score += 11; }
+        if self.fineibt_kmsan.verify_cfi_integrity() { score += 11; }
+        if self.rump_pci.verify_rump_isolation() { score += 11; }
+        if self.hammer2_cluster.verify_cluster_quorum() { score += 11; }
+        if self.zfs_dtrace.verify_zfs_dtrace_health() { score += 11; }
+        if self.befs_query.verify_query_engine() { score += 11; }
+        if self.plan9_plumber.verify_plumber_router() { score += 11; }
+        if self.redox_scheme.verify_scheme_broker() { score += 12; }
         score
     }
 }

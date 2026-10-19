@@ -694,10 +694,7 @@ impl Ring3TransitionManager {
     }
 
     /// Prepare user-space memory mapping for Ring 3 transition
-    pub fn prepare_user_memory(
-        &self,
-        mem_mgr: &mut AddressSpaceSeparationManager,
-    ) -> Result<(), &'static str> {
+    pub fn prepare_user_memory(&self, mem_mgr: &mut AddressSpaceSeparationManager) -> Result<(), &'static str> {
         // Map user stack as user-accessible
         for offset in (0..self.user_stack_size).step_by(4096) {
             let vaddr = self.user_stack_base + offset;

@@ -26,22 +26,22 @@ pub type MbufPtr = u64;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct Mbuf {
-    pub buf_addr: u64,       // Virtual address of data buffer
-    pub buf_physaddr: u64,   // Physical address of data buffer
-    pub buf_len: u16,        // Length of buffer
-    pub data_off: u16,       // Data offset
-    pub refcnt: u16,         // Reference count
-    pub nb_segs: u8,         // Number of segments
-    pub port: u8,            // Input port
-    pub ol_flags: u64,       // Offload flags
-    pub packet_type: u32,    // L2/L3/L4 packet type
-    pub pkt_len: u32,        // Total packet length
-    pub data_len: u16,       // Data length in this segment
-    pub vlan_tci: u16,       // VLAN TCI
-    pub hash: RssHash,       // RSS hash result
-    pub seqn: u32,           // Sequence number
-    pub vlan_tci_outer: u16, // Outer VLAN TCI
-    pub tx_offload: u64,     // TX offload metadata
+    pub buf_addr: u64,           // Virtual address of data buffer
+    pub buf_physaddr: u64,       // Physical address of data buffer
+    pub buf_len: u16,            // Length of buffer
+    pub data_off: u16,           // Data offset
+    pub refcnt: u16,             // Reference count
+    pub nb_segs: u8,             // Number of segments
+    pub port: u8,                // Input port
+    pub ol_flags: u64,           // Offload flags
+    pub packet_type: u32,        // L2/L3/L4 packet type
+    pub pkt_len: u32,            // Total packet length
+    pub data_len: u16,           // Data length in this segment
+    pub vlan_tci: u16,           // VLAN TCI
+    pub hash: RssHash,           // RSS hash result
+    pub seqn: u32,               // Sequence number
+    pub vlan_tci_outer: u16,     // Outer VLAN TCI
+    pub tx_offload: u64,         // TX offload metadata
 }
 
 #[repr(C)]
@@ -117,7 +117,7 @@ pub enum DeviceType {
 /// RX queue for receiving packets
 pub struct RxQueue {
     pub queue_id: u16,
-    pub nb_desc: u16, // Number of descriptors
+    pub nb_desc: u16,            // Number of descriptors
     pub rx_pkts: AtomicU64,
     pub rx_bytes: AtomicU64,
     pub rx_missed: AtomicU64,
@@ -241,14 +241,14 @@ impl EthDev {
 /// Ethernet device statistics
 #[derive(Debug, Clone, Copy, Default)]
 pub struct EthStats {
-    pub ipackets: u64,  // Total packets received
-    pub opackets: u64,  // Total packets transmitted
-    pub ibytes: u64,    // Total bytes received
-    pub obytes: u64,    // Total bytes transmitted
-    pub imissed: u64,   // Total RX missed
-    pub ierrors: u64,   // Total RX errors
-    pub oerrors: u64,   // Total TX errors
-    pub rx_nombuf: u64, // RX mbuf allocation failures
+    pub ipackets: u64,           // Total packets received
+    pub opackets: u64,           // Total packets transmitted
+    pub ibytes: u64,             // Total bytes received
+    pub obytes: u64,             // Total bytes transmitted
+    pub imissed: u64,            // Total RX missed
+    pub ierrors: u64,            // Total RX errors
+    pub oerrors: u64,            // Total TX errors
+    pub rx_nombuf: u64,          // RX mbuf allocation failures
 }
 
 /// RSS (Receive Side Scaling) configuration
@@ -256,7 +256,7 @@ pub struct EthStats {
 pub struct RssConf {
     pub rss_key: [u8; 40],
     pub rss_key_len: u8,
-    pub rss_hf: u64, // RSS hash functions
+    pub rss_hf: u64,             // RSS hash functions
 }
 
 /// RSS hash function flags
@@ -338,7 +338,9 @@ pub struct PipelineStage {
 
 impl Pipeline {
     pub fn new() -> Self {
-        Self { stages: Vec::new() }
+        Self {
+            stages: Vec::new(),
+        }
     }
 
     pub fn add_stage(&mut self, name: &[u8], handler: PacketHandler) {

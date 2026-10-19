@@ -7,9 +7,9 @@
 
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use alloc::collections::BTreeMap;
 
 /// 1. Archinstall Automated Script & Profile Engine
 #[derive(Debug, Clone)]
@@ -73,10 +73,7 @@ impl ArchSysctlHardeningConfigEngine {
         let mut sysctl_entries = BTreeMap::new();
         sysctl_entries.insert("kernel.kptr_restrict".to_string(), "2".to_string());
         sysctl_entries.insert("kernel.dmesg_restrict".to_string(), "1".to_string());
-        sysctl_entries.insert(
-            "kernel.unprivileged_bpf_disabled".to_string(),
-            "1".to_string(),
-        );
+        sysctl_entries.insert("kernel.unprivileged_bpf_disabled".to_string(), "1".to_string());
         sysctl_entries.insert("net.ipv4.tcp_syncookies".to_string(), "1".to_string());
 
         Self { sysctl_entries }
@@ -127,7 +124,7 @@ impl ArchLinuxKeyringWebOfTrustEngine {
                 "FEDCBA0987654321FEDCBA0987654321FEDCBA09".to_string(),
             ],
             package_signers: vec![
-                "Arch Linux Core Developers <arch-core@archlinux.org>".to_string()
+                "Arch Linux Core Developers <arch-core@archlinux.org>".to_string(),
             ],
         }
     }

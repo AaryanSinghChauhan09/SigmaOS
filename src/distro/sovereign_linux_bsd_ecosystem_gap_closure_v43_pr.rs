@@ -74,17 +74,10 @@ impl ClearLinuxStatelessPstatePrEngine {
         }
     }
 
-    pub fn validate_stateless_override(
-        &mut self,
-        config_path: &str,
-        content: &str,
-    ) -> Result<String, String> {
+    pub fn validate_stateless_override(&mut self, config_path: &str, content: &str) -> Result<String, String> {
         if !config_path.starts_with("/usr/share/defaults") {
             self.status = PrStatus::Rejected("Path must be in /usr/share/defaults".to_string());
-            return Err(
-                "Clear Linux stateless path error: overrides must reside under /usr/share/defaults"
-                    .to_string(),
-            );
+            return Err("Clear Linux stateless path error: overrides must reside under /usr/share/defaults".to_string());
         }
         if content.trim().is_empty() {
             self.status = PrStatus::Rejected("Content empty".to_string());
@@ -474,11 +467,7 @@ impl SolusEopkgBudgiePrEngine {
         ))
     }
 
-    pub fn send_budgie_applet_ipc_pr(
-        &mut self,
-        applet_id: &str,
-        command: &str,
-    ) -> Result<String, String> {
+    pub fn send_budgie_applet_ipc_pr(&mut self, applet_id: &str, command: &str) -> Result<String, String> {
         if applet_id.is_empty() || command.is_empty() {
             return Err("Applet ID and command required".to_string());
         }
@@ -559,10 +548,7 @@ impl SovereignLinuxBsdEcosystemGapClosureV43PrSuite {
         if let Ok(res) = self.clear_engine.set_pstate_governor_pr("performance") {
             results.push(res);
         }
-        if let Ok(res) = self
-            .opensuse_engine
-            .create_pre_post_snapshot_pr("Pre-update snapshot")
-        {
+        if let Ok(res) = self.opensuse_engine.create_pre_post_snapshot_pr("Pre-update snapshot") {
             results.push(res);
         }
         if let Ok(res) = self.kali_engine.start_anonsurf_proxy_pr() {
@@ -583,10 +569,7 @@ impl SovereignLinuxBsdEcosystemGapClosureV43PrSuite {
         if let Ok(res) = self.garuda_engine.tune_bore_scheduler_pr(2) {
             results.push(res);
         }
-        if let Ok(res) = self
-            .solus_engine
-            .apply_eopkg_delta_update_pr("desktop.budgie")
-        {
+        if let Ok(res) = self.solus_engine.apply_eopkg_delta_update_pr("desktop.budgie") {
             results.push(res);
         }
         if let Ok(res) = self.hardened_engine.audit_kernel_hardening_pr() {
@@ -613,9 +596,7 @@ mod tests {
         assert_eq!(clear.status, PrStatus::Merged);
 
         let mut opensuse = OpenSuseSnapperAutoYastPrEngine::new();
-        let res2 = opensuse
-            .create_pre_post_snapshot_pr("Test Snapshot")
-            .unwrap();
+        let res2 = opensuse.create_pre_post_snapshot_pr("Test Snapshot").unwrap();
         assert!(res2.contains("#2"));
         assert_eq!(opensuse.status, PrStatus::Validated);
     }

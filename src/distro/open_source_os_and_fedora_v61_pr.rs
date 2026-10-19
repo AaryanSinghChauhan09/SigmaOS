@@ -49,11 +49,7 @@ impl FreeBsdCapsicumVnetJailsPrEngineV61 {
         Self {
             cap_rights_mask: 0x0000_0000_0000_001F, // CAP_READ | CAP_WRITE | CAP_SEEK | CAP_FSTAT | CAP_MMAP
             vnet_jail_count: 3,
-            active_jails: vec![
-                "jail_web".to_string(),
-                "jail_db".to_string(),
-                "jail_dns".to_string(),
-            ],
+            active_jails: vec!["jail_web".to_string(), "jail_db".to_string(), "jail_dns".to_string()],
         }
     }
 
@@ -126,11 +122,7 @@ impl NetBsdRumpVeriexecPrEngineV61 {
         hashes.insert("/sbin/init".to_string(), "sha256_hash_init_v61".to_string());
         hashes.insert("/bin/sh".to_string(), "sha256_hash_sh_v61".to_string());
         Self {
-            rump_drivers: vec![
-                "rump_pci".to_string(),
-                "rump_usb".to_string(),
-                "rump_net".to_string(),
-            ],
+            rump_drivers: vec!["rump_pci".to_string(), "rump_usb".to_string(), "rump_net".to_string()],
             veriexec_enforced: true,
             signed_hashes: hashes,
         }
@@ -437,46 +429,16 @@ impl OpenSourceOsAndFedoraV61PrGateway {
 
     fn stage_all_v61_prs(&mut self) {
         let proposals = [
-            (
-                "feat(freebsd_v61) FreeBSD Capsicum Capabilities & VNET Jails Engine",
-                "freebsd_capsicum_v61",
-            ),
-            (
-                "feat(openbsd_v61) OpenBSD Pinsyscall & FineIBT Hardening Engine",
-                "openbsd_pinsyscall_v61",
-            ),
-            (
-                "feat(netbsd_v61) NetBSD Rump Drivers & Veriexec Verification Engine",
-                "netbsd_rump_v61",
-            ),
-            (
-                "feat(illumos_v61) Illumos DTrace & Crossbow Virtual Switch Engine",
-                "illumos_crossbow_v61",
-            ),
-            (
-                "feat(haiku_v61) Haiku BFS & MIME Database Registry Engine",
-                "haiku_bfs_v61",
-            ),
-            (
-                "feat(plan9_v61) Plan 9 9P2000 VFS Synthetic Namespace Engine",
-                "plan9_9p_v61",
-            ),
-            (
-                "feat(fedora_ostree_v61) Fedora DNF5 & RPM-OSTree Atomic Sysroot Engine",
-                "fedora_ostree_v61",
-            ),
-            (
-                "feat(fedora_zincati_v61) Fedora CoreOS Zincati & Ignition Provisioner Engine",
-                "fedora_zincati_v61",
-            ),
-            (
-                "feat(fedora_koji_v61) Fedora Koji & Bodhi Build Pipeline Triage Engine",
-                "fedora_koji_v61",
-            ),
-            (
-                "feat(fedora_greenboot_v61) Fedora Greenboot IoT & Firewalld DBus Rules Engine",
-                "fedora_greenboot_v61",
-            ),
+            ("feat(freebsd_v61) FreeBSD Capsicum Capabilities & VNET Jails Engine", "freebsd_capsicum_v61"),
+            ("feat(openbsd_v61) OpenBSD Pinsyscall & FineIBT Hardening Engine", "openbsd_pinsyscall_v61"),
+            ("feat(netbsd_v61) NetBSD Rump Drivers & Veriexec Verification Engine", "netbsd_rump_v61"),
+            ("feat(illumos_v61) Illumos DTrace & Crossbow Virtual Switch Engine", "illumos_crossbow_v61"),
+            ("feat(haiku_v61) Haiku BFS & MIME Database Registry Engine", "haiku_bfs_v61"),
+            ("feat(plan9_v61) Plan 9 9P2000 VFS Synthetic Namespace Engine", "plan9_9p_v61"),
+            ("feat(fedora_ostree_v61) Fedora DNF5 & RPM-OSTree Atomic Sysroot Engine", "fedora_ostree_v61"),
+            ("feat(fedora_zincati_v61) Fedora CoreOS Zincati & Ignition Provisioner Engine", "fedora_zincati_v61"),
+            ("feat(fedora_koji_v61) Fedora Koji & Bodhi Build Pipeline Triage Engine", "fedora_koji_v61"),
+            ("feat(fedora_greenboot_v61) Fedora Greenboot IoT & Firewalld DBus Rules Engine", "fedora_greenboot_v61"),
         ];
 
         for (title, comp) in proposals {
@@ -505,22 +467,15 @@ impl OpenSourceOsAndFedoraV61PrGateway {
         let msg1 = self.freebsd_capsicum.spawn_vnet_jail("jail_auth");
         assert!(msg1.contains("jail_auth"));
 
-        assert!(self
-            .openbsd_pinsyscall
-            .verify_syscall_pinning(0x7FFF0000, true));
+        assert!(self.openbsd_pinsyscall.verify_syscall_pinning(0x7FFF0000, true));
 
-        assert!(self
-            .netbsd_rump
-            .verify_executable("/sbin/init", "sha256_hash_init_v61"));
+        assert!(self.netbsd_rump.verify_executable("/sbin/init", "sha256_hash_init_v61"));
 
         let msg2 = self.illumos_crossbow.create_vnic_flow("vnic2", 5000);
         assert!(msg2.contains("5000 Mbps"));
 
         self.haiku_bfs.register_mime_type("image/png", "ShowImage");
-        assert_eq!(
-            self.haiku_bfs.mime_associations.get("image/png").unwrap(),
-            "ShowImage"
-        );
+        assert_eq!(self.haiku_bfs.mime_associations.get("image/png").unwrap(), "ShowImage");
 
         let msg3 = self.plan9_9p.mount_share("/usr", "tcp!10.0.0.1!9999");
         assert!(msg3.contains("/usr"));

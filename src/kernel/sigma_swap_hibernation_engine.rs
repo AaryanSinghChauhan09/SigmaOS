@@ -2,15 +2,16 @@
 /// Manages ZRAM swap, swsusp hibernate, and systemd sleep targets.
 ///
 /// Standard library (std, libc) are fully authorized per SigmaOS policy.
+
 use std::collections::HashMap;
 use std::fmt;
 
 /// Hibernation methods available
 #[derive(Debug, Clone, PartialEq)]
 pub enum HibernateMethod {
-    SuspendToRam,  // S2RAM (sleep)
-    SuspendToDisk, // S2Disk (hibernate, swsusp)
-    HybridSleep,   // RAM + Disk
+    SuspendToRam,    // S2RAM (sleep)
+    SuspendToDisk,   // S2Disk (hibernate, swsusp)
+    HybridSleep,     // RAM + Disk
     SuspendThenHibernate,
 }
 
@@ -126,11 +127,7 @@ impl SwapHibernationManager {
     }
 
     /// Prepare a hibernation image descriptor (does not touch disk — kernel handles actual write)
-    pub fn prepare_hibernate_image(
-        &self,
-        kernel_version: &str,
-        resume_device: &str,
-    ) -> Result<HibernationImage, &'static str> {
+    pub fn prepare_hibernate_image(&self, kernel_version: &str, resume_device: &str) -> Result<HibernationImage, &'static str> {
         if self.swap_devices.is_empty() {
             return Err("no swap device available for hibernation");
         }
@@ -192,9 +189,7 @@ mod tests {
     fn test_hibernate_image_creation() {
         let mut mgr = SwapHibernationManager::new();
         mgr.add_swap_device("/dev/nvme0n1p3", 8 * 1024 * 1024 * 1024, 0);
-        let img = mgr
-            .prepare_hibernate_image("6.6.0-sigma", "/dev/nvme0n1p3")
-            .unwrap();
+        let img = mgr.prepare_hibernate_image("6.6.0-sigma", "/dev/nvme0n1p3").unwrap();
         assert_eq!(img.resume_device, "/dev/nvme0n1p3");
         assert_eq!(img.compression, "lz4");
     }
@@ -203,9 +198,7 @@ mod tests {
     fn test_cmdline_generation() {
         let mut mgr = SwapHibernationManager::new();
         mgr.add_swap_device("/dev/nvme0n1p3", 8 * 1024 * 1024 * 1024, 0);
-        let img = mgr
-            .prepare_hibernate_image("6.6.0-sigma", "/dev/nvme0n1p3")
-            .unwrap();
+        let img = mgr.prepare_hibernate_image("6.6.0-sigma", "/dev/nvme0n1p3").unwrap();
         let cmdline = mgr.hibernate_cmdline(&img);
         assert!(cmdline.contains("resume=/dev/nvme0n1p3"));
     }

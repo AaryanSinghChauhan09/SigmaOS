@@ -2,6 +2,7 @@
 /// perf_events, PMU counters, Intel LBR/PEBS, AMD IBS, topology.
 ///
 /// Standard library (std, libc) are fully authorized per SigmaOS policy.
+
 use std::collections::HashMap;
 use std::fmt;
 
@@ -89,16 +90,14 @@ pub struct SigmaCpuPerfEngine {
 
 impl SigmaCpuPerfEngine {
     pub fn new(num_cpus: u32, paranoid_level: i32) -> Self {
-        let topology = (0..num_cpus)
-            .map(|i| CpuCore {
-                logical_id: i,
-                physical_id: i / 2,
-                core_id: i % (num_cpus / 2).max(1),
-                socket_id: 0,
-                numa_node: 0,
-                is_smt_sibling: i % 2 == 1,
-            })
-            .collect();
+        let topology = (0..num_cpus).map(|i| CpuCore {
+            logical_id: i,
+            physical_id: i / 2,
+            core_id: i % (num_cpus / 2).max(1),
+            socket_id: 0,
+            numa_node: 0,
+            is_smt_sibling: i % 2 == 1,
+        }).collect();
 
         Self {
             topology,
@@ -124,9 +123,7 @@ impl SigmaCpuPerfEngine {
     pub fn ipc(&self) -> f64 {
         let instr = self.read_counter(&PerfEventType::Instructions);
         let cycles = self.read_counter(&PerfEventType::Cycles);
-        if cycles == 0 {
-            return 0.0;
-        }
+        if cycles == 0 { return 0.0; }
         instr as f64 / cycles as f64
     }
 
@@ -134,9 +131,7 @@ impl SigmaCpuPerfEngine {
     pub fn branch_miss_rate(&self) -> f64 {
         let misses = self.read_counter(&PerfEventType::BranchMisses);
         let branches = self.read_counter(&PerfEventType::BranchInstructions);
-        if branches == 0 {
-            return 0.0;
-        }
+        if branches == 0 { return 0.0; }
         (misses as f64 / branches as f64) * 100.0
     }
 
@@ -144,16 +139,13 @@ impl SigmaCpuPerfEngine {
     pub fn cache_miss_rate(&self) -> f64 {
         let misses = self.read_counter(&PerfEventType::CacheMisses);
         let refs = self.read_counter(&PerfEventType::CacheReferences);
-        if refs == 0 {
-            return 0.0;
-        }
+        if refs == 0 { return 0.0; }
         (misses as f64 / refs as f64) * 100.0
     }
 
     /// Push an LBR entry
     pub fn push_lbr(&mut self, entry: LbrEntry) {
-        if self.lbr_stack.len() >= 32 {
-            // LBR stack depth = 32 (Intel)
+        if self.lbr_stack.len() >= 32 { // LBR stack depth = 32 (Intel)
             self.lbr_stack.remove(0);
         }
         self.lbr_stack.push(entry);
@@ -220,12 +212,7 @@ mod tests {
     fn test_lbr_stack_bounded() {
         let mut engine = SigmaCpuPerfEngine::new(4, 2);
         for i in 0..40u64 {
-            engine.push_lbr(LbrEntry {
-                from_ip: i * 16,
-                to_ip: i * 16 + 8,
-                mispredicted: false,
-                cycles: 1,
-            });
+            engine.push_lbr(LbrEntry { from_ip: i * 16, to_ip: i * 16 + 8, mispredicted: false, cycles: 1 });
         }
         assert_eq!(engine.lbr_stack.len(), 32);
     }

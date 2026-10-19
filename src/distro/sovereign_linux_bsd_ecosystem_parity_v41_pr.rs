@@ -71,15 +71,9 @@ impl ClearLinuxStatelessPowerPrEngine {
 
     pub fn verify_stateless_path_pr(&self, path: &str) -> String {
         if self.default_configs.contains_key(path) {
-            format!(
-                "PR-CLEAR-LINUX: Stateless default override found at '{}'",
-                path
-            )
+            format!("PR-CLEAR-LINUX: Stateless default override found at '{}'", path)
         } else {
-            format!(
-                "PR-CLEAR-LINUX: Path '{}' follows clean stateless defaults",
-                path
-            )
+            format!("PR-CLEAR-LINUX: Path '{}' follows clean stateless defaults", path)
         }
     }
 }
@@ -262,8 +256,7 @@ impl TailsAmnesicRamFsPrEngine {
 
     pub fn execute_shutdown_memory_wipe_pr(&mut self) -> String {
         self.volatile_ram_active = false;
-        "PR-TAILS-SHUTDOWN: RAM memory wipe sequence completed (zero-fill cold boot guard)"
-            .to_string()
+        "PR-TAILS-SHUTDOWN: RAM memory wipe sequence completed (zero-fill cold boot guard)".to_string()
     }
 }
 

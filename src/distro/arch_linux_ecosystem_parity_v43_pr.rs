@@ -163,10 +163,7 @@ pub struct ArchLinuxAlpmOrphanDbPrEngineV43 {
 impl ArchLinuxAlpmOrphanDbPrEngineV43 {
     pub fn new() -> Self {
         let mut db = BTreeMap::new();
-        db.insert(
-            "git".to_string(),
-            vec!["perl".to_string(), "curl".to_string()],
-        );
+        db.insert("git".to_string(), vec!["perl".to_string(), "curl".to_string()]);
         db.insert("liborphan".to_string(), Vec::new());
         Self { installed_pkgs: db }
     }
@@ -275,10 +272,7 @@ impl ArchLinuxPkgctlDevtoolsPrEngineV43 {
     }
 
     pub fn build_chroot_cmd(&self, pkg_name: &str, target_repo: &str) -> String {
-        format!(
-            "pkgctl build --arch x86_64 --target {}-x86_64 {}",
-            target_repo, pkg_name
-        )
+        format!("pkgctl build --arch x86_64 --target {}-x86_64 {}", target_repo, pkg_name)
     }
 }
 
@@ -430,10 +424,7 @@ impl ArchLinuxEcosystemParityV43PrSuite {
     }
 
     pub fn validate_and_process_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
-        let rec = self
-            .pr_records
-            .get_mut(&pr_id)
-            .ok_or("PR record not found")?;
+        let rec = self.pr_records.get_mut(&pr_id).ok_or("PR record not found")?;
 
         if rec.pqc_dilithium_signature.is_empty() {
             rec.status = DistroPrStatusV43::Rejected;
@@ -450,14 +441,8 @@ impl ArchLinuxEcosystemParityV43PrSuite {
         Ok(true)
     }
 
-    pub fn convert_pr_to_format(
-        &mut self,
-        pr_id: u64,
-    ) -> Result<PullRequestPackageFormat, &'static str> {
-        let rec = self
-            .pr_records
-            .get_mut(&pr_id)
-            .ok_or("PR record not found")?;
+    pub fn convert_pr_to_format(&mut self, pr_id: u64) -> Result<PullRequestPackageFormat, &'static str> {
+        let rec = self.pr_records.get_mut(&pr_id).ok_or("PR record not found")?;
 
         if rec.status != DistroPrStatusV43::Validated {
             return Err("PR must be validated before conversion");
@@ -480,10 +465,7 @@ impl ArchLinuxEcosystemParityV43PrSuite {
     }
 
     pub fn merge_arch_pr(&mut self, pr_id: u64) -> Result<bool, &'static str> {
-        let rec = self
-            .pr_records
-            .get_mut(&pr_id)
-            .ok_or("PR record not found")?;
+        let rec = self.pr_records.get_mut(&pr_id).ok_or("PR record not found")?;
 
         if rec.status != DistroPrStatusV43::ConvertedToSigPkg {
             return Err("PR must be converted to sigpkg format before merge");
@@ -536,9 +518,7 @@ mod tests {
         assert!(news.requires_intervention("python"));
 
         let pkgctl = ArchLinuxPkgctlDevtoolsPrEngineV43::new();
-        assert!(pkgctl
-            .build_chroot_cmd("yay", "extra")
-            .contains("pkgctl build"));
+        assert!(pkgctl.build_chroot_cmd("yay", "extra").contains("pkgctl build"));
 
         let collision = ArchLinuxPacmanCollisionPrEngineV43::new();
         assert_eq!(
@@ -547,9 +527,7 @@ mod tests {
         );
 
         let mkinit = ArchLinuxMkinitcpioInitramfsPrEngineV43::new();
-        assert!(mkinit
-            .generate_preset_cmd("6.8.1-arch1-1")
-            .contains("mkinitcpio -p"));
+        assert!(mkinit.generate_preset_cmd("6.8.1-arch1-1").contains("mkinitcpio -p"));
 
         let pacstrap = ArchLinuxPacstrapArchChrootPrEngineV43::new();
         assert!(pacstrap

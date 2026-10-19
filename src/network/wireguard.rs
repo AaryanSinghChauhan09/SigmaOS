@@ -83,7 +83,7 @@ pub struct WgInterface {
     /// Peers indexed by their public key
     pub peers: HashMap<[u8; 32], WgPeer>,
     /// Packets queued for transmission
-    tx_queue: Vec<(Vec<u8>, [u8; 32])>, // (packet, dest_peer_pubkey)
+    tx_queue: Vec<(Vec<u8>, [u8; 32])>,  // (packet, dest_peer_pubkey)
     /// Statistics
     pub total_encrypted_bytes: u64,
     pub total_decrypted_bytes: u64,
@@ -149,11 +149,7 @@ impl WgInterface {
 
     /// Encrypt and queue a packet for a peer.
     /// In production: uses ChaCha20-Poly1305 with the session tx key.
-    pub fn send_packet(
-        &mut self,
-        peer_pubkey: &[u8; 32],
-        plaintext: &[u8],
-    ) -> Result<usize, &'static str> {
+    pub fn send_packet(&mut self, peer_pubkey: &[u8; 32], plaintext: &[u8]) -> Result<usize, &'static str> {
         let peer = self.peers.get_mut(peer_pubkey).ok_or("Peer not found")?;
         if peer.session_state != WgSessionState::Established {
             return Err("No established session");
@@ -177,21 +173,15 @@ impl WgInterface {
     }
 
     /// Decrypt a received packet from a peer.
-    pub fn receive_packet(
-        &mut self,
-        peer_pubkey: &[u8; 32],
-        ciphertext: &[u8],
-    ) -> Result<Vec<u8>, &'static str> {
-        if ciphertext.len() < 16 {
-            return Err("Packet too short");
-        }
+    pub fn receive_packet(&mut self, peer_pubkey: &[u8; 32], ciphertext: &[u8]) -> Result<Vec<u8>, &'static str> {
+        if ciphertext.len() < 16 { return Err("Packet too short"); }
         let peer = self.peers.get_mut(peer_pubkey).ok_or("Peer not found")?;
         if peer.session_state != WgSessionState::Established {
             return Err("No established session");
         }
         let key = peer.session_rx_key.as_ref().ok_or("No rx key")?;
         // Strip 16-byte auth tag
-        let encrypted_body = &ciphertext[..ciphertext.len() - 16];
+        let encrypted_body = &ciphertext[..ciphertext.len()-16];
         let mut plaintext = encrypted_body.to_vec();
         // Simulate decryption (reverse of send_packet, using nonce=0 for simplicity)
         for (i, b) in plaintext.iter_mut().enumerate() {
@@ -209,9 +199,7 @@ impl WgInterface {
 
     /// Get peer statistics.
     pub fn peer_stats(&self, peer_pubkey: &[u8; 32]) -> Option<(u64, u64, WgSessionState)> {
-        self.peers
-            .get(peer_pubkey)
-            .map(|p| (p.bytes_sent, p.bytes_received, p.session_state))
+        self.peers.get(peer_pubkey).map(|p| (p.bytes_sent, p.bytes_received, p.session_state))
     }
 }
 
@@ -222,9 +210,7 @@ mod tests {
 
     fn make_peer_key(seed: u8) -> [u8; 32] {
         let mut k = [0u8; 32];
-        for i in 0..32 {
-            k[i] = seed.wrapping_add(i as u8);
-        }
+        for i in 0..32 { k[i] = seed.wrapping_add(i as u8); }
         k
     }
 

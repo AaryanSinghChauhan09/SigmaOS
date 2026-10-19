@@ -333,10 +333,7 @@ impl TmpfsManager {
 
     /// Create tmpfs instance
     pub fn create_instance(&self, max_size: usize) -> u64 {
-        let mut next_id = self
-            .next_instance_id
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self.next_instance_id.lock().unwrap_or_else(|e| e.into_inner());
         let instance_id = *next_id;
         *next_id += 1;
         drop(next_id);

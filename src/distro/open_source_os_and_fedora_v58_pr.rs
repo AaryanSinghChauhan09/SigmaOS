@@ -451,10 +451,7 @@ impl FedoraSelinuxContainerMcsV58PrEngine {
         let mut engine = Self {
             container_labels: BTreeMap::new(),
         };
-        engine.assign_label(
-            "container_app_v58",
-            "system_u:system_r:container_t:s0:c10,c20",
-        );
+        engine.assign_label("container_app_v58", "system_u:system_r:container_t:s0:c10,c20");
         engine
     }
 
@@ -523,10 +520,7 @@ impl FedoraMessagingAmqpBusV58PrEngine {
         let mut engine = Self {
             published_messages: Vec::new(),
         };
-        engine.publish(
-            "org.fedoraproject.prod.buildsys.task.state.change",
-            "task_5801_completed",
-        );
+        engine.publish("org.fedoraproject.prod.buildsys.task.state.change", "task_5801_completed");
         engine
     }
 
@@ -636,16 +630,9 @@ impl OpenSourceOsAndFedoraV58PrGateway {
     pub fn run_all_evaluations(&mut self) -> bool {
         assert!(self.capsicum_vnet.limit_fd_rights(4, 0b101));
         assert!(self.pinsyscall_ibt.validate_syscall(0x7fff0050));
-        assert!(self
-            .rump_veriexec
-            .verify_file("/usr/bin/tar", "sha256:e3b0c44298fc1c149afbf4c8996f"));
+        assert!(self.rump_veriexec.verify_file("/usr/bin/tar", "sha256:e3b0c44298fc1c149afbf4c8996f"));
         assert_eq!(self.dtrace_crossbow.crossbow_vnics.len(), 1);
-        assert_eq!(
-            self.haiku_bfs
-                .query_by_mime("application/x-vnd.SigmaOS-Zenith")
-                .len(),
-            1
-        );
+        assert_eq!(self.haiku_bfs.query_by_mime("application/x-vnd.SigmaOS-Zenith").len(), 1);
         assert_eq!(self.plan9_9p.mounted_9p_shares.len(), 1);
         assert_eq!(self.redox_orbital.orbital_windows, 1);
         assert_eq!(self.serenity_gui.process_events(), 1);
@@ -653,23 +640,15 @@ impl OpenSourceOsAndFedoraV58PrGateway {
         assert!(self.minix_rs.handle_driver_crash("e1000_driver"));
 
         assert_eq!(self.dnf5_daemon.install_package("htop"), 5802);
-        assert!(self
-            .ignition_zincati
-            .parse_ignition("{\"ignition\": {\"version\": \"3.4.0\"}}"));
+        assert!(self.ignition_zincati.parse_ignition("{\"ignition\": {\"version\": \"3.4.0\"}}"));
         assert_eq!(self.rpm_ostree.layered_packages.len(), 1);
-        assert_eq!(
-            self.koji_bodhi.vote_karma("sigmaos-tools-1.0.0-1.fc40", 3),
-            3
-        );
+        assert_eq!(self.koji_bodhi.vote_karma("sigmaos-tools-1.0.0-1.fc40", 3), 3);
         assert_eq!(self.selinux_mcs.container_labels.len(), 1);
         assert!(self.greenboot.run_health_checks(true));
         assert_eq!(self.mock_flatpak.mock_chroots.len(), 1);
         assert_eq!(self.messaging_bus.published_messages.len(), 1);
         assert_eq!(self.packit_copr.copr_builds.len(), 1);
-        assert_eq!(
-            self.firewalld_nft.active_zones.get("public").unwrap().len(),
-            2
-        );
+        assert_eq!(self.firewalld_nft.active_zones.get("public").unwrap().len(), 2);
 
         true
     }
@@ -708,12 +687,7 @@ mod tests {
         assert_eq!(illumos.crossbow_vnics.len(), 2);
 
         let haiku = HaikuBfsMimeQueryV58PrEngine::new();
-        assert_eq!(
-            haiku
-                .query_by_mime("application/x-vnd.SigmaOS-Zenith")
-                .len(),
-            1
-        );
+        assert_eq!(haiku.query_by_mime("application/x-vnd.SigmaOS-Zenith").len(), 1);
     }
 
     #[test]

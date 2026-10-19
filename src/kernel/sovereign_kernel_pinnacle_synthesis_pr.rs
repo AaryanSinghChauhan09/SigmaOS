@@ -21,7 +21,7 @@ pub struct PreemptRtTask {
     pub task_id: u64,
     pub name: String,
     pub rt_priority: u32, // 1 (lowest) to 99 (highest)
-    pub wcet_ns: u64,     // Worst-Case Execution Time in nanoseconds
+    pub wcet_ns: u64,      // Worst-Case Execution Time in nanoseconds
 }
 
 #[derive(Debug, Clone)]
@@ -45,8 +45,7 @@ impl SigmaPreemptRtEngine {
             rt_priority: priority.min(99),
             wcet_ns,
         });
-        self.rt_queue
-            .sort_by(|a, b| b.rt_priority.cmp(&a.rt_priority));
+        self.rt_queue.sort_by(|a, b| b.rt_priority.cmp(&a.rt_priority));
     }
 
     pub fn dispatch_highest_priority(&mut self) -> Option<PreemptRtTask> {
@@ -118,18 +117,9 @@ pub struct SigmaPsiPressureStallEngine {
 impl SigmaPsiPressureStallEngine {
     pub fn new() -> Self {
         Self {
-            cpu_pressure: PsiPressureMetrics {
-                some_pct: 1.2,
-                full_pct: 0.0,
-            },
-            memory_pressure: PsiPressureMetrics {
-                some_pct: 0.5,
-                full_pct: 0.1,
-            },
-            io_pressure: PsiPressureMetrics {
-                some_pct: 2.1,
-                full_pct: 0.4,
-            },
+            cpu_pressure: PsiPressureMetrics { some_pct: 1.2, full_pct: 0.0 },
+            memory_pressure: PsiPressureMetrics { some_pct: 0.5, full_pct: 0.1 },
+            io_pressure: PsiPressureMetrics { some_pct: 2.1, full_pct: 0.4 },
         }
     }
 
@@ -243,18 +233,12 @@ impl SovereignKernelPinnacleSynthesisPrGateway {
     }
 
     pub fn generate_pinnacle_pr_proposal(&mut self) -> PinnacleKernelPrDescriptor {
-        self.preempt_rt
-            .schedule_rt_task(1, "audio_dsp_thread", 90, 50_000);
-        let _ =
-            self.ksm_engine
-                .register_page(101, b"identical_anonymous_memory_payload", 0x1000_0000);
-        let _ =
-            self.ksm_engine
-                .register_page(102, b"identical_anonymous_memory_payload", 0x2000_0000);
+        self.preempt_rt.schedule_rt_task(1, "audio_dsp_thread", 90, 50_000);
+        let _ = self.ksm_engine.register_page(101, b"identical_anonymous_memory_payload", 0x1000_0000);
+        let _ = self.ksm_engine.register_page(102, b"identical_anonymous_memory_payload", 0x2000_0000);
 
         self.ftrace_engine.trace_call("sys_read", 1000, 150);
-        self.jails_engine
-            .create_jail(1, "secure_container_jail", "/jails/app1", "10.0.0.50");
+        self.jails_engine.create_jail(1, "secure_container_jail", "/jails/app1", "10.0.0.50");
 
         let title = String::from("feat(kernel): Implement Sovereign Pinnacle Kernel Innovations Parity Engine & PQC Gateway");
         let desc = format!(
@@ -262,9 +246,7 @@ impl SovereignKernelPinnacleSynthesisPrGateway {
             self.ksm_engine.pages_deduplicated
         );
 
-        let pqc_sig = String::from(
-            "DILITHIUM5_SIG_8c7b6a5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b",
-        );
+        let pqc_sig = String::from("DILITHIUM5_SIG_8c7b6a5f4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b");
 
         PinnacleKernelPrDescriptor {
             pr_id: String::from("PR-KERNEL-PINNACLE-2026-V3"),

@@ -85,11 +85,7 @@ pub struct ArchLinuxPacmanConfParserPrEngineV43 {
 impl ArchLinuxPacmanConfParserPrEngineV43 {
     pub fn new() -> Self {
         Self {
-            repositories: vec![
-                "core".to_string(),
-                "extra".to_string(),
-                "multilib".to_string(),
-            ],
+            repositories: vec!["core".to_string(), "extra".to_string(), "multilib".to_string()],
             color_enabled: true,
             parallel_downloads: 5,
         }
@@ -164,11 +160,7 @@ impl ArchLinuxArchisoCustomImagePrEngineV43 {
     pub fn new(profile_name: &str) -> Self {
         Self {
             profile_name: profile_name.to_string(),
-            packages_included: vec![
-                "base".to_string(),
-                "linux".to_string(),
-                "linux-firmware".to_string(),
-            ],
+            packages_included: vec!["base".to_string(), "linux".to_string(), "linux-firmware".to_string()],
         }
     }
 
@@ -177,10 +169,7 @@ impl ArchLinuxArchisoCustomImagePrEngineV43 {
     }
 
     pub fn build_iso_command(&self) -> String {
-        format!(
-            "mkarchiso -v -w /tmp/archiso-tmp -o /out /usr/share/archiso/configs/{}",
-            self.profile_name
-        )
+        format!("mkarchiso -v -w /tmp/archiso-tmp -o /out /usr/share/archiso/configs/{}", self.profile_name)
     }
 }
 
@@ -314,12 +303,7 @@ impl ArchLinuxAdvancementsV43MasterSuite {
         }
     }
 
-    pub fn submit_arch_pr(
-        &mut self,
-        title: &str,
-        author: &str,
-        component: &str,
-    ) -> ArchPrPackageV43 {
+    pub fn submit_arch_pr(&mut self, title: &str, author: &str, component: &str) -> ArchPrPackageV43 {
         let id = self.next_pr_id;
         self.next_pr_id += 1;
         let pr = ArchPrPackageV43 {
@@ -402,16 +386,9 @@ mod tests {
     #[test]
     fn test_master_suite_v43() {
         let mut suite = ArchLinuxAdvancementsV43MasterSuite::new();
-        let pr = suite.submit_arch_pr(
-            "feat(pacman): ALPM v7 dynamic hook triggers",
-            "Aaryan",
-            "pacman",
-        );
+        let pr = suite.submit_arch_pr("feat(pacman): ALPM v7 dynamic hook triggers", "Aaryan", "pacman");
         assert_eq!(pr.status, ArchPrStatusV43::Submitted);
         assert!(suite.validate_and_merge_pr(pr.pr_id));
-        assert_eq!(
-            suite.pr_store.get(&pr.pr_id).unwrap().status,
-            ArchPrStatusV43::Merged
-        );
+        assert_eq!(suite.pr_store.get(&pr.pr_id).unwrap().status, ArchPrStatusV43::Merged);
     }
 }

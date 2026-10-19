@@ -128,10 +128,7 @@ impl MountNamespace {
             flags,
             options,
         )));
-        mount_point
-            .lock()
-            .unwrap_or_else(|e| e.into_inner())
-            .mount();
+        mount_point.lock().unwrap_or_else(|e| e.into_inner()).mount();
 
         self.mounts.insert(target, mount_point);
         Ok(())

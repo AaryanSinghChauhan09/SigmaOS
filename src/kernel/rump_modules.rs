@@ -426,6 +426,7 @@ mod tests {
     }
 
     #[ignore]
+
     #[test]
     fn test_priority_ordering() {
         let mut loader = RumpModuleLoader::new();

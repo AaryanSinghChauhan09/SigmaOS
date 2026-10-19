@@ -209,10 +209,7 @@ impl OverlayManager {
 
     /// Create a new overlay filesystem
     pub fn create_overlay(&self, config: OverlayConfig) -> u64 {
-        let mut next_id = self
-            .next_overlay_id
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self.next_overlay_id.lock().unwrap_or_else(|e| e.into_inner());
         let overlay_id = *next_id;
         *next_id += 1;
         drop(next_id);

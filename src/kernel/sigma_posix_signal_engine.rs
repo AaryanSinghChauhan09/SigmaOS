@@ -2,6 +2,7 @@
 /// Manages sigaction disposition tables, RT signal queuing, and per-thread masks.
 ///
 /// Standard library (std, libc) are fully authorized per SigmaOS policy.
+
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -26,8 +27,8 @@ pub struct SigQueueEntry {
 #[derive(Debug)]
 pub struct SigmaSignalState {
     pub dispositions: HashMap<i32, SigDisposition>,
-    pub pending_mask: u64, // bitmask of pending signals
-    pub blocked_mask: u64, // sigprocmask
+    pub pending_mask: u64,    // bitmask of pending signals
+    pub blocked_mask: u64,    // sigprocmask
     pub rt_queue: Vec<SigQueueEntry>,
     pub sa_restart_flags: u64, // bitmask of signals with SA_RESTART
 }
@@ -53,12 +54,7 @@ impl SigmaSignalState {
     }
 
     /// Install a signal disposition (analogous to sigaction(2))
-    pub fn set_disposition(
-        &mut self,
-        signo: i32,
-        disposition: SigDisposition,
-        sa_restart: bool,
-    ) -> Result<(), &'static str> {
+    pub fn set_disposition(&mut self, signo: i32, disposition: SigDisposition, sa_restart: bool) -> Result<(), &'static str> {
         if signo < 1 || signo > 64 {
             return Err("invalid signal number");
         }
@@ -79,9 +75,9 @@ impl SigmaSignalState {
     pub fn update_mask(&mut self, how: u8, mask: u64) -> u64 {
         let old = self.blocked_mask;
         match how {
-            0 => self.blocked_mask |= mask,  // SIG_BLOCK
-            1 => self.blocked_mask &= !mask, // SIG_UNBLOCK
-            2 => self.blocked_mask = mask,   // SIG_SETMASK
+            0 => self.blocked_mask |= mask,   // SIG_BLOCK
+            1 => self.blocked_mask &= !mask,  // SIG_UNBLOCK
+            2 => self.blocked_mask = mask,    // SIG_SETMASK
             _ => {}
         }
         old
@@ -102,17 +98,13 @@ impl SigmaSignalState {
 
     /// Dequeue the highest priority pending RT signal
     pub fn dequeue_rt_signal(&mut self) -> Option<SigQueueEntry> {
-        if self.rt_queue.is_empty() {
-            return None;
-        }
+        if self.rt_queue.is_empty() { return None; }
         Some(self.rt_queue.remove(0))
     }
 
     /// Check if signal is currently blocked
     pub fn is_blocked(&self, signo: i32) -> bool {
-        if signo < 1 || signo > 64 {
-            return false;
-        }
+        if signo < 1 || signo > 64 { return false; }
         (self.blocked_mask >> (signo - 1)) & 1 == 1
     }
 
@@ -175,10 +167,7 @@ mod tests {
         let mut state = SigmaSignalState::new();
         let result = state.set_disposition(10, SigDisposition::Handler(0xdeadbeef), true);
         assert!(result.is_ok());
-        assert_eq!(
-            *state.dispositions.get(&10).unwrap(),
-            SigDisposition::Handler(0xdeadbeef)
-        );
+        assert_eq!(*state.dispositions.get(&10).unwrap(), SigDisposition::Handler(0xdeadbeef));
         assert!(state.sa_restart_flags & (1 << 9) != 0);
     }
 
@@ -201,22 +190,8 @@ mod tests {
     #[test]
     fn test_rt_signal_queue_ordering() {
         let mut state = SigmaSignalState::new();
-        state
-            .enqueue_rt_signal(SigQueueEntry {
-                signo: 34,
-                priority: 2,
-                sender_pid: 100,
-                value: 0,
-            })
-            .unwrap();
-        state
-            .enqueue_rt_signal(SigQueueEntry {
-                signo: 35,
-                priority: 1,
-                sender_pid: 101,
-                value: 0,
-            })
-            .unwrap();
+        state.enqueue_rt_signal(SigQueueEntry { signo: 34, priority: 2, sender_pid: 100, value: 0 }).unwrap();
+        state.enqueue_rt_signal(SigQueueEntry { signo: 35, priority: 1, sender_pid: 101, value: 0 }).unwrap();
         let first = state.dequeue_rt_signal().unwrap();
         assert_eq!(first.priority, 1); // higher priority first
     }

@@ -117,11 +117,11 @@ impl UniversalMultiFormatPackageInspectorV60 {
             match buffer[0..4] {
                 [0x21, 0x3C, 0x61, 0x72] => detected_format == PackageFormat::Deb, // "!arch" (.deb)
                 [0xED, 0xAB, 0xEE, 0xDB] => detected_format == PackageFormat::Rpm, // RPM magic
-                [0x28, 0xB5, 0x2F, 0xFD] => true, // Zstd magic (.pkg.tar.zst)
-                [0xFD, 0x37, 0x7A, 0x58] => true, // XZ magic
-                [0x1F, 0x8B, _, _] => true,       // Gzip magic
-                [0x7F, 0x45, 0x4C, 0x46] => true, // ELF binary (AppImage/Snap)
-                [0x50, 0x4B, 0x03, 0x04] => true, // Zip (APK/Jar/Nupkg/Wheel)
+                [0x28, 0xB5, 0x2F, 0xFD] => true,                                  // Zstd magic (.pkg.tar.zst)
+                [0xFD, 0x37, 0x7A, 0x58] => true,                                  // XZ magic
+                [0x1F, 0x8B, _, _] => true,                                        // Gzip magic
+                [0x7F, 0x45, 0x4C, 0x46] => true,                                  // ELF binary (AppImage/Snap)
+                [0x50, 0x4B, 0x03, 0x04] => true,                                  // Zip (APK/Jar/Nupkg/Wheel)
                 _ => false,
             }
         } else {
@@ -192,26 +192,14 @@ impl CrossDistroSatDependencySolverV60 {
         // ELF SONAME mappings
         symbol_map.insert("libc.so.6".to_string(), "sovereign-libc".to_string());
         symbol_map.insert("libssl.so.3".to_string(), "sovereign-openssl".to_string());
-        symbol_map.insert(
-            "libcrypto.so.3".to_string(),
-            "sovereign-openssl".to_string(),
-        );
+        symbol_map.insert("libcrypto.so.3".to_string(), "sovereign-openssl".to_string());
         symbol_map.insert("libz.so.1".to_string(), "sovereign-zlib".to_string());
-        symbol_map.insert(
-            "libzstd.so.1".to_string(),
-            "sovereign-compression".to_string(),
-        );
+        symbol_map.insert("libzstd.so.1".to_string(), "sovereign-compression".to_string());
         symbol_map.insert("libpthread.so.0".to_string(), "sovereign-libc".to_string());
         symbol_map.insert("libm.so.6".to_string(), "sovereign-libc".to_string());
         symbol_map.insert("libdl.so.2".to_string(), "sovereign-libc".to_string());
-        symbol_map.insert(
-            "libwayland-client.so.0".to_string(),
-            "sovereign-graphics".to_string(),
-        );
-        symbol_map.insert(
-            "libvulkan.so.1".to_string(),
-            "sovereign-graphics".to_string(),
-        );
+        symbol_map.insert("libwayland-client.so.0".to_string(), "sovereign-graphics".to_string());
+        symbol_map.insert("libvulkan.so.1".to_string(), "sovereign-graphics".to_string());
 
         Self {
             solver_invocations: 0,
@@ -234,10 +222,7 @@ impl CrossDistroSatDependencySolverV60 {
             "sovereign-compression".to_string()
         } else if lower.contains("python") {
             "sovereign-python".to_string()
-        } else if lower.contains("systemd")
-            || lower.contains("openrc")
-            || lower.contains("sysvinit")
-        {
+        } else if lower.contains("systemd") || lower.contains("openrc") || lower.contains("sysvinit") {
             "sovereign-init".to_string()
         } else if lower.contains("wayland") || lower.contains("x11") || lower.contains("mesa") {
             "sovereign-graphics".to_string()
@@ -246,13 +231,7 @@ impl CrossDistroSatDependencySolverV60 {
         } else if lower.contains("ffmpeg") || lower.contains("pipewire") || lower.contains("alsa") {
             "sovereign-media-engine".to_string()
         } else {
-            format!(
-                "sovereign-{}",
-                lower
-                    .replace("lib", "")
-                    .replace("-dev", "")
-                    .replace("-devel", "")
-            )
+            format!("sovereign-{}", lower.replace("lib", "").replace("-dev", "").replace("-devel", ""))
         }
     }
 
@@ -560,12 +539,7 @@ impl UniversalPmCliRouterV60 {
 
         let pm = parts[0];
         let action = parts.get(1).copied().unwrap_or("");
-        let pkgs = parts
-            .get(2..)
-            .unwrap_or(&[])
-            .iter()
-            .map(|s| s.to_string())
-            .collect();
+        let pkgs = parts.get(2..).unwrap_or(&[]).iter().map(|s| s.to_string()).collect();
 
         let mapped_action = match pm {
             "apt" | "apt-get" => match action {
@@ -660,9 +634,7 @@ impl SovereignDistroPackageAdvancementsSuiteV60 {
             BootEnvBackendV60::FreeBsdBectlZfs,
         );
 
-        let route = self
-            .cli_router
-            .route_foreign_cli_command("apt install curl");
+        let route = self.cli_router.route_foreign_cli_command("apt install curl");
 
         inspect_res.magic_bytes_matched
             && sat_res.is_ok()
@@ -784,10 +756,7 @@ mod tests {
     fn test_cross_distro_sat_solver_v60() {
         let mut solver = CrossDistroSatDependencySolverV60::new();
         assert_eq!(solver.map_canonical_package("libc.so.6"), "sovereign-libc");
-        assert_eq!(
-            solver.map_canonical_package("libssl-dev"),
-            "sovereign-openssl"
-        );
+        assert_eq!(solver.map_canonical_package("libssl-dev"), "sovereign-openssl");
 
         let clause = DependencySatClauseV60 {
             package_name: "libz.so.1".to_string(),
@@ -820,8 +789,10 @@ mod tests {
     #[test]
     fn test_boot_env_snapshot_governor_v60() {
         let mut gov = UniversalBootEnvSnapshotGovernorV60::new();
-        let snap_id =
-            gov.create_pre_transaction_snapshot("pre-upgrade", BootEnvBackendV60::FreeBsdBectlZfs);
+        let snap_id = gov.create_pre_transaction_snapshot(
+            "pre-upgrade",
+            BootEnvBackendV60::FreeBsdBectlZfs,
+        );
         assert_eq!(snap_id, 1);
         assert!(gov.rollback_to_snapshot(snap_id).is_ok());
     }

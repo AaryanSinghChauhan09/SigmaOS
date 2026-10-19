@@ -164,8 +164,7 @@ impl OpenBsdPinsyscallUnveilShadowV58PrEngine {
     }
 
     pub fn unveil_path(&mut self, path: &str, permissions: &str) {
-        self.unveiled_paths
-            .insert(path.to_string(), permissions.to_string());
+        self.unveiled_paths.insert(path.to_string(), permissions.to_string());
     }
 
     pub fn verify_syscall(&self, sys_num: u32) -> bool {
@@ -404,9 +403,7 @@ impl DebianDpkgTriggersDeferredExecutionV58PrEngine {
     }
 
     pub fn activate_trigger(&mut self, trigger_name: &str) {
-        if self.registered_triggers.contains_key(trigger_name)
-            && !self.pending_triggers.contains(&trigger_name.to_string())
-        {
+        if self.registered_triggers.contains_key(trigger_name) && !self.pending_triggers.contains(&trigger_name.to_string()) {
             self.pending_triggers.push(trigger_name.to_string());
         }
     }
@@ -526,16 +523,8 @@ impl DebianLintianStaticAnalysisV58PrEngine {
         let mut engine = Self {
             check_tags: Vec::new(),
         };
-        engine.register_tag(
-            "no-copyright-file",
-            "error",
-            "Package lacks debian/copyright",
-        );
-        engine.register_tag(
-            "hardening-no-relro",
-            "warning",
-            "Binary is missing RELRO flags",
-        );
+        engine.register_tag("no-copyright-file", "error", "Package lacks debian/copyright");
+        engine.register_tag("hardening-no-relro", "warning", "Binary is missing RELRO flags");
         engine
     }
 
@@ -712,33 +701,24 @@ impl OpenSourceOsDebianUnimplementedIdeasV58PrSuite {
         let processed = self.dpkg_triggers.process_deferred_triggers();
         assert_eq!(processed, 1);
 
-        assert!(self
-            .apt_pqc_keyring
-            .verify_inrelease_signature("SIGMA-PQC-KEY-2026-PRIMARY"));
+        assert!(self.apt_pqc_keyring.verify_inrelease_signature("SIGMA-PQC-KEY-2026-PRIMARY"));
 
         assert_eq!(
             self.debconf_db.get_value("sigma-desktop/theme").unwrap(),
             "Sovereign-Dark"
         );
 
-        let lintian_issues = self
-            .lintian_static
-            .run_checks_on_package("sigma-legacy-app");
+        let lintian_issues = self.lintian_static.run_checks_on_package("sigma-legacy-app");
         assert_eq!(lintian_issues.len(), 1);
 
-        let buildd_msg = self
-            .buildd_sbuild
-            .start_cleanroom_build("sigma-core_1.0.dsc");
+        let buildd_msg = self.buildd_sbuild.start_cleanroom_build("sigma-core_1.0.dsc");
         assert!(buildd_msg.contains("sbuild"));
 
         true
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.submissions
-            .values()
-            .filter(|s| s.status == OsPrStatusV58::Merged)
-            .count()
+        self.submissions.values().filter(|s| s.status == OsPrStatusV58::Merged).count()
     }
 }
 

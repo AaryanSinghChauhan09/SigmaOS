@@ -167,10 +167,7 @@ impl SovereignUefiMemoryMapHandoffEngine {
         let conventional_pages: u64 = self
             .memory_map
             .iter()
-            .filter(|d| {
-                d.memory_type == EfiMemoryType::EfiConventionalMemory
-                    || d.memory_type == EfiMemoryType::EfiBootServicesData
-            })
+            .filter(|d| d.memory_type == EfiMemoryType::EfiConventionalMemory || d.memory_type == EfiMemoryType::EfiBootServicesData)
             .map(|d| d.number_of_pages)
             .sum();
 
@@ -198,8 +195,7 @@ impl SovereignUefiRuntimeServicesEngine {
     }
 
     pub fn set_variable(&mut self, name: &str, value: &[u8]) {
-        self.nvram_variables
-            .insert(String::from(name), value.to_vec());
+        self.nvram_variables.insert(String::from(name), value.to_vec());
     }
 
     pub fn get_variable(&self, name: &str) -> Option<&[u8]> {
@@ -220,11 +216,7 @@ impl SovereignUefiAcpiRsdpEngine {
         }
     }
 
-    pub fn discover_rsdp(
-        &mut self,
-        raw_scan_bytes: &[u8],
-        base_address: u64,
-    ) -> Result<u64, &'static str> {
+    pub fn discover_rsdp(&mut self, raw_scan_bytes: &[u8], base_address: u64) -> Result<u64, &'static str> {
         if raw_scan_bytes.len() < 36 {
             return Err("ACPI: Scan memory buffer too small for RSDP structure");
         }
@@ -275,23 +267,12 @@ impl SovereignUefiLongModeBootPrGateway {
     }
 
     pub fn generate_uefi_pr_proposal(&mut self) -> UefiLongModePrDescriptor {
-        let gop = self
-            .gop_engine
-            .set_optimal_gop_mode(0xE000_0000, 1920, 1080)
-            .unwrap();
-        self.memory_handoff_engine.insert_descriptor(
-            EfiMemoryType::EfiConventionalMemory,
-            0x0010_0000,
-            262144,
-        );
-        let free_bytes = self
-            .memory_handoff_engine
-            .exit_boot_services(0x2026_0001)
-            .unwrap();
+        let gop = self.gop_engine.set_optimal_gop_mode(0xE000_0000, 1920, 1080).unwrap();
+        self.memory_handoff_engine.insert_descriptor(EfiMemoryType::EfiConventionalMemory, 0x0010_0000, 262144);
+        let free_bytes = self.memory_handoff_engine.exit_boot_services(0x2026_0001).unwrap();
 
         self.runtime_services_engine.set_virtual_address_map();
-        self.runtime_services_engine
-            .set_variable("SecureBootState", &[0x01]);
+        self.runtime_services_engine.set_variable("SecureBootState", &[0x01]);
 
         let mut sample_rsdp = [0u8; 64];
         sample_rsdp[0..8].copy_from_slice(&ACPI_RSDP_SIGNATURE);
@@ -306,9 +287,7 @@ impl SovereignUefiLongModeBootPrGateway {
             free_bytes / (1024 * 1024)
         );
 
-        let pqc_sig = String::from(
-            "DILITHIUM5_SIG_6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b",
-        );
+        let pqc_sig = String::from("DILITHIUM5_SIG_6a5b4c3d2e1f0a9b8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b");
 
         UefiLongModePrDescriptor {
             pr_id: String::from("PR-BOOT-UEFI-LONGMODE-2026-V5"),
@@ -333,14 +312,10 @@ mod tests {
 
     #[test]
     fn test_uefi_system_table_validation() {
-        let valid = SovereignUefiBootServicesEngine::validate_system_table(
-            EFI_SYSTEM_TABLE_SIGNATURE,
-            0x7FFF_1000,
-        );
+        let valid = SovereignUefiBootServicesEngine::validate_system_table(EFI_SYSTEM_TABLE_SIGNATURE, 0x7FFF_1000);
         assert!(valid.is_ok());
 
-        let invalid =
-            SovereignUefiBootServicesEngine::validate_system_table(0x1234_5678, 0x7FFF_1000);
+        let invalid = SovereignUefiBootServicesEngine::validate_system_table(0x1234_5678, 0x7FFF_1000);
         assert!(invalid.is_err());
     }
 
@@ -380,10 +355,7 @@ mod tests {
         let mut rt = SovereignUefiRuntimeServicesEngine::new();
         assert!(rt.set_virtual_address_map());
         rt.set_variable("SigmaBootMode", b"UEFI_LONG_MODE");
-        assert_eq!(
-            rt.get_variable("SigmaBootMode"),
-            Some(&b"UEFI_LONG_MODE"[..])
-        );
+        assert_eq!(rt.get_variable("SigmaBootMode"), Some(&b"UEFI_LONG_MODE"[..]));
 
         let mut acpi = SovereignUefiAcpiRsdpEngine::new();
         let mut sample_rsdp = [0u8; 64];

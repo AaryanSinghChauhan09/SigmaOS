@@ -150,10 +150,7 @@ impl SemaphoreManager {
         drop(next_id);
 
         let set = SemaphoreSet::new(set_id, key);
-        let mut sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         sets.insert(set_id, set);
 
         set_id
@@ -161,19 +158,13 @@ impl SemaphoreManager {
 
     /// Get a semaphore set by ID
     pub fn get_semaphore_set(&self, set_id: u64) -> Option<SemaphoreSet> {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         sets.get(&set_id).cloned()
     }
 
     /// Remove a semaphore set
     pub fn remove_semaphore_set(&self, set_id: u64) -> Result<(), String> {
-        let mut sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.remove(&set_id) {
             Some(_) => Ok(()),
             None => Err(format!("Semaphore set {} not found", set_id)),
@@ -187,10 +178,7 @@ impl SemaphoreManager {
         initial_value: i32,
         max_value: i32,
     ) -> Result<u64, String> {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => Ok(set.create_semaphore(initial_value, max_value)),
             None => Err(format!("Semaphore set {} not found", set_id)),
@@ -199,10 +187,7 @@ impl SemaphoreManager {
 
     /// Wait on a semaphore
     pub fn wait(&self, set_id: u64, sem_id: u64) -> Result<SemaphoreResult, String> {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
                 let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
@@ -217,10 +202,7 @@ impl SemaphoreManager {
 
     /// Try wait on a semaphore
     pub fn try_wait(&self, set_id: u64, sem_id: u64) -> Result<SemaphoreResult, String> {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
                 let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
@@ -235,10 +217,7 @@ impl SemaphoreManager {
 
     /// Post to a semaphore
     pub fn post(&self, set_id: u64, sem_id: u64) -> Result<SemaphoreResult, String> {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
                 let mut semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
@@ -253,10 +232,7 @@ impl SemaphoreManager {
 
     /// Get semaphore value
     pub fn get_value(&self, set_id: u64, sem_id: u64) -> Result<i32, String> {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         match sets.get(&set_id) {
             Some(set) => {
                 let semaphores = set.semaphores.lock().unwrap_or_else(|e| e.into_inner());
@@ -271,10 +247,7 @@ impl SemaphoreManager {
 
     /// Get semaphore set count
     pub fn set_count(&self) -> usize {
-        let sets = self
-            .semaphore_sets
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let sets = self.semaphore_sets.lock().unwrap_or_else(|e| e.into_inner());
         sets.len()
     }
 }

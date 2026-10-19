@@ -204,10 +204,7 @@ impl SocketManager {
         socket_type: SocketType,
         protocol: SocketProtocol,
     ) -> u64 {
-        let mut next_id = self
-            .next_socket_id
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self.next_socket_id.lock().unwrap_or_else(|e| e.into_inner());
         let socket_id = *next_id;
         *next_id += 1;
         drop(next_id);

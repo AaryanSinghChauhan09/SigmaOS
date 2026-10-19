@@ -73,11 +73,7 @@ impl OpenBsdPledgeUnveilPrEngine {
             title: alloc::format!("OpenBSD Pledge/Unveil PR: {}", promises),
             os_origin: "OpenBSD".to_string(),
             status: PrStatus::Merged,
-            payload: alloc::format!(
-                "Pledge promises '{}', unveiled path '{}'",
-                promises,
-                unveiled_path
-            ),
+            payload: alloc::format!("Pledge promises '{}', unveiled path '{}'", promises, unveiled_path),
         }
     }
 }
@@ -199,18 +195,14 @@ impl OpenSourceOsMissingComponentsV45PrSuite {
 
     pub fn run_all_prs(&self) -> Vec<OpenSourceOsPr> {
         vec![
-            self.ebpf_engine
-                .process_pr("PR-V45-001", "sys_enter_openat"),
-            self.dtrace_engine
-                .process_pr("PR-V45-002", "node", "http_request"),
-            self.pledge_engine
-                .process_pr("PR-V45-003", "stdio rpath wpath cpath inet", "/var/log"),
+            self.ebpf_engine.process_pr("PR-V45-001", "sys_enter_openat"),
+            self.dtrace_engine.process_pr("PR-V45-002", "node", "http_request"),
+            self.pledge_engine.process_pr("PR-V45-003", "stdio rpath wpath cpath inet", "/var/log"),
             self.casper_engine.process_pr("PR-V45-004", "system.dns"),
             self.plan9_engine.process_pr("PR-V45-005", "sys_root"),
             self.redox_engine.process_pr("PR-V45-006", "file"),
             self.haiku_engine.process_pr("PR-V45-007", "BEOS:TYPE"),
-            self.fuchsia_engine
-                .process_pr("PR-V45-008", "fuchsia.hardware.display.Controller"),
+            self.fuchsia_engine.process_pr("PR-V45-008", "fuchsia.hardware.display.Controller"),
         ]
     }
 }

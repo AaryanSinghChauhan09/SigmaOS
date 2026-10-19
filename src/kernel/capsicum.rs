@@ -191,10 +191,7 @@ impl CapsicumManager {
 
     /// Create a new sandbox
     pub fn create_sandbox(&self) -> u64 {
-        let mut next_id = self
-            .next_sandbox_id
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut next_id = self.next_sandbox_id.lock().unwrap_or_else(|e| e.into_inner());
         let sandbox_id = *next_id;
         *next_id += 1;
         drop(next_id);
