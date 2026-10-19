@@ -118,6 +118,7 @@ pub mod sigmascanner;
 pub mod sigmascheduledfsck;
 pub mod sigmasearch;
 pub mod sigmasecurityaudit;
+pub mod sigmasecuritymanager;
 pub mod sigmaservice;
 pub mod sigmaservicemanager2;
 pub mod sigmaservicemanager3;
@@ -919,4 +920,9 @@ pub use sigmanetworkmanager2::{
 pub use sigmaservicemanager3::{
     Service, ServiceState, ServiceType, SigmaServiceManager,
     add_service, get_sigmaservicemanager, get_sigmaservicemanager_mut, init_sigmaservicemanager,
+};
+
+pub use sigmasecuritymanager::{
+    AccessControlEntry, FirewallAction, FirewallProtocol, FirewallRule, SecurityPolicy, SigmaSecurityManager,
+    add_firewall_rule, get_sigmasecuritymanager, get_sigmasecuritymanager_mut, init_sigmasecuritymanager,
 };
