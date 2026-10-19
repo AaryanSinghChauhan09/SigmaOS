@@ -116,6 +116,7 @@ pub mod sigmawebcam;
 pub mod sigmamicrophone;
 pub mod sigmadiskmanager;
 pub mod sigmadiskusage;
+pub mod sigmataskmanager;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -617,6 +618,12 @@ pub use sigmadiskusage {
     SigmaDiskUsage, Filesystem, Directory,
     init_sigmadiskusage, get_sigmadiskusage, get_sigmadiskusage_mut,
     add_filesystem,
+};
+
+pub use sigmataskmanager {
+    SigmaTaskManager, Task, TaskState, TaskPriority,
+    init_sigmataskmanager, get_sigmataskmanager, get_sigmataskmanager_mut,
+    add_task,
 };
 
 pub use sigmaupdate::{
