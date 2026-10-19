@@ -23,6 +23,7 @@ pub mod service_manager;
 pub mod settings_manager;
 pub mod sigmaacpi;
 pub mod sigmaani;
+pub mod sigmaart;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -238,6 +239,10 @@ pub use sigmaacpi::{
 pub use sigmaani::{
     Animation, AnimationState, AnimationTrack, Keyframe, SigmaAni, TrackType, TweenType,
     add_animation, get_sigmaani, get_sigmaani_mut, init_sigmaani,
+};
+pub use sigmaart::{
+    Canvas, Color, Layer, Point, Rect, Shape, ShapeType, SigmaArt, Size,
+    add_canvas, get_sigmaart, get_sigmaart_mut, init_sigmaart,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
