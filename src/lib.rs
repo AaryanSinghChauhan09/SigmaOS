@@ -197,7 +197,7 @@ pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_freebsd_advanced_subsystems_pr::*;
-pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
+pub use distro::freebsd_missing_components_v61_pr::*;
 pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
