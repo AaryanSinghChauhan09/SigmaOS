@@ -1,10 +1,26 @@
 {
-  "timestamp": "2026-10-15T01:24:11.025650+00:00",
+  "timestamp": "2026-10-19T03:05:30.737248+00:00",
   "signer": "SigmaOS Evidence Signer v1.0.0",
   "artifacts": {
+    "qemu_boot_serial.log": {
+      "sha256": "7c54b08bc25d11dabe6575b4bce42b210d4b607695a4aa4d0fd742725d7ac106",
+      "size_bytes": 1496
+    },
+    "qemu_boot_serial.md": {
+      "sha256": "7c0146e35586984b0f76e56e8b27256b3d8c4d787ce93cd263f9d0e57bf7e529",
+      "size_bytes": 1651
+    },
+    "test/.gitkeep": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
     "build_test_sentinel/build-test-001_report.json": {
       "sha256": "75a98dc18c98dc874085e4911d1ee35254533b6f78dd91678c8638e2e6641b3c",
       "size_bytes": 1813
+    },
+    "security/.gitkeep": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
     },
     "steward/daily-status.md": {
       "sha256": "652516e99db1ffda9b8b5c82e35b256d2b919f1f3d5c154973cbea39d08ce029",
@@ -14,29 +30,37 @@
       "sha256": "7ddb590618f2d451e5bd06489fb783ef8814d5f0bbf0027484841fe9e6776481",
       "size_bytes": 254
     },
+    "installer/.gitkeep": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
     "boot/boot_matrix.json": {
-      "sha256": "0c3078ce2a1d1229f3fb0d4a6b97416af1a9309ef9d8b5d4d6768a2562ed369f",
+      "sha256": "b3dc9718a12a04d29266ad051acfdda7e55cea629ab94dd57973ad76aff39310",
       "size_bytes": 580
     },
     "boot/qemu_x86_64.json": {
-      "sha256": "889368272bf3f75ac9c63945a89ff4b9137aa50a7084942c61eb3c88ce707ed3",
+      "sha256": "b4de1389ac9fecf1a2e88017381c578be0913cb5752efea7267baa51351479e2",
       "size_bytes": 418
     },
     "boot/qemu_x86_64.log": {
       "sha256": "24473f9f3c1b2772d37224408fe2cd4015d8c441e1934007a3b42ffde404118a",
       "size_bytes": 730
     },
+    "package/.gitkeep": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
     "capability/truth_table.json": {
-      "sha256": "e4e7f35b6d28bbaf36cfb79720902be3f0f65e7d981535a3c0a0e8147a087b20",
-      "size_bytes": 4598
+      "sha256": "fd2267db486922c6ba40dafed788f047ae19b6691146ddff707bbb19a43567ff",
+      "size_bytes": 4807
     },
     "capability/verified_today.md": {
-      "sha256": "9ba4e757761c22734208a49d6fa3fe48ed38e8f13b6872e5a7126fd6cf494efd",
-      "size_bytes": 2070
+      "sha256": "3532601d084b212508ee828f9788aa29d340ddb30a6ee3808db687f6f052d5a5",
+      "size_bytes": 2146
     },
     "build/latest.json": {
-      "sha256": "8805fbb505aac8fc3b11f701f7d24ad4e9a89e78a6b5f7e8890d05721640387d",
-      "size_bytes": 165040
+      "sha256": "87e97a61df7eaf8abe1fa205d300760cd1a699fa241461f7206221a112b08fd8",
+      "size_bytes": 416182
     }
   }
 }
