@@ -91,6 +91,7 @@ pub mod sigmanotifyenhanced;
 pub mod sigmanotificationmanager;
 pub mod sigmantp;
 pub mod sigmapackagemanager;
+pub mod sigmapackagemanager2;
 pub mod sigmaparted;
 pub mod sigmaperformancemonitor;
 pub mod sigmapkg;
@@ -895,4 +896,9 @@ pub use sigmapowermanager::{
 pub use sigmakeyboardmanager::{
     InputMethod, Keybinding, KeyboardLayout, KeyboardSettings, SigmaKeyboardManager,
     add_layout, get_sigmakeyboardmanager, get_sigmakeyboardmanager_mut, init_sigmakeyboardmanager,
+};
+
+pub use sigmapackagemanager2::{
+    Package, PackageStatus, PackageType, Repository, SigmaPackageManager,
+    add_package, get_sigmapackagemanager, get_sigmapackagemanager_mut, init_sigmapackagemanager,
 };
