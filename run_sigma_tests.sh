@@ -1790,6 +1790,101 @@ if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     ./build/test_apex_v50
 fi
 
+if [ -f "src/boot/sovereign_kernel_and_boot_innovations_v52_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V52 Suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_boot_innovations_v52_pr.rs --edition=2021 -o build/test_kernel_boot_v52_pr
+    ./build/test_kernel_boot_v52_pr
+fi
+
+if [ -f "src/boot/sovereign_kernel_and_boot_innovations_v53_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V53 Suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_boot_innovations_v53_pr.rs --edition=2021 -o build/test_kernel_boot_v53_pr
+    ./build/test_kernel_boot_v53_pr
+fi
+
+if [ -f "src/boot/sovereign_kernel_and_boot_innovations_v61_pr.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V61 Suite..."
+    mkdir -p build
+    rustc --test src/boot/sovereign_kernel_and_boot_innovations_v61_pr.rs --edition=2021 -o build/test_kernel_boot_v61_pr
+    ./build/test_kernel_boot_v61_pr
+fi
+
+if [ -f "tests/test_kernel_and_boot_v61.rs" ]; then
+    echo "Running Sovereign Kernel & Boot Innovations V61 Integration Suite..."
+    mkdir -p build
+    rustc --test tests/test_kernel_and_boot_v61.rs --edition=2021 -o build/test_kernel_boot_v61_integration
+    ./build/test_kernel_boot_v61_integration
+fi
+
+if [ -f "src/community/sovereign_documentation_consolidation_pr_engine.rs" ]; then
+    echo "Running Sovereign Documentation & GitHub Wiki Consolidation Engine test suite..."
+    mkdir -p build
+    rustc --test src/community/sovereign_documentation_consolidation_pr_engine.rs --edition=2021 -o build/test_sovereign_documentation_consolidation_pr_engine
+    ./build/test_sovereign_documentation_consolidation_pr_engine
+fi
+
+if [ -f "tests/memory/physical.rs" ]; then
+    echo "Running Main Memory Subsystem test suites..."
+    mkdir -p build
+    [ -f "tests/memory/physical.rs" ] && rustc --test tests/memory/physical.rs --edition=2021 -o build/test_mem_physical && ./build/test_mem_physical
+    [ -f "tests/mm/paging.rs" ] && rustc --test tests/mm/paging.rs --edition=2021 -o build/test_mm_paging && ./build/test_mm_paging
+    [ -f "tests/mm/virtual.rs" ] && rustc --test tests/mm/virtual.rs --edition=2021 -o build/test_mm_virtual && ./build/test_mm_virtual
+    [ -f "tests/swap/core.rs" ] && rustc --test tests/swap/core.rs --edition=2021 -o build/test_swap_core && ./build/test_swap_core
+fi
+
+if [ -f "tests/fs/fd_table.rs" ]; then
+    echo "Running File Management & VFS test suites..."
+    mkdir -p build
+    rustc --test tests/fs/fd_table.rs --edition=2021 -o build/test_vfs_fd_table && ./build/test_vfs_fd_table
+    rustc --test tests/fs/inode.rs --edition=2021 -o build/test_vfs_inode && ./build/test_vfs_inode
+    rustc --test tests/filesystem/permission.rs --edition=2021 -o build/test_vfs_permission && ./build/test_vfs_permission
+    rustc --test tests/filesystem/lock.rs --edition=2021 -o build/test_vfs_lock && ./build/test_vfs_lock
+fi
+
+if [ -f "tests/scheduler/core.rs" ]; then
+    echo "Running Process Scheduler Core & Lifecycle test suite..."
+    mkdir -p build
+    rustc --test tests/scheduler/core.rs --edition=2021 -o build/test_sched_core && ./build/test_sched_core
+    rustc --test tests/scheduler/context_switch/context_switch_test.rs --edition=2021 -o build/test_sched_context_switch && ./build/test_sched_context_switch
+    rustc --test tests/scheduler/preemption/preemption_test.rs --edition=2021 -o build/test_sched_preemption && ./build/test_sched_preemption
+    rustc --test tests/scheduler/fairness/fairness_test.rs --edition=2021 -o build/test_sched_fairness && ./build/test_sched_fairness
+    rustc --test tests/scheduler/affinity/affinity_test.rs --edition=2021 -o build/test_sched_affinity && ./build/test_sched_affinity
+fi
+
+if [ -f "tests/process/pid_allocator.rs" ]; then
+    echo "Running Process Management Lifecycle & Isolation test suites..."
+    mkdir -p build
+    rustc --test tests/process/pid_allocator.rs --edition=2021 -o build/test_proc_pid && ./build/test_proc_pid
+    rustc --test tests/process/lifecycle/lifecycle_test.rs --edition=2021 -o build/test_proc_lifecycle && ./build/test_proc_lifecycle
+    rustc --test tests/process/fork_exec/fork_exec_test.rs --edition=2021 -o build/test_proc_fork && ./build/test_proc_fork
+    rustc --test tests/process/wait_reap/wait_reap_test.rs --edition=2021 -o build/test_proc_wait && ./build/test_proc_wait
+    rustc --test tests/process/rlimits/rlimit_test.rs --edition=2021 -o build/test_proc_rlimit && ./build/test_proc_rlimit
+    rustc --test tests/process/namespaces/namespace_test.rs --edition=2021 -o build/test_proc_ns && ./build/test_proc_ns
+fi
+
+if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_deckcraft_missing
+    ./build/test_deckcraft_missing
+fi
+
+if [ -f "src/creative/anicraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign AniCraft to ArtCraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/anicraft_artcraft_parity_pr.rs --edition=2021 -o build/test_anicraft_artcraft_parity
+    ./build/test_anicraft_artcraft_parity
+fi
+
+if [ -f "src/creative/deckcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Deckcraft to Artcraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/deckcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_deckcraft_artcraft_parity
+    ./build/test_deckcraft_artcraft_parity
+fi
+
 if [ -f "src/creative/sovereign_artcraft_craftlibs_pr_engine.rs" ]; then
     echo "Running Sovereign Artcraft Craftlibs PR Engine test suite..."
     mkdir -p build
