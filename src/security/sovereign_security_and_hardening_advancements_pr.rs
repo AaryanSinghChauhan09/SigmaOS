@@ -92,6 +92,16 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         path == profile_pattern
     }
 
+    /// Validate seccomp BPF architecture (e.g. AUDIT_ARCH_X86_64 = 0xC000003E).
+    pub fn validate_seccomp_bpf_arch(arch: u32) -> bool {
+        arch == 0xC000003E
+    }
+
+    /// Check if cgroup v2 controller is enabled.
+    pub fn is_cgroup_controller_enabled(available_controllers: &str, controller: &str) -> bool {
+        available_controllers.split_whitespace().any(|c| c == controller)
+    }
+
     /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW).
     pub fn evaluate_seccomp_bpf(&self, syscall_nr: u32, allowed_syscalls: &[u32]) -> u32 {
         if allowed_syscalls.contains(&syscall_nr) {
@@ -480,6 +490,28 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
+        )
+    }
+
+    pub fn generate_sssd_pam_nss_response(
+        &self,
+        username: &str,
+        uid: u32,
+        gid: u32,
+    ) -> (String, u32, u32, String, String) {
+        (
+            username.to_string(),
+            uid,
+            gid,
+            alloc::format!("/home/{}", username),
+            "/bin/bash".to_string(),
+        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
