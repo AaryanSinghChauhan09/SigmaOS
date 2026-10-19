@@ -94,6 +94,7 @@ pub mod sigmaphoto;
 pub mod sigmaports;
 pub mod sigmapower;
 pub mod sigmaprinter;
+pub mod sigmaprint2;
 pub mod sigmaprocess;
 pub mod sigmaprocessmonitor;
 pub mod sigmaproxy;
@@ -379,6 +380,10 @@ pub use sigmapdf::{
 pub use sigmaphoto::{
     AdjustmentType, ColorSpace, ImageFormat, Photo, PhotoAdjustment, PhotoAlbum, PhotoFilter, SigmaPhoto,
     add_photo, get_sigmaphoto, get_sigmaphoto_mut, init_sigmaphoto,
+};
+pub use sigmaprint2::{
+    ColorMode, PaperSize, PrintJob, PrintOptions, PrintOrientation, PrintQuality, SigmaPrint,
+    add_print_job, complete_job, fail_job, get_sigmaprint, get_sigmaprint_mut, init_sigmaprint,
 };
 pub use sigmahibernation::{
     create_image, get_sigmahibernation, get_sigmahibernation_mut, init_sigmahibernation,
