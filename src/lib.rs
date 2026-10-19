@@ -36,7 +36,7 @@ pub use creative::figcraft_missing_components_parity_pr::*;
 pub use creative::filmcraft_artcraft_parity_pr::*;
 pub use creative::filmcraft_missing_components_parity_pr::*;
 pub use creative::fontcraft::*;
-pub use creative::fontcraft_artcraft_parity_pr::*;
+pub use creative::photocraft_artcraft_parity_pr::*;
 pub use creative::fontcraft_missing_components_parity_pr::*;
 pub use creative::soundcraft_artcraft_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
