@@ -401,6 +401,27 @@ if [ -f "src/creative/fontcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_fontcraft_missing
 fi
 
+if [ -f "src/creative/voicecraft.rs" ]; then
+    echo "Running Sovereign VoiceCraft Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/voicecraft.rs --edition=2021 -o build/test_voicecraft
+    ./build/test_voicecraft
+fi
+
+if [ -f "src/creative/voicecraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign VoiceCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/voicecraft_missing_components_parity_pr.rs --edition=2021 -o build/test_voicecraft_missing
+    ./build/test_voicecraft_missing
+fi
+
+if [ -f "src/creative/voicecraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign VoiceCraft to ArtCraft Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/voicecraft_artcraft_parity_pr.rs --edition=2021 -o build/test_voicecraft_artcraft_parity
+    ./build/test_voicecraft_artcraft_parity
+fi
+
 if [ -f "src/distro/linux_bsd_distro_breakthroughs.rs" ]; then
     echo "Running Linux & BSD Distro Breakthroughs test suite..."
     mkdir -p build

@@ -43,6 +43,7 @@ pub mod threedcraft_missing_components_parity_pr;
 pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod voicecraft;
+pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
 pub mod wordcraft;
 pub mod wordcraft_artcraft_parity_pr;
@@ -269,3 +270,4 @@ pub use threedcraft_missing_components_parity_pr::{
     ThreeDCraftGltfAnimationParser, ThreeDCraftPbrShaderEngine, ThreeDCraftPrGatewayEngine,
     ThreeDCraftPrProposalManifest,
 };
+pub use voicecraft_artcraft_parity_pr::*;
