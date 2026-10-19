@@ -30,6 +30,7 @@ pub mod sigmaart;
 pub mod sigmaaudioconfig;
 pub mod sigmaautomation;
 pub mod sigmabackup;
+pub mod sigmabackupmanager;
 pub mod sigmabluetooth;
 pub mod sigmacache;
 pub mod sigmacad;
@@ -853,4 +854,9 @@ pub use sigmasoftwaremanager::{
 pub use sigmaupdatemanager2::{
     SystemUpdate, UpdatePriority, UpdateSchedule, UpdateStatus, UpdateType, SigmaUpdateManager,
     add_update, get_sigmaupdatemanager, get_sigmaupdatemanager_mut, init_sigmaupdatemanager,
+};
+
+pub use sigmabackupmanager::{
+    BackupJob, BackupSchedule, BackupStatus, BackupType, CompressionType, SigmaBackupManager,
+    add_backup, get_sigmabackupmanager, get_sigmabackupmanager_mut, init_sigmabackupmanager,
 };
