@@ -30,6 +30,7 @@ pub mod sigmaeffect;
 pub mod sigmafig;
 pub mod sigmafilm;
 pub mod sigmafont;
+pub mod sigmagrid;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -277,6 +278,10 @@ pub use sigmafilm::{
 pub use sigmafont::{
     Font, FontStyle, FontWeight, Glyph, SigmaFont, TextRun,
     add_font, get_sigmafont, get_sigmafont_mut, init_sigmafont,
+};
+pub use sigmagrid::{
+    GridArea, GridAlignment, GridColumn, GridItem, GridRow, GridUnit, SigmaGrid,
+    add_grid_area, get_sigmagrid, get_sigmagrid_mut, init_sigmagrid,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
