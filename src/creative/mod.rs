@@ -23,6 +23,7 @@ pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
+pub mod filmcraft_artcraft_missing_components_v64_pr;
 pub mod filmcraft_artcraft_parity_pr;
 pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
@@ -134,6 +135,7 @@ pub use filmcraft::{
     ColorWheel, Effect, ExportSettings, FrameRate, Resolution, Timeline, Transition,
     TransitionType, VideoCodec, VideoEditor, VideoTrack,
 };
+pub use filmcraft_artcraft_missing_components_v64_pr::*;
 pub use filmcraft_artcraft_parity_pr::*;
 pub use filmcraft_missing_components_parity_pr::*;
 pub use fontcraft::{
