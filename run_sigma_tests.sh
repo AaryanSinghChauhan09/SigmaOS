@@ -1941,6 +1941,20 @@ if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; 
     ./build/test_artcraft_parity
 fi
 
+if [ -f "src/creative/threedcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running 3DCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/threedcraft_missing_components_parity_pr.rs --edition=2021 -o build/threedcraft_pr_test
+    ./build/threedcraft_pr_test
+fi
+
+if [ -f "src/creative/threedcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running 3DCraft to ArtCraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/threedcraft_artcraft_parity_pr.rs --edition=2021 -o build/threedcraft_artcraft_parity_test
+    ./build/threedcraft_artcraft_parity_test
+fi
+
 if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
     echo "Running Omarchy Linux Missing Components Parity PR Gateway V60 test suite..."
     mkdir -p build
