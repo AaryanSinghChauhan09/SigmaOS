@@ -114,6 +114,7 @@ pub mod sigmaprinter;
 pub mod sigmascanner;
 pub mod sigmawebcam;
 pub mod sigmamicrophone;
+pub mod sigmadiskmanager;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -603,6 +604,12 @@ pub use sigmamicrophone {
     SigmaMicrophone, Microphone, MicrophoneState, SampleRate, SampleFormat, ChannelCount,
     init_sigmamicrophone, get_sigmamicrophone, get_sigmamicrophone_mut,
     add_microphone,
+};
+
+pub use sigmadiskmanager {
+    SigmaDiskManager, Disk, DiskType, DiskState,
+    init_sigmadiskmanager, get_sigmadiskmanager, get_sigmadiskmanager_mut,
+    add_disk,
 };
 
 pub use sigmaupdate::{
