@@ -327,4 +327,4 @@ mod tests {
         let primary = manager.get_primary_output();
         assert_eq!(primary.unwrap().id, "DP-1");
     }
-;
+}
