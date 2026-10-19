@@ -328,4 +328,3 @@ mod tests {
         assert_eq!(primary.unwrap().id, "DP-1");
     }
 ;
-}
