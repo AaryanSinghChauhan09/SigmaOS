@@ -93,6 +93,7 @@ pub mod sigmasnap;
 pub mod sigmabackup;
 pub mod sigmarecovery2;
 pub mod sigmasystemmonitor2;
+pub mod sigmaservicemanager2;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -472,6 +473,10 @@ pub use sigmarecovery2 {
 pub use sigmasystemmonitor2 {
     SigmaSystemMonitor, Metric, MonitorType,
     init_sigmasystemmonitor, get_sigmasystemmonitor,
+};
+pub use sigmaservicemanager2 {
+    SigmaServiceManager, Service, ServiceState,
+    init_sigmaservicemanager, get_sigmaservicemanager,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
