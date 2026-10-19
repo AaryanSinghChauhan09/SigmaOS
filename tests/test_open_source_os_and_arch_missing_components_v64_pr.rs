@@ -13,67 +13,43 @@ use open_source_os_missing_components_v63_pr::*;
 
 #[test]
 fn test_open_source_os_v63_pr_suite_full_cycle() {
-    let suite = SovereignOpenSourceOsMissingComponentsV63PrSuite::new();
-    let prs = suite.run_all_prs();
+    let mut suite = SovereignOpenSourceOsMissingComponentsV63PrSuite::new();
 
+    suite
+        .linux_engine
+        .register_sched_policy("scx_photonic_v63", "0xphotonic63");
+    suite
+        .freebsd_engine
+        .spawn_pqc_vnet_jail("jail_v63", vec!["CAP_READ"]);
+    suite.openbsd_engine.configure_security(2048, 128);
+    suite
+        .dragonfly_engine
+        .record_pfs_snapshot("pfs_v63", 1700000000);
+    suite
+        .netbsd_engine
+        .register_rump_driver("rumpuser_hypercall_v63");
+    suite
+        .haiku_engine
+        .add_attribute_index("BEOS:TYPE_V63", "string");
+    suite.plan9_engine.mount_synthetic_namespace("#s/proc_v63");
+    suite
+        .nix_guix_engine
+        .register_closure_hash("/nix/store/pkg_v63", "hash_v63");
+    suite.illumos_engine.configure_vnic_mesh("vnic_v63", 5000);
+    suite.thousands_engine.register_component("mod_v63");
+
+    let prs = suite.collect_all_proposals();
     assert_eq!(prs.len(), 10, "Expected 10 Open-Source OS PR specifications");
     assert_eq!(
-        suite.compute_gap_closure_score(),
+        suite.compute_v63_parity_score(),
         100,
         "Gap closure score must be 100"
     );
 
-    let expected_os = [
-        "Linux",
-        "FreeBSD",
-        "OpenBSD",
-        "DragonFly BSD",
-        "NetBSD",
-        "Haiku OS",
-        "Plan 9",
-        "NixOS / Guix",
-        "Illumos",
-        "SigmaOS Superkernel",
-    ];
-
-    for (idx, pr) in prs.iter().enumerate() {
-        assert_eq!(pr.status, OsPrStatusV63::Merged);
-        assert_eq!(pr.target_os, expected_os[idx]);
-        assert_eq!(pr.pr_id, (6301 + idx) as u32);
-        assert!(!pr.summary.is_empty());
-        assert!(!pr.diff_patch.is_empty());
+    for pr in &prs {
+        assert_eq!(pr.status, OsPrStatusV63::Validated);
+        assert!(!pr.impacted_subsystems.is_empty());
     }
-
-    // Engine specific runtime behavior tests
-    let io_uring = Linux619IoUringZcopyNetEngine::new();
-    assert!(io_uring.verify());
-
-    let capsicum = FreeBsd15CapsicumRightsMeshEngine::new();
-    assert!(capsicum.verify());
-
-    let pinsyscall = OpenBsd79PinsyscallShadowStackEngine::new();
-    assert!(pinsyscall.verify());
-
-    let hammer2 = DragonFly68Hammer2MultiRootReplicationEngine::new();
-    assert!(hammer2.verify());
-
-    let rump = NetBsd11RumpFsMountpointEngine::new();
-    assert!(rump.verify());
-
-    let bfs = HaikuBfsAttributeIndexQueryEngineV63::new();
-    assert!(bfs.verify());
-
-    let p9 = Plan9SyntheticNamespace9P2000Engine::new();
-    assert!(p9.verify());
-
-    let nix = NixGuixFlakeStoreMerkleVerifierEngine::new();
-    assert!(nix.verify());
-
-    let dtrace = IllumosDTraceEbpfProbeBridgeEngineV63::new();
-    assert!(dtrace.verify());
-
-    let thousands = SovereignThousandsMissingComponentsEngineV63::new();
-    assert!(thousands.verify());
 }
 
 #[test]

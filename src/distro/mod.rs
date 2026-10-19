@@ -754,6 +754,9 @@ pub use open_source_os_missing_components_v63_pr::*;
 pub mod open_source_os_missing_components_v64_pr;
 pub use open_source_os_missing_components_v64_pr::*;
 
+pub mod open_source_os_missing_components_v65_pr;
+pub use open_source_os_missing_components_v65_pr::*;
+
 pub mod open_source_os_debian_unimplemented_ideas_v63_pr;
 pub use open_source_os_debian_unimplemented_ideas_v63_pr::*;
 
