@@ -287,7 +287,7 @@ impl SovereignLfsBsdPrGateway {
         let activated = self
             .master_harmony
             .lfs_bootscripts
-            .set_runlevel(LfsRunlevel::Runlevel3MultiUserNet);
+            .set_runlevel(crate::distro::LfsRunlevel::Runlevel3MultiUserNet);
         assert!(activated >= 1);
 
         // 3. Verify LFS package build and install
