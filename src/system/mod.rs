@@ -83,6 +83,7 @@ pub mod sigmathemeinstaller;
 pub mod sigmainstaller;
 pub mod sigmawallpaper;
 pub mod sigmaananicy;
+pub mod sigmacolorscheme;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -422,6 +423,10 @@ pub use sigmawallpaper::{
 pub use sigmaananicy::{
     SigmaAnanicy, ProcessNice, NiceRule, PriorityClass, ProcessCategory,
     init_sigmaananicy, get_sigmaananicy, add_process, set_process_nice,
+};
+pub use sigmacolorscheme::{
+    SigmaColorScheme, ColorScheme, Color, Template, PaletteType, TemplateType,
+    init_sigmacolorscheme, get_sigmacolorscheme, generate_color_scheme,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
