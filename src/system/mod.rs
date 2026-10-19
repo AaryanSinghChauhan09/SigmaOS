@@ -122,6 +122,7 @@ pub mod sigmasystemmonitor;
 pub mod sigmasysteminfo;
 pub mod sigmafilemanager;
 pub mod sigmaarchivemanager;
+pub mod sigmaclipboardmanager;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -655,6 +656,12 @@ pub use sigmaarchivemanager {
     SigmaArchiveManager, Archive, ArchiveFormat, ArchiveState,
     init_sigmaarchivemanager, get_sigmaarchivemanager, get_sigmaarchivemanager_mut,
     add_archive,
+};
+
+pub use sigmaclipboardmanager {
+    SigmaClipboardManager, ClipboardItem, ClipboardFormat,
+    init_sigmaclipboardmanager, get_sigmaclipboardmanager, get_sigmaclipboardmanager_mut,
+    add_item,
 };
 
 pub use sigmaupdate::{
