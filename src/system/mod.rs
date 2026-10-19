@@ -24,6 +24,7 @@ pub mod settings_manager;
 pub mod sigmaacpi;
 pub mod sigmaani;
 pub mod sigmaart;
+pub mod sigmacad;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -243,6 +244,11 @@ pub use sigmaani::{
 pub use sigmaart::{
     Canvas, Color, Layer, Point, Rect, Shape, ShapeType, SigmaArt, Size,
     add_canvas, get_sigmaart, get_sigmaart_mut, init_sigmaart,
+};
+pub use sigmacad::{
+    Constraint, ConstraintType, Dimension, DimensionType, Drawing, DrawingLayer, Entity,
+    EntityType, Point3D, SigmaCAD,
+    add_drawing, get_sigmacad, get_sigmacad_mut, init_sigmacad,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
