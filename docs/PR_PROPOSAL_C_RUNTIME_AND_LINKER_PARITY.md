@@ -1,33 +1,33 @@
-# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V61)
+# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity
 
 ## Executive Summary
 
-This Pull Request proposal suite introduces a zero-dependency `#![no_std]` / `alloc` native C library, C++ runtime, and dynamic linker enhancement engine for SigmaOS, drawing architectural inspiration from landmark Linux distributions (GNU/Linux, Alpine, Void, Arch, Debian, Fedora, Clear Linux, CachyOS), BSD operating systems (FreeBSD, OpenBSD, NetBSD), Android, Cosmopolitan, and embedded systems.
+This Pull Request proposal introduces a zero-dependency `#![no_std]` / `alloc` compatible native C library, C++ runtime, and dynamic linker enhancement engine for SigmaOS, drawing architectural inspiration from landmark Linux distributions (GNU/Linux, Alpine, Void, Arch, Debian, Fedora, Clear Linux, CachyOS), BSD operating systems (FreeBSD, OpenBSD, NetBSD), Android, Cosmopolitan, and embedded systems.
 
 The goal is to achieve 100% ABI and functional parity with flagship C runtimes (`glibc`, `musl`, `uClibc-ng`, `BSD libc`, `Bionic`, `Newlib`, `Cosmopolitan libc`), C++ standard libraries (`libstdc++`, `libc++`), and the dynamic linker (`ld.so`).
 
 ---
 
-## Target Runtimes & PR Proposals (PRs #5001–#5010)
+## Target Runtimes & Subsystems
 
-| PR # | Target Subsystem | Original Runtime | PR Proposal Title | Performance Multiplier | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| PR #5001 | C Library Core Runtime | GNU C Library (glibc) | feat(glibc): Implement IFUNC AVX-512 Dispatch, DT_GNU_HASH & Tunables Router | 4.8x SIMD Throughput (AVX-512 ERMS) | Ready for Merge |
-| PR #5002 | Lightweight POSIX C Runtime | musl libc | feat(musl): Implement Ultra-Lightweight Pthread, malloc-ng & Hardened Stdio | 0.2x Memory Footprint & Sub-Microsecond Thread Spawn | Ready for Merge |
-| PR #5003 | Embedded & MMU-less C Runtime | uClibc-ng | feat(uclibc): Implement Embedded FLAT/FD-PIC Loader & Micro-Footprint Syscalls | Sub-100KB Executable Footprint | Ready for Merge |
-| PR #5004 | BSD Hardened C Library | BSD libc (FreeBSD / OpenBSD / NetBSD) | feat(bsd_libc): Implement OpenBSD ChaCha20 arc4random, explicit_bzero, freezero & Capsicum Rights | Zero-Trust Exploitation Defense | Ready for Merge |
-| PR #5005 | Mobile & Security-Hardened C Runtime | Android Bionic libc | feat(bionic): Implement Scudo Hardened Allocator, ARM64 PAC/BTI, fdsan & Property Bus | Hardened Memory Security & Sub-Millisecond Property Query | Ready for Merge |
-| PR #5006 | Bare-Metal Embedded C Runtime | Newlib / Newlib-nano | feat(newlib): Implement Embedded Reentrancy Context, _impure_ptr & Nano-Heap Manager | Sub-20KB Bare-Metal C Runtime | Ready for Merge |
-| PR #5007 | Universal Polyglot C Runtime | Cosmopolitan Libc | feat(cosmopolitan): Implement Actually Portable Executable (APE) Loader & Portable Syscall Dispatcher | Run Anywhere Single Binary | Ready for Merge |
-| PR #5008 | GNU Standard C++ Runtime | libstdc++ | feat(libstdc++): Implement C++ ABI Demangler, SSO std::string, std::variant & std::pmr Arenas | 3.5x Faster C++ Allocation & Demangling | Ready for Merge |
-| PR #5009 | LLVM Standard C++ Runtime | libc++ | feat(libc++): Implement DWARF .eh_frame Unwinder, Ryū <charconv>, Atomic shared_ptr & Futex | 12x Faster String Conversion (<charconv>) | Ready for Merge |
-| PR #5010 | ELF Dynamic Linker (ld.so) | Linux/BSD Dynamic Linker | feat(ld.so): Implement LD_PRELOAD Stack, Lazy GOT/PLT, DT_FLAGS_1, dlinfo & rtld-audit | Sub-Millisecond Dynamic Startup | Ready for Merge |
+| Target Subsystem | Original Runtime | PR Proposal Title | Performance Multiplier | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| C Library Core Runtime | GNU C Library (glibc) | feat(glibc): Implement IFUNC AVX-512 Dispatch, DT_GNU_HASH & Tunables Router | 4.8x SIMD Throughput (AVX-512 ERMS) | Ready for Merge |
+| Lightweight POSIX C Runtime | musl libc | feat(musl): Implement Ultra-Lightweight Pthread, malloc-ng & Hardened Stdio | 0.2x Memory Footprint & Sub-Microsecond Thread Spawn | Ready for Merge |
+| Embedded & MMU-less C Runtime | uClibc-ng | feat(uclibc): Implement Embedded FLAT/FD-PIC Loader & Micro-Footprint Syscalls | Sub-100KB Executable Footprint | Ready for Merge |
+| BSD Hardened C Library | BSD libc (FreeBSD / OpenBSD / NetBSD) | feat(bsd_libc): Implement OpenBSD ChaCha20 arc4random, explicit_bzero, freezero & Capsicum Rights | Zero-Trust Exploitation Defense | Ready for Merge |
+| Mobile & Security-Hardened C Runtime | Android Bionic libc | feat(bionic): Implement Scudo Hardened Allocator, ARM64 PAC/BTI, fdsan & Property Bus | Hardened Memory Security & Sub-Millisecond Property Query | Ready for Merge |
+| Bare-Metal Embedded C Runtime | Newlib / Newlib-nano | feat(newlib): Implement Embedded Reentrancy Context, _impure_ptr & Nano-Heap Manager | Sub-20KB Bare-Metal C Runtime | Ready for Merge |
+| Universal Polyglot C Runtime | Cosmopolitan Libc | feat(cosmopolitan): Implement Actually Portable Executable (APE) Loader & Portable Syscall Dispatcher | Run Anywhere Single Binary | Ready for Merge |
+| GNU Standard C++ Runtime | libstdc++ | feat(libstdc++): Implement C++ ABI Demangler, SSO std::string, std::variant & std::pmr Arenas | 3.5x Faster C++ Allocation & Demangling | Ready for Merge |
+| LLVM Standard C++ Runtime | libc++ | feat(libc++): Implement DWARF .eh_frame Unwinder, Ryū <charconv>, Atomic shared_ptr & Futex | 12x Faster String Conversion (<charconv>) | Ready for Merge |
+| ELF Dynamic Linker (ld.so) | Linux/BSD Dynamic Linker | feat(ld.so): Implement LD_PRELOAD Stack, Lazy GOT/PLT, DT_FLAGS_1, dlinfo & rtld-audit | Sub-Millisecond Dynamic Startup | Ready for Merge |
 
 ---
 
 ## Architectural Subsystem Highlights
 
-### PR #5001: feat(glibc): Implement IFUNC AVX-512 Dispatch, DT_GNU_HASH & Tunables Router
+### feat(glibc): Implement IFUNC AVX-512 Dispatch, DT_GNU_HASH & Tunables Router
 - **Original Inspiration**: GNU C Library (glibc)
 - **Target Subsystem**: C Library Core Runtime
 - **Performance Impact**: 4.8x SIMD Throughput (AVX-512 ERMS)
@@ -39,7 +39,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - GNU symbol version matching filter (GLIBC_2.34+)
   - dl_iterate_phdr ELF Program Header iterator & malloc_trim memory return
 
-### PR #5002: feat(musl): Implement Ultra-Lightweight Pthread, malloc-ng & Hardened Stdio
+### feat(musl): Implement Ultra-Lightweight Pthread, malloc-ng & Hardened Stdio
 - **Original Inspiration**: musl libc
 - **Target Subsystem**: Lightweight POSIX C Runtime
 - **Performance Impact**: 0.2x Memory Footprint & Sub-Microsecond Thread Spawn
@@ -51,7 +51,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - FILE stdio stream buffer lock optimization for high concurrency
   - __syscall_cp POSIX cancellation point signal wrapper
 
-### PR #5003: feat(uclibc): Implement Embedded FLAT/FD-PIC Loader & Micro-Footprint Syscalls
+### feat(uclibc): Implement Embedded FLAT/FD-PIC Loader & Micro-Footprint Syscalls
 - **Original Inspiration**: uClibc-ng
 - **Target Subsystem**: Embedded & MMU-less C Runtime
 - **Performance Impact**: Sub-100KB Executable Footprint
@@ -62,7 +62,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - Direct zero-copy system call wrappers (syscall0..syscall6)
   - Micro-footprint configurable feature mask stripper
 
-### PR #5004: feat(bsd_libc): Implement OpenBSD ChaCha20 arc4random, explicit_bzero, freezero & Capsicum Rights
+### feat(bsd_libc): Implement OpenBSD ChaCha20 arc4random, explicit_bzero, freezero & Capsicum Rights
 - **Original Inspiration**: BSD libc (FreeBSD / OpenBSD / NetBSD)
 - **Target Subsystem**: BSD Hardened C Library
 - **Performance Impact**: Zero-Trust Exploitation Defense
@@ -76,7 +76,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - FreeBSD Capsicum cap_rights_limit capability verification
   - NetBSD __symbol_rename symbol versioning compat layer
 
-### PR #5005: feat(bionic): Implement Scudo Hardened Allocator, ARM64 PAC/BTI, fdsan & Property Bus
+### feat(bionic): Implement Scudo Hardened Allocator, ARM64 PAC/BTI, fdsan & Property Bus
 - **Original Inspiration**: Android Bionic libc
 - **Target Subsystem**: Mobile & Security-Hardened C Runtime
 - **Performance Impact**: Hardened Memory Security & Sub-Millisecond Property Query
@@ -87,7 +87,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - __system_property_get lockless shared-memory property service router
   - Custom lightweight linker (linker64) with Android zip-alignment
 
-### PR #5006: feat(newlib): Implement Embedded Reentrancy Context, _impure_ptr & Nano-Heap Manager
+### feat(newlib): Implement Embedded Reentrancy Context, _impure_ptr & Nano-Heap Manager
 - **Original Inspiration**: Newlib / Newlib-nano
 - **Target Subsystem**: Bare-Metal Embedded C Runtime
 - **Performance Impact**: Sub-20KB Bare-Metal C Runtime
@@ -96,7 +96,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - Minimalistic _sbrk / _write / _read stub engine for zero-dependency microcontrollers
   - nano-malloc chunk header validator & nano-formatted printf/scanf
 
-### PR #5007: feat(cosmopolitan): Implement Actually Portable Executable (APE) Loader & Portable Syscall Dispatcher
+### feat(cosmopolitan): Implement Actually Portable Executable (APE) Loader & Portable Syscall Dispatcher
 - **Original Inspiration**: Cosmopolitan Libc
 - **Target Subsystem**: Universal Polyglot C Runtime
 - **Performance Impact**: Run Anywhere Single Binary
@@ -105,7 +105,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - Multi-OS system call translation table (Linux, BSD, Darwin, Bare-Metal)
   - Fat-binary single-file multi-platform C runtime launcher
 
-### PR #5008: feat(libstdc++): Implement C++ ABI Demangler, SSO std::string, std::variant & std::pmr Arenas
+### feat(libstdc++): Implement C++ ABI Demangler, SSO std::string, std::variant & std::pmr Arenas
 - **Original Inspiration**: libstdc++
 - **Target Subsystem**: GNU Standard C++ Runtime
 - **Performance Impact**: 3.5x Faster C++ Allocation & Demangling
@@ -115,7 +115,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - std::variant type-index resolver & std::pmr::memory_resource arena allocators
   - Parallel execution policy dispatcher (std::execution::par_unseq)
 
-### PR #5009: feat(libc++): Implement DWARF .eh_frame Unwinder, Ryū <charconv>, Atomic shared_ptr & Futex
+### feat(libc++): Implement DWARF .eh_frame Unwinder, Ryū <charconv>, Atomic shared_ptr & Futex
 - **Original Inspiration**: libc++
 - **Target Subsystem**: LLVM Standard C++ Runtime
 - **Performance Impact**: 12x Faster String Conversion (<charconv>)
@@ -126,7 +126,7 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
   - Inline namespace ABI versioning (std::__1) for zero breakages
   - Futex-backed std::atomic::wait and notify_all synchronization
 
-### PR #5010: feat(ld.so): Implement LD_PRELOAD Stack, Lazy GOT/PLT, DT_FLAGS_1, dlinfo & rtld-audit
+### feat(ld.so): Implement LD_PRELOAD Stack, Lazy GOT/PLT, DT_FLAGS_1, dlinfo & rtld-audit
 - **Original Inspiration**: Linux/BSD Dynamic Linker
 - **Target Subsystem**: ELF Dynamic Linker (ld.so)
 - **Performance Impact**: Sub-Millisecond Dynamic Startup
@@ -143,6 +143,6 @@ The goal is to achieve 100% ABI and functional parity with flagship C runtimes (
 
 ## Verification & Status
 
-All C library and runtime parity engines are fully verified via standalone Rust unit tests (`src/runtime/c_runtime_and_linker_advancements_v61_pr.rs`).
+All C library and runtime parity engines are fully verified via standalone Rust unit tests (`src/runtime/c_runtime_and_linker_inspirations_pr.rs`).
 
 Status: **Ready for Merge**.
