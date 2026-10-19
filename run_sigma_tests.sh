@@ -303,6 +303,20 @@ if [ -f "src/compatibility/sovereign_mint_pr_components_engine.rs" ]; then
     ./build/test_mint_pr_deploy
 fi
 
+if [ -f "src/creative/anicraft_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign AniCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/anicraft_missing_components_parity_pr.rs --edition=2021 -o build/test_anicraft_missing
+    ./build/test_anicraft_missing
+fi
+
+if [ -f "src/creative/anicraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign AniCraft to ArtCraft Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/anicraft_artcraft_parity_pr.rs --edition=2021 -o build/test_anicraft_artcraft_parity
+    ./build/test_anicraft_artcraft_parity
+fi
+
 if [ -f "src/creative/deckcraft.rs" ]; then
     echo "Running Sovereign DeckCraft Presentation Slide PR test suite..."
     mkdir -p build

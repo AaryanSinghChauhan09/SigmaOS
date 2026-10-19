@@ -49,7 +49,9 @@ pub mod wordcraft;
 pub mod wordcraft_artcraft_parity_pr;
 pub mod wordcraft_missing_components_parity_pr;
 
+pub use anicraft::*;
 pub use anicraft_artcraft_parity_pr::*;
+pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
 pub use craftlibs_missing_components_parity_pr::*;
