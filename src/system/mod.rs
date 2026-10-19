@@ -827,7 +827,7 @@ pub use sigmasystemtools::{
 
 pub use sigmasoftwaremanager::{
     add_application, get_sigmasoftwaremanager, get_sigmasoftwaremanager_mut,
-    init_sigmasoftwaremanager, AppCategory, AppStatus, Application, Rating, SigmaSoftwareManager,
+    init_sigmasoftwaremanager, SigmaSoftwareManager,
 };
 
 pub use sigmabackupmanager::{
