@@ -92,6 +92,16 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         path == profile_pattern
     }
 
+    /// Validate seccomp BPF architecture (e.g. AUDIT_ARCH_X86_64 = 0xC000003E).
+    pub fn validate_seccomp_bpf_arch(arch: u32) -> bool {
+        arch == 0xC000003E
+    }
+
+    /// Check if cgroup v2 controller is enabled.
+    pub fn is_cgroup_controller_enabled(available_controllers: &str, controller: &str) -> bool {
+        available_controllers.split_whitespace().any(|c| c == controller)
+    }
+
     /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW).
     pub fn evaluate_seccomp_bpf(&self, syscall_nr: u32, allowed_syscalls: &[u32]) -> u32 {
         if allowed_syscalls.contains(&syscall_nr) {
@@ -503,7 +513,7 @@ impl IdentityAndEnterpriseAuthPrEngine {
             uid,
             gid,
             alloc::format!("/home/{}", username),
-            "/bin/sh".to_string(),
+            "/bin/bash".to_string(),
         )
     }
 

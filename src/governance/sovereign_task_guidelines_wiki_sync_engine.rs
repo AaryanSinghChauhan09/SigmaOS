@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "CommandInterpreterPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "34-SigmaOS-Command-Interpreter-Plan.md".to_string(),
+                source_path: "wiki/34-SigmaOS-Command-Interpreter-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "SystemAppsDevelopmentPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "32-System-Apps-Development-Plan.md".to_string(),
@@ -367,6 +378,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "30-SigmaOS-GUI-Development-Plan.md",
             "SigmaOS GUI Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "34-SigmaOS-Command-Interpreter-Plan.md",
+            "SigmaOS Command Interpreter Plan PR",
             true,
         );
         self.register_spec_file(
