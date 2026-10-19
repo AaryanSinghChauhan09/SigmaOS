@@ -1,9 +1,29 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
-use alloc::format;
-use alloc::collections::BTreeMap;
 // SigmaOS - Pdfcraft to Artcraft Parity PR Proposal Engine
 // Bridges Pdfcraft (PDF suite) and Artcraft (Creative Suite) missing feature parity via structured PR proposals.
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::{String, ToString};
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec;
+#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 
 
@@ -33,7 +53,7 @@ impl PdfcraftVectorArtImportPrEngine {
                 .to_string(),
             target_subsystem: "Pdfcraft Vector Graphics Engine".to_string(),
             original_suite: "Artcraft Vectorcraft".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "Artcraft Vector Path & Bezier curve native parser".to_string(),
                 "Non-destructive multi-layer vector embedding in PDF pages".to_string(),
                 "Boolean shape operations (union, subtract, intersect) renderer".to_string(),
@@ -59,7 +79,7 @@ impl PdfcraftMultiWorkspaceProjectPrEngine {
                 .to_string(),
             target_subsystem: "Pdfcraft Document Management System".to_string(),
             original_suite: "Artcraft Workspace Engine".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "Unified ArtSuite project binder for multi-document PDF workflows".to_string(),
                 "Lockless workspace state persistence with asset link manager".to_string(),
                 "Cross-project asset drag-and-drop & asset palette syncer".to_string(),
@@ -86,7 +106,7 @@ impl PdfcraftBatchExportRenderPrEngine {
                     .to_string(),
             target_subsystem: "Pdfcraft Export & Color Pipeline".to_string(),
             original_suite: "Artcraft Designcraft & Lightcraft".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "PDF/A (archival) & PDF/X (print production) compliance validator".to_string(),
                 "ICC profile soft-proofing (CMYK, RGB, Grayscale, Spot colors)".to_string(),
                 "Parallelized multi-page rasterizer (PNG, JPEG, TIFF, SVG) exporter".to_string(),
@@ -112,7 +132,7 @@ impl PdfcraftDigitalSignatureWatermarkPrEngine {
                 .to_string(),
             target_subsystem: "Pdfcraft Security & Provenance Suite".to_string(),
             original_suite: "Artcraft Security & Watermarking Framework".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "Ed25519 & X.509 PQC-ready digital signature verifier".to_string(),
                 "Dynamic tiled opacity watermarking with custom text/logo".to_string(),
                 "AES-256 granular document access control & permission mask".to_string(),
@@ -138,7 +158,7 @@ impl PdfcraftOcrTextRecognitionPrEngine {
                 .to_string(),
             target_subsystem: "Pdfcraft OCR & Search Pipeline".to_string(),
             original_suite: "Artcraft Text & Layout Processing".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "On-device neural OCR model for image-based PDFs".to_string(),
                 "Invisible text layer overlay for full-text document search".to_string(),
                 "Automatic table structure detection & layout analyzer".to_string(),
@@ -164,7 +184,7 @@ impl PdfcraftInteractiveFormsXfaPrEngine {
                 .to_string(),
             target_subsystem: "Pdfcraft Interactive Forms Engine".to_string(),
             original_suite: "Artcraft Interactive Forms Suite".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "AcroForms and dynamic XFA form field renderer and calculation engine".to_string(),
                 "JavaScript-based form field validation and auto-fill logic controller".to_string(),
                 "Export form responses to JSON, FDF, and XFDF data standards".to_string(),
@@ -191,7 +211,7 @@ impl PdfcraftColorPreflightCmykPrEngine {
                     .to_string(),
             target_subsystem: "Pdfcraft Color & Preflight Suite".to_string(),
             original_suite: "Artcraft Print & Prepress Engine".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "CMYK spot color separation and ink density coverage analyzer".to_string(),
                 "Overprint preview and transparency flattening preflight validator".to_string(),
                 "PANTONE matching system and device-independent ICC profile transform".to_string(),
@@ -218,7 +238,7 @@ impl PdfcraftRedactionSanitizationPrEngine {
                     .to_string(),
             target_subsystem: "Pdfcraft Security & Redaction Pipeline".to_string(),
             original_suite: "Artcraft Security & Compliance Engine".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "True vector/raster pixel erasure for non-reversible redaction".to_string(),
                 "Regex pattern matching for automatic PII/SSN/Credit Card scrubbing".to_string(),
                 "Metadata, hidden layer, and comment stripper for clean publishing".to_string(),
@@ -244,7 +264,7 @@ impl PdfcraftPageImpositionBookletPrEngine {
                 .to_string(),
             target_subsystem: "Pdfcraft Page Geometry & Imposition Engine".to_string(),
             original_suite: "Artcraft Layout & Print Assembly Engine".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "N-Up (2-up, 4-up, 8-up) page imposition and booklet binding generator".to_string(),
                 "Bleed box, trim box, crop marks, and registration mark compositor".to_string(),
                 "Custom Creep compensation and page rotation layout rule builder".to_string(),
@@ -271,7 +291,7 @@ impl PdfcraftArchivalValidationPrEngine {
                     .to_string(),
             target_subsystem: "Pdfcraft Archival & Compliance Suite".to_string(),
             original_suite: "Artcraft Archival & Standards Engine".to_string(),
-            components_added: alloc::vec![
+            components_added: vec![
                 "ISO 19005 (PDF/A-1/2/3/4) long-term preservation validator and repairer"
                     .to_string(),
                 "ISO 15930 (PDF/X-1a/3/4/6) print exchange compliance inspector".to_string(),
@@ -304,7 +324,7 @@ impl SovereignPdfcraftArtcraftParityPrGateway {
     }
 
     pub fn collect_all_proposals(&self) -> Vec<PdfcraftArtcraftPrProposalManifest> {
-        alloc::vec![
+        vec![
             self.vector_import.generate_proposal(),
             self.multi_workspace.generate_proposal(),
             self.batch_export.generate_proposal(),

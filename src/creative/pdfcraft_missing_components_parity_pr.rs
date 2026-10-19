@@ -1,36 +1,29 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
-use alloc::collections::BTreeMap;
 // SigmaOS - Pdfcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/pdfcraft_missing_components_parity_pr.rs`)
-//
-// Provides structured PR proposals and full engine implementations for components
-// missing in SigmaOS when compared to ArtCraft PdfCraft document processing capabilities:
-// 1. PdfcraftVectorArtImportPrEngine (Artcraft Vector Path & Bezier curve native parser, non-destructive multi-layer vector embedding & boolean shape operations)
-// 2. PdfcraftMultiWorkspaceProjectPrEngine (Unified ArtSuite project binder, lockless workspace state persistence & cross-project asset drag-and-drop)
-// 3. PdfcraftBatchExportRenderPrEngine (PDF/A & PDF/X compliance validator, ICC profile soft-proofing & parallelized multi-page rasterizer)
-// 4. PdfcraftDigitalSignatureWatermarkPrEngine (Ed25519 & X.509 PQC-ready digital signatures, dynamic tiled watermarking & AES-256 access controls)
-// 5. PdfcraftOcrTextRecognitionPrEngine (On-device neural OCR, invisible searchable text layer & automatic table structure analyzer)
-// 6. PdfcraftInteractiveFormsXfaPrEngine (AcroForms & dynamic XFA renderer, JS validation/autofill & JSON/FDF/XFDF response export)
-// 7. PdfcraftColorPreflightCmykPrEngine (CMYK spot color separation, overprint preview, transparency flattening & PANTONE matching system)
-// 8. PdfcraftRedactionSanitizationPrEngine (True vector/raster pixel erasure, PII/SSN/Credit Card regex scrubbing & metadata stripper)
-// 9. PdfcraftPageImpositionBookletPrEngine (N-Up 2/4/8-up imposition, creep compensation, bleed/crop/trim marks & booklet binding)
-// 10. PdfcraftArchivalValidationPrEngine (ISO 19005 PDF/A-1/2/3/4 preservation & ISO 15930 PDF/X print exchange compliance repairer)
-// 11. SovereignPdfcraftMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Pdfcraft PR Category Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -173,7 +166,6 @@ impl PdfcraftBatchExportRenderPrEngine {
         if !icc_profile.is_empty() {
             page_count
         } else {
- {
             0
         }
     }
@@ -249,7 +241,6 @@ impl PdfcraftOcrTextRecognitionPrEngine {
         if image_bytes.is_empty() {
             (String::new(), 0.0)
         } else {
- {
             ("Extracted OCR Text".to_string(), 0.98)
         }
     }
@@ -404,7 +395,6 @@ impl PdfcraftPageImpositionBookletPrEngine {
         if nup == 0 {
             0
         } else {
- {
             (total_pages + nup - 1) / nup
         }
     }
@@ -528,7 +518,6 @@ impl SovereignPdfcraftMissingComponentsParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")
