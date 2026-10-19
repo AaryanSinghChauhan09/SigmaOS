@@ -423,6 +423,13 @@ if [ -f "src/creative/figcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_figcraft_missing
 fi
 
+if [ -f "src/creative/figcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Figcraft to Artcraft Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/figcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_figcraft_artcraft_parity
+    ./build/test_figcraft_artcraft_parity
+fi
+
 if [ -f "src/creative/cadcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Sovereign Cadcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
