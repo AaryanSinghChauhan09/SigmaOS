@@ -656,30 +656,26 @@ impl RootkitHookDetector {
 mod tests {
     use super::*;
 
-    static mut MOCK_DPC_CALLED: bool = false;
+    use core::sync::atomic::{AtomicBool, AtomicUsize};
+
+    static MOCK_DPC_CALLED: AtomicBool = AtomicBool::new(false);
     fn mock_dpc_routine(_context: usize) {
-        unsafe {
-            MOCK_DPC_CALLED = true;
-        }
+        MOCK_DPC_CALLED.store(true, Ordering::SeqCst);
     }
 
-    static mut MOCK_PROCESS_CREATION_NOTIFIED: bool = false;
+    static MOCK_PROCESS_CREATION_NOTIFIED: AtomicBool = AtomicBool::new(false);
     fn mock_process_callback(pid: usize, created: bool) {
         if created && pid == 42 {
-            unsafe {
-                MOCK_PROCESS_CREATION_NOTIFIED = true;
-            }
+            MOCK_PROCESS_CREATION_NOTIFIED.store(true, Ordering::SeqCst);
         }
     }
 
-    static mut COMPLETION_ROUTINE_CALLED: bool = false;
-    static mut COMPLETION_CONTEXT_VAL: usize = 0;
+    static COMPLETION_ROUTINE_CALLED: AtomicBool = AtomicBool::new(false);
+    static COMPLETION_CONTEXT_VAL: AtomicUsize = AtomicUsize::new(0);
 
     fn mock_completion_routine(_device: &DeviceObject, _irp: &mut Irp, context: usize) -> IoStatus {
-        unsafe {
-            COMPLETION_ROUTINE_CALLED = true;
-            COMPLETION_CONTEXT_VAL = context;
-        }
+        COMPLETION_ROUTINE_CALLED.store(true, Ordering::SeqCst);
+        COMPLETION_CONTEXT_VAL.store(context, Ordering::SeqCst);
         IoStatus::Success
     }
 
@@ -728,17 +724,13 @@ mod tests {
         });
 
         assert_eq!(manager.process_queued_dpcs(), 1);
-        unsafe {
-            assert!(MOCK_DPC_CALLED);
-        }
+        assert!(MOCK_DPC_CALLED.load(Ordering::SeqCst));
 
         manager
             .callbacks
             .register_process_callback(mock_process_callback);
         manager.callbacks.trigger_process_event(42, true);
-        unsafe {
-            assert!(MOCK_PROCESS_CREATION_NOTIFIED);
-        }
+        assert!(MOCK_PROCESS_CREATION_NOTIFIED.load(Ordering::SeqCst));
     }
 
     #[test]
@@ -809,10 +801,8 @@ mod tests {
         manager.complete_request(&mut irp, IoStatus::Success);
         assert_eq!(irp.current_location, 10); // Traversed back up
 
-        unsafe {
-            assert!(COMPLETION_ROUTINE_CALLED);
-            assert_eq!(core::ptr::addr_of!(COMPLETION_CONTEXT_VAL).read(), 1337);
-        }
+        assert!(COMPLETION_ROUTINE_CALLED.load(Ordering::SeqCst));
+        assert_eq!(COMPLETION_CONTEXT_VAL.load(Ordering::SeqCst), 1337);
     }
 
     #[test]
@@ -858,11 +848,9 @@ mod tests {
 
     // --- New Tests for Multi-OS Inspired Paradigms ---
 
-    static mut MOCK_CANCEL_CALLED: bool = false;
+    static MOCK_CANCEL_CALLED: AtomicBool = AtomicBool::new(false);
     fn mock_cancel_routine(_irp: &mut Irp) {
-        unsafe {
-            MOCK_CANCEL_CALLED = true;
-        }
+        MOCK_CANCEL_CALLED.store(true, Ordering::SeqCst);
     }
 
     #[test]
@@ -874,9 +862,7 @@ mod tests {
         irp.cancel();
         assert!(irp.cancelled);
         assert_eq!(irp.io_status.status, IoStatus::Cancelled);
-        unsafe {
-            assert!(MOCK_CANCEL_CALLED);
-        }
+        assert!(MOCK_CANCEL_CALLED.load(Ordering::SeqCst));
     }
 
     fn mock_fast_read(_device: &DeviceObject, buffer: &mut [u8]) -> bool {

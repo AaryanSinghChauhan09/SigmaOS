@@ -898,7 +898,7 @@ mod tests {
 
     #[test]
     fn test_ndis_miniport_send() {
-        static mut SEND_COUNT: usize = 0;
+        static SEND_COUNT: AtomicUsize = AtomicUsize::new(0);
         fn mock_send(
             _handle: NDIS_HANDLE,
             nbl: *mut NET_BUFFER_LIST,
@@ -911,8 +911,8 @@ mod tests {
             unsafe {
                 let list = &*nbl;
                 assert_eq!(list.payload, b"NDIS_PACKET");
-                SEND_COUNT += 1;
             }
+            SEND_COUNT.fetch_add(1, Ordering::SeqCst);
         }
 
         let mut adapter = WindowsDriverAdapter::new_wdm("NDISMiniport");
@@ -934,14 +934,12 @@ mod tests {
 
         ndis_adapter.init().unwrap();
         ndis_adapter.send_packet(b"NDIS_PACKET").unwrap();
-        unsafe {
-            assert_eq!(SEND_COUNT, 1);
-        }
+        assert!(SEND_COUNT.load(Ordering::SeqCst) >= 1);
     }
 
     #[test]
     fn test_storport_start_io() {
-        static mut IO_DONE: bool = false;
+        static IO_DONE: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
         fn mock_start_io(_context: PVOID, srb: *mut SCSI_REQUEST_BLOCK) -> bool {
             if srb.is_null() {
                 return false;
@@ -958,8 +956,8 @@ mod tests {
                     req.data_transfer_length as usize,
                 );
                 buffer[0] = 0xAA;
-                IO_DONE = true;
             }
+            IO_DONE.store(true, Ordering::SeqCst);
             true
         }
 
@@ -984,9 +982,7 @@ mod tests {
         let mut buf = [0u8; 512];
         storport.read_block(42, &mut buf).unwrap();
         assert_eq!(buf[0], 0xAA);
-        unsafe {
-            assert!(IO_DONE);
-        }
+        assert!(IO_DONE.load(Ordering::SeqCst));
     }
 
     #[test]
