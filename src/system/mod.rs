@@ -88,6 +88,7 @@ pub mod sigmapackagemanager;
 pub mod sigmaparted;
 pub mod sigmaperformancemonitor;
 pub mod sigmapkg;
+pub mod sigmalight;
 pub mod sigmaports;
 pub mod sigmapower;
 pub mod sigmaprinter;
@@ -364,6 +365,10 @@ pub use sigmaftp::{
 pub use sigmagrid::{
     add_grid_area, get_sigmagrid, get_sigmagrid_mut, init_sigmagrid, GridAlignment, GridArea,
     GridColumn, GridItem, GridRow, GridUnit, SigmaGrid,
+};
+pub use sigmalight::{
+    ColorTemperature, LightSource, LightType, LightingScene, SigmaLight,
+    add_light, get_sigmalight, get_sigmalight_mut, init_sigmalight,
 };
 pub use sigmahibernation::{
     create_image, get_sigmahibernation, get_sigmahibernation_mut, init_sigmahibernation,
