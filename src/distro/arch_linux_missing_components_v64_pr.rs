@@ -336,7 +336,10 @@ impl ArchPaccacheRetentionCleanerPrEngine {
     }
 
     pub fn format_clean_cmd(&self) -> String {
-        format!("paccache -rk{} -c {}", self.retain_versions, self.target_dir)
+        format!(
+            "paccache -rk{} -c {}",
+            self.retain_versions, self.target_dir
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV64PrSpec {
@@ -550,16 +553,36 @@ impl ArchLinuxMissingComponentsV64PrSuite {
 
     pub fn compute_gap_closure_score(&self) -> u32 {
         let mut score = 0;
-        if self.pkglist_export.verify() { score += 10; }
-        if self.hooks_linter.verify() { score += 10; }
-        if self.paru_wrapper.verify() { score += 10; }
-        if self.srcinfo_gen.verify() { score += 10; }
-        if self.cgroup_tuner.verify() { score += 10; }
-        if self.reflector_filter.verify() { score += 10; }
-        if self.paccache_cleaner.verify() { score += 10; }
-        if self.mkinitcpio_tuner.verify() { score += 10; }
-        if self.genfstab_gen.verify() { score += 10; }
-        if self.systemd_boot.verify() { score += 10; }
+        if self.pkglist_export.verify() {
+            score += 10;
+        }
+        if self.hooks_linter.verify() {
+            score += 10;
+        }
+        if self.paru_wrapper.verify() {
+            score += 10;
+        }
+        if self.srcinfo_gen.verify() {
+            score += 10;
+        }
+        if self.cgroup_tuner.verify() {
+            score += 10;
+        }
+        if self.reflector_filter.verify() {
+            score += 10;
+        }
+        if self.paccache_cleaner.verify() {
+            score += 10;
+        }
+        if self.mkinitcpio_tuner.verify() {
+            score += 10;
+        }
+        if self.genfstab_gen.verify() {
+            score += 10;
+        }
+        if self.systemd_boot.verify() {
+            score += 10;
+        }
         score
     }
 }

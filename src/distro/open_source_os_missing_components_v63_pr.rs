@@ -94,17 +94,18 @@ impl Linux619SchedExtPhotonicGovernorEngine {
         self.energy_cores.insert(core_id.to_string(), power_mw);
     }
 
-    pub fn evaluate_task_placement(&mut self, pid: u32, policy_name: &str) -> Option<TaskPlacementDecision> {
+    pub fn evaluate_task_placement(
+        &mut self,
+        pid: u32,
+        policy_name: &str,
+    ) -> Option<TaskPlacementDecision> {
         if !self.sched_policies.contains_key(policy_name) || self.energy_cores.is_empty() {
             return None;
         }
         self.active_workloads.insert(pid, policy_name.to_string());
 
         // Find core with lowest power consumption for optimal energy-efficiency routing
-        let (best_core, min_power) = self
-            .energy_cores
-            .iter()
-            .min_by_key(|(_, power)| *power)?;
+        let (best_core, min_power) = self.energy_cores.iter().min_by_key(|(_, power)| *power)?;
 
         Some(TaskPlacementDecision {
             target_core: best_core.clone(),
@@ -586,16 +587,22 @@ mod tests {
             .linux_engine
             .register_sched_policy("scx_photonic_governor", "0xdef456");
         master.linux_engine.register_energy_core("core_0", 12000);
-        let placement = master.linux_engine.evaluate_task_placement(101, "scx_photonic_governor");
+        let placement = master
+            .linux_engine
+            .evaluate_task_placement(101, "scx_photonic_governor");
         assert!(placement.is_some());
 
         master
             .freebsd_engine
             .spawn_pqc_vnet_jail("jail_pqc_01", vec!["CAP_READ", "CAP_WRITE"]);
-        assert!(master.freebsd_engine.authorize_capsicum_request("jail_pqc_01", "CAP_READ"));
+        assert!(master
+            .freebsd_engine
+            .authorize_capsicum_request("jail_pqc_01", "CAP_READ"));
 
         master.openbsd_engine.configure_security(4096, 256);
-        assert!(master.openbsd_engine.verify_shadow_stack_pointer(0x1000, 0x1000));
+        assert!(master
+            .openbsd_engine
+            .verify_shadow_stack_pointer(0x1000, 0x1000));
 
         master
             .dragonfly_engine
@@ -605,12 +612,16 @@ mod tests {
         master
             .netbsd_engine
             .register_rump_driver("rumpuser_hypercall_pci");
-        assert!(master.netbsd_engine.route_hypercall("rumpuser_hypercall_pci", 1));
+        assert!(master
+            .netbsd_engine
+            .route_hypercall("rumpuser_hypercall_pci", 1));
 
         master
             .haiku_engine
             .add_attribute_index("BEOS:TYPE", "string");
-        let results = master.haiku_engine.query_vector_attribute("BEOS:TYPE", "app");
+        let results = master
+            .haiku_engine
+            .query_vector_attribute("BEOS:TYPE", "app");
         assert_eq!(results.len(), 1);
 
         master.plan9_engine.mount_synthetic_namespace("#s/proc");

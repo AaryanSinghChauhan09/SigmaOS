@@ -39,7 +39,11 @@ fn test_open_source_os_v63_pr_suite_full_cycle() {
     suite.thousands_engine.register_component("mod_v63");
 
     let prs = suite.collect_all_proposals();
-    assert_eq!(prs.len(), 10, "Expected 10 Open-Source OS PR specifications");
+    assert_eq!(
+        prs.len(),
+        10,
+        "Expected 10 Open-Source OS PR specifications"
+    );
     assert_eq!(
         suite.compute_v63_parity_score(),
         100,
@@ -88,15 +92,23 @@ fn test_arch_linux_v64_pr_suite_full_cycle() {
     // Engine specific runtime command generation tests
     let pkglist = ArchPkglistExportBackupManagerPrEngine::new();
     assert!(pkglist.verify());
-    assert_eq!(pkglist.format_export_cmd(), "pacman -Qqe > /etc/pkglist.txt");
+    assert_eq!(
+        pkglist.format_export_cmd(),
+        "pacman -Qqe > /etc/pkglist.txt"
+    );
 
     let reflector = ArchReflectorCountryMirrorFilterPrEngine::new();
     assert!(reflector.verify());
-    assert!(reflector.format_reflector_cmd().contains("reflector --country US"));
+    assert!(reflector
+        .format_reflector_cmd()
+        .contains("reflector --country US"));
 
     let paccache = ArchPaccacheRetentionCleanerPrEngine::new();
     assert!(paccache.verify());
-    assert_eq!(paccache.format_clean_cmd(), "paccache -rk2 -c /var/cache/pacman/pkg");
+    assert_eq!(
+        paccache.format_clean_cmd(),
+        "paccache -rk2 -c /var/cache/pacman/pkg"
+    );
 
     let mkinitcpio = ArchMkinitcpioCompressionTunerPrEngine::new();
     assert!(mkinitcpio.verify());
