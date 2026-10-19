@@ -790,6 +790,9 @@ pub use sovereign_init_and_supervisor_inspirations_pr::*;
 pub mod sovereign_init_and_supervisor_advancements_v52;
 pub use sovereign_init_and_supervisor_advancements_v52::*;
 
+pub mod sovereign_init_and_supervisor_advancements_v63_pr;
+pub use sovereign_init_and_supervisor_advancements_v63_pr::*;
+
 pub mod sovereign_init_and_supervisor_advancements_v53;
 pub use sovereign_init_and_supervisor_advancements_v53::*;
 
