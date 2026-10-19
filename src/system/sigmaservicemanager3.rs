@@ -20,7 +20,7 @@ pub enum ServiceState {
     Stopped,
     Failed,
     Unknown,
-;
+}
 
 /// Service type
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -30,7 +30,7 @@ pub enum ServiceType {
     Socket,
     Timer,
     Path,
-;
+}
 
 /// Service
 #[derive(Debug, Clone)]
@@ -45,7 +45,7 @@ pub struct Service {
     pub memory_usage: u64, // in bytes
     pub cpu_usage: f32, // percentage
     pub dependencies: Vec<String>,
-;
+}
 
 impl Service {
     pub fn new(id: String, name: String, description: String, service_type: ServiceType) -> Self {
@@ -94,13 +94,13 @@ impl Service {
     pub fn is_failed(&self) -> bool {
         self.state == ServiceState::Failed
     }
-;
+}
 
 /// SigmaServiceManager - Service management
 #[derive(Debug)]
 pub struct SigmaServiceManager {
     services: BTreeMap<String, Service>,
-;
+}
 
 impl SigmaServiceManager {
     pub fn new() -> Self {
@@ -189,13 +189,13 @@ impl SigmaServiceManager {
     pub fn service_count(&self) -> usize {
         self.services.len()
     }
-;
+}
 
 impl Default for SigmaServiceManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 /// Global SigmaServiceManager instance
 static mut SIGMASERVICEMANAGER_INSTANCE: Option<SigmaServiceManager> = None;
@@ -205,21 +205,21 @@ pub fn init_sigmaservicemanager() {
     unsafe {
         SIGMASERVICEMANAGER_INSTANCE = Some(SigmaServiceManager::new());
     }
-;
+}
 
 /// Get the global SigmaServiceManager instance
 pub fn get_sigmaservicemanager() -> Option<&'static SigmaServiceManager> {
     unsafe {
         SIGMASERVICEMANAGER_INSTANCE.as_ref()
     }
-;
+}
 
 /// Get the global SigmaServiceManager instance (mutable)
 pub fn get_sigmaservicemanager_mut() -> Option<&'static mut SigmaServiceManager> {
     unsafe {
         SIGMASERVICEMANAGER_INSTANCE.as_mut()
     }
-;
+}
 
 /// Convenience function to add a service
 pub fn add_service(service: Service) -> bool {
@@ -229,7 +229,7 @@ pub fn add_service(service: Service) -> bool {
     } else {
         false
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -312,4 +312,4 @@ mod tests {
         manager.disable_service("test");
         assert!(manager.list_enabled().len() == 0);
     }
-;
+}
