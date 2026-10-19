@@ -115,6 +115,7 @@ pub mod sigmascanner;
 pub mod sigmawebcam;
 pub mod sigmamicrophone;
 pub mod sigmadiskmanager;
+pub mod sigmadiskusage;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -610,6 +611,12 @@ pub use sigmadiskmanager {
     SigmaDiskManager, Disk, DiskType, DiskState,
     init_sigmadiskmanager, get_sigmadiskmanager, get_sigmadiskmanager_mut,
     add_disk,
+};
+
+pub use sigmadiskusage {
+    SigmaDiskUsage, Filesystem, Directory,
+    init_sigmadiskusage, get_sigmadiskusage, get_sigmadiskusage_mut,
+    add_filesystem,
 };
 
 pub use sigmaupdate::{
