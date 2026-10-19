@@ -1,375 +1,181 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SigmaOS Contributors
-
-//! SigmaPower - Power Management Daemon
+//! SigmaPower - Power Management Settings System
 //!
-//! SigmaPower provides power management for SigmaOS, inspired by systemd-power and power-profiles-daemon from Linux.
+//! Provides comprehensive power management settings inspired by Linux power management tools.
+//! Supports power profiles, screen brightness, and power saving modes.
 
 #![no_std]
+
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::fmt;
+use alloc::{
+    collections::BTreeMap,
+    string::{String, ToString},
+    vec::Vec,
+};
 
 /// Power profile
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PowerProfile {
-    /// Power saver profile
-    PowerSaver,
-    /// Balanced profile
-    Balanced,
-    /// Performance profile
     Performance,
-}
-
-impl fmt::Display for PowerProfile {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            PowerProfile::PowerSaver => write!(f, "power_saver"),
-            PowerProfile::Balanced => write!(f, "balanced"),
-            PowerProfile::Performance => write!(f, "performance"),
-        }
-    }
-}
-
-/// Power state
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PowerState {
-    /// Active
-    Active,
-    /// Suspended
-    Suspended,
-    /// Hibernated
-    Hibernated,
-    /// Shutting down
-    ShuttingDown,
-}
-
-impl fmt::Display for PowerState {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            PowerState::Active => write!(f, "active"),
-            PowerState::Suspended => write!(f, "suspended"),
-            PowerState::Hibernated => write!(f, "hibernated"),
-            PowerState::ShuttingDown => write!(f, "shutting_down"),
-        }
-    }
-}
-
-/// Battery status
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BatteryStatus {
-    /// Discharging
-    Discharging,
-    /// Charging
-    Charging,
-    /// Full
-    Full,
-    /// Unknown
+    Balanced,
+    PowerSaver,
     Unknown,
 }
 
-impl fmt::Display for BatteryStatus {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            BatteryStatus::Discharging => write!(f, "discharging"),
-            BatteryStatus::Charging => write!(f, "charging"),
-            BatteryStatus::Full => write!(f, "full"),
-            BatteryStatus::Unknown => write!(f, "unknown"),
-        }
-    }
-}
-
-/// Battery information
+/// Screen brightness
 #[derive(Debug, Clone)]
-pub struct BatteryInfo {
-    /// Battery ID
-    pub battery_id: String,
-    /// Battery capacity (percentage)
-    pub capacity: u8,
-    /// Battery status
-    pub status: BatteryStatus,
-    /// Current voltage (mV)
-    pub voltage: Option<u32>,
-    /// Current current (mA)
-    pub current: Option<u32>,
-    /// Estimated time remaining (seconds)
-    pub time_remaining: Option<u64>,
+pub struct Brightness {
+    pub level: u8,
+    pub min: u8,
+    pub max: u8,
 }
 
-impl BatteryInfo {
-    /// Create new battery info
-    pub fn new(battery_id: String, capacity: u8, status: BatteryStatus) -> Self {
+impl Brightness {
+    pub fn new(level: u8) -> Self {
         Self {
-            battery_id,
-            capacity,
-            status,
-            voltage: None,
-            current: None,
-            time_remaining: None,
+            level,
+            min: 0,
+            max: 100,
         }
     }
 
-    /// Set voltage
-    pub fn with_voltage(mut self, voltage: u32) -> Self {
-        self.voltage = Some(voltage);
+    pub fn with_range(mut self, min: u8, max: u8) -> Self {
+        self.min = min;
+        self.max = max;
         self
     }
 
-    /// Set current
-    pub fn with_current(mut self, current: u32) -> Self {
-        self.current = Some(current);
-        self
+    pub fn set_level(&mut self, level: u8) {
+        self.level = level.clamp(self.min, self.max);
     }
 
-    /// Set time remaining
-    pub fn with_time_remaining(mut self, time: u64) -> Self {
-        self.time_remaining = Some(time);
-        self
+    pub fn percentage(&self) -> u8 {
+        if self.max == self.min {
+            0
+        } else {
+            ((self.level - self.min) * 100) / (self.max - self.min)
+        }
     }
 }
 
-/// Power statistics
+/// Power settings
 #[derive(Debug, Clone)]
-pub struct PowerStats {
-    /// Uptime (seconds)
-    pub uptime: u64,
-    /// Total energy consumed (Wh)
-    pub energy_consumed: f64,
-    /// Average power draw (W)
-    pub average_power: f64,
-    /// Profile switches count
-    pub profile_switches: u32,
-    /// Suspend count
-    pub suspend_count: u32,
-    /// Hibernate count
-    pub hibernate_count: u32,
+pub struct PowerSettings {
+    pub profile: PowerProfile,
+    pub screen_brightness: Brightness,
+    pub idle_timeout: Option<u32>,
+    pub sleep_timeout: Option<u32>,
+    pub hibernate_timeout: Option<u32>,
+    pub screen_off_timeout: Option<u32>,
 }
 
-/// SigmaPower - Power Management Daemon
+impl PowerSettings {
+    pub fn new() -> Self {
+        Self {
+            profile: PowerProfile::Balanced,
+            screen_brightness: Brightness::new(80),
+            idle_timeout: Some(300),
+            sleep_timeout: Some(900),
+            hibernate_timeout: None,
+            screen_off_timeout: Some(120),
+        }
+    }
+
+    pub fn with_profile(mut self, profile: PowerProfile) -> Self {
+        self.profile = profile;
+        self
+    }
+
+    pub fn with_brightness(mut self, level: u8) -> Self {
+        self.screen_brightness = Brightness::new(level);
+        self
+    }
+
+    pub fn set_profile(&mut self, profile: PowerProfile) {
+        self.profile = profile;
+    }
+
+    pub fn set_brightness(&mut self, level: u8) {
+        self.screen_brightness.set_level(level);
+    }
+
+    pub fn set_idle_timeout(&mut self, timeout: u32) {
+        self.idle_timeout = Some(timeout);
+    }
+
+    pub fn set_sleep_timeout(&mut self, timeout: u32) {
+        self.sleep_timeout = Some(timeout);
+    }
+
+    pub fn set_hibernate_timeout(&mut self, timeout: u32) {
+        self.hibernate_timeout = Some(timeout);
+    }
+
+    pub fn set_screen_off_timeout(&mut self, timeout: u32) {
+        self.screen_off_timeout = Some(timeout);
+    }
+}
+
+impl Default for PowerSettings {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Power manager
 pub struct SigmaPower {
-    /// Current power profile
-    current_profile: PowerProfile,
-    /// Current power state
-    current_state: PowerState,
-    /// Running state
-    running: bool,
-    /// Battery information (battery_id -> info)
-    batteries: BTreeMap<String, BatteryInfo>,
-    /// Power statistics
-    stats: PowerStats,
-    /// Profile-specific settings
-    profile_settings: BTreeMap<PowerProfile, BTreeMap<String, String>>,
+    settings: PowerSettings,
 }
 
 impl SigmaPower {
-    /// Create a new SigmaPower instance
     pub fn new() -> Self {
-        let mut profile_settings = BTreeMap::new();
-
-        // Power saver settings
-        let mut power_saver = BTreeMap::new();
-        power_saver.insert("cpu_governor".to_string(), "powersave".to_string());
-        power_saver.insert("screen_brightness".to_string(), "50".to_string());
-        power_saver.insert("disk_apm".to_string(), "127".to_string());
-        profile_settings.insert(PowerProfile::PowerSaver, power_saver);
-
-        // Balanced settings
-        let mut balanced = BTreeMap::new();
-        balanced.insert("cpu_governor".to_string(), "ondemand".to_string());
-        balanced.insert("screen_brightness".to_string(), "75".to_string());
-        balanced.insert("disk_apm".to_string(), "255".to_string());
-        profile_settings.insert(PowerProfile::Balanced, balanced);
-
-        // Performance settings
-        let mut performance = BTreeMap::new();
-        performance.insert("cpu_governor".to_string(), "performance".to_string());
-        performance.insert("screen_brightness".to_string(), "100".to_string());
-        performance.insert("disk_apm".to_string(), "255".to_string());
-        profile_settings.insert(PowerProfile::Performance, performance);
-
         Self {
-            current_profile: PowerProfile::Balanced,
-            current_state: PowerState::Active,
-            running: false,
-            batteries: BTreeMap::new(),
-            stats: PowerStats {
-                uptime: 0,
-                energy_consumed: 0.0,
-                average_power: 0.0,
-                profile_switches: 0,
-                suspend_count: 0,
-                hibernate_count: 0,
-            },
-            profile_settings,
+            settings: PowerSettings::new(),
         }
     }
 
-    /// Start the power daemon
-    pub fn start(&mut self) {
-        self.running = true;
+    pub fn get_settings(&self) -> &PowerSettings {
+        &self.settings
     }
 
-    /// Stop the power daemon
-    pub fn stop(&mut self) {
-        self.running = false;
+    pub fn get_settings_mut(&mut self) -> &mut PowerSettings {
+        &mut self.settings
     }
 
-    /// Check if the daemon is running
-    pub fn is_running(&self) -> bool {
-        self.running
+    pub fn set_profile(&mut self, profile: PowerProfile) {
+        self.settings.set_profile(profile);
     }
 
-    /// Set power profile
-    pub fn set_profile(&mut self, profile: PowerProfile) -> Result<(), String> {
-        if !self.running {
-            return Err("SigmaPower not running".to_string());
-        }
-
-        if self.current_profile != profile {
-            self.current_profile = profile;
-            self.stats.profile_switches += 1;
-        }
-
-        Ok(())
+    pub fn set_brightness(&mut self, level: u8) {
+        self.settings.set_brightness(level);
     }
 
-    /// Get current power profile
+    pub fn set_idle_timeout(&mut self, timeout: u32) {
+        self.settings.set_idle_timeout(timeout);
+    }
+
+    pub fn set_sleep_timeout(&mut self, timeout: u32) {
+        self.settings.set_sleep_timeout(timeout);
+    }
+
+    pub fn set_hibernate_timeout(&mut self, timeout: u32) {
+        self.settings.set_hibernate_timeout(timeout);
+    }
+
+    pub fn set_screen_off_timeout(&mut self, timeout: u32) {
+        self.settings.set_screen_off_timeout(timeout);
+    }
+
     pub fn get_profile(&self) -> PowerProfile {
-        self.current_profile
+        self.settings.profile
     }
 
-    /// Set power state
-    pub fn set_state(&mut self, state: PowerState) -> Result<(), String> {
-        if !self.running {
-            return Err("SigmaPower not running".to_string());
-        }
-
-        self.current_state = state;
-
-        match state {
-            PowerState::Suspended => self.stats.suspend_count += 1,
-            PowerState::Hibernated => self.stats.hibernate_count += 1,
-            _ => {}
-        }
-
-        Ok(())
+    pub fn get_brightness(&self) -> u8 {
+        self.settings.screen_brightness.level
     }
 
-    /// Get current power state
-    pub fn get_state(&self) -> PowerState {
-        self.current_state
-    }
-
-    /// Add battery information
-    pub fn add_battery(&mut self, battery: BatteryInfo) -> Result<(), String> {
-        if self.batteries.contains_key(&battery.battery_id) {
-            return Err(format!("Battery '{}' already exists", battery.battery_id));
-        }
-        self.batteries.insert(battery.battery_id.clone(), battery);
-        Ok(())
-    }
-
-    /// Update battery information
-    pub fn update_battery(&mut self, battery: BatteryInfo) -> Result<(), String> {
-        if !self.batteries.contains_key(&battery.battery_id) {
-            return Err(format!("Battery '{}' not found", battery.battery_id));
-        }
-        self.batteries.insert(battery.battery_id.clone(), battery);
-        Ok(())
-    }
-
-    /// Get battery information
-    pub fn get_battery(&self, battery_id: &str) -> Option<&BatteryInfo> {
-        self.batteries.get(battery_id)
-    }
-
-    /// List all batteries
-    pub fn list_batteries(&self) -> Vec<&BatteryInfo> {
-        self.batteries.values().collect()
-    }
-
-    /// Get total battery capacity
-    pub fn total_capacity(&self) -> u8 {
-        if self.batteries.is_empty() {
-            return 0;
-        }
-
-        let total: u32 = self.batteries.values().map(|b| b.capacity as u32).sum();
-        (total / self.batteries.len() as u32) as u8
-    }
-
-    /// Suspend system
-    pub fn suspend(&mut self) -> Result<(), String> {
-        if !self.running {
-            return Err("SigmaPower not running".to_string());
-        }
-
-        self.set_state(PowerState::Suspended)?;
-        Ok(())
-    }
-
-    /// Hibernate system
-    pub fn hibernate(&mut self) -> Result<(), String> {
-        if !self.running {
-            return Err("SigmaPower not running".to_string());
-        }
-
-        self.set_state(PowerState::Hibernated)?;
-        Ok(())
-    }
-
-    /// Shutdown system
-    pub fn shutdown(&mut self) -> Result<(), String> {
-        if !self.running {
-            return Err("SigmaPower not running".to_string());
-        }
-
-        self.set_state(PowerState::ShuttingDown)?;
-        Ok(())
-    }
-
-    /// Update statistics
-    pub fn update_stats(&mut self, uptime: u64, energy: f64, power: f64) {
-        self.stats.uptime = uptime;
-        self.stats.energy_consumed = energy;
-        self.stats.average_power = power;
-    }
-
-    /// Get power statistics
-    pub fn get_stats(&self) -> &PowerStats {
-        &self.stats
-    }
-
-    /// Get profile settings
-    pub fn get_profile_settings(&self, profile: PowerProfile) -> Option<&BTreeMap<String, String>> {
-        self.profile_settings.get(&profile)
-    }
-
-    /// Auto-switch profile based on battery capacity
-    pub fn auto_switch_profile(&mut self) -> Option<PowerProfile> {
-        if !self.running {
-            return None;
-        }
-
-        let capacity = self.total_capacity();
-
-        let new_profile = if capacity < 20 {
-            PowerProfile::PowerSaver
-        } else if capacity > 80 {
-            PowerProfile::Performance
-        } else {
-            PowerProfile::Balanced
-        };
-
-        if new_profile != self.current_profile {
-            let _ = self.set_profile(new_profile);
-            Some(new_profile)
-        } else {
-            None
-        }
+    pub fn get_brightness_percentage(&self) -> u8 {
+        self.settings.screen_brightness.percentage()
     }
 }
 
@@ -379,45 +185,27 @@ impl Default for SigmaPower {
     }
 }
 
-/// Global SigmaPower instance (placeholder for actual global state)
 static mut SIGMAPOWER_INSTANCE: Option<SigmaPower> = None;
 
-/// Initialize the global SigmaPower instance
 pub fn init_sigmapower() {
     unsafe {
         SIGMAPOWER_INSTANCE = Some(SigmaPower::new());
     }
 }
 
-/// Get the global SigmaPower instance
-pub fn get_sigmapower() -> Option<&'static mut SigmaPower> {
-    unsafe { SIGMAPOWER_INSTANCE.as_mut() }
-}
-
-/// Convenience function to set power profile
-pub fn set_power_profile(profile: PowerProfile) -> Result<(), String> {
-    if let Some(power) = get_sigmapower() {
-        power.set_profile(profile)
-    } else {
-        Err("SigmaPower not initialized".to_string())
+pub fn get_sigmapower() -> &'static SigmaPower {
+    unsafe {
+        SIGMAPOWER_INSTANCE
+            .as_ref()
+            .expect("SigmaPower not initialized")
     }
 }
 
-/// Convenience function to suspend system
-pub fn suspend_system() -> Result<(), String> {
-    if let Some(power) = get_sigmapower() {
-        power.suspend()
-    } else {
-        Err("SigmaPower not initialized".to_string())
-    }
-}
-
-/// Convenience function to shutdown system
-pub fn shutdown_system() -> Result<(), String> {
-    if let Some(power) = get_sigmapower() {
-        power.shutdown()
-    } else {
-        Err("SigmaPower not initialized".to_string())
+pub fn get_sigmapower_mut() -> &'static mut SigmaPower {
+    unsafe {
+        SIGMAPOWER_INSTANCE
+            .as_mut()
+            .expect("SigmaPower not initialized")
     }
 }
 
@@ -426,171 +214,92 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_power_profile_display() {
-        assert_eq!(PowerProfile::PowerSaver.to_string(), "power_saver");
-        assert_eq!(PowerProfile::Balanced.to_string(), "balanced");
+    fn test_brightness_creation() {
+        let brightness = Brightness::new(80);
+        assert_eq!(brightness.level, 80);
+        assert_eq!(brightness.min, 0);
+        assert_eq!(brightness.max, 100);
     }
 
     #[test]
-    fn test_power_state_display() {
-        assert_eq!(PowerState::Active.to_string(), "active");
-        assert_eq!(PowerState::Suspended.to_string(), "suspended");
+    fn test_brightness_range() {
+        let brightness = Brightness::new(50).with_range(10, 90);
+        assert_eq!(brightness.min, 10);
+        assert_eq!(brightness.max, 90);
     }
 
     #[test]
-    fn test_battery_status_display() {
-        assert_eq!(BatteryStatus::Charging.to_string(), "charging");
-        assert_eq!(BatteryStatus::Discharging.to_string(), "discharging");
+    fn test_brightness_clamping() {
+        let mut brightness = Brightness::new(50).with_range(10, 90);
+        brightness.set_level(5);
+        assert_eq!(brightness.level, 10);
+
+        brightness.set_level(100);
+        assert_eq!(brightness.level, 90);
     }
 
     #[test]
-    fn test_battery_info() {
-        let battery = BatteryInfo::new("BAT0".to_string(), 85, BatteryStatus::Charging)
-            .with_voltage(12000)
-            .with_current(2000)
-            .with_time_remaining(3600);
-
-        assert_eq!(battery.battery_id, "BAT0");
-        assert_eq!(battery.capacity, 85);
-        assert_eq!(battery.voltage, Some(12000));
+    fn test_brightness_percentage() {
+        let brightness = Brightness::new(50);
+        assert_eq!(brightness.percentage(), 50);
     }
 
     #[test]
-    fn test_sigmapower() {
-        let mut power = SigmaPower::new();
-        assert!(!power.is_running());
-        power.start();
-        assert!(power.is_running());
-        power.stop();
-        assert!(!power.is_running());
+    fn test_power_settings_creation() {
+        let settings = PowerSettings::new();
+        assert_eq!(settings.profile, PowerProfile::Balanced);
+        assert_eq!(settings.screen_brightness.level, 80);
     }
 
     #[test]
-    fn test_sigmapower_set_profile() {
-        let mut power = SigmaPower::new();
-        power.start();
+    fn test_power_settings_builder() {
+        let settings = PowerSettings::new()
+            .with_profile(PowerProfile::Performance)
+            .with_brightness(100);
 
-        assert!(power.set_profile(PowerProfile::Performance).is_ok());
-        assert_eq!(power.get_profile(), PowerProfile::Performance);
+        assert_eq!(settings.profile, PowerProfile::Performance);
+        assert_eq!(settings.screen_brightness.level, 100);
     }
 
     #[test]
-    fn test_sigmapower_profile_switches() {
-        let mut power = SigmaPower::new();
-        power.start();
-
-        power.set_profile(PowerProfile::Performance).unwrap();
-        power.set_profile(PowerProfile::PowerSaver).unwrap();
-
-        let stats = power.get_stats();
-        assert_eq!(stats.profile_switches, 2);
+    fn test_power_manager() {
+        let manager = SigmaPower::new();
+        assert_eq!(manager.get_profile(), PowerProfile::Balanced);
     }
 
     #[test]
-    fn test_sigmapower_add_battery() {
-        let mut power = SigmaPower::new();
-
-        let battery = BatteryInfo::new("BAT0".to_string(), 85, BatteryStatus::Charging);
-        assert!(power.add_battery(battery).is_ok());
-        assert_eq!(power.list_batteries().len(), 1);
+    fn test_set_profile() {
+        let mut manager = SigmaPower::new();
+        manager.set_profile(PowerProfile::Performance);
+        assert_eq!(manager.get_profile(), PowerProfile::Performance);
     }
 
     #[test]
-    fn test_sigmapower_update_battery() {
-        let mut power = SigmaPower::new();
-
-        let battery1 = BatteryInfo::new("BAT0".to_string(), 85, BatteryStatus::Charging);
-        power.add_battery(battery1).unwrap();
-
-        let battery2 = BatteryInfo::new("BAT0".to_string(), 90, BatteryStatus::Charging);
-        assert!(power.update_battery(battery2).is_ok());
-
-        let battery = power.get_battery("BAT0").unwrap();
-        assert_eq!(battery.capacity, 90);
+    fn test_set_brightness() {
+        let mut manager = SigmaPower::new();
+        manager.set_brightness(90);
+        assert_eq!(manager.get_brightness(), 90);
     }
 
     #[test]
-    fn test_sigmapower_total_capacity() {
-        let mut power = SigmaPower::new();
+    fn test_set_timeouts() {
+        let mut manager = SigmaPower::new();
+        manager.set_idle_timeout(600);
+        manager.set_sleep_timeout(1800);
+        manager.set_hibernate_timeout(3600);
+        manager.set_screen_off_timeout(300);
 
-        let battery1 = BatteryInfo::new("BAT0".to_string(), 80, BatteryStatus::Charging);
-        let battery2 = BatteryInfo::new("BAT1".to_string(), 90, BatteryStatus::Charging);
-
-        power.add_battery(battery1).unwrap();
-        power.add_battery(battery2).unwrap();
-
-        assert_eq!(power.total_capacity(), 85);
+        assert_eq!(manager.get_settings().idle_timeout, Some(600));
     }
 
     #[test]
-    fn test_sigmapower_suspend() {
-        let mut power = SigmaPower::new();
-        power.start();
-
-        assert!(power.suspend().is_ok());
-        assert_eq!(power.get_state(), PowerState::Suspended);
-    }
-
-    #[test]
-    fn test_sigmapower_hibernate() {
-        let mut power = SigmaPower::new();
-        power.start();
-
-        assert!(power.hibernate().is_ok());
-        assert_eq!(power.get_state(), PowerState::Hibernated);
-    }
-
-    #[test]
-    fn test_sigmapower_shutdown() {
-        let mut power = SigmaPower::new();
-        power.start();
-
-        assert!(power.shutdown().is_ok());
-        assert_eq!(power.get_state(), PowerState::ShuttingDown);
-    }
-
-    #[test]
-    fn test_sigmapower_auto_switch() {
-        let mut power = SigmaPower::new();
-        power.start();
-
-        let battery = BatteryInfo::new("BAT0".to_string(), 15, BatteryStatus::Discharging);
-        power.add_battery(battery).unwrap();
-
-        let new_profile = power.auto_switch_profile();
-        assert_eq!(new_profile, Some(PowerProfile::PowerSaver));
-    }
-
-    #[test]
-    fn test_set_power_profile_convenience() {
+    fn test_global_instance() {
         init_sigmapower();
+        let manager = get_sigmapower();
+        assert_eq!(manager.get_profile(), PowerProfile::Balanced);
 
-        let mut power = get_sigmapower().unwrap();
-        power.start();
-
-        let result = set_power_profile(PowerProfile::Performance);
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_suspend_system_convenience() {
-        init_sigmapower();
-
-        let mut power = get_sigmapower().unwrap();
-        power.start();
-
-        let result = suspend_system();
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_shutdown_system_convenience() {
-        init_sigmapower();
-
-        let mut power = get_sigmapower().unwrap();
-        power.start();
-
-        let result = shutdown_system();
-        assert!(result.is_ok());
+        let manager_mut = get_sigmapower_mut();
+        manager_mut.set_profile(PowerProfile::Performance);
+        assert_eq!(manager.get_profile(), PowerProfile::Performance);
     }
 }
