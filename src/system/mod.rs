@@ -28,6 +28,7 @@ pub mod sigmacad;
 pub mod sigmadesign;
 pub mod sigmaeffect;
 pub mod sigmafig;
+pub mod sigmafilm;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -266,6 +267,11 @@ pub use sigmafig::{
     Connector, ConnectorType, Diagram, DiagramLayer, DiagramNode, FigSize, NodeType, Position,
     SigmaFig,
     add_diagram, get_sigmafig, get_sigmafig_mut, init_sigmafig,
+};
+pub use sigmafilm::{
+    AudioCodec, FrameRate, MediaClip, TimelineTrack, VideoCodec, VideoProject, VideoResolution,
+    SigmaFilm,
+    add_project, get_sigmafilm, get_sigmafilm_mut, init_sigmafilm,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
