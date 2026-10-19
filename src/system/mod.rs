@@ -135,6 +135,7 @@ pub mod sigmavirtualization;
 pub mod sigmawalker;
 pub mod sigmawallpaper;
 pub mod sigmawebcam;
+pub mod sigmavector;
 pub mod signamespaces;
 pub mod system_manager;
 pub mod system_monitor;
@@ -591,8 +592,12 @@ pub use sigmausbwriter::{
 };
 pub use sigmavirtualization::{
     create_vm, get_sigmavirtualization, get_sigmavirtualization_mut, init_sigmavirtualization,
-    Architecture, DiskInterface, NetworkInterface, SigmaVirtualization, VMResources, VMState,
+    Architecture, DiskInterface, NetworkInterface as VirtualizationNetworkInterface, SigmaVirtualization, VMResources, VMState,
     VirtualDisk, VirtualMachine, VirtualNetwork,
+};
+pub use sigmavector::{
+    LineCap, LineJoin, PathSegment, VectorElement, VectorElementType, VectorLayer, VectorPoint, SigmaVector,
+    add_layer, get_sigmavector, get_sigmavector_mut, init_sigmavector,
 };
 pub use sigmawalker::{
     add_window, get_sigmawalker, init_sigmawalker, switch_workspace, Keybinding, SigmaWalker,
