@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
+use alloc::collections::BTreeMap;
 // SigmaOS - CadCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/cadcraft_artcraft_parity_pr.rs`)
 //

@@ -1,4 +1,7 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
+use alloc::format;
+use alloc::collections::BTreeMap;
 // SigmaOS - Pdfcraft to Artcraft Parity PR Proposal Engine
 // Bridges Pdfcraft (PDF suite) and Artcraft (Creative Suite) missing feature parity via structured PR proposals.
 

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // SigmaOS - Deckcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/deckcraft_missing_components_parity_pr.rs`)
 //

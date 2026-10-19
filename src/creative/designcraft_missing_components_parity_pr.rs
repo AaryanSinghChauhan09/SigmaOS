@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // Sovereign DesignCraft from ArtCraft Missing Components Parity PR Gateway Engine
 // (`src/creative/designcraft_missing_components_parity_pr.rs`)
 

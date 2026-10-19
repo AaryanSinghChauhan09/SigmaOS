@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
+use alloc::collections::BTreeMap;
 // SigmaOS - Pdfcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/pdfcraft_missing_components_parity_pr.rs`)
 //

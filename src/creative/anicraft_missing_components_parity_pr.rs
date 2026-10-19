@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 //

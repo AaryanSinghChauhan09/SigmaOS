@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // SigmaOS - CraftLibs Missing Components Parity PR Gateway Module
 // (`src/creative/craftlibs_missing_components_parity_pr.rs`)
 //

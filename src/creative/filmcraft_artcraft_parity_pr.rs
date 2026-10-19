@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // SigmaOS - Filmcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/filmcraft_artcraft_parity_pr.rs`)
 //

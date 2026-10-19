@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // SigmaOS Photocraft Missing Components Parity PR Proposal Engine
 // (`src/creative/photocraft_missing_components_parity_pr.rs`)
 //

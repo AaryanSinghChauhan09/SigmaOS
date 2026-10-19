@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+use alloc::string::{String, ToString};
 // SigmaOS - Soundcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/soundcraft_missing_components_parity_pr.rs`)
 //
