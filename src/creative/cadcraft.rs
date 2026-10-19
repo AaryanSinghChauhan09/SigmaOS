@@ -136,28 +136,6 @@ pub struct SketchEntity {
     pub properties: BTreeMap<String, String>,
 }
 
-/// Geometric constraint type
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum GeometricConstraintType {
-    Coincident,
-    Parallel,
-    Perpendicular,
-    Concentric,
-    Tangent,
-    EqualLength {
-        line1_idx: usize,
-        line2_idx: usize,
-    },
-    Distance {
-        point1_idx: usize,
-        point2_idx: usize,
-        target_distance: f64,
-    },
-    Angle,
-}
-
-pub type GeometricConstraintType = ConstraintType;
-
 /// Geometric constraint
 #[derive(Debug, Clone)]
 pub struct GeometricConstraint {
@@ -490,12 +468,7 @@ impl CadCraftEngine {
         id
     }
 
-    pub fn add_geometric_constraint(
-        &mut self,
-        constraint_type: GeometricConstraintType,
-        entity_ids: Vec<u32>,
-        value: f32,
-    ) -> u32 {
+    pub fn add_geometric_constraint(&mut self, constraint_type: GeometricConstraintType, entity_ids: Vec<u32>, value: f32) -> u32 {
         let id = self.next_constraint_id.fetch_add(1, Ordering::Relaxed);
         let constraint = GeometricConstraint {
             id,
@@ -519,15 +492,7 @@ impl CadCraftEngine {
         sketch_id: Option<u32>,
     ) -> u32 {
         let id = self.next_feature_id.fetch_add(1, Ordering::Relaxed);
-        let feature = SolidFeature {
-            id,
-            feature_type,
-            depth,
-            sketch_id,
-            angle: 0.0,
-            radius: 0.0,
-            parent_feature_ids: Vec::new(),
-        };
+        let feature = SolidFeature { id, feature_type, depth, sketch_id, angle: 0.0, radius: 0.0, parent_feature_ids: Vec::new() };
         self.solid_features.insert(id, feature);
         id
     }
@@ -544,14 +509,7 @@ impl CadCraftEngine {
 
     pub fn add_assembly_component(&mut self, name: String, location: [f32; 3]) -> u32 {
         let id = self.next_component_id.fetch_add(1, Ordering::Relaxed);
-        let component = AssemblyComponent {
-            id,
-            name,
-            location,
-            rotation: [0.0, 0.0, 0.0],
-            mates: Vec::new(),
-            solid_feature_ids: Vec::new(),
-        };
+        let component = AssemblyComponent { id, name, location, rotation: [0.0, 0.0, 0.0], mates: Vec::new(), solid_feature_ids: Vec::new() };
         self.assembly_components.insert(id, component);
         id
     }
@@ -577,28 +535,11 @@ impl CadCraftEngine {
 
     pub fn run_fea_analysis(&mut self, name: String, node_count: u32, element_count: u32) -> u32 {
         let id = self.next_fea_id.fetch_add(1, Ordering::Relaxed);
-        let mesh = FeaMesh {
-            id,
-            name,
-            node_count,
-            element_count,
-            elements: Vec::new(),
-            max_stress: 0.0,
-            min_safety_factor: f32::MAX,
-        };
+        let mesh = FeaMesh { id, name, node_count, element_count, elements: Vec::new(), max_stress: 0.0, min_safety_factor: f32::MAX };
         self.fea_meshes.insert(id, mesh);
         id
     }
 
-    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        match format {
-            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
-            ExportFormat::STEP => {
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
-            }
-            _ => b"CAD_EXPORT_DATA".to_vec(),
-        }
-    }
 }
 
 impl Default for CadCraftEngine {
@@ -1122,11 +1063,7 @@ impl CadCraftMasterPrDeploymentSuite {
         let p2 = sample_sketch.add_point(50.0, 0.0);
         sample_sketch.add_constraint(GeometricConstraint {
             id: 1,
-            constraint_type: GeometricConstraintType::Distance {
-                point1_idx: p1,
-                point2_idx: p2,
-                target_distance: 100.0,
-            },
+            constraint_type: GeometricConstraintType::Distance { point1_idx: p1, point2_idx: p2, target_distance: 100.0 },
             entity_ids: vec![p1 as u32, p2 as u32],
             target_value: 100.0,
             satisfied: true,
@@ -1142,6 +1079,8 @@ impl CadCraftMasterPrDeploymentSuite {
 
         prs
     }
+
+
 }
 
 #[cfg(test)]

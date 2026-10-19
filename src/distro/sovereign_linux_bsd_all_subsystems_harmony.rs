@@ -767,8 +767,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
                 SigmaOsSubsystem::ProcessActivity,
                 SigmaOsSubsystem::SecuritySandboxing,
                 LinuxBsdDistroInspiration::FreeBSD,
-                "pol_proc_sec_capsicum",
-                "capsicum_pdfork_jail_sandbox_isolation",
+                "pol_proc_sec",
+                "freebsd_procstat_capsicum_process_sandbox_guard",
                 true,
             ),
         ];
@@ -861,17 +861,7 @@ impl SovereignSubsystemDistroHarmonyEngine {
         }
     }
 
-    pub fn audit_all_subsystems_distro_compliance_vec(&self) -> Vec<(SigmaOsSubsystem, bool, u32)> {
-        self.subsystems
-            .iter()
-            .map(|(&sub, spec)| {
-                let is_compliant = spec.supported_distros.len() >= 30 && spec.interop_score >= 100;
-                (sub, is_compliant, spec.interop_score)
-            })
-            .collect()
-    }
-
-    pub fn translate_cross_subsystem_payload(
+    pub fn format_subsystem_payload(
         &self,
         distro: LinuxBsdDistroInspiration,
         subsystem: SigmaOsSubsystem,
@@ -1125,11 +1115,8 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         target_distro: LinuxBsdDistroInspiration,
         payload: &str,
     ) -> String {
-        self.harmony_engine.translate_cross_distro_payload_direct(
-            source_distro,
-            target_distro,
-            payload,
-        )
+        self.harmony_engine
+            .translate_subsystem_payload(source_distro, target_distro, payload)
     }
 
     /// Perform system-wide distro compliance audit across all core subsystems.
@@ -1333,11 +1320,14 @@ mod tests {
             "rpm"
         );
 
-        let (audits, compliance_score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 31);
-        assert_eq!(compliance_score, 100);
+        let (audits_map, audit_score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits_map.len(), 44);
+        assert_eq!(audit_score, 100);
+        for (_, compliant) in audits_map {
+            assert!(compliant);
+        }
 
-        let translated = engine.translate_cross_subsystem_payload(
+        let translated = engine.translate_subsystem_payload(
             LinuxBsdDistroInspiration::FreeBSD,
             LinuxBsdDistroInspiration::ArchLinux,
             "jail_vnet",
