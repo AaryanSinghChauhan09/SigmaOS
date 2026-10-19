@@ -862,11 +862,10 @@ pub use sigmakeyboardmanager::{
 
 pub use sigmafilesystemmanager::{
     add_filesystem, get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut,
-    init_sigmafilesystemmanager, FilesystemType, MountPoint, MountStatus,
-    SigmaFileSystemManager,
+    init_sigmafilesystemmanager, SigmaFileSystemManager,
 };
 
-pub use sigmasecuritymanager::{
+pub use sigmasecuritymanager{
     add_firewall_rule, get_sigmasecuritymanager, get_sigmasecuritymanager_mut,
-    init_sigmasecuritymanager, AccessControlEntry, SecurityPolicy, SigmaSecurityManager,
+    init_sigmasecuritymanager, SigmaSecurityManager,
 };
