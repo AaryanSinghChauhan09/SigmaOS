@@ -93,11 +93,10 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV33, SovereignDistroPackageAdvancementsSuiteV40,
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV64,
-    SovereignDistroPackageAdvancementsSuiteV65,
-    SovereignUniversalPackageVerifier,
-    UniversalDistroPackageOrchestrator, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter, UniversalPackageFormat, UniversalPackageImporter,
-    UniversalPackageTriggerEngine, UniversalPackageTriggerType, UniversalPackageVerificationResult,
+    SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter, UniversalPackageFormat,
+    UniversalPackageImporter, UniversalPackageTriggerEngine, UniversalPackageTriggerType,
+    UniversalPackageVerificationResult,
 };
 pub mod process;
 pub mod productivity;
@@ -185,6 +184,7 @@ pub use distro::cachy_linux_missing_components_v56_pr::*;
 pub use distro::cachy_linux_missing_components_v61_pr::*;
 pub use distro::cachy_linux_missing_components_v62_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
+pub use distro::freebsd_missing_components_v61_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
@@ -213,7 +213,6 @@ pub use distro::sovereign_2060_distro_supremacy_engine::*;
 pub use distro::sovereign_2070_distro_supremacy_engine::*;
 pub use distro::sovereign_2075_distro_supremacy_engine::*;
 pub use distro::sovereign_freebsd_advanced_subsystems_pr::*;
-pub use distro::freebsd_missing_components_v61_pr::*;
 pub use distro::sovereign_freebsd_ultimate_parity_pr_suite::*;
 pub use distro::sovereign_linux_bsd_all_subsystems_harmony::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;

@@ -415,8 +415,9 @@ pub use audio_editor::{
     AudioTool, AudioTrack, BitDepth, ChannelCount, SampleRate,
 };
 pub use audio_recorder::{
-    get_audio_recorder, init_audio_recorder, AudioFormat as RecorderAudioFormat, AudioRecorder, BitDepth as RecorderBitDepth, Recording,
-    RecordingState, SampleRate as RecorderSampleRate,
+    get_audio_recorder, init_audio_recorder, AudioFormat as AudioRecorderFormat, AudioRecorder,
+    BitDepth as AudioRecorderBitDepth, Recording, RecordingState,
+    SampleRate as AudioRecorderSampleRate,
 };
 pub use bluetooth_manager::{
     get_bluetooth_manager, init_bluetooth_manager, BluetoothAdapter, BluetoothDevice,
@@ -471,8 +472,10 @@ pub use image_viewer::{
     Rotation, SlideshowMode, ZoomMode,
 };
 pub use keyboard_shortcuts::{
-    get_keyboard_shortcuts_manager, init_keyboard_shortcuts_manager, KeyModifier as AppKeyModifier, KeyboardShortcut as AppKeyboardShortcut,
-    KeyboardShortcutsManager as AppShortcutsManager, ShortcutAction, ShortcutCategory as AppShortcutCategory,
+    get_keyboard_shortcuts_manager, init_keyboard_shortcuts_manager, KeyModifier as SysKeyModifier,
+    KeyboardShortcut as SysKeyboardShortcut,
+    KeyboardShortcutsManager as SysKeyboardShortcutsManager, ShortcutAction,
+    ShortcutCategory as SysShortcutCategory,
 };
 pub use media_player::{
     get_media_player, init_media_player, AudioTrack as PlayerAudioTrack, EqualizerBand, MediaItem, MediaPlayer,
@@ -488,8 +491,8 @@ pub use pdf_viewer::{
     get_pdf_viewer, init_pdf_viewer, PageMode, PdfDocument, PdfViewer, ZoomLevel,
 };
 pub use printer_manager::{
-    get_printer_manager, init_printer_manager, ConnectionType, PaperSize, PrintJob as AppPrintJob, PrintQuality,
-    Printer as AppPrinter, PrinterManager, PrinterStatus as AppPrinterStatus,
+    get_printer_manager, init_printer_manager, ConnectionType, PaperSize, PrintJob as SysPrintJob,
+    PrintQuality, Printer as SysPrinter, PrinterManager, PrinterStatus as SysPrinterStatus,
 };
 pub use screen_recorder::{
     get_screen_recorder, init_screen_recorder, AudioCodec as RecorderAudioCodec, ContainerFormat as RecorderContainerFormat, RecordingArea,

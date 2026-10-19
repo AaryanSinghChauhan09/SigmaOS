@@ -586,16 +586,6 @@ impl CadCraftEngine {
         self.fea_meshes.insert(id, mesh);
         id
     }
-
-    pub fn export_cad(&self, format: ExportFormat) -> Vec<u8> {
-        match format {
-            ExportFormat::DXF => b"0\nSECTION\n2\nHEADER\n0\nENDSEC\n0\nEOF\n".to_vec(),
-            ExportFormat::STEP => {
-                b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n".to_vec()
-            }
-            _ => b"CAD_EXPORT_DATA".to_vec(),
-        }
-    }
 }
 
 impl Default for CadCraftEngine {

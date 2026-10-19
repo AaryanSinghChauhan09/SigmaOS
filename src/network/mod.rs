@@ -60,8 +60,9 @@ pub use icmp::{
     IcmpUnreachableCode,
 };
 pub use sigmafirewall::{
-    add_firewall_rule, get_sigmafirewall, init_sigmafirewall, FirewallAction as SigmaFirewallAction, FirewallProtocol,
-    FirewallRule as SigmaFirewallRule, SigmaFirewall,
+    add_firewall_rule, get_sigmafirewall, init_sigmafirewall,
+    FirewallAction as SigmaFirewallAction, FirewallProtocol, FirewallRule as SigmaFirewallRule,
+    SigmaFirewall,
 };
 pub use sigmanet::{
     bring_up_interface, connect_interface, get_sigmanet, init_sigmanet, InterfaceStatus,
