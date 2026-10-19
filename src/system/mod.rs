@@ -134,6 +134,7 @@ pub mod sigmatimeshift;
 pub mod sigmatrim;
 pub mod sigmaupdate;
 pub mod sigmaupdatemanager;
+pub mod sigmaupdatemanager2;
 pub mod sigmausbwriter;
 pub mod sigmavirtualization;
 pub mod sigmawalker;
@@ -847,4 +848,9 @@ pub use sigmadrivermanager::{
 pub use sigmasoftwaremanager::{
     AppCategory, AppStatus, Application, Rating, SigmaSoftwareManager,
     add_application, get_sigmasoftwaremanager, get_sigmasoftwaremanager_mut, init_sigmasoftwaremanager,
+};
+
+pub use sigmaupdatemanager2::{
+    SystemUpdate, UpdatePriority, UpdateSchedule, UpdateStatus, UpdateType, SigmaUpdateManager,
+    add_update, get_sigmaupdatemanager, get_sigmaupdatemanager_mut, init_sigmaupdatemanager,
 };
