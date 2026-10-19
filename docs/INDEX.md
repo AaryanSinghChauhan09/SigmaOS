@@ -7,6 +7,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 ## Architectural & Development Plans (`docs/`)
 
 - [Dispatcher Architecture & Development Plan](DISPATCHER_PLAN.md) - Master Architecture & Support Matrix Plan defining boundaries between scheduler, context-switch, interrupt handling, and deferred work; 8 invariants, 16-PR roadmap, periodic maintenance cadences, component rules, PR template, and merge gates.
+- [Interrupt Handler Master Architecture & Development Plan](INTERRUPT_HANDLER_PLAN.md) - Master Architecture, Support Matrix, and 17-PR Plan defining boundaries for interrupt handling, 5-stage decoupled interrupt pipeline, multi-arch vector contracts, rules/invariants, periodic maintenance cadences, and merge gates.
 - [Signal Handler Architecture & Development Plan](SIGNAL_HANDLER_PLAN.md) - POSIX.1-2024 signal handler architecture, required safety rules, 18-PR roadmap, x86_64 frame & sigreturn validation rules, periodic maintenance schedule, and merge gates.
 - [Signal Path Audit & ABI Profile](SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) - Subsystem component audit, POSIX signal numbers and default actions, data structure ABI layouts, and x86_64 user frame layout.
 - [Thread Manager Architecture & Contract Specification](thread-manager.md) - Canonical Thread object lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), ownership categories, guarantees, and test acceptance criteria.
