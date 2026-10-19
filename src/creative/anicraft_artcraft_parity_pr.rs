@@ -207,7 +207,6 @@ impl AnicraftForwardInverseKinematicsBoneRiggingPrEngine {
             let end_y = start_y + bone.length * total_angle.sin();
             (end_x, end_y)
         } else {
- {
             (0.0, 0.0)
         }
     }
@@ -415,23 +414,14 @@ impl AnicraftAudioVisemeLipsyncTimelinePrEngine {
         if freq_hz < 300.0 {
             VisemeType::M
         } else if freq_hz < 800.0 {
- {
- {
             VisemeType::U
         } else if freq_hz < 1500.0 {
- {
- {
             VisemeType::O
         } else if freq_hz < 2500.0 {
- {
- {
             VisemeType::A
         } else if freq_hz < 4000.0 {
- {
- {
             VisemeType::E
         } else {
- {
             VisemeType::I
         }
     }
@@ -866,7 +856,6 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")
