@@ -86,9 +86,6 @@ pub struct KvmQemuEngine {
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
     pub virtio_fs_inodes_cached: u64,
-    pub confidential_mode: Option<ConfidentialComputingMode>,
-    pub live_migration: Option<QemuLiveMigrationState>,
-    pub virtio_mem_balloon_size_mb: u64,
 }
 
 impl KvmQemuEngine {
@@ -101,9 +98,6 @@ impl KvmQemuEngine {
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
             virtio_fs_inodes_cached: 0,
-            confidential_mode: None,
-            live_migration: None,
-            virtio_mem_balloon_size_mb: 0,
         }
     }
 

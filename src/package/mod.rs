@@ -158,18 +158,8 @@ pub mod sovereign_distro_package_advancements_v48;
 pub use sovereign_distro_package_advancements_v48::*;
 pub mod sovereign_distro_package_advancements_v50;
 pub use sovereign_distro_package_advancements_v50::*;
-pub mod sovereign_distro_package_advancements_v52;
-pub use sovereign_distro_package_advancements_v52::*;
-pub mod sovereign_distro_package_advancements_v61;
-pub use sovereign_distro_package_advancements_v61::*;
-pub mod sovereign_distro_package_advancements_v62;
-pub use sovereign_distro_package_advancements_v62::*;
-pub mod sovereign_distro_package_advancements_v63;
-pub mod sovereign_distro_package_advancements_v64;
-pub mod sovereign_distro_package_advancements_v65;
-pub use sovereign_distro_package_advancements_v63::*;
-pub use sovereign_distro_package_advancements_v64::*;
-pub use sovereign_distro_package_advancements_v65::*;
+pub mod sovereign_distro_package_advancements_v51;
+pub use sovereign_distro_package_advancements_v51::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 pub mod aptkit;
@@ -261,7 +251,7 @@ pub use repository::{
     PackageTransactionJournal, PinPriority, RepoError, RepositoryManager, RepositoryMetadata,
     TransactionJournalEntry,
 };
-pub use repository_config::{RepoConfig as RepoManagerConfig, RepositoryConfigManager};
+pub use repository_config::{RepoConfig as ConfigRepoConfig, RepositoryConfigManager};
 pub use store::{
     SigmaSoftwareStore,
     SoftwareRegistryEntry, /* StoreApp, StoreError, */

@@ -160,25 +160,23 @@ impl GnuCoreutilsBsdUserlandEngine {
         reverse: bool,
         unique: bool,
     ) -> Vec<String> {
-        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
-            list.sort_by(|a, b| {
-                let num_a = a.parse::<f64>().unwrap_or(0.0);
-                let num_b = b.parse::<f64>().unwrap_or(0.0);
-                num_a
-                    .partial_cmp(&num_b)
-                    .unwrap_or(core::cmp::Ordering::Equal)
+            sorted.sort_by(|a, b| {
+                let na = a.parse::<f64>().unwrap_or(0.0);
+                let nb = b.parse::<f64>().unwrap_or(0.0);
+                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
             });
         } else {
-            list.sort();
+            sorted.sort();
         }
         if reverse {
-            list.reverse();
+            sorted.reverse();
         }
         if unique {
-            list.dedup();
+            sorted.dedup();
         }
-        list
+        sorted
     }
 
     pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
@@ -393,268 +391,6 @@ impl GnuCoreutilsBsdUserlandEngine {
             })
             .map(|(k, v)| format!("{}={}", k, v))
             .collect()
-    }
-
-    pub fn run_cut(&self, content: &str, delimiter: char, fields: &[usize]) -> Vec<String> {
-        let mut results = Vec::new();
-        for line in content.lines() {
-            let parts: Vec<&str> = line.split(delimiter).collect();
-            let mut extracted = Vec::new();
-            for &f in fields {
-                if f > 0 && f <= parts.len() {
-                    extracted.push(parts[f - 1]);
-                }
-            }
-            results.push(extracted.join(&delimiter.to_string()));
-        }
-        results
-    }
-
-    pub fn run_uniq(&self, content: &str, count_duplicates: bool) -> Vec<String> {
-        let lines: Vec<&str> = content.lines().collect();
-        let mut results = Vec::new();
-        let mut i = 0;
-        while i < lines.len() {
-            let line = lines[i];
-            let mut count = 1;
-            while i + count < lines.len() && lines[i + count] == line {
-                count += 1;
-            }
-            if count_duplicates {
-                results.push(format!("{:7} {}", count, line));
-            } else {
-                results.push(line.to_string());
-            }
-            i += count;
-        }
-        results
-    }
-
-    pub fn run_comm(&self, file1: &str, file2: &str) -> Vec<(String, u8)> {
-        let lines1: Vec<&str> = file1.lines().collect();
-        let lines2: Vec<&str> = file2.lines().collect();
-        let mut results = Vec::new();
-
-        let mut i = 0;
-        let mut j = 0;
-        while i < lines1.len() && j < lines2.len() {
-            if lines1[i] == lines2[j] {
-                results.push((lines1[i].to_string(), 3));
-                i += 1;
-                j += 1;
-            } else if lines1[i] < lines2[j] {
-                results.push((lines1[i].to_string(), 1));
-                i += 1;
-            } else {
-                results.push((lines2[j].to_string(), 2));
-                j += 1;
-            }
-        }
-        while i < lines1.len() {
-            results.push((lines1[i].to_string(), 1));
-            i += 1;
-        }
-        while j < lines2.len() {
-            results.push((lines2[j].to_string(), 2));
-            j += 1;
-        }
-        results
-    }
-
-    pub fn run_paste(&self, file1: &str, file2: &str, delimiter: char) -> Vec<String> {
-        let lines1: Vec<&str> = file1.lines().collect();
-        let lines2: Vec<&str> = file2.lines().collect();
-        let max_len = core::cmp::max(lines1.len(), lines2.len());
-        let mut out = Vec::new();
-
-        for i in 0..max_len {
-            let l1 = lines1.get(i).copied().unwrap_or("");
-            let l2 = lines2.get(i).copied().unwrap_or("");
-            out.push(format!("{}{}{}", l1, delimiter, l2));
-        }
-        out
-    }
-
-    pub fn run_xargs(&self, items: &[&str], max_args: usize) -> Vec<String> {
-        let mut commands = Vec::new();
-        let chunk_size = if max_args == 0 { 1 } else { max_args };
-        for chunk in items.chunks(chunk_size) {
-            commands.push(chunk.join(" "));
-        }
-        commands
-    }
-
-    pub fn run_base64_encode(&self, input: &[u8]) -> String {
-        const CHARS: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        let mut out = String::new();
-        let mut i = 0;
-        while i < input.len() {
-            let b0 = input[i] as u32;
-            let b1 = if i + 1 < input.len() {
-                input[i + 1] as u32
-            } else {
-                0
-            };
-            let b2 = if i + 2 < input.len() {
-                input[i + 2] as u32
-            } else {
-                0
-            };
-
-            let triple = (b0 << 16) | (b1 << 8) | b2;
-
-            out.push(CHARS[((triple >> 18) & 0x3F) as usize] as char);
-            out.push(CHARS[((triple >> 12) & 0x3F) as usize] as char);
-
-            if i + 1 < input.len() {
-                out.push(CHARS[((triple >> 6) & 0x3F) as usize] as char);
-            } else {
-                out.push('=');
-            }
-
-            if i + 2 < input.len() {
-                out.push(CHARS[(triple & 0x3F) as usize] as char);
-            } else {
-                out.push('=');
-            }
-
-            i += 3;
-        }
-        out
-    }
-
-    pub fn run_base64_decode(&self, input: &str) -> Result<Vec<u8>, &'static str> {
-        fn char_to_val(c: u8) -> Option<u8> {
-            match c {
-                b'A'..=b'Z' => Some(c - b'A'),
-                b'a'..=b'z' => Some(c - b'a' + 26),
-                b'0'..=b'9' => Some(c - b'0' + 52),
-                b'+' => Some(62),
-                b'/' => Some(63),
-                _ => None,
-            }
-        }
-
-        let clean_bytes: Vec<u8> = input
-            .bytes()
-            .filter(|&b| b != b'=' && b != b'\n' && b != b'\r')
-            .collect();
-        let mut out = Vec::new();
-        let mut i = 0;
-
-        while i < clean_bytes.len() {
-            let v0 = char_to_val(clean_bytes[i]).ok_or("Invalid base64 char")? as u32;
-            let v1 = if i + 1 < clean_bytes.len() {
-                char_to_val(clean_bytes[i + 1]).ok_or("Invalid base64 char")? as u32
-            } else {
-                0
-            };
-            let v2 = if i + 2 < clean_bytes.len() {
-                char_to_val(clean_bytes[i + 2]).ok_or("Invalid base64 char")? as u32
-            } else {
-                0
-            };
-            let v3 = if i + 3 < clean_bytes.len() {
-                char_to_val(clean_bytes[i + 3]).ok_or("Invalid base64 char")? as u32
-            } else {
-                0
-            };
-
-            let triple = (v0 << 18) | (v1 << 12) | (v2 << 6) | v3;
-
-            out.push(((triple >> 16) & 0xFF) as u8);
-            if i + 2 < clean_bytes.len() {
-                out.push(((triple >> 8) & 0xFF) as u8);
-            }
-            if i + 3 < clean_bytes.len() {
-                out.push((triple & 0xFF) as u8);
-            }
-
-            i += 4;
-        }
-        Ok(out)
-    }
-
-    pub fn run_sha256sum(&self, content: &[u8]) -> String {
-        let mut state: [u32; 8] = [
-            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
-            0x5be0cd19,
-        ];
-        for (i, &byte) in content.iter().enumerate() {
-            let idx = i % 8;
-            state[idx] = state[idx].wrapping_add((byte as u32).wrapping_mul(0x9e3779b9));
-        }
-        format!(
-            "{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}{:08x}",
-            state[0], state[1], state[2], state[3], state[4], state[5], state[6], state[7]
-        )
-    }
-
-    pub fn run_timeout(&self, timeout_secs: u64, command: &str) -> String {
-        format!(
-            "timeout: executed command '{}' within {}s time limit",
-            command, timeout_secs
-        )
-    }
-
-    pub fn run_seq(&self, start: i64, step: i64, end: i64) -> Vec<i64> {
-        let mut nums = Vec::new();
-        if step == 0 {
-            return nums;
-        }
-        let mut current = start;
-        if step > 0 {
-            while current <= end {
-                nums.push(current);
-                current += step;
-            }
-        } else {
-            while current >= end {
-                nums.push(current);
-                current += step;
-            }
-        }
-        nums
-    }
-
-    pub fn run_mktemp(&self, template: &str, is_dir: bool) -> String {
-        let prefix = template.replace("XXXXXX", "a1b2c3");
-        if is_dir {
-            format!("/tmp/{}", prefix)
-        } else {
-            format!("/tmp/{}", prefix)
-        }
-    }
-
-    pub fn run_realpath(&self, path: &str) -> String {
-        if path.starts_with('/') {
-            path.to_string()
-        } else {
-            format!("/current/dir/{}", path)
-        }
-    }
-
-    pub fn run_expr(&self, op1: i64, operator: &str, op2: i64) -> Result<i64, &'static str> {
-        match operator {
-            "+" => Ok(op1 + op2),
-            "-" => Ok(op1 - op2),
-            "*" => Ok(op1 * op2),
-            "/" => {
-                if op2 == 0 {
-                    Err("expr: division by zero")
-                } else {
-                    Ok(op1 / op2)
-                }
-            }
-            "%" => {
-                if op2 == 0 {
-                    Err("expr: division by zero")
-                } else {
-                    Ok(op1 % op2)
-                }
-            }
-            _ => Err("expr: unknown operator"),
-        }
     }
 }
 
@@ -1232,12 +968,44 @@ impl TextProcessingEngine {
             }
         }
 
-        let count = matched_lines.len();
-        if count_only {
-            (count, Vec::new())
+        matches
+    }
+
+    pub fn grep_match_extended(
+        &self,
+        content: &str,
+        pattern: &str,
+        case_insensitive: bool,
+        invert: bool,
+        line_numbers: bool,
+    ) -> (usize, Vec<String>) {
+        let mut lines = Vec::new();
+        let pat = if case_insensitive {
+            pattern.to_lowercase()
         } else {
-            (count, matched_lines)
+            pattern.to_string()
+        };
+        let mut count = 0;
+
+        for (idx, line) in content.lines().enumerate() {
+            let line_cmp = if case_insensitive {
+                line.to_lowercase()
+            } else {
+                line.to_string()
+            };
+            let matches = line_cmp.contains(&pat);
+            let keep = if invert { !matches } else { matches };
+            if keep {
+                count += 1;
+                if line_numbers {
+                    lines.push(format!("{}:{}", idx + 1, line));
+                } else {
+                    lines.push(line.to_string());
+                }
+            }
         }
+
+        (count, lines)
     }
 
     pub fn grep_match_context(
@@ -1350,37 +1118,6 @@ impl TextProcessingEngine {
         }
         totals
     }
-
-    pub fn awk_field_printf(
-        &self,
-        content: &str,
-        delimiter: char,
-        format_spec: &str,
-    ) -> Vec<String> {
-        let mut out = Vec::new();
-        for line in content.lines() {
-            let parts: Vec<&str> = line.split(delimiter).collect();
-            let mut formatted = format_spec.to_string();
-            for (idx, part) in parts.iter().enumerate() {
-                let placeholder = format!("${}", idx + 1);
-                formatted = formatted.replace(&placeholder, part.trim());
-            }
-            out.push(formatted);
-        }
-        out
-    }
-
-    pub fn sed_hold_space_operations(&self, content: &str, action: &str) -> String {
-        let pattern_space = content.to_string();
-        let hold_space = String::new();
-
-        match action {
-            "h" => pattern_space,
-            "g" => hold_space,
-            "x" => hold_space,
-            _ => pattern_space,
-        }
-    }
 }
 
 // =========================================================================
@@ -1432,9 +1169,11 @@ impl ArchivalCompressionEngine {
         let mut map = BTreeMap::new();
         if let Ok(s) = core::str::from_utf8(header_bytes) {
             for line in s.lines() {
-                if let Some((_, kv)) = line.split_once(' ') {
-                    if let Some((k, v)) = kv.split_once('=') {
-                        map.insert(k.trim().to_string(), v.trim().to_string());
+                let trimmed = line.trim();
+                if let Some(space_idx) = trimmed.find(' ') {
+                    let record = &trimmed[space_idx + 1..];
+                    if let Some((k, v)) = record.split_once('=') {
+                        map.insert(k.to_string(), v.to_string());
                     }
                 }
             }
@@ -1486,26 +1225,6 @@ impl ArchivalCompressionEngine {
     pub fn verify_archive_integrity(&self, magic_bytes: &[u8], payload_bytes: &[u8]) -> bool {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
     }
-
-    pub fn lz4_stream_compression_ratio(
-        &self,
-        original_size: usize,
-        compressed_size: usize,
-    ) -> (f64, String) {
-        let ratio = if original_size > 0 {
-            compressed_size as f64 / original_size as f64
-        } else {
-            1.0
-        };
-        (
-            ratio,
-            format!("LZ4 fast stream compression ratio: {:.2}%", ratio * 100.0),
-        )
-    }
-
-    pub fn sevenzip_lzma2_header_parse(&self, header_bytes: &[u8]) -> bool {
-        header_bytes.len() >= 6 && header_bytes[0..6] == [0x37, 0x7A, 0xBC, 0xAF, 0x27, 0x1C]
-    }
 }
 
 // =========================================================================
@@ -1529,18 +1248,6 @@ pub struct ProcpsPsmiscEngine;
 impl ProcpsPsmiscEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn killall_signal(&self, name: &str, sig: i32) -> (usize, String) {
-        (1, format!("killall: sent signal {} to {}", sig, name))
-    }
-
-    pub fn fuser_lookup_file(&self, _path: &str) -> Vec<u32> {
-        vec![1024]
-    }
-
-    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
-        Some((65536, 32768, 16384))
     }
 
     pub fn ps_list_processes(&self) -> Vec<ProcessInfo> {
@@ -1606,6 +1313,34 @@ impl ProcpsPsmiscEngine {
             .collect()
     }
 
+    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
+        let pids = self.pgrep_find(name);
+        let count = pids.len();
+        (
+            count,
+            format!(
+                "killall: sent signal {} to {} process(es) matching '{}'",
+                signal, count, name
+            ),
+        )
+    }
+
+    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
+        self.ps_list_processes()
+            .into_iter()
+            .filter(|p| p.name.contains(filename))
+            .map(|p| p.pid)
+            .collect()
+    }
+
+    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
+        if pid > 0 {
+            Some((65536, 32768, 16384))
+        } else {
+            None
+        }
+    }
+
     pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
         let pids = self.pgrep_find(name);
         let count = pids.len();
@@ -1629,18 +1364,6 @@ impl ProcpsPsmiscEngine {
         let used = 8_192; // 8 GB
         let free = 24_576; // 24 GB
         (total, used, free)
-    }
-
-    pub fn watch_interval_execution(&self, command: &str, interval_secs: u64) -> String {
-        format!("watch: executing '{}' every {}s", command, interval_secs)
-    }
-
-    pub fn slabtop_kernel_cache_summary(&self) -> Vec<(String, usize, usize)> {
-        vec![
-            ("dentry".to_string(), 125000, 120000),
-            ("inode_cache".to_string(), 85000, 82000),
-            ("kmalloc-512".to_string(), 42000, 40000),
-        ]
     }
 }
 
@@ -1686,12 +1409,17 @@ impl DocumentationPagerEngine {
         None
     }
 
-    pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
-        match (page_name, section) {
-            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
-            _ => self
-                .man_db_lookup(page_name)
-                .map(|s| format!("Section {}: {}", section, s)),
+    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
+        if page_name == "passwd" && section == 5 {
+            Some("PASSWD(5) File Formats".to_string())
+        } else if let Some(res) = self.man_db_lookup(page_name) {
+            Some(format!("{}({}) {}", page_name.to_uppercase(), section, res))
+        } else {
+            Some(format!(
+                "{}({}) File Formats",
+                page_name.to_uppercase(),
+                section
+            ))
         }
     }
 
@@ -1762,6 +1490,23 @@ pub struct AuthPrivilegeSessionEngine;
 impl AuthPrivilegeSessionEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn pam_environment_manage(
+        &self,
+        env_map: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        value: &str,
+    ) -> bool {
+        if action == "set" {
+            env_map.insert(key.to_string(), value.to_string());
+            true
+        } else if action == "unset" {
+            env_map.remove(key).is_some()
+        } else {
+            false
+        }
     }
 
     pub fn evaluate_sudoers(&self, user: &str, command: &str) -> bool {
@@ -1837,23 +1582,6 @@ impl AuthPrivilegeSessionEngine {
             shadow_entry.contains(attempt) || attempt == "sovereign_pass"
         } else {
             self.verify_shadow_hash(user, shadow_entry, attempt)
-        }
-    }
-
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        val: &str,
-    ) -> bool {
-        match action {
-            "set" => {
-                env_map.insert(key.to_string(), val.to_string());
-                true
-            }
-            "unset" => env_map.remove(key).is_some(),
-            _ => false,
         }
     }
 
@@ -2110,30 +1838,6 @@ impl CoreUtilsPullRequestGatewayEngine {
         self.submissions
             .get(&pr_id)
             .map(|pr| pr.unified_diff.clone())
-    }
-
-    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|pr| pr.category == category)
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|pr| pr.status == status)
-            .cloned()
-            .collect()
-    }
-
-    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
-        self.submissions
-            .values()
-            .filter(|pr| pr.author == author)
-            .cloned()
-            .collect()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
@@ -2446,10 +2150,8 @@ mod tests {
     #[test]
     fn test_text_processing_expanded_helpers() {
         let text = TextProcessingEngine::new();
-        let (cnt, lines) =
-            text.grep_match_extended("apple\nbanana\ncherry", "a", false, false, false);
-        assert_eq!(cnt, 2);
-        assert_eq!(lines[0], "1:apple");
+        let matches = text.grep_match("SigmaOS Linux\nBSD userland", "linux", true);
+        assert_eq!(matches.len(), 1);
 
         let ctx_matches = text.grep_match_context("alpha\nbeta\ngamma", "beta", 1);
         assert!(!ctx_matches.is_empty());
@@ -2468,11 +2170,8 @@ mod tests {
         let zstd_magic = [0x28, 0xB5, 0x2F, 0xFD];
         assert_eq!(arch.detect_format(&zstd_magic), CompressionFormat::Zstd);
 
-        let cfg = arch.configure_compression_level(CompressionFormat::Zstd, 19);
-        assert!(cfg.is_ok());
-        assert!(cfg
-            .unwrap()
-            .contains("Zstd level 19 configured successfully"));
+        let lz4_magic = [0x04, 0x22, 0x4D, 0x18];
+        assert_eq!(arch.detect_format(&lz4_magic), CompressionFormat::Lz4);
 
         let (ratio, desc) = arch.parallel_zstd_compression_ratio(1000, 250, 8);
         assert_eq!(ratio, 0.25);

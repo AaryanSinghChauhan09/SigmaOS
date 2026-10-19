@@ -246,10 +246,7 @@ impl SigmaBus {
     pub fn bus_stats(&self) -> BTreeMap<String, String> {
         let mut stats = BTreeMap::new();
         stats.insert("endpoints".to_string(), self.endpoint_count().to_string());
-        stats.insert(
-            "messages_sent".to_string(),
-            self.message_count().to_string(),
-        );
+        stats.insert("messages_sent".to_string(), self.message_count().to_string());
         stats.insert("running".to_string(), self.running.to_string());
         stats
     }

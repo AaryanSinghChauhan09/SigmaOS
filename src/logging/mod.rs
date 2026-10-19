@@ -5,7 +5,7 @@ pub mod sigmalog;
 pub mod unified;
 
 pub use rotation::{
-    LogCompressor, LogFacility, LogFile, LogFileID, LogRotateConfig, LogRotator, LogSeverity,
+    LogCompressor, LogFacility as RotationLogFacility, LogFile, LogFileID, LogRotateConfig, LogRotator, LogSeverity,
     RotationError, RotationPolicy, SimpleLogCompressor, SimpleLogFile, SimpleLogRotator,
 };
 pub use sigmalog::{

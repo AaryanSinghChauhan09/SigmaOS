@@ -60,16 +60,15 @@ pub use icmp::{
     IcmpUnreachableCode,
 };
 pub use sigmafirewall::{
-    add_firewall_rule, get_sigmafirewall, init_sigmafirewall,
-    FirewallAction as SigmaFirewallAction, FirewallProtocol, FirewallRule as SigmaFirewallRule,
-    SigmaFirewall,
+    add_firewall_rule, get_sigmafirewall, init_sigmafirewall, FirewallAction as SigmaFirewallAction, FirewallProtocol,
+    FirewallRule as SigmaFirewallRule, SigmaFirewall,
 };
 pub use sigmanet::{
     bring_up_interface, connect_interface, get_sigmanet, init_sigmanet, InterfaceStatus,
     InterfaceType, IpMethod, IpType, NetworkInterface as SigmaNetInterface, SigmaNet,
 };
 pub use zenithnet::{
-    EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface,
+    EthernetFrame, IpProtocol, Ipv4Addr, Ipv4Header, MacAddr, NetworkError, NetworkInterface as ZenithNetworkInterface,
     PacketType, TcpHeader, TcpState as ZenithTcpState, UdpHeader, ZenithNet,
 };
 
