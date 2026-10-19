@@ -101,14 +101,14 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Validate seccomp BPF architecture identifier (0xC000003E = AUDIT_ARCH_X86_64).
+    /// Validate seccomp BPF architecture (e.g. AUDIT_ARCH_X86_64 = 0xC000003E).
     pub fn validate_seccomp_bpf_arch(arch: u32) -> bool {
-        arch == 0xC000003E || arch == 0x40000028 // x86_64 or arm64
+        arch == 0xC000_003E
     }
 
-    /// Check if cgroup controller is enabled in controllers string.
-    pub fn is_cgroup_controller_enabled(available_controllers: &str, target_controller: &str) -> bool {
-        available_controllers.split_whitespace().any(|c| c == target_controller)
+    /// Check if cgroup v2 controller is enabled in active controllers string.
+    pub fn is_cgroup_controller_enabled(active_controllers: &str, controller: &str) -> bool {
+        active_controllers.split_whitespace().any(|c| c == controller)
     }
 
     /// Check if Linux capability bit mask contains target capability.
@@ -485,7 +485,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
         Self
     }
 
-    /// Generate SSSD domain configuration.
     pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
         alloc::format!(
             "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
@@ -493,7 +492,6 @@ impl IdentityAndEnterpriseAuthPrEngine {
         )
     }
 
-    /// Generate SSSD PAM/NSS response tuple (username, uid, gid, homedir, shell).
     pub fn generate_sssd_pam_nss_response(
         &self,
         username: &str,
@@ -505,7 +503,7 @@ impl IdentityAndEnterpriseAuthPrEngine {
             uid,
             gid,
             alloc::format!("/home/{}", username),
-            "/bin/bash".to_string(),
+            "/bin/sh".to_string(),
         )
     }
 
