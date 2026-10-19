@@ -629,3 +629,6 @@ pub use omarchy_media_tools::*;
 
 pub mod omarchy_terminal_gamemode;
 pub use omarchy_terminal_gamemode::*;
+
+pub mod elementary_os_ecosystem_expansion_v64;
+pub use elementary_os_ecosystem_expansion_v64::*;
