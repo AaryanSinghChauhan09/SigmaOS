@@ -103,6 +103,7 @@ pub mod sigmacgroup;
 pub mod signamespaces;
 pub mod sigmacron;
 pub mod sigmasystemd;
+pub mod sigmaswap;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -531,6 +532,11 @@ pub use sigmasystemd {
     RestartPolicy,
     init_sigmasystemd, get_sigmasystemd, get_sigmasystemd_mut,
     create_unit,
+};
+pub use sigmaswap {
+    SigmaSwap, SwapEntry, SwapType, SwapState,
+    init_sigmaswap, get_sigmaswap, get_sigmaswap_mut,
+    add_swap,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
