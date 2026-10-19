@@ -110,7 +110,10 @@ impl CachyOsKernelPgoBoltOptimizerPrEngine {
     pub fn apply_bolt_optimization(&mut self) -> String {
         self.bolt_reorder_functions = true;
         self.performance_gain_pct += 3.2;
-        format!("LLVM-BOLT reordered kernel binary code layout (+{:.1}% throughput)", self.performance_gain_pct)
+        format!(
+            "LLVM-BOLT reordered kernel binary code layout (+{:.1}% throughput)",
+            self.performance_gain_pct
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -153,9 +156,15 @@ impl CachyOsChwdPrimeSwitcherPrEngine {
 
     pub fn set_render_offload(&mut self, active: bool) -> String {
         if active {
-            format!("CHWD PRIME: Engaged dGPU ({}) offload for active Wayland windows", self.render_offload_gpu)
+            format!(
+                "CHWD PRIME: Engaged dGPU ({}) offload for active Wayland windows",
+                self.render_offload_gpu
+            )
         } else {
-            format!("CHWD PRIME: Standard iGPU ({}) display mode active", self.primary_gpu)
+            format!(
+                "CHWD PRIME: Standard iGPU ({}) display mode active",
+                self.primary_gpu
+            )
         }
     }
 
@@ -201,7 +210,10 @@ impl CachyOsPacmanV3MirrorRouterPrEngine {
     }
 
     pub fn select_fastest_mirror(&self) -> String {
-        format!("Pacman routed to primary v3 mirror: {} (latency: {}ms)", self.fast_mirrors[0], self.geo_latency_ms)
+        format!(
+            "Pacman routed to primary v3 mirror: {} (latency: {}ms)",
+            self.fast_mirrors[0], self.geo_latency_ms
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -244,7 +256,10 @@ impl CachyOsProtonFutexWaitvGovernorPrEngine {
 
     pub fn attach_proton_process(&mut self, pid: u32) -> String {
         self.active_game_pids.push(pid);
-        format!("futex_waitv governor attached to Proton PID {} (spinlock limit: {}us)", pid, self.spinlock_threshold_us)
+        format!(
+            "futex_waitv governor attached to Proton PID {} (spinlock limit: {}us)",
+            pid, self.spinlock_threshold_us
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -287,7 +302,10 @@ impl CachyOsAnanicyRulesDbSyncPrEngine {
 
     pub fn sync_latest_rules(&mut self) -> String {
         self.rules_loaded += 45;
-        format!("Ananicy rules DB synced: {} rules active (ver {})", self.rules_loaded, self.db_version)
+        format!(
+            "Ananicy rules DB synced: {} rules active (ver {})",
+            self.rules_loaded, self.db_version
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -330,7 +348,10 @@ impl CachyOsBcachefsTieringGovernorPrEngine {
 
     pub fn promote_hot_data(&mut self, extents: u64) -> String {
         self.promoted_extents_count += extents;
-        format!("Bcachefs promoted {} hot extents to fast NVMe tier", extents)
+        format!(
+            "Bcachefs promoted {} hot extents to fast NVMe tier",
+            extents
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -373,7 +394,10 @@ impl CachyOsGamescopeHdrToneMapperPrEngine {
 
     pub fn set_display_peak_luminance(&mut self, nits: u32) -> String {
         self.peak_nits = nits;
-        format!("Gamescope HDR tone mapping calibrated to display peak: {} nits", nits)
+        format!(
+            "Gamescope HDR tone mapping calibrated to display peak: {} nits",
+            nits
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -417,7 +441,10 @@ impl CachyOsUksmMemoryDedupGovernorPrEngine {
     pub fn trigger_aggressive_scan(&mut self) -> String {
         self.scanned_pages_per_sec = 25000;
         self.deduplicated_ram_mb += 512;
-        format!("UKSM engaged aggressive memory scan (25,000 pages/sec, reclaimed {}MB RAM)", self.deduplicated_ram_mb)
+        format!(
+            "UKSM engaged aggressive memory scan (25,000 pages/sec, reclaimed {}MB RAM)",
+            self.deduplicated_ram_mb
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -460,7 +487,10 @@ impl CachyOsHandheldTdpVrrControllerPrEngine {
 
     pub fn set_power_profile(&mut self, tdp_watts: u32) -> String {
         self.target_tdp_watts = tdp_watts;
-        format!("Handheld TDP set to {}W (VRR window: {}-{} FPS)", tdp_watts, self.vrr_min_fps, self.vrr_max_fps)
+        format!(
+            "Handheld TDP set to {}W (VRR window: {}-{} FPS)",
+            tdp_watts, self.vrr_min_fps, self.vrr_max_fps
+        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -533,16 +563,46 @@ impl CachyLinuxMissingComponentsV63PrSuite {
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
         let mut map = BTreeMap::new();
         map.insert("total_components".to_string(), "10".to_string());
-        map.insert("scx_rusty".to_string(), self.scx_rusty.generate_manifest().title);
-        map.insert("kernel_pgo_bolt".to_string(), self.kernel_pgo_bolt.generate_manifest().title);
-        map.insert("chwd_prime".to_string(), self.chwd_prime.generate_manifest().title);
-        map.insert("pacman_v3".to_string(), self.pacman_v3.generate_manifest().title);
-        map.insert("proton_futex".to_string(), self.proton_futex.generate_manifest().title);
-        map.insert("ananicy_rules".to_string(), self.ananicy_rules.generate_manifest().title);
-        map.insert("bcachefs_tiering".to_string(), self.bcachefs_tiering.generate_manifest().title);
-        map.insert("gamescope_hdr".to_string(), self.gamescope_hdr.generate_manifest().title);
-        map.insert("uksm_dedup".to_string(), self.uksm_dedup.generate_manifest().title);
-        map.insert("handheld_tdp_vrr".to_string(), self.handheld_tdp_vrr.generate_manifest().title);
+        map.insert(
+            "scx_rusty".to_string(),
+            self.scx_rusty.generate_manifest().title,
+        );
+        map.insert(
+            "kernel_pgo_bolt".to_string(),
+            self.kernel_pgo_bolt.generate_manifest().title,
+        );
+        map.insert(
+            "chwd_prime".to_string(),
+            self.chwd_prime.generate_manifest().title,
+        );
+        map.insert(
+            "pacman_v3".to_string(),
+            self.pacman_v3.generate_manifest().title,
+        );
+        map.insert(
+            "proton_futex".to_string(),
+            self.proton_futex.generate_manifest().title,
+        );
+        map.insert(
+            "ananicy_rules".to_string(),
+            self.ananicy_rules.generate_manifest().title,
+        );
+        map.insert(
+            "bcachefs_tiering".to_string(),
+            self.bcachefs_tiering.generate_manifest().title,
+        );
+        map.insert(
+            "gamescope_hdr".to_string(),
+            self.gamescope_hdr.generate_manifest().title,
+        );
+        map.insert(
+            "uksm_dedup".to_string(),
+            self.uksm_dedup.generate_manifest().title,
+        );
+        map.insert(
+            "handheld_tdp_vrr".to_string(),
+            self.handheld_tdp_vrr.generate_manifest().title,
+        );
         map
     }
 }

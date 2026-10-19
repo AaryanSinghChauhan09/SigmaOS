@@ -47,7 +47,13 @@ impl LinuxBcachefsFolioEngineV55 {
         }
     }
 
-    pub fn register_device(&mut self, id: u32, path: &str, tier: StorageDeviceTierV55, capacity_mb: u64) {
+    pub fn register_device(
+        &mut self,
+        id: u32,
+        path: &str,
+        tier: StorageDeviceTierV55,
+        capacity_mb: u64,
+    ) {
         self.devices.push(BcachefsDeviceTarget {
             dev_id: id,
             dev_path: path.to_string(),
@@ -357,24 +363,39 @@ impl SovereignOpenSourceOsApexMasterSuiteV55 {
 
     pub fn run_v55_apex_suite(&mut self) -> Vec<ApexAuditResultV55> {
         // 1. Linux Bcachefs
-        self.bcachefs_folio.register_device(1, "/dev/nvme0n1", StorageDeviceTierV55::NvmeCache, 512000);
-        self.bcachefs_folio.register_device(2, "/dev/sda1", StorageDeviceTierV55::HddCapacity, 2048000);
+        self.bcachefs_folio.register_device(
+            1,
+            "/dev/nvme0n1",
+            StorageDeviceTierV55::NvmeCache,
+            512000,
+        );
+        self.bcachefs_folio.register_device(
+            2,
+            "/dev/sda1",
+            StorageDeviceTierV55::HddCapacity,
+            2048000,
+        );
         self.bcachefs_folio.allocate_folio(1, 4096);
         self.bcachefs_folio.allocate_folio(2, 2048);
         self.bcachefs_folio.promote_extent(2, 1, 1024);
 
         // 2. FreeBSD Capsicum & VNET
-        self.capsicum_vnet.delegate_descriptor(3, &[CapabilityRightV55::Read, CapabilityRightV55::Write]);
-        self.capsicum_vnet.create_vnet_container(1, "jail_web", "epair0a");
+        self.capsicum_vnet
+            .delegate_descriptor(3, &[CapabilityRightV55::Read, CapabilityRightV55::Write]);
+        self.capsicum_vnet
+            .create_vnet_container(1, "jail_web", "epair0a");
 
         // 3. OpenBSD Pledge & Unveil
-        self.pledge_unveil.set_pledge(&["stdio", "rpath", "wpath", "inet"]);
+        self.pledge_unveil
+            .set_pledge(&["stdio", "rpath", "wpath", "inet"]);
         self.pledge_unveil.unveil_path("/etc", "r");
         self.pledge_unveil.lock_unveil();
 
         // 4. Nix/Guix CAS Closure Lock
-        self.cas_closure.add_item("sha256:dep1", "/sigma/store/dep1", &[]);
-        self.cas_closure.add_item("sha256:app1", "/sigma/store/app1", &["sha256:dep1"]);
+        self.cas_closure
+            .add_item("sha256:dep1", "/sigma/store/dep1", &[]);
+        self.cas_closure
+            .add_item("sha256:app1", "/sigma/store/app1", &["sha256:dep1"]);
         self.cas_closure.lock_generation();
 
         vec![

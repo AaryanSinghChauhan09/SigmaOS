@@ -113,7 +113,13 @@ impl DragonFlyHammer2MultiVolumePrEngine {
         true
     }
 
-    pub fn allocate_extent(&mut self, offset: u64, length: u32, volume_id: u32, checksum: [u8; 32]) -> bool {
+    pub fn allocate_extent(
+        &mut self,
+        offset: u64,
+        length: u32,
+        volume_id: u32,
+        checksum: [u8; 32],
+    ) -> bool {
         if let Some(vol) = self.volumes.get_mut(&volume_id) {
             if vol.state != Hammer2VolumeState::Online {
                 return false;
@@ -453,10 +459,17 @@ impl DragonFlySwapcacheWritebackPrEngine {
         }
     }
 
-    pub fn cache_block(&mut self, block_id: u64, ssd_offset: u64, is_dirty: bool, now: u64) -> bool {
+    pub fn cache_block(
+        &mut self,
+        block_id: u64,
+        ssd_offset: u64,
+        is_dirty: bool,
+        now: u64,
+    ) -> bool {
         if self.cache.len() >= self.max_blocks && !self.cache.contains_key(&block_id) {
             // LRU eviction
-            if let Some((&evict_id, _)) = self.cache.iter().min_by_key(|(_, b)| b.access_timestamp) {
+            if let Some((&evict_id, _)) = self.cache.iter().min_by_key(|(_, b)| b.access_timestamp)
+            {
                 self.cache.remove(&evict_id);
             }
         }
@@ -690,7 +703,9 @@ impl DragonFlyFirmlinkNamespaceJailPrEngine {
         for (tgt, node) in &self.overlays {
             if base_path == *tgt {
                 return node.source.clone();
-            } else if base_path.starts_with(tgt) && base_path.as_bytes().get(tgt.len()) == Some(&b'/') {
+            } else if base_path.starts_with(tgt)
+                && base_path.as_bytes().get(tgt.len()) == Some(&b'/')
+            {
                 let suffix = &base_path[tgt.len()..];
                 return format!("{}{}", node.source, suffix);
             }
@@ -821,7 +836,9 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "Multi-volume pools, direct extent trees, and snapshot retention history."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn multi_volume_extent_sync()".to_string(),
+            unified_diff:
+                "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn multi_volume_extent_sync()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -831,7 +848,9 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "LWKT serializer locks, priority thread queues, and CPU affinity."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn lwkt_serializer_acquire()".to_string(),
+            unified_diff:
+                "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn lwkt_serializer_acquire()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -841,17 +860,21 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "Userland vkernel page table entry emulation and memory ballooning."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn vkernel_balloon_inflate()".to_string(),
+            unified_diff:
+                "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn vkernel_balloon_inflate()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6104,
             title: "dsynth Bulk Package Repo Indexer & Chroot Mount Engine".to_string(),
             target_component: "package/dsynth".to_string(),
-            description: "Bulk package repository indexer, clean chroots, and artifact verification."
-                .to_string(),
+            description:
+                "Bulk package repository indexer, clean chroots, and artifact verification."
+                    .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn build_repo_index()".to_string(),
+            unified_diff: "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn build_repo_index()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -861,7 +884,9 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "Dynamic path expansion for $ZONE, $HOSTNAME, $OSREL, and jail scoping."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn resolve_jail_path()".to_string(),
+            unified_diff:
+                "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn resolve_jail_path()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -878,10 +903,13 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             pr_id: 6107,
             title: "Lockless Namecache Negative Lookups & Inode Generation Engine".to_string(),
             target_component: "vfs/namecache".to_string(),
-            description: "Per-CPU lockless negative lookup caching and inode generation validation."
-                .to_string(),
+            description:
+                "Per-CPU lockless negative lookup caching and inode generation validation."
+                    .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/namecache.rs\n+++ b/vfs/namecache.rs\n+ pub fn insert_negative_entry()".to_string(),
+            unified_diff:
+                "--- a/vfs/namecache.rs\n+++ b/vfs/namecache.rs\n+ pub fn insert_negative_entry()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -891,7 +919,8 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "Device attach/detach hotplug event routing and kqueue dispatch."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/dev/devctl.rs\n+++ b/dev/devctl.rs\n+ pub fn poll_kqueue()".to_string(),
+            unified_diff: "--- a/dev/devctl.rs\n+++ b/dev/devctl.rs\n+ pub fn poll_kqueue()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -901,7 +930,8 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "Firmlink directory overlay stack and BSD jail namespace containment."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/firmlink.rs\n+++ b/vfs/firmlink.rs\n+ pub fn resolve_path()".to_string(),
+            unified_diff: "--- a/vfs/firmlink.rs\n+++ b/vfs/firmlink.rs\n+ pub fn resolve_path()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -911,19 +941,30 @@ impl DragonFlyBsdMissingComponentsV61PrSuite {
             description: "Cross-CPU IPI ring buffer queue and barrier fence synchronization."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/smp.rs\n+++ b/kernel/smp.rs\n+ pub fn send_ipi()".to_string(),
+            unified_diff: "--- a/kernel/smp.rs\n+++ b/kernel/smp.rs\n+ pub fn send_ipi()"
+                .to_string(),
         });
 
         prs
     }
 
     pub fn execute_v61_parity_eval(&mut self) -> bool {
-        let vol_alloc = self.hammer2_engine.allocate_extent(0x1000, 4096, 1, [1u8; 32]);
-        let lwkt_acq = self.lwkt_engine.acquire_serializer("lwkt_sys_serializer", 42);
+        let vol_alloc = self
+            .hammer2_engine
+            .allocate_extent(0x1000, 4096, 1, [1u8; 32]);
+        let lwkt_acq = self
+            .lwkt_engine
+            .acquire_serializer("lwkt_sys_serializer", 42);
         let vk_inflate = self.vkernel_engine.inflate_balloon(512);
-        let resolved = self.varsyms_engine.resolve_jail_path("web_jail", "/usr/$SYS/$ZONE/$HOSTNAME");
+        let resolved = self
+            .varsyms_engine
+            .resolve_jail_path("web_jail", "/usr/$SYS/$ZONE/$HOSTNAME");
 
-        vol_alloc && lwkt_acq && vk_inflate && resolved.contains("SigmaOS") && resolved.contains("web_jail")
+        vol_alloc
+            && lwkt_acq
+            && vk_inflate
+            && resolved.contains("SigmaOS")
+            && resolved.contains("web_jail")
     }
 }
 
@@ -986,7 +1027,10 @@ mod tests {
 
         let mut firmlink = DragonFlyFirmlinkNamespaceJailPrEngine::new();
         firmlink.add_overlay("/export/home", "/home", true);
-        assert_eq!(firmlink.resolve_path(None, "/home/user"), "/export/home/user");
+        assert_eq!(
+            firmlink.resolve_path(None, "/home/user"),
+            "/export/home/user"
+        );
 
         let mut ipi = DragonFlySmpIpiRingFencePrEngine::new(4);
         let msg = ipi.send_ipi(0, 1, 0x10);

@@ -11,7 +11,7 @@ use alloc::{
     collections::BTreeMap,
     string::{String, ToString},
     vec::Vec,
-}
+};
 
 /// Render state
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

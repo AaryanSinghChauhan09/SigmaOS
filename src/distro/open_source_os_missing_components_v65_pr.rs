@@ -83,7 +83,8 @@ impl Linux621SchedExtQuantumNeuralGovernorEngine {
     }
 
     pub fn register_quantum_core(&mut self, core_id: &str, latency_ps: u64) {
-        self.quantum_neural_cores.insert(core_id.to_string(), latency_ps);
+        self.quantum_neural_cores
+            .insert(core_id.to_string(), latency_ps);
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV65 {
@@ -433,15 +434,21 @@ impl SovereignOpenSourceOsMissingComponentsV65PrSuite {
     pub fn collect_all_proposals(&self) -> Vec<OpenSourceOsPrProposalV65> {
         vec![
             self.linux_engine.generate_pr_proposal("PR-V65-LINUX-01"),
-            self.freebsd_engine.generate_pr_proposal("PR-V65-FREEBSD-02"),
-            self.openbsd_engine.generate_pr_proposal("PR-V65-OPENBSD-03"),
-            self.dragonfly_engine.generate_pr_proposal("PR-V65-DRAGONFLY-04"),
+            self.freebsd_engine
+                .generate_pr_proposal("PR-V65-FREEBSD-02"),
+            self.openbsd_engine
+                .generate_pr_proposal("PR-V65-OPENBSD-03"),
+            self.dragonfly_engine
+                .generate_pr_proposal("PR-V65-DRAGONFLY-04"),
             self.netbsd_engine.generate_pr_proposal("PR-V65-NETBSD-05"),
             self.haiku_engine.generate_pr_proposal("PR-V65-HAIKU-06"),
             self.plan9_engine.generate_pr_proposal("PR-V65-PLAN9-07"),
-            self.nix_guix_engine.generate_pr_proposal("PR-V65-NIXGUIX-08"),
-            self.illumos_engine.generate_pr_proposal("PR-V65-ILLUMOS-09"),
-            self.thousands_engine.generate_pr_proposal("PR-V65-THOUSANDS-10"),
+            self.nix_guix_engine
+                .generate_pr_proposal("PR-V65-NIXGUIX-08"),
+            self.illumos_engine
+                .generate_pr_proposal("PR-V65-ILLUMOS-09"),
+            self.thousands_engine
+                .generate_pr_proposal("PR-V65-THOUSANDS-10"),
         ]
     }
 
@@ -469,7 +476,9 @@ mod tests {
         master
             .linux_engine
             .register_sched_policy("scx_quantum_neural_governor", "0xquantum123");
-        master.linux_engine.register_quantum_core("core_quantum_0", 500);
+        master
+            .linux_engine
+            .register_quantum_core("core_quantum_0", 500);
 
         master
             .freebsd_engine
@@ -488,7 +497,9 @@ mod tests {
         master
             .nix_guix_engine
             .register_closure_hash("/nix/store/pkg_v65", "hash_v65_abc");
-        master.illumos_engine.configure_vnic_mesh("vnic_v65_0", 10000);
+        master
+            .illumos_engine
+            .configure_vnic_mesh("vnic_v65_0", 10000);
         master
             .thousands_engine
             .register_component("subsystem_v65_mod");

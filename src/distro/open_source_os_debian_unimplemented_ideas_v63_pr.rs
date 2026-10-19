@@ -115,10 +115,26 @@ impl Linux615SchedExtFolioCompactionV63PrEngine {
         );
 
         let folios = vec![
-            FolioBlockV63 { pfn: 0x1000, size_pages: 1, is_free: false },
-            FolioBlockV63 { pfn: 0x1001, size_pages: 1, is_free: true },
-            FolioBlockV63 { pfn: 0x1002, size_pages: 1, is_free: false },
-            FolioBlockV63 { pfn: 0x1003, size_pages: 1, is_free: true },
+            FolioBlockV63 {
+                pfn: 0x1000,
+                size_pages: 1,
+                is_free: false,
+            },
+            FolioBlockV63 {
+                pfn: 0x1001,
+                size_pages: 1,
+                is_free: true,
+            },
+            FolioBlockV63 {
+                pfn: 0x1002,
+                size_pages: 1,
+                is_free: false,
+            },
+            FolioBlockV63 {
+                pfn: 0x1003,
+                size_pages: 1,
+                is_free: true,
+            },
         ];
 
         Self {
@@ -227,11 +243,17 @@ impl OpenBsdPinsyscallUnveilV63PrEngine {
         let mut rules = BTreeMap::new();
         rules.insert(
             "/usr/lib".to_string(),
-            UnveilRuleV63 { path: "/usr/lib".to_string(), permissions: "rx".to_string() },
+            UnveilRuleV63 {
+                path: "/usr/lib".to_string(),
+                permissions: "rx".to_string(),
+            },
         );
         rules.insert(
             "/tmp".to_string(),
-            UnveilRuleV63 { path: "/tmp".to_string(), permissions: "rwc".to_string() },
+            UnveilRuleV63 {
+                path: "/tmp".to_string(),
+                permissions: "rwc".to_string(),
+            },
         );
 
         Self {
@@ -241,7 +263,9 @@ impl OpenBsdPinsyscallUnveilV63PrEngine {
     }
 
     pub fn validate_pinsyscall(&self, call_site: usize) -> bool {
-        self.pinned_syscall_ranges.iter().any(|&(start, end)| call_site >= start && call_site < end)
+        self.pinned_syscall_ranges
+            .iter()
+            .any(|&(start, end)| call_site >= start && call_site < end)
     }
 
     pub fn check_unveil_access(&self, path: &str, req_perm: char) -> bool {
@@ -256,11 +280,16 @@ impl OpenBsdPinsyscallUnveilV63PrEngine {
     pub fn generate_pr_proposal(&self) -> OsPrProposalV63 {
         OsPrProposalV63 {
             pr_id: "PR-OPENBSD-77-PINSYS-UNVEIL-V63".to_string(),
-            title: "OpenBSD 7.7+ System Call Pinning (pinsyscall) & Dynamic Unveil Engine".to_string(),
+            title: "OpenBSD 7.7+ System Call Pinning (pinsyscall) & Dynamic Unveil Engine"
+                .to_string(),
             target_component: "src/security/openbsd_pinsys_unveil_v63.rs".to_string(),
             status: OsPrStatusV63::Staged,
-            description: "Enforces pinsyscall kernel validation and dynamic unveil tree path isolation.".to_string(),
-            git_diff_patch: "--- a/sys/kern/kern_exec.c\n+++ b/sys/kern/kern_exec.c\n@@ -5,3 +5,10 @@\n".to_string(),
+            description:
+                "Enforces pinsyscall kernel validation and dynamic unveil tree path isolation."
+                    .to_string(),
+            git_diff_patch:
+                "--- a/sys/kern/kern_exec.c\n+++ b/sys/kern/kern_exec.c\n@@ -5,3 +5,10 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-OPENBSD77-PINSYS-UNVEIL-V63".to_string(),
         }
     }
@@ -286,8 +315,16 @@ impl NetBsdRumpPciVirtio9pV63PrEngine {
     pub fn new() -> Self {
         Self {
             pci_bars: vec![
-                RumpPciBarV63 { bar_index: 0, base_addr: 0xf0000000, size: 0x100000 },
-                RumpPciBarV63 { bar_index: 1, base_addr: 0xf1000000, size: 0x1000 },
+                RumpPciBarV63 {
+                    bar_index: 0,
+                    base_addr: 0xf0000000,
+                    size: 0x100000,
+                },
+                RumpPciBarV63 {
+                    bar_index: 1,
+                    base_addr: 0xf1000000,
+                    size: 0x1000,
+                },
             ],
             virtio_9p_active: true,
         }
@@ -381,13 +418,19 @@ impl IllumosOpenZfsDtraceEbpfV63PrEngine {
 
         Self {
             dataset_keys: keys,
-            dtrace_probes: vec!["zfs:dbuf:read:entry".to_string(), "zfs:arc:evict:entry".to_string()],
+            dtrace_probes: vec![
+                "zfs:dbuf:read:entry".to_string(),
+                "zfs:arc:evict:entry".to_string(),
+            ],
         }
     }
 
     pub fn encrypt_block(&self, dataset: &str, data: &[u8]) -> Vec<u8> {
         if let Some(key) = self.dataset_keys.get(dataset) {
-            data.iter().enumerate().map(|(i, &b)| b ^ key[i % key.len()]).collect()
+            data.iter()
+                .enumerate()
+                .map(|(i, &b)| b ^ key[i % key.len()])
+                .collect()
         } else {
             data.to_vec()
         }
@@ -395,7 +438,11 @@ impl IllumosOpenZfsDtraceEbpfV63PrEngine {
 
     pub fn translate_dtrace_to_ebpf(&self, probe: &str) -> Option<String> {
         if self.dtrace_probes.contains(&probe.to_string()) {
-            Some(format!("SEC(\"kprobe/{}\") int bpf_{}(void *ctx) {{ return 0; }}", probe, probe.replace(':', "_")))
+            Some(format!(
+                "SEC(\"kprobe/{}\") int bpf_{}(void *ctx) {{ return 0; }}",
+                probe,
+                probe.replace(':', "_")
+            ))
         } else {
             None
         }
@@ -437,7 +484,9 @@ impl HaikuBeFsAttributeIndexingV63PrEngine {
     }
 
     pub fn query_attribute(&self, attr_name: &str, value: &str) -> Option<u64> {
-        self.attribute_index.get(attr_name).and_then(|m| m.get(value).copied())
+        self.attribute_index
+            .get(attr_name)
+            .and_then(|m| m.get(value).copied())
     }
 
     pub fn generate_pr_proposal(&self) -> OsPrProposalV63 {
@@ -471,8 +520,14 @@ impl Plan99p2000LPlumberV63PrEngine {
     pub fn new() -> Self {
         Self {
             plumber_rules: vec![
-                PlumberRuleV63 { pattern: "txt".to_string(), target_action: "open_editor".to_string() },
-                PlumberRuleV63 { pattern: "png".to_string(), target_action: "open_viewer".to_string() },
+                PlumberRuleV63 {
+                    pattern: "txt".to_string(),
+                    target_action: "open_editor".to_string(),
+                },
+                PlumberRuleV63 {
+                    pattern: "png".to_string(),
+                    target_action: "open_viewer".to_string(),
+                },
             ],
         }
     }
@@ -595,11 +650,14 @@ impl DebianDpkgTriggersDeferredExecutionV63PrEngine {
     pub fn generate_pr_proposal(&self) -> OsPrProposalV63 {
         OsPrProposalV63 {
             pr_id: "PR-DEBIAN-DPKG-TRIGGERS-V63".to_string(),
-            title: "Debian dpkg Trigger Execution Graph & Deferred File Action Governor".to_string(),
+            title: "Debian dpkg Trigger Execution Graph & Deferred File Action Governor"
+                .to_string(),
             target_component: "src/distro/debian_dpkg_triggers_v63.rs".to_string(),
             status: OsPrStatusV63::Staged,
-            description: "Implements Debian dpkg trigger handling and deferred hook execution.".to_string(),
-            git_diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n".to_string(),
+            description: "Implements Debian dpkg trigger handling and deferred hook execution."
+                .to_string(),
+            git_diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DPKG-TRIGGERS-V63".to_string(),
         }
     }
@@ -616,11 +674,19 @@ pub struct DebianAptSecureKeyringPqcV63PrEngine {
 impl DebianAptSecureKeyringPqcV63PrEngine {
     pub fn new() -> Self {
         let mut keys = BTreeMap::new();
-        keys.insert("debian-stable-2026".to_string(), "dilithium5-key-content-001".to_string());
+        keys.insert(
+            "debian-stable-2026".to_string(),
+            "dilithium5-key-content-001".to_string(),
+        );
         Self { trusted_keys: keys }
     }
 
-    pub fn verify_inrelease_signature(&self, key_id: &str, content: &[u8], signature: &str) -> bool {
+    pub fn verify_inrelease_signature(
+        &self,
+        key_id: &str,
+        content: &[u8],
+        signature: &str,
+    ) -> bool {
         if let Some(key) = self.trusted_keys.get(key_id) {
             !content.is_empty() && signature.contains("DILITHIUM5") && !key.is_empty()
         } else {
@@ -665,7 +731,8 @@ impl DebianDebconfDatabaseStateV63PrEngine {
     }
 
     pub fn set_answer(&mut self, question: &str, answer: &str) {
-        self.answers.insert(question.to_string(), answer.to_string());
+        self.answers
+            .insert(question.to_string(), answer.to_string());
     }
 
     pub fn generate_pr_proposal(&self) -> OsPrProposalV63 {
@@ -699,11 +766,18 @@ pub struct DebianLintianStaticAnalysisV63PrEngine {
 impl DebianLintianStaticAnalysisV63PrEngine {
     pub fn new() -> Self {
         Self {
-            active_checks: vec!["control-file-has-bad-permissions".to_string(), "no-copyright-file".to_string()],
+            active_checks: vec![
+                "control-file-has-bad-permissions".to_string(),
+                "no-copyright-file".to_string(),
+            ],
         }
     }
 
-    pub fn analyze_package_spec(&self, has_control: bool, has_copyright: bool) -> Vec<LintianTagV63> {
+    pub fn analyze_package_spec(
+        &self,
+        has_control: bool,
+        has_copyright: bool,
+    ) -> Vec<LintianTagV63> {
         let mut tags = Vec::new();
         if !has_control {
             tags.push(LintianTagV63 {
@@ -725,11 +799,16 @@ impl DebianLintianStaticAnalysisV63PrEngine {
     pub fn generate_pr_proposal(&self) -> OsPrProposalV63 {
         OsPrProposalV63 {
             pr_id: "PR-DEBIAN-LINTIAN-ANALYZER-V63".to_string(),
-            title: "Debian lintian Package Static Analysis Check Suite & Policy Tag Enforcement".to_string(),
+            title: "Debian lintian Package Static Analysis Check Suite & Policy Tag Enforcement"
+                .to_string(),
             target_component: "src/distro/debian_lintian_v63.rs".to_string(),
             status: OsPrStatusV63::Staged,
-            description: "Implements lintian package static analysis suite and policy compliance tagging.".to_string(),
-            git_diff_patch: "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,4 +1,9 @@\n".to_string(),
+            description:
+                "Implements lintian package static analysis suite and policy compliance tagging."
+                    .to_string(),
+            git_diff_patch:
+                "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,4 +1,9 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-LINTIAN-ANALYZER-V63".to_string(),
         }
     }
@@ -761,8 +840,11 @@ impl DebianBuilddCleanroomSbuildV63PrEngine {
             title: "Debian buildd Cleanroom sbuild Chroot Build Orchestrator Engine".to_string(),
             target_component: "src/distro/debian_sbuild_v63.rs".to_string(),
             status: OsPrStatusV63::Staged,
-            description: "Implements isolated cleanroom sbuild chroot build environment manager.".to_string(),
-            git_diff_patch: "--- a/lib/Sbuild/Build.pm\n+++ b/lib/Sbuild/Build.pm\n@@ -1,5 +1,10 @@\n".to_string(),
+            description: "Implements isolated cleanroom sbuild chroot build environment manager."
+                .to_string(),
+            git_diff_patch:
+                "--- a/lib/Sbuild/Build.pm\n+++ b/lib/Sbuild/Build.pm\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-BUILDD-SBUILD-V63".to_string(),
         }
     }
@@ -779,8 +861,13 @@ pub struct DebianDebsumsIntegrityAuditorV63PrEngine {
 impl DebianDebsumsIntegrityAuditorV63PrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert("/usr/bin/apt".to_string(), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string());
-        Self { expected_checksums: map }
+        map.insert(
+            "/usr/bin/apt".to_string(),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855".to_string(),
+        );
+        Self {
+            expected_checksums: map,
+        }
     }
 
     pub fn audit_file(&self, path: &str, actual_hash: &str) -> bool {
@@ -817,7 +904,9 @@ impl DebianPopconTelemetryAnalyzerV63PrEngine {
         let mut map = BTreeMap::new();
         map.insert("bash".to_string(), 1700000000);
         map.insert("vim".to_string(), 1690000000);
-        Self { package_access_times: map }
+        Self {
+            package_access_times: map,
+        }
     }
 
     pub fn compile_telemetry_packet(&self) -> String {
@@ -830,8 +919,11 @@ impl DebianPopconTelemetryAnalyzerV63PrEngine {
             title: "Debian popcon Anonymous Package Popularity Telemetry Compiler".to_string(),
             target_component: "src/distro/debian_popcon_v63.rs".to_string(),
             status: OsPrStatusV63::Staged,
-            description: "Implements popcon anonymous package installation and access telemetry compiler.".to_string(),
-            git_diff_patch: "--- a/popcon-upload\n+++ b/popcon-upload\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements popcon anonymous package installation and access telemetry compiler."
+                    .to_string(),
+            git_diff_patch: "--- a/popcon-upload\n+++ b/popcon-upload\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-POPCON-ANALYZER-V63".to_string(),
         }
     }
@@ -849,11 +941,16 @@ impl DebianPiupartsPackageSanitySuiteV63PrEngine {
     pub fn new() -> Self {
         let mut files = BTreeSet::new();
         files.insert("/etc/debian_version".to_string());
-        Self { chroot_files: files }
+        Self {
+            chroot_files: files,
+        }
     }
 
     pub fn verify_purge_cleanliness(&self, post_purge_files: &BTreeSet<String>) -> Vec<String> {
-        post_purge_files.difference(&self.chroot_files).cloned().collect()
+        post_purge_files
+            .difference(&self.chroot_files)
+            .cloned()
+            .collect()
     }
 
     pub fn generate_pr_proposal(&self) -> OsPrProposalV63 {
@@ -950,8 +1047,16 @@ mod tests {
     #[test]
     fn test_open_source_os_functional_logic() {
         let mut linux_eng = Linux615SchedExtFolioCompactionV63PrEngine::new();
-        linux_eng.task_queue.push(SchedExtTaskV63 { pid: 10, priority: 5, cpus_allowed: 0xf });
-        linux_eng.task_queue.push(SchedExtTaskV63 { pid: 11, priority: 20, cpus_allowed: 0xf });
+        linux_eng.task_queue.push(SchedExtTaskV63 {
+            pid: 10,
+            priority: 5,
+            cpus_allowed: 0xf,
+        });
+        linux_eng.task_queue.push(SchedExtTaskV63 {
+            pid: 11,
+            priority: 20,
+            cpus_allowed: 0xf,
+        });
         assert_eq!(linux_eng.schedule_next_task(), Some(11));
         assert_eq!(linux_eng.compact_folios(), 2);
 
@@ -977,10 +1082,16 @@ mod tests {
         assert_ne!(enc, vec![1, 2, 3]);
 
         let haiku_eng = HaikuBeFsAttributeIndexingV63PrEngine::new();
-        assert_eq!(haiku_eng.query_attribute("META:TITLE", "Song.mp3"), Some(1024));
+        assert_eq!(
+            haiku_eng.query_attribute("META:TITLE", "Song.mp3"),
+            Some(1024)
+        );
 
         let plan9_eng = Plan99p2000LPlumberV63PrEngine::new();
-        assert_eq!(plan9_eng.route_message("file.txt"), Some("open_editor".to_string()));
+        assert_eq!(
+            plan9_eng.route_message("file.txt"),
+            Some("open_editor".to_string())
+        );
 
         let mut redox_eng = RedoxFsCowCapabilityV63PrEngine::new();
         assert!(redox_eng.verify_token(0xcafe_babe));
@@ -995,12 +1106,22 @@ mod tests {
         assert_eq!(deferred, vec!["hicolor-icon-theme".to_string()]);
 
         let apt_eng = DebianAptSecureKeyringPqcV63PrEngine::new();
-        assert!(apt_eng.verify_inrelease_signature("debian-stable-2026", b"manifest", "DILITHIUM5-SIG"));
+        assert!(apt_eng.verify_inrelease_signature(
+            "debian-stable-2026",
+            b"manifest",
+            "DILITHIUM5-SIG"
+        ));
 
         let mut debconf_eng = DebianDebconfDatabaseStateV63PrEngine::new();
-        assert_eq!(debconf_eng.get_answer("tzdata/zones"), Some(&"UTC".to_string()));
+        assert_eq!(
+            debconf_eng.get_answer("tzdata/zones"),
+            Some(&"UTC".to_string())
+        );
         debconf_eng.set_answer("tzdata/zones", "EST");
-        assert_eq!(debconf_eng.get_answer("tzdata/zones"), Some(&"EST".to_string()));
+        assert_eq!(
+            debconf_eng.get_answer("tzdata/zones"),
+            Some(&"EST".to_string())
+        );
 
         let lintian_eng = DebianLintianStaticAnalysisV63PrEngine::new();
         let tags = lintian_eng.analyze_package_spec(false, false);
@@ -1010,7 +1131,10 @@ mod tests {
         assert!(sbuild_eng.build_in_cleanroom("sbuild-unstable-amd64", "foo.dsc"));
 
         let debsums_eng = DebianDebsumsIntegrityAuditorV63PrEngine::new();
-        assert!(debsums_eng.audit_file("/usr/bin/apt", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"));
+        assert!(debsums_eng.audit_file(
+            "/usr/bin/apt",
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ));
 
         let popcon_eng = DebianPopconTelemetryAnalyzerV63PrEngine::new();
         assert!(popcon_eng.compile_telemetry_packet().contains("count=2"));

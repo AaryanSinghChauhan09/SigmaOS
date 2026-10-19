@@ -68,8 +68,14 @@ pub struct OmarchyHyprpaperWallpaperDaemonEngine {
 impl OmarchyHyprpaperWallpaperDaemonEngine {
     pub fn new() -> Self {
         let mut active = BTreeMap::new();
-        active.insert("eDP-1".to_string(), "/usr/share/backgrounds/omarchy/default.jpg".to_string());
-        active.insert("HDMI-A-1".to_string(), "/usr/share/backgrounds/omarchy/default.jpg".to_string());
+        active.insert(
+            "eDP-1".to_string(),
+            "/usr/share/backgrounds/omarchy/default.jpg".to_string(),
+        );
+        active.insert(
+            "HDMI-A-1".to_string(),
+            "/usr/share/backgrounds/omarchy/default.jpg".to_string(),
+        );
 
         Self {
             active_wallpapers: active,
@@ -90,7 +96,8 @@ impl OmarchyHyprpaperWallpaperDaemonEngine {
 
     pub fn set_wallpaper(&mut self, monitor: &str, path: &str) -> bool {
         self.preload_wallpaper(path);
-        self.active_wallpapers.insert(monitor.to_string(), path.to_string());
+        self.active_wallpapers
+            .insert(monitor.to_string(), path.to_string());
         true
     }
 
@@ -127,8 +134,8 @@ pub struct OmarchyHypridlePowerManagerEngine {
 impl OmarchyHypridlePowerManagerEngine {
     pub fn new() -> Self {
         Self {
-            timeout_lock_sec: 300,    // 5 min
-            timeout_dpms_sec: 600,    // 10 min
+            timeout_lock_sec: 300,     // 5 min
+            timeout_dpms_sec: 600,     // 10 min
             timeout_suspend_sec: 1800, // 30 min
             lock_cmd: "hyprlock".to_string(),
             dpms_off_cmd: "hyprctl dispatch dpms off".to_string(),
@@ -367,7 +374,8 @@ impl OmarchyWlogoutSessionOverlayEngine {
         "text" : "Shutdown",
         "keybind" : "s"
     }
-]"#.to_string()
+]"#
+        .to_string()
     }
 }
 
@@ -483,7 +491,10 @@ impl OmarchyLinuxMissingComponentsV61MasterSuite {
     }
 
     pub fn get_merged_pr_count(&self) -> usize {
-        self.pr_registry.iter().filter(|pr| pr.status == OmarchyPrStatusV61::Merged).count()
+        self.pr_registry
+            .iter()
+            .filter(|pr| pr.status == OmarchyPrStatusV61::Merged)
+            .count()
     }
 
     pub fn execute_and_verify_all(&self) -> bool {
