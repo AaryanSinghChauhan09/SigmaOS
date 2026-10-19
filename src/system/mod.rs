@@ -89,6 +89,7 @@ pub mod sigmaquickshell;
 pub mod sigmapackagemanager;
 pub mod sigmaupdatemanager;
 pub mod sigmaflatpak;
+pub mod sigmasnap;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -452,6 +453,10 @@ pub use sigmaupdatemanager::{
 pub use sigmaflatpak::{
     SigmaFlatpak, Flatpak, FlatpakRemote, FlatpakType, FlatpakState,
     init_sigmaflatpak, get_sigmaflatpak, add_flatpak, install_flatpak,
+};
+pub use sigmasnap::{
+    SigmaSnap, Snap, SnapType, SnapState,
+    init_sigmasnap, get_sigmasnap, add_snap, install_snap,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
