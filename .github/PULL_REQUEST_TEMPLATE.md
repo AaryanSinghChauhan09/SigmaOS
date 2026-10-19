@@ -1,97 +1,82 @@
 ## Summary
 
-<!-- One paragraph: what changed and why. -->
+<!-- What component does this PR improve, add, or regulate? -->
+
+## Related issue
+
+Closes #
 
 ## Component
 
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
+<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
+
+## Upstream study
+
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
+
+## Component rules added or enforced
+
+- [ ] New rule
+- [ ] Existing rule enforced
+- [ ] Rule test added
+- [ ] CI gate added
+- [ ] Documentation updated
+
+## What SigmaOS adopts
+
+<!-- State the upstream principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
+## Changes
+
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
 - [ ] Documentation
-- [ ] CI / tooling
-
-## Changes (What SigmaOS adopts)
-
--
-
-## Motivation
-
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
-
-## Reference study (Upstream study)
-
-<!-- Required for lifecycle, ABI, storage, or scheduling changes -->
-
-- Study document:
-- Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
-- Reason:
-
-## Implementation notes
-
-<!-- Design decisions, data structures, locking, error handling. -->
-
-## Tests
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
 ## Verification
 
 ```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
+make check
+make test
+make format
 ```
 
-Paste relevant output below.
+## Runtime evidence
 
-## Capability status
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
 
-- Previous status:
-- New status:
-- Evidence:
+## Safety and rollback
 
-## Integration impact
-
-- [ ] No runtime integration yet
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input validated
+- [ ] Package scripts sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
 ## Reviewer checklist
 
 - [ ] Scope is narrow
-- [ ] Public API documented
-- [ ] `unsafe` justified
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] Feature status updated
-- [ ] No unsupported compatibility claim
-
-## Kernel safety review
-
-- [ ] Lock ordering documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
-
-## Safety and rollback
-
-- Risk:
-- Rollback:
+- [ ] Component rules are enforceable
+- [ ] Tests cover the rules
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported Linux/BSD parity claims
