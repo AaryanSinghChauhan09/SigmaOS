@@ -123,6 +123,7 @@ pub mod sigmasysteminfo;
 pub mod sigmafilemanager;
 pub mod sigmaarchivemanager;
 pub mod sigmaclipboardmanager;
+pub mod sigmasearch;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -662,6 +663,11 @@ pub use sigmaclipboardmanager {
     SigmaClipboardManager, ClipboardItem, ClipboardFormat,
     init_sigmaclipboardmanager, get_sigmaclipboardmanager, get_sigmaclipboardmanager_mut,
     add_item,
+};
+
+pub use sigmasearch {
+    SigmaSearch, SearchResult, SearchIndex,
+    init_sigmasearch, get_sigmasearch, get_sigmasearch_mut,
 };
 
 pub use sigmaupdate::{
