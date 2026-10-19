@@ -78,6 +78,7 @@ pub mod sigmathermal;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod sigmatrim;
+pub mod sigmatimeshift;
 pub mod sigmathemeinstaller;
 pub mod sigmainstaller;
 pub mod sigmausbwriter;
@@ -407,6 +408,10 @@ pub use sigmathemeinstaller::{
 pub use sigmainstaller::{
     SigmaInstaller, InstallConfig, InstallState, PartitioningMode, FilesystemType,
     init_sigmainstaller, get_sigmainstaller, create_install_config,
+};
+pub use sigmatimeshift::{
+    SigmaTimeshift, TimeshiftSnapshot, SnapshotSchedule, SnapshotLevel, SnapshotType, SnapshotState,
+    init_sigmatimeshift, get_sigmatimeshift, create_timeshift_snapshot, restore_timeshift_snapshot,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
