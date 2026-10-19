@@ -76,6 +76,24 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
+/// Confidential Computing attestation mode
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ConfidentialComputingMode {
+    None,
+    IntelTdx,
+    AmdSevSnp,
+    ArmRme,
+}
+
+/// QEMU Live Migration Post-Copy State
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QemuLiveMigrationState {
+    pub target_host: String,
+    pub is_postcopy_active: bool,
+    pub userfaultfd_pages_transferred: u64,
+    pub bandwidth_limit_mbps: u32,
+}
+
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {
@@ -86,6 +104,9 @@ pub struct KvmQemuEngine {
     pub io_uring_sqpoll_enabled: bool,
     pub vfio_passthrough_devices: Vec<VfioDevicePassthrough>,
     pub virtio_fs_inodes_cached: u64,
+    pub confidential_mode: Option<ConfidentialComputingMode>,
+    pub live_migration: Option<QemuLiveMigrationState>,
+    pub virtio_mem_balloon_size_mb: u64,
 }
 
 impl KvmQemuEngine {
@@ -98,6 +119,9 @@ impl KvmQemuEngine {
             io_uring_sqpoll_enabled: true,
             vfio_passthrough_devices: Vec::new(),
             virtio_fs_inodes_cached: 0,
+            confidential_mode: None,
+            live_migration: None,
+            virtio_mem_balloon_size_mb: 0,
         }
     }
 

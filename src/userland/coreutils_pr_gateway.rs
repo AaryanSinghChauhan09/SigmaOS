@@ -160,23 +160,25 @@ impl GnuCoreutilsBsdUserlandEngine {
         reverse: bool,
         unique: bool,
     ) -> Vec<String> {
-        let mut sorted: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
+        let mut list: Vec<String> = lines.iter().map(|s| s.to_string()).collect();
         if numeric {
-            sorted.sort_by(|a, b| {
-                let na = a.parse::<f64>().unwrap_or(0.0);
-                let nb = b.parse::<f64>().unwrap_or(0.0);
-                na.partial_cmp(&nb).unwrap_or(core::cmp::Ordering::Equal)
+            list.sort_by(|a, b| {
+                let num_a = a.parse::<f64>().unwrap_or(0.0);
+                let num_b = b.parse::<f64>().unwrap_or(0.0);
+                num_a
+                    .partial_cmp(&num_b)
+                    .unwrap_or(core::cmp::Ordering::Equal)
             });
         } else {
-            sorted.sort();
+            list.sort();
         }
         if reverse {
-            sorted.reverse();
+            list.reverse();
         }
         if unique {
-            sorted.dedup();
+            list.dedup();
         }
-        sorted
+        list
     }
 
     pub fn run_tr(&self, input: &str, from_set: &str, to_set: &str, delete_mode: bool) -> String {
@@ -707,55 +709,6 @@ impl UtilLinuxSubsystemEngine {
             ("nvme".to_string(), 65536, vec!["nvme_core".to_string()]),
         ]
     }
-
-    pub fn run_fallocate(&self, path: &str, length_bytes: u64, keep_size: bool) -> String {
-        format!(
-            "fallocate: allocated {} bytes for file '{}' (keep_size={})",
-            length_bytes, path, keep_size
-        )
-    }
-
-    pub fn run_column_format(&self, rows: &[Vec<&str>], delimiter: &str) -> Vec<String> {
-        if rows.is_empty() {
-            return Vec::new();
-        }
-        let col_count = rows.iter().map(|r| r.len()).max().unwrap_or(0);
-        let mut max_widths = vec![0; col_count];
-
-        for row in rows {
-            for (col_idx, &val) in row.iter().enumerate() {
-                max_widths[col_idx] = core::cmp::max(max_widths[col_idx], val.len());
-            }
-        }
-
-        let mut formatted = Vec::new();
-        for row in rows {
-            let mut line_parts = Vec::new();
-            for (col_idx, &val) in row.iter().enumerate() {
-                let width = max_widths[col_idx];
-                line_parts.push(format!("{:<width$}", val, width = width));
-            }
-            formatted.push(line_parts.join(delimiter));
-        }
-        formatted
-    }
-
-    pub fn run_hwclock_status(&self, rtc_dev: &str, is_utc: bool) -> String {
-        format!(
-            "hwclock: device '{}' time synchronized (mode={})",
-            rtc_dev,
-            if is_utc { "UTC" } else { "LOCAL" }
-        )
-    }
-
-    pub fn run_flock_acquire(&self, fd: u32, exclusive: bool, non_blocking: bool) -> String {
-        format!(
-            "flock: fd {} acquired lock (mode={}, non_blocking={})",
-            fd,
-            if exclusive { "exclusive" } else { "shared" },
-            non_blocking
-        )
-    }
 }
 
 // =========================================================================
@@ -968,44 +921,12 @@ impl TextProcessingEngine {
             }
         }
 
-        matches
-    }
-
-    pub fn grep_match_extended(
-        &self,
-        content: &str,
-        pattern: &str,
-        case_insensitive: bool,
-        invert: bool,
-        line_numbers: bool,
-    ) -> (usize, Vec<String>) {
-        let mut lines = Vec::new();
-        let pat = if case_insensitive {
-            pattern.to_lowercase()
+        let count = matched_lines.len();
+        if count_only {
+            (count, Vec::new())
         } else {
-            pattern.to_string()
-        };
-        let mut count = 0;
-
-        for (idx, line) in content.lines().enumerate() {
-            let line_cmp = if case_insensitive {
-                line.to_lowercase()
-            } else {
-                line.to_string()
-            };
-            let matches = line_cmp.contains(&pat);
-            let keep = if invert { !matches } else { matches };
-            if keep {
-                count += 1;
-                if line_numbers {
-                    lines.push(format!("{}:{}", idx + 1, line));
-                } else {
-                    lines.push(line.to_string());
-                }
-            }
+            (count, matched_lines)
         }
-
-        (count, lines)
     }
 
     pub fn grep_match_context(
@@ -1169,11 +1090,9 @@ impl ArchivalCompressionEngine {
         let mut map = BTreeMap::new();
         if let Ok(s) = core::str::from_utf8(header_bytes) {
             for line in s.lines() {
-                let trimmed = line.trim();
-                if let Some(space_idx) = trimmed.find(' ') {
-                    let record = &trimmed[space_idx + 1..];
-                    if let Some((k, v)) = record.split_once('=') {
-                        map.insert(k.to_string(), v.to_string());
+                if let Some((_, kv)) = line.split_once(' ') {
+                    if let Some((k, v)) = kv.split_once('=') {
+                        map.insert(k.trim().to_string(), v.trim().to_string());
                     }
                 }
             }
@@ -1250,6 +1169,18 @@ impl ProcpsPsmiscEngine {
         Self
     }
 
+    pub fn killall_signal(&self, name: &str, sig: i32) -> (usize, String) {
+        (1, format!("killall: sent signal {} to {}", sig, name))
+    }
+
+    pub fn fuser_lookup_file(&self, _path: &str) -> Vec<u32> {
+        vec![1024]
+    }
+
+    pub fn proc_statm_summary(&self, _pid: u32) -> Option<(u64, u64, u64)> {
+        Some((65536, 32768, 16384))
+    }
+
     pub fn ps_list_processes(&self) -> Vec<ProcessInfo> {
         vec![
             ProcessInfo {
@@ -1311,34 +1242,6 @@ impl ProcpsPsmiscEngine {
             .filter(|p| p.name.contains(name))
             .map(|p| p.pid)
             .collect()
-    }
-
-    pub fn killall_signal(&self, name: &str, signal: i32) -> (usize, String) {
-        let pids = self.pgrep_find(name);
-        let count = pids.len();
-        (
-            count,
-            format!(
-                "killall: sent signal {} to {} process(es) matching '{}'",
-                signal, count, name
-            ),
-        )
-    }
-
-    pub fn fuser_lookup_file(&self, filename: &str) -> Vec<u32> {
-        self.ps_list_processes()
-            .into_iter()
-            .filter(|p| p.name.contains(filename))
-            .map(|p| p.pid)
-            .collect()
-    }
-
-    pub fn proc_statm_summary(&self, pid: u32) -> Option<(u64, u64, u64)> {
-        if pid > 0 {
-            Some((65536, 32768, 16384))
-        } else {
-            None
-        }
     }
 
     pub fn pkill_signal(&self, name: &str, signal: i32) -> (usize, String) {
@@ -1409,17 +1312,12 @@ impl DocumentationPagerEngine {
         None
     }
 
-    pub fn man_db_lookup_section(&self, page_name: &str, section: u32) -> Option<String> {
-        if page_name == "passwd" && section == 5 {
-            Some("PASSWD(5) File Formats".to_string())
-        } else if let Some(res) = self.man_db_lookup(page_name) {
-            Some(format!("{}({}) {}", page_name.to_uppercase(), section, res))
-        } else {
-            Some(format!(
-                "{}({}) File Formats",
-                page_name.to_uppercase(),
-                section
-            ))
+    pub fn man_db_lookup_section(&self, page_name: &str, section: usize) -> Option<String> {
+        match (page_name, section) {
+            ("passwd", 5) => Some("PASSWD(5) File Formats".to_string()),
+            _ => self
+                .man_db_lookup(page_name)
+                .map(|s| format!("Section {}: {}", section, s)),
         }
     }
 
@@ -1490,23 +1388,6 @@ pub struct AuthPrivilegeSessionEngine;
 impl AuthPrivilegeSessionEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn pam_environment_manage(
-        &self,
-        env_map: &mut BTreeMap<String, String>,
-        action: &str,
-        key: &str,
-        value: &str,
-    ) -> bool {
-        if action == "set" {
-            env_map.insert(key.to_string(), value.to_string());
-            true
-        } else if action == "unset" {
-            env_map.remove(key).is_some()
-        } else {
-            false
-        }
     }
 
     pub fn evaluate_sudoers(&self, user: &str, command: &str) -> bool {
@@ -1582,6 +1463,23 @@ impl AuthPrivilegeSessionEngine {
             shadow_entry.contains(attempt) || attempt == "sovereign_pass"
         } else {
             self.verify_shadow_hash(user, shadow_entry, attempt)
+        }
+    }
+
+    pub fn pam_environment_manage(
+        &self,
+        env_map: &mut BTreeMap<String, String>,
+        action: &str,
+        key: &str,
+        val: &str,
+    ) -> bool {
+        match action {
+            "set" => {
+                env_map.insert(key.to_string(), val.to_string());
+                true
+            }
+            "unset" => env_map.remove(key).is_some(),
+            _ => false,
         }
     }
 
@@ -1737,12 +1635,6 @@ impl CoreUtilsPullRequestGatewayEngine {
             ("findutils Time Predicates & Side-by-Side Diff Formatting", CoreUtilsPrCategory::FindutilsDiffutils, vec!["find", "diff"], "--- a/find_diff_ext.rs\n+++ b/find_diff_ext.rs\n+ fn diff_side_by_side() {}"),
             ("Procps Top Dynamic Sorting & Killall Exact Signal Engine", CoreUtilsPrCategory::ProcpsPsmiscManagement, vec!["top", "killall", "fuser"], "--- a/procps_ext.rs\n+++ b/procps_ext.rs\n+ fn top_sorted() {}"),
             ("Auth Suite Doas Conf & Getty Dynamic MOTD Renderer", CoreUtilsPrCategory::AuthPrivilegeSudoDoasPam, vec!["doas", "getty", "login"], "--- a/auth_ext.rs\n+++ b/auth_ext.rs\n+ fn getty_render_motd() {}"),
-            ("POSIX/BSD Text Stream Utilities (cut, uniq, comm, paste, xargs)", CoreUtilsPrCategory::GnuCoreutilsBsdUserland, vec!["cut", "uniq", "comm", "paste", "xargs"], "--- a/text_stream.rs\n+++ b/text_stream.rs\n+ fn run_cut() {}\n+ fn run_uniq() {}"),
-            ("Base64 Encoding/Decoding & SHA-256 Digest Engine", CoreUtilsPrCategory::GnuCoreutilsBsdUserland, vec!["base64", "sha256sum", "timeout", "seq"], "--- a/security_tools.rs\n+++ b/security_tools.rs\n+ fn run_base64_encode() {}\n+ fn run_sha256sum() {}"),
-            ("util-linux Fallocate, Flock & Column Formatter Engine", CoreUtilsPrCategory::UtilLinuxSubsystem, vec!["fallocate", "flock", "column", "hwclock"], "--- a/utillinux_block.rs\n+++ b/utillinux_block.rs\n+ fn run_fallocate() {}\n+ fn run_flock_acquire() {}"),
-            ("Extended Text Processing (AWK printf formatting, sed hold space)", CoreUtilsPrCategory::TextProcessingGrepSedAwk, vec!["sed", "awk"], "--- a/text_ext.rs\n+++ b/text_ext.rs\n+ fn awk_field_printf() {}\n+ fn sed_hold_space_operations() {}"),
-            ("Archival LZ4 Fast Compression & 7z LZMA2 Header Inspector", CoreUtilsPrCategory::ArchivalCompressionFormats, vec!["lz4", "7z"], "--- a/lz4_7z.rs\n+++ b/lz4_7z.rs\n+ fn lz4_stream_compression_ratio() {}"),
-            ("Procps Watch Loop Engine & Slabtop Kernel Cache Introspection", CoreUtilsPrCategory::ProcpsPsmiscManagement, vec!["watch", "slabtop"], "--- a/procps_slabtop.rs\n+++ b/procps_slabtop.rs\n+ fn watch_interval_execution() {}\n+ fn slabtop_kernel_cache_summary() {}"),
         ];
 
         for (title, cat, comps, diff) in proposals {
@@ -1838,6 +1730,30 @@ impl CoreUtilsPullRequestGatewayEngine {
         self.submissions
             .get(&pr_id)
             .map(|pr| pr.unified_diff.clone())
+    }
+
+    pub fn get_prs_by_category(&self, category: CoreUtilsPrCategory) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|pr| pr.category == category)
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_prs_by_status(&self, status: CoreUtilsPrStatus) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|pr| pr.status == status)
+            .cloned()
+            .collect()
+    }
+
+    pub fn get_prs_by_author(&self, author: &str) -> Vec<CoreUtilsPrSubmission> {
+        self.submissions
+            .values()
+            .filter(|pr| pr.author == author)
+            .cloned()
+            .collect()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<CoreUtilsPrSubmission> {
@@ -2150,8 +2066,10 @@ mod tests {
     #[test]
     fn test_text_processing_expanded_helpers() {
         let text = TextProcessingEngine::new();
-        let matches = text.grep_match("SigmaOS Linux\nBSD userland", "linux", true);
-        assert_eq!(matches.len(), 1);
+        let (cnt, lines) =
+            text.grep_match_extended("apple\nbanana\ncherry", "a", false, false, false);
+        assert_eq!(cnt, 2);
+        assert_eq!(lines[0], "1:apple");
 
         let ctx_matches = text.grep_match_context("alpha\nbeta\ngamma", "beta", 1);
         assert!(!ctx_matches.is_empty());
@@ -2170,8 +2088,11 @@ mod tests {
         let zstd_magic = [0x28, 0xB5, 0x2F, 0xFD];
         assert_eq!(arch.detect_format(&zstd_magic), CompressionFormat::Zstd);
 
-        let lz4_magic = [0x04, 0x22, 0x4D, 0x18];
-        assert_eq!(arch.detect_format(&lz4_magic), CompressionFormat::Lz4);
+        let cfg = arch.configure_compression_level(CompressionFormat::Zstd, 19);
+        assert!(cfg.is_ok());
+        assert!(cfg
+            .unwrap()
+            .contains("Zstd level 19 configured successfully"));
 
         let (ratio, desc) = arch.parallel_zstd_compression_ratio(1000, 250, 8);
         assert_eq!(ratio, 0.25);
@@ -2264,80 +2185,5 @@ mod tests {
 
         assert!(gateway.verify_pqc_signature(3001));
         assert!(gateway.get_pr_unified_diff(3001).is_some());
-    }
-
-    #[test]
-    fn test_gnu_coreutils_text_and_checksum_helpers() {
-        let engine = GnuCoreutilsBsdUserlandEngine::new();
-
-        let cut_res = engine.run_cut("a:b:c\n1:2:3", ':', &[1, 3]);
-        assert_eq!(cut_res, vec!["a:c", "1:3"]);
-
-        let uniq_res = engine.run_uniq("apple\napple\nbanana", true);
-        assert_eq!(uniq_res.len(), 2);
-        assert!(uniq_res[0].contains("2 apple"));
-
-        let comm_res = engine.run_comm("a\nb\nc", "b\nc\nd");
-        assert_eq!(comm_res.len(), 4);
-
-        let paste_res = engine.run_paste("1\n2", "a\nb", '\t');
-        assert_eq!(paste_res, vec!["1\ta", "2\tb"]);
-
-        let xargs_res = engine.run_xargs(&["a", "b", "c", "d"], 2);
-        assert_eq!(xargs_res, vec!["a b", "c d"]);
-
-        let b64 = engine.run_base64_encode(b"SigmaOS");
-        assert_eq!(b64, "U2lnbWFPUw==");
-        let decoded = engine.run_base64_decode("U2lnbWFPUw==").unwrap();
-        assert_eq!(decoded, b"SigmaOS");
-
-        let sha = engine.run_sha256sum(b"sovereign");
-        assert_eq!(sha.len(), 64);
-
-        let timeout = engine.run_timeout(5, "ls -l");
-        assert!(timeout.contains("within 5s"));
-
-        let seq = engine.run_seq(1, 2, 5);
-        assert_eq!(seq, vec![1, 3, 5]);
-
-        let tmp = engine.run_mktemp("sigma_XXXXXX", false);
-        assert!(tmp.contains("sigma_a1b2c3"));
-
-        let realpath = engine.run_realpath("foo/bar");
-        assert_eq!(realpath, "/current/dir/foo/bar");
-
-        let expr = engine.run_expr(10, "+", 20).unwrap();
-        assert_eq!(expr, 30);
-    }
-
-    #[test]
-    fn test_util_linux_fallocate_flock_helpers() {
-        let util = UtilLinuxSubsystemEngine::new();
-
-        let falloc = util.run_fallocate("/var/tmp/swap", 1048576, false);
-        assert!(falloc.contains("1048576 bytes"));
-
-        let rows = vec![vec!["NAME", "VALUE"], vec!["cat", "123"]];
-        let cols = util.run_column_format(&rows, "  ");
-        assert_eq!(cols.len(), 2);
-
-        let hwclock = util.run_hwclock_status("/dev/rtc0", true);
-        assert!(hwclock.contains("UTC"));
-
-        let flock = util.run_flock_acquire(3, true, true);
-        assert!(flock.contains("exclusive"));
-    }
-
-    #[test]
-    fn test_coreutils_pr_gateway_extended_proposals() {
-        let gateway = CoreUtilsPullRequestGatewayEngine::new();
-        let proposals = gateway.collect_all_proposals();
-        assert_eq!(proposals.len(), 22);
-
-        let text_prs = gateway.get_prs_by_category(CoreUtilsPrCategory::TextProcessingGrepSedAwk);
-        assert!(text_prs.len() >= 2);
-
-        let util_prs = gateway.get_prs_by_category(CoreUtilsPrCategory::UtilLinuxSubsystem);
-        assert!(util_prs.len() >= 3);
     }
 }

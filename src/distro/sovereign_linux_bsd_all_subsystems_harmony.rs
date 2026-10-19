@@ -1115,11 +1115,8 @@ impl SovereignUniversalCrossDistroSubsystemOrchestrator {
         target_distro: LinuxBsdDistroInspiration,
         payload: &str,
     ) -> String {
-        self.harmony_engine.translate_cross_distro_payload_direct(
-            source_distro,
-            target_distro,
-            payload,
-        )
+        self.harmony_engine
+            .translate_subsystem_payload(source_distro, target_distro, payload)
     }
 
     /// Perform system-wide distro compliance audit across all core subsystems.
@@ -1323,10 +1320,10 @@ mod tests {
             "rpm"
         );
 
-        let (audits, score) = engine.audit_all_subsystems_distro_compliance();
-        assert_eq!(audits.len(), 44);
-        assert_eq!(score, 100);
-        for (_, compliant) in audits {
+        let (audits_map, audit_score) = engine.audit_all_subsystems_distro_compliance();
+        assert_eq!(audits_map.len(), 44);
+        assert_eq!(audit_score, 100);
+        for (_, compliant) in audits_map {
             assert!(compliant);
         }
 

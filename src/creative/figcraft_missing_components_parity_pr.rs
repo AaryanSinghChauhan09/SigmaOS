@@ -501,6 +501,59 @@ impl FigcraftInteractivePrototypingSmartAnimatePrEngine {
         }
     }
 
+    /// Calculate spring damped harmonic oscillator position x(t) over normalized time t in [0.0, 1.0]
+    pub fn evaluate_spring_position(&self, t: f32, start_val: f32, target_val: f32) -> f32 {
+        let delta = target_val - start_val;
+        if delta.abs() < 1e-5 {
+            return target_val;
+        }
+
+        let m = self.default_spring.mass;
+        let k = self.default_spring.stiffness;
+        let c = self.default_spring.damping;
+
+        let omega0 = (k / m).sqrt();
+        let zeta = c / (2.0 * (m * k).sqrt());
+
+        let t_sec = t * 0.5; // 500ms duration mapping
+
+        if zeta < 1.0 {
+            // Underdamped spring oscillation
+            let omega_d = omega0 * (1.0 - zeta * zeta).sqrt();
+            let envelope = (-zeta * omega0 * t_sec).exp();
+            let osc = (omega_d * t_sec).cos() + (zeta * omega0 / omega_d) * (omega_d * t_sec).sin();
+            target_val - delta * envelope * osc
+        } else {
+            // Overdamped / Critically damped
+            let envelope = (-omega0 * t_sec).exp();
+            target_val - delta * envelope * (1.0 + omega0 * t_sec)
+        }
+    }
+
+    /// Match layer topology between two artboard frames for Smart Animate path morphing
+    pub fn match_smart_animate_layers(
+        &mut self,
+        source_layers: &[(u32, &str)],
+        target_layers: &[(u32, &str)],
+    ) -> usize {
+        self.matched_layers.clear();
+
+        for &(src_id, src_name) in source_layers {
+            for &(tgt_id, tgt_name) in target_layers {
+                if src_name == tgt_name {
+                    self.matched_layers.push(SmartAnimateLayerMatch {
+                        source_node_id: src_id,
+                        target_node_id: tgt_id,
+                        node_name: src_name.to_string(),
+                        match_confidence: 1.0,
+                    });
+                    break;
+                }
+            }
+        }
+        self.matched_layers.len()
+    }
+
     pub fn trigger_interaction(
         &mut self,
         source_node_id: u32,
@@ -905,6 +958,31 @@ impl FigcraftDevModeMultiFrameworkExporterPrEngine {
         Self
     }
 
+    /// Calculate sRGB channel relative luminance
+    pub fn relative_luminance(&self, r: u8, g: u8, b: u8) -> f32 {
+        let channel_lum = |c: u8| -> f32 {
+            let s = c as f32 / 255.0;
+            if s <= 0.03928 {
+                s / 12.92
+            } else {
+                let x = (s + 0.055) / 1.055;
+                x * x * x
+            }
+        };
+        0.2126 * channel_lum(r) + 0.7152 * channel_lum(g) + 0.0722 * channel_lum(b)
+    }
+
+    /// Calculate WCAG 2.1 color contrast ratio between text foreground and background
+    pub fn compute_wcag_contrast_ratio(&self, fg_rgb: (u8, u8, u8), bg_rgb: (u8, u8, u8)) -> f32 {
+        let l1 = self.relative_luminance(fg_rgb.0, fg_rgb.1, fg_rgb.2);
+        let l2 = self.relative_luminance(bg_rgb.0, bg_rgb.1, bg_rgb.2);
+
+        let lighter = l1.max(l2);
+        let darker = l1.min(l2);
+
+        (lighter + 0.05) / (darker + 0.05)
+    }
+
     pub fn generate_code(
         &self,
         element_name: &str,
@@ -1020,6 +1098,9 @@ impl SovereignFigcraftArtcraftParityPrGateway {
         let token_val = self.tokens_variables.resolve_token("color/brand/primary");
         let token_ok = token_val.is_some();
 
+        let spring_pos = self.prototyping.evaluate_spring_position(0.5, 0.0, 100.0);
+        let prototyping_ok = spring_pos > 0.0;
+
         let proto_ok = self
             .prototyping
             .trigger_interaction(101, InteractionTrigger::OnClick);
@@ -1128,6 +1209,9 @@ mod tests {
         let (w, h) = engine.calculate_layout_bounds(1, &[(100.0, 40.0), (120.0, 40.0)]);
         assert_eq!(w, 284.0); // 24 + 100 + 16 + 120 + 24 = 284
         assert_eq!(h, 64.0); // 12 + 40 + 12 = 64
+
+        let fr_widths = engine.calculate_fractional_widths(1000.0);
+        assert_eq!(fr_widths.len(), 3);
     }
 
     #[test]
@@ -1143,6 +1227,9 @@ mod tests {
             engine.resolve_token("color/brand/primary"),
             Some(DesignTokenValue::Color("#3388FF".to_string()))
         );
+
+        let json = engine.export_style_dictionary_json("Light");
+        assert!(json.contains("color/brand/primary"));
     }
 
     #[test]
@@ -1217,8 +1304,10 @@ mod tests {
             exporter.generate_code("Card", 200.0, 100.0, ExportFrameworkTarget::CssTailwind);
         assert!(css_code.contains("w-[200px]"));
 
-        let swift_code =
-            exporter.generate_code("Card", 200.0, 100.0, ExportFrameworkTarget::SwiftUi);
-        assert!(swift_code.contains("VStack"));
+        let dev_code = exporter.generate_dev_mode_code(1, CodeTargetLang::SwiftUi);
+        assert!(dev_code.contains("VStack"));
+
+        let contrast = exporter.compute_wcag_contrast_ratio((0, 0, 0), (255, 255, 255));
+        assert!(contrast > 20.0);
     }
 }
