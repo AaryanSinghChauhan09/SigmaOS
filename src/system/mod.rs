@@ -51,6 +51,7 @@ pub mod sigmamonitor;
 pub mod sigmamount;
 pub mod sigmananny;
 pub mod sigmamq;
+pub mod sigmanotifyenhanced;
 pub mod sigmanfs;
 pub mod sigmanic;
 pub mod sigmantp;
@@ -290,6 +291,11 @@ pub use sigmananny::{
     init_sigmananny, get_sigmananny, add_filter_rule, check_content,
 };
 pub use sigmamq::{get_sigmamq, init_sigmamq, publish_message, Message, MessageState, SigmaMQ};
+pub use sigmanotifyenhanced::{
+    SigmaNotifyEnhanced, Notification, NotificationAction, ActionType,
+    NotificationCategory, NotificationUrgency, NotificationState,
+    init_sigmanotifyenhanced, get_sigmanotifyenhanced, post_notification,
+};
 pub use sigmanfs::{
     export_nfs_share, get_sigmanfs, init_sigmanfs, mount_nfs, NFSConnectionState, NFSExport,
     NFSExportAccess, NFSMount, NFSVersion, RootSquashPolicy, SigmaNFS,
