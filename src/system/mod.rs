@@ -78,6 +78,7 @@ pub mod sigmathermal;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod sigmatrim;
+pub mod sigmathemeinstaller;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -397,6 +398,10 @@ pub use sigmatrim::{
 pub use sigmausbwriter::{
     SigmaUSBWriter, USBDevice, WriteJob, WriteState, ImageFormat,
     init_sigmausbwriter, get_sigmausbwriter, create_write_job,
+};
+pub use sigmathemeinstaller::{
+    SigmaThemeInstaller, Theme, ThemeType, ThemeState,
+    init_sigmathemeinstaller, get_sigmathemeinstaller, add_theme, install_theme,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
