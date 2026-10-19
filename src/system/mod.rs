@@ -98,6 +98,7 @@ pub mod sigmausbwriter;
 pub mod sigmafirewall;
 pub mod sigmalogmanager;
 pub mod sigmacontainer;
+pub mod sigmavirtualization;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -497,6 +498,13 @@ pub use sigmacontainer {
     RestartPolicy, ResourceLimits,
     init_sigmacontainer, get_sigmacontainer, get_sigmacontainer_mut,
     create_container,
+};
+pub use sigmavirtualization {
+    SigmaVirtualization, VirtualMachine, VMState, Architecture,
+    VirtualDisk, DiskInterface, VirtualNetwork, NetworkInterface,
+    VMResources,
+    init_sigmavirtualization, get_sigmavirtualization, get_sigmavirtualization_mut,
+    create_vm,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
