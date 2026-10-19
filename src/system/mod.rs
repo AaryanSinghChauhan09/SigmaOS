@@ -34,6 +34,7 @@ pub mod sigmabluetooth;
 pub mod sigmacache;
 pub mod sigmacad;
 pub mod sigmacgroup;
+pub mod sigmacraftlibs;
 pub mod sigmaclipboardmanager;
 pub mod sigmacodec;
 pub mod sigmacolorscheme;
@@ -138,6 +139,7 @@ pub mod sigmawebcam;
 pub mod sigmavector;
 pub mod sigmavoice;
 pub mod sigmaword;
+pub mod sigmadeck;
 pub mod signamespaces;
 pub mod system_manager;
 pub mod system_monitor;
@@ -278,6 +280,14 @@ pub use sigmacgroup::{
     create_cgroup, get_sigmacgroup, get_sigmacgroup_mut, init_sigmacgroup, Cgroup,
     CgroupController, CgroupState, CpuControllerConfig, MemoryControllerConfig,
     PidsControllerConfig, SigmaCgroup,
+};
+pub use sigmacraftlibs::{
+    LibraryDependency, LibraryType, LibraryVersion, SharedLibrary, SigmaCraftLibs,
+    add_library, get_sigmacraftlibs, get_sigmacraftlibs_mut, init_sigmacraftlibs,
+};
+pub use sigmadeck::{
+    PresentationDeck, Slide, SlideElement, SlideElementType, SlideTransition, SigmaDeck,
+    add_deck, get_sigmadeck, get_sigmadeck_mut, init_sigmadeck,
 };
 pub use sigmacodec::{
     enable_codec, get_sigmacodec, init_sigmacodec, register_codec, Codec, CodecFormat, CodecState,
@@ -608,6 +618,10 @@ pub use sigmavoice::{
 pub use sigmaword::{
     Document, FontStyle, Paragraph, SigmaWord, TextAlignment,
     add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword,
+};
+pub use sigmadeck::{
+    PresentationDeck, Slide, SlideElement, SlideElementType, SlideTransition, SigmaDeck,
+    add_deck, get_sigmadeck, get_sigmadeck_mut, init_sigmadeck,
 };
 pub use sigmawalker::{
     add_window, get_sigmawalker, init_sigmawalker, switch_workspace, Keybinding, SigmaWalker,
