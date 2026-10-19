@@ -27,6 +27,7 @@ pub mod sigmaart;
 pub mod sigmacad;
 pub mod sigmadesign;
 pub mod sigmaeffect;
+pub mod sigmafig;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
@@ -260,6 +261,11 @@ pub use sigmadesign::{
 pub use sigmaeffect::{
     Effect, EffectChain, EffectParameter, EffectPreset, EffectType, SigmaEffect,
     add_effect, get_sigmaeffect, get_sigmaeffect_mut, init_sigmaeffect,
+};
+pub use sigmafig::{
+    Connector, ConnectorType, Diagram, DiagramLayer, DiagramNode, FigSize, NodeType, Position,
+    SigmaFig,
+    add_diagram, get_sigmafig, get_sigmafig_mut, init_sigmafig,
 };
 pub use sigmabackup::{
     get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
