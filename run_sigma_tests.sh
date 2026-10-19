@@ -689,6 +689,20 @@ if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v9_pr.rs" ]; t
     ./build/sovereign_logging_monitoring_diagnostics_v9_pr_test
 fi
 
+if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v10_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Logging, Monitoring, and Diagnostics V10 PR test suite..."
+    mkdir -p build
+    rustc --test src/diagnostics/sovereign_logging_monitoring_diagnostics_v10_pr.rs --edition=2021 -o build/sovereign_logging_monitoring_diagnostics_v10_pr_test
+    ./build/sovereign_logging_monitoring_diagnostics_v10_pr_test
+fi
+
+if [ -f "src/diagnostics/sovereign_logging_monitoring_diagnostics_v11_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Logging, Monitoring, and Diagnostics V11 PR test suite..."
+    mkdir -p build
+    rustc --test src/diagnostics/sovereign_logging_monitoring_diagnostics_v11_pr.rs --edition=2021 -o build/sovereign_logging_monitoring_diagnostics_v11_pr_test
+    ./build/sovereign_logging_monitoring_diagnostics_v11_pr_test
+fi
+
 if [ -f "src/kernel/panic_handler.rs" ]; then
     echo "Running Sovereign Kernel Panic & Crash Dump Subsystem test suite..."
     mkdir -p build
