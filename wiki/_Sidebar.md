@@ -141,6 +141,7 @@
 - [Printing (CUPS)](./Printing-Cups-Component-Guide.md)
 - [System Automation](./System-Automation-Component-Guide.md)
 - [Mint & Omarchy Gap Closure](./Mint-and-Omarchy-Complete-Gap-Closure-Components.md)
+- [Omarchy Desktop Parity Roadmap](./43-Omarchy-Linux-Desktop-Parity-And-Distro-Gap-Closure-Roadmap.md)
 - [Why SigmaOS Cannot Defeat Mint & Omarchy](./Why-SigmaOS-Cannot-Defeat-Linux-Mint-and-Omarchy.md)
 - [Mint & Omarchy Coexistence & Interop](./Mint-and-Omarchy-Coexistence-and-Interoperability-Components.md)
 - [Mint & Omarchy Federated Desktop](./Mint-and-Omarchy-Federated-Desktop-Components.md)
