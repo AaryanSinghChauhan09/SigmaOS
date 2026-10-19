@@ -110,6 +110,7 @@ pub mod sigmaacpi;
 pub mod sigmapower;
 pub mod sigmasound;
 pub mod sigmanetwork;
+pub mod sigmaprinter;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -576,6 +577,11 @@ pub use sigmanetwork {
     ConnectionType,
     init_sigmanetwork, get_sigmanetwork, get_sigmanetwork_mut,
     add_interface,
+};
+pub use sigmaprinter {
+    SigmaPrinter, Printer, PrintJob, PrinterState, JobState,
+    init_sigmaprinter, get_sigmaprinter, get_sigmaprinter_mut,
+    add_printer,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
