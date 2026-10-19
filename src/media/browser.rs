@@ -3434,6 +3434,34 @@ impl SovereignOpenSourceBrowserSuiteEngine {
             boost_count.to_string(),
         );
 
+        let v8_auditor = ChromiumV8JitSandboxAuditorEngine::new();
+        let v8_tier = v8_auditor.audit_ignition_bytecode_interpreter(600);
+        results.insert("chromium_v8_ignition_tier".to_string(), v8_tier.to_string());
+
+        let turbofan_ok = v8_auditor.verify_turbofan_jit_opt_tier(1500);
+        results.insert(
+            "chromium_v8_turbofan_verified".to_string(),
+            turbofan_ok.to_string(),
+        );
+
+        let gecko_spans = self
+            .browser
+            .gecko_subgrid
+            .allocate_subgrid_fr_spans(300.0, 3);
+        results.insert(
+            "gecko_subgrid_span_count".to_string(),
+            gecko_spans.len().to_string(),
+        );
+
+        let quantized_time = self
+            .browser
+            .librewolf_rfp_jitter
+            .quantize_high_res_time(1234567);
+        results.insert(
+            "librewolf_rfp_highres_time_quantized".to_string(),
+            quantized_time.to_string(),
+        );
+
         results
     }
 
@@ -3498,6 +3526,18 @@ impl ChromiumV8JitSandboxAuditorEngine {
         addr >= self.compressed_pointer_base
             && addr < (self.compressed_pointer_base + self.sandbox_size_bytes)
     }
+
+    pub fn audit_ignition_bytecode_interpreter(&self, opcode_count: u32) -> &'static str {
+        if opcode_count > 500 {
+            "Sparkplug_BaselineJIT"
+        } else {
+            "Ignition_BytecodeInterpreter"
+        }
+    }
+
+    pub fn verify_turbofan_jit_opt_tier(&self, hot_invocations: u32) -> bool {
+        hot_invocations >= 1000
+    }
 }
 
 pub struct FirefoxGeckoCssGridSubgridEngine {
@@ -3521,6 +3561,14 @@ impl FirefoxGeckoCssGridSubgridEngine {
             .iter()
             .map(|&w| (w / total_weight) * available_width)
             .collect()
+    }
+
+    pub fn allocate_subgrid_fr_spans(&self, parent_track_width: f32, span_count: usize) -> Vec<f32> {
+        if span_count == 0 {
+            return Vec::new();
+        }
+        let per_span = parent_track_width / (span_count as f32);
+        vec![per_span; span_count]
     }
 }
 
@@ -3567,6 +3615,18 @@ impl LibreWolfStrictRfpTimerJitterEngine {
             (raw_time_ms / self.quantization_step_ms).floor() * self.quantization_step_ms;
         quantized + (self.jitter_microseconds / 1000.0)
     }
+
+    pub fn quantize_high_res_time(&self, raw_time_us: u64) -> u64 {
+        let step_us = (self.quantization_step_ms * 1000.0) as u64;
+        if step_us == 0 {
+            return raw_time_us;
+        }
+        (raw_time_us / step_us) * step_us
+    }
+
+    pub fn apply_canvas_noise_jitter(&self, raw_hash: u64) -> u64 {
+        raw_hash ^ 0x0123_4567_89AB_CDEF
+    }
 }
 
 pub struct BraveShieldsFirstPartyEphemeralStorageEngine {
@@ -3594,6 +3654,12 @@ impl BraveShieldsFirstPartyEphemeralStorageEngine {
         } else {
             0
         }
+    }
+
+    pub fn purge_expired_ephemeral_containers(&mut self) -> usize {
+        let total_keys: usize = self.active_storage_jars.values().map(|j| j.len()).sum();
+        self.active_storage_jars.clear();
+        total_keys
     }
 }
 

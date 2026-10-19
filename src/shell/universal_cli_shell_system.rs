@@ -390,6 +390,20 @@ impl UniversalShellScriptTranspiler {
                 return format!("{}() {{ # event hook", func_name);
             }
         }
+        if l.starts_with("set -q ") {
+            let var = l.trim_start_matches("set -q ").trim();
+            return format!("[ -n \"${{{}}}\" ]", var);
+        }
+        if l == "status is-interactive" {
+            return "[ -t 0 ]".to_string();
+        }
+        if l == "status is-login" {
+            return "[ -f ~/.profile ]".to_string();
+        }
+        if l.starts_with("type -q ") {
+            let cmd = l.trim_start_matches("type -q ").trim();
+            return format!("command -v {} >/dev/null 2>&1", cmd);
+        }
         l
     }
 
@@ -439,7 +453,23 @@ impl UniversalShellScriptTranspiler {
         if l == "endif" {
             return "fi".to_string();
         }
-        if l == "end" || l == "endsw" {
+        if l.starts_with("switch (") {
+            if let (Some(open), Some(close)) = (l.find('('), l.find(')')) {
+                let expr = l[open + 1..close].trim();
+                return format!("case \"{}\" in", expr);
+            }
+        }
+        if l.starts_with("case ") {
+            let pattern = l.trim_start_matches("case ").trim_end_matches(':').trim();
+            return format!("{})", pattern);
+        }
+        if l == "breaksw" {
+            return ";;".to_string();
+        }
+        if l == "endsw" {
+            return "esac".to_string();
+        }
+        if l == "end" {
             return "done".to_string();
         }
         if l.starts_with("alias ") {
@@ -504,6 +534,13 @@ impl UniversalShellScriptTranspiler {
                 let target_name = rest[eq + 1..].trim();
                 vars.insert(ref_name.to_string(), format!("${{{}}}", target_name));
                 return format!("eval \"{}=\\${{{}}}\"", ref_name, target_name);
+            }
+        }
+        if l.contains("${!") && l.contains("}") {
+            // Ksh indirect variable expansion ${!var}
+            if let (Some(open), Some(close)) = (l.find("${!"), l.find('}')) {
+                let var = l[open + 3..close].trim();
+                return format!("eval \"echo \\${{{}}}\"", var);
             }
         }
         l
@@ -571,6 +608,13 @@ impl UniversalShellScriptTranspiler {
         if l.contains("ForEach-Object") {
             return "xargs -n1".to_string();
         }
+        if l.contains("$PSScriptRoot") {
+            return l.replace("$PSScriptRoot", "$(dirname \"$0\")");
+        }
+        if l.starts_with("Test-Path -PathType Leaf ") {
+            let path = l.trim_start_matches("Test-Path -PathType Leaf ").trim();
+            return format!("test -f {}", path);
+        }
         l
     }
 
@@ -592,6 +636,22 @@ impl UniversalShellScriptTranspiler {
         }
         if l.contains("sys | get") {
             return "uname -a".to_string();
+        }
+        if l.starts_with("http get ") {
+            let url = l.trim_start_matches("http get ").trim();
+            return format!("curl -s {}", url);
+        }
+        if l.starts_with("open --raw ") {
+            let file = l.trim_start_matches("open --raw ").trim();
+            return format!("cat {}", file);
+        }
+        if l.starts_with("first ") {
+            let n = l.trim_start_matches("first ").trim();
+            return format!("head -n {}", n);
+        }
+        if l.starts_with("last ") {
+            let n = l.trim_start_matches("last ").trim();
+            return format!("tail -n {}", n);
         }
         l
     }
@@ -704,6 +764,12 @@ impl UniversalShellScriptTranspiler {
         }
         if l.contains("${(L)") {
             l = l.replace("${(L)", "${");
+        }
+        if l.contains("${(z)") {
+            l = l.replace("${(z)", "${");
+        }
+        if l.contains("${(f)") {
+            l = l.replace("${(f)", "${");
         }
         if l.starts_with("autoload ") || l.starts_with("zmodload ") || l.starts_with("compdef ") {
             return format!("# zsh builtin stub: {}", l);
@@ -899,6 +965,25 @@ impl UniversalCliOptionTranslator {
                 canonical_command: "tar".to_string(),
                 detected_style: OptionStyle::BsdShortCombined,
                 translated_args: tr_args,
+            };
+        }
+        if cmd == "stat" && args.get(0) == Some(&"-f") && args.get(1) == Some(&"%z") {
+            // BSD stat -f %z -> GNU stat -c %s
+            let mut tr_args = vec!["-c".to_string(), "%s".to_string()];
+            tr_args.extend(args.iter().skip(2).map(|s| s.to_string()));
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "stat".to_string(),
+                detected_style: OptionStyle::BsdShortCombined,
+                translated_args: tr_args,
+            };
+        }
+        if cmd == "hwclock" && args.get(0) == Some(&"-w") {
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "hwclock".to_string(),
+                detected_style: OptionStyle::GnuLong,
+                translated_args: vec!["--systohc".to_string()],
             };
         }
         if cmd == "ls" && (args.get(0) == Some(&"-G") || args.get(0) == Some(&"--color")) {
@@ -1488,6 +1573,16 @@ mod tests {
             .posix_sh_script
             .contains("export PATH=\"/usr/bin:/bin\""));
         assert!(plan.posix_sh_script.contains("x=$(( 10 + 20 ))"));
+    }
+
+    #[test]
+    fn test_ksh_script_transpilation() {
+        let script = "#!/bin/ksh\ntypeset -i PORT=8080\n${!ref_var}";
+        let plan = UniversalShellScriptTranspiler::transpile_script(script);
+
+        assert_eq!(plan.target_format, ShellSystemFormat::Ksh);
+        assert!(plan.posix_sh_script.contains("PORT=8080"));
+        assert!(plan.posix_sh_script.contains("eval \"echo \\${ref_var}\""));
     }
 
     #[test]

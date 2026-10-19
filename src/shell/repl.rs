@@ -878,7 +878,9 @@ impl ShellRepl {
                     ShellCommand::Unknown(input.to_string())
                 }
             }
-            "sh" | "bash" | "zsh" | "fish" | "tcsh" | "ksh" | "dash" | "nu" | "pwsh" => {
+            "sh" | "bash" | "zsh" | "fish" | "tcsh" | "ksh" | "dash" | "nu" | "pwsh"
+            | "ion" | "elvish" | "xonsh" | "oil" | "ysh" | "rc" | "yash" | "es" | "bsh"
+            | "minixsh" | "psh" => {
                 if parts.len() >= 2 {
                     ShellCommand::Sh {
                         code: input.to_string(),
