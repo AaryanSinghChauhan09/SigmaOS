@@ -28,6 +28,8 @@ use alloc::format;
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
+extern crate alloc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 

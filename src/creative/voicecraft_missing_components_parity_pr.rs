@@ -27,7 +27,10 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
+extern crate alloc;
+
 #[cfg(any(feature = "standalone_test", test))]
+use std::f32::consts::PI;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]

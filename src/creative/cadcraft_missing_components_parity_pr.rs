@@ -25,7 +25,10 @@ use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
+extern crate alloc;
+
 #[cfg(any(feature = "standalone_test", test))]
+use std::f64::consts::PI;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
