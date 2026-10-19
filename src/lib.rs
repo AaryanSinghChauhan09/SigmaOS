@@ -429,7 +429,8 @@ pub use security::hardening;
 pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
-    SandboxPolicy,
+    SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
+    SovereignSecurityAndHardeningParityV61Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
