@@ -694,11 +694,6 @@ pub use sigmasearch::{
     get_sigmasearch, get_sigmasearch_mut, init_sigmasearch, SearchIndex, SearchResult, SigmaSearch,
 };
 
-pub use sigmaautomation::{
-    add_task, get_sigmaautomation, get_sigmaautomation_mut, init_sigmaautomation, AutomationTask,
-    SigmaAutomation,
-};
-
 pub use sigmaperformancemonitor::{
     get_sigmaperformancemonitor, get_sigmaperformancemonitor_mut, init_sigmaperformancemonitor,
     PerformanceCategory, PerformanceMetric, PerformanceProfile, SigmaPerformanceMonitor,
@@ -830,12 +825,6 @@ pub use sigmasystemtools::{
     MaintenanceTask, SigmaSystemTools, SystemTool, ToolCategory,
 };
 
-pub use sigmadrivermanager::{
-    add_device, add_driver, get_sigmadrivermanager, get_sigmadrivermanager_mut,
-    init_sigmadrivermanager, DriverPackage, DriverStatus, DriverType, HardwareDevice,
-    SigmaDriverManager,
-};
-
 pub use sigmasoftwaremanager::{
     add_application, get_sigmasoftwaremanager, get_sigmasoftwaremanager_mut,
     init_sigmasoftwaremanager, AppCategory, AppStatus, Application, Rating, SigmaSoftwareManager,
@@ -856,11 +845,6 @@ pub use sigmadisplaymanager::{
     DisplayOutput, LoginSettings, Resolution, SigmaDisplayManager,
 };
 
-pub use sigmathememanager::{
-    add_theme, get_sigmathememanager, get_sigmathememanager_mut, init_sigmathememanager,
-    AppearanceSettings, ColorScheme, FontConfig, SigmaThemeManager, Theme, ThemeType,
-};
-
 pub use sigmanotificationmanager::{
     add_notification, get_sigmanotificationmanager, get_sigmanotificationmanager_mut,
     init_sigmanotificationmanager, Notification, NotificationCategory, NotificationRule,
@@ -877,26 +861,10 @@ pub use sigmakeyboardmanager::{
     InputMethod, Keybinding, KeyboardLayout, KeyboardSettings, SigmaKeyboardManager,
 };
 
-pub use sigmapackagemanager2::{
-    add_package, get_sigmapackagemanager, get_sigmapackagemanager_mut, init_sigmapackagemanager,
-    Package, PackageStatus, PackageType, Repository, SigmaPackageManager,
-};
-
 pub use sigmafilesystemmanager::{
     add_filesystem, get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut,
     init_sigmafilesystemmanager, Filesystem, FilesystemType, MountPoint, MountStatus,
     SigmaFileSystemManager,
-};
-
-pub use sigmanetworkmanager2::{
-    add_interface, get_sigmanetworkmanager, get_sigmanetworkmanager_mut, init_sigmanetworkmanager,
-    ConnectionState, ConnectionType, DNSServer, NetworkInterface, NetworkProfile,
-    SigmaNetworkManager,
-};
-
-pub use sigmaservicemanager3::{
-    add_service, get_sigmaservicemanager, get_sigmaservicemanager_mut, init_sigmaservicemanager,
-    Service, ServiceState, ServiceType, SigmaServiceManager,
 };
 
 pub use sigmasecuritymanager::{
