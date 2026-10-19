@@ -19,6 +19,7 @@ pub mod supreme_court;
 pub use periodic_pr_component_rules_engine::*;
 pub use periodic_study_improve_prove_engine::*;
 pub use risk_mitigation::*;
+pub use sovereign_periodic_research_program_engine::*;
 pub use study_to_implementation_pipeline_pr::*;
 
 use crate::klib::HashMap;

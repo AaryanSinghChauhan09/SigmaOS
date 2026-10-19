@@ -64,3 +64,24 @@ fn test_engine_adrs_and_rules() {
     assert!(summary.contains("ADR-006"));
     assert!(summary.contains("Month 1: Boot and kernel entry [COMPLETED]"));
 }
+
+#[test]
+fn test_templates_schedule_and_pr() {
+    let engine = SovereignPeriodicResearchEngine::new();
+
+    let weekly_template = engine.get_weekly_task_template();
+    assert!(weekly_template.contains("STUDY-2026-W42"));
+    assert!(weekly_template.contains("deliverables"));
+
+    let monthly_template = engine.get_monthly_task_template();
+    assert!(monthly_template.contains("CAP-2026-M10"));
+    assert!(monthly_template.contains("required_evidence"));
+
+    let schedule = engine.get_first_30_days_schedule();
+    assert_eq!(schedule.len(), 4);
+    assert_eq!(schedule[0].0, "Week 1");
+
+    let pr_summary = engine.generate_pr_proposal_summary();
+    assert!(pr_summary.contains("PR Proposal: Establish Periodic Research-and-Implementation Program"));
+    assert!(pr_summary.contains("14 Mandatory Industry Rules"));
+}
