@@ -253,7 +253,7 @@ impl WordcraftStylesTemplatesThemesPrEngine {
         let style = self.styles.get(style_name)?;
         let mut computed = style.clone();
 
-        if let Some(ref parent_name) = style.parent_style {
+        if let Some(parent_name) = &style.parent_style {
             if let Some(parent) = self.resolve_computed_style(parent_name) {
                 if computed.font_family.is_empty() {
                     computed.font_family = parent.font_family;
