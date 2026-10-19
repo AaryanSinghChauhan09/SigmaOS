@@ -708,20 +708,18 @@ mod tests {
         idt.register_isr(0x21, 0x1000_5000, 0); // DPL: 0 (Kernel-Mode)
 
         // 1. Trigger from Kernel space (Ring 0) -> Succeeded!
-        static mut ISR_RAN: bool = false;
+        static ISR_RAN: core::sync::atomic::AtomicBool = core::sync::atomic::AtomicBool::new(false);
         fn mock_keyboard_isr(vector: u8, context: u64) -> bool {
             assert_eq!(vector, 0x21);
             assert_eq!(context, 0x99AA);
-            unsafe {
-                ISR_RAN = true;
-            }
+            ISR_RAN.store(true, Ordering::SeqCst);
             true
         }
 
         let res_kernel = idt.trigger_interrupt(0x21, 0, mock_keyboard_isr, 0x99AA);
         assert!(res_kernel.is_ok());
         assert!(res_kernel.unwrap());
-        assert!(unsafe { ISR_RAN });
+        assert!(ISR_RAN.load(Ordering::SeqCst));
 
         // 2. Trigger from User space (Ring 3) to Ring 0 Gate -> Fails with privilege error!
         let res_user = idt.trigger_interrupt(0x21, 3, mock_keyboard_isr, 0x99AA);
