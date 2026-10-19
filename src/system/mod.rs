@@ -137,6 +137,7 @@ pub mod sigmawallpaper;
 pub mod sigmawebcam;
 pub mod sigmavector;
 pub mod sigmavoice;
+pub mod sigmaword;
 pub mod signamespaces;
 pub mod system_manager;
 pub mod system_monitor;
@@ -603,6 +604,10 @@ pub use sigmavector::{
 pub use sigmavoice::{
     SpeechResult, VoiceCommand, VoiceProfile, SigmaVoice,
     add_voice_command, get_sigmavoice, get_sigmavoice_mut, init_sigmavoice,
+};
+pub use sigmaword::{
+    Document, FontStyle, Paragraph, SigmaWord, TextAlignment,
+    add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword,
 };
 pub use sigmawalker::{
     add_window, get_sigmawalker, init_sigmawalker, switch_workspace, Keybinding, SigmaWalker,
