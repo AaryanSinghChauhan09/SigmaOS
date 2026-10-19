@@ -130,6 +130,7 @@ pub mod sigmasecurityaudit;
 pub mod sigmatimer;
 pub mod sigmajails;
 pub mod sigmaports;
+pub mod sigma3d;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -708,6 +709,12 @@ pub use sigmaports {
     SigmaPorts, Port, BuildState,
     init_sigmaports, get_sigmaports, get_sigmaports_mut,
     add_port,
+};
+
+pub use sigma3d {
+    Sigma3D, Model3D, Scene, RenderState,
+    init_sigma3d, get_sigma3d, get_sigma3d_mut,
+    add_model,
 };
 
 pub use sigmaupdate::{
