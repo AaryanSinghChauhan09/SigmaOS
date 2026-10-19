@@ -8,7 +8,7 @@ pub struct Generation {
     pub id: u32,
     pub root_inode: u64,
     pub created_at: u64,
-;
+}
 
 /// Represents a purely functional Nix-style derivation
 #[derive(Debug, Clone)]
@@ -17,7 +17,7 @@ pub struct NixDerivation {
     pub inputs: Vec<&'static str>,    // Input derivation hashes/paths
     pub builder_script: &'static str, // Build instructions
     pub output_path: &'static str,    // Computed unique content-addressed path
-;
+}
 
 impl NixDerivation {
     pub fn new(
@@ -32,12 +32,12 @@ impl NixDerivation {
             output_path: "/nix/store/reproducible-build-hash-placeholder",
         }
     }
-;
+}
 
 pub struct GenerationManager {
     generations: Vec<Generation>,
     active_generation_idx: Option<usize>,
-;
+}
 
 impl GenerationManager {
     pub fn new() -> Self {
@@ -95,13 +95,13 @@ impl GenerationManager {
             }
         }
     }
-;
+}
 
 impl Default for GenerationManager {
     fn default() -> Self {
         Self::new()
     }
-;
+}
 
 #[cfg(test)]
 mod tests {
@@ -167,4 +167,4 @@ mod tests {
         assert_eq!(deriv.inputs.len(), 2);
         assert!(deriv.output_path.starts_with("/nix/store/"));
     }
-;
+}
