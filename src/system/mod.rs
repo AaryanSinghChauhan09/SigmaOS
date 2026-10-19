@@ -86,6 +86,7 @@ pub mod sigmaananicy;
 pub mod sigmacolorscheme;
 pub mod sigmawalker;
 pub mod sigmaquickshell;
+pub mod sigmapackagemanager;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -437,6 +438,10 @@ pub use sigmawalker::{
 pub use sigmaquickshell::{
     SigmaQuickshell, ShellModule, ShellConfig, ShellType, ModuleType,
     init_sigmaquickshell, get_sigmaquickshell, add_shell_module, generate_shell_config,
+};
+pub use sigmapackagemanager::{
+    SigmaPackageManager, Package, Repository, PackageFormat, PackageState,
+    init_sigmapackagemanager, get_sigmapackagemanager, add_package, install_package,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
