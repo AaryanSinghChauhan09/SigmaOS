@@ -194,14 +194,32 @@ pub fn validate_filename(name: &[u8]) -> Result<(), ValidationError> {
 /// Rules:
 /// - Non-empty, ≤ `MAX_URL_LEN` (2048 bytes)
 /// - Scheme must be allowlisted (`http://` or `https://`)
-/// - Rejects NUL bytes (`NullByte`) and ASCII control characters / spaces (`b <= 32` or `b == 127`, mitigating CWE-150 / CWE-117)
-/// - Rejects userinfo credentials (`user:pass@`) in authority to prevent SSRF and credential disclosure (CWE-918)
+/// - Rejects NUL bytes (`NullByte`) and percent-encoded NUL bytes (`%00`) to prevent C-ABI string truncation (CWE-626)
+/// - Rejects ASCII control characters / spaces (`b <= 32` or `b == 127`), and percent-encoded CRLF / control sequences
+///   (`%0d`, `%0a`, `%1b`, `%7f`) to prevent HTTP request smuggling, CRLF injection, and header injection (CWE-113 / CWE-150 / CWE-117)
+/// - Rejects userinfo credentials (`user:pass@` or `%40`) in authority to prevent SSRF and credential disclosure (CWE-918)
 pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
     if url.is_empty() {
         return Err(ValidationError::EmptyInput);
     }
     if url.len() > MAX_URL_LEN {
         return Err(ValidationError::TooLong);
+    }
+
+    // Reject percent-encoded NUL bytes (%00) and percent-encoded control / CRLF characters
+    // (%0d, %0D, %0a, %0A, %1b, %1B, %7f, %7F) to prevent HTTP header injection, request smuggling,
+    // and C-ABI NUL truncation vulnerabilities (CWE-113 / CWE-626 / CWE-918).
+    if url.windows(3).any(|w| {
+        w[0] == b'%'
+            && ((w[1] == b'0' && w[2] == b'0')
+                || (w[1] == b'0' && (w[2] == b'd' || w[2] == b'D' || w[2] == b'a' || w[2] == b'A'))
+                || (w[1] == b'1' && (w[2] == b'b' || w[2] == b'B'))
+                || (w[1] == b'7' && (w[2] == b'f' || w[2] == b'F')))
+    }) {
+        if url.windows(3).any(|w| w[0] == b'%' && w[1] == b'0' && w[2] == b'0') {
+            return Err(ValidationError::NullByte);
+        }
+        return Err(ValidationError::InvalidChars);
     }
 
     // Check scheme case-insensitively per RFC 3986: http:// or https://
@@ -225,8 +243,12 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::InvalidChars);
     }
 
-    // Reject userinfo credentials in authority (e.g., user:pass@host)
-    if authority.contains(&b'@') {
+    // Reject userinfo credentials in authority (e.g., user:pass@host or user%40pass)
+    if authority.contains(&b'@')
+        || authority
+            .windows(3)
+            .any(|w| w[0] == b'%' && w[1] == b'4' && (w[2] == b'0' || w[2] == b'O'))
+    {
         return Err(ValidationError::InvalidChars);
     }
 
@@ -1169,6 +1191,34 @@ mod tests {
         );
         assert_eq!(
             validate_url(b"https://user@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://user%40example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+
+        // Percent-encoded NUL bytes rejection (CWE-626 / C-ABI string truncation)
+        assert_eq!(
+            validate_url(b"http://example.com/page?id=1%00.jpg"),
+            Err(ValidationError::NullByte)
+        );
+
+        // Percent-encoded CRLF and control sequence rejection (CWE-113 / HTTP Request Smuggling & Header Injection)
+        assert_eq!(
+            validate_url(b"http://example.com/api?p=1%0d%0aSet-Cookie:session=evil"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/api?p=1%0D%0AHost:evil.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/path%1b[31m"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/path%7f"),
             Err(ValidationError::InvalidChars)
         );
 
