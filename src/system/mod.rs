@@ -95,6 +95,7 @@ pub mod sigmarecovery2;
 pub mod sigmasystemmonitor2;
 pub mod sigmaservicemanager2;
 pub mod sigmausbwriter;
+pub mod sigmafirewall;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -477,6 +478,12 @@ pub use sigmasystemmonitor2 {
 pub use sigmaservicemanager2 {
     SigmaServiceManager, Service, ServiceState,
     init_sigmaservicemanager, get_sigmaservicemanager,
+};
+pub use sigmafirewall {
+    SigmaFirewall, FirewallRule, FirewallAction, FirewallProtocol,
+    FirewallChain, RuleState,
+    init_sigmafirewall, get_sigmafirewall, get_sigmafirewall_mut,
+    create_rule,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
