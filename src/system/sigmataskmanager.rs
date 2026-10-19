@@ -256,8 +256,8 @@ mod tests {
     fn test_list_tasks_by_priority() {
         let mut manager = SigmaTaskManager::new();
         manager.add_task("bash".to_string(), 1000, 999);
-        manager.add_task("vim".to_string(), 1001, 1000);
-        manager.set_task_priority("vim".to_string(), TaskPriority::High);
+        let vim_id = manager.add_task("vim".to_string(), 1001, 1000);
+        manager.set_task_priority(&vim_id, TaskPriority::High);
 
         let high = manager.list_tasks_by_priority(TaskPriority::High);
         assert_eq!(high.len(), 1);
