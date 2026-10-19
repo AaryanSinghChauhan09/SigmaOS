@@ -90,6 +90,7 @@ pub mod sigmapackagemanager;
 pub mod sigmaupdatemanager;
 pub mod sigmaflatpak;
 pub mod sigmasnap;
+pub mod sigmabackup;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -457,6 +458,10 @@ pub use sigmaflatpak::{
 pub use sigmasnap::{
     SigmaSnap, Snap, SnapType, SnapState,
     init_sigmasnap, get_sigmasnap, add_snap, install_snap,
+};
+pub use sigmabackup {
+    SigmaBackup, Backup, BackupType, BackupState,
+    init_sigmabackup, get_sigmabackup, create_backup,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
