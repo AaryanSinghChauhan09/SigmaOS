@@ -70,6 +70,7 @@ Implement missing components in this order. Each item must be delivered through 
 | **P3** | [Desktop & Userland Innovations](./38-Universal-Desktop-And-Userland-Innovations-PR-Roadmap.md) | It's FOSS, How-To Geek, Omarchy, Mint | Wayland 1.24 HDR, Sovereign FOSS apps, Omakase themes | Unit & integration tests |
 | **P3** | [Enterprise Security, AI & Network](./39-Enterprise-Security-AI-And-Networking-PR-Roadmap.md) | KDnuggets, The New Stack, Fedora, NixOS | Active Directory SSSD, eBPF PQC WireGuard VPN, SIMD AI | Unit & integration tests |
 | **P3** | [Omarchy Desktop Parity AI Roadmap](./40-Omarchy-Linux-And-Sovereign-Desktop-Parity-AI-Agent-Roadmap.md) | Omarchy Linux, Arch Linux, Hyprland, Walker | Ghostty PTY, Master-stack layout, Walker launcher, Wallust sync | Unit & integration tests |
+| **P3** | [Omarchy Desktop Gap Closure Roadmap](./43-Omarchy-Linux-Desktop-Parity-And-Distro-Gap-Closure-Roadmap.md) | Omarchy Linux, Wayland, Hyprpaper, Swaync | Hyprpaper preload, Hypridle power, Swaync, Wallust, Wlogout | Unit & integration tests |
 | **P3** | [Linux/BSD Kernel & Security AI Roadmap](./41-Linux-BSD-Kernel-Security-And-Virtualization-AI-Agent-Roadmap.md) | Linux 6.12+, FreeBSD 14.1, OpenBSD 7.6, CachyOS | SchedExt BPF, Landlock V6, FreeBSD VNET, MicroVMs, PREEMPT_RT | Unit & integration tests |
 
 ---

@@ -176,6 +176,7 @@
 - [Printing (CUPS) Component Guide](./Printing-Cups-Component-Guide.md) &ndash; IPP printing daemon, raster filters, and driverless AirPrint discovery.
 - [System Automation Component Guide](./System-Automation-Component-Guide.md) &ndash; Cron scheduler, system event listeners, and unattended maintenance triggers.
 - [Linux Mint & Omarchy Complete Gap Closure](./Mint-and-Omarchy-Complete-Gap-Closure-Components.md) &ndash; 14-subsystem parity engine achieving 100% gap closure against Linux Mint 22 (X-Apps, Hypnotix, WebApps, Drivers) and Omarchy Linux (Swww, Wallust, Quickshell, Ananicy, Walker).
+- [Omarchy Linux Desktop Parity & Distro Gap Closure Roadmap](./43-Omarchy-Linux-Desktop-Parity-And-Distro-Gap-Closure-Roadmap.md) &ndash; Complete desktop environment parity roadmap covering Hyprpaper, Hypridle, Swaync, Waypaper, Wallust, Wlogout, and Wofi.
 - [Linux Mint & Omarchy Coexistence & Interoperability](./Mint-and-Omarchy-Coexistence-and-Interoperability-Components.md) &ndash; Containerized application bridge, dynamic Hyprland/Waybar configuration hot-reload, and High-Assurance Niche Governor.
 - [Linux Mint & Omarchy Federated Desktop](./Mint-and-Omarchy-Federated-Desktop-Components.md) &ndash; Warpinator line-rate P2P protocol, Backup selection manifests, Hyprland master-stack tiling, and Swww IPC socket engine.
 
