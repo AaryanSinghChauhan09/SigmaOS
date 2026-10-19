@@ -490,8 +490,16 @@ impl GnuCoreutilsBsdUserlandEngine {
         let mut i = 0;
         while i < input.len() {
             let b0 = input[i] as u32;
-            let b1 = if i + 1 < input.len() { input[i + 1] as u32 } else { 0 };
-            let b2 = if i + 2 < input.len() { input[i + 2] as u32 } else { 0 };
+            let b1 = if i + 1 < input.len() {
+                input[i + 1] as u32
+            } else {
+                0
+            };
+            let b2 = if i + 2 < input.len() {
+                input[i + 2] as u32
+            } else {
+                0
+            };
 
             let triple = (b0 << 16) | (b1 << 8) | b2;
 
@@ -527,15 +535,30 @@ impl GnuCoreutilsBsdUserlandEngine {
             }
         }
 
-        let clean_bytes: Vec<u8> = input.bytes().filter(|&b| b != b'=' && b != b'\n' && b != b'\r').collect();
+        let clean_bytes: Vec<u8> = input
+            .bytes()
+            .filter(|&b| b != b'=' && b != b'\n' && b != b'\r')
+            .collect();
         let mut out = Vec::new();
         let mut i = 0;
 
         while i < clean_bytes.len() {
             let v0 = char_to_val(clean_bytes[i]).ok_or("Invalid base64 char")? as u32;
-            let v1 = if i + 1 < clean_bytes.len() { char_to_val(clean_bytes[i + 1]).ok_or("Invalid base64 char")? as u32 } else { 0 };
-            let v2 = if i + 2 < clean_bytes.len() { char_to_val(clean_bytes[i + 2]).ok_or("Invalid base64 char")? as u32 } else { 0 };
-            let v3 = if i + 3 < clean_bytes.len() { char_to_val(clean_bytes[i + 3]).ok_or("Invalid base64 char")? as u32 } else { 0 };
+            let v1 = if i + 1 < clean_bytes.len() {
+                char_to_val(clean_bytes[i + 1]).ok_or("Invalid base64 char")? as u32
+            } else {
+                0
+            };
+            let v2 = if i + 2 < clean_bytes.len() {
+                char_to_val(clean_bytes[i + 2]).ok_or("Invalid base64 char")? as u32
+            } else {
+                0
+            };
+            let v3 = if i + 3 < clean_bytes.len() {
+                char_to_val(clean_bytes[i + 3]).ok_or("Invalid base64 char")? as u32
+            } else {
+                0
+            };
 
             let triple = (v0 << 18) | (v1 << 12) | (v2 << 6) | v3;
 
@@ -554,8 +577,8 @@ impl GnuCoreutilsBsdUserlandEngine {
 
     pub fn run_sha256sum(&self, content: &[u8]) -> String {
         let mut state: [u32; 8] = [
-            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
-            0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+            0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab,
+            0x5be0cd19,
         ];
         for (i, &byte) in content.iter().enumerate() {
             let idx = i % 8;
@@ -1328,7 +1351,12 @@ impl TextProcessingEngine {
         totals
     }
 
-    pub fn awk_field_printf(&self, content: &str, delimiter: char, format_spec: &str) -> Vec<String> {
+    pub fn awk_field_printf(
+        &self,
+        content: &str,
+        delimiter: char,
+        format_spec: &str,
+    ) -> Vec<String> {
         let mut out = Vec::new();
         for line in content.lines() {
             let parts: Vec<&str> = line.split(delimiter).collect();
@@ -1459,13 +1487,20 @@ impl ArchivalCompressionEngine {
         !magic_bytes.is_empty() && !payload_bytes.is_empty()
     }
 
-    pub fn lz4_stream_compression_ratio(&self, original_size: usize, compressed_size: usize) -> (f64, String) {
+    pub fn lz4_stream_compression_ratio(
+        &self,
+        original_size: usize,
+        compressed_size: usize,
+    ) -> (f64, String) {
         let ratio = if original_size > 0 {
             compressed_size as f64 / original_size as f64
         } else {
             1.0
         };
-        (ratio, format!("LZ4 fast stream compression ratio: {:.2}%", ratio * 100.0))
+        (
+            ratio,
+            format!("LZ4 fast stream compression ratio: {:.2}%", ratio * 100.0),
+        )
     }
 
     pub fn sevenzip_lzma2_header_parse(&self, header_bytes: &[u8]) -> bool {
@@ -1597,10 +1632,7 @@ impl ProcpsPsmiscEngine {
     }
 
     pub fn watch_interval_execution(&self, command: &str, interval_secs: u64) -> String {
-        format!(
-            "watch: executing '{}' every {}s",
-            command, interval_secs
-        )
+        format!("watch: executing '{}' every {}s", command, interval_secs)
     }
 
     pub fn slabtop_kernel_cache_summary(&self) -> Vec<(String, usize, usize)> {
