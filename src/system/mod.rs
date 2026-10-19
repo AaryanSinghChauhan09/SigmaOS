@@ -116,6 +116,7 @@ pub mod sigmasession;
 pub mod sigmasmb;
 pub mod sigmasnap;
 pub mod sigmasnapshot;
+pub mod sigmasoftwaremanager;
 pub mod sigmasound;
 pub mod sigmassh;
 pub mod sigmastorage;
@@ -841,4 +842,9 @@ pub use sigmasystemtools::{
 pub use sigmadrivermanager::{
     DriverPackage, DriverStatus, DriverType, HardwareDevice, SigmaDriverManager,
     add_device, add_driver, get_sigmadrivermanager, get_sigmadrivermanager_mut, init_sigmadrivermanager,
+};
+
+pub use sigmasoftwaremanager::{
+    AppCategory, AppStatus, Application, Rating, SigmaSoftwareManager,
+    add_application, get_sigmasoftwaremanager, get_sigmasoftwaremanager_mut, init_sigmasoftwaremanager,
 };
