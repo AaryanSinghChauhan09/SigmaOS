@@ -43,11 +43,15 @@ pub enum ColorSpace {
     Rec2020,
     AcesCg,
     AdobeRgb,
+}
+
 /// Craftlibs SIMD Color Space Transform PR Engine.
 #[derive(Debug, Clone)]
 pub struct CraftlibsSimdColorSpaceTransformPrEngine {
     pub active_color_space: ColorSpace,
     pub converted_pixels_count: usize,
+}
+
 impl CraftlibsSimdColorSpaceTransformPrEngine {
     pub fn new() -> Self {
         Self {
@@ -86,10 +90,14 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             };
             let g_lin = if g <= 0.04045 {
                 g / 12.92
+            } else {
                 ((g + 0.055) / 1.055).powf(2.4)
+            };
             let b_lin = if b <= 0.04045 {
                 b / 12.92
+            } else {
                 ((b + 0.055) / 1.055).powf(2.4)
+            };
             // Apply matrix transform
             let r_out = (r_lin * r_scale).clamp(0.0, 1.0);
             let g_out = (g_lin * g_scale).clamp(0.0, 1.0);
@@ -97,13 +105,19 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             // Re-apply gamma
             let r_gam = if r_out <= 0.0031308 {
                 r_out * 12.92
+            } else {
                 1.055 * r_out.powf(1.0 / 2.4) - 0.055
+            };
             let g_gam = if g_out <= 0.0031308 {
                 g_out * 12.92
+            } else {
                 1.055 * g_out.powf(1.0 / 2.4) - 0.055
+            };
             let b_gam = if b_out <= 0.0031308 {
                 b_out * 12.92
+            } else {
                 1.055 * b_out.powf(1.0 / 2.4) - 0.055
+            };
             rgba_out[idx] = (r_gam * 255.0).clamp(0.0, 255.0) as u8;
             rgba_out[idx + 1] = (g_gam * 255.0).clamp(0.0, 255.0) as u8;
             rgba_out[idx + 2] = (b_gam * 255.0).clamp(0.0, 255.0) as u8;
@@ -111,6 +125,8 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
         self.active_color_space = target_space;
         self.converted_pixels_count += pixel_count;
         Ok(pixel_count)
+    }
+
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 601,
