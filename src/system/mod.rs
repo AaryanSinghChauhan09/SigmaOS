@@ -25,6 +25,7 @@ pub mod sigmaacpi;
 pub mod sigmabackup;
 pub mod sigmacache;
 pub mod sigmacodec;
+pub mod sigmaaudioconfig;
 pub mod sigmaconfig;
 pub mod sigmacron;
 pub mod sigmacrypto;
@@ -189,6 +190,10 @@ pub use sigmacache::{
 pub use sigmacodec::{
     SigmaCodec, Codec, CodecType, CodecFormat, CodecState,
     init_sigmacodec, get_sigmacodec, register_codec, enable_codec,
+};
+pub use sigmaaudioconfig::{
+    SigmaAudioConfig, AudioDevice, AudioDeviceType, AudioProfile, SampleRate, BitDepth,
+    init_sigmaaudioconfig, get_sigmaaudioconfig, add_audio_device, set_default_audio_device,
 };
 pub use sigmaconfig::{
     get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry as SigmaConfigEntry,
