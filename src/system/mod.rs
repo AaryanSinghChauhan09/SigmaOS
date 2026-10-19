@@ -853,12 +853,12 @@ pub use sigmanotificationmanager::{
 
 pub use sigmapowermanager::{
     add_profile, get_sigmapowermanager, get_sigmapowermanager_mut, init_sigmapowermanager,
-    BatteryInfo, BatteryStatus, PowerMode, PowerProfile, SigmaPowerManager,
+    SigmaPowerManager,
 };
 
 pub use sigmakeyboardmanager::{
     add_layout, get_sigmakeyboardmanager, get_sigmakeyboardmanager_mut, init_sigmakeyboardmanager,
-    InputMethod, Keybinding, KeyboardLayout, KeyboardSettings, SigmaKeyboardManager,
+    InputMethod, KeyboardLayout, KeyboardSettings, SigmaKeyboardManager,
 };
 
 pub use sigmafilesystemmanager::{
