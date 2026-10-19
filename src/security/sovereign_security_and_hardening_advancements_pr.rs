@@ -87,8 +87,8 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
-    /// Evaluate Landlock v5 access permission.
-    pub fn check_landlock_access(handled_access: u64, requested_access: u64) -> bool {
+    /// Evaluate Landlock v5 access permission (u64 variant).
+    pub fn check_landlock_access_u64(handled_access: u64, requested_access: u64) -> bool {
         (handled_access & requested_access) == requested_access
     }
 
@@ -135,8 +135,8 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         flags
     }
 
-    /// Check Landlock access rule against requested access rights bitmask.
-    pub fn check_landlock_access(handled_access: u32, access_request: u32) -> bool {
+    /// Check Landlock access rule against requested access rights bitmask (u32 variant).
+    pub fn check_landlock_access_u32(handled_access: u32, access_request: u32) -> bool {
         (handled_access & access_request) == access_request
     }
 
@@ -417,15 +417,6 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
-        alloc::format!(
-            "[domain/{}]\nid_provider = {}\nldap_uri = {}\n",
-            domain,
-            provider,
-            uri
-        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
