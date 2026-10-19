@@ -92,6 +92,16 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         path == profile_pattern
     }
 
+    /// Validate seccomp BPF architecture AUDIT_ARCH_X86_64.
+    pub fn validate_seccomp_bpf_arch(arch: u32) -> bool {
+        arch == 0xC000003E // AUDIT_ARCH_X86_64
+    }
+
+    /// Check if cgroup v2 controller is enabled in controllers string.
+    pub fn is_cgroup_controller_enabled(controllers: &str, target: &str) -> bool {
+        controllers.split_whitespace().any(|c| c == target)
+    }
+
     /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW).
     pub fn evaluate_seccomp_bpf(&self, syscall_nr: u32, allowed_syscalls: &[u32]) -> u32 {
         if allowed_syscalls.contains(&syscall_nr) {
@@ -492,6 +502,30 @@ impl IdentityAndEnterpriseAuthPrEngine {
             }
         }
         parts
+    }
+
+    /// Generate SSSD domain configuration file format string.
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
+        )
+    }
+
+    /// Generate SSSD PAM/NSS user account response tuple.
+    pub fn generate_sssd_pam_nss_response(
+        &self,
+        user: &str,
+        uid: u32,
+        gid: u32,
+    ) -> (String, u32, u32, String, String) {
+        (
+            user.to_string(),
+            uid,
+            gid,
+            alloc::format!("/home/{}", user),
+            "/bin/bash".to_string(),
+        )
     }
 
     /// Simulate Kerberos v5 ticket validation.
