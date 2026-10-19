@@ -121,6 +121,7 @@ pub mod sigmaprocessmonitor;
 pub mod sigmasystemmonitor;
 pub mod sigmasysteminfo;
 pub mod sigmafilemanager;
+pub mod sigmaarchivemanager;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -648,6 +649,12 @@ pub use sigmasysteminfo {
 pub use sigmafilemanager {
     SigmaFileManager, FileEntry, FileType, FilePermissions,
     init_sigmafilemanager, get_sigmafilemanager, get_sigmafilemanager_mut,
+};
+
+pub use sigmaarchivemanager {
+    SigmaArchiveManager, Archive, ArchiveFormat, ArchiveState,
+    init_sigmaarchivemanager, get_sigmaarchivemanager, get_sigmaarchivemanager_mut,
+    add_archive,
 };
 
 pub use sigmaupdate::{
