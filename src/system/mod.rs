@@ -100,6 +100,7 @@ pub mod sigmalogmanager;
 pub mod sigmacontainer;
 pub mod sigmavirtualization;
 pub mod sigmacgroup;
+pub mod signamespaces;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -512,6 +513,11 @@ pub use sigmacgroup {
     CpuControllerConfig, MemoryControllerConfig, PidsControllerConfig,
     init_sigmacgroup, get_sigmacgroup, get_sigmacgroup_mut,
     create_cgroup,
+};
+pub use signamespaces {
+    SigmaNamespaces, Namespace, NamespaceType, NamespaceState,
+    init_signamespaces, get_signamespaces, get_signamespaces_mut,
+    create_namespace,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
