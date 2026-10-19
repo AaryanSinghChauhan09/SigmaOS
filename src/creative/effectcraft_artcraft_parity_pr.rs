@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
-use alloc::format;
-use alloc::collections::BTreeMap;
+use std::collections::BTreeMap;
 // SigmaOS - Effectcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/effectcraft_artcraft_parity_pr.rs`)
 //

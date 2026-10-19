@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+use std::collections::BTreeMap;
+use std::f32::consts::PI;
 // SigmaOS - VoiceCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/voicecraft_missing_components_parity_pr.rs`)
 //
@@ -197,7 +199,7 @@ impl VoicecraftAcousticPhonemizerG2pPrEngine {
     pub fn phonemize_word(&self, word: &str) -> Vec<Phoneme> {
         let lower = word.to_lowercase();
         if let Some(phonemes) = self.custom_rules.get(&lower) {
-            return phonemes.clone();
+            return phonemes.to_vec();
         }
 
         // Fallback rule-based G2P phonemizer heuristic

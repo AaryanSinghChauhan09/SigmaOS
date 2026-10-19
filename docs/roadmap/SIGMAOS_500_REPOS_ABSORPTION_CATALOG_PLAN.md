@@ -1,84 +1,63 @@
-# Detailed Feature, Algorithm, UI/UX & Security Absorption Plan across 500 Repositories
+# Granular Absorption Catalog Plan: 500+ Open-Source Repositories into SigmaOS
 
 ---
 
-## Technical Feature & Algorithm Mapping Matrix
+## Technical Mapping Matrix
 
-This document maps specific features, algorithms, UI/UX components, performance fastpaths, and security paradigms from the 500+ GitHub repository catalog into their target implementation modules within **SigmaOS**.
-
----
-
-### 1. Kernel, Microkernel & Storage Subsystems
-
-| Source Repository | Absorbed Features & Algorithms | Target Module in SigmaOS | Agent Responsibility |
-|---|---|---|---|
-| `torvalds/linux` | `sched_ext` BPF schedulers, `io_uring` SQPOLL async I/O rings, eBPF XDP packet processing | `src/kernel/sched_ext.rs`, `src/kernel/io_uring.rs`, `src/net/xdp.rs` | ⚡ **Bolt**: Fastpath execution, zero-copy ring buffers |
-| `gregkh/linux` | LTS patch queue backports, stable driver abstractions | `src/kernel/lts_drivers.rs` | 🛡️ **Sentinel**: Security patch verification |
-| `bcachefs/bcachefs-tools` | COW journaled filesystem, multi-device tiering, inline ZSTD compression | `src/fs/sigmafs_bcachefs.rs` | ⚡ **Bolt**: $O(1)$ block lookup, zero-copy caching |
-| `zfs/zfs` | ARC adaptive replacement cache, RAIDZ stripe calculation, datasets | `src/fs/zfs_arc.rs` | ⚡ **Bolt**: ARC cache hit ratio optimization |
-| `seL4/seL4` | Formally verified capability-based access control IPC | `src/kernel/sel4_capability.rs` | 🛡️ **Sentinel**: Mathematical capability verification |
-| `firecracker-microvm/firecracker` | Minimalist KVM vCPU bootloader, fast virtio devices | `src/virt/firecracker_microvm.rs` | ⚡ **Bolt**: Millisecond microVM boot speed |
-| `qemu/qemu` | TCG dynamic binary translator, PCI device emulation | `src/virt/qemu_tcg.rs` | ⚡ **Bolt**: JIT basic block translation cache |
-| `plan9foundation/plan9` | 9P2000 RPC wire protocol, per-process VFS namespaces | `src/fs/plan9_9p2000.rs` | 🎨 **Palette**: Uniform file namespace abstraction |
+This document provides a comprehensive mapping of functions, algorithms, features, UI/UX components, and security mechanisms absorbed from 500+ open-source GitHub repositories into target Rust modules within **SigmaOS** (`src/`).
 
 ---
 
-### 2. Package Managers, Distribution Adapters & Toolchains
+## 1. Core Kernel & Low-Level Subsystems
 
-| Source Repository | Absorbed Features & Algorithms | Target Module in SigmaOS | Agent Responsibility |
-|---|---|---|---|
-| `pacman/pacman` | libalpm sync database format, delta updates, PKGBUILD parser | `src/package/pacman_alpm.rs` | ⚡ **Bolt**: Fast binary database indexing |
-| `dpkg/dpkg` | Debconf pre-configuration triggers, .deb Zstd archive extraction | `src/package/debian_dpkg.rs` | 🛡️ **Sentinel**: Debconf statoverride safety checks |
-| `rpm-software-management/rpm` | RPM v4/v5 spec parser, CPIO header validation | `src/package/rpm_engine.rs` | 🛡️ **Sentinel**: CPIO buffer boundary enforcement |
-| `nixos/nixpkgs` | SAT DPLL constraint solver, declarative home-manager generations | `src/package/sat_solver.rs`, `src/distro/nix_declarative.rs` | ⚡ **Bolt**: $O(N \log N)$ SAT clause learning solver |
-| `alpinelinux/aports` | APK v3 binary package index, APK trust signature verification | `src/package/alpine_apk.rs` | 🛡️ **Sentinel**: Cryptographic package signature check |
-| `flatpak/flatpak` | Bubblewrap user namespace containerization, OSTree app store | `src/package/flatpak_container.rs` | 🛡️ **Sentinel**: Landlock sandbox confinement |
-| `serpent-os/core` | Moss blake3 deduplicated package transactions | `src/package/moss_blake3.rs` | ⚡ **Bolt**: BLAKE3 SIMD hashing fastpath |
-
----
-
-### 3. Desktop Compositors, User Interfaces & Accessibility
-
-| Source Repository | Absorbed Features & Algorithms | Target Module in SigmaOS | Agent Responsibility |
-|---|---|---|---|
-| `GNOME/gnome-shell` | Mutter Wayland surface management, accessibility AT-SPI bridge | `src/zenith_desktop/compositor.rs`, `src/ui/at_spi_bridge.rs` | 🎨 **Palette**: ARIA accessibility & keyboard focus |
-| `KDE/plasma-desktop` | KWin sub-surface rendering, Plasmoid status bar widgets | `src/zenith_desktop/widgets.rs` | 🎨 **Palette**: Intuitive widget UX & theme polish |
-| `swaywm/sway` | wlroots IPC protocol, tree-based tiling layout manager | `src/zenith_desktop/tiling_layout.rs` | ⚡ **Bolt**: Direct framebuffer rendering fastpath |
-| `alacritty/alacritty` | OpenGL GPU glyph renderer, VT100 parser | `src/terminal/alacritty_render.rs` | ⚡ **Bolt**: SIMD glyph layout cache |
-| `elementary/os` | Granite GTK custom widgets, app center layout | `src/ui/granite_widgets.rs` | 🎨 **Palette**: Consistent UI spacing and color contrast |
-| `deepin-community/deepin` | DDE Control Center Qt layout, blur effect shader | `src/ui/dde_control_center.rs` | 🎨 **Palette**: Smooth state transitions and animations |
+| Source Project | Feature / Algorithm / Innovation | Target Module in SigmaOS (`src/`) |
+|---|---|---|
+| `torvalds/linux` | `io_uring` SQPOLL zero-syscall ring & `sched_ext` BPF scheduling | `src/kernel/ebpf_ring.rs`, `src/kernel/sched.rs` |
+| `gregkh/linux` | Stable kernel API stability wrappers & LTS kernel tunables | `src/kernel/sovereign_kernel_pinnacle_synthesis.rs` |
+| `raspberrypi/linux` | ARM64 DTB device tree parser & GPIO memory mapping | `src/device/sovereign_device_management.rs` |
+| `rt-linux/rt-linux` | PREEMPT_RT deterministic interrupt latency handler | `src/kernel/irq/workqueue.rs` |
+| `seL4/seL4` | Capability-based access control & verified IPC channels | `src/security/capability.rs` |
+| `openbsd/src` | `pledge()` & `unveil()` system call restrictions | `src/security/pledge.rs`, `src/security/unveil.rs` |
+| `haiku/haiku` | BFS database-like extended file attributes | `src/filesystem/haiku_bfs.rs` |
+| `plan9foundation/plan9` | 9P2000 protocol synthetic filesystem namespaces | `src/filesystem/plan9_9p_network.rs` |
 
 ---
 
-### 4. System Utilities, Shells & Text Processing
+## 2. Package Management & Distro Adapters
 
-| Source Repository | Absorbed Features & Algorithms | Target Module in SigmaOS | Agent Responsibility |
-|---|---|---|---|
-| `coreutils/coreutils` | GNU core utilities fastpath, zero-allocation line parser | `src/userland/coreutils.rs` | ⚡ **Bolt**: Zero-allocation slice operations |
-| `busybox/busybox` | Single-binary multiplexed applet router | `src/userland/busybox_multicall.rs` | ⚡ **Bolt**: Binary size minimization |
-| `fish-shell/fish-shell` | Autosuggestions, syntax highlighting parser, web config | `src/shell/fish_autosuggest.rs` | 🎨 **Palette**: Interactive autosuggestions and UX |
-| `nushell/nushell` | Structured tabular pipelines, typed data streams | `src/shell/nushell_tables.rs` | 🎨 **Palette**: Clear tabular data display |
-| `neovim/neovim` | Tree-sitter AST syntax parser, Lua JIT plugin engine | `src/editor/neovim_treesitter.rs` | ⚡ **Bolt**: AST incremental parsing |
-| `helix-editor/helix` | Modal selection-first editing paradigm, LSP diagnostics | `src/editor/helix_modal.rs` | 🎨 **Palette**: Helpful status bar mode badges |
-
----
-
-### 5. Security, Cryptography & Networking
-
-| Source Repository | Absorbed Features & Algorithms | Target Module in SigmaOS | Agent Responsibility |
-|---|---|---|---|
-| `wireguard/wireguard-linux` | In-kernel Noise_IK handshake, ChaCha20Poly1305 encryption | `src/net/wireguard.rs` | ⚡ **Bolt**: SIMD crypto acceleration |
-| `nftables/nftables` | Netfilter bytecode expression evaluation engine | `src/net/nftables_vm.rs` | 🛡️ **Sentinel**: Strict packet bounds checking |
-| `openssh/openssh-portable` | Privilege separation architecture, SSH-2 handshake | `src/net/openssh_privsep.rs` | 🛡️ **Sentinel**: Zero-trust privilege separation |
-| `suricata/suricata` | Multi-threaded Hyperscan regex signature scanner | `src/net/suricata_ids.rs` | ⚡ **Bolt**: Multi-core parallel packet scanning |
-| `fail2ban/fail2ban` | Dynamic iptables/nftables IP ban rules engine | `src/security/fail2ban_auto.rs` | 🛡️ **Sentinel**: Automatic brute-force prevention |
-| `openbsd/src` | Pledge & Unveil syscall restriction engine | `src/security/pledge_unveil.rs` | 🛡️ **Sentinel**: Subprocess capability scoping |
+| Source Project | Feature / Algorithm / Innovation | Target Module in SigmaOS (`src/`) |
+|---|---|---|
+| `pacman/pacman` | libalpm 15 sync database transaction engine & vercmp | `src/package/sovereign_distro_package_advancements_v47.rs` |
+| `dpkg/dpkg` & `apt` | debconf preseed engine & statoverride trigger system | `src/sigpkg/debian_engine.rs` |
+| `rpm-software-management/rpm` | RPM v4 header verification & DNF5 transaction solver | `src/sigpkg/fedora_rpm_engine.rs` |
+| `nixos/nixpkgs` | SAT DPLL dependency solver with canonical remapping | `src/sigpkg/universal_adapter.rs` |
+| `alpinelinux/aports` | APK v3 musl trigger engine & LBU RAM rootfs | `src/sigpkg/alpine_engine.rs` |
+| `void-linux/void-packages` | XBPS transaction graph & runit process supervisor | `src/sigpkg/void_xbps.rs` |
+| `flatpak/flatpak` | OSTree atomic deployment switch & ostree ref pruning | `src/package/sandbox.rs` |
 
 ---
 
-## Testing & Quality Assurance Verification
+## 3. Desktop Environment, Terminals & Userland UI/UX
 
-- Every absorbed component must be backed by a standalone Rust unit test in its respective module.
-- Validation is performed using `./run_sigma_tests.sh`.
+| Source Project | Feature / Algorithm / Innovation | Target Module in SigmaOS (`src/`) |
+|---|---|---|
+| `GNOME/gnome-shell` | ARIA accessibility tree bridges & focus ring outlines | `src/zenith_desktop/accessibility.rs` |
+| `KDE/plasma-desktop` | Wayland explicit sync engine & HDR color management | `src/zenith_desktop/status_bar.rs` |
+| `swaywm/sway` | Wayland tiling layout engine & IPC socket protocol | `src/zenith_desktop/wm.rs` |
+| `alacritty/alacritty` | SIMD glyph cache & zero-copy terminal grid buffer | `src/zenith_desktop/terminal_grid.rs` |
+| `fish-shell/fish-shell` | Real-time interactive autosuggestions & syntax highlighting | `src/shell/interactive_prompt.rs` |
+| `htop-dev/htop` | Keyboard-navigable tree-view process hierarchy | `src/tools/htop_view.rs` |
+
+---
+
+## 4. Security, Networking & Observability
+
+| Source Project | Feature / Algorithm / Innovation | Target Module in SigmaOS (`src/`) |
+|---|---|---|
+| `wireguard/wireguard-linux` | Noise_IK handshake & SIMD ChaCha20Poly1305 encryption | `src/net/wireguard.rs` |
+| `suricata/suricata` | Multi-threaded packet inspection & IDS rules | `src/net/ids.rs` |
+| `openssh/openssh-portable` | Privilege separation architecture for system daemons | `src/security/privsep.rs` |
+| `prometheus/prometheus` | TSDB metric collection ring & scrape targets | `src/logging/sigmalog.rs` |
+| `vector/vector` | High-performance observability log transformation pipeline | `src/logging/vector_pipeline.rs` |
 
 ---

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
 // SigmaOS - FontCraft & Sovereign Typography Missing Components Parity PR Gateway Module
 // (`src/creative/fontcraft_missing_components_parity_pr.rs`)
 //
@@ -12,7 +12,6 @@ use alloc::string::{String, ToString};
 // 5. FontcraftWoff2BrotliCompressionPrEngine (WOFF2/WOFF web font Brotli decompressed micro-font loading, header parsing & glyph subsetting)
 // 6. SovereignFontcraftArtcraftParityPrGateway (Master PR Gateway, Parity Benchmark Suite & Markdown PR Specification Generator)
 
-#![no_std]
 
 
 

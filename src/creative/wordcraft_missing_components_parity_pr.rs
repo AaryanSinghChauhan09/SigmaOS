@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
 // SigmaOS - Wordcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/wordcraft_missing_components_parity_pr.rs`)
 //
@@ -405,11 +405,11 @@ impl WordcraftReferenceCitationBibliographyPrEngine {
     /// Build Table of Contents tree from headings
     pub fn build_table_of_contents(&self, headings: &[(String, u32, u32)]) -> Vec<TocEntry> {
         let mut toc = Vec::new();
-        for (idx, (text, level, page)) in headings.iter().enumerate() {
+        for (idx, item) in headings.iter().enumerate() {
             toc.push(TocEntry {
-                heading_text: text.clone(),
-                level: *level,
-                page_number: *page,
+                heading_text: item.0.clone(),
+                level: item.1,
+                page_number: item.2,
                 anchor_id: format!("heading_{}", idx + 1),
             });
         }
@@ -963,9 +963,9 @@ impl WordcraftDocumentSecurityWatermarkPrEngine {
     /// Redact sensitive terms in paragraph content
     pub fn redact_content(&self, text: &str) -> String {
         let mut redacted = text.to_string();
-        for term in &self.redacted_terms {
+        for term in self.redacted_terms.iter() {
             let replacement = "█".repeat(term.len());
-            redacted = redacted.replace(term, &replacement);
+            redacted = redacted.replace(term.as_str(), &replacement);
         }
         redacted
     }

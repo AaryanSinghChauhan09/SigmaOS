@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
 //
 // (`src/creative/gridcraft_missing_components_parity_pr.rs`)
@@ -114,7 +114,7 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
             None => return FormulaValue::Error("#REF!".to_string()),
         };
 
-        for row in table {
+        for row in table.iter() {
             if lookup_col_idx < row.len() && row[lookup_col_idx] == search_key {
                 if return_col_idx < row.len() {
                     let val_str = &row[return_col_idx];
@@ -272,12 +272,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
             Some(ValidationRule::List(allowed)) => allowed.contains(&value_str.to_string()),
             Some(ValidationRule::NumberRange { min, max }) => {
                 if let Ok(val) = value_str.parse::<f64>() {
-                    val >= min && val <= max
+                    val >= *min && val <= *max
                 } else {
                     false
                 }
             }
-            Some(ValidationRule::CustomRegex(pattern)) => value_str.contains(&pattern),
+            Some(ValidationRule::CustomRegex(pattern)) => value_str.contains(pattern.as_str()),
             None => true,
         }
     }
@@ -289,15 +289,15 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
     pub fn evaluate_conditional_style(&self, col: u32, row: u32, value: f64) -> Option<u32> {
         match self.format_rules.get(&(col, row)) {
             Some(ConditionalFormatRule::CellGreaterThan(thresh, color)) => {
-                if value > thresh {
-                    Some(color)
+                if value > *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
             }
             Some(ConditionalFormatRule::CellLessThan(thresh, color)) => {
-                if value < thresh {
-                    Some(color)
+                if value < *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
@@ -307,12 +307,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 max_color,
             }) => {
                 if value > 50.0 {
-                    Some(max_color)
+                    Some(*max_color)
                 } else {
-                    Some(min_color)
+                    Some(*min_color)
                 }
             }
-            Some(ConditionalFormatRule::DataBar { bar_color }) => Some(bar_color),
+            Some(ConditionalFormatRule::DataBar { bar_color }) => Some(*bar_color),
             None => None,
         }
     }

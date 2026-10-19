@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
+use std::collections::BTreeMap;
 // SigmaOS - CraftLibs Missing Components Parity PR Gateway Module
 // (`src/creative/craftlibs_missing_components_parity_pr.rs`)
 //
@@ -14,7 +14,6 @@ use alloc::string::{String, ToString};
 // 7. CraftlibsSdfTypographyGlyphPrEngine (HarfBuzz/FreeType SDF/MSDF font glyph rendering & script shaping)
 // 8. SovereignCraftlibsMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 
 
 
