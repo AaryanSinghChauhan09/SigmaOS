@@ -170,14 +170,14 @@ impl ElfBinary {
             return None;
         }
 
-        let ident = &*(data as *const [u8; 16]);
+        let ident: [u8; 16] = ptr::read_unaligned(data as *const [u8; 16]);
         if ident[0..4] != ELF_MAGIC {
             return None;
         }
 
         let is_64bit = ident[4] == 2;
         let entry_point = if is_64bit {
-            let header = &*(data as *const Elf64Header);
+            let header: Elf64Header = ptr::read_unaligned(data as *const Elf64Header);
             header.e_entry
         } else {
             0x400000

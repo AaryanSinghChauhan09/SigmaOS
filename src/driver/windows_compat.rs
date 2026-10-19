@@ -406,7 +406,8 @@ impl PeDriverLoader {
             return Err("Binary too small for DOS Header");
         }
 
-        let dos_header = unsafe { &*(binary.as_ptr() as *const ImageDosHeader) };
+        let dos_header: ImageDosHeader =
+            unsafe { core::ptr::read_unaligned(binary.as_ptr() as *const ImageDosHeader) };
         if dos_header.e_magic != 0x5A4D {
             return Err("Invalid MZ DOS signature");
         }
@@ -435,12 +436,18 @@ impl PeDriverLoader {
         }
 
         let file_header_offset = pe_offset + 4;
-        let file_header =
-            unsafe { &*(binary.as_ptr().add(file_header_offset) as *const ImageFileHeader) };
+        let file_header: ImageFileHeader = unsafe {
+            core::ptr::read_unaligned(
+                binary.as_ptr().add(file_header_offset) as *const ImageFileHeader
+            )
+        };
 
         let opt_header_offset = file_header_offset + core::mem::size_of::<ImageFileHeader>();
-        let opt_header =
-            unsafe { &*(binary.as_ptr().add(opt_header_offset) as *const ImageOptionalHeader64) };
+        let opt_header: ImageOptionalHeader64 = unsafe {
+            core::ptr::read_unaligned(
+                binary.as_ptr().add(opt_header_offset) as *const ImageOptionalHeader64,
+            )
+        };
 
         if opt_header.magic != 0x20B {
             return Err("PE Optional Header is not PE32+ (64-bit)");
@@ -464,7 +471,11 @@ impl PeDriverLoader {
             if offset + core::mem::size_of::<ImageSectionHeader>() > binary.len() {
                 return Err("Section header overflow");
             }
-            let section = unsafe { &*(binary.as_ptr().add(offset) as *const ImageSectionHeader) };
+            let section: ImageSectionHeader = unsafe {
+                core::ptr::read_unaligned(
+                    binary.as_ptr().add(offset) as *const ImageSectionHeader,
+                )
+            };
 
             let dest_start = section.virtual_address as usize;
             let src_start = section.pointer_to_raw_data as usize;

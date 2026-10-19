@@ -261,7 +261,8 @@ impl DynamicLinker {
             return None;
         }
 
-        let header = unsafe { *(data.as_ptr() as *const Elf64Ehdr) };
+        let header: Elf64Ehdr =
+            unsafe { core::ptr::read_unaligned(data.as_ptr() as *const Elf64Ehdr) };
 
         Some(header)
     }
@@ -282,7 +283,9 @@ impl DynamicLinker {
                 return Err("Program header out of bounds");
             }
 
-            let phdr = unsafe { *(data.as_ptr().add(offset) as *const Elf64Phdr) };
+            let phdr: Elf64Phdr = unsafe {
+                core::ptr::read_unaligned(data.as_ptr().add(offset) as *const Elf64Phdr)
+            };
             phdrs.push(phdr);
         }
 
@@ -354,7 +357,9 @@ impl DynamicLinker {
                         break;
                     }
 
-                    let dyn_entry = unsafe { *(data.as_ptr().add(offset) as *const Elf64Dyn) };
+                    let dyn_entry: Elf64Dyn = unsafe {
+                        core::ptr::read_unaligned(data.as_ptr().add(offset) as *const Elf64Dyn)
+                    };
 
                     if dyn_entry.d_tag == dt::NULL {
                         break;
