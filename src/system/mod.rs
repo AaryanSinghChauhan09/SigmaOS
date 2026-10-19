@@ -91,6 +91,7 @@ pub mod sigmaupdatemanager;
 pub mod sigmaflatpak;
 pub mod sigmasnap;
 pub mod sigmabackup;
+pub mod sigmarecovery2;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -462,6 +463,10 @@ pub use sigmasnap::{
 pub use sigmabackup {
     SigmaBackup, Backup, BackupType, BackupState,
     init_sigmabackup, get_sigmabackup, create_backup,
+};
+pub use sigmarecovery2 {
+    SigmaRecovery, RecoveryTask, RecoveryType, RecoveryState,
+    init_sigmarecovery, get_sigmarecovery,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
