@@ -106,6 +106,7 @@ pub mod sigmasystemd;
 pub mod sigmaswap;
 pub mod sigmahibernation;
 pub mod sigmabluetooth;
+pub mod sigmaacpi;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -551,6 +552,12 @@ pub use sigmabluetooth {
     DeviceState, DeviceType,
     init_sigmabluetooth, get_sigmabluetooth, get_sigmabluetooth_mut,
     add_adapter,
+};
+pub use sigmaacpi {
+    SigmaACPI, BatteryInfo, ThermalZone, PowerEvent, BatteryState,
+    ThermalState,
+    init_sigmaacpi, get_sigmaacpi, get_sigmaacpi_mut,
+    add_battery,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
