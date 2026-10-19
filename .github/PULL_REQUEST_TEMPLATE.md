@@ -1,77 +1,60 @@
 ## Summary
 
-<!-- What I/O-management behavior changed and why? -->
-
-## I/O component
-
-- [ ] I/O policy
-- [ ] Block device manager
-- [ ] virtio / NVMe / virtio
-- [ ] Interrupt manager
-- [ ] DMA manager
-- [ ] Buffer manager
-- [ ] I/O scheduler
-- [ ] Submit / complete
-- [ ] Callback
-- [ ] Interrupt
-- [ ] DMA
-- [ ] Buffer
-- [ ] Recovery
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Documentation
-- [ ] CI / tooling
+<!-- What kernel behavior changed and why? -->
 
 ## Kernel component
 
-- [ ] Kernel component
-
-## Shell component
-
-- [ ] Shell component
+- [ ] Boot / arch init
+- [ ] Interrupts / traps
+- [ ] Memory / paging / swap
+- [ ] Scheduler / processes
+- [ ] VFS / filesystems
+- [ ] Syscalls / ELF
+- [ ] Drivers
+- [ ] Networking / sockets
+- [ ] IPC / signals / timers
+- [ ] Security / capabilities
+- [ ] Diagnostics
+- [ ] Build / CI
 
 ## Recurring task
 
-- [ ] PR validation
+- [ ] PR-level validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
+- [ ] Weekly subsystem review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly I/O audit
-- [ ] Biweekly signal/wait audit
+- [ ] Biweekly syscall/ABI review
+- [ ] Biweekly memory/concurrency audit
 - [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Monthly driver/hardware audit
+- [ ] Monthly fuzz triage
+- [ ] Monthly diagnostics rehearsal
+- [ ] Quarterly release/architecture/security review
 
-## Reference behavior (Upstream study)
+## Reference study
 
-<!-- Required for lifecycle, ABI, or I/O changes -->
+<!-- Required for design-changing kernel PRs -->
 
-- POSIX section:
+- Study document:
 - Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+- Decision: Adopt / Adapt / Reject
+- Reason:
 
-## Changes (What SigmaOS adopts)
+## Changes
 
 -
 -
-
-## I/O safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-completion prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
 
 ## Kernel safety review
 
+- [ ] No unnecessary `unsafe`
+- [ ] Every `unsafe` block documents invariants
 - [ ] Lock ordering documented
+- [ ] Interrupt-context safety considered
+- [ ] Allocation limits defined
+- [ ] OOM behavior defined
+- [ ] Error paths tested
+- [ ] No silent failure introduced
 
 ## Shell safety review
 
@@ -89,19 +72,20 @@
 - [ ] `./run_sigma_tests.sh`
 - [ ] New/updated unit tests
 - [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-boot evidence, if boot-affecting
-- [ ] I/O benchmark, if performance-affecting
+- [ ] Fuzz target or reason for exemption
+- [ ] QEMU boot evidence, if boot-affecting
+- [ ] Driver/hardware evidence, if driver-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] I/O documentation
+- [ ] Component documentation
 - [ ] Boot matrix, if applicable
+- [ ] Hardware matrix, if applicable
 
-## Risks and rollback (Safety and rollback)
+## Risks and rollback
 
 - Risk:
 - Rollback:
