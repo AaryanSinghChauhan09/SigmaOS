@@ -194,6 +194,8 @@ pub use distro::open_source_os_missing_components_v54_pr::*;
 pub use distro::open_source_os_missing_components_v57_pr::*;
 pub use distro::open_source_os_missing_components_v60_pr::*;
 pub use distro::open_source_os_missing_components_v61_pr::*;
+pub use distro::open_source_os_missing_components_v62_pr::*;
+pub use distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
