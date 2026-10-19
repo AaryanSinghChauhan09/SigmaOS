@@ -124,6 +124,7 @@ pub mod sigmafilemanager;
 pub mod sigmaarchivemanager;
 pub mod sigmaclipboardmanager;
 pub mod sigmasearch;
+pub mod sigmaautomation;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -668,6 +669,12 @@ pub use sigmaclipboardmanager {
 pub use sigmasearch {
     SigmaSearch, SearchResult, SearchIndex,
     init_sigmasearch, get_sigmasearch, get_sigmasearch_mut,
+};
+
+pub use sigmaautomation {
+    SigmaAutomation, AutomationTask,
+    init_sigmaautomation, get_sigmaautomation, get_sigmaautomation_mut,
+    add_task,
 };
 
 pub use sigmaupdate::{
