@@ -10,6 +10,7 @@ use std::string::ToString;
 
 use sigmaos::arch::x86_64;
 use sigmaos::compatibility::{OpenRcManager, OpenRcRunlevel, OpenRcService};
+use sigmaos::kernel::scheduler::ProcessState as TaskProcessState;
 use sigmaos::kernel::{
     BuddyAllocator, Priority, ProcessTask, RoundRobinScheduler as Scheduler, SchedulerPolicy,
 };
@@ -39,7 +40,7 @@ pub fn start_kernel(
         pid: 0,
         priority: Priority::Idle,
         policy: SchedulerPolicy::Idle,
-        state: sigmaos::kernel::ProcessState::Ready,
+        state: TaskProcessState::Runnable,
         vruntime: 0,
         exec_start: 0,
         exec_duration: 0,

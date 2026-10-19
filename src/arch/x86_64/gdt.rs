@@ -158,20 +158,19 @@ impl GlobalDescriptorTableManager {
 
             // Reload segment registers
             core::arch::asm!(
-                "mov ax, {0}",
-                "mov ds, ax",
-                "mov es, ax",
-                "mov fs, ax",
-                "mov gs, ax",
-                "mov ss, ax",
-                in(reg) KERNEL_DS as u16,
+                "mov ds, {0:x}",
+                "mov es, {0:x}",
+                "mov fs, {0:x}",
+                "mov gs, {0:x}",
+                "mov ss, {0:x}",
+                in(reg) KERNEL_DS,
                 options(nostack)
             );
 
             // Load TSS using ltr instruction
             core::arch::asm!(
-                "ltr {0}",
-                in(reg) TSS_SELECTOR as u16,
+                "ltr {0:x}",
+                in(reg) TSS_SELECTOR,
                 options(nostack)
             );
         }
