@@ -92,14 +92,14 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         path == profile_pattern
     }
 
-    /// Validate seccomp BPF architecture AUDIT_ARCH_X86_64.
+    /// Validate seccomp BPF architecture (e.g. AUDIT_ARCH_X86_64 = 0xC000003E).
     pub fn validate_seccomp_bpf_arch(arch: u32) -> bool {
-        arch == 0xC000003E // AUDIT_ARCH_X86_64
+        arch == 0xC000003E || arch == 0x40000028 || arch == 0xC00000B7
     }
 
-    /// Check if cgroup v2 controller is enabled in controllers string.
-    pub fn is_cgroup_controller_enabled(controllers: &str, target: &str) -> bool {
-        controllers.split_whitespace().any(|c| c == target)
+    /// Check if cgroup controller is enabled.
+    pub fn is_cgroup_controller_enabled(active_controllers: &str, controller: &str) -> bool {
+        active_controllers.split_whitespace().any(|c| c == controller)
     }
 
     /// Evaluate seccomp BPF syscall action (0 = KILL_PROCESS, 1 = TRAP, 2 = ERRNO, 3 = ALLOW).
