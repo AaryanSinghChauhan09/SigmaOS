@@ -50,6 +50,7 @@ pub mod sigmadhcp;
 pub mod sigmadiskmanager;
 pub mod sigmadiskusage;
 pub mod sigmadns;
+pub mod sigmadrivermanager;
 pub mod sigmaeffect;
 pub mod sigmaevent;
 pub mod sigmafig;
@@ -835,4 +836,9 @@ pub use system_monitor::{
 pub use sigmasystemtools::{
     CleanupAction, MaintenanceTask, SystemTool, ToolCategory, SigmaSystemTools,
     add_tool, get_sigmasystemtools, get_sigmasystemtools_mut, init_sigmasystemtools,
+};
+
+pub use sigmadrivermanager::{
+    DriverPackage, DriverStatus, DriverType, HardwareDevice, SigmaDriverManager,
+    add_device, add_driver, get_sigmadrivermanager, get_sigmadrivermanager_mut, init_sigmadrivermanager,
 };
