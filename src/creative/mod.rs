@@ -26,6 +26,7 @@ pub mod filmcraft;
 pub mod filmcraft_artcraft_parity_pr;
 pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
+pub mod fontcraft_artcraft_parity_pr;
 pub mod fontcraft_missing_components_parity_pr;
 pub mod gridcraft;
 pub mod gridcraft_missing_components_parity_pr;
@@ -174,6 +175,28 @@ pub use gridcraft_missing_components_parity_pr::{
     GridcraftMultiUserCrdtCollabPrEngine, GridcraftPrProposalManifest,
     GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
     SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
+};
+pub use fontcraft::{
+    FontMetrics, FontTableTag, GlyphContour, GlyphData, GlyphPoint, SovereignFontEngine,
+};
+pub use fontcraft_artcraft_parity_pr::{
+    DesignAxis, FontcraftArtcraftParityPrSuite, FontcraftArtcraftPrProposalManifest,
+    FontcraftColorEmojiVectorCompositingPrEngine, FontcraftComplexScriptShapingLayoutPrEngine,
+    FontcraftFontMetricsBaselineKerningPrEngine, FontcraftGlyphAtlasCacheManagerPrEngine,
+    FontcraftMasterTypographyThemeCascadePrEngine, FontcraftMsdfGpuVectorShaderRasterizerPrEngine,
+    FontcraftOpenTypeFeatureTagRegistryPrEngine, FontcraftSdfTextRenderingPipelinePrEngine,
+    FontcraftVariableFontTupleDesignSpacePrEngine,
+    FontcraftWoff2BrotliDecompressionSubsettingPrEngine, MsdfTexelSample, OpenTypeFeatureKind,
+    PaletteRgba, PositionedGlyph, SdfEffectMode,
+    SovereignFontcraftArtcraftParityPrGateway as SovereignFontcraftArtcraftParityPrGatewayV2,
+    TypographyMetrics, VectorEmojiLayer, Woff2FontHeader,
+};
+pub use fontcraft_missing_components_parity_pr::{
+    FontcraftColorVectorEmojiEnginePrEngine, FontcraftComplexScriptHarfbuzzShapingPrEngine,
+    FontcraftMsdfGpuVectorRasterizerPrEngine, FontcraftPrProposalManifest,
+    FontcraftVariableFontInterpolationPrEngine, FontcraftWoff2BrotliCompressionPrEngine, MsdfTexel,
+    OpenTypeFeatureTag, ShapedGlyph, SovereignFontcraftArtcraftParityPrGateway, VariableFontAxis,
+    Woff2Header,
 };
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
