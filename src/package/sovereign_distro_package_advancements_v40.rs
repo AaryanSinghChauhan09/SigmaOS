@@ -1028,7 +1028,7 @@ mod tests {
         assert_eq!(delta_rec.compression_savings_ratio, 75);
 
         let mut boot_env = UniversalBootEnvSnapshotGovernorV40::new();
-        let snap_id = boot_env.create_snapshot(BootEnvKindV40::FreeBsdBectl, "Pre-Update-v39");
+        let snap_id = boot_env.create_snapshot(BootEnvKindV40::FreeBsdBectl, "Pre-Update-v40");
         assert_eq!(snap_id, 1);
         let res = boot_env.rollback(snap_id).unwrap();
         assert!(res.contains("Pre-Update-v40"));

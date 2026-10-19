@@ -101,6 +101,17 @@ impl LinuxAccessControlAndSandboxingPrEngine {
         }
     }
 
+    pub fn validate_seccomp_bpf_arch(arch: u32) -> bool {
+        arch == 0xC000003E // AUDIT_ARCH_X86_64
+            || arch == 0x40000028 // AUDIT_ARCH_ARM
+            || arch == 0xC00000B7 // AUDIT_ARCH_AARCH64
+            || arch == 0x80000015 // AUDIT_ARCH_PPC64
+    }
+
+    pub fn is_cgroup_controller_enabled(controllers_str: &str, target_controller: &str) -> bool {
+        controllers_str.split_whitespace().any(|c| c == target_controller)
+    }
+
     /// Check if Linux capability bit mask contains target capability.
     pub fn has_capability(effective_mask: u64, cap_bit: u8) -> bool {
         if cap_bit >= 64 {
@@ -480,6 +491,28 @@ pub struct IdentityAndEnterpriseAuthPrEngine;
 impl IdentityAndEnterpriseAuthPrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn generate_sssd_domain_conf(domain: &str, provider: &str, uri: &str) -> String {
+        alloc::format!(
+            "[domain/{}]\nid_provider = {}\nldap_uri = {}\ncache_credentials = true\n",
+            domain, provider, uri
+        )
+    }
+
+    pub fn generate_sssd_pam_nss_response(
+        &self,
+        username: &str,
+        uid: u32,
+        gid: u32,
+    ) -> (String, u32, u32, String, String) {
+        (
+            username.to_string(),
+            uid,
+            gid,
+            alloc::format!("/home/{}", username),
+            "/bin/bash".to_string(),
+        )
     }
 
     /// Parse LDAP Distinguished Name (DN) string (e.g., "cn=jules,ou=users,dc=sigmaos,dc=org").
