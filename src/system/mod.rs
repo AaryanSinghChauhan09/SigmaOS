@@ -120,6 +120,7 @@ pub mod sigmataskmanager;
 pub mod sigmaprocessmonitor;
 pub mod sigmasystemmonitor;
 pub mod sigmasysteminfo;
+pub mod sigmafilemanager;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -642,6 +643,11 @@ pub use sigmasystemmonitor {
 pub use sigmasysteminfo {
     SystemInfo,
     init_sigmasysteminfo, get_sigmasysteminfo, get_sigmasysteminfo_mut,
+};
+
+pub use sigmafilemanager {
+    SigmaFileManager, FileEntry, FileType, FilePermissions,
+    init_sigmafilemanager, get_sigmafilemanager, get_sigmafilemanager_mut,
 };
 
 pub use sigmaupdate::{
