@@ -217,6 +217,7 @@ impl FigcraftAdvancedAutoLayoutConstraintPrEngine {
                     if total_fr > 0.0 {
                         widths.push((fr / total_fr) * remaining);
                     } else {
+ {
                         widths.push(0.0);
                     }
                 }
@@ -516,6 +517,7 @@ impl FigcraftInteractivePrototypingSmartAnimatePrEngine {
             let osc = (omega_d * t_sec).cos() + (zeta * omega0 / omega_d) * (omega_d * t_sec).sin();
             target_val - delta * envelope * osc
         } else {
+ {
             // Overdamped / Critically damped
             let envelope = (-omega0 * t_sec).exp();
             target_val - delta * envelope * (1.0 + omega0 * t_sec)
@@ -875,6 +877,7 @@ impl FigcraftMultiUserCrdtCollaborationPrEngine {
                 if delta.timestamp_lamport > existing.timestamp_lamport {
                     replace_idx = Some(i);
                 } else {
+ {
                     return false; // Stale edit ignored
                 }
                 break;
@@ -884,6 +887,7 @@ impl FigcraftMultiUserCrdtCollaborationPrEngine {
         if let Some(idx) = replace_idx {
             self.delta_log[idx] = delta;
         } else {
+ {
             self.delta_log.push(delta);
         }
         true
@@ -957,6 +961,7 @@ impl FigcraftDevModeMultiFrameworkExporterPrEngine {
             if s <= 0.03928 {
                 s / 12.92
             } else {
+ {
                 let x = (s + 0.055) / 1.055;
                 x * x * x
             }
@@ -1132,6 +1137,7 @@ impl SovereignFigcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

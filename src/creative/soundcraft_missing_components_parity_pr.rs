@@ -223,19 +223,25 @@ impl SoundcraftSpectralSynthesisSamplerPrEngine {
                 if att > 0.0 {
                     time_sec / att
                 } else {
+ {
                     1.0
                 }
             } else if time_sec < att + dec {
+ {
+ {
                 let t_dec = (time_sec - att) / dec;
                 1.0 - (1.0 - self.adsr.sustain_level) * t_dec
             } else {
+ {
                 self.adsr.sustain_level
             }
         } else {
+ {
             let rel = self.adsr.release_ms / 1000.0;
             if time_sec < rel && rel > 0.0 {
                 self.adsr.sustain_level * (1.0 - time_sec / rel)
             } else {
+ {
                 0.0
             }
         }
@@ -597,6 +603,7 @@ impl SoundcraftRealtimeCollabCrdtPrEngine {
         if let Some(&holder) = self.locked_tracks.get(&track_id) {
             holder == user_id
         } else {
+ {
             self.locked_tracks.insert(track_id, user_id);
             true
         }
@@ -736,6 +743,7 @@ impl SovereignSoundcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

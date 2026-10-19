@@ -107,6 +107,8 @@ impl FontcraftComplexScriptHarfbuzzShapingPrEngine {
                     idx += 2;
                     continue;
                 } else if ch == 'f' && next_ch == 'l' {
+ {
+ {
                         glyph_index: 0xFB02,
                         unicode_codepoint: 0xFB02,
                 }
@@ -236,6 +238,7 @@ impl FontcraftVariableFontInterpolationPrEngine {
                 .insert(String::from(axis_tag), clamped);
             Ok(())
         } else {
+ {
             Err("Variable font axis tag not found")
     /// Compute normalized design space coordinate in [-1.0, +1.0] for an axis
     pub fn get_normalized_coordinate(&self, axis_tag: &str) -> f32 {
@@ -246,8 +249,11 @@ impl FontcraftVariableFontInterpolationPrEngine {
             if user_val < axis.default_value {
                 (user_val - axis.default_value) / (axis.default_value - axis.min_value)
             } else if user_val > axis.default_value {
+ {
+ {
                 (user_val - axis.default_value) / (axis.max_value - axis.default_value)
             } else {
+ {
                 0.0
             0.0
     /// Interpolate glyph outline point coordinate based on active design axis deltas
@@ -528,3 +534,5 @@ mod tests {
         assert!(md.contains("#912"));
         assert!(md.contains("#913"));
         assert!(md.contains("#914"));
+
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}

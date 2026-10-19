@@ -388,12 +388,19 @@ impl VoicecraftWaylandAccessibilityVoiceControlPrEngine {
         let intent = if lower.contains("open terminal") || lower.contains("launch terminal") {
             WaylandVoiceIntent::LaunchApp(String::from("ghostty"))
         } else if lower.contains("open browser") {
+ {
+ {
             WaylandVoiceIntent::LaunchApp(String::from("browser"))
         } else if lower.contains("close") || lower.contains("exit window") {
+ {
+ {
             WaylandVoiceIntent::CloseWindow
         } else if lower.contains("volume up") {
+ {
+ {
             WaylandVoiceIntent::AdjustVolume(80)
         } else {
+ {
             WaylandVoiceIntent::Unknown(String::from(spoken_text))
         };
 

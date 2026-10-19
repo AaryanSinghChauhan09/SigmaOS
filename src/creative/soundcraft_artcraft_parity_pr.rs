@@ -216,11 +216,15 @@ impl SoundcraftSpectralSynthesisGranularSamplerPrEngine {
             if time_sec < attack {
                 time_sec / attack
             } else if time_sec < (attack + decay) {
+ {
+ {
                 1.0 - (1.0 - sustain) * ((time_sec - attack) / decay)
             } else {
+ {
                 sustain
             }
         } else {
+ {
             sustain * (1.0 - (time_sec / release).min(1.0))
         }
     }
@@ -439,6 +443,7 @@ impl SoundcraftMasteringEbuR128LoudnessLimiterPrEngine {
         let lufs = if mean_sq > 1e-10 {
             -0.691 + 10.0 * (mean_sq).log10()
         } else {
+ {
             -70.0
         };
 
@@ -449,6 +454,7 @@ impl SoundcraftMasteringEbuR128LoudnessLimiterPrEngine {
         let true_peak = if max_sample > 1e-10 {
             20.0 * max_sample.log10()
         } else {
+ {
             -100.0
         };
 
@@ -530,6 +536,7 @@ impl SoundcraftRealtimeCrdtCoAuthoringPrEngine {
         if let Some(&owner) = self.track_locks.get(&track_id) {
             owner == user_id
         } else {
+ {
             self.track_locks.insert(track_id, user_id);
             true
         }

@@ -174,6 +174,7 @@ impl FilmcraftColorWheelHslSecondaryGradingPrEngine {
             let sat = if max_val > 0.001 {
                 delta / max_val
             } else {
+ {
                 0.0
             };
 
@@ -182,8 +183,11 @@ impl FilmcraftColorWheelHslSecondaryGradingPrEngine {
                 if max_val == r {
                     hue = (g - b) / delta;
                 } else if max_val == g {
+ {
+ {
                     hue = 2.0 + (b - r) / delta;
                 } else {
+ {
                     hue = 4.0 + (r - g) / delta;
                 }
                 hue *= 60.0;
@@ -196,6 +200,7 @@ impl FilmcraftColorWheelHslSecondaryGradingPrEngine {
             if hue_diff <= self.hsl_hue_width && sat >= self.hsl_saturation_min {
                 mask_out[i] = 1.0;
             } else {
+ {
                 mask_out[i] = 0.0;
             }
         }
@@ -873,6 +878,7 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

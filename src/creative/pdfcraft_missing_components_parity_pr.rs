@@ -173,6 +173,7 @@ impl PdfcraftBatchExportRenderPrEngine {
         if !icc_profile.is_empty() {
             page_count
         } else {
+ {
             0
         }
     }
@@ -248,6 +249,7 @@ impl PdfcraftOcrTextRecognitionPrEngine {
         if image_bytes.is_empty() {
             (String::new(), 0.0)
         } else {
+ {
             ("Extracted OCR Text".to_string(), 0.98)
         }
     }
@@ -402,6 +404,7 @@ impl PdfcraftPageImpositionBookletPrEngine {
         if nup == 0 {
             0
         } else {
+ {
             (total_pages + nup - 1) / nup
         }
     }
@@ -525,6 +528,7 @@ impl SovereignPdfcraftMissingComponentsParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

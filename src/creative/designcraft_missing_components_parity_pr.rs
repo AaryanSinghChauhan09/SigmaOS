@@ -1007,6 +1007,7 @@ impl RgbColor {
             if s <= 0.03928 {
                 s / 12.92
             } else {
+ {
                 let base = (s + 0.055) / 1.055;
                 // Approximation of powf(2.4) using base * base * sqrt(base)
                 base * base * (1.0 + 0.4 * (base - 1.0))

@@ -94,6 +94,7 @@ impl VoicecraftNeuralPitchProsodyContourPrEngine {
             let estimated_pitch = if energy > 0.005 {
                 (120.0 + zcr * 200.0).clamp(60.0, 400.0)
             } else {
+ {
                 0.0 // Silence
             };
 
@@ -264,6 +265,7 @@ impl VoicecraftFormantShifterAcousticResonancePrEngine {
             if scaled_idx < pcm_frame.len() {
                 shifted[i] = pcm_frame[scaled_idx];
             } else {
+ {
                 shifted[i] = pcm_frame[i % pcm_frame.len()] * 0.5;
             }
         }
@@ -350,6 +352,7 @@ impl VoicecraftSubframeAudioPacketStreamerPrEngine {
         if self.write_pos >= self.read_pos {
             self.write_pos - self.read_pos
         } else {
+ {
             self.buffer_capacity - (self.read_pos - self.write_pos)
         }
     }

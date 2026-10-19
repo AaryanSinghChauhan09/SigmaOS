@@ -330,6 +330,7 @@ impl AudioReactiveVisualizerPrEngine {
             let end = if b == 4 {
                 samples.len()
             } else {
+ {
                 (b + 1) * chunk_size
             };
             let sum: f32 = samples[start..end].iter().map(|s| s.abs()).sum();
@@ -428,6 +429,7 @@ impl Spatial3DDepthCompositorPrEngine {
             if z >= near_plane && z <= far_plane {
                 composited.push(color);
             } else {
+ {
                 composited.push(0);
             }
         }
@@ -507,6 +509,7 @@ impl ArtCraftOpenFxPluginPrEngine {
         if let Some(param) = plugin.parameters.iter_mut().find(|p| p.name == param_name) {
             param.value_f32 = val;
         } else {
+ {
             plugin.parameters.push(OfxParam {
                 name: param_name.to_string(),
                 value_f32: val,
@@ -1183,6 +1186,7 @@ impl EffectcraftExpressionScriptingRiggingPrEngine {
         if driver.expression_script.contains("wiggle") {
             Ok((time_sec * 5.0).sin() * 20.0 + 1.0)
         } else {
+ {
             Ok(time_sec * 10.0)
         }
     }

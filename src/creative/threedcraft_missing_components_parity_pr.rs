@@ -92,6 +92,7 @@ impl ThreeDCraftPbrShaderEngine {
         if denom == 0.0 {
             1.0
         } else {
+ {
             num / denom
         }
     }
@@ -125,6 +126,7 @@ impl ThreeDCraftPbrShaderEngine {
         let h_norm = if h_len > 0.0 {
             [h[0] / h_len, h[1] / h_len, h[2] / h_len]
         } else {
+ {
             [0.0, 1.0, 0.0]
         };
 
@@ -228,6 +230,7 @@ impl Aabb3D {
             let inv_d = if ray.direction[i] != 0.0 {
                 1.0 / ray.direction[i]
             } else {
+ {
                 1e30
             };
             let mut t0 = (self.min[i] - ray.origin[i]) * inv_d;
@@ -316,6 +319,7 @@ impl ThreeDCraftBvhRayTracerEngine {
         if root.bounding_box.intersect_ray(ray) {
             root.triangle_indices.first().copied()
         } else {
+ {
             None
         }
     }
@@ -629,6 +633,7 @@ impl ThreeDCraftPrGatewayEngine {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

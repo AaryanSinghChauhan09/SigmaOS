@@ -537,6 +537,7 @@ impl EffectcraftCleanPlateWireRemovalPrEngine {
                 clean_frame[px + 2] = frame_sequence[0][px + 2];
                 clean_frame[px + 3] = 255;
             } else {
+ {
                 clean_frame[px] = frame_sequence[0][px];
                 clean_frame[px + 1] = frame_sequence[0][px + 1];
                 clean_frame[px + 2] = frame_sequence[0][px + 2];

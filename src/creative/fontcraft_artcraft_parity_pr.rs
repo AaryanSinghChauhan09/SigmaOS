@@ -140,6 +140,8 @@ impl FontcraftComplexScriptShapingLayoutPrEngine {
                     idx += 2;
                     continue;
                 } else if ch == 'f' && next_ch == 'l' {
+ {
+ {
                     glyphs.push(PositionedGlyph {
                         glyph_index: 0xFB02,
                         unicode_codepoint: 0xFB02,
@@ -358,6 +360,7 @@ impl FontcraftVariableFontTupleDesignSpacePrEngine {
                 .insert(String::from(axis_tag), clamped);
             Ok(())
         } else {
+ {
             Err("Variable font axis tag not found")
         }
     }
@@ -371,11 +374,15 @@ impl FontcraftVariableFontTupleDesignSpacePrEngine {
             if user_val < axis.default_value {
                 (user_val - axis.default_value) / (axis.default_value - axis.min_value)
             } else if user_val > axis.default_value {
+ {
+ {
                 (user_val - axis.default_value) / (axis.max_value - axis.default_value)
             } else {
+ {
                 0.0
             }
         } else {
+ {
             0.0
         }
     }
@@ -523,6 +530,7 @@ impl FontcraftColorEmojiVectorCompositingPrEngine {
             }
             Some(resolved)
         } else {
+ {
             None
         }
     }
@@ -791,6 +799,7 @@ impl FontcraftSdfTextRenderingPipelinePrEngine {
                 if distance >= 0.4 && distance <= 0.6 {
                     1.0
                 } else {
+ {
                     0.0
                 }
             }
@@ -900,6 +909,7 @@ impl FontcraftMasterTypographyThemeCascadePrEngine {
         if requested == "default" || requested.is_empty() {
             self.primary_font_family.clone()
         } else {
+ {
             requested.to_string()
         }
     }
@@ -1040,6 +1050,7 @@ impl SovereignFontcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

@@ -306,6 +306,7 @@ impl GridcraftPivotTableCubeAggregationPrEngine {
                     if values.is_empty() {
                         0.0
                     } else {
+ {
                         values.iter().sum::<f64>() / (values.len() as f64)
                     }
                 }
@@ -391,6 +392,7 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if let Ok(val) = value_str.parse::<f64>() {
                     val >= min && val <= max
                 } else {
+ {
                     false
                 }
             }
@@ -409,6 +411,7 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if value > thresh {
                     Some(color)
                 } else {
+ {
                     None
                 }
             }
@@ -416,6 +419,7 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if value < thresh {
                     Some(color)
                 } else {
+ {
                     None
                 }
             }
@@ -426,6 +430,7 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if value > 50.0 {
                     Some(max_color)
                 } else {
+ {
                     Some(min_color)
                 }
             }
@@ -654,6 +659,7 @@ impl GridcraftFinancialGoalSeekMonteCarloPrEngine {
         let std_dev = if runs > 1 {
             (variance_sum / ((runs - 1) as f64)).sqrt()
         } else {
+ {
             0.0
         };
 
@@ -733,6 +739,7 @@ impl GridcraftRealtimeCrdtCoAuthoringPrEngine {
                 if delta.lamport_ts > existing.lamport_ts {
                     replace_idx = Some(i);
                 } else {
+ {
                     return false; // Earlier timestamp ignored
                 }
                 break;
@@ -742,6 +749,7 @@ impl GridcraftRealtimeCrdtCoAuthoringPrEngine {
         if let Some(idx) = replace_idx {
             self.delta_log[idx] = delta;
         } else {
+ {
             self.delta_log.push(delta);
         }
         true
@@ -842,8 +850,11 @@ impl GridcraftMacroScriptingUdfPrEngine {
         if udf.name == "DOUBLE" {
             Some(args[0] * 2.0)
         } else if udf.name == "MULTIPLY_ADD" {
+ {
+ {
             Some(args[0] * args[1] + args.get(2).copied().unwrap_or(0.0))
         } else {
+ {
             Some(args.iter().sum())
         }
     }

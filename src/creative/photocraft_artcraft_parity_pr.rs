@@ -108,6 +108,7 @@ impl PhotocraftRawProcessingPrEngine {
         let exposure_factor = if self.active_params.exposure_ev == 0.0 {
             1.0f32
         } else {
+ {
             (1.0f32 + self.active_params.exposure_ev * core::f32::consts::LN_2).max(0.1)
         };
 
@@ -191,6 +192,7 @@ impl PhotocraftAiInpaintingPrEngine {
                 let sample_pixel_idx = if i >= 1 {
                     i - 1
                 } else {
+ {
                     (i + 1).min(pixel_count.saturating_sub(1))
                 };
                 let sample_idx = sample_pixel_idx * 4;
@@ -896,6 +898,7 @@ impl SovereignPhotocraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge" || p.status.contains("Merged"))

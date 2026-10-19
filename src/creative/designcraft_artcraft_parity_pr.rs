@@ -251,6 +251,7 @@ impl DesigncraftAutoLayoutFlexboxPrEngine {
             };
             (w, h)
         } else {
+ {
             (0.0, 0.0)
         }
     }
@@ -329,9 +330,11 @@ impl DesigncraftDesignSystemTokensPrEngine {
                     other => Some(other.clone()),
                 }
             } else {
+ {
                 mode_map.values().next().cloned()
             }
         } else {
+ {
             None
         }
     }
@@ -573,6 +576,7 @@ impl DesigncraftCodeExportFrameworkPrEngine {
                 let dir = if frame.direction == FlexDirection::Row {
                     "flex-row"
                 } else {
+ {
                     "flex-col"
                 };
                 format!(
@@ -587,6 +591,7 @@ impl DesigncraftCodeExportFrameworkPrEngine {
                 let widget = if frame.direction == FlexDirection::Row {
                     "Row"
                 } else {
+ {
                     "Column"
                 };
                 format!("class {} extends StatelessWidget {{\n  @override\n  Widget build(BuildContext context) => {}(\n    children: [],\n  );\n}}", component_name, widget)
@@ -666,6 +671,7 @@ impl DesigncraftComponentVariantsPrEngine {
             v.overrides.insert(key, val);
             true
         } else {
+ {
             false
         }
     }
@@ -826,6 +832,7 @@ impl RgbColor {
             if s <= 0.03928 {
                 s / 12.92
             } else {
+ {
                 ((s + 0.055) / 1.055).powf(2.4)
             }
         };
@@ -835,6 +842,7 @@ impl RgbColor {
             if s <= 0.03928 {
                 s / 12.92
             } else {
+ {
                 let x = (s + 0.055) / 1.055;
                 x * x * x
             }

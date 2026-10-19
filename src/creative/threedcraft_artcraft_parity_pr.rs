@@ -238,6 +238,7 @@ impl ThreeDCraftOpenUsdSceneGraphPrEngine {
             prim.variant_selection = Some((set_name.to_string(), variant.to_string()));
             true
         } else {
+ {
             false
         }
     }
@@ -339,6 +340,7 @@ impl ThreeDCraftAutomaticUvUnwrappingPrEngine {
         if (var_u + var_v) > 0.0 {
             (1.0 - (var_u - var_v).abs() / (var_u + var_v)).clamp(0.85, 1.0)
         } else {
+ {
             1.0
         }
     }
@@ -404,6 +406,7 @@ impl SdfBoxCollider {
         if max_d < 0.0 {
             max_d
         } else {
+ {
             outside_dist
         }
     }
@@ -553,6 +556,7 @@ impl ThreeDCraftWayland3dSpatialCompositorPrEngine {
         {
             existing.1 = pose;
         } else {
+ {
             self.spatial_windows.push((window_id, pose));
         }
     }
@@ -681,6 +685,7 @@ impl SovereignThreeDCraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

@@ -226,6 +226,7 @@ impl FilmcraftChromaKeySpillSuppressionPrEngine {
             if g > r.saturating_add(30) && g > b.saturating_add(30) {
                 alpha_out[i] = 0; // Keyed out
             } else {
+ {
                 alpha_out[i] = 255;
         Ok(pixels_count)
     pub fn suppress_green_spill(&self, rgba_frame: &mut [u8]) -> usize {
@@ -501,6 +502,7 @@ impl SovereignFilmcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")
@@ -605,3 +607,5 @@ mod tests {
         assert_eq!(proposals.len(), 10);
         let mut suite = FilmcraftMissingComponentsParityPrSuite::new();
         assert!(suite.verify_complete_parity());
+
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}

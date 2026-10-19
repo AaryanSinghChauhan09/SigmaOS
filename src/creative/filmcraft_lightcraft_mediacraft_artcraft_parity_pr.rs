@@ -199,6 +199,7 @@ impl LightcraftToneCurveAiMaskingCatalogPrEngine {
             let boosted = if !curve_points.is_empty() {
                 normalized.powf(0.85) // High dynamic range S-curve approximation
             } else {
+ {
                 normalized
             };
             rgb_out[i] = (boosted * 255.0).clamp(0.0, 255.0) as u8;

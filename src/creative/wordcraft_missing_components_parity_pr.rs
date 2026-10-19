@@ -112,6 +112,7 @@ impl WordcraftTypographyLayoutPrEngine {
             let mid = word.len() / 2;
             vec![format!("{}-", &word[..mid]), word[mid..].to_string()]
         } else {
+ {
             vec![word.to_string()]
         }
     }
@@ -534,8 +535,11 @@ impl WordcraftLinguisticAiSpellGrammarPrEngine {
         if prompt.to_lowercase().contains("sigmaos") {
             "is a revolutionary sovereign operating system platform.".to_string()
         } else if prompt.to_lowercase().contains("wordcraft") {
+ {
+ {
             "provides professional typography and document editing.".to_string()
         } else {
+ {
             "continues with enhanced productivity and elegance.".to_string()
         }
     }
@@ -622,6 +626,8 @@ impl WordcraftRealtimeCrdtCollabPrEngine {
         if new_text.len() > old_text.len() {
             added = new_text[old_text.len()..].to_string();
         } else if old_text.len() > new_text.len() {
+ {
+ {
             removed = old_text[new_text.len()..].to_string();
         }
 
@@ -1045,6 +1051,7 @@ impl WordcraftMissingComponentsParityPrSuite {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

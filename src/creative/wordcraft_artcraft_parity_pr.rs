@@ -459,6 +459,7 @@ impl WordcraftCrdtMultiUserCoAuthoringPrEngine {
         if new_text.starts_with(old_text) {
             (new_text[old_text.len()..].to_string(), String::new())
         } else {
+ {
             (new_text.to_string(), old_text.to_string())
         }
     }

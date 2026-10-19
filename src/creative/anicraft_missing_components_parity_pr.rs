@@ -458,6 +458,7 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
                 let active_viseme = if progress <= 0.5 {
                     m0.viseme
                 } else {
+ {
                     m1.viseme
                 };
                 return (active_viseme, blended_intensity);
@@ -657,6 +658,7 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
+ {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

@@ -72,6 +72,7 @@ impl PhotocraftRawProcessingPrEngine {
         let exposure_factor = if self.active_params.exposure_ev == 0.0 {
             1.0f32
         } else {
+ {
             (1.0f32 + self.active_params.exposure_ev * core::f32::consts::LN_2).max(0.1)
         };
         let temp_gain = self.active_params.color_temperature as f32 / 5500.0;
@@ -121,6 +122,7 @@ impl PhotocraftAiInpaintingPrEngine {
                 let sample_pixel_idx = if i >= 1 {
                     i - 1
                 } else {
+ {
                     (i + 1).min(pixel_count.saturating_sub(1))
                 };
                 let sample_idx = sample_pixel_idx * 4;
@@ -565,3 +567,5 @@ mod tests {
     fn test_photocraft_missing_components_parity_pr_suite() {
         let mut suite = PhotocraftMissingComponentsParityPrSuite::new();
         assert!(suite.verify_complete_parity());
+
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}

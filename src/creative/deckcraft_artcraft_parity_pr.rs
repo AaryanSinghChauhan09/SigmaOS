@@ -129,6 +129,7 @@ impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
         let progress = if duration > 0.0 {
             (time_ms - kf0.0) as f32 / duration
         } else {
+ {
             1.0
         };
 
@@ -137,6 +138,7 @@ impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
                 if progress < 0.5 {
                     2.0 * progress * progress
                 } else {
+ {
                     -1.0 + (4.0 - 2.0 * progress) * progress
                 }
             }
@@ -328,6 +330,7 @@ impl DeckcraftLiveDataDrivenChartsPrEngine {
             series.values = new_values;
             true
         } else {
+ {
             false
         }
     }
@@ -473,6 +476,7 @@ impl DeckcraftCrdtMultiUserCoAuthoringPrEngine {
                 if delta.lamport_ts > existing.lamport_ts {
                     replace_idx = Some(i);
                 } else {
+ {
                     return false;
                 }
                 break;
@@ -482,6 +486,7 @@ impl DeckcraftCrdtMultiUserCoAuthoringPrEngine {
         if let Some(idx) = replace_idx {
             self.delta_log[idx] = delta;
         } else {
+ {
             self.delta_log.push(delta);
         }
         true
