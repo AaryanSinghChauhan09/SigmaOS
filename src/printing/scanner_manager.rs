@@ -1427,6 +1427,158 @@ impl Default for AdfUltrasonicDoubleFeedEngine {
 }
 
 // ============================================================================
+// SANE Hardware Concurrency Lock & Device Bridge Engine
+// ============================================================================
+
+/// SANE Scanner Hardware Concurrency Lock & Device Bridge Engine
+#[derive(Debug, Clone)]
+pub struct SaneHardwareLockDeviceBridgeEngine {
+    pub active_device_locks: HashMap<String, String>,
+    pub lock_timeout_seconds: u32,
+}
+
+impl SaneHardwareLockDeviceBridgeEngine {
+    pub fn new(timeout_sec: u32) -> Self {
+        Self {
+            active_device_locks: HashMap::new(),
+            lock_timeout_seconds: timeout_sec,
+        }
+    }
+
+    /// Acquire exclusive hardware lock on scanner device
+    pub fn acquire_hardware_lock(&mut self, device_name: &str, client_id: &str) -> Result<bool, String> {
+        if let Some(existing_owner) = self.active_device_locks.get(device_name) {
+            if existing_owner == client_id {
+                Ok(true)
+            } else {
+                Err(format!(
+                    "Device {} is locked by client {}",
+                    device_name, existing_owner
+                ))
+            }
+        } else {
+            self.active_device_locks
+                .insert(device_name.to_string(), client_id.to_string());
+            Ok(true)
+        }
+    }
+
+    /// Release hardware lock on scanner device
+    pub fn release_hardware_lock(&mut self, device_name: &str, client_id: &str) -> Result<bool, String> {
+        if let Some(existing_owner) = self.active_device_locks.get(device_name) {
+            if existing_owner == client_id {
+                self.active_device_locks.remove(device_name);
+                Ok(true)
+            } else {
+                Err(format!(
+                    "Client {} does not hold lock for {}",
+                    client_id, device_name
+                ))
+            }
+        } else {
+            Ok(true)
+        }
+    }
+}
+
+impl Default for SaneHardwareLockDeviceBridgeEngine {
+    fn default() -> Self {
+        Self::new(30)
+    }
+}
+
+// ============================================================================
+// SANE USB/IP Remote Scanner Bridge Engine
+// ============================================================================
+
+/// SANE USB/IP Remote Device Forwarding & URB Emulation Engine
+#[derive(Debug, Clone)]
+pub struct SaneUsbIpRemoteScannerBridgeEngine {
+    pub remote_usbip_host: String,
+    pub usb_bus_id: String,
+    pub is_connected: bool,
+}
+
+impl SaneUsbIpRemoteScannerBridgeEngine {
+    pub fn new(host: &str, bus_id: &str) -> Self {
+        Self {
+            remote_usbip_host: host.to_string(),
+            usb_bus_id: bus_id.to_string(),
+            is_connected: false,
+        }
+    }
+
+    /// Attach USB/IP remote scanner device
+    pub fn attach_usbip_device(&mut self) -> Result<String, String> {
+        self.is_connected = true;
+        Ok(format!(
+            "USB/IP device {}-{} attached from {}",
+            self.usb_bus_id, self.remote_usbip_host, self.remote_usbip_host
+        ))
+    }
+
+    /// Emulate URB (USB Request Block) packet transfer
+    pub fn submit_urb_transfer(&self, endpoint: u8, payload: &[u8]) -> Result<Vec<u8>, String> {
+        if !self.is_connected {
+            return Err("USB/IP remote device disconnected".to_string());
+        }
+
+        let mut response = Vec::from(
+            format!("%%USBIP-URB-RESP ep={:#x} len={}\n", endpoint, payload.len()).as_bytes(),
+        );
+        response.extend_from_slice(payload);
+        Ok(response)
+    }
+}
+
+impl Default for SaneUsbIpRemoteScannerBridgeEngine {
+    fn default() -> Self {
+        Self::new("192.168.1.200", "1-1.2")
+    }
+}
+
+// ============================================================================
+// AirScan / eSCL HTTP Chunked Transfer Streaming Feeder Engine
+// ============================================================================
+
+/// AirScan / eSCL HTTP Chunked Transfer Streaming Feeder Engine
+#[derive(Debug, Clone)]
+pub struct AirScanEsclStreamingFeederEngine {
+    pub chunk_size_bytes: usize,
+    pub is_streaming: bool,
+}
+
+impl AirScanEsclStreamingFeederEngine {
+    pub fn new(chunk_size: usize) -> Self {
+        Self {
+            chunk_size_bytes: chunk_size,
+            is_streaming: false,
+        }
+    }
+
+    /// Encode scan buffer page payload into HTTP Chunked Transfer Encoding format
+    pub fn encode_http_chunk(&self, page_data: &[u8]) -> Vec<u8> {
+        let mut chunked = Vec::new();
+        let chunk_hdr = format!("{:X}\r\n", page_data.len());
+        chunked.extend_from_slice(chunk_hdr.as_bytes());
+        chunked.extend_from_slice(page_data);
+        chunked.extend_from_slice(b"\r\n");
+        chunked
+    }
+
+    /// Generate terminal zero-length chunk for HTTP response completion
+    pub fn encode_terminal_chunk(&self) -> Vec<u8> {
+        b"0\r\n\r\n".to_vec()
+    }
+}
+
+impl Default for AirScanEsclStreamingFeederEngine {
+    fn default() -> Self {
+        Self::new(8192)
+    }
+}
+
+// ============================================================================
 // Sovereign Print & Scan Unified Ecosystem Orchestrator
 // ============================================================================
 
@@ -1518,6 +1670,9 @@ pub struct ScannerManager {
     pub sane_net_multiplexer: SaneNetProtocolV2MultiplexerEngine,
     pub airscan_auto_orient: DriverlessAirScanAutoOrientationEngine,
     pub adf_ultrasonic_double_feed: AdfUltrasonicDoubleFeedEngine,
+    pub sane_hardware_lock: SaneHardwareLockDeviceBridgeEngine,
+    pub sane_usbip_bridge: SaneUsbIpRemoteScannerBridgeEngine,
+    pub airscan_streaming_feeder: AirScanEsclStreamingFeederEngine,
 }
 
 impl ScannerManager {
@@ -1546,6 +1701,9 @@ impl ScannerManager {
             sane_net_multiplexer: SaneNetProtocolV2MultiplexerEngine::default(),
             airscan_auto_orient: DriverlessAirScanAutoOrientationEngine::default(),
             adf_ultrasonic_double_feed: AdfUltrasonicDoubleFeedEngine::default(),
+            sane_hardware_lock: SaneHardwareLockDeviceBridgeEngine::default(),
+            sane_usbip_bridge: SaneUsbIpRemoteScannerBridgeEngine::default(),
+            airscan_streaming_feeder: AirScanEsclStreamingFeederEngine::default(),
         };
 
         // Add default scanner
@@ -2060,5 +2218,38 @@ mod tests {
 
         let (no_double, _) = adf_us.evaluate_wave_attenuation(-12.0);
         assert!(!no_double);
+    }
+
+    #[test]
+    fn test_sane_hardware_lock_device_bridge_engine() {
+        let mut lock_engine = SaneHardwareLockDeviceBridgeEngine::new(30);
+        assert!(lock_engine.acquire_hardware_lock("epson:v39", "client-1").unwrap());
+        let err = lock_engine.acquire_hardware_lock("epson:v39", "client-2");
+        assert!(err.is_err());
+
+        assert!(lock_engine.release_hardware_lock("epson:v39", "client-1").unwrap());
+        assert!(lock_engine.acquire_hardware_lock("epson:v39", "client-2").unwrap());
+    }
+
+    #[test]
+    fn test_sane_usbip_remote_bridge_engine() {
+        let mut usbip = SaneUsbIpRemoteScannerBridgeEngine::new("192.168.1.200", "1-1.2");
+        let attach = usbip.attach_usbip_device();
+        assert!(attach.is_ok());
+
+        let urb_res = usbip.submit_urb_transfer(0x81, b"SCANNER COMMAND").unwrap();
+        assert!(urb_res.starts_with(b"%%USBIP-URB-RESP"));
+    }
+
+    #[test]
+    fn test_airscan_escl_streaming_feeder_engine() {
+        let feeder = AirScanEsclStreamingFeederEngine::new(8192);
+        let chunk = feeder.encode_http_chunk(b"SCANNER RASTER PAGE CHUNK");
+        let chunk_str = String::from_utf8_lossy(&chunk);
+        assert!(chunk_str.contains("SCANNER RASTER PAGE CHUNK"));
+        assert!(chunk_str.ends_with("\r\n"));
+
+        let terminal = feeder.encode_terminal_chunk();
+        assert_eq!(terminal, b"0\r\n\r\n");
     }
 }
