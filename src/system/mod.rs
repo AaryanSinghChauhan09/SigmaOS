@@ -99,6 +99,7 @@ pub mod sigmafirewall;
 pub mod sigmalogmanager;
 pub mod sigmacontainer;
 pub mod sigmavirtualization;
+pub mod sigmacgroup;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -505,6 +506,12 @@ pub use sigmavirtualization {
     VMResources,
     init_sigmavirtualization, get_sigmavirtualization, get_sigmavirtualization_mut,
     create_vm,
+};
+pub use sigmacgroup {
+    SigmaCgroup, Cgroup, CgroupState, CgroupController,
+    CpuControllerConfig, MemoryControllerConfig, PidsControllerConfig,
+    init_sigmacgroup, get_sigmacgroup, get_sigmacgroup_mut,
+    create_cgroup,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
