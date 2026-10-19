@@ -832,12 +832,12 @@ pub use sigmasoftwaremanager::{
 
 pub use sigmabackupmanager::{
     add_backup, get_sigmabackupmanager, get_sigmabackupmanager_mut, init_sigmabackupmanager,
-    BackupJob, BackupSchedule, BackupStatus, BackupType, CompressionType, SigmaBackupManager,
+    SigmaBackupManager,
 };
 
 pub use sigmausermanager::{
-    add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager, ShellType,
-    SigmaUserManager, UserAccount, UserGroup, UserStatus, UserType,
+    add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager,
+    SigmaUserManager,
 };
 
 pub use sigmadisplaymanager::{
