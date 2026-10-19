@@ -23,14 +23,12 @@ pub mod service_manager;
 pub mod settings_manager;
 pub mod sigma3d;
 pub mod sigmaacpi;
-pub mod sigmaacpi;
 pub mod sigmaananicy;
 pub mod sigmaani;
 pub mod sigmaarchivemanager;
 pub mod sigmaart;
 pub mod sigmaaudioconfig;
 pub mod sigmaautomation;
-pub mod sigmabackup;
 pub mod sigmabackup;
 pub mod sigmabluetooth;
 pub mod sigmacache;
@@ -41,7 +39,6 @@ pub mod sigmacodec;
 pub mod sigmacolorscheme;
 pub mod sigmaconfig;
 pub mod sigmacontainer;
-pub mod sigmacron;
 pub mod sigmacron;
 pub mod sigmacrypto;
 pub mod sigmadb;
@@ -93,7 +90,6 @@ pub mod sigmaperformancemonitor;
 pub mod sigmapkg;
 pub mod sigmaports;
 pub mod sigmapower;
-pub mod sigmapower;
 pub mod sigmaprinter;
 pub mod sigmaprocess;
 pub mod sigmaprocessmonitor;
@@ -118,7 +114,6 @@ pub mod sigmasound;
 pub mod sigmassh;
 pub mod sigmastorage;
 pub mod sigmaswap;
-pub mod sigmaswap;
 pub mod sigmasystemd;
 pub mod sigmasysteminfo;
 pub mod sigmasystemmonitor;
@@ -126,7 +121,6 @@ pub mod sigmasystemmonitor2;
 pub mod sigmataskmanager;
 pub mod sigmathemeinstaller;
 pub mod sigmatime;
-pub mod sigmatimer;
 pub mod sigmatimer;
 pub mod sigmatimeshift;
 pub mod sigmatrim;
@@ -240,10 +234,6 @@ pub use shredder::{
     ShreddingAlgorithm, ShreddingResult, ShreddingStrategy, ZeroPassShredder,
 };
 pub use sigmaacpi::{
-    add_acpi_event, get_sigmaacpi, init_sigmaacpi, register_acpi_action, AcpiAction,
-    AcpiActionType, AcpiEvent, AcpiEventType, SigmaACPI,
-};
-pub use sigmaacpi::{
     add_battery, get_sigmaacpi, get_sigmaacpi_mut, init_sigmaacpi, BatteryInfo, BatteryState,
     PowerEvent, SigmaACPI, ThermalState, ThermalZone,
 };
@@ -265,10 +255,6 @@ pub use sigmaaudioconfig::{
 };
 pub use sigmabackup::{
     create_backup, get_sigmabackup, init_sigmabackup, Backup, BackupState, BackupType, SigmaBackup,
-};
-pub use sigmabackup::{
-    get_sigmabackup, init_sigmabackup, start_backup_job, BackupJob, BackupStatus, BackupType,
-    CompressionLevel, SigmaBackup,
 };
 pub use sigmabluetooth::{
     add_adapter, get_sigmabluetooth, get_sigmabluetooth_mut, init_sigmabluetooth, AdapterState,
@@ -301,11 +287,6 @@ pub use sigmaconfig::{
 pub use sigmacontainer::{
     create_container, get_sigmacontainer, get_sigmacontainer_mut, init_sigmacontainer, Container,
     ContainerState, NetworkMode, ResourceLimits, RestartPolicy, SigmaContainer,
-};
-pub use sigmacron::{
-    add_cron_job, disable_cron_job, enable_cron_job, get_sigmacron, init_sigmacron,
-    CronField as SigmaCronField, CronJob as SigmaCronJob, CronSchedule as SigmaCronSchedule,
-    JobResult, JobStatus, SigmaCron,
 };
 pub use sigmacron::{
     create_job, get_sigmacron, get_sigmacron_mut, init_sigmacron, CronSpec, JobStatus,
@@ -474,11 +455,6 @@ pub use sigmapower::{
     get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerProfile, PowerSettings,
     SigmaPower,
 };
-pub use sigmapower::{
-    get_sigmapower, init_sigmapower, set_power_profile, shutdown_system, suspend_system,
-    BatteryInfo as SigmaBatteryInfo, BatteryStatus as SigmaBatteryStatus,
-    PowerProfile as SigmaPowerProfile, PowerState, PowerStats, SigmaPower,
-};
 pub use sigmaprinter::{
     add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState, PrintJob,
     Printer, PrinterState, SigmaPrinter,
@@ -553,10 +529,6 @@ pub use sigmastorage::{
     VolumeState,
 };
 pub use sigmaswap::{
-    activate_swap_space, get_sigmaswap, init_sigmaswap, SigmaSwap, SwapPriority, SwapSpace,
-    SwapState,
-};
-pub use sigmaswap::{
     add_swap, get_sigmaswap, get_sigmaswap_mut, init_sigmaswap, SigmaSwap, SwapEntry, SwapState,
     SwapType,
 };
@@ -571,18 +543,14 @@ pub use sigmathemeinstaller::{
     add_theme, get_sigmathemeinstaller, init_sigmathemeinstaller, install_theme,
     SigmaThemeInstaller, Theme, ThemeState, ThemeType,
 };
-pub use sigmathernal::{
-    get_sigmathernal, init_sigmathernal, set_thermal_policy, update_temperature, CoolingDevice,
-    CoolingDeviceType, SigmaThermal, ThermalPolicy, ThermalZone, ThermalZoneType, TripPointType,
-};
 pub use sigmatime::{
     add_ntp_server, get_current_time, get_sigmatime, init_sigmatime, init_sigmatime_default,
     sync_time, NtpServer as SigmaNtpServer, SigmaTime, SyncStats, SyncStatus, TimeConfig,
     TimeSource,
 };
 pub use sigmatimer::{
-    add_timer_unit, disable_timer_unit, enable_timer_unit, get_sigmatimer, init_sigmatimer,
-    SigmaTimer, TimerAccuracy, TimerStatus, TimerUnit, TriggerType,
+    add_timer, get_sigmatimer, get_sigmatimer_mut, init_sigmatimer, Alarm, SigmaTimer, Timer,
+    TimerState,
 };
 pub use sigmatimeshift::{
     create_timeshift_snapshot, get_sigmatimeshift, init_sigmatimeshift, restore_timeshift_snapshot,
@@ -734,9 +702,9 @@ pub use state::{
     get_system_config, get_system_config_mut, init_system_config, DeclarativeStateGraph,
     StateError, StateNode, StateValue, SystemConfiguration,
 };
-pub use syslog::{LogAction, LogEntry, LogFacility, LogLevel, LogRule, SyslogError, SyslogManager};
+pub use syslog::{LogAction, LogEntry as SyslogEntry, LogFacility, LogLevel as SyslogLogLevel, LogRule, SyslogError, SyslogManager};
 pub use system_manager::{
-    CpuInfo, DiskInfo, MemoryInfo, NetworkInfo, SystemHealth, SystemInfo, SystemManager,
+    CpuInfo, DiskInfo, MemoryInfo as SystemManagerMemoryInfo, NetworkInfo, SystemHealth, SystemInfo as SystemManagerSystemInfo, SystemManager,
     SystemSummary,
 };
 pub use system_monitor::{
@@ -804,12 +772,12 @@ pub use mint_tools::{
     UpdateType as MintUpdateType,
 };
 pub use network_manager::{
-    get_network_manager, init_network_manager, Connection, ConnectionState, ConnectionType,
+    get_network_manager, init_network_manager, Connection, ConnectionState, ConnectionType as NetworkManagerConnectionType,
     DNSServer, IPAddress, IPMethod, NetworkDevice, NetworkManager, WiFiSecurity,
 };
 pub use system_monitor::{
     get_system_monitor as get_new_system_monitor, init_system_monitor as init_new_system_monitor,
     DiskInfo as SystemMonitorDiskInfo, MemoryInfo as SystemMonitorMemoryInfo,
-    NetworkInterface as SystemMonitorNetworkInterface, Process,
+    NetworkInterface as SystemMonitorNetworkInterface, Process as SystemMonitorProcess,
     ProcessState as SystemMonitorProcessState, SystemMonitor as NewSystemMonitor,
 };
