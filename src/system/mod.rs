@@ -117,6 +117,7 @@ pub mod sigmamicrophone;
 pub mod sigmadiskmanager;
 pub mod sigmadiskusage;
 pub mod sigmataskmanager;
+pub mod sigmaprocessmonitor;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -624,6 +625,11 @@ pub use sigmataskmanager {
     SigmaTaskManager, Task, TaskState, TaskPriority,
     init_sigmataskmanager, get_sigmataskmanager, get_sigmataskmanager_mut,
     add_task,
+};
+
+pub use sigmaprocessmonitor {
+    SigmaProcessMonitor, Process, ProcessState,
+    init_sigmaprocessmonitor, get_sigmaprocessmonitor, get_sigmaprocessmonitor_mut,
 };
 
 pub use sigmaupdate::{
