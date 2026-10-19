@@ -105,6 +105,7 @@ pub mod sigmacron;
 pub mod sigmasystemd;
 pub mod sigmaswap;
 pub mod sigmahibernation;
+pub mod sigmabluetooth;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -544,6 +545,12 @@ pub use sigmahibernation {
     HibernationState,
     init_sigmahibernation, get_sigmahibernation, get_sigmahibernation_mut,
     create_image,
+};
+pub use sigmabluetooth {
+    SigmaBluetooth, BluetoothAdapter, BluetoothDevice, AdapterState,
+    DeviceState, DeviceType,
+    init_sigmabluetooth, get_sigmabluetooth, get_sigmabluetooth_mut,
+    add_adapter,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
