@@ -31,6 +31,7 @@
 - [Memory Management Component Guide](./Memory-Management-Component-Guide.md) &ndash; Paging, slab allocator, NUMA memory tiers, and page cache.
 - [Virtual Memory Manager Component Guide](./Virtual-Memory-Manager-Component-Guide.md) &ndash; Demand paging, Copy-on-Write fork, ASLR, and mmap sealing.
 - [Concurrency & Deadlocks Component Guide](./Concurrency-And-Deadlocks-Component-Guide.md) &ndash; Hierarchical spinlocks, witness cycle detection, and lockless RCU.
+- [Process Synchronization Master Architecture & Roadmap](./PROCESS_SYNCHRONIZATION_PLAN.md) &ndash; Integrated process synchronization layers, core design rules, 17-PR roadmap, and completion gates.
 - [Syscall Interface Component Guide](./Syscall-Interface-Component-Guide.md) &ndash; Fast syscall entry dispatch, vDSO time page, and seccomp filters.
 - [Tty Management Component Guide](./Tty-Management-Component-Guide.md) &ndash; Terminal line disciplines, PTY /dev/ptmx multiplexing, and virtual consoles.
 - [PCI Express Bus Enumeration Component Guide](./Pci-Express-Bus-Enumeration-Component-Guide.md) &ndash; PCIe root complex enumeration, MSI/MSI-X, and AER error logging.
