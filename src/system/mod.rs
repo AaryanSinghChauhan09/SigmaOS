@@ -463,7 +463,7 @@ pub use sigmanfs::{
     NFSExportAccess, NFSMount, NFSVersion, RootSquashPolicy, SigmaNFS,
 };
 pub use sigmanic::{
-    bring_up_interface, get_sigmanic, init_sigmanic, InterfaceState, NetworkInterface, SigmaNIC,
+    bring_up_interface, get_sigmanic, init_sigmanic, SigmaNIC,
 };
 pub use sigmanotifyenhanced::{
     get_sigmanotifyenhanced, init_sigmanotifyenhanced, post_notification, ActionType, Notification,
@@ -490,7 +490,7 @@ pub use sigmaphoto::{
     ImageFormat, Photo, PhotoAdjustment, PhotoAlbum, PhotoFilter, SigmaPhoto,
 };
 pub use sigmapower::{
-    get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerProfile, PowerSettings,
+    get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerSettings,
     SigmaPower,
 };
 pub use sigmaprint2::{
@@ -498,7 +498,7 @@ pub use sigmaprint2::{
     PrintJob, PrintOptions, PrintOrientation, PrintQuality, SigmaPrint,
 };
 pub use sigmaprinter::{
-    add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState, PrintJob,
+    add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState,
     Printer, PrinterState, SigmaPrinter,
 };
 pub use sigmaprocess::{
@@ -556,7 +556,7 @@ pub use sigmasnapshot::{
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
-    add_device, get_sigmasound, get_sigmasound_mut, init_sigmasound,
+    get_sigmasound, get_sigmasound_mut, init_sigmasound,
     AudioDeviceState, SigmaSound,
 };
 pub use sigmassh::{
@@ -622,7 +622,7 @@ pub use sigmawallpaper::{
     SigmaWallpaper, TransitionType, Wallpaper,
 };
 pub use sigmaword::{
-    add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document,
+    get_sigmaword, get_sigmaword_mut, init_sigmaword, Document,
     Paragraph, SigmaWord, TextAlignment,
 };
 pub use signamespaces::{
