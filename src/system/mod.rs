@@ -494,7 +494,7 @@ pub use sigmapower::{
     SigmaPower,
 };
 pub use sigmaprint2::{
-    add_print_job, complete_job, fail_job, get_sigmaprint, get_sigmaprint_mut, init_sigmaprint,
+    add_print_job, get_sigmaprint, get_sigmaprint_mut, init_sigmaprint,
     ColorMode, PaperSize, PrintJob, PrintOptions, PrintOrientation, PrintQuality, SigmaPrint,
 };
 pub use sigmaprinter::{
@@ -556,7 +556,7 @@ pub use sigmasnapshot::{
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
-    add_audio_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
+    add_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
     AudioDeviceType, SigmaSound,
 };
 pub use sigmassh::{
@@ -623,7 +623,7 @@ pub use sigmawallpaper::{
     SigmaWallpaper, TransitionType, Wallpaper,
 };
 pub use sigmaword::{
-    add_word_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
+    add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
     SigmaWord, TextAlignment,
 };
 pub use signamespaces::{
