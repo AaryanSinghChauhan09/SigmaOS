@@ -63,6 +63,7 @@ pub mod sigmaproxy;
 pub mod sigmaquota;
 pub mod sigmaraid;
 pub mod sigmarecovery;
+pub mod sigmarepo;
 pub mod sigmaresource;
 pub mod sigmascheduledfsck;
 pub mod sigmaservice;
@@ -72,10 +73,12 @@ pub mod sigmasnapshot;
 pub mod sigmassh;
 pub mod sigmastorage;
 pub mod sigmaswap;
-pub mod sigmathernal;
+pub mod sigmatest;
+pub mod sigmathermal;
 pub mod sigmatime;
 pub mod sigmatimer;
 pub mod sigmatrim;
+pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -390,6 +393,10 @@ pub use sigmatimer::{
 pub use sigmatrim::{
     get_sigmatrim, init_sigmatrim, is_trim_supported, trim_mount, DiscardRange, DiscardType,
     SigmaTRIM, TrimDevice, TrimMode, TrimResult, TrimStatus,
+};
+pub use sigmausbwriter::{
+    SigmaUSBWriter, USBDevice, WriteJob, WriteState, ImageFormat,
+    init_sigmausbwriter, get_sigmausbwriter, create_write_job,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
