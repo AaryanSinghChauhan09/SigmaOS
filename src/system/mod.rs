@@ -79,6 +79,7 @@ pub mod sigmatime;
 pub mod sigmatimer;
 pub mod sigmatrim;
 pub mod sigmathemeinstaller;
+pub mod sigmainstaller;
 pub mod sigmausbwriter;
 pub mod sigmaupdate;
 pub mod system_manager;
@@ -402,6 +403,10 @@ pub use sigmausbwriter::{
 pub use sigmathemeinstaller::{
     SigmaThemeInstaller, Theme, ThemeType, ThemeState,
     init_sigmathemeinstaller, get_sigmathemeinstaller, add_theme, install_theme,
+};
+pub use sigmainstaller::{
+    SigmaInstaller, InstallConfig, InstallState, PartitioningMode, FilesystemType,
+    init_sigmainstaller, get_sigmainstaller, create_install_config,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
