@@ -32,7 +32,6 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Wordcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

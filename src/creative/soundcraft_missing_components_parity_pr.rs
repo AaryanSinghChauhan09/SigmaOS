@@ -28,7 +28,6 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Structured PR proposal manifest for missing Soundcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]

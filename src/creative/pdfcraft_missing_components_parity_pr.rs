@@ -31,7 +31,6 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Pdfcraft PR Category Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

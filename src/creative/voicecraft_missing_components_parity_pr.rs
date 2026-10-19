@@ -28,7 +28,6 @@ use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 #[cfg(not(test))]
 use super::voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};

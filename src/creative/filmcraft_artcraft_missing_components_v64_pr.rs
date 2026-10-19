@@ -26,7 +26,6 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Filmcraft ArtCraft Missing Components V64.
 #[derive(Debug, Clone, PartialEq, Eq)]
