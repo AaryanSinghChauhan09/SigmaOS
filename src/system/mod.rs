@@ -123,6 +123,7 @@ pub mod sigmasystemd;
 pub mod sigmasysteminfo;
 pub mod sigmasystemmonitor;
 pub mod sigmasystemmonitor2;
+pub mod sigmasystemtools;
 pub mod sigmataskmanager;
 pub mod sigmathemeinstaller;
 pub mod sigmatime;
@@ -829,4 +830,9 @@ pub use system_monitor::{
     DiskInfo as SystemMonitorDiskInfo, MemoryInfo as SystemMonitorMemoryInfo,
     NetworkInterface as SystemMonitorNetworkInterface, Process as SystemMonitorProcess,
     ProcessState as SystemMonitorProcessState, SystemMonitor as NewSystemMonitor,
+};
+
+pub use sigmasystemtools::{
+    CleanupAction, MaintenanceTask, SystemTool, ToolCategory, SigmaSystemTools,
+    add_tool, get_sigmasystemtools, get_sigmasystemtools_mut, init_sigmasystemtools,
 };
