@@ -23,6 +23,7 @@ pub mod sigma_office;
 pub mod sigmadev;
 pub mod sovereign_application_replacements_pr_suite;
 pub mod sovereign_application_replacements_v2_pr_suite;
+pub mod sovereign_application_replacements_v3_pr_suite;
 pub mod sovereign_apps;
 pub mod subtitle_editor;
 pub mod system_settings;
@@ -71,6 +72,17 @@ pub use sovereign_application_replacements_v2_pr_suite::{
     SovereignP2pTorrentClientV2PrEngine, SovereignPasswordVaultV2PrEngine,
     SovereignRasterGraphicsV2PrEngine, SovereignSystemMonitorV2PrEngine,
     SovereignTerminalMultiplexerV2PrEngine, SovereignTextEditorV2PrEngine,
+};
+pub use sovereign_application_replacements_v3_pr_suite::{
+    BrowserV3SecurityFeature, SovereignAppV3PrProposalManifest,
+    SovereignApplicationReplacementsV3PrGateway, SovereignArchiveCompressorV3PrEngine,
+    SovereignBrowserEngineV3PrEngine, SovereignDiskPartitionManagerV3PrEngine,
+    SovereignDocumentViewerV3PrEngine, SovereignEmailClientV3PrEngine,
+    SovereignFileManagerV3PrEngine, SovereignMatrixIrcMessengerV3PrEngine,
+    SovereignMediaPlayerStudioV3PrEngine, SovereignOfficeSuiteV3PrEngine,
+    SovereignP2pTorrentClientV3PrEngine, SovereignPasswordVaultV3PrEngine,
+    SovereignRasterGraphicsV3PrEngine, SovereignSystemMonitorV3PrEngine,
+    SovereignTerminalMultiplexerV3PrEngine, SovereignTextEditorV3PrEngine,
 };
 pub use sovereign_apps::{
     ProductivityTask, SigmaOfficeDocument, SigmaTasksBoard, SigmaVaultContainer, TaskPriority,
