@@ -86,6 +86,7 @@ pub mod sigmamount;
 pub mod sigmamq;
 pub mod sigmananny;
 pub mod sigmanetwork;
+pub mod sigmanetworkmanager2;
 pub mod sigmanfs;
 pub mod sigmanic;
 pub mod sigmanotifyenhanced;
@@ -907,4 +908,9 @@ pub use sigmapackagemanager2::{
 pub use sigmafilesystemmanager::{
     Filesystem, FilesystemType, MountPoint, MountStatus, SigmaFileSystemManager,
     add_filesystem, get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut, init_sigmafilesystemmanager,
+};
+
+pub use sigmanetworkmanager2::{
+    ConnectionState, ConnectionType, DNSServer, NetworkInterface, NetworkProfile, SigmaNetworkManager,
+    add_interface, get_sigmanetworkmanager, get_sigmanetworkmanager_mut, init_sigmanetworkmanager,
 };
