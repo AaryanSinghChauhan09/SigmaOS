@@ -462,12 +462,16 @@ pub use userland::shell::{
 };
 pub use userland::system_utilities::*;
 pub use virtualization::{
-    Container, FirecrackerCloudHypervisorV61Engine, FreeBsdJailsZonesV61Engine,
-    GvisorKataAppleHvV61Engine, KubernetesK3sRancherV61Engine, KubernetesPod, KvmQemuV61Engine,
-    LibvirtDomainV61Engine, LxcLxdNspawnV61Engine, OciDockerPodmanRuncV61Engine, ResourcePool,
-    SovereignVirtualizationAndContainersParityV61Gateway, VirtualBoxBhyveVmmV61Engine,
-    VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
-    XenHypervisorV61Engine,
+    Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
+    FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine, GvisorKataAppleHvV61Engine,
+    GvisorKataAppleHvV63Engine, KubernetesK3sRancherV61Engine, KubernetesK3sRancherV63Engine,
+    KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine, LibvirtDomainV61Engine,
+    LibvirtDomainV63Engine, LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine,
+    OciDockerPodmanRuncV61Engine, OciDockerPodmanRuncV63Engine, ResourcePool,
+    SovereignVirtualizationAndContainersParityV61Gateway,
+    SovereignVirtualizationAndContainersParityV63Gateway, VirtualBoxBhyveVmmV61Engine,
+    VirtualBoxBhyveVmmV63Engine, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
+    VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
