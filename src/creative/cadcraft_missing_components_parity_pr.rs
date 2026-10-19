@@ -26,7 +26,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
