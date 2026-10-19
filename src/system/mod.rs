@@ -109,6 +109,7 @@ pub mod sigmabluetooth;
 pub mod sigmaacpi;
 pub mod sigmapower;
 pub mod sigmasound;
+pub mod sigmanetwork;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -569,6 +570,12 @@ pub use sigmasound {
     SigmaSound, AudioDevice, AudioDeviceType, AudioDeviceState,
     init_sigmasound, get_sigmasound, get_sigmasound_mut,
     add_device,
+};
+pub use sigmanetwork {
+    SigmaNetwork, NetworkInterface, NetworkConnection, InterfaceState,
+    ConnectionType,
+    init_sigmanetwork, get_sigmanetwork, get_sigmanetwork_mut,
+    add_interface,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
