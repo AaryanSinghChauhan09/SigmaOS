@@ -1,23 +1,32 @@
 ## Summary
 
-<!-- What secondary-memory behavior changed and why? -->
+<!-- What I/O-management behavior changed and why? -->
 
-## Storage component
+## I/O component
 
+- [ ] I/O policy
 - [ ] Block device manager
 - [ ] virtio / NVMe / virtio
-- [ ] Block cache manager
-- [ ] Filesystem manager
-- [ ] Mount / unmount
-- [ ] Cache
-- [ ] Filesystem
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] Submit / complete
+- [ ] Callback
+- [ ] Interrupt
+- [ ] DMA
+- [ ] Buffer
 - [ ] Recovery
 - [ ] procfs / diagnostics
 - [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Component
+## Kernel component
+
+- [ ] Kernel component
+
+## Shell component
 
 - [ ] Shell component
 
@@ -27,14 +36,14 @@
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly storage audit
+- [ ] Biweekly I/O audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
 ## Reference behavior (Upstream study)
 
-<!-- Required for lifecycle, ABI, or storage changes -->
+<!-- Required for lifecycle, ABI, or I/O changes -->
 
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
@@ -47,10 +56,8 @@
 -
 -
 
-## Storage safety review
+## I/O safety review
 
-- [ ] Storage safety review
-- [ ] Kernel safety review
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
 - [ ] Orphans are adopted
@@ -64,8 +71,15 @@
 
 ## Kernel safety review
 
-- [ ] Shell safety review
 - [ ] Lock ordering documented
+
+## Shell safety review
+
+- [ ] Interactive shell safety reviewed
+
+## Reviewer checklist
+
+- [ ] Safety and isolation verified
 
 ## Evidence
 
@@ -76,15 +90,15 @@
 - [ ] New/updated unit tests
 - [ ] Integration tests
 - [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Storage benchmark, if performance-affecting
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] I/O benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Storage documentation
+- [ ] I/O documentation
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback (Safety and rollback)
