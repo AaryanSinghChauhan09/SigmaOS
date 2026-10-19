@@ -1913,6 +1913,13 @@ if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_deckcraft_missing
 fi
 
+if [ -f "src/creative/anicraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign AniCraft to ArtCraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/anicraft_artcraft_parity_pr.rs --edition=2021 -o build/test_anicraft_artcraft_parity
+    ./build/test_anicraft_artcraft_parity
+fi
+
 if [ -f "src/creative/deckcraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign Deckcraft to Artcraft Parity PR Engine test suite..."
     mkdir -p build
