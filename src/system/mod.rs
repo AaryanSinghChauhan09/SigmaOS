@@ -98,6 +98,7 @@ pub mod sigmapdf;
 pub mod sigmaphoto;
 pub mod sigmaports;
 pub mod sigmapower;
+pub mod sigmapowermanager;
 pub mod sigmaprinter;
 pub mod sigmaprint2;
 pub mod sigmaprocess;
@@ -883,4 +884,9 @@ pub use sigmathememanager::{
 pub use sigmanotificationmanager::{
     Notification, NotificationCategory, NotificationRule, NotificationUrgency, SigmaNotificationManager,
     add_notification, get_sigmanotificationmanager, get_sigmanotificationmanager_mut, init_sigmanotificationmanager,
+};
+
+pub use sigmapowermanager::{
+    BatteryInfo, BatteryStatus, PowerMode, PowerProfile, SigmaPowerManager,
+    add_profile, get_sigmapowermanager, get_sigmapowermanager_mut, init_sigmapowermanager,
 };
