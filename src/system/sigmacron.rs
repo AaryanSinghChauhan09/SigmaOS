@@ -1,440 +1,317 @@
-// SPDX-License-Identifier: MIT
-// Copyright (c) 2026 SigmaOS Contributors
-
-//! SigmaCron - Job Scheduler
+//! SigmaCron - Job Scheduling System
 //!
-//! SigmaCron provides job scheduling for SigmaOS, inspired by cron and systemd-timers.
+//! Provides comprehensive job scheduling inspired by Linux cron and systemd timers.
+//! Supports time-based scheduling, recurring jobs, and job execution management.
 
 #![no_std]
+
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::fmt;
+use alloc::{
+    collections::BTreeMap,
+    string::{String, ToString},
+    vec::Vec,
+};
 
-/// Cron field types
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CronField {
-    /// Minute (0-59)
-    Minute,
-    /// Hour (0-23)
-    Hour,
-    /// Day of month (1-31)
-    DayOfMonth,
-    /// Month (1-12)
-    Month,
-    /// Day of week (0-6, 0=Sunday)
-    DayOfWeek,
-}
-
-impl fmt::Display for CronField {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            CronField::Minute => write!(f, "minute"),
-            CronField::Hour => write!(f, "hour"),
-            CronField::DayOfMonth => write!(f, "day_of_month"),
-            CronField::Month => write!(f, "month"),
-            CronField::DayOfWeek => write!(f, "day_of_week"),
-        }
-    }
-}
-
-/// Cron job status
+/// Job execution status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum JobStatus {
-    /// Job is enabled
-    Enabled,
-    /// Job is disabled
-    Disabled,
-    /// Job is running
+    Pending,
     Running,
-    /// Job failed
+    Completed,
     Failed,
-}
-
-impl fmt::Display for JobStatus {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            JobStatus::Enabled => write!(f, "enabled"),
-            JobStatus::Disabled => write!(f, "disabled"),
-            JobStatus::Running => write!(f, "running"),
-            JobStatus::Failed => write!(f, "failed"),
-        }
-    }
-}
-
-/// Cron job execution result
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum JobResult {
-    /// Job succeeded
-    Success,
-    /// Job failed
-    Failure,
-    /// Job timed out
-    Timeout,
-    /// Job was skipped
     Skipped,
+    Unknown,
 }
 
-impl fmt::Display for JobResult {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            JobResult::Success => write!(f, "success"),
-            JobResult::Failure => write!(f, "failure"),
-            JobResult::Timeout => write!(f, "timeout"),
-            JobResult::Skipped => write!(f, "skipped"),
+/// Job schedule type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ScheduleType {
+    Once,
+    minutely,
+    Hourly,
+    Daily,
+    Weekly,
+    Monthly,
+    Yearly,
+    CronExpression,
+    Unknown,
+}
+
+/// Cron time specification
+#[derive(Debug, Clone)]
+pub struct CronSpec {
+    pub minute: Option<String>,
+    pub hour: Option<String>,
+    pub day_of_month: Option<String>,
+    pub month: Option<String>,
+    pub day_of_week: Option<String>,
+}
+
+impl CronSpec {
+    pub fn new() -> Self {
+        Self {
+            minute: None,
+            hour: None,
+            day_of_month: None,
+            month: None,
+            day_of_week: None,
         }
+    }
+
+    pub fn with_minute(mut self, minute: String) -> Self {
+        self.minute = Some(minute);
+        self
+    }
+
+    pub fn with_hour(mut self, hour: String) -> Self {
+        self.hour = Some(hour);
+        self
+    }
+
+    pub fn with_day_of_month(mut self, day: String) -> Self {
+        self.day_of_month = Some(day);
+        self
+    }
+
+    pub fn with_month(mut self, month: String) -> Self {
+        self.month = Some(month);
+        self
+    }
+
+    pub fn with_day_of_week(mut self, day: String) -> Self {
+        self.day_of_week = Some(day);
+        self
     }
 }
 
-/// Cron job
-#[derive(Debug, Clone)]
-pub struct CronJob {
-    /// Job name
-    pub name: String,
-    /// Command to execute
-    pub command: String,
-    /// Arguments
-    pub args: Vec<String>,
-    /// Working directory
-    pub working_dir: String,
-    /// Environment variables
-    pub env: BTreeMap<String, String>,
-    /// Minute field (0-59, *)
-    pub minute: String,
-    /// Hour field (0-23, *)
-    pub hour: String,
-    /// Day of month field (1-31, *)
-    pub day_of_month: String,
-    /// Month field (1-12, *)
-    pub month: String,
-    /// Day of week field (0-6, *)
-    pub day_of_week: String,
-    /// Job status
-    pub status: JobStatus,
-    /// Enabled flag
-    pub enabled: bool,
-    /// Timeout in seconds (0 = no timeout)
-    pub timeout: u32,
-    /// Run as user
-    pub user: String,
-    /// Last run timestamp
-    pub last_run: Option<u64>,
-    /// Next run timestamp
-    pub next_run: Option<u64>,
-    /// Run count
-    pub run_count: u32,
-    /// Success count
-    pub success_count: u32,
-    /// Failure count
-    pub failure_count: u32,
+impl Default for CronSpec {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl CronJob {
-    /// Create a new cron job
-    pub fn new(name: String, command: String) -> Self {
+/// Scheduled job
+#[derive(Debug, Clone)]
+pub struct ScheduledJob {
+    pub id: String,
+    pub name: String,
+    pub command: String,
+    pub schedule_type: ScheduleType,
+    pub cron_spec: Option<CronSpec>,
+    pub status: JobStatus,
+    pub enabled: bool,
+    pub last_run: Option<u64>,
+    pub next_run: Option<u64>,
+    pub run_count: u32,
+    pub fail_count: u32,
+    pub environment: Vec<String>,
+    pub working_directory: Option<String>,
+}
+
+impl ScheduledJob {
+    pub fn new(id: String, name: String, command: String, schedule_type: ScheduleType) -> Self {
         Self {
+            id,
             name,
             command,
-            args: Vec::new(),
-            working_dir: "/".to_string(),
-            env: BTreeMap::new(),
-            minute: "*".to_string(),
-            hour: "*".to_string(),
-            day_of_month: "*".to_string(),
-            month: "*".to_string(),
-            day_of_week: "*".to_string(),
-            status: JobStatus::Enabled,
+            schedule_type,
+            cron_spec: None,
+            status: JobStatus::Pending,
             enabled: true,
-            timeout: 0,
-            user: "root".to_string(),
             last_run: None,
             next_run: None,
             run_count: 0,
-            success_count: 0,
-            failure_count: 0,
+            fail_count: 0,
+            environment: Vec::new(),
+            working_directory: None,
         }
     }
 
-    /// Set minute field
-    pub fn with_minute(mut self, minute: String) -> Self {
-        self.minute = minute;
+    pub fn with_cron_spec(mut self, spec: CronSpec) -> Self {
+        self.cron_spec = Some(spec);
         self
     }
 
-    /// Set hour field
-    pub fn with_hour(mut self, hour: String) -> Self {
-        self.hour = hour;
+    pub fn with_environment(mut self, env: Vec<String>) -> Self {
+        self.environment = env;
         self
     }
 
-    /// Set day of month field
-    pub fn with_day_of_month(mut self, day: String) -> Self {
-        self.day_of_month = day;
+    pub fn with_working_directory(mut self, dir: String) -> Self {
+        self.working_directory = Some(dir);
         self
     }
 
-    /// Set month field
-    pub fn with_month(mut self, month: String) -> Self {
-        self.month = month;
-        self
-    }
-
-    /// Set day of week field
-    pub fn with_day_of_week(mut self, day: String) -> Self {
-        self.day_of_week = day;
-        self
-    }
-
-    /// Set working directory
-    pub fn with_working_dir(mut self, dir: String) -> Self {
-        self.working_dir = dir;
-        self
-    }
-
-    /// Set user
-    pub fn with_user(mut self, user: String) -> Self {
-        self.user = user;
-        self
-    }
-
-    /// Set timeout
-    pub fn with_timeout(mut self, timeout: u32) -> Self {
-        self.timeout = timeout;
-        self
-    }
-
-    /// Add argument
-    pub fn with_arg(mut self, arg: String) -> Self {
-        self.args.push(arg);
-        self
-    }
-
-    /// Add environment variable
-    pub fn with_env(mut self, key: String, value: String) -> Self {
-        self.env.insert(key, value);
-        self
-    }
-
-    /// Enable job
     pub fn enable(&mut self) {
         self.enabled = true;
-        self.status = JobStatus::Enabled;
     }
 
-    /// Disable job
     pub fn disable(&mut self) {
         self.enabled = false;
-        self.status = JobStatus::Disabled;
     }
 
-    /// Record job run
-    pub fn record_run(&mut self, result: JobResult, timestamp: u64) {
-        self.last_run = Some(timestamp);
+    pub fn mark_running(&mut self) {
+        self.status = JobStatus::Running;
+    }
+
+    pub fn mark_completed(&mut self) {
+        self.status = JobStatus::Completed;
         self.run_count += 1;
-
-        match result {
-            JobResult::Success => self.success_count += 1,
-            JobResult::Failure | JobResult::Timeout => self.failure_count += 1,
-            JobResult::Skipped => {}
-        }
     }
 
-    /// Get cron expression
-    pub fn cron_expression(&self) -> String {
-        format!(
-            "{} {} {} {} {}",
-            self.minute, self.hour, self.day_of_month, self.month, self.day_of_week
-        )
+    pub fn mark_failed(&mut self) {
+        self.status = JobStatus::Failed;
+        self.fail_count += 1;
+    }
+
+    pub fn mark_skipped(&mut self) {
+        self.status = JobStatus::Skipped;
     }
 }
 
-/// Cron schedule
-#[derive(Debug, Clone)]
-pub struct CronSchedule {
-    /// Minute field (0-59)
-    pub minute: String,
-    /// Hour field (0-23)
-    pub hour: String,
-    /// Day of month field (1-31)
-    pub day_of_month: String,
-    /// Month field (1-12)
-    pub month: String,
-    /// Day of week field (0-6)
-    pub day_of_week: String,
-}
-
-impl CronSchedule {
-    /// Create a new cron schedule
-    pub fn new(
-        minute: String,
-        hour: String,
-        day_of_month: String,
-        month: String,
-        day_of_week: String,
-    ) -> Self {
-        Self {
-            minute,
-            hour,
-            day_of_month,
-            month,
-            day_of_week,
-        }
-    }
-
-    /// Create from cron expression
-    pub fn from_expression(expr: &str) -> Result<Self, String> {
-        let parts: Vec<&str> = expr.split_whitespace().collect();
-        if parts.len() != 5 {
-            return Err("Invalid cron expression".to_string());
-        }
-
-        Ok(Self::new(
-            parts[0].to_string(),
-            parts[1].to_string(),
-            parts[2].to_string(),
-            parts[3].to_string(),
-            parts[4].to_string(),
-        ))
-    }
-
-    /// Get as expression
-    pub fn expression(&self) -> String {
-        format!(
-            "{} {} {} {} {}",
-            self.minute, self.hour, self.day_of_month, self.month, self.day_of_week
-        )
-    }
-}
-
-/// SigmaCron - Job Scheduler
+/// Cron manager
 pub struct SigmaCron {
-    /// Cron jobs (name -> job)
-    jobs: BTreeMap<String, CronJob>,
-    /// Running state
-    running: bool,
-    /// Current timestamp
-    current_time: u64,
+    jobs: BTreeMap<String, ScheduledJob>,
+    next_job_id: u64,
 }
 
 impl SigmaCron {
-    /// Create a new SigmaCron instance
     pub fn new() -> Self {
         Self {
             jobs: BTreeMap::new(),
-            running: false,
-            current_time: 0,
+            next_job_id: 1,
         }
     }
 
-    /// Start the cron daemon
-    pub fn start(&mut self) {
-        self.running = true;
+    pub fn create_job(
+        &mut self,
+        name: String,
+        command: String,
+        schedule_type: ScheduleType,
+    ) -> String {
+        let id = format!("job-{}", self.next_job_id);
+        self.next_job_id += 1;
+        let job = ScheduledJob::new(id.clone(), name, command, schedule_type);
+        self.jobs.insert(id.clone(), job);
+        id
     }
 
-    /// Stop the cron daemon
-    pub fn stop(&mut self) {
-        self.running = false;
+    pub fn get_job(&self, id: &str) -> Option<&ScheduledJob> {
+        self.jobs.get(id)
     }
 
-    /// Check if the daemon is running
-    pub fn is_running(&self) -> bool {
-        self.running
+    pub fn get_job_mut(&mut self, id: &str) -> Option<&mut ScheduledJob> {
+        self.jobs.get_mut(id)
     }
 
-    /// Add a cron job
-    pub fn add_job(&mut self, job: CronJob) -> Result<(), String> {
-        if self.jobs.contains_key(&job.name) {
-            return Err(format!("Job '{}' already exists", job.name));
-        }
-        self.jobs.insert(job.name.clone(), job);
-        Ok(())
-    }
-
-    /// Remove a cron job
-    pub fn remove_job(&mut self, name: &str) -> Result<(), String> {
-        if self.jobs.remove(name).is_none() {
-            return Err(format!("Job '{}' not found", name));
-        }
-        Ok(())
-    }
-
-    /// Get a cron job
-    pub fn get_job(&self, name: &str) -> Option<&CronJob> {
-        self.jobs.get(name)
-    }
-
-    /// Get a cron job (mutable)
-    pub fn get_job_mut(&mut self, name: &str) -> Option<&mut CronJob> {
-        self.jobs.get_mut(name)
-    }
-
-    /// List all jobs
-    pub fn list_jobs(&self) -> Vec<&CronJob> {
+    pub fn list_jobs(&self) -> Vec<&ScheduledJob> {
         self.jobs.values().collect()
     }
 
-    /// List enabled jobs
-    pub fn list_enabled_jobs(&self) -> Vec<&CronJob> {
+    pub fn list_jobs_by_status(&self, status: JobStatus) -> Vec<&ScheduledJob> {
+        self.jobs.values().filter(|j| j.status == status).collect()
+    }
+
+    pub fn list_enabled_jobs(&self) -> Vec<&ScheduledJob> {
         self.jobs.values().filter(|j| j.enabled).collect()
     }
 
-    /// Enable a job
-    pub fn enable_job(&mut self, name: &str) -> Result<(), String> {
-        match self.jobs.get_mut(name) {
-            Some(job) => {
-                job.enable();
-                Ok(())
-            }
-            None => Err(format!("Job '{}' not found", name)),
+    pub fn list_disabled_jobs(&self) -> Vec<&ScheduledJob> {
+        self.jobs.values().filter(|j| !j.enabled).collect()
+    }
+
+    pub fn remove_job(&mut self, id: &str) -> bool {
+        self.jobs.remove(id).is_some()
+    }
+
+    pub fn enable_job(&mut self, id: &str) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            job.enable();
+            true
+        } else {
+            false
         }
     }
 
-    /// Disable a job
-    pub fn disable_job(&mut self, name: &str) -> Result<(), String> {
-        match self.jobs.get_mut(name) {
-            Some(job) => {
-                job.disable();
-                Ok(())
-            }
-            None => Err(format!("Job '{}' not found", name)),
+    pub fn disable_job(&mut self, id: &str) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            job.disable();
+            true
+        } else {
+            false
         }
     }
 
-    /// Set current time
-    pub fn set_time(&mut self, time: u64) {
-        self.current_time = time;
+    pub fn run_job(&mut self, id: &str) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            if job.enabled {
+                job.mark_running();
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
-    /// Get current time
-    pub fn current_time(&self) -> u64 {
-        self.current_time
+    pub fn complete_job(&mut self, id: &str) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            job.mark_completed();
+            true
+        } else {
+            false
+        }
     }
 
-    /// Get job count
+    pub fn fail_job(&mut self, id: &str) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            job.mark_failed();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn skip_job(&mut self, id: &str) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            job.mark_skipped();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn set_cron_spec(&mut self, id: &str, spec: CronSpec) -> bool {
+        if let Some(job) = self.jobs.get_mut(id) {
+            job.cron_spec = Some(spec);
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn job_count(&self) -> usize {
         self.jobs.len()
     }
 
-    /// Get enabled job count
     pub fn enabled_job_count(&self) -> usize {
         self.jobs.values().filter(|j| j.enabled).count()
     }
 
-    /// Get job statistics
-    pub fn job_stats(&self) -> BTreeMap<String, String> {
-        let mut stats = BTreeMap::new();
-        stats.insert("total_jobs".to_string(), self.job_count().to_string());
-        stats.insert(
-            "enabled_jobs".to_string(),
-            self.enabled_job_count().to_string(),
-        );
-        stats.insert(
-            "disabled_jobs".to_string(),
-            (self.job_count() - self.enabled_job_count()).to_string(),
-        );
-        stats
+    pub fn running_job_count(&self) -> usize {
+        self.jobs
+            .values()
+            .filter(|j| j.status == JobStatus::Running)
+            .count()
+    }
+
+    pub fn failed_job_count(&self) -> usize {
+        self.jobs
+            .values()
+            .filter(|j| j.status == JobStatus::Failed)
+            .count()
     }
 }
 
@@ -444,46 +321,33 @@ impl Default for SigmaCron {
     }
 }
 
-/// Global SigmaCron instance (placeholder for actual global state)
 static mut SIGMACRON_INSTANCE: Option<SigmaCron> = None;
 
-/// Initialize the global SigmaCron instance
 pub fn init_sigmacron() {
     unsafe {
         SIGMACRON_INSTANCE = Some(SigmaCron::new());
     }
 }
 
-/// Get the global SigmaCron instance
-pub fn get_sigmacron() -> Option<&'static mut SigmaCron> {
-    unsafe { SIGMACRON_INSTANCE.as_mut() }
-}
-
-/// Convenience function to add a cron job
-pub fn add_cron_job(job: CronJob) -> Result<(), String> {
-    if let Some(cron) = get_sigmacron() {
-        cron.add_job(job)
-    } else {
-        Err("SigmaCron not initialized".to_string())
+pub fn get_sigmacron() -> &'static SigmaCron {
+    unsafe {
+        SIGMACRON_INSTANCE
+            .as_ref()
+            .expect("SigmaCron not initialized")
     }
 }
 
-/// Convenience function to enable a job
-pub fn enable_cron_job(name: &str) -> Result<(), String> {
-    if let Some(cron) = get_sigmacron() {
-        cron.enable_job(name)
-    } else {
-        Err("SigmaCron not initialized".to_string())
+pub fn get_sigmacron_mut() -> &'static mut SigmaCron {
+    unsafe {
+        SIGMACRON_INSTANCE
+            .as_mut()
+            .expect("SigmaCron not initialized")
     }
 }
 
-/// Convenience function to disable a job
-pub fn disable_cron_job(name: &str) -> Result<(), String> {
-    if let Some(cron) = get_sigmacron() {
-        cron.disable_job(name)
-    } else {
-        Err("SigmaCron not initialized".to_string())
-    }
+pub fn create_job(name: String, command: String, schedule_type: ScheduleType) -> String {
+    let manager = get_sigmacron_mut();
+    manager.create_job(name, command, schedule_type)
 }
 
 #[cfg(test)]
@@ -491,210 +355,230 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_cron_field_display() {
-        assert_eq!(CronField::Minute.to_string(), "minute");
-        assert_eq!(CronField::Hour.to_string(), "hour");
-    }
-
-    #[test]
-    fn test_job_status_display() {
-        assert_eq!(JobStatus::Enabled.to_string(), "enabled");
-        assert_eq!(JobStatus::Running.to_string(), "running");
-    }
-
-    #[test]
-    fn test_job_result_display() {
-        assert_eq!(JobResult::Success.to_string(), "success");
-        assert_eq!(JobResult::Failure.to_string(), "failure");
-    }
-
-    #[test]
-    fn test_cron_job() {
-        let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string())
-            .with_minute("0".to_string())
-            .with_hour("*/6".to_string())
+    fn test_cron_spec_creation() {
+        let spec = CronSpec::new()
+            .with_minute("*".to_string())
+            .with_hour("*".to_string())
             .with_day_of_month("*".to_string())
             .with_month("*".to_string())
-            .with_day_of_week("*".to_string())
-            .with_user("root".to_string())
-            .with_timeout(300);
+            .with_day_of_week("*".to_string());
 
-        assert_eq!(job.name, "test-job");
-        assert_eq!(job.command, "/bin/echo");
-        assert_eq!(job.minute, "0");
-        assert_eq!(job.hour, "*/6");
-        assert_eq!(job.user, "root");
-        assert_eq!(job.timeout, 300);
+        assert_eq!(spec.minute, Some("*".to_string()));
+        assert_eq!(spec.hour, Some("*".to_string()));
     }
 
     #[test]
-    fn test_cron_job_enable_disable() {
-        let mut job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-
+    fn test_scheduled_job_creation() {
+        let job = ScheduledJob::new(
+            "job-1".to_string(),
+            "backup".to_string(),
+            "/usr/bin/backup".to_string(),
+            ScheduleType::Daily,
+        );
+        assert_eq!(job.id, "job-1");
+        assert_eq!(job.name, "backup");
+        assert_eq!(job.command, "/usr/bin/backup");
+        assert_eq!(job.schedule_type, ScheduleType::Daily);
+        assert_eq!(job.status, JobStatus::Pending);
         assert!(job.enabled);
+    }
+
+    #[test]
+    fn test_scheduled_job_builder() {
+        let cron_spec = CronSpec::new().with_minute("0".to_string()).with_hour("2".to_string());
+        let job = ScheduledJob::new(
+            "job-1".to_string(),
+            "backup".to_string(),
+            "/usr/bin/backup".to_string(),
+            ScheduleType::CronExpression,
+        )
+        .with_cron_spec(cron_spec)
+        .with_environment(vec!["PATH=/usr/bin".to_string()])
+        .with_working_directory("/home/user".to_string());
+
+        assert!(job.cron_spec.is_some());
+        assert_eq!(job.environment.len(), 1);
+        assert_eq!(job.working_directory, Some("/home/user".to_string()));
+    }
+
+    #[test]
+    fn test_job_state_transitions() {
+        let mut job = ScheduledJob::new(
+            "job-1".to_string(),
+            "test".to_string(),
+            "/bin/test".to_string(),
+            ScheduleType::Daily,
+        );
+        assert_eq!(job.status, JobStatus::Pending);
+
+        job.mark_running();
+        assert_eq!(job.status, JobStatus::Running);
+
+        job.mark_completed();
+        assert_eq!(job.status, JobStatus::Completed);
+        assert_eq!(job.run_count, 1);
+
+        job.mark_running();
+        job.mark_failed();
+        assert_eq!(job.status, JobStatus::Failed);
+        assert_eq!(job.fail_count, 1);
+
+        job.mark_skipped();
+        assert_eq!(job.status, JobStatus::Skipped);
+    }
+
+    #[test]
+    fn test_enable_disable_job() {
+        let mut job = ScheduledJob::new(
+            "job-1".to_string(),
+            "test".to_string(),
+            "/bin/test".to_string(),
+            ScheduleType::Daily,
+        );
+        assert!(job.enabled);
+
         job.disable();
         assert!(!job.enabled);
+
         job.enable();
         assert!(job.enabled);
     }
 
     #[test]
-    fn test_cron_job_record_run() {
-        let mut job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-
-        job.record_run(JobResult::Success, 1000);
-        assert_eq!(job.run_count, 1);
-        assert_eq!(job.success_count, 1);
-        assert_eq!(job.failure_count, 0);
-        assert_eq!(job.last_run, Some(1000));
-
-        job.record_run(JobResult::Failure, 2000);
-        assert_eq!(job.run_count, 2);
-        assert_eq!(job.success_count, 1);
-        assert_eq!(job.failure_count, 1);
+    fn test_cron_manager() {
+        let manager = SigmaCron::new();
+        assert_eq!(manager.job_count(), 0);
     }
 
     #[test]
-    fn test_cron_schedule() {
-        let schedule = CronSchedule::new(
-            "0".to_string(),
-            "*/6".to_string(),
-            "*".to_string(),
-            "*".to_string(),
-            "*".to_string(),
+    fn test_create_job() {
+        let mut manager = SigmaCron::new();
+        let id = manager.create_job(
+            "backup".to_string(),
+            "/usr/bin/backup".to_string(),
+            ScheduleType::Daily,
+        );
+        assert_eq!(id, "job-1");
+        assert_eq!(manager.job_count(), 1);
+    }
+
+    #[test]
+    fn test_enable_disable_job_manager() {
+        let mut manager = SigmaCron::new();
+        let id = manager.create_job(
+            "backup".to_string(),
+            "/usr/bin/backup".to_string(),
+            ScheduleType::Daily,
         );
 
-        assert_eq!(schedule.minute, "0");
-        assert_eq!(schedule.hour, "*/6");
-        assert_eq!(schedule.expression(), "0 */6 * * *");
+        assert!(manager.disable_job(&id));
+        assert!(!manager.get_job(&id).unwrap().enabled);
+
+        assert!(manager.enable_job(&id));
+        assert!(manager.get_job(&id).unwrap().enabled);
     }
 
     #[test]
-    fn test_cron_schedule_from_expression() {
-        let schedule = CronSchedule::from_expression("0 */6 * * *").unwrap();
+    fn test_run_complete_fail_job() {
+        let mut manager = SigmaCron::new();
+        let id = manager.create_job(
+            "backup".to_string(),
+            "/usr/bin/backup".to_string(),
+            ScheduleType::Daily,
+        );
 
-        assert_eq!(schedule.minute, "0");
-        assert_eq!(schedule.hour, "*/6");
+        assert!(manager.run_job(&id));
+        assert_eq!(manager.get_job(&id).unwrap().status, JobStatus::Running);
+
+        assert!(manager.complete_job(&id));
+        assert_eq!(manager.get_job(&id).unwrap().status, JobStatus::Completed);
+        assert_eq!(manager.get_job(&id).unwrap().run_count, 1);
+
+        manager.run_job(&id);
+        assert!(manager.fail_job(&id));
+        assert_eq!(manager.get_job(&id).unwrap().status, JobStatus::Failed);
+        assert_eq!(manager.get_job(&id).unwrap().fail_count, 1);
     }
 
     #[test]
-    fn test_sigmacron() {
-        let mut cron = SigmaCron::new();
-        assert!(!cron.is_running());
-        cron.start();
-        assert!(cron.is_running());
-        cron.stop();
-        assert!(!cron.is_running());
+    fn test_list_jobs_by_status() {
+        let mut manager = SigmaCron::new();
+        let id1 = manager.create_job("job1".to_string(), "/bin/test1".to_string(), ScheduleType::Daily);
+        let id2 = manager.create_job("job2".to_string(), "/bin/test2".to_string(), ScheduleType::Hourly);
+        manager.run_job(&id1);
+        manager.run_job(&id2);
+        manager.complete_job(&id1);
+
+        let completed = manager.list_jobs_by_status(JobStatus::Completed);
+        assert_eq!(completed.len(), 1);
+
+        let running = manager.list_jobs_by_status(JobStatus::Running);
+        assert_eq!(running.len(), 1);
     }
 
     #[test]
-    fn test_sigmacron_add_job() {
-        let mut cron = SigmaCron::new();
+    fn test_list_enabled_disabled_jobs() {
+        let mut manager = SigmaCron::new();
+        let id1 = manager.create_job("job1".to_string(), "/bin/test1".to_string(), ScheduleType::Daily);
+        let id2 = manager.create_job("job2".to_string(), "/bin/test2".to_string(), ScheduleType::Hourly);
+        manager.disable_job(&id2);
 
-        let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        assert!(cron.add_job(job).is_ok());
-        assert_eq!(cron.job_count(), 1);
-    }
-
-    #[test]
-    fn test_sigmacron_duplicate_job() {
-        let mut cron = SigmaCron::new();
-
-        let job1 = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        let job2 = CronJob::new("test-job".to_string(), "/bin/ls".to_string());
-
-        assert!(cron.add_job(job1).is_ok());
-        assert!(cron.add_job(job2).is_err());
-    }
-
-    #[test]
-    fn test_sigmacron_enable_disable() {
-        let mut cron = SigmaCron::new();
-
-        let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        cron.add_job(job).unwrap();
-
-        assert!(cron.enable_job("test-job").is_ok());
-        assert!(cron.disable_job("test-job").is_ok());
-    }
-
-    #[test]
-    fn test_sigmacron_list_jobs() {
-        let mut cron = SigmaCron::new();
-
-        let job1 = CronJob::new("job1".to_string(), "/bin/echo".to_string());
-        let job2 = CronJob::new("job2".to_string(), "/bin/ls".to_string());
-
-        cron.add_job(job1).unwrap();
-        cron.add_job(job2).unwrap();
-
-        let jobs = cron.list_jobs();
-        assert_eq!(jobs.len(), 2);
-    }
-
-    #[test]
-    fn test_sigmacron_enabled_jobs() {
-        let mut cron = SigmaCron::new();
-
-        let mut job1 = CronJob::new("job1".to_string(), "/bin/echo".to_string());
-        job1.disable();
-
-        let job2 = CronJob::new("job2".to_string(), "/bin/ls".to_string());
-
-        cron.add_job(job1).unwrap();
-        cron.add_job(job2).unwrap();
-
-        let enabled = cron.list_enabled_jobs();
+        let enabled = manager.list_enabled_jobs();
         assert_eq!(enabled.len(), 1);
+
+        let disabled = manager.list_disabled_jobs();
+        assert_eq!(disabled.len(), 1);
     }
 
     #[test]
-    fn test_sigmacron_stats() {
-        let mut cron = SigmaCron::new();
+    fn test_set_cron_spec() {
+        let mut manager = SigmaCron::new();
+        let id = manager.create_job(
+            "backup".to_string(),
+            "/usr/bin/backup".to_string(),
+            ScheduleType::CronExpression,
+        );
 
-        let mut job1 = CronJob::new("job1".to_string(), "/bin/echo".to_string());
-        job1.disable();
-
-        let job2 = CronJob::new("job2".to_string(), "/bin/ls".to_string());
-
-        cron.add_job(job1).unwrap();
-        cron.add_job(job2).unwrap();
-
-        let stats = cron.job_stats();
-        assert_eq!(stats.get("total_jobs"), Some(&"2".to_string()));
-        assert_eq!(stats.get("enabled_jobs"), Some(&"1".to_string()));
-        assert_eq!(stats.get("disabled_jobs"), Some(&"1".to_string()));
+        let spec = CronSpec::new().with_minute("0".to_string()).with_hour("2".to_string());
+        assert!(manager.set_cron_spec(&id, spec));
+        assert!(manager.get_job(&id).unwrap().cron_spec.is_some());
     }
 
     #[test]
-    fn test_add_cron_job_convenience() {
+    fn test_job_counts() {
+        let mut manager = SigmaCron::new();
+        let id1 = manager.create_job("job1".to_string(), "/bin/test1".to_string(), ScheduleType::Daily);
+        let id2 = manager.create_job("job2".to_string(), "/bin/test2".to_string(), ScheduleType::Hourly);
+        let id3 = manager.create_job("job3".to_string(), "/bin/test3".to_string(), ScheduleType::Weekly);
+        manager.disable_job(&id3);
+        manager.run_job(&id1);
+        manager.run_job(&id2);
+        manager.fail_job(&id2);
+
+        assert_eq!(manager.job_count(), 3);
+        assert_eq!(manager.enabled_job_count(), 2);
+        assert_eq!(manager.running_job_count(), 1);
+        assert_eq!(manager.failed_job_count(), 1);
+    }
+
+    #[test]
+    fn test_global_instance() {
         init_sigmacron();
+        let manager = get_sigmacron();
+        assert_eq!(manager.job_count(), 0);
 
-        let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        let result = add_cron_job(job);
-
-        assert!(result.is_ok());
+        let manager_mut = get_sigmacron_mut();
+        manager_mut.create_job("test".to_string(), "/bin/test".to_string(), ScheduleType::Daily);
+        assert_eq!(manager.job_count(), 1);
     }
 
     #[test]
-    fn test_enable_cron_job_convenience() {
+    fn test_create_job_convenience() {
         init_sigmacron();
+        let id = create_job("test".to_string(), "/bin/test".to_string(), ScheduleType::Daily);
+        assert_eq!(id, "job-1");
 
-        let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        add_cron_job(job).unwrap();
-
-        let result = enable_cron_job("test-job");
-        assert!(result.is_ok());
-    }
-
-    #[test]
-    fn test_disable_cron_job_convenience() {
-        init_sigmacron();
-
-        let job = CronJob::new("test-job".to_string(), "/bin/echo".to_string());
-        add_cron_job(job).unwrap();
-
-        let result = disable_cron_job("test-job");
-        assert!(result.is_ok());
+        let manager = get_sigmacron();
+        assert!(manager.get_job(&id).is_some());
     }
 }

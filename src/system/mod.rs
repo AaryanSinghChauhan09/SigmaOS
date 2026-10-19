@@ -101,6 +101,7 @@ pub mod sigmacontainer;
 pub mod sigmavirtualization;
 pub mod sigmacgroup;
 pub mod signamespaces;
+pub mod sigmacron;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -518,6 +519,11 @@ pub use signamespaces {
     SigmaNamespaces, Namespace, NamespaceType, NamespaceState,
     init_signamespaces, get_signamespaces, get_signamespaces_mut,
     create_namespace,
+};
+pub use sigmacron {
+    SigmaCron, ScheduledJob, JobStatus, ScheduleType, CronSpec,
+    init_sigmacron, get_sigmacron, get_sigmacron_mut,
+    create_job,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
