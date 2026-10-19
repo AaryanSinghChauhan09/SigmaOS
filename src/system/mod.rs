@@ -556,7 +556,7 @@ pub use sigmasnapshot::{
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
-    add_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
+    add_audio_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
     AudioDeviceType, SigmaSound,
 };
 pub use sigmassh::{
@@ -574,9 +574,6 @@ pub use sigmaswap::{
 pub use sigmasystemd::{
     create_unit, get_sigmasystemd, get_sigmasystemd_mut, init_sigmasystemd, DependencyType,
     RestartPolicy, SigmaSystemd, Target, Unit, UnitState, UnitType,
-};
-pub use sigmasystemmonitor2::{
-    get_sigmasystemmonitor, init_sigmasystemmonitor, Metric, MonitorType, SigmaSystemMonitor,
 };
 pub use sigmathemeinstaller::{
     add_theme, get_sigmathemeinstaller, init_sigmathemeinstaller, install_theme,
@@ -630,7 +627,7 @@ pub use sigmawallpaper::{
     SigmaWallpaper, TransitionType, Wallpaper,
 };
 pub use sigmaword::{
-    add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
+    add_word_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
     SigmaWord, TextAlignment,
 };
 pub use signamespaces::{
