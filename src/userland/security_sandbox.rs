@@ -60,6 +60,7 @@ impl UnveilPermissions {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserlandSecuritySandbox {
     pub process_id: u64,
     pub active_pledges: Option<BTreeSet<PledgeCapability>>,
