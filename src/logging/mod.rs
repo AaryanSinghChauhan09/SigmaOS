@@ -10,8 +10,7 @@ pub use rotation::{
 };
 pub use sigmalog::{
     get_sigmalog, init_sigmalog, init_sigmalog_default, log_message, LogEntry,
-    LogFacility as SigmaLogFacility,
-    LogFilter, LogLevel, LogStorage, SigmaLog, SigmaLogConfig,
+    LogFacility as SigmaLogFacility, LogFilter, LogLevel, LogStorage, SigmaLog, SigmaLogConfig,
 };
 pub use unified::{
     ConsoleLogTarget, FileLogTarget, LogError, LogField, LogLevel as UnifiedLogLevel, LogTarget,
