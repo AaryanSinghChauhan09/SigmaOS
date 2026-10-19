@@ -76,24 +76,6 @@ pub struct VfioDevicePassthrough {
     pub dma_mapped_bytes: u64,
 }
 
-/// Confidential Computing attestation mode
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ConfidentialComputingMode {
-    None,
-    IntelTdx,
-    AmdSevSnp,
-    ArmRme,
-}
-
-/// QEMU Live Migration Post-Copy State
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QemuLiveMigrationState {
-    pub target_host: String,
-    pub is_postcopy_active: bool,
-    pub userfaultfd_pages_transferred: u64,
-    pub bandwidth_limit_mbps: u32,
-}
-
 /// KVM & QEMU Hardware Acceleration Operational State
 #[derive(Debug, Clone, Default)]
 pub struct KvmQemuEngine {

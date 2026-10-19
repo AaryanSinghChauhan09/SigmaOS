@@ -1,61 +1,94 @@
 ## Summary
 
-<!-- What component does this PR improve, add, or regulate? -->
-
-## Related issue
-
-Closes #
+<!-- One paragraph: what changed and why. -->
 
 ## Component
 
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Upstream study
+## Changes (What SigmaOS adopts)
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
+-
 
-## Component rules added or enforced
+## Motivation
 
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
+<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+
+## Reference study (Upstream study)
+
+<!-- Required for lifecycle, ABI, storage, or scheduling changes -->
 
 ## What SigmaOS adopts
 
-<!-- State the upstream principle or mechanism adopted. -->
+## Implementation notes
 
-## What SigmaOS changes or rejects
+<!-- Design decisions, data structures, locking, error handling. -->
 
-<!-- State simplifications, deviations, and rejected ideas. -->
+## Tests
 
-## Changes
-
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Verification
 
 ```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
 cargo check --lib
 cargo test --lib
 ./run_sigma_tests.sh
-make check
-make test
-make format
 ```
 
-## Runtime evidence
+Paste relevant output below.
+
+## Capability status
+
+- Previous status:
+- New status:
+- Evidence:
+
+## Integration impact
+
+- [ ] No runtime integration yet
+- [ ] Connected to runtime path
+- [ ] Boot path validated
+- [ ] Installer/update path validated
+- [ ] Hardware tested
+
+## Reviewer checklist
+
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim
+
+## Kernel safety review
+
+- [ ] Lock ordering documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+
+## Safety and rollback
 
 - [ ] QEMU boot log
 - [ ] Installer/update test log
