@@ -126,6 +126,7 @@ pub mod sigmaclipboardmanager;
 pub mod sigmasearch;
 pub mod sigmaautomation;
 pub mod sigmaperformancemonitor;
+pub mod sigmasecurityaudit;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -681,6 +682,11 @@ pub use sigmaautomation {
 pub use sigmaperformancemonitor {
     SigmaPerformanceMonitor, PerformanceProfile, PerformanceMetric, PerformanceCategory,
     init_sigmaperformancemonitor, get_sigmaperformancemonitor, get_sigmaperformancemonitor_mut,
+};
+
+pub use sigmasecurityaudit {
+    SigmaSecurityAudit, SecurityReport, SecurityIssue, SecuritySeverity,
+    init_sigmasecurityaudit, get_sigmasecurityaudit, get_sigmasecurityaudit_mut,
 };
 
 pub use sigmaupdate::{
