@@ -23,6 +23,7 @@ use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 
 #[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]

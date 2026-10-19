@@ -21,7 +21,10 @@ use core::f32::consts::PI;
 #[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 
+extern crate alloc;
+
 #[cfg(any(feature = "standalone_test", test))]
+use std::f32::consts::PI;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]

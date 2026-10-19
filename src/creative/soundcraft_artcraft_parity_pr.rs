@@ -24,6 +24,9 @@ use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
 #[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
+extern crate alloc;
+
 #[cfg(not(any(feature = "standalone_test", test)))]
 
 #[cfg(any(feature = "standalone_test", test))]
