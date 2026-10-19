@@ -104,6 +104,7 @@ pub mod signamespaces;
 pub mod sigmacron;
 pub mod sigmasystemd;
 pub mod sigmaswap;
+pub mod sigmahibernation;
 pub mod sigmaupdate;
 pub mod system_manager;
 pub mod system_monitor;
@@ -537,6 +538,12 @@ pub use sigmaswap {
     SigmaSwap, SwapEntry, SwapType, SwapState,
     init_sigmaswap, get_sigmaswap, get_sigmaswap_mut,
     add_swap,
+};
+pub use sigmahibernation {
+    SigmaHibernation, HibernationImage, PowerState, HibernationMethod,
+    HibernationState,
+    init_sigmahibernation, get_sigmahibernation, get_sigmahibernation_mut,
+    create_image,
 };
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
