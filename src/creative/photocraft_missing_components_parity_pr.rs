@@ -8,14 +8,8 @@ use alloc::string::{String, ToString};
 
 #![no_std]
 
-extern crate alloc;
 
 use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Photocraft ArtCraft Parity.
 #[derive(Debug, Clone, PartialEq, Eq)]

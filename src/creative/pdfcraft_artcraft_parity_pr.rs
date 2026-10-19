@@ -5,10 +5,7 @@ use alloc::collections::BTreeMap;
 // SigmaOS - Pdfcraft to Artcraft Parity PR Proposal Engine
 // Bridges Pdfcraft (PDF suite) and Artcraft (Creative Suite) missing feature parity via structured PR proposals.
 
-extern crate alloc;
 
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Pdfcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

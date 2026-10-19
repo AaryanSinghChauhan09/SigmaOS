@@ -14,19 +14,13 @@ use alloc::string::{String, ToString};
 // 7. SovereignSoundcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
-use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]

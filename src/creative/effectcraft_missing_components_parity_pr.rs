@@ -2,12 +2,6 @@
 use alloc::string::{String, ToString};
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EffectcraftPrProposalSpec {
