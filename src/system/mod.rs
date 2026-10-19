@@ -259,7 +259,7 @@ pub use shredder::{
     ShreddingAlgorithm, ShreddingResult, ShreddingStrategy, ZeroPassShredder,
 };
 pub use sigmaacpi::{
-    add_battery, get_sigmaacpi, get_sigmaacpi_mut, init_sigmaacpi, BatteryInfo, BatteryState,
+    add_battery, get_sigmaacpi, get_sigmaacpi_mut, init_sigmaacpi, BatteryState,
     PowerEvent, SigmaACPI, ThermalState, ThermalZone,
 };
 pub use sigmaananicy::{
@@ -302,7 +302,7 @@ pub use sigmacodec::{
     CodecType, SigmaCodec,
 };
 pub use sigmacolorscheme::{
-    generate_color_scheme, get_sigmacolorscheme, init_sigmacolorscheme, Color, ColorScheme,
+    generate_color_scheme, get_sigmacolorscheme, init_sigmacolorscheme, ColorScheme,
     PaletteType, SigmaColorScheme, Template, TemplateType,
 };
 pub use sigmaconfig::{
@@ -311,7 +311,7 @@ pub use sigmaconfig::{
 };
 pub use sigmacontainer::{
     create_container, get_sigmacontainer, get_sigmacontainer_mut, init_sigmacontainer, Container,
-    ContainerState, NetworkMode, ResourceLimits, RestartPolicy, SigmaContainer,
+    ContainerState, NetworkMode, RestartPolicy, SigmaContainer,
 };
 pub use sigmacraftlibs::{
     add_library, get_sigmacraftlibs, get_sigmacraftlibs_mut, init_sigmacraftlibs,
@@ -338,7 +338,7 @@ pub use sigmadesign::{
 };
 pub use sigmadevice::{
     add_device, get_sigmadevice, init_sigmadevice, Device, DeviceEvent, DeviceEventType,
-    DeviceState, DeviceType, SigmaDevice,
+    SigmaDevice,
 };
 pub use sigmadhcp::{
     get_sigmadhcp, init_sigmadhcp, request_dhcp_lease, DhcpLease, DhcpState, SigmaDHCP,
@@ -407,7 +407,7 @@ pub use sigmahwmon::{
     SigmaHwMon,
 };
 pub use sigmainstaller::{
-    create_install_config, get_sigmainstaller, init_sigmainstaller, FilesystemType, InstallConfig,
+    create_install_config, get_sigmainstaller, init_sigmainstaller, InstallConfig,
     InstallState, PartitioningMode, SigmaInstaller,
 };
 pub use sigmaintegrity::{
@@ -428,7 +428,7 @@ pub use sigmalogmanager::{
 };
 pub use sigmalogrotate::{
     get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig,
-    RotationPolicy, SigmaLogRotate,
+    SigmaLogRotate,
 };
 pub use sigmalvm::{
     create_volume_group, get_sigmalvm, init_sigmalvm, LVState, LogicalVolume, PVState,
@@ -494,8 +494,8 @@ pub use sigmapower::{
     SigmaPower,
 };
 pub use sigmaprint2::{
-    add_print_job, get_sigmaprint, get_sigmaprint_mut, init_sigmaprint,
-    ColorMode, PaperSize, PrintJob, PrintOptions, PrintOrientation, PrintQuality, SigmaPrint,
+    add_print_job, get_sigmaprint, get_sigmaprint_mut, init_sigmaprint, ColorMode, PaperSize,
+    PrintJob, PrintOptions, PrintOrientation, PrintQuality, SigmaPrint,
 };
 pub use sigmaprinter::{
     add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState, PrintJob,
@@ -538,7 +538,7 @@ pub use sigmaservice::{
     SigmaService,
 };
 pub use sigmaservicemanager2::{
-    get_sigmaservicemanager, init_sigmaservicemanager, Service, ServiceState, SigmaServiceManager,
+    get_sigmaservicemanager, init_sigmaservicemanager, SigmaServiceManager,
 };
 pub use sigmasession::{
     add_user_session, get_sigmasession, init_sigmasession, SessionState, SessionType, SigmaSession,
@@ -556,8 +556,8 @@ pub use sigmasnapshot::{
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
-    add_audio_device, get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDevice, AudioDeviceState,
-    AudioDeviceType, SigmaSound,
+    add_device, get_sigmasound, get_sigmasound_mut, init_sigmasound,
+    AudioDeviceState, SigmaSound,
 };
 pub use sigmassh::{
     authenticate_ssh_connection, get_sigmassh, init_sigmassh, SigmaSSH, SshAuthMethod,
@@ -573,7 +573,7 @@ pub use sigmaswap::{
 };
 pub use sigmasystemd::{
     create_unit, get_sigmasystemd, get_sigmasystemd_mut, init_sigmasystemd, DependencyType,
-    RestartPolicy, SigmaSystemd, Target, Unit, UnitState, UnitType,
+    SigmaSystemd, Target, Unit, UnitState, UnitType,
 };
 pub use sigmathemeinstaller::{
     add_theme, get_sigmathemeinstaller, init_sigmathemeinstaller, install_theme,
@@ -586,8 +586,7 @@ pub use sigmatime::{
 };
 pub use sigmatimeshift::{
     create_timeshift_snapshot, get_sigmatimeshift, init_sigmatimeshift, restore_timeshift_snapshot,
-    SigmaTimeshift, SnapshotLevel, SnapshotSchedule, SnapshotState, SnapshotType,
-    TimeshiftSnapshot,
+    SigmaTimeshift, SnapshotLevel, TimeshiftSnapshot,
 };
 pub use sigmatrim::{
     get_sigmatrim, init_sigmatrim, is_trim_supported, trim_mount, DiscardRange, DiscardType,
@@ -598,7 +597,7 @@ pub use sigmaupdatemanager::{
     SigmaUpdateManager, Update, UpdateSchedule, UpdateState, UpdateType,
 };
 pub use sigmausbwriter::{
-    create_write_job, get_sigmausbwriter, init_sigmausbwriter, ImageFormat, SigmaUSBWriter,
+    create_write_job, get_sigmausbwriter, init_sigmausbwriter, SigmaUSBWriter,
     USBDevice, WriteJob, WriteState,
 };
 pub use sigmavector::{
@@ -623,8 +622,8 @@ pub use sigmawallpaper::{
     SigmaWallpaper, TransitionType, Wallpaper,
 };
 pub use sigmaword::{
-    add_word_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, FontStyle, Paragraph,
-    SigmaWord, TextAlignment,
+    add_document, get_sigmaword, get_sigmaword_mut, init_sigmaword, Document,
+    Paragraph, SigmaWord, TextAlignment,
 };
 pub use signamespaces::{
     create_namespace, get_signamespaces, get_signamespaces_mut, init_signamespaces, Namespace,
@@ -643,17 +642,17 @@ pub use sigmawebcam::{
 
 pub use sigmamicrophone::{
     add_microphone, get_sigmamicrophone, get_sigmamicrophone_mut, init_sigmamicrophone,
-    ChannelCount, Microphone, MicrophoneState, SampleFormat, SampleRate, SigmaMicrophone,
+    ChannelCount, Microphone, MicrophoneState, SampleFormat, SigmaMicrophone,
 };
 
 pub use sigmadiskmanager::{
-    add_disk, get_sigmadiskmanager, get_sigmadiskmanager_mut, init_sigmadiskmanager, Disk,
+    add_disk, get_sigmadiskmanager, get_sigmadiskmanager_mut, init_sigmadiskmanager,
     DiskState, DiskType, SigmaDiskManager,
 };
 
 pub use sigmadiskusage::{
     add_filesystem, get_sigmadiskusage, get_sigmadiskusage_mut, init_sigmadiskusage, Directory,
-    Filesystem, SigmaDiskUsage,
+    SigmaDiskUsage,
 };
 
 pub use sigmataskmanager::{
@@ -663,12 +662,12 @@ pub use sigmataskmanager::{
 
 pub use sigmaprocessmonitor::{
     get_sigmaprocessmonitor, get_sigmaprocessmonitor_mut, init_sigmaprocessmonitor, Process,
-    ProcessState, SigmaProcessMonitor,
+    SigmaProcessMonitor,
 };
 
 pub use sigmasystemmonitor::{
     get_sigmasystemmonitor, get_sigmasystemmonitor_mut, init_sigmasystemmonitor, CpuCore,
-    MemoryInfo, NetworkStats, SigmaSystemMonitor,
+    MemoryInfo, SigmaSystemMonitor,
 };
 
 pub use sigmasysteminfo::{
@@ -696,7 +695,7 @@ pub use sigmasearch::{
 
 pub use sigmaperformancemonitor::{
     get_sigmaperformancemonitor, get_sigmaperformancemonitor_mut, init_sigmaperformancemonitor,
-    PerformanceCategory, PerformanceMetric, PerformanceProfile, SigmaPerformanceMonitor,
+    PerformanceCategory, PerformanceMetric, SigmaPerformanceMonitor,
 };
 
 pub use sigmasecurityaudit::{
@@ -718,7 +717,7 @@ pub use sigma3d::{
 
 pub use sigmaupdate::{
     apply_system_update, get_sigmaupdate, init_sigmaupdate, SigmaUpdate, SystemUpdate,
-    UpdatePolicy, UpdateStatus, UpdateType,
+    UpdatePolicy, UpdateStatus,
 };
 pub use snapshot::{
     FileSnapshotStorage, MerkleSnapshotStorage, RestoreResult, SnapshotConfig, SnapshotError,
@@ -861,7 +860,7 @@ pub use sigmakeyboardmanager::{
 };
 
 pub use sigmafilesystemmanager::{
-    add_filesystem, get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut,
+    get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut,
     init_sigmafilesystemmanager, SigmaFileSystemManager,
 };
 
