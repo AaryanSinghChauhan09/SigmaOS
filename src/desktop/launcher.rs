@@ -613,12 +613,7 @@ pub fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
     haystack
         .as_bytes()
         .windows(needle_lower.len())
-        .any(|window| {
-            window
-                .iter()
-                .zip(needle_lower.as_bytes())
-                .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
-        })
+        .any(|window| window.eq_ignore_ascii_case(needle_lower.as_bytes()))
 }
 
 /// Perform zero-allocation ASCII case-insensitive prefix match.
@@ -628,10 +623,7 @@ pub fn starts_with_ignore_case(haystack: &str, needle_lower: &str) -> bool {
     if needle_lower.len() > haystack.len() {
         return false;
     }
-    haystack.as_bytes()[..needle_lower.len()]
-        .iter()
-        .zip(needle_lower.as_bytes())
-        .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
+    haystack.as_bytes()[..needle_lower.len()].eq_ignore_ascii_case(needle_lower.as_bytes())
 }
 
 fn clipboard_preview(content: &str, max_bytes: usize) -> String {
