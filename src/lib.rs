@@ -45,6 +45,7 @@ pub use creative::soundcraft_missing_components_parity_pr::*;
 pub use creative::voicecraft::*;
 pub use creative::voicecraft_artcraft_parity_pr::*;
 pub use creative::voicecraft_missing_components_parity_pr::*;
+pub use creative::threedcraft_artcraft_parity_pr::*;
 pub use creative::wordcraft::*;
 pub use creative::wordcraft_artcraft_parity_pr::*;
 pub use creative::wordcraft_missing_components_parity_pr::*;

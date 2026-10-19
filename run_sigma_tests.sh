@@ -2005,4 +2005,95 @@ if [ -f "src/creative/sovereign_artcraft_craftlibs_pr_engine.rs" ]; then
     ./build/test_artcraft_pr
 fi
 
+if [ -f "src/creative/craftlibs_missing_components_parity_pr.rs" ]; then
+    echo "Running Sovereign CraftLibs Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/craftlibs_missing_components_parity_pr.rs --edition=2021 -o build/test_craftlibs_missing
+    ./build/test_craftlibs_missing
+fi
+
+if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Artcraft Craftlibs Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs --edition=2021 -o build/test_artcraft_parity
+    ./build/test_artcraft_parity
+fi
+
+if [ -f "src/creative/threedcraft_missing_components_parity_pr.rs" ]; then
+    echo "Running 3DCraft Missing Components Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/threedcraft_missing_components_parity_pr.rs --edition=2021 -o build/threedcraft_pr_test
+    ./build/threedcraft_pr_test
+fi
+
+if [ -f "src/creative/threedcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running 3DCraft to ArtCraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/threedcraft_artcraft_parity_pr.rs --edition=2021 -o build/threedcraft_artcraft_parity_test
+    ./build/threedcraft_artcraft_parity_test
+fi
+
+if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
+    echo "Running Omarchy Linux Missing Components Parity PR Gateway V60 test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_missing_components_v60_pr.rs --edition=2021 -o build/omarchy_v60_test
+    ./build/omarchy_v60_test
+fi
+
+if [ -f "src/compatibility/mint_omarchy_complete_gap_closure.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Complete Gap Closure test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_complete_gap_closure.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_mint_omarchy
+    ./build/test_mint_omarchy
+fi
+
+if [ -f "src/compatibility/mint_omarchy_coexistence_interop_engine.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Coexistence & Interoperability test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_coexistence_interop_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_coexistence
+    ./build/test_coexistence
+fi
+
+if [ -f "src/compatibility/mint_omarchy_federated_desktop_engine.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Federated Desktop Engine test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_federated_desktop_engine.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_federated
+    ./build/test_federated
+fi
+
+if [ -f "src/compatibility/mint_omarchy_pinnacle_ecosystem_suite.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Pinnacle Ecosystem Suite test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_pinnacle_ecosystem_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_pinnacle
+    ./build/test_pinnacle
+fi
+
+if [ -f "src/compatibility/mint_omarchy_vanguard_subsystem_suite.rs" ]; then
+    echo "Running Sovereign Mint & Omarchy Vanguard Subsystem Suite test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/mint_omarchy_vanguard_subsystem_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_vanguard
+    ./build/test_vanguard
+fi
+
+if [ -f "src/compatibility/general_purpose_os_transformation_suite.rs" ]; then
+    echo "Running SigmaOS General-Purpose OS Transformation Suite test suite..."
+    mkdir -p build
+    rustc --test src/compatibility/general_purpose_os_transformation_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_transform
+    ./build/test_transform
+fi
+
+if [ -f "src/kernel/qemu_runtime_foundational_parity_suite.rs" ]; then
+    echo "Running Sovereign QEMU Runtime Foundational Parity Suite test suite..."
+    mkdir -p build
+    rustc --test src/kernel/qemu_runtime_foundational_parity_suite.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_qemu_runtime
+    ./build/test_qemu_runtime
+fi
+
+if [ -f "src/boot/bare_metal_independent_boot_system.rs" ]; then
+    echo "Running Sovereign Bare-Metal Independent Boot System test suite..."
+    mkdir -p build
+    rustc --test src/boot/bare_metal_independent_boot_system.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_bare_metal
+    ./build/test_bare_metal
+fi
+
 echo "All SigmaOS test suites completed."
