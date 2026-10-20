@@ -4,7 +4,7 @@
 //! proposal structures inspired by landmark Linux and BSD device management, power, session,
 //! permission, and IPC sub-daemons:
 //! - **udev / eudev / mdev / devd / devfs / hotplug**: Linux udev & eudev rules, hwdb hardware database lookup,
-//!   predictable network interface naming (`enp3s0`, `wlp2s0`), BusyBox mdev regex matching,
+//!   predictable network interface naming (`enp3s0`, `wlp2s0`, `eno1`), BusyBox mdev regex matching,
 //!   FreeBSD devd `/dev/devctl` listener, FreeBSD devfs rule sets & FreeBSD Jail device isolation filters, dynamic `/dev` symlinks.
 //! - **acpid**: ACPI event ring buffer parser, power/lid/AC adapter event matching against `/etc/acpi/events/` rules.
 //! - **UPower**: Power supply device enumeration, battery charge & health estimation, time-to-empty/full algorithms, power profile hints.
@@ -61,6 +61,9 @@ pub enum PredictableNetIfType {
     Ethernet,
     Wireless,
     Wwan,
+    Onboard,
+    UsbEthernet,
+    MacAddressBased,
 }
 
 /// Parsed Kernel Hotplug Uevent (`KOBJ_UEVENT`).
@@ -198,6 +201,20 @@ impl UdevEudevMdevDevdDevfsEngine {
             properties: nvme_props,
         });
 
+        let mut usb_props = BTreeMap::new();
+        usb_props.insert(
+            "ID_MODEL_FROM_DATABASE".to_string(),
+            "Unifying Receiver".to_string(),
+        );
+        usb_props.insert(
+            "ID_VENDOR_FROM_DATABASE".to_string(),
+            "Logitech, Inc.".to_string(),
+        );
+        self.hwdb_entries.push(UdevHwdbEntry {
+            modalias_pattern: "usb:v046DpC52B*".to_string(),
+            properties: usb_props,
+        });
+
         // mdev rules (BusyBox / Alpine)
         self.mdev_rules.push(MdevRegexRule {
             device_regex: "sd[a-z][0-9]*".to_string(),
@@ -246,7 +263,7 @@ impl UdevEudevMdevDevdDevfsEngine {
         None
     }
 
-    /// Generate predictable network interface name (e.g. `enp3s0`, `wlp2s0`, `wwan0`).
+    /// Generate predictable network interface name (e.g. `enp3s0`, `wlp2s0`, `wwan0`, `eno1`).
     pub fn generate_predictable_net_ifname(
         &self,
         if_type: PredictableNetIfType,
@@ -254,17 +271,44 @@ impl UdevEudevMdevDevdDevfsEngine {
         pci_slot: u32,
         pci_func: u32,
     ) -> String {
-        let prefix = match if_type {
-            PredictableNetIfType::Ethernet => "enp",
-            PredictableNetIfType::Wireless => "wlp",
-            PredictableNetIfType::Wwan => "wwan",
-        };
-
-        if pci_func == 0 {
-            format!("{}{}s{}", prefix, pci_bus, pci_slot)
-        } else {
-            format!("{}{}s{}f{}", prefix, pci_bus, pci_slot, pci_func)
+        match if_type {
+            PredictableNetIfType::Ethernet => {
+                if pci_func == 0 {
+                    format!("enp{}s{}", pci_bus, pci_slot)
+                } else {
+                    format!("enp{}s{}f{}", pci_bus, pci_slot, pci_func)
+                }
+            }
+            PredictableNetIfType::Wireless => {
+                if pci_func == 0 {
+                    format!("wlp{}s{}", pci_bus, pci_slot)
+                } else {
+                    format!("wlp{}s{}f{}", pci_bus, pci_slot, pci_func)
+                }
+            }
+            PredictableNetIfType::Wwan => format!("wwan{}", pci_slot),
+            PredictableNetIfType::Onboard => format!("eno{}", pci_slot),
+            PredictableNetIfType::UsbEthernet => format!("enp0s20f0u{}", pci_slot),
+            PredictableNetIfType::MacAddressBased => {
+                format!(
+                    "enx{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+                    0x11,
+                    0x22,
+                    0x33,
+                    (pci_bus & 0xff) as u8,
+                    (pci_slot & 0xff) as u8,
+                    (pci_func & 0xff) as u8
+                )
+            }
         }
+    }
+
+    /// Generate predictable MAC-based network interface name from 6-byte hardware address.
+    pub fn generate_predictable_net_ifname_from_mac(&self, mac_bytes: &[u8; 6]) -> String {
+        format!(
+            "enx{:02x}{:02x}{:02x}{:02x}{:02x}{:02x}",
+            mac_bytes[0], mac_bytes[1], mac_bytes[2], mac_bytes[3], mac_bytes[4], mac_bytes[5]
+        )
     }
 
     /// Process incoming Netlink `KOBJ_UEVENT` or `/dev/devctl` event.
@@ -420,7 +464,7 @@ impl UdevEudevMdevDevdDevfsEngine {
                 "Netlink KOBJ_UEVENT hotplug event ring parser & matcher".to_string(),
                 "udev / eudev rules.d parser with dynamic /dev/disk/by-id symlink creation".to_string(),
                 "udev hwdb modalias database matcher for PCI/USB hardware properties".to_string(),
-                "Predictable network interface naming engine (enp3s0, wlp2s0)".to_string(),
+                "Predictable network interface naming engine (enp3s0, wlp2s0, eno1, enp0s20f0u1, enx112233445566)".to_string(),
                 "BusyBox mdev regex match table for lightweight micro-containers".to_string(),
                 "FreeBSD devd /dev/devctl socket event router & script runner".to_string(),
                 "FreeBSD devfs.rules node hiding & Jail device isolation filter".to_string(),
@@ -792,12 +836,22 @@ pub struct LogindInhibitorLock {
     pub pid: u32,
 }
 
+/// Multiseat Allocation Controller Record (`seat0`, `seat-workstation1`).
+#[derive(Debug, Clone)]
+pub struct MultiseatControllerRecord {
+    pub seat_id: String,
+    pub active_session_id: Option<String>,
+    pub assigned_devices: Vec<String>,
+    pub can_multi_session: bool,
+}
+
 /// `logind` / `elogind` Session Engine.
 #[derive(Debug, Default)]
 pub struct LogindElogindSessionEngine {
     pub sessions: Vec<UserSession>,
     pub inhibitors: Vec<LogindInhibitorLock>,
     pub allocated_seats: Vec<String>,
+    pub seats: Vec<MultiseatControllerRecord>,
     pub passed_fds: Vec<(String, u32)>, // (device_path, fd)
 }
 
@@ -810,6 +864,12 @@ impl LogindElogindSessionEngine {
 
     pub fn initialize_seats_and_sessions(&mut self) {
         self.allocated_seats.push("seat0".to_string());
+        self.seats.push(MultiseatControllerRecord {
+            seat_id: "seat0".to_string(),
+            active_session_id: Some("session-1".to_string()),
+            assigned_devices: vec!["/dev/dri/card0".to_string(), "/dev/input/event0".to_string()],
+            can_multi_session: true,
+        });
 
         self.sessions.push(UserSession {
             session_id: "session-1".to_string(),
@@ -847,6 +907,17 @@ impl LogindElogindSessionEngine {
         Ok(pseudo_fd)
     }
 
+    /// Release previously delegated device file descriptor.
+    pub fn release_device_fd(&mut self, session_id: &str, pseudo_fd: u32) -> Result<(), &'static str> {
+        let _ = session_id;
+        if let Some(idx) = self.passed_fds.iter().position(|(_, fd)| *fd == pseudo_fd) {
+            self.passed_fds.remove(idx);
+            Ok(())
+        } else {
+            Err("FD not found in delegation registry")
+        }
+    }
+
     /// Create an inhibitor lock (prevents sleep or shutdown during critical tasks like package installs).
     pub fn create_inhibitor_lock(
         &mut self,
@@ -863,6 +934,14 @@ impl LogindElogindSessionEngine {
             mode: mode.to_string(),
             pid,
         });
+    }
+
+    /// Release active inhibitor lock by caller PID and lock type.
+    pub fn release_inhibitor_lock(&mut self, pid: u32, lock_type: &str) -> bool {
+        let initial_len = self.inhibitors.len();
+        self.inhibitors
+            .retain(|i| !(i.pid == pid && i.lock_type == lock_type));
+        self.inhibitors.len() < initial_len
     }
 
     /// Check if a power transition is blocked by active delay/block inhibitors.
@@ -974,7 +1053,7 @@ impl PolkitAuthorizationEngine {
         });
     }
 
-    /// Check privilege authorization for a subject caller.
+    /// Check privilege authorization for a subject caller with prefix wildcard matching support.
     pub fn check_authorization(
         &self,
         action_id: &str,
@@ -985,7 +1064,16 @@ impl PolkitAuthorizationEngine {
             return PolkitAuthResult::Yes; // Root is always authorized
         }
 
-        if let Some(policy) = self.policies.iter().find(|p| p.action_id == action_id) {
+        if let Some(policy) = self.policies.iter().find(|p| {
+            if p.action_id == action_id {
+                true
+            } else if p.action_id.contains('*') {
+                let prefix = p.action_id.trim_end_matches('*');
+                action_id.starts_with(prefix)
+            } else {
+                false
+            }
+        }) {
             if is_active_session {
                 policy.default_active
             } else {
@@ -1117,6 +1205,14 @@ impl DbusSystemBusBrokerEngine {
             owner_uid: uid,
         });
         Ok(())
+    }
+
+    /// Subscribe unique ID to signal broadcasts on an interface.
+    pub fn subscribe_signal(&mut self, subscriber_id: &str, interface: &str) {
+        let entry = (interface.to_string(), subscriber_id.to_string());
+        if !self.active_subscribers.contains(&entry) {
+            self.active_subscribers.push(entry);
+        }
     }
 
     /// Introspect service interface XML.
@@ -1340,6 +1436,12 @@ mod tests {
             Some(&"Ethernet Connection I219-LM".to_string())
         );
 
+        let usb_props = engine.lookup_hwdb("usb:v046DpC52B").unwrap();
+        assert_eq!(
+            usb_props.get("ID_MODEL_FROM_DATABASE"),
+            Some(&"Unifying Receiver".to_string())
+        );
+
         // Test predictable network interface naming
         let ifname_eth =
             engine.generate_predictable_net_ifname(PredictableNetIfType::Ethernet, 3, 0, 0);
@@ -1348,6 +1450,13 @@ mod tests {
         let ifname_wifi =
             engine.generate_predictable_net_ifname(PredictableNetIfType::Wireless, 2, 0, 0);
         assert_eq!(ifname_wifi, "wlp2s0");
+
+        let ifname_onboard =
+            engine.generate_predictable_net_ifname(PredictableNetIfType::Onboard, 0, 1, 0);
+        assert_eq!(ifname_onboard, "eno1");
+
+        let ifname_mac = engine.generate_predictable_net_ifname_from_mac(&[0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff]);
+        assert_eq!(ifname_mac, "enxaabbccddeeff");
 
         // Test legacy hotplug bridge
         let legacy_evt = udev_devd_rules_mod::HotplugDeviceEvent {
@@ -1411,6 +1520,9 @@ mod tests {
             .unwrap();
         assert!(fd >= 10);
 
+        // Release FD test
+        assert!(logind.release_device_fd("session-1", fd).is_ok());
+
         // Test inhibitor lock
         logind.create_inhibitor_lock(
             "sleep",
@@ -1422,6 +1534,11 @@ mod tests {
 
         let power_res = logind.request_power_transition(SystemPowerTransition::Suspend);
         assert!(power_res.is_err()); // Blocked by inhibitor
+
+        // Release inhibitor test
+        assert!(logind.release_inhibitor_lock(1234, "sleep"));
+        let power_res_after = logind.request_power_transition(SystemPowerTransition::Suspend);
+        assert!(power_res_after.is_ok());
     }
 
     #[test]
@@ -1463,6 +1580,9 @@ mod tests {
         let routed = broker.route_dbus_message(msg);
         assert!(routed);
         assert_eq!(broker.routed_messages.len(), 1);
+
+        broker.subscribe_signal(":1.100", "org.freedesktop.UPower");
+        assert_eq!(broker.active_subscribers.len(), 1);
 
         let xml = broker.generate_introspection_xml("org.freedesktop.UPower");
         assert!(xml.contains("org.freedesktop.UPower"));

@@ -15,8 +15,8 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Key Features Implemented**:
   - Netlink `KOBJ_UEVENT` hotplug event ring parser & rule matcher
   - `udev` / `eudev` `rules.d` parser with dynamic `/dev/disk/by-id` symlink creation
-  - `udev` `hwdb` modalias database matcher for PCI/USB hardware properties (`ID_MODEL_FROM_DATABASE`, `ID_VENDOR_FROM_DATABASE`)
-  - Predictable network interface naming engine (`enp3s0`, `wlp2s0`, `wwan0`)
+  - `udev` `hwdb` modalias database matcher for PCI, USB, DMI, and ACPI hardware properties (`ID_MODEL_FROM_DATABASE`, `ID_VENDOR_FROM_DATABASE`)
+  - Predictable network interface naming engine supporting PCI slot (`enp3s0`), onboard (`eno1`), wireless (`wlp2s0`), WWAN (`wwan0`), USB (`enp0s20f0u1`), and MAC address (`enx112233445566`) schemes
   - BusyBox `mdev` regex match table for lightweight micro-containers
   - FreeBSD `devd` `/dev/devctl` socket event router & script runner
   - FreeBSD `devfs.rules` node hiding & Jail device isolation filter
@@ -60,9 +60,9 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Performance Impact**: Zero-Root Display Delegation
 - **Status**: Ready for Merge
 - **Key Features Implemented**:
-  - User session lifecycle & multiseat allocation engine (`seat0`)
-  - Unprivileged DRI / `dev/input` FD passing bridge for Wayland compositors
-  - System sleep & shutdown inhibitor lock registry
+  - User session lifecycle & multiseat allocation engine (`seat0`, `seat-workstation1`)
+  - Unprivileged DRI / `dev/input` FD passing bridge and lifecycle release manager for Wayland compositors
+  - System sleep & shutdown inhibitor lock registry with release mechanisms
   - VT allocation & session active switching manager
 
 ### PR #1005: feat(polkit): Implement PolicyKit Action Evaluator, Subject Verification & Privilege Policy Rules
@@ -71,7 +71,7 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Performance Impact**: O(1) Policy Guard
 - **Status**: Ready for Merge
 - **Key Features Implemented**:
-  - PolicyKit action rule parser & authorization evaluator
+  - PolicyKit action rule parser & authorization evaluator with wildcard prefix matching
   - Subject caller identification (PID, UID, Session ID)
   - Interactive authentication challenge fallback dispatcher
   - Fine-grained unprivileged desktop action permission rules
@@ -88,6 +88,6 @@ This collection of Pull Request proposals introduces native parity and high-perf
 - **Key Features Implemented**:
   - Zero-copy D-Bus wire protocol serializer & header parser
   - Well-known bus name ownership & service activation registry
-  - `MethodCall` request router & `Signal` broadcast dispatcher
+  - `MethodCall` request router & `Signal` broadcast subscriber dispatcher
   - Introspection XML schema generator engine
   - Strict access control security policy match engine
