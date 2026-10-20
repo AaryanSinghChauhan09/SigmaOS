@@ -268,10 +268,7 @@ mod tests {
         let id1 = manager.add_index("Home".to_string(), "/home".to_string());
         let id2 = manager.add_index("Documents".to_string(), "/home/user/Documents".to_string());
 
-        manager
-            .get_index_mut(&id1)
-            .unwrap()
-            .set_indexed_files(1000);
+        manager.get_index_mut(&id1).unwrap().set_indexed_files(1000);
         manager.get_index_mut(&id2).unwrap().set_indexed_files(500);
 
         assert_eq!(manager.total_indexed_files(), 1500);

@@ -317,7 +317,7 @@ mod tests {
         let mut manager = SigmaPrinter::new();
         let printer_id = manager.add_printer("HP LaserJet".to_string(), "Office".to_string());
         manager.add_job(printer_id.clone(), "doc1.pdf".to_string(), 5);
-        manager.add_job(printer_id, "doc2.pdf".to_string(), 3);
+        manager.add_job(printer_id.clone(), "doc2.pdf".to_string(), 3);
 
         let jobs = manager.list_jobs_by_printer(&printer_id);
         assert_eq!(jobs.len(), 2);

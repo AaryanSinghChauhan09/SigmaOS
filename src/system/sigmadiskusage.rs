@@ -297,14 +297,8 @@ mod tests {
         let fs2 =
             manager.add_filesystem("/home".to_string(), "/dev/sda2".to_string(), 500000000000);
 
-        manager
-            .get_filesystem_mut(&fs1)
-            .unwrap()
-            .with_usage(500000000000);
-        manager
-            .get_filesystem_mut(&fs2)
-            .unwrap()
-            .with_usage(250000000000);
+        manager.get_filesystem_mut(&fs1).unwrap().used_size = 500000000000;
+        manager.get_filesystem_mut(&fs2).unwrap().used_size = 250000000000;
 
         assert_eq!(manager.total_used_space(), 750000000000);
     }

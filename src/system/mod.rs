@@ -259,8 +259,8 @@ pub use shredder::{
     ShreddingAlgorithm, ShreddingResult, ShreddingStrategy, ZeroPassShredder,
 };
 pub use sigmaacpi::{
-    add_battery, get_sigmaacpi, get_sigmaacpi_mut, init_sigmaacpi, BatteryState,
-    PowerEvent, SigmaACPI, ThermalState, ThermalZone,
+    add_battery, get_sigmaacpi, get_sigmaacpi_mut, init_sigmaacpi, BatteryState, PowerEvent,
+    SigmaACPI, ThermalState, ThermalZone,
 };
 pub use sigmaananicy::{
     add_process, get_sigmaananicy, init_sigmaananicy, set_process_nice, NiceRule, PriorityClass,
@@ -302,8 +302,8 @@ pub use sigmacodec::{
     CodecType, SigmaCodec,
 };
 pub use sigmacolorscheme::{
-    generate_color_scheme, get_sigmacolorscheme, init_sigmacolorscheme, ColorScheme,
-    PaletteType, SigmaColorScheme, Template, TemplateType,
+    generate_color_scheme, get_sigmacolorscheme, init_sigmacolorscheme, ColorScheme, PaletteType,
+    SigmaColorScheme, Template, TemplateType,
 };
 pub use sigmaconfig::{
     get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry as SigmaConfigEntry,
@@ -407,8 +407,8 @@ pub use sigmahwmon::{
     SigmaHwMon,
 };
 pub use sigmainstaller::{
-    create_install_config, get_sigmainstaller, init_sigmainstaller, InstallConfig,
-    InstallState, PartitioningMode, SigmaInstaller,
+    create_install_config, get_sigmainstaller, init_sigmainstaller, InstallConfig, InstallState,
+    PartitioningMode, SigmaInstaller,
 };
 pub use sigmaintegrity::{
     check_file_integrity, get_sigmaintegrity, init_sigmaintegrity, FileIntegrityRecord, FileStatus,
@@ -462,9 +462,7 @@ pub use sigmanfs::{
     export_nfs_share, get_sigmanfs, init_sigmanfs, mount_nfs, NFSConnectionState, NFSExport,
     NFSExportAccess, NFSMount, NFSVersion, RootSquashPolicy, SigmaNFS,
 };
-pub use sigmanic::{
-    bring_up_interface, get_sigmanic, init_sigmanic, SigmaNIC,
-};
+pub use sigmanic::{bring_up_interface, get_sigmanic, init_sigmanic, SigmaNIC};
 pub use sigmanotifyenhanced::{
     get_sigmanotifyenhanced, init_sigmanotifyenhanced, post_notification, ActionType, Notification,
     NotificationAction, NotificationCategory, NotificationState, NotificationUrgency,
@@ -490,16 +488,15 @@ pub use sigmaphoto::{
     ImageFormat, Photo, PhotoAdjustment, PhotoAlbum, PhotoFilter, SigmaPhoto,
 };
 pub use sigmapower::{
-    get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerSettings,
-    SigmaPower,
+    get_sigmapower, get_sigmapower_mut, init_sigmapower, Brightness, PowerSettings, SigmaPower,
 };
 pub use sigmaprint2::{
     add_print_job, get_sigmaprint, get_sigmaprint_mut, init_sigmaprint, ColorMode, PaperSize,
     PrintJob, PrintOptions, PrintOrientation, PrintQuality, SigmaPrint,
 };
 pub use sigmaprinter::{
-    add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState,
-    Printer, PrinterState, SigmaPrinter,
+    add_printer, get_sigmaprinter, get_sigmaprinter_mut, init_sigmaprinter, JobState, Printer,
+    PrinterState, SigmaPrinter,
 };
 pub use sigmaprocess::{
     get_sigmaprocess, init_sigmaprocess, send_process_signal, ProcessInfo,
@@ -556,8 +553,7 @@ pub use sigmasnapshot::{
     SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
-    get_sigmasound, get_sigmasound_mut, init_sigmasound,
-    AudioDeviceState, SigmaSound,
+    get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDeviceState, SigmaSound,
 };
 pub use sigmassh::{
     authenticate_ssh_connection, get_sigmassh, init_sigmassh, SigmaSSH, SshAuthMethod,
@@ -597,8 +593,8 @@ pub use sigmaupdatemanager::{
     SigmaUpdateManager, Update, UpdateSchedule, UpdateState, UpdateType,
 };
 pub use sigmausbwriter::{
-    create_write_job, get_sigmausbwriter, init_sigmausbwriter, SigmaUSBWriter,
-    USBDevice, WriteJob, WriteState,
+    create_write_job, get_sigmausbwriter, init_sigmausbwriter, SigmaUSBWriter, USBDevice, WriteJob,
+    WriteState,
 };
 pub use sigmavector::{
     add_layer, get_sigmavector, get_sigmavector_mut, init_sigmavector, LineCap, LineJoin,
@@ -622,8 +618,7 @@ pub use sigmawallpaper::{
     SigmaWallpaper, TransitionType, Wallpaper,
 };
 pub use sigmaword::{
-    get_sigmaword, get_sigmaword_mut, init_sigmaword, Document,
-    Paragraph, SigmaWord, TextAlignment,
+    get_sigmaword, get_sigmaword_mut, init_sigmaword, Document, Paragraph, SigmaWord, TextAlignment,
 };
 pub use signamespaces::{
     create_namespace, get_signamespaces, get_signamespaces_mut, init_signamespaces, Namespace,
@@ -646,8 +641,8 @@ pub use sigmamicrophone::{
 };
 
 pub use sigmadiskmanager::{
-    add_disk, get_sigmadiskmanager, get_sigmadiskmanager_mut, init_sigmadiskmanager,
-    DiskState, DiskType, SigmaDiskManager,
+    add_disk, get_sigmadiskmanager, get_sigmadiskmanager_mut, init_sigmadiskmanager, DiskState,
+    DiskType, SigmaDiskManager,
 };
 
 pub use sigmadiskusage::{
@@ -860,8 +855,8 @@ pub use sigmakeyboardmanager::{
 };
 
 pub use sigmafilesystemmanager::{
-    get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut,
-    init_sigmafilesystemmanager, SigmaFileSystemManager,
+    get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut, init_sigmafilesystemmanager,
+    SigmaFileSystemManager,
 };
 
 pub use sigmasecuritymanager::{

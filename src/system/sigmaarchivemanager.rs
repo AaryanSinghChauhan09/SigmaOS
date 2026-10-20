@@ -246,8 +246,8 @@ mod tests {
         let id1 = manager.add_archive("/backup1.tar.gz".to_string(), ArchiveFormat::TarGz);
         let id2 = manager.add_archive("/backup2.tar.gz".to_string(), ArchiveFormat::TarGz);
 
-        manager.get_archive_mut(&id1).unwrap().with_size(1000000);
-        manager.get_archive_mut(&id2).unwrap().with_size(2000000);
+        manager.get_archive_mut(&id1).unwrap().size = 1000000;
+        manager.get_archive_mut(&id2).unwrap().size = 2000000;
 
         assert_eq!(manager.total_size(), 3000000);
     }

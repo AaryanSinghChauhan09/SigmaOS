@@ -305,7 +305,7 @@ mod tests {
         let mut manager = SigmaScanner::new();
         let scanner_id = manager.add_scanner("Epson".to_string(), "/dev/usb/scanner".to_string());
         manager.add_job(scanner_id.clone(), 300, true);
-        manager.add_job(scanner_id, 600, false);
+        manager.add_job(scanner_id.clone(), 600, false);
 
         let jobs = manager.list_jobs_by_scanner(&scanner_id);
         assert_eq!(jobs.len(), 2);
