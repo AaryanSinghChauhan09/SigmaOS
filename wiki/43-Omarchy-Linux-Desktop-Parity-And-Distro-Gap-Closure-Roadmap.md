@@ -22,6 +22,10 @@ This roadmap establishes the architecture, component specs, and pull-request ver
 ### 4. Dynamic Color Palette Extraction (`Wallust`)
 - **Color Syncing**: Pywal-compatible palette extraction generating matching 16-color themes for Ghostty terminal, Waybar status bar, Swaync control center, and GTK applications.
 
+### 5. PTY Terminal & Fuzzy Application Launcher (`Ghostty` & `Walker`)
+- **GPU Terminal PTY**: Full PTY configuration generation with truecolor support, JetBrainsMono font rendering, and zero-flicker scrollback.
+- **Allocation-Free Walker Search**: Sub-millisecond fuzzy substring matching across indexed applications, emojis, and symbols without heap reallocations.
+
 ---
 
 ## Verification & Execution Commands

@@ -21,7 +21,7 @@ This agent directive governs autonomous AI agents responsible for developing, ma
    - Each module must include standalone `#[cfg(test)]` unit tests.
    - Run compilation and test execution via:
      ```bash
-     mkdir -p build && rustc --test --edition=2021 src/distro/omarchy_linux_missing_components_v60_pr.rs -o build/omarchy_v60_test && ./build/omarchy_v60_test
+     mkdir -p build && rustc --test --edition=2021 src/distro/omarchy_linux_missing_components_v61_pr.rs -o build/omarchy_v61_test && ./build/omarchy_v61_test
      ```
 
 ---

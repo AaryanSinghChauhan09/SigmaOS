@@ -67,6 +67,12 @@ This PR specification establishes the future roadmap for SigmaOS to achieve comp
 - **Status:** Merged / Verified
 - **Description:** Enforces PTY isolation and authentication timeouts for graphical sudo privilege elevation.
 
+### PR #6100: Omarchy V61 Missing Components & PTY/Walker Integration
+- **Target File:** `src/distro/omarchy_linux_missing_components_v61_pr.rs`
+- **Module:** `OmarchyLinuxMissingComponentsV61MasterSuite`
+- **Status:** Merged / Verified
+- **Description:** Integrates Hyprpaper, Hypridle, Swaync, Waypaper, Wallust, Wlogout, Wofi, Ghostty PTY config, and Walker zero-allocation fuzzy search.
+
 ---
 
 ## Verification

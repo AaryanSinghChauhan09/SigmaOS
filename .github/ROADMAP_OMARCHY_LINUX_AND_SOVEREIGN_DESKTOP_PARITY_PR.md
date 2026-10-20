@@ -33,6 +33,10 @@ This PR specification outlines the future development roadmap for achieving 100%
 - **PAM Biometric Authentication**: PAM integration for fingerprint and facial recognition unlock.
 - **DPMS & Sleep Timers**: Configurable multi-stage idle timeouts (screen dimming, screen lock, DPMS off, system suspend).
 
+### 5. BSD & Linux Distro Security & Kernel Scheduling Inspirations
+- **OpenBSD Pledge & Unveil Sandboxing**: Restrict desktop application system call access and file system paths.
+- **Linux Sched_ext BPF Scheduler**: Real-time gaming and interactive desktop thread scheduling via dynamic BPF policies (`scx_bpfland`, `scx_lavd`).
+
 ---
 
 ## Technical Verification & Benchmarks
