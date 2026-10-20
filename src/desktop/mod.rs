@@ -636,3 +636,6 @@ pub use omarchy_terminal_gamemode::*;
 
 pub mod elementary_os_ecosystem_expansion_v64;
 pub use elementary_os_ecosystem_expansion_v64::*;
+
+pub mod elementary_os_missing_components_v66;
+pub use elementary_os_missing_components_v66::*;
