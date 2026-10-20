@@ -1,6 +1,6 @@
 #![no_std]
 use alloc::collections::BTreeMap;
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft to ArtCraft Parity & 3D Spatial Innovations PR Proposal Engine
 // (`src/creative/threedcraft_artcraft_parity_pr.rs`)

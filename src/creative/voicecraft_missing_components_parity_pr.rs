@@ -1,6 +1,6 @@
 #![no_std]
 use alloc::collections::BTreeMap;
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/voicecraft_missing_components_parity_pr.rs`)

@@ -1,6 +1,6 @@
 #![no_std]
 use alloc::collections::BTreeMap;
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 // SPDX-License-Identifier: MIT
 // Sovereign DesignCraft from ArtCraft Missing Components Parity PR Gateway Engine
 // (`src/creative/designcraft_missing_components_parity_pr.rs`)

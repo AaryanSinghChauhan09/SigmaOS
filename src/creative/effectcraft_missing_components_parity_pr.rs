@@ -1,6 +1,6 @@
 #![no_std]
 use alloc::collections::BTreeMap;
-use core::f32::consts::PI;
+use core::f64::consts::PI;
 // SigmaOS Sovereign Creative Suite: EffectCraft & ArtCraft Parity PR Engine
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
