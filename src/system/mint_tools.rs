@@ -497,16 +497,15 @@ impl SystemToolsEngine {
         self.update_manager.auto_update_enabled = !self.update_manager.auto_update_enabled;
     }
 
-    /// Search software
+    /// Search software using zero-allocation ASCII case-insensitive substring search.
     pub fn search_software(&mut self, query: String) -> Vec<&SoftwarePackage> {
         self.software_manager.search_query = query.clone();
-        let query_lower = query.to_lowercase();
         self.software_manager
             .packages
             .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower)
-                    || pkg.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&pkg.name, &query)
+                    || contains_ignore_case(&pkg.description, &query)
             })
             .collect()
     }
@@ -603,6 +602,28 @@ impl SystemToolsEngine {
 impl Default for SystemToolsEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Zero-allocation case-insensitive substring search helper for ASCII strings.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes.windows(n_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(n_bytes.iter())
+                .all(|(h, n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
