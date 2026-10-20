@@ -117,7 +117,9 @@ pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as 
 pub mod sigmamenumanager;
 pub mod sigmahardwaremanager;
 pub mod sigmastallmanager;
+pub mod sigmatogglemanager;
 pub use sigmanotificationmanager::{NotificationUrgency as NotificationManagerUrgency, SigmaNotificationManager as NotificationManager};
+pub use sigmatogglemanager::{SigmaToggleManager, Toggle as ToggleManagerToggle, ToggleState as ToggleManagerState};
 pub use sigmastallmanager::{InstallStatus as InstallManagerStatus, InstallType as InstallManagerType, SigmaInstallManager, SoftwareItem as InstallManagerItem};
 pub use sigmahardwaremanager::{HardwareDevice as HardwareManagerDevice, HardwareType as HardwareManagerType, SigmaHardwareManager};
 pub use sigmamenumanager::{Menu as MenuManagerMenu, MenuEntry as MenuManagerEntry, MenuEntryType as MenuManagerEntryType, SigmaMenuManager};
