@@ -915,6 +915,9 @@ pub use sovereign_init_and_supervisor_advancements_v60::*;
 pub mod sovereign_init_and_supervisor_advancements_v61;
 pub use sovereign_init_and_supervisor_advancements_v61::*;
 
+pub mod sovereign_init_and_supervisor_advancements_v63_pr;
+pub use sovereign_init_and_supervisor_advancements_v63_pr::*;
+
 pub use mint_tools::{
     get_system_tools, init_system_tools, BackupConfig, BackupJob as MintBackupJob,
     BackupStatus as MintBackupStatus, BackupType as MintBackupType, DiagnosticEntry,
