@@ -12,6 +12,7 @@
 // 6. SovereignFontcraftArtcraftParityPrGateway (Master PR Gateway, Parity Benchmark Suite & Markdown PR Specification Generator)
 
 #![no_std]
+extern crate alloc;
 
 #![no_std]
 extern crate alloc;
@@ -20,7 +21,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-extern crate alloc;
 
 
 /// Structured PR proposal manifest for missing FontCraft / Typography components.

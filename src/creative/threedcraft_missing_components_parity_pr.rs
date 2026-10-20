@@ -1,4 +1,5 @@
 #![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft & Model3D Missing Components Parity PR Gateway Module
 // (`src/creative/threedcraft_missing_components_parity_pr.rs`)
@@ -19,7 +20,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-extern crate alloc;
 
 
 

@@ -14,6 +14,7 @@
 // 8. SovereignCraftlibsMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
+extern crate alloc;
 
 #![no_std]
 extern crate alloc;
@@ -22,7 +23,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-extern crate alloc;
 
 
 /// Structured PR proposal manifest descriptor for CraftLibs ArtCraft Parity.

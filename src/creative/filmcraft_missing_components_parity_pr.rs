@@ -12,7 +12,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-extern crate alloc;
 
 
 

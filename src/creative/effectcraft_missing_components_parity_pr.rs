@@ -1,4 +1,5 @@
 #![no_std]
+extern crate alloc;
 // SigmaOS Sovereign Creative Suite: EffectCraft & ArtCraft Parity PR Engine
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
@@ -9,7 +10,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-extern crate alloc;
 
 
 #[derive(Debug, Clone, PartialEq)]
