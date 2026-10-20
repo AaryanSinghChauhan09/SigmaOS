@@ -96,6 +96,7 @@ pub mod sigmanotifyenhanced;
 pub mod sigmantp;
 pub mod sigmapackagemanager;
 pub mod sigmapackagemanager2;
+pub mod sigmapackageupdates;
 pub mod sigmaparted;
 pub mod sigmapdf;
 pub mod sigmaperformancemonitor;
@@ -857,6 +858,12 @@ pub use sigmakeyboardmanager::{
 pub use sigmafilesystemmanager::{
     get_sigmafilesystemmanager, get_sigmafilesystemmanager_mut, init_sigmafilesystemmanager,
     SigmaFileSystemManager,
+};
+
+pub use sigmapackageupdates::{
+    check_for_updates, get_check_interval, get_critical_updates, get_sigmapackageupdates,
+    get_sigmapackageupdates_mut, init_sigmapackageupdates, set_auto_update, set_check_interval,
+    SigmaPackageUpdates, UpdateSeverity as PackageUpdateSeverity, UpdateSource,
 };
 
 pub use sigmasecuritymanager::{
