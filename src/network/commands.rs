@@ -156,7 +156,7 @@ impl SocketStatsCommand {
                 SocketStatsEntry {
                     local_port: 80,
                     remote_port: 0,
-                    state: TcpState::Listen,
+                    state: TcpState::Listening,
                     pid: 1042,
                     inode: 12048,
                 },

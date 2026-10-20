@@ -42,9 +42,9 @@ pub use sovereign_remote_sharing::{
     SovereignRsyncEngine, SovereignSambaEngine, SovereignScpEngine, SovereignSshEngine,
     SshCertificate, SshMatchRule, SshMultiplexControlMaster,
 };
-// tcp_complete has TcpConnection; tcp module has TcpSocket, TcpError, TcpSegment, TcpState
-pub use tcp::{TcpError, TcpSegment, TcpState};
-pub use tcp_complete::TcpConnection;
+// tcp_complete has TcpConnection, TcpError; tcp module has TcpSegment, TcpState
+pub use tcp::{TcpSegment, TcpState};
+pub use tcp_complete::{TcpConnection, TcpError};
 pub use wireless_manager::{BluetoothDevice, WifiProfile, WifiSecurity, WirelessManager};
 
 // ZenithNet TCP/IP Stack

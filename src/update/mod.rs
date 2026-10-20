@@ -25,7 +25,5 @@ pub use distro_update_parity::{
     SystemDiagnosticReport, UnattendedUpgradeRule,
 };
 pub use manager::{
-    PreflightCheckResult, SovereignSystemUpdateManager, SystemUpdatePayload, SystemUpdatePolicy,
-    SystemUpdateStrategy, UpdateHealthVerifier, UpdateLedgerEntry, UpdateSeverity,
-    UpdateTransactionLedger,
+    UpdateManager, UpdateStatus, UpdateType,
 };

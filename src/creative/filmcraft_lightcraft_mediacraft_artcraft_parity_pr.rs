@@ -706,3 +706,5 @@ mod tests {
         assert!(lufs < 0.0);
     }
 }
+
+}

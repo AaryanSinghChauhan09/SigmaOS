@@ -4,11 +4,11 @@
 //! Following principles: DIRECT_DEVICE_CONTROL, RACE_FREE DESIGN,
 //! MEMORY_SAFETY, and SEPARATION_OF_CONCERNS.
 
-use core::net::{SocketAddr, ToSocketAddr};
+use core::net::SocketAddr;
 use core::fmt;
 
 /// TCP connection state
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TcpState {
     /// Connection is closed
     Closed,

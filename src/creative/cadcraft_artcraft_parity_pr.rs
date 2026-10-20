@@ -130,7 +130,6 @@ impl CadcraftNurbsCurveSurfacePrEngine {
         if total_w > 1e-9 {
             NurbsControlPoint::new(x / total_w, y / total_w, z / total_w, 1.0)
         } else {
- {
             self.control_points[0]
         }
     }
@@ -572,8 +571,6 @@ impl CadcraftEdaPcb3dIntegrationPrEngine {
                     comp.designation, comp.height_mm, enclosure_height_mm
                 ));
             } else if comp.max_clearance_req_mm > enclosure_height_mm {
- {
- {
                 violations.push(format!(
                     "Clearance Warning: {} (req {:.1}mm > enclosure {:.1}mm)",
                     comp.designation, comp.max_clearance_req_mm, enclosure_height_mm
@@ -927,7 +924,6 @@ impl SovereignCadcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

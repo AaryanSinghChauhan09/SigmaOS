@@ -1075,3 +1075,5 @@ mod tests {
         assert!(wcag.audit_touch_target(48.0, 48.0));
     }
 }
+
+}}}}}}}}

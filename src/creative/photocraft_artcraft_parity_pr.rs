@@ -1056,3 +1056,5 @@ mod tests {
         assert!(suite.verify_complete_parity());
     }
 }
+
+}}}

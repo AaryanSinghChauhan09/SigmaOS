@@ -1310,3 +1310,5 @@ mod tests {
         assert!(contrast > 20.0);
     }
 }
+
+}}}}}}

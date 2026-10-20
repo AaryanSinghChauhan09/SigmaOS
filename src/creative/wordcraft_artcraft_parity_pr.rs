@@ -1220,3 +1220,5 @@ mod tests {
         assert_eq!(proposals.len(), 14);
     }
 }
+
+}

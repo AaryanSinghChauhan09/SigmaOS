@@ -1064,3 +1064,5 @@ mod tests {
         assert_eq!(out[1], 255); // Green from right
     }
 }
+
+}

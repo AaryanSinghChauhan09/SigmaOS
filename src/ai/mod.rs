@@ -37,7 +37,7 @@ pub use agentic_os_runtime::{
 
 pub use openclaw::{AlertPlatform, ClawBackgroundDaemon, ClawChatIntegrator, ClawVoiceTranscriber};
 
-pub use agent::{AIAgent, SimpleAIAgent};
+pub use orchestrator::{AIAgent, SimpleAIAgent};
 pub use autogen::{
     AgentRole as AutoGenRole, AutoGenError, AutoGenMessage, AutoGenTool, ConversableAgent,
     GroupChat, SandboxCodeExecutor,

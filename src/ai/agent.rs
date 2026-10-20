@@ -6,6 +6,8 @@
 //! PLUG_IN_DRIVER_MODEL, POLYMORPHISM, COMPOSITION_OVER_INHERITANCE, USER_FREEDOM_AND_CONTROL,
 //! CONFIGURABILITY, COMMUNITY_ORIENTED_DEVELOPMENT.
 
+use core::fmt;
+
 /// AI agent provider
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AIProvider {

@@ -1430,3 +1430,5 @@ mod tests {
         assert!(!engine.verify_touch_target(32.0, 32.0));
     }
 }
+
+}

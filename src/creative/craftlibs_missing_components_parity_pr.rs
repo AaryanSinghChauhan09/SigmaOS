@@ -94,19 +94,19 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             let r_lin = if r <= 0.04045 {
                 r / 12.92
             } else {
- {
+
                 ((r + 0.055) / 1.055).powf(2.4)
             };
             let g_lin = if g <= 0.04045 {
                 g / 12.92
             } else {
- {
+
                 ((g + 0.055) / 1.055).powf(2.4)
             };
             let b_lin = if b <= 0.04045 {
                 b / 12.92
             } else {
- {
+
                 ((b + 0.055) / 1.055).powf(2.4)
             };
             // Apply matrix transform
@@ -117,19 +117,19 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             let r_gam = if r_out <= 0.0031308 {
                 r_out * 12.92
             } else {
- {
+
                 1.055 * r_out.powf(1.0 / 2.4) - 0.055
             };
             let g_gam = if g_out <= 0.0031308 {
                 g_out * 12.92
             } else {
- {
+
                 1.055 * g_out.powf(1.0 / 2.4) - 0.055
             };
             let b_gam = if b_out <= 0.0031308 {
                 b_out * 12.92
             } else {
- {
+
                 1.055 * b_out.powf(1.0 / 2.4) - 0.055
             };
             rgba_out[idx] = (r_gam * 255.0).clamp(0.0, 255.0) as u8;
@@ -155,10 +155,14 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             ],
             performance_multiplier: "8x Vectorized SIMD Speedup (< 1.2ms 4K Frame)".to_string(),
             status: "Ready for Merge".to_string(),
+        }
+    }
 impl Default for CraftlibsSimdColorSpaceTransformPrEngine {
     fn default() -> Self {
         Self::new()
-// 2. LittleCMS ICC Profile Color Management Engine
+    }
+}
+/// 2. LittleCMS ICC Profile Color Management Engine
 /// Rendering Intent.
 pub enum RenderingIntent {
     Perceptual,
@@ -185,8 +189,10 @@ impl CraftlibsIccProfileColorManagementPrEngine {
         rgb_in: &[f32],
         intent: RenderingIntent,
         rgb_out: &mut [f32],
+    ) {
         if rgb_in.len() != rgb_out.len() {
             return Err("Input and output buffer dimensions mismatch".to_string());
+        }
         let boost = match intent {
             RenderingIntent::Perceptual => 1.02f32,
             RenderingIntent::RelativeColorimetric => 1.00f32,
@@ -261,7 +267,7 @@ impl CraftlibsLayerBlendModesPrEngine {
                     if b < 0.5 {
                         2.0 * b * s
                     } else {
- {
+
                         1.0 - 2.0 * (1.0 - b) * (1.0 - s)
                     }
                 }
@@ -292,7 +298,7 @@ impl CraftlibsLayerBlendModesPrEngine {
                         if s <= 0.0 {
                             0.0
                         } else {
- {
+
                             (1.0 - (1.0 - b) / (2.0 * s)).max(0.0)
                         }
                         if s >= 1.0 {
@@ -324,8 +330,10 @@ impl CraftlibsLayerBlendModesPrEngine {
         backdrop_rgba: &[u8],
         source_rgba: &[u8],
         output_rgba: &mut [u8],
+    ) {
         if backdrop_rgba.len() != source_rgba.len() || backdrop_rgba.len() != output_rgba.len() {
             return Err("Buffer length mismatch".to_string());
+        }
         let pixel_count = backdrop_rgba.len() / 4;
             let bg = [
                 backdrop_rgba[idx],
@@ -338,6 +346,7 @@ impl CraftlibsLayerBlendModesPrEngine {
                 source_rgba[idx + 1],
                 source_rgba[idx + 2],
                 source_rgba[idx + 3],
+            ];
             let res = self.blend_pixels(bg, src, mode, opacity);
             output_rgba[idx..idx + 4].copy_from_slice(&res);
             pr_id: 603,
@@ -369,6 +378,7 @@ impl CraftlibsLibvipsTilePipelinePrEngine {
         image_height: u32,
         roi: TileRoi,
         output_tile_rgba: &mut [u8],
+    ) {
         let expected_bytes = (roi.width * roi.height * 4) as usize;
         if output_tile_rgba.len() != expected_bytes {
             return Err("Output tile buffer length does not match ROI dimensions".to_string());
@@ -448,6 +458,7 @@ impl CraftlibsSkiaCanvasRendererPrEngine {
         path: &CraftlibsVectorPathGeometryPrEngine,
         color_rgba: [u8; 4],
         canvas_output_rgba: &mut [u8],
+    ) {
         let expected_bytes = (self.width * self.height * 4) as usize;
         if canvas_output_rgba.len() != expected_bytes {
             return Err("Canvas output buffer dimensions mismatch".to_string());
@@ -1363,5 +1374,4 @@ mod tests {
 
         let mut suite = CraftlibsMissingComponentsParityPrSuite::new();
         assert!(suite.verify_complete_parity());
-
-}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}

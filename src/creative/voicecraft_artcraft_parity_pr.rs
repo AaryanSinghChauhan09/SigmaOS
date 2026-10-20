@@ -631,3 +631,5 @@ mod tests {
         assert_eq!(gateway.compute_parity_score(), 100.0);
     }
 }
+
+}}}
