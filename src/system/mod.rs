@@ -109,7 +109,9 @@ pub mod sigmacontainermanager;
 pub mod sigmavirtualizationmanager;
 pub mod sigmasnapshotmanager;
 pub mod sigmaresourcemanager;
+pub mod sigmarepositorymanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmarepositorymanager::{SigmaRepositoryManager as RepositoryManager, Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType};
 pub use sigmaresourcemanager::{SigmaResourceManager as ResourceManager, ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota, ResourceType as ResourceManagerType};
 pub use sigmasnapshotmanager::{SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot, SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType};
 pub use sigmavirtualizationmanager::{SigmaVirtualizationManager as VirtManager, VirtualMachine as VirtMachine, VMConfig as VirtConfig, VMState as VirtState};
@@ -482,7 +484,7 @@ pub use sigmantp::{
 };
 pub use sigmapackagemanager::{
     add_package, get_sigmapackagemanager, init_sigmapackagemanager, install_package, Package,
-    PackageFormat, PackageState, Repository, SigmaPackageManager,
+    PackageFormat, PackageState, Repository as PackageManagerRepository, SigmaPackageManager,
 };
 pub use sigmaparted::{
     create_partition_table, get_sigmaparted, init_sigmaparted, Disk, Partition, PartitionFlag,
