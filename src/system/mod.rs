@@ -107,7 +107,9 @@ pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as
 pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager};
 pub mod sigmacontainermanager;
 pub mod sigmavirtualizationmanager;
+pub mod sigmasnapshotmanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmasnapshotmanager::{SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot, SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType};
 pub use sigmavirtualizationmanager::{SigmaVirtualizationManager as VirtManager, VirtualMachine as VirtMachine, VMConfig as VirtConfig, VMState as VirtState};
 pub use sigmacontainermanager::{Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig, ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager};
 pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
@@ -552,10 +554,6 @@ pub use sigmasmb::{
 };
 pub use sigmasnap::{
     add_snap, get_sigmasnap, init_sigmasnap, install_snap, SigmaSnap, Snap, SnapState, SnapType,
-};
-pub use sigmasnapshot::{
-    add_snapshot, get_sigmasnapshot, init_sigmasnapshot, restore_snapshot, SigmaSnapshot, Snapshot,
-    SnapshotPolicy, SnapshotSchedule, SnapshotState, SnapshotType,
 };
 pub use sigmasound::{
     get_sigmasound, get_sigmasound_mut, init_sigmasound, AudioDeviceState, SigmaSound,
