@@ -19,14 +19,10 @@ use core::f64::consts::PI;
 // 10. EffectcraftStereoscopic3dDepthMapPrEngine (Stereoscopic 3D anaglyph rendering & disparity map synthesis)
 // 11. SovereignEffectcraftArtcraftParityPrGateway & EffectcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]

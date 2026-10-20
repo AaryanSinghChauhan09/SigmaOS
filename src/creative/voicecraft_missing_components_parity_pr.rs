@@ -14,17 +14,11 @@ use core::f64::consts::PI;
 // 5. VoicecraftWaylandAccessibilityVoiceControlPrEngine (Wayland desktop action dispatcher, speech intent parsing & voice navigation)
 // 6. SovereignVoicecraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]

@@ -5,17 +5,11 @@ use core::f64::consts::PI;
 // Sovereign DesignCraft from ArtCraft Missing Components Parity PR Gateway Engine
 // (`src/creative/designcraft_missing_components_parity_pr.rs`)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
@@ -27,7 +21,6 @@ use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 #[cfg(any(feature = "standalone_test", test))]

@@ -16,17 +16,11 @@ use core::f64::consts::PI;
 // 6. GridcraftMacroScriptingUdfPrEngine (Macro action recorder, WASM/script sandbox & User-Defined Functions UDF registry)
 // 7. SovereignGridcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]

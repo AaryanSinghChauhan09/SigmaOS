@@ -19,18 +19,12 @@ use core::f64::consts::PI;
 // 10. PhotocraftPerspectiveWarpMeshDeformPrEngine (Perspective warp quad grid & puppet mesh deformer)
 // 11. SovereignPhotocraftArtcraftParityPrGateway & PhotocraftArtcraftParityPrSuite (Master Gateway & Parity Benchmark)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]

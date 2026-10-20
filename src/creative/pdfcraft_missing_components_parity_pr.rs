@@ -19,16 +19,11 @@ use core::f64::consts::PI;
 // 10. PdfcraftArchivalValidationPrEngine (ISO 19005 PDF/A-1/2/3/4 preservation & ISO 15930 PDF/X print exchange compliance repairer)
 // 11. SovereignPdfcraftMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]

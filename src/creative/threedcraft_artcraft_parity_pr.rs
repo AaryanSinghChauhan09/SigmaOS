@@ -14,16 +14,11 @@ use core::f64::consts::PI;
 // 5. ThreeDCraftWayland3dSpatialCompositorPrEngine (Wayland 3D spatial window compositing, VR/AR projection & stereoscopic eye matrices)
 // 6. SovereignThreeDCraftArtcraftParityPrGateway & ThreeDCraftArtcraftParityPrSuite (Master PR Gateway Coordinator & Parity Benchmark)
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
