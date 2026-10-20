@@ -57,6 +57,7 @@ User management, service supervision, logging, monitoring, and system maintenanc
 | [System-Automation-Engine-Components.md](./System-Automation-Engine-Components.md) | System automation engine components |
 | [System-Provisioning-Components.md](./System-Provisioning-Components.md) | System provisioning components |
 | [System-Governance-and-RFC-Components.md](./System-Governance-and-RFC-Components.md) | System governance and RFC components |
+| [DISPATCHER_PLAN.md](./DISPATCHER_PLAN.md) | Dispatcher architecture & support matrix plan |
 | [SIGNAL_HANDLER_PLAN.md](./SIGNAL_HANDLER_PLAN.md) | Signal handler development plan |
 | [SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md](./SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) | Signal handler audit and ABI profile |
 | [SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md](./SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) | System utilities development plan |
