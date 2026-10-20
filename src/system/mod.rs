@@ -108,7 +108,9 @@ pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLev
 pub mod sigmacontainermanager;
 pub mod sigmavirtualizationmanager;
 pub mod sigmasnapshotmanager;
+pub mod sigmaresourcemanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmaresourcemanager::{SigmaResourceManager as ResourceManager, ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota, ResourceType as ResourceManagerType};
 pub use sigmasnapshotmanager::{SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot, SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType};
 pub use sigmavirtualizationmanager::{SigmaVirtualizationManager as VirtManager, VirtualMachine as VirtMachine, VMConfig as VirtConfig, VMState as VirtState};
 pub use sigmacontainermanager::{Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig, ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager};
@@ -527,10 +529,6 @@ pub use sigmaraid::{
 pub use sigmarecovery::{
     boot_to_recovery, get_sigmarecovery, init_sigmarecovery, RecoveryAction, RecoveryMode,
     RecoverySnapshot, SigmaRecovery,
-};
-pub use sigmaresource::{
-    get_sigmaresource, init_sigmaresource, set_resource_limit, ResourceLimit, ResourceType,
-    SigmaResource,
 };
 pub use sigmascheduledfsck::{
     execute_scheduled_fsck, get_sigmascheduledfsck, init_sigmascheduledfsck, is_fsck_due,
