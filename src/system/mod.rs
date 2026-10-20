@@ -100,7 +100,9 @@ pub mod sigmapackageupdates;
 pub mod sigmaparted;
 pub mod sigmasoftwaremanager;
 pub mod sigmahardwareprofiler;
+pub mod sigmasystemmonitor2;
 pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePackage, SoftwareSource};
+pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
 pub mod sigmaperformancemonitor;
@@ -139,7 +141,6 @@ pub mod sigmaswap;
 pub mod sigmasystemd;
 pub mod sigmasysteminfo;
 pub mod sigmasystemmonitor;
-pub mod sigmasystemmonitor2;
 pub mod sigmasystemtools;
 pub mod sigmataskmanager;
 pub mod sigmathemeinstaller;
@@ -241,7 +242,7 @@ pub use power_manager::{
     PowerStatistics, SleepAction,
 };
 pub use process_supervisor::{
-    ProcessConfig, ProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
+    ProcessConfig, ProcessState as OtherProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
 };
 pub use sandbox::{
     CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ProcessSandboxManager,
@@ -503,7 +504,7 @@ pub use sigmaprinter::{
     PrinterState, SigmaPrinter,
 };
 pub use sigmaprocess::{
-    get_sigmaprocess, init_sigmaprocess, send_process_signal, ProcessInfo,
+    get_sigmaprocess, init_sigmaprocess, send_process_signal, ProcessInfo as OtherProcessInfo,
     ProcessState as SigmaProcessState, SigmaProcess, Signal,
 };
 pub use sigmaproxy::{
@@ -773,7 +774,7 @@ pub use boot_analyzer::{
 pub use monitor::{
     get_system_monitor, init_system_monitor, CpuStats, DiskStats as MonDiskStats,
     MemoryStats as MonMemoryStats, NetworkStats as MonNetworkStats,
-    ProcessState as MonitorProcessState, ProcessStats, SystemMonitor as SystemMonitorNew,
+    ProcessStats, SystemMonitor as SystemMonitorNew,
 };
 pub use preload::{
     add_common_preloads, get_preload_manager, init_preload_manager, PreloadEntry, PreloadManager,
