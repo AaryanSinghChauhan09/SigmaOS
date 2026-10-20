@@ -105,6 +105,7 @@ pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePack
 pub mod sigmataskscheduler;
 pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
 pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager};
+pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
 pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
@@ -287,7 +288,7 @@ pub use sigmaaudioconfig::{
     AudioDevice, AudioDeviceType, AudioProfile, BitDepth, SampleRate, SigmaAudioConfig,
 };
 pub use sigmabackup::{
-    create_backup, get_sigmabackup, init_sigmabackup, Backup, BackupState, BackupType, SigmaBackup,
+    create_backup, get_sigmabackup, init_sigmabackup, Backup, BackupState, BackupType as OtherBackupType, SigmaBackup,
 };
 pub use sigmabluetooth::{
     add_adapter, get_sigmabluetooth, get_sigmabluetooth_mut, init_sigmabluetooth, AdapterState,
@@ -824,10 +825,6 @@ pub use sigmasystemtools::{
 };
 
 
-pub use sigmabackupmanager::{
-    add_backup, get_sigmabackupmanager, get_sigmabackupmanager_mut, init_sigmabackupmanager,
-    SigmaBackupManager,
-};
 
 pub use sigmausermanager::{
     add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager,
