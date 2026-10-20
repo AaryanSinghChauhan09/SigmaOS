@@ -1,4 +1,5 @@
 #![no_std]
+extern crate alloc;
 use alloc::collections::BTreeMap;
 use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
