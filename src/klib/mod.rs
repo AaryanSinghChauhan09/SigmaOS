@@ -68,6 +68,7 @@ impl ZeroDependencyPrimitiveHub {
         hash::fnv1a_hash(data)
     }
 
+    #[allow(clippy::needless_lifetimes)]
     pub fn format_u64_stack<'a>(mut val: u64, buf: &'a mut [u8]) -> &'a str {
         if val == 0 {
             if !buf.is_empty() {

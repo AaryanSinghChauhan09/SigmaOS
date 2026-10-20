@@ -39,6 +39,7 @@ impl SigmaTimestamp {
     }
 
     /// Compare timestamps
+    #[allow(clippy::should_implement_trait)]
     pub fn cmp(&self, other: &SigmaTimestamp) -> core::cmp::Ordering {
         if self.seconds != other.seconds {
             self.seconds.cmp(&other.seconds)

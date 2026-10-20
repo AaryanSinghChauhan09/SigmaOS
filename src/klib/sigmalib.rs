@@ -309,7 +309,7 @@ mod tests {
         assert_eq!(string::strcmp(s1, s1), 0);
 
         let mut dest = [0u8; 10];
-        string::strncpy_secure(&mut dest, s1);
+        let _ = string::strncpy_secure(&mut dest, s1);
         assert_eq!(string::strcmp(&dest, s1), 0);
     }
 

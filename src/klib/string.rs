@@ -50,6 +50,7 @@ impl SigmaString {
 
     /// Create a SigmaString from a string slice
     /// Optimized by Bolt ⚡: uses bulk `extend_from_slice` memory copy rather than looping push.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         let bytes = s.as_bytes();
         let mut data = SigmaVec::with_capacity(bytes.len());
@@ -309,6 +310,7 @@ impl SigmaString {
     }
 
     /// Check if the string contains a pattern
+    #[allow(clippy::needless_lifetimes)]
     pub fn contains<'a, P>(&'a self, pat: P) -> bool
     where
         P: Pattern,
@@ -322,6 +324,7 @@ impl SigmaString {
     }
 
     /// Find the first occurrence of a pattern
+    #[allow(clippy::needless_lifetimes)]
     pub fn find<'a, P>(&'a self, pat: P) -> Option<usize>
     where
         P: Pattern,
@@ -330,6 +333,7 @@ impl SigmaString {
     }
 
     /// Replace occurrences of a pattern
+    #[allow(clippy::needless_lifetimes)]
     pub fn replace<'a, P>(&'a self, pat: P, replacement: &str) -> SigmaString
     where
         P: Pattern,
