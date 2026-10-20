@@ -106,7 +106,9 @@ pub mod sigmataskscheduler;
 pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
 pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager};
 pub mod sigmacontainermanager;
+pub mod sigmavirtualizationmanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmavirtualizationmanager::{SigmaVirtualizationManager as VirtManager, VirtualMachine as VirtMachine, VMConfig as VirtConfig, VMState as VirtState};
 pub use sigmacontainermanager::{Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig, ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager};
 pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
@@ -602,11 +604,6 @@ pub use sigmausbwriter::{
 pub use sigmavector::{
     add_layer, get_sigmavector, get_sigmavector_mut, init_sigmavector, LineCap, LineJoin,
     PathSegment, SigmaVector, VectorElement, VectorElementType, VectorLayer, VectorPoint,
-};
-pub use sigmavirtualization::{
-    create_vm, get_sigmavirtualization, get_sigmavirtualization_mut, init_sigmavirtualization,
-    Architecture, DiskInterface, NetworkInterface as VirtualizationNetworkInterface,
-    SigmaVirtualization, VMResources, VMState, VirtualDisk, VirtualMachine, VirtualNetwork,
 };
 pub use sigmavoice::{
     add_voice_command, get_sigmavoice, get_sigmavoice_mut, init_sigmavoice, SigmaVoice,
