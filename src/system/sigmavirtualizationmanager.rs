@@ -172,7 +172,7 @@ mod tests {
             network_enabled: true,
         };
         let vm = manager.create_vm(config);
-        manager.start_vm(vm.id).unwrap();
+        manager.start_vm(vm.id.clone()).unwrap();
         assert_eq!(manager.get_vms()[0].state, VMState::Running);
     }
 
@@ -188,8 +188,8 @@ mod tests {
             network_enabled: true,
         };
         let vm = manager.create_vm(config);
-        manager.start_vm(vm.id).unwrap();
-        manager.stop_vm(vm.id).unwrap();
+        manager.start_vm(vm.id.clone()).unwrap();
+        manager.stop_vm(vm.id.clone()).unwrap();
         assert_eq!(manager.get_vms()[0].state, VMState::Stopped);
     }
 

@@ -174,7 +174,7 @@ mod tests {
             network_enabled: true,
         };
         let container = manager.create_container("test".to_string(), config);
-        manager.start_container(container.id).unwrap();
+        manager.start_container(container.id.clone()).unwrap();
         assert_eq!(manager.get_containers()[0].state, ContainerState::Running);
     }
 
@@ -189,8 +189,8 @@ mod tests {
             network_enabled: true,
         };
         let container = manager.create_container("test".to_string(), config);
-        manager.start_container(container.id).unwrap();
-        manager.stop_container(container.id).unwrap();
+        manager.start_container(container.id.clone()).unwrap();
+        manager.stop_container(container.id.clone()).unwrap();
         assert_eq!(manager.get_containers()[0].state, ContainerState::Stopped);
     }
 
