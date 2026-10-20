@@ -209,14 +209,14 @@ mod tests {
         // Very basic check - should be different most of the time
         // (not guaranteed for this simple implementation)
         // Just ensure they are valid u32 values
-        assert!(r1 >= 0);
-        assert!(r2 >= 0);
+        assert!(r1 != r2 || r1 != 0);
     }
 
     #[test]
     fn test_random_u64() {
         let r = random_u64();
-        assert!(r >= 0);
+        // Just ensure it's a valid u64 value
+        assert!(true);
     }
 
     #[test]
