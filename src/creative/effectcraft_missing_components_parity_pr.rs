@@ -11,10 +11,6 @@ use core::f64::consts::PI;
 
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EffectcraftPrProposalSpec {
@@ -1345,7 +1341,6 @@ impl Default for EffectcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_optical_flow_engine_functional() {

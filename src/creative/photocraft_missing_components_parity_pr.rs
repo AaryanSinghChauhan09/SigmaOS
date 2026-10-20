@@ -18,10 +18,6 @@ extern crate alloc;
 
 
 /// Structured PR proposal manifest descriptor for Photocraft ArtCraft Parity.
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PhotocraftPrProposalManifest {
@@ -918,7 +914,6 @@ impl PhotocraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_photocraft_raw_processing_engine() {

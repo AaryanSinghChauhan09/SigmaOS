@@ -27,24 +27,15 @@ use core::f64::consts::PI;
 extern crate alloc;
 
 
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
-use core::sync::atomic::{AtomicU32, Ordering};
 
 #[cfg(any(feature = "standalone_test", test))]
-use std::sync::atomic::{AtomicU32, Ordering};
 
 /// Structured PR proposal manifest descriptor for Designcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -951,7 +942,6 @@ impl DesigncraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_designcraft_artcraft_parity_pr_gateway() {

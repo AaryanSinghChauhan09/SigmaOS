@@ -14,10 +14,6 @@ extern crate alloc;
 
 
 /// Structured PR proposal manifest descriptor for Pdfcraft / Artcraft parity features.
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PdfcraftArtcraftPrProposalManifest {
@@ -332,7 +328,6 @@ impl SovereignPdfcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_pdfcraft_artcraft_parity_pr_gateway() {

@@ -26,10 +26,6 @@ extern crate alloc;
 
 
 /// Structured PR proposal manifest descriptor for CraftLibs ArtCraft Parity.
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CraftlibsPrProposalManifest {
@@ -956,7 +952,6 @@ impl Default for CraftlibsMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     #[test]
     fn test_color_transform_engine() {
