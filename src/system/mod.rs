@@ -104,6 +104,7 @@ pub mod sigmasystemmonitor2;
 pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePackage, SoftwareSource};
 pub mod sigmataskscheduler;
 pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
+pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager};
 pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
@@ -428,10 +429,6 @@ pub use sigmait::{
 pub use sigmalight::{
     add_light, get_sigmalight, get_sigmalight_mut, init_sigmalight, ColorTemperature, LightSource,
     LightType, LightingScene, SigmaLight,
-};
-pub use sigmalogmanager::{
-    get_sigmalogmanager, get_sigmalogmanager_mut, init_sigmalogmanager, log_message, LogEntry,
-    LogLevel, LogSource, RotationPolicy, SigmaLogManager,
 };
 pub use sigmalogrotate::{
     get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig,
