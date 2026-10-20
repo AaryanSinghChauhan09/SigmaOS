@@ -114,6 +114,7 @@ pub mod sigmacommandmanager;
 pub mod sigmaconfigmanager;
 pub mod sigmathememanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmanotificationmanager::{NotificationUrgency as NotificationManagerUrgency, SigmaNotificationManager as NotificationManager};
 pub use sigmathememanager::{SigmaThemeManager, Theme as ThemeManagerTheme, ThemeColor as ThemeManagerColor};
 pub use sigmaconfigmanager::{ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager};
 pub use sigmacommandmanager::{Command as CommandManagerCommand, CommandPermission as CommandManagerPermission, CommandType as CommandManagerType, SigmaCommandManager};
@@ -831,10 +832,6 @@ pub use sigmadisplaymanager::{
     SigmaDisplayManager,
 };
 
-pub use sigmanotificationmanager::{
-    add_notification, get_sigmanotificationmanager, get_sigmanotificationmanager_mut,
-    init_sigmanotificationmanager, SigmaNotificationManager,
-};
 
 pub use sigmapowermanager::{
     add_profile, get_sigmapowermanager, get_sigmapowermanager_mut, init_sigmapowermanager,
