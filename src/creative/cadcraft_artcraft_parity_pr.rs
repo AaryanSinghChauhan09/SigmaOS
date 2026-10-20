@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/cadcraft_artcraft_parity_pr.rs`)
@@ -20,7 +23,6 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use core::f32::consts::PI;
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};

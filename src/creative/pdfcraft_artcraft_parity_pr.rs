@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Pdfcraft to Artcraft Parity PR Proposal Engine
 // Bridges Pdfcraft (PDF suite) and Artcraft (Creative Suite) missing feature parity via structured PR proposals.
@@ -322,7 +325,6 @@ impl SovereignPdfcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-use core::f32::consts::PI;
 
     #[test]
     fn test_pdfcraft_artcraft_parity_pr_gateway() {

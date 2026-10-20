@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Soundcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/soundcraft_missing_components_parity_pr.rs`)
@@ -17,7 +20,6 @@ extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
-use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]

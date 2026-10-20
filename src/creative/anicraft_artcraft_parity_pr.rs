@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
@@ -21,7 +24,6 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]

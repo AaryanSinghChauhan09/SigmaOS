@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/cadcraft_missing_components_parity_pr.rs`)
@@ -16,7 +19,6 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use core::f32::consts::PI;
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};

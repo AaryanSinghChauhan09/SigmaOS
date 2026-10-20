@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - ArtCraft Craftlibs Missing Components Parity PR Gateway
 // (`src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs`)
@@ -618,7 +621,6 @@ impl Default for SovereignArtcraftCraftlibsParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-use core::f32::consts::PI;
 
     #[test]
     fn test_craftlibs_parity_pr_gateway() {

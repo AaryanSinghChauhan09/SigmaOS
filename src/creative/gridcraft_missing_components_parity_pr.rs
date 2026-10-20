@@ -1,3 +1,6 @@
+#![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
 //
@@ -17,7 +20,6 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -860,7 +862,6 @@ impl Default for SovereignGridcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-use core::f32::consts::PI;
 
     #[test]
     fn test_gridcraft_parity_pr_gateway() {

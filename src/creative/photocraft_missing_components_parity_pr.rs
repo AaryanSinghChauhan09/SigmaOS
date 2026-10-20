@@ -6,11 +6,12 @@
 // photo editing ecosystem components in Pull Request proposal format.
 
 #![no_std]
+use alloc::collections::BTreeMap;
+use core::f32::consts::PI;
 
 extern crate alloc;
 
 use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
-use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -913,7 +914,6 @@ impl PhotocraftMissingComponentsParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
-use core::f32::consts::PI;
 
     #[test]
     fn test_photocraft_raw_processing_engine() {
