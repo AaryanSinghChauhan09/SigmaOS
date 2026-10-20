@@ -268,6 +268,13 @@ if [ -f "src/distro/sovereign_distro_outpacing_engine.rs" ]; then
     ./build/test_outpacing
 fi
 
+if [ -f "src/distro/sovereign_ahead_distro_supremacy.rs" ]; then
+    echo "Running Sovereign Ahead-of-Distros Innovation test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_ahead_distro_supremacy.rs --edition=2021 -o build/test_ahead_distro
+    ./build/test_ahead_distro
+fi
+
 if [ -f "src/distro/sovereign_2026_distro_leap_engine.rs" ]; then
     echo "Running 2026 Distro Leap test suite..."
     mkdir -p build

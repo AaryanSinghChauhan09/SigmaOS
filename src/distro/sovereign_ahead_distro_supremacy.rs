@@ -799,6 +799,20 @@ impl SovereignAheadOfDistrosSuite {
 
         sched_ok && cas_ok && cap_ok && storage_ok && microarch_ok && mesh_ok
     }
+
+    /// Computes the overall Distro Supremacy Index (0 to 100) combining scheduler efficiency,
+    /// CAS store generation & hot-swap activity, security capability enforcement, storage health,
+    /// microarchitecture JIT optimizations, and zero-copy networking.
+    pub fn compute_distro_supremacy_index(&self) -> u32 {
+        let sched_score = self.predictive_sched.compute_quantum_scheduler_efficiency_index();
+        let cas_score = if self.omni_cas_store.active_generation >= 1 { 100 } else { 50 };
+        let cap_score = if !self.cross_capability.multi_os_mask.openbsd_pledge_token.is_empty() { 100 } else { 70 };
+        let storage_score = u32::from(self.hammer2_storage.disk_health_percent);
+        let microarch_score = if self.microarch_tuner.detected_tier == MicroarchTier::X86_64V4 { 100 } else { 80 };
+        let mesh_score = if self.xdp_carp_mesh.is_master { 100 } else { 50 };
+
+        (sched_score + cas_score + cap_score + storage_score + microarch_score + mesh_score) / 6
+    }
 }
 
 impl Default for SovereignAheadOfDistrosSuite {
@@ -930,5 +944,6 @@ mod tests {
     fn test_ahead_of_distros_suite() {
         let mut suite = SovereignAheadOfDistrosSuite::new();
         assert!(suite.verify_unbroken_distro_dominance());
+        assert_eq!(suite.compute_distro_supremacy_index(), 100);
     }
 }
