@@ -89,7 +89,6 @@ pub mod sigmamount;
 pub mod sigmamq;
 pub mod sigmananny;
 pub mod sigmanetwork;
-pub mod sigmanetworkmanager2;
 pub mod sigmanfs;
 pub mod sigmanic;
 pub mod sigmanotificationmanager;
@@ -133,6 +132,7 @@ pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
 pub mod sigmamigrationmanager;
+pub mod sigmanetworkmanager3;
 pub mod sigmaservicemanager4;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
@@ -148,6 +148,10 @@ pub mod sigmaupdatemanager2;
 pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
 pub use sigmaapplicationmanager::{
     Application, AppState, SigmaApplicationManager,
+};
+pub use sigmanetworkmanager3::{
+    InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
+    NetworkInterface as NetworkInterface3, SigmaNetworkManager3,
 };
 pub use sigmaservicemanager4::{
     Service as ServiceManagerService, ServiceState as ServiceManagerState,
