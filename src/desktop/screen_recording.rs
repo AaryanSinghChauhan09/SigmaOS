@@ -511,7 +511,7 @@ mod tests {
         recorder.stop_recording().unwrap();
         let (count, duration, size) = recorder.get_statistics();
         assert_eq!(count, 1);
-        assert!(duration >= 0);
+        assert!(duration > 0);
         assert!(size > 0);
     }
 }

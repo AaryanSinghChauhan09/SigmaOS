@@ -19,6 +19,7 @@ extern crate alloc;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 /// Structured PR proposal manifest for C library and runtime enhancements (V61).
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1473,12 +1474,12 @@ mod tests {
         assert_eq!(weak_c, 1);
 
         let f_parsed = engine.fast_from_chars_f64_sim(b"3.14159");
-        assert!((f_parsed.unwrap() - 3.14159).abs() < 0.001);
+        assert!((f_parsed.unwrap() - PI).abs() < 0.001);
 
         assert_eq!(engine.futex_atomic_wait(5, 5), "futex_wait_blocked");
         assert_eq!(engine.futex_atomic_wait(6, 5), "value_changed_no_wait");
 
-        let float_str = engine.fast_to_chars_f64_sim(3.14159);
+        let float_str = engine.fast_to_chars_f64_sim(PI);
         assert_eq!(float_str, "3.14");
     }
 
