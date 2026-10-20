@@ -12,6 +12,13 @@
 // 4. ThreeDCraftCsgBooleanMeshEngine (Constructive Solid Geometry 3D mesh boolean union, difference, & intersection operations)
 // 5. ThreeDCraftPrGatewayEngine (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

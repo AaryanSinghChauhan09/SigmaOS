@@ -13,6 +13,13 @@
 // 5. VoicecraftSpeechToTextWordTimestampAlignerPrEngine (Forced audio-to-text alignment, word timestamp extraction, and subtitle SRT/VTT generation)
 // 6. SovereignVoicecraftArtcraftParityPrGateway & VoicecraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

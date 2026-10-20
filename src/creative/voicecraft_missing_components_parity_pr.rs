@@ -12,6 +12,13 @@
 // 5. VoicecraftWaylandAccessibilityVoiceControlPrEngine (Wayland desktop action dispatcher, speech intent parsing & voice navigation)
 // 6. SovereignVoicecraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

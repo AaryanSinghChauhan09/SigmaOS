@@ -17,6 +17,13 @@
 // 10. SoundcraftMasterSessionTemplateCascadePrEngine (Master session routing template hierarchy, global audio bus cascading & track preset palette syncer)
 // 11. SovereignSoundcraftArtcraftParityPrGateway & SoundcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

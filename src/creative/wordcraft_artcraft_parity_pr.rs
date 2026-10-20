@@ -17,6 +17,13 @@
 // 10. WordcraftMasterTemplateThemeCascadePrEngine (Master document template hierarchy, global style inheritance & brand palette synchronization)
 // 11. SovereignWordcraftArtcraftParityPrGateway & WordcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

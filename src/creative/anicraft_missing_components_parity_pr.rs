@@ -11,6 +11,13 @@
 // 5. AnicraftMeshDeformationShapeKeysPrEngine (Mesh deformation & morph target / shape key blend shape morphing)
 // 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

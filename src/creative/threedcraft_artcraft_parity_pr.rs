@@ -12,6 +12,13 @@
 // 5. ThreeDCraftWayland3dSpatialCompositorPrEngine (Wayland 3D spatial window compositing, VR/AR projection & stereoscopic eye matrices)
 // 6. SovereignThreeDCraftArtcraftParityPrGateway & ThreeDCraftArtcraftParityPrSuite (Master PR Gateway Coordinator & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

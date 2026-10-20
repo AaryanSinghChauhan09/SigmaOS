@@ -3,6 +3,13 @@
 // SigmaOS - Pdfcraft to Artcraft Parity PR Proposal Engine
 // Bridges Pdfcraft (PDF suite) and Artcraft (Creative Suite) missing feature parity via structured PR proposals.
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

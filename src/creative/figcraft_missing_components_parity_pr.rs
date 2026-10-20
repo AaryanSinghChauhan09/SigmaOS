@@ -13,6 +13,13 @@
 // 6. FigcraftDevModeMultiFrameworkExporterPrEngine (Dev Mode inspect code generation for CSS, Tailwind, SwiftUI, Jetpack Compose, Flutter, SVG/PDF)
 // 7. SovereignFigcraftArtcraftParityPrGateway & FigcraftMissingComponentsParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

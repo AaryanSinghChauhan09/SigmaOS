@@ -13,6 +13,13 @@
 // 6. SoundcraftRealtimeCollabCrdtPrEngine (Multi-user CRDT DAW session sync, track locking, stem delta sharing & project history diffs)
 // 7. SovereignSoundcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

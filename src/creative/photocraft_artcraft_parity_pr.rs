@@ -17,6 +17,13 @@
 // 10. PhotocraftPerspectiveWarpMeshDeformPrEngine (Perspective warp quad grid & puppet mesh deformer)
 // 11. SovereignPhotocraftArtcraftParityPrGateway & PhotocraftArtcraftParityPrSuite (Master Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

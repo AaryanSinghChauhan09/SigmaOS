@@ -17,6 +17,13 @@
 // 10. DeckcraftMasterTemplateThemeCascadePrEngine (Master slide inheritance hierarchy, global color/font theme cascading & asset palette syncer)
 // 11. SovereignDeckcraftArtcraftParityPrGateway & DeckcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

@@ -17,6 +17,13 @@
 // 10. DesigncraftWcagAccessibilityAuditPrEngine (WCAG 2.1 AA/AAA accessibility contrast & touch target auditor)
 // 11. SovereignDesigncraftArtcraftParityPrGateway & DesigncraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

@@ -13,6 +13,13 @@
 // 6. CadcraftEdaPcb3dIntegrationPrEngine (3D ECAD/MCAD electronics PCB clearance, STEP AP242 parsing & enclosure collision detection)
 // 7. SovereignCadcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

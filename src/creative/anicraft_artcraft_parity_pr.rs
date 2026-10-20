@@ -1,4 +1,11 @@
 #![no_std]
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine

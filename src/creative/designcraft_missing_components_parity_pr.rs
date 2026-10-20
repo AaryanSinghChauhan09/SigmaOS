@@ -3,6 +3,13 @@
 // Sovereign DesignCraft from ArtCraft Missing Components Parity PR Gateway Engine
 // (`src/creative/designcraft_missing_components_parity_pr.rs`)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

@@ -14,6 +14,13 @@
 // 6. GridcraftMacroScriptingUdfPrEngine (Macro action recorder, WASM/script sandbox & User-Defined Functions UDF registry)
 // 7. SovereignGridcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

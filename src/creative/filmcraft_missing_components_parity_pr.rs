@@ -5,6 +5,13 @@
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft FilmCraft
 // professional video editing ecosystem components in Pull Request proposal format.
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 

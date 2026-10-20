@@ -17,6 +17,13 @@
 // 10. PdfcraftArchivalValidationPrEngine (ISO 19005 PDF/A-1/2/3/4 preservation & ISO 15930 PDF/X print exchange compliance repairer)
 // 11. SovereignPdfcraftMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 extern crate alloc;
 
 
