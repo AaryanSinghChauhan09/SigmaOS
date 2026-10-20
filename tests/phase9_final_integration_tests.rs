@@ -343,7 +343,7 @@ mod phase9_e2e_tests {
 
         for _ in 0..10 {
             assert!(pids.fork_process().is_ok());
-            if pids.get_current_pids() % 2 == 0 {
+            if pids.get_current_pids() .is_multiple_of(2) {
                 assert!(rdma.allocate_qp().is_ok());
             }
         }

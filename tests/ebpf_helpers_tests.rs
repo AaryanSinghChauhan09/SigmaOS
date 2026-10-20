@@ -4,16 +4,16 @@
 #[cfg(test)]
 mod ebpf_integration_tests {
     use sigmaos::kernel::ebpf_verification::BpfProgramVerifier;
-    use sigmaos::kernel::ebpf_vm::{BpfInstruction, BpfVm, HelperRegistry};
+    use sigmaos::kernel::ebpf_vm::{BpfInstruction, BpfVm};
     use sigmaos::syscall::bpf_syscalls::{BpfProgType, BpfProgramRegistry};
 
     // ============ eBPF HELPER TESTS ============
 
     #[test]
     fn test_bpf_helper_ktime_get_ns() {
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
-        let mut registry = registry.lock().unwrap();
+        let registry = registry.lock().unwrap();
 
         let helper = registry
             .get_helper(sigmaos::kernel::ebpf_vm::helper_ids::BPF_KTIME_GET_NS)
@@ -23,16 +23,16 @@ mod ebpf_integration_tests {
         drop(vm); // Drop old vm
 
         // Create new VM for execution
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let result = helper.execute(&mut vm).expect("Helper execution failed");
         assert!(result > 0, "ktime_get_ns should return non-zero");
     }
 
     #[test]
     fn test_bpf_helper_get_current_pid_tgid() {
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
-        let mut registry = registry.lock().unwrap();
+        let registry = registry.lock().unwrap();
 
         let helper = registry
             .get_helper(sigmaos::kernel::ebpf_vm::helper_ids::BPF_GET_CURRENT_PID_TGID)
@@ -41,7 +41,7 @@ mod ebpf_integration_tests {
         drop(registry);
         drop(vm);
 
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let result = helper.execute(&mut vm).expect("Helper execution failed");
 
         // Result should be (tgid << 32) | pid
@@ -53,9 +53,9 @@ mod ebpf_integration_tests {
 
     #[test]
     fn test_bpf_helper_get_current_uid_gid() {
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
-        let mut registry = registry.lock().unwrap();
+        let registry = registry.lock().unwrap();
 
         let helper = registry
             .get_helper(sigmaos::kernel::ebpf_vm::helper_ids::BPF_GET_CURRENT_UID_GID)
@@ -64,21 +64,21 @@ mod ebpf_integration_tests {
         drop(registry);
         drop(vm);
 
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let result = helper.execute(&mut vm).expect("Helper execution failed");
 
         // Result should be (gid << 32) | uid
         let uid = (result & 0xFFFFFFFF) as u32;
         let gid = (result >> 32) as u32;
-        assert!(uid >= 0, "UID should be non-negative");
-        assert!(gid >= 0, "GID should be non-negative");
+        assert!(uid != u32::MAX, "UID should be non-negative");
+        assert!(gid != u32::MAX, "GID should be non-negative");
     }
 
     #[test]
     fn test_bpf_helper_get_prandom_u32() {
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
-        let mut registry = registry.lock().unwrap();
+        let registry = registry.lock().unwrap();
 
         let helper = registry
             .get_helper(sigmaos::kernel::ebpf_vm::helper_ids::BPF_GET_PRANDOM_U32)
@@ -87,7 +87,7 @@ mod ebpf_integration_tests {
         drop(registry);
         drop(vm);
 
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let result1 = helper
             .execute(&mut vm)
             .expect("First random generation failed");
@@ -105,12 +105,12 @@ mod ebpf_integration_tests {
 
     #[test]
     fn test_bpf_helper_map_lookup_elem() {
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         vm.set_register(1, 0x1000).expect("Failed to set register");
         vm.set_register(2, 0x2000).expect("Failed to set register");
 
         let registry = vm.get_helper_registry();
-        let mut registry = registry.lock().unwrap();
+        let registry = registry.lock().unwrap();
 
         let helper = registry
             .get_helper(sigmaos::kernel::ebpf_vm::helper_ids::BPF_MAP_LOOKUP_ELEM)
@@ -119,7 +119,7 @@ mod ebpf_integration_tests {
         drop(registry);
         drop(vm);
 
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         vm.set_register(1, 0x1000).expect("Failed to set register");
         vm.set_register(2, 0x2000).expect("Failed to set register");
 
@@ -493,7 +493,7 @@ mod ebpf_integration_tests {
 
     #[test]
     fn test_bpf_helper_registry_access() {
-        let mut vm = BpfVm::new();
+        let vm = BpfVm::new();
         let registry = vm.get_helper_registry();
         let registry = registry.lock().unwrap();
 

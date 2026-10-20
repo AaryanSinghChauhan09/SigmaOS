@@ -2,7 +2,6 @@
 
 #[cfg(test)]
 mod pid_namespace_tests {
-    use std::sync::Arc;
 
     // Import the modules - we'll use the binary name to reference the library
     // Note: This test will compile against the sigmaos crate

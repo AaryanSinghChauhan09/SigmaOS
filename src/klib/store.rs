@@ -117,7 +117,7 @@ mod tests {
         let history = state_history.borrow();
         assert_eq!(history.len(), 3);
         assert_eq!(history[0].counter, 1);
-        assert_eq!(history[1].dark_mode, true);
+        assert!(history[1].dark_mode);
         assert_eq!(history[2].counter, 0);
     }
 }
