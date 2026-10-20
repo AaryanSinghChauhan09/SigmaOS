@@ -18,6 +18,7 @@ pub mod designcraft;
 pub mod designcraft_artcraft_parity_pr;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
+pub mod effectcraft_artcraft_missing_components_v65_pr;
 pub mod effectcraft_artcraft_parity_pr;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
@@ -121,6 +122,7 @@ pub use effectcraft_artcraft_parity_pr::{
     SovereignEffectcraftArtcraftParityPrGateway as SovereignEffectcraftArtcraftParityPrGatewayV2,
     Stereo3dMode, SubsurfaceProfile, SurveyPointTarget, VolumetricLightParams,
 };
+pub use effectcraft_artcraft_missing_components_v65_pr::*;
 pub use effectcraft_missing_components_parity_pr::{
     ArtCraftOpenFxPluginPrEngine, AudioReactiveVisualizerPrEngine,
     EffectcraftAcesOcioColorManagementPrEngine, EffectcraftCryptomatteAovExtractorPrEngine,
