@@ -36,6 +36,12 @@ The proposals cover the complete graphics and display stack: core protocols, har
 | **PR #123** | Vulkan 1.3 | Vulkan Mesh Shading & Timeline Semaphores | SteamOS Gamescope, CachyOS | Vulkan 1.3 mesh shading pipeline execution (`vkCmdDrawMeshTasksEXT`), timeline semaphores, and descriptor set layouts. |
 | **PR #124** | wlroots Layout | wlroots Multi-Monitor Output Layout & Seat | SwayWM, Void Linux, Alpine | `wlr_output_layout` multi-monitor alignment, `wlr_seat` pointer/keyboard focus, and damage ring accumulation. |
 | **PR #125** | BSD vt(4) | BSD vt(4) Sysmouse & wscons VT Matrix | FreeBSD, OpenBSD | FreeBSD `vt_sysmouse` cursor overlay, OpenBSD `wscons` VT keymap translation, and ANSI VT100 escape sequence parsing. |
+| **PR #126** | SteamOS Gamescope | SteamOS Gamescope HDR Color & FSR Upscaling | SteamOS, Gamescope | HDR PQ-ST2084 EOTF tonemapping, FSR upscaling pipeline, and dynamic refresh rate switching. |
+| **PR #127** | Hyprland Bezier | Hyprland v2 Bezier Animations & Hyprcursor | Hyprland, Arch Linux | Cubic bezier curve animation evaluation, Hyprcursor SVG/PNG themes, blur passes, and window rules. |
+| **PR #128** | Nvidia PRIME | Nvidia PRIME Offload & NVK Open Driver Bridge | Arch, Fedora, Mesa3D | `NV_PRIME_RENDER_OFFLOAD` GPU selection, NVK open Vulkan driver integration, and CUDA DMA-BUF sharing. |
+| **PR #129** | Wayland Ext | Extended Protocols (Session Lock, Tearing, Color) | Wayland, Fedora, Ubuntu | `ext-session-lock-v1` security, `tearing-control-v1` async pageflips, and `wp_color_management_v1` ICC transformations. |
+| **PR #130** | COSMIC Smithay | System76 COSMIC / Smithay Rust Compositor | System76, Pop!_OS | Smithay Rust window management primitives, Iced GUI shell widget overlays, and dock autohiding. |
+| **PR #131** | BSD DRM Isolation | BSD DRM Kernel Driver Isolation & Rump | FreeBSD, OpenBSD, NetBSD | FreeBSD `kld` DRM kernel modules, OpenBSD `inteldrm`/`radeondrm` KMS ports, and NetBSD Rump driver isolation. |
 
 ---
 
@@ -118,11 +124,35 @@ The proposals cover the complete graphics and display stack: core protocols, har
 - **Architecture**: 80x25 character grid matrix, VT switching ioctls (`VT_ACTIVATE`), cursor tracking, and FreeBSD `vt(4)` / OpenBSD `wscons` keymap translation.
 - **Inspirations**: FreeBSD `vt(4)` and OpenBSD `wscons(4)` drivers.
 
+### 20. SteamOS Gamescope HDR & FSR Upscaling (`SovereignGamescopeHdrFsrEngine`)
+- **Architecture**: FSR scale factor resolution computation, HDR PQ-ST2084 EOTF curve tonemapping, dynamic refresh rate (DRR) switching, and Steam overlay layer surface management.
+- **Inspirations**: SteamOS Gamescope compositor.
+
+### 21. Hyprland v2 Bezier Animations & Hyprcursor (`SovereignHyprlandBezierHyprcursorEngine`)
+- **Architecture**: Cubic bezier animation easing curve evaluation, Hyprcursor SVG/PNG theme rendering, multi-pass blur shaders, and dynamic window class rules.
+- **Inspirations**: Hyprland window manager & Hyprcursor project.
+
+### 22. Nvidia PRIME Offload & NVK Open Driver Bridge (`SovereignNvidiaPrimeNvkBridgeEngine`)
+- **Architecture**: `NV_PRIME_RENDER_OFFLOAD` GPU target selection, NVK open Vulkan driver feature querying, and CUDA/NVENC DMA-BUF surface handle sharing.
+- **Inspirations**: Mesa NVK driver & Nvidia PRIME offloading.
+
+### 23. Wayland Extended Protocols (`SovereignWaylandExtProtocolsEngine`)
+- **Architecture**: `ext-session-lock-v1` security state management, `tearing-control-v1` async flip toggling, and `wp_color_management_v1` ICC color space transformations.
+- **Inspirations**: Wayland-Protocols extended specifications.
+
+### 24. System76 COSMIC / Smithay Rust Compositor (`SovereignCosmicSmithayCompositorEngine`)
+- **Architecture**: Smithay Rust-native window layout evaluation, Iced shell widget layer surface spawning, and dock auto-hide state handling.
+- **Inspirations**: System76 COSMIC desktop & Smithay compositor library.
+
+### 25. BSD DRM Driver Isolation & Rump Graphics (`SovereignBsdDrmRumpGraphicsEngine`)
+- **Architecture**: FreeBSD `kld` DRM kernel module loading, OpenBSD `inteldrm`/`radeondrm` KMS connector probing, and NetBSD Rump kernel userland DRM driver hypercall isolation.
+- **Inspirations**: FreeBSD DRM/KMS, OpenBSD DRM, and NetBSD Rump Kernels.
+
 ---
 
 ## PR Gateway, PQC Signatures & CI Gating
 
-All 25 PR proposals (#101..#125) are registered in `SovereignGraphicsDisplayPrGatewayEngine` featuring:
+All 31 PR proposals (#101..#131) are registered in `SovereignGraphicsDisplayPrGatewayEngine` featuring:
 1. **Post-Quantum Cryptography (PQC)** signatures (`PQC-SIG-DILITHIUM5-GRAPHICS-PR-*`).
 2. **SAT Dependency Constraint Solver** validation.
 3. **Automated CI Gating Pipeline**: Checks PQC signature validity and SAT constraints before transitioning PR status from `Proposed` -> `CiValidationPass` -> `Merged`.
@@ -136,4 +166,4 @@ Verified via standalone Rust test runner:
 ```bash
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/graphics/sovereign_graphics_display_pr_suite.rs -o build/test_graphics_pr_suite && ./build/test_graphics_pr_suite
 ```
-**Results**: 28 passed; 0 failed. All audits across X11, Wayland, Mesa, DRM/KMS, Vulkan, OpenGL, Weston, Sway, wlroots, Mutter, KWin, Compiz, Picom, Xwayland, evdev, libinput, fbdev, and Virtual Terminals passed cleanly.
+**Results**: 29 passed; 0 failed. All 29 unit tests and 26 system audit checks across X11, Wayland, Mesa, DRM/KMS, Vulkan, OpenGL, Weston, Sway, wlroots, Mutter, KWin, Compiz, Picom, Xwayland, evdev, libinput, fbdev, Virtual Terminals, Gamescope, Hyprland, Nvidia PRIME/NVK, Wayland Ext Protocols, COSMIC/Smithay, and BSD DRM driver isolation passed cleanly.

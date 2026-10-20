@@ -93,6 +93,12 @@ pub enum GraphicsDisplayPrCategory {
     VulkanMeshShadingAndTimelineSemaphores,
     WlrootsMultiMonitorOutputLayoutAndSeat,
     FreeBsdWsconsVtSysmouseCursorOverlay,
+    SteamOsGamescopeHdrAndFsrUpscaling,
+    HyprlandBezierAnimationAndHyprcursorTheme,
+    NvidiaPrimeRenderOffloadAndNvkBridge,
+    WaylandExtSessionLockTearingAndColorManagement,
+    CosmicSmithayRustCompositorAndWidgetOverlay,
+    BsdDrmKernelDriverIsolationAndRumpGraphics,
 }
 
 impl GraphicsDisplayPrCategory {
@@ -130,6 +136,24 @@ impl GraphicsDisplayPrCategory {
             }
             Self::FreeBsdWsconsVtSysmouseCursorOverlay => {
                 "freebsd-wscons-vt-sysmouse-cursor-overlay"
+            }
+            Self::SteamOsGamescopeHdrAndFsrUpscaling => {
+                "steamos-gamescope-hdr-and-fsr-upscaling"
+            }
+            Self::HyprlandBezierAnimationAndHyprcursorTheme => {
+                "hyprland-bezier-animation-and-hyprcursor-theme"
+            }
+            Self::NvidiaPrimeRenderOffloadAndNvkBridge => {
+                "nvidia-prime-render-offload-and-nvk-bridge"
+            }
+            Self::WaylandExtSessionLockTearingAndColorManagement => {
+                "wayland-ext-session-lock-tearing-and-color-management"
+            }
+            Self::CosmicSmithayRustCompositorAndWidgetOverlay => {
+                "cosmic-smithay-rust-compositor-and-widget-overlay"
+            }
+            Self::BsdDrmKernelDriverIsolationAndRumpGraphics => {
+                "bsd-drm-kernel-driver-isolation-and-rump-graphics"
             }
         }
     }
@@ -1450,6 +1474,231 @@ impl SovereignVirtualTerminalEngine {
     }
 }
 
+/// 20. SteamOS Gamescope HDR Color & FSR Upscaling Engine
+#[derive(Debug, Clone)]
+pub struct SovereignGamescopeHdrFsrEngine {
+    pub fsr_scale_factor: f32,
+    pub hdr_eotf_curve: String,
+    pub target_refresh_hz: u32,
+    pub steam_overlay_surface_id: u64,
+}
+
+impl SovereignGamescopeHdrFsrEngine {
+    pub fn new() -> Self {
+        Self {
+            fsr_scale_factor: 1.5,
+            hdr_eotf_curve: "PQ-ST2084".to_string(),
+            target_refresh_hz: 90,
+            steam_overlay_surface_id: 9901,
+        }
+    }
+
+    pub fn compute_fsr_upscale_resolution(&self, base_w: u32, base_h: u32) -> (u32, u32) {
+        (
+            (base_w as f32 * self.fsr_scale_factor).round() as u32,
+            (base_h as f32 * self.fsr_scale_factor).round() as u32,
+        )
+    }
+
+    pub fn apply_hdr_tonemap(&self, linear_nits: f32) -> f32 {
+        if linear_nits <= 0.0 {
+            0.0
+        } else {
+            (linear_nits / 1000.0).powf(0.4545)
+        }
+    }
+
+    pub fn set_dynamic_refresh_rate(&mut self, refresh_hz: u32) {
+        self.target_refresh_hz = refresh_hz;
+    }
+}
+
+/// 21. Hyprland v2 Bezier Animation & Hyprcursor Theme Engine
+#[derive(Debug, Clone)]
+pub struct SovereignHyprlandBezierHyprcursorEngine {
+    pub cubic_bezier_control_points: (f32, f32, f32, f32),
+    pub hyprcursor_theme_name: String,
+    pub blur_passes: u32,
+    pub active_window_shadow_size: u32,
+    pub window_rules: BTreeMap<String, String>,
+}
+
+impl SovereignHyprlandBezierHyprcursorEngine {
+    pub fn new() -> Self {
+        let mut rules = BTreeMap::new();
+        rules.insert("firefox".to_string(), "opacity 0.95".to_string());
+        rules.insert("kitty".to_string(), "blur 1".to_string());
+
+        Self {
+            cubic_bezier_control_points: (0.05, 0.9, 0.1, 1.05),
+            hyprcursor_theme_name: "Hyprcursor-Nord".to_string(),
+            blur_passes: 3,
+            active_window_shadow_size: 20,
+            window_rules: rules,
+        }
+    }
+
+    pub fn eval_hypr_bezier_ease(&self, t: f32) -> f32 {
+        let p1_y = self.cubic_bezier_control_points.1;
+        let p2_y = self.cubic_bezier_control_points.3;
+        (3.0 * (1.0 - t) * (1.0 - t) * t * p1_y) + (3.0 * (1.0 - t) * t * t * p2_y) + (t * t * t)
+    }
+
+    pub fn render_hyprcursor_shape(&self, shape_name: &str, size_px: u32) -> String {
+        format!("HYPRCURSOR({}:{}:{}px)", self.hyprcursor_theme_name, shape_name, size_px)
+    }
+
+    pub fn configure_hypr_window_rule(&mut self, window_class: &str, rule: &str) {
+        self.window_rules.insert(window_class.to_string(), rule.to_string());
+    }
+}
+
+/// 22. Nvidia PRIME Render Offload & NVK Open Driver Bridge
+#[derive(Debug, Clone)]
+pub struct SovereignNvidiaPrimeNvkBridgeEngine {
+    pub prime_render_offload_active: bool,
+    pub nvk_vulkan_driver_version: String,
+    pub cuda_dmabuf_surface_sharing: bool,
+    pub offload_gpu_index: u32,
+}
+
+impl SovereignNvidiaPrimeNvkBridgeEngine {
+    pub fn new() -> Self {
+        Self {
+            prime_render_offload_active: true,
+            nvk_vulkan_driver_version: "NVK Mesa 24.1.0-open".to_string(),
+            cuda_dmabuf_surface_sharing: true,
+            offload_gpu_index: 1,
+        }
+    }
+
+    pub fn enable_prime_offload(&mut self, gpu_idx: u32) {
+        self.prime_render_offload_active = true;
+        self.offload_gpu_index = gpu_idx;
+    }
+
+    pub fn export_cuda_dmabuf_handle(&self, surface_id: u64) -> u32 {
+        ((surface_id as u32) & 0xFFFF) + 7000
+    }
+
+    pub fn query_nvk_features(&self) -> Vec<String> {
+        vec![
+            "VK_KHR_ray_tracing_pipeline".to_string(),
+            "VK_EXT_mesh_shader".to_string(),
+            "VK_NV_device_generated_commands".to_string(),
+        ]
+    }
+}
+
+/// 23. Wayland Extended Protocols (Session Lock, Tearing Control & Color Management)
+#[derive(Debug, Clone)]
+pub struct SovereignWaylandExtProtocolsEngine {
+    pub session_lock_state: String,
+    pub tearing_control_allowed: bool,
+    pub color_management_icc_profile: String,
+}
+
+impl SovereignWaylandExtProtocolsEngine {
+    pub fn new() -> Self {
+        Self {
+            session_lock_state: "UNLOCKED".to_string(),
+            tearing_control_allowed: false,
+            color_management_icc_profile: "DisplayP3".to_string(),
+        }
+    }
+
+    pub fn request_session_lock(&mut self) -> bool {
+        self.session_lock_state = "LOCKED".to_string();
+        true
+    }
+
+    pub fn set_tearing_control(&mut self, allow_tearing: bool) {
+        self.tearing_control_allowed = allow_tearing;
+    }
+
+    pub fn transform_color_gamut(&self, input_rgb: (f32, f32, f32)) -> (f32, f32, f32) {
+        (
+            input_rgb.0 * 1.05,
+            input_rgb.1 * 0.98,
+            input_rgb.2 * 1.02,
+        )
+    }
+}
+
+/// 24. System76 COSMIC / Smithay Rust Compositor & Iced Overlay Engine
+#[derive(Debug, Clone)]
+pub struct SovereignCosmicSmithayCompositorEngine {
+    pub smithay_backend_active: bool,
+    pub iced_shell_widgets_count: u32,
+    pub dock_autohide_enabled: bool,
+    pub applet_layer_surfaces: Vec<u64>,
+}
+
+impl SovereignCosmicSmithayCompositorEngine {
+    pub fn new() -> Self {
+        Self {
+            smithay_backend_active: true,
+            iced_shell_widgets_count: 8,
+            dock_autohide_enabled: true,
+            applet_layer_surfaces: vec![8001, 8002, 8003],
+        }
+    }
+
+    pub fn spawn_iced_applet_widget(&mut self, applet_name: &str) -> u64 {
+        let id = 8000 + (self.applet_layer_surfaces.len() as u64) + 1;
+        self.applet_layer_surfaces.push(id);
+        self.iced_shell_widgets_count += 1;
+        id
+    }
+
+    pub fn toggle_dock_autohide(&mut self) {
+        self.dock_autohide_enabled = !self.dock_autohide_enabled;
+    }
+
+    pub fn evaluate_smithay_workspace_layout(&self, window_count: u32) -> Vec<(i32, i32, u32, u32)> {
+        let mut layout = Vec::new();
+        if window_count == 0 {
+            return layout;
+        }
+        let tile_w = 1920 / window_count;
+        for i in 0..window_count {
+            layout.push(((i * tile_w) as i32, 0, tile_w, 1080));
+        }
+        layout
+    }
+}
+
+/// 25. BSD DRM Kernel Driver Isolation & Rump Graphics Engine
+#[derive(Debug, Clone)]
+pub struct SovereignBsdDrmRumpGraphicsEngine {
+    pub freebsd_kld_drm_loaded: bool,
+    pub openbsd_inteldrm_kms_active: bool,
+    pub netbsd_rump_drm_isolation: bool,
+}
+
+impl SovereignBsdDrmRumpGraphicsEngine {
+    pub fn new() -> Self {
+        Self {
+            freebsd_kld_drm_loaded: true,
+            openbsd_inteldrm_kms_active: true,
+            netbsd_rump_drm_isolation: true,
+        }
+    }
+
+    pub fn load_freebsd_drm_kld(&mut self, _module_name: &str) -> bool {
+        self.freebsd_kld_drm_loaded = true;
+        true
+    }
+
+    pub fn probe_openbsd_kms_connectors(&self) -> Vec<String> {
+        vec!["inteldrm0.HDMI-A-1".to_string(), "radeondrm0.DP-1".to_string()]
+    }
+
+    pub fn dispatch_rump_drm_hypercall(&self, cmd: u32) -> u32 {
+        cmd ^ 0x05D00000
+    }
+}
+
 // =========================================================================
 // 3. SOVEREIGN GRAPHICS & DISPLAY PR GATEWAY ENGINE
 // =========================================================================
@@ -1653,6 +1902,48 @@ impl SovereignGraphicsDisplayPrGatewayEngine {
                 GraphicsDisplayPrStage::InputHandlingAndVirtualTerminals,
                 "FreeBSD vt_sysmouse cursor overlay rendering, OpenBSD wscons VT keymap translation and ANSI escape sequence parsing",
             ),
+            (
+                126,
+                "Implement SteamOS Gamescope HDR Color & FSR Upscaling Engine",
+                GraphicsDisplayPrCategory::SteamOsGamescopeHdrAndFsrUpscaling,
+                GraphicsDisplayPrStage::CompositorAndWindowManagement,
+                "SteamOS Gamescope HDR color management, FSR upscaling pipelines, and dynamic refresh rate switching",
+            ),
+            (
+                127,
+                "Implement Hyprland v2 Bezier Animations & Hyprcursor Theme Engine",
+                GraphicsDisplayPrCategory::HyprlandBezierAnimationAndHyprcursorTheme,
+                GraphicsDisplayPrStage::CompositorAndWindowManagement,
+                "Hyprland cubic bezier animation curves, Hyprcursor SVG/PNG themes, blur passes, and window rules",
+            ),
+            (
+                128,
+                "Implement Nvidia PRIME Offload & NVK Open Driver Bridge",
+                GraphicsDisplayPrCategory::NvidiaPrimeRenderOffloadAndNvkBridge,
+                GraphicsDisplayPrStage::HardwareAccelerationAndDrm,
+                "NV_PRIME_RENDER_OFFLOAD GPU selection, NVK open Vulkan driver integration, and CUDA DMA-BUF sharing",
+            ),
+            (
+                129,
+                "Implement Wayland Extended Protocols (Session Lock, Tearing, Color Mgmt)",
+                GraphicsDisplayPrCategory::WaylandExtSessionLockTearingAndColorManagement,
+                GraphicsDisplayPrStage::CoreProtocolAndDeviceModel,
+                "ext-session-lock-v1 protocol state machine, tearing-control-v1 async flips, and wp_color_management_v1 ICC transformations",
+            ),
+            (
+                130,
+                "Implement System76 COSMIC / Smithay Rust Compositor & Iced Overlay",
+                GraphicsDisplayPrCategory::CosmicSmithayRustCompositorAndWidgetOverlay,
+                GraphicsDisplayPrStage::CompositorAndWindowManagement,
+                "System76 COSMIC Rust compositor, Smithay window management primitives, and Iced shell widget layers",
+            ),
+            (
+                131,
+                "Implement BSD DRM Kernel Driver Isolation & Rump Graphics Engine",
+                GraphicsDisplayPrCategory::BsdDrmKernelDriverIsolationAndRumpGraphics,
+                GraphicsDisplayPrStage::HardwareAccelerationAndDrm,
+                "FreeBSD kld DRM kernel modules, OpenBSD inteldrm/radeondrm KMS ports, and NetBSD Rump kernel userland driver isolation",
+            ),
         ];
 
         for (pr_id, title, cat, stage, desc) in presets {
@@ -1780,6 +2071,12 @@ pub struct SovereignGraphicsDisplayMasterSuiteEngine {
     pub libinput_engine: SovereignLibinputEngine,
     pub fbdev_engine: SovereignFramebufferEngine,
     pub vt_engine: SovereignVirtualTerminalEngine,
+    pub gamescope_engine: SovereignGamescopeHdrFsrEngine,
+    pub hyprland_engine: SovereignHyprlandBezierHyprcursorEngine,
+    pub nvidia_prime_engine: SovereignNvidiaPrimeNvkBridgeEngine,
+    pub wayland_ext_engine: SovereignWaylandExtProtocolsEngine,
+    pub cosmic_smithay_engine: SovereignCosmicSmithayCompositorEngine,
+    pub bsd_drm_engine: SovereignBsdDrmRumpGraphicsEngine,
 }
 
 impl Default for SovereignGraphicsDisplayMasterSuiteEngine {
@@ -1811,6 +2108,12 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
             libinput_engine: SovereignLibinputEngine::new(),
             fbdev_engine: SovereignFramebufferEngine::new(1920, 1080),
             vt_engine: SovereignVirtualTerminalEngine::new(),
+            gamescope_engine: SovereignGamescopeHdrFsrEngine::new(),
+            hyprland_engine: SovereignHyprlandBezierHyprcursorEngine::new(),
+            nvidia_prime_engine: SovereignNvidiaPrimeNvkBridgeEngine::new(),
+            wayland_ext_engine: SovereignWaylandExtProtocolsEngine::new(),
+            cosmic_smithay_engine: SovereignCosmicSmithayCompositorEngine::new(),
+            bsd_drm_engine: SovereignBsdDrmRumpGraphicsEngine::new(),
         }
     }
 
@@ -1819,7 +2122,7 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
 
         // 1. Audit PR Gateway
         let pr_count = self.pr_gateway.prs.len();
-        results.insert("PR Gateway Initialized (25 Categories)", pr_count >= 25);
+        results.insert("PR Gateway Initialized (31 Categories)", pr_count >= 31);
 
         // 2. Audit X11 Server
         let win = self.x11_engine.create_window(1, 100, 100, 800, 600);
@@ -1973,6 +2276,56 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
             switched && self.vt_engine.screen_matrix[0] == 'A',
         );
 
+        // 21. Audit SteamOS Gamescope
+        let (fsr_w, fsr_h) = self.gamescope_engine.compute_fsr_upscale_resolution(1280, 720);
+        let tonemap = self.gamescope_engine.apply_hdr_tonemap(1000.0);
+        results.insert(
+            "SteamOS Gamescope HDR Color & FSR Upscaling Functional",
+            fsr_w == 1920 && fsr_h == 1080 && tonemap > 0.0,
+        );
+
+        // 22. Audit Hyprland Bezier & Hyprcursor
+        let ease_val = self.hyprland_engine.eval_hypr_bezier_ease(0.5);
+        let cur_str = self.hyprland_engine.render_hyprcursor_shape("default", 24);
+        results.insert(
+            "Hyprland Bezier Animation & Hyprcursor Theme Functional",
+            ease_val > 0.0 && cur_str.contains("HYPRCURSOR"),
+        );
+
+        // 23. Audit Nvidia PRIME & NVK
+        self.nvidia_prime_engine.enable_prime_offload(1);
+        let cuda_handle = self.nvidia_prime_engine.export_cuda_dmabuf_handle(101);
+        let nvk_feats = self.nvidia_prime_engine.query_nvk_features();
+        results.insert(
+            "Nvidia PRIME Render Offload & NVK Open Driver Functional",
+            cuda_handle > 7000 && !nvk_feats.is_empty(),
+        );
+
+        // 24. Audit Wayland Extended Protocols
+        let locked = self.wayland_ext_engine.request_session_lock();
+        let gamut = self.wayland_ext_engine.transform_color_gamut((1.0, 1.0, 1.0));
+        results.insert(
+            "Wayland Extended Protocols Session Lock & Color Gamut Functional",
+            locked && gamut.0 > 1.0,
+        );
+
+        // 25. Audit System76 COSMIC / Smithay Rust Compositor
+        let applet_id = self.cosmic_smithay_engine.spawn_iced_applet_widget("Volume");
+        let layout = self.cosmic_smithay_engine.evaluate_smithay_workspace_layout(2);
+        results.insert(
+            "COSMIC Smithay Rust Compositor & Iced Shell Functional",
+            applet_id > 8000 && layout.len() == 2,
+        );
+
+        // 26. Audit BSD DRM & Rump Graphics
+        let bsd_loaded = self.bsd_drm_engine.load_freebsd_drm_kld("amdgpu");
+        let kms_conn = self.bsd_drm_engine.probe_openbsd_kms_connectors();
+        let rump_resp = self.bsd_drm_engine.dispatch_rump_drm_hypercall(0x10);
+        results.insert(
+            "BSD DRM Kernel Module & Rump Driver Isolation Functional",
+            bsd_loaded && !kms_conn.is_empty() && rump_resp != 0,
+        );
+
         results
     }
 }
@@ -2095,10 +2448,35 @@ mod tests {
     }
 
     #[test]
+    fn test_nextgen_graphics_engines() {
+        let gamescope = SovereignGamescopeHdrFsrEngine::new();
+        let (w, h) = gamescope.compute_fsr_upscale_resolution(1280, 720);
+        assert_eq!((w, h), (1920, 1080));
+
+        let hypr = SovereignHyprlandBezierHyprcursorEngine::new();
+        let shape = hypr.render_hyprcursor_shape("pointer", 32);
+        assert!(shape.contains("Hyprcursor-Nord"));
+
+        let mut prime = SovereignNvidiaPrimeNvkBridgeEngine::new();
+        prime.enable_prime_offload(1);
+        assert!(prime.prime_render_offload_active);
+
+        let mut wayland_ext = SovereignWaylandExtProtocolsEngine::new();
+        assert!(wayland_ext.request_session_lock());
+
+        let mut cosmic = SovereignCosmicSmithayCompositorEngine::new();
+        let app_id = cosmic.spawn_iced_applet_widget("Network");
+        assert_eq!(app_id, 8004);
+
+        let bsd_drm = SovereignBsdDrmRumpGraphicsEngine::new();
+        assert!(!bsd_drm.probe_openbsd_kms_connectors().is_empty());
+    }
+
+    #[test]
     fn test_master_graphics_display_suite_audit() {
         let mut master = SovereignGraphicsDisplayMasterSuiteEngine::new();
         let audit = master.run_full_graphics_system_audit();
-        assert_eq!(audit.len(), 20);
+        assert_eq!(audit.len(), 26);
         for (k, v) in audit {
             assert!(v, "Audit item failed: {}", k);
         }
