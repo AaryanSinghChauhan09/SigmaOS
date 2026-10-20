@@ -134,7 +134,7 @@ next_milestone = "Per-CPU cache pools"
 
 [kernel.process_manager]
 status = "modeled"
-files = ["docs/process/PROCESS_LIFECYCLE.md", "docs/process/PID_POLICY.md", "docs/process/FORK_CLONE_EXEC.md", "docs/process/WAIT_REAP_POLICY.md", "docs/process/SCHEDULER_POLICY.md", "docs/process/SIGNAL_POLICY.md", "docs/process/RESOURCE_LIMITS.md", "docs/process/ISOLATION_POLICY.md", "src/process/state.rs", "src/process/table.rs", "src/process/pid.rs"]
+files = ["docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md", "docs/process/PROCESS_LIFECYCLE.md", "docs/process/PID_POLICY.md", "docs/process/FORK_CLONE_EXEC.md", "docs/process/WAIT_REAP_POLICY.md", "docs/process/SCHEDULER_POLICY.md", "docs/process/SIGNAL_POLICY.md", "docs/process/RESOURCE_LIMITS.md", "docs/process/ISOLATION_POLICY.md", "src/process/state.rs", "src/process/table.rs", "src/process/pid.rs"]
 description = "SigmaOS Process Manager Master Architecture, 18-PR sequence roadmap, lifecycle state transitions, PID allocation, orphan adoption, scheduler contracts, signal policy, rlimits, and isolation"
 test_evidence = "Lifecycle, pid allocator, fork/exec, wait/reap, rlimit, namespace, scheduler, and signal test suites pass via ./run_sigma_tests.sh"
 next_milestone = "Boot-to-shell integration validation"

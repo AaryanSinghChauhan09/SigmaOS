@@ -61,6 +61,7 @@ User management, service supervision, logging, monitoring, and system maintenanc
 | [SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md](./SIGNAL_HANDLER_AUDIT_AND_ABI_PROFILE.md) | Signal handler audit and ABI profile |
 | [SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md](./SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) | System utilities development plan |
 | [SYSTEM_UTILITIES_PLAN.md](./SYSTEM_UTILITIES_PLAN.md) | System utilities plan |
+| [PROCESS_MANAGER_PLAN.md](./PROCESS_MANAGER_PLAN.md) | Process manager architecture & roadmap plan |
 
 ---
 
