@@ -19,16 +19,9 @@ use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::distro::sovereign_linux_bsd_lfs_master_harmony::{
-    LfsRunlevel, SovereignLinuxBsdLfsMasterHarmonyEngine,
-};
-
-#[cfg(feature = "standalone_test")]
 #[path = "sovereign_linux_bsd_lfs_master_harmony.rs"]
 mod sovereign_linux_bsd_lfs_master_harmony;
 
-#[cfg(feature = "standalone_test")]
 use sovereign_linux_bsd_lfs_master_harmony::{
     LfsRunlevel, SovereignLinuxBsdLfsMasterHarmonyEngine,
 };
@@ -287,7 +280,7 @@ impl SovereignLfsBsdPrGateway {
         let activated = self
             .master_harmony
             .lfs_bootscripts
-            .set_runlevel(crate::distro::LfsRunlevel::Runlevel3MultiUserNet);
+            .set_runlevel(LfsRunlevel::Runlevel3MultiUserNet);
         assert!(activated >= 1);
 
         // 3. Verify LFS package build and install
