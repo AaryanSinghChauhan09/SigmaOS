@@ -98,6 +98,8 @@ pub mod sigmapackagemanager;
 pub mod sigmapackagemanager2;
 pub mod sigmapackageupdates;
 pub mod sigmaparted;
+pub mod sigmahardwareprofiler;
+pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
 pub mod sigmaperformancemonitor;
 pub mod sigmaphoto;
