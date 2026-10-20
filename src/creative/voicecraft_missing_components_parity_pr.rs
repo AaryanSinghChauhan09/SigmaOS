@@ -17,16 +17,11 @@
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::f64::consts::PI;
+use core::f32::consts::PI;
 
 
 
 
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
 
 #[cfg(not(test))]
 

@@ -22,10 +22,6 @@ use core::f64::consts::PI;
 
 
 
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
 
 /// Structured PR proposal manifest for 3DCraft / ArtCraft 3D spatial & rendering features.
 #[derive(Debug, Clone, PartialEq, Eq)]

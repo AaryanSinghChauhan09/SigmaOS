@@ -23,11 +23,6 @@ use core::f64::consts::PI;
 
 
 
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
 
 /// Structured PR proposal manifest for missing Figcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
