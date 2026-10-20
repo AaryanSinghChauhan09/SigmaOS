@@ -1,6 +1,4 @@
 #![no_std]
-use alloc::collections::BTreeMap;
-use core::f64::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/voicecraft_artcraft_parity_pr.rs`)
@@ -17,10 +15,11 @@ use core::f64::consts::PI;
 
 extern crate alloc;
 
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
+
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]

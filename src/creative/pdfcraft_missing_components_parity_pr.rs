@@ -1,6 +1,4 @@
 #![no_std]
-use alloc::collections::BTreeMap;
-use core::f64::consts::PI;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Pdfcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/pdfcraft_missing_components_parity_pr.rs`)
@@ -21,10 +19,11 @@ use core::f64::consts::PI;
 
 extern crate alloc;
 
-use alloc::format;
+
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 #[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]

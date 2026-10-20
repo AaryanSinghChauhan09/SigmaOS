@@ -1,14 +1,13 @@
 #![no_std]
-use alloc::collections::BTreeMap;
-use core::f64::consts::PI;
 // SigmaOS Sovereign Creative Suite: EffectCraft & ArtCraft Parity PR Engine
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
 extern crate alloc;
-use alloc::format;
+
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EffectcraftPrProposalSpec {
