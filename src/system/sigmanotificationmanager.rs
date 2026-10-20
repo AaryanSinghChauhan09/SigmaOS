@@ -39,7 +39,13 @@ impl SigmaNotificationManager {
         }
     }
 
-    pub fn send_notification(&mut self, title: String, body: String, urgency: NotificationUrgency, app_name: String) -> Notification {
+    pub fn send_notification(
+        &mut self,
+        title: String,
+        body: String,
+        urgency: NotificationUrgency,
+        app_name: String,
+    ) -> Notification {
         let notification = Notification {
             id: alloc::format!("notif_{}", self.notifications.len()),
             title,
@@ -61,11 +67,17 @@ impl SigmaNotificationManager {
     }
 
     pub fn get_notifications_by_app(&self, app_name: &str) -> Vec<&Notification> {
-        self.notifications.iter().filter(|n| n.app_name == app_name).collect()
+        self.notifications
+            .iter()
+            .filter(|n| n.app_name == app_name)
+            .collect()
     }
 
     pub fn get_critical_notifications(&self) -> Vec<&Notification> {
-        self.notifications.iter().filter(|n| n.urgency == NotificationUrgency::Critical).collect()
+        self.notifications
+            .iter()
+            .filter(|n| n.urgency == NotificationUrgency::Critical)
+            .collect()
     }
 
     pub fn dismiss_notification(&mut self, id: String) -> Result<(), String> {
@@ -101,30 +113,60 @@ mod tests {
     #[test]
     fn test_send_notification() {
         let mut manager = SigmaNotificationManager::new();
-        manager.send_notification("Test".to_string(), "Test body".to_string(), NotificationUrgency::Normal, "TestApp".to_string());
+        manager.send_notification(
+            "Test".to_string(),
+            "Test body".to_string(),
+            NotificationUrgency::Normal,
+            "TestApp".to_string(),
+        );
         assert_eq!(manager.get_notifications().len(), 1);
     }
 
     #[test]
     fn test_notifications_by_app() {
         let mut manager = SigmaNotificationManager::new();
-        manager.send_notification("Test1".to_string(), "Body1".to_string(), NotificationUrgency::Normal, "App1".to_string());
-        manager.send_notification("Test2".to_string(), "Body2".to_string(), NotificationUrgency::Normal, "App2".to_string());
+        manager.send_notification(
+            "Test1".to_string(),
+            "Body1".to_string(),
+            NotificationUrgency::Normal,
+            "App1".to_string(),
+        );
+        manager.send_notification(
+            "Test2".to_string(),
+            "Body2".to_string(),
+            NotificationUrgency::Normal,
+            "App2".to_string(),
+        );
         assert_eq!(manager.get_notifications_by_app("App1").len(), 1);
     }
 
     #[test]
     fn test_critical_notifications() {
         let mut manager = SigmaNotificationManager::new();
-        manager.send_notification("Normal".to_string(), "Body".to_string(), NotificationUrgency::Normal, "App".to_string());
-        manager.send_notification("Critical".to_string(), "Body".to_string(), NotificationUrgency::Critical, "App".to_string());
+        manager.send_notification(
+            "Normal".to_string(),
+            "Body".to_string(),
+            NotificationUrgency::Normal,
+            "App".to_string(),
+        );
+        manager.send_notification(
+            "Critical".to_string(),
+            "Body".to_string(),
+            NotificationUrgency::Critical,
+            "App".to_string(),
+        );
         assert_eq!(manager.get_critical_notifications().len(), 1);
     }
 
     #[test]
     fn test_dismiss_notification() {
         let mut manager = SigmaNotificationManager::new();
-        let notif = manager.send_notification("Test".to_string(), "Body".to_string(), NotificationUrgency::Normal, "App".to_string());
+        let notif = manager.send_notification(
+            "Test".to_string(),
+            "Body".to_string(),
+            NotificationUrgency::Normal,
+            "App".to_string(),
+        );
         manager.dismiss_notification(notif.id).unwrap();
         assert_eq!(manager.get_notifications().len(), 0);
     }
@@ -132,8 +174,18 @@ mod tests {
     #[test]
     fn test_clear_all() {
         let mut manager = SigmaNotificationManager::new();
-        manager.send_notification("Test1".to_string(), "Body1".to_string(), NotificationUrgency::Normal, "App".to_string());
-        manager.send_notification("Test2".to_string(), "Body2".to_string(), NotificationUrgency::Normal, "App".to_string());
+        manager.send_notification(
+            "Test1".to_string(),
+            "Body1".to_string(),
+            NotificationUrgency::Normal,
+            "App".to_string(),
+        );
+        manager.send_notification(
+            "Test2".to_string(),
+            "Body2".to_string(),
+            NotificationUrgency::Normal,
+            "App".to_string(),
+        );
         manager.clear_all();
         assert_eq!(manager.get_notifications().len(), 0);
     }

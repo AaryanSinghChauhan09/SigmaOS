@@ -51,7 +51,10 @@ impl SigmaCaptureManager {
     }
 
     pub fn get_captures_by_type(&self, capture_type: CaptureType) -> Vec<&Capture> {
-        self.captures.iter().filter(|c| c.capture_type == capture_type).collect()
+        self.captures
+            .iter()
+            .filter(|c| c.capture_type == capture_type)
+            .collect()
     }
 
     pub fn delete_capture(&mut self, id: String) -> Result<(), String> {
@@ -110,7 +113,10 @@ mod tests {
         };
         manager.add_capture(capture1);
         manager.add_capture(capture2);
-        assert_eq!(manager.get_captures_by_type(CaptureType::Screenshot).len(), 1);
+        assert_eq!(
+            manager.get_captures_by_type(CaptureType::Screenshot).len(),
+            1
+        );
     }
 
     #[test]
@@ -123,7 +129,9 @@ mod tests {
             timestamp: 0,
         };
         manager.add_capture(capture);
-        manager.delete_capture("screenshot-001".to_string()).unwrap();
+        manager
+            .delete_capture("screenshot-001".to_string())
+            .unwrap();
         assert_eq!(manager.get_captures().len(), 0);
     }
 }

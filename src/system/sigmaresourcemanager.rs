@@ -39,16 +39,11 @@ pub struct SigmaResourceManager {
 
 impl SigmaResourceManager {
     pub fn new() -> Self {
-        Self {
-            quotas: Vec::new(),
-        }
+        Self { quotas: Vec::new() }
     }
 
     pub fn set_quota(&mut self, process_id: u32, limits: Vec<ResourceLimit>) {
-        let quota = ResourceQuota {
-            process_id,
-            limits,
-        };
+        let quota = ResourceQuota { process_id, limits };
         if let Some(idx) = self.quotas.iter().position(|q| q.process_id == process_id) {
             self.quotas[idx] = quota;
         } else {
@@ -73,14 +68,22 @@ impl SigmaResourceManager {
         }
     }
 
-    pub fn get_limit(&self, process_id: u32, resource_type: ResourceType) -> Option<&ResourceLimit> {
+    pub fn get_limit(
+        &self,
+        process_id: u32,
+        resource_type: ResourceType,
+    ) -> Option<&ResourceLimit> {
         self.get_quota(process_id)
             .and_then(|q| q.limits.iter().find(|l| l.resource_type == resource_type))
     }
 
     pub fn set_limit(&mut self, process_id: u32, limit: ResourceLimit) {
         if let Some(quota) = self.quotas.iter_mut().find(|q| q.process_id == process_id) {
-            if let Some(idx) = quota.limits.iter().position(|l| l.resource_type == limit.resource_type) {
+            if let Some(idx) = quota
+                .limits
+                .iter()
+                .position(|l| l.resource_type == limit.resource_type)
+            {
                 quota.limits[idx] = limit;
             } else {
                 quota.limits.push(limit);
@@ -114,13 +117,11 @@ mod tests {
     #[test]
     fn test_set_quota() {
         let mut manager = SigmaResourceManager::new();
-        let limits = vec![
-            ResourceLimit {
-                resource_type: ResourceType::CPU,
-                limit_value: 50,
-                unit: "percent".to_string(),
-            },
-        ];
+        let limits = vec![ResourceLimit {
+            resource_type: ResourceType::CPU,
+            limit_value: 50,
+            unit: "percent".to_string(),
+        }];
         manager.set_quota(1, limits);
         assert_eq!(manager.get_quotas().len(), 1);
     }
@@ -128,13 +129,11 @@ mod tests {
     #[test]
     fn test_get_quota() {
         let mut manager = SigmaResourceManager::new();
-        let limits = vec![
-            ResourceLimit {
-                resource_type: ResourceType::CPU,
-                limit_value: 50,
-                unit: "percent".to_string(),
-            },
-        ];
+        let limits = vec![ResourceLimit {
+            resource_type: ResourceType::CPU,
+            limit_value: 50,
+            unit: "percent".to_string(),
+        }];
         manager.set_quota(1, limits);
         assert!(manager.get_quota(1).is_some());
         assert!(manager.get_quota(2).is_none());
@@ -143,13 +142,11 @@ mod tests {
     #[test]
     fn test_remove_quota() {
         let mut manager = SigmaResourceManager::new();
-        let limits = vec![
-            ResourceLimit {
-                resource_type: ResourceType::CPU,
-                limit_value: 50,
-                unit: "percent".to_string(),
-            },
-        ];
+        let limits = vec![ResourceLimit {
+            resource_type: ResourceType::CPU,
+            limit_value: 50,
+            unit: "percent".to_string(),
+        }];
         manager.set_quota(1, limits);
         manager.remove_quota(1).unwrap();
         assert_eq!(manager.get_quotas().len(), 0);
@@ -158,13 +155,11 @@ mod tests {
     #[test]
     fn test_get_limit() {
         let mut manager = SigmaResourceManager::new();
-        let limits = vec![
-            ResourceLimit {
-                resource_type: ResourceType::CPU,
-                limit_value: 50,
-                unit: "percent".to_string(),
-            },
-        ];
+        let limits = vec![ResourceLimit {
+            resource_type: ResourceType::CPU,
+            limit_value: 50,
+            unit: "percent".to_string(),
+        }];
         manager.set_quota(1, limits);
         assert!(manager.get_limit(1, ResourceType::CPU).is_some());
         assert!(manager.get_limit(1, ResourceType::Memory).is_none());

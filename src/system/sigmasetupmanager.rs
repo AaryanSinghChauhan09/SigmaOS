@@ -88,7 +88,12 @@ impl SigmaSetupManager {
 
     pub fn get_pending_steps(&self, wizard_id: &str) -> Vec<&SetupStep> {
         self.get_wizard(wizard_id)
-            .map(|w| w.steps.iter().filter(|s| s.status == SetupStepStatus::Pending).collect())
+            .map(|w| {
+                w.steps
+                    .iter()
+                    .filter(|s| s.status == SetupStepStatus::Pending)
+                    .collect()
+            })
             .unwrap_or_default()
     }
 }
@@ -138,8 +143,13 @@ mod tests {
             steps,
         };
         manager.add_wizard(wizard);
-        manager.start_step("initial-setup".to_string(), "step1".to_string()).unwrap();
-        assert_eq!(manager.get_wizards()[0].steps[0].status, SetupStepStatus::InProgress);
+        manager
+            .start_step("initial-setup".to_string(), "step1".to_string())
+            .unwrap();
+        assert_eq!(
+            manager.get_wizards()[0].steps[0].status,
+            SetupStepStatus::InProgress
+        );
     }
 
     #[test]
@@ -159,9 +169,16 @@ mod tests {
             steps,
         };
         manager.add_wizard(wizard);
-        manager.start_step("initial-setup".to_string(), "step1".to_string()).unwrap();
-        manager.complete_step("initial-setup".to_string(), "step1".to_string()).unwrap();
-        assert_eq!(manager.get_wizards()[0].steps[0].status, SetupStepStatus::Completed);
+        manager
+            .start_step("initial-setup".to_string(), "step1".to_string())
+            .unwrap();
+        manager
+            .complete_step("initial-setup".to_string(), "step1".to_string())
+            .unwrap();
+        assert_eq!(
+            manager.get_wizards()[0].steps[0].status,
+            SetupStepStatus::Completed
+        );
     }
 
     #[test]

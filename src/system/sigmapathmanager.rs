@@ -51,7 +51,10 @@ impl SigmaPathManager {
     }
 
     pub fn get_path(&self, path_type: PathType) -> Option<&String> {
-        self.paths.iter().find(|p| p.path_type == path_type).map(|p| &p.path)
+        self.paths
+            .iter()
+            .find(|p| p.path_type == path_type)
+            .map(|p| &p.path)
     }
 
     pub fn resolve_path(&self, relative_path: &str) -> String {

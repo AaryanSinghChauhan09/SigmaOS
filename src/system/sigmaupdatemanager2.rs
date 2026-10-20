@@ -76,11 +76,17 @@ impl SigmaUpdateManager2 {
     }
 
     pub fn get_available_updates(&self) -> Vec<&Update> {
-        self.updates.iter().filter(|u| u.status == UpdateStatus::Available).collect()
+        self.updates
+            .iter()
+            .filter(|u| u.status == UpdateStatus::Available)
+            .collect()
     }
 
     pub fn get_security_updates(&self) -> Vec<&Update> {
-        self.updates.iter().filter(|u| u.update_type == UpdateType::Security).collect()
+        self.updates
+            .iter()
+            .filter(|u| u.update_type == UpdateType::Security)
+            .collect()
     }
 
     pub fn set_auto_update(&mut self, enabled: bool) {

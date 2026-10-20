@@ -36,7 +36,10 @@ impl SigmaEnvironmentManager {
     }
 
     pub fn get_variable(&self, key: &str) -> Option<&String> {
-        self.variables.iter().find(|v| v.key == key).map(|v| &v.value)
+        self.variables
+            .iter()
+            .find(|v| v.key == key)
+            .map(|v| &v.value)
     }
 
     pub fn get_variables(&self) -> &[EnvironmentVariable] {

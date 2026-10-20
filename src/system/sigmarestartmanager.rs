@@ -81,7 +81,10 @@ impl SigmaRestartManager {
     }
 
     pub fn get_running_components(&self) -> Vec<&Component> {
-        self.components.iter().filter(|c| c.state == ComponentState::Running).collect()
+        self.components
+            .iter()
+            .filter(|c| c.state == ComponentState::Running)
+            .collect()
     }
 }
 

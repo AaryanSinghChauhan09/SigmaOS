@@ -33,9 +33,7 @@ pub struct SigmaRefreshManager {
 
 impl SigmaRefreshManager {
     pub fn new() -> Self {
-        Self {
-            items: Vec::new(),
-        }
+        Self { items: Vec::new() }
     }
 
     pub fn add_item(&mut self, item: RefreshItem) {
@@ -68,7 +66,10 @@ impl SigmaRefreshManager {
     }
 
     pub fn get_pending_items(&self) -> Vec<&RefreshItem> {
-        self.items.iter().filter(|i| i.status == RefreshStatus::Pending).collect()
+        self.items
+            .iter()
+            .filter(|i| i.status == RefreshStatus::Pending)
+            .collect()
     }
 }
 
@@ -133,7 +134,10 @@ mod tests {
         manager.add_item(item1);
         manager.add_item(item2);
         manager.refresh_all();
-        assert!(manager.get_items().iter().all(|i| i.status == RefreshStatus::Completed));
+        assert!(manager
+            .get_items()
+            .iter()
+            .all(|i| i.status == RefreshStatus::Completed));
     }
 
     #[test]

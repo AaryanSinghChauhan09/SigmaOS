@@ -169,6 +169,9 @@ mod tests {
             foreground: "#d4d4d4".to_string(),
         };
         manager.add_theme(theme);
-        assert_eq!(manager.get_theme_color("dark", "red"), Some(&"#ff0000".to_string()));
+        assert_eq!(
+            manager.get_theme_color("dark", "red"),
+            Some(&"#ff0000".to_string())
+        );
     }
 }

@@ -37,15 +37,26 @@ impl SigmaPrivilegeManager {
         }
     }
 
-    pub fn check_privilege(&self, required_level: PrivilegeLevel, current_level: PrivilegeLevel) -> bool {
+    pub fn check_privilege(
+        &self,
+        required_level: PrivilegeLevel,
+        current_level: PrivilegeLevel,
+    ) -> bool {
         match required_level {
             PrivilegeLevel::User => true,
-            PrivilegeLevel::Admin => current_level == PrivilegeLevel::Admin || current_level == PrivilegeLevel::Root,
+            PrivilegeLevel::Admin => {
+                current_level == PrivilegeLevel::Admin || current_level == PrivilegeLevel::Root
+            }
             PrivilegeLevel::Root => current_level == PrivilegeLevel::Root,
         }
     }
 
-    pub fn request_privilege(&mut self, command: String, required_level: PrivilegeLevel, current_level: PrivilegeLevel) -> PrivilegeRequest {
+    pub fn request_privilege(
+        &mut self,
+        command: String,
+        required_level: PrivilegeLevel,
+        current_level: PrivilegeLevel,
+    ) -> PrivilegeRequest {
         let request = PrivilegeRequest {
             id: alloc::format!("req_{}", self.requests.len()),
             command,
@@ -88,7 +99,11 @@ mod tests {
     #[test]
     fn test_request_privilege() {
         let mut manager = SigmaPrivilegeManager::new();
-        manager.request_privilege("test".to_string(), PrivilegeLevel::Admin, PrivilegeLevel::User);
+        manager.request_privilege(
+            "test".to_string(),
+            PrivilegeLevel::Admin,
+            PrivilegeLevel::User,
+        );
         assert_eq!(manager.get_requests().len(), 1);
     }
 }

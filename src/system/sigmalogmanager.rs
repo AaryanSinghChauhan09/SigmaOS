@@ -42,7 +42,13 @@ impl SigmaLogManager {
         }
     }
 
-    pub fn log(&mut self, level: LogLevel, source: String, message: String, process_id: Option<u32>) {
+    pub fn log(
+        &mut self,
+        level: LogLevel,
+        source: String,
+        message: String,
+        process_id: Option<u32>,
+    ) {
         let entry = LogEntry {
             timestamp: 0,
             level,
@@ -69,11 +75,17 @@ impl SigmaLogManager {
     }
 
     pub fn get_logs_by_process(&self, pid: u32) -> Vec<&LogEntry> {
-        self.logs.iter().filter(|l| l.process_id == Some(pid)).collect()
+        self.logs
+            .iter()
+            .filter(|l| l.process_id == Some(pid))
+            .collect()
     }
 
     pub fn get_error_logs(&self) -> Vec<&LogEntry> {
-        self.logs.iter().filter(|l| l.level >= LogLevel::Error).collect()
+        self.logs
+            .iter()
+            .filter(|l| l.level >= LogLevel::Error)
+            .collect()
     }
 
     pub fn clear_logs(&mut self) {
@@ -85,7 +97,10 @@ impl SigmaLogManager {
     }
 
     pub fn search_logs(&self, query: &str) -> Vec<&LogEntry> {
-        self.logs.iter().filter(|l| l.message.contains(query)).collect()
+        self.logs
+            .iter()
+            .filter(|l| l.message.contains(query))
+            .collect()
     }
 }
 
@@ -109,50 +124,120 @@ mod tests {
     #[test]
     fn test_log() {
         let mut manager = SigmaLogManager::new(100);
-        manager.log(LogLevel::Info, "test".to_string(), "Test message".to_string(), Some(1));
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Test message".to_string(),
+            Some(1),
+        );
         assert_eq!(manager.get_logs().len(), 1);
     }
 
     #[test]
     fn test_logs_by_level() {
         let mut manager = SigmaLogManager::new(100);
-        manager.log(LogLevel::Info, "test".to_string(), "Info message".to_string(), Some(1));
-        manager.log(LogLevel::Error, "test".to_string(), "Error message".to_string(), Some(1));
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Info message".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Error,
+            "test".to_string(),
+            "Error message".to_string(),
+            Some(1),
+        );
         assert_eq!(manager.get_logs_by_level(LogLevel::Error).len(), 1);
     }
 
     #[test]
     fn test_logs_by_source() {
         let mut manager = SigmaLogManager::new(100);
-        manager.log(LogLevel::Info, "kernel".to_string(), "Kernel message".to_string(), Some(1));
-        manager.log(LogLevel::Info, "user".to_string(), "User message".to_string(), Some(1));
+        manager.log(
+            LogLevel::Info,
+            "kernel".to_string(),
+            "Kernel message".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Info,
+            "user".to_string(),
+            "User message".to_string(),
+            Some(1),
+        );
         assert_eq!(manager.get_logs_by_source("kernel").len(), 1);
     }
 
     #[test]
     fn test_error_logs() {
         let mut manager = SigmaLogManager::new(100);
-        manager.log(LogLevel::Info, "test".to_string(), "Info message".to_string(), Some(1));
-        manager.log(LogLevel::Error, "test".to_string(), "Error message".to_string(), Some(1));
-        manager.log(LogLevel::Critical, "test".to_string(), "Critical message".to_string(), Some(1));
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Info message".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Error,
+            "test".to_string(),
+            "Error message".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Critical,
+            "test".to_string(),
+            "Critical message".to_string(),
+            Some(1),
+        );
         assert_eq!(manager.get_error_logs().len(), 2);
     }
 
     #[test]
     fn test_max_logs() {
         let mut manager = SigmaLogManager::new(3);
-        manager.log(LogLevel::Info, "test".to_string(), "Message 1".to_string(), Some(1));
-        manager.log(LogLevel::Info, "test".to_string(), "Message 2".to_string(), Some(1));
-        manager.log(LogLevel::Info, "test".to_string(), "Message 3".to_string(), Some(1));
-        manager.log(LogLevel::Info, "test".to_string(), "Message 4".to_string(), Some(1));
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Message 1".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Message 2".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Message 3".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Message 4".to_string(),
+            Some(1),
+        );
         assert_eq!(manager.get_logs().len(), 3);
     }
 
     #[test]
     fn test_search_logs() {
         let mut manager = SigmaLogManager::new(100);
-        manager.log(LogLevel::Info, "test".to_string(), "Error occurred".to_string(), Some(1));
-        manager.log(LogLevel::Info, "test".to_string(), "Info message".to_string(), Some(1));
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Error occurred".to_string(),
+            Some(1),
+        );
+        manager.log(
+            LogLevel::Info,
+            "test".to_string(),
+            "Info message".to_string(),
+            Some(1),
+        );
         assert_eq!(manager.search_logs("Error").len(), 1);
     }
 }

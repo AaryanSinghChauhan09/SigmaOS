@@ -69,7 +69,10 @@ impl SigmaMigrationManager {
     }
 
     pub fn get_pending_migrations(&self) -> Vec<&Migration> {
-        self.migrations.iter().filter(|m| m.status == MigrationStatus::Pending).collect()
+        self.migrations
+            .iter()
+            .filter(|m| m.status == MigrationStatus::Pending)
+            .collect()
     }
 }
 

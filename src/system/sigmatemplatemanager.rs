@@ -41,7 +41,11 @@ impl SigmaTemplateManager {
         self.templates.iter().find(|t| t.id == id)
     }
 
-    pub fn render_template(&self, id: &str, variables: &[(String, String)]) -> Result<String, String> {
+    pub fn render_template(
+        &self,
+        id: &str,
+        variables: &[(String, String)],
+    ) -> Result<String, String> {
         if let Some(template) = self.get_template(id) {
             let mut content = template.content.clone();
             for (key, value) in variables {
@@ -93,7 +97,9 @@ mod tests {
             variables: vec!["color".to_string()],
         };
         manager.add_template(template);
-        let rendered = manager.render_template("config", &[("color".to_string(), "red".to_string())]).unwrap();
+        let rendered = manager
+            .render_template("config", &[("color".to_string(), "red".to_string())])
+            .unwrap();
         assert_eq!(rendered, "color: red");
     }
 }

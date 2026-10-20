@@ -88,7 +88,10 @@ impl SigmaRepositoryManager {
     }
 
     pub fn get_repositories_by_type(&self, repository_type: RepositoryType) -> Vec<&Repository> {
-        self.repositories.iter().filter(|r| r.repository_type == repository_type).collect()
+        self.repositories
+            .iter()
+            .filter(|r| r.repository_type == repository_type)
+            .collect()
     }
 }
 
@@ -216,6 +219,11 @@ mod tests {
         };
         manager.add_repository(repo1);
         manager.add_repository(repo2);
-        assert_eq!(manager.get_repositories_by_type(RepositoryType::Official).len(), 1);
+        assert_eq!(
+            manager
+                .get_repositories_by_type(RepositoryType::Official)
+                .len(),
+            1
+        );
     }
 }

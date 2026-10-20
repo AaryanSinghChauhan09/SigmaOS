@@ -70,11 +70,17 @@ impl SigmaToggleManager {
     }
 
     pub fn get_on_toggles(&self) -> Vec<&Toggle> {
-        self.toggles.iter().filter(|t| t.state == ToggleState::On).collect()
+        self.toggles
+            .iter()
+            .filter(|t| t.state == ToggleState::On)
+            .collect()
     }
 
     pub fn get_off_toggles(&self) -> Vec<&Toggle> {
-        self.toggles.iter().filter(|t| t.state == ToggleState::Off).collect()
+        self.toggles
+            .iter()
+            .filter(|t| t.state == ToggleState::Off)
+            .collect()
     }
 }
 
@@ -117,7 +123,9 @@ mod tests {
             description: "WiFi toggle".to_string(),
         };
         manager.add_toggle(toggle);
-        manager.set_toggle("wifi".to_string(), ToggleState::On).unwrap();
+        manager
+            .set_toggle("wifi".to_string(), ToggleState::On)
+            .unwrap();
         assert_eq!(manager.get_toggles()[0].state, ToggleState::On);
     }
 

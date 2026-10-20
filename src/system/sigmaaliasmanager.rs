@@ -82,6 +82,9 @@ mod tests {
             target: "kitty".to_string(),
         };
         manager.add_alias(alias);
-        assert_eq!(manager.resolve_alias("terminal"), Some(&"kitty".to_string()));
+        assert_eq!(
+            manager.resolve_alias("terminal"),
+            Some(&"kitty".to_string())
+        );
     }
 }

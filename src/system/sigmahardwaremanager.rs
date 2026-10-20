@@ -55,15 +55,23 @@ impl SigmaHardwareManager {
     }
 
     pub fn get_devices_by_type(&self, hardware_type: HardwareType) -> Vec<&HardwareDevice> {
-        self.devices.iter().filter(|d| d.hardware_type == hardware_type).collect()
+        self.devices
+            .iter()
+            .filter(|d| d.hardware_type == hardware_type)
+            .collect()
     }
 
     pub fn detect_asus_rog(&self) -> bool {
-        self.devices.iter().any(|d| d.vendor.contains("ASUS") && d.model.contains("ROG"))
+        self.devices
+            .iter()
+            .any(|d| d.vendor.contains("ASUS") && d.model.contains("ROG"))
     }
 
     pub fn get_vendor_devices(&self, vendor: &str) -> Vec<&HardwareDevice> {
-        self.devices.iter().filter(|d| d.vendor.contains(vendor)).collect()
+        self.devices
+            .iter()
+            .filter(|d| d.vendor.contains(vendor))
+            .collect()
     }
 }
 

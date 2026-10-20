@@ -68,6 +68,7 @@ pub mod sigmafsck;
 pub mod sigmafsmon;
 pub mod sigmaftp;
 pub mod sigmagrid;
+pub mod sigmahardwareprofiler;
 pub mod sigmahibernation;
 pub mod sigmahttp;
 pub mod sigmahwmon;
@@ -99,70 +100,138 @@ pub mod sigmapackagemanager2;
 pub mod sigmapackageupdates;
 pub mod sigmaparted;
 pub mod sigmasoftwaremanager;
-pub mod sigmahardwareprofiler;
 pub mod sigmasystemmonitor2;
-pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePackage, SoftwareSource};
+pub use sigmasoftwaremanager::{
+    InstallStatus, SigmaSoftwareManager, SoftwarePackage, SoftwareSource,
+};
 pub mod sigmataskscheduler;
-pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
-pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager};
-pub mod sigmacontainermanager;
-pub mod sigmavirtualizationmanager;
-pub mod sigmasnapshotmanager;
-pub mod sigmaresourcemanager;
-pub mod sigmarepositorymanager;
+pub use sigmalogmanager::{
+    LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager,
+};
+pub use sigmasystemmonitor2::{
+    ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2,
+    SystemMetrics,
+};
 pub mod sigmacommandmanager;
 pub mod sigmaconfigmanager;
+pub mod sigmacontainermanager;
+pub mod sigmarepositorymanager;
+pub mod sigmaresourcemanager;
+pub mod sigmasnapshotmanager;
 pub mod sigmathememanager;
-pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
-pub mod sigmamenumanager;
+pub mod sigmavirtualizationmanager;
+pub use sigmabackupmanager::{
+    BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus,
+    BackupType as BackupManagerType, SigmaBackupManager as BackupManager,
+};
+pub mod sigmaaliasmanager;
+pub mod sigmacapturemanager;
+pub mod sigmaenvironmentmanager;
 pub mod sigmahardwaremanager;
+pub mod sigmahelpermanager;
+pub mod sigmalaunchmanager;
+pub mod sigmamenumanager;
+pub mod sigmamigrationmanager;
+pub mod sigmapathmanager;
+pub mod sigmaprivilegemanager;
+pub mod sigmaprofilemanager;
+pub mod sigmarefreshmanager;
+pub mod sigmarestartmanager;
+pub mod sigmasessionmanager;
+pub mod sigmasetupmanager;
 pub mod sigmastallmanager;
+pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
-pub mod sigmalaunchmanager;
-pub mod sigmasetupmanager;
-pub mod sigmarestartmanager;
-pub mod sigmarefreshmanager;
-pub mod sigmacapturemanager;
-pub mod sigmahelpermanager;
-pub mod sigmaprivilegemanager;
-pub mod sigmapathmanager;
-pub mod sigmatemplatemanager;
-pub mod sigmamigrationmanager;
-pub mod sigmaaliasmanager;
-pub mod sigmasessionmanager;
-pub mod sigmaenvironmentmanager;
-pub mod sigmaprofilemanager;
-pub use sigmanotificationmanager::{NotificationUrgency as NotificationManagerUrgency, SigmaNotificationManager as NotificationManager};
-pub use sigmaprofilemanager::{Profile as ProfileManagerProfile, SigmaProfileManager};
-pub use sigmaenvironmentmanager::{EnvironmentVariable, SigmaEnvironmentManager};
-pub use sigmasessionmanager::{Session as SessionManagerSession, SessionType as SessionManagerType, SigmaSessionManager};
 pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
-pub use sigmamigrationmanager::{Migration as MigrationManagerMigration, MigrationStatus as MigrationManagerStatus, SigmaMigrationManager};
-pub use sigmatemplatemanager::{SigmaTemplateManager, Template as TemplateManagerTemplate};
+pub use sigmacapturemanager::{
+    Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
+};
+pub use sigmacommandmanager::{
+    Command as CommandManagerCommand, CommandPermission as CommandManagerPermission,
+    CommandType as CommandManagerType, SigmaCommandManager,
+};
+pub use sigmaconfigmanager::{
+    ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager,
+};
+pub use sigmacontainermanager::{
+    Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig,
+    ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager,
+};
+pub use sigmaenvironmentmanager::{EnvironmentVariable, SigmaEnvironmentManager};
+pub use sigmahardwaremanager::{
+    HardwareDevice as HardwareManagerDevice, HardwareType as HardwareManagerType,
+    SigmaHardwareManager,
+};
+pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
+pub use sigmahelpermanager::{HelperCommand, SigmaHelperManager};
+pub use sigmalaunchmanager::{
+    Application as LaunchManagerApplication, LaunchPriority, SigmaLaunchManager,
+};
+pub use sigmamenumanager::{
+    Menu as MenuManagerMenu, MenuEntry as MenuManagerEntry, MenuEntryType as MenuManagerEntryType,
+    SigmaMenuManager,
+};
+pub use sigmamigrationmanager::{
+    Migration as MigrationManagerMigration, MigrationStatus as MigrationManagerStatus,
+    SigmaMigrationManager,
+};
+pub use sigmanotificationmanager::{
+    NotificationUrgency as NotificationManagerUrgency,
+    SigmaNotificationManager as NotificationManager,
+};
 pub use sigmapathmanager::{PathEntry, PathType, SigmaPathManager};
 pub use sigmaprivilegemanager::{PrivilegeLevel, PrivilegeRequest, SigmaPrivilegeManager};
-pub use sigmahelpermanager::{HelperCommand, SigmaHelperManager};
-pub use sigmacapturemanager::{Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager};
-pub use sigmarefreshmanager::{RefreshItem as RefreshManagerItem, RefreshStatus as RefreshManagerStatus, SigmaRefreshManager};
-pub use sigmarestartmanager::{Component as RestartManagerComponent, ComponentState as RestartManagerState, SigmaRestartManager};
-pub use sigmasetupmanager::{SigmaSetupManager, SetupStep as SetupManagerStep, SetupStepStatus as SetupManagerStatus, SetupWizard as SetupManagerWizard};
-pub use sigmalaunchmanager::{Application as LaunchManagerApplication, LaunchPriority, SigmaLaunchManager};
-pub use sigmaupdatemanager2::{SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus, UpdateType as UpdateManagerType};
-pub use sigmatogglemanager::{SigmaToggleManager, Toggle as ToggleManagerToggle, ToggleState as ToggleManagerState};
-pub use sigmastallmanager::{InstallStatus as InstallManagerStatus, InstallType as InstallManagerType, SigmaInstallManager, SoftwareItem as InstallManagerItem};
-pub use sigmahardwaremanager::{HardwareDevice as HardwareManagerDevice, HardwareType as HardwareManagerType, SigmaHardwareManager};
-pub use sigmamenumanager::{Menu as MenuManagerMenu, MenuEntry as MenuManagerEntry, MenuEntryType as MenuManagerEntryType, SigmaMenuManager};
-pub use sigmathememanager::{SigmaThemeManager, Theme as ThemeManagerTheme, ThemeColor as ThemeManagerColor};
-pub use sigmaconfigmanager::{ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager};
-pub use sigmacommandmanager::{Command as CommandManagerCommand, CommandPermission as CommandManagerPermission, CommandType as CommandManagerType, SigmaCommandManager};
-pub use sigmarepositorymanager::{SigmaRepositoryManager as RepositoryManager, Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType};
-pub use sigmaresourcemanager::{SigmaResourceManager as ResourceManager, ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota, ResourceType as ResourceManagerType};
-pub use sigmasnapshotmanager::{SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot, SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType};
-pub use sigmavirtualizationmanager::{SigmaVirtualizationManager as VirtManager, VirtualMachine as VirtMachine, VMConfig as VirtConfig, VMState as VirtState};
-pub use sigmacontainermanager::{Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig, ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager};
-pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
-pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
+pub use sigmaprofilemanager::{Profile as ProfileManagerProfile, SigmaProfileManager};
+pub use sigmarefreshmanager::{
+    RefreshItem as RefreshManagerItem, RefreshStatus as RefreshManagerStatus, SigmaRefreshManager,
+};
+pub use sigmarepositorymanager::{
+    Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType,
+    SigmaRepositoryManager as RepositoryManager,
+};
+pub use sigmaresourcemanager::{
+    ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota,
+    ResourceType as ResourceManagerType, SigmaResourceManager as ResourceManager,
+};
+pub use sigmarestartmanager::{
+    Component as RestartManagerComponent, ComponentState as RestartManagerState,
+    SigmaRestartManager,
+};
+pub use sigmasessionmanager::{
+    Session as SessionManagerSession, SessionType as SessionManagerType, SigmaSessionManager,
+};
+pub use sigmasetupmanager::{
+    SetupStep as SetupManagerStep, SetupStepStatus as SetupManagerStatus,
+    SetupWizard as SetupManagerWizard, SigmaSetupManager,
+};
+pub use sigmasnapshotmanager::{
+    SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot,
+    SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType,
+};
+pub use sigmastallmanager::{
+    InstallStatus as InstallManagerStatus, InstallType as InstallManagerType, SigmaInstallManager,
+    SoftwareItem as InstallManagerItem,
+};
+pub use sigmataskscheduler::{
+    ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
+    TaskStatus as SchedulerTaskStatus,
+};
+pub use sigmatemplatemanager::{SigmaTemplateManager, Template as TemplateManagerTemplate};
+pub use sigmathememanager::{
+    SigmaThemeManager, Theme as ThemeManagerTheme, ThemeColor as ThemeManagerColor,
+};
+pub use sigmatogglemanager::{
+    SigmaToggleManager, Toggle as ToggleManagerToggle, ToggleState as ToggleManagerState,
+};
+pub use sigmaupdatemanager2::{
+    SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
+    UpdateType as UpdateManagerType,
+};
+pub use sigmavirtualizationmanager::{
+    SigmaVirtualizationManager as VirtManager, VMConfig as VirtConfig, VMState as VirtState,
+    VirtualMachine as VirtMachine,
+};
 pub mod sigmapdf;
 pub mod sigmaperformancemonitor;
 pub mod sigmaphoto;
@@ -261,7 +330,9 @@ pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
 };
 
-pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus as OtherTaskStatus};
+pub use automation::{
+    AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus as OtherTaskStatus,
+};
 
 pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
@@ -296,7 +367,8 @@ pub use power_manager::{
     PowerStatistics, SleepAction,
 };
 pub use process_supervisor::{
-    ProcessConfig, ProcessState as OtherProcessState, ProcessStatus, ProcessSupervisor, SupervisorError,
+    ProcessConfig, ProcessState as OtherProcessState, ProcessStatus, ProcessSupervisor,
+    SupervisorError,
 };
 pub use sandbox::{
     CapabilitySandboxEnforcer, NamespaceSandboxEnforcer, NetworkPolicy, ProcessSandboxManager,
@@ -304,7 +376,8 @@ pub use sandbox::{
     SandboxProcess, SandboxProfile, SandboxResult,
 };
 pub use scheduler_manager::{
-    ScheduleFrequency, ScheduleStatus, ScheduledTask as OtherScheduledTask, SchedulerManager, SchedulerStatistics,
+    ScheduleFrequency, ScheduleStatus, ScheduledTask as OtherScheduledTask, SchedulerManager,
+    SchedulerStatistics,
 };
 pub use service_manager::{
     SystemRestartPolicy, SystemService, SystemServiceConfig, SystemServiceManager,
@@ -338,7 +411,8 @@ pub use sigmaaudioconfig::{
     AudioDevice, AudioDeviceType, AudioProfile, BitDepth, SampleRate, SigmaAudioConfig,
 };
 pub use sigmabackup::{
-    create_backup, get_sigmabackup, init_sigmabackup, Backup, BackupState, BackupType as OtherBackupType, SigmaBackup,
+    create_backup, get_sigmabackup, init_sigmabackup, Backup, BackupState,
+    BackupType as OtherBackupType, SigmaBackup,
 };
 pub use sigmabluetooth::{
     add_adapter, get_sigmabluetooth, get_sigmabluetooth_mut, init_sigmabluetooth, AdapterState,
@@ -806,8 +880,8 @@ pub use boot_analyzer::{
 };
 pub use monitor::{
     get_system_monitor, init_system_monitor, CpuStats, DiskStats as MonDiskStats,
-    MemoryStats as MonMemoryStats, NetworkStats as MonNetworkStats,
-    ProcessStats, SystemMonitor as SystemMonitorNew,
+    MemoryStats as MonMemoryStats, NetworkStats as MonNetworkStats, ProcessStats,
+    SystemMonitor as SystemMonitorNew,
 };
 pub use preload::{
     add_common_preloads, get_preload_manager, init_preload_manager, PreloadEntry, PreloadManager,
@@ -837,8 +911,8 @@ pub use mint_tools::{
     BackupStatus as MintBackupStatus, BackupType as MintBackupType, DiagnosticEntry,
     DiagnosticTest, Driver, DriverManager, DriverStatus, DriverType, HardwareInfo,
     MintUpdateManager, PackageUpdate, SoftwareCategory, SoftwareInfo, SoftwareManager,
-    SoftwarePackage as OtherSoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity,
-    UpdateType as MintUpdateType,
+    SoftwarePackage as OtherSoftwarePackage, SystemReport, SystemToolsEngine, TestResult,
+    UpdateSeverity, UpdateType as MintUpdateType,
 };
 pub use network_manager::{
     get_network_manager, init_network_manager, Connection, ConnectionState,
@@ -857,8 +931,6 @@ pub use sigmasystemtools::{
     MaintenanceTask, SigmaSystemTools, SystemTool, ToolCategory,
 };
 
-
-
 pub use sigmausermanager::{
     add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager,
     SigmaUserManager,
@@ -868,7 +940,6 @@ pub use sigmadisplaymanager::{
     add_output, get_sigmadisplaymanager, get_sigmadisplaymanager_mut, init_sigmadisplaymanager,
     SigmaDisplayManager,
 };
-
 
 pub use sigmapowermanager::{
     add_profile, get_sigmapowermanager, get_sigmapowermanager_mut, init_sigmapowermanager,

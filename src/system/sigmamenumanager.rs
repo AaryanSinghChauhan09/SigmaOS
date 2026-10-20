@@ -42,9 +42,7 @@ pub struct SigmaMenuManager {
 
 impl SigmaMenuManager {
     pub fn new() -> Self {
-        Self {
-            menus: Vec::new(),
-        }
+        Self { menus: Vec::new() }
     }
 
     pub fn add_menu(&mut self, menu: Menu) {

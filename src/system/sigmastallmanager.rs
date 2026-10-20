@@ -42,9 +42,7 @@ pub struct SigmaInstallManager {
 
 impl SigmaInstallManager {
     pub fn new() -> Self {
-        Self {
-            items: Vec::new(),
-        }
+        Self { items: Vec::new() }
     }
 
     pub fn add_item(&mut self, item: SoftwareItem) {
@@ -79,11 +77,17 @@ impl SigmaInstallManager {
     }
 
     pub fn get_installed_items(&self) -> Vec<&SoftwareItem> {
-        self.items.iter().filter(|i| i.status == InstallStatus::Installed).collect()
+        self.items
+            .iter()
+            .filter(|i| i.status == InstallStatus::Installed)
+            .collect()
     }
 
     pub fn get_items_by_type(&self, install_type: InstallType) -> Vec<&SoftwareItem> {
-        self.items.iter().filter(|i| i.install_type == install_type).collect()
+        self.items
+            .iter()
+            .filter(|i| i.install_type == install_type)
+            .collect()
     }
 }
 
