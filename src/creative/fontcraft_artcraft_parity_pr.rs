@@ -1105,6 +1105,7 @@ impl Default for FontcraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_fontcraft_artcraft_parity_pr_gateway() {

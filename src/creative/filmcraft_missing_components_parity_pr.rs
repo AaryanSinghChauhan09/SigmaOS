@@ -941,6 +941,7 @@ impl Default for FilmcraftMissingComponentsParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_filmcraft_multicam_sync_engine() {

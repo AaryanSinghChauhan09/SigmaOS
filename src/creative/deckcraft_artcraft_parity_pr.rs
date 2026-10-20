@@ -908,6 +908,7 @@ impl Default for DeckcraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_deckcraft_artcraft_parity_pr_gateway() {

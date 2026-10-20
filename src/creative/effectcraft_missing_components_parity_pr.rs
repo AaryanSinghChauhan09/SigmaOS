@@ -1338,6 +1338,7 @@ impl Default for EffectcraftMissingComponentsParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_optical_flow_engine_functional() {

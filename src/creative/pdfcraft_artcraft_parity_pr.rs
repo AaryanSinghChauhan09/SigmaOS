@@ -322,6 +322,7 @@ impl SovereignPdfcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_pdfcraft_artcraft_parity_pr_gateway() {

@@ -937,6 +937,7 @@ impl PhotocraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_photocraft_raw_processing_engine() {

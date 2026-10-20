@@ -879,6 +879,7 @@ impl SovereignWordcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_opentype_typography_engine() {

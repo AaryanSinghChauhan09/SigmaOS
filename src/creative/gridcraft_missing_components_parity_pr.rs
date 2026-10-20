@@ -860,6 +860,7 @@ impl Default for SovereignGridcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
+use core::f32::consts::PI;
 
     #[test]
     fn test_gridcraft_parity_pr_gateway() {
