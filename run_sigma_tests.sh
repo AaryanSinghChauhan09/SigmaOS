@@ -2025,6 +2025,13 @@ if [ -f "tests/process/pid_allocator.rs" ]; then
     rustc --test tests/process/namespaces/namespace_test.rs --edition=2021 -o build/test_proc_ns && ./build/test_proc_ns
 fi
 
+if [ -f "tests/shell.rs" ]; then
+    echo "Running Shell Conformance and Lifecycle test suites..."
+    mkdir -p build
+    rustc --test tests/shell.rs --edition=2021 -o build/test_shell && ./build/test_shell
+    rustc --test tests/shell_lifecycle_tests.rs --edition=2021 -o build/test_shell_lifecycle && ./build/test_shell_lifecycle
+fi
+
 if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
