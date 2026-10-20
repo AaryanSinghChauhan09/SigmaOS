@@ -111,7 +111,9 @@ pub mod sigmasnapshotmanager;
 pub mod sigmaresourcemanager;
 pub mod sigmarepositorymanager;
 pub mod sigmacommandmanager;
+pub mod sigmaconfigmanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmaconfigmanager::{ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager};
 pub use sigmacommandmanager::{Command as CommandManagerCommand, CommandPermission as CommandManagerPermission, CommandType as CommandManagerType, SigmaCommandManager};
 pub use sigmarepositorymanager::{SigmaRepositoryManager as RepositoryManager, Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType};
 pub use sigmaresourcemanager::{SigmaResourceManager as ResourceManager, ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota, ResourceType as ResourceManagerType};
@@ -226,9 +228,6 @@ pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType
 pub use cleanup::{
     CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
     SystemCleanupManager, TempFileStrategy,
-};
-pub use config::{
-    ConfigEntry, ConfigError, ConfigType, ServiceManager, ServiceUnit, SystemConfigManager,
 };
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
