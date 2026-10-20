@@ -71,6 +71,7 @@
 - [System Monitoring Component Guide](./System-Monitoring-Component-Guide.md) &ndash; Real-time CPU, RAM, disk, and network instrumentation telemetry.
 - [Logging Component Guide](./Logging-Component-Guide.md) &ndash; Structured circular journal buffer, syslog compatibility, and log rotation.
 - [IPC Component Guide](./Ipc-Component-Guide.md) &ndash; Shared memory, Unix domain sockets, pipes, and message queues.
+- [IPC Handler Master Architecture & Development Plan](./ipc-handler.md) &ndash; Formally specified IPC handler subsystem architecture, periodic task cadence, development phases, and 10-PR roadmap.
 - [Dynamic Linker Loader Component Guide](./Dynamic-Linker-Loader-Component-Guide.md) &ndash; ELF shared object loader, symbol resolution, and lazy binding.
 - [System Calls ABI Component Guide](./System-Calls-Abi-Component-Guide.md) &ndash; POSIX syscall interface, register conventions, and error translation.
 - [Signal Handler Development Plan](./SIGNAL_HANDLER_PLAN.md) &ndash; Architecture, POSIX.1-2024 semantics, 18-PR roadmap, and merge gates.
