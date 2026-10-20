@@ -131,6 +131,7 @@ pub mod sigmahardwaremanager;
 pub mod sigmahelpermanager;
 pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
+pub mod sigmaapplicationmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
@@ -144,6 +145,9 @@ pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
 pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
+pub use sigmaapplicationmanager::{
+    Application, AppState, SigmaApplicationManager,
+};
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
 };
