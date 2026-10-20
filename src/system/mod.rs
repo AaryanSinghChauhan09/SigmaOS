@@ -133,6 +133,7 @@ pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
 pub mod sigmamigrationmanager;
+pub mod sigmaservicemanager4;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
 pub mod sigmaprofilemanager;
@@ -147,6 +148,10 @@ pub mod sigmaupdatemanager2;
 pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
 pub use sigmaapplicationmanager::{
     Application, AppState, SigmaApplicationManager,
+};
+pub use sigmaservicemanager4::{
+    Service as ServiceManagerService, ServiceState as ServiceManagerState,
+    SigmaServiceManager4,
 };
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
@@ -260,7 +265,6 @@ pub mod sigmasearch;
 pub mod sigmasecurityaudit;
 pub mod sigmasecuritymanager;
 pub mod sigmaservice;
-pub mod sigmaservicemanager2;
 pub mod sigmaservicemanager3;
 pub mod sigmasession;
 pub mod sigmasmb;
@@ -658,9 +662,6 @@ pub use sigmascheduledfsck::{
 pub use sigmaservice::{
     get_sigmaservice, init_sigmaservice, start_service, Service, ServiceState, ServiceType,
     SigmaService,
-};
-pub use sigmaservicemanager2::{
-    get_sigmaservicemanager, init_sigmaservicemanager, SigmaServiceManager,
 };
 pub use sigmasession::{
     add_user_session, get_sigmasession, init_sigmasession, SessionState, SessionType, SigmaSession,
