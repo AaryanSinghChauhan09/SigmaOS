@@ -54,6 +54,8 @@ pub mod sovereign_open_source_distro_synthesis;
 pub mod sovereign_stack_replacements;
 pub mod sovereign_universal_subsystem_interop;
 pub use sovereign_universal_subsystem_interop::*;
+pub mod sovereign_universal_subsystem_distro_harmony_pr;
+pub use sovereign_universal_subsystem_distro_harmony_pr::*;
 pub mod sovereign_omarchy_pr_components_engine;
 pub use sovereign_omarchy_pr_components_engine::*;
 pub mod sovereign_wiki_ideas_pr_deployment_engine;
