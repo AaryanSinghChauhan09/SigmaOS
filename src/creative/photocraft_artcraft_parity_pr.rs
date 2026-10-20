@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - Photocraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/photocraft_artcraft_parity_pr.rs`)
 //
@@ -18,21 +17,29 @@ use alloc::string::{String, ToString};
 // 11. SovereignPhotocraftArtcraftParityPrGateway & PhotocraftArtcraftParityPrSuite (Master Gateway & Parity Benchmark)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
+use std::format;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec;
 #[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Photocraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -108,7 +115,6 @@ impl PhotocraftRawProcessingPrEngine {
         let exposure_factor = if self.active_params.exposure_ev == 0.0 {
             1.0f32
         } else {
- {
             (1.0f32 + self.active_params.exposure_ev * core::f32::consts::LN_2).max(0.1)
         };
 
@@ -192,7 +198,6 @@ impl PhotocraftAiInpaintingPrEngine {
                 let sample_pixel_idx = if i >= 1 {
                     i - 1
                 } else {
- {
                     (i + 1).min(pixel_count.saturating_sub(1))
                 };
                 let sample_idx = sample_pixel_idx * 4;
@@ -898,7 +903,6 @@ impl SovereignPhotocraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge" || p.status.contains("Merged"))
