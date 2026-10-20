@@ -34,6 +34,7 @@ pub mod gridcraft;
 pub mod gridcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
+pub mod lightcraft_artcraft_parity_pr;
 pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
@@ -165,6 +166,7 @@ pub use gridcraft_missing_components_parity_pr::{
     GridcraftRealtimeDataStreamSpillArrayPrEngine, MonteCarloResult,
     SovereignGridcraftArtcraftParityPrGateway, TickerData, UserDefinedFunction, ValidationRule,
 };
+pub use lightcraft_artcraft_parity_pr::*;
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
     ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
