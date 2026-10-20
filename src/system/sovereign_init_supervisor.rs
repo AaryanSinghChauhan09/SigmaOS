@@ -109,12 +109,22 @@ impl SovereignServiceUnit {
 }
 
 /// Sovereign PID 1 Supervisor
+use super::sovereign_init_and_supervisor_advancements_v63::*;
+
 pub struct SovereignInitSupervisor {
     pub next_pid: AtomicU32,
     pub services: BTreeMap<String, SovereignServiceUnit>,
     pub pid_map: BTreeMap<u32, String>,
     pub total_spawned_processes: AtomicU64,
     pub total_reaped_zombies: AtomicU64,
+    pub systemd_v63_engine: SystemdAdvancementsV63Engine,
+    pub openrc_v63_engine: OpenRcAdvancementsV63Engine,
+    pub runit_s6_v63_engine: RunitS6AdvancementsV63Engine,
+    pub sysvinit_v63_engine: SysVinitAdvancementsV63Engine,
+    pub bsd_rc_v63_engine: BsdRcAdvancementsV63Engine,
+    pub launchd_android_v63_engine: LaunchdAndroidAdvancementsV63Engine,
+    pub scheduler_v63_engine: SchedulerTimersAdvancementsV63Engine,
+    pub pr_gateway_v63: SovereignInitSupervisorV63PrGateway,
 }
 
 impl SovereignInitSupervisor {
@@ -125,6 +135,14 @@ impl SovereignInitSupervisor {
             pid_map: BTreeMap::new(),
             total_spawned_processes: AtomicU64::new(0),
             total_reaped_zombies: AtomicU64::new(0),
+            systemd_v63_engine: SystemdAdvancementsV63Engine::new(),
+            openrc_v63_engine: OpenRcAdvancementsV63Engine::new(),
+            runit_s6_v63_engine: RunitS6AdvancementsV63Engine::new(),
+            sysvinit_v63_engine: SysVinitAdvancementsV63Engine::new(),
+            bsd_rc_v63_engine: BsdRcAdvancementsV63Engine::new(),
+            launchd_android_v63_engine: LaunchdAndroidAdvancementsV63Engine::new(),
+            scheduler_v63_engine: SchedulerTimersAdvancementsV63Engine::new(),
+            pr_gateway_v63: SovereignInitSupervisorV63PrGateway::new(),
         }
     }
 
@@ -218,37 +236,44 @@ impl SovereignInitSupervisor {
         timed_out_services
     }
 
-    /// Parse and apply sd_notify protocol messages (READY=1, STATUS=..., STOPPING=1, RELOAD=1, WATCHDOG=1)
+    /// Parse and apply sd_notify protocol messages using SystemdAdvancementsV63Engine
     pub fn process_sd_notify(&mut self, pid: u32, payload: &str) -> bool {
         let service_name = match self.pid_map.get(&pid) {
             Some(n) => n.clone(),
             None => return false,
         };
 
+        let parsed = self.systemd_v63_engine.parse_sd_notify_payload(payload);
+
         let unit = match self.services.get_mut(&service_name) {
             Some(u) => u,
             None => return false,
         };
 
-        for line in payload.split('\n') {
-            let line = line.trim();
-            if line == "READY=1" {
-                unit.state = ServiceState::Ready;
-                unit.status_message = String::from("Service active and operational");
-            } else if line.starts_with("STATUS=") {
-                unit.status_message = String::from(&line[7..]);
-            } else if line == "STOPPING=1" {
-                unit.state = ServiceState::Stopping;
-            } else if line == "RELOAD=1" {
-                unit.state = ServiceState::Reloading;
-                unit.status_message = String::from("Reloading configuration");
-            } else if line == "WATCHDOG=1" {
-                unit.last_watchdog_ping += 1;
-            } else if line.starts_with("WATCHDOG_USEC=") {
-                if let Ok(usec) = line[14..].parse::<u64>() {
-                    unit.watchdog_usec = usec;
-                }
-            }
+        if parsed.ready {
+            unit.state = ServiceState::Ready;
+            unit.status_message = parsed.status.unwrap_or_else(|| String::from("Service active and operational"));
+        } else if let Some(status) = parsed.status {
+            unit.status_message = status;
+        }
+
+        if parsed.watchdog_ping {
+            unit.last_watchdog_ping += 1;
+        }
+
+        if let Some(usec) = parsed.extend_timeout_usec {
+            unit.watchdog_usec = usec;
+        }
+
+        if let Some(main_pid) = parsed.main_pid {
+            unit.pid = Some(main_pid);
+        }
+
+        if parsed.stopping {
+            unit.state = ServiceState::Stopping;
+        } else if parsed.reloading {
+            unit.state = ServiceState::Reloading;
+            unit.status_message = String::from("Reloading configuration");
         }
 
         true
@@ -279,8 +304,9 @@ impl SovereignInitSupervisor {
 
         if should_restart && unit.restart_count < unit.max_restarts {
             unit.restart_count += 1;
+            let delay = self.runit_s6_v63_engine.calculate_backoff_delay(unit.restart_count, 300);
             unit.state = ServiceState::Restarting;
-            unit.status_message = String::from("Restarting after exit");
+            unit.status_message = format!("Restarting after exit (backoff delay {}s)", delay);
         } else if exit_code != 0 {
             unit.state = ServiceState::Failed;
             unit.status_message = String::from("Service exited with error");
