@@ -98,7 +98,9 @@ pub mod sigmapackagemanager;
 pub mod sigmapackagemanager2;
 pub mod sigmapackageupdates;
 pub mod sigmaparted;
+pub mod sigmasoftwaremanager;
 pub mod sigmahardwareprofiler;
+pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePackage, SoftwareSource};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
 pub mod sigmaperformancemonitor;
@@ -130,7 +132,6 @@ pub mod sigmasession;
 pub mod sigmasmb;
 pub mod sigmasnap;
 pub mod sigmasnapshot;
-pub mod sigmasoftwaremanager;
 pub mod sigmasound;
 pub mod sigmassh;
 pub mod sigmastorage;
@@ -802,7 +803,7 @@ pub use mint_tools::{
     BackupStatus as MintBackupStatus, BackupType as MintBackupType, DiagnosticEntry,
     DiagnosticTest, Driver, DriverManager, DriverStatus, DriverType, HardwareInfo,
     MintUpdateManager, PackageUpdate, SoftwareCategory, SoftwareInfo, SoftwareManager,
-    SoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity,
+    SoftwarePackage as OtherSoftwarePackage, SystemReport, SystemToolsEngine, TestResult, UpdateSeverity,
     UpdateType as MintUpdateType,
 };
 pub use network_manager::{
@@ -822,10 +823,6 @@ pub use sigmasystemtools::{
     MaintenanceTask, SigmaSystemTools, SystemTool, ToolCategory,
 };
 
-pub use sigmasoftwaremanager::{
-    add_application, get_sigmasoftwaremanager, get_sigmasoftwaremanager_mut,
-    init_sigmasoftwaremanager, SigmaSoftwareManager,
-};
 
 pub use sigmabackupmanager::{
     add_backup, get_sigmabackupmanager, get_sigmabackupmanager_mut, init_sigmabackupmanager,

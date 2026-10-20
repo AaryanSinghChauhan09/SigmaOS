@@ -1,241 +1,115 @@
-//! SigmaSoftwareManager - Software Management System
-//!
-//! Provides comprehensive software management inspired by Linux Mint and Omarchy.
-//! Supports application discovery, installation, updates, and categorization.
+// SPDX-License-Identifier: MIT
+// SigmaOS - Software Manager
+// Software installation and management inspired by Arch (pacman), Debian (apt), and CachyOS
 
 #![no_std]
-
 extern crate alloc;
 
-use alloc::{
-    collections::BTreeMap,
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 
-/// Application category
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum AppCategory {
-    System,
-    Development,
-    Graphics,
-    Multimedia,
-    Office,
-    Internet,
-    Games,
-    Education,
-    Science,
-    Utilities,
-    Accessories,
-    Other,
-}
-
-/// Application status
+/// Software installation status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AppStatus {
-    Installed,
+pub enum InstallStatus {
     NotInstalled,
-    UpdateAvailable,
-    Broken,
+    Installing,
+    Installed,
+    Updating,
+    Removing,
+    Failed,
 }
 
-/// Rating score
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Rating {
-    pub score: u8, // 0-5
-    pub count: u32,
+/// Software source
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SoftwareSource {
+    Repository(String),
+    Local(String),
+    Flatpak(String),
+    Snap(String),
 }
 
-impl Rating {
-    pub fn new(score: u8, count: u32) -> Self {
-        Self {
-            score: score.min(5),
-            count,
-        }
-    }
-}
-
-/// Application
+/// Software package
 #[derive(Debug, Clone)]
-pub struct Application {
-    pub id: String,
+pub struct SoftwarePackage {
     pub name: String,
-    pub summary: String,
-    pub description: String,
-    pub category: AppCategory,
     pub version: String,
-    pub status: AppStatus,
-    pub installed_version: Option<String>,
-    pub latest_version: String,
-    pub size: u64, // in bytes
-    pub rating: Rating,
-    pub icon: String,
-    pub screenshots: Vec<String>,
+    pub description: String,
+    pub source: SoftwareSource,
+    pub size_bytes: u64,
+    pub status: InstallStatus,
+    pub dependencies: Vec<String>,
 }
 
-impl Application {
-    pub fn new(
-        id: String,
-        name: String,
-        summary: String,
-        description: String,
-        category: AppCategory,
-        version: String,
-    ) -> Self {
-        Self {
-            id,
-            name,
-            summary,
-            description,
-            category,
-            version: version.clone(),
-            status: AppStatus::NotInstalled,
-            installed_version: None,
-            latest_version: version,
-            size: 0,
-            rating: Rating::new(0, 0),
-            icon: String::new(),
-            screenshots: Vec::new(),
-        }
-    }
-
-    pub fn set_status(&mut self, status: AppStatus) {
-        self.status = status;
-    }
-
-    pub fn set_installed_version(&mut self, version: Option<String>) {
-        self.installed_version = version;
-    }
-
-    pub fn set_size(&mut self, size: u64) {
-        self.size = size;
-    }
-
-    pub fn set_rating(&mut self, rating: Rating) {
-        self.rating = rating;
-    }
-
-    pub fn set_icon(&mut self, icon: String) {
-        self.icon = icon;
-    }
-
-    pub fn add_screenshot(&mut self, url: String) {
-        self.screenshots.push(url);
-    }
-
-    pub fn needs_update(&self) -> bool {
-        self.status == AppStatus::UpdateAvailable
-    }
-
-    pub fn is_installed(&self) -> bool {
-        self.status == AppStatus::Installed || self.status == AppStatus::UpdateAvailable
-    }
-}
-
-/// SigmaSoftwareManager - Software management system
-#[derive(Debug)]
+/// Software manager
 pub struct SigmaSoftwareManager {
-    applications: BTreeMap<String, Application>,
-    categories: BTreeMap<AppCategory, Vec<String>>, // category -> app IDs
+    packages: Vec<SoftwarePackage>,
 }
 
 impl SigmaSoftwareManager {
     pub fn new() -> Self {
         Self {
-            applications: BTreeMap::new(),
-            categories: BTreeMap::new(),
+            packages: Vec::new(),
         }
     }
 
-    pub fn add_application(&mut self, app: Application) {
-        let category = app.category;
-        let id = app.id.clone();
-        self.applications.insert(id.clone(), app);
-        self.categories
-            .entry(category)
-            .or_insert_with(Vec::new)
-            .push(id);
+    pub fn add_package(&mut self, package: SoftwarePackage) {
+        self.packages.push(package);
     }
 
-    pub fn remove_application(&mut self, id: &str) -> bool {
-        if let Some(app) = self.applications.remove(id) {
-            if let Some(apps) = self.categories.get_mut(&app.category) {
-                apps.retain(|x| x != id);
-            }
-            true
+    pub fn get_packages(&self) -> &[SoftwarePackage] {
+        &self.packages
+    }
+
+    pub fn get_package(&self, name: &str) -> Option<&SoftwarePackage> {
+        self.packages.iter().find(|p| p.name == name)
+    }
+
+    pub fn get_package_mut(&mut self, name: &str) -> Option<&mut SoftwarePackage> {
+        self.packages.iter_mut().find(|p| p.name == name)
+    }
+
+    pub fn install_package(&mut self, name: String) -> Result<(), String> {
+        if let Some(pkg) = self.get_package_mut(&name) {
+            pkg.status = InstallStatus::Installing;
+            pkg.status = InstallStatus::Installed;
+            Ok(())
         } else {
-            false
+            Err(format!("Package {} not found", name))
         }
     }
 
-    pub fn get_application(&self, id: &str) -> Option<&Application> {
-        self.applications.get(id)
+    pub fn remove_package(&mut self, name: String) -> Result<(), String> {
+        if let Some(pkg) = self.get_package_mut(&name) {
+            pkg.status = InstallStatus::Removing;
+            pkg.status = InstallStatus::NotInstalled;
+            Ok(())
+        } else {
+            Err(format!("Package {} not found", name))
+        }
     }
 
-    pub fn get_application_mut(&mut self, id: &str) -> Option<&mut Application> {
-        self.applications.get_mut(id)
+    pub fn update_package(&mut self, name: String) -> Result<(), String> {
+        if let Some(pkg) = self.get_package_mut(&name) {
+            pkg.status = InstallStatus::Updating;
+            pkg.status = InstallStatus::Installed;
+            Ok(())
+        } else {
+            Err(format!("Package {} not found", name))
+        }
     }
 
-    pub fn search_applications(&self, query: &str) -> Vec<&Application> {
-        let query_lower = query.to_lowercase();
-        self.applications
-            .values()
-            .filter(|app| {
-                app.name.to_lowercase().contains(&query_lower)
-                    || app.summary.to_lowercase().contains(&query_lower)
-                    || app.description.to_lowercase().contains(&query_lower)
-            })
+    pub fn get_installed_packages(&self) -> Vec<&SoftwarePackage> {
+        self.packages
+            .iter()
+            .filter(|p| p.status == InstallStatus::Installed)
             .collect()
     }
 
-    pub fn list_by_category(&self, category: AppCategory) -> Vec<&Application> {
-        self.categories
-            .get(&category)
-            .map(|ids| {
-                ids.iter()
-                    .filter_map(|id| self.applications.get(id))
-                    .collect()
-            })
-            .unwrap_or_default()
-    }
-
-    pub fn list_installed(&self) -> Vec<&Application> {
-        self.applications
-            .values()
-            .filter(|app| app.is_installed())
+    pub fn search_packages(&self, query: &str) -> Vec<&SoftwarePackage> {
+        self.packages
+            .iter()
+            .filter(|p| p.name.contains(query) || p.description.contains(query))
             .collect()
-    }
-
-    pub fn list_updates(&self) -> Vec<&Application> {
-        self.applications
-            .values()
-            .filter(|app| app.needs_update())
-            .collect()
-    }
-
-    pub fn list_by_rating(&self, min_score: u8) -> Vec<&Application> {
-        self.applications
-            .values()
-            .filter(|app| app.rating.score >= min_score)
-            .collect()
-    }
-
-    pub fn application_count(&self) -> usize {
-        self.applications.len()
-    }
-
-    pub fn installed_count(&self) -> usize {
-        self.applications
-            .values()
-            .filter(|app| app.is_installed())
-            .count()
-    }
-
-    pub fn update_count(&self) -> usize {
-        self.applications
-            .values()
-            .filter(|app| app.needs_update())
-            .count()
     }
 }
 
@@ -245,119 +119,107 @@ impl Default for SigmaSoftwareManager {
     }
 }
 
-/// Global SigmaSoftwareManager instance
-static mut SIGMASOFTWAREMANAGER_INSTANCE: Option<SigmaSoftwareManager> = None;
-
-/// Initialize the global SigmaSoftwareManager instance
-pub fn init_sigmasoftwaremanager() {
-    unsafe {
-        SIGMASOFTWAREMANAGER_INSTANCE = Some(SigmaSoftwareManager::new());
-    }
-}
-
-/// Get the global SigmaSoftwareManager instance
-pub fn get_sigmasoftwaremanager() -> Option<&'static SigmaSoftwareManager> {
-    unsafe { SIGMASOFTWAREMANAGER_INSTANCE.as_ref() }
-}
-
-/// Get the global SigmaSoftwareManager instance (mutable)
-pub fn get_sigmasoftwaremanager_mut() -> Option<&'static mut SigmaSoftwareManager> {
-    unsafe { SIGMASOFTWAREMANAGER_INSTANCE.as_mut() }
-}
-
-/// Convenience function to add an application
-pub fn add_application(app: Application) -> bool {
-    if let Some(manager) = get_sigmasoftwaremanager_mut() {
-        manager.add_application(app);
-        true
-    } else {
-        false
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_rating_creation() {
-        let rating = Rating::new(4, 100);
-        assert_eq!(rating.score, 4);
-        assert_eq!(rating.count, 100);
-    }
-
-    #[test]
-    fn test_rating_clamping() {
-        let rating = Rating::new(7, 10);
-        assert_eq!(rating.score, 5); // clamped to 5
-    }
-
-    #[test]
-    fn test_application_creation() {
-        let app = Application::new(
-            "app1".to_string(),
-            "Firefox".to_string(),
-            "Web Browser".to_string(),
-            "A web browser".to_string(),
-            AppCategory::Internet,
-            "100.0".to_string(),
-        );
-        assert_eq!(app.id, "app1");
-        assert_eq!(app.status, AppStatus::NotInstalled);
-    }
-
-    #[test]
-    fn test_application_modification() {
-        let mut app = Application::new(
-            "app1".to_string(),
-            "Test".to_string(),
-            "Test app".to_string(),
-            "Test".to_string(),
-            AppCategory::System,
-            "1.0".to_string(),
-        );
-        app.set_status(AppStatus::Installed);
-        app.set_installed_version(Some("1.0".to_string()));
-        app.set_size(1000000);
-        app.set_rating(Rating::new(5, 100));
-        assert!(app.is_installed());
-        assert_eq!(app.size, 1000000);
-    }
-
-    #[test]
-    fn test_sigmasoftwaremanager_creation() {
+    fn test_software_manager_creation() {
         let manager = SigmaSoftwareManager::new();
-        assert_eq!(manager.application_count(), 0);
+        assert_eq!(manager.get_packages().len(), 0);
     }
 
     #[test]
-    fn test_sigmasoftwaremanager_management() {
+    fn test_add_package() {
         let mut manager = SigmaSoftwareManager::new();
-        let app = Application::new(
-            "app1".to_string(),
-            "Test".to_string(),
-            "Test".to_string(),
-            "Test".to_string(),
-            AppCategory::System,
-            "1.0".to_string(),
-        );
-        manager.add_application(app);
-        assert_eq!(manager.application_count(), 1);
+        let pkg = SoftwarePackage {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            description: "Test package".to_string(),
+            source: SoftwareSource::Repository("repo".to_string()),
+            size_bytes: 1000,
+            status: InstallStatus::NotInstalled,
+            dependencies: Vec::new(),
+        };
+        manager.add_package(pkg);
+        assert_eq!(manager.get_packages().len(), 1);
     }
 
     #[test]
-    fn test_application_search() {
+    fn test_install_package() {
         let mut manager = SigmaSoftwareManager::new();
-        let app = Application::new(
-            "app1".to_string(),
-            "Firefox".to_string(),
-            "Web Browser".to_string(),
-            "A web browser".to_string(),
-            AppCategory::Internet,
-            "1.0".to_string(),
-        );
-        manager.add_application(app);
-        let results = manager.search_applications("browser");
-        assert_eq!(results.len(), 1);
+        let pkg = SoftwarePackage {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            description: "Test package".to_string(),
+            source: SoftwareSource::Repository("repo".to_string()),
+            size_bytes: 1000,
+            status: InstallStatus::NotInstalled,
+            dependencies: Vec::new(),
+        };
+        manager.add_package(pkg);
+        manager.install_package("test".to_string()).unwrap();
+        assert_eq!(manager.get_package("test").unwrap().status, InstallStatus::Installed);
+    }
+
+    #[test]
+    fn test_remove_package() {
+        let mut manager = SigmaSoftwareManager::new();
+        let pkg = SoftwarePackage {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            description: "Test package".to_string(),
+            source: SoftwareSource::Repository("repo".to_string()),
+            size_bytes: 1000,
+            status: InstallStatus::Installed,
+            dependencies: Vec::new(),
+        };
+        manager.add_package(pkg);
+        manager.remove_package("test".to_string()).unwrap();
+        assert_eq!(manager.get_package("test").unwrap().status, InstallStatus::NotInstalled);
+    }
+
+    #[test]
+    fn test_update_package() {
+        let mut manager = SigmaSoftwareManager::new();
+        let pkg = SoftwarePackage {
+            name: "test".to_string(),
+            version: "1.0".to_string(),
+            description: "Test package".to_string(),
+            source: SoftwareSource::Repository("repo".to_string()),
+            size_bytes: 1000,
+            status: InstallStatus::Installed,
+            dependencies: Vec::new(),
+        };
+        manager.add_package(pkg);
+        manager.update_package("test".to_string()).unwrap();
+        assert_eq!(manager.get_package("test").unwrap().status, InstallStatus::Installed);
+    }
+
+    #[test]
+    fn test_search_packages() {
+        let mut manager = SigmaSoftwareManager::new();
+        let pkg1 = SoftwarePackage {
+            name: "firefox".to_string(),
+            version: "1.0".to_string(),
+            description: "Web browser".to_string(),
+            source: SoftwareSource::Repository("repo".to_string()),
+            size_bytes: 1000,
+            status: InstallStatus::Installed,
+            dependencies: Vec::new(),
+        };
+        let pkg2 = SoftwarePackage {
+            name: "thunderbird".to_string(),
+            version: "1.0".to_string(),
+            description: "Email client".to_string(),
+            source: SoftwareSource::Repository("repo".to_string()),
+            size_bytes: 1000,
+            status: InstallStatus::Installed,
+            dependencies: Vec::new(),
+        };
+        manager.add_package(pkg1);
+        manager.add_package(pkg2);
+        assert_eq!(manager.search_packages("fire").len(), 1);
+        assert_eq!(manager.search_packages("browser").len(), 1);
     }
 }
