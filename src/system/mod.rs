@@ -102,7 +102,9 @@ pub mod sigmasoftwaremanager;
 pub mod sigmahardwareprofiler;
 pub mod sigmasystemmonitor2;
 pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePackage, SoftwareSource};
+pub mod sigmataskscheduler;
 pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
+pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
 pub mod sigmaperformancemonitor;
@@ -204,7 +206,7 @@ pub use abi::{
     AbiType, SovereignSyscallAbiCompatibilityEngine, SyscallAbiResult, SyscallRegisters64,
 };
 
-pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus};
+pub use automation::{AutomationTask, AutomationTaskKind, SovereignAutomationEngine, TaskStatus as OtherTaskStatus};
 
 pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
@@ -250,7 +252,7 @@ pub use sandbox::{
     SandboxProcess, SandboxProfile, SandboxResult,
 };
 pub use scheduler_manager::{
-    ScheduleFrequency, ScheduleStatus, ScheduledTask, SchedulerManager, SchedulerStatistics,
+    ScheduleFrequency, ScheduleStatus, ScheduledTask as OtherScheduledTask, SchedulerManager, SchedulerStatistics,
 };
 pub use service_manager::{
     SystemRestartPolicy, SystemService, SystemServiceConfig, SystemServiceManager,
@@ -657,7 +659,7 @@ pub use sigmadiskusage::{
 
 pub use sigmataskmanager::{
     add_task, get_sigmataskmanager, get_sigmataskmanager_mut, init_sigmataskmanager,
-    SigmaTaskManager, Task, TaskPriority, TaskState,
+    SigmaTaskManager, Task, TaskPriority as OtherTaskPriority, TaskState,
 };
 
 pub use sigmaprocessmonitor::{
