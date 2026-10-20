@@ -268,5 +268,7 @@ pub mod visa_harness;
 pub use sovereign_security_and_hardening_advancements_pr::*;
 pub mod sovereign_security_and_hardening_advancements_v61_pr;
 pub use sovereign_security_and_hardening_advancements_v61_pr::*;
+pub mod sovereign_security_and_hardening_advancements_v63_pr;
+pub use sovereign_security_and_hardening_advancements_v63_pr::*;
 pub mod sovereign_security_management_plan;
 pub use sovereign_security_management_plan::*;

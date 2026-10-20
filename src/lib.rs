@@ -433,6 +433,7 @@ pub use security::{
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
     SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
     SovereignSecurityAndHardeningParityV61Gateway,
+    SovereignSecurityAndHardeningParityV63Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
