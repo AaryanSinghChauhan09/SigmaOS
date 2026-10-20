@@ -1908,6 +1908,13 @@ if [ -f "src/productivity/sovereign_application_replacements_v3_pr_suite.rs" ]; 
     ./build/test_app_replacements_v3_pr_suite
 fi
 
+if [ -f "src/productivity/sovereign_application_replacements_v4_pr_suite.rs" ]; then
+    echo "Running Sovereign Application Replacements V4 PR Suite..."
+    mkdir -p build
+    rustc --test src/productivity/sovereign_application_replacements_v4_pr_suite.rs --edition=2021 -o build/test_app_replacements_v4_pr_suite
+    ./build/test_app_replacements_v4_pr_suite
+fi
+
 
 if [ -f "src/system_apps/sovereign_system_apps_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign System Applications Development and PR Gateway Suite..."

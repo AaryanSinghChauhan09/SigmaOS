@@ -230,9 +230,73 @@ All sovereign app replacements are exposed via Pull Request proposal engines (PR
 
 ---
 
+## Next-Generation V4 PR Proposal Engines (PR IDs 246–260)
+
+### 46. Web Engine V4 (`SovereignBrowserEngineV4PrEngine` - PR 246)
+* **Replaces:** Firefox, Chromium, Brave, LibreWolf, Vivaldi
+* **Features:** WebGPU/Vulkan tile rasterization, Kyber-1024 PQC TLS 1.3, zero-trace memory sanitizer, amnesic zero-wipe RAM sessions.
+
+### 47. Mail Suite V4 (`SovereignEmailClientV4PrEngine` - PR 247)
+* **Replaces:** Thunderbird, Evolution, Claws Mail, Geary, KMail
+* **Features:** JMAP Real-Time Push sync, Dilithium OpenPGP, FTS5 offline indexer, offline CalDAV/CardDAV queue, zero-leak HTML sanitizer.
+
+### 48. Office Suite V4 (`SovereignOfficeSuiteV4PrEngine` - PR 248)
+* **Replaces:** LibreOffice (Writer, Calc, Impress, Draw), Apache OpenOffice, OnlyOffice
+* **Features:** P2P CRDT collaborative editing, zero-copy ODF 1.3 / OOXML parsers, PDF/A-4 signer with Dilithium5 PQC, Git document history.
+
+### 49. Code Editor V4 (`SovereignTextEditorV4PrEngine` - PR 249)
+* **Replaces:** Vim, Neovim, Emacs, nano, Helix, Kakoune
+* **Features:** LSP v3.17 & DAP client, Tree-sitter incremental AST parser, Vi/Emacs dispatcher with Org-Mode, zero-latency multi-cursor editing.
+
+### 50. Image Studio V4 (`SovereignRasterGraphicsV4PrEngine` - PR 250)
+* **Replaces:** GIMP, Krita, Inkscape, Darktable, Pinta
+* **Features:** OpenFX filter graph pipeline, ACES color management, Vulkan compute shader renderer, procedural brush dynamics.
+
+### 51. Document Reader V4 (`SovereignDocumentViewerV4PrEngine` - PR 251)
+* **Replaces:** Evince, Okular, MuPDF, Zathura, Atril
+* **Features:** Multithreaded vector renderer, local neural OCR engine, PDF/A-4 signature verifier, dual-page presenter view.
+
+### 52. File Manager V4 (`SovereignFileManagerV4PrEngine` - PR 252)
+* **Replaces:** Nautilus, Dolphin, Thunar, PCManFM, Nemo, Ranger
+* **Features:** B-Tree metadata tag catalog, dual-pane spatial navigator, VFS mount governor for SSHFS/SMB/NFS, regex batch renamer.
+
+### 53. Terminal Multiplexer V4 (`SovereignTerminalMultiplexerV4PrEngine` - PR 253)
+* **Replaces:** Alacritty, Kitty, rxvt-unicode, tmux, Screen, Zellij
+* **Features:** Vulkan GPU cell grid renderer, SIXEL/iTerm2 inline images, persistent multiplexer state machine, Asciinema session recorder.
+
+### 54. Media Studio V4 (`SovereignMediaPlayerStudioV4PrEngine` - PR 254)
+* **Replaces:** VLC, MPV, Audacity, Tenacity, HandBrake
+* **Features:** Zero-copy HW video decoding (VAAPI/NVDEC), VST3/LV2 DAW host, HDR10 tone mapping, real-time vocal isolation DSP.
+
+### 55. Password Vault V4 (`SovereignPasswordVaultV4PrEngine` - PR 255)
+* **Replaces:** KeePassXC, GNU pass, Bitwarden, 1Password
+* **Features:** Argon2id KDF, ChaCha20-Poly1305 encrypted vault, TPM2 / SecureEnclave binding, FIDO2 / YubiKey hardware key support.
+
+### 56. System Monitor V4 (`SovereignSystemMonitorV4PrEngine` - PR 256)
+* **Replaces:** htop, btop, top, glances, GNOME System Monitor
+* **Features:** eBPF /proc & Cgroup v2 telemetry, Pressure Stall Information (PSI) monitor, process memory map fault inspector, GPU VRAM graphs.
+
+### 57. P2P Torrent Engine V4 (`SovereignP2pTorrentClientV4PrEngine` - PR 257)
+* **Replaces:** Transmission, Deluge, qBittorrent, KTorrent
+* **Features:** BitTorrent v2 (BEP-52) SHA256 hash tree, Kademlia DHT, uTP congestion control, encrypted swarm governor, sequential video streaming.
+
+### 58. Messenger V4 (`SovereignMatrixIrcMessengerV4PrEngine` - PR 258)
+* **Replaces:** HexChat, Element, WeeChat, Irssi, Dino
+* **Features:** Matrix Olm/Megolm E2EE, IRCv3 SASL/CAP negotiation, unified multi-protocol router, post-quantum cross-signing verification.
+
+### 59. Archive Studio V4 (`SovereignArchiveCompressorV4PrEngine` - PR 259)
+* **Replaces:** Ark, File Roller, 7-Zip, PeaZip, Xarchiver
+* **Features:** Multi-threaded Zstd/LZMA2/Bzip2 codecs, AES-256 encrypted Zip/7z creation, streaming in-memory archive inspector & automated repair runner.
+
+### 60. Disk Studio V4 (`SovereignDiskPartitionManagerV4PrEngine` - PR 260)
+* **Replaces:** GParted, GNOME Disks, KDE Partition Manager, gpart
+* **Features:** MBR/GPT/BSD partition table solver, Ext4/Btrfs/ZFS/XFS resizer, NVMe SMART health monitor, LUKS2 key manager, DoD secure disk wiping.
+
+---
+
 ## Status & Integration Verification
 
-All 45 engines (V1, V2, V3) are registered, verified, and tested in `src/productivity/sovereign_application_replacements_v3_pr_suite.rs` and `run_sigma_tests.sh`. You can run tests at any time using:
+All 60 engines (V1, V2, V3, V4) are registered, verified, and tested in `src/productivity/sovereign_application_replacements_v4_pr_suite.rs` and `run_sigma_tests.sh`. You can run tests at any time using:
 ```bash
 ./run_sigma_tests.sh
 ```
