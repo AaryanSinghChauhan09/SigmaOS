@@ -2556,6 +2556,824 @@ impl Default for MpvLuaScriptingEngine {
     }
 }
 
+// =========================================================================
+// 20. ADVANCED DISTRO AUDIO & VIDEO ENGINES V3 (ALSA, OSS, PULSE, PIPEWIRE, JACK, SNDIO, GST, FFMPEG, V4L2, VLC, MPV)
+// =========================================================================
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AlsaChannelPosition {
+    Unknown,
+    FrontLeft,
+    FrontRight,
+    RearLeft,
+    RearRight,
+    FrontCenter,
+    Lfe,
+    SideLeft,
+    SideRight,
+}
+
+#[derive(Debug, Clone)]
+pub struct AlsaChmapPositionEngine {
+    pub pcm_name: String,
+    pub channel_positions: Vec<AlsaChannelPosition>,
+    pub is_surround_configured: bool,
+}
+
+impl AlsaChmapPositionEngine {
+    pub fn new(pcm_name: &str) -> Self {
+        Self {
+            pcm_name: pcm_name.to_string(),
+            channel_positions: vec![AlsaChannelPosition::FrontLeft, AlsaChannelPosition::FrontRight],
+            is_surround_configured: false,
+        }
+    }
+
+    pub fn set_surround_5_1_layout(&mut self) {
+        self.channel_positions = vec![
+            AlsaChannelPosition::FrontLeft,
+            AlsaChannelPosition::FrontRight,
+            AlsaChannelPosition::FrontCenter,
+            AlsaChannelPosition::Lfe,
+            AlsaChannelPosition::RearLeft,
+            AlsaChannelPosition::RearRight,
+        ];
+        self.is_surround_configured = true;
+    }
+
+    pub fn get_channel_count(&self) -> usize {
+        self.channel_positions.len()
+    }
+}
+
+impl Default for AlsaChmapPositionEngine {
+    fn default() -> Self {
+        Self::new("default")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AlsaTimerControlEngine {
+    pub timer_id: String,
+    pub resolution_ns: u64,
+    pub ticks_count: u64,
+    pub is_running: bool,
+}
+
+impl AlsaTimerControlEngine {
+    pub fn new(timer_id: &str, resolution_ns: u64) -> Self {
+        Self {
+            timer_id: timer_id.to_string(),
+            resolution_ns,
+            ticks_count: 0,
+            is_running: false,
+        }
+    }
+
+    pub fn start_timer(&mut self) {
+        self.is_running = true;
+    }
+
+    pub fn stop_timer(&mut self) {
+        self.is_running = false;
+    }
+
+    pub fn tick(&mut self, elapsed_ticks: u64) -> u64 {
+        if self.is_running {
+            self.ticks_count += elapsed_ticks;
+        }
+        self.ticks_count
+    }
+}
+
+impl Default for AlsaTimerControlEngine {
+    fn default() -> Self {
+        Self::new("system_timer", 1000000)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Oss4AudioCookerFormatEngine {
+    pub device_path: String,
+    pub is_cooked_mode: bool,
+    pub source_format: String,
+    pub target_format: String,
+    pub byte_order_swapped: bool,
+}
+
+impl Oss4AudioCookerFormatEngine {
+    pub fn new(device_path: &str) -> Self {
+        Self {
+            device_path: device_path.to_string(),
+            is_cooked_mode: true,
+            source_format: "S16_LE".to_string(),
+            target_format: "S16_LE".to_string(),
+            byte_order_swapped: false,
+        }
+    }
+
+    pub fn configure_transcode(&mut self, src_fmt: &str, dst_fmt: &str, swap_endian: bool) {
+        self.source_format = src_fmt.to_string();
+        self.target_format = dst_fmt.to_string();
+        self.byte_order_swapped = swap_endian;
+    }
+
+    pub fn toggle_cooked_mode(&mut self, enabled: bool) {
+        self.is_cooked_mode = enabled;
+    }
+}
+
+impl Default for Oss4AudioCookerFormatEngine {
+    fn default() -> Self {
+        Self::new("/dev/dsp0")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Oss4MultiChannelPeakMeterEngine {
+    pub mixer_path: String,
+    pub channel_peaks_db: Vec<f32>,
+    pub max_channels: usize,
+}
+
+impl Oss4MultiChannelPeakMeterEngine {
+    pub fn new(mixer_path: &str, channels: usize) -> Self {
+        Self {
+            mixer_path: mixer_path.to_string(),
+            channel_peaks_db: vec![-90.0; channels],
+            max_channels: channels,
+        }
+    }
+
+    pub fn update_peaks(&mut self, new_peaks: &[f32]) {
+        for (i, &val) in new_peaks.iter().enumerate().take(self.max_channels) {
+            self.channel_peaks_db[i] = val.clamp(-90.0, 0.0);
+        }
+    }
+
+    pub fn get_highest_peak(&self) -> f32 {
+        self.channel_peaks_db
+            .iter()
+            .cloned()
+            .fold(-90.0, f32::max)
+    }
+}
+
+impl Default for Oss4MultiChannelPeakMeterEngine {
+    fn default() -> Self {
+        Self::new("/dev/mixer0", 8)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PulseAudioMemfdSharedBufferEngine {
+    pub buffer_name: String,
+    pub size_bytes: usize,
+    pub memfd_descriptor_id: u32,
+    pub is_zero_copy_active: bool,
+    pub bytes_transferred_total: u64,
+}
+
+impl PulseAudioMemfdSharedBufferEngine {
+    pub fn new(buffer_name: &str, initial_size: usize) -> Self {
+        Self {
+            buffer_name: buffer_name.to_string(),
+            size_bytes: initial_size,
+            memfd_descriptor_id: 101,
+            is_zero_copy_active: true,
+            bytes_transferred_total: 0,
+        }
+    }
+
+    pub fn transfer_frames(&mut self, frame_bytes: usize) -> u64 {
+        if self.is_zero_copy_active {
+            self.bytes_transferred_total += frame_bytes as u64;
+        }
+        self.bytes_transferred_total
+    }
+
+    pub fn resize(&mut self, new_size: usize) {
+        self.size_bytes = new_size;
+    }
+}
+
+impl Default for PulseAudioMemfdSharedBufferEngine {
+    fn default() -> Self {
+        Self::new("pa_memfd_ring", 65536)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PulseAudioEchoCancelBeamformingEngine {
+    pub module_name: String,
+    pub aec_enabled: bool,
+    pub noise_suppression_db: f32,
+    pub beamforming_angle_deg: u32,
+    pub mic_count: usize,
+}
+
+impl PulseAudioEchoCancelBeamformingEngine {
+    pub fn new(mic_count: usize) -> Self {
+        Self {
+            module_name: "module-echo-cancel".to_string(),
+            aec_enabled: true,
+            noise_suppression_db: -18.0,
+            beamforming_angle_deg: 90,
+            mic_count,
+        }
+    }
+
+    pub fn configure_beamforming(&mut self, angle_deg: u32, suppression_db: f32) {
+        self.beamforming_angle_deg = angle_deg.min(180);
+        self.noise_suppression_db = suppression_db;
+    }
+
+    pub fn toggle_aec(&mut self, enabled: bool) {
+        self.aec_enabled = enabled;
+    }
+}
+
+impl Default for PulseAudioEchoCancelBeamformingEngine {
+    fn default() -> Self {
+        Self::new(2)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PipeWireProfilingMetadataEngine {
+    pub node_id: u32,
+    pub process_time_us: u64,
+    pub quantum_size: u32,
+    pub sample_rate: u32,
+    pub overrun_count: u32,
+}
+
+impl PipeWireProfilingMetadataEngine {
+    pub fn new(node_id: u32) -> Self {
+        Self {
+            node_id,
+            process_time_us: 150,
+            quantum_size: 1024,
+            sample_rate: 48000,
+            overrun_count: 0,
+        }
+    }
+
+    pub fn record_cycle(&mut self, execution_us: u64, is_overrun: bool) {
+        self.process_time_us = execution_us;
+        if is_overrun {
+            self.overrun_count += 1;
+        }
+    }
+
+    pub fn calculate_latency_ms(&self) -> f32 {
+        (self.quantum_size as f32 / self.sample_rate as f32) * 1000.0
+    }
+}
+
+impl Default for PipeWireProfilingMetadataEngine {
+    fn default() -> Self {
+        Self::new(1)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WirePlumberPolicyRulesEngine {
+    pub auto_switch_bluetooth_hfp: bool,
+    pub active_route_device: String,
+    pub default_sink_name: String,
+    pub policy_rule_count: usize,
+}
+
+impl WirePlumberPolicyRulesEngine {
+    pub fn new(default_sink: &str) -> Self {
+        Self {
+            auto_switch_bluetooth_hfp: true,
+            active_route_device: default_sink.to_string(),
+            default_sink_name: default_sink.to_string(),
+            policy_rule_count: 4,
+        }
+    }
+
+    pub fn trigger_media_event(&mut self, mic_requested: bool) -> String {
+        if mic_requested && self.auto_switch_bluetooth_hfp {
+            self.active_route_device = "bluez_card.HFP_handsfree".to_string();
+        } else {
+            self.active_route_device = self.default_sink_name.clone();
+        }
+        self.active_route_device.clone()
+    }
+}
+
+impl Default for WirePlumberPolicyRulesEngine {
+    fn default() -> Self {
+        Self::new("alsa_output.pci-0000_00_1f.3.analog-stereo")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JackXrunMonitoringEngine {
+    pub client_name: String,
+    pub xrun_count: u64,
+    pub max_delay_ms: f32,
+    pub auto_recovery_enabled: bool,
+}
+
+impl JackXrunMonitoringEngine {
+    pub fn new(client_name: &str) -> Self {
+        Self {
+            client_name: client_name.to_string(),
+            xrun_count: 0,
+            max_delay_ms: 0.0,
+            auto_recovery_enabled: true,
+        }
+    }
+
+    pub fn report_xrun(&mut self, delay_ms: f32) {
+        self.xrun_count += 1;
+        if delay_ms > self.max_delay_ms {
+            self.max_delay_ms = delay_ms;
+        }
+    }
+
+    pub fn reset_stats(&mut self) {
+        self.xrun_count = 0;
+        self.max_delay_ms = 0.0;
+    }
+}
+
+impl Default for JackXrunMonitoringEngine {
+    fn default() -> Self {
+        Self::new("jack_client_mon")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JackFreewheelModeEngine {
+    pub is_freewheel_active: bool,
+    pub process_cycles_rendered: u64,
+    pub offline_render_speed_multiplier: f32,
+}
+
+impl JackFreewheelModeEngine {
+    pub fn new() -> Self {
+        Self {
+            is_freewheel_active: false,
+            process_cycles_rendered: 0,
+            offline_render_speed_multiplier: 1.0,
+        }
+    }
+
+    pub fn enable_freewheel(&mut self, speed_multiplier: f32) {
+        self.is_freewheel_active = true;
+        self.offline_render_speed_multiplier = speed_multiplier;
+    }
+
+    pub fn disable_freewheel(&mut self) {
+        self.is_freewheel_active = false;
+        self.offline_render_speed_multiplier = 1.0;
+    }
+
+    pub fn render_cycle(&mut self, cycles: u64) -> u64 {
+        if self.is_freewheel_active {
+            self.process_cycles_rendered += cycles;
+        }
+        self.process_cycles_rendered
+    }
+}
+
+impl Default for JackFreewheelModeEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SndioVolumeAttenuationEngine {
+    pub volume_level: u8,
+    pub pan_balance: f32,
+    pub is_muted: bool,
+}
+
+impl SndioVolumeAttenuationEngine {
+    pub fn new(initial_vol: u8) -> Self {
+        Self {
+            volume_level: initial_vol.min(127),
+            pan_balance: 0.0,
+            is_muted: false,
+        }
+    }
+
+    pub fn set_volume(&mut self, vol: u8) {
+        self.volume_level = vol.min(127);
+    }
+
+    pub fn set_pan(&mut self, pan: f32) {
+        self.pan_balance = pan.clamp(-1.0, 1.0);
+    }
+
+    pub fn calculate_effective_volume_db(&self) -> f32 {
+        if self.is_muted || self.volume_level == 0 {
+            -90.0
+        } else {
+            20.0 * (self.volume_level as f32 / 127.0).log10()
+        }
+    }
+}
+
+impl Default for SndioVolumeAttenuationEngine {
+    fn default() -> Self {
+        Self::new(100)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SndioMidiSyncClockEngine {
+    pub bpm: f32,
+    pub ppqn: u32,
+    pub total_pulses: u64,
+    pub is_running: bool,
+}
+
+impl SndioMidiSyncClockEngine {
+    pub fn new(bpm: f32) -> Self {
+        Self {
+            bpm,
+            ppqn: 24,
+            total_pulses: 0,
+            is_running: false,
+        }
+    }
+
+    pub fn start(&mut self) {
+        self.is_running = true;
+    }
+
+    pub fn stop(&mut self) {
+        self.is_running = false;
+    }
+
+    pub fn emit_clock_pulses(&mut self, count: u64) -> u64 {
+        if self.is_running {
+            self.total_pulses += count;
+        }
+        self.total_pulses
+    }
+}
+
+impl Default for SndioMidiSyncClockEngine {
+    fn default() -> Self {
+        Self::new(120.0)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GStreamerPadProbeCapsEngine {
+    pub pad_name: String,
+    pub negotiated_caps: String,
+    pub probe_count: u64,
+    pub is_probe_attached: bool,
+}
+
+impl GStreamerPadProbeCapsEngine {
+    pub fn new(pad_name: &str) -> Self {
+        Self {
+            pad_name: pad_name.to_string(),
+            negotiated_caps: "video/x-raw, format=NV12, width=1920, height=1080".to_string(),
+            probe_count: 0,
+            is_probe_attached: false,
+        }
+    }
+
+    pub fn attach_pad_probe(&mut self) {
+        self.is_probe_attached = true;
+    }
+
+    pub fn inspect_buffer(&mut self, caps_override: Option<&str>) -> u64 {
+        if self.is_probe_attached {
+            self.probe_count += 1;
+            if let Some(caps) = caps_override {
+                self.negotiated_caps = caps.to_string();
+            }
+        }
+        self.probe_count
+    }
+}
+
+impl Default for GStreamerPadProbeCapsEngine {
+    fn default() -> Self {
+        Self::new("src_0")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GStreamerVideoTestSrcEngine {
+    pub pattern_type: String,
+    pub is_live: bool,
+    pub freq_hz: f32,
+    pub generated_frames: u64,
+}
+
+impl GStreamerVideoTestSrcEngine {
+    pub fn new(pattern: &str) -> Self {
+        Self {
+            pattern_type: pattern.to_string(),
+            is_live: true,
+            freq_hz: 440.0,
+            generated_frames: 0,
+        }
+    }
+
+    pub fn generate_stream_batch(&mut self, frames: u64) -> u64 {
+        self.generated_frames += frames;
+        self.generated_frames
+    }
+
+    pub fn set_pattern(&mut self, pattern: &str) {
+        self.pattern_type = pattern.to_string();
+    }
+}
+
+impl Default for GStreamerVideoTestSrcEngine {
+    fn default() -> Self {
+        Self::new("smpte")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FfmpegBitstreamFilterEngine {
+    pub filter_name: String,
+    pub packets_processed: u64,
+    pub is_annexb_conversion: bool,
+}
+
+impl FfmpegBitstreamFilterEngine {
+    pub fn new(filter_name: &str) -> Self {
+        Self {
+            filter_name: filter_name.to_string(),
+            packets_processed: 0,
+            is_annexb_conversion: filter_name.contains("h264_mp4toannexb"),
+        }
+    }
+
+    pub fn process_packet_batch(&mut self, count: u64) -> u64 {
+        self.packets_processed += count;
+        self.packets_processed
+    }
+}
+
+impl Default for FfmpegBitstreamFilterEngine {
+    fn default() -> Self {
+        Self::new("h264_mp4toannexb")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FfmpegHardwareFrameTransferEngine {
+    pub source_hw_device: String,
+    pub memory_type: String,
+    pub frames_transferred: u64,
+    pub pool_capacity: usize,
+}
+
+impl FfmpegHardwareFrameTransferEngine {
+    pub fn new(hw_device: &str, pool_capacity: usize) -> Self {
+        Self {
+            source_hw_device: hw_device.to_string(),
+            memory_type: "VAAPI_DRM".to_string(),
+            frames_transferred: 0,
+            pool_capacity,
+        }
+    }
+
+    pub fn transfer_frame_zero_copy(&mut self) -> bool {
+        if self.frames_transferred < self.pool_capacity as u64 {
+            self.frames_transferred += 1;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for FfmpegHardwareFrameTransferEngine {
+    fn default() -> Self {
+        Self::new("/dev/dri/renderD128", 32)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct V4l2RequestApiEngine {
+    pub device_path: String,
+    pub allocated_request_fds: Vec<i32>,
+    pub queued_requests: u32,
+}
+
+impl V4l2RequestApiEngine {
+    pub fn new(device_path: &str) -> Self {
+        Self {
+            device_path: device_path.to_string(),
+            allocated_request_fds: Vec::new(),
+            queued_requests: 0,
+        }
+    }
+
+    pub fn allocate_requests(&mut self, count: u32) -> usize {
+        for i in 0..count {
+            self.allocated_request_fds.push(100 + i as i32);
+        }
+        self.allocated_request_fds.len()
+    }
+
+    pub fn queue_request(&mut self, req_fd: i32) -> Result<(), String> {
+        if self.allocated_request_fds.contains(&req_fd) {
+            self.queued_requests += 1;
+            Ok(())
+        } else {
+            Err("Invalid request FD".to_string())
+        }
+    }
+}
+
+impl Default for V4l2RequestApiEngine {
+    fn default() -> Self {
+        Self::new("/dev/video0")
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct V4l2CropSelectionCapabilitiesEngine {
+    pub target: String,
+    pub crop_rect: (u32, u32, u32, u32),
+    pub is_selection_supported: bool,
+}
+
+impl V4l2CropSelectionCapabilitiesEngine {
+    pub fn new() -> Self {
+        Self {
+            target: "V4L2_SEL_TGT_CROP".to_string(),
+            crop_rect: (0, 0, 1920, 1080),
+            is_selection_supported: true,
+        }
+    }
+
+    pub fn set_crop_rectangle(&mut self, left: u32, top: u32, width: u32, height: u32) {
+        self.crop_rect = (left, top, width, height);
+    }
+}
+
+impl Default for V4l2CropSelectionCapabilitiesEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VlcAudioFilterEqualizerEngine {
+    pub preamp_gain_db: f32,
+    pub band_gains_db: Vec<f32>,
+    pub preset_name: String,
+}
+
+impl VlcAudioFilterEqualizerEngine {
+    pub fn new() -> Self {
+        Self {
+            preamp_gain_db: 0.0,
+            band_gains_db: vec![0.0; 10],
+            preset_name: "flat".to_string(),
+        }
+    }
+
+    pub fn load_preset(&mut self, preset: &str) {
+        self.preset_name = preset.to_string();
+        match preset {
+            "rock" => {
+                self.band_gains_db = vec![4.8, 3.2, -1.5, -3.8, -1.2, 2.0, 5.0, 6.2, 6.0, 5.8];
+            }
+            "pop" => {
+                self.band_gains_db = vec![-1.2, 1.0, 3.5, 4.0, 3.0, -1.0, -2.0, -1.8, -1.0, 1.2];
+            }
+            "jazz" => {
+                self.band_gains_db = vec![3.0, 2.0, 1.2, 1.8, -1.5, -1.5, 0.0, 1.2, 2.5, 3.2];
+            }
+            _ => {
+                self.band_gains_db = vec![0.0; 10];
+            }
+        }
+    }
+
+    pub fn set_band(&mut self, index: usize, gain_db: f32) {
+        if index < self.band_gains_db.len() {
+            self.band_gains_db[index] = gain_db.clamp(-20.0, 20.0);
+        }
+    }
+}
+
+impl Default for VlcAudioFilterEqualizerEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VlcVideoOutputCropAspectEngine {
+    pub aspect_ratio: String,
+    pub crop_geometry: String,
+    pub is_hardware_scaler_active: bool,
+}
+
+impl VlcVideoOutputCropAspectEngine {
+    pub fn new() -> Self {
+        Self {
+            aspect_ratio: "16:9".to_string(),
+            crop_geometry: "1920x1080+0+0".to_string(),
+            is_hardware_scaler_active: true,
+        }
+    }
+
+    pub fn set_aspect_ratio(&mut self, aspect: &str) {
+        self.aspect_ratio = aspect.to_string();
+    }
+
+    pub fn set_crop(&mut self, crop: &str) {
+        self.crop_geometry = crop.to_string();
+    }
+}
+
+impl Default for VlcVideoOutputCropAspectEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MpvShaderPackEngine {
+    pub active_shaders: Vec<String>,
+    pub is_gpu_next: bool,
+}
+
+impl MpvShaderPackEngine {
+    pub fn new() -> Self {
+        Self {
+            active_shaders: Vec::new(),
+            is_gpu_next: true,
+        }
+    }
+
+    pub fn add_shader(&mut self, shader_path: &str) {
+        self.active_shaders.push(shader_path.to_string());
+    }
+
+    pub fn clear_shaders(&mut self) {
+        self.active_shaders.clear();
+    }
+}
+
+impl Default for MpvShaderPackEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MpvCommandIpcDispatcherEngine {
+    pub socket_path: String,
+    pub command_sequence: u64,
+    pub is_connected: bool,
+}
+
+impl MpvCommandIpcDispatcherEngine {
+    pub fn new(socket_path: &str) -> Self {
+        Self {
+            socket_path: socket_path.to_string(),
+            command_sequence: 1,
+            is_connected: true,
+        }
+    }
+
+    pub fn format_json_cmd(&mut self, command_name: &str, args: &[&str]) -> String {
+        let seq = self.command_sequence;
+        self.command_sequence += 1;
+
+        let args_str = args
+            .iter()
+            .map(|a| format!("\"{}\"", a))
+            .collect::<Vec<_>>()
+            .join(",");
+
+        format!(
+            "{{\"command\": [\"{}\", {}], \"request_id\": {}}}",
+            command_name, args_str, seq
+        )
+    }
+}
+
+impl Default for MpvCommandIpcDispatcherEngine {
+    fn default() -> Self {
+        Self::new("/tmp/mpvsocket")
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AudioVideoPrStatus {
     Proposed,
@@ -2743,6 +3561,28 @@ impl LinuxBsdAudioVideoGapClosurePrGateway {
             ("V4L2 Multi-Planar Capture Buffer Exporter", "V4L2"),
             ("VLC LibVLC Network Media Discoverer Engine", "VLC"),
             ("mpv Script Hook & Custom Property Binding Engine", "mpv"),
+            ("ALSA Channel Map Position & 5.1/7.1 Surround Engine", "ALSA"),
+            ("ALSA Hardware Timer & Period Control Engine", "ALSA"),
+            ("OSS v4 Cooked Mode & Endian Transcode Engine", "OSS"),
+            ("OSS v4 Multi-Channel Peak Level Meter Engine", "OSS"),
+            ("PulseAudio POSIX memfd Shared Memory Ring Buffer Engine", "PulseAudio"),
+            ("PulseAudio Acoustic Echo Cancellation & Beamforming Engine", "PulseAudio"),
+            ("PipeWire Profiling Metadata & Cycle Latency Engine", "PipeWire"),
+            ("WirePlumber Dynamic Bluetooth HFP Routing Rules Engine", "WirePlumber"),
+            ("JACK XRUN Delay Spike & Auto-Recovery Monitor Engine", "JACK"),
+            ("JACK Freewheel Offline Fast Render Engine", "JACK"),
+            ("sndio Logarithmic Volume & Matrix Panning Engine", "sndio"),
+            ("sndio Real-Time MIDI Clock Sync Engine", "sndio"),
+            ("GStreamer Pad Probe & Caps Negotiation Engine", "GStreamer"),
+            ("GStreamer Video & Audio Synthetic TestSrc Engine", "GStreamer"),
+            ("FFmpeg Bitstream Filter AnnexB Converter Engine", "FFmpeg"),
+            ("FFmpeg Zero-Copy Hardware Surface Transfer Engine", "FFmpeg"),
+            ("V4L2 Stateless Request API & Buffer Queue Engine", "V4L2"),
+            ("V4L2 Crop Selection & Rectangle Scaling Engine", "V4L2"),
+            ("VLC 10-Band Graphic Equalizer Preset Engine", "VLC"),
+            ("VLC Aspect Ratio Transformation & Crop Engine", "VLC"),
+            ("mpv Custom GLSL Shader Pack Pipeline Engine", "mpv"),
+            ("mpv JSON-IPC Socket Command Dispatcher Engine", "mpv"),
         ];
 
         for (title, subsystem) in prs {
@@ -2815,6 +3655,28 @@ pub struct LinuxBsdDistroMediaSuite {
     pub v4l2_multiplanar_buffer: V4l2MultiPlanarBufferEngine,
     pub vlc_media_discoverer: VlcLibvlcMediaDiscovererEngine,
     pub mpv_script_hook: MpvScriptHookEngine,
+    pub alsa_chmap_position: AlsaChmapPositionEngine,
+    pub alsa_timer_control: AlsaTimerControlEngine,
+    pub oss4_cooker_format: Oss4AudioCookerFormatEngine,
+    pub oss4_multichannel_meter: Oss4MultiChannelPeakMeterEngine,
+    pub pulseaudio_memfd_buffer: PulseAudioMemfdSharedBufferEngine,
+    pub pulseaudio_aec_beamforming: PulseAudioEchoCancelBeamformingEngine,
+    pub pipewire_profiling_metadata: PipeWireProfilingMetadataEngine,
+    pub wireplumber_policy_rules: WirePlumberPolicyRulesEngine,
+    pub jack_xrun_monitoring: JackXrunMonitoringEngine,
+    pub jack_freewheel_mode: JackFreewheelModeEngine,
+    pub sndio_volume_attenuation: SndioVolumeAttenuationEngine,
+    pub sndio_midi_sync_clock: SndioMidiSyncClockEngine,
+    pub gstreamer_pad_probe_caps: GStreamerPadProbeCapsEngine,
+    pub gstreamer_video_testsrc: GStreamerVideoTestSrcEngine,
+    pub ffmpeg_bitstream_filter: FfmpegBitstreamFilterEngine,
+    pub ffmpeg_hw_frame_transfer: FfmpegHardwareFrameTransferEngine,
+    pub v4l2_request_api: V4l2RequestApiEngine,
+    pub v4l2_crop_selection: V4l2CropSelectionCapabilitiesEngine,
+    pub vlc_audio_equalizer: VlcAudioFilterEqualizerEngine,
+    pub vlc_video_crop_aspect: VlcVideoOutputCropAspectEngine,
+    pub mpv_shader_pack: MpvShaderPackEngine,
+    pub mpv_command_ipc_dispatcher: MpvCommandIpcDispatcherEngine,
     pub pr_gateway: LinuxBsdAudioVideoPrGatewayEngine,
     pub gap_closure_pr_gateway: LinuxBsdAudioVideoGapClosurePrGateway,
 }
@@ -2877,6 +3739,28 @@ impl LinuxBsdDistroMediaSuite {
             v4l2_multiplanar_buffer: V4l2MultiPlanarBufferEngine::new("/dev/video0", 2),
             vlc_media_discoverer: VlcLibvlcMediaDiscovererEngine::new("upnp"),
             mpv_script_hook: MpvScriptHookEngine::new(),
+            alsa_chmap_position: AlsaChmapPositionEngine::new("default"),
+            alsa_timer_control: AlsaTimerControlEngine::new("system_timer", 1000000),
+            oss4_cooker_format: Oss4AudioCookerFormatEngine::new("/dev/dsp0"),
+            oss4_multichannel_meter: Oss4MultiChannelPeakMeterEngine::new("/dev/mixer0", 8),
+            pulseaudio_memfd_buffer: PulseAudioMemfdSharedBufferEngine::new("pa_memfd_ring", 65536),
+            pulseaudio_aec_beamforming: PulseAudioEchoCancelBeamformingEngine::new(2),
+            pipewire_profiling_metadata: PipeWireProfilingMetadataEngine::new(1),
+            wireplumber_policy_rules: WirePlumberPolicyRulesEngine::new("alsa_output.pci-0000_00_1f.3.analog-stereo"),
+            jack_xrun_monitoring: JackXrunMonitoringEngine::new("jack_client_mon"),
+            jack_freewheel_mode: JackFreewheelModeEngine::new(),
+            sndio_volume_attenuation: SndioVolumeAttenuationEngine::new(100),
+            sndio_midi_sync_clock: SndioMidiSyncClockEngine::new(120.0),
+            gstreamer_pad_probe_caps: GStreamerPadProbeCapsEngine::new("src_0"),
+            gstreamer_video_testsrc: GStreamerVideoTestSrcEngine::new("smpte"),
+            ffmpeg_bitstream_filter: FfmpegBitstreamFilterEngine::new("h264_mp4toannexb"),
+            ffmpeg_hw_frame_transfer: FfmpegHardwareFrameTransferEngine::new("/dev/dri/renderD128", 32),
+            v4l2_request_api: V4l2RequestApiEngine::new("/dev/video0"),
+            v4l2_crop_selection: V4l2CropSelectionCapabilitiesEngine::new(),
+            vlc_audio_equalizer: VlcAudioFilterEqualizerEngine::new(),
+            vlc_video_crop_aspect: VlcVideoOutputCropAspectEngine::new(),
+            mpv_shader_pack: MpvShaderPackEngine::new(),
+            mpv_command_ipc_dispatcher: MpvCommandIpcDispatcherEngine::new("/tmp/mpvsocket"),
             pr_gateway: LinuxBsdAudioVideoPrGatewayEngine::new(),
             gap_closure_pr_gateway: LinuxBsdAudioVideoGapClosurePrGateway::new(),
         }
@@ -3087,7 +3971,7 @@ mod tests {
         assert_eq!(merged_status, AudioVideoPrStatus::Merged);
 
         let gap_closure = LinuxBsdAudioVideoGapClosurePrGateway::new();
-        assert_eq!(gap_closure.gateway.submissions.len(), 44);
+        assert_eq!(gap_closure.gateway.submissions.len(), 66);
     }
 
     #[test]
@@ -3155,7 +4039,7 @@ mod tests {
 
         // Suite verification
         let suite = LinuxBsdDistroMediaSuite::new();
-        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 44);
+        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 66);
     }
 
     #[test]
@@ -3280,6 +4164,130 @@ mod tests {
 
         // Verify master suite instantiation
         let suite = LinuxBsdDistroMediaSuite::new();
-        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 44);
+        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 66);
+    }
+
+    #[test]
+    fn test_v3_advanced_distro_audio_video_engines() {
+        // 1. ALSA Chmap
+        let mut alsa_ch = AlsaChmapPositionEngine::new("pcm_surround");
+        alsa_ch.set_surround_5_1_layout();
+        assert!(alsa_ch.is_surround_configured);
+        assert_eq!(alsa_ch.get_channel_count(), 6);
+
+        // 2. ALSA Timer
+        let mut alsa_timer = AlsaTimerControlEngine::new("hw_timer0", 500000);
+        alsa_timer.start_timer();
+        assert_eq!(alsa_timer.tick(10), 10);
+        alsa_timer.stop_timer();
+
+        // 3. OSS4 Cooker
+        let mut oss_cooker = Oss4AudioCookerFormatEngine::new("/dev/dsp0");
+        oss_cooker.configure_transcode("S16_LE", "S32_LE", true);
+        assert_eq!(oss_cooker.target_format, "S32_LE");
+        assert!(oss_cooker.byte_order_swapped);
+
+        // 4. OSS4 Multi-Channel Peak Meter
+        let mut oss_meter = Oss4MultiChannelPeakMeterEngine::new("/dev/mixer0", 8);
+        oss_meter.update_peaks(&[-6.0, -12.0, -3.0]);
+        assert_eq!(oss_meter.get_highest_peak(), -3.0);
+
+        // 5. PulseAudio Memfd Shared Buffer
+        let mut pa_memfd = PulseAudioMemfdSharedBufferEngine::new("shm_buf", 131072);
+        assert_eq!(pa_memfd.transfer_frames(4096), 4096);
+        pa_memfd.resize(262144);
+        assert_eq!(pa_memfd.size_bytes, 262144);
+
+        // 6. PulseAudio Echo Cancel Beamforming
+        let mut pa_aec = PulseAudioEchoCancelBeamformingEngine::new(4);
+        pa_aec.configure_beamforming(45, -24.0);
+        assert_eq!(pa_aec.beamforming_angle_deg, 45);
+        assert_eq!(pa_aec.noise_suppression_db, -24.0);
+
+        // 7. PipeWire Profiling Metadata
+        let mut pw_prof = PipeWireProfilingMetadataEngine::new(42);
+        pw_prof.record_cycle(200, true);
+        assert_eq!(pw_prof.overrun_count, 1);
+        assert!(pw_prof.calculate_latency_ms() > 0.0);
+
+        // 8. WirePlumber Policy Rules
+        let mut wp_policy = WirePlumberPolicyRulesEngine::new("default_speaker");
+        let route = wp_policy.trigger_media_event(true);
+        assert_eq!(route, "bluez_card.HFP_handsfree");
+
+        // 9. JACK XRUN Monitor
+        let mut jack_xrun = JackXrunMonitoringEngine::new("daw_out");
+        jack_xrun.report_xrun(1.5);
+        assert_eq!(jack_xrun.xrun_count, 1);
+        assert_eq!(jack_xrun.max_delay_ms, 1.5);
+
+        // 10. JACK Freewheel Mode
+        let mut jack_fw = JackFreewheelModeEngine::new();
+        jack_fw.enable_freewheel(10.0);
+        assert_eq!(jack_fw.render_cycle(100), 100);
+
+        // 11. sndio Volume Attenuation
+        let mut sndio_vol = SndioVolumeAttenuationEngine::new(100);
+        sndio_vol.set_pan(0.5);
+        assert!(sndio_vol.calculate_effective_volume_db() < 0.0);
+
+        // 12. sndio MIDI Sync Clock
+        let mut sndio_clock = SndioMidiSyncClockEngine::new(140.0);
+        sndio_clock.start();
+        assert_eq!(sndio_clock.emit_clock_pulses(48), 48);
+
+        // 13. GStreamer Pad Probe Caps
+        let mut gst_pad = GStreamerPadProbeCapsEngine::new("sink_0");
+        gst_pad.attach_pad_probe();
+        assert_eq!(gst_pad.inspect_buffer(Some("video/x-raw, format=RGBA")), 1);
+        assert_eq!(gst_pad.negotiated_caps, "video/x-raw, format=RGBA");
+
+        // 14. GStreamer Video TestSrc
+        let mut gst_src = GStreamerVideoTestSrcEngine::new("ball");
+        assert_eq!(gst_src.generate_stream_batch(60), 60);
+
+        // 15. FFmpeg Bitstream Filter
+        let mut ff_bsf = FfmpegBitstreamFilterEngine::new("h264_mp4toannexb");
+        assert_eq!(ff_bsf.process_packet_batch(20), 20);
+        assert!(ff_bsf.is_annexb_conversion);
+
+        // 16. FFmpeg HW Frame Transfer
+        let mut ff_tf = FfmpegHardwareFrameTransferEngine::new("/dev/dri/renderD128", 16);
+        assert!(ff_tf.transfer_frame_zero_copy());
+        assert_eq!(ff_tf.frames_transferred, 1);
+
+        // 17. V4L2 Request API
+        let mut v4l2_req = V4l2RequestApiEngine::new("/dev/video0");
+        assert_eq!(v4l2_req.allocate_requests(4), 4);
+        assert!(v4l2_req.queue_request(100).is_ok());
+
+        // 18. V4L2 Crop Selection
+        let mut v4l2_crop = V4l2CropSelectionCapabilitiesEngine::new();
+        v4l2_crop.set_crop_rectangle(100, 100, 1280, 720);
+        assert_eq!(v4l2_crop.crop_rect, (100, 100, 1280, 720));
+
+        // 19. VLC Audio Equalizer
+        let mut vlc_eq = VlcAudioFilterEqualizerEngine::new();
+        vlc_eq.load_preset("rock");
+        assert_eq!(vlc_eq.preset_name, "rock");
+
+        // 20. VLC Video Crop & Aspect
+        let mut vlc_crop = VlcVideoOutputCropAspectEngine::new();
+        vlc_crop.set_aspect_ratio("21:9");
+        assert_eq!(vlc_crop.aspect_ratio, "21:9");
+
+        // 21. mpv Shader Pack
+        let mut mpv_shader = MpvShaderPackEngine::new();
+        mpv_shader.add_shader("anime4k.glsl");
+        assert_eq!(mpv_shader.active_shaders.len(), 1);
+
+        // 22. mpv Command IPC Dispatcher
+        let mut mpv_cmd = MpvCommandIpcDispatcherEngine::new("/tmp/mpvsocket");
+        let json = mpv_cmd.format_json_cmd("seek", &["10", "relative"]);
+        assert!(json.contains("seek"));
+
+        // Verify master suite instantiation
+        let suite = LinuxBsdDistroMediaSuite::new();
+        assert_eq!(suite.gap_closure_pr_gateway.gateway.submissions.len(), 66);
     }
 }

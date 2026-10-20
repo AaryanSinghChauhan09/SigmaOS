@@ -22,10 +22,14 @@ pub mod pipewire_server;
 pub mod sigma_audio_router;
 
 pub use crate::media::distro_media_engine::{
-    AlsaMixerElement, AlsaPcmHwConfigEngine, AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine,
-    AudioSinkBackend, BluetoothAudioCodec, JackProAudioEngine, JackRealtimeGraphEngine,
-    JackTransportState, OssDspDevice, OssIoctlCmd, OssMixerPeakMeterEngine, OssSoundEngine,
-    PipeWireEngine, PipeWireNodeState, PipeWireSpaBufferEngine, PulseAudioEngine,
-    PulseAudioModuleRouterEngine, PulseAudioSink, SndPcmHwParams, SndioEngine,
-    SndioMidiPcmMultiplexerEngine,
+    AlsaChannelPosition, AlsaChmapPositionEngine, AlsaMixerElement, AlsaPcmHwConfigEngine,
+    AlsaPcmState, AlsaSampleFormat, AlsaSoundEngine, AlsaTimerControlEngine, AudioSinkBackend,
+    BluetoothAudioCodec, JackFreewheelModeEngine, JackProAudioEngine, JackRealtimeGraphEngine,
+    JackTransportState, JackXrunMonitoringEngine, Oss4AudioCookerFormatEngine,
+    Oss4MultiChannelPeakMeterEngine, OssDspDevice, OssIoctlCmd, OssMixerPeakMeterEngine,
+    OssSoundEngine, PipeWireEngine, PipeWireNodeState, PipeWireProfilingMetadataEngine,
+    PipeWireSpaBufferEngine, PulseAudioEchoCancelBeamformingEngine, PulseAudioEngine,
+    PulseAudioMemfdSharedBufferEngine, PulseAudioModuleRouterEngine, PulseAudioSink, SndPcmHwParams,
+    SndioEngine, SndioMidiPcmMultiplexerEngine, SndioMidiSyncClockEngine,
+    SndioVolumeAttenuationEngine, WirePlumberPolicyRulesEngine,
 };
