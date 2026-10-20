@@ -197,8 +197,8 @@ impl Date {
         }
     }
 
+    #[allow(clippy::manual_is_multiple_of)]
     pub fn is_leap_year(year: u16) -> bool {
-        #[allow(clippy::manual_is_multiple_of)]
         (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
     }
 
