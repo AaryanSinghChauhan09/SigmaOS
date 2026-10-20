@@ -94,19 +94,16 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             let r_lin = if r <= 0.04045 {
                 r / 12.92
             } else {
- {
                 ((r + 0.055) / 1.055).powf(2.4)
             };
             let g_lin = if g <= 0.04045 {
                 g / 12.92
             } else {
- {
                 ((g + 0.055) / 1.055).powf(2.4)
             };
             let b_lin = if b <= 0.04045 {
                 b / 12.92
             } else {
- {
                 ((b + 0.055) / 1.055).powf(2.4)
             };
             // Apply matrix transform
@@ -117,19 +114,16 @@ impl CraftlibsSimdColorSpaceTransformPrEngine {
             let r_gam = if r_out <= 0.0031308 {
                 r_out * 12.92
             } else {
- {
                 1.055 * r_out.powf(1.0 / 2.4) - 0.055
             };
             let g_gam = if g_out <= 0.0031308 {
                 g_out * 12.92
             } else {
- {
                 1.055 * g_out.powf(1.0 / 2.4) - 0.055
             };
             let b_gam = if b_out <= 0.0031308 {
                 b_out * 12.92
             } else {
- {
                 1.055 * b_out.powf(1.0 / 2.4) - 0.055
             };
             rgba_out[idx] = (r_gam * 255.0).clamp(0.0, 255.0) as u8;
@@ -261,7 +255,6 @@ impl CraftlibsLayerBlendModesPrEngine {
                     if b < 0.5 {
                         2.0 * b * s
                     } else {
- {
                         1.0 - 2.0 * (1.0 - b) * (1.0 - s)
                     }
                 }
@@ -292,7 +285,6 @@ impl CraftlibsLayerBlendModesPrEngine {
                         if s <= 0.0 {
                             0.0
                         } else {
- {
                             (1.0 - (1.0 - b) / (2.0 * s)).max(0.0)
                         }
                         if s >= 1.0 {
