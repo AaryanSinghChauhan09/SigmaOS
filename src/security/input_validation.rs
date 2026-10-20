@@ -246,11 +246,27 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::InvalidChars);
     }
 
-    // Reject userinfo credentials in authority (e.g., user:pass@host or user%40pass)
+    // Reject userinfo credentials and percent-encoded / double percent-encoded boundary delimiters
+    // (%2f, %2F, %23, %3f, %3F, %5c, %5C, %40, %2540, %2523, %253f, %252f, %255c) in authority
+    // to prevent authority boundary ambiguity, SSRF, host header injection, and open redirect bypasses
+    // (CWE-918 / CWE-292 / CWE-838 / CWE-601).
     if authority.contains(&b'@')
-        || authority
-            .windows(3)
-            .any(|w| w[0] == b'%' && w[1] == b'4' && (w[2] == b'0' || w[2] == b'O'))
+        || authority.windows(3).any(|w| {
+            w[0] == b'%'
+                && ((w[1] == b'2' && (w[2] == b'f' || w[2] == b'F' || w[2] == b'3'))
+                    || (w[1] == b'3' && (w[2] == b'f' || w[2] == b'F'))
+                    || (w[1] == b'4' && w[2] == b'0')
+                    || (w[1] == b'5' && (w[2] == b'c' || w[2] == b'C')))
+        })
+        || authority.windows(5).any(|w| {
+            w[0] == b'%'
+                && w[1] == b'2'
+                && w[2] == b'5'
+                && ((w[3] == b'2' && (w[4] == b'f' || w[4] == b'F' || w[4] == b'3'))
+                    || (w[3] == b'3' && (w[4] == b'f' || w[4] == b'F'))
+                    || (w[3] == b'4' && w[4] == b'0')
+                    || (w[3] == b'5' && (w[4] == b'c' || w[4] == b'C')))
+        })
     {
         return Err(ValidationError::InvalidChars);
     }
@@ -1198,6 +1214,33 @@ mod tests {
         );
         assert_eq!(
             validate_url(b"http://user%40example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+
+        // Double percent-encoded and single percent-encoded authority boundary injection rejection
+        // (mitigating authority ambiguity, SSRF, host header injection CWE-918 / CWE-292 / CWE-838)
+        assert_eq!(
+            validate_url(b"http://attacker.com%2523.internal.com/"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://admin%2540evil.com/"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://host%2fpath.evil.com/"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://host%252fpath.evil.com/"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://host%253fquery.evil.com/"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://host%255cpath.evil.com/"),
             Err(ValidationError::InvalidChars)
         );
 
