@@ -23,6 +23,7 @@ pub mod effectcraft;
 pub mod figcraft;
 // pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
+pub mod filmcraft_artcraft_missing_components_v65_pr;
 // pub mod filmcraft_artcraft_missing_components_v64_pr;
 // pub mod filmcraft_artcraft_parity_pr;
 // pub mod filmcraft_missing_components_parity_pr;
@@ -77,6 +78,7 @@ pub use effectcraft::{
     EffectCraftPullRequestSpec, EffectEngine, EffectInstance, InterpolationType, Keyframe,
     NodeGraph, NodeType, Parameter, ParameterType,
 };
+pub use filmcraft_artcraft_missing_components_v65_pr::*;
 // pub use filmcraft_artcraft_missing_components_v64_pr::*;
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
