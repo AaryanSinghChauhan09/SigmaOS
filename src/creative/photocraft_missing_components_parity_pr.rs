@@ -1,3 +1,4 @@
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS Photocraft Missing Components Parity PR Proposal Engine
 // (`src/creative/photocraft_missing_components_parity_pr.rs`)
@@ -6,10 +7,8 @@
 // photo editing ecosystem components in Pull Request proposal format.
 
 #![no_std]
-extern crate alloc;
 
 #![no_std]
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

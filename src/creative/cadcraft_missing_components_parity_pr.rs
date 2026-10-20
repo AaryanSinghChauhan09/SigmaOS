@@ -1,5 +1,5 @@
 #![no_std]
-extern crate alloc;
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/cadcraft_missing_components_parity_pr.rs`)
@@ -15,7 +15,6 @@ extern crate alloc;
 // 7. SovereignCadcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -1,5 +1,5 @@
 #![no_std]
-extern crate alloc;
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - Wordcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/wordcraft_artcraft_parity_pr.rs`)
@@ -19,7 +19,6 @@ extern crate alloc;
 // 11. SovereignWordcraftArtcraftParityPrGateway & WordcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
 #![no_std]
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -1,5 +1,5 @@
 #![no_std]
-extern crate alloc;
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - ArtCraft Craftlibs Missing Components Parity PR Gateway
 // (`src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs`)
@@ -15,7 +15,6 @@ extern crate alloc;
 // 7. SovereignArtcraftCraftlibsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

@@ -1,3 +1,4 @@
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - CraftLibs Missing Components Parity PR Gateway Module
 // (`src/creative/craftlibs_missing_components_parity_pr.rs`)
@@ -14,10 +15,8 @@
 // 8. SovereignCraftlibsMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
-extern crate alloc;
 
 #![no_std]
-extern crate alloc;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

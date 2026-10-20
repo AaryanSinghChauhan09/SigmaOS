@@ -1,5 +1,5 @@
 #![no_std]
-extern crate alloc;
+#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
