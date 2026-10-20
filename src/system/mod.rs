@@ -105,7 +105,9 @@ pub use sigmasoftwaremanager::{InstallStatus, SigmaSoftwareManager, SoftwarePack
 pub mod sigmataskscheduler;
 pub use sigmasystemmonitor2::{ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2, SystemMetrics};
 pub use sigmalogmanager::{LogEntry as LogManagerEntry, LogLevel as LogManagerLevel, SigmaLogManager as LogManager};
+pub mod sigmacontainermanager;
 pub use sigmabackupmanager::{BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus, BackupType as BackupManagerType, SigmaBackupManager as BackupManager};
+pub use sigmacontainermanager::{Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig, ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager};
 pub use sigmataskscheduler::{ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority, TaskStatus as SchedulerTaskStatus};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
 pub mod sigmapdf;
@@ -317,10 +319,6 @@ pub use sigmacolorscheme::{
 pub use sigmaconfig::{
     get_sigmaconfig, init_sigmaconfig, set_config_value, ConfigEntry as SigmaConfigEntry,
     ConfigValue, SigmaConfig,
-};
-pub use sigmacontainer::{
-    create_container, get_sigmacontainer, get_sigmacontainer_mut, init_sigmacontainer, Container,
-    ContainerState, NetworkMode, RestartPolicy, SigmaContainer,
 };
 pub use sigmacraftlibs::{
     add_library, get_sigmacraftlibs, get_sigmacraftlibs_mut, init_sigmacraftlibs,
