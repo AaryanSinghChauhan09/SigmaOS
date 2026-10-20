@@ -466,6 +466,11 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV61Gateway, VirtualBoxBhyveVmmV61Engine,
     VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
     XenHypervisorV61Engine,
+    FirecrackerCloudHypervisorV63Engine, FreeBsdJailsZonesV63Engine,
+    GvisorKataAppleHvV63Engine, KubernetesK3sRancherV63Engine, KvmQemuV63Engine,
+    LibvirtDomainV63Engine, LxcLxdNspawnV63Engine, OciDockerPodmanRuncV63Engine,
+    SovereignVirtualizationAndContainersParityV63Gateway, VirtualBoxBhyveVmmV63Engine,
+    XenHypervisorV63Engine,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
