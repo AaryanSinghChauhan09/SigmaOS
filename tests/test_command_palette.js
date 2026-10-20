@@ -377,4 +377,20 @@ assert.strictEqual(termOutput.children.length, 0, "Expected clear command to cle
 
 console.log("✓ OmniShell Terminal interactive command execution and ARIA log output verified successfully!");
 
+// Test 16: Form Input Enter Submission Handler
+const archSearchInput = createMockElement("archweb-search");
+archSearchInput.value = "hyprland";
+let preventDefaultCalled = false;
+
+zenith.initFormInputEnterSubmit();
+
+archSearchInput.dispatchEvent({
+  type: "keydown",
+  key: "Enter",
+  preventDefault: () => { preventDefaultCalled = true; },
+});
+
+assert.strictEqual(preventDefaultCalled, true, "Expected Enter keydown to call preventDefault on archweb-search");
+console.log("✓ Form input Enter submission handler verified successfully!");
+
 console.log("All Command Palette & Desktop UX tests passed successfully!");

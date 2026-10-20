@@ -1100,6 +1100,34 @@ const APP_WIN_MAP = {
 
 let topZIndex = 100;
 
+/**
+ * Enables Enter key submission on interactive desktop utility form inputs
+ * (#archweb-search, #legal-query, #gst-amount, #gst-rate, #syscall-search)
+ * for standard keyboard accessibility and seamless submission without requiring mouse clicks.
+ */
+export function initFormInputEnterSubmit() {
+  if (typeof document === "undefined") return;
+  const mappings = [
+    { inputId: "archweb-search", action: () => searchArchWebPackages() },
+    { inputId: "legal-query", action: () => checkLegalCompliance() },
+    { inputId: "gst-amount", action: () => calculateGST() },
+    { inputId: "gst-rate", action: () => calculateGST() },
+    { inputId: "syscall-search", action: () => searchSyscalls() },
+  ];
+
+  mappings.forEach(({ inputId, action }) => {
+    const input = document.getElementById(inputId);
+    if (input) {
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          action();
+        }
+      });
+    }
+  });
+}
+
 // Auto-initialize accessibility listeners when loaded in browser environments
 if (typeof window !== "undefined" && typeof document !== "undefined") {
   const autoInit = () => {
@@ -1118,6 +1146,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initAmbientMouseGlow();
     initLiveTelemetry();
     initOmniShellTerminal();
+    initFormInputEnterSubmit();
     updateDockAppStates();
   };
   if (document.readyState === "loading") {
@@ -1597,6 +1626,7 @@ if (typeof window !== "undefined") {
   window.handleEmulatorCommand = handleEmulatorCommand;
   window.handleTerminalCommand = handleTerminalCommand;
   window.initOmniShellTerminal = initOmniShellTerminal;
+  window.initFormInputEnterSubmit = initFormInputEnterSubmit;
 }
 
 // Minimal dummy index file to export initialization and basic attributes
