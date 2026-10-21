@@ -6,6 +6,7 @@ pub mod sovereign_backup_recovery_advancements_v2_pr;
 pub mod sovereign_backup_recovery_pinnacle;
 pub mod sovereign_backup_recovery_pr_suite;
 pub mod sovereign_backup_recovery_v4_pr;
+pub mod sovereign_backup_recovery_v5_pr;
 
 pub use backup_manager::{
     BackupDestination, BackupJob, BackupJobManager, BackupJobStatistics, BackupSource,
@@ -46,4 +47,12 @@ pub use sovereign_backup_recovery_v4_pr::{
     SovereignPhotoRecSignatureFileCarvingEngineV4, SovereignRescueModeRamOverlayfsShellV4,
     SovereignRsyncRollingChecksumEngineV4, SovereignTestDiskPartitionSuperblockScannerV4,
     SovereignTimeshiftSnapperSnapshotGovernorV4,
+};
+pub use sovereign_backup_recovery_v5_pr::{
+    SovereignBackupRecoveryPrGatewayV5, SovereignBackupRecoveryPrProposalManifestV5,
+    SovereignBorgResticContentAddressedVaultV5, SovereignBsdExt4DumpRestoreEngineV5,
+    SovereignDdrescueSectorRecoveryEngineV5, SovereignIsoHybridInstallerToolkitV5,
+    SovereignPhotoRecSignatureFileCarvingEngineV5, SovereignRescueModeRamOverlayfsShellV5,
+    SovereignRsyncRollingChecksumEngineV5, SovereignTestDiskPartitionSuperblockScannerV5,
+    SovereignTimeshiftSnapperSnapshotGovernorV5,
 };

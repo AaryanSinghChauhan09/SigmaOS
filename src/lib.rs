@@ -285,6 +285,7 @@ pub mod backup;
 pub use backup::sovereign_backup_recovery_advancements_v2_pr::*;
 pub use backup::sovereign_backup_recovery_pr_suite::*;
 pub use backup::sovereign_backup_recovery_v4_pr::*;
+pub use backup::sovereign_backup_recovery_v5_pr::*;
 pub mod bluetooth;
 pub mod boot;
 pub use boot::start_assembly_entry::*;
