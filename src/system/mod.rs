@@ -51,7 +51,6 @@ pub mod sigmadevice;
 pub mod sigmadhcp;
 pub mod sigmadiskmanager;
 pub mod sigmadiskusage;
-pub mod sigmadisplaymanager;
 pub mod sigmadns;
 pub mod sigmadrivermanager;
 pub mod sigmaeffect;
@@ -132,6 +131,7 @@ pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
 pub mod sigmaauditmanager;
+pub mod sigmadisplaymanager2;
 pub mod sigmainstallmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
@@ -206,6 +206,10 @@ pub use sigmastoragemanager::{
 };
 pub use sigmathememanager2::{
     SigmaThemeManager2, Theme as ThemeManager2Theme, ThemeComponent,
+};
+pub use sigmadisplaymanager2::{
+    DisplayMode as DisplayManager2Mode, DisplayOutput as DisplayManager2Output,
+    DisplayState as DisplayManager2State, SigmaDisplayManager as SigmaDisplayManager2,
 };
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
@@ -990,11 +994,6 @@ pub use sigmasystemtools::{
 pub use sigmausermanager::{
     add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager,
     SigmaUserManager,
-};
-
-pub use sigmadisplaymanager::{
-    add_output, get_sigmadisplaymanager, get_sigmadisplaymanager_mut, init_sigmadisplaymanager,
-    SigmaDisplayManager,
 };
 
 pub use sigmapowermanager::{
