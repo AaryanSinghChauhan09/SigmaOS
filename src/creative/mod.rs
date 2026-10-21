@@ -32,8 +32,8 @@ pub mod fontcraft;
 // pub mod fontcraft_artcraft_parity_pr;
 // pub mod fontcraft_missing_components_parity_pr;
 pub mod gridcraft;
-// pub mod gridcraft_artcraft_parity_pr;
-// pub mod gridcraft_missing_components_parity_pr;
+pub mod gridcraft_artcraft_parity_pr;
+pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
 pub mod mediacraft;
 pub mod model3d;
@@ -91,6 +91,8 @@ pub use gridcraft::{
     GridcraftPivotTableAnalyticsPrDeployer, GridcraftPrPullRequestSpec, NumberFormat,
     PivotFieldOrientation, PivotTable, PivotTableEngine, Workbook, Worksheet,
 };
+pub use gridcraft_artcraft_parity_pr::*;
+pub use gridcraft_missing_components_parity_pr::*;
 pub use lightcraft::{
     get_lightcraft, init_lightcraft, Album, ColorGradingWheel, ColorMixer, ColorMixerBand,
     ColorSpace, CurveType, Flag, Light, LightEngine, LightType, Mask, MaskType as LightMaskType,
