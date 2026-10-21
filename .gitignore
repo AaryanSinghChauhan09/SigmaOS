@@ -80,6 +80,9 @@ wiki/
 # Explicit repository specifications
 !OMARCHY_LINUX_GAPS.md
 !docs/OMARCHY_LINUX_GAPS.md
+!OMARCHY_GAPS.md
+!docs/OMARCHY_GAPS.md
+!SIGMAOS_VS_OMARCHY_GAPS.md
 # Allow Python tools and scripts
 !scripts/*.py
 !tools/*.py
