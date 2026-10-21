@@ -171,6 +171,7 @@ pub mod sigmametricsmanager;
 pub mod sigmarestoremanager;
 pub mod sigmadevicemanager2;
 pub mod sigmacleaner;
+pub mod sigmaintegritymanager2;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -380,6 +381,10 @@ pub use sigmadevicemanager2::{
 };
 pub use sigmacleaner::{
     CleanerManager, CleanupTask as CleanerTask, CleanupType as CleanerType, TaskState as CleanerTaskState,
+};
+pub use sigmaintegritymanager2::{
+    CheckState as IntegrityManager2CheckState, IntegrityCheck as IntegrityManager2Check,
+    IntegrityManager2HashAlgorithm, SigmaIntegrityManager2,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
