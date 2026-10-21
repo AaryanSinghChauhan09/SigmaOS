@@ -133,6 +133,7 @@ pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
+pub mod sigmapackagemanager3;
 pub mod sigmaservicemanager4;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
@@ -152,6 +153,10 @@ pub use sigmaapplicationmanager::{
 pub use sigmanetworkmanager3::{
     InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
     NetworkInterface as NetworkInterface3, SigmaNetworkManager3,
+};
+pub use sigmapackagemanager3::{
+    Package as PackageManager3Package, PackageRepo as PackageManager3Repo,
+    PackageState as PackageManager3State, SigmaPackageManager3,
 };
 pub use sigmaservicemanager4::{
     Service as ServiceManagerService, ServiceState as ServiceManagerState,
