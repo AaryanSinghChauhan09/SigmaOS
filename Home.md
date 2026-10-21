@@ -76,3 +76,16 @@ SigmaOS is engineered in strict compliance with industry and systems engineering
 - [[Community-Toolkit-Components]]: Decentralized packaging recipes and contributor licensing hooks.
 - [[System-Governance-and-RFC-Components]]: RFC decision registry and architectural council voting.
 - [[Legal-and-Licensing-Components]]: SPDX licensing compliance, patent disclosures, and contributor attestations.
+
+---
+
+## 🏆 Omarchy 4.0.5 Integration, Documentation & Parity Suite
+
+SigmaOS incorporates, matches, and surpasses **Omarchy 4.0.5** across every user-facing and architectural feature:
+
+- 📖 **[[The Complete Omarchy 4.0.5 Manual (Chapters 1–51)|Omarchy-Manual-Comprehensive-Guide]]**: Complete 51-chapter authoritative manual mirrored and cross-referenced with native SigmaOS components.
+- 🛠️ **[[449 Binary Utilities Catalog|Omarchy-4.0.5-Complete-Integration-Catalog]]**: Detailed mapping of all 449 `omarchy-*` commands to `#![no_std]` Rust modules.
+- 🎨 **[[22 First-Party Themes Catalog|Omarchy-Themes-Catalog]]**: Complete styling guide for all 22 themes (`catppuccin`, `everforest`, `gruvbox`, `tokyo-night`, `nord`, `matte-black`, `vantablack`, etc.).
+- 📐 **[[File Layout & Architectural Mental Model|Omarchy-File-Layout-and-Mental-Model]]**: Detailed guide on packaging, `/etc/skel` drop-ins, and userland binaries.
+- 🔊 **[[Audio Tuning Architecture|Omarchy-Audio-Tuning]]**: Latency profiling and PipeWire/WirePlumber tuning mechanics.
+- 🔄 **[[Update System & Migrations Engine|Omarchy-Update-Process-and-Migrations]]**: Declarative upgrade pipelines and atomic state rollbacks.

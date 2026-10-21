@@ -77,3 +77,14 @@
 - [[Governance-and-RFC|System-Governance-and-RFC-Components]]
 - [[Legal-and-Licensing|Legal-and-Licensing-Components]]
 - [[Subsystem-Integration|Subsystem-Integration-Components]]
+
+### Omarchy 4.0.5 Complete Integration
+- [[Omarchy-Manual-Comprehensive-Guide|The Omarchy 4.0.5 Manual (Chapters 1–51)]]
+- [[Omarchy-4.0.5-Complete-Integration-Catalog|449 Binary Utilities Catalog]]
+- [[Omarchy-Themes-Catalog|22-Themes Catalog]]
+- [[Omarchy-Parity|Omarchy vs SigmaOS Parity Breakdown]]
+- [[Omarchy-File-Layout-and-Mental-Model|Omarchy File Layout]]
+- [[Omarchy-Theming-System-Architecture|Theming System Architecture]]
+- [[Omarchy-Shell-Architecture|Quickshell Desktop Architecture]]
+- [[Omarchy-Audio-Tuning|Audio Tuning Guide]]
+- [[Omarchy-Update-Process-and-Migrations|Update Process & Migrations]]
