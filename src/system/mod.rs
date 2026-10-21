@@ -120,6 +120,29 @@ pub use sigmabackupmanager::{
     BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus,
     BackupType as BackupManagerType, SigmaBackupManager as BackupManager,
 };
+pub mod sigmaaliasmanager;
+pub mod sigmacapturemanager;
+pub mod sigmaenvironmentmanager;
+pub mod sigmahardwaremanager;
+pub mod sigmahelpermanager;
+pub mod sigmalaunchmanager;
+pub mod sigmamenumanager;
+pub mod sigmamigrationmanager;
+pub mod sigmapathmanager;
+pub mod sigmaprivilegemanager;
+pub mod sigmaprofilemanager;
+pub mod sigmarefreshmanager;
+pub mod sigmarestartmanager;
+pub mod sigmasessionmanager;
+pub mod sigmasetupmanager;
+pub mod sigmastallmanager;
+pub mod sigmatemplatemanager;
+pub mod sigmatogglemanager;
+pub mod sigmaupdatemanager2;
+pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
+pub use sigmacapturemanager::{
+    Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
+};
 pub use sigmacommandmanager::{
     Command as CommandManagerCommand, CommandPermission as CommandManagerPermission,
     CommandType as CommandManagerType, SigmaCommandManager,

@@ -1663,6 +1663,12 @@ if [ -f "src/distro/open_source_os_missing_components_v63_pr.rs" ]; then
     ./build/test_open_source_v63_pr
 fi
 
+if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v63_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS & Debian GitHub Unimplemented Ideas V63 PR test suite..."
+    rustc --test tests/test_open_source_os_debian_unimplemented_ideas_v63_pr.rs --edition=2021 -o build/test_open_source_os_debian_v63_pr
+    ./build/test_open_source_os_debian_v63_pr
+fi
+
 if [ -f "src/distro/open_source_os_missing_components_v65_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V65 PR Suite tests..."
     rustc --test src/distro/open_source_os_missing_components_v65_pr.rs --edition=2021 -o build/test_open_source_v65_pr
