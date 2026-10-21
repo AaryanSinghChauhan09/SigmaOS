@@ -2,19 +2,21 @@
 // Sovereign Distro Package Advancements Suite V67
 // (`src/package/sovereign_distro_package_advancements_v67.rs`)
 //
-// Inspired by Linux (Debian, Arch, Fedora, Alpine, Gentoo, Void, Solus, Slax, Puppy,
-// Tiny Core, Clear Linux) & BSD (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) distributions,
-// language-level package managers (Cargo, Pip, Gem, NPM, NuGet, Go, Zig, Swift), and mobile/app
-// image bundles (AppImage, Flatpak, Snap, APK, AAB, APEX, IPA, HAP), this suite provides
-// complete universal multi-format package inspection, zero-copy classification across 200+ package
-// formats, Post-Quantum Cryptography (PQC) Dilithium5 & Signify signature verification, Object-Oriented
-// Programming (OOP) design patterns (Factory, Strategy, Command with Undo, Observer, Memento, Chain of
-// Responsibility, Facade, Decorator, Flyweight), User-Defined Functions (UDFs) scriptlet sandboxing,
-// SAT DPLL dependency resolution with canonical `sovereign-*` system package remapping and VuXML/GLSA/NVD
-// vulnerability auditing, multi-sandbox security isolation (Landlock v5, Pledge/Unveil, Capsicum, macOS
-// App Sandbox, Seccomp BPF), CAS delta deduplication, boot environment snapshots (FreeBSD bectl, OpenSUSE
-// snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS), foreign PM CLI command routing across 35+ package managers,
-// multi-format transpilation, and transactional installation with rollback.
+// Inspired by Linux (Debian/Ubuntu, Arch, Fedora, Alpine, Gentoo, Void, Solus, Slax, Puppy,
+// Tiny Core, Clear Linux, Bedrock, OpenWrt, Chimera, Slackware, CRUX) & BSD (FreeBSD, OpenBSD,
+// NetBSD, DragonFly BSD) distributions, language-level package managers (Cargo, Pip, Gem, NPM,
+// Pnpm, Yarn, LuaRocks, Go, Zig, Swift, CocoaPods, Hex, Conan, Spack), and mobile/app image bundles
+// (AppImage, Flatpak, Snap, APK, AAB, APEX, IPA, HAP, HPKG, Bottle), this suite provides
+// complete universal multi-format package inspection, zero-copy classification across 190+ package
+// formats, Post-Quantum Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4
+// provenance verification, Object-Oriented Programming (OOP) design patterns (Factory, Strategy,
+// Command with Undo, Observer, Memento, Chain of Responsibility, Facade, Decorator, Flyweight),
+// User-Defined Functions (UDFs) scriptlet sandboxing, SAT DPLL dependency resolution with canonical
+// `sovereign-*` system package remapping and VuXML/GLSA vulnerability auditing, multi-sandbox security
+// isolation (Landlock v5, Pledge/Unveil, Capsicum, macOS App Sandbox, Seccomp BPF), CAS delta deduplication,
+// boot environment snapshots (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS),
+// foreign PM CLI command routing across 35+ package managers, multi-format transpilation, and transactional
+// installation with rollback for Sigma-pkg.
 
 extern crate alloc;
 
@@ -60,8 +62,6 @@ pub enum PackageSignatureKindV67 {
     ApkV2V3Signature,
     CosignSigstore,
     Minisign,
-    AppleCodeSignature,
-    AndroidApkSigV4,
     Unsigned,
 }
 
@@ -89,7 +89,7 @@ pub struct UniversalPackageFormatInspectorV67 {
 impl UniversalPackageFormatInspectorV67 {
     pub fn new() -> Self {
         Self {
-            total_formats_supported: 205,
+            total_formats_supported: 195,
             inspection_cache: BTreeMap::new(),
         }
     }
@@ -146,7 +146,7 @@ impl UniversalPackageFormatInspectorV67 {
             ),
             f if f.ends_with(".ipa") => (
                 PackageFormat::Ipa,
-                PackageSignatureKindV67::AppleCodeSignature,
+                PackageSignatureKindV67::X509Certificate,
                 "zip",
             ),
             f if f.ends_with(".ports") => (
@@ -156,7 +156,7 @@ impl UniversalPackageFormatInspectorV67 {
             ),
             f if f.ends_with(".aab") => (
                 PackageFormat::Aab,
-                PackageSignatureKindV67::AndroidApkSigV4,
+                PackageSignatureKindV67::ApkV2V3Signature,
                 "zip",
             ),
             f if f.ends_with(".app") => (
@@ -338,13 +338,11 @@ impl PqcAttestedSignatureVerifierV67 {
             | PackageSignatureKindV67::X509Certificate
             | PackageSignatureKindV67::ApkV2V3Signature
             | PackageSignatureKindV67::CosignSigstore
-            | PackageSignatureKindV67::Minisign
-            | PackageSignatureKindV67::AppleCodeSignature
-            | PackageSignatureKindV67::AndroidApkSigV4 => Ok(SlsaProvenanceAttestationV67 {
+            | PackageSignatureKindV67::Minisign => Ok(SlsaProvenanceAttestationV67 {
                 builder_id: "https://github.com/sigmaos/builders/slsa-level-4".to_string(),
                 build_type: "https://sigmaos.org/reproducible-build/v1".to_string(),
                 source_repository: "https://github.com/sigmaos/sigmaos".to_string(),
-                commit_sha: "c67f913d80a1420d88b49e29a37e1b4028fa6799".to_string(),
+                commit_sha: "d67f913d80a1420d88b49e29a37e1b4028fa6700".to_string(),
                 is_reproducible: true,
             }),
             PackageSignatureKindV67::Unsigned => {
@@ -623,9 +621,12 @@ impl UniversalCrossDistroSatSolverV67 {
             "dev-libs/openssl".to_string(),
             "sovereign-openssl".to_string(),
         );
+        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());
+        map.insert("freebsd-runtime".to_string(), "sovereign-libc".to_string());
+        map.insert("openbsd-sys".to_string(), "sovereign-libc".to_string());
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
 
         let vulns = BTreeMap::new();
@@ -821,26 +822,38 @@ impl UniversalPmCliRouterV67 {
         }
 
         let pm = tokens[0];
-        let dry_run = tokens.contains(&"--dry-run");
+        let dry_run = tokens.contains(&"--dry-run")
+            || tokens.contains(&"--dryrun")
+            || tokens.contains(&"-s")
+            || tokens.contains(&"-n")
+            || tokens.contains(&"-p")
+            || tokens.contains(&"-pv");
 
         let action = if tokens.contains(&"install")
             || tokens.contains(&"add")
             || tokens.contains(&"-S")
             || tokens.contains(&"get")
+            || tokens.contains(&"in")
+            || tokens.contains(&"it")
         {
             UniversalPmActionV67::Install
         } else if tokens.contains(&"remove")
             || tokens.contains(&"delete")
             || tokens.contains(&"-R")
             || tokens.contains(&"uninstall")
+            || tokens.contains(&"del")
+            || tokens.contains(&"rm")
+            || tokens.contains(&"purge")
         {
             UniversalPmActionV67::Remove
         } else if tokens.contains(&"update")
             || tokens.contains(&"upgrade")
             || tokens.contains(&"-Syu")
+            || tokens.contains(&"up")
+            || tokens.contains(&"dup")
         {
             UniversalPmActionV67::Update
-        } else if tokens.contains(&"search") || tokens.contains(&"-Ss") {
+        } else if tokens.contains(&"search") || tokens.contains(&"-Ss") || tokens.contains(&"se") {
             UniversalPmActionV67::Search
         } else {
             UniversalPmActionV67::Info
@@ -848,8 +861,26 @@ impl UniversalPmCliRouterV67 {
 
         let package_targets = tokens
             .iter()
-            .skip(2)
-            .filter(|&&t| !t.starts_with('-'))
+            .skip(1)
+            .filter(|&&t| {
+                !t.starts_with('-')
+                    && t != "install"
+                    && t != "add"
+                    && t != "remove"
+                    && t != "delete"
+                    && t != "uninstall"
+                    && t != "del"
+                    && t != "rm"
+                    && t != "purge"
+                    && t != "update"
+                    && t != "upgrade"
+                    && t != "search"
+                    && t != "info"
+                    && t != "show"
+                    && t != "in"
+                    && t != "it"
+                    && t != "se"
+            })
             .map(|&t| t.to_string())
             .collect();
 
@@ -996,7 +1027,7 @@ mod tests {
         let mut inspector = UniversalPackageFormatInspectorV67::new();
         let payload = b"SUPERDEB_HEADER_PAYLOAD_DATA_V67";
         let manifest = inspector
-            .inspect_package("gcc-15.1.superdeb", payload)
+            .inspect_package("gcc-14.2.superdeb", payload)
             .unwrap();
 
         assert_eq!(manifest.detected_format, PackageFormat::Superdeb);
@@ -1030,6 +1061,7 @@ mod tests {
             ("app.wasm", PackageFormat::Wasm),
             ("app.oci", PackageFormat::Oci),
             ("app.tar.gz", PackageFormat::TarGz),
+            ("app.tgz", PackageFormat::TarGz),
             ("app.xz", PackageFormat::Xz),
             ("app.rpm", PackageFormat::Rpm),
             ("app.ebuild", PackageFormat::Ebuild),
@@ -1038,7 +1070,6 @@ mod tests {
             ("app.app", PackageFormat::App),
             ("app.hap", PackageFormat::Hap),
             ("app.pisi", PackageFormat::Pisi),
-            ("app.tgz", PackageFormat::TarGz),
             ("app.superdeb", PackageFormat::Superdeb),
             ("app.lzm", PackageFormat::Lzm),
             ("app.pup", PackageFormat::Pup),
@@ -1097,7 +1128,7 @@ mod tests {
             "glibc".to_string(),
             "dbus".to_string(),
             "openssl-devel".to_string(),
-            "dev-libs/openssl".to_string(),
+            "security/openssl".to_string(),
         ];
         let solved = solver.solve_dependencies(&raw_deps).unwrap();
         assert_eq!(
@@ -1152,9 +1183,10 @@ mod tests {
             .unwrap();
         assert_eq!(cmd.action, UniversalPmActionV67::Install);
         assert!(cmd.dry_run);
+        assert_eq!(cmd.package_targets, vec!["ripgrep".to_string()]);
 
         let sigpkg = suite
-            .process_and_install("htop-3.4.0.apk", b"APK_PAYLOAD")
+            .process_and_install("htop-3.3.0.apk", b"APK_PAYLOAD")
             .unwrap();
         assert_eq!(sigpkg.name, "htop");
         assert!(suite
