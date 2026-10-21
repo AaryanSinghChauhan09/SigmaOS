@@ -1147,6 +1147,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initLiveTelemetry();
     initOmniShellTerminal();
     initFormInputEnterSubmit();
+    initFileManagerGrid();
     updateDockAppStates();
   };
   if (document.readyState === "loading") {
@@ -1570,10 +1571,73 @@ export function searchSyscalls() {
   }
 }
 
+export function initFileManagerGrid() {
+  if (typeof document === "undefined") return;
+  const grid = document.getElementById("fm-grid");
+  if (!grid) return;
+
+  const items = [
+    { name: "documents", type: "folder", icon: "📁", label: "documents" },
+    { name: "downloads", type: "folder", icon: "📁", label: "downloads" },
+    { name: "system", type: "folder", icon: "📁", label: "system" },
+    { name: "zenith.conf", type: "file", icon: "📄", label: "zenith.conf" },
+    { name: "kernel.log", type: "file", icon: "📄", label: "kernel.log" },
+  ];
+
+  while (grid.firstChild) {
+    grid.removeChild(grid.firstChild);
+  }
+
+  items.forEach((item) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "fm-item";
+    btn.setAttribute("role", "button");
+    btn.setAttribute("tabindex", "0");
+    const isFolder = item.type === "folder";
+    const ariaText = isFolder ? `Open directory ${item.name}` : `View file ${item.name}`;
+    btn.setAttribute("aria-label", ariaText);
+    btn.setAttribute("title", `${isFolder ? "Directory" : "File"}: ${item.name}`);
+    btn.setAttribute("data-tooltip", `${isFolder ? "Directory" : "File"}: ${item.name}`);
+
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "fm-item-icon";
+    iconSpan.textContent = item.icon;
+
+    const labelSpan = document.createElement("span");
+    labelSpan.className = "fm-item-label";
+    labelSpan.textContent = item.label;
+
+    btn.appendChild(iconSpan);
+    btn.appendChild(labelSpan);
+
+    const activateItem = () => {
+      const breadcrumbEl = document.getElementById("fm-breadcrumbs");
+      if (isFolder) {
+        if (breadcrumbEl) breadcrumbEl.textContent = `/home/sovereign/${item.name}`;
+        showToast(`📂 Opened folder /home/sovereign/${item.name}`);
+      } else {
+        showToast(`📄 Viewed file ${item.name}`);
+      }
+    };
+
+    btn.addEventListener("click", activateItem);
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        activateItem();
+      }
+    });
+
+    grid.appendChild(btn);
+  });
+}
+
 export function fmBack() {
   if (typeof document === "undefined") return;
   const breadcrumbEl = document.getElementById("fm-breadcrumbs");
-  if (breadcrumbEl) breadcrumbEl.textContent = "/home";
+  if (breadcrumbEl) breadcrumbEl.textContent = "/home/sovereign";
+  initFileManagerGrid();
   showToast("📂 Navigated back in folder hierarchy.");
 }
 
@@ -1627,6 +1691,7 @@ if (typeof window !== "undefined") {
   window.handleTerminalCommand = handleTerminalCommand;
   window.initOmniShellTerminal = initOmniShellTerminal;
   window.initFormInputEnterSubmit = initFormInputEnterSubmit;
+  window.initFileManagerGrid = initFileManagerGrid;
 }
 
 // Minimal dummy index file to export initialization and basic attributes

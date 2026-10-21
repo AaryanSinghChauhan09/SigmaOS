@@ -354,7 +354,7 @@ assert.strictEqual(syscallContainer.children.length, 1, "Expected searchSyscalls
 
 const fmCrumbs = createMockElement("fm-breadcrumbs");
 zenith.fmBack();
-assert.strictEqual(fmCrumbs.textContent, "/home", "Expected fmBack to update breadcrumb");
+assert.strictEqual(fmCrumbs.textContent, "/home/sovereign", "Expected fmBack to update breadcrumb");
 
 const emulatorConsole = createMockElement("emulator-console");
 const emulatorInput = createMockElement("emulator-input");
@@ -392,5 +392,22 @@ archSearchInput.dispatchEvent({
 
 assert.strictEqual(preventDefaultCalled, true, "Expected Enter keydown to call preventDefault on archweb-search");
 console.log("✓ Form input Enter submission handler verified successfully!");
+
+// Test 17: File Manager VFS Grid Initialization and Keyboard Navigation
+const fmGridEl = createMockElement("fm-grid");
+zenith.initFileManagerGrid();
+assert.strictEqual(fmGridEl.children.length, 5, "Expected 5 default VFS items in File Manager grid");
+assert.strictEqual(fmGridEl.children[0].getAttribute("aria-label"), "Open directory documents", "Expected directory ARIA label");
+assert.strictEqual(fmGridEl.children[3].getAttribute("aria-label"), "View file zenith.conf", "Expected file ARIA label");
+
+// Simulate folder click
+const folderBtn = fmGridEl.children[0];
+folderBtn.dispatchEvent({ type: "click" });
+assert.strictEqual(fmCrumbs.textContent, "/home/sovereign/documents", "Expected folder click to update breadcrumb");
+
+// Simulate fmBack navigation
+zenith.fmBack();
+assert.strictEqual(fmCrumbs.textContent, "/home/sovereign", "Expected fmBack to reset breadcrumb");
+console.log("✓ File Manager VFS grid initialization and keyboard navigation verified successfully!");
 
 console.log("All Command Palette & Desktop UX tests passed successfully!");
