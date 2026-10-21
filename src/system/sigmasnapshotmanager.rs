@@ -50,7 +50,12 @@ impl SigmaSnapshotManager {
         }
     }
 
-    pub fn create_snapshot(&mut self, name: String, snapshot_type: SnapshotType, source_path: String) -> Snapshot {
+    pub fn create_snapshot(
+        &mut self,
+        name: String,
+        snapshot_type: SnapshotType,
+        source_path: String,
+    ) -> Snapshot {
         let snapshot = Snapshot {
             id: alloc::format!("snapshot_{}", self.snapshots.len()),
             name,
@@ -105,7 +110,10 @@ impl SigmaSnapshotManager {
     }
 
     pub fn get_snapshots_by_type(&self, snapshot_type: SnapshotType) -> Vec<&Snapshot> {
-        self.snapshots.iter().filter(|s| s.snapshot_type == snapshot_type).collect()
+        self.snapshots
+            .iter()
+            .filter(|s| s.snapshot_type == snapshot_type)
+            .collect()
     }
 
     pub fn get_total_snapshot_size(&self) -> u64 {
@@ -132,14 +140,22 @@ mod tests {
     #[test]
     fn test_create_snapshot() {
         let mut manager = SigmaSnapshotManager::new();
-        manager.create_snapshot("test".to_string(), SnapshotType::Filesystem, "/".to_string());
+        manager.create_snapshot(
+            "test".to_string(),
+            SnapshotType::Filesystem,
+            "/".to_string(),
+        );
         assert_eq!(manager.get_snapshots().len(), 1);
     }
 
     #[test]
     fn test_complete_snapshot() {
         let mut manager = SigmaSnapshotManager::new();
-        let snapshot = manager.create_snapshot("test".to_string(), SnapshotType::Filesystem, "/".to_string());
+        let snapshot = manager.create_snapshot(
+            "test".to_string(),
+            SnapshotType::Filesystem,
+            "/".to_string(),
+        );
         manager.complete_snapshot(snapshot.id, 1000).unwrap();
         assert_eq!(manager.get_snapshots()[0].state, SnapshotState::Available);
         assert_eq!(manager.get_snapshots()[0].size_bytes, 1000);
@@ -148,8 +164,14 @@ mod tests {
     #[test]
     fn test_restore_snapshot() {
         let mut manager = SigmaSnapshotManager::new();
-        let snapshot = manager.create_snapshot("test".to_string(), SnapshotType::Filesystem, "/".to_string());
-        manager.complete_snapshot(snapshot.id.clone(), 1000).unwrap();
+        let snapshot = manager.create_snapshot(
+            "test".to_string(),
+            SnapshotType::Filesystem,
+            "/".to_string(),
+        );
+        manager
+            .complete_snapshot(snapshot.id.clone(), 1000)
+            .unwrap();
         manager.restore_snapshot(snapshot.id).unwrap();
         assert_eq!(manager.get_snapshots()[0].state, SnapshotState::Restoring);
     }
@@ -157,7 +179,11 @@ mod tests {
     #[test]
     fn test_delete_snapshot() {
         let mut manager = SigmaSnapshotManager::new();
-        let snapshot = manager.create_snapshot("test".to_string(), SnapshotType::Filesystem, "/".to_string());
+        let snapshot = manager.create_snapshot(
+            "test".to_string(),
+            SnapshotType::Filesystem,
+            "/".to_string(),
+        );
         manager.delete_snapshot(snapshot.id).unwrap();
         assert_eq!(manager.get_snapshots().len(), 0);
     }
@@ -166,15 +192,32 @@ mod tests {
     fn test_snapshots_by_type() {
         let mut manager = SigmaSnapshotManager::new();
         manager.create_snapshot("fs".to_string(), SnapshotType::Filesystem, "/".to_string());
-        manager.create_snapshot("vol".to_string(), SnapshotType::Volume, "/dev/sda1".to_string());
-        assert_eq!(manager.get_snapshots_by_type(SnapshotType::Filesystem).len(), 1);
+        manager.create_snapshot(
+            "vol".to_string(),
+            SnapshotType::Volume,
+            "/dev/sda1".to_string(),
+        );
+        assert_eq!(
+            manager
+                .get_snapshots_by_type(SnapshotType::Filesystem)
+                .len(),
+            1
+        );
     }
 
     #[test]
     fn test_total_snapshot_size() {
         let mut manager = SigmaSnapshotManager::new();
-        let snapshot1 = manager.create_snapshot("test1".to_string(), SnapshotType::Filesystem, "/".to_string());
-        let snapshot2 = manager.create_snapshot("test2".to_string(), SnapshotType::Filesystem, "/".to_string());
+        let snapshot1 = manager.create_snapshot(
+            "test1".to_string(),
+            SnapshotType::Filesystem,
+            "/".to_string(),
+        );
+        let snapshot2 = manager.create_snapshot(
+            "test2".to_string(),
+            SnapshotType::Filesystem,
+            "/".to_string(),
+        );
         manager.complete_snapshot(snapshot1.id, 1000).unwrap();
         manager.complete_snapshot(snapshot2.id, 2000).unwrap();
         assert_eq!(manager.get_total_snapshot_size(), 3000);

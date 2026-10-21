@@ -187,11 +187,17 @@ impl UniversalPackageFormatInspectorV67 {
                 PackageSignatureKindV67::Unsigned,
                 "gzip",
             ),
-            f if f.ends_with(".ebuild") || f.ends_with(".tbz2") || f.ends_with(".portage") || f.ends_with(".gpkg.tar") => (
-                PackageFormat::Ebuild,
-                PackageSignatureKindV67::OpenBsdSignify,
-                "bzip2",
-            ),
+            f if f.ends_with(".ebuild")
+                || f.ends_with(".tbz2")
+                || f.ends_with(".portage")
+                || f.ends_with(".gpkg.tar") =>
+            {
+                (
+                    PackageFormat::Ebuild,
+                    PackageSignatureKindV67::OpenBsdSignify,
+                    "bzip2",
+                )
+            }
             f if f.ends_with(".xbps") => (
                 PackageFormat::Xbps,
                 PackageSignatureKindV67::OpenBsdSignify,
@@ -541,7 +547,11 @@ impl UniversalPackageStrategyV67 for EncryptedPackageDecoratorV67 {
     }
     fn execute_stage(&self, stage: &str) -> Result<String, String> {
         let base = self.inner_strategy.execute_stage(stage)?;
-        Ok(alloc::format!("Encrypted[{}] :: {}", self.encryption_algo, base))
+        Ok(alloc::format!(
+            "Encrypted[{}] :: {}",
+            self.encryption_algo,
+            base
+        ))
     }
 }
 

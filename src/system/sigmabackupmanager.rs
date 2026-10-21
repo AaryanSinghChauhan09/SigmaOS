@@ -50,7 +50,13 @@ impl SigmaBackupManager {
         }
     }
 
-    pub fn create_backup(&mut self, name: String, backup_type: BackupType, source_path: String, destination_path: String) -> BackupEntry {
+    pub fn create_backup(
+        &mut self,
+        name: String,
+        backup_type: BackupType,
+        source_path: String,
+        destination_path: String,
+    ) -> BackupEntry {
         let backup = BackupEntry {
             id: alloc::format!("backup_{}", self.backups.len()),
             name,
@@ -115,7 +121,10 @@ impl SigmaBackupManager {
     }
 
     pub fn get_backups_by_type(&self, backup_type: BackupType) -> Vec<&BackupEntry> {
-        self.backups.iter().filter(|b| b.backup_type == backup_type).collect()
+        self.backups
+            .iter()
+            .filter(|b| b.backup_type == backup_type)
+            .collect()
     }
 
     pub fn get_total_backup_size(&self) -> u64 {
@@ -142,14 +151,24 @@ mod tests {
     #[test]
     fn test_create_backup() {
         let mut manager = SigmaBackupManager::new();
-        manager.create_backup("test".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
+        manager.create_backup(
+            "test".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
         assert_eq!(manager.get_backups().len(), 1);
     }
 
     #[test]
     fn test_start_backup() {
         let mut manager = SigmaBackupManager::new();
-        let backup = manager.create_backup("test".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
+        let backup = manager.create_backup(
+            "test".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
         manager.start_backup(backup.id).unwrap();
         assert_eq!(manager.get_backups()[0].status, BackupStatus::Running);
     }
@@ -157,7 +176,12 @@ mod tests {
     #[test]
     fn test_complete_backup() {
         let mut manager = SigmaBackupManager::new();
-        let backup = manager.create_backup("test".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
+        let backup = manager.create_backup(
+            "test".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
         manager.start_backup(backup.id).unwrap();
         manager.complete_backup(backup.id, 1000).unwrap();
         assert_eq!(manager.get_backups()[0].status, BackupStatus::Completed);
@@ -167,7 +191,12 @@ mod tests {
     #[test]
     fn test_delete_backup() {
         let mut manager = SigmaBackupManager::new();
-        let backup = manager.create_backup("test".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
+        let backup = manager.create_backup(
+            "test".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
         manager.delete_backup(backup.id).unwrap();
         assert_eq!(manager.get_backups().len(), 0);
     }
@@ -175,16 +204,36 @@ mod tests {
     #[test]
     fn test_backups_by_type() {
         let mut manager = SigmaBackupManager::new();
-        manager.create_backup("full".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
-        manager.create_backup("incremental".to_string(), BackupType::Incremental, "/source".to_string(), "/dest".to_string());
+        manager.create_backup(
+            "full".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
+        manager.create_backup(
+            "incremental".to_string(),
+            BackupType::Incremental,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
         assert_eq!(manager.get_backups_by_type(BackupType::Full).len(), 1);
     }
 
     #[test]
     fn test_total_backup_size() {
         let mut manager = SigmaBackupManager::new();
-        let backup1 = manager.create_backup("test1".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
-        let backup2 = manager.create_backup("test2".to_string(), BackupType::Full, "/source".to_string(), "/dest".to_string());
+        let backup1 = manager.create_backup(
+            "test1".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
+        let backup2 = manager.create_backup(
+            "test2".to_string(),
+            BackupType::Full,
+            "/source".to_string(),
+            "/dest".to_string(),
+        );
         manager.complete_backup(backup1.id, 1000).unwrap();
         manager.complete_backup(backup2.id, 2000).unwrap();
         assert_eq!(manager.get_total_backup_size(), 3000);

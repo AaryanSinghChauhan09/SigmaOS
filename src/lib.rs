@@ -94,10 +94,10 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV64,
     SovereignDistroPackageAdvancementsSuiteV66, SovereignDistroPackageAdvancementsSuiteV67,
-    SovereignUniversalPackageVerifier,
-    UniversalDistroPackageOrchestrator, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter, UniversalPackageFormat, UniversalPackageImporter,
-    UniversalPackageTriggerEngine, UniversalPackageTriggerType, UniversalPackageVerificationResult,
+    SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter, UniversalPackageFormat,
+    UniversalPackageImporter, UniversalPackageTriggerEngine, UniversalPackageTriggerType,
+    UniversalPackageVerificationResult,
 };
 pub mod process;
 pub mod productivity;
