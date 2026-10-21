@@ -120,6 +120,115 @@ pub use sigmabackupmanager::{
     BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus,
     BackupType as BackupManagerType, SigmaBackupManager as BackupManager,
 };
+pub mod sigmaaliasmanager;
+pub mod sigmacapturemanager;
+pub mod sigmaenvironmentmanager;
+pub mod sigmahardwaremanager;
+pub mod sigmahelpermanager;
+pub mod sigmalaunchmanager;
+pub mod sigmamenumanager;
+pub mod sigmamigrationmanager;
+pub mod sigmapathmanager;
+pub mod sigmaprivilegemanager;
+pub mod sigmaprofilemanager;
+pub mod sigmarefreshmanager;
+pub mod sigmarestartmanager;
+pub mod sigmasessionmanager;
+pub mod sigmasetupmanager;
+pub mod sigmastallmanager;
+pub mod sigmafilewatcher;
+pub mod sigmaapplicationmanager;
+pub mod sigmaauditmanager;
+pub mod sigmaaudiomanager2;
+pub mod sigmadisplaymanager2;
+pub mod sigmabluetoothmanager2;
+pub mod sigmainstallmanager;
+pub mod sigmanetworkmanager3;
+pub mod sigmapackagemanager3;
+pub mod sigmapowermanager2;
+pub mod sigmaprocessmanager;
+pub mod sigmaschedulermanager;
+pub mod sigmasecuritymanager2;
+pub mod sigmaservicemanager4;
+pub mod sigmasetupmanager2;
+pub mod sigmastoragemanager;
+pub mod sigmathememanager2;
+pub mod sigmawizardmanager;
+pub mod sigmatemplatemanager;
+pub mod sigmatogglemanager;
+pub mod sigmaupdatemanager2;
+pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
+pub use sigmaapplicationmanager::{
+    Application, AppState, SigmaApplicationManager,
+};
+pub use sigmaauditmanager::{
+    AuditEvent as AuditManagerEvent, AuditEventType as AuditManagerEventType,
+    AuditSeverity as AuditManagerSeverity, SigmaAuditManager,
+};
+pub use sigmainstallmanager::{
+    InstallStatus as InstallManagerStatus, InstallType, SoftwareItem, SigmaInstallManager,
+};
+pub use sigmasetupmanager2::{
+    SetupStep, SetupStepStatus, SigmaSetupManager2,
+};
+pub use sigmawizardmanager::{
+    SigmaWizardManager, WizardPage, WizardPageType,
+};
+pub use sigmanetworkmanager3::{
+    InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
+    NetworkInterface as NetworkInterface3, SigmaNetworkManager3,
+};
+pub use sigmapackagemanager3::{
+    Package as PackageManager3Package, PackageRepo as PackageManager3Repo,
+    PackageState as PackageManager3State, SigmaPackageManager3,
+};
+pub use sigmaprocessmanager::{
+    Process as ProcessManagerProcess, ProcessPriority as ProcessManagerPriority,
+    ProcessState as ProcessManagerState, SigmaProcessManager,
+};
+pub use sigmaschedulermanager::{
+    ScheduledTask, TaskPriority as ScheduleTaskPriority, TaskStatus as ScheduleTaskStatus,
+    SigmaScheduleManager,
+};
+pub use sigmasecuritymanager2::{
+    SecurityPolicy, SecurityPolicyType, SigmaSecurityManager2,
+};
+pub use sigmapowermanager2::{
+    BatteryStatus as PowerManagerBatteryStatus, PowerPlan, PowerState as PowerManagerState,
+    SigmaPowerManager2,
+};
+pub use sigmaservicemanager4::{
+    Service as ServiceManagerService, ServiceState as ServiceManagerState,
+    SigmaServiceManager4,
+};
+pub use sigmastoragemanager::{
+    FilesystemType as StorageFilesystemType, MountState as StorageMountState,
+    StorageDevice, StorageType, SigmaStorageManager,
+};
+pub use sigmathememanager2::{
+    SigmaThemeManager2, Theme as ThemeManager2Theme, ThemeComponent,
+};
+pub use sigmadisplaymanager2::{
+    DisplayMode as DisplayManager2Mode, DisplayOutput as DisplayManager2Output,
+    DisplayState as DisplayManager2State, SigmaDisplayManager as SigmaDisplayManager2,
+};
+pub use sigmaaudiomanager2::{
+    AudioDevice as AudioManager2Device, AudioDeviceState as AudioManager2State,
+    AudioDeviceType as AudioManager2Type, SigmaAudioManager2,
+};
+pub use sigmabluetoothmanager2::{
+    BluetoothDevice as BluetoothManager2Device, BluetoothState as BluetoothManager2State, BluetoothType as BluetoothManager2Type, SigmaBluetoothManager2,
+};
+pub use sigmacapturemanager::{
+    Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
+};
+pub use sigmacommandmanager::{
+    Command as CommandManagerCommand, CommandPermission as CommandManagerPermission,
+    CommandType as CommandManagerType, SigmaCommandManager,
+};
+pub use sigmaconfigmanager::{
+    ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager,
+};
 pub use sigmacontainermanager::{
     Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig,
     ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager,
