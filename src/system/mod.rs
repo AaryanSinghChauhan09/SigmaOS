@@ -162,6 +162,7 @@ pub mod sigmacompressionmanager;
 pub mod sigmaencryptionmanager;
 pub mod sigmafirewallmanager2;
 pub mod sigmalogrotationmanager;
+pub mod sigmanetworkmonitor;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -334,6 +335,10 @@ pub use sigmafirewallmanager2::{
 pub use sigmalogrotationmanager::{
     LogRotationManager, PolicyState as LogRotationPolicyState,
     RotationInterval as LogRotationInterval, RotationPolicy as LogRotationPolicy,
+};
+pub use sigmanetworkmonitor::{
+    ConnectionProtocol as NetworkMonitorProtocol, NetworkMonitorConnectionState,
+    NetworkMonitorConnection, NetworkMonitorInterface, NetworkMonitor,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
