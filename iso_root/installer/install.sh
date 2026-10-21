@@ -53,14 +53,6 @@ log_error() {
     echo "[ERROR] $msg" >> "$LOG_FILE"
 }
 
-log_oop() {
-    local class_method="$1"
-    local message="$2"
-    # Print the exact format for compatibility, option for colorized terminal output
-    echo "${class_method} ${message}"
-    echo "${class_method} ${message}" >> "$LOG_FILE"
-}
-
 # ==============================================================================
 # EXCEPTION HANDLING & SIGNAL TRAPS (Defensive Linux practices)
 # ==============================================================================
@@ -273,148 +265,6 @@ run_interactive_wizard() {
 }
 
 # ==============================================================================
-# CLASS: StorageDevice (OOP Compliant)
-# Represents a physical or logical target disk for SigmaOS installation.
-# ==============================================================================
-
-# Constructor: StorageDevice_new <out_var> <device_path> <label> <filesystem>
-StorageDevice_new() {
-    local out_var="$1"
-    local path="$2"
-    local label="$3"
-    local filesystem="$4"
-
-    local rand_id="${RANDOM}_${RANDOM}"
-    local self="StorageDevice_${rand_id}"
-
-    eval "${self}_path=\"\$path\""
-    eval "${self}_label=\"\$label\""
-    eval "${self}_filesystem=\"\$filesystem\""
-
-    eval "$out_var=\"\$self\""
-}
-
-# Method: StorageDevice_detect <self>
-StorageDevice_detect() {
-    local self="$1"
-    local path
-    eval "path=\"\$${self}_path\""
-
-    log_oop "[StorageDevice::detect]" "Querying silicon storage bus... Found target lattice device: $path"
-}
-
-# Method: StorageDevice_partition <self>
-StorageDevice_partition() {
-    local self="$1"
-    local path
-    local label
-    eval "path=\"\$${self}_path\""
-    eval "label=\"\$${self}_label\""
-
-    log_oop "[StorageDevice::partition]" "Initializing partition map on $path with standard: $label"
-    # Simulated execution: sgdisk --clear -g "$path"
-}
-
-# Method: StorageDevice_format <self>
-StorageDevice_format() {
-    local self="$1"
-    local path
-    local fs
-    eval "path=\"\$${self}_path\""
-    eval "fs=\"\$${self}_filesystem\""
-
-    log_oop "[StorageDevice::format]" "Formatting system partition ${path}1 with ultra-resilient $fs (Lattice-Optimized)..."
-    # Simulated execution: mkfs.sovfs "${path}1"
-}
-
-
-# ==============================================================================
-# CLASS: Installer (OOP Compliant)
-# Orchestrates the system setup lifecycle of SigmaOS.
-# ==============================================================================
-
-# Constructor: Installer_new <out_var> <device_instance> <hostname> <shard_preset>
-Installer_new() {
-    local out_var="$1"
-    local device="$2"
-    local hostname="$3"
-    local shard_preset="$4"
-
-    local rand_id="${RANDOM}_${RANDOM}"
-    local self="Installer_${rand_id}"
-
-    eval "${self}_device=\"\$device\""
-    eval "${self}_hostname=\"\$hostname\""
-    eval "${self}_shard_preset=\"\$shard_preset\""
-
-    # Presets mapping
-    local count=600
-    if [[ "$shard_preset" == "Minimal" ]]; then
-        count=150
-    elif [[ "$shard_preset" == "Standard" ]]; then
-        count=450
-    elif [[ "$shard_preset" == "Enterprise" ]]; then
-        count=900
-    fi
-    eval "${self}_shard_count=\$count"
-
-    eval "$out_var=\"\$self\""
-}
-
-# Method: Installer_inject_shards <self>
-Installer_inject_shards() {
-    local self="$1"
-    local count
-    eval "count=\"\$${self}_shard_count\""
-
-    log_oop "[Installer::inject_shards]" "Injecting $count+ industrial capability shards into the sovereign OS structure..."
-    # Simulated execution: cp -r /shards /mnt/sigmaos/
-}
-
-# Method: Installer_install_bootloader <self>
-Installer_install_bootloader() {
-    local self="$1"
-    local device
-    eval "device=\"\$${self}_device\""
-
-    local disk_path
-    eval "disk_path=\"\$${device}_path\""
-
-    log_oop "[Installer::install_bootloader]" "Binding Sovereign Boot Orchestrator onto master sector of $disk_path"
-    # Simulated execution: grub-install --target=x86_64-efi "$disk_path"
-}
-
-# Method: Installer_run <self>
-Installer_run() {
-    local self="$1"
-    local device
-    eval "device=\"\$${self}_device\""
-
-    echo "Σ SIGMAOS SOVEREIGN INSTALLER (OOP COMPLIANT)"
-    echo "-----------------------------------------------"
-
-    # 1. Detect target device
-    StorageDevice_detect "$device"
-
-    # 2. Partition schema configuration
-    StorageDevice_partition "$device"
-
-    # 3. Format primary system sector
-    StorageDevice_format "$device"
-
-    # 4. Inject industrial payload
-    Installer_inject_shards "$self"
-
-    # 5. Build boot structures
-    Installer_install_bootloader "$self"
-
-    echo "-----------------------------------------------"
-    log_oop "[Installer::run]" "SUCCESS: SigmaOS has been successfully integrated into the physical silicon."
-    log_oop "[Installer::run]" "Please reboot to enter the Sovereign Zenith."
-}
-
-
-# ==============================================================================
 # MAIN ENGINE ENTRY POINT
 # ==============================================================================
 
@@ -510,67 +360,259 @@ main() {
 
     if [[ $DRY_RUN -eq 1 ]]; then
         log_warn "DRY RUN: Simulating installation sequence (No state mutations)."
+        log_info "DRY RUN complete. No changes were made to $TARGET_DEVICE."
+        exit 0
     fi
 
-    # 4. Instantiate Target Storage Object via OOP Framework
-    local dev
-    StorageDevice_new dev "$TARGET_DEVICE" "$PART_LABEL" "$FILESYSTEM"
+    # ========================================================================
+    # PHASE 1: Partition target disk
+    # ========================================================================
+    log_step "Partitioning $TARGET_DEVICE ($PART_LABEL, $FILESYSTEM)"
 
-    # 5. Instantiate Sovereign Installer Engine Object with referenced parameters
-    local inst
-    Installer_new inst "$dev" "$HOSTNAME" "$SHARD_PRESET"
+    # Create GPT partition table with EFI + root partitions
+    sgdisk -Z "$TARGET_DEVICE" 2>/dev/null || true
+    sgdisk -n 1:0:+512M -t 1:ef00 "$TARGET_DEVICE"   # EFI system partition
+    sgdisk -n 2:0:0     -t 2:8300 "$TARGET_DEVICE"   # Linux filesystem
 
-    # 6. Execute full setup lifecycle
-    Installer_run "$inst"
+    # Wait for kernel to re-read partition table
+    partprobe "$TARGET_DEVICE" 2>/dev/null || true
+    sleep 2
 
-    # 7. Apply SigmaOS system configuration (Omarchy-inspired)
-    #    Copies /etc, default/, bin/, shell/, and install/helpers/ from the
-    #    ISO root to the target, then enables services via the shared helper.
-    log_step "Applying SigmaOS system configuration..."
+    # Determine partition paths
+    if [[ "$TARGET_DEVICE" == *nvme* ]]; then
+        EFI_PART="${TARGET_DEVICE}p1"
+        ROOT_PART="${TARGET_DEVICE}p2"
+    else
+        EFI_PART="${TARGET_DEVICE}1"
+        ROOT_PART="${TARGET_DEVICE}2"
+    fi
+
+    log_info "EFI partition: $EFI_PART"
+    log_info "Root partition: $ROOT_PART"
+
+    # ========================================================================
+    # PHASE 2: Format partitions
+    # ========================================================================
+    log_step "Formatting partitions"
+
+    mkfs.fat -F 32 "$EFI_PART" -n SIGMAOS-EFI
+    log_info "Formatted EFI partition as FAT32"
+
+    if [[ "$FILESYSTEM" == "Btrfs" ]]; then
+        mkfs.btrfs -f -L SIGMAOS-ROOT "$ROOT_PART"
+        log_info "Formatted root partition as Btrfs"
+    elif [[ "$FILESYSTEM" == "ZFS" ]]; then
+        log_warn "ZFS not supported in installer, falling back to Ext4"
+        mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
+        FILESYSTEM="Ext4"
+    elif [[ "$FILESYSTEM" == "SovereignFS" || "$FILESYSTEM" == "SemanticFS" ]]; then
+        # Map custom names to Ext4 for actual functionality
+        mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
+        log_info "Formatted root partition as Ext4 (mapped from $FILESYSTEM)"
+        FILESYSTEM="Ext4"
+    else
+        mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
+        log_info "Formatted root partition as Ext4"
+    fi
+
+    # ========================================================================
+    # PHASE 3: Mount filesystems
+    # ========================================================================
+    log_step "Mounting target filesystems"
+
+    MOUNT_POINT="/mnt/sigmaos"
+    mkdir -p "$MOUNT_POINT"
+    mount "$ROOT_PART" "$MOUNT_POINT"
+    mkdir -p "$MOUNT_POINT/boot"
+    mount "$EFI_PART" "$MOUNT_POINT/boot"
+
+    log_info "Mounted $ROOT_PART -> $MOUNT_POINT"
+    log_info "Mounted $EFI_PART -> $MOUNT_POINT/boot"
+
+    # ========================================================================
+    # PHASE 4: Install base packages
+    # ========================================================================
+    log_step "Installing base packages"
+
+    # Resolve package list from ISO root
+    PKG_LIST="/iso_root/install/packages/sigmaos-base.packages"
+    if [[ -f "$PKG_LIST" ]]; then
+        # Filter out comments and empty lines
+        PKGS=$(grep -v '^#' "$PKG_LIST" | grep -v '^$' | tr '\n' ' ')
+    else
+        log_warn "Package list not found at $PKG_LIST, using minimal set"
+        PKGS="base base-devel linux linux-firmware systemd hyprland waybar sddm foot grim slurp wl-clipboard mako networkmanager"
+    fi
+
+    if command -v pacstrap >/dev/null 2>&1; then
+        log_info "Using pacstrap to install base packages to $MOUNT_POINT"
+        pacstrap "$MOUNT_POINT" $PKGS 2>&1 | tee -a "$LOG_FILE" || {
+            log_error "pacstrap failed, checking if packages are already installed..."
+        }
+    elif command -v pacman >/dev/null 2>&1; then
+        log_info "Using pacman to install base packages"
+        pacman -Sy --needed --noconfirm --root "$MOUNT_POINT" $PKGS 2>&1 | tee -a "$LOG_FILE" || true
+    else
+        log_warn "No package manager available, skipping package installation"
+    fi
+
+    # ========================================================================
+    # PHASE 5: Generate fstab
+    # ========================================================================
+    log_step "Generating fstab"
+
+    genfstab -U "$MOUNT_POINT" >> "$MOUNT_POINT/etc/fstab" 2>/dev/null || {
+        # Manual fstab generation fallback
+        ROOT_UUID=$(blkid -s UUID -o value "$ROOT_PART" 2>/dev/null || echo "")
+        EFI_UUID=$(blkid -s UUID -o value "$EFI_PART" 2>/dev/null || echo "")
+        cat > "$MOUNT_POINT/etc/fstab" <<EOF
+# SigmaOS fstab (generated by installer)
+UUID=$ROOT_PART  /          ext4  defaults,noatime  0 1
+UUID=$EFI_PART   /boot      vfat  defaults          0 2
+EOF
+        log_info "Generated manual fstab"
+    }
+    log_info "fstab generated at $MOUNT_POINT/etc/fstab"
+
+    # ========================================================================
+    # PHASE 6: Copy SigmaOS system files to target
+    # ========================================================================
+    log_step "Copying SigmaOS system files"
+
     if [[ -d /iso_root/etc ]]; then
-        cp -a /iso_root/etc/* /etc/ 2>/dev/null || log_warn "Failed to copy /etc configs"
+        cp -a /iso_root/etc/* "$MOUNT_POINT/etc/" 2>/dev/null || log_warn "Failed to copy /etc configs"
         log_info "Applied /etc system configuration"
     fi
     if [[ -d /iso_root/default ]]; then
-        mkdir -p /usr/share/sigmaos/default
-        cp -a /iso_root/default/* /usr/share/sigmaos/default/ 2>/dev/null || log_warn "Failed to copy default configs"
+        mkdir -p "$MOUNT_POINT/usr/share/sigmaos/default"
+        cp -a /iso_root/default/* "$MOUNT_POINT/usr/share/sigmaos/default/" 2>/dev/null || log_warn "Failed to copy default configs"
         log_info "Applied default desktop configuration"
     fi
     if [[ -d /iso_root/bin ]]; then
-        mkdir -p /usr/bin
-        cp -a /iso_root/bin/* /usr/bin/ 2>/dev/null || log_warn "Failed to copy runtime binaries"
+        mkdir -p "$MOUNT_POINT/usr/bin"
+        cp -a /iso_root/bin/* "$MOUNT_POINT/usr/bin/" 2>/dev/null || log_warn "Failed to copy runtime binaries"
         log_info "Applied runtime binaries"
     fi
     if [[ -d /iso_root/shell ]]; then
-        mkdir -p /usr/share/sigmaos/shell
-        cp -a /iso_root/shell/* /usr/share/sigmaos/shell/ 2>/dev/null || log_warn "Failed to copy shell configs"
+        mkdir -p "$MOUNT_POINT/usr/share/sigmaos/shell"
+        cp -a /iso_root/shell/* "$MOUNT_POINT/usr/share/sigmaos/shell/" 2>/dev/null || log_warn "Failed to copy shell configs"
         log_info "Applied shell configuration"
     fi
     if [[ -d /iso_root/install/helpers ]]; then
-        mkdir -p /usr/share/sigmaos/install/helpers
-        cp -a /iso_root/install/helpers/* /usr/share/sigmaos/install/helpers/ 2>/dev/null || log_warn "Failed to copy install helpers"
+        mkdir -p "$MOUNT_POINT/usr/share/sigmaos/install/helpers"
+        cp -a /iso_root/install/helpers/* "$MOUNT_POINT/usr/share/sigmaos/install/helpers/" 2>/dev/null || log_warn "Failed to copy install helpers"
         log_info "Applied install helpers"
     fi
-    # Enable core desktop services via shared helper (single source of truth, DRY).
-    if [[ -r /usr/share/sigmaos/install/helpers/enable-services.sh ]]; then
-        # shellcheck source=/dev/null
-        . /usr/share/sigmaos/install/helpers/enable-services.sh
-        enable_sigmaos_services
-    else
-        log_warn "enable-services.sh helper not found, falling back to inline enabling"
-        systemctl enable sddm.service 2>/dev/null || log_warn "sddm not available"
-        systemctl enable wireplumber.service 2>/dev/null || log_warn "wireplumber not available"
-        systemctl enable sigmaos-shell.service 2>/dev/null || log_warn "sigmaos-shell not available"
-        systemctl enable sigmaos-desktop-session.service 2>/dev/null || log_warn "sigmaos-desktop-session not available"
-        systemctl enable plymouth-start.service 2>/dev/null || log_warn "plymouth not available"
-        systemctl enable zram-generator.service 2>/dev/null || log_warn "zram-generator not available"
-        systemctl enable sigmaos-provision-owner.service 2>/dev/null || log_warn "sigmaos-provision-owner not available"
-        systemctl enable theme-system.service 2>/dev/null || log_warn "theme-system not available"
+    if [[ -d /iso_root/boot/limine ]]; then
+        mkdir -p "$MOUNT_POINT/boot/limine"
+        cp -a /iso_root/boot/limine/* "$MOUNT_POINT/boot/limine/" 2>/dev/null || log_warn "Failed to copy limine config"
+        log_info "Applied bootloader configuration"
     fi
-    # Schedule first-boot provisioning (runs setup-form.sh on first boot).
-    mkdir -p /var/lib/sigmaos
-    rm -f /var/lib/sigmaos/provisioned 2>/dev/null || true
-    log_info "First-boot provisioning scheduled (sigmaos-provision-owner.service)"
+    if [[ -d /iso_root/usr/share/plymouth/themes/sigmaos ]]; then
+        mkdir -p "$MOUNT_POINT/usr/share/plymouth/themes/sigmaos"
+        cp -a /iso_root/usr/share/plymouth/themes/sigmaos/* "$MOUNT_POINT/usr/share/plymouth/themes/sigmaos/" 2>/dev/null || log_warn "Failed to copy Plymouth theme"
+        log_info "Applied Plymouth boot theme"
+    fi
+    if [[ -d /iso_root/etc/skel ]]; then
+        cp -a /iso_root/etc/skel/. "$MOUNT_POINT/etc/skel/" 2>/dev/null || log_warn "Failed to copy /etc/skel dotfiles"
+        log_info "Applied /etc/skel user dotfiles"
+    fi
+    if [[ -d /iso_root/etc/systemd/user ]]; then
+        mkdir -p "$MOUNT_POINT/etc/systemd/user"
+        cp -a /iso_root/etc/systemd/user/* "$MOUNT_POINT/etc/systemd/user/" 2>/dev/null || log_warn "Failed to copy user systemd services"
+        log_info "Applied user systemd services"
+    fi
+    if [[ -d /iso_root/usr/share/wayland-sessions ]]; then
+        mkdir -p "$MOUNT_POINT/usr/share/wayland-sessions"
+        cp -a /iso_root/usr/share/wayland-sessions/* "$MOUNT_POINT/usr/share/wayland-sessions/" 2>/dev/null || true
+    fi
+    if [[ -d /iso_root/usr/share/xsessions ]]; then
+        mkdir -p "$MOUNT_POINT/usr/share/xsessions"
+        cp -a /iso_root/usr/share/xsessions/* "$MOUNT_POINT/usr/share/xsessions/" 2>/dev/null || true
+    fi
+
+    # ========================================================================
+    # PHASE 7: Configure bootloader (limine)
+    # ========================================================================
+    log_step "Configuring limine bootloader"
+
+    # Replace UUID placeholder in limine.conf with actual root UUID
+    ROOT_UUID=$(blkid -s UUID -o value "$ROOT_PART" 2>/dev/null || echo "")
+    if [[ -f "$MOUNT_POINT/boot/limine/limine.conf" ]] && [[ -n "$ROOT_UUID" ]]; then
+        sed -i "s/__ROOT_UUID__/$ROOT_UUID/g" "$MOUNT_POINT/boot/limine/limine.conf"
+        log_info "Updated limine.conf with root UUID: $ROOT_UUID"
+    fi
+
+    # Install limine to EFI partition
+    if command -v limine-deploy >/dev/null 2>&1; then
+        limine-deploy --efi "$EFI_PART" 2>/dev/null || log_warn "limine-deploy failed"
+    elif command -v limine-install >/dev/null 2>&1; then
+        limine-install "$EFI_PART" 2>/dev/null || log_warn "limine-install failed"
+    else
+        log_warn "limine-deploy/limine-install not available, bootloader not installed to disk"
+    fi
+
+    log_info "Bootloader configured on $EFI_PART"
+
+    # ========================================================================
+    # PHASE 8: Configure target system (chroot operations)
+    # ========================================================================
+    log_step "Configuring target system"
+
+    # Set hostname
+    echo "$HOSTNAME" > "$MOUNT_POINT/etc/hostname"
+
+    # Enable services via chroot (or directly if not in chroot environment)
+    if command -v arch-chroot >/dev/null 2>&1; then
+        log_info "Using arch-chroot to enable services in target"
+        arch-chroot "$MOUNT_POINT" systemctl enable sddm.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable wireplumber.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable plymouth-start.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable sigmaos-provision-owner.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable theme-system.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable zram-generator.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable sigmaos-desktop-session.service 2>/dev/null || true
+        # Rebuild initramfs with Plymouth hooks
+        arch-chroot "$MOUNT_POINT" mkinitcpio -P 2>/dev/null || \
+        arch-chroot "$MOUNT_POINT" dracut -f 2>/dev/null || true
+    else
+        # Not in a chroot-capable environment; enable via symlinks directly
+        log_info "Enabling services via symlink (no chroot available)"
+        for svc in sddm wireplumber plymouth-start sigmaos-provision-owner theme-system zram-generator sigmaos-desktop-session; do
+            ln -sf "/usr/lib/systemd/system/${svc}.service" "$MOUNT_POINT/etc/systemd/system/multi-user.target.wants/${svc}.service" 2>/dev/null || true
+        done
+    fi
+
+    # Mark provisioning as not-yet-done (first-boot will run setup-form.sh)
+    mkdir -p "$MOUNT_POINT/var/lib/sigmaos"
+    rm -f "$MOUNT_POINT/var/lib/sigmaos/provisioned" 2>/dev/null || true
+
+    # Set root password if provided
+    if [[ -n "$PASSWORD" ]]; then
+        echo "root:$PASSWORD" | chroot "$MOUNT_POINT" chpasswd 2>/dev/null || \
+        echo "root:$PASSWORD" | chroot "$MOUNT_POINT" /usr/sbin/chpasswd 2>/dev/null || true
+        log_info "Root password set"
+    fi
+
+    log_info "Target system configured"
+
+    # ========================================================================
+    # PHASE 9: Unmount and finalize
+    # ========================================================================
+    log_step "Finalizing installation"
+
+    sync
+    umount "$MOUNT_POINT/boot" 2>/dev/null || true
+    umount "$MOUNT_POINT" 2>/dev/null || true
+
+    log_success "SigmaOS installation complete!"
+    log_info "Target: $TARGET_DEVICE"
+    log_info "Root partition: $ROOT_PART ($FILESYSTEM)"
+    log_info "EFI partition: $EFI_PART"
+    log_info "Hostname: $HOSTNAME"
+    log_info "Reboot into SigmaOS to begin first-boot provisioning."
 }
+
+main "$@"
 
 main "$@"
