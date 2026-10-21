@@ -1,45 +1,48 @@
-//! Sigma Network Manager 3
-//!
-//! Advanced multi-interface network routing, state management, and configuration.
+// SPDX-License-Identifier: MIT
+// SigmaOS Network Manager 3 Engine (`src/system/sigmanetworkmanager3.rs`)
 
+#![allow(dead_code)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
-use alloc::vec::Vec;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum InterfaceState {
+    Down,
+    Up,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InterfaceType {
     Ethernet,
-    WiFi,
+    Wifi,
     Loopback,
-    Bridge,
-    Vlan,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum InterfaceState {
-    Up,
-    Down,
-    Configuring,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct NetworkInterface {
     pub name: String,
     pub if_type: InterfaceType,
     pub state: InterfaceState,
-    pub ip_address: Option<String>,
 }
 
 #[derive(Debug, Default)]
 pub struct SigmaNetworkManager3 {
-    pub interfaces: Vec<NetworkInterface>,
+    pub interfaces: BTreeMap<String, NetworkInterface>,
 }
 
 impl SigmaNetworkManager3 {
     pub fn new() -> Self {
         Self::default()
-    }
-
-    pub fn add_interface(&mut self, iface: NetworkInterface) {
-        self.interfaces.push(iface);
     }
 }

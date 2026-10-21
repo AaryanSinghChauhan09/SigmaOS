@@ -1,37 +1,41 @@
-//! Sigma Service Manager 4
-//!
-//! Enterprise multi-tier service state manager and dependency supervisor.
+// SPDX-License-Identifier: MIT
+// SigmaOS Service Manager 4 Engine (`src/system/sigmaservicemanager4.rs`)
 
+#![allow(dead_code)]
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
+
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
-use alloc::vec::Vec;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
+#[cfg(any(feature = "standalone_test", test))]
+use std::string::String;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ServiceState {
+    Stopped,
     Active,
-    Inactive,
     Failed,
-    Reloading,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct Service {
     pub name: String,
-    pub description: String,
     pub state: ServiceState,
-    pub auto_restart: bool,
 }
 
 #[derive(Debug, Default)]
 pub struct SigmaServiceManager4 {
-    pub services: Vec<Service>,
+    pub services: BTreeMap<String, Service>,
 }
 
 impl SigmaServiceManager4 {
     pub fn new() -> Self {
         Self::default()
-    }
-
-    pub fn register_service(&mut self, svc: Service) {
-        self.services.push(svc);
     }
 }
