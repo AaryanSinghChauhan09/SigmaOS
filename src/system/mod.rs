@@ -160,6 +160,7 @@ pub mod sigmaindexmanager;
 pub mod sigmacachemanager2;
 pub mod sigmacompressionmanager;
 pub mod sigmaencryptionmanager;
+pub mod sigmafirewallmanager2;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -322,6 +323,12 @@ pub use sigmaencryptionmanager::{
     CipherAlgorithm as EncryptionManagerCipher, EncryptedVolume as EncryptionManagerVolume,
     EncryptionKey as EncryptionManagerKey, EncryptionManager, KeyType as EncryptionManagerKeyType,
     VolumeState as EncryptionManagerVolumeState,
+};
+pub use sigmafirewallmanager2::{
+    ChainPolicy as FirewallManager2ChainPolicy, ChainState as FirewallManager2ChainState,
+    FirewallManager2Chain, FirewallManager2Rule, Protocol as FirewallManager2Protocol,
+    RuleAction as FirewallManager2RuleAction, RuleState as FirewallManager2RuleState,
+    SigmaFirewallManager2,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
