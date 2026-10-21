@@ -12,11 +12,15 @@ Welcome to the official, consolidated GitHub Wiki for **SigmaOS** — a sovereig
 - **Root .md/.txt Files**: ✅ None tracked in main branch (gitignore enforced)
 - **Remote Branches Remaining**: None (all merged/pruned)
 
-### Recent Merges
-| PR | Branch | Status |
+### Recent Merges & Parity Advances
+| Component / PR | Detail | Status |
 |---|---|---|
+| PR #3212 (jules) | Incorporated CI enhancements & enforced documentation sovereignty | ✅ Merged into `main` |
 | feat(omarchy) V63 | feat/omarchy-linux-missing-components-v63 | ✅ Merged |
 | feature(arch) V66 | feature/arch-linux-missing-components-v66 | ✅ Merged |
+| Gap Analysis Spec | [[Omarchy-Linux-Gap-Analysis]]: Complete 10-subsystem comparison & 6-phase roadmap | ✅ Published |
+| Omarchy Parity Tools | `sigmaos-theme-reload`, `sigmaos-bar`, `sigmaos-voxtype`, `sigmaos-snapshot` | ✅ Implemented in `bin/` |
+| Turnkey Workstation | `make launch` / `bin/sigmaos-launch` & auto-fallback `make run` | ✅ Live & Operational |
 
 ### Compile Fixes
 | File | Fix | Error Resolved |

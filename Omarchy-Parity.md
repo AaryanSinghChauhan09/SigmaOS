@@ -1,9 +1,26 @@
-# Omarchy Parity
+# Omarchy Parity & Ecosystem Synthesis
+
+> 📌 **Comprehensive Gap Analysis & Roadmap**: For the complete 10-domain architectural breakdown and 6-phase engineering roadmap, see [[Omarchy-Linux-Gap-Analysis]].
 
 ## Overview and Purpose
-This page documents the SigmaOS components: How SigmaOS surpasses Omarchy. These components form a crucial part of the SigmaOS ecosystem, providing robust, high-performance, and secure foundations.
+This page documents how SigmaOS matches, integrates, and surpasses the architecture of **Omarchy Linux** (v4.0.5 / v4.0.6). These components form a crucial part of the SigmaOS ecosystem, providing robust, high-performance, and secure foundations.
 
 SigmaOS aims to build a comprehensive system that matches and exceeds standard distributions, offering deep integration and modern APIs.
+
+---
+
+## 🛠️ Native Parity Implementations in `bin/`
+
+| Tool | Omarchy Functionality | SigmaOS Native Implementation | Role |
+| :--- | :--- | :--- | :--- |
+| `sigmaos-theme-reload` | Wallust / Matugen live color reload | [`bin/sigmaos-theme-reload`](file:///home/aaryansinghchauhan/SigmaOS/bin/sigmaos-theme-reload) | Signals Foot, Kitty, Waybar, Hyprland to update colors live |
+| `sigmaos-bar` | Quickshell top bar telemetry | [`bin/sigmaos-bar`](file:///home/aaryansinghchauhan/SigmaOS/bin/sigmaos-bar) | Generates JSON telemetry (CPU, RAM, battery, pledge security) |
+| `sigmaos-voxtype` | Voxtype offline push-to-talk | [`bin/sigmaos-voxtype`](file:///home/aaryansinghchauhan/SigmaOS/bin/sigmaos-voxtype) | VoiceCraft dictation pipeline with Wayland clipboard hook |
+| `sigmaos-snapshot` | Snapper / Timeshift Btrfs snapshots | [`bin/sigmaos-snapshot`](file:///home/aaryansinghchauhan/SigmaOS/bin/sigmaos-snapshot) | Automated pre-transaction rollback snapshot generator |
+| `sigmaos-shell` | Unified quickshell controller | [`bin/sigmaos-shell`](file:///home/aaryansinghchauhan/SigmaOS/bin/sigmaos-shell) | Daemon IPC controller (`ping`, `toggle-bar`, `summon`) |
+| `sigmaos-launch` | Turnkey desktop workstation | [`bin/sigmaos-launch`](file:///home/aaryansinghchauhan/SigmaOS/bin/sigmaos-launch) | Omarchy/Mint style interactive terminal dashboard |
+
+---
 
 ## Key Structs/Engines Implemented
 The architecture is designed around several core structures:
