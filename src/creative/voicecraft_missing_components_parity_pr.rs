@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/voicecraft_missing_components_parity_pr.rs`)
@@ -14,21 +12,24 @@
 // 6. SovereignVoicecraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f32::consts::PI;
 
-
-
-
-
 #[cfg(not(test))]
+use crate::creative::voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
 
 #[cfg(test)]
 #[path = "voicecraft.rs"]
 mod voicecraft;
+
 #[cfg(test)]
+use voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
 
 /// Structured PR proposal manifest for missing VoiceCraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -127,6 +128,12 @@ impl VoicecraftNeuralTtsInferencePrEngine {
             performance_multiplier: String::from("18.5x (Zero-Latency Realtime Neural Vocoding)"),
             status: String::from("PR_READY"),
         }
+    }
+}
+
+impl Default for VoicecraftNeuralTtsInferencePrEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -230,6 +237,12 @@ impl VoicecraftAcousticPhonemizerG2pPrEngine {
     }
 }
 
+impl Default for VoicecraftAcousticPhonemizerG2pPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 3. VoicecraftZeroShotVoiceCloningPrEngine
 // ============================================================================
@@ -293,6 +306,12 @@ impl VoicecraftZeroShotVoiceCloningPrEngine {
     }
 }
 
+impl Default for VoicecraftZeroShotVoiceCloningPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 4. VoicecraftRealtimeStreamingDenoiserPrEngine
 // ============================================================================
@@ -346,6 +365,12 @@ impl VoicecraftRealtimeStreamingDenoiserPrEngine {
             performance_multiplier: String::from("25.0x (Sub-1ms Realtime Noise Suppression)"),
             status: String::from("PR_READY"),
         }
+    }
+}
+
+impl Default for VoicecraftRealtimeStreamingDenoiserPrEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -414,6 +439,12 @@ impl VoicecraftWaylandAccessibilityVoiceControlPrEngine {
     }
 }
 
+impl Default for VoicecraftWaylandAccessibilityVoiceControlPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // 6. SovereignVoicecraftArtcraftParityPrGateway
 // ============================================================================
@@ -477,12 +508,19 @@ impl SovereignVoicecraftArtcraftParityPrGateway {
     }
 }
 
+impl Default for SovereignVoicecraftArtcraftParityPrGateway {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // ============================================================================
 // Unit Tests
 // ============================================================================
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_neural_tts_inference_engine() {
