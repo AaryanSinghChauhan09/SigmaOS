@@ -1,0 +1,26 @@
+# SigmaOS Snapper configuration
+# Btrfs snapshot management for system rollback.
+
+# Default subvolume layout.
+SUBVOLUME="@"
+
+# Root subvolume.
+SUBVOLUME_ROOT="/"
+
+# Snapshot location.
+SNAPSHOT_LOCATION=".snapshots"
+
+# Number of timeline snapshots to keep.
+NUMBER_LIMIT="5"
+NUMBER_LIMIT_OS="10"
+
+# Timeline creation (hourly, daily, weekly, monthly, yearly).
+TIMELINE_CREATE="yes"
+TIMELINE_LIMIT_HOURLY="5"
+TIMELINE_LIMIT_DAILY="7"
+TIMELINE_LIMIT_WEEKLY="4"
+TIMELINE_LIMIT_MONTHLY="1"
+TIMELINE_LIMIT_YEARLY="0"
+
+# Cleanup algorithm: number of timeline snapshots to keep by age.
+CLEANUP_TIMEOUT_AGE="1800"  # 30 minutes

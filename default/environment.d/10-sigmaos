@@ -1,0 +1,4 @@
+# SigmaOS environment.d - session environment
+# Sourced by UWSM session, not login shells.
+
+[ -r /usr/share/sigmaos/default/bash/env-bootstrap ] && . /usr/share/sigmaos/default/bash/env-bootstrap

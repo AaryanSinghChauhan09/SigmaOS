@@ -1,0 +1,14 @@
+[Unit]
+Description=SigmaOS First-Boot Provisioning
+ConditionPathExists=!/var/lib/sigmaos/provisioned
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/sigmaos-provision-owner
+ExecStartPost=/bin/touch /var/lib/sigmaos/provisioned
+
+[Install]
+WantedBy=multi-user.target

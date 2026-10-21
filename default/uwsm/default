@@ -1,0 +1,20 @@
+# SigmaOS UWSM (Universal Window Manager Session Manager) defaults
+# Inspired by Omarchy 4.0.5 default/uwsm/default
+
+# Changes require a restart to take effect.
+
+# Install other terminals via Install > Terminal
+export TERMINAL=xdg-terminal-exec
+
+# BROWSER is intentionally not exported here: session-wide, it makes
+# xdg-settings refuse to change the default browser.
+# Interactive shells get BROWSER from default/bash/env-bootstrap instead.
+
+# Used by terminal programs to open files with the selected SigmaOS default editor.
+export EDITOR="micro"
+
+# Use a custom directory for screenshots.
+# export SIGMAOS_SCREENSHOT_DIR="$HOME/Pictures/Screenshots"
+
+# Activate mise if present.
+sigmaos-cmd-present mise 2>/dev/null && eval "$(mise activate bash --shims)" 2>/dev/null || true

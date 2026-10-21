@@ -1,0 +1,14 @@
+# SigmaOS user systemd: start the desktop shell and bar automatically.
+
+[Unit]
+Description=SigmaOS Desktop Shell
+After=graphical-session.target
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/sigmaos-shell
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,35 @@
+# SigmaOS environment bootstrap
+# Sourced by default/bash/env-bootstrap (mirrors Omarchy's
+# default/bash/env-bootstrap pattern).
+#
+# This file is sourced by both the shell session and the graphical session
+# so that environment variables are consistent everywhere.
+
+# Editor preference.
+export EDITOR="${EDITOR:-micro}"
+export VISUAL="${VISUAL:-micro}"
+
+# Default terminal.
+export TERMINAL="${TERMINAL:-foot}"
+
+# Default file manager.
+export FILE_MANAGER="${FILE_MANAGER:-nautilus}"
+
+# Pager.
+export PAGER="${PAGER:-less}"
+export LESS="${LESS:-R}"
+
+# XDG directories.
+export XDG_DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+export XDG_STATE_HOME="${XDG_STATE_HOME:-$HOME/.local/state}"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
+
+# SigmaOS paths.
+export OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/sigmaos}"
+export SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+
+# Activate mise if present (developer experience).
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate bash --shims 2>/dev/null || true)"
+fi

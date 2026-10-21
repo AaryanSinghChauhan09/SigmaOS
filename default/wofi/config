@@ -1,0 +1,66 @@
+# SigmaOS Wofi launcher configuration
+# Inspired by Omarchy 4.0.5 default/themed/
+
+[general]
+prompt = Run:
+width = 400
+height = 300
+scrollmethod = line
+lines = 10
+columns = 1
+allow-images = true
+cache = false
+case-sensitive = false
+regex = false
+fuzzy = true
+hide-scroll = true
+show-cursor = false
+
+[style]
+theme-path = /usr/share/wofi/themes/sigmaos
+styles = /usr/share/wofi/styles/sigmaos.css
+layer = overlay
+output = null
+x = 0
+y = 0
+mon = 0
+focus = yes
+
+[shortcuts]
+alt_f4 = close
+alt_up = move-current-up
+alt_down = move-current-down
+alt_tab = toggle-focus
+ret = select
+shift-ret = exec
+ctrl-v = paste
+ctrl-c = copy
+ctrl-u = clear
+alt-a = all
+alt-c = copy-q
+alt-d = deselect
+alt-f = toggle-fuzzy
+alt-n = clear
+alt-p = print
+alt-s = toggle-hide-scroll
+alt-w = toggle-wrap
+left = left-char
+right = right-char
+up = line-up
+down = line-down
+shift-home = to-start
+shift-end = to-end
+home = to-start
+end = to-end
+ctrl-c = exit
+ctrl-d = exit
+
+[color]
+active = #89b4fa
+active_foreground = #1e1e2e
+normal = #585b70
+normal_foreground = #cdd6f4
+warning = #f38ba8
+warning_foreground = #1e1e2e
+error = #f38ba8
+error_foreground = #1e1e2e

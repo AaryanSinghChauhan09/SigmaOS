@@ -1,0 +1,14 @@
+# SigmaOS system-sleep hooks: run pre-sleep and post-suspend tasks.
+# These keep the desktop responsive across suspend/resume cycles.
+
+[Unit]
+Description=SigmaOS suspend/resume hooks
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/sigmaos-pre-sleep
+ExecStart=/usr/bin/sigmaos-post-suspend
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sleep.target

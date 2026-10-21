@@ -1,0 +1,58 @@
+# SigmaOS Ghostty terminal configuration
+# Inspired by Omarchy 4.0.5 default/ghostty/
+
+window-title = SigmaOS Terminal
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+background-opacity = 0.95
+
+# Colors (Catppuccin Mocha inspired, matches SigmaOS theme).
+background = 0x1e1e2e
+foreground = 0xcdd6f4
+
+cursor-shape = block
+cursor-blink = false
+
+# Clickable URLs (DISCOVERABILITY).
+detect-urls = true
+
+# Copy / paste (LEAST ASTONISHMENT).
+copy-on-select = false
+paste-on-middle-click = true
+
+# Bell.
+bell-mode = system
+
+# Scrollback.
+scrollback = 10000
+scrollback-multiplier = 3
+
+# Window decorations.
+window-decoration-height = 0
+window-decoration-integrated-wm = false
+
+# Keybindings (LEAST ASTONISHMENT: standard terminal bindings).
+# Copy / paste.
+bindkey = ctrl+shift+c = copy_to_clipboard
+bindkey = ctrl+shift+v = paste_from_clipboard
+bindkey = ctrl+shift+v = paste_from_primary
+bindkey = ctrl+shift+c = copy_to_selection
+
+# Font size.
+bindkey = ctrl+plus = increase_font_size
+bindkey = ctrl+minus = decrease_font_size
+bindkey = ctrl+zero = reset_font_size
+
+# New window / tab.
+bindkey = ctrl+shift+n = new_window
+bindkey = ctrl+shift+t = new_tab
+bindkey = ctrl+shift+q = close_window
+bindkey = ctrl+shift+w = close_tab
+
+# Scrolling.
+bindkey = shift+page_up = scroll_to_top
+bindkey = shift+page_down = scroll_to_bottom
+bindkey = shift+up = scroll_one_line_up
+bindkey = shift+down = scroll_one_line_down
+bindkey = shift+page_up_page = scroll_one_page_up
+bindkey = shift+page_down_page = scroll_one_page_down

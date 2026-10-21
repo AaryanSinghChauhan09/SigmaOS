@@ -1,0 +1,37 @@
+# SigmaOS default shell configuration
+# Mirrors Omarchy 4.0.5 default/omarchy/shell.json (conceptual equivalent).
+
+{
+  "version": 1,
+  "idle": {
+    "screensaver": 150,
+    "lock": 300
+  },
+  "bar": {
+    "position": "top",
+    "transparent": false,
+    "centerAnchor": "sigmaos.clock",
+    "layout": {
+      "left": [
+        { "id": "sigmaos.menu" },
+        { "id": "sigmaos.workspaces" }
+      ],
+      "center": [
+        { "id": "sigmaos.clock", "format": "dddd HH:mm" }
+      ],
+      "right": [
+        { "id": "sigmaos.audio" },
+        { "id": "sigmaos.battery" }
+      ]
+    }
+  },
+  "plugins": [
+    "sigmaos.menu",
+    "sigmaos.workspaces",
+    "sigmaos.clock",
+    "sigmaos.audio",
+    "sigmaos.battery",
+    "sigmaos.notifications",
+    "sigmaos.screensaver"
+  ]
+}

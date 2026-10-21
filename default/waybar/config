@@ -1,0 +1,9 @@
+# SigmaOS Waybar configuration
+# Inspired by Omarchy 4.0.5 default/themed/btop.theme.tpl + bar modules
+
+# Waybar modules layout:
+#   left:   workspace buttons + menu
+#   center: clock
+#   right:  audio, network, battery, power
+
+# Default module values are set here; individual modules override below.

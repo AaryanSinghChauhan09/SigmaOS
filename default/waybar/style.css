@@ -1,0 +1,98 @@
+/* SigmaOS Waybar styling
+   Inspired by Omarchy 4.0.5 default/themed/btop.theme.tpl */
+
+* {
+  border: none;
+  border-radius: 0;
+  font-family: "JetBrainsMono Nerd Font", sans-serif;
+  font-size: 13px;
+  min-height: 24px;
+}
+
+window#waybar {
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  border-bottom: 2px solid #585b70;
+}
+
+#workspaces button {
+  padding: 0 8px;
+  color: #cdd6f4;
+}
+
+#workspaces button.active {
+  background-color: #89b4fa;
+  color: #1e1e2e;
+  border-radius: 6px;
+}
+
+#workspaces button.urgent {
+  color: #f38ba8;
+}
+
+#clock {
+  padding: 0 10px;
+  color: #bac2de;
+}
+
+#battery {
+  padding: 0 10px;
+  color: #a6e3a1;
+}
+
+#battery.charging {
+  color: #fab387;
+}
+
+#battery.warning {
+  color: #f38ba8;
+}
+
+#network {
+  padding: 0 10px;
+  color: #89b4fa;
+}
+
+#network.disconnected {
+  color: #f38ba8;
+}
+
+#pulseaudio {
+  padding: 0 10px;
+  color: #cba6f7;
+}
+
+#pulseaudio.muted {
+  color: #f38ba8;
+}
+
+#temperature {
+  padding: 0 10px;
+  color: #fab387;
+}
+
+#cpu {
+  padding: 0 10px;
+  color: #cba6f7;
+}
+
+#memory {
+  padding: 0 10px;
+  color: #94e2d5;
+}
+
+#tray {
+  padding: 0 10px;
+}
+
+#mode {
+  background-color: #f38ba8;
+  color: #1e1e2e;
+  padding: 0 10px;
+  border-radius: 6px;
+}
+
+#window {
+  padding: 0 10px;
+  color: #cdd6f4;
+}

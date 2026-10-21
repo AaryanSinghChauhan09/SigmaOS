@@ -1,0 +1,19 @@
+# SigmaOS systemd user slice: grant the desktop session access to audio,
+# video, seat, and logind so the shell can control the display directly.
+[Unit]
+Description=SigmaOS Desktop Session
+Documentation=man:systemd.special(7)
+Requires=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=org.sigmaos.DesktopSession
+ExecStart=/usr/bin/sigmaos-session
+# The desktop session needs direct device control (DRM, input, audio).
+# These are granted via logind seat access (least privilege: only this seat).
+# No AmbientCapabilities here — capabilities are handled by the kernel
+# driver and logind's seat management.
+
+[Install]
+WantedBy=graphical-session.target

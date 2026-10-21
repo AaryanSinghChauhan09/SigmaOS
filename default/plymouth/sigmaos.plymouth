@@ -1,0 +1,11 @@
+# SigmaOS Plymouth theme definition
+# Inspired by Omarchy 4.0.5 default/plymouth/omarchy.plymouth
+
+[Plymouth Theme]
+Name=SigmaOS
+Description=SigmaOS desktop boot theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/sigmaos
+ScriptFile=/usr/share/plymouth/themes/sigmaos/sigmaos.script

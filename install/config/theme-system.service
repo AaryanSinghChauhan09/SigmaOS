@@ -1,0 +1,11 @@
+[Unit]
+Description=SigmaOS Theme System
+Documentation=man:sigmaos-theme-system(7)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sigmaos-theme-system sigmaos
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
