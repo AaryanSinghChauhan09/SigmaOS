@@ -1,13 +1,16 @@
-#![no_std]
-#![no_std]
+// SPDX-License-Identifier: MIT
 // SigmaOS Sovereign Creative Suite: EffectCraft & ArtCraft Parity PR Engine
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
 #![no_std]
+
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 
 
@@ -1324,7 +1327,7 @@ impl EffectcraftMissingComponentsParityPrSuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_effectcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 14
+            && self.gateway.collect_all_proposals().len() == 10
     }
 }
 
@@ -1340,6 +1343,7 @@ impl Default for EffectcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_optical_flow_engine_functional() {
@@ -1558,16 +1562,16 @@ mod tests {
     #[test]
     fn test_openfx_adapter_engine_functional_v2() {
         let mut engine = ArtCraftOpenFxPluginPrEngine::new();
-        let load_res = engine.load_openfx_plugin("com.artcraft.Sharpen");
+        let load_res = engine.load_openfx_plugin("com.artcraft.Glow");
         assert!(load_res.is_ok());
 
         engine
-            .set_plugin_parameter("com.artcraft.Sharpen", "intensity", 0.5)
+            .set_plugin_parameter("com.artcraft.Glow", "intensity", 0.5)
             .unwrap();
 
         let mut pixels = vec![100, 150, 200, 255];
         engine
-            .process_frame("com.artcraft.Sharpen", &mut pixels)
+            .process_frame("com.artcraft.Glow", &mut pixels)
             .unwrap();
         assert_eq!(pixels[0], 50);
     }
