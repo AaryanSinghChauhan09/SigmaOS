@@ -6,6 +6,7 @@ authors = ["SigmaOS Team"]
 description = "SigmaOS - Sovereign, AI-Native Operating System"
 license = "MIT OR GPL-2.0"
 repository = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+default-run = "sigmaos"
 
 [dependencies]
 # Core dependencies (minimal as per SigmaOS philosophy)

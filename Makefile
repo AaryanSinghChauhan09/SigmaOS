@@ -83,13 +83,16 @@ iso-stub:
 	@mkdir -p build
 	@bash scripts/build_stub_iso.sh
 
-# 9. Run QEMU smoke test (real ISO, requires compiled kernel)
+# 9. Run SigmaOS (boots in QEMU if installed; gracefully falls back to native workstation)
 run:
-	@set -eu; image=build/sigmaos-desktop-preview.iso; \
-	if [ ! -s "$$image" ]; then echo "No non-empty SigmaOS ISO at $$image. Run 'make iso-stub' to build a bootable stub ISO." >&2; exit 1; fi; \
-	if ! python3 -c 'import sys; f=open(sys.argv[1], "rb"); f.seek(32769); sys.exit(0 if f.read(5) == b"CD001" else 1)' "$$image"; then echo "Invalid ISO: missing ISO9660 volume descriptor." >&2; exit 1; fi; \
-	if ! command -v qemu-system-x86_64 >/dev/null 2>&1; then echo "qemu-system-x86_64 not found in PATH" >&2; exit 1; fi; \
-	exec qemu-system-x86_64 -m 2048 -cdrom "$$image" -serial stdio -no-reboot
+	@image=build/sigmaos-desktop-preview.iso; \
+	if command -v qemu-system-x86_64 >/dev/null 2>&1 && [ -s "$$image" ]; then \
+		echo "==> Booting SigmaOS Desktop Preview in QEMU..."; \
+		exec qemu-system-x86_64 -m 2048 -cdrom "$$image" -serial stdio -no-reboot; \
+	else \
+		echo "==> QEMU not found in PATH or ISO not present. Launching native SigmaOS Workstation..."; \
+		bash bin/sigmaos-launch; \
+	fi
 
 # 9b. Run stub ISO in QEMU (GALL'S LAW: start simple — works now!)
 run-stub:
