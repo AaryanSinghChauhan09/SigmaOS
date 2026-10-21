@@ -140,6 +140,7 @@ pub mod sigmapowermanager2;
 pub mod sigmaprocessmanager;
 pub mod sigmaschedulermanager;
 pub mod sigmaservicemanager4;
+pub mod sigmasetupmanager2;
 pub mod sigmastoragemanager;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
@@ -162,6 +163,9 @@ pub use sigmaauditmanager::{
 };
 pub use sigmainstallmanager::{
     InstallStatus as InstallManagerStatus, InstallType, SoftwareItem, SigmaInstallManager,
+};
+pub use sigmasetupmanager2::{
+    SetupStep, SetupStepStatus, SigmaSetupManager2,
 };
 pub use sigmanetworkmanager3::{
     InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
