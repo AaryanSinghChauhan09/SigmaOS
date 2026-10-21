@@ -1,0 +1,19 @@
+## 2026-10-16 - Case-Insensitive URL Scheme & Backslash Parser Differential Security
+**Vulnerability:** `validate_url` rejected uppercase schemes (e.g. `HTTP://` / `Https://`) while allowing backslashes (`\`) which WHATWG URL parsers normalize to slashes (`/`), leading to URL parser differential, open redirect, and SSRF vulnerabilities (CWE-601 / CWE-918).
+**Learning:** Strict RFC 3986 scheme comparison requires ASCII case-insensitivity (`eq_ignore_ascii_case`). Furthermore, backslashes in URL paths allow host-path confusion when downstream components decode or parse URLs differently (WHATWG vs RFC 3986).
+**Prevention:** Always parse scheme prefixes case-insensitively and explicitly reject backslash characters in web input validation to prevent parser differential attacks.
+
+## 2026-10-17 - Mixed & Double URL-Encoded Path Traversal Bypass Security
+**Vulnerability:** `validate_path` checked for double URL-encoded dot pairs (`%2e%2e`) and single URL-encoded separators (`%2f`, `%5c`), but missed mixed literal and URL-encoded dot sequences (`.%2e`, `%2e.`) and double-encoded entities (`%252e`, `%252f`, `%255c`), allowing path traversal bypasses (CWE-22).
+**Learning:** Checking only uniform URL encoding sequences allows attacker bypasses using mixed encoding (`.%2e`) or double percent encoding (`%252e`).
+**Prevention:** Always inspect byte slices for mixed URL-encoded representations and double-percent hex sequences (`%25..`) in input validation filters.
+
+## 2026-10-18 - Percent-Encoded NUL and CRLF HTTP Injection Security
+**Vulnerability:** `validate_url` checked literal NUL bytes and control characters (`b <= 32`), but missed percent-encoded NUL bytes (`%00`) and percent-encoded CRLF/control sequences (`%0d`, `%0a`, `%1b`, `%7f`), enabling HTTP request smuggling, response header injection, and C-ABI string truncation (CWE-113 / CWE-626 / CWE-918).
+**Learning:** Checking only literal raw bytes leaves applications vulnerable when downstream network components decode percent-encoded control sequences or C-ABI string handlers truncate at `%00`.
+**Prevention:** Always scan URL byte slices for percent-encoded NUL bytes (`%00`), CRLF sequences (`%0d`/`%0a`), and encoded userinfo credentials (`%40`) in input validation routines before URL processing or forwarding.
+
+## 2026-10-19 - Double Percent-Encoded Authority Boundary Injection Security
+**Vulnerability:** `validate_url` checked literal userinfo credentials (`@`) and single percent-encoded `@` (`%40`), but missed double percent-encoded credentials (`%2540`) and single/double-encoded authority boundary delimiters (`%2f`, `%23`, `%3f`, `%5c`, `%2523`, `%253f`, `%252f`, `%255c`) in authority segments, enabling SSRF, host header injection, and authority parser differential bypasses (CWE-918 / CWE-292 / CWE-838).
+**Learning:** Downstream web proxies and URL parsers decode percent-encoded boundary characters, shifting the authority boundary after validation if percent-encoded delimiters (`%23`, `%3f`, `%2f`, `%2523`, `%2540`) are allowed in authority segments.
+**Prevention:** Always scan URL authority slices for single and double percent-encoded boundary delimiters (`%2f`, `%23`, `%3f`, `%5c`, `%40`, `%2523`, `%2540`, `%252f`, `%253f`, `%255c`) to guarantee consistent authority boundaries across intermediate proxies and backend handlers.
