@@ -1,28 +1,15 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Deckcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/deckcraft_artcraft_parity_pr.rs`)
-//
-// Bridges Deckcraft (Presentation & Slide Deck Engine) and ArtCraft Deckcraft missing feature parity via structured PR proposals.
-// Provides implementations for 10 missing components:
-// 1. DeckcraftVectorMorphingKeyframeAnimationPrEngine (Keyframe vector morphing, path interpolation, bezier timing & audio timecode sync)
-// 2. DeckcraftSmartDiagramConnectorFlowPrEngine (Smart diagrams, org charts, process flowcharts & automatic connector line routing)
-// 3. DeckcraftLiveDataDrivenChartsPrEngine (Live spreadsheet-linked data charts, animated data entry reveals & dynamic legends)
-// 4. DeckcraftLiveAudienceQnaPollingPrEngine (Live audience Q&A, polling, QR/PIN auth, upvoting & moderation dashboard)
-// 5. DeckcraftCrdtMultiUserCoAuthoringPrEngine (CRDT co-authoring, Lamport LWW delta edits, cursor presence & lockless slide edit merging)
-// 6. DeckcraftAiSlideGeneratorLayoutAutoBalancePrEngine (AI slide generator, topic-to-outline synthesis, WCAG AA contrast validator & smart layout auto-balancer)
-// 7. DeckcraftMultiFormat4kVideoRendererPrEngine (4K 60FPS video timeline renderer, slide transition alpha blending & audio multiplexing)
-// 8. DeckcraftRevealJsHtml5ExporterPrEngine (Reveal.js interactive HTML5 bundle exporter with embedded fonts & offline assets)
-// 9. DeckcraftPresenterZenithDualScreenPrEngine (Dual-screen presenter mode, speaker notes, live timer, laser pointer & slide annotation whiteboard)
-// 10. DeckcraftMasterTemplateThemeCascadePrEngine (Master slide inheritance hierarchy, global color/font theme cascading & asset palette syncer)
-// 11. SovereignDeckcraftArtcraftParityPrGateway & DeckcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 
 
@@ -896,6 +883,8 @@ impl Default for DeckcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_deckcraft_artcraft_parity_pr_gateway() {

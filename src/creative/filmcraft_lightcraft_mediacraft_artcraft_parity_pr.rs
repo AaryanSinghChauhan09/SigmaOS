@@ -1,22 +1,14 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - ArtCraft Craftlibs Missing Components Parity PR Gateway
 // (`src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs`)
-//
-// Provides structured PR proposal specifications and full engine implementations for
-// components missing in SigmaOS when compared to craftlibs from ArtCraft:
-// 1. FilmcraftNleTimelineOpticalFlowPrEngine (Multi-camera audio sync, GPU optical flow slow-motion, 3D LUT ACES color grading & proxy transcode)
-// 2. LightcraftToneCurveAiMaskingCatalogPrEngine (Non-destructive non-linear tone curves, AI sky/subject auto-masking, EXIF/IPTC catalog tagger & tethered capture)
-// 3. MediacraftLowLatencyPipelineEqualizerPrEngine (Universal H.265/AV1/ProRes hardware decoding, 3D spatial audio decoders, 31-band DSP EQ & RTP streaming)
-// 4. Model3dSculptingRiggingPbrExporterPrEngine (Dynamic topology sculpting brushes, auto-rigging IK solver, PBR material graph & GLTF/USD export)
-// 5. VectorcraftAnimationLottieBonesPrEngine (Non-destructive boolean path geometry, bone IK rigging, onion skinning & SVG/Lottie exporter)
-// 6. AudiocraftDawSynthesizerVst3MasteringPrEngine (Multi-track DAW automation, spectral synthesis, VST3/CLAP plugin hosting & EBU R128 loudness mastering)
-// 7. SovereignArtcraftCraftlibsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -284,8 +276,9 @@ impl MediacraftLowLatencyPipelineEqualizerPrEngine {
         }
 
         let rad = azimuth_deg * 0.0174532925; // deg to rad
-        let pan_l = (core::f32::consts::FRAC_PI_4 - rad * 0.5).cos();
-        let pan_r = (core::f32::consts::FRAC_PI_4 + rad * 0.5).sin();
+        let frac_pi_4 = core::f32::consts::PI / 4.0;
+        let pan_l = (frac_pi_4 - rad * 0.5).cos();
+        let pan_r = (frac_pi_4 + rad * 0.5).sin();
 
         for i in 0..pcm_mono.len() {
             pcm_left[i] = pcm_mono[i] * pan_l;
@@ -610,6 +603,9 @@ impl Default for SovereignArtcraftCraftlibsParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_craftlibs_parity_pr_gateway() {

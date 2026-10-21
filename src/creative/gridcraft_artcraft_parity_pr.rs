@@ -1,26 +1,14 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/gridcraft_artcraft_parity_pr.rs`)
-//
-// Bridges Gridcraft (Spreadsheet & Data Analytics Framework) and ArtCraft GridCraft missing feature parity via structured PR proposals.
-// Provides implementations for 10 missing components:
-// 1. GridcraftAdvancedFormulaXlookupPrEngine (XLOOKUP, VLOOKUP, INDEX/MATCH matrix searching, financial/statistical functions & DAG dependency graph solver)
-// 2. GridcraftPivotTableCubeAggregationPrEngine (Pivot table multi-dimensional cube aggregation, row/column field slicing & calculated fields)
-// 3. GridcraftDataValidationConditionalFormattingPrEngine (Cell data validation bounds/dropdowns & conditional formatting rules/data bars)
-// 4. GridcraftDynamicSpillArrayStreamPrEngine (Dynamic array spill formulas FILTER/UNIQUE/SORT/SEQUENCE & real-time RTD ticker stream pipeline)
-// 5. GridcraftFinancialGoalSeekMonteCarloPrEngine (Newton-Raphson Goal Seek non-linear solver, What-If scenario manager & Monte Carlo risk simulator)
-// 6. GridcraftRealtimeCrdtCoAuthoringPrEngine (CRDT operational cell delta sync, Lamport LWW timestamps & lockless multi-user concurrency)
-// 7. GridcraftMacroScriptingUdfPrEngine (Macro action recorder/playback, sandboxed WASM/script runner for custom User-Defined Functions UDF)
-// 8. GridcraftVectorChartExporterPrEngine (Dynamic vector SVG chart renderer Bar, Line, Pie, Donut, Scatter, Waterfall, TreeMap, Radar)
-// 9. GridcraftMultiFormatSpreadsheetConverterPrEngine (Lossless multi-format spreadsheet converter XLSX, ODS, CSV, TSV, JSON, HTML, PDF)
-// 10. GridcraftMasterThemeTemplateCascadePrEngine (Master workbook template hierarchy, cell style themes & global design token cascading)
-// 11. SovereignGridcraftArtcraftParityPrGateway & GridcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -384,12 +372,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
             Some(ValidationRuleType::List(allowed)) => allowed.contains(&value_str.to_string()),
             Some(ValidationRuleType::NumberRange { min, max }) => {
                 if let Ok(val) = value_str.parse::<f64>() {
-                    val >= min && val <= max
+                    val >= *min && val <= *max
                 } else {
                     false
                 }
             }
-            Some(ValidationRuleType::CustomRegex(pattern)) => value_str.contains(&pattern),
+            Some(ValidationRuleType::CustomRegex(pattern)) => value_str.contains(pattern.as_str()),
             None => true,
         }
     }
@@ -401,15 +389,15 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
     pub fn evaluate_conditional_style(&self, col: u32, row: u32, value: f64) -> Option<u32> {
         match self.format_rules.get(&(col, row)) {
             Some(ConditionalFormatRuleType::CellGreaterThan(thresh, color)) => {
-                if value > thresh {
-                    Some(color)
+                if value > *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
             }
             Some(ConditionalFormatRuleType::CellLessThan(thresh, color)) => {
-                if value < thresh {
-                    Some(color)
+                if value < *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
@@ -419,12 +407,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 max_color,
             }) => {
                 if value > 50.0 {
-                    Some(max_color)
+                    Some(*max_color)
                 } else {
-                    Some(min_color)
+                    Some(*min_color)
                 }
             }
-            Some(ConditionalFormatRuleType::DataBar { bar_color }) => Some(bar_color),
+            Some(ConditionalFormatRuleType::DataBar { bar_color }) => Some(*bar_color),
             None => None,
         }
     }
@@ -1232,6 +1220,9 @@ impl Default for GridcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_gridcraft_artcraft_parity_pr_gateway() {

@@ -1,28 +1,16 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Soundcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/soundcraft_artcraft_parity_pr.rs`)
-//
-// Bridges Soundcraft (Digital Audio Workstation & Audio Processing Subsystem) and ArtCraft SoundCraft missing feature parity via structured PR proposals.
-// Provides implementations for 10 missing components:
-// 1. SoundcraftAdvancedMultiTrackElasticTimePitchPrEngine (Multi-track DAW timeline, elastic time stretching, pitch shifting, non-destructive clip editing & crossfading)
-// 2. SoundcraftSpectralSynthesisGranularSamplerPrEngine (Granular synthesis engine, additive/wavetable spectral oscillator, multi-sample zone mapping & ADSR modulation matrix)
-// 3. SoundcraftSpatial3dAmbisonicHrtfReverbPrEngine (3D HRTF binaural panning, Higher-Order Ambisonics, acoustic room convolution reverb & Dolby Atmos surround bed mixing)
-// 4. SoundcraftMidi20MpeVst3ClapPluginPrEngine (MIDI 2.0 / MPE expression control, piano roll automation curves, VST3/CLAP plugin hosting sandbox & state serialization)
-// 5. SoundcraftMasteringEbuR128LoudnessLimiterPrEngine (EBU R128 integrated LUFS loudness meter, multiband mastering compressor, true-peak brickwall limiter & dynamic EQ)
-// 6. SoundcraftRealtimeCrdtCoAuthoringPrEngine (Multi-user CRDT DAW session sync, lockless track edits, stem delta sharing & project history diffs)
-// 7. SoundcraftNeuralStemSeparationAiDenoisePrEngine (AI-driven neural stem separation, spectral noise suppression & dereverberation)
-// 8. SoundcraftAnalogTapeConsoleSaturationPrEngine (Analog tape saturation modeling, vintage console channel strip emulation & harmonic distortion)
-// 9. SoundcraftInteractiveScoreSheetNotationPrEngine (Interactive sheet music score notation editor, MusicXML / MIDI import-export & dynamic engraving layout)
-// 10. SoundcraftMasterSessionTemplateCascadePrEngine (Master session routing template hierarchy, global audio bus cascading & track preset palette syncer)
-// 11. SovereignSoundcraftArtcraftParityPrGateway & SoundcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
+use core::f32::consts::PI;
 
 
 
@@ -874,6 +862,9 @@ impl SoundcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_soundcraft_artcraft_parity_pr_gateway() {

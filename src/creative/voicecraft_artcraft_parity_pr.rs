@@ -1,35 +1,26 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/voicecraft_artcraft_parity_pr.rs`)
-//
-// Bridges VoiceCraft (Sovereign On-Device Speech Synthesis & Audio DSP Engine) and
-// ArtCraft creative audio parity via structured PR proposals.
-// Provides implementations for 5 advanced speech & neural audio DSP components:
-// 1. VoicecraftNeuralPitchProsodyContourPrEngine (F0 fundamental frequency curve pitch contour extraction, prosody curve styling, and duration pitch-shift scaling)
-// 2. VoicecraftMultiSpeakerStyleMorphingPrEngine (Multi-speaker timbre interpolation, emotional style morphing [neutral, happy, whisper, energetic], and embedding blending)
-// 3. VoicecraftFormantShifterAcousticResonancePrEngine (Vocal tract length scaling, formant frequency shift, and resonant filter pole tuning without affecting pitch)
-// 4. VoicecraftSubframeAudioPacketStreamerPrEngine (Real-time subframe PCM audio packet ring buffer, jitter buffer smoothing, and low-latency audio stream dispatcher)
-// 5. VoicecraftSpeechToTextWordTimestampAlignerPrEngine (Forced audio-to-text alignment, word timestamp extraction, and subtitle SRT/VTT generation)
-// 6. SovereignVoicecraftArtcraftParityPrGateway & VoicecraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
-
-
-
-
-
-#[cfg(not(test))]
+use core::f32::consts::PI;
 
 #[cfg(test)]
 #[path = "voicecraft.rs"]
 mod voicecraft;
+
 #[cfg(test)]
+use voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
+
+#[cfg(not(test))]
+use super::voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -537,6 +528,9 @@ impl Default for VoicecraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_neural_pitch_prosody_contour_engine() {

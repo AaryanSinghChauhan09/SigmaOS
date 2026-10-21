@@ -1,23 +1,16 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft to ArtCraft Parity & 3D Spatial Innovations PR Proposal Engine
 // (`src/creative/threedcraft_artcraft_parity_pr.rs`)
-//
-// Bridges 3DCraft / Model3D spatial computing & rendering features to ArtCraft and SigmaOS
-// via structured PR proposals and clean-room engine implementations:
-// 1. ThreeDCraftSubsurfaceScatteringPrEngine (BSSRDF dipole model, volumetric light diffusion & translucent material profiles)
-// 2. ThreeDCraftOpenUsdSceneGraphPrEngine (OpenUSD Universal Scene Description stage composition, layer stacking & prim traversal)
-// 3. ThreeDCraftAutomaticUvUnwrappingPrEngine (Least Squares Conformal Maps [LSCM] UV unwrapping, seam heuristics & texture baking)
-// 4. ThreeDCraftRealtimeParticlePhysicsPrEngine (GPU particle physics, SDF collider, force fields & Verlet integration)
-// 5. ThreeDCraftWayland3dSpatialCompositorPrEngine (Wayland 3D spatial window compositing, VR/AR projection & stereoscopic eye matrices)
-// 6. SovereignThreeDCraftArtcraftParityPrGateway & ThreeDCraftArtcraftParityPrSuite (Master PR Gateway Coordinator & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
+use core::f32::consts::PI;
 
 
 
@@ -741,6 +734,9 @@ impl Default for ThreeDCraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_threedcraft_artcraft_parity_pr_gateway() {

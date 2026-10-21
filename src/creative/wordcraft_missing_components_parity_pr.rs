@@ -1,22 +1,14 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Wordcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/wordcraft_missing_components_parity_pr.rs`)
-//
-// Provides structured PR proposals and full engine implementations for components
-// missing in SigmaOS when compared to ArtCraft Wordcraft document processing capabilities:
-// 1. WordcraftTypographyLayoutPrEngine (Advanced OpenType kerning, ligatures, hyphenation, drop caps, multi-column layout & text wrapping around shapes)
-// 2. WordcraftStylesTemplatesThemesPrEngine (Hierarchical styles inheritance, font/color themes, and smart document templates)
-// 3. WordcraftReferenceCitationBibliographyPrEngine (Footnotes/endnotes, citations (APA/MLA/Chicago/IEEE), dynamic TOC & caption cross-references)
-// 4. WordcraftLinguisticAiSpellGrammarPrEngine (Multilingual spell checking, grammar linting, AI completion, thesaurus & readability scoring)
-// 5. WordcraftRealtimeCrdtCollabPrEngine (CRDT operational document deltas, selection presence, and point-in-time version history diffs)
-// 6. WordcraftMailMergeAutomationPrEngine (Data source binding, template field substitution, batch document processing & form generation)
-// 7. SovereignWordcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -1153,6 +1145,9 @@ impl Default for SovereignWordcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_wordcraft_parity_pr_gateway() {

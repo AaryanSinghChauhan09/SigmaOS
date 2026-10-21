@@ -1,22 +1,14 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/cadcraft_missing_components_parity_pr.rs`)
-//
-// Provides structured PR proposals and full engine implementations for components
-// missing in SigmaOS when compared to ArtCraft CadCraft CAD/CAM/CAE ecosystem capabilities:
-// 1. CadcraftNurbsCurveSurfacePrEngine (Non-Uniform Rational B-Spline curves/surfaces, knot vectors, G0/G1/G2/G3 continuity & trim evaluation)
-// 2. CadcraftParametricConstraintSolver3dPrEngine (3D spatial assembly kinematic mates, spherical/cylindrical/gear/screw & 6-DOF solver)
-// 3. CadcraftMultiAxisCncCamToolpathPrEngine (3/4/5-axis continuous CNC CAM, High-Speed Machining (HSM) trochoidal milling & multi-dialect post-processor)
-// 4. CadcraftNonLinearTransientFeaCaePrEngine (Transient thermal-structural FEA, element stiffness matrices, modal natural frequencies & thermal expansion)
-// 5. CadcraftSheetMetalSurfaceUnfoldPrEngine (Sheet metal bend deduction, K-factor compensation, hem edges & flat pattern DXF unfolding)
-// 6. CadcraftEdaPcb3dIntegrationPrEngine (3D ECAD/MCAD electronics PCB clearance, STEP AP242 parsing & enclosure collision detection)
-// 7. SovereignCadcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -710,6 +702,9 @@ impl Default for SovereignCadcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_cadcraft_parity_pr_gateway() {

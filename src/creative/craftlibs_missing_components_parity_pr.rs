@@ -1,24 +1,14 @@
 #![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CraftLibs Missing Components Parity PR Gateway Module
 // (`src/creative/craftlibs_missing_components_parity_pr.rs`)
-//
-// Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft CraftLibs
-// foundational creative core components in Pull Request proposal format:
-// 1. CraftlibsSimdColorSpaceTransformPrEngine (Display P3, Rec.2020, ACEScg, Adobe RGB & Bradford adaptation)
-// 2. CraftlibsIccProfileColorManagementPrEngine (LittleCMS ICC profile parsing, rendering intents & 3D CLUTs)
-// 3. CraftlibsLayerBlendModesPrEngine (25+ blend modes: Normal, Multiply, Screen, Overlay, Color Dodge, etc.)
-// 4. CraftlibsLibvipsTilePipelinePrEngine (libvips demand-driven streaming image tile processing & ROI cache)
-// 5. CraftlibsVectorPathGeometryPrEngine (Skia-inspired Bezier flattening, stroke expansion & fill rules)
-// 6. CraftlibsSkiaCanvasRendererPrEngine (Skia-inspired vector canvas, anti-aliased edge rasterizer & gradient shaders)
-// 7. CraftlibsSdfTypographyGlyphPrEngine (HarfBuzz/FreeType SDF/MSDF font glyph rendering & script shaping)
-// 8. SovereignCraftlibsMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
-
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -951,6 +941,9 @@ impl Default for CraftlibsMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_color_transform_engine() {

@@ -1,22 +1,14 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Figcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/figcraft_missing_components_parity_pr.rs`)
-//
-// Provides structured PR proposals and full engine implementations for components
-// missing in SigmaOS when compared to ArtCraft Figcraft UI/UX vector canvas capabilities:
-// 1. FigcraftAdvancedAutoLayoutConstraintPrEngine (Auto-layout flexbox/grid containers, gap/padding, hug/fill constraints & responsive rules)
-// 2. FigcraftDesignSystemTokensVariablesPrEngine (Design system tokens, multi-mode variables for Light/Dark, component variants & token aliasing)
-// 3. FigcraftInteractivePrototypingSmartAnimatePrEngine (Interactive prototyping triggers, smart animate layer matching, overlays & transitions)
-// 4. FigcraftVectorNetworkBooleanOpsPrEngine (Bezier vector networks, non-destructive boolean operations: Union, Subtract, Intersect, Exclude)
-// 5. FigcraftMultiUserCrdtCollaborationPrEngine (Multi-user CRDT real-time editing, live cursors, selection sync & conflict resolution)
-// 6. FigcraftDevModeMultiFrameworkExporterPrEngine (Dev Mode inspect code generation for CSS, Tailwind, SwiftUI, Jetpack Compose, Flutter, SVG/PDF)
-// 7. SovereignFigcraftArtcraftParityPrGateway & FigcraftMissingComponentsParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -1168,6 +1160,9 @@ impl Default for FigcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_figcraft_parity_pr_gateway() {

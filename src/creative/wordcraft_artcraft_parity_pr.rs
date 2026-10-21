@@ -1,26 +1,14 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Wordcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/wordcraft_artcraft_parity_pr.rs`)
-//
-// Bridges Wordcraft (Word Processor & Document Processing Framework) and ArtCraft WordCraft missing feature parity via structured PR proposals.
-// Provides implementations for 10 missing components:
-// 1. WordcraftOpenTypeTypographyLayoutPrEngine (OpenType kerning, ligatures, hyphenation, drop caps, multi-column layout & text wrapping around shapes)
-// 2. WordcraftStyleHierarchyThemeCascadePrEngine (Hierarchical styles inheritance, font/color theme palette cascading & smart document templates)
-// 3. WordcraftCitationBibliographyCrossReferencePrEngine (Footnotes/endnotes, citations (APA, MLA, Chicago, IEEE), dynamic TOC & caption cross-references)
-// 4. WordcraftLinguisticAiSpellGrammarPrEngine (Multilingual spell checking, grammar linting, AI completion, thesaurus & readability scoring)
-// 5. WordcraftCrdtMultiUserCoAuthoringPrEngine (CRDT operational document deltas, selection presence & point-in-time version history diffs)
-// 6. WordcraftMailMergeAutomationPrEngine (Data source binding, template field substitution, batch document processing & form field generation)
-// 7. WordcraftEpubPdfBookPublisherPrEngine (EPUB3/PDF book publishing, master page headers/footers, trim marks & print preflight validation)
-// 8. WordcraftTableFormulaChartPrEngine (Embedded table cell grids, formula evaluation (SUM, AVERAGE, COUNT, MAX, MIN) & SVG vector chart generator)
-// 9. WordcraftDocumentSecurityWatermarkPrEngine (Document watermarking, digital signatures, redacted text masking & permission access policies)
-// 10. WordcraftMasterTemplateThemeCascadePrEngine (Master document template hierarchy, global style inheritance & brand palette synchronization)
-// 11. SovereignWordcraftArtcraftParityPrGateway & WordcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -867,6 +855,9 @@ impl SovereignWordcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_opentype_typography_engine() {

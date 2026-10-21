@@ -1,34 +1,26 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/voicecraft_missing_components_parity_pr.rs`)
-//
-// Provides structured PR proposals and full engine implementations for components
-// missing in SigmaOS when compared to Voicecraft / ArtCraft speech & audio DSP capabilities:
-// 1. VoicecraftNeuralTtsInferencePrEngine (FastSpeech2 acoustic duration predictor & HiFi-GAN neural vocoder mel-spectrogram synthesis)
-// 2. VoicecraftAcousticPhonemizerG2pPrEngine (Grapheme-to-Phoneme (G2P) rule-based dictionary & ARPAbet/IPA alignment)
-// 3. VoicecraftZeroShotVoiceCloningPrEngine (Speaker embedding vector extraction, mel-spectrogram conditioning & timbre transfer)
-// 4. VoicecraftRealtimeStreamingDenoiserPrEngine (Spectral subtraction, Wiener filter noise suppression & low-latency STFT windowing)
-// 5. VoicecraftWaylandAccessibilityVoiceControlPrEngine (Wayland desktop action dispatcher, speech intent parsing & voice navigation)
-// 6. SovereignVoicecraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f32::consts::PI;
-
-
-
-
-
-#[cfg(not(test))]
 
 #[cfg(test)]
 #[path = "voicecraft.rs"]
 mod voicecraft;
+
 #[cfg(test)]
+use voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
+
+#[cfg(not(test))]
+use super::voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
 
 /// Structured PR proposal manifest for missing VoiceCraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -483,6 +475,9 @@ impl SovereignVoicecraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::{String, ToString};
+    use alloc::vec;
 
     #[test]
     fn test_neural_tts_inference_engine() {

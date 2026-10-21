@@ -1,28 +1,15 @@
 #![no_std]
-#![no_std]
+
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Effectcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/effectcraft_artcraft_parity_pr.rs`)
-//
-// Bridges Effectcraft (VFX & Compositing Engine) and ArtCraft EffectCraft missing feature parity via structured PR proposals.
-// Provides implementations for 10 missing components:
-// 1. EffectcraftCameraTracker3dReconstructionPrEngine (3D Camera Tracking, survey point calibration & ground plane solver)
-// 2. EffectcraftVolumetricLightingRaymarchingPrEngine (Volumetric light shafts, atmospheric fog & GPU raymarching)
-// 3. EffectcraftDeepCompositingExrChannelPrEngine (Deep pixel Z-sample compositing & opacity merging)
-// 4. EffectcraftSubsurfaceScatteringSkinShaderPrEngine (Subsurface Scattering [SSS], dipole diffusion profiler & skin shader)
-// 5. EffectcraftGpuFluidDynamicsSimulationPrEngine (Navier-Stokes 2D/3D grid fluid simulation, smoke & combustion)
-// 6. EffectcraftTimeWarpRetimingOpticalFlowPrEngine (Optical flow frame retiming, speed curve interpolation & super slow-motion)
-// 7. EffectcraftCleanPlateWireRemovalPrEngine (Temporal clean plate generation, patch auto-alignment & rig removal)
-// 8. EffectcraftColorMatchPytorchGradePrEngine (Automated color matching, 3D histogram alignment & palette transfer)
-// 9. EffectcraftProjectionMapping3dMeshPrEngine (UV surface camera projection mapping & 3D mesh unwrap)
-// 10. EffectcraftStereoscopic3dDepthMapPrEngine (Stereoscopic 3D anaglyph rendering & disparity map synthesis)
-// 11. SovereignEffectcraftArtcraftParityPrGateway & EffectcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
+use core::f32::consts::PI;
 
 
 
@@ -930,6 +917,9 @@ impl Default for EffectcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_effectcraft_artcraft_parity_pr_gateway() {
