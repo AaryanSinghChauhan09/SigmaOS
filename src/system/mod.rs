@@ -131,6 +131,7 @@ pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
 pub mod sigmaauditmanager;
+pub mod sigmaaudiomanager2;
 pub mod sigmadisplaymanager2;
 pub mod sigmainstallmanager;
 pub mod sigmamigrationmanager;
@@ -210,6 +211,10 @@ pub use sigmathememanager2::{
 pub use sigmadisplaymanager2::{
     DisplayMode as DisplayManager2Mode, DisplayOutput as DisplayManager2Output,
     DisplayState as DisplayManager2State, SigmaDisplayManager as SigmaDisplayManager2,
+};
+pub use sigmaaudiomanager2::{
+    AudioDevice as AudioManager2Device, AudioDeviceState as AudioManager2State,
+    AudioDeviceType as AudioManager2Type, SigmaAudioManager2,
 };
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
