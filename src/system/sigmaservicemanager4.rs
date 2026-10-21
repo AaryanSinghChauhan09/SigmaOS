@@ -1,25 +1,16 @@
 // SPDX-License-Identifier: MIT
-// SigmaOS Service Manager 4 Engine (`src/system/sigmaservicemanager4.rs`)
+// SigmaOS Service Manager 4
 
-#![allow(dead_code)]
-
-#[cfg(not(any(feature = "standalone_test", test)))]
+#![no_std]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::String;
+use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::String;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ServiceState {
     Stopped,
-    Active,
+    Running,
     Failed,
 }
 
@@ -29,9 +20,9 @@ pub struct Service {
     pub state: ServiceState,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct SigmaServiceManager4 {
-    pub services: BTreeMap<String, Service>,
+    pub services: Vec<Service>,
 }
 
 impl SigmaServiceManager4 {
