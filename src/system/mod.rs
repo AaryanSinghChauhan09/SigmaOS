@@ -167,6 +167,7 @@ pub mod sigmacertificatemanager;
 pub mod sigmadnsmanager2;
 pub mod sigmakernelmanager;
 pub mod sigmacronmanager2;
+pub mod sigmametricsmanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -361,6 +362,11 @@ pub use sigmakernelmanager::{
 pub use sigmacronmanager2::{
     CronJob as CronManager2Job, CronManager2JobState, CronSchedule as CronManager2Schedule,
     SigmaCronManager2,
+};
+pub use sigmametricsmanager::{
+    CollectorState as MetricsCollectorState, CollectorType as MetricsCollectorType,
+    Metric as MetricsMetric, MetricCollector as MetricsCollector, MetricLabel as MetricsLabel,
+    MetricType as MetricsType, MetricsManager,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
