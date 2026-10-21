@@ -110,69 +110,37 @@ pub use sigmasystemmonitor2::{
     ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2,
     SystemMetrics,
 };
+pub mod sigmacommandmanager;
 pub mod sigmacontainermanager;
 pub mod sigmarepositorymanager;
 pub mod sigmaresourcemanager;
 pub mod sigmasnapshotmanager;
-pub mod sigmathememanager;
 pub mod sigmavirtualizationmanager;
 pub use sigmabackupmanager::{
     BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus,
     BackupType as BackupManagerType, SigmaBackupManager as BackupManager,
 };
-pub mod sigmaaliasmanager;
-pub mod sigmacapturemanager;
-pub mod sigmaenvironmentmanager;
-pub mod sigmahardwaremanager;
-pub mod sigmahelpermanager;
-pub mod sigmalaunchmanager;
-pub mod sigmamenumanager;
-pub mod sigmamigrationmanager;
-pub mod sigmapathmanager;
-pub mod sigmaprivilegemanager;
-pub mod sigmaprofilemanager;
-pub mod sigmarefreshmanager;
-pub mod sigmarestartmanager;
-pub mod sigmasessionmanager;
-pub mod sigmasetupmanager;
-pub mod sigmastallmanager;
-pub mod sigmafilewatcher;
-pub mod sigmaapplicationmanager;
-pub mod sigmaauditmanager;
-pub mod sigmaaudiomanager2;
-pub mod sigmadisplaymanager2;
-pub mod sigmabluetoothmanager2;
-pub mod sigmainstallmanager;
-pub mod sigmanetworkmanager3;
-pub mod sigmapackagemanager3;
-pub mod sigmapowermanager2;
-pub mod sigmaprocessmanager;
-pub mod sigmaschedulermanager;
-pub mod sigmasecuritymanager2;
-pub mod sigmaservicemanager4;
-pub mod sigmasetupmanager2;
-pub mod sigmastoragemanager;
-pub mod sigmathememanager2;
-pub mod sigmawizardmanager;
-pub mod sigmatemplatemanager;
-pub mod sigmatogglemanager;
-pub mod sigmaupdatemanager2;
-pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
-pub use sigmacapturemanager::{
-    Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
-};
 pub use sigmacommandmanager::{
     Command as CommandManagerCommand, CommandPermission as CommandManagerPermission,
     CommandType as CommandManagerType, SigmaCommandManager,
-};
-pub use sigmaconfigmanager::{
-    ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager,
 };
 pub use sigmacontainermanager::{
     Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig,
     ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager,
 };
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
+pub use sigmarepositorymanager::{
+    Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType,
+    SigmaRepositoryManager as RepositoryManager,
+};
+pub use sigmaresourcemanager::{
+    ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota,
+    ResourceType as ResourceManagerType, SigmaResourceManager as ResourceManager,
+};
+pub use sigmasnapshotmanager::{
+    SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot,
+    SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType,
+};
 pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,

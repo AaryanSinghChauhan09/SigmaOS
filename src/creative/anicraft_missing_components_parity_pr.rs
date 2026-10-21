@@ -1,4 +1,3 @@
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
@@ -9,6 +8,10 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+
+
+
+
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
