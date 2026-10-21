@@ -136,6 +136,7 @@ pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
 pub mod sigmapackagemanager3;
 pub mod sigmaservicemanager4;
+pub mod sigmastoragemanager;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
 pub mod sigmaprofilemanager;
@@ -166,6 +167,10 @@ pub use sigmapackagemanager3::{
 pub use sigmaservicemanager4::{
     Service as ServiceManagerService, ServiceState as ServiceManagerState,
     SigmaServiceManager4,
+};
+pub use sigmastoragemanager::{
+    FilesystemType as StorageFilesystemType, MountState as StorageMountState,
+    StorageDevice, StorageType, SigmaStorageManager,
 };
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
