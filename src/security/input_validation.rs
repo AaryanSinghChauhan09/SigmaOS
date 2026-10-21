@@ -206,20 +206,30 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::TooLong);
     }
 
-    // Reject percent-encoded NUL bytes (%00) and percent-encoded control / CRLF characters
-    // (%0d, %0D, %0a, %0A, %1b, %1B, %7f, %7F) to prevent HTTP header injection, request smuggling,
-    // and C-ABI NUL truncation vulnerabilities (CWE-113 / CWE-626 / CWE-918).
-    if url.windows(3).any(|w| {
-        w[0] == b'%'
-            && ((w[1] == b'0' && w[2] == b'0')
-                || (w[1] == b'0' && (w[2] == b'd' || w[2] == b'D' || w[2] == b'a' || w[2] == b'A'))
-                || (w[1] == b'1' && (w[2] == b'b' || w[2] == b'B'))
-                || (w[1] == b'7' && (w[2] == b'f' || w[2] == b'F')))
-    }) {
-        if url
+    // Reject percent-encoded (%XY) and double-percent-encoded (%25XY) NUL bytes and
+    // ASCII control / CRLF characters (0x00..0x1F, 0x7F) to prevent HTTP header injection,
+    // request smuggling, terminal hijacking, and C-ABI string truncation (CWE-113 / CWE-150 / CWE-626 / CWE-918).
+    let is_ctrl_hex = |h1: u8, h2: u8| -> bool {
+        ((h1 == b'0' || h1 == b'1') && h2.is_ascii_hexdigit())
+            || (h1 == b'7' && (h2 == b'f' || h2 == b'F'))
+    };
+
+    let has_single_encoded_ctrl = url
+        .windows(3)
+        .any(|w| w[0] == b'%' && is_ctrl_hex(w[1], w[2]));
+    let has_double_encoded_ctrl = url
+        .windows(5)
+        .any(|w| w[0] == b'%' && w[1] == b'2' && w[2] == b'5' && is_ctrl_hex(w[3], w[4]));
+
+    if has_single_encoded_ctrl || has_double_encoded_ctrl {
+        let is_nul_single = url
             .windows(3)
-            .any(|w| w[0] == b'%' && w[1] == b'0' && w[2] == b'0')
-        {
+            .any(|w| w[0] == b'%' && w[1] == b'0' && w[2] == b'0');
+        let is_nul_double = url
+            .windows(5)
+            .any(|w| w[0] == b'%' && w[1] == b'2' && w[2] == b'5' && w[3] == b'0' && w[4] == b'0');
+
+        if is_nul_single || is_nul_double {
             return Err(ValidationError::NullByte);
         }
         return Err(ValidationError::InvalidChars);
@@ -1249,6 +1259,10 @@ mod tests {
             validate_url(b"http://example.com/page?id=1%00.jpg"),
             Err(ValidationError::NullByte)
         );
+        assert_eq!(
+            validate_url(b"http://example.com/page?id=1%2500.jpg"),
+            Err(ValidationError::NullByte)
+        );
 
         // Percent-encoded CRLF and control sequence rejection (CWE-113 / HTTP Request Smuggling & Header Injection)
         assert_eq!(
@@ -1257,6 +1271,18 @@ mod tests {
         );
         assert_eq!(
             validate_url(b"http://example.com/api?p=1%0D%0AHost:evil.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/api?p=1%250d%250aSet-Cookie:session=evil"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/path%09tab"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com/path%251f"),
             Err(ValidationError::InvalidChars)
         );
         assert_eq!(

@@ -13,7 +13,7 @@
 **Learning:** Checking only literal raw bytes leaves applications vulnerable when downstream network components decode percent-encoded control sequences or C-ABI string handlers truncate at `%00`.
 **Prevention:** Always scan URL byte slices for percent-encoded NUL bytes (`%00`), CRLF sequences (`%0d`/`%0a`), and encoded userinfo credentials (`%40`) in input validation routines before URL processing or forwarding.
 
-## 2026-10-19 - Double Percent-Encoded Authority Boundary Injection Security
-**Vulnerability:** `validate_url` checked literal userinfo credentials (`@`) and single percent-encoded `@` (`%40`), but missed double percent-encoded credentials (`%2540`) and single/double-encoded authority boundary delimiters (`%2f`, `%23`, `%3f`, `%5c`, `%2523`, `%253f`, `%252f`, `%255c`) in authority segments, enabling SSRF, host header injection, and authority parser differential bypasses (CWE-918 / CWE-292 / CWE-838).
-**Learning:** Downstream web proxies and URL parsers decode percent-encoded boundary characters, shifting the authority boundary after validation if percent-encoded delimiters (`%23`, `%3f`, `%2f`, `%2523`, `%2540`) are allowed in authority segments.
-**Prevention:** Always scan URL authority slices for single and double percent-encoded boundary delimiters (`%2f`, `%23`, `%3f`, `%5c`, `%40`, `%2523`, `%2540`, `%252f`, `%253f`, `%255c`) to guarantee consistent authority boundaries across intermediate proxies and backend handlers.
+## 2026-10-19 - Double Percent-Encoded ASCII Control Character Injection Security
+**Vulnerability:** `validate_url` checked single percent-encoded control characters (`%00`..`%1F`), but allowed double percent-encoded control sequences (`%2500`..`%251F`, `%257F`) which downstream multi-pass decoders resolve to raw control characters or C-ABI NUL terminators, enabling HTTP header injection, request smuggling, and bypass of URL input filters (CWE-113 / CWE-150 / CWE-626).
+**Learning:** Single-pass URL filters that inspect only `%XY` miss double-encoded entities (`%25XY`) when multi-stage web frameworks or proxies perform double unescaping.
+**Prevention:** Always inspect byte slices for both single percent-encoded (`%XY`) and double percent-encoded (`%25XY`) hex representations of ASCII control characters (0x00..0x1F, 0x7F) in input validation.
