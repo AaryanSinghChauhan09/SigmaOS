@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
 //
@@ -15,10 +15,9 @@
 // 6. GridcraftMacroScriptingUdfPrEngine (Macro action recorder, WASM/script sandbox & User-Defined Functions UDF registry)
 // 7. SovereignGridcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
 
@@ -267,12 +266,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
             Some(ValidationRule::List(allowed)) => allowed.contains(&value_str.to_string()),
             Some(ValidationRule::NumberRange { min, max }) => {
                 if let Ok(val) = value_str.parse::<f64>() {
-                    val >= min && val <= max
+                    val >= *min && val <= *max
                 } else {
                     false
                 }
             }
-            Some(ValidationRule::CustomRegex(pattern)) => value_str.contains(&pattern),
+            Some(ValidationRule::CustomRegex(pattern)) => value_str.contains(&*pattern),
             None => true,
         }
     }
@@ -284,15 +283,15 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
     pub fn evaluate_conditional_style(&self, col: u32, row: u32, value: f64) -> Option<u32> {
         match self.format_rules.get(&(col, row)) {
             Some(ConditionalFormatRule::CellGreaterThan(thresh, color)) => {
-                if value > thresh {
-                    Some(color)
+                if value > *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
             }
             Some(ConditionalFormatRule::CellLessThan(thresh, color)) => {
-                if value < thresh {
-                    Some(color)
+                if value < *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
@@ -302,12 +301,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 max_color,
             }) => {
                 if value > 50.0 {
-                    Some(max_color)
+                    Some(*max_color)
                 } else {
-                    Some(min_color)
+                    Some(*min_color)
                 }
             }
-            Some(ConditionalFormatRule::DataBar { bar_color }) => Some(bar_color),
+            Some(ConditionalFormatRule::DataBar { bar_color }) => Some(*bar_color),
             None => None,
         }
     }
@@ -849,6 +848,7 @@ impl Default for SovereignGridcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_gridcraft_parity_pr_gateway() {

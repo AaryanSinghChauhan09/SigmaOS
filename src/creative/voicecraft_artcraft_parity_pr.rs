@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/voicecraft_artcraft_parity_pr.rs`)
@@ -14,22 +14,18 @@
 // 5. VoicecraftSpeechToTextWordTimestampAlignerPrEngine (Forced audio-to-text alignment, word timestamp extraction, and subtitle SRT/VTT generation)
 // 6. SovereignVoicecraftArtcraftParityPrGateway & VoicecraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
 
 
 
 
-#[cfg(not(test))]
-
-#[cfg(test)]
 #[path = "voicecraft.rs"]
 mod voicecraft;
-#[cfg(test)]
+use self::voicecraft::*;
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -537,6 +533,7 @@ impl Default for VoicecraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_neural_pitch_prosody_contour_engine() {

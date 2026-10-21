@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Wordcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/wordcraft_missing_components_parity_pr.rs`)
@@ -14,10 +14,9 @@
 // 6. WordcraftMailMergeAutomationPrEngine (Data source binding, template field substitution, batch document processing & form generation)
 // 7. SovereignWordcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
 
@@ -1153,6 +1152,7 @@ impl Default for SovereignWordcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_wordcraft_parity_pr_gateway() {

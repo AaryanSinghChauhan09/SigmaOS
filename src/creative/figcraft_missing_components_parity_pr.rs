@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Figcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/figcraft_missing_components_parity_pr.rs`)
@@ -14,10 +14,9 @@
 // 6. FigcraftDevModeMultiFrameworkExporterPrEngine (Dev Mode inspect code generation for CSS, Tailwind, SwiftUI, Jetpack Compose, Flutter, SVG/PDF)
 // 7. SovereignFigcraftArtcraftParityPrGateway & FigcraftMissingComponentsParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
 
@@ -1168,6 +1167,7 @@ impl Default for FigcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_figcraft_parity_pr_gateway() {

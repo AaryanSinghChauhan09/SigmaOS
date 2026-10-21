@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Effectcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/effectcraft_artcraft_parity_pr.rs`)
@@ -18,10 +18,9 @@
 // 10. EffectcraftStereoscopic3dDepthMapPrEngine (Stereoscopic 3D anaglyph rendering & disparity map synthesis)
 // 11. SovereignEffectcraftArtcraftParityPrGateway & EffectcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
 
@@ -930,6 +929,7 @@ impl Default for EffectcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_effectcraft_artcraft_parity_pr_gateway() {

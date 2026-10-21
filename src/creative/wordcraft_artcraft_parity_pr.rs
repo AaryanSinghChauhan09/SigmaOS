@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Wordcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/wordcraft_artcraft_parity_pr.rs`)
@@ -18,10 +18,9 @@
 // 10. WordcraftMasterTemplateThemeCascadePrEngine (Master document template hierarchy, global style inheritance & brand palette synchronization)
 // 11. SovereignWordcraftArtcraftParityPrGateway & WordcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
 
@@ -867,6 +866,7 @@ impl SovereignWordcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_opentype_typography_engine() {
