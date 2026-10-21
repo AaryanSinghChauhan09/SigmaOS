@@ -183,7 +183,7 @@ mod tests {
             "/source".to_string(),
             "/dest".to_string(),
         );
-        manager.start_backup(backup.id.clone()).unwrap();
+        manager.start_backup(backup.id).unwrap();
         manager.complete_backup(backup.id, 1000).unwrap();
         assert_eq!(manager.get_backups()[0].status, BackupStatus::Completed);
         assert_eq!(manager.get_backups()[0].size_bytes, 1000);
