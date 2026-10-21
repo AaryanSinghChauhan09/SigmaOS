@@ -131,6 +131,7 @@ pub mod sigmahelpermanager;
 pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
+pub mod sigmaauditmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
 pub mod sigmapackagemanager3;
@@ -149,6 +150,10 @@ pub mod sigmaupdatemanager2;
 pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
 pub use sigmaapplicationmanager::{
     Application, AppState, SigmaApplicationManager,
+};
+pub use sigmaauditmanager::{
+    AuditEvent as AuditManagerEvent, AuditEventType as AuditManagerEventType,
+    AuditSeverity as AuditManagerSeverity, SigmaAuditManager,
 };
 pub use sigmanetworkmanager3::{
     InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
