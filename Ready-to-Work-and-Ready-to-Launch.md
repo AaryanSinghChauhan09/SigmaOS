@@ -18,17 +18,21 @@ SigmaOS is designed to boot, install, and work out-of-the-box, taking inspiratio
 
 ### Quick Start (Run NOW)
 ```bash
-# Build bootable stub ISO (no Rust kernel needed)
-make iso-stub
+# 1. Launch interactive SigmaOS Sovereign Workstation (auto-detects QEMU; falls back to native CLI):
+make run
+# or:
+make launch
+# or directly:
+bin/sigmaos-launch
 
-# Check everything is in order
+# 2. Check system & launch readiness (21-point automated check):
 make launch-check
 
-# Boot in QEMU (install qemu-system-x86 first)
-make run-stub
+# 3. Build bootable stub ISO (no Rust kernel needed, GRUB2 El Torito):
+make iso-stub
 
-# Or manually:
-qemu-system-x86_64 -m 512 -cdrom build/sigmaos-desktop-preview.iso -serial stdio
+# 4. Boot in QEMU (if qemu-system-x86_64 installed):
+make run-stub
 ```
 
 ---
