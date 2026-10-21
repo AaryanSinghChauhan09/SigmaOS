@@ -1,7 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
-use alloc::format;
-use alloc::collections::BTreeMap;
 // SigmaOS - Effectcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/effectcraft_artcraft_parity_pr.rs`)
 //
@@ -20,16 +17,23 @@ use alloc::collections::BTreeMap;
 // 11. SovereignEffectcraftArtcraftParityPrGateway & EffectcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
+#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Effectcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -537,7 +541,6 @@ impl EffectcraftCleanPlateWireRemovalPrEngine {
                 clean_frame[px + 2] = frame_sequence[0][px + 2];
                 clean_frame[px + 3] = 255;
             } else {
- {
                 clean_frame[px] = frame_sequence[0][px];
                 clean_frame[px + 1] = frame_sequence[0][px + 1];
                 clean_frame[px + 2] = frame_sequence[0][px + 2];

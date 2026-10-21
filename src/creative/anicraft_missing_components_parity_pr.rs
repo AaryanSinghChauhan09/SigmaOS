@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 //
@@ -12,20 +11,21 @@ use alloc::string::{String, ToString};
 // 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -459,7 +459,6 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
                 let active_viseme = if progress <= 0.5 {
                     m0.viseme
                 } else {
- {
                     m1.viseme
                 };
                 return (active_viseme, blended_intensity);
@@ -659,7 +658,6 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

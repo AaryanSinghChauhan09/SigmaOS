@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
 //
@@ -19,29 +18,21 @@ use alloc::string::{String, ToString};
 // 11. SovereignAnicraftArtcraftParityPrGateway & AnicraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
-
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-
-#[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest for AniCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -207,7 +198,6 @@ impl AnicraftForwardInverseKinematicsBoneRiggingPrEngine {
             let end_y = start_y + bone.length * total_angle.sin();
             (end_x, end_y)
         } else {
- {
             (0.0, 0.0)
         }
     }
@@ -415,23 +405,14 @@ impl AnicraftAudioVisemeLipsyncTimelinePrEngine {
         if freq_hz < 300.0 {
             VisemeType::M
         } else if freq_hz < 800.0 {
- {
- {
             VisemeType::U
         } else if freq_hz < 1500.0 {
- {
- {
             VisemeType::O
         } else if freq_hz < 2500.0 {
- {
- {
             VisemeType::A
         } else if freq_hz < 4000.0 {
- {
- {
             VisemeType::E
         } else {
- {
             VisemeType::I
         }
     }
@@ -866,7 +847,6 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

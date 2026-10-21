@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - Deckcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/deckcraft_artcraft_parity_pr.rs`)
 //
@@ -18,21 +17,21 @@ use alloc::string::{String, ToString};
 // 11. SovereignDeckcraftArtcraftParityPrGateway & DeckcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Deckcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -130,7 +129,6 @@ impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
         let progress = if duration > 0.0 {
             (time_ms - kf0.0) as f32 / duration
         } else {
- {
             1.0
         };
 
@@ -139,7 +137,6 @@ impl DeckcraftVectorMorphingKeyframeAnimationPrEngine {
                 if progress < 0.5 {
                     2.0 * progress * progress
                 } else {
- {
                     -1.0 + (4.0 - 2.0 * progress) * progress
                 }
             }
@@ -331,7 +328,6 @@ impl DeckcraftLiveDataDrivenChartsPrEngine {
             series.values = new_values;
             true
         } else {
- {
             false
         }
     }
@@ -477,7 +473,6 @@ impl DeckcraftCrdtMultiUserCoAuthoringPrEngine {
                 if delta.lamport_ts > existing.lamport_ts {
                     replace_idx = Some(i);
                 } else {
- {
                     return false;
                 }
                 break;
@@ -487,7 +482,6 @@ impl DeckcraftCrdtMultiUserCoAuthoringPrEngine {
         if let Some(idx) = replace_idx {
             self.delta_log[idx] = delta;
         } else {
- {
             self.delta_log.push(delta);
         }
         true

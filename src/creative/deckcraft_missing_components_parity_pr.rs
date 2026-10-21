@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - Deckcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/deckcraft_missing_components_parity_pr.rs`)
 //
@@ -22,22 +21,21 @@ use alloc::string::{String, ToString};
 // 15. SovereignDeckcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest for missing Deckcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -154,7 +152,6 @@ impl DeckcraftAdvancedVectorAnimationTimelinePrEngine {
                 let progress = if duration > 0.0 {
                     (timestamp_ms - kf1.timestamp_ms) as f32 / duration
                 } else {
- {
                     1.0
                 };
 
@@ -164,7 +161,6 @@ impl DeckcraftAdvancedVectorAnimationTimelinePrEngine {
                         if progress < 0.5 {
                             4.0 * progress * progress * progress
                         } else {
- {
                             1.0 - (-2.0 * progress + 2.0).powi(3) / 2.0
                         }
                     }
@@ -545,7 +541,6 @@ impl DeckcraftRealtimeCrdtMultiUserCollabPrEngine {
                 if delta.timestamp_lamport > existing.timestamp_lamport {
                     replace_idx = Some(i);
                 } else {
- {
                     return false; // Stale edit ignored
                 }
                 break;
@@ -555,7 +550,6 @@ impl DeckcraftRealtimeCrdtMultiUserCollabPrEngine {
         if let Some(idx) = replace_idx {
             self.delta_log[idx] = delta;
         } else {
- {
             self.delta_log.push(delta);
         }
         true
@@ -631,7 +625,6 @@ impl DeckcraftAiSlideGeneratorLayoutSmartDesignPrEngine {
                 ],
             ));
         } else {
- {
             slides.push((
                 format!("Introduction to {}", topic_prompt),
                 vec![
@@ -878,7 +871,6 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsPrEngine {
         let current_wpm = if duration_secs > 0.0 {
             (words as f32 / duration_secs) * 60.0
         } else {
- {
             0.0
         };
 
@@ -894,11 +886,8 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsPrEngine {
         let status = if current_wpm > self.target_wpm + 30.0 {
             "Too Fast - Slow Down".to_string()
         } else if current_wpm < self.target_wpm - 30.0 && current_wpm > 0.0 {
- {
- {
             "Too Slow - Pick Up Pace".to_string()
         } else {
- {
             "Optimal Pacing".to_string()
         };
 
@@ -1308,7 +1297,6 @@ impl DeckcraftMissingComponentsParityPrSuite {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

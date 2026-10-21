@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
 //
 // (`src/creative/gridcraft_missing_components_parity_pr.rs`)
@@ -15,20 +14,21 @@ use alloc::string::{String, ToString};
 // 7. SovereignGridcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
 
 #[cfg(any(feature = "standalone_test", test))]
 use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest for missing Gridcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -274,7 +274,6 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if let Ok(val) = value_str.parse::<f64>() {
                     val >= min && val <= max
                 } else {
- {
                     false
                 }
             }
@@ -293,7 +292,6 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if value > thresh {
                     Some(color)
                 } else {
- {
                     None
                 }
             }
@@ -301,7 +299,6 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if value < thresh {
                     Some(color)
                 } else {
- {
                     None
                 }
             }
@@ -312,7 +309,6 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 if value > 50.0 {
                     Some(max_color)
                 } else {
- {
                     Some(min_color)
                 }
             }
@@ -537,7 +533,6 @@ impl GridcraftFinancialGoalSeekSolverPrEngine {
         let std_dev = if runs > 1 {
             (variance_sum / ((runs - 1) as f64)).sqrt()
         } else {
- {
             0.0
         };
 
@@ -618,7 +613,6 @@ impl GridcraftMultiUserCrdtCollabPrEngine {
                 if delta.timestamp_lamport > existing.timestamp_lamport {
                     replace_idx = Some(i);
                 } else {
- {
                     return false; // Earlier timestamp ignored
                 }
                 break;
@@ -628,7 +622,6 @@ impl GridcraftMultiUserCrdtCollabPrEngine {
         if let Some(idx) = replace_idx {
             self.delta_log[idx] = delta;
         } else {
- {
             self.delta_log.push(delta);
         }
         true
@@ -731,11 +724,8 @@ impl GridcraftMacroScriptingUdfPrEngine {
         if udf.name == "DOUBLE" {
             Some(args[0] * 2.0)
         } else if udf.name == "MULTIPLY_ADD" {
- {
- {
             Some(args[0] * args[1] + args.get(2).copied().unwrap_or(0.0))
         } else {
- {
             Some(args.iter().sum())
         }
     }
@@ -847,7 +837,6 @@ impl SovereignGridcraftArtcraftParityPrGateway {
         if proposals.is_empty() {
             0.0
         } else {
- {
             let ready_count = proposals
                 .iter()
                 .filter(|p| p.status == "Ready for Merge")

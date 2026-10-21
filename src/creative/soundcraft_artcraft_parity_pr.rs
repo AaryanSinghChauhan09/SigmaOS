@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-use alloc::string::{String, ToString};
 // SigmaOS - Soundcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/soundcraft_artcraft_parity_pr.rs`)
 //
@@ -18,24 +17,23 @@ use alloc::string::{String, ToString};
 // 11. SovereignSoundcraftArtcraftParityPrGateway & SoundcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use core::f32::consts::{FRAC_PI_4, LN_2, FRAC_1_SQRT_2};
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::collections::BTreeMap;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::vec::Vec;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use core::f32::consts::{FRAC_1_SQRT_2, FRAC_PI_4, LN_2};
 
 #[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
+use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Soundcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -219,15 +217,11 @@ impl SoundcraftSpectralSynthesisGranularSamplerPrEngine {
             if time_sec < attack {
                 time_sec / attack
             } else if time_sec < (attack + decay) {
- {
- {
                 1.0 - (1.0 - sustain) * ((time_sec - attack) / decay)
             } else {
- {
                 sustain
             }
         } else {
- {
             sustain * (1.0 - (time_sec / release).min(1.0))
         }
     }
@@ -446,7 +440,6 @@ impl SoundcraftMasteringEbuR128LoudnessLimiterPrEngine {
         let lufs = if mean_sq > 1e-10 {
             -0.691 + 10.0 * (mean_sq).log10()
         } else {
- {
             -70.0
         };
 
@@ -457,7 +450,6 @@ impl SoundcraftMasteringEbuR128LoudnessLimiterPrEngine {
         let true_peak = if max_sample > 1e-10 {
             20.0 * max_sample.log10()
         } else {
- {
             -100.0
         };
 
@@ -539,7 +531,6 @@ impl SoundcraftRealtimeCrdtCoAuthoringPrEngine {
         if let Some(&owner) = self.track_locks.get(&track_id) {
             owner == user_id
         } else {
- {
             self.track_locks.insert(track_id, user_id);
             true
         }
