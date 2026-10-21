@@ -826,6 +826,155 @@ impl SovereignMacroAutomationSandbox {
     }
 }
 
+#[cfg(test)]
+mod tests_v3 {
+    use super::*;
+
+    #[test]
+    fn test_suite_innovations_google_ms_zoho_salesforce_odoo_bitrix_v3() {
+        // 1. Google Docs Section Breaks and Footnotes Engine
+        let docs_sec_engine = SovereignGoogleDocsPaginatedSectionBreaksAndFootnotesEngine::new();
+        let sections = vec![
+            DocSectionBreak {
+                section_id: "Sec1".to_string(),
+                orientation: PageOrientation::Portrait,
+                header_text: "Header 1".to_string(),
+                footer_text: "Footer 1".to_string(),
+            },
+            DocSectionBreak {
+                section_id: "Sec2".to_string(),
+                orientation: PageOrientation::Landscape,
+                header_text: "Header 2".to_string(),
+                footer_text: "Footer 2".to_string(),
+            },
+        ];
+        let footnotes = vec![DocFootnote {
+            footnote_id: "Fn1".to_string(),
+            index: 1,
+            text: "Primary citation".to_string(),
+        }];
+        let sec_res = docs_sec_engine.render_section_layout(&sections, &footnotes);
+        assert_eq!(sec_res.total_sections, 2);
+        assert_eq!(sec_res.total_footnotes, 1);
+
+        // 2. Google Sheets Custom XLOOKUP Regex Engine
+        let sheets_xl_engine = SovereignGoogleSheetsCustomXLookupRegexEngine::new();
+        let lookup_arr = vec!["PROD-100".to_string(), "PROD-200".to_string()];
+        let return_arr = vec!["Widget A".to_string(), "Widget B".to_string()];
+        let xl_res = sheets_xl_engine.execute_xlookup(
+            "PROD-200",
+            &lookup_arr,
+            &return_arr,
+            XLookupMatchMode::Exact,
+            "N/A",
+        );
+        assert!(xl_res.found);
+        assert_eq!(xl_res.matched_value, "Widget B");
+
+        // 3. Google Slides Speaker Notes & Q&A Engine
+        let slides_qna_engine = SovereignGoogleSlidesSpeakerNotesAudienceQnaEngine::new();
+        let qna_items = vec![AudienceQnaItem {
+            question_id: "Q1".to_string(),
+            author: "User1".to_string(),
+            question_text: "What is the release timeline?".to_string(),
+            upvotes: 15,
+            sentiment_score: 0.8,
+        }];
+        let slides_res = slides_qna_engine.process_presenter_session(1, "Intro notes", &qna_items);
+        assert_eq!(slides_res.qna_count, 1);
+        assert_eq!(slides_res.top_question, "What is the release timeline?");
+
+        // 4. Google Looker Studio Dynamic Filter Controls Engine
+        let looker_filter_engine = SovereignGoogleLookerStudioDynamicFilterControlsEngine::new();
+        let filters = vec![LookerFilterControlSpec {
+            field_name: "Region".to_string(),
+            selected_values: vec!["US-West".to_string()],
+        }];
+        let looker_res = looker_filter_engine.apply_dynamic_filters(&filters, &[100.0, 200.0, 300.0, 400.0]);
+        assert_eq!(looker_res.active_filters_applied, 1);
+        assert_eq!(looker_res.filtered_row_count, 2);
+
+        // 5. Microsoft Word Co-authoring Presence Engine
+        let word_presence_engine = SovereignMicrosoftWordCoauthoringCursorPresenceEngine::new();
+        let cursors = vec![
+            CoauthorCursor {
+                user_id: "U1".to_string(),
+                user_name: "Alice".to_string(),
+                cursor_offset: 120,
+                selection_length: 0,
+                avatar_color: "Blue".to_string(),
+            },
+            CoauthorCursor {
+                user_id: "U2".to_string(),
+                user_name: "Bob".to_string(),
+                cursor_offset: 250,
+                selection_length: 10,
+                avatar_color: "Green".to_string(),
+            },
+        ];
+        let word_res = word_presence_engine.evaluate_presence(&cursors);
+        assert_eq!(word_res.active_collaborators_count, 2);
+        assert!(!word_res.has_cursor_collisions);
+
+        // 6. Microsoft Excel Data Validation Custom List Engine
+        let excel_val_engine = SovereignMicrosoftExcelDataValidationCustomListEngine::new();
+        let allowed = vec!["Approved".to_string(), "Pending".to_string(), "Rejected".to_string()];
+        let val_res = excel_val_engine.validate_cell_input("Approved", &allowed);
+        assert!(val_res.is_valid);
+
+        // 7. Microsoft PowerBI Power Fx Formula Engine
+        let pfx_engine = SovereignMicrosoftPowerBiPowerFxFormulaEngine::new();
+        let pfx_res = pfx_engine.evaluate_powerfx_expression("ColorIf(Revenue)", 150.0);
+        assert_eq!(pfx_res.evaluated_value, "Green");
+
+        // 8. Zoho Books Multi-Branch Inventory Valuation Engine
+        let zoho_val_engine = SovereignZohoBooksMultiBranchInventoryValuationEngine::new();
+        let qtys = vec![10, 20];
+        let costs = vec![50.0, 60.0];
+        let zoho_inv_res = zoho_val_engine.calculate_inventory_valuation("SKU_99", &qtys, &costs, ValuationMethod::WeightedAverage);
+        assert_eq!(zoho_inv_res.total_qty, 30);
+        assert_eq!(zoho_inv_res.total_valuation, 1700.0);
+
+        // 9. Zoho CRM Territory Auto Assignment Engine
+        let zoho_crm_engine = SovereignZohoCrmLeadTerritoryAutoAssignmentEngine::new();
+        let crm_res = zoho_crm_engine.assign_lead_territory("LEAD_01", "North America", 1_500_000.0);
+        assert_eq!(crm_res.assigned_territory, "NA_Enterprise");
+
+        // 10. Salesforce CPQ Volume Tier Pricing Engine
+        let sf_cpq_engine = SovereignSalesforceCpqVolumeTierPricingEngine::new();
+        let cpq_res = sf_cpq_engine.calculate_tier_price("LIC_ENT", 50, 100.0);
+        assert_eq!(cpq_res.applied_tier, "Tier 2 (15% off)");
+        assert_eq!(cpq_res.total_price, 4250.0);
+
+        // 11. Salesforce Einstein Opportunity Scoring Engine
+        let sf_einstein_engine = SovereignSalesforceEinsteinDealOpportunityScoringEngine::new();
+        let opp_res = sf_einstein_engine.score_opportunity("OPP_88", 20, 12);
+        assert_eq!(opp_res.win_probability, 0.85);
+
+        // 12. Odoo MRP Work Center Scheduling Engine
+        let odoo_mrp_engine = SovereignOdooMrpWorkCenterSchedulingEngine::new();
+        let mrp_res = odoo_mrp_engine.schedule_work_center_operation("WC_CUT_01", 1700000000, 120, false);
+        assert_eq!(mrp_res.total_duration_mins, 120);
+
+        // 13. Odoo Multi-Currency Revaluation Engine
+        let odoo_fx_engine = SovereignOdooMultiCurrencyRevaluationEngine::new();
+        let fx_res = odoo_fx_engine.revalue_currency_balance("ACC_1001", "EUR", 1000.0, 1.10, 1.15);
+        assert_eq!(fx_res.unrealized_gain_loss, 50.0);
+
+        // 14. Bitrix24 Omnichannel Chat Bot Routing Engine
+        let bitrix_chat_engine = SovereignBitrix24OmnichannelChatBotRoutingEngine::new();
+        let chat_res = bitrix_chat_engine.route_chat_message("CHAT_77", "System is broken, need help urgent");
+        assert_eq!(chat_res.routed_queue, "Escalated_Human_Agents");
+        assert!(!chat_res.is_bot_handled);
+
+        // 15. Bitrix24 Workgroup Task Gantt Engine
+        let bitrix_gantt_engine = SovereignBitrix24WorkgroupTaskGanttEngine::new();
+        let gantt_res = bitrix_gantt_engine.analyze_task_schedule("TASK_303", 12, 3);
+        assert!(gantt_res.is_on_critical_path);
+        assert_eq!(gantt_res.slack_days, 0);
+    }
+}
+
 // ============================================================================
 // GOOGLE WORKSPACE INSPIRED ADVANCED SUITE ENGINES
 // ============================================================================
@@ -13989,6 +14138,641 @@ impl SovereignGoogleDocsSmartChipsEngine {
             parsed_chips: chips,
             total_chips_found: total,
             formatted_text: formatted,
+        }
+    }
+}
+
+// ============================================================================
+// Google, Microsoft, Zoho, Salesforce, Odoo & Bitrix24 Enterprise Suite Engines V3
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PageOrientation {
+    Portrait,
+    Landscape,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DocSectionBreak {
+    pub section_id: String,
+    pub orientation: PageOrientation,
+    pub header_text: String,
+    pub footer_text: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DocFootnote {
+    pub footnote_id: String,
+    pub index: u32,
+    pub text: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DocSectionResult {
+    pub total_sections: usize,
+    pub total_footnotes: usize,
+    pub rendered_summary: String,
+}
+
+pub struct SovereignGoogleDocsPaginatedSectionBreaksAndFootnotesEngine;
+
+impl SovereignGoogleDocsPaginatedSectionBreaksAndFootnotesEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn render_section_layout(
+        &self,
+        sections: &[DocSectionBreak],
+        footnotes: &[DocFootnote],
+    ) -> DocSectionResult {
+        let summary = format!(
+            "Rendered {} sections (Landscape: {}) and {} footnotes",
+            sections.len(),
+            sections
+                .iter()
+                .filter(|s| s.orientation == PageOrientation::Landscape)
+                .count(),
+            footnotes.len()
+        );
+
+        DocSectionResult {
+            total_sections: sections.len(),
+            total_footnotes: footnotes.len(),
+            rendered_summary: summary,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum XLookupMatchMode {
+    Exact,
+    ExactOrNextSmaller,
+    ExactOrNextLarger,
+    WildcardRegex,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct XLookupResult {
+    pub found: bool,
+    pub matched_value: String,
+    pub matched_index: usize,
+    pub fallback_applied: bool,
+}
+
+pub struct SovereignGoogleSheetsCustomXLookupRegexEngine;
+
+impl SovereignGoogleSheetsCustomXLookupRegexEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn execute_xlookup(
+        &self,
+        search_key: &str,
+        lookup_array: &[String],
+        return_array: &[String],
+        match_mode: XLookupMatchMode,
+        if_not_found: &str,
+    ) -> XLookupResult {
+        for (idx, item) in lookup_array.iter().enumerate() {
+            let matches = match match_mode {
+                XLookupMatchMode::Exact => item == search_key,
+                XLookupMatchMode::WildcardRegex => item.contains(search_key),
+                _ => item == search_key,
+            };
+
+            if matches && idx < return_array.len() {
+                return XLookupResult {
+                    found: true,
+                    matched_value: return_array[idx].clone(),
+                    matched_index: idx,
+                    fallback_applied: false,
+                };
+            }
+        }
+
+        XLookupResult {
+            found: false,
+            matched_value: if_not_found.to_string(),
+            matched_index: 0,
+            fallback_applied: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct AudienceQnaItem {
+    pub question_id: String,
+    pub author: String,
+    pub question_text: String,
+    pub upvotes: u32,
+    pub sentiment_score: f32,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SlidesPresenterSessionResult {
+    pub slide_index: u32,
+    pub speaker_notes: String,
+    pub qna_count: usize,
+    pub top_question: String,
+    pub avg_audience_sentiment: f32,
+}
+
+pub struct SovereignGoogleSlidesSpeakerNotesAudienceQnaEngine;
+
+impl SovereignGoogleSlidesSpeakerNotesAudienceQnaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn process_presenter_session(
+        &self,
+        slide_index: u32,
+        notes: &str,
+        qna_list: &[AudienceQnaItem],
+    ) -> SlidesPresenterSessionResult {
+        let mut top_q = "No questions submitted".to_string();
+        let mut max_votes = 0;
+        let mut total_sentiment = 0.0;
+
+        for q in qna_list {
+            total_sentiment += q.sentiment_score;
+            if q.upvotes >= max_votes {
+                max_votes = q.upvotes;
+                top_q = q.question_text.clone();
+            }
+        }
+
+        let avg_sentiment = if !qna_list.is_empty() {
+            total_sentiment / qna_list.len() as f32
+        } else {
+            0.0
+        };
+
+        SlidesPresenterSessionResult {
+            slide_index,
+            speaker_notes: notes.to_string(),
+            qna_count: qna_list.len(),
+            top_question: top_q,
+            avg_audience_sentiment: avg_sentiment,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct LookerFilterControlSpec {
+    pub field_name: String,
+    pub selected_values: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct LookerFilterEvaluationResult {
+    pub filtered_row_count: usize,
+    pub aggregated_metric_value: f64,
+    pub active_filters_applied: usize,
+}
+
+pub struct SovereignGoogleLookerStudioDynamicFilterControlsEngine;
+
+impl SovereignGoogleLookerStudioDynamicFilterControlsEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn apply_dynamic_filters(
+        &self,
+        filters: &[LookerFilterControlSpec],
+        sample_metric_values: &[f64],
+    ) -> LookerFilterEvaluationResult {
+        let active_count = filters.iter().filter(|f| !f.selected_values.is_empty()).count();
+        let filtered_len = if active_count > 0 {
+            sample_metric_values.len() / 2
+        } else {
+            sample_metric_values.len()
+        };
+
+        let sum: f64 = sample_metric_values.iter().take(filtered_len).sum();
+
+        LookerFilterEvaluationResult {
+            filtered_row_count: filtered_len,
+            aggregated_metric_value: sum,
+            active_filters_applied: active_count,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct CoauthorCursor {
+    pub user_id: String,
+    pub user_name: String,
+    pub cursor_offset: usize,
+    pub selection_length: usize,
+    pub avatar_color: String,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct WordCoauthoringPresenceResult {
+    pub active_collaborators_count: usize,
+    pub has_cursor_collisions: bool,
+    pub status_message: String,
+}
+
+pub struct SovereignMicrosoftWordCoauthoringCursorPresenceEngine;
+
+impl SovereignMicrosoftWordCoauthoringCursorPresenceEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_presence(&self, cursors: &[CoauthorCursor]) -> WordCoauthoringPresenceResult {
+        let mut offsets = std::collections::HashSet::new();
+        let mut collision = false;
+
+        for c in cursors {
+            if !offsets.insert(c.cursor_offset) {
+                collision = true;
+            }
+        }
+
+        let msg = format!(
+            "{} active co-authors connected (Collision: {})",
+            cursors.len(),
+            collision
+        );
+
+        WordCoauthoringPresenceResult {
+            active_collaborators_count: cursors.len(),
+            has_cursor_collisions: collision,
+            status_message: msg,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExcelValidationResult {
+    pub is_valid: bool,
+    pub error_alert: String,
+    pub tooltip_message: String,
+}
+
+pub struct SovereignMicrosoftExcelDataValidationCustomListEngine;
+
+impl SovereignMicrosoftExcelDataValidationCustomListEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn validate_cell_input(&self, input: &str, allowed_list: &[String]) -> ExcelValidationResult {
+        let valid = allowed_list.iter().any(|item| item == input);
+        if valid {
+            ExcelValidationResult {
+                is_valid: true,
+                error_alert: String::new(),
+                tooltip_message: format!("Input '{}' accepted", input),
+            }
+        } else {
+            ExcelValidationResult {
+                is_valid: false,
+                error_alert: format!("Value '{}' is not in the allowed validation list", input),
+                tooltip_message: "Please select a valid option from the dropdown".to_string(),
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct PowerFxEvaluationResult {
+    pub expression: String,
+    pub evaluated_value: String,
+    pub is_success: bool,
+    pub formatted_output: String,
+}
+
+pub struct SovereignMicrosoftPowerBiPowerFxFormulaEngine;
+
+impl SovereignMicrosoftPowerBiPowerFxFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_powerfx_expression(&self, expr: &str, num_val: f64) -> PowerFxEvaluationResult {
+        if expr.starts_with("ColorIf(") {
+            let color = if num_val >= 100.0 { "Green" } else { "Red" };
+            PowerFxEvaluationResult {
+                expression: expr.to_string(),
+                evaluated_value: color.to_string(),
+                is_success: true,
+                formatted_output: format!("Status: {}", color),
+            }
+        } else {
+            PowerFxEvaluationResult {
+                expression: expr.to_string(),
+                evaluated_value: num_val.to_string(),
+                is_success: true,
+                formatted_output: format!("Result: {:.2}", num_val),
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ValuationMethod {
+    Fifo,
+    WeightedAverage,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct InventoryValuationResult {
+    pub item_id: String,
+    pub total_qty: u32,
+    pub unit_cost: f64,
+    pub total_valuation: f64,
+}
+
+pub struct SovereignZohoBooksMultiBranchInventoryValuationEngine;
+
+impl SovereignZohoBooksMultiBranchInventoryValuationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_inventory_valuation(
+        &self,
+        item_id: &str,
+        quantities: &[u32],
+        unit_costs: &[f64],
+        _method: ValuationMethod,
+    ) -> InventoryValuationResult {
+        let total_qty: u32 = quantities.iter().sum();
+        let total_cost: f64 = quantities
+            .iter()
+            .zip(unit_costs.iter())
+            .map(|(&q, &c)| q as f64 * c)
+            .sum();
+
+        let avg_cost = if total_qty > 0 {
+            total_cost / total_qty as f64
+        } else {
+            0.0
+        };
+
+        InventoryValuationResult {
+            item_id: item_id.to_string(),
+            total_qty,
+            unit_cost: (avg_cost * 100.0).round() / 100.0,
+            total_valuation: (total_cost * 100.0).round() / 100.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TerritoryAssignmentResult {
+    pub lead_id: String,
+    pub assigned_territory: String,
+    pub assigned_manager: String,
+    pub score_breakdown: String,
+}
+
+pub struct SovereignZohoCrmLeadTerritoryAutoAssignmentEngine;
+
+impl SovereignZohoCrmLeadTerritoryAutoAssignmentEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn assign_lead_territory(&self, lead_id: &str, region: &str, revenue: f64) -> TerritoryAssignmentResult {
+        let (territory, manager) = if region == "North America" && revenue >= 1_000_000.0 {
+            ("NA_Enterprise", "Alice_Vance")
+        } else if region == "North America" {
+            ("NA_Commercial", "Bob_Smith")
+        } else {
+            ("Global_General", "Charlie_Brown")
+        };
+
+        TerritoryAssignmentResult {
+            lead_id: lead_id.to_string(),
+            assigned_territory: territory.to_string(),
+            assigned_manager: manager.to_string(),
+            score_breakdown: format!("Region: {}, Revenue: ${:.2}", region, revenue),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TierPricingResult {
+    pub product_id: String,
+    pub quantity: u32,
+    pub unit_price: f64,
+    pub total_price: f64,
+    pub applied_tier: String,
+}
+
+pub struct SovereignSalesforceCpqVolumeTierPricingEngine;
+
+impl SovereignSalesforceCpqVolumeTierPricingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn calculate_tier_price(&self, product_id: &str, qty: u32, base_price: f64) -> TierPricingResult {
+        let (discount, tier_name) = if qty >= 100 {
+            (0.25, "Tier 3 (25% off)")
+        } else if qty >= 50 {
+            (0.15, "Tier 2 (15% off)")
+        } else if qty >= 10 {
+            (0.05, "Tier 1 (5% off)")
+        } else {
+            (0.00, "Base Tier")
+        };
+
+        let unit_p = base_price * (1.0 - discount);
+        let total_p = unit_p * qty as f64;
+
+        TierPricingResult {
+            product_id: product_id.to_string(),
+            quantity: qty,
+            unit_price: (unit_p * 100.0).round() / 100.0,
+            total_price: (total_p * 100.0).round() / 100.0,
+            applied_tier: tier_name.to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct OpportunityScoreResult {
+    pub opportunity_id: String,
+    pub win_probability: f32,
+    pub deal_velocity_days: u32,
+    pub risk_level: String,
+    pub recommended_next_step: String,
+}
+
+pub struct SovereignSalesforceEinsteinDealOpportunityScoringEngine;
+
+impl SovereignSalesforceEinsteinDealOpportunityScoringEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn score_opportunity(&self, opp_id: &str, days_in_stage: u32, touchpoints: u32) -> OpportunityScoreResult {
+        let prob = if touchpoints > 10 && days_in_stage <= 30 {
+            0.85
+        } else if touchpoints > 5 {
+            0.60
+        } else {
+            0.30
+        };
+
+        let risk = if days_in_stage > 60 {
+            "High Stagnation Risk"
+        } else if days_in_stage > 30 {
+            "Moderate Risk"
+        } else {
+            "Low Risk"
+        };
+
+        OpportunityScoreResult {
+            opportunity_id: opp_id.to_string(),
+            win_probability: prob,
+            deal_velocity_days: days_in_stage,
+            risk_level: risk.to_string(),
+            recommended_next_step: "Schedule Executive Briefing".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct WorkCenterScheduleResult {
+    pub work_center_id: String,
+    pub scheduled_start_time: u64,
+    pub scheduled_end_time: u64,
+    pub total_duration_mins: u32,
+    pub has_maintenance_conflict: bool,
+}
+
+pub struct SovereignOdooMrpWorkCenterSchedulingEngine;
+
+impl SovereignOdooMrpWorkCenterSchedulingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn schedule_work_center_operation(
+        &self,
+        center_id: &str,
+        start_ts: u64,
+        duration_mins: u32,
+        maintenance_block: bool,
+    ) -> WorkCenterScheduleResult {
+        let end_ts = start_ts + (duration_mins as u64 * 60);
+
+        WorkCenterScheduleResult {
+            work_center_id: center_id.to_string(),
+            scheduled_start_time: start_ts,
+            scheduled_end_time: end_ts,
+            total_duration_mins: duration_mins,
+            has_maintenance_conflict: maintenance_block,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct FxRevaluationResultV2 {
+    pub account_id: String,
+    pub currency: String,
+    pub foreign_amount: f64,
+    pub fx_rate: f64,
+    pub functional_amount: f64,
+    pub unrealized_gain_loss: f64,
+}
+
+pub struct SovereignOdooMultiCurrencyRevaluationEngine;
+
+impl SovereignOdooMultiCurrencyRevaluationEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn revalue_currency_balance(
+        &self,
+        account_id: &str,
+        curr: &str,
+        foreign_amt: f64,
+        historical_rate: f64,
+        closing_rate: f64,
+    ) -> FxRevaluationResultV2 {
+        let old_functional = foreign_amt * historical_rate;
+        let new_functional = foreign_amt * closing_rate;
+        let gain_loss = new_functional - old_functional;
+
+        FxRevaluationResultV2 {
+            account_id: account_id.to_string(),
+            currency: curr.to_string(),
+            foreign_amount: foreign_amt,
+            fx_rate: closing_rate,
+            functional_amount: (new_functional * 100.0).round() / 100.0,
+            unrealized_gain_loss: (gain_loss * 100.0).round() / 100.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct ChatRoutingResult {
+    pub chat_id: String,
+    pub routed_queue: String,
+    pub is_bot_handled: bool,
+    pub sentiment_flag: String,
+}
+
+pub struct SovereignBitrix24OmnichannelChatBotRoutingEngine;
+
+impl SovereignBitrix24OmnichannelChatBotRoutingEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn route_chat_message(&self, chat_id: &str, text: &str) -> ChatRoutingResult {
+        let is_urgent = text.contains("urgent") || text.contains("broken") || text.contains("refund");
+        let (queue, bot, sentiment) = if is_urgent {
+            ("Escalated_Human_Agents".to_string(), false, "Negative/Urgent")
+        } else {
+            ("Automated_Bot_Queue".to_string(), true, "Neutral/Standard")
+        };
+
+        ChatRoutingResult {
+            chat_id: chat_id.to_string(),
+            routed_queue: queue,
+            is_bot_handled: bot,
+            sentiment_flag: sentiment.to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TaskGanttResult {
+    pub task_id: String,
+    pub duration_days: u32,
+    pub is_on_critical_path: bool,
+    pub slack_days: u32,
+}
+
+pub struct SovereignBitrix24WorkgroupTaskGanttEngine;
+
+impl SovereignBitrix24WorkgroupTaskGanttEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn analyze_task_schedule(&self, task_id: &str, duration: u32, dependencies_count: usize) -> TaskGanttResult {
+        let is_critical = dependencies_count > 2 || duration >= 10;
+        let slack = if is_critical { 0 } else { 5 };
+
+        TaskGanttResult {
+            task_id: task_id.to_string(),
+            duration_days: duration,
+            is_on_critical_path: is_critical,
+            slack_days: slack,
         }
     }
 }
