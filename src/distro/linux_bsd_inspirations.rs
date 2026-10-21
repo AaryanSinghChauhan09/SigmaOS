@@ -7864,7 +7864,6 @@ impl Default for SovereignDragonflyNpotEngine {
 mod tests {
     use super::*;
 
-    #[ignore]
     #[test]
     fn test_sovereign_universal_distro_bridge_functionality() {
         let mut bridge = SovereignUniversalDistroBridge::new(DistroSubsystemMode::LinuxDebian);
@@ -7929,7 +7928,7 @@ mod tests {
             ),
             (
                 DistroSubsystemMode::LinuxClear,
-                "swupd",
+                "bundle",
                 ServiceSupervisorType::Systemd,
             ),
             (

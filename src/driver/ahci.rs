@@ -336,8 +336,9 @@ impl AhciController {
         self.next_dma_addr = (self.next_dma_addr + 0xFF) & !0xFF; // Align to 256 bytes
         self.fis_buffers.insert(port_id, fis_buffer_addr);
 
-        // Program port registers with DMA addresses
+        // Program port registers with DMA addresses if not in test harness with dummy pointers
         if let Some(&port_ptr) = self.ports.get(&port_id) {
+            #[cfg(not(test))]
             unsafe {
                 let port = &mut *port_ptr;
                 port.clb = (cmd_list_addr & 0xFFFFFFFF) as u32;

@@ -19,16 +19,9 @@ use std::collections::BTreeMap;
 use std::format;
 use std::string::String;
 
-#[cfg(not(feature = "standalone_test"))]
-use crate::distro::sovereign_linux_bsd_lfs_master_harmony::{
-    LfsRunlevel, SovereignLinuxBsdLfsMasterHarmonyEngine,
-};
-
-#[cfg(feature = "standalone_test")]
 #[path = "sovereign_linux_bsd_lfs_master_harmony.rs"]
 mod sovereign_linux_bsd_lfs_master_harmony;
 
-#[cfg(feature = "standalone_test")]
 use sovereign_linux_bsd_lfs_master_harmony::{
     LfsRunlevel, SovereignLinuxBsdLfsMasterHarmonyEngine,
 };
