@@ -64,6 +64,7 @@ pub use storage::*;
 pub mod system;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub use system::*;
+pub use system::sovereign_init_and_supervisor_advancements_v67::*;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
