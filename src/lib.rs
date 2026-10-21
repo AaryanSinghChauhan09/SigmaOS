@@ -18,6 +18,7 @@ pub mod accessibility;
 pub mod audio;
 pub mod automation;
 pub mod build;
+pub mod clipboard;
 pub mod community;
 pub mod compatibility;
 pub mod container;
