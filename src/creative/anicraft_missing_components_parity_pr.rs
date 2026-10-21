@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
@@ -13,8 +11,11 @@
 // 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
@@ -670,6 +671,7 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
@@ -706,8 +708,6 @@ mod tests {
     fn test_nla_blending_engine() {
         let engine = AnicraftNlaTrackClipBlendingPrEngine::new();
         let frame20_val = engine.evaluate_blended_value(20);
-        // Clip 1 progress at frame 20: 20/60 = 1/3 -> 10.0 * (1/3) = 3.333
-        // Clip 2 progress at frame 20: (20-15)/30 = 5/30 = 1/6 -> 5.0 * (1/6) * 0.5 = 0.4166
         assert!(frame20_val > 3.0);
     }
 
