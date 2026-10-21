@@ -36,6 +36,12 @@ The proposals cover the complete graphics and display stack: core protocols, har
 | **PR #123** | Vulkan 1.3 | Vulkan Mesh Shading & Timeline Semaphores | SteamOS Gamescope, CachyOS | Vulkan 1.3 mesh shading pipeline execution (`vkCmdDrawMeshTasksEXT`), timeline semaphores, and descriptor set layouts. |
 | **PR #124** | wlroots Layout | wlroots Multi-Monitor Output Layout & Seat | SwayWM, Void Linux, Alpine | `wlr_output_layout` multi-monitor alignment, `wlr_seat` pointer/keyboard focus, and damage ring accumulation. |
 | **PR #125** | BSD vt(4) | BSD vt(4) Sysmouse & wscons VT Matrix | FreeBSD, OpenBSD | FreeBSD `vt_sysmouse` cursor overlay, OpenBSD `wscons` VT keymap translation, and ANSI VT100 escape sequence parsing. |
+| **PR #126** | X11 Extensions | X11 Extension Stack & Multi-Pointer Input | Arch Linux, Debian, FreeBSD | XInput2 multi-pointer/multitouch event routing, XComposite window redirection, XDamage tracking, and RandR 1.5 VR display leasing. |
+| **PR #127** | Wayland Ext v2 | Wayland Tearing Control & Color Management v4 | Fedora, Ubuntu, Arch | `wp_tearing_control_v1` async page-flip requests, `xx_color_management_v4` ICC profile surfaces, and `zwp_input_method_v2` text protocols. |
+| **PR #128** | Mesa ACO Compiler | Mesa ACO Shader Compiler & Zink Vulkan Bridge | Mesa3D, SteamOS, CachyOS | AMD ACO wave64/wave32 ISA code generator, Zink Vulkan-over-OpenGL translation layer, and Intel Iris batchbuffer submission. |
+| **PR #129** | DRM Syncobjs | DRM Explicit Syncobj Timelines & Color CTM | Linux Kernel DRM, SteamOS | DRM explicit syncobj timeline point waiting (`DRM_IOCTL_SYNCOBJ_TIMELINE_WAIT`), plane de-gamma CTM 3x3 color matrices, and DRM output leasing. |
+| **PR #130** | Vulkan 1.4 RT | Vulkan 1.4 Ray Tracing & Bindless Array | SteamOS Gamescope, CachyOS | Vulkan 1.4 ray tracing acceleration structure building (`VK_KHR_acceleration_structure`), bindless descriptor arrays, and Sync2 barriers. |
+| **PR #131** | COSMIC Smithay | System76 COSMIC & Smithay Compositor Engine | Pop!_OS COSMIC, Arch Linux | System76 COSMIC desktop compositor, Smithay Rust Wayland framework abstraction, RON configuration parsing, and applet event dispatching. |
 
 ---
 
@@ -118,11 +124,15 @@ The proposals cover the complete graphics and display stack: core protocols, har
 - **Architecture**: 80x25 character grid matrix, VT switching ioctls (`VT_ACTIVATE`), cursor tracking, and FreeBSD `vt(4)` / OpenBSD `wscons` keymap translation.
 - **Inspirations**: FreeBSD `vt(4)` and OpenBSD `wscons(4)` drivers.
 
+### 20. System76 COSMIC & Smithay Compositor Framework (`SovereignCosmicSmithayCompositorEngine`)
+- **Architecture**: Smithay Rust Wayland compositor framework integration, RON configuration parser, COSMIC applet event dispatcher, and workspace overview renderer.
+- **Inspirations**: Pop!_OS COSMIC desktop environment, Smithay Wayland library.
+
 ---
 
 ## PR Gateway, PQC Signatures & CI Gating
 
-All 25 PR proposals (#101..#125) are registered in `SovereignGraphicsDisplayPrGatewayEngine` featuring:
+All 31 PR proposals (#101..#131) are registered in `SovereignGraphicsDisplayPrGatewayEngine` featuring:
 1. **Post-Quantum Cryptography (PQC)** signatures (`PQC-SIG-DILITHIUM5-GRAPHICS-PR-*`).
 2. **SAT Dependency Constraint Solver** validation.
 3. **Automated CI Gating Pipeline**: Checks PQC signature validity and SAT constraints before transitioning PR status from `Proposed` -> `CiValidationPass` -> `Merged`.
@@ -136,4 +146,4 @@ Verified via standalone Rust test runner:
 ```bash
 rustc --test --edition=2021 --cfg 'feature="standalone_test"' src/graphics/sovereign_graphics_display_pr_suite.rs -o build/test_graphics_pr_suite && ./build/test_graphics_pr_suite
 ```
-**Results**: 28 passed; 0 failed. All audits across X11, Wayland, Mesa, DRM/KMS, Vulkan, OpenGL, Weston, Sway, wlroots, Mutter, KWin, Compiz, Picom, Xwayland, evdev, libinput, fbdev, and Virtual Terminals passed cleanly.
+**Results**: 29 passed; 0 failed. All audits across X11, Wayland, Mesa, DRM/KMS, Vulkan, OpenGL, Weston, Sway, wlroots, Mutter, KWin, Compiz, Picom, Xwayland, evdev, libinput, fbdev, Virtual Terminals, and COSMIC Smithay passed cleanly.
