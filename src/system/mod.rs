@@ -168,6 +168,7 @@ pub mod sigmadnsmanager2;
 pub mod sigmakernelmanager;
 pub mod sigmacronmanager2;
 pub mod sigmametricsmanager;
+pub mod sigmarestoremanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -367,6 +368,10 @@ pub use sigmametricsmanager::{
     CollectorState as MetricsCollectorState, CollectorType as MetricsCollectorType,
     Metric as MetricsMetric, MetricCollector as MetricsCollector, MetricLabel as MetricsLabel,
     MetricType as MetricsType, MetricsManager,
+};
+pub use sigmarestoremanager::{
+    RestoreManager, RestorePoint as RestoreManagerPoint, RestorePointState as RestoreManagerState,
+    RestorePointType as RestoreManagerType,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
