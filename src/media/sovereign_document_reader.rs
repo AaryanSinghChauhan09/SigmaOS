@@ -122,12 +122,26 @@ impl SovereignDocumentReader {
     }
 
     pub fn search_text(&self, query: &str) -> Vec<usize> {
-        let q = query.to_lowercase();
         self.pages
             .values()
-            .filter(|p| p.text_content.to_lowercase().contains(&q))
+            .filter(|p| contains_ignore_case(&p.text_content, query))
             .map(|p| p.page_number)
             .collect()
+    }
+}
+
+/// Zero-allocation case-insensitive substring search helper for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
