@@ -68,20 +68,16 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
-# Documentation policy: NO .md or .txt files tracked in main branch root.
+# Documentation policy: NO .md or .txt files tracked in main branch.
 # All documentation lives in the SigmaOS.wiki repository.
-# Only docs/ subdirectory .md files are permitted (architecture docs).
 *.md
+**/*.md
 *.txt
+**/*.txt
 *.py
 WIKI/
 wiki/
-# Allow docs/ subdirectory markdown (architecture, shell, roadmap docs)
-!docs/
-!docs/**/*.md
 # Allow Python tools and scripts
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
-# Allow GitHub PR template
-!.github/PULL_REQUEST_TEMPLATE.md
