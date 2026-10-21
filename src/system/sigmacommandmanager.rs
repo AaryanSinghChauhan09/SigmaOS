@@ -66,7 +66,10 @@ impl SigmaCommandManager {
     }
 
     pub fn get_commands_by_type(&self, command_type: CommandType) -> Vec<&Command> {
-        self.commands.iter().filter(|c| c.command_type == command_type).collect()
+        self.commands
+            .iter()
+            .filter(|c| c.command_type == command_type)
+            .collect()
     }
 
     pub fn get_visible_commands(&self) -> Vec<&Command> {
@@ -86,7 +89,10 @@ impl SigmaCommandManager {
         if let Some(cmd) = self.get_command(id) {
             match required_permission {
                 CommandPermission::User => true,
-                CommandPermission::Admin => cmd.permission == CommandPermission::Admin || cmd.permission == CommandPermission::Root,
+                CommandPermission::Admin => {
+                    cmd.permission == CommandPermission::Admin
+                        || cmd.permission == CommandPermission::Root
+                }
                 CommandPermission::Root => cmd.permission == CommandPermission::Root,
             }
         } else {

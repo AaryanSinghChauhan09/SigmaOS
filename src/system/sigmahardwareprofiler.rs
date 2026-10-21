@@ -40,7 +40,11 @@ impl SigmaHardwareProfiler {
         }
     }
 
-    pub fn run_benchmark(&mut self, component: HardwareComponent, test_name: String) -> BenchmarkResult {
+    pub fn run_benchmark(
+        &mut self,
+        component: HardwareComponent,
+        test_name: String,
+    ) -> BenchmarkResult {
         let result = BenchmarkResult {
             component,
             test_name: test_name.clone(),
@@ -92,8 +96,18 @@ mod tests {
         profiler.run_benchmark(HardwareComponent::CPU, "FLOPS".to_string());
         profiler.run_benchmark(HardwareComponent::CPU, "Cache".to_string());
         profiler.run_benchmark(HardwareComponent::GPU, "FPS".to_string());
-        assert_eq!(profiler.get_component_benchmarks(HardwareComponent::CPU).len(), 2);
-        assert_eq!(profiler.get_component_benchmarks(HardwareComponent::GPU).len(), 1);
+        assert_eq!(
+            profiler
+                .get_component_benchmarks(HardwareComponent::CPU)
+                .len(),
+            2
+        );
+        assert_eq!(
+            profiler
+                .get_component_benchmarks(HardwareComponent::GPU)
+                .len(),
+            1
+        );
     }
 
     #[test]

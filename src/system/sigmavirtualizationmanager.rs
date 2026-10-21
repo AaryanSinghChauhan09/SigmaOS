@@ -45,9 +45,7 @@ pub struct SigmaVirtualizationManager {
 
 impl SigmaVirtualizationManager {
     pub fn new() -> Self {
-        Self {
-            vms: Vec::new(),
-        }
+        Self { vms: Vec::new() }
     }
 
     pub fn create_vm(&mut self, config: VMConfig) -> VirtualMachine {
@@ -120,7 +118,10 @@ impl SigmaVirtualizationManager {
     }
 
     pub fn get_running_vms(&self) -> Vec<&VirtualMachine> {
-        self.vms.iter().filter(|v| v.state == VMState::Running).collect()
+        self.vms
+            .iter()
+            .filter(|v| v.state == VMState::Running)
+            .collect()
     }
 
     pub fn get_vm_count(&self) -> usize {
