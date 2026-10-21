@@ -113,7 +113,11 @@ impl SovereignServiceUnit {
 #[path = "sovereign_init_and_supervisor_advancements_v63.rs"]
 mod sovereign_init_and_supervisor_advancements_v63;
 
+#[path = "sovereign_init_and_supervisor_advancements_v67.rs"]
+pub mod sovereign_init_and_supervisor_advancements_v67;
+
 use sovereign_init_and_supervisor_advancements_v63::*;
+use sovereign_init_and_supervisor_advancements_v67::SovereignInitAndSupervisorAdvancementsV67Suite;
 
 pub struct SovereignInitSupervisor {
     pub next_pid: AtomicU32,
@@ -129,6 +133,7 @@ pub struct SovereignInitSupervisor {
     pub launchd_android_v63_engine: LaunchdAndroidAdvancementsV63Engine,
     pub scheduler_v63_engine: SchedulerTimersAdvancementsV63Engine,
     pub pr_gateway_v63: SovereignInitSupervisorV63PrGateway,
+    pub suite_v67: SovereignInitAndSupervisorAdvancementsV67Suite,
 }
 
 impl SovereignInitSupervisor {
@@ -147,6 +152,7 @@ impl SovereignInitSupervisor {
             launchd_android_v63_engine: LaunchdAndroidAdvancementsV63Engine::new(),
             scheduler_v63_engine: SchedulerTimersAdvancementsV63Engine::new(),
             pr_gateway_v63: SovereignInitSupervisorV63PrGateway::new(),
+            suite_v67: SovereignInitAndSupervisorAdvancementsV67Suite::new(),
         }
     }
 
@@ -427,5 +433,13 @@ mod tests {
             supervisor.services.get("app").unwrap().state,
             ServiceState::Failed
         );
+    }
+
+    #[test]
+    fn test_v67_suite_integration() {
+        let supervisor = SovereignInitSupervisor::new();
+        assert!(supervisor.suite_v67.run_master_verification());
+        let manifests = supervisor.suite_v67.collect_all_manifests();
+        assert_eq!(manifests.len(), 7);
     }
 }

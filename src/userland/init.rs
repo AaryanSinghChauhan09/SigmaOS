@@ -394,6 +394,18 @@ impl SystemdOnCalendarParser {
             None
         }
     }
+
+    pub fn resolve_on_calendar_interval(expr: &str) -> u64 {
+        match expr.trim() {
+            "minutely" => 60,
+            "hourly" => 3600,
+            "daily" | "midnight" => 86400,
+            "weekly" => 604800,
+            "monthly" => 2592000,
+            "annually" | "yearly" => 31536000,
+            _ => 86400,
+        }
+    }
 }
 
 /// Systemd sd_notify IPC Socket Notification Message
@@ -1502,6 +1514,10 @@ impl SovereignCoreUserlandInitEngine {
         self.at_jobs = remaining_jobs;
         ready_jobs
     }
+
+    pub fn audit_spool_queues(&self) -> (usize, usize, usize) {
+        (self.cron_entries.len(), self.anacron_jobs.len(), self.at_jobs.len())
+    }
 }
 
 // ============================================================================
@@ -1879,5 +1895,17 @@ mod tests {
         assert_eq!(pr_id, 5001);
         let diff = gateway.generate_pr_unified_diff(pr_id).unwrap();
         assert!(diff.contains("Add systemd socket activation support"));
+    }
+
+    #[test]
+    fn test_task_execution_auditing() {
+        let engine = SovereignCoreUserlandInitEngine::new();
+        assert_eq!(SystemdOnCalendarParser::resolve_on_calendar_interval("hourly"), 3600);
+        assert_eq!(SystemdOnCalendarParser::resolve_on_calendar_interval("daily"), 86400);
+
+        let (cron, anacron, at) = engine.audit_spool_queues();
+        assert_eq!(cron, 0);
+        assert_eq!(anacron, 0);
+        assert_eq!(at, 0);
     }
 }
