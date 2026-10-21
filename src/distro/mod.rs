@@ -511,6 +511,8 @@ pub mod freebsd_missing_components_v60_pr;
 pub use freebsd_missing_components_v60_pr::*;
 pub mod freebsd_missing_components_v61_pr;
 pub use freebsd_missing_components_v61_pr::*;
+pub mod freebsd_missing_components_v62_pr;
+pub use freebsd_missing_components_v62_pr::*;
 pub mod openbsd_missing_components_v60_pr;
 pub use openbsd_missing_components_v60_pr::*;
 pub mod openbsd_missing_components_v61_pr;
