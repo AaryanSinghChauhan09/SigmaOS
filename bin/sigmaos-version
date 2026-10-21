@@ -1,0 +1,14 @@
+#!/bin/bash
+# sigmaos-version - Report SigmaOS version
+# Modeled on Omancy 4.0.5 omancy-version
+
+set -euo pipefail
+
+SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+VERSION_FILE="${SIGMAOS_PATH}/version"
+
+if [ -f "${VERSION_FILE}" ]; then
+  cat "${VERSION_FILE}"
+else
+  echo "0.1.0"
+fi

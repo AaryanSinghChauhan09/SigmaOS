@@ -1,0 +1,30 @@
+#!/bin/bash
+# sigmaos-default-browser - Report/set default browser
+# Modeled on Omancy 4.0.5 omancy-default-browser
+
+set -euo pipefail
+
+# Check xdg-settings first
+if command -v xdg-settings >/dev/null 2>&1; then
+  local browser
+  browser=$(xdg-settings get default-web-browser 2>/dev/null || echo "")
+  if [ -n "${browser}" ]; then
+    # Extract name from .desktop file
+    case "${browser}" in
+      chromium.desktop) echo "chromium" ;;
+      firefox.desktop) echo "firefox" ;;
+      epiphany.desktop) echo "epiphany" ;;
+      *) echo "${browser%.desktop}" ;;
+    esac
+    exit 0
+  fi
+fi
+
+# Fallback: check default terminal symlink or config
+if command -v chromium >/dev/null 2>&1; then
+  echo "chromium"
+elif command -v firefox >/dev/null 2>&1; then
+  echo "firefox"
+else
+  echo "chromium"
+fi

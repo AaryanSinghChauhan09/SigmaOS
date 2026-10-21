@@ -1,0 +1,13 @@
+#!/bin/bash
+# sigmaos-theme-bg-current - Report current background
+# Modeled on Omancy 4.0.5 omancy-theme-bg-current
+
+set -euo pipefail
+
+BG_STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/background"
+
+if [ -f "${BG_STATE_FILE}" ]; then
+  cat "${BG_STATE_FILE}"
+else
+  echo "sigmaos-default"
+fi

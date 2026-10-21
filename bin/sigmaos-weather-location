@@ -1,0 +1,32 @@
+#!/bin/bash
+# sigmaos-weather-location - Set/get weather location
+# Modeled on Omancy 4.0.5 omancy-weather-location
+
+set -euo pipefail
+
+WEATHER_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos"
+WEATHER_FILE="${WEATHER_STATE_DIR}/weather.json"
+
+mkdir -p "${WEATHER_STATE_DIR}"
+
+case "${1:-}" in
+  --set)
+    local city="$2"
+    local coords="$3"
+    if [ -z "${city}" ] || [ -z "${coords}" ]; then
+      echo "Usage: sigmaos-weather-location --set <city> <lat,lon>" >&2
+      exit 1
+    fi
+    cat > "${WEATHER_FILE}" <<EOF
+{"city": "${city}", "coordinates": "${coords}", "updated": "$(date -u +%s)"}
+EOF
+    echo "Weather location set to ${city} (${coords})"
+    ;;
+  *)
+    if [ -f "${WEATHER_FILE}" ]; then
+      cat "${WEATHER_FILE}"
+    else
+      echo '{"city": "Unknown", "coordinates": "0,0"}'
+    fi
+    ;;
+esac

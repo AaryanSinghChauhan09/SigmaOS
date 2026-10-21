@@ -1,0 +1,17 @@
+#!/bin/bash
+# sigmaos-default-editor - Report/set default editor
+# Modeled on Omancy 4.0.5 omancy-default-editor
+
+set -euo pipefail
+
+if command -v nvim >/dev/null 2>&1; then
+  echo "nvim"
+elif command -v micro >/dev/null 2>&1; then
+  echo "micro"
+elif command -v vim >/dev/null 2>&1; then
+  echo "vim"
+elif command -v helix >/dev/null 2>&1; then
+  echo "helix"
+else
+  echo "nvim"
+fi

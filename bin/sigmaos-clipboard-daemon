@@ -15,6 +15,11 @@ POLL_INTERVAL=0.5
 mkdir -p "$(dirname "${HISTORY_FILE}")"
 touch "${HISTORY_FILE}"
 
+# Also maintain JSON history for shell plugin
+CLIPBOARD_JSON="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/clipboard-history.json"
+mkdir -p "$(dirname "${CLIPBOARD_JSON}")"
+touch "${CLIPBOARD_JSON}"
+
 last_hash=""
 
 while true; do
@@ -28,6 +33,8 @@ while true; do
         date +%s
         echo "${current}"
       } >> "${HISTORY_FILE}"
+      # Also append to JSON history for shell plugin
+      echo "{\"timestamp\": $(date +%s), \"content\": \"${current}\"}" >> "${CLIPBOARD_JSON}"
       # Trim to max entries (keep pairs of timestamp+content).
       # Simple approach: keep file size bounded.
       if [ "$(wc -l < "${HISTORY_FILE}")" -gt $((MAX_ENTRIES * 3)) ]; then

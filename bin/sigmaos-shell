@@ -1,77 +1,184 @@
 #!/bin/bash
-# sigmaos-shell - SigmaOS desktop session startup
-# Inspired by Omarchy 4.0.5 shell session startup
+# sigmaos-shell - SigmaOS unified shell controller
+# Modeled on Omancy 4.0.5 omancy-shell
 #
-# This is the entry point executed by systemd user service sigmaos-shell.service.
-# It launches the window manager, bar, notifications, and desktop components.
+# Commands:
+#   sigmaos-shell ping                          - Check shell responsiveness
+#   sigmaos-shell listPlugins                   - List loaded shell plugins
+#   sigmaos-shell summon <plugin> [payload]     - Open a shell plugin overlay
+#   sigmaos-shell hide <plugin>                 - Close a shell plugin overlay
+#   sigmaos-shell toggle-bar on|off             - Toggle bar visibility
 #
-# Design: Single responsibility - start the desktop session. Delegates to
-# individual component scripts (separation of concerns). Secure defaults:
-# fails gracefully if components are missing.
+# Plugin overlays are implemented as separate scripts that render a
+# temporary UI layer (waybar module, wofi menu, mako notification, etc.)
+# and register themselves in the shell plugin registry.
+#
+# Design: single responsibility, loose coupling, command-query separation,
+# secure defaults, fail-fast, deterministic.
 
 set -uo pipefail
 
-# Resolve SigmaOS paths.
 SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
 export SIGMAOS_PATH
 
-# Source environment bootstrap.
-if [ -r "${SIGMAOS_PATH}/default/bash/env-bootstrap" ]; then
-  # shellcheck source=/dev/null
-  . "${SIGMAOS_PATH}/default/bash/env-bootstrap"
-fi
+PLUGIN_STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/sigmaos-shell"
+PLUGIN_REGISTRY="${PLUGIN_STATE_DIR}/plugins"
+PLUGIN_DIR="${SIGMAOS_PATH}/shell/plugins"
+mkdir -p "${PLUGIN_STATE_DIR}"
 
-# Wait for logind/seat to be ready (direct device control via logind).
-for i in $(seq 1 30); do
-  if loginctl show-session "$(loginctl | awk -v user="$USER" '$3==user{print $1}')" -p State 2>/dev/null | grep -q "State=active"; then
-    break
+log() { echo "[sigmaos-shell] $*" >&2; }
+
+# ---------------------------------------------------------------------------
+# Plugin registry
+# ---------------------------------------------------------------------------
+register_plugin() {
+  local plugin="$1"
+  local status="${2:-loaded}"
+  echo "${plugin}=${status}" >> "${PLUGIN_REGISTRY}"
+}
+
+is_plugin_loaded() {
+  local plugin="$1"
+  grep -q "^${plugin}=" "${PLUGIN_REGISTRY}" 2>/dev/null
+}
+
+get_plugin_status() {
+  local plugin="$1"
+  grep "^${plugin}=" "${PLUGIN_REGISTRY}" 2>/dev/null | cut -d= -f2 || echo "unknown"
+}
+
+set_plugin_status() {
+  local plugin="$1"
+  local status="$2"
+  if is_plugin_loaded "${plugin}"; then
+    sed -i "s/^${plugin}=.*/${plugin}=${status}/" "${PLUGIN_REGISTRY}"
+  else
+    echo "${plugin}=${status}" >> "${PLUGIN_REGISTRY}"
   fi
-  sleep 0.5
-done
+}
 
-# Start the notification daemon (mako) if available.
-if command -v mako >/dev/null 2>&1; then
-  mako &
-fi
+# Register all available plugins on startup
+register_all_plugins() {
+  : > "${PLUGIN_REGISTRY}"
+  local plugins="audio background bar bluetooth clipboard emojis menu monitor network notifications power reminders weather"
+  for plugin in ${plugins}; do
+    register_plugin "${plugin}" "loaded"
+  done
+}
 
-# Start the clipboard daemon if available.
-if command -v sigmaos-clipboard-daemon >/dev/null 2>&1; then
-  sigmaos-clipboard-daemon &
-fi
+# Initialize plugin registry on startup
+register_all_plugins
 
-# Start the reminder daemon if available.
-if command -v sigmaos-reminderd >/dev/null 2>&1; then
-  sigmaos-reminderd &
-fi
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+cmd_ping() {
+  log "pong"
+  echo "pong"
+}
 
-# Start the power manager if available.
-if command -v sigmaos-power-manager >/dev/null 2>&1; then
-  sigmaos-power-manager &
-fi
+cmd_listPlugins() {
+  local plugins=""
+  if [ -f "${PLUGIN_REGISTRY}" ]; then
+    plugins=$(cut -d= -f1 "${PLUGIN_REGISTRY}" | tr '\n' ' ')
+  fi
+  echo "${plugins}"
+}
 
-# Start WirePlumber audio if available.
-if command -v wireplumber >/dev/null 2>&1; then
-  wireplumber &
-fi
+cmd_summon() {
+  local plugin="$1"
+  local payload="${2:-}"
 
-# Restore wallpaper if swww is available.
-if command -v swww >/dev/null 2>&1 && [ -f "${HOME}/.config/sigmaos/wallpaper" ]; then
-  swww restore "$(cat "${HOME}/.config/sigmaos/wallpaper")" 2>/dev/null || true
-fi
+  if [ -z "${plugin}" ]; then
+    log "error: plugin name required"
+    exit 1
+  fi
 
-# Start Waybar if available.
-if command -v waybar >/dev/null 2>&1; then
-  waybar &
-fi
+  # Register the plugin as active
+  set_plugin_status "${plugin}" "active"
 
-# Launch the window manager (Hyprland) - this blocks until the session ends.
-# Direct device control via logind seat (DRM, input, audio).
-if command -v Hyprland >/dev/null 2>&1; then
-  exec Hyprland
-elif command -v hyprland >/dev/null 2>&1; then
-  exec hyprland
-else
-  echo "[sigmaos-shell] No window manager found. Starting fallback shell."
-  # Fallback: keep the session alive with a simple loop.
-  while true; do sleep 60; done
-fi
+  # Dispatch to the plugin's summon handler
+  local plugin_script="${PLUGIN_DIR}/${plugin}.sh"
+  if [ -f "${plugin_script}" ]; then
+    # shellcheck source=/dev/null
+    . "${plugin_script}" summon "${payload}"
+  else
+    # Fallback: generic plugin activation
+    log "activating plugin: ${plugin}"
+    if [ -n "${payload}" ]; then
+      echo "${payload}" > "${PLUGIN_STATE_DIR}/${plugin}.payload"
+    fi
+  fi
+
+  echo "${plugin} summoned"
+}
+
+cmd_hide() {
+  local plugin="$1"
+
+  if [ -z "${plugin}" ]; then
+    log "error: plugin name required"
+    exit 1
+  fi
+
+  set_plugin_status "${plugin}" "hidden"
+
+  local plugin_script="${PLUGIN_DIR}/${plugin}.sh"
+  if [ -f "${plugin_script}" ]; then
+    # shellcheck source=/dev/null
+    . "${plugin_script}" hide
+  fi
+
+  echo "${plugin} hidden"
+}
+
+cmd_toggle_bar() {
+  local state="$1"
+  if [ -z "${state}" ]; then
+    log "error: bar state required (on|off)"
+    exit 1
+  fi
+
+  # Signal waybar to toggle visibility
+  if command -v pkill >/dev/null 2>&1; then
+    if [ "${state}" = "off" ]; then
+      pkill -USR1 waybar 2>/dev/null || true
+    else
+      pkill -USR1 waybar 2>/dev/null || true
+    fi
+  fi
+
+  set_plugin_status "sigmaos.bar" "${state}"
+  echo "bar ${state}"
+}
+
+# ---------------------------------------------------------------------------
+# Main dispatch
+# ---------------------------------------------------------------------------
+main() {
+  local cmd="${1:-}"
+
+  case "${cmd}" in
+    ping)
+      cmd_ping
+      ;;
+    listPlugins)
+      cmd_listPlugins
+      ;;
+    summon)
+      cmd_summon "${2:-}" "${3:-}"
+      ;;
+    hide)
+      cmd_hide "${2:-}"
+      ;;
+    toggle-bar)
+      cmd_toggle_bar "${2:-}"
+      ;;
+    *)
+      echo "Usage: sigmaos-shell <ping|listPlugins|summon|hide|toggle-bar> [args...]" >&2
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

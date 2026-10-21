@@ -1,0 +1,13 @@
+#!/bin/bash
+# sigmaos-font-current - Report current monospace font
+# Modeled on Omancy 4.0.5 omancy-font-current
+
+set -euo pipefail
+
+FONT_STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/font"
+
+if [ -f "${FONT_STATE_FILE}" ]; then
+  cat "${FONT_STATE_FILE}"
+else
+  echo "JetBrainsMono Nerd Font"
+fi

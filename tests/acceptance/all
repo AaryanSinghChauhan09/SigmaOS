@@ -1,0 +1,29 @@
+#!/bin/bash
+# sigmaos-acceptance - Run all SigmaOS acceptance test suites
+# Modeled on Omancy 4.0.5 test/all
+
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+
+tests=(
+  "$ROOT/acceptance/base-acceptance.sh"
+  "$ROOT/acceptance/session-acceptance.sh"
+  "$ROOT/acceptance/apps-acceptance.sh"
+)
+
+# Run every suite even when an earlier one fails, so a single failure can't
+# hide whole suites behind it.
+failed=()
+for test in "${tests[@]}"; do
+  printf '==> %s\n' "${test#$ROOT/}"
+  "$test" || failed+=("${test#$ROOT/}")
+done
+
+if (( ${#failed[@]} > 0 )); then
+  printf '\n%d of %d suites failed:\n' "${#failed[@]}" "${#tests[@]}" >&2
+  printf '  %s\n' "${failed[@]}" >&2
+  exit 1
+fi
+
+echo "All SigmaOS acceptance tests passed."

@@ -1,0 +1,17 @@
+#!/bin/bash
+# sigmaos-default-terminal - Report/set default terminal
+# Modeled on Omancy 4.0.5 omancy-default-terminal
+
+set -euo pipefail
+
+if command -v foot >/dev/null 2>&1; then
+  echo "foot"
+elif command -v ghostty >/dev/null 2>&1; then
+  echo "ghostty"
+elif command -v kitty >/dev/null 2>&1; then
+  echo "kitty"
+elif command -v alacritty >/dev/null 2>&1; then
+  echo "alacritty"
+else
+  echo "foot"
+fi

@@ -1,0 +1,13 @@
+#!/bin/bash
+# sigmaos-theme-current - Report current theme
+# Modeled on Omancy 4.0.5 omancy-theme-current
+
+set -euo pipefail
+
+THEME_STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/theme"
+
+if [ -f "${THEME_STATE_FILE}" ]; then
+  cat "${THEME_STATE_FILE}"
+else
+  echo "sigmaos"
+fi
