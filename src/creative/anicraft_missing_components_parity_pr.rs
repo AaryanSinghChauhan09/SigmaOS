@@ -2,6 +2,7 @@
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 
+#![no_std]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -698,8 +699,6 @@ mod tests {
     fn test_nla_blending_engine() {
         let engine = AnicraftNlaTrackClipBlendingPrEngine::new();
         let frame20_val = engine.evaluate_blended_value(20);
-        // Clip 1 progress at frame 20: 20/60 = 1/3 -> 10.0 * (1/3) = 3.333
-        // Clip 2 progress at frame 20: (20-15)/30 = 5/30 = 1/6 -> 5.0 * (1/6) * 0.5 = 0.4166
         assert!(frame20_val > 3.0);
     }
 

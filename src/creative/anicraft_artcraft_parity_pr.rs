@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: MIT
+// SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
+// (`src/creative/anicraft_artcraft_parity_pr.rs`)
+
 #![no_std]
 extern crate alloc;
 
