@@ -555,6 +555,7 @@ pub mod privacy;
 pub mod provisioning;
 pub mod recovery;
 pub mod release;
+pub mod reminder;
 pub mod resource;
 pub mod robotics;
 pub mod rt;
