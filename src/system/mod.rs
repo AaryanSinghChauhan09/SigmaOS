@@ -159,6 +159,7 @@ pub mod sigmafilewatcher;
 pub mod sigmaindexmanager;
 pub mod sigmacachemanager2;
 pub mod sigmacompressionmanager;
+pub mod sigmaencryptionmanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -316,6 +317,11 @@ pub use sigmacachemanager2::{
 pub use sigmacompressionmanager::{
     CompressionAlgorithm as CompressionManagerAlgorithm, CompressionManager,
     CompressionOperation as CompressionManagerOperation, OperationState as CompressionManagerState,
+};
+pub use sigmaencryptionmanager::{
+    CipherAlgorithm as EncryptionManagerCipher, EncryptedVolume as EncryptionManagerVolume,
+    EncryptionKey as EncryptionManagerKey, EncryptionManager, KeyType as EncryptionManagerKeyType,
+    VolumeState as EncryptionManagerVolumeState,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
