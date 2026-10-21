@@ -538,6 +538,8 @@ pub mod cachy_linux_missing_components_v62_pr;
 pub mod cachy_linux_missing_components_v63_pr;
 pub mod cachy_linux_missing_components_v64_pr;
 pub use cachy_linux_missing_components_parity_pr::*;
+pub mod cachy_linux_missing_components_v65_pr;
+pub use cachy_linux_missing_components_v65_pr::*;
 pub use cachy_linux_missing_components_pr_gateway::*;
 pub use cachy_linux_missing_components_v56_pr::*;
 pub use cachy_linux_missing_components_v58_pr::*;
@@ -799,9 +801,6 @@ pub use open_source_os_unimplemented_ideas_v64_pr::*;
 
 pub mod open_source_os_unimplemented_ideas_v65_pr;
 pub use open_source_os_unimplemented_ideas_v65_pr::*;
-
-pub mod omarchy_linux_missing_components_v62_pr;
-pub use omarchy_linux_missing_components_v62_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
