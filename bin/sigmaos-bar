@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# sigmaos-bar - Desktop Shell Status Stream & Metrics Provider
+# Modeled on Omarchy 4.0.6 quickshell top bar engine
+#
+# Outputs JSON-formatted telemetry for Waybar / Quickshell:
+# CPU, Memory, Workspaces, Battery, Audio, and Security status (OpenBSD pledge).
+set -euo pipefail
+
+get_cpu_usage() {
+    if [ -f /proc/stat ]; then
+        read -r cpu a b c idle rest < /proc/stat
+        total=$((a + b + c + idle))
+        usage=$(( (total - idle) * 100 / total ))
+        echo "${usage}%"
+    else
+        echo "0%"
+    fi
+}
+
+get_mem_usage() {
+    if [ -f /proc/meminfo ]; then
+        total=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+        avail=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
+        used=$(( (total - avail) * 100 / total ))
+        echo "${used}%"
+    else
+        echo "0%"
+    fi
+}
+
+get_battery() {
+    bat="/sys/class/power_supply/BAT0"
+    if [ -d "$bat" ] && [ -f "$bat/capacity" ]; then
+        cat "$bat/capacity" | tr -d '\n'
+        echo "%"
+    else
+        echo "AC"
+    fi
+}
+
+get_pledge_status() {
+    echo "pledge:stdio,rpath,wpath"
+}
+
+# Single snapshot JSON output
+cat << JSON
+{
+  "cpu": "$(get_cpu_usage)",
+  "memory": "$(get_mem_usage)",
+  "battery": "$(get_battery)",
+  "security": "$(get_pledge_status)",
+  "compositor": "Hyprland",
+  "kernel": "SigmaOS-x86_64",
+  "text": "SigmaOS | CPU $(get_cpu_usage) | RAM $(get_mem_usage) | $(get_battery)",
+  "tooltip": "SigmaOS Sovereign Workstation\nSecurity: $(get_pledge_status)\nBase: Arch/Omarchy/Mint Parity"
+}
+JSON

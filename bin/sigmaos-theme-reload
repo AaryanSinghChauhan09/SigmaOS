@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# sigmaos-theme-reload - Live Dynamic Theme Hot-Reload Dispatcher
+# Modeled on Omarchy 4.0.6 live theming pipeline (wallust / matugen / hyprland)
+#
+# Principles: COMMAND-QUERY SEPARATION, FAIL-FAST, LOOSE COUPLING, DEFENSIVE PROGRAMMING
+set -uo pipefail
+
+SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+THEME_NAME="${1:-$(bash "$SIGMAOS_PATH/bin/sigmaos-theme-current" 2>/dev/null || echo "default")}"
+
+log() { echo "[sigmaos-theme-reload] $*" >&2; }
+
+log "Reloading system themes dynamically for: $THEME_NAME"
+
+# 1. Reload Hyprland styles via hyprctl if compositor running
+if command -v hyprctl >/dev/null 2>&1 && [ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+    log "Reloading Hyprland border and active window colors..."
+    hyprctl reload >/dev/null 2>&1 || true
+fi
+
+# 2. Reload Foot terminals via SIGUSR1
+if command -v pkill >/dev/null 2>&1; then
+    pkill -USR1 -x foot 2>/dev/null && log "Foot terminal color profile reloaded" || true
+fi
+
+# 3. Reload Kitty terminals via remote control
+if command -v kitty >/dev/null 2>&1; then
+    kitty @ set-colors --all --configured 2>/dev/null && log "Kitty terminal colors refreshed" || true
+fi
+
+# 4. Reload Waybar if running
+if command -v pkill >/dev/null 2>&1; then
+    pkill -USR2 -x waybar 2>/dev/null && log "Waybar status styling refreshed" || true
+fi
+
+# 5. Reload Shell Daemon overlay
+if [ -x "$SIGMAOS_PATH/bin/sigmaos-shell" ]; then
+    "$SIGMAOS_PATH/bin/sigmaos-shell" ping >/dev/null 2>&1 || true
+fi
+
+log "Theme reload complete for $THEME_NAME."
+exit 0
