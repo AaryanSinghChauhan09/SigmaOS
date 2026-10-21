@@ -77,48 +77,53 @@ impl SigmaContainerManager {
         self.containers.iter_mut().find(|c| c.id == id)
     }
 
-    pub fn start_container(&mut self, id: String) -> Result<(), String> {
-        if let Some(container) = self.get_container_mut(&id) {
+    pub fn start_container(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(container) = self.get_container_mut(id_str) {
             container.state = ContainerState::Running;
             Ok(())
         } else {
-            Err(format!("Container {} not found", id))
+            Err(format!("Container {} not found", id_str))
         }
     }
 
-    pub fn stop_container(&mut self, id: String) -> Result<(), String> {
-        if let Some(container) = self.get_container_mut(&id) {
+    pub fn stop_container(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(container) = self.get_container_mut(id_str) {
             container.state = ContainerState::Stopped;
             Ok(())
         } else {
-            Err(format!("Container {} not found", id))
+            Err(format!("Container {} not found", id_str))
         }
     }
 
-    pub fn pause_container(&mut self, id: String) -> Result<(), String> {
-        if let Some(container) = self.get_container_mut(&id) {
+    pub fn pause_container(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(container) = self.get_container_mut(id_str) {
             container.state = ContainerState::Paused;
             Ok(())
         } else {
-            Err(format!("Container {} not found", id))
+            Err(format!("Container {} not found", id_str))
         }
     }
 
-    pub fn resume_container(&mut self, id: String) -> Result<(), String> {
-        if let Some(container) = self.get_container_mut(&id) {
+    pub fn resume_container(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(container) = self.get_container_mut(id_str) {
             container.state = ContainerState::Running;
             Ok(())
         } else {
-            Err(format!("Container {} not found", id))
+            Err(format!("Container {} not found", id_str))
         }
     }
 
-    pub fn remove_container(&mut self, id: String) -> Result<(), String> {
-        if let Some(idx) = self.containers.iter().position(|c| c.id == id) {
+    pub fn remove_container(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(idx) = self.containers.iter().position(|c| c.id == id_str) {
             self.containers.remove(idx);
             Ok(())
         } else {
-            Err(format!("Container {} not found", id))
+            Err(format!("Container {} not found", id_str))
         }
     }
 
@@ -190,8 +195,8 @@ mod tests {
             network_enabled: true,
         };
         let container = manager.create_container("test".to_string(), config);
-        manager.start_container(container.id.clone()).unwrap();
-        manager.stop_container(container.id).unwrap();
+        manager.start_container(&container.id).unwrap();
+        manager.stop_container(&container.id).unwrap();
         assert_eq!(manager.get_containers()[0].state, ContainerState::Stopped);
     }
 

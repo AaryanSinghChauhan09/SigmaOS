@@ -3,15 +3,10 @@
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 
 extern crate alloc;
-
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
-
-
-
-
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -130,18 +125,20 @@ impl AnicraftFabrikInverseKinematicsPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 850,
-            pr_title:
-                "feat(anicraft): Implement FABRIK Inverse Kinematics (IK) Multi-Bone Chain Solver"
-                    .to_string(),
-            target_subsystem: "AniCraft Skeletal Rigging Engine".to_string(),
-            original_suite: "ArtCraft AniCraft IK Solver".to_string(),
+            pr_title: String::from(
+                "feat(anicraft): Implement FABRIK Inverse Kinematics (IK) Multi-Bone Chain Solver",
+            ),
+            target_subsystem: String::from("AniCraft Skeletal Rigging Engine"),
+            original_suite: String::from("ArtCraft AniCraft IK Solver"),
             components_added: vec![
-                "FABRIK (Forward And Backward Reaching IK) multi-joint chain solver".to_string(),
-                "Target distance reachability and bone constraint clamping".to_string(),
-                "Sub-millisecond multi-limb character posing convergence".to_string(),
+                String::from(
+                    "FABRIK (Forward And Backward Reaching IK) multi-joint chain solver",
+                ),
+                String::from("Target distance reachability and bone constraint clamping"),
+                String::from("Sub-millisecond multi-limb character posing convergence"),
             ],
-            performance_multiplier: "100+ IK Skeletal Chains Solved in <0.2ms".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: String::from("100+ IK Skeletal Chains Solved in <0.2ms"),
+            status: String::from("Ready for Merge"),
         }
     }
 }
@@ -188,7 +185,7 @@ impl AnicraftNlaTrackClipBlendingPrEngine {
         let mut clips = Vec::new();
         clips.push(NlaClip {
             clip_id: 1,
-            name: "WalkCycle".to_string(),
+            name: String::from("WalkCycle"),
             start_frame: 0,
             duration_frames: 60,
             base_value: 0.0,
@@ -198,7 +195,7 @@ impl AnicraftNlaTrackClipBlendingPrEngine {
         });
         clips.push(NlaClip {
             clip_id: 2,
-            name: "WaveAdditive".to_string(),
+            name: String::from("WaveAdditive"),
             start_frame: 15,
             duration_frames: 30,
             base_value: 0.0,
@@ -245,16 +242,16 @@ impl AnicraftNlaTrackClipBlendingPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 851,
-            pr_title: "feat(anicraft): Implement Non-Linear Animation (NLA) Multi-Track Clip Blending Engine".to_string(),
-            target_subsystem: "AniCraft NLA & Clip Manager".to_string(),
-            original_suite: "ArtCraft AniCraft NLA Track Suite".to_string(),
+            pr_title: String::from("feat(anicraft): Implement Non-Linear Animation (NLA) Multi-Track Clip Blending Engine"),
+            target_subsystem: String::from("AniCraft NLA & Clip Manager"),
+            original_suite: String::from("ArtCraft AniCraft NLA Track Suite"),
             components_added: vec![
-                "Multi-track non-linear animation clip layout & timeline mapping".to_string(),
-                "Replace, Additive, and Multiplicative clip blending modes".to_string(),
-                "Time-scaling and dynamic weight influence modulation".to_string(),
+                String::from("Multi-track non-linear animation clip layout & timeline mapping"),
+                String::from("Replace, Additive, and Multiplicative clip blending modes"),
+                String::from("Time-scaling and dynamic weight influence modulation"),
             ],
-            performance_multiplier: "1000+ Blended Animation Tracks Evaluated in <0.1ms".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: String::from("1000+ Blended Animation Tracks Evaluated in <0.1ms"),
+            status: String::from("Ready for Merge"),
         }
     }
 }
@@ -331,19 +328,20 @@ impl AnicraftOnionSkinningPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 852,
-            pr_title:
-                "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-Frame Ghosts Engine"
-                    .to_string(),
-            target_subsystem: "AniCraft Timeline & Frame Preview".to_string(),
-            original_suite: "ArtCraft AniCraft Onion Skinning".to_string(),
+            pr_title: String::from(
+                "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-Frame Ghosts Engine",
+            ),
+            target_subsystem: String::from("AniCraft Timeline & Frame Preview"),
+            original_suite: String::from("ArtCraft AniCraft Onion Skinning"),
             components_added: vec![
-                "Multi-layer onion skinning with past/future frame ghosting".to_string(),
-                "Directional color tinting (retro-red / ahead-green) and opacity falloff"
-                    .to_string(),
-                "Sub-frame vector contour preview for frame-by-frame animators".to_string(),
+                String::from("Multi-layer onion skinning with past/future frame ghosting"),
+                String::from(
+                    "Directional color tinting (retro-red / ahead-green) and opacity falloff",
+                ),
+                String::from("Sub-frame vector contour preview for frame-by-frame animators"),
             ],
-            performance_multiplier: "Instant Zero-Allocation Ghost Contour Rendering".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: String::from("Instant Zero-Allocation Ghost Contour Rendering"),
+            status: String::from("Ready for Merge"),
         }
     }
 }
@@ -457,19 +455,20 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 853,
-            pr_title:
-                "feat(anicraft): Implement Audio-Driven Phoneme/Viseme LipSync Timeline Engine"
-                    .to_string(),
-            target_subsystem: "AniCraft Audio & LipSync Timeline".to_string(),
-            original_suite: "ArtCraft AniCraft LipSync Studio".to_string(),
+            pr_title: String::from(
+                "feat(anicraft): Implement Audio-Driven Phoneme/Viseme LipSync Timeline Engine",
+            ),
+            target_subsystem: String::from("AniCraft Audio & LipSync Timeline"),
+            original_suite: String::from("ArtCraft AniCraft LipSync Studio"),
             components_added: vec![
-                "Audio timestamp to phoneme/viseme mouth shape keyframe mapping".to_string(),
-                "7-category viseme classification (Rest, AE, IO, UW, MPB, FV, LNT)".to_string(),
-                "Sub-frame smooth intensity interpolation and morph transition".to_string(),
+                String::from("Audio timestamp to phoneme/viseme mouth shape keyframe mapping"),
+                String::from("7-category viseme classification (Rest, AE, IO, UW, MPB, FV, LNT)"),
+                String::from("Sub-frame smooth intensity interpolation and morph transition"),
             ],
-            performance_multiplier: "Sub-millisecond Real-Time Audio LipSync Evaluation"
-                .to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: String::from(
+                "Sub-millisecond Real-Time Audio LipSync Evaluation",
+            ),
+            status: String::from("Ready for Merge"),
         }
     }
 }
@@ -517,9 +516,9 @@ impl AnicraftMeshDeformationShapeKeysPrEngine {
 
         let mut shape_keys = BTreeMap::new();
         shape_keys.insert(
-            "Smile".to_string(),
+            String::from("Smile"),
             ShapeKey2D {
-                name: "Smile".to_string(),
+                name: String::from("Smile"),
                 weight: 0.8,
                 deltas: vec![
                     VertexDelta2D { dx: 0.0, dy: 1.0 },
@@ -557,16 +556,16 @@ impl AnicraftMeshDeformationShapeKeysPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 854,
-            pr_title: "feat(anicraft): Implement Mesh Deformation & Morph Target / Shape Key Morphing Engine".to_string(),
-            target_subsystem: "AniCraft Mesh Deformation Engine".to_string(),
-            original_suite: "ArtCraft AniCraft Mesh Morpher".to_string(),
+            pr_title: String::from("feat(anicraft): Implement Mesh Deformation & Morph Target / Shape Key Morphing Engine"),
+            target_subsystem: String::from("AniCraft Mesh Deformation Engine"),
+            original_suite: String::from("ArtCraft AniCraft Mesh Morpher"),
             components_added: vec![
-                "Mesh vertex grid deformation and lattice warping".to_string(),
-                "Morph target shape key definition with weight parameter controls".to_string(),
-                "Linear blend shape vertex displacement evaluation".to_string(),
+                String::from("Mesh vertex grid deformation and lattice warping"),
+                String::from("Morph target shape key definition with weight parameter controls"),
+                String::from("Linear blend shape vertex displacement evaluation"),
             ],
-            performance_multiplier: "10,000 Vertices Deformed in <0.3ms".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: String::from("10,000 Vertices Deformed in <0.3ms"),
+            status: String::from("Ready for Merge"),
         }
     }
 }

@@ -72,49 +72,54 @@ impl SigmaVirtualizationManager {
         self.vms.iter_mut().find(|v| v.id == id)
     }
 
-    pub fn start_vm(&mut self, id: String) -> Result<(), String> {
-        if let Some(vm) = self.get_vm_mut(&id) {
+    pub fn start_vm(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(vm) = self.get_vm_mut(id_str) {
             vm.state = VMState::Running;
             Ok(())
         } else {
-            Err(format!("VM {} not found", id))
+            Err(format!("VM {} not found", id_str))
         }
     }
 
-    pub fn stop_vm(&mut self, id: String) -> Result<(), String> {
-        if let Some(vm) = self.get_vm_mut(&id) {
+    pub fn stop_vm(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(vm) = self.get_vm_mut(id_str) {
             vm.state = VMState::Stopped;
             vm.uptime_seconds = 0;
             Ok(())
         } else {
-            Err(format!("VM {} not found", id))
+            Err(format!("VM {} not found", id_str))
         }
     }
 
-    pub fn pause_vm(&mut self, id: String) -> Result<(), String> {
-        if let Some(vm) = self.get_vm_mut(&id) {
+    pub fn pause_vm(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(vm) = self.get_vm_mut(id_str) {
             vm.state = VMState::Paused;
             Ok(())
         } else {
-            Err(format!("VM {} not found", id))
+            Err(format!("VM {} not found", id_str))
         }
     }
 
-    pub fn resume_vm(&mut self, id: String) -> Result<(), String> {
-        if let Some(vm) = self.get_vm_mut(&id) {
+    pub fn resume_vm(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(vm) = self.get_vm_mut(id_str) {
             vm.state = VMState::Running;
             Ok(())
         } else {
-            Err(format!("VM {} not found", id))
+            Err(format!("VM {} not found", id_str))
         }
     }
 
-    pub fn delete_vm(&mut self, id: String) -> Result<(), String> {
-        if let Some(idx) = self.vms.iter().position(|v| v.id == id) {
+    pub fn delete_vm(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(idx) = self.vms.iter().position(|v| v.id == id_str) {
             self.vms.remove(idx);
             Ok(())
         } else {
-            Err(format!("VM {} not found", id))
+            Err(format!("VM {} not found", id_str))
         }
     }
 
@@ -189,8 +194,8 @@ mod tests {
             network_enabled: true,
         };
         let vm = manager.create_vm(config);
-        manager.start_vm(vm.id.clone()).unwrap();
-        manager.stop_vm(vm.id).unwrap();
+        manager.start_vm(&vm.id).unwrap();
+        manager.stop_vm(&vm.id).unwrap();
         assert_eq!(manager.get_vms()[0].state, VMState::Stopped);
     }
 

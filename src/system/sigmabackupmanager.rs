@@ -84,40 +84,44 @@ impl SigmaBackupManager {
         self.backups.iter_mut().find(|b| b.id == id)
     }
 
-    pub fn start_backup(&mut self, id: String) -> Result<(), String> {
-        if let Some(backup) = self.get_backup_mut(&id) {
+    pub fn start_backup(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(backup) = self.get_backup_mut(id_str) {
             backup.status = BackupStatus::Running;
             Ok(())
         } else {
-            Err(format!("Backup {} not found", id))
+            Err(format!("Backup {} not found", id_str))
         }
     }
 
-    pub fn complete_backup(&mut self, id: String, size_bytes: u64) -> Result<(), String> {
-        if let Some(backup) = self.get_backup_mut(&id) {
+    pub fn complete_backup(&mut self, id: impl AsRef<str>, size_bytes: u64) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(backup) = self.get_backup_mut(id_str) {
             backup.status = BackupStatus::Completed;
             backup.size_bytes = size_bytes;
             Ok(())
         } else {
-            Err(format!("Backup {} not found", id))
+            Err(format!("Backup {} not found", id_str))
         }
     }
 
-    pub fn fail_backup(&mut self, id: String) -> Result<(), String> {
-        if let Some(backup) = self.get_backup_mut(&id) {
+    pub fn fail_backup(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(backup) = self.get_backup_mut(id_str) {
             backup.status = BackupStatus::Failed;
             Ok(())
         } else {
-            Err(format!("Backup {} not found", id))
+            Err(format!("Backup {} not found", id_str))
         }
     }
 
-    pub fn delete_backup(&mut self, id: String) -> Result<(), String> {
-        if let Some(idx) = self.backups.iter().position(|b| b.id == id) {
+    pub fn delete_backup(&mut self, id: impl AsRef<str>) -> Result<(), String> {
+        let id_str = id.as_ref();
+        if let Some(idx) = self.backups.iter().position(|b| b.id == id_str) {
             self.backups.remove(idx);
             Ok(())
         } else {
-            Err(format!("Backup {} not found", id))
+            Err(format!("Backup {} not found", id_str))
         }
     }
 
@@ -183,8 +187,8 @@ mod tests {
             "/source".to_string(),
             "/dest".to_string(),
         );
-        manager.start_backup(backup.id).unwrap();
-        manager.complete_backup(backup.id, 1000).unwrap();
+        manager.start_backup(&backup.id).unwrap();
+        manager.complete_backup(&backup.id, 1000).unwrap();
         assert_eq!(manager.get_backups()[0].status, BackupStatus::Completed);
         assert_eq!(manager.get_backups()[0].size_bytes, 1000);
     }
