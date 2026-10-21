@@ -2,18 +2,13 @@
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 
-extern crate alloc;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::f64::consts::PI;
 
-#[cfg(not(feature = "standalone_test"))]
-use alloc::collections::BTreeMap;
-#[cfg(not(feature = "standalone_test"))]
-use alloc::format;
-#[cfg(not(feature = "standalone_test"))]
-use alloc::string::{String, ToString};
-#[cfg(not(feature = "standalone_test"))]
-use alloc::vec;
-#[cfg(not(feature = "standalone_test"))]
-use alloc::vec::Vec;
+
+
 
 #[cfg(feature = "standalone_test")]
 use std::collections::BTreeMap;
