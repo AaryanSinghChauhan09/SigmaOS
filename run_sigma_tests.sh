@@ -465,6 +465,13 @@ if [ -f "src/creative/fontcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_fontcraft_missing
 fi
 
+if [ -f "src/creative/fontcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign FontCraft to ArtCraft Parity PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/fontcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_fontcraft_artcraft_parity
+    ./build/test_fontcraft_artcraft_parity
+fi
+
 if [ -f "src/creative/voicecraft.rs" ]; then
     echo "Running Sovereign VoiceCraft Engine test suite..."
     mkdir -p build

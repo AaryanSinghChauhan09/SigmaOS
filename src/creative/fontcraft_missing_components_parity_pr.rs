@@ -12,13 +12,13 @@
 // 5. FontcraftWoff2BrotliCompressionPrEngine (WOFF2/WOFF web font Brotli decompressed micro-font loading, header parsing & glyph subsetting)
 // 6. SovereignFontcraftArtcraftParityPrGateway (Master PR Gateway, Parity Benchmark Suite & Markdown PR Specification Generator)
 
-#![no_std]
+extern crate alloc;
 
-#![no_std]
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 
 
@@ -734,6 +734,7 @@ impl Default for SovereignFontcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_shaping_engine_ligatures_and_kerning() {
@@ -771,8 +772,8 @@ mod tests {
         assert!((engine.get_normalized_coordinate("wght") - 1.0).abs() < 1e-3);
 
         let (interp_x, interp_y) = engine.interpolate_point(10.0, 20.0, 5.0, 2.0);
-        assert!((interp_x - 15.0).abs() < 1e-3);
-        assert!((interp_y - 22.0).abs() < 1e-3);
+        assert!((interp_x - 15.0f32).abs() < 1e-3);
+        assert!((interp_y - 22.0f32).abs() < 1e-3);
     }
 
     #[test]
