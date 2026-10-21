@@ -189,11 +189,17 @@ impl UniversalPackageFormatInspectorV67 {
                 PackageSignatureKindV67::Unsigned,
                 "gzip",
             ),
-            f if f.ends_with(".ebuild") || f.ends_with(".tbz2") || f.ends_with(".gpkg.tar") => (
-                PackageFormat::Ebuild,
-                PackageSignatureKindV67::OpenBsdSignify,
-                "bzip2",
-            ),
+            f if f.ends_with(".ebuild")
+                || f.ends_with(".tbz2")
+                || f.ends_with(".portage")
+                || f.ends_with(".gpkg.tar") =>
+            {
+                (
+                    PackageFormat::Ebuild,
+                    PackageSignatureKindV67::OpenBsdSignify,
+                    "bzip2",
+                )
+            }
             f if f.ends_with(".xbps") => (
                 PackageFormat::Xbps,
                 PackageSignatureKindV67::OpenBsdSignify,
@@ -202,6 +208,11 @@ impl UniversalPackageFormatInspectorV67 {
             f if f.ends_with(".eopkg") => (
                 PackageFormat::Eopkg,
                 PackageSignatureKindV67::X509Certificate,
+                "xz",
+            ),
+            f if f.ends_with(".nixpkg") || f.ends_with(".nix") => (
+                PackageFormat::Nix,
+                PackageSignatureKindV67::CosignSigstore,
                 "xz",
             ),
             f if f.ends_with(".flatpak") || f.ends_with(".flatpakref") => (
@@ -523,6 +534,44 @@ impl UniversalPackageMetadataFlyweightV67 {
         Self {
             common_dependencies: map,
         }
+    }
+}
+
+/// Decorator Pattern V67
+pub struct EncryptedPackageDecoratorV67 {
+    pub inner_strategy: alloc::boxed::Box<dyn UniversalPackageStrategyV67>,
+    pub encryption_algo: String,
+}
+
+impl UniversalPackageStrategyV67 for EncryptedPackageDecoratorV67 {
+    fn format_kind(&self) -> PackageFormat {
+        self.inner_strategy.format_kind()
+    }
+    fn execute_stage(&self, stage: &str) -> Result<String, String> {
+        let base = self.inner_strategy.execute_stage(stage)?;
+        Ok(alloc::format!(
+            "Encrypted[{}] :: {}",
+            self.encryption_algo,
+            base
+        ))
+    }
+}
+
+/// Facade Pattern V67
+pub struct SovereignPackageFacadeV67 {
+    pub coordinator: SovereignDistroPackageAdvancementsSuiteV67,
+}
+
+impl SovereignPackageFacadeV67 {
+    pub fn new() -> Self {
+        Self {
+            coordinator: SovereignDistroPackageAdvancementsSuiteV67::new(),
+        }
+    }
+
+    pub fn quick_install(&mut self, filename: &str, payload: &[u8]) -> Result<String, String> {
+        let pkg = self.coordinator.process_and_install(filename, payload)?;
+        Ok(alloc::format!("Facade installed: {}", pkg.name))
     }
 }
 
@@ -1118,6 +1167,17 @@ mod tests {
 
         let flyweight = UniversalPackageMetadataFlyweightV67::new();
         assert!(flyweight.common_dependencies.contains_key("core"));
+
+        let decorator = EncryptedPackageDecoratorV67 {
+            inner_strategy: alloc::boxed::Box::new(DebPackageStrategyV67),
+            encryption_algo: "AES-256-GCM".to_string(),
+        };
+        let dec_res = decorator.execute_stage("Unpack").unwrap();
+        assert!(dec_res.contains("Encrypted[AES-256-GCM]"));
+
+        let mut facade = SovereignPackageFacadeV67::new();
+        let fac_res = facade.quick_install("ripgrep.apk", b"APK_PAYLOAD").unwrap();
+        assert!(fac_res.contains("ripgrep"));
     }
 
     #[test]
