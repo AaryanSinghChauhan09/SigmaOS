@@ -156,6 +156,7 @@ pub mod sigmasessionmanager;
 pub mod sigmasetupmanager;
 pub mod sigmastallmanager;
 pub mod sigmafilewatcher;
+pub mod sigmaindexmanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -301,6 +302,10 @@ pub use sigmatogglemanager::{
 pub use sigmafilewatcher::{
     EventMask as FileWatcherEventMask, FileEvent, FileWatcher, Watch as FileWatcherWatch,
     WatchState as FileWatcherState,
+};
+pub use sigmaindexmanager::{
+    IndexEntry as IndexManagerEntry, FileType as IndexManagerFileType, Index as IndexManagerIndex,
+    IndexManager, IndexState as IndexManagerState, IndexType as IndexManagerType,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
