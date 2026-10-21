@@ -51,6 +51,7 @@ pub mod sigmadevice;
 pub mod sigmadhcp;
 pub mod sigmadiskmanager;
 pub mod sigmadiskusage;
+pub mod sigmadisplaymanager;
 pub mod sigmadns;
 pub mod sigmadrivermanager;
 pub mod sigmaeffect;
