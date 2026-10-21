@@ -3,10 +3,24 @@
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 
 extern crate alloc;
+
+#[cfg(not(feature = "standalone_test"))]
 use alloc::collections::BTreeMap;
-use alloc::string::String;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::format;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
 use alloc::vec;
+#[cfg(not(feature = "standalone_test"))]
 use alloc::vec::Vec;
+
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::string::{String, ToString};
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -704,7 +718,7 @@ mod tests {
     fn test_onion_skinning_engine() {
         let engine = AnicraftOnionSkinningPrEngine::new(2, 2);
         let ghosts = engine.compute_ghost_frames(10);
-        assert_eq!(ghosts.len(), 4); // 2 past + 2 future
+        assert_eq!(ghosts.len(), 4);
         assert_eq!(ghosts[0].frame_index, 9);
         assert_eq!(ghosts[2].frame_index, 11);
     }

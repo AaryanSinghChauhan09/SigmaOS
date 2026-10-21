@@ -110,35 +110,17 @@ pub use sigmasystemmonitor2::{
     ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2,
     SystemMetrics,
 };
+pub mod sigmacommandmanager;
+pub mod sigmaconfigmanager;
 pub mod sigmacontainermanager;
+pub mod sigmarepositorymanager;
+pub mod sigmaresourcemanager;
 pub mod sigmasnapshotmanager;
+pub mod sigmathememanager;
 pub mod sigmavirtualizationmanager;
 pub use sigmabackupmanager::{
     BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus,
     BackupType as BackupManagerType, SigmaBackupManager as BackupManager,
-};
-pub mod sigmaaliasmanager;
-pub mod sigmacapturemanager;
-pub mod sigmaenvironmentmanager;
-pub mod sigmahardwaremanager;
-pub mod sigmahelpermanager;
-pub mod sigmalaunchmanager;
-pub mod sigmamenumanager;
-pub mod sigmamigrationmanager;
-pub mod sigmapathmanager;
-pub mod sigmaprivilegemanager;
-pub mod sigmaprofilemanager;
-pub mod sigmarefreshmanager;
-pub mod sigmarestartmanager;
-pub mod sigmasessionmanager;
-pub mod sigmasetupmanager;
-pub mod sigmastallmanager;
-pub mod sigmatemplatemanager;
-pub mod sigmatogglemanager;
-pub mod sigmaupdatemanager2;
-pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
-pub use sigmacapturemanager::{
-    Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
 };
 pub use sigmacommandmanager::{
     Command as CommandManagerCommand, CommandPermission as CommandManagerPermission,
@@ -152,6 +134,18 @@ pub use sigmacontainermanager::{
     ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager,
 };
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
+pub use sigmanotificationmanager::{
+    NotificationUrgency as NotificationManagerUrgency,
+    SigmaNotificationManager as NotificationManager,
+};
+pub use sigmarepositorymanager::{
+    Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType,
+    SigmaRepositoryManager as RepositoryManager,
+};
+pub use sigmaresourcemanager::{
+    ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota,
+    ResourceType as ResourceManagerType, SigmaResourceManager as ResourceManager,
+};
 pub use sigmasnapshotmanager::{
     SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot,
     SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType,
@@ -159,6 +153,9 @@ pub use sigmasnapshotmanager::{
 pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
+};
+pub use sigmathememanager::{
+    SigmaThemeManager, Theme as ThemeManagerTheme, ThemeColor as ThemeManagerColor,
 };
 pub use sigmavirtualizationmanager::{
     SigmaVirtualizationManager as VirtManager, VMConfig as VirtConfig, VMState as VirtState,
@@ -865,6 +862,11 @@ pub use sigmasystemtools::{
 pub use sigmausermanager::{
     add_user, get_sigmausermanager, get_sigmausermanager_mut, init_sigmausermanager,
     SigmaUserManager,
+};
+
+pub use sigmadisplaymanager::{
+    add_output, get_sigmadisplaymanager, get_sigmadisplaymanager_mut, init_sigmadisplaymanager,
+    SigmaDisplayManager,
 };
 
 pub use sigmapowermanager::{
