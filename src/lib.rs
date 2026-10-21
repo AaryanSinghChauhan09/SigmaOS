@@ -38,6 +38,8 @@ pub use creative::designcraft::*;
 // pub use creative::filmcraft_missing_components_parity_pr::*;
 pub use creative::fontcraft::*;
 // pub use creative::fontcraft_missing_components_parity_pr::*;
+pub use creative::gridcraft_artcraft_parity_pr::*;
+pub use creative::gridcraft_missing_components_parity_pr::*;
 // pub use creative::photocraft_artcraft_parity_pr::*;
 // pub use creative::soundcraft_artcraft_parity_pr::*;
 // pub use creative::soundcraft_missing_components_parity_pr::*;

@@ -1,5 +1,5 @@
 #![no_std]
-#![no_std]
+
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
 //
@@ -7,23 +7,20 @@
 //
 // Provides structured PR proposals and full engine implementations for components
 // missing in SigmaOS when compared to ArtCraft Gridcraft spreadsheet ecosystem capabilities:
-// 1. GridcraftAdvancedFormulaXlookupPrEngine (XLOOKUP, VLOOKUP, INDEX/MATCH, financial/statistical functions & DAG dependency solver)
-// 2. GridcraftDataValidationConditionalFormattingPrEngine (Data validation bounds/dropdowns & conditional formatting rules/data bars)
+// 1. GridcraftAdvancedFormulaXlookupMissingPrEngine (XLOOKUP, VLOOKUP, INDEX/MATCH, financial/statistical functions & DAG dependency solver)
+// 2. GridcraftDataValidationConditionalFormattingMissingPrEngine (Data validation bounds/dropdowns & conditional formatting rules/data bars)
 // 3. GridcraftRealtimeDataStreamSpillArrayPrEngine (Dynamic spill arrays FILTER/UNIQUE/SORT/SEQUENCE & real-time RTD ticker web queries)
 // 4. GridcraftFinancialGoalSeekSolverPrEngine (Newton-Raphson Goal Seek, What-If scenario manager & Monte Carlo simulation engine)
 // 5. GridcraftMultiUserCrdtCollabPrEngine (CRDT operational cell delta sync, locking matrix & lockless multi-user concurrency)
-// 6. GridcraftMacroScriptingUdfPrEngine (Macro action recorder, WASM/script sandbox & User-Defined Functions UDF registry)
+// 6. GridcraftMacroScriptingUdfMissingPrEngine (Macro action recorder, WASM/script sandbox & User-Defined Functions UDF registry)
 // 7. SovereignGridcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
-
-
-
-
 
 /// Structured PR proposal manifest for missing Gridcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -53,12 +50,12 @@ pub enum FormulaValue {
 
 /// Advanced Formula, Lookup & DAG Dependency Engine.
 #[derive(Debug, Clone)]
-pub struct GridcraftAdvancedFormulaXlookupPrEngine {
+pub struct GridcraftAdvancedFormulaXlookupMissingPrEngine {
     pub lookup_tables: BTreeMap<String, Vec<Vec<String>>>,
     pub dependency_graph: BTreeMap<String, Vec<String>>,
 }
 
-impl GridcraftAdvancedFormulaXlookupPrEngine {
+impl GridcraftAdvancedFormulaXlookupMissingPrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         // Sample lookup table: Product ID, Name, Price, Stock
@@ -216,7 +213,7 @@ impl GridcraftAdvancedFormulaXlookupPrEngine {
     }
 }
 
-impl Default for GridcraftAdvancedFormulaXlookupPrEngine {
+impl Default for GridcraftAdvancedFormulaXlookupMissingPrEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -245,12 +242,12 @@ pub enum ConditionalFormatRule {
 
 /// Data Validation & Conditional Formatting Engine.
 #[derive(Debug, Clone)]
-pub struct GridcraftDataValidationConditionalFormattingPrEngine {
+pub struct GridcraftDataValidationConditionalFormattingMissingPrEngine {
     pub validation_rules: BTreeMap<(u32, u32), ValidationRule>,
     pub format_rules: BTreeMap<(u32, u32), ConditionalFormatRule>,
 }
 
-impl GridcraftDataValidationConditionalFormattingPrEngine {
+impl GridcraftDataValidationConditionalFormattingMissingPrEngine {
     pub fn new() -> Self {
         Self {
             validation_rules: BTreeMap::new(),
@@ -267,12 +264,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
             Some(ValidationRule::List(allowed)) => allowed.contains(&value_str.to_string()),
             Some(ValidationRule::NumberRange { min, max }) => {
                 if let Ok(val) = value_str.parse::<f64>() {
-                    val >= min && val <= max
+                    val >= *min && val <= *max
                 } else {
                     false
                 }
             }
-            Some(ValidationRule::CustomRegex(pattern)) => value_str.contains(&pattern),
+            Some(ValidationRule::CustomRegex(pattern)) => value_str.contains(pattern),
             None => true,
         }
     }
@@ -284,15 +281,15 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
     pub fn evaluate_conditional_style(&self, col: u32, row: u32, value: f64) -> Option<u32> {
         match self.format_rules.get(&(col, row)) {
             Some(ConditionalFormatRule::CellGreaterThan(thresh, color)) => {
-                if value > thresh {
-                    Some(color)
+                if value > *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
             }
             Some(ConditionalFormatRule::CellLessThan(thresh, color)) => {
-                if value < thresh {
-                    Some(color)
+                if value < *thresh {
+                    Some(*color)
                 } else {
                     None
                 }
@@ -302,12 +299,12 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
                 max_color,
             }) => {
                 if value > 50.0 {
-                    Some(max_color)
+                    Some(*max_color)
                 } else {
-                    Some(min_color)
+                    Some(*min_color)
                 }
             }
-            Some(ConditionalFormatRule::DataBar { bar_color }) => Some(bar_color),
+            Some(ConditionalFormatRule::DataBar { bar_color }) => Some(*bar_color),
             None => None,
         }
     }
@@ -329,7 +326,7 @@ impl GridcraftDataValidationConditionalFormattingPrEngine {
     }
 }
 
-impl Default for GridcraftDataValidationConditionalFormattingPrEngine {
+impl Default for GridcraftDataValidationConditionalFormattingMissingPrEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -670,13 +667,13 @@ pub struct MacroAction {
 
 /// Embedded Macro & UDF Scripting Engine.
 #[derive(Debug, Clone)]
-pub struct GridcraftMacroScriptingUdfPrEngine {
+pub struct GridcraftMacroScriptingUdfMissingPrEngine {
     pub registered_udfs: BTreeMap<String, UserDefinedFunction>,
     pub macro_recorder_active: bool,
     pub recorded_actions: Vec<MacroAction>,
 }
 
-impl GridcraftMacroScriptingUdfPrEngine {
+impl GridcraftMacroScriptingUdfMissingPrEngine {
     pub fn new() -> Self {
         Self {
             registered_udfs: BTreeMap::new(),
@@ -742,7 +739,7 @@ impl GridcraftMacroScriptingUdfPrEngine {
     }
 }
 
-impl Default for GridcraftMacroScriptingUdfPrEngine {
+impl Default for GridcraftMacroScriptingUdfMissingPrEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -754,24 +751,24 @@ impl Default for GridcraftMacroScriptingUdfPrEngine {
 
 /// Master Gateway Coordinator for Gridcraft & ArtCraft Parity PR Proposals.
 #[derive(Debug, Clone)]
-pub struct SovereignGridcraftArtcraftParityPrGateway {
-    pub formula_xlookup: GridcraftAdvancedFormulaXlookupPrEngine,
-    pub validation_formatting: GridcraftDataValidationConditionalFormattingPrEngine,
+pub struct SovereignGridcraftMissingComponentsParityPrGateway {
+    pub formula_xlookup: GridcraftAdvancedFormulaXlookupMissingPrEngine,
+    pub validation_formatting: GridcraftDataValidationConditionalFormattingMissingPrEngine,
     pub realtime_spill: GridcraftRealtimeDataStreamSpillArrayPrEngine,
     pub goal_seek_solver: GridcraftFinancialGoalSeekSolverPrEngine,
     pub crdt_collab: GridcraftMultiUserCrdtCollabPrEngine,
-    pub macro_udf: GridcraftMacroScriptingUdfPrEngine,
+    pub macro_udf: GridcraftMacroScriptingUdfMissingPrEngine,
 }
 
-impl SovereignGridcraftArtcraftParityPrGateway {
+impl SovereignGridcraftMissingComponentsParityPrGateway {
     pub fn new() -> Self {
         Self {
-            formula_xlookup: GridcraftAdvancedFormulaXlookupPrEngine::new(),
-            validation_formatting: GridcraftDataValidationConditionalFormattingPrEngine::new(),
+            formula_xlookup: GridcraftAdvancedFormulaXlookupMissingPrEngine::new(),
+            validation_formatting: GridcraftDataValidationConditionalFormattingMissingPrEngine::new(),
             realtime_spill: GridcraftRealtimeDataStreamSpillArrayPrEngine::new(),
             goal_seek_solver: GridcraftFinancialGoalSeekSolverPrEngine::new(),
             crdt_collab: GridcraftMultiUserCrdtCollabPrEngine::new(),
-            macro_udf: GridcraftMacroScriptingUdfPrEngine::new(),
+            macro_udf: GridcraftMacroScriptingUdfMissingPrEngine::new(),
         }
     }
 
@@ -841,7 +838,7 @@ impl SovereignGridcraftArtcraftParityPrGateway {
     }
 }
 
-impl Default for SovereignGridcraftArtcraftParityPrGateway {
+impl Default for SovereignGridcraftMissingComponentsParityPrGateway {
     fn default() -> Self {
         Self::new()
     }
@@ -849,10 +846,13 @@ impl Default for SovereignGridcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_gridcraft_parity_pr_gateway() {
-        let mut gateway = SovereignGridcraftArtcraftParityPrGateway::new();
+        let mut gateway = SovereignGridcraftMissingComponentsParityPrGateway::new();
         assert!(gateway.evaluate_gridcraft_parity());
         assert_eq!(gateway.compute_parity_score(), 100.0);
 
@@ -866,7 +866,7 @@ mod tests {
 
     #[test]
     fn test_advanced_formula_xlookup_engine() {
-        let mut engine = GridcraftAdvancedFormulaXlookupPrEngine::new();
+        let mut engine = GridcraftAdvancedFormulaXlookupMissingPrEngine::new();
         let res = engine.xlookup("Products", "102", 0, 1);
         assert_eq!(res, FormulaValue::Text("Mouse".to_string()));
 
@@ -889,7 +889,7 @@ mod tests {
 
     #[test]
     fn test_data_validation_conditional_formatting() {
-        let mut engine = GridcraftDataValidationConditionalFormattingPrEngine::new();
+        let mut engine = GridcraftDataValidationConditionalFormattingMissingPrEngine::new();
         engine.add_validation_rule(
             1,
             1,
@@ -965,7 +965,7 @@ mod tests {
 
     #[test]
     fn test_macro_scripting_udf_engine() {
-        let mut engine = GridcraftMacroScriptingUdfPrEngine::new();
+        let mut engine = GridcraftMacroScriptingUdfMissingPrEngine::new();
         engine.start_macro_recording();
         engine.record_action("SetText", 1, 1, "Hello World");
         let count = engine.stop_macro_recording();
