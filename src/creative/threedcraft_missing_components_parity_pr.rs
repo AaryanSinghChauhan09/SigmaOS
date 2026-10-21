@@ -1,3 +1,6 @@
+#![no_std]
+extern crate alloc;
+
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft & Model3D Missing Components Parity PR Gateway Module
 // (`src/creative/threedcraft_missing_components_parity_pr.rs`)
@@ -11,11 +14,6 @@
 // 4. ThreeDCraftCsgBooleanMeshEngine (Constructive Solid Geometry 3D mesh boolean union, difference, & intersection operations)
 // 5. ThreeDCraftPrGatewayEngine (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
-
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
@@ -645,6 +643,8 @@ impl Default for ThreeDCraftPrGatewayEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_threedcraft_parity_pr_gateway() {
