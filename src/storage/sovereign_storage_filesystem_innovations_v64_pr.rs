@@ -89,7 +89,14 @@ impl Ext4AdvancementsV64Engine {
         true
     }
 
-    pub fn append_fast_commit(&mut self, ino: u32, lblk: u32, pblk: u64, count: u16, unwritten: bool) {
+    pub fn append_fast_commit(
+        &mut self,
+        ino: u32,
+        lblk: u32,
+        pblk: u64,
+        count: u16,
+        unwritten: bool,
+    ) {
         self.fc_journal_records.push(Ext4V64FastCommitEntry {
             inode_num: ino,
             logical_block: lblk,
@@ -131,7 +138,10 @@ impl Ext4AdvancementsV64Engine {
     }
 
     pub fn e2fsck_quick_check(&self) -> (bool, &'static str) {
-        (true, "ext4: Superblock, Block Groups, and Fast Commit Log Clean")
+        (
+            true,
+            "ext4: Superblock, Block Groups, and Fast Commit Log Clean",
+        )
     }
 }
 
@@ -272,7 +282,12 @@ impl BtrfsAdvancementsV64Engine {
         id
     }
 
-    pub fn snapshot_subvolume(&mut self, src_id: u64, snap_name: &str, readonly: bool) -> Option<u64> {
+    pub fn snapshot_subvolume(
+        &mut self,
+        src_id: u64,
+        snap_name: &str,
+        readonly: bool,
+    ) -> Option<u64> {
         if self.subvolumes.iter().any(|s| s.id == src_id) {
             let id = self.next_subvol_id;
             self.next_subvol_id += 1;
@@ -425,9 +440,17 @@ impl UfsFfsAdvancementsV64Engine {
     }
 
     pub fn commit_soft_dependency(&mut self, dep_id: u64) -> bool {
-        let parent_id = self.soft_dep_graph.iter().find(|d| d.dep_id == dep_id).and_then(|d| d.parent_id);
+        let parent_id = self
+            .soft_dep_graph
+            .iter()
+            .find(|d| d.dep_id == dep_id)
+            .and_then(|d| d.parent_id);
         if let Some(pid) = parent_id {
-            if !self.soft_dep_graph.iter().any(|p| p.dep_id == pid && p.is_committed) {
+            if !self
+                .soft_dep_graph
+                .iter()
+                .any(|p| p.dep_id == pid && p.is_committed)
+            {
                 return false; // Parent dependency not yet committed
             }
         }
@@ -443,7 +466,10 @@ impl UfsFfsAdvancementsV64Engine {
     }
 
     pub fn fsck_ffs_check(&self) -> (bool, &'static str) {
-        (true, "UFS2/FFS: Soft Updates Journal SU+J clean, 0 cylinder group discrepancies")
+        (
+            true,
+            "UFS2/FFS: Soft Updates Journal SU+J clean, 0 cylinder group discrepancies",
+        )
     }
 }
 
@@ -485,7 +511,11 @@ impl F2fsAdvancementsV64Engine {
     }
 
     pub fn invalidate_block(&mut self, segment_id: u32) {
-        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
+        if let Some(seg) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.segment_id == segment_id)
+        {
             if seg.valid_blocks > 0 {
                 seg.valid_blocks -= 1;
                 seg.is_dirty = true;
@@ -529,7 +559,7 @@ impl ExFatFatAdvancementsV64Engine {
     pub fn new(total_clusters: usize) -> Self {
         Self {
             fat_entries: alloc::vec![0xFFFFFFF8; total_clusters], // EOF initial state
-            flash_boundary_shift: 128, // 128KB boundary
+            flash_boundary_shift: 128,                            // 128KB boundary
             is_texfat_active: true,
         }
     }
@@ -548,10 +578,15 @@ impl ExFatFatAdvancementsV64Engine {
     pub fn walk_cluster_chain(&self, start_cluster: usize) -> Vec<u32> {
         let mut chain = Vec::new();
         let mut current = start_cluster;
-        while current < self.fat_entries.len() && self.fat_entries[current] != 0xFFFFFFFF && self.fat_entries[current] != 0xFFFFFFF8 {
+        while current < self.fat_entries.len()
+            && self.fat_entries[current] != 0xFFFFFFFF
+            && self.fat_entries[current] != 0xFFFFFFF8
+        {
             chain.push(current as u32);
             current = self.fat_entries[current] as usize;
-            if chain.len() > 10000 { break; } // Loop guard
+            if chain.len() > 10000 {
+                break;
+            } // Loop guard
         }
         if current < self.fat_entries.len() {
             chain.push(current as u32);
@@ -670,7 +705,11 @@ impl LvmCryptoMaintenanceUtilsV64Engine {
         (p_parity, q_parity)
     }
 
-    pub fn verify_dm_verity_merkle_block(&self, block_data: &[u8], expected_hash: &[u8; 32]) -> bool {
+    pub fn verify_dm_verity_merkle_block(
+        &self,
+        block_data: &[u8],
+        expected_hash: &[u8; 32],
+    ) -> bool {
         let mut computed = [0u8; 32];
         for (i, &b) in block_data.iter().enumerate() {
             computed[i % 32] ^= b;
@@ -932,15 +971,23 @@ impl SovereignStorageAndFilesystemParityV64Gateway {
         let proposals = self.collect_all_proposals();
         let mut md = String::new();
 
-        md.push_str("# Pull Request Proposals: Linux & BSD Storage and Filesystems Parity (v64 Suite)\n\n");
+        md.push_str(
+            "# Pull Request Proposals: Linux & BSD Storage and Filesystems Parity (v64 Suite)\n\n",
+        );
         md.push_str("## Overview\n");
         md.push_str("This proposal suite introduces native zero-dependency `#![no_std]` / `alloc` parity engines and PR manifests for Linux and BSD filesystems, volume managers, encryption, and disk maintenance utilities in SigmaOS.\n\n");
 
         for pr in proposals {
             md.push_str(&format!("### PR #{}: {}\n", pr.pr_id, pr.title));
             md.push_str(&format!("- **Category**: {}\n", pr.category));
-            md.push_str(&format!("- **Inspiration Sources**: {}\n", pr.inspiration_sources.join(", ")));
-            md.push_str(&format!("- **Components**: {}\n", pr.components_implemented.join(", ")));
+            md.push_str(&format!(
+                "- **Inspiration Sources**: {}\n",
+                pr.inspiration_sources.join(", ")
+            ));
+            md.push_str(&format!(
+                "- **Components**: {}\n",
+                pr.components_implemented.join(", ")
+            ));
             md.push_str(&format!("- **Throughput**: {} MB/s\n", pr.throughput_mbps));
             md.push_str(&format!("- **Resilience**: {}\n", pr.resilience_rating));
             md.push_str(&format!("- **Summary**: {}\n\n", pr.pr_markdown_summary));
@@ -1000,7 +1047,7 @@ mod tests {
     fn test_zfs_advancements_v64() {
         let mut zfs = OpenZfsAdvancementsV64Engine::new(4);
         assert!(!zfs.access_arc_block(1001)); // Miss
-        assert!(zfs.access_arc_block(1001));  // Hit
+        assert!(zfs.access_arc_block(1001)); // Hit
         assert_eq!(zfs.calculate_hit_ratio_pct(), 50);
 
         let send_stream = zfs.simulate_zfs_send("pool/root@snap1");
@@ -1056,7 +1103,10 @@ mod tests {
         assert!(utils.check_gpt_4k_alignment(2048, 512));
 
         let autofs = utils.parse_autofs_map_entry("/net /etc/auto.net");
-        assert_eq!(autofs, Some(("/net".to_string(), "/etc/auto.net".to_string())));
+        assert_eq!(
+            autofs,
+            Some(("/net".to_string(), "/etc/auto.net".to_string()))
+        );
 
         let gateway = SovereignStorageAndFilesystemParityV64Gateway::new();
         let proposals = gateway.collect_all_proposals();

@@ -69,7 +69,14 @@ impl SigmaTaskScheduler {
         self.tasks.iter_mut().find(|t| t.id == id)
     }
 
-    pub fn schedule_task(&mut self, id: String, name: String, command: String, priority: TaskPriority, delay_seconds: u64) {
+    pub fn schedule_task(
+        &mut self,
+        id: String,
+        name: String,
+        command: String,
+        priority: TaskPriority,
+        delay_seconds: u64,
+    ) {
         let task = ScheduledTask {
             id,
             name,
@@ -177,7 +184,13 @@ mod tests {
     #[test]
     fn test_schedule_task() {
         let mut scheduler = SigmaTaskScheduler::new();
-        scheduler.schedule_task("1".to_string(), "test".to_string(), "echo test".to_string(), TaskPriority::Normal, 5);
+        scheduler.schedule_task(
+            "1".to_string(),
+            "test".to_string(),
+            "echo test".to_string(),
+            TaskPriority::Normal,
+            5,
+        );
         assert_eq!(scheduler.get_tasks().len(), 1);
         assert_eq!(scheduler.get_tasks()[0].scheduled_time, 5);
     }
@@ -185,7 +198,13 @@ mod tests {
     #[test]
     fn test_tick() {
         let mut scheduler = SigmaTaskScheduler::new();
-        scheduler.schedule_task("1".to_string(), "test".to_string(), "echo test".to_string(), TaskPriority::Normal, 1);
+        scheduler.schedule_task(
+            "1".to_string(),
+            "test".to_string(),
+            "echo test".to_string(),
+            TaskPriority::Normal,
+            1,
+        );
         scheduler.tick();
         assert_eq!(scheduler.current_time, 1);
         assert_eq!(scheduler.get_tasks()[0].status, TaskStatus::Running);
@@ -194,7 +213,13 @@ mod tests {
     #[test]
     fn test_complete_task() {
         let mut scheduler = SigmaTaskScheduler::new();
-        scheduler.schedule_task("1".to_string(), "test".to_string(), "echo test".to_string(), TaskPriority::Normal, 0);
+        scheduler.schedule_task(
+            "1".to_string(),
+            "test".to_string(),
+            "echo test".to_string(),
+            TaskPriority::Normal,
+            0,
+        );
         scheduler.tick();
         scheduler.complete_task("1".to_string()).unwrap();
         assert_eq!(scheduler.get_tasks()[0].status, TaskStatus::Completed);
@@ -203,7 +228,13 @@ mod tests {
     #[test]
     fn test_fail_task() {
         let mut scheduler = SigmaTaskScheduler::new();
-        scheduler.schedule_task("1".to_string(), "test".to_string(), "echo test".to_string(), TaskPriority::Normal, 0);
+        scheduler.schedule_task(
+            "1".to_string(),
+            "test".to_string(),
+            "echo test".to_string(),
+            TaskPriority::Normal,
+            0,
+        );
         scheduler.tick();
         scheduler.fail_task("1".to_string()).unwrap();
         assert_eq!(scheduler.get_tasks()[0].status, TaskStatus::Failed);
@@ -213,8 +244,20 @@ mod tests {
     #[test]
     fn test_high_priority_tasks() {
         let mut scheduler = SigmaTaskScheduler::new();
-        scheduler.schedule_task("1".to_string(), "low".to_string(), "echo low".to_string(), TaskPriority::Low, 0);
-        scheduler.schedule_task("2".to_string(), "high".to_string(), "echo high".to_string(), TaskPriority::High, 0);
+        scheduler.schedule_task(
+            "1".to_string(),
+            "low".to_string(),
+            "echo low".to_string(),
+            TaskPriority::Low,
+            0,
+        );
+        scheduler.schedule_task(
+            "2".to_string(),
+            "high".to_string(),
+            "echo high".to_string(),
+            TaskPriority::High,
+            0,
+        );
         assert_eq!(scheduler.get_high_priority_tasks().len(), 1);
     }
 }

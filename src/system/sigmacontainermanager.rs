@@ -122,7 +122,10 @@ impl SigmaContainerManager {
     }
 
     pub fn get_running_containers(&self) -> Vec<&Container> {
-        self.containers.iter().filter(|c| c.state == ContainerState::Running).collect()
+        self.containers
+            .iter()
+            .filter(|c| c.state == ContainerState::Running)
+            .collect()
     }
 
     pub fn get_container_count(&self) -> usize {
