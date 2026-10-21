@@ -622,8 +622,8 @@ pub mod sovereign_linux_bsd_ecosystem_gap_closure_v58_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v58_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v60_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v60_pr::*;
-pub mod sovereign_linux_bsd_ecosystem_gap_closure_v67_pr;
-pub use sovereign_linux_bsd_ecosystem_gap_closure_v67_pr::*;
+pub mod sovereign_linux_bsd_ecosystem_gap_closure_v66_pr;
+pub use sovereign_linux_bsd_ecosystem_gap_closure_v66_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_pinnacle_suite;
 pub mod sovereign_linux_bsd_gap_closure_v39_pr;
 pub mod sovereign_linux_bsd_master_innovations;
@@ -772,6 +772,8 @@ pub use open_source_os_missing_components_v64_pr::*;
 
 pub mod open_source_os_missing_components_v65_pr;
 pub use open_source_os_missing_components_v65_pr::*;
+pub mod open_source_os_missing_components_v66_pr;
+pub use open_source_os_missing_components_v66_pr::*;
 
 pub mod open_source_os_debian_unimplemented_ideas_v63_pr;
 pub use open_source_os_debian_unimplemented_ideas_v63_pr::*;
