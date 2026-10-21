@@ -157,6 +157,7 @@ pub mod sigmasetupmanager;
 pub mod sigmastallmanager;
 pub mod sigmafilewatcher;
 pub mod sigmaindexmanager;
+pub mod sigmacachemanager2;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -306,6 +307,10 @@ pub use sigmafilewatcher::{
 pub use sigmaindexmanager::{
     IndexEntry as IndexManagerEntry, FileType as IndexManagerFileType, Index as IndexManagerIndex,
     IndexManager, IndexState as IndexManagerState, IndexType as IndexManagerType,
+};
+pub use sigmacachemanager2::{
+    Cache as CacheManager2Cache, CacheState as CacheManager2State, CacheType as CacheManager2Type,
+    SigmaCacheManager2,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
