@@ -132,6 +132,7 @@ pub mod sigmalaunchmanager;
 pub mod sigmamenumanager;
 pub mod sigmaapplicationmanager;
 pub mod sigmaauditmanager;
+pub mod sigmainstallmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
 pub mod sigmapackagemanager3;
@@ -158,6 +159,9 @@ pub use sigmaapplicationmanager::{
 pub use sigmaauditmanager::{
     AuditEvent as AuditManagerEvent, AuditEventType as AuditManagerEventType,
     AuditSeverity as AuditManagerSeverity, SigmaAuditManager,
+};
+pub use sigmainstallmanager::{
+    InstallStatus as InstallManagerStatus, InstallType, SoftwareItem, SigmaInstallManager,
 };
 pub use sigmanetworkmanager3::{
     InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
@@ -252,10 +256,7 @@ pub use sigmasnapshotmanager::{
     SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot,
     SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType,
 };
-pub use sigmastallmanager::{
-    InstallStatus as InstallManagerStatus, InstallType as InstallManagerType, SigmaInstallManager,
-    SoftwareItem as InstallManagerItem,
-};
+
 pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
