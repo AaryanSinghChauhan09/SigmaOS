@@ -173,3 +173,6 @@ cmake
 
 # SigmaOS specific
 sigmaos
+htop
+iotop
+gimp
