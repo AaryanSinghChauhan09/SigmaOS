@@ -10,6 +10,10 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+
+
+
+
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AnicraftPrProposalManifest {
@@ -659,6 +663,7 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {

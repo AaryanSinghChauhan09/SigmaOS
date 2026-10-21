@@ -1,3 +1,16 @@
+#![no_std]
+// SPDX-License-Identifier: MIT
+// SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
+// (`src/creative/anicraft_artcraft_parity_pr.rs`)
+
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
@@ -895,6 +908,7 @@ impl Default for AnicraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
