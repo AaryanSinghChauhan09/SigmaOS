@@ -142,6 +142,7 @@ pub mod sigmaschedulermanager;
 pub mod sigmaservicemanager4;
 pub mod sigmasetupmanager2;
 pub mod sigmastoragemanager;
+pub mod sigmawizardmanager;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
 pub mod sigmaprofilemanager;
@@ -166,6 +167,9 @@ pub use sigmainstallmanager::{
 };
 pub use sigmasetupmanager2::{
     SetupStep, SetupStepStatus, SigmaSetupManager2,
+};
+pub use sigmawizardmanager::{
+    SigmaWizardManager, WizardPage, WizardPageType,
 };
 pub use sigmanetworkmanager3::{
     InterfaceState as NetworkInterfaceState3, InterfaceType as NetworkInterfaceType3,
