@@ -111,7 +111,8 @@ impl SovereignServiceUnit {
 
 /// Sovereign PID 1 Supervisor
 #[path = "sovereign_init_and_supervisor_advancements_v63.rs"]
-pub mod sovereign_init_and_supervisor_advancements_v63;
+mod sovereign_init_and_supervisor_advancements_v63;
+
 use sovereign_init_and_supervisor_advancements_v63::*;
 
 pub struct SovereignInitSupervisor {
