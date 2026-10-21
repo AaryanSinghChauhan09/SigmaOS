@@ -139,6 +139,7 @@ pub mod sigmapackagemanager3;
 pub mod sigmapowermanager2;
 pub mod sigmaprocessmanager;
 pub mod sigmaschedulermanager;
+pub mod sigmasecuritymanager2;
 pub mod sigmaservicemanager4;
 pub mod sigmasetupmanager2;
 pub mod sigmastoragemanager;
@@ -186,6 +187,9 @@ pub use sigmaprocessmanager::{
 pub use sigmaschedulermanager::{
     ScheduledTask, TaskPriority as ScheduleTaskPriority, TaskStatus as ScheduleTaskStatus,
     SigmaScheduleManager,
+};
+pub use sigmasecuritymanager2::{
+    SecurityPolicy, SecurityPolicyType, SigmaSecurityManager2,
 };
 pub use sigmapowermanager2::{
     BatteryStatus as PowerManagerBatteryStatus, PowerPlan, PowerState as PowerManagerState,
