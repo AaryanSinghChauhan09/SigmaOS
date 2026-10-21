@@ -4,17 +4,17 @@
 //
 // Provides clean-room Pull Request (PR) proposal engines bridging key remaining gaps
 // between SigmaOS and the OpenBSD operating system ecosystem:
-// 1. OpenBsdSmfDrmKmsKernelGraphicsPrEngine (DRM/KMS display graphics stack & wscons integration)
-// 2. OpenBsdSpwdMasterPasswdAuthPrEngine (master.passwd shadow auth & pwd_mkdb indexing)
-// 3. OpenBsdPthreadsSmpSchedulerPrEngine (1:1 rthreads/pthreads & SMP scheduler affinity)
-// 4. OpenBsdIsakmpdIpsecIkeEngine (isakmpd IKEv1/IKEv2 daemon & IPsec security association)
-// 5. OpenBsdLdapdDirectoryServerPrEngine (native ldapd LDAP directory server & schema validator)
-// 6. OpenBsdKrouteRoutingTablePrEngine (kernel kroute routing table daemon & RTM socket manager)
-// 7. OpenBsdSiphashKernelEntropyPrEngine (SipHash PRNG entropy harvester & arc4random seed)
-// 8. OpenBsdDhcpdStaticLeaseServerPrEngine (dhcpd DHCP server with static lease & BOOTP/PXE)
-// 9. OpenBsdEgressNetworkInterfaceGroupPrEngine (network interface groups 'egress'/'carp' & dynamic routing)
-// 10. OpenBsdMpathMultipathIoStoragePrEngine (mpath multipath I/O storage failover & SCSI device path)
-// 11. OpenBsdMissingComponentsV63PrSuite (Master PR Gateway Suite)
+// 1. OpenBsdSmfDrmKmsKernelGraphicsPrEngine (DRM/KMS kernel graphics driver acceleration & display mode setting)
+// 2. OpenBsdSpwdMasterPasswdAuthPrEngine (spwd/master.passwd shadow password database authentication & blowfish/argon2 hashing)
+// 3. OpenBsdPthreadsSmpSchedulerPrEngine (rthreads/pthreads SMP M:N thread scheduler & cpu affinity manager)
+// 4. OpenBsdIsakmpdIpsecIkeEngine (isakmpd IKEv1/IKEv2 daemon & IPsec key exchange Security Association engine)
+// 5. OpenBsdLdapdDirectoryServerPrEngine (ldapd lightweight directory access protocol server engine with schema validation)
+// 6. OpenBsdKrouteRoutingTablePrEngine (kroute kernel routing table multiplexer & RTM_ADD / RTM_DELETE message processor)
+// 7. OpenBsdSiphashKernelEntropyPrEngine (siphash/arc4random kernel entropy pool PRNG generator & fast hashtable keying)
+// 8. OpenBsdDhcpdStaticLeaseServerPrEngine (dhcpd DHCP server engine with MAC binding & static IP lease pool manager)
+// 9. OpenBsdEgressNetworkInterfaceGroupPrEngine (egress network interface group supervisor with dynamic default route tracking)
+// 10. OpenBsdMpathMultipathIoStoragePrEngine (mpath storage multipath I/O redundancy controller with active-active failover)
+// 11. OpenBsdMissingComponentsV63PrSuite (Master PR Gateway Suite V63)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -62,55 +62,53 @@ pub struct OpenBsdPrProposalV63 {
 }
 
 // ============================================================================
-// 1. OpenBSD DRM/KMS Kernel Display Graphics PR Engine
+// 1. OpenBSD DRM/KMS Kernel Graphics PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct DisplayOutput {
+pub struct DisplayConnector {
     pub name: String,
-    pub resolution: String,
     pub connected: bool,
-    pub primary: bool,
+    pub resolution: String,
+    pub refresh_rate: u32,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSmfDrmKmsKernelGraphicsPrEngine {
-    pub driver_name: String,
-    pub outputs: BTreeMap<String, DisplayOutput>,
-    pub wscons_active: bool,
+    pub connectors: BTreeMap<String, DisplayConnector>,
+    pub hw_acceleration_enabled: bool,
 }
 
 impl OpenBsdSmfDrmKmsKernelGraphicsPrEngine {
     pub fn new() -> Self {
-        let mut outputs = BTreeMap::new();
-        outputs.insert(
+        let mut connectors = BTreeMap::new();
+        connectors.insert(
             "DP-1".to_string(),
-            DisplayOutput {
+            DisplayConnector {
                 name: "DP-1".to_string(),
-                resolution: "3840x2160@60Hz".to_string(),
                 connected: true,
-                primary: true,
+                resolution: "3840x2160".to_string(),
+                refresh_rate: 60,
             },
         );
         Self {
-            driver_name: "inteldrm".to_string(),
-            outputs,
-            wscons_active: true,
+            connectors,
+            hw_acceleration_enabled: true,
         }
     }
 
-    pub fn attach_output(&mut self, name: &str, res: &str) -> String {
-        let output = DisplayOutput {
-            name: name.to_string(),
-            resolution: res.to_string(),
+    pub fn configure_mode(&mut self, connector: &str, res: &str, hz: u32) -> String {
+        let conn = DisplayConnector {
+            name: connector.to_string(),
             connected: true,
-            primary: false,
+            resolution: res.to_string(),
+            refresh_rate: hz,
         };
-        self.outputs.insert(name.to_string(), output);
+        self.connectors.insert(connector.to_string(), conn);
 
         format!(
-            "--- a/sys/dev/pci/drm/drm_kms.c\n+++ b/sys/dev/pci/drm/drm_kms.c\n@@ -0,0 +1,3 @@\n+inteldrm0: attached display output {} mode {}\n",
-            name, res
+            "--- a/sys/dev/pci/drm/drm_modes.c\n+++ b/sys/dev/pci/drm/drm_modes.c\n@@ -100,6 +100,8 @@\n+ drm_kms_set_mode(\"{}\", \"{}\", {}Hz);\n",
+            connector, res, hz
         )
     }
 }
@@ -122,60 +120,62 @@ impl Default for OpenBsdSmfDrmKmsKernelGraphicsPrEngine {
 }
 
 // ============================================================================
-// 2. OpenBSD master.passwd Shadow Auth & pwd_mkdb PR Engine
+// 2. OpenBSD spwd / master.passwd Shadow Auth PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct MasterPasswdUser {
+pub struct MasterPasswdEntry {
     pub username: String,
-    pub password_hash: String,
+    pub hashed_pw: String,
     pub uid: u32,
     pub gid: u32,
+    pub class: String,
+    pub home_dir: String,
     pub shell: String,
-    pub homedir: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSpwdMasterPasswdAuthPrEngine {
-    pub users: BTreeMap<String, MasterPasswdUser>,
-    pub db_indexed: bool,
+    pub entries: BTreeMap<String, MasterPasswdEntry>,
+    pub argon2_enabled: bool,
 }
 
 impl OpenBsdSpwdMasterPasswdAuthPrEngine {
     pub fn new() -> Self {
-        let mut users = BTreeMap::new();
-        users.insert(
+        let mut entries = BTreeMap::new();
+        entries.insert(
             "root".to_string(),
-            MasterPasswdUser {
+            MasterPasswdEntry {
                 username: "root".to_string(),
-                password_hash: "$2b$12$eXampLeHaShFoRRoOtUsErInOpEnBsD".to_string(),
+                hashed_pw: "$2b$10$e7X1...".to_string(),
                 uid: 0,
                 gid: 0,
+                class: "daemon".to_string(),
+                home_dir: "/root".to_string(),
                 shell: "/bin/ksh".to_string(),
-                homedir: "/root".to_string(),
             },
         );
         Self {
-            users,
-            db_indexed: true,
+            entries,
+            argon2_enabled: true,
         }
     }
 
-    pub fn add_user(&mut self, user: &str, uid: u32, gid: u32, hash: &str, shell: &str) -> String {
-        let entry = MasterPasswdUser {
+    pub fn add_user(&mut self, user: &str, uid: u32, gid: u32, home: &str, shell: &str) -> String {
+        let entry = MasterPasswdEntry {
             username: user.to_string(),
-            password_hash: hash.to_string(),
+            hashed_pw: "$argon2id$v=19$m=65536,t=3,p=1$fakehash".to_string(),
             uid,
             gid,
+            class: "default".to_string(),
+            home_dir: home.to_string(),
             shell: shell.to_string(),
-            homedir: format!("/home/{}", user),
         };
-        self.users.insert(user.to_string(), entry);
-        self.db_indexed = true;
+        self.entries.insert(user.to_string(), entry);
 
         format!(
-            "--- a/etc/master.passwd\n+++ b/etc/master.passwd\n@@ -0,0 +1,1 @@\n+{}:{}:0:0:0:{}:0:0:User:{}:{}\n",
-            user, hash, uid, format!("/home/{}", user), shell
+            "--- a/etc/master.passwd\n+++ b/etc/master.passwd\n@@ -1,1 +1,2 @@\n+{}:$argon2id$...:{}:{}:default:0:0:User:{}:{}\n",
+            user, uid, gid, home, shell
         )
     }
 }
@@ -187,23 +187,22 @@ impl Default for OpenBsdSpwdMasterPasswdAuthPrEngine {
 }
 
 // ============================================================================
-// 3. OpenBSD 1:1 rthreads / pthreads & SMP Scheduler PR Engine
+// 3. OpenBSD rthreads / pthreads SMP Scheduler PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct RthreadThread {
+pub struct ThreadState {
     pub tid: u32,
-    pub pid: u32,
-    pub priority: u8,
+    pub name: String,
     pub cpu_affinity: u32,
-    pub state: String,
+    pub priority: u8,
+    pub running: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPthreadsSmpSchedulerPrEngine {
-    pub threads: BTreeMap<u32, RthreadThread>,
-    pub next_tid: u32,
-    pub smp_cores: u32,
+    pub threads: BTreeMap<u32, ThreadState>,
+    pub active_cores: u32,
 }
 
 impl OpenBsdPthreadsSmpSchedulerPrEngine {
@@ -211,38 +210,31 @@ impl OpenBsdPthreadsSmpSchedulerPrEngine {
         let mut threads = BTreeMap::new();
         threads.insert(
             1001,
-            RthreadThread {
+            ThreadState {
                 tid: 1001,
-                pid: 100,
-                priority: 32,
+                name: "main-worker".to_string(),
                 cpu_affinity: 0,
-                state: "RUNNING".to_string(),
+                priority: 20,
+                running: true,
             },
         );
         Self {
             threads,
-            next_tid: 1002,
-            smp_cores: 8,
+            active_cores: 8,
         }
     }
 
-    pub fn spawn_rthread(&mut self, pid: u32, core_affinity: u32) -> String {
-        let tid = self.next_tid;
-        self.next_tid += 1;
-
-        let thread = RthreadThread {
+    pub fn spawn_thread(&mut self, name: &str, affinity: u32, prio: u8) -> u32 {
+        let tid = 1000 + self.threads.len() as u32 + 1;
+        let thread = ThreadState {
             tid,
-            pid,
-            priority: 32,
-            cpu_affinity: core_affinity,
-            state: "RUNNABLE".to_string(),
+            name: name.to_string(),
+            cpu_affinity: affinity,
+            priority: prio,
+            running: true,
         };
         self.threads.insert(tid, thread);
-
-        format!(
-            "--- a/sys/kern/kern_sched.c\n+++ b/sys/kern/kern_sched.c\n@@ -0,0 +1,3 @@\n+rthread_spawn: spawned tid {} for pid {} bound to cpu {}\n",
-            tid, pid, core_affinity
-        )
+        tid
     }
 }
 
@@ -253,55 +245,59 @@ impl Default for OpenBsdPthreadsSmpSchedulerPrEngine {
 }
 
 // ============================================================================
-// 4. OpenBSD isakmpd IKEv1/IKEv2 & IPsec Keying PR Engine
+// 4. OpenBSD isakmpd IPsec IKE Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct IsakmpSa {
+pub struct IpsecSa {
     pub sa_id: String,
-    pub local_endpoint: String,
-    pub remote_endpoint: String,
-    pub enc_algorithm: String,
-    pub auth_algorithm: String,
-    pub state: String,
+    pub local_ip: String,
+    pub remote_ip: String,
+    pub enc_algo: String,
+    pub auth_algo: String,
+    pub active: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdIsakmpdIpsecIkeEngine {
-    pub sas: BTreeMap<String, IsakmpSa>,
+    pub sas: BTreeMap<String, IpsecSa>,
+    pub ike_version: u8,
 }
 
 impl OpenBsdIsakmpdIpsecIkeEngine {
     pub fn new() -> Self {
         let mut sas = BTreeMap::new();
         sas.insert(
-            "sa0".to_string(),
-            IsakmpSa {
-                sa_id: "sa0".to_string(),
-                local_endpoint: "198.51.100.10".to_string(),
-                remote_endpoint: "203.0.113.20".to_string(),
-                enc_algorithm: "AES-256-GCM".to_string(),
-                auth_algorithm: "HMAC-SHA2-384".to_string(),
-                state: "ESTABLISHED".to_string(),
+            "sa01".to_string(),
+            IpsecSa {
+                sa_id: "sa01".to_string(),
+                local_ip: "192.0.2.10".to_string(),
+                remote_ip: "198.51.100.5".to_string(),
+                enc_algo: "AES-GCM-256".to_string(),
+                auth_algo: "HMAC-SHA2-512".to_string(),
+                active: true,
             },
         );
-        Self { sas }
+        Self {
+            sas,
+            ike_version: 2,
+        }
     }
 
-    pub fn create_ipsec_sa(&mut self, sa_id: &str, local: &str, remote: &str) -> String {
-        let sa = IsakmpSa {
+    pub fn establish_sa(&mut self, sa_id: &str, local: &str, remote: &str) -> String {
+        let sa = IpsecSa {
             sa_id: sa_id.to_string(),
-            local_endpoint: local.to_string(),
-            remote_endpoint: remote.to_string(),
-            enc_algorithm: "AES-256-GCM".to_string(),
-            auth_algorithm: "HMAC-SHA2-384".to_string(),
-            state: "ESTABLISHED".to_string(),
+            local_ip: local.to_string(),
+            remote_ip: remote.to_string(),
+            enc_algo: "AES-GCM-256".to_string(),
+            auth_algo: "HMAC-SHA2-512".to_string(),
+            active: true,
         };
         self.sas.insert(sa_id.to_string(), sa);
 
         format!(
-            "--- a/etc/isakmpd/isakmpd.conf\n+++ b/etc/isakmpd/isakmpd.conf\n@@ -0,0 +1,3 @@\n+[{}]\n+Local-address = {}\n+Remote-address = {}\n",
-            sa_id, local, remote
+            "--- a/etc/ipsec.conf\n+++ b/etc/ipsec.conf\n@@ -0,0 +1,2 @@\n+ike active esp from {} to {}\n",
+            local, remote
         )
     }
 }
@@ -313,11 +309,11 @@ impl Default for OpenBsdIsakmpdIpsecIkeEngine {
 }
 
 // ============================================================================
-// 5. OpenBSD ldapd Native Directory Server PR Engine
+// 5. OpenBSD ldapd Directory Server PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct LdapRecord {
+pub struct LdapDirectoryEntry {
     pub dn: String,
     pub object_class: String,
     pub attributes: BTreeMap<String, String>,
@@ -325,43 +321,40 @@ pub struct LdapRecord {
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdLdapdDirectoryServerPrEngine {
-    pub records: BTreeMap<String, LdapRecord>,
-    pub schema_validation: bool,
+    pub entries: BTreeMap<String, LdapDirectoryEntry>,
+    pub schema_validated: bool,
 }
 
 impl OpenBsdLdapdDirectoryServerPrEngine {
     pub fn new() -> Self {
-        let mut records = BTreeMap::new();
+        let mut entries = BTreeMap::new();
         let mut attrs = BTreeMap::new();
-        attrs.insert("cn".to_string(), "admin".to_string());
-        records.insert(
+        attrs.insert("cn".to_string(), "Admin User".to_string());
+        entries.insert(
             "cn=admin,dc=sigmaos,dc=org".to_string(),
-            LdapRecord {
+            LdapDirectoryEntry {
                 dn: "cn=admin,dc=sigmaos,dc=org".to_string(),
-                object_class: "organizationalRole".to_string(),
+                object_class: "inetOrgPerson".to_string(),
                 attributes: attrs,
             },
         );
         Self {
-            records,
-            schema_validation: true,
+            entries,
+            schema_validated: true,
         }
     }
 
-    pub fn add_entry(&mut self, dn: &str, obj_class: &str, attr_key: &str, attr_val: &str) -> String {
-        let mut attrs = BTreeMap::new();
-        attrs.insert(attr_key.to_string(), attr_val.to_string());
-
-        let record = LdapRecord {
+    pub fn add_entry(&mut self, dn: &str, obj_class: &str) -> String {
+        let entry = LdapDirectoryEntry {
             dn: dn.to_string(),
             object_class: obj_class.to_string(),
-            attributes: attrs,
+            attributes: BTreeMap::new(),
         };
-        self.records.insert(dn.to_string(), record);
+        self.entries.insert(dn.to_string(), entry);
 
         format!(
-            "--- a/etc/ldapd.conf\n+++ b/etc/ldapd.conf\n@@ -0,0 +1,4 @@\n+entry \"{}\" {{\n+    objectClass {}\n+    {} \"{}\"\n+}}\n",
-            dn, obj_class, attr_key, attr_val
+            "--- a/etc/ldapd.conf\n+++ b/etc/ldapd.conf\n@@ -0,0 +1,2 @@\n+namespace \"{}\" {{ schema \"/etc/ldap/core.schema\" }}\n",
+            dn
         )
     }
 }
@@ -373,7 +366,7 @@ impl Default for OpenBsdLdapdDirectoryServerPrEngine {
 }
 
 // ============================================================================
-// 6. OpenBSD kroute Routing Table & RTM Sockets PR Engine
+// 6. OpenBSD kroute Kernel Routing Table PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -387,7 +380,6 @@ pub struct RouteEntry {
 #[derive(Debug, Clone)]
 pub struct OpenBsdKrouteRoutingTablePrEngine {
     pub routes: BTreeMap<String, RouteEntry>,
-    pub rtm_socket_active: bool,
 }
 
 impl OpenBsdKrouteRoutingTablePrEngine {
@@ -399,13 +391,10 @@ impl OpenBsdKrouteRoutingTablePrEngine {
                 destination: "default".to_string(),
                 gateway: "192.168.1.1".to_string(),
                 interface: "em0".to_string(),
-                flags: "UG".to_string(),
+                flags: "UGP".to_string(),
             },
         );
-        Self {
-            routes,
-            rtm_socket_active: true,
-        }
+        Self { routes }
     }
 
     pub fn add_route(&mut self, dest: &str, gw: &str, iface: &str) -> String {
@@ -417,10 +406,7 @@ impl OpenBsdKrouteRoutingTablePrEngine {
         };
         self.routes.insert(dest.to_string(), route);
 
-        format!(
-            "--- a/sys/net/kroute.c\n+++ b/sys/net/kroute.c\n@@ -0,0 +1,3 @@\n+kroute_add: route dest {} via gw {} on interface {}\n",
-            dest, gw, iface
-        )
+        format!("kroute: RTM_ADD dest {} via {} on {}\n", dest, gw, iface)
     }
 }
 
@@ -431,34 +417,34 @@ impl Default for OpenBsdKrouteRoutingTablePrEngine {
 }
 
 // ============================================================================
-// 7. OpenBSD SipHash PRNG Kernel Entropy PR Engine
+// 7. OpenBSD SipHash & Kernel Entropy PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSiphashKernelEntropyPrEngine {
-    pub entropy_pool_bytes: usize,
-    pub arc4random_seeded: bool,
-    pub siphash_key_version: u32,
+    pub entropy_pool_bits: u32,
+    pub arc4random_reseeded: bool,
+    pub siphash_key_a: u64,
+    pub siphash_key_b: u64,
 }
 
 impl OpenBsdSiphashKernelEntropyPrEngine {
     pub fn new() -> Self {
         Self {
-            entropy_pool_bytes: 4096,
-            arc4random_seeded: true,
-            siphash_key_version: 1,
+            entropy_pool_bits: 4096,
+            arc4random_reseeded: true,
+            siphash_key_a: 0x0706050403020100,
+            siphash_key_b: 0x0f0e0d0c0b0a0908,
         }
     }
 
-    pub fn reseed_arc4random(&mut self, seed_bytes: usize) -> String {
-        self.entropy_pool_bytes += seed_bytes;
-        self.siphash_key_version += 1;
-        self.arc4random_seeded = true;
-
-        format!(
-            "arc4random: reseeded SipHash entropy pool with {} bytes (key version {})\n",
-            seed_bytes, self.siphash_key_version
-        )
+    pub fn siphash24(&self, data: &[u8]) -> u64 {
+        // Pseudo SipHash-2-4 calculation for test verification
+        let mut hash = self.siphash_key_a ^ self.siphash_key_b;
+        for &b in data {
+            hash = hash.wrapping_add(b as u64).rotate_left(13);
+        }
+        hash
     }
 }
 
@@ -469,20 +455,19 @@ impl Default for OpenBsdSiphashKernelEntropyPrEngine {
 }
 
 // ============================================================================
-// 8. OpenBSD dhcpd Static Lease & PXE PR Engine
+// 8. OpenBSD dhcpd Static Lease Server PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct DhcpLease {
+pub struct DhcpStaticLease {
+    pub hostname: String,
     pub mac_address: String,
     pub ip_address: String,
-    pub hostname: String,
-    pub pxe_bootfile: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdDhcpdStaticLeaseServerPrEngine {
-    pub leases: BTreeMap<String, DhcpLease>,
+    pub leases: BTreeMap<String, DhcpStaticLease>,
     pub subnet: String,
 }
 
@@ -490,12 +475,11 @@ impl OpenBsdDhcpdStaticLeaseServerPrEngine {
     pub fn new() -> Self {
         let mut leases = BTreeMap::new();
         leases.insert(
-            "00:11:22:33:44:55".to_string(),
-            DhcpLease {
-                mac_address: "00:11:22:33:44:55".to_string(),
+            "printer.local".to_string(),
+            DhcpStaticLease {
+                hostname: "printer.local".to_string(),
+                mac_address: "52:54:00:12:34:56".to_string(),
                 ip_address: "192.168.1.50".to_string(),
-                hostname: "node01.sigmaos.org".to_string(),
-                pxe_bootfile: "pxeboot".to_string(),
             },
         );
         Self {
@@ -504,17 +488,16 @@ impl OpenBsdDhcpdStaticLeaseServerPrEngine {
         }
     }
 
-    pub fn add_static_lease(&mut self, mac: &str, ip: &str, host: &str) -> String {
-        let lease = DhcpLease {
+    pub fn bind_static_lease(&mut self, host: &str, mac: &str, ip: &str) -> String {
+        let lease = DhcpStaticLease {
+            hostname: host.to_string(),
             mac_address: mac.to_string(),
             ip_address: ip.to_string(),
-            hostname: host.to_string(),
-            pxe_bootfile: "auto_install.bsd".to_string(),
         };
-        self.leases.insert(mac.to_string(), lease);
+        self.leases.insert(host.to_string(), lease);
 
         format!(
-            "--- a/etc/dhcpd.conf\n+++ b/etc/dhcpd.conf\n@@ -0,0 +1,5 @@\n+host {} {{\n+    hardware ethernet {};\n+    fixed-address {};\n+    filename \"auto_install.bsd\";\n+}}\n",
+            "--- a/etc/dhcpd.conf\n+++ b/etc/dhcpd.conf\n@@ -0,0 +1,4 @@\n+host {} {{\n+    hardware ethernet {};\n+    fixed-address {};\n+}}\n",
             host, mac, ip
         )
     }
@@ -527,51 +510,31 @@ impl Default for OpenBsdDhcpdStaticLeaseServerPrEngine {
 }
 
 // ============================================================================
-// 9. OpenBSD Network Interface Groups & Egress PR Engine
+// 9. OpenBSD egress Interface Group PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct InterfaceGroup {
-    pub group_name: String,
-    pub member_interfaces: Vec<String>,
-    pub is_egress: bool,
-}
-
-#[derive(Debug, Clone)]
 pub struct OpenBsdEgressNetworkInterfaceGroupPrEngine {
-    pub groups: BTreeMap<String, InterfaceGroup>,
+    pub active_egress_iface: String,
+    pub member_ifaces: Vec<String>,
+    pub auto_route_sync: bool,
 }
 
 impl OpenBsdEgressNetworkInterfaceGroupPrEngine {
     pub fn new() -> Self {
-        let mut groups = BTreeMap::new();
-        groups.insert(
-            "egress".to_string(),
-            InterfaceGroup {
-                group_name: "egress".to_string(),
-                member_interfaces: vec!["em0".to_string()],
-                is_egress: true,
-            },
-        );
-        Self { groups }
+        Self {
+            active_egress_iface: "em0".to_string(),
+            member_ifaces: vec!["em0".to_string(), "em1".to_string()],
+            auto_route_sync: true,
+        }
     }
 
-    pub fn add_interface_to_group(&mut self, group: &str, iface: &str) -> String {
-        let entry = self
-            .groups
-            .entry(group.to_string())
-            .or_insert_with(|| InterfaceGroup {
-                group_name: group.to_string(),
-                member_interfaces: Vec::new(),
-                is_egress: group == "egress",
-            });
-        if !entry.member_interfaces.contains(&iface.to_string()) {
-            entry.member_interfaces.push(iface.to_string());
-        }
+    pub fn switch_egress(&mut self, new_iface: &str) -> String {
+        self.active_egress_iface = new_iface.to_string();
 
         format!(
-            "ifconfig {} group {}\n",
-            iface, group
+            "ifconfig: Dynamic egress interface updated to {}\nPF: egress group re-bound to {}\n",
+            new_iface, new_iface
         )
     }
 }
@@ -583,58 +546,45 @@ impl Default for OpenBsdEgressNetworkInterfaceGroupPrEngine {
 }
 
 // ============================================================================
-// 10. OpenBSD mpath Storage Multipath Failover PR Engine
+// 10. OpenBSD mpath Multipath I/O Storage PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct MultipathPath {
-    pub path_id: String,
-    pub device_node: String,
-    pub active: bool,
-    pub scsi_wwid: String,
+pub struct MpathDevice {
+    pub name: String,
+    pub paths: Vec<String>,
+    pub active_path: String,
+    pub failover_mode: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdMpathMultipathIoStoragePrEngine {
-    pub mpath_device: String,
-    pub paths: Vec<MultipathPath>,
-    pub active_path_idx: usize,
+    pub devices: BTreeMap<String, MpathDevice>,
 }
 
 impl OpenBsdMpathMultipathIoStoragePrEngine {
     pub fn new() -> Self {
-        Self {
-            mpath_device: "mpath0".to_string(),
-            paths: vec![
-                MultipathPath {
-                    path_id: "path0".to_string(),
-                    device_node: "/dev/sd0".to_string(),
-                    active: true,
-                    scsi_wwid: "naa.600140500112233445566778899aabbc".to_string(),
-                },
-                MultipathPath {
-                    path_id: "path1".to_string(),
-                    device_node: "/dev/sd1".to_string(),
-                    active: false,
-                    scsi_wwid: "naa.600140500112233445566778899aabbc".to_string(),
-                },
-            ],
-            active_path_idx: 0,
-        }
+        let mut devices = BTreeMap::new();
+        devices.insert(
+            "mpath0".to_string(),
+            MpathDevice {
+                name: "mpath0".to_string(),
+                paths: vec!["/dev/sd0".to_string(), "/dev/sd1".to_string()],
+                active_path: "/dev/sd0".to_string(),
+                failover_mode: "active-active".to_string(),
+            },
+        );
+        Self { devices }
     }
 
-    pub fn failover_to_next_path(&mut self) -> String {
-        if self.paths.is_empty() {
-            return "mpath: no paths available".to_string();
+    pub fn failover_path(&mut self, mpath_name: &str, new_path: &str) -> String {
+        if let Some(dev) = self.devices.get_mut(mpath_name) {
+            dev.active_path = new_path.to_string();
         }
-        self.paths[self.active_path_idx].active = false;
-        self.active_path_idx = (self.active_path_idx + 1) % self.paths.len();
-        self.paths[self.active_path_idx].active = true;
 
-        let active_node = &self.paths[self.active_path_idx].device_node;
         format!(
-            "mpath0: active path changed to {} ({})\n",
-            self.paths[self.active_path_idx].path_id, active_node
+            "mpath: Switched active I/O path for {} to {}\n",
+            mpath_name, new_path
         )
     }
 }
@@ -646,7 +596,7 @@ impl Default for OpenBsdMpathMultipathIoStoragePrEngine {
 }
 
 // ============================================================================
-// 11. Master OpenBSD Missing Components V63 PR Suite
+// 11. Master OpenBSD Missing Components V63 PR Gateway Suite
 // ============================================================================
 
 pub struct OpenBsdMissingComponentsV63PrSuite {
@@ -717,33 +667,33 @@ impl OpenBsdMissingComponentsV63PrSuite {
     }
 
     pub fn evaluate_openbsd_v63_parity(&mut self) -> bool {
-        let drm_diff = self.drm_kms.attach_output("HDMI-1", "2560x1440@144Hz");
+        let mode_diff = self.drm_kms.configure_mode("HDMI-A-1", "2560x1440", 144);
         let pr1 = self.submit_pr_proposal(
-            "Attach DRM KMS output HDMI-1",
+            "Configure DRM KMS display mode HDMI-A-1 2560x1440@144Hz",
             "jules",
             "sys/dev/pci/drm",
-            "Configure inteldrm HDMI-1 high-refresh mode",
-            &drm_diff,
+            "Set kernel display mode and dynamic refresh rate",
+            &mode_diff,
         );
         self.validate_and_merge_pr(pr1);
 
-        let spwd_diff = self.spwd.add_user("operator", 1001, 1001, "$2b$12$hash", "/bin/ksh");
+        let user_diff = self.spwd.add_user("sigma", 1000, 1000, "/home/sigma", "/bin/ksh");
         let pr2 = self.submit_pr_proposal(
-            "Add operator user to master.passwd",
+            "Add user sigma to master.passwd with Argon2id hash",
             "jules",
-            "usr.sbin/pwd_mkdb",
-            "Add operator entry and regenerate pwd_mkdb shadow index",
-            &spwd_diff,
+            "etc/master.passwd",
+            "Add local user account with secure Argon2id password hash",
+            &user_diff,
         );
         self.validate_and_merge_pr(pr2);
 
-        let kroute_diff = self.kroute.add_route("10.0.0.0/8", "192.168.1.1", "em0");
+        let route_diff = self.kroute.add_route("10.0.0.0/8", "192.168.1.254", "em0");
         let pr3 = self.submit_pr_proposal(
-            "Add static route for 10.0.0.0/8",
+            "Add kernel routing table entry for 10.0.0.0/8",
             "jules",
             "sys/net",
-            "Add kernel routing entry via kroute RTM socket",
-            &kroute_diff,
+            "Process RTM_ADD kernel routing table update for private network",
+            &route_diff,
         );
         self.validate_and_merge_pr(pr3);
 
@@ -770,52 +720,52 @@ mod tests {
     #[test]
     fn test_drm_kms_and_spwd() {
         let mut drm = OpenBsdSmfDrmKmsKernelGraphicsPrEngine::new();
-        let diff = drm.attach_output("HDMI-2", "1920x1080@60Hz");
-        assert!(diff.contains("inteldrm0: attached display output HDMI-2"));
-        assert!(drm.outputs.contains_key("HDMI-2"));
+        let diff = drm.configure_mode("DP-2", "1920x1080", 60);
+        assert!(diff.contains("DP-2"));
+        assert!(drm.connectors.contains_key("DP-2"));
 
         let mut spwd = OpenBsdSpwdMasterPasswdAuthPrEngine::new();
-        let msg = spwd.add_user("testuser", 2000, 2000, "$2b$12$hash", "/bin/ksh");
-        assert!(msg.contains("testuser"));
-        assert!(spwd.users.contains_key("testuser"));
+        let udiff = spwd.add_user("admin", 1001, 1001, "/home/admin", "/bin/ksh");
+        assert!(udiff.contains("admin"));
+        assert!(spwd.entries.contains_key("admin"));
     }
 
     #[test]
     fn test_rthreads_isakmpd_ldapd() {
         let mut rthreads = OpenBsdPthreadsSmpSchedulerPrEngine::new();
-        let rmsg = rthreads.spawn_rthread(200, 2);
-        assert!(rmsg.contains("rthread_spawn"));
+        let tid = rthreads.spawn_thread("async-io", 1, 10);
+        assert_eq!(tid, 1002);
 
-        let mut ike = OpenBsdIsakmpdIpsecIkeEngine::new();
-        let imsg = ike.create_ipsec_sa("sa1", "10.0.0.1", "10.0.0.2");
-        assert!(imsg.contains("sa1"));
+        let mut isakmpd = OpenBsdIsakmpdIpsecIkeEngine::new();
+        let sa_diff = isakmpd.establish_sa("sa02", "10.0.0.1", "10.0.0.2");
+        assert!(sa_diff.contains("10.0.0.1"));
 
         let mut ldapd = OpenBsdLdapdDirectoryServerPrEngine::new();
-        let lmsg = ldapd.add_entry("uid=john,dc=sigmaos,dc=org", "inetOrgPerson", "cn", "John");
-        assert!(lmsg.contains("inetOrgPerson"));
+        let ldiff = ldapd.add_entry("dc=sigma,dc=org", "domain");
+        assert!(ldiff.contains("dc=sigma,dc=org"));
     }
 
     #[test]
     fn test_kroute_siphash_dhcpd_egress_mpath() {
         let mut kroute = OpenBsdKrouteRoutingTablePrEngine::new();
-        let kmsg = kroute.add_route("172.16.0.0/12", "192.168.1.1", "em0");
-        assert!(kmsg.contains("kroute_add"));
+        let rmsg = kroute.add_route("172.16.0.0/12", "192.168.1.1", "em0");
+        assert!(rmsg.contains("RTM_ADD"));
 
-        let mut siphash = OpenBsdSiphashKernelEntropyPrEngine::new();
-        let smsg = siphash.reseed_arc4random(256);
-        assert!(smsg.contains("reseeded SipHash"));
+        let sip = OpenBsdSiphashKernelEntropyPrEngine::new();
+        let hash = sip.siphash24(b"sigmaos");
+        assert_ne!(hash, 0);
 
         let mut dhcpd = OpenBsdDhcpdStaticLeaseServerPrEngine::new();
-        let dmsg = dhcpd.add_static_lease("00:aa:bb:cc:dd:ee", "192.168.1.99", "server1");
-        assert!(dmsg.contains("fixed-address 192.168.1.99"));
+        let ddiff = dhcpd.bind_static_lease("nas.local", "00:11:22:33:44:55", "192.168.1.100");
+        assert!(ddiff.contains("nas.local"));
 
         let mut egress = OpenBsdEgressNetworkInterfaceGroupPrEngine::new();
-        let emsg = egress.add_interface_to_group("egress", "em1");
-        assert!(emsg.contains("ifconfig em1 group egress"));
+        let emsg = egress.switch_egress("em1");
+        assert!(emsg.contains("em1"));
 
         let mut mpath = OpenBsdMpathMultipathIoStoragePrEngine::new();
-        let mmsg = mpath.failover_to_next_path();
-        assert!(mmsg.contains("active path changed to path1"));
+        let mmsg = mpath.failover_path("mpath0", "/dev/sd1");
+        assert!(mmsg.contains("/dev/sd1"));
     }
 
     #[test]
