@@ -158,6 +158,7 @@ pub mod sigmastallmanager;
 pub mod sigmafilewatcher;
 pub mod sigmaindexmanager;
 pub mod sigmacachemanager2;
+pub mod sigmacompressionmanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -311,6 +312,10 @@ pub use sigmaindexmanager::{
 pub use sigmacachemanager2::{
     Cache as CacheManager2Cache, CacheState as CacheManager2State, CacheType as CacheManager2Type,
     SigmaCacheManager2,
+};
+pub use sigmacompressionmanager::{
+    CompressionAlgorithm as CompressionManagerAlgorithm, CompressionManager,
+    CompressionOperation as CompressionManagerOperation, OperationState as CompressionManagerState,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
