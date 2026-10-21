@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub run run-stub launch-check clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub run run-stub launch launch-check start clean help
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -100,6 +100,12 @@ run-stub:
 launch-check:
 	@bash scripts/check_launch_ready.sh || true
 
+# 11. Interactive OS launch & workstation dashboard (READY TO WORK & LAUNCH)
+launch:
+	@bash bin/sigmaos-launch
+
+start: launch
+
 help:
 	@echo "SigmaOS Unified Build & Test Interface"
 	@echo "  make check        - Static analysis via cargo check (timed)"
@@ -113,5 +119,6 @@ help:
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"
 	@echo "  make run          - Boot real ISO in QEMU (requires full iso)"
 	@echo "  make run-stub     - Boot stub ISO in QEMU (works immediately!)  ✓"
+	@echo "  make launch       - Launch interactive SigmaOS Workstation Dashboard ✓"
 	@echo "  make launch-check - Full launch readiness validation"
 	@echo "  make clean        - Remove build artifacts"
