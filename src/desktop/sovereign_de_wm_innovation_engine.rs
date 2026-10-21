@@ -152,6 +152,22 @@ impl GnomeInnovationEngine {
             .cloned()
             .unwrap_or(false)
     }
+
+    pub fn allocate_dynamic_workspace(&mut self) -> usize {
+        self.active_workspace_count += 1;
+        self.active_workspace_count
+    }
+
+    pub fn remove_empty_workspaces(&mut self) -> usize {
+        if self.active_workspace_count > 1 {
+            self.active_workspace_count -= 1;
+        }
+        self.active_workspace_count
+    }
+
+    pub fn set_night_light_enabled(&mut self, enabled: bool) {
+        self.quick_settings_state.insert(String::from("night_light"), enabled);
+    }
 }
 
 impl Default for GnomeInnovationEngine {
@@ -344,6 +360,17 @@ impl KdePlasmaInnovationEngine {
             false
         }
     }
+
+    pub fn get_active_plasmoids(&self) -> &[String] {
+        &self.plasmoids
+    }
+
+    pub fn configure_activity_context(&mut self, activity_name: &str) -> bool {
+        if !self.activities.contains(&activity_name.to_string()) {
+            self.activities.push(activity_name.to_string());
+        }
+        self.switch_activity(activity_name)
+    }
 }
 
 impl Default for KdePlasmaInnovationEngine {
@@ -460,6 +487,15 @@ impl XfceInnovationEngine {
     pub fn validate_thunar_action(&self, action_name: &str) -> bool {
         self.custom_actions.iter().any(|a| a.name == action_name)
     }
+
+    pub fn filter_whisker_menu(&self, query: &str) -> Vec<String> {
+        let q = query.to_lowercase();
+        self.custom_actions
+            .iter()
+            .filter(|a| a.name.to_lowercase().contains(&q))
+            .map(|a| a.name.clone())
+            .collect()
+    }
 }
 
 impl Default for XfceInnovationEngine {
@@ -551,6 +587,14 @@ impl LxqtInnovationEngine {
             self.lxqt_style, self.qt_palette_sync_enabled
         )
     }
+
+    pub fn get_autostart_summary(&self) -> Vec<String> {
+        self.autostart_services
+            .iter()
+            .filter(|(_, enabled)| **enabled)
+            .map(|(k, _)| k.clone())
+            .collect()
+    }
 }
 
 impl Default for LxqtInnovationEngine {
@@ -627,6 +671,10 @@ impl LxdeInnovationEngine {
     pub fn switch_lxappearance_gtk_theme(&mut self, theme: &str) {
         self.gtk_theme = theme.to_string();
     }
+
+    pub fn set_desktop_icon_grid(&mut self, enabled: bool) {
+        self.pcmanfm_desktop_grid = enabled;
+    }
 }
 
 impl Default for LxdeInnovationEngine {
@@ -702,6 +750,15 @@ impl MateInnovationEngine {
 
     pub fn activate_caja_python_extension(&mut self, ext_name: &str) -> bool {
         self.register_caja_extension(&format!("python-{}", ext_name))
+    }
+
+    pub fn search_brisk_menu(&self, query: &str) -> Vec<String> {
+        let q = query.to_lowercase();
+        self.brisk_menu_categories
+            .iter()
+            .filter(|c| c.to_lowercase().contains(&q))
+            .cloned()
+            .collect()
     }
 }
 
@@ -785,6 +842,10 @@ impl CinnamonInnovationEngine {
 
     pub fn run_nemo_action_script(&self, action_id: &str) -> Option<String> {
         self.nemo_action_triggers.get(action_id).cloned()
+    }
+
+    pub fn trigger_hot_corner(&self, corner: &str) -> Option<String> {
+        self.hot_corners.get(corner).cloned()
     }
 }
 
@@ -879,6 +940,10 @@ impl BudgieInnovationEngine {
 
     pub fn sync_solus_accent_color(&mut self, color_hex: &str) {
         self.solus_accent_color = color_hex.to_string();
+    }
+
+    pub fn get_active_raven_widgets(&self) -> Vec<String> {
+        self.raven_widget_marketplace.clone()
     }
 }
 
@@ -985,6 +1050,18 @@ impl EnlightenmentMokshaEngine {
 
     pub fn parse_moksha_gadget_layout(&self) -> usize {
         self.moksha_shelves.len()
+    }
+
+    pub fn update_evas_object_bounds(&mut self, id: u32, x: i32, y: i32, width: u32, height: u32) -> bool {
+        if let Some(obj) = self.evas_objects.get_mut(&id) {
+            obj.x = x;
+            obj.y = y;
+            obj.width = width;
+            obj.height = height;
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -1099,6 +1176,11 @@ impl I3WmInnovationEngine {
             .cloned()
             .collect()
     }
+
+    pub fn parse_i3_ipc_message(&mut self, msg: &str) -> Result<String, &'static str> {
+        self.publish_ipc_event(msg);
+        self.dispatch_i3_command(msg)
+    }
 }
 
 impl Default for I3WmInnovationEngine {
@@ -1200,6 +1282,10 @@ impl BspwmInnovationEngine {
             node.split_ratio = ratio;
         }
     }
+
+    pub fn get_node_flags(&self, node_id: u32) -> Vec<String> {
+        self.node_flags.get(&node_id).cloned().unwrap_or_default()
+    }
 }
 
 impl Default for BspwmInnovationEngine {
@@ -1299,6 +1385,10 @@ impl DwmInnovationEngine {
     pub fn match_client_tag_rules(&self, class_name: &str) -> Option<u32> {
         self.client_tag_rules.get(class_name).cloned()
     }
+
+    pub fn get_active_tag_mask(&self) -> u32 {
+        self.selected_tags_mask
+    }
 }
 
 impl Default for DwmInnovationEngine {
@@ -1395,6 +1485,10 @@ impl OpenboxInnovationEngine {
 
     pub fn execute_keybind_action(&self, shortcut: &str) -> Option<String> {
         self.keybind_actions.get(shortcut).cloned()
+    }
+
+    pub fn get_menu_item_count(&self) -> usize {
+        self.menu_items.len()
     }
 }
 
@@ -1503,6 +1597,10 @@ impl FluxboxInnovationEngine {
             group.window_ids.push(window_id);
         }
     }
+
+    pub fn get_tab_group(&self, group_id: u32) -> Option<&FluxboxTabGroup> {
+        self.tab_groups.get(&group_id)
+    }
 }
 
 impl Default for FluxboxInnovationEngine {
@@ -1603,6 +1701,10 @@ impl AwesomeWmInnovationEngine {
     pub fn evaluate_client_rules(&self, class_name: &str) -> bool {
         self.match_rule(class_name).is_some()
     }
+
+    pub fn get_active_wibar_widgets(&self) -> &[String] {
+        &self.wibar_widgets
+    }
 }
 
 impl Default for AwesomeWmInnovationEngine {
@@ -1688,6 +1790,10 @@ impl HyprlandInnovationEngine {
     pub fn evaluate_bezier_curve(&self, curve_name: &str) -> Option<String> {
         self.animation_curves.get(curve_name).cloned()
     }
+
+    pub fn get_input_config(&self, device_id: &str) -> Option<String> {
+        self.input_device_configs.get(device_id).cloned()
+    }
 }
 
 impl Default for HyprlandInnovationEngine {
@@ -1772,6 +1878,10 @@ impl SwayWmInnovationEngine {
 
     pub fn get_output_config_state(&self, output_id: &str) -> Option<String> {
         self.output_configs.get(output_id).cloned()
+    }
+
+    pub fn get_output_transform(&self, output_id: &str) -> Option<String> {
+        self.output_transforms.get(output_id).cloned()
     }
 }
 
@@ -1918,6 +2028,13 @@ impl SovereignDeWmInnovationOrchestrator {
         );
         scores
     }
+
+    pub fn get_active_de_summary(&self) -> String {
+        format!(
+            "Active Environment: {}, Total Environments Supported: 17",
+            self.active_de_name
+        )
+    }
 }
 
 impl Default for SovereignDeWmInnovationOrchestrator {
@@ -1968,10 +2085,34 @@ pub struct DeWmInnovationPullRequestEngine {
 
 impl DeWmInnovationPullRequestEngine {
     pub fn new() -> Self {
-        Self {
+        let mut engine = Self {
             submissions: BTreeMap::new(),
             next_id: 4001,
-        }
+        };
+
+        engine.submit_pr(
+            "GNOME Mutter Fractional Scaling Enhancements",
+            "SovereignDev",
+            "GNOME",
+            DeWmPrCategory::ExtensionPlugin,
+            "+ mutter_fractional_scale = 1.25",
+        );
+        engine.submit_pr(
+            "KDE Plasma KWin Scriptable Layout Rules",
+            "SovereignDev",
+            "KDE Plasma",
+            DeWmPrCategory::LayoutTiling,
+            "+ kwin_tile_grid_slots = 4",
+        );
+        engine.submit_pr(
+            "Xfce Xfconf Channel XML Transpiler",
+            "SovereignDev",
+            "Xfce",
+            DeWmPrCategory::IpcProtocol,
+            "+ xfconf_sync_enabled = true",
+        );
+
+        engine
     }
 
     pub fn submit_pr(
@@ -2496,7 +2637,7 @@ mod tests {
             DeWmPrCategory::ThemePalette,
             "+ blur_size = 12",
         );
-        assert_eq!(pr_id, 4001);
+        assert_eq!(pr_id, 4004);
 
         assert!(pr_engine.verify_pqc_signature(pr_id));
         let diff = pr_engine.generate_unified_diff(pr_id).unwrap();
