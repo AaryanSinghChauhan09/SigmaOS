@@ -188,12 +188,12 @@ echo "--> Staging kernel..."
 mkdir -p "$BUILD_DIR/boot"
 
 if [ -f "$ROOT_DIR/target/x86_64-unknown-none/release/sigmaos" ]; then
-    cp "$ROOT_DIR/target/x86_64-unknown-none/release/sigmaos" "$BUILD_DIR/boot/vmlinuz-linux"
-    echo "    Staged real SigmaOS kernel"
+    cp "$ROOT_DIR/target/x86_64-unknown-none/release/sigmaos" "$BUILD_DIR/boot/vmlinuz-linux-t2"
+    echo "    Staged real SigmaOS kernel as vmlinuz-linux-t2"
 else
     # Create a multiboot2-compatible kernel stub for ISO boot testing
-    printf '\x7f\x45\x4c\x46\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\xf3\x00\x01\x00\x00\x00' > "$BUILD_DIR/boot/vmlinuz-linux"
-    echo "    Staged kernel stub (real kernel not built yet)"
+    printf '\x7f\x45\x4c\x46\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\xf3\x00\x01\x00\x00\x00' > "$BUILD_DIR/boot/vmlinuz-linux-t2"
+    echo "    Staged kernel stub as vmlinuz-linux-t2 (real kernel not built yet)"
 fi
 
 # ---------------------------------------------------------------------------
@@ -249,12 +249,12 @@ set timeout=5
 set default=0
 
 menuentry "SigmaOS Desktop Installer" {
-    linux /boot/vmlinuz-linux root=UUID=REPLACE_WITH_ROOT_UUID rw quiet splash
+    linux /boot/vmlinuz-linux-t2 root=UUID=REPLACE_WITH_ROOT_UUID rw quiet splash
     initrd /boot/initramfs.gz
 }
 
 menuentry "SigmaOS Desktop Installer (Safe Mode)" {
-    linux /boot/vmlinuz-linux root=UUID=REPLACE_WITH_ROOT_UUID rw nomodeset
+    linux /boot/vmlinuz-linux-t2 root=UUID=REPLACE_WITH_ROOT_UUID rw nomodeset
     initrd /boot/initramfs.gz
 }
 GRUBEOF

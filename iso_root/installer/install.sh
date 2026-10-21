@@ -20,6 +20,10 @@ FILESYSTEM="SovereignFS"
 HOSTNAME="sigmaos-node"
 SHARD_PRESET="Standard"
 PASSWORD=""
+ACCESSIBILITY=0
+ARCHINSTALL=0
+CLOUD_INIT=0
+TPM=0
 
 # ==============================================================================
 # AUDITING & LOGGING SUBSYSTEM (Debian/Enterprise Linux style)
@@ -92,6 +96,10 @@ Options:
   -n, --hostname NAME    Define custom system hostname (default: sigmaos-node)
   -p, --preset PRESET    Shard profile preset: Minimal, Standard, Enterprise (default: Standard)
   -h, --help             Show this help guide and exit
+  --accessibility        Enable accessibility mode (speakup screen reader)
+  --archinstall          Use archinstall guided installer
+  --cloud-init           Enable cloud-init provisioning
+  --tpm                  Enable TPM security features
 
 Devices:
   Specify a target block device path (e.g., /dev/sda). If omitted and running
@@ -320,6 +328,22 @@ main() {
                 show_help
                 exit 0
                 ;;
+            --accessibility)
+                ACCESSIBILITY=1
+                shift
+                ;;
+            --archinstall)
+                ARCHINSTALL=1
+                shift
+                ;;
+            --cloud-init)
+                CLOUD_INIT=1
+                shift
+                ;;
+            --tpm)
+                TPM=1
+                shift
+                ;;
             -*)
                 echo -e "\e[31mError: Unrecognized option: $1\e[0m" >&2
                 show_help
@@ -362,6 +386,37 @@ main() {
         log_warn "DRY RUN: Simulating installation sequence (No state mutations)."
         log_info "DRY RUN complete. No changes were made to $TARGET_DEVICE."
         exit 0
+    fi
+
+    # ========================================================================
+    # PHASE 0: Omarchy 4.0.6 Feature Configuration
+    # ========================================================================
+    log_step "Configuring Omarchy 4.0.6 features"
+
+    # Accessibility mode (speakup screen reader like Omarchy)
+    if [[ $ACCESSIBILITY -eq 1 ]]; then
+        log_info "Accessibility mode enabled (speakup screen reader)"
+        # Accessibility will be configured in the kernel command line
+        echo "accessibility=on" >> "$MOUNT_POINT/etc/kernel/cmdline" 2>/dev/null || true
+        PKGS="$PKGS speakup espeakup espeak-ng"
+    fi
+
+    # archinstall guided installer option
+    if [[ $ARCHINSTALL -eq 1 ]]; then
+        log_info "archinstall guided installer enabled"
+        PKGS="$PKGS archinstall arch-install-scripts"
+    fi
+
+    # Cloud-init provisioning
+    if [[ $CLOUD_INIT -eq 1 ]]; then
+        log_info "Cloud-init provisioning enabled"
+        PKGS="$PKGS cloud-init"
+    fi
+
+    # TPM security features
+    if [[ $TPM -eq 1 ]]; then
+        log_info "TPM security features enabled"
+        PKGS="$PKGS tpm2-tools tpm2-tss"
     fi
 
     # ========================================================================

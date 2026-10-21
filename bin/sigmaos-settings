@@ -1,0 +1,52 @@
+#!/bin/bash
+# sigmaos-settings - SigmaOS system settings manager
+# Modeled on Omancy 4.0.6 omarchy-settings
+
+set -euo pipefail
+
+SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+SETTINGS_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/sigmaos/settings.conf"
+
+show_settings() {
+    echo "=== SigmaOS System Settings ==="
+    if [ -f "$SETTINGS_FILE" ]; then
+        cat "$SETTINGS_FILE"
+    else
+        echo "Using default settings"
+        echo "theme=sigmaos"
+        echo "background=default"
+        echo "font=JetBrainsMono Nerd Font"
+        echo "terminal=foot"
+        echo "editor=micro"
+        echo "browser=chromium"
+    fi
+}
+
+set_setting() {
+    local key="$1"
+    local value="$2"
+    if [ -z "$key" ] || [ -z "$value" ]; then
+        echo "Usage: sigmaos-settings set <key> <value>" >&2
+        exit 1
+    fi
+    mkdir -p "$(dirname "$SETTINGS_FILE")"
+    if [ -f "$SETTINGS_FILE" ] && grep -q "^${key}=" "$SETTINGS_FILE"; then
+        sed -i "s/^${key}=.*/${key}=${value}/" "$SETTINGS_FILE"
+    else
+        echo "${key}=${value}" >> "$SETTINGS_FILE"
+    fi
+    echo "Set ${key}=${value}"
+}
+
+case "${1:-}" in
+    show)
+        show_settings
+        ;;
+    set)
+        set_setting "${2:-}" "${3:-}"
+        ;;
+    *)
+        echo "Usage: sigmaos-settings <show|set <key> <value>>" >&2
+        exit 1
+        ;;
+esac

@@ -13,10 +13,19 @@ efibootmgr
 dosfstools
 btrfs-progs
 zram-generator
+arch-install-scripts
+archinstall
 
 # Bootloader (limine like Omarchy)
 limine
 limine-mkinitcpio-hook
+
+# Omarchy 4.0.6 style packages
+sigmaos-keyring
+sigmaos-settings
+sdparm
+openbsd-netcat
+xorg-xprop
 
 # Display server & session
 wayland
@@ -139,6 +148,21 @@ print-manager
 # Security / authentication
 polkit-kde-agent
 gnome-keyring
+tpm2-tools
+tpm2-tss
+
+# Accessibility (Omancy 4.0.6 speakup screen reader)
+speakup
+espeakup
+espeak-ng
+
+# Recovery / rescue tools (Omancy-inspired)
+clonezilla
+drbl
+testdisk
+
+# Cloud provisioning (Omancy-style first-boot)
+cloud-init
 
 # Development (optional but useful)
 gcc

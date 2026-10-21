@@ -38,6 +38,13 @@ depends=(
   'bluez' 'bluez-utils' 'blueman'
   'cups' 'cups-pk-helper'
   'polkit-kde-agent' 'gnome-keyring'
+  'tpm2-tools' 'tpm2-tss'
+  'speakup' 'espeakup' 'espeak-ng'
+  'cloud-init'
+  'clonezilla' 'drbl' 'testdisk'
+  'sdparm' 'openbsd-netcat' 'xorg-xprop'
+  'archinstall' 'arch-install-scripts'
+  'sigmaos-keyring' 'sigmaos-settings'
 )
 
 package() {
@@ -78,4 +85,8 @@ package() {
   # Install install scripts
   mkdir -p "${pkgdir}/usr/share/sigmaos/install"
   cp -a install/* "${pkgdir}/usr/share/sigmaos/install/"
+  
+  # Install PKGBUILD definitions
+  mkdir -p "${pkgdir}/usr/share/sigmaos/pkgbuild"
+  cp -a pkgbuild/* "${pkgdir}/usr/share/sigmaos/pkgbuild/"
 }

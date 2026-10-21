@@ -1,0 +1,10 @@
+post_install() {
+  echo "Initializing SigmaOS keyring..."
+  pacman-key --init 2>/dev/null || true
+  pacman-key --populate sigmaos 2>/dev/null || true
+  echo "SigmaOS keyring initialized."
+}
+
+post_remove() {
+  echo "SigmaOS keyring removed."
+}
