@@ -1,5 +1,7 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/cadcraft_artcraft_parity_pr.rs`)
@@ -18,7 +20,6 @@
 // 10. CadcraftPdmVersionControlBOMGeneratorPrEngine (Product Data Management [PDM] vault revision control & multi-level BOM generator)
 // 11. SovereignCadcraftArtcraftParityPrGateway & CadcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -960,6 +961,7 @@ impl Default for CadcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_cadcraft_parity_pr_gateway() {

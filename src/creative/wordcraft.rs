@@ -631,6 +631,7 @@ pub fn get_wordcraft() -> Option<&'static mut WordCraftMasterPrDeploymentSuite> 
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use super::*;
 
     #[test]

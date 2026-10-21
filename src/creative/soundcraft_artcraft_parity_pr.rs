@@ -1,5 +1,7 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Soundcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/soundcraft_artcraft_parity_pr.rs`)
@@ -18,7 +20,6 @@
 // 10. SoundcraftMasterSessionTemplateCascadePrEngine (Master session routing template hierarchy, global audio bus cascading & track preset palette syncer)
 // 11. SovereignSoundcraftArtcraftParityPrGateway & SoundcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -874,6 +875,7 @@ impl SoundcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_soundcraft_artcraft_parity_pr_gateway() {
