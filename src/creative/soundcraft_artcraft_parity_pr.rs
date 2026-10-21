@@ -1,3 +1,13 @@
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+
 // SPDX-License-Identifier: MIT
 // SigmaOS - Soundcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/soundcraft_artcraft_parity_pr.rs`)
@@ -16,16 +26,6 @@
 // 10. SoundcraftMasterSessionTemplateCascadePrEngine (Master session routing template hierarchy, global audio bus cascading & track preset palette syncer)
 // 11. SovereignSoundcraftArtcraftParityPrGateway & SoundcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
-
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 /// Structured PR proposal manifest descriptor for Soundcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -874,6 +874,8 @@ impl SoundcraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
+    use alloc::vec;
 
     #[test]
     fn test_soundcraft_artcraft_parity_pr_gateway() {
@@ -933,8 +935,7 @@ mod tests {
             z: 0.0,
         };
         let (w, bx, _by, _bz) = engine.encode_foa_bformat(1.0, pos);
-        let diff: f32 = (w - core::f32::consts::FRAC_1_SQRT_2).abs();
-        assert!(diff < 1e-3);
+        assert!(((w as f32) - core::f32::consts::FRAC_1_SQRT_2).abs() < 1e-3);
         assert_eq!(bx, 1.0);
 
         let (left, right) = engine.hrtf_binaural_pan(pos);
@@ -972,8 +973,7 @@ mod tests {
         let mut buffer = vec![1.5, -2.0, 0.5];
         engine.process_brickwall_limiter(&mut buffer);
         for &s in &buffer {
-            let abs_s: f32 = s.abs();
-            assert!(abs_s <= 1.0);
+            assert!((s as f32).abs() <= 1.0);
         }
     }
 
