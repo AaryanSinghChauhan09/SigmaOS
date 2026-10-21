@@ -15,8 +15,8 @@ pub mod deckcraft;
 // pub mod deckcraft_artcraft_parity_pr;
 // pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
-// pub mod designcraft_artcraft_parity_pr;
-// pub mod designcraft_missing_components_parity_pr;
+pub mod designcraft_artcraft_parity_pr;
+pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
 // pub mod effectcraft_artcraft_parity_pr;
 // pub mod effectcraft_missing_components_parity_pr;
@@ -70,6 +70,8 @@ pub use designcraft::{
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
 };
+pub use designcraft_artcraft_parity_pr::*;
+pub use designcraft_missing_components_parity_pr::*;
 pub use effectcraft::{
     fnv1a_effectcraft_pr_digest, get_effectcraft, init_effectcraft, AnimatedParameter,
     BlendMode as EffectBlendMode, CompositingNode, Effect as EffectCraftEffect, EffectCategory,

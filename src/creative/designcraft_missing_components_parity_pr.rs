@@ -1,21 +1,16 @@
 #![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // Sovereign DesignCraft from ArtCraft Missing Components Parity PR Gateway Engine
 // (`src/creative/designcraft_missing_components_parity_pr.rs`)
 
-#![no_std]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use alloc::sync::atomic::{AtomicU32, AtomicBool, Ordering};
-use core::f64::consts::PI;
-
-
-
-
-
-
+use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
 /// DesignCraft PR Category Classification
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -1349,6 +1344,7 @@ impl Default for SovereignDesigncraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_designcraft_pr_gateway_staging() {
