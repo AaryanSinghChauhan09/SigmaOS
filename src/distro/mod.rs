@@ -441,6 +441,9 @@ pub mod sovereign_media_and_distro_unimplemented_innovations;
 pub mod sovereign_linux_bsd_all_subsystems_harmony;
 pub use sovereign_linux_bsd_all_subsystems_harmony::*;
 
+pub mod sovereign_linux_bsd_all_subsystems_harmony_pr;
+pub use sovereign_linux_bsd_all_subsystems_harmony_pr::*;
+
 pub mod sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine;
 pub use sovereign_linux_bsd_media_wiki_unimplemented_ideas_engine::*;
 

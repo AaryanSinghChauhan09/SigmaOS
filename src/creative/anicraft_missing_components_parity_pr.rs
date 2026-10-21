@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
@@ -12,11 +10,10 @@
 // 5. AnicraftMeshDeformationShapeKeysPrEngine (Mesh deformation & morph target / shape key blend shape morphing)
 // 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::f64::consts::PI;
 
 
 
@@ -670,6 +667,7 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {

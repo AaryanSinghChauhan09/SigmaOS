@@ -1,13 +1,11 @@
-#![no_std]
-#![no_std]
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
-use core::f64::consts::PI;
-
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
+
+use std::collections::BTreeMap;
+use std::string::{String, ToString};
+use std::vec::Vec;
+use std::f64::consts::PI;
 //
 // Bridges AniCraft (Sovereign 2D/3D Animation Timeline, Keyframing & Skeletal Rigging Engine)
 // and ArtCraft AniCraft missing feature parity via structured PR proposals.
@@ -883,6 +881,7 @@ impl Default for AnicraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {

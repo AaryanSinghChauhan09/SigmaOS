@@ -514,6 +514,13 @@ if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony.rs" ]; then
     ./build/test_subsystem_harmony
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_all_subsystems_harmony_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD All Subsystems Harmony PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_all_subsystems_harmony_pr.rs --edition=2021 -o build/test_subsystem_harmony_pr
+    ./build/test_subsystem_harmony_pr
+fi
+
 if [ -f "src/distro/sovereign_linux_bsd_distro_next_gen_innovations.rs" ]; then
     echo "Running Next-Gen Sovereign Linux & BSD Distro Innovations test suite..."
     mkdir -p build
