@@ -163,6 +163,7 @@ pub mod sigmaencryptionmanager;
 pub mod sigmafirewallmanager2;
 pub mod sigmalogrotationmanager;
 pub mod sigmanetworkmonitor;
+pub mod sigmacertificatemanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -339,6 +340,11 @@ pub use sigmalogrotationmanager::{
 pub use sigmanetworkmonitor::{
     ConnectionProtocol as NetworkMonitorProtocol, NetworkMonitorConnectionState,
     NetworkMonitorConnection, NetworkMonitorInterface, NetworkMonitor,
+};
+pub use sigmacertificatemanager::{
+    Certificate as CertificateManagerCertificate, CertificateManager,
+    CertificateState as CertificateManagerState, CertificateType as CertificateManagerType,
+    CertificateKeyType, PrivateKey as CertificateManagerKey,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
