@@ -17,6 +17,7 @@ pub mod access;
 pub mod accessibility;
 pub mod audio;
 pub mod automation;
+pub mod branding;
 pub mod build;
 pub mod clipboard;
 pub mod community;
@@ -284,6 +285,7 @@ pub mod bluetooth;
 pub mod boot;
 pub use boot::start_assembly_entry::*;
 pub use boot::*;
+pub mod browser_handoff;
 pub mod toolchain {
     pub mod adapter;
     pub mod bootstrap;
