@@ -13,6 +13,7 @@
 - [CPU Frequency Scaling](./Cpu-Frequency-Scaling-Governor-Component-Guide.md)
 - [Thermal Cooling](./Thermal-Cooling-Component-Guide.md)
 - [Hardware HAL Drivers](./Hardware-Hal-Drivers-Component-Guide.md)
+- [Device Driver Development Plan](./35-SigmaOS-Device-Driver-Development-Plan.md)
 - [USB & HID Subsystem](./Usb-Subsystem-Hid-Mass-Storage-Component-Guide.md)
 - [Interrupts & APIC](./Interrupt-Apic-Component-Guide.md)
 - [Timekeeping](./Timekeeping-Component-Guide.md)
