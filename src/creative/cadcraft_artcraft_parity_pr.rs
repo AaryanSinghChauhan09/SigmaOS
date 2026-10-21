@@ -1,7 +1,10 @@
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/cadcraft_artcraft_parity_pr.rs`)
+
+#![no_std]
+
+extern crate alloc;
 //
 // Bridges CadCraft (3D CAD/CAM/CAE Modeling Framework) and ArtCraft CadCraft missing feature parity via structured PR proposals.
 // Provides implementations for 10 missing components:
@@ -19,7 +22,9 @@
 
 // alloc is declared at the crate root (lib.rs); no re-declaration needed here.
 
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
