@@ -10,7 +10,7 @@ pub mod audiocraft;
 pub mod cadcraft;
 // pub mod cadcraft_artcraft_parity_pr;
 // pub mod cadcraft_missing_components_parity_pr;
-// pub mod craftlibs_missing_components_parity_pr;
+pub mod craftlibs_missing_components_parity_pr;
 pub mod deckcraft;
 // pub mod deckcraft_artcraft_parity_pr;
 // pub mod deckcraft_missing_components_parity_pr;
@@ -56,6 +56,7 @@ pub mod wordcraft;
 // pub mod wordcraft_artcraft_parity_pr;
 // pub mod wordcraft_missing_components_parity_pr;
 
+pub use craftlibs_missing_components_parity_pr::*;
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
     DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine, DeckCraftMasterPrDeploymentSuite,
