@@ -1,0 +1,148 @@
+# SigmaOS base package list
+# Packages installed to make SigmaOS a working desktop OS.
+# Modeled on Omarchy 4.0.5 install/omarchy-base.packages
+
+# Core system
+base
+base-devel
+linux-firmware
+systemd
+systemd-sysvcompat
+grub
+efibootmgr
+dosfstools
+btrfs-progs
+zram-generator
+
+# Bootloader (limine like Omarchy)
+limine
+limine-mkinitcpio-hook
+
+# Display server & session
+wayland
+wayland-utils
+xorg-server-xwayland
+uwsm
+seatd
+
+# Compositor / Window Manager
+hyprland
+hyprlock
+hypridle
+swaylock
+
+# Display manager
+sddm
+
+# Boot splash
+plymouth
+plymouth-theme-sigmaos
+
+# Terminals
+foot
+ghostty
+
+# Launcher
+wofi
+
+# Status bar
+waybar
+
+# Notifications
+mako
+
+# Audio
+pipewire
+pipewire-pulse
+pipewire-alsa
+wireplumber
+alsa-utils
+pamixer
+pavucontrol
+
+# Input / input tools
+libinput
+xdotool
+ydotool
+
+# Screenshot / recording
+grim
+slurp
+wf-recorder
+gpu-screen-recorder
+wl-clipboard
+
+# File manager
+nautilus
+gvfs
+gvfs-mtp
+gvfs-nfs
+
+# Browser
+chromium
+firefox
+
+# Text editor
+micro
+helix
+
+# System tools
+fastfetch
+btop
+btop
+brightnessctl
+power-profiles-daemon
+gum
+fzf
+git
+curl
+wget
+unzip
+zip
+tar
+rsync
+
+# Shell
+bash
+bash-completion
+zsh
+
+# Fonts
+noto-fonts
+noto-fonts-emoji
+ttf-jetbrains-mono-nerd
+
+# Theming / appearance
+gtk4
+gtk3
+qt5-wayland
+qt6-wayland
+adwaita-icon-theme
+papirus-icon-theme
+cursor-themes
+
+# Networking
+networkmanager
+network-manager-applet
+bluez
+bluez-utils
+blueman
+
+# Printing
+cups
+cups-pk-helper
+print-manager
+
+# Security / authentication
+polkit-kde-agent
+gnome-keyring
+
+# Development (optional but useful)
+gcc
+clang
+rustup
+make
+cmake
+
+# SigmaOS specific
+sigmaos

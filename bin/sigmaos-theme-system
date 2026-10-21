@@ -1,0 +1,25 @@
+#!/bin/bash
+# sigmaos-theme-system - SigmaOS theme applier
+# Applies theme templates from default/themed/ to user config locations.
+# Inspired by Omarchy 4.0.5 install/config/theme-system.sh
+
+set -euo pipefail
+
+THEME_NAME="${1:-sigmaos}"
+THEME_DIR="/usr/share/sigmaos/themes/${THEME_NAME}"
+
+apply_template() {
+  local template="$1"
+  local target="$2"
+  if [ -f "${THEME_DIR}/${template}" ]; then
+    mkdir -p "$(dirname "${target}")"
+    cp "${THEME_DIR}/${template}" "${target}"
+    echo "[sigmaos-theme-system] Applied ${template} -> ${target}"
+  fi
+}
+
+apply_template "foot.ini.tpl" "${HOME}/.config/foot/foot.ini"
+apply_template "ghostty.conf.tpl" "${HOME}/.config/ghostty/config"
+apply_template "hyprland.lua.tpl" "${HOME}/.config/hypr/hyprland.conf"
+
+echo "[sigmaos-theme-system] Theme ${THEME_NAME} applied successfully"

@@ -1,0 +1,30 @@
+#!/bin/bash
+# sigmaos-capture-region - SigmaOS region screenshot capture
+# Implements omancy-capture-region semantics.
+# Captures a selected region of the screen to a file.
+
+set -euo pipefail
+
+OUT_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+mkdir -p "${OUT_DIR}"
+FILE="${OUT_DIR}/sigmaos-region-$(date +%Y%m%d-%H%M%S).png"
+
+if command -v grim >/dev/null 2>&1 && command -v slurp >/dev/null 2>&1; then
+  geometry=$(slurp) || exit 1
+  grim -g "${geometry}" "${FILE}"
+elif command -v import >/dev/null 2>&1; then
+  import "${FILE}"
+else
+  echo "[sigmaos-capture-region] No screenshot tool found (grim+slurp/import)." >&2
+  exit 1
+fi
+
+echo "${FILE}"
+
+if command -v wl-copy >/dev/null 2>&1; then
+  wl-copy < "${FILE}" 2>/dev/null || true
+fi
+
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "SigmaOS Screenshot" "Region saved to ${FILE}" 2>/dev/null || true
+fi

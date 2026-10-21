@@ -1,0 +1,31 @@
+#!/bin/bash
+# sigmaos-capture-screenshot - SigmaOS screenshot capture
+# Implements omancy-capture-screenshot semantics.
+# Captures the entire screen to a file.
+
+set -euo pipefail
+
+OUT_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots"
+mkdir -p "${OUT_DIR}"
+FILE="${OUT_DIR}/sigmaos-screenshot-$(date +%Y%m%d-%H%M%S).png"
+
+if command -v grim >/dev/null 2>&1; then
+  grim "${FILE}"
+elif command -v import >/dev/null 2>&1; then
+  import -window root "${FILE}"
+else
+  echo "[sigmaos-capture-screenshot] No screenshot tool found (grim/import)." >&2
+  exit 1
+fi
+
+echo "${FILE}"
+
+# Copy to clipboard if wl-copy is available.
+if command -v wl-copy >/dev/null 2>&1; then
+  wl-copy < "${FILE}" 2>/dev/null || true
+fi
+
+# Notify user.
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "SigmaOS Screenshot" "Saved to ${FILE}" 2>/dev/null || true
+fi

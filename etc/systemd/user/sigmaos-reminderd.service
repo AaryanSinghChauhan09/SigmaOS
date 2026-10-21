@@ -1,0 +1,18 @@
+[Unit]
+Description=SigmaOS Reminder Daemon
+Documentation=man:sigmaos-reminderd(8)
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sigmaos-reminderd
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=${XDG_RUNTIME_DIR:-/run/user/1000}
+
+[Install]
+WantedBy=graphical-session.target

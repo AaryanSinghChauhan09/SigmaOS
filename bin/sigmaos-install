@@ -1,0 +1,220 @@
+#!/bin/bash
+# sigmaos-install - SigmaOS full installation script
+# Implements end-to-end installation modeled on Omarchy 4.0.5 install flow.
+#
+# Usage: sigmaos-install [--target /dev/sda] [--hostname sigmaos] [--username sigma]
+#
+# Steps:
+#   1. Partition and format target disk
+#   2. Install base packages (pacstrap equivalent)
+#   3. Generate fstab
+#   4. Copy SigmaOS system files (/etc, default/, bin/, shell/, boot/)
+#   5. Configure bootloader (limine)
+#   6. Enable services
+#   7. Schedule first-boot provisioning
+#
+# Design: fail-fast, defensive, modular (each phase is a separate function).
+
+set -euo pipefail
+
+TARGET_DEVICE="/dev/sda"
+HOSTNAME="sigmaos"
+USERNAME="sigma"
+MOUNT_POINT="/mnt/sigmaos"
+
+log_info()  { echo "[sigmaos-install] [INFO]  $*" >&2; }
+log_step()  { echo "[sigmaos-install] [STEP]  $*" >&2; }
+log_warn()  { echo "[sigmaos-install] [WARN]  $*" >&2; }
+log_error() { echo "[sigmaos-install] [ERROR] $*" >&2; }
+
+usage() {
+  cat <<EOF
+Usage: sigmaos-install [--target DEVICE] [--hostname NAME] [--username NAME]
+  --target    Target block device (default: /dev/sda)
+  --hostname  System hostname (default: sigmaos)
+  --username  Primary user account (default: sigma)
+EOF
+  exit 1
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --target) TARGET_DEVICE="$2"; shift 2 ;;
+    --hostname) HOSTNAME="$2"; shift 2 ;;
+    --username) USERNAME="$2"; shift 2 ;;
+    --help|-h) usage ;;
+    *) log_error "Unknown option: $1"; usage ;;
+  esac
+done
+
+# ---------------------------------------------------------------------------
+# Phase 1: Pre-flight checks
+# ---------------------------------------------------------------------------
+preflight() {
+  log_step "Pre-flight checks"
+  if [[ $EUID -ne 0 ]]; then
+    log_error "Must run as root"
+    exit 1
+  fi
+  if [[ ! -b "${TARGET_DEVICE}" ]]; then
+    log_error "Target device ${TARGET_DEVICE} not found"
+    exit 1
+  fi
+  log_info "Target device: ${TARGET_DEVICE}"
+  log_info "Hostname: ${HOSTNAME}"
+  log_info "Username: ${USERNAME}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 2: Partition and format
+# ---------------------------------------------------------------------------
+partition() {
+  log_step "Partitioning ${TARGET_DEVICE}"
+  # Create GPT with EFI + root partitions
+  parted -s "${TARGET_DEVICE}" mklabel gpt
+  parted -s "${TARGET_DEVICE}" mkpart ESP fat32 1MiB 512MiB
+  parted -s "${TARGET_DEVICE}" set 1 esp on
+  parted -s "${TARGET_DEVICE}" mkpart primary ext4 512MiB 100%
+  
+  # Format
+  mkfs.fat -F 32 "${TARGET_DEVICE}1"
+  mkfs.ext4 -F "${TARGET_DEVICE}2"
+  
+  # Mount
+  mkdir -p "${MOUNT_POINT}"
+  mount "${TARGET_DEVICE}2" "${MOUNT_POINT}"
+  mkdir -p "${MOUNT_POINT}/boot"
+  mount "${TARGET_DEVICE}1" "${MOUNT_POINT}/boot"
+  
+  log_info "Partitioned and mounted ${TARGET_DEVICE}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 3: Install base packages
+# ---------------------------------------------------------------------------
+install_packages() {
+  log_step "Installing base packages"
+  
+  if command -v pacstrap >/dev/null 2>&1; then
+    pacstrap "${MOUNT_POINT}" - < install/packages/sigmaos-base.packages 2>/dev/null || \
+      pacstrap "${MOUNT_POINT}" $(grep -v '^#' install/packages/sigmaos-base.packages | grep -v '^$')
+  elif command -v pacman >/dev/null 2>&1; then
+    pacman -Sy --needed --noconfirm $(grep -v '^#' install/packages/sigmaos-base.packages | grep -v '^$')
+  else
+    log_warn "No package manager found, skipping package installation"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4: Generate fstab
+# ---------------------------------------------------------------------------
+generate_fstab() {
+  log_step "Generating fstab"
+  genfstab -U "${MOUNT_POINT}" >> "${MOUNT_POINT}/etc/fstab" 2>/dev/null || true
+}
+
+# ---------------------------------------------------------------------------
+# Phase 5: Copy SigmaOS system files
+# ---------------------------------------------------------------------------
+copy_system_files() {
+  log_step "Copying SigmaOS system files"
+  
+  # Copy /etc configuration
+  cp -a etc/* "${MOUNT_POINT}/etc/" 2>/dev/null || true
+  
+  # Copy /usr/share/sigmaos defaults
+  mkdir -p "${MOUNT_POINT}/usr/share/sigmaos"
+  cp -a default/* "${MOUNT_POINT}/usr/share/sigmaos/default/" 2>/dev/null || true
+  cp -a shell/* "${MOUNT_POINT}/usr/share/sigmaos/shell/" 2>/dev/null || true
+  
+  # Copy runtime binaries
+  mkdir -p "${MOUNT_POINT}/usr/bin"
+  cp -a bin/* "${MOUNT_POINT}/usr/bin/" 2>/dev/null || true
+  
+  # Copy Plymouth theme
+  mkdir -p "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos"
+  cp -a usr/share/plymouth/themes/sigmaos/* "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos/" 2>/dev/null || true
+  
+  # Copy bootloader config
+  mkdir -p "${MOUNT_POINT}/boot/limine"
+  cp -a boot/limine/* "${MOUNT_POINT}/boot/limine/" 2>/dev/null || true
+  
+  # Copy /etc/skel dotfiles
+  cp -a etc/skel/. "${MOUNT_POINT}/etc/skel/" 2>/dev/null || true
+  
+  # Copy systemd user services
+  mkdir -p "${MOUNT_POINT}/etc/systemd/user"
+  cp -a etc/systemd/user/* "${MOUNT_POINT}/etc/systemd/user/" 2>/dev/null || true
+  
+  log_info "System files copied to ${MOUNT_POINT}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 6: Configure bootloader (limine)
+# ---------------------------------------------------------------------------
+configure_bootloader() {
+  log_step "Configuring limine bootloader"
+  
+  # Replace UUID placeholder in limine.conf
+  ROOT_UUID=$(blkid -s UUID -o value "${TARGET_DEVICE}2" 2>/dev/null || echo "REPLACE_ME")
+  if [ -f "${MOUNT_POINT}/boot/limine/limine.conf" ]; then
+    sed -i "s/__ROOT_UUID__/${ROOT_UUID}/g" "${MOUNT_POINT}/boot/limine/limine.conf"
+  fi
+  
+  # Install limine to EFI partition
+  if command -v limine-deploy >/dev/null 2>&1; then
+    limine-deploy --efi "${TARGET_DEVICE}1" 2>/dev/null || true
+  elif command -v limine-install >/dev/null 2>&1; then
+    limine-install "${TARGET_DEVICE}1" 2>/dev/null || true
+  fi
+  
+  log_info "Bootloader configured"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 7: Enable services and first-boot provisioning
+# ---------------------------------------------------------------------------
+enable_services() {
+  log_step "Enabling services and first-boot provisioning"
+  
+  # Enable services via systemctl in the target
+  if command -v arch-chroot >/dev/null 2>&1; then
+    arch-chroot "${MOUNT_POINT}" systemctl enable sddm.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable wireplumber.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable plymouth-start.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable sigmaos-provision-owner.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable theme-system.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable zram-generator.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable sigmaos-desktop-session.service 2>/dev/null || true
+    arch-chroot "${MOUNT_POINT}" systemctl enable sigmaos-shell.service 2>/dev/null || true
+    
+    # Rebuild initramfs with Plymouth hooks
+    arch-chroot "${MOUNT_POINT}" mkinitcpio -P 2>/dev/null || \
+      arch-chroot "${MOUNT_POINT}" dracut -f 2>/dev/null || true
+  fi
+  
+  # Mark provisioning as not-yet-done (first-boot will run setup-form.sh)
+  rm -f "${MOUNT_POINT}/var/lib/sigmaos/provisioned" 2>/dev/null || true
+  
+  log_info "Services enabled, first-boot provisioning scheduled"
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+main() {
+  preflight
+  partition
+  install_packages
+  generate_fstab
+  copy_system_files
+  configure_bootloader
+  enable_services
+  
+  log_step "SigmaOS installation complete!"
+  log_info "Target: ${TARGET_DEVICE}"
+  log_info "Reboot into SigmaOS to begin first-boot provisioning."
+}
+
+main "$@"

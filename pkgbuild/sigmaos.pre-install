@@ -1,0 +1,17 @@
+#!/bin/bash
+# SigmaOS pre-install hook - validates system readiness
+
+set -euo pipefail
+
+# Check for required architecture
+if [[ "$(uname -m)" != "x86_64" ]]; then
+  echo "[sigmaos.pre-install] Error: SigmaOS requires x86_64 architecture" >&2
+  exit 1
+fi
+
+# Check for UEFI
+if [[ ! -d /sys/firmware/efi ]]; then
+  echo "[sigmaos.pre-install] Warning: UEFI not detected, bootloader may not work" >&2
+fi
+
+echo "[sigmaos.pre-install] System ready for SigmaOS installation"

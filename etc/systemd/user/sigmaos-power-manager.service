@@ -1,0 +1,19 @@
+[Unit]
+Description=SigmaOS Power Manager Daemon
+Documentation=man:sigmaos-power-manager(8)
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sigmaos-power-manager
+Restart=on-failure
+RestartSec=30
+# Least privilege: only read battery sysfs, no write access needed.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadOnlyPaths=/sys/class/power_supply
+
+[Install]
+WantedBy=graphical-session.target

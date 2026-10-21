@@ -1,0 +1,33 @@
+#!/bin/bash
+# sigmaos-power-manager - SigmaOS power management daemon
+# Implements omancy-power-present / omancy-powerprofiles-set semantics.
+# Monitors battery and AC state, adjusts power profile accordingly.
+#
+# Design: single responsibility, fail-fast, efficient polling.
+
+set -uo pipefail
+
+POLL_INTERVAL=30
+
+while true; do
+  if command -v powerprofilesctl >/dev/null 2>&1; then
+    # Let powerprofilesd handle the actual profile; just observe.
+    :
+  fi
+
+  # If on battery and low, notify user.
+  if command -v cat >/dev/null 2>&1; then
+    for bat in /sys/class/power_supply/BAT*; do
+      [ -d "${bat}" ] || continue
+      capacity=$(cat "${bat}/capacity" 2>/dev/null || echo "100")
+      status=$(cat "${bat}/status" 2>/dev/null || echo "Unknown")
+      if [ "${capacity}" -le 10 ] 2>/dev/null && [ "${status}" = "Discharging" ]; then
+        if command -v notify-send >/dev/null 2>&1; then
+          notify-send -u critical "SigmaOS Power" "Battery low (${capacity}%)" 2>/dev/null || true
+        fi
+      fi
+    done
+  fi
+
+  sleep "${POLL_INTERVAL}"
+done

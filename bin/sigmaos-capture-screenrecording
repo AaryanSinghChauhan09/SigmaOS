@@ -1,0 +1,24 @@
+#!/bin/bash
+# sigmaos-capture-screenrecording - SigmaOS screen recording
+# Implements omancy-capture-screenrecording semantics.
+
+set -euo pipefail
+
+OUT_DIR="${XDG_VIDEOS_DIR:-$HOME/Videos}/Screencasts"
+mkdir -p "${OUT_DIR}"
+FILE="${OUT_DIR}/sigmaos-recording-$(date +%Y%m%d-%H%M%S).mp4"
+
+if command -v wf-recorder >/dev/null 2>&1; then
+  wf-recorder -f "${FILE}"
+elif command -v gpu-screen-recorder >/dev/null 2>&1; then
+  gpu-screen-recorder -o "${FILE}"
+else
+  echo "[sigmaos-capture-screenrecording] No recording tool found (wf-recorder/gpu-screen-recorder)." >&2
+  exit 1
+fi
+
+echo "${FILE}"
+
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "SigmaOS Recording" "Saved to ${FILE}" 2>/dev/null || true
+fi

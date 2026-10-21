@@ -1,0 +1,16 @@
+# SigmaOS Plymouth script
+# Draws the SigmaOS logo during boot with a progress bar.
+# Modeled on Omarchy 4.0.5 default/plymouth/sigmaos.script
+
+image = Image("/usr/share/plymouth/themes/sigmaos/logo.png");
+sprite = Sprite(image);
+sprite.SetPosition(window.GetWidth() / 2 - image.GetWidth() / 2,
+                   window.GetHeight() / 2 - image.GetHeight() / 2);
+
+progress_bar = Image("/usr/share/plymouth/themes/sigmaos/progress_bar.png");
+progress_bar.SetPosition(window.GetWidth() / 2 - progress_bar.GetWidth() / 2,
+                         window.GetHeight() / 2 + 60);
+
+Plymouth.SetBootProgressFunction(function(progress) {
+    progress_bar.SetProgress(progress);
+});

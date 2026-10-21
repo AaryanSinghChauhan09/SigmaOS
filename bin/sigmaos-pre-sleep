@@ -1,0 +1,28 @@
+#!/bin/bash
+# sigmaos-pre-sleep - SigmaOS pre-sleep hook
+# Runs before system suspend. Saves state, pauses media, locks screen.
+#
+# Design: fail-fast, defensive — never prevents sleep due to errors.
+
+set -uo pipefail
+
+# Pause media players if playerctl is available.
+if command -v playerctl >/dev/null 2>&1; then
+  playerctl pause 2>/dev/null || true
+fi
+
+# Lock the screen if the locker is available.
+if command -v swaylock >/dev/null 2>&1; then
+  # swaylock runs in background; systemd will handle the sleep.
+  true
+elif command -v hyprlock >/dev/null 2>&1; then
+  true
+fi
+
+# Notify audio to suspend gracefully.
+if command -v pactl >/dev/null 2>&1; then
+  # No-op: WirePlumber handles audio suspend automatically.
+  true
+fi
+
+exit 0

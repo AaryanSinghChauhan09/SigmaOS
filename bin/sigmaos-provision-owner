@@ -1,0 +1,140 @@
+#!/bin/bash
+# sigmaos-provision-owner - SigmaOS first-boot provisioning
+# Inspired by Omarchy 4.0.5 install/provisioning/setup-form.sh
+#
+# Runs on first boot via sigmaos-provision-owner.service.
+# Prompts for keyboard, user account, hostname, timezone; applies system
+# configuration; schedules desktop session startup.
+#
+# Exit statuses (omarchy convention):
+#   0   field set, move on
+#   1   Esc — unwind to start of form
+#   130 Ctrl+C — deferred provisioning / reboot
+
+set -euo pipefail
+
+SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+export SIGMAOS_PATH
+
+notice() { echo "[sigmaos-provision] $*" >&2; }
+
+# ---------------------------------------------------------------------------
+# Phase 1: Keyboard layout
+# ---------------------------------------------------------------------------
+setup_keyboard() {
+  notice "Configuring keyboard layout..."
+  local layout
+  if command -v gum >/dev/null 2>&1; then
+    layout=$(localectl list-keymaps | gum choose --header "Keyboard layout" --height 20 --default us 2>/dev/null) || layout="us"
+  else
+    layout="us"
+  fi
+  localectl set-keymap "${layout}" 2>/dev/null || true
+  notice "Keyboard set to ${layout}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 2: User account
+# ---------------------------------------------------------------------------
+setup_user() {
+  notice "Creating user account..."
+  local username="${SUDO_USER:-sigma}"
+  if [ -n "${SUDO_USER:-}" ]; then
+    username="${SUDO_USER}"
+  else
+    if command -v gum >/dev/null 2>&1; then
+      username=$(gum input --header "Username" --value "sigma" --placeholder "Enter username" 2>/dev/null) || username="sigma"
+    fi
+  fi
+
+  if id "${username}" &>/dev/null; then
+    notice "User ${username} already exists"
+  else
+    useradd -m -G wheel,video,audio,input,render -s /bin/bash "${username}" 2>/dev/null || true
+    notice "User ${username} created"
+  fi
+
+  # Ensure user can use sudo (least privilege: wheel group).
+  if [ -f /etc/sudoers.d/sigmaos ] && ! grep -q "^%wheel" /etc/sudoers.d/sigmaos 2>/dev/null; then
+    echo '%wheel ALL=(ALL:ALL) ALL' >> /etc/sudoers.d/sigmaos 2>/dev/null || true
+  fi
+
+  # Copy /etc/skel dotfiles to the new user's home.
+  local userhome
+  userhome=$(getent passwd "${username}" | cut -d: -f6)
+  if [ -d /etc/skel ] && [ -n "${userhome}" ] && [ -d "${userhome}" ]; then
+    cp -a /etc/skel/. "${userhome}/" 2>/dev/null || true
+    chown -R "${username}:${username}" "${userhome}" 2>/dev/null || true
+    notice "Copied /etc/skel dotfiles to ${userhome}"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Phase 3: Hostname
+# ---------------------------------------------------------------------------
+setup_hostname() {
+  notice "Setting hostname..."
+  local hostname="sigmaos"
+  if command -v gum >/dev/null 2>&1; then
+    hostname=$(gum input --header "Hostname" --value "sigmaos" --placeholder "Enter hostname" 2>/dev/null) || hostname="sigmaos"
+  fi
+  hostnamectl set-hostname "${hostname}" 2>/dev/null || echo "${hostname}" > /etc/hostname 2>/dev/null || true
+  notice "Hostname set to ${hostname}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 4: Timezone
+# ---------------------------------------------------------------------------
+setup_timezone() {
+  notice "Selecting timezone..."
+  local tz="UTC"
+  if command -v gum >/dev/null 2>&1; then
+    tz=$(timedatectl list-timezones | gum choose --header "Timezone" --height 20 --default UTC 2>/dev/null) || tz="UTC"
+  fi
+  timedatectl set-timezone "${tz}" 2>/dev/null || true
+  notice "Timezone set to ${tz}"
+}
+
+# ---------------------------------------------------------------------------
+# Phase 5: Apply system configuration
+# ---------------------------------------------------------------------------
+apply_system_config() {
+  notice "Applying SigmaOS system configuration..."
+
+  # /etc configs are already in place from install/post-install/all.sh.
+  # Ensure permissions are correct.
+  chmod 600 /etc/sudoers.d/sigmaos 2>/dev/null || true
+  chmod 644 /etc/sysctl.d/90-sigmaos.conf 2>/dev/null || true
+  chmod 644 /etc/tmpfiles.d/sigmaos.conf 2>/dev/null || true
+
+  # Apply sysctl settings.
+  if command -v sysctl >/dev/null 2>&1; then
+    sysctl --system 2>/dev/null || true
+  fi
+
+  # Apply tmpfiles.
+  if command -v systemd-tmpfiles >/dev/null 2>&1; then
+    systemd-tmpfiles --create 2>/dev/null || true
+  fi
+
+  # Mark provisioning complete.
+  mkdir -p /var/lib/sigmaos
+  touch /var/lib/sigmaos/provisioned
+
+  notice "SigmaOS system configuration applied"
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+main() {
+  notice "SigmaOS first-boot provisioning starting..."
+  setup_keyboard
+  setup_user
+  setup_hostname
+  setup_timezone
+  apply_system_config
+  notice "SigmaOS provisioning complete. The desktop session will start on next login."
+}
+
+main "$@"

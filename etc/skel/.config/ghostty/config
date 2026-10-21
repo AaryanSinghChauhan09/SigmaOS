@@ -1,0 +1,14 @@
+# SigmaOS /etc/skel .config/ghostty/config
+window-title = SigmaOS Terminal
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+background-opacity = 0.95
+background = 0x1e1e2e
+foreground = 0xcdd6f4
+cursor-shape = block
+detect-urls = true
+
+bindkey = ctrl+shift+c = copy_to_clipboard
+bindkey = ctrl+shift+v = paste_from_clipboard
+bindkey = ctrl+plus = increase_font_size
+bindkey = ctrl+minus = decrease_font_size

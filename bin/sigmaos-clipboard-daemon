@@ -1,0 +1,41 @@
+#!/bin/bash
+# sigmaos-clipboard-daemon - SigmaOS clipboard history daemon
+# Implements omancy-clipboard-open / omancy-clipboard-paste-text semantics.
+# Stores a bounded history of clipboard entries for later recall.
+#
+# Design: single responsibility, bounded memory (zero-one-infinity),
+# fail-fast, deterministic.
+
+set -uo pipefail
+
+HISTORY_FILE="${XDG_DATA_HOME:-$HOME/.local/share}/sigmaos/clipboard_history"
+MAX_ENTRIES=200
+POLL_INTERVAL=0.5
+
+mkdir -p "$(dirname "${HISTORY_FILE}")"
+touch "${HISTORY_FILE}"
+
+last_hash=""
+
+while true; do
+  # Detect clipboard change (via wl-clipboard if available).
+  if command -v wl-paste >/dev/null 2>&1; then
+    current=$(wl-paste --no-newline 2>/dev/null || true)
+    if [ -n "${current}" ] && [ "${current}" != "${last_hash}" ]; then
+      # Append to history (bounded).
+      {
+        echo "---"
+        date +%s
+        echo "${current}"
+      } >> "${HISTORY_FILE}"
+      # Trim to max entries (keep pairs of timestamp+content).
+      # Simple approach: keep file size bounded.
+      if [ "$(wc -l < "${HISTORY_FILE}")" -gt $((MAX_ENTRIES * 3)) ]; then
+        tail -n $((MAX_ENTRIES * 3)) "${HISTORY_FILE}" > "${HISTORY_FILE}.tmp"
+        mv "${HISTORY_FILE}.tmp" "${HISTORY_FILE}"
+      fi
+      last_hash="${current}"
+    fi
+  fi
+  sleep "${POLL_INTERVAL}"
+done

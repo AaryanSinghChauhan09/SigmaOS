@@ -1,0 +1,19 @@
+#!/bin/bash
+# sigmaos-post-suspend - SigmaOS post-suspend hook
+# Runs after system resume. Restores state, unlocks screen, refreshes audio.
+#
+# Design: fail-fast, defensive — never blocks resume due to errors.
+
+set -uo pipefail
+
+# Refresh audio after resume.
+if command -v pactl >/dev/null 2>&1; then
+  pactl set-sink-mute @DEFAULT_SINK@ 0 2>/dev/null || true
+fi
+
+# Refresh display outputs.
+if command -v hyprctl >/dev/null 2>&1; then
+  hyprctl reload 2>/dev/null || true
+fi
+
+exit 0

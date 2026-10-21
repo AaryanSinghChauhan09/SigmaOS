@@ -1,0 +1,34 @@
+#!/bin/bash
+# sigmaos-reminderd - SigmaOS reminder daemon
+# Implements omancy-reminder semantics: fire notifications at due times.
+# Reads reminders from a state directory and sends notifications via notify-send.
+#
+# Design: single responsibility, deterministic tick loop, fail-fast.
+
+set -uo pipefail
+
+REMINDER_DIR="${XDG_RUNTIME_DIR:-/tmp}/sigmaos-reminders"
+mkdir -p "${REMINDER_DIR}"
+
+while true; do
+  now=$(date +%s)
+  for timer_file in "${REMINDER_DIR}"/*.timer; do
+    [ -f "${timer_file}" ] || continue
+    due_at=$(cat "${timer_file}" 2>/dev/null || echo "0")
+    if [ "${now}" -ge "${due_at}" ] 2>/dev/null; then
+      # Fire the reminder.
+      message_file="${timer_file%.timer}.message"
+      if [ -f "${message_file}" ]; then
+        message=$(cat "${message_file}" 2>/dev/null || echo "Reminder")
+      else
+        message="Reminder"
+      fi
+      if command -v notify-send >/dev/null 2>&1; then
+        notify-send "SigmaOS Reminder" "${message}" 2>/dev/null || true
+      fi
+      # Remove fired timer.
+      rm -f "${timer_file}" "${message_file}" 2>/dev/null || true
+    fi
+  done
+  sleep 5
+done

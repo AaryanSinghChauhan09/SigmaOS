@@ -1,0 +1,15 @@
+# SigmaOS /etc/skel .config/wofi/config
+[general]
+prompt = Run:
+width = 400
+height = 300
+lines = 10
+columns = 1
+fuzzy = true
+case-sensitive = false
+
+[color]
+active = #89b4fa
+active_foreground = #1e1e2e
+normal = #585b70
+normal_foreground = #cdd6f4

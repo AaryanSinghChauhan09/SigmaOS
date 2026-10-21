@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=SigmaOS
+Description=SigmaOS desktop boot theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/sigmaos
+ScriptFile=/usr/share/plymouth/themes/sigmaos/sigmaos.script

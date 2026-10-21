@@ -1,0 +1,19 @@
+[Unit]
+Description=SigmaOS Clipboard History Daemon
+Documentation=man:sigmaos-clipboard-daemon(8)
+After=graphical-session.target
+Wants=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sigmaos-clipboard-daemon
+Restart=on-failure
+RestartSec=5
+# Process isolation: no new privileges, minimal capabilities.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=${XDG_DATA_HOME:-/var/lib/sigmaos}
+
+[Install]
+WantedBy=graphical-session.target

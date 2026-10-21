@@ -1,0 +1,36 @@
+#!/bin/bash
+# SigmaOS post-install hook - runs after package installation
+# Sets up system configuration and enables services.
+
+set -euo pipefail
+
+# Apply /etc configuration (already in place from package)
+chmod 600 /etc/sudoers.d/sigmaos 2>/dev/null || true
+chmod 644 /etc/sysctl.d/90-sigmaos.conf 2>/dev/null || true
+chmod 644 /etc/tmpfiles.d/sigmaos.conf 2>/dev/null || true
+
+# Enable system services
+systemctl enable sddm.service 2>/dev/null || true
+systemctl enable wireplumber.service 2>/dev/null || true
+systemctl enable plymouth-start.service 2>/dev/null || true
+systemctl enable sigmaos-provision-owner.service 2>/dev/null || true
+systemctl enable theme-system.service 2>/dev/null || true
+systemctl enable zram-generator.service 2>/dev/null || true
+systemctl enable sigmaos-desktop-session.service 2>/dev/null || true
+
+# Apply sysctl
+sysctl --system 2>/dev/null || true
+
+# Apply tmpfiles
+systemd-tmpfiles --create 2>/dev/null || true
+
+# Rebuild initramfs
+if command -v mkinitcpio >/dev/null 2>&1; then
+  mkinitcpio -P 2>/dev/null || true
+elif command -v dracut >/dev/null 2>&1; then
+  dracut -f 2>/dev/null || true
+fi
+
+echo "[sigmaos.post-install] SigmaOS package installed successfully"
+echo "Run 'sigmaos-install' to perform a full system installation, or reboot"
+echo "to start the SigmaOS desktop session."

@@ -1,0 +1,77 @@
+#!/bin/bash
+# sigmaos-shell - SigmaOS desktop session startup
+# Inspired by Omarchy 4.0.5 shell session startup
+#
+# This is the entry point executed by systemd user service sigmaos-shell.service.
+# It launches the window manager, bar, notifications, and desktop components.
+#
+# Design: Single responsibility - start the desktop session. Delegates to
+# individual component scripts (separation of concerns). Secure defaults:
+# fails gracefully if components are missing.
+
+set -uo pipefail
+
+# Resolve SigmaOS paths.
+SIGMAOS_PATH="${SIGMAOS_PATH:-/usr/share/sigmaos}"
+export SIGMAOS_PATH
+
+# Source environment bootstrap.
+if [ -r "${SIGMAOS_PATH}/default/bash/env-bootstrap" ]; then
+  # shellcheck source=/dev/null
+  . "${SIGMAOS_PATH}/default/bash/env-bootstrap"
+fi
+
+# Wait for logind/seat to be ready (direct device control via logind).
+for i in $(seq 1 30); do
+  if loginctl show-session "$(loginctl | awk -v user="$USER" '$3==user{print $1}')" -p State 2>/dev/null | grep -q "State=active"; then
+    break
+  fi
+  sleep 0.5
+done
+
+# Start the notification daemon (mako) if available.
+if command -v mako >/dev/null 2>&1; then
+  mako &
+fi
+
+# Start the clipboard daemon if available.
+if command -v sigmaos-clipboard-daemon >/dev/null 2>&1; then
+  sigmaos-clipboard-daemon &
+fi
+
+# Start the reminder daemon if available.
+if command -v sigmaos-reminderd >/dev/null 2>&1; then
+  sigmaos-reminderd &
+fi
+
+# Start the power manager if available.
+if command -v sigmaos-power-manager >/dev/null 2>&1; then
+  sigmaos-power-manager &
+fi
+
+# Start WirePlumber audio if available.
+if command -v wireplumber >/dev/null 2>&1; then
+  wireplumber &
+fi
+
+# Restore wallpaper if swww is available.
+if command -v swww >/dev/null 2>&1 && [ -f "${HOME}/.config/sigmaos/wallpaper" ]; then
+  swww restore "$(cat "${HOME}/.config/sigmaos/wallpaper")" 2>/dev/null || true
+fi
+
+# Start Waybar if available.
+if command -v waybar >/dev/null 2>&1; then
+  waybar &
+fi
+
+# Launch the window manager (Hyprland) - this blocks until the session ends.
+# Direct device control via logind seat (DRM, input, audio).
+if command -v Hyprland >/dev/null 2>&1; then
+  exec Hyprland
+elif command -v hyprland >/dev/null 2>&1; then
+  exec hyprland
+else
+  echo "[sigmaos-shell] No window manager found. Starting fallback shell."
+  # Fallback: keep the session alive with a simple loop.
+  while true; do sleep 60; done
+fi

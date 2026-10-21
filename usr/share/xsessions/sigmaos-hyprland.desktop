@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=SigmaOS Hyprland
+Comment=SigmaOS desktop with Hyprland compositor
+Exec=/usr/bin/sigmaos-shell
+TryExec=/usr/bin/Hyprland
+Type=Application
+DesktopNames=Hyprland

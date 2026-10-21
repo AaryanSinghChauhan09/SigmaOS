@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=SigmaOS
+Comment=SigmaOS Desktop Session
+Exec=/usr/bin/sigmaos-shell
+TryExec=/usr/bin/sigmaos-shell
+Type=Application
+DesktopNames=Hyprland
+Keywords=tiling;wayland;compositor;
+X-GSM-Provides=display-server
