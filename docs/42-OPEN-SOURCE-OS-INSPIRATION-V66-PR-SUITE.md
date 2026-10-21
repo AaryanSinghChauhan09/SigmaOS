@@ -7,9 +7,9 @@ The **Sovereign Open Source OS Inspiration V66 PR Suite** introduces advanced Li
 
 ## Key V66 Modules & Distro Inspirations
 
-1. **Linux 6.22+ SchedExt Quantum-Neural Topology Governor Engine (`Linux622SchedExtQuantumNeuralTopologyGovernorEngine`)**
-   - eBPF AI quantum-neural dynamic core topology scheduler & sub-milliwatt power governor integration.
-2. **FreeBSD 15.3+ Capsicum Casper Netlink Dynamic Micro-Jail Mesh Engine (`FreeBsd153CapsicumCasperDynamicMeshEngine`)**
+1. **Linux 6.22+ SchedExt Quantum-Neural Dynamic Topology Governor Engine (`Linux622SchedExtQuantumNeuralTopologyGovernorEngine`)**
+   - eBPF AI quantum-neural dynamic core scheduling & sub-milliwatt power governor integration.
+2. **FreeBSD 15.3+ Capsicum Casper Netlink Micro-Jail Dynamic Mesh Engine (`FreeBsd153CapsicumCasperDynamicMeshEngine`)**
    - FreeBSD 15.3-RELEASE Netlink capability delegates & micro-jail network mesh isolation.
 3. **OpenBSD 8.2+ FineIBT Dynamic Pinsyscall & PTE Guard Engine (`OpenBsd82FineIbtPteShadowGuardEngine`)**
    - FineIBT Control Flow Integrity enforcement & page-table shadow stack memory verification.

@@ -5,12 +5,12 @@
 // Staging, pull request proposal specification, diff patch generation, and automated
 // execution pipeline for missing/enhanced Linux and BSD OS components advancing SigmaOS
 // across all core subsystems:
-// 1. `Linux622SchedExtQuantumNeuralTopologyGovernorEngine`: Linux 6.22+ SchedExt eBPF quantum-neural topology core scheduler & sub-milliwatt power governor.
-// 2. `FreeBsd153CapsicumCasperDynamicMeshEngine`: FreeBSD 15.3+ Capsicum Casper Netlink capability delegates & micro-jail mesh network isolation.
+// 1. `Linux622SchedExtQuantumNeuralTopologyGovernorEngine`: Linux 6.22+ SchedExt eBPF quantum-neural dynamic topology core scheduling & sub-milliwatt power governor.
+// 2. `FreeBsd153CapsicumCasperDynamicMeshEngine`: FreeBSD 15.3+ Capsicum Casper Netlink capability delegates & micro-jail dynamic mesh network isolation.
 // 3. `OpenBsd82FineIbtPteShadowGuardEngine`: OpenBSD 8.2+ FineIBT CFI enforcement & dynamic page-table shadow stack memory verification.
 // 4. `DragonFly70Hammer2ErasureDirectIoEngine`: DragonFly BSD 7.0+ HAMMER2 PFS erasure coding & lock-free direct-IO cluster replication.
 // 5. `NetBsd120RumpHypercallAudioRouterEngine`: NetBSD 12.0 Rump hypercall userland PCI/audio driver router & virtual device server.
-// 6. `HaikuBfsRelationalAttributeQueryEngineV66`: Haiku BFS live relational attribute query indexing & real-time file metadata search.
+// 6. `HaikuBfsRelationalAttributeQueryEngineV66`: Haiku BFS live relational attribute query indexing & real-time file metadata desktop search.
 // 7. `Plan9Synthetic9P2000VfsRforkEngineV66`: Plan 9 9P2000 synthetic VFS namespace multiplexer & process rfork isolation.
 // 8. `NixGuixHermeticCasMerkleClosureTreeEngineV66`: NixOS / GNU Guix hermetic CAS store Merkle closure tree builder & transactional rollback governor.
 // 9. `IllumosCrossbowVnicDtraceSwitchMeshEngineV66`: Illumos Crossbow VNIC virtual switch mesh & dynamic DTrace observability probes.
@@ -62,18 +62,18 @@ pub struct OpenSourceOsPrProposalV66 {
     pub patch_diff: String,
 }
 
-// 1. Linux 6.22+ SchedExt Quantum-Neural Topology Governor Engine
+// 1. Linux 6.22+ SchedExt Quantum-Neural Dynamic Topology Governor Engine
 #[derive(Debug, Default)]
 pub struct Linux622SchedExtQuantumNeuralTopologyGovernorEngine {
     sched_policies: BTreeMap<String, String>,
-    quantum_neural_cores: BTreeMap<String, u64>,
+    topology_cores: BTreeMap<String, u64>,
 }
 
 impl Linux622SchedExtQuantumNeuralTopologyGovernorEngine {
     pub fn new() -> Self {
         Self {
             sched_policies: BTreeMap::new(),
-            quantum_neural_cores: BTreeMap::new(),
+            topology_cores: BTreeMap::new(),
         }
     }
 
@@ -82,29 +82,29 @@ impl Linux622SchedExtQuantumNeuralTopologyGovernorEngine {
             .insert(name.to_string(), ebpf_bytecode_hash.to_string());
     }
 
-    pub fn register_quantum_core(&mut self, core_id: &str, latency_ps: u64) {
-        self.quantum_neural_cores
+    pub fn register_topology_core(&mut self, core_id: &str, latency_ps: u64) {
+        self.topology_cores
             .insert(core_id.to_string(), latency_ps);
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "Linux 6.22+ SchedExt Quantum-Neural Power Governor & Sub-Picosecond Dynamic Topology Scheduler".to_string(),
+            title: "Linux 6.22+ SchedExt Quantum-Neural Dynamic Topology Governor & Sub-Picosecond Core Scheduler".to_string(),
             component_name: "Linux622SchedExtQuantumNeuralTopologyGovernorEngine".to_string(),
             os_origin: "Linux Kernel 6.22+".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
             patch_diff: format!(
-                "--- kernel/sched/scx_quantum_neural_topology_governor.c\n+++ kernel/sched/scx_quantum_neural_topology_governor.c\n@@ -1,5 +1,12 @@\n+ active_quantum_policies: {}\n+ quantum_neural_cores: {}\n",
+                "--- kernel/sched/scx_quantum_neural_topology_v66.c\n+++ kernel/sched/scx_quantum_neural_topology_v66.c\n@@ -1,5 +1,12 @@\n+ active_quantum_policies: {}\n+ topology_cores: {}\n",
                 self.sched_policies.len(),
-                self.quantum_neural_cores.len()
+                self.topology_cores.len()
             ),
         }
     }
 }
 
-// 2. FreeBSD 15.3+ Capsicum Casper Dynamic Mesh Engine
+// 2. FreeBSD 15.3+ Capsicum Casper Netlink Dynamic Mesh Engine
 #[derive(Debug, Default)]
 pub struct FreeBsd153CapsicumCasperDynamicMeshEngine {
     casper_jails: BTreeMap<String, Vec<String>>,
@@ -133,7 +133,7 @@ impl FreeBsd153CapsicumCasperDynamicMeshEngine {
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
             patch_diff: format!(
-                "--- sys/kern/subr_capsicum_casper_vnet_v66.c\n+++ sys/kern/subr_capsicum_casper_vnet_v66.c\n@@ -1,5 +1,10 @@\n+ casper_micro_jails: {}\n",
+                "--- sys/kern/subr_capsicum_casper_vnet_v66.c\n+++ sys/kern/subr_capsicum_casper_vnet_v66.c\n@@ -1,5 +1,10 @@\n+ casper_dynamic_jails: {}\n",
                 self.casper_jails.len()
             ),
         }
@@ -163,7 +163,7 @@ impl OpenBsd82FineIbtPteShadowGuardEngine {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "OpenBSD 8.2+ FineIBT Dynamic Pinsyscall & PTE Page-Table Shadow Guard Verification".to_string(),
+            title: "OpenBSD 8.2+ FineIBT Dynamic Pinsyscall & Page-Table Shadow Stack Verification V66".to_string(),
             component_name: "OpenBsd82FineIbtPteShadowGuardEngine".to_string(),
             os_origin: "OpenBSD 8.2-RELEASE".to_string(),
             status: OsPrStatusV66::Validated,
@@ -333,7 +333,7 @@ impl NixGuixHermeticCasMerkleClosureTreeEngineV66 {
             pr_id: pr_id.to_string(),
             title: "NixOS / GNU Guix Hermetic Content-Addressed Store Merkle Closure Tree Builder V66".to_string(),
             component_name: "NixGuixHermeticCasMerkleClosureTreeEngineV66".to_string(),
-            os_origin: "NixOS 25.05 / GNU Guix 1.5+".to_string(),
+            os_origin: "NixOS 24.11 / GNU Guix 1.4+".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["PackageManagement".to_string(), "SystemAudit".to_string()],
             patch_diff: format!(
@@ -475,10 +475,10 @@ mod tests {
 
         master
             .linux_engine
-            .register_sched_policy("scx_quantum_neural_topology_governor", "0xquantum123v66");
+            .register_sched_policy("scx_quantum_neural_topology_governor", "0xquantum456");
         master
             .linux_engine
-            .register_quantum_core("core_quantum_v66_0", 450);
+            .register_topology_core("core_quantum_topology_0", 400);
 
         master
             .freebsd_engine
@@ -496,7 +496,7 @@ mod tests {
         master.plan9_engine.mount_synthetic_namespace("#s/proc_v66");
         master
             .nix_guix_engine
-            .register_closure_hash("/nix/store/pkg_v66", "hash_v66_xyz");
+            .register_closure_hash("/nix/store/pkg_v66", "hash_v66_def");
         master
             .illumos_engine
             .configure_vnic_mesh("vnic_v66_0", 20000);
