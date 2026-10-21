@@ -164,6 +164,7 @@ pub mod sigmafirewallmanager2;
 pub mod sigmalogrotationmanager;
 pub mod sigmanetworkmonitor;
 pub mod sigmacertificatemanager;
+pub mod sigmadnsmanager2;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -345,6 +346,11 @@ pub use sigmacertificatemanager::{
     Certificate as CertificateManagerCertificate, CertificateManager,
     CertificateState as CertificateManagerState, CertificateType as CertificateManagerType,
     CertificateKeyType, PrivateKey as CertificateManagerKey,
+};
+pub use sigmadnsmanager2::{
+    DNSManager2Record, DNSManager2Resolver, DNSManager2Zone, RecordType as DNSManager2RecordType,
+    ResolverType as DNSManager2ResolverType, SigmaDNSManager2, ZoneState as DNSManager2ZoneState,
+    ZoneType as DNSManager2ZoneType,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
