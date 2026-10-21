@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
@@ -12,15 +10,25 @@
 // 5. AnicraftMeshDeformationShapeKeysPrEngine (Mesh deformation & morph target / shape key blend shape morphing)
 // 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
+extern crate alloc;
+
+#[cfg(not(feature = "standalone_test"))]
 use alloc::collections::BTreeMap;
+#[cfg(not(feature = "standalone_test"))]
+use alloc::format;
+#[cfg(not(feature = "standalone_test"))]
 use alloc::string::{String, ToString};
+#[cfg(not(feature = "standalone_test"))]
+use alloc::vec;
+#[cfg(not(feature = "standalone_test"))]
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
-
-
-
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::string::{String, ToString};
+#[cfg(feature = "standalone_test")]
+use std::vec::Vec;
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -670,6 +678,7 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
@@ -706,8 +715,6 @@ mod tests {
     fn test_nla_blending_engine() {
         let engine = AnicraftNlaTrackClipBlendingPrEngine::new();
         let frame20_val = engine.evaluate_blended_value(20);
-        // Clip 1 progress at frame 20: 20/60 = 1/3 -> 10.0 * (1/3) = 3.333
-        // Clip 2 progress at frame 20: (20-15)/30 = 5/30 = 1/6 -> 5.0 * (1/6) * 0.5 = 0.4166
         assert!(frame20_val > 3.0);
     }
 
@@ -715,7 +722,7 @@ mod tests {
     fn test_onion_skinning_engine() {
         let engine = AnicraftOnionSkinningPrEngine::new(2, 2);
         let ghosts = engine.compute_ghost_frames(10);
-        assert_eq!(ghosts.len(), 4); // 2 past + 2 future
+        assert_eq!(ghosts.len(), 4);
         assert_eq!(ghosts[0].frame_index, 9);
         assert_eq!(ghosts[2].frame_index, 11);
     }
