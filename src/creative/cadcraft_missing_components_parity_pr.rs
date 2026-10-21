@@ -1,5 +1,4 @@
 #![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/cadcraft_missing_components_parity_pr.rs`)
@@ -14,8 +13,9 @@
 // 6. CadcraftEdaPcb3dIntegrationPrEngine (3D ECAD/MCAD electronics PCB clearance, STEP AP242 parsing & enclosure collision detection)
 // 7. SovereignCadcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
-use alloc::collections::BTreeMap;
+#[macro_use]
+extern crate alloc;
+
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
@@ -710,6 +710,7 @@ impl Default for SovereignCadcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_cadcraft_parity_pr_gateway() {
