@@ -155,6 +155,7 @@ pub mod sigmarestartmanager;
 pub mod sigmasessionmanager;
 pub mod sigmasetupmanager;
 pub mod sigmastallmanager;
+pub mod sigmafilewatcher;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -296,6 +297,10 @@ pub use sigmathememanager::{
 };
 pub use sigmatogglemanager::{
     SigmaToggleManager, Toggle as ToggleManagerToggle, ToggleState as ToggleManagerState,
+};
+pub use sigmafilewatcher::{
+    EventMask as FileWatcherEventMask, FileEvent, FileWatcher, Watch as FileWatcherWatch,
+    WatchState as FileWatcherState,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
