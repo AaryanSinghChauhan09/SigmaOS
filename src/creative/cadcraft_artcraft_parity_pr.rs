@@ -17,9 +17,11 @@
 // 10. CadcraftPdmVersionControlBOMGeneratorPrEngine (Product Data Management [PDM] vault revision control & multi-level BOM generator)
 // 11. SovereignCadcraftArtcraftParityPrGateway & CadcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-// alloc is declared at the crate root (lib.rs); no re-declaration needed here.
+extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
