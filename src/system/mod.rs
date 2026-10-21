@@ -143,6 +143,7 @@ pub mod sigmasecuritymanager2;
 pub mod sigmaservicemanager4;
 pub mod sigmasetupmanager2;
 pub mod sigmastoragemanager;
+pub mod sigmathememanager2;
 pub mod sigmawizardmanager;
 pub mod sigmapathmanager;
 pub mod sigmaprivilegemanager;
@@ -202,6 +203,9 @@ pub use sigmaservicemanager4::{
 pub use sigmastoragemanager::{
     FilesystemType as StorageFilesystemType, MountState as StorageMountState,
     StorageDevice, StorageType, SigmaStorageManager,
+};
+pub use sigmathememanager2::{
+    SigmaThemeManager2, Theme as ThemeManager2Theme, ThemeComponent,
 };
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
