@@ -110,8 +110,6 @@ pub use sigmasystemmonitor2::{
     ProcessInfo as MonitorProcessInfo, ProcessState as MonitorProcessState, SigmaSystemMonitor2,
     SystemMetrics,
 };
-pub mod sigmacommandmanager;
-pub mod sigmaconfigmanager;
 pub mod sigmacontainermanager;
 pub mod sigmarepositorymanager;
 pub mod sigmaresourcemanager;
@@ -122,200 +120,14 @@ pub use sigmabackupmanager::{
     BackupEntry as BackupManagerEntry, BackupStatus as BackupManagerStatus,
     BackupType as BackupManagerType, SigmaBackupManager as BackupManager,
 };
-pub mod sigmaaliasmanager;
-pub mod sigmacapturemanager;
-pub mod sigmaenvironmentmanager;
-pub mod sigmahardwaremanager;
-pub mod sigmahelpermanager;
-pub mod sigmalaunchmanager;
-pub mod sigmamenumanager;
-pub mod sigmamigrationmanager;
-pub mod sigmapathmanager;
-pub mod sigmaprivilegemanager;
-pub mod sigmaprofilemanager;
-pub mod sigmarefreshmanager;
-pub mod sigmarestartmanager;
-pub mod sigmasessionmanager;
-pub mod sigmasetupmanager;
-pub mod sigmastallmanager;
-pub mod sigmafilewatcher;
-pub mod sigmaindexmanager;
-pub mod sigmacachemanager2;
-pub mod sigmacompressionmanager;
-pub mod sigmaencryptionmanager;
-pub mod sigmafirewallmanager2;
-pub mod sigmalogrotationmanager;
-pub mod sigmanetworkmonitor;
-pub mod sigmacertificatemanager;
-pub mod sigmadnsmanager2;
-pub mod sigmakernelmanager;
-pub mod sigmacronmanager2;
-pub mod sigmametricsmanager;
-pub mod sigmarestoremanager;
-pub mod sigmadevicemanager2;
-pub mod sigmacleaner;
-pub mod sigmaintegritymanager2;
-pub mod sigmaremotemanager;
-pub mod sigmatemplatemanager;
-pub mod sigmatogglemanager;
-pub mod sigmaupdatemanager2;
-pub use sigmaaliasmanager::{Alias, SigmaAliasManager};
-pub use sigmacapturemanager::{
-    Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
-};
-pub use sigmacommandmanager::{
-    Command as CommandManagerCommand, CommandPermission as CommandManagerPermission,
-    CommandType as CommandManagerType, SigmaCommandManager,
-};
-pub use sigmaconfigmanager::{
-    ConfigEntry as ConfigManagerEntry, ConfigType as ConfigManagerType, SigmaConfigManager,
-};
 pub use sigmacontainermanager::{
     Container as ContainerManagerContainer, ContainerConfig as ContainerManagerConfig,
     ContainerState as ContainerManagerState, SigmaContainerManager as ContainerManager,
 };
-pub use sigmaenvironmentmanager::{EnvironmentVariable, SigmaEnvironmentManager};
-pub use sigmahardwaremanager::{
-    HardwareDevice as HardwareManagerDevice, HardwareType as HardwareManagerType,
-    SigmaHardwareManager,
-};
 pub use sigmahardwareprofiler::{BenchmarkResult, HardwareComponent, SigmaHardwareProfiler};
-pub use sigmahelpermanager::{HelperCommand, SigmaHelperManager};
-pub use sigmalaunchmanager::{
-    Application as LaunchManagerApplication, LaunchPriority, SigmaLaunchManager,
-};
-pub use sigmamenumanager::{
-    Menu as MenuManagerMenu, MenuEntry as MenuManagerEntry, MenuEntryType as MenuManagerEntryType,
-    SigmaMenuManager,
-};
-pub use sigmamigrationmanager::{
-    Migration as MigrationManagerMigration, MigrationStatus as MigrationManagerStatus,
-    SigmaMigrationManager,
-};
-pub use sigmanotificationmanager::{
-    NotificationUrgency as NotificationManagerUrgency,
-    SigmaNotificationManager as NotificationManager,
-};
-pub use sigmapathmanager::{PathEntry, PathType, SigmaPathManager};
-pub use sigmaprivilegemanager::{PrivilegeLevel, PrivilegeRequest, SigmaPrivilegeManager};
-pub use sigmaprofilemanager::{Profile as ProfileManagerProfile, SigmaProfileManager};
-pub use sigmarefreshmanager::{
-    RefreshItem as RefreshManagerItem, RefreshStatus as RefreshManagerStatus, SigmaRefreshManager,
-};
-pub use sigmarepositorymanager::{
-    Repository as RepositoryManagerRepo, RepositoryType as RepositoryManagerType,
-    SigmaRepositoryManager as RepositoryManager,
-};
-pub use sigmaresourcemanager::{
-    ResourceLimit as ResourceManagerLimit, ResourceQuota as ResourceManagerQuota,
-    ResourceType as ResourceManagerType, SigmaResourceManager as ResourceManager,
-};
-pub use sigmarestartmanager::{
-    Component as RestartManagerComponent, ComponentState as RestartManagerState,
-    SigmaRestartManager,
-};
-pub use sigmasessionmanager::{
-    Session as SessionManagerSession, SessionType as SessionManagerType, SigmaSessionManager,
-};
-pub use sigmasetupmanager::{
-    SetupStep as SetupManagerStep, SetupStepStatus as SetupManagerStatus,
-    SetupWizard as SetupManagerWizard, SigmaSetupManager,
-};
-pub use sigmasnapshotmanager::{
-    SigmaSnapshotManager as SnapshotManager, Snapshot as SnapshotManagerSnapshot,
-    SnapshotState as SnapshotManagerState, SnapshotType as SnapshotManagerType,
-};
-
 pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
-};
-pub use sigmatemplatemanager::{SigmaTemplateManager, Template as TemplateManagerTemplate};
-pub use sigmathememanager::{
-    SigmaThemeManager, Theme as ThemeManagerTheme, ThemeColor as ThemeManagerColor,
-};
-pub use sigmatogglemanager::{
-    SigmaToggleManager, Toggle as ToggleManagerToggle, ToggleState as ToggleManagerState,
-};
-pub use sigmafilewatcher::{
-    EventMask as FileWatcherEventMask, FileEvent, FileWatcher, Watch as FileWatcherWatch,
-    WatchState as FileWatcherState,
-};
-pub use sigmaindexmanager::{
-    IndexEntry as IndexManagerEntry, FileType as IndexManagerFileType, Index as IndexManagerIndex,
-    IndexManager, IndexState as IndexManagerState, IndexType as IndexManagerType,
-};
-pub use sigmacachemanager2::{
-    Cache as CacheManager2Cache, CacheState as CacheManager2State, CacheType as CacheManager2Type,
-    SigmaCacheManager2,
-};
-pub use sigmacompressionmanager::{
-    CompressionAlgorithm as CompressionManagerAlgorithm, CompressionManager,
-    CompressionOperation as CompressionManagerOperation, OperationState as CompressionManagerState,
-};
-pub use sigmaencryptionmanager::{
-    CipherAlgorithm as EncryptionManagerCipher, EncryptedVolume as EncryptionManagerVolume,
-    EncryptionKey as EncryptionManagerKey, EncryptionManager, KeyType as EncryptionManagerKeyType,
-    VolumeState as EncryptionManagerVolumeState,
-};
-pub use sigmafirewallmanager2::{
-    ChainPolicy as FirewallManager2ChainPolicy, ChainState as FirewallManager2ChainState,
-    FirewallManager2Chain, FirewallManager2Rule, Protocol as FirewallManager2Protocol,
-    RuleAction as FirewallManager2RuleAction, RuleState as FirewallManager2RuleState,
-    SigmaFirewallManager2,
-};
-pub use sigmalogrotationmanager::{
-    LogRotationManager, PolicyState as LogRotationPolicyState,
-    RotationInterval as LogRotationInterval, RotationPolicy as LogRotationPolicy,
-};
-pub use sigmanetworkmonitor::{
-    ConnectionProtocol as NetworkMonitorProtocol, NetworkMonitorConnectionState,
-    NetworkMonitorConnection, NetworkMonitorInterface, NetworkMonitor,
-};
-pub use sigmacertificatemanager::{
-    Certificate as CertificateManagerCertificate, CertificateManager,
-    CertificateState as CertificateManagerState, CertificateType as CertificateManagerType,
-    CertificateKeyType, PrivateKey as CertificateManagerKey,
-};
-pub use sigmadnsmanager2::{
-    DNSManager2Record, DNSManager2Resolver, DNSManager2Zone, RecordType as DNSManager2RecordType,
-    ResolverType as DNSManager2ResolverType, SigmaDNSManager2, ZoneState as DNSManager2ZoneState,
-    ZoneType as DNSManager2ZoneType,
-};
-pub use sigmakernelmanager::{
-    KernelManager, KernelModule, KernelParameter, ModuleState as KernelModuleState,
-    ParameterState as KernelParameterState, ParameterType as KernelParameterType,
-};
-pub use sigmacronmanager2::{
-    CronJob as CronManager2Job, CronManager2JobState, CronSchedule as CronManager2Schedule,
-    SigmaCronManager2,
-};
-pub use sigmametricsmanager::{
-    CollectorState as MetricsCollectorState, CollectorType as MetricsCollectorType,
-    Metric as MetricsMetric, MetricCollector as MetricsCollector, MetricLabel as MetricsLabel,
-    MetricType as MetricsType, MetricsManager,
-};
-pub use sigmarestoremanager::{
-    RestoreManager, RestorePoint as RestoreManagerPoint, RestorePointState as RestoreManagerState,
-    RestorePointType as RestoreManagerType,
-};
-pub use sigmadevicemanager2::{
-    Device as DeviceManager2Device, DeviceManager2State, DeviceManager2Type, SigmaDeviceManager2,
-};
-pub use sigmacleaner::{
-    CleanerManager, CleanupTask as CleanerTask, CleanupType as CleanerType, TaskState as CleanerTaskState,
-};
-pub use sigmaintegritymanager2::{
-    CheckState as IntegrityManager2CheckState, IntegrityCheck as IntegrityManager2Check,
-    IntegrityManager2HashAlgorithm, SigmaIntegrityManager2,
-};
-pub use sigmaremotemanager::{
-    AuthType as RemoteAuthType, CommandState as RemoteCommandState, ConnectionState as RemoteConnectionState,
-    RemoteCommand, RemoteConnection, RemoteManager,
-};
-pub use sigmaupdatemanager2::{
-    SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
-    UpdateType as UpdateManagerType,
 };
 pub use sigmavirtualizationmanager::{
     SigmaVirtualizationManager as VirtManager, VMConfig as VirtConfig, VMState as VirtState,
