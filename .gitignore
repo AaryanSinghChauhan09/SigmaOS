@@ -80,3 +80,6 @@ wiki/
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
+.github/PULL_REQUEST_TEMPLATE.md
+SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+docs/
