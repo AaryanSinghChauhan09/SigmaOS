@@ -42,8 +42,8 @@ pub mod photocraft;
 // pub mod photocraft_artcraft_parity_pr;
 // pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
-// pub mod soundcraft_artcraft_parity_pr;
-// pub mod soundcraft_missing_components_parity_pr;
+pub mod soundcraft_artcraft_parity_pr;
+pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 // pub mod threedcraft_artcraft_parity_pr;
 // pub mod threedcraft_missing_components_parity_pr;
@@ -118,6 +118,8 @@ pub use soundcraft::{
     SoundCraftPullRequestSpec, SoundCraftSpatialMixingMasteringPrDeployer, SoundTrack,
     Spatial3DPosition, SynthesizerVoice, Waveform,
 };
+pub use soundcraft_artcraft_parity_pr::*;
+pub use soundcraft_missing_components_parity_pr::*;
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
     AnimationLayerType, AnimationProject as VectorAnimationProject, Bone, InterpolationMode,
