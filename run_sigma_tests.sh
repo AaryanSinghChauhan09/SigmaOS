@@ -2202,6 +2202,7 @@ if [ -f "src/creative/threedcraft_artcraft_parity_pr.rs" ]; then
     mkdir -p build
     rustc --test src/creative/threedcraft_artcraft_parity_pr.rs --edition=2021 -o build/threedcraft_artcraft_parity_test
     ./build/threedcraft_artcraft_parity_test
+fi
 
 if [ -f "src/creative/threedcraft_spatial_computing_pr.rs" ]; then
     echo "Running Sovereign 3DCraft Spatial Computing PR test suite..."
