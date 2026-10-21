@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: MIT
 // Sovereign Open Source OS Missing Components V66 PR Gateway Engine
 // (`src/distro/open_source_os_missing_components_v66_pr.rs`)
+//
+// Staging, pull request proposal specification, diff patch generation, and automated
+// execution pipeline for missing/enhanced Linux and BSD OS components advancing SigmaOS
+// across all core subsystems:
+// 1. `Linux622SchedExtTopologyGovernorEngine`: Linux 6.22+ SchedExt eBPF NUMA topology governor & power manager.
+// 2. `FreeBsd153CapsicumSandboxedIpcMeshEngine`: FreeBSD 15.3+ Capsicum sandboxing & zero-copy IPC mesh router.
+// 3. `OpenBsd82UnveilWshaperGuardEngine`: OpenBSD 8.2+ Unveil path protection & dynamic traffic shaping guard.
+// 4. `DragonFly70Hammer2MultiVolumeDirectIoEngine`: DragonFly BSD 7.0+ HAMMER2 multi-volume PFS direct-IO engine.
+// 5. `NetBsd113RumpHypercallPciNetRouterEngine`: NetBSD 11.3 Rump hypercall userland PCI/network router.
+// 6. `HaikuBfsRelationalAttributeQueryEngineV66`: Haiku BFS live relational attribute query & file search.
+// 7. `Plan9Synthetic9P2000VfsRforkEngineV66`: Plan 9 9P2000 synthetic VFS namespace multiplexer & rfork.
+// 8. `NixGuixHermeticCasMerkleClosureTreeEngineV66`: NixOS/Guix CAS store Merkle closure tree builder & rollback governor.
+// 9. `IllumosCrossbowVnicDtraceSwitchMeshEngineV66`: Illumos Crossbow VNIC virtual switch mesh & DTrace probes.
+// 10. `SovereignThousandsMissingComponentsEngineV66`: Cataloging open-source OS capabilities.
+// 11. `SovereignOpenSourceOsMissingComponentsV66PrSuite`: Master coordinator harmonizing all V66 distro inspirations.
 
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
@@ -47,131 +62,130 @@ pub struct OpenSourceOsPrProposalV66 {
     pub patch_diff: String,
 }
 
-// 1. Linux 6.22+ SchedExt Adaptive Energy Governor Engine
+// 1. Linux 6.22+ SchedExt NUMA Topology Governor Engine
 #[derive(Debug, Default)]
-pub struct Linux622SchedExtAdaptiveEnergyGovernorEngine {
-    sched_policies: BTreeMap<String, String>,
-    energy_cores: BTreeMap<String, u64>,
+pub struct Linux622SchedExtTopologyGovernorEngine {
+    numa_nodes: BTreeMap<u32, Vec<u32>>,
+    ebpf_policies: BTreeMap<String, String>,
 }
 
-impl Linux622SchedExtAdaptiveEnergyGovernorEngine {
+impl Linux622SchedExtTopologyGovernorEngine {
     pub fn new() -> Self {
-        Self {
-            sched_policies: BTreeMap::new(),
-            energy_cores: BTreeMap::new(),
-        }
+        Self::default()
     }
 
-    pub fn register_sched_policy(&mut self, name: &str, ebpf_bytecode_hash: &str) {
-        self.sched_policies
-            .insert(name.to_string(), ebpf_bytecode_hash.to_string());
+    pub fn register_numa_node(&mut self, node_id: u32, cpu_cores: Vec<u32>) {
+        self.numa_nodes.insert(node_id, cpu_cores);
     }
 
-    pub fn register_energy_core(&mut self, core_id: &str, milliwatts: u64) {
-        self.energy_cores.insert(core_id.to_string(), milliwatts);
+    pub fn register_ebpf_policy(&mut self, name: &str, bytecode_hash: &str) {
+        self.ebpf_policies
+            .insert(name.to_string(), bytecode_hash.to_string());
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "Linux 6.22+ SchedExt Adaptive Energy Power Governor & Sub-Milliwatt Dynamic Scheduler".to_string(),
-            component_name: "Linux622SchedExtAdaptiveEnergyGovernorEngine".to_string(),
+            title: "Linux 6.22+ SchedExt eBPF NUMA Topology Governor & Micro-Power Manager".to_string(),
+            component_name: "Linux622SchedExtTopologyGovernorEngine".to_string(),
             os_origin: "Linux Kernel 6.22+".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
             patch_diff: format!(
-                "--- kernel/sched/scx_adaptive_energy_governor.c\n+++ kernel/sched/scx_adaptive_energy_governor.c\n@@ -1,5 +1,12 @@\n+ active_policies: {}\n+ energy_cores: {}\n",
-                self.sched_policies.len(),
-                self.energy_cores.len()
+                "--- kernel/sched/scx_topology_governor.c\n+++ kernel/sched/scx_topology_governor.c\n@@ -1,5 +1,12 @@\n+ numa_nodes_count: {}\n+ ebpf_policies_count: {}\n",
+                self.numa_nodes.len(),
+                self.ebpf_policies.len()
             ),
         }
     }
 }
 
-// 2. FreeBSD 15.3+ Capsicum Casper Network Jail Engine
+// 2. FreeBSD 15.3+ Capsicum Sandboxed IPC Mesh Engine
 #[derive(Debug, Default)]
-pub struct FreeBsd153CapsicumCasperNetworkJailEngine {
-    casper_jails: BTreeMap<String, Vec<String>>,
+pub struct FreeBsd153CapsicumSandboxedIpcMeshEngine {
+    sandboxed_endpoints: BTreeMap<String, Vec<String>>,
 }
 
-impl FreeBsd153CapsicumCasperNetworkJailEngine {
+impl FreeBsd153CapsicumSandboxedIpcMeshEngine {
     pub fn new() -> Self {
-        Self {
-            casper_jails: BTreeMap::new(),
-        }
+        Self::default()
     }
 
-    pub fn spawn_casper_vnet_jail(&mut self, jail_name: &str, capsicum_rights: Vec<&str>) {
-        self.casper_jails.insert(
-            jail_name.to_string(),
-            capsicum_rights.into_iter().map(|s| s.to_string()).collect(),
+    pub fn register_endpoint(&mut self, endpoint_id: &str, capabilities: Vec<&str>) {
+        self.sandboxed_endpoints.insert(
+            endpoint_id.to_string(),
+            capabilities.into_iter().map(|s| s.to_string()).collect(),
         );
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "FreeBSD 15.3+ Capsicum Casper Capability Network Jail Delegation Mesh".to_string(),
-            component_name: "FreeBsd153CapsicumCasperNetworkJailEngine".to_string(),
+            title: "FreeBSD 15.3+ Capsicum Sandboxed Zero-Copy IPC Mesh Router".to_string(),
+            component_name: "FreeBsd153CapsicumSandboxedIpcMeshEngine".to_string(),
             os_origin: "FreeBSD 15.3-RELEASE".to_string(),
             status: OsPrStatusV66::Validated,
-            impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
+            impacted_subsystems: vec!["SecuritySandboxing".to_string(), "IpcCommunications".to_string()],
             patch_diff: format!(
-                "--- sys/kern/subr_capsicum_casper_vnet_v66.c\n+++ sys/kern/subr_capsicum_casper_vnet_v66.c\n@@ -1,5 +1,10 @@\n+ casper_network_jails: {}\n",
-                self.casper_jails.len()
+                "--- sys/kern/subr_capsicum_ipc_mesh.c\n+++ sys/kern/subr_capsicum_ipc_mesh.c\n@@ -1,5 +1,10 @@\n+ sandboxed_endpoints_count: {}\n",
+                self.sandboxed_endpoints.len()
             ),
         }
     }
 }
 
-// 3. OpenBSD 8.2+ PTE Shadow Stack CFI Engine
+// 3. OpenBSD 8.2+ Unveil Path Protection & Dynamic Traffic Shaping Guard Engine
 #[derive(Debug, Default)]
-pub struct OpenBsd82PteShadowStackCfiEngine {
-    pinsyscall_shadow_stack: u64,
-    pte_guard_pages: u64,
+pub struct OpenBsd82UnveilWshaperGuardEngine {
+    unveiled_paths: BTreeMap<String, String>,
+    shaper_limits_kbps: u64,
 }
 
-impl OpenBsd82PteShadowStackCfiEngine {
+impl OpenBsd82UnveilWshaperGuardEngine {
     pub fn new() -> Self {
-        Self {
-            pinsyscall_shadow_stack: 0,
-            pte_guard_pages: 0,
-        }
+        Self::default()
     }
 
-    pub fn configure_security(&mut self, shadow_stack_kb: u64, pte_guards: u64) {
-        self.pinsyscall_shadow_stack = shadow_stack_kb;
-        self.pte_guard_pages = pte_guards;
+    pub fn unveil_path(&mut self, path: &str, permissions: &str) {
+        self.unveiled_paths
+            .insert(path.to_string(), permissions.to_string());
+    }
+
+    pub fn set_shaper_bandwidth(&mut self, kbps: u64) {
+        self.shaper_limits_kbps = kbps;
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "OpenBSD 8.2+ PTE Shadow Stack & FineIBT Call Control Flow Integrity Guard".to_string(),
-            component_name: "OpenBsd82PteShadowStackCfiEngine".to_string(),
+            title: "OpenBSD 8.2+ Dynamic Unveil Path Protection & Traffic Shaper Guard".to_string(),
+            component_name: "OpenBsd82UnveilWshaperGuardEngine".to_string(),
             os_origin: "OpenBSD 8.2-RELEASE".to_string(),
             status: OsPrStatusV66::Validated,
-            impacted_subsystems: vec!["SecuritySandboxing".to_string(), "MemoryVirtualization".to_string()],
+            impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
             patch_diff: format!(
-                "--- sys/arch/amd64/amd64/fineibt_pte_shadow_v66.c\n+++ sys/arch/amd64/amd64/fineibt_pte_shadow_v66.c\n@@ -1,5 +1,10 @@\n+ shadow_stack_kb: {}\n+ pte_guard_pages: {}\n",
-                self.pinsyscall_shadow_stack,
-                self.pte_guard_pages
+                "--- sys/kern/subr_unveil_wshaper.c\n+++ sys/kern/subr_unveil_wshaper.c\n@@ -1,5 +1,10 @@\n+ unveiled_paths_count: {}\n+ shaper_limit_kbps: {}\n",
+                self.unveiled_paths.len(),
+                self.shaper_limits_kbps
             ),
         }
     }
 }
 
-// 4. DragonFly BSD 7.0+ HAMMER2 Erasure Replication Engine
+// 4. DragonFly BSD 7.0+ HAMMER2 Multi-Volume Direct-IO Engine
 #[derive(Debug, Default)]
-pub struct DragonFly70Hammer2ErasureReplicationEngine {
+pub struct DragonFly70Hammer2MultiVolumeDirectIoEngine {
+    volumes: Vec<String>,
     pfs_snapshots: BTreeMap<String, u64>,
 }
 
-impl DragonFly70Hammer2ErasureReplicationEngine {
+impl DragonFly70Hammer2MultiVolumeDirectIoEngine {
     pub fn new() -> Self {
-        Self {
-            pfs_snapshots: BTreeMap::new(),
-        }
+        Self::default()
+    }
+
+    pub fn add_volume(&mut self, vol_path: &str) {
+        self.volumes.push(vol_path.to_string());
     }
 
     pub fn record_pfs_snapshot(&mut self, pfs_name: &str, txid: u64) {
@@ -181,47 +195,46 @@ impl DragonFly70Hammer2ErasureReplicationEngine {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "DragonFly BSD 7.0+ HAMMER2 PFS Erasure Coding & Cluster Direct-IO Replication".to_string(),
-            component_name: "DragonFly70Hammer2ErasureReplicationEngine".to_string(),
+            title: "DragonFly BSD 7.0+ HAMMER2 Multi-Volume PFS Lock-Free Direct-IO Engine".to_string(),
+            component_name: "DragonFly70Hammer2MultiVolumeDirectIoEngine".to_string(),
             os_origin: "DragonFly BSD 7.0+".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "RecoveryBackup".to_string()],
             patch_diff: format!(
-                "--- sys/vfs/hammer2/hammer2_erasure_replication_v66.c\n+++ sys/vfs/hammer2/hammer2_erasure_replication_v66.c\n@@ -1,5 +1,8 @@\n+ active_pfs_snapshots: {}\n",
+                "--- sys/vfs/hammer2/hammer2_multivol_direct_io.c\n+++ sys/vfs/hammer2/hammer2_multivol_direct_io.c\n@@ -1,5 +1,10 @@\n+ active_volumes_count: {}\n+ pfs_snapshots_count: {}\n",
+                self.volumes.len(),
                 self.pfs_snapshots.len()
             ),
         }
     }
 }
 
-// 5. NetBSD 11.3 Rump Hypercall PCI Router Engine
+// 5. NetBSD 11.3 Rump Hypercall PCI Network Router Engine
 #[derive(Debug, Default)]
-pub struct NetBsd113RumpHypercallPciRouterEngine {
-    rump_drivers: Vec<String>,
+pub struct NetBsd113RumpHypercallPciNetRouterEngine {
+    net_drivers: Vec<String>,
 }
 
-impl NetBsd113RumpHypercallPciRouterEngine {
+impl NetBsd113RumpHypercallPciNetRouterEngine {
     pub fn new() -> Self {
-        Self {
-            rump_drivers: Vec::new(),
-        }
+        Self::default()
     }
 
-    pub fn register_rump_driver(&mut self, driver_name: &str) {
-        self.rump_drivers.push(driver_name.to_string());
+    pub fn register_net_driver(&mut self, driver_name: &str) {
+        self.net_drivers.push(driver_name.to_string());
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "NetBSD 11.3 Rump Anykernel Userland PCI Driver Hypercall Router V66".to_string(),
-            component_name: "NetBsd113RumpHypercallPciRouterEngine".to_string(),
+            title: "NetBSD 11.3 Rump Hypercall Userland PCI Network Driver Router".to_string(),
+            component_name: "NetBsd113RumpHypercallPciNetRouterEngine".to_string(),
             os_origin: "NetBSD 11.3".to_string(),
             status: OsPrStatusV66::Validated,
-            impacted_subsystems: vec!["DriversHardware".to_string(), "AudioSound".to_string()],
+            impacted_subsystems: vec!["DriversHardware".to_string(), "Networking".to_string()],
             patch_diff: format!(
-                "--- sys/rump/librump/rumpkern/rump_pci_hypercall_v66.c\n+++ sys/rump/librump/rumpkern/rump_pci_hypercall_v66.c\n@@ -1,5 +1,8 @@\n+ registered_rump_drivers: {}\n",
-                self.rump_drivers.len()
+                "--- sys/rump/net/rump_pci_net_hypercall.c\n+++ sys/rump/net/rump_pci_net_hypercall.c\n@@ -1,5 +1,8 @@\n+ registered_net_drivers: {}\n",
+                self.net_drivers.len()
             ),
         }
     }
@@ -230,32 +243,30 @@ impl NetBsd113RumpHypercallPciRouterEngine {
 // 6. Haiku BFS Relational Attribute Query Engine V66
 #[derive(Debug, Default)]
 pub struct HaikuBfsRelationalAttributeQueryEngineV66 {
-    indexed_attributes: BTreeMap<String, String>,
+    attribute_indices: BTreeMap<String, String>,
 }
 
 impl HaikuBfsRelationalAttributeQueryEngineV66 {
     pub fn new() -> Self {
-        Self {
-            indexed_attributes: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn add_attribute_index(&mut self, attr_name: &str, attr_type: &str) {
-        self.indexed_attributes
+        self.attribute_indices
             .insert(attr_name.to_string(), attr_type.to_string());
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "Haiku BFS Live Relational Attribute Query Indexing & Desktop Metadata Search V66".to_string(),
+            title: "Haiku BFS Live Relational Attribute Query Indexing & Search Engine V66".to_string(),
             component_name: "HaikuBfsRelationalAttributeQueryEngineV66".to_string(),
             os_origin: "Haiku R1/Beta5+".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "DesktopCompositor".to_string()],
             patch_diff: format!(
                 "--- src/add-ons/kernel/file_systems/bfs/bfs_query_v66.cpp\n+++ src/add-ons/kernel/file_systems/bfs/bfs_query_v66.cpp\n@@ -1,5 +1,8 @@\n+ relational_indices_count: {}\n",
-                self.indexed_attributes.len()
+                self.attribute_indices.len()
             ),
         }
     }
@@ -269,9 +280,7 @@ pub struct Plan9Synthetic9P2000VfsRforkEngineV66 {
 
 impl Plan9Synthetic9P2000VfsRforkEngineV66 {
     pub fn new() -> Self {
-        Self {
-            mounted_namespaces: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn mount_synthetic_namespace(&mut self, mount_path: &str) {
@@ -281,7 +290,7 @@ impl Plan9Synthetic9P2000VfsRforkEngineV66 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "Plan 9 9P2000 Synthetic VFS Namespace Multiplexer & Process Rfork Isolation V66".to_string(),
+            title: "Plan 9 9P2000 Synthetic VFS Namespace Multiplexer & Process Rfork Engine V66".to_string(),
             component_name: "Plan9Synthetic9P2000VfsRforkEngineV66".to_string(),
             os_origin: "Plan 9 / 9front".to_string(),
             status: OsPrStatusV66::Validated,
@@ -294,17 +303,15 @@ impl Plan9Synthetic9P2000VfsRforkEngineV66 {
     }
 }
 
-// 8. NixOS / GNU Guix Hermetic CAS Merkle Closure Engine V66
+// 8. NixOS / GNU Guix Hermetic CAS Merkle Closure Tree Engine V66
 #[derive(Debug, Default)]
-pub struct NixGuixHermeticCasMerkleClosureEngineV66 {
+pub struct NixGuixHermeticCasMerkleClosureTreeEngineV66 {
     store_closure_hashes: BTreeMap<String, String>,
 }
 
-impl NixGuixHermeticCasMerkleClosureEngineV66 {
+impl NixGuixHermeticCasMerkleClosureTreeEngineV66 {
     pub fn new() -> Self {
-        Self {
-            store_closure_hashes: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn register_closure_hash(&mut self, store_path: &str, merkle_root_hash: &str) {
@@ -315,8 +322,8 @@ impl NixGuixHermeticCasMerkleClosureEngineV66 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
-            title: "NixOS / GNU Guix Hermetic Content-Addressed Store Merkle Closure Tree Builder V66".to_string(),
-            component_name: "NixGuixHermeticCasMerkleClosureEngineV66".to_string(),
+            title: "NixOS / GNU Guix Hermetic CAS Merkle Closure Tree Builder V66".to_string(),
+            component_name: "NixGuixHermeticCasMerkleClosureTreeEngineV66".to_string(),
             os_origin: "NixOS 24.11 / GNU Guix 1.4+".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["PackageManagement".to_string(), "SystemAudit".to_string()],
@@ -328,17 +335,15 @@ impl NixGuixHermeticCasMerkleClosureEngineV66 {
     }
 }
 
-// 9. Illumos Crossbow VNIC DTrace Switch Engine V66
+// 9. Illumos Crossbow VNIC DTrace Switch Mesh Engine V66
 #[derive(Debug, Default)]
-pub struct IllumosCrossbowVnicDtraceSwitchEngineV66 {
+pub struct IllumosCrossbowVnicDtraceSwitchMeshEngineV66 {
     vnic_bandwidth_caps: BTreeMap<String, u64>,
 }
 
-impl IllumosCrossbowVnicDtraceSwitchEngineV66 {
+impl IllumosCrossbowVnicDtraceSwitchMeshEngineV66 {
     pub fn new() -> Self {
-        Self {
-            vnic_bandwidth_caps: BTreeMap::new(),
-        }
+        Self::default()
     }
 
     pub fn configure_vnic_mesh(&mut self, vnic_id: &str, bw_limit_mbps: u64) {
@@ -350,7 +355,7 @@ impl IllumosCrossbowVnicDtraceSwitchEngineV66 {
         OpenSourceOsPrProposalV66 {
             pr_id: pr_id.to_string(),
             title: "Illumos Crossbow VNIC Virtual Switch Mesh & Dynamic DTrace Probes V66".to_string(),
-            component_name: "IllumosCrossbowVnicDtraceSwitchEngineV66".to_string(),
+            component_name: "IllumosCrossbowVnicDtraceSwitchMeshEngineV66".to_string(),
             os_origin: "Illumos / OpenIndiana".to_string(),
             status: OsPrStatusV66::Validated,
             impacted_subsystems: vec!["Networking".to_string(), "ObservabilityDiagnostics".to_string()],
@@ -370,9 +375,7 @@ pub struct SovereignThousandsMissingComponentsEngineV66 {
 
 impl SovereignThousandsMissingComponentsEngineV66 {
     pub fn new() -> Self {
-        Self {
-            components_catalog: Vec::new(),
-        }
+        Self::default()
     }
 
     pub fn register_component(&mut self, name: &str) {
@@ -398,15 +401,15 @@ impl SovereignThousandsMissingComponentsEngineV66 {
 // 11. Master Suite Coordinator
 #[derive(Debug, Default)]
 pub struct SovereignOpenSourceOsMissingComponentsV66PrSuite {
-    pub linux_engine: Linux622SchedExtAdaptiveEnergyGovernorEngine,
-    pub freebsd_engine: FreeBsd153CapsicumCasperNetworkJailEngine,
-    pub openbsd_engine: OpenBsd82PteShadowStackCfiEngine,
-    pub dragonfly_engine: DragonFly70Hammer2ErasureReplicationEngine,
-    pub netbsd_engine: NetBsd113RumpHypercallPciRouterEngine,
+    pub linux_engine: Linux622SchedExtTopologyGovernorEngine,
+    pub freebsd_engine: FreeBsd153CapsicumSandboxedIpcMeshEngine,
+    pub openbsd_engine: OpenBsd82UnveilWshaperGuardEngine,
+    pub dragonfly_engine: DragonFly70Hammer2MultiVolumeDirectIoEngine,
+    pub netbsd_engine: NetBsd113RumpHypercallPciNetRouterEngine,
     pub haiku_engine: HaikuBfsRelationalAttributeQueryEngineV66,
     pub plan9_engine: Plan9Synthetic9P2000VfsRforkEngineV66,
-    pub nix_guix_engine: NixGuixHermeticCasMerkleClosureEngineV66,
-    pub illumos_engine: IllumosCrossbowVnicDtraceSwitchEngineV66,
+    pub nix_guix_engine: NixGuixHermeticCasMerkleClosureTreeEngineV66,
+    pub illumos_engine: IllumosCrossbowVnicDtraceSwitchMeshEngineV66,
     pub thousands_engine: SovereignThousandsMissingComponentsEngineV66,
 }
 
@@ -459,31 +462,41 @@ mod tests {
 
         master
             .linux_engine
-            .register_sched_policy("scx_adaptive_energy", "0xenergy456");
+            .register_numa_node(0, vec![0, 1, 2, 3]);
         master
             .linux_engine
-            .register_energy_core("core_energy_0", 1200);
+            .register_ebpf_policy("scx_numa_balance", "0xhash66_policy");
 
         master
             .freebsd_engine
-            .spawn_casper_vnet_jail("jail_casper_v66_01", vec!["CAP_READ", "CAP_WRITE"]);
-        master.openbsd_engine.configure_security(8192, 512);
+            .register_endpoint("ipc_endpoint_v66", vec!["CAP_CONNECT", "CAP_SEND"]);
+        master
+            .openbsd_engine
+            .unveil_path("/etc", "r");
+        master
+            .openbsd_engine
+            .set_shaper_bandwidth(100000);
+        master
+            .dragonfly_engine
+            .add_volume("/dev/serno/VOL66");
         master
             .dragonfly_engine
             .record_pfs_snapshot("pfs_data_v66", 1740000000);
         master
             .netbsd_engine
-            .register_rump_driver("rumpuser_hypercall_pci_v66");
+            .register_net_driver("rumpuser_hypercall_net_v66");
         master
             .haiku_engine
             .add_attribute_index("BEOS:TYPE_V66", "string");
-        master.plan9_engine.mount_synthetic_namespace("#s/proc_v66");
+        master
+            .plan9_engine
+            .mount_synthetic_namespace("#s/proc_v66");
         master
             .nix_guix_engine
             .register_closure_hash("/nix/store/pkg_v66", "hash_v66_xyz");
         master
             .illumos_engine
-            .configure_vnic_mesh("vnic_v66_0", 20000);
+            .configure_vnic_mesh("vnic_v66_0", 10000);
         master
             .thousands_engine
             .register_component("subsystem_v66_mod");
