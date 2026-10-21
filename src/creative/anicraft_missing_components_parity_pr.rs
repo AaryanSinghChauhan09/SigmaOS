@@ -1,18 +1,13 @@
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 
 extern crate alloc;
-
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-
-
-
-
+use alloc::vec;
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -663,7 +658,6 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::vec;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
