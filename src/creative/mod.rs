@@ -41,6 +41,7 @@ pub mod pdfcraft;
 // pub mod pdfcraft_artcraft_parity_pr;
 // pub mod pdfcraft_missing_components_parity_pr;
 pub mod photocraft;
+pub mod photocraft_artcraft_missing_components_v65_pr;
 // pub mod photocraft_artcraft_parity_pr;
 // pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
@@ -120,6 +121,7 @@ pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
+pub use photocraft_artcraft_missing_components_v65_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
 pub use soundcraft::{
