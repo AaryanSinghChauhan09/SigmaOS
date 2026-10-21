@@ -3,11 +3,6 @@
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
 
 #![no_std]
-// SPDX-License-Identifier: MIT
-// SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
-// (`src/creative/anicraft_artcraft_parity_pr.rs`)
-
-#![no_std]
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -16,28 +11,6 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
-//
-// Bridges AniCraft (Sovereign 2D/3D Animation Timeline, Keyframing & Skeletal Rigging Engine)
-// and ArtCraft AniCraft missing feature parity via structured PR proposals.
-// Provides implementations for 10 missing animation components:
-// 1. AnicraftBezierEasingCurveOptimizationPrEngine (Cubic Bézier pre-computed LUT & motion curve optimization)
-// 2. AnicraftForwardInverseKinematicsBoneRiggingPrEngine (FK/IK skeletal bone hierarchy rigging & joint constraint solver)
-// 3. AnicraftNlaTrackClipBlendingCompositePrEngine (Non-linear animation multi-track clip blending & stacking)
-// 4. AnicraftOnionSkinningSubframePreviewPrEngine (Multi-layer onion skinning ghosting & directional color tinting)
-// 5. AnicraftAudioVisemeLipsyncTimelinePrEngine (Audio FFT to phoneme/viseme mouth shape alignment)
-// 6. AnicraftMeshDeformationShapeKeyMorphingPrEngine (Mesh vertex deformation & shape key blend shape morphing)
-// 7. AnicraftSubframeInterpolationTearFreeRenderPrEngine (Sub-frame high-refresh rate tear-free playback renderer)
-// 8. AnicraftRiggingWeightPaintingInfluencePrEngine (Vertex bone skinning weight influence map)
-// 9. AnicraftMotionCaptureBvhImporterPrEngine (BVH skeletal motion capture import & retargeting)
-// 10. AnicraftSpriteSheetAtlasExporterPrEngine (Sprite sheet atlas generation & game engine export)
-// 11. SovereignAnicraftArtcraftParityPrGateway & AnicraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
-
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
 
 /// Structured PR proposal manifest for AniCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

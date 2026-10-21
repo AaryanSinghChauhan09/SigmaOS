@@ -894,3 +894,6 @@ pub use sigmasecuritymanager::{
     add_firewall_rule, get_sigmasecuritymanager, get_sigmasecuritymanager_mut,
     init_sigmasecuritymanager, SigmaSecurityManager,
 };
+
+pub mod sovereign_init_and_supervisor_advancements_v67;
+pub use sovereign_init_and_supervisor_advancements_v67::*;
