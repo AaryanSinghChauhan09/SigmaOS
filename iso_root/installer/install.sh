@@ -524,8 +524,8 @@ main() {
     Installer_run "$inst"
 
     # 7. Apply SigmaOS system configuration (Omarchy-inspired)
-    #    Copies /etc configs, default desktop configs, enables services,
-    #    and schedules first-boot provisioning.
+    #    Copies /etc, default/, bin/, shell/, and install/helpers/ from the
+    #    ISO root to the target, then enables services via the shared helper.
     log_step "Applying SigmaOS system configuration..."
     if [[ -d /iso_root/etc ]]; then
         cp -a /iso_root/etc/* /etc/ 2>/dev/null || log_warn "Failed to copy /etc configs"
@@ -536,17 +536,40 @@ main() {
         cp -a /iso_root/default/* /usr/share/sigmaos/default/ 2>/dev/null || log_warn "Failed to copy default configs"
         log_info "Applied default desktop configuration"
     fi
-    # Enable core desktop services.
-    systemctl enable sddm.service 2>/dev/null || log_warn "sddm not available"
-    systemctl enable wireplumber.service 2>/dev/null || log_warn "wireplumber not available"
-    systemctl enable sigmaos-shell.service 2>/dev/null || log_warn "sigmaos-shell not available"
-    systemctl enable sigmaos-desktop-session.service 2>/dev/null || log_warn "sigmaos-desktop-session not available"
-    systemctl enable plymouth-start.service 2>/dev/null || log_warn "plymouth not available"
-    systemctl enable zram-generator.service 2>/dev/null || log_warn "zram-generator not available"
-    systemctl enable sigmaos-provision-owner.service 2>/dev/null || log_warn "sigmaos-provision-owner not available"
-    systemctl enable theme-system.service 2>/dev/null || log_warn "theme-system not available"
+    if [[ -d /iso_root/bin ]]; then
+        mkdir -p /usr/bin
+        cp -a /iso_root/bin/* /usr/bin/ 2>/dev/null || log_warn "Failed to copy runtime binaries"
+        log_info "Applied runtime binaries"
+    fi
+    if [[ -d /iso_root/shell ]]; then
+        mkdir -p /usr/share/sigmaos/shell
+        cp -a /iso_root/shell/* /usr/share/sigmaos/shell/ 2>/dev/null || log_warn "Failed to copy shell configs"
+        log_info "Applied shell configuration"
+    fi
+    if [[ -d /iso_root/install/helpers ]]; then
+        mkdir -p /usr/share/sigmaos/install/helpers
+        cp -a /iso_root/install/helpers/* /usr/share/sigmaos/install/helpers/ 2>/dev/null || log_warn "Failed to copy install helpers"
+        log_info "Applied install helpers"
+    fi
+    # Enable core desktop services via shared helper (single source of truth, DRY).
+    if [[ -r /usr/share/sigmaos/install/helpers/enable-services.sh ]]; then
+        # shellcheck source=/dev/null
+        . /usr/share/sigmaos/install/helpers/enable-services.sh
+        enable_sigmaos_services
+    else
+        log_warn "enable-services.sh helper not found, falling back to inline enabling"
+        systemctl enable sddm.service 2>/dev/null || log_warn "sddm not available"
+        systemctl enable wireplumber.service 2>/dev/null || log_warn "wireplumber not available"
+        systemctl enable sigmaos-shell.service 2>/dev/null || log_warn "sigmaos-shell not available"
+        systemctl enable sigmaos-desktop-session.service 2>/dev/null || log_warn "sigmaos-desktop-session not available"
+        systemctl enable plymouth-start.service 2>/dev/null || log_warn "plymouth not available"
+        systemctl enable zram-generator.service 2>/dev/null || log_warn "zram-generator not available"
+        systemctl enable sigmaos-provision-owner.service 2>/dev/null || log_warn "sigmaos-provision-owner not available"
+        systemctl enable theme-system.service 2>/dev/null || log_warn "theme-system not available"
+    fi
     # Schedule first-boot provisioning (runs setup-form.sh on first boot).
     mkdir -p /var/lib/sigmaos
+    rm -f /var/lib/sigmaos/provisioned 2>/dev/null || true
     log_info "First-boot provisioning scheduled (sigmaos-provision-owner.service)"
 }
 

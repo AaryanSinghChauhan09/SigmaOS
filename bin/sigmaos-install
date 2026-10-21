@@ -49,6 +49,21 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ---------------------------------------------------------------------------
+# Determine SigmaOS root directory for source files
+# Run from repo root: files are at ./etc, ./default, ./bin, etc.
+# Installed to /usr/bin: files are at /usr/share/sigmaos/etc, /usr/share/sigmaos/default, etc.
+# ---------------------------------------------------------------------------
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -d "/usr/share/sigmaos/etc" ]; then
+  SIGMAOS_ROOT="/usr/share/sigmaos"
+else
+  SIGMAOS_ROOT="${SCRIPT_DIR}/.."
+fi
+export SIGMAOS_ROOT
+
+log_info "SigmaOS root: ${SIGMAOS_ROOT}"
+
+# ---------------------------------------------------------------------------
 # Phase 1: Pre-flight checks
 # ---------------------------------------------------------------------------
 preflight() {
@@ -97,10 +112,10 @@ install_packages() {
   log_step "Installing base packages"
   
   if command -v pacstrap >/dev/null 2>&1; then
-    pacstrap "${MOUNT_POINT}" - < install/packages/sigmaos-base.packages 2>/dev/null || \
-      pacstrap "${MOUNT_POINT}" $(grep -v '^#' install/packages/sigmaos-base.packages | grep -v '^$')
+    pacstrap "${MOUNT_POINT}" - < "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" 2>/dev/null || \
+      pacstrap "${MOUNT_POINT}" $(grep -v '^#' "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" | grep -v '^$')
   elif command -v pacman >/dev/null 2>&1; then
-    pacman -Sy --needed --noconfirm $(grep -v '^#' install/packages/sigmaos-base.packages | grep -v '^$')
+    pacman -Sy --needed --noconfirm $(grep -v '^#' "${SIGMAOS_ROOT}/install/packages/sigmaos-base.packages" | grep -v '^$')
   else
     log_warn "No package manager found, skipping package installation"
   fi
@@ -121,31 +136,35 @@ copy_system_files() {
   log_step "Copying SigmaOS system files"
   
   # Copy /etc configuration
-  cp -a etc/* "${MOUNT_POINT}/etc/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/etc"/* "${MOUNT_POINT}/etc/" 2>/dev/null || true
   
   # Copy /usr/share/sigmaos defaults
   mkdir -p "${MOUNT_POINT}/usr/share/sigmaos"
-  cp -a default/* "${MOUNT_POINT}/usr/share/sigmaos/default/" 2>/dev/null || true
-  cp -a shell/* "${MOUNT_POINT}/usr/share/sigmaos/shell/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/default"/* "${MOUNT_POINT}/usr/share/sigmaos/default/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/shell"/* "${MOUNT_POINT}/usr/share/sigmaos/shell/" 2>/dev/null || true
+  
+  # Copy install helpers
+  mkdir -p "${MOUNT_POINT}/usr/share/sigmaos/install/helpers"
+  cp -a "${SIGMAOS_ROOT}/install/helpers"/* "${MOUNT_POINT}/usr/share/sigmaos/install/helpers/" 2>/dev/null || true
   
   # Copy runtime binaries
   mkdir -p "${MOUNT_POINT}/usr/bin"
-  cp -a bin/* "${MOUNT_POINT}/usr/bin/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/bin"/* "${MOUNT_POINT}/usr/bin/" 2>/dev/null || true
   
   # Copy Plymouth theme
   mkdir -p "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos"
-  cp -a usr/share/plymouth/themes/sigmaos/* "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/usr/share/plymouth/themes/sigmaos"/* "${MOUNT_POINT}/usr/share/plymouth/themes/sigmaos/" 2>/dev/null || true
   
   # Copy bootloader config
   mkdir -p "${MOUNT_POINT}/boot/limine"
-  cp -a boot/limine/* "${MOUNT_POINT}/boot/limine/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/boot/limine"/* "${MOUNT_POINT}/boot/limine/" 2>/dev/null || true
   
   # Copy /etc/skel dotfiles
-  cp -a etc/skel/. "${MOUNT_POINT}/etc/skel/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/etc/skel"/. "${MOUNT_POINT}/etc/skel/" 2>/dev/null || true
   
   # Copy systemd user services
   mkdir -p "${MOUNT_POINT}/etc/systemd/user"
-  cp -a etc/systemd/user/* "${MOUNT_POINT}/etc/systemd/user/" 2>/dev/null || true
+  cp -a "${SIGMAOS_ROOT}/etc/systemd/user"/* "${MOUNT_POINT}/etc/systemd/user/" 2>/dev/null || true
   
   log_info "System files copied to ${MOUNT_POINT}"
 }
