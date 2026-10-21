@@ -8,8 +8,8 @@ pub mod anicraft;
 pub mod artcraft;
 pub mod audiocraft;
 pub mod cadcraft;
-// pub mod cadcraft_artcraft_parity_pr;
-// pub mod cadcraft_missing_components_parity_pr;
+pub mod cadcraft_artcraft_parity_pr;
+pub mod cadcraft_missing_components_parity_pr;
 // pub mod craftlibs_missing_components_parity_pr;
 pub mod deckcraft;
 // pub mod deckcraft_artcraft_parity_pr;
@@ -112,6 +112,8 @@ pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
+pub use cadcraft_artcraft_parity_pr::*;
+pub use cadcraft_missing_components_parity_pr::*;
 pub use soundcraft::{
     fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
     SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,

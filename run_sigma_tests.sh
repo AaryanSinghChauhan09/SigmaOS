@@ -423,11 +423,25 @@ if [ -f "src/creative/figcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_figcraft_missing
 fi
 
+if [ -f "src/creative/cadcraft.rs" ]; then
+    echo "Running Sovereign CadCraft CAD Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/cadcraft.rs --edition=2021 -o build/test_cadcraft
+    ./build/test_cadcraft
+fi
+
 if [ -f "src/creative/cadcraft_missing_components_parity_pr.rs" ]; then
     echo "Running Sovereign Cadcraft & ArtCraft Missing Components Parity PR Gateway test suite..."
     mkdir -p build
     rustc --test src/creative/cadcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_cadcraft_missing
     ./build/test_cadcraft_missing
+fi
+
+if [ -f "src/creative/cadcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign CadCraft to ArtCraft Parity PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/creative/cadcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_cadcraft_parity
+    ./build/test_cadcraft_parity
 fi
 
 if [ -f "src/creative/fontcraft.rs" ]; then
