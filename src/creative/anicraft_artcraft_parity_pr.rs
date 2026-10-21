@@ -2,10 +2,17 @@
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
 
-use std::collections::BTreeMap;
-use std::string::{String, ToString};
-use std::vec::Vec;
-use std::f64::consts::PI;
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
+use alloc::format;
+use alloc::string::{String, ToString};
+use alloc::vec;
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
 //
 // Bridges AniCraft (Sovereign 2D/3D Animation Timeline, Keyframing & Skeletal Rigging Engine)
 // and ArtCraft AniCraft missing feature parity via structured PR proposals.
@@ -21,19 +28,6 @@ use std::f64::consts::PI;
 // 9. AnicraftMotionCaptureBvhImporterPrEngine (BVH skeletal motion capture import & retargeting)
 // 10. AnicraftSpriteSheetAtlasExporterPrEngine (Sprite sheet atlas generation & game engine export)
 // 11. SovereignAnicraftArtcraftParityPrGateway & AnicraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
-
-
-
-
-#![no_std]
-extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 /// Structured PR proposal manifest for AniCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
