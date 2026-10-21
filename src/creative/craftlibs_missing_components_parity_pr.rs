@@ -1,4 +1,7 @@
 #![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CraftLibs Missing Components Parity PR Gateway Module
 // (`src/creative/craftlibs_missing_components_parity_pr.rs`)
@@ -14,9 +17,7 @@
 // 7. CraftlibsSdfTypographyGlyphPrEngine (HarfBuzz/FreeType SDF/MSDF font glyph rendering & script shaping)
 // 8. SovereignCraftlibsMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -951,6 +952,7 @@ impl Default for CraftlibsMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_color_transform_engine() {

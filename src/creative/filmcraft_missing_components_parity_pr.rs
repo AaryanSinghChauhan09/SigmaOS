@@ -1,4 +1,7 @@
 #![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Filmcraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/filmcraft_missing_components_parity_pr.rs`)
@@ -6,7 +9,6 @@
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft FilmCraft
 // professional video editing ecosystem components in Pull Request proposal format.
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -927,6 +929,7 @@ impl Default for FilmcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_filmcraft_multicam_sync_engine() {

@@ -1,5 +1,6 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Soundcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/soundcraft_missing_components_parity_pr.rs`)
@@ -14,7 +15,6 @@
 // 6. SoundcraftRealtimeCollabCrdtPrEngine (Multi-user CRDT DAW session sync, track locking, stem delta sharing & project history diffs)
 // 7. SovereignSoundcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -748,6 +748,7 @@ impl Default for SovereignSoundcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_soundcraft_parity_pr_gateway() {

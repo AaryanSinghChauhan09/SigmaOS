@@ -6,6 +6,7 @@
 #![no_std]
 
 extern crate alloc;
+use alloc::vec;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;

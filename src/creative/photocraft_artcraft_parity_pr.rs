@@ -1,5 +1,7 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Photocraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/photocraft_artcraft_parity_pr.rs`)
@@ -18,7 +20,6 @@
 // 10. PhotocraftPerspectiveWarpMeshDeformPrEngine (Perspective warp quad grid & puppet mesh deformer)
 // 11. SovereignPhotocraftArtcraftParityPrGateway & PhotocraftArtcraftParityPrSuite (Master Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -924,6 +925,7 @@ impl PhotocraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_photocraft_raw_processing_engine() {

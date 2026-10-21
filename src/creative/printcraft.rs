@@ -120,6 +120,7 @@ impl SovereignPrintSpooler {
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use super::*;
 
     #[test]

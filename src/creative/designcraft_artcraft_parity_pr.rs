@@ -1,5 +1,7 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Designcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/designcraft_artcraft_parity_pr.rs`)
@@ -18,11 +20,10 @@
 // 10. DesigncraftWcagAccessibilityAuditPrEngine (WCAG 2.1 AA/AAA accessibility contrast & touch target auditor)
 // 11. SovereignDesigncraftArtcraftParityPrGateway & DesigncraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::sync::atomic::{AtomicU32, AtomicBool, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
 use core::f64::consts::PI;
 
 
@@ -936,6 +937,7 @@ impl DesigncraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_designcraft_artcraft_parity_pr_gateway() {

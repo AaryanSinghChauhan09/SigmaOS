@@ -1,4 +1,7 @@
 #![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS Photocraft Missing Components Parity PR Proposal Engine
 // (`src/creative/photocraft_missing_components_parity_pr.rs`)
@@ -6,9 +9,7 @@
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft PhotoCraft
 // photo editing ecosystem components in Pull Request proposal format.
 
-#![no_std]
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -913,6 +914,7 @@ impl PhotocraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_photocraft_raw_processing_engine() {

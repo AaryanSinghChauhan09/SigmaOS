@@ -1,9 +1,10 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SigmaOS Sovereign Creative Suite: EffectCraft & ArtCraft Parity PR Engine
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -1340,6 +1341,7 @@ impl Default for EffectcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_optical_flow_engine_functional() {
