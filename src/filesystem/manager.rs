@@ -27,6 +27,30 @@ use crate::klib::btreemap::BTreeMap;
 use std::collections::BTreeMap;
 // str/String not in no_std
 
+/// Fast zero-allocation case-insensitive substring search helper.
+/// Uses window slice byte comparison for ASCII fast-path to avoid creating heap `String`s via `to_lowercase()`.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        let needle_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(needle.len())
+            .any(|window| {
+                window.iter().zip(needle_bytes).all(|(&h, &n)| {
+                    h.to_ascii_lowercase() == n.to_ascii_lowercase()
+                })
+            })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// File item
 #[derive(Debug, Clone)]
 pub struct FileItem {
@@ -367,9 +391,8 @@ impl FileManager {
         let mut results = Vec::new();
 
         if let Ok(items) = self.list_directory(&self.current_path) {
-            let query_lower = query.to_lowercase();
             for item in items {
-                if item.name.to_lowercase().contains(&query_lower) {
+                if contains_ignore_case(&item.name, query) {
                     results.push(item);
                 }
             }
@@ -477,28 +500,43 @@ pub struct FuzzyFileSearchEngine;
 
 impl FuzzyFileSearchEngine {
     pub fn fuzzy_score(pattern: &str, target: &str) -> usize {
-        let pattern_lower = pattern.to_lowercase();
-        let target_lower = target.to_lowercase();
-
-        if pattern_lower.is_empty() {
+        if pattern.is_empty() {
             return 100;
         }
 
         let mut score = 0;
         let mut p_idx = 0;
-        let p_chars: Vec<char> = pattern_lower.chars().collect();
 
-        for (t_idx, t_char) in target_lower.chars().enumerate() {
-            if p_idx < p_chars.len() && t_char == p_chars[p_idx] {
-                score += 10 + (100 / (t_idx + 1));
-                p_idx += 1;
+        if pattern.is_ascii() && target.is_ascii() {
+            let pat_bytes = pattern.as_bytes();
+            for (t_idx, &t_byte) in target.as_bytes().iter().enumerate() {
+                if p_idx < pat_bytes.len() && t_byte.to_ascii_lowercase() == pat_bytes[p_idx].to_ascii_lowercase() {
+                    score += 10 + (100 / (t_idx + 1));
+                    p_idx += 1;
+                }
             }
-        }
-
-        if p_idx == p_chars.len() {
-            score
+            if p_idx == pat_bytes.len() {
+                score
+            } else {
+                0
+            }
         } else {
-            0
+            let pattern_lower = pattern.to_lowercase();
+            let target_lower = target.to_lowercase();
+            let p_chars: Vec<char> = pattern_lower.chars().collect();
+
+            for (t_idx, t_char) in target_lower.chars().enumerate() {
+                if p_idx < p_chars.len() && t_char == p_chars[p_idx] {
+                    score += 10 + (100 / (t_idx + 1));
+                    p_idx += 1;
+                }
+            }
+
+            if p_idx == p_chars.len() {
+                score
+            } else {
+                0
+            }
         }
     }
 
@@ -790,6 +828,34 @@ impl FileTagManager {
 impl Default for FileTagManager {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod manager_unit_tests {
+    use super::*;
+
+    #[test]
+    fn test_contains_ignore_case() {
+        assert!(contains_ignore_case("Documents.pdf", "doc"));
+        assert!(contains_ignore_case("README.MD", "md"));
+        assert!(!contains_ignore_case("file.txt", "pdf"));
+        assert!(contains_ignore_case("", ""));
+    }
+
+    #[test]
+    fn test_file_manager_search_zero_alloc() {
+        let manager = FileManager::default();
+        let results = manager.search("DOC");
+        assert_eq!(results.len(), 2); // Documents and document.pdf
+    }
+
+    #[test]
+    fn test_fuzzy_file_search_engine_zero_alloc() {
+        let score = FuzzyFileSearchEngine::fuzzy_score("doc", "documents.pdf");
+        assert!(score > 0);
+        let score_mismatch = FuzzyFileSearchEngine::fuzzy_score("xyz", "documents.pdf");
+        assert_eq!(score_mismatch, 0);
     }
 }
 
