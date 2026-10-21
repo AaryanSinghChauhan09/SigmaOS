@@ -352,7 +352,7 @@ mod tests {
 
     #[test]
     fn zero_capacity_is_clamped_instead_of_panicking() {
-        let h = ClipboardHistory::new(0);
+        let mut h = ClipboardHistory::new(0);
         assert_eq!(h.capacity(), 1);
         let id = h.set_text("only".to_string());
         assert_eq!(h.paste_text(id), Some("only".to_string()));
