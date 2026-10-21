@@ -169,6 +169,7 @@ pub mod sigmakernelmanager;
 pub mod sigmacronmanager2;
 pub mod sigmametricsmanager;
 pub mod sigmarestoremanager;
+pub mod sigmadevicemanager2;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -372,6 +373,9 @@ pub use sigmametricsmanager::{
 pub use sigmarestoremanager::{
     RestoreManager, RestorePoint as RestoreManagerPoint, RestorePointState as RestoreManagerState,
     RestorePointType as RestoreManagerType,
+};
+pub use sigmadevicemanager2::{
+    Device as DeviceManager2Device, DeviceManager2State, DeviceManager2Type, SigmaDeviceManager2,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
