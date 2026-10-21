@@ -1,0 +1,95 @@
+#!/bin/bash
+# sigmaos-emoji-picker - Emoji picker for SigmaOS shell
+# Modeled on Omancy 4.0.5 emoji picker (omancy.emojis shell plugin)
+# Accepts typed input via wtype-compatible interface and inserts selected emoji.
+
+set -euo pipefail
+
+EMOJIS='😀 Grinning face
+😃 Grinning face with big eyes
+😄 Grinning face with smiling eyes
+😁 Beaming face with smiling eyes
+😆 Grinning squinting face
+😅 Grinning face with sweat
+😂 Face with tears of joy
+🤣 Rolling on the floor laughing
+😊 Slightly smiling face
+😇 Smiling face with halo
+😍 Smiling face with heart-eyes
+😘 Face blowing a kiss
+😗 Kissing face
+😙 Kissing face with smiling eyes
+😚 Face blowing a kiss
+😋 Face savoring food
+😎 Face with sunglasses
+😏 Smirking face
+😒 Unamused face
+😞 Disappointed face
+😔 Pensive face
+😟 Worried face
+😠 Angry face
+😡 Pouting face
+😢 Crying face
+😭 Loudly crying face
+😤 Face with steam from nose
+😠 Angry face
+😡 Pouting face
+😶 Face without mouth
+😐 Neutral face
+😑 Expressionless face
+😬 Grimacing face
+😮 Face with open mouth
+😯 Hushed face
+😲 Astonished face
+😳 Flushed face
+😴 Sleeping face
+😵 Dizzy face
+😶‍🌫️ Face in clouds
+😷 Face with medical mask
+🤒 Face with thermometer
+🤕 Face with head-bandage
+🤢 Nauseated face
+🤮 Face vomiting
+🤧 Sneezing face
+😇 Smiling face with halo
+😈 Smiling face with horns
+👻 Ghost
+💀 Skull
+👽 Alien
+👾 Alien monster
+🤖 Robot
+🎃 Jack-o-lantern'
+
+CLIPBOARD_TOOL=""
+
+if command -v wl-copy >/dev/null 2>&1; then
+    CLIPBOARD_TOOL="wl-copy"
+elif command -v xclip >/dev/null 2>&1; then
+    CLIPBOARD_TOOL="xclip -selection clipboard"
+elif command -v xsel >/dev/null 2>&1; then
+    CLIPBOARD_TOOL="xsel --clipboard --input"
+fi
+
+case "${1:-}" in
+    pick)
+        if command -v wofi >/dev/null 2>&1; then
+            selection=$(echo "${EMOJIS}" | wofi --show dmenu --prompt "Emoji" 2>/dev/null || true)
+            if [ -n "${selection}" ]; then
+                emoji=$(echo "${selection}" | cut -d' ' -f1)
+                if [ -n "${CLIPBOARD_TOOL}" ]; then
+                    echo -n "${emoji}" | ${CLIPBOARD_TOOL}
+                fi
+                echo "${emoji}"
+            fi
+        else
+            echo "${EMOJIS}"
+        fi
+        ;;
+    list)
+        echo "${EMOJIS}"
+        ;;
+    *)
+        echo "Usage: sigmaos-emoji-picker <pick|list>" >&2
+        exit 1
+        ;;
+esac

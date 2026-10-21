@@ -1,9 +1,166 @@
 # SigmaOS Waybar configuration
-# Inspired by Omarchy 4.0.5 default/themed/btop.theme.tpl + bar modules
+# Real, working bar configuration with all modules visible.
+# Modeled on Omancy 4.0.5 bar layout: left=workspaces+menu, center=clock, right=audio+network+battery+power
 
-# Waybar modules layout:
-#   left:   workspace buttons + menu
-#   center: clock
-#   right:  audio, network, battery, power
+layer = top
+position = top
+margin-top = 0
+margin-bottom = 0
+margin-left = 0
+margin-right = 0
 
-# Default module values are set here; individual modules override below.
+modules-left = "sigmaos/menu sigmaos/workspaces"
+modules-center = "sigmaos/clock"
+modules-right = "sigmaos/audio sigmaos/network sigmaos/battery sigmaos/power sigmaos/tray"
+
+# --- Menu button (opens root menu) ---
+module/sigmaos/menu {
+    type = "custom/button"
+    padding = 0 8
+    margin = 4 2
+    on-click = "sigmaos-shell shell summon sigmaos.menu '{\"menu\":\"root\"}'"
+    format = "󰣇 SigmaOS"
+    format-foreground = "#cdd6f4"
+    background = "#1e1e2e"
+}
+
+# --- Workspaces ---
+module/sigmaos/workspaces {
+    type = "hyprland/workspaces"
+    enable-click = true
+    enable-scroll = false
+    all-outputs = true
+    format = "{name}"
+    format-separator = " "
+    label-active-foreground = "#1e1e2e"
+    label-active-background = "#89b4fa"
+    label-active-padding = 4
+    label-inactive-foreground = "#cdd6f4"
+    label-inactive-padding = 4
+    label-urgent-foreground = "#f38ba8"
+}
+
+# --- Clock ---
+module/sigmaos/clock {
+    type = "custom/text"
+    padding = 0 10
+    margin = 4 2
+    format = "󰥔 {:%Y-%m-%d %H:%M}"
+    format-foreground = "#bac2de"
+    background = "#1e1e2e"
+    exec = "date +'%Y-%m-%d %H:%M'"
+    interval = 10
+    on-click = "sigmaos-shell shell summon sigmaos.clock"
+}
+
+# --- Audio ---
+module/sigmaos/audio {
+    type = "custom/text"
+    padding = 0 8
+    margin = 4 2
+    format = "󰕾 {volume}%"
+    format-foreground = "#cba6f7"
+    background = "#1e1e2e"
+    exec = "pamixer --get-volume 2>/dev/null || echo 0"
+    interval = 5
+    on-click = "sigmaos-shell shell summon sigmaos.audio"
+    on-click-right = "pamixer -t"
+}
+
+# --- Network ---
+module/sigmaos/network {
+    type = "custom/text"
+    padding = 0 8
+    margin = 4 2
+    format = "󰖩 {essid}"
+    format-foreground = "#89b4fa"
+    format-disconnected = "󰖪 offline"
+    format-disconnected-foreground = "#f38ba8"
+    background = "#1e1e2e"
+    exec = "nmcli -t -f active,ssid dev wifi 2>/dev/null | grep '^yes' | cut -d: -f2 || echo offline"
+    interval = 10
+    on-click = "sigmaos-shell shell summon sigmaos.network"
+}
+
+# --- Battery ---
+module/sigmaos/battery {
+    type = "battery"
+    padding = 0 8
+    margin = 4 2
+    format = "{capacity}% {icon}"
+    format-charging = "󰂄 {capacity}%"
+    format-discharging = "󰁹 {capacity}%"
+    format-alert = "󰂎 {capacity}%"
+    format-foreground = "#a6e3a1"
+    format-charging-foreground = "#fab387"
+    format-alert-foreground = "#f38ba8"
+    background = "#1e1e2e"
+    on-click = "sigmaos-shell shell summon sigmaos.power"
+}
+
+# --- Power ---
+module/sigmaos/power {
+    type = "custom/button"
+    padding = 0 8
+    margin = 4 2
+    format = ""
+    format-foreground = "#f38ba8"
+    background = "#1e1e2e"
+    on-click = "sigmaos-shell shell summon sigmaos.menu '{\"menu\":\"system\"}'"
+}
+
+# --- Tray ---
+module/sigmaos/tray {
+    type = "tray"
+    padding = 0 6
+    margin = 4 2
+    icon-size = 16
+    background = "#1e1e2e"
+}
+
+# --- Global styling ---
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 13px;
+    min-height: 24px;
+}
+
+window#waybar {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    border-bottom: 2px solid #585b70;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #cdd6f4;
+}
+
+#workspaces button.active {
+    background-color: #89b4fa;
+    color: #1e1e2e;
+    border-radius: 6px;
+}
+
+#clock, #audio, #network, #battery, #power, #tray, #menu {
+    padding: 0 10px;
+    color: #cdd6f4;
+}
+
+#power {
+    color: #f38ba8;
+}
+
+#mode {
+    background-color: #f38ba8;
+    color: #1e1e2e;
+    padding: 0 10px;
+    border-radius: 6px;
+}
+
+#window {
+    padding: 0 10px;
+    color: #cdd6f4;
+}

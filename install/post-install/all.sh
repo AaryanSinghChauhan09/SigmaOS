@@ -48,6 +48,9 @@ fi
 # Enable system services via shared helper (single source of truth).
 enable_sigmaos_services
 
+# CUPS is enabled by the shared helper; ensure it's running.
+systemctl start cups.service 2>/dev/null || true
+
 # Rebuild initramfs.
 if command -v dracut >/dev/null 2>&1; then
   dracut -f 2>/dev/null || true

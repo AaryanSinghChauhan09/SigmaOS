@@ -22,6 +22,9 @@ enable_sigmaos_services() {
   # Display manager
   systemctl enable sddm.service 2>/dev/null || log_warn "sddm not available"
 
+  # Printing (CUPS - Omancy acceptance test requires cups.service enabled and running)
+  systemctl enable cups.service 2>/dev/null || log_warn "cups not available"
+
   # Audio
   systemctl enable wireplumber.service 2>/dev/null || log_warn "wireplumber not available"
 

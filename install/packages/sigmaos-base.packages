@@ -89,7 +89,6 @@ helix
 # System tools
 fastfetch
 btop
-btop
 brightnessctl
 power-profiles-daemon
 gum
@@ -120,6 +119,8 @@ qt6-wayland
 adwaita-icon-theme
 papirus-icon-theme
 cursor-themes
+swww
+hyprpaper
 
 # Networking
 networkmanager
@@ -128,9 +129,11 @@ bluez
 bluez-utils
 blueman
 
-# Printing
+# Printing (CUPS - Omancy acceptance test requires cups.service enabled and running)
 cups
+cups-filters
 cups-pk-helper
+system-config-printer
 print-manager
 
 # Security / authentication

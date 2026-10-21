@@ -60,7 +60,7 @@ set_plugin_status() {
 # Register all available plugins on startup
 register_all_plugins() {
   : > "${PLUGIN_REGISTRY}"
-  local plugins="audio background bar bluetooth clipboard emojis menu monitor network notifications power reminders weather"
+  local plugins="audio background bar bluetooth clipboard emojis menu monitor network notifications power reminders settings weather"
   for plugin in ${plugins}; do
     register_plugin "${plugin}" "loaded"
   done

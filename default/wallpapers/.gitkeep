@@ -1,0 +1,8 @@
+# SigmaOS wallpaper/background setup
+# Place wallpaper images here for use with sigmaos-theme-bg-switcher
+# Supported formats: jpg, jpeg, png, webp
+
+# Default wallpaper placeholder
+# Add your wallpapers to this directory and run:
+#   sigmaos-theme-bg-switcher set <path>
+#   sigmaos-theme-bg-switcher next

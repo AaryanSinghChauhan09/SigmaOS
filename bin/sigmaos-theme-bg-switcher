@@ -1,0 +1,103 @@
+#!/bin/bash
+# sigmaos-theme-bg-switcher - Switch SigmaOS background/wallpaper
+# Modeled on Omancy 4.0.5 omancy-theme-bg-switcher
+#
+# Switches the desktop wallpaper using swww (preferred) or hyprpaper.
+# Stores the current background in state for persistence across sessions.
+
+set -euo pipefail
+
+WALLPAPER_DIR="${XDG_PICTURES_DIR:-$HOME/Pictures}/Wallpapers"
+BG_STATE_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/sigmaos/background"
+CURRENT_BG=""
+
+# Ensure state dir exists
+mkdir -p "$(dirname "${BG_STATE_FILE}")"
+
+# List available wallpapers
+list_wallpapers() {
+    if [ -d "${WALLPAPER_DIR}" ]; then
+        find "${WALLPAPER_DIR}" -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.webp' \) 2>/dev/null | sort
+    fi
+}
+
+# Get current background
+get_current_bg() {
+    if [ -f "${BG_STATE_FILE}" ]; then
+        cat "${BG_STATE_FILE}"
+    fi
+}
+
+# Set background via swww (preferred for Hyprland/Wayland)
+set_bg_swww() {
+    local wallpaper="$1"
+    if command -v swww >/dev/null 2>&1; then
+        swww img "${wallpaper}" --transition-type any --transition-duration 1 2>/dev/null || true
+        echo "${wallpaper}" > "${BG_STATE_FILE}"
+        echo "Background set to ${wallpaper}"
+        return 0
+    fi
+    return 1
+}
+
+# Set background via hyprpaper
+set_bg_hyprpaper() {
+    local wallpaper="$1"
+    if command -v hyprpaper >/dev/null 2>&1; then
+        pkill hyprpaper 2>/dev/null || true
+        hyprpaper &
+        sleep 1
+        hyprctl hyprpaper wallpaper ",${wallpaper}" 2>/dev/null || true
+        echo "${wallpaper}" > "${BG_STATE_FILE}"
+        echo "Background set to ${wallpaper}"
+        return 0
+    fi
+    return 1
+}
+
+case "${1:-}" in
+    list)
+        echo "Available wallpapers:"
+        list_wallpapers
+        ;;
+    current)
+        get_current_bg || echo "No background set"
+        ;;
+    next)
+        wallpapers=$(list_wallpapers)
+        current=$(get_current_bg)
+        if [ -z "${wallpapers}" ]; then
+            echo "No wallpapers found in ${WALLPAPER_DIR}" >&2
+            exit 1
+        fi
+        # Find next wallpaper after current
+        next=""
+        found=0
+        while IFS= read -r wp; do
+            if [ "${found}" -eq 1 ]; then
+                next="${wp}"
+                break
+            fi
+            if [ "${wp}" = "${current}" ]; then
+                found=1
+            fi
+        done <<< "${wallpapers}"
+        # Wrap around to first if at end
+        if [ -z "${next}" ]; then
+            next=$(echo "${wallpapers}" | head -n1)
+        fi
+        set_bg_swww "${next}" || set_bg_hyprpaper "${next}"
+        ;;
+    set)
+        wallpaper="${2:-}"
+        if [ -z "${wallpaper}" ]; then
+            echo "Usage: sigmaos-theme-bg-switcher set <wallpaper-path>" >&2
+            exit 1
+        fi
+        set_bg_swww "${wallpaper}" || set_bg_hyprpaper "${wallpaper}"
+        ;;
+    *)
+        echo "Usage: sigmaos-theme-bg-switcher <list|current|next|set <path>>" >&2
+        exit 1
+        ;;
+esac

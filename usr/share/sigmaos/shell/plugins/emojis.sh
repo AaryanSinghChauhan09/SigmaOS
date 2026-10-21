@@ -1,17 +1,16 @@
 #!/bin/bash
-# sigmaos shell plugin: emojis
+# sigmaos emoji shell plugin
 # Modeled on Omancy 4.0.5 omancy.emojis shell plugin
-# Opens an emoji picker via wofi or similar.
+# Opens emoji picker that accepts typed search input.
 
 plugin_cmd="${1:-}"
 payload="${2:-}"
 
 case "${plugin_cmd}" in
   summon)
-    if command -v wofi >/dev/null 2>&1; then
-      # Simple emoji list
-      echo -e "😀\n😃\n😄\n😁\n😆\n😅\n😂\n🤣\n😊\n😇" | wofi --show dmenu 2>/dev/null || true
-    fi
+    # The emoji picker shows available emojis.
+    # User types to search (handled by wofi/filter externally).
+    sigmaos-emoji-picker pick 2>/dev/null || true
     echo "emoji picker opened"
     ;;
   hide)

@@ -401,6 +401,19 @@ main() {
     if [[ "$FILESYSTEM" == "Btrfs" ]]; then
         mkfs.btrfs -f -L SIGMAOS-ROOT "$ROOT_PART"
         log_info "Formatted root partition as Btrfs"
+        # Create btrfs subvolumes for snapper support
+        btrfs subvolume create "${MOUNT_POINT}/@home" 2>/dev/null || true
+        btrfs subvolume create "${MOUNT_POINT}/@snapshots" 2>/dev/null || true
+        btrfs subvolume create "${MOUNT_POINT}/@var_log" 2>/dev/null || true
+        btrfs subvolume create "${MOUNT_POINT}/@var_cache_pacman" 2>/dev/null || true
+        umount "${MOUNT_POINT}" 2>/dev/null || true
+        mount -o subvol=@,compress=zstd "$ROOT_PART" "${MOUNT_POINT}"
+        mkdir -p "${MOUNT_POINT}/@home" "${MOUNT_POINT}/.snapshots" "${MOUNT_POINT}/@var_log" "${MOUNT_POINT}/@var_cache_pacman"
+        mount -o subvol=@home,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/@home"
+        mount -o subvol=@snapshots,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/.snapshots"
+        mount -o subvol=@var_log,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/@var_log"
+        mount -o subvol=@var_cache_pacman,compress=zstd "$ROOT_PART" "${MOUNT_POINT}/@var_cache_pacman"
+        log_info "Created btrfs subvolumes for snapper support"
     elif [[ "$FILESYSTEM" == "ZFS" ]]; then
         log_warn "ZFS not supported in installer, falling back to Ext4"
         mkfs.ext4 -F -L SIGMAOS-ROOT "$ROOT_PART"
@@ -566,6 +579,7 @@ EOF
     if command -v arch-chroot >/dev/null 2>&1; then
         log_info "Using arch-chroot to enable services in target"
         arch-chroot "$MOUNT_POINT" systemctl enable sddm.service 2>/dev/null || true
+        arch-chroot "$MOUNT_POINT" systemctl enable cups.service 2>/dev/null || true
         arch-chroot "$MOUNT_POINT" systemctl enable wireplumber.service 2>/dev/null || true
         arch-chroot "$MOUNT_POINT" systemctl enable plymouth-start.service 2>/dev/null || true
         arch-chroot "$MOUNT_POINT" systemctl enable sigmaos-provision-owner.service 2>/dev/null || true
@@ -578,7 +592,7 @@ EOF
     else
         # Not in a chroot-capable environment; enable via symlinks directly
         log_info "Enabling services via symlink (no chroot available)"
-        for svc in sddm wireplumber plymouth-start sigmaos-provision-owner theme-system zram-generator sigmaos-desktop-session; do
+        for svc in sddm cups wireplumber plymouth-start sigmaos-provision-owner theme-system zram-generator sigmaos-desktop-session; do
             ln -sf "/usr/lib/systemd/system/${svc}.service" "$MOUNT_POINT/etc/systemd/system/multi-user.target.wants/${svc}.service" 2>/dev/null || true
         done
     fi
