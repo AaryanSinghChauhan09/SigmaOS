@@ -222,8 +222,8 @@ impl WikiDataTransferEngine {
         self.feature_specs.insert(
             "DeviceDriverDevelopmentPlan".to_string(),
             FeatureMdStatus {
-                spec_name: "31-Device-Driver-Development-And-Maintenance-Plan.md".to_string(),
-                source_path: "wiki/31-Device-Driver-Development-And-Maintenance-Plan.md"
+                spec_name: "35-SigmaOS-Device-Driver-Development-Plan.md".to_string(),
+                source_path: "wiki/35-SigmaOS-Device-Driver-Development-Plan.md"
                     .to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
@@ -378,6 +378,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "30-SigmaOS-GUI-Development-Plan.md",
             "SigmaOS GUI Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "35-SigmaOS-Device-Driver-Development-Plan.md",
+            "SigmaOS Device Driver Development Plan PR",
             true,
         );
         self.register_spec_file(

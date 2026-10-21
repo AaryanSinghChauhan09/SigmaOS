@@ -34,6 +34,7 @@ pub mod pods;
 pub mod rootkit;
 pub mod shims;
 pub mod simulation;
+pub mod sovereign_device_driver_development_and_pr_suite;
 pub mod ubuntu_common_drivers;
 pub mod universal_support;
 pub mod usb_xhci_host;
@@ -43,6 +44,8 @@ pub mod wifi;
 pub mod wifi_broadcom_bcm4318;
 pub mod wifi_intel_iwlwifi;
 pub mod windows_compat;
+
+pub use sovereign_device_driver_development_and_pr_suite::*;
 
 pub use ahci::{
     AhciCommandFis, AhciCommandHeader, AhciController, AhciGenericHostControl, AhciPort, AhciPrdt,
