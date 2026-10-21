@@ -218,6 +218,7 @@ pub use distro::open_source_os_missing_components_v57_pr::*;
 pub use distro::open_source_os_missing_components_v60_pr::*;
 pub use distro::open_source_os_missing_components_v61_pr::*;
 pub use distro::open_source_os_missing_components_v62_pr::*;
+pub use distro::open_source_os_missing_components_v65_pr::*;
 pub use distro::open_source_os_missing_components_v66_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
