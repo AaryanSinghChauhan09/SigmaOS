@@ -111,3 +111,43 @@ fn test_monthly_milestone_completion_and_report() {
     assert!(summary.contains("SigmaOS Periodic Improvement Program Status Report"));
     assert!(summary.contains("Month 1: Reproducible QEMU x86_64 boot-to-shell [COMPLETED]"));
 }
+
+#[test]
+fn test_periodic_pr_gateway_and_proposal_formatting() {
+    let mut gateway = PeriodicStudyImproveProvePrGateway::new();
+    assert_eq!(gateway.pr_proposals.len(), 6);
+
+    let vfs_prs = gateway.search_by_domain(ComponentDomain::VfsFilesystems);
+    assert_eq!(vfs_prs.len(), 1);
+    assert_eq!(vfs_prs[0].pr_id, 103);
+
+    let formatted_desc = vfs_prs[0].format_pull_request_description();
+    assert!(formatted_desc.contains("## PR #103: VFS/Filesystems: Centralized Path Resolution"));
+    assert!(formatted_desc.contains("ADR-012: VFS Path-Resolution Hardening"));
+    assert!(formatted_desc.contains("reports/vfs/vfs_conformance.json"));
+    assert!(formatted_desc.contains("Rule 3: Runtime evidence gated status promotion"));
+
+    let summary_report = gateway.generate_pr_gateway_summary();
+    assert!(summary_report.contains("SigmaOS Periodic Study-Improve-Prove PR Gateway Report"));
+    assert!(summary_report.contains("Total Staged PR Proposals: 6"));
+
+    // Verify Rule 3 rejection when submitting unevidenced proposal
+    let bad_proposal = PeriodicImprovementPrProposal {
+        pr_id: 999,
+        pr_title: "Drivers: Untested driver promotion".into(),
+        branch_name: "feat/untested-driver".into(),
+        domain: ComponentDomain::Drivers,
+        upstream_reference: "Linux drivers".into(),
+        adr_title: "ADR-999".into(),
+        initial_maturity: ComponentMaturity::Prototype,
+        promoted_maturity: ComponentMaturity::Integrated,
+        runtime_evidence_path: None,
+        summary_diff: "+ bad_driver_code()".into(),
+        pqc_signature: "DILITHIUM5_SIG_UNTESTED".into(),
+        ci_status: "FAILED".into(),
+    };
+
+    let submit_res = gateway.submit_pr_proposal(bad_proposal);
+    assert!(submit_res.is_err());
+    assert!(submit_res.unwrap_err().contains("Rule 3 Violation"));
+}
