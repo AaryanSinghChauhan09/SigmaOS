@@ -24,7 +24,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, Ordering};
 
 /// Structured PR proposal manifest descriptor for Designcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

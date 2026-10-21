@@ -99,7 +99,7 @@ pub fn fnv1a_designcraft_patch_digest(data: &[u8]) -> u64 {
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PrototypeTrigger {
+pub enum DesigncraftFlowTrigger {
     OnClick,
     OnHover,
     OnDrag,
@@ -108,7 +108,7 @@ pub enum PrototypeTrigger {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PrototypeTransition {
+pub enum DesigncraftFlowTransition {
     Instant,
     Dissolve,
     SmartAnimate,
@@ -117,7 +117,7 @@ pub enum PrototypeTransition {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PrototypeActionTarget {
+pub enum DesigncraftFlowActionTarget {
     NavigateTo(u32),
     OpenOverlay(u32),
     CloseOverlay,
@@ -126,23 +126,24 @@ pub enum PrototypeActionTarget {
 }
 
 #[derive(Debug, Clone)]
-pub struct PrototypeInteraction {
+pub struct DesigncraftFlowInteraction {
     pub interaction_id: u32,
     pub source_element_id: u32,
-    pub trigger: PrototypeTrigger,
-    pub action: PrototypeActionTarget,
-    pub transition: PrototypeTransition,
+    pub trigger: DesigncraftFlowTrigger,
+    pub action: DesigncraftFlowActionTarget,
+    pub transition: DesigncraftFlowTransition,
     pub duration_ms: u32,
 }
 
-pub struct DesigncraftInteractivePrototypingPrEngine {
-    pub interactions: BTreeMap<u32, PrototypeInteraction>,
+#[derive(Debug)]
+pub struct DesigncraftInteractivePrototypingFlowPrEngine {
+    pub interactions: BTreeMap<u32, DesigncraftFlowInteraction>,
     pub active_screen_id: u32,
     pub overlay_stack: Vec<u32>,
     pub next_interaction_id: AtomicU32,
 }
 
-impl DesigncraftInteractivePrototypingPrEngine {
+impl DesigncraftInteractivePrototypingFlowPrEngine {
     pub fn new() -> Self {
         Self {
             interactions: BTreeMap::new(),
@@ -155,13 +156,13 @@ impl DesigncraftInteractivePrototypingPrEngine {
     pub fn add_interaction(
         &mut self,
         source_element_id: u32,
-        trigger: PrototypeTrigger,
-        action: PrototypeActionTarget,
-        transition: PrototypeTransition,
+        trigger: DesigncraftFlowTrigger,
+        action: DesigncraftFlowActionTarget,
+        transition: DesigncraftFlowTransition,
         duration_ms: u32,
     ) -> u32 {
         let id = self.next_interaction_id.fetch_add(1, Ordering::Relaxed);
-        let interaction = PrototypeInteraction {
+        let interaction = DesigncraftFlowInteraction {
             interaction_id: id,
             source_element_id,
             trigger,
@@ -176,7 +177,7 @@ impl DesigncraftInteractivePrototypingPrEngine {
     pub fn trigger_event(
         &mut self,
         source_element_id: u32,
-        trigger_type: PrototypeTrigger,
+        trigger_type: DesigncraftFlowTrigger,
     ) -> bool {
         let mut triggered = false;
         let keys: Vec<u32> = self.interactions.keys().cloned().collect();
@@ -184,17 +185,17 @@ impl DesigncraftInteractivePrototypingPrEngine {
             if let Some(inter) = self.interactions.get(&k) {
                 if inter.source_element_id == source_element_id && inter.trigger == trigger_type {
                     match inter.action {
-                        PrototypeActionTarget::NavigateTo(screen_id) => {
+                        DesigncraftFlowActionTarget::NavigateTo(screen_id) => {
                             self.active_screen_id = screen_id;
                             self.overlay_stack.clear();
                         }
-                        PrototypeActionTarget::OpenOverlay(overlay_id) => {
+                        DesigncraftFlowActionTarget::OpenOverlay(overlay_id) => {
                             self.overlay_stack.push(overlay_id);
                         }
-                        PrototypeActionTarget::CloseOverlay => {
+                        DesigncraftFlowActionTarget::CloseOverlay => {
                             self.overlay_stack.pop();
                         }
-                        PrototypeActionTarget::ScrollTo(_) | PrototypeActionTarget::Back => {}
+                        DesigncraftFlowActionTarget::ScrollTo(_) | DesigncraftFlowActionTarget::Back => {}
                     }
                     triggered = true;
                     break;
@@ -221,24 +222,26 @@ impl DesigncraftInteractivePrototypingPrEngine {
     }
 }
 
-impl Default for DesigncraftInteractivePrototypingPrEngine {
+impl Default for DesigncraftInteractivePrototypingFlowPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftInteractivePrototypingPrEngine = DesigncraftInteractivePrototypingFlowPrEngine;
 
 // ============================================================================
 // 2. AUTO-LAYOUT & RESPONSIVE FLEXBOX CONTAINER ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FlexDirection {
+pub enum DesigncraftFlexDirection {
     Horizontal,
     Vertical,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum FlexAlign {
+pub enum DesigncraftFlexAlign {
     Start,
     Center,
     End,
@@ -246,14 +249,14 @@ pub enum FlexAlign {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ResizingConstraint {
+pub enum DesigncraftResizingConstraint {
     Fixed,
     HugContent,
     FillContainer,
 }
 
 #[derive(Debug, Clone)]
-pub struct Padding {
+pub struct DesigncraftPadding {
     pub top: f32,
     pub right: f32,
     pub bottom: f32,
@@ -261,30 +264,31 @@ pub struct Padding {
 }
 
 #[derive(Debug, Clone)]
-pub struct AutoLayoutFrame {
+pub struct DesigncraftFlexAutoLayoutFrame {
     pub frame_id: u32,
-    pub direction: FlexDirection,
-    pub primary_align: FlexAlign,
-    pub counter_align: FlexAlign,
-    pub padding: Padding,
+    pub direction: DesigncraftFlexDirection,
+    pub primary_align: DesigncraftFlexAlign,
+    pub counter_align: DesigncraftFlexAlign,
+    pub padding: DesigncraftPadding,
     pub item_gap: f32,
-    pub horizontal_resizing: ResizingConstraint,
-    pub vertical_resizing: ResizingConstraint,
+    pub horizontal_resizing: DesigncraftResizingConstraint,
+    pub vertical_resizing: DesigncraftResizingConstraint,
     pub child_element_ids: Vec<u32>,
 }
 
-pub struct DesigncraftAutoLayoutFlexEngine {
-    pub frames: BTreeMap<u32, AutoLayoutFrame>,
+#[derive(Debug)]
+pub struct DesigncraftAutoLayoutFlexContainerPrEngine {
+    pub frames: BTreeMap<u32, DesigncraftFlexAutoLayoutFrame>,
 }
 
-impl DesigncraftAutoLayoutFlexEngine {
+impl DesigncraftAutoLayoutFlexContainerPrEngine {
     pub fn new() -> Self {
         Self {
             frames: BTreeMap::new(),
         }
     }
 
-    pub fn register_frame(&mut self, frame: AutoLayoutFrame) {
+    pub fn register_frame(&mut self, frame: DesigncraftFlexAutoLayoutFrame) {
         self.frames.insert(frame.frame_id, frame);
     }
 
@@ -308,13 +312,13 @@ impl DesigncraftAutoLayoutFlexEngine {
         let gaps = (child_sizes.len().saturating_sub(1)) as f32 * frame.item_gap;
 
         match frame.direction {
-            FlexDirection::Horizontal => {
+            DesigncraftFlexDirection::Horizontal => {
                 let sum_width: f32 = child_sizes.iter().map(|s| s.0).sum();
                 let max_height: f32 = child_sizes.iter().map(|s| s.1).fold(0.0, f32::max);
                 total_width += sum_width + gaps;
                 total_height += max_height;
             }
-            FlexDirection::Vertical => {
+            DesigncraftFlexDirection::Vertical => {
                 let max_width: f32 = child_sizes.iter().map(|s| s.0).fold(0.0, f32::max);
                 let sum_height: f32 = child_sizes.iter().map(|s| s.1).sum();
                 total_width += max_width;
@@ -342,18 +346,20 @@ impl DesigncraftAutoLayoutFlexEngine {
     }
 }
 
-impl Default for DesigncraftAutoLayoutFlexEngine {
+impl Default for DesigncraftAutoLayoutFlexContainerPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftAutoLayoutFlexEngine = DesigncraftAutoLayoutFlexContainerPrEngine;
 
 // ============================================================================
 // 3. DESIGN SYSTEM TOKENS & VARIABLE MODES ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum DesignVariableValue {
+pub enum DesigncraftVariableValue {
     Color(String),
     Number(f32),
     StringVal(String),
@@ -362,7 +368,7 @@ pub enum DesignVariableValue {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum VariableScope {
+pub enum DesigncraftVariableScope {
     Fills,
     Strokes,
     Typography,
@@ -371,18 +377,19 @@ pub enum VariableScope {
 }
 
 #[derive(Debug, Clone)]
-pub struct DesignVariable {
+pub struct DesigncraftSystemVariable {
     pub key: String,
-    pub scope: VariableScope,
-    pub values_by_mode: BTreeMap<String, DesignVariableValue>,
+    pub scope: DesigncraftVariableScope,
+    pub values_by_mode: BTreeMap<String, DesigncraftVariableValue>,
 }
 
-pub struct DesigncraftDesignSystemVariablesEngine {
-    pub variables: BTreeMap<String, DesignVariable>,
+#[derive(Debug)]
+pub struct DesigncraftDesignSystemVariablesThemePrEngine {
+    pub variables: BTreeMap<String, DesigncraftSystemVariable>,
     pub active_mode: String,
 }
 
-impl DesigncraftDesignSystemVariablesEngine {
+impl DesigncraftDesignSystemVariablesThemePrEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             variables: BTreeMap::new(),
@@ -393,31 +400,31 @@ impl DesigncraftDesignSystemVariablesEngine {
     }
 
     fn init_default_tokens(&mut self) {
-        let mut primary_color = DesignVariable {
+        let mut primary_color = DesigncraftSystemVariable {
             key: String::from("color.brand.primary"),
-            scope: VariableScope::Fills,
+            scope: DesigncraftVariableScope::Fills,
             values_by_mode: BTreeMap::new(),
         };
         primary_color.values_by_mode.insert(
             String::from("Light"),
-            DesignVariableValue::Color(String::from("#0066FF")),
+            DesigncraftVariableValue::Color(String::from("#0066FF")),
         );
         primary_color.values_by_mode.insert(
             String::from("Dark"),
-            DesignVariableValue::Color(String::from("#3385FF")),
+            DesigncraftVariableValue::Color(String::from("#3385FF")),
         );
 
-        let mut spacing_unit = DesignVariable {
+        let mut spacing_unit = DesigncraftSystemVariable {
             key: String::from("spacing.md"),
-            scope: VariableScope::Gap,
+            scope: DesigncraftVariableScope::Gap,
             values_by_mode: BTreeMap::new(),
         };
         spacing_unit
             .values_by_mode
-            .insert(String::from("Light"), DesignVariableValue::Number(16.0));
+            .insert(String::from("Light"), DesigncraftVariableValue::Number(16.0));
         spacing_unit
             .values_by_mode
-            .insert(String::from("Dark"), DesignVariableValue::Number(16.0));
+            .insert(String::from("Dark"), DesigncraftVariableValue::Number(16.0));
 
         self.variables
             .insert(primary_color.key.clone(), primary_color);
@@ -429,7 +436,7 @@ impl DesigncraftDesignSystemVariablesEngine {
         self.active_mode = mode;
     }
 
-    pub fn get_variable_value(&self, key: &str) -> Option<DesignVariableValue> {
+    pub fn get_variable_value(&self, key: &str) -> Option<DesigncraftVariableValue> {
         let var = self.variables.get(key)?;
         var.values_by_mode.get(&self.active_mode).cloned()
     }
@@ -451,18 +458,20 @@ impl DesigncraftDesignSystemVariablesEngine {
     }
 }
 
-impl Default for DesigncraftDesignSystemVariablesEngine {
+impl Default for DesigncraftDesignSystemVariablesThemePrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftDesignSystemVariablesEngine = DesigncraftDesignSystemVariablesThemePrEngine;
 
 // ============================================================================
 // 4. BOOLEAN OPERATIONS & VECTOR GEOMETRY ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BooleanOpType {
+pub enum DesigncraftBooleanOpType {
     Union,
     Subtract,
     Intersect,
@@ -470,21 +479,21 @@ pub enum BooleanOpType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StrokeCap {
+pub enum DesigncraftStrokeCap {
     Butt,
     Round,
     Square,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum StrokeJoin {
+pub enum DesigncraftStrokeJoin {
     Miter,
     Round,
     Bevel,
 }
 
 #[derive(Debug, Clone)]
-pub struct BezierKnot {
+pub struct DesigncraftBezierKnot {
     pub x: f32,
     pub y: f32,
     pub handle_in_x: f32,
@@ -494,33 +503,34 @@ pub struct BezierKnot {
 }
 
 #[derive(Debug, Clone)]
-pub struct VectorPath {
+pub struct DesigncraftVectorPath {
     pub id: u32,
     pub name: String,
-    pub knots: Vec<BezierKnot>,
+    pub knots: Vec<DesigncraftBezierKnot>,
     pub closed: bool,
 }
 
-pub struct DesigncraftVectorGeometryEngine {
-    pub paths: BTreeMap<u32, VectorPath>,
-    pub cap: StrokeCap,
-    pub join: StrokeJoin,
+#[derive(Debug)]
+pub struct DesigncraftVectorGeometryBooleanOpsPrEngine {
+    pub paths: BTreeMap<u32, DesigncraftVectorPath>,
+    pub cap: DesigncraftStrokeCap,
+    pub join: DesigncraftStrokeJoin,
     pub next_path_id: AtomicU32,
 }
 
-impl DesigncraftVectorGeometryEngine {
+impl DesigncraftVectorGeometryBooleanOpsPrEngine {
     pub fn new() -> Self {
         Self {
             paths: BTreeMap::new(),
-            cap: StrokeCap::Round,
-            join: StrokeJoin::Round,
+            cap: DesigncraftStrokeCap::Round,
+            join: DesigncraftStrokeJoin::Round,
             next_path_id: AtomicU32::new(1),
         }
     }
 
-    pub fn create_path(&mut self, name: String, knots: Vec<BezierKnot>, closed: bool) -> u32 {
+    pub fn create_path(&mut self, name: String, knots: Vec<DesigncraftBezierKnot>, closed: bool) -> u32 {
         let id = self.next_path_id.fetch_add(1, Ordering::Relaxed);
-        let path = VectorPath {
+        let path = DesigncraftVectorPath {
             id,
             name,
             knots,
@@ -534,17 +544,17 @@ impl DesigncraftVectorGeometryEngine {
         &mut self,
         path_a_id: u32,
         path_b_id: u32,
-        op: BooleanOpType,
+        op: DesigncraftBooleanOpType,
     ) -> Option<u32> {
         let path_a = self.paths.get(&path_a_id)?.clone();
         let path_b = self.paths.get(&path_b_id)?.clone();
 
         let mut combined_knots = path_a.knots;
         match op {
-            BooleanOpType::Union => {
+            DesigncraftBooleanOpType::Union => {
                 combined_knots.extend(path_b.knots);
             }
-            BooleanOpType::Subtract => {
+            DesigncraftBooleanOpType::Subtract => {
                 combined_knots.retain(|k| {
                     !path_b
                         .knots
@@ -552,7 +562,7 @@ impl DesigncraftVectorGeometryEngine {
                         .any(|bk| (bk.x - k.x).abs() < 0.001 && (bk.y - k.y).abs() < 0.001)
                 });
             }
-            BooleanOpType::Intersect => {
+            DesigncraftBooleanOpType::Intersect => {
                 combined_knots.retain(|k| {
                     path_b
                         .knots
@@ -560,7 +570,7 @@ impl DesigncraftVectorGeometryEngine {
                         .any(|bk| (bk.x - k.x).abs() < 0.001 && (bk.y - k.y).abs() < 0.001)
                 });
             }
-            BooleanOpType::Exclude => {
+            DesigncraftBooleanOpType::Exclude => {
                 combined_knots.extend(path_b.knots);
             }
         }
@@ -591,18 +601,20 @@ impl DesigncraftVectorGeometryEngine {
     }
 }
 
-impl Default for DesigncraftVectorGeometryEngine {
+impl Default for DesigncraftVectorGeometryBooleanOpsPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftVectorGeometryEngine = DesigncraftVectorGeometryBooleanOpsPrEngine;
 
 // ============================================================================
 // 5. REAL-TIME MULTIPLAYER CRDT ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct UserCursor {
+pub struct DesigncraftCrdtUserCursor {
     pub user_id: u32,
     pub user_name: String,
     pub cursor_x: f32,
@@ -611,7 +623,7 @@ pub struct UserCursor {
 }
 
 #[derive(Debug, Clone)]
-pub struct CrdtOpLog {
+pub struct DesigncraftCrdtOpLog {
     pub op_id: u64,
     pub user_id: u32,
     pub op_type: String,
@@ -619,13 +631,14 @@ pub struct CrdtOpLog {
     pub timestamp: u64,
 }
 
-pub struct DesigncraftMultiplayerCrdtEngine {
-    pub connected_users: BTreeMap<u32, UserCursor>,
-    pub op_history: Vec<CrdtOpLog>,
+#[derive(Debug)]
+pub struct DesigncraftMultiplayerCrdtStateSyncPrEngine {
+    pub connected_users: BTreeMap<u32, DesigncraftCrdtUserCursor>,
+    pub op_history: Vec<DesigncraftCrdtOpLog>,
     pub next_op_id: AtomicU32,
 }
 
-impl DesigncraftMultiplayerCrdtEngine {
+impl DesigncraftMultiplayerCrdtStateSyncPrEngine {
     pub fn new() -> Self {
         Self {
             connected_users: BTreeMap::new(),
@@ -635,7 +648,7 @@ impl DesigncraftMultiplayerCrdtEngine {
     }
 
     pub fn update_user_cursor(&mut self, user_id: u32, user_name: String, x: f32, y: f32) {
-        let entry = self.connected_users.entry(user_id).or_insert(UserCursor {
+        let entry = self.connected_users.entry(user_id).or_insert(DesigncraftCrdtUserCursor {
             user_id,
             user_name,
             cursor_x: x,
@@ -648,7 +661,7 @@ impl DesigncraftMultiplayerCrdtEngine {
 
     pub fn push_crdt_op(&mut self, user_id: u32, op_type: String, target_element_id: u32) -> u64 {
         let op_id = self.next_op_id.fetch_add(1, Ordering::Relaxed) as u64;
-        let log = CrdtOpLog {
+        let log = DesigncraftCrdtOpLog {
             op_id,
             user_id,
             op_type,
@@ -678,18 +691,20 @@ impl DesigncraftMultiplayerCrdtEngine {
     }
 }
 
-impl Default for DesigncraftMultiplayerCrdtEngine {
+impl Default for DesigncraftMultiplayerCrdtStateSyncPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftMultiplayerCrdtEngine = DesigncraftMultiplayerCrdtStateSyncPrEngine;
 
 // ============================================================================
 // 6. DESIGN-TO-CODE & MULTI-FRAMEWORK EXPORTER ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CodeFrameworkTarget {
+pub enum DesigncraftCodeExportFrameworkTarget {
     CssTailwind,
     ReactJsx,
     VueSvelte,
@@ -697,12 +712,13 @@ pub enum CodeFrameworkTarget {
     SvgPdfMarkup,
 }
 
-pub struct DesigncraftCodeExportEngine {
-    pub target: CodeFrameworkTarget,
+#[derive(Debug)]
+pub struct DesigncraftCodeExporterMultiFrameworkPrEngine {
+    pub target: DesigncraftCodeExportFrameworkTarget,
 }
 
-impl DesigncraftCodeExportEngine {
-    pub fn new(target: CodeFrameworkTarget) -> Self {
+impl DesigncraftCodeExporterMultiFrameworkPrEngine {
+    pub fn new(target: DesigncraftCodeExportFrameworkTarget) -> Self {
         Self { target }
     }
 
@@ -715,25 +731,25 @@ impl DesigncraftCodeExportEngine {
         height: f32,
     ) -> String {
         match self.target {
-            CodeFrameworkTarget::CssTailwind => {
+            DesigncraftCodeExportFrameworkTarget::CssTailwind => {
                 format!(
                     "className=\"absolute left-[{}px] top-[{}px] w-[{}px] h-[{}px]\"",
                     x, y, width, height
                 )
             }
-            CodeFrameworkTarget::ReactJsx => {
+            DesigncraftCodeExportFrameworkTarget::ReactJsx => {
                 format!("<div id=\"{}\" style={{{{ position: 'absolute', left: '{}px', top: '{}px', width: '{}px', height: '{}px' }}}} />", element_name, x, y, width, height)
             }
-            CodeFrameworkTarget::VueSvelte => {
+            DesigncraftCodeExportFrameworkTarget::VueSvelte => {
                 format!("<div class=\"{}\" style=\"position: absolute; left: {}px; top: {}px; width: {}px; height: {}px;\"></div>", element_name, x, y, width, height)
             }
-            CodeFrameworkTarget::FlutterSwiftUI => {
+            DesigncraftCodeExportFrameworkTarget::FlutterSwiftUI => {
                 format!(
                     "Positioned(left: {}, top: {}, width: {}, height: {}, child: Container())",
                     x, y, width, height
                 )
             }
-            CodeFrameworkTarget::SvgPdfMarkup => {
+            DesigncraftCodeExportFrameworkTarget::SvgPdfMarkup => {
                 format!(
                     "<rect id=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" />",
                     element_name, x, y, width, height
@@ -759,24 +775,27 @@ impl DesigncraftCodeExportEngine {
     }
 }
 
+pub type DesigncraftCodeExportEngine = DesigncraftCodeExporterMultiFrameworkPrEngine;
+
 // ============================================================================
 // 7. COMPONENT VARIANTS & STATE MACHINE ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct ComponentVariant {
+pub struct DesigncraftComponentVariantState {
     pub variant_id: u32,
     pub variant_name: String,
     pub state: String, // e.g. "Default", "Hover", "Pressed", "Disabled"
     pub property_overrides: BTreeMap<String, String>,
 }
 
-pub struct DesigncraftComponentVariantsPrEngine {
-    pub variants: BTreeMap<u32, ComponentVariant>,
+#[derive(Debug)]
+pub struct DesigncraftComponentVariantsStateMachinePrEngine {
+    pub variants: BTreeMap<u32, DesigncraftComponentVariantState>,
     pub next_variant_id: AtomicU32,
 }
 
-impl DesigncraftComponentVariantsPrEngine {
+impl DesigncraftComponentVariantsStateMachinePrEngine {
     pub fn new() -> Self {
         Self {
             variants: BTreeMap::new(),
@@ -786,7 +805,7 @@ impl DesigncraftComponentVariantsPrEngine {
 
     pub fn add_variant(&mut self, variant_name: String, state: String) -> u32 {
         let id = self.next_variant_id.fetch_add(1, Ordering::Relaxed);
-        let variant = ComponentVariant {
+        let variant = DesigncraftComponentVariantState {
             variant_id: id,
             variant_name,
             state,
@@ -827,25 +846,28 @@ impl DesigncraftComponentVariantsPrEngine {
     }
 }
 
-impl Default for DesigncraftComponentVariantsPrEngine {
+impl Default for DesigncraftComponentVariantsStateMachinePrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftComponentVariantsPrEngine = DesigncraftComponentVariantsStateMachinePrEngine;
 
 // ============================================================================
 // 8. DESIGN TOKENS & W3C STYLE DICTIONARY ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct W3cDesignToken {
+pub struct DesigncraftW3cDesignToken {
     pub name: String,
     pub token_type: String, // "color", "dimension", "fontFamily"
     pub value: String,
 }
 
+#[derive(Debug)]
 pub struct DesigncraftDesignTokensStyleDictionaryPrEngine {
-    pub tokens: BTreeMap<String, W3cDesignToken>,
+    pub tokens: BTreeMap<String, DesigncraftW3cDesignToken>,
 }
 
 impl DesigncraftDesignTokensStyleDictionaryPrEngine {
@@ -859,7 +881,7 @@ impl DesigncraftDesignTokensStyleDictionaryPrEngine {
     }
 
     pub fn register_token(&mut self, name: &str, token_type: &str, value: &str) {
-        let token = W3cDesignToken {
+        let token = DesigncraftW3cDesignToken {
             name: name.to_string(),
             token_type: token_type.to_string(),
             value: value.to_string(),
@@ -907,17 +929,18 @@ impl Default for DesigncraftDesignTokensStyleDictionaryPrEngine {
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct VectorIconSymbol {
+pub struct DesigncraftVectorIconSymbol {
     pub symbol_id: String,
     pub svg_path_d: String,
     pub view_box: String,
 }
 
-pub struct DesigncraftIconSystemPackagingPrEngine {
-    pub icons: BTreeMap<String, VectorIconSymbol>,
+#[derive(Debug)]
+pub struct DesigncraftIconSystemPackagingSymbolsPrEngine {
+    pub icons: BTreeMap<String, DesigncraftVectorIconSymbol>,
 }
 
-impl DesigncraftIconSystemPackagingPrEngine {
+impl DesigncraftIconSystemPackagingSymbolsPrEngine {
     pub fn new() -> Self {
         let mut engine = Self {
             icons: BTreeMap::new(),
@@ -931,7 +954,7 @@ impl DesigncraftIconSystemPackagingPrEngine {
     }
 
     pub fn add_icon(&mut self, symbol_id: &str, svg_path_d: &str, view_box: &str) {
-        let icon = VectorIconSymbol {
+        let icon = DesigncraftVectorIconSymbol {
             symbol_id: symbol_id.to_string(),
             svg_path_d: svg_path_d.to_string(),
             view_box: view_box.to_string(),
@@ -969,24 +992,26 @@ impl DesigncraftIconSystemPackagingPrEngine {
     }
 }
 
-impl Default for DesigncraftIconSystemPackagingPrEngine {
+impl Default for DesigncraftIconSystemPackagingSymbolsPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
+
+pub type DesigncraftIconSystemPackagingPrEngine = DesigncraftIconSystemPackagingSymbolsPrEngine;
 
 // ============================================================================
 // 10. DESIGN ACCESSIBILITY & WCAG CONTRAST AUDIT ENGINE
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct RgbColor {
+pub struct DesigncraftRgbColor {
     pub r: u8,
     pub g: u8,
     pub b: u8,
 }
 
-impl RgbColor {
+impl DesigncraftRgbColor {
     /// Calculate relative luminance according to WCAG 2.1 formula
     pub fn relative_luminance(&self) -> f32 {
         let convert = |c: u8| -> f32 {
@@ -995,7 +1020,6 @@ impl RgbColor {
                 s / 12.92
             } else {
                 let base = (s + 0.055) / 1.055;
-                // Approximation of powf(2.4) using base * base * sqrt(base)
                 base * base * (1.0 + 0.4 * (base - 1.0))
             }
         };
@@ -1008,7 +1032,7 @@ impl RgbColor {
     }
 
     /// Calculate WCAG contrast ratio between two colors (range 1.0 to 21.0)
-    pub fn contrast_ratio_with(&self, other: &RgbColor) -> f32 {
+    pub fn contrast_ratio_with(&self, other: &DesigncraftRgbColor) -> f32 {
         let l1 = self.relative_luminance();
         let l2 = other.relative_luminance();
 
@@ -1017,18 +1041,19 @@ impl RgbColor {
     }
 }
 
-pub struct DesigncraftAccessibilityAuditLintPrEngine {
+#[derive(Debug)]
+pub struct DesigncraftAccessibilityAuditWcagLintPrEngine {
     pub min_touch_target: f32,
 }
 
-impl DesigncraftAccessibilityAuditLintPrEngine {
+impl DesigncraftAccessibilityAuditWcagLintPrEngine {
     pub fn new() -> Self {
         Self {
             min_touch_target: 44.0,
         }
     }
 
-    pub fn audit_contrast(&self, fg: RgbColor, bg: RgbColor) -> (f32, bool, bool) {
+    pub fn audit_contrast(&self, fg: DesigncraftRgbColor, bg: DesigncraftRgbColor) -> (f32, bool, bool) {
         let ratio = fg.contrast_ratio_with(&bg);
         let passes_aa = ratio >= 4.5;
         let passes_aaa = ratio >= 7.0;
@@ -1059,46 +1084,49 @@ impl DesigncraftAccessibilityAuditLintPrEngine {
     }
 }
 
-impl Default for DesigncraftAccessibilityAuditLintPrEngine {
+impl Default for DesigncraftAccessibilityAuditWcagLintPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
+pub type DesigncraftAccessibilityAuditLintPrEngine = DesigncraftAccessibilityAuditWcagLintPrEngine;
+
 // ============================================================================
 // SOVEREIGN DESIGNCRAFT ARTCRAFT PARITY PR GATEWAY
 // ============================================================================
 
-pub struct SovereignDesigncraftArtcraftParityPrGateway {
+#[derive(Debug)]
+pub struct SovereignDesigncraftMissingComponentsParityPrGateway {
     pub pr_proposals: BTreeMap<u32, DesigncraftPrProposalSpec>,
-    pub prototyping_engine: DesigncraftInteractivePrototypingPrEngine,
-    pub auto_layout_engine: DesigncraftAutoLayoutFlexEngine,
-    pub variables_engine: DesigncraftDesignSystemVariablesEngine,
-    pub geometry_engine: DesigncraftVectorGeometryEngine,
-    pub crdt_engine: DesigncraftMultiplayerCrdtEngine,
-    pub exporter_engine: DesigncraftCodeExportEngine,
-    pub variants_engine: DesigncraftComponentVariantsPrEngine,
+    pub prototyping_engine: DesigncraftInteractivePrototypingFlowPrEngine,
+    pub auto_layout_engine: DesigncraftAutoLayoutFlexContainerPrEngine,
+    pub variables_engine: DesigncraftDesignSystemVariablesThemePrEngine,
+    pub geometry_engine: DesigncraftVectorGeometryBooleanOpsPrEngine,
+    pub crdt_engine: DesigncraftMultiplayerCrdtStateSyncPrEngine,
+    pub exporter_engine: DesigncraftCodeExporterMultiFrameworkPrEngine,
+    pub variants_engine: DesigncraftComponentVariantsStateMachinePrEngine,
     pub tokens_dictionary_engine: DesigncraftDesignTokensStyleDictionaryPrEngine,
-    pub icon_packaging_engine: DesigncraftIconSystemPackagingPrEngine,
-    pub accessibility_audit_engine: DesigncraftAccessibilityAuditLintPrEngine,
+    pub icon_packaging_engine: DesigncraftIconSystemPackagingSymbolsPrEngine,
+    pub accessibility_audit_engine: DesigncraftAccessibilityAuditWcagLintPrEngine,
     pub next_pr_id: u32,
     pub is_active: AtomicBool,
 }
 
-impl SovereignDesigncraftArtcraftParityPrGateway {
+impl SovereignDesigncraftMissingComponentsParityPrGateway {
     pub fn new() -> Self {
         let mut gateway = Self {
             pr_proposals: BTreeMap::new(),
-            prototyping_engine: DesigncraftInteractivePrototypingPrEngine::new(),
-            auto_layout_engine: DesigncraftAutoLayoutFlexEngine::new(),
-            variables_engine: DesigncraftDesignSystemVariablesEngine::new(),
-            geometry_engine: DesigncraftVectorGeometryEngine::new(),
-            crdt_engine: DesigncraftMultiplayerCrdtEngine::new(),
-            exporter_engine: DesigncraftCodeExportEngine::new(CodeFrameworkTarget::CssTailwind),
-            variants_engine: DesigncraftComponentVariantsPrEngine::new(),
+            prototyping_engine: DesigncraftInteractivePrototypingFlowPrEngine::new(),
+            auto_layout_engine: DesigncraftAutoLayoutFlexContainerPrEngine::new(),
+            variables_engine: DesigncraftDesignSystemVariablesThemePrEngine::new(),
+            geometry_engine: DesigncraftVectorGeometryBooleanOpsPrEngine::new(),
+            crdt_engine: DesigncraftMultiplayerCrdtStateSyncPrEngine::new(),
+            exporter_engine: DesigncraftCodeExporterMultiFrameworkPrEngine::new(DesigncraftCodeExportFrameworkTarget::CssTailwind),
+            variants_engine: DesigncraftComponentVariantsStateMachinePrEngine::new(),
             tokens_dictionary_engine: DesigncraftDesignTokensStyleDictionaryPrEngine::new(),
-            icon_packaging_engine: DesigncraftIconSystemPackagingPrEngine::new(),
-            accessibility_audit_engine: DesigncraftAccessibilityAuditLintPrEngine::new(),
+            icon_packaging_engine: DesigncraftIconSystemPackagingSymbolsPrEngine::new(),
+            accessibility_audit_engine: DesigncraftAccessibilityAuditWcagLintPrEngine::new(),
             next_pr_id: 3001,
             is_active: AtomicBool::new(true),
         };
@@ -1213,40 +1241,40 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         // 1. Verify Prototyping
         let inter_id = self.prototyping_engine.add_interaction(
             10,
-            PrototypeTrigger::OnClick,
-            PrototypeActionTarget::NavigateTo(2),
-            PrototypeTransition::SmartAnimate,
+            DesigncraftFlowTrigger::OnClick,
+            DesigncraftFlowActionTarget::NavigateTo(2),
+            DesigncraftFlowTransition::SmartAnimate,
             300,
         );
         assert!(inter_id >= 100);
         let triggered = self
             .prototyping_engine
-            .trigger_event(10, PrototypeTrigger::OnClick);
+            .trigger_event(10, DesigncraftFlowTrigger::OnClick);
         assert!(triggered);
         assert_eq!(self.prototyping_engine.active_screen_id, 2);
 
         // 2. Verify Auto-Layout Flex
-        self.auto_layout_engine.register_frame(AutoLayoutFrame {
+        self.auto_layout_engine.register_frame(DesigncraftFlexAutoLayoutFrame {
             frame_id: 1,
-            direction: FlexDirection::Horizontal,
-            primary_align: FlexAlign::Start,
-            counter_align: FlexAlign::Center,
-            padding: Padding {
+            direction: DesigncraftFlexDirection::Horizontal,
+            primary_align: DesigncraftFlexAlign::Start,
+            counter_align: DesigncraftFlexAlign::Center,
+            padding: DesigncraftPadding {
                 top: 10.0,
                 right: 10.0,
                 bottom: 10.0,
                 left: 10.0,
             },
             item_gap: 8.0,
-            horizontal_resizing: ResizingConstraint::HugContent,
-            vertical_resizing: ResizingConstraint::HugContent,
+            horizontal_resizing: DesigncraftResizingConstraint::HugContent,
+            vertical_resizing: DesigncraftResizingConstraint::HugContent,
             child_element_ids: Vec::new(),
         });
         let (w, h) = self
             .auto_layout_engine
             .compute_frame_dimensions(1, &[(100.0, 40.0), (120.0, 40.0)]);
-        assert_eq!(w, 248.0); // 10 + 100 + 8 + 120 + 10
-        assert_eq!(h, 60.0); // 10 + 40 + 10
+        assert_eq!(w, 248.0);
+        assert_eq!(h, 60.0);
 
         // 3. Verify Design Tokens
         let token = self
@@ -1255,7 +1283,7 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         assert!(token.is_some());
 
         // 4. Verify Geometry
-        let knot1 = BezierKnot {
+        let knot1 = DesigncraftBezierKnot {
             x: 0.0,
             y: 0.0,
             handle_in_x: -5.0,
@@ -1271,7 +1299,7 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
             .create_path(String::from("PathB"), vec![knot1], true);
         let merged_p = self
             .geometry_engine
-            .perform_boolean_op(p1, p2, BooleanOpType::Union);
+            .perform_boolean_op(p1, p2, DesigncraftBooleanOpType::Union);
         assert!(merged_p.is_some());
         assert_eq!(
             self.geometry_engine
@@ -1313,8 +1341,8 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
         assert!(sprite.contains("symbol id=\"check\""));
 
         // 10. Verify Accessibility Audit
-        let black = RgbColor { r: 0, g: 0, b: 0 };
-        let white = RgbColor {
+        let black = DesigncraftRgbColor { r: 0, g: 0, b: 0 };
+        let white = DesigncraftRgbColor {
             r: 255,
             g: 255,
             b: 255,
@@ -1332,9 +1360,36 @@ impl SovereignDesigncraftArtcraftParityPrGateway {
     }
 }
 
-impl Default for SovereignDesigncraftArtcraftParityPrGateway {
+impl Default for SovereignDesigncraftMissingComponentsParityPrGateway {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub type SovereignDesigncraftArtcraftParityPrGateway = SovereignDesigncraftMissingComponentsParityPrGateway;
+
+// ============================================================================
+// MASTER SUITE FOR DESIGNCRAFT MISSING COMPONENTS
+// ============================================================================
+
+#[derive(Debug, Default)]
+pub struct DesigncraftMissingComponentsParityPrSuite {
+    pub gateway: SovereignDesigncraftMissingComponentsParityPrGateway,
+}
+
+impl DesigncraftMissingComponentsParityPrSuite {
+    pub fn new() -> Self {
+        Self {
+            gateway: SovereignDesigncraftMissingComponentsParityPrGateway::new(),
+        }
+    }
+
+    pub fn verify_complete_parity(&mut self) -> bool {
+        self.gateway.execute_and_verify_all_prs() && self.gateway.get_merged_pr_count() == 10
+    }
+
+    pub fn total_pr_proposals(&self) -> usize {
+        self.gateway.collect_all_proposals().len()
     }
 }
 
@@ -1348,7 +1403,7 @@ mod tests {
 
     #[test]
     fn test_designcraft_pr_gateway_staging() {
-        let gateway = SovereignDesigncraftArtcraftParityPrGateway::new();
+        let gateway = SovereignDesigncraftMissingComponentsParityPrGateway::new();
         assert_eq!(gateway.get_merged_pr_count(), 10);
 
         let diff = gateway.generate_pr_diff_patch(3001);
@@ -1367,13 +1422,13 @@ mod tests {
 
     #[test]
     fn test_designcraft_pr_gateway_execution() {
-        let mut gateway = SovereignDesigncraftArtcraftParityPrGateway::new();
+        let mut gateway = SovereignDesigncraftMissingComponentsParityPrGateway::new();
         assert!(gateway.execute_and_verify_all_prs());
     }
 
     #[test]
     fn test_component_variants_engine_functional() {
-        let mut engine = DesigncraftComponentVariantsPrEngine::new();
+        let mut engine = DesigncraftComponentVariantsStateMachinePrEngine::new();
         let id = engine.add_variant("IconButton".to_string(), "Disabled".to_string());
         assert_eq!(id, 1);
         assert!(engine
@@ -1391,7 +1446,7 @@ mod tests {
 
     #[test]
     fn test_icon_packaging_engine_functional() {
-        let mut engine = DesigncraftIconSystemPackagingPrEngine::new();
+        let mut engine = DesigncraftIconSystemPackagingSymbolsPrEngine::new();
         engine.add_icon("close", "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z", "0 0 24 24");
         let sprite = engine.compile_svg_sprite_sheet();
         assert!(sprite.contains("symbol id=\"close\""));
@@ -1399,13 +1454,13 @@ mod tests {
 
     #[test]
     fn test_accessibility_audit_engine_functional() {
-        let engine = DesigncraftAccessibilityAuditLintPrEngine::new();
-        let fg = RgbColor {
+        let engine = DesigncraftAccessibilityAuditWcagLintPrEngine::new();
+        let fg = DesigncraftRgbColor {
             r: 120,
             g: 120,
             b: 120,
         };
-        let bg = RgbColor {
+        let bg = DesigncraftRgbColor {
             r: 255,
             g: 255,
             b: 255,
@@ -1414,5 +1469,12 @@ mod tests {
         assert!(ratio > 1.0);
         assert!(engine.verify_touch_target(48.0, 48.0));
         assert!(!engine.verify_touch_target(32.0, 32.0));
+    }
+
+    #[test]
+    fn test_master_suite() {
+        let mut suite = DesigncraftMissingComponentsParityPrSuite::new();
+        assert!(suite.verify_complete_parity());
+        assert_eq!(suite.total_pr_proposals(), 10);
     }
 }
