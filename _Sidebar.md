@@ -1,5 +1,9 @@
 ## SigmaOS Documentation
 
+### 🟢 Current Status
+- [[Current Build & Merge Status (2026-10-21)|Home#-current-status-2026-10-21]]
+- [[Ready-to-Work-and-Ready-to-Launch|Ready to Work & Ready to Launch]]
+
 ### Getting Started
 - [[Home]]
 - [[Sovereign-Engineering-Principles]]
