@@ -133,6 +133,7 @@ pub mod sigmaapplicationmanager;
 pub mod sigmaauditmanager;
 pub mod sigmaaudiomanager2;
 pub mod sigmadisplaymanager2;
+pub mod sigmabluetoothmanager2;
 pub mod sigmainstallmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
@@ -215,6 +216,9 @@ pub use sigmadisplaymanager2::{
 pub use sigmaaudiomanager2::{
     AudioDevice as AudioManager2Device, AudioDeviceState as AudioManager2State,
     AudioDeviceType as AudioManager2Type, SigmaAudioManager2,
+};
+pub use sigmabluetoothmanager2::{
+    BluetoothDevice as BluetoothManager2Device, BluetoothState as BluetoothManager2State, BluetoothType as BluetoothManager2Type, SigmaBluetoothManager2,
 };
 pub use sigmacapturemanager::{
     Capture as CaptureManagerCapture, CaptureType as CaptureManagerType, SigmaCaptureManager,
