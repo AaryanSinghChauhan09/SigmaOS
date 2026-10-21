@@ -50,6 +50,7 @@ pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
 pub mod threedcraft_artcraft_parity_pr;
 pub mod threedcraft_missing_components_parity_pr;
+pub mod threedcraft_spatial_computing_pr;
 pub mod vectoranimation;
 pub mod vectorcraft;
 pub mod voicecraft;
@@ -132,6 +133,9 @@ pub use soundcraft::{
 };
 pub use soundcraft_artcraft_parity_pr::*;
 pub use soundcraft_missing_components_parity_pr::*;
+pub use threedcraft_artcraft_parity_pr::*;
+pub use threedcraft_missing_components_parity_pr::*;
+pub use threedcraft_spatial_computing_pr::*;
 pub use vectoranimation::{
     get_vectoranimation, init_vectoranimation, AnimationExportFormat, AnimationLayer,
     AnimationLayerType, AnimationProject as VectorAnimationProject, Bone, InterpolationMode,
