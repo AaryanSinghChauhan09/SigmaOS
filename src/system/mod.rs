@@ -135,6 +135,7 @@ pub mod sigmaauditmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
 pub mod sigmapackagemanager3;
+pub mod sigmaprocessmanager;
 pub mod sigmaservicemanager4;
 pub mod sigmastoragemanager;
 pub mod sigmapathmanager;
@@ -163,6 +164,10 @@ pub use sigmanetworkmanager3::{
 pub use sigmapackagemanager3::{
     Package as PackageManager3Package, PackageRepo as PackageManager3Repo,
     PackageState as PackageManager3State, SigmaPackageManager3,
+};
+pub use sigmaprocessmanager::{
+    Process as ProcessManagerProcess, ProcessPriority as ProcessManagerPriority,
+    ProcessState as ProcessManagerState, SigmaProcessManager,
 };
 pub use sigmaservicemanager4::{
     Service as ServiceManagerService, ServiceState as ServiceManagerState,
