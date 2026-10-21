@@ -161,6 +161,7 @@ pub mod sigmacachemanager2;
 pub mod sigmacompressionmanager;
 pub mod sigmaencryptionmanager;
 pub mod sigmafirewallmanager2;
+pub mod sigmalogrotationmanager;
 pub mod sigmatemplatemanager;
 pub mod sigmatogglemanager;
 pub mod sigmaupdatemanager2;
@@ -329,6 +330,10 @@ pub use sigmafirewallmanager2::{
     FirewallManager2Chain, FirewallManager2Rule, Protocol as FirewallManager2Protocol,
     RuleAction as FirewallManager2RuleAction, RuleState as FirewallManager2RuleState,
     SigmaFirewallManager2,
+};
+pub use sigmalogrotationmanager::{
+    LogRotationManager, PolicyState as LogRotationPolicyState,
+    RotationInterval as LogRotationInterval, RotationPolicy as LogRotationPolicy,
 };
 pub use sigmaupdatemanager2::{
     SigmaUpdateManager2, Update as UpdateManagerUpdate, UpdateStatus as UpdateManagerStatus,
