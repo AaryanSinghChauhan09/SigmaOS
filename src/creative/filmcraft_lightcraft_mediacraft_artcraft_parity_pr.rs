@@ -1,6 +1,3 @@
-#![no_std]
-
-extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - ArtCraft Craftlibs Missing Components Parity PR Gateway
 // (`src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs`)
@@ -15,6 +12,11 @@ extern crate alloc;
 // 6. AudiocraftDawSynthesizerVst3MasteringPrEngine (Multi-track DAW automation, spectral synthesis, VST3/CLAP plugin hosting & EBU R128 loudness mastering)
 // 7. SovereignArtcraftCraftlibsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+
+extern crate alloc;
+
+use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;

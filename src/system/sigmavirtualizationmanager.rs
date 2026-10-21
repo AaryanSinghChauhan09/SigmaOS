@@ -5,6 +5,7 @@
 #![no_std]
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -189,7 +190,7 @@ mod tests {
         };
         let vm = manager.create_vm(config);
         manager.start_vm(vm.id.clone()).unwrap();
-        manager.stop_vm(vm.id.clone()).unwrap();
+        manager.stop_vm(vm.id).unwrap();
         assert_eq!(manager.get_vms()[0].state, VMState::Stopped);
     }
 
@@ -221,7 +222,7 @@ mod tests {
             network_enabled: true,
         };
         let vm1 = manager.create_vm(config.clone());
-        let vm2 = manager.create_vm(config);
+        let _vm2 = manager.create_vm(config);
         manager.start_vm(vm1.id).unwrap();
         assert_eq!(manager.get_running_vms().len(), 1);
     }

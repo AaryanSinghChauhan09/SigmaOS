@@ -1,12 +1,3 @@
-extern crate alloc;
-use alloc::collections::BTreeMap;
-use alloc::format;
-use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
-use alloc::vec;
-use alloc::format;
-
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/anicraft_artcraft_parity_pr.rs`)
@@ -41,6 +32,8 @@ use core::f64::consts::PI;
 // 10. AnicraftSpriteSheetAtlasExporterPrEngine (Sprite sheet atlas generation & game engine export)
 // 11. SovereignAnicraftArtcraftParityPrGateway & AnicraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
+#![no_std]
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -48,6 +41,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 /// Structured PR proposal manifest for AniCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

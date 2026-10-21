@@ -26,10 +26,6 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-
-
-
-
 /// Structured PR proposal manifest descriptor for Deckcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DeckcraftArtcraftPrProposalManifest {
@@ -899,7 +895,6 @@ impl Default for DeckcraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
 
     #[test]
     fn test_deckcraft_artcraft_parity_pr_gateway() {

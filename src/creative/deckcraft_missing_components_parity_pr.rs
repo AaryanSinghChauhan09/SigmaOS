@@ -30,10 +30,6 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-
-
-
-
 /// Structured PR proposal manifest for missing Deckcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DeckcraftPrProposalManifest {
@@ -1454,8 +1450,6 @@ impl Default for SovereignDeckcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
 
     #[test]
     fn test_deckcraft_parity_pr_gateway() {

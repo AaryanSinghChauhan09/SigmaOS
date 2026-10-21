@@ -1,5 +1,3 @@
-#![no_std]
-
 // SPDX-License-Identifier: MIT
 // SigmaOS - Gridcraft & ArtCraft Missing Components Parity PR Gateway
 //
@@ -15,12 +13,15 @@
 // 6. GridcraftMacroScriptingUdfMissingPrEngine (Macro action recorder, WASM/script sandbox & User-Defined Functions UDF registry)
 // 7. SovereignGridcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
+#![no_std]
+
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 /// Structured PR proposal manifest for missing Gridcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -847,8 +848,6 @@ impl Default for SovereignGridcraftMissingComponentsParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
 
     #[test]
     fn test_gridcraft_parity_pr_gateway() {

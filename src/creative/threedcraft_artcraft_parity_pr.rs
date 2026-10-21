@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft to ArtCraft Parity & 3D Spatial Innovations PR Proposal Engine
 // (`src/creative/threedcraft_artcraft_parity_pr.rs`)
@@ -14,10 +12,15 @@
 // 6. SovereignThreeDCraftArtcraftParityPrGateway & ThreeDCraftArtcraftParityPrSuite (Master PR Gateway Coordinator & Parity Benchmark)
 
 #![no_std]
+
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
+use core::f32::consts::PI;
 
 
 
@@ -741,6 +744,7 @@ impl Default for ThreeDCraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_threedcraft_artcraft_parity_pr_gateway() {

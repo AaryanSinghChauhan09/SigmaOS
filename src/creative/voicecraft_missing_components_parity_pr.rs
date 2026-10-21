@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/voicecraft_missing_components_parity_pr.rs`)
@@ -14,21 +12,19 @@
 // 6. SovereignVoicecraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
+
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
+use alloc::format;
+use alloc::string::String;
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f32::consts::PI;
 
-
-
-
-
-#[cfg(not(test))]
-
-#[cfg(test)]
 #[path = "voicecraft.rs"]
 mod voicecraft;
-#[cfg(test)]
+use voicecraft::*;
 
 /// Structured PR proposal manifest for missing VoiceCraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -483,6 +479,7 @@ impl SovereignVoicecraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_neural_tts_inference_engine() {
