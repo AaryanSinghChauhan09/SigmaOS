@@ -1,71 +1,79 @@
-# Specification: Study-to-Implementation Pipeline Engine
+# Roadmap Specification: Study-to-Implementation Pipeline
+
+## Specification Metadata
+- **Spec Name**: `PR_SPEC_STUDY_TO_IMPLEMENTATION_PIPELINE`
+- **Module Path**: `src/governance/study_to_implementation_pipeline_pr.rs`
+- **Status**: Implemented / Verified
+- **Target Release**: SigmaOS 1.0 Milestone
+
+---
 
 ## Overview
-
-This specification details the engine architecture and runtime requirements for SigmaOS's **Study → Extract Pattern → Implement Minimal Slice → Validate at Runtime** methodology.
-
----
-
-## Data Model & Pipeline Schema
-
-### 1. Upstream Study Item
-- `project_name`: String (e.g. `"xv6"`, `"linux"`, `"freebsd"`, `"openbsd"`, `"arch"`, `"debian"`, `"fedora"`, `"nixos"`)
-- `concept_name`: String (e.g. `"boot"`, `"scheduler"`, `"vfs"`, `"pledge"`, `"packaging"`)
-- `upstream_problem`: String
-- `data_structure_control_flow`: String
-- `security_failure_assumptions`: String
-- `adopted_directly`: String
-- `simplified_for_rust`: String
-- `exit_test_criteria`: String
-- `licensing_attribution`: String
-
-### 2. Architecture Decision Record (ADR)
-- `adr_id`: String (e.g. `"ADR-001"`, `"ADR-002"`, `"ADR-003"`, `"ADR-004"`, `"ADR-005"`)
-- `title`: String
-- `status`: AdrStatus (`Proposed`, `Accepted`, `Deprecated`, `Superseded`)
-- `context`: String
-- `upstream_study_ref`: String
-- `decision`: String
-- `consequences`: String
-- `validation_method`: String
-
-### 3. Comparison Matrix
-- `domain`: String (e.g. `"scheduler"`, `"filesystem"`, `"security"`, `"packaging"`, `"hardware-support"`)
-- `comparisons`: Vector of OS mechanism records
-- `tradeoff_analysis`: String
-
-### 4. Curriculum Phase
-- `phase_id`: usize (1 to 5)
-- `name`: String
-- `duration_weeks`: usize
-- `study_focus`: String
-- `deliverables`: String
-- `exit_test_status`: ExitTestStatus (`Pending`, `InProgress`, `Passed`)
+This specification governs the 10-step repeatable cycle, 11-project study focus matrix, 5-phase study curriculum, research directory structure, ADR standards, 12 mandatory rules, 12-week schedule, definition of done, and first 30 days roadmap for borrowing and adapting concepts from upstream operating systems into SigmaOS.
 
 ---
 
-## Pipeline Execution Rules Engine
-
-The pipeline engine validates adherence to the 12 core rules:
-
-1. `Rule 1`: Single Concept Scope per Study Cycle.
-2. `Rule 2`: Invariant Extraction (no raw code copy-paste).
-3. `Rule 3`: License Compatibility Verification (MIT/GPL-2.0).
-4. `Rule 4`: Minimal Connected Vertical Slice (boot → shell).
-5. `Rule 5`: Mandatory Runtime Boot / QEMU Validation.
-6. `Rule 6`: Mandatory CI Gating Gates (`run_sigma_tests.sh`).
-7. `Rule 7`: Dedicated Security Review for Isolation Changes.
-8. `Rule 8`: Experiment Reproducibility Tracking.
-9. `Rule 9`: Least-Privilege Execution Guarantees.
-10. `Rule 10`: Explicit Adoption / Rejection Boundaries.
-11. `Rule 11`: Mandatory Behavioral Regression Tests.
-12. `Rule 12`: Human Sign-Off for High-Risk Subsystems.
+## 1. Repeatable 10-Step Cycle
+1. **SELECT**: Choose a narrow OS concept.
+2. **STUDY**: Analyze upstream implementation and documentation.
+3. **WRITE**: Author a design note in `research/upstream/`.
+4. **DEFINE**: Specify the minimum testable slice.
+5. **IMPLEMENT**: Code behind clean `no_std` + `alloc` Rust module boundaries.
+6. **ADD TESTS**: Implement unit, integration, and runtime tests.
+7. **VALIDATE**: Exercise via QEMU or named hardware runtime path.
+8. **DOCUMENT**: Record adopted, modified, and rejected aspects in an ADR.
+9. **REGRESSION**: Add a mandatory regression test.
+10. **UPDATE**: Log runtime evidence in `CAPABILITY_MATRIX.toml`.
 
 ---
 
-## Gate Verification Methods
+## 2. 11 Upstream Study Targets
+- **xv6**: Boot-to-shell reference path and minimal kernel clarity.
+- **Linux Kernel**: VFS abstractions, scheduler, driver model, namespaces.
+- **Redox OS**: Safe Rust OS architecture, scheme IPC, capability model.
+- **Arch Linux**: Transparent package model, PKGINFO parser, PKGBUILD.
+- **Linux Mint**: Desktop onboarding, update safety, Timeshift recovery.
+- **FreeBSD**: Jail container isolation, release engineering, ZFS boot environments.
+- **OpenBSD**: Least-privilege `pledge`/`unveil`, W^X memory, proactive auditing.
+- **Debian**: DEB822 metadata stanzas, multi-channel release policy.
+- **Fedora**: Automated Greenwave CI gating, staged atomic updates.
+- **NixOS**: Declarative TOML/Nix configuration schema and generation rollbacks.
+- **OSDev**: Bare-metal x86_64 UEFI boot trace, GDT/IDT, COM1 serial logging.
 
-The engine provides runtime verification methods:
-- `validate_10_step_cycle()`: Ensures all 10 steps are satisfied.
-- `evaluate_curriculum_progress()`: Computes completion percentage across 5 curriculum phases.
-- `generate_pr_gateway_manifest()`: Formats PR proposal report for pull request submission.
+---
+
+## 3. 5-Phase Study Curriculum
+- **Phase 1 (2 wks)**: OS Fundamentals — QEMU x86_64 boot trace, paging, scheduler, shell.
+- **Phase 2 (3 wks)**: Kernel Services — EEVDF scheduler, trait VFS, process fork/exec, IPC, syscalls.
+- **Phase 3 (3 wks)**: Userspace & Distribution — Package metadata, SAT dependency solver, staged updates, rollback.
+- **Phase 4 (3 wks)**: Security & Isolation — pledge/unveil, Landlock sandboxing, capability checks, signed updates.
+- **Phase 5 (4 wks)**: Desktop & Hardware — VirtIO drivers, framebuffer graphics, Zenith Compositor, hardware matrix.
+
+---
+
+## 4. Research Artifacts Layout
+- `research/upstream/`: Study notes per project (`xv6`, `linux`, `freebsd`, `openbsd`, `arch`, `debian`, `fedora`, `nixos`, `redox`, `mint`, `osdev`).
+- `research/decisions/`: Architecture Decision Records (`ADR-001` through `ADR-005`).
+- `research/comparisons/`: Domain comparison matrices (scheduler, VFS, security, packaging, hardware).
+- `research/reports/`: Weekly "studied → implemented → validated" reports.
+
+---
+
+## 5. 12 Mandatory Implementation Rules
+1. Study one concept at a time.
+2. Extract the invariant, not the code.
+3. License and attribution first (MIT / GPL-2.0 compatibility).
+4. Implement the smallest vertical slice.
+5. Runtime validation is mandatory.
+6. CI gates merges (`cargo check --lib`, `cargo test --lib`, `./run_sigma_tests.sh`).
+7. Security changes get separate review.
+8. Reproducibility (log commit, toolchain, hashes).
+9. Least privilege.
+10. Document adoption boundaries.
+11. Regression tests are mandatory.
+12. Human approval for high-risk work.
+
+---
+
+## Verification
+Executed via `tests/test_study_to_implementation_pipeline.rs` and `./run_sigma_tests.sh`.

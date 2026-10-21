@@ -18,6 +18,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [IPC Handler Master Architecture & Development Plan](ipc-handler.md) - Formally specified IPC handler subsystem covering scope, periodic task cadence, 5 development phases, missing components deliverable matrix, correctness/security/Rust/testing rules, PR template, example PR, and 10-PR roadmap.
 - [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - Master Architecture & Development Roadmap Plan establishing 5 integrated synchronization layers, 11 core design rules, 17-PR sequence roadmap, maintenance cadences, component rules, PR review template, and completion gates.
 - [GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) - Master Architecture & Development Roadmap Plan for SigmaOS GUI and Compositor Stack; Wayland protocol model, DRM/KMS atomic modesetting, freedesktop desktop interfaces, WCAG 2.2 accessibility guidance, 19-PR roadmap, maintenance cadences, component rules, PR review template, and rollout criteria.
+- [Device Driver Development Plan](SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md) - Master Architecture & Development Roadmap Plan for SigmaOS Device Drivers; bus/device model, managed RAII resource lifecycles, platform DMA API, IRQ contracts, 15-PR gateway roadmap sequence, maintenance cadences, PR template, merge gates, and status vocabulary.
 - [Command Interpreter Plan](shell/COMMAND_INTERPRETER_PLAN.md) - Master Command Interpreter Development Plan; small native command runner baseline transitioning into explicitly scoped POSIX subset, 17-PR roadmap, product rules, maintenance schedule, and review gates.
 - [Filesystem & Storage Parity Proposal](PR_PROPOSAL_FILESYSTEMS_AND_STORAGE_PARITY.md) - Multi-tiered storage engines, zswap writeback cache, and OverlayFS mount simulation.
 - [Toolchain & Development Ecosystem Proposal](PR_PROPOSAL_TOOLCHAIN_AND_DEVELOPMENT_PARITY.md) - Zero-dependency toolchain engines, compilers, build orchestration, and dynamic tracing.
@@ -33,6 +34,7 @@ Welcome to the SigmaOS Architecture and Subsystem Development Master Index. This
 - [System Utilities Plan](../wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md)
 - [CLI Development Plan Mirror](../wiki/27-SigmaOS-CLI-Development-Plan.md)
 - [GUI Development Plan Mirror](../wiki/30-SigmaOS-GUI-Development-Plan.md)
+- [Device Driver Development Plan Mirror](../wiki/35-SigmaOS-Device-Driver-Development-Plan.md)
 - [Command Interpreter Plan Mirror](../wiki/34-SigmaOS-Command-Interpreter-Plan.md)
 - [Architectural Pillars](../wiki/Architectural-Pillars-Components.md)
 - [Kernel Functions & ABI](../wiki/Kernel-Functions-and-ABI-Components.md)
