@@ -714,6 +714,8 @@ pub use arch_linux_missing_components_v53_pr::*;
 
 pub mod arch_linux_missing_components_v54_pr;
 pub use arch_linux_missing_components_v54_pr::*;
+pub mod arch_linux_missing_components_v65_pr;
+pub use arch_linux_missing_components_v65_pr::*;
 
 pub mod open_source_os_missing_components_v54_pr;
 pub use open_source_os_missing_components_v54_pr::*;
