@@ -12,3 +12,8 @@
 **Vulnerability:** `validate_url` checked literal NUL bytes and control characters (`b <= 32`), but missed percent-encoded NUL bytes (`%00`) and percent-encoded CRLF/control sequences (`%0d`, `%0a`, `%1b`, `%7f`), enabling HTTP request smuggling, response header injection, and C-ABI string truncation (CWE-113 / CWE-626 / CWE-918).
 **Learning:** Checking only literal raw bytes leaves applications vulnerable when downstream network components decode percent-encoded control sequences or C-ABI string handlers truncate at `%00`.
 **Prevention:** Always scan URL byte slices for percent-encoded NUL bytes (`%00`), CRLF sequences (`%0d`/`%0a`), and encoded userinfo credentials (`%40`) in input validation routines before URL processing or forwarding.
+
+## 2026-10-19 - Double Percent-Encoded ASCII Control Character Injection Security
+**Vulnerability:** `validate_url` checked single percent-encoded control characters (`%00`..`%1F`), but allowed double percent-encoded control sequences (`%2500`..`%251F`, `%257F`) which downstream multi-pass decoders resolve to raw control characters or C-ABI NUL terminators, enabling HTTP header injection, request smuggling, and bypass of URL input filters (CWE-113 / CWE-150 / CWE-626).
+**Learning:** Single-pass URL filters that inspect only `%XY` miss double-encoded entities (`%25XY`) when multi-stage web frameworks or proxies perform double unescaping.
+**Prevention:** Always inspect byte slices for both single percent-encoded (`%XY`) and double percent-encoded (`%25XY`) hex representations of ASCII control characters (0x00..0x1F, 0x7F) in input validation.
