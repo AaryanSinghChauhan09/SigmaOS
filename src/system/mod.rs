@@ -135,6 +135,7 @@ pub mod sigmaauditmanager;
 pub mod sigmamigrationmanager;
 pub mod sigmanetworkmanager3;
 pub mod sigmapackagemanager3;
+pub mod sigmapowermanager2;
 pub mod sigmaprocessmanager;
 pub mod sigmaschedulermanager;
 pub mod sigmaservicemanager4;
@@ -173,6 +174,10 @@ pub use sigmaprocessmanager::{
 pub use sigmaschedulermanager::{
     ScheduledTask, TaskPriority as ScheduleTaskPriority, TaskStatus as ScheduleTaskStatus,
     SigmaScheduleManager,
+};
+pub use sigmapowermanager2::{
+    BatteryStatus as PowerManagerBatteryStatus, PowerPlan, PowerState as PowerManagerState,
+    SigmaPowerManager2,
 };
 pub use sigmaservicemanager4::{
     Service as ServiceManagerService, ServiceState as ServiceManagerState,
