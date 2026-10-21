@@ -66,7 +66,10 @@ impl ArchPacmanKeyringWkdFetcherPrEngine {
     }
 
     pub fn format_fetch_cmd(&self) -> String {
-        format!("gpg --locate-keys --auto-key-locate wkd user@{}", self.wkd_domain)
+        format!(
+            "gpg --locate-keys --auto-key-locate wkd user@{}",
+            self.wkd_domain
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV66PrSpec {
@@ -276,7 +279,9 @@ impl ArchBtrfsSnapperRollbackOrchestratorPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.subvolume_path.is_empty() && self.systemd_boot_integration && self.auto_rollback_on_failure
+        !self.subvolume_path.is_empty()
+            && self.systemd_boot_integration
+            && self.auto_rollback_on_failure
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV66PrSpec {

@@ -38,16 +38,16 @@ pub struct FontcraftPrProposalManifest {
 /// OpenType Feature Tag
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum OpentypeFeatureTag {
-    Kerning,            // kern
-    StandardLigature,   // liga
-    DiscretionaryLig,   // dlig
+    Kerning,          // kern
+    StandardLigature, // liga
+    DiscretionaryLig, // dlig
 }
 
 /// OpenType Kerning & GSUB/GPOS Ligature Feature Engine.
 #[derive(Debug, Clone)]
 pub struct FontcraftOpentypeKerningLigatureFeaturePrEngine {
     pub kerning_pairs: BTreeMap<(u32, u32), i16>, // (left_glyph, right_glyph) -> kerning_units
-    pub ligatures: BTreeMap<Vec<u32>, u32>,        // [glyph_a, glyph_b] -> ligature_glyph
+    pub ligatures: BTreeMap<Vec<u32>, u32>,       // [glyph_a, glyph_b] -> ligature_glyph
 }
 
 impl FontcraftOpentypeKerningLigatureFeaturePrEngine {
@@ -184,7 +184,14 @@ impl FontcraftVariableFontAxisInterpolationPrEngine {
         }
     }
 
-    pub fn interpolate_glyph_point(&self, base_x: f32, base_y: f32, delta_x: f32, delta_y: f32, axis_tag: u32) -> (f32, f32) {
+    pub fn interpolate_glyph_point(
+        &self,
+        base_x: f32,
+        base_y: f32,
+        delta_x: f32,
+        delta_y: f32,
+        axis_tag: u32,
+    ) -> (f32, f32) {
         let norm_coord = self.compute_axis_normalized_coordinate(axis_tag);
         (base_x + delta_x * norm_coord, base_y + delta_y * norm_coord)
     }
@@ -338,7 +345,9 @@ impl SovereignFontcraftArtcraftParityPrGateway {
         let ligs = self.opentype_feature.substitute_ligatures(&[102, 105]);
         let lig_ok = ligs == vec![192];
 
-        let (interp_x, interp_y) = self.variable_font.interpolate_glyph_point(10.0, 20.0, 10.0, 4.0, 0x77676874);
+        let (interp_x, interp_y) = self
+            .variable_font
+            .interpolate_glyph_point(10.0, 20.0, 10.0, 4.0, 0x77676874);
         let var_ok = (interp_x - 16.0).abs() < 1e-3 && (interp_y - 22.4).abs() < 1e-3;
 
         let layers = self.color_emoji.render_color_emoji_layers(1000);

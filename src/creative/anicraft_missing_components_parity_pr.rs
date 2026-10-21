@@ -3,12 +3,9 @@
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
 
 use std::collections::BTreeMap;
+use std::f64::consts::PI;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::f64::consts::PI;
-
-
-
 
 #[cfg(feature = "standalone_test")]
 use std::collections::BTreeMap;
@@ -140,9 +137,7 @@ impl AnicraftFabrikInverseKinematicsPrEngine {
             target_subsystem: String::from("AniCraft Skeletal Rigging Engine"),
             original_suite: String::from("ArtCraft AniCraft IK Solver"),
             components_added: vec![
-                String::from(
-                    "FABRIK (Forward And Backward Reaching IK) multi-joint chain solver",
-                ),
+                String::from("FABRIK (Forward And Backward Reaching IK) multi-joint chain solver"),
                 String::from("Target distance reachability and bone constraint clamping"),
                 String::from("Sub-millisecond multi-limb character posing convergence"),
             ],

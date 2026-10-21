@@ -137,7 +137,9 @@ impl WordcraftCitationBibliographyManagerPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement BibTeX Reference Parser & APA/MLA Citation Formatter".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement BibTeX Reference Parser & APA/MLA Citation Formatter"
+                    .to_string(),
             target_subsystem: "Wordcraft Citation Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Reference Suite".to_string(),
             components_added: vec![
@@ -152,7 +154,11 @@ impl WordcraftCitationBibliographyManagerPrEngine {
 
     pub fn format_citation(&self, cite_key: &str) -> Option<String> {
         let rec = self.library.get(cite_key)?;
-        Some(format!("({}, {})", rec.author.split(',').next().unwrap_or(""), rec.year))
+        Some(format!(
+            "({}, {})",
+            rec.author.split(',').next().unwrap_or(""),
+            rec.year
+        ))
     }
 }
 
@@ -183,7 +189,9 @@ impl WordcraftMultiUserCrdtCoAuthoringPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement CRDT Lockless Real-Time Multi-User Document Sync Engine".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement CRDT Lockless Real-Time Multi-User Document Sync Engine"
+                    .to_string(),
             target_subsystem: "Wordcraft Collaboration Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Collaboration Suite".to_string(),
             components_added: vec![
@@ -270,7 +278,8 @@ impl WordcraftMailMergeBatchDocumentGeneratorPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement Mail Merge Automation & Batch Document Generator".to_string(),
+            pr_title: "feat(wordcraft): Implement Mail Merge Automation & Batch Document Generator"
+                .to_string(),
             target_subsystem: "Wordcraft Document Automation Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Merge Suite".to_string(),
             components_added: vec![
@@ -353,7 +362,8 @@ impl WordcraftTexFormulaMathNotationPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement TeX/LaTeX Formula Editor & MathML Glyph Renderer".to_string(),
+            pr_title: "feat(wordcraft): Implement TeX/LaTeX Formula Editor & MathML Glyph Renderer"
+                .to_string(),
             target_subsystem: "Wordcraft Math Typesetting Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Math Suite".to_string(),
             components_added: vec![
@@ -392,7 +402,9 @@ impl WordcraftDocumentDiffTrackChangesPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement Myers Word-Level Diff & Track Changes Markup Engine".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement Myers Word-Level Diff & Track Changes Markup Engine"
+                    .to_string(),
             target_subsystem: "Wordcraft Document Review Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Review Suite".to_string(),
             components_added: vec![
@@ -433,7 +445,9 @@ impl WordcraftAiWritingStyleGrammarAssistantPrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement AI Grammar Checker, Readability Score & Tone Enhancer".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement AI Grammar Checker, Readability Score & Tone Enhancer"
+                    .to_string(),
             target_subsystem: "Wordcraft AI Assistant Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft AI Suite".to_string(),
             components_added: vec![
@@ -450,7 +464,9 @@ impl WordcraftAiWritingStyleGrammarAssistantPrEngine {
         if sentences == 0 || words == 0 {
             return 100.0;
         }
-        206.835 - 1.015 * (words as f64 / sentences as f64) - 84.6 * (syllables as f64 / words as f64)
+        206.835
+            - 1.015 * (words as f64 / sentences as f64)
+            - 84.6 * (syllables as f64 / words as f64)
     }
 }
 
@@ -481,7 +497,9 @@ impl WordcraftMasterTemplateBrandCascadePrEngine {
 
     pub fn generate_proposal(&self) -> WordcraftArtcraftPrProposalManifest {
         WordcraftArtcraftPrProposalManifest {
-            pr_title: "feat(wordcraft): Implement Master Template Hierarchy & Brand Theme Token Cascader".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement Master Template Hierarchy & Brand Theme Token Cascader"
+                    .to_string(),
             target_subsystem: "Wordcraft Master Style Subsystem".to_string(),
             original_suite: "ArtCraft WordCraft Brand Suite".to_string(),
             components_added: vec![

@@ -70,7 +70,11 @@ fn test_arch_linux_v65_pr_suite_full_cycle() {
     let suite = ArchLinuxMissingComponentsV65PrSuite::new();
     let prs = suite.run_all_prs();
 
-    assert_eq!(prs.len(), 10, "Expected 10 Arch Linux V65 PR specifications");
+    assert_eq!(
+        prs.len(),
+        10,
+        "Expected 10 Arch Linux V65 PR specifications"
+    );
     assert_eq!(
         suite.compute_gap_closure_score(),
         100,

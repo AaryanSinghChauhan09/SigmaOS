@@ -68,10 +68,7 @@ fn test_dragonfly_hammer2_scrub_engine() {
     assert!(engine.verify_block(0x100, 0xabcd1234));
     assert!(!engine.verify_block(0x100, 0x00000000));
     engine.sync_master("@replica_node", 200);
-    assert_eq!(
-        engine.pfs_nodes.get("@replica_node").copied(),
-        Some(200)
-    );
+    assert_eq!(engine.pfs_nodes.get("@replica_node").copied(), Some(200));
 
     let proposal = engine.generate_pr_proposal();
     assert_eq!(proposal.pr_id, "PR-DRAGONFLY-HAMMER2-MULTIMASTER-V63");
@@ -94,10 +91,7 @@ fn test_illumos_openzfs_dtrace_engine() {
 #[test]
 fn test_haiku_befs_indexing_engine() {
     let engine = HaikuBeFsAttributeIndexingV63PrEngine::new();
-    assert_eq!(
-        engine.query_attribute("META:TITLE", "Song.mp3"),
-        Some(1024)
-    );
+    assert_eq!(engine.query_attribute("META:TITLE", "Song.mp3"), Some(1024));
 
     let proposal = engine.generate_pr_proposal();
     assert_eq!(proposal.pr_id, "PR-HAIKU-BEFS-INDEXING-V63");
@@ -152,15 +146,9 @@ fn test_debian_apt_pqc_engine() {
 #[test]
 fn test_debian_debconf_engine() {
     let mut engine = DebianDebconfDatabaseStateV63PrEngine::new();
-    assert_eq!(
-        engine.get_answer("tzdata/zones"),
-        Some(&"UTC".to_string())
-    );
+    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"UTC".to_string()));
     engine.set_answer("tzdata/zones", "PST");
-    assert_eq!(
-        engine.get_answer("tzdata/zones"),
-        Some(&"PST".to_string())
-    );
+    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"PST".to_string()));
 
     let proposal = engine.generate_pr_proposal();
     assert_eq!(proposal.pr_id, "PR-DEBIAN-DEBCONF-STATE-V63");

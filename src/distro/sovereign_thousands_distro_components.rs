@@ -49260,13 +49260,14 @@ impl SovereignThousandsDistroComponentsEngine {
             });
         }
 
-
         components.push(DistroComponentItem {
             id: 25001,
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v100)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #100"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #100",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49320,7 +49321,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v100)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #100"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #100",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49329,7 +49332,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v100)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #100"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #100",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49338,7 +49343,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v100)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #100"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #100",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49356,7 +49363,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v100)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #100"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #100",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49410,7 +49419,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v100)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #100"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #100",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49464,7 +49475,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v101)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #101"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #101",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49500,7 +49513,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v101)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #101"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #101",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49554,7 +49569,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v101)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #101"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #101",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49653,7 +49670,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v102)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #102"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #102",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49680,7 +49699,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v102)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #102"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #102",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49716,7 +49737,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v102)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #102"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #102",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49734,7 +49757,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v102)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #102"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #102",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49770,7 +49795,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v102)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #102"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #102",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49806,7 +49833,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v103)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #103"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #103",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49833,7 +49862,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v103)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #103"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #103",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49860,7 +49891,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v103)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #103"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #103",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49878,7 +49911,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v103)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #103"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #103",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49914,7 +49949,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v103)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #103"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #103",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -49950,7 +49987,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v103)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #103"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #103",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50004,7 +50043,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v104)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #104"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #104",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50094,7 +50135,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v104)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #104"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #104",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50130,7 +50173,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v104)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #104"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #104",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50166,7 +50211,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v105)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #105"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #105",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50220,7 +50267,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v105)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #105"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #105",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50229,7 +50278,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v105)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #105"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #105",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50238,7 +50289,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v105)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #105"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #105",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50256,7 +50309,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v105)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #105"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #105",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50310,7 +50365,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v105)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #105"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #105",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50364,7 +50421,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v106)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #106"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #106",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50400,7 +50459,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v106)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #106"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #106",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50454,7 +50515,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v106)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #106"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #106",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50553,7 +50616,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v107)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #107"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #107",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50580,7 +50645,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v107)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #107"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #107",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50616,7 +50683,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v107)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #107"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #107",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50634,7 +50703,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v107)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #107"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #107",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50670,7 +50741,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v107)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #107"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #107",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50706,7 +50779,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v108)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #108"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #108",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50733,7 +50808,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v108)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #108"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #108",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50760,7 +50837,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v108)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #108"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #108",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50778,7 +50857,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v108)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #108"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #108",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50814,7 +50895,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v108)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #108"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #108",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50850,7 +50933,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v108)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #108"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #108",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50904,7 +50989,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v109)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #109"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #109",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -50994,7 +51081,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v109)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #109"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #109",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51030,7 +51119,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v109)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #109"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #109",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51066,7 +51157,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v110)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #110"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #110",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51120,7 +51213,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v110)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #110"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #110",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51129,7 +51224,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v110)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #110"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #110",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51138,7 +51235,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v110)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #110"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #110",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51156,7 +51255,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v110)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #110"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #110",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51210,7 +51311,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v110)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #110"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #110",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51264,7 +51367,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v111)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #111"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #111",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51300,7 +51405,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v111)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #111"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #111",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51354,7 +51461,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v111)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #111"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #111",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51453,7 +51562,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v112)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #112"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #112",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51480,7 +51591,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v112)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #112"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #112",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51516,7 +51629,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v112)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #112"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #112",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51534,7 +51649,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v112)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #112"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #112",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51570,7 +51687,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v112)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #112"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #112",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51606,7 +51725,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v113)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #113"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #113",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51633,7 +51754,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v113)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #113"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #113",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51660,7 +51783,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v113)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #113"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #113",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51678,7 +51803,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v113)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #113"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #113",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51714,7 +51841,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v113)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #113"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #113",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51750,7 +51879,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v113)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #113"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #113",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51804,7 +51935,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v114)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #114"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #114",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51894,7 +52027,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v114)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #114"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #114",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51930,7 +52065,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v114)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #114"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #114",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -51966,7 +52103,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v115)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #115"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #115",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52020,7 +52159,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v115)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #115"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #115",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52029,7 +52170,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v115)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #115"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #115",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52038,7 +52181,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v115)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #115"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #115",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52056,7 +52201,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v115)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #115"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #115",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52110,7 +52257,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v115)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #115"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #115",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52164,7 +52313,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v116)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #116"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #116",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52200,7 +52351,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v116)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #116"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #116",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52254,7 +52407,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v116)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #116"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #116",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52353,7 +52508,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v117)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #117"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #117",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52380,7 +52537,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v117)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #117"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #117",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52416,7 +52575,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v117)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #117"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #117",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52434,7 +52595,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v117)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #117"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #117",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52470,7 +52633,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v117)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #117"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #117",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52506,7 +52671,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v118)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #118"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #118",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52533,7 +52700,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v118)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #118"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #118",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52560,7 +52729,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v118)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #118"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #118",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52578,7 +52749,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v118)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #118"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #118",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52614,7 +52787,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v118)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #118"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #118",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52650,7 +52825,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v118)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #118"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #118",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52704,7 +52881,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v119)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #119"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #119",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52794,7 +52973,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v119)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #119"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #119",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52830,7 +53011,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v119)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #119"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #119",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52866,7 +53049,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v120)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #120"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #120",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52920,7 +53105,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v120)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #120"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #120",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52929,7 +53116,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v120)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #120"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #120",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52938,7 +53127,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v120)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #120"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #120",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -52956,7 +53147,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v120)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #120"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #120",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53010,7 +53203,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v120)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #120"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #120",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53064,7 +53259,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v121)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #121"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #121",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53100,7 +53297,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v121)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #121"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #121",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53154,7 +53353,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v121)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #121"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #121",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53253,7 +53454,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v122)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #122"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #122",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53280,7 +53483,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v122)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #122"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #122",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53316,7 +53521,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v122)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #122"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #122",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53334,7 +53541,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v122)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #122"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #122",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53370,7 +53579,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v122)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #122"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #122",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53406,7 +53617,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v123)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #123"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #123",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53433,7 +53646,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v123)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #123"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #123",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53460,7 +53675,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v123)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #123"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #123",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53478,7 +53695,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v123)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #123"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #123",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53514,7 +53733,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v123)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #123"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #123",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53550,7 +53771,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v123)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #123"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #123",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53604,7 +53827,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v124)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #124"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #124",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53694,7 +53919,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v124)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #124"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #124",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53730,7 +53957,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v124)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #124"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #124",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53766,7 +53995,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v125)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #125"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #125",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53820,7 +54051,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v125)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #125"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #125",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53829,7 +54062,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v125)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #125"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #125",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53838,7 +54073,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v125)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #125"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #125",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53856,7 +54093,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v125)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #125"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #125",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53910,7 +54149,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v125)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #125"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #125",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -53964,7 +54205,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v126)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #126"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #126",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54000,7 +54243,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v126)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #126"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #126",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54054,7 +54299,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v126)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #126"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #126",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54153,7 +54400,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v127)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #127"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #127",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54180,7 +54429,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v127)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #127"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #127",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54216,7 +54467,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v127)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #127"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #127",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54234,7 +54487,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v127)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #127"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #127",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54270,7 +54525,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v127)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #127"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #127",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54306,7 +54563,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v128)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #128"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #128",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54333,7 +54592,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v128)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #128"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #128",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54360,7 +54621,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v128)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #128"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #128",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54378,7 +54641,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v128)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #128"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #128",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54414,7 +54679,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v128)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #128"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #128",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54450,7 +54717,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v128)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #128"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #128",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54504,7 +54773,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v129)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #129"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #129",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54594,7 +54865,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v129)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #129"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #129",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54630,7 +54903,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v129)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #129"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #129",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54666,7 +54941,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v130)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #130"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #130",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54720,7 +54997,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v130)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #130"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #130",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54729,7 +55008,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v130)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #130"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #130",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54738,7 +55019,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v130)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #130"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #130",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54756,7 +55039,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v130)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #130"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #130",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54810,7 +55095,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v130)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #130"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #130",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54864,7 +55151,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v131)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #131"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #131",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54900,7 +55189,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v131)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #131"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #131",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -54954,7 +55245,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v131)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #131"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #131",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55053,7 +55346,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v132)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #132"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #132",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55080,7 +55375,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v132)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #132"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #132",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55116,7 +55413,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v132)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #132"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #132",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55134,7 +55433,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v132)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #132"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #132",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55170,7 +55471,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v132)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #132"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #132",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55206,7 +55509,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v133)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #133"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #133",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55233,7 +55538,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v133)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #133"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #133",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55260,7 +55567,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v133)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #133"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #133",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55278,7 +55587,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v133)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #133"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #133",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55314,7 +55625,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v133)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #133"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #133",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55350,7 +55663,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v133)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #133"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #133",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55404,7 +55719,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v134)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #134"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #134",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55494,7 +55811,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v134)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #134"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #134",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55530,7 +55849,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v134)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #134"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #134",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55566,7 +55887,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v135)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #135"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #135",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55620,7 +55943,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v135)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #135"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #135",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55629,7 +55954,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v135)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #135"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #135",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55638,7 +55965,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v135)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #135"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #135",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55656,7 +55985,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v135)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #135"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #135",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55710,7 +56041,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v135)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #135"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #135",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55764,7 +56097,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v136)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #136"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #136",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55800,7 +56135,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v136)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #136"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #136",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55854,7 +56191,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v136)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #136"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #136",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55953,7 +56292,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v137)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #137"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #137",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -55980,7 +56321,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v137)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #137"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #137",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56016,7 +56359,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v137)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #137"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #137",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56034,7 +56379,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v137)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #137"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #137",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56070,7 +56417,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v137)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #137"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #137",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56106,7 +56455,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v138)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #138"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #138",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56133,7 +56484,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v138)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #138"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #138",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56160,7 +56513,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v138)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #138"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #138",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56178,7 +56533,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v138)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #138"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #138",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56214,7 +56571,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v138)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #138"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #138",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56250,7 +56609,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v138)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #138"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #138",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56304,7 +56665,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v139)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #139"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #139",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56394,7 +56757,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v139)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #139"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #139",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56430,7 +56795,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v139)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #139"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #139",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56466,7 +56833,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v140)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #140"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #140",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56520,7 +56889,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v140)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #140"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #140",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56529,7 +56900,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v140)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #140"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #140",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56538,7 +56911,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v140)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #140"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #140",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56556,7 +56931,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v140)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #140"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #140",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56610,7 +56987,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v140)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #140"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #140",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56664,7 +57043,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v141)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #141"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #141",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56700,7 +57081,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v141)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #141"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #141",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56754,7 +57137,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v141)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #141"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #141",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56853,7 +57238,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v142)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #142"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #142",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56880,7 +57267,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v142)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #142"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #142",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56916,7 +57305,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v142)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #142"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #142",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56934,7 +57325,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v142)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #142"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #142",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -56970,7 +57363,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v142)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #142"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #142",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57006,7 +57401,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v143)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #143"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #143",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57033,7 +57430,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v143)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #143"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #143",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57060,7 +57459,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v143)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #143"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #143",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57078,7 +57479,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v143)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #143"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #143",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57114,7 +57517,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v143)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #143"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #143",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57150,7 +57555,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v143)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #143"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #143",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57204,7 +57611,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v144)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #144"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #144",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57294,7 +57703,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v144)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #144"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #144",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57330,7 +57741,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v144)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #144"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #144",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57366,7 +57779,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (Ubuntu v145)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #145"),
+            description: String::from(
+                "Ubuntu-inspired EEVDF Scheduler Slice Tuning component capability variant #145",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57420,7 +57835,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Void Linux v145)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #145"),
+            description: String::from(
+                "Void Linux-inspired SAT DPLL Canonical Remapper component capability variant #145",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57429,7 +57846,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Hermetic Merkle CAS Store Engine (NixOS v145)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("NixOS"),
-            description: String::from("NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #145"),
+            description: String::from(
+                "NixOS-inspired Hermetic Merkle CAS Store Engine component capability variant #145",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57438,7 +57857,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (openSUSE v145)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("openSUSE"),
-            description: String::from("openSUSE-inspired XDP Express Data Path Router component capability variant #145"),
+            description: String::from(
+                "openSUSE-inspired XDP Express Data Path Router component capability variant #145",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57456,7 +57877,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (OpenBSD v145)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #145"),
+            description: String::from(
+                "OpenBSD-inspired Systemd Unit Dependency Sorter component capability variant #145",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57510,7 +57933,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (CachyOS v145)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired GSP Firmware GPU Allocator component capability variant #145"),
+            description: String::from(
+                "CachyOS-inspired GSP Firmware GPU Allocator component capability variant #145",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57564,7 +57989,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (RHEL v146)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #146"),
+            description: String::from(
+                "RHEL-inspired Bcachefs CoW Multi-tier Allocator component capability variant #146",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57600,7 +58027,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (PCLinuxOS v146)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #146"),
+            description: String::from(
+                "PCLinuxOS-inspired SAT DPLL Canonical Remapper component capability variant #146",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57654,7 +58083,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (KaOS v146)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired POSIX Core Utility Fastpipe component capability variant #146"),
+            description: String::from(
+                "KaOS-inspired POSIX Core Utility Fastpipe component capability variant #146",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57753,7 +58184,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (OmniOS v147)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("OmniOS"),
-            description: String::from("OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #147"),
+            description: String::from(
+                "OmniOS-inspired ZFS ARC Cache Pressure Governor component capability variant #147",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57780,7 +58213,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (Haiku v147)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired SAT DPLL Canonical Remapper component capability variant #147"),
+            description: String::from(
+                "Haiku-inspired SAT DPLL Canonical Remapper component capability variant #147",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57816,7 +58251,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Systemd Unit Dependency Sorter (Ubuntu v147)"),
             category: DistroComponentCategory::InitAndSupervisor,
             origin_distro: String::from("Ubuntu"),
-            description: String::from("Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #147"),
+            description: String::from(
+                "Ubuntu-inspired Systemd Unit Dependency Sorter component capability variant #147",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57834,7 +58271,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Fedora v147)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Fedora"),
-            description: String::from("Fedora-inspired POSIX Core Utility Fastpipe component capability variant #147"),
+            description: String::from(
+                "Fedora-inspired POSIX Core Utility Fastpipe component capability variant #147",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57870,7 +58309,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Void Linux v147)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Void Linux"),
-            description: String::from("Void Linux-inspired GSP Firmware GPU Allocator component capability variant #147"),
+            description: String::from(
+                "Void Linux-inspired GSP Firmware GPU Allocator component capability variant #147",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57906,7 +58347,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("EEVDF Scheduler Slice Tuning (OpenBSD v148)"),
             category: DistroComponentCategory::KernelScheduler,
             origin_distro: String::from("OpenBSD"),
-            description: String::from("OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #148"),
+            description: String::from(
+                "OpenBSD-inspired EEVDF Scheduler Slice Tuning component capability variant #148",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57933,7 +58376,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("ZFS ARC Cache Pressure Governor (Solus v148)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("Solus"),
-            description: String::from("Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #148"),
+            description: String::from(
+                "Solus-inspired ZFS ARC Cache Pressure Governor component capability variant #148",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57960,7 +58405,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("SAT DPLL Canonical Remapper (CachyOS v148)"),
             category: DistroComponentCategory::PackageManagement,
             origin_distro: String::from("CachyOS"),
-            description: String::from("CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #148"),
+            description: String::from(
+                "CachyOS-inspired SAT DPLL Canonical Remapper component capability variant #148",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -57978,7 +58425,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("XDP Express Data Path Router (Manjaro v148)"),
             category: DistroComponentCategory::NetworkingFirewall,
             origin_distro: String::from("Manjaro"),
-            description: String::from("Manjaro-inspired XDP Express Data Path Router component capability variant #148"),
+            description: String::from(
+                "Manjaro-inspired XDP Express Data Path Router component capability variant #148",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -58014,7 +58463,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (RHEL v148)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("RHEL"),
-            description: String::from("RHEL-inspired POSIX Core Utility Fastpipe component capability variant #148"),
+            description: String::from(
+                "RHEL-inspired POSIX Core Utility Fastpipe component capability variant #148",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -58050,7 +58501,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (PCLinuxOS v148)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("PCLinuxOS"),
-            description: String::from("PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #148"),
+            description: String::from(
+                "PCLinuxOS-inspired GSP Firmware GPU Allocator component capability variant #148",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -58104,7 +58557,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("Bcachefs CoW Multi-tier Allocator (KaOS v149)"),
             category: DistroComponentCategory::FilesystemsStorage,
             origin_distro: String::from("KaOS"),
-            description: String::from("KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #149"),
+            description: String::from(
+                "KaOS-inspired Bcachefs CoW Multi-tier Allocator component capability variant #149",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -58194,7 +58649,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("POSIX Core Utility Fastpipe (Illumos v149)"),
             category: DistroComponentCategory::UserlandUtilities,
             origin_distro: String::from("Illumos"),
-            description: String::from("Illumos-inspired POSIX Core Utility Fastpipe component capability variant #149"),
+            description: String::from(
+                "Illumos-inspired POSIX Core Utility Fastpipe component capability variant #149",
+            ),
             enabled: true,
             execution_count: 0,
         });
@@ -58230,7 +58687,9 @@ impl SovereignThousandsDistroComponentsEngine {
             name: String::from("GSP Firmware GPU Allocator (Haiku v149)"),
             category: DistroComponentCategory::DriversHardware,
             origin_distro: String::from("Haiku"),
-            description: String::from("Haiku-inspired GSP Firmware GPU Allocator component capability variant #149"),
+            description: String::from(
+                "Haiku-inspired GSP Firmware GPU Allocator component capability variant #149",
+            ),
             enabled: true,
             execution_count: 0,
         });

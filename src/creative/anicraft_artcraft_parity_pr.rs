@@ -610,7 +610,9 @@ impl AnicraftRiggingWeightPaintingInfluencePrEngine {
                     "Linear Blend Skinning (LBS) and Dual Quaternion Skinning (DQS) solvers",
                 ),
             ],
-            performance_multiplier: String::from("50,000 Vertex Weight Skinning Evaluation (<0.4ms)"),
+            performance_multiplier: String::from(
+                "50,000 Vertex Weight Skinning Evaluation (<0.4ms)",
+            ),
             status: String::from("Ready for Merge"),
         }
     }

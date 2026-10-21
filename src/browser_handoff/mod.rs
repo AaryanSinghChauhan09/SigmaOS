@@ -7,5 +7,5 @@
 pub mod browser_handoff;
 
 pub use browser_handoff::{
-    DefaultBrowser, HandoffError, HandoffOutcome, HandoffResult, BrowserHandoff,
+    BrowserHandoff, DefaultBrowser, HandoffError, HandoffOutcome, HandoffResult,
 };

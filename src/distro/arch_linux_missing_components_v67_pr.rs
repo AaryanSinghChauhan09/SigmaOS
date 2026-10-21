@@ -62,7 +62,9 @@ impl ArchPacmanKeyringWoTIntegrityPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.keyring_path.is_empty() && self.required_signatures > 0 && self.verified_developers > 0
+        !self.keyring_path.is_empty()
+            && self.required_signatures > 0
+            && self.verified_developers > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {
@@ -139,7 +141,11 @@ pub struct ArchDevtoolsPkgctlMatrixBuildPrEngine {
 impl ArchDevtoolsPkgctlMatrixBuildPrEngine {
     pub fn new() -> Self {
         Self {
-            target_architectures: vec!["x86_64".to_string(), "x86_64-v3".to_string(), "aarch64".to_string()],
+            target_architectures: vec![
+                "x86_64".to_string(),
+                "x86_64-v3".to_string(),
+                "aarch64".to_string(),
+            ],
             clean_chroot: true,
             parallel_build_slots: 32,
         }
@@ -188,7 +194,9 @@ impl ArchReflectorMirrorlistPqcRttPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.pqc_signature_algorithm.is_empty() && self.max_acceptable_rtt_ms > 0 && self.benchmarked_mirrors > 0
+        !self.pqc_signature_algorithm.is_empty()
+            && self.max_acceptable_rtt_ms > 0
+            && self.benchmarked_mirrors > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {
@@ -223,14 +231,20 @@ pub struct ArchArchisoCloudInitExporterPrEngine {
 impl ArchArchisoCloudInitExporterPrEngine {
     pub fn new() -> Self {
         Self {
-            export_targets: vec!["qcow2".to_string(), "oci-container".to_string(), "raw-iso".to_string()],
+            export_targets: vec![
+                "qcow2".to_string(),
+                "oci-container".to_string(),
+                "raw-iso".to_string(),
+            ],
             cloud_init_schema_version: 2,
             generated_profiles: 18,
         }
     }
 
     pub fn verify(&self) -> bool {
-        !self.export_targets.is_empty() && self.cloud_init_schema_version > 0 && self.generated_profiles > 0
+        !self.export_targets.is_empty()
+            && self.cloud_init_schema_version > 0
+            && self.generated_profiles > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {
@@ -274,7 +288,10 @@ impl ArchBtrfsSnapperRetentionPolicyPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.config_name.is_empty() && self.hourly_limit > 0 && self.daily_limit > 0 && self.auto_reclaim_space
+        !self.config_name.is_empty()
+            && self.hourly_limit > 0
+            && self.daily_limit > 0
+            && self.auto_reclaim_space
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {
@@ -316,7 +333,9 @@ impl ArchSecurityTrackerCveMitigationPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.tracker_url.is_empty() && self.min_cvss_threshold > 0.0 && self.mitigated_advisories > 0
+        !self.tracker_url.is_empty()
+            && self.min_cvss_threshold > 0.0
+            && self.mitigated_advisories > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {
@@ -358,7 +377,9 @@ impl ArchModprobedDbKernelProfilePrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.db_path.is_empty() && self.auto_generate_localmodconfig && self.recorded_modules_count > 0
+        !self.db_path.is_empty()
+            && self.auto_generate_localmodconfig
+            && self.recorded_modules_count > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {
@@ -400,7 +421,9 @@ impl ArchPacmanTransactionHooksLinterPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.hooks_directory.is_empty() && self.strict_ordering_check && self.validated_hooks_count > 0
+        !self.hooks_directory.is_empty()
+            && self.strict_ordering_check
+            && self.validated_hooks_count > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV67PrSpec {

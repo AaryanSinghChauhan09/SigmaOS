@@ -175,10 +175,19 @@ impl GccClangLlvmToolchainPrEngine {
 
     pub fn generate_sanitizer_pass_config(&self, sanitizer: &str) -> Vec<String> {
         match sanitizer {
-            "asan" => vec!["-fsanitize=address".to_string(), "-fno-omit-frame-pointer".to_string()],
-            "msan" => vec!["-fsanitize=memory".to_string(), "-fsanitize-memory-track-origins=2".to_string()],
+            "asan" => vec![
+                "-fsanitize=address".to_string(),
+                "-fno-omit-frame-pointer".to_string(),
+            ],
+            "msan" => vec![
+                "-fsanitize=memory".to_string(),
+                "-fsanitize-memory-track-origins=2".to_string(),
+            ],
             "tsan" => vec!["-fsanitize=thread".to_string()],
-            "ubsan" => vec!["-fsanitize=undefined".to_string(), "-fno-sanitize-recover=all".to_string()],
+            "ubsan" => vec![
+                "-fsanitize=undefined".to_string(),
+                "-fno-sanitize-recover=all".to_string(),
+            ],
             _ => vec!["-fsanitize=cfi".to_string()],
         }
     }
@@ -746,7 +755,12 @@ impl DebuggerTracerProfilerPrEngine {
     }
 
     pub fn format_ltrace_call_args(&self, symbol: &str, args: &[u64]) -> String {
-        format!("{}(0x{:x}, 0x{:x})", symbol, args.get(0).copied().unwrap_or(0), args.get(1).copied().unwrap_or(0))
+        format!(
+            "{}(0x{:x}, 0x{:x})",
+            symbol,
+            args.get(0).copied().unwrap_or(0),
+            args.get(1).copied().unwrap_or(0)
+        )
     }
 
     pub fn valgrind_helgrind_race_detector(&self, thread_id: u32, addr: usize) -> bool {
@@ -1023,7 +1037,10 @@ impl VcsAndLanguageRuntimesPrEngine {
 
     pub fn extract_cargo_auditable_sbom(&self, binary_bytes: &[u8]) -> Option<String> {
         if binary_bytes.len() >= 16 {
-            Some("{\"packages\": [{\"name\": \"sigmaos-kernel\", \"version\": \"1.0.0\"}]}".to_string())
+            Some(
+                "{\"packages\": [{\"name\": \"sigmaos-kernel\", \"version\": \"1.0.0\"}]}"
+                    .to_string(),
+            )
         } else {
             None
         }

@@ -166,7 +166,8 @@ impl GnomeInnovationEngine {
     }
 
     pub fn set_night_light_enabled(&mut self, enabled: bool) {
-        self.quick_settings_state.insert(String::from("night_light"), enabled);
+        self.quick_settings_state
+            .insert(String::from("night_light"), enabled);
     }
 }
 
@@ -1052,7 +1053,14 @@ impl EnlightenmentMokshaEngine {
         self.moksha_shelves.len()
     }
 
-    pub fn update_evas_object_bounds(&mut self, id: u32, x: i32, y: i32, width: u32, height: u32) -> bool {
+    pub fn update_evas_object_bounds(
+        &mut self,
+        id: u32,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> bool {
         if let Some(obj) = self.evas_objects.get_mut(&id) {
             obj.x = x;
             obj.y = y;

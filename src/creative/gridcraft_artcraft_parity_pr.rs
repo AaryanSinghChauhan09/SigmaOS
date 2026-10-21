@@ -103,8 +103,16 @@ pub struct GridcraftXlookupIndexMatchFormulaPrEngine {
 impl GridcraftXlookupIndexMatchFormulaPrEngine {
     pub fn new() -> Self {
         let mut table = Vec::new();
-        table.push(vec!["101".to_string(), "Router 10G".to_string(), "500.00".to_string()]);
-        table.push(vec!["102".to_string(), "Switch 100G".to_string(), "1200.00".to_string()]);
+        table.push(vec![
+            "101".to_string(),
+            "Router 10G".to_string(),
+            "500.00".to_string(),
+        ]);
+        table.push(vec![
+            "102".to_string(),
+            "Switch 100G".to_string(),
+            "1200.00".to_string(),
+        ]);
 
         let mut data = BTreeMap::new();
         data.insert("Inventory".to_string(), table);
@@ -112,7 +120,13 @@ impl GridcraftXlookupIndexMatchFormulaPrEngine {
         Self { table_data: data }
     }
 
-    pub fn xlookup(&self, table_name: &str, key: &str, search_col: usize, return_col: usize) -> Option<String> {
+    pub fn xlookup(
+        &self,
+        table_name: &str,
+        key: &str,
+        search_col: usize,
+        return_col: usize,
+    ) -> Option<String> {
         let table = self.table_data.get(table_name)?;
         for row in table {
             if search_col < row.len() && row[search_col] == key {
@@ -170,7 +184,9 @@ impl GridcraftRealtimeDataStreamWebQueryPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement Real-Time Data Streaming (RTD) & Web Query Engine".to_string(),
+            pr_title:
+                "feat(gridcraft): Implement Real-Time Data Streaming (RTD) & Web Query Engine"
+                    .to_string(),
             target_subsystem: "Gridcraft RTD Data Pipeline".to_string(),
             original_suite: "ArtCraft Gridcraft RTD Feeds".to_string(),
             components_added: vec![
@@ -203,7 +219,11 @@ pub struct GridcraftDataValidationConditionalFormattingRulesPrEngine {
 impl GridcraftDataValidationConditionalFormattingRulesPrEngine {
     pub fn new() -> Self {
         Self {
-            validation_list: vec!["Pass".to_string(), "Fail".to_string(), "Pending".to_string()],
+            validation_list: vec![
+                "Pass".to_string(),
+                "Fail".to_string(),
+                "Pending".to_string(),
+            ],
         }
     }
 
@@ -268,7 +288,9 @@ impl GridcraftGoalSeekSolverMonteCarloRiskPrEngine {
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
         GridcraftArtcraftPrProposalManifest {
-            pr_title: "feat(gridcraft): Implement Goal Seek Parameter Solver & Monte Carlo Risk Simulator".to_string(),
+            pr_title:
+                "feat(gridcraft): Implement Goal Seek Parameter Solver & Monte Carlo Risk Simulator"
+                    .to_string(),
             target_subsystem: "Gridcraft Financial Optimization Subsystem".to_string(),
             original_suite: "ArtCraft Gridcraft Financial Modeling".to_string(),
             components_added: vec![
@@ -316,7 +338,8 @@ impl GridcraftCrdtLocklessCellSyncPrEngine {
                 return false;
             }
         }
-        self.delta_history.push((col, row, val.to_string(), lamport));
+        self.delta_history
+            .push((col, row, val.to_string(), lamport));
         true
     }
 
@@ -539,7 +562,10 @@ impl GridcraftCellDependencyDagCycleDetectorPrEngine {
     }
 
     pub fn add_dependency(&mut self, cell: &str, depends_on: &str) {
-        self.deps.entry(cell.to_string()).or_default().push(depends_on.to_string());
+        self.deps
+            .entry(cell.to_string())
+            .or_default()
+            .push(depends_on.to_string());
     }
 
     pub fn generate_proposal(&self) -> GridcraftArtcraftPrProposalManifest {
@@ -709,7 +735,9 @@ impl SovereignGridcraftArtcraftParityPrGateway {
         self.macro_engine.register_udf_name("DOUBLE");
         let macro_ok = !self.macro_engine.registered_udfs.is_empty();
 
-        let csv = self.io_engine.export_csv_stub(&["A", "B"], &[vec!["1".to_string(), "2".to_string()]]);
+        let csv = self
+            .io_engine
+            .export_csv_stub(&["A", "B"], &[vec!["1".to_string(), "2".to_string()]]);
         let io_ok = csv.contains("A,B");
 
         self.dag_engine.add_dependency("B1", "A1");
@@ -853,10 +881,7 @@ mod tests {
     #[test]
     fn test_pivot_engine() {
         let engine = GridcraftPivotTableMultidimensionalAggregationPrEngine::new();
-        let data = vec![
-            ("Sales".to_string(), 100.0),
-            ("Sales".to_string(), 250.0),
-        ];
+        let data = vec![("Sales".to_string(), 100.0), ("Sales".to_string(), 250.0)];
         let agg = engine.aggregate_pivot_sum(&data);
         assert_eq!(agg.get("Sales"), Some(&350.0));
     }

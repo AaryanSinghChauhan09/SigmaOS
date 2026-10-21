@@ -75,16 +75,24 @@ impl PhotocraftRawDemosaicNoiseReductionPrEngine {
         }
     }
 
-    pub fn process_bayer_raw(&self, bayer_data: &[u16], width: usize, height: usize, output_rgb: &mut [u8]) -> Result<usize, String> {
+    pub fn process_bayer_raw(
+        &self,
+        bayer_data: &[u16],
+        width: usize,
+        height: usize,
+        output_rgb: &mut [u8],
+    ) -> Result<usize, String> {
         if bayer_data.len() != width * height || output_rgb.len() != width * height * 3 {
-            return Err(String::from("Invalid buffer dimensions for RAW demosaicing"));
+            return Err(String::from(
+                "Invalid buffer dimensions for RAW demosaicing",
+            ));
         }
 
         // Apply demosaicing and gain adjustment
         let gain = (2.0f32).powf(self.config.exposure_ev);
         for i in 0..(width * height) {
             let val = (bayer_data[i] as f32 / 256.0 * gain).min(255.0) as u8;
-            output_rgb[i * 3] = val;     // R
+            output_rgb[i * 3] = val; // R
             output_rgb[i * 3 + 1] = val; // G
             output_rgb[i * 3 + 2] = val; // B
         }
@@ -128,16 +136,24 @@ impl PhotocraftAiContentAwareObjectRemovalPrEngine {
         }
     }
 
-    pub fn remove_masked_object(&self, image_buffer: &mut [u8], mask: &[u8], width: usize, height: usize) -> Result<usize, String> {
+    pub fn remove_masked_object(
+        &self,
+        image_buffer: &mut [u8],
+        mask: &[u8],
+        width: usize,
+        height: usize,
+    ) -> Result<usize, String> {
         if image_buffer.len() != width * height * 4 || mask.len() != width * height {
-            return Err(String::from("Invalid buffer lengths for content-aware removal"));
+            return Err(String::from(
+                "Invalid buffer lengths for content-aware removal",
+            ));
         }
 
         let mut replaced_count = 0;
         for i in 0..(width * height) {
             if mask[i] > 128 {
                 // Inpaint with sample average background color
-                image_buffer[i * 4] = 120;     // R
+                image_buffer[i * 4] = 120; // R
                 image_buffer[i * 4 + 1] = 130; // G
                 image_buffer[i * 4 + 2] = 140; // B
                 image_buffer[i * 4 + 3] = 255; // A
@@ -184,7 +200,12 @@ impl PhotocraftFrequencySeparationSkinRetouchPrEngine {
         }
     }
 
-    pub fn split_frequencies(&self, input_rgba: &[u8], low_freq: &mut [u8], high_freq: &mut [u8]) -> Result<(), String> {
+    pub fn split_frequencies(
+        &self,
+        input_rgba: &[u8],
+        low_freq: &mut [u8],
+        high_freq: &mut [u8],
+    ) -> Result<(), String> {
         if input_rgba.len() != low_freq.len() || input_rgba.len() != high_freq.len() {
             return Err(String::from("Buffer size mismatch in frequency separation"));
         }
@@ -235,7 +256,11 @@ impl PhotocraftHdrFocusStackingExposureFusionPrEngine {
         }
     }
 
-    pub fn fuse_hdr_stack(&self, exposures: &[Vec<u8>], output_hdr: &mut [u8]) -> Result<usize, String> {
+    pub fn fuse_hdr_stack(
+        &self,
+        exposures: &[Vec<u8>],
+        output_hdr: &mut [u8],
+    ) -> Result<usize, String> {
         if exposures.is_empty() || output_hdr.is_empty() {
             return Err(String::from("Empty exposures or output buffer"));
         }
@@ -298,7 +323,12 @@ impl PhotocraftVectorMaskPrecisionPenPathPrEngine {
         self.nodes.push(node);
     }
 
-    pub fn rasterize_mask_to_alpha(&self, alpha_mask: &mut [u8], width: usize, height: usize) -> Result<(), String> {
+    pub fn rasterize_mask_to_alpha(
+        &self,
+        alpha_mask: &mut [u8],
+        width: usize,
+        height: usize,
+    ) -> Result<(), String> {
         if alpha_mask.len() != width * height {
             return Err(String::from("Mask buffer length mismatch"));
         }
@@ -402,7 +432,12 @@ impl PhotocraftSmartObjectLayerStyleMatrixPrEngine {
         }
     }
 
-    pub fn apply_layer_styles(&self, layer_rgba: &mut [u8], width: usize, height: usize) -> Result<(), String> {
+    pub fn apply_layer_styles(
+        &self,
+        layer_rgba: &mut [u8],
+        width: usize,
+        height: usize,
+    ) -> Result<(), String> {
         if layer_rgba.len() != width * height * 4 {
             return Err(String::from("Invalid layer buffer size"));
         }
@@ -447,7 +482,12 @@ impl PhotocraftAiSubjectMattingHairSelectionPrEngine {
         }
     }
 
-    pub fn refine_hair_edges(&self, alpha_trimap: &mut [u8], width: usize, height: usize) -> Result<usize, String> {
+    pub fn refine_hair_edges(
+        &self,
+        alpha_trimap: &mut [u8],
+        width: usize,
+        height: usize,
+    ) -> Result<usize, String> {
         if alpha_trimap.len() != width * height {
             return Err(String::from("Invalid trimap buffer size"));
         }
@@ -511,7 +551,9 @@ impl PhotocraftPanoramaStitchingEquirectangularPrEngine {
 
     pub fn stitch_photos(&self, photo_count: usize) -> Result<usize, String> {
         if photo_count < 2 {
-            return Err(String::from("At least 2 photos required for panorama stitching"));
+            return Err(String::from(
+                "At least 2 photos required for panorama stitching",
+            ));
         }
         Ok(photo_count)
     }
@@ -519,7 +561,9 @@ impl PhotocraftPanoramaStitchingEquirectangularPrEngine {
     pub fn generate_pr_manifest(&self) -> PhotocraftV65PrProposalManifest {
         PhotocraftV65PrProposalManifest {
             pr_id: 6509,
-            pr_title: String::from("PR #6509: Multi-Photo Panorama Stitching & Equirectangular Projection"),
+            pr_title: String::from(
+                "PR #6509: Multi-Photo Panorama Stitching & Equirectangular Projection",
+            ),
             target_subsystem: String::from("PhotoCraft Geometric Alignment Engine"),
             original_suite: String::from("PhotoCraft Panorama Studio"),
             components_added: vec![
@@ -553,7 +597,9 @@ pub struct PhotocraftPerspectiveWarpPuppetMeshDeformPrEngine {
 
 impl PhotocraftPerspectiveWarpPuppetMeshDeformPrEngine {
     pub fn new() -> Self {
-        Self { vertices: Vec::new() }
+        Self {
+            vertices: Vec::new(),
+        }
     }
 
     pub fn add_pin(&mut self, u: f32, v: f32) {
@@ -659,7 +705,9 @@ mod tests {
         let engine = PhotocraftRawDemosaicNoiseReductionPrEngine::new();
         let bayer_data = vec![2048u16; 16];
         let mut rgb_out = vec![0u8; 16 * 3];
-        let processed = engine.process_bayer_raw(&bayer_data, 4, 4, &mut rgb_out).unwrap();
+        let processed = engine
+            .process_bayer_raw(&bayer_data, 4, 4, &mut rgb_out)
+            .unwrap();
         assert_eq!(processed, 16);
     }
 
@@ -678,7 +726,9 @@ mod tests {
         let input = vec![100u8; 16];
         let mut low = vec![0u8; 16];
         let mut high = vec![0u8; 16];
-        engine.split_frequencies(&input, &mut low, &mut high).unwrap();
+        engine
+            .split_frequencies(&input, &mut low, &mut high)
+            .unwrap();
         assert_eq!(low[0], 100);
         assert_eq!(high[0], 128);
     }

@@ -62,6 +62,8 @@ pub mod wordcraft_missing_components_parity_pr;
 
 pub use anicraft_artcraft_parity_pr::*;
 pub use anicraft_missing_components_parity_pr::*;
+pub use cadcraft_artcraft_parity_pr::*;
+pub use cadcraft_missing_components_parity_pr::*;
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
     DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine, DeckCraftMasterPrDeploymentSuite,
@@ -123,8 +125,6 @@ pub use photocraft::{
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
 pub use photocraft_artcraft_missing_components_v65_pr::*;
-pub use cadcraft_artcraft_parity_pr::*;
-pub use cadcraft_missing_components_parity_pr::*;
 pub use soundcraft::{
     fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
     SoundCraftDspSynthesizerPrDeployer, SoundCraftEngine, SoundCraftMasterPrDeploymentSuite,

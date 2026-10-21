@@ -256,7 +256,9 @@ impl SovereignInitSupervisor {
 
         if parsed.ready {
             unit.state = ServiceState::Ready;
-            unit.status_message = parsed.status.unwrap_or_else(|| String::from("Service active and operational"));
+            unit.status_message = parsed
+                .status
+                .unwrap_or_else(|| String::from("Service active and operational"));
         } else if let Some(status) = parsed.status {
             unit.status_message = status;
         }
@@ -308,7 +310,9 @@ impl SovereignInitSupervisor {
 
         if should_restart && unit.restart_count < unit.max_restarts {
             unit.restart_count += 1;
-            let delay = self.runit_s6_v63_engine.calculate_backoff_delay(unit.restart_count, 300);
+            let delay = self
+                .runit_s6_v63_engine
+                .calculate_backoff_delay(unit.restart_count, 300);
             unit.state = ServiceState::Restarting;
             unit.status_message = format!("Restarting after exit (backoff delay {}s)", delay);
         } else if exit_code != 0 {

@@ -217,12 +217,13 @@ impl ClipboardHistory {
     fn evict_if_over_capacity(&mut self) {
         while self.items.len() > self.capacity {
             // Evict the oldest non-pinned entry (scan from the tail).
-            let evict_idx = self
-                .items
-                .iter()
-                .enumerate()
-                .rev()
-                .find_map(|(i, item)| if !item.pinned { Some(i) } else { None });
+            let evict_idx = self.items.iter().enumerate().rev().find_map(|(i, item)| {
+                if !item.pinned {
+                    Some(i)
+                } else {
+                    None
+                }
+            });
 
             match evict_idx {
                 Some(i) => {
@@ -309,7 +310,7 @@ mod tests {
         assert_eq!(h.len(), 2);
         let third = h.set_text("third".to_string());
         assert_eq!(h.len(), 2);
-        assert_eq!(h.paste_text(first), None);   // evicted
+        assert_eq!(h.paste_text(first), None); // evicted
         assert_eq!(h.paste_text(second), Some("second".to_string()));
         assert_eq!(h.paste_text(third), Some("third".to_string()));
         assert_eq!(h.evictions(), 1);

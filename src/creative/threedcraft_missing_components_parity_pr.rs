@@ -20,10 +20,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::f32::consts::PI;
 
-
-
-
-
 /// Structured PR proposal manifest for 3DCraft missing components.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ThreeDCraftPrProposalManifest {

@@ -166,10 +166,7 @@ impl ReminderStore {
     /// Borrow references to reminders due for delivery at the current tick.
     /// (Query, zero-copy of payloads)
     pub fn due(&self) -> Vec<&Reminder> {
-        self.items
-            .iter()
-            .filter(|r| r.is_due(self.tick))
-            .collect()
+        self.items.iter().filter(|r| r.is_due(self.tick)).collect()
     }
 
     /// Mark the reminder with `id` as fired, returning `true` when found and active.
@@ -261,7 +258,9 @@ mod tests {
         let mut store = ReminderStore::new(10);
         store.set_tick(100);
         // Act
-        let id = store.add("check the oven".to_string(), 30).expect("reminder added");
+        let id = store
+            .add("check the oven".to_string(), 30)
+            .expect("reminder added");
         // Assert
         assert_eq!(store.tick(), 100);
         assert_eq!(store.len(), 1);
@@ -347,14 +346,8 @@ mod tests {
         assert_eq!(store.len(), 2);
         assert_eq!(store.firings(), 1);
         // `first` was evicted (it was non-active), `second` and `third` remain.
-        assert!(store
-            .list()
-            .iter()
-            .any(|r| r.id == second));
-        assert!(store
-            .list()
-            .iter()
-            .any(|r| r.id == third));
+        assert!(store.list().iter().any(|r| r.id == second));
+        assert!(store.list().iter().any(|r| r.id == third));
     }
 
     #[test]

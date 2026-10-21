@@ -93,7 +93,8 @@ impl WordcraftCrdtMultiUserCollabPrEngine {
                 self.document_buffer.drain(delta.char_index..end);
             }
             if !delta.inserted_text.is_empty() {
-                self.document_buffer.insert_str(delta.char_index, &delta.inserted_text);
+                self.document_buffer
+                    .insert_str(delta.char_index, &delta.inserted_text);
             }
             self.delta_log.push(delta);
             return true;
@@ -104,7 +105,9 @@ impl WordcraftCrdtMultiUserCollabPrEngine {
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 830,
-            pr_title: "feat(wordcraft): Implement CRDT Real-Time Co-Authoring & Multi-User Document Sync".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement CRDT Real-Time Co-Authoring & Multi-User Document Sync"
+                    .to_string(),
             target_subsystem: "Wordcraft Collaboration Subsystem".to_string(),
             original_suite: "ArtCraft Wordcraft Collaboration Suite".to_string(),
             components_added: vec![
@@ -249,7 +252,11 @@ impl WordcraftCitationBibliographyManagerPrEngine {
     pub fn format_citation(&self, cite_key: &str, style: CitationStyle) -> Option<String> {
         let record = self.library.get(cite_key)?;
         match style {
-            CitationStyle::Apa => Some(format!("({}, {})", record.author.split(',').next().unwrap_or(""), record.year)),
+            CitationStyle::Apa => Some(format!(
+                "({}, {})",
+                record.author.split(',').next().unwrap_or(""),
+                record.year
+            )),
             CitationStyle::Ieee => Some(format!("[{}]", record.cite_key)),
             _ => Some(format!("{}, {}", record.author, record.year)),
         }
@@ -303,11 +310,13 @@ impl WordcraftMailMergeAutomationPrEngine {
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 833,
-            pr_title: "feat(wordcraft): Implement Mail Merge Automation & Batch Document Generator".to_string(),
+            pr_title: "feat(wordcraft): Implement Mail Merge Automation & Batch Document Generator"
+                .to_string(),
             target_subsystem: "Wordcraft Automation & Merge Pipeline".to_string(),
             original_suite: "ArtCraft Wordcraft Document Automation".to_string(),
             components_added: vec![
-                "Template placeholder field substitution engine ({{first_name}}, {{address}})".to_string(),
+                "Template placeholder field substitution engine ({{first_name}}, {{address}})"
+                    .to_string(),
                 "CSV/JSON/Database data source binding and row iterator".to_string(),
                 "Batch PDF/Word document generation with custom filename rules".to_string(),
             ],
@@ -449,7 +458,8 @@ impl WordcraftEquationMathFormulaEditorPrEngine {
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 836,
-            pr_title: "feat(wordcraft): Implement TeX/LaTeX Formula Editor & MathML Glyph Renderer".to_string(),
+            pr_title: "feat(wordcraft): Implement TeX/LaTeX Formula Editor & MathML Glyph Renderer"
+                .to_string(),
             target_subsystem: "Wordcraft Mathematical Typesetting Subsystem".to_string(),
             original_suite: "ArtCraft Wordcraft Math Notation".to_string(),
             components_added: vec![
@@ -526,17 +536,26 @@ impl WordcraftAiWritingStyleGrammarAssistantPrEngine {
         Self
     }
 
-    pub fn calculate_readability_flesch(&self, word_count: usize, sentence_count: usize, syllable_count: usize) -> f64 {
+    pub fn calculate_readability_flesch(
+        &self,
+        word_count: usize,
+        sentence_count: usize,
+        syllable_count: usize,
+    ) -> f64 {
         if sentence_count == 0 || word_count == 0 {
             return 100.0;
         }
-        206.835 - 1.015 * (word_count as f64 / sentence_count as f64) - 84.6 * (syllable_count as f64 / word_count as f64)
+        206.835
+            - 1.015 * (word_count as f64 / sentence_count as f64)
+            - 84.6 * (syllable_count as f64 / word_count as f64)
     }
 
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 838,
-            pr_title: "feat(wordcraft): Implement AI Grammar Assistant, Readability Index & Tone Enhancer".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement AI Grammar Assistant, Readability Index & Tone Enhancer"
+                    .to_string(),
             target_subsystem: "Wordcraft AI Writing Assistant Engine".to_string(),
             original_suite: "ArtCraft Wordcraft AI Copilot".to_string(),
             components_added: vec![
@@ -620,12 +639,16 @@ impl WordcraftMasterStyleBranchingThemeCascadePrEngine {
     pub fn generate_proposal(&self) -> WordcraftPrProposalManifest {
         WordcraftPrProposalManifest {
             pr_id: 840,
-            pr_title: "feat(wordcraft): Implement Master Style Branching & Typography Token Cascader".to_string(),
+            pr_title:
+                "feat(wordcraft): Implement Master Style Branching & Typography Token Cascader"
+                    .to_string(),
             target_subsystem: "Wordcraft Master Style & Theme Subsystem".to_string(),
             original_suite: "ArtCraft Wordcraft Theme Engine".to_string(),
             components_added: vec![
-                "Master document template style hierarchy with paragraph/character styles".to_string(),
-                "Global design token typography, color, and spacing cascading overrides".to_string(),
+                "Master document template style hierarchy with paragraph/character styles"
+                    .to_string(),
+                "Global design token typography, color, and spacing cascading overrides"
+                    .to_string(),
                 "Asset palette synchronization across document sections".to_string(),
             ],
             performance_multiplier: "Instant Global Theme Propagation (<0.1ms)".to_string(),
@@ -686,31 +709,47 @@ impl SovereignWordcraftArtcraftParityPrGateway {
             timestamp_lamport: 1,
         });
 
-        let lines = self.typography_engine.compute_line_breaks("Lorem ipsum dolor sit amet", 50.0);
+        let lines = self
+            .typography_engine
+            .compute_line_breaks("Lorem ipsum dolor sit amet", 50.0);
         let typo_ok = !lines.is_empty();
 
-        let citation = self.citation_engine.format_citation("Knuth1984", CitationStyle::Apa);
+        let citation = self
+            .citation_engine
+            .format_citation("Knuth1984", CitationStyle::Apa);
         let citation_ok = citation == Some("(Knuth, 1984)".to_string());
 
         let mut map = BTreeMap::new();
         map.insert("name".to_string(), "John Doe".to_string());
-        let merged = self.mail_merge_engine.execute_mail_merge("Hello {{name}}", &map);
+        let merged = self
+            .mail_merge_engine
+            .execute_mail_merge("Hello {{name}}", &map);
         let merge_ok = merged == "Hello John Doe";
 
-        let pdfa_ok = self.epub_pdfa_engine.validate_pdfa_preflight("Document Title", true);
+        let pdfa_ok = self
+            .epub_pdfa_engine
+            .validate_pdfa_preflight("Document Title", true);
 
-        let form_ok = self.form_field_engine.set_field_value("field_name", "Jane Doe");
+        let form_ok = self
+            .form_field_engine
+            .set_field_value("field_name", "Jane Doe");
 
         let svg = self.math_engine.render_tex_to_svg_stub("E = mc^2");
         let math_ok = svg.contains("mc^2");
 
-        let (added, deleted) = self.diff_engine.diff_text("Hello World", "Hello Brave New World");
+        let (added, deleted) = self
+            .diff_engine
+            .diff_text("Hello World", "Hello Brave New World");
         let diff_ok = added == 2 && deleted == 0;
 
-        let score = self.ai_assistant_engine.calculate_readability_flesch(100, 10, 150);
+        let score = self
+            .ai_assistant_engine
+            .calculate_readability_flesch(100, 10, 150);
         let ai_ok = score > 0.0;
 
-        let redacted = self.protection_engine.apply_redaction("Secret: TOP SECRET", "TOP SECRET");
+        let redacted = self
+            .protection_engine
+            .apply_redaction("Secret: TOP SECRET", "TOP SECRET");
         let protection_ok = redacted.contains("██████");
 
         self.theme_engine.apply_theme("Modern Corporate");
@@ -779,8 +818,7 @@ impl WordcraftArtcraftParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_wordcraft_parity()
-            && self.gateway.collect_all_proposals().len() == 11
+        self.gateway.evaluate_wordcraft_parity() && self.gateway.collect_all_proposals().len() == 11
     }
 }
 

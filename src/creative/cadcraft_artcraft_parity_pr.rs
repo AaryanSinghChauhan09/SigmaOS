@@ -25,10 +25,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-
-
-
-
 /// Structured PR proposal manifest for CadCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CadcraftPrProposalManifest {

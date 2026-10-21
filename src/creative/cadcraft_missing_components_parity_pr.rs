@@ -140,15 +140,20 @@ impl CadcraftBRepNurbsParametricSolidKernelPrEngine {
     pub fn generate_proposal(&self) -> CadcraftPrProposalManifest {
         CadcraftPrProposalManifest {
             pr_id: 841,
-            pr_title: "feat(cadcraft): Implement B-Rep NURBS Parametric Solid Modeling Kernel Engine".to_string(),
+            pr_title:
+                "feat(cadcraft): Implement B-Rep NURBS Parametric Solid Modeling Kernel Engine"
+                    .to_string(),
             target_subsystem: "Cadcraft Solid Geometry Kernel".to_string(),
             original_suite: "ArtCraft CadCraft NURBS Kernel".to_string(),
             components_added: vec![
-                "Non-Uniform Rational B-Spline (NURBS) curve & surface geometry evaluator".to_string(),
-                "Boundary Representation (B-Rep) topological face, edge & vertex shell graph".to_string(),
+                "Non-Uniform Rational B-Spline (NURBS) curve & surface geometry evaluator"
+                    .to_string(),
+                "Boundary Representation (B-Rep) topological face, edge & vertex shell graph"
+                    .to_string(),
                 "Exact CSG Boolean solid operations (Union, Difference, Intersection)".to_string(),
             ],
-            performance_multiplier: "1,000,000 NURBS Surface Points Evaluated / sec (<1ms)".to_string(),
+            performance_multiplier: "1,000,000 NURBS Surface Points Evaluated / sec (<1ms)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -333,7 +338,11 @@ impl CadcraftFeaStructuralThermalSimulationPrEngine {
     }
 
     /// Solve linear static stress FEA for tetrahedral mesh nodes
-    pub fn solve_static_stress_fea(&self, node_count: u32, applied_force_n: f64) -> Vec<FeaNodeResult> {
+    pub fn solve_static_stress_fea(
+        &self,
+        node_count: u32,
+        applied_force_n: f64,
+    ) -> Vec<FeaNodeResult> {
         let mut results = Vec::with_capacity(node_count as usize);
         let base_stress = applied_force_n / 100.0; // Simulated MPa
         for i in 1..=node_count {
@@ -384,7 +393,13 @@ impl CadcraftSheetMetalUnfoldBendDeductionPrEngine {
     }
 
     /// Compute bend deduction = 2 * (R + T) * tan(angle/2) - (PI/180) * angle * (R + K * T)
-    pub fn compute_bend_deduction(&self, thickness_mm: f64, inner_radius_mm: f64, bend_angle_deg: f64, k_factor: f64) -> f64 {
+    pub fn compute_bend_deduction(
+        &self,
+        thickness_mm: f64,
+        inner_radius_mm: f64,
+        bend_angle_deg: f64,
+        k_factor: f64,
+    ) -> f64 {
         let rad = bend_angle_deg * (PI / 180.0);
         let bend_allowance = rad * (inner_radius_mm + k_factor * thickness_mm);
         let outside_setback = 2.0 * (inner_radius_mm + thickness_mm) * (rad / 2.0).tan();
@@ -499,10 +514,14 @@ impl SovereignCadcraftArtcraftParityPrGateway {
         let fea_res = self.fea_solver.solve_static_stress_fea(10, 1000.0);
         let fea_ok = fea_res.len() == 10;
 
-        let bd = self.sheet_metal.compute_bend_deduction(2.0, 3.0, 90.0, 0.44);
+        let bd = self
+            .sheet_metal
+            .compute_bend_deduction(2.0, 3.0, 90.0, 0.44);
         let sheet_ok = bd > 0.0;
 
-        let step_ok = self.step_bridge.validate_step_header("ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;");
+        let step_ok = self.step_bridge.validate_step_header(
+            "ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;",
+        );
 
         nurbs_ok && joint_ok && cam_ok && fea_ok && sheet_ok && step_ok
     }

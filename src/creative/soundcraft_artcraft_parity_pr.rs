@@ -26,7 +26,6 @@ use alloc::vec::Vec;
 // 10. SoundcraftMasterSessionTemplateCascadePrEngine (Master session routing template hierarchy, global audio bus cascading & track preset palette syncer)
 // 11. SovereignSoundcraftArtcraftParityPrGateway & SoundcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-
 /// Structured PR proposal manifest descriptor for Soundcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SoundcraftArtcraftPrProposalManifest {

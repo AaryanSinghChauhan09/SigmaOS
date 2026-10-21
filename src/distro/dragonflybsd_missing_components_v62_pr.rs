@@ -230,16 +230,17 @@ impl DragonFlyLwktCpuTokenSerializerPrEngine {
             cpu,
             tokens_required: required_tokens,
         });
-        self.preemption_queue.sort_by(|a, b| b.priority.cmp(&a.priority));
+        self.preemption_queue
+            .sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
     pub fn schedule_cpu(&mut self, cpu: u32) -> Option<u64> {
         if let Some(idx) = self.preemption_queue.iter().position(|t| {
             t.cpu == cpu
                 && t.tokens_required.iter().all(|tok_id| {
-                    self.tokens
-                        .get(tok_id)
-                        .map_or(false, |tok| tok.holding_thread_id.is_none() || tok.holding_thread_id == Some(t.tid))
+                    self.tokens.get(tok_id).map_or(false, |tok| {
+                        tok.holding_thread_id.is_none() || tok.holding_thread_id == Some(t.tid)
+                    })
                 })
         }) {
             let task = self.preemption_queue.remove(idx);
@@ -772,27 +773,33 @@ impl DragonFlyBsdMissingComponentsV62PrSuite {
             description: "Multi-PFS snapshot clustering, delta replication log, and slave sync."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn sync_slave_nodes()".to_string(),
+            unified_diff: "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn sync_slave_nodes()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6202,
-            title: "LWKT CPU Token Serialization & Lockless Cross-CPU Preemption Engine".to_string(),
+            title: "LWKT CPU Token Serialization & Lockless Cross-CPU Preemption Engine"
+                .to_string(),
             target_component: "kernel/scheduler/lwkt".to_string(),
             description: "LWKT CPU token serialization lock management and priority preemption."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn acquire_token()".to_string(),
+            unified_diff: "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn acquire_token()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6203,
-            title: "vkernel Zero-Copy Nested Page Table & Hypercall Trap Dispatch Engine".to_string(),
-            target_component: "virtualization/vkernel".to_string(),
-            description: "Nested page table entry translation and zero-copy hypercall trap dispatch."
+            title: "vkernel Zero-Copy Nested Page Table & Hypercall Trap Dispatch Engine"
                 .to_string(),
+            target_component: "virtualization/vkernel".to_string(),
+            description:
+                "Nested page table entry translation and zero-copy hypercall trap dispatch."
+                    .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn translate_gva()".to_string(),
+            unified_diff: "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn translate_gva()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -802,7 +809,8 @@ impl DragonFlyBsdMissingComponentsV62PrSuite {
             description: "Chroot build execution, ccache artifact hashing, and verification."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn lookup_ccache()".to_string(),
+            unified_diff: "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn lookup_ccache()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -812,7 +820,8 @@ impl DragonFlyBsdMissingComponentsV62PrSuite {
             description: "Scoped macro expansion for jails ($ZONE, $SYS, $ARCH) with fallback."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn set_jail_scope()".to_string(),
+            unified_diff: "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn set_jail_scope()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -827,54 +836,68 @@ impl DragonFlyBsdMissingComponentsV62PrSuite {
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6207,
-            title: "Lockless Per-CPU Namecache Generation Validation & Directory Invalidation Engine".to_string(),
+            title:
+                "Lockless Per-CPU Namecache Generation Validation & Directory Invalidation Engine"
+                    .to_string(),
             target_component: "vfs/namecache".to_string(),
             description: "Per-CPU generation counters and directory invalidation synchronization."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/namecache.rs\n+++ b/vfs/namecache.rs\n+ pub fn invalidate_directory()".to_string(),
+            unified_diff:
+                "--- a/vfs/namecache.rs\n+++ b/vfs/namecache.rs\n+ pub fn invalidate_directory()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6208,
             title: "DevFS kqueue Hotplug Event Filter & Device Node Permission Engine".to_string(),
             target_component: "dev/devfs".to_string(),
-            description: "Hotplug device node creation, permission check, and kqueue event counter."
-                .to_string(),
+            description:
+                "Hotplug device node creation, permission check, and kqueue event counter."
+                    .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/dev/devfs.rs\n+++ b/dev/devfs.rs\n+ pub fn check_permission()".to_string(),
+            unified_diff: "--- a/dev/devfs.rs\n+++ b/dev/devfs.rs\n+ pub fn check_permission()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6209,
             title: "Firmlink Overlay Bindings & Jail Mount Isolation Gateway Engine".to_string(),
             target_component: "vfs/firmlink".to_string(),
-            description: "Jail-specific firmlink overlay bindings and path isolation."
-                .to_string(),
+            description: "Jail-specific firmlink overlay bindings and path isolation.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/firmlink.rs\n+++ b/vfs/firmlink.rs\n+ pub fn resolve_path()".to_string(),
+            unified_diff: "--- a/vfs/firmlink.rs\n+++ b/vfs/firmlink.rs\n+ pub fn resolve_path()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6210,
-            title: "SMP Cross-CPU IPI Barrier Synchronization & Hardware Spin-Fence Engine".to_string(),
+            title: "SMP Cross-CPU IPI Barrier Synchronization & Hardware Spin-Fence Engine"
+                .to_string(),
             target_component: "kernel/smp".to_string(),
             description: "Cross-CPU IPI barrier synchronization and spin-fence status tracking."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/smp.rs\n+++ b/kernel/smp.rs\n+ pub fn cpu_check_in()".to_string(),
+            unified_diff: "--- a/kernel/smp.rs\n+++ b/kernel/smp.rs\n+ pub fn cpu_check_in()"
+                .to_string(),
         });
 
         prs
     }
 
     pub fn execute_v62_parity_eval(&mut self) -> bool {
-        let delta_tx = self.hammer2_engine.commit_pfs_delta("root_pfs", [5u8; 32], 4096);
+        let delta_tx = self
+            .hammer2_engine
+            .commit_pfs_delta("root_pfs", [5u8; 32], 4096);
         let tok_acq = self.lwkt_engine.acquire_token(1, 100);
-        self.vkernel_engine.map_nested_pte(0x1000, 0x2000, 0x3000, true, true);
+        self.vkernel_engine
+            .map_nested_pte(0x1000, 0x2000, 0x3000, true, true);
         let trans = self.vkernel_engine.translate_gva(0x1000);
-        self.varsyms_engine.set_jail_scope("jail1", "ZONE", "jail1_zone");
-        let path = self.varsyms_engine.resolve_path(Some("jail1"), "/usr/$SYS/$ZONE");
+        self.varsyms_engine
+            .set_jail_scope("jail1", "ZONE", "jail1_zone");
+        let path = self
+            .varsyms_engine
+            .resolve_path(Some("jail1"), "/usr/$SYS/$ZONE");
 
         delta_tx > 10000 && tok_acq && trans == Some(0x3000) && path.contains("jail1_zone")
     }

@@ -563,13 +563,13 @@ pub struct PeriodicImprovementPrProposal {
 impl PeriodicImprovementPrProposal {
     /// Formats the proposal as a Pull Request proposal description matching repository standards
     pub fn format_pull_request_description(&self) -> String {
-        let mut desc = format!(
-            "## PR #{}: {}\n\n",
-            self.pr_id, self.pr_title
-        );
+        let mut desc = format!("## PR #{}: {}\n\n", self.pr_id, self.pr_title);
         desc.push_str(&format!("**Branch Name**: `{}`\n", self.branch_name));
         desc.push_str(&format!("**Target Component**: {}\n", self.domain.name()));
-        desc.push_str(&format!("**Upstream Study Reference**: {}\n", self.upstream_reference));
+        desc.push_str(&format!(
+            "**Upstream Study Reference**: {}\n",
+            self.upstream_reference
+        ));
         desc.push_str(&format!("**ADR Document**: {}\n", self.adr_title));
         desc.push_str(&format!(
             "**Maturity Level Shift**: {:?} → {:?}\n",
@@ -577,9 +577,14 @@ impl PeriodicImprovementPrProposal {
         ));
         desc.push_str(&format!(
             "**Runtime Evidence Path**: {}\n",
-            self.runtime_evidence_path.as_deref().unwrap_or("None (Unpromoted)")
+            self.runtime_evidence_path
+                .as_deref()
+                .unwrap_or("None (Unpromoted)")
         ));
-        desc.push_str(&format!("**PQC Post-Quantum Signature**: `{}`\n", self.pqc_signature));
+        desc.push_str(&format!(
+            "**PQC Post-Quantum Signature**: `{}`\n",
+            self.pqc_signature
+        ));
         desc.push_str(&format!("**CI Gate Status**: {}\n\n", self.ci_status));
 
         desc.push_str("### Proposed Changes\n```diff\n");
@@ -697,19 +702,9 @@ impl PeriodicStudyImproveProvePrGateway {
             ),
         ];
 
-        for (
-            id,
-            title,
-            branch,
-            domain,
-            ref_os,
-            adr,
-            init_mat,
-            prom_mat,
-            evidence,
-            diff,
-            pqc,
-        ) in default_specs {
+        for (id, title, branch, domain, ref_os, adr, init_mat, prom_mat, evidence, diff, pqc) in
+            default_specs
+        {
             let proposal = PeriodicImprovementPrProposal {
                 pr_id: id,
                 pr_title: title.into(),
@@ -747,10 +742,7 @@ impl PeriodicStudyImproveProvePrGateway {
     }
 
     /// Queries PR proposals by component domain
-    pub fn search_by_domain(
-        &self,
-        domain: ComponentDomain,
-    ) -> Vec<&PeriodicImprovementPrProposal> {
+    pub fn search_by_domain(&self, domain: ComponentDomain) -> Vec<&PeriodicImprovementPrProposal> {
         self.pr_proposals
             .iter()
             .filter(|p| p.domain == domain)
@@ -759,9 +751,8 @@ impl PeriodicStudyImproveProvePrGateway {
 
     /// Generates a master gateway proposal report summarizing all staged PRs
     pub fn generate_pr_gateway_summary(&self) -> String {
-        let mut report = String::from(
-            "# SigmaOS Periodic Study-Improve-Prove PR Gateway Report\n\n",
-        );
+        let mut report =
+            String::from("# SigmaOS Periodic Study-Improve-Prove PR Gateway Report\n\n");
         report.push_str(&format!(
             "Total Staged PR Proposals: {}\n\n",
             self.pr_proposals.len()

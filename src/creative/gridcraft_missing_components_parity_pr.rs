@@ -765,7 +765,8 @@ impl SovereignGridcraftMissingComponentsParityPrGateway {
     pub fn new() -> Self {
         Self {
             formula_xlookup: GridcraftAdvancedFormulaXlookupMissingPrEngine::new(),
-            validation_formatting: GridcraftDataValidationConditionalFormattingMissingPrEngine::new(),
+            validation_formatting: GridcraftDataValidationConditionalFormattingMissingPrEngine::new(
+            ),
             realtime_spill: GridcraftRealtimeDataStreamSpillArrayPrEngine::new(),
             goal_seek_solver: GridcraftFinancialGoalSeekSolverPrEngine::new(),
             crdt_collab: GridcraftMultiUserCrdtCollabPrEngine::new(),

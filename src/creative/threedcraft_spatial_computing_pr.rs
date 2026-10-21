@@ -144,11 +144,14 @@ impl ThreeDCraftVolumetricPathTracerPrEngine {
     pub fn generate_proposal(&self) -> ThreeDCraftSpatialPrProposalManifest {
         ThreeDCraftSpatialPrProposalManifest {
             pr_id: 889,
-            pr_title: "feat(threedcraft): Implement Unbiased Volumetric Spectral Path Tracer Engine".to_string(),
+            pr_title:
+                "feat(threedcraft): Implement Unbiased Volumetric Spectral Path Tracer Engine"
+                    .to_string(),
             target_subsystem: "3DCraft Rendering Core".to_string(),
             original_suite: "ArtCraft 3DCraft Volumetric Optics".to_string(),
             components_added: vec![
-                "Participating media fog absorption, scattering, and extinction integration".to_string(),
+                "Participating media fog absorption, scattering, and extinction integration"
+                    .to_string(),
                 "Henyey-Greenstein anisotropic phase function evaluator".to_string(),
                 "Russian roulette path termination for unbiased Monte Carlo rendering".to_string(),
             ],
@@ -259,7 +262,9 @@ impl ThreeDCraftVDBVolumetricFluidPrEngine {
     pub fn generate_proposal(&self) -> ThreeDCraftSpatialPrProposalManifest {
         ThreeDCraftSpatialPrProposalManifest {
             pr_id: 890,
-            pr_title: "feat(threedcraft): Implement OpenVDB Sparse Voxel Grid Volumetric Fluid Engine".to_string(),
+            pr_title:
+                "feat(threedcraft): Implement OpenVDB Sparse Voxel Grid Volumetric Fluid Engine"
+                    .to_string(),
             target_subsystem: "3DCraft Fluid & Dynamic Simulation".to_string(),
             original_suite: "ArtCraft 3DCraft Sparse Volumetric Voxel".to_string(),
             components_added: vec![
@@ -346,7 +351,9 @@ impl ThreeDCraftSubdivisionSurfaceCatmullClarkPrEngine {
     pub fn generate_proposal(&self) -> ThreeDCraftSpatialPrProposalManifest {
         ThreeDCraftSpatialPrProposalManifest {
             pr_id: 891,
-            pr_title: "feat(threedcraft): Implement Catmull-Clark Subdivision Surface Quad Mesh Solver".to_string(),
+            pr_title:
+                "feat(threedcraft): Implement Catmull-Clark Subdivision Surface Quad Mesh Solver"
+                    .to_string(),
             target_subsystem: "3DCraft Geometry Core".to_string(),
             original_suite: "ArtCraft 3DCraft Subdivision Surfaces".to_string(),
             components_added: vec![
@@ -500,13 +507,16 @@ impl ThreeDCraftGpuClothSoftBodyPrEngine {
     pub fn generate_proposal(&self) -> ThreeDCraftSpatialPrProposalManifest {
         ThreeDCraftSpatialPrProposalManifest {
             pr_id: 892,
-            pr_title: "feat(threedcraft): Implement GPU Mass-Spring-Damper Cloth & Soft-Body Simulation".to_string(),
+            pr_title:
+                "feat(threedcraft): Implement GPU Mass-Spring-Damper Cloth & Soft-Body Simulation"
+                    .to_string(),
             target_subsystem: "3DCraft Soft-Body Physics".to_string(),
             original_suite: "ArtCraft 3DCraft Cloth & Soft-Body".to_string(),
             components_added: vec![
                 "Mass-spring-damper structural, shear, and bending constraint solver".to_string(),
                 "Position-Based Dynamics (PBD) constraint relaxation scheme".to_string(),
-                "Spatial hash grid self-collision and environment penetration responder".to_string(),
+                "Spatial hash grid self-collision and environment penetration responder"
+                    .to_string(),
             ],
             performance_multiplier: "50,000 Active Cloth Nodes @ 120 FPS".to_string(),
             status: "Ready for Merge".to_string(),
@@ -541,9 +551,7 @@ pub struct ThreeDCraft3dGaussianSplattingPrEngine {
 
 impl ThreeDCraft3dGaussianSplattingPrEngine {
     pub fn new() -> Self {
-        let mut engine = Self {
-            splats: Vec::new(),
-        };
+        let mut engine = Self { splats: Vec::new() };
 
         // Initialize sample gaussians
         for i in 0..16 {
@@ -633,7 +641,12 @@ impl SovereignThreeDCraftSpatialComputingPrGateway {
         let density = self.fluid_vdb.query_density_at([4.0, 4.0, 4.0]);
         let fluid_ok = density >= 0.0;
 
-        let quad = [[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0]]];
+        let quad = [[
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ]];
         let subquads = self.subsurf_catmull.subdivide_quad_mesh(&quad);
         let catmull_ok = subquads.len() == 4;
 
@@ -670,9 +683,8 @@ impl SovereignThreeDCraftSpatialComputingPrGateway {
     }
 
     pub fn export_all_pr_manifests_markdown(&self) -> String {
-        let mut markdown = String::from(
-            "# 3DCraft Spatial Computing & Advanced 3D Rendering PR Manifest\n\n",
-        );
+        let mut markdown =
+            String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering PR Manifest\n\n");
         markdown.push_str("## Staged Pull Request Proposals\n\n");
 
         for pr in self.collect_all_proposals() {
@@ -743,7 +755,9 @@ mod tests {
         }
 
         let markdown = gateway.export_all_pr_manifests_markdown();
-        assert!(markdown.contains("# 3DCraft Spatial Computing & Advanced 3D Rendering PR Manifest"));
+        assert!(
+            markdown.contains("# 3DCraft Spatial Computing & Advanced 3D Rendering PR Manifest")
+        );
         assert!(markdown.contains("PR #889"));
         assert!(markdown.contains("PR #893"));
     }
@@ -784,7 +798,12 @@ mod tests {
     #[test]
     fn test_catmull_clark_subdivision_engine() {
         let engine = ThreeDCraftSubdivisionSurfaceCatmullClarkPrEngine::new();
-        let quad = [[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0]]];
+        let quad = [[
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ]];
         let subquads = engine.subdivide_quad_mesh(&quad);
         assert_eq!(subquads.len(), 4);
 

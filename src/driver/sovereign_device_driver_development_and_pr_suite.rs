@@ -197,9 +197,16 @@ pub struct DeviceId {
 /// Resource Description (MMIO, IRQ, DMA)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DeviceResource {
-    Mmio { base: CpuPhysicalAddress, size: usize },
-    Irq { vector: u32 },
-    DmaChannel { channel: u32 },
+    Mmio {
+        base: CpuPhysicalAddress,
+        size: usize,
+    },
+    Irq {
+        vector: u32,
+    },
+    DmaChannel {
+        channel: u32,
+    },
 }
 
 /// Managed RAII Resource Guard to ensure cleanup on failed probe or detach
@@ -349,7 +356,11 @@ impl InterruptQueueEngine {
     }
 
     /// Primary interrupt handler: short, non-blocking, schedules deferred work
-    pub fn handle_interrupt(&mut self, device_name: &str, payload: u64) -> Result<bool, &'static str> {
+    pub fn handle_interrupt(
+        &mut self,
+        device_name: &str,
+        payload: u64,
+    ) -> Result<bool, &'static str> {
         if self.is_quiesced {
             return Ok(false); // Spurious or ignored interrupt during teardown
         }
@@ -494,14 +505,17 @@ impl SovereignDeviceDriverMasterSuite {
         if mmio.read_u32(0x10).unwrap() != 0xDEADBEEF {
             return false;
         }
-        if mmio.read_u32(0x11).is_ok() { // Misaligned read check
+        if mmio.read_u32(0x11).is_ok() {
+            // Misaligned read check
             return false;
         }
 
         // 4. Test DMA mapping abstraction
         let virt = CpuVirtualAddress(0xC0000000);
         let phys = CpuPhysicalAddress(0x40000000);
-        let mapping = PlatformDmaApi::map_single(virt, phys, 4096, DmaDirection::Bidirectional, 0xFFFFFFFF).unwrap();
+        let mapping =
+            PlatformDmaApi::map_single(virt, phys, 4096, DmaDirection::Bidirectional, 0xFFFFFFFF)
+                .unwrap();
         PlatformDmaApi::sync_for_device(&mapping);
 
         // 5. Test Interrupt & Deferred Work Engine
@@ -524,7 +538,9 @@ impl SovereignDeviceDriverMasterSuite {
             recovery_attempts: 0,
         });
 
-        self.diagnostics.trigger_safe_recovery("pci_0000_00_01_0").unwrap();
+        self.diagnostics
+            .trigger_safe_recovery("pci_0000_00_01_0")
+            .unwrap();
         let snap = self.diagnostics.get_snapshot("pci_0000_00_01_0").unwrap();
         if snap.state != "Recovered" || snap.error_count != 0 {
             return false;

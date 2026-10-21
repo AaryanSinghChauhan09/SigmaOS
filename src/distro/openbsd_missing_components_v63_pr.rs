@@ -680,12 +680,9 @@ impl OpenBsdMissingComponentsV63PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let user_diff = self.master_passwd.add_user(
-            "sysadmin",
-            1001,
-            "$2b$12$K890x...",
-            "/usr/local/bin/zsh",
-        );
+        let user_diff =
+            self.master_passwd
+                .add_user("sysadmin", 1001, "$2b$12$K890x...", "/usr/local/bin/zsh");
         let pr2 = self.submit_pr_proposal(
             "Add sysadmin account to master.passwd",
             "jules",

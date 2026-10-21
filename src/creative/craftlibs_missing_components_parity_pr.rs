@@ -32,8 +32,6 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-
-
 /// Structured PR proposal manifest descriptor for CraftLibs ArtCraft Parity.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CraftlibsPrProposalManifest {
@@ -421,9 +419,7 @@ impl CraftlibsLayerBlendModesPrEngine {
                 BlendMode::Hue
                 | BlendMode::Saturation
                 | BlendMode::Color
-                | BlendMode::Luminosity => {
-                    b * 0.3 + s * 0.7
-                }
+                | BlendMode::Luminosity => b * 0.3 + s * 0.7,
             };
 
             let final_val = s * src_a + b * dst_a * (1.0 - src_a);
@@ -628,7 +624,9 @@ impl CraftlibsVectorPathGeometryPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 605,
-            pr_title: "feat(craftlibs): Skia Vector Path Geometry, Cubic Bezier Flattening & Fill Rules".to_string(),
+            pr_title:
+                "feat(craftlibs): Skia Vector Path Geometry, Cubic Bezier Flattening & Fill Rules"
+                    .to_string(),
             target_subsystem: "CraftLibs Vector Geometry Kernel".to_string(),
             original_suite: "ArtCraft CraftLibs Skia Geometry".to_string(),
             artcraft_feature_parity: "Skia Vector Bezier & Path Geometry Solver Parity".to_string(),
@@ -701,16 +699,20 @@ impl CraftlibsSkiaCanvasRendererPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 606,
-            pr_title: "feat(craftlibs): Skia Anti-Aliased Vector Canvas Renderer & Gradient Shaders".to_string(),
+            pr_title:
+                "feat(craftlibs): Skia Anti-Aliased Vector Canvas Renderer & Gradient Shaders"
+                    .to_string(),
             target_subsystem: "CraftLibs 2D Vector Rendering Canvas".to_string(),
             original_suite: "ArtCraft CraftLibs Skia Renderer".to_string(),
             artcraft_feature_parity: "Skia 2D Vector Canvas & Gradient Shader Parity".to_string(),
             components_added: vec![
                 "Sub-pixel analytical anti-aliased edge rasterizer".to_string(),
                 "Linear, Radial & Conic multi-stop gradient color shaders".to_string(),
-                "Hierarchical clip mask stacks and transformation matrix stack (Save/Restore)".to_string(),
+                "Hierarchical clip mask stacks and transformation matrix stack (Save/Restore)"
+                    .to_string(),
             ],
-            performance_multiplier: "Zero-Latency Sub-Pixel Anti-Aliased Vector Rasterization".to_string(),
+            performance_multiplier: "Zero-Latency Sub-Pixel Anti-Aliased Vector Rasterization"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -954,7 +956,11 @@ impl CraftlibsEmbreeBvhRaytracingPrEngine {
 
     pub fn build_bvh(&mut self, triangles: &[[[f32; 3]; 3]]) -> usize {
         self.triangle_count = triangles.len();
-        self.node_count = if triangles.is_empty() { 0 } else { triangles.len() * 2 - 1 };
+        self.node_count = if triangles.is_empty() {
+            0
+        } else {
+            triangles.len() * 2 - 1
+        };
         self.node_count
     }
 
@@ -964,8 +970,16 @@ impl CraftlibsEmbreeBvhRaytracingPrEngine {
         ray_dir: [f32; 3],
         tri: [[f32; 3]; 3],
     ) -> RayHit {
-        let e1 = [tri[1][0] - tri[0][0], tri[1][1] - tri[0][1], tri[1][2] - tri[0][2]];
-        let e2 = [tri[2][0] - tri[0][0], tri[2][1] - tri[0][1], tri[2][2] - tri[0][2]];
+        let e1 = [
+            tri[1][0] - tri[0][0],
+            tri[1][1] - tri[0][1],
+            tri[1][2] - tri[0][2],
+        ];
+        let e2 = [
+            tri[2][0] - tri[0][0],
+            tri[2][1] - tri[0][1],
+            tri[2][2] - tri[0][2],
+        ];
 
         let pvec = [
             ray_dir[1] * e2[2] - ray_dir[2] * e2[1],
@@ -976,15 +990,31 @@ impl CraftlibsEmbreeBvhRaytracingPrEngine {
         let det = e1[0] * pvec[0] + e1[1] * pvec[1] + e1[2] * pvec[2];
 
         if det.abs() < 1e-6 {
-            return RayHit { hit: false, distance: 0.0, u: 0.0, v: 0.0, triangle_idx: 0 };
+            return RayHit {
+                hit: false,
+                distance: 0.0,
+                u: 0.0,
+                v: 0.0,
+                triangle_idx: 0,
+            };
         }
 
         let inv_det = 1.0 / det;
-        let tvec = [ray_origin[0] - tri[0][0], ray_origin[1] - tri[0][1], ray_origin[2] - tri[0][2]];
+        let tvec = [
+            ray_origin[0] - tri[0][0],
+            ray_origin[1] - tri[0][1],
+            ray_origin[2] - tri[0][2],
+        ];
         let u = (tvec[0] * pvec[0] + tvec[1] * pvec[1] + tvec[2] * pvec[2]) * inv_det;
 
         if u < 0.0 || u > 1.0 {
-            return RayHit { hit: false, distance: 0.0, u: 0.0, v: 0.0, triangle_idx: 0 };
+            return RayHit {
+                hit: false,
+                distance: 0.0,
+                u: 0.0,
+                v: 0.0,
+                triangle_idx: 0,
+            };
         }
 
         let qvec = [
@@ -996,7 +1026,13 @@ impl CraftlibsEmbreeBvhRaytracingPrEngine {
         let v = (ray_dir[0] * qvec[0] + ray_dir[1] * qvec[1] + ray_dir[2] * qvec[2]) * inv_det;
 
         if v < 0.0 || u + v > 1.0 {
-            return RayHit { hit: false, distance: 0.0, u: 0.0, v: 0.0, triangle_idx: 0 };
+            return RayHit {
+                hit: false,
+                distance: 0.0,
+                u: 0.0,
+                v: 0.0,
+                triangle_idx: 0,
+            };
         }
 
         let dist = (e2[0] * qvec[0] + e2[1] * qvec[1] + e2[2] * qvec[2]) * inv_det;
@@ -1064,9 +1100,18 @@ impl CraftlibsOpenSubdivTessellationPrEngine {
         let w2 = u * v;
         let w3 = (1.0 - u) * v;
 
-        let x = face_vertex_positions[0][0] * w0 + face_vertex_positions[1][0] * w1 + face_vertex_positions[2][0] * w2 + face_vertex_positions[3][0] * w3;
-        let y = face_vertex_positions[0][1] * w0 + face_vertex_positions[1][1] * w1 + face_vertex_positions[2][1] * w2 + face_vertex_positions[3][1] * w3;
-        let z = face_vertex_positions[0][2] * w0 + face_vertex_positions[1][2] * w1 + face_vertex_positions[2][2] * w2 + face_vertex_positions[3][2] * w3;
+        let x = face_vertex_positions[0][0] * w0
+            + face_vertex_positions[1][0] * w1
+            + face_vertex_positions[2][0] * w2
+            + face_vertex_positions[3][0] * w3;
+        let y = face_vertex_positions[0][1] * w0
+            + face_vertex_positions[1][1] * w1
+            + face_vertex_positions[2][1] * w2
+            + face_vertex_positions[3][1] * w3;
+        let z = face_vertex_positions[0][2] * w0
+            + face_vertex_positions[1][2] * w1
+            + face_vertex_positions[2][2] * w2
+            + face_vertex_positions[3][2] * w3;
 
         self.evaluated_stencils_count += 1;
         [x, y, z]
@@ -1124,7 +1169,12 @@ impl CraftlibsOpenVdbVolumetricGridPrEngine {
         }
     }
 
-    pub fn raymarch_level_set(&mut self, ray_start: [f32; 3], ray_dir: [f32; 3], steps: usize) -> f32 {
+    pub fn raymarch_level_set(
+        &mut self,
+        ray_start: [f32; 3],
+        ray_dir: [f32; 3],
+        steps: usize,
+    ) -> f32 {
         let mut accum_density = 0.0f32;
         let step_size = 0.5f32;
 
@@ -1301,7 +1351,11 @@ impl CraftlibsNeuralSuperResolutionPrEngine {
         }
     }
 
-    pub fn super_resolve_4x(&mut self, input_1080p_rgba: &[u8], output_4k_rgba: &mut [u8]) -> Result<usize, String> {
+    pub fn super_resolve_4x(
+        &mut self,
+        input_1080p_rgba: &[u8],
+        output_4k_rgba: &mut [u8],
+    ) -> Result<usize, String> {
         if output_4k_rgba.len() != input_1080p_rgba.len() * 16 {
             return Err("Output 4K buffer size must be 16x input 1080p buffer size".to_string());
         }
@@ -1475,21 +1529,44 @@ impl SovereignCraftlibsMissingComponentsParityPrGateway {
 
         let cdl_in = [0.5, 0.5, 0.5];
         let mut cdl_out = [0.0, 0.0, 0.0];
-        self.ocio_grading.apply_cdl_transform(&cdl_in, [1.0, 1.0, 1.0], [0.0, 0.0, 0.0], [1.0, 1.0, 1.0], &mut cdl_out);
+        self.ocio_grading.apply_cdl_transform(
+            &cdl_in,
+            [1.0, 1.0, 1.0],
+            [0.0, 0.0, 0.0],
+            [1.0, 1.0, 1.0],
+            &mut cdl_out,
+        );
 
-        let tris = [[ [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0] ]];
+        let tris = [[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]];
         self.embree_bvh.build_bvh(&tris);
 
-        let quad_pts = [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0]];
-        let _subdiv_pt = self.opensubdiv.evaluate_limit_surface_point(&quad_pts, 0.5, 0.5);
+        let quad_pts = [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ];
+        let _subdiv_pt = self
+            .opensubdiv
+            .evaluate_limit_surface_point(&quad_pts, 0.5, 0.5);
 
-        let _vdb_density = self.openvdb.raymarch_level_set([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], 5);
-        let _ofx_ok = self.openfx.load_ofx_plugin("org.sigmaos.filmcraft.blur").is_ok();
-        let _crdt_clk = self.crdt_sync.apply_remote_crdt_op(10, CrdtOpType::InsertShape);
+        let _vdb_density = self
+            .openvdb
+            .raymarch_level_set([0.0, 0.0, 0.0], [0.0, 0.0, 1.0], 5);
+        let _ofx_ok = self
+            .openfx
+            .load_ofx_plugin("org.sigmaos.filmcraft.blur")
+            .is_ok();
+        let _crdt_clk = self
+            .crdt_sync
+            .apply_remote_crdt_op(10, CrdtOpType::InsertShape);
 
         let in_1080p = vec![100u8; 4];
         let mut out_4k = vec![0u8; 64];
-        let _sr_ok = self.neural_sr.super_resolve_4x(&in_1080p, &mut out_4k).is_ok();
+        let _sr_ok = self
+            .neural_sr
+            .super_resolve_4x(&in_1080p, &mut out_4k)
+            .is_ok();
 
         true
     }
@@ -1657,7 +1734,9 @@ mod tests {
         let mut engine = CraftlibsGpuTextureCompressionPrEngine::new();
         let block = [128u8; 64];
         let mut comp = [0u8; 16];
-        let count = engine.compress_texture_block(&block, TextureFormat::Bc7, &mut comp).unwrap();
+        let count = engine
+            .compress_texture_block(&block, TextureFormat::Bc7, &mut comp)
+            .unwrap();
         assert_eq!(count, 16);
 
         let proposal = engine.generate_proposal();
@@ -1669,7 +1748,13 @@ mod tests {
         let engine = CraftlibsOpenColorIoColorGradingPrEngine::new();
         let in_rgb = [0.5, 0.5, 0.5];
         let mut out_rgb = [0.0, 0.0, 0.0];
-        engine.apply_cdl_transform(&in_rgb, [1.0, 1.0, 1.0], [0.1, 0.1, 0.1], [1.0, 1.0, 1.0], &mut out_rgb);
+        engine.apply_cdl_transform(
+            &in_rgb,
+            [1.0, 1.0, 1.0],
+            [0.1, 0.1, 0.1],
+            [1.0, 1.0, 1.0],
+            &mut out_rgb,
+        );
         assert!(out_rgb[0] > 0.5);
 
         let proposal = engine.generate_proposal();
@@ -1679,7 +1764,7 @@ mod tests {
     #[test]
     fn test_embree_bvh_engine() {
         let mut engine = CraftlibsEmbreeBvhRaytracingPrEngine::new();
-        let tris = [[ [0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0] ]];
+        let tris = [[[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]];
         let nodes = engine.build_bvh(&tris);
         assert_eq!(nodes, 1);
 
@@ -1693,7 +1778,12 @@ mod tests {
     #[test]
     fn test_opensubdiv_tessellation_engine() {
         let mut engine = CraftlibsOpenSubdivTessellationPrEngine::new();
-        let quad = [[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.0, 1.0, 0.0]];
+        let quad = [
+            [0.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0],
+            [1.0, 1.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ];
         let pt = engine.evaluate_limit_surface_point(&quad, 0.5, 0.5);
         assert_eq!(pt, [0.5, 0.5, 0.0]);
 
@@ -1714,7 +1804,9 @@ mod tests {
     #[test]
     fn test_openfx_plugin_host_engine() {
         let mut engine = CraftlibsOpenFxPluginHostPrEngine::new();
-        let id = engine.load_ofx_plugin("org.sigmaos.artcraft.colorgrade").unwrap();
+        let id = engine
+            .load_ofx_plugin("org.sigmaos.artcraft.colorgrade")
+            .unwrap();
         assert_eq!(id, 1);
 
         let proposal = engine.generate_proposal();

@@ -150,7 +150,8 @@ impl OpenBsd78UnveilV4PathRestrictionEngine {
         if self.locked {
             return false;
         }
-        self.veiled_paths.insert(path.to_string(), permissions.to_string());
+        self.veiled_paths
+            .insert(path.to_string(), permissions.to_string());
         true
     }
 
@@ -357,7 +358,8 @@ impl RedoxOsSchemeProxyDriverEngine {
         if self.scheme_endpoints.contains_key(scheme_name) {
             false
         } else {
-            self.scheme_endpoints.insert(scheme_name.to_string(), handle);
+            self.scheme_endpoints
+                .insert(scheme_name.to_string(), handle);
             true
         }
     }
@@ -384,7 +386,9 @@ pub struct IllumosDTraceProbeAggregatorEngine {
 
 impl IllumosDTraceProbeAggregatorEngine {
     pub fn new() -> Self {
-        Self { aggregated_events: 0 }
+        Self {
+            aggregated_events: 0,
+        }
     }
 
     pub fn record_probe_fire(&mut self) {
@@ -413,7 +417,9 @@ pub struct SerenityLibGuiAsyncCompositorIpcEngine {
 
 impl SerenityLibGuiAsyncCompositorIpcEngine {
     pub fn new() -> Self {
-        Self { pending_messages: 0 }
+        Self {
+            pending_messages: 0,
+        }
     }
 
     pub fn send_async_ipc(&mut self, _msg_id: u32) {
@@ -533,7 +539,9 @@ mod tests {
 
         // 6. Haiku
         assert!(suite.haiku_bfs.register_query("META:author=Sigma"));
-        let count = suite.haiku_bfs.evaluate_attribute_change("META:author", "Sigma");
+        let count = suite
+            .haiku_bfs
+            .evaluate_attribute_change("META:author", "Sigma");
         assert_eq!(count, 1);
 
         // 7. Plan 9

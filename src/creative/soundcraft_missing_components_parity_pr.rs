@@ -21,11 +21,6 @@ use alloc::vec::Vec;
 // 6. SoundcraftRealtimeCollabCrdtPrEngine (Multi-user CRDT DAW session sync, track locking, stem delta sharing & project history diffs)
 // 7. SovereignSoundcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-
-
-
-
-
 /// Structured PR proposal manifest for missing Soundcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SoundcraftPrProposalManifest {
