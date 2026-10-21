@@ -64,7 +64,10 @@ impl SigmaConfigManager {
     }
 
     pub fn get_configs_by_type(&self, config_type: ConfigType) -> Vec<&ConfigEntry> {
-        self.configs.iter().filter(|c| c.config_type == config_type).collect()
+        self.configs
+            .iter()
+            .filter(|c| c.config_type == config_type)
+            .collect()
     }
 
     pub fn remove_config(&mut self, key: String) -> Result<(), String> {
@@ -76,7 +79,11 @@ impl SigmaConfigManager {
         }
     }
 
-    pub fn refresh_config(&mut self, default_path: String, user_path: String) -> Result<(), String> {
+    pub fn refresh_config(
+        &mut self,
+        default_path: String,
+        user_path: String,
+    ) -> Result<(), String> {
         // Simulated refresh - in real implementation would copy from default to user
         Ok(())
     }
@@ -101,30 +108,56 @@ mod tests {
     #[test]
     fn test_set_config() {
         let mut manager = SigmaConfigManager::new();
-        manager.set_config("test-key".to_string(), "test-value".to_string(), ConfigType::System);
+        manager.set_config(
+            "test-key".to_string(),
+            "test-value".to_string(),
+            ConfigType::System,
+        );
         assert_eq!(manager.get_configs().len(), 1);
     }
 
     #[test]
     fn test_get_config_value() {
         let mut manager = SigmaConfigManager::new();
-        manager.set_config("test-key".to_string(), "test-value".to_string(), ConfigType::System);
-        assert_eq!(manager.get_config_value("test-key"), Some(&"test-value".to_string()));
+        manager.set_config(
+            "test-key".to_string(),
+            "test-value".to_string(),
+            ConfigType::System,
+        );
+        assert_eq!(
+            manager.get_config_value("test-key"),
+            Some(&"test-value".to_string())
+        );
     }
 
     #[test]
     fn test_update_config() {
         let mut manager = SigmaConfigManager::new();
-        manager.set_config("test-key".to_string(), "old-value".to_string(), ConfigType::System);
-        manager.set_config("test-key".to_string(), "new-value".to_string(), ConfigType::System);
-        assert_eq!(manager.get_config_value("test-key"), Some(&"new-value".to_string()));
+        manager.set_config(
+            "test-key".to_string(),
+            "old-value".to_string(),
+            ConfigType::System,
+        );
+        manager.set_config(
+            "test-key".to_string(),
+            "new-value".to_string(),
+            ConfigType::System,
+        );
+        assert_eq!(
+            manager.get_config_value("test-key"),
+            Some(&"new-value".to_string())
+        );
         assert_eq!(manager.get_configs().len(), 1);
     }
 
     #[test]
     fn test_remove_config() {
         let mut manager = SigmaConfigManager::new();
-        manager.set_config("test-key".to_string(), "test-value".to_string(), ConfigType::System);
+        manager.set_config(
+            "test-key".to_string(),
+            "test-value".to_string(),
+            ConfigType::System,
+        );
         manager.remove_config("test-key".to_string()).unwrap();
         assert_eq!(manager.get_configs().len(), 0);
     }
@@ -132,8 +165,16 @@ mod tests {
     #[test]
     fn test_configs_by_type() {
         let mut manager = SigmaConfigManager::new();
-        manager.set_config("sys-key".to_string(), "sys-value".to_string(), ConfigType::System);
-        manager.set_config("user-key".to_string(), "user-value".to_string(), ConfigType::User);
+        manager.set_config(
+            "sys-key".to_string(),
+            "sys-value".to_string(),
+            ConfigType::System,
+        );
+        manager.set_config(
+            "user-key".to_string(),
+            "user-value".to_string(),
+            ConfigType::User,
+        );
         assert_eq!(manager.get_configs_by_type(ConfigType::System).len(), 1);
     }
 }

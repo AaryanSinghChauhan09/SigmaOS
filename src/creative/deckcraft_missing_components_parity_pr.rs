@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - Deckcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/deckcraft_missing_components_parity_pr.rs`)
@@ -23,14 +21,15 @@
 // 15. SovereignDeckcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
+
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
-
-
-
-
 
 /// Structured PR proposal manifest for missing Deckcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1451,6 +1450,7 @@ impl Default for SovereignDeckcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_deckcraft_parity_pr_gateway() {

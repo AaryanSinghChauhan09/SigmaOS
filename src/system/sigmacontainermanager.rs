@@ -5,6 +5,7 @@
 #![no_std]
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -122,7 +123,10 @@ impl SigmaContainerManager {
     }
 
     pub fn get_running_containers(&self) -> Vec<&Container> {
-        self.containers.iter().filter(|c| c.state == ContainerState::Running).collect()
+        self.containers
+            .iter()
+            .filter(|c| c.state == ContainerState::Running)
+            .collect()
     }
 
     pub fn get_container_count(&self) -> usize {
@@ -186,7 +190,7 @@ mod tests {
             network_enabled: true,
         };
         let container = manager.create_container("test".to_string(), config);
-        manager.start_container(container.id).unwrap();
+        manager.start_container(container.id.clone()).unwrap();
         manager.stop_container(container.id).unwrap();
         assert_eq!(manager.get_containers()[0].state, ContainerState::Stopped);
     }
@@ -217,7 +221,7 @@ mod tests {
             network_enabled: true,
         };
         let container1 = manager.create_container("test1".to_string(), config.clone());
-        let container2 = manager.create_container("test2".to_string(), config);
+        let _container2 = manager.create_container("test2".to_string(), config);
         manager.start_container(container1.id).unwrap();
         assert_eq!(manager.get_running_containers().len(), 1);
     }

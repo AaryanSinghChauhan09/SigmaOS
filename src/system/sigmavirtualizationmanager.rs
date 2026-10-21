@@ -5,6 +5,7 @@
 #![no_std]
 extern crate alloc;
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -45,9 +46,7 @@ pub struct SigmaVirtualizationManager {
 
 impl SigmaVirtualizationManager {
     pub fn new() -> Self {
-        Self {
-            vms: Vec::new(),
-        }
+        Self { vms: Vec::new() }
     }
 
     pub fn create_vm(&mut self, config: VMConfig) -> VirtualMachine {
@@ -120,7 +119,10 @@ impl SigmaVirtualizationManager {
     }
 
     pub fn get_running_vms(&self) -> Vec<&VirtualMachine> {
-        self.vms.iter().filter(|v| v.state == VMState::Running).collect()
+        self.vms
+            .iter()
+            .filter(|v| v.state == VMState::Running)
+            .collect()
     }
 
     pub fn get_vm_count(&self) -> usize {
@@ -187,7 +189,7 @@ mod tests {
             network_enabled: true,
         };
         let vm = manager.create_vm(config);
-        manager.start_vm(vm.id).unwrap();
+        manager.start_vm(vm.id.clone()).unwrap();
         manager.stop_vm(vm.id).unwrap();
         assert_eq!(manager.get_vms()[0].state, VMState::Stopped);
     }
@@ -220,7 +222,7 @@ mod tests {
             network_enabled: true,
         };
         let vm1 = manager.create_vm(config.clone());
-        let vm2 = manager.create_vm(config);
+        let _vm2 = manager.create_vm(config);
         manager.start_vm(vm1.id).unwrap();
         assert_eq!(manager.get_running_vms().len(), 1);
     }

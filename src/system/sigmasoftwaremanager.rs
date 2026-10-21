@@ -159,7 +159,10 @@ mod tests {
         };
         manager.add_package(pkg);
         manager.install_package("test".to_string()).unwrap();
-        assert_eq!(manager.get_package("test").unwrap().status, InstallStatus::Installed);
+        assert_eq!(
+            manager.get_package("test").unwrap().status,
+            InstallStatus::Installed
+        );
     }
 
     #[test]
@@ -176,7 +179,10 @@ mod tests {
         };
         manager.add_package(pkg);
         manager.remove_package("test".to_string()).unwrap();
-        assert_eq!(manager.get_package("test").unwrap().status, InstallStatus::NotInstalled);
+        assert_eq!(
+            manager.get_package("test").unwrap().status,
+            InstallStatus::NotInstalled
+        );
     }
 
     #[test]
@@ -193,7 +199,10 @@ mod tests {
         };
         manager.add_package(pkg);
         manager.update_package("test".to_string()).unwrap();
-        assert_eq!(manager.get_package("test").unwrap().status, InstallStatus::Installed);
+        assert_eq!(
+            manager.get_package("test").unwrap().status,
+            InstallStatus::Installed
+        );
     }
 
     #[test]

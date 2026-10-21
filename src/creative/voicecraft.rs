@@ -6,7 +6,6 @@
 //! - Linear pulse-code modulation (PCM) audio synthesis buffer
 //! - Low-latency streaming integration for Wayland voice commands and accessibility
 
-#![no_std]
 extern crate alloc;
 use core::f32::consts::PI;
 
