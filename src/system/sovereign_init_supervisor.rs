@@ -10,6 +10,7 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicU32, AtomicU64, Ordering};
@@ -109,7 +110,9 @@ impl SovereignServiceUnit {
 }
 
 /// Sovereign PID 1 Supervisor
-use super::sovereign_init_and_supervisor_advancements_v63::*;
+#[path = "sovereign_init_and_supervisor_advancements_v63.rs"]
+pub mod sovereign_init_and_supervisor_advancements_v63;
+use sovereign_init_and_supervisor_advancements_v63::*;
 
 pub struct SovereignInitSupervisor {
     pub next_pid: AtomicU32,

@@ -69,11 +69,14 @@ wiki_repo/
 /uts_namespace
 /zfs
 *.md
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+!.github/PULL_REQUEST_TEMPLATE.md
 *.txt
 *.py
 WIKI/
 wiki/
-docs/
+!docs/
+!docs/**/*.md
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
