@@ -3,6 +3,7 @@
 ### 🟢 Current Status
 - [[Current Build & Merge Status (2026-10-21)|Home#-current-status-2026-10-21]]
 - [[Ready-to-Work-and-Ready-to-Launch|Ready to Work & Ready to Launch]]
+- [[Omarchy-Linux-Gap-Analysis|SigmaOS vs Omarchy Linux Gap Analysis]]
 
 ### Getting Started
 - [[Home]]
@@ -83,6 +84,7 @@
 - [[Subsystem-Integration|Subsystem-Integration-Components]]
 
 ### Omarchy 4.0.5 Complete Integration
+- [[Omarchy-Linux-Gap-Analysis|Missing Gaps & Parity Roadmap (Omarchy vs SigmaOS)]]
 - [[Omarchy-Manual-Comprehensive-Guide|The Omarchy 4.0.5 Manual (Chapters 1–51)]]
 - [[Omarchy-4.0.5-Complete-Integration-Catalog|449 Binary Utilities Catalog]]
 - [[Omarchy-Themes-Catalog|22-Themes Catalog]]
