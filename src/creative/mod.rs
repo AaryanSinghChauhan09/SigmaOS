@@ -27,6 +27,7 @@ pub mod figcraft_artcraft_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_artcraft_missing_components_v65_pr;
 // pub mod filmcraft_artcraft_missing_components_v64_pr;
+pub mod filmcraft_artcraft_missing_components_v65_pr;
 // pub mod filmcraft_artcraft_parity_pr;
 // pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
@@ -85,7 +86,6 @@ pub use effectcraft::{
     NodeGraph, NodeType, Parameter, ParameterType,
 };
 pub use filmcraft_artcraft_missing_components_v65_pr::*;
-// pub use filmcraft_artcraft_missing_components_v64_pr::*;
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
     DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
