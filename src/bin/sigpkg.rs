@@ -77,7 +77,12 @@ fn main() {
         | "pkgman" | "swupd" | "slapt-get" | "urpmi" | "pisi" | "debian" | "ubuntu" | "fedora"
         | "rhel" | "centos" | "arch" | "manjaro" | "cachy" | "cachyos" | "alpine" | "freebsd"
         | "openbsd" | "netbsd" | "bsd" | "void" | "gentoo" | "portage" | "opensuse" | "suse"
-        | "slackware" | "solus" | "nixos" | "guixsd" => cmd_foreign_pm(&args[0], &args[1..]),
+        | "slackware" | "solus" | "nixos" | "guixsd" | "nala" | "aptitude" | "rpm-ostree"
+        | "poudriere" | "pkgsend" | "makepkg" | "devuan" | "ghostbsd" | "omnios" | "smartos"
+        | "illumos" | "dragonfly" | "postmarketos" | "pop" | "mint" | "garuda" | "endeavour"
+        | "artix" | "salix" | "funtoo" | "amazon" | "mageia" | "openmandriva" => {
+            cmd_foreign_pm(&args[0], &args[1..])
+        }
         "remove" => cmd_remove(&args[1..]),
         "search" => cmd_search(&args[1..]),
         "status" => cmd_status(&args[1..]),
@@ -339,6 +344,40 @@ mod tests {
             .unwrap();
         assert_eq!(nixos.source_pm, "nixos");
         assert_eq!(nixos.operation, UniversalPmOperation::Install);
+
+        let nala = dispatcher
+            .dispatch_command("nala install htop")
+            .unwrap();
+        assert_eq!(nala.source_pm, "nala");
+        assert_eq!(nala.operation, UniversalPmOperation::Install);
+
+        let ostree = dispatcher
+            .dispatch_command("rpm-ostree install podman")
+            .unwrap();
+        assert_eq!(ostree.source_pm, "rpm-ostree");
+        assert_eq!(ostree.operation, UniversalPmOperation::Install);
+
+        let devuan = dispatcher
+            .dispatch_command("devuan install sysvinit")
+            .unwrap();
+        assert_eq!(devuan.source_pm, "devuan");
+        assert_eq!(devuan.operation, UniversalPmOperation::Install);
+    }
+
+    #[test]
+    fn test_expanded_distro_aliases_dispatch() {
+        let dispatcher = UniversalPmCommandDispatcher::new();
+        let ghostbsd = dispatcher.dispatch_command("ghostbsd install xfce4").unwrap();
+        assert_eq!(ghostbsd.source_pm, "ghostbsd");
+        assert_eq!(ghostbsd.operation, UniversalPmOperation::Install);
+
+        let postmarketos = dispatcher.dispatch_command("postmarketos add waybar").unwrap();
+        assert_eq!(postmarketos.source_pm, "postmarketos");
+        assert_eq!(postmarketos.operation, UniversalPmOperation::Install);
+
+        let garuda = dispatcher.dispatch_command("garuda -S hyprland").unwrap();
+        assert_eq!(garuda.source_pm, "garuda");
+        assert_eq!(garuda.operation, UniversalPmOperation::Install);
     }
 
     #[test]
@@ -416,17 +455,19 @@ mod tests {
 
 fn format_flag_for_source_pm(source_pm: &str) -> Option<&'static str> {
     match source_pm.to_lowercase().as_str() {
-        "apt" | "apt-get" | "apt-cache" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" => {
-            Some("--apt")
-        }
+        "apt" | "apt-get" | "apt-cache" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" | "nala"
+        | "aptitude" | "devuan" | "pop" | "mint" => Some("--apt"),
         "dnf" | "dnf5" | "yum" | "microdnf" | "rpm" | "urpmq" | "urpme" | "urpmi" | "fedora"
-        | "rhel" | "centos" | "rocky" | "alma" | "almalinux" => Some("--dnf"),
+        | "rhel" | "centos" | "rocky" | "alma" | "almalinux" | "rpm-ostree" | "amazon"
+        | "mageia" | "openmandriva" => Some("--dnf"),
         "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro" | "cachy"
-        | "cachyos" => Some("--pacman"),
-        "apk" | "alpine" => Some("--apk"),
-        "pkg" | "freebsd" | "bsd" => Some("--pkg"),
+        | "cachyos" | "makepkg" | "garuda" | "endeavour" | "artix" => Some("--pacman"),
+        "apk" | "alpine" | "postmarketos" => Some("--apk"),
+        "pkg" | "freebsd" | "bsd" | "ghostbsd" | "poudriere" => Some("--pkg"),
         "openbsd" => Some("--openbsd"),
         "netbsd" | "pkgin" | "pkgsrc" | "pkg_delete" | "pkg_add" | "pkg_info" => Some("--pkgsrc"),
+        "dragonfly" => Some("--ports"),
+        "omnios" | "smartos" | "illumos" | "pkgsend" => Some("--p5p"),
         "zypper" | "opensuse" | "suse" => Some("--zypper"),
         "xbps" | "xbps-install" | "xbps-remove" | "xbps-query" | "void" => Some("--xbps"),
         "emerge" | "ebuild" | "gentoo" | "portage" => Some("--ebuild"),
