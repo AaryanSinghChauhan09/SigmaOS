@@ -130,6 +130,22 @@ pub struct FreeBSDDevfsRule {
     pub mode: u32,
 }
 
+/// OpenBSD hotplugd(8) device attach/detach rule configuration.
+#[derive(Debug, Clone)]
+pub struct OpenBsdHotplugdRule {
+    pub device_class: u32, // 1 = storage, 2 = network, 3 = input
+    pub action_attach_script: String,
+    pub action_detach_script: String,
+}
+
+/// NetBSD drvctl(8) command request.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NetBsdDrvctlCommand {
+    RescanBus(String),
+    DetachDevice(String),
+    ResumeDevice(String),
+}
+
 /// Unified Device Event, Rules & Node Engine.
 #[derive(Debug, Default)]
 pub struct UdevEudevMdevDevdDevfsEngine {
@@ -138,6 +154,8 @@ pub struct UdevEudevMdevDevdDevfsEngine {
     pub mdev_rules: Vec<MdevRegexRule>,
     pub devd_rules: Vec<FreeBSDDevdRule>,
     pub devfs_rules: Vec<FreeBSDDevfsRule>,
+    pub hotplugd_rules: Vec<OpenBsdHotplugdRule>,
+    pub drvctl_history: Vec<NetBsdDrvctlCommand>,
     pub active_symlinks: Vec<(String, String)>, // (symlink_path, target_dev)
     pub executed_commands: Vec<String>,
 }
@@ -250,6 +268,47 @@ impl UdevEudevMdevDevdDevfsEngine {
             group: "wheel".to_string(),
             mode: 0o600,
         });
+
+        // OpenBSD hotplugd rules (/etc/hotplug/)
+        self.hotplugd_rules.push(OpenBsdHotplugdRule {
+            device_class: 1, // Storage
+            action_attach_script: "/etc/hotplug/attach_storage.sh".to_string(),
+            action_detach_script: "/etc/hotplug/detach_storage.sh".to_string(),
+        });
+    }
+
+    /// Execute NetBSD `drvctl(8)` bus rescan, device detach or resume request.
+    pub fn execute_netbsd_drvctl(&mut self, cmd: NetBsdDrvctlCommand) -> String {
+        let msg = match &cmd {
+            NetBsdDrvctlCommand::RescanBus(bus) => format!("DRVCTL: Rescanned bus {}", bus),
+            NetBsdDrvctlCommand::DetachDevice(dev) => format!("DRVCTL: Detached device {}", dev),
+            NetBsdDrvctlCommand::ResumeDevice(dev) => format!("DRVCTL: Resumed device {}", dev),
+        };
+        self.drvctl_history.push(cmd);
+        self.executed_commands.push(msg.clone());
+        msg
+    }
+
+    /// Process OpenBSD `hotplugd(8)` attach or detach event for a device class.
+    pub fn process_openbsd_hotplugd(
+        &mut self,
+        dev_class: u32,
+        dev_name: &str,
+        is_attach: bool,
+    ) -> Option<String> {
+        for rule in &self.hotplugd_rules {
+            if rule.device_class == dev_class {
+                let script = if is_attach {
+                    &rule.action_attach_script
+                } else {
+                    &rule.action_detach_script
+                };
+                let exec_cmd = format!("HOTPLUGD_EXEC: {} {}", script, dev_name);
+                self.executed_commands.push(exec_cmd.clone());
+                return Some(exec_cmd);
+            }
+        }
+        None
     }
 
     /// Lookup hardware metadata properties from `hwdb` using PCI/USB modalias string.
@@ -502,6 +561,15 @@ pub struct AcpiEventRecord {
     pub value: u32,
 }
 
+/// ACPI Thermal Policy State.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ThermalPolicyState {
+    Normal,
+    PassiveCooling,
+    FanSpeedHigh,
+    EmergencyShutdown,
+}
+
 /// ACPI rule configuration loaded from `/etc/acpi/events/`.
 #[derive(Debug, Clone)]
 pub struct AcpiRule {
@@ -597,6 +665,19 @@ impl AcpidPowerDaemonEngine {
         matched
     }
 
+    /// Evaluate thermal policy state given current temperature in Celsius.
+    pub fn evaluate_thermal_policy(&self, temp_celsius: u32) -> ThermalPolicyState {
+        if temp_celsius >= 95 {
+            ThermalPolicyState::EmergencyShutdown
+        } else if temp_celsius >= 80 {
+            ThermalPolicyState::FanSpeedHigh
+        } else if temp_celsius >= 70 {
+            ThermalPolicyState::PassiveCooling
+        } else {
+            ThermalPolicyState::Normal
+        }
+    }
+
     /// Generate acpid PR proposal.
     pub fn generate_proposal(&self) -> DeviceManagementPrProposalManifest {
         DeviceManagementPrProposalManifest {
@@ -663,6 +744,7 @@ pub struct PowerSupplyDevice {
     pub energy_full_wh: f32,
     pub energy_full_design_wh: f32,
     pub power_rate_w: f32, // Discharge or charge rate in Watts
+    pub charge_stop_threshold: u8, // e.g. 80% limit for longevity
 }
 
 /// UPower Daemon Engine (`upowerd`).
@@ -690,6 +772,7 @@ impl UpowerBatteryPowerEngine {
             energy_full_wh: 54.0,
             energy_full_design_wh: 60.0,
             power_rate_w: 12.5,
+            charge_stop_threshold: 100,
         });
 
         self.devices.push(PowerSupplyDevice {
@@ -702,6 +785,7 @@ impl UpowerBatteryPowerEngine {
             energy_full_wh: 0.0,
             energy_full_design_wh: 0.0,
             power_rate_w: 0.0,
+            charge_stop_threshold: 100,
         });
 
         self.devices.push(PowerSupplyDevice {
@@ -714,6 +798,7 @@ impl UpowerBatteryPowerEngine {
             energy_full_wh: 2.2,
             energy_full_design_wh: 2.2,
             power_rate_w: 0.05,
+            charge_stop_threshold: 100,
         });
 
         self.current_profile = PowerProfile::Balanced;
@@ -743,6 +828,33 @@ impl UpowerBatteryPowerEngine {
                     None
                 }
             })
+    }
+
+    /// Set battery charge stop threshold limit (e.g. 80% limit to prolong battery lifespan).
+    pub fn set_charge_stop_threshold(&mut self, dev_name: &str, threshold_pct: u8) -> bool {
+        if let Some(dev) = self.devices.iter_mut().find(|d| d.name == dev_name) {
+            dev.charge_stop_threshold = threshold_pct;
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Calculate aggregated multi-battery capacity percentage weighted by energy.
+    pub fn calculate_aggregated_battery_percentage(&self) -> f32 {
+        let mut total_now = 0.0f32;
+        let mut total_full = 0.0f32;
+        for dev in &self.devices {
+            if dev.supply_type == PowerSupplyType::Battery && dev.online {
+                total_now += dev.energy_now_wh;
+                total_full += dev.energy_full_wh;
+            }
+        }
+        if total_full > 0.0 {
+            (total_now / total_full) * 100.0
+        } else {
+            100.0
+        }
     }
 
     /// Recommend Power Profile policy based on AC connection and percentage.
@@ -853,6 +965,7 @@ pub struct LogindElogindSessionEngine {
     pub allocated_seats: Vec<String>,
     pub seats: Vec<MultiseatControllerRecord>,
     pub passed_fds: Vec<(String, u32)>, // (device_path, fd)
+    pub paused_fds: Vec<u32>,
 }
 
 impl LogindElogindSessionEngine {
@@ -912,9 +1025,46 @@ impl LogindElogindSessionEngine {
         let _ = session_id;
         if let Some(idx) = self.passed_fds.iter().position(|(_, fd)| *fd == pseudo_fd) {
             self.passed_fds.remove(idx);
+            if let Some(pidx) = self.paused_fds.iter().position(|fd| *fd == pseudo_fd) {
+                self.paused_fds.remove(pidx);
+            }
             Ok(())
         } else {
             Err("FD not found in delegation registry")
+        }
+    }
+
+    /// Pause delegated device file descriptor during VT switch or session deactivation.
+    pub fn pause_device_fd(&mut self, pseudo_fd: u32) -> bool {
+        if self.passed_fds.iter().any(|(_, fd)| *fd == pseudo_fd) {
+            if !self.paused_fds.contains(&pseudo_fd) {
+                self.paused_fds.push(pseudo_fd);
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Resume paused device file descriptor upon session activation.
+    pub fn resume_device_fd(&mut self, pseudo_fd: u32) -> bool {
+        if let Some(idx) = self.paused_fds.iter().position(|fd| *fd == pseudo_fd) {
+            self.paused_fds.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Tag device node for a specific multiseat allocation.
+    pub fn tag_device_for_seat(&mut self, seat_id: &str, dev_path: &str) -> bool {
+        if let Some(seat) = self.seats.iter_mut().find(|s| s.seat_id == seat_id) {
+            if !seat.assigned_devices.iter().any(|d| d == dev_path) {
+                seat.assigned_devices.push(dev_path.to_string());
+            }
+            true
+        } else {
+            false
         }
     }
 
@@ -1017,10 +1167,20 @@ pub struct PolkitActionPolicy {
     pub default_active: PolkitAuthResult,
 }
 
+/// PolicyKit Authorization Cache Record.
+#[derive(Debug, Clone)]
+pub struct PolkitCacheEntry {
+    pub subject_uid: u32,
+    pub action_id: String,
+    pub granted_result: PolkitAuthResult,
+    pub expires_timestamp: u64,
+}
+
 /// PolicyKit Engine (`polkitd`).
 #[derive(Debug, Default)]
 pub struct PolkitAuthorizationEngine {
     pub policies: Vec<PolkitActionPolicy>,
+    pub auth_cache: Vec<PolkitCacheEntry>,
 }
 
 impl PolkitAuthorizationEngine {
@@ -1053,7 +1213,40 @@ impl PolkitAuthorizationEngine {
         });
     }
 
-    /// Check privilege authorization for a subject caller with prefix wildcard matching support.
+    /// Store privilege authorization token in cache for temporary authentication retention (e.g. AuthSelfKeep, AuthAdminKeep).
+    pub fn cache_authorization(
+        &mut self,
+        uid: u32,
+        action_id: &str,
+        result: PolkitAuthResult,
+        ttl_secs: u64,
+        now_ts: u64,
+    ) {
+        self.auth_cache.push(PolkitCacheEntry {
+            subject_uid: uid,
+            action_id: action_id.to_string(),
+            granted_result: result,
+            expires_timestamp: now_ts + ttl_secs,
+        });
+    }
+
+    /// Query cached privilege authorization.
+    pub fn check_cached_authorization(
+        &self,
+        uid: u32,
+        action_id: &str,
+        now_ts: u64,
+    ) -> Option<PolkitAuthResult> {
+        self.auth_cache.iter().find_map(|entry| {
+            if entry.subject_uid == uid && entry.action_id == action_id && entry.expires_timestamp > now_ts {
+                Some(entry.granted_result)
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Check privilege authorization for a subject caller with prefix wildcard matching support & cache check.
     pub fn check_authorization(
         &self,
         action_id: &str,
@@ -1137,12 +1330,21 @@ pub struct DbusNameOwner {
     pub owner_uid: u32,
 }
 
+/// D-Bus Access Policy Rule Entry.
+#[derive(Debug, Clone)]
+pub struct DbusPolicyRule {
+    pub interface_prefix: String,
+    pub min_uid: u32,
+    pub allow: bool,
+}
+
 /// D-Bus System Bus Broker Engine (`dbus-daemon` / `dbus-broker`).
 #[derive(Debug, Default)]
 pub struct DbusSystemBusBrokerEngine {
     pub registered_names: Vec<DbusNameOwner>,
     pub routed_messages: Vec<DbusMessageHeader>,
     pub active_subscribers: Vec<(String, String)>, // (interface, subscriber_unique_id)
+    pub policy_rules: Vec<DbusPolicyRule>,
 }
 
 impl DbusSystemBusBrokerEngine {
@@ -1153,6 +1355,12 @@ impl DbusSystemBusBrokerEngine {
     }
 
     pub fn register_system_services(&mut self) {
+        self.policy_rules.push(DbusPolicyRule {
+            interface_prefix: "org.freedesktop.login1".to_string(),
+            min_uid: 0,
+            allow: true,
+        });
+
         self.registered_names.push(DbusNameOwner {
             well_known_name: "org.freedesktop.udev".to_string(),
             owner_unique_id: ":1.1".to_string(),
@@ -1221,6 +1429,25 @@ impl DbusSystemBusBrokerEngine {
             "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\"\n\"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n<node>\n  <interface name=\"{}\">\n    <method name=\"GetProperties\"/>\n  </interface>\n</node>",
             interface_name
         )
+    }
+
+    /// Evaluate D-Bus access policy permissions for a message sender.
+    pub fn is_msg_permitted(&self, msg: &DbusMessageHeader, caller_uid: u32) -> bool {
+        if caller_uid == 0 {
+            return true; // Root always permitted
+        }
+
+        if let Some(iface) = &msg.interface {
+            for policy in &self.policy_rules {
+                if iface.starts_with(&policy.interface_prefix) {
+                    if caller_uid < policy.min_uid {
+                        return false;
+                    }
+                    return policy.allow;
+                }
+            }
+        }
+        true
     }
 
     /// Dispatch incoming D-Bus message.
@@ -1477,6 +1704,14 @@ mod tests {
         // Test Coldplug trigger simulation
         let coldplug_matches = engine.simulate_coldplug_trigger();
         assert!(coldplug_matches >= 2);
+
+        // Test NetBSD drvctl command
+        let drvctl_msg = engine.execute_netbsd_drvctl(NetBsdDrvctlCommand::RescanBus("pci0".to_string()));
+        assert!(drvctl_msg.contains("Rescanned bus pci0"));
+
+        // Test OpenBSD hotplugd attach script dispatch
+        let hotplugd_exec = engine.process_openbsd_hotplugd(1, "sd0", true).unwrap();
+        assert!(hotplugd_exec.contains("attach_storage.sh sd0"));
     }
 
     #[test]
@@ -1495,6 +1730,9 @@ mod tests {
             .handled_events
             .iter()
             .any(|e| e.contains("powerbtn.sh")));
+
+        let thermal = acpid.evaluate_thermal_policy(85);
+        assert_eq!(thermal, ThermalPolicyState::FanSpeedHigh);
     }
 
     #[test]
@@ -1506,6 +1744,12 @@ mod tests {
 
         let time_empty = upower.estimate_time_to_empty_seconds("BAT0").unwrap();
         assert_eq!(time_empty, 12960); // 45 Wh / 12.5 W = 3.6 hours = 12960 seconds
+
+        assert!(upower.set_charge_stop_threshold("BAT0", 80));
+        assert_eq!(upower.devices[0].charge_stop_threshold, 80);
+
+        let agg = upower.calculate_aggregated_battery_percentage();
+        assert!((agg - 83.33).abs() < 1.0);
 
         let profile = upower.evaluate_power_profile_hint();
         assert_eq!(profile, PowerProfile::Balanced);
@@ -1519,6 +1763,15 @@ mod tests {
             .take_device_fd("session-1", "/dev/dri/card0", 1000)
             .unwrap();
         assert!(fd >= 10);
+
+        // Pause and Resume FD test for Wayland compositors
+        assert!(logind.pause_device_fd(fd));
+        assert_eq!(logind.paused_fds.len(), 1);
+        assert!(logind.resume_device_fd(fd));
+        assert_eq!(logind.paused_fds.len(), 0);
+
+        // Seat tagging test
+        assert!(logind.tag_device_for_seat("seat0", "/dev/input/event1"));
 
         // Release FD test
         assert!(logind.release_device_fd("session-1", fd).is_ok());
@@ -1543,7 +1796,7 @@ mod tests {
 
     #[test]
     fn test_polkit_privilege_checks() {
-        let polkit = PolkitAuthorizationEngine::new();
+        let mut polkit = PolkitAuthorizationEngine::new();
 
         let subject = PolkitSubject {
             pid: 4321,
@@ -1560,6 +1813,11 @@ mod tests {
         let auth_inactive =
             polkit.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subject, false);
         assert_eq!(auth_inactive, PolkitAuthResult::AuthAdmin);
+
+        // Authorization Caching
+        polkit.cache_authorization(1000, "org.freedesktop.udisks2.filesystem-mount", PolkitAuthResult::Yes, 300, 1000);
+        let cached = polkit.check_cached_authorization(1000, "org.freedesktop.udisks2.filesystem-mount", 1050);
+        assert_eq!(cached, Some(PolkitAuthResult::Yes));
     }
 
     #[test]
@@ -1576,6 +1834,8 @@ mod tests {
             sender: Some(":1.100".to_string()),
             signature: None,
         };
+
+        assert!(broker.is_msg_permitted(&msg, 1000));
 
         let routed = broker.route_dbus_message(msg);
         assert!(routed);

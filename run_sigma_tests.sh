@@ -1982,6 +1982,13 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+if [ -f "src/device/sovereign_device_management_inspirations_pr.rs" ]; then
+    echo "Running Sovereign Device Management Inspirations PR Suite..."
+    mkdir -p build
+    rustc --test src/device/sovereign_device_management_inspirations_pr.rs --edition=2021 -o build/test_device_pr
+    ./build/test_device_pr
+fi
+
 if [ -f "src/userland/coreutils_pr_gateway.rs" ]; then
     echo "Running Core Utilities & PR Gateway test suite..."
     mkdir -p build
