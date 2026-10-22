@@ -29,6 +29,7 @@ pub mod filmcraft_artcraft_missing_components_v65_pr;
 // pub mod filmcraft_artcraft_parity_pr;
 // pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
+pub mod fontcraft_artcraft_missing_components_v66_pr;
 pub mod fontcraft_artcraft_parity_pr;
 pub mod fontcraft_missing_components_parity_pr;
 pub mod gridcraft;
@@ -122,6 +123,7 @@ pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
+pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use photocraft_artcraft_missing_components_v65_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
