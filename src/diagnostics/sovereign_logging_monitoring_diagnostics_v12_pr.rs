@@ -94,6 +94,20 @@ pub struct LogrotatePolicyV12 {
     pub postrotate_script: Option<String>,
 }
 
+/// Journald Structured Index Record V12 (`_SYSTEMD_UNIT`, `_PID`, `_COMM`, `_HOSTNAME`, `_UID`, `_GID`, `_SELINUX_CONTEXT`)
+#[derive(Debug, Clone)]
+pub struct JournaldStructuredIndexEntryV12 {
+    pub systemd_unit: Option<String>,
+    pub pid: u32,
+    pub comm: String,
+    pub hostname: String,
+    pub uid: u32,
+    pub gid: u32,
+    pub selinux_context: Option<String>,
+    pub timestamp_us: u64,
+    pub message: String,
+}
+
 /// Sovereign Journald & Syslog Engine V12
 #[derive(Debug, Clone)]
 pub struct JournaldSyslogNgLogEngineV12 {
@@ -102,6 +116,7 @@ pub struct JournaldSyslogNgLogEngineV12 {
     syslog_pipelines: Vec<SyslogBrokerPipelineV12>,
     bsd_syslog_rules: Vec<BsdSyslogRuleV12>,
     logrotate_policies: HashMap<String, LogrotatePolicyV12>,
+    structured_entries: Vec<JournaldStructuredIndexEntryV12>,
 }
 
 impl JournaldSyslogNgLogEngineV12 {
@@ -112,6 +127,7 @@ impl JournaldSyslogNgLogEngineV12 {
             syslog_pipelines: Vec::new(),
             bsd_syslog_rules: Vec::new(),
             logrotate_policies: HashMap::new(),
+            structured_entries: Vec::new(),
         };
         engine.init_defaults();
         engine
@@ -198,6 +214,14 @@ impl JournaldSyslogNgLogEngineV12 {
 
     pub fn get_syslog_pipelines(&self) -> &[SyslogBrokerPipelineV12] {
         &self.syslog_pipelines
+    }
+
+    pub fn add_structured_entry(&mut self, entry: JournaldStructuredIndexEntryV12) {
+        self.structured_entries.push(entry);
+    }
+
+    pub fn get_structured_entries(&self) -> &[JournaldStructuredIndexEntryV12] {
+        &self.structured_entries
     }
 }
 
@@ -867,6 +891,25 @@ pub struct PrometheusOpenMetricsTargetV12 {
     pub metrics_count: u32,
 }
 
+/// Prometheus Node Exporter Collector Telemetry V12
+#[derive(Debug, Clone)]
+pub struct NodeExporterCollectorSampleV12 {
+    pub collector_name: String, // "cpu", "meminfo", "diskstats", "netdev", "filesystem", "loadavg", "stat", "uname"
+    pub metric_name: String,
+    pub labels: BTreeMap<String, String>,
+    pub value: f64,
+}
+
+/// OpenMetrics Trace Exemplar Record V12
+#[derive(Debug, Clone)]
+pub struct OpenMetricsTraceExemplarV12 {
+    pub metric_name: String,
+    pub value: f64,
+    pub timestamp_sec: f64,
+    pub trace_id: String,
+    pub span_id: String,
+}
+
 /// OpenTelemetry OTLP gRPC/HTTP Exporter Payload V12
 #[derive(Debug, Clone)]
 pub struct OtlpMetricsAndLogsPayloadV12 {
@@ -893,6 +936,8 @@ pub struct VectorPrometheusSosreportSuiteV12 {
     vector_rules: Vec<VectorTransformationRuleV12>,
     collectd_metrics: Vec<CollectdPluginMetricV12>,
     prometheus_targets: Vec<PrometheusOpenMetricsTargetV12>,
+    node_exporter_samples: Vec<NodeExporterCollectorSampleV12>,
+    openmetrics_exemplars: Vec<OpenMetricsTraceExemplarV12>,
     otlp_payloads: Vec<OtlpMetricsAndLogsPayloadV12>,
     sosreport_manifests: Vec<SosreportManifestV12>,
 }
@@ -903,6 +948,8 @@ impl VectorPrometheusSosreportSuiteV12 {
             vector_rules: Vec::new(),
             collectd_metrics: Vec::new(),
             prometheus_targets: Vec::new(),
+            node_exporter_samples: Vec::new(),
+            openmetrics_exemplars: Vec::new(),
             otlp_payloads: Vec::new(),
             sosreport_manifests: Vec::new(),
         }
@@ -955,6 +1002,22 @@ impl VectorPrometheusSosreportSuiteV12 {
 
     pub fn get_otlp_payloads(&self) -> &[OtlpMetricsAndLogsPayloadV12] {
         &self.otlp_payloads
+    }
+
+    pub fn record_node_exporter_sample(&mut self, sample: NodeExporterCollectorSampleV12) {
+        self.node_exporter_samples.push(sample);
+    }
+
+    pub fn record_openmetrics_exemplar(&mut self, exemplar: OpenMetricsTraceExemplarV12) {
+        self.openmetrics_exemplars.push(exemplar);
+    }
+
+    pub fn get_node_exporter_samples(&self) -> &[NodeExporterCollectorSampleV12] {
+        &self.node_exporter_samples
+    }
+
+    pub fn get_openmetrics_exemplars(&self) -> &[OpenMetricsTraceExemplarV12] {
+        &self.openmetrics_exemplars
     }
 }
 
@@ -1384,11 +1447,53 @@ mod tests {
             metric_value: 8589934592.0,
         });
 
+        let mut node_labels = BTreeMap::new();
+        node_labels.insert("cpu".to_string(), "0".to_string());
+        node_labels.insert("mode".to_string(), "user".to_string());
+
+        suite.record_node_exporter_sample(NodeExporterCollectorSampleV12 {
+            collector_name: "cpu".to_string(),
+            metric_name: "node_cpu_seconds_total".to_string(),
+            labels: node_labels,
+            value: 1420.5,
+        });
+
+        suite.record_openmetrics_exemplar(OpenMetricsTraceExemplarV12 {
+            metric_name: "http_request_duration_seconds_bucket".to_string(),
+            value: 0.042,
+            timestamp_sec: 1774872000.0,
+            trace_id: "4bf92f3577b34da6a3ce929d0e0e4736".to_string(),
+            span_id: "00f067aa0ba902b7".to_string(),
+        });
+
         assert_eq!(manifest.bundle_filename, "sosreport-sigma-v12.tar.zst");
         assert_eq!(manifest.secrets_redacted_count, 5);
         assert!(manifest.pqc_signature.contains("DILITHIUM5"));
         assert_eq!(suite.get_collectd_metrics().len(), 1);
         assert_eq!(suite.get_otlp_payloads().len(), 1);
+        assert_eq!(suite.get_node_exporter_samples().len(), 1);
+        assert_eq!(suite.get_openmetrics_exemplars().len(), 1);
+    }
+
+    #[test]
+    fn test_journald_structured_index_v12() {
+        let mut engine = JournaldSyslogNgLogEngineV12::new();
+        engine.add_structured_entry(JournaldStructuredIndexEntryV12 {
+            systemd_unit: Some("sshd.service".to_string()),
+            pid: 1042,
+            comm: "sshd".to_string(),
+            hostname: "sigma-gateway".to_string(),
+            uid: 0,
+            gid: 0,
+            selinux_context: Some("system_u:system_r:sshd_t:s0".to_string()),
+            timestamp_us: 1774872000000000,
+            message: "Accepted publickey for admin".to_string(),
+        });
+
+        assert_eq!(engine.get_structured_entries().len(), 1);
+        let entry = &engine.get_structured_entries()[0];
+        assert_eq!(entry.comm, "sshd");
+        assert_eq!(entry.systemd_unit.as_deref(), Some("sshd.service"));
     }
 
     #[test]
