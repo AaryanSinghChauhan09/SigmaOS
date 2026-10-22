@@ -5,11 +5,11 @@
 // Staging, pull request proposal specification, diff patch generation, and automated
 // execution pipeline for missing/enhanced Linux, BSD, GitHub Wiki/repo ideas, and 33 Global
 // Tech Media Portals advancing SigmaOS across all core subsystems:
-// 1. `Linux624SchedExtBpfPowerTopologyGovernorEngineV68`: Linux 6.24+ SchedExt eBPF quantum-neural dynamic NUMA core scheduling & sub-milliwatt power governor.
-// 2. `FreeBsd155CapsicumCasperMeshVnetEngineV68`: FreeBSD 15.5+ Capsicum Casper Netlink capability delegates & dynamic micro-jail mesh isolation.
-// 3. `OpenBsd84FineIbtPinsyscallPteGuardEngineV68`: OpenBSD 8.4+ FineIBT CFI enforcement & dynamic page-table shadow stack memory verification.
-// 4. `DragonFly74Hammer2DirectIoErasureEngineV68`: DragonFly BSD 7.4+ HAMMER2 PFS erasure coding & lock-free direct-IO cluster replication.
-// 5. `NetBsd122RumpUserlandAudioPciRouterEngineV68`: NetBSD 12.2 Rump hypercall userland PCI/audio driver router & virtual device server.
+// 1. `LinuxSchedExtBpfPowerTopologyGovernorEngineV68`: Linux SchedExt eBPF quantum-neural dynamic NUMA core scheduling & power governor.
+// 2. `FreeBsdCapsicumCasperMeshVnetEngineV68`: FreeBSD Capsicum Casper Netlink capability delegates & dynamic micro-jail mesh isolation.
+// 3. `OpenBsdFineIbtPinsyscallPteGuardEngineV68`: OpenBSD FineIBT CFI enforcement & dynamic page-table shadow stack memory verification.
+// 4. `DragonFlyHammer2DirectIoErasureEngineV68`: DragonFly BSD HAMMER2 PFS erasure coding & lock-free direct-IO cluster replication.
+// 5. `NetBsdRumpUserlandAudioPciRouterEngineV68`: NetBSD Rump hypercall userland PCI/audio driver router & virtual device server.
 // 6. `HaikuBfsRelationalLiveQueryMetadataEngineV68`: Haiku BFS live relational attribute query indexing & real-time file metadata search V68.
 // 7. `Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68`: Plan 9 9P2000 synthetic VFS namespace multiplexer & process rfork isolation V68.
 // 8. `NixGuixHermeticCasMerkleClosureEngineV68`: NixOS / GNU Guix hermetic CAS store Merkle closure tree builder & transactional rollback governor V68.
@@ -62,14 +62,14 @@ pub struct OpenSourceOsPrProposalV68 {
     pub patch_diff: String,
 }
 
-// 1. Linux 6.24+ SchedExt eBPF Power Topology Governor Engine V68
+// 1. Linux SchedExt eBPF Power Topology Governor Engine V68
 #[derive(Debug, Default)]
-pub struct Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
+pub struct LinuxSchedExtBpfPowerTopologyGovernorEngineV68 {
     sched_policies: BTreeMap<String, String>,
     quantum_cores: BTreeMap<String, u64>,
 }
 
-impl Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
+impl LinuxSchedExtBpfPowerTopologyGovernorEngineV68 {
     pub fn new() -> Self {
         Self {
             sched_policies: BTreeMap::new(),
@@ -88,9 +88,9 @@ impl Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
         OpenSourceOsPrProposalV68 {
             pr_id: pr_id.to_string(),
-            title: "Linux 6.24+ SchedExt eBPF Quantum-Neural Power Governor & NUMA Dynamic Scheduler V68".to_string(),
-            component_name: "Linux624SchedExtBpfPowerTopologyGovernorEngineV68".to_string(),
-            os_origin: "Linux Kernel 6.24+".to_string(),
+            title: "Linux SchedExt eBPF Quantum-Neural Power Governor & NUMA Dynamic Scheduler V68".to_string(),
+            component_name: "LinuxSchedExtBpfPowerTopologyGovernorEngineV68".to_string(),
+            os_origin: "Linux Kernel".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
             patch_diff: format!(
@@ -102,13 +102,13 @@ impl Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
     }
 }
 
-// 2. FreeBSD 15.5+ Capsicum Casper Netlink Mesh Engine V68
+// 2. FreeBSD Capsicum Casper Netlink Mesh Engine V68
 #[derive(Debug, Default)]
-pub struct FreeBsd155CapsicumCasperMeshVnetEngineV68 {
+pub struct FreeBsdCapsicumCasperMeshVnetEngineV68 {
     casper_jails: BTreeMap<String, Vec<String>>,
 }
 
-impl FreeBsd155CapsicumCasperMeshVnetEngineV68 {
+impl FreeBsdCapsicumCasperMeshVnetEngineV68 {
     pub fn new() -> Self {
         Self {
             casper_jails: BTreeMap::new(),
@@ -125,9 +125,9 @@ impl FreeBsd155CapsicumCasperMeshVnetEngineV68 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
         OpenSourceOsPrProposalV68 {
             pr_id: pr_id.to_string(),
-            title: "FreeBSD 15.5+ Capsicum Casper Netlink Capability Delegates & Dynamic Micro-Jail Mesh V68".to_string(),
-            component_name: "FreeBsd155CapsicumCasperMeshVnetEngineV68".to_string(),
-            os_origin: "FreeBSD 15.5-RELEASE".to_string(),
+            title: "FreeBSD Capsicum Casper Netlink Capability Delegates & Dynamic Micro-Jail Mesh V68".to_string(),
+            component_name: "FreeBsdCapsicumCasperMeshVnetEngineV68".to_string(),
+            os_origin: "FreeBSD".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "Networking".to_string()],
             patch_diff: format!(
@@ -138,14 +138,14 @@ impl FreeBsd155CapsicumCasperMeshVnetEngineV68 {
     }
 }
 
-// 3. OpenBSD 8.4+ FineIBT Pinsyscall PTE Shadow Guard Engine V68
+// 3. OpenBSD FineIBT Pinsyscall PTE Shadow Guard Engine V68
 #[derive(Debug, Default)]
-pub struct OpenBsd84FineIbtPinsyscallPteGuardEngineV68 {
+pub struct OpenBsdFineIbtPinsyscallPteGuardEngineV68 {
     pinsyscall_shadow_stack_kb: u64,
     pte_guard_pages: u64,
 }
 
-impl OpenBsd84FineIbtPinsyscallPteGuardEngineV68 {
+impl OpenBsdFineIbtPinsyscallPteGuardEngineV68 {
     pub fn new() -> Self {
         Self {
             pinsyscall_shadow_stack_kb: 0,
@@ -161,9 +161,9 @@ impl OpenBsd84FineIbtPinsyscallPteGuardEngineV68 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
         OpenSourceOsPrProposalV68 {
             pr_id: pr_id.to_string(),
-            title: "OpenBSD 8.4+ FineIBT Dynamic Pinsyscall & PTE Page-Table Shadow Guard V68".to_string(),
-            component_name: "OpenBsd84FineIbtPinsyscallPteGuardEngineV68".to_string(),
-            os_origin: "OpenBSD 8.4-RELEASE".to_string(),
+            title: "OpenBSD FineIBT Dynamic Pinsyscall & PTE Page-Table Shadow Guard V68".to_string(),
+            component_name: "OpenBsdFineIbtPinsyscallPteGuardEngineV68".to_string(),
+            os_origin: "OpenBSD".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["SecuritySandboxing".to_string(), "MemoryVirtualization".to_string()],
             patch_diff: format!(
@@ -175,13 +175,13 @@ impl OpenBsd84FineIbtPinsyscallPteGuardEngineV68 {
     }
 }
 
-// 4. DragonFly BSD 7.4+ HAMMER2 PFS Erasure Direct-IO Engine V68
+// 4. DragonFly BSD HAMMER2 PFS Erasure Direct-IO Engine V68
 #[derive(Debug, Default)]
-pub struct DragonFly74Hammer2DirectIoErasureEngineV68 {
+pub struct DragonFlyHammer2DirectIoErasureEngineV68 {
     pfs_snapshots: BTreeMap<String, u64>,
 }
 
-impl DragonFly74Hammer2DirectIoErasureEngineV68 {
+impl DragonFlyHammer2DirectIoErasureEngineV68 {
     pub fn new() -> Self {
         Self {
             pfs_snapshots: BTreeMap::new(),
@@ -195,9 +195,9 @@ impl DragonFly74Hammer2DirectIoErasureEngineV68 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
         OpenSourceOsPrProposalV68 {
             pr_id: pr_id.to_string(),
-            title: "DragonFly BSD 7.4+ HAMMER2 PFS Lock-Free Direct-IO & Erasure Cluster Replication V68".to_string(),
-            component_name: "DragonFly74Hammer2DirectIoErasureEngineV68".to_string(),
-            os_origin: "DragonFly BSD 7.4+".to_string(),
+            title: "DragonFly BSD HAMMER2 PFS Lock-Free Direct-IO & Erasure Cluster Replication V68".to_string(),
+            component_name: "DragonFlyHammer2DirectIoErasureEngineV68".to_string(),
+            os_origin: "DragonFly BSD".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "RecoveryBackup".to_string()],
             patch_diff: format!(
@@ -208,13 +208,13 @@ impl DragonFly74Hammer2DirectIoErasureEngineV68 {
     }
 }
 
-// 5. NetBSD 12.2 Rump Hypercall Userland Audio/PCI Router Engine V68
+// 5. NetBSD Rump Hypercall Userland Audio/PCI Router Engine V68
 #[derive(Debug, Default)]
-pub struct NetBsd122RumpUserlandAudioPciRouterEngineV68 {
+pub struct NetBsdRumpUserlandAudioPciRouterEngineV68 {
     rump_drivers: Vec<String>,
 }
 
-impl NetBsd122RumpUserlandAudioPciRouterEngineV68 {
+impl NetBsdRumpUserlandAudioPciRouterEngineV68 {
     pub fn new() -> Self {
         Self {
             rump_drivers: Vec::new(),
@@ -228,9 +228,9 @@ impl NetBsd122RumpUserlandAudioPciRouterEngineV68 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
         OpenSourceOsPrProposalV68 {
             pr_id: pr_id.to_string(),
-            title: "NetBSD 12.2 Rump Anykernel Userland PCI/Audio Driver Hypercall Router V68".to_string(),
-            component_name: "NetBsd122RumpUserlandAudioPciRouterEngineV68".to_string(),
-            os_origin: "NetBSD 12.2".to_string(),
+            title: "NetBSD Rump Anykernel Userland PCI/Audio Driver Hypercall Router V68".to_string(),
+            component_name: "NetBsdRumpUserlandAudioPciRouterEngineV68".to_string(),
+            os_origin: "NetBSD".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["DriversHardware".to_string(), "AudioSound".to_string()],
             patch_diff: format!(
@@ -264,7 +264,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV68 {
             pr_id: pr_id.to_string(),
             title: "Haiku BFS Live Relational Attribute Query Indexing & Desktop Metadata Search V68".to_string(),
             component_name: "HaikuBfsRelationalLiveQueryMetadataEngineV68".to_string(),
-            os_origin: "Haiku R1/Beta6+".to_string(),
+            os_origin: "Haiku".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "DesktopCompositor".to_string()],
             patch_diff: format!(
@@ -297,7 +297,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68 {
             pr_id: pr_id.to_string(),
             title: "Plan 9 9P2000 Synthetic VFS Namespace Multiplexer & Process Rfork Isolation V68".to_string(),
             component_name: "Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68".to_string(),
-            os_origin: "Plan 9 / 9front".to_string(),
+            os_origin: "Plan 9".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "SecuritySandboxing".to_string()],
             patch_diff: format!(
@@ -331,7 +331,7 @@ impl NixGuixHermeticCasMerkleClosureEngineV68 {
             pr_id: pr_id.to_string(),
             title: "NixOS / GNU Guix Hermetic Content-Addressed Store Merkle Closure Tree Builder V68".to_string(),
             component_name: "NixGuixHermeticCasMerkleClosureEngineV68".to_string(),
-            os_origin: "NixOS 25.05 / GNU Guix 1.5+".to_string(),
+            os_origin: "NixOS / GNU Guix".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["PackageManagement".to_string(), "SystemAudit".to_string()],
             patch_diff: format!(
@@ -365,7 +365,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV68 {
             pr_id: pr_id.to_string(),
             title: "Illumos Crossbow VNIC Virtual Switch Mesh & Dynamic DTrace Probes V68".to_string(),
             component_name: "IllumosCrossbowVnicDtraceSwitchMeshEngineV68".to_string(),
-            os_origin: "Illumos / OpenIndiana".to_string(),
+            os_origin: "Illumos".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["Networking".to_string(), "ObservabilityDiagnostics".to_string()],
             patch_diff: format!(
@@ -386,7 +386,7 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV68 {
     pub fn new() -> Self {
         let mut portal_map = BTreeMap::new();
         portal_map.insert("9to5google.com".to_string(), vec!["Android Ashmem/Binder zero-copy IPC buffer pooling".to_string()]);
-        portal_map.insert("9to5linux.com".to_string(), vec!["Linux 6.14+ eBPF SchedExt latency governor".to_string()]);
+        portal_map.insert("9to5linux.com".to_string(), vec!["Linux eBPF SchedExt latency governor".to_string()]);
         portal_map.insert("9to5mac.com".to_string(), vec!["macOS XNU Mach IPC port right delegation".to_string()]);
         portal_map.insert("androidauthority.com".to_string(), vec!["Android ZRAM lz4/zstd compression tuning".to_string()]);
         portal_map.insert("androidpolice.com".to_string(), vec!["Android Mainline APEX modular updates".to_string()]);
@@ -450,11 +450,11 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV68 {
 // 11. Master Suite Coordinator V68
 #[derive(Debug, Default)]
 pub struct SovereignOpenSourceOsMissingComponentsV68PrSuite {
-    pub linux_engine: Linux624SchedExtBpfPowerTopologyGovernorEngineV68,
-    pub freebsd_engine: FreeBsd155CapsicumCasperMeshVnetEngineV68,
-    pub openbsd_engine: OpenBsd84FineIbtPinsyscallPteGuardEngineV68,
-    pub dragonfly_engine: DragonFly74Hammer2DirectIoErasureEngineV68,
-    pub netbsd_engine: NetBsd122RumpUserlandAudioPciRouterEngineV68,
+    pub linux_engine: LinuxSchedExtBpfPowerTopologyGovernorEngineV68,
+    pub freebsd_engine: FreeBsdCapsicumCasperMeshVnetEngineV68,
+    pub openbsd_engine: OpenBsdFineIbtPinsyscallPteGuardEngineV68,
+    pub dragonfly_engine: DragonFlyHammer2DirectIoErasureEngineV68,
+    pub netbsd_engine: NetBsdRumpUserlandAudioPciRouterEngineV68,
     pub haiku_engine: HaikuBfsRelationalLiveQueryMetadataEngineV68,
     pub plan9_engine: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68,
     pub nix_guix_engine: NixGuixHermeticCasMerkleClosureEngineV68,
@@ -528,7 +528,7 @@ mod tests {
         master.illumos_engine.configure_vnic_mesh("vnic_v68_0", 40000);
         master
             .media_portals_engine
-            .register_portal_idea("phoronix.com", "Linux 6.24 PQC driver benchmarks");
+            .register_portal_idea("phoronix.com", "Linux PQC driver benchmarks");
 
         let proposals = master.collect_all_proposals();
         assert_eq!(proposals.len(), 10);

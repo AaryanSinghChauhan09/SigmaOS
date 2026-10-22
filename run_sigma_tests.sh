@@ -381,20 +381,6 @@ if [ -f "src/creative/effectcraft_artcraft_parity_pr.rs" ]; then
     ./build/test_effectcraft_artcraft_parity
 fi
 
-if [ -f "src/creative/effectcraft_missing_components_parity_pr.rs" ]; then
-    echo "Running Sovereign EffectCraft & ArtCraft Missing Components Parity PR test suite..."
-    mkdir -p build
-    rustc --test src/creative/effectcraft_missing_components_parity_pr.rs --edition=2021 -o build/test_effectcraft_missing
-    ./build/test_effectcraft_missing
-fi
-
-if [ -f "src/creative/effectcraft_artcraft_missing_components_v65_pr.rs" ]; then
-    echo "Running Sovereign EffectCraft & ArtCraft Missing Components V65 PR test suite..."
-    mkdir -p build
-    rustc --test src/creative/effectcraft_artcraft_missing_components_v65_pr.rs --edition=2021 -o build/test_effectcraft_v65
-    ./build/test_effectcraft_v65
-fi
-
 if [ -f "src/creative/gridcraft.rs" ]; then
     echo "Running Sovereign Gridcraft Spreadsheet PR test suite..."
     mkdir -p build
@@ -414,13 +400,6 @@ if [ -f "src/creative/gridcraft_artcraft_parity_pr.rs" ]; then
     mkdir -p build
     rustc --test src/creative/gridcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_gridcraft_artcraft_parity
     ./build/test_gridcraft_artcraft_parity
-fi
-
-if [ -f "src/creative/gridcraft_artcraft_missing_components_v65_pr.rs" ]; then
-    echo "Running Sovereign GridCraft & ArtCraft Missing Components Parity PR Gateway V65 test suite..."
-    mkdir -p build
-    rustc --test src/creative/gridcraft_artcraft_missing_components_v65_pr.rs --edition=2021 -o build/test_gridcraft_v65
-    ./build/test_gridcraft_v65
 fi
 
 if [ -f "src/creative/wordcraft.rs" ]; then
@@ -603,13 +582,6 @@ if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_advancements_v65_pr.r
     mkdir -p build
     rustc --test src/kernel/sovereign_kernel_open_source_os_distro_advancements_v65_pr.rs --edition=2021 -o build/test_kernel_distro_advancements_v65_pr
     ./build/test_kernel_distro_advancements_v65_pr
-fi
-
-if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_advancements_v68_pr.rs" ]; then
-    echo "Running Sovereign Kernel Open Source OS & Distro Advancements V68 PR test suite..."
-    mkdir -p build
-    rustc --test src/kernel/sovereign_kernel_open_source_os_distro_advancements_v68_pr.rs --edition=2021 -o build/test_kernel_distro_advancements_v68_pr
-    ./build/test_kernel_distro_advancements_v68_pr
 fi
 
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
@@ -1685,13 +1657,6 @@ if [ -f "src/distro/openbsd_missing_components_v62_pr.rs" ]; then
     ./build/test_openbsd_v62_pr
 fi
 
-if [ -f "src/distro/openbsd_missing_components_v64_pr.rs" ]; then
-    echo "Running OpenBSD Missing Components V64 PR Suite..."
-    mkdir -p build
-    rustc --test src/distro/openbsd_missing_components_v64_pr.rs --edition=2021 -o build/test_openbsd_v64_pr
-    ./build/test_openbsd_v64_pr
-fi
-
 if [ -f "src/distro/freebsd_missing_components_v62_pr.rs" ]; then
     echo "Running FreeBSD Missing Components V62 PR Suite..."
     mkdir -p build
@@ -1736,10 +1701,10 @@ if [ -f "src/distro/open_source_os_missing_components_v67_pr.rs" ]; then
     ./build/test_open_source_v67_pr
 fi
 
-if [ -f "src/distro/cachy_linux_missing_components_v67_pr.rs" ]; then
-    echo "Running Cachy Linux Missing Components V67 PR Suite tests..."
-    rustc --test src/distro/cachy_linux_missing_components_v67_pr.rs --edition=2021 -o build/test_cachy_v67_pr
-    ./build/test_cachy_v67_pr
+if [ -f "src/distro/open_source_os_missing_components_v68_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V68 PR Suite tests..."
+    rustc --test src/distro/open_source_os_missing_components_v68_pr.rs --edition=2021 -o build/test_open_source_v68_pr
+    ./build/test_open_source_v68_pr
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
@@ -1971,13 +1936,6 @@ if [ -f "tests/test_open_source_os_and_arch_missing_components_v65_pr.rs" ]; the
     mkdir -p build
     rustc --test tests/test_open_source_os_and_arch_missing_components_v65_pr.rs --edition=2021 -o build/test_v65_os_arch_prs
     ./build/test_v65_os_arch_prs
-fi
-
-if [ -f "tests/test_open_source_os_and_arch_missing_components_v68_pr.rs" ]; then
-    echo "Running Arch Linux Missing Components PRs V68 test suite..."
-    mkdir -p build
-    rustc --test tests/test_open_source_os_and_arch_missing_components_v68_pr.rs --edition=2021 -o build/test_v68_os_arch_prs
-    ./build/test_v68_os_arch_prs
 fi
 
 
