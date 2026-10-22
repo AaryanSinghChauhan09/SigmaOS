@@ -81,3 +81,5 @@ wiki/
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
+!FUTURE-DEVELOPMENT-ROADMAP.md
+!.github/PULL_REQUEST_TEMPLATE.md
