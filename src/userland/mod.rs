@@ -1,5 +1,6 @@
 pub mod coreutils;
 pub mod coreutils_pr_gateway;
+pub mod sovereign_coreutils_and_userland_advancements_v69_pr;
 pub mod format_runner;
 pub mod init;
 pub mod job_control;
@@ -12,6 +13,7 @@ pub mod system_utilities;
 pub mod terminal_emulator;
 
 pub use coreutils_pr_gateway::*;
+pub use sovereign_coreutils_and_userland_advancements_v69_pr::*;
 pub use format_runner::*;
 pub use init::*;
 pub use libc::*;
