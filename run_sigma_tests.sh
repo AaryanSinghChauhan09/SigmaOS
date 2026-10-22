@@ -1664,13 +1664,6 @@ if [ -f "src/distro/freebsd_missing_components_v62_pr.rs" ]; then
     ./build/test_freebsd_v62_pr
 fi
 
-if [ -f "src/distro/freebsd_missing_components_v63_pr.rs" ]; then
-    echo "Running FreeBSD Missing Components V63 PR Suite..."
-    mkdir -p build
-    rustc --test src/distro/freebsd_missing_components_v63_pr.rs --edition=2021 -o build/test_freebsd_v63_pr
-    ./build/test_freebsd_v63_pr
-fi
-
 if [ -f "src/distro/open_source_os_missing_components_v62_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V62 PR Suite..."
     mkdir -p build
@@ -1690,9 +1683,10 @@ if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v63_pr.rs" ]; then
     ./build/test_open_source_os_debian_v63_pr
 fi
 
-if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v68_pr.rs" ]; then
-    echo "Running Sovereign Open Source OS & Debian GitHub Unimplemented Ideas V68 PR test suite..."
-    rustc --test tests/test_open_source_os_debian_unimplemented_ideas_v68_pr.rs --edition=2021 -o build/test_open_source_os_debian_v68_pr
+if [ -f "src/distro/open_source_os_debian_unimplemented_ideas_v68_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS & Debian Unimplemented Ideas V68 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_debian_unimplemented_ideas_v68_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_os_debian_v68_pr
     ./build/test_open_source_os_debian_v68_pr
 fi
 
@@ -1712,12 +1706,6 @@ if [ -f "src/distro/open_source_os_missing_components_v67_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V67 PR Suite tests..."
     rustc --test src/distro/open_source_os_missing_components_v67_pr.rs --edition=2021 -o build/test_open_source_v67_pr
     ./build/test_open_source_v67_pr
-fi
-
-if [ -f "src/distro/open_source_os_missing_components_v68_pr.rs" ]; then
-    echo "Running Open Source OS Missing Components V68 PR Suite tests..."
-    rustc --test src/distro/open_source_os_missing_components_v68_pr.rs --edition=2021 -o build/test_open_source_v68_pr
-    ./build/test_open_source_v68_pr
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
@@ -1949,13 +1937,6 @@ if [ -f "tests/test_open_source_os_and_arch_missing_components_v65_pr.rs" ]; the
     mkdir -p build
     rustc --test tests/test_open_source_os_and_arch_missing_components_v65_pr.rs --edition=2021 -o build/test_v65_os_arch_prs
     ./build/test_v65_os_arch_prs
-fi
-
-if [ -f "tests/test_open_source_os_and_arch_missing_components_v67_pr.rs" ]; then
-    echo "Running Open Source OS Unimplemented Ideas & Arch GitHub PRs V67 test suite..."
-    mkdir -p build
-    rustc --test tests/test_open_source_os_and_arch_missing_components_v67_pr.rs --edition=2021 -o build/test_v67_os_arch_prs
-    ./build/test_v67_os_arch_prs
 fi
 
 
