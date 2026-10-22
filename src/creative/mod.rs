@@ -15,6 +15,7 @@ pub mod deckcraft;
 pub mod deckcraft_artcraft_parity_pr;
 pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
+pub mod designcraft_artcraft_missing_components_v65_pr;
 pub mod designcraft_artcraft_parity_pr;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -79,6 +80,7 @@ pub use designcraft::{
     FontFamily, FontWeight, Grid, Guide, GuideOrientation, Layer, Style, StyleType, TextAlignment,
     TextElement,
 };
+pub use designcraft_artcraft_missing_components_v65_pr::*;
 pub use designcraft_artcraft_parity_pr::*;
 pub use designcraft_missing_components_parity_pr::*;
 pub use effectcraft::{
