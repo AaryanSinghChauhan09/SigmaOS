@@ -2026,6 +2026,171 @@ impl Default for AirScanMultiFormatOutputEngine {
     }
 }
 
+// SANE Backend Configuration Parser Engine
+// ============================================================================
+
+/// Parsed device configuration from `/etc/sane.d/*.conf` backend files.
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub struct SaneBackendDeviceConfig {
+    pub backend_name: String,
+    pub usb_vendor_ids: Vec<(u16, u16)>,
+    pub network_hosts: Vec<String>,
+    pub option_settings: HashMap<String, String>,
+}
+
+/// Clean-room parser for `/etc/sane.d/*.conf` backend configuration files.
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub struct SaneBackendConfigurationParserEngine {
+    pub configs: HashMap<String, SaneBackendDeviceConfig>,
+}
+
+impl SaneBackendConfigurationParserEngine {
+    pub fn new() -> Self {
+        Self {
+            configs: HashMap::new(),
+        }
+    }
+
+    pub fn parse_sane_conf_file(&mut self, backend_name: &str, conf_content: &str) -> &SaneBackendDeviceConfig {
+        let mut usb_ids = Vec::new();
+        let mut hosts = Vec::new();
+        let mut options = HashMap::new();
+
+        for line in conf_content.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            if trimmed.starts_with("usb") {
+                let parts: Vec<&str> = trimmed.split_whitespace().collect();
+                if parts.len() >= 3 {
+                    let vendor = u16::from_str_radix(parts[1].trim_start_matches("0x"), 16).unwrap_or(0);
+                    let product = u16::from_str_radix(parts[2].trim_start_matches("0x"), 16).unwrap_or(0);
+                    usb_ids.push((vendor, product));
+                }
+            } else if trimmed.starts_with("option") {
+                let parts: Vec<&str> = trimmed.splitn(3, ' ').collect();
+                if parts.len() == 3 {
+                    options.insert(parts[1].to_string(), parts[2].to_string());
+                }
+            } else if trimmed.contains('.') || trimmed.contains(':') || trimmed.contains("localhost") {
+                hosts.push(trimmed.to_string());
+            }
+        }
+
+        let cfg = SaneBackendDeviceConfig {
+            backend_name: backend_name.to_string(),
+            usb_vendor_ids: usb_ids,
+            network_hosts: hosts,
+            option_settings: options,
+        };
+
+        self.configs.insert(backend_name.to_string(), cfg);
+        self.configs.get(backend_name).unwrap()
+    }
+
+    pub fn get_backend_config(&self, backend_name: &str) -> Option<&SaneBackendDeviceConfig> {
+        self.configs.get(backend_name)
+    }
+}
+
+impl Default for SaneBackendConfigurationParserEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// SANE Color Calibration Profile Engine
+// ============================================================================
+
+/// SANE optical scanner calibration and ICC color management engine.
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub struct SaneColorCalibrationProfileEngine {
+    pub icc_profile_name: String,
+    pub white_point_gain: (f32, f32, f32),
+    pub dark_current_offset: (i16, i16, i16),
+    pub gamma_value: f32,
+}
+
+impl SaneColorCalibrationProfileEngine {
+    pub fn new(icc_profile_name: &str) -> Self {
+        Self {
+            icc_profile_name: icc_profile_name.to_string(),
+            white_point_gain: (1.05, 1.0, 0.98),
+            dark_current_offset: (2, 2, 2),
+            gamma_value: 2.2,
+        }
+    }
+
+    pub fn calibrate_pixel(&self, r: u8, g: u8, b: u8) -> (u8, u8, u8) {
+        let sub_r = (r as i16 - self.dark_current_offset.0).max(0) as f32;
+        let sub_g = (g as i16 - self.dark_current_offset.1).max(0) as f32;
+        let sub_b = (b as i16 - self.dark_current_offset.2).max(0) as f32;
+
+        let gain_r = (sub_r * self.white_point_gain.0).min(255.0);
+        let gain_g = (sub_g * self.white_point_gain.1).min(255.0);
+        let gain_b = (sub_b * self.white_point_gain.2).min(255.0);
+
+        (gain_r as u8, gain_g as u8, gain_b as u8)
+    }
+}
+
+// AirScan eSCL Scanner Capabilities Engine
+// ============================================================================
+
+/// AirScan eSCL XML capabilities and status protocol generator/parser.
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+pub struct AirScanEsclScannerCapabilitiesEngine {
+    pub vendor: String,
+    pub model: String,
+    pub supported_resolutions: Vec<u32>,
+    pub color_modes: Vec<String>,
+    pub adf_duplex: bool,
+    pub max_width_mm: u32,
+    pub max_height_mm: u32,
+}
+
+impl AirScanEsclScannerCapabilitiesEngine {
+    pub fn new(vendor: &str, model: &str) -> Self {
+        Self {
+            vendor: vendor.to_string(),
+            model: model.to_string(),
+            supported_resolutions: vec![300, 600, 1200],
+            color_modes: vec!["RGB24".to_string(), "Grayscale8".to_string(), "Binary1".to_string()],
+            adf_duplex: true,
+            max_width_mm: 216,
+            max_height_mm: 356,
+        }
+    }
+
+    pub fn generate_escl_scanner_capabilities_xml(&self) -> String {
+        let res_xml: String = self
+            .supported_resolutions
+            .iter()
+            .map(|r| format!("<DiscreteResolution>{}</DiscreteResolution>", r))
+            .collect();
+
+        format!(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<eSCL:ScannerCapabilities xmlns:eSCL=\"http://schemas.hp.com/imaging/escl/2011/05/03\">\n  <eSCL:MakeAndModel>{} {}</eSCL:MakeAndModel>\n  <eSCL:SupportedResolutions>{}\n  </eSCL:SupportedResolutions>\n  <eSCL:AdfDuplex>{}</eSCL:AdfDuplex>\n</eSCL:ScannerCapabilities>",
+            self.vendor, self.model, res_xml, if self.adf_duplex { "true" } else { "false" }
+        )
+    }
+
+    pub fn parse_escl_scanner_status_xml(&self, status_xml: &str) -> String {
+        if status_xml.contains("<eSCL:State>Processing</eSCL:State>") {
+            "Processing".to_string()
+        } else if status_xml.contains("<eSCL:State>Testing</eSCL:State>") {
+            "Testing".to_string()
+        } else {
+            "Idle".to_string()
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2420,5 +2585,40 @@ mod tests {
         let tiff_engine = AirScanMultiFormatOutputEngine::new("TIFF", 300, "Epson-Perfection");
         let tiff_payload = tiff_engine.transcode_raster_payload(b"TIFF-DATA", 1).unwrap();
         assert!(tiff_payload.windows(4).any(|w| w == b"II*\x00"));
+    }
+
+    #[test]
+    fn test_sane_backend_configuration_parser_engine() {
+        let mut parser = SaneBackendConfigurationParserEngine::new();
+        let conf = "# SANE Epson2 Backend\nusb 0x04b8 0x0130\noption option-run-mode normal\n192.168.1.120\n";
+        let cfg = parser.parse_sane_conf_file("epson2", conf);
+        assert_eq!(cfg.backend_name, "epson2");
+        assert_eq!(cfg.usb_vendor_ids, vec![(0x04b8, 0x0130)]);
+        assert_eq!(cfg.network_hosts, vec!["192.168.1.120"]);
+        assert_eq!(cfg.option_settings.get("option-run-mode").unwrap(), "normal");
+
+        let fetched = parser.get_backend_config("epson2").unwrap();
+        assert_eq!(fetched.backend_name, "epson2");
+    }
+
+    #[test]
+    fn test_sane_color_calibration_profile_engine() {
+        let calib = SaneColorCalibrationProfileEngine::new("Epson-Perfection-V600.icc");
+        let (r, g, b) = calib.calibrate_pixel(100, 100, 100);
+        assert_eq!(r, 102); // (100 - 2) * 1.05 = 102.9 -> 102
+        assert_eq!(g, 98);  // (100 - 2) * 1.00 = 98
+        assert_eq!(b, 96);  // (100 - 2) * 0.98 = 96.04 -> 96
+    }
+
+    #[test]
+    fn test_airscan_escl_scanner_capabilities_engine() {
+        let engine = AirScanEsclScannerCapabilitiesEngine::new("Fujitsu", "ScanSnap-iX1600");
+        let xml = engine.generate_escl_scanner_capabilities_xml();
+        assert!(xml.contains("<eSCL:MakeAndModel>Fujitsu ScanSnap-iX1600</eSCL:MakeAndModel>"));
+        assert!(xml.contains("<DiscreteResolution>600</DiscreteResolution>"));
+        assert!(xml.contains("<eSCL:AdfDuplex>true</eSCL:AdfDuplex>"));
+
+        let status_xml = "<eSCL:ScannerStatus><eSCL:State>Processing</eSCL:State></eSCL:ScannerStatus>";
+        assert_eq!(engine.parse_escl_scanner_status_xml(status_xml), "Processing");
     }
 }
