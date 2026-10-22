@@ -1327,7 +1327,11 @@ impl EffectcraftMissingComponentsParityPrSuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_effectcraft_parity()
+<<<<<<< HEAD
             && self.gateway.collect_all_proposals().len() >= 10
+=======
+            && self.gateway.collect_all_proposals().len() == 10
+>>>>>>> origin/feat/effectcraft-missing-components-parity-pr-10995382916238701864
     }
 }
 
@@ -1344,8 +1348,11 @@ impl Default for EffectcraftMissingComponentsParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+<<<<<<< HEAD
     use alloc::string::ToString;
     use alloc::vec;
+=======
+>>>>>>> origin/feat/effectcraft-missing-components-parity-pr-10995382916238701864
 
     #[test]
     fn test_optical_flow_engine_functional() {
@@ -1564,16 +1571,20 @@ mod tests {
     #[test]
     fn test_openfx_adapter_engine_functional_v2() {
         let mut engine = ArtCraftOpenFxPluginPrEngine::new();
+<<<<<<< HEAD
         let load_res = engine.load_openfx_plugin("com.artcraft.Blur");
+=======
+        let load_res = engine.load_openfx_plugin("com.artcraft.Glow");
+>>>>>>> origin/feat/effectcraft-missing-components-parity-pr-10995382916238701864
         assert!(load_res.is_ok());
 
         engine
-            .set_plugin_parameter("com.artcraft.Sharpen", "intensity", 0.5)
+            .set_plugin_parameter("com.artcraft.Glow", "intensity", 0.5)
             .unwrap();
 
         let mut pixels = vec![100, 150, 200, 255];
         engine
-            .process_frame("com.artcraft.Sharpen", &mut pixels)
+            .process_frame("com.artcraft.Glow", &mut pixels)
             .unwrap();
         assert_eq!(pixels[0], 50);
     }
