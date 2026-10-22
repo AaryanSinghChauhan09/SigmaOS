@@ -10,6 +10,7 @@ pub mod nvidia_prime;
 pub mod paint;
 pub mod raytracer;
 pub mod render3d;
+pub mod sovereign_graphics_display_advancements_pr;
 pub mod sovereign_graphics_display_pr_suite;
 pub mod vector_engine;
 pub mod video;
@@ -24,6 +25,7 @@ pub use drm_kms::{
     DrmAtomicCommit, DrmConnector, DrmConnectorStatus, DrmConnectorType, DrmCrtc, DrmEncoder,
     DrmFramebuffer, DrmKmsDevice, DrmMode, DrmNodeType, DrmPlane, DrmPlaneType, GemBuffer,
 };
+pub use sovereign_graphics_display_advancements_pr::*;
 pub use sovereign_graphics_display_pr_suite::*;
 pub use video::{PixelRgba, VideoFrame};
 

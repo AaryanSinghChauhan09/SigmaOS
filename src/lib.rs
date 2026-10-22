@@ -12,6 +12,7 @@ pub mod arch_kernel_inspirations;
 pub mod auth;
 pub mod compositor;
 pub mod graphics;
+pub use graphics::*;
 
 pub mod access;
 pub mod accessibility;
