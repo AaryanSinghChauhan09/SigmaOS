@@ -36,6 +36,7 @@ pub use creative::deckcraft::*;
 // pub use creative::designcraft_artcraft_parity_pr::*;
 // pub use creative::designcraft_missing_components_parity_pr::*;
 pub use creative::effectcraft_artcraft_missing_components_v65_pr::*;
+pub use creative::effectcraft_artcraft_missing_components_v66_pr::*;
 // pub use creative::effectcraft_artcraft_parity_pr::*;
 // pub use creative::effectcraft_missing_components_parity_pr::*;
 // pub use creative::figcraft_missing_components_parity_pr::*;
