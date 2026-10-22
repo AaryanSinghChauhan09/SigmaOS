@@ -281,6 +281,40 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::InvalidChars);
     }
 
+    // Parse and validate IPv6 literal bracket syntax or host:port structure within authority segment per RFC 3986
+    if authority.starts_with(b"[") {
+        let close_pos = authority.iter().position(|&b| b == b']');
+        let close = match close_pos {
+            Some(idx) if idx > 1 => idx,
+            _ => return Err(ValidationError::InvalidChars),
+        };
+        let ipv6_bytes = &authority[1..close];
+        validate_ipv6(ipv6_bytes)?;
+
+        let rest_auth = &authority[close + 1..];
+        if !rest_auth.is_empty() {
+            if !rest_auth.starts_with(b":") || rest_auth.len() == 1 {
+                return Err(ValidationError::InvalidChars);
+            }
+            let port_bytes = &rest_auth[1..];
+            let port_num = parse_port_bytes(port_bytes).ok_or(ValidationError::InvalidChars)?;
+            validate_port(port_num)?;
+        }
+    } else {
+        if authority.contains(&b'[') || authority.contains(&b']') {
+            return Err(ValidationError::InvalidChars);
+        }
+        if let Some(colon_pos) = authority.iter().position(|&b| b == b':') {
+            let host_part = &authority[..colon_pos];
+            let port_bytes = &authority[colon_pos + 1..];
+            if host_part.is_empty() || port_bytes.is_empty() {
+                return Err(ValidationError::InvalidChars);
+            }
+            let port_num = parse_port_bytes(port_bytes).ok_or(ValidationError::InvalidChars)?;
+            validate_port(port_num)?;
+        }
+    }
+
     // Iterate through all bytes: check for NUL, control chars/spaces, and backslashes (`\`)
     // Rejects backslashes to prevent WHATWG vs RFC 3986 URL parser differential attacks (CWE-601 / CWE-918)
     for &b in url {
@@ -643,6 +677,21 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
 }
 
 // ── Port number ────────────────────────────────────────────────────────────
+
+/// Parse ASCII byte slice into a port number (`u32`), returning `None` if invalid or overflowed.
+fn parse_port_bytes(bytes: &[u8]) -> Option<u32> {
+    if bytes.is_empty() {
+        return None;
+    }
+    let mut val: u32 = 0;
+    for &b in bytes {
+        if !b.is_ascii_digit() {
+            return None;
+        }
+        val = val.checked_mul(10)?.checked_add((b - b'0') as u32)?;
+    }
+    Some(val)
+}
 
 /// Validate a TCP/UDP port number (1..=65535).
 pub fn validate_port(port: u32) -> Result<(), ValidationError> {
@@ -1309,6 +1358,52 @@ mod tests {
         );
         assert_eq!(
             validate_url(b"http://example.com/\x7fpath"),
+            Err(ValidationError::InvalidChars)
+        );
+
+        // IPv6 literal URL authority validation
+        assert_eq!(validate_url(b"http://[::1]"), Ok(()));
+        assert_eq!(validate_url(b"http://[::1]:8080/api"), Ok(()));
+        assert_eq!(
+            validate_url(b"https://[2001:db8::1]:443/test"),
+            Ok(())
+        );
+
+        // Malformed IPv6 literal bracket URLs
+        assert_eq!(
+            validate_url(b"http://[::1"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://::1]"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://[invalid_ipv6]"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://[::1]:"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://[::1]:65536"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_url(b"http://[::1]:abc"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com:65536"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com:abc"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_url(b"http://example.com:"),
             Err(ValidationError::InvalidChars)
         );
     }
