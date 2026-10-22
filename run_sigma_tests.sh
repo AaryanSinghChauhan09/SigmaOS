@@ -1690,6 +1690,13 @@ if [ -f "src/distro/open_source_os_debian_unimplemented_ideas_v68_pr.rs" ]; then
     ./build/test_open_source_os_debian_v68_pr
 fi
 
+if [ -f "src/distro/open_source_os_debian_unimplemented_ideas_v69_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS & Debian Unimplemented Ideas V69 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_debian_unimplemented_ideas_v69_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_os_debian_v69_pr
+    ./build/test_open_source_os_debian_v69_pr
+fi
+
 if [ -f "src/distro/open_source_os_missing_components_v65_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V65 PR Suite tests..."
     rustc --test src/distro/open_source_os_missing_components_v65_pr.rs --edition=2021 -o build/test_open_source_v65_pr
