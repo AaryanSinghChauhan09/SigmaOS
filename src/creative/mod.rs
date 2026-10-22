@@ -66,6 +66,7 @@ pub use anicraft_artcraft_parity_pr::*;
 pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
+pub use craftlibs_missing_components_parity_pr::*;
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
     DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine, DeckCraftMasterPrDeploymentSuite,
