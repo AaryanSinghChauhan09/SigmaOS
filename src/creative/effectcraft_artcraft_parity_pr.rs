@@ -20,12 +20,9 @@
 
 extern crate alloc;
 
-use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 /// Structured PR proposal manifest descriptor for EffectCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
