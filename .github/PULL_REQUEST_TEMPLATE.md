@@ -1,6 +1,30 @@
 ## Summary
 
-<!-- What I/O-management behavior changed and why? -->
+<!-- What changed and why? -->
+
+## Component
+
+- [ ] IPC handler
+- [ ] Pipes / FIFOs
+- [ ] UNIX-domain sockets
+- [ ] Shared memory
+- [ ] Message queues
+- [ ] Event wakeups
+- [ ] Signals
+- [ ] Process/thread management
+- [ ] VFS
+- [ ] Security
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
+- [ ] Documentation
+- [ ] CI / tooling
 
 ## I/O component
 
@@ -54,8 +78,6 @@
 - Upstream study details:
 
 ## Reference behavior
-
-<!-- Required for lifecycle, ABI, or I/O changes -->
 
 - POSIX section:
 - Linux/BSD/Redox/xv6 reference:
