@@ -1729,6 +1729,12 @@ if [ -f "src/distro/open_source_os_missing_components_v67_pr.rs" ]; then
     ./build/test_open_source_v67_pr
 fi
 
+if [ -f "src/distro/cachy_linux_missing_components_v67_pr.rs" ]; then
+    echo "Running Cachy Linux Missing Components V67 PR Suite tests..."
+    rustc --test src/distro/cachy_linux_missing_components_v67_pr.rs --edition=2021 -o build/test_cachy_v67_pr
+    ./build/test_cachy_v67_pr
+fi
+
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build
