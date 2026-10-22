@@ -1,5 +1,3 @@
-#![no_std]
-#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
@@ -13,14 +11,14 @@
 // 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
 #![no_std]
+extern crate alloc;
+
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
-
-
-
-
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -638,7 +636,7 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         ik_ok && nla_ok && onion_ok && lipsync_ok && mesh_ok
     }
 
-    pub fn collect_all_proposals(&self) -> Vec<AnicraftPrProposalManifest> {
+    pub fn collect_all_proposals(&self) -> Vec<AnicraftPrProposalManifest {
         vec![
             self.fabrik_ik.generate_proposal(),
             self.nla_blending.generate_proposal(),
@@ -670,6 +668,7 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
@@ -698,7 +697,10 @@ mod tests {
         assert_eq!(solved.len(), 3);
         assert_eq!(solved[0], IkJoint2D { x: 0.0, y: 0.0 });
 
-        let end_err = ((solved[2].x - target.x).powi(2) + (solved[2].y - target.y).powi(2)).sqrt();
+        let end_err =
+            ((solved[2].x - target.x) * (solved[2].x - target.x)
+                + (solved[2].y - target.y) * (solved[2].y - target.y))
+                .sqrt();
         assert!(end_err < 1e-2);
     }
 
@@ -706,8 +708,6 @@ mod tests {
     fn test_nla_blending_engine() {
         let engine = AnicraftNlaTrackClipBlendingPrEngine::new();
         let frame20_val = engine.evaluate_blended_value(20);
-        // Clip 1 progress at frame 20: 20/60 = 1/3 -> 10.0 * (1/3) = 3.333
-        // Clip 2 progress at frame 20: (20-15)/30 = 5/30 = 1/6 -> 5.0 * (1/6) * 0.5 = 0.4166
         assert!(frame20_val > 3.0);
     }
 
