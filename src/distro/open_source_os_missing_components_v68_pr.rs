@@ -2,21 +2,20 @@
 // Sovereign Open Source OS & Global Tech Media Missing Components V68 PR Gateway Engine
 // (`src/distro/open_source_os_missing_components_v68_pr.rs`)
 //
-// Staging, pull request proposal specification, diff patch generation, comparison matrix engine,
-// and automated execution pipeline for missing/enhanced Linux, BSD, GitHub Wiki/repo ideas, and 33 Global
+// Staging, pull request proposal specification, diff patch generation, and automated
+// execution pipeline for missing/enhanced Linux, BSD, GitHub Wiki/repo ideas, and 33 Global
 // Tech Media Portals advancing SigmaOS across all core subsystems:
-// 1. `SigmaOsVsOpenSourceOsComparisonMatrixEngineV68`: Architectural comparison matrix comparing SigmaOS against 10 Tier-1 open-source operating systems across 10 core dimensions.
-// 2. `Linux624SchedExtBpfPowerTopologyGovernorEngineV68`: Linux 6.24+ SchedExt eBPF quantum-neural dynamic NUMA core scheduling & sub-milliwatt power governor.
-// 3. `FreeBsd155CapsicumCasperMeshVnetEngineV68`: FreeBSD 15.5+ Capsicum Casper Netlink capability delegates & dynamic micro-jail mesh isolation.
-// 4. `OpenBsd84FineIbtPinsyscallPteGuardEngineV68`: OpenBSD 8.4+ FineIBT CFI enforcement & dynamic page-table shadow stack memory verification.
-// 5. `DragonFly73Hammer2DirectIoErasureEngineV68`: DragonFly BSD 7.3+ HAMMER2 PFS erasure coding & lock-free direct-IO cluster replication.
-// 6. `NetBsd122RumpUserlandAudioPciRouterEngineV68`: NetBSD 12.2 Rump hypercall userland PCI/audio driver router & virtual device server.
-// 7. `HaikuBfsRelationalLiveQueryMetadataEngineV68`: Haiku BFS live relational attribute query indexing & real-time file metadata search V68.
-// 8. `Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68`: Plan 9 9P2000 synthetic VFS namespace multiplexer & process rfork isolation V68.
-// 9. `NixGuixHermeticCasMerkleClosureEngineV68`: NixOS / GNU Guix hermetic CAS store Merkle closure tree builder & transactional rollback governor V68.
-// 10. `IllumosCrossbowVnicDtraceSwitchMeshEngineV68`: Illumos Crossbow VNIC virtual switch mesh & dynamic DTrace observability probes V68.
-// 11. `GlobalTechMedia33PortalUnimplementedIdeasEngineV68`: Harvester & synthesizer for all 33 global tech media portals, GitHub Wiki, and .md roadmaps.
-// 12. `SovereignOpenSourceOsMissingComponentsV68PrSuite`: Master coordinator harmonizing all V68 distro inspirations with 100% interop score across all subsystems of SigmaOS.
+// 1. `Linux624SchedExtBpfPowerTopologyGovernorEngineV68`: Linux 6.24+ SchedExt eBPF quantum-neural dynamic NUMA core scheduling & sub-milliwatt power governor.
+// 2. `FreeBsd155CapsicumCasperMeshVnetEngineV68`: FreeBSD 15.5+ Capsicum Casper Netlink capability delegates & dynamic micro-jail mesh isolation.
+// 3. `OpenBsd84FineIbtPinsyscallPteGuardEngineV68`: OpenBSD 8.4+ FineIBT CFI enforcement & dynamic page-table shadow stack memory verification.
+// 4. `DragonFly74Hammer2DirectIoErasureEngineV68`: DragonFly BSD 7.4+ HAMMER2 PFS erasure coding & lock-free direct-IO cluster replication.
+// 5. `NetBsd122RumpUserlandAudioPciRouterEngineV68`: NetBSD 12.2 Rump hypercall userland PCI/audio driver router & virtual device server.
+// 6. `HaikuBfsRelationalLiveQueryMetadataEngineV68`: Haiku BFS live relational attribute query indexing & real-time file metadata search V68.
+// 7. `Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68`: Plan 9 9P2000 synthetic VFS namespace multiplexer & process rfork isolation V68.
+// 8. `NixGuixHermeticCasMerkleClosureEngineV68`: NixOS / GNU Guix hermetic CAS store Merkle closure tree builder & transactional rollback governor V68.
+// 9. `IllumosCrossbowVnicDtraceSwitchMeshEngineV68`: Illumos Crossbow VNIC virtual switch mesh & dynamic DTrace observability probes V68.
+// 10. `GlobalTechMedia33PortalUnimplementedIdeasEngineV68`: Harvester & synthesizer for all 33 global tech media portals, GitHub Wiki, and .md roadmaps.
+// 11. `SovereignOpenSourceOsMissingComponentsV68PrSuite`: Master coordinator harmonizing all V68 distro inspirations with 100% interop score across all subsystems of SigmaOS.
 
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
@@ -45,207 +44,6 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OsCategoryV68 {
-    SigmaOSNative,
-    LinuxGeneral,
-    LinuxDeclarative,
-    LinuxLightweight,
-    BsdTier1,
-    MicrokernelDesktop,
-}
-
-#[derive(Debug, Clone)]
-pub struct OsComparisonProfileV68 {
-    pub name: String,
-    pub category: OsCategoryV68,
-    pub kernel_arch: String,
-    pub package_management: String,
-    pub security_sandboxing: String,
-    pub virtualization_tech: String,
-    pub filesystem_tiering: String,
-    pub network_stack: String,
-    pub service_supervisor: String,
-    pub desktop_display: String,
-    pub ipc_microkernel: String,
-    pub observability_diagnostics: String,
-    pub parity_score_vs_sigmaos: u32,
-}
-
-#[derive(Debug, Clone)]
-pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV68 {
-    pub profiles: Vec<OsComparisonProfileV68>,
-}
-
-impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV68 {
-    pub fn new() -> Self {
-        let profiles = vec![
-            OsComparisonProfileV68 {
-                name: "SigmaOS".to_string(),
-                category: OsCategoryV68::SigmaOSNative,
-                kernel_arch: "Capability Hybrid Microkernel + SchedExt Quantum eBPF".to_string(),
-                package_management: "sigpkg + PQC SAT + Foreign Universal Adapter".to_string(),
-                security_sandboxing: "Pledge/Unveil + Capsicum + Landlock v5 + FineIBT".to_string(),
-                virtualization_tech: "MicroVM + Xen Amnesic AppVM + VNET Jails".to_string(),
-                filesystem_tiering: "Bcachefs Photonic + HAMMER2 PFS + ZFS ARC".to_string(),
-                network_stack: "XDP Mesh + Crossbow VNIC + Netlink VNET".to_string(),
-                service_supervisor: "Autonomous PQC Mesh Supervisor".to_string(),
-                desktop_display: "Wayland 256-bit Quantum Neural HDR Direct KMS".to_string(),
-                ipc_microkernel: "Mach Port Rights + Zero-Copy Shared Memory Ring".to_string(),
-                observability_diagnostics: "DTrace Probes + eBPF Realtime Telemetry Mesh".to_string(),
-                parity_score_vs_sigmaos: 100,
-            },
-            OsComparisonProfileV68 {
-                name: "Debian / Ubuntu".to_string(),
-                category: OsCategoryV68::LinuxGeneral,
-                kernel_arch: "Monolithic Linux 6.24+".to_string(),
-                package_management: "APT / DPKG + Snap".to_string(),
-                security_sandboxing: "AppArmor + Seccomp".to_string(),
-                virtualization_tech: "KVM / QEMU + LXC".to_string(),
-                filesystem_tiering: "EXT4 / Btrfs / ZFS".to_string(),
-                network_stack: "Linux Netfilter / iptables / nftables".to_string(),
-                service_supervisor: "Systemd".to_string(),
-                desktop_display: "GNOME / Wayland / X11".to_string(),
-                ipc_microkernel: "Unix Domain Sockets + dbus".to_string(),
-                observability_diagnostics: "ftrace + eBPF perf".to_string(),
-                parity_score_vs_sigmaos: 83,
-            },
-            OsComparisonProfileV68 {
-                name: "Fedora / RHEL".to_string(),
-                category: OsCategoryV68::LinuxGeneral,
-                kernel_arch: "Monolithic Linux 6.24+".to_string(),
-                package_management: "DNF5 / RPM / bootc ostree".to_string(),
-                security_sandboxing: "SELinux".to_string(),
-                virtualization_tech: "KVM / Podman".to_string(),
-                filesystem_tiering: "Btrfs / XFS".to_string(),
-                network_stack: "NetworkManager / nftables".to_string(),
-                service_supervisor: "Systemd".to_string(),
-                desktop_display: "GNOME / Wayland".to_string(),
-                ipc_microkernel: "Unix Domain Sockets + Varlink".to_string(),
-                observability_diagnostics: "bpftrace + SystemTap".to_string(),
-                parity_score_vs_sigmaos: 86,
-            },
-            OsComparisonProfileV68 {
-                name: "Arch Linux".to_string(),
-                category: OsCategoryV68::LinuxGeneral,
-                kernel_arch: "Monolithic Linux 6.24+".to_string(),
-                package_management: "Pacman + AUR / Paru".to_string(),
-                security_sandboxing: "AppArmor / Landlock".to_string(),
-                virtualization_tech: "KVM / Docker / Podman".to_string(),
-                filesystem_tiering: "Btrfs + Snapper / EXT4".to_string(),
-                network_stack: "systemd-networkd / NetworkManager".to_string(),
-                service_supervisor: "Systemd".to_string(),
-                desktop_display: "Hyprland / KDE / GNOME Wayland".to_string(),
-                ipc_microkernel: "Unix Domain Sockets + D-Bus".to_string(),
-                observability_diagnostics: "perf + bpftrace".to_string(),
-                parity_score_vs_sigmaos: 88,
-            },
-            OsComparisonProfileV68 {
-                name: "Gentoo Linux".to_string(),
-                category: OsCategoryV68::LinuxGeneral,
-                kernel_arch: "Monolithic Custom Linux".to_string(),
-                package_management: "Portage EAPI-8 ebuilds".to_string(),
-                security_sandboxing: "Hardened SELinux / Pax".to_string(),
-                virtualization_tech: "KVM / QEMU".to_string(),
-                filesystem_tiering: "Btrfs / ZFS / EXT4".to_string(),
-                network_stack: "OpenRC / netifrc".to_string(),
-                service_supervisor: "OpenRC / Systemd".to_string(),
-                desktop_display: "Custom Wayland / X11".to_string(),
-                ipc_microkernel: "Unix Domain Sockets".to_string(),
-                observability_diagnostics: "perf + ftrace".to_string(),
-                parity_score_vs_sigmaos: 81,
-            },
-            OsComparisonProfileV68 {
-                name: "NixOS / GNU Guix".to_string(),
-                category: OsCategoryV68::LinuxDeclarative,
-                kernel_arch: "Monolithic Linux".to_string(),
-                package_management: "Nix Flakes / Guix Functional CAS Store".to_string(),
-                security_sandboxing: "Nix Sandbox / Guix Shepherd".to_string(),
-                virtualization_tech: "MicroVM / NixOS Containers".to_string(),
-                filesystem_tiering: "ZFS / Btrfs / Erase-your-darlings tmpfs".to_string(),
-                network_stack: "systemd-networkd".to_string(),
-                service_supervisor: "Systemd / Shepherd".to_string(),
-                desktop_display: "Wayland / Sway / KDE".to_string(),
-                ipc_microkernel: "Unix Domain Sockets + D-Bus".to_string(),
-                observability_diagnostics: "bpftrace + Nix daemon traces".to_string(),
-                parity_score_vs_sigmaos: 90,
-            },
-            OsComparisonProfileV68 {
-                name: "FreeBSD".to_string(),
-                category: OsCategoryV68::BsdTier1,
-                kernel_arch: "Monolithic FreeBSD 15.5+".to_string(),
-                package_management: "pkg / Poudriere / Ports".to_string(),
-                security_sandboxing: "Capsicum Casper + MAC Framework".to_string(),
-                virtualization_tech: "bhyve + Jails / VNET".to_string(),
-                filesystem_tiering: "ZFS zpool + OpenZFS ARC".to_string(),
-                network_stack: "pf firewall + netgraph".to_string(),
-                service_supervisor: "bsdrc / launchd-like init".to_string(),
-                desktop_display: "KDE / Wayland / Xorg".to_string(),
-                ipc_microkernel: "Capsicum Capability Rights + kqueue".to_string(),
-                observability_diagnostics: "DTrace + ktr".to_string(),
-                parity_score_vs_sigmaos: 89,
-            },
-            OsComparisonProfileV68 {
-                name: "OpenBSD".to_string(),
-                category: OsCategoryV68::BsdTier1,
-                kernel_arch: "Monolithic Hardened OpenBSD 8.4+".to_string(),
-                package_management: "pkg_add + Signify".to_string(),
-                security_sandboxing: "Pledge / Unveil + FineIBT + Pinsyscall".to_string(),
-                virtualization_tech: "vmd hypervisor".to_string(),
-                filesystem_tiering: "FFS2 + softraid crypto".to_string(),
-                network_stack: "PF firewall + relayd / iked".to_string(),
-                service_supervisor: "rc.d".to_string(),
-                desktop_display: "Xenocara X11 / Wayland".to_string(),
-                ipc_microkernel: "Kqueue + Syscall pledge".to_string(),
-                observability_diagnostics: "sysctl + ktrace".to_string(),
-                parity_score_vs_sigmaos: 87,
-            },
-            OsComparisonProfileV68 {
-                name: "DragonFly BSD".to_string(),
-                category: OsCategoryV68::BsdTier1,
-                kernel_arch: "Hybrid LWKT Kernel 7.3+".to_string(),
-                package_management: "dports + dsynth".to_string(),
-                security_sandboxing: "Chroot / Varsyms isolation".to_string(),
-                virtualization_tech: "VKernel userland virtualization".to_string(),
-                filesystem_tiering: "HAMMER2 PFS + Swapcache".to_string(),
-                network_stack: "PF + Netgraph".to_string(),
-                service_supervisor: "rc.d".to_string(),
-                desktop_display: "X11 / Wayland".to_string(),
-                ipc_microkernel: "LWKT Token Serializer Messages".to_string(),
-                observability_diagnostics: "ktrace + sysctl".to_string(),
-                parity_score_vs_sigmaos: 84,
-            },
-            OsComparisonProfileV68 {
-                name: "Haiku / Plan 9 / Illumos".to_string(),
-                category: OsCategoryV68::MicrokernelDesktop,
-                kernel_arch: "Modular Microkernel / Distributed / Illumos Kernel".to_string(),
-                package_management: "HaikuDepot / 9P / IPS pkg".to_string(),
-                security_sandboxing: "9P Rfork / Crossbow VNIC".to_string(),
-                virtualization_tech: "Zones / 9P Synthetic VFS".to_string(),
-                filesystem_tiering: "BFS Relational Query / ZFS".to_string(),
-                network_stack: "Crossbow VNIC Virtual Switch Mesh".to_string(),
-                service_supervisor: "launch_daemon / SMF".to_string(),
-                desktop_display: "Haiku App Server / Rio".to_string(),
-                ipc_microkernel: "BeAPI BMessage + 9P2000 Protocol".to_string(),
-                observability_diagnostics: "DTrace Probes + Haiku SystemProfiler".to_string(),
-                parity_score_vs_sigmaos: 82,
-            },
-        ];
-
-        Self { profiles }
-    }
-
-    pub fn get_profile_by_name(&self, name: &str) -> Option<OsComparisonProfileV68> {
-        self.profiles.iter().find(|p| p.name == name).cloned()
-    }
-}
-
-impl Default for SigmaOsVsOpenSourceOsComparisonMatrixEngineV68 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OsPrStatusV68 {
     Draft,
     Submitted,
@@ -264,7 +62,7 @@ pub struct OpenSourceOsPrProposalV68 {
     pub patch_diff: String,
 }
 
-// 2. Linux 6.24+ SchedExt eBPF Power Topology Governor Engine V68
+// 1. Linux 6.24+ SchedExt eBPF Power Topology Governor Engine V68
 #[derive(Debug, Default)]
 pub struct Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
     sched_policies: BTreeMap<String, String>,
@@ -304,7 +102,7 @@ impl Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
     }
 }
 
-// 3. FreeBSD 15.5+ Capsicum Casper Netlink Mesh Engine V68
+// 2. FreeBSD 15.5+ Capsicum Casper Netlink Mesh Engine V68
 #[derive(Debug, Default)]
 pub struct FreeBsd155CapsicumCasperMeshVnetEngineV68 {
     casper_jails: BTreeMap<String, Vec<String>>,
@@ -340,7 +138,7 @@ impl FreeBsd155CapsicumCasperMeshVnetEngineV68 {
     }
 }
 
-// 4. OpenBSD 8.4+ FineIBT Pinsyscall PTE Shadow Guard Engine V68
+// 3. OpenBSD 8.4+ FineIBT Pinsyscall PTE Shadow Guard Engine V68
 #[derive(Debug, Default)]
 pub struct OpenBsd84FineIbtPinsyscallPteGuardEngineV68 {
     pinsyscall_shadow_stack_kb: u64,
@@ -377,13 +175,13 @@ impl OpenBsd84FineIbtPinsyscallPteGuardEngineV68 {
     }
 }
 
-// 5. DragonFly BSD 7.3+ HAMMER2 PFS Erasure Direct-IO Engine V68
+// 4. DragonFly BSD 7.4+ HAMMER2 PFS Erasure Direct-IO Engine V68
 #[derive(Debug, Default)]
-pub struct DragonFly73Hammer2DirectIoErasureEngineV68 {
+pub struct DragonFly74Hammer2DirectIoErasureEngineV68 {
     pfs_snapshots: BTreeMap<String, u64>,
 }
 
-impl DragonFly73Hammer2DirectIoErasureEngineV68 {
+impl DragonFly74Hammer2DirectIoErasureEngineV68 {
     pub fn new() -> Self {
         Self {
             pfs_snapshots: BTreeMap::new(),
@@ -397,9 +195,9 @@ impl DragonFly73Hammer2DirectIoErasureEngineV68 {
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
         OpenSourceOsPrProposalV68 {
             pr_id: pr_id.to_string(),
-            title: "DragonFly BSD 7.3+ HAMMER2 PFS Lock-Free Direct-IO & Erasure Cluster Replication V68".to_string(),
-            component_name: "DragonFly73Hammer2DirectIoErasureEngineV68".to_string(),
-            os_origin: "DragonFly BSD 7.3+".to_string(),
+            title: "DragonFly BSD 7.4+ HAMMER2 PFS Lock-Free Direct-IO & Erasure Cluster Replication V68".to_string(),
+            component_name: "DragonFly74Hammer2DirectIoErasureEngineV68".to_string(),
+            os_origin: "DragonFly BSD 7.4+".to_string(),
             status: OsPrStatusV68::Validated,
             impacted_subsystems: vec!["FilesystemStorage".to_string(), "RecoveryBackup".to_string()],
             patch_diff: format!(
@@ -410,7 +208,7 @@ impl DragonFly73Hammer2DirectIoErasureEngineV68 {
     }
 }
 
-// 6. NetBSD 12.2 Rump Hypercall Userland Audio/PCI Router Engine V68
+// 5. NetBSD 12.2 Rump Hypercall Userland Audio/PCI Router Engine V68
 #[derive(Debug, Default)]
 pub struct NetBsd122RumpUserlandAudioPciRouterEngineV68 {
     rump_drivers: Vec<String>,
@@ -443,7 +241,7 @@ impl NetBsd122RumpUserlandAudioPciRouterEngineV68 {
     }
 }
 
-// 7. Haiku BFS Relational Live Query Metadata Engine V68
+// 6. Haiku BFS Relational Live Query Metadata Engine V68
 #[derive(Debug, Default)]
 pub struct HaikuBfsRelationalLiveQueryMetadataEngineV68 {
     indexed_attributes: BTreeMap<String, String>,
@@ -477,7 +275,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV68 {
     }
 }
 
-// 8. Plan 9 Synthetic 9P2000 VFS Rfork Multiplexer Engine V68
+// 7. Plan 9 Synthetic 9P2000 VFS Rfork Multiplexer Engine V68
 #[derive(Debug, Default)]
 pub struct Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68 {
     mounted_namespaces: Vec<String>,
@@ -510,7 +308,7 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68 {
     }
 }
 
-// 9. NixOS / GNU Guix Hermetic CAS Merkle Closure Engine V68
+// 8. NixOS / GNU Guix Hermetic CAS Merkle Closure Engine V68
 #[derive(Debug, Default)]
 pub struct NixGuixHermeticCasMerkleClosureEngineV68 {
     store_closure_hashes: BTreeMap<String, String>,
@@ -544,7 +342,7 @@ impl NixGuixHermeticCasMerkleClosureEngineV68 {
     }
 }
 
-// 10. Illumos Crossbow VNIC DTrace Switch Mesh Engine V68
+// 9. Illumos Crossbow VNIC DTrace Switch Mesh Engine V68
 #[derive(Debug, Default)]
 pub struct IllumosCrossbowVnicDtraceSwitchMeshEngineV68 {
     vnic_bandwidth_caps: BTreeMap<String, u64>,
@@ -578,7 +376,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV68 {
     }
 }
 
-// 11. Global Tech Media 33 Portal Unimplemented Ideas Engine V68
+// 10. Global Tech Media 33 Portal Unimplemented Ideas Engine V68
 #[derive(Debug, Default)]
 pub struct GlobalTechMedia33PortalUnimplementedIdeasEngineV68 {
     harvested_portal_innovations: BTreeMap<String, Vec<String>>,
@@ -649,14 +447,13 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV68 {
     }
 }
 
-// 12. Master Suite Coordinator V68
+// 11. Master Suite Coordinator V68
 #[derive(Debug, Default)]
 pub struct SovereignOpenSourceOsMissingComponentsV68PrSuite {
-    pub matrix_engine: SigmaOsVsOpenSourceOsComparisonMatrixEngineV68,
     pub linux_engine: Linux624SchedExtBpfPowerTopologyGovernorEngineV68,
     pub freebsd_engine: FreeBsd155CapsicumCasperMeshVnetEngineV68,
     pub openbsd_engine: OpenBsd84FineIbtPinsyscallPteGuardEngineV68,
-    pub dragonfly_engine: DragonFly73Hammer2DirectIoErasureEngineV68,
+    pub dragonfly_engine: DragonFly74Hammer2DirectIoErasureEngineV68,
     pub netbsd_engine: NetBsd122RumpUserlandAudioPciRouterEngineV68,
     pub haiku_engine: HaikuBfsRelationalLiveQueryMetadataEngineV68,
     pub plan9_engine: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV68,
@@ -703,29 +500,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_v68_matrix_engine() {
-        let matrix = SigmaOsVsOpenSourceOsComparisonMatrixEngineV68::new();
-        assert_eq!(matrix.profiles.len(), 10);
-
-        let sigma = matrix.get_profile_by_name("SigmaOS").unwrap();
-        assert_eq!(sigma.parity_score_vs_sigmaos, 100);
-        assert_eq!(sigma.category, OsCategoryV68::SigmaOSNative);
-
-        let debian = matrix.get_profile_by_name("Debian / Ubuntu").unwrap();
-        assert_eq!(debian.parity_score_vs_sigmaos, 83);
-
-        let nix = matrix.get_profile_by_name("NixOS / GNU Guix").unwrap();
-        assert_eq!(nix.parity_score_vs_sigmaos, 90);
-    }
-
-    #[test]
     fn test_v68_engines_and_proposals() {
         let mut master = SovereignOpenSourceOsMissingComponentsV68PrSuite::new();
 
         master
             .linux_engine
             .register_policy("scx_quantum_neural_power_v68", "0xebpf_v68_hash");
-        master.linux_engine.register_quantum_core("core_quantum_v68_1", 320);
+        master.linux_engine.register_quantum_core("core_quantum_v68_1", 350);
 
         master
             .freebsd_engine
@@ -733,7 +514,7 @@ mod tests {
         master.openbsd_engine.configure_security(32768, 2048);
         master
             .dragonfly_engine
-            .record_pfs_snapshot("pfs_data_v68", 1740600000);
+            .record_pfs_snapshot("pfs_data_v68", 1740500000);
         master
             .netbsd_engine
             .register_rump_driver("rumpuser_hypercall_audio_v68");
