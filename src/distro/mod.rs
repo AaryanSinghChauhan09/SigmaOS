@@ -729,6 +729,12 @@ pub use omarchy_linux_missing_components_v61_pr::*;
 pub mod omarchy_linux_missing_components_v62_pr;
 pub use omarchy_linux_missing_components_v62_pr::*;
 
+pub mod omarchy_linux_missing_components_v63_pr;
+pub use omarchy_linux_missing_components_v63_pr::*;
+
+pub mod omarchy_linux_missing_components_v64_pr;
+pub use omarchy_linux_missing_components_v64_pr::*;
+
 pub mod arch_linux_missing_components_v53_pr;
 pub use arch_linux_missing_components_v53_pr::*;
 
