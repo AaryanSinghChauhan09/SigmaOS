@@ -23,7 +23,7 @@ pub mod effectcraft_artcraft_parity_pr;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
 pub mod figcraft_artcraft_parity_pr;
-// pub mod figcraft_missing_components_parity_pr;
+pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_artcraft_missing_components_v65_pr;
 // pub mod filmcraft_artcraft_parity_pr;
@@ -63,6 +63,7 @@ pub mod wordcraft_artcraft_parity_pr;
 pub mod wordcraft_missing_components_parity_pr;
 
 pub use anicraft_artcraft_parity_pr::*;
+pub use figcraft_missing_components_parity_pr::*;
 pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
