@@ -248,6 +248,8 @@ pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v60_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v67_pr::*;
+pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v68_pr::*;
+pub use distro::open_source_os_missing_components_v68_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
