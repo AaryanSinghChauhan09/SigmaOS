@@ -78,7 +78,8 @@ impl Linux623SchedExtBpfPowerTopologyGovernorEngineV67 {
     }
 
     pub fn register_policy(&mut self, name: &str, ebpf_hash: &str) {
-        self.sched_policies.insert(name.to_string(), ebpf_hash.to_string());
+        self.sched_policies
+            .insert(name.to_string(), ebpf_hash.to_string());
     }
 
     pub fn register_quantum_core(&mut self, core_id: &str, latency_ps: u64) {
@@ -385,39 +386,138 @@ pub struct GlobalTechMedia33PortalUnimplementedIdeasEngineV67 {
 impl GlobalTechMedia33PortalUnimplementedIdeasEngineV67 {
     pub fn new() -> Self {
         let mut portal_map = BTreeMap::new();
-        portal_map.insert("9to5google.com".to_string(), vec!["Android Ashmem/Binder zero-copy IPC buffer pooling".to_string()]);
-        portal_map.insert("9to5linux.com".to_string(), vec!["Linux 6.14+ eBPF SchedExt latency governor".to_string()]);
-        portal_map.insert("9to5mac.com".to_string(), vec!["macOS XNU Mach IPC port right delegation".to_string()]);
-        portal_map.insert("androidauthority.com".to_string(), vec!["Android ZRAM lz4/zstd compression tuning".to_string()]);
-        portal_map.insert("androidpolice.com".to_string(), vec!["Android Mainline APEX modular updates".to_string()]);
-        portal_map.insert("appuals.com".to_string(), vec!["Cross-platform hardware diagnostic automation".to_string()]);
-        portal_map.insert("distrowatch.com".to_string(), vec!["Distro package absorption matrices".to_string()]);
-        portal_map.insert("frappe.io".to_string(), vec!["Frappe event broker & real-time socket mesh".to_string()]);
-        portal_map.insert("geeky-gadgets.com".to_string(), vec!["IoT micro-kernel low-power scheduling".to_string()]);
-        portal_map.insert("hwbusters.com".to_string(), vec!["ATX 3.1 & PCIe 6.0 power rail telemetry".to_string()]);
-        portal_map.insert("howtogeek.com".to_string(), vec!["Userland system cleaning and optimization".to_string()]);
-        portal_map.insert("infoworld.com".to_string(), vec!["Enterprise Cloud-Native MicroVM isolation".to_string()]);
-        portal_map.insert("itsfoss.com".to_string(), vec!["Desktop app ecosystem parity & themes".to_string()]);
-        portal_map.insert("itdaily.com".to_string(), vec!["Enterprise IT infrastructure automation".to_string()]);
-        portal_map.insert("kdnuggets.com".to_string(), vec!["On-device LLM & vector DB acceleration".to_string()]);
-        portal_map.insert("linux.com".to_string(), vec!["Linux kernel core subsystem interop".to_string()]);
-        portal_map.insert("linux.org".to_string(), vec!["Community kernel driver compatibility".to_string()]);
-        portal_map.insert("linuxfoundation.org".to_string(), vec!["Open source compliance & SLSA attestation".to_string()]);
-        portal_map.insert("linuxteck.com".to_string(), vec!["DevOps container networking & eBPF XDP".to_string()]);
-        portal_map.insert("makeuseof.com".to_string(), vec!["User productivity suite shortcuts & tools".to_string()]);
-        portal_map.insert("marktechpost.com".to_string(), vec!["Quantum-neural AI inference scheduling".to_string()]);
-        portal_map.insert("opensourceforu.com".to_string(), vec!["FOSS stack replacements & zero-dependency OOP".to_string()]);
-        portal_map.insert("pcmag.com".to_string(), vec!["Hardware performance benchmarks & reviews".to_string()]);
-        portal_map.insert("pcworld.com".to_string(), vec!["PC hardware acceleration & Vulkan 1.4".to_string()]);
-        portal_map.insert("phoronix.com".to_string(), vec!["Linux/BSD hardware benchmarks & PQC crypto".to_string()]);
-        portal_map.insert("techcrunch.com".to_string(), vec!["Next-gen startup platform architectures".to_string()]);
-        portal_map.insert("techpowerup.com".to_string(), vec!["GPU VRAM allocation & PCIe Gen6 Resizable BAR".to_string()]);
-        portal_map.insert("techspot.com".to_string(), vec!["Gaming performance optimization & Wayland HDR".to_string()]);
-        portal_map.insert("thenewstack.io".to_string(), vec!["Cloud-native WebAssembly & eBPF observability".to_string()]);
-        portal_map.insert("windowscentral.com".to_string(), vec!["Windows Subsystem for Linux (WSL) interop".to_string()]);
-        portal_map.insert("windowslatest.com".to_string(), vec!["DirectX / Vulkan zero-copy graphics pipeline".to_string()]);
-        portal_map.insert("xda-developers.com".to_string(), vec!["Android/Linux kernel modding & custom ROMs".to_string()]);
-        portal_map.insert("zdnet.com".to_string(), vec!["Enterprise security & zero-trust network access".to_string()]);
+        portal_map.insert(
+            "9to5google.com".to_string(),
+            vec!["Android Ashmem/Binder zero-copy IPC buffer pooling".to_string()],
+        );
+        portal_map.insert(
+            "9to5linux.com".to_string(),
+            vec!["Linux 6.14+ eBPF SchedExt latency governor".to_string()],
+        );
+        portal_map.insert(
+            "9to5mac.com".to_string(),
+            vec!["macOS XNU Mach IPC port right delegation".to_string()],
+        );
+        portal_map.insert(
+            "androidauthority.com".to_string(),
+            vec!["Android ZRAM lz4/zstd compression tuning".to_string()],
+        );
+        portal_map.insert(
+            "androidpolice.com".to_string(),
+            vec!["Android Mainline APEX modular updates".to_string()],
+        );
+        portal_map.insert(
+            "appuals.com".to_string(),
+            vec!["Cross-platform hardware diagnostic automation".to_string()],
+        );
+        portal_map.insert(
+            "distrowatch.com".to_string(),
+            vec!["Distro package absorption matrices".to_string()],
+        );
+        portal_map.insert(
+            "frappe.io".to_string(),
+            vec!["Frappe event broker & real-time socket mesh".to_string()],
+        );
+        portal_map.insert(
+            "geeky-gadgets.com".to_string(),
+            vec!["IoT micro-kernel low-power scheduling".to_string()],
+        );
+        portal_map.insert(
+            "hwbusters.com".to_string(),
+            vec!["ATX 3.1 & PCIe 6.0 power rail telemetry".to_string()],
+        );
+        portal_map.insert(
+            "howtogeek.com".to_string(),
+            vec!["Userland system cleaning and optimization".to_string()],
+        );
+        portal_map.insert(
+            "infoworld.com".to_string(),
+            vec!["Enterprise Cloud-Native MicroVM isolation".to_string()],
+        );
+        portal_map.insert(
+            "itsfoss.com".to_string(),
+            vec!["Desktop app ecosystem parity & themes".to_string()],
+        );
+        portal_map.insert(
+            "itdaily.com".to_string(),
+            vec!["Enterprise IT infrastructure automation".to_string()],
+        );
+        portal_map.insert(
+            "kdnuggets.com".to_string(),
+            vec!["On-device LLM & vector DB acceleration".to_string()],
+        );
+        portal_map.insert(
+            "linux.com".to_string(),
+            vec!["Linux kernel core subsystem interop".to_string()],
+        );
+        portal_map.insert(
+            "linux.org".to_string(),
+            vec!["Community kernel driver compatibility".to_string()],
+        );
+        portal_map.insert(
+            "linuxfoundation.org".to_string(),
+            vec!["Open source compliance & SLSA attestation".to_string()],
+        );
+        portal_map.insert(
+            "linuxteck.com".to_string(),
+            vec!["DevOps container networking & eBPF XDP".to_string()],
+        );
+        portal_map.insert(
+            "makeuseof.com".to_string(),
+            vec!["User productivity suite shortcuts & tools".to_string()],
+        );
+        portal_map.insert(
+            "marktechpost.com".to_string(),
+            vec!["Quantum-neural AI inference scheduling".to_string()],
+        );
+        portal_map.insert(
+            "opensourceforu.com".to_string(),
+            vec!["FOSS stack replacements & zero-dependency OOP".to_string()],
+        );
+        portal_map.insert(
+            "pcmag.com".to_string(),
+            vec!["Hardware performance benchmarks & reviews".to_string()],
+        );
+        portal_map.insert(
+            "pcworld.com".to_string(),
+            vec!["PC hardware acceleration & Vulkan 1.4".to_string()],
+        );
+        portal_map.insert(
+            "phoronix.com".to_string(),
+            vec!["Linux/BSD hardware benchmarks & PQC crypto".to_string()],
+        );
+        portal_map.insert(
+            "techcrunch.com".to_string(),
+            vec!["Next-gen startup platform architectures".to_string()],
+        );
+        portal_map.insert(
+            "techpowerup.com".to_string(),
+            vec!["GPU VRAM allocation & PCIe Gen6 Resizable BAR".to_string()],
+        );
+        portal_map.insert(
+            "techspot.com".to_string(),
+            vec!["Gaming performance optimization & Wayland HDR".to_string()],
+        );
+        portal_map.insert(
+            "thenewstack.io".to_string(),
+            vec!["Cloud-native WebAssembly & eBPF observability".to_string()],
+        );
+        portal_map.insert(
+            "windowscentral.com".to_string(),
+            vec!["Windows Subsystem for Linux (WSL) interop".to_string()],
+        );
+        portal_map.insert(
+            "windowslatest.com".to_string(),
+            vec!["DirectX / Vulkan zero-copy graphics pipeline".to_string()],
+        );
+        portal_map.insert(
+            "xda-developers.com".to_string(),
+            vec!["Android/Linux kernel modding & custom ROMs".to_string()],
+        );
+        portal_map.insert(
+            "zdnet.com".to_string(),
+            vec!["Enterprise security & zero-trust network access".to_string()],
+        );
 
         Self {
             harvested_portal_innovations: portal_map,
@@ -470,15 +570,21 @@ impl SovereignOpenSourceOsMissingComponentsV67PrSuite {
     pub fn collect_all_proposals(&self) -> Vec<OpenSourceOsPrProposalV67> {
         vec![
             self.linux_engine.generate_pr_proposal("PR-V67-LINUX-01"),
-            self.freebsd_engine.generate_pr_proposal("PR-V67-FREEBSD-02"),
-            self.openbsd_engine.generate_pr_proposal("PR-V67-OPENBSD-03"),
-            self.dragonfly_engine.generate_pr_proposal("PR-V67-DRAGONFLY-04"),
+            self.freebsd_engine
+                .generate_pr_proposal("PR-V67-FREEBSD-02"),
+            self.openbsd_engine
+                .generate_pr_proposal("PR-V67-OPENBSD-03"),
+            self.dragonfly_engine
+                .generate_pr_proposal("PR-V67-DRAGONFLY-04"),
             self.netbsd_engine.generate_pr_proposal("PR-V67-NETBSD-05"),
             self.haiku_engine.generate_pr_proposal("PR-V67-HAIKU-06"),
             self.plan9_engine.generate_pr_proposal("PR-V67-PLAN9-07"),
-            self.nix_guix_engine.generate_pr_proposal("PR-V67-NIXGUIX-08"),
-            self.illumos_engine.generate_pr_proposal("PR-V67-ILLUMOS-09"),
-            self.media_portals_engine.generate_pr_proposal("PR-V67-MEDIA33-10"),
+            self.nix_guix_engine
+                .generate_pr_proposal("PR-V67-NIXGUIX-08"),
+            self.illumos_engine
+                .generate_pr_proposal("PR-V67-ILLUMOS-09"),
+            self.media_portals_engine
+                .generate_pr_proposal("PR-V67-MEDIA33-10"),
         ]
     }
 
@@ -506,7 +612,9 @@ mod tests {
         master
             .linux_engine
             .register_policy("scx_quantum_neural_power_v67", "0xebpf_v67_hash");
-        master.linux_engine.register_quantum_core("core_quantum_v67_1", 350);
+        master
+            .linux_engine
+            .register_quantum_core("core_quantum_v67_1", 350);
 
         master
             .freebsd_engine
@@ -525,7 +633,9 @@ mod tests {
         master
             .nix_guix_engine
             .register_closure_hash("/nix/store/pkg_v67", "hash_v67_abc");
-        master.illumos_engine.configure_vnic_mesh("vnic_v67_0", 40000);
+        master
+            .illumos_engine
+            .configure_vnic_mesh("vnic_v67_0", 40000);
         master
             .media_portals_engine
             .register_portal_idea("phoronix.com", "Linux 6.23 PQC driver benchmarks");

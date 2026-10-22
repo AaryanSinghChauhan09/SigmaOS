@@ -143,18 +143,12 @@ impl GraphicsDisplayPrCategory {
             Self::WaylandExtendedProtocolsAndColorManagement => {
                 "wayland-extended-protocols-and-color-management"
             }
-            Self::MesaAcoCompilerAndZinkTranslation => {
-                "mesa-aco-compiler-and-zink-translation"
-            }
-            Self::DrmExplicitSyncAndPlaneColorMatrix => {
-                "drm-explicit-sync-and-plane-color-matrix"
-            }
+            Self::MesaAcoCompilerAndZinkTranslation => "mesa-aco-compiler-and-zink-translation",
+            Self::DrmExplicitSyncAndPlaneColorMatrix => "drm-explicit-sync-and-plane-color-matrix",
             Self::VulkanRayTracingAndBindlessDescriptors => {
                 "vulkan-ray-tracing-and-bindless-descriptors"
             }
-            Self::System76CosmicSmithayCompositor => {
-                "system76-cosmic-smithay-compositor"
-            }
+            Self::System76CosmicSmithayCompositor => "system76-cosmic-smithay-compositor",
         }
     }
 }
@@ -2169,7 +2163,9 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
 
         // 23. Audit Mesa ACO & Zink Translation
         let aco_isa = self.mesa_engine.compile_aco_wave64_isa("NIR_PASS");
-        let zink_spv = self.mesa_engine.translate_zink_opengl_to_vulkan(&[0x1, 0x2]);
+        let zink_spv = self
+            .mesa_engine
+            .translate_zink_opengl_to_vulkan(&[0x1, 0x2]);
         results.insert(
             "Mesa ACO Compiler & Zink Translation Functional",
             !aco_isa.is_empty() && !zink_spv.is_empty(),
@@ -2184,7 +2180,9 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         );
 
         // 25. Audit Vulkan 1.4 Ray Tracing & Bindless Descriptors
-        let rt_as = self.vulkan_engine.build_ray_tracing_acceleration_structure(100);
+        let rt_as = self
+            .vulkan_engine
+            .build_ray_tracing_acceleration_structure(100);
         let bindless = self.vulkan_engine.bind_bindless_descriptor_array(0, 16);
         results.insert(
             "Vulkan 1.4 Ray Tracing & Bindless Array Functional",
@@ -2192,7 +2190,9 @@ impl SovereignGraphicsDisplayMasterSuiteEngine {
         );
 
         // 26. Audit System76 COSMIC & Smithay Compositor
-        let overview = self.cosmic_smithay_engine.render_cosmic_workspace_overview();
+        let overview = self
+            .cosmic_smithay_engine
+            .render_cosmic_workspace_overview();
         let applet = self.cosmic_smithay_engine.dispatch_cosmic_applet_event(1);
         results.insert(
             "System76 COSMIC & Smithay Compositor Framework Functional",
@@ -2252,7 +2252,9 @@ mod tests {
         let dri3 = mesa.allocate_dri3_buffer(1280, 720, 32);
         assert_eq!(dri3.stride, 1280 * 4);
         assert!(dri3.fd_index > 0);
-        assert!(mesa.compile_aco_wave64_isa("NIR_MAIN").contains("ACO_WAVE64"));
+        assert!(mesa
+            .compile_aco_wave64_isa("NIR_MAIN")
+            .contains("ACO_WAVE64"));
         assert_eq!(mesa.translate_zink_opengl_to_vulkan(&[1, 2])[0], 0x03);
     }
 

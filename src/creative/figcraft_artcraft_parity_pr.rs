@@ -118,7 +118,8 @@ impl FigcraftAdvancedAutoLayoutGridConstraintPrEngine {
     ) -> Vec<(u32, f32, f32, f32, f32)> {
         let mut results = Vec::new();
         let avail_w = (container.width - container.padding.left - container.padding.right).max(0.0);
-        let avail_h = (container.height - container.padding.top - container.padding.bottom).max(0.0);
+        let avail_h =
+            (container.height - container.padding.top - container.padding.bottom).max(0.0);
 
         let flex_items_count = items
             .iter()
@@ -160,7 +161,9 @@ impl FigcraftAdvancedAutoLayoutGridConstraintPrEngine {
             avail_w
         } else {
             avail_h
-        } - fixed_space_used - total_spacing).max(0.0);
+        } - fixed_space_used
+            - total_spacing)
+            .max(0.0);
 
         let per_flex_size = if flex_items_count > 0.0 {
             remaining_space / flex_items_count
@@ -206,7 +209,9 @@ impl FigcraftAdvancedAutoLayoutGridConstraintPrEngine {
                     current_y += computed_h + container.item_spacing;
                 }
                 AutoLayoutMode::WrapGrid => {
-                    if current_x + computed_w + container.item_spacing > container.width - container.padding.right {
+                    if current_x + computed_w + container.item_spacing
+                        > container.width - container.padding.right
+                    {
                         current_x = container.padding.left;
                         current_y += computed_h + container.item_spacing;
                     } else {
@@ -275,9 +280,18 @@ impl FigcraftDesignSystemTokensMultiModeVariablesPrEngine {
     pub fn new() -> Self {
         let mut tokens = BTreeMap::new();
         let mut mode_values = BTreeMap::new();
-        mode_values.insert(TokenMode::Light, DesignTokenValue::Color("#0066FF".to_string()));
-        mode_values.insert(TokenMode::Dark, DesignTokenValue::Color("#3388FF".to_string()));
-        mode_values.insert(TokenMode::HighContrast, DesignTokenValue::Color("#0000FF".to_string()));
+        mode_values.insert(
+            TokenMode::Light,
+            DesignTokenValue::Color("#0066FF".to_string()),
+        );
+        mode_values.insert(
+            TokenMode::Dark,
+            DesignTokenValue::Color("#3388FF".to_string()),
+        );
+        mode_values.insert(
+            TokenMode::HighContrast,
+            DesignTokenValue::Color("#0000FF".to_string()),
+        );
 
         tokens.insert(
             "color.primary".to_string(),
@@ -306,7 +320,9 @@ impl FigcraftDesignSystemTokensMultiModeVariablesPrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Design System Tokens, Multi-Mode Variables & Component Variants".to_string(),
+            pr_title:
+                "feat(figcraft): Design System Tokens, Multi-Mode Variables & Component Variants"
+                    .to_string(),
             target_subsystem: "Figcraft Design System Core".to_string(),
             original_suite: "ArtCraft Figcraft Tokens".to_string(),
             components_added: vec![
@@ -375,12 +391,15 @@ impl FigcraftInteractivePrototypingSpringSmartAnimatePrEngine {
 
     pub fn calculate_spring_position(&self, time_s: f32) -> f32 {
         let omega = (self.spring_config.stiffness / self.spring_config.mass).sqrt();
-        let zeta = self.spring_config.damping / (2.0 * (self.spring_config.stiffness * self.spring_config.mass).sqrt());
+        let zeta = self.spring_config.damping
+            / (2.0 * (self.spring_config.stiffness * self.spring_config.mass).sqrt());
         #[cfg(feature = "std")]
         {
             if zeta < 1.0 {
                 let omega_d = omega * (1.0 - zeta * zeta).sqrt();
-                1.0 - (-zeta * omega * time_s).exp() * ((omega_d * time_s).cos() + (zeta * omega / omega_d) * (omega_d * time_s).sin())
+                1.0 - (-zeta * omega * time_s).exp()
+                    * ((omega_d * time_s).cos()
+                        + (zeta * omega / omega_d) * (omega_d * time_s).sin())
             } else {
                 1.0 - (-omega * time_s).exp() * (1.0 + omega * time_s)
             }
@@ -393,7 +412,9 @@ impl FigcraftInteractivePrototypingSpringSmartAnimatePrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Spring Physics Prototyping & Smart Animate Path Morphing Engine".to_string(),
+            pr_title:
+                "feat(figcraft): Spring Physics Prototyping & Smart Animate Path Morphing Engine"
+                    .to_string(),
             target_subsystem: "Figcraft Interactive Prototyping Engine".to_string(),
             original_suite: "ArtCraft Figcraft Prototyping".to_string(),
             components_added: vec![
@@ -514,7 +535,8 @@ impl FigcraftVectorNetworkBooleanOpsPrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Bezier Vector Networks & Non-Destructive Boolean Operations".to_string(),
+            pr_title: "feat(figcraft): Bezier Vector Networks & Non-Destructive Boolean Operations"
+                .to_string(),
             target_subsystem: "Figcraft Vector Mesh Engine".to_string(),
             original_suite: "ArtCraft Figcraft Vector".to_string(),
             components_added: vec![
@@ -578,12 +600,17 @@ impl FigcraftCrdtMultiUserCoAuthoringPrEngine {
     }
 
     pub fn get_active_users(&self) -> Vec<String> {
-        self.active_presences.values().map(|p| p.user_name.clone()).collect()
+        self.active_presences
+            .values()
+            .map(|p| p.user_name.clone())
+            .collect()
     }
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Multi-User CRDT Real-Time Collaboration & Live Presence Cursors".to_string(),
+            pr_title:
+                "feat(figcraft): Multi-User CRDT Real-Time Collaboration & Live Presence Cursors"
+                    .to_string(),
             target_subsystem: "Figcraft Collaboration Core".to_string(),
             original_suite: "ArtCraft Figcraft Collaboration".to_string(),
             components_added: vec![
@@ -698,7 +725,8 @@ impl FigcraftDevModeMultiFrameworkCodeGeneratorPrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Dev Mode Multi-Framework Code Generator & Asset Exporter".to_string(),
+            pr_title: "feat(figcraft): Dev Mode Multi-Framework Code Generator & Asset Exporter"
+                .to_string(),
             target_subsystem: "Figcraft Dev Mode CodeGen Engine".to_string(),
             original_suite: "ArtCraft Figcraft Exporter".to_string(),
             components_added: vec![
@@ -744,7 +772,11 @@ impl FigcraftAiDesignAssistantSmartLayoutPrEngine {
 
     pub fn synthesize_ui_from_prompt(&self, prompt: &UiDesignPrompt) -> GeneratedUiLayout {
         let count = (prompt.prompt_text.len() as u32 % 10) + 5;
-        let score = if prompt.color_scheme == "dark" { 98.5 } else { 96.0 };
+        let score = if prompt.color_scheme == "dark" {
+            98.5
+        } else {
+            96.0
+        };
         GeneratedUiLayout {
             frame_name: format!("AI Generated {}", prompt.target_device),
             elements_count: count,
@@ -811,7 +843,8 @@ impl FigcraftInteractiveWidgetMicroAppPrEngine {
 
     pub fn dispatch_widget_action(&mut self, widget_id: u32, action: &str, payload: &str) -> bool {
         if let Some(w) = self.widgets.get_mut(&widget_id) {
-            w.props.insert(format!("action.{}", action), payload.to_string());
+            w.props
+                .insert(format!("action.{}", action), payload.to_string());
             true
         } else {
             false
@@ -820,7 +853,8 @@ impl FigcraftInteractiveWidgetMicroAppPrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Embedded Interactive Canvas Widgets & Micro-App Extensions".to_string(),
+            pr_title: "feat(figcraft): Embedded Interactive Canvas Widgets & Micro-App Extensions"
+                .to_string(),
             target_subsystem: "Figcraft Micro-App Subsystem".to_string(),
             original_suite: "ArtCraft Figcraft Widgets".to_string(),
             components_added: vec![
@@ -942,7 +976,9 @@ impl FigcraftVersionControlBranchingPrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Design File Version Control, Visual Diffing & Branch Merging".to_string(),
+            pr_title:
+                "feat(figcraft): Design File Version Control, Visual Diffing & Branch Merging"
+                    .to_string(),
             target_subsystem: "Figcraft Versioning Subsystem".to_string(),
             original_suite: "ArtCraft Figcraft VersionControl".to_string(),
             components_added: vec![
@@ -1048,7 +1084,9 @@ impl FigcraftMasterTemplateCascadePrEngine {
 
     pub fn to_pr_proposal(&self) -> FigcraftArtcraftPrProposalManifest {
         FigcraftArtcraftPrProposalManifest {
-            pr_title: "feat(figcraft): Master UI Design System Template Hierarchy & Global Style Cascade".to_string(),
+            pr_title:
+                "feat(figcraft): Master UI Design System Template Hierarchy & Global Style Cascade"
+                    .to_string(),
             target_subsystem: "Figcraft Design Template Engine".to_string(),
             original_suite: "ArtCraft Figcraft Templates".to_string(),
             components_added: vec![

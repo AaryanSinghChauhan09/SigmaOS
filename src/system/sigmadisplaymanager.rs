@@ -20,7 +20,11 @@ pub struct DisplayMode {
 
 impl DisplayMode {
     pub const fn new(width: u32, height: u32, refresh_rate: u32) -> Self {
-        Self { width, height, refresh_rate }
+        Self {
+            width,
+            height,
+            refresh_rate,
+        }
     }
 }
 

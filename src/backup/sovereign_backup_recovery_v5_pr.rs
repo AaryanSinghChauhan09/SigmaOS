@@ -618,7 +618,9 @@ impl SovereignRescueModeRamOverlayfsShellV5 {
             "freebsd-loader" => {
                 "gpart bootcode -b /boot/pmbr -p /boot/gptzfsboot zroot: SUCCESS".to_string()
             }
-            "openbsd-biosboot" => "installboot -v sd0 /usr/mdec/biosboot /usr/mdec/boot: SUCCESS".to_string(),
+            "openbsd-biosboot" => {
+                "installboot -v sd0 /usr/mdec/biosboot /usr/mdec/boot: SUCCESS".to_string()
+            }
             _ => format!("Repaired bootloader {}: SUCCESS", bootloader_kind),
         }
     }
@@ -663,7 +665,9 @@ impl SovereignIsoHybridInstallerToolkitV5 {
             "unpack" => "Unpacked SquashFS image to /target (100% complete)".to_string(),
             "configure" => "Generated /etc/fstab and set timezone to UTC".to_string(),
             "bootloader" => "Installed systemd-boot to /target/boot/efi".to_string(),
-            "user_creation" => "Created default user admin with sudo & wheel privileges".to_string(),
+            "user_creation" => {
+                "Created default user admin with sudo & wheel privileges".to_string()
+            }
             _ => format!("Installer step [{}] executed successfully", step_name),
         }
     }

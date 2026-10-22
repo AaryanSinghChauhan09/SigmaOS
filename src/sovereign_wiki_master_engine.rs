@@ -192,7 +192,8 @@ impl Sovereign100IdeasSuite {
             name: "SigmaOS Device Driver Development Plan & 15-PR Gateway Suite".to_string(),
             category: IdeaCategory::PerformanceAndKernel,
             legacy_counterparts: "Linux Device Driver Model, FreeBSD Newbus".to_string(),
-            implementation_module: "src/driver/sovereign_device_driver_development_and_pr_suite.rs".to_string(),
+            implementation_module: "src/driver/sovereign_device_driver_development_and_pr_suite.rs"
+                .to_string(),
             is_fulfilled: true,
         });
 

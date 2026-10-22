@@ -774,7 +774,12 @@ impl BusyBoxMulticallEngine {
             .collect()
     }
 
-    pub fn register_custom_applet(&mut self, name: &str, category: &str, size_bytes: usize) -> bool {
+    pub fn register_custom_applet(
+        &mut self,
+        name: &str,
+        category: &str,
+        size_bytes: usize,
+    ) -> bool {
         if self.applets.contains_key(name) {
             false
         } else {
@@ -1002,7 +1007,12 @@ impl UtilLinuxSubsystemEngine {
         )
     }
 
-    pub fn flock_acquire(&self, lock_file: &str, exclusive: bool, non_blocking: bool) -> Result<String, String> {
+    pub fn flock_acquire(
+        &self,
+        lock_file: &str,
+        exclusive: bool,
+        non_blocking: bool,
+    ) -> Result<String, String> {
         let mode = if exclusive { "EX" } else { "SH" };
         Ok(format!(
             "flock: acquired {} lock on '{}' (non_blocking={})",
@@ -1012,7 +1022,10 @@ impl UtilLinuxSubsystemEngine {
 
     pub fn hwclock_sync_system_time(&self, rtc_dev: &str, to_rtc: bool) -> String {
         if to_rtc {
-            format!("hwclock: synchronized system time to hardware clock '{}'", rtc_dev)
+            format!(
+                "hwclock: synchronized system time to hardware clock '{}'",
+                rtc_dev
+            )
         } else {
             format!("hwclock: set system time from hardware clock '{}'", rtc_dev)
         }
@@ -1404,7 +1417,12 @@ impl TextProcessingEngine {
         (pattern_space, hold_space)
     }
 
-    pub fn awk_printf_field_formatting(&self, content: &str, fmt_spec: &str, delimiter: char) -> Vec<String> {
+    pub fn awk_printf_field_formatting(
+        &self,
+        content: &str,
+        fmt_spec: &str,
+        delimiter: char,
+    ) -> Vec<String> {
         let mut out = Vec::new();
         for line in content.lines() {
             let parts: Vec<&str> = line.split(delimiter).collect();
@@ -1812,7 +1830,10 @@ impl DocumentationPagerEngine {
         }
         if "file".contains(keyword) || "ls".contains(keyword) {
             matches.push(("ls(1)".to_string(), "list directory contents".to_string()));
-            matches.push(("stat(1)".to_string(), "display file or file system status".to_string()));
+            matches.push((
+                "stat(1)".to_string(),
+                "display file or file system status".to_string(),
+            ));
         }
         matches
     }
@@ -2039,23 +2060,39 @@ impl AuthPrivilegeSessionEngine {
     ) -> (bool, String) {
         let is_locked = failed_attempts >= max_failed;
         let msg = if is_locked {
-            format!("Account '{}' LOCKED due to {} failed attempts", user, failed_attempts)
+            format!(
+                "Account '{}' LOCKED due to {} failed attempts",
+                user, failed_attempts
+            )
         } else {
-            format!("Account '{}' active ({} / {} failed attempts)", user, failed_attempts, max_failed)
+            format!(
+                "Account '{}' active ({} / {} failed attempts)",
+                user, failed_attempts, max_failed
+            )
         };
         (is_locked, msg)
     }
 
-    pub fn shadow_password_quality_check(&self, password: &str, min_length: usize) -> (bool, String) {
+    pub fn shadow_password_quality_check(
+        &self,
+        password: &str,
+        min_length: usize,
+    ) -> (bool, String) {
         if password.len() < min_length {
-            return (false, format!("Password too short (< {} chars)", min_length));
+            return (
+                false,
+                format!("Password too short (< {} chars)", min_length),
+            );
         }
         let has_digit = password.chars().any(|c| c.is_ascii_digit());
         let has_alpha = password.chars().any(|c| c.is_ascii_alphabetic());
         if has_digit && has_alpha {
             (true, "Password quality check PASSED".to_string())
         } else {
-            (false, "Password must contain both letters and digits".to_string())
+            (
+                false,
+                "Password must contain both letters and digits".to_string(),
+            )
         }
     }
 }

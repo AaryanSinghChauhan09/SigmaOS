@@ -1626,7 +1626,8 @@ mod tests_v3 {
             field_name: "Region".to_string(),
             selected_values: vec!["US-West".to_string()],
         }];
-        let looker_res = looker_filter_engine.apply_dynamic_filters(&filters, &[100.0, 200.0, 300.0, 400.0]);
+        let looker_res =
+            looker_filter_engine.apply_dynamic_filters(&filters, &[100.0, 200.0, 300.0, 400.0]);
         assert_eq!(looker_res.active_filters_applied, 1);
         assert_eq!(looker_res.filtered_row_count, 2);
 
@@ -1654,7 +1655,11 @@ mod tests_v3 {
 
         // 6. Microsoft Excel Data Validation Custom List Engine
         let excel_val_engine = SovereignMicrosoftExcelDataValidationCustomListEngine::new();
-        let allowed = vec!["Approved".to_string(), "Pending".to_string(), "Rejected".to_string()];
+        let allowed = vec![
+            "Approved".to_string(),
+            "Pending".to_string(),
+            "Rejected".to_string(),
+        ];
         let val_res = excel_val_engine.validate_cell_input("Approved", &allowed);
         assert!(val_res.is_valid);
 
@@ -1667,13 +1672,19 @@ mod tests_v3 {
         let zoho_val_engine = SovereignZohoBooksMultiBranchInventoryValuationEngine::new();
         let qtys = vec![10, 20];
         let costs = vec![50.0, 60.0];
-        let zoho_inv_res = zoho_val_engine.calculate_inventory_valuation("SKU_99", &qtys, &costs, ValuationMethod::WeightedAverage);
+        let zoho_inv_res = zoho_val_engine.calculate_inventory_valuation(
+            "SKU_99",
+            &qtys,
+            &costs,
+            ValuationMethod::WeightedAverage,
+        );
         assert_eq!(zoho_inv_res.total_qty, 30);
         assert_eq!(zoho_inv_res.total_valuation, 1700.0);
 
         // 9. Zoho CRM Territory Auto Assignment Engine
         let zoho_crm_engine = SovereignZohoCrmLeadTerritoryAutoAssignmentEngine::new();
-        let crm_res = zoho_crm_engine.assign_lead_territory("LEAD_01", "North America", 1_500_000.0);
+        let crm_res =
+            zoho_crm_engine.assign_lead_territory("LEAD_01", "North America", 1_500_000.0);
         assert_eq!(crm_res.assigned_territory, "NA_Enterprise");
 
         // 10. Salesforce CPQ Volume Tier Pricing Engine
@@ -1689,7 +1700,8 @@ mod tests_v3 {
 
         // 12. Odoo MRP Work Center Scheduling Engine
         let odoo_mrp_engine = SovereignOdooMrpWorkCenterSchedulingEngine::new();
-        let mrp_res = odoo_mrp_engine.schedule_work_center_operation("WC_CUT_01", 1700000000, 120, false);
+        let mrp_res =
+            odoo_mrp_engine.schedule_work_center_operation("WC_CUT_01", 1700000000, 120, false);
         assert_eq!(mrp_res.total_duration_mins, 120);
 
         // 13. Odoo Multi-Currency Revaluation Engine
@@ -1699,7 +1711,8 @@ mod tests_v3 {
 
         // 14. Bitrix24 Omnichannel Chat Bot Routing Engine
         let bitrix_chat_engine = SovereignBitrix24OmnichannelChatBotRoutingEngine::new();
-        let chat_res = bitrix_chat_engine.route_chat_message("CHAT_77", "System is broken, need help urgent");
+        let chat_res =
+            bitrix_chat_engine.route_chat_message("CHAT_77", "System is broken, need help urgent");
         assert_eq!(chat_res.routed_queue, "Escalated_Human_Agents");
         assert!(!chat_res.is_bot_handled);
 
@@ -15201,7 +15214,10 @@ impl SovereignGoogleLookerStudioDynamicFilterControlsEngine {
         filters: &[LookerFilterControlSpec],
         sample_metric_values: &[f64],
     ) -> LookerFilterEvaluationResult {
-        let active_count = filters.iter().filter(|f| !f.selected_values.is_empty()).count();
+        let active_count = filters
+            .iter()
+            .filter(|f| !f.selected_values.is_empty())
+            .count();
         let filtered_len = if active_count > 0 {
             sample_metric_values.len() / 2
         } else {
@@ -15279,7 +15295,11 @@ impl SovereignMicrosoftExcelDataValidationCustomListEngine {
         Self
     }
 
-    pub fn validate_cell_input(&self, input: &str, allowed_list: &[String]) -> ExcelValidationResult {
+    pub fn validate_cell_input(
+        &self,
+        input: &str,
+        allowed_list: &[String],
+    ) -> ExcelValidationResult {
         let valid = allowed_list.iter().any(|item| item == input);
         if valid {
             ExcelValidationResult {
@@ -15397,7 +15417,12 @@ impl SovereignZohoCrmLeadTerritoryAutoAssignmentEngine {
         Self
     }
 
-    pub fn assign_lead_territory(&self, lead_id: &str, region: &str, revenue: f64) -> TerritoryAssignmentResult {
+    pub fn assign_lead_territory(
+        &self,
+        lead_id: &str,
+        region: &str,
+        revenue: f64,
+    ) -> TerritoryAssignmentResult {
         let (territory, manager) = if region == "North America" && revenue >= 1_000_000.0 {
             ("NA_Enterprise", "Alice_Vance")
         } else if region == "North America" {
@@ -15431,7 +15456,12 @@ impl SovereignSalesforceCpqVolumeTierPricingEngine {
         Self
     }
 
-    pub fn calculate_tier_price(&self, product_id: &str, qty: u32, base_price: f64) -> TierPricingResult {
+    pub fn calculate_tier_price(
+        &self,
+        product_id: &str,
+        qty: u32,
+        base_price: f64,
+    ) -> TierPricingResult {
         let (discount, tier_name) = if qty >= 100 {
             (0.25, "Tier 3 (25% off)")
         } else if qty >= 50 {
@@ -15471,7 +15501,12 @@ impl SovereignSalesforceEinsteinDealOpportunityScoringEngine {
         Self
     }
 
-    pub fn score_opportunity(&self, opp_id: &str, days_in_stage: u32, touchpoints: u32) -> OpportunityScoreResult {
+    pub fn score_opportunity(
+        &self,
+        opp_id: &str,
+        days_in_stage: u32,
+        touchpoints: u32,
+    ) -> OpportunityScoreResult {
         let prob = if touchpoints > 10 && days_in_stage <= 30 {
             0.85
         } else if touchpoints > 5 {
@@ -15589,9 +15624,14 @@ impl SovereignBitrix24OmnichannelChatBotRoutingEngine {
     }
 
     pub fn route_chat_message(&self, chat_id: &str, text: &str) -> ChatRoutingResult {
-        let is_urgent = text.contains("urgent") || text.contains("broken") || text.contains("refund");
+        let is_urgent =
+            text.contains("urgent") || text.contains("broken") || text.contains("refund");
         let (queue, bot, sentiment) = if is_urgent {
-            ("Escalated_Human_Agents".to_string(), false, "Negative/Urgent")
+            (
+                "Escalated_Human_Agents".to_string(),
+                false,
+                "Negative/Urgent",
+            )
         } else {
             ("Automated_Bot_Queue".to_string(), true, "Neutral/Standard")
         };
@@ -15620,7 +15660,12 @@ impl SovereignBitrix24WorkgroupTaskGanttEngine {
         Self
     }
 
-    pub fn analyze_task_schedule(&self, task_id: &str, duration: u32, dependencies_count: usize) -> TaskGanttResult {
+    pub fn analyze_task_schedule(
+        &self,
+        task_id: &str,
+        duration: u32,
+        dependencies_count: usize,
+    ) -> TaskGanttResult {
         let is_critical = dependencies_count > 2 || duration >= 10;
         let slack = if is_critical { 0 } else { 5 };
 

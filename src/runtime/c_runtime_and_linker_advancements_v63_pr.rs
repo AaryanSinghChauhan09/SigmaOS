@@ -52,11 +52,7 @@ impl GlibcInspirationsV63Engine {
     }
 
     /// Fast GNU Bloom filter match check for symbol lookup.
-    pub fn check_gnu_bloom_filter(
-        gnu_hash: u32,
-        bloom_words: &[u64],
-        shift2: u32,
-    ) -> bool {
+    pub fn check_gnu_bloom_filter(gnu_hash: u32, bloom_words: &[u64], shift2: u32) -> bool {
         if bloom_words.is_empty() {
             return false;
         }
@@ -124,9 +120,7 @@ impl GlibcInspirationsV63Engine {
     }
 
     /// Simulate `dl_iterate_phdr` callback over loaded ELF Shared Objects.
-    pub fn iterate_loaded_phdrs(
-        loaded_objects: &[(&str, usize, u16)],
-    ) -> Vec<String> {
+    pub fn iterate_loaded_phdrs(loaded_objects: &[(&str, usize, u16)]) -> Vec<String> {
         let mut summaries = Vec::new();
         for (name, base_addr, phnum) in loaded_objects {
             summaries.push(format!(
@@ -156,7 +150,11 @@ impl GlibcInspirationsV63Engine {
     }
 
     /// Generate XML telemetry inspired by glibc `malloc_info(3)`.
-    pub fn malloc_info_xml(total_allocated: usize, total_free: usize, arena_count: usize) -> String {
+    pub fn malloc_info_xml(
+        total_allocated: usize,
+        total_free: usize,
+        arena_count: usize,
+    ) -> String {
         format!(
             "<malloc version=\"1\"><heap nr=\"0\" total=\"{}\" free=\"{}\"/><arenas count=\"{}\"/></malloc>",
             total_allocated, total_free, arena_count
@@ -166,12 +164,24 @@ impl GlibcInspirationsV63Engine {
     /// Parse and validate flags for `dlopen` / `dlmopen`.
     pub fn resolve_dlopen_flags(flags: i32) -> Vec<&'static str> {
         let mut active = Vec::new();
-        if flags & 0x1 != 0 { active.push("RTLD_LAZY"); }
-        if flags & 0x2 != 0 { active.push("RTLD_NOW"); }
-        if flags & 0x100 != 0 { active.push("RTLD_GLOBAL"); }
-        if flags & 0x0 != 0 && active.is_empty() { active.push("RTLD_LOCAL"); }
-        if flags & 0x8 != 0 { active.push("RTLD_NODELETE"); }
-        if flags & 0x10 != 0 { active.push("RTLD_NOLOAD"); }
+        if flags & 0x1 != 0 {
+            active.push("RTLD_LAZY");
+        }
+        if flags & 0x2 != 0 {
+            active.push("RTLD_NOW");
+        }
+        if flags & 0x100 != 0 {
+            active.push("RTLD_GLOBAL");
+        }
+        if flags & 0x0 != 0 && active.is_empty() {
+            active.push("RTLD_LOCAL");
+        }
+        if flags & 0x8 != 0 {
+            active.push("RTLD_NODELETE");
+        }
+        if flags & 0x10 != 0 {
+            active.push("RTLD_NOLOAD");
+        }
         active
     }
 
@@ -260,7 +270,10 @@ impl MuslLibcInspirationsV63Engine {
 
     /// Simulate musl `__unmapself` safe stack unmapping upon thread exit.
     pub fn unmapself_safe_exit(stack_addr: usize, stack_size: usize) -> String {
-        format!("unmap_and_exit_asm(base={:#x}, len={})", stack_addr, stack_size)
+        format!(
+            "unmap_and_exit_asm(base={:#x}, len={})",
+            stack_addr, stack_size
+        )
     }
 
     /// Simulate musl `__res_msend` parallel DNS query dispatch.
@@ -300,7 +313,11 @@ impl UclibcInspirationsV63Engine {
     }
 
     /// Parse FLAT / FD-PIC ELF GOT relocations for MMU-less microcontroller targets.
-    pub fn process_fdpic_got_reloc(got_index: usize, base_addr: usize, target_offset: usize) -> usize {
+    pub fn process_fdpic_got_reloc(
+        got_index: usize,
+        base_addr: usize,
+        target_offset: usize,
+    ) -> usize {
         base_addr + target_offset + (got_index * 8)
     }
 
@@ -328,7 +345,9 @@ impl UclibcInspirationsV63Engine {
     pub fn generate_pr_proposal(&self) -> CRuntimePrProposalManifestV63 {
         CRuntimePrProposalManifestV63 {
             pr_number: 5023,
-            pr_title: "uClibc-ng V63 Parity: FD-PIC MMU-less GOT Handling & Modular Feature Stripping".to_string(),
+            pr_title:
+                "uClibc-ng V63 Parity: FD-PIC MMU-less GOT Handling & Modular Feature Stripping"
+                    .to_string(),
             target_subsystem: "Embedded C Runtime".to_string(),
             original_runtime: "uClibc-ng".to_string(),
             components_added: alloc::vec![
@@ -474,7 +493,11 @@ impl BionicInspirationsV63Engine {
     }
 
     /// Evaluate Bionic File Descriptor Sanitizer `fdsan` ownership check.
-    pub fn fdsan_check_owner(fd: i32, expected_tag: u64, actual_tag: u64) -> Result<(), &'static str> {
+    pub fn fdsan_check_owner(
+        fd: i32,
+        expected_tag: u64,
+        actual_tag: u64,
+    ) -> Result<(), &'static str> {
         if fd < 0 {
             Err("EBADF")
         } else if expected_tag != actual_tag {
@@ -493,7 +516,9 @@ impl BionicInspirationsV63Engine {
     pub fn generate_pr_proposal(&self) -> CRuntimePrProposalManifestV63 {
         CRuntimePrProposalManifestV63 {
             pr_number: 5025,
-            pr_title: "bionic V63 Parity: Scudo Hardened Allocation, PAC/BTI, fdsan & Namespace Isolation".to_string(),
+            pr_title:
+                "bionic V63 Parity: Scudo Hardened Allocation, PAC/BTI, fdsan & Namespace Isolation"
+                    .to_string(),
             target_subsystem: "Android / Bionic C Runtime".to_string(),
             original_runtime: "bionic".to_string(),
             components_added: alloc::vec![
@@ -523,7 +548,11 @@ impl NewlibInspirationsV63Engine {
     }
 
     /// Newlib nano-malloc chunk header validation.
-    pub fn nano_malloc_split(heap_addr: usize, total_size: usize, alloc_size: usize) -> (usize, usize) {
+    pub fn nano_malloc_split(
+        heap_addr: usize,
+        total_size: usize,
+        alloc_size: usize,
+    ) -> (usize, usize) {
         let chunk = alloc_size + 8; // 8 bytes overhead
         if chunk <= total_size {
             (heap_addr + chunk, total_size - chunk)
@@ -564,7 +593,9 @@ impl CosmopolitanInspirationsV63Engine {
             return "INVALID_HEADER_SHORT";
         }
         if header_bytes[0] == b'M' && header_bytes[1] == b'Z' {
-            if header_bytes[0x3c..].starts_with(b"PE\0\0") || header_bytes.windows(4).any(|w| w == b"\x7fELF") {
+            if header_bytes[0x3c..].starts_with(b"PE\0\0")
+                || header_bytes.windows(4).any(|w| w == b"\x7fELF")
+            {
                 "APE_POLYGLOT_VALID"
             } else {
                 "DOS_MZ_ONLY"
@@ -579,9 +610,15 @@ impl CosmopolitanInspirationsV63Engine {
     /// Translate POSIX file flags to Win32 `CreateFile` access mode.
     pub fn posix_to_win32_file_access(flags: i32) -> u32 {
         let mut access = 0u32;
-        if flags & 0x3 == 0 { access |= 0x8000_0000; } // O_RDONLY -> GENERIC_READ
-        if flags & 0x3 == 1 { access |= 0x4000_0000; } // O_WRONLY -> GENERIC_WRITE
-        if flags & 0x3 == 2 { access |= 0xc000_0000; } // O_RDWR -> GENERIC_READ | GENERIC_WRITE
+        if flags & 0x3 == 0 {
+            access |= 0x8000_0000;
+        } // O_RDONLY -> GENERIC_READ
+        if flags & 0x3 == 1 {
+            access |= 0x4000_0000;
+        } // O_WRONLY -> GENERIC_WRITE
+        if flags & 0x3 == 2 {
+            access |= 0xc000_0000;
+        } // O_RDWR -> GENERIC_READ | GENERIC_WRITE
         access
     }
 
@@ -634,7 +671,11 @@ impl LibstdcxxInspirationsV63Engine {
     }
 
     /// Allocate from Polymorphic Memory Resource (`std::pmr::memory_resource`).
-    pub fn allocate_pmr_buffer(&self, request: usize, capacity: usize) -> Result<usize, &'static str> {
+    pub fn allocate_pmr_buffer(
+        &self,
+        request: usize,
+        capacity: usize,
+    ) -> Result<usize, &'static str> {
         if request <= capacity {
             Ok(request)
         } else {
@@ -661,7 +702,10 @@ impl LibstdcxxInspirationsV63Engine {
     }
 
     /// Simulate `std::variant` type-index resolver.
-    pub fn resolve_variant_type_index(index: usize, max_types: usize) -> Result<usize, &'static str> {
+    pub fn resolve_variant_type_index(
+        index: usize,
+        max_types: usize,
+    ) -> Result<usize, &'static str> {
         if index < max_types {
             Ok(index)
         } else {
@@ -839,10 +883,18 @@ impl DynamicLinkerLdSoInspirationsV63Engine {
     /// Parse ELF `DT_FLAGS_1` flags (e.g. `DF_1_NOW`, `DF_1_GLOBAL`, `DF_1_NODELETE`, `DF_1_PIE`).
     pub fn parse_dt_flags_1(flags: u64) -> Vec<&'static str> {
         let mut list = Vec::new();
-        if flags & 0x0000_0001 != 0 { list.push("DF_1_NOW"); }
-        if flags & 0x0000_0002 != 0 { list.push("DF_1_GLOBAL"); }
-        if flags & 0x0000_0008 != 0 { list.push("DF_1_NODELETE"); }
-        if flags & 0x0800_0000 != 0 { list.push("DF_1_PIE"); }
+        if flags & 0x0000_0001 != 0 {
+            list.push("DF_1_NOW");
+        }
+        if flags & 0x0000_0002 != 0 {
+            list.push("DF_1_GLOBAL");
+        }
+        if flags & 0x0000_0008 != 0 {
+            list.push("DF_1_NODELETE");
+        }
+        if flags & 0x0800_0000 != 0 {
+            list.push("DF_1_PIE");
+        }
         list
     }
 
@@ -886,7 +938,11 @@ impl DynamicLinkerLdSoInspirationsV63Engine {
     }
 
     /// Match symbol version string against provided library export versions.
-    pub fn match_elf_symbol_versions(&self, required_version: &str, export_versions: &[&str]) -> bool {
+    pub fn match_elf_symbol_versions(
+        &self,
+        required_version: &str,
+        export_versions: &[&str],
+    ) -> bool {
         export_versions.contains(&required_version)
     }
 
@@ -962,7 +1018,9 @@ impl SovereignCRuntimeAndLinkerParityV63Gateway {
     /// Format Markdown proposal document.
     pub fn generate_pr_proposal_markdown(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut md = String::from("# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V63)\n\n");
+        let mut md = String::from(
+            "# Pull Request Proposal: C Library, C++ Runtime, and Dynamic Linker Parity (V63)\n\n",
+        );
         md.push_str("## Executive Summary\n");
         md.push_str("This suite provides native zero-dependency `#![no_std]` implementations and proposal manifests ");
         md.push_str("for advanced features from glibc, musl, uClibc-ng, BSD libc, Android Bionic, Newlib, Cosmopolitan, ");
@@ -971,9 +1029,18 @@ impl SovereignCRuntimeAndLinkerParityV63Gateway {
 
         for pr in proposals {
             md.push_str(&format!("### PR #{}: {}\n", pr.pr_number, pr.pr_title));
-            md.push_str(&format!("- **Target Subsystem**: {}\n", pr.target_subsystem));
-            md.push_str(&format!("- **Inspiration Source**: {}\n", pr.original_runtime));
-            md.push_str(&format!("- **Performance Impact**: {}\n", pr.performance_multiplier));
+            md.push_str(&format!(
+                "- **Target Subsystem**: {}\n",
+                pr.target_subsystem
+            ));
+            md.push_str(&format!(
+                "- **Inspiration Source**: {}\n",
+                pr.original_runtime
+            ));
+            md.push_str(&format!(
+                "- **Performance Impact**: {}\n",
+                pr.performance_multiplier
+            ));
             md.push_str(&format!("- **Status**: {}\n", pr.status));
             md.push_str("- **Components Added**:\n");
             for comp in &pr.components_added {
@@ -998,20 +1065,24 @@ mod tests {
         let found = GlibcInspirationsV63Engine::check_gnu_bloom_filter(hash, &bloom, 5);
         assert!(found || !found); // ensure execution without panic
 
-        let memcpy_impl = GlibcInspirationsV63Engine::resolve_ifunc_symbol(&["avx512f", "avx2"], "memcpy");
+        let memcpy_impl =
+            GlibcInspirationsV63Engine::resolve_ifunc_symbol(&["avx512f", "avx2"], "memcpy");
         assert_eq!(memcpy_impl, "avx512_optimized");
 
         let memset_impl = GlibcInspirationsV63Engine::resolve_ifunc_symbol(&["sse2"], "memset");
         assert_eq!(memset_impl, "sse2_fallback");
 
-        let tunables = GlibcInspirationsV63Engine::parse_glibc_tunables("glibc.malloc.trim_threshold=128:glibc.cpu.hwcaps=AVX2");
+        let tunables = GlibcInspirationsV63Engine::parse_glibc_tunables(
+            "glibc.malloc.trim_threshold=128:glibc.cpu.hwcaps=AVX2",
+        );
         assert_eq!(tunables.len(), 2);
         assert_eq!(tunables[0], ("glibc.malloc.trim_threshold", "128"));
 
         let tls_var1 = GlibcInspirationsV63Engine::calculate_tls_offset(1, 64, 16, 100);
         assert!(tls_var1 >= 164);
 
-        let phdrs = GlibcInspirationsV63Engine::iterate_loaded_phdrs(&[("libc.so.6", 0x7fff0000, 12)]);
+        let phdrs =
+            GlibcInspirationsV63Engine::iterate_loaded_phdrs(&[("libc.so.6", 0x7fff0000, 12)]);
         assert_eq!(phdrs.len(), 1);
         assert!(phdrs[0].contains("libc.so.6"));
 
@@ -1032,15 +1103,22 @@ mod tests {
         assert_eq!(size, 16);
         assert_eq!(group, "slab_group_tiny");
 
-        let (flushed, ok) = MuslLibcInspirationsV63Engine::lockless_stdio_flush(b"hello\nworld", true);
+        let (flushed, ok) =
+            MuslLibcInspirationsV63Engine::lockless_stdio_flush(b"hello\nworld", true);
         assert_eq!(flushed, 6);
         assert!(ok);
 
         let sync_count = MuslLibcInspirationsV63Engine::synccall_broadcast(&[101, 102, 103], 111);
         assert_eq!(sync_count, 3);
 
-        assert_eq!(MuslLibcInspirationsV63Engine::syscall_cp_guard(true, 1), Err("ECANCELED"));
-        assert_eq!(MuslLibcInspirationsV63Engine::syscall_cp_guard(false, 1), Ok(1));
+        assert_eq!(
+            MuslLibcInspirationsV63Engine::syscall_cp_guard(true, 1),
+            Err("ECANCELED")
+        );
+        assert_eq!(
+            MuslLibcInspirationsV63Engine::syscall_cp_guard(false, 1),
+            Ok(1)
+        );
 
         let unmap = MuslLibcInspirationsV63Engine::unmapself_safe_exit(0x700000, 8192);
         assert!(unmap.contains("unmap_and_exit_asm"));
@@ -1054,8 +1132,14 @@ mod tests {
         let got = UclibcInspirationsV63Engine::process_fdpic_got_reloc(2, 0x1000, 0x50);
         assert_eq!(got, 0x1000 + 0x50 + 16);
 
-        assert!(UclibcInspirationsV63Engine::is_feature_enabled(0b0000_0100, 2));
-        assert!(!UclibcInspirationsV63Engine::is_feature_enabled(0b0000_0100, 1));
+        assert!(UclibcInspirationsV63Engine::is_feature_enabled(
+            0b0000_0100,
+            2
+        ));
+        assert!(!UclibcInspirationsV63Engine::is_feature_enabled(
+            0b0000_0100,
+            1
+        ));
 
         let sysv_hash = UclibcInspirationsV63Engine::compute_elf_sysv_hash("exit");
         assert_ne!(sysv_hash, 0);
@@ -1094,9 +1178,15 @@ mod tests {
         assert_eq!(mib, alloc::vec![1, 14, 100]);
 
         let mut ent_buf = [0u8; 32];
-        assert_eq!(BsdLibcInspirationsV63Engine::getentropy_fill(&mut ent_buf, 12345), Ok(()));
+        assert_eq!(
+            BsdLibcInspirationsV63Engine::getentropy_fill(&mut ent_buf, 12345),
+            Ok(())
+        );
         let mut big_buf = [0u8; 300];
-        assert_eq!(BsdLibcInspirationsV63Engine::getentropy_fill(&mut big_buf, 12345), Err("EIO_ENTROPY_LIMIT_256"));
+        assert_eq!(
+            BsdLibcInspirationsV63Engine::getentropy_fill(&mut big_buf, 12345),
+            Err("EIO_ENTROPY_LIMIT_256")
+        );
     }
 
     #[test]

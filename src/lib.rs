@@ -46,7 +46,6 @@ pub use creative::filmcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::fontcraft::*;
 pub use creative::fontcraft_artcraft_parity_pr::*;
 pub use creative::fontcraft_missing_components_parity_pr::*;
-pub use creative::gridcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::photocraft_artcraft_missing_components_v65_pr::*;
 // pub use creative::photocraft_artcraft_parity_pr::*;
 pub use creative::soundcraft_artcraft_parity_pr::*;
@@ -74,9 +73,8 @@ pub mod storage;
 pub use storage::*;
 pub mod system;
 pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
-pub use system::*;
-pub use system::sovereign_init_and_supervisor_advancements_v63_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v67::*;
+pub use system::*;
 pub mod driver;
 pub mod drivers;
 pub use drivers::sovereign_comprehensive_drivers::*;
@@ -107,10 +105,10 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV64,
     SovereignDistroPackageAdvancementsSuiteV66, SovereignDistroPackageAdvancementsSuiteV67,
-    SovereignUniversalPackageVerifier,
-    UniversalDistroPackageOrchestrator, UniversalForeignPackageFormat,
-    UniversalForeignPackageFormatConverter, UniversalPackageFormat, UniversalPackageImporter,
-    UniversalPackageTriggerEngine, UniversalPackageTriggerType, UniversalPackageVerificationResult,
+    SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
+    UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter, UniversalPackageFormat,
+    UniversalPackageImporter, UniversalPackageTriggerEngine, UniversalPackageTriggerType,
+    UniversalPackageVerificationResult,
 };
 pub mod process;
 pub mod productivity;
@@ -210,6 +208,7 @@ pub use distro::dragonflybsd_missing_components_v61_pr::*;
 pub use distro::dragonflybsd_missing_components_v62_pr::*;
 pub use distro::freebsd_missing_components_v61_pr::*;
 pub use distro::freebsd_missing_components_v62_pr::*;
+pub use distro::freebsd_missing_components_v63_pr::*;
 pub use distro::omarchy_linux_gap_closure_pr_suite::*;
 pub use distro::omarchy_linux_missing_components_v52_pr::*;
 pub use distro::omarchy_linux_missing_components_v57_pr::*;
@@ -228,10 +227,10 @@ pub use distro::open_source_os_missing_components_v61_pr::*;
 pub use distro::open_source_os_missing_components_v62_pr::*;
 pub use distro::open_source_os_missing_components_v65_pr::*;
 pub use distro::open_source_os_missing_components_v66_pr::*;
+pub use distro::open_source_os_missing_components_v67_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
-pub use distro::open_source_os_missing_components_v67_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::openbsd_missing_components_v61_pr::*;
@@ -250,8 +249,6 @@ pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v50_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v51_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v60_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v67_pr::*;
-pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v68_pr::*;
-pub use distro::open_source_os_missing_components_v68_pr::*;
 pub use distro::sovereign_linux_bsd_ecosystem_parity_v42_pr::*;
 pub use distro::sovereign_linux_bsd_master_synthesis::*;
 pub use distro::sovereign_linux_bsd_pinnacle_innovations_v14::*;
@@ -463,8 +460,7 @@ pub use security::{
     AnonSurfShunt, AppSandboxEngine, ArithmeticSubstitutionDeobfuscator, CapabilityGate,
     CapabilityToken, ForensicStorageFilter, Permission, PledgeManager, PledgePromise, RoutingMode,
     SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
-    SovereignSecurityAndHardeningParityV61Gateway,
-    SovereignSecurityAndHardeningParityV64Gateway,
+    SovereignSecurityAndHardeningParityV61Gateway, SovereignSecurityAndHardeningParityV64Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
@@ -494,17 +490,16 @@ pub use userland::shell::{
 };
 pub use userland::system_utilities::*;
 pub use virtualization::{
-    Container, FirecrackerCloudHypervisorV61Engine, FreeBsdJailsZonesV61Engine,
-    GvisorKataAppleHvV61Engine, KubernetesK3sRancherV61Engine, KubernetesPod, KvmQemuV61Engine,
-    LibvirtDomainV61Engine, LxcLxdNspawnV61Engine, OciDockerPodmanRuncV61Engine, ResourcePool,
-    SovereignVirtualizationAndContainersParityV61Gateway, VirtualBoxBhyveVmmV61Engine,
-    VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
-    XenHypervisorV61Engine,
-    FirecrackerCloudHypervisorV63Engine, FreeBsdJailsZonesV63Engine,
-    GvisorKataAppleHvV63Engine, KubernetesK3sRancherV63Engine, KvmQemuV63Engine,
-    LibvirtDomainV63Engine, LxcLxdNspawnV63Engine, OciDockerPodmanRuncV63Engine,
-    SovereignVirtualizationAndContainersParityV63Gateway, VirtualBoxBhyveVmmV63Engine,
-    XenHypervisorV63Engine,
+    Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
+    FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine, GvisorKataAppleHvV61Engine,
+    GvisorKataAppleHvV63Engine, KubernetesK3sRancherV61Engine, KubernetesK3sRancherV63Engine,
+    KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine, LibvirtDomainV61Engine,
+    LibvirtDomainV63Engine, LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine,
+    OciDockerPodmanRuncV61Engine, OciDockerPodmanRuncV63Engine, ResourcePool,
+    SovereignVirtualizationAndContainersParityV61Gateway,
+    SovereignVirtualizationAndContainersParityV63Gateway, VirtualBoxBhyveVmmV61Engine,
+    VirtualBoxBhyveVmmV63Engine, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
+    VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
@@ -606,11 +601,10 @@ pub mod io;
 
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
-pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
+pub use crate::distro::open_source_os_missing_components_v66_pr::*;
 pub use crate::distro::open_source_os_missing_components_v67_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
-pub use crate::distro::open_source_os_missing_components_v66_pr::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;

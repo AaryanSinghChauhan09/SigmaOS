@@ -1235,14 +1235,22 @@ impl Multiboot2BootInfoEngine {
         self.tags
             .iter()
             .find(|t| t.tag_type == Multiboot2TagType::CmdLine)
-            .map(|t| String::from_utf8_lossy(&t.data).trim_matches('\0').to_string())
+            .map(|t| {
+                String::from_utf8_lossy(&t.data)
+                    .trim_matches('\0')
+                    .to_string()
+            })
     }
 
     pub fn get_bootloader_name(&self) -> Option<String> {
         self.tags
             .iter()
             .find(|t| t.tag_type == Multiboot2TagType::BootLoaderName)
-            .map(|t| String::from_utf8_lossy(&t.data).trim_matches('\0').to_string())
+            .map(|t| {
+                String::from_utf8_lossy(&t.data)
+                    .trim_matches('\0')
+                    .to_string()
+            })
     }
 }
 
@@ -1300,9 +1308,7 @@ impl GdbStubEngine {
     /// Process GDB RSP command
     pub fn handle_command(&mut self, cmd: GdbCommand) -> GdbResponse {
         match cmd {
-            GdbCommand::ReadRegisters => {
-                GdbResponse::RegisterData("0000000000000000".repeat(16))
-            }
+            GdbCommand::ReadRegisters => GdbResponse::RegisterData("0000000000000000".repeat(16)),
             GdbCommand::ReadMemory { len, .. } => GdbResponse::MemoryData(vec![0x90; len]), // NOP fill
             GdbCommand::InsertBreakpoint { addr } => {
                 self.breakpoints.push(addr);
@@ -1551,8 +1557,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5112,
-            title: "feat(arch_x86_64): Implement pvh PVH Boot Protocol & MicroVM Entry Handoff engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement pvh PVH Boot Protocol & MicroVM Entry Handoff engine"
+                    .to_string(),
             target_subsystem: "MicroVM Boot Handoff".to_string(),
             rust_osdev_crate_inspiration: "pvh".to_string(),
             components_added: vec![

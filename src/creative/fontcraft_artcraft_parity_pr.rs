@@ -23,10 +23,6 @@ use alloc::string::{String, ToString};
 use alloc::{format, vec, vec::Vec};
 use core::f64::consts::PI;
 
-
-
-
-
 /// Structured PR proposal manifest descriptor for FontCraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FontcraftArtcraftPrProposalManifest {

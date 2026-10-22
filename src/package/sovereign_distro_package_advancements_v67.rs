@@ -670,7 +670,10 @@ impl UniversalCrossDistroSatSolverV67 {
             "dev-libs/openssl".to_string(),
             "sovereign-openssl".to_string(),
         );
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("musl".to_string(), "sovereign-libc".to_string());

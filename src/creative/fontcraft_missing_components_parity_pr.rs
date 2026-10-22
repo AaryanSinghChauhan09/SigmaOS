@@ -39,6 +39,7 @@ pub struct FontcraftPrProposalManifest {
 // 1. OpenType GSUB/GPOS Complex Script Text Shaping Engine
 // ============================================================================
 
+<<<<<<< HEAD
 /// Text shaping feature tags (e.g. `liga`, `rlig`, `init`, `medi`, `fina`, `kern`)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OpenTypeFeatureTag {
@@ -49,6 +50,14 @@ pub enum OpenTypeFeatureTag {
     FinalForm,         // "fina"
     MarkPositioning,   // "mark"
     Kerning,           // "kern"
+=======
+/// OpenType Feature Tag
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum OpentypeFeatureTag {
+    Kerning,          // kern
+    StandardLigature, // liga
+    DiscretionaryLig, // dlig
+>>>>>>> origin/jules-7863353944660423925-7bb74642
 }
 
 /// Shaped Glyph Glyph Position & Offset
@@ -65,10 +74,16 @@ pub struct ShapedGlyph {
 
 /// OpenType GSUB/GPOS Complex Script Text Shaping PR Engine.
 #[derive(Debug, Clone)]
+<<<<<<< HEAD
 pub struct FontcraftComplexScriptHarfbuzzShapingPrEngine {
     pub enabled_features: Vec<OpenTypeFeatureTag>,
     pub active_script: String,
     pub active_language: String,
+=======
+pub struct FontcraftOpentypeKerningLigatureFeaturePrEngine {
+    pub kerning_pairs: BTreeMap<(u32, u32), i16>, // (left_glyph, right_glyph) -> kerning_units
+    pub ligatures: BTreeMap<Vec<u32>, u32>,       // [glyph_a, glyph_b] -> ligature_glyph
+>>>>>>> origin/jules-7863353944660423925-7bb74642
 }
 
 impl FontcraftComplexScriptHarfbuzzShapingPrEngine {
@@ -369,6 +384,7 @@ impl FontcraftVariableFontInterpolationPrEngine {
         }
     }
 
+<<<<<<< HEAD
     /// Interpolate glyph outline point coordinate based on active design axis deltas
     pub fn interpolate_point(
         &self,
@@ -381,6 +397,18 @@ impl FontcraftVariableFontInterpolationPrEngine {
         let interpolated_x = base_x + weight_delta_x * norm_weight;
         let interpolated_y = base_y + weight_delta_y * norm_weight;
         (interpolated_x, interpolated_y)
+=======
+    pub fn interpolate_glyph_point(
+        &self,
+        base_x: f32,
+        base_y: f32,
+        delta_x: f32,
+        delta_y: f32,
+        axis_tag: u32,
+    ) -> (f32, f32) {
+        let norm_coord = self.compute_axis_normalized_coordinate(axis_tag);
+        (base_x + delta_x * norm_coord, base_y + delta_y * norm_coord)
+>>>>>>> origin/jules-7863353944660423925-7bb74642
     }
 
     pub fn generate_proposal(&self) -> FontcraftPrProposalManifest {
@@ -662,9 +690,16 @@ impl SovereignFontcraftArtcraftParityPrGateway {
         let texels = self.msdf_rasterizer.rasterize_glyph_msdf(65);
         let msdf_ok = !texels.is_empty();
 
+<<<<<<< HEAD
         let _ = self.variable_font_engine.set_axis_coordinate("wght", 700.0);
         let norm_wght = self.variable_font_engine.get_normalized_coordinate("wght");
         let var_ok = (norm_wght - 0.6).abs() < 1e-3;
+=======
+        let (interp_x, interp_y) = self
+            .variable_font
+            .interpolate_glyph_point(10.0, 20.0, 10.0, 4.0, 0x77676874);
+        let var_ok = (interp_x - 16.0).abs() < 1e-3 && (interp_y - 22.4).abs() < 1e-3;
+>>>>>>> origin/jules-7863353944660423925-7bb74642
 
         let emoji_layers = self.color_emoji_engine.get_emoji_color_layers(0x1F600, 0);
         let emoji_ok = emoji_layers.is_some() && emoji_layers.unwrap().len() >= 2;

@@ -257,7 +257,10 @@ impl OpenRcAdvancementsV63Engine {
             ordered: &mut Vec<String>,
         ) -> Result<(), String> {
             if in_stack.contains(node_name) {
-                return Err(format!("Circular dependency detected involving: {}", node_name));
+                return Err(format!(
+                    "Circular dependency detected involving: {}",
+                    node_name
+                ));
             }
             if !visited.contains(node_name) {
                 in_stack.insert(node_name.to_string());
@@ -286,7 +289,13 @@ impl OpenRcAdvancementsV63Engine {
 
         for s in services {
             if !visited.contains(&s.name) {
-                visit(&s.name, &service_map, &mut visited, &mut in_stack, &mut ordered)?;
+                visit(
+                    &s.name,
+                    &service_map,
+                    &mut visited,
+                    &mut in_stack,
+                    &mut ordered,
+                )?;
             }
         }
 
@@ -521,8 +530,7 @@ impl SysVinitAdvancementsV63Engine {
 
                     match k {
                         "Provides" => {
-                            header.provides =
-                                v.split_whitespace().map(|s| s.to_string()).collect();
+                            header.provides = v.split_whitespace().map(|s| s.to_string()).collect();
                         }
                         "Required-Start" => {
                             header.required_start =
@@ -816,11 +824,7 @@ impl SchedulerTimersAdvancementsV63Engine {
     }
 
     /// Evaluates if an Anacron job is due for execution.
-    pub fn is_anacron_job_due(
-        &self,
-        job: &AnacronJobSpecV63,
-        current_time_days: u64,
-    ) -> bool {
+    pub fn is_anacron_job_due(&self, job: &AnacronJobSpecV63, current_time_days: u64) -> bool {
         let days_elapsed = current_time_days.saturating_sub(job.last_run_timestamp_days);
         days_elapsed >= job.period_days as u64
     }
@@ -1120,7 +1124,9 @@ mod tests {
     #[test]
     fn test_schedulers_timers_v63_cron_and_at() {
         let engine = SchedulerTimersAdvancementsV63Engine::new();
-        let cron = engine.parse_vixie_cron_line("@daily /usr/bin/backup").unwrap();
+        let cron = engine
+            .parse_vixie_cron_line("@daily /usr/bin/backup")
+            .unwrap();
         assert_eq!(cron.minute, "0");
         assert_eq!(cron.hour, "0");
 

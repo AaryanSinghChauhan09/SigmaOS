@@ -71,7 +71,11 @@ impl EffectcraftNeuralDepthSegmentationPrEngine {
         }
     }
 
-    pub fn compute_depth_mask(&self, depth_map: &[f32], mask_out: &mut [u8]) -> Result<usize, String> {
+    pub fn compute_depth_mask(
+        &self,
+        depth_map: &[f32],
+        mask_out: &mut [u8],
+    ) -> Result<usize, String> {
         if depth_map.len() != mask_out.len() {
             return Err("Depth map and mask length mismatch".to_string());
         }
@@ -90,7 +94,8 @@ impl EffectcraftNeuralDepthSegmentationPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6501,
-            pr_title: "feat(effectcraft): Add AI Neural Depth Segmentation & Keying Subsystem".to_string(),
+            pr_title: "feat(effectcraft): Add AI Neural Depth Segmentation & Keying Subsystem"
+                .to_string(),
             target_subsystem: "EffectCraft Neural Compositing Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -139,7 +144,14 @@ impl EffectcraftVolumetricSmokeCombustionFluidPrEngine {
         }
     }
 
-    pub fn inject_combustion_source(&mut self, x: usize, y: usize, z: usize, density: f32, temp: f32) {
+    pub fn inject_combustion_source(
+        &mut self,
+        x: usize,
+        y: usize,
+        z: usize,
+        density: f32,
+        temp: f32,
+    ) {
         let (w, h, d) = self.grid_res;
         if x < w && y < h && z < d {
             let idx = x + y * w + z * w * h;
@@ -164,7 +176,8 @@ impl EffectcraftVolumetricSmokeCombustionFluidPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6502,
-            pr_title: "feat(effectcraft): Add Volumetric Smoke, Fire & Fluid Combustion Simulator".to_string(),
+            pr_title: "feat(effectcraft): Add Volumetric Smoke, Fire & Fluid Combustion Simulator"
+                .to_string(),
             target_subsystem: "EffectCraft Physics Particle Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -222,7 +235,9 @@ impl EffectcraftSubsurfaceScatteringSkinDiffusionPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6503,
-            pr_title: "feat(effectcraft): Add Subsurface Scattering & Skin Multi-Layer Diffusion Shader".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Subsurface Scattering & Skin Multi-Layer Diffusion Shader"
+                    .to_string(),
             target_subsystem: "EffectCraft Shader Surface Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -248,7 +263,9 @@ pub struct EffectcraftTemporalOpticalFlowRetimePrEngine {
 
 impl EffectcraftTemporalOpticalFlowRetimePrEngine {
     pub fn new() -> Self {
-        Self { motion_vector_scale: 1.0 }
+        Self {
+            motion_vector_scale: 1.0,
+        }
     }
 
     pub fn interpolate_frame_at_time(
@@ -272,7 +289,8 @@ impl EffectcraftTemporalOpticalFlowRetimePrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6504,
-            pr_title: "feat(effectcraft): Add Temporal Optical Flow & Extreme Slow-Motion Retimer".to_string(),
+            pr_title: "feat(effectcraft): Add Temporal Optical Flow & Extreme Slow-Motion Retimer"
+                .to_string(),
             target_subsystem: "EffectCraft Temporal Retiming Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -307,7 +325,9 @@ pub struct EffectcraftGpuParticleVectorFieldPhysicsPrEngine {
 
 impl EffectcraftGpuParticleVectorFieldPhysicsPrEngine {
     pub fn new() -> Self {
-        Self { particles: Vec::new() }
+        Self {
+            particles: Vec::new(),
+        }
     }
 
     pub fn spawn_burst(&mut self, count: usize, origin: (f32, f32, f32)) {
@@ -342,7 +362,8 @@ impl EffectcraftGpuParticleVectorFieldPhysicsPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6505,
-            pr_title: "feat(effectcraft): Add GPU Particle System & Vector Field Physics Simulator".to_string(),
+            pr_title: "feat(effectcraft): Add GPU Particle System & Vector Field Physics Simulator"
+                .to_string(),
             target_subsystem: "EffectCraft Particle Physics Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -402,7 +423,9 @@ impl EffectcraftCleanPlateRigRemovalInpaintPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6506,
-            pr_title: "feat(effectcraft): Add Clean Plate Wire & Rig Removal Patch Inpainting Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Clean Plate Wire & Rig Removal Patch Inpainting Engine"
+                    .to_string(),
             target_subsystem: "EffectCraft Paint & Inpaint Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -451,13 +474,18 @@ impl EffectcraftACESOcioV2ColorPipelinePrEngine {
         let r_out = (r * 0.88) + (g * 0.08) + (b * 0.04);
         let g_out = (r * 0.04) + (g * 0.92) + (b * 0.04);
         let b_out = (r * 0.02) + (g * 0.05) + (b * 0.93);
-        (r_out.clamp(0.0, 1.0), g_out.clamp(0.0, 1.0), b_out.clamp(0.0, 1.0))
+        (
+            r_out.clamp(0.0, 1.0),
+            g_out.clamp(0.0, 1.0),
+            b_out.clamp(0.0, 1.0),
+        )
     }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6507,
-            pr_title: "feat(effectcraft): Add ACES 1.3 & OpenColorIO v2 Color Management Pipeline".to_string(),
+            pr_title: "feat(effectcraft): Add ACES 1.3 & OpenColorIO v2 Color Management Pipeline"
+                .to_string(),
             target_subsystem: "EffectCraft Color Grading Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -504,7 +532,8 @@ impl EffectcraftOpenFxPluginHostBridgePrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6508,
-            pr_title: "feat(effectcraft): Add OpenFX (OFX) Standard Host Plugin Bridge Suite".to_string(),
+            pr_title: "feat(effectcraft): Add OpenFX (OFX) Standard Host Plugin Bridge Suite"
+                .to_string(),
             target_subsystem: "EffectCraft Plugin Host Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -538,7 +567,9 @@ pub struct EffectcraftCryptomatteAovChannelExtractorPrEngine {
 
 impl EffectcraftCryptomatteAovChannelExtractorPrEngine {
     pub fn new() -> Self {
-        Self { channels: Vec::new() }
+        Self {
+            channels: Vec::new(),
+        }
     }
 
     pub fn extract_matte_for_hash(&self, hash_id: u32, output_mask: &mut [u8]) {
@@ -554,7 +585,8 @@ impl EffectcraftCryptomatteAovChannelExtractorPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6509,
-            pr_title: "feat(effectcraft): Add Cryptomatte AOV & EXR Multi-Pass ID Extractor Engine".to_string(),
+            pr_title: "feat(effectcraft): Add Cryptomatte AOV & EXR Multi-Pass ID Extractor Engine"
+                .to_string(),
             target_subsystem: "EffectCraft Deep Compositing Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -607,7 +639,9 @@ impl EffectcraftSpatial3dCameraTrackMeshProjectionPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV65PrProposalManifest {
         EffectcraftV65PrProposalManifest {
             pr_id: 6510,
-            pr_title: "feat(effectcraft): Add Spatial 3D Camera Tracking & Mesh Texture Projection Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Spatial 3D Camera Tracking & Mesh Texture Projection Engine"
+                    .to_string(),
             target_subsystem: "EffectCraft 3D Spatial Compositing Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VFX Studio".to_string(),
             components_added: vec![
@@ -730,7 +764,9 @@ mod tests {
         let engine = EffectcraftTemporalOpticalFlowRetimePrEngine::new();
         let frame_a = vec![100, 100, 100, 255];
         let frame_b = vec![200, 200, 200, 255];
-        let interp = engine.interpolate_frame_at_time(&frame_a, &frame_b, 0.5).unwrap();
+        let interp = engine
+            .interpolate_frame_at_time(&frame_a, &frame_b, 0.5)
+            .unwrap();
         assert_eq!(interp[0], 150);
     }
 
@@ -747,7 +783,9 @@ mod tests {
         let engine = EffectcraftCleanPlateRigRemovalInpaintPrEngine::new();
         let mut image = vec![0u8; 16];
         let mask = vec![0, 0, 255, 0];
-        let replaced = engine.inpaint_masked_region(&mut image, &mask, 2, 2).unwrap();
+        let replaced = engine
+            .inpaint_masked_region(&mut image, &mask, 2, 2)
+            .unwrap();
         assert_eq!(replaced, 1);
     }
 

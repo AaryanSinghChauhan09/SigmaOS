@@ -40,26 +40,86 @@ fn print_status() {
 fn print_craft_suite() {
     println!("\x1b[1;35m── 20-Module Craft Creative Suite ───────────────────────────────────────\x1b[0m");
     let apps = [
-        ("3DCraft", "3D Modeling, Rigging, Simulation & Rendering (Blender parity)"),
-        ("AniCraft", "2D Vector & Traditional Animation Studio (OpenToonz parity)"),
-        ("ArtCraft", "Digital Painting, Concept Art & Illustration (Krita parity)"),
-        ("CADCraft", "Parametric Solid Modeling, CAM & CAE (FreeCAD/SolidWorks)"),
-        ("CraftLibs", "Unified Creative Core, Color Management & Shader Pipeline"),
-        ("DeckCraft", "Interactive Presentation Decks & Visual Slides"),
-        ("DesignCraft", "Vector UI/UX Canvas & Prototyping (Figma parity)"),
-        ("EffectCraft", "Node-Based VFX Compositor & Color Grading (Nuke parity)"),
-        ("FigCraft", "Technical Diagrams, Schematics & Architecture Figures"),
-        ("FilmCraft", "Non-Linear Video Editor & Audio Timeline (DaVinci parity)"),
-        ("FontCraft", "Typography Studio, Font Editor & OpenType Shaping Engine"),
-        ("GridCraft", "High-Performance Reactive Spreadsheets & Data Grid"),
-        ("LightCraft", "Optical Lighting Simulation, Lux Calculations & Shaders"),
-        ("PDFCraft", "Sovereign PDF Engine, Form Filler & Preflight Analyzer"),
-        ("PhotoCraft", "Non-Destructive RAW Image Processing (Darktable parity)"),
-        ("PrintCraft", "Professional Desktop Publishing & Layout (InDesign parity)"),
-        ("SoundCraft", "Digital Audio Workstation, Synthesizers & MIDI (Bitwig parity)"),
-        ("VectorCraft", "Scalable Vector Graphics Illustration (Inkscape parity)"),
-        ("VoiceCraft", "Speech Recognition, Dictation & Voice Synthesis Engine"),
-        ("WordCraft", "Typographic Document Processor & Typesetting (Writer parity)"),
+        (
+            "3DCraft",
+            "3D Modeling, Rigging, Simulation & Rendering (Blender parity)",
+        ),
+        (
+            "AniCraft",
+            "2D Vector & Traditional Animation Studio (OpenToonz parity)",
+        ),
+        (
+            "ArtCraft",
+            "Digital Painting, Concept Art & Illustration (Krita parity)",
+        ),
+        (
+            "CADCraft",
+            "Parametric Solid Modeling, CAM & CAE (FreeCAD/SolidWorks)",
+        ),
+        (
+            "CraftLibs",
+            "Unified Creative Core, Color Management & Shader Pipeline",
+        ),
+        (
+            "DeckCraft",
+            "Interactive Presentation Decks & Visual Slides",
+        ),
+        (
+            "DesignCraft",
+            "Vector UI/UX Canvas & Prototyping (Figma parity)",
+        ),
+        (
+            "EffectCraft",
+            "Node-Based VFX Compositor & Color Grading (Nuke parity)",
+        ),
+        (
+            "FigCraft",
+            "Technical Diagrams, Schematics & Architecture Figures",
+        ),
+        (
+            "FilmCraft",
+            "Non-Linear Video Editor & Audio Timeline (DaVinci parity)",
+        ),
+        (
+            "FontCraft",
+            "Typography Studio, Font Editor & OpenType Shaping Engine",
+        ),
+        (
+            "GridCraft",
+            "High-Performance Reactive Spreadsheets & Data Grid",
+        ),
+        (
+            "LightCraft",
+            "Optical Lighting Simulation, Lux Calculations & Shaders",
+        ),
+        (
+            "PDFCraft",
+            "Sovereign PDF Engine, Form Filler & Preflight Analyzer",
+        ),
+        (
+            "PhotoCraft",
+            "Non-Destructive RAW Image Processing (Darktable parity)",
+        ),
+        (
+            "PrintCraft",
+            "Professional Desktop Publishing & Layout (InDesign parity)",
+        ),
+        (
+            "SoundCraft",
+            "Digital Audio Workstation, Synthesizers & MIDI (Bitwig parity)",
+        ),
+        (
+            "VectorCraft",
+            "Scalable Vector Graphics Illustration (Inkscape parity)",
+        ),
+        (
+            "VoiceCraft",
+            "Speech Recognition, Dictation & Voice Synthesis Engine",
+        ),
+        (
+            "WordCraft",
+            "Typographic Document Processor & Typesetting (Writer parity)",
+        ),
     ];
 
     for (idx, (name, desc)) in apps.iter().enumerate() {
@@ -69,13 +129,17 @@ fn print_craft_suite() {
 }
 
 fn print_distro_parity() {
-    println!("\x1b[1;36m── Linux & BSD Ecosystem Parity ────────────────────────────────────────\x1b[0m");
+    println!(
+        "\x1b[1;36m── Linux & BSD Ecosystem Parity ────────────────────────────────────────\x1b[0m"
+    );
     println!("  • \x1b[1mArch Linux\x1b[0m  : Rolling release, pacman/pkgbuild integration, AUR-style repository");
     println!("  • \x1b[1mOmarchy\x1b[0m     : Hyprland tiling compositor, Quickshell bar, keyboard navigation");
     println!("  • \x1b[1mLinux Mint\x1b[0m  : User ergonomics, Nemo file manager, MintUpdate GUI, driver autodetect");
     println!("  • \x1b[1mCachyOS\x1b[0m     : BORE/EEVDF scheduler, AutoBOLT/PGO profile, zram-zstd pool");
     println!("  • \x1b[1mDebian\x1b[0m      : Multiarch libraries, DPKG/APT compatibility layer, rock-solid core");
-    println!("  • \x1b[1mDragonFlyBSD\x1b[0m: HAMMER2 high-throughput VFS, lightweight kernel threads");
+    println!(
+        "  • \x1b[1mDragonFlyBSD\x1b[0m: HAMMER2 high-throughput VFS, lightweight kernel threads"
+    );
     println!("  • \x1b[1mFreeBSD\x1b[0m     : Capsicum capability isolation, kqueue event multiplexing, Jails");
     println!("  • \x1b[1mOpenBSD\x1b[0m     : pledge() promises, unveil() path masking, W^X PTE protection\n");
 }
@@ -100,7 +164,9 @@ fn run_interactive_repl() {
         match cmd {
             "help" | "?" => {
                 println!("\nAvailable Commands:");
-                println!("  status         - Display comprehensive system and launch readiness status");
+                println!(
+                    "  status         - Display comprehensive system and launch readiness status"
+                );
                 println!("  craft          - Explore the 20-module Craft Creative Suite");
                 println!("  distro         - Inspect Linux (Arch/Cachy/Debian) and BSD (DragonFly/Free/Open) parity");
                 println!("  shell          - Ping the SigmaOS unified desktop shell controller");
@@ -160,7 +226,10 @@ fn run_interactive_repl() {
             }
             "" => {}
             other => {
-                println!("Unknown command: '{}'. Type 'help' for available commands.", other);
+                println!(
+                    "Unknown command: '{}'. Type 'help' for available commands.",
+                    other
+                );
             }
         }
     }

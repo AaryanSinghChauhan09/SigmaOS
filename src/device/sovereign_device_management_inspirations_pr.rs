@@ -867,7 +867,10 @@ impl LogindElogindSessionEngine {
         self.seats.push(MultiseatControllerRecord {
             seat_id: "seat0".to_string(),
             active_session_id: Some("session-1".to_string()),
-            assigned_devices: vec!["/dev/dri/card0".to_string(), "/dev/input/event0".to_string()],
+            assigned_devices: vec![
+                "/dev/dri/card0".to_string(),
+                "/dev/input/event0".to_string(),
+            ],
             can_multi_session: true,
         });
 
@@ -908,7 +911,11 @@ impl LogindElogindSessionEngine {
     }
 
     /// Release previously delegated device file descriptor.
-    pub fn release_device_fd(&mut self, session_id: &str, pseudo_fd: u32) -> Result<(), &'static str> {
+    pub fn release_device_fd(
+        &mut self,
+        session_id: &str,
+        pseudo_fd: u32,
+    ) -> Result<(), &'static str> {
         let _ = session_id;
         if let Some(idx) = self.passed_fds.iter().position(|(_, fd)| *fd == pseudo_fd) {
             self.passed_fds.remove(idx);
@@ -1455,7 +1462,8 @@ mod tests {
             engine.generate_predictable_net_ifname(PredictableNetIfType::Onboard, 0, 1, 0);
         assert_eq!(ifname_onboard, "eno1");
 
-        let ifname_mac = engine.generate_predictable_net_ifname_from_mac(&[0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff]);
+        let ifname_mac =
+            engine.generate_predictable_net_ifname_from_mac(&[0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff]);
         assert_eq!(ifname_mac, "enxaabbccddeeff");
 
         // Test legacy hotplug bridge

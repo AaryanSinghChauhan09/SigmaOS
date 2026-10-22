@@ -289,7 +289,11 @@ impl GentooPortageEapi9V67PrEngine {
                 package_atom: "sys-apps/sigmaos-core-1.0".to_string(),
                 slot: "0".to_string(),
                 subslot: "1.0".to_string(),
-                use_flags: vec!["systemd".to_string(), "hardened".to_string(), "v67".to_string()],
+                use_flags: vec![
+                    "systemd".to_string(),
+                    "hardened".to_string(),
+                    "v67".to_string(),
+                ],
             },
         );
         Self { ebuilds }

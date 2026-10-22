@@ -54,7 +54,10 @@ impl SystemdAdvancementsV67Engine {
     }
 
     /// Perform topological sorting on systemd unit startup order based on `After=` and `Requires=` dependencies.
-    pub fn resolve_startup_order(&self, units: &[SystemdUnitSpecV67]) -> Result<Vec<String>, String> {
+    pub fn resolve_startup_order(
+        &self,
+        units: &[SystemdUnitSpecV67],
+    ) -> Result<Vec<String>, String> {
         let mut adj: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut in_degree: BTreeMap<String, usize> = BTreeMap::new();
         let mut all_units: BTreeSet<String> = BTreeSet::new();
@@ -122,7 +125,12 @@ impl SystemdAdvancementsV67Engine {
     }
 
     /// Evaluate watchdog ping interval and return whether ping is within acceptable timeframe.
-    pub fn evaluate_watchdog_ping(&self, last_ping_usec: u64, current_usec: u64, watchdog_usec: u64) -> bool {
+    pub fn evaluate_watchdog_ping(
+        &self,
+        last_ping_usec: u64,
+        current_usec: u64,
+        watchdog_usec: u64,
+    ) -> bool {
         if watchdog_usec == 0 {
             return true;
         }
@@ -133,7 +141,11 @@ impl SystemdAdvancementsV67Engine {
     }
 
     /// Calculate socket activation file descriptor environment parameters (`LISTEN_FDS`, `LISTEN_PID`).
-    pub fn calculate_socket_activation_fds(&self, socket_count: usize, pid: u32) -> BTreeMap<String, String> {
+    pub fn calculate_socket_activation_fds(
+        &self,
+        socket_count: usize,
+        pid: u32,
+    ) -> BTreeMap<String, String> {
         let mut env = BTreeMap::new();
         env.insert("LISTEN_FDS".to_string(), socket_count.to_string());
         env.insert("LISTEN_PID".to_string(), pid.to_string());
@@ -150,7 +162,9 @@ impl SystemdAdvancementsV67Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
             pr_id: 4067,
-            pr_title: "PR #4067: systemd V67 Socket Activation & sd_notify Watchdog Protocol Engine".to_string(),
+            pr_title:
+                "PR #4067: systemd V67 Socket Activation & sd_notify Watchdog Protocol Engine"
+                    .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "Linux systemd".to_string(),
             components_added: vec![
@@ -188,7 +202,11 @@ impl OpenRcAdvancementsV67Engine {
     }
 
     /// Validate runlevel transition validity.
-    pub fn validate_runlevel_transition(&self, current: OpenRcRunlevelV67, target: OpenRcRunlevelV67) -> bool {
+    pub fn validate_runlevel_transition(
+        &self,
+        current: OpenRcRunlevelV67,
+        target: OpenRcRunlevelV67,
+    ) -> bool {
         match (current, target) {
             (OpenRcRunlevelV67::SysInit, OpenRcRunlevelV67::Boot) => true,
             (OpenRcRunlevelV67::Boot, OpenRcRunlevelV67::Default) => true,
@@ -228,7 +246,8 @@ impl OpenRcAdvancementsV67Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
             pr_id: 4068,
-            pr_title: "PR #4068: OpenRC V67 Multi-Runlevel State Machine & Conf.d Override Merger".to_string(),
+            pr_title: "PR #4068: OpenRC V67 Multi-Runlevel State Machine & Conf.d Override Merger"
+                .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "Gentoo / Alpine OpenRC".to_string(),
             components_added: vec![
@@ -267,7 +286,12 @@ impl RunitS6AdvancementsV67Engine {
     }
 
     /// Calculate exponential backoff restart delay for crashed service (capped at max_sec).
-    pub fn calculate_exponential_backoff(&self, restart_count: u32, base_sec: u32, max_sec: u32) -> u32 {
+    pub fn calculate_exponential_backoff(
+        &self,
+        restart_count: u32,
+        base_sec: u32,
+        max_sec: u32,
+    ) -> u32 {
         if restart_count == 0 {
             return 0;
         }
@@ -296,7 +320,9 @@ impl RunitS6AdvancementsV67Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
             pr_id: 4069,
-            pr_title: "PR #4069: runit & s6 V67 Exponential Backoff Supervision & s6-rc Atomic Rollbacks".to_string(),
+            pr_title:
+                "PR #4069: runit & s6 V67 Exponential Backoff Supervision & s6-rc Atomic Rollbacks"
+                    .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "runit / s6 / s6-rc".to_string(),
             components_added: vec![
@@ -361,10 +387,12 @@ impl SysVinitAdvancementsV67Engine {
                         header.provides = val.split_whitespace().map(|s| s.to_string()).collect();
                     }
                     "Required-Start" => {
-                        header.required_start = val.split_whitespace().map(|s| s.to_string()).collect();
+                        header.required_start =
+                            val.split_whitespace().map(|s| s.to_string()).collect();
                     }
                     "Required-Stop" => {
-                        header.required_stop = val.split_whitespace().map(|s| s.to_string()).collect();
+                        header.required_stop =
+                            val.split_whitespace().map(|s| s.to_string()).collect();
                     }
                     "Default-Start" => {
                         header.default_start = val
@@ -398,7 +426,8 @@ impl SysVinitAdvancementsV67Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
             pr_id: 4070,
-            pr_title: "PR #4070: SysVinit V67 LSB Header Parser & Respawn Throttling Governor".to_string(),
+            pr_title: "PR #4070: SysVinit V67 LSB Header Parser & Respawn Throttling Governor"
+                .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "Linux SysVinit / SysV rc".to_string(),
             components_added: vec![
@@ -495,7 +524,8 @@ impl BsdRcAdvancementsV67Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
             pr_id: 4071,
-            pr_title: "PR #4071: BSD rc V67 FreeBSD rcorder(8) Sorter & OpenBSD rcctl(8) Engine".to_string(),
+            pr_title: "PR #4071: BSD rc V67 FreeBSD rcorder(8) Sorter & OpenBSD rcctl(8) Engine"
+                .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "FreeBSD / OpenBSD / NetBSD rc".to_string(),
             components_added: vec![
@@ -531,7 +561,12 @@ impl LaunchdAndroidInitAdvancementsV67Engine {
     }
 
     /// Evaluate launchd `KeepAlive` dictionary rules.
-    pub fn evaluate_keep_alive(&self, spec: &LaunchdKeepAliveSpecV67, last_exit_code: i32, current_network_up: bool) -> bool {
+    pub fn evaluate_keep_alive(
+        &self,
+        spec: &LaunchdKeepAliveSpecV67,
+        last_exit_code: i32,
+        current_network_up: bool,
+    ) -> bool {
         if let Some(expected_success) = spec.successful_exit {
             let was_success = last_exit_code == 0;
             return expected_success == was_success;
@@ -584,8 +619,16 @@ pub enum CronScheduleSpecV67 {
     MacroDaily,
     MacroWeekly,
     MacroMonthly,
-    StepInterval { minutes_step: u8 },
-    Custom { minute: String, hour: String, dom: String, month: String, dow: String },
+    StepInterval {
+        minutes_step: u8,
+    },
+    Custom {
+        minute: String,
+        hour: String,
+        dom: String,
+        month: String,
+        dow: String,
+    },
 }
 
 /// Cron, Anacron, Timers & At Advancements V67 Engine.
@@ -645,9 +688,17 @@ impl CronAnacronTimersAtV67Engine {
         let spec = spec.trim();
         let parts: Vec<&str> = spec.split_whitespace().collect();
         if parts.len() >= 2 {
-            (parts[0].to_string(), parts[1].to_string(), parts.get(2).unwrap_or(&"00").to_string())
+            (
+                parts[0].to_string(),
+                parts[1].to_string(),
+                parts.get(2).unwrap_or(&"00").to_string(),
+            )
         } else {
-            ("*-*-*".to_string(), "00:00:00".to_string(), "00".to_string())
+            (
+                "*-*-*".to_string(),
+                "00:00:00".to_string(),
+                "00".to_string(),
+            )
         }
     }
 
@@ -655,7 +706,9 @@ impl CronAnacronTimersAtV67Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
             pr_id: 4073,
-            pr_title: "PR #4073: Cron, Anacron, Timers & At V67 Extended Macros & OnCalendar Scheduler".to_string(),
+            pr_title:
+                "PR #4073: Cron, Anacron, Timers & At V67 Extended Macros & OnCalendar Scheduler"
+                    .to_string(),
             target_subsystem: "Scheduled Tasks / Timers".to_string(),
             original_system: "Vixie Cron / Anacron / systemd.timer / atd".to_string(),
             components_added: vec![
@@ -723,7 +776,10 @@ impl SovereignInitAndSupervisorAdvancementsV67Suite {
         }
 
         // 2. Verify OpenRC state transition
-        if !self.openrc_engine.validate_runlevel_transition(OpenRcRunlevelV67::Boot, OpenRcRunlevelV67::Default) {
+        if !self
+            .openrc_engine
+            .validate_runlevel_transition(OpenRcRunlevelV67::Boot, OpenRcRunlevelV67::Default)
+        {
             return false;
         }
 
@@ -747,7 +803,9 @@ impl SovereignInitAndSupervisorAdvancementsV67Suite {
         }
 
         // 6. Verify Cron expression parser
-        if self.cron_timers_engine.parse_cron_expression("@daily") != Ok(CronScheduleSpecV67::MacroDaily) {
+        if self.cron_timers_engine.parse_cron_expression("@daily")
+            != Ok(CronScheduleSpecV67::MacroDaily)
+        {
             return false;
         }
 
@@ -783,7 +841,8 @@ mod tests {
         assert_eq!(order[0], "syslog.service");
         assert_eq!(order[1], "nginx.service");
 
-        let notify = engine.parse_sd_notify_message("READY=1\nSTATUS=Ready to accept connections\nWATCHDOG=1\n");
+        let notify = engine
+            .parse_sd_notify_message("READY=1\nSTATUS=Ready to accept connections\nWATCHDOG=1\n");
         assert_eq!(notify.get("READY"), Some(&"1".to_string()));
         assert_eq!(notify.get("WATCHDOG"), Some(&"1".to_string()));
 
@@ -801,13 +860,16 @@ mod tests {
     #[test]
     fn test_openrc_v67_engine() {
         let engine = OpenRcAdvancementsV67Engine::new();
-        assert!(engine.validate_runlevel_transition(OpenRcRunlevelV67::SysInit, OpenRcRunlevelV67::Boot));
-        assert!(!engine.validate_runlevel_transition(OpenRcRunlevelV67::SysInit, OpenRcRunlevelV67::Shutdown));
+        assert!(engine
+            .validate_runlevel_transition(OpenRcRunlevelV67::SysInit, OpenRcRunlevelV67::Boot));
+        assert!(!engine
+            .validate_runlevel_transition(OpenRcRunlevelV67::SysInit, OpenRcRunlevelV67::Shutdown));
 
         let conf_d = engine.parse_conf_d_overrides("rc_parallel=\"YES\"\nrc_env_allow=\"*\"\n");
         assert_eq!(conf_d.get("rc_parallel"), Some(&"YES".to_string()));
 
-        let status = engine.format_rc_status("default", &[("sshd", "started"), ("crond", "started")]);
+        let status =
+            engine.format_rc_status("default", &[("sshd", "started"), ("crond", "started")]);
         assert!(status.contains("sshd"));
         assert!(status.contains("started"));
     }
@@ -881,8 +943,14 @@ mod tests {
     #[test]
     fn test_cron_timers_at_v67_engine() {
         let engine = CronAnacronTimersAtV67Engine::new();
-        assert_eq!(engine.parse_cron_expression("@reboot"), Ok(CronScheduleSpecV67::MacroReboot));
-        assert_eq!(engine.parse_cron_expression("@daily"), Ok(CronScheduleSpecV67::MacroDaily));
+        assert_eq!(
+            engine.parse_cron_expression("@reboot"),
+            Ok(CronScheduleSpecV67::MacroReboot)
+        );
+        assert_eq!(
+            engine.parse_cron_expression("@daily"),
+            Ok(CronScheduleSpecV67::MacroDaily)
+        );
         assert_eq!(
             engine.parse_cron_expression("*/15 * * * *"),
             Ok(CronScheduleSpecV67::StepInterval { minutes_step: 15 })

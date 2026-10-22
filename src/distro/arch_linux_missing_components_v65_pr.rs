@@ -66,7 +66,10 @@ impl ArchPacmanKeyringPqcRotatorPrEngine {
     }
 
     pub fn format_keyring_cmd(&self) -> String {
-        format!("pacman-key --populate archlinux --pqc-algo {}", self.pqc_algorithm)
+        format!(
+            "pacman-key --populate archlinux --pqc-algo {}",
+            self.pqc_algorithm
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV65PrSpec {
@@ -249,7 +252,10 @@ impl ArchisoLiveProfileCustomizerPrEngine {
     }
 
     pub fn format_build_iso_cmd(&self) -> String {
-        format!("mkarchiso -v -w /tmp/archiso-work -o {} /usr/share/archiso/configs/{}", self.output_dir, self.profile_name)
+        format!(
+            "mkarchiso -v -w /tmp/archiso-work -o {} /usr/share/archiso/configs/{}",
+            self.output_dir, self.profile_name
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV65PrSpec {
@@ -379,7 +385,10 @@ impl ArchModprobedDbKernelModuleTrimmerPrEngine {
     }
 
     pub fn format_trim_cmd(&self) -> String {
-        format!("modprobed-db store && make localmodconfig LSMOD={}", self.db_file)
+        format!(
+            "modprobed-db store && make localmodconfig LSMOD={}",
+            self.db_file
+        )
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV65PrSpec {

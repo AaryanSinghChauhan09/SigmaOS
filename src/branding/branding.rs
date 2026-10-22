@@ -100,8 +100,7 @@ impl Branding {
             && self.tagline.is_empty()
             && self.logo.is_empty()
             && self.copyright.is_empty()
-            && self.support_url.is_empty()
-            == false
+            && self.support_url.is_empty() == false
     }
 
     /// Human-readable "about" summary (Query). Builds one String so callers
@@ -339,7 +338,10 @@ mod tests {
         assert!(b.push_logo_line("line one".to_string()));
         assert!(b.push_logo_line("line two".to_string()));
         // Assert
-        assert_eq!(b.show_logo(), &["line one".to_string(), "line two".to_string()]);
+        assert_eq!(
+            b.show_logo(),
+            &["line one".to_string(), "line two".to_string()]
+        );
     }
 
     #[test]

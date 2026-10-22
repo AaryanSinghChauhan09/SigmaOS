@@ -74,7 +74,14 @@ impl Ext4AdvancementsV65Engine {
         }
     }
 
-    pub fn append_fast_commit(&mut self, inode_num: u32, logical: u32, physical: u64, count: u16, unwritten: bool) {
+    pub fn append_fast_commit(
+        &mut self,
+        inode_num: u32,
+        logical: u32,
+        physical: u64,
+        count: u16,
+        unwritten: bool,
+    ) {
         self.fast_commit_log.push(Ext4V65FastCommitEntry {
             inode_num,
             logical_block: logical,
@@ -94,7 +101,11 @@ impl Ext4AdvancementsV65Engine {
         if data.len() > 128 {
             return false;
         }
-        if let Some(existing) = self.inline_inodes.iter_mut().find(|i| i.inode_num == inode_num) {
+        if let Some(existing) = self
+            .inline_inodes
+            .iter_mut()
+            .find(|i| i.inode_num == inode_num)
+        {
             existing.inline_data = data.to_vec();
         } else {
             self.inline_inodes.push(Ext4V65InlineInode {
@@ -259,7 +270,12 @@ impl BtrfsAdvancementsV65Engine {
         new_id
     }
 
-    pub fn snapshot_subvolume(&mut self, source_id: u64, snap_name: &str, read_only: bool) -> Option<u64> {
+    pub fn snapshot_subvolume(
+        &mut self,
+        source_id: u64,
+        snap_name: &str,
+        read_only: bool,
+    ) -> Option<u64> {
         let source = self.subvolumes.iter().find(|s| s.id == source_id)?.clone();
         let snap_id = (self.subvolumes.len() as u64) + 256;
         self.subvolumes.push(BtrfsV65Subvol {
@@ -775,7 +791,8 @@ impl SovereignStorageAndFilesystemParityV65Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut md = String::from("# Sovereign Storage & Filesystem Innovations (v65 PR Suite)\n\n");
+        let mut md =
+            String::from("# Sovereign Storage & Filesystem Innovations (v65 PR Suite)\n\n");
         md.push_str("| PR ID | Title | Category | Throughput | Resilience |\n");
         md.push_str("|---|---|---|---|---|\n");
         for p in &proposals {

@@ -67,7 +67,8 @@ impl CachyOsScxBmapSchedulerPrEngine {
 
     pub fn enable_low_latency_mode(&mut self) -> String {
         self.latency_mode_engaged = true;
-        "scx_bmap: low-latency interactive task mode engaged (bitmap task queues active)".to_string()
+        "scx_bmap: low-latency interactive task mode engaged (bitmap task queues active)"
+            .to_string()
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifest {
@@ -343,7 +344,8 @@ impl CachyOsBtrfsAdaptiveZstdCompressorPrEngine {
     pub fn adjust_compression_level(&mut self, system_load_high: bool) -> String {
         if system_load_high {
             self.current_level = 1;
-            "Btrfs adaptive compression reduced to ZSTD:1 to conserve CPU under heavy load".to_string()
+            "Btrfs adaptive compression reduced to ZSTD:1 to conserve CPU under heavy load"
+                .to_string()
         } else {
             self.current_level = 3;
             "Btrfs adaptive compression restored to ZSTD:3 for optimal disk footprint".to_string()

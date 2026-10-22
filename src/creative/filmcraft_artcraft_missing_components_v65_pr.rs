@@ -270,7 +270,9 @@ impl FilmcraftOpticalFlowMotionBlurSynthesisPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV65PrProposalManifest {
         FilmcraftV65PrProposalManifest {
             pr_id: 333,
-            pr_title: "feat(filmcraft): Optical Flow Motion Blur Synthesis & Shutter Angle Simulator".to_string(),
+            pr_title:
+                "feat(filmcraft): Optical Flow Motion Blur Synthesis & Shutter Angle Simulator"
+                    .to_string(),
             target_subsystem: "Motion FX & Processing".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -351,7 +353,9 @@ impl FilmcraftAcesv13OcioV2ColorPipelinePrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV65PrProposalManifest {
         FilmcraftV65PrProposalManifest {
             pr_id: 334,
-            pr_title: "feat(filmcraft): ACES v1.3 OCIO v2 Full Color Pipeline & Gamut Compression Engine".to_string(),
+            pr_title:
+                "feat(filmcraft): ACES v1.3 OCIO v2 Full Color Pipeline & Gamut Compression Engine"
+                    .to_string(),
             target_subsystem: "Color Management".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -425,7 +429,9 @@ impl FilmcraftSpatialAudioAmbisonicsBinauralPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV65PrProposalManifest {
         FilmcraftV65PrProposalManifest {
             pr_id: 335,
-            pr_title: "feat(filmcraft): Spatial Audio Ambisonics & Binaural 3D Head-Tracking Engine".to_string(),
+            pr_title:
+                "feat(filmcraft): Spatial Audio Ambisonics & Binaural 3D Head-Tracking Engine"
+                    .to_string(),
             target_subsystem: "Audio Post-Production".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -482,7 +488,9 @@ impl FilmcraftMultiFormatHardwareEncoderVaultPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV65PrProposalManifest {
         FilmcraftV65PrProposalManifest {
             pr_id: 336,
-            pr_title: "feat(filmcraft): Multi-Format Hardware Encoder Vault & Dynamic Bitrate Allocator".to_string(),
+            pr_title:
+                "feat(filmcraft): Multi-Format Hardware Encoder Vault & Dynamic Bitrate Allocator"
+                    .to_string(),
             target_subsystem: "Export & Hardware Acceleration".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -553,7 +561,9 @@ impl FilmcraftTimelineSmartCacheInvalidationPrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV65PrProposalManifest {
         FilmcraftV65PrProposalManifest {
             pr_id: 337,
-            pr_title: "feat(filmcraft): Timeline Smart Cache Invalidation & Background Pre-Render Engine".to_string(),
+            pr_title:
+                "feat(filmcraft): Timeline Smart Cache Invalidation & Background Pre-Render Engine"
+                    .to_string(),
             target_subsystem: "Timeline Performance & Caching".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -670,7 +680,12 @@ impl FilmcraftVectorKineticTypographyMotionEngine {
 
         let first = &self.keyframes[0];
         if time <= first.time_sec {
-            return (first.position.0, first.position.1, first.scale.0, first.scale.1);
+            return (
+                first.position.0,
+                first.position.1,
+                first.scale.0,
+                first.scale.1,
+            );
         }
 
         let last = &self.keyframes[self.keyframes.len() - 1];
@@ -698,7 +713,8 @@ impl FilmcraftVectorKineticTypographyMotionEngine {
     pub fn generate_proposal(&self) -> FilmcraftV65PrProposalManifest {
         FilmcraftV65PrProposalManifest {
             pr_id: 339,
-            pr_title: "feat(filmcraft): Vector Kinetic Typography & Bezier Motion Graphics Engine".to_string(),
+            pr_title: "feat(filmcraft): Vector Kinetic Typography & Bezier Motion Graphics Engine"
+                .to_string(),
             target_subsystem: "Motion Graphics & Titling".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -748,10 +764,16 @@ impl FilmcraftUniversalNleInteroperabilityEdlPrEngine {
                 format!("TITLE: {}\nFCM: DROP FRAME\n001  AX       V     C        00:00:00:00 00:00:05:00 00:00:00:00 00:00:05:00", self.timeline_name)
             }
             NleInterchangeFormat::FcpxmlV1_10 => {
-                format!("<fcpxml version=\"1.10\"><project name=\"{}\"/></fcpxml>", self.timeline_name)
+                format!(
+                    "<fcpxml version=\"1.10\"><project name=\"{}\"/></fcpxml>",
+                    self.timeline_name
+                )
             }
             NleInterchangeFormat::OtioOpenTimelineIo => {
-                format!("{{\"OTIO_SCHEMA\": \"Timeline.1\", \"name\": \"{}\"}}", self.timeline_name)
+                format!(
+                    "{{\"OTIO_SCHEMA\": \"Timeline.1\", \"name\": \"{}\"}}",
+                    self.timeline_name
+                )
             }
             NleInterchangeFormat::AafComposition => {
                 format!("AAF_COMPOSITION_PACKAGE:{}", self.timeline_name)
@@ -792,16 +814,38 @@ impl SovereignFilmcraftArtcraftMissingComponentsV65PrGateway {
             proposals: BTreeMap::new(),
         };
 
-        gateway.register_proposal(FilmcraftAiSubjectMattingSmartCutoutPrEngine::new().generate_proposal());
-        gateway.register_proposal(Filmcraft3dStereoscopicDepthColorGradePrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftOpticalFlowMotionBlurSynthesisPrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftAcesv13OcioV2ColorPipelinePrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftSpatialAudioAmbisonicsBinauralPrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftMultiFormatHardwareEncoderVaultPrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftTimelineSmartCacheInvalidationPrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftCrdtRealtimeTimelineCollabPrEngine::new().generate_proposal());
-        gateway.register_proposal(FilmcraftVectorKineticTypographyMotionEngine::new("Sample", "Inter").generate_proposal());
-        gateway.register_proposal(FilmcraftUniversalNleInteroperabilityEdlPrEngine::new("Master_Edit", 24.0).generate_proposal());
+        gateway.register_proposal(
+            FilmcraftAiSubjectMattingSmartCutoutPrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            Filmcraft3dStereoscopicDepthColorGradePrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftOpticalFlowMotionBlurSynthesisPrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftAcesv13OcioV2ColorPipelinePrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftSpatialAudioAmbisonicsBinauralPrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftMultiFormatHardwareEncoderVaultPrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftTimelineSmartCacheInvalidationPrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftCrdtRealtimeTimelineCollabPrEngine::new().generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftVectorKineticTypographyMotionEngine::new("Sample", "Inter")
+                .generate_proposal(),
+        );
+        gateway.register_proposal(
+            FilmcraftUniversalNleInteroperabilityEdlPrEngine::new("Master_Edit", 24.0)
+                .generate_proposal(),
+        );
 
         gateway
     }
@@ -880,7 +924,14 @@ mod tests {
     fn test_motion_blur_engine() {
         let engine = FilmcraftOpticalFlowMotionBlurSynthesisPrEngine::new();
         let frame = vec![0.5f32; 30];
-        let vectors = vec![MotionBlurVector { vx: 1.0, vy: 0.0, magnitude: 1.0 }; 10];
+        let vectors = vec![
+            MotionBlurVector {
+                vx: 1.0,
+                vy: 0.0,
+                magnitude: 1.0
+            };
+            10
+        ];
         let mut out = Vec::new();
 
         let res = engine.synthesize_motion_blur(&frame, &vectors, 10, 1, &mut out);
@@ -995,7 +1046,8 @@ mod tests {
 
     #[test]
     fn test_universal_nle_interchange_engine() {
-        let engine = FilmcraftUniversalNleInteroperabilityEdlPrEngine::new("Commercial_Cut", 23.976);
+        let engine =
+            FilmcraftUniversalNleInteroperabilityEdlPrEngine::new("Commercial_Cut", 23.976);
         let manifest = engine.export_interchange_manifest();
         assert!(manifest.contains("Commercial_Cut"));
 

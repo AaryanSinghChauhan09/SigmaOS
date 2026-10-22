@@ -223,8 +223,7 @@ impl WikiDataTransferEngine {
             "DeviceDriverDevelopmentPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "35-SigmaOS-Device-Driver-Development-Plan.md".to_string(),
-                source_path: "wiki/35-SigmaOS-Device-Driver-Development-Plan.md"
-                    .to_string(),
+                source_path: "wiki/35-SigmaOS-Device-Driver-Development-Plan.md".to_string(),
                 is_fully_implemented: true,
                 completion_percentage: 100,
                 wiki_mirrored: true,

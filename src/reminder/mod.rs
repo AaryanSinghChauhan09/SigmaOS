@@ -4,6 +4,4 @@
 
 pub mod reminder_store;
 
-pub use reminder_store::{
-    DEFAULT_REMINDER_CAPACITY, Reminder, ReminderStatus, ReminderStore,
-};
+pub use reminder_store::{Reminder, ReminderStatus, ReminderStore, DEFAULT_REMINDER_CAPACITY};

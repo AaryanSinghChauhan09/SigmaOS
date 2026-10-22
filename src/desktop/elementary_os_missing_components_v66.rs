@@ -264,7 +264,9 @@ impl ElementaryCalculatorEngine {
             repository: String::from("elementary/calculator"),
             title: String::from("Elementary Scientific Calculator & History Tape Engine V66"),
             component_name: String::from("Elementary Calculator"),
-            description: String::from("Provides scientific mode, unit conversions, and formula history tape logging."),
+            description: String::from(
+                "Provides scientific mode, unit conversions, and formula history tape logging.",
+            ),
             features: vec![
                 String::from("Scientific & programmer modes"),
                 String::from("Currency & length unit conversion"),
@@ -310,7 +312,9 @@ impl ElementaryTasksEngine {
             repository: String::from("elementary/tasks"),
             title: String::from("Elementary Tasks & CalDAV Todo Sync Engine V66"),
             component_name: String::from("Elementary Tasks"),
-            description: String::from("Provides task lists, due date reminders, and CalDAV cloud synchronization."),
+            description: String::from(
+                "Provides task lists, due date reminders, and CalDAV cloud synchronization.",
+            ),
             features: vec![
                 String::from("CalDAV vTodo sync protocol"),
                 String::from("Smart due date parsing"),

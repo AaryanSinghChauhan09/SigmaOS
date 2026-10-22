@@ -151,7 +151,8 @@ impl AnacondaKickstartBlivetEngineV7 {
                     self.partitions.push(spec);
                 }
                 "%packages" => {
-                    self.execution_log.push("Entering %packages block".to_string());
+                    self.execution_log
+                        .push("Entering %packages block".to_string());
                 }
                 pkg if !pkg.starts_with('%') => {
                     self.package_groups.push(pkg.to_string());
@@ -159,8 +160,10 @@ impl AnacondaKickstartBlivetEngineV7 {
                 _ => {}
             }
         }
-        self.execution_log
-            .push(format!("Parsed Kickstart v7 with {} partitions", self.partitions.len()));
+        self.execution_log.push(format!(
+            "Parsed Kickstart v7 with {} partitions",
+            self.partitions.len()
+        ));
         Ok(())
     }
 
@@ -240,8 +243,12 @@ impl CalamaresModularWizardEngineV7 {
 
     /// Auto-detect system GPU hardware for driver installation
     pub fn detect_gpu_hardware(&mut self) -> Vec<String> {
-        self.detected_gpus = vec!["NVIDIA RTX 4090 (Nouveau/Nvidia-open)".to_string(), "Intel Arc A770 (i915/xe)".to_string()];
-        self.execution_log.push(format!("Detected {} GPUs", self.detected_gpus.len()));
+        self.detected_gpus = vec![
+            "NVIDIA RTX 4090 (Nouveau/Nvidia-open)".to_string(),
+            "Intel Arc A770 (i915/xe)".to_string(),
+        ];
+        self.execution_log
+            .push(format!("Detected {} GPUs", self.detected_gpus.len()));
         self.detected_gpus.clone()
     }
 
@@ -408,12 +415,17 @@ impl ArchinstallProfileEngineV7 {
         if json_str.contains("uki") {
             self.profile.enable_uki_sbat = true;
         }
-        self.execution_log.push("Loaded Archinstall JSON v5 profile spec".to_string());
+        self.execution_log
+            .push("Loaded Archinstall JSON v5 profile spec".to_string());
         Ok(())
     }
 
     /// Generate SBAT-compliant UKI (Unified Kernel Image) signed payload
-    pub fn generate_uki_sbat_payload(&mut self, kernel_path: &str, initrd_path: &str) -> Result<String, String> {
+    pub fn generate_uki_sbat_payload(
+        &mut self,
+        kernel_path: &str,
+        initrd_path: &str,
+    ) -> Result<String, String> {
         self.uki_signed_image_path = "/boot/efi/EFI/Linux/arch-sigmaos-v7.efi".to_string();
         let msg = format!(
             "Generated UKI SBAT payload from {} and {} -> {}",
@@ -608,10 +620,19 @@ impl AnsibleAgentlessEngineV7 {
     }
 
     /// Decrypt Ansible Vault secret payload (AES-256-GCM / Argon2id)
-    pub fn decrypt_vault_secret(&mut self, key: &str, encrypted_hex: &str) -> Result<String, String> {
-        let plain = format!("decrypted_val_for_{}_{}", key, &encrypted_hex[..encrypted_hex.len().min(4)]);
+    pub fn decrypt_vault_secret(
+        &mut self,
+        key: &str,
+        encrypted_hex: &str,
+    ) -> Result<String, String> {
+        let plain = format!(
+            "decrypted_val_for_{}_{}",
+            key,
+            &encrypted_hex[..encrypted_hex.len().min(4)]
+        );
         self.vault_secrets.insert(key.to_string(), plain.clone());
-        self.execution_log.push(format!("Decrypted Ansible Vault key '{}'", key));
+        self.execution_log
+            .push(format!("Decrypted Ansible Vault key '{}'", key));
         Ok(plain)
     }
 
@@ -643,15 +664,24 @@ pub struct PuppetRalCatalogCompilerEngineV7 {
 impl PuppetRalCatalogCompilerEngineV7 {
     pub fn new() -> Self {
         let mut puppet = Self::default();
-        puppet.facter_4_facts.insert("osfamily".to_string(), "SigmaOS".to_string());
-        puppet.facter_4_facts.insert("architecture".to_string(), "x86_64".to_string());
-        puppet.facter_4_facts.insert("kernel".to_string(), "Linux/BSD".to_string());
+        puppet
+            .facter_4_facts
+            .insert("osfamily".to_string(), "SigmaOS".to_string());
+        puppet
+            .facter_4_facts
+            .insert("architecture".to_string(), "x86_64".to_string());
+        puppet
+            .facter_4_facts
+            .insert("kernel".to_string(), "Linux/BSD".to_string());
         puppet
     }
 
     /// Perform Hiera v5 hierarchy lookup and sort catalog DAG
     pub fn compile_catalog(&mut self, node_certname: &str) -> Result<usize, String> {
-        self.hiera_v5_tree.insert("common::ntp_servers".to_string(), "[\"time.sigmaos.org\"]".to_string());
+        self.hiera_v5_tree.insert(
+            "common::ntp_servers".to_string(),
+            "[\"time.sigmaos.org\"]".to_string(),
+        );
         self.catalog_dag_nodes = vec![
             "Package[nginx]".to_string(),
             "File[/etc/nginx/nginx.conf]".to_string(),
@@ -686,8 +716,12 @@ impl ChefRecipeConvergenceEngineV7 {
 
     /// Converge node attributes and run-list via custom LWRP providers
     pub fn converge_and_report_metrics(&mut self) -> Result<u32, String> {
-        self.run_list = vec!["recipe[sigmaos::core]".to_string(), "recipe[sigmaos::security]".to_string()];
-        self.lwrp_providers.push("sigmaos_firewall_rule".to_string());
+        self.run_list = vec![
+            "recipe[sigmaos::core]".to_string(),
+            "recipe[sigmaos::security]".to_string(),
+        ];
+        self.lwrp_providers
+            .push("sigmaos_firewall_rule".to_string());
         self.converged_resources = 12;
         let msg = format!(
             "Chef convergence engine updated {} resources across {} recipes",
@@ -729,13 +763,17 @@ impl CloudInitMultiStageEngineV7 {
     /// Acquire IMDSv2 session token with dynamic token refresh
     pub fn acquire_imdsv2_session_token(&mut self) -> Result<String, String> {
         self.imdsv2_token = "imds-v2-token-sigmaos-v7-998877665544".to_string();
-        self.execution_log.push("Acquired IMDSv2 dynamic bearer session token".to_string());
+        self.execution_log
+            .push("Acquired IMDSv2 dynamic bearer session token".to_string());
         Ok(self.imdsv2_token.clone())
     }
 
     /// Execute cloud-boothook script
     pub fn execute_cloud_boothooks(&mut self, script: &str) -> Result<(), String> {
-        self.execution_log.push(format!("Executed cloud-boothook: {}", script.lines().next().unwrap_or("")));
+        self.execution_log.push(format!(
+            "Executed cloud-boothook: {}",
+            script.lines().next().unwrap_or("")
+        ));
         Ok(())
     }
 }
@@ -768,14 +806,16 @@ impl CoreOsIgnitionInitramfsEngineV7 {
             return Err("Empty TLS client certificate".to_string());
         }
         self.tls_attestation_verified = true;
-        self.execution_log.push("Validated TLS client cert attestation chain for Ignition".to_string());
+        self.execution_log
+            .push("Validated TLS client cert attestation chain for Ignition".to_string());
         Ok(true)
     }
 
     /// Format early-boot LUKS encrypted block devices
     pub fn format_luks_device(&mut self, dev: &str) -> Result<(), String> {
         self.luks_devices_formatted.push(dev.to_string());
-        self.execution_log.push(format!("Ignition formatted LUKS device {}", dev));
+        self.execution_log
+            .push(format!("Ignition formatted LUKS device {}", dev));
         Ok(())
     }
 }
@@ -829,12 +869,22 @@ impl SovereignInstallerAndSystemToolsMasterSuiteV7 {
     ) -> Result<String, String> {
         let _ = self.anaconda.provision_luks2_crypto_keyslots(target_disk)?;
         let _ = self.calamares.execute_next_step()?;
-        let _ = self.subiquity.stage_pxe_netboot("http://netboot.sigmaos.org/v7")?;
-        let _ = self.archinstall.generate_uki_sbat_payload("/vmlinuz", "/initrd.img")?;
+        let _ = self
+            .subiquity
+            .stage_pxe_netboot("http://netboot.sigmaos.org/v7")?;
+        let _ = self
+            .archinstall
+            .generate_uki_sbat_payload("/vmlinuz", "/initrd.img")?;
         let _ = self.bsdinstall.provision_zfs_bootenv_and_vnet("zroot")?;
-        let _ = self.dracut.attach_ebpf_and_measure_tpm2("sys_enter_mount")?;
-        let _ = self.mkinitcpio.splice_microcode_and_compress("/boot/intel-ucode.img")?;
-        let _ = self.update_initramfs.build_parallel_initramfs_matrix(&["6.11.0-sigma", "6.10.0-sigma"])?;
+        let _ = self
+            .dracut
+            .attach_ebpf_and_measure_tpm2("sys_enter_mount")?;
+        let _ = self
+            .mkinitcpio
+            .splice_microcode_and_compress("/boot/intel-ucode.img")?;
+        let _ = self
+            .update_initramfs
+            .build_parallel_initramfs_matrix(&["6.11.0-sigma", "6.10.0-sigma"])?;
         let _ = self.ansible.run_async_playbook("site.yml")?;
         let _ = self.puppet.compile_catalog(hostname)?;
         let _ = self.chef.converge_and_report_metrics()?;
@@ -1010,7 +1060,9 @@ mod tests {
         let json = "{\"audio\": \"pipewire\", \"desktop\": \"hyprland\", \"filesystem\": \"btrfs\", \"uki\": true}";
         assert!(arch.load_profile_json(json).is_ok());
         assert!(arch.profile.enable_snapper);
-        assert!(arch.generate_uki_sbat_payload("/boot/vmlinuz", "/boot/initramfs.img").is_ok());
+        assert!(arch
+            .generate_uki_sbat_payload("/boot/vmlinuz", "/boot/initramfs.img")
+            .is_ok());
 
         let mut bsd = BsdinstallAutoinstallEngineV7::new();
         assert!(bsd.provision_zfs_bootenv_and_vnet("zroot").is_ok());
@@ -1022,17 +1074,23 @@ mod tests {
         assert!(dracut.attach_ebpf_and_measure_tpm2("sys_enter").is_ok());
 
         let mut mk = MkinitcpioHookEngineV7::new();
-        assert!(mk.splice_microcode_and_compress("/boot/intel-ucode.img").is_ok());
+        assert!(mk
+            .splice_microcode_and_compress("/boot/intel-ucode.img")
+            .is_ok());
 
         let mut update = UpdateInitramfsDebianEngineV7::new();
-        let count = update.build_parallel_initramfs_matrix(&["6.11.0-sigma", "6.10.0-sigma"]).unwrap();
+        let count = update
+            .build_parallel_initramfs_matrix(&["6.11.0-sigma", "6.10.0-sigma"])
+            .unwrap();
         assert_eq!(count, 2);
     }
 
     #[test]
     fn test_ansible_puppet_chef_iac_v7() {
         let mut ans = AnsibleAgentlessEngineV7::new();
-        let secret = ans.decrypt_vault_secret("db_pass", "1234567890abcdef").unwrap();
+        let secret = ans
+            .decrypt_vault_secret("db_pass", "1234567890abcdef")
+            .unwrap();
         assert!(secret.contains("decrypted_val"));
         assert_eq!(ans.run_async_playbook("deploy.yml").unwrap(), 15);
 
@@ -1048,7 +1106,9 @@ mod tests {
         let mut ci = CloudInitMultiStageEngineV7::new();
         let token = ci.acquire_imdsv2_session_token().unwrap();
         assert!(token.contains("imds-v2"));
-        assert!(ci.execute_cloud_boothooks("#!/bin/sh\necho boothook").is_ok());
+        assert!(ci
+            .execute_cloud_boothooks("#!/bin/sh\necho boothook")
+            .is_ok());
 
         let mut ig = CoreOsIgnitionInitramfsEngineV7::new();
         assert!(ig.validate_tls_attestation_chain("CERT_DATA").is_ok());

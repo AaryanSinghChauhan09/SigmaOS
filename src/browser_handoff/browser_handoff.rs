@@ -77,7 +77,10 @@ impl Default for DefaultBrowser {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HandoffOutcome {
     /// The URL should be opened in `browser`.
-    Opened { browser: DefaultBrowser, url: String },
+    Opened {
+        browser: DefaultBrowser,
+        url: String,
+    },
     /// No browser configured; URL queued for later.
     Deferred { url: String },
     /// The URL was rejected (invalid).
@@ -353,7 +356,7 @@ mod tests {
     fn no_browser_defers_instead_of_opening_secure_default() {
         // Arrange
         let mut bh = BrowserHandoff::new(); // no browser
-        // Act
+                                            // Act
         let res = bh.handoff_url("https://example.com".to_string());
         // Assert
         assert_eq!(res, Err(HandoffError::NoDefaultBrowser));
@@ -383,7 +386,10 @@ mod tests {
             BrowserHandoff::copy_url_host("http://www.omarchy.org/"),
             Some("www.omarchy.org".to_string())
         );
-        assert_eq!(BrowserHandoff::copy_url_host("not-a-url"), Some("not-a-url".to_string()));
+        assert_eq!(
+            BrowserHandoff::copy_url_host("not-a-url"),
+            Some("not-a-url".to_string())
+        );
         assert_eq!(BrowserHandoff::copy_url_host(""), None);
     }
 
