@@ -540,6 +540,8 @@ pub mod cachy_linux_missing_components_v64_pr;
 pub use cachy_linux_missing_components_parity_pr::*;
 pub mod cachy_linux_missing_components_v65_pr;
 pub use cachy_linux_missing_components_v65_pr::*;
+pub mod cachy_linux_missing_components_v66_pr;
+pub use cachy_linux_missing_components_v66_pr::*;
 pub use cachy_linux_missing_components_pr_gateway::*;
 pub use cachy_linux_missing_components_v56_pr::*;
 pub use cachy_linux_missing_components_v58_pr::*;
