@@ -53,6 +53,12 @@ if [ -f "tests/storage/block.rs" ]; then
     rustc --test tests/filesystem_core_tests.rs --edition=2021 -o build/test_fs_core_standalone && ./build/test_fs_core_standalone
 fi
 
+if [ -f "src/storage/sovereign_storage_filesystem_innovations_v66_pr.rs" ]; then
+    echo "Running Sovereign Storage & Filesystem Innovations V66 test suite..."
+    mkdir -p build
+    rustc --test src/storage/sovereign_storage_filesystem_innovations_v66_pr.rs --edition=2021 -o build/test_storage_v66 && ./build/test_storage_v66
+fi
+
 if [ -f "./algorithm_and_components_inspection_tests" ]; then
     echo "Running core algorithm & component inspection test binary..."
     ./algorithm_and_components_inspection_tests
