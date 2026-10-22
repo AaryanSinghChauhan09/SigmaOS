@@ -64,6 +64,7 @@ pub mod database;
 pub mod desktop;
 pub mod development;
 pub mod device;
+pub use device::*;
 pub mod diagnostics;
 pub use diagnostics::*;
 pub mod distro;
