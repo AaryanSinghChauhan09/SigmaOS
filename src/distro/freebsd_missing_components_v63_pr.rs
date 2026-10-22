@@ -3,17 +3,17 @@
 // (`src/distro/freebsd_missing_components_v63_pr.rs`)
 //
 // Provides clean-room Pull Request (PR) proposal engines bridging remaining FreeBSD 14.2 / 15.0+ gaps:
-// 1. FreeBsdNfsV42PnfsFlexFilesPrEngine (NFSv4.2 pNFS Flex Files layout driver & RPCSEC_GSS Kerberos v5 delegation)
-// 2. FreeBsdCtlIscsiNvmeofTargetPrEngine (CAM Target Layer CTL iSCSI & NVMe-oF target controller)
-// 3. FreeBsdIpfwInKernelNatPptpPrEngine (ipfw in-kernel NAT with stateful PPTP/GRE/SIP ALG helper modules)
-// 4. FreeBsdBhyveNvmeDirectIoPrEngine (bhyve NVMe direct pass-through with custom IOPS rate limiting & dynamic queue depth)
-// 5. FreeBsdOpenZfsSpecialVdevTrimPrEngine (OpenZFS 2.3+ metadata special vdev allocation governor & background TRIM scheduler)
-// 6. FreeBsdCapsicumCasperGrpSystemPrEngine (Capsicum sandbox capability mode with casper cap_sysctl, cap_grp & cap_net helpers)
-// 7. FreeBsdAuditdistdCompressionPqcPrEngine (auditdistd ZSTD stream compression & Kyber1024-Dilithium5 PQC signature pipeline)
-// 8. FreeBsdNetgraphEifaceNgBpfPrEngine (Netgraph ng_eiface virtual Ethernet interface & ng_bpf packet filter graph node)
-// 9. FreeBsdRctlRacctIopsBandwidthPrEngine (rctl RACCT IOPS throttle & block I/O bandwidth capping governor)
-// 10. FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine (pkgbase base system kernel module drm-kmod GPU firmware update & rollback engine)
-// 11. FreeBsdMissingComponentsV63PrGateway (Master FreeBSD Parity PR Gateway Suite V63)
+// 1. FreeBsdBhyveNvmeVirtioGpuPrEngine (bhyve NVMe controller and virtio-gpu 3D acceleration governor)
+// 2. FreeBsdOpenZfsRaidzExpansionPrEngine (OpenZFS 2.3+ RAID-Z vdev expansion and dynamic draid rebalancing)
+// 3. FreeBsdCapsicumCasperSysctlPrEngine (Capsicum sandbox security governor with casper cap_sysctl & cap_net delegates)
+// 4. FreeBsdIpfwInKernelNatDummynetPrEngine (ipfw in-kernel NAT stateful engine & dummynet FQ-CoDel AQM shaper)
+// 5. FreeBsdNetgraphEpairVnetPrEngine (Netgraph graph-based networking epair topology and VNET jail interconnect)
+// 6. FreeBsdAuditdistdTlsPqcStreamPrEngine (auditdistd TLS 1.3 / ML-KEM post-quantum audit trail streaming)
+// 7. FreeBsdGpartZfsPartitionResizerPrEngine (gpart GPT partitioner with live ZFS pool alignment and online expansion)
+// 8. FreeBsdRctlRacctCgroupGovernorPrEngine (rctl RACCT resource control governor for process memory/CPU & swap limits)
+// 9. FreeBsdPkgBaseSystemRepositoryPrEngine (pkgbase FreeBSD base system atomic release update & repository mirror manager)
+// 10. FreeBsdDtraceLockProfilingPrEngine (DTrace kernel mutex lock profiling & latency tracing governor)
+// 11. FreeBsdMissingComponentsV63PrSuite (Master FreeBSD Parity PR Gateway Suite V63)
 
 #[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
@@ -61,565 +61,517 @@ pub struct FreeBsdPrProposalV63 {
 }
 
 // ============================================================================
-// 1. FreeBSD NFSv4.2 pNFS Flex Files & RPCSEC_GSS Kerberos v5 Delegation PR Engine
+// 1. FreeBSD bhyve NVMe Controller & Virtio-GPU 3D Governor PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NfsV42PnfsSpec {
-    pub export_path: String,
-    pub pnfs_layout_type: String, // "flexfiles"
-    pub kerberos_realm: String,
-    pub ds_servers: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdNfsV42PnfsFlexFilesPrEngine {
-    pub pnfs_exports: BTreeMap<String, NfsV42PnfsSpec>,
-}
-
-impl FreeBsdNfsV42PnfsFlexFilesPrEngine {
-    pub fn new() -> Self {
-        let mut pnfs_exports = BTreeMap::new();
-        pnfs_exports.insert(
-            "/exports/data".to_string(),
-            NfsV42PnfsSpec {
-                export_path: "/exports/data".to_string(),
-                pnfs_layout_type: "flexfiles".to_string(),
-                kerberos_realm: "EXAMPLE.COM".to_string(),
-                ds_servers: vec!["ds1.example.com".to_string(), "ds2.example.com".to_string()],
-            },
-        );
-        Self { pnfs_exports }
-    }
-
-    pub fn configure_pnfs_export(
-        &mut self,
-        path: &str,
-        layout: &str,
-        realm: &str,
-        ds_list: Vec<&str>,
-    ) -> String {
-        let spec = NfsV42PnfsSpec {
-            export_path: path.to_string(),
-            pnfs_layout_type: layout.to_string(),
-            kerberos_realm: realm.to_string(),
-            ds_servers: ds_list.iter().map(|s| s.to_string()).collect(),
-        };
-        self.pnfs_exports.insert(path.to_string(), spec);
-        format!(
-            "nfsd -u -t -n 16 --pnfs-layout={} --sec=krb5p:{}\nexports: {} -pnfs -sec=krb5p {}\n",
-            layout,
-            realm,
-            path,
-            ds_list.join(" ")
-        )
-    }
-}
-
-impl Default for FreeBsdNfsV42PnfsFlexFilesPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 2. FreeBSD CAM Target Layer CTL iSCSI & NVMe-oF Target Controller PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct CtlTargetSpec {
-    pub target_iqn_or_nqn: String,
-    pub target_type: String, // "iscsi" or "nvmeof"
-    pub portal_group: String,
-    pub lun_size_gb: u64,
-}
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdCtlIscsiNvmeofTargetPrEngine {
-    pub targets: BTreeMap<String, CtlTargetSpec>,
-}
-
-impl FreeBsdCtlIscsiNvmeofTargetPrEngine {
-    pub fn new() -> Self {
-        let mut targets = BTreeMap::new();
-        targets.insert(
-            "iqn.2026-03.org.sigmaos:target0".to_string(),
-            CtlTargetSpec {
-                target_iqn_or_nqn: "iqn.2026-03.org.sigmaos:target0".to_string(),
-                target_type: "iscsi".to_string(),
-                portal_group: "pg0".to_string(),
-                lun_size_gb: 500,
-            },
-        );
-        Self { targets }
-    }
-
-    pub fn configure_ctl_target(
-        &mut self,
-        target_id: &str,
-        t_type: &str,
-        portal: &str,
-        lun_gb: u64,
-    ) -> String {
-        let spec = CtlTargetSpec {
-            target_iqn_or_nqn: target_id.to_string(),
-            target_type: t_type.to_string(),
-            portal_group: portal.to_string(),
-            lun_size_gb: lun_gb,
-        };
-        self.targets.insert(target_id.to_string(), spec);
-        format!(
-            "ctladm target create -t {} -target {} -group {}\nctladm lun create -b zvol -s {}G -t {}\n",
-            t_type, target_id, portal, lun_gb, target_id
-        )
-    }
-}
-
-impl Default for FreeBsdCtlIscsiNvmeofTargetPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 3. FreeBSD ipfw In-Kernel NAT PPTP/GRE/SIP ALG Helpers PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct IpfwAlgSpec {
-    pub nat_id: u32,
-    pub external_iface: String,
-    pub supported_algs: Vec<String>,
-}
-
-#[derive(Debug, Clone)]
-pub struct FreeBsdIpfwInKernelNatPptpPrEngine {
-    pub nat_configs: BTreeMap<u32, IpfwAlgSpec>,
-}
-
-impl FreeBsdIpfwInKernelNatPptpPrEngine {
-    pub fn new() -> Self {
-        let mut nat_configs = BTreeMap::new();
-        nat_configs.insert(
-            1,
-            IpfwAlgSpec {
-                nat_id: 1,
-                external_iface: "em0".to_string(),
-                supported_algs: vec!["pptp".to_string(), "gre".to_string(), "sip".to_string()],
-            },
-        );
-        Self { nat_configs }
-    }
-
-    pub fn configure_nat_alg(&mut self, id: u32, iface: &str, algs: Vec<&str>) -> String {
-        let spec = IpfwAlgSpec {
-            nat_id: id,
-            external_iface: iface.to_string(),
-            supported_algs: algs.iter().map(|s| s.to_string()).collect(),
-        };
-        self.nat_configs.insert(id, spec);
-        format!(
-            "ipfw nat {} config if {} reset same_ports {}\nipfw add {} nat {} ip from any to any via {}\n",
-            id,
-            iface,
-            algs.iter().map(|a| format!("alg_{}", a)).collect::<Vec<_>>().join(" "),
-            id * 100,
-            id,
-            iface
-        )
-    }
-}
-
-impl Default for FreeBsdIpfwInKernelNatPptpPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 4. FreeBSD bhyve NVMe Direct Pass-Through & Rate Limit PR Engine
-// ============================================================================
-
-#[derive(Debug, Clone)]
-pub struct BhyveNvmeSpec {
+pub struct BhyveVirtioGpuSpec {
     pub vm_name: String,
-    pub nvme_device: String,
-    pub max_iops: u32,
-    pub queue_depth: u32,
+    pub nvme_dev_path: String,
+    pub virtio_gpu_3d: bool,
+    pub vram_mb: u32,
+    pub pci_slot: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdBhyveNvmeDirectIoPrEngine {
-    pub bhyve_nvme_devs: BTreeMap<String, BhyveNvmeSpec>,
+pub struct FreeBsdBhyveNvmeVirtioGpuPrEngine {
+    pub vm_configs: BTreeMap<String, BhyveVirtioGpuSpec>,
 }
 
-impl FreeBsdBhyveNvmeDirectIoPrEngine {
+impl FreeBsdBhyveNvmeVirtioGpuPrEngine {
     pub fn new() -> Self {
-        let mut bhyve_nvme_devs = BTreeMap::new();
-        bhyve_nvme_devs.insert(
-            "freebsd-guest".to_string(),
-            BhyveNvmeSpec {
-                vm_name: "freebsd-guest".to_string(),
-                nvme_device: "nvme0n1".to_string(),
-                max_iops: 50000,
-                queue_depth: 64,
+        let mut vm_configs = BTreeMap::new();
+        vm_configs.insert(
+            "graphics_workstation".to_string(),
+            BhyveVirtioGpuSpec {
+                vm_name: "graphics_workstation".to_string(),
+                nvme_dev_path: "/dev/nvme0n1".to_string(),
+                virtio_gpu_3d: true,
+                vram_mb: 2048,
+                pci_slot: "0:4:0".to_string(),
             },
         );
-        Self { bhyve_nvme_devs }
+        Self { vm_configs }
     }
 
-    pub fn attach_nvme_direct(&mut self, vm: &str, dev: &str, iops: u32, q_depth: u32) -> String {
-        let spec = BhyveNvmeSpec {
+    pub fn configure_bhyve_gpu(&mut self, vm: &str, nvme: &str, vram: u32) -> String {
+        let spec = BhyveVirtioGpuSpec {
             vm_name: vm.to_string(),
-            nvme_device: dev.to_string(),
-            max_iops: iops,
-            queue_depth: q_depth,
+            nvme_dev_path: nvme.to_string(),
+            virtio_gpu_3d: true,
+            vram_mb: vram,
+            pci_slot: "0:4:0".to_string(),
         };
-        self.bhyve_nvme_devs.insert(vm.to_string(), spec);
+        self.vm_configs.insert(vm.to_string(), spec);
         format!(
-            "bhyve -s 4,nvme,/dev/{}?iops={}&qdepth={} {}\n",
-            dev, iops, q_depth, vm
+            "bhyve -s 4,virtio-gpu,vram={} -s 5,nvme,{} {}\n",
+            vram, nvme, vm
         )
     }
 }
 
-impl Default for FreeBsdBhyveNvmeDirectIoPrEngine {
+impl Default for FreeBsdBhyveNvmeVirtioGpuPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 5. FreeBSD OpenZFS 2.3+ Metadata Special VDEV & TRIM PR Engine
+// 2. FreeBSD OpenZFS 2.3+ RAID-Z Vdev Expansion PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct OpenZfsSpecialVdevSpec {
+pub struct OpenZfsExpansionSpec {
     pub pool_name: String,
-    pub special_disks: Vec<String>,
-    pub special_small_blocks_kb: u32,
-    pub background_trim_rate: u32,
+    pub raidz_vdev: String,
+    pub new_disk: String,
+    pub expansion_progress_percent: u8,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdOpenZfsSpecialVdevTrimPrEngine {
-    pub special_vdev_pools: BTreeMap<String, OpenZfsSpecialVdevSpec>,
+pub struct FreeBsdOpenZfsRaidzExpansionPrEngine {
+    pub expansions: BTreeMap<String, OpenZfsExpansionSpec>,
 }
 
-impl FreeBsdOpenZfsSpecialVdevTrimPrEngine {
+impl FreeBsdOpenZfsRaidzExpansionPrEngine {
     pub fn new() -> Self {
-        let mut special_vdev_pools = BTreeMap::new();
-        special_vdev_pools.insert(
+        let mut expansions = BTreeMap::new();
+        expansions.insert(
             "zroot".to_string(),
-            OpenZfsSpecialVdevSpec {
+            OpenZfsExpansionSpec {
                 pool_name: "zroot".to_string(),
-                special_disks: vec!["nvd2p1".to_string(), "nvd3p1".to_string()],
-                special_small_blocks_kb: 64,
-                background_trim_rate: 100,
+                raidz_vdev: "raidz1-0".to_string(),
+                new_disk: "ada3".to_string(),
+                expansion_progress_percent: 100,
             },
         );
-        Self { special_vdev_pools }
+        Self { expansions }
     }
 
-    pub fn add_special_vdev_with_trim(
-        &mut self,
-        pool: &str,
-        disks: Vec<&str>,
-        small_blocks_kb: u32,
-    ) -> String {
-        let spec = OpenZfsSpecialVdevSpec {
+    pub fn expand_raidz_vdev(&mut self, pool: &str, vdev: &str, disk: &str) -> String {
+        let spec = OpenZfsExpansionSpec {
             pool_name: pool.to_string(),
-            special_disks: disks.iter().map(|s| s.to_string()).collect(),
-            special_small_blocks_kb: small_blocks_kb,
-            background_trim_rate: 200,
+            raidz_vdev: vdev.to_string(),
+            new_disk: disk.to_string(),
+            expansion_progress_percent: 0,
         };
-        self.special_vdev_pools.insert(pool.to_string(), spec);
-        format!(
-            "zpool add {} special mirror {}\nzfs set special_small_blocks={}K {}\nzpool trim {}\n",
-            pool,
-            disks.join(" "),
-            small_blocks_kb,
-            pool,
-            pool
-        )
+        self.expansions.insert(pool.to_string(), spec);
+        format!("zpool attach {} {} {}\nzpool status {}\n", pool, vdev, disk, pool)
     }
 }
 
-impl Default for FreeBsdOpenZfsSpecialVdevTrimPrEngine {
+impl Default for FreeBsdOpenZfsRaidzExpansionPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 6. FreeBSD Capsicum Casper cap_sysctl, cap_grp & cap_net Helpers PR Engine
+// 3. FreeBSD Capsicum Casper cap_sysctl & cap_net Helper PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct CasperExtendedSpec {
-    pub service_name: String,
-    pub sysctl_mib_whitelist: Vec<String>,
-    pub cap_net_ports: Vec<u16>,
+pub struct CasperSysctlSpec {
+    pub sandbox_name: String,
+    pub sysctl_mib_prefix: String,
+    pub cap_services: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdCapsicumCasperGrpSystemPrEngine {
-    pub casper_services: BTreeMap<String, CasperExtendedSpec>,
+pub struct FreeBsdCapsicumCasperSysctlPrEngine {
+    pub sysctl_helpers: BTreeMap<String, CasperSysctlSpec>,
 }
 
-impl FreeBsdCapsicumCasperGrpSystemPrEngine {
+impl FreeBsdCapsicumCasperSysctlPrEngine {
     pub fn new() -> Self {
-        let mut casper_services = BTreeMap::new();
-        casper_services.insert(
-            "casper_sysctl_net".to_string(),
-            CasperExtendedSpec {
-                service_name: "casper_sysctl_net".to_string(),
-                sysctl_mib_whitelist: vec!["kern.hostname".to_string(), "hw.ncpu".to_string()],
-                cap_net_ports: vec![80, 443],
+        let mut sysctl_helpers = BTreeMap::new();
+        sysctl_helpers.insert(
+            "cap_sysctl_net".to_string(),
+            CasperSysctlSpec {
+                sandbox_name: "cap_sysctl_net".to_string(),
+                sysctl_mib_prefix: "net.inet.tcp".to_string(),
+                cap_services: vec!["cap_sysctl".to_string(), "cap_net".to_string()],
             },
         );
-        Self { casper_services }
+        Self { sysctl_helpers }
     }
 
-    pub fn configure_casper_extended(
-        &mut self,
-        name: &str,
-        mib_list: Vec<&str>,
-        ports: Vec<u16>,
-    ) -> String {
-        let spec = CasperExtendedSpec {
-            service_name: name.to_string(),
-            sysctl_mib_whitelist: mib_list.iter().map(|s| s.to_string()).collect(),
-            cap_net_ports: ports.clone(),
+    pub fn register_sysctl_casper(&mut self, name: &str, mib: &str) -> String {
+        let spec = CasperSysctlSpec {
+            sandbox_name: name.to_string(),
+            sysctl_mib_prefix: mib.to_string(),
+            cap_services: vec!["cap_sysctl".to_string()],
         };
-        self.casper_services.insert(name.to_string(), spec);
+        self.sysctl_helpers.insert(name.to_string(), spec);
         format!(
-            "cap_service_open(chan, \"cap_sysctl\"); cap_limits_set(\"{}\"); cap_service_open(chan, \"cap_net\");\n",
-            mib_list.join(",")
+            "cap_channel = cap_init(); cap_service_open(cap_channel, \"cap_sysctl:{}\");\n",
+            mib
         )
     }
 }
 
-impl Default for FreeBsdCapsicumCasperGrpSystemPrEngine {
+impl Default for FreeBsdCapsicumCasperSysctlPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 7. FreeBSD auditdistd ZSTD Stream & Kyber1024-Dilithium5 PQC PR Engine
+// 4. FreeBSD ipfw In-Kernel NAT & Dummynet FQ-CoDel PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct AuditdistdPqcExtSpec {
-    pub host_name: String,
-    pub compression_level: u32, // ZSTD level
-    pub pqc_suite: String,      // Kyber1024-Dilithium5
+pub struct IpfwFqCodelSpec {
+    pub pipe_id: u32,
+    pub interface_name: String,
+    pub bandwidth_mbps: u32,
+    pub quantum: u32,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdAuditdistdCompressionPqcPrEngine {
-    pub audit_nodes: BTreeMap<String, AuditdistdPqcExtSpec>,
+pub struct FreeBsdIpfwInKernelNatDummynetPrEngine {
+    pub pipes: BTreeMap<u32, IpfwFqCodelSpec>,
 }
 
-impl FreeBsdAuditdistdCompressionPqcPrEngine {
+impl FreeBsdIpfwInKernelNatDummynetPrEngine {
     pub fn new() -> Self {
-        let mut audit_nodes = BTreeMap::new();
-        audit_nodes.insert(
-            "node1.sigma.os".to_string(),
-            AuditdistdPqcExtSpec {
-                host_name: "node1.sigma.os".to_string(),
-                compression_level: 3,
-                pqc_suite: "Kyber1024-Dilithium5".to_string(),
+        let mut pipes = BTreeMap::new();
+        pipes.insert(
+            1,
+            IpfwFqCodelSpec {
+                pipe_id: 1,
+                interface_name: "vtnet0".to_string(),
+                bandwidth_mbps: 1000,
+                quantum: 1514,
             },
         );
-        Self { audit_nodes }
+        Self { pipes }
     }
 
-    pub fn configure_pqc_zstd_audit(&mut self, host: &str, zstd_lvl: u32, pqc: &str) -> String {
-        let spec = AuditdistdPqcExtSpec {
-            host_name: host.to_string(),
-            compression_level: zstd_lvl,
-            pqc_suite: pqc.to_string(),
+    pub fn configure_fq_codel_pipe(&mut self, pipe: u32, iface: &str, bw: u32) -> String {
+        let spec = IpfwFqCodelSpec {
+            pipe_id: pipe,
+            interface_name: iface.to_string(),
+            bandwidth_mbps: bw,
+            quantum: 1514,
         };
-        self.audit_nodes.insert(host.to_string(), spec);
+        self.pipes.insert(pipe, spec);
         format!(
-            "auditdistd -h {} --zstd-level {} --pqc-cipher {}\n",
-            host, zstd_lvl, pqc
+            "ipfw pipe {} config bw {}Mbit type fq_codel quantum 1514\nipfw add {} pipe {} ip from any to any out xmit {}\n",
+            pipe, bw, pipe * 10, pipe, iface
         )
     }
 }
 
-impl Default for FreeBsdAuditdistdCompressionPqcPrEngine {
+impl Default for FreeBsdIpfwInKernelNatDummynetPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 8. FreeBSD Netgraph ng_eiface & ng_bpf Filter Node PR Engine
+// 5. FreeBSD Netgraph Epair VNET Jail Interconnect PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NetgraphEifaceSpec {
-    pub iface_name: String,
-    pub bpf_filter_prog: String,
-    pub attached_hook: String,
+pub struct NetgraphEpairSpec {
+    pub epair_id: u32,
+    pub jail_a: String,
+    pub jail_b: String,
+    pub bridge_name: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdNetgraphEifaceNgBpfPrEngine {
-    pub eiface_nodes: BTreeMap<String, NetgraphEifaceSpec>,
+pub struct FreeBsdNetgraphEpairVnetPrEngine {
+    pub epairs: BTreeMap<u32, NetgraphEpairSpec>,
 }
 
-impl FreeBsdNetgraphEifaceNgBpfPrEngine {
+impl FreeBsdNetgraphEpairVnetPrEngine {
     pub fn new() -> Self {
-        let mut eiface_nodes = BTreeMap::new();
-        eiface_nodes.insert(
-            "ngeb0".to_string(),
-            NetgraphEifaceSpec {
-                iface_name: "ngeb0".to_string(),
-                bpf_filter_prog: "ip and tcp port 80".to_string(),
-                attached_hook: "ether".to_string(),
+        let mut epairs = BTreeMap::new();
+        epairs.insert(
+            0,
+            NetgraphEpairSpec {
+                epair_id: 0,
+                jail_a: "jail_web".to_string(),
+                jail_b: "jail_db".to_string(),
+                bridge_name: "ng_bridge0".to_string(),
             },
         );
-        Self { eiface_nodes }
+        Self { epairs }
     }
 
-    pub fn create_eiface_bpf_node(&mut self, iface: &str, bpf_prog: &str) -> String {
-        let spec = NetgraphEifaceSpec {
-            iface_name: iface.to_string(),
-            bpf_filter_prog: bpf_prog.to_string(),
-            attached_hook: "ether".to_string(),
+    pub fn connect_jails_via_epair(&mut self, id: u32, ja: &str, jb: &str) -> String {
+        let spec = NetgraphEpairSpec {
+            epair_id: id,
+            jail_a: ja.to_string(),
+            jail_b: jb.to_string(),
+            bridge_name: format!("ng_bridge{}", id),
         };
-        self.eiface_nodes.insert(iface.to_string(), spec);
+        self.epairs.insert(id, spec);
         format!(
-            "ngctl mkpeer eiface {} ether\nngctl mkpeer {}: bpf bpf_in ether\nngctl msg {}:bpf_in setprogram {}\n",
-            iface, iface, iface, bpf_prog
+            "ifconfig epair{} create\nifconfig epair{}a vnet {}\nifconfig epair{}b vnet {}\n",
+            id, id, ja, id, jb
         )
     }
 }
 
-impl Default for FreeBsdNetgraphEifaceNgBpfPrEngine {
+impl Default for FreeBsdNetgraphEpairVnetPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 9. FreeBSD rctl RACCT IOPS & Bandwidth Throttle PR Engine
+// 6. FreeBSD auditdistd TLS 1.3 ML-KEM PQC Audit Stream PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct RctlIopsSpec {
-    pub subject: String, // e.g. "jail:db_jail"
-    pub max_read_iops: u32,
-    pub max_write_iops: u32,
-    pub max_read_bps: u64,
-    pub max_write_bps: u64,
+pub struct AuditdistdMlKemSpec {
+    pub stream_id: String,
+    pub remote_host: String,
+    pub pqc_suite: String,
+    pub hmac_integrity: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdRctlRacctIopsBandwidthPrEngine {
-    pub iops_limits: BTreeMap<String, RctlIopsSpec>,
+pub struct FreeBsdAuditdistdTlsPqcStreamPrEngine {
+    pub streams: BTreeMap<String, AuditdistdMlKemSpec>,
 }
 
-impl FreeBsdRctlRacctIopsBandwidthPrEngine {
+impl FreeBsdAuditdistdTlsPqcStreamPrEngine {
     pub fn new() -> Self {
-        let mut iops_limits = BTreeMap::new();
-        iops_limits.insert(
-            "jail:db_jail".to_string(),
-            RctlIopsSpec {
-                subject: "jail:db_jail".to_string(),
-                max_read_iops: 10000,
-                max_write_iops: 5000,
-                max_read_bps: 100 * 1024 * 1024,
-                max_write_bps: 50 * 1024 * 1024,
+        let mut streams = BTreeMap::new();
+        streams.insert(
+            "pqc_audit_0".to_string(),
+            AuditdistdMlKemSpec {
+                stream_id: "pqc_audit_0".to_string(),
+                remote_host: "audit.sec.local:7899".to_string(),
+                pqc_suite: "ML-KEM-768-Dilithium3".to_string(),
+                hmac_integrity: "HMAC-SHA384".to_string(),
             },
         );
-        Self { iops_limits }
+        Self { streams }
     }
 
-    pub fn set_iops_throttle(
-        &mut self,
-        subj: &str,
-        r_iops: u32,
-        w_iops: u32,
-        r_mbps: u64,
-        w_mbps: u64,
-    ) -> String {
-        let spec = RctlIopsSpec {
-            subject: subj.to_string(),
-            max_read_iops: r_iops,
-            max_write_iops: w_iops,
-            max_read_bps: r_mbps * 1024 * 1024,
-            max_write_bps: w_mbps * 1024 * 1024,
+    pub fn enable_pqc_audit_stream(&mut self, id: &str, host: &str, suite: &str) -> String {
+        let spec = AuditdistdMlKemSpec {
+            stream_id: id.to_string(),
+            remote_host: host.to_string(),
+            pqc_suite: suite.to_string(),
+            hmac_integrity: "HMAC-SHA384".to_string(),
         };
-        self.iops_limits.insert(subj.to_string(), spec);
+        self.streams.insert(id.to_string(), spec);
         format!(
-            "rctl -a {}:readiops:throttle:{}\nrctl -a {}:writeiops:throttle:{}\nrctl -a {}:readbps:throttle:{}M\nrctl -a {}:writebps:throttle:{}M\n",
-            subj, r_iops, subj, w_iops, subj, r_mbps, subj, w_mbps
+            "auditdistd -c /etc/security/auditdistd.conf --pqc-suite {} --host {}\n",
+            suite, host
         )
     }
 }
 
-impl Default for FreeBsdRctlRacctIopsBandwidthPrEngine {
+impl Default for FreeBsdAuditdistdTlsPqcStreamPrEngine {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 10. FreeBSD pkgbase drm-kmod GPU Firmware Upgrade & Rollback PR Engine
+// 7. FreeBSD gpart Live ZFS Partition Resizer PR Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct PkgBaseDrmGpuSpec {
-    pub gpu_driver: String, // e.g. "drm-kmod-5.15"
-    pub firmware_pkg: String,
-    pub installed_version: String,
-    pub rollback_version: String,
+pub struct GpartResizeSpec {
+    pub disk_name: String,
+    pub partition_index: u32,
+    pub pool_name: String,
+    pub new_size_bytes: u64,
 }
 
 #[derive(Debug, Clone)]
-pub struct FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine {
-    pub gpu_packages: BTreeMap<String, PkgBaseDrmGpuSpec>,
+pub struct FreeBsdGpartZfsPartitionResizerPrEngine {
+    pub resizes: BTreeMap<String, GpartResizeSpec>,
 }
 
-impl FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine {
+impl FreeBsdGpartZfsPartitionResizerPrEngine {
     pub fn new() -> Self {
-        let mut gpu_packages = BTreeMap::new();
-        gpu_packages.insert(
-            "drm-515-kmod".to_string(),
-            PkgBaseDrmGpuSpec {
-                gpu_driver: "drm-515-kmod".to_string(),
-                firmware_pkg: "gpu-firmware-kmod".to_string(),
-                installed_version: "5.15.160".to_string(),
-                rollback_version: "5.15.150".to_string(),
+        let mut resizes = BTreeMap::new();
+        resizes.insert(
+            "nvd0p3".to_string(),
+            GpartResizeSpec {
+                disk_name: "nvd0".to_string(),
+                partition_index: 3,
+                pool_name: "zroot".to_string(),
+                new_size_bytes: 500 * 1024 * 1024 * 1024,
             },
         );
-        Self { gpu_packages }
+        Self { resizes }
     }
 
-    pub fn upgrade_or_rollback_gpu(
-        &mut self,
-        driver: &str,
-        fw: &str,
-        ver: &str,
-        rollback: &str,
-    ) -> String {
-        let spec = PkgBaseDrmGpuSpec {
-            gpu_driver: driver.to_string(),
-            firmware_pkg: fw.to_string(),
-            installed_version: ver.to_string(),
-            rollback_version: rollback.to_string(),
+    pub fn resize_zfs_partition(&mut self, disk: &str, index: u32, pool: &str) -> String {
+        let key = format!("{}p{}", disk, index);
+        let spec = GpartResizeSpec {
+            disk_name: disk.to_string(),
+            partition_index: index,
+            pool_name: pool.to_string(),
+            new_size_bytes: 1000 * 1024 * 1024 * 1024,
         };
-        self.gpu_packages.insert(driver.to_string(), spec);
-        format!("pkg install -U -y {} {}\nkldload {}\n", driver, fw, driver)
+        self.resizes.insert(key, spec);
+        format!(
+            "gpart resize -i {} {}\nzpool online -e {} {}p{}\n",
+            index, disk, pool, disk, index
+        )
     }
 }
 
-impl Default for FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine {
+impl Default for FreeBsdGpartZfsPartitionResizerPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 8. FreeBSD rctl RACCT Resource Control Governor PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct RctlGovernorSpec {
+    pub subject: String,
+    pub resource: String,
+    pub limit: String,
+    pub action: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdRctlRacctCgroupGovernorPrEngine {
+    pub rules: BTreeMap<String, RctlGovernorSpec>,
+}
+
+impl FreeBsdRctlRacctCgroupGovernorPrEngine {
+    pub fn new() -> Self {
+        let mut rules = BTreeMap::new();
+        rules.insert(
+            "jail:database:pcpu".to_string(),
+            RctlGovernorSpec {
+                subject: "jail:database".to_string(),
+                resource: "pcpu".to_string(),
+                limit: "400".to_string(),
+                action: "deny".to_string(),
+            },
+        );
+        Self { rules }
+    }
+
+    pub fn set_rctl_limit(&mut self, subject: &str, resource: &str, limit: &str) -> String {
+        let key = format!("{}:{}", subject, resource);
+        let spec = RctlGovernorSpec {
+            subject: subject.to_string(),
+            resource: resource.to_string(),
+            limit: limit.to_string(),
+            action: "deny".to_string(),
+        };
+        self.rules.insert(key, spec);
+        format!("rctl -a {}:{}:deny:{}\n", subject, resource, limit)
+    }
+}
+
+impl Default for FreeBsdRctlRacctCgroupGovernorPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 9. FreeBSD pkgbase Base System Repository Upgrade PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct PkgBaseRepoSpec {
+    pub release_version: String,
+    pub repo_url: String,
+    pub signature_key: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdPkgBaseSystemRepositoryPrEngine {
+    pub repos: BTreeMap<String, PkgBaseRepoSpec>,
+}
+
+impl FreeBsdPkgBaseSystemRepositoryPrEngine {
+    pub fn new() -> Self {
+        let mut repos = BTreeMap::new();
+        repos.insert(
+            "FreeBSD-base".to_string(),
+            PkgBaseRepoSpec {
+                release_version: "14.2-RELEASE".to_string(),
+                repo_url: "pkg.freebsd.org/FreeBSD:14:amd64/latest".to_string(),
+                signature_key: "/usr/share/keys/pkg/trusted/pkg.freebsd.org.2024".to_string(),
+            },
+        );
+        Self { repos }
+    }
+
+    pub fn update_pkgbase_repo(&mut self, release: &str, url: &str) -> String {
+        let spec = PkgBaseRepoSpec {
+            release_version: release.to_string(),
+            repo_url: url.to_string(),
+            signature_key: "/usr/share/keys/pkg/trusted/pkg.freebsd.org.2024".to_string(),
+        };
+        self.repos.insert(release.to_string(), spec);
+        format!("pkg update -r FreeBSD-base\npkg upgrade -y FreeBSD-base-*\n")
+    }
+}
+
+impl Default for FreeBsdPkgBaseSystemRepositoryPrEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// 10. FreeBSD DTrace Kernel Mutex Lock Profiling PR Engine
+// ============================================================================
+
+#[derive(Debug, Clone)]
+pub struct DtraceLockProfileSpec {
+    pub lock_name: String,
+    pub min_hold_time_ns: u64,
+    pub max_stack_depth: u32,
+}
+
+#[derive(Debug, Clone)]
+pub struct FreeBsdDtraceLockProfilingPrEngine {
+    pub profiles: BTreeMap<String, DtraceLockProfileSpec>,
+}
+
+impl FreeBsdDtraceLockProfilingPrEngine {
+    pub fn new() -> Self {
+        let mut profiles = BTreeMap::new();
+        profiles.insert(
+            "vnode_mutex".to_string(),
+            DtraceLockProfileSpec {
+                lock_name: "vnode_mutex".to_string(),
+                min_hold_time_ns: 1000,
+                max_stack_depth: 20,
+            },
+        );
+        Self { profiles }
+    }
+
+    pub fn profile_lock(&mut self, lock: &str, min_hold_ns: u64) -> String {
+        let spec = DtraceLockProfileSpec {
+            lock_name: lock.to_string(),
+            min_hold_time_ns: min_hold_ns,
+            max_stack_depth: 20,
+        };
+        self.profiles.insert(lock.to_string(), spec);
+        format!(
+            "dtrace -n 'lockstat:::adaptive-block /arg1 > {}/ {{ @[stack()] = count(); }}'\n",
+            min_hold_ns
+        )
+    }
+}
+
+impl Default for FreeBsdDtraceLockProfilingPrEngine {
     fn default() -> Self {
         Self::new()
     }
@@ -629,34 +581,34 @@ impl Default for FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine {
 // 11. Master FreeBSD Missing Components V63 PR Suite
 // ============================================================================
 
-pub struct FreeBsdMissingComponentsV63PrGateway {
-    pub nfs_pnfs: FreeBsdNfsV42PnfsFlexFilesPrEngine,
-    pub ctl_target: FreeBsdCtlIscsiNvmeofTargetPrEngine,
-    pub ipfw_nat: FreeBsdIpfwInKernelNatPptpPrEngine,
-    pub bhyve_nvme: FreeBsdBhyveNvmeDirectIoPrEngine,
-    pub openzfs_special: FreeBsdOpenZfsSpecialVdevTrimPrEngine,
-    pub casper_grp: FreeBsdCapsicumCasperGrpSystemPrEngine,
-    pub audit_pqc: FreeBsdAuditdistdCompressionPqcPrEngine,
-    pub netgraph_eiface: FreeBsdNetgraphEifaceNgBpfPrEngine,
-    pub rctl_iops: FreeBsdRctlRacctIopsBandwidthPrEngine,
-    pub pkgbase_drm: FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine,
+pub struct FreeBsdMissingComponentsV63PrSuite {
+    pub bhyve_gpu: FreeBsdBhyveNvmeVirtioGpuPrEngine,
+    pub openzfs_expansion: FreeBsdOpenZfsRaidzExpansionPrEngine,
+    pub capsicum_sysctl: FreeBsdCapsicumCasperSysctlPrEngine,
+    pub ipfw_fq_codel: FreeBsdIpfwInKernelNatDummynetPrEngine,
+    pub netgraph_epair: FreeBsdNetgraphEpairVnetPrEngine,
+    pub audit_pqc: FreeBsdAuditdistdTlsPqcStreamPrEngine,
+    pub gpart_resize: FreeBsdGpartZfsPartitionResizerPrEngine,
+    pub rctl_governor: FreeBsdRctlRacctCgroupGovernorPrEngine,
+    pub pkgbase_repo: FreeBsdPkgBaseSystemRepositoryPrEngine,
+    pub dtrace_lock: FreeBsdDtraceLockProfilingPrEngine,
     pub proposals: BTreeMap<u64, FreeBsdPrProposalV63>,
     pub next_pr_id: u64,
 }
 
-impl FreeBsdMissingComponentsV63PrGateway {
+impl FreeBsdMissingComponentsV63PrSuite {
     pub fn new() -> Self {
         Self {
-            nfs_pnfs: FreeBsdNfsV42PnfsFlexFilesPrEngine::new(),
-            ctl_target: FreeBsdCtlIscsiNvmeofTargetPrEngine::new(),
-            ipfw_nat: FreeBsdIpfwInKernelNatPptpPrEngine::new(),
-            bhyve_nvme: FreeBsdBhyveNvmeDirectIoPrEngine::new(),
-            openzfs_special: FreeBsdOpenZfsSpecialVdevTrimPrEngine::new(),
-            casper_grp: FreeBsdCapsicumCasperGrpSystemPrEngine::new(),
-            audit_pqc: FreeBsdAuditdistdCompressionPqcPrEngine::new(),
-            netgraph_eiface: FreeBsdNetgraphEifaceNgBpfPrEngine::new(),
-            rctl_iops: FreeBsdRctlRacctIopsBandwidthPrEngine::new(),
-            pkgbase_drm: FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine::new(),
+            bhyve_gpu: FreeBsdBhyveNvmeVirtioGpuPrEngine::new(),
+            openzfs_expansion: FreeBsdOpenZfsRaidzExpansionPrEngine::new(),
+            capsicum_sysctl: FreeBsdCapsicumCasperSysctlPrEngine::new(),
+            ipfw_fq_codel: FreeBsdIpfwInKernelNatDummynetPrEngine::new(),
+            netgraph_epair: FreeBsdNetgraphEpairVnetPrEngine::new(),
+            audit_pqc: FreeBsdAuditdistdTlsPqcStreamPrEngine::new(),
+            gpart_resize: FreeBsdGpartZfsPartitionResizerPrEngine::new(),
+            rctl_governor: FreeBsdRctlRacctCgroupGovernorPrEngine::new(),
+            pkgbase_repo: FreeBsdPkgBaseSystemRepositoryPrEngine::new(),
+            dtrace_lock: FreeBsdDtraceLockProfilingPrEngine::new(),
             proposals: BTreeMap::new(),
             next_pr_id: 6300,
         }
@@ -697,45 +649,41 @@ impl FreeBsdMissingComponentsV63PrGateway {
     }
 
     pub fn evaluate_freebsd_v63_parity(&mut self) -> bool {
-        let pnfs_diff = self.nfs_pnfs.configure_pnfs_export(
-            "/mnt/analytics",
-            "flexfiles",
-            "SIGMA.REALM",
-            vec!["ds1.local", "ds2.local"],
-        );
+        let gpu_diff =
+            self.bhyve_gpu
+                .configure_bhyve_gpu("virt_workstation", "/dev/nvme0n1", 4096);
         let pr1 = self.submit_pr_proposal(
-            "Configure NFSv4.2 pNFS Flex Files export for /mnt/analytics",
+            "Configure bhyve virtio-gpu 3D and NVMe controller for virt_workstation",
             "jules",
-            "sys/fs/nfs",
-            "NFSv4.2 pNFS parallel layout with Kerberos v5 delegation",
-            &pnfs_diff,
+            "sys/amd64/vmm",
+            "3D accelerated virtio-gpu and NVMe controller virtualization",
+            &gpu_diff,
         );
         self.validate_and_merge_pr(pr1);
 
-        let ctl_diff = self.ctl_target.configure_ctl_target(
-            "iqn.2026-03.org.sigmaos:san01",
-            "iscsi",
-            "pg0",
-            1000,
+        let raidz_diff = self.openzfs_expansion.expand_raidz_vdev(
+            "zroot",
+            "raidz1-0",
+            "ada4",
         );
         let pr2 = self.submit_pr_proposal(
-            "Deploy CTL iSCSI target for SAN storage pool",
+            "Expand OpenZFS RAID-Z1 vdev with new member ada4",
             "jules",
-            "sys/cam/ctl",
-            "CAM Target Layer iSCSI and NVMe-oF target controller",
-            &ctl_diff,
+            "sys/contrib/openzfs",
+            "Live RAID-Z vdev expansion and block redistribution",
+            &raidz_diff,
         );
         self.validate_and_merge_pr(pr2);
 
-        let rctl_diff = self
-            .rctl_iops
-            .set_iops_throttle("jail:database", 20000, 10000, 500, 250);
+        let dtrace_diff = self
+            .dtrace_lock
+            .profile_lock("vm_object_lock", 5000);
         let pr3 = self.submit_pr_proposal(
-            "Throttle database jail to 20K IOPS and 500MB/s throughput",
+            "Trace vm_object_lock contention using DTrace lockstat provider",
             "jules",
-            "sys/kern/rctl",
-            "RACCT IOPS and throughput throttle governor for database jail",
-            &rctl_diff,
+            "sys/cddl/contrib/opensolaris",
+            "Kernel lock contention profiling governor",
+            &dtrace_diff,
         );
         self.validate_and_merge_pr(pr3);
 
@@ -745,7 +693,7 @@ impl FreeBsdMissingComponentsV63PrGateway {
     }
 }
 
-impl Default for FreeBsdMissingComponentsV63PrGateway {
+impl Default for FreeBsdMissingComponentsV63PrSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -760,66 +708,59 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_freebsd_pnfs_and_ctl() {
-        let mut pnfs = FreeBsdNfsV42PnfsFlexFilesPrEngine::new();
-        let diff1 = pnfs.configure_pnfs_export(
-            "/data",
-            "flexfiles",
-            "REALM.LOCAL",
-            vec!["ds1.realm", "ds2.realm"],
-        );
-        assert!(diff1.contains("pnfs-layout"));
-        assert!(pnfs.pnfs_exports.contains_key("/data"));
+    fn test_bhyve_gpu_and_openzfs_expansion() {
+        let mut gpu = FreeBsdBhyveNvmeVirtioGpuPrEngine::new();
+        let diff1 = gpu.configure_bhyve_gpu("test_vm", "/dev/nvme0n1", 2048);
+        assert!(diff1.contains("virtio-gpu"));
+        assert!(gpu.vm_configs.contains_key("test_vm"));
 
-        let mut ctl = FreeBsdCtlIscsiNvmeofTargetPrEngine::new();
-        let diff2 = ctl.configure_ctl_target("iqn.test", "iscsi", "pg0", 200);
-        assert!(diff2.contains("ctladm"));
-        assert!(ctl.targets.contains_key("iqn.test"));
+        let mut zfs = FreeBsdOpenZfsRaidzExpansionPrEngine::new();
+        let diff2 = zfs.expand_raidz_vdev("tank", "raidz1-0", "ada5");
+        assert!(diff2.contains("zpool attach"));
+        assert!(zfs.expansions.contains_key("tank"));
     }
 
     #[test]
-    fn test_freebsd_bhyve_nvme_and_openzfs_special() {
-        let mut bhyve = FreeBsdBhyveNvmeDirectIoPrEngine::new();
-        let diff1 = bhyve.attach_nvme_direct("vm1", "nvme0", 25000, 32);
-        assert!(diff1.contains("nvme"));
-        assert!(bhyve.bhyve_nvme_devs.contains_key("vm1"));
+    fn test_capsicum_ipfw_netgraph_audit() {
+        let mut caps = FreeBsdCapsicumCasperSysctlPrEngine::new();
+        let diff1 = caps.register_sysctl_casper("casper_kern", "kern.ipc");
+        assert!(diff1.contains("cap_service_open"));
 
-        let mut zfs = FreeBsdOpenZfsSpecialVdevTrimPrEngine::new();
-        let diff2 = zfs.add_special_vdev_with_trim("zroot", vec!["nvd1p1", "nvd2p1"], 128);
-        assert!(diff2.contains("special"));
-        assert!(zfs.special_vdev_pools.contains_key("zroot"));
+        let mut ipfw = FreeBsdIpfwInKernelNatDummynetPrEngine::new();
+        let diff2 = ipfw.configure_fq_codel_pipe(2, "vtnet1", 500);
+        assert!(diff2.contains("fq_codel"));
+
+        let mut ng = FreeBsdNetgraphEpairVnetPrEngine::new();
+        let diff3 = ng.connect_jails_via_epair(1, "j1", "j2");
+        assert!(diff3.contains("epair1a"));
+
+        let mut audit = FreeBsdAuditdistdTlsPqcStreamPrEngine::new();
+        let diff4 = audit.enable_pqc_audit_stream("s2", "auditor.internal", "ML-KEM-1024");
+        assert!(diff4.contains("ML-KEM-1024"));
     }
 
     #[test]
-    fn test_freebsd_v63_extended_engines() {
-        let mut ipfw = FreeBsdIpfwInKernelNatPptpPrEngine::new();
-        let diff1 = ipfw.configure_nat_alg(2, "em1", vec!["pptp", "sip"]);
-        assert!(diff1.contains("ipfw nat"));
+    fn test_gpart_rctl_pkgbase_dtrace() {
+        let mut gpart = FreeBsdGpartZfsPartitionResizerPrEngine::new();
+        let diff1 = gpart.resize_zfs_partition("ada0", 2, "zroot");
+        assert!(diff1.contains("gpart resize"));
 
-        let mut casper = FreeBsdCapsicumCasperGrpSystemPrEngine::new();
-        let diff2 = casper.configure_casper_extended("casper_net", vec!["hw.ncpu"], vec![80, 443]);
-        assert!(diff2.contains("cap_service_open"));
+        let mut rctl = FreeBsdRctlRacctCgroupGovernorPrEngine::new();
+        let diff2 = rctl.set_rctl_limit("jail:app", "vmemoryuse", "16G");
+        assert!(diff2.contains("rctl -a"));
 
-        let mut audit = FreeBsdAuditdistdCompressionPqcPrEngine::new();
-        let diff3 = audit.configure_pqc_zstd_audit("audit.host", 3, "Kyber1024");
-        assert!(diff3.contains("Kyber1024"));
+        let mut pkg = FreeBsdPkgBaseSystemRepositoryPrEngine::new();
+        let diff3 = pkg.update_pkgbase_repo("15.0-CURRENT", "pkg.freebsd.org/base");
+        assert!(diff3.contains("pkg update"));
 
-        let mut ng = FreeBsdNetgraphEifaceNgBpfPrEngine::new();
-        let diff4 = ng.create_eiface_bpf_node("ngeb1", "ip");
-        assert!(diff4.contains("ngctl"));
-
-        let mut rctl = FreeBsdRctlRacctIopsBandwidthPrEngine::new();
-        let diff5 = rctl.set_iops_throttle("user:1000", 1000, 500, 50, 25);
-        assert!(diff5.contains("readiops"));
-
-        let mut drm = FreeBsdPkgBaseDrmKmodGpuUpgradePrEngine::new();
-        let diff6 = drm.upgrade_or_rollback_gpu("drm-kmod", "gpu-firmware", "5.15.160", "5.15.150");
-        assert!(diff6.contains("pkg install"));
+        let mut dtrace = FreeBsdDtraceLockProfilingPrEngine::new();
+        let diff4 = dtrace.profile_lock("kernel_lock", 2000);
+        assert!(diff4.contains("lockstat"));
     }
 
     #[test]
     fn test_master_suite_v63() {
-        let mut master = FreeBsdMissingComponentsV63PrGateway::new();
+        let mut master = FreeBsdMissingComponentsV63PrSuite::new();
         assert!(master.evaluate_freebsd_v63_parity());
         assert_eq!(master.proposals.len(), 3);
     }
