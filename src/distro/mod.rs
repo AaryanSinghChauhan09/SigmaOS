@@ -823,6 +823,12 @@ pub use open_source_os_unimplemented_ideas_v64_pr::*;
 pub mod open_source_os_unimplemented_ideas_v65_pr;
 pub use open_source_os_unimplemented_ideas_v65_pr::*;
 
+pub mod open_source_os_unimplemented_ideas_v68_pr;
+pub use open_source_os_unimplemented_ideas_v68_pr::*;
+
+pub mod debian_github_repo_missing_components_v68_pr;
+pub use debian_github_repo_missing_components_v68_pr::*;
+
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
