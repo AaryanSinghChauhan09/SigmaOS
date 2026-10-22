@@ -141,6 +141,11 @@ impl SystemdAdvancementsV67Engine {
         env
     }
 
+    /// Evaluate cgroup v2 Pressure Stall Information (PSI) metrics against threshold.
+    pub fn evaluate_cgroup_psi_pressure(&self, some_avg10: f32, full_avg10: f32, threshold: f32) -> bool {
+        some_avg10 >= threshold || full_avg10 >= threshold
+    }
+
     /// Generate PR proposal manifest for systemd V67.
     pub fn generate_pr_manifest(&self) -> CoreUserlandV67Manifest {
         CoreUserlandV67Manifest {
@@ -280,6 +285,11 @@ impl RunitS6AdvancementsV67Engine {
             'r' => "RESTART_REQUESTED",
             _ => "UNKNOWN_EVENT",
         }
+    }
+
+    /// Verify s6-rc compiled database transition validity and atomic rollback target.
+    pub fn validate_s6_rc_database_transition(&self, current_db_version: u32, target_db_version: u32) -> bool {
+        target_db_version >= current_db_version || target_db_version == 0
     }
 
     /// Generate PR proposal manifest for runit & s6 V67.
@@ -471,6 +481,14 @@ impl BsdRcAdvancementsV67Engine {
             service_name,
             flags
         )
+    }
+
+    /// Parse OpenBSD `rcctl` flags string into vector of option arguments.
+    pub fn parse_rcctl_flags(&self, flags_str: &str) -> Vec<String> {
+        flags_str
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect()
     }
 
     /// Generate PR proposal manifest for BSD rc V67.
@@ -775,6 +793,9 @@ mod tests {
         let fds = engine.calculate_socket_activation_fds(3, 1001);
         assert_eq!(fds.get("LISTEN_FDS"), Some(&"3".to_string()));
         assert_eq!(fds.get("LISTEN_PID"), Some(&"1001".to_string()));
+
+        assert!(engine.evaluate_cgroup_psi_pressure(45.0, 10.0, 30.0));
+        assert!(!engine.evaluate_cgroup_psi_pressure(10.0, 5.0, 30.0));
     }
 
     #[test]
@@ -802,6 +823,10 @@ mod tests {
 
         assert_eq!(engine.parse_s6_fifo_event('u'), "SERVICE_UP");
         assert_eq!(engine.parse_s6_fifo_event('d'), "SERVICE_DOWN");
+
+        assert!(engine.validate_s6_rc_database_transition(1, 2));
+        assert!(engine.validate_s6_rc_database_transition(2, 0));
+        assert!(!engine.validate_s6_rc_database_transition(2, 1));
     }
 
     #[test]
@@ -831,6 +856,10 @@ mod tests {
         let status = engine.format_rcctl_status("sshd", true, "-u0");
         assert!(status.contains("sshd= YES"));
         assert!(status.contains("sshd_flags= -u0"));
+
+        let flags = engine.parse_rcctl_flags("-d -f /etc/ssh/sshd_config");
+        assert_eq!(flags.len(), 3);
+        assert_eq!(flags[0], "-d");
     }
 
     #[test]
