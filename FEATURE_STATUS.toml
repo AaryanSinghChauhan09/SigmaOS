@@ -1,5 +1,5 @@
 # SigmaOS Feature Inventory — Development Status (Not a Release Support Matrix)
-# Updated: 2026-10-08
+# Updated: 2026-10-22
 # Scope: Entries track implementation or module-level test evidence, not general OS readiness.
 # A passing unit test does not establish kernel/runtime integration, bootability, or hardware support.
 # Values such as "working" are legacy component statuses; use docs/PROJECT_STATUS.md and

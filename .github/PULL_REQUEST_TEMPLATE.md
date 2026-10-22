@@ -14,6 +14,15 @@
 - [ ] Process/thread management
 - [ ] VFS
 - [ ] Security
+- [ ] Thread manager
+- [ ] Scheduler
+- [ ] Process management
+- [ ] Memory management
+- [ ] VFS / filesystems
+- [ ] Drivers
+- [ ] IPC
+- [ ] Security
+- [ ] Installer / packaging
 - [ ] Documentation
 - [ ] CI / tooling
 
@@ -25,48 +34,26 @@
 
 <!-- Link issue, roadmap item, or gap-analysis entry. -->
 
-## IPC semantics
+## Implementation notes
 
-- Blocking behavior:
-- Non-blocking behavior:
-- EOF / closure behavior:
-- Error behavior:
-- Permission model:
-- Resource limits:
-- Backpressure policy:
+<!-- Design decisions, data structures, locking, error handling. -->
 
-## Security review
+## Upstream study / Reference study
 
-## Shell safety review
+<!-- Upstream study or Reference study: What SigmaOS adopts from Linux/BSD/etc. -->
 
-- [ ] User input validated
-- [ ] Descriptor lifecycle checked
-- [ ] Capability/namespace checks enforced
-- [ ] No unbounded kernel allocation
-- [ ] `unsafe` justified with SAFETY comments
-- [ ] Threat model updated
+## Safety and rollback
+
+<!-- Safety and rollback risks, memory/type safety invariants, error recovery. -->
 
 ## Tests
 
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] Concurrency/stress tests
-- [ ] Timeout tests
-- [ ] Fuzz tests
-- [ ] Resource-exhaustion tests
-- [ ] Regression test for fixed bug
-
-## Verification
-
-```bash
-cargo fmt --check
-cargo clippy --all-targets -- -D warnings
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-```
-
-Paste output below.
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Concurrency/stress tests added/updated
+- [ ] Fuzz tests added/updated
+- [ ] Boot smoke test performed, if kernel-facing
+- [ ] No regression in existing tests
 
 ## Capability status
 
@@ -76,16 +63,31 @@ Paste output below.
 
 ## Integration impact
 
-- [ ] Unit-tested only
+- [ ] No runtime integration yet
 - [ ] Connected to runtime path
 - [ ] Boot path validated
 - [ ] Installer/update path validated
 - [ ] Hardware tested
 
+## Reviewer checklist
 
-<!--
-Reference study:
-What SigmaOS adopts:
-Safety and rollback:
-Reviewer checklist:
--->
+- [ ] Scope is narrow
+- [ ] Public API documented
+- [ ] `unsafe` justified
+- [ ] Lock ordering documented
+- [ ] Error paths tested
+- [ ] Feature status updated
+- [ ] No unsupported compatibility claim
+
+## Kernel safety review
+
+- [ ] All `unsafe` blocks have `// SAFETY:` invariant comments
+- [ ] No unbounded memory allocations or recursion in kernel context
+- [ ] Lock ordering hierarchy observed to prevent deadlocks
+- [ ] Timeouts and explicit wakeups enforced for all blocking paths
+- [ ] All `unsafe` blocks have `// SAFETY:` invariant comments
+- [ ] No unbounded memory allocations or recursion in kernel context
+- [ ] Lock ordering hierarchy observed to prevent deadlocks
+- [ ] Timeouts and explicit wakeups enforced for all blocking paths
+
+Paste relevant output below.
