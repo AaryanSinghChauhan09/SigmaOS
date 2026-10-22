@@ -1,22 +1,22 @@
 //! Sovereign Desktop Environment & Window Manager Innovation Engine for SigmaOS
 //! Natively absorbs and synthesizes innovations across 17 major Linux & BSD DEs and WMs:
-//! 1. GNOME (Mutter fractional scaling, Extension sandbox, Quick Settings, Dash-to-Dock, Dynamic Workspaces, Gestures, Extension Health, Window Corner Radius & Decoration)
-//! 2. KDE Plasma (KWin split/grid tiling, KRunner DBus search & Calculator, Breeze accent colors, Plasmoids shelf, KWin scripts & Window rules, Activities, Breeze palette, LookAndFeel themes)
-//! 3. Xfce (Thunar custom actions & emblems, Xfconf channel sync, Whisker menu, Panel profiles & autohide, Bulk renamer presets, Xfwm4 vsync modes)
-//! 4. LXQt (Qt session manager & idle timeout, QTerminal drop-down integration & transparency, PCManFM-Qt spatial view & wallpaper slideshow, Autostart manager, Qt palette sync)
-//! 5. LXDE (LXPanel taskbar grouping & icon sizes, PCManFM desktop grid icons, LXAppearance GTK theme, Openbox config & edge resistance, Session lock triggers)
-//! 6. MATE (Caja extensions & thumbnail limits, Marco window shadows & button layout, Brisk menu search, Marco window snapping, Caja script generator)
-//! 7. Cinnamon (Cinnamon Spices, Nemo emblems/actions, Hot Corners grid, Applet IPC event bus, Nemo action triggers, Desklet grid snapping, Sound event themes)
-//! 8. Budgie (Raven sidebar control center & dark theme override, Budgie panel applets & autohide/transparency, Solus GTK theme sync, Raven widget marketplace, Panel presets)
-//! 9. Enlightenment / Moksha (Evas canvas smart objects & physics tuning, Moksha shelf gadgets & positioning, EFL scaling, Evas themes, Moksha modules)
-//! 10. i3 (Tree-based split containers, i3 IPC command router, i3bar status line, Scratchpad manager, IPC event stream, i3-gaps smart gaps, Criteria rules)
-//! 11. bspwm (Binary Space Partitioning tree splitting, bspc IPC router, monitor/desktop focus, Preselect direction & ratio, Tree exporter, Automatic insertion scheme, Node flags)
-//! 12. dwm (Dynamic tag layouts, dwm status bar text renderer, client tag rules, Floating rules toggle, Tag rules, Window swallow patch, Pertag layout rules)
-//! 13. Openbox (Openbox XML menu.xml parser, EWMH netwm hints, pipe menu execution, Pipe menus, Keybind actions, Desktop margins, Focus model)
-//! 14. Fluxbox (Window tab grouping, Slit / Dockapp container, Fluxbox style parser, Tab detachment, Slit dockapp reordering, Placement strategies, Keybinding chains)
-//! 15. awesome (Dynamic multi-tag client rules, Lua-inspired wibar layouts, chord box, Wibar widget matrix, Client geometry evaluator, Naughty notifications, Tag layout matrix)
-//! 16. Hyprland (Wayland BSP/Dwindle tiling, window rules v2, glassmorphism blur/shadow, Animation curves, Active submaps, Workspace rules, Input device gesture config)
-//! 17. Sway (Sway tree layout with gaps, Swaylock/Swayidle triggers, layer-shell surface placement, Output configs & transforms, Idle inhibitors, Criteria match rules)
+//! 1. GNOME (Mutter fractional scaling, Extension sandbox, Quick Settings, Dash-to-Dock, Dynamic Workspaces, Gestures, Extension Health, Window Corner Radius, Pop Shell auto-tiling, Libadwaita accent sync, Mutter async rendering)
+//! 2. KDE Plasma (KWin split/grid tiling, KRunner DBus search & Calculator, Breeze accent colors, Plasmoids shelf, KWin scripts & Window rules, Activities, VRR adaptive sync policy, Plasma Vault encryption, KRunner DBus runners)
+//! 3. Xfce (Thunar custom actions & emblems, Xfconf channel sync & property watchers, Whisker menu, Panel profiles & autohide, Bulk renamer presets, Xfwm4 vsync, Thunar MIME triggers, Dual-panel presets)
+//! 4. LXQt (Qt session manager & idle timeout, QTerminal drop-down integration & transparency, PCManFM-Qt spatial view & wallpaper slideshow, Autostart manager, Qt palette sync, GVfs/KIO remote mounts, Power policy engine)
+//! 5. LXDE (LXPanel taskbar grouping & icon sizes, PCManFM desktop grid icons, LXAppearance GTK theme, Openbox config & edge resistance, Session lock triggers, Dynamic applet loader, Pipe script engine)
+//! 6. MATE (Caja extensions & thumbnail limits, Marco window shadows & button layout, Brisk menu search, Marco window snapping & CSD toggle, Caja script generator & Python script runner)
+//! 7. Cinnamon (Cinnamon Spices sandbox & auto-updates, Nemo emblems/actions, Hot Corners grid, Applet IPC event bus, Nemo action triggers, Desklet grid snapping, Sound event themes & quadrant actions)
+//! 8. Budgie (Raven sidebar control center & dark theme override, Budgie panel applets & autohide/transparency curves, Solus GTK theme & accent color sync, Raven widget marketplace, Audio output switcher)
+//! 9. Enlightenment / Moksha (Evas canvas smart objects & physics tuning, Moksha shelf gadgets & positioning, EFL scaling, Evas themes, Moksha modules, EET/Edje compiled themes)
+//! 10. i3 (Tree-based split containers, i3 IPC command router & socket, i3bar status line, Scratchpad floating stack, IPC event stream, i3-gaps smart gaps, Criteria rules)
+//! 11. bspwm (Binary Space Partitioning tree splitting, bspc IPC router & subscriptions, monitor/desktop focus, Preselect direction & ratio, Tree exporter, Automatic insertion scheme, Node flags, Desktop layout matrix)
+//! 12. dwm (Dynamic tag layouts, dwm status bar text renderer & status FIFO, client tag rules, Floating rules toggle, Tag rules, Window swallow patch, Pertag layout rules, Master factor & count)
+//! 13. Openbox (Openbox XML menu.xml & rc.xml parser, EWMH netwm hints, pipe menu execution & output sanitizer, Keybind actions, Desktop margins, Focus model)
+//! 14. Fluxbox (Window tab grouping & attachment policy, Slit / Dockapp container, Fluxbox style parser, Tab detachment, Slit dockapp reordering, Placement strategies, Keybinding chains & keychain timeout)
+//! 15. awesome (Dynamic multi-tag client rules, Lua-inspired wibar layouts & opacity, chord box, Wibar widget matrix, Client geometry evaluator, Naughty notifications, Tag layout matrix)
+//! 16. Hyprland (Wayland BSP/Dwindle tiling & pseudotile, window rules v2, glassmorphism blur/shadow & vibrancy, Animation curves, Active submaps, Workspace rules, Input device gesture config)
+//! 17. Sway (Sway tree layout with gaps, Swaylock/Swayidle triggers, layer-shell surface placement & exclusivity, Output configs & transforms, Idle inhibitors, Criteria match rules)
 
 use std::collections::BTreeMap;
 use std::format;
@@ -40,6 +40,10 @@ pub struct GnomeInnovationEngine {
     pub window_corner_radius: u32,
     pub shadow_radius: u32,
     pub extension_auto_update_policy: String,
+    pub pop_shell_tiling_enabled: bool,
+    pub pop_shell_active_gap: u32,
+    pub libadwaita_accent_color: String,
+    pub mutter_async_rendering: bool,
 }
 
 impl GnomeInnovationEngine {
@@ -79,6 +83,10 @@ impl GnomeInnovationEngine {
             window_corner_radius: 12,
             shadow_radius: 24,
             extension_auto_update_policy: String::from("notify_and_verify"),
+            pop_shell_tiling_enabled: false,
+            pop_shell_active_gap: 6,
+            libadwaita_accent_color: String::from("#3584e4"),
+            mutter_async_rendering: true,
         }
     }
 
@@ -168,6 +176,19 @@ impl GnomeInnovationEngine {
     pub fn set_night_light_enabled(&mut self, enabled: bool) {
         self.quick_settings_state.insert(String::from("night_light"), enabled);
     }
+
+    pub fn toggle_pop_shell_tiling(&mut self, enabled: bool, gap_px: u32) {
+        self.pop_shell_tiling_enabled = enabled;
+        self.pop_shell_active_gap = gap_px;
+    }
+
+    pub fn sync_libadwaita_accent(&mut self, hex_color: &str) {
+        self.libadwaita_accent_color = hex_color.to_string();
+    }
+
+    pub fn configure_mutter_async_rendering(&mut self, enabled: bool) {
+        self.mutter_async_rendering = enabled;
+    }
 }
 
 impl Default for GnomeInnovationEngine {
@@ -205,10 +226,19 @@ pub struct KdePlasmaInnovationEngine {
     pub activities: Vec<String>,
     pub window_rules: Vec<KWinWindowRule>,
     pub look_and_feel_theme: String,
+    pub vrr_policy: String,
+    pub plasma_vault_encrypted_dirs: Vec<String>,
+    pub krunner_dbus_runners: BTreeMap<String, String>,
 }
 
 impl KdePlasmaInnovationEngine {
     pub fn new() -> Self {
+        let mut dbus_runners = BTreeMap::new();
+        dbus_runners.insert(
+            String::from("org.kde.krunner.calculator"),
+            String::from("CalculatorRunner"),
+        );
+
         Self {
             accent_color_hex: String::from("#3daee9"),
             plasmoids: vec![
@@ -226,6 +256,9 @@ impl KdePlasmaInnovationEngine {
             ],
             window_rules: Vec::new(),
             look_and_feel_theme: String::from("org.kde.breezedark.desktop"),
+            vrr_policy: String::from("automatic"),
+            plasma_vault_encrypted_dirs: Vec::new(),
+            krunner_dbus_runners: dbus_runners,
         }
     }
 
@@ -371,6 +404,30 @@ impl KdePlasmaInnovationEngine {
         }
         self.switch_activity(activity_name)
     }
+
+    pub fn set_vrr_policy(&mut self, policy: &str) -> bool {
+        let valid = ["always", "never", "automatic"];
+        if valid.contains(&policy) {
+            self.vrr_policy = policy.to_string();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn mount_plasma_vault(&mut self, vault_name: &str) -> bool {
+        if !vault_name.is_empty() && !self.plasma_vault_encrypted_dirs.contains(&vault_name.to_string()) {
+            self.plasma_vault_encrypted_dirs.push(vault_name.to_string());
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn register_krunner_dbus_runner(&mut self, runner_id: &str, dbus_service: &str) {
+        self.krunner_dbus_runners
+            .insert(runner_id.to_string(), dbus_service.to_string());
+    }
 }
 
 impl Default for KdePlasmaInnovationEngine {
@@ -399,6 +456,9 @@ pub struct XfceInnovationEngine {
     pub xfwm4_vsync_mode: String,
     pub thunar_emblem_map: BTreeMap<String, String>,
     pub panel_autohide_mode: String,
+    pub thunar_mime_triggers: BTreeMap<String, String>,
+    pub xfconf_property_watchers: Vec<String>,
+    pub dual_panel_layout_enabled: bool,
 }
 
 impl XfceInnovationEngine {
@@ -411,6 +471,9 @@ impl XfceInnovationEngine {
         let mut renamer = BTreeMap::new();
         renamer.insert(String::from("date_prefix"), String::from("YYYY-MM-DD_%f"));
         renamer.insert(String::from("lowercase"), String::from("to_lowercase"));
+
+        let mut mime_triggers = BTreeMap::new();
+        mime_triggers.insert(String::from("text/x-shellscript"), String::from("xed %f"));
 
         Self {
             custom_actions: Vec::new(),
@@ -425,6 +488,9 @@ impl XfceInnovationEngine {
             xfwm4_vsync_mode: String::from("glx"),
             thunar_emblem_map: BTreeMap::new(),
             panel_autohide_mode: String::from("intelligent"),
+            thunar_mime_triggers: mime_triggers,
+            xfconf_property_watchers: Vec::new(),
+            dual_panel_layout_enabled: false,
         }
     }
 
@@ -496,6 +562,21 @@ impl XfceInnovationEngine {
             .map(|a| a.name.clone())
             .collect()
     }
+
+    pub fn register_mime_trigger(&mut self, mime_type: &str, action_cmd: &str) {
+        self.thunar_mime_triggers
+            .insert(mime_type.to_string(), action_cmd.to_string());
+    }
+
+    pub fn watch_xfconf_channel(&mut self, channel_name: &str) {
+        if !self.xfconf_property_watchers.contains(&channel_name.to_string()) {
+            self.xfconf_property_watchers.push(channel_name.to_string());
+        }
+    }
+
+    pub fn toggle_dual_panel_layout(&mut self, enabled: bool) {
+        self.dual_panel_layout_enabled = enabled;
+    }
 }
 
 impl Default for XfceInnovationEngine {
@@ -519,6 +600,9 @@ pub struct LxqtInnovationEngine {
     pub wallpaper_slideshow_interval_sec: u32,
     pub qterminal_opacity_pct: u8,
     pub qterminal_scrollback_lines: u32,
+    pub pcmanfm_kio_gvfs_mounts: Vec<String>,
+    pub power_policy_mode: String,
+    pub session_idle_inhibitor: bool,
 }
 
 impl LxqtInnovationEngine {
@@ -538,6 +622,9 @@ impl LxqtInnovationEngine {
             wallpaper_slideshow_interval_sec: 1800,
             qterminal_opacity_pct: 90,
             qterminal_scrollback_lines: 10000,
+            pcmanfm_kio_gvfs_mounts: Vec::new(),
+            power_policy_mode: String::from("balanced"),
+            session_idle_inhibitor: false,
         }
     }
 
@@ -595,6 +682,20 @@ impl LxqtInnovationEngine {
             .map(|(k, _)| k.clone())
             .collect()
     }
+
+    pub fn register_remote_mount(&mut self, uri: &str) {
+        if !uri.is_empty() && !self.pcmanfm_kio_gvfs_mounts.contains(&uri.to_string()) {
+            self.pcmanfm_kio_gvfs_mounts.push(uri.to_string());
+        }
+    }
+
+    pub fn set_power_policy(&mut self, mode: &str) {
+        self.power_policy_mode = mode.to_string();
+    }
+
+    pub fn toggle_idle_inhibitor(&mut self, enabled: bool) {
+        self.session_idle_inhibitor = enabled;
+    }
 }
 
 impl Default for LxqtInnovationEngine {
@@ -617,6 +718,9 @@ pub struct LxdeInnovationEngine {
     pub openbox_edge_resistance_px: u32,
     pub lxpanel_taskbar_grouping: bool,
     pub lxpanel_icon_size_px: u32,
+    pub lxpanel_dynamic_applets: Vec<String>,
+    pub pcmanfm_wallpaper_slideshow: bool,
+    pub openbox_pipe_scripts: BTreeMap<String, String>,
 }
 
 impl LxdeInnovationEngine {
@@ -636,6 +740,9 @@ impl LxdeInnovationEngine {
             openbox_edge_resistance_px: 10,
             lxpanel_taskbar_grouping: true,
             lxpanel_icon_size_px: 24,
+            lxpanel_dynamic_applets: Vec::new(),
+            pcmanfm_wallpaper_slideshow: false,
+            openbox_pipe_scripts: BTreeMap::new(),
         }
     }
 
@@ -675,6 +782,21 @@ impl LxdeInnovationEngine {
     pub fn set_desktop_icon_grid(&mut self, enabled: bool) {
         self.pcmanfm_desktop_grid = enabled;
     }
+
+    pub fn load_dynamic_applet(&mut self, applet_name: &str) {
+        if !self.lxpanel_dynamic_applets.contains(&applet_name.to_string()) {
+            self.lxpanel_dynamic_applets.push(applet_name.to_string());
+        }
+    }
+
+    pub fn configure_wallpaper_slideshow(&mut self, enabled: bool) {
+        self.pcmanfm_wallpaper_slideshow = enabled;
+    }
+
+    pub fn register_pipe_script(&mut self, script_name: &str, script_body: &str) {
+        self.openbox_pipe_scripts
+            .insert(script_name.to_string(), script_body.to_string());
+    }
 }
 
 impl Default for LxdeInnovationEngine {
@@ -695,6 +817,9 @@ pub struct MateInnovationEngine {
     pub caja_scripts: BTreeMap<String, String>,
     pub marco_button_layout: String,
     pub caja_thumbnail_max_size_mb: u32,
+    pub marco_csd_toggle: bool,
+    pub caja_python_scripts: Vec<String>,
+    pub brisk_super_key_binding: String,
 }
 
 impl MateInnovationEngine {
@@ -722,6 +847,9 @@ impl MateInnovationEngine {
             caja_scripts: scripts,
             marco_button_layout: String::from("menu:minimize,maximize,close"),
             caja_thumbnail_max_size_mb: 10,
+            marco_csd_toggle: true,
+            caja_python_scripts: Vec::new(),
+            brisk_super_key_binding: String::from("Super_L"),
         }
     }
 
@@ -760,6 +888,20 @@ impl MateInnovationEngine {
             .cloned()
             .collect()
     }
+
+    pub fn toggle_marco_csd(&mut self, enabled: bool) {
+        self.marco_csd_toggle = enabled;
+    }
+
+    pub fn load_python_caja_script(&mut self, script_name: &str) {
+        if !self.caja_python_scripts.contains(&script_name.to_string()) {
+            self.caja_python_scripts.push(script_name.to_string());
+        }
+    }
+
+    pub fn set_brisk_launcher_key(&mut self, key_str: &str) {
+        self.brisk_super_key_binding = key_str.to_string();
+    }
 }
 
 impl Default for MateInnovationEngine {
@@ -788,6 +930,9 @@ pub struct CinnamonInnovationEngine {
     pub nemo_action_triggers: BTreeMap<String, String>,
     pub desklet_grid_snapping: bool,
     pub sound_event_theme: String,
+    pub sound_theme_events: BTreeMap<String, String>,
+    pub spice_auto_update: bool,
+    pub hot_corners_quadrant_actions: BTreeMap<String, String>,
 }
 
 impl CinnamonInnovationEngine {
@@ -807,6 +952,9 @@ impl CinnamonInnovationEngine {
             nemo_action_triggers: nemo_actions,
             desklet_grid_snapping: true,
             sound_event_theme: String::from("mint-sounds"),
+            sound_theme_events: BTreeMap::new(),
+            spice_auto_update: true,
+            hot_corners_quadrant_actions: BTreeMap::new(),
         }
     }
 
@@ -847,6 +995,20 @@ impl CinnamonInnovationEngine {
     pub fn trigger_hot_corner(&self, corner: &str) -> Option<String> {
         self.hot_corners.get(corner).cloned()
     }
+
+    pub fn register_sound_event(&mut self, event_id: &str, sound_file: &str) {
+        self.sound_theme_events
+            .insert(event_id.to_string(), sound_file.to_string());
+    }
+
+    pub fn set_spice_autoupdate(&mut self, enabled: bool) {
+        self.spice_auto_update = enabled;
+    }
+
+    pub fn configure_hot_corner_quadrant(&mut self, corner: &str, action: &str) {
+        self.hot_corners_quadrant_actions
+            .insert(corner.to_string(), action.to_string());
+    }
 }
 
 impl Default for CinnamonInnovationEngine {
@@ -869,6 +1031,9 @@ pub struct BudgieInnovationEngine {
     pub raven_dark_theme_override: bool,
     pub panel_autohide_enabled: bool,
     pub panel_transparency_pct: u8,
+    pub audio_output_switcher_active: bool,
+    pub panel_transparency_curve: String,
+    pub solus_gtk_theme_sync: bool,
 }
 
 impl BudgieInnovationEngine {
@@ -892,6 +1057,9 @@ impl BudgieInnovationEngine {
             raven_dark_theme_override: true,
             panel_autohide_enabled: false,
             panel_transparency_pct: 0,
+            audio_output_switcher_active: true,
+            panel_transparency_curve: String::from("linear"),
+            solus_gtk_theme_sync: true,
         }
     }
 
@@ -945,6 +1113,19 @@ impl BudgieInnovationEngine {
     pub fn get_active_raven_widgets(&self) -> Vec<String> {
         self.raven_widget_marketplace.clone()
     }
+
+    pub fn toggle_audio_output_switcher(&mut self) -> bool {
+        self.audio_output_switcher_active = !self.audio_output_switcher_active;
+        self.audio_output_switcher_active
+    }
+
+    pub fn set_transparency_curve(&mut self, curve_type: &str) {
+        self.panel_transparency_curve = curve_type.to_string();
+    }
+
+    pub fn toggle_solus_theme_sync(&mut self, sync: bool) {
+        self.solus_gtk_theme_sync = sync;
+    }
 }
 
 impl Default for BudgieInnovationEngine {
@@ -978,6 +1159,9 @@ pub struct EnlightenmentMokshaEngine {
     pub evas_anim_friction: f32,
     pub moksha_shelf_position: String,
     pub moksha_shelf_autohide: bool,
+    pub eet_theme_compiled_path: String,
+    pub evas_vector_objects_count: u32,
+    pub moksha_module_positions: BTreeMap<String, (i32, i32)>,
 }
 
 impl EnlightenmentMokshaEngine {
@@ -998,6 +1182,9 @@ impl EnlightenmentMokshaEngine {
             evas_anim_friction: 0.05,
             moksha_shelf_position: String::from("bottom"),
             moksha_shelf_autohide: false,
+            eet_theme_compiled_path: String::from("/usr/share/enlightenment/themes/darkness.edj"),
+            evas_vector_objects_count: 0,
+            moksha_module_positions: BTreeMap::new(),
         }
     }
 
@@ -1063,6 +1250,15 @@ impl EnlightenmentMokshaEngine {
             false
         }
     }
+
+    pub fn compile_eet_theme(&mut self, edj_path: &str) {
+        self.eet_theme_compiled_path = edj_path.to_string();
+    }
+
+    pub fn position_moksha_module(&mut self, mod_id: &str, x: i32, y: i32) {
+        self.moksha_module_positions
+            .insert(mod_id.to_string(), (x, y));
+    }
 }
 
 impl Default for EnlightenmentMokshaEngine {
@@ -1093,6 +1289,9 @@ pub struct I3WmInnovationEngine {
     pub ipc_event_stream: Vec<String>,
     pub smart_gaps_enabled: bool,
     pub criteria_rules: BTreeMap<String, String>,
+    pub i3_ipc_socket_path: String,
+    pub i3_bar_commands: Vec<String>,
+    pub scratchpad_floating_stack: Vec<u32>,
 }
 
 impl I3WmInnovationEngine {
@@ -1107,6 +1306,9 @@ impl I3WmInnovationEngine {
             ipc_event_stream: Vec::new(),
             smart_gaps_enabled: true,
             criteria_rules: BTreeMap::new(),
+            i3_ipc_socket_path: String::from("/tmp/i3-ipc.sock"),
+            i3_bar_commands: Vec::new(),
+            scratchpad_floating_stack: Vec::new(),
         }
     }
 
@@ -1181,6 +1383,20 @@ impl I3WmInnovationEngine {
         self.publish_ipc_event(msg);
         self.dispatch_i3_command(msg)
     }
+
+    pub fn set_ipc_socket(&mut self, socket_path: &str) {
+        self.i3_ipc_socket_path = socket_path.to_string();
+    }
+
+    pub fn add_i3bar_command(&mut self, cmd: &str) {
+        self.i3_bar_commands.push(cmd.to_string());
+    }
+
+    pub fn push_scratchpad_stack(&mut self, win_id: u32) {
+        if !self.scratchpad_floating_stack.contains(&win_id) {
+            self.scratchpad_floating_stack.push(win_id);
+        }
+    }
 }
 
 impl Default for I3WmInnovationEngine {
@@ -1209,6 +1425,8 @@ pub struct BspwmInnovationEngine {
     pub tree_state_exported: bool,
     pub automatic_scheme: String,
     pub node_flags: BTreeMap<u32, Vec<String>>,
+    pub bspc_event_subscriptions: Vec<String>,
+    pub desktop_layouts: BTreeMap<u32, String>,
 }
 
 impl BspwmInnovationEngine {
@@ -1222,6 +1440,8 @@ impl BspwmInnovationEngine {
             tree_state_exported: false,
             automatic_scheme: String::from("longest_side"),
             node_flags: BTreeMap::new(),
+            bspc_event_subscriptions: Vec::new(),
+            desktop_layouts: BTreeMap::new(),
         }
     }
 
@@ -1286,6 +1506,17 @@ impl BspwmInnovationEngine {
     pub fn get_node_flags(&self, node_id: u32) -> Vec<String> {
         self.node_flags.get(&node_id).cloned().unwrap_or_default()
     }
+
+    pub fn subscribe_bspc_events(&mut self, event_type: &str) {
+        if !self.bspc_event_subscriptions.contains(&event_type.to_string()) {
+            self.bspc_event_subscriptions.push(event_type.to_string());
+        }
+    }
+
+    pub fn set_desktop_layout(&mut self, desktop_id: u32, layout: &str) {
+        self.desktop_layouts
+            .insert(desktop_id, layout.to_string());
+    }
 }
 
 impl Default for BspwmInnovationEngine {
@@ -1317,6 +1548,8 @@ pub struct DwmInnovationEngine {
     pub swallow_patch_enabled: bool,
     pub swallowed_windows: BTreeMap<u32, u32>,
     pub tag_layouts: BTreeMap<u32, DwmLayout>,
+    pub swallow_floating_clients: bool,
+    pub status_fifo_path: String,
 }
 
 impl DwmInnovationEngine {
@@ -1336,6 +1569,8 @@ impl DwmInnovationEngine {
             swallow_patch_enabled: true,
             swallowed_windows: BTreeMap::new(),
             tag_layouts: BTreeMap::new(),
+            swallow_floating_clients: false,
+            status_fifo_path: String::from("/tmp/dwm-bar.fifo"),
         }
     }
 
@@ -1389,6 +1624,19 @@ impl DwmInnovationEngine {
     pub fn get_active_tag_mask(&self) -> u32 {
         self.selected_tags_mask
     }
+
+    pub fn adjust_master_factor(&mut self, delta: f32) {
+        self.master_factor = (self.master_factor + delta).clamp(0.05, 0.95);
+    }
+
+    pub fn inc_master_count(&mut self, delta: i32) {
+        let new_val = self.master_count as i32 + delta;
+        self.master_count = new_val.max(1) as u32;
+    }
+
+    pub fn set_status_fifo(&mut self, fifo_path: &str) {
+        self.status_fifo_path = fifo_path.to_string();
+    }
 }
 
 impl Default for DwmInnovationEngine {
@@ -1416,6 +1664,9 @@ pub struct OpenboxInnovationEngine {
     pub keybind_actions: BTreeMap<String, String>,
     pub desktop_margins: (u32, u32, u32, u32),
     pub focus_model: String,
+    pub rc_xml_path: String,
+    pub menu_xml_path: String,
+    pub pipe_menu_sanitizer_enabled: bool,
 }
 
 impl OpenboxInnovationEngine {
@@ -1449,6 +1700,9 @@ impl OpenboxInnovationEngine {
             keybind_actions: keybinds,
             desktop_margins: (0, 0, 0, 0),
             focus_model: String::from("click"),
+            rc_xml_path: String::from("~/.config/openbox/rc.xml"),
+            menu_xml_path: String::from("~/.config/openbox/menu.xml"),
+            pipe_menu_sanitizer_enabled: true,
         }
     }
 
@@ -1490,6 +1744,15 @@ impl OpenboxInnovationEngine {
     pub fn get_menu_item_count(&self) -> usize {
         self.menu_items.len()
     }
+
+    pub fn set_openbox_config_paths(&mut self, rc_path: &str, menu_path: &str) {
+        self.rc_xml_path = rc_path.to_string();
+        self.menu_xml_path = menu_path.to_string();
+    }
+
+    pub fn toggle_pipe_sanitizer(&mut self, enabled: bool) {
+        self.pipe_menu_sanitizer_enabled = enabled;
+    }
 }
 
 impl Default for OpenboxInnovationEngine {
@@ -1516,6 +1779,9 @@ pub struct FluxboxInnovationEngine {
     pub detached_tabs: Vec<u32>,
     pub window_placement_strategy: String,
     pub keychain_bindings: BTreeMap<String, Vec<String>>,
+    pub tab_attachment_policy: String,
+    pub slit_auto_hide: bool,
+    pub keychain_timeout_ms: u32,
 }
 
 impl FluxboxInnovationEngine {
@@ -1527,6 +1793,9 @@ impl FluxboxInnovationEngine {
             detached_tabs: Vec::new(),
             window_placement_strategy: String::from("RowSmartPlacement"),
             keychain_bindings: BTreeMap::new(),
+            tab_attachment_policy: String::from("automatic"),
+            slit_auto_hide: false,
+            keychain_timeout_ms: 1000,
         }
     }
 
@@ -1601,6 +1870,18 @@ impl FluxboxInnovationEngine {
     pub fn get_tab_group(&self, group_id: u32) -> Option<&FluxboxTabGroup> {
         self.tab_groups.get(&group_id)
     }
+
+    pub fn set_tab_policy(&mut self, policy: &str) {
+        self.tab_attachment_policy = policy.to_string();
+    }
+
+    pub fn toggle_slit_autohide(&mut self, enabled: bool) {
+        self.slit_auto_hide = enabled;
+    }
+
+    pub fn set_keychain_timeout(&mut self, timeout_ms: u32) {
+        self.keychain_timeout_ms = timeout_ms;
+    }
 }
 
 impl Default for FluxboxInnovationEngine {
@@ -1627,6 +1908,9 @@ pub struct AwesomeWmInnovationEngine {
     pub wibar_widgets: Vec<String>,
     pub tag_layouts: BTreeMap<u32, String>,
     pub naughty_notifications: Vec<String>,
+    pub wibar_opacity: f32,
+    pub naughty_max_visible: u32,
+    pub lua_config_version: String,
 }
 
 impl AwesomeWmInnovationEngine {
@@ -1647,6 +1931,9 @@ impl AwesomeWmInnovationEngine {
             ],
             tag_layouts: BTreeMap::new(),
             naughty_notifications: Vec::new(),
+            wibar_opacity: 0.95,
+            naughty_max_visible: 5,
+            lua_config_version: String::from("v4.3"),
         }
     }
 
@@ -1705,6 +1992,14 @@ impl AwesomeWmInnovationEngine {
     pub fn get_active_wibar_widgets(&self) -> &[String] {
         &self.wibar_widgets
     }
+
+    pub fn set_wibar_opacity(&mut self, opacity: f32) {
+        self.wibar_opacity = opacity.clamp(0.0, 1.0);
+    }
+
+    pub fn configure_naughty_limits(&mut self, max_visible: u32) {
+        self.naughty_max_visible = max_visible;
+    }
 }
 
 impl Default for AwesomeWmInnovationEngine {
@@ -1727,6 +2022,8 @@ pub struct HyprlandInnovationEngine {
     pub active_submap: String,
     pub workspace_rules: Vec<String>,
     pub input_device_configs: BTreeMap<String, String>,
+    pub dwindle_pseudotile: bool,
+    pub glassmorphism_vibrancy: f32,
 }
 
 impl HyprlandInnovationEngine {
@@ -1750,6 +2047,8 @@ impl HyprlandInnovationEngine {
             active_submap: String::from("global"),
             workspace_rules: Vec::new(),
             input_device_configs: BTreeMap::new(),
+            dwindle_pseudotile: false,
+            glassmorphism_vibrancy: 0.16,
         }
     }
 
@@ -1794,6 +2093,14 @@ impl HyprlandInnovationEngine {
     pub fn get_input_config(&self, device_id: &str) -> Option<String> {
         self.input_device_configs.get(device_id).cloned()
     }
+
+    pub fn toggle_pseudotile(&mut self, enabled: bool) {
+        self.dwindle_pseudotile = enabled;
+    }
+
+    pub fn set_glassmorphism_vibrancy(&mut self, vibrancy: f32) {
+        self.glassmorphism_vibrancy = vibrancy.clamp(0.0, 1.0);
+    }
 }
 
 impl Default for HyprlandInnovationEngine {
@@ -1816,6 +2123,8 @@ pub struct SwayWmInnovationEngine {
     pub idle_inhibitor_active: bool,
     pub sway_criteria_rules: BTreeMap<String, String>,
     pub output_transforms: BTreeMap<String, String>,
+    pub swayidle_timeout_cmd: String,
+    pub layer_shell_exclusivity: BTreeMap<String, bool>,
 }
 
 impl SwayWmInnovationEngine {
@@ -1825,6 +2134,9 @@ impl SwayWmInnovationEngine {
             String::from("eDP-1"),
             String::from("mode 1920x1080@60Hz pos 0 0 scale 1"),
         );
+
+        let mut exclusivity = BTreeMap::new();
+        exclusivity.insert(String::from("waybar"), true);
 
         Self {
             active_workspace: 1,
@@ -1836,6 +2148,8 @@ impl SwayWmInnovationEngine {
             idle_inhibitor_active: false,
             sway_criteria_rules: BTreeMap::new(),
             output_transforms: BTreeMap::new(),
+            swayidle_timeout_cmd: String::from("swaylock -f -c 000000"),
+            layer_shell_exclusivity: exclusivity,
         }
     }
 
@@ -1882,6 +2196,15 @@ impl SwayWmInnovationEngine {
 
     pub fn get_output_transform(&self, output_id: &str) -> Option<String> {
         self.output_transforms.get(output_id).cloned()
+    }
+
+    pub fn set_swayidle_command(&mut self, cmd: &str) {
+        self.swayidle_timeout_cmd = cmd.to_string();
+    }
+
+    pub fn set_layer_shell_exclusivity(&mut self, surface_id: &str, exclusive: bool) {
+        self.layer_shell_exclusivity
+            .insert(surface_id.to_string(), exclusive);
     }
 }
 
@@ -1969,6 +2292,19 @@ impl SovereignDeWmInnovationOrchestrator {
 
     pub fn total_supported_environments(&self) -> usize {
         17
+    }
+
+    pub fn sync_global_theme(&mut self, theme_name: &str, dark_mode: bool, accent_color: &str) {
+        self.gnome.sync_libadwaita_accent(accent_color);
+        self.kde.accent_color_hex = accent_color.to_string();
+        self.kde.look_and_feel_theme = theme_name.to_string();
+        self.xfce.set_xfconf_property("desktop/theme", theme_name);
+        self.lxqt.sync_qt_palette(dark_mode);
+        self.lxde.switch_lxappearance_gtk_theme(theme_name);
+        self.budgie.sync_solus_accent_color(accent_color);
+        self.budgie.set_raven_dark_theme(dark_mode);
+        self.openbox.theme_name = theme_name.to_string();
+        self.bspwm.focused_border_color = accent_color.to_string();
     }
 
     pub fn run_capability_matrix_audit(&self) -> BTreeMap<String, usize> {
@@ -2177,6 +2513,16 @@ impl DeWmInnovationPullRequestEngine {
         }
     }
 
+    pub fn merge_pr(&mut self, pr_id: u32) -> bool {
+        if let Some(sub) = self.submissions.get_mut(&pr_id) {
+            if sub.status == DeWmPrStatus::Gated && sub.ci_passed {
+                sub.status = DeWmPrStatus::Merged;
+                return true;
+            }
+        }
+        false
+    }
+
     pub fn get_prs_by_target(&self, de_target: &str) -> Vec<&DeWmPrSubmission> {
         self.submissions
             .values()
@@ -2228,6 +2574,13 @@ mod tests {
             gnome.check_extension_health("dash-to-dock@micxgx.gmail.com"),
             "Healthy"
         );
+        gnome.toggle_pop_shell_tiling(true, 8);
+        assert!(gnome.pop_shell_tiling_enabled);
+        assert_eq!(gnome.pop_shell_active_gap, 8);
+        gnome.sync_libadwaita_accent("#123456");
+        assert_eq!(gnome.libadwaita_accent_color, "#123456");
+        gnome.configure_mutter_async_rendering(false);
+        assert!(!gnome.mutter_async_rendering);
     }
 
     #[test]
@@ -2262,6 +2615,10 @@ mod tests {
         kde.switch_look_and_feel_theme("org.kde.breeze.dark");
         assert_eq!(kde.look_and_feel_theme, "org.kde.breeze.dark");
         assert_eq!(kde.krunner_calculate("10 * 5"), Some(50.0));
+        assert!(kde.set_vrr_policy("always"));
+        assert_eq!(kde.vrr_policy, "always");
+        assert!(kde.mount_plasma_vault("SecretsVault"));
+        assert_eq!(kde.plasma_vault_encrypted_dirs.len(), 1);
     }
 
     #[test]
@@ -2285,6 +2642,15 @@ mod tests {
             xfce.thunar_bulk_renamer_presets.get("number_suffix"),
             Some(&String::from("%f_%n"))
         );
+        xfce.register_mime_trigger("application/pdf", "xreader %f");
+        assert_eq!(
+            xfce.thunar_mime_triggers.get("application/pdf"),
+            Some(&String::from("xreader %f"))
+        );
+        xfce.watch_xfconf_channel("xfce4-panel");
+        assert_eq!(xfce.xfconf_property_watchers.len(), 1);
+        xfce.toggle_dual_panel_layout(true);
+        assert!(xfce.dual_panel_layout_enabled);
     }
 
     #[test]
@@ -2309,6 +2675,12 @@ mod tests {
         lxqt.configure_qterminal(85, 20000);
         assert_eq!(lxqt.qterminal_opacity_pct, 85);
         assert_eq!(lxqt.qterminal_scrollback_lines, 20000);
+        lxqt.register_remote_mount("sftp://user@remote/share");
+        assert_eq!(lxqt.pcmanfm_kio_gvfs_mounts.len(), 1);
+        lxqt.set_power_policy("performance");
+        assert_eq!(lxqt.power_policy_mode, "performance");
+        lxqt.toggle_idle_inhibitor(true);
+        assert!(lxqt.session_idle_inhibitor);
     }
 
     #[test]
@@ -2329,6 +2701,12 @@ mod tests {
         lxde.configure_lxpanel_taskbar(false, 32);
         assert!(!lxde.lxpanel_taskbar_grouping);
         assert_eq!(lxde.lxpanel_icon_size_px, 32);
+        lxde.load_dynamic_applet("cpu_temp");
+        assert_eq!(lxde.lxpanel_dynamic_applets.len(), 1);
+        lxde.configure_wallpaper_slideshow(true);
+        assert!(lxde.pcmanfm_wallpaper_slideshow);
+        lxde.register_pipe_script("sys_info", "echo '<menu><item label=\"OK\"/></menu>'");
+        assert_eq!(lxde.openbox_pipe_scripts.len(), 1);
     }
 
     #[test]
@@ -2348,6 +2726,12 @@ mod tests {
             mate.caja_scripts.get("Resize JPG"),
             Some(&String::from("mogrify -resize 50% \"$1\""))
         );
+        mate.toggle_marco_csd(false);
+        assert!(!mate.marco_csd_toggle);
+        mate.load_python_caja_script("image_converter.py");
+        assert_eq!(mate.caja_python_scripts.len(), 1);
+        mate.set_brisk_launcher_key("Super_R");
+        assert_eq!(mate.brisk_super_key_binding, "Super_R");
     }
 
     #[test]
@@ -2372,6 +2756,18 @@ mod tests {
             cinn.nemo_action_triggers.get("edit_as_root"),
             Some(&String::from("sudo xed %f"))
         );
+        cinn.register_sound_event("tile_snap", "snap.wav");
+        assert_eq!(
+            cinn.sound_theme_events.get("tile_snap"),
+            Some(&String::from("snap.wav"))
+        );
+        cinn.set_spice_autoupdate(false);
+        assert!(!cinn.spice_auto_update);
+        cinn.configure_hot_corner_quadrant("top_right", "toggle_desktop");
+        assert_eq!(
+            cinn.hot_corners_quadrant_actions.get("top_right"),
+            Some(&String::from("toggle_desktop"))
+        );
     }
 
     #[test]
@@ -2393,6 +2789,11 @@ mod tests {
         budgie.configure_budgie_panel(true, 50);
         assert!(budgie.panel_autohide_enabled);
         assert_eq!(budgie.panel_transparency_pct, 50);
+        assert!(!budgie.toggle_audio_output_switcher());
+        budgie.set_transparency_curve("quadratic");
+        assert_eq!(budgie.panel_transparency_curve, "quadratic");
+        budgie.toggle_solus_theme_sync(false);
+        assert!(!budgie.solus_gtk_theme_sync);
     }
 
     #[test]
@@ -2415,6 +2816,10 @@ mod tests {
         efl.set_shelf_position("top", true);
         assert_eq!(efl.moksha_shelf_position, "top");
         assert!(efl.moksha_shelf_autohide);
+        efl.compile_eet_theme("/tmp/theme.edj");
+        assert_eq!(efl.eet_theme_compiled_path, "/tmp/theme.edj");
+        efl.position_moksha_module("clock", 100, 200);
+        assert_eq!(efl.moksha_module_positions.get("clock"), Some(&(100, 200)));
     }
 
     #[test]
@@ -2440,6 +2845,12 @@ mod tests {
             i3.match_criteria("class=Firefox"),
             Some(String::from("move workspace 2"))
         );
+        i3.set_ipc_socket("/tmp/custom-i3.sock");
+        assert_eq!(i3.i3_ipc_socket_path, "/tmp/custom-i3.sock");
+        i3.add_i3bar_command("i3status");
+        assert_eq!(i3.i3_bar_commands.len(), 1);
+        i3.push_scratchpad_stack(202);
+        assert_eq!(i3.scratchpad_floating_stack, vec![202]);
     }
 
     #[test]
@@ -2464,6 +2875,10 @@ mod tests {
             bspwm.node_flags.get(&101),
             Some(&vec![String::from("sticky")])
         );
+        bspwm.subscribe_bspc_events("node_focus");
+        assert_eq!(bspwm.bspc_event_subscriptions, vec![String::from("node_focus")]);
+        bspwm.set_desktop_layout(1, "monocle");
+        assert_eq!(bspwm.desktop_layouts.get(&1), Some(&String::from("monocle")));
     }
 
     #[test]
@@ -2486,6 +2901,12 @@ mod tests {
         assert!(dwm.swallow_window(200, 201));
         dwm.set_tag_layout(2, DwmLayout::Grid);
         assert_eq!(dwm.tag_layouts.get(&2), Some(&DwmLayout::Grid));
+        dwm.adjust_master_factor(0.05);
+        assert!((dwm.master_factor - 0.60).abs() < 0.001);
+        dwm.inc_master_count(1);
+        assert_eq!(dwm.master_count, 2);
+        dwm.set_status_fifo("/tmp/my-dwm-fifo");
+        assert_eq!(dwm.status_fifo_path, "/tmp/my-dwm-fifo");
     }
 
     #[test]
@@ -2508,6 +2929,10 @@ mod tests {
             ob.keybind_actions.get("W-e"),
             Some(&String::from("Execute: thunar"))
         );
+        ob.set_openbox_config_paths("/etc/rc.xml", "/etc/menu.xml");
+        assert_eq!(ob.rc_xml_path, "/etc/rc.xml");
+        ob.toggle_pipe_sanitizer(false);
+        assert!(!ob.pipe_menu_sanitizer_enabled);
     }
 
     #[test]
@@ -2529,6 +2954,12 @@ mod tests {
         assert_eq!(fb.window_placement_strategy, "ColSmartPlacement");
         fb.register_keychain("Mod4 a c", &["Exec xterm", "Exec firefox"]);
         assert_eq!(fb.execute_keychain("Mod4 a c").unwrap().len(), 2);
+        fb.set_tab_policy("manual");
+        assert_eq!(fb.tab_attachment_policy, "manual");
+        fb.toggle_slit_autohide(true);
+        assert!(fb.slit_auto_hide);
+        fb.set_keychain_timeout(1500);
+        assert_eq!(fb.keychain_timeout_ms, 1500);
     }
 
     #[test]
@@ -2551,6 +2982,10 @@ mod tests {
         assert_eq!(awesome.tag_layouts.get(&1), Some(&String::from("tile")));
         awesome.show_naughty_notification("Battery Low", "15% remaining", "critical");
         assert_eq!(awesome.naughty_notifications.len(), 1);
+        awesome.set_wibar_opacity(0.8);
+        assert_eq!(awesome.wibar_opacity, 0.8);
+        awesome.configure_naughty_limits(10);
+        assert_eq!(awesome.naughty_max_visible, 10);
     }
 
     #[test]
@@ -2577,6 +3012,10 @@ mod tests {
             hypr.input_device_configs.get("touchpad"),
             Some(&String::from("tap_to_click = true"))
         );
+        hypr.toggle_pseudotile(true);
+        assert!(hypr.dwindle_pseudotile);
+        hypr.set_glassmorphism_vibrancy(0.25);
+        assert_eq!(hypr.glassmorphism_vibrancy, 0.25);
     }
 
     #[test]
@@ -2606,6 +3045,10 @@ mod tests {
             sway.output_transforms.get("eDP-1"),
             Some(&String::from("90"))
         );
+        sway.set_swayidle_command("swaylock -i wallpaper.png");
+        assert_eq!(sway.swayidle_timeout_cmd, "swaylock -i wallpaper.png");
+        sway.set_layer_shell_exclusivity("waybar", false);
+        assert_eq!(sway.layer_shell_exclusivity.get("waybar"), Some(&false));
     }
 
     #[test]
@@ -2615,6 +3058,11 @@ mod tests {
         assert!(orch.set_active_environment("KDE Plasma"));
         assert_eq!(orch.active_de_name, "KDE Plasma");
         assert!(!orch.set_active_environment("InvalidDE"));
+
+        orch.sync_global_theme("Catppuccin-Mocha", true, "#b4befe");
+        assert_eq!(orch.gnome.libadwaita_accent_color, "#b4befe");
+        assert_eq!(orch.kde.accent_color_hex, "#b4befe");
+        assert_eq!(orch.bspwm.focused_border_color, "#b4befe");
     }
 
     #[test]
@@ -2646,6 +3094,10 @@ mod tests {
         assert!(pr_engine.run_automated_ci_gate(pr_id));
         let gated_prs = pr_engine.get_prs_by_status(DeWmPrStatus::Gated);
         assert_eq!(gated_prs.len(), 1);
+
+        assert!(pr_engine.merge_pr(pr_id));
+        let merged_prs = pr_engine.get_prs_by_status(DeWmPrStatus::Merged);
+        assert_eq!(merged_prs.len(), 1);
 
         let hypr_prs = pr_engine.get_prs_by_target("Hyprland");
         assert_eq!(hypr_prs.len(), 1);
