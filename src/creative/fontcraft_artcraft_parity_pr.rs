@@ -1,4 +1,5 @@
 #![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - FontCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/fontcraft_artcraft_parity_pr.rs`)
@@ -17,13 +18,10 @@
 // 10. FontcraftMasterTypographyThemeCascadePrEngine (Global typography tokens, font family cascading, fallback font stack resolution)
 // 11. SovereignFontcraftArtcraftParityPrGateway & FontcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-extern crate alloc;
-
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
-use alloc::vec::Vec;
+use alloc::{format, vec, vec::Vec};
+use core::f64::consts::PI;
 
 
 

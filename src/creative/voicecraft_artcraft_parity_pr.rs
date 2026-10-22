@@ -1,3 +1,5 @@
+#![no_std]
+extern crate alloc;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/voicecraft_artcraft_parity_pr.rs`)
@@ -12,23 +14,18 @@
 // 5. VoicecraftSpeechToTextWordTimestampAlignerPrEngine (Forced audio-to-text alignment, word timestamp extraction, and subtitle SRT/VTT generation)
 // 6. SovereignVoicecraftArtcraftParityPrGateway & VoicecraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-#![no_std]
-extern crate alloc;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::{format, vec, vec::Vec};
+use core::f64::consts::PI;
 
-use alloc::format;
-use alloc::string::String;
-use alloc::vec;
-use alloc::vec::Vec;
 
-#[cfg(not(test))]
-use crate::creative::voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
 
-#[cfg(test)]
+
+
 #[path = "voicecraft.rs"]
 mod voicecraft;
-
-#[cfg(test)]
-use voicecraft::{Phoneme, PhonemeType, VoiceActivityDetector, SAMPLE_RATE};
+use self::voicecraft::*;
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -84,9 +81,8 @@ impl VoicecraftNeuralPitchProsodyContourPrEngine {
 
             // Estimate pitch via zero-crossing rate approximation or autocorrelation peak
             let zcr = VoiceActivityDetector::compute_zcr(frame);
-            let raw_pitch: f32 = 120.0 + zcr * 200.0;
             let estimated_pitch = if energy > 0.005 {
-                (120.0f32 + zcr * 200.0f32).clamp(60.0f32, 400.0f32)
+                (120.0 + zcr * 200.0).clamp(60.0, 400.0)
             } else {
                 0.0 // Silence
             };
