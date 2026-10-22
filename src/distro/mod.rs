@@ -797,22 +797,14 @@ pub use open_source_os_missing_components_v67_pr::*;
 pub mod open_source_os_missing_components_v68_pr;
 pub use open_source_os_missing_components_v68_pr::*;
 
-pub mod open_source_os_missing_components_v68_pr;
-pub use open_source_os_missing_components_v68_pr::*;
-
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v67_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v67_pr::*;
 
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v68_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v68_pr::*;
 
-pub mod open_source_os_missing_components_v68_pr;
-pub use open_source_os_missing_components_v68_pr::*;
-
 pub mod open_source_os_debian_unimplemented_ideas_v63_pr;
 pub use open_source_os_debian_unimplemented_ideas_v63_pr::*;
-pub mod open_source_os_debian_unimplemented_ideas_v68_pr;
-pub use open_source_os_debian_unimplemented_ideas_v68_pr::*;
 
 pub mod open_source_os_debian_unimplemented_ideas_v68_pr;
 pub use open_source_os_debian_unimplemented_ideas_v68_pr::*;
@@ -831,6 +823,9 @@ pub use open_source_os_unimplemented_ideas_v68_pr::*;
 
 pub mod debian_github_repo_missing_components_v68_pr;
 pub use debian_github_repo_missing_components_v68_pr::*;
+
+pub mod sovereign_universal_linux_bsd_subsystem_advancements_v69_pr;
+pub use sovereign_universal_linux_bsd_subsystem_advancements_v69_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
