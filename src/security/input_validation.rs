@@ -523,6 +523,7 @@ pub fn usize_to_u16(v: usize) -> Option<u16> {
 
 /// Copy `input` into `out`, replacing every non-printable / non-ASCII byte
 /// with `?`.  Returns the number of bytes written (≤ both slice lengths).
+/// Prevents terminal escape injection (CWE-150) and control character log tampering.
 pub fn sanitize_for_log(input: &[u8], out: &mut [u8]) -> usize {
     let max = out.len().min(input.len());
     for i in 0..max {
@@ -563,7 +564,8 @@ pub fn validate_command(cmd: &[u8]) -> Result<(), ValidationError> {
 // ── Network address ────────────────────────────────────────────────────────
 
 /// Validate a textual IPv4 address (digits and dots, ≤ 15 bytes).
-/// Rejects leading zeros in multi-digit octets (e.g., `010.0.0.1`) to prevent
+/// Rejects empty octets (e.g., `.1.2.3`, `1..2.3`, `1.2.3.`), missing or trailing dots,
+/// and leading zeros in multi-digit octets (e.g., `010.0.0.1`) to prevent
 /// octal parser differential and SSRF security bypass vulnerabilities.
 pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     if addr.is_empty() {
@@ -1119,6 +1121,24 @@ mod tests {
         );
         assert_eq!(
             validate_ipv4(b"001.1.1.1"),
+            Err(ValidationError::OutOfRange)
+        );
+
+        // Reject trailing dots, leading dots, and empty/consecutive dot octets
+        assert_eq!(
+            validate_ipv4(b"127.0.0.1."),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b".1.2.3.4"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168..1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"..."),
             Err(ValidationError::OutOfRange)
         );
     }
