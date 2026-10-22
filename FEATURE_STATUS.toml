@@ -253,34 +253,34 @@ next_milestone = "ARM NEON acceleration"
 [scheduler.core]
 status = "prototype"
 files = ["docs/SCHEDULER_STATUS_AND_INVARIANTS.md", "docs/SCHEDULER_DEVELOPMENT_PLAN.md", "src/scheduler/scheduler.rs", "src/kernel/scheduler.rs"]
-description = "Core run-queue operations, class dispatch interface, and task state transitions (docs/SCHEDULER_STATUS_AND_INVARIANTS.md)"
+description = "Core run-queue operations, class dispatch interface, and task state transitions (docs/SCHEDULER_STATUS_AND_INVARIANTS.md & docs/SCHEDULER_DEVELOPMENT_PLAN.md)"
 test_evidence = "Unit tests for run queues and state machine stubs"
 next_milestone = "PR 3: SchedClass interface refactor & PR 4: Task lifecycle run-queue integration"
 
 [scheduler.bore]
 status = "prototype"
-files = ["src/scheduler/bore.rs"]
+files = ["src/scheduler/bore.rs", "docs/SCHEDULER_STATUS_AND_INVARIANTS.md", "docs/SCHEDULER_DEVELOPMENT_PLAN.md"]
 description = "BORE burst-scored scheduling with interactive task boosting (docs/SCHEDULER_STATUS_AND_INVARIANTS.md)"
 test_evidence = "Unit tests for burst scoring, EMA decay, and priority"
 next_milestone = "PR 9: Integrate BORE as optional interactive heuristic for Fair class"
 
 [scheduler.cfs]
 status = "prototype"
-files = ["src/kernel/cfs_scheduler.rs", "src/scheduler/distro_schedulers.rs"]
+files = ["src/kernel/cfs_scheduler.rs", "src/scheduler/distro_schedulers.rs", "docs/SCHEDULER_STATUS_AND_INVARIANTS.md", "docs/SCHEDULER_DEVELOPMENT_PLAN.md"]
 description = "CFS with vruntime, weight table, group scheduling stubs (docs/SCHEDULER_STATUS_AND_INVARIANTS.md)"
 test_evidence = "Unit tests for vruntime and fairness"
 next_milestone = "PR 7: Implement weighted fair scheduling semantics"
 
 [scheduler.realtime]
 status = "prototype"
-files = ["src/scheduler/distro_schedulers.rs", "src/kernel/roundrobin.rs"]
+files = ["src/scheduler/distro_schedulers.rs", "src/kernel/roundrobin.rs", "docs/SCHEDULER_STATUS_AND_INVARIANTS.md", "docs/SCHEDULER_DEVELOPMENT_PLAN.md"]
 description = "SCHED_FIFO + SCHED_RR with 100 priority levels, bitmap-based O(1) pick (docs/SCHEDULER_STATUS_AND_INVARIANTS.md)"
 test_evidence = "Unit tests for FIFO order and RR rotation"
 next_milestone = "PR 10: Enforce FIFO and round-robin policy semantics & RT bandwidth throttling"
 
 [scheduler.eevdf]
 status = "prototype"
-files = ["src/scheduler/eevdf.rs", "src/kernel/sigma_scheduler_eevdf.rs"]
+files = ["src/scheduler/eevdf.rs", "src/kernel/sigma_scheduler_eevdf.rs", "docs/SCHEDULER_STATUS_AND_INVARIANTS.md", "docs/SCHEDULER_DEVELOPMENT_PLAN.md"]
 description = "EEVDF virtual deadline scheduling algorithm with lag and eligibility tracking (docs/SCHEDULER_STATUS_AND_INVARIANTS.md)"
 test_evidence = "Unit tests for eligibility, lag calculation, and deadline ordering"
 next_milestone = "PR 8: Implement EEVDF fair-class prototype & evaluation against CFS baseline"
