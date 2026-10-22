@@ -129,6 +129,11 @@ impl RemoteManager {
         &self.connections
     }
 
+    /// Get connection by ID
+    pub fn get_connection(&self, id: &str) -> Option<&RemoteConnection> {
+        self.connections.iter().find(|c| c.id == id)
+    }
+
     /// Get connected hosts
     pub fn get_connected_hosts(&self) -> Vec<&RemoteConnection> {
         self.connections.iter().filter(|c| c.state == ConnectionState::Connected).collect()

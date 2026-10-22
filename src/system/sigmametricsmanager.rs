@@ -159,6 +159,11 @@ impl MetricsManager {
         self.metrics.iter().find(|m| m.id == id)
     }
 
+    /// Get collector by ID
+    pub fn get_collector(&self, id: &str) -> Option<&MetricCollector> {
+        self.collectors.iter().find(|c| c.id == id)
+    }
+
     /// Get all collectors
     pub fn get_collectors(&self) -> &[MetricCollector] {
         &self.collectors
