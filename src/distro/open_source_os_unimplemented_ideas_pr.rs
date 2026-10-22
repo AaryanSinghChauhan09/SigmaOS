@@ -205,6 +205,36 @@ impl OpenSourceOsUnimplementedIdeasPrEngine {
                 OpenSourceOsCategory::LinuxKernel,
                 "linux_eevdf_iouring",
             ),
+            (
+                "feat(linux): BPF sched_ext dynamic policy switching & multi-page folio compaction",
+                OpenSourceOsCategory::LinuxKernel,
+                "linux_sched_ext_folio",
+            ),
+            (
+                "feat(bsd): FreeBSD 15 Capsicum Casper sandboxing & NVMe-TLS 1.3 handshake",
+                OpenSourceOsCategory::BsdEcosystem,
+                "freebsd_casper_nvme_tls",
+            ),
+            (
+                "feat(bsd): OpenBSD 8 Pinsyscall dynamic range checking & unveil permission path validator",
+                OpenSourceOsCategory::BsdEcosystem,
+                "openbsd_pinsyscall_unveil",
+            ),
+            (
+                "feat(bsd): NetBSD 11 Rump Kernel hypercall IPC router & VirtIO 9P VFS bridge",
+                OpenSourceOsCategory::BsdEcosystem,
+                "netbsd_rump_virtio_9p",
+            ),
+            (
+                "feat(bsd): DragonFly BSD 7 HAMMER3 distributed transaction log scrubbing & erasure replication",
+                OpenSourceOsCategory::BsdEcosystem,
+                "dragonfly_hammer3_scrubbing",
+            ),
+            (
+                "feat(debian): dpkg triggers deferred execution & APT Dilithium-5 PQC keyring verifier",
+                OpenSourceOsCategory::LinuxKernel,
+                "debian_dpkg_apt_pqc",
+            ),
         ];
 
         for (title, cat, target_sub) in pr_definitions {
@@ -333,7 +363,7 @@ mod tests {
     #[test]
     fn test_open_source_os_unimplemented_ideas_pr_engine() {
         let engine = OpenSourceOsUnimplementedIdeasPrEngine::new();
-        assert_eq!(engine.get_merged_pr_count(), 21);
+        assert_eq!(engine.get_merged_pr_count(), 27);
 
         let diff = engine.generate_pr_diff_patch(1001);
         assert!(diff.is_some());
