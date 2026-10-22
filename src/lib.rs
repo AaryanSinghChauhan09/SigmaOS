@@ -105,6 +105,7 @@ pub use package::{
     SovereignDistroPackageAdvancementsSuiteV41, SovereignDistroPackageAdvancementsSuiteV47,
     SovereignDistroPackageAdvancementsSuiteV50, SovereignDistroPackageAdvancementsSuiteV64,
     SovereignDistroPackageAdvancementsSuiteV66, SovereignDistroPackageAdvancementsSuiteV67,
+    SovereignDistroPackageAdvancementsSuiteV68, SovereignDistroPackagePrGatewayV68,
     SovereignUniversalPackageVerifier, UniversalDistroPackageOrchestrator,
     UniversalForeignPackageFormat, UniversalForeignPackageFormatConverter, UniversalPackageFormat,
     UniversalPackageImporter, UniversalPackageTriggerEngine, UniversalPackageTriggerType,
