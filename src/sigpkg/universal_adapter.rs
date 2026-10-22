@@ -2418,11 +2418,14 @@ impl UniversalPmCommandDispatcher {
         let mut dry_run = false;
 
         match pm.as_str() {
-            "apt" | "apt-get" | "apt-cache" | "dpkg" | "dpkg-query" | "debian" | "ubuntu" => {
+            "apt" | "apt-get" | "apt-cache" | "dpkg" | "dpkg-query" | "debian" | "ubuntu"
+            | "nala" | "aptitude" | "devuan" | "pop" | "mint" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "-i" | "download" => operation = UniversalPmOperation::Install,
+                        "install" | "-i" | "download" | "add" => {
+                            operation = UniversalPmOperation::Install
+                        }
                         "remove" | "purge" | "-r" | "-P" => {
                             operation = UniversalPmOperation::Remove
                         }
@@ -2459,11 +2462,13 @@ impl UniversalPmCommandDispatcher {
                 }
             }
             "pacman" | "yay" | "paru" | "pikaur" | "trizen" | "aura" | "arch" | "manjaro"
-            | "cachy" | "cachyos" => {
+            | "cachy" | "cachyos" | "makepkg" | "garuda" | "endeavour" | "artix" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "-S" | "-Sy" | "install" => operation = UniversalPmOperation::Install,
+                        "-S" | "-Sy" | "install" | "-U" => {
+                            operation = UniversalPmOperation::Install
+                        }
                         "-R" | "-Rns" | "-Rs" | "remove" => {
                             operation = UniversalPmOperation::Remove
                         }
@@ -2483,11 +2488,14 @@ impl UniversalPmCommandDispatcher {
                 }
             }
             "dnf" | "dnf5" | "yum" | "zypper" | "microdnf" | "rpm" | "fedora" | "rhel"
-            | "centos" | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" => {
+            | "centos" | "rocky" | "alma" | "almalinux" | "opensuse" | "suse" | "rpm-ostree"
+            | "amazon" | "mageia" | "openmandriva" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "in" | "download" => operation = UniversalPmOperation::Install,
+                        "install" | "in" | "download" | "override" | "layer" => {
+                            operation = UniversalPmOperation::Install
+                        }
                         "remove" | "erase" | "rm" => operation = UniversalPmOperation::Remove,
                         "autoremove" | "clean" => operation = UniversalPmOperation::CleanCache,
                         "update" | "upgrade" | "up" | "check-update" => {
@@ -2504,7 +2512,7 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "apk" | "alpine" => {
+            "apk" | "alpine" | "postmarketos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
@@ -2538,11 +2546,14 @@ impl UniversalPmCommandDispatcher {
                     i += 1;
                 }
             }
-            "pkg" | "pkgsend" | "freebsd" | "netbsd" | "openbsd" | "bsd" => {
+            "pkg" | "pkgsend" | "freebsd" | "netbsd" | "openbsd" | "bsd" | "ghostbsd"
+            | "poudriere" | "dragonfly" | "omnios" | "smartos" | "illumos" => {
                 let mut i = 0;
                 while i < args.len() {
                     match args[i] {
-                        "install" | "add" | "fetch" => operation = UniversalPmOperation::Install,
+                        "install" | "add" | "fetch" | "send" | "bulk" => {
+                            operation = UniversalPmOperation::Install
+                        }
                         "delete" | "remove" => operation = UniversalPmOperation::Remove,
                         "autoremove" | "clean" => operation = UniversalPmOperation::CleanCache,
                         "upgrade" => operation = UniversalPmOperation::Upgrade,
