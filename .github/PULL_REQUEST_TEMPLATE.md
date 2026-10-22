@@ -1,93 +1,133 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What I/O-management behavior changed and why? -->
 
-## Component
+## I/O component
 
-- [ ] IPC handler
-- [ ] Pipes / FIFOs
-- [ ] UNIX-domain sockets
-- [ ] Shared memory
-- [ ] Message queues
-- [ ] Event wakeups
-- [ ] Signals
-- [ ] Process/thread management
-- [ ] VFS
-- [ ] Security
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
+- [ ] I/O policy
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Interrupt manager
+- [ ] DMA manager
+- [ ] Buffer manager
+- [ ] I/O scheduler
+- [ ] Submit / complete
+- [ ] Callback
+- [ ] Interrupt
+- [ ] DMA
+- [ ] Buffer
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Kernel component
+
+- [ ] Kernel core / scheduler
+- [ ] Memory management / paging
+- [ ] Drivers / I/O subsystem
+- [ ] Architecture / boot
+
+## Shell component
+
+- [ ] Lexer / parser / AST
+- [ ] Execution engine / built-ins
+- [ ] Redirection / pipelines
+- [ ] Expansion / variables / quoting
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly I/O audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Upstream study
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- Upstream study details:
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or I/O changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
+
+## What SigmaOS adopts
+
+- Adopted abstractions and architecture patterns:
 
 ## Changes
 
 -
 
-## Motivation
+## I/O safety review
 
-<!-- Link issue, roadmap item, or gap-analysis entry. -->
-
-## Implementation notes
-
-<!-- Design decisions, data structures, locking, error handling. -->
-
-## Upstream study / Reference study
-
-<!-- Upstream study or Reference study: What SigmaOS adopts from Linux/BSD/etc. -->
-
-## Safety and rollback
-
-<!-- Safety and rollback risks, memory/type safety invariants, error recovery. -->
-
-## Tests
-
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Concurrency/stress tests added/updated
-- [ ] Fuzz tests added/updated
-- [ ] Boot smoke test performed, if kernel-facing
-- [ ] No regression in existing tests
-
-## Capability status
-
-- Previous status:
-- New status:
-- Evidence:
-
-## Integration impact
-
-- [ ] No runtime integration yet
-- [ ] Connected to runtime path
-- [ ] Boot path validated
-- [ ] Installer/update path validated
-- [ ] Hardware tested
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Public API documented
-- [ ] `unsafe` justified
-- [ ] Lock ordering documented
-- [ ] Error paths tested
-- [ ] Feature status updated
-- [ ] No unsupported compatibility claim
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Kernel safety review
 
-- [ ] All `unsafe` blocks have `// SAFETY:` invariant comments
-- [ ] No unbounded memory allocations or recursion in kernel context
-- [ ] Lock ordering hierarchy observed to prevent deadlocks
-- [ ] Timeouts and explicit wakeups enforced for all blocking paths
-- [ ] All `unsafe` blocks have `// SAFETY:` invariant comments
-- [ ] No unbounded memory allocations or recursion in kernel context
-- [ ] Lock ordering hierarchy observed to prevent deadlocks
-- [ ] Timeouts and explicit wakeups enforced for all blocking paths
+- [ ] Memory safety invariants held
+- [ ] Lock ordering verified
+- [ ] No race conditions
 
-Paste relevant output below.
+## Shell safety review
+
+- [ ] Deterministic evaluation
+- [ ] Quoting and redirection safe
+- [ ] Resource limits respected
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] I/O benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] I/O documentation
+- [ ] Boot matrix, if applicable
+
+## Safety and rollback
+
+- Risk:
+- Safety precautions:
+- Rollback:
+
+## Risks and rollback
+
+- Risk:
+- Rollback:
+
+## Reviewer checklist
+
+- [ ] Code review completed
+- [ ] Safety invariants verified

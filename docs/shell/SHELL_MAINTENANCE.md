@@ -1,3 +1,2 @@
-# SigmaOS Shell Maintenance Guidelines
-
-This document specifies maintenance routines, regression prevention rules, and CI verification procedures for the SigmaOS command interpreter and shell.
+# SigmaOS Shell Maintenance Specification
+This document defines maintenance guidelines and lifecycle rules for the SigmaOS Shell Engine.

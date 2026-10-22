@@ -1,3 +1,2 @@
 # SigmaOS Shell Grammar Specification
-
-Formal lexer and EBNF parser grammar definitions for the SigmaOS command interpreter.
+Formal grammar and AST token definitions.
