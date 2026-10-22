@@ -59,6 +59,7 @@ pub mod voicecraft;
 pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
 pub mod wordcraft;
+pub mod wordcraft_artcraft_missing_components_v65_pr;
 pub mod wordcraft_artcraft_parity_pr;
 pub mod wordcraft_missing_components_parity_pr;
 
@@ -151,6 +152,9 @@ pub use vectorcraft::{
     get_vectorcraft, init_vectorcraft, BooleanOperation, FillRule, Path, PathPoint, PenToolMode,
     Shape, ShapeProperties, VectorEditor, VectorLayer,
 };
+pub use wordcraft_artcraft_missing_components_v65_pr::*;
+pub use wordcraft_artcraft_parity_pr::*;
+pub use wordcraft_missing_components_parity_pr::*;
 pub use wordcraft::{
     fnv1a_wordcraft_pr_digest, get_wordcraft, init_wordcraft, Alignment as WordCraftAlignment,
     ChangeType as WordCraftChangeType, Comment as WordCraftComment, Document as WordCraftDocument,
