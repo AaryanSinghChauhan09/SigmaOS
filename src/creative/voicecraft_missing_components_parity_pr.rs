@@ -1,5 +1,7 @@
 #![no_std]
 extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft & ArtCraft Missing Components Parity PR Gateway Module
 // (`src/creative/voicecraft_missing_components_parity_pr.rs`)
@@ -15,7 +17,7 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::{format, vec, vec::Vec};
+use alloc::vec::Vec;
 use core::f32::consts::PI;
 
 
@@ -23,8 +25,8 @@ use core::f32::consts::PI;
 
 
 #[path = "voicecraft.rs"]
-mod voicecraft;
-use self::voicecraft::*;
+pub mod voicecraft;
+use crate::voicecraft::*;
 
 /// Structured PR proposal manifest for missing VoiceCraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]

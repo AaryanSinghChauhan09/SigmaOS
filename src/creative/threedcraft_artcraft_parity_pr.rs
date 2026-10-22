@@ -1,5 +1,7 @@
 #![no_std]
 extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft to ArtCraft Parity & 3D Spatial Innovations PR Proposal Engine
 // (`src/creative/threedcraft_artcraft_parity_pr.rs`)
@@ -15,8 +17,12 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::{format, vec, vec::Vec};
-use core::f64::consts::PI;
+use alloc::vec::Vec;
+use core::f32::consts::PI;
+
+
+
+
 
 /// Structured PR proposal manifest for 3DCraft / ArtCraft 3D spatial & rendering features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -113,7 +119,7 @@ impl ThreeDCraftSubsurfaceScatteringPrEngine {
 
             radiance[i] = ((real_source * z_r * (1.0 + sigma_tr * d_r)
                 - virt_source * z_v * (1.0 + sigma_tr * d_v))
-                * (1.0 / (4.0 * (PI as f32))))
+                * (1.0 / (4.0 * PI)))
                 .max(0.0);
         }
 
@@ -296,7 +302,7 @@ impl ThreeDCraftAutomaticUvUnwrappingPrEngine {
 
         // LSCM conformal angle-preserving mapping approximation
         for i in 0..vertex_count {
-            let angle = (i as f32 / vertex_count as f32) * 2.0 * (PI as f32);
+            let angle = (i as f32 / vertex_count as f32) * 2.0 * PI;
             let radius = 0.45 + (i % 3) as f32 * 0.02;
             let u = (0.5 + radius * angle.cos()).clamp(0.0, 1.0);
             let v = (0.5 + radius * angle.sin()).clamp(0.0, 1.0);

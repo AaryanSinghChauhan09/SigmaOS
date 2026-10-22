@@ -1,4 +1,7 @@
 #![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Designcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/designcraft_artcraft_parity_pr.rs`)
@@ -17,14 +20,17 @@
 // 10. DesigncraftWcagAccessibilityAuditPrEngine (WCAG 2.1 AA/AAA accessibility contrast & touch target auditor)
 // 11. SovereignDesigncraftArtcraftParityPrGateway & DesigncraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-extern crate alloc;
-
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
-use core::sync::atomic::{AtomicU32, Ordering};
+use core::sync::atomic::{AtomicU32, AtomicBool, Ordering};
+use core::f64::consts::PI;
+
+
+
+
+
+
 
 /// Structured PR proposal manifest descriptor for Designcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -807,6 +813,16 @@ pub struct RgbColor {
 
 impl RgbColor {
     pub fn relative_luminance(&self) -> f32 {
+        #[cfg(feature = "std")]
+        let channel_lum = |c: u8| -> f32 {
+            let s = c as f32 / 255.0;
+            if s <= 0.03928 {
+                s / 12.92
+            } else {
+                ((s + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        #[cfg(not(feature = "std"))]
         let channel_lum = |c: u8| -> f32 {
             let s = c as f32 / 255.0;
             if s <= 0.03928 {

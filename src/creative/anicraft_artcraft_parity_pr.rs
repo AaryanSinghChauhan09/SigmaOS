@@ -1,18 +1,16 @@
-// SPDX-License-Identifier: MIT
-// SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
-// (`src/creative/anicraft_artcraft_parity_pr.rs`)
-
 #![no_std]
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use alloc::vec;
 use core::f64::consts::PI;
 
+// SPDX-License-Identifier: MIT
+// SigmaOS - AniCraft to ArtCraft Parity PR Proposal Engine
+// (`src/creative/anicraft_artcraft_parity_pr.rs`)
 //
 // Bridges AniCraft (Sovereign 2D/3D Animation Timeline, Keyframing & Skeletal Rigging Engine)
 // and ArtCraft AniCraft missing feature parity via structured PR proposals.
@@ -28,6 +26,11 @@ use core::f64::consts::PI;
 // 9. AnicraftMotionCaptureBvhImporterPrEngine (BVH skeletal motion capture import & retargeting)
 // 10. AnicraftSpriteSheetAtlasExporterPrEngine (Sprite sheet atlas generation & game engine export)
 // 11. SovereignAnicraftArtcraftParityPrGateway & AnicraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
+
+
+
+
+
 
 /// Structured PR proposal manifest for AniCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -107,16 +110,16 @@ impl AnicraftBezierEasingCurveOptimizationPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 860,
-            pr_title: String::from("feat(anicraft): Implement Cubic Bézier Pre-computed LUT Easing & Motion Path Curve Engine"),
-            target_subsystem: String::from("AniCraft Motion Curves & Easing Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Cubic Bezier Motion"),
+            pr_title: "feat(anicraft): Implement Cubic Bézier Pre-computed LUT Easing & Motion Path Curve Engine".to_string(),
+            target_subsystem: "AniCraft Motion Curves & Easing Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Cubic Bezier Motion".to_string(),
             components_added: vec![
-                String::from("Sub-nanosecond 256-entry pre-computed LUT curve lookups"),
-                String::from("Ease-in, ease-out, ease-in-out, bounce, and custom handle interpolation"),
-                String::from("Parametric motion path velocity & acceleration profile solver"),
+                "Sub-nanosecond 256-entry pre-computed LUT curve lookups".to_string(),
+                "Ease-in, ease-out, ease-in-out, bounce, and custom handle interpolation".to_string(),
+                "Parametric motion path velocity & acceleration profile solver".to_string(),
             ],
-            performance_multiplier: String::from("10,000,000 Eased Keyframe Samples / sec (<0.05ms)"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "10,000,000 Eased Keyframe Samples / sec (<0.05ms)".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -200,16 +203,16 @@ impl AnicraftForwardInverseKinematicsBoneRiggingPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 861,
-            pr_title: String::from("feat(anicraft): Implement Forward/Inverse Kinematics (FK/IK) Skeletal Bone Rigging Engine"),
-            target_subsystem: String::from("AniCraft Skeletal Rigging Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Kinematic Skeleton"),
+            pr_title: "feat(anicraft): Implement Forward/Inverse Kinematics (FK/IK) Skeletal Bone Rigging Engine".to_string(),
+            target_subsystem: "AniCraft Skeletal Rigging Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Kinematic Skeleton".to_string(),
             components_added: vec![
-                String::from("Forward Kinematics (FK) rotational parent-child angle inheritance"),
-                String::from("Inverse Kinematics (IK) rotational joint constraint angle clamping"),
-                String::from("Multi-bone skeletal chain pose solver & hierarchical transform graph"),
+                "Forward Kinematics (FK) rotational parent-child angle inheritance".to_string(),
+                "Inverse Kinematics (IK) rotational joint constraint angle clamping".to_string(),
+                "Multi-bone skeletal chain pose solver & hierarchical transform graph".to_string(),
             ],
-            performance_multiplier: String::from("500+ Bone Rig Pose Solves / frame (<0.1ms)"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "500+ Bone Rig Pose Solves / frame (<0.1ms)".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -244,13 +247,13 @@ impl AnicraftNlaTrackClipBlendingCompositePrEngine {
         let layers = vec![
             NlaTrackLayer {
                 layer_id: 1,
-                name: String::from("Base Walk"),
+                name: "Base Walk".to_string(),
                 weight: 1.0,
                 is_active: true,
             },
             NlaTrackLayer {
                 layer_id: 2,
-                name: String::from("Upper Body Wave"),
+                name: "Upper Body Wave".to_string(),
                 weight: 0.6,
                 is_active: true,
             },
@@ -272,16 +275,16 @@ impl AnicraftNlaTrackClipBlendingCompositePrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 862,
-            pr_title: String::from("feat(anicraft): Implement NLA Multi-Track Clip Blending & Stacking Composite Engine"),
-            target_subsystem: String::from("AniCraft Non-Linear Animation Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft NLA Tracks"),
+            pr_title: "feat(anicraft): Implement NLA Multi-Track Clip Blending & Stacking Composite Engine".to_string(),
+            target_subsystem: "AniCraft Non-Linear Animation Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft NLA Tracks".to_string(),
             components_added: vec![
-                String::from("Multi-track non-linear animation clip stacking & layer precedence"),
-                String::from("Cross-fade transition curves & dynamic weight influence modulation"),
-                String::from("Additive and override blend modes for upper/lower body pose split"),
+                "Multi-track non-linear animation clip stacking & layer precedence".to_string(),
+                "Cross-fade transition curves & dynamic weight influence modulation".to_string(),
+                "Additive and override blend modes for upper/lower body pose split".to_string(),
             ],
-            performance_multiplier: String::from("1,000 NLA Clips Blended / sec (<0.1ms)"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "1,000 NLA Clips Blended / sec (<0.1ms)".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -341,16 +344,16 @@ impl AnicraftOnionSkinningSubframePreviewPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 863,
-            pr_title: String::from("feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-frame Contour Preview Engine"),
-            target_subsystem: String::from("AniCraft Frame Preview & Onion Skinning Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Onion Skinning Preview"),
+            pr_title: "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-frame Contour Preview Engine".to_string(),
+            target_subsystem: "AniCraft Frame Preview & Onion Skinning Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Onion Skinning Preview".to_string(),
             components_added: vec![
-                String::from("Multi-layer onion skinning ghosting with past/future frame visibility"),
-                String::from("Directional color tinting (retro-red / ahead-green) and opacity falloff"),
-                String::from("Sub-frame vector contour preview for frame-by-frame 2D animators"),
+                "Multi-layer onion skinning ghosting with past/future frame visibility".to_string(),
+                "Directional color tinting (retro-red / ahead-green) and opacity falloff".to_string(),
+                "Sub-frame vector contour preview for frame-by-frame 2D animators".to_string(),
             ],
-            performance_multiplier: String::from("Instant Zero-Allocation Ghost Contour Preview"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "Instant Zero-Allocation Ghost Contour Preview".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -415,16 +418,16 @@ impl AnicraftAudioVisemeLipsyncTimelinePrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 864,
-            pr_title: String::from("feat(anicraft): Implement Audio FFT Spectrum to Viseme Lip-Sync Timeline Alignment Engine"),
-            target_subsystem: String::from("AniCraft Audio & Lip-Sync Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft LipSync Audio Studio"),
+            pr_title: "feat(anicraft): Implement Audio FFT Spectrum to Viseme Lip-Sync Timeline Alignment Engine".to_string(),
+            target_subsystem: "AniCraft Audio & Lip-Sync Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft LipSync Audio Studio".to_string(),
             components_added: vec![
-                String::from("Audio FFT spectral energy mapping to 7 core mouth viseme shapes"),
-                String::from("Automatic phoneme timestamp alignment & lip-sync track keyframing"),
-                String::from("Sub-frame smooth viseme morph transitions and mouth opening scaling"),
+                "Audio FFT spectral energy mapping to 7 core mouth viseme shapes".to_string(),
+                "Automatic phoneme timestamp alignment & lip-sync track keyframing".to_string(),
+                "Sub-frame smooth viseme morph transitions and mouth opening scaling".to_string(),
             ],
-            performance_multiplier: String::from("Real-time Sub-millisecond Audio Lip-Sync Analysis"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "Real-time Sub-millisecond Audio Lip-Sync Analysis".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -482,18 +485,18 @@ impl AnicraftMeshDeformationShapeKeyMorphingPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 865,
-            pr_title: String::from(
-                "feat(anicraft): Implement Mesh Vertex Deformation & Shape Key Morphing Engine",
-            ),
-            target_subsystem: String::from("AniCraft Mesh Deformation Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Shape Key Morpher"),
+            pr_title:
+                "feat(anicraft): Implement Mesh Vertex Deformation & Shape Key Morphing Engine"
+                    .to_string(),
+            target_subsystem: "AniCraft Mesh Deformation Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Shape Key Morpher".to_string(),
             components_added: vec![
-                String::from("Mesh vertex grid deformation and lattice warping"),
-                String::from("Morph target shape key definition with weight parameter controls"),
-                String::from("Linear blend shape vertex displacement evaluation"),
+                "Mesh vertex grid deformation and lattice warping".to_string(),
+                "Morph target shape key definition with weight parameter controls".to_string(),
+                "Linear blend shape vertex displacement evaluation".to_string(),
             ],
-            performance_multiplier: String::from("10,000 Vertices Deformed in <0.3ms"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "10,000 Vertices Deformed in <0.3ms".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -540,16 +543,16 @@ impl AnicraftSubframeInterpolationTearFreeRenderPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 866,
-            pr_title: String::from("feat(anicraft): Implement Sub-Frame High-Refresh Rate (60/120/144Hz) Tear-Free Renderer"),
-            target_subsystem: String::from("AniCraft Playback & Renderer Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Sub-Frame Playback"),
+            pr_title: "feat(anicraft): Implement Sub-Frame High-Refresh Rate (60/120/144Hz) Tear-Free Renderer".to_string(),
+            target_subsystem: "AniCraft Playback & Renderer Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Sub-Frame Playback".to_string(),
             components_added: vec![
-                String::from("Sub-frame keyframe time delta interpolation for smooth high-refresh playback"),
-                String::from("Wayland presentation-time sync for zero-screen-tearing rendering"),
-                String::from("Adaptive frame-skipping and GPU VSync lock-step frame scheduler"),
+                "Sub-frame keyframe time delta interpolation for smooth high-refresh playback".to_string(),
+                "Wayland presentation-time sync for zero-screen-tearing rendering".to_string(),
+                "Adaptive frame-skipping and GPU VSync lock-step frame scheduler".to_string(),
             ],
-            performance_multiplier: String::from("144Hz Smooth Animation Playback (<0.01ms overhead)"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "144Hz Smooth Animation Playback (<0.01ms overhead)".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -596,24 +599,20 @@ impl AnicraftRiggingWeightPaintingInfluencePrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 867,
-            pr_title: String::from(
-                "feat(anicraft): Implement Vertex Skinning Weight Painting Influence Map Engine",
-            ),
-            target_subsystem: String::from("AniCraft Skinning & Mesh Rigging Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Weight Painting"),
+            pr_title:
+                "feat(anicraft): Implement Vertex Skinning Weight Painting Influence Map Engine"
+                    .to_string(),
+            target_subsystem: "AniCraft Skinning & Mesh Rigging Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Weight Painting".to_string(),
             components_added: vec![
-                String::from(
-                    "Vertex bone skinning influence weight normalization (max 4 bones per vertex)",
-                ),
-                String::from("Interactive brush-based weight painting & heat map visualization"),
-                String::from(
-                    "Linear Blend Skinning (LBS) and Dual Quaternion Skinning (DQS) solvers",
-                ),
+                "Vertex bone skinning influence weight normalization (max 4 bones per vertex)"
+                    .to_string(),
+                "Interactive brush-based weight painting & heat map visualization".to_string(),
+                "Linear Blend Skinning (LBS) and Dual Quaternion Skinning (DQS) solvers"
+                    .to_string(),
             ],
-            performance_multiplier: String::from(
-                "50,000 Vertex Weight Skinning Evaluation (<0.4ms)",
-            ),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "50,000 Vertex Weight Skinning Evaluation (<0.4ms)".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -646,16 +645,16 @@ impl AnicraftMotionCaptureBvhImporterPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 868,
-            pr_title: String::from("feat(anicraft): Implement BVH / FBX Skeletal Motion Capture Importer & Retargeting Engine"),
-            target_subsystem: String::from("AniCraft Motion Capture Import Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft MoCap Retargeting"),
+            pr_title: "feat(anicraft): Implement BVH / FBX Skeletal Motion Capture Importer & Retargeting Engine".to_string(),
+            target_subsystem: "AniCraft Motion Capture Import Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft MoCap Retargeting".to_string(),
             components_added: vec![
-                String::from("BVH motion capture hierarchical joint skeleton parser"),
-                String::from("Automatic bone axis alignment & scale retargeting to target character rig"),
-                String::from("Keyframe filtering & motion smoothing noise reducer"),
+                "BVH motion capture hierarchical joint skeleton parser".to_string(),
+                "Automatic bone axis alignment & scale retargeting to target character rig".to_string(),
+                "Keyframe filtering & motion smoothing noise reducer".to_string(),
             ],
-            performance_multiplier: String::from("10,000 BVH MoCap Frames Parsed in <2ms"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "10,000 BVH MoCap Frames Parsed in <2ms".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -711,16 +710,16 @@ impl AnicraftSpriteSheetAtlasExporterPrEngine {
     pub fn generate_proposal(&self) -> AnicraftArtcraftPrProposalManifest {
         AnicraftArtcraftPrProposalManifest {
             pr_id: 869,
-            pr_title: String::from("feat(anicraft): Implement Packed Sprite Sheet Atlas Generator & Game Engine Exporter"),
-            target_subsystem: String::from("AniCraft Asset Export Subsystem"),
-            original_suite: String::from("ArtCraft AniCraft Sprite Exporter"),
+            pr_title: "feat(anicraft): Implement Packed Sprite Sheet Atlas Generator & Game Engine Exporter".to_string(),
+            target_subsystem: "AniCraft Asset Export Subsystem".to_string(),
+            original_suite: "ArtCraft AniCraft Sprite Exporter".to_string(),
             components_added: vec![
-                String::from("Bin-packing sprite sheet atlas texture generator"),
-                String::from("JSON / XML animation frame metadata and UV clip coordinates exporter"),
-                String::from("Unity, Unreal Engine, Godot, and Raylib game engine clip presets"),
+                "Bin-packing sprite sheet atlas texture generator".to_string(),
+                "JSON / XML animation frame metadata and UV clip coordinates exporter".to_string(),
+                "Unity, Unreal Engine, Godot, and Raylib game engine clip presets".to_string(),
             ],
-            performance_multiplier: String::from("Instant Sprite Sheet Atlas Packing (<0.5ms)"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "Instant Sprite Sheet Atlas Packing (<0.5ms)".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -806,7 +805,7 @@ impl SovereignAnicraftArtcraftParityPrGateway {
         let bvh_ok = self.mocap_engine.parse_bvh_header("HIERARCHY\nROOT Hips\n");
 
         let json = self.atlas_engine.generate_atlas_json(&[SpriteCell {
-            name: String::from("frame0"),
+            name: "frame0".to_string(),
             x: 0,
             y: 0,
             width: 64,
@@ -888,6 +887,7 @@ impl Default for AnicraftArtcraftParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
@@ -997,7 +997,7 @@ mod tests {
     fn test_sprite_exporter_engine() {
         let engine = AnicraftSpriteSheetAtlasExporterPrEngine::new();
         let cells = vec![SpriteCell {
-            name: String::from("walk1"),
+            name: "walk1".to_string(),
             x: 0,
             y: 0,
             width: 32,

@@ -1,3 +1,4 @@
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - Filmcraft & ArtCraft Missing Components Parity PR Gateway V64
 // (`src/creative/filmcraft_artcraft_missing_components_v64_pr.rs`)
@@ -5,28 +6,13 @@
 // Zero-dependency, `#![no_std]` compliant Rust engine implementing missing ArtCraft FilmCraft
 // professional video editing ecosystem components in Pull Request proposal format.
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 extern crate alloc;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec;
-#[cfg(any(feature = "standalone_test", test))]
-use std::vec::Vec;
 
 /// Structured PR proposal manifest descriptor for Filmcraft ArtCraft Missing Components V64.
 #[derive(Debug, Clone, PartialEq, Eq)]

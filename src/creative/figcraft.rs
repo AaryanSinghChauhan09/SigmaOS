@@ -743,6 +743,7 @@ pub fn get_figcraft() -> Option<&'static mut FigCraftEngine> {
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use super::*;
 
     #[test]

@@ -1,5 +1,6 @@
 #![no_std]
 extern crate alloc;
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Effectcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/effectcraft_artcraft_parity_pr.rs`)
@@ -20,7 +21,7 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::{format, vec, vec::Vec};
+use alloc::vec::Vec;
 use core::f64::consts::PI;
 
 

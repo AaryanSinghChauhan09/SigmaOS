@@ -1,5 +1,7 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Filmcraft to Artcraft Parity PR Proposal Engine
 // (`src/creative/filmcraft_artcraft_parity_pr.rs`)
@@ -18,7 +20,6 @@
 // 10. FilmcraftProjectXmlFcpxmlAafInterchangePrEngine (Bi-directional FCPXML, Premiere XML & AAF interchange)
 // 11. SovereignFilmcraftArtcraftParityPrGateway & FilmcraftArtcraftParityPrSuite (Master Gateway & Parity Benchmark)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -913,6 +914,7 @@ impl Default for FilmcraftArtcraftParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_filmcraft_trim_engine() {

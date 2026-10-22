@@ -1,5 +1,7 @@
 #![no_std]
 extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/voicecraft_artcraft_parity_pr.rs`)
@@ -16,7 +18,7 @@ extern crate alloc;
 
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::{format, vec, vec::Vec};
+use alloc::vec::Vec;
 use core::f64::consts::PI;
 
 
@@ -24,8 +26,8 @@ use core::f64::consts::PI;
 
 
 #[path = "voicecraft.rs"]
-mod voicecraft;
-use self::voicecraft::*;
+pub mod voicecraft;
+use crate::voicecraft::*;
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,7 +84,7 @@ impl VoicecraftNeuralPitchProsodyContourPrEngine {
             // Estimate pitch via zero-crossing rate approximation or autocorrelation peak
             let zcr = VoiceActivityDetector::compute_zcr(frame);
             let estimated_pitch = if energy > 0.005 {
-                (120.0 + zcr * 200.0).clamp(60.0, 400.0)
+                (120.0f32 + zcr * 200.0f32).clamp(60.0f32, 400.0f32)
             } else {
                 0.0 // Silence
             };

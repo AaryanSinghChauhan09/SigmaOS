@@ -3,6 +3,7 @@
 // Inspired by ArtCraft CadCraft, FreeCAD, AutoCAD, SolidWorks, OpenCASCADE
 
 extern crate alloc;
+use alloc::format;
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -1115,6 +1116,7 @@ impl CadCraftMasterPrDeploymentSuite {
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec;
     use super::*;
 
     #[test]

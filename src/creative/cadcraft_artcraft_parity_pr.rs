@@ -1,4 +1,7 @@
 #![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - CadCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/cadcraft_artcraft_parity_pr.rs`)
@@ -17,13 +20,14 @@
 // 10. CadcraftPdmVersionControlBOMGeneratorPrEngine (Product Data Management [PDM] vault revision control & multi-level BOM generator)
 // 11. SovereignCadcraftArtcraftParityPrGateway & CadcraftArtcraftParityPrSuite (Master PR Gateway & Parity Benchmark)
 
-extern crate alloc;
-
-use alloc::format;
+use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
+
+
+
+
 
 /// Structured PR proposal manifest for CadCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1067,7 +1071,7 @@ mod tests {
     #[test]
     fn test_generative_design_engine() {
         let engine = CadcraftGenerativeDesignTopologyOptimizationPrEngine::new();
-        let (rem, pct): (usize, f64) = engine.optimize_mesh_topology(1000);
+        let (rem, pct) = engine.optimize_mesh_topology(1000);
         assert_eq!(rem, 400);
         assert!((pct - 60.0).abs() < 1e-3);
     }

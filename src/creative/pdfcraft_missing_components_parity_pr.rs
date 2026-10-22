@@ -1,5 +1,7 @@
 #![no_std]
-#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Pdfcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/pdfcraft_missing_components_parity_pr.rs`)
@@ -18,7 +20,6 @@
 // 10. PdfcraftArchivalValidationPrEngine (ISO 19005 PDF/A-1/2/3/4 preservation & ISO 15930 PDF/X print exchange compliance repairer)
 // 11. SovereignPdfcraftMissingComponentsParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-#![no_std]
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -572,6 +573,7 @@ impl PdfcraftMissingComponentsParityPrSuite {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
     #[test]
     fn test_pdfcraft_missing_components_parity_pr_gateway() {

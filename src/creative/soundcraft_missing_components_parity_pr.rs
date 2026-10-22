@@ -1,12 +1,6 @@
 #![no_std]
-
 extern crate alloc;
-
-use alloc::collections::BTreeMap;
-use alloc::string::{String, ToString};
 use alloc::vec;
-use alloc::vec::Vec;
-
 // SPDX-License-Identifier: MIT
 // SigmaOS - Soundcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/soundcraft_missing_components_parity_pr.rs`)
@@ -20,6 +14,15 @@ use alloc::vec::Vec;
 // 5. SoundcraftMasteringLoudnessMeterPrEngine (EBU R128 integrated LUFS loudness meter, multiband mastering compressor, true-peak limiter & dynamic EQ)
 // 6. SoundcraftRealtimeCollabCrdtPrEngine (Multi-user CRDT DAW session sync, track locking, stem delta sharing & project history diffs)
 // 7. SovereignSoundcraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
+
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::f64::consts::PI;
+
+
+
+
 
 /// Structured PR proposal manifest for missing Soundcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -746,8 +749,6 @@ impl Default for SovereignSoundcraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloc::string::ToString;
-    use alloc::vec;
 
     #[test]
     fn test_soundcraft_parity_pr_gateway() {
@@ -803,7 +804,7 @@ mod tests {
                 z: 0.0,
             },
         );
-        assert!(((w as f32) - core::f32::consts::FRAC_1_SQRT_2).abs() < 1e-3);
+        assert!((w - core::f32::consts::FRAC_1_SQRT_2).abs() < 1e-3);
         assert_eq!(x, 1.0);
         assert_eq!(y, 0.0);
         assert_eq!(z, 0.0);
@@ -850,7 +851,7 @@ mod tests {
         let mut loud_samples = vec![0.5, -0.5, 1.5, -2.0];
         engine.process_brickwall_limiter(&mut loud_samples);
         for &s in &loud_samples {
-            assert!((s as f32).abs() <= 1.0); // clamped by ceiling
+            assert!(s.abs() <= 1.0); // clamped by ceiling
         }
     }
 

@@ -1,16 +1,14 @@
-// SPDX-License-Identifier: MIT
+#![no_std]
+extern crate alloc;
+use alloc::vec;
+use alloc::format;
 // SigmaOS Sovereign Creative Suite: EffectCraft & ArtCraft Parity PR Engine
 // Clean zero-dependency Rust implementation for EffectCraft VFX engines.
 
-#![no_std]
-
-extern crate alloc;
-
 use alloc::collections::BTreeMap;
-use alloc::format;
 use alloc::string::{String, ToString};
-use alloc::vec;
 use alloc::vec::Vec;
+use core::f64::consts::PI;
 
 
 
@@ -1225,7 +1223,7 @@ impl Default for EffectcraftExpressionScriptingRiggingPrEngine {
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct SovereignEffectcraftMissingComponentsParityPrGateway {
+pub struct SovereignEffectcraftArtcraftParityPrGateway {
     pub shader_graph: ShaderFilterGraphPrEngine,
     pub particle_physics: ParticlePhysicsEffectPrEngine,
     pub neural_matte: NeuralMatteSegmentationPrEngine,
@@ -1238,7 +1236,7 @@ pub struct SovereignEffectcraftMissingComponentsParityPrGateway {
     pub expression_scripting: EffectcraftExpressionScriptingRiggingPrEngine,
 }
 
-impl SovereignEffectcraftMissingComponentsParityPrGateway {
+impl SovereignEffectcraftArtcraftParityPrGateway {
     pub fn new() -> Self {
         Self {
             shader_graph: ShaderFilterGraphPrEngine::new(),
@@ -1307,7 +1305,7 @@ impl SovereignEffectcraftMissingComponentsParityPrGateway {
     }
 }
 
-impl Default for SovereignEffectcraftMissingComponentsParityPrGateway {
+impl Default for SovereignEffectcraftArtcraftParityPrGateway {
     fn default() -> Self {
         Self::new()
     }
@@ -1315,23 +1313,19 @@ impl Default for SovereignEffectcraftMissingComponentsParityPrGateway {
 
 #[derive(Debug, Clone)]
 pub struct EffectcraftMissingComponentsParityPrSuite {
-    pub gateway: SovereignEffectcraftMissingComponentsParityPrGateway,
+    pub gateway: SovereignEffectcraftArtcraftParityPrGateway,
 }
 
 impl EffectcraftMissingComponentsParityPrSuite {
     pub fn new() -> Self {
         Self {
-            gateway: SovereignEffectcraftMissingComponentsParityPrGateway::new(),
+            gateway: SovereignEffectcraftArtcraftParityPrGateway::new(),
         }
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_effectcraft_parity()
-<<<<<<< HEAD
-            && self.gateway.collect_all_proposals().len() >= 10
-=======
-            && self.gateway.collect_all_proposals().len() == 10
->>>>>>> origin/feat/effectcraft-missing-components-parity-pr-10995382916238701864
+            && self.gateway.collect_all_proposals().len() == 14
     }
 }
 
@@ -1348,11 +1342,6 @@ impl Default for EffectcraftMissingComponentsParityPrSuite {
 #[cfg(test)]
 mod tests {
     use super::*;
-<<<<<<< HEAD
-    use alloc::string::ToString;
-    use alloc::vec;
-=======
->>>>>>> origin/feat/effectcraft-missing-components-parity-pr-10995382916238701864
 
     #[test]
     fn test_optical_flow_engine_functional() {
@@ -1571,20 +1560,16 @@ mod tests {
     #[test]
     fn test_openfx_adapter_engine_functional_v2() {
         let mut engine = ArtCraftOpenFxPluginPrEngine::new();
-<<<<<<< HEAD
-        let load_res = engine.load_openfx_plugin("com.artcraft.Blur");
-=======
-        let load_res = engine.load_openfx_plugin("com.artcraft.Glow");
->>>>>>> origin/feat/effectcraft-missing-components-parity-pr-10995382916238701864
+        let load_res = engine.load_openfx_plugin("com.artcraft.Sharpen");
         assert!(load_res.is_ok());
 
         engine
-            .set_plugin_parameter("com.artcraft.Glow", "intensity", 0.5)
+            .set_plugin_parameter("com.artcraft.Sharpen", "intensity", 0.5)
             .unwrap();
 
         let mut pixels = vec![100, 150, 200, 255];
         engine
-            .process_frame("com.artcraft.Glow", &mut pixels)
+            .process_frame("com.artcraft.Sharpen", &mut pixels)
             .unwrap();
         assert_eq!(pixels[0], 50);
     }

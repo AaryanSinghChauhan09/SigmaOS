@@ -1,18 +1,27 @@
+#![no_std]
 // SPDX-License-Identifier: MIT
 // SigmaOS - AniCraft & ArtCraft Animation Missing Components Parity PR Gateway
 // (`src/creative/anicraft_missing_components_parity_pr.rs`)
+//
+// Provides structured PR proposals and full engine implementations for missing AniCraft components:
+// 1. AnicraftFabrikInverseKinematicsPrEngine (FABRIK IK multi-bone chain solver for natural limb posing)
+// 2. AnicraftNlaTrackClipBlendingPrEngine (Non-Linear Animation multi-track clip blending & weight scaling)
+// 3. AnicraftOnionSkinningPrEngine (Multi-layer timeline onion skinning, ghosting & color tinting)
+// 4. AnicraftAudioLipSyncTimelinePrEngine (Audio-driven phoneme/viseme lip-sync timeline animation)
+// 5. AnicraftMeshDeformationShapeKeysPrEngine (Mesh deformation & morph target / shape key blend shape morphing)
+// 6. SovereignAnicraftArtcraftParityPrGateway (Master PR Gateway & Parity Benchmark Engine)
 
-use std::collections::BTreeMap;
-use std::f64::consts::PI;
-use std::string::{String, ToString};
-use std::vec::Vec;
+extern crate alloc;
 
-#[cfg(feature = "standalone_test")]
-use std::collections::BTreeMap;
-#[cfg(feature = "standalone_test")]
-use std::string::{String, ToString};
-#[cfg(feature = "standalone_test")]
-use std::vec::Vec;
+use alloc::collections::BTreeMap;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use alloc::vec;
+use core::f64::consts::PI;
+
+
+
+
 
 /// Structured PR proposal manifest for missing AniCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -131,18 +140,18 @@ impl AnicraftFabrikInverseKinematicsPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 850,
-            pr_title: String::from(
-                "feat(anicraft): Implement FABRIK Inverse Kinematics (IK) Multi-Bone Chain Solver",
-            ),
-            target_subsystem: String::from("AniCraft Skeletal Rigging Engine"),
-            original_suite: String::from("ArtCraft AniCraft IK Solver"),
+            pr_title:
+                "feat(anicraft): Implement FABRIK Inverse Kinematics (IK) Multi-Bone Chain Solver"
+                    .to_string(),
+            target_subsystem: "AniCraft Skeletal Rigging Engine".to_string(),
+            original_suite: "ArtCraft AniCraft IK Solver".to_string(),
             components_added: vec![
-                String::from("FABRIK (Forward And Backward Reaching IK) multi-joint chain solver"),
-                String::from("Target distance reachability and bone constraint clamping"),
-                String::from("Sub-millisecond multi-limb character posing convergence"),
+                "FABRIK (Forward And Backward Reaching IK) multi-joint chain solver".to_string(),
+                "Target distance reachability and bone constraint clamping".to_string(),
+                "Sub-millisecond multi-limb character posing convergence".to_string(),
             ],
-            performance_multiplier: String::from("100+ IK Skeletal Chains Solved in <0.2ms"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "100+ IK Skeletal Chains Solved in <0.2ms".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -189,7 +198,7 @@ impl AnicraftNlaTrackClipBlendingPrEngine {
         let mut clips = Vec::new();
         clips.push(NlaClip {
             clip_id: 1,
-            name: String::from("WalkCycle"),
+            name: "WalkCycle".to_string(),
             start_frame: 0,
             duration_frames: 60,
             base_value: 0.0,
@@ -199,7 +208,7 @@ impl AnicraftNlaTrackClipBlendingPrEngine {
         });
         clips.push(NlaClip {
             clip_id: 2,
-            name: String::from("WaveAdditive"),
+            name: "WaveAdditive".to_string(),
             start_frame: 15,
             duration_frames: 30,
             base_value: 0.0,
@@ -246,16 +255,16 @@ impl AnicraftNlaTrackClipBlendingPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 851,
-            pr_title: String::from("feat(anicraft): Implement Non-Linear Animation (NLA) Multi-Track Clip Blending Engine"),
-            target_subsystem: String::from("AniCraft NLA & Clip Manager"),
-            original_suite: String::from("ArtCraft AniCraft NLA Track Suite"),
+            pr_title: "feat(anicraft): Implement Non-Linear Animation (NLA) Multi-Track Clip Blending Engine".to_string(),
+            target_subsystem: "AniCraft NLA & Clip Manager".to_string(),
+            original_suite: "ArtCraft AniCraft NLA Track Suite".to_string(),
             components_added: vec![
-                String::from("Multi-track non-linear animation clip layout & timeline mapping"),
-                String::from("Replace, Additive, and Multiplicative clip blending modes"),
-                String::from("Time-scaling and dynamic weight influence modulation"),
+                "Multi-track non-linear animation clip layout & timeline mapping".to_string(),
+                "Replace, Additive, and Multiplicative clip blending modes".to_string(),
+                "Time-scaling and dynamic weight influence modulation".to_string(),
             ],
-            performance_multiplier: String::from("1000+ Blended Animation Tracks Evaluated in <0.1ms"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "1000+ Blended Animation Tracks Evaluated in <0.1ms".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -332,20 +341,19 @@ impl AnicraftOnionSkinningPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 852,
-            pr_title: String::from(
-                "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-Frame Ghosts Engine",
-            ),
-            target_subsystem: String::from("AniCraft Timeline & Frame Preview"),
-            original_suite: String::from("ArtCraft AniCraft Onion Skinning"),
+            pr_title:
+                "feat(anicraft): Implement Multi-Layer Onion Skinning & Sub-Frame Ghosts Engine"
+                    .to_string(),
+            target_subsystem: "AniCraft Timeline & Frame Preview".to_string(),
+            original_suite: "ArtCraft AniCraft Onion Skinning".to_string(),
             components_added: vec![
-                String::from("Multi-layer onion skinning with past/future frame ghosting"),
-                String::from(
-                    "Directional color tinting (retro-red / ahead-green) and opacity falloff",
-                ),
-                String::from("Sub-frame vector contour preview for frame-by-frame animators"),
+                "Multi-layer onion skinning with past/future frame ghosting".to_string(),
+                "Directional color tinting (retro-red / ahead-green) and opacity falloff"
+                    .to_string(),
+                "Sub-frame vector contour preview for frame-by-frame animators".to_string(),
             ],
-            performance_multiplier: String::from("Instant Zero-Allocation Ghost Contour Rendering"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "Instant Zero-Allocation Ghost Contour Rendering".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -459,20 +467,19 @@ impl AnicraftAudioLipSyncTimelinePrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 853,
-            pr_title: String::from(
-                "feat(anicraft): Implement Audio-Driven Phoneme/Viseme LipSync Timeline Engine",
-            ),
-            target_subsystem: String::from("AniCraft Audio & LipSync Timeline"),
-            original_suite: String::from("ArtCraft AniCraft LipSync Studio"),
+            pr_title:
+                "feat(anicraft): Implement Audio-Driven Phoneme/Viseme LipSync Timeline Engine"
+                    .to_string(),
+            target_subsystem: "AniCraft Audio & LipSync Timeline".to_string(),
+            original_suite: "ArtCraft AniCraft LipSync Studio".to_string(),
             components_added: vec![
-                String::from("Audio timestamp to phoneme/viseme mouth shape keyframe mapping"),
-                String::from("7-category viseme classification (Rest, AE, IO, UW, MPB, FV, LNT)"),
-                String::from("Sub-frame smooth intensity interpolation and morph transition"),
+                "Audio timestamp to phoneme/viseme mouth shape keyframe mapping".to_string(),
+                "7-category viseme classification (Rest, AE, IO, UW, MPB, FV, LNT)".to_string(),
+                "Sub-frame smooth intensity interpolation and morph transition".to_string(),
             ],
-            performance_multiplier: String::from(
-                "Sub-millisecond Real-Time Audio LipSync Evaluation",
-            ),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "Sub-millisecond Real-Time Audio LipSync Evaluation"
+                .to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -520,9 +527,9 @@ impl AnicraftMeshDeformationShapeKeysPrEngine {
 
         let mut shape_keys = BTreeMap::new();
         shape_keys.insert(
-            String::from("Smile"),
+            "Smile".to_string(),
             ShapeKey2D {
-                name: String::from("Smile"),
+                name: "Smile".to_string(),
                 weight: 0.8,
                 deltas: vec![
                     VertexDelta2D { dx: 0.0, dy: 1.0 },
@@ -560,16 +567,16 @@ impl AnicraftMeshDeformationShapeKeysPrEngine {
     pub fn generate_proposal(&self) -> AnicraftPrProposalManifest {
         AnicraftPrProposalManifest {
             pr_id: 854,
-            pr_title: String::from("feat(anicraft): Implement Mesh Deformation & Morph Target / Shape Key Morphing Engine"),
-            target_subsystem: String::from("AniCraft Mesh Deformation Engine"),
-            original_suite: String::from("ArtCraft AniCraft Mesh Morpher"),
+            pr_title: "feat(anicraft): Implement Mesh Deformation & Morph Target / Shape Key Morphing Engine".to_string(),
+            target_subsystem: "AniCraft Mesh Deformation Engine".to_string(),
+            original_suite: "ArtCraft AniCraft Mesh Morpher".to_string(),
             components_added: vec![
-                String::from("Mesh vertex grid deformation and lattice warping"),
-                String::from("Morph target shape key definition with weight parameter controls"),
-                String::from("Linear blend shape vertex displacement evaluation"),
+                "Mesh vertex grid deformation and lattice warping".to_string(),
+                "Morph target shape key definition with weight parameter controls".to_string(),
+                "Linear blend shape vertex displacement evaluation".to_string(),
             ],
-            performance_multiplier: String::from("10,000 Vertices Deformed in <0.3ms"),
-            status: String::from("Ready for Merge"),
+            performance_multiplier: "10,000 Vertices Deformed in <0.3ms".to_string(),
+            status: "Ready for Merge".to_string(),
         }
     }
 }
@@ -665,6 +672,7 @@ impl Default for SovereignAnicraftArtcraftParityPrGateway {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_anicraft_parity_pr_gateway() {
@@ -701,6 +709,8 @@ mod tests {
     fn test_nla_blending_engine() {
         let engine = AnicraftNlaTrackClipBlendingPrEngine::new();
         let frame20_val = engine.evaluate_blended_value(20);
+        // Clip 1 progress at frame 20: 20/60 = 1/3 -> 10.0 * (1/3) = 3.333
+        // Clip 2 progress at frame 20: (20-15)/30 = 5/30 = 1/6 -> 5.0 * (1/6) * 0.5 = 0.4166
         assert!(frame20_val > 3.0);
     }
 
@@ -708,7 +718,7 @@ mod tests {
     fn test_onion_skinning_engine() {
         let engine = AnicraftOnionSkinningPrEngine::new(2, 2);
         let ghosts = engine.compute_ghost_frames(10);
-        assert_eq!(ghosts.len(), 4);
+        assert_eq!(ghosts.len(), 4); // 2 past + 2 future
         assert_eq!(ghosts[0].frame_index, 9);
         assert_eq!(ghosts[2].frame_index, 11);
     }
