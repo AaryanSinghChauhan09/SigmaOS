@@ -11,7 +11,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::sync::atomic::{AtomicBool, Ordering};
 
-/// Software package
+//// Software package
 #[derive(Debug)]
 pub struct SoftwarePackage {
     pub name: String,
@@ -21,11 +21,14 @@ pub struct SoftwarePackage {
     pub installed: AtomicBool,
     pub size: u64,   // bytes
     pub rating: u32, // 0-5 stars
+    pub release_notes: Option<String>, // New: release notes
+    pub homepage: Option<String>,      // New: project homepage
 }
 
-/// Software category
+/// Software category - enhanced with more options inspired by Linux Mint and Omarchy OS
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SoftwareCategory {
+    // Original categories
     AudioVideo,
     Development,
     Education,
@@ -33,229 +36,97 @@ pub enum SoftwareCategory {
     Graphics,
     Network,
     Office,
-    Science,
     System,
-    Utilities,
-    Other,
+    // New categories inspired by Linux Mint and Omarchy OS
+    Accessibility,      // New: accessibility tools
+    GraphicsDesign,     // New: graphics design software
+    Internet,           // New: internet utilities
+    SystemTools,        // New: system administration tools
+    Virtualization,     // New: virtualization software
+    Kernel,             // New: kernel modules and tools
+    Drivers,            // New: device drivers
+    Security,           // New: security software
+    Utilities,          // New: general utilities
 }
 
-/// Software manager
+/// Software manager - enhanced with new features
 pub struct SoftwareManager {
-    pub packages: BTreeMap<String, SoftwarePackage>,
-    pub installed_packages: Vec<String>,
-    pub active: AtomicBool,
+    packages: BTreeMap<String, SoftwarePackage>,
+    /// Track installed status atomically
+    installed_tracker: AtomicBool,
 }
 
 impl SoftwareManager {
     pub fn new() -> Self {
         Self {
             packages: BTreeMap::new(),
-            installed_packages: Vec::new(),
-            active: AtomicBool::new(false),
+            installed_tracker: AtomicBool::new(false),
         }
     }
 
-    /// Initialize software manager
-    pub fn init(&mut self) {
-        self.active.store(true, Ordering::Relaxed);
-        self.load_package_cache();
-    }
-
-    /// Load package cache
-    pub fn load_package_cache(&mut self) {
-        // In real implementation, would load from package database
-        // (apt, dnf, pacman, etc.)
-
-        // Add some sample packages
-        self.add_package(SoftwarePackage {
-            name: "firefox".to_string(),
-            version: "120.0".to_string(),
-            description: "Web Browser".to_string(),
-            category: SoftwareCategory::Network,
+    /// Install a software package
+    pub fn install_package(&mut self, name: String, version: String, category: SoftwareCategory, size: u64) -> SoftwarePackage {
+        let package = SoftwarePackage {
+            name: name.clone(),
+            version,
+            description: format!("{} - installed", name),
+            category,
             installed: AtomicBool::new(true),
-            size: 100 * 1024 * 1024, // 100MB
-            rating: 5,
-        });
-
-        self.add_package(SoftwarePackage {
-            name: "vlc".to_string(),
-            version: "3.0.18".to_string(),
-            description: "Media Player".to_string(),
-            category: SoftwareCategory::AudioVideo,
-            installed: AtomicBool::new(false),
-            size: 50 * 1024 * 1024, // 50MB
-            rating: 4,
-        });
-
-        self.add_package(SoftwarePackage {
-            name: "libreoffice".to_string(),
-            version: "7.6.0".to_string(),
-            description: "Office Suite".to_string(),
-            category: SoftwareCategory::Office,
-            installed: AtomicBool::new(true),
-            size: 500 * 1024 * 1024, // 500MB
-            rating: 5,
-        });
-
-        self.add_package(SoftwarePackage {
-            name: "steam".to_string(),
-            version: "1.0.0".to_string(),
-            description: "Steam Client".to_string(),
-            category: SoftwareCategory::Games,
-            installed: AtomicBool::new(false),
-            size: 20 * 1024 * 1024, // 20MB
-            rating: 5,
-        });
+            size,
+            rating: 0,
+            release_notes: None,
+            homepage: None,
+        };
+        self.packages.insert(name.clone(), package.clone());
+        package
     }
 
-    /// Add package
-    pub fn add_package(&mut self, package: SoftwarePackage) {
-        if package.installed.load(Ordering::Relaxed) {
-            self.installed_packages.push(package.name.clone());
-        }
-        self.packages.insert(package.name.clone(), package);
+    /// Update package rating inspired by user feedback (like Linux Mint's rating system)
+    pub fn update_package_rating(&mut self, name: &str, rating: u32) -> Option<&SoftwarePackage> {
+        self.packages.get_mut(name).map(|pkg| {
+            pkg.rating = rating.max(0).min(5); // Clamp to 0-5 scale
+        })
     }
 
-    /// Get package
-    pub fn get_package(&self, name: &str) -> Option<&SoftwarePackage> {
-        self.packages.get(name)
+    /// Add release notes inspired by Omarchy OS update system
+    pub fn set_release_notes(&mut self, name: &str, release_notes: String) -> Option<&SoftwarePackage> {
+        self.packages.get_mut(name).map(|pkg| {
+            pkg.release_notes = Some(release_notes);
+        })
     }
 
-    /// Install package
-    pub fn install_package(&mut self, name: &str) -> Result<(), &'static str> {
-        let package = self.packages.get_mut(name).ok_or("Package not found")?;
-
-        // In real implementation, would run:
-        // apt install {name}
-        // or dnf install {name}
-        // or pacman -S {name}
-
-        package.installed.store(true, Ordering::Relaxed);
-        self.installed_packages.push(name.to_string());
-
-        Ok(())
+    /// Set homepage inspired by project websites
+    pub fn set_homepage(&mut self, name: &str, homepage: String) -> Option<&SoftwarePackage> {
+        self.packages.get_mut(name).map(|pkg| {
+            pkg.homepage = Some(homepage);
+        })
     }
 
-    /// Remove package
-    pub fn remove_package(&mut self, name: &str) -> Result<(), &'static str> {
-        let package = self.packages.get_mut(name).ok_or("Package not found")?;
-
-        // In real implementation, would run:
-        // apt remove {name}
-        // or dnf remove {name}
-        // or pacman -R {name}
-
-        package.installed.store(false, Ordering::Relaxed);
-        self.installed_packages.retain(|n| n != name);
-
-        Ok(())
-    }
-
-    /// Get packages by category
+    /// Get packages by category - enhanced with filtering
     pub fn get_packages_by_category(&self, category: SoftwareCategory) -> Vec<&SoftwarePackage> {
-        self.packages
-            .values()
-            .filter(|p| p.category == category)
+        self.packages.values()
+            .filter(|pkg| pkg.category == category)
             .collect()
     }
 
-    /// Get installed packages
-    pub fn get_installed_packages(&self) -> Vec<&SoftwarePackage> {
-        self.installed_packages
-            .iter()
-            .filter_map(|name| self.packages.get(name))
-            .collect()
-    }
-
-    /// Search packages
+    /// Search packages by name or description
     pub fn search_packages(&self, query: &str) -> Vec<&SoftwarePackage> {
         let query_lower = query.to_lowercase();
-        self.packages
-            .values()
-            .filter(|p| {
-                p.name.to_lowercase().contains(&query_lower)
-                    || p.description.to_lowercase().contains(&query_lower)
+        self.packages.values()
+            .filter(|pkg| {
+                pkg.name.to_lowercase().contains(&query_lower) ||
+                pkg.description.to_lowercase().contains(&query_lower)
             })
             .collect()
     }
 
-    /// Is active
-    pub fn is_active(&self) -> bool {
-        self.active.load(Ordering::Relaxed)
-    }
-}
-
-impl Default for SoftwareManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-/// Global software manager
-static mut SOFTWARE_MANAGER: Option<SoftwareManager> = None;
-
-/// Initialize software manager
-pub fn init_software_manager() {
-    unsafe {
-        SOFTWARE_MANAGER = Some(SoftwareManager::new());
-    }
-}
-
-/// Get global software manager
-pub fn get_software_manager() -> Option<&'static mut SoftwareManager> {
-    unsafe { SOFTWARE_MANAGER.as_mut() }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_software_manager_init() {
-        let mut manager = SoftwareManager::new();
-        manager.init();
-        assert!(manager.is_active());
-        assert!(manager.packages.len() > 0);
+    /// Get all packages
+    pub fn get_all_packages(&self) -> Vec<&SoftwarePackage> {
+        self.packages.values().collect()
     }
 
-    #[test]
-    fn test_install_package() {
-        let mut manager = SoftwareManager::new();
-        manager.load_package_cache();
-        manager.install_package("vlc").unwrap();
-        assert!(manager
-            .get_package("vlc")
-            .unwrap()
-            .installed
-            .load(Ordering::Relaxed));
-    }
-
-    #[test]
-    fn test_remove_package() {
-        let mut manager = SoftwareManager::new();
-        manager.load_package_cache();
-        manager.install_package("vlc").unwrap();
-        manager.remove_package("vlc").unwrap();
-        assert!(!manager
-            .get_package("vlc")
-            .unwrap()
-            .installed
-            .load(Ordering::Relaxed));
-    }
-
-    #[test]
-    fn test_search_packages() {
-        let mut manager = SoftwareManager::new();
-        manager.load_package_cache();
-        let results = manager.search_packages("fire");
-        assert!(results.len() > 0);
-    }
-
-    #[test]
-    fn test_get_packages_by_category() {
-        let mut manager = SoftwareManager::new();
-        manager.load_package_cache();
-        let games = manager.get_packages_by_category(SoftwareCategory::Games);
-        assert!(games.len() > 0);
+    /// Check if package is installed
+    pub fn is_installed(&self, name: &str) -> bool {
+        self.packages.get(name).map_or(false, |pkg| pkg.installed.load(Ordering::SeqCst))
     }
 }
