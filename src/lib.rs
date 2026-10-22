@@ -606,6 +606,7 @@ pub mod io;
 
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
+pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_missing_components_v67_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
