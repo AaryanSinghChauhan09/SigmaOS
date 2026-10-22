@@ -1,3 +1,5 @@
+# SigmaOS Subsystem I/O Management Rules
+
 [rule.io_completeness]
 requirement = "I/O management defines submit, interrupt, DMA, buffer, and scheduler semantics."
 enforcement = "I/O tests + rehearsals"

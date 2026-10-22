@@ -1,4 +1,6 @@
-//! SigmaOS I/O subsystem
+//! SigmaOS I/O Subsystem Management Engine
+//! Enforces the 10-stage authoritative I/O lifecycle contract:
+//! submit -> validate -> enqueue -> execute -> interrupt/DMA -> complete -> callback -> reclaim -> free -> error/recovery.
 pub mod io_uring;
 
 pub use io_uring::{
