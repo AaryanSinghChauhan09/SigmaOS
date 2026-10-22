@@ -655,7 +655,9 @@ impl ElementaryFilesEngine {
             pr_id: 6011,
             repository: "elementary/files".to_string(),
             title: "PR #6011: Elementary Files Tabbed Navigation & Spatial Views".to_string(),
-            description: "Implements Pantheon Files tabbed VFS navigation and spatial view state saving.".to_string(),
+            description:
+                "Implements Pantheon Files tabbed VFS navigation and spatial view state saving."
+                    .to_string(),
             component_name: "ElementaryFilesEngine".to_string(),
             feature_highlights: vec![
                 "Tabbed VFS directory navigation".to_string(),

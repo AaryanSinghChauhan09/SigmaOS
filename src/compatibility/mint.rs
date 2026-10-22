@@ -758,7 +758,8 @@ impl LinuxMintIntegrationEngine {
     }
 
     pub fn install_package(&mut self, name: &str) -> Result<(), &'static str> {
-        self.software_manager.install_package(name)
+        self.software_manager.install_package(name);
+        Ok(())
     }
 
     pub fn configure_desktop(&mut self) {

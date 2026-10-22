@@ -1,7 +1,7 @@
 #![no_std]
 extern crate alloc;
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS - VoiceCraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/voicecraft_artcraft_parity_pr.rs`)
@@ -21,13 +21,13 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-
-
-
-
 #[path = "voicecraft.rs"]
 pub mod voicecraft;
-use crate::voicecraft::*;
+
+use voicecraft::Phoneme;
+use voicecraft::PhonemeType;
+use voicecraft::VoiceActivityDetector;
+use voicecraft::SAMPLE_RATE;
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]

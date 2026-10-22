@@ -108,14 +108,28 @@ impl GridcraftXlookupMatrixSearchEngine {
     pub fn new() -> Self {
         let mut tables = BTreeMap::new();
         let sample_table = vec![
-            vec![String::from("SKU-1001"), String::from("Precision Switch"), String::from("450.00")],
-            vec![String::from("SKU-1002"), String::from("Optical Fiber"), String::from("120.00")],
+            vec![
+                String::from("SKU-1001"),
+                String::from("Precision Switch"),
+                String::from("450.00"),
+            ],
+            vec![
+                String::from("SKU-1002"),
+                String::from("Optical Fiber"),
+                String::from("120.00"),
+            ],
         ];
         tables.insert(String::from("Inventory"), sample_table);
         Self { tables }
     }
 
-    pub fn xlookup(&self, table_name: &str, key: &str, search_col: usize, return_col: usize) -> Option<String> {
+    pub fn xlookup(
+        &self,
+        table_name: &str,
+        key: &str,
+        search_col: usize,
+        return_col: usize,
+    ) -> Option<String> {
         let table = self.tables.get(table_name)?;
         for row in table {
             if search_col < row.len() && row[search_col] == key {
@@ -196,7 +210,11 @@ pub struct GridcraftConditionalFormatValidationEngine {
 impl GridcraftConditionalFormatValidationEngine {
     pub fn new() -> Self {
         Self {
-            validation_list: vec![String::from("Approved"), String::from("Rejected"), String::from("Pending")],
+            validation_list: vec![
+                String::from("Approved"),
+                String::from("Rejected"),
+                String::from("Pending"),
+            ],
         }
     }
 
@@ -207,7 +225,9 @@ impl GridcraftConditionalFormatValidationEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV65PrProposalManifest {
         GridcraftV65PrProposalManifest {
             pr_id: 6524,
-            pr_title: String::from("PR #6524: Data Validation Bounds & Conditional Formatting Engine"),
+            pr_title: String::from(
+                "PR #6524: Data Validation Bounds & Conditional Formatting Engine",
+            ),
             target_subsystem: String::from("GridCraft Cell Rules & Formatting"),
             original_suite: String::from("ArtCraft GridCraft Interactive Rules"),
             components_added: vec![
@@ -257,7 +277,9 @@ impl GridcraftGoalSeekMonteCarloRiskEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV65PrProposalManifest {
         GridcraftV65PrProposalManifest {
             pr_id: 6525,
-            pr_title: String::from("PR #6525: Goal Seek Parameter Solver & Monte Carlo Risk Simulator"),
+            pr_title: String::from(
+                "PR #6525: Goal Seek Parameter Solver & Monte Carlo Risk Simulator",
+            ),
             target_subsystem: String::from("GridCraft Financial Simulation"),
             original_suite: String::from("ArtCraft GridCraft Financial Modeling"),
             components_added: vec![
@@ -369,7 +391,9 @@ pub struct GridcraftWasmUdfMacroScriptEngine {
 
 impl GridcraftWasmUdfMacroScriptEngine {
     pub fn new() -> Self {
-        Self { registered_udfs: Vec::new() }
+        Self {
+            registered_udfs: Vec::new(),
+        }
     }
 
     pub fn register_udf(&mut self, name: &str) {
@@ -446,17 +470,24 @@ pub struct GridcraftCellDependencyDagCycleEngine {
 
 impl GridcraftCellDependencyDagCycleEngine {
     pub fn new() -> Self {
-        Self { deps: BTreeMap::new() }
+        Self {
+            deps: BTreeMap::new(),
+        }
     }
 
     pub fn add_dependency(&mut self, cell: &str, depends_on: &str) {
-        self.deps.entry(cell.to_string()).or_default().push(depends_on.to_string());
+        self.deps
+            .entry(cell.to_string())
+            .or_default()
+            .push(depends_on.to_string());
     }
 
     pub fn generate_pr_manifest(&self) -> GridcraftV65PrProposalManifest {
         GridcraftV65PrProposalManifest {
             pr_id: 6530,
-            pr_title: String::from("PR #6530: DAG Topological Cell Dependency Graph & Cycle Solver"),
+            pr_title: String::from(
+                "PR #6530: DAG Topological Cell Dependency Graph & Cycle Solver",
+            ),
             target_subsystem: String::from("GridCraft Calculation Graph Engine"),
             original_suite: String::from("ArtCraft GridCraft Graph Solver"),
             components_added: vec![
@@ -464,7 +495,9 @@ impl GridcraftCellDependencyDagCycleEngine {
                 String::from("Circular Reference Detection & Iterative Calculation Resolver"),
                 String::from("Multi-Threaded Parallel Cell Sub-Graph Evaluation Engine"),
             ],
-            performance_multiplier: String::from("Parallel Multi-Core Calculation Sub-Graph Solves"),
+            performance_multiplier: String::from(
+                "Parallel Multi-Core Calculation Sub-Graph Solves",
+            ),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -617,7 +650,8 @@ mod tests {
     #[test]
     fn test_batch_io_engine() {
         let engine = GridcraftBatchParquetXlsxPipelineEngine::new();
-        let csv = engine.export_csv_stub(&["A", "B"], &[vec![String::from("1"), String::from("2")]]);
+        let csv =
+            engine.export_csv_stub(&["A", "B"], &[vec![String::from("1"), String::from("2")]]);
         assert!(csv.contains("A,B"));
         assert!(csv.contains("1,2"));
     }

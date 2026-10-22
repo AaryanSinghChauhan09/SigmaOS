@@ -3,8 +3,8 @@
 // Inspired by ArtCraft CadCraft, FreeCAD, AutoCAD, SolidWorks, OpenCASCADE
 
 extern crate alloc;
-use alloc::format;
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::f64::consts::PI;
@@ -1116,8 +1116,8 @@ impl CadCraftMasterPrDeploymentSuite {
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_cadcraft_2d_sketch_and_solver() {

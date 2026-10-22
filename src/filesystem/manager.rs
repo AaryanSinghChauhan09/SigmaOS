@@ -38,14 +38,12 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
     }
     if haystack.is_ascii() && needle.is_ascii() {
         let needle_bytes = needle.as_bytes();
-        haystack
-            .as_bytes()
-            .windows(needle.len())
-            .any(|window| {
-                window.iter().zip(needle_bytes).all(|(&h, &n)| {
-                    h.to_ascii_lowercase() == n.to_ascii_lowercase()
-                })
-            })
+        haystack.as_bytes().windows(needle.len()).any(|window| {
+            window
+                .iter()
+                .zip(needle_bytes)
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
     } else {
         haystack.to_lowercase().contains(&needle.to_lowercase())
     }
@@ -510,7 +508,9 @@ impl FuzzyFileSearchEngine {
         if pattern.is_ascii() && target.is_ascii() {
             let pat_bytes = pattern.as_bytes();
             for (t_idx, &t_byte) in target.as_bytes().iter().enumerate() {
-                if p_idx < pat_bytes.len() && t_byte.to_ascii_lowercase() == pat_bytes[p_idx].to_ascii_lowercase() {
+                if p_idx < pat_bytes.len()
+                    && t_byte.to_ascii_lowercase() == pat_bytes[p_idx].to_ascii_lowercase()
+                {
                     score += 10 + (100 / (t_idx + 1));
                     p_idx += 1;
                 }

@@ -292,8 +292,8 @@ pub mod vfs_foundations {
     /// Filesystem type identifier
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum FilesystemType {
-        Native,          // SigmaOS native filesystem
-        // Future: Ext4, XFS, ZFS support
+        Native, // SigmaOS native filesystem
+                // Future: Ext4, XFS, ZFS support
     }
 
     /// Open flags inspired by Linux open(2) flags
@@ -307,8 +307,20 @@ pub mod vfs_foundations {
     }
 
     impl open_flags {
-        pub fn new(readonly: bool, write: bool, create: bool, truncate: bool, directory: bool) -> Self {
-            open_flags { readonly, write, create, truncate, directory }
+        pub fn new(
+            readonly: bool,
+            write: bool,
+            create: bool,
+            truncate: bool,
+            directory: bool,
+        ) -> Self {
+            open_flags {
+                readonly,
+                write,
+                create,
+                truncate,
+                directory,
+            }
         }
     }
 }
@@ -350,7 +362,6 @@ pub mod memory_foundations {
 /// Device driver framework foundation - inspired by Linux kernel driver model
 pub mod driver_framework {
     /// Device structure foundation
-    #[derive(Debug)]
     pub struct Device {
         pub name: alloc::string::String,
         pub driver: Option<alloc::sync::Arc<dyn DriverTrait>>,
@@ -434,29 +445,29 @@ pub mod network_foundations {
     /// Address families inspired by Linux AF_* constants
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum AddressFamily {
-        Ipv4,     // AF_INET
-        Ipv6,     // AF_INET6
-        Unix,     // AF_UNIX
+        Ipv4, // AF_INET
+        Ipv6, // AF_INET6
+        Unix, // AF_UNIX
     }
 
     /// Socket types inspired by Linux SOCK_* constants
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum SocketType {
-        Stream,     // SOCK_STREAM
-        Dgram,      // SOCK_DGRAM
-        Raw,        // SOCK_RAW
+        Stream,      // SOCK_STREAM
+        Dgram,       // SOCK_DGRAM
+        Raw,         // SOCK_RAW
         Resequenced, // SOCK_RSEQ
     }
 
     /// Socket options inspired by Linux SO_* constants
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum SocketOption {
-        ReuseAddress,      // SO_REUSEADDR
-        ReusePort,         // SO_REUSEPORT
-        SendBufferSize,    // SO_SNDBUF
-        RecvBufferSize,    // SO_RCVBUF
-        KeepAlive,         // SO_KEEPALIVE
-        NoDelay,           // TCP_NODELAY
+        ReuseAddress,   // SO_REUSEADDR
+        ReusePort,      // SO_REUSEPORT
+        SendBufferSize, // SO_SNDBUF
+        RecvBufferSize, // SO_RCVBUF
+        KeepAlive,      // SO_KEEPALIVE
+        NoDelay,        // TCP_NODELAY
     }
 
     /// Network socket address structures
@@ -464,14 +475,14 @@ pub mod network_foundations {
     pub struct SockAddrIn {
         pub family: AddressFamily,
         pub port: u16,
-        pub address: [u8; 4],  // IPv4 address
+        pub address: [u8; 4], // IPv4 address
     }
 
     #[derive(Debug, Clone)]
     pub struct SockAddrIn6 {
         pub family: AddressFamily,
         pub port: u16,
-        pub address: [u8; 16],  // IPv6 address
+        pub address: [u8; 16], // IPv6 address
         pub flow_info: u32,
         pub scope_id: u32,
     }
@@ -543,16 +554,16 @@ pub mod filesystem_foundations {
     /// Filesystem type identification
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum FilesystemType {
-        Native,           // SigmaOS native filesystem
-        Ext4,             // Linux Ext4 - journaling filesystem
-        Xfs,              // Linux XFS - high-performance journaling filesystem
-        Zfs,              // ZFS - copy-on-write filesystem
-        Ufs,              // UFS - BSD Unix filesystem
-        Btrfs,            // Btrfs - copy-on-write RAID filesystem
-        Fat32,            // FAT32 - removable media filesystem
-        Exfat,            // exFAT - extended FAT for large media
-        Nfs,              // NFS - network filesystem
-        Smb,              // SMB/CIFS - Windows network filesystem,
+        Native, // SigmaOS native filesystem
+        Ext4,   // Linux Ext4 - journaling filesystem
+        Xfs,    // Linux XFS - high-performance journaling filesystem
+        Zfs,    // ZFS - copy-on-write filesystem
+        Ufs,    // UFS - BSD Unix filesystem
+        Btrfs,  // Btrfs - copy-on-write RAID filesystem
+        Fat32,  // FAT32 - removable media filesystem
+        Exfat,  // exFAT - extended FAT for large media
+        Nfs,    // NFS - network filesystem
+        Smb,    // SMB/CIFS - Windows network filesystem,
     }
 
     /// Filesystem mount options inspired by Linux mount(8)
@@ -596,25 +607,25 @@ pub mod package_management_foundations {
     /// Package status states inspired by dpkg/ RPM states
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PackageStatus {
-        NotInstalled,   // pkgStatus::not_installed
-        Installed,      // pkgStatus::installed
-        FailedHook,     // pkgStatus::failed_hour
-        ConfigFiles,    // pkgStatus::config_files
-        HalfConfigured, // pkgStatus::half_configured
-        HalfInstalled,  // pkgStatus::half_installed
-        TriggersPending,// pkgStatus::triggers_pending
-        Unpackaged,     // pkgStatus::unpackaged
+        NotInstalled,    // pkgStatus::not_installed
+        Installed,       // pkgStatus::installed
+        FailedHook,      // pkgStatus::failed_hour
+        ConfigFiles,     // pkgStatus::config_files
+        HalfConfigured,  // pkgStatus::half_configured
+        HalfInstalled,   // pkgStatus::half_installed
+        TriggersPending, // pkgStatus::triggers_pending
+        Unpackaged,      // pkgStatus::unpackaged
     }
 
     /// Package architecture foundations
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum PackageArchitecture {
         Generic,
-        Amd64,      // x86_64
-        I386,       // i686
-        Aarch64,    // arm64
-        Armhf,      // armhf
-        Mips,       // mips
+        Amd64,   // x86_64
+        I386,    // i686
+        Aarch64, // arm64
+        Armhf,   // armhf
+        Mips,    // mips
     }
 
     /// Package version representation
@@ -630,12 +641,12 @@ pub mod package_management_foundations {
     /// Package dependency type foundations
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum DependencyType {
-        HardDependency,   // Must be installed
-        SoftDependency,   // Recommended
-        Suggests,         // Suggested
-        Conflicts,        // Conflicts with
-        Replaces,         // Replaces
-        Provides,         // Provides this capability
+        HardDependency, // Must be installed
+        SoftDependency, // Recommended
+        Suggests,       // Suggested
+        Conflicts,      // Conflicts with
+        Replaces,       // Replaces
+        Provides,       // Provides this capability
     }
 
     /// Package dependency foundation
@@ -670,15 +681,15 @@ pub mod shell_foundations {
     /// Shell builtin commands foundation
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum BuiltinCommand {
-        Exit,         // exit [n]
-        Cd,           // cd [directory]
-        Pwd,          // pwd
-        Echo,         // echo [string]
-        Export,       // export [name=[value]]
-        Unset,        // unset name
-        Type,         // type command
-        Which,        // which command
-        Pause,        // pause
+        Exit,   // exit [n]
+        Cd,     // cd [directory]
+        Pwd,    // pwd
+        Echo,   // echo [string]
+        Export, // export [name=[value]]
+        Unset,  // unset name
+        Type,   // type command
+        Which,  // which command
+        Pause,  // pause
     }
 
     /// Shell environment variable foundation
@@ -720,7 +731,9 @@ pub mod shell_foundations {
         pub fn execute_external(
             path: alloc::string::String,
             arguments: alloc::vec::Vec<alloc::string::String>,
-            environment: Option<alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>>,
+            environment: Option<
+                alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>,
+            >,
         ) -> ShellCommandResult {
             // Foundation - implementation grows with distro parity
             ShellCommandResult {
@@ -739,8 +752,8 @@ pub mod security_foundations {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum SecurityModuleType {
         None,
-        Selinux,     // Security-Enhanced Linux
-        Apparmor,    // Application Armor
+        Selinux,      // Security-Enhanced Linux
+        Apparmor,     // Application Armor
         Capabilities, // POSIX capabilities
     }
 
@@ -758,7 +771,7 @@ pub mod security_foundations {
         pub pid: u32,
         pub uid: u32,
         pub gid: u32,
-        pub sid: u32,  // Security ID (SELinux) or profile (AppArmor)
+        pub sid: u32, // Security ID (SELinux) or profile (AppArmor)
     }
 
     /// Security object foundation - resource being accessed
@@ -781,7 +794,7 @@ pub mod security_foundations {
     pub struct AccessRequest {
         pub subject: SecuritySubject,
         pub object: SecurityObject,
-        pub requested_access: alloc::primitive::u32,
+        pub requested_access: u32,
     }
 
     /// Access check foundation
@@ -802,7 +815,7 @@ pub mod security_foundations {
         pub event_type: alloc::string::String,
         pub subject: SecuritySubject,
         pub object: SecurityObject,
-       pub success: bool,
+        pub success: bool,
         pub details: alloc::string::String,
     }
 }
@@ -822,10 +835,10 @@ pub mod device_driver_foundations {
     /// Device resource foundation - inspired by Linux resource struct
     #[derive(Debug, Clone)]
     pub struct DeviceResource {
-        pub resource_type: alloc::primitive::u32,
-        pub start: alloc::primitive::u64,
-        pub end: alloc::primitive::u64,
-        pub flags: alloc::primitive::u32,
+        pub resource_type: u32,
+        pub start: u64,
+        pub end: u64,
+        pub flags: u32,
     }
 
     /// Device driver binding foundation - inspired by Linux driver binding
@@ -833,13 +846,19 @@ pub mod device_driver_foundations {
 
     impl DeviceDriverBinding {
         /// Bind a driver to a device
-        pub fn bind(driver: alloc::sync::Arc<dyn driver_framework::DriverTrait>, device: alloc::sync::Arc<device_driver_foundations::Device>) -> Result<(), alloc::string::String> {
+        pub fn bind(
+            driver: alloc::sync::Arc<dyn super::driver_framework::DriverTrait>,
+            device: alloc::sync::Arc<super::driver_framework::Device>,
+        ) -> Result<(), alloc::string::String> {
             // Foundation - driver binding grows with distro parity
             Ok(())
         }
 
         /// Probe a device with a driver
-        pub fn probe(driver: alloc::sync::Arc<dyn driver_framework::DriverTrait>, device: alloc::sync::Arc<device_driver_foundations::Device>) -> Result<(), alloc::string::String> {
+        pub fn probe(
+            driver: alloc::sync::Arc<dyn super::driver_framework::DriverTrait>,
+            device: alloc::sync::Arc<super::driver_framework::Device>,
+        ) -> Result<(), alloc::string::String> {
             // Foundation - driver probing grows with distro parity
             Ok(())
         }
@@ -880,7 +899,7 @@ pub mod device_driver_foundations {
         /// PCI bar resource foundation
         #[derive(Debug, Clone)]
         pub struct PciBar {
-            pub bar_type: u32,    // 0 = memory, 1 = io
+            pub bar_type: u32, // 0 = memory, 1 = io
             pub bar_number: u32,
             pub address: u64,
             pub size: u64,
@@ -895,11 +914,11 @@ pub mod boot_foundations {
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum InitSystemType {
         None,
-        Systemd,          // system and service manager (80%+ of Linux distros)
-        Runit,           // service supervisor
-        Openrc,          // service dependency management
-        BsdInit,         // BSD-style init
-        Sysvinit,        // System V init
+        Systemd,  // system and service manager (80%+ of Linux distros)
+        Runit,    // service supervisor
+        Openrc,   // service dependency management
+        BsdInit,  // BSD-style init
+        Sysvinit, // System V init
     }
 
     /// Service descriptor foundation
@@ -918,7 +937,8 @@ pub mod boot_foundations {
     pub struct BootParameters {
         pub command_line: alloc::string::String,
         pub init: alloc::string::String,
-        pub kernel_cmdline: alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>,
+        pub kernel_cmdline:
+            alloc::collections::BTreeMap<alloc::string::String, alloc::string::String>,
         pub memory_size: usize,
         pub screen_size: Option<(usize, usize)>,
     }
@@ -930,18 +950,18 @@ pub mod compatibility_foundations {
     /// ABI stability levels
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum AbiStability {
-        Unstable,    // Changing API/ABI
-        Stable,      // Guaranteed stable API/ABI
-        Compat,      // Compatibility layer support
+        Unstable, // Changing API/ABI
+        Stable,   // Guaranteed stable API/ABI
+        Compat,   // Compatibility layer support
     }
 
     /// Syscall support level
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     pub enum SyscallSupport {
-        Full,          // Full syscall implementation
-        Subset,        // Subset of syscalls supported
-        Partial,       // Partial support
-        Emulated,      // Emulated via compatibility layer
+        Full,     // Full syscall implementation
+        Subset,   // Subset of syscalls supported
+        Partial,  // Partial support
+        Emulated, // Emulated via compatibility layer
     }
 
     /// Binary compatibility foundation

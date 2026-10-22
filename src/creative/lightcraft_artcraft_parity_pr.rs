@@ -69,7 +69,8 @@ impl LightcraftToneCurveSplineSolverPrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 101,
-            pr_title: "feat(lightcraft): Non-Linear Cubic Hermite Spline RGB Tone Curve Solver".to_string(),
+            pr_title: "feat(lightcraft): Non-Linear Cubic Hermite Spline RGB Tone Curve Solver"
+                .to_string(),
             target_subsystem: "LightCraft Tone & Color Processing Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -134,11 +135,14 @@ impl LightcraftAiSemanticAutoMaskingPrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 102,
-            pr_title: "feat(lightcraft): AI Semantic Auto-Masking Engine for Sky & Subject Isolation".to_string(),
+            pr_title:
+                "feat(lightcraft): AI Semantic Auto-Masking Engine for Sky & Subject Isolation"
+                    .to_string(),
             target_subsystem: "LightCraft AI Masking Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
-                "Neural semantic segmentation for sky, subject, background & skin tones".to_string(),
+                "Neural semantic segmentation for sky, subject, background & skin tones"
+                    .to_string(),
                 "Edge-aware alpha feathering filter".to_string(),
                 "Sub-10ms GPU mask inference pipeline".to_string(),
             ],
@@ -195,7 +199,9 @@ impl LightcraftRawImageDecodingPipelinePrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 103,
-            pr_title: "feat(lightcraft): Hardware-Accelerated RAW Image Decoding & Demosaicing Pipeline".to_string(),
+            pr_title:
+                "feat(lightcraft): Hardware-Accelerated RAW Image Decoding & Demosaicing Pipeline"
+                    .to_string(),
             target_subsystem: "LightCraft RAW Engine".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -264,7 +270,9 @@ impl LightcraftColorGradingWheel3WayPrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 104,
-            pr_title: "feat(lightcraft): 3-Way Color Grading Wheels for Shadows, Midtones & Highlights".to_string(),
+            pr_title:
+                "feat(lightcraft): 3-Way Color Grading Wheels for Shadows, Midtones & Highlights"
+                    .to_string(),
             target_subsystem: "LightCraft Color Grading Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -319,7 +327,8 @@ impl LightcraftDigitalAssetManagementCatalogPrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 105,
-            pr_title: "feat(lightcraft): Digital Asset Management Catalog & Fast Search Engine".to_string(),
+            pr_title: "feat(lightcraft): Digital Asset Management Catalog & Fast Search Engine"
+                .to_string(),
             target_subsystem: "LightCraft Catalog & Asset Management Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -375,7 +384,8 @@ impl LightcraftTetheredCameraCapturePrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 106,
-            pr_title: "feat(lightcraft): Tethered Camera Live Capture Control & Ingestion Pipeline".to_string(),
+            pr_title: "feat(lightcraft): Tethered Camera Live Capture Control & Ingestion Pipeline"
+                .to_string(),
             target_subsystem: "LightCraft Tethering & Hardware Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -433,7 +443,8 @@ impl LightcraftNoiseReductionSharpeningPrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 107,
-            pr_title: "feat(lightcraft): Wavelet Noise Reduction & Unsharp Mask Sharpening Filter".to_string(),
+            pr_title: "feat(lightcraft): Wavelet Noise Reduction & Unsharp Mask Sharpening Filter"
+                .to_string(),
             target_subsystem: "LightCraft Image Filter Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -479,9 +490,11 @@ impl LightcraftLensCorrectionPerspectivePrEngine {
         let dist_factor = 1.0 + self.distortion_k1;
         for chunk in input_rgb.chunks(3) {
             if chunk.len() == 3 {
-                let r = (chunk[0] as f32 * dist_factor * self.chromatic_aberration_r).clamp(0.0, 255.0) as u8;
+                let r = (chunk[0] as f32 * dist_factor * self.chromatic_aberration_r)
+                    .clamp(0.0, 255.0) as u8;
                 let g = (chunk[1] as f32 * dist_factor).clamp(0.0, 255.0) as u8;
-                let b = (chunk[2] as f32 * dist_factor / self.chromatic_aberration_r).clamp(0.0, 255.0) as u8;
+                let b = (chunk[2] as f32 * dist_factor / self.chromatic_aberration_r)
+                    .clamp(0.0, 255.0) as u8;
                 output.extend_from_slice(&[r, g, b]);
             }
         }
@@ -491,7 +504,8 @@ impl LightcraftLensCorrectionPerspectivePrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 108,
-            pr_title: "feat(lightcraft): Lens Geometric Distortion, CA & Perspective Correction".to_string(),
+            pr_title: "feat(lightcraft): Lens Geometric Distortion, CA & Perspective Correction"
+                .to_string(),
             target_subsystem: "LightCraft Lens & Geometry Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -537,7 +551,8 @@ impl LightcraftBatchExportWatermarkPrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 109,
-            pr_title: "feat(lightcraft): Batch Multi-Format Export Pipeline & Dynamic Watermarking".to_string(),
+            pr_title: "feat(lightcraft): Batch Multi-Format Export Pipeline & Dynamic Watermarking"
+                .to_string(),
             target_subsystem: "LightCraft Export & Output Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -570,8 +585,14 @@ pub struct LightcraftNonDestructivePresetEnginePrEngine {
 impl LightcraftNonDestructivePresetEnginePrEngine {
     pub fn new() -> Self {
         let mut presets = BTreeMap::new();
-        presets.insert("Cinematic".to_string(), "contrast:+15,saturation:-10,luma:S-curve".to_string());
-        presets.insert("Monochrome".to_string(), "saturation:-100,contrast:+25".to_string());
+        presets.insert(
+            "Cinematic".to_string(),
+            "contrast:+15,saturation:-10,luma:S-curve".to_string(),
+        );
+        presets.insert(
+            "Monochrome".to_string(),
+            "saturation:-100,contrast:+25".to_string(),
+        );
         Self { presets }
     }
 
@@ -582,7 +603,9 @@ impl LightcraftNonDestructivePresetEnginePrEngine {
     pub fn generate_proposal(&self) -> LightcraftArtcraftPrProposalManifest {
         LightcraftArtcraftPrProposalManifest {
             pr_id: 110,
-            pr_title: "feat(lightcraft): Non-Destructive Parameter Preset Engine & Snapshot History".to_string(),
+            pr_title:
+                "feat(lightcraft): Non-Destructive Parameter Preset Engine & Snapshot History"
+                    .to_string(),
             target_subsystem: "LightCraft Preset & History Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -643,7 +666,9 @@ impl SovereignLightcraftArtcraftParityPrGateway {
             return false;
         }
 
-        let mask = self.ai_masking_engine.generate_ai_mask(LightcraftAiMaskTarget::Sky, 4, 4);
+        let mask = self
+            .ai_masking_engine
+            .generate_ai_mask(LightcraftAiMaskTarget::Sky, 4, 4);
         if mask.len() != 16 {
             return false;
         }
@@ -659,7 +684,8 @@ impl SovereignLightcraftArtcraftParityPrGateway {
             return false;
         }
 
-        self.catalog_engine.index_photo(1, "test.cr2", &["landscape", "sky"]);
+        self.catalog_engine
+            .index_photo(1, "test.cr2", &["landscape", "sky"]);
         let search_res = self.catalog_engine.search_photos("landscape");
         if search_res.is_empty() {
             return false;
@@ -670,7 +696,9 @@ impl SovereignLightcraftArtcraftParityPrGateway {
             return false;
         }
 
-        let filtered = self.noise_reduction_engine.apply_noise_reduction_sharpening(&graded);
+        let filtered = self
+            .noise_reduction_engine
+            .apply_noise_reduction_sharpening(&graded);
         if filtered.is_empty() {
             return false;
         }

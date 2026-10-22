@@ -344,9 +344,7 @@ mod tests {
         assert_eq!(nixos.source_pm, "nixos");
         assert_eq!(nixos.operation, UniversalPmOperation::Install);
 
-        let nala = dispatcher
-            .dispatch_command("nala install htop")
-            .unwrap();
+        let nala = dispatcher.dispatch_command("nala install htop").unwrap();
         assert_eq!(nala.source_pm, "nala");
         assert_eq!(nala.operation, UniversalPmOperation::Install);
 
@@ -366,11 +364,15 @@ mod tests {
     #[test]
     fn test_expanded_distro_aliases_dispatch() {
         let dispatcher = UniversalPmCommandDispatcher::new();
-        let ghostbsd = dispatcher.dispatch_command("ghostbsd install xfce4").unwrap();
+        let ghostbsd = dispatcher
+            .dispatch_command("ghostbsd install xfce4")
+            .unwrap();
         assert_eq!(ghostbsd.source_pm, "ghostbsd");
         assert_eq!(ghostbsd.operation, UniversalPmOperation::Install);
 
-        let postmarketos = dispatcher.dispatch_command("postmarketos add waybar").unwrap();
+        let postmarketos = dispatcher
+            .dispatch_command("postmarketos add waybar")
+            .unwrap();
         assert_eq!(postmarketos.source_pm, "postmarketos");
         assert_eq!(postmarketos.operation, UniversalPmOperation::Install);
 

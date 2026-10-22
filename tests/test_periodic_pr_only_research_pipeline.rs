@@ -100,7 +100,12 @@ fn test_github_templates_exist() {
     // Check PR Template
     let pr_template = fs::read_to_string(".github/PULL_REQUEST_TEMPLATE.md")
         .expect("PULL_REQUEST_TEMPLATE.md should exist");
-    assert!(pr_template.contains("Study document") || pr_template.contains("Upstream study") || pr_template.contains("IPC handler") || pr_template.contains("Component"));
+    assert!(
+        pr_template.contains("Study document")
+            || pr_template.contains("Upstream study")
+            || pr_template.contains("IPC handler")
+            || pr_template.contains("Component")
+    );
     assert!(pr_template.contains("Reference study") || pr_template.contains("What SigmaOS adopts"));
     assert!(
         pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback")

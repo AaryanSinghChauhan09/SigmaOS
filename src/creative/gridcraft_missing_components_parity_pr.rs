@@ -21,10 +21,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-
-
-
-
 /// Structured PR proposal manifest for missing Gridcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GridcraftPrProposalManifest {

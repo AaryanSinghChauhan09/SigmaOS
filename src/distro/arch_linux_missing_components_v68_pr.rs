@@ -189,7 +189,9 @@ impl ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.scheduler_policy.is_empty() && self.bore_interactivity_score > 0 && self.latency_reduction_pct > 0
+        !self.scheduler_policy.is_empty()
+            && self.bore_interactivity_score > 0
+            && self.latency_reduction_pct > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV68PrSpec {
@@ -236,7 +238,9 @@ impl ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.subvolume_names.is_empty() && self.snapper_integration && !self.compression_type.is_empty()
+        !self.subvolume_names.is_empty()
+            && self.snapper_integration
+            && !self.compression_type.is_empty()
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV68PrSpec {
@@ -278,7 +282,9 @@ impl ArchPacmanConfigRepositoryCustomDbPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.repo_name.is_empty() && !self.pqc_signature_algorithm.is_empty() && self.zstd_compression_level > 0
+        !self.repo_name.is_empty()
+            && !self.pqc_signature_algorithm.is_empty()
+            && self.zstd_compression_level > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV68PrSpec {
@@ -362,7 +368,9 @@ impl ArchPacmanCachePaccacheRetentionPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.keep_uninstalled_candidates > 0 && self.min_cache_age_days > 0 && self.reclaimed_space_gb > 0
+        self.keep_uninstalled_candidates > 0
+            && self.min_cache_age_days > 0
+            && self.reclaimed_space_gb > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV68PrSpec {
@@ -404,7 +412,9 @@ impl ArchArchNewsSystemNotificationPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.feed_url.is_empty() && self.auto_block_breaking_upgrades && self.parsed_news_articles > 0
+        !self.feed_url.is_empty()
+            && self.auto_block_breaking_upgrades
+            && self.parsed_news_articles > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV68PrSpec {
@@ -446,7 +456,9 @@ impl ArchKeyringWebOfTrustAutoRefreshPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.wkd_server.is_empty() && self.auto_revoke_compromised_keys && self.refreshed_keys_count > 0
+        !self.wkd_server.is_empty()
+            && self.auto_revoke_compromised_keys
+            && self.refreshed_keys_count > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV68PrSpec {

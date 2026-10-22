@@ -97,8 +97,14 @@ fn test_haiku_befs_attribute_indexing_engine() {
 #[test]
 fn test_plan9_9p2000l_plumber_engine() {
     let engine = Plan99p2000LPlumberV68PrEngine::new();
-    assert_eq!(engine.route_plumber_message("http://sigmaos.org"), Some("dispatch_browser"));
-    assert_eq!(engine.route_plumber_message("main.rs"), Some("dispatch_editor"));
+    assert_eq!(
+        engine.route_plumber_message("http://sigmaos.org"),
+        Some("dispatch_browser")
+    );
+    assert_eq!(
+        engine.route_plumber_message("main.rs"),
+        Some("dispatch_editor")
+    );
     assert_eq!(engine.route_plumber_message("unknown"), None);
 
     let proposal = engine.generate_pr_proposal();
@@ -128,7 +134,10 @@ fn test_debian_dpkg_triggers_engine() {
 #[test]
 fn test_debian_apt_secure_keyring_pqc_engine() {
     let engine = DebianAptSecureKeyringPqcV68PrEngine::new();
-    assert!(engine.verify_inrelease_signature("InReleaseContent", "DILITHIUM5:8F93A4B1C2D3E4F567890ABCDEF1234567890ABC"));
+    assert!(engine.verify_inrelease_signature(
+        "InReleaseContent",
+        "DILITHIUM5:8F93A4B1C2D3E4F567890ABCDEF1234567890ABC"
+    ));
     assert!(!engine.verify_inrelease_signature("InReleaseContent", "INVALID_FINGERPRINT"));
 
     let proposal = engine.generate_pr_proposal();
@@ -148,7 +157,10 @@ fn test_debian_debconf_state_engine() {
 #[test]
 fn test_debian_lintian_static_analysis_engine() {
     let engine = DebianLintianStaticAnalysisV68PrEngine::new();
-    let files = vec!["/usr/bin/symlink_app".to_string(), "/usr/bin/real_app".to_string()];
+    let files = vec![
+        "/usr/bin/symlink_app".to_string(),
+        "/usr/bin/real_app".to_string(),
+    ];
     let tags = engine.audit_package_manifest(&files);
     assert_eq!(tags.len(), 1);
     assert_eq!(tags[0], "E: no-symbolic-link-in-usr-bin");

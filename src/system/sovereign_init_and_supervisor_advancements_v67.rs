@@ -154,7 +154,12 @@ impl SystemdAdvancementsV67Engine {
     }
 
     /// Evaluate cgroup v2 Pressure Stall Information (PSI) metrics against threshold.
-    pub fn evaluate_cgroup_psi_pressure(&self, some_avg10: f32, full_avg10: f32, threshold: f32) -> bool {
+    pub fn evaluate_cgroup_psi_pressure(
+        &self,
+        some_avg10: f32,
+        full_avg10: f32,
+        threshold: f32,
+    ) -> bool {
         some_avg10 >= threshold || full_avg10 >= threshold
     }
 
@@ -312,7 +317,11 @@ impl RunitS6AdvancementsV67Engine {
     }
 
     /// Verify s6-rc compiled database transition validity and atomic rollback target.
-    pub fn validate_s6_rc_database_transition(&self, current_db_version: u32, target_db_version: u32) -> bool {
+    pub fn validate_s6_rc_database_transition(
+        &self,
+        current_db_version: u32,
+        target_db_version: u32,
+    ) -> bool {
         target_db_version >= current_db_version || target_db_version == 0
     }
 

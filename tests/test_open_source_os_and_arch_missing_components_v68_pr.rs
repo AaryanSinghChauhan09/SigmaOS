@@ -11,7 +11,11 @@ fn test_arch_linux_v68_pr_suite_full_cycle() {
     let suite = ArchLinuxMissingComponentsV68PrSuite::new();
     let prs = suite.run_all_prs();
 
-    assert_eq!(prs.len(), 10, "Expected 10 Arch Linux V68 PR specifications");
+    assert_eq!(
+        prs.len(),
+        10,
+        "Expected 10 Arch Linux V68 PR specifications"
+    );
     assert_eq!(
         suite.compute_gap_closure_score(),
         100,

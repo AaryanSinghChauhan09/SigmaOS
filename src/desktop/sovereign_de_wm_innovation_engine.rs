@@ -417,8 +417,13 @@ impl KdePlasmaInnovationEngine {
     }
 
     pub fn mount_plasma_vault(&mut self, vault_name: &str) -> bool {
-        if !vault_name.is_empty() && !self.plasma_vault_encrypted_dirs.contains(&vault_name.to_string()) {
-            self.plasma_vault_encrypted_dirs.push(vault_name.to_string());
+        if !vault_name.is_empty()
+            && !self
+                .plasma_vault_encrypted_dirs
+                .contains(&vault_name.to_string())
+        {
+            self.plasma_vault_encrypted_dirs
+                .push(vault_name.to_string());
             true
         } else {
             false
@@ -570,7 +575,10 @@ impl XfceInnovationEngine {
     }
 
     pub fn watch_xfconf_channel(&mut self, channel_name: &str) {
-        if !self.xfconf_property_watchers.contains(&channel_name.to_string()) {
+        if !self
+            .xfconf_property_watchers
+            .contains(&channel_name.to_string())
+        {
             self.xfconf_property_watchers.push(channel_name.to_string());
         }
     }
@@ -785,7 +793,10 @@ impl LxdeInnovationEngine {
     }
 
     pub fn load_dynamic_applet(&mut self, applet_name: &str) {
-        if !self.lxpanel_dynamic_applets.contains(&applet_name.to_string()) {
+        if !self
+            .lxpanel_dynamic_applets
+            .contains(&applet_name.to_string())
+        {
             self.lxpanel_dynamic_applets.push(applet_name.to_string());
         }
     }
@@ -1516,14 +1527,16 @@ impl BspwmInnovationEngine {
     }
 
     pub fn subscribe_bspc_events(&mut self, event_type: &str) {
-        if !self.bspc_event_subscriptions.contains(&event_type.to_string()) {
+        if !self
+            .bspc_event_subscriptions
+            .contains(&event_type.to_string())
+        {
             self.bspc_event_subscriptions.push(event_type.to_string());
         }
     }
 
     pub fn set_desktop_layout(&mut self, desktop_id: u32, layout: &str) {
-        self.desktop_layouts
-            .insert(desktop_id, layout.to_string());
+        self.desktop_layouts.insert(desktop_id, layout.to_string());
     }
 }
 
@@ -2884,9 +2897,15 @@ mod tests {
             Some(&vec![String::from("sticky")])
         );
         bspwm.subscribe_bspc_events("node_focus");
-        assert_eq!(bspwm.bspc_event_subscriptions, vec![String::from("node_focus")]);
+        assert_eq!(
+            bspwm.bspc_event_subscriptions,
+            vec![String::from("node_focus")]
+        );
         bspwm.set_desktop_layout(1, "monocle");
-        assert_eq!(bspwm.desktop_layouts.get(&1), Some(&String::from("monocle")));
+        assert_eq!(
+            bspwm.desktop_layouts.get(&1),
+            Some(&String::from("monocle"))
+        );
     }
 
     #[test]

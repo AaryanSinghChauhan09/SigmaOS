@@ -865,7 +865,9 @@ impl SovereignGoogleDocsSmartChipMetadataEngine {
                 hover_url: format!("sigmaos://users/{}", name.to_lowercase()),
             }
         } else if raw_chip_tag.starts_with("@doc:") || raw_chip_tag.starts_with("@file:") {
-            let file = raw_chip_tag.trim_start_matches("@doc:").trim_start_matches("@file:");
+            let file = raw_chip_tag
+                .trim_start_matches("@doc:")
+                .trim_start_matches("@file:");
             SmartChipMetadata {
                 chip_id: format!("chip_f_{}", file.to_lowercase()),
                 chip_kind: SmartChipKind::FileReference,
@@ -1377,7 +1379,8 @@ impl SovereignSalesforceEinsteinPipelineScoringEngine {
         let stagnation_penalty = (days_in_stage as f64 * 1.5).min(60.0);
         let amount_boost = if deal_amount >= 100_000.0 { 20.0 } else { 10.0 };
 
-        let final_health = (base_score + amount_boost - stagnation_penalty).clamp(0.0, 100.0) as u32;
+        let final_health =
+            (base_score + amount_boost - stagnation_penalty).clamp(0.0, 100.0) as u32;
 
         let risk = if final_health < 30 {
             ChurnRiskLevel::Critical
@@ -1791,12 +1794,24 @@ mod tests_v3 {
         // 5. SovereignMicrosoftPowerBiDaxEngine
         let dax_engine = SovereignMicrosoftPowerBiDaxEngine::new();
         let filters = HashMap::new();
-        let dax_res = dax_engine.evaluate_dax_measure_with_context("TotalSales", "SUM", &[100.0, 200.0, 300.0], "Region", "US", &filters);
+        let dax_res = dax_engine.evaluate_dax_measure_with_context(
+            "TotalSales",
+            "SUM",
+            &[100.0, 200.0, 300.0],
+            "Region",
+            "US",
+            &filters,
+        );
         assert_eq!(dax_res.calculated_value, 600.0);
 
         // 6. SovereignMicrosoftExcelWhatIfDataSensitivityEngine
         let whatif_engine = SovereignMicrosoftExcelWhatIfDataSensitivityEngine::new();
-        let sens_res = whatif_engine.generate_two_variable_data_table("Profit Matrix", &[10.0, 20.0], &[5.0, 10.0], |v1, v2| v1 * v2);
+        let sens_res = whatif_engine.generate_two_variable_data_table(
+            "Profit Matrix",
+            &[10.0, 20.0],
+            &[5.0, 10.0],
+            |v1, v2| v1 * v2,
+        );
         assert_eq!(sens_res.data_table.len(), 4);
         assert_eq!(sens_res.optimal_variable_1, 20.0);
         assert_eq!(sens_res.optimal_variable_2, 10.0);
@@ -1831,13 +1846,11 @@ mod tests_v3 {
             required_skill: "Tier2".to_string(),
             customer_tier: "VIP".to_string(),
         };
-        let agents = vec![
-            AgentSkillMatch {
-                agent_id: "agent_a".to_string(),
-                skill_level: 6,
-                current_workload: 2,
-            },
-        ];
+        let agents = vec![AgentSkillMatch {
+            agent_id: "agent_a".to_string(),
+            skill_level: 6,
+            current_workload: 2,
+        }];
         let route_res = route_engine.route_omnichannel_ticket(&ticket, &agents);
         assert_eq!(route_res.assigned_agent_id, Some("agent_a".to_string()));
         assert!(route_res.routing_strategy.contains("VIP"));

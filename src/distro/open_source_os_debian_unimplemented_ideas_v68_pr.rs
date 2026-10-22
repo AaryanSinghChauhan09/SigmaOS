@@ -132,8 +132,11 @@ impl DebianDpkgTriggersOrderingEngineV68Pr {
             title: "Debian dpkg Trigger Execution Graph & Deferred Action Governor V68".to_string(),
             target_component: "src/distro/debian_dpkg_triggers_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements topological dependency ordering and deferred trigger execution.".to_string(),
-            git_diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements topological dependency ordering and deferred trigger execution."
+                    .to_string(),
+            git_diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DPKG-TRIGGERS-V68".to_string(),
         }
     }
@@ -157,7 +160,12 @@ impl DebianSecureAptPqcDilithiumInReleaseEngineV68Pr {
         Self { trusted_keys: keys }
     }
 
-    pub fn verify_inrelease_signature(&self, key_id: &str, content: &[u8], signature: &str) -> bool {
+    pub fn verify_inrelease_signature(
+        &self,
+        key_id: &str,
+        content: &[u8],
+        signature: &str,
+    ) -> bool {
         if let Some(key) = self.trusted_keys.get(key_id) {
             !content.is_empty() && signature.contains("DILITHIUM5") && !key.is_empty()
         } else {
@@ -191,7 +199,10 @@ impl DebianDebconfStateDatabaseEngineV68Pr {
     pub fn new() -> Self {
         let mut db = BTreeMap::new();
         db.insert("tzdata/zones".to_string(), "UTC".to_string());
-        db.insert("locales/default_environment_locale".to_string(), "en_US.UTF-8".to_string());
+        db.insert(
+            "locales/default_environment_locale".to_string(),
+            "en_US.UTF-8".to_string(),
+        );
 
         Self {
             answers: db,
@@ -204,7 +215,8 @@ impl DebianDebconfStateDatabaseEngineV68Pr {
     }
 
     pub fn set_answer(&mut self, question: &str, answer: &str) {
-        self.answers.insert(question.to_string(), answer.to_string());
+        self.answers
+            .insert(question.to_string(), answer.to_string());
     }
 
     pub fn generate_pr_proposal(&self) -> OsPrProposalV68 {
@@ -213,8 +225,11 @@ impl DebianDebconfStateDatabaseEngineV68Pr {
             title: "Debian debconf Configuration Database & Priority Engine V68".to_string(),
             target_component: "src/distro/debian_debconf_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements debconf multi-backend configuration state database and question filter.".to_string(),
-            git_diff_patch: "--- a/Debconf/Db.pm\n+++ b/Debconf/Db.pm\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements debconf multi-backend configuration state database and question filter."
+                    .to_string(),
+            git_diff_patch: "--- a/Debconf/Db.pm\n+++ b/Debconf/Db.pm\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBCONF-STATE-V68".to_string(),
         }
     }
@@ -245,7 +260,11 @@ impl DebianLintianStaticPolicyCheckerEngineV68Pr {
         }
     }
 
-    pub fn analyze_package_spec(&self, has_control: bool, has_copyright: bool) -> Vec<LintianTagV68> {
+    pub fn analyze_package_spec(
+        &self,
+        has_control: bool,
+        has_copyright: bool,
+    ) -> Vec<LintianTagV68> {
         let mut tags = Vec::new();
         if !has_control {
             tags.push(LintianTagV68 {
@@ -270,8 +289,12 @@ impl DebianLintianStaticPolicyCheckerEngineV68Pr {
             title: "Debian lintian Package Policy Enforcement Suite V68".to_string(),
             target_component: "src/distro/debian_lintian_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements lintian package static analysis suite and Debian Policy tag checks.".to_string(),
-            git_diff_patch: "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,4 +1,9 @@\n".to_string(),
+            description:
+                "Implements lintian package static analysis suite and Debian Policy tag checks."
+                    .to_string(),
+            git_diff_patch:
+                "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,4 +1,9 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-LINTIAN-ANALYZER-V68".to_string(),
         }
     }
@@ -305,8 +328,12 @@ impl DebianBuilddCleanroomSbuildChrootEngineV68Pr {
             title: "Debian buildd Cleanroom sbuild Sandbox Orchestrator V68".to_string(),
             target_component: "src/distro/debian_sbuild_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements cleanroom sbuild chroot build orchestrator for reproducible builds.".to_string(),
-            git_diff_patch: "--- a/lib/Sbuild/Build.pm\n+++ b/lib/Sbuild/Build.pm\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements cleanroom sbuild chroot build orchestrator for reproducible builds."
+                    .to_string(),
+            git_diff_patch:
+                "--- a/lib/Sbuild/Build.pm\n+++ b/lib/Sbuild/Build.pm\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-BUILDD-SBUILD-V68".to_string(),
         }
     }
@@ -351,7 +378,9 @@ impl DebianDebsumsIntegrityTamperDetectorEngineV68Pr {
             title: "Debian debsums Package Checksum Integrity Auditor V68".to_string(),
             target_component: "src/distro/debian_debsums_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements debsums package integrity auditor and sysroot tamper detector.".to_string(),
+            description:
+                "Implements debsums package integrity auditor and sysroot tamper detector."
+                    .to_string(),
             git_diff_patch: "--- a/debsums\n+++ b/debsums\n@@ -1,5 +1,10 @@\n".to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBSUMS-AUDITOR-V68".to_string(),
         }
@@ -388,8 +417,11 @@ impl DebianPopconUsageTelemetryEngineV68Pr {
             title: "Debian popcon Package Popularity Telemetry Engine V68".to_string(),
             target_component: "src/distro/debian_popcon_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements popcon anonymized package installation and access telemetry compiler.".to_string(),
-            git_diff_patch: "--- a/popcon-upload\n+++ b/popcon-upload\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements popcon anonymized package installation and access telemetry compiler."
+                    .to_string(),
+            git_diff_patch: "--- a/popcon-upload\n+++ b/popcon-upload\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-POPCON-ANALYZER-V68".to_string(),
         }
     }
@@ -427,7 +459,9 @@ impl DebianPiupartsLifecycleSanityEngineV68Pr {
             title: "Debian piuparts Package Lifecycle Cleanliness Verification V68".to_string(),
             target_component: "src/distro/debian_piuparts_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements piuparts package install, upgrade, remove, and purge cleanliness suite.".to_string(),
+            description:
+                "Implements piuparts package install, upgrade, remove, and purge cleanliness suite."
+                    .to_string(),
             git_diff_patch: "--- a/piuparts.py\n+++ b/piuparts.py\n@@ -1,5 +1,10 @@\n".to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-PIUPARTS-SANITY-V68".to_string(),
         }
@@ -446,8 +480,14 @@ pub struct DebianSubiquityInstallerAutoinstallEngineV68Pr {
 impl DebianSubiquityInstallerAutoinstallEngineV68Pr {
     pub fn new() -> Self {
         let mut preseeds = BTreeMap::new();
-        preseeds.insert("d-i mirror/country".to_string(), "string manual".to_string());
-        preseeds.insert("d-i netcfg/get_hostname".to_string(), "string sigma-node".to_string());
+        preseeds.insert(
+            "d-i mirror/country".to_string(),
+            "string manual".to_string(),
+        );
+        preseeds.insert(
+            "d-i netcfg/get_hostname".to_string(),
+            "string sigma-node".to_string(),
+        );
 
         Self {
             autoinstall_yaml: "version: 1\nidentity: {hostname: sigma-node}".to_string(),
@@ -469,8 +509,12 @@ impl DebianSubiquityInstallerAutoinstallEngineV68Pr {
             title: "Debian/Ubuntu Subiquity Autoinstall & Debconf Preseed Engine V68".to_string(),
             target_component: "src/distro/debian_subiquity_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements automated Subiquity YAML autoinstall and debconf preseed engine.".to_string(),
-            git_diff_patch: "--- a/subiquity/autoinstall.py\n+++ b/subiquity/autoinstall.py\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements automated Subiquity YAML autoinstall and debconf preseed engine."
+                    .to_string(),
+            git_diff_patch:
+                "--- a/subiquity/autoinstall.py\n+++ b/subiquity/autoinstall.py\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-SUBIQUITY-AUTOINSTALL-V68".to_string(),
         }
     }
@@ -487,7 +531,11 @@ pub struct DebianMultiarchAptResolverEngineV68Pr {
 impl DebianMultiarchAptResolverEngineV68Pr {
     pub fn new() -> Self {
         Self {
-            foreign_architectures: vec!["i386".to_string(), "arm64".to_string(), "riscv64".to_string()],
+            foreign_architectures: vec![
+                "i386".to_string(),
+                "arm64".to_string(),
+                "riscv64".to_string(),
+            ],
         }
     }
 
@@ -501,8 +549,12 @@ impl DebianMultiarchAptResolverEngineV68Pr {
             title: "Debian Multi-Arch Co-Installation Dependency Resolver V68".to_string(),
             target_component: "src/distro/debian_multiarch_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Implements multi-arch co-installation dependency resolution and SONAME validation.".to_string(),
-            git_diff_patch: "--- a/apt-pkg/algorithms.cc\n+++ b/apt-pkg/algorithms.cc\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements multi-arch co-installation dependency resolution and SONAME validation."
+                    .to_string(),
+            git_diff_patch:
+                "--- a/apt-pkg/algorithms.cc\n+++ b/apt-pkg/algorithms.cc\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-MULTIARCH-RESOLVER-V68".to_string(),
         }
     }
@@ -542,7 +594,9 @@ impl DebianUsrMergeAliasedSymlinksEngineV68Pr {
             title: "Debian Merged-/usr Symlink Resolution & Migration Engine V68".to_string(),
             target_component: "src/distro/debian_usr_merge_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Enforces canonical merged-/usr path resolution and aliased symlink validation.".to_string(),
+            description:
+                "Enforces canonical merged-/usr path resolution and aliased symlink validation."
+                    .to_string(),
             git_diff_patch: "--- a/usrmerge\n+++ b/usrmerge\n@@ -1,5 +1,10 @@\n".to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-USR-MERGE-V68".to_string(),
         }
@@ -595,8 +649,11 @@ impl DebianAptListbugsSecurityAdvisoryEngineV68Pr {
             title: "Debian apt-listbugs BTS Grave Bug Safety Gate V68".to_string(),
             target_component: "src/distro/debian_apt_listbugs_v68.rs".to_string(),
             status: OsPrStatusV68::Staged,
-            description: "Queries Debian BTS for grave/critical bugs and prevents unsafe apt operations.".to_string(),
-            git_diff_patch: "--- a/apt-listbugs\n+++ b/apt-listbugs\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Queries Debian BTS for grave/critical bugs and prevents unsafe apt operations."
+                    .to_string(),
+            git_diff_patch: "--- a/apt-listbugs\n+++ b/apt-listbugs\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-APT-LISTBUGS-V68".to_string(),
         }
     }
@@ -614,7 +671,9 @@ impl DebianAptCacherNgProxyStorageEngineV68Pr {
     pub fn new() -> Self {
         let mut set = BTreeSet::new();
         set.insert("libc6_2.38-1_amd64.deb".to_string());
-        Self { cached_packages: set }
+        Self {
+            cached_packages: set,
+        }
     }
 
     pub fn is_cached(&self, pkg_filename: &str) -> bool {
@@ -686,8 +745,14 @@ pub struct DebianMetapackageTaskselEngineV68Pr {
 impl DebianMetapackageTaskselEngineV68Pr {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert("desktop".to_string(), vec!["gnome-core".to_string(), "xorg".to_string()]);
-        map.insert("web-server".to_string(), vec!["nginx".to_string(), "certbot".to_string()]);
+        map.insert(
+            "desktop".to_string(),
+            vec!["gnome-core".to_string(), "xorg".to_string()],
+        );
+        map.insert(
+            "web-server".to_string(),
+            vec!["nginx".to_string(), "certbot".to_string()],
+        );
 
         Self { tasks: map }
     }
@@ -720,7 +785,10 @@ pub struct DebianSnapshotArchiveTimeTravelEngineV68Pr {
 impl DebianSnapshotArchiveTimeTravelEngineV68Pr {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert("20260101T000000Z".to_string(), "http://snapshot.debian.org/archive/debian/20260101T000000Z/".to_string());
+        map.insert(
+            "20260101T000000Z".to_string(),
+            "http://snapshot.debian.org/archive/debian/20260101T000000Z/".to_string(),
+        );
 
         Self { snapshots: map }
     }
@@ -866,7 +934,10 @@ mod tests {
         assert_eq!(orphans, vec!["/tmp/leftover.tmp".to_string()]);
 
         let subiquity = DebianSubiquityInstallerAutoinstallEngineV68Pr::new();
-        assert_eq!(subiquity.parse_autoinstall_hostname(), Some("sigma-node".to_string()));
+        assert_eq!(
+            subiquity.parse_autoinstall_hostname(),
+            Some("sigma-node".to_string())
+        );
 
         let multiarch = DebianMultiarchAptResolverEngineV68Pr::new();
         assert!(multiarch.resolve_coinstallation("libssl3", "i386"));
@@ -882,10 +953,16 @@ mod tests {
         assert!(cacher.is_cached("libc6_2.38-1_amd64.deb"));
 
         let sysv = DebianSystemdSysvinitCompatibilityEngineV68Pr::new();
-        assert!(sysv.generate_systemd_unit("/etc/init.d/networking").unwrap().contains("Network Interfaces"));
+        assert!(sysv
+            .generate_systemd_unit("/etc/init.d/networking")
+            .unwrap()
+            .contains("Network Interfaces"));
 
         let tasksel = DebianMetapackageTaskselEngineV68Pr::new();
-        assert_eq!(tasksel.resolve_task_packages("desktop"), vec!["gnome-core".to_string(), "xorg".to_string()]);
+        assert_eq!(
+            tasksel.resolve_task_packages("desktop"),
+            vec!["gnome-core".to_string(), "xorg".to_string()]
+        );
 
         let snapshot = DebianSnapshotArchiveTimeTravelEngineV68Pr::new();
         assert!(snapshot.get_snapshot_url("20260101T000000Z").is_some());

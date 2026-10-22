@@ -1,7 +1,7 @@
 #![no_std]
 extern crate alloc;
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS - 3DCraft to ArtCraft Parity & 3D Spatial Innovations PR Proposal Engine
 // (`src/creative/threedcraft_artcraft_parity_pr.rs`)
@@ -19,10 +19,6 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f32::consts::PI;
-
-
-
-
 
 /// Structured PR proposal manifest for 3DCraft / ArtCraft 3D spatial & rendering features.
 #[derive(Debug, Clone, PartialEq, Eq)]

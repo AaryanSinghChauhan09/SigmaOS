@@ -78,7 +78,8 @@ impl Linux624SchedExtBpfPowerTopologyGovernorEngineV68 {
     }
 
     pub fn register_policy(&mut self, name: &str, ebpf_hash: &str) {
-        self.sched_policies.insert(name.to_string(), ebpf_hash.to_string());
+        self.sched_policies
+            .insert(name.to_string(), ebpf_hash.to_string());
     }
 
     pub fn register_quantum_core(&mut self, core_id: &str, latency_ps: u64) {
@@ -188,7 +189,8 @@ impl DragonFly73Hammer2DirectIoErasureEngineV68 {
     }
 
     pub fn mount_pfs(&mut self, pfs_name: &str, redundancy_k_m: u32) {
-        self.pfs_volumes.insert(pfs_name.to_string(), redundancy_k_m);
+        self.pfs_volumes
+            .insert(pfs_name.to_string(), redundancy_k_m);
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
@@ -221,7 +223,8 @@ impl NetBsd122RumpUserlandAudioPciRouterEngineV68 {
     }
 
     pub fn register_hypercall(&mut self, symbol: &str, driver_path: &str) {
-        self.rump_hypercalls.insert(symbol.to_string(), driver_path.to_string());
+        self.rump_hypercalls
+            .insert(symbol.to_string(), driver_path.to_string());
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
@@ -254,7 +257,8 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV68 {
     }
 
     pub fn add_attribute_index(&mut self, attr_name: &str, attr_type: &str) {
-        self.indexed_attributes.insert(attr_name.to_string(), attr_type.to_string());
+        self.indexed_attributes
+            .insert(attr_name.to_string(), attr_type.to_string());
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
@@ -320,7 +324,8 @@ impl NixGuixHermeticCasMerkleClosureEngineV68 {
     }
 
     pub fn add_store_path(&mut self, hash_path: &str, merkle_root: &str) {
-        self.store_paths.insert(hash_path.to_string(), merkle_root.to_string());
+        self.store_paths
+            .insert(hash_path.to_string(), merkle_root.to_string());
     }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV68 {
@@ -386,7 +391,8 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV68 {
     }
 
     pub fn harvest_idea(&mut self, source: &str, description: &str) {
-        self.harvested_ideas.insert(source.to_string(), description.to_string());
+        self.harvested_ideas
+            .insert(source.to_string(), description.to_string());
     }
 
     pub fn generate_wiki_documentation_page(&self, title: &str) -> String {
@@ -401,7 +407,9 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV68 {
         doc.push_str("\n### Maintenance & Deployment Instructions\n");
         doc.push_str("1. Execute standalone module test suites using `rustc --test`.\n");
         doc.push_str("2. Verify cross-subsystem interop scores using `SovereignOpenSourceOsMissingComponentsV68PrSuite`.\n");
-        doc.push_str("3. Run `./run_sigma_tests.sh` to validate system integrity prior to PR submissions.\n");
+        doc.push_str(
+            "3. Run `./run_sigma_tests.sh` to validate system integrity prior to PR submissions.\n",
+        );
         doc
     }
 
@@ -473,8 +481,14 @@ impl SovereignOpenSourceOsMissingComponentsV68PrSuite {
         illumos_crossbow.bind_vnic("vnic0", 8080);
 
         let mut tech_media = GlobalTechMedia33PortalUnimplementedIdeasEngineV68::new();
-        tech_media.harvest_idea("Phoronix", "Linux 6.24 eBPF Quantum NUMA SchedExt Benchmarks");
-        tech_media.harvest_idea("HackerNews", "Capability-based Micro-Jail VNET isolation in FreeBSD");
+        tech_media.harvest_idea(
+            "Phoronix",
+            "Linux 6.24 eBPF Quantum NUMA SchedExt Benchmarks",
+        );
+        tech_media.harvest_idea(
+            "HackerNews",
+            "Capability-based Micro-Jail VNET isolation in FreeBSD",
+        );
 
         Self {
             linux_sched,
@@ -527,7 +541,9 @@ mod tests {
             assert!(!p.patch_diff.is_empty());
         }
 
-        let wiki_page = suite.tech_media.generate_wiki_documentation_page("V68 Open Source OS Wiki Maintenance");
+        let wiki_page = suite
+            .tech_media
+            .generate_wiki_documentation_page("V68 Open Source OS Wiki Maintenance");
         assert!(wiki_page.contains("V68 Open Source OS Wiki Maintenance"));
         assert!(wiki_page.contains("Phoronix"));
     }

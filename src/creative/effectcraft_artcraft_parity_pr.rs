@@ -24,10 +24,6 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-
-
-
-
 /// Structured PR proposal manifest descriptor for Effectcraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EffectcraftArtcraftPrProposalManifest {

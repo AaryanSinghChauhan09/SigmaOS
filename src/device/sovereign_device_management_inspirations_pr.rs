@@ -743,7 +743,7 @@ pub struct PowerSupplyDevice {
     pub energy_now_wh: f32,
     pub energy_full_wh: f32,
     pub energy_full_design_wh: f32,
-    pub power_rate_w: f32, // Discharge or charge rate in Watts
+    pub power_rate_w: f32,         // Discharge or charge rate in Watts
     pub charge_stop_threshold: u8, // e.g. 80% limit for longevity
 }
 
@@ -1245,7 +1245,10 @@ impl PolkitAuthorizationEngine {
         now_ts: u64,
     ) -> Option<PolkitAuthResult> {
         self.auth_cache.iter().find_map(|entry| {
-            if entry.subject_uid == uid && entry.action_id == action_id && entry.expires_timestamp > now_ts {
+            if entry.subject_uid == uid
+                && entry.action_id == action_id
+                && entry.expires_timestamp > now_ts
+            {
                 Some(entry.granted_result)
             } else {
                 None
@@ -1714,7 +1717,8 @@ mod tests {
         assert!(coldplug_matches >= 2);
 
         // Test NetBSD drvctl command
-        let drvctl_msg = engine.execute_netbsd_drvctl(NetBsdDrvctlCommand::RescanBus("pci0".to_string()));
+        let drvctl_msg =
+            engine.execute_netbsd_drvctl(NetBsdDrvctlCommand::RescanBus("pci0".to_string()));
         assert!(drvctl_msg.contains("Rescanned bus pci0"));
 
         // Test OpenBSD hotplugd attach script dispatch
@@ -1823,8 +1827,18 @@ mod tests {
         assert_eq!(auth_inactive, PolkitAuthResult::AuthAdmin);
 
         // Authorization Caching
-        polkit.cache_authorization(1000, "org.freedesktop.udisks2.filesystem-mount", PolkitAuthResult::Yes, 300, 1000);
-        let cached = polkit.check_cached_authorization(1000, "org.freedesktop.udisks2.filesystem-mount", 1050);
+        polkit.cache_authorization(
+            1000,
+            "org.freedesktop.udisks2.filesystem-mount",
+            PolkitAuthResult::Yes,
+            300,
+            1000,
+        );
+        let cached = polkit.check_cached_authorization(
+            1000,
+            "org.freedesktop.udisks2.filesystem-mount",
+            1050,
+        );
         assert_eq!(cached, Some(PolkitAuthResult::Yes));
     }
 

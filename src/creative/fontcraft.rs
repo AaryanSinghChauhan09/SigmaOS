@@ -131,8 +131,8 @@ impl SovereignFontEngine {
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_fontcraft_glyph_parsing() {

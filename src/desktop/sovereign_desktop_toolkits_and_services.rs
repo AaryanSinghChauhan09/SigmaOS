@@ -307,7 +307,12 @@ impl SovereignGtkQtToolkitEngine {
         qss
     }
 
-    pub fn calculate_sunset_dark_mode(&self, _latitude: f64, longitude: f64, current_hour_utc: u32) -> AdwColorScheme {
+    pub fn calculate_sunset_dark_mode(
+        &self,
+        _latitude: f64,
+        longitude: f64,
+        current_hour_utc: u32,
+    ) -> AdwColorScheme {
         // Approximate sunset/sunrise based on longitude adjustment
         let tz_offset = (longitude / 15.0).round() as i32;
         let local_hour = (current_hour_utc as i32 + tz_offset).rem_euclid(24) as u32;
@@ -648,7 +653,12 @@ impl SovereignDisplayManagerSuiteEngine {
         }
     }
 
-    pub fn assign_lightdm_seat(&mut self, seat_id: &str, display_num: u32, inputs: &[&str]) -> bool {
+    pub fn assign_lightdm_seat(
+        &mut self,
+        seat_id: &str,
+        display_num: u32,
+        inputs: &[&str],
+    ) -> bool {
         let bound_input_devices = inputs.iter().map(|s| s.to_string()).collect();
         self.seats.insert(
             seat_id.to_string(),
@@ -1116,7 +1126,10 @@ impl SovereignPolicyKitAuthorizationEngine {
     }
 
     pub fn start_polkit_agent_session(&mut self, action_id: &str, user: &str) -> String {
-        let session_id = format!("agent_session_{}", NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst));
+        let session_id = format!(
+            "agent_session_{}",
+            NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst)
+        );
         self.auth_audit_log.push(format!(
             "Polkit Agent Session Started: SessionID='{}' User='{}' Action='{}'",
             session_id, user, action_id
@@ -1342,7 +1355,10 @@ impl SovereignXdgDesktopPortalEngine {
         );
         self.portal_permissions
             .insert(key, PortalPermissionState::Granted);
-        let key_id = format!("transfer_key_{}", NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst));
+        let key_id = format!(
+            "transfer_key_{}",
+            NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst)
+        );
         key_id
     }
 
@@ -1552,7 +1568,13 @@ impl SovereignFontAndTextLayoutEngine {
         self.fontconfig_aliases
             .get(family)
             .cloned()
-            .unwrap_or_else(|| vec![family.to_string(), "DejaVu Sans".to_string(), "Noto Color Emoji".to_string()])
+            .unwrap_or_else(|| {
+                vec![
+                    family.to_string(),
+                    "DejaVu Sans".to_string(),
+                    "Noto Color Emoji".to_string(),
+                ]
+            })
     }
 }
 
@@ -1715,7 +1737,8 @@ impl SovereignInputMethodFrameworkEngine {
     }
 
     pub fn simulate_ibus_dbus_ipc(&mut self, method: &str, arg: &str) -> String {
-        match method { "FocusIn" => {
+        match method {
+            "FocusIn" => {
                 self.surrounding_text = arg.to_string();
                 format!("IBus.FocusIn('{}')", arg)
             }
@@ -1863,8 +1886,13 @@ impl SovereignDesktopNotificationDaemonEngine {
     }
 
     pub fn submit_inline_reply(&mut self, notification_id: u32, reply_text: &str) -> bool {
-        if self.notification_history.iter().any(|n| n.id == notification_id) {
-            self.action_invocations.push((notification_id, format!("inline-reply:{}", reply_text)));
+        if self
+            .notification_history
+            .iter()
+            .any(|n| n.id == notification_id)
+        {
+            self.action_invocations
+                .push((notification_id, format!("inline-reply:{}", reply_text)));
             self.close_notification(notification_id);
             true
         } else {
@@ -1879,7 +1907,9 @@ impl SovereignDesktopNotificationDaemonEngine {
     pub fn search_notification_history(&self, query: &str) -> Vec<DesktopNotificationItem> {
         self.notification_history
             .iter()
-            .filter(|n| n.summary.contains(query) || n.body.contains(query) || n.app_name.contains(query))
+            .filter(|n| {
+                n.summary.contains(query) || n.body.contains(query) || n.app_name.contains(query)
+            })
             .cloned()
             .collect()
     }
@@ -2108,7 +2138,11 @@ impl SovereignClipboardManagerEngine {
     }
 
     pub fn build_cliphist_index(&self) -> String {
-        format!("CliphistIndex[count={}, max={}]", self.clipboard_history.len(), self.max_history_items)
+        format!(
+            "CliphistIndex[count={}, max={}]",
+            self.clipboard_history.len(),
+            self.max_history_items
+        )
     }
 
     pub fn filter_mime_types(&self, mime_prefix: &str) -> Vec<usize> {
@@ -2570,8 +2604,14 @@ mod tests {
         let qss = engine.translate_css_to_qss("background-color: #1e1e2e;\ncolor: #cdd6f4;");
         assert!(qss.contains("qproperty-backgroundColor:"));
         // UTC 2 with longitude -122.41 (tz_offset -8) -> local_hour 18 (6 PM). ForceLight before 19:00 local.
-        assert_eq!(engine.calculate_sunset_dark_mode(37.77, -122.41, 2), AdwColorScheme::ForceLight);
-        assert_eq!(engine.calculate_sunset_dark_mode(37.77, -122.41, 4), AdwColorScheme::PreferDark);
+        assert_eq!(
+            engine.calculate_sunset_dark_mode(37.77, -122.41, 2),
+            AdwColorScheme::ForceLight
+        );
+        assert_eq!(
+            engine.calculate_sunset_dark_mode(37.77, -122.41, 4),
+            AdwColorScheme::PreferDark
+        );
         assert!(engine.generate_high_contrast_css().contains("!important"));
 
         let mut dm = SovereignDisplayManagerSuiteEngine::new(DisplayManagerBackend::Sddm);
@@ -2595,35 +2635,65 @@ mod tests {
 
         let mut gvfs = SovereignGvfsGioEngine::new();
         gvfs.sync_dconf_settings("org.gnome.desktop.interface", "color-scheme", "prefer-dark");
-        assert_eq!(gvfs.g_file_read_async("/gsettings/org/gnome/desktop/interface/color-scheme").unwrap(), b"prefer-dark");
+        assert_eq!(
+            gvfs.g_file_read_async("/gsettings/org/gnome/desktop/interface/color-scheme")
+                .unwrap(),
+            b"prefer-dark"
+        );
         let events = gvfs.batch_file_monitor_events();
         assert!(!events.is_empty());
 
         let mut polkit = SovereignPolicyKitAuthorizationEngine::new();
-        let pkla_count = polkit.parse_pkla_rules("Action=org.freedesktop.NetworkManager.settings.modify.system\nResultAny=yes");
+        let pkla_count = polkit.parse_pkla_rules(
+            "Action=org.freedesktop.NetworkManager.settings.modify.system\nResultAny=yes",
+        );
         assert_eq!(pkla_count, 1);
-        let session_id = polkit.start_polkit_agent_session("org.freedesktop.NetworkManager.settings.modify.system", "admin");
+        let session_id = polkit.start_polkit_agent_session(
+            "org.freedesktop.NetworkManager.settings.modify.system",
+            "admin",
+        );
         assert!(session_id.contains("agent_session_"));
 
         let mut portal = SovereignXdgDesktopPortalEngine::new();
-        let transfer_key = portal.handle_portal_file_transfer("org.sigmaos.files", &["/home/user/doc.pdf"]);
+        let transfer_key =
+            portal.handle_portal_file_transfer("org.sigmaos.files", &["/home/user/doc.pdf"]);
         assert!(transfer_key.contains("transfer_key_"));
-        assert_eq!(portal.parse_mimeapps_list("text/html=org.sigmaos.browser.desktop"), 1);
+        assert_eq!(
+            portal.parse_mimeapps_list("text/html=org.sigmaos.browser.desktop"),
+            1
+        );
         let env_status = portal.validate_xdg_env_vars();
         assert_eq!(env_status.get("XDG_CONFIG_HOME"), Some(&true));
 
         let mut font_engine = SovereignFontAndTextLayoutEngine::new();
-        assert_eq!(font_engine.parse_opentype_features(&["kern", "liga", "smcp"]), 4);
-        assert!(font_engine.layout_markup_text("<b>Bold</b>").contains("PangoMarkup"));
+        assert_eq!(
+            font_engine.parse_opentype_features(&["kern", "liga", "smcp"]),
+            4
+        );
+        assert!(font_engine
+            .layout_markup_text("<b>Bold</b>")
+            .contains("PangoMarkup"));
         let fallbacks = font_engine.build_font_fallback_chain("monospace");
         assert!(fallbacks.contains(&"JetBrainsMono".to_string()));
 
         let mut ime = SovereignInputMethodFrameworkEngine::new(ImeFrameworkKind::Fcitx5);
-        assert!(ime.list_available_fcitx5_addons().contains(&"fcitx5-pinyin".to_string()));
-        assert_eq!(ime.simulate_ibus_dbus_ipc("FocusIn", "terminal"), "IBus.FocusIn('terminal')");
+        assert!(ime
+            .list_available_fcitx5_addons()
+            .contains(&"fcitx5-pinyin".to_string()));
+        assert_eq!(
+            ime.simulate_ibus_dbus_ipc("FocusIn", "terminal"),
+            "IBus.FocusIn('terminal')"
+        );
 
         let mut notif = SovereignDesktopNotificationDaemonEngine::new();
-        let nid = notif.notify("test", 0, "Hello", "World", NotificationUrgency::Normal, 3000);
+        let nid = notif.notify(
+            "test",
+            0,
+            "Hello",
+            "World",
+            NotificationUrgency::Normal,
+            3000,
+        );
         assert!(notif.submit_inline_reply(nid, "Thanks!"));
         assert!(notif.is_category_enabled("device.added"));
         assert_eq!(notif.search_notification_history("Hello").len(), 1);
@@ -2631,7 +2701,9 @@ mod tests {
         let mut locker = SovereignScreenLockerEngine::new();
         locker.authenticate_and_unlock("wrong_pass");
         assert_eq!(locker.calculate_pam_backoff(), 2);
-        assert!(locker.generate_lockscreen_blur_matrix("/bg.png", 10).contains("BlurMatrix"));
+        assert!(locker
+            .generate_lockscreen_blur_matrix("/bg.png", 10)
+            .contains("BlurMatrix"));
 
         let mut clip = SovereignClipboardManagerEngine::new();
         clip.copy_text("clip test", "test_app", false);

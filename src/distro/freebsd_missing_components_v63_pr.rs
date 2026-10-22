@@ -156,7 +156,10 @@ impl FreeBsdOpenZfsRaidzExpansionPrEngine {
             expansion_progress_percent: 0,
         };
         self.expansions.insert(pool.to_string(), spec);
-        format!("zpool attach {} {} {}\nzpool status {}\n", pool, vdev, disk, pool)
+        format!(
+            "zpool attach {} {} {}\nzpool status {}\n",
+            pool, vdev, disk, pool
+        )
     }
 }
 
@@ -649,9 +652,9 @@ impl FreeBsdMissingComponentsV63PrSuite {
     }
 
     pub fn evaluate_freebsd_v63_parity(&mut self) -> bool {
-        let gpu_diff =
-            self.bhyve_gpu
-                .configure_bhyve_gpu("virt_workstation", "/dev/nvme0n1", 4096);
+        let gpu_diff = self
+            .bhyve_gpu
+            .configure_bhyve_gpu("virt_workstation", "/dev/nvme0n1", 4096);
         let pr1 = self.submit_pr_proposal(
             "Configure bhyve virtio-gpu 3D and NVMe controller for virt_workstation",
             "jules",
@@ -661,11 +664,9 @@ impl FreeBsdMissingComponentsV63PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let raidz_diff = self.openzfs_expansion.expand_raidz_vdev(
-            "zroot",
-            "raidz1-0",
-            "ada4",
-        );
+        let raidz_diff = self
+            .openzfs_expansion
+            .expand_raidz_vdev("zroot", "raidz1-0", "ada4");
         let pr2 = self.submit_pr_proposal(
             "Expand OpenZFS RAID-Z1 vdev with new member ada4",
             "jules",
@@ -675,9 +676,7 @@ impl FreeBsdMissingComponentsV63PrSuite {
         );
         self.validate_and_merge_pr(pr2);
 
-        let dtrace_diff = self
-            .dtrace_lock
-            .profile_lock("vm_object_lock", 5000);
+        let dtrace_diff = self.dtrace_lock.profile_lock("vm_object_lock", 5000);
         let pr3 = self.submit_pr_proposal(
             "Trace vm_object_lock contention using DTrace lockstat provider",
             "jules",

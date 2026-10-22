@@ -409,7 +409,9 @@ impl SovereignKernelOpenSourceOsDistroAdvancementsV68PrGateway {
             .pinsyscall_karl
             .verify_retguard_canary(ret_addr, canary);
 
-        let snap_gen = self.hammer2_cow.create_pfs_snapshot(2, "root_pfs_v68", 20001);
+        let snap_gen = self
+            .hammer2_cow
+            .create_pfs_snapshot(2, "root_pfs_v68", 20001);
         let _ = self.hammer2_cow.perform_atomic_rollback(2, snap_gen);
 
         let dummy_hash = [0x88u8; 32];

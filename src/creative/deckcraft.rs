@@ -458,8 +458,8 @@ pub fn get_deckcraft() -> Option<&'static mut DeckCraftEngine> {
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use super::*;
+    use alloc::vec;
 
     #[test]
     fn test_deckcraft_engine_init() {

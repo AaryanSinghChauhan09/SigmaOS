@@ -1,7 +1,7 @@
 #![no_std]
 extern crate alloc;
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS - FontCraft & Sovereign Typography Missing Components Parity PR Gateway Module
 // (`src/creative/fontcraft_missing_components_parity_pr.rs`)
@@ -15,13 +15,10 @@ use alloc::format;
 // 5. FontcraftWoff2BrotliCompressionPrEngine (WOFF2/WOFF web font Brotli decompressed micro-font loading, header parsing & glyph subsetting)
 // 6. SovereignFontcraftArtcraftParityPrGateway (Master PR Gateway, Parity Benchmark Suite & Markdown PR Specification Generator)
 
-
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
-
-
 
 /// Structured PR proposal manifest for missing FontCraft / Typography components.
 

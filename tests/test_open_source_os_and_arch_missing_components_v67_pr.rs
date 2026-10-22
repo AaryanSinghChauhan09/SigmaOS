@@ -39,7 +39,9 @@ fn test_open_source_os_v67_pr_suite_full_cycle() {
     suite
         .nix_guix_engine
         .register_closure_hash("/nix/store/pkg_v67", "hash_v67_abc");
-    suite.illumos_engine.configure_vnic_mesh("vnic_v67_0", 40000);
+    suite
+        .illumos_engine
+        .configure_vnic_mesh("vnic_v67_0", 40000);
     suite
         .media_portals_engine
         .register_portal_idea("phoronix.com", "Linux 6.23 PQC driver benchmarks");
@@ -68,7 +70,11 @@ fn test_arch_linux_v67_pr_suite_full_cycle() {
     let suite = ArchLinuxMissingComponentsV67PrSuite::new();
     let prs = suite.run_all_prs();
 
-    assert_eq!(prs.len(), 10, "Expected 10 Arch Linux V67 PR specifications");
+    assert_eq!(
+        prs.len(),
+        10,
+        "Expected 10 Arch Linux V67 PR specifications"
+    );
     assert_eq!(
         suite.compute_gap_closure_score(),
         100,

@@ -1364,10 +1364,7 @@ mod tests {
         // IPv6 literal URL authority validation
         assert_eq!(validate_url(b"http://[::1]"), Ok(()));
         assert_eq!(validate_url(b"http://[::1]:8080/api"), Ok(()));
-        assert_eq!(
-            validate_url(b"https://[2001:db8::1]:443/test"),
-            Ok(())
-        );
+        assert_eq!(validate_url(b"https://[2001:db8::1]:443/test"), Ok(()));
 
         // Malformed IPv6 literal bracket URLs
         assert_eq!(

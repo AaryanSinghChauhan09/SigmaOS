@@ -1516,7 +1516,11 @@ impl SovereignCoreUserlandInitEngine {
     }
 
     pub fn audit_spool_queues(&self) -> (usize, usize, usize) {
-        (self.cron_entries.len(), self.anacron_jobs.len(), self.at_jobs.len())
+        (
+            self.cron_entries.len(),
+            self.anacron_jobs.len(),
+            self.at_jobs.len(),
+        )
     }
 }
 
@@ -1900,8 +1904,14 @@ mod tests {
     #[test]
     fn test_task_execution_auditing() {
         let engine = SovereignCoreUserlandInitEngine::new();
-        assert_eq!(SystemdOnCalendarParser::resolve_on_calendar_interval("hourly"), 3600);
-        assert_eq!(SystemdOnCalendarParser::resolve_on_calendar_interval("daily"), 86400);
+        assert_eq!(
+            SystemdOnCalendarParser::resolve_on_calendar_interval("hourly"),
+            3600
+        );
+        assert_eq!(
+            SystemdOnCalendarParser::resolve_on_calendar_interval("daily"),
+            86400
+        );
 
         let (cron, anacron, at) = engine.audit_spool_queues();
         assert_eq!(cron, 0);

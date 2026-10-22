@@ -228,7 +228,14 @@ impl SovereignX11AdvancementsEngine {
         atom
     }
 
-    pub fn create_window(&mut self, parent: u32, x: i32, y: i32, w: u32, h: u32) -> Result<u32, &'static str> {
+    pub fn create_window(
+        &mut self,
+        parent: u32,
+        x: i32,
+        y: i32,
+        w: u32,
+        h: u32,
+    ) -> Result<u32, &'static str> {
         if !self.windows.contains_key(&parent) {
             return Err("Parent window not found");
         }
@@ -253,11 +260,19 @@ impl SovereignX11AdvancementsEngine {
         Ok(id)
     }
 
-    pub fn present_pixmap_to_window(&mut self, window_id: u32, pixmap_id: u32) -> Result<u64, &'static str> {
+    pub fn present_pixmap_to_window(
+        &mut self,
+        window_id: u32,
+        pixmap_id: u32,
+    ) -> Result<u64, &'static str> {
         if !self.windows.contains_key(&window_id) {
             return Err("Window not found");
         }
-        let frame = self.present_pixmaps.get(&window_id).map(|(_, f)| f + 1).unwrap_or(1);
+        let frame = self
+            .present_pixmaps
+            .get(&window_id)
+            .map(|(_, f)| f + 1)
+            .unwrap_or(1);
         self.present_pixmaps.insert(window_id, (pixmap_id, frame));
         Ok(frame)
     }
@@ -337,11 +352,21 @@ impl SovereignWaylandAdvancementsEngine {
         id
     }
 
-    pub fn create_subsurface(&mut self, child_id: u64, parent_id: u64, rel_x: i32, rel_y: i32, z_order: i32) -> Result<(), &'static str> {
+    pub fn create_subsurface(
+        &mut self,
+        child_id: u64,
+        parent_id: u64,
+        rel_x: i32,
+        rel_y: i32,
+        z_order: i32,
+    ) -> Result<(), &'static str> {
         if !self.surfaces.contains_key(&parent_id) {
             return Err("Parent surface not found");
         }
-        let child = self.surfaces.get_mut(&child_id).ok_or("Child surface not found")?;
+        let child = self
+            .surfaces
+            .get_mut(&child_id)
+            .ok_or("Child surface not found")?;
         child.parent_id = Some(parent_id);
         child.rel_x = rel_x;
         child.rel_y = rel_y;
@@ -360,7 +385,8 @@ impl SovereignWaylandAdvancementsEngine {
 
     pub fn generate_xdg_activation_token(&mut self, surface_id: u64, now_sec: u64) -> String {
         let token = format!("sigma-wayland-act-{}-{}", surface_id, now_sec);
-        self.xdg_activation_tokens.insert(token.clone(), (surface_id, now_sec + 30));
+        self.xdg_activation_tokens
+            .insert(token.clone(), (surface_id, now_sec + 30));
         token
     }
 
@@ -495,7 +521,12 @@ impl SovereignDrmKmsAdvancementsEngine {
         }
     }
 
-    pub fn create_gem_and_export_prime(&mut self, width: u32, height: u32, bpp: u32) -> Result<(u32, i32), &'static str> {
+    pub fn create_gem_and_export_prime(
+        &mut self,
+        width: u32,
+        height: u32,
+        bpp: u32,
+    ) -> Result<(u32, i32), &'static str> {
         let pitch = width * (bpp / 8);
         let size = (pitch * height) as usize;
         let handle = self.native_kms.gem_create(size as u64)?;
@@ -709,13 +740,26 @@ impl SovereignSwayAdvancementsEngine {
         }
     }
 
-    pub fn add_tiling_window(&mut self, parent_id: u64, title: &str, is_split_v: bool) -> Result<u64, &'static str> {
-        let parent = self.nodes.get(&parent_id).ok_or("Parent node not found")?.clone();
+    pub fn add_tiling_window(
+        &mut self,
+        parent_id: u64,
+        title: &str,
+        is_split_v: bool,
+    ) -> Result<u64, &'static str> {
+        let parent = self
+            .nodes
+            .get(&parent_id)
+            .ok_or("Parent node not found")?
+            .clone();
         let id = self.next_node_id;
         self.next_node_id += 1;
 
         let (px, py, pw, ph) = parent.bounds;
-        let (cw, ch) = if is_split_v { (pw, ph / 2) } else { (pw / 2, ph) };
+        let (cw, ch) = if is_split_v {
+            (pw, ph / 2)
+        } else {
+            (pw / 2, ph)
+        };
 
         let node = SwayNodeAdv {
             id,
@@ -855,7 +899,7 @@ impl SovereignKWinAdvancementsEngine {
 
         for i in 0..size {
             let x = i as f32 - self.blur_radius as f32;
-            let val = (- (x * x) / (2.0 * sigma * sigma)).exp();
+            let val = (-(x * x) / (2.0 * sigma * sigma)).exp();
             kernel[i] = val;
             sum += val;
         }
@@ -1120,11 +1164,22 @@ impl SovereignFramebufferAdvancementsEngine {
         }
     }
 
-    pub fn render_psf2_font_char(&mut self, glyph_bitmap: [u8; 16], x: u32, y: u32, fg: u32, bg: u32) {
+    pub fn render_psf2_font_char(
+        &mut self,
+        glyph_bitmap: [u8; 16],
+        x: u32,
+        y: u32,
+        fg: u32,
+        bg: u32,
+    ) {
         for row in 0..16 {
             let bitmask = glyph_bitmap[row];
             for col in 0..8 {
-                let color = if (bitmask & (1 << (7 - col))) != 0 { fg } else { bg };
+                let color = if (bitmask & (1 << (7 - col))) != 0 {
+                    fg
+                } else {
+                    bg
+                };
                 self.draw_pixel(x + col, y + row as u32, color);
             }
         }
@@ -1373,7 +1428,10 @@ impl SovereignGraphicsDisplayAdvancementsPrGatewayEngine {
         Ok(id)
     }
 
-    pub fn run_ci_validation(&mut self, pr_id: u32) -> Result<GraphicsAdvancementPrStatus, &'static str> {
+    pub fn run_ci_validation(
+        &mut self,
+        pr_id: u32,
+    ) -> Result<GraphicsAdvancementPrStatus, &'static str> {
         let pr = self.prs.get_mut(&pr_id).ok_or("PR not found")?;
         if !pr.satisfies_sat_constraints {
             pr.status = GraphicsAdvancementPrStatus::Rejected;
@@ -1467,86 +1525,137 @@ impl SovereignGraphicsDisplayAdvancementsMasterSuiteEngine {
         let atom = self.x11_adv.intern_atom("_NET_WM_NAME");
         let win = self.x11_adv.create_window(1, 10, 10, 800, 600);
         let pres = self.x11_adv.present_pixmap_to_window(win.unwrap_or(1), 20);
-        audit.insert("X11 DRI3 & Present Extensions Functional", atom > 0 && pres.is_ok());
+        audit.insert(
+            "X11 DRI3 & Present Extensions Functional",
+            atom > 0 && pres.is_ok(),
+        );
 
         // 3. Audit Wayland Extensions
         let surf_a = self.wayland_adv.create_surface();
         let surf_b = self.wayland_adv.create_surface();
-        let sub = self.wayland_adv.create_subsurface(surf_b, surf_a, 10, 10, 1);
+        let sub = self
+            .wayland_adv
+            .create_subsurface(surf_b, surf_a, 10, 10, 1);
         let token = self.wayland_adv.generate_xdg_activation_token(surf_a, 100);
         let valid = self.wayland_adv.validate_xdg_activation_token(&token, 110);
-        audit.insert("Wayland Subsurfaces & Activation Tokens Functional", sub.is_ok() && valid == Some(surf_a));
+        audit.insert(
+            "Wayland Subsurfaces & Activation Tokens Functional",
+            sub.is_ok() && valid == Some(surf_a),
+        );
 
         // 4. Audit Mesa NIR & Zink
         let len_nir = self.mesa_adv.optimize_nir_passes();
         let aco = self.mesa_adv.compile_aco_binary();
         let zink = self.mesa_adv.translate_zink_gl_spirv_to_vulkan(&[0x1, 0x2]);
-        audit.insert("Mesa NIR Optimization & ACO Binary Functional", len_nir > 0 && aco.len() > 4 && zink.len() == 4);
+        audit.insert(
+            "Mesa NIR Optimization & ACO Binary Functional",
+            len_nir > 0 && aco.len() > 4 && zink.len() == 4,
+        );
 
         // 5. Audit DRM/KMS PRIME & VRR
         let gem_prime = self.drm_adv.create_gem_and_export_prime(1920, 1080, 32);
         let vrr_ns = self.drm_adv.calculate_vrr_frametime_ns(144);
-        audit.insert("DRM KMS PRIME Handle Export & VRR Sync Functional", gem_prime.is_ok() && vrr_ns < 10_000_000);
+        audit.insert(
+            "DRM KMS PRIME Handle Export & VRR Sync Functional",
+            gem_prime.is_ok() && vrr_ns < 10_000_000,
+        );
 
         // 6. Audit libdrm
         let cap = self.libdrm_adv.drm_get_cap("DRM_CAP_PRIME");
         let dumb = self.libdrm_adv.drm_alloc_dumb_buffer(1920, 1080, 32);
-        audit.insert("libdrm Ioctl Capability & Dumb Buffer Functional", cap == Some(3) && dumb.0 > 0);
+        audit.insert(
+            "libdrm Ioctl Capability & Dumb Buffer Functional",
+            cap == Some(3) && dumb.0 > 0,
+        );
 
         // 7. Audit Vulkan Mesh Shading
         let tasks = self.vulkan_adv.dispatch_mesh_task_groups(8, 8);
         let sem = self.vulkan_adv.signal_timeline_semaphore(50);
-        audit.insert("Vulkan Mesh Tasks & Timeline Semaphore Functional", tasks == 2048 && sem == 50);
+        audit.insert(
+            "Vulkan Mesh Tasks & Timeline Semaphore Functional",
+            tasks == 2048 && sem == 50,
+        );
 
         // 8. Audit OpenGL Compute Context
         let compute = self.opengl_adv.dispatch_compute_shader(16, 16, 1);
-        audit.insert("OpenGL 4.6 Compute Shader Dispatch Functional", compute == 256);
+        audit.insert(
+            "OpenGL 4.6 Compute Shader Dispatch Functional",
+            compute == 256,
+        );
 
         // 9. Audit Weston Scheduler
         let repaint = self.weston_adv.schedule_drm_repaint(1000);
         let mut dst_buf = vec![0u32; 100];
-        let blit_len = self.weston_adv.pixman_software_blit_blend(&vec![0xFF00FF00; 100], &mut dst_buf);
-        audit.insert("Weston Output Repaint Scheduler Functional", repaint && blit_len == 100);
+        let blit_len = self
+            .weston_adv
+            .pixman_software_blit_blend(&vec![0xFF00FF00; 100], &mut dst_buf);
+        audit.insert(
+            "Weston Output Repaint Scheduler Functional",
+            repaint && blit_len == 100,
+        );
 
         // 10. Audit Sway Tiling Layout
         let tile_win = self.sway_adv.add_tiling_window(1, "Terminal", false);
         let ipc_res = self.sway_adv.execute_ipc_command("focus left");
-        audit.insert("Sway Dynamic Workspace Switcher Functional", tile_win.is_ok() && ipc_res.contains("ok"));
+        audit.insert(
+            "Sway Dynamic Workspace Switcher Functional",
+            tile_win.is_ok() && ipc_res.contains("ok"),
+        );
 
         // 11. Audit wlroots Scene Graph
         let sc_node = self.wlroots_adv.create_scene_node(10, 10);
         self.wlroots_adv.add_damage_rect((0, 0, 100, 100));
         let focus = self.wlroots_adv.route_pointer_motion(15, 15);
-        audit.insert("wlroots Damage Ring & Pointer Focus Functional", sc_node > 0 && focus == Some(sc_node));
+        audit.insert(
+            "wlroots Damage Ring & Pointer Focus Functional",
+            sc_node > 0 && focus == Some(sc_node),
+        );
 
         // 12. Audit Mutter Fractional Scaling
         let geom = self.mutter_adv.transform_logical_geometry(100.0);
         let ease = self.mutter_adv.evaluate_cubic_bezier_easing(0.5);
-        audit.insert("Mutter Clutter Fractional Scaling Functional", geom == 125 && ease > 0.0);
+        audit.insert(
+            "Mutter Clutter Fractional Scaling Functional",
+            geom == 125 && ease > 0.0,
+        );
 
         // 13. Audit KWin Plasma Effects
         let (kw_w, kw_h) = self.kwin_adv.calculate_decorated_window_bounds(800, 600);
         let kernel = self.kwin_adv.generate_gaussian_blur_kernel();
-        audit.insert("KWin Window Extents Geometry Functional", kw_w == 832 && kw_h == 662 && !kernel.is_empty());
+        audit.insert(
+            "KWin Window Extents Geometry Functional",
+            kw_w == 832 && kw_h == 662 && !kernel.is_empty(),
+        );
 
         // 14. Audit Compiz 3D Cube & Physics
         let rot = self.compiz_adv.rotate_cube(0.5);
         let wobble = self.compiz_adv.step_wobbly_mass_spring(2.0, 0.016);
-        audit.insert("Compiz 3D Desktop Cube & Wobbly Physics Functional", rot.0 != 0.0 && wobble != 0.0);
+        audit.insert(
+            "Compiz 3D Desktop Cube & Wobbly Physics Functional",
+            rot.0 != 0.0 && wobble != 0.0,
+        );
 
         // 15. Audit Picom Vsync & Blur
         let mut img = vec![0xFF112233u32; 100];
         img[0] = 0xFF000000;
         img[1] = 0xFFFFFFFF;
         self.picom_adv.apply_dual_kawase_blur_pass(&mut img, 10, 10);
-        let corner = self.picom_adv.evaluate_rounded_corner_clip(50, 50, 100, 100);
+        let corner = self
+            .picom_adv
+            .evaluate_rounded_corner_clip(50, 50, 100, 100);
         let blurred = img[0] != 0xFF000000; // Blended
-        audit.insert("Picom Kawase Blur & Opacity Transition Functional", corner && blurred);
+        audit.insert(
+            "Picom Kawase Blur & Opacity Transition Functional",
+            corner && blurred,
+        );
 
         // 16. Audit Xwayland Clipboard Bridge
         self.xwayland_adv.sync_clipboard_data("Clipboard Buffer");
         let mapped = self.xwayland_adv.map_x11_rect_to_wayland(100, 200);
-        audit.insert("Xwayland Clipboard Sync Functional", self.xwayland_adv.clipboard_buffer == "Clipboard Buffer" && mapped == (100, 200));
+        audit.insert(
+            "Xwayland Clipboard Sync Functional",
+            self.xwayland_adv.clipboard_buffer == "Clipboard Buffer" && mapped == (100, 200),
+        );
 
         // 17. Audit evdev Multitouch Slot Tracker
         let packet = EvdevInputPacketAdv {
@@ -1556,23 +1665,36 @@ impl SovereignGraphicsDisplayAdvancementsMasterSuiteEngine {
             value: 400,
         };
         let ev_res = self.evdev_adv.parse_input_packet(packet);
-        audit.insert("evdev 10-Slot Multitouch Tracker Functional", ev_res.is_some());
+        audit.insert(
+            "evdev 10-Slot Multitouch Tracker Functional",
+            ev_res.is_some(),
+        );
 
         // 18. Audit libinput Palm Rejection & Accel
         let palm = self.libinput_adv.check_palm_touch(10, 1000);
         let (ax, ay) = self.libinput_adv.calculate_adaptive_accel(5.0, 5.0);
-        audit.insert("libinput Palm Rejection & Pointer Acceleration Functional", palm && ax > 5.0 && ay > 5.0);
+        audit.insert(
+            "libinput Palm Rejection & Pointer Acceleration Functional",
+            palm && ax > 5.0 && ay > 5.0,
+        );
 
         // 19. Audit Console Framebuffer
         self.fbdev_adv.draw_pixel(50, 50, 0xFF00FF00);
-        self.fbdev_adv.render_psf2_font_char([0xFF; 16], 100, 100, 0xFFFFFFFF, 0x00000000);
-        audit.insert("Console Framebuffer fbdev Pixel & Glyph Drawing Functional", self.fbdev_adv.pixel_buffer[50 * 1920 + 50] == 0xFF00FF00);
+        self.fbdev_adv
+            .render_psf2_font_char([0xFF; 16], 100, 100, 0xFFFFFFFF, 0x00000000);
+        audit.insert(
+            "Console Framebuffer fbdev Pixel & Glyph Drawing Functional",
+            self.fbdev_adv.pixel_buffer[50 * 1920 + 50] == 0xFF00FF00,
+        );
 
         // 20. Audit Virtual Terminal matrix
         self.vt_adv.write_char('Z');
         let ansi = self.vt_adv.parse_ansi_escape("\x1b[2J");
         let vt_switch = self.vt_adv.switch_vt(3);
-        audit.insert("Virtual Terminal Matrix & VT Switcher Functional", ansi && vt_switch.is_ok());
+        audit.insert(
+            "Virtual Terminal Matrix & VT Switcher Functional",
+            ansi && vt_switch.is_ok(),
+        );
 
         audit
     }
@@ -1675,7 +1797,10 @@ mod tests {
             code: 53,
             value: 500,
         };
-        assert!(evdev.parse_input_packet(pkt).unwrap().contains("Slot 0 X=500"));
+        assert!(evdev
+            .parse_input_packet(pkt)
+            .unwrap()
+            .contains("Slot 0 X=500"));
 
         let libinp = SovereignLibinputAdvancementsEngine::new();
         assert!(libinp.check_palm_touch(10, 1000));

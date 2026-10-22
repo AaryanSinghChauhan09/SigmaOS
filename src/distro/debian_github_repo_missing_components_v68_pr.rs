@@ -156,7 +156,10 @@ impl DebianDebconfDatabaseStateV68PrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         map.insert(String::from("tzdata/Zones/Etc"), String::from("UTC"));
-        map.insert(String::from("locales/default_environment_locale"), String::from("en_US.UTF-8"));
+        map.insert(
+            String::from("locales/default_environment_locale"),
+            String::from("en_US.UTF-8"),
+        );
         Self { db: map }
     }
 
@@ -280,7 +283,9 @@ pub struct DebianDebsumsIntegrityAuditorV68PrEngine {
 
 impl DebianDebsumsIntegrityAuditorV68PrEngine {
     pub fn new() -> Self {
-        Self { total_audited_files: 0 }
+        Self {
+            total_audited_files: 0,
+        }
     }
 
     pub fn audit_file_checksum(&mut self, file_path: &str, expected_hash: &str) -> bool {
@@ -320,11 +325,16 @@ impl DebianPopconTelemetryAnalyzerV68PrEngine {
         ranks.insert(String::from("coreutils"), 10000);
         ranks.insert(String::from("bash"), 9950);
         ranks.insert(String::from("apt"), 9900);
-        Self { package_ranks: ranks }
+        Self {
+            package_ranks: ranks,
+        }
     }
 
     pub fn record_usage(&mut self, package_name: &str) {
-        let count = self.package_ranks.entry(package_name.to_string()).or_insert(0);
+        let count = self
+            .package_ranks
+            .entry(package_name.to_string())
+            .or_insert(0);
         *count += 1;
     }
 
@@ -393,9 +403,17 @@ pub struct DebianUscanWatchfileMonitorV68PrEngine {
 impl DebianUscanWatchfileMonitorV68PrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
-        map.insert(String::from("openssl"), String::from("https://www.openssl.org/source/openssl-(.*)\\.tar\\.gz"));
-        map.insert(String::from("zlib"), String::from("https://zlib.net/zlib-(.*)\\.tar\\.gz"));
-        Self { watched_upstream_urls: map }
+        map.insert(
+            String::from("openssl"),
+            String::from("https://www.openssl.org/source/openssl-(.*)\\.tar\\.gz"),
+        );
+        map.insert(
+            String::from("zlib"),
+            String::from("https://zlib.net/zlib-(.*)\\.tar\\.gz"),
+        );
+        Self {
+            watched_upstream_urls: map,
+        }
     }
 
     pub fn check_upstream_new_version(&self, pkg: &str, current_ver: &str) -> Option<String> {
@@ -512,22 +530,29 @@ impl DebianGithubRepoMissingComponentsV68PrSuite {
 
     pub fn verify_all_pr_engines(&self) -> bool {
         let proposals = self.collect_all_proposals();
-        proposals.len() == 10 && proposals.iter().all(|p| p.pqc_signature.contains("DILITHIUM5"))
+        proposals.len() == 10
+            && proposals
+                .iter()
+                .all(|p| p.pqc_signature.contains("DILITHIUM5"))
     }
 
     pub fn execute_pr_pipeline(&mut self) -> usize {
         self.dpkg_eng.activate_trigger("/usr/share/fonts");
-        self.apt_eng.verify_inrelease_signature("sid", "DILITHIUM5-SIG");
+        self.apt_eng
+            .verify_inrelease_signature("sid", "DILITHIUM5-SIG");
         self.debconf_eng.set_answer("tzdata/Zones/Etc", "UTC");
         self.lintian_eng.analyze_package("coreutils");
-        self.sbuild_eng.build_in_cleanroom("unstable-amd64-sbuild", "bash_5.2.dsc");
-        self.debsums_eng.audit_file_checksum("/bin/bash", "abc123hash");
+        self.sbuild_eng
+            .build_in_cleanroom("unstable-amd64-sbuild", "bash_5.2.dsc");
+        self.debsums_eng
+            .audit_file_checksum("/bin/bash", "abc123hash");
         self.popcon_eng.record_usage("gcc");
         let mut set = BTreeSet::new();
         set.insert(String::from("/tmp/junk.tmp"));
         self.piuparts_eng.verify_purge_cleanliness(&set);
         self.uscan_eng.check_upstream_new_version("zlib", "1.2.13");
-        self.debootstrap_eng.bootstrap_base_system("unstable", "/mnt/target");
+        self.debootstrap_eng
+            .bootstrap_base_system("unstable", "/mnt/target");
         10
     }
 }
