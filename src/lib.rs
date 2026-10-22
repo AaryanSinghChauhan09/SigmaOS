@@ -498,7 +498,9 @@ pub use virtualization::{
     LibvirtDomainV63Engine, LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine,
     OciDockerPodmanRuncV61Engine, OciDockerPodmanRuncV63Engine, ResourcePool,
     SovereignVirtualizationAndContainersParityV61Gateway,
-    SovereignVirtualizationAndContainersParityV63Gateway, VirtualBoxBhyveVmmV61Engine,
+    SovereignVirtualizationAndContainersParityV63Gateway,
+    SovereignVirtualizationAndContainersParityV65Gateway,
+    SovereignVirtualizationAndContainersParityV66Gateway, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
     VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
 };
