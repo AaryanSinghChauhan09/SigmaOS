@@ -72,6 +72,11 @@ wiki_repo/
 # All documentation lives in the SigmaOS.wiki repository.
 *.md
 **/*.md
+!.github/PULL_REQUEST_TEMPLATE.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+!docs/**/*.md
 *.txt
 **/*.txt
 *.py
