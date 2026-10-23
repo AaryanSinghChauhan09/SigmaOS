@@ -257,3 +257,52 @@ else
     echo ""
     exit 0
 fi
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 9. Omarchy Linux Parity Check
+# ─────────────────────────────────────────────────────────────────────────────
+echo ""
+echo -e "${BLUE}── Omarchy Linux Parity ────────────────────────────────────${NC}"
+echo ""
+
+OMARCHY_KERNEL="$ROOT_DIR/boot/sigma_kernel.elf"
+OMARCHY_ISO="$ROOT_DIR/build/sigmaos-desktop-preview.iso"
+
+# Check kernel binary existence (Omarchy has complete kernel)
+if [ -f "$OMARCHY_KERNEL" ]; then
+    ok "Kernel binary exists: boot/sigma_kernel.elf"
+else
+    warn "Kernel binary missing — Omarchy parity: basic kernel boot not yet achieved"
+    info "Run: make iso-stub to build bootable stub"
+fi
+
+# Check ISO build (Omarchy is bootable)
+if [ -f "$OMARCHY_ISO" ]; then
+    ISO_SIZE=$(du -sh "$OMARCHY_ISO" | cut -f1)
+    ok "Built ISO exists: build/sigmaos-desktop-preview.iso ($ISO_SIZE)"
+    info "Boot with: make run-stub | qemu-system-x86_64 -m 2048 -cdrom build/sigmaos-desktop-preview.iso"
+else
+    warn "No built ISO — Omarchy parity: bootable ISO not yet produced"
+    info "Run: make iso-stub to generate stub ISO"
+fi
+
+# Check package manager format support
+if [ -f "$ROOT_DIR/src/sigpkg/"*.rs ] 2>/dev/null; then
+    ok "Sovereign package manager source found — format adapters available"
+else
+    warn "Package manager source not fully checked"
+fi
+
+# Check filesystem support
+FS_COUNT=0
+if [ -f "$ROOT_DIR/src/filesystem/ext4.rs" ]; then FS_COUNT=$((FS_COUNT + 1)); fi
+if [ -f "$ROOT_DIR/src/filesystem/btrfs.rs" ]; then FS_COUNT=$((FS_COUNT + 1)); fi
+if [ -f "$ROOT_DIR/src/filesystem/zfs.rs" ]; then FS_COUNT=$((FS_COUNT + 1)); fi
+if [ "$FS_COUNT" -ge 2 ]; then
+    ok "Filesystem support: $FS_COUNT/3 major filesystems (Ext4, Btrfs, ZFS)"
+else
+    warn "Limited filesystem support — Omarchy parity: more filesystem types needed"
+fi
+
+echo ""
+echo -e "${BLUE}── End Omarchy Linux Parity Check ──────────────────────────${NC}"
