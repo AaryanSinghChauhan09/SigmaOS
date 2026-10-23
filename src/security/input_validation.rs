@@ -392,6 +392,11 @@ pub fn validate_username(name: &[u8]) -> Result<(), ValidationError> {
     if name.len() > MAX_USERNAME_LEN {
         return Err(ValidationError::TooLong);
     }
+    for &b in name {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+    }
     // Prevent argument injection: initial character cannot be `-` or a digit
     let first = name[0];
     if !first.is_ascii_alphabetic() && first != b'_' {
@@ -421,6 +426,11 @@ pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
     }
     if name.len() > MAX_HOSTNAME_LEN {
         return Err(ValidationError::TooLong);
+    }
+    for &b in name {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
     }
 
     for label in name.split(|&b| b == b'.') {
@@ -459,6 +469,11 @@ pub fn validate_env_key(key: &[u8]) -> Result<(), ValidationError> {
     }
     if key.len() > MAX_ENV_KEY_LEN {
         return Err(ValidationError::TooLong);
+    }
+    for &b in key {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
     }
     let first = key[0];
     if !first.is_ascii_alphabetic() && first != b'_' {
@@ -585,6 +600,11 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
     if addr.len() > MAX_IPV4_LEN {
         return Err(ValidationError::TooLong);
     }
+    for &b in addr {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+    }
     let mut octet_count = 0u8;
     let mut octet_val: u32 = 0;
     let mut octet_len = 0u8;
@@ -633,6 +653,11 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
     }
     if addr.len() > MAX_IPV6_LEN {
         return Err(ValidationError::TooLong);
+    }
+    for &b in addr {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
     }
 
     let mut colons = 0;
@@ -918,7 +943,12 @@ mod tests {
 
     #[test]
     fn test_null_byte_rejected() {
-        assert!(validate_path(&[b'/', b'f', 0, b'o']).is_err());
+        assert_eq!(validate_path(&[b'/', b'f', 0, b'o']), Err(ValidationError::NullByte));
+        assert_eq!(validate_username(b"user\x00name"), Err(ValidationError::NullByte));
+        assert_eq!(validate_hostname(b"host\x00name.com"), Err(ValidationError::NullByte));
+        assert_eq!(validate_env_key(b"ENV\x00KEY"), Err(ValidationError::NullByte));
+        assert_eq!(validate_ipv4(b"192.168.\x001.1"), Err(ValidationError::NullByte));
+        assert_eq!(validate_ipv6(b"2001:db8::\x001"), Err(ValidationError::NullByte));
     }
 
     #[test]
