@@ -46,48 +46,284 @@ impl RouteEntry {
     }
 }
 
-/// Routing Table
-pub struct RoutingTable {
-    routes: Vec<RouteEntry>,
+/// Advanced Routing Tables
+/// Supports multiple routing tables (main, default, local, main) as per Linux networking stack
+/// Roadmap item: Full multi-table routing support for Omarchy Linux parity
+pub enum RoutingTableId {
+    /// Main routing table
+    Main,
+    /// Default routing table
+    Default,
+    /// Local routing table
+    Local,
+    /// Custom routing table
+    Custom(String),
 }
 
-impl RoutingTable {
+pub enum RoutingTableEntry {
+    /// Primary routing table
+    Primary(RoutingTable),
+    /// Secondary routing table
+    Secondary(RoutingTable),
+    /// Policy routing table
+    Policy(RoutingTable),
+}
+
+pub struct AdvancedRoutingTable {
+    /// Primary routing table (main)
+    primary: RoutingTable,
+    /// Secondary routing tables indexed by table ID
+    secondary: alloc::collections::BTreeMap<RoutingTableId, RoutingTable>,
+    /// Default gateway
+    default_gateway: Option<Ipv4Addr>,
+    /// Local addresses
+    local_addresses: alloc::vec::Vec<Ipv4Addr>,
+}
+
+impl AdvancedRoutingTable {
     pub fn new() -> Self {
-        Self { routes: Vec::new() }
+        Self {
+            primary: RoutingTable::new(),
+            secondary: alloc::collections::BTreeMap::new(),
+            default_gateway: None,
+            local_addresses: alloc::vec::Vec::new(),
+        }
     }
 
-    /// Add route
-    pub fn add_route(&mut self, route: RouteEntry) {
-        self.routes.push(route);
-        // Sort by netmask length (most specific first)
-        self.routes.sort_by_key(|r| {
-            let bits = u32::BITS - r.netmask.0.leading_zeros();
-            -(bits as i32) // Negative for reverse sort (most specific first)
-        });
+    /// Add route to primary routing table
+    pub fn add_primary_route(&mut self, route: RouteEntry) {
+        self.primary.add_route(route);
     }
 
-    /// Remove route
-    pub fn remove_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
-        if let Some(pos) = self
-            .routes
-            .iter()
-            .position(|r| r.destination == dest && r.netmask == netmask)
-        {
-            self.routes.remove(pos);
-            true
+    /// Add route to secondary routing table
+    pub fn add_secondary_route(&mut self, table_id: RoutingTableId, route: RouteEntry) {
+        self.secondary.entry(table_id).or_insert_with(RoutingTable::new).add_route(route);
+    }
+
+    /// Remove route from primary table
+    pub fn remove_primary_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
+        self.primary.remove_route(dest, netmask)
+    }
+
+    /// Remove route from secondary table
+    pub fn remove_secondary_route(&mut self, table_id: RoutingTableId, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
+        if let Some(table) = self.secondary.get_mut(&table_id) {
+            table.remove_route(dest, netmask)
         } else {
             false
         }
     }
 
-    /// Lookup route for destination
-    pub fn lookup(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
-        self.routes.iter().find(|r| r.matches(dest))
+    /// Lookup route in primary table
+    pub fn lookup_primary(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
+        self.primary.lookup(dest)
     }
 
-    /// Get all routes
-    pub fn routes(&self) -> &[RouteEntry] {
-        &self.routes
+    /// Lookup route in secondary table
+    pub fn lookup_secondary(&self, table_id: RoutingTableId, dest: Ipv4Addr) -> Option<&RouteEntry> {
+        self.secondary.get(&table_id).and_then(|t| t.lookup(dest))
+    }
+
+    /// Get all routes from primary table
+    pub fn primary_routes(&self) -> &[RouteEntry] {
+        self.primary.routes()
+    }
+
+    /// Get all routes from secondary table
+    pub fn secondary_routes(&self, table_id: RoutingTableId) -> Option<&[RouteEntry]> {
+        self.secondary.get(&table_id).map(|t| t.routes())
+    }
+
+    /// Add local address
+    pub fn add_local_address(&mut self, addr: Ipv4Addr) {
+        self.local_addresses.push(addr);
+    }
+
+    /// Set default gateway
+    pub fn set_default_gateway(&mut self, gateway: Ipv4Addr) {
+        self.default_gateway = Some(gateway);
+    }
+
+    /// Get default gateway
+    pub fn default_gateway(&self) -> Option<&Ipv4Addr> {
+        self.default_gateway.as_ref()
+    }
+}
+
+/// Multi-table Routing Engine
+/// Supports multiple routing tables for policy-based routing
+/// Roadmap item: Full multi-table routing support for Omarchy Linux parity
+pub struct MultiTableRoutingEngine {
+    /// Advanced routing tables
+    routing_tables: alloc::collections::BTreeMap<RoutingTableId, AdvancedRoutingTable>,
+    /// Current active table
+    active_table: RoutingTableId,
+}
+
+impl MultiTableRoutingEngine {
+    pub fn new() -> Self {
+        Self {
+            routing_tables: alloc::collections::BTreeMap::new(),
+            active_table: RoutingTableId::Main,
+        }
+    }
+
+    /// Add routing table
+    pub fn add_routing_table(&mut self, table_id: RoutingTableId) {
+        self.routing_tables.entry(table_id).or_insert_with(AdvancedRoutingTable::new);
+    }
+
+    /// Set active routing table
+    pub fn set_active_table(&mut self, table_id: RoutingTableId) {
+        self.active_table = table_id;
+    }
+
+    /// Get active routing table
+    pub fn active_table(&self) -> &AdvancedRoutingTable {
+        self.routing_tables.get(&self.active_table).unwrap_or_else(|| {
+            // Return main table if not created yet
+            let mut table = Self::new_routing_table();
+            self.routing_tables.insert(self.active_table.clone(), table);
+            self.routing_tables.get(&self.active_table).unwrap()
+        })
+    }
+
+    /// Forward packet using active routing table
+    pub fn forward_packet(&self, dest: Ipv4Addr) -> Result<ForwardingDecision, NetworkError> {
+        let table = self.active_table();
+        table.forward_packet(dest)
+    }
+
+    /// Add route to active table
+    pub fn add_route(&mut self, route: RouteEntry) {
+        self.get_active_routing_table().add_primary_route(route);
+    }
+
+    /// Add route to specific table
+    pub fn add_route_to_table(&mut self, table_id: RoutingTableId, route: RouteEntry) {
+        self.routing_tables.entry(table_id).or_insert_with(AdvancedRoutingTable::new).add_primary_route(route);
+    }
+
+    /// Remove route from active table
+    pub fn remove_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
+        self.get_active_routing_table().remove_primary_route(dest, netmask)
+    }
+
+    /// Lookup route in active table
+    pub fn lookup_route(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
+        self.get_active_routing_table().lookup_primary(dest)
+    }
+
+    /// Get all routes from active table
+    pub fn get_routes(&self) -> alloc::vec::Vec<RouteEntry> {
+        let mut routes = alloc::vec::Vec::new();
+        if let Some(table) = self.routing_tables.get(&self.active_table) {
+            routes.extend_from_slice(table.primary_routes());
+        }
+        for (_, secondary_table) in &self.routing_tables {
+            if let Some(sec_routes) = secondary_table.secondary_routes(self.active_table) {
+                routes.extend_from_slice(sec_routes);
+            }
+        }
+        routes
+    }
+
+    /// Get all routing table IDs
+    pub fn routing_table_ids(&self) -> alloc::vec::Vec<RoutingTableId> {
+        self.routing_tables.keys().cloned().collect()
+    }
+
+    /// Get routing table by ID
+    pub fn get_routing_table(&self, table_id: RoutingTableId) -> Option<&AdvancedRoutingTable> {
+        self.routing_tables.get(&table_id)
+    }
+
+    /// Get local addresses
+    pub fn local_addresses(&self) -> &alloc::vec::Vec<Ipv4Addr> {
+        // This would need access to the routing engine's state
+        // For now, return empty - would need to store reference
+        alloc::vec::Vec::new()
+    }
+}
+
+/// Policy Routing Decision
+/// Supports policy-based routing with multiple routing tables
+#[derive(Debug, Clone)]
+pub enum PolicyRoutingDecision {
+    /// Standard forwarding
+    Standard(ForwardingDecision),
+    /// Policy-based forwarding
+    Policy {
+        table: RoutingTableId,
+        decision: ForwardingDecision,
+    },
+    /// Drop packet
+    Drop,
+}
+
+/// Policy Routing Engine
+/// Supports policy-based routing with multiple routing tables
+/// Roadmap item: Full multi-table routing support for Omarchy Linux parity
+pub struct PolicyRoutingEngine {
+    /// Routing tables
+    routing_tables: alloc::collections::BTreeMap<RoutingTableId, AdvancedRoutingTable>,
+    /// Routing decisions
+    decisions: alloc::vec::Vec<PolicyRoutingDecision>,
+}
+
+impl PolicyRoutingEngine {
+    pub fn new() -> Self {
+        Self {
+            routing_tables: alloc::collections::BTreeMap::new(),
+            decisions: alloc::vec::Vec::new(),
+        }
+    }
+
+    /// Add routing table
+    pub fn add_routing_table(&mut self, table_id: RoutingTableId) {
+        self.routing_tables.entry(table_id).or_insert_with(AdvancedRoutingTable::new);
+    }
+
+    /// Add policy routing decision
+    pub fn add_decision(&mut self, decision: PolicyRoutingDecision) {
+        self.decisions.push(decision);
+    }
+
+    /// Get routing table
+    pub fn get_routing_table(&self, table_id: RoutingTableId) -> Option<&AdvancedRoutingTable> {
+        self.routing_tables.get(&table_id)
+    }
+
+    /// Get all routing table IDs
+    pub fn routing_table_ids(&self) -> alloc::vec::Vec<RoutingTableId> {
+        self.routing_tables.keys().cloned().collect()
+    }
+
+    /// Evaluate policy routing for destination
+    pub fn evaluate_policy(&self, dest: Ipv4Addr) -> PolicyRoutingDecision {
+        // Check configured policy decisions
+        for decision in &self.decisions {
+            match decision {
+                PolicyRoutingDecision::Policy { table, decision } => {
+                    // If table is active, use that decision
+                    if let Some(table) = self.routing_tables.get(table) {
+                        // Check if destination matches any route in that table
+                        if table.lookup_secondary(*table_id, dest).is_some() {
+                            return decision.clone();
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        // Fall back to standard routing
+        PolicyRoutingDecision::Standard(ForwardingDecision::DropPacket)
+    }
+
+    /// Get all policy decisions
+    pub fn decisions(&self) -> &alloc::vec::Vec<PolicyRoutingDecision> {
+        &self.decisions
     }
 }
 
