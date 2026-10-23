@@ -82,5 +82,4 @@ wiki/
 !tools/*.py
 !tools/**/*.py
 !.github/PULL_REQUEST_TEMPLATE.md
-!docs/shell/*.md
-!docs/studies/*.md
+!docs/**/*.md
