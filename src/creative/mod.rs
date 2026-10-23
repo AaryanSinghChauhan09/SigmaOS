@@ -68,6 +68,7 @@ pub mod vectorcraft;
 pub mod voicecraft;
 pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
+pub mod voicecraft_neural_dsp_advancements_v68_pr;
 pub mod wordcraft;
 pub mod wordcraft_artcraft_missing_components_v65_pr;
 pub mod wordcraft_artcraft_parity_pr;
