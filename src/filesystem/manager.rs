@@ -28,7 +28,8 @@ use std::collections::BTreeMap;
 // str/String not in no_std
 
 /// Fast zero-allocation case-insensitive substring search helper.
-/// Uses window slice byte comparison for ASCII fast-path to avoid creating heap `String`s via `to_lowercase()`.
+/// Uses `eq_ignore_ascii_case` on slice windows for ASCII fast-path to eliminate
+/// per-element iterator overhead and avoid creating heap `String`s via `to_lowercase()`.
 fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
     if needle.is_empty() {
         return true;
@@ -38,12 +39,10 @@ fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
     }
     if haystack.is_ascii() && needle.is_ascii() {
         let needle_bytes = needle.as_bytes();
-        haystack.as_bytes().windows(needle.len()).any(|window| {
-            window
-                .iter()
-                .zip(needle_bytes)
-                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
-        })
+        haystack
+            .as_bytes()
+            .windows(needle.len())
+            .any(|window| window.eq_ignore_ascii_case(needle_bytes))
     } else {
         haystack.to_lowercase().contains(&needle.to_lowercase())
     }
