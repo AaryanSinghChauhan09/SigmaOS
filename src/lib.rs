@@ -53,6 +53,7 @@ pub use creative::fontcraft_artcraft_parity_pr::*;
 pub use creative::fontcraft_missing_components_parity_pr::*;
 pub use creative::photocraft_artcraft_missing_components_v65_pr::*;
 // pub use creative::photocraft_artcraft_parity_pr::*;
+pub use creative::soundcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::soundcraft_artcraft_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
 // pub use creative::threedcraft_artcraft_parity_pr::*;
