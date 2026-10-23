@@ -2859,7 +2859,11 @@ impl Ossv4VirtualAudioMuxEngine {
         if pcm_data.is_empty() {
             return self.peak_levels_dbfs.clone();
         }
-        let max_val = pcm_data.iter().map(|&s| (s as i32).abs()).max().unwrap_or(0) as f32;
+        let max_val = pcm_data
+            .iter()
+            .map(|&s| (s as i32).abs())
+            .max()
+            .unwrap_or(0) as f32;
         let dbfs = if max_val > 0.0 {
             20.0 * (max_val / 32768.0).log10()
         } else {
@@ -3274,14 +3278,38 @@ impl LinuxBsdAudioVideoV68GatewayEngine {
 
     pub fn register_v68_prs(&mut self) {
         let v68_prs = [
-            ("ALSA Channel Map & MMAP Ring Buffer Tracking Engine", "ALSA"),
-            ("OSSv4 Virtual Audio Matrix Multiplexer & Peak Meters", "OSS"),
-            ("PulseAudio Native Stream Binary Protocol Engine", "PulseAudio"),
-            ("PipeWire SPA Buffer Pod & WirePlumber 0.5 Rules", "PipeWire"),
-            ("JACK Realtime Zero-Copy Execution Graph & NSM Session", "JACK"),
-            ("sndio Realtime sioctl Parameters & Master Clock Engine", "sndio"),
-            ("GStreamer Dynamic Pad Probe & SplitMuxSink Recorder", "GStreamer"),
-            ("FFmpeg AVIOContext Custom I/O & DRM PRIME Surface Pool", "FFmpeg"),
+            (
+                "ALSA Channel Map & MMAP Ring Buffer Tracking Engine",
+                "ALSA",
+            ),
+            (
+                "OSSv4 Virtual Audio Matrix Multiplexer & Peak Meters",
+                "OSS",
+            ),
+            (
+                "PulseAudio Native Stream Binary Protocol Engine",
+                "PulseAudio",
+            ),
+            (
+                "PipeWire SPA Buffer Pod & WirePlumber 0.5 Rules",
+                "PipeWire",
+            ),
+            (
+                "JACK Realtime Zero-Copy Execution Graph & NSM Session",
+                "JACK",
+            ),
+            (
+                "sndio Realtime sioctl Parameters & Master Clock Engine",
+                "sndio",
+            ),
+            (
+                "GStreamer Dynamic Pad Probe & SplitMuxSink Recorder",
+                "GStreamer",
+            ),
+            (
+                "FFmpeg AVIOContext Custom I/O & DRM PRIME Surface Pool",
+                "FFmpeg",
+            ),
             ("V4L2 Multi-Planar Queue & DMA-BUF Exporter Engine", "V4L2"),
             ("VLC libVLC Core Module Loader & SSA/ASS Subtitles", "VLC"),
             ("mpv JSON-RPC IPC Output Bridge & Lua Script Hooks", "mpv"),
@@ -3446,7 +3474,9 @@ impl LinuxBsdDistroMediaSuite {
             pipewire_spa_pod: PipeWireSpaPodBuffersEngine::new(1),
             jack_zero_copy_graph: JackRealtimeZeroCopyGraphEngine::new("jack_client_v68"),
             sndio_sioctl_mux: SndioSioctlControlMuxEngine::new("snd/0"),
-            gstreamer_pad_probe_splitmux: GStreamerPadProbeSplitMuxEngine::new("v4l2src ! vaapih264enc"),
+            gstreamer_pad_probe_splitmux: GStreamerPadProbeSplitMuxEngine::new(
+                "v4l2src ! vaapih264enc",
+            ),
             ffmpeg_drm_prime: FfmpegDrmPrimeSurfaceEngine::new("h264", "/dev/dri/renderD128"),
             v4l2_multiplanar_dmabuf: V4l2MultiPlanarDmaBufEngine::new("/dev/video0"),
             vlc_ssa_subtitles: VlcLibvlcSsaSubtitleRendererEngine::new(),
@@ -3936,5 +3966,4 @@ mod tests {
         let suite = LinuxBsdDistroMediaSuite::new();
         assert_eq!(suite.v68_pr_gateway.submissions.len(), 11);
     }
-
 }

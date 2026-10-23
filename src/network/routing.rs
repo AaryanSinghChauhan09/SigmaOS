@@ -97,7 +97,10 @@ impl AdvancedRoutingTable {
 
     /// Add route to secondary routing table
     pub fn add_secondary_route(&mut self, table_id: RoutingTableId, route: RouteEntry) {
-        self.secondary.entry(table_id).or_insert_with(RoutingTable::new).add_route(route);
+        self.secondary
+            .entry(table_id)
+            .or_insert_with(RoutingTable::new)
+            .add_route(route);
     }
 
     /// Remove route from primary table
@@ -106,7 +109,12 @@ impl AdvancedRoutingTable {
     }
 
     /// Remove route from secondary table
-    pub fn remove_secondary_route(&mut self, table_id: RoutingTableId, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
+    pub fn remove_secondary_route(
+        &mut self,
+        table_id: RoutingTableId,
+        dest: Ipv4Addr,
+        netmask: Ipv4Addr,
+    ) -> bool {
         if let Some(table) = self.secondary.get_mut(&table_id) {
             table.remove_route(dest, netmask)
         } else {
@@ -120,7 +128,11 @@ impl AdvancedRoutingTable {
     }
 
     /// Lookup route in secondary table
-    pub fn lookup_secondary(&self, table_id: RoutingTableId, dest: Ipv4Addr) -> Option<&RouteEntry> {
+    pub fn lookup_secondary(
+        &self,
+        table_id: RoutingTableId,
+        dest: Ipv4Addr,
+    ) -> Option<&RouteEntry> {
         self.secondary.get(&table_id).and_then(|t| t.lookup(dest))
     }
 
@@ -170,7 +182,9 @@ impl MultiTableRoutingEngine {
 
     /// Add routing table
     pub fn add_routing_table(&mut self, table_id: RoutingTableId) {
-        self.routing_tables.entry(table_id).or_insert_with(AdvancedRoutingTable::new);
+        self.routing_tables
+            .entry(table_id)
+            .or_insert_with(AdvancedRoutingTable::new);
     }
 
     /// Set active routing table
@@ -180,12 +194,14 @@ impl MultiTableRoutingEngine {
 
     /// Get active routing table
     pub fn active_table(&self) -> &AdvancedRoutingTable {
-        self.routing_tables.get(&self.active_table).unwrap_or_else(|| {
-            // Return main table if not created yet
-            let mut table = Self::new_routing_table();
-            self.routing_tables.insert(self.active_table.clone(), table);
-            self.routing_tables.get(&self.active_table).unwrap()
-        })
+        self.routing_tables
+            .get(&self.active_table)
+            .unwrap_or_else(|| {
+                // Return main table if not created yet
+                let mut table = Self::new_routing_table();
+                self.routing_tables.insert(self.active_table.clone(), table);
+                self.routing_tables.get(&self.active_table).unwrap()
+            })
     }
 
     /// Forward packet using active routing table
@@ -201,12 +217,16 @@ impl MultiTableRoutingEngine {
 
     /// Add route to specific table
     pub fn add_route_to_table(&mut self, table_id: RoutingTableId, route: RouteEntry) {
-        self.routing_tables.entry(table_id).or_insert_with(AdvancedRoutingTable::new).add_primary_route(route);
+        self.routing_tables
+            .entry(table_id)
+            .or_insert_with(AdvancedRoutingTable::new)
+            .add_primary_route(route);
     }
 
     /// Remove route from active table
     pub fn remove_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
-        self.get_active_routing_table().remove_primary_route(dest, netmask)
+        self.get_active_routing_table()
+            .remove_primary_route(dest, netmask)
     }
 
     /// Lookup route in active table
@@ -281,7 +301,9 @@ impl PolicyRoutingEngine {
 
     /// Add routing table
     pub fn add_routing_table(&mut self, table_id: RoutingTableId) {
-        self.routing_tables.entry(table_id).or_insert_with(AdvancedRoutingTable::new);
+        self.routing_tables
+            .entry(table_id)
+            .or_insert_with(AdvancedRoutingTable::new);
     }
 
     /// Add policy routing decision

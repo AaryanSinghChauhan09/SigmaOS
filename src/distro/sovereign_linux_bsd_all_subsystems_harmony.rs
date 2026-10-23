@@ -995,15 +995,19 @@ impl SovereignSubsystemDistroHarmonyEngine {
             (LinuxBsdDistroInspiration::NixOS, LinuxBsdDistroInspiration::GentooLinux) => payload
                 .replace("flake_closure", "ebuild_use_flags")
                 .replace("store_path", "portage_vdb"),
-            (LinuxBsdDistroInspiration::AlpineLinux, LinuxBsdDistroInspiration::ArchLinux) => payload
-                .replace("apk_world", "pacman_world")
-                .replace("musl_libc", "glibc_core"),
+            (LinuxBsdDistroInspiration::AlpineLinux, LinuxBsdDistroInspiration::ArchLinux) => {
+                payload
+                    .replace("apk_world", "pacman_world")
+                    .replace("musl_libc", "glibc_core")
+            }
             (LinuxBsdDistroInspiration::VoidLinux, LinuxBsdDistroInspiration::FreeBSD) => payload
                 .replace("runit_service", "rc_subr_service")
                 .replace("xbps_pkg", "pkg_freebsd"),
-            (LinuxBsdDistroInspiration::ClearLinux, LinuxBsdDistroInspiration::FedoraLinux) => payload
-                .replace("swupd_bundle", "dnf_group")
-                .replace("clr_opt_flags", "fedora_opt_flags"),
+            (LinuxBsdDistroInspiration::ClearLinux, LinuxBsdDistroInspiration::FedoraLinux) => {
+                payload
+                    .replace("swupd_bundle", "dnf_group")
+                    .replace("clr_opt_flags", "fedora_opt_flags")
+            }
             _ => format!(
                 "transpiled_from_{}_to_{}:{}",
                 source_distro.as_str(),

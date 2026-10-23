@@ -11,23 +11,47 @@ fn test_maintenance_calendar_tasks_count() {
     let engine = MaintenanceOperatingModelEngine::new();
     assert_eq!(engine.tasks.len(), 14);
 
-    let daily_tasks: Vec<_> = engine.tasks.iter().filter(|t| t.cadence == MaintenanceCadence::Daily).collect();
+    let daily_tasks: Vec<_> = engine
+        .tasks
+        .iter()
+        .filter(|t| t.cadence == MaintenanceCadence::Daily)
+        .collect();
     assert_eq!(daily_tasks.len(), 1);
     assert_eq!(daily_tasks[0].id, "daily_ci");
 
-    let weekly_tasks: Vec<_> = engine.tasks.iter().filter(|t| t.cadence == MaintenanceCadence::Weekly).collect();
+    let weekly_tasks: Vec<_> = engine
+        .tasks
+        .iter()
+        .filter(|t| t.cadence == MaintenanceCadence::Weekly)
+        .collect();
     assert_eq!(weekly_tasks.len(), 3);
 
-    let biweekly_tasks: Vec<_> = engine.tasks.iter().filter(|t| t.cadence == MaintenanceCadence::Biweekly).collect();
+    let biweekly_tasks: Vec<_> = engine
+        .tasks
+        .iter()
+        .filter(|t| t.cadence == MaintenanceCadence::Biweekly)
+        .collect();
     assert_eq!(biweekly_tasks.len(), 2);
 
-    let monthly_tasks: Vec<_> = engine.tasks.iter().filter(|t| t.cadence == MaintenanceCadence::Monthly).collect();
+    let monthly_tasks: Vec<_> = engine
+        .tasks
+        .iter()
+        .filter(|t| t.cadence == MaintenanceCadence::Monthly)
+        .collect();
     assert_eq!(monthly_tasks.len(), 4);
 
-    let quarterly_tasks: Vec<_> = engine.tasks.iter().filter(|t| t.cadence == MaintenanceCadence::Quarterly).collect();
+    let quarterly_tasks: Vec<_> = engine
+        .tasks
+        .iter()
+        .filter(|t| t.cadence == MaintenanceCadence::Quarterly)
+        .collect();
     assert_eq!(quarterly_tasks.len(), 3);
 
-    let semiannual_tasks: Vec<_> = engine.tasks.iter().filter(|t| t.cadence == MaintenanceCadence::Semiannual).collect();
+    let semiannual_tasks: Vec<_> = engine
+        .tasks
+        .iter()
+        .filter(|t| t.cadence == MaintenanceCadence::Semiannual)
+        .collect();
     assert_eq!(semiannual_tasks.len(), 1);
 }
 
@@ -40,13 +64,25 @@ fn test_task_completion_recording() {
         title: "fix(ci): repair nightly boot-smoke workflow".to_string(),
     };
 
-    assert!(engine.record_task_completion("daily_ci", pr_artifact.clone(), TaskResultStatus::SystemBehaviorVerified).is_ok());
+    assert!(engine
+        .record_task_completion(
+            "daily_ci",
+            pr_artifact.clone(),
+            TaskResultStatus::SystemBehaviorVerified
+        )
+        .is_ok());
     assert_eq!(engine.completed_artifacts.len(), 1);
     assert_eq!(engine.completed_artifacts[0].1, pr_artifact);
     assert!(engine.completed_artifacts[0].2.is_verified());
 
     // Error on invalid task ID
-    assert!(engine.record_task_completion("non_existent_task", pr_artifact, TaskResultStatus::CodeExists).is_err());
+    assert!(engine
+        .record_task_completion(
+            "non_existent_task",
+            pr_artifact,
+            TaskResultStatus::CodeExists
+        )
+        .is_err());
 }
 
 #[test]
@@ -64,9 +100,16 @@ fn test_hardware_matrix_updates() {
         "Verified 16550 UART serial boot logging under QEMU".to_string(),
     );
 
-    let serial_entry = engine.hardware_matrix.iter().find(|e| e.driver_class == HardwareDriverClass::Serial).unwrap();
+    let serial_entry = engine
+        .hardware_matrix
+        .iter()
+        .find(|e| e.driver_class == HardwareDriverClass::Serial)
+        .unwrap();
     assert!(serial_entry.status.is_verified());
-    assert_eq!(serial_entry.evidence_path.as_deref(), Some("reports/hardware/serial_qemu.log"));
+    assert_eq!(
+        serial_entry.evidence_path.as_deref(),
+        Some("reports/hardware/serial_qemu.log")
+    );
 }
 
 #[test]
@@ -78,27 +121,31 @@ fn test_release_tier_readiness_gates() {
     assert!(!engine.evaluate_release_readiness(ReleaseTier::DeveloperPreview));
 
     // Record boot validation
-    engine.record_task_completion(
-        "monthly_boot",
-        TaskArtifact::Report {
-            title: "QEMU Boot Validation".to_string(),
-            path: "reports/boot/qemu.log".to_string(),
-        },
-        TaskResultStatus::SystemBehaviorVerified,
-    ).unwrap();
+    engine
+        .record_task_completion(
+            "monthly_boot",
+            TaskArtifact::Report {
+                title: "QEMU Boot Validation".to_string(),
+                path: "reports/boot/qemu.log".to_string(),
+            },
+            TaskResultStatus::SystemBehaviorVerified,
+        )
+        .unwrap();
 
     assert!(engine.evaluate_release_readiness(ReleaseTier::DeveloperPreview));
     assert!(!engine.evaluate_release_readiness(ReleaseTier::TestDistribution));
 
     // Record installer rehearsal
-    engine.record_task_completion(
-        "monthly_installer",
-        TaskArtifact::Report {
-            title: "Installer VM Rehearsal".to_string(),
-            path: "reports/installer/vm_rehearsal.log".to_string(),
-        },
-        TaskResultStatus::SystemBehaviorVerified,
-    ).unwrap();
+    engine
+        .record_task_completion(
+            "monthly_installer",
+            TaskArtifact::Report {
+                title: "Installer VM Rehearsal".to_string(),
+                path: "reports/installer/vm_rehearsal.log".to_string(),
+            },
+            TaskResultStatus::SystemBehaviorVerified,
+        )
+        .unwrap();
 
     assert!(engine.evaluate_release_readiness(ReleaseTier::TestDistribution));
     assert!(!engine.evaluate_release_readiness(ReleaseTier::Stable));

@@ -103,7 +103,9 @@ impl EffectcraftNeuralVideoSuperResolutionUpscalerPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6601,
-            pr_title: "feat(effectcraft): Add AI Neural Video Super-Resolution & Spatial Upscaler Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Add AI Neural Video Super-Resolution & Spatial Upscaler Engine"
+                    .to_string(),
             target_subsystem: "EffectCraft Super-Resolution Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft AI Video Suite".to_string(),
             components_added: vec![
@@ -169,7 +171,9 @@ impl EffectcraftAnamorphicBokehLensDistortionSimulationPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6602,
-            pr_title: "feat(effectcraft): Add Anamorphic Lens Optical Distortion & Oval Bokeh Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Anamorphic Lens Optical Distortion & Oval Bokeh Engine"
+                    .to_string(),
             target_subsystem: "EffectCraft Optical Physics Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Lens FX Studio".to_string(),
             components_added: vec![
@@ -238,7 +242,8 @@ impl EffectcraftRealtimeGpuRaytracedReflectionsRefractionsPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6603,
-            pr_title: "feat(effectcraft): Add Real-Time GPU Raytraced Reflections & Refractions".to_string(),
+            pr_title: "feat(effectcraft): Add Real-Time GPU Raytraced Reflections & Refractions"
+                .to_string(),
             target_subsystem: "EffectCraft Raytracing Render Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Raytrace Studio".to_string(),
             components_added: vec![
@@ -316,7 +321,8 @@ impl EffectcraftClothSoftbodyMeshDeformationPhysicsPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6604,
-            pr_title: "feat(effectcraft): Add Cloth & Softbody Viscoelastic Mesh Physics Simulator".to_string(),
+            pr_title: "feat(effectcraft): Add Cloth & Softbody Viscoelastic Mesh Physics Simulator"
+                .to_string(),
             target_subsystem: "EffectCraft Softbody Physics Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Physics Studio".to_string(),
             components_added: vec![
@@ -394,7 +400,9 @@ impl EffectcraftTemporalFaceLandmarkTrackingBeautyRetouchPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6605,
-            pr_title: "feat(effectcraft): Add AI 3D Facial Landmark Tracking & Beauty Retouch Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Add AI 3D Facial Landmark Tracking & Beauty Retouch Engine"
+                    .to_string(),
             target_subsystem: "EffectCraft Facial Tracking Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft AI Beauty Studio".to_string(),
             components_added: vec![
@@ -445,7 +453,8 @@ impl EffectcraftVolumetricAtmosphericCloudsNebulaGeneratorPrEngine {
 
     pub fn generate_volumetric_nebula(&self, x: f32, y: f32, z: f32) -> (f32, f32, f32, f32) {
         let dist = (x * x + y * y + z * z).sqrt();
-        let density = (1.0 / (1.0 + dist * self.config.noise_scale) * self.config.density_multiplier)
+        let density = (1.0 / (1.0 + dist * self.config.noise_scale)
+            * self.config.density_multiplier)
             .clamp(0.0, 1.0);
         (
             self.config.primary_color_rgb.0 * density,
@@ -458,7 +467,9 @@ impl EffectcraftVolumetricAtmosphericCloudsNebulaGeneratorPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6606,
-            pr_title: "feat(effectcraft): Add 3D Volumetric Atmospheric Cloud & Cosmic Nebula Generator".to_string(),
+            pr_title:
+                "feat(effectcraft): Add 3D Volumetric Atmospheric Cloud & Cosmic Nebula Generator"
+                    .to_string(),
             target_subsystem: "EffectCraft Procedural Environment Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Sky & Space Studio".to_string(),
             components_added: vec![
@@ -535,7 +546,9 @@ impl EffectcraftMotionBlindSpotOpticalFlowSpeedRampingPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6607,
-            pr_title: "feat(effectcraft): Add Optical Flow Variable Speed Ramping & Motion Shutter Engine".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Optical Flow Variable Speed Ramping & Motion Shutter Engine"
+                    .to_string(),
             target_subsystem: "EffectCraft Speed Ramping Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft TimeRamp Studio".to_string(),
             components_added: vec![
@@ -610,7 +623,9 @@ impl EffectcraftMultispectralAovLightPathExpressionExtractorPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6608,
-            pr_title: "feat(effectcraft): Add Multispectral EXR Light Path Expression (LPE) Extractor".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Multispectral EXR Light Path Expression (LPE) Extractor"
+                    .to_string(),
             target_subsystem: "EffectCraft Deep LPE Compositing Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft AOV Studio".to_string(),
             components_added: vec![
@@ -696,7 +711,9 @@ impl EffectcraftMultiGpuDistributedRenderFarmDispatcherPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6609,
-            pr_title: "feat(effectcraft): Add Multi-GPU Distributed Render Farm Tile Cluster Dispatcher".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Multi-GPU Distributed Render Farm Tile Cluster Dispatcher"
+                    .to_string(),
             target_subsystem: "EffectCraft Distributed Render Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft RenderFarm Studio".to_string(),
             components_added: vec![
@@ -775,7 +792,9 @@ impl EffectcraftRealtimeVirtualProductionChromaKeySpillSuppressorPrEngine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV66PrProposalManifest {
         EffectcraftV66PrProposalManifest {
             pr_id: 6610,
-            pr_title: "feat(effectcraft): Add Real-Time Virtual Production Live Keyer & Spill Suppressor".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Real-Time Virtual Production Live Keyer & Spill Suppressor"
+                    .to_string(),
             target_subsystem: "EffectCraft Live Virtual Production Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Live Studio".to_string(),
             components_added: vec![
@@ -904,7 +923,8 @@ mod tests {
     #[test]
     fn test_realtime_gpu_raytracing() {
         let engine = EffectcraftRealtimeGpuRaytracedReflectionsRefractionsPrEngine::new();
-        let (rx, ry, rz) = engine.trace_reflection_refraction_rays((0.1, 0.2, 0.3), (0.5, 0.5, 0.5));
+        let (rx, ry, rz) =
+            engine.trace_reflection_refraction_rays((0.1, 0.2, 0.3), (0.5, 0.5, 0.5));
         assert!(rx >= 0.0 && ry >= 0.0 && rz >= 0.0);
     }
 

@@ -160,9 +160,7 @@ impl DesigncraftInteractivePrototypingFlowV65PrEngine {
                 String::from("SmartAnimate & Dissolve screen transitions with overlay stack"),
                 String::from("Interactive screen flow routing and back navigation"),
             ],
-            performance_multiplier: String::from(
-                "60 FPS Hardware-Accelerated Transition Pipeline",
-            ),
+            performance_multiplier: String::from("60 FPS Hardware-Accelerated Transition Pipeline"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -245,12 +243,16 @@ impl DesigncraftAutoLayoutFlexContainerV65PrEngine {
                         + f.padding.right
                         + f.gap * (f.children_count.saturating_sub(1) as f32)
                 }
-                ResizingConstraintV65::FillContainer => parent_w - (f.padding.left + f.padding.right),
+                ResizingConstraintV65::FillContainer => {
+                    parent_w - (f.padding.left + f.padding.right)
+                }
             };
             let h = match f.height_constraint {
                 ResizingConstraintV65::Fixed(val) => val,
                 ResizingConstraintV65::HugContent => 40.0 + f.padding.top + f.padding.bottom,
-                ResizingConstraintV65::FillContainer => parent_h - (f.padding.top + f.padding.bottom),
+                ResizingConstraintV65::FillContainer => {
+                    parent_h - (f.padding.top + f.padding.bottom)
+                }
             };
             (w, h)
         } else {
@@ -267,7 +269,9 @@ impl DesigncraftAutoLayoutFlexContainerV65PrEngine {
             target_subsystem: String::from("DesignCraft Layout Engine"),
             original_suite: String::from("ArtCraft DesignCraft Auto-Layout Studio"),
             components_added: vec![
-                String::from("Horizontal & vertical flex container directions with padding and gaps"),
+                String::from(
+                    "Horizontal & vertical flex container directions with padding and gaps",
+                ),
                 String::from("HugContent, FillContainer & Fixed sizing constraints"),
                 String::from("Dynamic alignment matrix and nested container solver"),
             ],
@@ -1079,10 +1083,7 @@ mod tests {
         let p2 = engine.create_path(String::from("PathB"), vec![knot], true);
         let res = engine.perform_boolean_op(p1, p2, BooleanOpTypeV65::Union);
         assert!(res.is_some());
-        assert_eq!(
-            engine.paths.get(&res.unwrap()).unwrap().knots.len(),
-            2
-        );
+        assert_eq!(engine.paths.get(&res.unwrap()).unwrap().knots.len(), 2);
     }
 
     #[test]

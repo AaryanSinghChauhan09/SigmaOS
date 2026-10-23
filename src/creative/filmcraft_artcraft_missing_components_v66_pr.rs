@@ -204,9 +204,12 @@ impl FilmcraftObjectTrackingAiInpaintingCleanPlatePrEngine {
                         let idx = (y * width + x) * 3;
                         let blend = ((region.radius_px - dist) / region.radius_px).clamp(0.0, 1.0);
                         // Inpaint with edge sample approximation
-                        out_clean_rgb[idx] = out_clean_rgb[idx] * (1.0 - blend * self.edge_guided_fill_strength);
-                        out_clean_rgb[idx + 1] = out_clean_rgb[idx + 1] * (1.0 - blend * self.edge_guided_fill_strength);
-                        out_clean_rgb[idx + 2] = out_clean_rgb[idx + 2] * (1.0 - blend * self.edge_guided_fill_strength);
+                        out_clean_rgb[idx] =
+                            out_clean_rgb[idx] * (1.0 - blend * self.edge_guided_fill_strength);
+                        out_clean_rgb[idx + 1] =
+                            out_clean_rgb[idx + 1] * (1.0 - blend * self.edge_guided_fill_strength);
+                        out_clean_rgb[idx + 2] =
+                            out_clean_rgb[idx + 2] * (1.0 - blend * self.edge_guided_fill_strength);
                     }
                 }
             }
@@ -280,7 +283,8 @@ impl FilmcraftDolbyVisionV41DynamicMetadataToneMapperPrEngine {
         let scale_ratio = self.metadata.target_max_nits / self.master_display_peak_nits;
 
         for nits in hdr_nits_in {
-            let mapped = (nits * scale_ratio * self.metadata.trim_slope + self.metadata.trim_offset)
+            let mapped = (nits * scale_ratio * self.metadata.trim_slope
+                + self.metadata.trim_offset)
                 .powf(self.metadata.trim_power)
                 .clamp(self.metadata.target_min_nits, self.metadata.target_max_nits);
             out_nits.push(mapped);
@@ -354,7 +358,8 @@ impl Filmcraft3dCameraProjectionLightwrapCompositorPrEngine {
 
         for i in 0..pixels {
             let alpha = foreground_alpha[i].clamp(0.0, 1.0);
-            let rim = (alpha * (1.0 - alpha) * 4.0 * self.lightwrap_params.wrap_amount).clamp(0.0, 1.0);
+            let rim =
+                (alpha * (1.0 - alpha) * 4.0 * self.lightwrap_params.wrap_amount).clamp(0.0, 1.0);
 
             for c in 0..3 {
                 let fg = foreground_rgb[i * 3 + c];
@@ -803,7 +808,8 @@ impl SovereignFilmcraftArtcraftMissingComponentsV66PrGateway {
             FilmcraftHardwareAcceleratedAv1FilmGrainSynthesisPrEngine::new().generate_proposal(),
         );
         gateway.register_proposal(
-            FilmcraftRealtimeSubframeAudioPitchCorrectionAutotunePrEngine::new().generate_proposal(),
+            FilmcraftRealtimeSubframeAudioPitchCorrectionAutotunePrEngine::new()
+                .generate_proposal(),
         );
         gateway.register_proposal(
             FilmcraftAcesv2ColorSpaceTransformationEnginePrEngine::new().generate_proposal(),

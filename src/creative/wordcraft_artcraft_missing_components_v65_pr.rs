@@ -103,7 +103,10 @@ impl WordcraftTypographyLayoutEngine {
         if self.drop_cap.enabled && !formatted.is_empty() {
             let first_char = formatted.chars().next().unwrap();
             let remainder: String = formatted.chars().skip(1).collect();
-            formatted = format!("[DROP_CAP:{}:lines={}] {}", first_char, self.drop_cap.lines_to_drop, remainder);
+            formatted = format!(
+                "[DROP_CAP:{}:lines={}] {}",
+                first_char, self.drop_cap.lines_to_drop, remainder
+            );
         }
         formatted
     }
@@ -181,9 +184,21 @@ impl WordcraftStyleThemeCascadeEngine {
                 return Some(StyleNodeV65 {
                     name: node.name.clone(),
                     parent: node.parent.clone(),
-                    font_family: if node.font_family.is_empty() { parent_node.font_family } else { node.font_family.clone() },
-                    font_size_pt: if node.font_size_pt == 0.0 { parent_node.font_size_pt } else { node.font_size_pt },
-                    color_hex: if node.color_hex.is_empty() { parent_node.color_hex } else { node.color_hex.clone() },
+                    font_family: if node.font_family.is_empty() {
+                        parent_node.font_family
+                    } else {
+                        node.font_family.clone()
+                    },
+                    font_size_pt: if node.font_size_pt == 0.0 {
+                        parent_node.font_size_pt
+                    } else {
+                        node.font_size_pt
+                    },
+                    color_hex: if node.color_hex.is_empty() {
+                        parent_node.color_hex
+                    } else {
+                        node.color_hex.clone()
+                    },
                 });
             }
         }
@@ -261,10 +276,20 @@ impl WordcraftCitationBibliographyTocEngine {
     pub fn format_citation(&self, key: &str) -> String {
         if let Some(entry) = self.references.get(key) {
             match self.style {
-                CitationStyleV65::APA => format!("({}, {})", entry.authors.first().unwrap_or(&"Anon".to_string()), entry.year),
+                CitationStyleV65::APA => format!(
+                    "({}, {})",
+                    entry.authors.first().unwrap_or(&"Anon".to_string()),
+                    entry.year
+                ),
                 CitationStyleV65::IEEE => format!("[{}]", entry.key),
-                CitationStyleV65::MLA => format!("({})", entry.authors.first().unwrap_or(&"Anon".to_string())),
-                CitationStyleV65::Chicago => format!("{}, {}.", entry.authors.first().unwrap_or(&"Anon".to_string()), entry.title),
+                CitationStyleV65::MLA => {
+                    format!("({})", entry.authors.first().unwrap_or(&"Anon".to_string()))
+                }
+                CitationStyleV65::Chicago => format!(
+                    "{}, {}.",
+                    entry.authors.first().unwrap_or(&"Anon".to_string()),
+                    entry.title
+                ),
             }
         } else {
             format!("[Unknown citation: {}]", key)
@@ -337,11 +362,18 @@ impl WordcraftLinguisticAiSpellGrammarEngine {
         issues
     }
 
-    pub fn compute_flesch_kincaid_reading_ease(&self, words_count: u32, sentences_count: u32, syllables_count: u32) -> f32 {
+    pub fn compute_flesch_kincaid_reading_ease(
+        &self,
+        words_count: u32,
+        sentences_count: u32,
+        syllables_count: u32,
+    ) -> f32 {
         if words_count == 0 || sentences_count == 0 {
             return 100.0;
         }
-        206.835 - (1.015 * (words_count as f32 / sentences_count as f32)) - (84.6 * (syllables_count as f32 / words_count as f32))
+        206.835
+            - (1.015 * (words_count as f32 / sentences_count as f32))
+            - (84.6 * (syllables_count as f32 / words_count as f32))
     }
 
     pub fn ai_autocomplete(&self, context: &str) -> String {
@@ -538,7 +570,10 @@ impl WordcraftTableFormulaChartEngine {
         for (i, val) in values.iter().enumerate() {
             let y = 40 + i * 30;
             let bar_width = val * 2.0;
-            svg.push_str(&format!("<rect x=\"10\" y=\"{}\" width=\"{}\" height=\"20\" fill=\"#1F4E79\" />", y, bar_width));
+            svg.push_str(&format!(
+                "<rect x=\"10\" y=\"{}\" width=\"{}\" height=\"20\" fill=\"#1F4E79\" />",
+                y, bar_width
+            ));
         }
         svg.push_str("</svg>");
         svg
@@ -613,8 +648,14 @@ impl WordcraftMultiFormatTranspilerEngine {
             TargetFormatV65::Rtf => format!("{{\\rtf1\\ansi {}", content),
             TargetFormatV65::Docx => format!("[DOCX_BINARY_STREAM: {}]", content),
             TargetFormatV65::Odt => format!("[ODT_ZIP_PACKAGE: {}]", content),
-            TargetFormatV65::Pdf => format!("%PDF-1.7\n1 0 obj\n<< /Type /Catalog >>\nstream\n{}\nendstream", content),
-            TargetFormatV65::Epub => format!("<?xml version=\"1.0\" encoding=\"utf-8\"?><epub>{}</epub>", content),
+            TargetFormatV65::Pdf => format!(
+                "%PDF-1.7\n1 0 obj\n<< /Type /Catalog >>\nstream\n{}\nendstream",
+                content
+            ),
+            TargetFormatV65::Epub => format!(
+                "<?xml version=\"1.0\" encoding=\"utf-8\"?><epub>{}</epub>",
+                content
+            ),
         }
     }
 }
@@ -636,10 +677,14 @@ impl SovereignWordcraftArtcraftMissingComponentsV65PrGateway {
         vec![
             WordcraftV65PrProposalManifest {
                 pr_id: 6501,
-                pr_title: "PR #6501: OpenType Typography, Drop Caps & Multi-Column Layout Engine".to_string(),
+                pr_title: "PR #6501: OpenType Typography, Drop Caps & Multi-Column Layout Engine"
+                    .to_string(),
                 target_subsystem: "Creative/Wordcraft/Typography".to_string(),
                 original_suite: "ArtCraft Wordcraft".to_string(),
-                components_added: vec!["WordcraftTypographyLayoutEngine".to_string(), "DropCapConfigV65".to_string()],
+                components_added: vec![
+                    "WordcraftTypographyLayoutEngine".to_string(),
+                    "DropCapConfigV65".to_string(),
+                ],
                 performance_multiplier: "12.8x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -648,16 +693,23 @@ impl SovereignWordcraftArtcraftMissingComponentsV65PrGateway {
                 pr_title: "PR #6502: Style Hierarchy & Cascading Theme Palette Engine".to_string(),
                 target_subsystem: "Creative/Wordcraft/Styles".to_string(),
                 original_suite: "ArtCraft Wordcraft".to_string(),
-                components_added: vec!["WordcraftStyleThemeCascadeEngine".to_string(), "StyleNodeV65".to_string()],
+                components_added: vec![
+                    "WordcraftStyleThemeCascadeEngine".to_string(),
+                    "StyleNodeV65".to_string(),
+                ],
                 performance_multiplier: "15.4x".to_string(),
                 status: "APPROVED".to_string(),
             },
             WordcraftV65PrProposalManifest {
                 pr_id: 6503,
-                pr_title: "PR #6503: Footnotes, Bibliography & Dynamic Table of Contents Engine".to_string(),
+                pr_title: "PR #6503: Footnotes, Bibliography & Dynamic Table of Contents Engine"
+                    .to_string(),
                 target_subsystem: "Creative/Wordcraft/References".to_string(),
                 original_suite: "ArtCraft Wordcraft".to_string(),
-                components_added: vec!["WordcraftCitationBibliographyTocEngine".to_string(), "BibliographyEntryV65".to_string()],
+                components_added: vec![
+                    "WordcraftCitationBibliographyTocEngine".to_string(),
+                    "BibliographyEntryV65".to_string(),
+                ],
                 performance_multiplier: "14.2x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -672,10 +724,14 @@ impl SovereignWordcraftArtcraftMissingComponentsV65PrGateway {
             },
             WordcraftV65PrProposalManifest {
                 pr_id: 6505,
-                pr_title: "PR #6505: CRDT Realtime Co-Authoring & Selection Sync Engine".to_string(),
+                pr_title: "PR #6505: CRDT Realtime Co-Authoring & Selection Sync Engine"
+                    .to_string(),
                 target_subsystem: "Creative/Wordcraft/Collaboration".to_string(),
                 original_suite: "ArtCraft Wordcraft".to_string(),
-                components_added: vec!["WordcraftCrdtCollabSyncEngine".to_string(), "UserPresenceV65".to_string()],
+                components_added: vec![
+                    "WordcraftCrdtCollabSyncEngine".to_string(),
+                    "UserPresenceV65".to_string(),
+                ],
                 performance_multiplier: "22.1x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -690,7 +746,8 @@ impl SovereignWordcraftArtcraftMissingComponentsV65PrGateway {
             },
             WordcraftV65PrProposalManifest {
                 pr_id: 6507,
-                pr_title: "PR #6507: EPUB3/PDF Book Publishing & Preflight Validation Engine".to_string(),
+                pr_title: "PR #6507: EPUB3/PDF Book Publishing & Preflight Validation Engine"
+                    .to_string(),
                 target_subsystem: "Creative/Wordcraft/Publishing".to_string(),
                 original_suite: "ArtCraft Wordcraft".to_string(),
                 components_added: vec!["WordcraftEpubPdfPublisherPreflightEngine".to_string()],
@@ -699,7 +756,8 @@ impl SovereignWordcraftArtcraftMissingComponentsV65PrGateway {
             },
             WordcraftV65PrProposalManifest {
                 pr_id: 6508,
-                pr_title: "PR #6508: Embedded Table Formula & SVG Vector Chart Generator".to_string(),
+                pr_title: "PR #6508: Embedded Table Formula & SVG Vector Chart Generator"
+                    .to_string(),
                 target_subsystem: "Creative/Wordcraft/Tables".to_string(),
                 original_suite: "ArtCraft Wordcraft".to_string(),
                 components_added: vec!["WordcraftTableFormulaChartEngine".to_string()],

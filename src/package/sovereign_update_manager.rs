@@ -22,11 +22,11 @@
 
 #![allow(dead_code)]
 
+use std::boxed::Box;
 use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
-use std::boxed::Box;
 
 // ============================================================
 // Core Update Types — single responsibility per enum variant
@@ -68,39 +68,40 @@ impl SafetyLevel {
 /// Update category — what kind of update this is (SINGLE RESPONSIBILITY)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UpdateCategory {
-    SecurityPatch,      // CVE fix — highest priority, auto-apply
-    KernelUpdate,       // New kernel version — requires reboot
-    DriverUpdate,       // Hardware driver — may need reboot
-    LibraryUpdate,      // Shared library — safe after restart
-    ApplicationUpdate,  // Desktop app — safe immediately
-    SystemUpdate,       // Core OS components
-    LanguagePackUpdate, // Locale / i18n
-    FirmwareUpdate,     // UEFI/BIOS firmware — handle with care
-    ConfigUpdate,       // Configuration-only change
-    DocumentationUpdate,// Docs only — always safe
+    SecurityPatch,       // CVE fix — highest priority, auto-apply
+    KernelUpdate,        // New kernel version — requires reboot
+    DriverUpdate,        // Hardware driver — may need reboot
+    LibraryUpdate,       // Shared library — safe after restart
+    ApplicationUpdate,   // Desktop app — safe immediately
+    SystemUpdate,        // Core OS components
+    LanguagePackUpdate,  // Locale / i18n
+    FirmwareUpdate,      // UEFI/BIOS firmware — handle with care
+    ConfigUpdate,        // Configuration-only change
+    DocumentationUpdate, // Docs only — always safe
 }
 
 impl UpdateCategory {
     pub fn requires_reboot(self) -> bool {
-        matches!(self,
-            UpdateCategory::KernelUpdate |
-            UpdateCategory::FirmwareUpdate |
-            UpdateCategory::DriverUpdate
+        matches!(
+            self,
+            UpdateCategory::KernelUpdate
+                | UpdateCategory::FirmwareUpdate
+                | UpdateCategory::DriverUpdate
         )
     }
 
     pub fn safety_level(self) -> SafetyLevel {
         match self {
-            UpdateCategory::SecurityPatch    => SafetyLevel::Certified,
+            UpdateCategory::SecurityPatch => SafetyLevel::Certified,
             UpdateCategory::DocumentationUpdate => SafetyLevel::Certified,
-            UpdateCategory::ConfigUpdate     => SafetyLevel::Recommended,
+            UpdateCategory::ConfigUpdate => SafetyLevel::Recommended,
             UpdateCategory::LanguagePackUpdate => SafetyLevel::Recommended,
             UpdateCategory::ApplicationUpdate => SafetyLevel::Normal,
-            UpdateCategory::LibraryUpdate    => SafetyLevel::Normal,
-            UpdateCategory::SystemUpdate     => SafetyLevel::Caution,
-            UpdateCategory::DriverUpdate     => SafetyLevel::Caution,
-            UpdateCategory::KernelUpdate     => SafetyLevel::Caution,
-            UpdateCategory::FirmwareUpdate   => SafetyLevel::Dangerous,
+            UpdateCategory::LibraryUpdate => SafetyLevel::Normal,
+            UpdateCategory::SystemUpdate => SafetyLevel::Caution,
+            UpdateCategory::DriverUpdate => SafetyLevel::Caution,
+            UpdateCategory::KernelUpdate => SafetyLevel::Caution,
+            UpdateCategory::FirmwareUpdate => SafetyLevel::Dangerous,
         }
     }
 }
@@ -114,10 +115,10 @@ pub struct PackageUpdate {
     pub category: UpdateCategory,
     pub size_bytes: u64,
     pub changelog_url: Option<String>,
-    pub cve_ids: Vec<String>,      // CVE identifiers if security patch
-    pub source_repo: String,       // Which repo this comes from
-    pub checksum_sha256: String,   // For integrity verification
-    pub signature_verified: bool,  // GPG verification status
+    pub cve_ids: Vec<String>,     // CVE identifiers if security patch
+    pub source_repo: String,      // Which repo this comes from
+    pub checksum_sha256: String,  // For integrity verification
+    pub signature_verified: bool, // GPG verification status
 }
 
 impl PackageUpdate {
@@ -152,9 +153,9 @@ pub struct SystemGeneration {
 pub struct UpdateRepository {
     pub name: String,
     pub url: String,
-    pub priority: u8,           // Higher = preferred when same pkg in multiple repos
+    pub priority: u8, // Higher = preferred when same pkg in multiple repos
     pub enabled: bool,
-    pub verified: bool,         // GPG key verified
+    pub verified: bool, // GPG key verified
     pub component: RepoComponent,
     pub last_synced: Option<u64>,
 }
@@ -237,20 +238,26 @@ impl UpdateCheckResult {
         }
     }
 
-    pub fn count(&self) -> usize { self.available_updates.len() }
+    pub fn count(&self) -> usize {
+        self.available_updates.len()
+    }
 
-    pub fn has_security_updates(&self) -> bool { self.security_count > 0 }
+    pub fn has_security_updates(&self) -> bool {
+        self.security_count > 0
+    }
 
     /// Filter updates by safety level (OPEN-CLOSED: filter without modifying source)
     pub fn by_safety(&self, max_level: SafetyLevel) -> Vec<&PackageUpdate> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| u.safety_level() <= max_level)
             .collect()
     }
 
     /// Get only unverified updates — should warn user (DEFENSIVE PROGRAMMING)
     pub fn unverified(&self) -> Vec<&PackageUpdate> {
-        self.available_updates.iter()
+        self.available_updates
+            .iter()
             .filter(|u| !u.is_verified())
             .collect()
     }
@@ -263,13 +270,19 @@ pub struct InstallResult {
     pub failed: Vec<(String, String)>, // (package, error)
     pub skipped: Vec<String>,
     pub reboot_required: bool,
-    pub generation_id: Option<u64>,    // New generation created if rollback supported
+    pub generation_id: Option<u64>, // New generation created if rollback supported
 }
 
 impl InstallResult {
-    pub fn success_count(&self) -> usize { self.installed.len() }
-    pub fn failure_count(&self) -> usize { self.failed.len() }
-    pub fn is_fully_successful(&self) -> bool { self.failed.is_empty() }
+    pub fn success_count(&self) -> usize {
+        self.installed.len()
+    }
+    pub fn failure_count(&self) -> usize {
+        self.failed.len()
+    }
+    pub fn is_fully_successful(&self) -> bool {
+        self.failed.is_empty()
+    }
 }
 
 /// Backend trait for package manager implementations (INTERFACE SEGREGATION)
@@ -299,7 +312,9 @@ impl AptBackend {
 }
 
 impl PackageBackend for AptBackend {
-    fn name(&self) -> &str { "apt" }
+    fn name(&self) -> &str {
+        "apt"
+    }
 
     fn check_updates(&self) -> Result<Vec<PackageUpdate>, UpdateError> {
         // In production: parse `apt list --upgradable`
@@ -317,10 +332,14 @@ impl PackageBackend for AptBackend {
     }
 
     fn rollback(&mut self, _generation_id: u64) -> Result<(), UpdateError> {
-        Err(UpdateError::NotSupported("APT does not support generation rollback".to_string()))
+        Err(UpdateError::NotSupported(
+            "APT does not support generation rollback".to_string(),
+        ))
     }
 
-    fn list_generations(&self) -> Vec<SystemGeneration> { Vec::new() }
+    fn list_generations(&self) -> Vec<SystemGeneration> {
+        Vec::new()
+    }
 
     fn clean_cache(&mut self) -> Result<u64, UpdateError> {
         // In production: `apt-get clean`
@@ -344,7 +363,9 @@ impl PacmanBackend {
 }
 
 impl PackageBackend for PacmanBackend {
-    fn name(&self) -> &str { "pacman" }
+    fn name(&self) -> &str {
+        "pacman"
+    }
 
     fn check_updates(&self) -> Result<Vec<PackageUpdate>, UpdateError> {
         Ok(Vec::new())
@@ -365,7 +386,9 @@ impl PackageBackend for PacmanBackend {
         Ok(())
     }
 
-    fn list_generations(&self) -> Vec<SystemGeneration> { Vec::new() }
+    fn list_generations(&self) -> Vec<SystemGeneration> {
+        Vec::new()
+    }
 
     fn clean_cache(&mut self) -> Result<u64, UpdateError> {
         // In production: `paccache -r`
@@ -380,13 +403,19 @@ pub struct PkgBackend {
 
 impl PkgBackend {
     pub fn new() -> Self {
-        Self { db_path: "/var/db/pkg".to_string() }
+        Self {
+            db_path: "/var/db/pkg".to_string(),
+        }
     }
 }
 
 impl PackageBackend for PkgBackend {
-    fn name(&self) -> &str { "pkg" }
-    fn check_updates(&self) -> Result<Vec<PackageUpdate>, UpdateError> { Ok(Vec::new()) }
+    fn name(&self) -> &str {
+        "pkg"
+    }
+    fn check_updates(&self) -> Result<Vec<PackageUpdate>, UpdateError> {
+        Ok(Vec::new())
+    }
     fn install(&mut self, packages: &[String]) -> Result<InstallResult, UpdateError> {
         Ok(InstallResult {
             installed: packages.to_vec(),
@@ -396,18 +425,31 @@ impl PackageBackend for PkgBackend {
             generation_id: None,
         })
     }
-    fn rollback(&mut self, _id: u64) -> Result<(), UpdateError> { Ok(()) }
-    fn list_generations(&self) -> Vec<SystemGeneration> { Vec::new() }
-    fn clean_cache(&mut self) -> Result<u64, UpdateError> { Ok(0) }
+    fn rollback(&mut self, _id: u64) -> Result<(), UpdateError> {
+        Ok(())
+    }
+    fn list_generations(&self) -> Vec<SystemGeneration> {
+        Vec::new()
+    }
+    fn clean_cache(&mut self) -> Result<u64, UpdateError> {
+        Ok(0)
+    }
 }
 
 /// Update error type (FAIL-FAST system)
 #[derive(Debug, Clone)]
 pub enum UpdateError {
     NetworkError(String),
-    ChecksumMismatch { pkg: String, expected: String, actual: String },
+    ChecksumMismatch {
+        pkg: String,
+        expected: String,
+        actual: String,
+    },
     SignatureInvalid(String),
-    InsufficientSpace { needed: u64, available: u64 },
+    InsufficientSpace {
+        needed: u64,
+        available: u64,
+    },
     DependencyConflict(String),
     PermissionDenied(String),
     BackendError(String),
@@ -420,11 +462,20 @@ impl UpdateError {
     pub fn as_str(&self) -> String {
         match self {
             UpdateError::NetworkError(e) => format!("Network error: {}", e),
-            UpdateError::ChecksumMismatch { pkg, expected, actual } =>
-                format!("Checksum mismatch for {}: expected {} got {}", pkg, expected, actual),
+            UpdateError::ChecksumMismatch {
+                pkg,
+                expected,
+                actual,
+            } => format!(
+                "Checksum mismatch for {}: expected {} got {}",
+                pkg, expected, actual
+            ),
             UpdateError::SignatureInvalid(p) => format!("Invalid GPG signature: {}", p),
-            UpdateError::InsufficientSpace { needed, available } =>
-                format!("Need {}MB, only {}MB available", needed / 1_048_576, available / 1_048_576),
+            UpdateError::InsufficientSpace { needed, available } => format!(
+                "Need {}MB, only {}MB available",
+                needed / 1_048_576,
+                available / 1_048_576
+            ),
             UpdateError::DependencyConflict(e) => format!("Dependency conflict: {}", e),
             UpdateError::PermissionDenied(e) => format!("Permission denied: {}", e),
             UpdateError::BackendError(e) => format!("Backend error: {}", e),
@@ -493,7 +544,8 @@ impl SovereignUpdateManager {
         }
 
         // Validate all updates before reporting (DEFENSIVE PROGRAMMING)
-        let unverified: Vec<_> = all_updates.iter()
+        let unverified: Vec<_> = all_updates
+            .iter()
             .filter(|u| !u.is_verified())
             .map(|u| u.name.clone())
             .collect();
@@ -509,13 +561,14 @@ impl SovereignUpdateManager {
     /// Respects LEAST PRIVILEGE: only applies what policy permits.
     pub fn apply_updates(&mut self, max_level: SafetyLevel) -> Result<InstallResult, UpdateError> {
         let pkgs_to_install: Vec<String> = if let Some(ref check) = self.last_check {
-            check.by_safety(max_level)
+            check
+                .by_safety(max_level)
                 .iter()
                 .map(|u| u.name.clone())
                 .collect()
         } else {
             return Err(UpdateError::BackendError(
-                "Must call check_updates() before apply_updates()".to_string()
+                "Must call check_updates() before apply_updates()".to_string(),
             ));
         };
 
@@ -547,7 +600,9 @@ impl SovereignUpdateManager {
 
             Ok(result)
         } else {
-            Err(UpdateError::BackendError("No package backend registered".to_string()))
+            Err(UpdateError::BackendError(
+                "No package backend registered".to_string(),
+            ))
         }
     }
 
@@ -566,13 +621,16 @@ impl SovereignUpdateManager {
         if let Some(backend) = self.backends.first_mut() {
             backend.rollback(generation_id)
         } else {
-            Err(UpdateError::BackendError("No backend registered".to_string()))
+            Err(UpdateError::BackendError(
+                "No backend registered".to_string(),
+            ))
         }
     }
 
     /// List available system generations for rollback
     pub fn list_generations(&self) -> Vec<SystemGeneration> {
-        self.backends.first()
+        self.backends
+            .first()
             .map(|b| b.list_generations())
             .unwrap_or_default()
     }
@@ -587,13 +645,19 @@ impl SovereignUpdateManager {
     }
 
     /// Check if a reboot is pending (INSTRUMENTATION)
-    pub fn pending_reboot(&self) -> bool { self.pending_reboot }
+    pub fn pending_reboot(&self) -> bool {
+        self.pending_reboot
+    }
 
     /// Get update history (TRANSPARENCY)
-    pub fn history(&self) -> &[UpdateHistoryEntry] { &self.update_history }
+    pub fn history(&self) -> &[UpdateHistoryEntry] {
+        &self.update_history
+    }
 
     /// Get current policy (INFORMATION HIDING via reference)
-    pub fn policy(&self) -> &UpdatePolicy { &self.policy }
+    pub fn policy(&self) -> &UpdatePolicy {
+        &self.policy
+    }
 }
 
 // ============================================================
@@ -620,17 +684,19 @@ impl DeltaPatch {
     }
 
     pub fn savings_pct(&self) -> u8 {
-        if self.full_size_bytes == 0 { return 0; }
+        if self.full_size_bytes == 0 {
+            return 0;
+        }
         ((self.savings_bytes() * 100) / self.full_size_bytes) as u8
     }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DeltaAlgorithm {
-    Zsync,    // rsync-over-HTTP (apt-delta style)
-    Casync,   // Content-addressable sync (systemd casync)
-    Bsdiff,   // Binary diff (old Chromium style)
-    Xdelta3,  // Open-source xdelta binary diff
+    Zsync,   // rsync-over-HTTP (apt-delta style)
+    Casync,  // Content-addressable sync (systemd casync)
+    Bsdiff,  // Binary diff (old Chromium style)
+    Xdelta3, // Open-source xdelta binary diff
 }
 
 /// Delta update engine — downloads and applies patches (ZERO-COPY where possible)
@@ -662,7 +728,11 @@ impl DeltaUpdateEngine {
             patches.len(),
             patches.len(),
             saved / 1_048_576,
-            if total_full > 0 { (saved * 100) as f64 / total_full as f64 } else { 0.0 }
+            if total_full > 0 {
+                (saved * 100) as f64 / total_full as f64
+            } else {
+                0.0
+            }
         )
     }
 }
@@ -701,7 +771,11 @@ mod tests {
 
     #[test]
     fn test_security_update_is_certified() {
-        let u = make_update("openssl", UpdateCategory::SecurityPatch, vec!["CVE-2026-1234"]);
+        let u = make_update(
+            "openssl",
+            UpdateCategory::SecurityPatch,
+            vec!["CVE-2026-1234"],
+        );
         assert_eq!(u.safety_level(), SafetyLevel::Certified);
         assert!(u.is_security_critical());
     }
@@ -722,7 +796,11 @@ mod tests {
     #[test]
     fn test_update_check_result_filtering() {
         let updates = vec![
-            make_update("openssl", UpdateCategory::SecurityPatch, vec!["CVE-2026-1234"]),
+            make_update(
+                "openssl",
+                UpdateCategory::SecurityPatch,
+                vec!["CVE-2026-1234"],
+            ),
             make_update("firefox", UpdateCategory::ApplicationUpdate, vec![]),
             make_update("linux", UpdateCategory::KernelUpdate, vec![]),
         ];
@@ -779,8 +857,8 @@ mod tests {
             from_version: "23.0".to_string(),
             to_version: "23.1".to_string(),
             patch_url: "https://updates.sigmaos.dev/delta/mesa-23.0-to-23.1.zs".to_string(),
-            patch_size_bytes: 10 * 1_048_576,   // 10MB delta
-            full_size_bytes: 100 * 1_048_576,    // 100MB full
+            patch_size_bytes: 10 * 1_048_576, // 10MB delta
+            full_size_bytes: 100 * 1_048_576, // 100MB full
             algorithm: DeltaAlgorithm::Zsync,
             checksum: "deadbeef".to_string(),
         };

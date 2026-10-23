@@ -222,7 +222,9 @@ impl SoundcraftAmbisonicBinaural3dHrtfPannerEngine {
     }
 
     pub fn calculate_binaural_gain(&self, pos: SoundcraftVector3D) -> (f32, f32) {
-        let dist = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z).sqrt().max(0.001);
+        let dist = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z)
+            .sqrt()
+            .max(0.001);
         let pan = (pos.x / dist).clamp(-1.0, 1.0);
         let left = ((1.0 - pan) * 0.5).sqrt() / dist.max(1.0);
         let right = ((1.0 + pan) * 0.5).sqrt() / dist.max(1.0);
@@ -278,7 +280,9 @@ impl SoundcraftMidi20PolyphonicExpressionMpeEngine {
             target_subsystem: String::from("SoundCraft MIDI & Modulation Engine"),
             original_suite: String::from("ArtCraft SoundCraft MIDI Suite"),
             components_added: vec![
-                String::from("MIDI 2.0 32-bit High-Precision Velocity & Property Exchange Protocol"),
+                String::from(
+                    "MIDI 2.0 32-bit High-Precision Velocity & Property Exchange Protocol",
+                ),
                 String::from("MIDI Polyphonic Expression (MPE) Per-Note Pitch Bend & Pressure"),
                 String::from("Bezier Automation Curve Editor & Envelope Follower"),
             ],

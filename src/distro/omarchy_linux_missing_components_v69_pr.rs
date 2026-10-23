@@ -513,8 +513,13 @@ mod tests {
         let mut suite = OmarchyLinuxMissingComponentsV69MasterSuite::new();
 
         // 1. Gestures
-        suite.gestures.register_gesture("pinch:4:in", "close_window");
-        assert!(suite.gestures.generate_hyprland_gestures_conf().contains("pinch"));
+        suite
+            .gestures
+            .register_gesture("pinch:4:in", "close_window");
+        assert!(suite
+            .gestures
+            .generate_hyprland_gestures_conf()
+            .contains("pinch"));
 
         // 2. Walker
         suite.walker.enable_plugin("todo");
@@ -525,13 +530,22 @@ mod tests {
         assert!(suite.ghostty.generate_ghostty_config().contains("nord"));
 
         // 4. Waybar
-        assert!(suite.waybar.generate_waybar_config_json().contains("modules-left"));
+        assert!(suite
+            .waybar
+            .generate_waybar_config_json()
+            .contains("modules-left"));
 
         // 5. Starship
-        assert!(suite.starship.generate_starship_toml().contains("character"));
+        assert!(suite
+            .starship
+            .generate_starship_toml()
+            .contains("character"));
 
         // 6. Fastfetch
-        assert!(suite.fastfetch.generate_fastfetch_jsonc().contains("Kernel"));
+        assert!(suite
+            .fastfetch
+            .generate_fastfetch_jsonc()
+            .contains("Kernel"));
 
         // 7. Omakub
         assert!(suite.omakub.verify_setup());

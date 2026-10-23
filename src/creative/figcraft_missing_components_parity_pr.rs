@@ -1,7 +1,7 @@
 #![no_std]
 extern crate alloc;
-use alloc::vec;
 use alloc::format;
+use alloc::vec;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Figcraft & ArtCraft Missing Components Parity PR Gateway
 // (`src/creative/figcraft_missing_components_parity_pr.rs`)
@@ -19,10 +19,6 @@ use alloc::format;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-
-
-
-
 
 /// Structured PR proposal manifest for missing Figcraft / ArtCraft components.
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -406,7 +406,7 @@ impl BsdLibcInspirationsV64Engine {
             0x89abcdefu32,
             0xfedcba98u32,
             0x76543210u32,
-            1,            // block counter
+            1,             // block counter
             0x00000000u32, // nonce 0
             0x00000000u32, // nonce 1
             0x00000000u32, // nonce 2

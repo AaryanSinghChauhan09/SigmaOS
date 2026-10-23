@@ -925,7 +925,8 @@ impl SovereignBitrix24OmnichannelVoiceSentimentMetricsEngine {
         let clamped_sentiment = sentiment.clamp(0.0, 1.0);
 
         let greeting_ok = lower.contains("hello") || lower.contains("welcome");
-        let recording_notice_ok = lower.contains("recorded for quality") || lower.contains("recording");
+        let recording_notice_ok =
+            lower.contains("recorded for quality") || lower.contains("recording");
 
         let compliance_flags = vec![
             ComplianceRuleFlag {
@@ -1159,7 +1160,11 @@ impl SovereignGoogleDocsPaginatedOutlineEngine {
     ) -> Vec<DocumentTocEntry> {
         let mut entries = Vec::new();
         let mut running_word_count = 0;
-        let effective_wpp = if words_per_page == 0 { 300 } else { words_per_page };
+        let effective_wpp = if words_per_page == 0 {
+            300
+        } else {
+            words_per_page
+        };
 
         for (idx, node) in text_processor.document().tree().iter().enumerate() {
             match node {
@@ -1224,7 +1229,12 @@ impl SovereignGoogleSheetsCustomLambdaFormulaEngine {
         Self
     }
 
-    pub fn define_lambda(&self, name: &str, params: &[&str], expression: &str) -> LambdaFormulaScope {
+    pub fn define_lambda(
+        &self,
+        name: &str,
+        params: &[&str],
+        expression: &str,
+    ) -> LambdaFormulaScope {
         LambdaFormulaScope {
             lambda_name: name.to_string(),
             param_names: params.iter().map(|s| s.to_string()).collect(),
@@ -1453,8 +1463,15 @@ impl SovereignMicrosoftPowerAppsDataverseConnectorEngine {
         Self
     }
 
-    pub fn build_odata_query_uri(&self, entity: &DataverseEntityMetadata, spec: &ODataFilterSpec) -> String {
-        let mut query = format!("https://dataverse.dynamics.com/api/data/v9.2/{}", entity.entity_name);
+    pub fn build_odata_query_uri(
+        &self,
+        entity: &DataverseEntityMetadata,
+        spec: &ODataFilterSpec,
+    ) -> String {
+        let mut query = format!(
+            "https://dataverse.dynamics.com/api/data/v9.2/{}",
+            entity.entity_name
+        );
 
         let mut params = Vec::new();
 
@@ -2522,9 +2539,13 @@ mod tests_v3 {
         // 1. SovereignGoogleDocsPaginatedOutlineEngine
         let mut text_proc = TextProcessor::new("Outline Doc".to_string(), cap.clone());
         text_proc.add_heading(1, "Executive Summary").unwrap();
-        text_proc.add_text("This is an executive summary section.", false, false).unwrap();
+        text_proc
+            .add_text("This is an executive summary section.", false, false)
+            .unwrap();
         text_proc.add_heading(2, "Key Deliverables").unwrap();
-        text_proc.add_text("Deliverables include fast booting.", false, false).unwrap();
+        text_proc
+            .add_text("Deliverables include fast booting.", false, false)
+            .unwrap();
 
         let outline_engine = SovereignGoogleDocsPaginatedOutlineEngine::new();
         let toc = outline_engine.generate_document_outline(&text_proc, 10);
@@ -2568,7 +2589,10 @@ mod tests_v3 {
         ];
         let state = timing_engine.evaluate_presenter_timeline(&cues, 0, 75);
         assert!(state.is_behind_schedule);
-        assert_eq!(state.next_cue_note, Some("Explain architecture".to_string()));
+        assert_eq!(
+            state.next_cue_note,
+            Some("Explain architecture".to_string())
+        );
 
         // 4. SovereignMicrosoftWordDocumentComparingDeltaEngine
         let mut orig = TextProcessor::new("Orig Doc".to_string(), cap.clone());

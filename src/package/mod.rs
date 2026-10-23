@@ -52,18 +52,17 @@ pub use sigma_pkg::{
 pub mod sigmarepo;
 pub mod signing;
 pub mod sovereign_distro_package_matrix;
+pub mod sovereign_update_manager;
 pub mod spac;
 pub mod store;
 pub mod universal;
 pub mod updater;
 pub mod zsync_delta;
-pub mod sovereign_update_manager;
 // Note: PackageUpdate and SystemGeneration are exported without glob to avoid name conflicts
 pub use sovereign_update_manager::{
-    SovereignUpdateManager, UpdatePolicy, UpdateCategory,
-    SafetyLevel, UpdateCheckResult, InstallResult, PackageBackend,
-    AptBackend, PacmanBackend, PkgBackend, DeltaUpdateEngine, DeltaPatch,
-    UpdateRepository,
+    AptBackend, DeltaPatch, DeltaUpdateEngine, InstallResult, PackageBackend, PacmanBackend,
+    PkgBackend, SafetyLevel, SovereignUpdateManager, UpdateCategory, UpdateCheckResult,
+    UpdatePolicy, UpdateRepository,
 };
 
 pub use sigmarepo::{

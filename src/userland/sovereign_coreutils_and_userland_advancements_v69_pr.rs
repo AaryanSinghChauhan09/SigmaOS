@@ -73,7 +73,10 @@ impl GnuBsdCoreutilsAdvancedEngine {
             "\x1b[1;36m" // Bold Cyan
         } else if (entry.mode & 0o111) != 0 {
             "\x1b[1;32m" // Bold Green
-        } else if entry.path.ends_with(".tar") || entry.path.ends_with(".gz") || entry.path.ends_with(".zst") {
+        } else if entry.path.ends_with(".tar")
+            || entry.path.ends_with(".gz")
+            || entry.path.ends_with(".zst")
+        {
             "\x1b[1;31m" // Bold Red
         } else {
             "\x1b[0m"
@@ -87,13 +90,34 @@ impl GnuBsdCoreutilsAdvancedEngine {
     }
 
     /// Copy operation simulator supporting reflink COW and sparse extents copy logic
-    pub fn run_cp_reflink(&self, src: &str, dst: &str, try_reflink: bool, sparse: bool) -> (bool, String) {
+    pub fn run_cp_reflink(
+        &self,
+        src: &str,
+        dst: &str,
+        try_reflink: bool,
+        sparse: bool,
+    ) -> (bool, String) {
         if try_reflink {
-            (true, format!("cp: copied '{}' -> '{}' using Btrfs/XFS COW reflink", src, dst))
+            (
+                true,
+                format!(
+                    "cp: copied '{}' -> '{}' using Btrfs/XFS COW reflink",
+                    src, dst
+                ),
+            )
         } else if sparse {
-            (true, format!("cp: copied '{}' -> '{}' maintaining sparse extents", src, dst))
+            (
+                true,
+                format!(
+                    "cp: copied '{}' -> '{}' maintaining sparse extents",
+                    src, dst
+                ),
+            )
         } else {
-            (true, format!("cp: copied '{}' -> '{}' using standard I/O", src, dst))
+            (
+                true,
+                format!("cp: copied '{}' -> '{}' using standard I/O", src, dst),
+            )
         }
     }
 
@@ -117,11 +141,22 @@ impl GnuBsdCoreutilsAdvancedEngine {
             let total_1k = u.total_bytes / 1024;
             let used_1k = u.used_bytes / 1024;
             let avail_1k = u.avail_bytes / 1024;
-            let pct = if u.total_bytes > 0 { (u.used_bytes * 100) / u.total_bytes } else { 0 };
+            let pct = if u.total_bytes > 0 {
+                (u.used_bytes * 100) / u.total_bytes
+            } else {
+                0
+            };
 
             out.push(format!(
                 "{:<12} {:<8} {:>10} {:>10} {:>10} {:>4}% {} (subvol={})",
-                u.filesystem, u.fs_type, total_1k, used_1k, avail_1k, pct, u.mount_point, u.subvolume_id
+                u.filesystem,
+                u.fs_type,
+                total_1k,
+                used_1k,
+                avail_1k,
+                pct,
+                u.mount_point,
+                u.subvolume_id
             ));
         }
         out
@@ -130,7 +165,11 @@ impl GnuBsdCoreutilsAdvancedEngine {
     /// DD command with status=progress output calculation
     pub fn run_dd_progress(&self, bytes_transferred: u64, elapsed_secs: f64) -> String {
         let mb_transferred = bytes_transferred as f64 / 1_048_576.0;
-        let speed = if elapsed_secs > 0.0 { mb_transferred / elapsed_secs } else { 0.0 };
+        let speed = if elapsed_secs > 0.0 {
+            mb_transferred / elapsed_secs
+        } else {
+            0.0
+        };
         format!(
             "{} bytes ({:.1} MB) copied, {:.2} s, {:.1} MB/s",
             bytes_transferred, mb_transferred, elapsed_secs, speed
@@ -141,7 +180,11 @@ impl GnuBsdCoreutilsAdvancedEngine {
     pub fn run_install(&self, src: &str, dst: &str, mode: u32, owner: &str, group: &str) -> String {
         format!(
             "install: copy '{}' -> '{}' (mode={:04o}, owner={}:{})",
-            src, dst, mode & 0o7777, owner, group
+            src,
+            dst,
+            mode & 0o7777,
+            owner,
+            group
         )
     }
 
@@ -160,7 +203,10 @@ impl GnuBsdCoreutilsAdvancedEngine {
         if new_root.is_empty() {
             Err("chroot: missing root directory".to_string())
         } else {
-            Ok(format!("chroot: jail mounted at '{}', executed '{}'", new_root, command))
+            Ok(format!(
+                "chroot: jail mounted at '{}', executed '{}'",
+                new_root, command
+            ))
         }
     }
 
@@ -234,19 +280,51 @@ pub struct BusyBoxAppletExtensionEngine {
 
 impl BusyBoxAppletExtensionEngine {
     pub fn new() -> Self {
-        let mut engine = Self { applets: BTreeMap::new() };
+        let mut engine = Self {
+            applets: BTreeMap::new(),
+        };
         engine.register_extended_applets();
         engine
     }
 
     fn register_extended_applets(&mut self) {
         let list = [
-            ("ash", "shells", "Almquist Shell command interpreter", 1024, true),
-            ("ip", "networking", "Linux routing & network device configuration", 512, true),
-            ("nc", "networking", "Netcat arbitrary TCP/UDP connections", 256, true),
-            ("wget", "networking", "HTTP/HTTPS/FTP network retriever", 512, true),
+            (
+                "ash",
+                "shells",
+                "Almquist Shell command interpreter",
+                1024,
+                true,
+            ),
+            (
+                "ip",
+                "networking",
+                "Linux routing & network device configuration",
+                512,
+                true,
+            ),
+            (
+                "nc",
+                "networking",
+                "Netcat arbitrary TCP/UDP connections",
+                256,
+                true,
+            ),
+            (
+                "wget",
+                "networking",
+                "HTTP/HTTPS/FTP network retriever",
+                512,
+                true,
+            ),
             ("vi", "editors", "Visual screen editor", 1024, true),
-            ("hwclock", "util-linux", "Query/Set Hardware Clock", 128, false),
+            (
+                "hwclock",
+                "util-linux",
+                "Query/Set Hardware Clock",
+                128,
+                false,
+            ),
             ("syslogd", "system", "System logging daemon", 512, true),
             ("klogd", "system", "Kernel log message daemon", 256, true),
         ];
@@ -269,7 +347,10 @@ impl BusyBoxAppletExtensionEngine {
         if let Some(app) = self.applets.get(applet_name) {
             Ok(format!(
                 "BusyBox applet '{}' ({}) executed with {} args [min RAM: {}KB]",
-                app.name, app.description, args.len(), app.min_ram_kb
+                app.name,
+                app.description,
+                args.len(),
+                app.min_ram_kb
             ))
         } else {
             Err(format!("BusyBox applet not registered: '{}'", applet_name))
@@ -278,7 +359,10 @@ impl BusyBoxAppletExtensionEngine {
 
     pub fn execute_ash_script(&self, script: &str) -> (i32, String) {
         let line_count = script.lines().count();
-        (0, format!("ash: executed {} script lines without error", line_count))
+        (
+            0,
+            format!("ash: executed {} script lines without error", line_count),
+        )
     }
 
     pub fn ip_route_show(&self) -> Vec<String> {
@@ -361,8 +445,15 @@ impl UtilLinuxAdvancedEngine {
     }
 
     /// Flops lock queue supervisor (`flock`)
-    pub fn flock_queue_acquire(&self, lock_file: &str, timeout_secs: u64) -> Result<String, String> {
-        Ok(format!("flock: lock on '{}' granted within {}s timeout limit", lock_file, timeout_secs))
+    pub fn flock_queue_acquire(
+        &self,
+        lock_file: &str,
+        timeout_secs: u64,
+    ) -> Result<String, String> {
+        Ok(format!(
+            "flock: lock on '{}' granted within {}s timeout limit",
+            lock_file, timeout_secs
+        ))
     }
 }
 
@@ -379,19 +470,32 @@ impl FindutilsDiffutilsAdvancedEngine {
     }
 
     /// Parallel multi-threaded find traversal
-    pub fn find_parallel_walk(&self, root_paths: &[&str], extension: &str, max_threads: usize) -> Vec<String> {
+    pub fn find_parallel_walk(
+        &self,
+        root_paths: &[&str],
+        extension: &str,
+        max_threads: usize,
+    ) -> Vec<String> {
         let mut results = Vec::new();
         for path in root_paths {
             if path.ends_with(extension) || extension == "*" {
                 results.push((*path).to_string());
             }
         }
-        results.push(format!("[parallel scan finished using {} worker threads]", max_threads));
+        results.push(format!(
+            "[parallel scan finished using {} worker threads]",
+            max_threads
+        ));
         results
     }
 
     /// Xargs worker pool with NUL delimiter support
-    pub fn xargs_nul_worker_pool(&self, cmd: &str, args_nul: &[u8], max_procs: usize) -> Vec<String> {
+    pub fn xargs_nul_worker_pool(
+        &self,
+        cmd: &str,
+        args_nul: &[u8],
+        max_procs: usize,
+    ) -> Vec<String> {
         let mut invocations = Vec::new();
         let items: Vec<&str> = args_nul
             .split(|&b| b == 0)
@@ -428,7 +532,12 @@ impl FindutilsDiffutilsAdvancedEngine {
     }
 
     /// Patch fuzz-matching and `.rej` rejection generator
-    pub fn patch_fuzz_apply(&self, original: &str, diff_patch: &str, _fuzz_factor: usize) -> (String, Option<String>) {
+    pub fn patch_fuzz_apply(
+        &self,
+        original: &str,
+        diff_patch: &str,
+        _fuzz_factor: usize,
+    ) -> (String, Option<String>) {
         if diff_patch.contains("CONFLICT") {
             (
                 original.to_string(),
@@ -478,7 +587,12 @@ impl StreamingTextEngine {
     }
 
     /// AWK programming engine with associative array aggregation
-    pub fn awk_associative_array_script(&self, records: &[&str], key_field: usize, val_field: usize) -> BTreeMap<String, f64> {
+    pub fn awk_associative_array_script(
+        &self,
+        records: &[&str],
+        key_field: usize,
+        val_field: usize,
+    ) -> BTreeMap<String, f64> {
         let mut map = BTreeMap::new();
         for rec in records {
             let fields: Vec<&str> = rec.split_whitespace().collect();
@@ -506,16 +620,30 @@ impl ArchivalCompressionSuiteAdvanced {
     }
 
     /// PAX extended header parser & sparse archive builder
-    pub fn tar_pax_sparse_builder(&self, filename: &str, real_size: u64, sparse_bytes: u64) -> BTreeMap<String, String> {
+    pub fn tar_pax_sparse_builder(
+        &self,
+        filename: &str,
+        real_size: u64,
+        sparse_bytes: u64,
+    ) -> BTreeMap<String, String> {
         let mut pax = BTreeMap::new();
         pax.insert("path".to_string(), filename.to_string());
         pax.insert("GNU.sparse.size".to_string(), real_size.to_string());
-        pax.insert("GNU.sparse.numblocks".to_string(), (sparse_bytes / 512).to_string());
+        pax.insert(
+            "GNU.sparse.numblocks".to_string(),
+            (sparse_bytes / 512).to_string(),
+        );
         pax
     }
 
     /// Stream compression engine applying actual Run-Length Encoding byte transformation
-    pub fn compress_stream(&self, input: &[u8], format: &str, level: u32, threads: usize) -> (Vec<u8>, String) {
+    pub fn compress_stream(
+        &self,
+        input: &[u8],
+        format: &str,
+        level: u32,
+        threads: usize,
+    ) -> (Vec<u8>, String) {
         let magic_bytes: Vec<u8> = match format {
             "zstd" => vec![0x28, 0xB5, 0x2F, 0xFD],
             "xz" => vec![0xFD, b'7', b'z', b'X'],
@@ -530,7 +658,10 @@ impl ArchivalCompressionSuiteAdvanced {
             while i < input.len() {
                 let run_byte = input[i];
                 let mut run_len = 1u8;
-                while i + (run_len as usize) < input.len() && input[i + (run_len as usize)] == run_byte && run_len < 255 {
+                while i + (run_len as usize) < input.len()
+                    && input[i + (run_len as usize)] == run_byte
+                    && run_len < 255
+                {
                     run_len += 1;
                 }
                 compressed_payload.push(run_len);
@@ -542,7 +673,14 @@ impl ArchivalCompressionSuiteAdvanced {
         let mut out = magic_bytes;
         out.extend_from_slice(&compressed_payload);
 
-        let desc = format!("Compressed {} bytes to {} bytes with {} (level={}, threads={})", input.len(), out.len(), format, level, threads);
+        let desc = format!(
+            "Compressed {} bytes to {} bytes with {} (level={}, threads={})",
+            input.len(),
+            out.len(),
+            format,
+            level,
+            threads
+        );
         (out, desc)
     }
 }
@@ -673,15 +811,35 @@ impl AuthPrivilegeSessionAdvancedEngine {
     }
 
     /// Sudoers rule evaluation with sub-command restrictions & ticket caching
-    pub fn sudo_verify_rule_cached(&self, user: &str, cmd: &str, ticket_valid: bool) -> (bool, String) {
+    pub fn sudo_verify_rule_cached(
+        &self,
+        user: &str,
+        cmd: &str,
+        ticket_valid: bool,
+    ) -> (bool, String) {
         if user == "root" || user == "sovereign" {
             if ticket_valid {
-                (true, format!("sudo: user '{}' authenticated via cached ticket for '{}'", user, cmd))
+                (
+                    true,
+                    format!(
+                        "sudo: user '{}' authenticated via cached ticket for '{}'",
+                        user, cmd
+                    ),
+                )
             } else {
-                (true, format!("sudo: user '{}' authenticated via password prompt for '{}'", user, cmd))
+                (
+                    true,
+                    format!(
+                        "sudo: user '{}' authenticated via password prompt for '{}'",
+                        user, cmd
+                    ),
+                )
             }
         } else {
-            (false, format!("sudo: user '{}' is not in sudoers file", user))
+            (
+                false,
+                format!("sudo: user '{}' is not in sudoers file", user),
+            )
         }
     }
 
@@ -702,14 +860,20 @@ impl AuthPrivilegeSessionAdvancedEngine {
             success,
             format!(
                 "PAM stack [{}] service='{}' user='{}' -> {}",
-                control_flag, service, user, if success { "SUCCESS" } else { "FAILURE" }
+                control_flag,
+                service,
+                user,
+                if success { "SUCCESS" } else { "FAILURE" }
             ),
         )
     }
 
     /// Login & Getty TTY session initializer with dynamic MOTD
     pub fn getty_login_init(&self, tty: &str, _user: &str, hostname: &str) -> String {
-        format!("Welcome to {} ({})\nLast login: Mon Mar 30 on {}\n", hostname, tty, tty)
+        format!(
+            "Welcome to {} ({})\nLast login: Mon Mar 30 on {}\n",
+            hostname, tty, tty
+        )
     }
 }
 
@@ -769,15 +933,60 @@ impl SovereignCoreutilsUserlandAdvancementsV69GatewayEngine {
 
     fn populate_proposals(&mut self) {
         let items = [
-            ("GNU Coreutils EXA/EZA Colorization & Reflink CP Engine", CoreUtilsAdvPrCategory::GnuBsdCoreutils, vec!["ls", "cp", "stat", "df"], "--- a/coreutils.rs\n+++ b/coreutils.rs\n+ fn run_ls_colored() {}"),
-            ("BusyBox Ash Shell & IP Route Applet Extension Engine", CoreUtilsAdvPrCategory::BusyBoxMulticall, vec!["ash", "ip", "nc", "wget"], "--- a/busybox.rs\n+++ b/busybox.rs\n+ fn execute_ash_script() {}"),
-            ("util-linux Namespace Isolation & Encrypted Losetup Engine", CoreUtilsAdvPrCategory::UtilLinuxSubsystem, vec!["mount", "losetup", "taskset", "nsenter"], "--- a/utillinux.rs\n+++ b/utillinux.rs\n+ fn losetup_encrypted() {}"),
-            ("Findutils Multi-threaded Walk & Patience Diff Engine", CoreUtilsAdvPrCategory::FindutilsDiffutils, vec!["find", "xargs", "diff", "patch"], "--- a/findutils.rs\n+++ b/findutils.rs\n+ fn diff_patience() {}"),
-            ("Text Processing PCRE2 SIMD Grep & AWK Array Runtime", CoreUtilsAdvPrCategory::TextProcessingStreaming, vec!["grep", "sed", "awk"], "--- a/text.rs\n+++ b/text.rs\n+ fn grep_pcre2_simd() {}"),
-            ("Archival PAX Sparse Header & Zstd Multithreaded Pipeline", CoreUtilsAdvPrCategory::ArchivalCompressionSuite, vec!["tar", "zstd", "xz", "lz4"], "--- a/archive.rs\n+++ b/archive.rs\n+ fn tar_pax_sparse_builder() {}"),
-            ("Procps Top EEVDF Scheduling & Free Memory Breakdown Engine", CoreUtilsAdvPrCategory::ProcpsPsmiscManagement, vec!["top", "ps", "free", "vmstat"], "--- a/procps.rs\n+++ b/procps.rs\n+ fn top_eevdf_telemetry() {}"),
-            ("Documentation Mandoc ANSI AST Compiler & Texinfo Cross-Ref", CoreUtilsAdvPrCategory::DocumentationPagerSuite, vec!["less", "mandoc", "texinfo"], "--- a/doc.rs\n+++ b/doc.rs\n+ fn mandoc_compile_ast() {}"),
-            ("Auth Suite Sudo Ticket Caching & Shadow Argon2id Validator", CoreUtilsAdvPrCategory::AuthPrivilegeSessionSuite, vec!["sudo", "doas", "shadow", "PAM"], "--- a/auth.rs\n+++ b/auth.rs\n+ fn shadow_argon2id_validate() {}"),
+            (
+                "GNU Coreutils EXA/EZA Colorization & Reflink CP Engine",
+                CoreUtilsAdvPrCategory::GnuBsdCoreutils,
+                vec!["ls", "cp", "stat", "df"],
+                "--- a/coreutils.rs\n+++ b/coreutils.rs\n+ fn run_ls_colored() {}",
+            ),
+            (
+                "BusyBox Ash Shell & IP Route Applet Extension Engine",
+                CoreUtilsAdvPrCategory::BusyBoxMulticall,
+                vec!["ash", "ip", "nc", "wget"],
+                "--- a/busybox.rs\n+++ b/busybox.rs\n+ fn execute_ash_script() {}",
+            ),
+            (
+                "util-linux Namespace Isolation & Encrypted Losetup Engine",
+                CoreUtilsAdvPrCategory::UtilLinuxSubsystem,
+                vec!["mount", "losetup", "taskset", "nsenter"],
+                "--- a/utillinux.rs\n+++ b/utillinux.rs\n+ fn losetup_encrypted() {}",
+            ),
+            (
+                "Findutils Multi-threaded Walk & Patience Diff Engine",
+                CoreUtilsAdvPrCategory::FindutilsDiffutils,
+                vec!["find", "xargs", "diff", "patch"],
+                "--- a/findutils.rs\n+++ b/findutils.rs\n+ fn diff_patience() {}",
+            ),
+            (
+                "Text Processing PCRE2 SIMD Grep & AWK Array Runtime",
+                CoreUtilsAdvPrCategory::TextProcessingStreaming,
+                vec!["grep", "sed", "awk"],
+                "--- a/text.rs\n+++ b/text.rs\n+ fn grep_pcre2_simd() {}",
+            ),
+            (
+                "Archival PAX Sparse Header & Zstd Multithreaded Pipeline",
+                CoreUtilsAdvPrCategory::ArchivalCompressionSuite,
+                vec!["tar", "zstd", "xz", "lz4"],
+                "--- a/archive.rs\n+++ b/archive.rs\n+ fn tar_pax_sparse_builder() {}",
+            ),
+            (
+                "Procps Top EEVDF Scheduling & Free Memory Breakdown Engine",
+                CoreUtilsAdvPrCategory::ProcpsPsmiscManagement,
+                vec!["top", "ps", "free", "vmstat"],
+                "--- a/procps.rs\n+++ b/procps.rs\n+ fn top_eevdf_telemetry() {}",
+            ),
+            (
+                "Documentation Mandoc ANSI AST Compiler & Texinfo Cross-Ref",
+                CoreUtilsAdvPrCategory::DocumentationPagerSuite,
+                vec!["less", "mandoc", "texinfo"],
+                "--- a/doc.rs\n+++ b/doc.rs\n+ fn mandoc_compile_ast() {}",
+            ),
+            (
+                "Auth Suite Sudo Ticket Caching & Shadow Argon2id Validator",
+                CoreUtilsAdvPrCategory::AuthPrivilegeSessionSuite,
+                vec!["sudo", "doas", "shadow", "PAM"],
+                "--- a/auth.rs\n+++ b/auth.rs\n+ fn shadow_argon2id_validate() {}",
+            ),
         ];
 
         for (title, cat, comps, diff) in items {
@@ -962,7 +1171,8 @@ mod tests {
         let wipe = engine.wipefs_clear_signature("/dev/sda1");
         assert!(wipe.contains("erased magic signatures"));
 
-        let dmesg_logs = "[   0.000000] Linux version 6.14.0-sovereign\n[   1.234567] btrfs: loaded";
+        let dmesg_logs =
+            "[   0.000000] Linux version 6.14.0-sovereign\n[   1.234567] btrfs: loaded";
         let parsed = engine.dmesg_kmsg_parse(dmesg_logs);
         assert_eq!(parsed.len(), 2);
 
@@ -1046,7 +1256,10 @@ mod tests {
         assert!(sudo_ok);
         assert!(msg.contains("cached ticket"));
 
-        let shadow_ok = engine.shadow_argon2id_validate("sovereign_pass", "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass");
+        let shadow_ok = engine.shadow_argon2id_validate(
+            "sovereign_pass",
+            "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass",
+        );
         assert!(shadow_ok);
 
         let (pam_ok, pam_msg) = engine.pam_stack_eval("root", "systemd", "required");

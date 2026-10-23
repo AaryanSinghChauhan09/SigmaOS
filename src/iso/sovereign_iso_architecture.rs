@@ -18,9 +18,9 @@
 //! - FAIL-FAST: Early error detection in build pipeline
 //! - OPEN STANDARD & INTEROPERABILITY: ISO 9660 El Torito / UEFI ESP
 
+use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloc::format;
 
 /// ISO 9660 compliant volume ID (≤32 chars, uppercase, no spaces)
 pub const SIGMA_ISO_VOLUME_ID: &str = "SIGMAOS_DESKTOP_1_0";
@@ -67,10 +67,10 @@ impl ArchTarget {
 /// Squashfs compression algorithm (CACHE CONSCIOUS DESIGN)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SquashfsCompression {
-    Zstd,   // Best for modern systems (fast decompress, good ratio)
-    Lz4,    // Fastest decompression (cache-friendly, warm boot)
-    Xz,     // Best ratio (slow decompress, good for archival ISOs)
-    Gzip,   // Maximum compatibility fallback
+    Zstd, // Best for modern systems (fast decompress, good ratio)
+    Lz4,  // Fastest decompression (cache-friendly, warm boot)
+    Xz,   // Best ratio (slow decompress, good for archival ISOs)
+    Gzip, // Maximum compatibility fallback
 }
 
 impl SquashfsCompression {
@@ -119,7 +119,11 @@ impl IsoError {
             IsoError::FilesystemError(e) => format!("Filesystem error: {}", e),
             IsoError::UnsupportedArch(a) => format!("Unsupported arch: {}", a),
             IsoError::InsufficientSpace { needed, available } => {
-                format!("Insufficient space: need {}MB, have {}MB", needed / 1_048_576, available / 1_048_576)
+                format!(
+                    "Insufficient space: need {}MB, have {}MB",
+                    needed / 1_048_576,
+                    available / 1_048_576
+                )
             }
             IsoError::CompressionFailed(e) => format!("Compression failed: {}", e),
             IsoError::SigningFailed(e) => format!("Signing failed: {}", e),
@@ -141,12 +145,14 @@ pub struct BootLayer {
 }
 
 impl IsoLayer for BootLayer {
-    fn name(&self) -> &str { "boot" }
+    fn name(&self) -> &str {
+        "boot"
+    }
 
     fn validate(&self) -> Result<(), IsoError> {
         if self.timeout_secs > 60 {
             return Err(IsoError::InvalidProfile(
-                "Boot timeout > 60s is unreasonable".to_string()
+                "Boot timeout > 60s is unreasonable".to_string(),
             ));
         }
         Ok(())
@@ -266,8 +272,8 @@ GRAPHICS=yes
 /// (VIRTUAL MEMORY ABSTRACTION + ZERO-COPY + MEMORY DISCIPLINE)
 pub struct LiveFilesystemLayer {
     pub compression: SquashfsCompression,
-    pub block_size: u32,         // squashfs block size (128K default)
-    pub tmpfs_size_pct: u8,      // % of RAM for overlayfs write layer (50% default)
+    pub block_size: u32,    // squashfs block size (128K default)
+    pub tmpfs_size_pct: u8, // % of RAM for overlayfs write layer (50% default)
     pub persistence_enabled: bool,
     pub overlay_backend: OverlayBackend,
 }
@@ -275,23 +281,25 @@ pub struct LiveFilesystemLayer {
 /// Overlay filesystem backend (Debian live / Arch mkinitcpio style)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OverlayBackend {
-    Overlayfs,   // Linux kernel overlayfs (modern, recommended)
-    Aufs,        // Legacy Debian live-boot (compatibility)
-    Tmpfs,       // Pure RAM (no persistence, fastest boot)
+    Overlayfs, // Linux kernel overlayfs (modern, recommended)
+    Aufs,      // Legacy Debian live-boot (compatibility)
+    Tmpfs,     // Pure RAM (no persistence, fastest boot)
 }
 
 impl IsoLayer for LiveFilesystemLayer {
-    fn name(&self) -> &str { "live-filesystem" }
+    fn name(&self) -> &str {
+        "live-filesystem"
+    }
 
     fn validate(&self) -> Result<(), IsoError> {
         if self.block_size < 4096 || self.block_size > 1_048_576 {
             return Err(IsoError::InvalidProfile(
-                "squashfs block_size must be 4K–1M".to_string()
+                "squashfs block_size must be 4K–1M".to_string(),
             ));
         }
         if self.tmpfs_size_pct > 75 {
             return Err(IsoError::InvalidProfile(
-                "tmpfs size > 75% RAM may cause OOM on low-memory systems".to_string()
+                "tmpfs size > 75% RAM may cause OOM on low-memory systems".to_string(),
             ));
         }
         Ok(())
@@ -331,9 +339,9 @@ pub struct InstallerLayer {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InstallerType {
-    CalamaresGui,      // Friendly GUI installer (Linux Mint style)
-    ArchinstallTui,    // TUI JSON-driven (Arch Linux style)
-    SigmaTuiNative,   // Native Rust TUI installer (SigmaOS own)
+    CalamaresGui,        // Friendly GUI installer (Linux Mint style)
+    ArchinstallTui,      // TUI JSON-driven (Arch Linux style)
+    SigmaTuiNative,      // Native Rust TUI installer (SigmaOS own)
     UnattendedAutomatic, // Cloud-init / autoinstall (Server automation)
 }
 
@@ -375,12 +383,12 @@ impl Default for UnattendedConfig {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetFilesystem {
-    Btrfs,       // Recommended: snapshots, subvolumes, compression
-    Ext4,        // Compatibility default
-    Xfs,         // High-throughput (RHEL/Fedora style)
-    Zfs,         // Enterprise: CoW, dedup (FreeBSD style)
-    F2fs,        // SSD/NVMe optimized (Android/ChromeOS inspired)
-    Hammer2,     // DragonFlyBSD transactional FS
+    Btrfs,   // Recommended: snapshots, subvolumes, compression
+    Ext4,    // Compatibility default
+    Xfs,     // High-throughput (RHEL/Fedora style)
+    Zfs,     // Enterprise: CoW, dedup (FreeBSD style)
+    F2fs,    // SSD/NVMe optimized (Android/ChromeOS inspired)
+    Hammer2, // DragonFlyBSD transactional FS
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -394,12 +402,14 @@ pub enum PartitionStrategy {
 }
 
 impl IsoLayer for InstallerLayer {
-    fn name(&self) -> &str { "installer" }
+    fn name(&self) -> &str {
+        "installer"
+    }
 
     fn validate(&self) -> Result<(), IsoError> {
         if self.partition_strategies.is_empty() {
             return Err(IsoError::InvalidProfile(
-                "At least one partition strategy required".to_string()
+                "At least one partition strategy required".to_string(),
             ));
         }
         Ok(())
@@ -431,44 +441,64 @@ impl Default for PackageManifestLayer {
     fn default() -> Self {
         Self {
             essential_packages: vec![
-                "systemd".to_string(), "dbus".to_string(), "udev".to_string(),
-                "network-manager".to_string(), "openssh".to_string(),
-                "sudo".to_string(), "bash".to_string(), "zsh".to_string(),
-                "coreutils".to_string(), "util-linux".to_string(),
-                "procps".to_string(), "findutils".to_string(),
+                "systemd".to_string(),
+                "dbus".to_string(),
+                "udev".to_string(),
+                "network-manager".to_string(),
+                "openssh".to_string(),
+                "sudo".to_string(),
+                "bash".to_string(),
+                "zsh".to_string(),
+                "coreutils".to_string(),
+                "util-linux".to_string(),
+                "procps".to_string(),
+                "findutils".to_string(),
             ],
             desktop_packages: vec![
-                "wayland".to_string(), "weston".to_string(), "hyprland".to_string(),
-                "waybar".to_string(), "wofi".to_string(), "foot".to_string(),
-                "pipewire".to_string(), "wireplumber".to_string(),
-                "xdg-utils".to_string(), "xdg-user-dirs".to_string(),
+                "wayland".to_string(),
+                "weston".to_string(),
+                "hyprland".to_string(),
+                "waybar".to_string(),
+                "wofi".to_string(),
+                "foot".to_string(),
+                "pipewire".to_string(),
+                "wireplumber".to_string(),
+                "xdg-utils".to_string(),
+                "xdg-user-dirs".to_string(),
             ],
             media_packages: vec![
-                "ffmpeg".to_string(), "gstreamer".to_string(),
-                "vlc".to_string(), "mpv".to_string(),
+                "ffmpeg".to_string(),
+                "gstreamer".to_string(),
+                "vlc".to_string(),
+                "mpv".to_string(),
             ],
             dev_tools: vec![
-                "rustup".to_string(), "gcc".to_string(), "make".to_string(),
-                "git".to_string(), "python3".to_string(),
+                "rustup".to_string(),
+                "gcc".to_string(),
+                "make".to_string(),
+                "git".to_string(),
+                "python3".to_string(),
             ],
             security_packages: vec![
-                "apparmor".to_string(), "nftables".to_string(),
-                "gnupg".to_string(), "age".to_string(),
+                "apparmor".to_string(),
+                "nftables".to_string(),
+                "gnupg".to_string(),
+                "age".to_string(),
             ],
-            locale_packages: vec![
-                "locales".to_string(), "tzdata".to_string(),
-            ],
+            locale_packages: vec!["locales".to_string(), "tzdata".to_string()],
         }
     }
 }
 
 impl IsoLayer for PackageManifestLayer {
-    fn name(&self) -> &str { "package-manifest" }
+    fn name(&self) -> &str {
+        "package-manifest"
+    }
 
     fn validate(&self) -> Result<(), IsoError> {
         if self.essential_packages.is_empty() {
             return Err(IsoError::InvalidProfile(
-                "essential_packages cannot be empty".to_string()
+                "essential_packages cannot be empty".to_string(),
             ));
         }
         Ok(())
@@ -497,8 +527,8 @@ pub struct SigningLayer {
     pub gpg_key_id: Option<String>,
     pub sha256_checksums: bool,
     pub sha512_checksums: bool,
-    pub sbom_enabled: bool,    // Software Bill of Materials (SLSA compliance)
-    pub cosign_enabled: bool,  // Sigstore cosign for OCI/ISO attestation
+    pub sbom_enabled: bool,   // Software Bill of Materials (SLSA compliance)
+    pub cosign_enabled: bool, // Sigstore cosign for OCI/ISO attestation
 }
 
 impl Default for SigningLayer {
@@ -514,18 +544,22 @@ impl Default for SigningLayer {
 }
 
 impl IsoLayer for SigningLayer {
-    fn name(&self) -> &str { "signing" }
+    fn name(&self) -> &str {
+        "signing"
+    }
 
     fn validate(&self) -> Result<(), IsoError> {
         if !self.sha256_checksums && !self.sha512_checksums {
             return Err(IsoError::InvalidProfile(
-                "At least one checksum algorithm required for integrity".to_string()
+                "At least one checksum algorithm required for integrity".to_string(),
             ));
         }
         Ok(())
     }
 
-    fn estimated_size_bytes(&self) -> u64 { 4096 } // Just checksum files
+    fn estimated_size_bytes(&self) -> u64 {
+        4096
+    } // Just checksum files
 
     fn description(&self) -> &str {
         "Signing layer: GPG, SHA256/512 checksums, SBOM generation"
@@ -583,8 +617,7 @@ impl SigmaIsoProfile {
         profile.name = "SigmaOS Server".to_string();
         profile.boot.splash_enabled = false;
         profile.boot.timeout_secs = 3;
-        profile.boot.kernel_cmdline =
-            "quiet loglevel=3 net.ifnames=0 biosdevname=0".to_string();
+        profile.boot.kernel_cmdline = "quiet loglevel=3 net.ifnames=0 biosdevname=0".to_string();
         profile.live_fs.compression = SquashfsCompression::Xz; // Best ratio for server
         profile.installer.installer_type = InstallerType::UnattendedAutomatic;
         profile.output_path = format!("target/sigmaos-server-{}.iso", arch.as_str());
@@ -594,12 +627,26 @@ impl SigmaIsoProfile {
     /// Validate entire profile (DEFENSIVE PROGRAMMING + FAIL-FAST)
     pub fn validate(&self) -> Result<(), Vec<IsoError>> {
         let mut errors = Vec::new();
-        if let Err(e) = self.boot.validate() { errors.push(e); }
-        if let Err(e) = self.live_fs.validate() { errors.push(e); }
-        if let Err(e) = self.installer.validate() { errors.push(e); }
-        if let Err(e) = self.packages.validate() { errors.push(e); }
-        if let Err(e) = self.signing.validate() { errors.push(e); }
-        if errors.is_empty() { Ok(()) } else { Err(errors) }
+        if let Err(e) = self.boot.validate() {
+            errors.push(e);
+        }
+        if let Err(e) = self.live_fs.validate() {
+            errors.push(e);
+        }
+        if let Err(e) = self.installer.validate() {
+            errors.push(e);
+        }
+        if let Err(e) = self.packages.validate() {
+            errors.push(e);
+        }
+        if let Err(e) = self.signing.validate() {
+            errors.push(e);
+        }
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(errors)
+        }
     }
 
     /// Estimate total ISO size in bytes

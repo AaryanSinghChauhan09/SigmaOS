@@ -96,7 +96,9 @@ impl DeckcraftKineticVectorTypographyMorphEngine {
                 String::from("Variable Font Axis Interpolation (Weight, Width, Slant)"),
                 String::from("Path-Following Text Reveal Micro-Animations"),
             ],
-            performance_multiplier: String::from("60 FPS Hardware-Accelerated Vector Morphing (<0.5ms)"),
+            performance_multiplier: String::from(
+                "60 FPS Hardware-Accelerated Vector Morphing (<0.5ms)",
+            ),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -134,7 +136,9 @@ impl DeckcraftRealtimeAudioVisualSyncKeyframeEngine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV65PrProposalManifest {
         DeckcraftV65PrProposalManifest {
             pr_id: 6532,
-            pr_title: String::from("PR #6532: Real-Time Audio-Visual Sync & Keyframe Trigger Engine"),
+            pr_title: String::from(
+                "PR #6532: Real-Time Audio-Visual Sync & Keyframe Trigger Engine",
+            ),
             target_subsystem: String::from("Deckcraft Audio & Animation Sync Engine"),
             original_suite: String::from("ArtCraft Deckcraft Audio Motion"),
             components_added: vec![
@@ -227,7 +231,9 @@ impl DeckcraftSmartDiagramMatrixAutoLayoutEngine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV65PrProposalManifest {
         DeckcraftV65PrProposalManifest {
             pr_id: 6533,
-            pr_title: String::from("PR #6533: Smart Diagram & Infographic Matrix Auto-Layout Engine"),
+            pr_title: String::from(
+                "PR #6533: Smart Diagram & Infographic Matrix Auto-Layout Engine",
+            ),
             target_subsystem: String::from("Deckcraft Graphics & Layout Subsystem"),
             original_suite: String::from("ArtCraft Deckcraft Smart Diagrams"),
             components_added: vec![
@@ -317,7 +323,9 @@ impl DeckcraftLiveAudienceQnaPollingModerationEngine {
             components_added: vec![
                 String::from("QR Code & 4-Digit PIN Authenticated Audience Session Portal"),
                 String::from("Real-Time Audience Polling with Instant Animated Chart Reveals"),
-                String::from("Moderated Q&A Queue with Peer Upvoting & Presenter Highlight Overlay"),
+                String::from(
+                    "Moderated Q&A Queue with Peer Upvoting & Presenter Highlight Overlay",
+                ),
                 String::from("Live Emoji Reaction Particle Stream Overlay"),
             ],
             performance_multiplier: String::from("10,000+ Concurrent Audience Interactions (<1ms)"),
@@ -560,7 +568,9 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsEngine {
             target_subsystem: String::from("Deckcraft Presenter Teleprompter & Speech Subsystem"),
             original_suite: String::from("ArtCraft Deckcraft Presenter Analytics"),
             components_added: vec![
-                String::from("Speech-to-Text Timecode Tracking & Teleprompter Auto-Scroll Matching"),
+                String::from(
+                    "Speech-to-Text Timecode Tracking & Teleprompter Auto-Scroll Matching",
+                ),
                 String::from("Speech Pacing Analyzer (WPM Calculator, Filler Word Detection)"),
                 String::from("Voice Keyword Trigger Slide Advancement"),
             ],
@@ -596,7 +606,9 @@ impl DeckcraftMobileRemoteGyroLaserPointerEngine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV65PrProposalManifest {
         DeckcraftV65PrProposalManifest {
             pr_id: 6539,
-            pr_title: String::from("PR #6539: Mobile Remote Controller & Gyro Laser Pointer Engine"),
+            pr_title: String::from(
+                "PR #6539: Mobile Remote Controller & Gyro Laser Pointer Engine",
+            ),
             target_subsystem: String::from("Deckcraft Mobile Remote Sync Subsystem"),
             original_suite: String::from("ArtCraft Deckcraft Mobile Remote"),
             components_added: vec![
@@ -642,7 +654,9 @@ impl DeckcraftMultiFormatBatchExporterPdfaRevealEngine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV65PrProposalManifest {
         DeckcraftV65PrProposalManifest {
             pr_id: 6540,
-            pr_title: String::from("PR #6540: 4K 60FPS Video Renderer & Reveal.js Web Exporter Pipeline"),
+            pr_title: String::from(
+                "PR #6540: 4K 60FPS Video Renderer & Reveal.js Web Exporter Pipeline",
+            ),
             target_subsystem: String::from("Deckcraft Rendering & Export Subsystem"),
             original_suite: String::from("ArtCraft Deckcraft Exporter"),
             components_added: vec![

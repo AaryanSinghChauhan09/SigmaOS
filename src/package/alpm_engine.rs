@@ -217,7 +217,11 @@ impl SovereignAlpmEngine {
     }
 
     /// YUM-style group package installation (yum groupinstall)
-    pub fn install_group(&mut self, _group_name: &str, _flags: AlpmTransactionFlags) -> Result<(), &'static str> {
+    pub fn install_group(
+        &mut self,
+        _group_name: &str,
+        _flags: AlpmTransactionFlags,
+    ) -> Result<(), &'static str> {
         // YUM group support - install meta-package collection
         // Full implementation would resolve group package dependencies
         Err("YUM group installation pending - partial implementation")

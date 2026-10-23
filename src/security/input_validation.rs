@@ -1140,18 +1140,12 @@ mod tests {
             validate_ipv4(b"127.0.0.1."),
             Err(ValidationError::OutOfRange)
         );
-        assert_eq!(
-            validate_ipv4(b".1.2.3.4"),
-            Err(ValidationError::OutOfRange)
-        );
+        assert_eq!(validate_ipv4(b".1.2.3.4"), Err(ValidationError::OutOfRange));
         assert_eq!(
             validate_ipv4(b"192.168..1"),
             Err(ValidationError::OutOfRange)
         );
-        assert_eq!(
-            validate_ipv4(b"..."),
-            Err(ValidationError::OutOfRange)
-        );
+        assert_eq!(validate_ipv4(b"..."), Err(ValidationError::OutOfRange));
     }
 
     #[test]

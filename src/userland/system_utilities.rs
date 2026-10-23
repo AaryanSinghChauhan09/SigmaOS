@@ -871,10 +871,7 @@ pub struct CpEngine;
 impl CpEngine {
     pub fn run(src: &str, dest: &str, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
         if src.is_empty() || dest.is_empty() {
-            return SystemUtilityOutput::failure(
-                EXIT_SYNTAX_ERROR,
-                "cp: missing file operand\n",
-            );
+            return SystemUtilityOutput::failure(EXIT_SYNTAX_ERROR, "cp: missing file operand\n");
         }
         if src == dest {
             return SystemUtilityOutput::failure(
@@ -884,7 +881,10 @@ impl CpEngine {
         }
 
         let recursive = parser.has_flag("r") || parser.has_flag("R");
-        let stdout = format!("cp: copied '{}' to '{}' (recursive: {})\n", src, dest, recursive);
+        let stdout = format!(
+            "cp: copied '{}' to '{}' (recursive: {})\n",
+            src, dest, recursive
+        );
         let mut output = SystemUtilityOutput::success(stdout);
 
         if parser.format_json {
@@ -905,10 +905,7 @@ pub struct MvEngine;
 impl MvEngine {
     pub fn run(src: &str, dest: &str, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
         if src.is_empty() || dest.is_empty() {
-            return SystemUtilityOutput::failure(
-                EXIT_SYNTAX_ERROR,
-                "mv: missing file operand\n",
-            );
+            return SystemUtilityOutput::failure(EXIT_SYNTAX_ERROR, "mv: missing file operand\n");
         }
         if src == dest {
             return SystemUtilityOutput::failure(
@@ -956,7 +953,10 @@ impl RmEngine {
                 continue;
             }
 
-            stdout.push_str(&format!("rm: removed '{}' (recursive: {})\n", path, recursive));
+            stdout.push_str(&format!(
+                "rm: removed '{}' (recursive: {})\n",
+                path, recursive
+            ));
         }
 
         let mut output = SystemUtilityOutput {
@@ -967,7 +967,11 @@ impl RmEngine {
         };
 
         if parser.format_json {
-            let json = format!("{{\"removed_count\": {}, \"recursive\": {}}}", paths.len(), recursive);
+            let json = format!(
+                "{{\"removed_count\": {}, \"recursive\": {}}}",
+                paths.len(),
+                recursive
+            );
             output = output.with_json(json);
         }
 
@@ -979,7 +983,11 @@ impl RmEngine {
 pub struct WcEngine;
 
 impl WcEngine {
-    pub fn run(content: &str, filename: &str, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+    pub fn run(
+        content: &str,
+        filename: &str,
+        parser: &SystemUtilityArgParser,
+    ) -> SystemUtilityOutput {
         let lines = content.lines().count();
         let words = content.split_whitespace().count();
         let bytes = content.len();
@@ -1002,7 +1010,11 @@ impl WcEngine {
 pub struct HeadEngine;
 
 impl HeadEngine {
-    pub fn run(content: &str, line_count: usize, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+    pub fn run(
+        content: &str,
+        line_count: usize,
+        parser: &SystemUtilityArgParser,
+    ) -> SystemUtilityOutput {
         let lines: Vec<&str> = content.lines().take(line_count).collect();
         let mut stdout = lines.join("\n");
         if !stdout.is_empty() {
@@ -1022,7 +1034,11 @@ impl HeadEngine {
 pub struct TailEngine;
 
 impl TailEngine {
-    pub fn run(content: &str, line_count: usize, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+    pub fn run(
+        content: &str,
+        line_count: usize,
+        parser: &SystemUtilityArgParser,
+    ) -> SystemUtilityOutput {
         let all_lines: Vec<&str> = content.lines().collect();
         let start_idx = if all_lines.len() > line_count {
             all_lines.len() - line_count
@@ -1386,9 +1402,17 @@ mod tests {
         assert!(output_env.stdout.contains("USER=root"));
 
         let parser_uname = SystemUtilityArgParser::parse(vec!["-a", "--json"]);
-        let output_uname = UnameEngine::run("SigmaOS", "node1", "1.0.0-sovereign", "x86_64", &parser_uname);
+        let output_uname = UnameEngine::run(
+            "SigmaOS",
+            "node1",
+            "1.0.0-sovereign",
+            "x86_64",
+            &parser_uname,
+        );
         assert_eq!(output_uname.exit_status, EXIT_SUCCESS);
-        assert!(output_uname.stdout.contains("SigmaOS node1 1.0.0-sovereign x86_64"));
+        assert!(output_uname
+            .stdout
+            .contains("SigmaOS node1 1.0.0-sovereign x86_64"));
     }
 
     #[test]

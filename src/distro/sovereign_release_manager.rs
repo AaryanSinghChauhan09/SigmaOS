@@ -22,10 +22,10 @@
 
 #![allow(dead_code)]
 
+use std::collections::BTreeMap;
+use std::format;
 use std::string::{String, ToString};
 use std::vec::Vec;
-use std::format;
-use std::collections::BTreeMap;
 
 // ============================================================
 // Release Series — the top-level release concept
@@ -37,9 +37,17 @@ use std::collections::BTreeMap;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ReleaseSeries {
     /// Long-Term Support: 5 years full + 5 years extended (Ubuntu LTS style)
-    Lts { year: u16, month: u8, codename: String },
+    Lts {
+        year: u16,
+        month: u8,
+        codename: String,
+    },
     /// Standard release: 9 months support (Ubuntu interim style)
-    Standard { year: u16, month: u8, codename: String },
+    Standard {
+        year: u16,
+        month: u8,
+        codename: String,
+    },
     /// Rolling release: always latest (Arch/Omarchy style)
     Rolling { codename: String },
     /// Development: pre-release (Debian testing style)
@@ -49,14 +57,10 @@ pub enum ReleaseSeries {
 impl ReleaseSeries {
     pub fn version_string(&self) -> String {
         match self {
-            ReleaseSeries::Lts { year, month, .. } =>
-                format!("{}.{:02} LTS", year, month),
-            ReleaseSeries::Standard { year, month, .. } =>
-                format!("{}.{:02}", year, month),
-            ReleaseSeries::Rolling { codename } =>
-                format!("Rolling ({})", codename),
-            ReleaseSeries::Development { codename } =>
-                format!("Dev ({})", codename),
+            ReleaseSeries::Lts { year, month, .. } => format!("{}.{:02} LTS", year, month),
+            ReleaseSeries::Standard { year, month, .. } => format!("{}.{:02}", year, month),
+            ReleaseSeries::Rolling { codename } => format!("Rolling ({})", codename),
+            ReleaseSeries::Development { codename } => format!("Dev ({})", codename),
         }
     }
 
@@ -80,7 +84,7 @@ impl ReleaseSeries {
     /// Support duration in months (None = indefinite for rolling)
     pub fn support_months(&self) -> Option<u32> {
         match self {
-            ReleaseSeries::Lts { .. } => Some(60),   // 5 years
+            ReleaseSeries::Lts { .. } => Some(60), // 5 years
             ReleaseSeries::Standard { .. } => Some(9),
             ReleaseSeries::Rolling { .. } => None,
             ReleaseSeries::Development { .. } => None,
@@ -97,12 +101,12 @@ impl ReleaseSeries {
 #[derive(Debug, Clone)]
 pub struct PointRelease {
     pub series: ReleaseSeries,
-    pub point: u8,               // 0 = initial, 1 = first point release, etc.
-    pub build_date: String,      // ISO 8601 date
-    pub iso_sha256: String,      // SHA256 of the ISO image (PRISTINE SOURCES)
+    pub point: u8,          // 0 = initial, 1 = first point release, etc.
+    pub build_date: String, // ISO 8601 date
+    pub iso_sha256: String, // SHA256 of the ISO image (PRISTINE SOURCES)
     pub iso_url: String,
     pub delta_url: Option<String>, // Optional delta from previous point release
-    pub kernel_version: String,  // Bundled kernel version
+    pub kernel_version: String,    // Bundled kernel version
     pub base_packages: Vec<String>, // Key packages and versions
     pub release_notes_url: String,
     pub is_current: bool,
@@ -129,14 +133,14 @@ impl PointRelease {
 /// Upgrade transition descriptor (USER FREEDOM AND CONTROL)
 #[derive(Debug, Clone)]
 pub struct UpgradePath {
-    pub from: String,         // Source release codename
-    pub to: String,           // Target release codename
-    pub supported: bool,      // Whether this transition is officially supported
+    pub from: String,    // Source release codename
+    pub to: String,      // Target release codename
+    pub supported: bool, // Whether this transition is officially supported
     pub method: UpgradeMethod,
     pub estimated_duration_mins: u32,
     pub risk_level: UpgradeRisk,
-    pub pre_checks: Vec<String>,  // Required preconditions
-    pub post_steps: Vec<String>,  // Steps to take after upgrade
+    pub pre_checks: Vec<String>, // Required preconditions
+    pub post_steps: Vec<String>, // Steps to take after upgrade
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -188,9 +192,11 @@ impl EolTracker {
     }
 
     pub fn register(&mut self, codename: &str, eol_date: &str, upgrade_to: Option<&str>) {
-        self.eol_dates.insert(codename.to_string(), eol_date.to_string());
+        self.eol_dates
+            .insert(codename.to_string(), eol_date.to_string());
         if let Some(target) = upgrade_to {
-            self.upgrade_targets.insert(codename.to_string(), target.to_string());
+            self.upgrade_targets
+                .insert(codename.to_string(), target.to_string());
         }
     }
 
@@ -269,18 +275,28 @@ impl ReleaseAnnouncement {
     pub fn to_markdown(&self) -> String {
         let mut out = String::new();
 
-        out.push_str(&format!("# SigmaOS {} Release Notes\n\n", self.release.full_version()));
+        out.push_str(&format!(
+            "# SigmaOS {} Release Notes\n\n",
+            self.release.full_version()
+        ));
         out.push_str(&format!("**Release Date:** {}\n", self.release.build_date));
         out.push_str(&format!("**Kernel:** {}\n", self.release.kernel_version));
         out.push_str(&format!("**Download:** [ISO]({})\n", self.release.iso_url));
         out.push_str(&format!("**SHA256:** `{}`\n\n", self.release.iso_sha256));
-        out.push_str(&format!("**Minimum Requirements:** {}MB RAM, {}GB storage\n\n",
-            self.release.min_ram_mb, self.release.min_storage_gb));
+        out.push_str(&format!(
+            "**Minimum Requirements:** {}MB RAM, {}GB storage\n\n",
+            self.release.min_ram_mb, self.release.min_storage_gb
+        ));
 
         // Highlights by category
         out.push_str("## Highlights\n\n");
         for h in &self.highlights {
-            out.push_str(&format!("{} **{}**: {}\n\n", h.category.emoji(), h.title, h.description));
+            out.push_str(&format!(
+                "{} **{}**: {}\n\n",
+                h.category.emoji(),
+                h.title,
+                h.description
+            ));
         }
 
         // Breaking changes
@@ -347,11 +363,16 @@ impl SovereignReleaseManager {
         if let Some(eol_date) = self.eol_tracker.eol_date(codename) {
             // Simple string comparison works for ISO 8601 dates
             if current_date >= eol_date {
-                let upgrade_to = self.eol_tracker.recommended_upgrade(codename)
+                let upgrade_to = self
+                    .eol_tracker
+                    .recommended_upgrade(codename)
                     .unwrap_or("the latest release");
                 return Some(format!(
                     "⚠️ SigmaOS {} ({}) has reached End of Life ({}). Please upgrade to {}.",
-                    release.full_version(), codename, eol_date, upgrade_to
+                    release.full_version(),
+                    codename,
+                    eol_date,
+                    upgrade_to
                 ));
             }
         }
@@ -362,7 +383,8 @@ impl SovereignReleaseManager {
     pub fn recommended_upgrade_path(&self) -> Option<&UpgradePath> {
         let current = self.current_release.as_ref()?;
         let codename = current.series.codename();
-        self.upgrade_paths.iter()
+        self.upgrade_paths
+            .iter()
             .find(|p| p.from == codename && p.supported)
     }
 
@@ -370,8 +392,7 @@ impl SovereignReleaseManager {
     pub fn has_new_point_release(&self) -> bool {
         if let Some(ref current) = self.current_release {
             self.available_releases.iter().any(|r| {
-                r.series.codename() == current.series.codename()
-                    && r.point > current.point
+                r.series.codename() == current.series.codename() && r.point > current.point
             })
         } else {
             !self.available_releases.is_empty()
@@ -380,7 +401,8 @@ impl SovereignReleaseManager {
 
     /// Get release notes URL for current release
     pub fn release_notes_url(&self) -> Option<&str> {
-        self.current_release.as_ref()
+        self.current_release
+            .as_ref()
             .map(|r| r.release_notes_url.as_str())
     }
 }
@@ -403,7 +425,8 @@ mod tests {
             point: 0,
             build_date: "2026-04-20".to_string(),
             iso_sha256: "abc123def456".to_string(),
-            iso_url: "https://releases.sigmaos.dev/26.04/sigmaos-26.04-desktop-amd64.iso".to_string(),
+            iso_url: "https://releases.sigmaos.dev/26.04/sigmaos-26.04-desktop-amd64.iso"
+                .to_string(),
             delta_url: None,
             kernel_version: "6.9.0-sigmaos".to_string(),
             base_packages: vec!["systemd-256".to_string(), "hyprland-0.41".to_string()],
@@ -417,7 +440,9 @@ mod tests {
     #[test]
     fn test_lts_version_string() {
         let r = ReleaseSeries::Lts {
-            year: 2026, month: 4, codename: "apex".to_string()
+            year: 2026,
+            month: 4,
+            codename: "apex".to_string(),
         };
         assert_eq!(r.version_string(), "2026.04 LTS");
         assert!(r.is_lts());
@@ -429,7 +454,9 @@ mod tests {
     #[test]
     fn test_standard_version_string() {
         let r = ReleaseSeries::Standard {
-            year: 2026, month: 10, codename: "vanguard".to_string()
+            year: 2026,
+            month: 10,
+            codename: "vanguard".to_string(),
         };
         assert_eq!(r.version_string(), "2026.10");
         assert!(!r.is_lts());
@@ -438,7 +465,9 @@ mod tests {
 
     #[test]
     fn test_rolling_no_eol() {
-        let r = ReleaseSeries::Rolling { codename: "sovereign".to_string() };
+        let r = ReleaseSeries::Rolling {
+            codename: "sovereign".to_string(),
+        };
         assert!(r.is_rolling());
         assert_eq!(r.support_months(), None);
         assert!(!r.has_esm());
@@ -499,7 +528,7 @@ mod tests {
     fn test_no_new_point_release() {
         let mut mgr = SovereignReleaseManager::new();
         mgr.current_release = Some(make_lts_release()); // point = 0
-        // No available releases
+                                                        // No available releases
         assert!(!mgr.has_new_point_release());
     }
 
@@ -536,8 +565,10 @@ mod tests {
     fn test_upgrade_risk_levels() {
         // Just ensure enum coverage
         let levels = [
-            UpgradeRisk::Low, UpgradeRisk::Medium,
-            UpgradeRisk::High, UpgradeRisk::Critical
+            UpgradeRisk::Low,
+            UpgradeRisk::Medium,
+            UpgradeRisk::High,
+            UpgradeRisk::Critical,
         ];
         assert_eq!(levels.len(), 4);
     }

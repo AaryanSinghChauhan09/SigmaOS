@@ -81,10 +81,9 @@ pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
 pub use craftlibs_artcraft_parity_pr::{
     CraftlibsArtcraftParityPrSuite, CraftlibsEmbreeBvhRaytracingKernelPrEngine,
-    CraftlibsGpuTextureCompressionAstcBtcPrEngine,
-    CraftlibsNeuralSuperResolutionUpscalerPrEngine, CraftlibsOpenColorIoColorGradingLutPrEngine,
-    CraftlibsOpenFxPluginHostRouterPrEngine, CraftlibsOpenSubdivTessellationSurfacePrEngine,
-    CraftlibsOpenVdbVolumetricGridPrEngine,
+    CraftlibsGpuTextureCompressionAstcBtcPrEngine, CraftlibsNeuralSuperResolutionUpscalerPrEngine,
+    CraftlibsOpenColorIoColorGradingLutPrEngine, CraftlibsOpenFxPluginHostRouterPrEngine,
+    CraftlibsOpenSubdivTessellationSurfacePrEngine, CraftlibsOpenVdbVolumetricGridPrEngine,
     CraftlibsPhysicallyBasedFluidClothPhysicsPrEngine,
     CraftlibsPrProposalManifest as CraftlibsParityPrProposalManifest,
     CraftlibsRealtimeCrdtCanvasSyncPrEngine, CraftlibsUniversalFormatTranspilerPrEngine,
@@ -122,6 +121,7 @@ pub use figcraft_artcraft_parity_pr::*;
 pub use figcraft_missing_components_parity_pr::*;
 pub use filmcraft_artcraft_missing_components_v65_pr::*;
 pub use filmcraft_artcraft_missing_components_v66_pr::*;
+pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use gridcraft::{
     get_gridcraft, init_gridcraft, AggregationType, CellFormat, CellValue, Chart, ChartType,
     DataVisualizationEngine, FormulaEngine, GridCell, GridcraftChartVisualizationPrDeployer,
@@ -162,7 +162,6 @@ pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
-pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use photocraft_artcraft_missing_components_v65_pr::*;
 pub use soundcraft::{
     fnv1a_soundcraft_pr_digest, SoundClip, SoundCraftAudioEnginePrDeployer,
