@@ -1,2 +1,3 @@
-# SigmaOS Shell Diagnostics Specification
-Error formatting, suggestions, and diagnostic messaging.
+# SigmaOS Shell Diagnostics
+
+Diagnostics formatting and error messages for `sigma-sh`.

@@ -1,2 +1,3 @@
-# SigmaOS Shell Maintenance Guide
-Maintenance rules and procedures for the SigmaOS Command Interpreter.
+# SigmaOS Shell Maintenance Policy
+
+Maintenance policy and lifecycle guidelines for the SigmaOS shell (`sigma-sh`).

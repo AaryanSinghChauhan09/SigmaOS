@@ -1,39 +1,81 @@
 ## Summary
-What physical memory management (PMM), IPC, or kernel component correctness or capability gap does this PR address?
 
-## Scope
-Boot map | reservation | early allocator | runtime allocator | page metadata | VMM | DMA | zones | NUMA | IPC handler | Component
+<!-- What file-management behavior changed and why? -->
 
-## Reference study
-Upstream study / What SigmaOS adopts / Reference study
+## Component
 
-## Memory-map evidence
-Source (UEFI/ACPI/bootloader/QEMU), memory types, ranges, and exact target.
+- [ ] File descriptor manager
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Invariants and safety
-Reserved-range policy, checked arithmetic, frame states, ownership/refcounts,
-zeroing, physical/virtual/DMA address separation, and failure behavior.
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly memory audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference study / Reference behavior
+
+<!-- Required for lifecycle, ABI, or file changes. What SigmaOS adopts. -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
+
+## Changes
+
+-
+
+## Kernel safety review / File safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-boot evidence, if boot-affecting
+- [ ] File benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] File documentation
+- [ ] Boot matrix, if applicable
 
 ## Risks and rollback
-Safety and rollback
 
-## Runtime evidence
-Unit/model | booted QEMU | SMP QEMU | physical hardware
-List memory size, architecture, boot protocol, and exact operations tested.
-
-## Tests
-Malformed maps, overlaps/holes, allocation/free, double-free, exhaustion,
-coalescing, VMM map/unmap, zeroing, DMA, and anything not tested.
-
-## Status and documentation
-Proposed | Prototype | Integrated | Supported
-Link updated memory docs, feature inventory, and test evidence.
-
-## Reviewer checklist
-- [ ] Unknown/reserved memory is never allocated
-- [ ] Critical kernel/boot/firmware/MMIO ranges are reserved
-- [ ] Arithmetic and PFN conversions are checked
-- [ ] Physical, virtual, and DMA addresses are distinct
-- [ ] Allocation/free accounting and ownership are tested
-- [ ] User-visible pages are zeroed before exposure
-- [ ] Required CI and QEMU checks pass; review conversations resolved
+- Risk:
+- Rollback:

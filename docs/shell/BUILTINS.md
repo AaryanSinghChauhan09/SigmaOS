@@ -1,2 +1,3 @@
-# SigmaOS Shell Built-in Commands
-Built-in command implementations: cd, pwd, echo, export, unset, alias, exit.
+# SigmaOS Shell Builtins
+
+Builtin command specifications for `sigma-sh`.

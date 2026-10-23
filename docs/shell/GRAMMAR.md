@@ -1,2 +1,3 @@
-# SigmaOS Shell Grammar Specification
-Lexical tokens, AST node structures, and grammar rules.
+# SigmaOS Shell Grammar
+
+Grammar and lexer rules for `sigma-sh`.

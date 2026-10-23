@@ -1,2 +1,3 @@
-# Upstream Study: Shell Word Splitting Rules
-Analysis of POSIX word splitting semantics and SigmaOS implementation strategy.
+# Study: Shell Word Splitting and Path Expansion
+
+Analysis of POSIX shell word splitting and expansion rules.
