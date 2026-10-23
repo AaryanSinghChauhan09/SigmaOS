@@ -234,13 +234,59 @@ Based on the Omarchy Linux 4.0.6 ISO analysis, this section documents the specif
 | **Init/Boot** | systemd, grub, bsdinit | Custom boot process, Grub integration | Critical | P0: systemd unit compatibility (6-12 months) |
 | **Security** | SELinux/AppArmor, FirewallD, OpenSSH | Kernel hardening (ASLR, canines), capability-based | High | P1: SELinux/AppArmor consideration (12-24 months) |
 
+**Advanced Subsystem Roadmap Items:**
+
+**Networking Subsystem:**
+- 🟡 Advanced routing - Foundation implemented, roadmap item for full multi-table routing
+- 🟡 BPF/XDP - Foundation under development, roadmap priority
+- 🟡 Network namespaces - Roadmap item for process isolation
+- 🟡 VLAN tagging (802.1Q) - Roadmap item for trunk port support
+- 🟡 Bonding/teaming - Roadmap item for link aggregation
+- 🟡 Bridge-utils - Roadmap item for bridge control
+- 🟡 IPsec - Roadmap item for VPN gateway support
+- 🟡 WireGuard VPN - Roadmap item for lightweight VPN stack
+
+**Filesystem Subsystem:**
+- 🟡 XFS - Aggressive allocation and online repair roadmap item
+- 🟡 UFS - BSD Unix filesystem compatibility roadmap item
+- 🟡 NFS client - Versions 3 and 4 on development roadmap
+- 🟡 SMB/CIFS client - Windows network filesystem roadmap item
+
+**Package Management Subsystem:**
+- 🟡 APT/Dpkg command-line - Partial compatibility layer roadmap item
+- 🟡 YUM/DNF command-line - Roadmap item for RHEL/CentOS compatibility
+- 🟡 Pacman integration - Arch Linux package manager roadmap item
+- 🟡 Snap/Flatpak - Container-style packaging roadmap item
+
+**Shell & CLI Subsystem:**
+- 🟡 Full Bash/Zsh compatibility - Builtins compatibility roadmap item
+- 🟡 Man pages - Documentation set roadmap item
+- 🟡 Util-linux - Collection utilities roadmap item
+
+**Security Subsystem:**
+- 🟡 SELinux - Porting consideration for long-term roadmap
+- 🟡 AppArmor - Profile compatibility roadmap item
+- 🟡 FirewallD/ufw - Graphical and CLI configuration roadmap item
+- 🟡 OpenSSH - Key-based authentication compatibility roadmap item
+- 🟡 Fail2ban - Intrusion detection roadmap item
+
+**Init/Boot Subsystem:**
+- 🟡 Systemd units - Full compatibility layer roadmap item
+- 🟡 Runit service files - Service supervisor compatibility roadmap item
+- 🟡 OpenRC scripts - Service dependency management roadmap item
+- 🟡 Grub configuration - Bootloader integration (already partially implemented)
+
+**Device Driver Subsystem:**
+- 🟡 Complete udev/devd equivalence - Device node management roadmap item
+- 🟡 Comprehensive driver collection - Expanded hardware support roadmap item
+
 **Parity Assessment:**
 - **P0 Foundation** (0-6 months): Kernel binary, basic filesystem, package manager format, shell basics, bootloader
 - **P1 Functional** (6-12 months): Networking stack, device drivers, security modules, init system compatibility
 - **P2 Usable** (12-18 months): Desktop environment features, advanced filesystems, full compatibility
 - **P3 Competitive** (18-36 months): Complete Omarchy Linux parity, market competitiveness
 
-*The roadmap items marked with 🟦 represent the specific Omarchy Linux parity milestones. SigmaOS's unique value proposition (principle compliance, modular architecture, sovereignty) is maintained throughout development.*
+*Foundational implementations already exist in SigmaOS codebase (VFS, slab allocator, TCP/IP stack, Ext4/Btrfs/ZFS/FAT32 filesystems, Sovereign pkg manager with 60+ adapters, custom shell with coreutils compatibility, 40+ device drivers, kernel hardening ASLR/stack canaries). Roadmap items marked with 🟡 represent active development priorities. The roadmap items marked with 🟦 represent the specific Omarchy Linux parity milestones. SigmaOS's unique value proposition (principle compliance, modular architecture, sovereignty) is maintained throughout development.*
 
 ---
 *Document generated as part of SigmaOS wiki component parity analysis.*
