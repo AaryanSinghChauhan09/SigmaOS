@@ -54,7 +54,10 @@ impl SystemdAdvancementsV63Engine {
     }
 
     /// Perform topological sorting on systemd unit startup order based on `After=` and `Requires=` dependencies.
-    pub fn resolve_startup_order(&self, units: &[SystemdUnitSpecV63]) -> Result<Vec<String>, String> {
+    pub fn resolve_startup_order(
+        &self,
+        units: &[SystemdUnitSpecV63],
+    ) -> Result<Vec<String>, String> {
         let mut adj: BTreeMap<String, Vec<String>> = BTreeMap::new();
         let mut in_degree: BTreeMap<String, usize> = BTreeMap::new();
         let mut all_units: BTreeSet<String> = BTreeSet::new();
@@ -122,7 +125,12 @@ impl SystemdAdvancementsV63Engine {
     }
 
     /// Evaluate watchdog ping interval and return whether ping is within acceptable timeframe.
-    pub fn evaluate_watchdog_ping(&self, last_ping_usec: u64, current_usec: u64, watchdog_usec: u64) -> bool {
+    pub fn evaluate_watchdog_ping(
+        &self,
+        last_ping_usec: u64,
+        current_usec: u64,
+        watchdog_usec: u64,
+    ) -> bool {
         if watchdog_usec == 0 {
             return true;
         }
@@ -133,7 +141,11 @@ impl SystemdAdvancementsV63Engine {
     }
 
     /// Parse socket activation environment descriptor string (`LISTEN_FDS=3`, `LISTEN_FDNAMES=http:https`).
-    pub fn parse_socket_activation_fds(&self, listen_fds: u32, fd_names: &str) -> Vec<(u32, String)> {
+    pub fn parse_socket_activation_fds(
+        &self,
+        listen_fds: u32,
+        fd_names: &str,
+    ) -> Vec<(u32, String)> {
         let names: Vec<&str> = fd_names.split(':').collect();
         let mut fds = Vec::new();
         const SD_LISTEN_FDS_START: u32 = 3;
@@ -190,7 +202,11 @@ impl OpenRcAdvancementsV63Engine {
     }
 
     /// Validate runlevel transition validity.
-    pub fn validate_runlevel_transition(&self, current: OpenRcRunlevelV63, target: OpenRcRunlevelV63) -> bool {
+    pub fn validate_runlevel_transition(
+        &self,
+        current: OpenRcRunlevelV63,
+        target: OpenRcRunlevelV63,
+    ) -> bool {
         match (current, target) {
             (OpenRcRunlevelV63::SysInit, OpenRcRunlevelV63::Boot) => true,
             (OpenRcRunlevelV63::Boot, OpenRcRunlevelV63::Default) => true,
@@ -247,7 +263,8 @@ impl OpenRcAdvancementsV63Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV63Manifest {
         CoreUserlandV63Manifest {
             pr_id: 4040,
-            pr_title: "PR #4040: OpenRC V63 Depend Block AST Parser & Stacked Runlevel Cascading".to_string(),
+            pr_title: "PR #4040: OpenRC V63 Depend Block AST Parser & Stacked Runlevel Cascading"
+                .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "Gentoo / Alpine OpenRC".to_string(),
             components_added: vec![
@@ -286,7 +303,13 @@ impl RunitS6AdvancementsV63Engine {
     }
 
     /// Calculate exponential backoff restart delay with pseudorandom jitter for crashed service (capped at max_sec).
-    pub fn calculate_backoff_with_jitter(&self, restart_count: u32, base_sec: u32, max_sec: u32, seed: u32) -> u32 {
+    pub fn calculate_backoff_with_jitter(
+        &self,
+        restart_count: u32,
+        base_sec: u32,
+        max_sec: u32,
+        seed: u32,
+    ) -> u32 {
         if restart_count == 0 {
             return 0;
         }
@@ -310,7 +333,11 @@ impl RunitS6AdvancementsV63Engine {
     }
 
     /// Simulate `s6-rc` compiled database atomic state transition from `old_db` to `new_db`.
-    pub fn simulate_s6_rc_atomic_switch(&self, active_services: &[&str], new_target_services: &[&str]) -> Vec<String> {
+    pub fn simulate_s6_rc_atomic_switch(
+        &self,
+        active_services: &[&str],
+        new_target_services: &[&str],
+    ) -> Vec<String> {
         let current_set: BTreeSet<&str> = active_services.iter().copied().collect();
         let target_set: BTreeSet<&str> = new_target_services.iter().copied().collect();
 
@@ -398,10 +425,12 @@ impl SysVinitAdvancementsV63Engine {
                         header.provides = val.split_whitespace().map(|s| s.to_string()).collect();
                     }
                     "Required-Start" => {
-                        header.required_start = val.split_whitespace().map(|s| s.to_string()).collect();
+                        header.required_start =
+                            val.split_whitespace().map(|s| s.to_string()).collect();
                     }
                     "Required-Stop" => {
-                        header.required_stop = val.split_whitespace().map(|s| s.to_string()).collect();
+                        header.required_stop =
+                            val.split_whitespace().map(|s| s.to_string()).collect();
                     }
                     "Default-Start" => {
                         header.default_start = val
@@ -450,7 +479,9 @@ impl SysVinitAdvancementsV63Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV63Manifest {
         CoreUserlandV63Manifest {
             pr_id: 4042,
-            pr_title: "PR #4042: SysVinit V63 /etc/inittab Declarative Parser & Respawn Crash Throttler".to_string(),
+            pr_title:
+                "PR #4042: SysVinit V63 /etc/inittab Declarative Parser & Respawn Crash Throttler"
+                    .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "Linux SysVinit / SysV rc".to_string(),
             components_added: vec![
@@ -589,7 +620,12 @@ impl LaunchdAndroidInitAdvancementsV63Engine {
     }
 
     /// Evaluate launchd `KeepAlive` dictionary rules.
-    pub fn evaluate_keep_alive(&self, spec: &LaunchdKeepAliveSpecV63, last_exit_code: i32, current_network_up: bool) -> bool {
+    pub fn evaluate_keep_alive(
+        &self,
+        spec: &LaunchdKeepAliveSpecV63,
+        last_exit_code: i32,
+        current_network_up: bool,
+    ) -> bool {
         if let Some(expected_success) = spec.successful_exit {
             let was_success = last_exit_code == 0;
             return expected_success == was_success;
@@ -642,8 +678,16 @@ pub enum CronScheduleSpecV63 {
     MacroDaily,
     MacroWeekly,
     MacroMonthly,
-    StepInterval { minutes_step: u8 },
-    Custom { minute: String, hour: String, dom: String, month: String, dow: String },
+    StepInterval {
+        minutes_step: u8,
+    },
+    Custom {
+        minute: String,
+        hour: String,
+        dom: String,
+        month: String,
+        dow: String,
+    },
 }
 
 /// Cron, Anacron, Timers & At Advancements V63 Engine.
@@ -703,9 +747,17 @@ impl CronAnacronTimersAtV63Engine {
         let spec = spec.trim();
         let parts: Vec<&str> = spec.split_whitespace().collect();
         if parts.len() >= 2 {
-            (parts[0].to_string(), parts[1].to_string(), parts.get(2).unwrap_or(&"00").to_string())
+            (
+                parts[0].to_string(),
+                parts[1].to_string(),
+                parts.get(2).unwrap_or(&"00").to_string(),
+            )
         } else {
-            ("*-*-*".to_string(), "00:00:00".to_string(), "00".to_string())
+            (
+                "*-*-*".to_string(),
+                "00:00:00".to_string(),
+                "00".to_string(),
+            )
         }
     }
 
@@ -791,13 +843,18 @@ impl SovereignInitAndSupervisorAdvancementsV63Suite {
             return false;
         }
 
-        let fds = self.systemd_engine.parse_socket_activation_fds(2, "http:https");
+        let fds = self
+            .systemd_engine
+            .parse_socket_activation_fds(2, "http:https");
         if fds.len() != 2 || fds[0].0 != 3 || fds[0].1 != "http" {
             return false;
         }
 
         // 2. Verify OpenRC state transition & depend block
-        if !self.openrc_engine.validate_runlevel_transition(OpenRcRunlevelV63::Boot, OpenRcRunlevelV63::Default) {
+        if !self
+            .openrc_engine
+            .validate_runlevel_transition(OpenRcRunlevelV63::Boot, OpenRcRunlevelV63::Default)
+        {
             return false;
         }
         let depend_script = "depend() {\n  need net localmount\n  provide webserver\n}\n";
@@ -807,11 +864,17 @@ impl SovereignInitAndSupervisorAdvancementsV63Suite {
         }
 
         // 3. Verify runit / s6 exponential backoff with jitter
-        if self.runit_s6_engine.calculate_backoff_with_jitter(3, 1, 30, 42) < 4 {
+        if self
+            .runit_s6_engine
+            .calculate_backoff_with_jitter(3, 1, 30, 42)
+            < 4
+        {
             return false;
         }
 
-        let actions = self.runit_s6_engine.simulate_s6_rc_atomic_switch(&["nginx", "sshd"], &["sshd", "crond"]);
+        let actions = self
+            .runit_s6_engine
+            .simulate_s6_rc_atomic_switch(&["nginx", "sshd"], &["sshd", "crond"]);
         if actions.len() != 2 {
             return false;
         }
@@ -823,7 +886,10 @@ impl SovereignInitAndSupervisorAdvancementsV63Suite {
             return false;
         }
 
-        if let Some((id, rl, action, proc_cmd)) = self.sysvinit_engine.parse_inittab_line("id:3:initdefault:/sbin/init") {
+        if let Some((id, rl, action, proc_cmd)) = self
+            .sysvinit_engine
+            .parse_inittab_line("id:3:initdefault:/sbin/init")
+        {
             if id != "id" || rl != "3" || action != "initdefault" || proc_cmd != "/sbin/init" {
                 return false;
             }
@@ -842,7 +908,9 @@ impl SovereignInitAndSupervisorAdvancementsV63Suite {
         }
 
         // 6. Verify Cron expression parser & at job spool
-        if self.cron_timers_engine.parse_cron_expression("@daily") != Ok(CronScheduleSpecV63::MacroDaily) {
+        if self.cron_timers_engine.parse_cron_expression("@daily")
+            != Ok(CronScheduleSpecV63::MacroDaily)
+        {
             return false;
         }
 
@@ -878,7 +946,8 @@ mod tests {
         assert_eq!(order[0], "syslog.service");
         assert_eq!(order[1], "nginx.service");
 
-        let notify = engine.parse_sd_notify_message("READY=1\nSTATUS=Ready to accept connections\nWATCHDOG=1\n");
+        let notify = engine
+            .parse_sd_notify_message("READY=1\nSTATUS=Ready to accept connections\nWATCHDOG=1\n");
         assert_eq!(notify.get("READY"), Some(&"1".to_string()));
         assert_eq!(notify.get("WATCHDOG"), Some(&"1".to_string()));
 
@@ -894,15 +963,21 @@ mod tests {
     #[test]
     fn test_openrc_v63_engine() {
         let engine = OpenRcAdvancementsV63Engine::new();
-        assert!(engine.validate_runlevel_transition(OpenRcRunlevelV63::SysInit, OpenRcRunlevelV63::Boot));
-        assert!(!engine.validate_runlevel_transition(OpenRcRunlevelV63::SysInit, OpenRcRunlevelV63::Shutdown));
+        assert!(engine
+            .validate_runlevel_transition(OpenRcRunlevelV63::SysInit, OpenRcRunlevelV63::Boot));
+        assert!(!engine
+            .validate_runlevel_transition(OpenRcRunlevelV63::SysInit, OpenRcRunlevelV63::Shutdown));
 
         let script = "depend() {\n  need net localmount\n  provide webserver\n}\n";
         let deps = engine.parse_depend_block(script);
-        assert_eq!(deps.get("need"), Some(&vec!["net".to_string(), "localmount".to_string()]));
+        assert_eq!(
+            deps.get("need"),
+            Some(&vec!["net".to_string(), "localmount".to_string()])
+        );
         assert_eq!(deps.get("provide"), Some(&vec!["webserver".to_string()]));
 
-        let status = engine.format_rc_status("default", &[("sshd", "started"), ("crond", "started")]);
+        let status =
+            engine.format_rc_status("default", &[("sshd", "started"), ("crond", "started")]);
         assert!(status.contains("sshd"));
         assert!(status.contains("started"));
     }
@@ -918,7 +993,10 @@ mod tests {
         assert_eq!(engine.parse_s6_fifo_event('d'), "SERVICE_DOWN");
 
         let actions = engine.simulate_s6_rc_atomic_switch(&["nginx", "sshd"], &["sshd", "crond"]);
-        assert_eq!(actions, vec!["STOP nginx".to_string(), "START crond".to_string()]);
+        assert_eq!(
+            actions,
+            vec!["STOP nginx".to_string(), "START crond".to_string()]
+        );
     }
 
     #[test]
@@ -930,7 +1008,8 @@ mod tests {
         assert_eq!(lsb.required_start, vec!["$remote_fs", "$syslog"]);
         assert_eq!(lsb.default_start, vec![2, 3, 4, 5]);
 
-        let parsed = engine.parse_inittab_line("s0:2345:respawn:/sbin/agetty -L ttyS0 115200 vt100");
+        let parsed =
+            engine.parse_inittab_line("s0:2345:respawn:/sbin/agetty -L ttyS0 115200 vt100");
         assert!(parsed.is_some());
         let (id, rl, action, proc_cmd) = parsed.unwrap();
         assert_eq!(id, "s0");
@@ -980,8 +1059,14 @@ mod tests {
     #[test]
     fn test_cron_timers_at_v63_engine() {
         let engine = CronAnacronTimersAtV63Engine::new();
-        assert_eq!(engine.parse_cron_expression("@reboot"), Ok(CronScheduleSpecV63::MacroReboot));
-        assert_eq!(engine.parse_cron_expression("@daily"), Ok(CronScheduleSpecV63::MacroDaily));
+        assert_eq!(
+            engine.parse_cron_expression("@reboot"),
+            Ok(CronScheduleSpecV63::MacroReboot)
+        );
+        assert_eq!(
+            engine.parse_cron_expression("@daily"),
+            Ok(CronScheduleSpecV63::MacroDaily)
+        );
         assert_eq!(
             engine.parse_cron_expression("*/15 * * * *"),
             Ok(CronScheduleSpecV63::StepInterval { minutes_step: 15 })

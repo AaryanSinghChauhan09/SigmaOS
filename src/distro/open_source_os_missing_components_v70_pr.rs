@@ -105,7 +105,10 @@ impl Linux626SchedExtQuantumNeuralPowerGovernorEngineV70 {
     pub fn calculate_quantum_priority(&self, pid: u32, base_weight: u32, numa_node: u32) -> u64 {
         let core_count = self.quantum_cores.len() as u64;
         let policy_count = self.sched_policies.len() as u64;
-        let seed = format!("pid={};base={};numa={};cores={}", pid, base_weight, numa_node, core_count);
+        let seed = format!(
+            "pid={};base={};numa={};cores={}",
+            pid, base_weight, numa_node, core_count
+        );
         let h = fnv1a_hash(seed.as_bytes());
         let priority = (base_weight as u64) * 1000 + (h % 500) + (policy_count * 10);
         priority
@@ -304,14 +307,15 @@ impl NetBsd124RumpUserlandAudioPciRouterEngineV70 {
     }
 
     /// Dispatch a rump hypercall and convert audio PCM samples to 32-bit float buffers.
-    pub fn route_rump_audio_samples(&self, symbol: &str, raw_samples: &[i16]) -> Result<Vec<f32>, &'static str> {
+    pub fn route_rump_audio_samples(
+        &self,
+        symbol: &str,
+        raw_samples: &[i16],
+    ) -> Result<Vec<f32>, &'static str> {
         if !self.rump_hypercalls.contains_key(symbol) {
             return Err("Hypercall symbol not registered");
         }
-        let float_samples: Vec<f32> = raw_samples
-            .iter()
-            .map(|&s| (s as f32) / 32768.0)
-            .collect();
+        let float_samples: Vec<f32> = raw_samples.iter().map(|&s| (s as f32) / 32768.0).collect();
         Ok(float_samples)
     }
 
@@ -689,28 +693,45 @@ mod tests {
         assert_eq!(suite.linux_sched.estimate_power_consumption_mw(), 150 + 45);
 
         // 2. FreeBSD Capsicum Casper rights verification
-        assert!(suite.freebsd_casper.verify_jail_capability("jail_net_0_v70", "CAP_SOCKET"));
-        assert!(suite.freebsd_casper.validate_vnet_packet_route("jail_net_0_v70", "192.168.1.1", 8080));
+        assert!(suite
+            .freebsd_casper
+            .verify_jail_capability("jail_net_0_v70", "CAP_SOCKET"));
+        assert!(suite.freebsd_casper.validate_vnet_packet_route(
+            "jail_net_0_v70",
+            "192.168.1.1",
+            8080
+        ));
 
         // 3. OpenBSD FineIBT callsites
         assert!(suite.openbsd_fineibt.verify_indirect_callsite(1, 0x1000));
 
         // 4. DragonFly HAMMER2 erasure XOR
-        let parity = suite.dragonfly_hammer2.compute_erasure_parity_block(&[0xAA, 0xFF], &[0x55, 0x00]);
+        let parity = suite
+            .dragonfly_hammer2
+            .compute_erasure_parity_block(&[0xAA, 0xFF], &[0x55, 0x00]);
         assert_eq!(parity, vec![0xFF, 0xFF]);
 
         // 5. NetBSD Rump audio routing
-        let float_samples = suite.netbsd_rump.route_rump_audio_samples("rump_audio_init_v70", &[32767, -32768]).unwrap();
+        let float_samples = suite
+            .netbsd_rump
+            .route_rump_audio_samples("rump_audio_init_v70", &[32767, -32768])
+            .unwrap();
         assert!((float_samples[0] - 0.9999).abs() < 0.01);
 
         // 6. Haiku BFS relational query
-        assert!(suite.haiku_bfs.evaluate_live_query("BEOS:TYPE_V70", "application/x-vnd.be-elfexec"));
+        assert!(suite
+            .haiku_bfs
+            .evaluate_live_query("BEOS:TYPE_V70", "application/x-vnd.be-elfexec"));
 
         // 7. Plan 9 synthetic 9P2000
-        assert!(suite.plan9_9p.process_9p2000_read("/proc/0/status_v70", 0o444));
+        assert!(suite
+            .plan9_9p
+            .process_9p2000_read("/proc/0/status_v70", 0o444));
 
         // 8. Nix/Guix Merkle integrity
-        assert!(suite.nix_guix.verify_store_integrity("/nix/store/pkg_v70", b"package_payload"));
+        assert!(suite
+            .nix_guix
+            .verify_store_integrity("/nix/store/pkg_v70", b"package_payload"));
 
         // 9. Illumos Crossbow switch packet inspection
         let rate = suite.illumos_crossbow.inspect_vnic_packet("vnic0_v70", 128);

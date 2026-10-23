@@ -86,8 +86,11 @@ impl Linux628SchedExtFolioCompactionV70PrEngine {
             subsystem: "Linux BPF sched_ext".to_string(),
             title: "Linux 6.28 BPF SchedExt & Multi-Page Folio Compaction V70".to_string(),
             upstream_target: "kernel/sched/ext.c".to_string(),
-            description: "Implements BPF sched_ext extensible scheduling policy and memory folio compaction.".to_string(),
-            diff_patch: "--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Implements BPF sched_ext extensible scheduling policy and memory folio compaction."
+                    .to_string(),
+            diff_patch: "--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -1,5 +1,10 @@\n"
+                .to_string(),
             status: OsPrStatusV70::Validated,
             parity_score: 99,
         }
@@ -119,8 +122,12 @@ impl FreeBsd158CapsicumCasperNvmeTlsV70PrEngine {
             subsystem: "FreeBSD Capsicum Casper".to_string(),
             title: "FreeBSD 15.8 Capsicum Casper Sandbox & NVMe-over-TLS V70".to_string(),
             upstream_target: "sys/kern/kern_capsicum.c".to_string(),
-            description: "Extends FreeBSD Capsicum process capability sandboxing with Casper daemon RPCs.".to_string(),
-            diff_patch: "--- a/sys/kern/kern_capsicum.c\n+++ b/sys/kern/kern_capsicum.c\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Extends FreeBSD Capsicum process capability sandboxing with Casper daemon RPCs."
+                    .to_string(),
+            diff_patch:
+                "--- a/sys/kern/kern_capsicum.c\n+++ b/sys/kern/kern_capsicum.c\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: OsPrStatusV70::Validated,
             parity_score: 98,
         }
@@ -226,7 +233,10 @@ impl IllumosOpenZfsDtraceEbpfV70PrEngine {
     }
 
     pub fn encrypt_block_aes_gcm(&self, data: &[u8], key: &[u8; 32]) -> Vec<u8> {
-        data.iter().zip(key.iter().cycle()).map(|(b, k)| b ^ k).collect()
+        data.iter()
+            .zip(key.iter().cycle())
+            .map(|(b, k)| b ^ k)
+            .collect()
     }
 
     pub fn translate_dtrace_to_ebpf(&self, probe: &str) -> String {

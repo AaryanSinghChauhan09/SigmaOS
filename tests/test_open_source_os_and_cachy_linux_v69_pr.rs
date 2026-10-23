@@ -7,8 +7,8 @@ mod open_source_os_unimplemented_ideas_v69_pr;
 #[path = "../src/distro/cachy_linux_missing_components_v69_pr.rs"]
 mod cachy_linux_missing_components_v69_pr;
 
-use open_source_os_unimplemented_ideas_v69_pr::*;
 use cachy_linux_missing_components_v69_pr::*;
+use open_source_os_unimplemented_ideas_v69_pr::*;
 
 #[test]
 fn test_open_source_os_v69_pr_suite_full_cycle() {

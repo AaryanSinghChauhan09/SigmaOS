@@ -57,7 +57,13 @@ impl LinuxBcachefsFolioEngineV70 {
         }
     }
 
-    pub fn register_device(&mut self, dev_id: u32, dev_path: &str, tier: StorageDeviceTierV70, capacity_bytes: u64) {
+    pub fn register_device(
+        &mut self,
+        dev_id: u32,
+        dev_path: &str,
+        tier: StorageDeviceTierV70,
+        capacity_bytes: u64,
+    ) {
         self.devices.push(BcachefsDeviceTargetV70 {
             dev_id,
             dev_path: dev_path.to_string(),
@@ -67,7 +73,12 @@ impl LinuxBcachefsFolioEngineV70 {
         });
     }
 
-    pub fn allocate_folio(&mut self, folio_id: u64, order: u8, preferred_tier: StorageDeviceTierV70) -> Option<FolioPageAllocationV70> {
+    pub fn allocate_folio(
+        &mut self,
+        folio_id: u64,
+        order: u8,
+        preferred_tier: StorageDeviceTierV70,
+    ) -> Option<FolioPageAllocationV70> {
         let size_bytes = (1 << order) * 4096;
         for dev in self.devices.iter_mut() {
             if dev.tier == preferred_tier && (dev.capacity_bytes - dev.used_bytes) >= size_bytes {
@@ -154,7 +165,13 @@ impl FreeBsdCapsicumVnetIsolationEngineV70 {
         });
     }
 
-    pub fn attach_vnet_interface(&mut self, jail_id: u32, if_name: &str, ip: &str, mac: &str) -> bool {
+    pub fn attach_vnet_interface(
+        &mut self,
+        jail_id: u32,
+        if_name: &str,
+        ip: &str,
+        mac: &str,
+    ) -> bool {
         if let Some(jail) = self.jails.iter_mut().find(|j| j.jail_id == jail_id) {
             jail.vnet_interfaces.push(VnetInterfaceV70 {
                 if_name: if_name.to_string(),
@@ -166,7 +183,12 @@ impl FreeBsdCapsicumVnetIsolationEngineV70 {
         false
     }
 
-    pub fn delegate_capability(&mut self, jail_id: u32, fd: u32, rights: Vec<CapsicumRightV70>) -> bool {
+    pub fn delegate_capability(
+        &mut self,
+        jail_id: u32,
+        fd: u32,
+        rights: Vec<CapsicumRightV70>,
+    ) -> bool {
         if let Some(jail) = self.jails.iter_mut().find(|j| j.jail_id == jail_id) {
             jail.capabilities.push(CapsicumCapabilityV70 {
                 fd,
@@ -376,7 +398,12 @@ mod tests {
     #[test]
     fn test_bcachefs_engine() {
         let mut engine = LinuxBcachefsFolioEngineV70::new();
-        engine.register_device(1, "/dev/nvme0n1", StorageDeviceTierV70::NvmeCache, 1_000_000);
+        engine.register_device(
+            1,
+            "/dev/nvme0n1",
+            StorageDeviceTierV70::NvmeCache,
+            1_000_000,
+        );
         let folio = engine.allocate_folio(100, 2, StorageDeviceTierV70::NvmeCache);
         assert!(folio.is_some());
         assert_eq!(engine.folios.len(), 1);
@@ -389,7 +416,11 @@ mod tests {
         let mut engine = FreeBsdCapsicumVnetIsolationEngineV70::new();
         engine.create_jail(1, "sandbox_jail");
         assert!(engine.attach_vnet_interface(1, "vnet0", "192.168.1.10", "aa:bb:cc:dd:ee:ff"));
-        assert!(engine.delegate_capability(1, 3, vec![CapsicumRightV70::Read, CapsicumRightV70::Write]));
+        assert!(engine.delegate_capability(
+            1,
+            3,
+            vec![CapsicumRightV70::Read, CapsicumRightV70::Write]
+        ));
         assert!(engine.verify_right(1, 3, CapsicumRightV70::Read));
         assert!(!engine.verify_right(1, 3, CapsicumRightV70::Ioctl));
     }
@@ -408,7 +439,11 @@ mod tests {
     #[test]
     fn test_cas_closure_engine() {
         let mut engine = NixGuixCasClosureLockEngineV70::new();
-        engine.add_derivation("/nix/store/pkg.drv", "sha256-abc", vec!["/nix/store/dep1.drv".to_string()]);
+        engine.add_derivation(
+            "/nix/store/pkg.drv",
+            "sha256-abc",
+            vec!["/nix/store/dep1.drv".to_string()],
+        );
         let lock = engine.create_closure_lock("lock-1", "/nix/store/pkg.drv");
         assert!(lock.is_some());
         assert!(engine.verify_hermetic_closure("lock-1"));

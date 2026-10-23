@@ -209,11 +209,17 @@ impl OpenRcAdvancementsV68Engine {
                 in_degree.entry(target.clone()).or_insert(0);
                 match dep_type {
                     OpenRcDependencyTypeV68::Need | OpenRcDependencyTypeV68::After => {
-                        graph.entry(target.clone()).or_default().push(svc.name.clone());
+                        graph
+                            .entry(target.clone())
+                            .or_default()
+                            .push(svc.name.clone());
                         *in_degree.entry(svc.name.clone()).or_insert(0) += 1;
                     }
                     OpenRcDependencyTypeV68::Before => {
-                        graph.entry(svc.name.clone()).or_default().push(target.clone());
+                        graph
+                            .entry(svc.name.clone())
+                            .or_default()
+                            .push(target.clone());
                         *in_degree.entry(target.clone()).or_insert(0) += 1;
                     }
                     _ => {}
@@ -533,8 +539,14 @@ impl LaunchdAndroidInitAdvancementsV68Engine {
         }
 
         let trigger_body = line[3..].trim();
-        if let Some((prop_k, prop_v)) = trigger_body.strip_prefix("property:").and_then(|s| s.split_once('=')) {
-            Some(("property".to_string(), format!("{}={}", prop_k.trim(), prop_v.trim())))
+        if let Some((prop_k, prop_v)) = trigger_body
+            .strip_prefix("property:")
+            .and_then(|s| s.split_once('='))
+        {
+            Some((
+                "property".to_string(),
+                format!("{}={}", prop_k.trim(), prop_v.trim()),
+            ))
         } else {
             Some(("event".to_string(), trigger_body.to_string()))
         }
@@ -544,7 +556,9 @@ impl LaunchdAndroidInitAdvancementsV68Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV68Manifest {
         CoreUserlandV68Manifest {
             pr_id: 4083,
-            pr_title: "PR #4083: launchd & Android init V68 Plist PathState & init.rc Property Triggers".to_string(),
+            pr_title:
+                "PR #4083: launchd & Android init V68 Plist PathState & init.rc Property Triggers"
+                    .to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "macOS launchd / Android init.rc".to_string(),
             components_added: vec![
@@ -679,7 +693,9 @@ impl SovereignInitAndSupervisorAdvancementsV68Suite {
             cpu_quota_percent: Some(50),
             ..Default::default()
         };
-        let params = self.systemd_engine.build_cgroup_v2_control_parameters(&limits);
+        let params = self
+            .systemd_engine
+            .build_cgroup_v2_control_parameters(&limits);
         if params.get("memory.max") != Some(&"1073741824".to_string()) {
             return false;
         }
@@ -696,7 +712,11 @@ impl SovereignInitAndSupervisorAdvancementsV68Suite {
                 ..Default::default()
             },
         ];
-        if self.openrc_engine.resolve_rc_service_order(&services).is_err() {
+        if self
+            .openrc_engine
+            .resolve_rc_service_order(&services)
+            .is_err()
+        {
             return false;
         }
 
@@ -706,12 +726,17 @@ impl SovereignInitAndSupervisorAdvancementsV68Suite {
             expected_token: "READY".to_string(),
             timeout_ms: 1000,
         };
-        if !self.runit_s6_engine.evaluate_readiness_notification("SERVICE_READY\n", &spec) {
+        if !self
+            .runit_s6_engine
+            .evaluate_readiness_notification("SERVICE_READY\n", &spec)
+        {
             return false;
         }
 
         // 4. Verify SysVinit inittab parsing
-        let parsed = self.sysvinit_engine.parse_inittab_line("id:2345:respawn:/sbin/getty 38400 tty1");
+        let parsed = self
+            .sysvinit_engine
+            .parse_inittab_line("id:2345:respawn:/sbin/getty 38400 tty1");
         if parsed.is_none() || parsed.unwrap().action != SysVinitActionV68::Respawn {
             return false;
         }
@@ -724,7 +749,9 @@ impl SovereignInitAndSupervisorAdvancementsV68Suite {
         }
 
         // 6. Verify Android trigger parsing
-        let trig = self.launchd_android_engine.parse_android_trigger_condition("on property:sys.boot_completed=1");
+        let trig = self
+            .launchd_android_engine
+            .parse_android_trigger_condition("on property:sys.boot_completed=1");
         if trig != Some(("property".to_string(), "sys.boot_completed=1".to_string())) {
             return false;
         }
@@ -734,7 +761,10 @@ impl SovereignInitAndSupervisorAdvancementsV68Suite {
             on_boot_sec: Some(30),
             ..Default::default()
         };
-        if !self.cron_timers_engine.evaluate_timer_readiness(&timer, 100, 0, 135) {
+        if !self
+            .cron_timers_engine
+            .evaluate_timer_readiness(&timer, 100, 0, 135)
+        {
             return false;
         }
 

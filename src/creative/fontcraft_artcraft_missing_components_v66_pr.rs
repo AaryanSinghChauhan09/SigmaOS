@@ -130,8 +130,13 @@ impl FontcraftComplexBidiOpticalKerningPrEngine {
         let mut start_idx = 0;
 
         for (i, ch) in text.chars().enumerate() {
-            let is_rtl_char = (ch >= '\u{0590}' && ch <= '\u{08FF}') || (ch >= '\u{FB1D}' && ch <= '\u{FDFF}');
-            let dir = if is_rtl_char { BidiDirection::RightToLeft } else { BidiDirection::LeftToRight };
+            let is_rtl_char =
+                (ch >= '\u{0590}' && ch <= '\u{08FF}') || (ch >= '\u{FB1D}' && ch <= '\u{FDFF}');
+            let dir = if is_rtl_char {
+                BidiDirection::RightToLeft
+            } else {
+                BidiDirection::LeftToRight
+            };
 
             if spans.is_empty() && current_segment.is_empty() {
                 current_dir = dir;
@@ -163,7 +168,11 @@ impl FontcraftComplexBidiOpticalKerningPrEngine {
         spans
     }
 
-    pub fn compute_optical_kerning_distance(&self, left_contour_area: f32, right_contour_area: f32) -> f32 {
+    pub fn compute_optical_kerning_distance(
+        &self,
+        left_contour_area: f32,
+        right_contour_area: f32,
+    ) -> f32 {
         let area_delta = (left_contour_area - right_contour_area).abs();
         -0.05 * area_delta * self.optical_kerning_sensitivity
     }
@@ -214,15 +223,27 @@ impl FontcraftVariableFontAnimatableMotionPrEngine {
     pub fn new() -> Self {
         Self {
             keyframes: vec![
-                AxisKeyframe { time_t: 0.0, axis_tag: String::from("wght"), value: 100.0 },
-                AxisKeyframe { time_t: 1.0, axis_tag: String::from("wght"), value: 900.0 },
+                AxisKeyframe {
+                    time_t: 0.0,
+                    axis_tag: String::from("wght"),
+                    value: 100.0,
+                },
+                AxisKeyframe {
+                    time_t: 1.0,
+                    axis_tag: String::from("wght"),
+                    value: 900.0,
+                },
             ],
         }
     }
 
     pub fn evaluate_interpolated_axis(&self, axis_tag: &str, progress: f32) -> f32 {
         let clamped = progress.clamp(0.0, 1.0);
-        let matching: Vec<&AxisKeyframe> = self.keyframes.iter().filter(|k| k.axis_tag == axis_tag).collect();
+        let matching: Vec<&AxisKeyframe> = self
+            .keyframes
+            .iter()
+            .filter(|k| k.axis_tag == axis_tag)
+            .collect();
         if matching.len() < 2 {
             return 400.0; // Default regular weight fallback
         }
@@ -235,7 +256,8 @@ impl FontcraftVariableFontAnimatableMotionPrEngine {
     pub fn generate_pr_manifest(&self) -> FontcraftV66PrProposalManifest {
         FontcraftV66PrProposalManifest {
             pr_id: 6603,
-            pr_title: "feat(fontcraft): Implement Variable Font Axis Keyframe Motion Interpolator".to_string(),
+            pr_title: "feat(fontcraft): Implement Variable Font Axis Keyframe Motion Interpolator"
+                .to_string(),
             target_subsystem: "FontCraft Variable Font Motion Subsystem".to_string(),
             original_suite: "ArtCraft FontCraft Typography Studio".to_string(),
             components_added: vec![
@@ -291,7 +313,11 @@ impl FontcraftSdfGlyphDistanceTransformPrEngine {
                 let cy = (y as f32 / self.grid_res as f32) - 0.5;
                 let r = (cx * cx + cy * cy).sqrt();
 
-                dist_map[idx] = if inside { 0.5 + r * 0.5 } else { (0.5 - r * 0.5).max(0.0) };
+                dist_map[idx] = if inside {
+                    0.5 + r * 0.5
+                } else {
+                    (0.5 - r * 0.5).max(0.0)
+                };
             }
         }
 
@@ -346,10 +372,15 @@ pub struct FontcraftOpenTypeCff2VectorOutlinePrEngine {
 
 impl FontcraftOpenTypeCff2VectorOutlinePrEngine {
     pub fn new() -> Self {
-        Self { call_stack: Vec::new() }
+        Self {
+            call_stack: Vec::new(),
+        }
     }
 
-    pub fn execute_charstring_opcodes(&mut self, opcodes: &[Cff2Opcode]) -> Result<usize, &'static str> {
+    pub fn execute_charstring_opcodes(
+        &mut self,
+        opcodes: &[Cff2Opcode],
+    ) -> Result<usize, &'static str> {
         let mut count = 0;
         for op in opcodes {
             match op {
@@ -369,7 +400,13 @@ impl FontcraftOpenTypeCff2VectorOutlinePrEngine {
         Ok(count)
     }
 
-    pub fn cubic_to_quadratic_bezier(&self, p0: (f32, f32), p1: (f32, f32), p2: (f32, f32), p3: (f32, f32)) -> ((f32, f32), (f32, f32), (f32, f32)) {
+    pub fn cubic_to_quadratic_bezier(
+        &self,
+        p0: (f32, f32),
+        p1: (f32, f32),
+        p2: (f32, f32),
+        p3: (f32, f32),
+    ) -> ((f32, f32), (f32, f32), (f32, f32)) {
         let control_x = (3.0 * (p1.0 + p2.0) - (p0.0 + p3.0)) / 4.0;
         let control_y = (3.0 * (p1.1 + p2.1) - (p0.1 + p3.1)) / 4.0;
         (p0, (control_x, control_y), p3)
@@ -435,9 +472,12 @@ impl FontcraftSubpixelColorSubsamplingPrEngine {
             let curr = rgb_line[i];
             let next = rgb_line[i + 1];
 
-            let filtered_r = (prev.0 as f32 * 0.25 + curr.0 as f32 * 0.5 + next.0 as f32 * 0.25) as u8;
-            let filtered_g = (prev.1 as f32 * 0.25 + curr.1 as f32 * 0.5 + next.1 as f32 * 0.25) as u8;
-            let filtered_b = (prev.2 as f32 * 0.25 + curr.2 as f32 * 0.5 + next.2 as f32 * 0.25) as u8;
+            let filtered_r =
+                (prev.0 as f32 * 0.25 + curr.0 as f32 * 0.5 + next.0 as f32 * 0.25) as u8;
+            let filtered_g =
+                (prev.1 as f32 * 0.25 + curr.1 as f32 * 0.5 + next.1 as f32 * 0.25) as u8;
+            let filtered_b =
+                (prev.2 as f32 * 0.25 + curr.2 as f32 * 0.5 + next.2 as f32 * 0.25) as u8;
 
             rgb_line[i] = (filtered_r, filtered_g, filtered_b);
         }
@@ -490,9 +530,24 @@ impl FontcraftFontSubsetterSanitizerPrEngine {
     pub fn new() -> Self {
         Self {
             directories: vec![
-                TableDirectoryEntry { tag: String::from("head"), check_sum: 0x12345678, offset: 64, length: 54 },
-                TableDirectoryEntry { tag: String::from("cmap"), check_sum: 0x87654321, offset: 120, length: 200 },
-                TableDirectoryEntry { tag: String::from("glyf"), check_sum: 0x11223344, offset: 320, length: 1024 },
+                TableDirectoryEntry {
+                    tag: String::from("head"),
+                    check_sum: 0x12345678,
+                    offset: 64,
+                    length: 54,
+                },
+                TableDirectoryEntry {
+                    tag: String::from("cmap"),
+                    check_sum: 0x87654321,
+                    offset: 120,
+                    length: 200,
+                },
+                TableDirectoryEntry {
+                    tag: String::from("glyf"),
+                    check_sum: 0x11223344,
+                    offset: 320,
+                    length: 1024,
+                },
             ],
         }
     }
@@ -509,7 +564,9 @@ impl FontcraftFontSubsetterSanitizerPrEngine {
     pub fn generate_pr_manifest(&self) -> FontcraftV66PrProposalManifest {
         FontcraftV66PrProposalManifest {
             pr_id: 6607,
-            pr_title: "feat(fontcraft): Implement OpenType Table Sanitizer & Micro-Font Subsetting Engine".to_string(),
+            pr_title:
+                "feat(fontcraft): Implement OpenType Table Sanitizer & Micro-Font Subsetting Engine"
+                    .to_string(),
             target_subsystem: "FontCraft Font Sanitizer & Subsetter".to_string(),
             original_suite: "ArtCraft FontCraft Typography Studio".to_string(),
             components_added: vec![
@@ -518,7 +575,8 @@ impl FontcraftFontSubsetterSanitizerPrEngine {
                 "CmapTableDirectoryRebuilder".to_string(),
                 "SandboxedFontStructureValidator".to_string(),
             ],
-            performance_multiplier: "10x Smaller Web/Desktop Font Memory Footprint (<0.5ms)".to_string(),
+            performance_multiplier: "10x Smaller Web/Desktop Font Memory Footprint (<0.5ms)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -561,7 +619,11 @@ impl FontcraftVariableFontPaletteThemeCascadePrEngine {
         let dark = PaletteTokenMap {
             palette_id: 1,
             theme_mode: String::from("dark"),
-            colors_rgba: vec![(240, 240, 240, 255), (100, 180, 255, 255), (40, 40, 40, 255)],
+            colors_rgba: vec![
+                (240, 240, 240, 255),
+                (100, 180, 255, 255),
+                (40, 40, 40, 255),
+            ],
         };
 
         theme_palettes.insert(String::from("light"), light);
@@ -571,7 +633,9 @@ impl FontcraftVariableFontPaletteThemeCascadePrEngine {
     }
 
     pub fn resolve_theme_palette(&self, theme_mode: &str) -> Option<Vec<(u8, u8, u8, u8)>> {
-        self.theme_palettes.get(theme_mode).map(|p| p.colors_rgba.clone())
+        self.theme_palettes
+            .get(theme_mode)
+            .map(|p| p.colors_rgba.clone())
     }
 
     pub fn generate_pr_manifest(&self) -> FontcraftV66PrProposalManifest {
@@ -633,7 +697,9 @@ impl SovereignFontcraftArtcraftMissingComponentsV66PrGateway {
         let (rx, rw) = self.hinting_engine.align_stem_to_pixel_grid(10.2, 2.4);
         let hinting_ok = rx > 0.0 && rw >= 1.0;
 
-        let bidi_spans = self.bidi_kerning.reorder_bidi_spans("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
+        let bidi_spans = self
+            .bidi_kerning
+            .reorder_bidi_spans("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
         let bidi_ok = bidi_spans.len() >= 2;
 
         let interpolated_weight = self.motion_animator.evaluate_interpolated_axis("wght", 0.5);
@@ -650,12 +716,22 @@ impl SovereignFontcraftArtcraftMissingComponentsV66PrGateway {
         self.subpixel_filter.apply_subpixel_fringe_filter(&mut line);
         let subpixel_ok = line.len() == 3;
 
-        let sanitize_ok = self.subsetter_sanitizer.sanitize_table_directory(2000).unwrap_or(false);
+        let sanitize_ok = self
+            .subsetter_sanitizer
+            .sanitize_table_directory(2000)
+            .unwrap_or(false);
 
         let dark_palette = self.theme_cascade.resolve_theme_palette("dark");
         let theme_ok = dark_palette.is_some() && dark_palette.unwrap().len() == 3;
 
-        hinting_ok && bidi_ok && motion_ok && sdf_ok && cff2_ok && subpixel_ok && sanitize_ok && theme_ok
+        hinting_ok
+            && bidi_ok
+            && motion_ok
+            && sdf_ok
+            && cff2_ok
+            && subpixel_ok
+            && sanitize_ok
+            && theme_ok
     }
 
     pub fn collect_all_pr_manifests(&self) -> Vec<FontcraftV66PrProposalManifest> {
@@ -672,7 +748,8 @@ impl SovereignFontcraftArtcraftMissingComponentsV66PrGateway {
     }
 
     pub fn export_pr_manifest_markdown(&self) -> String {
-        let mut md = String::from("# FontCraft & Sovereign Typography V66 Advancements PR Manifest\n\n");
+        let mut md =
+            String::from("# FontCraft & Sovereign Typography V66 Advancements PR Manifest\n\n");
         md.push_str("| PR ID | Proposal Title | Target Subsystem | Status |\n");
         md.push_str("|-------|----------------|------------------|--------|\n");
 
@@ -707,7 +784,8 @@ impl FontcraftArtcraftMissingComponentsV66PrSuite {
     }
 
     pub fn verify_complete_v66_parity(&mut self) -> bool {
-        self.gateway.evaluate_v66_fontcraft_parity() && self.gateway.collect_all_pr_manifests().len() == 8
+        self.gateway.evaluate_v66_fontcraft_parity()
+            && self.gateway.collect_all_pr_manifests().len() == 8
     }
 }
 
@@ -736,7 +814,8 @@ mod tests {
     #[test]
     fn test_bidi_reorder_and_optical_kerning() {
         let engine = FontcraftComplexBidiOpticalKerningPrEngine::new();
-        let spans = engine.reorder_bidi_spans("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
+        let spans =
+            engine.reorder_bidi_spans("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
         assert!(spans.len() >= 2);
         let dist = engine.compute_optical_kerning_distance(100.0, 80.0);
         assert!(dist < 0.0);
@@ -764,7 +843,8 @@ mod tests {
         let res = engine.execute_charstring_opcodes(&ops).unwrap();
         assert_eq!(res, 2);
 
-        let (p0, ctrl, p3) = engine.cubic_to_quadratic_bezier((0.0, 0.0), (10.0, 20.0), (30.0, 20.0), (40.0, 0.0));
+        let (p0, ctrl, p3) =
+            engine.cubic_to_quadratic_bezier((0.0, 0.0), (10.0, 20.0), (30.0, 20.0), (40.0, 0.0));
         assert_eq!(p0, (0.0, 0.0));
         assert_eq!(p3, (40.0, 0.0));
         assert!(ctrl.0 > 0.0);

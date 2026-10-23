@@ -56,7 +56,10 @@ pub struct DebianDpkgTriggersDeferredExecutionV70PrEngine {
 impl DebianDpkgTriggersDeferredExecutionV70PrEngine {
     pub fn new() -> Self {
         Self {
-            pending_triggers: vec!["/usr/share/icons".to_string(), "/usr/share/fonts".to_string()],
+            pending_triggers: vec![
+                "/usr/share/icons".to_string(),
+                "/usr/share/fonts".to_string(),
+            ],
             processed_triggers: 0,
         }
     }
@@ -74,7 +77,16 @@ impl DebianDpkgTriggersDeferredExecutionV70PrEngine {
         let triggers = self.pending_triggers.clone();
         self.processed_triggers += self.pending_triggers.len() as u32;
         self.pending_triggers.clear();
-        triggers.into_iter().map(|t| if t.contains("icons") { "hicolor-icon-theme".to_string() } else { "fontconfig".to_string() }).collect()
+        triggers
+            .into_iter()
+            .map(|t| {
+                if t.contains("icons") {
+                    "hicolor-icon-theme".to_string()
+                } else {
+                    "fontconfig".to_string()
+                }
+            })
+            .collect()
     }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV70PrSpec {
@@ -98,7 +110,12 @@ impl DebianSecureAptPqcDilithiumInReleaseV70PrEngine {
         Self
     }
 
-    pub fn verify_inrelease_signature(&self, release_channel: &str, content: &[u8], sig: &str) -> bool {
+    pub fn verify_inrelease_signature(
+        &self,
+        release_channel: &str,
+        content: &[u8],
+        sig: &str,
+    ) -> bool {
         !release_channel.is_empty() && !content.is_empty() && sig.contains("DILITHIUM5")
     }
 
@@ -106,10 +123,15 @@ impl DebianSecureAptPqcDilithiumInReleaseV70PrEngine {
         DebianGithubV70PrSpec {
             pr_id: 7011,
             component_name: "apt-pqc".to_string(),
-            title: "Debian Secure APT PQC Dilithium-5 Keyring & InRelease Verification V70".to_string(),
+            title: "Debian Secure APT PQC Dilithium-5 Keyring & InRelease Verification V70"
+                .to_string(),
             repo_url: "https://github.com/debian/apt".to_string(),
-            description: "Extends APT package manager with post-quantum Dilithium-5 signature verification.".to_string(),
-            diff_patch: "--- a/apt-pkg/contrib/gpgv.cc\n+++ b/apt-pkg/contrib/gpgv.cc\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Extends APT package manager with post-quantum Dilithium-5 signature verification."
+                    .to_string(),
+            diff_patch:
+                "--- a/apt-pkg/contrib/gpgv.cc\n+++ b/apt-pkg/contrib/gpgv.cc\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: DebianPrStatusV70::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-APT-PQC-V70".to_string(),
         }
@@ -142,7 +164,9 @@ impl DebianDebconfDatabaseStateV70PrEngine {
             component_name: "debconf".to_string(),
             title: "Debian debconf Multi-Backend Database & Answer Filter V70".to_string(),
             repo_url: "https://github.com/debian/debconf".to_string(),
-            description: "Implements debconf multi-backend database engine and answer priority filters.".to_string(),
+            description:
+                "Implements debconf multi-backend database engine and answer priority filters."
+                    .to_string(),
             diff_patch: "--- a/Debconf/Db.pm\n+++ b/Debconf/Db.pm\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV70::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBCONF-V70".to_string(),
@@ -170,8 +194,12 @@ impl DebianLintianStaticAnalysisV70PrEngine {
             component_name: "lintian".to_string(),
             title: "Debian lintian Static Package Policy Checker Engine V70".to_string(),
             repo_url: "https://github.com/debian/lintian".to_string(),
-            description: "Enforces Debian policy compliance and static package linting rule checks.".to_string(),
-            diff_patch: "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Enforces Debian policy compliance and static package linting rule checks."
+                    .to_string(),
+            diff_patch:
+                "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: DebianPrStatusV70::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-LINTIAN-V70".to_string(),
         }

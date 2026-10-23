@@ -75,7 +75,11 @@ impl DragonFlyHammer2ErasureCodingPrEngine {
         }
     }
 
-    pub fn recover_corrupted_block(&mut self, stripe_id: u64, missing_block_id: u64) -> Option<u64> {
+    pub fn recover_corrupted_block(
+        &mut self,
+        stripe_id: u64,
+        missing_block_id: u64,
+    ) -> Option<u64> {
         if let Some(stripe) = self.stripe_groups.get_mut(&stripe_id) {
             if stripe.data_blocks.contains(&missing_block_id) {
                 let remaining_xor = stripe
@@ -205,7 +209,9 @@ impl DragonFlyVKernelVirtioPciPassPrEngine {
 
     pub fn handle_dma_trap(&mut self, device_id: u32, guest_addr: u64) -> bool {
         if let Some(dev) = self.devices.get_mut(&device_id) {
-            if guest_addr >= dev.dma_mapped_addr && guest_addr < dev.dma_mapped_addr + dev.dma_buffer_len as u64 {
+            if guest_addr >= dev.dma_mapped_addr
+                && guest_addr < dev.dma_mapped_addr + dev.dma_buffer_len as u64
+            {
                 dev.active_transfers += 1;
                 self.trap_log.push((device_id, guest_addr));
                 return true;
@@ -351,12 +357,15 @@ impl DragonFlySwapcacheMetadataTierPrEngine {
             100
         };
 
-        let entry = self.hot_index.entry(inode).or_insert(SwapcacheHotMetaEntry {
-            inode,
-            compression_ratio: ratio,
-            access_frequency: 0,
-            is_hot: false,
-        });
+        let entry = self
+            .hot_index
+            .entry(inode)
+            .or_insert(SwapcacheHotMetaEntry {
+                inode,
+                compression_ratio: ratio,
+                access_frequency: 0,
+                is_hot: false,
+            });
 
         entry.access_frequency += 1;
         if entry.access_frequency >= self.hot_threshold {
@@ -460,7 +469,8 @@ impl DragonFlyDevctlRulesEnginePrEngine {
     pub fn match_and_apply_device(&mut self, dev_name: &str) -> Option<u32> {
         for rule in &self.rules {
             if dev_name.contains(&rule.device_pattern) {
-                self.managed_devices.insert(dev_name.to_string(), rule.max_power_milliwatts);
+                self.managed_devices
+                    .insert(dev_name.to_string(), rule.max_power_milliwatts);
                 return Some(rule.max_power_milliwatts);
             }
         }
@@ -598,7 +608,9 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "XOR parity stripe reconstruction and corrupted extent recovery."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn recover_corrupted_block()".to_string(),
+            unified_diff:
+                "--- a/fs/hammer2.rs\n+++ b/fs/hammer2.rs\n+ pub fn recover_corrupted_block()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -608,7 +620,8 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "LWKT cross-CPU load balancing, thread migration, and priority boost."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn migrate_thread()".to_string(),
+            unified_diff: "--- a/kernel/lwkt.rs\n+++ b/kernel/lwkt.rs\n+ pub fn migrate_thread()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -618,7 +631,9 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "VirtIO PCI device assignment and guest DMA range trap interception."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn handle_dma_trap()".to_string(),
+            unified_diff:
+                "--- a/virt/vkernel.rs\n+++ b/virt/vkernel.rs\n+ pub fn handle_dma_trap()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -628,7 +643,9 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Ed25519 signing and verification of dports package repository metadata."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn verify_package_signature()".to_string(),
+            unified_diff:
+                "--- a/pkg/dsynth.rs\n+++ b/pkg/dsynth.rs\n+ pub fn verify_package_signature()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -638,7 +655,9 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Hierarchical parent-child scope inheritance and variable substitution."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn set_child_override()".to_string(),
+            unified_diff:
+                "--- a/vfs/varsyms.rs\n+++ b/vfs/varsyms.rs\n+ pub fn set_child_override()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -648,7 +667,9 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Hot-metadata identification and dynamic ratio tracking for SSD cache."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/storage/swapcache.rs\n+++ b/storage/swapcache.rs\n+ pub fn is_inode_hot()".to_string(),
+            unified_diff:
+                "--- a/storage/swapcache.rs\n+++ b/storage/swapcache.rs\n+ pub fn is_inode_hot()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -658,7 +679,8 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Radix-hash lockless per-CPU namecache lookup and inode mapping."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/namecache.rs\n+++ b/vfs/namecache.rs\n+ pub fn compute_hash()".to_string(),
+            unified_diff: "--- a/vfs/namecache.rs\n+++ b/vfs/namecache.rs\n+ pub fn compute_hash()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -668,7 +690,9 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Power limit rules and auto-suspend policy matcher for hotplug devices."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/dev/devctl.rs\n+++ b/dev/devctl.rs\n+ pub fn match_and_apply_device()".to_string(),
+            unified_diff:
+                "--- a/dev/devctl.rs\n+++ b/dev/devctl.rs\n+ pub fn match_and_apply_device()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -678,7 +702,8 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Overlay quota enforcement and isolate mount limits for firmlinks."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/firmlink.rs\n+++ b/vfs/firmlink.rs\n+ pub fn write_data()".to_string(),
+            unified_diff: "--- a/vfs/firmlink.rs\n+++ b/vfs/firmlink.rs\n+ pub fn write_data()"
+                .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -688,7 +713,8 @@ impl DragonFlyBsdMissingComponentsV63PrSuite {
             description: "Per-CPU TSC drift offset compensation and IPI time sync protocol."
                 .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/smp.rs\n+++ b/kernel/smp.rs\n+ pub fn get_adjusted_tsc()".to_string(),
+            unified_diff: "--- a/kernel/smp.rs\n+++ b/kernel/smp.rs\n+ pub fn get_adjusted_tsc()"
+                .to_string(),
         });
 
         prs

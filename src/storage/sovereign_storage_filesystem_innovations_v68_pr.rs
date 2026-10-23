@@ -173,7 +173,12 @@ impl XfsAdvancementsV68Engine {
         None
     }
 
-    pub fn reflink_share_extent(&mut self, _src_extent: u64, _dst_extent: u64, _blocks: u32) -> bool {
+    pub fn reflink_share_extent(
+        &mut self,
+        _src_extent: u64,
+        _dst_extent: u64,
+        _blocks: u32,
+    ) -> bool {
         self.reflink_shared_extents += 1;
         self.rmap_tree_nodes += 1;
         true
@@ -227,8 +232,17 @@ impl BtrfsAdvancementsV68Engine {
         id
     }
 
-    pub fn snapshot_subvolume(&mut self, source_id: u64, snapshot_name: &str, readonly: bool) -> Option<u64> {
-        let parent = self.subvolumes.iter().find(|s| s.subvol_id == source_id)?.clone();
+    pub fn snapshot_subvolume(
+        &mut self,
+        source_id: u64,
+        snapshot_name: &str,
+        readonly: bool,
+    ) -> Option<u64> {
+        let parent = self
+            .subvolumes
+            .iter()
+            .find(|s| s.subvol_id == source_id)?
+            .clone();
         let id = self.next_subvol_id;
         self.next_subvol_id += 1;
         self.subvolumes.push(BtrfsV68Subvolume {
@@ -411,7 +425,11 @@ impl F2fsAdvancementsV68Engine {
     }
 
     pub fn invalidate_block(&mut self, segment_num: u32) {
-        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_num == segment_num) {
+        if let Some(seg) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.segment_num == segment_num)
+        {
             if seg.valid_blocks > 0 {
                 seg.valid_blocks -= 1;
             }
@@ -742,8 +760,14 @@ impl SovereignStorageAndFilesystemParityV68Gateway {
         md.push_str("\n## PR Details\n\n");
         for p in &proposals {
             md.push_str(&format!("### PR #{}: {}\n", p.pr_id, p.title));
-            md.push_str(&format!("- **Inspiration**: {}\n", p.inspiration_sources.join(", ")));
-            md.push_str(&format!("- **Components**: {}\n", p.components_implemented.join(", ")));
+            md.push_str(&format!(
+                "- **Inspiration**: {}\n",
+                p.inspiration_sources.join(", ")
+            ));
+            md.push_str(&format!(
+                "- **Components**: {}\n",
+                p.components_implemented.join(", ")
+            ));
             md.push_str(&format!("- **Summary**: {}\n\n", p.pr_markdown_summary));
         }
         md

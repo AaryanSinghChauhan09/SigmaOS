@@ -187,10 +187,13 @@ impl CraftlibsOpenColorIoColorGradingLutPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 612,
-            pr_title: "feat(craftlibs): OpenColorIO v2 OCIO Color Pipeline & 3D LUT Cube Parser Engine".to_string(),
+            pr_title:
+                "feat(craftlibs): OpenColorIO v2 OCIO Color Pipeline & 3D LUT Cube Parser Engine"
+                    .to_string(),
             target_subsystem: "CraftLibs OCIO Color Grading Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs OpenColorIO Studio".to_string(),
-            artcraft_feature_parity: "OpenColorIO v2 & ACES 1.3 Color Management Parity".to_string(),
+            artcraft_feature_parity: "OpenColorIO v2 & ACES 1.3 Color Management Parity"
+                .to_string(),
             components_added: vec![
                 "OpenColorIO v2 configuration parser and color space graph router".to_string(),
                 "3D LUT .cube file parser with trilinear tetrahedral interpolation".to_string(),
@@ -280,10 +283,13 @@ impl CraftlibsEmbreeBvhRaytracingKernelPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 613,
-            pr_title: "feat(craftlibs): Intel Embree BVH Acceleration Structure & Ray Intersection Kernel".to_string(),
+            pr_title:
+                "feat(craftlibs): Intel Embree BVH Acceleration Structure & Ray Intersection Kernel"
+                    .to_string(),
             target_subsystem: "CraftLibs BVH Raytracing Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs Embree Core".to_string(),
-            artcraft_feature_parity: "Intel Embree BVH8 / SAH Tri-Mesh Ray Intersection Parity".to_string(),
+            artcraft_feature_parity: "Intel Embree BVH8 / SAH Tri-Mesh Ray Intersection Parity"
+                .to_string(),
             components_added: vec![
                 "Surface Area Heuristic (SAH) BVH2 / BVH8 spatial partition builder".to_string(),
                 "SIMD vectorized Möller-Trumbore ray-triangle intersection kernel".to_string(),
@@ -417,10 +423,13 @@ impl CraftlibsOpenVdbVolumetricGridPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 615,
-            pr_title: "feat(craftlibs): DreamWorks OpenVDB Sparse Volumetric Grid & Marching Cubes Mesher".to_string(),
+            pr_title:
+                "feat(craftlibs): DreamWorks OpenVDB Sparse Volumetric Grid & Marching Cubes Mesher"
+                    .to_string(),
             target_subsystem: "CraftLibs Sparse Volumetric Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs OpenVDB Studio".to_string(),
-            artcraft_feature_parity: "DreamWorks OpenVDB Sparse Tree & Level-Set Marching Cubes Parity".to_string(),
+            artcraft_feature_parity:
+                "DreamWorks OpenVDB Sparse Tree & Level-Set Marching Cubes Parity".to_string(),
             components_added: vec![
                 "OpenVDB 5-4-3 hierarchical sparse tree data structure".to_string(),
                 "Level-set smoke/fog/cloud density grid voxel raymarcher".to_string(),
@@ -482,16 +491,20 @@ impl CraftlibsOpenFxPluginHostRouterPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 616,
-            pr_title: "feat(craftlibs): OpenFX v1.4 Visual Effects Plugin Host & Frame Rendering Router".to_string(),
+            pr_title:
+                "feat(craftlibs): OpenFX v1.4 Visual Effects Plugin Host & Frame Rendering Router"
+                    .to_string(),
             target_subsystem: "CraftLibs OFX Plugin Host Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs OpenFX Host Architecture".to_string(),
-            artcraft_feature_parity: "OpenFX v1.4 Plugin Host Architecture & Memory Suite Parity".to_string(),
+            artcraft_feature_parity: "OpenFX v1.4 Plugin Host Architecture & Memory Suite Parity"
+                .to_string(),
             components_added: vec![
                 "OpenFX C API host suite glue and parameter binding engine".to_string(),
                 "Memory-safe sandboxed plugin execution context manager".to_string(),
                 "Multi-threaded GPU/CPU frame render request router".to_string(),
             ],
-            performance_multiplier: "Zero-Overhead Interop with Third-Party OFX Plugins".to_string(),
+            performance_multiplier: "Zero-Overhead Interop with Third-Party OFX Plugins"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -542,10 +555,12 @@ impl CraftlibsRealtimeCrdtCanvasSyncPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 617,
-            pr_title: "feat(craftlibs): Real-Time Lockless CRDT Vector Path Delta Sync Engine".to_string(),
+            pr_title: "feat(craftlibs): Real-Time Lockless CRDT Vector Path Delta Sync Engine"
+                .to_string(),
             target_subsystem: "CraftLibs CRDT Multi-User Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs Collaboration Suite".to_string(),
-            artcraft_feature_parity: "Lockless Vector CRDT Multi-User Operational Synchronization Parity".to_string(),
+            artcraft_feature_parity:
+                "Lockless Vector CRDT Multi-User Operational Synchronization Parity".to_string(),
             components_added: vec![
                 "Conflict-free Replicated Data Type (CRDT) LWW-Element-Graph solver".to_string(),
                 "Delta-state operational path vector compression and merge router".to_string(),
@@ -603,10 +618,13 @@ impl CraftlibsNeuralSuperResolutionUpscalerPrEngine {
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
             pr_id: 618,
-            pr_title: "feat(craftlibs): Neural Network ML 4x Super-Resolution Image & Video Upscaler".to_string(),
+            pr_title:
+                "feat(craftlibs): Neural Network ML 4x Super-Resolution Image & Video Upscaler"
+                    .to_string(),
             target_subsystem: "CraftLibs ML Super-Resolution Subsystem".to_string(),
             original_suite: "ArtCraft CraftLibs Neural ML Studio".to_string(),
-            artcraft_feature_parity: "Neural ML 4x Super-Resolution & Artifact Removal Parity".to_string(),
+            artcraft_feature_parity: "Neural ML 4x Super-Resolution & Artifact Removal Parity"
+                .to_string(),
             components_added: vec![
                 "ESRGAN / Real-CGAN neural network inference engine".to_string(),
                 "Sub-pixel convolutional layer 4x tensor image upscaler".to_string(),
@@ -933,8 +951,7 @@ impl CraftlibsArtcraftParityPrSuite {
     }
 
     pub fn verify_complete_parity(&mut self) -> bool {
-        self.gateway.evaluate_craftlibs_parity()
-            && self.gateway.collect_all_proposals().len() == 10
+        self.gateway.evaluate_craftlibs_parity() && self.gateway.collect_all_proposals().len() == 10
     }
 }
 

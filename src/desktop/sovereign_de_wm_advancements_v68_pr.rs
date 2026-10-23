@@ -99,9 +99,18 @@ pub struct KdePlasmaAdvancementsV68Engine {
 impl KdePlasmaAdvancementsV68Engine {
     pub fn new() -> Self {
         let mut runners = BTreeMap::new();
-        runners.insert(String::from("calculator"), String::from("org.kde.krunner.calculator"));
-        runners.insert(String::from("plasma-desktop"), String::from("org.kde.krunner.desktop"));
-        runners.insert(String::from("services"), String::from("org.kde.krunner.services"));
+        runners.insert(
+            String::from("calculator"),
+            String::from("org.kde.krunner.calculator"),
+        );
+        runners.insert(
+            String::from("plasma-desktop"),
+            String::from("org.kde.krunner.desktop"),
+        );
+        runners.insert(
+            String::from("services"),
+            String::from("org.kde.krunner.services"),
+        );
 
         Self {
             kwin_vrr_adaptive_sync: true,
@@ -119,15 +128,23 @@ impl KdePlasmaAdvancementsV68Engine {
     }
 
     pub fn mount_plasma_vault(&mut self, vault_name: &str) -> Result<String, &'static str> {
-        if self.plasma_vault_encrypted_containers.iter().any(|v| v.contains(vault_name)) {
-            Ok(format!("Plasma Vault '{}' mounted successfully at /media/vault/{}", vault_name, vault_name))
+        if self
+            .plasma_vault_encrypted_containers
+            .iter()
+            .any(|v| v.contains(vault_name))
+        {
+            Ok(format!(
+                "Plasma Vault '{}' mounted successfully at /media/vault/{}",
+                vault_name, vault_name
+            ))
         } else {
             Err("Plasma Vault: Vault container not found")
         }
     }
 
     pub fn register_krunner_runner(&mut self, id: &str, dbus_service: &str) {
-        self.krunner_dbus_runners.insert(id.to_string(), dbus_service.to_string());
+        self.krunner_dbus_runners
+            .insert(id.to_string(), dbus_service.to_string());
     }
 }
 
@@ -395,7 +412,10 @@ impl I3AdvancementsV68Engine {
                 String::from("Split orientation set to vertical")
             }
             "scratchpad show" => {
-                format!("Scratchpad window toggled (stack size: {})", self.scratchpad_stack_count)
+                format!(
+                    "Scratchpad window toggled (stack size: {})",
+                    self.scratchpad_stack_count
+                )
             }
             _ => format!("i3 IPC executed: {}", cmd),
         }
@@ -483,7 +503,10 @@ impl OpenboxAdvancementsV68Engine {
     }
 
     pub fn execute_pipe_menu(&self, script: &str) -> String {
-        format!("<openbox_pipe_menu><item label=\"Output from {}\"/></openbox_pipe_menu>", script)
+        format!(
+            "<openbox_pipe_menu><item label=\"Output from {}\"/></openbox_pipe_menu>",
+            script
+        )
     }
 }
 
@@ -646,23 +669,95 @@ impl SovereignDeWmAdvancementsSuiteV68 {
 
     pub fn audit_all_environments(&self) -> BTreeMap<String, String> {
         let mut audit = BTreeMap::new();
-        audit.insert(String::from("GNOME"), format!("Mutter scanout: {}, Pop Shell: {}", self.gnome.mutter_direct_scanout, self.gnome.pop_shell_tiling_mode));
-        audit.insert(String::from("KDE Plasma"), format!("KWin VRR: {}, Plasma6 HDR: {}", self.kde_plasma.kwin_vrr_adaptive_sync, self.kde_plasma.plasma6_hdr_color_profile));
-        audit.insert(String::from("Xfce"), format!("Xfwm4 Wayland state: {}", self.xfce.xfwm4_wayland_transition_state));
-        audit.insert(String::from("LXQt"), format!("Qt6 Wayland session active: {}", self.lxqt.qt6_wayland_session_active));
-        audit.insert(String::from("LXDE"), format!("LXPanel XML parsed: {}", self.lxde.lxpanel_config_parsed));
-        audit.insert(String::from("MATE"), format!("Marco CSD toggle: {}", self.mate.marco_csd_toggle_enabled));
-        audit.insert(String::from("Cinnamon"), format!("Spices sandbox: {}", self.cinnamon.spices_sandbox_verified));
-        audit.insert(String::from("Budgie"), format!("Raven sidebar open: {}", self.budgie.raven_sidebar_open));
-        audit.insert(String::from("Enlightenment"), format!("EFL Evas physics: {}", self.enlightenment.efl_evas_physics_enabled));
-        audit.insert(String::from("i3"), format!("i3 IPC path: {}", self.i3.i3_ipc_socket_path));
-        audit.insert(String::from("bspwm"), format!("bspwm split ratio: {}", self.bspwm.split_ratio));
-        audit.insert(String::from("dwm"), format!("dwm master factor: {}", self.dwm.master_factor));
-        audit.insert(String::from("Openbox"), format!("Openbox pipe menus: {}", self.openbox.pipe_menu_count));
-        audit.insert(String::from("Fluxbox"), format!("Fluxbox tab grouping: {}", self.fluxbox.tab_grouping_enabled));
-        audit.insert(String::from("awesome"), format!("awesome wibar matrix: {}", self.awesome.wibar_widget_matrix_count));
-        audit.insert(String::from("Hyprland"), format!("Hyprland layout: {}", self.hyprland.wayland_layout_mode));
-        audit.insert(String::from("Sway"), format!("Sway inner gaps: {}", self.sway.wayland_gaps_inner));
+        audit.insert(
+            String::from("GNOME"),
+            format!(
+                "Mutter scanout: {}, Pop Shell: {}",
+                self.gnome.mutter_direct_scanout, self.gnome.pop_shell_tiling_mode
+            ),
+        );
+        audit.insert(
+            String::from("KDE Plasma"),
+            format!(
+                "KWin VRR: {}, Plasma6 HDR: {}",
+                self.kde_plasma.kwin_vrr_adaptive_sync, self.kde_plasma.plasma6_hdr_color_profile
+            ),
+        );
+        audit.insert(
+            String::from("Xfce"),
+            format!(
+                "Xfwm4 Wayland state: {}",
+                self.xfce.xfwm4_wayland_transition_state
+            ),
+        );
+        audit.insert(
+            String::from("LXQt"),
+            format!(
+                "Qt6 Wayland session active: {}",
+                self.lxqt.qt6_wayland_session_active
+            ),
+        );
+        audit.insert(
+            String::from("LXDE"),
+            format!("LXPanel XML parsed: {}", self.lxde.lxpanel_config_parsed),
+        );
+        audit.insert(
+            String::from("MATE"),
+            format!("Marco CSD toggle: {}", self.mate.marco_csd_toggle_enabled),
+        );
+        audit.insert(
+            String::from("Cinnamon"),
+            format!("Spices sandbox: {}", self.cinnamon.spices_sandbox_verified),
+        );
+        audit.insert(
+            String::from("Budgie"),
+            format!("Raven sidebar open: {}", self.budgie.raven_sidebar_open),
+        );
+        audit.insert(
+            String::from("Enlightenment"),
+            format!(
+                "EFL Evas physics: {}",
+                self.enlightenment.efl_evas_physics_enabled
+            ),
+        );
+        audit.insert(
+            String::from("i3"),
+            format!("i3 IPC path: {}", self.i3.i3_ipc_socket_path),
+        );
+        audit.insert(
+            String::from("bspwm"),
+            format!("bspwm split ratio: {}", self.bspwm.split_ratio),
+        );
+        audit.insert(
+            String::from("dwm"),
+            format!("dwm master factor: {}", self.dwm.master_factor),
+        );
+        audit.insert(
+            String::from("Openbox"),
+            format!("Openbox pipe menus: {}", self.openbox.pipe_menu_count),
+        );
+        audit.insert(
+            String::from("Fluxbox"),
+            format!(
+                "Fluxbox tab grouping: {}",
+                self.fluxbox.tab_grouping_enabled
+            ),
+        );
+        audit.insert(
+            String::from("awesome"),
+            format!(
+                "awesome wibar matrix: {}",
+                self.awesome.wibar_widget_matrix_count
+            ),
+        );
+        audit.insert(
+            String::from("Hyprland"),
+            format!("Hyprland layout: {}", self.hyprland.wayland_layout_mode),
+        );
+        audit.insert(
+            String::from("Sway"),
+            format!("Sway inner gaps: {}", self.sway.wayland_gaps_inner),
+        );
         audit
     }
 
@@ -715,13 +810,19 @@ mod tests {
         let res = kde.mount_plasma_vault("PersonalSecrets.cryfs");
         assert!(res.is_ok());
         kde.register_krunner_runner("weather", "org.kde.krunner.weather");
-        assert_eq!(kde.krunner_dbus_runners.get("weather").unwrap(), "org.kde.krunner.weather");
+        assert_eq!(
+            kde.krunner_dbus_runners.get("weather").unwrap(),
+            "org.kde.krunner.weather"
+        );
     }
 
     #[test]
     fn test_xfce_advancements() {
         let xfce = XfceAdvancementsV68Engine::new();
-        assert_eq!(xfce.xfwm4_wayland_transition_state, "WaylandCompositorActive");
+        assert_eq!(
+            xfce.xfwm4_wayland_transition_state,
+            "WaylandCompositorActive"
+        );
         let act = xfce.execute_thunar_action("Open Terminal Here", "/home/user");
         assert!(act.contains("Open Terminal Here"));
     }

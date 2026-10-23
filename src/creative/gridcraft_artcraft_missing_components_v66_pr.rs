@@ -63,16 +63,23 @@ impl GridcraftInCellVectorChartSparklineEngine {
 
     pub fn render_sparkline_svg(&self, spark_type: SparklineType, values: &[f64]) -> String {
         if values.is_empty() {
-            return String::from("<svg width=\"120\" height=\"30\" xmlns=\"http://www.w3.org/2000/svg\"></svg>");
+            return String::from(
+                "<svg width=\"120\" height=\"30\" xmlns=\"http://www.w3.org/2000/svg\"></svg>",
+            );
         }
 
-        let mut svg = String::from("<svg width=\"120\" height=\"30\" xmlns=\"http://www.w3.org/2000/svg\">");
+        let mut svg =
+            String::from("<svg width=\"120\" height=\"30\" xmlns=\"http://www.w3.org/2000/svg\">");
 
         match spark_type {
             SparklineType::Line => {
                 let min_val = values.iter().copied().fold(f64::INFINITY, f64::min);
                 let max_val = values.iter().copied().fold(f64::NEG_INFINITY, f64::max);
-                let range = if (max_val - min_val).abs() < 1e-6 { 1.0 } else { max_val - min_val };
+                let range = if (max_val - min_val).abs() < 1e-6 {
+                    1.0
+                } else {
+                    max_val - min_val
+                };
                 let step_x = 120.0 / ((values.len().max(2) - 1) as f64);
 
                 let mut path = String::from("M");
@@ -81,7 +88,10 @@ impl GridcraftInCellVectorChartSparklineEngine {
                     let y = 28.0 - ((v - min_val) / range) * 26.0;
                     path.push_str(&format!(" {:.1},{:.1}", x, y));
                 }
-                svg.push_str(&format!("<path d=\"{}\" fill=\"none\" stroke=\"#1F4E79\" stroke-width=\"1.5\"/>", path));
+                svg.push_str(&format!(
+                    "<path d=\"{}\" fill=\"none\" stroke=\"#1F4E79\" stroke-width=\"1.5\"/>",
+                    path
+                ));
             }
             SparklineType::Column => {
                 let max_val = values.iter().copied().fold(1.0f64, f64::max);
@@ -119,7 +129,9 @@ impl GridcraftInCellVectorChartSparklineEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV66PrProposalManifest {
         GridcraftV66PrProposalManifest {
             pr_id: 6621,
-            pr_title: String::from("PR #6621: In-Cell Vector Sparklines & Micro-Chart Render Engine"),
+            pr_title: String::from(
+                "PR #6621: In-Cell Vector Sparklines & Micro-Chart Render Engine",
+            ),
             target_subsystem: String::from("GridCraft In-Cell Visualization"),
             original_suite: String::from("ArtCraft GridCraft Micro Visuals"),
             components_added: vec![
@@ -127,7 +139,9 @@ impl GridcraftInCellVectorChartSparklineEngine {
                 String::from("In-Cell Column & Win/Loss Ratio Micro Charts"),
                 String::from("Sub-Pixel Anti-Aliased Vector Path Builder"),
             ],
-            performance_multiplier: String::from("Instant 100,000 In-Cell Sparklines Render (<3ms)"),
+            performance_multiplier: String::from(
+                "Instant 100,000 In-Cell Sparklines Render (<3ms)",
+            ),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -165,7 +179,13 @@ impl GridcraftHierarchicalDataGroupingOutlineEngine {
         Self { groups: Vec::new() }
     }
 
-    pub fn add_group(&mut self, group_type: GroupType, start_idx: usize, end_idx: usize, level: u8) {
+    pub fn add_group(
+        &mut self,
+        group_type: GroupType,
+        start_idx: usize,
+        end_idx: usize,
+        level: u8,
+    ) {
         self.groups.push(OutlineGroup {
             group_type,
             start_idx,
@@ -185,7 +205,11 @@ impl GridcraftHierarchicalDataGroupingOutlineEngine {
 
     pub fn is_index_hidden(&self, group_type: GroupType, idx: usize) -> bool {
         for group in &self.groups {
-            if group.group_type == group_type && group.collapsed && idx >= group.start_idx && idx <= group.end_idx {
+            if group.group_type == group_type
+                && group.collapsed
+                && idx >= group.start_idx
+                && idx <= group.end_idx
+            {
                 return true;
             }
         }
@@ -203,7 +227,9 @@ impl GridcraftHierarchicalDataGroupingOutlineEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV66PrProposalManifest {
         GridcraftV66PrProposalManifest {
             pr_id: 6622,
-            pr_title: String::from("PR #6622: Hierarchical Multi-Level Outline Grouping & Subtotals"),
+            pr_title: String::from(
+                "PR #6622: Hierarchical Multi-Level Outline Grouping & Subtotals",
+            ),
             target_subsystem: String::from("GridCraft Sheet Structuring"),
             original_suite: String::from("ArtCraft GridCraft Outline Engine"),
             components_added: vec![
@@ -239,7 +265,11 @@ impl GridcraftAnomalousDataOutlierDetectionEngine {
         Self
     }
 
-    pub fn detect_outliers_zscore(&self, matrix: &[(u32, u32, f64)], threshold: f64) -> Vec<CellOutlierEntry> {
+    pub fn detect_outliers_zscore(
+        &self,
+        matrix: &[(u32, u32, f64)],
+        threshold: f64,
+    ) -> Vec<CellOutlierEntry> {
         if matrix.is_empty() {
             return Vec::new();
         }
@@ -330,7 +360,9 @@ impl GridcraftHighPerformanceCsvTsvAsyncStreamEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV66PrProposalManifest {
         GridcraftV66PrProposalManifest {
             pr_id: 6624,
-            pr_title: String::from("PR #6624: Chunked Async Streaming CSV/TSV High-Performance Parser"),
+            pr_title: String::from(
+                "PR #6624: Chunked Async Streaming CSV/TSV High-Performance Parser",
+            ),
             target_subsystem: String::from("GridCraft File Ingestion Pipeline"),
             original_suite: String::from("ArtCraft GridCraft Streaming I/O"),
             components_added: vec![
@@ -473,7 +505,9 @@ impl GridcraftMultiSheet3dCellReferenceEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV66PrProposalManifest {
         GridcraftV66PrProposalManifest {
             pr_id: 6626,
-            pr_title: String::from("PR #6626: Multi-Sheet 3D Cell Reference Range Evaluation Engine"),
+            pr_title: String::from(
+                "PR #6626: Multi-Sheet 3D Cell Reference Range Evaluation Engine",
+            ),
             target_subsystem: String::from("GridCraft Cross-Sheet Calculation"),
             original_suite: String::from("ArtCraft GridCraft 3D Formulas"),
             components_added: vec![
@@ -545,7 +579,11 @@ impl GridcraftMultiColumnSortFilterMatrixEngine {
     where
         F: Fn(&[String]) -> bool,
     {
-        matrix.iter().filter(|row| predicate(row)).cloned().collect()
+        matrix
+            .iter()
+            .filter(|row| predicate(row))
+            .cloned()
+            .collect()
     }
 
     pub fn generate_pr_manifest(&self) -> GridcraftV66PrProposalManifest {
@@ -603,15 +641,33 @@ impl GridcraftCellCommentAuditTrailRevisionEngine {
         }
     }
 
-    pub fn add_comment(&mut self, col: u32, row: u32, author: &str, text: &str, timestamp_sec: u64) {
-        self.comments.entry((col, row)).or_default().push(CellComment {
-            author: author.to_string(),
-            comment_text: text.to_string(),
-            timestamp_sec,
-        });
+    pub fn add_comment(
+        &mut self,
+        col: u32,
+        row: u32,
+        author: &str,
+        text: &str,
+        timestamp_sec: u64,
+    ) {
+        self.comments
+            .entry((col, row))
+            .or_default()
+            .push(CellComment {
+                author: author.to_string(),
+                comment_text: text.to_string(),
+                timestamp_sec,
+            });
     }
 
-    pub fn log_edit_revision(&mut self, col: u32, row: u32, old_val: &str, new_val: &str, author_id: u32, timestamp_sec: u64) {
+    pub fn log_edit_revision(
+        &mut self,
+        col: u32,
+        row: u32,
+        old_val: &str,
+        new_val: &str,
+        author_id: u32,
+        timestamp_sec: u64,
+    ) {
         self.audit_trail.push(AuditTrailRecord {
             col,
             row,
@@ -739,7 +795,9 @@ impl GridcraftOpenDocumentOdsSpreadsheetTranspilerEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV66PrProposalManifest {
         GridcraftV66PrProposalManifest {
             pr_id: 6630,
-            pr_title: String::from("PR #6630: OpenDocument ODS Spreadsheet Lossless Transpiler Engine"),
+            pr_title: String::from(
+                "PR #6630: OpenDocument ODS Spreadsheet Lossless Transpiler Engine",
+            ),
             target_subsystem: String::from("GridCraft Open Standards Interop"),
             original_suite: String::from("ArtCraft GridCraft ODS Transpiler"),
             components_added: vec![
@@ -917,8 +975,14 @@ mod tests {
         ];
 
         let criteria = vec![
-            SortCriterion { col_index: 0, direction: SortDirection::Ascending },
-            SortCriterion { col_index: 1, direction: SortDirection::Ascending },
+            SortCriterion {
+                col_index: 0,
+                direction: SortDirection::Ascending,
+            },
+            SortCriterion {
+                col_index: 1,
+                direction: SortDirection::Ascending,
+            },
         ];
         engine.sort_matrix(&mut matrix, &criteria);
 

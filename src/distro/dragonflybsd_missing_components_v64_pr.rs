@@ -117,7 +117,11 @@ impl DragonFlyLwktCpuTopologyTopologyAwareSchedulerV2PrEngine {
     }
 
     pub fn schedule_thread(&mut self, tid: u64, numa_node: u32, latency_critical: bool) -> u32 {
-        let cpus = self.numa_cpu_map.get(&numa_node).cloned().unwrap_or_else(|| vec![0]);
+        let cpus = self
+            .numa_cpu_map
+            .get(&numa_node)
+            .cloned()
+            .unwrap_or_else(|| vec![0]);
         let chosen_cpu = cpus[tid as usize % cpus.len()];
         self.threads.insert(
             tid,
@@ -522,7 +526,9 @@ impl DragonFlyBsdMissingComponentsV64PrSuite {
             target_component: "filesystem/hammer2".to_string(),
             description: "Multi-PFS live transaction snapshot replication and sync.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/fs/hammer2_repl.rs\n+++ b/fs/hammer2_repl.rs\n+ pub fn sync_pfs_replica()".to_string(),
+            unified_diff:
+                "--- a/fs/hammer2_repl.rs\n+++ b/fs/hammer2_repl.rs\n+ pub fn sync_pfs_replica()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -531,7 +537,9 @@ impl DragonFlyBsdMissingComponentsV64PrSuite {
             target_component: "kernel/scheduler/lwkt".to_string(),
             description: "NUMA and topology aware thread placement in LWKT subsystem.".to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/lwkt_topo.rs\n+++ b/kernel/lwkt_topo.rs\n+ pub fn schedule_thread()".to_string(),
+            unified_diff:
+                "--- a/kernel/lwkt_topo.rs\n+++ b/kernel/lwkt_topo.rs\n+ pub fn schedule_thread()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -547,18 +555,24 @@ impl DragonFlyBsdMissingComponentsV64PrSuite {
             pr_id: 6404,
             title: "dsynth Distributed Cluster Package Build Orchestrator Engine V2".to_string(),
             target_component: "package/dsynth".to_string(),
-            description: "Cluster job scheduling and parallel package build dispatching.".to_string(),
+            description: "Cluster job scheduling and parallel package build dispatching."
+                .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/pkg/dsynth_cluster.rs\n+++ b/pkg/dsynth_cluster.rs\n+ pub fn dispatch_jobs()".to_string(),
+            unified_diff:
+                "--- a/pkg/dsynth_cluster.rs\n+++ b/pkg/dsynth_cluster.rs\n+ pub fn dispatch_jobs()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6405,
             title: "VFS Variant Symlinks Jail Environment Isolation Resolver Engine V2".to_string(),
             target_component: "vfs/varsyms".to_string(),
-            description: "Jail-scoped variant symlink string substitution and path resolution.".to_string(),
+            description: "Jail-scoped variant symlink string substitution and path resolution."
+                .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/varsyms_jail.rs\n+++ b/vfs/varsyms_jail.rs\n+ pub fn resolve_jail_path()".to_string(),
+            unified_diff:
+                "--- a/vfs/varsyms_jail.rs\n+++ b/vfs/varsyms_jail.rs\n+ pub fn resolve_jail_path()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
@@ -592,18 +606,24 @@ impl DragonFlyBsdMissingComponentsV64PrSuite {
             pr_id: 6409,
             title: "Firmlink Mount Namespace Quota Manager Engine V2".to_string(),
             target_component: "vfs/firmlink".to_string(),
-            description: "Mount namespace byte quota allocation and firmlink boundary guard.".to_string(),
+            description: "Mount namespace byte quota allocation and firmlink boundary guard."
+                .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/vfs/firmlink_ns.rs\n+++ b/vfs/firmlink_ns.rs\n+ pub fn allocate_bytes()".to_string(),
+            unified_diff:
+                "--- a/vfs/firmlink_ns.rs\n+++ b/vfs/firmlink_ns.rs\n+ pub fn allocate_bytes()"
+                    .to_string(),
         });
 
         prs.push(DragonFlyComponentPrSpec {
             pr_id: 6410,
             title: "SMP Cross-CPU TSC Drift Compensation & IPI Sync Governor V2".to_string(),
             target_component: "kernel/smp".to_string(),
-            description: "SMP IPI clock sync, drift measurement, and hardware TSC calibration.".to_string(),
+            description: "SMP IPI clock sync, drift measurement, and hardware TSC calibration."
+                .to_string(),
             status: PrProposalStatus::Approved,
-            unified_diff: "--- a/kernel/smp_tsc.rs\n+++ b/kernel/smp_tsc.rs\n+ pub fn calibrate_tsc()".to_string(),
+            unified_diff:
+                "--- a/kernel/smp_tsc.rs\n+++ b/kernel/smp_tsc.rs\n+ pub fn calibrate_tsc()"
+                    .to_string(),
         });
 
         prs
@@ -679,7 +699,10 @@ mod tests {
 
         let mut devctl = DragonFlyDevctlKqueueRulePolicyV2PrEngine::new();
         devctl.register_rule("pci", "pci_driver_x", 100);
-        assert_eq!(devctl.evaluate_hotplug("pci"), Some("pci_driver_x".to_string()));
+        assert_eq!(
+            devctl.evaluate_hotplug("pci"),
+            Some("pci_driver_x".to_string())
+        );
 
         let mut fl = DragonFlyFirmlinkMountNamespaceQuotaV2PrEngine::new();
         fl.init_namespace_quota(1, 1000);

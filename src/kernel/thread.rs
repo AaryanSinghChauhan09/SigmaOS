@@ -692,16 +692,28 @@ mod tests {
 
         let t1 = tm.create_thread(1, "t_timeout", ThreadOwnership::User, stack);
         tm.enqueue_ready(t1).unwrap();
-        tm.find_mut(t1).unwrap().transition_to(ThreadState::Running).unwrap();
-        tm.find_mut(t1).unwrap().block_on(WaitChannelId(99)).unwrap();
+        tm.find_mut(t1)
+            .unwrap()
+            .transition_to(ThreadState::Running)
+            .unwrap();
+        tm.find_mut(t1)
+            .unwrap()
+            .block_on(WaitChannelId(99))
+            .unwrap();
 
         // Timeout on wait channel wakes thread up back to Ready
         assert_eq!(tm.timeout_wait_channel(t1), Ok(true));
         assert_eq!(tm.find(t1).unwrap().state, ThreadState::Ready);
 
         // Deliver signal test
-        tm.find_mut(t1).unwrap().transition_to(ThreadState::Running).unwrap();
-        tm.find_mut(t1).unwrap().block_on(WaitChannelId(100)).unwrap();
+        tm.find_mut(t1)
+            .unwrap()
+            .transition_to(ThreadState::Running)
+            .unwrap();
+        tm.find_mut(t1)
+            .unwrap()
+            .block_on(WaitChannelId(100))
+            .unwrap();
 
         // Deliver unblocked signal 1u64 << 2 (SIGINT)
         assert_eq!(tm.deliver_signal(t1, 1u64 << 2), Ok(true));

@@ -370,12 +370,18 @@ impl SovereignGtkQtToolkitEngine {
         palette.insert("QPalette::WindowText".to_string(), fg.clone());
         palette.insert("QPalette::Base".to_string(), "#181825".to_string());
         palette.insert("QPalette::Text".to_string(), fg);
-        palette.insert("QPalette::Highlight".to_string(), self.accent_color.to_hex());
+        palette.insert(
+            "QPalette::Highlight".to_string(),
+            self.accent_color.to_hex(),
+        );
         palette
     }
 
     pub fn generate_gtk_css(&self) -> String {
-        let mut css = format!("@define-color accent_color {};\n", self.accent_color.to_hex());
+        let mut css = format!(
+            "@define-color accent_color {};\n",
+            self.accent_color.to_hex()
+        );
         for (selector, props) in &self.css_rules {
             css.push_str(&format!("{} {{\n", selector));
             for (key, val) in props {
@@ -658,7 +664,10 @@ impl SovereignDisplayManagerSuiteEngine {
             if trimmed.starts_with("WaylandEnable=") {
                 let val = trimmed.ends_with("true");
                 if val {
-                    if !self.available_sessions.contains(&DesktopSessionType::Wayland) {
+                    if !self
+                        .available_sessions
+                        .contains(&DesktopSessionType::Wayland)
+                    {
                         self.available_sessions.push(DesktopSessionType::Wayland);
                     }
                 }
@@ -688,11 +697,7 @@ impl SovereignDisplayManagerSuiteEngine {
         count
     }
 
-    pub fn register_logind_consolekit2_session(
-        &mut self,
-        user: &str,
-        seat_id: &str,
-    ) -> String {
+    pub fn register_logind_consolekit2_session(&mut self, user: &str, seat_id: &str) -> String {
         let session_id = format!(
             "session-{}",
             NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst)
@@ -1551,7 +1556,10 @@ impl SovereignXdgDesktopPortalEngine {
 
         let mut portal_backends = BTreeMap::new();
         portal_backends.insert("default".to_string(), "gtk;hyprland;gnome;kde".to_string());
-        portal_backends.insert("org.freedesktop.impl.portal.Secret".to_string(), "gnome-keyring".to_string());
+        portal_backends.insert(
+            "org.freedesktop.impl.portal.Secret".to_string(),
+            "gnome-keyring".to_string(),
+        );
 
         Self {
             mime_apps,
@@ -2288,7 +2296,10 @@ impl SovereignDesktopNotificationDaemonEngine {
             timeout_ms,
             sound_event,
             desktop_entry_hint: Some(format!("org.sigmaos.{}", app_name.to_lowercase())),
-            image_path_hint: Some(format!("/usr/share/icons/hicolor/48x48/apps/{}.png", app_name.to_lowercase())),
+            image_path_hint: Some(format!(
+                "/usr/share/icons/hicolor/48x48/apps/{}.png",
+                app_name.to_lowercase()
+            )),
         };
 
         if !self.dnd_mode || urgency == NotificationUrgency::Critical {
@@ -2310,7 +2321,10 @@ impl SovereignDesktopNotificationDaemonEngine {
         {
             self.action_invocations
                 .push((notification_id, action_key.to_string()));
-            self.close_notification_with_reason(notification_id, NotificationCloseReason::DismissedByUser);
+            self.close_notification_with_reason(
+                notification_id,
+                NotificationCloseReason::DismissedByUser,
+            );
             true
         } else {
             false
@@ -2324,7 +2338,11 @@ impl SovereignDesktopNotificationDaemonEngine {
         )
     }
 
-    pub fn close_notification_with_reason(&mut self, id: u32, reason: NotificationCloseReason) -> bool {
+    pub fn close_notification_with_reason(
+        &mut self,
+        id: u32,
+        reason: NotificationCloseReason,
+    ) -> bool {
         if let Some(pos) = self.active_notifications.iter().position(|n| n.id == id) {
             self.active_notifications.remove(pos);
             self.closed_reasons.push((id, reason));
@@ -2462,7 +2480,10 @@ impl SovereignScreenLockerEngine {
     }
 
     pub fn generate_lockscreen_blur_matrix(&self, wallpaper_path: &str, radius: u32) -> String {
-        format!("DualKawaseBlurMatrix[path='{}', radius={}]", wallpaper_path, radius)
+        format!(
+            "DualKawaseBlurMatrix[path='{}', radius={}]",
+            wallpaper_path, radius
+        )
     }
 
     pub fn handle_screen_lock_media_pause(&self) -> Option<String> {
@@ -2510,11 +2531,7 @@ impl SovereignClipboardManagerEngine {
         }
     }
 
-    pub fn copy_image_with_thumbnail(
-        &mut self,
-        png_bytes: &[u8],
-        app_origin: &str,
-    ) -> usize {
+    pub fn copy_image_with_thumbnail(&mut self, png_bytes: &[u8], app_origin: &str) -> usize {
         let id = NEXT_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         let mut mime_map = BTreeMap::new();
         mime_map.insert("image/png".to_string(), png_bytes.to_vec());
@@ -2703,13 +2720,14 @@ impl SovereignDesktopServicesPrGatewayEngine {
 
         self.compatibility_audit_results.clear();
         for (distro, lat) in distros {
-            self.compatibility_audit_results.push(DistroDesktopCompatibilityAudit {
-                distro_name: distro.to_string(),
-                supports_gtk4: true,
-                supports_qt6: true,
-                supports_xdg_portals: true,
-                latency_ms: lat,
-            });
+            self.compatibility_audit_results
+                .push(DistroDesktopCompatibilityAudit {
+                    distro_name: distro.to_string(),
+                    supports_gtk4: true,
+                    supports_qt6: true,
+                    supports_xdg_portals: true,
+                    latency_ms: lat,
+                });
         }
         &self.compatibility_audit_results
     }
@@ -2932,8 +2950,14 @@ mod tests {
         let xdmcp_id = dm.initiate_xdmcp_remote_handshake("192.168.1.50", 1);
         assert!(xdmcp_id > 0);
 
-        assert_eq!(dm.parse_gdm_custom_conf("WaylandEnable=true\nAutomaticLoginEnable=true"), 2);
-        assert_eq!(dm.parse_sddm_conf("Current=breeze\nCursorTheme=breeze_cursors"), 2);
+        assert_eq!(
+            dm.parse_gdm_custom_conf("WaylandEnable=true\nAutomaticLoginEnable=true"),
+            2
+        );
+        assert_eq!(
+            dm.parse_sddm_conf("Current=breeze\nCursorTheme=breeze_cursors"),
+            2
+        );
         let sess_id = dm.register_logind_consolekit2_session("sigma_user", "seat0");
         assert!(sess_id.starts_with("session-"));
     }
@@ -2988,7 +3012,9 @@ mod tests {
         let res_js = polkit.check_authorization("sigma_user", &[], "org.sigmaos.device.drive");
         assert_eq!(res_js, PolkitResult::Yes);
 
-        let xml_count = polkit.parse_policy_xml("<action id=\"org.sigmaos.admin\"><allow_active>auth_admin</allow_active></action>");
+        let xml_count = polkit.parse_policy_xml(
+            "<action id=\"org.sigmaos.admin\"><allow_active>auth_admin</allow_active></action>",
+        );
         assert_eq!(xml_count, 1);
 
         polkit.grant_temporary_auth("sigma_user", "org.sigmaos.admin", 300);
@@ -3031,7 +3057,14 @@ mod tests {
         assert!(commit_msg.contains("commit('Text')"));
 
         let mut notif = SovereignDesktopNotificationDaemonEngine::new();
-        let nid = notif.notify("app", 0, "Summary", "Body", NotificationUrgency::Normal, 5000);
+        let nid = notif.notify(
+            "app",
+            0,
+            "Summary",
+            "Body",
+            NotificationUrgency::Normal,
+            5000,
+        );
         assert!(notif.close_notification_with_reason(nid, NotificationCloseReason::DismissedByUser));
 
         let locker = SovereignScreenLockerEngine::new();
@@ -3064,7 +3097,8 @@ mod tests {
     #[test]
     fn test_advanced_desktop_services_enhancements() {
         let mut engine = SovereignGtkQtToolkitEngine::new();
-        let qss = engine.translate_css_to_qss("background-color: #1e1e2e;\ncolor: #cdd6f4;\ndisplay: flex;");
+        let qss = engine
+            .translate_css_to_qss("background-color: #1e1e2e;\ncolor: #cdd6f4;\ndisplay: flex;");
         assert!(qss.contains("qproperty-backgroundColor:"));
         assert!(qss.contains("QHBoxLayout"));
 
@@ -3078,10 +3112,12 @@ mod tests {
         );
         assert!(engine.generate_high_contrast_css().contains("!important"));
 
-        let extracted_accent = engine.extract_wallpaper_accent_color("/usr/share/backgrounds/sigma.jpg");
+        let extracted_accent =
+            engine.extract_wallpaper_accent_color("/usr/share/backgrounds/sigma.jpg");
         assert!(extracted_accent.to_hex().starts_with("#"));
 
-        let count = engine.parse_dconf_binary_blob(b"/org/gnome/desktop/interface/clock-show-date=true\n");
+        let count =
+            engine.parse_dconf_binary_blob(b"/org/gnome/desktop/interface/clock-show-date=true\n");
         assert_eq!(count, 1);
 
         let mut dm = SovereignDisplayManagerSuiteEngine::new(DisplayManagerBackend::Sddm);

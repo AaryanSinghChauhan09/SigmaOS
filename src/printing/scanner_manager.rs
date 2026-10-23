@@ -519,11 +519,17 @@ impl PrintScanPullRequestGatewayEngine {
             ("Ghostscript PostScript/PDF Engine".to_string(), true),
             ("Poppler PDF Form & Search Subsystem".to_string(), true),
             ("PPD PostScript Compiler Pipeline".to_string(), true),
-            ("ADF Ultrasonic Double-Feed Sensor Interface".to_string(), true),
+            (
+                "ADF Ultrasonic Double-Feed Sensor Interface".to_string(),
+                true,
+            ),
             ("SANE Image Processing & Deskew Pipeline".to_string(), true),
             ("16-bit RGB Gamma Calibration Engine".to_string(), true),
             ("Searchable PDF/A OCR Overlay Generator".to_string(), true),
-            ("PQC Post-Quantum Cryptographic Signatures".to_string(), true),
+            (
+                "PQC Post-Quantum Cryptographic Signatures".to_string(),
+                true,
+            ),
         ]
     }
 
@@ -1179,7 +1185,8 @@ impl SaneScanButtonEventMonitorEngine {
 
     /// Register auto-dispatch action rule for button event
     pub fn register_button_rule(&mut self, event_name: &str, command: &str) {
-        self.event_action_routes.insert(event_name.to_string(), command.to_string());
+        self.event_action_routes
+            .insert(event_name.to_string(), command.to_string());
     }
 
     /// Dispatch push-button hardware trigger event
@@ -1227,7 +1234,11 @@ impl PopplerFormsSearchRenderEngine {
     }
 
     /// Extract layout words with character bounding boxes
-    pub fn extract_words_with_bbox(&self, pdf_bytes: &[u8], page_num: u32) -> Vec<PopplerWordBoundingBox> {
+    pub fn extract_words_with_bbox(
+        &self,
+        pdf_bytes: &[u8],
+        page_num: u32,
+    ) -> Vec<PopplerWordBoundingBox> {
         if pdf_bytes.is_empty() {
             return Vec::new();
         }
@@ -1443,8 +1454,12 @@ impl AdfUltrasonicDoubleFeedEngine {
     }
 
     /// Evaluate ultrasonic signal wave attenuation in dB
-    pub fn evaluate_wave_attenuation(&self, measured_signal_db: f32) -> (bool, AdfDoubleFeedRecoveryPolicy) {
-        let is_double_feed = self.ultrasonic_sensor_enabled && measured_signal_db < self.double_feed_threshold_db;
+    pub fn evaluate_wave_attenuation(
+        &self,
+        measured_signal_db: f32,
+    ) -> (bool, AdfDoubleFeedRecoveryPolicy) {
+        let is_double_feed =
+            self.ultrasonic_sensor_enabled && measured_signal_db < self.double_feed_threshold_db;
         (is_double_feed, self.recovery_policy)
     }
 }
@@ -1475,7 +1490,11 @@ impl SaneHardwareLockDeviceBridgeEngine {
     }
 
     /// Acquire exclusive hardware lock on scanner device
-    pub fn acquire_hardware_lock(&mut self, device_name: &str, client_id: &str) -> Result<bool, String> {
+    pub fn acquire_hardware_lock(
+        &mut self,
+        device_name: &str,
+        client_id: &str,
+    ) -> Result<bool, String> {
         if let Some(existing_owner) = self.active_device_locks.get(device_name) {
             if existing_owner == client_id {
                 Ok(true)
@@ -1493,7 +1512,11 @@ impl SaneHardwareLockDeviceBridgeEngine {
     }
 
     /// Release hardware lock on scanner device
-    pub fn release_hardware_lock(&mut self, device_name: &str, client_id: &str) -> Result<bool, String> {
+    pub fn release_hardware_lock(
+        &mut self,
+        device_name: &str,
+        client_id: &str,
+    ) -> Result<bool, String> {
         if let Some(existing_owner) = self.active_device_locks.get(device_name) {
             if existing_owner == client_id {
                 self.active_device_locks.remove(device_name);
@@ -1553,7 +1576,12 @@ impl SaneUsbIpRemoteScannerBridgeEngine {
         }
 
         let mut response = Vec::from(
-            format!("%%USBIP-URB-RESP ep={:#x} len={}\n", endpoint, payload.len()).as_bytes(),
+            format!(
+                "%%USBIP-URB-RESP ep={:#x} len={}\n",
+                endpoint,
+                payload.len()
+            )
+            .as_bytes(),
         );
         response.extend_from_slice(payload);
         Ok(response)
@@ -1939,7 +1967,11 @@ impl SaneNetSessionGovernorEngine {
     pub fn new(timeout_secs: u64) -> Self {
         Self {
             active_sessions: HashMap::new(),
-            allowed_subnets: vec!["127.0.0.1/32".to_string(), "192.168.0.0/16".to_string(), "10.0.0.0/8".to_string()],
+            allowed_subnets: vec![
+                "127.0.0.1/32".to_string(),
+                "192.168.0.0/16".to_string(),
+                "10.0.0.0/8".to_string(),
+            ],
             session_timeout_secs: timeout_secs,
             compression_enabled: true,
         }
@@ -1964,10 +1996,15 @@ impl SaneNetSessionGovernorEngine {
     /// Start a SANE network session for an authorized client.
     pub fn start_session(&mut self, session_id: &str, client_ip: &str) -> Result<String, String> {
         if !self.is_client_authorized(client_ip) {
-            return Err(format!("Client IP '{}' denied by SANED ACL policy", client_ip));
+            return Err(format!(
+                "Client IP '{}' denied by SANED ACL policy",
+                client_ip
+            ));
         }
-        self.active_sessions.insert(session_id.to_string(), client_ip.to_string());
-        Ok(format!("SANED-SESSION-OPEN: ID='{}', IP='{}', Timeout={}s, Compression={}",
+        self.active_sessions
+            .insert(session_id.to_string(), client_ip.to_string());
+        Ok(format!(
+            "SANED-SESSION-OPEN: ID='{}', IP='{}', Timeout={}s, Compression={}",
             session_id, client_ip, self.session_timeout_secs, self.compression_enabled
         ))
     }
@@ -2018,7 +2055,11 @@ impl AirScanMultiFormatOutputEngine {
     }
 
     /// Transcode raw scan raster into selected target format payload.
-    pub fn transcode_raster_payload(&self, raw_raster: &[u8], page_number: u32) -> Result<Vec<u8>, String> {
+    pub fn transcode_raster_payload(
+        &self,
+        raw_raster: &[u8],
+        page_number: u32,
+    ) -> Result<Vec<u8>, String> {
         if raw_raster.is_empty() {
             return Err("Empty raw raster payload provided for transcoding".to_string());
         }
@@ -2042,7 +2083,10 @@ impl AirScanMultiFormatOutputEngine {
                 output.extend_from_slice(raw_raster);
             }
             other => {
-                return Err(format!("Unsupported AirScan target transcode format '{}'", other));
+                return Err(format!(
+                    "Unsupported AirScan target transcode format '{}'",
+                    other
+                ));
             }
         }
         Ok(output)
@@ -2085,14 +2129,28 @@ impl SaneDeskewAutoCropPipelineEngine {
         }
     }
 
-    pub fn auto_crop_margins(&self, _raster_data: &[u8], width: u32, height: u32) -> (u32, u32, u32, u32) {
+    pub fn auto_crop_margins(
+        &self,
+        _raster_data: &[u8],
+        width: u32,
+        height: u32,
+    ) -> (u32, u32, u32, u32) {
         // Returns (cropped_x, cropped_y, cropped_width, cropped_height)
         let margin_x = width / 20;
         let margin_y = height / 20;
-        (margin_x, margin_y, width - (2 * margin_x), height - (2 * margin_y))
+        (
+            margin_x,
+            margin_y,
+            width - (2 * margin_x),
+            height - (2 * margin_y),
+        )
     }
 
-    pub fn detect_and_strip_blank_page(&self, raster_pixels: &[u8], luminance_threshold: u8) -> bool {
+    pub fn detect_and_strip_blank_page(
+        &self,
+        raster_pixels: &[u8],
+        luminance_threshold: u8,
+    ) -> bool {
         if raster_pixels.is_empty() {
             return true;
         }
@@ -2126,10 +2184,16 @@ impl AirScanWsdCapabilityParserEngine {
         caps.insert("DeviceName".to_string(), self.device_name.clone());
 
         if xml_payload.contains("<wscn:Color") {
-            caps.insert("ColorMode".to_string(), "RGB24,Grayscale8,Binary1".to_string());
+            caps.insert(
+                "ColorMode".to_string(),
+                "RGB24,Grayscale8,Binary1".to_string(),
+            );
         }
         if xml_payload.contains("<wscn:DocumentSizeOptions") {
-            caps.insert("DocumentSizes".to_string(), "A4,Letter,Legal,A5,B5".to_string());
+            caps.insert(
+                "DocumentSizes".to_string(),
+                "A4,Letter,Legal,A5,B5".to_string(),
+            );
         }
         if let Some(start) = xml_payload.find("<wscn:SupportedResolutions>") {
             let rest = &xml_payload[start + "<wscn:SupportedResolutions>".len()..];
@@ -2138,7 +2202,10 @@ impl AirScanWsdCapabilityParserEngine {
                 caps.insert("SupportedResolutionsDpi".to_string(), res_vals.to_string());
             }
         } else if xml_payload.contains("<wscn:SupportedResolutions") {
-            caps.insert("SupportedResolutionsDpi".to_string(), "150,200,300,600,1200".to_string());
+            caps.insert(
+                "SupportedResolutionsDpi".to_string(),
+                "150,200,300,600,1200".to_string(),
+            );
         }
 
         caps
@@ -2147,7 +2214,9 @@ impl AirScanWsdCapabilityParserEngine {
     pub fn validate_supported_resolution(&self, dpi: u32, xml_payload: &str) -> bool {
         let caps = self.parse_ws_scan_capabilities_xml(xml_payload);
         if let Some(res_str) = caps.get("SupportedResolutionsDpi") {
-            res_str.split(',').any(|s| s.trim().parse::<u32>().ok() == Some(dpi))
+            res_str
+                .split(',')
+                .any(|s| s.trim().parse::<u32>().ok() == Some(dpi))
         } else {
             false
         }
@@ -2212,10 +2281,16 @@ impl DriverlessScanOcrPdfGeneratorEngine {
         }
     }
 
-    pub fn generate_searchable_pdf_a(&self, page_rasters: &[Vec<u8>], ocr_text_layers: &[&str]) -> Vec<u8> {
+    pub fn generate_searchable_pdf_a(
+        &self,
+        page_rasters: &[Vec<u8>],
+        ocr_text_layers: &[&str],
+    ) -> Vec<u8> {
         let mut pdf_data = Vec::new();
         pdf_data.extend_from_slice(b"%PDF-1.7\n%^\xa1\xb3\xc5\xd7\n");
-        pdf_data.extend_from_slice(format!("%%PDF/A Standard: {}\n", self.compliance_standard).as_bytes());
+        pdf_data.extend_from_slice(
+            format!("%%PDF/A Standard: {}\n", self.compliance_standard).as_bytes(),
+        );
 
         for (idx, raster) in page_rasters.iter().enumerate() {
             pdf_data.extend_from_slice(format!("%%PAGE-OBJECT-{}", idx + 1).as_bytes());
@@ -2574,12 +2649,18 @@ mod tests {
     #[test]
     fn test_sane_hardware_lock_device_bridge_engine() {
         let mut lock_engine = SaneHardwareLockDeviceBridgeEngine::new(30);
-        assert!(lock_engine.acquire_hardware_lock("epson:v39", "client-1").unwrap());
+        assert!(lock_engine
+            .acquire_hardware_lock("epson:v39", "client-1")
+            .unwrap());
         let err = lock_engine.acquire_hardware_lock("epson:v39", "client-2");
         assert!(err.is_err());
 
-        assert!(lock_engine.release_hardware_lock("epson:v39", "client-1").unwrap());
-        assert!(lock_engine.acquire_hardware_lock("epson:v39", "client-2").unwrap());
+        assert!(lock_engine
+            .release_hardware_lock("epson:v39", "client-1")
+            .unwrap());
+        assert!(lock_engine
+            .acquire_hardware_lock("epson:v39", "client-2")
+            .unwrap());
     }
 
     #[test]
@@ -2627,13 +2708,17 @@ mod tests {
         assert!(header_str.contains("Fujitsu-ScanSnap"));
         assert!(header_str.contains("DPI: 600"));
 
-        let payload = engine.transcode_raster_payload(b"RASTER-PIXEL-DATA", 1).unwrap();
+        let payload = engine
+            .transcode_raster_payload(b"RASTER-PIXEL-DATA", 1)
+            .unwrap();
         let payload_str = String::from_utf8_lossy(&payload);
         assert!(payload_str.contains("%PDF-A-2b-Transcoded"));
         assert!(payload_str.contains("RASTER-PIXEL-DATA"));
 
         let tiff_engine = AirScanMultiFormatOutputEngine::new("TIFF", 300, "Epson-Perfection");
-        let tiff_payload = tiff_engine.transcode_raster_payload(b"TIFF-DATA", 1).unwrap();
+        let tiff_payload = tiff_engine
+            .transcode_raster_payload(b"TIFF-DATA", 1)
+            .unwrap();
         assert!(tiff_payload.windows(4).any(|w| w == b"II*\x00"));
     }
 

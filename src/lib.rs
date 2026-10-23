@@ -463,8 +463,7 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, UnifiedPackage,
-    UniversalPackageManager,
+    PackageSource, UnifiedPackage, UniversalPackageManager,
 };
 pub use productivity::{
     Achievement, AchievementType, GamifiedProductivity, Goal, LayoutPreset as TmuxLayoutPreset,
@@ -503,7 +502,6 @@ pub use sigpkg::{
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
 pub use userland::coreutils_pr_gateway::*;
-pub use userland::sovereign_coreutils_and_userland_advancements_v69_pr::*;
 pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::init::*;
@@ -514,6 +512,7 @@ pub use userland::shell::{
     Parser as UserlandShellParser, RedirectSpec, RedirectionEngine, Shell as UserlandShell,
     StreamTarget,
 };
+pub use userland::sovereign_coreutils_and_userland_advancements_v69_pr::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
@@ -630,24 +629,26 @@ pub mod workflow;
 
 pub mod io;
 
+pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;
+pub use crate::distro::omarchy_linux_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v69_pr::*;
 pub use crate::distro::open_source_os_missing_components_v66_pr::*;
 pub use crate::distro::open_source_os_missing_components_v67_pr::*;
-pub use crate::distro::omarchy_linux_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_missing_components_v68_pr::*;
 pub use crate::distro::open_source_os_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_missing_components_v70_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v69_pr::*;
+pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
+pub use crate::distro::open_source_os_unimplemented_ideas_v71_pr::*;
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v70::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
-pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;

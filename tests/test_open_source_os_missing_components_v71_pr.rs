@@ -35,12 +35,16 @@ fn test_open_source_os_missing_components_v71_pr_suite_full_cycle() {
     let pr_001 = &proposals[0];
     assert_eq!(pr_001.pr_id, "PR-V71-001");
     assert!(pr_001.title.contains("Linux 6.26+"));
-    assert!(pr_001.impacted_subsystems.contains(&"KernelScheduling".to_string()));
+    assert!(pr_001
+        .impacted_subsystems
+        .contains(&"KernelScheduling".to_string()));
 
     let pr_002 = &proposals[1];
     assert_eq!(pr_002.pr_id, "PR-V71-002");
     assert!(pr_002.title.contains("FreeBSD 16.0+"));
-    assert!(pr_002.impacted_subsystems.contains(&"SecuritySandboxing".to_string()));
+    assert!(pr_002
+        .impacted_subsystems
+        .contains(&"SecuritySandboxing".to_string()));
 
     let pr_003 = &proposals[2];
     assert_eq!(pr_003.pr_id, "PR-V71-003");
@@ -48,7 +52,9 @@ fn test_open_source_os_missing_components_v71_pr_suite_full_cycle() {
 
     let pr_010 = &proposals[9];
     assert_eq!(pr_010.pr_id, "PR-V71-010");
-    assert!(pr_010.title.contains("Omarchy Linux Dynamic Wallust Theme Reloading"));
+    assert!(pr_010
+        .title
+        .contains("Omarchy Linux Dynamic Wallust Theme Reloading"));
 
     let wiki_doc = suite
         .tech_media

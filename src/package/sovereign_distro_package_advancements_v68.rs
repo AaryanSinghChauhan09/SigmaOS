@@ -350,7 +350,9 @@ impl PackageExecutionStrategyV68 for ApkPackageStrategyV68 {
 
 pub struct UniversalPackageAdapterFactoryV68;
 impl UniversalPackageAdapterFactoryV68 {
-    pub fn create_strategy(fmt: PackageFormat) -> Vec<alloc::boxed::Box<dyn PackageExecutionStrategyV68>> {
+    pub fn create_strategy(
+        fmt: PackageFormat,
+    ) -> Vec<alloc::boxed::Box<dyn PackageExecutionStrategyV68>> {
         match fmt {
             PackageFormat::Deb | PackageFormat::Superdeb => {
                 vec![alloc::boxed::Box::new(DebPackageStrategyV68)]
@@ -412,7 +414,8 @@ pub struct LoggingLifecycleObserverV68 {
 
 impl PackageLifecycleObserverV68 for LoggingLifecycleObserverV68 {
     fn on_package_event(&mut self, event: &str, package_name: &str) {
-        self.events.push(format!("Event [{}]: {}", event, package_name));
+        self.events
+            .push(format!("Event [{}]: {}", event, package_name));
     }
 }
 
@@ -430,9 +433,14 @@ impl UniversalPackageMetadataFlyweightV68 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         map.insert("core", vec!["glibc", "openssl", "zlib", "ca-certificates"]);
-        map.insert("desktop", vec!["wayland", "xorg-server", "pipewire", "fontconfig"]);
+        map.insert(
+            "desktop",
+            vec!["wayland", "xorg-server", "pipewire", "fontconfig"],
+        );
         map.insert("devel", vec!["gcc", "clang", "make", "binutils", "cmake"]);
-        Self { common_dependencies: map }
+        Self {
+            common_dependencies: map,
+        }
     }
 }
 
@@ -463,7 +471,10 @@ impl SovereignPackageFacadeV68 {
 
     pub fn quick_install(&mut self, filename: &str, payload: &[u8]) -> Result<String, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
-        Ok(format!("Facade installed {} ({:?})", manifest.name, manifest.detected_format))
+        Ok(format!(
+            "Facade installed {} ({:?})",
+            manifest.name, manifest.detected_format
+        ))
     }
 }
 
@@ -549,20 +560,24 @@ impl UniversalCrossDistroSatSolverV68 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert("dev-libs/openssl".to_string(), "sovereign-openssl".to_string());
-        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
+        map.insert(
+            "dev-libs/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
+        map.insert(
+            "security/openssl".to_string(),
+            "sovereign-openssl".to_string(),
+        );
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
 
-        let vulns = vec![
-            PackageVulnerabilityReportV68 {
-                advisory_id: "VuXML-2024-001".to_string(),
-                cve_id: "CVE-2024-9999".to_string(),
-                affected_package: "openssl-1.1.1".to_string(),
-                cvss_score: 9,
-            },
-        ];
+        let vulns = vec![PackageVulnerabilityReportV68 {
+            advisory_id: "VuXML-2024-001".to_string(),
+            cve_id: "CVE-2024-9999".to_string(),
+            affected_package: "openssl-1.1.1".to_string(),
+            cvss_score: 9,
+        }];
 
         Self {
             canonical_mapping: map,
@@ -649,7 +664,11 @@ impl UniversalCasDeltaStoreGovernorV68 {
         }
     }
 
-    pub fn apply_delta_patch(&mut self, base_hash: &str, delta_hash: &str) -> Result<CasDeltaRecordV68, String> {
+    pub fn apply_delta_patch(
+        &mut self,
+        base_hash: &str,
+        delta_hash: &str,
+    ) -> Result<CasDeltaRecordV68, String> {
         let rec = CasDeltaRecordV68 {
             base_chunk_hash: base_hash.to_string(),
             delta_patch_hash: delta_hash.to_string(),
@@ -687,7 +706,9 @@ pub struct UniversalBootEnvSnapshotGovernorV68 {
 
 impl UniversalBootEnvSnapshotGovernorV68 {
     pub fn new() -> Self {
-        Self { snapshots: Vec::new() }
+        Self {
+            snapshots: Vec::new(),
+        }
     }
 
     pub fn create_snapshot(&mut self, kind: BootEnvKindV68, name: &str) -> usize {
@@ -703,7 +724,10 @@ impl UniversalBootEnvSnapshotGovernorV68 {
 
     pub fn rollback(&self, snapshot_id: usize) -> Result<String, String> {
         if let Some(snap) = self.snapshots.iter().find(|s| s.snapshot_id == snapshot_id) {
-            Ok(format!("Successfully rolled back boot environment to snapshot '{}'", snap.name))
+            Ok(format!(
+                "Successfully rolled back boot environment to snapshot '{}'",
+                snap.name
+            ))
         } else {
             Err(format!("Snapshot ID {} not found", snapshot_id))
         }
@@ -749,12 +773,16 @@ impl UniversalPmCliRouterV68 {
         let dry_run = input_cli.contains("--dry-run");
 
         let parsed_action = match (pm_tool, action) {
-            ("apt", "install") | ("pacman", "-S") | ("dnf", "install") | ("apk", "add") | ("pkg", "install") => {
-                UniversalPmActionV68::Install
-            }
-            ("apt", "remove") | ("pacman", "-R") | ("dnf", "remove") | ("apk", "del") | ("pkg", "delete") => {
-                UniversalPmActionV68::Remove
-            }
+            ("apt", "install")
+            | ("pacman", "-S")
+            | ("dnf", "install")
+            | ("apk", "add")
+            | ("pkg", "install") => UniversalPmActionV68::Install,
+            ("apt", "remove")
+            | ("pacman", "-R")
+            | ("dnf", "remove")
+            | ("apk", "del")
+            | ("pkg", "delete") => UniversalPmActionV68::Remove,
             ("apt", "update") | ("pacman", "-Sy") | ("dnf", "check-update") | ("apk", "update") => {
                 UniversalPmActionV68::Update
             }
@@ -808,10 +836,16 @@ impl SovereignDistroPackageAdvancementsSuiteV68 {
         }
     }
 
-    pub fn process_and_install(&mut self, filename: &str, payload: &[u8]) -> Result<UnifiedPackage, String> {
+    pub fn process_and_install(
+        &mut self,
+        filename: &str,
+        payload: &[u8],
+    ) -> Result<UnifiedPackage, String> {
         let manifest = self.inspector.inspect_package(filename, payload)?;
         let solved_deps = self.sat_solver.solve_dependencies(&manifest.dependencies)?;
-        let _sandbox_rules = self.sandbox_gov.generate_sandbox_rules(manifest.detected_format);
+        let _sandbox_rules = self
+            .sandbox_gov
+            .generate_sandbox_rules(manifest.detected_format);
 
         self.udf_engine.register_hook(UdfExecutionContextV68 {
             hook_type: UdfHookTypeV68::PreInstall,
@@ -819,7 +853,8 @@ impl SovereignDistroPackageAdvancementsSuiteV68 {
             scriptlet_code: "echo PreInstall Hook".to_string(),
             environment_vars: BTreeMap::new(),
         });
-        self.udf_engine.execute_hooks_for_phase(&manifest.name, UdfHookTypeV68::PreInstall)?;
+        self.udf_engine
+            .execute_hooks_for_phase(&manifest.name, UdfHookTypeV68::PreInstall)?;
 
         let unified_name = format!("sigpkg-v68-{}", manifest.name);
         self.installed_packages.push(unified_name.clone());
@@ -845,7 +880,9 @@ mod tests {
     fn test_format_inspection_v68() {
         let mut inspector = UniversalPackageFormatInspectorV68::new();
         let payload = b"V68_MOCK_PAYLOAD_DEB";
-        let manifest = inspector.inspect_package("ripgrep-14.1.0.deb", payload).unwrap();
+        let manifest = inspector
+            .inspect_package("ripgrep-14.1.0.deb", payload)
+            .unwrap();
         assert_eq!(manifest.name, "ripgrep");
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
         assert_eq!(manifest.signature_kind, PackageSignatureKindV68::GpgOpenPgp);

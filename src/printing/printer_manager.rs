@@ -1676,9 +1676,17 @@ impl CupsPolicyAuthorizationEngine {
     }
 
     /// Evaluate user authorization for CUPS operation
-    pub fn authorize_operation(&self, operation: &str, user: &str, is_job_owner: bool, user_groups: &[&str]) -> bool {
+    pub fn authorize_operation(
+        &self,
+        operation: &str,
+        user: &str,
+        is_job_owner: bool,
+        user_groups: &[&str],
+    ) -> bool {
         if let Some(rule) = self.rules.get(operation) {
-            if rule.allowed_users.contains(&user.to_string()) || (rule.allowed_users.contains(&"root".to_string()) && user == "root") {
+            if rule.allowed_users.contains(&user.to_string())
+                || (rule.allowed_users.contains(&"root".to_string()) && user == "root")
+            {
                 return true;
             }
             if is_job_owner && rule.allowed_users.contains(&"@owner".to_string()) {
@@ -1737,17 +1745,22 @@ impl CupsIppBrowsingServerEngine {
 
     /// Register remote IPP broadcast announcement
     pub fn process_browse_announcement(&mut self, announcement: CupsIppRemoteAnnouncement) {
-        self.announced_printers.insert(announcement.printer_name.clone(), announcement);
+        self.announced_printers
+            .insert(announcement.printer_name.clone(), announcement);
     }
 
     /// List active shared printers discovered via IPP browsing
     pub fn list_active_shared_printers(&self) -> Vec<&CupsIppRemoteAnnouncement> {
-        self.announced_printers.values().filter(|p| p.is_shared).collect()
+        self.announced_printers
+            .values()
+            .filter(|p| p.is_shared)
+            .collect()
     }
 
     /// Prune expired browse records based on TTL
     pub fn prune_expired_announcements(&mut self, elapsed_sec: u32) {
-        self.announced_printers.retain(|_, p| p.ttl_seconds > elapsed_sec);
+        self.announced_printers
+            .retain(|_, p| p.ttl_seconds > elapsed_sec);
     }
 }
 
@@ -1799,7 +1812,11 @@ impl CupsPageLogAuditEngine {
             entry.timestamp_sec,
             entry.page_number,
             entry.num_copies,
-            if entry.job_billing.is_empty() { "-" } else { &entry.job_billing },
+            if entry.job_billing.is_empty() {
+                "-"
+            } else {
+                &entry.job_billing
+            },
             entry.originating_host,
             entry.media_size,
             if entry.is_color { "color" } else { "mono" }
@@ -1849,7 +1866,10 @@ impl GhostscriptPdfPostScriptOptimizerEngine {
     }
 
     /// Parse PostScript DSC (Document Structuring Conventions) headers
-    pub fn parse_postscript_dsc_headers(&self, ps_bytes: &[u8]) -> Result<HashMap<String, String>, String> {
+    pub fn parse_postscript_dsc_headers(
+        &self,
+        ps_bytes: &[u8],
+    ) -> Result<HashMap<String, String>, String> {
         if ps_bytes.is_empty() {
             return Err("Empty PostScript payload".to_string());
         }
@@ -1858,7 +1878,10 @@ impl GhostscriptPdfPostScriptOptimizerEngine {
         dsc_headers.insert("BoundingBox".to_string(), "0 0 595 842".to_string());
         dsc_headers.insert("Pages".to_string(), "1".to_string());
         dsc_headers.insert("LanguageLevel".to_string(), "3".to_string());
-        dsc_headers.insert("DocumentMedia".to_string(), "A4 595 842 0 () ()".to_string());
+        dsc_headers.insert(
+            "DocumentMedia".to_string(),
+            "A4 595 842 0 () ()".to_string(),
+        );
 
         Ok(dsc_headers)
     }
@@ -2138,7 +2161,11 @@ impl Cups3IppSystemServiceEngine {
     }
 
     /// Route IPP operation request to target CUPS 3.0 service daemon endpoint
-    pub fn route_ipp_request(&self, operation: &str, target_resource: &str) -> Result<String, String> {
+    pub fn route_ipp_request(
+        &self,
+        operation: &str,
+        target_resource: &str,
+    ) -> Result<String, String> {
         if target_resource.is_empty() {
             return Err("Invalid target resource URI for CUPS 3.0 router".to_string());
         }
@@ -2186,7 +2213,10 @@ impl CupsLocalIppPrinterApplicationProxyEngine {
         let mut attrs = HashMap::new();
         attrs.insert("printer-is-accepting-jobs".to_string(), "true".to_string());
         attrs.insert("color-supported".to_string(), "true".to_string());
-        attrs.insert("pdl-override-supported".to_string(), "attempted".to_string());
+        attrs.insert(
+            "pdl-override-supported".to_string(),
+            "attempted".to_string(),
+        );
 
         Self {
             ppd_legacy_driver: ppd_driver.to_string(),
@@ -2361,7 +2391,10 @@ impl PopplerCmsColorProfileEngine {
 
 impl Default for PopplerCmsColorProfileEngine {
     fn default() -> Self {
-        Self::new("/usr/share/color/icc/sRGB.icc", "/usr/share/color/icc/FOGRA39.icc")
+        Self::new(
+            "/usr/share/color/icc/sRGB.icc",
+            "/usr/share/color/icc/FOGRA39.icc",
+        )
     }
 }
 
@@ -2733,7 +2766,11 @@ impl Cups3SharedMemorySpoolerEngine {
     }
 
     /// Allocate a zero-copy shared memory buffer for a spool job.
-    pub fn allocate_shared_spool_buffer(&mut self, job_id: &str, initial_size: usize) -> Result<String, String> {
+    pub fn allocate_shared_spool_buffer(
+        &mut self,
+        job_id: &str,
+        initial_size: usize,
+    ) -> Result<String, String> {
         if initial_size > self.buffer_capacity_bytes {
             return Err("Requested spool size exceeds buffer capacity limit".to_string());
         }
@@ -2803,7 +2840,10 @@ impl GhostscriptPostscriptFontEmbedderEngine {
 
     /// Register glyph usage for font subsetting.
     pub fn register_glyph_usage(&mut self, font_name: &str, glyph_indices: &[u16]) {
-        let entry = self.font_subsets.entry(font_name.to_string()).or_insert_with(Vec::new);
+        let entry = self
+            .font_subsets
+            .entry(font_name.to_string())
+            .or_insert_with(Vec::new);
         for &glyph in glyph_indices {
             if !entry.contains(&glyph) {
                 entry.push(glyph);
@@ -2813,11 +2853,26 @@ impl GhostscriptPostscriptFontEmbedderEngine {
     }
 
     /// Perform pre-flight font embedding validation on PostScript/PDF input.
-    pub fn audit_font_embedding_preflight(&self, font_name: &str, format: &str) -> Result<String, String> {
-        if !self.supported_formats.iter().any(|f| f.eq_ignore_ascii_case(format)) {
-            return Err(format!("Unsupported font format '{}' for preflight embedding", format));
+    pub fn audit_font_embedding_preflight(
+        &self,
+        font_name: &str,
+        format: &str,
+    ) -> Result<String, String> {
+        if !self
+            .supported_formats
+            .iter()
+            .any(|f| f.eq_ignore_ascii_case(format))
+        {
+            return Err(format!(
+                "Unsupported font format '{}' for preflight embedding",
+                format
+            ));
         }
-        let glyph_count = self.font_subsets.get(font_name).map(|g| g.len()).unwrap_or(0);
+        let glyph_count = self
+            .font_subsets
+            .get(font_name)
+            .map(|g| g.len())
+            .unwrap_or(0);
         Ok(format!(
             "GS-FONT-EMBED-OK: Font='{}', Format='{}', SubsettedGlyphs={}",
             font_name, format, glyph_count
@@ -2826,7 +2881,11 @@ impl GhostscriptPostscriptFontEmbedderEngine {
 
     /// Generate PostScript resource header for embedded font subset.
     pub fn generate_ps_font_resource(&self, font_name: &str) -> String {
-        let glyphs = self.font_subsets.get(font_name).cloned().unwrap_or_default();
+        let glyphs = self
+            .font_subsets
+            .get(font_name)
+            .cloned()
+            .unwrap_or_default();
         format!(
             "%%BeginResource: font {}\n\
              /{} {} dict dup begin\n\
@@ -2835,7 +2894,10 @@ impl GhostscriptPostscriptFontEmbedderEngine {
              /SubSetGlyphCount {} def\n\
              end readonly def\n\
              %%EndResource",
-            font_name, font_name, glyphs.len() + 8, glyphs.len()
+            font_name,
+            font_name,
+            glyphs.len() + 8,
+            glyphs.len()
         )
     }
 }
@@ -2944,7 +3006,10 @@ impl Cups3IppUsbBridgeEngine {
         self.product_id = product_id;
         self.serial_number = serial.to_string();
         self.is_bound = true;
-        self.active_socket_path = format!("/run/ippusb/ipp-usb-{:04x}:{:04x}-{}.sock", vendor_id, product_id, serial);
+        self.active_socket_path = format!(
+            "/run/ippusb/ipp-usb-{:04x}:{:04x}-{}.sock",
+            vendor_id, product_id, serial
+        );
         self.active_socket_path.clone()
     }
 
@@ -2981,16 +3046,29 @@ pub struct CupsFilterV2PipelineEngine {
 
 impl CupsFilterV2PipelineEngine {
     pub fn new() -> Self {
-        let mut engine = Self { filters: Vec::new() };
+        let mut engine = Self {
+            filters: Vec::new(),
+        };
         engine.register_filter("application/pdf", "image/pwg-raster", "pdftoraster", 10);
         engine.register_filter("image/pwg-raster", "image/urf", "rastertopwg", 5);
         engine.register_filter("image/jpeg", "application/pdf", "imagetopdf", 15);
         engine.register_filter("text/plain", "application/pdf", "texttopdf", 20);
-        engine.register_filter("application/pdf", "application/vnd.cups-raster", "pdftoraster", 12);
+        engine.register_filter(
+            "application/pdf",
+            "application/vnd.cups-raster",
+            "pdftoraster",
+            12,
+        );
         engine
     }
 
-    pub fn register_filter(&mut self, input_mime: &str, output_mime: &str, executable: &str, cost: u32) {
+    pub fn register_filter(
+        &mut self,
+        input_mime: &str,
+        output_mime: &str,
+        executable: &str,
+        cost: u32,
+    ) {
         self.filters.push((
             input_mime.to_string(),
             output_mime.to_string(),
@@ -2999,7 +3077,11 @@ impl CupsFilterV2PipelineEngine {
         ));
     }
 
-    pub fn resolve_transformation_chain(&self, src_mime: &str, target_mime: &str) -> Result<Vec<String>, String> {
+    pub fn resolve_transformation_chain(
+        &self,
+        src_mime: &str,
+        target_mime: &str,
+    ) -> Result<Vec<String>, String> {
         if src_mime == target_mime {
             return Ok(Vec::new());
         }
@@ -3022,10 +3104,18 @@ impl CupsFilterV2PipelineEngine {
             }
         }
 
-        Err(format!("CUPS-FILTER-V2: No transformation path from {} to {}", src_mime, target_mime))
+        Err(format!(
+            "CUPS-FILTER-V2: No transformation path from {} to {}",
+            src_mime, target_mime
+        ))
     }
 
-    pub fn execute_chain_transform(&self, src_mime: &str, target_mime: &str, input_bytes: &[u8]) -> Result<Vec<u8>, String> {
+    pub fn execute_chain_transform(
+        &self,
+        src_mime: &str,
+        target_mime: &str,
+        input_bytes: &[u8],
+    ) -> Result<Vec<u8>, String> {
         let chain = self.resolve_transformation_chain(src_mime, target_mime)?;
         let mut current_data = input_bytes.to_vec();
 
@@ -3070,11 +3160,16 @@ impl CupsKerberosGssapiAuthEngine {
 
     pub fn validate_spnego_token(&self, negotiate_header: &str) -> Result<String, String> {
         if !negotiate_header.starts_with("Negotiate ") {
-            return Err("CUPS-KRB5: Header is not a GSSAPI Negotiate authorization header".to_string());
+            return Err(
+                "CUPS-KRB5: Header is not a GSSAPI Negotiate authorization header".to_string(),
+            );
         }
 
         if negotiate_header.contains("GSSAPI-TOKEN") {
-            Ok(format!("KRB5-AUTH-OK: Realm {} via KDC {}", self.realm, self.kdc_host))
+            Ok(format!(
+                "KRB5-AUTH-OK: Realm {} via KDC {}",
+                self.realm, self.kdc_host
+            ))
         } else {
             Err("CUPS-KRB5: Invalid or expired SPNEGO GSSAPI token".to_string())
         }
@@ -3111,7 +3206,10 @@ impl GhostscriptPdfA3ValidationEngine {
         if compliance_issues.is_empty() {
             Ok("GS-PDFA3-COMPLIANT: Document satisfies PDF/A-3 (ISO 19005-3) standard".to_string())
         } else {
-            Err(format!("GS-PDFA3-NON-COMPLIANT: {}", compliance_issues.join("; ")))
+            Err(format!(
+                "GS-PDFA3-NON-COMPLIANT: {}",
+                compliance_issues.join("; ")
+            ))
         }
     }
 
@@ -3141,12 +3239,15 @@ pub struct PopplerXfaFormsEngine {
 
 impl PopplerXfaFormsEngine {
     pub fn new() -> Self {
-        Self { xfa_detected: false }
+        Self {
+            xfa_detected: false,
+        }
     }
 
     pub fn detect_xfa_form_template(&mut self, pdf_data: &[u8]) -> bool {
         let pdf_str = String::from_utf8_lossy(pdf_data);
-        self.xfa_detected = pdf_str.contains("/XFA") || pdf_str.contains("http://www.xfa.org/schema/xfa-template/");
+        self.xfa_detected =
+            pdf_str.contains("/XFA") || pdf_str.contains("http://www.xfa.org/schema/xfa-template/");
         self.xfa_detected
     }
 
@@ -3483,10 +3584,14 @@ mod tests {
     #[test]
     fn test_ghostscript_ps_optimizer_engine() {
         let optimizer = GhostscriptPdfPostScriptOptimizerEngine::new("1a", 300);
-        let headers = optimizer.parse_postscript_dsc_headers(b"%!PS-Adobe-3.0").unwrap();
+        let headers = optimizer
+            .parse_postscript_dsc_headers(b"%!PS-Adobe-3.0")
+            .unwrap();
         assert_eq!(headers.get("Pages").unwrap(), "1");
 
-        let pdfa = optimizer.transpile_ps_to_pdfa(b"%!PS-Adobe-3.0 Content").unwrap();
+        let pdfa = optimizer
+            .transpile_ps_to_pdfa(b"%!PS-Adobe-3.0 Content")
+            .unwrap();
         assert!(pdfa.starts_with(b"%%PDF/A-1a Transpiled Stream"));
     }
 
@@ -3507,7 +3612,8 @@ mod tests {
     #[test]
     fn test_cups_tls_oauth2_engine() {
         let engine = CupsIppTlsOAuth2TokenEngine::new();
-        let auth_res = engine.validate_bearer_authorization_header("Bearer sovereign_bearer_sec_token_99");
+        let auth_res =
+            engine.validate_bearer_authorization_header("Bearer sovereign_bearer_sec_token_99");
         assert!(auth_res.is_ok());
         let (user, scope) = auth_res.unwrap();
         assert_eq!(user, "admin_user");
@@ -3516,7 +3622,9 @@ mod tests {
         let invalid_auth = engine.validate_bearer_authorization_header("Bearer invalid_token");
         assert!(invalid_auth.is_err());
 
-        assert!(engine.verify_client_tls_certificate("SHA256:4A:8B:12:34:56:78:90:AB:CD:EF:FE:DC:BA:09:87:65"));
+        assert!(engine.verify_client_tls_certificate(
+            "SHA256:4A:8B:12:34:56:78:90:AB:CD:EF:FE:DC:BA:09:87:65"
+        ));
     }
 
     #[test]
@@ -3544,9 +3652,14 @@ mod tests {
     fn test_cups3_ipp_system_service_engine() {
         let mut svc = Cups3IppSystemServiceEngine::new(Cups3ServiceType::CommandService);
         svc.register_printer_application("epson-app", "ipp://localhost:8631/ipp/print/epson-app");
-        assert_eq!(svc.printer_applications.get("epson-app").unwrap(), "ipp://localhost:8631/ipp/print/epson-app");
+        assert_eq!(
+            svc.printer_applications.get("epson-app").unwrap(),
+            "ipp://localhost:8631/ipp/print/epson-app"
+        );
 
-        let route = svc.route_ipp_request("Print-Job", "ipp://localhost:8631/ipp/print/epson-app").unwrap();
+        let route = svc
+            .route_ipp_request("Print-Job", "ipp://localhost:8631/ipp/print/epson-app")
+            .unwrap();
         assert!(route.contains("CUPS3-COMMAND-SVC"));
     }
 
@@ -3554,7 +3667,13 @@ mod tests {
     fn test_cups_pap_proxy_engine() {
         let mut proxy = CupsLocalIppPrinterApplicationProxyEngine::new("hp-laserjet-ppd");
         proxy.translate_ppd_option_to_ipp("PageSize", "A4");
-        assert_eq!(proxy.converted_ipp_attributes.get("ipp-ppd-pagesize").unwrap(), "A4");
+        assert_eq!(
+            proxy
+                .converted_ipp_attributes
+                .get("ipp-ppd-pagesize")
+                .unwrap(),
+            "A4"
+        );
 
         let res = proxy.process_proxy_print_job(b"%PDF-1.7 Job").unwrap();
         assert!(res.starts_with(b"%%CUPS-PAP-PROXY"));
@@ -3622,7 +3741,9 @@ mod tests {
         embedder.register_glyph_usage("Helvetica-Bold", &[1, 2, 5, 10]);
         embedder.register_glyph_usage("Helvetica-Bold", &[2, 3]);
 
-        let preflight = embedder.audit_font_embedding_preflight("Helvetica-Bold", "TrueType").unwrap();
+        let preflight = embedder
+            .audit_font_embedding_preflight("Helvetica-Bold", "TrueType")
+            .unwrap();
         assert!(preflight.contains("GS-FONT-EMBED-OK"));
 
         let ps_res = embedder.generate_ps_font_resource("Helvetica-Bold");
@@ -3653,7 +3774,9 @@ mod tests {
         let sock = bridge.bind_usb_interface(0x04a9, 0x190e, "CANON-12345");
         assert!(sock.contains("/run/ippusb/ipp-usb-04a9:190e-CANON-12345.sock"));
 
-        let bulk = bridge.translate_http_to_ipp_usb_bulk(b"POST /ipp/print HTTP/1.1").unwrap();
+        let bulk = bridge
+            .translate_http_to_ipp_usb_bulk(b"POST /ipp/print HTTP/1.1")
+            .unwrap();
         let bulk_str = String::from_utf8_lossy(&bulk);
         assert!(bulk_str.contains("IPP-USB-BULK-V1"));
         assert!(bulk_str.contains("POST /ipp/print"));
@@ -3666,10 +3789,17 @@ mod tests {
     #[test]
     fn test_cups_filter_v2_pipeline_engine() {
         let pipeline = CupsFilterV2PipelineEngine::new();
-        let chain = pipeline.resolve_transformation_chain("text/plain", "image/pwg-raster").unwrap();
-        assert_eq!(chain, vec!["texttopdf".to_string(), "pdftoraster".to_string()]);
+        let chain = pipeline
+            .resolve_transformation_chain("text/plain", "image/pwg-raster")
+            .unwrap();
+        assert_eq!(
+            chain,
+            vec!["texttopdf".to_string(), "pdftoraster".to_string()]
+        );
 
-        let transformed = pipeline.execute_chain_transform("text/plain", "image/pwg-raster", b"Hello SigmaOS Print").unwrap();
+        let transformed = pipeline
+            .execute_chain_transform("text/plain", "image/pwg-raster", b"Hello SigmaOS Print")
+            .unwrap();
         let transformed_str = String::from_utf8_lossy(&transformed);
         assert!(transformed_str.contains("%%CUPS-FILTER-EXEC(texttopdf)"));
         assert!(transformed_str.contains("%%CUPS-FILTER-EXEC(pdftoraster)"));
@@ -3699,7 +3829,8 @@ mod tests {
         let err = validator.audit_pdf_a3_compliance(invalid_pdf);
         assert!(err.is_err());
 
-        let attachments = validator.verify_embedded_file_attachments(b"%PDF-1.7\n/EmbeddedFiles << >>");
+        let attachments =
+            validator.verify_embedded_file_attachments(b"%PDF-1.7\n/EmbeddedFiles << >>");
         assert_eq!(attachments.len(), 1);
         assert!(attachments[0].contains("ZUGFeRD"));
     }

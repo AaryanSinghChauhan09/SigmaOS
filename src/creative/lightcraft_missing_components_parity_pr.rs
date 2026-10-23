@@ -709,7 +709,9 @@ impl SovereignLightcraftMissingComponentsParityPrGateway {
         true
     }
 
-    pub fn collect_all_proposals(&self) -> Vec<LightcraftMissingComponentsParityPrProposalManifest> {
+    pub fn collect_all_proposals(
+        &self,
+    ) -> Vec<LightcraftMissingComponentsParityPrProposalManifest> {
         vec![
             self.tone_curve_engine.generate_proposal(),
             self.ai_masking_engine.generate_proposal(),

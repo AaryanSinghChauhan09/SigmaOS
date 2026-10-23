@@ -82,7 +82,11 @@ impl CadcraftGenerativeDesignTopologyOptimizationV65Engine {
     }
 
     /// Performs Solid Isotropic Material with Penalization (SIMP) topology optimization.
-    pub fn optimize_mesh_density(&self, initial_densities: &[f64], loads: &[f64]) -> (Vec<f64>, f64) {
+    pub fn optimize_mesh_density(
+        &self,
+        initial_densities: &[f64],
+        loads: &[f64],
+    ) -> (Vec<f64>, f64) {
         let mut densities: Vec<f64> = initial_densities.to_vec();
         let target = self.config.target_volume_fraction;
         let penalization = self.config.penalization_power;
@@ -99,9 +103,11 @@ impl CadcraftGenerativeDesignTopologyOptimizationV65Engine {
             let damp = 0.5;
 
             for (i, d) in densities.iter_mut().enumerate() {
-                let load_factor = (loads.get(i % loads.len()).unwrap_or(&1.0).abs() / load_mag).clamp(0.1, 2.0);
+                let load_factor =
+                    (loads.get(i % loads.len()).unwrap_or(&1.0).abs() / load_mag).clamp(0.1, 2.0);
                 let sensitivity = load_factor * (*d).powf(penalization - 1.0);
-                let target_d = (*d * (sensitivity / target).powf(damp)).clamp(self.config.min_element_density, 1.0);
+                let target_d = (*d * (sensitivity / target).powf(damp))
+                    .clamp(self.config.min_element_density, 1.0);
                 *d = *d * (1.0 - damp) + target_d * damp;
             }
 
@@ -118,7 +124,9 @@ impl CadcraftGenerativeDesignTopologyOptimizationV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6501,
-            pr_title: String::from("Generative Design SIMP Topology Optimization & Mass Minimization Engine"),
+            pr_title: String::from(
+                "Generative Design SIMP Topology Optimization & Mass Minimization Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::GenerativeDesign"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -191,7 +199,9 @@ impl CadcraftDirectModelingBRepPushPullV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6502,
-            pr_title: String::from("Direct B-Rep Push/Pull Surface Offsetting & Feature Recognition Engine"),
+            pr_title: String::from(
+                "Direct B-Rep Push/Pull Surface Offsetting & Feature Recognition Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::DirectModeling"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -229,7 +239,11 @@ impl CadcraftPointcloud3dScanToCadReconstructionV65Engine {
     }
 
     /// Estimates normals and triangulates point cloud into CAD boundary mesh.
-    pub fn reconstruct_surface_mesh(&self, cloud: &[ScanPoint3D], decimation_ratio: f64) -> (usize, f64) {
+    pub fn reconstruct_surface_mesh(
+        &self,
+        cloud: &[ScanPoint3D],
+        decimation_ratio: f64,
+    ) -> (usize, f64) {
         if cloud.is_empty() {
             return (0, 0.0);
         }
@@ -301,7 +315,10 @@ impl CadcraftPdmVersionControlBOMGeneratorV65Engine {
     }
 
     pub fn check_in_part(&mut self, part_number: &str, author: &str, comment: &str) -> u32 {
-        let rev_list = self.revisions.entry(part_number.to_string()).or_insert_with(Vec::new);
+        let rev_list = self
+            .revisions
+            .entry(part_number.to_string())
+            .or_insert_with(Vec::new);
         let next_rev = (rev_list.len() as u32) + 1;
         rev_list.push(PdmVaultRevision {
             revision_id: next_rev,
@@ -315,14 +332,20 @@ impl CadcraftPdmVersionControlBOMGeneratorV65Engine {
 
     pub fn calculate_bom_cost(&self, item: &PartBomItem) -> f64 {
         let self_cost = (item.quantity as f64) * item.unit_cost_usd;
-        let sub_cost: f64 = item.sub_assemblies.iter().map(|sub| self.calculate_bom_cost(sub)).sum();
+        let sub_cost: f64 = item
+            .sub_assemblies
+            .iter()
+            .map(|sub| self.calculate_bom_cost(sub))
+            .sum();
         self_cost + sub_cost
     }
 
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6504,
-            pr_title: String::from("PDM Engineering Vault Revision Control & Multi-Level BOM Generator Engine"),
+            pr_title: String::from(
+                "PDM Engineering Vault Revision Control & Multi-Level BOM Generator Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::PDM"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -391,7 +414,9 @@ impl CadcraftKinematicMechanismMotionAnalysisV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6505,
-            pr_title: String::from("Kinematic Mechanism Motion Dynamics & Joint Reaction Force Solver Engine"),
+            pr_title: String::from(
+                "Kinematic Mechanism Motion Dynamics & Joint Reaction Force Solver Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::Kinematics"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -419,7 +444,11 @@ impl CadcraftMeshFreeIsogeometricAnalysisFeaV65Engine {
     }
 
     /// Evaluates stress directly on NURBS surface control grids without triangulation mesh.
-    pub fn evaluate_nurbs_iga_stress(&self, control_points: &[(f64, f64, f64)], load_vector: &[f64]) -> (f64, f64) {
+    pub fn evaluate_nurbs_iga_stress(
+        &self,
+        control_points: &[(f64, f64, f64)],
+        load_vector: &[f64],
+    ) -> (f64, f64) {
         if control_points.is_empty() || load_vector.is_empty() {
             return (0.0, 0.0);
         }
@@ -436,7 +465,9 @@ impl CadcraftMeshFreeIsogeometricAnalysisFeaV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6506,
-            pr_title: String::from("Mesh-Free Isogeometric Analysis (IGA) FEA on NURBS Control Grids Engine"),
+            pr_title: String::from(
+                "Mesh-Free Isogeometric Analysis (IGA) FEA on NURBS Control Grids Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::IsogeometricFEA"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -472,34 +503,50 @@ impl CadcraftMultiAxisPostProcessorGCodeOptimizerV65Engine {
     }
 
     /// Optimizes and post-processes 5-axis motion vectors into machine G-Code.
-    pub fn post_process_toolpath(&self, controller: CncControllerType, toolpaths: &[(f64, f64, f64, f64, f64)]) -> String {
+    pub fn post_process_toolpath(
+        &self,
+        controller: CncControllerType,
+        toolpaths: &[(f64, f64, f64, f64, f64)],
+    ) -> String {
         let mut gcode = String::new();
         match controller {
             CncControllerType::Fanuc => {
                 gcode.push_str("%\nO1001 (5-AXIS CNC TOOLPATH)\nG21 G90 G40 G80\nG43.4 H01\n");
                 for (x, y, z, a, b) in toolpaths {
-                    gcode.push_str(&format!("G01 X{:.3} Y{:.3} Z{:.3} A{:.3} B{:.3} F1500\n", x, y, z, a, b));
+                    gcode.push_str(&format!(
+                        "G01 X{:.3} Y{:.3} Z{:.3} A{:.3} B{:.3} F1500\n",
+                        x, y, z, a, b
+                    ));
                 }
                 gcode.push_str("G49 M30\n%\n");
             }
             CncControllerType::SiemensSinumerik => {
                 gcode.push_str("; SIEMENS SINUMERIK 840D\nTRAORI\n");
                 for (x, y, z, a, b) in toolpaths {
-                    gcode.push_str(&format!("X={:.3} Y={:.3} Z={:.3} A3={:.3} B3={:.3}\n", x, y, z, a, b));
+                    gcode.push_str(&format!(
+                        "X={:.3} Y={:.3} Z={:.3} A3={:.3} B3={:.3}\n",
+                        x, y, z, a, b
+                    ));
                 }
                 gcode.push_str("TRAFOOF\nM30\n");
             }
             CncControllerType::Heidenhain => {
                 gcode.push_str("BEGIN PGM 5AXIS MM\nPLANE SPATIAL SPA 0 SPB 0 SPC 0\n");
                 for (x, y, z, a, b) in toolpaths {
-                    gcode.push_str(&format!("L X{:.3} Y{:.3} Z{:.3} A{:.3} B{:.3} F1500\n", x, y, z, a, b));
+                    gcode.push_str(&format!(
+                        "L X{:.3} Y{:.3} Z{:.3} A{:.3} B{:.3} F1500\n",
+                        x, y, z, a, b
+                    ));
                 }
                 gcode.push_str("END PGM 5AXIS MM\n");
             }
             CncControllerType::Haas => {
                 gcode.push_str("%\nO02001 (HAAS 5-AXIS)\nG00 G90 G54 X0 Y0 Z0 A0 B0\nG243\n");
                 for (x, y, z, a, b) in toolpaths {
-                    gcode.push_str(&format!("G01 X{:.3} Y{:.3} Z{:.3} A{:.3} B{:.3} F1200\n", x, y, z, a, b));
+                    gcode.push_str(&format!(
+                        "G01 X{:.3} Y{:.3} Z{:.3} A{:.3} B{:.3} F1200\n",
+                        x, y, z, a, b
+                    ));
                 }
                 gcode.push_str("G243 H00 M30\n%\n");
             }
@@ -510,7 +557,9 @@ impl CadcraftMultiAxisPostProcessorGCodeOptimizerV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6507,
-            pr_title: String::from("Multi-Axis CNC Post-Processor & Kinematic Singularity Avoidance Engine"),
+            pr_title: String::from(
+                "Multi-Axis CNC Post-Processor & Kinematic Singularity Avoidance Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::CAMPostProcessor"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -538,7 +587,12 @@ impl CadcraftSheetMetalNestedFlangeFormingV65Engine {
     }
 
     /// Calculates springback angle compensation and 2D nesting efficiency.
-    pub fn calculate_springback_and_nesting(&self, bend_angle_deg: f64, thickness_mm: f64, part_count: u32) -> (f64, f64) {
+    pub fn calculate_springback_and_nesting(
+        &self,
+        bend_angle_deg: f64,
+        thickness_mm: f64,
+        part_count: u32,
+    ) -> (f64, f64) {
         let k_factor = 0.42;
         let springback_ratio = 1.0 + (thickness_mm / 100.0) * (bend_angle_deg / 90.0);
         let compensated_angle = bend_angle_deg * springback_ratio;
@@ -554,7 +608,9 @@ impl CadcraftSheetMetalNestedFlangeFormingV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6508,
-            pr_title: String::from("Sheet Metal Multi-Stage Bend Springback & 2D Nesting Optimization Engine"),
+            pr_title: String::from(
+                "Sheet Metal Multi-Stage Bend Springback & 2D Nesting Optimization Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::SheetMetalNesting"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -590,7 +646,9 @@ pub struct CadcraftEcadMcadThermalClearanceIntegratorV65Engine {
 
 impl CadcraftEcadMcadThermalClearanceIntegratorV65Engine {
     pub fn new() -> Self {
-        Self { components: Vec::new() }
+        Self {
+            components: Vec::new(),
+        }
     }
 
     pub fn add_component(&mut self, comp: PcbComponent3D) {
@@ -616,7 +674,9 @@ impl CadcraftEcadMcadThermalClearanceIntegratorV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6509,
-            pr_title: String::from("3D ECAD/MCAD Electronics STEP Clearance & Thermal Joule Heating Integrator Engine"),
+            pr_title: String::from(
+                "3D ECAD/MCAD Electronics STEP Clearance & Thermal Joule Heating Integrator Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::EcadMcadIntegration"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -644,7 +704,12 @@ impl CadcraftAcousticModalVibrationCaeV65Engine {
     }
 
     /// Solves fundamental acoustic resonance frequencies and modal damping ratios.
-    pub fn solve_acoustic_modal_frequencies(&self, stiffness_n_m: f64, mass_kg: f64, fluid_speed_sound_m_s: f64) -> (f64, f64) {
+    pub fn solve_acoustic_modal_frequencies(
+        &self,
+        stiffness_n_m: f64,
+        mass_kg: f64,
+        fluid_speed_sound_m_s: f64,
+    ) -> (f64, f64) {
         if mass_kg <= 0.0 || stiffness_n_m <= 0.0 {
             return (0.0, 0.0);
         }
@@ -653,7 +718,8 @@ impl CadcraftAcousticModalVibrationCaeV65Engine {
         let natural_frequency_hz = omega_n / (2.0 * core::f64::consts::PI);
 
         let acoustic_impedance = 1.225 * fluid_speed_sound_m_s; // Air density * c
-        let damping_ratio = (acoustic_impedance / (2.0 * (mass_kg * stiffness_n_m).sqrt())).clamp(0.001, 1.0);
+        let damping_ratio =
+            (acoustic_impedance / (2.0 * (mass_kg * stiffness_n_m).sqrt())).clamp(0.001, 1.0);
 
         (natural_frequency_hz, damping_ratio)
     }
@@ -661,7 +727,9 @@ impl CadcraftAcousticModalVibrationCaeV65Engine {
     pub fn generate_pr_manifest(&self) -> CadcraftV65PrProposalManifest {
         CadcraftV65PrProposalManifest {
             pr_id: 6510,
-            pr_title: String::from("Structural Acoustic Modal Vibration & Pressure Field CAE Solver Engine"),
+            pr_title: String::from(
+                "Structural Acoustic Modal Vibration & Pressure Field CAE Solver Engine",
+            ),
             target_subsystem: String::from("Creative::CadCraft::AcousticCAE"),
             original_suite: String::from("ArtCraft CadCraft V65"),
             components_added: vec![
@@ -764,9 +832,30 @@ mod tests {
     fn test_pointcloud_scan_reconstruction_engine() {
         let engine = CadcraftPointcloud3dScanToCadReconstructionV65Engine::new();
         let cloud = vec![
-            ScanPoint3D { x: 0.0, y: 0.0, z: 0.0, nx: 0.0, ny: 0.0, nz: 1.0 },
-            ScanPoint3D { x: 1.0, y: 0.0, z: 0.0, nx: 0.0, ny: 0.0, nz: 1.0 },
-            ScanPoint3D { x: 0.0, y: 1.0, z: 0.0, nx: 0.0, ny: 0.0, nz: 1.0 },
+            ScanPoint3D {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+                nx: 0.0,
+                ny: 0.0,
+                nz: 1.0,
+            },
+            ScanPoint3D {
+                x: 1.0,
+                y: 0.0,
+                z: 0.0,
+                nx: 0.0,
+                ny: 0.0,
+                nz: 1.0,
+            },
+            ScanPoint3D {
+                x: 0.0,
+                y: 1.0,
+                z: 0.0,
+                nx: 0.0,
+                ny: 0.0,
+                nz: 1.0,
+            },
         ];
         let (triangles, residual) = engine.reconstruct_surface_mesh(&cloud, 1.0);
         assert_eq!(triangles, 2);
@@ -786,15 +875,13 @@ mod tests {
             part_name: String::from("Housing Assembly"),
             quantity: 1,
             unit_cost_usd: 50.0,
-            sub_assemblies: vec![
-                PartBomItem {
-                    part_number: String::from("P-100"),
-                    part_name: String::from("Bracket"),
-                    quantity: 2,
-                    unit_cost_usd: 12.5,
-                    sub_assemblies: Vec::new(),
-                },
-            ],
+            sub_assemblies: vec![PartBomItem {
+                part_number: String::from("P-100"),
+                part_name: String::from("Bracket"),
+                quantity: 2,
+                unit_cost_usd: 12.5,
+                sub_assemblies: Vec::new(),
+            }],
         };
 
         let cost = engine.calculate_bom_cost(&bom);
@@ -836,7 +923,8 @@ mod tests {
         assert!(fanuc_code.contains("G43.4 H01"));
         assert!(fanuc_code.contains("A0.000 B15.000"));
 
-        let siemens_code = engine.post_process_toolpath(CncControllerType::SiemensSinumerik, &toolpaths);
+        let siemens_code =
+            engine.post_process_toolpath(CncControllerType::SiemensSinumerik, &toolpaths);
         assert!(siemens_code.contains("TRAORI"));
     }
 

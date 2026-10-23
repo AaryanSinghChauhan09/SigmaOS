@@ -122,14 +122,15 @@ impl JournaldSyslogSuiteV13 {
         let mut filters = HashMap::new();
         filters.insert("_SYSTEMD_UNIT".to_string(), "sshd.service".to_string());
 
-        self.gateway_endpoints.push(JournaldGatewayRestApiEndpointV13 {
-            endpoint_path: "/entries".to_string(),
-            format: JournalGatewayFormatV13::ServerSentEvents,
-            cursor_pagination: Some("s=a1b2c3d4e5f6".to_string()),
-            range_entries_limit: 100,
-            field_filters: filters,
-            stream_active: true,
-        });
+        self.gateway_endpoints
+            .push(JournaldGatewayRestApiEndpointV13 {
+                endpoint_path: "/entries".to_string(),
+                format: JournalGatewayFormatV13::ServerSentEvents,
+                cursor_pagination: Some("s=a1b2c3d4e5f6".to_string()),
+                range_entries_limit: 100,
+                field_filters: filters,
+                stream_active: true,
+            });
 
         self.relp_queues.push(RsyslogRelpDiskQueueEngineV13 {
             txnr: 1042,
@@ -194,8 +195,7 @@ impl JournaldSyslogSuiteV13 {
     }
 
     pub fn add_logrotate_state(&mut self, state: LogrotateStatusStateV13) {
-        self.logrotate_states
-            .insert(state.log_path.clone(), state);
+        self.logrotate_states.insert(state.log_path.clone(), state);
     }
 
     pub fn get_gateway_endpoints(&self) -> &[JournaldGatewayRestApiEndpointV13] {
@@ -246,11 +246,11 @@ impl DmesgLogLevelV13 {
     pub fn ansi_color_code(&self) -> &'static str {
         match self {
             Self::Emerg | Self::Alert | Self::Crit => "\x1b[1;31m", // Bright Red
-            Self::Err => "\x1b[31m",                               // Red
-            Self::Warning => "\x1b[33m",                           // Yellow
-            Self::Notice => "\x1b[32m",                            // Green
-            Self::Info => "\x1b[36m",                              // Cyan
-            Self::Debug => "\x1b[90m",                             // Bright Black / Gray
+            Self::Err => "\x1b[31m",                                // Red
+            Self::Warning => "\x1b[33m",                            // Yellow
+            Self::Notice => "\x1b[32m",                             // Green
+            Self::Info => "\x1b[36m",                               // Cyan
+            Self::Debug => "\x1b[90m",                              // Bright Black / Gray
         }
     }
 }

@@ -154,7 +154,8 @@ impl CachyOsChwdVulkanWaylandDirectScanoutV2PrEngine {
         Self {
             direct_scanout_active: true,
             latency_reduction_ms: 7.9,
-            wayland_surface_format: "VK_FORMAT_A2B10G10R10_UNORM_PACK32 / DRM_FORMAT_XRGB2101010".to_string(),
+            wayland_surface_format: "VK_FORMAT_A2B10G10R10_UNORM_PACK32 / DRM_FORMAT_XRGB2101010"
+                .to_string(),
         }
     }
 

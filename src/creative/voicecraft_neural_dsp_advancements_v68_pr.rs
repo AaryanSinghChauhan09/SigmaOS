@@ -59,7 +59,8 @@ impl VoicecraftDiffusionAcousticMelSynthesizerPrEngine {
     /// Perform score-based reverse diffusion to synthesize mel-spectrogram from noise
     pub fn synthesize_mel(&self, phonemes: &[Phoneme]) -> Vec<Vec<f32>> {
         let total_duration_ms: u32 = phonemes.iter().map(|p| p.duration_ms).sum();
-        let frames = ((total_duration_ms as f32 * self.sample_rate as f32 / 1000.0) / 256.0) as usize;
+        let frames =
+            ((total_duration_ms as f32 * self.sample_rate as f32 / 1000.0) / 256.0) as usize;
         let num_frames = if frames == 0 { 16 } else { frames };
 
         let mut mel = vec![vec![0.0f32; num_frames]; self.mel_channels];
@@ -68,7 +69,8 @@ impl VoicecraftDiffusionAcousticMelSynthesizerPrEngine {
             let step_scale = (step + 1) as f32 / self.diffusion_steps as f32;
             for ch in 0..self.mel_channels {
                 for f in 0..num_frames {
-                    let noise_estimate = ((f as f32 * 0.1 + ch as f32 * 0.05 + step as f32).sin()) * step_scale;
+                    let noise_estimate =
+                        ((f as f32 * 0.1 + ch as f32 * 0.05 + step as f32).sin()) * step_scale;
                     mel[ch][f] += noise_estimate * 0.05;
                 }
             }
@@ -87,7 +89,9 @@ impl VoicecraftDiffusionAcousticMelSynthesizerPrEngine {
                 String::from("ReverseSdeMelEstimator"),
                 String::from("ConditionalPhonemeEmbeddingMapper"),
             ],
-            performance_multiplier: String::from("22.4x (High-Fidelity Realtime Diffusion Synthesis)"),
+            performance_multiplier: String::from(
+                "22.4x (High-Fidelity Realtime Diffusion Synthesis)",
+            ),
             status: String::from("PR_READY"),
         }
     }
@@ -130,12 +134,15 @@ impl VoicecraftNeuralVocoderBigVGANPrEngine {
         let mut pcm = vec![0.0f32; total_samples];
 
         for f in 0..num_frames {
-            let frame_energy: f32 = mel_spec.iter().map(|ch| ch[f]).sum::<f32>() / mel_spec.len() as f32;
+            let frame_energy: f32 =
+                mel_spec.iter().map(|ch| ch[f]).sum::<f32>() / mel_spec.len() as f32;
             let start = f * total_upsample;
             for i in 0..total_upsample {
                 if start + i < total_samples {
-                    let phase = (i as f32 / total_upsample as f32) * 2.0 * PI * 440.0 / self.sample_rate as f32;
-                    let anti_aliased_signal = phase.sin() * (1.0 - (i as f32 / total_upsample as f32) * 0.1);
+                    let phase = (i as f32 / total_upsample as f32) * 2.0 * PI * 440.0
+                        / self.sample_rate as f32;
+                    let anti_aliased_signal =
+                        phase.sin() * (1.0 - (i as f32 / total_upsample as f32) * 0.1);
                     pcm[start + i] = anti_aliased_signal * frame_energy;
                 }
             }
@@ -146,7 +153,9 @@ impl VoicecraftNeuralVocoderBigVGANPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftV68PrProposalManifest {
         VoicecraftV68PrProposalManifest {
             pr_id: 8682,
-            pr_title: String::from("VoiceCraft BigVGAN Periodic Anti-Aliased Neural Vocoder Engine"),
+            pr_title: String::from(
+                "VoiceCraft BigVGAN Periodic Anti-Aliased Neural Vocoder Engine",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Neural Vocoder Parity"),
             components_added: vec![
@@ -154,7 +163,9 @@ impl VoicecraftNeuralVocoderBigVGANPrEngine {
                 String::from("SnakeActivationPeriodicityNetwork"),
                 String::from("MultiPeriodDiscriminatorVocoder"),
             ],
-            performance_multiplier: String::from("31.0x (Artifact-Free Neural Waveform Generation)"),
+            performance_multiplier: String::from(
+                "31.0x (Artifact-Free Neural Waveform Generation)",
+            ),
             status: String::from("PR_READY"),
         }
     }
@@ -190,7 +201,11 @@ impl VoicecraftMultilingualPhonemizerG2pPrEngine {
     /// Convert text into international phonetic alphabet (IPA) phonemes according to language code
     pub fn phonemize_multilingual(&self, text: &str, lang_code: &str) -> Vec<Phoneme> {
         let mut phonemes = Vec::new();
-        let target_lang = self.language_map.get(lang_code).map(|s| s.as_str()).unwrap_or("English (US)");
+        let target_lang = self
+            .language_map
+            .get(lang_code)
+            .map(|s| s.as_str())
+            .unwrap_or("English (US)");
 
         for word in text.split_whitespace() {
             for (idx, ch) in word.chars().enumerate() {
@@ -231,7 +246,9 @@ impl VoicecraftMultilingualPhonemizerG2pPrEngine {
                 String::from("NeuralG2pAligner"),
                 String::from("UniversalPhonemeLexicon"),
             ],
-            performance_multiplier: String::from("16.8x (Sub-Millisecond Multilingual Tokenization)"),
+            performance_multiplier: String::from(
+                "16.8x (Sub-Millisecond Multilingual Tokenization)",
+            ),
             status: String::from("PR_READY"),
         }
     }
@@ -415,13 +432,20 @@ impl SovereignVoicecraftAdvancementsV68MasterSuite {
 
     pub fn export_pr_manifest_markdown(&self) -> String {
         let manifests = self.generate_all_manifests();
-        let mut md = String::from("# VoiceCraft Neural DSP & Audio Advancements V68 PR Proposal\n\n");
+        let mut md =
+            String::from("# VoiceCraft Neural DSP & Audio Advancements V68 PR Proposal\n\n");
 
         for m in manifests {
             md.push_str(&format!("## PR #{}: {}\n", m.pr_id, m.pr_title));
-            md.push_str(&format!("- **Target Subsystem:** `{}`\n", m.target_subsystem));
+            md.push_str(&format!(
+                "- **Target Subsystem:** `{}`\n",
+                m.target_subsystem
+            ));
             md.push_str(&format!("- **Original Suite:** {}\n", m.original_suite));
-            md.push_str(&format!("- **Performance Multiplier:** {}\n", m.performance_multiplier));
+            md.push_str(&format!(
+                "- **Performance Multiplier:** {}\n",
+                m.performance_multiplier
+            ));
             md.push_str(&format!("- **Status:** {}\n", m.status));
             md.push_str("- **Components Added:**\n");
             for c in m.components_added {
