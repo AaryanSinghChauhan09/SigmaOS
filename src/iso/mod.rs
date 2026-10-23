@@ -2,6 +2,9 @@
 // SigmaOS Iso Module
 // ISO image creation and mounting
 // Zero-dependency implementation - no external libraries required
+//
+// Sovereign ISO Architecture module is in sovereign_iso_architecture.rs
+pub mod sovereign_iso_architecture;
 
 use core::fmt;
 use std::boxed::Box;
