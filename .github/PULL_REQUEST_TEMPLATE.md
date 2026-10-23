@@ -1,26 +1,22 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What component does this PR improve, add, or regulate? -->
+
+## Related issue
+
+Closes #<issue-id>
 
 ## Task type
 
 - [ ] Daily CI maintenance
-- [ ] Weekly dependency/security review
-- [ ] Weekly open-source study
+- [ ] Weekly open-source study & implementation
 - [ ] Biweekly component gap review
-- [ ] Monthly boot validation
-- [ ] Monthly installer/recovery rehearsal
-- [ ] Monthly package/update rehearsal
-- [ ] Quarterly release review
-- [ ] Quarterly architecture review
-- [ ] Quarterly hardware audit
-
-## Study and Adoption
-
-- Reference study:
-- What SigmaOS adopts:
+- [ ] Monthly milestone completion
+- [ ] Quarterly architecture / security review
 
 ## Component
+
+<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
 
 - [ ] Boot / platform
 - [ ] Kernel
@@ -33,34 +29,72 @@
 - [ ] IPC
 - [ ] Security
 - [ ] Userspace
+- [ ] Packaging
 - [ ] Desktop
-- [ ] Packaging / installer
+- [ ] Installer / Update
 - [ ] Documentation
 - [ ] CI / tooling
 
+## Upstream study
+
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
+
+## Component rules added or enforced
+
+- [ ] New rule
+- [ ] Existing rule enforced
+- [ ] Rule test added
+- [ ] CI gate added
+- [ ] Documentation updated
+
+## What SigmaOS adopts
+
+<!-- State the upstream principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
 ## Changes
 
--
--
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
-## Evidence
+## Verification
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New or updated tests
-- [ ] QEMU boot evidence, if applicable
-- [ ] Installer/recovery evidence, if applicable
-- [ ] Hardware evidence, if applicable
-- [ ] Security review requested, if applicable
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
 
-## Status updates
+## Runtime evidence
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Roadmap or release checklist
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
+
+## Safety and rollback
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input validated
+- [ ] Package scripts sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
 ## Shell safety review
 
@@ -69,10 +103,11 @@
 
 ## Reviewer checklist
 
-- [ ] Kernel safety review completed, if applicable.
-- [ ] Unsafe blocks verified and documented.
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
+- [ ] Scope is narrow
+- [ ] Component rules are enforceable
+- [ ] Tests cover the rules
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported Linux/BSD parity claims
+- [ ] Unsafe blocks verified and documented, if applicable
