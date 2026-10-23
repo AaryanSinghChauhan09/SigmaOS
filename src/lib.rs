@@ -516,17 +516,19 @@ pub use userland::shell::{
 pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
-    FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine, GvisorKataAppleHvV61Engine,
-    GvisorKataAppleHvV63Engine, KubernetesK3sRancherV61Engine, KubernetesK3sRancherV63Engine,
-    KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine, LibvirtDomainV61Engine,
-    LibvirtDomainV63Engine, LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine,
-    OciDockerPodmanRuncV61Engine, OciDockerPodmanRuncV63Engine, ResourcePool,
-    SovereignVirtualizationAndContainersParityV61Gateway,
+    FirecrackerCloudHypervisorV67Engine, FreeBsdJailsZonesV61Engine, FreeBsdJailsZonesV63Engine,
+    FreeBsdJailsZonesV67Engine, GvisorKataAppleHvV61Engine, GvisorKataAppleHvV63Engine,
+    GvisorKataAppleHvV67Engine, KubernetesK3sRancherV61Engine, KubernetesK3sRancherV63Engine,
+    KubernetesK3sRancherV67Engine, KubernetesPod, KvmQemuV61Engine, KvmQemuV63Engine,
+    KvmQemuV67Engine, LibvirtDomainV61Engine, LibvirtDomainV63Engine, LibvirtDomainV67Engine,
+    LxcLxdNspawnV61Engine, LxcLxdNspawnV63Engine, LxcLxdNspawnV67Engine,
+    OciDockerPodmanRuncV61Engine, OciDockerPodmanRuncV63Engine, OciDockerPodmanRuncV67Engine,
+    ResourcePool, SovereignVirtualizationAndContainersParityV61Gateway,
     SovereignVirtualizationAndContainersParityV63Gateway,
-    SovereignVirtualizationAndContainersParityV65Gateway,
-    SovereignVirtualizationAndContainersParityV66Gateway, VirtualBoxBhyveVmmV61Engine,
-    VirtualBoxBhyveVmmV63Engine, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
-    VirtualizationTech, VmState, XenHypervisorV61Engine, XenHypervisorV63Engine,
+    SovereignVirtualizationAndContainersParityV67Gateway, VirtualBoxBhyveVmmV61Engine,
+    VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualMachine, VirtualizationError,
+    VirtualizationOrchestrator, VirtualizationTech, VmState, XenHypervisorV61Engine,
+    XenHypervisorV63Engine, XenHypervisorV67Engine,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
