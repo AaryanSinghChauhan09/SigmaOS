@@ -1,15 +1,17 @@
 ## SigmaOS Documentation
 
-### 🟢 Current Status
-- [[Current Build & Merge Status (2026-10-21)|Home#-current-status-2026-10-21]]
+### 🟢 Current Status (2026-10-23)
+- [[Home]] — Sovereign Unification Complete ✅
+- [[ISO-Architecture]] — New: ISO layer system
 - [[Ready-to-Work-and-Ready-to-Launch|Ready to Work & Ready to Launch]]
-- [[Omarchy-Linux-Gap-Analysis|SigmaOS vs Omarchy Linux Gap Analysis]]
+- [[Omarchy-Linux-Gap-Analysis|SigmaOS vs Omarchy Gap Analysis]]
 
 ### Getting Started
 - [[Home]]
 - [[Sovereign-Engineering-Principles]]
 - [[Architecture-Overview|Architectural-Pillars-Components]]
 - [[Release-Engineering|Release-Engineering-Components]]
+- [[ISO-Architecture|ISO Architecture & Boot System]]
 - [[ISO-Builder|ISO-Builder-and-Rufus-Components]]
 - [[User-Onboarding|User-Onboarding-Wizard-Components]]
 
