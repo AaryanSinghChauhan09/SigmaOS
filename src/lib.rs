@@ -640,6 +640,7 @@ pub use crate::distro::omarchy_linux_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v69_pr::*;
+pub use crate::distro::open_source_os_debian_unimplemented_ideas_v72_pr::*;
 pub use crate::distro::open_source_os_missing_components_v66_pr::*;
 pub use crate::distro::open_source_os_missing_components_v67_pr::*;
 pub use crate::distro::open_source_os_missing_components_v68_pr::*;
