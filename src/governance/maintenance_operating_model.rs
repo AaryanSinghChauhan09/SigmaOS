@@ -5,6 +5,7 @@
 //! documentation, packaging, installer recovery, and community review.
 //!
 //! Every recurring task must produce a reviewable artifact (PR, issue, report, test result, or decision).
+//! Enforces status honesty, evidence validation, and release readiness gates.
 
 use std::format;
 use std::string::{String, ToString};

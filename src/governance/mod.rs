@@ -16,6 +16,7 @@ pub mod strategic_vision;
 pub mod study_to_implementation_pipeline_pr;
 pub mod supreme_court;
 
+pub use maintenance_operating_model::*;
 pub use periodic_pr_component_rules_engine::*;
 pub use periodic_study_improve_prove_engine::*;
 pub use risk_mitigation::*;
