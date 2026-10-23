@@ -2293,4 +2293,18 @@ if [ -f "src/boot/bare_metal_independent_boot_system.rs" ]; then
     ./build/test_bare_metal
 fi
 
+if [ -f "src/distro/open_source_os_missing_components_v69_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V69 PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v69_pr.rs --edition=2021 -o build/test_v69_missing
+    ./build/test_v69_missing
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v69_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure V69 PR Suite test suite..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v69_pr.rs --edition=2021 -o build/test_v69_gap
+    ./build/test_v69_gap
+fi
+
 echo "All SigmaOS test suites completed."
