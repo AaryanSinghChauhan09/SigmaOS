@@ -67,10 +67,21 @@ bench:
 clean:
 	@echo "==> Cleaning build artifacts..."
 	$(CARGO) clean
-	rm -rf build/ target/
+	rm -rf build/ target/ boot/sigma_kernel.elf bin/sigmaos
+
+# 7b. Build standalone Multiboot kernel
+kernel:
+	@echo "==> Compiling SigmaOS Sovereign Multiboot Kernel (Multiboot1 & Multiboot2)..."
+	@gcc -m32 -ffreestanding -static -no-pie -fno-stack-protector -nostdlib -O2 -T boot/kernel.ld boot/sigma_kernel_core.c -o boot/sigma_kernel.elf
+	@echo "==> Kernel built successfully: boot/sigma_kernel.elf"
+
+# 7c. Build native workstation binary
+bin/sigmaos: src/bin/sigmaos.rs
+	@echo "==> Building native SigmaOS Workstation binary..."
+	@rustc -O src/bin/sigmaos.rs -o bin/sigmaos
 
 # 8. Build bootable QEMU / ISO image (M1 milestone)
-iso:
+iso: kernel
 	@echo "==> Building SigmaOS Desktop Preview ISO image..."
 	@mkdir -p build
 	@echo "Stage 1: Staging kernel, initramfs, and bootloader..."
@@ -78,24 +89,24 @@ iso:
 
 # 8b. Build minimal stub ISO (GALL'S LAW: working simple > broken complex)
 # Uses GRUB2 + genisoimage; no nasm required. Boots immediately in QEMU.
-iso-stub:
-	@echo "==> Building SigmaOS Stub ISO (GRUB2-based, no compiled kernel needed)..."
+iso-stub: kernel
+	@echo "==> Building SigmaOS Stub ISO (GRUB2-based, with Multiboot kernel)..."
 	@mkdir -p build
 	@bash scripts/build_stub_iso.sh
 
 # 9. Run SigmaOS (boots in QEMU if installed; gracefully falls back to native workstation)
-run:
+run: iso-stub bin/sigmaos
 	@image=build/sigmaos-desktop-preview.iso; \
 	if command -v qemu-system-x86_64 >/dev/null 2>&1 && [ -s "$$image" ]; then \
 		echo "==> Booting SigmaOS Desktop Preview in QEMU..."; \
 		exec qemu-system-x86_64 -m 2048 -cdrom "$$image" -serial stdio -no-reboot; \
 	else \
-		echo "==> QEMU not found in PATH or ISO not present. Launching native SigmaOS Workstation..."; \
+		echo "==> QEMU not found in PATH or running headlessly. Launching native SigmaOS Workstation..."; \
 		bash bin/sigmaos-launch; \
 	fi
 
 # 9b. Run stub ISO in QEMU (GALL'S LAW: start simple — works now!)
-run-stub:
+run-stub: iso-stub
 	@echo "==> Booting SigmaOS stub ISO in QEMU..."
 	@bash scripts/run_qemu.sh
 
@@ -104,7 +115,7 @@ launch-check:
 	@bash scripts/check_launch_ready.sh || true
 
 # 11. Interactive OS launch & workstation dashboard (READY TO WORK & LAUNCH)
-launch:
+launch: bin/sigmaos
 	@bash bin/sigmaos-launch
 
 start: launch

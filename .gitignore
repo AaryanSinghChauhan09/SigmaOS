@@ -19,6 +19,7 @@ build/*
 *.dll
 *.exe
 *.elf
+bin/sigmaos
 test_runner
 .cache/
 __pycache__/

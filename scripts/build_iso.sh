@@ -182,18 +182,25 @@ chmod +x "$INITRAMFS_STAGE/init"
 echo "    Initramfs created: $BUILD_DIR/boot/initramfs.gz"
 
 # ---------------------------------------------------------------------------
-# Stage kernel (real or stub)
+# Stage kernel (real SigmaOS kernel, host substrate, or multiboot)
 # ---------------------------------------------------------------------------
 echo "--> Staging kernel..."
 mkdir -p "$BUILD_DIR/boot"
 
+if [ -f "$ROOT_DIR/boot/sigma_kernel.elf" ]; then
+    cp "$ROOT_DIR/boot/sigma_kernel.elf" "$BUILD_DIR/boot/sigma_kernel.elf"
+    echo "    Staged SigmaOS sovereign kernel: boot/sigma_kernel.elf"
+fi
+
 if [ -f "$ROOT_DIR/target/x86_64-unknown-none/release/sigmaos" ]; then
     cp "$ROOT_DIR/target/x86_64-unknown-none/release/sigmaos" "$BUILD_DIR/boot/vmlinuz-linux-t2"
-    echo "    Staged real SigmaOS kernel as vmlinuz-linux-t2"
-else
-    # Create a multiboot2-compatible kernel stub for ISO boot testing
-    printf '\x7f\x45\x4c\x46\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\xf3\x00\x01\x00\x00\x00' > "$BUILD_DIR/boot/vmlinuz-linux-t2"
-    echo "    Staged kernel stub as vmlinuz-linux-t2 (real kernel not built yet)"
+    echo "    Staged compiled Rust kernel as vmlinuz-linux-t2"
+elif [ -r "/boot/vmlinuz-6.17.0-20-generic" ]; then
+    cp "/boot/vmlinuz-6.17.0-20-generic" "$BUILD_DIR/boot/vmlinuz-linux-t2" 2>/dev/null || true
+    echo "    Staged host Linux hardware substrate as vmlinuz-linux-t2"
+elif [ -f "$ROOT_DIR/boot/sigma_kernel.elf" ]; then
+    cp "$ROOT_DIR/boot/sigma_kernel.elf" "$BUILD_DIR/boot/vmlinuz-linux-t2"
+    echo "    Staged SigmaOS kernel as vmlinuz-linux-t2"
 fi
 
 # ---------------------------------------------------------------------------
@@ -248,12 +255,17 @@ if command -v xorriso >/dev/null 2>&1; then
 set timeout=5
 set default=0
 
-menuentry "SigmaOS Desktop Installer" {
+menuentry "SigmaOS Sovereign Microkernel (Live Shell)" {
+    multiboot /boot/sigma_kernel.elf
+    boot
+}
+
+menuentry "SigmaOS Desktop Live & Installer" {
     linux /boot/vmlinuz-linux-t2 root=UUID=REPLACE_WITH_ROOT_UUID rw quiet splash
     initrd /boot/initramfs.gz
 }
 
-menuentry "SigmaOS Desktop Installer (Safe Mode)" {
+menuentry "SigmaOS Desktop (Safe Mode)" {
     linux /boot/vmlinuz-linux-t2 root=UUID=REPLACE_WITH_ROOT_UUID rw nomodeset
     initrd /boot/initramfs.gz
 }

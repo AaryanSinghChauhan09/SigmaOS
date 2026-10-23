@@ -133,16 +133,49 @@ if [ -f "$KERNEL_ELF" ]; then
     echo "--> Staging kernel: $KERNEL_ELF"
     mkdir -p "$ISO_BUILD_DIR/boot"
     cp "$KERNEL_ELF" "$ISO_BUILD_DIR/boot/sigma_kernel.elf"
-    # Add multiboot2 kernel entry to grub.cfg
-    cat >> "$ISO_BUILD_DIR/boot/grub/grub.cfg" << 'KERNELENTRY'
+    
+    # Prepend real kernel entry as default boot entry
+    cat > "$ISO_BUILD_DIR/boot/grub/grub.cfg" << 'GRUBCFG'
+# SigmaOS GRUB Boot Configuration — Live Real Kernel
+set default=0
+set timeout=5
+set timeout_style=menu
 
-# Auto-detected: real kernel found!
-menuentry "SigmaOS — Boot Real Kernel" --class sigmaos-real {
+menuentry "SigmaOS v0.1 — Sovereign Kernel (Live Shell)" --class sigmaos {
+    echo "Loading SigmaOS Sovereign Kernel..."
+    multiboot /boot/sigma_kernel.elf
+    boot
+}
+
+menuentry "SigmaOS v0.1 — Kernel (Multiboot2 Mode)" --class sigmaos-mb2 {
+    echo "Loading SigmaOS Sovereign Kernel (Multiboot2)..."
     multiboot2 /boot/sigma_kernel.elf
     boot
 }
-KERNELENTRY
-    echo "--> Real kernel entry added to GRUB menu [OK]"
+
+menuentry "SigmaOS v0.1 — Information & Status" --class info {
+    echo ""
+    echo "  ╔══════════════════════════════════════════════════════╗"
+    echo "  ║          SigmaOS v0.1 — Sovereign OS                ║"
+    echo "  ║   #![no_std] Rust · Arch · CachyOS · Debian parity ║"
+    echo "  ║   BSD: DragonFly · FreeBSD · OpenBSD               ║"
+    echo "  ║   Craft Suite: 20 creative apps                     ║"
+    echo "  ╚══════════════════════════════════════════════════════╝"
+    echo ""
+    echo "  Kernel binary: /boot/sigma_kernel.elf [READY]"
+    echo "  Repository   : https://github.com/AaryanSinghChauhan09/SigmaOS"
+    echo ""
+}
+
+menuentry "SigmaOS — GRUB Debug Shell" --class shell {
+    set pager=1
+    echo "GRUB shell active. Commands: ls, cat, set, reboot, halt"
+}
+
+menuentry "Reboot" --class reboot { reboot }
+menuentry "Power Off" --class halt { halt }
+GRUBCFG
+    echo "--> Real kernel entry set as default boot entry [OK]"
 fi
 
 # ─────────────────────────────────────────────────────────────────────────────

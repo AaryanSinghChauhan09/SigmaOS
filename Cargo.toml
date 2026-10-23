@@ -86,9 +86,10 @@ unexpected_cfgs = { level = "warn", check-cfg = [
 #                    of the compile time, for daily benchmarking workflows.
 # ---------------------------------------------------------------------------
 [profile.dev]
-opt-level = 1
-debug = "line-tables-only"
-incremental = true
+opt-level = 0
+debug = false
+incremental = false
+codegen-units = 16
 panic = "abort"
 
 # Tests inherit dev; keep assertions but shed full DWARF for faster linking.

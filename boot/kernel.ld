@@ -15,6 +15,7 @@ SECTIONS {
     /* Multiboot2 header first (must be within first 32 KiB of file) */
     .multiboot2_header ALIGN(8) : {
         *(.multiboot2_header)
+        *(.multiboot_header)
     }
 
     /* Executable code */
