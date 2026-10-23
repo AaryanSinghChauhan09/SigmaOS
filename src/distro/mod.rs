@@ -848,11 +848,11 @@ pub use omarchy_linux_missing_components_v69_pr::*;
 pub mod debian_github_repo_missing_components_v68_pr;
 pub use debian_github_repo_missing_components_v68_pr::*;
 
-pub mod open_source_os_unimplemented_ideas_v69_pr;
-pub use open_source_os_unimplemented_ideas_v69_pr::*;
+pub mod open_source_os_missing_components_v69_pr;
+pub use open_source_os_missing_components_v69_pr::*;
 
-pub mod debian_github_repo_missing_components_v69_pr;
-pub use debian_github_repo_missing_components_v69_pr::*;
+pub mod sovereign_linux_bsd_ecosystem_gap_closure_v69_pr;
+pub use sovereign_linux_bsd_ecosystem_gap_closure_v69_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
