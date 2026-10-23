@@ -1,0 +1,50 @@
+name: Open Source OS Idea Adoption Issue
+description: Propose adopting or prototyping an idea or mechanism from an open-source OS project
+title: "idea(<subsystem>): "
+labels: ["type:oss-idea-adoption", "status:needs-triage"]
+body:
+  - type: textarea
+    id: component
+    attributes:
+      label: Component / Subsystem
+      description: Affected subsystem (kernel, memory, VFS, drivers, scheduler, security, IPC, userland)
+    validations:
+      required: true
+  - type: textarea
+    id: upstream_project
+    attributes:
+      label: Upstream project
+      description: Upstream project source (Redox, seL4, Tock, Fuchsia, Linux, FreeBSD, OpenBSD, Plan 9, Haiku, Debian)
+    validations:
+      required: true
+  - type: textarea
+    id: mechanism
+    attributes:
+      label: Open Source OS Mechanism to Adopt
+      description: Detailed summary of the mechanism or architectural pattern to adopt
+    validations:
+      required: true
+  - type: textarea
+    id: sigmaos_benefit
+    attributes:
+      label: Benefit to SigmaOS
+      description: Expected performance, security, memory safety, or developer experience improvement
+    validations:
+      required: true
+  - type: checkboxes
+    id: architecture_compliance
+    attributes:
+      label: SigmaOS Architecture Constraints
+      options:
+        - label: "#![no_std] compliant in kernel/drivers"
+        - label: CapabilityToken verification required on syscall entrypoints
+        - label: Driver follows IoManager/DriverObject/DeviceObject lifecycle model
+        - label: Paged/NonPaged memory allocation rules respected
+        - label: Includes standalone file unit test (rustc --test)
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation Plan
+      description: How the prototype/adoption will be tested and verified (QEMU, unit test, benchmark)
+    validations:
+      required: true
