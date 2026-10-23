@@ -2431,4 +2431,11 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v69_pr.rs" ]; then
     ./build/test_open_source_os_v69_pr
 fi
 
+if [ -f "tests/test_package_advancements_v69.rs" ]; then
+    echo "Running Sovereign Package Advancements V69 test suite..."
+    mkdir -p build
+    rustc --test tests/test_package_advancements_v69.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_v69_integration
+    ./build/test_package_v69_integration
+fi
+
 echo "All SigmaOS test suites completed."
