@@ -619,6 +619,7 @@ pub mod io;
 
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
+pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_missing_components_v66_pr::*;

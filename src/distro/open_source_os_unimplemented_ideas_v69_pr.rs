@@ -49,22 +49,22 @@ pub struct OpenSourceOsV69PrSpec {
 }
 
 // -------------------------------------------------------------------------
-// 1. LINUX 6.28 BPF SCHED_EXT & FOLIO MEMORY TIERING
+// 1. LINUX 6.27 BPF SCHED_EXT & FOLIO COMPACTION ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
-pub struct Linux628BpfSchedExtFolioTieringV69PrEngine {
+pub struct Linux627BpfSchedExtFolioCompactionV69PrEngine {
     pub total_tasks_scheduled: u64,
     pub active_cpus: u32,
-    pub folios_migrated: u64,
+    pub folios_compacted: u64,
 }
 
-impl Linux628BpfSchedExtFolioTieringV69PrEngine {
+impl Linux627BpfSchedExtFolioCompactionV69PrEngine {
     pub fn new() -> Self {
         Self {
             total_tasks_scheduled: 0,
-            active_cpus: 32,
-            folios_migrated: 0,
+            active_cpus: 16,
+            folios_compacted: 0,
         }
     }
 
@@ -76,49 +76,43 @@ impl Linux628BpfSchedExtFolioTieringV69PrEngine {
         (pid + (nice_val + 20) as u32) % self.active_cpus
     }
 
-    pub fn migrate_folios(&mut self, uncompacted_pages: u64) -> u64 {
-        let migrated = uncompacted_pages / 2;
-        self.folios_migrated += migrated;
-        migrated
+    pub fn compact_folios(&mut self, uncompacted_pages: u64) -> u64 {
+        let compacted = uncompacted_pages / 4;
+        self.folios_compacted += compacted;
+        compacted
     }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV69PrSpec {
         OpenSourceOsV69PrSpec {
             pr_id: 6901,
             subsystem: String::from("Kernel/Scheduler"),
-            title: String::from("Linux 6.28 BPF SchedExt Policy Switching & Folio Tiering"),
-            upstream_target: String::from("linux-6.28/kernel/sched/ext.c"),
-            description: String::from("Dynamic BPF-guided task dispatching with multi-page folio NUMA tiering migration"),
-            diff_patch: String::from("--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -110,6 +110,12 @@\n+ bpf_sched_ext_migrate_folios();\n"),
+            title: String::from("Linux 6.27 BPF SchedExt Policy Switching & Folio Compaction"),
+            upstream_target: String::from("linux-6.27/kernel/sched/ext.c"),
+            description: String::from("Dynamic BPF-guided task dispatching with multi-page folio compaction page migration"),
+            diff_patch: String::from("--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -102,6 +102,12 @@\n+ bpf_sched_ext_compact_folios_v69();\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 100,
+            parity_score: 99,
         }
     }
 }
 
-impl Default for Linux628BpfSchedExtFolioTieringV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 2. FREEBSD 15.7 CAPSICUM CASPER & VNET MICRO-JAIL MESH
+// 2. FREEBSD 15.7 CAPSICUM CASPER & NVME-TLS SESSION HANDSHAKE ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
-pub struct FreeBsd157CapsicumCasperVnetV69PrEngine {
+pub struct FreeBsd157CapsicumCasperNvmeTlsV69PrEngine {
     pub total_rights_verified: u64,
     pub casper_services_dispatched: u32,
-    pub active_vnet_jails: u32,
+    pub active_nvme_tls_sessions: u32,
 }
 
-impl FreeBsd157CapsicumCasperVnetV69PrEngine {
+impl FreeBsd157CapsicumCasperNvmeTlsV69PrEngine {
     pub fn new() -> Self {
         Self {
             total_rights_verified: 0,
             casper_services_dispatched: 0,
-            active_vnet_jails: 0,
+            active_nvme_tls_sessions: 0,
         }
     }
 
@@ -136,9 +130,9 @@ impl FreeBsd157CapsicumCasperVnetV69PrEngine {
         }
     }
 
-    pub fn spawn_vnet_jail(&mut self, jail_name: &str) -> bool {
-        if !jail_name.is_empty() {
-            self.active_vnet_jails += 1;
+    pub fn establish_nvme_tls_session(&mut self, target_nqn: &str) -> bool {
+        if target_nqn.starts_with("nqn.2026-01.org.sigmaos:") {
+            self.active_nvme_tls_sessions += 1;
             true
         } else {
             false
@@ -149,24 +143,18 @@ impl FreeBsd157CapsicumCasperVnetV69PrEngine {
         OpenSourceOsV69PrSpec {
             pr_id: 6902,
             subsystem: String::from("Security/Capsicum"),
-            title: String::from("FreeBSD 15.7 Capsicum Casper & VNET Micro-Jail Mesh"),
+            title: String::from("FreeBSD 15.7 Capsicum Casper & NVMe-TLS Session Handshake"),
             upstream_target: String::from("freebsd-15.7/sys/kern/sys_capability.c"),
-            description: String::from("Capsicum capability rights verification, Casper daemon dispatching, and VNET micro-jail container isolation"),
-            diff_patch: String::from("--- a/sys/kern/sys_capability.c\n+++ b/sys/kern/sys_capability.c\n@@ -50,6 +50,10 @@\n+ cap_casper_dispatch_vnet_jail(jail_name);\n"),
+            description: String::from("Capsicum capability rights verification, Casper daemon dispatching, and NVMe over Fabrics TLS session handshake"),
+            diff_patch: String::from("--- a/sys/kern/sys_capability.c\n+++ b/sys/kern/sys_capability.c\n@@ -45,6 +45,10 @@\n+ cap_casper_dispatch_nvme_tls_v69(target_nqn);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 99,
+            parity_score: 98,
         }
     }
 }
 
-impl Default for FreeBsd157CapsicumCasperVnetV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 3. OPENBSD 8.7 PINSYS CALL & UNVEIL V5 PATH RESTRICTIONS
+// 3. OPENBSD 8.7 PINSYS CALL & DYNAMIC UNVEIL PATH CHECKS ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -180,9 +168,8 @@ impl OpenBsd87PinsyscallUnveilV69PrEngine {
         let mut rules = BTreeMap::new();
         rules.insert(String::from("/etc"), String::from("r"));
         rules.insert(String::from("/tmp"), String::from("rwc"));
-        rules.insert(String::from("/var/log"), String::from("rw"));
         Self {
-            pinned_syscall_ranges: vec![(0x400000, 0x420000)],
+            pinned_syscall_ranges: vec![(0x400000, 0x410000)],
             unveil_rules: rules,
         }
     }
@@ -209,24 +196,18 @@ impl OpenBsd87PinsyscallUnveilV69PrEngine {
         OpenSourceOsV69PrSpec {
             pr_id: 6903,
             subsystem: String::from("Security/Pinsyscall"),
-            title: String::from("OpenBSD 8.7 Pinsyscall & Unveil V5 Path Restrictions"),
+            title: String::from("OpenBSD 8.7 Pinsyscall & Dynamic Unveil Permission Path Checks"),
             upstream_target: String::from("openbsd-8.7/sys/kern/kern_unveil.c"),
-            description: String::from("Address range verification for pinned syscall instructions and Unveil V5 path permissions auditing"),
-            diff_patch: String::from("--- a/sys/kern/kern_unveil.c\n+++ b/sys/kern/kern_unveil.c\n@@ -92,6 +92,10 @@\n+ pinsyscall_unveil_v5_audit(ip, path, mode);\n"),
+            description: String::from("Address range verification for pinned syscall instructions and dynamic unveil permissions auditing"),
+            diff_patch: String::from("--- a/sys/kern/kern_unveil.c\n+++ b/sys/kern/kern_unveil.c\n@@ -88,6 +88,10 @@\n+ pinsyscall_unveil_audit_v69(ip, path, mode);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 99,
+            parity_score: 98,
         }
     }
 }
 
-impl Default for OpenBsd87PinsyscallUnveilV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 4. NETBSD 12.3 RUMP PCI & VIRTIO-9P HYPERCALL VFS
+// 4. NETBSD 12.3 RUMP PCI BAR SPACE & VIRTIO 9P REQUEST PARSING ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -238,7 +219,7 @@ pub struct NetBsd123RumpPciVirtio9pV69PrEngine {
 impl NetBsd123RumpPciVirtio9pV69PrEngine {
     pub fn new() -> Self {
         Self {
-            bar_allocations: vec![(0, 0xF0000000), (1, 0xF0100000), (2, 0xF0200000)],
+            bar_allocations: vec![(0, 0xF0000000), (1, 0xF0100000)],
             virtio_9p_requests_processed: 0,
         }
     }
@@ -256,24 +237,18 @@ impl NetBsd123RumpPciVirtio9pV69PrEngine {
         OpenSourceOsV69PrSpec {
             pr_id: 6904,
             subsystem: String::from("Kernel/RumpHypercall"),
-            title: String::from("NetBSD 12.3 Rump PCI & VirtIO-9P Hypercall VFS"),
+            title: String::from("NetBSD 12.3 Rump PCI BAR Space & VirtIO-9P Request Parsing"),
             upstream_target: String::from("netbsd-12.3/sys/rump/librump/rumpdev/rumppci.c"),
             description: String::from("Rump PCI BAR memory space mapping and VirtIO-9P VFS request parser isolation"),
-            diff_patch: String::from("--- a/sys/rump/librump/rumpdev/rumppci.c\n+++ b/sys/rump/librump/rumpdev/rumppci.c\n@@ -120,6 +120,10 @@\n+ rump_virtio_9p_vfs_parse(hdr);\n"),
+            diff_patch: String::from("--- a/sys/rump/librump/rumpdev/rumppci.c\n+++ b/sys/rump/librump/rumpdev/rumppci.c\n@@ -112,6 +112,10 @@\n+ rump_virtio_9p_parse_hdr_v69(hdr);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 98,
+            parity_score: 97,
         }
     }
 }
 
-impl Default for NetBsd123RumpPciVirtio9pV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 5. DRAGONFLY BSD 7.5 HAMMER2 MULTI-MASTER PFS DELTA SYNC & SCRUB
+// 5. DRAGONFLY BSD 7.5 HAMMER2 MULTI-MASTER PFS DELTA SYNC & SCRUB ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -285,7 +260,7 @@ pub struct DragonFly75Hammer2MultiMasterScrubV69PrEngine {
 impl DragonFly75Hammer2MultiMasterScrubV69PrEngine {
     pub fn new() -> Self {
         Self {
-            pfs_replicas: 4,
+            pfs_replicas: 3,
             total_scrubbed_blocks: 0,
         }
     }
@@ -310,21 +285,15 @@ impl DragonFly75Hammer2MultiMasterScrubV69PrEngine {
             title: String::from("DragonFly BSD 7.5 HAMMER2 Multi-Master PFS Delta Sync & Scrub"),
             upstream_target: String::from("dragonflybsd-7.5/sys/vfs/hammer2/hammer2_vfsops.c"),
             description: String::from("HAMMER2 pseudo-filesystem (PFS) snapshot delta synchronization and multi-master checksum scrub"),
-            diff_patch: String::from("--- a/sys/vfs/hammer2/hammer2_vfsops.c\n+++ b/sys/vfs/hammer2/hammer2_vfsops.c\n@@ -210,6 +210,10 @@\n+ hammer2_pfs_v69_sync_scrub(pfs, crc);\n"),
+            diff_patch: String::from("--- a/sys/vfs/hammer2/hammer2_vfsops.c\n+++ b/sys/vfs/hammer2/hammer2_vfsops.c\n@@ -201,6 +201,10 @@\n+ hammer2_pfs_sync_scrub_delta_v69(pfs, crc);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 99,
+            parity_score: 98,
         }
     }
 }
 
-impl Default for DragonFly75Hammer2MultiMasterScrubV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 6. ILLUMOS OPENZFS BLOCK AES-GCM & DTRACE-TO-EBPF TRANSLATOR
+// 6. ILLUMOS OPENZFS BLOCK AES-GCM & DTRACE-TO-EBPF TRANSLATOR ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -336,7 +305,7 @@ pub struct IllumosOpenZfsDtraceEbpfV69PrEngine {
 impl IllumosOpenZfsDtraceEbpfV69PrEngine {
     pub fn new() -> Self {
         Self {
-            active_zfs_pools: 4,
+            active_zfs_pools: 2,
             translated_probes: 0,
         }
     }
@@ -352,7 +321,7 @@ impl IllumosOpenZfsDtraceEbpfV69PrEngine {
     pub fn translate_dtrace_probe(&mut self, dtrace_script: &str) -> String {
         self.translated_probes += 1;
         format!(
-            "SEC(\"kprobe/{}\") int ebpf_probe_v69(void *ctx) {{ return 0; }}",
+            "SEC(\"kprobe/{}\") int ebpf_probe(void *ctx) {{ return 0; }}",
             dtrace_script
         )
     }
@@ -364,21 +333,15 @@ impl IllumosOpenZfsDtraceEbpfV69PrEngine {
             title: String::from("Illumos OpenZFS Block AES-GCM Encryption & DTrace-to-eBPF Translator"),
             upstream_target: String::from("illumos-gate/usr/src/uts/common/fs/zfs/zio_crypt.c"),
             description: String::from("OpenZFS AES-GCM block encryption pipeline and DTrace-to-eBPF dynamic probe translation gateway"),
-            diff_patch: String::from("--- a/usr/src/uts/common/fs/zfs/zio_crypt.c\n+++ b/usr/src/uts/common/fs/zfs/zio_crypt.c\n@@ -160,6 +160,10 @@\n+ zio_crypt_v69_encrypt_gcm(zio, key);\n"),
+            diff_patch: String::from("--- a/usr/src/uts/common/fs/zfs/zio_crypt.c\n+++ b/usr/src/uts/common/fs/zfs/zio_crypt.c\n@@ -150,6 +150,10 @@\n+ zio_crypt_encrypt_gcm_ebpf_v69(zio, key);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 100,
+            parity_score: 99,
         }
     }
 }
 
-impl Default for IllumosOpenZfsDtraceEbpfV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 7. HAIKU BEFS ATTRIBUTE INDEXING & OPENTRACKER NODE BROADCAST
+// 7. HAIKU BEFS ATTRIBUTE INDEXING & OPENTRACKER NODE BROADCAST ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -391,8 +354,7 @@ impl HaikuBeFsAttributeIndexingV69PrEngine {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
         map.insert(String::from("BEOS:TYPE"), String::from("text/plain"));
-        map.insert(String::from("META:TITLE"), String::from("SigmaOS V69 Document"));
-        map.insert(String::from("META:AUTHOR"), String::from("SigmaOS Core"));
+        map.insert(String::from("META:TITLE"), String::from("SigmaOS Document"));
         Self {
             indexed_attributes: map,
             total_tracker_notifications: 0,
@@ -419,21 +381,15 @@ impl HaikuBeFsAttributeIndexingV69PrEngine {
             title: String::from("Haiku BeFS Attribute Indexing & OpenTracker Node Broadcasting"),
             upstream_target: String::from("haiku/src/add-ons/kernel/file_systems/bfs/Attribute.cpp"),
             description: String::from("BeFS BFS attribute index tree search and OpenTracker live node change notification broadcasting"),
-            diff_patch: String::from("--- a/src/add-ons/kernel/file_systems/bfs/Attribute.cpp\n+++ b/src/add-ons/kernel/file_systems/bfs/Attribute.cpp\n@@ -80,6 +80,10 @@\n+ bfs_broadcast_tracker_v69_node_change(node_id);\n"),
+            diff_patch: String::from("--- a/src/add-ons/kernel/file_systems/bfs/Attribute.cpp\n+++ b/src/add-ons/kernel/file_systems/bfs/Attribute.cpp\n@@ -75,6 +75,10 @@\n+ bfs_broadcast_tracker_node_change_v69(node_id, event);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 99,
+            parity_score: 98,
         }
     }
 }
 
-impl Default for HaikuBeFsAttributeIndexingV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 8. PLAN 9 9P2000.L REQUEST FRAMING & PLUMBER PATTERN ROUTING
+// 8. PLAN 9 9P2000.L REQUEST FRAMING & PLUMBER PATTERN ROUTING ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -448,7 +404,6 @@ impl Plan99p2000LPlumberV69PrEngine {
             active_plumber_rules: vec![
                 (String::from("type is text"), String::from("editor")),
                 (String::from("type is image"), String::from("viewer")),
-                (String::from("type is audio"), String::from("player")),
             ],
             messages_routed: 0,
         }
@@ -474,21 +429,15 @@ impl Plan99p2000LPlumberV69PrEngine {
             title: String::from("Plan 9 9P2000.L Request Framing & Plumber Pattern Routing"),
             upstream_target: String::from("plan9/sys/src/cmd/plumb/plumb.c"),
             description: String::from("9P2000.L request framing pipeline and Plumber message pattern routing broker"),
-            diff_patch: String::from("--- a/sys/src/cmd/plumb/plumb.c\n+++ b/sys/src/cmd/plumb/plumb.c\n@@ -40,6,10 @@\n+ plumb_route_v69_pattern(msg_type, payload);\n"),
+            diff_patch: String::from("--- a/sys/src/cmd/plumb/plumb.c\n+++ b/sys/src/cmd/plumb/plumb.c\n@@ -33,6 +33,10 @@\n+ plumb_route_pattern_9p_v69(msg_type, payload);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 98,
+            parity_score: 97,
         }
     }
 }
 
-impl Default for Plan99p2000LPlumberV69PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 // -------------------------------------------------------------------------
-// 9. REDOXFS COW BLOCK TREE COMMIT & SCHEME CAPABILITY TOKEN
+// 9. REDOXFS COW BLOCK TREE COMMIT & SCHEME CAPABILITY TOKEN ENGINE
 // -------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
@@ -500,7 +449,7 @@ pub struct RedoxFsCowCapabilityV69PrEngine {
 impl RedoxFsCowCapabilityV69PrEngine {
     pub fn new() -> Self {
         Self {
-            current_tx_id: 2000,
+            current_tx_id: 1000,
             verified_tokens: 0,
         }
     }
@@ -530,16 +479,10 @@ impl RedoxFsCowCapabilityV69PrEngine {
             title: String::from("RedoxFS CoW Block Tree Transaction Commit & Scheme Capability Tokens"),
             upstream_target: String::from("redoxfs/src/filesystem.rs"),
             description: String::from("Copy-on-Write B-tree transaction commit and Scheme capability token verification"),
-            diff_patch: String::from("--- a/src/filesystem.rs\n+++ b/src/filesystem.rs\n@@ -150,6,10 @@\n+ commit_cow_v69_transaction(tx, tokens);\n"),
+            diff_patch: String::from("--- a/src/filesystem.rs\n+++ b/src/filesystem.rs\n@@ -140,6 +140,10 @@\n+ commit_cow_transaction_with_capabilities_v69(tx, tokens);\n"),
             status: OsPrStatusV69::Validated,
-            parity_score: 99,
+            parity_score: 98,
         }
-    }
-}
-
-impl Default for RedoxFsCowCapabilityV69PrEngine {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -548,8 +491,8 @@ impl Default for RedoxFsCowCapabilityV69PrEngine {
 // -------------------------------------------------------------------------
 
 pub struct OpenSourceOsUnimplementedIdeasV69PrSuite {
-    pub linux_eng: Linux628BpfSchedExtFolioTieringV69PrEngine,
-    pub freebsd_eng: FreeBsd157CapsicumCasperVnetV69PrEngine,
+    pub linux_eng: Linux627BpfSchedExtFolioCompactionV69PrEngine,
+    pub freebsd_eng: FreeBsd157CapsicumCasperNvmeTlsV69PrEngine,
     pub openbsd_eng: OpenBsd87PinsyscallUnveilV69PrEngine,
     pub netbsd_eng: NetBsd123RumpPciVirtio9pV69PrEngine,
     pub dragonfly_eng: DragonFly75Hammer2MultiMasterScrubV69PrEngine,
@@ -562,8 +505,8 @@ pub struct OpenSourceOsUnimplementedIdeasV69PrSuite {
 impl OpenSourceOsUnimplementedIdeasV69PrSuite {
     pub fn new() -> Self {
         Self {
-            linux_eng: Linux628BpfSchedExtFolioTieringV69PrEngine::new(),
-            freebsd_eng: FreeBsd157CapsicumCasperVnetV69PrEngine::new(),
+            linux_eng: Linux627BpfSchedExtFolioCompactionV69PrEngine::new(),
+            freebsd_eng: FreeBsd157CapsicumCasperNvmeTlsV69PrEngine::new(),
             openbsd_eng: OpenBsd87PinsyscallUnveilV69PrEngine::new(),
             netbsd_eng: NetBsd123RumpPciVirtio9pV69PrEngine::new(),
             dragonfly_eng: DragonFly75Hammer2MultiMasterScrubV69PrEngine::new(),
@@ -605,12 +548,6 @@ impl OpenSourceOsUnimplementedIdeasV69PrSuite {
         self.redox_eng
             .verify_scheme_capability_token("REDOX-CAP-123");
         9
-    }
-}
-
-impl Default for OpenSourceOsUnimplementedIdeasV69PrSuite {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
