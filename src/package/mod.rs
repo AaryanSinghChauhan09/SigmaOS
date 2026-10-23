@@ -57,6 +57,14 @@ pub mod store;
 pub mod universal;
 pub mod updater;
 pub mod zsync_delta;
+pub mod sovereign_update_manager;
+// Note: PackageUpdate and SystemGeneration are exported without glob to avoid name conflicts
+pub use sovereign_update_manager::{
+    SovereignUpdateManager, UpdatePolicy, UpdateCategory,
+    SafetyLevel, UpdateCheckResult, InstallResult, PackageBackend,
+    AptBackend, PacmanBackend, PkgBackend, DeltaUpdateEngine, DeltaPatch,
+    UpdateRepository,
+};
 
 pub use sigmarepo::{
     add_repository, get_sigmarepo, init_sigmarepo, init_sigmarepo_default, search_package,

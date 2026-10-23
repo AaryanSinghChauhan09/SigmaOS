@@ -462,7 +462,7 @@ pub use orchestration::{
 };
 pub use package::{
     ConflictResolution, DependencyResolver, PackageAdapter, PackageError, PackageFormat,
-    PackageSource, SovereignDistroPackageAdvancementsSuiteV68, UnifiedPackage,
+    PackageSource, UnifiedPackage,
     UniversalPackageManager,
 };
 pub use productivity::{

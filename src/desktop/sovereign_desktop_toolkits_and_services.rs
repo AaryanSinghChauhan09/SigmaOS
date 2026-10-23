@@ -109,6 +109,7 @@ pub enum ToolkitEvent {
     GtkInspectorToggled(bool),
     KvantumThemeApplied(String),
     WallpaperAccentExtracted(String),
+    RenderPipelineChanged(Gtk4RenderPipeline),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -130,10 +131,10 @@ pub struct SovereignGtkQtToolkitEngine {
     pub gtk_inspector_enabled: bool,
     pub kvantum_spec: Option<KvantumThemeSpec>,
     pub qml_bridge: Qt6QmlThemeBridge,
+    pub qml_plugin_bridge: QmlPluginRuntimeBridge,
     pub css_rules: BTreeMap<String, BTreeMap<String, String>>,
     pub signal_listeners: BTreeMap<String, Vec<String>>,
     pub event_log: Vec<ToolkitEvent>,
-    pub qml_bridge: QmlPluginRuntimeBridge,
     pub dconf_keys: BTreeMap<String, String>,
 }
 
@@ -184,7 +185,7 @@ impl SovereignGtkQtToolkitEngine {
             css_rules,
             signal_listeners: BTreeMap::new(),
             event_log: Vec::new(),
-            qml_bridge: QmlPluginRuntimeBridge {
+            qml_plugin_bridge: QmlPluginRuntimeBridge {
                 registered_qml_modules: vec![
                     "Org.SigmaOS.Controls".to_string(),
                     "QtQuick.Controls.Material".to_string(),
@@ -590,6 +591,7 @@ pub struct SovereignDisplayManagerSuiteEngine {
     pub xdmcp_sessions: Vec<XdmcpSessionHandshake>,
     pub xdmcp_manager: XdmcpSessionManager,
     pub accounts_service_sync: BTreeMap<String, String>,
+    pub logind_session_ids: BTreeMap<String, String>,
 }
 
 impl SovereignDisplayManagerSuiteEngine {
@@ -645,6 +647,7 @@ impl SovereignDisplayManagerSuiteEngine {
             xdmcp_sessions: Vec::new(),
             xdmcp_manager: XdmcpSessionManager::new(),
             accounts_service_sync,
+            logind_session_ids: BTreeMap::new(),
         }
     }
 

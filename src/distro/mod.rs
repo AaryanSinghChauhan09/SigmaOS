@@ -853,8 +853,11 @@ pub use open_source_os_unimplemented_ideas_v69_pr::*;
 pub mod debian_github_repo_missing_components_v68_pr;
 pub use debian_github_repo_missing_components_v68_pr::*;
 
-pub mod open_source_os_unimplemented_ideas_v69_pr;
-pub use open_source_os_unimplemented_ideas_v69_pr::*;
+pub mod debian_github_repo_missing_components_v69_pr;
+pub use debian_github_repo_missing_components_v69_pr::*;
+
+pub mod omarchy_linux_missing_components_v69_pr;
+pub use omarchy_linux_missing_components_v69_pr::*;
 
 pub mod cachy_linux_missing_components_v69_pr;
 pub use cachy_linux_missing_components_v69_pr::*;
@@ -862,3 +865,11 @@ pub use cachy_linux_missing_components_v69_pr::*;
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
+
+// Sovereign Release Manager
+pub mod sovereign_release_manager;
+pub use sovereign_release_manager::{
+    SovereignReleaseManager, PointRelease, ReleaseSeries,
+    UpgradePath, UpgradeMethod, UpgradeRisk, EolTracker,
+    ReleaseAnnouncement, ReleaseHighlight, HighlightCategory, KnownIssue,
+};
