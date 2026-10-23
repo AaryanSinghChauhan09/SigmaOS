@@ -2121,6 +2121,13 @@ if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     ./build/test_command_interpreter
 fi
 
+if [ -f "src/shell/sovereign_shells_terminals_supervisors_pr.rs" ]; then
+    echo "Running Sovereign Shells, Terminals, Init Systems & Supervisors PR test suite..."
+    mkdir -p build
+    rustc --test src/shell/sovereign_shells_terminals_supervisors_pr.rs --edition=2021 -o build/test_shells_pr
+    ./build/test_shells_pr
+fi
+
 if [ -f "src/distro/sovereign_open_source_os_apex_inspirations_v50.rs" ]; then
     echo "Running Sovereign Open Source OS Apex Inspirations Engine (V50) test suite..."
     mkdir -p build
