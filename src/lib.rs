@@ -220,6 +220,8 @@ pub use distro::cachy_linux_missing_components_v65_pr::*;
 pub use distro::cachy_linux_missing_components_v66_pr::*;
 pub use distro::cachy_linux_missing_components_v67_pr::*;
 pub use distro::cachy_linux_missing_components_v68_pr::*;
+pub use distro::cachy_linux_missing_components_v69_pr::*;
+pub use distro::cachy_linux_missing_components_v70_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::dragonflybsd_missing_components_v61_pr::*;
 pub use distro::dragonflybsd_missing_components_v62_pr::*;
