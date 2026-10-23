@@ -331,18 +331,29 @@ pub fn validate_url(url: &[u8]) -> Result<(), ValidationError> {
 
 // ── MAC Address ─────────────────────────────────────────────────────────────
 
-/// Validate an IEEE 802 48-bit MAC address (e.g., `00:1A:2B:3C:4D:5E` or `00-1A-2B-3C-4D-5E`).
-/// Enforces strict 17-byte ASCII format and uniform delimiter checking (all colons or all hyphens)
-/// to prevent parser differential attacks across network drivers and security components.
+/// Validate an IEEE 802 48-bit MAC address or EUI-64 64-bit MAC address
+/// (e.g., `00:1A:2B:3C:4D:5E`, `00-1A-2B-3C-4D-5E`, or 23-byte `00:1A:2B:3C:4D:5E:6F:70`).
+/// Enforces strict ASCII format, NUL-byte rejection, control character rejection, and uniform delimiter checking
+/// (all colons or all hyphens) to prevent C-string truncation (CWE-626), terminal sequence injection (CWE-150),
+/// and parser differential attacks across network drivers and security components.
 pub fn validate_mac_address(mac: &[u8]) -> Result<(), ValidationError> {
     if mac.is_empty() {
         return Err(ValidationError::EmptyInput);
     }
-    if mac.len() > 17 {
+    if mac.len() > 23 {
         return Err(ValidationError::TooLong);
     }
-    if mac.len() < 17 {
+    if mac.len() != 17 && mac.len() != 23 {
         return Err(ValidationError::OutOfRange);
+    }
+
+    for &b in mac {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b < 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
     }
 
     let delimiter = mac[2];
@@ -351,7 +362,7 @@ pub fn validate_mac_address(mac: &[u8]) -> Result<(), ValidationError> {
     }
 
     for (i, &b) in mac.iter().enumerate() {
-        if i == 2 || i == 5 || i == 8 || i == 11 || i == 14 {
+        if (i % 3) == 2 {
             if b != delimiter {
                 return Err(ValidationError::InvalidChars);
             }
@@ -1427,14 +1438,32 @@ mod tests {
 
     #[test]
     fn test_mac_address_validation() {
-        // Valid colon-separated MAC
+        // Valid colon-separated MAC (48-bit MAC & 64-bit EUI-64)
         assert_eq!(validate_mac_address(b"00:1A:2B:3C:4D:5E"), Ok(()));
         assert_eq!(validate_mac_address(b"ff:ff:ff:ff:ff:ff"), Ok(()));
         assert_eq!(validate_mac_address(b"01:23:45:67:89:ab"), Ok(()));
+        assert_eq!(validate_mac_address(b"00:1A:2B:3C:4D:5E:6F:70"), Ok(()));
 
-        // Valid hyphen-separated MAC
+        // Valid hyphen-separated MAC (48-bit MAC & 64-bit EUI-64)
         assert_eq!(validate_mac_address(b"00-1A-2B-3C-4D-5E"), Ok(()));
         assert_eq!(validate_mac_address(b"FF-FF-FF-FF-FF-FF"), Ok(()));
+        assert_eq!(validate_mac_address(b"00-1A-2B-3C-4D-5E-6F-70"), Ok(()));
+
+        // NUL byte injection check
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B\x003C:4D:5E"),
+            Err(ValidationError::NullByte)
+        );
+
+        // ASCII control character injection check
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B\n3C:4D:5E"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B\x1b3C:4D:5E"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Empty and length checks
         assert_eq!(validate_mac_address(b""), Err(ValidationError::EmptyInput));
@@ -1444,6 +1473,10 @@ mod tests {
         );
         assert_eq!(
             validate_mac_address(b"00:1A:2B:3C:4D:5E:6F"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_mac_address(b"00:1A:2B:3C:4D:5E:6F:70:81"),
             Err(ValidationError::TooLong)
         );
 
