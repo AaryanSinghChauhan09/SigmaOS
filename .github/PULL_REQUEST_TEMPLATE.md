@@ -1,47 +1,60 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What secondary-memory behavior changed and why? -->
 
-## Task type
+## Storage component
 
-- [ ] Daily CI maintenance
-- [ ] Weekly dependency/security review
-- [ ] Weekly open-source study
-- [ ] Biweekly component gap review
-- [ ] Monthly boot validation
-- [ ] Monthly installer/recovery rehearsal
-- [ ] Monthly package/update rehearsal
-- [ ] Quarterly release review
-- [ ] Quarterly architecture review
-- [ ] Quarterly hardware audit
-
-## Study and Adoption
-
-- Reference study:
-- What SigmaOS adopts:
-
-## Component
-
-- [ ] Boot / platform
-- [ ] Kernel
-- [ ] Memory
-- [ ] Scheduler
-- [ ] VFS / filesystems
-- [ ] Syscalls
-- [ ] Drivers
-- [ ] Networking
-- [ ] IPC
-- [ ] Security
-- [ ] Userspace
-- [ ] Desktop
-- [ ] Packaging / installer
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly storage audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or storage changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
 -
+
+## Storage safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Evidence
 
@@ -49,28 +62,19 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New or updated tests
-- [ ] QEMU boot evidence, if applicable
-- [ ] Installer/recovery evidence, if applicable
-- [ ] Hardware evidence, if applicable
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Roadmap or release checklist
-
-## Shell safety review
-
-- [ ] Shell lexer/parser safety verified.
-- [ ] Builtin contract and exit code policy enforced.
-
-## Reviewer checklist
-
-- [ ] Kernel safety review completed, if applicable.
-- [ ] Unsafe blocks verified and documented.
+- [ ] Storage documentation
+- [ ] Boot matrix, if applicable
 
 ## Risks and rollback
 
