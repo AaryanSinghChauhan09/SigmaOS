@@ -86,3 +86,11 @@ wiki/
 !docs/**/*.md
 !FUTURE-DEVELOPMENT-ROADMAP.md
 !docs/FUTURE-DEVELOPMENT-ROADMAP.md
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+!docs/roadmap/*.md
+!wiki/
+!wiki/*.md
+!wiki/**/*.md
+!WIKI/
+!WIKI/*.md
+!WIKI/**/*.md
