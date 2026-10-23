@@ -404,6 +404,27 @@ impl UniversalShellScriptTranspiler {
             let cmd = l.trim_start_matches("type -q ").trim();
             return format!("command -v {} >/dev/null 2>&1", cmd);
         }
+        if l.starts_with("for ") && l.contains(" in ") {
+            // Fish for loop: for i in (seq 1 5) -> for i in $(seq 1 5); do
+            let mut loop_line = l.replace(" (", " $( ").replace(")", " )");
+            if !loop_line.ends_with("; do") {
+                loop_line.push_str("; do");
+            }
+            return loop_line;
+        }
+        if l.starts_with("while ") {
+            // Fish while loop: while test $x -lt 10 -> while [ $x -lt 10 ]; do
+            let cond = l.trim_start_matches("while ").trim().replace("test ", "");
+            return format!("while [ {} ]; do", cond);
+        }
+        if l.starts_with("if ") {
+            // Fish if: if test -f /file -> if [ -f /file ]; then
+            let cond = l.trim_start_matches("if ").trim().replace("test ", "");
+            return format!("if [ {} ]; then", cond);
+        }
+        if l == "else" {
+            return "else".to_string();
+        }
         l
     }
 
@@ -1128,6 +1149,36 @@ impl UniversalCliOptionTranslator {
                 canonical_command: "systemctl".to_string(),
                 detected_style: OptionStyle::PowerShellCmdlet,
                 translated_args: vec!["status".to_string()],
+            };
+        }
+        if cmd == "Start-Service" {
+            let mut tr_args = vec!["start".to_string()];
+            tr_args.extend(args.iter().map(|s| s.to_string()));
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "systemctl".to_string(),
+                detected_style: OptionStyle::PowerShellCmdlet,
+                translated_args: tr_args,
+            };
+        }
+        if cmd == "Stop-Service" {
+            let mut tr_args = vec!["stop".to_string()];
+            tr_args.extend(args.iter().map(|s| s.to_string()));
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "systemctl".to_string(),
+                detected_style: OptionStyle::PowerShellCmdlet,
+                translated_args: tr_args,
+            };
+        }
+        if cmd == "find" && args.get(0) == Some(&"-name") {
+            let mut tr_args = vec!["-name".to_string()];
+            tr_args.extend(args.iter().skip(1).map(|s| s.to_string()));
+            return TranslatedCliOptionCommand {
+                original_command: trimmed.to_string(),
+                canonical_command: "find".to_string(),
+                detected_style: OptionStyle::PosixSingleDash,
+                translated_args: tr_args,
             };
         }
 

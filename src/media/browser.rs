@@ -2130,10 +2130,13 @@ impl SigmaWebBrowser {
             return Err("Navigation Blocked: DeclarativeNetRequest Rule Triggered");
         }
 
-        // 2. HTTPS Upgrade
-        let upgraded = self.brave_shields.upgrade_to_https(raw_url);
+        // 2. Brave DeAMP Unwrap
+        let deamped = self.brave_deamp.unwrap_amp_url(raw_url);
 
-        // 3. Telemetry and tracking parameter scrubbing
+        // 3. HTTPS Upgrade
+        let upgraded = self.brave_shields.upgrade_to_https(&deamped);
+
+        // 4. Telemetry and tracking parameter scrubbing
         let sanitized = self.stripper.sanitize_url(&upgraded);
 
         // 4. CNAME Uncloaking & Domain extraction

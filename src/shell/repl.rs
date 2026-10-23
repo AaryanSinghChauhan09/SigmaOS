@@ -2088,5 +2088,15 @@ mod tests {
         assert!(matches!(fish_cmd, ShellCommand::Sh { .. }));
         let fish_res = repl.execute_command(fish_cmd).unwrap();
         assert!(fish_res.contains("Friendly Interactive Shell"));
+
+        let zsh_cmd = repl.parse_command("zsh -c 'export ZSH_VAR=1'");
+        assert!(matches!(zsh_cmd, ShellCommand::Sh { .. }));
+        let zsh_res = repl.execute_command(zsh_cmd).unwrap();
+        assert!(zsh_res.contains("Z Shell"));
+
+        let pwsh_cmd = repl.parse_command("pwsh -c '$env:TEST = 1'");
+        assert!(matches!(pwsh_cmd, ShellCommand::Sh { .. }));
+        let pwsh_res = repl.execute_command(pwsh_cmd).unwrap();
+        assert!(pwsh_res.contains("PowerShell Core"));
     }
 }
