@@ -7,6 +7,19 @@ use periodic_study_improve_prove_engine::*;
 
 #[test]
 fn test_periodic_cadence_metadata() {
+    let cadences = [
+        PeriodicCadence::Daily,
+        PeriodicCadence::Weekly,
+        PeriodicCadence::Biweekly,
+        PeriodicCadence::Monthly,
+        PeriodicCadence::Quarterly,
+    ];
+
+    for c in &cadences {
+        assert!(!c.description().is_empty());
+        assert!(!c.output_artifact().is_empty());
+    }
+
     assert_eq!(
         PeriodicCadence::Daily.description(),
         "Keep build, tests, and boot status healthy"
@@ -19,6 +32,28 @@ fn test_periodic_cadence_metadata() {
 
 #[test]
 fn test_component_domain_ownership_map() {
+    let domains = [
+        ComponentDomain::KernelCore,
+        ComponentDomain::Memory,
+        ComponentDomain::VfsFilesystems,
+        ComponentDomain::Ipc,
+        ComponentDomain::Syscalls,
+        ComponentDomain::Security,
+        ComponentDomain::Drivers,
+        ComponentDomain::Networking,
+        ComponentDomain::Packaging,
+        ComponentDomain::DesktopZenith,
+        ComponentDomain::InstallerUpdate,
+        ComponentDomain::DistroCompatibility,
+    ];
+
+    for d in &domains {
+        assert!(!d.name().is_empty());
+        assert!(!d.primary_references().is_empty());
+        assert!(!d.periodic_focus().is_empty());
+        assert!(!d.required_proof().is_empty());
+    }
+
     let domain = ComponentDomain::VfsFilesystems;
     assert_eq!(domain.name(), "VFS/filesystems");
     assert_eq!(domain.primary_references(), "Linux, xv6, FreeBSD");
@@ -27,6 +62,23 @@ fn test_component_domain_ownership_map() {
 
 #[test]
 fn test_improvement_loop_steps() {
+    let steps = [
+        ImprovementLoopStep::Step1SelectComponent,
+        ImprovementLoopStep::Step2MeasureCurrentState,
+        ImprovementLoopStep::Step3SelectUpstreamReference,
+        ImprovementLoopStep::Step4StudyMechanism,
+        ImprovementLoopStep::Step5WriteImprovementProposal,
+        ImprovementLoopStep::Step6ImplementSmallestSafeChange,
+        ImprovementLoopStep::Step7RunTests,
+        ImprovementLoopStep::Step8UpdateDocsAndStatus,
+        ImprovementLoopStep::Step9AddRegressionProtection,
+        ImprovementLoopStep::Step10ReviewMergeAndMonitor,
+    ];
+
+    for s in &steps {
+        assert!(!s.name().is_empty());
+    }
+
     assert_eq!(
         ImprovementLoopStep::Step1SelectComponent.name(),
         "1. SELECT COMPONENT"
@@ -38,8 +90,25 @@ fn test_improvement_loop_steps() {
 }
 
 #[test]
+fn test_component_maturity_levels() {
+    let levels = [
+        ComponentMaturity::Proposed,
+        ComponentMaturity::Prototype,
+        ComponentMaturity::Integrated,
+        ComponentMaturity::Hardened,
+        ComponentMaturity::Supported,
+    ];
+
+    for lvl in &levels {
+        assert!(!lvl.name().is_empty());
+        assert!(!lvl.requirement().is_empty());
+    }
+}
+
+#[test]
 fn test_maturity_promotion_rule_3_enforcement() {
     let mut engine = PeriodicImprovementEngine::new();
+    assert_eq!(engine.active_loop_step, ImprovementLoopStep::Step1SelectComponent);
 
     // Default status is Prototype
     assert_eq!(
@@ -92,6 +161,13 @@ fn test_maturity_promotion_rule_3_enforcement() {
     );
 
     assert!(res_ok.is_ok());
+    let record = res_ok.unwrap();
+    assert_eq!(record.domain, ComponentDomain::VfsFilesystems);
+    assert_eq!(record.adr_file, "research/decisions/ADR-012-vfs.md");
+    assert_eq!(record.unit_tests_added, 14);
+    assert_eq!(record.integration_tests_added, 2);
+    assert_eq!(record.study.target_domain, ComponentDomain::VfsFilesystems);
+
     assert_eq!(
         engine.get_maturity(ComponentDomain::VfsFilesystems),
         ComponentMaturity::Integrated
@@ -100,12 +176,17 @@ fn test_maturity_promotion_rule_3_enforcement() {
 
 #[test]
 fn test_monthly_milestone_completion_and_report() {
-    let mut engine = PeriodicImprovementEngine::new();
+    let mut engine = PeriodicImprovementEngine::default();
 
     // Complete Month 1 milestone
     assert!(engine
         .complete_monthly_milestone(1, "reports/boot/qemu-x86_64-boot-matrix.json".into())
         .is_ok());
+
+    assert!(engine.complete_monthly_milestone(99, "bad".into()).is_err());
+
+    let m1 = &engine.monthly_milestones[0];
+    assert_eq!(m1.domain, ComponentDomain::KernelCore);
 
     let summary = engine.generate_program_summary();
     assert!(summary.contains("SigmaOS Periodic Improvement Program Status Report"));
@@ -114,8 +195,9 @@ fn test_monthly_milestone_completion_and_report() {
 
 #[test]
 fn test_periodic_pr_gateway_and_proposal_formatting() {
-    let mut gateway = PeriodicStudyImproveProvePrGateway::new();
+    let mut gateway = PeriodicStudyImproveProvePrGateway::default();
     assert_eq!(gateway.pr_proposals.len(), 6);
+    assert_eq!(gateway.engine.component_maturities.len(), 12);
 
     let vfs_prs = gateway.search_by_domain(ComponentDomain::VfsFilesystems);
     assert_eq!(vfs_prs.len(), 1);

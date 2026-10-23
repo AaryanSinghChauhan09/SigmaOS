@@ -206,6 +206,21 @@ pub struct UpstreamStudyRecord {
     pub adr_title: String,
 }
 
+impl UpstreamStudyRecord {
+    pub fn formatted_summary(&self) -> String {
+        format!(
+            "Upstream: {}, Problem: {}, Flow: {}, Assumptions: {}, Adaptations: {}, Rejections: {}, ADR: {}",
+            self.upstream_reference,
+            self.problem_solved,
+            self.core_structures_and_flow,
+            self.failure_and_security_assumptions,
+            self.sigmaos_adaptations,
+            self.explicit_rejections,
+            self.adr_title
+        )
+    }
+}
+
 /// Record of a weekly component improvement cycle execution
 #[derive(Debug, Clone)]
 pub struct WeeklyCycleRecord {
@@ -504,13 +519,14 @@ impl PeriodicImprovementEngine {
 
         for record in &self.weekly_records {
             report.push_str(&format!(
-                "- Cycle #{}: {} -> PR '{}' (Maturity: {:?} -> {:?}, Evidence: {})\n",
+                "- Cycle #{}: {} -> PR '{}' (Maturity: {:?} -> {:?}, Evidence: {})\n  - {}\n",
                 record.cycle_id,
                 record.domain.name(),
                 record.pr_title,
                 record.initial_maturity,
                 record.promoted_maturity,
-                record.runtime_evidence_path.as_deref().unwrap_or("None")
+                record.runtime_evidence_path.as_deref().unwrap_or("None"),
+                record.study.formatted_summary()
             ));
         }
 
