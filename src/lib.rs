@@ -486,6 +486,7 @@ pub use sigpkg::{
     Transaction, Version, MAX_RECIPE_DEPENDENCIES,
 };
 pub use userland::coreutils_pr_gateway::*;
+pub use userland::sovereign_coreutils_and_userland_advancements_v69_pr::*;
 pub use userland::init::*;
 pub use userland::init::*;
 pub use userland::init::*;
