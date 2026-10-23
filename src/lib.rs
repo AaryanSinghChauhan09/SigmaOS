@@ -644,3 +644,4 @@ pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
