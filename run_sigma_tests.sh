@@ -2062,6 +2062,20 @@ if [ -f "tests/test_open_source_os_and_arch_missing_components_v69_pr.rs" ]; the
     ./build/test_v69_os_arch_prs
 fi
 
+if [ -f "src/distro/arch_linux_missing_components_v71_pr.rs" ]; then
+    echo "Running Arch Linux missing components v71 PR suite..."
+    mkdir -p build
+    rustc --test src/distro/arch_linux_missing_components_v71_pr.rs --edition=2021 -o build/arch_missing_v71_test
+    ./build/arch_missing_v71_test
+fi
+
+if [ -f "tests/test_open_source_os_and_arch_missing_components_v71_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas & Arch GitHub PRs V71 test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_and_arch_missing_components_v71_pr.rs --edition=2021 -o build/test_v71_os_arch_prs
+    ./build/test_v71_os_arch_prs
+fi
+
 
 if [ -f "src/distro/sovereign_open_source_os_fedora_github_pr_suite.rs" ]; then
     echo "Running Sovereign Open Source OS Fedora GitHub PR Suite test suite..."
