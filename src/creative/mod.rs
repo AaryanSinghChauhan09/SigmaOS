@@ -13,6 +13,7 @@ pub mod cadcraft_missing_components_parity_pr;
 pub mod craftlibs_artcraft_parity_pr;
 pub mod craftlibs_missing_components_parity_pr;
 pub mod deckcraft;
+pub mod deckcraft_artcraft_missing_components_v65_pr;
 pub mod deckcraft_artcraft_parity_pr;
 pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
@@ -85,6 +86,7 @@ pub use deckcraft::{
     DeckCraftSlideLayoutMasterPrDeployer, DeckExportFormat, PresentationDeck, PresenterState,
     Slide, SlideElement, SlideExporterEngine, SlideLayoutType,
 };
+pub use deckcraft_artcraft_missing_components_v65_pr::*;
 pub use designcraft::{
     get_designcraft, init_designcraft, Artboard, Canvas, Color, ColorModel, Component,
     DesignBlendMode, DesignEditor, Element, ElementType, ExportFormat as DesignExportFormat,
