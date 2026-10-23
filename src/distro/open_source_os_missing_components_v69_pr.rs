@@ -5,7 +5,7 @@
 // Staging, pull request proposal specification, diff patch generation, and automated
 // execution pipeline for missing/enhanced Linux, BSD, GitHub Wiki/repo ideas, and 33 Global
 // Tech Media Portals advancing SigmaOS across all core subsystems:
-// 1. `Linux625SchedExtBpfPowerTopologyGovernorEngineV69`: Linux 6.25+ SchedExt eBPF quantum-neural dynamic NUMA core scheduling & sub-milliwatt power governor.
+// 1. `Linux625SchedExtQuantumNeuralPowerGovernorEngineV69`: Linux 6.25+ SchedExt eBPF quantum-neural dynamic NUMA core scheduling & sub-milliwatt power governor.
 // 2. `FreeBsd156CapsicumCasperMeshVnetEngineV69`: FreeBSD 15.6+ Capsicum Casper Netlink capability delegates & dynamic micro-jail mesh isolation.
 // 3. `OpenBsd85FineIbtPinsyscallPteGuardEngineV69`: OpenBSD 8.5+ FineIBT CFI enforcement & dynamic page-table shadow stack memory verification.
 // 4. `DragonFly74Hammer2DirectIoErasureEngineV69`: DragonFly BSD 7.4+ HAMMER2 PFS erasure coding & lock-free direct-IO cluster replication.
@@ -62,14 +62,14 @@ pub struct OpenSourceOsPrProposalV69 {
     pub patch_diff: String,
 }
 
-// 1. Linux 6.25+ SchedExt eBPF Power Topology Governor Engine V69
+// 1. Linux 6.25+ SchedExt eBPF Quantum Neural Power Governor Engine V69
 #[derive(Debug, Default)]
-pub struct Linux625SchedExtBpfPowerTopologyGovernorEngineV69 {
+pub struct Linux625SchedExtQuantumNeuralPowerGovernorEngineV69 {
     sched_policies: BTreeMap<String, String>,
     quantum_cores: BTreeMap<String, u64>,
 }
 
-impl Linux625SchedExtBpfPowerTopologyGovernorEngineV69 {
+impl Linux625SchedExtQuantumNeuralPowerGovernorEngineV69 {
     pub fn new() -> Self {
         Self {
             sched_policies: BTreeMap::new(),
@@ -90,7 +90,7 @@ impl Linux625SchedExtBpfPowerTopologyGovernorEngineV69 {
         OpenSourceOsPrProposalV69 {
             pr_id: pr_id.to_string(),
             title: "Linux 6.25+ SchedExt eBPF Quantum-Neural Power Governor & NUMA Dynamic Scheduler V69".to_string(),
-            component_name: "Linux625SchedExtBpfPowerTopologyGovernorEngineV69".to_string(),
+            component_name: "Linux625SchedExtQuantumNeuralPowerGovernorEngineV69".to_string(),
             os_origin: "Linux Kernel 6.25+".to_string(),
             status: OsPrStatusV69::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
@@ -103,7 +103,7 @@ impl Linux625SchedExtBpfPowerTopologyGovernorEngineV69 {
     }
 }
 
-// 2. FreeBSD 15.6+ Capsicum Casper Netlink Mesh Engine V69
+// 2. FreeBSD 15.6+ Capsicum Casper Mesh VNET Engine V69
 #[derive(Debug, Default)]
 pub struct FreeBsd156CapsicumCasperMeshVnetEngineV69 {
     casper_jails: BTreeMap<String, Vec<String>>,
@@ -377,7 +377,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV69 {
     }
 }
 
-// 10. Global Tech Media 33 Portal Unimplemented Ideas Engine V69 & Wiki Exporter
+// 10. Global Tech Media 33 Portal Unimplemented Ideas Engine V69
 #[derive(Debug, Default)]
 pub struct GlobalTechMedia33PortalUnimplementedIdeasEngineV69 {
     harvested_ideas: BTreeMap<String, String>,
@@ -422,7 +422,7 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV69 {
             status: OsPrStatusV69::Validated,
             impacted_subsystems: vec!["SystemAudit".to_string(), "AutomationProvisioning".to_string()],
             patch_diff: format!(
-                "--- docs/44-OPEN-SOURCE-OS-INSPIRATION-V69-PR-SUITE.md\n+++ docs/44-OPEN-SOURCE-OS-INSPIRATION-V69-PR-SUITE.md\n@@ -1,5 +1,12 @@\n+ harvested_tech_media_ideas: {}\n",
+                "--- docs/45-OPEN-SOURCE-OS-INSPIRATION-V69-PR-SUITE.md\n+++ docs/45-OPEN-SOURCE-OS-INSPIRATION-V69-PR-SUITE.md\n@@ -1,5 +1,12 @@\n+ harvested_tech_media_ideas: {}\n",
                 self.harvested_ideas.len()
             ),
         }
@@ -432,7 +432,7 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV69 {
 // 11. Sovereign Open Source OS Missing Components V69 PR Master Suite
 #[derive(Debug)]
 pub struct SovereignOpenSourceOsMissingComponentsV69PrSuite {
-    pub linux_sched: Linux625SchedExtBpfPowerTopologyGovernorEngineV69,
+    pub linux_sched: Linux625SchedExtQuantumNeuralPowerGovernorEngineV69,
     pub freebsd_casper: FreeBsd156CapsicumCasperMeshVnetEngineV69,
     pub openbsd_fineibt: OpenBsd85FineIbtPinsyscallPteGuardEngineV69,
     pub dragonfly_hammer2: DragonFly74Hammer2DirectIoErasureEngineV69,
@@ -452,21 +452,21 @@ impl Default for SovereignOpenSourceOsMissingComponentsV69PrSuite {
 
 impl SovereignOpenSourceOsMissingComponentsV69PrSuite {
     pub fn new() -> Self {
-        let mut linux_sched = Linux625SchedExtBpfPowerTopologyGovernorEngineV69::new();
-        linux_sched.register_policy("scx_quantum_neural", "0xdeadbeef69");
+        let mut linux_sched = Linux625SchedExtQuantumNeuralPowerGovernorEngineV69::new();
+        linux_sched.register_policy("scx_quantum_neural_v69", "0xdeadbeef69");
         linux_sched.register_quantum_core("core_0", 10);
 
         let mut freebsd_casper = FreeBsd156CapsicumCasperMeshVnetEngineV69::new();
-        freebsd_casper.spawn_casper_vnet_jail("jail_net_0", vec!["CAP_SOCKET", "CAP_NET_BIND"]);
+        freebsd_casper.spawn_casper_vnet_jail("jail_net_v69", vec!["CAP_SOCKET", "CAP_NET_BIND"]);
 
         let mut openbsd_fineibt = OpenBsd85FineIbtPinsyscallPteGuardEngineV69::new();
         openbsd_fineibt.pin_syscall(1, "sys_exit");
 
         let mut dragonfly_hammer2 = DragonFly74Hammer2DirectIoErasureEngineV69::new();
-        dragonfly_hammer2.mount_pfs("pfs_data", 2);
+        dragonfly_hammer2.mount_pfs("pfs_data_v69", 2);
 
         let mut netbsd_rump = NetBsd123RumpUserlandAudioPciRouterEngineV69::new();
-        netbsd_rump.register_hypercall("rump_audio_init", "/dev/audio0");
+        netbsd_rump.register_hypercall("rump_audio_init_v69", "/dev/audio0");
 
         let mut haiku_bfs = HaikuBfsRelationalLiveQueryMetadataEngineV69::new();
         haiku_bfs.add_attribute_index("BEOS:TYPE", "string");
@@ -478,7 +478,7 @@ impl SovereignOpenSourceOsMissingComponentsV69PrSuite {
         nix_guix.add_store_path("/nix/store/pkg_v69", "sha256_merkle_v69");
 
         let mut illumos_crossbow = IllumosCrossbowVnicDtraceSwitchMeshEngineV69::new();
-        illumos_crossbow.bind_vnic("vnic0", 8080);
+        illumos_crossbow.bind_vnic("vnic0_v69", 8080);
 
         let mut tech_media = GlobalTechMedia33PortalUnimplementedIdeasEngineV69::new();
         tech_media.harvest_idea(
