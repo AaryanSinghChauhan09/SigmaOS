@@ -47,6 +47,7 @@ pub mod photocraft_artcraft_missing_components_v65_pr;
 // pub mod photocraft_artcraft_parity_pr;
 // pub mod photocraft_missing_components_parity_pr;
 pub mod soundcraft;
+pub mod soundcraft_artcraft_missing_components_v65_pr;
 pub mod soundcraft_artcraft_parity_pr;
 pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
@@ -137,6 +138,7 @@ pub use soundcraft::{
     SoundCraftPullRequestSpec, SoundCraftSpatialMixingMasteringPrDeployer, SoundTrack,
     Spatial3DPosition, SynthesizerVoice, Waveform,
 };
+pub use soundcraft_artcraft_missing_components_v65_pr::*;
 pub use soundcraft_artcraft_parity_pr::*;
 pub use soundcraft_missing_components_parity_pr::*;
 pub use threedcraft_artcraft_parity_pr::*;
