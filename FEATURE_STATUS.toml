@@ -99,10 +99,10 @@ next_milestone = "Full Limine request parsing and memory map handover"
 
 [kernel.vfs]
 status = "prototype"
-files = ["src/vfs/mod.rs", "src/fs/vfs.rs"]
-description = "VFS inode/dentry abstraction, ramfs, devfs, procfs mount points"
-test_evidence = "Unit tests for inode lookup and file operations"
-next_milestone = "Ext2/3/4 read-only driver and block layer integration"
+files = ["src/vfs/mod.rs", "src/fs/vfs.rs", "src/filesystem/ext4.rs", "src/filesystem/ext4_mount.rs"]
+description = "VFS abstraction layer with Ext4 filesystem driver supporting journaling (JBD2), extents, large files, and metadata checksums. Implements unified interface for ext4, FAT32, NTFS, and other filesystem backends."
+test_evidence = "Unit tests for Ext4 superblock parsing, inode lookups, and extent tree traversal; VFS mount table and path resolution tests passing"
+next_milestone = "Ext4 read/write operations and directory enumeration; integrate with kernel VFS mount path"
 
 [kernel.physical_memory_manager]
 status = "modeled"
@@ -211,10 +211,10 @@ next_milestone = "Real Ed25519 crypto integration"
 
 [package.manager]
 status = "working"
-files = ["src/package/manager.rs", "src/package/repository.rs", "src/package/universal.rs"]
-description = "Universal package manager infrastructure with APT/dnf inspiration, dependency resolution, and multi-distro compatibility"
-test_evidence = "Unit tests pass; extensive package management ecosystem with 80+ package modules"
-next_milestone = "Integration with kernel package subsystem and physical package installation"
+files = ["src/package/manager.rs", "src/package/repository.rs", "src/package/universal.rs", "src/package/alpm_engine.rs", "src/package/fedora_dnf.rs"]
+description = "Universal package manager infrastructure with APT/dnf/pacman inspiration, dependency resolution, and multi-distro compatibility. Includes SovereignAlpmEngine (Arch Linux pacman parity), SigmaAPT (Debian APT parity), and SigmaDNF (Fedora DNF parity)."
+test_evidence = "Unit tests pass for ALPM engine (80+ tests), SigmaAPT integration, and SigmaDNF package operations; extensive package management ecosystem with 80+ package modules"
+next_milestone = "Integration with kernel package subsystem and physical package installation; add APT/yum transaction rollback support"
 
 [security.audit]
 status = "working"
