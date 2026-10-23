@@ -668,6 +668,301 @@ impl Default for TypographyRenderer {
     }
 }
 
+// ============================================================================
+// ZOHO, SALESFORCE, ODOO & BITRIX24 ENHANCEMENT ENGINES
+// ============================================================================
+
+/// Article publish status enum for Zoho Desk Knowledge Base
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PublishStatus {
+    Draft,
+    PendingReview,
+    Published,
+    Archived,
+}
+
+/// Metadata struct for multi-channel knowledge base articles
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct KbArticleMetadata {
+    pub article_id: String,
+    pub title: String,
+    pub category: String,
+    pub primary_locale: String,
+    pub available_translations: Vec<String>,
+    pub status: PublishStatus,
+    pub view_count: u32,
+}
+
+/// Zoho Desk Multi-Channel & Multi-Locale Knowledge Base Engine
+pub struct SovereignZohoDeskMultiChannelKnowledgeBaseEngine {
+    pub articles: HashMap<String, KbArticleMetadata>,
+}
+
+impl SovereignZohoDeskMultiChannelKnowledgeBaseEngine {
+    pub fn new() -> Self {
+        Self {
+            articles: HashMap::new(),
+        }
+    }
+
+    pub fn create_article(&mut self, article_id: &str, title: &str, category: &str, locale: &str) {
+        let meta = KbArticleMetadata {
+            article_id: article_id.to_string(),
+            title: title.to_string(),
+            category: category.to_string(),
+            primary_locale: locale.to_string(),
+            available_translations: vec![locale.to_string()],
+            status: PublishStatus::Draft,
+            view_count: 0,
+        };
+        self.articles.insert(article_id.to_string(), meta);
+    }
+
+    pub fn add_translation(&mut self, article_id: &str, locale: &str) -> bool {
+        if let Some(article) = self.articles.get_mut(article_id) {
+            if !article.available_translations.contains(&locale.to_string()) {
+                article.available_translations.push(locale.to_string());
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn update_status(&mut self, article_id: &str, status: PublishStatus) -> bool {
+        if let Some(article) = self.articles.get_mut(article_id) {
+            article.status = status;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+impl Default for SovereignZohoDeskMultiChannelKnowledgeBaseEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Co-term alignment rule for Salesforce Revenue Cloud subscription scheduling
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CoTermRule {
+    AlignToCalendarYearEnd,
+    AlignToParentContractEnd,
+    CustomTargetDate,
+}
+
+/// Subscription schedule period definition
+#[derive(Debug, Clone, PartialEq)]
+pub struct SubscriptionSchedulePeriod {
+    pub period_index: u32,
+    pub start_month: u32,
+    pub end_month: u32,
+    pub term_monthly_arr: f64,
+    pub period_billed_amount: f64,
+}
+
+/// Salesforce Revenue Cloud Subscription Schedule & Co-termed Billing Engine
+pub struct SovereignSalesforceRevenueCloudSubscriptionScheduleEngine;
+
+impl SovereignSalesforceRevenueCloudSubscriptionScheduleEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_subscription_schedule(
+        &self,
+        base_annual_arr: f64,
+        term_months: u32,
+        co_term_rule: CoTermRule,
+    ) -> Vec<SubscriptionSchedulePeriod> {
+        let mut periods = Vec::new();
+        if term_months == 0 {
+            return periods;
+        }
+
+        let monthly_arr = base_annual_arr / 12.0;
+
+        let effective_months = match co_term_rule {
+            CoTermRule::AlignToCalendarYearEnd => term_months.min(12),
+            CoTermRule::AlignToParentContractEnd => term_months,
+            CoTermRule::CustomTargetDate => term_months,
+        };
+
+        for p in 0..effective_months {
+            periods.push(SubscriptionSchedulePeriod {
+                period_index: p + 1,
+                start_month: p + 1,
+                end_month: p + 1,
+                term_monthly_arr: monthly_arr,
+                period_billed_amount: (monthly_arr * 100.0).round() / 100.0,
+            });
+        }
+
+        periods
+    }
+}
+
+impl Default for SovereignSalesforceRevenueCloudSubscriptionScheduleEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Warehouse bin location specification
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BinLocationSpec {
+    pub bin_id: String,
+    pub zone: String,
+    pub capacity_units: u32,
+    pub current_occupancy: u32,
+}
+
+/// Putaway strategy rule type
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PutawayStrategyRule {
+    FifoClosestBin,
+    LifoHighDensityBin,
+    ZoneDedicated,
+}
+
+/// Odoo Inventory Multi-Location Warehouse Putaway Strategy Engine
+pub struct SovereignOdooInventoryMultiLocationPutawayEngine;
+
+impl SovereignOdooInventoryMultiLocationPutawayEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn select_optimal_putaway_bin(
+        &self,
+        bins: &[BinLocationSpec],
+        required_units: u32,
+        preferred_zone: &str,
+        strategy: PutawayStrategyRule,
+    ) -> Option<String> {
+        let mut available_bins: Vec<&BinLocationSpec> = bins
+            .iter()
+            .filter(|b| b.capacity_units.saturating_sub(b.current_occupancy) >= required_units)
+            .collect();
+
+        if available_bins.is_empty() {
+            return None;
+        }
+
+        match strategy {
+            PutawayStrategyRule::ZoneDedicated => {
+                if let Some(zone_bin) = available_bins.iter().find(|b| b.zone == preferred_zone) {
+                    return Some(zone_bin.bin_id.clone());
+                }
+            }
+            PutawayStrategyRule::FifoClosestBin => {
+                available_bins.sort_by_key(|b| b.current_occupancy);
+            }
+            PutawayStrategyRule::LifoHighDensityBin => {
+                available_bins.sort_by_key(|b| u32::MAX - b.current_occupancy);
+            }
+        }
+
+        available_bins.first().map(|b| b.bin_id.clone())
+    }
+}
+
+impl Default for SovereignOdooInventoryMultiLocationPutawayEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Call compliance rule flags for Bitrix24 Telephony Speech AI
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ComplianceRuleFlag {
+    pub rule_id: String,
+    pub rule_description: String,
+    pub is_compliant: bool,
+}
+
+/// Result of voice sentiment & call metrics analysis
+#[derive(Debug, Clone, PartialEq)]
+pub struct VoiceSentimentMetricResult {
+    pub talk_to_listen_ratio: f64,
+    pub sentiment_score: f64,
+    pub compliance_flags: Vec<ComplianceRuleFlag>,
+    pub overall_quality_rating: u32,
+}
+
+/// Bitrix24 Omnichannel Voice Sentiment & Call Compliance Metrics Engine
+pub struct SovereignBitrix24OmnichannelVoiceSentimentMetricsEngine;
+
+impl SovereignBitrix24OmnichannelVoiceSentimentMetricsEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn analyze_voice_metrics(
+        &self,
+        agent_talk_secs: u32,
+        customer_talk_secs: u32,
+        transcript: &str,
+    ) -> VoiceSentimentMetricResult {
+        let _total_talk = (agent_talk_secs + customer_talk_secs) as f64;
+        let ratio = if customer_talk_secs > 0 {
+            agent_talk_secs as f64 / customer_talk_secs as f64
+        } else {
+            1.0
+        };
+
+        let lower = transcript.to_lowercase();
+
+        let mut sentiment: f64 = 0.5;
+        if lower.contains("thank you") || lower.contains("great service") {
+            sentiment += 0.3;
+        }
+        if lower.contains("frustrated") || lower.contains("unacceptable") {
+            sentiment -= 0.4;
+        }
+        let clamped_sentiment = sentiment.clamp(0.0, 1.0);
+
+        let greeting_ok = lower.contains("hello") || lower.contains("welcome");
+        let recording_notice_ok = lower.contains("recorded for quality") || lower.contains("recording");
+
+        let compliance_flags = vec![
+            ComplianceRuleFlag {
+                rule_id: "RULE_GREETING".to_string(),
+                rule_description: "Agent greeting stated".to_string(),
+                is_compliant: greeting_ok,
+            },
+            ComplianceRuleFlag {
+                rule_id: "RULE_RECORDING_CONSENT".to_string(),
+                rule_description: "Call recording notification provided".to_string(),
+                is_compliant: recording_notice_ok,
+            },
+        ];
+
+        let quality = if greeting_ok && recording_notice_ok && clamped_sentiment > 0.5 {
+            5
+        } else if greeting_ok && clamped_sentiment > 0.3 {
+            3
+        } else {
+            1
+        };
+
+        VoiceSentimentMetricResult {
+            talk_to_listen_ratio: (ratio * 100.0).round() / 100.0,
+            sentiment_score: (clamped_sentiment * 100.0).round() / 100.0,
+            compliance_flags,
+            overall_quality_rating: quality,
+        }
+    }
+}
+
+impl Default for SovereignBitrix24OmnichannelVoiceSentimentMetricsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// SigmaOffice main application interface
 pub struct SigmaOffice {
     documents: Vec<SigmaDocument>,
@@ -823,6 +1118,370 @@ impl SovereignMacroAutomationSandbox {
         } else {
             Ok(false)
         }
+    }
+}
+
+// ============================================================================
+// GOOGLE WORKSPACE & MICROSOFT 365 ENHANCEMENT ENGINES
+// ============================================================================
+
+/// Toc level formatting enumeration for Google Docs Paginated Outline Engine
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TocLevelFormat {
+    Heading1,
+    Heading2,
+    Heading3,
+    Subtitle,
+}
+
+/// Document TOC entry struct
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DocumentTocEntry {
+    pub section_id: String,
+    pub heading_title: String,
+    pub level_format: TocLevelFormat,
+    pub estimated_page_number: usize,
+    pub anchor_link: String,
+}
+
+/// Google Docs Paginated Document Outline & Table of Contents Engine
+pub struct SovereignGoogleDocsPaginatedOutlineEngine;
+
+impl SovereignGoogleDocsPaginatedOutlineEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn generate_document_outline(
+        &self,
+        text_processor: &TextProcessor,
+        words_per_page: usize,
+    ) -> Vec<DocumentTocEntry> {
+        let mut entries = Vec::new();
+        let mut running_word_count = 0;
+        let effective_wpp = if words_per_page == 0 { 300 } else { words_per_page };
+
+        for (idx, node) in text_processor.document().tree().iter().enumerate() {
+            match node {
+                DocumentNode::Heading { level, content } => {
+                    let level_fmt = match level {
+                        1 => TocLevelFormat::Heading1,
+                        2 => TocLevelFormat::Heading2,
+                        3 => TocLevelFormat::Heading3,
+                        _ => TocLevelFormat::Subtitle,
+                    };
+
+                    let page_num = (running_word_count / effective_wpp) + 1;
+                    let anchor = format!("#heading_{}", idx);
+
+                    entries.push(DocumentTocEntry {
+                        section_id: format!("sec_{}", idx),
+                        heading_title: content.clone(),
+                        level_format: level_fmt,
+                        estimated_page_number: page_num,
+                        anchor_link: anchor,
+                    });
+
+                    running_word_count += content.split_whitespace().count();
+                }
+                DocumentNode::Text { content, .. } => {
+                    running_word_count += content.split_whitespace().count();
+                }
+                _ => {}
+            }
+        }
+
+        entries
+    }
+}
+
+impl Default for SovereignGoogleDocsPaginatedOutlineEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Parameter binding definition for custom spreadsheet LAMBDA formulas
+#[derive(Debug, Clone, PartialEq)]
+pub struct LambdaParamBinding {
+    pub param_name: String,
+    pub bound_value: CellValue,
+}
+
+/// Scope evaluation structure for user-defined LAMBDA formulas in Google Sheets
+#[derive(Debug, Clone, PartialEq)]
+pub struct LambdaFormulaScope {
+    pub lambda_name: String,
+    pub param_names: Vec<String>,
+    pub expression_template: String,
+}
+
+/// Google Sheets Custom LAMBDA Formula Scope Evaluation Engine
+pub struct SovereignGoogleSheetsCustomLambdaFormulaEngine;
+
+impl SovereignGoogleSheetsCustomLambdaFormulaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn define_lambda(&self, name: &str, params: &[&str], expression: &str) -> LambdaFormulaScope {
+        LambdaFormulaScope {
+            lambda_name: name.to_string(),
+            param_names: params.iter().map(|s| s.to_string()).collect(),
+            expression_template: expression.to_string(),
+        }
+    }
+
+    pub fn evaluate_lambda_call(
+        &self,
+        scope: &LambdaFormulaScope,
+        bindings: &[LambdaParamBinding],
+    ) -> CellValue {
+        let mut substituted_expr = scope.expression_template.clone();
+
+        for binding in bindings {
+            let val_str = match &binding.bound_value {
+                CellValue::Number(n) => n.to_string(),
+                CellValue::Text(s) => s.clone(),
+                CellValue::Boolean(b) => b.to_string(),
+                _ => "0".to_string(),
+            };
+            substituted_expr = substituted_expr.replace(&binding.param_name, &val_str);
+        }
+
+        if substituted_expr.contains('+') {
+            let parts: Vec<&str> = substituted_expr.split('+').map(|s| s.trim()).collect();
+            let mut sum = 0.0;
+            let mut valid = true;
+            for part in parts {
+                if let Ok(num) = part.parse::<f64>() {
+                    sum += num;
+                } else {
+                    valid = false;
+                }
+            }
+            if valid {
+                return CellValue::Number((sum * 10000.0).round() / 10000.0);
+            }
+        } else if substituted_expr.contains('*') {
+            let parts: Vec<&str> = substituted_expr.split('*').map(|s| s.trim()).collect();
+            let mut prod = 1.0;
+            let mut valid = true;
+            for part in parts {
+                if let Ok(num) = part.parse::<f64>() {
+                    prod *= num;
+                } else {
+                    valid = false;
+                }
+            }
+            if valid {
+                return CellValue::Number((prod * 10000.0).round() / 10000.0);
+            }
+        }
+
+        CellValue::Text(substituted_expr)
+    }
+}
+
+impl Default for SovereignGoogleSheetsCustomLambdaFormulaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Slide cue metadata for presenter slide deck automation
+#[derive(Debug, Clone, PartialEq)]
+pub struct PresenterSlideCue {
+    pub slide_index: usize,
+    pub planned_duration_secs: u32,
+    pub cue_note: String,
+    pub auto_advance_on_timer: bool,
+}
+
+/// State tracking result for slide timing timeline
+#[derive(Debug, Clone, PartialEq)]
+pub struct TimelineCueState {
+    pub current_slide: usize,
+    pub elapsed_total_secs: u32,
+    pub is_behind_schedule: bool,
+    pub next_cue_note: Option<String>,
+}
+
+/// Google Slides Presenter Timing & Timeline Cue Engine
+pub struct SovereignGoogleSlidesPresenterTimingAndTimelineEngine;
+
+impl SovereignGoogleSlidesPresenterTimingAndTimelineEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn evaluate_presenter_timeline(
+        &self,
+        cues: &[PresenterSlideCue],
+        current_slide: usize,
+        actual_elapsed_secs: u32,
+    ) -> TimelineCueState {
+        let mut expected_time = 0;
+        let mut next_note = None;
+
+        for (idx, cue) in cues.iter().enumerate() {
+            if idx <= current_slide {
+                expected_time += cue.planned_duration_secs;
+            }
+            if idx == current_slide + 1 {
+                next_note = Some(cue.cue_note.clone());
+            }
+        }
+
+        let is_behind = actual_elapsed_secs > expected_time;
+
+        TimelineCueState {
+            current_slide,
+            elapsed_total_secs: actual_elapsed_secs,
+            is_behind_schedule: is_behind,
+            next_cue_note: next_note,
+        }
+    }
+}
+
+impl Default for SovereignGoogleSlidesPresenterTimingAndTimelineEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Revision type for document diff comparisons
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RevisionType {
+    Unchanged,
+    Inserted,
+    Deleted,
+    Modified,
+}
+
+/// Document diff chunk representation for MS Word redlining
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DocumentDiffChunk {
+    pub chunk_index: usize,
+    pub revision: RevisionType,
+    pub original_text: String,
+    pub revised_text: String,
+}
+
+/// Microsoft Word Document Side-by-Side Comparing & Redlining Delta Engine
+pub struct SovereignMicrosoftWordDocumentComparingDeltaEngine;
+
+impl SovereignMicrosoftWordDocumentComparingDeltaEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn compare_documents(
+        &self,
+        original_doc: &TextProcessor,
+        revised_doc: &TextProcessor,
+    ) -> Vec<DocumentDiffChunk> {
+        let mut diffs = Vec::new();
+        let orig_nodes = original_doc.document().tree();
+        let rev_nodes = revised_doc.document().tree();
+
+        let max_len = orig_nodes.len().max(rev_nodes.len());
+
+        for i in 0..max_len {
+            let orig_text = match orig_nodes.get(i) {
+                Some(DocumentNode::Text { content, .. }) => content.clone(),
+                Some(DocumentNode::Heading { content, .. }) => content.clone(),
+                _ => String::new(),
+            };
+
+            let rev_text = match rev_nodes.get(i) {
+                Some(DocumentNode::Text { content, .. }) => content.clone(),
+                Some(DocumentNode::Heading { content, .. }) => content.clone(),
+                _ => String::new(),
+            };
+
+            let rev_type = if orig_text.is_empty() && !rev_text.is_empty() {
+                RevisionType::Inserted
+            } else if !orig_text.is_empty() && rev_text.is_empty() {
+                RevisionType::Deleted
+            } else if orig_text != rev_text {
+                RevisionType::Modified
+            } else {
+                RevisionType::Unchanged
+            };
+
+            diffs.push(DocumentDiffChunk {
+                chunk_index: i,
+                revision: rev_type,
+                original_text: orig_text,
+                revised_text: rev_text,
+            });
+        }
+
+        diffs
+    }
+}
+
+impl Default for SovereignMicrosoftWordDocumentComparingDeltaEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Metadata definition for Dataverse entities in PowerApps
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DataverseEntityMetadata {
+    pub entity_name: String,
+    pub primary_key_field: String,
+    pub display_name: String,
+    pub attributes: Vec<String>,
+}
+
+/// OData query specification for PowerApps data connections
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ODataFilterSpec {
+    pub select_fields: Vec<String>,
+    pub filter_clause: String,
+    pub top_count: Option<u32>,
+}
+
+/// Microsoft PowerApps Dataverse Connector & OData Query Spec Engine
+pub struct SovereignMicrosoftPowerAppsDataverseConnectorEngine;
+
+impl SovereignMicrosoftPowerAppsDataverseConnectorEngine {
+    pub fn new() -> Self {
+        Self
+    }
+
+    pub fn build_odata_query_uri(&self, entity: &DataverseEntityMetadata, spec: &ODataFilterSpec) -> String {
+        let mut query = format!("https://dataverse.dynamics.com/api/data/v9.2/{}", entity.entity_name);
+
+        let mut params = Vec::new();
+
+        if !spec.select_fields.is_empty() {
+            params.push(format!("$select={}", spec.select_fields.join(",")));
+        }
+
+        if !spec.filter_clause.is_empty() {
+            params.push(format!("$filter={}", spec.filter_clause));
+        }
+
+        if let Some(top) = spec.top_count {
+            params.push(format!("$top={}", top));
+        }
+
+        if !params.is_empty() {
+            query.push('?');
+            query.push_str(&params.join("&"));
+        }
+
+        query
+    }
+}
+
+impl Default for SovereignMicrosoftPowerAppsDataverseConnectorEngine {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -1854,6 +2513,152 @@ mod tests_v3 {
         let route_res = route_engine.route_omnichannel_ticket(&ticket, &agents);
         assert_eq!(route_res.assigned_agent_id, Some("agent_a".to_string()));
         assert!(route_res.routing_strategy.contains("VIP"));
+    }
+
+    #[test]
+    fn test_new_suite_enhancements_google_ms_zoho_salesforce_odoo_bitrix() {
+        let cap = CapabilityToken { id: 100 };
+
+        // 1. SovereignGoogleDocsPaginatedOutlineEngine
+        let mut text_proc = TextProcessor::new("Outline Doc".to_string(), cap.clone());
+        text_proc.add_heading(1, "Executive Summary").unwrap();
+        text_proc.add_text("This is an executive summary section.", false, false).unwrap();
+        text_proc.add_heading(2, "Key Deliverables").unwrap();
+        text_proc.add_text("Deliverables include fast booting.", false, false).unwrap();
+
+        let outline_engine = SovereignGoogleDocsPaginatedOutlineEngine::new();
+        let toc = outline_engine.generate_document_outline(&text_proc, 10);
+        assert_eq!(toc.len(), 2);
+        assert_eq!(toc[0].heading_title, "Executive Summary");
+        assert_eq!(toc[0].level_format, TocLevelFormat::Heading1);
+        assert_eq!(toc[1].heading_title, "Key Deliverables");
+        assert_eq!(toc[1].level_format, TocLevelFormat::Heading2);
+
+        // 2. SovereignGoogleSheetsCustomLambdaFormulaEngine
+        let lambda_engine = SovereignGoogleSheetsCustomLambdaFormulaEngine::new();
+        let scope = lambda_engine.define_lambda("ADD_TAX", &["val", "rate"], "val * rate");
+        let bindings = vec![
+            LambdaParamBinding {
+                param_name: "val".to_string(),
+                bound_value: CellValue::Number(100.0),
+            },
+            LambdaParamBinding {
+                param_name: "rate".to_string(),
+                bound_value: CellValue::Number(1.15),
+            },
+        ];
+        let res = lambda_engine.evaluate_lambda_call(&scope, &bindings);
+        assert_eq!(res, CellValue::Number(115.0));
+
+        // 3. SovereignGoogleSlidesPresenterTimingAndTimelineEngine
+        let timing_engine = SovereignGoogleSlidesPresenterTimingAndTimelineEngine::new();
+        let cues = vec![
+            PresenterSlideCue {
+                slide_index: 0,
+                planned_duration_secs: 60,
+                cue_note: "Introduce team".to_string(),
+                auto_advance_on_timer: false,
+            },
+            PresenterSlideCue {
+                slide_index: 1,
+                planned_duration_secs: 120,
+                cue_note: "Explain architecture".to_string(),
+                auto_advance_on_timer: true,
+            },
+        ];
+        let state = timing_engine.evaluate_presenter_timeline(&cues, 0, 75);
+        assert!(state.is_behind_schedule);
+        assert_eq!(state.next_cue_note, Some("Explain architecture".to_string()));
+
+        // 4. SovereignMicrosoftWordDocumentComparingDeltaEngine
+        let mut orig = TextProcessor::new("Orig Doc".to_string(), cap.clone());
+        orig.add_heading(1, "Chapter 1").unwrap();
+        orig.add_text("Old Text", false, false).unwrap();
+
+        let mut rev = TextProcessor::new("Rev Doc".to_string(), cap.clone());
+        rev.add_heading(1, "Chapter 1").unwrap();
+        rev.add_text("New Text", false, false).unwrap();
+
+        let compare_engine = SovereignMicrosoftWordDocumentComparingDeltaEngine::new();
+        let diffs = compare_engine.compare_documents(&orig, &rev);
+        assert_eq!(diffs.len(), 2);
+        assert_eq!(diffs[0].revision, RevisionType::Unchanged);
+        assert_eq!(diffs[1].revision, RevisionType::Modified);
+        assert_eq!(diffs[1].original_text, "Old Text");
+        assert_eq!(diffs[1].revised_text, "New Text");
+
+        // 5. SovereignMicrosoftPowerAppsDataverseConnectorEngine
+        let dv_engine = SovereignMicrosoftPowerAppsDataverseConnectorEngine::new();
+        let entity = DataverseEntityMetadata {
+            entity_name: "accounts".to_string(),
+            primary_key_field: "accountid".to_string(),
+            display_name: "Accounts".to_string(),
+            attributes: vec!["name".to_string(), "revenue".to_string()],
+        };
+        let spec = ODataFilterSpec {
+            select_fields: vec!["name".to_string(), "revenue".to_string()],
+            filter_clause: "revenue gt 100000".to_string(),
+            top_count: Some(50),
+        };
+        let uri = dv_engine.build_odata_query_uri(&entity, &spec);
+        assert!(uri.contains("$select=name,revenue"));
+        assert!(uri.contains("$filter=revenue gt 100000"));
+        assert!(uri.contains("$top=50"));
+
+        // 6. SovereignZohoDeskMultiChannelKnowledgeBaseEngine
+        let mut kb = SovereignZohoDeskMultiChannelKnowledgeBaseEngine::new();
+        kb.create_article("ART_01", "Installation Guide", "Docs", "en-US");
+        assert!(kb.add_translation("ART_01", "fr-FR"));
+        assert!(kb.update_status("ART_01", PublishStatus::Published));
+        let art = kb.articles.get("ART_01").unwrap();
+        assert_eq!(art.status, PublishStatus::Published);
+        assert_eq!(art.available_translations.len(), 2);
+
+        // 7. SovereignSalesforceRevenueCloudSubscriptionScheduleEngine
+        let sched_engine = SovereignSalesforceRevenueCloudSubscriptionScheduleEngine::new();
+        let periods = sched_engine.generate_subscription_schedule(
+            120_000.0,
+            12,
+            CoTermRule::AlignToParentContractEnd,
+        );
+        assert_eq!(periods.len(), 12);
+        assert_eq!(periods[0].period_billed_amount, 10000.0);
+
+        // 8. SovereignOdooInventoryMultiLocationPutawayEngine
+        let putaway_engine = SovereignOdooInventoryMultiLocationPutawayEngine::new();
+        let bins = vec![
+            BinLocationSpec {
+                bin_id: "BIN_A1".to_string(),
+                zone: "Zone_1".to_string(),
+                capacity_units: 100,
+                current_occupancy: 20,
+            },
+            BinLocationSpec {
+                bin_id: "BIN_B1".to_string(),
+                zone: "Zone_2".to_string(),
+                capacity_units: 100,
+                current_occupancy: 30,
+            },
+        ];
+        let chosen_bin = putaway_engine.select_optimal_putaway_bin(
+            &bins,
+            50,
+            "Zone_2",
+            PutawayStrategyRule::ZoneDedicated,
+        );
+        assert_eq!(chosen_bin, Some("BIN_B1".to_string()));
+
+        // 9. SovereignBitrix24OmnichannelVoiceSentimentMetricsEngine
+        let voice_engine = SovereignBitrix24OmnichannelVoiceSentimentMetricsEngine::new();
+        let voice_res = voice_engine.analyze_voice_metrics(
+            180,
+            120,
+            "Hello, welcome! Thank you for recorded for quality purpose call.",
+        );
+        assert_eq!(voice_res.talk_to_listen_ratio, 1.5);
+        assert!(voice_res.sentiment_score > 0.5);
+        assert_eq!(voice_res.compliance_flags.len(), 2);
+        assert!(voice_res.compliance_flags[0].is_compliant);
     }
 }
 
