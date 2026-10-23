@@ -1,9 +1,13 @@
-# Shell Word Splitting & Field Expansion Study
+# SigmaOS Study: POSIX Word Splitting and Quoting Integrity
 
-## Overview
-This study evaluates the mechanisms for field splitting, quote removal, and globbing in modern shell interpreters compared to IEEE Std 1003.1-2017.
+## Abstract
+This study evaluates the trade-offs of POSIX compliant word splitting vs zero-allocation word splitting algorithms for `sigma-sh` in no_std / kernel-userspace environments.
 
-## Key Findings
-1. Unquoted parameter expansion (`$VAR`) must split on characters in `$IFS` (default: space, tab, newline).
-2. Quoted parameter expansion (`"$VAR"`) suppresses word splitting and treats the value as a single field.
-3. Pathname expansion (globbing) occurs after field splitting on unquoted words containing `*`, `?`, or `[...]`.
+## Analysis
+1. Unquoted parameter expansions undergo word splitting based on internal field separators (`$IFS`).
+2. Single-quoted (`'...'`) and double-quoted (`"..."`) literals protect whitespace and wildcards from pathname expansion.
+3. Pathname expansion (globbing) occurs strictly after word splitting step in sequence.
+
+## Recommendations for SigmaOS
+- Implement zero-allocation window iterators over string slices to perform splitting without extra heap allocations.
+- Guarantee exact evaluation order to maintain POSIX compatibility.

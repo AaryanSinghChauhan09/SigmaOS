@@ -1,7 +1,13 @@
-# Interactive Shell & Line Editing Specification
+# SigmaOS Interactive Shell Architecture
 
-The interactive shell module (`src/shell/interactive/`) provides:
-- **Prompt Rendering**: Customizable prompt strings with status code reflection.
-- **Multiline Quote Detection**: Automatically prompts for continuation (`> `) when quotes or blocks are unclosed.
-- **Signal Handling**: Handles `SIGINT` (Ctrl+C) to cancel input line without exiting, and `EOF` (Ctrl+D) to exit cleanly.
-- **Tab Completion**: Candidate generation for path completion and PATH commands.
+## Prompt Rendering
+The default prompt format string `\u@\h:\w\$ ` expands dynamically:
+- `\u`: Current user login
+- `\h`: Hostname
+- `\w`: Current working directory (using `~` for home)
+- `\$`: `#` for root, `$` for non-root users
+
+## Line Editing and Auto-completion
+- Supports Tab auto-completion for pathnames and executable commands.
+- Multi-line quote detection prevents executing incomplete strings until closing quotes are matched.
+- Signal handling ensures interactive prompt recovery on `SIGINT`.

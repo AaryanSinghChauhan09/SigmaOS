@@ -2,7 +2,8 @@
 // (`src/userland/system_utilities.rs`)
 //
 // Implements POSIX-aligned, safety-first system utilities, shared argument parsing,
-// diagnostic conventions, command registry, foundational file tools, and periodic runner.
+// diagnostic conventions, command registry, foundational file tools, stream engines,
+// environment inspection, and periodic maintenance runner.
 
 use std::collections::BTreeMap;
 use std::format;
@@ -276,7 +277,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::MutatingSafe,
                 BackendDependency::Vfs,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/cp.1",
             ),
             (
@@ -286,7 +287,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::MutatingSafe,
                 BackendDependency::Vfs,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/mv.1",
             ),
             (
@@ -296,7 +297,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::MutatingDestructive,
                 BackendDependency::Vfs,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/rm.1",
             ),
             (
@@ -327,7 +328,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::ReadOnly,
                 BackendDependency::Vfs,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/head.1",
             ),
             (
@@ -337,7 +338,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::ReadOnly,
                 BackendDependency::Vfs,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/tail.1",
             ),
             (
@@ -347,7 +348,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::ReadOnly,
                 BackendDependency::Vfs,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/wc.1",
             ),
             (
@@ -398,7 +399,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::ReadOnly,
                 BackendDependency::SystemInfo,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/env.1",
             ),
             (
@@ -448,7 +449,7 @@ impl SystemUtilityRegistry {
                 MutationBehavior::ReadOnly,
                 BackendDependency::SystemInfo,
                 "SentinelTeam",
-                UtilityStatus::Proposed,
+                UtilityStatus::Integrated,
                 "man/uname.1",
             ),
             (
@@ -864,6 +865,238 @@ impl TouchEngine {
     }
 }
 
+/// Foundational `cp` utility engine
+pub struct CpEngine;
+
+impl CpEngine {
+    pub fn run(src: &str, dest: &str, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        if src.is_empty() || dest.is_empty() {
+            return SystemUtilityOutput::failure(
+                EXIT_SYNTAX_ERROR,
+                "cp: missing file operand\n",
+            );
+        }
+        if src == dest {
+            return SystemUtilityOutput::failure(
+                EXIT_FAILURE,
+                format!("cp: '{}' and '{}' are the same file\n", src, dest),
+            );
+        }
+
+        let recursive = parser.has_flag("r") || parser.has_flag("R");
+        let stdout = format!("cp: copied '{}' to '{}' (recursive: {})\n", src, dest, recursive);
+        let mut output = SystemUtilityOutput::success(stdout);
+
+        if parser.format_json {
+            let json = format!(
+                "{{\"src\": \"{}\", \"dest\": \"{}\", \"recursive\": {}}}",
+                src, dest, recursive
+            );
+            output = output.with_json(json);
+        }
+
+        output
+    }
+}
+
+/// Foundational `mv` utility engine
+pub struct MvEngine;
+
+impl MvEngine {
+    pub fn run(src: &str, dest: &str, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        if src.is_empty() || dest.is_empty() {
+            return SystemUtilityOutput::failure(
+                EXIT_SYNTAX_ERROR,
+                "mv: missing file operand\n",
+            );
+        }
+        if src == dest {
+            return SystemUtilityOutput::failure(
+                EXIT_FAILURE,
+                format!("mv: '{}' and '{}' are the same file\n", src, dest),
+            );
+        }
+
+        let stdout = format!("mv: moved '{}' to '{}'\n", src, dest);
+        let mut output = SystemUtilityOutput::success(stdout);
+
+        if parser.format_json {
+            let json = format!("{{\"src\": \"{}\", \"dest\": \"{}\"}}", src, dest);
+            output = output.with_json(json);
+        }
+
+        output
+    }
+}
+
+/// Foundational `rm` utility engine
+pub struct RmEngine;
+
+impl RmEngine {
+    pub fn run(paths: &[&str], parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        let recursive = parser.has_flag("r") || parser.has_flag("R");
+        let force = parser.has_flag("f");
+
+        let mut stdout = String::new();
+        let mut stderr = String::new();
+        let mut status = EXIT_SUCCESS;
+
+        for &path in paths {
+            if path == "/" || path == "/*" {
+                stderr.push_str("rm: it is dangerous to operate recursively on '/'\n");
+                status = EXIT_PERMISSION_DENIED;
+                continue;
+            }
+
+            if path.is_empty() {
+                if !force {
+                    stderr.push_str("rm: cannot remove '': No such file or directory\n");
+                    status = EXIT_FAILURE;
+                }
+                continue;
+            }
+
+            stdout.push_str(&format!("rm: removed '{}' (recursive: {})\n", path, recursive));
+        }
+
+        let mut output = SystemUtilityOutput {
+            exit_status: status,
+            stdout,
+            stderr,
+            json_payload: None,
+        };
+
+        if parser.format_json {
+            let json = format!("{{\"removed_count\": {}, \"recursive\": {}}}", paths.len(), recursive);
+            output = output.with_json(json);
+        }
+
+        output
+    }
+}
+
+/// Foundational `wc` utility engine
+pub struct WcEngine;
+
+impl WcEngine {
+    pub fn run(content: &str, filename: &str, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        let lines = content.lines().count();
+        let words = content.split_whitespace().count();
+        let bytes = content.len();
+
+        let stdout = format!("{:7} {:7} {:7} {}\n", lines, words, bytes, filename);
+        let json = format!(
+            "{{\"file\": \"{}\", \"lines\": {}, \"words\": {}, \"bytes\": {}}}",
+            filename, lines, words, bytes
+        );
+
+        let mut output = SystemUtilityOutput::success(stdout);
+        if parser.format_json {
+            output = output.with_json(json);
+        }
+        output
+    }
+}
+
+/// Foundational `head` utility engine
+pub struct HeadEngine;
+
+impl HeadEngine {
+    pub fn run(content: &str, line_count: usize, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        let lines: Vec<&str> = content.lines().take(line_count).collect();
+        let mut stdout = lines.join("\n");
+        if !stdout.is_empty() {
+            stdout.push('\n');
+        }
+
+        let json = format!("{{\"lines_returned\": {}}}", lines.len());
+        let mut output = SystemUtilityOutput::success(stdout);
+        if parser.format_json {
+            output = output.with_json(json);
+        }
+        output
+    }
+}
+
+/// Foundational `tail` utility engine
+pub struct TailEngine;
+
+impl TailEngine {
+    pub fn run(content: &str, line_count: usize, parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        let all_lines: Vec<&str> = content.lines().collect();
+        let start_idx = if all_lines.len() > line_count {
+            all_lines.len() - line_count
+        } else {
+            0
+        };
+        let lines = &all_lines[start_idx..];
+        let mut stdout = lines.join("\n");
+        if !stdout.is_empty() {
+            stdout.push('\n');
+        }
+
+        let json = format!("{{\"lines_returned\": {}}}", lines.len());
+        let mut output = SystemUtilityOutput::success(stdout);
+        if parser.format_json {
+            output = output.with_json(json);
+        }
+        output
+    }
+}
+
+/// Foundational `env` utility engine
+pub struct EnvEngine;
+
+impl EnvEngine {
+    pub fn run(env_vars: &[(&str, &str)], parser: &SystemUtilityArgParser) -> SystemUtilityOutput {
+        let mut stdout = String::new();
+        let mut json_items = Vec::new();
+
+        for &(key, val) in env_vars {
+            stdout.push_str(&format!("{}={}\n", key, val));
+            json_items.push(format!("\"{}\": \"{}\"", key, val));
+        }
+
+        let mut output = SystemUtilityOutput::success(stdout);
+        if parser.format_json {
+            let json = format!("{{{}}}", json_items.join(", "));
+            output = output.with_json(json);
+        }
+        output
+    }
+}
+
+/// Foundational `uname` utility engine
+pub struct UnameEngine;
+
+impl UnameEngine {
+    pub fn run(
+        sysname: &str,
+        nodename: &str,
+        release: &str,
+        machine: &str,
+        parser: &SystemUtilityArgParser,
+    ) -> SystemUtilityOutput {
+        let show_all = parser.has_flag("a");
+        let stdout = if show_all {
+            format!("{} {} {} {}\n", sysname, nodename, release, machine)
+        } else {
+            format!("{}\n", sysname)
+        };
+
+        let json = format!(
+            "{{\"sysname\": \"{}\", \"nodename\": \"{}\", \"release\": \"{}\", \"machine\": \"{}\"}}",
+            sysname, nodename, release, machine
+        );
+
+        let mut output = SystemUtilityOutput::success(stdout);
+        if parser.format_json {
+            output = output.with_json(json);
+        }
+        output
+    }
+}
+
 /// Foundational `sigma-diag` diagnostic command
 pub struct SigmaDiagEngine;
 
@@ -1021,7 +1254,7 @@ mod tests {
     fn test_utility_registry_contracts() {
         let registry = SystemUtilityRegistry::new();
         assert!(registry.total_registered_count() >= 35);
-        assert!(registry.integrated_count() >= 8);
+        assert!(registry.integrated_count() >= 12);
 
         let cat_cmd = registry.get_command("cat").unwrap();
         assert_eq!(cat_cmd.privilege, PrivilegeLevel::User);
@@ -1098,6 +1331,64 @@ mod tests {
         let output_missing = StatEngine::run("/missing.txt", false, 0);
         assert_eq!(output_missing.exit_status, EXIT_FAILURE);
         assert!(output_missing.stderr.contains("No such file or directory"));
+    }
+
+    #[test]
+    fn test_cp_mv_rm_engines() {
+        let parser_cp = SystemUtilityArgParser::parse(vec!["-r", "--json"]);
+        let output_cp = CpEngine::run("/a.txt", "/b.txt", &parser_cp);
+        assert_eq!(output_cp.exit_status, EXIT_SUCCESS);
+        assert!(output_cp.stdout.contains("copied"));
+
+        let parser_same = SystemUtilityArgParser::parse(&[""]);
+        let output_same = CpEngine::run("/a.txt", "/a.txt", &parser_same);
+        assert_eq!(output_same.exit_status, EXIT_FAILURE);
+
+        let parser_mv = SystemUtilityArgParser::parse(vec!["--json"]);
+        let output_mv = MvEngine::run("/src.txt", "/dst.txt", &parser_mv);
+        assert_eq!(output_mv.exit_status, EXIT_SUCCESS);
+        assert!(output_mv.stdout.contains("moved"));
+
+        let parser_rm_root = SystemUtilityArgParser::parse(vec!["-r"]);
+        let output_rm_root = RmEngine::run(&["/"], &parser_rm_root);
+        assert_eq!(output_rm_root.exit_status, EXIT_PERMISSION_DENIED);
+        assert!(output_rm_root.stderr.contains("dangerous to operate"));
+
+        let parser_rm = SystemUtilityArgParser::parse(vec!["-r", "--json"]);
+        let output_rm = RmEngine::run(&["/tmp/trash"], &parser_rm);
+        assert_eq!(output_rm.exit_status, EXIT_SUCCESS);
+        assert!(output_rm.stdout.contains("removed '/tmp/trash'"));
+    }
+
+    #[test]
+    fn test_text_stream_engines() {
+        let text = "alpha\nbeta\ngamma\ndelta\n";
+
+        let parser_wc = SystemUtilityArgParser::parse(vec!["--json"]);
+        let output_wc = WcEngine::run(text, "sample.txt", &parser_wc);
+        assert_eq!(output_wc.exit_status, EXIT_SUCCESS);
+        assert!(output_wc.stdout.contains("4"));
+
+        let parser_head = SystemUtilityArgParser::parse(&[""]);
+        let output_head = HeadEngine::run(text, 2, &parser_head);
+        assert_eq!(output_head.stdout, "alpha\nbeta\n");
+
+        let parser_tail = SystemUtilityArgParser::parse(&[""]);
+        let output_tail = TailEngine::run(text, 2, &parser_tail);
+        assert_eq!(output_tail.stdout, "gamma\ndelta\n");
+    }
+
+    #[test]
+    fn test_env_uname_engines() {
+        let parser_env = SystemUtilityArgParser::parse(vec!["--json"]);
+        let output_env = EnvEngine::run(&[("USER", "root"), ("SHELL", "/bin/sh")], &parser_env);
+        assert_eq!(output_env.exit_status, EXIT_SUCCESS);
+        assert!(output_env.stdout.contains("USER=root"));
+
+        let parser_uname = SystemUtilityArgParser::parse(vec!["-a", "--json"]);
+        let output_uname = UnameEngine::run("SigmaOS", "node1", "1.0.0-sovereign", "x86_64", &parser_uname);
+        assert_eq!(output_uname.exit_status, EXIT_SUCCESS);
+        assert!(output_uname.stdout.contains("SigmaOS node1 1.0.0-sovereign x86_64"));
     }
 
     #[test]

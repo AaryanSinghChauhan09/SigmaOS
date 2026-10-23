@@ -1,10 +1,14 @@
-# Shell Built-In Commands Reference
+# SigmaOS Shell Builtin Commands
 
-The following built-in commands are handled directly by the shell interpreter:
-- `cd [dir]`: Changes working directory.
-- `echo [args...]`: Prints arguments to standard output.
-- `exit [code]`: Exits shell with specified exit code.
-- `type [name]`: Indicates how name would be interpreted.
-- `which [name]`: Locates command in PATH.
-- `export [NAME=val]`: Sets environment variable in shell environment.
-- `unset [NAME]`: Unsets environment variable.
+## Builtin Reference
+
+| Command | Description | Return Values |
+|---------|-------------|---------------|
+| `cd [dir]` | Change working directory | `0` on success, `1` on invalid directory |
+| `pwd` | Print working directory | `0` |
+| `echo [args...]` | Output arguments to standard output | `0` |
+| `export [NAME=VAL]` | Set environment variable | `0` on success, `2` on invalid syntax |
+| `exit [N]` | Exit shell session with status N | Exits process |
+| `help` | Display list of supported commands | `0` |
+| `history` | List command history entries | `0` |
+| `type [cmd]` | Describe command classification | `0` if found, `1` if not found |

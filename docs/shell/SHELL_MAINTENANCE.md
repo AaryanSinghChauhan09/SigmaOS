@@ -1,16 +1,17 @@
-# Shell Maintenance Guide & Architectural Guidelines
+# SigmaOS Shell Maintenance Guide
 
-This document outlines maintenance procedures, code organization, and safety invariants for the SigmaOS shell component (`src/shell/`).
+## Overview
+This document outlines the maintenance standards and operating procedures for the `sigma-sh` userspace shell engine in SigmaOS.
 
-## Architecture & Subsystems
-- **Command Interpreter (`src/shell/command.rs`, `src/shell/sovereign_command_interpreter.rs`)**:
-  - Handles parsing, execution, redirection (`<`, `>`, `>>`), and pipeline management (`|`).
-  - Implements zero-allocation string searching and bulk capacity pre-allocation.
-- **Diagnostics (`src/shell/diagnostics/`)**:
-  - Formats compiler-style error messages, line numbers, and fuzzy command suggestions.
-- **Interactive Shell (`src/shell/interactive/`)**:
-  - Controls prompt rendering, signal handling (`SIGINT`, `SIGTSTP`), multiline quotes, and completion candidate generation.
-
-## Testing & Quality Assurance
-- Execute shell unit tests via `rustc --test tests/shell_lifecycle_tests.rs --edition=2021 -o build/test_shell_lifecycle && ./build/test_shell_lifecycle`.
-- Verify POSIX compliance subset rules and exit code policies before opening PRs.
+## Maintenance Procedures
+1. **Parser and Lexer Integrity**:
+   - Ensure all grammar changes maintain LL(1) deterministic parsing guarantees.
+   - Avoid infinite loops or recursion overflows on malformed inputs.
+2. **Signal Handling**:
+   - `SIGINT` (Ctrl+C) must interrupt current foreground execution without killing the shell session.
+   - `EOF` (Ctrl+D) on an empty prompt gracefully exits interactive shell loop with code 0.
+3. **Execution Safety**:
+   - Strict validation of environment variables and expansion orders.
+   - Quoting integrity must prevent arbitrary code execution during pathname expansion.
+4. **Testing Suite**:
+   - All shell features must be verified using `tests/shell_lifecycle_tests.rs`.

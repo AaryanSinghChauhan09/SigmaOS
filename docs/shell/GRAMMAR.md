@@ -1,10 +1,16 @@
-# Shell Formal Grammar Specification
+# SigmaOS Shell Formal Grammar
 
-```ebnf
-command_line  ::= pipeline ( ( ';' | '&' | '&&' | '||' ) pipeline )* [ ';' | '&' ] ;
-pipeline      ::= [ '!' ] command ( '|' command )* ;
-command       ::= ( assignment | redirection | word )+ ;
-redirection   ::= ( '<' | '>' | '>>' | '2>' | '2>&1' ) word ;
-assignment    ::= IDENTIFIER '=' word ;
-word          ::= ( CHAR | QUOTED_STRING | VARIABLE )+ ;
+## BNF Specification
+
+```bnf
+<command_line> ::= <pipeline> { ";" | "&" | "&&" | "||" }
+<pipeline>     ::= <command> { "|" <command> }
+<command>      ::= { <assignment> | <redirection> } [ <word> { <word> | <redirection> } ]
+<redirection>  ::= "<" <word> | ">" <word> | ">>" <word> | "2>" <word>
+<assignment>   ::= <IDENTIFIER> "=" <word>
+<word>         ::= <LITERAL> | <QUOTED_STRING> | <VARIABLE_EXPANSION>
 ```
+
+## Parsing Rules
+- No partial execution occurs if a syntax parse error is detected during line analysis.
+- Pipelines run asynchronously when terminated with `&`.

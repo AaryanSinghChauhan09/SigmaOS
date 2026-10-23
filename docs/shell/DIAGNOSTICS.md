@@ -1,6 +1,18 @@
-# Shell Diagnostics & Formatting Specification
+# SigmaOS Shell Diagnostics Engine
 
-Diagnostics formatting module (`src/shell/diagnostics/`) provides:
-- **Compiler-Style Errors**: Displays source snippet, line number, column pointer (`^`), and detailed error message.
-- **Command Suggestions**: Calculates string distance when command is not found and suggests similar PATH executables.
-- **Redirection Error Reporting**: Clarifies permission denied, missing file, or target directory errors.
+## Error Formatting Standards
+
+### Command Not Found
+```
+sigma-sh: <command>: command not found (did you mean '<suggestion>'?)
+```
+
+### Parse Error
+```
+sigma-sh: parse error at line <line>, col <col>: <description>
+```
+
+### Redirection Error
+```
+sigma-sh: redirection error: <reason>
+```
