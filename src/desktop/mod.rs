@@ -642,3 +642,6 @@ pub use elementary_os_missing_components_v66::*;
 
 pub mod sovereign_de_wm_advancements_v68_pr;
 pub use sovereign_de_wm_advancements_v68_pr::*;
+
+pub mod sovereign_desktop_toolkits_and_services_v72_pr;
+pub use sovereign_desktop_toolkits_and_services_v72_pr::*;
