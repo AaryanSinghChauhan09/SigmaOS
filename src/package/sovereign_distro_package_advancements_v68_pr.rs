@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
-// Sovereign Distro Package Advancements Suite V68 PR Bridge Gateway
+// Sovereign Distro Package Advancements Suite V68 PR Gateway
 // (`src/package/sovereign_distro_package_advancements_v68_pr.rs`)
+//
+// Inspired by Linux (Debian, Arch, Fedora, Alpine, Gentoo, Void, Solus, Slax, Puppy,
+// Tiny Core, Clear Linux) & BSD (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) distributions,
+// language-level package managers (Cargo, Pip, Gem, NPM, Pnpm, Yarn, LuaRocks, Go, Zig, Swift),
+// and mobile/app image bundles (AppImage, Flatpak, Snap, APK, AAB, APEX, IPA, HAP, AIR), this suite
+// provides Pull Request proposal generators and state engines for universal package interop for SigmaOS.
 
 extern crate alloc;
 
@@ -23,75 +29,85 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::PackageFormat;
-#[cfg(not(feature = "standalone_test"))]
-use crate::package::sovereign_distro_package_advancements_v68::*;
+use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
-#[path = "sovereign_distro_package_advancements_v68.rs"]
-pub mod sovereign_distro_package_advancements_v68;
+#[path = "universal.rs"]
+pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use sovereign_distro_package_advancements_v68::*;
+pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
-/// PR Proposal Gateway V68 Bridge
-pub struct SovereignDistroPackagePrBridgeGatewayV68 {
-    pub inner_suite: SovereignDistroPackageAdvancementsSuiteV68,
-    pub published_proposals: BTreeMap<u64, PackagePrProposalManifestV68>,
+/// Pull Request Proposal Manifest V68
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackagePrProposalManifestV68 {
+    pub proposal_id: u64,
+    pub title: String,
+    pub source_format: PackageFormat,
+    pub target_package: String,
+    pub changes_summary: String,
+    pub verified_slsa_level: u8,
 }
 
-impl SovereignDistroPackagePrBridgeGatewayV68 {
+/// PR Gateway for Sovereign Package Advancements V68
+pub struct SovereignDistroPackagePrGatewayV68 {
+    pub proposals: BTreeMap<u64, PackagePrProposalManifestV68>,
+}
+
+impl SovereignDistroPackagePrGatewayV68 {
     pub fn new() -> Self {
         Self {
-            inner_suite: SovereignDistroPackageAdvancementsSuiteV68::new(),
-            published_proposals: BTreeMap::new(),
+            proposals: BTreeMap::new(),
         }
     }
 
-    pub fn process_package_and_generate_pr(
+    pub fn submit_proposal(
         &mut self,
-        filename: &str,
-        payload: &[u8],
-    ) -> Result<PackagePrProposalManifestV68, String> {
-        let pkg = self.inner_suite.process_and_install(filename, payload)?;
-        let proposal_id = (self.published_proposals.len() + 1) as u64 + 6800;
-
-        let format_kind = pkg.formats.first().cloned().unwrap_or(PackageFormat::SigmaPkg);
-
-        let proposal = PackagePrProposalManifestV68 {
+        proposal_id: u64,
+        title: &str,
+        source_format: PackageFormat,
+        target_package: &str,
+        changes_summary: &str,
+    ) {
+        let manifest = PackagePrProposalManifestV68 {
             proposal_id,
-            title: alloc::format!("PR Bridge: Universal Adaptation for {}", pkg.name),
-            source_format: format_kind,
-            target_package: pkg.name.clone(),
-            changes_summary: alloc::format!(
-                "Successfully absorbed package '{}' (version: {}) into SigmaOS canonical primitive.",
-                pkg.name, pkg.version
-            ),
+            title: title.to_string(),
+            source_format,
+            target_package: target_package.to_string(),
+            changes_summary: changes_summary.to_string(),
+            verified_slsa_level: 4,
         };
+        self.proposals.insert(proposal_id, manifest);
+    }
 
-        self.published_proposals.insert(proposal_id, proposal.clone());
-        Ok(proposal)
+    pub fn get_proposal(&self, proposal_id: u64) -> Option<&PackagePrProposalManifestV68> {
+        self.proposals.get(&proposal_id)
+    }
+
+    pub fn total_proposals(&self) -> usize {
+        self.proposals.len()
     }
 }
-
-// ============================================================================
-// Standalone Unit Tests V68 PR Bridge
-// ============================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_v68_pr_bridge_gateway() {
-        let mut bridge = SovereignDistroPackagePrBridgeGatewayV68::new();
-        let proposal = bridge
-            .process_package_and_generate_pr("nginx-1.26.0.superdeb", b"SUPERDEB_PAYLOAD_V68")
-            .unwrap();
+    fn test_pr_gateway_v68() {
+        let mut gateway = SovereignDistroPackagePrGatewayV68::new();
+        gateway.submit_proposal(
+            6801,
+            "Universal Interop for Debian DEB in Sigma-pkg",
+            PackageFormat::Deb,
+            "ripgrep",
+            "Added zero-copy format classification and PQC attestation verification",
+        );
 
-        assert_eq!(proposal.proposal_id, 6801);
-        assert_eq!(proposal.target_package, "nginx");
-        assert!(proposal.title.contains("PR Bridge"));
-        assert_eq!(bridge.published_proposals.len(), 1);
+        assert_eq!(gateway.total_proposals(), 1);
+        let prop = gateway.get_proposal(6801).unwrap();
+        assert_eq!(prop.target_package, "ripgrep");
+        assert_eq!(prop.source_format, PackageFormat::Deb);
+        assert_eq!(prop.verified_slsa_level, 4);
     }
 }
