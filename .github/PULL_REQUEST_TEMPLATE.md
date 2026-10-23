@@ -2,12 +2,6 @@
 - **Component / Subsystem**:
 - **Upstream study / IPC handler**:
 
-## Shell component
-- **Shell component**:
-
-## Shell safety review
-- **Shell safety review**:
-
 ## Reference study
 - **Reference study**:
 - **What SigmaOS adopts**:
