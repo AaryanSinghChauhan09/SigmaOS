@@ -23,6 +23,23 @@ use std::vec::Vec;
 
 use crate::klib::btreemap::BTreeMap;
 
+/// Case-insensitive substring search helper without allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.len() <= haystack.len()
+            && haystack
+                .as_bytes()
+                .windows(needle.len())
+                .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Email address
 #[derive(Debug, Clone)]
 pub struct EmailAddress {
@@ -356,16 +373,12 @@ impl EmailClient {
             .into_iter()
             .filter(|email| {
                 if let Some(ref from) = filter.from {
-                    if !email.from.address.contains(from) {
+                    if !contains_ignore_case(&email.from.address, from) {
                         return false;
                     }
                 }
                 if let Some(ref subject) = filter.subject_contains {
-                    if !email
-                        .subject
-                        .to_lowercase()
-                        .contains(&subject.to_lowercase())
-                    {
+                    if !contains_ignore_case(&email.subject, subject) {
                         return false;
                     }
                 }
@@ -528,5 +541,75 @@ mod tests {
         }];
         let message = client.compose_email(to, "Test Subject".to_string(), "Test Body".to_string());
         assert_eq!(message.subject, "Test Subject");
+    }
+
+    #[test]
+    fn test_search_emails_zero_alloc() {
+        let config = EmailAccountConfig {
+            email: "user@example.com".to_string(),
+            imap_server: "imap.example.com".to_string(),
+            imap_port: 993,
+            smtp_server: "smtp.example.com".to_string(),
+            smtp_port: 587,
+            use_ssl: true,
+            use_tls: true,
+        };
+        let mut client = EmailClient::new(Box::new(ImapSmtpBackend::new(config.clone())));
+        client.add_account(config);
+
+        let msg1 = EmailMessage {
+            id: "msg1".to_string(),
+            from: EmailAddress {
+                name: "Alice Smith".to_string(),
+                address: "alice@example.com".to_string(),
+            },
+            to: vec![],
+            cc: vec![],
+            bcc: vec![],
+            subject: "Urgent: Project Update".to_string(),
+            body: "Body text".to_string(),
+            body_html: None,
+            attachments: vec![],
+            sent_at: 1000,
+            received_at: 1000,
+            read: true,
+            starred: false,
+            folder: EmailFolder::Inbox,
+            labels: vec![],
+        };
+
+        client.send_email(msg1).unwrap();
+
+        let filter_subject = EmailFilter {
+            folder: Some(EmailFolder::Sent),
+            from: None,
+            subject_contains: Some("PROJECT".to_string()),
+            unread_only: false,
+            starred_only: false,
+            has_attachments: false,
+            date_from: None,
+            date_to: None,
+            label: None,
+        };
+
+        let results = client.search_emails(filter_subject).unwrap();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].id, "msg1");
+
+        let filter_from = EmailFilter {
+            folder: Some(EmailFolder::Sent),
+            from: Some("ALICE".to_string()),
+            subject_contains: None,
+            unread_only: false,
+            starred_only: false,
+            has_attachments: false,
+            date_from: None,
+            date_to: None,
+            label: None,
+        };
+
+        let results_from = client.search_emails(filter_from).unwrap();
+        assert_eq!(results_from.len(), 1);
+        assert_eq!(results_from[0].id, "msg1");
     }
 }
