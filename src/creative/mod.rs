@@ -59,6 +59,7 @@ pub mod voicecraft;
 pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
 pub mod wordcraft;
+pub mod wordcraft_artcraft_missing_components_v65_pr;
 pub mod wordcraft_artcraft_parity_pr;
 pub mod wordcraft_missing_components_parity_pr;
 
@@ -162,3 +163,4 @@ pub use wordcraft::{
     WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
     WordCraftPullRequestSpec,
 };
+pub use wordcraft_artcraft_missing_components_v65_pr::*;
