@@ -2293,4 +2293,11 @@ if [ -f "src/boot/bare_metal_independent_boot_system.rs" ]; then
     ./build/test_bare_metal
 fi
 
+if [ -f "tests/test_open_source_os_unimplemented_ideas_v69_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V69 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_unimplemented_ideas_v69_pr.rs --edition=2021 -o build/test_open_source_os_v69_pr
+    ./build/test_open_source_os_v69_pr
+fi
+
 echo "All SigmaOS test suites completed."
