@@ -1777,10 +1777,11 @@ if [ -f "src/distro/open_source_os_missing_components_v68_pr.rs" ]; then
     ./build/test_open_source_v68_pr
 fi
 
-if [ -f "tests/test_open_source_os_missing_components_v69_pr.rs" ]; then
-    echo "Running Open Source OS Missing Components V69 PR Suite integration tests..."
-    rustc --test tests/test_open_source_os_missing_components_v69_pr.rs --edition=2021 -o build/test_open_source_v69_pr
-    ./build/test_open_source_v69_pr
+if [ -f "tests/test_open_source_os_and_cachy_linux_v69_pr.rs" ]; then
+    echo "Running Open-Source OS & CachyOS Missing Components V69 PR integration test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_and_cachy_linux_v69_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_open_source_os_cachy_v69
+    ./build/test_open_source_os_cachy_v69
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then

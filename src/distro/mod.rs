@@ -850,12 +850,11 @@ pub use arch_linux_missing_components_v69_pr::*;
 pub mod debian_github_repo_missing_components_v68_pr;
 pub use debian_github_repo_missing_components_v68_pr::*;
 
-pub mod open_source_os_unimplemented_ideas_v70_pr;
-pub use open_source_os_unimplemented_ideas_v70_pr::*;
-pub mod debian_github_repo_missing_components_v70_pr;
-pub use debian_github_repo_missing_components_v70_pr::*;
-pub mod open_source_os_debian_unimplemented_ideas_v70_pr;
-pub use open_source_os_debian_unimplemented_ideas_v70_pr::*;
+pub mod open_source_os_unimplemented_ideas_v69_pr;
+pub use open_source_os_unimplemented_ideas_v69_pr::*;
+
+pub mod cachy_linux_missing_components_v69_pr;
+pub use cachy_linux_missing_components_v69_pr::*;
 
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
