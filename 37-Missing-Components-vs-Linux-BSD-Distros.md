@@ -185,6 +185,7 @@ SigmaOS aims to provide a unique operating system experience while maintaining c
 - 🟡 Package manager format specification - In progress
 - 🟡 BPF foundation - Roadmap priority
 - 🟡 Network namespace support - Roadmap item
+- 🟦 **Omarchy Linux v0.6 parity: Basic kernel boot, filesystem read/write, package manager format specification**
 
 **Medium-term (v0.7 - v0.8):**
 - 🟡 Ext4 read/write support - Already implemented, refinement ongoing
@@ -193,6 +194,7 @@ SigmaOS aims to provide a unique operating system experience while maintaining c
 - 🟡 Shell compatibility layer (bash builtins) - Roadmap item
 - 🟡 Firewall configuration basics - Roadmap item
 - 🟡 Complete driver framework (USB, PCI, ACPI) - Expansion ongoing
+- 🟦 **Omarchy Linux v0.8 parity: Full hardware support, networking stack, package management, shell compatibility**
 
 **Long-term (v0.9+):**
 - 🟡 ZFS integration - Foundation already present, feature expansion
@@ -200,6 +202,7 @@ SigmaOS aims to provide a unique operating system experience while maintaining c
 - 🟡 APT/YUM package manager format - Adapters already implemented, CLI compatibility
 - 🟡 Complete hardware compatibility suite
 - 🟡 Advanced desktop environment features
+- 🟦 **Omarchy Linux v1.0+: Complete desktop environment, application compatibility, full parity**
 
 ### Conclusion
 
@@ -216,14 +219,28 @@ The documented "missing" components represent a prioritized development roadmap,
 - Wiki-driven documentation (1,067+ .md files)
 - Single branch governance (only main branch)
 
-### Related Wiki Pages
+### Omarchy Linux Parity Analysis
 
-- 27-SigmaOS-CLI-Development-Plan.md
-- 26-System-Utilities-Development-Plan.md
-- 28-Network-Development-And-Maintenance-Plan.md
-- 35-SigmaOS-Device-Driver-Development-Plan.md
-- 20-Tri-Agent-500-Repos-Absorption-Master-Plan.md
-- Complete development plan suite
+Based on the Omarchy Linux 4.0.6 ISO analysis, this section documents the specific gaps between SigmaOS and Omarchy Linux, and the roadmap items needed to achieve parity.
+
+| Category | Omarchy Linux 4.0.6 | SigmaOS Current | Gap Impact | Roadmap to Parity |
+|----------|---------------------|-----------------|------------|-------------------|
+| **Kernel** | Complete monolithic kernel with drivers | Modular foundations (VFS, memory, driver framework) | Critical | P0: Kernel binary, USB drivers, PCI enumeration (6-12 months) |
+| **Filesystem** | Ext4, XFS, UFS, FAT32, NFS, SMB/CIFS | Ext4, Btrfs, ZFS, FAT32 foundations | Critical | P1: XFS, NFS, SMB/CIFS support (6-12 months) |
+| **Package Management** | Custom package system (omarchy-apt, omarchy-pkg) | Sovereign pkg manager with 60+ format adapters | Critical | P0: Omarchy pkg format compatibility layer (3-6 months) |
+| **Networking** | Full TCP/IP, IPsec, WireGuard, firewall | TCP/IP stack, DNS, HTTP; advanced features roadmap | Critical | P1: IPsec, WireGuard, firewall (6-12 months) |
+| **Shell & CLI** | Bash/Zsh with coreutils | Custom shell with coreutils compatibility | Critical | P1: Bash builtins compatibility (3-6 months) |
+| **Device Drivers** | USB, PCI, ACPI, hot-plug (udev/devd) | Modular framework with 40+ drivers | Critical | P1: Complete driver suite, udev/devd equivalence (6-12 months) |
+| **Init/Boot** | systemd, grub, bsdinit | Custom boot process, Grub integration | Critical | P0: systemd unit compatibility (6-12 months) |
+| **Security** | SELinux/AppArmor, FirewallD, OpenSSH | Kernel hardening (ASLR, canines), capability-based | High | P1: SELinux/AppArmor consideration (12-24 months) |
+
+**Parity Assessment:**
+- **P0 Foundation** (0-6 months): Kernel binary, basic filesystem, package manager format, shell basics, bootloader
+- **P1 Functional** (6-12 months): Networking stack, device drivers, security modules, init system compatibility
+- **P2 Usable** (12-18 months): Desktop environment features, advanced filesystems, full compatibility
+- **P3 Competitive** (18-36 months): Complete Omarchy Linux parity, market competitiveness
+
+*The roadmap items marked with 🟦 represent the specific Omarchy Linux parity milestones. SigmaOS's unique value proposition (principle compliance, modular architecture, sovereignty) is maintained throughout development.*
 
 ---
 *Document generated as part of SigmaOS wiki component parity analysis.*
