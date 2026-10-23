@@ -1,97 +1,151 @@
 # SigmaOS System Utilities Development Plan
 
-SigmaOS describes itself as an experimental OS codebase, not a supported general-purpose installation. Its feature inventory shows the shell is still a prototype, system-information reporting is hosted-only, and core components such as process spawning, syscall dispatch, and storage integration still have runtime milestones ahead. So system utilities should be developed in dependency order: **first a small set of trustworthy tools backed by real OS services; then broader POSIX-like utilities and recurring maintenance automation.**
+## Executive Summary
 
-This plan treats a *system utility* as a command-line program for inspecting or managing files, processes, storage, accounts, networking, services, and system health. It uses POSIX utility conventions as the portability baseline, with Linux and BSD tools as design references—not as a claim of compatibility.
+SigmaOS's README describes an experimental OS codebase, not a supported general-purpose installation. Its feature inventory specifies that the shell is a prototype with built-ins (`echo`, `pwd`, `ls`) and requires process execution integration; the hosted system-report tool has no SigmaOS runtime integration; and init requires process spawning and service-dependency enforcement.
 
-## Rules for utility development
+Therefore, this plan establishes a small set of real, useful utilities backed by working OS interfaces, rather than treating a large list of command names as an implemented userland. The development roadmap follows a sequence of proposed Pull Requests (PRs), supplemented by recurring periodic maintenance cadences inspired by POSIX utility conventions and BSD/Linux operational frameworks.
 
-- **Keep the contract consistent.** Document synopsis, options, operands, standard input/output/error, exit statuses, environment, examples, and compatibility for every command. POSIX conventions cover utility syntax and the `--` end-of-options delimiter.
-- **Separate portable behavior from extensions.** Label POSIX behavior, SigmaOS-specific options, and any GNU/Linux/BSD-inspired behavior. GNU Coreutils provides a broad reference for standard file and system utilities; FreeBSD’s base utilities offer a useful BSD comparison.
-- **Make tools compose safely.** Use stdout for primary output and stderr for diagnostics; support stdin or `-` for file-oriented commands where appropriate; define predictable exit statuses; do not mix human output into machine-readable output.
-- **Prefer stable machine-readable output for administration.** Add JSON only where scripting or automation benefits; version the output schema and test it separately from human-readable text.
-- **Avoid false capability claims.** A utility must report when a service, syscall, filesystem operation, or device is unavailable; it must not substitute mock success for runtime behavior.
-- **Design mutations for safety.** Make inspection read-only. For destructive operations, identify the target clearly, validate inputs, avoid dangerous path/symlink behavior, and provide preview, confirmation, or recovery where appropriate.
-- **Use bounded and robust implementations.** Test long paths, unusual filenames, invalid encodings, large files, permission failures, partial I/O, and resource exhaustion.
-- **Document and test the real execution path.** Distinguish unit/model tests from a utility running against SigmaOS syscalls and VFS. Linux distinguishes internal unit tests from userspace tests that exercise interfaces on a booted system; SigmaOS should make those test levels clear too.
-- **Treat periodic maintenance as a first-class system facility.** FreeBSD’s `periodic` framework runs daily, weekly, monthly, and security tasks with configurable output and scheduling; SigmaOS can adopt the task categories without copying its implementation details.
+---
 
-## Proposed PR sequence
+## Baseline Rules
 
-Each row is a proposed, separately reviewable PR. Split further if a PR crosses independent interfaces or exceeds what maintainers can test.
+### 1. Command Contract Definition
+Every utility must define an explicit contract:
+- **Synopsis:** Command usage syntax following POSIX option/operand conventions.
+- **Options & Operands:** Parsing syntax adhering to POSIX utility standards (e.g., standard flag handling, `--` delimiter support).
+- **Streams (stdin/stdout/stderr):** Standard input for stream tools; normal program output on `stdout`; error messages and diagnostics strictly on `stderr`.
+- **Exit Status:** Stable, predictable exit codes (`0` success, `1` runtime failure, `2` syntax error, `126` permission denied, `127` command not found).
+- **Environment & Compatibility Profile:** Declared POSIX profile along with GNU/Linux/BSD-inspired extensions clearly marked.
 
-| PR | Proposed title | Scope | Acceptance criteria |
-|---|---|---|---|
-| 1 | `docs(utils): define system-utility scope and compatibility policy` | Audit current utility code, shell built-ins, system-information tooling, VFS/syscall dependencies, and feature inventory. Define naming, POSIX subset, extension policy, status levels, and supported boot target. | Inventory shows each utility’s implementation, runtime dependencies, tests, and limitations; host-only tools are distinguished from SigmaOS runtime utilities. |
-| 2 | `docs(utils): add command contract and utility registry` | Add a registry for command name, function, privilege, read/write behavior, dependencies, owner, manual page, and test evidence. | Every shipped/proposed command has one entry; duplicate names and unowned privileged commands are detected or resolved. |
-| 3 | `feat(utils): add shared argument and diagnostic conventions` | Create common Rust helpers for argument parsing, usage output, error formatting, stdout/stderr, exit status, and optional JSON output. | Golden tests cover valid and invalid options, `--`, output streams, and status codes; shared helpers do not conceal command-specific semantics. |
-| 4 | `feat(utils): add foundational file-inspection commands` | Implement or integrate `cat`, `pwd`, `ls`, `stat`, `mkdir`, and `touch` against SigmaOS VFS and permissions. | Commands use the real VFS path; tests cover missing paths, permission denial, unusual filenames, directories, and partial errors. |
-| 5 | `feat(utils): add safe file mutation commands` | Add `cp`, `mv`, `rm`, `rmdir`, and `ln` in staged PRs, with explicit symlink, overwrite, and recursive behavior. | Tests cover same-file operations, overwrite refusal, symlinks, root/path edge cases, permission failures, and interruption; recursive deletion cannot escape its intended target. |
-| 6 | `feat(utils): add text and stream tools` | Add `head`, `tail`, `wc`, `cut`, `sort`, `uniq`, and `tee` in dependency-sized PRs. | Tools correctly handle stdin, multiple files, empty input, large streams, UTF-8/binary policy, and pipeline errors; compatibility subset is documented. |
-| 7 | `feat(utils): add environment and identity inspection tools` | Add `env`, `printenv`, `id`, `whoami`, `groups`, `uname`, and `hostname` where corresponding OS services exist. | Output comes from authoritative SigmaOS runtime providers; permission and unavailable-provider behavior is explicit; JSON schemas are stable if provided. |
-| 8 | `feat(utils): add process and job-control utilities` | Add `ps`, `kill`, `sleep`, and `timeout` after process enumeration, signals, and process-group semantics are integrated. | Commands operate on real processes, enforce permissions, handle races and stale identifiers, and document signal/status behavior. |
-| 9 | `feat(utils): add storage and filesystem status tools` | Add `df`, `du`, `mount`, `umount`, `sync`, and disk/device inspection after block, mount, and filesystem interfaces work. Keep formatting/partitioning separate. | Read-only commands cannot mutate devices; device identities are unambiguous; any future destructive operation has target confirmation and recovery guidance. |
-| 10 | `feat(utils): add account and permission administration tools` | Add `chmod`, `chown`, `useradd`, `userdel`, and related tools only after identity database and access-control enforcement are real. | Authorization occurs in kernel/service APIs; privilege failures are tested; account changes are transactional and auditable. |
-| 11 | `feat(utils): add system status and diagnostics commands` | Extend the existing hosted report tool into a provider-backed SigmaOS diagnostic command; distinguish host, cached, and live OS data. | No host metrics are presented as SigmaOS data; missing services report unavailable; report output is bounded and secrets are redacted. |
-| 12 | `feat(periodic): add scheduled system-maintenance runner` | Implement a small scheduler/runner for daily, weekly, monthly, and security task groups; define task registration, timeout, environment, output, and configuration. | Tasks are opt-in or configured predictably; one failing task does not silently suppress the rest; logs are bounded, rotated or expired, and attributable. |
-| 13 | `feat(periodic): add initial read-only health and security checks` | Add checks for failed services, filesystem capacity, stale temporary files, failed updates, insecure permissions, and authentication/security events—only where data sources exist. | Checks are read-only, report evidence and severity, are safe to rerun, and do not label unavailable checks as passing. |
-| 14 | `docs(utils): add manual pages and runnable examples` | Document every shipped utility and periodic task; use consistent manual-page sections and validate rendered output. | Each command has a manual/reference page with synopsis, options, exit status, examples, and compatibility; documentation matches parser tests. |
-| 15 | `test(utils): add command contract and booted-system suite` | Add unit tests, golden CLI tests, filesystem fixtures, process tests, and QEMU integration tests for commands that depend on the OS runtime. | CI clearly labels test level; core utilities run against SigmaOS in a booted target; failures preserve logs and exact target configuration. |
-| 16 | `security(utils): add unsafe-input and destructive-operation checks` | Audit path handling, symlink traversal, permissions, numeric parsing, environment variables, command execution, and log/report redaction. | High-risk paths have adversarial tests; utilities never build privileged shell commands from strings; unresolved security findings have owners and disposition. |
-| 17 | `ci(utils): enforce command docs, status, and test consistency` | Add checks that compare the command registry, installed binaries, help output, manual pages, capability matrix, and integration tests. | CI catches undocumented commands, stale status, missing tests, or manual/help option drift; required checks are enforced before merging. |
-| 18 | `release(utils): publish supported utility and maintenance-task matrix` | Document included commands, standards profile, architecture/boot target, dependencies, privileges, and support limitations. | “Supported” means tested against the stated runtime and target; no utility is called POSIX-compatible without appropriate conformance evidence. |
+### 2. Tool Composability
+- Never mix human-formatted text into machine-readable streams on `stdout`.
+- Standardize stream-oriented tools to read from `stdin` when operand files are omitted or specified as `-`.
+- Ensure output formats remain deterministic and pipeline-friendly across command combinations.
 
-### Priority order
+### 3. Structured Output & JSON Interfaces
+- Structured output (such as `--json`) is provided as a separate, first-class interface for automation.
+- Schema definitions for JSON payloads must be explicitly versioned.
+- Machine-readable JSON output paths must be tested independently from human-readable text output.
 
-Start with PRs **1–4, 11, and 15**: audit what exists, define shared behavior, implement a small real-VFS utility set, and add accurate runtime diagnostics. Next add safe file operations and stream tools. Defer process, storage, account administration, and scheduled security checks until the underlying process, filesystem, identity, and logging APIs are genuinely integrated. That keeps the tool surface aligned with SigmaOS’s current boot/runtime status rather than its feature names.
+### 4. Separation of Inspection from Mutation
+- Status and report commands (`pwd`, `stat`, `df`, `ps`, `sigma-diag`) are strictly read-only and free of mutating side-effects.
+- Destructive or mutating operations (`rm`, `userdel`, formatting) must explicitly identify target resources and incorporate safeguards such as previews, confirmation prompts, dry-run flags, or recovery options.
 
-## Periodic maintenance PR cadence
+### 5. Truthful Backend Reporting
+- Commands must never claim success when an underlying kernel or service backend is missing or unavailable.
+- Implement explicit diagnostic distinctions for four separate failure conditions:
+  1. `unsupported` (feature not implemented in current build)
+  2. `not integrated` (backend exists but binding unavailable)
+  3. `permission denied` (authorization failed)
+  4. `operation failed` (runtime backend error)
 
-| Cadence | Proposed recurring PR/task | Required output |
-|---|---|---|
-| Every PR | `ci(utils): run contract checks for changed commands` | Formatting/build, utility tests, help/manual checks, and relevant booted-system tests; skipped checks explained. |
-| Weekly | `maint(utils): triage utility failures and stale capability claims` | Reproducer, runtime target, responsible owner, priority, and fix or documented deferral; inventory updated only with evidence. |
-| Weekly | `docs(utils): reconcile command registry, help, and manuals` | Names/options/examples/status agree across code, registry, help output, and docs. |
-| Monthly | `test(utils): run core command behavior matrix` | Check stdin, multiple operands, `--`, exit codes, stderr, permissions, long paths, unusual filenames, and non-TTY output. |
-| Monthly | `security(utils): review privileged and destructive tools` | Revisit `rm`, mount/storage, permission, account, update, and service commands for path traversal, authorization, confirmation, rollback, and logging. |
-| Monthly | `maint(periodic): review maintenance task results and output retention` | Task duration/failure, duplicate scheduling, log volume, output routing, and disabled/unavailable checks reviewed. |
-| Quarterly | `docs(utils): review POSIX and Linux/BSD behavior differences` | Confirm supported option syntax and semantics against POSIX; document Linux/BSD extensions and deviations. |
-| Quarterly | `test(utils): run clean-boot and upgrade smoke matrix` | Validate core utilities and maintenance tasks on clean QEMU boot and supported update path; record exact revision/configuration. |
-| Each release candidate | `release(utils): certify command set and periodic checks` | Utility matrix, manual pages, installed paths, privileges, maintenance-task results, known gaps, and release notes. |
-| After each incident | `fix(utils): prevent recurrence of <failure>` | Root cause, minimized reproducer, regression test, data-loss/security impact, and backport/release decision. |
+### 6. Layered Testing & Runtime Evidence
+Following Linux testing guidelines (distinguishing KUnit in-kernel white-box tests from kselftest userspace interface tests), test evidence must be classified into four distinct maturity tiers:
+1. `Unit/Model`: In-memory Rust unit tests and simulated data models.
+2. `Hosted`: Execution under standard host OS developer environments.
+3. `QEMU Booted`: Verification against a booted SigmaOS kernel and VFS inside QEMU.
+4. `Physical Target`: Validation on bare-metal target hardware.
 
-## Utility-family rules
+### 7. Bounded Periodic Maintenance Framework
+- Maintenance tasks must be safe, idempotent, and bounded by time and memory limits.
+- Tasks must explicitly report outcome categories: `Pass`, `Finding`, `Warning`, `BadConfig`, or `ExecutionFailure`.
+- Follow FreeBSD's periodic framework model for daily, weekly, monthly, and security maintenance tasks.
 
-- **File and text tools:** Treat filenames as data, not shell syntax; define symlink traversal and overwrite behavior; support streaming without unbounded buffering.
-- **Process tools:** Require real process/service APIs; distinguish process IDs from stable handles where possible; define races, signals, and exit status.
-- **Storage tools:** Keep status/inspection separate from formatting or partition changes; identify devices by stable properties as well as transient names.
-- **Network and service tools:** Expose actual state from the network/service manager; mutation must validate first and have rollback or a documented recovery path.
-- **Identity and permission tools:** Enforce ownership and capability checks in the system service or kernel; report partial failure clearly; audit changes.
-- **System reports:** Identify data source and freshness; redact credentials and private user data; keep machine output schema-versioned.
-- **Periodic checks:** Make checks idempotent and bounded; configure schedule and output; distinguish pass, finding, warning, bad configuration, and execution failure.
+### 8. Focused PRs & Protected Branch Merge Gates
+- PRs must be strictly scoped to single utility families or maintenance subsystems.
+- All code additions require unit test coverage, updated manuals, passing CI checks, and resolved review conversations prior to merge.
 
-## PR template and merge gates
+---
+
+## Proposed PR Roadmap
+
+| PR # | Proposed Title | Scope | Acceptance Criteria |
+|:---:|:---|:---|:---|
+| **1** | `docs(utils): audit current tools and define compatibility policy` | Inventory utility code, shell built-ins, hosted tools, syscall/VFS dependencies, tests, and documentation. Define POSIX scope, naming, maturity vocabulary, and runtime evidence requirements. | Each existing command is labeled by implementation and test level; hosted tools are not described as SigmaOS runtime tools; compatibility claims have explicit criteria. |
+| **2** | `docs(utils): add command registry and ownership map` | Add a registry of command name, purpose, owner, privilege, read/write behavior, backend, docs page, and tests. | No duplicate names or undocumented privileged commands; registry can drive generated help/docs where appropriate. |
+| **3** | `feat(utils): add shared CLI contract helpers` | Add reusable Rust support for argument parsing, usage text, errors, exit status, stdout/stderr, TTY/color detection, and optional structured output. | Golden tests cover valid/invalid args, `--`, non-TTY use, stdout/stderr separation, and documented exit statuses. |
+| **4** | `feat(utils): implement minimal file and directory utilities` | Add or integrate `cat`, `pwd`, `ls`, `stat`, `mkdir`, and `touch` against the real VFS and permission model. | QEMU/user-process tests exercise actual VFS calls; invalid paths, permissions, unusual filenames, and partial errors are covered. |
+| **5** | `feat(utils): implement safe file mutation utilities` | Add `cp`, `mv`, `rm`, `rmdir`, and `ln` in small PRs; define overwrite, recursive, and symlink behavior. | Tests cover symlink/path traversal, same-file operations, overwrite behavior, permission failures, and interrupted operations; recursive deletion cannot escape the chosen target. |
+| **6** | `feat(utils): add stream and text-processing utilities` | Add `head`, `tail`, `wc`, `cut`, `sort`, `uniq`, and `tee` incrementally. | Tools handle stdin, empty input, multiple operands, large streams, and defined text/binary behavior without unbounded buffering. |
+| **7** | `feat(utils): add system identity and environment queries` | Add `env`, `printenv`, `id`, `whoami`, `uname`, and `hostname` only when backed by real process/account/kernel APIs. | Results come from SigmaOS providers; permissions and missing providers are handled explicitly; machine output schemas are stable if added. |
+| **8** | `feat(utils): add process inspection and signal tools` | Add `ps`, `kill`, `sleep`, and `timeout` after process enumeration, signal delivery, and process-group semantics work. | Commands operate on real processes; target identity and authorization are checked; races and exit behavior are documented and tested. |
+| **9** | `feat(utils): add storage and filesystem status tools` | Add `df`, `du`, `mount` inspection, `sync`, and device status once block/VFS/mount interfaces are integrated. Keep formatting and partition changes separate. | Read-only inspection never writes to devices; device identity is clear; errors and unavailable storage are distinguishable. |
+| **10** | `feat(utils): add account and permission administration tools` | Add permission/account management only after identity storage, kernel authorization, and audit logging are implemented. | Permission checks occur in the authoritative kernel/service API; partial failures are reported; changes are auditable and tested. |
+| **11** | `feat(utils): make system reports SigmaOS-runtime aware` | Extend the existing report tool with actual SigmaOS providers for kernel, hardware, filesystems, network, and services as they become available. | Each field identifies its source/freshness; host metrics are never represented as SigmaOS state; missing providers report unavailable. |
+| **12** | `feat(periodic): add bounded maintenance-task runner` | Implement daily/weekly/monthly/security task groups, configuration, timeouts, output routing, and enable/disable policy. | Tasks are attributable and bounded; one task failure does not suppress others; logs are controlled; tasks do not perform destructive repairs by default. |
+| **13** | `feat(periodic): add initial read-only health checks` | Add checks for failed services, disk capacity, update status, permission anomalies, and security events when those providers exist. | Every check reports pass/finding/unavailable/error; checks are read-only, rerunnable, and supported by fixtures or runtime tests. |
+| **14** | `docs(utils): add manual pages and executable examples` | Document every command and periodic check using consistent manual sections; add examples exercised by tests where practical. | Manuals document syntax, options, exit status, examples, compatibility, and limitations; rendered output is validated. |
+| **15** | `test(utils): add command contract and booted-system suite` | Add unit, golden-output, VFS, process, and QEMU integration tests; classify test evidence. | CI separates model tests from booted runtime tests; core utilities run against SigmaOS interfaces on a named QEMU target. |
+| **16** | `security(utils): audit path, privilege, and data-handling risks` | Review path/symlink handling, numeric parsing, permissions, shell invocation, logs, and destructive operations. | No privileged command is built from shell strings; untrusted paths and inputs have regression tests; secrets/private data are redacted. |
+| **17** | `ci(utils): validate registry, help, manuals, and status matrix` | Check installed command list, registry, help output, manual pages, feature status, and test coverage for drift. | CI fails on undocumented commands, stale claims, missing manuals, or parser/docs mismatches. |
+| **18** | `release(utils): publish utility support matrix` | List commands, versions, compatibility profile, privilege, backend, architecture, and known gaps. | “Supported” tools have repeatable runtime evidence; unsupported behavior is explicitly listed. |
+
+### Priority Sequence
+The highest-value initial sequence is **PRs 1–4, 11, and 15**:
+1. Establish truthful status claims.
+2. Ensure consistent CLI parsing behavior.
+3. Implement basic VFS utilities (`cat`, `pwd`, `ls`, `stat`, `mkdir`, `touch`).
+4. Implement runtime-backed diagnostic reporting (`sigma-diag`).
+5. Establish booted system test paths.
+
+Process, storage, account administration, and periodic security tools are deferred until their respective kernel and service interfaces are fully integrated.
+
+---
+
+## Periodic Maintenance Cadence
+
+| Cadence | Task Title | Acceptance Evidence |
+|:---|:---|:---|
+| **Every PR** | `ci(utils): run utility contract checks` | Build, unit/golden tests, docs checks, and affected QEMU tests; skipped checks explained. |
+| **Weekly** | `maint(utils): triage failures and stale status claims` | Reproducer, affected command/backend, owner, priority, and fix or documented deferral; feature status updated only from evidence. |
+| **Weekly** | `docs(utils): reconcile registry, help, and manuals` | Command names, options, examples, and status agree across code, registry, help, and docs. |
+| **Monthly** | `test(utils): run core command behavior matrix` | Verify stdin, multiple operands, `--`, exit status, stderr, permission errors, long/unusual filenames, and non-TTY use. |
+| **Monthly** | `security(utils): review privileged and destructive utilities` | Review `rm`, storage, account, mount, service, and update operations for authorization, target validation, confirmation, rollback, and data exposure. |
+| **Monthly** | `maint(periodic): review maintenance-task results and retention` | Runtime, failure rate, duplicate scheduling, time/output bounds, and log retention assessed; unavailable checks are not counted as passed. |
+| **Quarterly** | `docs(utils): review POSIX and Linux/BSD deviations` | Revalidate declared option syntax and semantics against POSIX; document platform-specific behavior. |
+| **Quarterly** | `test(utils): run clean-boot and upgrade smoke tests` | Core commands and periodic tasks run after fresh QEMU boot and supported upgrade path; configuration and logs retained. |
+| **Each Release Candidate** | `release(utils): certify shipped tools and maintenance checks` | Supported command matrix, manual pages, permissions, boot target, periodic results, and open limitations recorded. |
+| **After Each Incident** | `fix(utils): prevent recurrence of <failure>` | Root cause, test reproducer, data-loss/security assessment, and backport decision included. |
+
+---
+
+## Component & Utility-Family Rules
+
+- **File utilities:** Treat names as data, not shell syntax; define symlink-following, overwrite, recursion, and partial-I/O semantics; preserve file metadata only when explicitly specified.
+- **Text utilities:** Stream large input; define byte-vs-text behavior, locale, and invalid encoding handling; avoid hidden buffering that can exhaust memory.
+- **Process utilities:** Use kernel process APIs; authorize signals and inspection; make stale IDs/races predictable; do not report process state from a model or cache as live state.
+- **Storage utilities:** Separate inspection from destructive operations; show stable device identity and exact target; require preview/confirmation/recovery for future writes.
+- **System reporting:** Mark each value live, cached, host-derived, or unavailable; bound output and redact credentials and private user data.
+- **Maintenance runner:** Make tasks idempotent and read-only by default; set time/resource limits; record task ID, start/end, result category, and concise output; allow administrator policy to disable tasks.
+- **Documentation:** Use a consistent manual structure with synopsis, description, options, environment, exit status, examples, and standards/compatibility notes.
+- **Testing:** Use unit tests for isolated logic and end-to-end tests for actual userspace interfaces. Linux distinguishes KUnit's internal white-box tests from kselftest's userspace/system-level tests; SigmaOS preserves this distinction in reports.
+
+---
+
+## PR Review Template & Merge Gates
 
 ```text
 ## Summary
-What system task or utility gap does this PR address?
+What utility or maintenance task does this PR add or fix?
 
-## Command/task
-Name, synopsis or schedule, owner, privilege level, and backend dependencies.
+## Scope
+Command/task, backend, privilege, and excluded work.
 
-## Compatibility contract
-POSIX subset, SigmaOS behavior, Linux/BSD extensions, and deviations.
-
-## Side effects and safety
-Read-only or mutating; path/permission checks, confirmation, dry-run,
-rollback/recovery, and output redaction.
+## Command contract
+Synopsis, options, operands, stdin/stdout/stderr, exit status,
+environment, output format, and compatibility profile.
 
 ## Runtime evidence
 Unit/model | hosted | QEMU booted SigmaOS | physical target
-State exactly where it was tested and what data source it used.
+State the exact target and data source.
+
+## Safety and side effects
+Read-only or mutating; input/path validation, authorization, preview,
+confirmation, rollback/recovery, and data redaction.
 
 ## Tests and docs
-Commands run, expected output/exit statuses, manual page, examples,
+Commands run, expected output/status, manual page, periodic-task behavior,
 and anything not tested.
 
 ## Status
@@ -100,10 +154,18 @@ Explain the evidence behind the status.
 
 ## Checklist
 - [ ] Focused PR with measurable acceptance criteria
-- [ ] Tests cover normal, invalid, and permission/error paths
-- [ ] Help, exit status, stderr, and documentation match behavior
-- [ ] No false success when a backend is unavailable
-- [ ] Destructive actions are explicit and recoverable
-- [ ] Capability matrix updated with evidence
-- [ ] Required reviews and CI checks pass
+- [ ] Normal, invalid-input, permission, and failure cases tested
+- [ ] Help, exit status, stderr, and manual match implementation
+- [ ] Unavailable backend never reports false success
+- [ ] Destructive behavior is explicit and recoverable
+- [ ] Feature inventory updated with test evidence
+- [ ] Required CI passes; review conversations resolved
 ```
+
+---
+
+## Maturity & Completion Gates
+
+1. **Integrated:** Mark a utility `Integrated` only when it uses the real SigmaOS interface on a documented boot target.
+2. **Supported:** Mark it `Supported` only after repeatable tests, documented behavior, permissions, failure paths, and manual pages all agree.
+3. **Periodic Checks:** Periodic checks must additionally show safe reruns, bounded runtime/output, and explicit handling when their provider is unavailable.
