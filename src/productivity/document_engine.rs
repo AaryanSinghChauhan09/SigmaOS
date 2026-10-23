@@ -193,16 +193,38 @@ impl DocumentEngine {
         Ok(latex)
     }
 
-    /// Search text in document
+    /// Search text in document using zero-allocation ASCII fast path when possible
     pub fn search_text(document: &Document, query: &str) -> Vec<usize> {
         let mut positions = Vec::new();
-        let content_lower = document.content.to_lowercase();
-        let query_lower = query.to_lowercase();
+        if query.is_empty() {
+            return positions;
+        }
 
-        let mut start = 0;
-        while let Some(pos) = content_lower[start..].find(&query_lower) {
-            positions.push(start + pos);
-            start += pos + query.len();
+        // ASCII fast-path: avoids heap String allocations (`to_lowercase()`) during search
+        if document.content.is_ascii() && query.is_ascii() {
+            let needle = query.as_bytes();
+            let n_len = needle.len();
+            let haystack = document.content.as_bytes();
+            if n_len <= haystack.len() {
+                let mut start = 0;
+                while start + n_len <= haystack.len() {
+                    if haystack[start..start + n_len].eq_ignore_ascii_case(needle) {
+                        positions.push(start);
+                        start += n_len;
+                    } else {
+                        start += 1;
+                    }
+                }
+            }
+        } else {
+            let content_lower = document.content.to_lowercase();
+            let query_lower = query.to_lowercase();
+
+            let mut start = 0;
+            while let Some(pos) = content_lower[start..].find(&query_lower) {
+                positions.push(start + pos);
+                start += pos + query.len();
+            }
         }
 
         positions
@@ -301,8 +323,17 @@ mod tests {
             "Hello World Hello".to_string(),
         );
 
-        let positions = DocumentEngine::search_text(&doc, "Hello");
-        assert_eq!(positions.len(), 2);
+        let positions = DocumentEngine::search_text(&doc, "hello");
+        assert_eq!(positions, vec![0, 12]);
+
+        // Test Unicode fallback path
+        let unicode_doc = DocumentEngine::create_document(
+            "Test".to_string(),
+            "Author".to_string(),
+            "Café CRÈME café".to_string(),
+        );
+        let unicode_positions = DocumentEngine::search_text(&unicode_doc, "café");
+        assert_eq!(unicode_positions.len(), 2);
     }
 
     #[test]
