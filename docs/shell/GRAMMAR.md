@@ -1,3 +1,10 @@
-# SigmaOS Shell Formal Grammar & AST Specification
+# Shell Formal Grammar Specification
 
-Defines the formal grammar, tokenization rules, operator precedence, and AST nodes for the SigmaOS command interpreter.
+```ebnf
+command_line  ::= pipeline ( ( ';' | '&' | '&&' | '||' ) pipeline )* [ ';' | '&' ] ;
+pipeline      ::= [ '!' ] command ( '|' command )* ;
+command       ::= ( assignment | redirection | word )+ ;
+redirection   ::= ( '<' | '>' | '>>' | '2>' | '2>&1' ) word ;
+assignment    ::= IDENTIFIER '=' word ;
+word          ::= ( CHAR | QUOTED_STRING | VARIABLE )+ ;
+```

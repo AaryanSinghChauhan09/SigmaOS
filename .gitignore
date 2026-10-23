@@ -81,9 +81,6 @@ wiki/
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
-
-# Unignore system status documentation and PR template
-!WHAT_IS_WORKING_AND_NOT_WORKING.md
-!docs/WHAT_IS_WORKING_AND_NOT_WORKING.md
-!wiki/WHAT_IS_WORKING_AND_NOT_WORKING.md
 !.github/PULL_REQUEST_TEMPLATE.md
+!docs/shell/*.md
+!docs/studies/*.md
