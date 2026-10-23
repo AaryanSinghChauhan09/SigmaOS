@@ -32,6 +32,7 @@ pub use creative::cadcraft_artcraft_missing_components_v65_pr::*;
 // pub use creative::craftlibs_missing_components_parity_pr::*;
 pub use creative::designcraft::*;
 pub use creative::designcraft_artcraft_missing_components_v65_pr::*;
+pub use creative::designcraft_artcraft_missing_components_v66_pr::*;
 // pub use creative::deckcraft_artcraft_parity_pr::*;
 // pub use creative::deckcraft_missing_components_parity_pr::*;
 pub use creative::deckcraft::*;
