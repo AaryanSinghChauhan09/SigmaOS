@@ -1,47 +1,64 @@
 ## Summary
 
-<!-- What changed and why? -->
+<!-- What shell behavior changed and why? -->
 
-## Task type
+## Shell component
 
-- [ ] Daily CI maintenance
-- [ ] Weekly dependency/security review
-- [ ] Weekly open-source study
-- [ ] Biweekly component gap review
-- [ ] Monthly boot validation
-- [ ] Monthly installer/recovery rehearsal
-- [ ] Monthly package/update rehearsal
-- [ ] Quarterly release review
-- [ ] Quarterly architecture review
-- [ ] Quarterly hardware audit
-
-## Study and Adoption
-
-- Reference study:
-- What SigmaOS adopts:
-
-## Component
-
-- [ ] Boot / platform
-- [ ] Kernel
-- [ ] Memory
-- [ ] Scheduler
-- [ ] VFS / filesystems
-- [ ] Syscalls
-- [ ] Drivers
-- [ ] Networking
-- [ ] IPC
-- [ ] Security
-- [ ] Userspace
-- [ ] Desktop
-- [ ] Packaging / installer
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
+- [ ] Signals
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
+- [ ] Diagnostics
+- [ ] Security / sandboxing
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
+
+## Reference behavior
+
+<!-- Required for compatibility or grammar changes -->
+
+- POSIX section:
+- Bash/dash/Zsh/BusyBox reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
 -
 -
+
+## Shell safety review
+
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
 
 ## Evidence
 
@@ -49,28 +66,18 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New or updated tests
-- [ ] QEMU boot evidence, if applicable
-- [ ] Installer/recovery evidence, if applicable
-- [ ] Hardware evidence, if applicable
+- [ ] New/updated shell tests
+- [ ] POSIX/conformance test evidence
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Roadmap or release checklist
-
-## Shell safety review
-
-- [ ] Shell lexer/parser safety verified.
-- [ ] Builtin contract and exit code policy enforced.
-
-## Reviewer checklist
-
-- [ ] Kernel safety review completed, if applicable.
-- [ ] Unsafe blocks verified and documented.
+- [ ] Shell documentation
+- [ ] Boot matrix, if applicable
 
 ## Risks and rollback
 
