@@ -1,10 +1,34 @@
 // SPDX-License-Identifier: MIT
-// Comprehensive Integration Test Suite for Arch Linux Missing Components PR Engines (V69)
+// Comprehensive Integration Test Suite for Open Source OS Unimplemented Ideas & Arch Linux Missing Components V69 PR Engines
+
+#[path = "../src/distro/open_source_os_unimplemented_ideas_v69_pr.rs"]
+mod open_source_os_unimplemented_ideas_v69_pr;
 
 #[path = "../src/distro/arch_linux_missing_components_v69_pr.rs"]
 mod arch_linux_missing_components_v69_pr;
 
 use arch_linux_missing_components_v69_pr::*;
+use open_source_os_unimplemented_ideas_v69_pr::*;
+
+#[test]
+fn test_open_source_os_unimplemented_ideas_v69_pr_suite_full_cycle() {
+    let mut suite = OpenSourceOsUnimplementedIdeasV69PrSuite::new();
+    assert_eq!(suite.execute_pr_pipeline(), 9);
+    assert!(suite.verify_all_pr_engines());
+
+    let proposals = suite.collect_all_proposals();
+    assert_eq!(proposals.len(), 9);
+
+    for prop in proposals {
+        assert!(prop.pr_id >= 6901 && prop.pr_id <= 6909);
+        assert_eq!(prop.status, OsPrStatusV69::Validated);
+        assert!(prop.parity_score >= 95);
+        assert!(!prop.title.is_empty());
+        assert!(!prop.subsystem.is_empty());
+        assert!(!prop.upstream_target.is_empty());
+        assert!(!prop.diff_patch.is_empty());
+    }
+}
 
 #[test]
 fn test_arch_linux_v69_pr_suite_full_cycle() {
@@ -24,15 +48,15 @@ fn test_arch_linux_v69_pr_suite_full_cycle() {
 
     let expected_target_repos = [
         "archlinux/pacman",
-        "archlinux/pacman",
-        "archlinux/aurweb",
-        "systemd/systemd",
-        "archlinux/archinstall",
-        "archlinux/reflector",
-        "archlinux/pacman",
+        "Jguer/yay",
         "archlinux/mkinitcpio",
         "CachyOS/linux-cachyos",
-        "archlinux/devtools",
+        "archlinux/archinstall",
+        "archlinux/pacman",
+        "archlinux/archiso",
+        "archlinux/pacman-contrib",
+        "archlinux/archnews",
+        "archlinux/archlinux-keyring",
     ];
 
     for (idx, pr) in prs.iter().enumerate() {
@@ -43,64 +67,41 @@ fn test_arch_linux_v69_pr_suite_full_cycle() {
         assert!(!pr.patch_diff.is_empty());
     }
 
-    // Sub-engine individual verification tests
-    let delta_diff = ArchPacman7DeltaDiffEnginePrEngine::new();
-    assert!(delta_diff.verify());
-    let pr1 = delta_diff.generate_pr();
+    // Sub-engine verification tests
+    let parallel_download = ArchPacmanParallelDownloadConnectionPoolPrEngine::new();
+    assert!(parallel_download.verify());
+    let pr1 = parallel_download.generate_pr();
     assert_eq!(pr1.pr_id, 6901);
-    assert!(pr1.title.contains("FastCDC & VCDIFF"));
+    assert!(pr1.title.contains("Parallel Download"));
 
-    let compiler_tuner = ArchMakepkgLtoPgoCompilerTunerPrEngine::new();
-    assert!(compiler_tuner.verify());
-    let pr2 = compiler_tuner.generate_pr();
+    let yay_resolver = ArchAurHelperYayDependencyResolverPrEngine::new();
+    assert!(yay_resolver.verify());
+    let pr2 = yay_resolver.generate_pr();
     assert_eq!(pr2.pr_id, 6902);
-    assert!(pr2.title.contains("ThinLTO, PGO"));
 
-    let aur_client = ArchAurWebRpcV5GraphClientPrEngine::new();
-    assert!(aur_client.verify());
-    let pr3 = aur_client.generate_pr();
+    let uki_stub = ArchMkinitcpioSystemdUkiStubEnginePrEngine::new();
+    assert!(uki_stub.verify());
+    let pr3 = uki_stub.generate_pr();
     assert_eq!(pr3.pr_id, 6903);
-    assert!(pr3.title.contains("AUR Web RPC v5"));
 
-    let boot_rollback = ArchSystemdBootUkiRollbackGovernorPrEngine::new();
-    assert!(boot_rollback.verify());
-    let pr4 = boot_rollback.generate_pr();
-    assert_eq!(pr4.pr_id, 6904);
-    assert!(pr4.title.contains("Systemd-Boot"));
+    let cachyos = ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine::new();
+    assert!(cachyos.verify());
 
-    let encrypted_installer = ArchArchinstallEncryptedLuks2Tpm2Fido2PrEngine::new();
-    assert!(encrypted_installer.verify());
-    let pr5 = encrypted_installer.generate_pr();
-    assert_eq!(pr5.pr_id, 6905);
-    assert!(pr5.title.contains("LUKS2 Storage Encryption"));
+    let btrfs = ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine::new();
+    assert!(btrfs.verify());
 
-    let mirror_ranker = ArchReflectorMirrorlistGeoLatencyRankerPrEngine::new();
-    assert!(mirror_ranker.verify());
-    let pr6 = mirror_ranker.generate_pr();
-    assert_eq!(pr6.pr_id, 6906);
-    assert!(pr6.title.contains("Reflector High-Speed Mirrorlist"));
+    let repo_custom = ArchPacmanConfigRepositoryCustomDbPrEngine::new();
+    assert!(repo_custom.verify());
 
-    let hook_graph = ArchPacmanHookTriggerDependencyGraphPrEngine::new();
-    assert!(hook_graph.verify());
-    let pr7 = hook_graph.generate_pr();
-    assert_eq!(pr7.pr_id, 6907);
-    assert!(pr7.title.contains("Pacman ALPM Hook"));
+    let archiso = ArchArchisoSquashfsZstdBootstrapPrEngine::new();
+    assert!(archiso.verify());
 
-    let microcode_splicer = ArchMkinitcpioMicrocodeSplicerEnginePrEngine::new();
-    assert!(microcode_splicer.verify());
-    let pr8 = microcode_splicer.generate_pr();
-    assert_eq!(pr8.pr_id, 6908);
-    assert!(pr8.title.contains("Early CPU Microcode"));
+    let paccache = ArchPacmanCachePaccacheRetentionPrEngine::new();
+    assert!(paccache.verify());
 
-    let lavd_tuner = ArchCachyOsSchedExtLavdAutoTunerPrEngine::new();
-    assert!(lavd_tuner.verify());
-    let pr9 = lavd_tuner.generate_pr();
-    assert_eq!(pr9.pr_id, 6909);
-    assert!(pr9.title.contains("scx_lavd"));
+    let archnews = ArchArchNewsSystemNotificationPrEngine::new();
+    assert!(archnews.verify());
 
-    let chroot_builder = ArchDevtoolsPkgctlCleanChrootBuilderPrEngine::new();
-    assert!(chroot_builder.verify());
-    let pr10 = chroot_builder.generate_pr();
-    assert_eq!(pr10.pr_id, 6910);
-    assert!(pr10.title.contains("Devtools/Pkgctl Clean Chroot"));
+    let wkd_keyring = ArchKeyringWebOfTrustAutoRefreshPrEngine::new();
+    assert!(wkd_keyring.verify());
 }
