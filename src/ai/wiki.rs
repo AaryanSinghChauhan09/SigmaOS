@@ -49,14 +49,14 @@ impl SovereignWikiEngine {
 
     /// Perform a localized, fast semantic query lookup.
     /// Finds articles with matching terms in title, category, or body.
+    /// Uses zero-allocation ASCII substring search to eliminate per-article heap allocations.
     pub fn semantic_query(&self, query: &str) -> Vec<&WikiArticle> {
         let mut results = Vec::new();
-        let query_lower = query.to_lowercase();
 
         for article in &self.articles {
-            if article.title.to_lowercase().contains(&query_lower)
-                || article.category.to_lowercase().contains(&query_lower)
-                || article.content.to_lowercase().contains(&query_lower)
+            if contains_ignore_case(&article.title, query)
+                || contains_ignore_case(&article.category, query)
+                || contains_ignore_case(&article.content, query)
             {
                 results.push(article);
             }
@@ -97,6 +97,28 @@ impl SovereignWikiEngine {
 impl Default for SovereignWikiEngine {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+/// Zero-allocation case-insensitive substring search for ASCII text.
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let h_bytes = haystack.as_bytes();
+        let n_bytes = needle.as_bytes();
+        if n_bytes.len() > h_bytes.len() {
+            return false;
+        }
+        h_bytes.windows(n_bytes.len()).any(|window| {
+            window
+                .iter()
+                .zip(n_bytes)
+                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
+        })
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
