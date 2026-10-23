@@ -1,16 +1,17 @@
-# SigmaOS Wiki Architecture Index
+# SigmaOS Technical Documentation Index
 
-Welcome to the SigmaOS Subsystem Documentation & Master Plan Wiki Index.
+## Kernel Architecture & Subsystem Development Plans
 
-## Subsystem Architecture Plans
+- [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) - Master Architecture, Support Matrix, and 20-PR Plan for physical memory management.
+- [Dispatcher Development Plan](DISPATCHER_PLAN.md) - Dispatcher Master Architecture, Context Switching, Run-State Transitions, and 16-PR Plan.
+- [Process Manager Development Plan](PROCESS_MANAGER_PLAN.md) - Process Lifecycle, Task Group Supervision, State Machine, and 18-PR Sequence Roadmap.
+- [IPC Handler Development Plan](ipc-handler.md) - Inter-Process Communication Specification, Microkernel IPC Endpoints, Channels, and 10-PR Roadmap.
+- [Interrupt Handler Plan](INTERRUPT_HANDLER_PLAN.md) - Master Architecture, Support Matrix, Decoupled 5-Stage Pipeline, and 17-PR Sequence Roadmap for x86_64 IDT/APIC, AArch64 GICv3, and RISC-V PLIC.
+- [Thread Manager Plan](thread-manager.md) - Thread Lifecycle, Stack Guards, Context Switches, and Execution Models.
+- [Signal Handler Plan](SIGNAL_HANDLER_PLAN.md) - Signal Management Architecture, POSIX Compatibility Profile, and 18-PR Sequence Roadmap.
+- [CPU Scheduler Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) - CFS, BORE, EEVDF, Real-Time FIFO/RR, and SchedExt BPF Governor Roadmap.
+- [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - Synchronization Primitives, Futex, Wait Queues, Spinlocks, and Lockdep Architecture.
 
-- [Dispatcher Plan](DISPATCHER_PLAN.md) — Master Architecture, 8 Core Invariants, 16-PR Roadmap & Support Matrix for Scheduler-Dispatcher-IRQ boundary separation, context switching, interrupt flow, and deferred work execution.
-- [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) — Two-stage physical memory allocation, 11 invariants, and 20-PR sequence roadmap.
-- [Interrupt Handler Plan](INTERRUPT_HANDLER_PLAN.md) — 5-stage decoupled interrupt pipeline, multi-arch vector contracts, and 17-PR sequence roadmap.
-- [Process Manager Plan](PROCESS_MANAGER_PLAN.md) — State machine transitions, subreaper adoption, process lifecycle, and 18-PR sequence roadmap.
-- [Thread Manager Plan](thread-manager.md) — Thread lifecycle states, ownership contracts, wait channel wakeups, and CpuContext.
-- [Signal Handler Plan](SIGNAL_HANDLER_PLAN.md) — POSIX.1-2024 signal semantics, ABI profile, signal-frame layout, and 18-PR sequence roadmap.
-- [IPC Handler Plan](ipc-handler.md) — Pipes, FIFOs, UNIX sockets, shared memory, message queues, and futexes.
-- [Scheduler Status & Invariants](SCHEDULER_STATUS_AND_INVARIANTS.md) — CFS, BORE, EEVDF, and RT policy invariants and 18-PR sequence roadmap.
-- [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) — Wait queues, spinlocks, semaphores, futexes, flock, and lockdep.
-- [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) — Core POSIX utilities, command registry framework, and 18-PR sequence roadmap.
+## Userspace & Subsystem Development Plans
+
+- [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - POSIX Coreutils Baseline, CLI Parsing Engines, and 18-PR Sequence Roadmap.

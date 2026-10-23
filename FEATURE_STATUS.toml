@@ -78,17 +78,17 @@ next_milestone = "QEMU virt machine boot to kernel_main"
 
 [kernel.interrupt_framework]
 status = "modeled"
-files = ["docs/INTERRUPT_HANDLER_PLAN.md", "wiki/INTERRUPT_HANDLER_PLAN.md"]
+files = ["docs/INTERRUPT_HANDLER_PLAN.md", "wiki/INTERRUPT_HANDLER_PLAN.md", "docs/INDEX.md", "wiki/INDEX.md"]
 description = "Master Architecture, Support Matrix, and 17-PR Plan for SigmaOS interrupt handling: 5-stage decoupled pipeline, multi-arch vector contracts, and deferred work dispatch."
-test_evidence = "Architecture specification published in docs/INTERRUPT_HANDLER_PLAN.md; 12 unit tests pass via rustc --test src/kernel/interrupt.rs"
-next_milestone = "PR 1: Interrupt framework architectural boundary specification & PR 2: IDT/vector table abstractions"
+test_evidence = "Master specification published in docs/INTERRUPT_HANDLER_PLAN.md & wiki/INTERRUPT_HANDLER_PLAN.md; unit tests pass via rustc --test src/kernel/interrupt.rs"
+next_milestone = "PR 1: audit interrupt paths & PR 2: define handler context contracts"
 
 [kernel.irq_subsystem]
 status = "unit-tested"
-files = ["src/kernel/irq/mod.rs"]
+files = ["src/kernel/irq/mod.rs", "src/kernel/interrupt.rs"]
 description = "Generic IRQ subsystem handling vector registration, mask/unmask, EOI dispatch, and handler callbacks across APIC, GICv3, and PLIC"
-test_evidence = "Unit tests pass via rustc --test src/kernel/irq/mod.rs"
-next_milestone = "Integration with hardware interrupt entry stubs"
+test_evidence = "Unit tests pass via rustc --test src/kernel/irq/mod.rs and rustc --test src/kernel/interrupt.rs"
+next_milestone = "PR 3: interrupt-frame layout checks & PR 4: generic IRQ descriptors"
 
 [kernel.boot]
 status = "partial"

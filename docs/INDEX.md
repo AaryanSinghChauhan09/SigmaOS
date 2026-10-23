@@ -1,19 +1,17 @@
-# SigmaOS Master Architectural & Development Index
+# SigmaOS Technical Documentation Index
 
-Welcome to the central documentation index for SigmaOS architecture, system development plans, and engineering guidelines.
+## Kernel Architecture & Subsystem Development Plans
 
-## Userspace & CLI Plans
+- [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) - Master Architecture, Support Matrix, and 20-PR Plan for physical memory management.
+- [Dispatcher Development Plan](DISPATCHER_PLAN.md) - Dispatcher Master Architecture, Context Switching, Run-State Transitions, and 16-PR Plan.
+- [Process Manager Development Plan](PROCESS_MANAGER_PLAN.md) - Process Lifecycle, Task Group Supervision, State Machine, and 18-PR Sequence Roadmap.
+- [IPC Handler Development Plan](ipc-handler.md) - Inter-Process Communication Specification, Microkernel IPC Endpoints, Channels, and 10-PR Roadmap.
+- [Interrupt Handler Plan](INTERRUPT_HANDLER_PLAN.md) - Master Architecture, Support Matrix, Decoupled 5-Stage Pipeline, and 17-PR Sequence Roadmap for x86_64 IDT/APIC, AArch64 GICv3, and RISC-V PLIC.
+- [Thread Manager Plan](thread-manager.md) - Thread Lifecycle, Stack Guards, Context Switches, and Execution Models.
+- [Signal Handler Plan](SIGNAL_HANDLER_PLAN.md) - Signal Management Architecture, POSIX Compatibility Profile, and 18-PR Sequence Roadmap.
+- [CPU Scheduler Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) - CFS, BORE, EEVDF, Real-Time FIFO/RR, and SchedExt BPF Governor Roadmap.
+- [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) - Synchronization Primitives, Futex, Wait Queues, Spinlocks, and Lockdep Architecture.
 
-- [SigmaOS CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md) — Two distinct CLI layers (system CLI utilities vs shell engine), POSIX compatibility baseline, 18-PR roadmap, maintenance cadence, command family rules, and rollout gates.
-- [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) — Master architecture for POSIX system utilities, utility registry framework, and file/stream engines.
-- [Command Interpreter Development Plan](shell/COMMAND_INTERPRETER_PLAN.md) — Shell interpreter architecture, lexer/parser/AST, execution contract, redirections, and job control.
-- [System Applications Development Plan](SYSTEM_APPS_DEVELOPMENT_PLAN.md) — System application architecture, IPC client governor, and lifecycle management.
-- [SigmaOS GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) — Desktop GUI development roadmap, Wayland compositor integration, and freedesktop interfaces.
+## Userspace & Subsystem Development Plans
 
-## Kernel & Core Subsystem Plans
-
-- [Security Management Plan](SECURITY.md) — NIST SP 800-218 aligned security policy, threat models, and vulnerability management.
-- [Signals Development and Maintenance Plan](signal/SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — POSIX.1-2024 signal architecture and cross-subsystem interruption suite.
-- [Network Development and Maintenance Plan](net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — Network stack architecture, socket lifecycle, and firewall policy framework.
-- [Device Driver Development Plan](SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md) — Device driver framework, VirtIO, and physical hardware roadmap.
-- [Kernel & Bootloader Advancements Plan](boot/KERNEL_AND_BOOTLOADER_ADVANCEMENTS_PLAN.md) — Bootloader compatibility, UEFI GOP handoff, and kernel innovations.
+- [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) - POSIX Coreutils Baseline, CLI Parsing Engines, and 18-PR Sequence Roadmap.
