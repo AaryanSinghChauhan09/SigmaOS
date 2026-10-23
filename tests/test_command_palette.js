@@ -366,6 +366,17 @@ console.log("✓ Developer Portal & System Action handlers verified successfully
 // Test 15: OmniShell Terminal Interactive Command Handler & ARIA Log Output
 const termOutput = createMockElement("terminal-output");
 const termInput = createMockElement("terminal-input");
+const termContainer = createMockElement("term-container");
+termContainer.classList.add("terminal-container");
+
+global.document.querySelectorAll = (selector) => {
+  if (selector === ".terminal-container") return [termContainer];
+  return [];
+};
+
+zenith.initOmniShellTerminal();
+termContainer.dispatchEvent({ type: "click" });
+assert.strictEqual(global.document.activeElement, termInput, "Expected terminal container click to focus terminal input");
 
 zenith.handleTerminalCommand("neofetch");
 assert.strictEqual(termOutput.children.length, 2, "Expected handleTerminalCommand('neofetch') to append prompt line and response line");

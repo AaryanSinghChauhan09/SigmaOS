@@ -1229,6 +1229,16 @@ export function initOmniShellTerminal() {
       handleTerminalCommand(input.value);
     }
   });
+
+  const container = SovereignDomSelector.selectOne(".terminal-container");
+  if (container) {
+    container.addEventListener("click", () => {
+      const selection = typeof window !== "undefined" && window.getSelection ? window.getSelection().toString() : "";
+      if (!selection) {
+        input.focus();
+      }
+    });
+  }
 }
 
 // =========================================================================
