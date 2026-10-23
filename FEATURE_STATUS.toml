@@ -135,16 +135,16 @@ next_milestone = "Per-CPU cache pools"
 [kernel.process_manager]
 status = "modeled"
 files = ["docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md", "src/kernel/process.rs", "src/userspace/sigma_init.rs"]
-description = "SigmaOS Process Manager Master Architecture, 18-PR sequence roadmap, state transitions, subreaper adoption, and restart bounds"
-test_evidence = "Architecture specification published in docs/PROCESS_MANAGER_PLAN.md; unit tests pass via rustc --test src/kernel/process.rs and src/userspace/sigma_init.rs"
-next_milestone = "PR 1: Process Manager architectural boundary audit & PR 2: State machine invariants"
+description = "SigmaOS Process Manager Master Architecture, design & safety rules, 18-PR sequence roadmap, periodic maintenance cadences, component-specific rules, PR template, and completion gates"
+test_evidence = "Architectural specification published in docs/PROCESS_MANAGER_PLAN.md and wiki/PROCESS_MANAGER_PLAN.md; standalone unit tests pass via rustc --test src/kernel/process.rs"
+next_milestone = "PR 1: docs(process): audit process lifecycle and manager status & PR 2: docs(process): define process and service lifecycle contracts"
 
 [userspace.process_manager]
-status = "unit-tested"
-files = ["src/userspace/sigma_init.rs"]
+status = "modeled"
+files = ["src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md"]
 description = "Init process service creation, dependency resolution, process tree supervision, and service status tracking"
-test_evidence = "Unit tests pass via rustc --test src/userspace/sigma_init.rs"
-next_milestone = "Service state recovery and child process reaping loop"
+test_evidence = "Architectural specification in docs/PROCESS_MANAGER_PLAN.md and wiki/PROCESS_MANAGER_PLAN.md; standalone unit tests pass via rustc --test src/userspace/sigma_init.rs"
+next_milestone = "PR 9: feat(init): spawn and supervise real service processes & PR 10: feat(init): validate service dependencies and readiness"
 
 [process.lifecycle]
 status = "prototype"
