@@ -1,12 +1,8 @@
-# SigmaOS Shell Exit Codes Specification
+# SigmaOS Shell Exit Codes Standard
 
-## Standard Status Codes
-
-- `0`: Success / Normal Completion
+- `0`: Success
 - `1`: General command error
-- `2`: Shell misusage or parse error
-- `126`: Command requested is non-executable
-- `127`: Command requested was not found in `$PATH`
-- `130`: Command terminated by `SIGINT` (Ctrl+C)
-- `137`: Command killed by `SIGKILL`
-- `143`: Command terminated by `SIGTERM`
+- `2`: Misuse / Shell syntax error
+- `126`: Command invoked cannot execute
+- `127`: Command not found
+- `128+N`: Terminated by signal N (e.g. 130 for SIGINT)
