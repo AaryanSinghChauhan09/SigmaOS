@@ -164,7 +164,9 @@ pub use kernel::{
     SovereignKernelDistroParityPrGateway, SovereignKernelNextGenDistroInnovationsPrGateway,
     SovereignKernelOpenSourceInnovationsPrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV65PrGateway,
+    SovereignKernelOpenSourceOsDistroAdvancementsV68PrGateway,
     SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
+    SovereignKernelOpenSourceOsDistroInnovationsV72PrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };
 pub use process::{
