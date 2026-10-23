@@ -10,7 +10,7 @@
 - [ ] Memory management
 - [ ] VFS / filesystems
 - [ ] Drivers
-- [ ] IPC
+- [ ] IPC / IPC handler
 - [ ] Security
 - [ ] Installer / packaging
 - [ ] Documentation
@@ -27,6 +27,14 @@
 ## Implementation notes
 
 <!-- Design decisions, data structures, locking, error handling. -->
+
+## Reference study / What SigmaOS adopts
+
+<!-- Upstream patterns, BSD/Linux study references, adopted designs. -->
+
+## Safety and rollback
+
+<!-- Risks, safety invariants, rollback plan. -->
 
 ## Tests
 
@@ -72,3 +80,9 @@ Paste relevant output below.
 - [ ] Error paths tested
 - [ ] Feature status updated
 - [ ] No unsupported compatibility claim
+
+## Kernel safety review
+
+- [ ] Lock ordering verified
+- [ ] Interrupt and concurrency safety invariants verified
+- [ ] Kernel stack guard checks verified
