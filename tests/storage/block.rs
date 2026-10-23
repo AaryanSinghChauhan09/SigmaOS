@@ -1,7 +1,7 @@
 #[path = "../../src/storage/block.rs"]
-mod block;
+pub mod block;
 #[path = "../../src/storage/virtio.rs"]
-mod virtio;
+pub mod virtio;
 
 use block::{
     BlockError, BlockOpCode, BlockOrientedDevice, BoundedBlockDeviceManager,

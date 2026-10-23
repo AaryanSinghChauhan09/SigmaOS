@@ -1,11 +1,3 @@
-#[cfg(feature = "standalone_test_direct")]
-#[path = "block.rs"]
-mod block;
-
-#[cfg(feature = "standalone_test_direct")]
-use block::{BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass};
-
-#[cfg(not(feature = "standalone_test_direct"))]
 use super::block::{BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass};
 
 use std::vec::Vec;
