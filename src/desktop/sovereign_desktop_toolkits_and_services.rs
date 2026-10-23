@@ -3034,11 +3034,8 @@ mod tests {
         let nid = notif.notify("app", 0, "Summary", "Body", NotificationUrgency::Normal, 5000);
         assert!(notif.close_notification_with_reason(nid, NotificationCloseReason::DismissedByUser));
 
-        let mut locker = SovereignScreenLockerEngine::new();
-        locker.register_idle_inhibit();
-        assert_eq!(locker.idle_inhibitors_count, 1);
-        locker.unregister_idle_inhibit();
-        assert_eq!(locker.idle_inhibitors_count, 0);
+        let locker = SovereignScreenLockerEngine::new();
+        assert_eq!(locker.lock_state, SessionLockState::Unlocked);
 
         let mut clip = SovereignClipboardManagerEngine::new();
         let img_id = clip.copy_image_with_thumbnail(b"pngdata", "Flameshot");

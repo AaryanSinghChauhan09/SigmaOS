@@ -290,6 +290,8 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::HaikuOS,
             LinuxBsdDistroInspiration::QubesOS,
             LinuxBsdDistroInspiration::WhonixOS,
+            LinuxBsdDistroInspiration::OmarchyLinux,
+            LinuxBsdDistroInspiration::BlackArchLinux,
         ];
 
         let subsystems_list = [
@@ -803,7 +805,10 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::GhostBSD
             | LinuxBsdDistroInspiration::HardenedBSD
-            | LinuxBsdDistroInspiration::MidnightBSD => {
+            | LinuxBsdDistroInspiration::MidnightBSD
+            | LinuxBsdDistroInspiration::OpenBSD
+            | LinuxBsdDistroInspiration::NetBSD
+            | LinuxBsdDistroInspiration::DragonFlyBSD => {
                 if path.starts_with("/usr/local/etc") {
                     path.to_string()
                 } else if path.starts_with("/etc") {
@@ -819,6 +824,13 @@ impl SovereignSubsystemDistroHarmonyEngine {
                     path.to_string()
                 }
             }
+            LinuxBsdDistroInspiration::AlpineLinux | LinuxBsdDistroInspiration::VoidLinux => {
+                if path.starts_with("/usr/lib64") {
+                    path.replace("/usr/lib64", "/usr/lib")
+                } else {
+                    path.to_string()
+                }
+            }
             _ => path.to_string(),
         }
     }
@@ -828,10 +840,14 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::OpenBSD | LinuxBsdDistroInspiration::HardenedBSD => 100,
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::TailsOS
-            | LinuxBsdDistroInspiration::KaliLinux => 90,
+            | LinuxBsdDistroInspiration::KaliLinux
+            | LinuxBsdDistroInspiration::QubesOS
+            | LinuxBsdDistroInspiration::WhonixOS => 90,
             LinuxBsdDistroInspiration::NixOS
             | LinuxBsdDistroInspiration::AlpineLinux
-            | LinuxBsdDistroInspiration::ChimeraLinux => 85,
+            | LinuxBsdDistroInspiration::ChimeraLinux
+            | LinuxBsdDistroInspiration::GNUGuix
+            | LinuxBsdDistroInspiration::VoidLinux => 85,
             _ => 75,
         }
     }
@@ -843,12 +859,14 @@ impl SovereignSubsystemDistroHarmonyEngine {
         match distro {
             LinuxBsdDistroInspiration::ArchLinux
             | LinuxBsdDistroInspiration::GarudaLinux
-            | LinuxBsdDistroInspiration::EndeavourOS => "pkg.tar.zst",
+            | LinuxBsdDistroInspiration::EndeavourOS
+            | LinuxBsdDistroInspiration::BlackArchLinux => "pkg.tar.zst",
             LinuxBsdDistroInspiration::DebianGNU
             | LinuxBsdDistroInspiration::UbuntuLinux
             | LinuxBsdDistroInspiration::LinuxMint
             | LinuxBsdDistroInspiration::KaliLinux
-            | LinuxBsdDistroInspiration::ParrotOS => "deb",
+            | LinuxBsdDistroInspiration::ParrotOS
+            | LinuxBsdDistroInspiration::PopOS => "deb",
             LinuxBsdDistroInspiration::FedoraLinux
             | LinuxBsdDistroInspiration::OpenSUSE
             | LinuxBsdDistroInspiration::RockyLinux
@@ -856,7 +874,13 @@ impl SovereignSubsystemDistroHarmonyEngine {
             LinuxBsdDistroInspiration::AlpineLinux => "apk",
             LinuxBsdDistroInspiration::FreeBSD
             | LinuxBsdDistroInspiration::GhostBSD
-            | LinuxBsdDistroInspiration::HardenedBSD => "pkg",
+            | LinuxBsdDistroInspiration::HardenedBSD
+            | LinuxBsdDistroInspiration::MidnightBSD => "pkg",
+            LinuxBsdDistroInspiration::VoidLinux => "xbps",
+            LinuxBsdDistroInspiration::GentooLinux => "ebuild",
+            LinuxBsdDistroInspiration::NixOS => "nix",
+            LinuxBsdDistroInspiration::GNUGuix => "guix",
+            LinuxBsdDistroInspiration::NetBSD => "pkgsrc",
             _ => "sigpkg",
         }
     }
@@ -971,6 +995,15 @@ impl SovereignSubsystemDistroHarmonyEngine {
             (LinuxBsdDistroInspiration::NixOS, LinuxBsdDistroInspiration::GentooLinux) => payload
                 .replace("flake_closure", "ebuild_use_flags")
                 .replace("store_path", "portage_vdb"),
+            (LinuxBsdDistroInspiration::AlpineLinux, LinuxBsdDistroInspiration::ArchLinux) => payload
+                .replace("apk_world", "pacman_world")
+                .replace("musl_libc", "glibc_core"),
+            (LinuxBsdDistroInspiration::VoidLinux, LinuxBsdDistroInspiration::FreeBSD) => payload
+                .replace("runit_service", "rc_subr_service")
+                .replace("xbps_pkg", "pkg_freebsd"),
+            (LinuxBsdDistroInspiration::ClearLinux, LinuxBsdDistroInspiration::FedoraLinux) => payload
+                .replace("swupd_bundle", "dnf_group")
+                .replace("clr_opt_flags", "fedora_opt_flags"),
             _ => format!(
                 "transpiled_from_{}_to_{}:{}",
                 source_distro.as_str(),
@@ -1286,6 +1319,68 @@ mod tests {
             LinuxBsdDistroInspiration::IllumosSolaris
         );
         assert!(policy.enforce_strict_isolation);
+    }
+
+    #[test]
+    fn test_newly_enhanced_cross_distro_payload_and_format_mappings() {
+        let engine = SovereignSubsystemDistroHarmonyEngine::new();
+
+        // Package specifiers
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::AlpineLinux),
+            "apk"
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::VoidLinux),
+            "xbps"
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::GentooLinux),
+            "ebuild"
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::NetBSD),
+            "pkgsrc"
+        );
+        assert_eq!(
+            engine.resolve_package_format_specifier(LinuxBsdDistroInspiration::PopOS),
+            "deb"
+        );
+
+        // Security level
+        assert_eq!(
+            engine.map_security_isolation_level(LinuxBsdDistroInspiration::QubesOS),
+            90
+        );
+        assert_eq!(
+            engine.map_security_isolation_level(LinuxBsdDistroInspiration::AlpineLinux),
+            85
+        );
+
+        // VFS Path translation
+        assert_eq!(
+            engine.translate_vfs_path(LinuxBsdDistroInspiration::OpenBSD, "/etc/pf.conf"),
+            "/usr/local/etc/pf.conf"
+        );
+        assert_eq!(
+            engine.translate_vfs_path(LinuxBsdDistroInspiration::AlpineLinux, "/usr/lib64/libz.so"),
+            "/usr/lib/libz.so"
+        );
+
+        // Payload transpilation
+        let alpine_to_arch = engine.translate_subsystem_payload(
+            LinuxBsdDistroInspiration::AlpineLinux,
+            LinuxBsdDistroInspiration::ArchLinux,
+            "apk_world:musl_libc",
+        );
+        assert_eq!(alpine_to_arch, "pacman_world:glibc_core");
+
+        let void_to_freebsd = engine.translate_subsystem_payload(
+            LinuxBsdDistroInspiration::VoidLinux,
+            LinuxBsdDistroInspiration::FreeBSD,
+            "runit_service:xbps_pkg",
+        );
+        assert_eq!(void_to_freebsd, "rc_subr_service:pkg_freebsd");
     }
 
     #[test]
