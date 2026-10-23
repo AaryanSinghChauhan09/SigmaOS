@@ -1,3 +1,12 @@
-# SigmaOS Shell Exit Codes & Status Policy
+# SigmaOS Shell Exit Codes Specification
 
-Defines standard exit codes: 0 (Success), 1 (General Error), 2 (Misuse/Parse Error), 126 (Command Not Executable), 127 (Command Not Found), 128+N (Fatal Signal N).
+## Standard Status Codes
+
+- `0`: Success / Normal Completion
+- `1`: General command error
+- `2`: Shell misusage or parse error
+- `126`: Command requested is non-executable
+- `127`: Command requested was not found in `$PATH`
+- `130`: Command terminated by `SIGINT` (Ctrl+C)
+- `137`: Command killed by `SIGKILL`
+- `143`: Command terminated by `SIGTERM`
