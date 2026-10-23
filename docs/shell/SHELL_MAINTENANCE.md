@@ -1,3 +1,3 @@
-# SigmaOS Shell Maintenance Policy
+# SigmaOS Shell Maintenance & Lifecycle Policy
 
-Maintenance policy and lifecycle guidelines for the SigmaOS shell (`sigma-sh`).
+This document defines maintenance cadences, automated test requirements, regression tracking, and code quality standards for the SigmaOS shell engine layer.

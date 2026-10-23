@@ -1,3 +1,3 @@
-# Study: Shell Word Splitting and Path Expansion
+# Upstream Study: Shell Word Splitting & Expansion Invariants
 
-Analysis of POSIX shell word splitting and expansion rules.
+Comparative study of POSIX IFS word splitting, quoting preservation, and field splitting semantics across dash, bash, zsh, and SigmaOS shell.

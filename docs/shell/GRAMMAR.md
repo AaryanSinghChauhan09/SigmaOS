@@ -1,3 +1,3 @@
-# SigmaOS Shell Grammar
+# SigmaOS Shell Formal Grammar & AST Specification
 
-Grammar and lexer rules for `sigma-sh`.
+Defines the formal grammar, tokenization rules, operator precedence, and AST nodes for the SigmaOS command interpreter.

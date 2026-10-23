@@ -1,3 +1,3 @@
-# SigmaOS Interactive Shell Policy
+# SigmaOS Interactive Shell & Line Editor Specification
 
-Interactive shell editing, prompts, and keybindings for `sigma-sh`.
+Defines interactive line editing, history, tab completion, signal handling (SIGINT/SIGTSTP), and prompt formatting.

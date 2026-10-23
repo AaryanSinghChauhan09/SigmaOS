@@ -1,3 +1,3 @@
-# SigmaOS Shell POSIX Conformance
+# SigmaOS Shell POSIX Conformance Specification
 
-POSIX conformance specification for `sigma-sh`.
+Defines POSIX.1-2024 compliance baseline for shell lexing, parsing, expansion, execution, redirection, and pipeline lifecycle.

@@ -1,3 +1,3 @@
-# SigmaOS Shell Diagnostics
+# SigmaOS Shell Error Diagnostics & Warning Formatting
 
-Diagnostics formatting and error messages for `sigma-sh`.
+Defines diagnostic message structure, source location reporting, warning levels, and stderr formatting.

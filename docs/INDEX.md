@@ -1,23 +1,19 @@
-# SigmaOS Master Architecture & Subsystem Plans Index
+# SigmaOS Master Architectural & Development Index
 
-This directory contains the primary architectural specifications, development plans, and support matrices for SigmaOS kernel and userspace subsystems.
+Welcome to the central documentation index for SigmaOS architecture, system development plans, and engineering guidelines.
 
-## Kernel Subsystem Master Plans
+## Userspace & CLI Plans
 
-- [Dispatcher Plan](DISPATCHER_PLAN.md) — Master Architecture, 8 Core Invariants, 16-PR Roadmap & Support Matrix for Scheduler-Dispatcher-IRQ boundary separation, context switching, interrupt flow, and deferred work execution.
-- [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) — Two-stage physical memory allocation, 11 invariants, and 20-PR sequence roadmap.
-- [Interrupt Handler Plan](INTERRUPT_HANDLER_PLAN.md) — 5-stage decoupled interrupt pipeline, multi-arch vector contracts, and 17-PR sequence roadmap.
-- [Process Manager Plan](PROCESS_MANAGER_PLAN.md) — State machine transitions, subreaper adoption, process lifecycle, and 18-PR sequence roadmap.
-- [Thread Manager Plan](thread-manager.md) — Thread lifecycle states, ownership contracts, wait channel wakeups, and CpuContext.
-- [Signal Handler Plan](SIGNAL_HANDLER_PLAN.md) — POSIX.1-2024 signal semantics, ABI profile, signal-frame layout, and 18-PR sequence roadmap.
-- [IPC Handler Plan](ipc-handler.md) — Pipes, FIFOs, UNIX sockets, shared memory, message queues, and futexes.
-- [Scheduler Status & Invariants](SCHEDULER_STATUS_AND_INVARIANTS.md) — CFS, BORE, EEVDF, and RT policy invariants and 18-PR sequence roadmap.
-- [Process Synchronization Plan](PROCESS_SYNCHRONIZATION_PLAN.md) — Wait queues, spinlocks, semaphores, futexes, flock, and lockdep.
+- [SigmaOS CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md) — Two distinct CLI layers (system CLI utilities vs shell engine), POSIX compatibility baseline, 18-PR roadmap, maintenance cadence, command family rules, and rollout gates.
+- [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) — Master architecture for POSIX system utilities, utility registry framework, and file/stream engines.
+- [Command Interpreter Development Plan](shell/COMMAND_INTERPRETER_PLAN.md) — Shell interpreter architecture, lexer/parser/AST, execution contract, redirections, and job control.
+- [System Applications Development Plan](SYSTEM_APPS_DEVELOPMENT_PLAN.md) — System application architecture, IPC client governor, and lifecycle management.
+- [SigmaOS GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) — Desktop GUI development roadmap, Wayland compositor integration, and freedesktop interfaces.
 
-## Userspace & System Plans
+## Kernel & Core Subsystem Plans
 
-- [System Utilities Development Plan](SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md) — Core POSIX utilities, command registry framework, and 18-PR sequence roadmap.
-- [CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md) — POSIX compatibility baseline, CLI framework, and 18-PR roadmap.
-- [GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) — Wayland protocol model, DRM/KMS atomic modesetting, and 19-PR roadmap.
-- [Network Development Plan](net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — Protocol specifications and 13-PR sequence roadmap.
-- [Device Driver Development Plan](SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md) — Bus/device abstractions, PCI enumeration, and 15-PR gateway.
+- [Security Management Plan](SECURITY.md) — NIST SP 800-218 aligned security policy, threat models, and vulnerability management.
+- [Signals Development and Maintenance Plan](signal/SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — POSIX.1-2024 signal architecture and cross-subsystem interruption suite.
+- [Network Development and Maintenance Plan](net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — Network stack architecture, socket lifecycle, and firewall policy framework.
+- [Device Driver Development Plan](SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md) — Device driver framework, VirtIO, and physical hardware roadmap.
+- [Kernel & Bootloader Advancements Plan](boot/KERNEL_AND_BOOTLOADER_ADVANCEMENTS_PLAN.md) — Bootloader compatibility, UEFI GOP handoff, and kernel innovations.
