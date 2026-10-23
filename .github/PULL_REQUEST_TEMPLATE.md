@@ -1,34 +1,39 @@
 ## Summary
-What dispatch behavior or integration gap does this PR address?
+What physical memory management (PMM), IPC, or kernel component correctness or capability gap does this PR address?
 
-## Component
-Context switch | interrupt flow | return-to-user | deferred work | SMP
-State what is not included.
+## Scope
+Boot map | reservation | early allocator | runtime allocator | page metadata | VMM | DMA | zones | NUMA | IPC handler | Component
 
-## Reference study / What SigmaOS adopts
-Task/run-queue ownership, context state, interrupt/preemption assumptions,
-locking, queue semantics, and forward-progress guarantees.
+## Reference study
+Upstream study / What SigmaOS adopts / Reference study
+
+## Memory-map evidence
+Source (UEFI/ACPI/bootloader/QEMU), memory types, ranges, and exact target.
+
+## Invariants and safety
+Reserved-range policy, checked arithmetic, frame states, ownership/refcounts,
+zeroing, physical/virtual/DMA address separation, and failure behavior.
+
+## Risks and rollback
+Safety and rollback
 
 ## Runtime evidence
-Unit/model | booted QEMU single CPU | booted QEMU SMP | physical target
-List architecture, machine, timer/controller configuration, and workload.
+Unit/model | booted QEMU | SMP QEMU | physical hardware
+List memory size, architecture, boot protocol, and exact operations tested.
 
-## Safety and rollback / Risks and rollback
-Malformed frame, spurious IRQ, queue saturation, task exit, cancellation,
-cleanup, privilege return, and resource-limit behavior.
+## Tests
+Malformed maps, overlaps/holes, allocation/free, double-free, exhaustion,
+coalescing, VMM map/unmap, zeroing, DMA, and anything not tested.
 
-## Tests and metrics
-State-transition, race/stress, architecture tests, switch/IRQ latency,
-queue depth, and anything not tested.
-
-## Status and docs
+## Status and documentation
 Proposed | Prototype | Integrated | Supported
-Link feature inventory, design docs, and test evidence.
+Link updated memory docs, feature inventory, and test evidence.
 
-## Kernel safety review
-- [ ] Scheduler selection and dispatcher mechanics remain separate
-- [ ] Context frame and privilege return are validated
-- [ ] IRQ handlers are bounded; deferred work runs in valid context
-- [ ] No lost wakeup, duplicate queue membership, or double execution
-- [ ] Shutdown/removal synchronizes in-flight dispatch/work
-- [ ] Required CI passes; review conversations resolved
+## Reviewer checklist
+- [ ] Unknown/reserved memory is never allocated
+- [ ] Critical kernel/boot/firmware/MMIO ranges are reserved
+- [ ] Arithmetic and PFN conversions are checked
+- [ ] Physical, virtual, and DMA addresses are distinct
+- [ ] Allocation/free accounting and ownership are tested
+- [ ] User-visible pages are zeroed before exposure
+- [ ] Required CI and QEMU checks pass; review conversations resolved
