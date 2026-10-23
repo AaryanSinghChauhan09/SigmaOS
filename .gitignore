@@ -81,3 +81,7 @@ wiki/
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
