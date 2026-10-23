@@ -10,6 +10,7 @@ pub mod audiocraft;
 pub mod cadcraft;
 pub mod cadcraft_artcraft_parity_pr;
 pub mod cadcraft_missing_components_parity_pr;
+pub mod craftlibs_artcraft_parity_pr;
 pub mod craftlibs_missing_components_parity_pr;
 pub mod deckcraft;
 pub mod deckcraft_artcraft_parity_pr;
@@ -66,6 +67,17 @@ pub use anicraft_artcraft_parity_pr::*;
 pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
+pub use craftlibs_artcraft_parity_pr::{
+    CraftlibsArtcraftParityPrSuite, CraftlibsEmbreeBvhRaytracingKernelPrEngine,
+    CraftlibsGpuTextureCompressionAstcBtcPrEngine,
+    CraftlibsNeuralSuperResolutionUpscalerPrEngine, CraftlibsOpenColorIoColorGradingLutPrEngine,
+    CraftlibsOpenFxPluginHostRouterPrEngine, CraftlibsOpenSubdivTessellationSurfacePrEngine,
+    CraftlibsOpenVdbVolumetricGridPrEngine,
+    CraftlibsPhysicallyBasedFluidClothPhysicsPrEngine,
+    CraftlibsPrProposalManifest as CraftlibsParityPrProposalManifest,
+    CraftlibsRealtimeCrdtCanvasSyncPrEngine, CraftlibsUniversalFormatTranspilerPrEngine,
+    SovereignCraftlibsArtcraftParityPrGateway,
+};
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
     DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine, DeckCraftMasterPrDeploymentSuite,
