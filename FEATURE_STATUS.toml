@@ -29,8 +29,8 @@ next_milestone = "PR 1: Define scheduler-dispatcher-IRQ boundaries & PR 2: Conte
 [kernel.thread_manager]
 status = "unit-tested"
 files = ["src/kernel/thread.rs", "docs/thread-manager.md"]
-description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
-test_evidence = "Architectural specification in docs/thread-manager.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
+description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, priority/affinity, signal delivery, and ownership contract"
+test_evidence = "Architectural specification in docs/thread-manager.md; 10 unit tests pass via rustc --test src/kernel/thread.rs --edition=2021"
 next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
 
 [arch.x86_64]

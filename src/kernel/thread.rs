@@ -278,6 +278,36 @@ impl Thread {
         }
     }
 
+    /// Returns true if the thread is runnable (`Ready` or `Running`).
+    pub fn is_runnable(&self) -> bool {
+        self.state == ThreadState::Ready || self.state == ThreadState::Running
+    }
+
+    /// Returns true if the thread is currently sleeping on a wait channel.
+    pub fn is_blocked(&self) -> bool {
+        self.state == ThreadState::Blocked
+    }
+
+    /// Sets thread priority (bounded 0..=139)
+    pub fn set_priority(&mut self, prio: u8) {
+        self.priority = prio.min(139);
+    }
+
+    /// Sets thread CPU affinity mask
+    pub fn set_affinity(&mut self, affinity: CpuAffinity) {
+        self.affinity = affinity;
+    }
+
+    /// Sets signal mask
+    pub fn set_signal_mask(&mut self, mask: u64) {
+        self.signal_mask = mask;
+    }
+
+    /// Posts a signal bit to the thread's pending signal set
+    pub fn post_signal(&mut self, signal_bit: u64) {
+        self.pending_signals |= signal_bit;
+    }
+
     /// Attempts a thread lifecycle state transition
     pub fn transition_to(&mut self, new_state: ThreadState) -> Result<(), &'static str> {
         if self.state.is_valid_transition(new_state) {
@@ -295,7 +325,7 @@ impl Thread {
         Ok(())
     }
 
-    /// Wake thread from blocked state
+    /// Wake thread from blocked state safely without lost-wakeup race
     pub fn wake(&mut self) -> Result<(), &'static str> {
         if self.state == ThreadState::Blocked {
             self.transition_to(ThreadState::Ready)?;
@@ -303,6 +333,17 @@ impl Thread {
             Ok(())
         } else {
             Err("thread is not in blocked state")
+        }
+    }
+
+    /// Cancel a wait channel block (e.g. on timeout or signal interruption)
+    pub fn cancel_wait_channel(&mut self) -> Result<(), &'static str> {
+        if self.state == ThreadState::Blocked {
+            self.wait_channel = None;
+            self.transition_to(ThreadState::Ready)?;
+            Ok(())
+        } else {
+            Err("thread is not blocked on wait channel")
         }
     }
 
@@ -437,6 +478,30 @@ impl ThreadManager {
             }
         }
         woken
+    }
+
+    pub fn timeout_wait_channel(&mut self, tid: ThreadId) -> Result<bool, &'static str> {
+        let thread = self.find_mut(tid).ok_or("thread not found")?;
+        if thread.state == ThreadState::Blocked {
+            thread.cancel_wait_channel()?;
+            Ok(true)
+        } else {
+            Ok(false) // Was already woken or changed state
+        }
+    }
+
+    pub fn deliver_signal(&mut self, tid: ThreadId, signal_bit: u64) -> Result<bool, &'static str> {
+        let thread = self.find_mut(tid).ok_or("thread not found")?;
+        thread.post_signal(signal_bit);
+        let is_unblocked = (signal_bit & !thread.signal_mask) != 0;
+        if is_unblocked {
+            if thread.state == ThreadState::Blocked {
+                let _ = thread.cancel_wait_channel();
+            } else if thread.state == ThreadState::Suspended {
+                let _ = thread.resume();
+            }
+        }
+        Ok(is_unblocked)
     }
 
     pub fn reap_terminated(&mut self) {
@@ -618,5 +683,50 @@ mod tests {
         tm.reap_terminated();
         assert!(tm.find(t1).is_none());
         assert!(tm.find(t2).is_some());
+    }
+
+    #[test]
+    fn test_wait_channel_timeout_and_signal_delivery() {
+        let mut tm = ThreadManager::new();
+        let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
+
+        let t1 = tm.create_thread(1, "t_timeout", ThreadOwnership::User, stack);
+        tm.enqueue_ready(t1).unwrap();
+        tm.find_mut(t1).unwrap().transition_to(ThreadState::Running).unwrap();
+        tm.find_mut(t1).unwrap().block_on(WaitChannelId(99)).unwrap();
+
+        // Timeout on wait channel wakes thread up back to Ready
+        assert_eq!(tm.timeout_wait_channel(t1), Ok(true));
+        assert_eq!(tm.find(t1).unwrap().state, ThreadState::Ready);
+
+        // Deliver signal test
+        tm.find_mut(t1).unwrap().transition_to(ThreadState::Running).unwrap();
+        tm.find_mut(t1).unwrap().block_on(WaitChannelId(100)).unwrap();
+
+        // Deliver unblocked signal 1u64 << 2 (SIGINT)
+        assert_eq!(tm.deliver_signal(t1, 1u64 << 2), Ok(true));
+        assert_eq!(tm.find(t1).unwrap().state, ThreadState::Ready);
+        assert_ne!(tm.find(t1).unwrap().pending_signals & (1u64 << 2), 0);
+    }
+
+    #[test]
+    fn test_priority_and_affinity() {
+        let stack = StackMeta::new(0x1000, 0x4000, 0x1000);
+        let mut thread = Thread::new(ThreadId(6), 1, "prio_aff", ThreadOwnership::User, stack);
+
+        thread.set_priority(10);
+        assert_eq!(thread.priority, 10);
+
+        thread.set_priority(200); // Clamped to 139
+        assert_eq!(thread.priority, 139);
+
+        let mut aff = CpuAffinity::none();
+        aff.set_cpu(0);
+        aff.set_cpu(3);
+        thread.set_affinity(aff);
+
+        assert!(thread.affinity.is_set(0));
+        assert!(thread.affinity.is_set(3));
+        assert!(!thread.affinity.is_set(1));
     }
 }
