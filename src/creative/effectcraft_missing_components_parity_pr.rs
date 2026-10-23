@@ -8,7 +8,6 @@ use alloc::vec;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct EffectcraftPrProposalSpec {
@@ -1232,6 +1231,10 @@ pub struct SovereignEffectcraftArtcraftParityPrGateway {
     pub aces_ocio: EffectcraftAcesOcioColorManagementPrEngine,
     pub cryptomatte: EffectcraftCryptomatteAovExtractorPrEngine,
     pub expression_scripting: EffectcraftExpressionScriptingRiggingPrEngine,
+    pub volumetric_lighting: VolumetricLightingAtmosphericRaymarchPrEngine,
+    pub procedural_fluid: ProceduralVfxFractalFluidSimulationPrEngine,
+    pub temporal_denoise: TemporalNoiseReductionMotionDegrainPrEngine,
+    pub vr_spatial: StereoscopicVr360SpatialVideoPrEngine,
 }
 
 impl SovereignEffectcraftArtcraftParityPrGateway {
@@ -1247,6 +1250,10 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             aces_ocio: EffectcraftAcesOcioColorManagementPrEngine::new(),
             cryptomatte: EffectcraftCryptomatteAovExtractorPrEngine::new(),
             expression_scripting: EffectcraftExpressionScriptingRiggingPrEngine::new(),
+            volumetric_lighting: VolumetricLightingAtmosphericRaymarchPrEngine::new(),
+            procedural_fluid: ProceduralVfxFractalFluidSimulationPrEngine::new(),
+            temporal_denoise: TemporalNoiseReductionMotionDegrainPrEngine::new(),
+            vr_spatial: StereoscopicVr360SpatialVideoPrEngine::new(),
         }
     }
 
@@ -1275,6 +1282,21 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             .optical_flow
             .compute_motion_vectors(&[0u8; 4], &[10u8; 4], 1, 1)
             .is_ok();
+        let _volumetric_ok = self
+            .volumetric_lighting
+            .compute_volumetric_shafts([0.0, 1.0, 0.0], [0.0, 0.0, 1.0], &[5.0])
+            .is_ok();
+        let _fluid_ok = self.procedural_fluid.step_fluid_dynamics(0.1).is_ok();
+        let mut denoise_out = vec![0u8; 4];
+        let _denoise_ok = self
+            .temporal_denoise
+            .process_temporal_denoise(&[&frame[..]], &mut denoise_out)
+            .is_ok();
+        let mut right_eye = vec![0u8; 4];
+        let _vr_ok = self
+            .vr_spatial
+            .generate_stereoscopic_parallax(&frame, &mut right_eye, 2.0)
+            .is_ok();
         true
     }
 
@@ -1290,6 +1312,10 @@ impl SovereignEffectcraftArtcraftParityPrGateway {
             self.aces_ocio.generate_proposal(),
             self.cryptomatte.generate_proposal(),
             self.expression_scripting.generate_proposal(),
+            self.volumetric_lighting.generate_proposal(),
+            self.procedural_fluid.generate_proposal(),
+            self.temporal_denoise.generate_proposal(),
+            self.vr_spatial.generate_proposal(),
         ]
     }
 
@@ -1558,16 +1584,16 @@ mod tests {
     #[test]
     fn test_openfx_adapter_engine_functional_v2() {
         let mut engine = ArtCraftOpenFxPluginPrEngine::new();
-        let load_res = engine.load_openfx_plugin("com.artcraft.Sharpen");
+        let load_res = engine.load_openfx_plugin("com.artcraft.Blur");
         assert!(load_res.is_ok());
 
         engine
-            .set_plugin_parameter("com.artcraft.Sharpen", "intensity", 0.5)
+            .set_plugin_parameter("com.artcraft.Blur", "intensity", 0.5)
             .unwrap();
 
         let mut pixels = vec![100, 150, 200, 255];
         engine
-            .process_frame("com.artcraft.Sharpen", &mut pixels)
+            .process_frame("com.artcraft.Blur", &mut pixels)
             .unwrap();
         assert_eq!(pixels[0], 50);
     }
