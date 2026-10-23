@@ -1,3 +1,3 @@
-# SigmaOS Shell Builtin Command Catalog
+# SigmaOS Shell Builtins
 
-Specification for shell builtins: `cd`, `pwd`, `echo`, `export`, `unset`, `exit`, `alias`, `unalias`, `type`, `help`, and `history`.
+Builtin command specifications for `sigma-sh`.

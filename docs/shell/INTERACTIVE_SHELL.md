@@ -1,3 +1,3 @@
-# SigmaOS Interactive Shell & Line Editor
+# SigmaOS Interactive Shell Policy
 
-Line editor, history navigation, tab completion, prompt rendering, multiline quote detection, and signal handling (`SIGINT`/`SIGTSTP`).
+Interactive shell editing, prompts, and keybindings for `sigma-sh`.

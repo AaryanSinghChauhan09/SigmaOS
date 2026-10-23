@@ -1,3 +1,3 @@
-# SigmaOS Shell Diagnostics Engine
+# SigmaOS Shell Diagnostics
 
-Structured error formatting, line and column offset reporting, typos/did-you-mean suggestions, and redirection error reporting.
+Diagnostics formatting and error messages for `sigma-sh`.

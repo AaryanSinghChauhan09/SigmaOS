@@ -1,3 +1,3 @@
-# SigmaOS Shell Formal Grammar
+# SigmaOS Shell Grammar
 
-EBNF specification of lexer tokens, AST nodes, pipeline chains, compound commands, and redirection operators.
+Grammar and lexer rules for `sigma-sh`.

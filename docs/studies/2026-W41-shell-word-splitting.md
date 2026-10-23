@@ -1,3 +1,3 @@
-# Upstream Study: Shell Word Splitting Mechanics
+# Study: Shell Word Splitting and Path Expansion
 
-Comparative study of bash, zsh, dash, and FreeBSD sh word-splitting behavior across IFS whitespace and non-whitespace delimiters.
+Analysis of POSIX shell word splitting and expansion rules.

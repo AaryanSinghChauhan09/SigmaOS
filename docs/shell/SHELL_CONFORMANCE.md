@@ -1,3 +1,3 @@
-# SigmaOS Shell POSIX Conformance Baseline
+# SigmaOS Shell POSIX Conformance
 
-Defines POSIX.1-2024 expansion ordering, parameter substitution, quoting integrity, and redirection conformance rules.
+POSIX conformance specification for `sigma-sh`.

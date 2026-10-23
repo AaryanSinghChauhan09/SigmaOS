@@ -1,3 +1,3 @@
-# SigmaOS Shell Maintenance Specification
+# SigmaOS Shell Maintenance Policy
 
-Defines maintenance cadences, lint checks, test coverage gates, and regression procedures for the SigmaOS command interpreter.
+Maintenance policy and lifecycle guidelines for the SigmaOS shell (`sigma-sh`).
