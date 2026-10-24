@@ -3,7 +3,6 @@
 // Covers GTK4/Libadwaita, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP),
 // GVfs/GIO, PolicyKit, XDG Portals/Utilities, fontconfig/FreeType/HarfBuzz/Pango/Cairo/Skia,
 // IBus/Fcitx5, Notification Daemons, Screen Lockers, Clipboard Managers, and PR Gateway.
-
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
@@ -12,8 +11,7 @@ use std::vec::Vec;
 static NEXT_V72_DESKTOP_SERVICE_ID: AtomicUsize = AtomicUsize::new(72000);
 
 // ============================================================================
-// 1. GTK4/Libadwaita & Qt6/Kvantum Toolkit Sync Engine V72
-// ============================================================================
+// 1. GTK4/Libadwaita & Qt6/Kvantum Toolkit Sync Engine V72// ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AdwColorSchemeV72 {
@@ -24,8 +22,7 @@ pub enum AdwColorSchemeV72 {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Qt6PlatformStyleV72 {
-    Breeze = 0,
+pub enum Qt6PlatformStyleV72 {    Breeze = 0,
     Fusion = 1,
     AdwaitaQt = 2,
     Oxygen = 3,
@@ -60,8 +57,7 @@ pub struct SovereignGtkQtToolkitEngineV72 {
     pub gtk_render_pipeline: Gtk4RenderPipelineV72,
     pub active_accent_hex: String,
     pub kvantum_spec: Option<KvantumThemeSpecV72>,
-    pub css_custom_rules: Vec<String>,
-}
+    pub css_custom_rules: Vec<String>,}
 
 impl SovereignGtkQtToolkitEngineV72 {
     pub fn new() -> Self {
@@ -131,8 +127,7 @@ impl SovereignGtkQtToolkitEngineV72 {
             )
         } else {
             "[Config]\ntheme=Default\n".to_string()
-        }
-    }
+        }    }
 }
 
 // ============================================================================
@@ -140,20 +135,34 @@ impl SovereignGtkQtToolkitEngineV72 {
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisplayManagerKindV72 {
-    Gdm,
+pub enum DisplayManagerKindV72 {    Gdm,
     Sddm,
     LightDm,
     Xdm,
+=======
+    SlickGreeter,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DesktopSessionTypeV72 {
+    Wayland,
+    X11,
+    Mir,
+    Hyprland,
+    Zenith,
+    Sway,
+    KdePlasma,
+    GnomeShell,
+>>>>>>> origin/main
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PamAuthRequestV72 {
     pub username: String,
+<<<<<<< HEAD
     pub password: String,
     pub password_hash: String,
-    pub mfa_otp: Option<String>,
-    pub seat_id: String,
+    pub mfa_otp: Option<String>,    pub seat_id: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -227,8 +236,7 @@ impl SovereignDisplayManagerSuiteEngineV72 {
     pub fn build_xdmcp_query(&self, target_host: &str) -> Vec<u8> {
         let mut packet = vec![0x00, 0x01, 0x00, 0x02]; // XDMCP Header
         packet.extend_from_slice(target_host.as_bytes());
-        packet
-    }
+        packet    }
 }
 
 // ============================================================================
@@ -294,8 +302,7 @@ impl SovereignGvfsGioFileSystemEngineV72 {
     }
 
     pub fn get_dconf_value(&self, key: &str) -> Option<&String> {
-        self.dconf_tree.get(key)
-    }
+        self.dconf_tree.get(key)    }
 }
 
 // ============================================================================
@@ -313,8 +320,7 @@ pub struct PolkitRuleV72 {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignPolicyKitAuthorizationEngineV72 {
     pub rules: Vec<PolkitRuleV72>,
-    pub active_agent_sessions: BTreeMap<String, String>,
-}
+    pub active_agent_sessions: BTreeMap<String, String>,}
 
 impl SovereignPolicyKitAuthorizationEngineV72 {
     pub fn new() -> Self {
@@ -356,8 +362,7 @@ impl SovereignPolicyKitAuthorizationEngineV72 {
                 count += 1;
             }
         }
-        count
-    }
+        count    }
 }
 
 // ============================================================================
@@ -407,8 +412,7 @@ impl SovereignXdgPortalsUtilitiesEngineV72 {
                 count += 1;
             }
         }
-        count
-    }
+        count    }
 }
 
 // ============================================================================
@@ -504,8 +508,7 @@ impl SovereignInputMethodFrameworkEngineV72 {
     }
 
     pub fn switch_layout(&mut self, layout: &str) {
-        self.active_layout = layout.to_string();
-    }
+        self.active_layout = layout.to_string();    }
 }
 
 // ============================================================================
@@ -558,8 +561,7 @@ impl SovereignNotificationDaemonEngineV72 {
     }
 
     pub fn close_notification(&mut self, id: u32) -> bool {
-        self.notifications.remove(&id).is_some()
-    }
+        self.notifications.remove(&id).is_some()    }
 }
 
 // ============================================================================
@@ -571,8 +573,7 @@ pub struct SovereignScreenLockerEngineV72 {
     pub is_locked: bool,
     pub pam_backoff_sec: u32,
     pub blur_radius: u32,
-    pub password_hash: String,
-}
+    pub password_hash: String,}
 
 impl SovereignScreenLockerEngineV72 {
     pub fn new() -> Self {
@@ -605,8 +606,7 @@ impl SovereignScreenLockerEngineV72 {
     }
 
     pub fn generate_kawase_blur_pipeline(&self) -> String {
-        format!("OpenGL::DualKawaseBlur(radius={}, passes=4)", self.blur_radius)
-    }
+        format!("OpenGL::DualKawaseBlur(radius={}, passes=4)", self.blur_radius)    }
 }
 
 // ============================================================================
@@ -624,8 +624,7 @@ pub struct ClipboardItemV72 {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignClipboardManagerEngineV72 {
     pub history: Vec<ClipboardItemV72>,
-    pub max_history: usize,
-}
+    pub max_history: usize,}
 
 impl SovereignClipboardManagerEngineV72 {
     pub fn new() -> Self {
@@ -651,8 +650,7 @@ impl SovereignClipboardManagerEngineV72 {
     pub fn wipe_secrets(&mut self) -> usize {
         let orig_len = self.history.len();
         self.history.retain(|item| !item.is_secret);
-        orig_len - self.history.len()
-    }
+        orig_len - self.history.len()    }
 }
 
 // ============================================================================
@@ -696,13 +694,11 @@ impl SovereignDesktopServicesV72PrGatewayEngine {
     }
 
     pub fn audit_all_proposals(&self) -> bool {
-        self.proposals.iter().all(|p| p.passed_audit)
-    }
+        self.proposals.iter().all(|p| p.passed_audit)    }
 }
 
 // ============================================================================
-// Unit Tests Suite
-// ============================================================================
+// Unit Tests Suite// ============================================================================
 
 #[cfg(test)]
 mod tests {
@@ -730,8 +726,7 @@ mod tests {
             username: "sigma".to_string(),
             password: "secret_password".to_string(),
             password_hash: "sha256_secret_password".to_string(),
-            mfa_otp: None,
-            seat_id: "seat0".to_string(),
+            mfa_otp: None,            seat_id: "seat0".to_string(),
         };
         let res = dm.authenticate_pam(&req);
         assert!(res.authenticated);
@@ -802,6 +797,5 @@ mod tests {
 
         let mut pr = SovereignDesktopServicesV72PrGatewayEngine::new();
         assert_eq!(pr.generate_10_distro_prs(), 10);
-        assert!(pr.audit_all_proposals());
-    }
+        assert!(pr.audit_all_proposals());    }
 }
