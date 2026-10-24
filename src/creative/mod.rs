@@ -79,6 +79,7 @@ pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_missing_components_v65_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
+pub use craftlibs_missing_components_parity_pr::*;
 pub use craftlibs_artcraft_parity_pr::{
     CraftlibsArtcraftParityPrSuite, CraftlibsEmbreeBvhRaytracingKernelPrEngine,
     CraftlibsGpuTextureCompressionAstcBtcPrEngine, CraftlibsNeuralSuperResolutionUpscalerPrEngine,
