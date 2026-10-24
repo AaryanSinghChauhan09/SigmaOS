@@ -1906,6 +1906,13 @@ if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v72_pr.rs" ]; then
     ./build/test_open_source_os_debian_v72_pr
 fi
 
+if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v73_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS & Debian Unimplemented Ideas V73 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_debian_unimplemented_ideas_v73_pr.rs --edition=2021 -o build/test_open_source_os_debian_v73_pr
+    ./build/test_open_source_os_debian_v73_pr
+fi
+
 if [ -f "src/distro/open_source_os_missing_components_v65_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V65 PR Suite tests..."
     rustc --test src/distro/open_source_os_missing_components_v65_pr.rs --edition=2021 -o build/test_open_source_v65_pr
