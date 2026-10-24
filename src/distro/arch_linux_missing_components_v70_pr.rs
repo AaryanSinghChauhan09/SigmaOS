@@ -229,9 +229,7 @@ impl ArchArchinstallEncryptedLuks3BtrfsProfilePrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        !self.luks_cipher.is_empty()
-            && !self.btrfs_subvolumes.is_empty()
-            && self.snapper_timeline
+        !self.luks_cipher.is_empty() && !self.btrfs_subvolumes.is_empty() && self.snapper_timeline
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV70PrSpec {

@@ -12,8 +12,7 @@ extern crate alloc;
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
+#[cfg(not(any(feature = "standalone_test", test)))]use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
@@ -55,8 +54,7 @@ pub struct SchedExtTaskV72 {
 
 pub struct Linux629SchedExtFolioCompactionV72PrEngine {
     pub task_queue: Vec<SchedExtTaskV72>,
-    pub active_folios: u32,
-}
+    pub active_folios: u32,}
 
 impl Default for Linux629SchedExtFolioCompactionV72PrEngine {
     fn default() -> Self {
@@ -83,7 +81,6 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
         }
         self.active_folios
     }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7201,
@@ -94,8 +91,7 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
                 "Implements BPF sched_ext extensible AI scheduling policy and zero-copy memory folio compaction V72."
                     .to_string(),
             diff_patch: "--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -1,5 +1,10 @@\n"
-                .to_string(),
-            status: OsPrStatusV72::Validated,
+                .to_string(),            status: OsPrStatusV72::Validated,
             parity_score: 100,
         }
     }
@@ -104,7 +100,6 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
 pub struct FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     pub casper_rights: Vec<String>,
 }
-
 impl Default for FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     fn default() -> Self {
         Self::new()
@@ -125,7 +120,6 @@ impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     pub fn check_casper_right(&self, right: &str) -> bool {
         self.casper_rights.iter().any(|r| r == right)
     }
-
     pub fn handshake_nvme_tls(&self, session_id: &str) -> bool {
         !session_id.is_empty()
     }
@@ -141,8 +135,7 @@ impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
                     .to_string(),
             diff_patch:
                 "--- a/sys/kern/kern_capsicum.c\n+++ b/sys/kern/kern_capsicum.c\n@@ -1,5 +1,10 @@\n"
-                    .to_string(),
-            status: OsPrStatusV72::Validated,
+                    .to_string(),            status: OsPrStatusV72::Validated,
             parity_score: 99,
         }
     }
@@ -152,8 +145,7 @@ pub struct OpenBsd89FineIbtPinsyscallUnveilV72PrEngine {
     pub pinned_syscall_addr: u64,
 }
 
-impl Default for OpenBsd89FineIbtPinsyscallUnveilV72PrEngine {
-    fn default() -> Self {
+impl Default for OpenBsd89FineIbtPinsyscallUnveilV72PrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -172,15 +164,13 @@ impl OpenBsd89FineIbtPinsyscallUnveilV72PrEngine {
     pub fn check_unveil_access(&self, path: &str, permissions: char) -> bool {
         (path.starts_with("/usr") || path.starts_with("/etc")) && (permissions == 'r' || permissions == 'w')
     }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7203,
             subsystem: "OpenBSD Security".to_string(),
             title: "OpenBSD 8.9 FineIBT Pinsyscall & Unveil PTE Guard V72".to_string(),
             upstream_target: "sys/kern/kern_pledge_v72.c".to_string(),
-            description: "Enforces kernel-level FineIBT pinsyscall verification and shadow stack PTE protection guard V72.".to_string(),
-            diff_patch: "--- a/sys/kern/kern_pledge.c\n+++ b/sys/kern/kern_pledge.c\n@@ -1,5 +1,10 @@\n".to_string(),
+            description: "Enforces kernel-level FineIBT pinsyscall verification and shadow stack PTE protection guard V72.".to_string(),            diff_patch: "--- a/sys/kern/kern_pledge.c\n+++ b/sys/kern/kern_pledge.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
             parity_score: 100,
         }
@@ -194,7 +184,6 @@ impl Default for NetBsd125RumpPciVirtio9pV72PrEngine {
         Self::new()
     }
 }
-
 impl NetBsd125RumpPciVirtio9pV72PrEngine {
     pub fn new() -> Self {
         Self
@@ -224,17 +213,18 @@ impl NetBsd125RumpPciVirtio9pV72PrEngine {
 
 pub struct DragonFlyHammer3ErasureDirectIoV72PrEngine;
 
-impl Default for DragonFlyHammer3ErasureDirectIoV72PrEngine {
-    fn default() -> Self {
+impl Default for DragonFlyHammer3ErasureDirectIoV72PrEngine {    fn default() -> Self {
         Self::new()
     }
 }
 
-impl DragonFlyHammer3ErasureDirectIoV72PrEngine {
-    pub fn new() -> Self {
+impl DragonFlyHammer3ErasureDirectIoV72PrEngine {    pub fn new() -> Self {
         Self
     }
 
+=======
+=======>>>>>>> origin/main
+>>>>>>> origin/main
     pub fn sync_pfs_delta(&self, master_a: u32, master_b: u32) -> bool {
         master_a != master_b
     }
@@ -242,6 +232,7 @@ impl DragonFlyHammer3ErasureDirectIoV72PrEngine {
     pub fn verify_scrub_checksum(&self, checksum: &str) -> bool {
         checksum.starts_with("SHA256:")
     }
+<<<<<<< HEAD
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -256,7 +247,6 @@ impl DragonFlyHammer3ErasureDirectIoV72PrEngine {
         }
     }
 }
-
 pub struct IllumosOpenZfsDtraceEbpfV72PrEngine;
 
 impl Default for IllumosOpenZfsDtraceEbpfV72PrEngine {
@@ -290,28 +280,24 @@ impl IllumosOpenZfsDtraceEbpfV72PrEngine {
             description: "Provides Crossbow VNIC virtual switch mesh, OpenZFS block AES-256-GCM encryption, and DTrace probes V72.".to_string(),
             diff_patch: "--- a/usr/src/uts/common/fs/zfs/sys/zil.h\n+++ b/usr/src/uts/common/fs/zfs/sys/zil.h\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 100,
-        }
+            parity_score: 100,        }
     }
 }
 
 pub struct HaikuBeFsRelationalLiveQueryV72PrEngine;
 
-impl Default for HaikuBeFsRelationalLiveQueryV72PrEngine {
-    fn default() -> Self {
+impl Default for HaikuBeFsRelationalLiveQueryV72PrEngine {    fn default() -> Self {
         Self::new()
     }
 }
 
-impl HaikuBeFsRelationalLiveQueryV72PrEngine {
-    pub fn new() -> Self {
+impl HaikuBeFsRelationalLiveQueryV72PrEngine {    pub fn new() -> Self {
         Self
     }
 
     pub fn query_index(&self, attribute_name: &str) -> bool {
         attribute_name.starts_with("META:") || attribute_name.starts_with("BEOS:")
     }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7207,
@@ -325,7 +311,6 @@ impl HaikuBeFsRelationalLiveQueryV72PrEngine {
         }
     }
 }
-
 pub struct Plan99p2000LPlumberV72PrEngine;
 
 impl Default for Plan99p2000LPlumberV72PrEngine {
@@ -345,8 +330,7 @@ impl Plan99p2000LPlumberV72PrEngine {
         } else if msg.ends_with(".rs") {
             Some("dispatch_editor")
         } else {
-            None
-        }
+            None        }
     }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
@@ -365,21 +349,18 @@ impl Plan99p2000LPlumberV72PrEngine {
 
 pub struct RedoxFsHermeticCasCowCapabilityV72PrEngine;
 
-impl Default for RedoxFsHermeticCasCowCapabilityV72PrEngine {
-    fn default() -> Self {
+impl Default for RedoxFsHermeticCasCowCapabilityV72PrEngine {    fn default() -> Self {
         Self::new()
     }
 }
 
-impl RedoxFsHermeticCasCowCapabilityV72PrEngine {
-    pub fn new() -> Self {
+impl RedoxFsHermeticCasCowCapabilityV72PrEngine {    pub fn new() -> Self {
         Self
     }
 
     pub fn verify_scheme_capability(&self, scheme: &str) -> bool {
         scheme == "file:" || scheme == "event:" || scheme == "cas:"
     }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7209,
@@ -393,7 +374,6 @@ impl RedoxFsHermeticCasCowCapabilityV72PrEngine {
         }
     }
 }
-
 pub struct OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub linux_schedext: Linux629SchedExtFolioCompactionV72PrEngine,
     pub freebsd_capsicum: FreeBsd161CapsicumCasperNvmeTlsV72PrEngine,
@@ -403,8 +383,7 @@ pub struct OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine,
     pub haiku_befs: HaikuBeFsRelationalLiveQueryV72PrEngine,
     pub plan9_plumber: Plan99p2000LPlumberV72PrEngine,
-    pub redox_cow: RedoxFsHermeticCasCowCapabilityV72PrEngine,
-}
+    pub redox_cow: RedoxFsHermeticCasCowCapabilityV72PrEngine,}
 
 impl Default for OpenSourceOsUnimplementedIdeasV72PrSuite {
     fn default() -> Self {
@@ -423,8 +402,7 @@ impl OpenSourceOsUnimplementedIdeasV72PrSuite {
             illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine::new(),
             haiku_befs: HaikuBeFsRelationalLiveQueryV72PrEngine::new(),
             plan9_plumber: Plan99p2000LPlumberV72PrEngine::new(),
-            redox_cow: RedoxFsHermeticCasCowCapabilityV72PrEngine::new(),
-        }
+            redox_cow: RedoxFsHermeticCasCowCapabilityV72PrEngine::new(),        }
     }
 
     pub fn collect_all_pr_specs(&self) -> Vec<OpenSourceOsV72PrSpec> {
