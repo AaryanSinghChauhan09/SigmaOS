@@ -16,12 +16,10 @@
 // deduplication, boot environment snapshots (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS),
 // foreign PM CLI command routing across 40+ package managers, multi-format transpilation, and transactional
 // installation with rollback for Sigma-pkg.
-
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
-use alloc::collections::{BTreeMap, BTreeSet};
-#[cfg(not(feature = "standalone_test"))]
+use alloc::collections::{BTreeMap, BTreeSet};#[cfg(not(feature = "standalone_test"))]
 use alloc::format;
 #[cfg(not(feature = "standalone_test"))]
 use alloc::string::{String, ToString};
@@ -31,8 +29,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
-use std::collections::{BTreeMap, BTreeSet};
-#[cfg(feature = "standalone_test")]
+use std::collections::{BTreeMap, BTreeSet};#[cfg(feature = "standalone_test")]
 use std::string::{String, ToString};
 #[cfg(feature = "standalone_test")]
 use std::vec::Vec;
@@ -51,8 +48,7 @@ pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 // 1. Universal Package Format Classification & Zero-Copy Magic Byte Inspection V73
 // ============================================================================
 
-/// Signature attestation types supported across Linux, BSD, Unix, Language Runtimes & Mobile V73
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// Signature attestation types supported across Linux, BSD, Unix, Language Runtimes & Mobile V73#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PackageSignatureKindV73 {
     OpenBsdSignify,
     PqcKyberDilithium5,
@@ -64,18 +60,7 @@ pub enum PackageSignatureKindV73 {
     Unsigned,
 }
 
-/// SLSA Level 4 Build Provenance Attestation Record V73
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PackageProvenanceAttestationV73 {
-    pub builder_id: String,
-    pub build_timestamp: u64,
-    pub source_commit_sha: String,
-    pub reproducible_build_hash: String,
-    pub slsa_level: u8,
-}
-
-/// Extracted metadata from zero-copy inspection of foreign package archives V73
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// SLSA Level 4 Build Provenance Attestation Record V73#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InspectedPackageManifestV73 {
     pub name: String,
     pub version: String,
@@ -95,7 +80,6 @@ pub struct UniversalPackageFormatInspectorV73 {
     pub total_formats_supported: usize,
     pub inspection_cache: BTreeMap<String, InspectedPackageManifestV73>,
 }
-
 impl UniversalPackageFormatInspectorV73 {
     pub fn new() -> Self {
         Self {
@@ -152,13 +136,6 @@ impl UniversalPackageFormatInspectorV73 {
     }
 
     /// Inspects a raw package file by name and binary payload header V73
-    pub fn inspect_package(
-        &mut self,
-        filename: &str,
-        raw_payload: &[u8],
-    ) -> Result<InspectedPackageManifestV73, String> {
-        let (format, sig_kind, compression) = self.detect_format_by_magic_bytes(raw_payload, filename);
-
         let base_name = filename
             .split('/')
             .last()
@@ -178,8 +155,7 @@ impl UniversalPackageFormatInspectorV73 {
                 acc ^= byte as u64;
                 acc = acc.wrapping_mul(1099511628211);
             }
-            format!("sha256_v73_{:016x}_{}", acc, base_name)
-        };
+            format!("sha256_v73_{:016x}_{}", acc, base_name)        };
 
         let manifest = InspectedPackageManifestV73 {
             name: base_name.to_string(),
@@ -191,8 +167,7 @@ impl UniversalPackageFormatInspectorV73 {
             provides: vec![base_name.to_string()],
             conflicts: Vec::new(),
             target_microarch: "x86_64-v3".to_string(),
-            build_cflags: Some("-O3 -march=x86-64-v3 -flto".to_string()),
-            payload_sha256: hash_val,
+            build_cflags: Some("-O3 -march=x86-64-v3 -flto".to_string()),            payload_sha256: hash_val,
             provenance: Some(PackageProvenanceAttestationV73 {
                 builder_id: "sigmaos-reproducible-builder-v73".to_string(),
                 build_timestamp: 1712000000,
@@ -437,8 +412,7 @@ impl SovereignPackageFacadeV73 {
 }
 
 // ============================================================================
-// 3. User-Defined Functions (UDF) Maintainer Scriptlet Engine V73
-// ============================================================================
+// 3. User-Defined Functions (UDF) Maintainer Scriptlet Engine V73// ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UdfHookTypeV73 {
@@ -462,7 +436,6 @@ pub struct UdfScriptletEngineV73 {
     pub hooks_registered: Vec<UdfExecutionContextV73>,
     pub execution_log: Vec<String>,
 }
-
 impl UdfScriptletEngineV73 {
     pub fn new() -> Self {
         Self {
@@ -486,8 +459,7 @@ impl UdfScriptletEngineV73 {
                 executed += 1;
                 self.execution_log.push(format!(
                     "Executed UDF Scriptlet {:?} for {} with code length {}",
-                    phase, package_name, hook.scriptlet_code.len()
-                ));
+                    phase, package_name, hook.scriptlet_code.len()                ));
             }
         }
         Ok(executed)
@@ -507,7 +479,6 @@ pub struct UniversalCrossDistroSatSolverV73 {
     pub canonical_package_map: BTreeMap<String, String>,
     pub known_vulnerabilities: BTreeSet<String>,
 }
-
 impl UniversalCrossDistroSatSolverV73 {
     pub fn new() -> Self {
         let mut map = BTreeMap::new();
@@ -552,7 +523,6 @@ impl UniversalCrossDistroSatSolverV73 {
         }
         true
     }
-
     pub fn solve_dependencies(
         &self,
         raw_dependencies: &[String],
@@ -572,13 +542,11 @@ impl UniversalCrossDistroSatSolverV73 {
     }
 
     pub fn audit_vulnerabilities(&self, package_version: &str) -> bool {
-        !self.known_vulnerabilities.contains(package_version)
-    }
+        !self.known_vulnerabilities.contains(package_version)    }
 }
 
 // ============================================================================
-// 5. Multi-Sandbox Security Isolation Governor V73
-// ============================================================================
+// 5. Multi-Sandbox Security Isolation Governor V73// ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SandboxCapabilityRulesV73 {
@@ -595,8 +563,7 @@ pub struct UniversalMultiSandboxGovernorV73 {
 
 impl UniversalMultiSandboxGovernorV73 {
     pub fn new() -> Self {
-        Self { enforced_level: 5 }
-    }
+        Self { enforced_level: 5 }    }
 
     pub fn generate_sandbox_rules(&self, format: PackageFormat) -> SandboxCapabilityRulesV73 {
         match format {
@@ -621,8 +588,7 @@ impl UniversalMultiSandboxGovernorV73 {
 }
 
 // ============================================================================
-// 6. Content-Addressed Store (CAS) FastCDC Deduplication Governor V73
-// ============================================================================
+// 6. Content-Addressed Store (CAS) FastCDC Deduplication Governor V73// ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CasDeltaRecordV73 {
@@ -635,7 +601,6 @@ pub struct CasDeltaRecordV73 {
 pub struct UniversalCasDeltaStoreGovernorV73 {
     pub cas_index: BTreeMap<String, CasDeltaRecordV73>,
 }
-
 impl UniversalCasDeltaStoreGovernorV73 {
     pub fn new() -> Self {
         Self {
@@ -643,26 +608,7 @@ impl UniversalCasDeltaStoreGovernorV73 {
         }
     }
 
-    /// Calculates FastCDC rolling chunk hash and records delta patch V73
-    pub fn apply_delta_patch(
-        &mut self,
-        base_hash: &str,
-        delta_hash: &str,
-    ) -> Result<CasDeltaRecordV73, String> {
-        let rec = CasDeltaRecordV73 {
-            base_chunk_hash: base_hash.to_string(),
-            delta_patch_hash: delta_hash.to_string(),
-            compressed_size: 1024,
-            compression_savings_ratio: 90,
-        };
-        self.cas_index.insert(base_hash.to_string(), rec.clone());
-        Ok(rec)
-    }
-}
-
-// ============================================================================
-// 7. Boot Environment Snapshot Governor V73
-// ============================================================================
+    /// Calculates FastCDC rolling chunk hash and records delta patch V73// ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum BootEnvKindV73 {
@@ -688,7 +634,6 @@ pub struct UniversalBootEnvSnapshotGovernorV73 {
     pub snapshots: BTreeMap<u64, BootEnvSnapshotRecordV73>,
     pub next_id: u64,
 }
-
 impl UniversalBootEnvSnapshotGovernorV73 {
     pub fn new() -> Self {
         Self {
@@ -722,8 +667,7 @@ impl UniversalBootEnvSnapshotGovernorV73 {
 }
 
 // ============================================================================
-// 8. Foreign Package Manager CLI Command Router V73
-// ============================================================================
+// 8. Foreign Package Manager CLI Command Router V73// ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UniversalPmActionV73 {
@@ -826,6 +770,39 @@ impl UniversalPmCliRouterV73 {
 }
 
 // ============================================================================
+=======
+// 8. Sovereign Distro Package PR Gateway V73
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignPackagePrProposalV73 {
+    pub pr_id: String,
+    pub title: String,
+    pub format_target: String,
+    pub status: String,
+    pub patch_diff: String,
+}
+
+pub struct SovereignDistroPackagePrGatewayV73 {
+    pub active_proposals: Vec<SovereignPackagePrProposalV73>,}
+
+impl SovereignDistroPackagePrGatewayV73 {
+    pub fn new() -> Self {
+        Self {
+            active_proposals: vec![
+                SovereignPackagePrProposalV73 {
+                    pr_id: "PR-PKG-V73-001".to_string(),
+                    title: "Universal 210+ Format Zero-Copy Inspection & PQC Dilithium5 Signature Gate V73".to_string(),
+                    format_target: "Multi-Format Universe".to_string(),
+                    status: "Validated".to_string(),
+                    patch_diff: "--- src/package/universal_inspector_v73.rs\n+++ src/package/universal_inspector_v73.rs\n@@ -1,3 +1,8 @@\n+ total_formats_supported: 210\n".to_string(),
+                },
+            ],        }
+    }
+}
+
+// ============================================================================
+>>>>>>> origin/main
 // 9. Master Coordinator: Sovereign Distro Package Advancements Suite V73
 // ============================================================================
 
@@ -837,9 +814,9 @@ pub struct SovereignDistroPackageAdvancementsSuiteV73 {
     pub cas_store: UniversalCasDeltaStoreGovernorV73,
     pub boot_env_governor: UniversalBootEnvSnapshotGovernorV73,
     pub cli_router: UniversalPmCliRouterV73,
+<<<<<<< HEAD
     pub installed_packages: Vec<String>,
 }
-
 impl SovereignDistroPackageAdvancementsSuiteV73 {
     pub fn new() -> Self {
         Self {
@@ -850,6 +827,9 @@ impl SovereignDistroPackageAdvancementsSuiteV73 {
             cas_store: UniversalCasDeltaStoreGovernorV73::new(),
             boot_env_governor: UniversalBootEnvSnapshotGovernorV73::new(),
             cli_router: UniversalPmCliRouterV73::new(),
+=======
+            pr_gateway: SovereignDistroPackagePrGatewayV73::new(),
+>>>>>>> origin/main
             installed_packages: Vec::new(),
         }
     }
@@ -886,23 +866,13 @@ impl SovereignDistroPackageAdvancementsSuiteV73 {
 // ============================================================================
 // 10. Standalone Unit Tests V73
 // ============================================================================
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_format_inspection_v73() {
-        let mut inspector = UniversalPackageFormatInspectorV73::new();
-        let manifest = inspector
-            .inspect_package("ripgrep-13.0.0-amd64.deb", b"!<arch>\nDEB_HEADER_PAYLOAD")
+<<<<<<< HEAD
             .unwrap();
 
         assert_eq!(manifest.name, "ripgrep");
         assert_eq!(manifest.detected_format, PackageFormat::Deb);
         assert_eq!(manifest.signature_kind, PackageSignatureKindV73::GpgOpenPgp);
-        assert_eq!(manifest.compression_type, "ar/tar");
-        assert_eq!(manifest.provenance.as_ref().unwrap().slsa_level, 4);
+        assert_eq!(manifest.compression_type, "ar/tar");        assert_eq!(manifest.provenance.as_ref().unwrap().slsa_level, 4);
     }
 
     #[test]
@@ -947,30 +917,7 @@ mod tests {
         assert!(fac_res.contains("ripgrep"));
     }
 
-    #[test]
-    fn test_sat_solver_and_sandboxing_v73() {
-        let solver = UniversalCrossDistroSatSolverV73::new();
-        let raw_deps = vec![
-            "libssl-dev".to_string(),
-            "glibc".to_string(),
-            "dbus".to_string(),
-            "openssl-devel".to_string(),
-            "security/openssl".to_string(),
-        ];
-        let solved = solver.solve_dependencies(&raw_deps).unwrap();
-        assert_eq!(
-            solved,
-            vec!["sovereign-openssl", "sovereign-libc", "sovereign-dbus"]
-        );
-
-        let mut assignments = BTreeMap::new();
-        assignments.insert("sovereign-openssl".to_string(), true);
-        let clause = SatClauseV73 {
-            literals: vec![("sovereign-openssl".to_string(), true)],
-        };
-        assert!(solver.dpll_solve_clauses(&[clause], &mut assignments));
-
-        let sandbox_gov = UniversalMultiSandboxGovernorV73::new();
+    #[test]        let sandbox_gov = UniversalMultiSandboxGovernorV73::new();
         let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
         assert!(rules.pledge_promises.contains("inet"));
         assert!(rules.unveil_paths.contains(&"/var/lib".to_string()));
@@ -1020,12 +967,10 @@ mod tests {
         assert_eq!(cmd.package_targets, vec!["ripgrep".to_string()]);
 
         let sigpkg = suite
-            .process_and_install("htop-3.3.0.apk", b"PK\x03\x04_APK_PAYLOAD")
-            .unwrap();
+            .process_and_install("htop-3.3.0.apk", b"PK\x03\x04_APK_PAYLOAD")            .unwrap();
         assert_eq!(sigpkg.name, "htop");
         assert!(suite
             .installed_packages
             .contains(&"sigpkg-v73-htop".to_string()));
         assert_eq!(suite.udf_engine.execution_log.len(), 1);
-    }
-}
+    }}
