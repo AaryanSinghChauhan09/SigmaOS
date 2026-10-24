@@ -306,12 +306,24 @@ pub struct CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
     pub ebpf_iops_monitor: bool,
 }
 
+pub type CachyOsBtrfsZstdEbpfCompressorV5TunerPrEngine = CachyOsBtrfsZstdEbpfCompressorV5TunerEngine;
+pub type CachyOsHandheldPowerCapThermalV5GovernorPrEngine = CachyOsHandheldPowerCapThermalV5GovernorEngine;
+
 impl CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
     pub fn new() -> Self {
         Self {
             zstd_compression_level: 3,
             ebpf_iops_monitor: true,
         }
+    }
+
+    pub fn optimize_file_compression(&mut self, high_iops: bool) -> String {
+        if high_iops {
+            self.zstd_compression_level = 1;
+        } else {
+            self.zstd_compression_level = 3;
+        }
+        format!("level {}", self.zstd_compression_level)
     }
 
     pub fn tune_compression_ratio(&mut self, iops_demand: u32) -> u32 {
@@ -436,6 +448,11 @@ impl CachyOsHandheldPowerCapThermalV5GovernorEngine {
         }
     }
 
+    pub fn apply_handheld_settings(&mut self, profile: &str, tdp: u32) -> String {
+        self.tdp_watts = tdp;
+        format!("Profile: {} applied with TDP {}", profile, tdp)
+    }
+
     pub fn set_tdp_cap(&mut self, watts: u32) -> String {
         self.tdp_watts = watts;
         format!("Handheld Governor v5: Hardware TDP capped at {} Watts with active thermal throttle", watts)    }
@@ -542,7 +559,7 @@ mod tests {
         let mut engine = CachyOsBtrfsZstdEbpfCompressorV5TunerPrEngine::new();
         let status = engine.optimize_file_compression(true);
         assert!(status.contains("level 1"));
-        assert_eq!(engine.current_zstd_level, 1);
+        assert_eq!(engine.zstd_compression_level, 1);
     }
 
     #[test]
@@ -550,6 +567,6 @@ mod tests {
         let mut engine = CachyOsHandheldPowerCapThermalV5GovernorPrEngine::new();
         let status = engine.apply_handheld_settings("Overclock Extreme v5", 40);
         assert!(status.contains("Overclock Extreme v5"));
-        assert_eq!(engine.tdp_limit_watts, 40);
+        assert_eq!(engine.tdp_watts, 40);
     }
 }
