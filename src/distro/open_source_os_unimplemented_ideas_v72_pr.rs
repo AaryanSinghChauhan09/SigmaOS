@@ -9,8 +9,10 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+=======
 use alloc::collections::BTreeMap;
 #[cfg(not(any(feature = "standalone_test", test)))]
+>>>>>>> origin/main
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
@@ -72,16 +74,7 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
         }
     }
 
-    pub fn schedule_bpf_task(&mut self, pid: u64, priority: u32) -> bool {
-        self.task_queue.push(SchedExtTaskV72 {
-            pid,
-            priority,
-            cpus_allowed: 0xff,
-        });
-        true
-    }
-
-    pub fn schedule_next_task(&mut self) -> Option<u64> {
+<<<<<<< HEAD    pub fn schedule_next_task(&mut self) -> Option<u64> {
         self.task_queue.sort_by(|a, b| a.priority.cmp(&b.priority));
         self.task_queue.pop().map(|t| t.pid)
     }
@@ -110,27 +103,27 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
     }
 }
 
-pub struct FreeBsd162CapsicumCasperNvmeTlsV72PrEngine {
+pub struct FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     pub casper_rights: Vec<String>,
 }
 
-impl Default for FreeBsd162CapsicumCasperNvmeTlsV72PrEngine {
-    fn default() -> Self {
+impl Default for FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {    fn default() -> Self {
         Self::new()
     }
 }
 
-impl FreeBsd162CapsicumCasperNvmeTlsV72PrEngine {
-    pub fn new() -> Self {
+impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {    pub fn new() -> Self {
         Self {
             casper_rights: vec!["system.dns".to_string(), "system.sysctl".to_string()],
         }
     }
 
+=======
     pub fn check_capability_rights(&self, mask: u64, required: u64) -> bool {
         (mask & required) == required
     }
 
+>>>>>>> origin/main
     pub fn check_casper_right(&self, right: &str) -> bool {
         self.casper_rights.iter().any(|r| r == right)
     }
@@ -143,8 +136,8 @@ impl FreeBsd162CapsicumCasperNvmeTlsV72PrEngine {
         OpenSourceOsV72PrSpec {
             pr_id: 7202,
             subsystem: "FreeBSD Capsicum Casper".to_string(),
-            title: "FreeBSD 16.2 Capsicum Casper Sandbox & NVMe-over-TLS V72".to_string(),
-            upstream_target: "sys/kern/kern_capsicum.c".to_string(),
+<<<<<<< HEAD
+            title: "FreeBSD 16.1 Capsicum Casper Sandbox & NVMe-over-TLS V72".to_string(),            upstream_target: "sys/kern/kern_capsicum.c".to_string(),
             description:
                 "Extends FreeBSD Capsicum process capability sandboxing with Casper daemon RPCs."
                     .to_string(),
@@ -174,10 +167,12 @@ impl OpenBsd89PinsyscallUnveilV72PrEngine {
         }
     }
 
+=======
     pub fn verify_pinsyscall(&self, addr: u64) -> bool {
         addr != 0
     }
 
+>>>>>>> origin/main
     pub fn validate_pinsyscall(&self, addr: u64) -> bool {
         addr == self.pinned_syscall_addr
     }
@@ -200,23 +195,24 @@ impl OpenBsd89PinsyscallUnveilV72PrEngine {
     }
 }
 
-pub struct NetBsd126RumpPciVirtio9pV72PrEngine;
+<<<<<<< HEAD
+pub struct NetBsd125RumpPciVirtio9pV72PrEngine;
 
-impl Default for NetBsd126RumpPciVirtio9pV72PrEngine {
-    fn default() -> Self {
+impl Default for NetBsd125RumpPciVirtio9pV72PrEngine {    fn default() -> Self {
         Self::new()
     }
 }
 
-impl NetBsd126RumpPciVirtio9pV72PrEngine {
-    pub fn new() -> Self {
+impl NetBsd125RumpPciVirtio9pV72PrEngine {    pub fn new() -> Self {
         Self
     }
 
+=======
     pub fn parse_9p_request(&self, req: &[u8]) -> bool {
         !req.is_empty()
     }
 
+>>>>>>> origin/main
     pub fn parse_9p_header(&self, packet: &[u8]) -> Option<(u8, u16)> {
         if packet.len() >= 7 {
             Some((packet[4], u16::from_le_bytes([packet[5], packet[6]])))
@@ -229,8 +225,8 @@ impl NetBsd126RumpPciVirtio9pV72PrEngine {
         OpenSourceOsV72PrSpec {
             pr_id: 7204,
             subsystem: "NetBSD Rump Kernel".to_string(),
-            title: "NetBSD 12.6 Rump PCI & VirtIO-9P Microkernel Engine V72".to_string(),
-            upstream_target: "sys/rump/librump/rumpvfs/rumpvfs.c".to_string(),
+<<<<<<< HEAD
+            title: "NetBSD 12.5 Rump PCI & VirtIO-9P Microkernel Engine V72".to_string(),            upstream_target: "sys/rump/librump/rumpvfs/rumpvfs.c".to_string(),
             description: "Provides isolated userland Rump kernel hypervisor drivers and 9P2000.L VFS protocol routing.".to_string(),
             diff_patch: "--- a/sys/rump/librump/rumpvfs/rumpvfs.c\n+++ b/sys/rump/librump/rumpvfs/rumpvfs.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
@@ -252,11 +248,13 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
         Self
     }
 
+=======
     pub fn scrub_block_checksum(&self, data: &[u8], expected_sum: u32) -> bool {
         let sum: u32 = data.iter().map(|&b| b as u32).sum();
         sum == expected_sum || !data.is_empty()
     }
 
+>>>>>>> origin/main
     pub fn sync_pfs_delta(&self, master_a: u32, master_b: u32) -> bool {
         master_a != master_b
     }
@@ -269,8 +267,8 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
         OpenSourceOsV72PrSpec {
             pr_id: 7205,
             subsystem: "DragonFly HAMMER3".to_string(),
-            title: "DragonFly BSD 7.8 HAMMER3 Multi-Master Replication V72".to_string(),
-            upstream_target: "sys/vfs/hammer3/hammer3_vfsops.c".to_string(),
+<<<<<<< HEAD
+            title: "DragonFly BSD 7.7 HAMMER3 Multi-Master Replication V72".to_string(),            upstream_target: "sys/vfs/hammer3/hammer3_vfsops.c".to_string(),
             description: "Implements HAMMER3 multi-master PFS snapshot synchronization and active background scrubbing.".to_string(),
             diff_patch: "--- a/sys/vfs/hammer3/hammer3_vfsops.c\n+++ b/sys/vfs/hammer3/hammer3_vfsops.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
@@ -299,14 +297,9 @@ impl IllumosOpenZfsDtraceEbpfV72PrEngine {
             .collect()
     }
 
-    pub fn translate_dtrace_probe(&self, probe: &str) -> String {
+    pub fn translate_dtrace_to_ebpf(&self, probe: &str) -> String {
         format!("bpf_probe_{}", probe.replace(':', "_"))
     }
-
-    pub fn translate_dtrace_to_ebpf(&self, probe: &str) -> String {
-        self.translate_dtrace_probe(probe)
-    }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7206,
@@ -334,10 +327,12 @@ impl HaikuBeFsAttributeIndexingV72PrEngine {
         Self
     }
 
+=======
     pub fn broadcast_node_change(&self, node_id: u64, op: u32) -> bool {
         node_id > 0 && op > 0
     }
 
+>>>>>>> origin/main
     pub fn query_index(&self, attribute_name: &str) -> bool {
         attribute_name.starts_with("META:")
     }
@@ -369,11 +364,7 @@ impl Plan99p2000LPlumberV72PrEngine {
         Self
     }
 
-    pub fn route_plumb_message(&self, port: &str, msg: &str) -> bool {
-        !port.is_empty() && !msg.is_empty()
-    }
-
-    pub fn route_plumber_message(&self, msg: &str) -> Option<&'static str> {
+<<<<<<< HEAD    pub fn route_plumber_message(&self, msg: &str) -> Option<&'static str> {
         if msg.starts_with("http") {
             Some("dispatch_browser")
         } else if msg.ends_with(".rs") {
@@ -410,10 +401,12 @@ impl RedoxFsCowCapabilityV72PrEngine {
         Self
     }
 
+=======
     pub fn verify_scheme_capability_token(&self, token: &str) -> bool {
         !token.is_empty()
     }
 
+>>>>>>> origin/main
     pub fn verify_scheme_capability(&self, scheme: &str) -> bool {
         scheme == "file:" || scheme == "event:"
     }
@@ -434,10 +427,10 @@ impl RedoxFsCowCapabilityV72PrEngine {
 
 pub struct OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub linux_schedext: Linux629SchedExtFolioCompactionV72PrEngine,
-    pub freebsd_capsicum: FreeBsd162CapsicumCasperNvmeTlsV72PrEngine,
+<<<<<<< HEAD
+    pub freebsd_capsicum: FreeBsd161CapsicumCasperNvmeTlsV72PrEngine,
     pub openbsd_pinsyscall: OpenBsd89PinsyscallUnveilV72PrEngine,
-    pub netbsd_rump: NetBsd126RumpPciVirtio9pV72PrEngine,
-    pub dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine,
+    pub netbsd_rump: NetBsd125RumpPciVirtio9pV72PrEngine,    pub dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine,
     pub illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine,
     pub haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine,
     pub plan9_plumber: Plan99p2000LPlumberV72PrEngine,
@@ -454,10 +447,9 @@ impl OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub fn new() -> Self {
         Self {
             linux_schedext: Linux629SchedExtFolioCompactionV72PrEngine::new(),
-            freebsd_capsicum: FreeBsd162CapsicumCasperNvmeTlsV72PrEngine::new(),
+            freebsd_capsicum: FreeBsd161CapsicumCasperNvmeTlsV72PrEngine::new(),
             openbsd_pinsyscall: OpenBsd89PinsyscallUnveilV72PrEngine::new(),
-            netbsd_rump: NetBsd126RumpPciVirtio9pV72PrEngine::new(),
-            dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine::new(),
+            netbsd_rump: NetBsd125RumpPciVirtio9pV72PrEngine::new(),            dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine::new(),
             illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine::new(),
             haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine::new(),
             plan9_plumber: Plan99p2000LPlumberV72PrEngine::new(),
@@ -478,6 +470,8 @@ impl OpenSourceOsUnimplementedIdeasV72PrSuite {
             self.redox_cow.generate_pr_spec(),
         ]
     }
+<<<<<<< HEAD
+=======
 
     pub fn collect_all_proposals(&self) -> Vec<OpenSourceOsV72PrSpec> {
         self.collect_all_pr_specs()
@@ -518,4 +512,5 @@ mod tests {
             assert_eq!(prop.status, OsPrStatusV72::Validated);
         }
     }
+>>>>>>> origin/main
 }

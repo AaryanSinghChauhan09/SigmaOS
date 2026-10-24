@@ -2566,11 +2566,10 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v71_pr.rs" ]; then
     ./build/test_open_source_os_v71_pr
 fi
 
-if [ -f "src/governance/kernel_lifecycle_program.rs" ]; then
-    echo "Running SigmaOS Kernel Lifecycle Program Engine test suite..."
+if [ -f "tests/test_open_source_os_debian_unimplemented_ideas_v72_pr.rs" ]; then
+    echo "Running Open Source OS & Debian Unimplemented Ideas V72 PR test suite..."
     mkdir -p build
-    rustc --test src/governance/kernel_lifecycle_program.rs --edition=2021 -o build/test_klp
-    ./build/test_klp
-fi
+    rustc --test tests/test_open_source_os_debian_unimplemented_ideas_v72_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v72_pr
+    ./build/test_open_source_os_v72_prfi
 
 echo "All SigmaOS test suites completed."
