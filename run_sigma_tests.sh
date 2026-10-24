@@ -2434,6 +2434,12 @@ if [ -f "src/creative/threedcraft_spatial_computing_pr.rs" ]; then
     ./build/threedcraft_spatial_test
 fi
 
+if [ -f "src/creative/threedcraft_advancements_v74_pr.rs" ]; then
+    echo "Running Sovereign 3DCraft Advancements V74 PR test suite..."
+    rustc --test src/creative/threedcraft_advancements_v74_pr.rs --edition=2021 -o build/threedcraft_v74_test
+    ./build/threedcraft_v74_test
+fi
+
 if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
     echo "Running Omarchy Linux Missing Components Parity PR Gateway V60 test suite..."
     mkdir -p build
