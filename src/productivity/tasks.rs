@@ -29,23 +29,22 @@ use std::collections::BTreeMap;
 // Instant not in no_std
 
 /// Zero-allocation case-insensitive substring search helper.
-/// Expects `needle_lower` to already be lowercase.
+/// Expects `needle_lower` to already be lowercase (or ASCII).
+/// Uses `eq_ignore_ascii_case` on byte slice windows to enable fast SIMD-friendly
+/// comparisons without per-element iterator overhead or dynamic memory allocations.
 fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
     if needle_lower.is_empty() {
         return true;
     }
+    if haystack.len() < needle_lower.len() {
+        return false;
+    }
     if needle_lower.is_ascii() && haystack.is_ascii() {
-        let h_bytes = haystack.as_bytes();
         let n_bytes = needle_lower.as_bytes();
-        if n_bytes.len() > h_bytes.len() {
-            return false;
-        }
-        h_bytes.windows(n_bytes.len()).any(|window| {
-            window
-                .iter()
-                .zip(n_bytes)
-                .all(|(&h, &n)| h.to_ascii_lowercase() == n)
-        })
+        haystack
+            .as_bytes()
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
     } else {
         haystack.to_lowercase().contains(needle_lower)
     }
