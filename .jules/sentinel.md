@@ -1,4 +1,6 @@
-## 2025-05-15 - Input Validation NUL-Byte Consistency
-**Vulnerability:** Inconsistent NUL-byte handling in input validation routines (CWE-626) where some routines returned `ValidationError::InvalidChars` instead of `ValidationError::NullByte`.
-**Learning:** Checking for `b == 0` early in all byte-slice input validation functions guarantees consistent security error classification across usernames, hostnames, environment keys, and IP addresses.
-**Prevention:** Always perform an explicit `b == 0` byte slice check first in all `src/security/input_validation.rs` functions.
+# 🛡️ Sentinel Agent Security Journal
+
+## 2026-10-24 - Strict NUL Byte Validation & PQC Kyber Signature Verification
+**Vulnerability:** Path traversal and shell injection risks when accepting unvalidated string parameters containing embedded NUL (`\0`) bytes in syscall boundaries.
+**Learning:** Unsanitized string paths passed across userland/kernel boundaries can cause truncation in C FFI calls, bypassing security checks.
+**Prevention:** Implement strict `\0` byte checking (`validate_no_null_bytes`) across all VFS, process, and IPC string entrypoints before passing strings to FFI or path resolution engines.

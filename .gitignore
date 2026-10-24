@@ -94,6 +94,8 @@ wiki/
 !WIKI/
 !WIKI/*.md
 !WIKI/**/*.md
-!WHAT_IS_WORKING_AND_NOT_WORKING.md
-!docs/WHAT_IS_WORKING_AND_NOT_WORKING.md
-!wiki/WHAT_IS_WORKING_AND_NOT_WORKING.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
+!.jules/**/*.md
