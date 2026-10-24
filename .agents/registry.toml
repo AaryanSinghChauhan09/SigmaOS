@@ -1,0 +1,50 @@
+# SigmaOS Agent Registry Contract (.agents/registry.toml)
+
+[agents.repository-steward]
+name = "Repository Steward"
+purpose = "Keep repository clean, coherent, and reviewable."
+scope = ["docs/", ".github/", ".agents/", "reports/steward/"]
+deliverables = ["reports/steward/daily-status.md", "reports/steward/stale-work.md"]
+permissions = ["read_all", "write_reports", "submit_docs_pr"]
+
+[agents.build-test-sentinel]
+name = "Build and Test Sentinel"
+purpose = "Make build and test workflow trustworthy."
+scope = ["src/", "tests/", "tools/", "Makefile", "run_sigma_tests.sh", "reports/build/", "reports/test/"]
+deliverables = ["reports/build/latest.json", "reports/test/summary.json"]
+permissions = ["execute_build", "run_tests", "submit_mechanical_pr"]
+
+[agents.boot-runtime-validator]
+name = "Boot and Runtime Validator"
+purpose = "Prove firmware-to-desktop path in QEMU and target environments."
+scope = ["boot/", "kernel/", "installer/", "iso_root/", "scripts/", "reports/boot/"]
+deliverables = ["reports/boot/qemu_x86_64.json", "reports/boot/qemu_x86_64.log"]
+permissions = ["build_iso", "invoke_qemu", "publish_boot_matrix"]
+
+[agents.capability-auditor]
+name = "Capability Auditor"
+purpose = "Prevent aspirational completion and enforce evidence-gated claims."
+scope = ["CAPABILITY_MATRIX.toml", "FEATURE_STATUS.toml", "README.md", "reports/capability/"]
+deliverables = ["reports/capability/truth_table.json", "reports/capability/verified_today.md"]
+permissions = ["read_all", "update_capability_matrix"]
+
+[agents.kernel-subsystem-agents]
+name = "Kernel and Subsystem Agents"
+purpose = "Maintain ownership boundaries and evidence for core kernel/subsystems."
+scope = ["src/kernel/", "src/fs/", "src/vfs/", "src/driver/", "src/network/"]
+deliverables = ["reports/test/subsystem_traces.log"]
+permissions = ["write_subsystem_source", "run_subsystem_tests"]
+
+[agents.package-compatibility-agent]
+name = "Package and Distro Compatibility Agent"
+purpose = "Maintain package metadata compatibility and sandboxed execution."
+scope = ["pkgbuild/", "src/compatibility/", "tools/sigma_pacman_compat.rs", "reports/package/"]
+deliverables = ["reports/package/compatibility_matrix.json"]
+permissions = ["parse_metadata", "sandboxed_dry_run"]
+
+[agents.docs-onboarding-agent]
+name = "Documentation and Onboarding Agent"
+purpose = "Ensure contributor and agent onboarding usability."
+scope = ["README.md", "docs/", "CONTRIBUTING.md", "reports/capability/verified_today.md"]
+deliverables = ["reports/capability/verified_today.md"]
+permissions = ["sync_docs", "update_quickstart"]
