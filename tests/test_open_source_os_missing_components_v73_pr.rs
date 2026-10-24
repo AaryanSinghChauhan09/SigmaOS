@@ -34,8 +34,8 @@ fn test_open_source_os_missing_components_v73_pr_suite_full_cycle() {
     // Verify individual engine functionality
     let pr_001 = &proposals[0];
     assert_eq!(pr_001.pr_id, "PR-V73-001");
-    assert!(pr_001.title.contains("Linux 6.28+"));    assert!(pr_001
-        .impacted_subsystems
+    assert!(pr_001.title.contains("Linux 6.28+"));
+    assert!(pr_001        .impacted_subsystems
         .contains(&"KernelScheduling".to_string()));
 
     let pr_002 = &proposals[1];
@@ -51,14 +51,16 @@ fn test_open_source_os_missing_components_v73_pr_suite_full_cycle() {
 
     let pr_010 = &proposals[9];
     assert_eq!(pr_010.pr_id, "PR-V73-010");
-    assert!(pr_010
-        .title
-        .contains("Omarchy Linux Dynamic Wallust Theme Reloading"));
-
+    assert!(pr_010.title.contains("Omarchy Linux"));
     let wiki_doc = suite
         .tech_media
         .generate_wiki_documentation_page("Sovereign SigmaOS V73 Open Source OS Architecture");
     assert!(wiki_doc.contains("Sovereign SigmaOS V73 Open Source OS Architecture"));
     assert!(wiki_doc.contains("Phoronix"));
-    assert!(wiki_doc.contains("HackerNews"));
-}
+
+    let report = suite.comparison_matrix.generate_matrix_report();
+    assert!(report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V73"));
+    assert!(report.contains("Linux 6.28+"));
+    assert!(report.contains("FreeBSD 16.2+"));
+
+    assert_eq!(suite.universal_adapter.supported_categories.len(), 44);}

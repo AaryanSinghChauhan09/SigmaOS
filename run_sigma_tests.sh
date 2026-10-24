@@ -1956,6 +1956,8 @@ if [ -f "src/distro/open_source_os_missing_components_v73_pr.rs" ]; then
     ./build/test_open_source_v73_pr
 
     rustc --test tests/test_open_source_os_missing_components_v73_pr.rs --edition=2021 -o build/test_open_source_v73_pr_integration
+    ./build/test_open_source_v73_pr_integration
+fi
     ./build/test_open_source_v73_pr_integrationfi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
