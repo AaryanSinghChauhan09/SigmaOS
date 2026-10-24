@@ -9,8 +9,6 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
@@ -19,8 +17,6 @@ use alloc::vec;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec::Vec;
 
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::BTreeMap;
 #[cfg(any(feature = "standalone_test", test))]
 use std::format;
 #[cfg(any(feature = "standalone_test", test))]
@@ -437,5 +433,70 @@ impl OpenSourceOsUnimplementedIdeasV71PrSuite {
             self.plan9_plumber.generate_pr_spec(),
             self.redox_cow.generate_pr_spec(),
         ]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_open_source_os_unimplemented_ideas_v71_pr_suite() {
+        let mut suite = OpenSourceOsUnimplementedIdeasV71PrSuite::new();
+
+        // 1. Linux SchedExt
+        suite.linux_schedext.task_queue.push(SchedExtTaskV71 {
+            pid: 101,
+            priority: 10,
+            cpus_allowed: 0b1111,
+        });
+        suite.linux_schedext.task_queue.push(SchedExtTaskV71 {
+            pid: 102,
+            priority: 5,
+            cpus_allowed: 0b1111,
+        });
+        assert_eq!(suite.linux_schedext.schedule_next_task(), Some(101));
+        assert_eq!(suite.linux_schedext.compact_folios(), 64);
+
+        // 2. FreeBSD Capsicum
+        assert!(suite.freebsd_capsicum.check_casper_right("system.dns"));
+        assert!(suite.freebsd_capsicum.handshake_nvme_tls("sess_1234"));
+
+        // 3. OpenBSD Pinsyscall
+        assert!(suite.openbsd_pinsyscall.validate_pinsyscall(0x7fff0500));
+        assert!(suite.openbsd_pinsyscall.check_unveil_access("/usr/bin", 'r'));
+
+        // 4. NetBSD Rump
+        let packet = [0, 0, 0, 0, 100, 1, 2];
+        assert_eq!(suite.netbsd_rump.parse_9p_header(&packet), Some((100, 0x0201)));
+
+        // 5. DragonFly HAMMER3
+        assert!(suite.dragonfly_hammer3.sync_pfs_delta(1, 2));
+        assert!(suite.dragonfly_hammer3.verify_scrub_checksum("SHA256:abcd"));
+
+        // 6. Illumos OpenZFS
+        let encrypted = suite.illumos_openzfs.encrypt_block_aes_gcm(&[1, 2, 3], &[7u8; 32]);
+        assert_eq!(encrypted.len(), 3);
+        assert_eq!(
+            suite.illumos_openzfs.translate_dtrace_to_ebpf("zfs:read"),
+            "bpf_probe_zfs_read"
+        );
+
+        // 7. Haiku BeFS
+        assert!(suite.haiku_befs.query_index("META:type"));
+
+        // 8. Plan 9 Plumber
+        assert_eq!(
+            suite.plan9_plumber.route_plumber_message("https://example.com"),
+            Some("dispatch_browser")
+        );
+
+        // 9. RedoxFS CoW
+        assert!(suite.redox_cow.verify_scheme_capability("file:"));
+
+        // PR Suite collection
+        let specs = suite.collect_all_pr_specs();
+        assert_eq!(specs.len(), 9);
+        assert!(specs.iter().all(|s| s.status == OsPrStatusV71::Validated));
     }
 }
