@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: MIT
 // Integration Test Suite for Sovereign Distro Package Advancements V69 Engine & PR Gateway
 
+// The #[path]-included src files reference `crate::package::universal` in their
+// non-standalone_test branch. Provide that path by re-exporting the compiled lib
+// module (mirrors tests/test_universal_adapter.rs and sigpkg_cli_verification_test.rs).
+mod package {
+    pub use sigmaos::package::universal;
+}
+
 #[path = "../src/package/sovereign_distro_package_advancements_v69.rs"]
 mod sovereign_distro_package_advancements_v69;
 
 #[path = "../src/package/sovereign_distro_package_advancements_v69_pr.rs"]
 mod sovereign_distro_package_advancements_v69_pr;
 
-use sovereign_distro_package_advancements_v69::universal::{PackageFormat, PackageState};
+use package::universal::{PackageFormat, PackageState};
 use sovereign_distro_package_advancements_v69::*;
 use sovereign_distro_package_advancements_v69_pr::SovereignDistroPackagePrGatewayV69;
 
