@@ -2451,6 +2451,13 @@ if [ -f "tests/process/pid_allocator.rs" ]; then
     rustc --test tests/process/namespaces/namespace_test.rs --edition=2021 -o build/test_proc_ns && ./build/test_proc_ns
 fi
 
+if [ -f "tests/process/test_process_synchronization_plan.rs" ]; then
+    echo "Running Process Synchronization Architecture & Contract test suite..."
+    mkdir -p build
+    rustc --test tests/process/test_process_synchronization_plan.rs --edition=2021 -o build/test_process_sync_plan
+    ./build/test_process_sync_plan
+fi
+
 if [ -f "tests/shell.rs" ]; then
     echo "Running Shell Conformance and Lifecycle test suites..."
     mkdir -p build
