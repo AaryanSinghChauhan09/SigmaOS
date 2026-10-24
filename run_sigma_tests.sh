@@ -2368,6 +2368,13 @@ if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
     ./build/omarchy_v60_test
 fi
 
+if [ -f "src/distro/omarchy_linux_missing_components_v70_pr.rs" ]; then
+    echo "Running Omarchy Linux Missing Components Parity PR Gateway V70 test suite..."
+    mkdir -p build
+    rustc --test src/distro/omarchy_linux_missing_components_v70_pr.rs --edition=2021 -o build/omarchy_v70_test
+    ./build/omarchy_v70_test
+fi
+
 if [ -f "src/compatibility/mint_omarchy_complete_gap_closure.rs" ]; then
     echo "Running Sovereign Mint & Omarchy Complete Gap Closure test suite..."
     mkdir -p build
