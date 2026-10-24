@@ -13,8 +13,7 @@
 // 7. OpenBsdSmtpdSpamTrapDkimSignerPrEngine
 // 8. OpenBsdSignifyPqcDilithiumVerifierPrEngine
 // 9. OpenBsdRelaydHttp2StreamSniBalancerPrEngine
-// 10. OpenBsdUnwindDnssecDoHResolverPrEngine
-// 11. OpenBsdMissingComponentsV66PrSuite (Master PR Gateway Suite)
+// 10. OpenBsdUnwindDnssecDoHResolverPrEngine// 11. OpenBsdMissingComponentsV66PrSuite (Master PR Gateway Suite)
 
 extern crate alloc;
 use alloc::format;
@@ -72,13 +71,11 @@ impl OpenBsdPinsyscallSecTrapKernelEnforcerPrEngine {
             instruction_pointer: ip,
             syscall_number: sys_num,
             is_valid,
-            action_taken: String::from(if is_valid { "ALLOW" } else { "SIGABRT_SEC_TRAP" }),
-        }
+            action_taken: String::from(if is_valid { "ALLOW" } else { "SIGABRT_SEC_TRAP" }),        }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} registered pinsyscall ranges, {} total kernel verifications", self.engine_name, self.active_pins.len(), self.total_enforcements)
-    }
+        format!("{}: {} registered pinsyscall ranges, {} total kernel verifications", self.engine_name, self.active_pins.len(), self.total_enforcements)    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -130,20 +127,17 @@ impl OpenBsdUnveilPathMaskKernelIsolationPrEngine {
         if let Some(rule) = self.path_rules.iter().find(|r| path.starts_with(&r.path)) {
             requested_perm.chars().all(|c| rule.permissions.contains(c))
         } else {
-            false
-        }
+            false        }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} unveil path rules (locked: {})", self.engine_name, self.path_rules.len(), self.is_unveil_locked)
-    }
+        format!("{}: {} unveil path rules (locked: {})", self.engine_name, self.path_rules.len(), self.is_unveil_locked)    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct PledgePromiseSpec {
     pub promises: String,
-    pub execpromises: String,
-    pub is_active: bool,
+    pub execpromises: String,    pub is_active: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -192,8 +186,7 @@ impl OpenBsdPledgeSyscallCategorySandboxPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: active: {}, violations logged: {}", self.engine_name, self.active_pledge.is_some(), self.violations_count)
-    }
+        format!("{}: active: {}, violations logged: {}", self.engine_name, self.active_pledge.is_some(), self.violations_count)    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -240,8 +233,7 @@ impl OpenBsdSoftraidKryptexMasterKeyringPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} registered softraid kryptex volumes", self.engine_name, self.volumes.len())
-    }
+        format!("{}: {} registered softraid kryptex volumes", self.engine_name, self.volumes.len())    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -284,8 +276,7 @@ impl OpenBsdPfStatefulSynProxyMultiQueuePrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} multi-queue rules active, {} packets routed", self.engine_name, self.rules.len(), self.processed_packets)
-    }
+        format!("{}: {} multi-queue rules active, {} packets routed", self.engine_name, self.rules.len(), self.processed_packets)    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -494,8 +485,7 @@ impl OpenBsdUnwindDnssecDoHResolverPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} DoH upstream resolvers active", self.engine_name, self.upstream_doh_servers.len())
-    }
+        format!("{}: {} DoH upstream resolvers active", self.engine_name, self.upstream_doh_servers.len())    }
 }
 
 #[derive(Debug, Clone)]
@@ -510,8 +500,7 @@ pub struct OpenBsdMissingComponentsV66PrSuite {
     pub smtpd_engine: OpenBsdSmtpdSpamTrapDkimSignerPrEngine,
     pub signify_engine: OpenBsdSignifyPqcDilithiumVerifierPrEngine,
     pub relayd_engine: OpenBsdRelaydHttp2StreamSniBalancerPrEngine,
-    pub unwind_engine: OpenBsdUnwindDnssecDoHResolverPrEngine,
-}
+    pub unwind_engine: OpenBsdUnwindDnssecDoHResolverPrEngine,}
 
 impl OpenBsdMissingComponentsV66PrSuite {
     pub fn new() -> Self {
@@ -526,8 +515,7 @@ impl OpenBsdMissingComponentsV66PrSuite {
             smtpd_engine: OpenBsdSmtpdSpamTrapDkimSignerPrEngine::new(),
             signify_engine: OpenBsdSignifyPqcDilithiumVerifierPrEngine::new(),
             relayd_engine: OpenBsdRelaydHttp2StreamSniBalancerPrEngine::new(),
-            unwind_engine: OpenBsdUnwindDnssecDoHResolverPrEngine::new(),
-        }
+            unwind_engine: OpenBsdUnwindDnssecDoHResolverPrEngine::new(),        }
     }
 
     pub fn run_all_checks(&mut self) -> Vec<String> {
@@ -541,8 +529,7 @@ impl OpenBsdMissingComponentsV66PrSuite {
         reports.push(self.smtpd_engine.get_summary());
         reports.push(self.signify_engine.get_summary());
         reports.push(self.relayd_engine.get_summary());
-        reports.push(self.unwind_engine.get_summary());
-        reports
+        reports.push(self.unwind_engine.get_summary());        reports
     }
 }
 
@@ -670,8 +657,7 @@ mod tests {
     }
 
     #[test]
-    fn test_openbsd_v66_master_suite() {
-        let mut suite = OpenBsdMissingComponentsV66PrSuite::new();
+    fn test_openbsd_v66_master_suite() {        let mut suite = OpenBsdMissingComponentsV66PrSuite::new();
         let reports = suite.run_all_checks();
         assert_eq!(reports.len(), 10);
     }
