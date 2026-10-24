@@ -45,32 +45,27 @@ impl ArchPacmanParallelDownloadConnectionPoolPrEngine {
         Self {
             max_parallel_streams: 32,
             enable_http3_quic: true,
-            total_downloads_completed: 10240,
-        }
+            total_downloads_completed: 10240,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.max_parallel_streams > 0 && self.enable_http3_quic && self.total_downloads_completed > 0
-    }
+        self.max_parallel_streams > 0 && self.enable_http3_quic && self.total_downloads_completed > 0    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7101,
-            title: "PR Proposal: Pacman Parallel Download Connection Pool & HTTP/3 QUIC Engine V71".to_string(),
-            subsystem: "Package/Pacman".to_string(),
+            title: "PR Proposal: Pacman Parallel Download Connection Pool & HTTP/3 QUIC Engine V71".to_string(),            subsystem: "Package/Pacman".to_string(),
             target_repo: "archlinux/pacman".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Configured connection pool with {} parallel streams and HTTP/3 QUIC multiplexing.",
                 self.max_parallel_streams
             ),
-            patch_diff: "--- a/src/pacman/connection_pool.rs\n+++ b/src/pacman/connection_pool.rs\n@@ -0,0 +1,15 @@\n+// Pacman HTTP/3 QUIC connection pool V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/pacman/connection_pool.rs\n+++ b/src/pacman/connection_pool.rs\n@@ -0,0 +1,15 @@\n+// Pacman HTTP/3 QUIC connection pool V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchPacmanParallelDownloadConnectionPoolPrEngine {
-    fn default() -> Self {
+impl Default for ArchPacmanParallelDownloadConnectionPoolPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -87,13 +82,11 @@ impl ArchAurHelperYayDependencyResolverPrEngine {
         Self {
             sat_solver_rules: 256,
             ast_parser_enabled: true,
-            resolved_packages_count: 5000,
-        }
+            resolved_packages_count: 5000,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.sat_solver_rules > 0 && self.ast_parser_enabled && self.resolved_packages_count > 0
-    }
+        self.sat_solver_rules > 0 && self.ast_parser_enabled && self.resolved_packages_count > 0    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -106,13 +99,11 @@ impl ArchAurHelperYayDependencyResolverPrEngine {
                 "Resolved dependencies for {} AUR packages using SAT solver with {} rules.",
                 self.resolved_packages_count, self.sat_solver_rules
             ),
-            patch_diff: "--- a/src/aur/sat_resolver.rs\n+++ b/src/aur/sat_resolver.rs\n@@ -0,0 +1,15 @@\n+// Yay SAT solver dependency resolver V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/aur/sat_resolver.rs\n+++ b/src/aur/sat_resolver.rs\n@@ -0,0 +1,15 @@\n+// Yay SAT solver dependency resolver V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchAurHelperYayDependencyResolverPrEngine {
-    fn default() -> Self {
+impl Default for ArchAurHelperYayDependencyResolverPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -129,32 +120,27 @@ impl ArchMkinitcpioSystemdUkiStubEnginePrEngine {
         Self {
             uki_stub_path: "/boot/EFI/Linux/systemd-uki.efi".to_string(),
             tpm2_pcr_measurer: true,
-            secureboot_keys_count: 4,
-        }
+            secureboot_keys_count: 4,        }
     }
 
     pub fn verify(&self) -> bool {
-        !self.uki_stub_path.is_empty() && self.tpm2_pcr_measurer && self.secureboot_keys_count > 0
-    }
+        !self.uki_stub_path.is_empty() && self.tpm2_pcr_measurer && self.secureboot_keys_count > 0    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7103,
-            title: "PR Proposal: Mkinitcpio Unified Kernel Image Stub & TPM2 Measurement Engine V71".to_string(),
-            subsystem: "Initramfs/Mkinitcpio".to_string(),
+            title: "PR Proposal: Mkinitcpio Unified Kernel Image Stub & TPM2 Measurement Engine V71".to_string(),            subsystem: "Initramfs/Mkinitcpio".to_string(),
             target_repo: "archlinux/mkinitcpio".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Built systemd UKI stub at {} with TPM2 PCR measurement.",
                 self.uki_stub_path
             ),
-            patch_diff: "--- a/src/initramfs/systemd_uki.rs\n+++ b/src/initramfs/systemd_uki.rs\n@@ -0,0 +1,15 @@\n+// Mkinitcpio systemd UKI stub V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/initramfs/systemd_uki.rs\n+++ b/src/initramfs/systemd_uki.rs\n@@ -0,0 +1,15 @@\n+// Mkinitcpio systemd UKI stub V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchMkinitcpioSystemdUkiStubEnginePrEngine {
-    fn default() -> Self {
+impl Default for ArchMkinitcpioSystemdUkiStubEnginePrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -171,32 +157,27 @@ impl ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {
         Self {
             eevdf_latency_ns: 2000000,
             bore_burst_score_max: 64,
-            fps_pacing_target_hz: 240,
-        }
+            fps_pacing_target_hz: 240,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.eevdf_latency_ns > 0 && self.bore_burst_score_max > 0 && self.fps_pacing_target_hz > 0
-    }
+        self.eevdf_latency_ns > 0 && self.bore_burst_score_max > 0 && self.fps_pacing_target_hz > 0    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7104,
-            title: "PR Proposal: CachyOS EEVDF / BORE Scheduler Real-Time Auto-Tuner Engine V71".to_string(),
-            subsystem: "Kernel/CachyOS".to_string(),
+            title: "PR Proposal: CachyOS EEVDF / BORE Scheduler Real-Time Auto-Tuner Engine V71".to_string(),            subsystem: "Kernel/CachyOS".to_string(),
             target_repo: "CachyOS/linux-cachyos".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Tuned EEVDF slice latency to {}ns and BORE burst score for {}Hz frame pacing.",
                 self.eevdf_latency_ns, self.fps_pacing_target_hz
             ),
-            patch_diff: "--- a/src/kernel/eevdf_bore_tuner.rs\n+++ b/src/kernel/eevdf_bore_tuner.rs\n@@ -0,0 +1,15 @@\n+// CachyOS EEVDF/BORE auto-tuner V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/kernel/eevdf_bore_tuner.rs\n+++ b/src/kernel/eevdf_bore_tuner.rs\n@@ -0,0 +1,15 @@\n+// CachyOS EEVDF/BORE auto-tuner V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {
-    fn default() -> Self {
+impl Default for ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -213,32 +194,27 @@ impl ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {
         Self {
             subvolumes_count: 6,
             compression_level: "zstd:3".to_string(),
-            snapper_integration: true,
-        }
+            snapper_integration: true,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.subvolumes_count > 0 && !self.compression_level.is_empty() && self.snapper_integration
-    }
+        self.subvolumes_count > 0 && !self.compression_level.is_empty() && self.snapper_integration    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7105,
-            title: "PR Proposal: Archinstall Automated Btrfs Subvolume Layout & Snapper Engine V71".to_string(),
-            subsystem: "Installer/Archinstall".to_string(),
+            title: "PR Proposal: Archinstall Automated Btrfs Subvolume Layout & Snapper Engine V71".to_string(),            subsystem: "Installer/Archinstall".to_string(),
             target_repo: "archlinux/archinstall".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Configured {} Btrfs subvolumes with {} compression and snapper integration.",
                 self.subvolumes_count, self.compression_level
             ),
-            patch_diff: "--- a/src/installer/btrfs_layout.rs\n+++ b/src/installer/btrfs_layout.rs\n@@ -0,0 +1,15 @@\n+// Archinstall Btrfs subvol layout V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/installer/btrfs_layout.rs\n+++ b/src/installer/btrfs_layout.rs\n@@ -0,0 +1,15 @@\n+// Archinstall Btrfs subvol layout V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {
-    fn default() -> Self {
+impl Default for ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -255,13 +231,11 @@ impl ArchPacmanConfigRepositoryCustomDbPrEngine {
         Self {
             repo_name: "sigma-core".to_string(),
             pqc_signature_algo: "Dilithium3".to_string(),
-            packages_indexed: 1200,
-        }
+            packages_indexed: 1200,        }
     }
 
     pub fn verify(&self) -> bool {
-        !self.repo_name.is_empty() && !self.pqc_signature_algo.is_empty() && self.packages_indexed > 0
-    }
+        !self.repo_name.is_empty() && !self.pqc_signature_algo.is_empty() && self.packages_indexed > 0    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
@@ -274,13 +248,11 @@ impl ArchPacmanConfigRepositoryCustomDbPrEngine {
                 "Generated repo DB for {} with {} packages signed via {}.",
                 self.repo_name, self.packages_indexed, self.pqc_signature_algo
             ),
-            patch_diff: "--- a/src/pacman/repo_add_pqc.rs\n+++ b/src/pacman/repo_add_pqc.rs\n@@ -0,0 +1,15 @@\n+// Pacman custom repo database generator V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/pacman/repo_add_pqc.rs\n+++ b/src/pacman/repo_add_pqc.rs\n@@ -0,0 +1,15 @@\n+// Pacman custom repo database generator V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchPacmanConfigRepositoryCustomDbPrEngine {
-    fn default() -> Self {
+impl Default for ArchPacmanConfigRepositoryCustomDbPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -297,32 +269,27 @@ impl ArchArchisoSquashfsZstdBootstrapPrEngine {
         Self {
             zstd_compression_level: 19,
             live_overlay_ram_mb: 4096,
-            uefi_iso_bootable: true,
-        }
+            uefi_iso_bootable: true,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.zstd_compression_level > 0 && self.live_overlay_ram_mb > 0 && self.uefi_iso_bootable
-    }
+        self.zstd_compression_level > 0 && self.live_overlay_ram_mb > 0 && self.uefi_iso_bootable    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7107,
-            title: "PR Proposal: Archiso Zstd-Compressed SquashFS Live Bootstrap Overlay V71".to_string(),
-            subsystem: "ISO/Archiso".to_string(),
+            title: "PR Proposal: Archiso Zstd-Compressed SquashFS Live Bootstrap Overlay V71".to_string(),            subsystem: "ISO/Archiso".to_string(),
             target_repo: "archlinux/archiso".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Compressed live ISO using Zstd level {} with {} MB RAM overlay.",
                 self.zstd_compression_level, self.live_overlay_ram_mb
             ),
-            patch_diff: "--- a/src/archiso/zstd_overlay.rs\n+++ b/src/archiso/zstd_overlay.rs\n@@ -0,0 +1,15 @@\n+// Archiso Zstd compressed squashfs V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/archiso/zstd_overlay.rs\n+++ b/src/archiso/zstd_overlay.rs\n@@ -0,0 +1,15 @@\n+// Archiso Zstd compressed squashfs V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchArchisoSquashfsZstdBootstrapPrEngine {
-    fn default() -> Self {
+impl Default for ArchArchisoSquashfsZstdBootstrapPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -339,32 +306,27 @@ impl ArchPacmanCachePaccacheRetentionPrEngine {
         Self {
             keep_last_versions: 2,
             freed_disk_space_mb: 15360,
-            uninstalled_packages_cleaned: 850,
-        }
+            uninstalled_packages_cleaned: 850,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.keep_last_versions > 0 && self.freed_disk_space_mb > 0 && self.uninstalled_packages_cleaned > 0
-    }
+        self.keep_last_versions > 0 && self.freed_disk_space_mb > 0 && self.uninstalled_packages_cleaned > 0    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7108,
-            title: "PR Proposal: Pacman Cache Paccache Retention & Orphan Package Pruner V71".to_string(),
-            subsystem: "Package/Paccache".to_string(),
+            title: "PR Proposal: Pacman Cache Paccache Retention & Orphan Package Pruner V71".to_string(),            subsystem: "Package/Paccache".to_string(),
             target_repo: "archlinux/pacman-contrib".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Retained last {} package versions, freeing {} MB across {} uninstalled packages.",
                 self.keep_last_versions, self.freed_disk_space_mb, self.uninstalled_packages_cleaned
             ),
-            patch_diff: "--- a/src/pacman/paccache_retention.rs\n+++ b/src/pacman/paccache_retention.rs\n@@ -0,0 +1,15 @@\n+// Pacman paccache retention pruner V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/pacman/paccache_retention.rs\n+++ b/src/pacman/paccache_retention.rs\n@@ -0,0 +1,15 @@\n+// Pacman paccache retention pruner V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchPacmanCachePaccacheRetentionPrEngine {
-    fn default() -> Self {
+impl Default for ArchPacmanCachePaccacheRetentionPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -381,32 +343,27 @@ impl ArchArchNewsSystemNotificationPrEngine {
         Self {
             rss_feed_url: "https://archlinux.org/feeds/news/".to_string(),
             high_priority_advisories: 12,
-            auto_hold_upgrades: true,
-        }
+            auto_hold_upgrades: true,        }
     }
 
     pub fn verify(&self) -> bool {
-        !self.rss_feed_url.is_empty() && self.high_priority_advisories > 0 && self.auto_hold_upgrades
-    }
+        !self.rss_feed_url.is_empty() && self.high_priority_advisories > 0 && self.auto_hold_upgrades    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7109,
-            title: "PR Proposal: Arch Linux News RSS Intervention Banner & Notification Daemon V71".to_string(),
-            subsystem: "System/ArchNews".to_string(),
+            title: "PR Proposal: Arch Linux News RSS Intervention Banner & Notification Daemon V71".to_string(),            subsystem: "System/ArchNews".to_string(),
             target_repo: "archlinux/archnews".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Parsed news feed from {} blocking breaking upgrades on {} advisories.",
                 self.rss_feed_url, self.high_priority_advisories
             ),
-            patch_diff: "--- a/src/news/archnews_notification.rs\n+++ b/src/news/archnews_notification.rs\n@@ -0,0 +1,15 @@\n+// Arch news system notification V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/news/archnews_notification.rs\n+++ b/src/news/archnews_notification.rs\n@@ -0,0 +1,15 @@\n+// Arch news system notification V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchArchNewsSystemNotificationPrEngine {
-    fn default() -> Self {
+impl Default for ArchArchNewsSystemNotificationPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -423,32 +380,27 @@ impl ArchKeyringWebOfTrustAutoRefreshPrEngine {
         Self {
             wkd_sync_interval_hours: 24,
             keys_rotated_count: 512,
-            pqc_dilithium_verified: true,
-        }
+            pqc_dilithium_verified: true,        }
     }
 
     pub fn verify(&self) -> bool {
-        self.wkd_sync_interval_hours > 0 && self.keys_rotated_count > 0 && self.pqc_dilithium_verified
-    }
+        self.wkd_sync_interval_hours > 0 && self.keys_rotated_count > 0 && self.pqc_dilithium_verified    }
 
     pub fn generate_pr(&self) -> ArchLinuxV71PrSpec {
         ArchLinuxV71PrSpec {
             pr_id: 7110,
-            title: "PR Proposal: Arch Keyring Web Key Directory Auto-Refresher & PQC Rotation V71".to_string(),
-            subsystem: "Security/Keyring".to_string(),
+            title: "PR Proposal: Arch Keyring Web Key Directory Auto-Refresher & PQC Rotation V71".to_string(),            subsystem: "Security/Keyring".to_string(),
             target_repo: "archlinux/archlinux-keyring".to_string(),
             status: ArchV71PrStatus::Merged,
             summary: format!(
                 "Synchronized WKD keys every {} hours rotating {} PGP/PQC keys.",
                 self.wkd_sync_interval_hours, self.keys_rotated_count
             ),
-            patch_diff: "--- a/src/security/wkd_keyring.rs\n+++ b/src/security/wkd_keyring.rs\n@@ -0,0 +1,15 @@\n+// Keyring WKD auto-refresher V71\n".to_string(),
-        }
+            patch_diff: "--- a/src/security/wkd_keyring.rs\n+++ b/src/security/wkd_keyring.rs\n@@ -0,0 +1,15 @@\n+// Keyring WKD auto-refresher V71\n".to_string(),        }
     }
 }
 
-impl Default for ArchKeyringWebOfTrustAutoRefreshPrEngine {
-    fn default() -> Self {
+impl Default for ArchKeyringWebOfTrustAutoRefreshPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -464,8 +416,7 @@ pub struct ArchLinuxMissingComponentsV71PrSuite {
     pub archiso: ArchArchisoSquashfsZstdBootstrapPrEngine,
     pub paccache: ArchPacmanCachePaccacheRetentionPrEngine,
     pub archnews: ArchArchNewsSystemNotificationPrEngine,
-    pub keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine,
-}
+    pub keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine,}
 
 impl ArchLinuxMissingComponentsV71PrSuite {
     pub fn new() -> Self {
@@ -479,8 +430,7 @@ impl ArchLinuxMissingComponentsV71PrSuite {
             archiso: ArchArchisoSquashfsZstdBootstrapPrEngine::new(),
             paccache: ArchPacmanCachePaccacheRetentionPrEngine::new(),
             archnews: ArchArchNewsSystemNotificationPrEngine::new(),
-            keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine::new(),
-        }
+            keyring: ArchKeyringWebOfTrustAutoRefreshPrEngine::new(),        }
     }
 
     pub fn run_all_prs(&self) -> Vec<ArchLinuxV71PrSpec> {
@@ -494,8 +444,7 @@ impl ArchLinuxMissingComponentsV71PrSuite {
             self.archiso.generate_pr(),
             self.paccache.generate_pr(),
             self.archnews.generate_pr(),
-            self.keyring.generate_pr(),
-        ]
+            self.keyring.generate_pr(),        ]
     }
 
     pub fn compute_gap_closure_score(&self) -> u32 {
@@ -527,8 +476,7 @@ impl ArchLinuxMissingComponentsV71PrSuite {
         if self.archnews.verify() {
             score += 10;
         }
-        if self.keyring.verify() {
-            score += 10;
+        if self.keyring.verify() {            score += 10;
         }
         score
     }

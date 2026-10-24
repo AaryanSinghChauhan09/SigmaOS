@@ -3,7 +3,6 @@
 
 #[path = "../src/distro/open_source_os_unimplemented_ideas_v71_pr.rs"]
 mod open_source_os_unimplemented_ideas_v71_pr;
-
 #[path = "../src/distro/arch_linux_missing_components_v71_pr.rs"]
 mod arch_linux_missing_components_v71_pr;
 
@@ -66,8 +65,7 @@ fn test_arch_linux_missing_components_v71_suite() {
     let suite = ArchLinuxMissingComponentsV71PrSuite::new();
     let prs = suite.run_all_prs();
 
-    assert_eq!(prs.len(), 10, "Expected 10 Arch Linux V71 PR specs");
-    assert_eq!(
+    assert_eq!(prs.len(), 10, "Expected 10 Arch Linux V71 PR specs");    assert_eq!(
         suite.compute_gap_closure_score(),
         100,
         "Gap closure score must be 100"
@@ -79,8 +77,7 @@ fn test_arch_linux_missing_components_v71_suite() {
         "archlinux/mkinitcpio",
         "CachyOS/linux-cachyos",
         "archlinux/archinstall",
-        "archlinux/pacman",
-        "archlinux/archiso",
+        "archlinux/pacman",        "archlinux/archiso",
         "archlinux/pacman-contrib",
         "archlinux/archnews",
         "archlinux/archlinux-keyring",
@@ -128,5 +125,4 @@ fn test_arch_linux_missing_components_v71_suite() {
     assert!(archnews.verify());
 
     let keyring = ArchKeyringWebOfTrustAutoRefreshPrEngine::new();
-    assert!(keyring.verify());
-}
+    assert!(keyring.verify());}
