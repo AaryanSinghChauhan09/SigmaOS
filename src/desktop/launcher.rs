@@ -521,17 +521,8 @@ impl CommandPalette {
             .apps
             .iter()
             .filter_map(|e| {
-                if contains_ignore_case(&e.name, &q) {
-                    let pos = e
-                        .name
-                        .as_bytes()
-                        .windows(q.len())
-                        .position(|w| {
-                            w.iter()
-                                .zip(q.as_bytes())
-                                .all(|(&b1, &b2)| b1.to_ascii_lowercase() == b2)
-                        })
-                        .unwrap_or(usize::MAX);
+                // Performance: zero-allocation position search replaces manual byte iteration loop
+                if let Some(pos) = position_ignore_case(&e.name, &q) {
                     Some((e, pos))
                 } else if e.keywords.iter().any(|k| contains_ignore_case(k, &q)) {
                     Some((e, 1000))
@@ -600,20 +591,27 @@ impl CommandPalette {
     }
 }
 
-/// Perform zero-allocation ASCII case-insensitive substring search.
+/// Perform zero-allocation ASCII case-insensitive substring position search.
 /// `needle_lower` is expected to be lowercased by the caller.
 #[inline]
-pub fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+pub fn position_ignore_case(haystack: &str, needle_lower: &str) -> Option<usize> {
     if needle_lower.is_empty() {
-        return true;
+        return Some(0);
     }
     if needle_lower.len() > haystack.len() {
-        return false;
+        return None;
     }
     haystack
         .as_bytes()
         .windows(needle_lower.len())
-        .any(|window| window.eq_ignore_ascii_case(needle_lower.as_bytes()))
+        .position(|window| window.eq_ignore_ascii_case(needle_lower.as_bytes()))
+}
+
+/// Perform zero-allocation ASCII case-insensitive substring search.
+/// `needle_lower` is expected to be lowercased by the caller.
+#[inline]
+pub fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+    position_ignore_case(haystack, needle_lower).is_some()
 }
 
 /// Perform zero-allocation ASCII case-insensitive prefix match.
@@ -860,6 +858,13 @@ mod tests {
 
     #[test]
     fn test_zero_allocation_case_insensitive_matching() {
+        assert_eq!(position_ignore_case("Firefox Web Browser", "firefox"), Some(0));
+        assert_eq!(position_ignore_case("SigmaOS Terminal", "term"), Some(8));
+        assert_eq!(position_ignore_case("SigmaOS Terminal", "TERMINAL"), Some(8));
+        assert_eq!(position_ignore_case("SigmaOS", "nonexistent"), None);
+        assert_eq!(position_ignore_case("SigmaOS", ""), Some(0));
+        assert_eq!(position_ignore_case("Short", "VeryLongNeedle"), None);
+
         assert!(contains_ignore_case("Firefox Web Browser", "firefox"));
         assert!(contains_ignore_case("SigmaOS Terminal", "term"));
         assert!(!contains_ignore_case("SigmaOS", "nonexistent"));
