@@ -176,6 +176,7 @@ pub mod thread;
 pub mod virtualization;
 pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v72_pr::*;
+pub use desktop::sovereign_desktop_toolkits_and_services_v73_pr::*;
 pub use desktop::{
     CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
     KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,
