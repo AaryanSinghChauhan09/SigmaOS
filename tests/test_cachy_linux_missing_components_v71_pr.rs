@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Integration Test Suite for CachyOS Missing Components V71 PR Engine
 // (`tests/test_cachy_linux_missing_components_v71_pr.rs`)
-
 #[path = "../src/distro/cachy_linux_missing_components_v71_pr.rs"]
 mod cachy_linux_missing_components_v71_pr;
 
@@ -61,5 +60,4 @@ fn test_cachy_linux_v71_pr_suite_full_cycle() {
 
     let mut handheld = CachyOsHandheldPowerCapThermalV5GovernorEngine::new();
     let tdp_res = handheld.set_tdp_cap(25);
-    assert!(tdp_res.contains("25 Watts"));
-}
+    assert!(tdp_res.contains("25 Watts"));}

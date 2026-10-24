@@ -9,8 +9,7 @@
 //! 2. `cachyos-kernel-autobolt-pgo-v5-pipeline`: LLVM BOLT v5 + PGO + ThinLTO tri-stage kernel binary optimization pipeline
 //! 3. `cachyos-chwd-vulkan-wayland-direct-scanout-v5`: CHWD Wayland explicit sync v5 primary & overlay KMS direct scanout manager
 //! 4. `cachyos-pacman-v5-pqc-dilithium-verifier`: Pacman x86-64-v4 AVX-512 PQC ML-DSA-87/Dilithium5 package verifier v5
-//! 5. `cachyos-proton-wine-ntsync-fsync5-governor`: Proton Wine NTSync & futex_waitv Fsync5 event synchronization governor
-//! 6. `cachyos-ananicy-realtime-ebpf-v5-governor`: Ananicy-cpp real-time eBPF v5 cgroups v2 process classification governor
+//! 5. `cachyos-proton-wine-ntsync-fsync5-governor`: Proton Wine NTSync & futex_waitv Fsync5 event synchronization governor//! 6. `cachyos-ananicy-realtime-ebpf-v5-governor`: Ananicy-cpp real-time eBPF v5 cgroups v2 process classification governor
 //! 7. `cachyos-btrfs-zstd-ebpf-compressor-v5-tuner`: Btrfs eBPF-guided adaptive ZSTD compression ratio & IOPS tuner v5
 //! 8. `cachyos-gamescope-hdr10-vrr-passthrough-pacer-v5`: Gamescope HDR10/VRR Vulkan WSI sub-millisecond frame presentation pacer v5
 //! 9. `cachyos-zram-lz4-zstd-dynamic-pool-v5`: ZRAM dual-tier LZ4/ZSTD dynamic memory allocation pool & page reclaimer v5
@@ -40,7 +39,6 @@ use std::format;
 use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
-
 /// Status of a CachyOS PR Engine operation
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CachyOsPrStatusV71 {
@@ -85,8 +83,7 @@ impl CachyOsScxCentralLavdV5SchedulerPrEngine {
         self.core_parking_mitigated = true;
         format!(
             "scx_central_lavd_v5: Thread {} pinned to CPU core {} with zero-latency LLC cache affinity",
-            thread_id, cpu_core
-        )
+            thread_id, cpu_core        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
@@ -97,8 +94,7 @@ impl CachyOsScxCentralLavdV5SchedulerPrEngine {
             status: CachyOsPrStatusV71::Proposed,
             patch_description: "SCX_CENTRAL LAVD v5 eBPF scheduler optimizing NUMA topology and L3 cache access.".to_string(),
             diff_summary: "diff --git a/kernel/sched/scx_lavd.c b/kernel/sched/scx_lavd.c".to_string(),
-        }
-    }
+        }    }
 }
 
 impl Default for CachyOsScxCentralLavdV5SchedulerPrEngine {
@@ -127,8 +123,7 @@ impl CachyOsKernelAutoBoltPgoV5PipelinePrEngine {
 
     pub fn optimize_kernel_binary(&mut self) -> bool {
         self.pgo_profiles_processed += 1;
-        true
-    }
+        true    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -142,8 +137,7 @@ impl CachyOsKernelAutoBoltPgoV5PipelinePrEngine {
     }
 }
 
-impl Default for CachyOsKernelAutoBoltPgoV5PipelinePrEngine {
-    fn default() -> Self {
+impl Default for CachyOsKernelAutoBoltPgoV5PipelinePrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -168,8 +162,7 @@ impl CachyOsChwdVulkanWaylandDirectScanoutV5Engine {
 
     pub fn bypass_compositor(&mut self, surface_id: u32) -> String {
         self.direct_scanout_active = true;
-        format!("CHWD v5: Direct KMS scanout active for Wayland surface {}", surface_id)
-    }
+        format!("CHWD v5: Direct KMS scanout active for Wayland surface {}", surface_id)    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -183,8 +176,7 @@ impl CachyOsChwdVulkanWaylandDirectScanoutV5Engine {
     }
 }
 
-impl Default for CachyOsChwdVulkanWaylandDirectScanoutV5Engine {
-    fn default() -> Self {
+impl Default for CachyOsChwdVulkanWaylandDirectScanoutV5Engine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -208,8 +200,7 @@ impl CachyOsPacmanV5PqcDilithiumVerifierEngine {
     }
 
     pub fn verify_package_signature(&self, pkg_name: &str) -> bool {
-        pkg_name.ends_with(".pkg.tar.zst")
-    }
+        pkg_name.ends_with(".pkg.tar.zst")    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -224,8 +215,7 @@ impl CachyOsPacmanV5PqcDilithiumVerifierEngine {
 }
 
 impl Default for CachyOsPacmanV5PqcDilithiumVerifierEngine {
-    fn default() -> Self {
-        Self::new()
+    fn default() -> Self {        Self::new()
     }
 }
 
@@ -248,8 +238,7 @@ impl CachyOsProtonWineNtsyncFsync5GovernorEngine {
     }
 
     pub fn synchronize_win32_handles(&mut self, count: u32) -> String {
-        format!("Fsync5/NTSync v5: Synchronized {} Win32 primitive handles in kernelspace", count)
-    }
+        format!("Fsync5/NTSync v5: Synchronized {} Win32 primitive handles in kernelspace", count)    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -263,8 +252,7 @@ impl CachyOsProtonWineNtsyncFsync5GovernorEngine {
     }
 }
 
-impl Default for CachyOsProtonWineNtsyncFsync5GovernorEngine {
-    fn default() -> Self {
+impl Default for CachyOsProtonWineNtsyncFsync5GovernorEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -289,8 +277,7 @@ impl CachyOsAnanicyRealtimeEbpfV5GovernorEngine {
 
     pub fn classify_process(&mut self, comm: &str, pid: u32) -> String {
         self.cgroups_v2_classified += 1;
-        format!("Ananicy-cpp v5: Process {} (PID {}) granted real-time SCHED_RR priority", comm, pid)
-    }
+        format!("Ananicy-cpp v5: Process {} (PID {}) granted real-time SCHED_RR priority", comm, pid)    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -304,8 +291,7 @@ impl CachyOsAnanicyRealtimeEbpfV5GovernorEngine {
     }
 }
 
-impl Default for CachyOsAnanicyRealtimeEbpfV5GovernorEngine {
-    fn default() -> Self {
+impl Default for CachyOsAnanicyRealtimeEbpfV5GovernorEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -334,8 +320,7 @@ impl CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
         } else {
             self.zstd_compression_level = 3;
         }
-        self.zstd_compression_level
-    }
+        self.zstd_compression_level    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -349,8 +334,7 @@ impl CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
     }
 }
 
-impl Default for CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
-    fn default() -> Self {
+impl Default for CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -376,8 +360,7 @@ impl CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine {
     pub fn pace_frame(&self, frame_id: u64, target_fps: u32) -> String {
         format!(
             "Gamescope v5: Frame {} presented at {} Hz with HDR10 passthrough and VRR sync",
-            frame_id, target_fps
-        )
+            frame_id, target_fps        )
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
@@ -392,8 +375,7 @@ impl CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine {
     }
 }
 
-impl Default for CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine {
-    fn default() -> Self {
+impl Default for CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -417,8 +399,7 @@ impl CachyOsZramLz4ZstdDynamicPoolV5Engine {
     }
 
     pub fn allocate_compressed_page(&mut self, size: usize) -> bool {
-        size < 4096
-    }
+        size < 4096    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -432,8 +413,7 @@ impl CachyOsZramLz4ZstdDynamicPoolV5Engine {
     }
 }
 
-impl Default for CachyOsZramLz4ZstdDynamicPoolV5Engine {
-    fn default() -> Self {
+impl Default for CachyOsZramLz4ZstdDynamicPoolV5Engine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -458,8 +438,7 @@ impl CachyOsHandheldPowerCapThermalV5GovernorEngine {
 
     pub fn set_tdp_cap(&mut self, watts: u32) -> String {
         self.tdp_watts = watts;
-        format!("Handheld Governor v5: Hardware TDP capped at {} Watts with active thermal throttle", watts)
-    }
+        format!("Handheld Governor v5: Hardware TDP capped at {} Watts with active thermal throttle", watts)    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -473,15 +452,13 @@ impl CachyOsHandheldPowerCapThermalV5GovernorEngine {
     }
 }
 
-impl Default for CachyOsHandheldPowerCapThermalV5GovernorEngine {
-    fn default() -> Self {
+impl Default for CachyOsHandheldPowerCapThermalV5GovernorEngine {    fn default() -> Self {
         Self::new()
     }
 }
 
 // ----------------------------------------------------------------------------
-// Master Suite: CachyLinuxMissingComponentsV71PrSuite
-// ----------------------------------------------------------------------------
+// Master Suite: CachyLinuxMissingComponentsV71PrSuite// ----------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
 pub struct CachyLinuxMissingComponentsV71PrSuite {
@@ -494,8 +471,7 @@ pub struct CachyLinuxMissingComponentsV71PrSuite {
     pub btrfs_tuner: CachyOsBtrfsZstdEbpfCompressorV5TunerEngine,
     pub gamescope_pacer: CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine,
     pub zram_pool: CachyOsZramLz4ZstdDynamicPoolV5Engine,
-    pub handheld_governor: CachyOsHandheldPowerCapThermalV5GovernorEngine,
-}
+    pub handheld_governor: CachyOsHandheldPowerCapThermalV5GovernorEngine,}
 
 impl CachyLinuxMissingComponentsV71PrSuite {
     pub fn new() -> Self {
@@ -509,8 +485,7 @@ impl CachyLinuxMissingComponentsV71PrSuite {
             btrfs_tuner: CachyOsBtrfsZstdEbpfCompressorV5TunerEngine::new(),
             gamescope_pacer: CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine::new(),
             zram_pool: CachyOsZramLz4ZstdDynamicPoolV5Engine::new(),
-            handheld_governor: CachyOsHandheldPowerCapThermalV5GovernorEngine::new(),
-        }
+            handheld_governor: CachyOsHandheldPowerCapThermalV5GovernorEngine::new(),        }
     }
 
     pub fn collect_all_manifests(&self) -> Vec<CachyOsPrManifestV71> {
@@ -524,8 +499,7 @@ impl CachyLinuxMissingComponentsV71PrSuite {
             self.btrfs_tuner.generate_manifest(),
             self.gamescope_pacer.generate_manifest(),
             self.zram_pool.generate_manifest(),
-            self.handheld_governor.generate_manifest(),
-        ]
+            self.handheld_governor.generate_manifest(),        ]
     }
 
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
@@ -534,8 +508,7 @@ impl CachyLinuxMissingComponentsV71PrSuite {
         summary.insert("total_components".to_string(), "10".to_string());
         summary.insert("release_parity".to_string(), "v71.0".to_string());
         summary.insert("gaming_optimizations".to_string(), "Active".to_string());
-        summary
-    }
+        summary    }
 }
 
 impl Default for CachyLinuxMissingComponentsV71PrSuite {
@@ -543,3 +516,43 @@ impl Default for CachyLinuxMissingComponentsV71PrSuite {
         Self::new()
     }
 }
+<<<<<<< HEAD
+=======
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_cachy_v71_suite_initialization() {
+        let suite = CachyLinuxMissingComponentsV71PrSuite::new();
+        let manifests = suite.collect_all_manifests();
+        assert_eq!(manifests.len(), 10);
+        assert_eq!(manifests[0].pr_number, 7101);
+    }
+
+    #[test]
+    fn test_scx_central_scheduling() {
+        let mut engine = CachyOsScxCentralLavdV5SchedulerPrEngine::new();
+        let status = engine.schedule_gaming_thread(4096, 8);
+        assert!(status.contains("Thread 4096"));
+        assert!(engine.core_parking_mitigated);
+    }
+
+    #[test]
+    fn test_btrfs_zstd_optimization() {
+        let mut engine = CachyOsBtrfsZstdEbpfCompressorV5TunerPrEngine::new();
+        let status = engine.optimize_file_compression(true);
+        assert!(status.contains("level 1"));
+        assert_eq!(engine.current_zstd_level, 1);
+    }
+
+    #[test]
+    fn test_handheld_settings() {
+        let mut engine = CachyOsHandheldPowerCapThermalV5GovernorPrEngine::new();
+        let status = engine.apply_handheld_settings("Overclock Extreme v5", 40);
+        assert!(status.contains("Overclock Extreme v5"));
+        assert_eq!(engine.tdp_limit_watts, 40);
+    }
+}
+>>>>>>> origin/main

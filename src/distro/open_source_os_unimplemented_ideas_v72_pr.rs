@@ -9,8 +9,7 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
+use alloc::format;#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
@@ -63,8 +62,7 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
 
     pub fn compact_folios(&mut self) -> u64 {
         self.folios_compacted += 64;
-        self.folios_compacted
-    }
+        self.folios_compacted    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -85,8 +83,7 @@ pub struct FreeBsd161CapsicumCasperNvmeTlsV72PrEngine;
 impl Default for FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
+    }}
 
 impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     pub fn new() -> Self {
@@ -94,8 +91,7 @@ impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
     }
 
     pub fn check_casper_right(&self, service: &str) -> bool {
-        service.starts_with("system.")
-    }
+        service.starts_with("system.")    }
 
     pub fn handshake_nvme_tls(&self, session_id: &str) -> bool {
         !session_id.is_empty()
@@ -116,7 +112,6 @@ impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
 }
 
 pub struct OpenBsd89PinsyscallUnveilV72PrEngine;
-
 impl Default for OpenBsd89PinsyscallUnveilV72PrEngine {
     fn default() -> Self {
         Self::new()
@@ -135,7 +130,6 @@ impl OpenBsd89PinsyscallUnveilV72PrEngine {
     pub fn check_unveil_access(&self, path: &str, permissions: char) -> bool {
         path.starts_with("/usr") && permissions == 'r'
     }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7203,
@@ -155,33 +149,11 @@ pub struct NetBsd125RumpPciVirtio9pV72PrEngine;
 impl Default for NetBsd125RumpPciVirtio9pV72PrEngine {
     fn default() -> Self {
         Self::new()
-    }
-}
+    }}
 
 impl NetBsd125RumpPciVirtio9pV72PrEngine {
     pub fn new() -> Self {
         Self
-    }
-
-    pub fn parse_9p_header(&self, packet: &[u8]) -> Option<(u8, u16)> {
-        if packet.len() >= 7 {
-            Some((packet[4], u16::from_le_bytes([packet[5], packet[6]])))
-        } else {
-            None
-        }
-    }
-
-    pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
-        OpenSourceOsV72PrSpec {
-            pr_id: 7204,
-            subsystem: "NetBSD Rump Kernel".to_string(),
-            title: "NetBSD 12.5 Rump PCI & VirtIO-9P Microkernel Engine V72".to_string(),
-            upstream_target: "sys/rump/librump/rumpvfs/rumpvfs.c".to_string(),
-            description: "Provides isolated userland Rump kernel hypervisor drivers and 9P2000.L VFS protocol routing.".to_string(),
-            diff_patch: "--- a/sys/rump/librump/rumpvfs/rumpvfs.c\n+++ b/sys/rump/librump/rumpvfs/rumpvfs.c\n@@ -1,5 +1,10 @@\n".to_string(),
-            status: OsPrStatusV72::Validated,
-            parity_score: 97,
-        }
     }
 }
 
@@ -198,6 +170,7 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
         Self
     }
 
+=======>>>>>>> origin/main
     pub fn sync_pfs_delta(&self, master_a: u32, master_b: u32) -> bool {
         master_a != master_b
     }
@@ -205,20 +178,17 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
     pub fn verify_scrub_checksum(&self, checksum: &str) -> bool {
         checksum.starts_with("SHA256:")
     }
-
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7205,
             subsystem: "DragonFly HAMMER3".to_string(),
-            title: "DragonFly BSD 7.8 HAMMER3 Multi-Master Replication V72".to_string(),
-            upstream_target: "sys/vfs/hammer3/hammer3_vfsops.c".to_string(),
+            title: "DragonFly BSD 7.8 HAMMER3 Multi-Master Replication V72".to_string(),            upstream_target: "sys/vfs/hammer3/hammer3_vfsops.c".to_string(),
             description: "Implements HAMMER3 multi-master PFS snapshot synchronization and active background scrubbing.".to_string(),
             diff_patch: "--- a/sys/vfs/hammer3/hammer3_vfsops.c\n+++ b/sys/vfs/hammer3/hammer3_vfsops.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
             parity_score: 98,
         }
-    }
-}
+    }}
 
 pub struct IllumosOpenZfsDtraceEbpfV72PrEngine;
 
@@ -272,8 +242,7 @@ impl HaikuBeFsAttributeIndexingV72PrEngine {
     }
 
     pub fn query_index(&self, attribute_name: &str) -> bool {
-        attribute_name.starts_with("META:")
-    }
+        attribute_name.starts_with("META:")    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -286,8 +255,7 @@ impl HaikuBeFsAttributeIndexingV72PrEngine {
             status: OsPrStatusV72::Validated,
             parity_score: 96,
         }
-    }
-}
+    }}
 
 pub struct Plan99p2000LPlumberV72PrEngine;
 
@@ -307,8 +275,7 @@ impl Plan99p2000LPlumberV72PrEngine {
             Some("dispatch_browser")
         } else if msg.ends_with(".rs") {
             Some("dispatch_editor")
-        } else {
-            None
+        } else {            None
         }
     }
 
@@ -323,8 +290,7 @@ impl Plan99p2000LPlumberV72PrEngine {
             status: OsPrStatusV72::Validated,
             parity_score: 98,
         }
-    }
-}
+    }}
 
 pub struct RedoxFsCowCapabilityV72PrEngine;
 
@@ -340,8 +306,7 @@ impl RedoxFsCowCapabilityV72PrEngine {
     }
 
     pub fn verify_scheme_capability(&self, scheme: &str) -> bool {
-        scheme == "file:" || scheme == "event:"
-    }
+        scheme == "file:" || scheme == "event:"    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -354,8 +319,7 @@ impl RedoxFsCowCapabilityV72PrEngine {
             status: OsPrStatusV72::Validated,
             parity_score: 97,
         }
-    }
-}
+    }}
 
 pub struct OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub linux_schedext: Linux629SchedExtFolioCompactionV72PrEngine,
@@ -364,8 +328,7 @@ pub struct OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub netbsd_rump: NetBsd125RumpPciVirtio9pV72PrEngine,
     pub dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine,
     pub illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine,
-    pub haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine,
-    pub plan9_plumber: Plan99p2000LPlumberV72PrEngine,
+    pub haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine,    pub plan9_plumber: Plan99p2000LPlumberV72PrEngine,
     pub redox_cow: RedoxFsCowCapabilityV72PrEngine,
 }
 
@@ -384,8 +347,7 @@ impl OpenSourceOsUnimplementedIdeasV72PrSuite {
             netbsd_rump: NetBsd125RumpPciVirtio9pV72PrEngine::new(),
             dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine::new(),
             illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine::new(),
-            haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine::new(),
-            plan9_plumber: Plan99p2000LPlumberV72PrEngine::new(),
+            haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine::new(),            plan9_plumber: Plan99p2000LPlumberV72PrEngine::new(),
             redox_cow: RedoxFsCowCapabilityV72PrEngine::new(),
         }
     }
