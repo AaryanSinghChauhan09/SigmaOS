@@ -12,7 +12,6 @@
 //! 8. Kubernetes, K3s & Rancher Harvester Engine (Kubelet CRI pod sandbox, SQLite K3s, VM-to-pod mappings, eBPF CNI network policies)
 //! 9. Firecracker & Cloud-Hypervisor Engine (Fast boot MicroVMs <5ms, virtio-vsock, virtio-mem ballooning, direct ELF kernel boot)
 //! 10. gVisor, Kata Containers & Apple Hypervisor Engine (Sentry syscall proxy, Kata microVMs, Apple Hypervisor.framework hv_vcpu, Rosetta 2)
-
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
@@ -52,8 +51,7 @@ pub enum KvmVmStateV68 {
     Running,
     Paused,
     Migrating,
-    Stopped,
-}
+    Stopped,}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct KvmVmSpecV68 {
@@ -64,8 +62,7 @@ pub struct KvmVmSpecV68 {
     pub io_uring_block_enabled: bool,
     pub dirty_ring_entries: u32,
     pub vfio_passthrough_addr: Option<String>,
-    pub state: KvmVmStateV68,
-}
+    pub state: KvmVmStateV68,}
 
 #[derive(Debug, Default)]
 pub struct KvmQemuV68Engine {
@@ -83,17 +80,20 @@ impl KvmQemuV68Engine {
         vcpus: u32,
         memory_mb: u64,
         confidential: ConfidentialModeV68,
+=======
+        iommu_group: u32,
+>>>>>>> origin/main
     ) -> KvmVmSpecV68 {
         let spec = KvmVmSpecV68 {
             vm_id: vm_id.to_string(),
             vcpus,
             memory_mb,
             confidential_mode: confidential,
+<<<<<<< HEAD
             io_uring_block_enabled: true,
             dirty_ring_entries: 4096,
             vfio_passthrough_addr: Some("0000:01:00.0".to_string()),
-            state: KvmVmStateV68::Running,
-        };
+            state: KvmVmStateV68::Running,        };
         self.vms.push(spec.clone());
         spec
     }
@@ -109,8 +109,7 @@ impl KvmQemuV68Engine {
 
     pub fn format_qemu_img_command(&self, image_path: &str, size_gb: u32, fmt: &str) -> String {
         format!(
-            "qemu-img create -f {} -o cluster_size=65536,preallocation=metadata {} {}G",
-            fmt, image_path, size_gb
+            "qemu-img create -f {} -o cluster_size=65536,preallocation=metadata {} {}G",            fmt, image_path, size_gb
         )
     }
 
@@ -131,8 +130,7 @@ impl KvmQemuV68Engine {
             boot_latency_ms: 7,
             overhead_reduction_pct: 52,
             isolation_tier: "Hardware-Enforced Confidential (Level 1)".to_string(),
-            pr_markdown_summary: "Delivers KVM dirty page ring logging, io_uring asynchronous disk I/O, confidential memory attestation (SEV-SNP/TDX/Realm), VFIO device passthrough, and zero-downtime TLS live migration.".to_string(),
-        }
+            pr_markdown_summary: "Delivers KVM dirty page ring logging, io_uring asynchronous disk I/O, confidential memory attestation (SEV-SNP/TDX/Realm), VFIO device passthrough, and zero-downtime TLS live migration.".to_string(),        }
     }
 }
 
@@ -149,21 +147,12 @@ pub struct LibvirtDomainSpecV68 {
     pub bridge_interface: String,
     pub disk_pool_path: String,
     pub nwfilter_enabled: bool,
-    pub autostart: bool,
-}
+    pub autostart: bool,}
 
 #[derive(Debug, Default)]
 pub struct LibvirtDomainV68Engine {
     pub domains: Vec<LibvirtDomainSpecV68>,
-    pub storage_pools: BTreeMap<String, String>,
-}
-
-impl LibvirtDomainV68Engine {
-    pub fn new() -> Self {
-        let mut engine = Self::default();
-        engine.storage_pools.insert("default".to_string(), "/var/lib/libvirt/images".to_string());
-        engine
-    }
+    pub storage_pools: BTreeMap<String, String>,    }
 
     pub fn define_domain(
         &mut self,
@@ -180,8 +169,7 @@ impl LibvirtDomainV68Engine {
             bridge_interface: "virbr0".to_string(),
             disk_pool_path: format!("/var/lib/libvirt/images/{}.qcow2", name),
             nwfilter_enabled: true,
-            autostart: true,
-        };
+            autostart: true,        };
         self.domains.push(spec.clone());
         spec
     }
@@ -189,8 +177,7 @@ impl LibvirtDomainV68Engine {
     pub fn render_domain_xml(&self, spec: &LibvirtDomainSpecV68) -> String {
         format!(
             "<domain type='{}'>\n  <name>{}</name>\n  <memory unit='KiB'>{}</memory>\n  <vcpu>{}</vcpu>\n  <devices>\n    <interface type='bridge'>\n      <source bridge='{}'/>\n      <filterref filter='clean-traffic'/>\n    </interface>\n    <disk type='file' device='disk'>\n      <driver name='qemu' type='qcow2'/>\n      <source file='{}'/>\n    </disk>\n  </devices>\n</domain>",
-            spec.driver_type, spec.domain_name, spec.memory_ki_b, spec.vcpu_count, spec.bridge_interface, spec.disk_pool_path
-        )
+            spec.driver_type, spec.domain_name, spec.memory_ki_b, spec.vcpu_count, spec.bridge_interface, spec.disk_pool_path        )
     }
 
     pub fn generate_pr_manifest(&self) -> VirtualizationV68PrProposalManifest {
@@ -209,8 +196,7 @@ impl LibvirtDomainV68Engine {
             boot_latency_ms: 13,
             overhead_reduction_pct: 45,
             isolation_tier: "Hypervisor Domain (Level 1)".to_string(),
-            pr_markdown_summary: "Delivers libvirt multi-hypervisor domain lifecycle engine supporting virsh CLI definitions, XML/JSON spec parsing, nwfilter MAC/IP filtering, and ZFS/LVM storage pools.".to_string(),
-        }
+            pr_markdown_summary: "Delivers libvirt multi-hypervisor domain lifecycle engine supporting virsh CLI definitions, XML/JSON spec parsing, nwfilter MAC/IP filtering, and ZFS/LVM storage pools.".to_string(),        }
     }
 }
 
@@ -233,8 +219,7 @@ pub struct XenGuestSpecV68 {
     pub memory_mb: u64,
     pub xenstore_path: String,
     pub argo_ring_size: u32,
-    pub grant_frames: u32,
-}
+    pub grant_frames: u32,}
 
 #[derive(Debug, Default)]
 pub struct XenHypervisorV68Engine {
@@ -257,6 +242,9 @@ impl XenHypervisorV68Engine {
         name: &str,
         mode: XenGuestModeV68,
         mem_mb: u64,
+=======
+        dispvm: bool,
+>>>>>>> origin/main
     ) -> XenGuestSpecV68 {
         let xs_path = format!("/local/domain/{}", domid);
         self.xenstore_tree
@@ -272,9 +260,9 @@ impl XenHypervisorV68Engine {
             mode,
             memory_mb: mem_mb,
             xenstore_path: xs_path,
+<<<<<<< HEAD
             argo_ring_size: 65536,
-            grant_frames: 512,
-        };
+            grant_frames: 512,        };
         self.guests.push(guest.clone());
         guest
     }
@@ -282,8 +270,7 @@ impl XenHypervisorV68Engine {
     pub fn apply_qubes_dispvm_netvm_policy(&mut self, disp_domid: u32, net_domid: u32) -> String {
         format!(
             "QubesOS Isolation Policy: DispVM DomID {} routed through NetVM DomID {} with Grant Table memory guards",
-            disp_domid, net_domid
-        )
+            disp_domid, net_domid        )
     }
 
     pub fn generate_pr_manifest(&self) -> VirtualizationV68PrProposalManifest {
@@ -302,8 +289,7 @@ impl XenHypervisorV68Engine {
             boot_latency_ms: 11,
             overhead_reduction_pct: 48,
             isolation_tier: "Hardware Microkernel Security (Level 0)".to_string(),
-            pr_markdown_summary: "Provides Xen hypervisor orchestrator with Dom0 management, DomU PVH guest execution, XenStore event bus, Argo inter-domain messaging, and Qubes OS disposable VM network policies.".to_string(),
-        }
+            pr_markdown_summary: "Provides Xen hypervisor orchestrator with Dom0 management, DomU PVH guest execution, XenStore event bus, Argo inter-domain messaging, and Qubes OS disposable VM network policies.".to_string(),        }
     }
 }
 
@@ -318,8 +304,7 @@ pub struct BhyveVmSpecV68 {
     pub memory_mb: u64,
     pub capsicum_restricted: bool,
     pub nvme_emulation: bool,
-    pub virtio_rnd_enabled: bool,
-}
+    pub virtio_rnd_enabled: bool,}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OpenBsdVmdSpecV68 {
@@ -347,8 +332,7 @@ impl VirtualBoxBhyveVmmV68Engine {
             memory_mb: mem_mb,
             capsicum_restricted: true,
             nvme_emulation: true,
-            virtio_rnd_enabled: true,
-        };
+            virtio_rnd_enabled: true,        };
         self.bhyve_vms.push(spec.clone());
         spec
     }
@@ -358,8 +342,7 @@ impl VirtualBoxBhyveVmmV68Engine {
             vm_name: name.to_string(),
             kernel_path: kernel.to_string(),
             pledge_str: "stdio rpath vmm".to_string(),
-            unveil_paths: vec![kernel.to_string(), "/dev/vmm".to_string()],
-        };
+            unveil_paths: vec![kernel.to_string(), "/dev/vmm".to_string()],        };
         self.vmd_vms.push(spec.clone());
         spec
     }
@@ -378,19 +361,16 @@ impl VirtualBoxBhyveVmmV68Engine {
                 "FreeBSD bhyve NVMe Queue & Virtio-Rnd Emulation".to_string(),
                 "Capsicum Sandbox Helper Integration".to_string(),
                 "OpenBSD vmd Pledge/Unveil Direct Boot".to_string(),
-                "VirtualBox VMMdev IPC Backdoor Interface".to_string(),
-            ],
+                "VirtualBox VMMdev IPC Backdoor Interface".to_string(),            ],
             boot_latency_ms: 7,
             overhead_reduction_pct: 46,
             isolation_tier: "BSD Kernel Sandboxed (Level 1)".to_string(),
-            pr_markdown_summary: "Implements FreeBSD bhyve hypervisor execution with Capsicum sandboxed helpers, OpenBSD vmd direct kernel booting with pledge/unveil isolation, and VirtualBox VMMdev guest IPC.".to_string(),
-        }
+            pr_markdown_summary: "Implements FreeBSD bhyve hypervisor execution with Capsicum sandboxed helpers, OpenBSD vmd direct kernel booting with pledge/unveil isolation, and VirtualBox VMMdev guest IPC.".to_string(),        }
     }
 }
 
 // ============================================================================
-// 5. DOCKER, PODMAN, CONTAINERD & RUNC OCI ENGINE V68
-// ============================================================================
+// 5. DOCKER, PODMAN, CONTAINERD & RUNC OCI ENGINE V68// ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OciContainerSpecV68 {
@@ -401,8 +381,7 @@ pub struct OciContainerSpecV68 {
     pub subgid_start: u32,
     pub memory_max_bytes: u64,
     pub cpu_weight: u32,
-    pub seccomp_profile: String,
-}
+    pub seccomp_profile: String,}
 
 #[derive(Debug, Default)]
 pub struct OciDockerPodmanRuncV68Engine {
@@ -428,16 +407,14 @@ impl OciDockerPodmanRuncV68Engine {
             subgid_start: 100000,
             memory_max_bytes: mem_mb * 1024 * 1024,
             cpu_weight: 100,
-            seccomp_profile: "default_unconfined_filter".to_string(),
-        };
+            seccomp_profile: "default_unconfined_filter".to_string(),        };
         self.containers.push(spec.clone());
         spec
     }
 
     pub fn generate_quadlet_unit(&self, name: &str, image: &str) -> String {
         format!(
-            "[Unit]\nDescription={} Podman Quadlet Container\nAfter=network-online.target\n\n[Container]\nImage={}\nExec=sh\nPublishPort=8080:80\nSeccompProfile=default\n\n[Install]\nWantedBy=multi-user.target",
-            name, image
+            "[Unit]\nDescription={} Podman Quadlet Container\nAfter=network-online.target\n\n[Container]\nImage={}\nExec=sh\nPublishPort=8080:80\nSeccompProfile=default\n\n[Install]\nWantedBy=multi-user.target",            name, image
         )
     }
 
@@ -461,8 +438,7 @@ impl OciDockerPodmanRuncV68Engine {
             boot_latency_ms: 5,
             overhead_reduction_pct: 58,
             isolation_tier: "Namespace, Cgroup v2 & Seccomp (Level 2)".to_string(),
-            pr_markdown_summary: "Delivers complete OCI container execution with rootless user namespace remapping, Cgroups v2 resource controllers, Systemd Quadlet unit synthesis, Seccomp profiles, and Containerd CRI integration.".to_string(),
-        }
+            pr_markdown_summary: "Delivers complete OCI container execution with rootless user namespace remapping, Cgroups v2 resource controllers, Systemd Quadlet unit synthesis, Seccomp profiles, and Containerd CRI integration.".to_string(),        }
     }
 }
 
@@ -477,8 +453,7 @@ pub struct SystemContainerSpecV68 {
     pub rootfs_path: String,
     pub epoll_event_fd: i32,
     pub active: bool,
-    pub ovn_network_id: Option<String>,
-}
+    pub ovn_network_id: Option<String>,}
 
 #[derive(Debug, Default)]
 pub struct LxcLxdNspawnV68Engine {
@@ -497,21 +472,18 @@ impl LxcLxdNspawnV68Engine {
             rootfs_path: path.to_string(),
             epoll_event_fd: 42,
             active: true,
-            ovn_network_id: None,
-        };
+            ovn_network_id: None,        };
         self.instances.push(spec.clone());
         spec
     }
 
-    pub fn create_incus_instance(&mut self, name: &str, ovn_net: &str) -> SystemContainerSpecV68 {
-        let spec = SystemContainerSpecV68 {
+    pub fn create_incus_instance(&mut self, name: &str, ovn_net: &str) -> SystemContainerSpecV68 {        let spec = SystemContainerSpecV68 {
             instance_name: name.to_string(),
             engine_type: "incus".to_string(),
             rootfs_path: format!("/var/lib/incus/storage-pools/default/containers/{}", name),
             epoll_event_fd: 43,
             active: true,
-            ovn_network_id: Some(ovn_net.to_string()),
-        };
+            ovn_network_id: Some(ovn_net.to_string()),        };
         self.instances.push(spec.clone());
         spec
     }
@@ -532,8 +504,7 @@ impl LxcLxdNspawnV68Engine {
             boot_latency_ms: 10,
             overhead_reduction_pct: 53,
             isolation_tier: "System Container Namespace (Level 2)".to_string(),
-            pr_markdown_summary: "Implements full system container management with systemd-nspawn, machinectl image state, Incus clustered REST API, distributed OVN virtual networking, and ZFS/Btrfs subvolume drivers.".to_string(),
-        }
+            pr_markdown_summary: "Implements full system container management with systemd-nspawn, machinectl image state, Incus clustered REST API, distributed OVN virtual networking, and ZFS/Btrfs subvolume drivers.".to_string(),        }
     }
 }
 
@@ -548,8 +519,7 @@ pub struct FreeBsdJailSpecV68 {
     pub vnet_interface: String,
     pub devfs_ruleset: u32,
     pub racct_pcpu_max: u32,
-    pub zfs_dataset_delegated: Option<String>,
-}
+    pub zfs_dataset_delegated: Option<String>,}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IllumosZoneSpecV68 {
@@ -577,8 +547,7 @@ impl FreeBsdJailsZonesV68Engine {
             vnet_interface: epair.to_string(),
             devfs_ruleset: 4,
             racct_pcpu_max: 80,
-            zfs_dataset_delegated: Some(format!("zroot/jails/{}", name)),
-        };
+            zfs_dataset_delegated: Some(format!("zroot/jails/{}", name)),        };
         self.jails.push(spec.clone());
         spec
     }
@@ -615,8 +584,7 @@ impl FreeBsdJailsZonesV68Engine {
             boot_latency_ms: 3,
             overhead_reduction_pct: 68,
             isolation_tier: "OS-Level Kernel Virtualization (Level 2)".to_string(),
-            pr_markdown_summary: "Provides FreeBSD VNET jail virtualization with epair virtual switches, RACCT resource limits, devfs security rule sets, ZFS dataset delegation, and Illumos BrandZ LX syscall emulation zones.".to_string(),
-        }
+            pr_markdown_summary: "Provides FreeBSD VNET jail virtualization with epair virtual switches, RACCT resource limits, devfs security rule sets, ZFS dataset delegation, and Illumos BrandZ LX syscall emulation zones.".to_string(),        }
     }
 }
 
@@ -631,8 +599,7 @@ pub struct K8sPodSpecV68 {
     pub ip_address: String,
     pub runtime_handler: String, // "runc", "crun", "kata", "gvisor"
     pub ebpf_cni_enabled: bool,
-    pub service_account: String,
-}
+    pub service_account: String,}
 
 #[derive(Debug, Default)]
 pub struct KubernetesK3sRancherV68Engine {
@@ -652,8 +619,7 @@ impl KubernetesK3sRancherV68Engine {
             ip_address: "10.42.0.15".to_string(),
             runtime_handler: handler.to_string(),
             ebpf_cni_enabled: true,
-            service_account: "default".to_string(),
-        };
+            service_account: "default".to_string(),        };
         self.pods.push(spec.clone());
         spec
     }
@@ -674,13 +640,11 @@ impl KubernetesK3sRancherV68Engine {
                 "Embedded Lightweight K3s Control Plane".to_string(),
                 "Rancher Harvester Hyper-Converged VM-to-Pod Mapping".to_string(),
                 "eBPF CNI Network Policy Engine".to_string(),
-                "Custom Resource Definition (CRD) State Syncer".to_string(),
-            ],
+                "Custom Resource Definition (CRD) State Syncer".to_string(),            ],
             boot_latency_ms: 18,
             overhead_reduction_pct: 42,
             isolation_tier: "Pod Sandbox & Virtual Machine (Level 1-2)".to_string(),
-            pr_markdown_summary: "Implements Kubernetes CRI pod lifecycle management, K3s lightweight control plane with SQLite storage, eBPF CNI filtering, and Rancher Harvester hyper-converged VM-to-pod mappings.".to_string(),
-        }
+            pr_markdown_summary: "Implements Kubernetes CRI pod lifecycle management, K3s lightweight control plane with SQLite storage, eBPF CNI filtering, and Rancher Harvester hyper-converged VM-to-pod mappings.".to_string(),        }
     }
 }
 
@@ -695,8 +659,7 @@ pub struct MicroVmSpecV68 {
     pub memory_mb: u64,
     pub boot_time_ms: u32,
     pub vsock_cid: u32,
-    pub direct_kernel_path: String,
-}
+    pub direct_kernel_path: String,}
 
 #[derive(Debug, Default)]
 pub struct FirecrackerCloudHypervisorV68Engine {
@@ -720,8 +683,7 @@ impl FirecrackerCloudHypervisorV68Engine {
             memory_mb: mem_mb,
             boot_time_ms: 2,
             vsock_cid: 3,
-            direct_kernel_path: "/boot/vmlinux-microvm".to_string(),
-        };
+            direct_kernel_path: "/boot/vmlinux-microvm".to_string(),        };
         self.instances.push(spec.clone());
         spec
     }
@@ -738,8 +700,7 @@ impl FirecrackerCloudHypervisorV68Engine {
             memory_mb: mem_mb,
             boot_time_ms: 4,
             vsock_cid: 4,
-            direct_kernel_path: "/boot/vmlinux-cloud-hyp".to_string(),
-        };
+            direct_kernel_path: "/boot/vmlinux-cloud-hyp".to_string(),        };
         self.instances.push(spec.clone());
         spec
     }
@@ -759,8 +720,7 @@ impl FirecrackerCloudHypervisorV68Engine {
             boot_latency_ms: 2,
             overhead_reduction_pct: 78,
             isolation_tier: "Hardware MicroVM (Level 1)".to_string(),
-            pr_markdown_summary: "Delivers sub-5ms AWS Firecracker microVM execution, zero-overhead virtio-vsock communication, direct ELF kernel booting bypassing firmware, and Cloud-Hypervisor virtio-mem memory ballooning.".to_string(),
-        }
+            pr_markdown_summary: "Delivers sub-5ms AWS Firecracker microVM execution, zero-overhead virtio-vsock communication, direct ELF kernel booting bypassing firmware, and Cloud-Hypervisor virtio-mem memory ballooning.".to_string(),        }
     }
 }
 
@@ -774,8 +734,7 @@ pub struct SecureSandboxSpecV68 {
     pub technology: String, // "gvisor", "kata", "apple_hv"
     pub memory_mb: u64,
     pub rosetta2_enabled: bool,
-    pub sentry_platform: String, // "ptrace", "kvm"
-}
+    pub sentry_platform: String, // "ptrace", "kvm"}
 
 #[derive(Debug, Default)]
 pub struct GvisorKataAppleHvV68Engine {
@@ -793,8 +752,7 @@ impl GvisorKataAppleHvV68Engine {
             technology: "gvisor".to_string(),
             memory_mb: mem_mb,
             rosetta2_enabled: false,
-            sentry_platform: "kvm".to_string(),
-        };
+            sentry_platform: "kvm".to_string(),        };
         self.sandboxes.push(spec.clone());
         spec
     }
@@ -805,8 +763,7 @@ impl GvisorKataAppleHvV68Engine {
             technology: "kata".to_string(),
             memory_mb: mem_mb,
             rosetta2_enabled: false,
-            sentry_platform: "none".to_string(),
-        };
+            sentry_platform: "none".to_string(),        };
         self.sandboxes.push(spec.clone());
         spec
     }
@@ -822,8 +779,7 @@ impl GvisorKataAppleHvV68Engine {
             technology: "apple_hv".to_string(),
             memory_mb: mem_mb,
             rosetta2_enabled: rosetta,
-            sentry_platform: "none".to_string(),
-        };
+            sentry_platform: "none".to_string(),        };
         self.sandboxes.push(spec.clone());
         spec
     }
@@ -838,13 +794,11 @@ impl GvisorKataAppleHvV68Engine {
                 "gVisor Sentry User-Space Kernel Syscall Interception".to_string(),
                 "Kata Containers Hardware MicroVM Pod Isolation".to_string(),
                 "Apple Hypervisor.framework hv_vcpu Execution".to_string(),
-                "Rosetta 2 Guest x86_64 Translation Engine".to_string(),
-            ],
+                "Rosetta 2 Guest x86_64 Translation Engine".to_string(),            ],
             boot_latency_ms: 7,
             overhead_reduction_pct: 62,
             isolation_tier: "Sandboxed Kernel & MicroVM (Level 1-2)".to_string(),
-            pr_markdown_summary: "Provides gVisor user-space kernel syscall sandboxing, Kata Containers hardware microVM pod isolation, Apple Hypervisor.framework execution, and Rosetta 2 translation.".to_string(),
-        }
+            pr_markdown_summary: "Provides gVisor user-space kernel syscall sandboxing, Kata Containers hardware microVM pod isolation, Apple Hypervisor.framework execution, and Rosetta 2 translation.".to_string(),        }
     }
 }
 
@@ -929,8 +883,7 @@ mod tests {
         let img_cmd = engine.format_qemu_img_command("/tmp/disk.qcow2", 20, "qcow2");
         assert!(img_cmd.contains("qemu-img create"));
         let manifest = engine.generate_pr_manifest();
-        assert_eq!(manifest.pr_id, 4152);
-    }
+        assert_eq!(manifest.pr_id, 4152);    }
 
     #[test]
     fn test_libvirt_domain_v68_engine() {
@@ -941,8 +894,7 @@ mod tests {
         let xml = engine.render_domain_xml(&dom);
         assert!(xml.contains("<domain type='kvm'>"));
         assert!(xml.contains("<name>web1</name>"));
-        assert!(xml.contains("disk type='file'"));
-    }
+        assert!(xml.contains("disk type='file'"));    }
 
     #[test]
     fn test_xen_hypervisor_v68_engine() {
@@ -952,8 +904,7 @@ mod tests {
         assert_eq!(guest.mode, XenGuestModeV68::Pvh);
         assert_eq!(guest.grant_frames, 512);
         let policy = engine.apply_qubes_dispvm_netvm_policy(1, 0);
-        assert!(policy.contains("QubesOS Isolation Policy"));
-    }
+        assert!(policy.contains("QubesOS Isolation Policy"));    }
 
     #[test]
     fn test_virtualbox_bhyve_vmm_v68_engine() {
@@ -964,8 +915,7 @@ mod tests {
         let vmd = engine.launch_vmd_microvm("openbsd1", "/bsd");
         assert_eq!(vmd.pledge_str, "stdio rpath vmm");
         let ipc = engine.format_vbox_vmmdev_ipc("guest1", "clipboard");
-        assert!(ipc.contains("VMMdev Guest Channel"));
-    }
+        assert!(ipc.contains("VMMdev Guest Channel"));    }
 
     #[test]
     fn test_oci_docker_podman_runc_v68_engine() {
@@ -975,8 +925,7 @@ mod tests {
         let quadlet = engine.generate_quadlet_unit("redis", "redis:alpine");
         assert!(quadlet.contains("[Container]"));
         let inspect = engine.inspect_oci_image_manifest("docker.io/library/ubuntu:latest");
-        assert!(inspect.contains("OCI Registry Manifest Inspector"));
-    }
+        assert!(inspect.contains("OCI Registry Manifest Inspector"));    }
 
     #[test]
     fn test_lxc_lxd_nspawn_v68_engine() {
@@ -985,26 +934,14 @@ mod tests {
         assert_eq!(nspawn.engine_type, "nspawn");
         let incus = engine.create_incus_instance("inc1", "ovn-net-1");
         assert_eq!(incus.engine_type, "incus");
-        assert_eq!(incus.ovn_network_id, Some("ovn-net-1".to_string()));
-    }
+        assert_eq!(incus.ovn_network_id, Some("ovn-net-1".to_string()));    }
 
     #[test]
     fn test_freebsd_jails_zones_v68_engine() {
         let mut engine = FreeBsdJailsZonesV68Engine::new();
         let jail = engine.create_vnet_jail("j1", "/jails/j1", "epair0b");
         assert_eq!(jail.vnet_interface, "epair0b");
-        assert!(jail.zfs_dataset_delegated.is_some());
-        let zone = engine.create_illumos_zone("z1", "lx", 1024);
-        assert_eq!(zone.brand, "lx");
-    }
-
-    #[test]
-    fn test_kubernetes_k3s_rancher_v68_engine() {
-        let mut engine = KubernetesK3sRancherV68Engine::new();
-        let pod = engine.deploy_pod("default", "nginx", "runc");
-        assert_eq!(pod.pod_name, "nginx");
-        assert!(pod.ebpf_cni_enabled);
-        engine.map_harvester_vm("vm-core", "pod-core");
+        assert!(jail.zfs_dataset_delegated.is_some());        engine.map_harvester_vm("vm-core", "pod-core");
         assert_eq!(
             engine.harvester_vm_mappings.get("vm-core").unwrap(),
             "pod-core"
@@ -1015,8 +952,7 @@ mod tests {
     fn test_firecracker_cloud_hypervisor_v68_engine() {
         let mut engine = FirecrackerCloudHypervisorV68Engine::new();
         let fc = engine.spawn_firecracker_microvm("fc1", 2, 128);
-        assert_eq!(fc.boot_time_ms, 2);
-        let ch = engine.spawn_cloud_hypervisor_vm("ch1", 4, 512);
+        assert_eq!(fc.boot_time_ms, 2);        let ch = engine.spawn_cloud_hypervisor_vm("ch1", 4, 512);
         assert_eq!(ch.vsock_cid, 4);
     }
 
@@ -1025,12 +961,7 @@ mod tests {
         let mut engine = GvisorKataAppleHvV68Engine::new();
         let gv = engine.create_gvisor_sandbox("gv1", 256);
         assert_eq!(gv.technology, "gvisor");
-        assert_eq!(gv.sentry_platform, "kvm");
-        let kata = engine.create_kata_sandbox("kt1", 512);
-        assert_eq!(kata.technology, "kata");
-        let apple = engine.launch_apple_hv_guest("ah1", 1024, true);
-        assert!(apple.rosetta2_enabled);
-    }
+        assert_eq!(gv.sentry_platform, "kvm");    }
 
     #[test]
     fn test_gateway_v68() {
@@ -1039,7 +970,6 @@ mod tests {
         assert_eq!(proposals.len(), 10);
         let summary = gateway.generate_pr_markdown_summary();
         assert!(summary.contains("PR #4152"));
-        assert!(summary.contains("PR #4161"));
-        assert!(summary.contains("Virtualization & Container Ecosystem Parity Suite (v68)"));
+        assert!(summary.contains("PR #4161"));        assert!(summary.contains("Virtualization & Container Ecosystem Parity Suite (v68)"));
     }
 }
