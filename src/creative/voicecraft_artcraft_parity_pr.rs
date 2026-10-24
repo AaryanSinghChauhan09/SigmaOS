@@ -21,13 +21,11 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
 
-#[path = "voicecraft.rs"]
-pub mod voicecraft;
-
-use voicecraft::Phoneme;
-use voicecraft::PhonemeType;
-use voicecraft::VoiceActivityDetector;
-use voicecraft::SAMPLE_RATE;
+use super::voicecraft;
+use super::voicecraft::Phoneme;
+use super::voicecraft::PhonemeType;
+use super::voicecraft::VoiceActivityDetector;
+use super::voicecraft::SAMPLE_RATE;
 
 /// Structured PR proposal manifest for VoiceCraft / ArtCraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -464,6 +462,7 @@ impl Default for VoicecraftSpeechToTextWordTimestampAlignerPrEngine {
 // ============================================================================
 
 /// Master Gateway Coordinator aggregating all 10 VoiceCraft PR proposals.
+#[derive(Debug, Clone)]
 pub struct SovereignVoicecraftArtcraftParityPrGateway {
     pub pitch_prosody_engine: VoicecraftNeuralPitchProsodyContourPrEngine,
     pub style_morphing_engine: VoicecraftMultiSpeakerStyleMorphingPrEngine,
@@ -492,6 +491,14 @@ impl SovereignVoicecraftArtcraftParityPrGateway {
             self.audio_packet_streamer.generate_pr_proposal(),
             self.word_timestamp_aligner.generate_pr_proposal(),
         ]
+    }
+
+    pub fn collect_all_proposals(&self) -> Vec<VoicecraftArtcraftPrProposalManifest> {
+        self.generate_all_pr_manifests()
+    }
+
+    pub fn evaluate_voicecraft_artcraft_parity(&mut self) -> bool {
+        self.compute_parity_score() >= 100.0
     }
 
     pub fn compute_parity_score(&self) -> f32 {

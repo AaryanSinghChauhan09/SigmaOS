@@ -1621,6 +1621,145 @@ impl Default for LoggingMonitoringDiagnosticsPullRequestEngine {
 }
 
 // ============================================================================
+// 9. EXTENDED LINUX & BSD DISTRO DIAGNOSTICS SUITES
+// ============================================================================
+
+/// Journald Server-Sent Events (SSE) REST Endpoint Specifier
+#[derive(Debug, Clone)]
+pub struct JournaldStreamSseEndpoint {
+    pub endpoint_path: String,
+    pub cursor_pagination: Option<String>,
+    pub max_entries: u32,
+    pub unit_filter: Option<String>,
+    pub is_streaming_active: bool,
+}
+
+/// Rsyslog RELP Disk Queue Buffer Specifier
+#[derive(Debug, Clone)]
+pub struct RsyslogRelpDiskQueueBuffer {
+    pub spool_directory: String,
+    pub queue_file_prefix: String,
+    pub max_disk_bytes: u64,
+    pub relp_tx_number: u64,
+}
+
+/// Syslog-ng ClickHouse / Elasticsearch / SQL Sink Destination
+#[derive(Debug, Clone)]
+pub struct SyslogNgSinkDestination {
+    pub sink_name: String,
+    pub driver_type: String, // "clickhouse", "elasticsearch", "sql", "kafka"
+    pub endpoint_url: String,
+    pub batch_size: u32,
+    pub flush_interval_ms: u32,
+}
+
+/// BSD Syslogd Priority Selector Route
+#[derive(Debug, Clone)]
+pub struct BsdSyslogdSelectorRoute {
+    pub selector_rule: String, // e.g. "kern.crit", "*.info"
+    pub destination_path: String,
+    pub no_sync_flag: bool,
+}
+
+/// Logrotate Lifecycle Status Record
+#[derive(Debug, Clone)]
+pub struct LogrotateStatusRecord {
+    pub log_file_path: String,
+    pub last_rotated_date: String,
+    pub rotate_interval: String, // "daily", "weekly", "monthly"
+    pub keep_generations: u32,
+    pub post_rotate_cmd: Option<String>,
+}
+
+/// Kdump Vmcore ELF Header & Panic Record
+#[derive(Debug, Clone)]
+pub struct KdumpVmcoreElfHeader {
+    pub vmcore_path: String,
+    pub machine_arch: String,
+    pub kernel_release: String,
+    pub panic_reason: String,
+    pub registers_dump: HashMap<String, u64>,
+}
+
+/// Htop / Top Interactivity Score with EEVDF & BORE Schedulers
+#[derive(Debug, Clone)]
+pub struct HtopSchedulerInteractivityScore {
+    pub pid: u32,
+    pub comm_name: String,
+    pub eevdf_latency_ns: u64,
+    pub bore_score: u32,
+    pub thread_count: u32,
+    pub virt_mem_bytes: u64,
+    pub res_mem_bytes: u64,
+}
+
+/// Extended Iostat Latency & Queue Statistics
+#[derive(Debug, Clone)]
+pub struct IostatDeviceQueueLatencyStats {
+    pub device_name: String,
+    pub reads_per_sec: f32,
+    pub writes_per_sec: f32,
+    pub read_kb_per_sec: f32,
+    pub write_kb_per_sec: f32,
+    pub r_await_ms: f32,
+    pub w_await_ms: f32,
+    pub avg_queue_length: f32,
+    pub util_pct: f32,
+}
+
+/// Sar / Sysstat Binary Performance Report Aggregator
+#[derive(Debug, Clone)]
+pub struct SarBinaryPerformanceReport {
+    pub date_stamp: String,
+    pub sample_interval_sec: u32,
+    pub sample_count: u32,
+    pub avg_cpu_user_pct: f32,
+    pub avg_cpu_sys_pct: f32,
+    pub peak_mem_used_pct: f32,
+}
+
+/// Lspci PCIe Base Address Register (BAR) & MSI-X Descriptor
+#[derive(Debug, Clone)]
+pub struct LspciPcieResourceDescriptor {
+    pub bdf_address: String,
+    pub vendor_id: u16,
+    pub device_id: u16,
+    pub bar_addresses: Vec<String>,
+    pub msix_table_size: u16,
+}
+
+/// Lsusb USB Device Endpoint Hierarchy Descriptor
+#[derive(Debug, Clone)]
+pub struct LsusbEndpointHierarchyDescriptor {
+    pub bus_num: u8,
+    pub dev_num: u8,
+    pub vendor_id: u16,
+    pub product_id: u16,
+    pub usb_version: String,
+    pub num_endpoints: u8,
+}
+
+/// Dmidecode SMBIOS Structure Record
+#[derive(Debug, Clone)]
+pub struct DmidecodeSmbiosStructureRecord {
+    pub handle_id: u16,
+    pub table_type: u8, // 0=BIOS, 1=System, 2=Baseboard, 3=Chassis, 4=Processor, 17=Memory Device
+    pub type_name: String,
+    pub vendor_manufacturer: String,
+    pub product_version: String,
+    pub serial_number: String,
+}
+
+/// Sosreport Sanitized Archive Summary
+#[derive(Debug, Clone)]
+pub struct SosreportSanitizedArchiveSummary {
+    pub archive_id: String,
+    pub subsystems_collected: Vec<String>,
+    pub secrets_redacted_count: u32,
+    pub total_bytes: u64,
+}
+
+// ============================================================================
 // MASTER LOGGING, MONITORING & DIAGNOSTICS SUITE
 // ============================================================================
 
@@ -2036,5 +2175,87 @@ mod tests {
             .generate_sosreport(&suite.journal, &suite.dmesg, &suite.hardware);
         assert_eq!(sos.confidential_secrets_redacted_count, 12);
         assert!(sos.pqc_signature.contains("DILITHIUM5"));
+    }
+
+    #[test]
+    fn test_extended_diagnostics_suite() {
+        let sse = JournaldStreamSseEndpoint {
+            endpoint_path: "/entries".to_string(),
+            cursor_pagination: Some("s=a1b2c3".to_string()),
+            max_entries: 50,
+            unit_filter: Some("sshd.service".to_string()),
+            is_streaming_active: true,
+        };
+        assert!(sse.is_streaming_active);
+
+        let queue = RsyslogRelpDiskQueueBuffer {
+            spool_directory: "/var/spool/rsyslog".to_string(),
+            queue_file_prefix: "relp".to_string(),
+            max_disk_bytes: 1073741824,
+            relp_tx_number: 1042,
+        };
+        assert_eq!(queue.relp_tx_number, 1042);
+
+        let sink = SyslogNgSinkDestination {
+            sink_name: "clickhouse_prod".to_string(),
+            driver_type: "clickhouse".to_string(),
+            endpoint_url: "http://clickhouse.internal:8123".to_string(),
+            batch_size: 5000,
+            flush_interval_ms: 1000,
+        };
+        assert_eq!(sink.driver_type, "clickhouse");
+
+        let route = BsdSyslogdSelectorRoute {
+            selector_rule: "kern.crit".to_string(),
+            destination_path: "/dev/console".to_string(),
+            no_sync_flag: true,
+        };
+        assert!(route.no_sync_flag);
+
+        let rot = LogrotateStatusRecord {
+            log_file_path: "/var/log/messages".to_string(),
+            last_rotated_date: "2026-03-30".to_string(),
+            rotate_interval: "daily".to_string(),
+            keep_generations: 7,
+            post_rotate_cmd: Some("/usr/bin/killall -HUP syslogd".to_string()),
+        };
+        assert_eq!(rot.keep_generations, 7);
+
+        let pci_desc = LspciPcieResourceDescriptor {
+            bdf_address: "0000:01:00.0".to_string(),
+            vendor_id: 0x10de,
+            device_id: 0x2704,
+            bar_addresses: vec!["0x70000000".to_string()],
+            msix_table_size: 64,
+        };
+        assert_eq!(pci_desc.vendor_id, 0x10de);
+
+        let usb_desc = LsusbEndpointHierarchyDescriptor {
+            bus_num: 1,
+            dev_num: 2,
+            vendor_id: 0x046d,
+            product_id: 0xc52b,
+            usb_version: "3.2".to_string(),
+            num_endpoints: 4,
+        };
+        assert_eq!(usb_desc.num_endpoints, 4);
+
+        let smbios = DmidecodeSmbiosStructureRecord {
+            handle_id: 0x0001,
+            table_type: 1,
+            type_name: "System Information".to_string(),
+            vendor_manufacturer: "SigmaOS".to_string(),
+            product_version: "1.0".to_string(),
+            serial_number: "SIGMA-123".to_string(),
+        };
+        assert_eq!(smbios.table_type, 1);
+
+        let sos_sum = SosreportSanitizedArchiveSummary {
+            archive_id: "sosreport-node1".to_string(),
+            subsystems_collected: vec!["systemd".to_string(), "kernel".to_string()],
+            secrets_redacted_count: 15,
+            total_bytes: 10485760,
+        };
+        assert_eq!(sos_sum.secrets_redacted_count, 15);
     }
 }
