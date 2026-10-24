@@ -1,0 +1,3 @@
+## 2025-05-18 - Zero-Allocation Fuzzy Finder Matching for ASCII Paths
+**Learning:** In string search & fuzzy finder engines (like `fzf`), converting strings to lower case via `.to_lowercase()` and collecting chars into `Vec<char>` creates 4 heap allocations per candidate item. Checking `candidate.is_ascii() && query.is_ascii()` allows a fast-path byte window comparison using `.to_ascii_lowercase()` with zero allocations while preserving a Unicode fallback path.
+**Action:** Always check `is_ascii()` on strings in hot search/filter loops and apply in-place `to_ascii_lowercase()` byte comparisons.
