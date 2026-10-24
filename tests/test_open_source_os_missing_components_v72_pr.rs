@@ -66,5 +66,4 @@ fn test_open_source_os_missing_components_v72_pr_suite_full_cycle() {
     let report = suite.comparison_matrix.generate_matrix_report();
     assert!(report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V72"));
     assert!(report.contains("Linux 6.27+"));
-    assert!(report.contains("FreeBSD 16.1+"));
-}
+    assert!(report.contains("FreeBSD 16.1+"));}

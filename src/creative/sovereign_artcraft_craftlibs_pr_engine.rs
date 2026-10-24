@@ -162,6 +162,7 @@ impl Default for ArtcraftSuiteIntegrationPrDeployer {
 }
 
 /// Master Artcraft Craftlibs PR Deployment Suite
+#[derive(Debug, Clone)]
 pub struct ArtcraftCraftlibsMasterPrDeploymentSuite {
     pub proposals: BTreeMap<u32, ArtcraftCraftlibsPrPullRequestSpec>,
     pub photo_design_deployer: ArtcraftPhotoDesignPrDeployer,
