@@ -646,7 +646,8 @@ const CONTEXT_MESSAGES = {
 let contextLastFocusedElement = null;
 
 /**
- * Displays an accessible, transient toast notification with role="status" and aria-live="polite".
+ * Displays an accessible, transient toast notification with role="status", aria-live="polite",
+ * and interactive click-to-dismiss capability with aria-label feedback.
  */
 export function showToast(message, duration = 3000) {
   if (typeof document === "undefined") return null;
@@ -657,17 +658,35 @@ export function showToast(message, duration = 3000) {
   toast.className = "kernel-toast";
   toast.setAttribute("role", "status");
   toast.setAttribute("aria-live", "polite");
+  toast.setAttribute("title", "Click to dismiss notification");
+  toast.setAttribute("aria-label", `${message} (Click to dismiss)`);
+  toast.style.cursor = "pointer";
   toast.textContent = message;
   container.appendChild(toast);
 
-  if (typeof setTimeout === "function") {
-    setTimeout(() => {
-      toast.classList.add("fade-out");
-      setTimeout(() => {
+  let timerId = null;
+  let removeTimerId = null;
+
+  const dismiss = () => {
+    if (timerId) clearTimeout(timerId);
+    if (removeTimerId) clearTimeout(removeTimerId);
+    toast.classList.add("fade-out");
+    if (typeof setTimeout === "function") {
+      removeTimerId = setTimeout(() => {
         if (toast.parentNode) {
           toast.parentNode.removeChild(toast);
         }
       }, 300);
+    } else if (toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  };
+
+  toast.addEventListener("click", dismiss);
+
+  if (typeof setTimeout === "function") {
+    timerId = setTimeout(() => {
+      dismiss();
     }, duration);
   }
   return toast;
