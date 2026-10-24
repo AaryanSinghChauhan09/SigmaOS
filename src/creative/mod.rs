@@ -38,6 +38,8 @@ pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_artcraft_missing_components_v65_pr;
 pub mod filmcraft_artcraft_missing_components_v66_pr;
+pub mod filmcraft_artcraft_parity_pr;
+pub mod filmcraft_lightcraft_mediacraft_artcraft_parity_pr;
 pub mod filmcraft_artcraft_missing_components_v67_pr;
 // pub mod filmcraft_artcraft_parity_pr;
 // pub mod filmcraft_missing_components_parity_pr;
@@ -58,11 +60,11 @@ pub mod lightcraft_missing_components_parity_pr;
 pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
-// pub mod pdfcraft_artcraft_parity_pr;
+pub mod pdfcraft_artcraft_parity_pr;
 // pub mod pdfcraft_missing_components_parity_pr;
 pub mod photocraft;
 pub mod photocraft_artcraft_missing_components_v65_pr;
-// pub mod photocraft_artcraft_parity_pr;
+pub mod photocraft_artcraft_parity_pr;
 // pub mod photocraft_missing_components_parity_pr;
 pub mod printcraft;
 pub mod printcraft_artcraft_parity_pr;
@@ -72,6 +74,8 @@ pub mod soundcraft_artcraft_missing_components_v66_pr;
 pub mod soundcraft_artcraft_parity_pr;
 pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
+pub mod sovereign_artcraft_creative_suite_master_pr;
+pub use sovereign_artcraft_creative_suite_master_pr::*;
 pub mod threedcraft_advancements_v74_pr;
 pub mod threedcraft_artcraft_parity_pr;
 pub mod threedcraft_missing_components_parity_pr;
@@ -144,6 +148,8 @@ pub use figcraft_artcraft_parity_pr::*;
 pub use figcraft_missing_components_parity_pr::*;
 pub use filmcraft_artcraft_missing_components_v65_pr::*;
 pub use filmcraft_artcraft_missing_components_v66_pr::*;
+pub use filmcraft_artcraft_parity_pr::*;
+pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::*;
 pub use filmcraft_artcraft_missing_components_v67_pr::*;
 pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use gridcraft::{
@@ -184,11 +190,13 @@ pub use pdfcraft::{
     FormFieldType, Hyperlink, ImageObject, PdfEditor, PdfElement, PdfMetadata, PdfPage,
     SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
 };
+pub use pdfcraft_artcraft_parity_pr::*;
 pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
 };
 pub use photocraft_artcraft_missing_components_v65_pr::*;
+pub use photocraft_artcraft_parity_pr::*;
 pub use printcraft::*;
 pub use printcraft_artcraft_parity_pr::*;
 pub use soundcraft::{
