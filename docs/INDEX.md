@@ -17,3 +17,5 @@ Welcome to the central documentation index for SigmaOS architecture, system deve
 - [Network Development and Maintenance Plan](net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — Network stack architecture, socket lifecycle, and firewall policy framework.
 - [Device Driver Development Plan](SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md) — Device driver framework, VirtIO, and physical hardware roadmap.
 - [Kernel & Bootloader Advancements Plan](boot/KERNEL_AND_BOOTLOADER_ADVANCEMENTS_PLAN.md) — Bootloader compatibility, UEFI GOP handoff, and kernel innovations.
+- [CPU Scheduler Development Plan](SCHEDULER_DEVELOPMENT_PLAN.md) — CPU Scheduler development roadmap, 18-PR sequence, recommended initial milestone, periodic maintenance cadences, and merge gates.
+- [CPU Scheduler Status & Invariants](SCHEDULER_STATUS_AND_INVARIANTS.md) — Subsystem architecture status matrix, task state transitions, and 9 core policy and concurrency invariants.
