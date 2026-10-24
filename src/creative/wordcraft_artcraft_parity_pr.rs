@@ -59,7 +59,7 @@ impl Default for WordcraftColumnLayoutConfig {
 }
 
 /// OpenType Typography and Advanced Layout PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftOpenTypeTypographyLayoutPrEngine {
     pub opentype_features_enabled: bool,
     pub hyphenation_dictionary_loaded: bool,
@@ -135,7 +135,7 @@ pub struct WordcraftDocumentTheme {
 }
 
 /// Hierarchical Styles and Theme Cascading PR Engine.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WordcraftStyleHierarchyThemeCascadePrEngine {
     pub styles: BTreeMap<String, WordcraftDocumentStyle>,
     pub active_theme: WordcraftDocumentTheme,
@@ -246,7 +246,7 @@ pub struct WordcraftTocEntry {
 }
 
 /// Citations, Bibliography and Reference Cross-Reference PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftCitationBibliographyCrossReferencePrEngine {
     pub sources: BTreeMap<String, WordcraftCitationSource>,
     pub footnotes: Vec<String>,
@@ -332,7 +332,7 @@ pub struct WordcraftLinguisticIssue {
 }
 
 /// Linguistic AI Spell/Grammar & Assistant PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftLinguisticAiSpellGrammarPrEngine {
     pub active_language: String,
     pub spell_checker_active: bool,
@@ -413,7 +413,7 @@ pub struct WordcraftSelectionCursor {
 }
 
 /// CRDT Multi-User Real-Time Co-Authoring PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftCrdtMultiUserCoAuthoringPrEngine {
     pub active_cursors: BTreeMap<u32, WordcraftSelectionCursor>,
     pub delta_history: Vec<WordcraftDocumentTextDelta>,
@@ -470,7 +470,7 @@ pub struct WordcraftFormFieldEntry {
 }
 
 /// Mail Merge Automation PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftMailMergeAutomationPrEngine {
     pub data_records: Vec<BTreeMap<String, String>>,
     pub form_fields: BTreeMap<String, WordcraftFormFieldEntry>,
@@ -533,7 +533,7 @@ pub struct WordcraftChapterManifestEntry {
 }
 
 /// EPUB3 & PDF Book Publisher PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftEpubPdfBookPublisherPrEngine {
     pub chapters: Vec<WordcraftChapterManifestEntry>,
     pub print_bleed_mm: f32,
@@ -587,7 +587,7 @@ pub enum WordcraftTableFormula {
 }
 
 /// Embedded Tables, Formulas & SVG Charts PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftTableFormulaChartPrEngine;
 
 impl WordcraftTableFormulaChartPrEngine {
@@ -641,7 +641,7 @@ impl WordcraftTableFormulaChartPrEngine {
 // ============================================================================
 
 /// Security & Watermark Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftDocumentSecurityWatermarkPrEngine {
     pub active_watermark: Option<String>,
     pub digital_signature_present: bool,
@@ -682,7 +682,7 @@ impl WordcraftDocumentSecurityWatermarkPrEngine {
 // ============================================================================
 
 /// Master Document Template Theme Cascade PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftMasterTemplateThemeCascadePrEngine {
     pub primary_brand_color: String,
     pub primary_font: String,
@@ -724,7 +724,7 @@ impl WordcraftMasterTemplateThemeCascadePrEngine {
 // ============================================================================
 
 /// Parity suite containing all 10 component engines.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct WordcraftArtcraftParityPrSuite {
     pub typography_layout: WordcraftOpenTypeTypographyLayoutPrEngine,
     pub style_hierarchy: WordcraftStyleHierarchyThemeCascadePrEngine,
@@ -771,7 +771,7 @@ impl WordcraftArtcraftParityPrSuite {
 }
 
 /// Sovereign Master Gateway for Wordcraft / Artcraft parity evaluation.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SovereignWordcraftArtcraftParityPrGateway {
     pub suite: WordcraftArtcraftParityPrSuite,
 }
