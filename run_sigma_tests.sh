@@ -871,6 +871,13 @@ if [ -f "src/kernel/bare_metal_target.rs" ]; then
     ./build/bare_metal_target_test
 fi
 
+if [ -f "src/arch/x86_64/sovereign_rust_osdev_synthesis.rs" ]; then
+    echo "Running Sovereign rust-osdev Ecosystem Synthesis PR test suite..."
+    mkdir -p build
+    rustc --test src/arch/x86_64/sovereign_rust_osdev_synthesis.rs --edition=2021 -o build/test_rust_osdev
+    ./build/test_rust_osdev
+fi
+
 if [ -f "src/kernel/sovereign_smp_xhci_apc_synthesis.rs" ]; then
     echo "Running Sovereign SMP Multi-Core, xHCI & APC Subsystem test suite..."
     mkdir -p build
