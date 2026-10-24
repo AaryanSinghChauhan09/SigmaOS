@@ -23,6 +23,7 @@ pub mod deckcraft_missing_components_parity_pr;
 pub mod designcraft;
 pub mod designcraft_artcraft_missing_components_v65_pr;
 pub mod designcraft_artcraft_missing_components_v66_pr;
+pub mod designcraft_artcraft_missing_components_v67_pr;
 pub mod designcraft_artcraft_parity_pr;
 pub mod designcraft_missing_components_parity_pr;
 pub mod effectcraft;
@@ -130,6 +131,7 @@ pub use designcraft::{
 };
 pub use designcraft_artcraft_missing_components_v65_pr::*;
 pub use designcraft_artcraft_missing_components_v66_pr::*;
+pub use designcraft_artcraft_missing_components_v67_pr::*;
 pub use designcraft_artcraft_parity_pr::*;
 pub use designcraft_missing_components_parity_pr::*;
 pub use effectcraft::{
