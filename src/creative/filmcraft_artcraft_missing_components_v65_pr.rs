@@ -1057,7 +1057,7 @@ mod tests {
 
     #[test]
     fn test_v65_gateway_and_suite() {
-        let mut gateway = SovereignFilmcraftArtcraftMissingComponentsV65PrGateway::new();
+        let gateway = SovereignFilmcraftArtcraftMissingComponentsV65PrGateway::new();
         assert!(gateway.evaluate_filmcraft_v65_parity());
         assert_eq!(gateway.compute_parity_score(), 100.0);
 
