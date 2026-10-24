@@ -124,13 +124,14 @@ Lower Addresses
 
 ### 2.4 `sigreturn` Frame Validation Rules
 
-When a signal handler completes and invokes `sys_sigreturn`, the kernel performs strict validation checks before restoring execution context:
+When a signal handler completes and invokes `sys_sigreturn`, the kernel restores the interrupted execution context from the System V x86_64 ABI `ucontext_t` structure (saved registers, `sigset_t`, and `stack_t`) that was written onto the user stack at delivery time. Before restoring, it performs strict validation checks:
 
 1. **Stack Pointer Alignment:** The user stack pointer (`rsp`) must reside within canonical user-space memory (`0x0000_0000_0000_0000` to `0x0000_7FFF_FFFF_FFFF`) and align to a 16-byte boundary.
 2. **Magic Token Verification:** The frame signature at the expected offset must equal `0x5349474652414D45` (`"SIGFRAME"`).
 3. **Instruction Pointer Verification:** Saved `rip` must reside in executable user memory and cannot point into kernel address space (`0xFFFF_8000_0000_0000` and above).
 4. **RFLAGS Filtering:** Saved `rflags` are masked with `0x0020_0202` (enforcing User Interrupt Enable `IF=1`, clearing `IOPL` and system control flags) to prevent privilege escalation.
 5. **Signal Mask Restoration:** The saved signal mask is restored to the thread state after filtering out uncatchable signals (`SIGKILL` and `SIGSTOP`).
+6. **Alternate Stack Validation:** If `SA_ONSTACK` was configured, the kernel verifies that the alternate stack registered via `sigaltstack` has valid guard pages and adequate headroom before allowing a frame to be placed on it.
 
 ---
 
