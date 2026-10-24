@@ -108,7 +108,10 @@ fn test_component_maturity_levels() {
 #[test]
 fn test_maturity_promotion_rule_3_enforcement() {
     let mut engine = PeriodicImprovementEngine::new();
-    assert_eq!(engine.active_loop_step, ImprovementLoopStep::Step1SelectComponent);
+    assert_eq!(
+        engine.active_loop_step,
+        ImprovementLoopStep::Step1SelectComponent
+    );
 
     // Default status is Prototype
     assert_eq!(
