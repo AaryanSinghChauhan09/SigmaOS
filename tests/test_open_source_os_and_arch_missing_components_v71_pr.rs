@@ -1,22 +1,71 @@
 // SPDX-License-Identifier: MIT
-// Comprehensive Integration Test Suite for Open Source OS Unimplemented Ideas & Arch Linux Missing Components V71 PR Engines
+// Integration Test Suite for Open Source OS Unimplemented Ideas & Arch Linux Missing Components V71 PR Engines
 
+#[path = "../src/distro/open_source_os_unimplemented_ideas_v71_pr.rs"]
+mod open_source_os_unimplemented_ideas_v71_pr;
 #[path = "../src/distro/arch_linux_missing_components_v71_pr.rs"]
 mod arch_linux_missing_components_v71_pr;
 
 use arch_linux_missing_components_v71_pr::*;
+use open_source_os_unimplemented_ideas_v71_pr::*;
 
 #[test]
-fn test_arch_linux_v71_pr_suite_full_cycle() {
+fn test_open_source_os_unimplemented_ideas_v71_suite() {
+    let suite = OpenSourceOsUnimplementedIdeasV71PrSuite::new();
+    let specs = suite.collect_all_pr_specs();
+
+    assert_eq!(specs.len(), 9);
+
+    for spec in &specs {
+        assert_eq!(spec.status, OsPrStatusV71::Validated);
+        assert!(spec.parity_score >= 95);
+        assert!(!spec.diff_patch.is_empty());
+    }
+
+    // Verify individual engines
+    let mut sched = Linux628SchedExtFolioCompactionV71PrEngine::new();
+    assert_eq!(sched.compact_folios(), 64);
+
+    let capsicum = FreeBsd160CapsicumCasperNvmeTlsV71PrEngine::new();
+    assert!(capsicum.check_casper_right("system.dns"));
+    assert!(capsicum.handshake_nvme_tls("session_v71"));
+
+    let openbsd = OpenBsd88PinsyscallUnveilV71PrEngine::new();
+    assert!(openbsd.validate_pinsyscall(0x7fff0500));
+    assert!(openbsd.check_unveil_access("/usr/bin", 'r'));
+
+    let rump = NetBsd124RumpPciVirtio9pV71PrEngine::new();
+    let packet = [0, 0, 0, 0, 10, 0x12, 0x34];
+    assert_eq!(rump.parse_9p_header(&packet), Some((10, 0x3412)));
+
+    let hammer3 = DragonFlyHammer3MultiMasterScrubV71PrEngine::new();
+    assert!(hammer3.sync_pfs_delta(1, 2));
+    assert!(hammer3.verify_scrub_checksum("SHA256:abc123v71"));
+
+    let zfs = IllumosOpenZfsDtraceEbpfV71PrEngine::new();
+    let key = [7u8; 32];
+    let encrypted = zfs.encrypt_block_aes_gcm(b"hello v71", &key);
+    assert_eq!(encrypted.len(), 9);
+
+    let befs = HaikuBeFsAttributeIndexingV71PrEngine::new();
+    assert!(befs.query_index("META:name"));
+
+    let plumber = Plan99p2000LPlumberV71PrEngine::new();
+    assert_eq!(
+        plumber.route_plumber_message("https://sigmaos.org"),
+        Some("dispatch_browser")
+    );
+
+    let redox = RedoxFsCowCapabilityV71PrEngine::new();
+    assert!(redox.verify_scheme_capability("file:"));
+}
+
+#[test]
+fn test_arch_linux_missing_components_v71_suite() {
     let suite = ArchLinuxMissingComponentsV71PrSuite::new();
     let prs = suite.run_all_prs();
 
-    assert_eq!(
-        prs.len(),
-        10,
-        "Expected 10 Arch Linux V71 PR specifications"
-    );
-    assert_eq!(
+    assert_eq!(prs.len(), 10, "Expected 10 Arch Linux V71 PR specs");    assert_eq!(
         suite.compute_gap_closure_score(),
         100,
         "Gap closure score must be 100"
@@ -28,8 +77,7 @@ fn test_arch_linux_v71_pr_suite_full_cycle() {
         "archlinux/mkinitcpio",
         "CachyOS/linux-cachyos",
         "archlinux/archinstall",
-        "archlinux/reflector",
-        "archlinux/archiso",
+        "archlinux/pacman",        "archlinux/archiso",
         "archlinux/pacman-contrib",
         "archlinux/archnews",
         "archlinux/archlinux-keyring",
@@ -43,41 +91,38 @@ fn test_arch_linux_v71_pr_suite_full_cycle() {
         assert!(!pr.patch_diff.is_empty());
     }
 
-    // Sub-engine verification tests
-    let http3_pool = ArchPacman71Http3MultiStreamDownloadPoolPrEngine::new();
-    assert!(http3_pool.verify());
-    let pr1 = http3_pool.generate_pr();
+    // Individual sub-engine verification tests
+    let parallel_download = ArchPacmanParallelDownloadConnectionPoolPrEngine::new();
+    assert!(parallel_download.verify());
+    let pr1 = parallel_download.generate_pr();
     assert_eq!(pr1.pr_id, 7101);
-    assert!(pr1.title.contains("HTTP/3 QUIC"));
+    assert!(pr1.title.contains("Parallel Download"));
 
-    let yay_paru_linter = ArchAurHelperYayParuAstSecurityLinterPrEngine::new();
-    assert!(yay_paru_linter.verify());
-    let pr2 = yay_paru_linter.generate_pr();
+    let yay_resolver = ArchAurHelperYayDependencyResolverPrEngine::new();
+    assert!(yay_resolver.verify());
+    let pr2 = yay_resolver.generate_pr();
     assert_eq!(pr2.pr_id, 7102);
 
-    let uki_measurer = ArchMkinitcpioUkiTpm2PcrMeasurerPrEngine::new();
-    assert!(uki_measurer.verify());
-    let pr3 = uki_measurer.generate_pr();
-    assert_eq!(pr3.pr_id, 7103);
+    let uki_stub = ArchMkinitcpioSystemdUkiStubEnginePrEngine::new();
+    assert!(uki_stub.verify());
 
-    let cachyos_governor = ArchCachyOsSchedExtBoreV2GovernorPrEngine::new();
-    assert!(cachyos_governor.verify());
+    let cachyos = ArchCachyOsEevdfSchedulerBoreAutoTunerPrEngine::new();
+    assert!(cachyos.verify());
 
-    let luks3_profile = ArchArchinstallLuks3BtrfsSnapperProfilePrEngine::new();
-    assert!(luks3_profile.verify());
+    let btrfs = ArchArchinstallAutomatedBtrfsSubvolLayoutPrEngine::new();
+    assert!(btrfs.verify());
 
-    let pqc_ranker = ArchReflectorPqcDilithium5MirrorRankerPrEngine::new();
-    assert!(pqc_ranker.verify());
+    let repo_custom = ArchPacmanConfigRepositoryCustomDbPrEngine::new();
+    assert!(repo_custom.verify());
 
-    let ram_bootstrapper = ArchArchisoRamOverlaySquashfsZstdBootstrapperPrEngine::new();
-    assert!(ram_bootstrapper.verify());
+    let archiso = ArchArchisoSquashfsZstdBootstrapPrEngine::new();
+    assert!(archiso.verify());
 
-    let orphan_pruner = ArchPacmanPaccacheMultiGenOrphanPrunerPrEngine::new();
-    assert!(orphan_pruner.verify());
+    let paccache = ArchPacmanCachePaccacheRetentionPrEngine::new();
+    assert!(paccache.verify());
 
-    let news_banner = ArchNewsRssParserBreakingUpgradeBannerPrEngine::new();
-    assert!(news_banner.verify());
+    let archnews = ArchArchNewsSystemNotificationPrEngine::new();
+    assert!(archnews.verify());
 
-    let keyring_rotation = ArchKeyringWkdWebOfTrustAutoRefreshPrEngine::new();
-    assert!(keyring_rotation.verify());
-}
+    let keyring = ArchKeyringWebOfTrustAutoRefreshPrEngine::new();
+    assert!(keyring.verify());}
