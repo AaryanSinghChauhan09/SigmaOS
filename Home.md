@@ -115,6 +115,8 @@ SigmaOS includes a comprehensive, hardware-accelerated creative and office suite
 ---
 
 ### 📁 GitHub Sub-Repositories
+- 📦 **[[Sub-Repositories-and-Components|Complete Sub-Repositories & Component Catalog (108 Repositories)]]**: Full architecture, role, and upstream inspirations for all 108 modular repositories.
+
 SigmaOS is organized into multiple specialized GitHub repositories for better modularity and maintainability:
 
 - **[[SigmaOS|https://github.com/AaryanSinghChauhan09/SigmaOS]]**: Main microkernel OS - Core kernel, shell, drivers, and system utilities
