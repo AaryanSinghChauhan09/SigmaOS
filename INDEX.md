@@ -15,6 +15,10 @@ Welcome to the central documentation index for SigmaOS architecture, system deve
 - [Process Manager Architecture, Support Matrix, and PR Plan](PROCESS_MANAGER_PLAN.md) — Process manager architecture, lifecycle rules, 18-PR sequence roadmap, periodic maintenance cadences, and completion gates.
 ## AI Agent Roadmaps & Distro Parity Specifications
 
+- [Software Category Matrix](SOFTWARE-CATEGORY-MATRIX.md) — Canonical category taxonomies: BSD, Craft (20 modules), Linux (17 distros), DOS, Kernel, LibreOffice, OpenOffice, RDBMS, and Tools families, each cross-linked to its parity page.
+- [Sub-Repositories & Component Ecosystem](Sub-Repositories-and-Components.md) — All 150 component repositories with descriptions and upstream Linux Mint / Omarchy inspirations, generated from the repository's COMPONENTS.toml.
+- [Universal BSD Subsystems Synthesis & Parity Matrix](BSD-Universal-Synthesis-and-Parity.md) — Tri-BSD (DragonFly, FreeBSD, OpenBSD) subsystem parity plus the full Debian/niche BSD family coverage table.
+- [Universal Linux Distro Parity](Linux-Universal-Distro-Parity.md) — Five-pillar distro synthesis (Arch, CachyOS, Debian, Mint, Omarchy) plus the full 17-distro category coverage table.
 - [Omarchy Linux & Sovereign Desktop Parity AI Agent Roadmap](40-Omarchy-Linux-And-Sovereign-Desktop-Parity-AI-Agent-Roadmap.md) — Desktop tiling compositing, Waybar status HUD, Ghostty terminal, Walker launcher, Wallust color sync, and PAM security roadmap.
 - [Linux & BSD Kernel, Security, and Virtualization AI Agent Roadmap](41-Linux-BSD-Kernel-Security-And-Virtualization-AI-Agent-Roadmap.md) — Linux sched_ext BPF, FreeBSD Capsicum, OpenBSD Pledge/Unveil, Landlock V6, eBPF zero-trust, and MicroVM roadmap.
 ## Kernel & Core Subsystem Plans
@@ -28,7 +32,7 @@ Welcome to the central documentation index for SigmaOS architecture, system deve
 
 - [SigmaOS CLI Development Plan](SIGMAOS_CLI_DEVELOPMENT_PLAN.md) — Two distinct CLI layers (system CLI utilities vs shell engine), POSIX compatibility baseline, 18-PR roadmap, maintenance cadence, command family rules, and rollout gates.
 - [Command Interpreter Development Plan](shell-COMMAND_INTERPRETER_PLAN.md) — Shell interpreter architecture, lexer/parser/AST, execution contract, redirections, and job control.
-- [System Applications Development Plan](SYSTEM_APPS_DEVELOPMENT_PLAN.md) — System application architecture, IPC client governor, and lifecycle management.
+- [Init & Services (System Applications)](Init-and-Services.md) — System application architecture, init/service lifecycle management, and the IPC client governor (see also `src/system_apps` in the repository).
 - [SigmaOS GUI Development Plan](SIGMAOS_GUI_DEVELOPMENT_PLAN.md) — Desktop GUI development roadmap, Wayland compositor integration, and freedesktop interfaces.
 - [Security Management Plan](SECURITY.md) — NIST SP 800-218 aligned security policy, threat models, and vulnerability management.
 - [Signals Development and Maintenance Plan](signal-SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — POSIX.1-2024 signal architecture and cross-subsystem interruption suite.
