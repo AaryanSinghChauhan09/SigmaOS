@@ -4,43 +4,37 @@
 desktop-agent
 
 ## Upstream references
-- elementary OS Pantheon / Granite / Gala
-- Hyprland / Wayland Compositor Ecosystem
-- Mint Cinnamon / XApps Suite
+- Wayland / Zenith Compositor
+- Linux Mint Cinnamon / XApp ecosystem
+- Omarchy / Elementary OS desktop UX
 
 ## Purpose
-Define required behavior, safety boundaries, and validation
-for SigmaOS Zenith Desktop, Wayland Compositor, Window Manager, and HIG components.
+Define required behavior, safety boundaries, and validation for SigmaOS desktop components.
 
 ## Mandatory rules
 
-1. Desktop features must not precede a stable kernel boot and core-runtime path.
-2. Every desktop change must define explicit error handling for input loss, application crash, display failure, and clean shutdown.
-3. Graphical claims require a QEMU graphical smoke test or framebuffer render test.
-4. UI controls and HIG themes must respect system accent colors and dark/light modes cleanly.
-5. Compositor damage regions and double buffering must be managed to prevent screen tearing or memory leaks.
+1. Desktop features must not precede a stable boot and core-runtime path.
+2. Every desktop change must define behavior for input loss, application crash, display failure, and shutdown.
+3. Graphical claims require a QEMU graphical smoke test.
 
 ## Prohibited
 
-- Claiming desktop usability without kernel boot-to-shell stability
-- Unhandled compositor crashes on missing display outputs
-- Bypassing Wayland protocol capability checks
-- Memory leaks in frame buffer or texture allocation loops
-- Status promotion without QEMU graphical smoke test evidence
+- Prioritizing desktop UI features over kernel boot stability
+- Unhandled compositor crashes on display disconnect
+- Unsupported graphical parity claims
 
 ## Required evidence
 
-- Desktop unit tests (`tests/desktop/` or `elementary_pantheon_innovations.rs`)
-- QEMU graphical framebuffer smoke test output
-- Zenith display bridge test logs (`src/desktop/zenith_display_bridge.rs`)
-- App display failure and input loss fallback test reports
+- Desktop unit test report
+- Input/crash recovery test report
+- QEMU graphical smoke test log
 
 ## Promotion criteria
 
 | Level | Requirement |
 |---|---|
-| Proposed | HIG specification and desktop component ADR |
-| Prototype | Component unit tests & headless rendering |
-| Integrated | QEMU graphical framebuffer smoke test + compositor bridge |
-| Hardened | Input event stress tests, display disconnect handling |
-| Supported | Interactive session boot log and userland UI evidence |
+| Proposed | ADR and gap analysis |
+| Prototype | Unit tests |
+| Integrated | QEMU graphical session boot |
+| Hardened | Display crash recovery & fault tolerance |
+| Supported | End-to-end desktop session validation evidence |

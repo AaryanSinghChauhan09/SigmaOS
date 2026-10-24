@@ -1,46 +1,41 @@
 # Component Rules: Packaging
 
 ## Component owner
-packaging-agent
+package-agent
 
 ## Upstream references
-- Arch Linux pacman / PKGBUILD
-- Debian dpkg / APT & Dilithium-5 PQC
-- NixOS Declarative Package Store
+- Arch Linux pacman & PKGBUILD / devtools
+- Debian APT / dpkg & Lintian
+- Sovereign Universal Package Format (sigpkg)
 
 ## Purpose
-Define required behavior, safety boundaries, and validation
-for SigmaOS Packaging, Dependency Resolution, and Metadata components.
+Define required behavior, safety boundaries, and validation for SigmaOS packaging components.
 
 ## Mandatory rules
 
-1. Package metadata must be fully parsed and validated before any installation or script execution action.
-2. Dependency resolution must support dry-run mode (`--dry-run`) without modifying filesystem state.
-3. Package post-install scripts must run only in a restricted sandbox with declared minimal capabilities.
-4. Updates must be atomic or recoverable; failed package installations must restore prior known-good state.
-5. Package signatures must be verified against trusted PQC keys before unpacking.
+1. Package metadata must be parsed before any installation action.
+2. Dependency resolution must support dry-run mode.
+3. Package scripts must run only in a sandbox with declared capabilities.
+4. Updates must be atomic or recoverable; failed updates must restore the prior known-good state.
 
 ## Prohibited
 
-- Executing maintainer scripts unsandboxed with root privileges
-- Modifying filesystem files during dry-run dependency checks
-- Swallowing package metadata parse errors or checksum mismatches
-- Partial package installs leaving broken dependency graphs
-- Status promotion without dry-run and sandbox evidence logs
+- Unsandboxed execution of package scriptlets
+- Silent dependency resolution failures
+- Non-atomic package file overwrites
 
 ## Required evidence
 
-- Package metadata parser unit test reports
-- Dependency solver dry-run integration test logs
-- Sandboxed package script execution report
-- PQC signature verification test logs
+- Packaging metadata corpus parser test report
+- Dependency resolver dry-run report
+- Sandboxed installation test log
 
 ## Promotion criteria
 
 | Level | Requirement |
 |---|---|
-| Proposed | Package specification ADR and format definition |
-| Prototype | Metadata parser and solver unit tests |
-| Integrated | Dry-run installation and sandboxed script execution tests |
-| Hardened | Malicious package corpus fuzzing and security review |
-| Supported | Reproducible repository index & package installation evidence |
+| Proposed | ADR and gap analysis |
+| Prototype | Unit tests & metadata parser |
+| Integrated | Dry-run dependency resolution & sandboxing |
+| Hardened | Malformed package fuzzing |
+| Supported | Production package repository synchronization evidence |

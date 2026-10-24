@@ -4,43 +4,38 @@
 driver-agent
 
 ## Upstream references
-- Linux Drivers & VirtIO Specification
-- WDM (Windows Driver Model) Architecture
-- FreeBSD Network & Storage Drivers
+- Linux virtio drivers & C symbol bridge
+- FreeBSD KLD & OpenBSD dev shims
+- Redox OS userland drivers
 
 ## Purpose
-Define required behavior, safety boundaries, and validation
-for SigmaOS Device Driver components (PCI, USB, VirtIO, Framebuffer, Network, Storage).
+Define required behavior, safety boundaries, and validation for SigmaOS driver components.
 
 ## Mandatory rules
 
-1. A driver name does not imply hardware support; support requires a named device, driver version, test date, and log.
-2. Every driver must define explicit probe, initialization, error handling, and shutdown behavior (WDM-style IoManager/DriverObject/DeviceObject).
-3. QEMU virtio devices (virtio-blk, virtio-net, virtio-gpu) must be validated in QEMU before physical hardware claims are made.
-4. Device MMIO operations must use bounded, volatile, typed memory maps.
-5. DMA operations must validate physical buffer bounds and enforce IOMMU / alignment constraints.
+1. A driver name does not imply hardware support.
+2. Every driver must define probe, initialization, error, and shutdown behavior.
+3. Device support requires a named device, driver version, test date, and log.
+4. QEMU virtio devices should be validated before physical hardware claims.
 
 ## Prohibited
 
-- Claiming physical hardware compatibility without driver evidence logs
-- Unbounded MMIO reads/writes or unmapped physical address access
-- Unhandled device interrupts or missing IRQ handler cleanup
-- Driver crash propagating to unrecoverable kernel panic
-- Status promotion without QEMU or hardware diagnostic log
+- Overbroad hardware compatibility claims without hardware/QEMU logs
+- Driver panics crashing the global kernel execution state
+- Unsandboxed Tier 2+ driver access to host hardware
 
 ## Required evidence
 
-- Driver probe/init/shutdown unit test logs
-- QEMU VirtIO device test execution output
-- Diagnostics log from `collect_diagnostics.sh` and driver evidence test
-- Hardware support ledger entry in `docs/platform/HARDWARE_SUPPORT.md`
+- Driver unit and probe test reports
+- QEMU device-specific test log (e.g. virtio-blk, virtio-net)
+- Hardware test log if physical support is claimed
 
 ## Promotion criteria
 
 | Level | Requirement |
 |---|---|
-| Proposed | Driver specification and hardware matrix registration |
-| Prototype | Standalone unit tests & simulated MMIO probe tests |
-| Integrated | QEMU VirtIO device integration & IO control tests |
-| Hardened | Hot-plug/removal fault injection, DMA stress tests |
-| Supported | Real hardware diagnostic log and reproducible boot evidence |
+| Proposed | ADR and gap analysis |
+| Prototype | Unit tests & mock probe |
+| Integrated | QEMU virtio device integration |
+| Hardened | Ring 3 driver fault containment |
+| Supported | Reproducible hardware/QEMU test log |

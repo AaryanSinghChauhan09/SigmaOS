@@ -54,7 +54,7 @@
 
 ### 4. Documentation & Workflow
 - **Documentation Audit:**
-  - Root documents (`README.md`, `SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md`) and roadmap specifications in `docs/roadmap/` synchronized across `wiki/` and `WIKI/` mirrors.
+  - Root documents (`README.md`, `SIGMAOS_500_REPOS_TRI_AGENT_ABSORPTION_MASTER_PLAN.md`) and roadmap specifications in `docs/roadmap/` synchronized across `wiki/` and `WIKI/` mirrors.
 - **CI/CD Pipeline Efficiency:**
   - Audit of 25 GitHub Actions workflows in `.github/workflows/` confirmed fast PR checks (`pr_fast_checks.yml`) run under 2 minutes.
 - **Developer Onboarding:**

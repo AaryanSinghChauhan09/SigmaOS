@@ -9,8 +9,7 @@ filesystem-agent
 - FreeBSD VFS
 
 ## Purpose
-Define required behavior, safety boundaries, and validation
-for SigmaOS VFS components.
+Define required behavior, safety boundaries, and validation for SigmaOS VFS components.
 
 ## Mandatory rules
 
