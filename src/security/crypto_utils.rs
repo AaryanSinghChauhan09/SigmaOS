@@ -86,21 +86,19 @@ impl Default for SecureRandom {
     }
 }
 
-/// Constant-time comparison for cryptographic values
+/// Constant-time comparison for cryptographic values (CWE-208 / CWE-385)
 ///
-/// This prevents timing attacks that could leak information about
-/// secret values (like MACs or passwords).
+/// Prevents timing side-channel leaks by avoiding early returns on slice length mismatch
+/// and shielding comparison logic against compiler loop shortcut optimizations via `black_box`.
 pub fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
-    if a.len() != b.len() {
-        return false;
-    }
+    // Accumulate length discrepancy into bitmask to avoid timing leak on length mismatch
+    let mut result = (a.len() != b.len()) as u8;
 
-    let mut result = 0u8;
-    for (byte_a, byte_b) in a.iter().zip(b.iter()) {
+    for (&byte_a, &byte_b) in a.iter().zip(b.iter()) {
         result |= byte_a ^ byte_b;
     }
 
-    result == 0
+    core::hint::black_box(result) == 0
 }
 
 /// Password hashing placeholder using zero-allocation iterator cycles

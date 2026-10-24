@@ -30,7 +30,7 @@ next_milestone = "PR 1: Define scheduler-dispatcher-IRQ boundaries & PR 2: Conte
 status = "unit-tested"
 files = ["src/kernel/thread.rs", "docs/thread-manager.md", "CONTRIBUTING.md", "AGENTS.md", ".github/PULL_REQUEST_TEMPLATE.md"]
 description = "Canonical thread lifecycle (New, Ready, Running, Blocked, Suspended, Zombie, Terminated), join/detach, wait channel wakeups, stack guard checks, CpuContext, and ownership contract"
-test_evidence = "Architectural specification in docs/thread-manager.md; engineering cadence in CONTRIBUTING.md; 8 unit tests pass via rustc --test src/kernel/thread.rs"
+test_evidence = "Architectural specification in docs/thread-manager.md; engineering cadence in CONTRIBUTING.md; 10 unit tests pass via rustc --test src/kernel/thread.rs"
 next_milestone = "Integrate canonical Thread objects into CPU run queue and scheduler dispatch path"
 
 [arch.x86_64]
@@ -452,6 +452,13 @@ files = ["docs/SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md", "wiki/35-SigmaOS-Devi
 description = "SigmaOS Device Driver Development and Maintenance Plan establishing 15-PR implementation gateway, status vocabulary, bus/device abstractions, managed RAII resource lifecycles, platform DMA mapping, IRQ contracts, MMIO access validations, PCI enumeration, devlink health diagnostics, and master PR suite"
 test_evidence = "Architecture specification published in docs/SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md and wiki/35-SigmaOS-Device-Driver-Development-Plan.md; standalone unit test passes via rustc --test src/driver/sovereign_device_driver_development_and_pr_suite.rs"
 next_milestone = "PR 1: docs(drivers): audit driver status and define support evidence & PR 8: feat(drivers): integrate VirtIO block through PCI discovery"
+
+[syscall.development_plan]
+status = "integrated"
+files = ["docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/36-SigmaOS-Syscall-Development-Plan.md", "src/syscall/sovereign_syscall_development_and_pr_suite.rs"]
+description = "SigmaOS System-Call Development and Maintenance Plan establishing 10 mandatory ABI policies, 17-PR implementation sequence, periodic maintenance cadences, component rules, PR review gates, and rollout criteria"
+test_evidence = "Architecture specification published in docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/36-SigmaOS-Syscall-Development-Plan.md; standalone unit tests pass via rustc --test src/syscall/sovereign_syscall_development_and_pr_suite.rs"
+next_milestone = "PR 1: docs(syscall): define ABI policy and component status & PR 3: test(syscall): add user-memory access harness"
 
 
 [compilation.status]
