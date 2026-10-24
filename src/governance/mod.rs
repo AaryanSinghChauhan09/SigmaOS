@@ -4,6 +4,7 @@ use std::vec::Vec;
 // Foundation Model, Democratic Voting, and Release Roadmaps
 
 pub mod future_protocol;
+pub mod kernel_lifecycle_program;
 pub mod maintenance_operating_model;
 pub mod okr;
 pub mod periodic_pr_component_rules_engine;
@@ -16,6 +17,7 @@ pub mod strategic_vision;
 pub mod study_to_implementation_pipeline_pr;
 pub mod supreme_court;
 
+pub use kernel_lifecycle_program::*;
 pub use maintenance_operating_model::*;
 pub use periodic_pr_component_rules_engine::*;
 pub use periodic_study_improve_prove_engine::*;
