@@ -44,6 +44,7 @@ pub mod gridcraft_artcraft_missing_components_v66_pr;
 pub mod gridcraft_artcraft_parity_pr;
 pub mod gridcraft_missing_components_parity_pr;
 pub mod lightcraft;
+pub mod lightcraft_artcraft_missing_components_v67_pr;
 pub mod lightcraft_artcraft_parity_pr;
 pub mod lightcraft_missing_components_parity_pr;
 pub mod mediacraft;
@@ -139,6 +140,7 @@ pub use lightcraft::{
     Material, Photo, PhotoMetadata, Preset, Rating, RawFormat, Scene, ThreeWayColorGrading,
     ToneCurve, ToneCurvePoint,
 };
+pub use lightcraft_artcraft_missing_components_v67_pr::*;
 pub use lightcraft_artcraft_parity_pr::*;
 pub use lightcraft_missing_components_parity_pr::*;
 pub use mediacraft::{

@@ -51,6 +51,7 @@ pub use creative::gridcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::fontcraft::*;
 pub use creative::fontcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::fontcraft_artcraft_parity_pr::*;
+pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::fontcraft_missing_components_parity_pr::*;
 pub use creative::photocraft_artcraft_missing_components_v65_pr::*;
 // pub use creative::photocraft_artcraft_parity_pr::*;
