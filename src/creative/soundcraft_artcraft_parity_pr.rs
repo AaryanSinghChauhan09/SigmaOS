@@ -53,7 +53,7 @@ pub struct SoundcraftAudioClip {
 }
 
 /// Advanced Multi-Track Timeline & Elastic Resampling Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftAdvancedMultiTrackElasticTimePitchPrEngine {
     pub sample_rate: u32,
     pub active_clips: Vec<SoundcraftAudioClip>,
@@ -145,7 +145,7 @@ pub struct SoundcraftGranularGrain {
 }
 
 /// Spectral Synthesis & Multi-Zone Sampler PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftSpectralSynthesisGranularSamplerPrEngine {
     pub wavetable_harmonics: u32,
     pub max_polyphony: u32,
@@ -230,7 +230,7 @@ pub struct SoundcraftPosition3D {
 }
 
 /// 3D Spatial HRTF & Reverb Convolution Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftSpatial3dAmbisonicHrtfReverbPrEngine {
     pub ambisonic_order: u8,
     pub room_reflections_enabled: bool,
@@ -303,7 +303,7 @@ pub struct SoundcraftAutomationPoint {
 }
 
 /// MIDI 2.0 / MPE & VST3/CLAP Plugin Host PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftMidi20MpeVst3ClapPluginPrEngine {
     pub mpe_enabled: bool,
     pub hosted_plugins_count: u32,
@@ -383,7 +383,7 @@ pub struct SoundcraftLoudnessMeasurement {
 }
 
 /// EBU R128 LUFS Loudness & Mastering Limiter PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftMasteringEbuR128LoudnessLimiterPrEngine {
     pub target_lufs: f32,
     pub ceiling_dbfs: f32,
@@ -478,7 +478,7 @@ pub struct SoundcraftDawTrackDelta {
 }
 
 /// Multi-User CRDT DAW Session PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftRealtimeCrdtCoAuthoringPrEngine {
     pub connected_peers: Vec<u32>,
     pub delta_log: Vec<SoundcraftDawTrackDelta>,
@@ -551,7 +551,7 @@ pub struct SoundcraftSeparatedStems {
 }
 
 /// AI Neural Stem Separation & Denoising Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftNeuralStemSeparationAiDenoisePrEngine {
     pub model_precision_bits: u8,
     pub noise_reduction_db: f32,
@@ -627,7 +627,7 @@ pub struct SoundcraftConsoleChannelStrip {
 }
 
 /// Analog Tape Saturation & Console Modeling Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftAnalogTapeConsoleSaturationPrEngine {
     pub channel_strip: Option<SoundcraftConsoleChannelStrip>,
 }
@@ -687,7 +687,7 @@ pub struct SoundcraftNoteEntry {
 }
 
 /// Score Sheet Notation & Dynamic Engraving PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftInteractiveScoreSheetNotationPrEngine {
     pub staff_count: u8,
     pub time_signature_num: u8,
@@ -748,7 +748,7 @@ pub struct SoundcraftAudioBus {
 }
 
 /// Master Session Template & Audio Bus Cascade Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SoundcraftMasterSessionTemplateCascadePrEngine {
     pub master_bus_volume_db: f32,
     pub buses: BTreeMap<u32, SoundcraftAudioBus>,
@@ -807,7 +807,7 @@ impl SoundcraftMasterSessionTemplateCascadePrEngine {
 // ============================================================================
 
 /// Master PR Gateway for Soundcraft / Artcraft parity features.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SovereignSoundcraftArtcraftParityPrGateway {
     pub multitrack_engine: SoundcraftAdvancedMultiTrackElasticTimePitchPrEngine,
     pub spectral_synthesis_engine: SoundcraftSpectralSynthesisGranularSamplerPrEngine,

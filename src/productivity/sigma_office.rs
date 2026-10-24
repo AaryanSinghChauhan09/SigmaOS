@@ -739,6 +739,9 @@ impl SovereignZohoDeskMultiChannelKnowledgeBaseEngine {
     }
 }
 
+#[cfg(not(feature = "standalone_test"))]
+pub use super::sovereign_office_suite_innovations_v5::*;
+
 impl Default for SovereignZohoDeskMultiChannelKnowledgeBaseEngine {
     fn default() -> Self {
         Self::new()

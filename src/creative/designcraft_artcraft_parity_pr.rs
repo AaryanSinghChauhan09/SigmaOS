@@ -85,6 +85,17 @@ pub struct DesigncraftInteractivePrototypingPrEngine {
     pub next_id: AtomicU32,
 }
 
+impl Clone for DesigncraftInteractivePrototypingPrEngine {
+    fn clone(&self) -> Self {
+        Self {
+            interactions: self.interactions.clone(),
+            active_screen_id: self.active_screen_id,
+            overlay_stack: self.overlay_stack.clone(),
+            next_id: AtomicU32::new(self.next_id.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 impl Default for DesigncraftInteractivePrototypingPrEngine {
     fn default() -> Self {
         Self::new()
@@ -201,7 +212,7 @@ pub struct AutoLayoutFrame {
 }
 
 /// Auto-Layout Flexbox Container PR Engine
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DesigncraftAutoLayoutFlexboxPrEngine {
     pub frames: BTreeMap<u32, AutoLayoutFrame>,
 }
@@ -271,7 +282,7 @@ pub enum TokenValue {
 }
 
 /// Design System Tokens & Variable Modes PR Engine
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DesigncraftDesignSystemTokensPrEngine {
     pub modes: Vec<String>,
     pub current_mode: String,
@@ -380,6 +391,15 @@ pub struct DesigncraftVectorBooleanGeometryPrEngine {
     pub next_path_id: AtomicU32,
 }
 
+impl Clone for DesigncraftVectorBooleanGeometryPrEngine {
+    fn clone(&self) -> Self {
+        Self {
+            paths: self.paths.clone(),
+            next_path_id: AtomicU32::new(self.next_path_id.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 impl Default for DesigncraftVectorBooleanGeometryPrEngine {
     fn default() -> Self {
         Self::new()
@@ -471,6 +491,16 @@ pub struct DesigncraftMultiplayerCrdtSyncPrEngine {
     pub next_op_id: AtomicU32,
 }
 
+impl Clone for DesigncraftMultiplayerCrdtSyncPrEngine {
+    fn clone(&self) -> Self {
+        Self {
+            cursors: self.cursors.clone(),
+            op_log: self.op_log.clone(),
+            next_op_id: AtomicU32::new(self.next_op_id.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 impl Default for DesigncraftMultiplayerCrdtSyncPrEngine {
     fn default() -> Self {
         Self::new()
@@ -538,7 +568,7 @@ pub enum CodeFrameworkTarget {
 }
 
 /// Multi-Framework Code Exporter PR Engine
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct DesigncraftCodeExportFrameworkPrEngine {
     pub target: CodeFrameworkTarget,
 }
@@ -622,6 +652,15 @@ pub struct DesigncraftComponentVariantsPrEngine {
     pub next_variant_id: AtomicU32,
 }
 
+impl Clone for DesigncraftComponentVariantsPrEngine {
+    fn clone(&self) -> Self {
+        Self {
+            variants: self.variants.clone(),
+            next_variant_id: AtomicU32::new(self.next_variant_id.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 impl Default for DesigncraftComponentVariantsPrEngine {
     fn default() -> Self {
         Self::new()
@@ -685,7 +724,7 @@ pub struct DtcgToken {
 }
 
 /// W3C Design Tokens & Style Dictionary PR Engine
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DesigncraftDesignTokensStyleDictionaryPrEngine {
     pub tokens: BTreeMap<String, DtcgToken>,
 }
@@ -744,7 +783,7 @@ pub struct VectorIconSymbol {
 }
 
 /// Vector Icon System Packaging PR Engine
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DesigncraftIconSystemPackagingPrEngine {
     pub icons: BTreeMap<String, VectorIconSymbol>,
 }
@@ -838,7 +877,7 @@ impl RgbColor {
 }
 
 /// WCAG Accessibility Audit PR Engine
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DesigncraftWcagAccessibilityAuditPrEngine;
 
 impl DesigncraftWcagAccessibilityAuditPrEngine {
@@ -878,7 +917,7 @@ impl DesigncraftWcagAccessibilityAuditPrEngine {
 // ============================================================================
 
 /// Master Gateway Coordinator for Designcraft to Artcraft Parity PR Proposals.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SovereignDesigncraftArtcraftParityPrGateway {
     pub interactive_prototyping: DesigncraftInteractivePrototypingPrEngine,
     pub auto_layout_flexbox: DesigncraftAutoLayoutFlexboxPrEngine,
@@ -895,6 +934,14 @@ pub struct SovereignDesigncraftArtcraftParityPrGateway {
 impl SovereignDesigncraftArtcraftParityPrGateway {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn evaluate_designcraft_parity(&mut self) -> bool {
+        self.collect_all_proposals().len() == 10
+    }
+
+    pub fn evaluate_designcraft_artcraft_parity(&mut self) -> bool {
+        self.evaluate_designcraft_parity()
     }
 
     pub fn collect_all_proposals(&self) -> Vec<DesigncraftArtcraftPrProposalManifest> {
