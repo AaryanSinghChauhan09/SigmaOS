@@ -16,8 +16,7 @@
 // 10. OpenBsdUnwindDnssecDoHResolverPrEngine
 // 11. OpenBsdMissingComponentsV66PrSuite (Master PR Gateway Suite)
 
-extern crate alloc;
-use alloc::string::String;
+extern crate alloc;use alloc::string::String;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -34,16 +33,14 @@ pub struct PinsyscallEnforcementStatus {
     pub process_id: u32,
     pub total_syscalls_intercepted: u64,
     pub illegal_syscall_traps: u64,
-    pub active_pin_ranges: usize,
-}
+    pub active_pin_ranges: usize,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPinsyscallSecTrapKernelEnforcerPrEngine {
     pub engine_name: String,
     pub registered_ranges: Vec<PinsyscallTrapRange>,
     pub intercepted_count: u64,
-    pub trap_count: u64,
-}
+    pub trap_count: u64,}
 
 impl OpenBsdPinsyscallSecTrapKernelEnforcerPrEngine {
     pub fn new() -> Self {
@@ -86,15 +83,13 @@ pub struct UnveilNodePermissions {
     pub allow_read: bool,
     pub allow_write: bool,
     pub allow_execute: bool,
-    pub allow_create: bool,
-}
+    pub allow_create: bool,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdUnveilPathMaskKernelIsolationPrEngine {
     pub engine_name: String,
     pub unveil_table: Vec<UnveilNodePermissions>,
-    pub is_locked: bool,
-}
+    pub is_locked: bool,}
 
 impl OpenBsdUnveilPathMaskKernelIsolationPrEngine {
     pub fn new() -> Self {
@@ -119,8 +114,7 @@ impl OpenBsdUnveilPathMaskKernelIsolationPrEngine {
             allow_read,
             allow_write,
             allow_execute,
-            allow_create,
-        });
+            allow_create,        });
         Ok(())
     }
 
@@ -159,14 +153,12 @@ pub struct PledgeRuleSet {
     pub inet: bool,
     pub dns: bool,
     pub exec: bool,
-    pub proc: bool,
-}
+    pub proc: bool,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPledgeSyscallCategorySandboxPrEngine {
     pub engine_name: String,
-    pub active_pledge: Option<PledgeRuleSet>,
-}
+    pub active_pledge: Option<PledgeRuleSet>,}
 
 impl OpenBsdPledgeSyscallCategorySandboxPrEngine {
     pub fn new() -> Self {
@@ -203,8 +195,7 @@ impl OpenBsdPledgeSyscallCategorySandboxPrEngine {
                 "exec" => pledge.exec,
                 "proc" => pledge.proc,
                 _ => false,
-            }
-        } else {
+            }        } else {
             true
         }
     }
@@ -220,20 +211,17 @@ pub struct KryptexVolumeSpec {
     pub cipher_suite: String,
     pub key_derivation_rounds: u32,
     pub physical_chunks: Vec<String>,
-    pub master_key_unlocked: bool,
-}
+    pub master_key_unlocked: bool,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSoftraidKryptexMasterKeyringPrEngine {
     pub engine_name: String,
-    pub volumes: Vec<KryptexVolumeSpec>,
-}
+    pub volumes: Vec<KryptexVolumeSpec>,}
 
 impl OpenBsdSoftraidKryptexMasterKeyringPrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Softraid Kryptex Master Keyring Engine V66"),
-            volumes: Vec::new(),
+            engine_name: String::from("OpenBSD Softraid Kryptex Master Keyring Engine V66"),            volumes: Vec::new(),
         }
     }
 
@@ -249,8 +237,7 @@ impl OpenBsdSoftraidKryptexMasterKeyringPrEngine {
             vol.master_key_unlocked = true;
             Ok(true)
         } else {
-            Err(String::from("Kryptex volume not found"))
-        }
+            Err(String::from("Kryptex volume not found"))        }
     }
 
     pub fn get_summary(&self) -> String {
@@ -263,15 +250,13 @@ pub struct PfMultiQueueSpec {
     pub queue_id: u32,
     pub interface: String,
     pub bandwidth_mbps: u32,
-    pub syn_proxy_max_states: u64,
-}
+    pub syn_proxy_max_states: u64,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPfStatefulSynProxyMultiQueuePrEngine {
     pub engine_name: String,
     pub queues: Vec<PfMultiQueueSpec>,
-    pub active_syn_proxies: u64,
-}
+    pub active_syn_proxies: u64,}
 
 impl OpenBsdPfStatefulSynProxyMultiQueuePrEngine {
     pub fn new() -> Self {
@@ -302,14 +287,12 @@ pub struct VmdVirtioGpuDevice {
     pub vm_name: String,
     pub vram_mb: u32,
     pub enable_3d_acceleration: bool,
-    pub pci_passthrough_address: Option<String>,
-}
+    pub pci_passthrough_address: Option<String>,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdVmdVirtioGpuPassThroughPrEngine {
     pub engine_name: String,
-    pub active_gpus: Vec<VmdVirtioGpuDevice>,
-}
+    pub active_gpus: Vec<VmdVirtioGpuDevice>,}
 
 impl OpenBsdVmdVirtioGpuPassThroughPrEngine {
     pub fn new() -> Self {
@@ -329,8 +312,7 @@ impl OpenBsdVmdVirtioGpuPassThroughPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} Virtio-GPU instances active", self.engine_name, self.active_gpus.len())
-    }
+        format!("{}: {} Virtio-GPU instances active", self.engine_name, self.active_gpus.len())    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -340,15 +322,13 @@ pub struct SpamTrapAnalysisResult {
     pub is_spam_trap: bool,
     pub dkim_signature_valid: bool,
     pub dmarc_alignment_pass: bool,
-    pub decision: String,
-}
+    pub decision: String,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSmtpdSpamTrapDkimSignerPrEngine {
     pub engine_name: String,
     pub trap_addresses: Vec<String>,
-    pub domain_keys: Vec<String>,
-}
+    pub domain_keys: Vec<String>,}
 
 impl OpenBsdSmtpdSpamTrapDkimSignerPrEngine {
     pub fn new() -> Self {
@@ -375,13 +355,11 @@ impl OpenBsdSmtpdSpamTrapDkimSignerPrEngine {
             is_spam_trap: is_trap,
             dkim_signature_valid: dkim_present,
             dmarc_alignment_pass: dkim_present && !is_trap,
-            decision,
-        }
+            decision,        }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} spam traps, {} DKIM domain keys active", self.engine_name, self.trap_addresses.len(), self.domain_keys.len())
-    }
+        format!("{}: {} spam traps, {} DKIM domain keys active", self.engine_name, self.trap_addresses.len(), self.domain_keys.len())    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -389,8 +367,7 @@ pub struct SignifyPqcVerification {
     pub package_name: String,
     pub key_id: String,
     pub pqc_algorithm: String,
-    pub is_valid: bool,
-}
+    pub is_valid: bool,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSignifyPqcDilithiumVerifierPrEngine {
@@ -414,13 +391,11 @@ impl OpenBsdSignifyPqcDilithiumVerifierPrEngine {
             package_name: String::from(package_name),
             key_id: String::from(key_fingerprint),
             pqc_algorithm: String::from("Dilithium3-Ed25519-Hybrid"),
-            is_valid: valid,
-        }
+            is_valid: valid,        }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} trusted signify PQC public keys loaded", self.engine_name, self.trusted_key_fingerprints.len())
-    }
+        format!("{}: {} trusted signify PQC public keys loaded", self.engine_name, self.trusted_key_fingerprints.len())    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -428,14 +403,12 @@ pub struct RelaydHttp2Backend {
     pub endpoint: String,
     pub port: u16,
     pub grpc_capable: bool,
-    pub active_connections: u32,
-}
+    pub active_connections: u32,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdRelaydHttp2StreamSniBalancerPrEngine {
     pub engine_name: String,
-    pub backends: Vec<RelaydHttp2Backend>,
-}
+    pub backends: Vec<RelaydHttp2Backend>,}
 
 impl OpenBsdRelaydHttp2StreamSniBalancerPrEngine {
     pub fn new() -> Self {
@@ -453,13 +426,11 @@ impl OpenBsdRelaydHttp2StreamSniBalancerPrEngine {
         if sni_host.is_empty() {
             None
         } else {
-            self.backends.first().cloned()
-        }
+            self.backends.first().cloned()        }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} HTTP/2 gRPC backends configured", self.engine_name, self.backends.len())
-    }
+        format!("{}: {} HTTP/2 gRPC backends configured", self.engine_name, self.backends.len())    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -467,15 +438,13 @@ pub struct UnwindResolveResponse {
     pub query_domain: String,
     pub dnssec_status: String,
     pub upstream_transport: String,
-    pub ip_addresses: Vec<String>,
-}
+    pub ip_addresses: Vec<String>,}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdUnwindDnssecDoHResolverPrEngine {
     pub engine_name: String,
     pub doh_servers: Vec<String>,
-    pub dot_servers: Vec<String>,
-}
+    pub dot_servers: Vec<String>,}
 
 impl OpenBsdUnwindDnssecDoHResolverPrEngine {
     pub fn new() -> Self {
@@ -491,14 +460,12 @@ impl OpenBsdUnwindDnssecDoHResolverPrEngine {
             query_domain: String::from(domain),
             dnssec_status: String::from("SECURE_VALIDATED"),
             upstream_transport: String::from(if require_doh { "DNS-over-HTTPS" } else { "DNS-over-TLS" }),
-            ip_addresses: Vec::from([String::from("198.51.100.25")]),
-        }
+            ip_addresses: Vec::from([String::from("198.51.100.25")]),        }
     }
 
     pub fn get_summary(&self) -> String {
         format!("{}: {} DoH & {} DoT resolvers active", self.engine_name, self.doh_servers.len(), self.dot_servers.len())
-    }
-}
+    }}
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdMissingComponentsV66PrSuite {
@@ -514,7 +481,6 @@ pub struct OpenBsdMissingComponentsV66PrSuite {
     pub relayd_engine: OpenBsdRelaydHttp2StreamSniBalancerPrEngine,
     pub unwind_engine: OpenBsdUnwindDnssecDoHResolverPrEngine,
 }
-
 impl OpenBsdMissingComponentsV66PrSuite {
     pub fn new() -> Self {
         Self {
@@ -529,8 +495,7 @@ impl OpenBsdMissingComponentsV66PrSuite {
             signify_engine: OpenBsdSignifyPqcDilithiumVerifierPrEngine::new(),
             relayd_engine: OpenBsdRelaydHttp2StreamSniBalancerPrEngine::new(),
             unwind_engine: OpenBsdUnwindDnssecDoHResolverPrEngine::new(),
-        }
-    }
+        }    }
 
     pub fn run_all_checks(&mut self) -> Vec<String> {
         let mut reports = Vec::new();
@@ -544,8 +509,7 @@ impl OpenBsdMissingComponentsV66PrSuite {
         reports.push(self.signify_engine.get_summary());
         reports.push(self.relayd_engine.get_summary());
         reports.push(self.unwind_engine.get_summary());
-        reports
-    }
+        reports    }
 }
 
 #[cfg(test)]
@@ -567,8 +531,7 @@ mod tests {
         assert!(valid.is_ok());
 
         let invalid = engine.validate_syscall_entry(1001, 0x500000);
-        assert!(invalid.is_err());
-    }
+        assert!(invalid.is_err());    }
 
     #[test]
     fn test_unveil_isolation_engine() {
@@ -578,8 +541,7 @@ mod tests {
         assert!(!engine.check_path_access("/usr/lib/libc.so", 'w'));
 
         engine.lock_unveil();
-        assert!(engine.add_unveil("/etc", "r").is_err());
-    }
+        assert!(engine.add_unveil("/etc", "r").is_err());    }
 
     #[test]
     fn test_pledge_sandbox_engine() {
@@ -587,8 +549,7 @@ mod tests {
         assert!(engine.set_pledge("stdio rpath inet").is_ok());
         assert!(engine.is_category_permitted("stdio"));
         assert!(engine.is_category_permitted("inet"));
-        assert!(!engine.is_category_permitted("exec"));
-    }
+        assert!(!engine.is_category_permitted("exec"));    }
 
     #[test]
     fn test_softraid_kryptex_engine() {
@@ -601,8 +562,7 @@ mod tests {
             master_key_unlocked: false,
         });
 
-        let unlock = engine.unlock_kryptex("vol-001", "secret_passphrase");
-        assert!(unlock.is_ok());
+        let unlock = engine.unlock_kryptex("vol-001", "secret_passphrase");        assert!(unlock.is_ok());
         assert!(unlock.unwrap());
     }
 
@@ -617,8 +577,7 @@ mod tests {
         });
 
         assert!(engine.handle_syn_packet());
-        assert_eq!(engine.active_syn_proxies, 1);
-    }
+        assert_eq!(engine.active_syn_proxies, 1);    }
 
     #[test]
     fn test_vmd_virtio_gpu_engine() {
@@ -652,8 +611,7 @@ mod tests {
         let engine = OpenBsdSignifyPqcDilithiumVerifierPrEngine::new();
         let verification = engine.verify_syspatch("syspatch-76-002", "sig_data_dilithium3", "openbsd-v66-base.pub");
         assert!(verification.is_valid);
-        assert_eq!(verification.pqc_algorithm, "Dilithium3-Ed25519-Hybrid");
-    }
+        assert_eq!(verification.pqc_algorithm, "Dilithium3-Ed25519-Hybrid");    }
 
     #[test]
     fn test_relayd_http2_sni_engine() {
@@ -682,6 +640,5 @@ mod tests {
     fn test_openbsd_master_suite_v66() {
         let mut suite = OpenBsdMissingComponentsV66PrSuite::new();
         let summaries = suite.run_all_checks();
-        assert_eq!(summaries.len(), 10);
-    }
+        assert_eq!(summaries.len(), 10);    }
 }

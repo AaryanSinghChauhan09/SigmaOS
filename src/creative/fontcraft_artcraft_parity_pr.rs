@@ -1012,6 +1012,10 @@ impl SovereignFontcraftArtcraftParityPrGateway {
             && theme_ok
     }
 
+    pub fn evaluate_fontcraft_artcraft_parity(&mut self) -> bool {
+        self.evaluate_fontcraft_parity()
+    }
+
     pub fn collect_all_proposals(&self) -> Vec<FontcraftArtcraftPrProposalManifest> {
         vec![
             self.complex_shaping.generate_proposal(),
