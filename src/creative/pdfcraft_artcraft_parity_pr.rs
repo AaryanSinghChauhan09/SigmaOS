@@ -4,10 +4,8 @@ extern crate alloc;
 // SigmaOS - Pdfcraft to Artcraft Parity PR Proposal Engine
 // Bridges Pdfcraft (PDF suite) and Artcraft (Creative Suite) missing feature parity via structured PR proposals.
 
-use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use core::f64::consts::PI;
 
 
 
@@ -24,7 +22,7 @@ pub struct PdfcraftArtcraftPrProposalManifest {
 }
 
 /// Vector Art & Layer Import PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftVectorArtImportPrEngine;
 
 impl PdfcraftVectorArtImportPrEngine {
@@ -50,7 +48,7 @@ impl PdfcraftVectorArtImportPrEngine {
 }
 
 /// Multi-Workspace Project Management PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftMultiWorkspaceProjectPrEngine;
 
 impl PdfcraftMultiWorkspaceProjectPrEngine {
@@ -76,7 +74,7 @@ impl PdfcraftMultiWorkspaceProjectPrEngine {
 }
 
 /// Batch Export & Color Space Render PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftBatchExportRenderPrEngine;
 
 impl PdfcraftBatchExportRenderPrEngine {
@@ -103,7 +101,7 @@ impl PdfcraftBatchExportRenderPrEngine {
 }
 
 /// Digital Signature & Watermarking PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftDigitalSignatureWatermarkPrEngine;
 
 impl PdfcraftDigitalSignatureWatermarkPrEngine {
@@ -129,7 +127,7 @@ impl PdfcraftDigitalSignatureWatermarkPrEngine {
 }
 
 /// OCR Text Recognition & Searchable Layer PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftOcrTextRecognitionPrEngine;
 
 impl PdfcraftOcrTextRecognitionPrEngine {
@@ -155,7 +153,7 @@ impl PdfcraftOcrTextRecognitionPrEngine {
 }
 
 /// Interactive PDF Form Filler & Dynamic XFA Engine PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftInteractiveFormsXfaPrEngine;
 
 impl PdfcraftInteractiveFormsXfaPrEngine {
@@ -181,7 +179,7 @@ impl PdfcraftInteractiveFormsXfaPrEngine {
 }
 
 /// Print Preflight & CMYK Color Separation PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftColorPreflightCmykPrEngine;
 
 impl PdfcraftColorPreflightCmykPrEngine {
@@ -208,7 +206,7 @@ impl PdfcraftColorPreflightCmykPrEngine {
 }
 
 /// Document Redaction & Sanitization PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftRedactionSanitizationPrEngine;
 
 impl PdfcraftRedactionSanitizationPrEngine {
@@ -235,7 +233,7 @@ impl PdfcraftRedactionSanitizationPrEngine {
 }
 
 /// Page Imposition Layout & Booklet Assembly PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftPageImpositionBookletPrEngine;
 
 impl PdfcraftPageImpositionBookletPrEngine {
@@ -261,7 +259,7 @@ impl PdfcraftPageImpositionBookletPrEngine {
 }
 
 /// PDF/A & PDF/X Compliance Validation & Repair PR Engine.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct PdfcraftArchivalValidationPrEngine;
 
 impl PdfcraftArchivalValidationPrEngine {
@@ -289,7 +287,7 @@ impl PdfcraftArchivalValidationPrEngine {
 }
 
 /// Master Gateway Coordinator for Pdfcraft to Artcraft Parity PR Proposals.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SovereignPdfcraftArtcraftParityPrGateway {
     pub vector_import: PdfcraftVectorArtImportPrEngine,
     pub multi_workspace: PdfcraftMultiWorkspaceProjectPrEngine,
@@ -326,7 +324,6 @@ impl SovereignPdfcraftArtcraftParityPrGateway {
 
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
     use super::*;
 
     #[test]

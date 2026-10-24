@@ -552,7 +552,7 @@ fi
 if [ -f "src/creative/voicecraft_artcraft_parity_pr.rs" ]; then
     echo "Running Sovereign VoiceCraft to ArtCraft Parity PR Gateway test suite..."
     mkdir -p build
-    rustc --test src/creative/voicecraft_artcraft_parity_pr.rs --edition=2021 -o build/test_voicecraft_artcraft_parity
+    rustc --test src/creative/mod.rs --edition=2021 -o build/test_voicecraft_artcraft_parity
     ./build/test_voicecraft_artcraft_parity
 fi
 
@@ -2339,6 +2339,34 @@ if [ -f "src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs" ]; 
     mkdir -p build
     rustc --test src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs --edition=2021 -o build/test_artcraft_parity
     ./build/test_artcraft_parity
+fi
+
+if [ -f "src/creative/photocraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Photocraft to ArtCraft Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/photocraft_artcraft_parity_pr.rs --edition=2021 -o build/test_photocraft_artcraft_parity
+    ./build/test_photocraft_artcraft_parity
+fi
+
+if [ -f "src/creative/filmcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Filmcraft to ArtCraft Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/filmcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_filmcraft_artcraft_parity
+    ./build/test_filmcraft_artcraft_parity
+fi
+
+if [ -f "src/creative/pdfcraft_artcraft_parity_pr.rs" ]; then
+    echo "Running Sovereign Pdfcraft to ArtCraft Parity PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/pdfcraft_artcraft_parity_pr.rs --edition=2021 -o build/test_pdfcraft_artcraft_parity
+    ./build/test_pdfcraft_artcraft_parity
+fi
+
+if [ -f "tests/test_artcraft_creative_suite_master_pr.rs" ]; then
+    echo "Running Sovereign ArtCraft Creative Suite Master PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_artcraft_creative_suite_master_pr.rs --edition=2021 -o build/test_artcraft_master_pr
+    ./build/test_artcraft_master_pr
 fi
 
 if [ -f "src/creative/threedcraft_missing_components_parity_pr.rs" ]; then

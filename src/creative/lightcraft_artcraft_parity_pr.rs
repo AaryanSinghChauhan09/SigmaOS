@@ -720,6 +720,10 @@ impl SovereignLightcraftArtcraftParityPrGateway {
         true
     }
 
+    pub fn evaluate_lightcraft_artcraft_parity(&mut self) -> bool {
+        self.evaluate_lightcraft_parity()
+    }
+
     pub fn collect_all_proposals(&self) -> Vec<LightcraftArtcraftPrProposalManifest> {
         vec![
             self.tone_curve_engine.generate_proposal(),
