@@ -3601,6 +3601,11 @@ impl ChromiumBlinkV8IsolateMemoryGovernorEngine {
     pub fn verify_wx_sandbox_bounds(&self, addr: u64) -> bool {
         addr >= 0x0000_7f00_0000_0000 && addr < 0x0000_7f00_4000_0000
     }
+
+    pub fn audit_isolate_memory_limits(&self) -> (u64, u64, bool) {
+        let is_healthy = self.active_allocations_bytes < self.heap_limit_bytes;
+        (self.active_allocations_bytes, self.heap_limit_bytes, is_healthy)
+    }
 }
 
 pub struct LibreWolfStrictRfpTimerJitterEngine {
