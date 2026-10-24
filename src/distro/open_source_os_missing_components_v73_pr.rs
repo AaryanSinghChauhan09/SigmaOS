@@ -46,6 +46,35 @@ use std::vec::Vec;
 #[path = "sovereign_universal_subsystem_interop.rs"]
 pub mod sovereign_universal_subsystem_interop;
 use sovereign_universal_subsystem_interop::UniversalSubsystemCategory;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OsPrStatusV73 {
+    Draft,
+    Submitted,
+    Validated,
+    Merged,
+}
+
+#[derive(Debug, Clone)]
+pub struct OpenSourceOsPrProposalV73 {
+    pub pr_id: String,
+    pub title: String,
+    pub component_name: String,
+    pub os_origin: String,
+    pub status: OsPrStatusV73,
+    pub impacted_subsystems: Vec<String>,
+    pub patch_diff: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct OsFeatureComparisonEntryV73 {
+    pub os_name: String,
+    pub feature_category: String,
+    pub os_capability: String,
+    pub sigma_os_parity_status: String,
+    pub missing_component_pr_id: String,
+}
+
 #[derive(Debug, Default)]
 pub struct SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
     pub matrix_entries: BTreeMap<String, OsFeatureComparisonEntryV73>,

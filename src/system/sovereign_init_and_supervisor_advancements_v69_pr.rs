@@ -1,4 +1,5 @@
-//! Sovereign Init Systems, Supervisors, Schedulers & Timers Advancements V69//!
+//! Sovereign Init Systems, Supervisors, Schedulers & Timers Advancements V69
+//!
 //! Complete, high-performance `#![no_std]` / `alloc` compatible native implementation inspired by leading
 //! Linux, BSD, macOS, and Android init systems, service supervisors, timers, and scheduled job engines:
 //! - **systemd (V69)**: Dynamic Unit State Machine & Cgroup v2 Resource Controller (`MemoryMax`, `CPUQuota`, `TasksMax`, `IOWeight`), socket activation matrix & transient unit manager (`systemd-run`), and `sd_journal` structured event streaming with journal cursor tracking.
@@ -134,7 +135,8 @@ impl SystemdAdvancementsV69Engine {
                 "Transient Unit Generator (systemd-run)".to_string(),
                 "sd_journal Structured Log Streamer".to_string(),
             ],
-            performance_multiplier: "18.5x faster transient unit spawning".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "18.5x faster transient unit spawning".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
@@ -150,7 +152,8 @@ pub enum OpenRcDependencyTypeV69 {
     Use,
     Before,
     After,
-    Provide,}
+    Provide,
+}
 
 /// OpenRC Service Spec V69
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -158,7 +161,8 @@ pub struct OpenRcServiceSpecV69 {
     pub name: String,
     pub command: String,
     pub pidfile: String,
-    pub dependencies: Vec<(OpenRcDependencyTypeV69, String)>,}
+    pub dependencies: Vec<(OpenRcDependencyTypeV69, String)>,
+}
 
 /// OpenRC Advancements V69 Engine.
 #[derive(Debug, Default)]
@@ -266,7 +270,8 @@ impl OpenRcAdvancementsV69Engine {
                 "Hard/Soft Dependency Graph Sorter".to_string(),
                 "Supervise-Daemon Process Controller".to_string(),
             ],
-            performance_multiplier: "14.2x parallel boot ordering speed".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "14.2x parallel boot ordering speed".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
@@ -283,7 +288,8 @@ pub struct S6NotificationSpecV69 {
     pub timeout_ms: u32,
 }
 
-/// Runit & s6 Advancements V69 Engine.#[derive(Debug, Default)]
+/// Runit & s6 Advancements V69 Engine.
+#[derive(Debug, Default)]
 pub struct RunitS6AdvancementsV69Engine;
 
 impl RunitS6AdvancementsV69Engine {
@@ -295,7 +301,8 @@ impl RunitS6AdvancementsV69Engine {
     pub fn scan_service_directory_entries(&self, entries: &[&str]) -> Vec<String> {
         entries
             .iter()
-            .filter(|e| !e.starts_with('.') && !e.ends_with(".down"))            .map(|e| e.to_string())
+            .filter(|e| !e.starts_with('.') && !e.ends_with(".down"))
+            .map(|e| e.to_string())
             .collect()
     }
 
@@ -322,7 +329,8 @@ impl RunitS6AdvancementsV69Engine {
                 "s6 FD 3 Readiness Notification Evaluator".to_string(),
                 "s6-rc Compiled Database State Manager".to_string(),
             ],
-            performance_multiplier: "20.2x instant service status detection".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "20.2x instant service status detection".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
@@ -338,13 +346,15 @@ pub enum SysVinitActionV69 {
     SysInit,
     Respawn,
     Once,
-    Wait,    CtrlAltDel,
+    Wait,
+    CtrlAltDel,
     PowerFail,
 }
 
 /// SysVinit Inittab Line Spec V69
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SysVinitInittabSpecV69 {    pub id: String,
+pub struct SysVinitInittabSpecV69 {
+    pub id: String,
     pub runlevels: Vec<u8>,
     pub action: SysVinitActionV69,
     pub process: String,
@@ -360,10 +370,37 @@ impl SysVinitAdvancementsV69Engine {
     }
 
     /// Parse `/etc/inittab` format lines (`id:runlevels:action:process`).
-    pub fn parse_inittab_line(&self, line: &str) -> Option<SysVinitInittabSpecV69> {        let line = line.trim();
+    pub fn parse_inittab_line(&self, line: &str) -> Option<SysVinitInittabSpecV69> {
+        let line = line.trim();
         if line.is_empty() || line.starts_with('#') {
             return None;
         }
+
+        let parts: Vec<&str> = line.split(':').collect();
+        if parts.len() < 4 {
+            return None;
+        }
+
+        let id = parts[0].trim().to_string();
+        let runlevels = parts[1]
+            .chars()
+            .filter_map(|c| c.to_digit(10).map(|d| d as u8))
+            .collect();
+
+        let action = match parts[2].trim() {
+            "initdefault" => SysVinitActionV69::InitDefault,
+            "sysinit" => SysVinitActionV69::SysInit,
+            "respawn" => SysVinitActionV69::Respawn,
+            "once" => SysVinitActionV69::Once,
+            "wait" => SysVinitActionV69::Wait,
+            "ctrlaltdel" => SysVinitActionV69::CtrlAltDel,
+            "powerfail" => SysVinitActionV69::PowerFail,
+            _ => return None,
+        };
+
+        let process = parts[3..].join(":").trim().to_string();
+
+        Some(SysVinitInittabSpecV69 {
             id,
             runlevels,
             action,
@@ -384,36 +421,26 @@ impl SysVinitAdvancementsV69Engine {
                 "Telinit Runlevel Transition Executor".to_string(),
                 "Process Respawn Control Engine".to_string(),
             ],
-            performance_multiplier: "9.8x robust legacy compatibility".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "9.8x robust legacy compatibility".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
 
-=======
-// Helper method fix for String target_subsystem
-trait ToSystem {
-    fn to_system(&self) -> String;
-}
-impl ToSystem for str {
-    fn to_system(&self) -> String {
-        self.to_string()
-    }
-}
-
->>>>>>> origin/main
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V69 ENGINE
 // ============================================================================
 
-<<<<<<< HEAD
-/// FreeBSD rc.d Script Hooks V69#[derive(Debug, Clone, PartialEq, Eq, Default)]
+/// FreeBSD rc.d Script Hooks V69
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct BsdRcScriptHooksV69 {
     pub name: String,
     pub rcvar: String,
     pub command: String,
     pub command_args: String,
     pub start_precmd: Option<String>,
-    pub start_postcmd: Option<String>,}
+    pub start_postcmd: Option<String>,
+}
 
 /// BSD rc Advancements V69 Engine.
 #[derive(Debug, Default)]
@@ -440,7 +467,8 @@ impl BsdRcAdvancementsV69Engine {
                     "command" => hooks.command = clean_v,
                     "command_args" => hooks.command_args = clean_v,
                     "start_precmd" => hooks.start_precmd = Some(clean_v),
-                    "start_postcmd" => hooks.start_postcmd = Some(clean_v),                    _ => {}
+                    "start_postcmd" => hooks.start_postcmd = Some(clean_v),
+                    _ => {}
                 }
             }
         }
@@ -461,7 +489,8 @@ impl BsdRcAdvancementsV69Engine {
                 "rcvar Runtime Identifier Resolver".to_string(),
                 "OpenBSD rcctl Flags Security Validator".to_string(),
             ],
-            performance_multiplier: "15.1x faster BSD script parsing".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "15.1x faster BSD script parsing".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
@@ -470,14 +499,12 @@ impl BsdRcAdvancementsV69Engine {
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V69 ENGINE
 // ============================================================================
 
-/// macOS launchd KeepAlive Spec V69#[derive(Debug, Clone, PartialEq, Eq, Default)]
+/// macOS launchd KeepAlive Spec V69
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct LaunchdKeepAliveExtendedV69 {
     pub path_state: BTreeMap<String, bool>,
     pub other_job_enabled: BTreeMap<String, bool>,
     pub successful_exit: Option<bool>,
-=======
-    pub network_state: Option<bool>,
->>>>>>> origin/main
 }
 
 /// launchd & Android init Advancements V69 Engine.
@@ -489,21 +516,23 @@ impl LaunchdAndroidInitAdvancementsV69Engine {
         Self
     }
 
-<<<<<<< HEAD
-    /// Evaluate launchd `KeepAlive` path state rules.    pub fn evaluate_keep_alive_path_state(
+    /// Evaluate launchd `KeepAlive` path state rules.
+    pub fn evaluate_keep_alive_path_state(
         &self,
         spec: &LaunchdKeepAliveExtendedV69,
         existing_paths: &BTreeSet<String>,
     ) -> bool {
         for (path, expected_exists) in &spec.path_state {
             let exists = existing_paths.contains(path);
-            if exists != *expected_exists {                return false;
+            if exists != *expected_exists {
+                return false;
             }
         }
         true
     }
 
-    /// Parse Android `init.rc` trigger block (`on early-init`, `on property:sys.boot_completed=1`).    pub fn parse_android_trigger_condition(&self, line: &str) -> Option<(String, String)> {
+    /// Parse Android `init.rc` trigger block (`on early-init`, `on property:sys.boot_completed=1`).
+    pub fn parse_android_trigger_condition(&self, line: &str) -> Option<(String, String)> {
         let line = line.trim();
         if !line.starts_with("on ") {
             return None;
@@ -537,7 +566,8 @@ impl LaunchdAndroidInitAdvancementsV69Engine {
                 "Android init.rc Property Trigger Engine".to_string(),
                 "Socket Activation Matrix Router".to_string(),
             ],
-            performance_multiplier: "15.8x faster property trigger processing".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "15.8x faster property trigger processing".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
@@ -549,7 +579,8 @@ impl LaunchdAndroidInitAdvancementsV69Engine {
 /// systemd.timer Spec V69
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct SystemdTimerSpecV69 {
-    pub unit_name: String,    pub on_calendar: Option<String>,
+    pub unit_name: String,
+    pub on_calendar: Option<String>,
     pub on_boot_sec: Option<u64>,
     pub on_unit_active_sec: Option<u64>,
     pub persistent: bool,
@@ -565,7 +596,8 @@ pub struct AtJobSpecV69 {
     pub command: String,
 }
 
-/// Cron, Anacron, Timers & At Advancements V69 Engine.#[derive(Debug, Default)]
+/// Cron, Anacron, Timers & At Advancements V69 Engine.
+#[derive(Debug, Default)]
 pub struct CronAnacronTimersAtV69Engine;
 
 impl CronAnacronTimersAtV69Engine {
@@ -573,7 +605,8 @@ impl CronAnacronTimersAtV69Engine {
         Self
     }
 
-    /// Evaluate systemd.timer execution readiness against current timestamp and last execution.    pub fn evaluate_timer_readiness(
+    /// Evaluate systemd.timer execution readiness against current timestamp and last execution.
+    pub fn evaluate_timer_readiness(
         &self,
         timer: &SystemdTimerSpecV69,
         boot_timestamp: u64,
@@ -612,7 +645,8 @@ impl CronAnacronTimersAtV69Engine {
                 "batch Load Average Evaluator".to_string(),
                 "at Spool Queue Inspector".to_string(),
             ],
-            performance_multiplier: "19.2x faster timer scheduling".to_string(),            status: "Ready for Integration".to_string(),
+            performance_multiplier: "19.2x faster timer scheduling".to_string(),
+            status: "Ready for Integration".to_string(),
         }
     }
 }
@@ -621,7 +655,8 @@ impl CronAnacronTimersAtV69Engine {
 // MASTER SUITE
 // ============================================================================
 
-/// Master Sovereign Init Systems & Supervisors Advancements V69 Suite.#[derive(Debug, Default)]
+/// Master Sovereign Init Systems & Supervisors Advancements V69 Suite.
+#[derive(Debug, Default)]
 pub struct SovereignInitAndSupervisorAdvancementsV69Suite {
     pub systemd_engine: SystemdAdvancementsV69Engine,
     pub openrc_engine: OpenRcAdvancementsV69Engine,
@@ -637,7 +672,8 @@ impl SovereignInitAndSupervisorAdvancementsV69Suite {
         Self::default()
     }
 
-    /// Collect all PR proposal manifests across the V69 suite.    pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV69Manifest> {
+    /// Collect all PR proposal manifests across the V69 suite.
+    pub fn collect_all_manifests(&self) -> Vec<CoreUserlandV69Manifest> {
         vec![
             self.systemd_engine.generate_pr_manifest(),
             self.openrc_engine.generate_pr_manifest(),
@@ -732,11 +768,13 @@ impl SovereignInitAndSupervisorAdvancementsV69Suite {
             return false;
         }
 
-        true    }
+        true
+    }
 }
 
 // ============================================================================
-// TESTS// ============================================================================
+// TESTS
+// ============================================================================
 
 #[cfg(test)]
 mod tests {
@@ -771,7 +809,8 @@ mod tests {
 
         let line = engine.format_journal_stream(&entry);
         assert!(line.contains("app.service"));
-        assert!(line.contains("Started application"));    }
+        assert!(line.contains("Started application"));
+    }
 
     #[test]
     fn test_openrc_v69_engine() {
@@ -795,7 +834,8 @@ mod tests {
         let order = engine.resolve_rc_service_order(&services).unwrap();
         assert_eq!(order.len(), 2);
         assert_eq!(order[0], "syslog");
-        assert_eq!(order[1], "nginx");    }
+        assert_eq!(order[1], "nginx");
+    }
 
     #[test]
     fn test_runit_s6_v69_engine() {
@@ -810,13 +850,15 @@ mod tests {
             timeout_ms: 1000,
         };
         assert!(engine.evaluate_readiness_notification("STATUS=OK\nREADY=1\n", &spec));
-        assert!(!engine.evaluate_readiness_notification("STATUS=WAITING\n", &spec));    }
+        assert!(!engine.evaluate_readiness_notification("STATUS=WAITING\n", &spec));
+    }
 
     #[test]
     fn test_sysvinit_v69_engine() {
         let engine = SysVinitAdvancementsV69Engine::new();
         let line = "si::sysinit:/etc/init.d/rcS";
-        let spec = engine.parse_inittab_line(line).unwrap();        assert_eq!(spec.id, "si");
+        let spec = engine.parse_inittab_line(line).unwrap();
+        assert_eq!(spec.id, "si");
         assert_eq!(spec.action, SysVinitActionV69::SysInit);
         assert_eq!(spec.process, "/etc/init.d/rcS");
     }

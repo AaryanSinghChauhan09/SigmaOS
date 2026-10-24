@@ -516,8 +516,6 @@ impl Default for CachyLinuxMissingComponentsV71PrSuite {
         Self::new()
     }
 }
-<<<<<<< HEAD
-=======
 
 #[cfg(test)]
 mod tests {
@@ -555,4 +553,3 @@ mod tests {
         assert_eq!(engine.tdp_limit_watts, 40);
     }
 }
->>>>>>> origin/main

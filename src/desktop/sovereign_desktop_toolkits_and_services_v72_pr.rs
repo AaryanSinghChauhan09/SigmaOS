@@ -135,11 +135,11 @@ impl SovereignGtkQtToolkitEngineV72 {
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisplayManagerKindV72 {    Gdm,
+pub enum DisplayManagerKindV72 {
+    Gdm,
     Sddm,
     LightDm,
     Xdm,
-=======
     SlickGreeter,
 }
 
@@ -153,16 +153,15 @@ pub enum DesktopSessionTypeV72 {
     Sway,
     KdePlasma,
     GnomeShell,
->>>>>>> origin/main
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PamAuthRequestV72 {
     pub username: String,
-<<<<<<< HEAD
     pub password: String,
     pub password_hash: String,
-    pub mfa_otp: Option<String>,    pub seat_id: String,
+    pub mfa_otp: Option<String>,
+    pub seat_id: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

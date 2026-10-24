@@ -2651,8 +2651,4 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v72_pr.rs" ]; then
     rustc --test tests/test_open_source_os_unimplemented_ideas_v72_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v72_pr
     ./build/test_open_source_os_v72_pr
 fi
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 echo "All SigmaOS test suites completed."

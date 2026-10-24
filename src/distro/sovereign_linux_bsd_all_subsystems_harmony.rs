@@ -226,6 +226,7 @@ pub struct CrossSubsystemEvent {
 }
 
 /// Master harmony engine orchestrating all subsystems and Linux/BSD distro inspirations.
+#[derive(Debug)]
 pub struct SovereignSubsystemDistroHarmonyEngine {
     pub subsystems: BTreeMap<SigmaOsSubsystem, SubsystemCapabilitySpec>,
     pub translations: Vec<SubsystemPolicyTranslation>,

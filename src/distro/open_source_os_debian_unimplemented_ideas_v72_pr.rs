@@ -92,7 +92,6 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
 
         proposals
     }
-<<<<<<< HEAD
 
     pub fn evaluate_distro_parity_score(&self) -> u32 {
         let os_proposals = self.os_unimplemented_suite.collect_all_pr_specs();
@@ -103,6 +102,4 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
             total_score / os_proposals.len() as u32
         }
     }
-=======
->>>>>>> origin/main
 }

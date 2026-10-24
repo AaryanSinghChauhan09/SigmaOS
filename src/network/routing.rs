@@ -77,36 +77,6 @@ impl RouteEntry {
     }
 }
 
-/// Routing Table
-#[derive(Debug, Clone)]
-pub struct RoutingTable {
-    routes: Vec<RouteEntry>,
-}
-
-impl RoutingTable {
-    pub fn new() -> Self {
-        Self { routes: Vec::new() }
-    }
-
-    pub fn add_route(&mut self, route: RouteEntry) {
-        self.routes.push(route);
-    }
-
-    pub fn remove_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
-        let len_before = self.routes.len();
-        self.routes.retain(|r| !(r.destination == dest && r.netmask == netmask));
-        self.routes.len() < len_before
-    }
-
-    pub fn lookup(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
-        self.routes.iter().find(|r| r.matches(dest))
-    }
-
-    pub fn routes(&self) -> &[RouteEntry] {
-        &self.routes
-    }
-}
-
 /// Advanced Routing Tables
 /// Supports multiple routing tables (main, default, local, main) as per Linux networking stack
 /// Roadmap item: Full multi-table routing support for Omarchy Linux parity
@@ -267,20 +237,19 @@ impl MultiTableRoutingEngine {
 
     /// Forward packet using active routing table
     pub fn forward_packet(&self, dest: Ipv4Addr) -> Result<ForwardingDecision, NetworkError> {
-        if let Some(table) = self.active_table() {            if let Some(route) = table.lookup_primary(dest) {
+        if let Some(table) = self.active_table() {
+            if let Some(route) = table.lookup_primary(dest) {
                 return Ok(ForwardingDecision::Forward {
                     interface: route.interface.clone(),
                     next_hop: route.gateway,
                 });
             }
-=======
             if let Some(gateway) = table.default_gateway() {
                 return Ok(ForwardingDecision::Forward {
                     interface: "eth0".to_string(),
                     next_hop: Some(*gateway),
                 });
             }
->>>>>>> origin/main
         }
         Err(NetworkError::RouteNotFound)
     }
@@ -306,7 +275,6 @@ impl MultiTableRoutingEngine {
 
     /// Lookup route in active table
     pub fn lookup_route(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
-<<<<<<< HEAD
         self.active_table().and_then(|t| t.lookup_primary(dest))    }
 
     /// Get all routes from active table
