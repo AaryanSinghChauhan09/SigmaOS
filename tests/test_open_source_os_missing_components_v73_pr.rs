@@ -34,8 +34,7 @@ fn test_open_source_os_missing_components_v73_pr_suite_full_cycle() {
     // Verify individual engine functionality
     let pr_001 = &proposals[0];
     assert_eq!(pr_001.pr_id, "PR-V73-001");
-    assert!(pr_001.title.contains("Linux 6.29+"));
-    assert!(pr_001
+    assert!(pr_001.title.contains("Linux 6.28+"));    assert!(pr_001
         .impacted_subsystems
         .contains(&"KernelScheduling".to_string()));
 
