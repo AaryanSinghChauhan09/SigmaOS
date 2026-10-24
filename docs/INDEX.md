@@ -12,6 +12,7 @@ Welcome to the central documentation index for SigmaOS architecture, system deve
 
 ## Kernel & Core Subsystem Plans
 
+- [IPC Handler Master Architecture & Specification Plan](ipc-handler.md) — Formally specified, testable IPC handler subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, event wakeups, signal control plane, FD passing, and access control policies.
 - [Security Management Plan](SECURITY.md) — NIST SP 800-218 aligned security policy, threat models, and vulnerability management.
 - [Signals Development and Maintenance Plan](signal/SIGNAL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — POSIX.1-2024 signal architecture and cross-subsystem interruption suite.
 - [Network Development and Maintenance Plan](net/NETWORK_DEVELOPMENT_AND_MAINTENANCE_PLAN.md) — Network stack architecture, socket lifecycle, and firewall policy framework.
