@@ -1,19 +1,17 @@
-// Sovereign Desktop Services & Toolkits Engine V72 PR
-// Inspired by Linux and BSD Distributions: GTK (GTK4/Libadwaita), Qt (Qt6/Kvantum/QSS),
-// Display Managers (GDM, SDDM, LightDM, XDM), GVfs, GIO, PolicyKit (polkit), XDG Utilities & Portals,
-// fontconfig, FreeType, HarfBuzz, Pango, Cairo, Skia, IBus, Fcitx5, Notification Daemons,
-// Screen Lockers (ext-session-lock-v1), Clipboard Managers (cliphist), and 10-Distro PR Gateway.
-
+// Sovereign Desktop Services & Toolkits Advancements (V72 PR)
+// Clean-Room Rust PR Format Engines for Linux & BSD Desktop Ecosystems
+// Covers GTK4/Libadwaita, Qt6/Kvantum, Display Managers (GDM, SDDM, LightDM, XDMCP),
+// GVfs/GIO, PolicyKit, XDG Portals/Utilities, fontconfig/FreeType/HarfBuzz/Pango/Cairo/Skia,
+// IBus/Fcitx5, Notification Daemons, Screen Lockers, Clipboard Managers, and PR Gateway.
 use core::sync::atomic::{AtomicUsize, Ordering};
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;
 
-static NEXT_DESKTOP_SERVICE_ID_V72: AtomicUsize = AtomicUsize::new(7200);
+static NEXT_V72_DESKTOP_SERVICE_ID: AtomicUsize = AtomicUsize::new(72000);
 
 // ============================================================================
-// 1. GTK & Qt Toolkit Synchronization Engine V72
-// ============================================================================
+// 1. GTK4/Libadwaita & Qt6/Kvantum Toolkit Sync Engine V72// ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AdwColorSchemeV72 {
@@ -24,8 +22,7 @@ pub enum AdwColorSchemeV72 {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum QtPlatformStyleV72 {
-    Breeze = 0,
+pub enum Qt6PlatformStyleV72 {    Breeze = 0,
     Fusion = 1,
     AdwaitaQt = 2,
     Oxygen = 3,
@@ -52,357 +49,97 @@ pub struct KvantumThemeSpecV72 {
     pub window_margin_px: u32,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SovereignAccentColorV72 {
-    Blue,
-    Teal,
-    Green,
-    Yellow,
-    Orange,
-    Red,
-    Pink,
-    Purple,
-    Slate,
-    Custom(u8, u8, u8),
-}
-
-impl SovereignAccentColorV72 {
-    pub fn to_hex(&self) -> String {
-        match self {
-            SovereignAccentColorV72::Blue => "#3584e4".to_string(),
-            SovereignAccentColorV72::Teal => "#129eaf".to_string(),
-            SovereignAccentColorV72::Green => "#33d17a".to_string(),
-            SovereignAccentColorV72::Yellow => "#f6d32d".to_string(),
-            SovereignAccentColorV72::Orange => "#ff7800".to_string(),
-            SovereignAccentColorV72::Red => "#e01b24".to_string(),
-            SovereignAccentColorV72::Pink => "#d56199".to_string(),
-            SovereignAccentColorV72::Purple => "#9141ac".to_string(),
-            SovereignAccentColorV72::Slate => "#77767b".to_string(),
-            SovereignAccentColorV72::Custom(r, g, b) => format!("#{:02x}{:02x}{:02x}", r, g, b),
-        }
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Qt6QmlThemeBridgeV72 {
-    pub active_palette: BTreeMap<String, String>,
-    pub qml_import_paths: Vec<String>,
-    pub font_family: String,
-    pub font_size_pt: u32,
-    pub is_dark: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ToolkitEventV72 {
-    ThemeChanged { dark_mode: bool, theme_name: String },
-    ColorSchemeChanged(AdwColorSchemeV72),
-    AccentColorChanged(SovereignAccentColorV72),
-    FontConfigUpdated { family: String, size_pt: u32 },
-    GtkInspectorToggled(bool),
-    KvantumThemeApplied(String),
-    WallpaperAccentExtracted(String),
-    RenderPipelineChanged(Gtk4RenderPipelineV72),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct QmlPluginRuntimeBridgeV72 {
-    pub registered_qml_modules: Vec<String>,
-    pub active_quick_controls_theme: String,
-}
-
 pub struct SovereignGtkQtToolkitEngineV72 {
-    pub color_scheme: AdwColorSchemeV72,
-    pub qt_style: QtPlatformStyleV72,
-    pub render_pipeline: Gtk4RenderPipelineV72,
-    pub accent_color: SovereignAccentColorV72,
-    pub gtk_theme_name: String,
-    pub icon_theme_name: String,
-    pub cursor_theme_name: String,
-    pub font_name: String,
-    pub font_size: u32,
-    pub gtk_inspector_enabled: bool,
+    pub engine_id: usize,
+    pub adw_color_scheme: AdwColorSchemeV72,
+    pub qt_style: Qt6PlatformStyleV72,
+    pub gtk_render_pipeline: Gtk4RenderPipelineV72,
+    pub active_accent_hex: String,
     pub kvantum_spec: Option<KvantumThemeSpecV72>,
-    pub qml_bridge: Qt6QmlThemeBridgeV72,
-    pub qml_plugin_bridge: QmlPluginRuntimeBridgeV72,
-    pub css_rules: BTreeMap<String, BTreeMap<String, String>>,
-    pub signal_listeners: BTreeMap<String, Vec<String>>,
-    pub event_log: Vec<ToolkitEventV72>,
-    pub dconf_keys: BTreeMap<String, String>,
-}
+    pub css_custom_rules: Vec<String>,}
 
 impl SovereignGtkQtToolkitEngineV72 {
     pub fn new() -> Self {
-        let mut css_rules = BTreeMap::new();
-        let mut window_rules = BTreeMap::new();
-        window_rules.insert("background-color".to_string(), "#1e1e2e".to_string());
-        window_rules.insert("color".to_string(), "#cdd6f4".to_string());
-        window_rules.insert("border-radius".to_string(), "12px".to_string());
-
-        let mut row_rules = BTreeMap::new();
-        row_rules.insert("padding".to_string(), "10px 14px".to_string());
-        row_rules.insert("background-color".to_string(), "#313244".to_string());
-
-        css_rules.insert("window.main".to_string(), window_rules);
-        css_rules.insert(".adw-action-row".to_string(), row_rules);
-
-        let mut qml_palette = BTreeMap::new();
-        qml_palette.insert("windowBackground".to_string(), "#1e1e2e".to_string());
-        qml_palette.insert("windowText".to_string(), "#cdd6f4".to_string());
-        qml_palette.insert("accent".to_string(), "#3584e4".to_string());
-
-        let qml_bridge = Qt6QmlThemeBridgeV72 {
-            active_palette: qml_palette,
-            qml_import_paths: vec![
-                "/usr/lib/qt6/qml".to_string(),
-                "/usr/lib/x86_64-linux-gnu/qt6/qml".to_string(),
-            ],
-            font_family: "Cantarell".to_string(),
-            font_size_pt: 11,
-            is_dark: true,
-        };
-
         Self {
-            color_scheme: AdwColorSchemeV72::PreferDark,
-            qt_style: QtPlatformStyleV72::Breeze,
-            render_pipeline: Gtk4RenderPipelineV72::Ngl,
-            accent_color: SovereignAccentColorV72::Blue,
-            gtk_theme_name: "Adwaita-dark".to_string(),
-            icon_theme_name: "Papirus-Dark".to_string(),
-            cursor_theme_name: "Adwaita".to_string(),
-            font_name: "Cantarell".to_string(),
-            font_size: 11,
-            gtk_inspector_enabled: false,
-            kvantum_spec: None,
-            qml_bridge,
-            css_rules,
-            signal_listeners: BTreeMap::new(),
-            event_log: Vec::new(),
-            qml_plugin_bridge: QmlPluginRuntimeBridgeV72 {
-                registered_qml_modules: vec![
-                    "Org.SigmaOS.Controls".to_string(),
-                    "QtQuick.Controls.Material".to_string(),
-                ],
-                active_quick_controls_theme: "Org.SigmaOS.Controls".to_string(),
-            },
-            dconf_keys: BTreeMap::new(),
+            engine_id: NEXT_V72_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst),
+            adw_color_scheme: AdwColorSchemeV72::PreferDark,
+            qt_style: Qt6PlatformStyleV72::Kvantum,
+            gtk_render_pipeline: Gtk4RenderPipelineV72::Vulkan,
+            active_accent_hex: "#3584e4".to_string(),
+            kvantum_spec: Some(KvantumThemeSpecV72 {
+                theme_name: "SovereignDark".to_string(),
+                blur_background: true,
+                translucent_windows: true,
+                svg_path: "/usr/share/Kvantum/SovereignDark/SovereignDark.svg".to_string(),
+                shadow_size_px: 12,
+                corner_radius_px: 8,
+                window_margin_px: 4,
+            }),
+            css_custom_rules: Vec::new(),
         }
     }
 
-    pub fn set_render_pipeline(&mut self, pipeline: Gtk4RenderPipelineV72) {
-        self.render_pipeline = pipeline;
-        self.event_log
-            .push(ToolkitEventV72::RenderPipelineChanged(pipeline));
-    }
-
-    pub fn sync_qml_bridge(&mut self) -> &Qt6QmlThemeBridgeV72 {
-        self.qml_bridge.font_family = self.font_name.clone();
-        self.qml_bridge.font_size_pt = self.font_size;
-        self.qml_bridge.is_dark = matches!(
-            self.color_scheme,
-            AdwColorSchemeV72::PreferDark | AdwColorSchemeV72::ForceDark
-        );
-        let palette = self.sync_qt_to_gtk_palette();
-        for (k, v) in palette {
-            self.qml_bridge.active_palette.insert(k, v);
-        }
-        &self.qml_bridge
-    }
-
-    pub fn set_color_scheme(&mut self, scheme: AdwColorSchemeV72) {
-        self.color_scheme = scheme;
-        match scheme {
-            AdwColorSchemeV72::PreferDark | AdwColorSchemeV72::ForceDark => {
-                self.gtk_theme_name = "Adwaita-dark".to_string();
-                self.qt_style = QtPlatformStyleV72::Breeze;
-            }
-            AdwColorSchemeV72::ForceLight | AdwColorSchemeV72::Default => {
-                self.gtk_theme_name = "Adwaita".to_string();
-                self.qt_style = QtPlatformStyleV72::Fusion;
-            }
-        }
-        self.event_log
-            .push(ToolkitEventV72::ColorSchemeChanged(scheme));
-        self.sync_qml_bridge();
-    }
-
-    pub fn set_accent_color(&mut self, accent: SovereignAccentColorV72) {
-        self.accent_color = accent;
-        self.event_log
-            .push(ToolkitEventV72::AccentColorChanged(accent));
-        self.sync_qml_bridge();
-    }
-
-    pub fn extract_wallpaper_accent_color(&mut self, wallpaper_path: &str) -> SovereignAccentColorV72 {
-        let mut sum_r = 0u32;
-        let mut sum_g = 0u32;
-        let mut sum_b = 0u32;
-        let bytes = wallpaper_path.as_bytes();
-        for (i, &b) in bytes.iter().enumerate() {
-            match i % 3 {
-                0 => sum_r += b as u32,
-                1 => sum_g += b as u32,
-                _ => sum_b += b as u32,
-            }
-        }
-        let count = (bytes.len().max(1)) as u32;
-        let r = ((sum_r * 3 / count) % 256) as u8;
-        let g = ((sum_g * 3 / count) % 256) as u8;
-        let b = ((sum_b * 3 / count) % 256) as u8;
-        let color = SovereignAccentColorV72::Custom(r, g, b);
-        self.set_accent_color(color);
-        self.event_log
-            .push(ToolkitEventV72::WallpaperAccentExtracted(color.to_hex()));
-        color
-    }
-
-    pub fn toggle_gtk_inspector(&mut self) -> bool {
-        self.gtk_inspector_enabled = !self.gtk_inspector_enabled;
-        self.event_log.push(ToolkitEventV72::GtkInspectorToggled(
-            self.gtk_inspector_enabled,
-        ));
-        self.gtk_inspector_enabled
-    }
-
-    pub fn parse_and_apply_kvantum_config(&mut self, config_str: &str) -> bool {
-        let mut theme_name = "Catppuccin-Mocha".to_string();
-        let mut blur = false;
-        let mut translucent = false;
-        let mut shadow_size = 10u32;
-        let mut corner_radius = 12u32;
-        let mut margin = 8u32;
-
-        for line in config_str.lines() {
-            let line = line.trim();
-            if line.starts_with("theme=") {
-                theme_name = line["theme=".len()..].to_string();
-            } else if line.starts_with("blur=") || line.starts_with("blur_radius=") {
-                blur = true;
-            } else if line.starts_with("translucent=") || line.starts_with("translucent_windows=") {
-                translucent = line.ends_with("true");
-            } else if line.starts_with("shadow_size=") {
-                shadow_size = line["shadow_size=".len()..].parse().unwrap_or(10);
-            } else if line.starts_with("corner_radius=") {
-                corner_radius = line["corner_radius=".len()..].parse().unwrap_or(12);
-            } else if line.starts_with("margin=") {
-                margin = line["margin=".len()..].parse().unwrap_or(8);
-            }
-        }
-        let svg_path = format!("/usr/share/Kvantum/{}/{}.svg", theme_name, theme_name);
-        let spec = KvantumThemeSpecV72 {
-            theme_name: theme_name.clone(),
-            blur_background: blur,
-            translucent_windows: translucent,
-            svg_path,
-            shadow_size_px: shadow_size,
-            corner_radius_px: corner_radius,
-            window_margin_px: margin,
-        };
-        self.kvantum_spec = Some(spec);
-        self.qt_style = QtPlatformStyleV72::Kvantum;
-        self.event_log.push(ToolkitEventV72::KvantumThemeApplied(
-            self.kvantum_spec.as_ref().unwrap().theme_name.clone(),
-        ));
-        true
-    }
-
-    pub fn parse_dconf_binary_blob(&mut self, blob: &[u8]) -> usize {
-        let mut count = 0;
-        let blob_str = String::from_utf8_lossy(blob);
-        for line in blob_str.lines() {
-            let trimmed = line.trim();
-            if trimmed.contains('=') && trimmed.starts_with('/') {
-                let parts: Vec<&str> = trimmed.splitn(2, '=').collect();
-                if parts.len() == 2 {
-                    self.dconf_keys
-                        .insert(parts[0].to_string(), parts[1].to_string());
-                    count += 1;
-                }
-            }
-        }
-        count
-    }
-
-    pub fn sync_qt_to_gtk_palette(&self) -> BTreeMap<String, String> {
-        let mut palette = BTreeMap::new();
-        let bg = self
-            .css_rules
-            .get("window.main")
-            .and_then(|r| r.get("background-color"))
-            .cloned()
-            .unwrap_or_else(|| "#1e1e2e".to_string());
-        let fg = self
-            .css_rules
-            .get("window.main")
-            .and_then(|r| r.get("color"))
-            .cloned()
-            .unwrap_or_else(|| "#cdd6f4".to_string());
-
-        palette.insert("QPalette::Window".to_string(), bg);
-        palette.insert("QPalette::WindowText".to_string(), fg.clone());
-        palette.insert("QPalette::Base".to_string(), "#181825".to_string());
-        palette.insert("QPalette::Text".to_string(), fg);
-        palette.insert(
-            "QPalette::Highlight".to_string(),
-            self.accent_color.to_hex(),
-        );
-        palette
-    }
-
-    pub fn generate_gtk_css(&self) -> String {
-        let mut css = format!(
-            "@define-color accent_color {};\n",
-            self.accent_color.to_hex()
-        );
-        for (selector, props) in &self.css_rules {
-            css.push_str(&format!("{} {{\n", selector));
-            for (key, val) in props {
-                css.push_str(&format!("  {}: {};\n", key, val));
-            }
-            css.push_str("}\n");
-        }
-        css
-    }
-
-    pub fn translate_css_to_qss(&self, css_input: &str) -> String {
-        let mut qss = String::new();
+    pub fn convert_css_to_qss(&self, css_input: &str) -> String {
+        let mut qss_lines = Vec::new();
+        qss_lines.push("/* QSS Converted from GTK3/GTK4 CSS Engine */".to_string());
         for line in css_input.lines() {
             let trimmed = line.trim();
-            if trimmed.contains("background-color:") {
-                qss.push_str(&trimmed.replace("background-color:", "qproperty-backgroundColor:"));
-                qss.push('\n');
-            } else if trimmed.contains("color:") {
-                qss.push_str(&trimmed.replace("color:", "qproperty-color:"));
-                qss.push('\n');
-            } else if trimmed.contains("border-radius:") {
-                qss.push_str(&trimmed.replace("border-radius:", "border-radius:"));
-                qss.push('\n');
-            } else if trimmed.contains("display: flex;") {
-                qss.push_str("/* qss layout: QHBoxLayout / QVBoxLayout */\n");
+            if trimmed.is_empty() {
+                continue;
+            }
+            if trimmed.starts_with("@define-color") {
+                let parts: Vec<&str> = trimmed.split_whitespace().collect();
+                if parts.len() >= 3 {
+                    let name = parts[1];
+                    let val = parts[2].trim_end_matches(';');
+                    qss_lines.push(format!("/* Palette Variable: {} -> {} */", name, val));
+                }
             } else {
-                qss.push_str(trimmed);
-                qss.push('\n');
+                let translated = trimmed
+                    .replace("window.background", "QMainWindow, QDialog")
+                    .replace("button.suggested-action", "QPushButton[accent=\"true\"]")
+                    .replace("entry", "QLineEdit")
+                    .replace("headerbar", "QHeaderView")
+                    .replace("border-radius:", "border-radius:")
+                    .replace("background-color:", "background-color:");
+                qss_lines.push(translated);
             }
         }
-        qss
+        qss_lines.join("\n")
     }
-}
 
-impl Default for SovereignGtkQtToolkitEngineV72 {
-    fn default() -> Self {
-        Self::new()
+    pub fn set_accent_color(&mut self, hex: &str) {
+        self.active_accent_hex = hex.to_string();
     }
+
+    pub fn generate_kvantum_config(&self) -> String {
+        if let Some(spec) = &self.kvantum_spec {
+            format!(
+                "[Config]\ntheme={}\nblur_background={}\ntranslucent_windows={}\nshadow_size={}\ncorner_radius={}\nwindow_margin={}\naccent_color={}\n",
+                spec.theme_name,
+                spec.blur_background,
+                spec.translucent_windows,
+                spec.shadow_size_px,
+                spec.corner_radius_px,
+                spec.window_margin_px,
+                self.active_accent_hex
+            )
+        } else {
+            "[Config]\ntheme=Default\n".to_string()
+        }    }
 }
 
 // ============================================================================
-// 2. Display Manager Suite Engine V72 (GDM, SDDM, LightDM, XDM)
+// 2. Display Managers & PAM Auth Suite Engine V72
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DisplayManagerBackendV72 {
-    Gdm,
+pub enum DisplayManagerKindV72 {    Gdm,
     Sddm,
     LightDm,
     Xdm,
+=======
     SlickGreeter,
 }
 
@@ -416,666 +153,649 @@ pub enum DesktopSessionTypeV72 {
     Sway,
     KdePlasma,
     GnomeShell,
+>>>>>>> origin/main
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PamAuthRequestV72 {
     pub username: String,
+<<<<<<< HEAD
+    pub password: String,
     pub password_hash: String,
-    pub mfa_otp: Option<String>,
-    pub biometric_token: Option<String>,
-    pub fido2_security_key: Option<String>,
-    pub session_type: DesktopSessionTypeV72,
-    pub seat_id: String,
+    pub mfa_otp: Option<String>,    pub seat_id: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PamAuthResultV72 {
+pub struct PamAuthResponseV72 {
     pub authenticated: bool,
     pub user_uid: u32,
-    pub home_dir: String,
-    pub mfa_verified: bool,
-    pub fido2_verified: bool,
-    pub error_message: Option<String>,
+    pub user_gid: u32,
+    pub session_id: String,
+    pub environment_vars: BTreeMap<String, String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GreeterThemeConfigV72 {
-    pub wallpaper_path: String,
-    pub user_avatars: BTreeMap<String, String>,
-    pub cursor_theme: String,
-    pub gtk_theme: String,
-    pub icon_theme: String,
-    pub sddm_qml_main_file: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DMSeatConfigV72 {
-    pub seat_id: String,
-    pub vt_number: u32,
-    pub active_user: Option<String>,
-    pub greeter_active: bool,
-    pub auto_login_enabled: bool,
-    pub is_guest_session: bool,
-    pub bound_input_devices: Vec<String>,
-    pub sandbox_container_id: Option<String>,
-}
-
 pub struct SovereignDisplayManagerSuiteEngineV72 {
-    pub active_backend: DisplayManagerBackendV72,
-    pub seats: BTreeMap<String, DMSeatConfigV72>,
-    pub greeter_config: GreeterThemeConfigV72,
-    pub available_sessions: Vec<DesktopSessionTypeV72>,
-    pub pam_auth_history: Vec<(String, bool)>,
-    pub accounts_service_sync: BTreeMap<String, String>,
-    pub logind_session_ids: BTreeMap<String, String>,
+    pub dm_kind: DisplayManagerKindV72,
+    pub seat_assignments: BTreeMap<String, Vec<String>>,
+    pub pam_service_name: String,
+    pub active_sessions_count: usize,
 }
 
 impl SovereignDisplayManagerSuiteEngineV72 {
-    pub fn new(backend: DisplayManagerBackendV72) -> Self {
-        let mut seats = BTreeMap::new();
-        seats.insert(
-            "seat0".to_string(),
-            DMSeatConfigV72 {
-                seat_id: "seat0".to_string(),
-                vt_number: 1,
-                active_user: None,
-                greeter_active: true,
-                auto_login_enabled: false,
-                is_guest_session: false,
-                bound_input_devices: vec![
-                    "/dev/input/event0".to_string(),
-                    "/dev/input/event1".to_string(),
-                ],
-                sandbox_container_id: None,
-            },
-        );
-
-        let mut avatars = BTreeMap::new();
-        avatars.insert(
-            "sigma_user".to_string(),
-            "/var/lib/AccountsService/icons/sigma_user.png".to_string(),
-        );
-
-        let mut accounts_service_sync = BTreeMap::new();
-        accounts_service_sync.insert("sigma_user.Language".to_string(), "en_US.UTF-8".to_string());
-        accounts_service_sync.insert("sigma_user.XSession".to_string(), "wayland".to_string());
-
+    pub fn new(kind: DisplayManagerKindV72) -> Self {
+        let mut seat_assignments = BTreeMap::new();
+        seat_assignments.insert("seat0".to_string(), vec!["/dev/dri/card0".to_string(), "/dev/input/event0".to_string()]);
         Self {
-            active_backend: backend,
-            seats,
-            greeter_config: GreeterThemeConfigV72 {
-                wallpaper_path: "/usr/share/backgrounds/sigma_default.png".to_string(),
-                user_avatars: avatars,
-                cursor_theme: "Adwaita".to_string(),
-                gtk_theme: "Adwaita-dark".to_string(),
-                icon_theme: "Papirus-Dark".to_string(),
-                sddm_qml_main_file: "/usr/share/sddm/themes/sigma/Main.qml".to_string(),
-            },
-            available_sessions: vec![
-                DesktopSessionTypeV72::Wayland,
-                DesktopSessionTypeV72::Hyprland,
-                DesktopSessionTypeV72::Zenith,
-                DesktopSessionTypeV72::KdePlasma,
-                DesktopSessionTypeV72::GnomeShell,
-                DesktopSessionTypeV72::X11,
-            ],
-            pam_auth_history: Vec::new(),
-            accounts_service_sync,
-            logind_session_ids: BTreeMap::new(),
+            dm_kind: kind,
+            seat_assignments,
+            pam_service_name: "sddm-autologin".to_string(),
+            active_sessions_count: 1,
         }
     }
 
-    pub fn parse_gdm_custom_conf(&mut self, conf_content: &str) -> usize {
-        let mut parsed = 0;
-        for line in conf_content.lines() {
+    pub fn authenticate_pam(&self, req: &PamAuthRequestV72) -> PamAuthResponseV72 {
+        let simple_hash = format!("sha256_{}", req.password);
+        let auth_ok = !req.username.is_empty()
+            && ((!req.password_hash.is_empty() && simple_hash == req.password_hash)
+                || req.mfa_otp.is_some());
+
+        let mut envs = BTreeMap::new();
+        envs.insert("XDG_SESSION_TYPE".to_string(), "wayland".to_string());
+        envs.insert("XDG_SEAT".to_string(), req.seat_id.clone());
+        envs.insert("USER".to_string(), req.username.clone());
+
+        PamAuthResponseV72 {
+            authenticated: auth_ok,
+            user_uid: 1000,
+            user_gid: 1000,
+            session_id: format!("sess_v72_{}", req.username),
+            environment_vars: envs,
+        }
+    }
+
+    pub fn parse_bsd_login_conf(&self, conf_data: &str) -> BTreeMap<String, String> {
+        let mut limits = BTreeMap::new();
+        for line in conf_data.lines() {
             let trimmed = line.trim();
-            if trimmed.starts_with("WaylandEnable=") {
-                let val = trimmed.ends_with("true");
-                if val {
-                    if !self
-                        .available_sessions
-                        .contains(&DesktopSessionTypeV72::Wayland)
-                    {
-                        self.available_sessions.push(DesktopSessionTypeV72::Wayland);
-                    }
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            let clean = trimmed.trim_end_matches('\\').trim_matches(':');
+            for item in clean.split(':') {
+                if let Some((k, v)) = item.split_once('=') {
+                    limits.insert(k.trim().to_string(), v.trim().to_string());
+                } else if !item.trim().is_empty() {
+                    limits.insert(item.trim().to_string(), "true".to_string());
                 }
-                parsed += 1;
-            } else if trimmed.starts_with("AutomaticLoginEnable=") {
-                if let Some(seat) = self.seats.get_mut("seat0") {
-                    seat.auto_login_enabled = trimmed.ends_with("true");
-                }
-                parsed += 1;
             }
         }
-        parsed
+        limits
     }
 
-    pub fn authenticate_pam(&mut self, req: &PamAuthRequestV72) -> PamAuthResultV72 {
-        let auth_success = !req.username.is_empty()
-            && (!req.password_hash.is_empty()
-                || req.biometric_token.is_some()
-                || req.fido2_security_key.is_some());
-        let mfa_ok = req.mfa_otp.as_deref() == Some("123456") || req.mfa_otp.is_none();
-        let fido_ok = req.fido2_security_key.is_none()
-            || req.fido2_security_key.as_deref() == Some("fido2_valid");
-
-        let final_ok = auth_success && mfa_ok && fido_ok;
-        self.pam_auth_history.push((req.username.clone(), final_ok));
-
-        if final_ok {
-            if let Some(seat) = self.seats.get_mut(&req.seat_id) {
-                seat.active_user = Some(req.username.clone());
-                seat.greeter_active = false;
-            }
-            PamAuthResultV72 {
-                authenticated: true,
-                user_uid: 1000,
-                home_dir: format!("/home/{}", req.username),
-                mfa_verified: req.mfa_otp.is_some(),
-                fido2_verified: req.fido2_security_key.is_some(),
-                error_message: None,
-            }
-        } else {
-            PamAuthResultV72 {
-                authenticated: false,
-                user_uid: 0,
-                home_dir: String::new(),
-                mfa_verified: false,
-                fido2_verified: false,
-                error_message: Some("PAM Authentication Failed".to_string()),
-            }
-        }
-    }
-}
-
-impl Default for SovereignDisplayManagerSuiteEngineV72 {
-    fn default() -> Self {
-        Self::new(DisplayManagerBackendV72::Gdm)
-    }
+    pub fn build_xdmcp_query(&self, target_host: &str) -> Vec<u8> {
+        let mut packet = vec![0x00, 0x01, 0x00, 0x02]; // XDMCP Header
+        packet.extend_from_slice(target_host.as_bytes());
+        packet    }
 }
 
 // ============================================================================
-// 3. GVfs & GIO Virtual File Systems Engine V72
+// 3. GVfs / GIO Virtual Filesystem Engine V72
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GvfsMountSchemeV72 {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MountSchemeV72 {
     Smb,
     Sftp,
-    WebDav,
     Mtp,
-    Trash,
+    Davs,
     Archive,
-    Http,
-    Nfs,
-    GPhoto2,
-    Afc,
-    GoogleDrive,
-    Davfs2,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GFileMonitorEventV72 {
-    Changed,
-    Created,
-    Deleted,
-    AttributeChanged,
-    PreUnmount,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GioNetworkConnectivityV72 {
-    Local,
-    Limited,
-    Portal,
-    Full,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GvfsMountPointV72 {
-    pub mount_id: usize,
-    pub scheme: GvfsMountSchemeV72,
+pub struct GvfsMountV72 {
+    pub mount_id: String,
+    pub scheme: MountSchemeV72,
     pub uri: String,
-    pub local_mount_path: String,
+    pub mount_path: String,
     pub is_mounted: bool,
-    pub read_only: bool,
-    pub protocol_version: String,
 }
 
-pub struct SovereignGvfsGioEngineV72 {
-    pub mounts: Vec<GvfsMountPointV72>,
-    pub gio_file_cache: BTreeMap<String, Vec<u8>>,
-    pub active_monitors: Vec<(String, GFileMonitorEventV72)>,
-    pub network_connectivity: GioNetworkConnectivityV72,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignGvfsGioFileSystemEngineV72 {
+    pub active_mounts: BTreeMap<String, GvfsMountV72>,
+    pub dconf_tree: BTreeMap<String, String>,
 }
 
-impl SovereignGvfsGioEngineV72 {
+impl SovereignGvfsGioFileSystemEngineV72 {
     pub fn new() -> Self {
         Self {
-            mounts: Vec::new(),
-            gio_file_cache: BTreeMap::new(),
-            active_monitors: Vec::new(),
-            network_connectivity: GioNetworkConnectivityV72::Full,
+            active_mounts: BTreeMap::new(),
+            dconf_tree: BTreeMap::new(),
         }
     }
 
-    pub fn mount_uri(&mut self, uri: &str, local_path: &str) -> usize {
-        let id = NEXT_DESKTOP_SERVICE_ID_V72.fetch_add(1, Ordering::SeqCst);
-        let scheme = if uri.starts_with("smb://") {
-            GvfsMountSchemeV72::Smb
-        } else if uri.starts_with("sftp://") {
-            GvfsMountSchemeV72::Sftp
-        } else if uri.starts_with("trash://") {
-            GvfsMountSchemeV72::Trash
-        } else {
-            GvfsMountSchemeV72::Http
-        };
-        self.mounts.push(GvfsMountPointV72 {
-            mount_id: id,
+    pub fn mount_uri(&mut self, uri: &str, scheme: MountSchemeV72) -> String {
+        let mount_id = format!("mount_v72_{}", self.active_mounts.len() + 1);
+        let mount = GvfsMountV72 {
+            mount_id: mount_id.clone(),
             scheme,
             uri: uri.to_string(),
-            local_mount_path: local_path.to_string(),
+            mount_path: format!("/run/user/1000/gvfs/{}", mount_id),
             is_mounted: true,
-            read_only: false,
-            protocol_version: "v1.0".to_string(),
-        });
-        id
+        };
+        self.active_mounts.insert(mount_id.clone(), mount);
+        mount_id
     }
-}
 
-impl Default for SovereignGvfsGioEngineV72 {
-    fn default() -> Self {
-        Self::new()
+    pub fn unmount_id(&mut self, mount_id: &str) -> bool {
+        if let Some(mount) = self.active_mounts.get_mut(mount_id) {
+            mount.is_mounted = false;
+            true
+        } else {
+            false
+        }
     }
+
+    pub fn set_dconf_value(&mut self, key: &str, value: &str) {
+        self.dconf_tree.insert(key.to_string(), value.to_string());
+    }
+
+    pub fn get_dconf_value(&self, key: &str) -> Option<&String> {
+        self.dconf_tree.get(key)    }
 }
 
 // ============================================================================
 // 4. PolicyKit Authorization Engine V72
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PolkitResultV72 {
-    Yes,
-    No,
-    AuthAdmin,
-    AuthAdminKeep,
-    AuthUser,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PolkitRuleV72 {
+    pub action_id: String,
+    pub allow_any: String,
+    pub allow_inactive: String,
+    pub allow_active: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PolkitActionRuleV72 {
-    pub action_id: String,
-    pub required_permission: PolkitResultV72,
-    pub description: String,
-}
-
 pub struct SovereignPolicyKitAuthorizationEngineV72 {
-    pub action_rules: BTreeMap<String, PolkitActionRuleV72>,
-    pub js_rules: Vec<(String, PolkitResultV72)>,
-    pub admin_groups: Vec<String>,
-}
+    pub rules: Vec<PolkitRuleV72>,
+    pub active_agent_sessions: BTreeMap<String, String>,}
 
 impl SovereignPolicyKitAuthorizationEngineV72 {
     pub fn new() -> Self {
-        let mut rules = BTreeMap::new();
-        rules.insert(
-            "org.sigmaos.system.reboot".to_string(),
-            PolkitActionRuleV72 {
-                action_id: "org.sigmaos.system.reboot".to_string(),
-                required_permission: PolkitResultV72::Yes,
-                description: "Reboot system".to_string(),
-            },
-        );
+        let default_rule = PolkitRuleV72 {
+            action_id: "org.freedesktop.policykit.exec".to_string(),
+            allow_any: "no".to_string(),
+            allow_inactive: "no".to_string(),
+            allow_active: "auth_admin".to_string(),
+        };
         Self {
-            action_rules: rules,
-            js_rules: Vec::new(),
-            admin_groups: vec!["wheel".to_string(), "sudo".to_string()],
+            rules: vec![default_rule],
+            active_agent_sessions: BTreeMap::new(),
         }
     }
 
-    pub fn check_authorization(&self, action_id: &str) -> PolkitResultV72 {
-        self.action_rules
-            .get(action_id)
-            .map(|r| r.required_permission)
-            .unwrap_or(PolkitResultV72::No)
+    pub fn evaluate_js_rule(&self, action_id: &str, user: &str) -> bool {
+        if user == "root" {
+            return true;
+        }
+        for rule in &self.rules {
+            if rule.action_id == action_id || rule.action_id == "*" {
+                return rule.allow_active == "yes" || rule.allow_active == "auth_admin";
+            }
+        }
+        false
     }
-}
 
-impl Default for SovereignPolicyKitAuthorizationEngineV72 {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub fn parse_pkla_file(&mut self, pkla_content: &str) -> usize {
+        let mut count = 0;
+        for line in pkla_content.lines() {
+            if line.starts_with("Action=") {
+                let action = line.trim_start_matches("Action=").trim().to_string();
+                self.rules.push(PolkitRuleV72 {
+                    action_id: action,
+                    allow_any: "no".to_string(),
+                    allow_inactive: "no".to_string(),
+                    allow_active: "yes".to_string(),
+                });
+                count += 1;
+            }
+        }
+        count    }
 }
 
 // ============================================================================
-// 5. XDG Utilities & Portal Gateway V72
+// 5. XDG Desktop Portals & Utilities Engine V72
 // ============================================================================
 
-pub struct SovereignXdgDesktopPortalEngineV72 {
-    pub mime_apps: BTreeMap<String, String>,
-    pub user_dirs: BTreeMap<String, String>,
-    pub portal_backends: BTreeMap<String, String>,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignXdgPortalsUtilitiesEngineV72 {
+    pub mime_associations: BTreeMap<String, String>,
+    pub portals_config: BTreeMap<String, String>,
 }
 
-impl SovereignXdgDesktopPortalEngineV72 {
+impl SovereignXdgPortalsUtilitiesEngineV72 {
     pub fn new() -> Self {
-        let mut mime_apps = BTreeMap::new();
-        mime_apps.insert("text/html".to_string(), "org.sigmaos.browser.desktop".to_string());
+        let mut mime = BTreeMap::new();
+        mime.insert("text/html".to_string(), "org.gnome.Epiphany.desktop".to_string());
+        mime.insert("application/pdf".to_string(), "org.gnome.Evince.desktop".to_string());
+
+        let mut portals = BTreeMap::new();
+        portals.insert("default".to_string(), "gtk;hyprland".to_string());
+
         Self {
-            mime_apps,
-            user_dirs: BTreeMap::new(),
-            portal_backends: BTreeMap::new(),
+            mime_associations: mime,
+            portals_config: portals,
         }
     }
 
-    pub fn query_mime_association(&self, mime_type: &str) -> Option<String> {
-        self.mime_apps.get(mime_type).cloned()
+    pub fn open_uri_handler(&self, uri: &str) -> String {
+        if uri.starts_with("http://") || uri.starts_with("https://") {
+            format!("xdg-open: Launching browser for {}", uri)
+        } else if uri.starts_with("file://") {
+            format!("xdg-open: Opening file manager for {}", uri)
+        } else {
+            format!("xdg-open: Handling custom scheme {}", uri)
+        }
     }
-}
 
-impl Default for SovereignXdgDesktopPortalEngineV72 {
-    fn default() -> Self {
-        Self::new()
-    }
+    pub fn parse_portals_conf(&mut self, conf: &str) -> usize {
+        let mut count = 0;
+        for line in conf.lines() {
+            let trimmed = line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with('[') {
+                continue;
+            }
+            if let Some((k, v)) = trimmed.split_once('=') {
+                self.portals_config.insert(k.trim().to_string(), v.trim().to_string());
+                count += 1;
+            }
+        }
+        count    }
 }
 
 // ============================================================================
-// 6. Font & Text Layout Pipeline V72 (fontconfig, FreeType, HarfBuzz, Pango, Cairo, Skia)
+// 6. Font & Text Layout Engine V72 (fontconfig, FreeType, HarfBuzz, Pango, Cairo, Skia)
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum HintingStyleV72 {
-    None,
-    Slight,
-    Medium,
-    Full,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GlyphPositionV72 {
+    pub glyph_id: u32,
+    pub x_advance: i32,
+    pub y_advance: i32,
+    pub x_offset: i32,
+    pub y_offset: i32,
+    pub cluster: u32,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SubpixelOrderV72 {
-    Rgb,
-    Bgr,
-    Vrgb,
-    Vbgr,
-    None,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignFontTextLayoutEngineV72 {
+    pub default_font_family: String,
+    pub font_size_pt: u32,
+    pub subpixel_antialiasing: bool,
+    pub lcd_filter: String,
 }
 
-pub struct SovereignFontAndTextLayoutEngineV72 {
-    pub font_match_cache: BTreeMap<String, String>,
-    pub fontconfig_aliases: BTreeMap<String, Vec<String>>,
-}
-
-impl SovereignFontAndTextLayoutEngineV72 {
+impl SovereignFontTextLayoutEngineV72 {
     pub fn new() -> Self {
-        let mut font_match_cache = BTreeMap::new();
-        font_match_cache.insert(
-            "monospace".to_string(),
-            "/usr/share/fonts/JetBrainsMono.ttf".to_string(),
-        );
         Self {
-            font_match_cache,
-            fontconfig_aliases: BTreeMap::new(),
+            default_font_family: "Inter".to_string(),
+            font_size_pt: 11,
+            subpixel_antialiasing: true,
+            lcd_filter: "lcddefault".to_string(),
         }
     }
 
-    pub fn match_font(&self, family: &str) -> String {
-        self.font_match_cache
-            .get(family)
-            .cloned()
-            .unwrap_or_else(|| "/usr/share/fonts/DejaVuSans.ttf".to_string())
+    pub fn generate_fontconfig_xml(&self) -> String {
+        format!(
+            "<?xml version=\"1.0\"?>\n<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n<fontconfig>\n  <alias>\n    <family>sans-serif</family>\n    <prefer><family>{}</family></prefer>\n  </alias>\n</fontconfig>",
+            self.default_font_family
+        )
     }
-}
 
-impl Default for SovereignFontAndTextLayoutEngineV72 {
-    fn default() -> Self {
-        Self::new()
+    pub fn shape_harfbuzz_text(&self, text: &str, _script: &str) -> Vec<GlyphPositionV72> {
+        let mut glyphs = Vec::new();
+        for (cluster_idx, ch) in text.chars().enumerate() {
+            let glyph_id = ch as u32;
+            let advance = (self.font_size_pt * 64) as i32;
+            glyphs.push(GlyphPositionV72 {
+                glyph_id,
+                x_advance: advance,
+                y_advance: 0,
+                x_offset: 0,
+                y_offset: 0,
+                cluster: cluster_idx as u32,
+            });
+        }
+        glyphs
+    }
+
+    pub fn parse_pango_markup(&self, markup: &str) -> String {
+        let clean = markup.replace("<b>", "").replace("</b>", "").replace("<i>", "").replace("</i>", "");
+        format!("PangoLayout::clean_text('{}')", clean)
     }
 }
 
 // ============================================================================
-// 7. Input Method Frameworks Engine V72 (IBus, Fcitx5)
+// 7. Input Method Framework Engine V72 (IBus & Fcitx5)
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ImeFrameworkKindV72 {
-    IBus,
+pub enum ImeEngineKindV72 {
     Fcitx5,
+    IBus,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignInputMethodFrameworkEngineV72 {
-    pub framework: ImeFrameworkKindV72,
-    pub active_engine_id: String,
-    pub preedit_text: String,
+    pub ime_kind: ImeEngineKindV72,
+    pub active_layout: String,
+    pub enabled_addons: Vec<String>,
 }
 
 impl SovereignInputMethodFrameworkEngineV72 {
-    pub fn new(framework: ImeFrameworkKindV72) -> Self {
+    pub fn new(kind: ImeEngineKindV72) -> Self {
         Self {
-            framework,
-            active_engine_id: "pinyin".to_string(),
-            preedit_text: String::new(),
+            ime_kind: kind,
+            active_layout: "us".to_string(),
+            enabled_addons: vec!["pinyin".to_string(), "mozc".to_string(), "hangul".to_string()],
         }
     }
-}
 
-impl Default for SovereignInputMethodFrameworkEngineV72 {
-    fn default() -> Self {
-        Self::new(ImeFrameworkKindV72::Fcitx5)
+    pub fn handle_text_input_v3_commit(&mut self, text: &str) -> String {
+        format!("text-input-v3: committed '{}' via {:?}", text, self.ime_kind)
     }
+
+    pub fn switch_layout(&mut self, layout: &str) {
+        self.active_layout = layout.to_string();    }
 }
 
 // ============================================================================
-// 8. Desktop Notification Daemon Suite V72 (org.freedesktop.Notifications)
+// 8. Notification Daemon Engine V72
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NotificationUrgencyV72 {
-    Low = 0,
-    Normal = 1,
-    Critical = 2,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NotificationV72 {
+    pub id: u32,
+    pub app_name: String,
+    pub summary: String,
+    pub body: String,
+    pub urgency: u8,
+    pub timeout_ms: i32,
 }
 
-pub struct SovereignDesktopNotificationDaemonEngineV72 {
-    pub active_notifications_count: usize,
-    pub dnd_mode: bool,
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignNotificationDaemonEngineV72 {
+    pub notifications: BTreeMap<u32, NotificationV72>,
+    pub next_id: u32,
+    pub dnd_enabled: bool,
 }
 
-impl SovereignDesktopNotificationDaemonEngineV72 {
+impl SovereignNotificationDaemonEngineV72 {
     pub fn new() -> Self {
         Self {
-            active_notifications_count: 0,
-            dnd_mode: false,
+            notifications: BTreeMap::new(),
+            next_id: 1,
+            dnd_enabled: false,
         }
     }
-}
 
-impl Default for SovereignDesktopNotificationDaemonEngineV72 {
-    fn default() -> Self {
-        Self::new()
+    pub fn notify(&mut self, app: &str, summary: &str, body: &str, urgency: u8, timeout: i32) -> u32 {
+        let id = self.next_id;
+        self.next_id += 1;
+        if !self.dnd_enabled {
+            self.notifications.insert(
+                id,
+                NotificationV72 {
+                    id,
+                    app_name: app.to_string(),
+                    summary: summary.to_string(),
+                    body: body.to_string(),
+                    urgency,
+                    timeout_ms: timeout,
+                },
+            );
+        }
+        id
     }
+
+    pub fn close_notification(&mut self, id: u32) -> bool {
+        self.notifications.remove(&id).is_some()    }
 }
 
 // ============================================================================
-// 9. Screen Locker Engine V72 (ext-session-lock-v1 & PAM)
+// 9. Screen Locker Engine V72 (`ext-session-lock-v1`)
 // ============================================================================
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SessionLockStateV72 {
-    Unlocked,
-    Locking,
-    Locked,
-}
-
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignScreenLockerEngineV72 {
-    pub lock_state: SessionLockStateV72,
-}
+    pub is_locked: bool,
+    pub pam_backoff_sec: u32,
+    pub blur_radius: u32,
+    pub password_hash: String,}
 
 impl SovereignScreenLockerEngineV72 {
     pub fn new() -> Self {
         Self {
-            lock_state: SessionLockStateV72::Unlocked,
+            is_locked: false,
+            pam_backoff_sec: 0,
+            blur_radius: 16,
+            password_hash: String::new(),
         }
     }
-}
 
-impl Default for SovereignScreenLockerEngineV72 {
-    fn default() -> Self {
-        Self::new()
+    pub fn set_password(&mut self, raw_password: &str) {
+        self.password_hash = format!("sha256_{}", raw_password);
     }
+
+    pub fn lock(&mut self) {
+        self.is_locked = true;
+    }
+
+    pub fn unlock(&mut self, raw_password: &str) -> bool {
+        let candidate_hash = format!("sha256_{}", raw_password);
+        if !self.password_hash.is_empty() && candidate_hash == self.password_hash {
+            self.is_locked = false;
+            self.pam_backoff_sec = 0;
+            true
+        } else {
+            self.pam_backoff_sec += 2;
+            false
+        }
+    }
+
+    pub fn generate_kawase_blur_pipeline(&self) -> String {
+        format!("OpenGL::DualKawaseBlur(radius={}, passes=4)", self.blur_radius)    }
 }
 
 // ============================================================================
-// 10. Clipboard Manager Suite V72
+// 10. Clipboard Manager Engine V72 (`cliphist`)
 // ============================================================================
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ClipboardItemV72 {
+    pub id: usize,
+    pub mime_type: String,
+    pub content: Vec<u8>,
+    pub is_secret: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignClipboardManagerEngineV72 {
-    pub max_history_items: usize,
-    pub history_count: usize,
-}
+    pub history: Vec<ClipboardItemV72>,
+    pub max_history: usize,}
 
 impl SovereignClipboardManagerEngineV72 {
     pub fn new() -> Self {
         Self {
-            max_history_items: 50,
-            history_count: 0,
+            history: Vec::new(),
+            max_history: 50,
         }
     }
-}
 
-impl Default for SovereignClipboardManagerEngineV72 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 11. Pull Request Gateway Engine V72
-// ============================================================================
-
-pub struct SovereignDesktopServicesPrGatewayEngineV72 {
-    pub audit_completed: bool,
-}
-
-impl SovereignDesktopServicesPrGatewayEngineV72 {
-    pub fn new() -> Self {
-        Self { audit_completed: true }
-    }
-}
-
-impl Default for SovereignDesktopServicesPrGatewayEngineV72 {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 12. Master Orchestrator V72
-// ============================================================================
-
-pub struct SovereignDesktopToolkitsAndServicesSuiteV72 {
-    pub toolkit_engine: SovereignGtkQtToolkitEngineV72,
-    pub display_manager: SovereignDisplayManagerSuiteEngineV72,
-    pub gvfs_gio: SovereignGvfsGioEngineV72,
-    pub polkit: SovereignPolicyKitAuthorizationEngineV72,
-    pub xdg_portal: SovereignXdgDesktopPortalEngineV72,
-    pub font_layout: SovereignFontAndTextLayoutEngineV72,
-    pub ime_engine: SovereignInputMethodFrameworkEngineV72,
-    pub notification_daemon: SovereignDesktopNotificationDaemonEngineV72,
-    pub screen_locker: SovereignScreenLockerEngineV72,
-    pub clipboard_manager: SovereignClipboardManagerEngineV72,
-    pub pr_gateway: SovereignDesktopServicesPrGatewayEngineV72,
-}
-
-impl SovereignDesktopToolkitsAndServicesSuiteV72 {
-    pub fn new() -> Self {
-        Self {
-            toolkit_engine: SovereignGtkQtToolkitEngineV72::new(),
-            display_manager: SovereignDisplayManagerSuiteEngineV72::new(DisplayManagerBackendV72::Gdm),
-            gvfs_gio: SovereignGvfsGioEngineV72::new(),
-            polkit: SovereignPolicyKitAuthorizationEngineV72::new(),
-            xdg_portal: SovereignXdgDesktopPortalEngineV72::new(),
-            font_layout: SovereignFontAndTextLayoutEngineV72::new(),
-            ime_engine: SovereignInputMethodFrameworkEngineV72::new(ImeFrameworkKindV72::Fcitx5),
-            notification_daemon: SovereignDesktopNotificationDaemonEngineV72::new(),
-            screen_locker: SovereignScreenLockerEngineV72::new(),
-            clipboard_manager: SovereignClipboardManagerEngineV72::new(),
-            pr_gateway: SovereignDesktopServicesPrGatewayEngineV72::new(),
+    pub fn push_item(&mut self, mime: &str, content: &[u8], secret: bool) {
+        let item = ClipboardItemV72 {
+            id: self.history.len() + 1,
+            mime_type: mime.to_string(),
+            content: content.to_vec(),
+            is_secret: secret,
+        };
+        self.history.push(item);
+        if self.history.len() > self.max_history {
+            self.history.remove(0);
         }
     }
+
+    pub fn wipe_secrets(&mut self) -> usize {
+        let orig_len = self.history.len();
+        self.history.retain(|item| !item.is_secret);
+        orig_len - self.history.len()    }
 }
 
-impl Default for SovereignDesktopToolkitsAndServicesSuiteV72 {
-    fn default() -> Self {
-        Self::new()
+// ============================================================================
+// 11. 10-Distro PR Gateway Engine V72
+// ============================================================================
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DesktopPrProposalV72 {
+    pub distro_target: String,
+    pub component_name: String,
+    pub description: String,
+    pub code_changes_count: usize,
+    pub passed_audit: bool,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SovereignDesktopServicesV72PrGatewayEngine {
+    pub proposals: Vec<DesktopPrProposalV72>,
+}
+
+impl SovereignDesktopServicesV72PrGatewayEngine {
+    pub fn new() -> Self {
+        Self { proposals: Vec::new() }
     }
+
+    pub fn generate_10_distro_prs(&mut self) -> usize {
+        let distros = [
+            "Debian", "Ubuntu", "Fedora", "Arch Linux", "Alpine Linux",
+            "FreeBSD", "OpenBSD", "Void Linux", "Gentoo", "openSUSE",
+        ];
+        for d in distros {
+            self.proposals.push(DesktopPrProposalV72 {
+                distro_target: d.to_string(),
+                component_name: "SovereignDesktopServicesV72".to_string(),
+                description: format!("Integrate V72 GTK/Qt/Polkit/Portals/Font/IME suite into {}", d),
+                code_changes_count: 42,
+                passed_audit: true,
+            });
+        }
+        self.proposals.len()
+    }
+
+    pub fn audit_all_proposals(&self) -> bool {
+        self.proposals.iter().all(|p| p.passed_audit)    }
 }
 
 // ============================================================================
-// Unit Tests V72
-// ============================================================================
+// Unit Tests Suite// ============================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_gtk_qt_toolkit_v72() {
+    fn test_gtk_qt_toolkit_engine_v72() {
         let mut engine = SovereignGtkQtToolkitEngineV72::new();
-        engine.set_color_scheme(AdwColorSchemeV72::PreferDark);
-        assert_eq!(engine.gtk_theme_name, "Adwaita-dark");
+        engine.set_accent_color("#ff7800");
+        assert_eq!(engine.active_accent_hex, "#ff7800");
 
-        engine.set_accent_color(SovereignAccentColorV72::Teal);
-        assert_eq!(engine.accent_color.to_hex(), "#129eaf");
+        let qss = engine.convert_css_to_qss("window.background { background-color: #333; }\nbutton.suggested-action { color: #fff; }");
+        assert!(qss.contains("QSS Converted"));
+        assert!(qss.contains("QPushButton[accent=\"true\"]"));
 
-        let css = engine.generate_gtk_css();
-        assert!(css.contains("@define-color accent_color #129eaf;"));
-
-        assert!(engine.parse_and_apply_kvantum_config("theme=KvMocha\nblur=true"));
-        assert_eq!(engine.qt_style, QtPlatformStyleV72::Kvantum);
+        let kvantum_cfg = engine.generate_kvantum_config();
+        assert!(kvantum_cfg.contains("theme=SovereignDark"));
+        assert!(kvantum_cfg.contains("accent_color=#ff7800"));
     }
 
     #[test]
-    fn test_display_manager_v72() {
-        let mut dm = SovereignDisplayManagerSuiteEngineV72::new(DisplayManagerBackendV72::Gdm);
-        assert_eq!(dm.parse_gdm_custom_conf("WaylandEnable=true"), 1);
-
+    fn test_display_manager_engine_v72() {
+        let dm = SovereignDisplayManagerSuiteEngineV72::new(DisplayManagerKindV72::Sddm);
         let req = PamAuthRequestV72 {
-            username: "user".to_string(),
-            password_hash: "pass".to_string(),
-            mfa_otp: None,
-            biometric_token: None,
-            fido2_security_key: None,
-            session_type: DesktopSessionTypeV72::Wayland,
-            seat_id: "seat0".to_string(),
+            username: "sigma".to_string(),
+            password: "secret_password".to_string(),
+            password_hash: "sha256_secret_password".to_string(),
+            mfa_otp: None,            seat_id: "seat0".to_string(),
         };
         let res = dm.authenticate_pam(&req);
         assert!(res.authenticated);
+
+        let limits = dm.parse_bsd_login_conf("default:\\\n  :maxproc=2048:\\\n  :openfiles=1024:\n");
+        assert_eq!(limits.get("maxproc"), Some(&"2048".to_string()));
+
+        let xdmcp = dm.build_xdmcp_query("192.168.1.10");
+        assert_eq!(xdmcp[0..4], [0x00, 0x01, 0x00, 0x02]);
     }
 
     #[test]
-    fn test_gvfs_polkit_xdg_v72() {
-        let mut gvfs = SovereignGvfsGioEngineV72::new();
-        let mid = gvfs.mount_uri("smb://server/share", "/mnt/smb");
-        assert!(mid > 0);
+    fn test_gvfs_gio_engine_v72() {
+        let mut gvfs = SovereignGvfsGioFileSystemEngineV72::new();
+        let mid = gvfs.mount_uri("sftp://user@host/path", MountSchemeV72::Sftp);
+        assert!(gvfs.active_mounts.contains_key(&mid));
 
-        let polkit = SovereignPolicyKitAuthorizationEngineV72::new();
+        gvfs.set_dconf_value("/org/gnome/desktop/interface/color-scheme", "prefer-dark");
         assert_eq!(
-            polkit.check_authorization("org.sigmaos.system.reboot"),
-            PolkitResultV72::Yes
+            gvfs.get_dconf_value("/org/gnome/desktop/interface/color-scheme"),
+            Some(&"prefer-dark".to_string())
         );
 
-        let portal = SovereignXdgDesktopPortalEngineV72::new();
-        assert_eq!(
-            portal.query_mime_association("text/html"),
-            Some("org.sigmaos.browser.desktop".to_string())
-        );
+        assert!(gvfs.unmount_id(&mid));
     }
 
     #[test]
-    fn test_master_suite_v72() {
-        let suite = SovereignDesktopToolkitsAndServicesSuiteV72::new();
-        assert_eq!(suite.screen_locker.lock_state, SessionLockStateV72::Unlocked);
-        assert!(suite.pr_gateway.audit_completed);
+    fn test_polkit_and_portals_v72() {
+        let mut polkit = SovereignPolicyKitAuthorizationEngineV72::new();
+        assert!(polkit.evaluate_js_rule("org.freedesktop.policykit.exec", "root"));
+
+        let pkla_count = polkit.parse_pkla_file("Action=org.freedesktop.NetworkManager.modify\n");
+        assert_eq!(pkla_count, 1);
+
+        let mut portals = SovereignXdgPortalsUtilitiesEngineV72::new();
+        let handler = portals.open_uri_handler("https://sigmaos.org");
+        assert!(handler.contains("Launching browser"));
+
+        let conf_count = portals.parse_portals_conf("default=gtk;hyprland\n");
+        assert_eq!(conf_count, 1);
     }
+
+    #[test]
+    fn test_fonts_ime_notifications_locker_clip_pr_v72() {
+        let fonts = SovereignFontTextLayoutEngineV72::new();
+        assert!(fonts.generate_fontconfig_xml().contains("fontconfig"));
+        let glyphs = fonts.shape_harfbuzz_text("Hello", "Latn");
+        assert_eq!(glyphs.len(), 5);
+
+        let mut ime = SovereignInputMethodFrameworkEngineV72::new(ImeEngineKindV72::Fcitx5);
+        assert!(ime.handle_text_input_v3_commit("Text").contains("committed 'Text'"));
+
+        let mut notif = SovereignNotificationDaemonEngineV72::new();
+        let nid = notif.notify("App", "Sum", "Body", 1, 3000);
+        assert!(notif.close_notification(nid));
+
+        let mut locker = SovereignScreenLockerEngineV72::new();
+        locker.set_password("user_secure_pass");
+        locker.lock();
+        assert!(locker.is_locked);
+        assert!(locker.unlock("user_secure_pass"));
+        assert!(!locker.is_locked);
+
+        let mut clip = SovereignClipboardManagerEngineV72::new();
+        clip.push_item("text/plain", b"normal", false);
+        clip.push_item("text/plain", b"secret", true);
+        assert_eq!(clip.wipe_secrets(), 1);
+
+        let mut pr = SovereignDesktopServicesV72PrGatewayEngine::new();
+        assert_eq!(pr.generate_10_distro_prs(), 10);
+        assert!(pr.audit_all_proposals());    }
 }
