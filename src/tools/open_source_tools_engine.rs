@@ -292,41 +292,75 @@ impl FzfFuzzyFinderEngine {
     }
 
     /// Smith-Waterman inspired fuzzy match score
+    /// Uses an ASCII fast-path to eliminate temporary heap `String`s and `Vec<char>` buffers.
     pub fn fuzzy_score(candidate: &str, query: &str) -> Option<i32> {
         if query.is_empty() {
             return Some(0);
         }
 
-        let cand_lower = candidate.to_lowercase();
-        let query_lower = query.to_lowercase();
+        if candidate.is_ascii() && query.is_ascii() {
+            let query_bytes = query.as_bytes();
+            let cand_bytes = candidate.as_bytes();
+            let mut query_idx = 0;
+            let mut score = 0;
+            let mut consecutive_bonus = 0;
 
-        let mut query_idx = 0;
-        let query_chars: Vec<char> = query_lower.chars().collect();
-        let cand_chars: Vec<char> = cand_lower.chars().collect();
-
-        let mut score = 0;
-        let mut consecutive_bonus = 0;
-
-        for (c_idx, &c) in cand_chars.iter().enumerate() {
-            if query_idx < query_chars.len() && c == query_chars[query_idx] {
-                score += 10 + consecutive_bonus;
-                if c_idx == 0
-                    || cand_chars.get(c_idx - 1) == Some(&'/')
-                    || cand_chars.get(c_idx - 1) == Some(&'_')
+            for (c_idx, &b) in cand_bytes.iter().enumerate() {
+                if query_idx < query_bytes.len()
+                    && b.to_ascii_lowercase() == query_bytes[query_idx].to_ascii_lowercase()
                 {
-                    score += 15; // Prefix / boundary bonus
+                    score += 10 + consecutive_bonus;
+                    if c_idx == 0
+                        || cand_bytes.get(c_idx.wrapping_sub(1)) == Some(&b'/')
+                        || cand_bytes.get(c_idx.wrapping_sub(1)) == Some(&b'_')
+                    {
+                        score += 15; // Prefix / boundary bonus
+                    }
+                    consecutive_bonus += 5;
+                    query_idx += 1;
+                } else {
+                    consecutive_bonus = 0;
                 }
-                consecutive_bonus += 5;
-                query_idx += 1;
-            } else {
-                consecutive_bonus = 0;
             }
-        }
 
-        if query_idx == query_chars.len() {
-            Some(score - (candidate.len() as i32)) // Penalty for longer strings
+            if query_idx == query_bytes.len() {
+                Some(score - (candidate.len() as i32)) // Penalty for longer strings
+            } else {
+                None // Query not matched fully
+            }
         } else {
-            None // Query not matched fully
+            // Non-ASCII fallback path
+            let cand_lower = candidate.to_lowercase();
+            let query_lower = query.to_lowercase();
+
+            let mut query_idx = 0;
+            let query_chars: Vec<char> = query_lower.chars().collect();
+            let cand_chars: Vec<char> = cand_lower.chars().collect();
+
+            let mut score = 0;
+            let mut consecutive_bonus = 0;
+
+            for (c_idx, &c) in cand_chars.iter().enumerate() {
+                if query_idx < query_chars.len() && c == query_chars[query_idx] {
+                    score += 10 + consecutive_bonus;
+                    if c_idx == 0
+                        || cand_chars.get(c_idx.wrapping_sub(1)) == Some(&'/')
+                        || cand_chars.get(c_idx.wrapping_sub(1)) == Some(&'_')
+                    {
+                        score += 15; // Prefix / boundary bonus
+                    }
+                    consecutive_bonus += 5;
+                    query_idx += 1;
+                } else {
+                    consecutive_bonus = 0;
+                }
+            }
+
+            if query_idx == query_chars.len() {
+                Some(score - (candidate.len() as i32)) // Penalty for longer strings
+            } else {
+                None // Query not matched fully
+            }
         }
     }
 
@@ -419,5 +453,13 @@ mod tests {
         let results = fzf.filter_and_rank(&candidates, "landlock");
         assert_eq!(results.len(), 1);
         assert_eq!(results[0].candidate, "src/security/landlock.rs");
+
+        // Test ASCII case-insensitivity fast path
+        let ascii_score = FzfFuzzyFinderEngine::fuzzy_score("SRC/SECURITY/LANDLOCK.RS", "landlock");
+        assert!(ascii_score.is_some());
+
+        // Test Unicode fallback path
+        let unicode_score = FzfFuzzyFinderEngine::fuzzy_score("über_landlock_file", "über");
+        assert!(unicode_score.is_some());
     }
 }
