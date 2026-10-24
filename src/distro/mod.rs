@@ -499,6 +499,8 @@ pub mod dragonflybsd_missing_components_parity_pr;
 pub use dragonflybsd_missing_components_parity_pr::*;
 pub mod openbsd_missing_components_parity_pr;
 pub use openbsd_missing_components_parity_pr::*;
+pub mod reactos_missing_components_parity_pr;
+pub use reactos_missing_components_parity_pr::*;
 pub mod dragonflybsd_missing_components_v60_pr;
 pub use dragonflybsd_missing_components_v60_pr::*;
 pub mod dragonflybsd_missing_components_v61_pr;
