@@ -1220,7 +1220,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
@@ -1989,6 +1990,14 @@ if [ -f "src/distro/cachy_linux_missing_components_v71_pr.rs" ]; then
 
     rustc --test tests/test_cachy_linux_missing_components_v71_pr.rs --edition=2021 -o build/test_cachy_v71_pr_integration
     ./build/test_cachy_v71_pr_integration
+fi
+
+if [ -f "src/distro/cachy_linux_missing_components_v72_pr.rs" ]; then
+    echo "Running CachyOS Missing Components V72 PR test suite..."
+    rustc --test src/distro/cachy_linux_missing_components_v72_pr.rs --edition=2021 -o build/test_cachy_v72_pr
+    ./build/test_cachy_v72_pr
+    rustc --test tests/test_cachy_linux_missing_components_v72_pr.rs --edition=2021 -o build/test_cachy_v72_pr_integration
+    ./build/test_cachy_v72_pr_integration
 fi
 
 if [ -f "src/distro/open_source_os_unimplemented_ideas_pr_gateway.rs" ]; then
