@@ -77,6 +77,36 @@ impl RouteEntry {
     }
 }
 
+/// Routing Table
+#[derive(Debug, Clone)]
+pub struct RoutingTable {
+    routes: Vec<RouteEntry>,
+}
+
+impl RoutingTable {
+    pub fn new() -> Self {
+        Self { routes: Vec::new() }
+    }
+
+    pub fn add_route(&mut self, route: RouteEntry) {
+        self.routes.push(route);
+    }
+
+    pub fn remove_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
+        let len_before = self.routes.len();
+        self.routes.retain(|r| !(r.destination == dest && r.netmask == netmask));
+        self.routes.len() < len_before
+    }
+
+    pub fn lookup(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
+        self.routes.iter().find(|r| r.matches(dest))
+    }
+
+    pub fn routes(&self) -> &[RouteEntry] {
+        &self.routes
+    }
+}
+
 /// Advanced Routing Tables
 /// Supports multiple routing tables (main, default, local, main) as per Linux networking stack
 /// Roadmap item: Full multi-table routing support for Omarchy Linux parity
@@ -224,35 +254,33 @@ impl MultiTableRoutingEngine {
         self.active_table = table_id;
     }
 
-    /// Get active routing table
-    pub fn active_table(&self) -> &AdvancedRoutingTable {
-        self.routing_tables
-            .get(&self.active_table)
-            .expect("Active routing table not found")
+    /// Get active routing table reference
+    pub fn active_table(&self) -> Option<&AdvancedRoutingTable> {
+        self.routing_tables.get(&self.active_table)
     }
 
+    /// Get or insert active routing table mutable reference
     pub fn get_active_routing_table(&mut self) -> &mut AdvancedRoutingTable {
-        let active = self.active_table.clone();
         self.routing_tables
-            .entry(active)
-            .or_insert_with(AdvancedRoutingTable::new)
+            .entry(self.active_table.clone())            .or_insert_with(AdvancedRoutingTable::new)
     }
 
     /// Forward packet using active routing table
     pub fn forward_packet(&self, dest: Ipv4Addr) -> Result<ForwardingDecision, NetworkError> {
-        if let Some(table) = self.routing_tables.get(&self.active_table) {
-            if let Some(route) = table.lookup_primary(dest) {
+        if let Some(table) = self.active_table() {            if let Some(route) = table.lookup_primary(dest) {
                 return Ok(ForwardingDecision::Forward {
                     interface: route.interface.clone(),
                     next_hop: route.gateway,
                 });
             }
+=======
             if let Some(gateway) = table.default_gateway() {
                 return Ok(ForwardingDecision::Forward {
                     interface: "eth0".to_string(),
                     next_hop: Some(*gateway),
                 });
             }
+>>>>>>> origin/main
         }
         Err(NetworkError::RouteNotFound)
     }
@@ -278,10 +306,8 @@ impl MultiTableRoutingEngine {
 
     /// Lookup route in active table
     pub fn lookup_route(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
-        self.routing_tables
-            .get(&self.active_table)
-            .and_then(|t| t.lookup_primary(dest))
-    }
+<<<<<<< HEAD
+        self.active_table().and_then(|t| t.lookup_primary(dest))    }
 
     /// Get all routes from active table
     pub fn get_routes(&self) -> alloc::vec::Vec<RouteEntry> {
@@ -308,13 +334,8 @@ impl MultiTableRoutingEngine {
     }
 
     /// Get local addresses
-    pub fn local_addresses(&self) -> &[Ipv4Addr] {
-        if let Some(table) = self.routing_tables.get(&self.active_table) {
-            &table.local_addresses
-        } else {
-            &[]
-        }
-    }
+    pub fn local_addresses(&self) -> Option<&alloc::vec::Vec<Ipv4Addr>> {
+        self.active_table().map(|t| &t.local_addresses)    }
 }
 
 /// Policy Routing Decision
@@ -377,13 +398,14 @@ impl PolicyRoutingEngine {
         // Check configured policy decisions
         for decision in &self.decisions {
             match decision {
-                PolicyRoutingDecision::Policy { table, decision: dec } => {
+                PolicyRoutingDecision::Policy { table, decision } => {
+                    // If table is active, use that decision
                     if let Some(tbl) = self.routing_tables.get(table) {
+                        // Check if destination matches any route in that table
                         if tbl.lookup_secondary(table.clone(), dest).is_some() {
                             return PolicyRoutingDecision::Policy {
                                 table: table.clone(),
-                                decision: dec.clone(),
-                            };
+                                decision: decision.clone(),                            };
                         }
                     }
                 }
