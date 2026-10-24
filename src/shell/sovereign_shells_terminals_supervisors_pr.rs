@@ -111,6 +111,24 @@ impl InitSupervisorsAndTimersPrEngine {
         (is_ready, status_msg, watchdog_triggered)
     }
 
+    pub fn parse_systemd_socket_activation(&self, env_vars: &[(&str, &str)]) -> Option<(u32, u32)> {
+        let mut fds = None;
+        let mut pid = None;
+
+        for (key, val) in env_vars {
+            if *key == "LISTEN_FDS" {
+                fds = val.parse::<u32>().ok();
+            } else if *key == "LISTEN_PID" {
+                pid = val.parse::<u32>().ok();
+            }
+        }
+
+        match (fds, pid) {
+            (Some(f), Some(p)) => Some((f, p)),
+            _ => None,
+        }
+    }
+
     pub fn resolve_openrc_runlevel_dependencies(
         &self,
         _runlevel: &str,
@@ -160,6 +178,10 @@ impl InitSupervisorsAndTimersPrEngine {
 
     pub fn s6_readiness_handshake(&self, notification_fd: i32) -> bool {
         notification_fd >= 3
+    }
+
+    pub fn s6_readiness_fd_event(&self, notification_fd: i32, payload: &str) -> bool {
+        notification_fd >= 3 && (payload == "\n" || payload.trim().is_empty())
     }
 
     pub fn parse_sysvinit_inittab_action(&self, line: &str) -> Option<(u8, String, String)> {
@@ -324,6 +346,14 @@ impl InitSupervisorsAndTimersPrEngine {
             .into_iter()
             .map(|(name, _)| name.to_string())
             .collect()
+    }
+
+    pub fn calculate_at_job_delay_sec(&self, scheduled_time: u64, current_time: u64) -> u64 {
+        if scheduled_time > current_time {
+            scheduled_time - current_time
+        } else {
+            0
+        }
     }
 
     pub fn generate_proposal(&self) -> ShellsTerminalsSupervisorsPrProposalManifest {
@@ -551,6 +581,42 @@ impl PosixAndAdvancedShellsPrEngine {
     pub fn format_zsh_vcs_prompt(&self, branch: &str, is_dirty: bool) -> String {
         let status = if is_dirty { "*" } else { "" };
         format!("\x1b[35m(git:{}{})\x1b[0m ", branch, status)
+    }
+
+    pub fn is_dash_posix_builtin(&self, cmd: &str) -> bool {
+        matches!(
+            cmd,
+            ":" | "." | "alias" | "bg" | "cd" | "command" | "echo" | "eval" | "exec" | "exit"
+                | "export" | "fg" | "getopts" | "hash" | "jobs" | "kill" | "local" | "printf"
+                | "pwd" | "read" | "readonly" | "return" | "set" | "shift" | "test" | "times"
+                | "trap" | "type" | "ulimit" | "umask" | "unalias" | "unset" | "wait"
+        )
+    }
+
+    pub fn parse_fish_universal_var(&self, line: &str) -> Option<(String, String)> {
+        let trimmed = line.trim();
+        if trimmed.starts_with("set -U") || trimmed.starts_with("set --universal") {
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.len() >= 4 {
+                let var = parts[2].to_string();
+                let val = parts[3..].join(" ");
+                return Some((var, val));
+            }
+        }
+        None
+    }
+
+    pub fn parse_zsh_zle_bindkey(&self, line: &str) -> Option<(String, String)> {
+        let trimmed = line.trim();
+        if trimmed.starts_with("bindkey") {
+            let parts: Vec<&str> = trimmed.split_whitespace().collect();
+            if parts.len() >= 3 {
+                let seq = parts[1].trim_matches('"').trim_matches('\'').to_string();
+                let widget = parts[2].to_string();
+                return Some((seq, widget));
+            }
+        }
+        None
     }
 
     pub fn tokenize_fish_syntax(&self, line: &str) -> Vec<(String, &'static str)> {
@@ -841,6 +907,29 @@ impl TerminalMultiplexersAndEmulatorsPrEngine {
         None
     }
 
+    pub fn parse_gnome_konsole_profile_colors(&self, profile_data: &str) -> Option<(u32, u32)> {
+        let mut fg = None;
+        let mut bg = None;
+        for line in profile_data.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with("foreground-color=") || trimmed.starts_with("ColorForeground=") {
+                let val = trimmed.split('=').nth(1).unwrap_or("").trim_start_matches('#');
+                fg = u32::from_str_radix(val, 16).ok();
+            } else if trimmed.starts_with("background-color=") || trimmed.starts_with("ColorBackground=") {
+                let val = trimmed.split('=').nth(1).unwrap_or("").trim_start_matches('#');
+                bg = u32::from_str_radix(val, 16).ok();
+            }
+        }
+        match (fg, bg) {
+            (Some(f), Some(b)) => Some((f, b)),
+            _ => None,
+        }
+    }
+
+    pub fn format_gnu_screen_socket_path(&self, user: &str, session_name: &str) -> String {
+        format!("/run/screen/S-{}/{}.{}", user, 1234, session_name)
+    }
+
     pub fn compute_alacritty_cell_metrics(&self, font_size_pt: f32, dpi: f32) -> (u16, u16) {
         let cell_height = (font_size_pt * (dpi / 72.0)) as u16;
         let cell_width = (cell_height as f32 * 0.6) as u16;
@@ -1008,6 +1097,9 @@ mod tests {
         assert_eq!(status, Some("Running".to_string()));
         assert!(watchdog);
 
+        let socket_activation = engine.parse_systemd_socket_activation(&[("LISTEN_FDS", "3"), ("LISTEN_PID", "1024")]);
+        assert_eq!(socket_activation, Some((3, 1024)));
+
         let openrc_deps = engine.resolve_openrc_runlevel_dependencies(
             "default",
             &[("sshd", &["networking"]), ("networking", &[])],
@@ -1021,6 +1113,9 @@ mod tests {
         assert!(runit_ctl.contains("ok: run: sshd"));
 
         assert!(engine.s6_readiness_handshake(3));
+
+        let s6_event = engine.s6_readiness_fd_event(3, "\n");
+        assert!(s6_event);
 
         let sysv = engine
             .parse_sysvinit_inittab_action("id:3:initdefault:")
@@ -1050,6 +1145,9 @@ mod tests {
 
         let sorted_spool = engine.sort_at_job_spool_queue(&[("job2", 2000), ("job1", 1000)]);
         assert_eq!(sorted_spool, vec!["job1".to_string(), "job2".to_string()]);
+
+        let at_delay = engine.calculate_at_job_delay_sec(1700000100, 1700000000);
+        assert_eq!(at_delay, 100);
 
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Init Systems"));
@@ -1108,6 +1206,16 @@ mod tests {
         let prompt = engine.format_zsh_prompt("root", "sigma", "/root");
         assert!(prompt.contains("root@sigma"));
 
+        assert!(engine.is_dash_posix_builtin("echo"));
+        assert!(engine.is_dash_posix_builtin("cd"));
+        assert!(!engine.is_dash_posix_builtin("htop"));
+
+        let uvar = engine.parse_fish_universal_var("set -U greeting Hello World");
+        assert_eq!(uvar, Some(("greeting".to_string(), "Hello World".to_string())));
+
+        let zle = engine.parse_zsh_zle_bindkey("bindkey '^R' history-incremental-search-backward");
+        assert_eq!(zle, Some(("^R".to_string(), "history-incremental-search-backward".to_string())));
+
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Bash, Zsh, Fish"));
         assert_eq!(proposal.status, "Ready for Merge");
@@ -1149,6 +1257,12 @@ mod tests {
 
         let screen_caption = engine.render_screen_caption_line(&["bash", "htop"], 0);
         assert!(screen_caption.contains("[0*bash]"));
+
+        let colors = engine.parse_gnome_konsole_profile_colors("foreground-color=#FFFFFF\nbackground-color=#000000");
+        assert_eq!(colors, Some((0xFFFFFF, 0x000000)));
+
+        let screen_path = engine.format_gnu_screen_socket_path("root", "session1");
+        assert!(screen_path.contains("/run/screen/S-root/"));
 
         let proposal = engine.generate_proposal();
         assert!(proposal.pr_title.contains("Terminal"));
