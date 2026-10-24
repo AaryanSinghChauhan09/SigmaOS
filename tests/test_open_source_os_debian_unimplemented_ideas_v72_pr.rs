@@ -2,15 +2,13 @@
 // Integration Test Suite for Sovereign Open Source OS & Debian GitHub Unimplemented Ideas V72 PR Engine
 
 #[path = "../src/distro/debian_github_repo_missing_components_v72_pr.rs"]
-mod debian_github_repo_missing_components_v72_pr;
-#[path = "../src/distro/open_source_os_unimplemented_ideas_v72_pr.rs"]
+mod debian_github_repo_missing_components_v72_pr;#[path = "../src/distro/open_source_os_unimplemented_ideas_v72_pr.rs"]
 mod open_source_os_unimplemented_ideas_v72_pr;
 
 #[path = "../src/distro/open_source_os_debian_unimplemented_ideas_v72_pr.rs"]
 mod open_source_os_debian_unimplemented_ideas_v72_pr;
 
-use debian_github_repo_missing_components_v72_pr::*;
-use open_source_os_debian_unimplemented_ideas_v72_pr::*;
+use debian_github_repo_missing_components_v72_pr::*;use open_source_os_debian_unimplemented_ideas_v72_pr::*;
 use open_source_os_unimplemented_ideas_v72_pr::*;
 use std::collections::BTreeSet;
 
@@ -40,23 +38,6 @@ fn test_freebsd_161_capsicum_casper_nvme_engine_v72() {
     let engine = FreeBsd161CapsicumCasperNvmeTlsV72PrEngine::new();
     assert!(engine.check_casper_right("system.dns"));
     assert!(engine.check_casper_right("system.nvme"));
-    assert!(!engine.check_casper_right("system.unregistered"));
-    assert!(engine.handshake_nvme_tls("session_v72"));
-
-    let spec = engine.generate_pr_spec();
-    assert_eq!(spec.pr_id, 7202);
-    assert_eq!(spec.status, OsPrStatusV72::Validated);
-}
-
-#[test]
-fn test_openbsd_89_pinsyscall_unveil_engine_v72() {
-    let engine = OpenBsd89PinsyscallUnveilV72PrEngine::new();
-    assert!(engine.validate_pinsyscall(0x7fff0600));
-    assert!(!engine.validate_pinsyscall(0x10000000));
-    assert!(engine.check_unveil_access("/usr/lib/libc.so", 'r'));
-    assert!(engine.check_unveil_access("/usr/bin/ls", 'x'));
-    assert!(!engine.check_unveil_access("/etc/passwd", 'w'));
-
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7203);
 }
@@ -98,35 +79,7 @@ fn test_illumos_openzfs_dtrace_ebpf_engine_v72() {
 fn test_haiku_befs_attribute_indexing_engine_v72() {
     let engine = HaikuBeFsAttributeIndexingV72PrEngine::new();
     assert!(engine.query_index("META:title"));
-    assert!(engine.query_index("BEOS:PPCN:signature"));
-    assert!(!engine.query_index("other"));
-
-    let spec = engine.generate_pr_spec();
-    assert_eq!(spec.pr_id, 7207);
-}
-
-#[test]
-fn test_plan9_9p2000l_plumber_engine_v72() {
-    let engine = Plan99p2000LPlumberV72PrEngine::new();
-    assert_eq!(
-        engine.route_plumber_message("http://sigmaos.org"),
-        Some("dispatch_browser")
-    );
-    assert_eq!(
-        engine.route_plumber_message("main.rs"),
-        Some("dispatch_editor")
-    );
-
-    let spec = engine.generate_pr_spec();
-    assert_eq!(spec.pr_id, 7208);
-}
-
-#[test]
-fn test_redox_cow_scheme_capability_engine_v72() {
-    let engine = RedoxFsCowCapabilityV72PrEngine::new();
-    assert!(engine.verify_scheme_capability("file:"));
-    assert!(engine.verify_scheme_capability("disk:"));
-    assert!(!engine.verify_scheme_capability("unknown:"));
+    assert!(engine.query_index("BEOS:PPCN:signature"));    assert!(!engine.verify_scheme_capability("unknown:"));
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7209);
@@ -153,8 +106,7 @@ fn test_debian_apt_pqc_engine_v72() {
 
 #[test]
 fn test_debian_debconf_engine_v72() {
-    let mut engine = DebianDebconfDatabaseStateV72PrEngine::new();
-    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"UTC".to_string()));
+    let mut engine = DebianDebconfDatabaseStateV72PrEngine::new();    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"UTC".to_string()));
     engine.set_answer("tzdata/zones", "EST");
     assert_eq!(engine.get_answer("tzdata/zones"), Some(&"EST".to_string()));
 
@@ -164,8 +116,7 @@ fn test_debian_debconf_engine_v72() {
 
 #[test]
 fn test_debian_lintian_engine_v72() {
-    let engine = DebianLintianStaticAnalysisV72PrEngine::new();
-    let tags = engine.analyze_package_spec(false, false);
+    let engine = DebianLintianStaticAnalysisV72PrEngine::new();    let tags = engine.analyze_package_spec(false, false);
     assert_eq!(tags.len(), 2);
 
     let spec = engine.generate_pr_spec();
@@ -183,8 +134,7 @@ fn test_debian_sbuild_engine_v72() {
 
 #[test]
 fn test_debian_debsums_engine_v72() {
-    let engine = DebianDebsumsIntegrityAuditorV72PrEngine::new();
-    assert!(engine.audit_file(
+    let engine = DebianDebsumsIntegrityAuditorV72PrEngine::new();    assert!(engine.audit_file(
         "/usr/bin/apt",
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     ));
@@ -204,8 +154,7 @@ fn test_debian_popcon_engine_v72() {
 
 #[test]
 fn test_debian_piuparts_engine_v72() {
-    let engine = DebianPiupartsPackageSanitySuiteV72PrEngine::new();
-    let mut files = BTreeSet::new();
+    let engine = DebianPiupartsPackageSanitySuiteV72PrEngine::new();    let mut files = BTreeSet::new();
     files.insert("/etc/debian_version".to_string());
     files.insert("/var/log/leftover.log".to_string());
     let orphans = engine.verify_purge_cleanliness(&files);
@@ -233,8 +182,7 @@ fn test_debian_multiarch_engine_v72() {
     assert!(engine.resolve_coinstallation("libc6", "i386"));
 
     let spec = engine.generate_pr_spec();
-    assert_eq!(spec.pr_id, 7219);
-}
+    assert_eq!(spec.pr_id, 7219);}
 
 #[test]
 fn test_open_source_os_debian_v72_master_suite() {

@@ -25,15 +25,13 @@ use std::string::{String, ToString};
 use std::vec::Vec;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
-use crate::distro::debian_github_repo_missing_components_v72_pr::*;
-#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::distro::debian_github_repo_missing_components_v72_pr::*;#[cfg(not(any(feature = "standalone_test", test)))]
 use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
 
 #[cfg(any(feature = "standalone_test", test))]
 use super::debian_github_repo_missing_components_v72_pr::*;
 #[cfg(any(feature = "standalone_test", test))]
 use super::open_source_os_unimplemented_ideas_v72_pr::*;
-
 #[derive(Debug, Clone)]
 pub struct UnifiedOsDebianV72PrProposal {
     pub pr_id: String,
@@ -47,8 +45,7 @@ pub struct UnifiedOsDebianV72PrProposal {
 
 pub struct OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
     pub os_unimplemented_suite: OpenSourceOsUnimplementedIdeasV72PrSuite,
-    pub debian_missing_suite: DebianGithubRepoMissingComponentsV72PrSuite,
-}
+    pub debian_missing_suite: DebianGithubRepoMissingComponentsV72PrSuite,}
 
 impl Default for OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
     fn default() -> Self {
@@ -60,8 +57,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
     pub fn new() -> Self {
         Self {
             os_unimplemented_suite: OpenSourceOsUnimplementedIdeasV72PrSuite::new(),
-            debian_missing_suite: DebianGithubRepoMissingComponentsV72PrSuite::new(),
-        }
+            debian_missing_suite: DebianGithubRepoMissingComponentsV72PrSuite::new(),        }
     }
 
     pub fn collect_all_proposals(&self) -> Vec<UnifiedOsDebianV72PrProposal> {
@@ -81,8 +77,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
 
         for spec in self.debian_missing_suite.collect_all_pr_specs() {
             proposals.push(UnifiedOsDebianV72PrProposal {
-                pr_id: format!("PR-DEBIAN-V72-{}", spec.pr_id),
-                title: spec.title,
+                pr_id: format!("PR-DEBIAN-V72-{}", spec.pr_id),                title: spec.title,
                 target_component: spec.component_name,
                 status: "Staged".to_string(),
                 description: spec.description,

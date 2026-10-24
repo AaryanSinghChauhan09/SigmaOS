@@ -9,6 +9,7 @@
 extern crate alloc;
 
 #[cfg(not(any(feature = "standalone_test", test)))]
+=======>>>>>>> origin/main
 use alloc::format;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
@@ -70,8 +71,7 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
         }
     }
 
-    pub fn schedule_next_task(&mut self) -> Option<u64> {
-        self.task_queue.sort_by(|a, b| a.priority.cmp(&b.priority));
+    pub fn schedule_next_task(&mut self) -> Option<u64> {        self.task_queue.sort_by(|a, b| a.priority.cmp(&b.priority));
         self.task_queue.pop().map(|t| t.pid)
     }
 
@@ -94,8 +94,7 @@ impl Linux629SchedExtFolioCompactionV72PrEngine {
             diff_patch: "--- a/kernel/sched/ext.c\n+++ b/kernel/sched/ext.c\n@@ -1,5 +1,10 @@\n"
                 .to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 100,
-        }
+            parity_score: 100,        }
     }
 }
 
@@ -104,8 +103,7 @@ pub struct FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
 }
 
 impl Default for FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
-    fn default() -> Self {
-        Self::new()
+    fn default() -> Self {        Self::new()
     }
 }
 
@@ -119,7 +117,7 @@ impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
             ],
         }
     }
-
+>>>>>>> origin/main
     pub fn check_casper_right(&self, right: &str) -> bool {
         self.casper_rights.iter().any(|r| r == right)
     }
@@ -133,16 +131,14 @@ impl FreeBsd161CapsicumCasperNvmeTlsV72PrEngine {
             pr_id: 7202,
             subsystem: "FreeBSD Capsicum Casper".to_string(),
             title: "FreeBSD 16.1 Capsicum Casper Sandbox & NVMe-over-TLS V72".to_string(),
-            upstream_target: "sys/kern/kern_capsicum.c".to_string(),
-            description:
+            upstream_target: "sys/kern/kern_capsicum.c".to_string(),            description:
                 "Extends FreeBSD Capsicum process capability sandboxing with Casper daemon RPCs."
                     .to_string(),
             diff_patch:
                 "--- a/sys/kern/kern_capsicum.c\n+++ b/sys/kern/kern_capsicum.c\n@@ -1,5 +1,10 @@\n"
                     .to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 99,
-        }
+            parity_score: 99,        }
     }
 }
 
@@ -162,14 +158,13 @@ impl OpenBsd89PinsyscallUnveilV72PrEngine {
             pinned_syscall_addr: 0x7fff0600,
         }
     }
-
+>>>>>>> origin/main
     pub fn validate_pinsyscall(&self, addr: u64) -> bool {
         addr == self.pinned_syscall_addr
     }
 
     pub fn check_unveil_access(&self, path: &str, permissions: char) -> bool {
-        path.starts_with("/usr") && (permissions == 'r' || permissions == 'x')
-    }
+        path.starts_with("/usr") && (permissions == 'r' || permissions == 'x')    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -188,8 +183,7 @@ impl OpenBsd89PinsyscallUnveilV72PrEngine {
 pub struct NetBsd125RumpPciVirtio9pV72PrEngine;
 
 impl Default for NetBsd125RumpPciVirtio9pV72PrEngine {
-    fn default() -> Self {
-        Self::new()
+    fn default() -> Self {        Self::new()
     }
 }
 
@@ -197,7 +191,7 @@ impl NetBsd125RumpPciVirtio9pV72PrEngine {
     pub fn new() -> Self {
         Self
     }
-
+>>>>>>> origin/main
     pub fn parse_9p_header(&self, packet: &[u8]) -> Option<(u8, u16)> {
         if packet.len() >= 7 {
             Some((packet[4], u16::from_le_bytes([packet[5], packet[6]])))
@@ -215,8 +209,7 @@ impl NetBsd125RumpPciVirtio9pV72PrEngine {
             description: "Provides isolated userland Rump kernel hypervisor drivers and 9P2000.L VFS protocol routing.".to_string(),
             diff_patch: "--- a/sys/rump/librump/rumpvfs/rumpvfs.c\n+++ b/sys/rump/librump/rumpvfs/rumpvfs.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 98,
-        }
+            parity_score: 98,        }
     }
 }
 
@@ -233,6 +226,7 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
         Self
     }
 
+=======>>>>>>> origin/main
     pub fn sync_pfs_delta(&self, master_a: u32, master_b: u32) -> bool {
         master_a != master_b
     }
@@ -250,8 +244,7 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
             description: "Implements HAMMER3 multi-master PFS snapshot synchronization and active background scrubbing.".to_string(),
             diff_patch: "--- a/sys/vfs/hammer3/hammer3_vfsops.c\n+++ b/sys/vfs/hammer3/hammer3_vfsops.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 99,
-        }
+            parity_score: 99,        }
     }
 }
 
@@ -278,17 +271,6 @@ impl IllumosOpenZfsDtraceEbpfV72PrEngine {
     pub fn translate_dtrace_to_ebpf(&self, probe: &str) -> String {
         format!("bpf_probe_{}", probe.replace(':', "_"))
     }
-
-    pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
-        OpenSourceOsV72PrSpec {
-            pr_id: 7206,
-            subsystem: "Illumos OpenZFS DTrace".to_string(),
-            title: "Illumos OpenZFS Block Encryption & DTrace-to-eBPF V72".to_string(),
-            upstream_target: "usr/src/uts/common/fs/zfs/sys/zil.h".to_string(),
-            description: "Provides OpenZFS native block-level AES-256-GCM encryption and dynamic DTrace-to-eBPF probe translation.".to_string(),
-            diff_patch: "--- a/usr/src/uts/common/fs/zfs/sys/zil.h\n+++ b/usr/src/uts/common/fs/zfs/sys/zil.h\n@@ -1,5 +1,10 @@\n".to_string(),
-            status: OsPrStatusV72::Validated,
-            parity_score: 100,
         }
     }
 }
@@ -307,7 +289,9 @@ impl HaikuBeFsAttributeIndexingV72PrEngine {
     }
 
     pub fn query_index(&self, attribute_name: &str) -> bool {
-        attribute_name.starts_with("META:") || attribute_name.starts_with("BEOS:")
+        attribute_name.starts_with("META:") || attribute_name.starts_with("BEOS:")    pub fn query_index(&self, attribute_name: &str) -> bool {
+        attribute_name.starts_with("META:")
+>>>>>>> origin/main
     }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
@@ -319,8 +303,7 @@ impl HaikuBeFsAttributeIndexingV72PrEngine {
             description: "Implements BeFS MIME extended attribute B+Tree indexing and live Tracker queries.".to_string(),
             diff_patch: "--- a/src/add-ons/kernel/file_systems/befs/Attribute.cpp\n+++ b/src/add-ons/kernel/file_systems/befs/Attribute.cpp\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 97,
-        }
+            parity_score: 97,        }
     }
 }
 
@@ -340,8 +323,7 @@ impl Plan99p2000LPlumberV72PrEngine {
     pub fn route_plumber_message(&self, msg: &str) -> Option<&'static str> {
         if msg.starts_with("http") {
             Some("dispatch_browser")
-        } else if msg.ends_with(".rs") || msg.ends_with(".c") {
-            Some("dispatch_editor")
+        } else if msg.ends_with(".rs") || msg.ends_with(".c") {            Some("dispatch_editor")
         } else {
             None
         }
@@ -356,8 +338,7 @@ impl Plan99p2000LPlumberV72PrEngine {
             description: "Enables Plan 9 9P2000.L zero-copy file protocol server and Plumber pattern-matching message routing.".to_string(),
             diff_patch: "--- a/sys/src/cmd/plumb/plumb.c\n+++ b/sys/src/cmd/plumb/plumb.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 99,
-        }
+            parity_score: 99,        }
     }
 }
 
@@ -375,7 +356,9 @@ impl RedoxFsCowCapabilityV72PrEngine {
     }
 
     pub fn verify_scheme_capability(&self, scheme: &str) -> bool {
-        scheme == "file:" || scheme == "event:" || scheme == "disk:"
+        scheme == "file:" || scheme == "event:" || scheme == "disk:"    pub fn verify_scheme_capability(&self, scheme: &str) -> bool {
+        scheme == "file:" || scheme == "event:"
+>>>>>>> origin/main
     }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
@@ -387,8 +370,7 @@ impl RedoxFsCowCapabilityV72PrEngine {
             description: "Implements RedoxFS Copy-on-Write capability-based scheme handlers and zero-copy microkernel IPC.".to_string(),
             diff_patch: "--- a/redoxfs/src/scheme.rs\n+++ b/redoxfs/src/scheme.rs\n@@ -1,5 +1,10 @@\n".to_string(),
             status: OsPrStatusV72::Validated,
-            parity_score: 98,
-        }
+            parity_score: 98,        }
     }
 }
 
@@ -397,8 +379,7 @@ pub struct OpenSourceOsUnimplementedIdeasV72PrSuite {
     pub freebsd_capsicum: FreeBsd161CapsicumCasperNvmeTlsV72PrEngine,
     pub openbsd_pinsyscall: OpenBsd89PinsyscallUnveilV72PrEngine,
     pub netbsd_rump: NetBsd125RumpPciVirtio9pV72PrEngine,
-    pub dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine,
-    pub illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine,
+    pub dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine,    pub illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine,
     pub haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine,
     pub plan9_plumber: Plan99p2000LPlumberV72PrEngine,
     pub redox_cow: RedoxFsCowCapabilityV72PrEngine,
@@ -417,8 +398,7 @@ impl OpenSourceOsUnimplementedIdeasV72PrSuite {
             freebsd_capsicum: FreeBsd161CapsicumCasperNvmeTlsV72PrEngine::new(),
             openbsd_pinsyscall: OpenBsd89PinsyscallUnveilV72PrEngine::new(),
             netbsd_rump: NetBsd125RumpPciVirtio9pV72PrEngine::new(),
-            dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine::new(),
-            illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine::new(),
+            dragonfly_hammer3: DragonFlyHammer3MultiMasterScrubV72PrEngine::new(),            illumos_openzfs: IllumosOpenZfsDtraceEbpfV72PrEngine::new(),
             haiku_befs: HaikuBeFsAttributeIndexingV72PrEngine::new(),
             plan9_plumber: Plan99p2000LPlumberV72PrEngine::new(),
             redox_cow: RedoxFsCowCapabilityV72PrEngine::new(),
@@ -438,4 +418,6 @@ impl OpenSourceOsUnimplementedIdeasV72PrSuite {
             self.redox_cow.generate_pr_spec(),
         ]
     }
+=======
+<<<<<<< HEAD>>>>>>> origin/main
 }
