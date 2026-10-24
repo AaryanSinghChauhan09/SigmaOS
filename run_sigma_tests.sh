@@ -479,6 +479,13 @@ if [ -f "src/creative/figcraft_missing_components_parity_pr.rs" ]; then
     ./build/test_figcraft_missing
 fi
 
+if [ -f "src/creative/figcraft_artcraft_missing_components_v65_pr.rs" ]; then
+    echo "Running Sovereign Figcraft & ArtCraft Missing Components V65 PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/figcraft_artcraft_missing_components_v65_pr.rs --edition=2021 -o build/test_figcraft_v65
+    ./build/test_figcraft_v65
+fi
+
 if [ -f "src/creative/cadcraft.rs" ]; then
     echo "Running Sovereign CadCraft CAD Engine test suite..."
     mkdir -p build
