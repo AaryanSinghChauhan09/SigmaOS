@@ -33,7 +33,6 @@ use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
 use crate::debian_github_repo_missing_components_v71_pr::*;
 #[cfg(any(feature = "standalone_test", test))]
 use crate::open_source_os_unimplemented_ideas_v72_pr::*;
-
 #[derive(Debug, Clone)]
 pub struct UnifiedOsDebianV72PrProposal {
     pub pr_id: String,
@@ -49,7 +48,6 @@ pub struct OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
     pub os_unimplemented_suite: OpenSourceOsUnimplementedIdeasV72PrSuite,
     pub debian_missing_suite: DebianGithubRepoMissingComponentsV71PrSuite,
 }
-
 impl Default for OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
     fn default() -> Self {
         Self::new()
@@ -70,8 +68,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
 
         let mut proposals = Vec::new();
 
-        for spec in os_specs {
-            proposals.push(UnifiedOsDebianV72PrProposal {
+        for spec in os_specs {            proposals.push(UnifiedOsDebianV72PrProposal {
                 pr_id: format!("PR-OS-V72-{}", spec.pr_id),
                 title: spec.title,
                 target_component: spec.subsystem,
@@ -87,8 +84,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
                 pr_id: format!("PR-DEBIAN-V71-{}", spec.pr_id),
                 title: spec.title,
                 target_component: spec.component_name,
-                status: format!("{:?}", spec.status),
-                description: spec.description,
+                status: format!("{:?}", spec.status),                description: spec.description,
                 git_diff_patch: spec.diff_patch,
                 pqc_signature: spec.pqc_signature,
             });
@@ -96,6 +92,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
 
         proposals
     }
+<<<<<<< HEAD
 
     pub fn evaluate_distro_parity_score(&self) -> u32 {
         let os_proposals = self.os_unimplemented_suite.collect_all_pr_specs();
@@ -106,4 +103,6 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
             total_score / os_proposals.len() as u32
         }
     }
+=======
+>>>>>>> origin/main
 }
