@@ -94,3 +94,8 @@ wiki/
 !WIKI/
 !WIKI/*.md
 !WIKI/**/*.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
+!.jules/**/*.md
