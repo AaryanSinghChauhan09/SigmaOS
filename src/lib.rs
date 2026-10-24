@@ -225,6 +225,7 @@ pub mod tools;
 pub use desktop::elementary_os_ecosystem_expansion_v64::*;
 pub use desktop::elementary_os_missing_components_v66::*;
 pub use desktop::elementary_os_missing_components_v72::*;
+pub use desktop::elementary_os_missing_components_v73::*;
 pub use distro::additional_linux_bsd_components::*;
 pub use distro::arch_linux_missing_components_v53_pr::*;
 pub use distro::arch_linux_missing_components_v54_pr::*;
@@ -253,6 +254,7 @@ pub use distro::cachy_linux_missing_components_v69_pr::*;
 pub use distro::cachy_linux_missing_components_v70_pr::*;
 pub use distro::cachy_linux_missing_components_v71_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
+pub use distro::open_source_os_unimplemented_ideas_v73_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 // Module-path re-exports so `crate::<module>` resolves under cfg(test)/standalone_test
 pub use distro::debian_github_repo_missing_components_v71_pr;
