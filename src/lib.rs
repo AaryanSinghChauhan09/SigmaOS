@@ -293,6 +293,8 @@ pub use distro::open_source_os_missing_components_v71_pr::*;
 pub use distro::open_source_os_missing_components_v72_pr::*;
 pub use distro::open_source_os_missing_components_v73_pr::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
+pub use package::sovereign_distro_package_advancements_v74::*;
+pub use package::sovereign_distro_package_advancements_v74_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
