@@ -118,15 +118,6 @@ SigmaOS is engineered to systematically outpace, unify, and replace traditional 
 2. **Resource-Efficient Dormant Tooling**:
    - Developer utilities remain pre-compressed and dormant in virtual memory until invoked, consuming zero RAM or background CPU cycles during routine OS usage.
 
-### 2.3 SigmaPkg Universal Package Absorption Engine
-1. **Multi-Format Compatibility**:
-   - SigmaPkg reads and translates metadata from `.deb` (APT), `.pkg.tar.zst` (Pacman), `.rpm` (DNF), and Nix expressions natively.
-   - Translation modules automatically sandbox external Linux binaries in lightweight compatibility wrappers using syscall translation gates.
-
-2. **Transactional Snapshot & Rollback**:
-   - Every package installation or system update executes inside a read-only transactional filesystem snapshot.
-   - If an update fails or degrades performance, SigmaPkg performs an instantaneous, atomic rollback to the previous system state in <1 second.
-
 ---
 
 ## 3. THE ZENITH COMPOSITOR & VISUAL CORE
@@ -437,9 +428,9 @@ SigmaOS embeds compliance verification into its system core, offering live, auto
 
 ---
 
-## 7. COMPOSITE SPECIALIST ROLES MATRIX
+## 7. COMPOSITE SPECIALIST ROLES MATRIX & AUTONOMOUS AGENTS
 
-To ensure total system excellence, SigmaOS development is governed by 16 distinct specialist engineering roles:
+To ensure total system excellence, SigmaOS development is governed by 16 distinct specialist engineering roles and autonomous AI development agents:
 
 1. **System / Architecture Designer**: Enforces modular subsystem boundaries and interface rules.
 2. **Kernel / Systems Engineer**: Owns scheduler, page tables, capability rings, and IPC.
@@ -457,6 +448,11 @@ To ensure total system excellence, SigmaOS development is governed by 16 distinc
 14. **Performance Specialist**: Profiles CPU cache lines, context switch latencies, and memory allocation paths.
 15. **Accessibility Specialist**: Ensures WCAG 2.1 AAA compliance and screen reader interfaces.
 16. **Governance & Community Manager**: Oversees CLA agreements, contributor pipelines, and voting dashboards.
+
+### Autonomous AI Specialist Agents
+- **Bolt ⚡ (Performance Optimizer)**: Dedicated to micro-benchmarking, O(N²) loop elimination, zero-allocation buffer re-use, and latency reduction across kernel and userland modules.
+- **Palette 🎨 (UX & Accessibility Designer)**: Dedicated to WCAG 2.1 AAA accessibility, keyboard-driven navigation, focus state indicators, and fluid Zenith interface polish.
+- **Sentinel 🛡️ (Security Auditor & Hardening Specialist)**: Dedicated to vulnerability scanning, CVE mitigations, constant-time cryptographic primitives, and memory safety invariants.
 
 ---
 
@@ -483,13 +479,23 @@ SigmaOS includes an automated intelligence engine that monitors open-source repo
 
 ---
 
-## 9. CONCLUSION & EXECUTION ROADMAP
+## 9. SIGMAPKG UNIVERSAL PACKAGE ABSORPTION & LINUX DISTRO HARVESTING
+
+SigmaPkg acts as a universal package manager that ingests packages from Ubuntu (APT), Arch (Pacman), Fedora (DNF), and NixOS (Nix) into sandboxed, zero-trust SigmaOS containers:
+1. **Metadata Parsing & Translation**: Converts `.deb`, `.pkg.tar.zst`, `.rpm`, and Nix derivation schemas into unified SigmaPkg descriptors (`sigma_pkg.toml`).
+2. **Container Sandbox Isolation**: Runs untrusted third-party binaries inside lightweight Capsicum/Casper micro-sandboxes with restricted syscall gates.
+3. **Atomic State Rollback**: Integrates with Ext4/ZFS CoW block layers to ensure instant rollback on installation or update failure.
+
+---
+
+## 10. CONCLUSION & EXECUTION ROADMAP
 
 SigmaOS represents the ultimate evolution of bare-metal operating systems. By combining:
 - From-scratch **`no_std` low-level purity** in Rust, Zig, and Nim,
 - A **distro-crushing execution strategy** with universal package absorption (SigmaPkg),
 - The **Zenith direct framebuffer compositor** free from X11/Wayland overhead,
-- **Post-Quantum Cryptography** (Kyber-1024, Dilithium-5) and zero-trust capability rings, and
-- A **multi-tier compliance and automated updater framework**,
+- **Post-Quantum Cryptography** (Kyber-1024, Dilithium-5) and zero-trust capability rings,
+- A **multi-tier compliance and automated updater framework**, and
+- Autonomous AI specialist agents (**Bolt ⚡**, **Palette 🎨**, **Sentinel 🛡️**),
 
 SigmaOS sets the undisputed standard for modern, secure, lightweight, and high-performance operating systems.
