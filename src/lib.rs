@@ -287,8 +287,10 @@ pub use distro::open_source_os_missing_components_v67_pr::*;
 pub use distro::open_source_os_missing_components_v68_pr::*;
 pub use distro::open_source_os_missing_components_v69_pr::*;
 pub use distro::open_source_os_missing_components_v71_pr::*;
+=======
 pub use distro::open_source_os_missing_components_v73_pr::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
+>>>>>>> origin/main
 pub use distro::open_source_os_missing_components_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
@@ -301,9 +303,7 @@ pub use distro::openbsd_missing_components_v62_pr::*;
 pub use distro::openbsd_missing_components_v63_pr::*;
 pub use distro::openbsd_missing_components_v64_pr::*;
 <<<<<<< HEAD
-=======
 pub use distro::openbsd_missing_components_v65_pr::*;
->>>>>>> origin/main
 >>>>>>> origin/main
 pub use distro::openbsd_missing_components_v66_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
@@ -702,6 +702,7 @@ pub use crate::distro::open_source_os_missing_components_v67_pr::*;
 pub use crate::distro::open_source_os_missing_components_v68_pr::*;
 pub use crate::distro::open_source_os_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_missing_components_v70_pr::*;
+pub use crate::distro::open_source_os_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
 =======
