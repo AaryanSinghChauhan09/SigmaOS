@@ -8,8 +8,7 @@
 // 1. `SigmaOsVsOpenSourceOsComparisonMatrixEngineV73`: Comprehensive comparison matrix comparing SigmaOS against 10 Tier-1 open-source operating systems across architectural dimensions.
 // 2. `Linux628SchedExtAiPredictivePowerGovernorEngineV73`: Linux 6.28+ SchedExt eBPF AI-predictive dynamic workload scheduler & sub-milliwatt power governor.
 // 3. `FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73`: FreeBSD 16.2+ Capsicum Casper Netlink capability delegates & micro-jail VNET mesh isolation.
-// 4. `OpenBsd88FineIbtPinsyscallPteGuardEngineV73`: OpenBSD 8.8+ FineIBT CFI enforcement & shadow call stack PTE guard.
-// 5. `DragonFly78Hammer2DirectIoErasureEngineV73`: DragonFly BSD 7.8+ HAMMER2 PFS erasure-coded zero-copy direct-IO cluster engine.
+// 4. `OpenBsd88FineIbtPinsyscallPteGuardEngineV73`: OpenBSD 8.8+ FineIBT CFI enforcement & shadow call stack PTE guard.// 5. `DragonFly78Hammer2DirectIoErasureEngineV73`: DragonFly BSD 7.8+ HAMMER2 PFS erasure-coded zero-copy direct-IO cluster engine.
 // 6. `NetBsd126RumpUserlandAudioPciRouterEngineV73`: NetBSD 12.6 Rump hypercall userland audio & PCI driver router.
 // 7. `HaikuBfsRelationalLiveQueryMetadataEngineV73`: Haiku BFS live relational attribute query indexing & search engine.
 // 8. `Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73`: Plan 9 synthetic 9P2000 VFS namespace multiplexer & process rfork isolation.
@@ -92,8 +91,7 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
         let comparisons = vec![
             ("Linux 6.28+", "Scheduling", "SchedExt eBPF AI-Predictive Power Governor", "PR Staged / Component Added", "PR-V73-001"),
             ("FreeBSD 16.2+", "Security", "Capsicum Casper Netlink Micro-Jail Mesh", "PR Staged / Component Added", "PR-V73-002"),
-            ("OpenBSD 8.8+", "Memory Protection", "FineIBT Pinsyscall PTE Shadow Stack Guard", "PR Staged / Component Added", "PR-V73-003"),
-            ("DragonFly BSD 7.8+", "Filesystem", "HAMMER2 PFS Erasure-Coded Direct-IO", "PR Staged / Component Added", "PR-V73-004"),
+            ("OpenBSD 8.8+", "Memory Protection", "FineIBT Pinsyscall PTE Shadow Stack Guard", "PR Staged / Component Added", "PR-V73-003"),            ("DragonFly BSD 7.8+", "Filesystem", "HAMMER2 PFS Erasure-Coded Direct-IO", "PR Staged / Component Added", "PR-V73-004"),
             ("NetBSD 12.6", "Device Drivers", "Rump Hypercall Userland Audio/PCI Router", "PR Staged / Component Added", "PR-V73-005"),
             ("Haiku OS R1/Beta 8", "File Indexing", "BFS Live Relational Attribute Search Engine", "PR Staged / Component Added", "PR-V73-006"),
             ("Plan 9 / 9front", "Virtual VFS", "Synthetic 9P2000 Rfork Process Isolation", "PR Staged / Component Added", "PR-V73-007"),
@@ -116,7 +114,6 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
             );
         }
     }
-
     pub fn generate_matrix_report(&self) -> String {
         let mut report = String::from("# SigmaOS vs Open Source Operating Systems Feature Parity Matrix V73\n\n");
         report.push_str("| Open Source OS | Feature Category | Native OS Capability | SigmaOS Parity Status | PR ID |\n");
@@ -137,15 +134,13 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
 
 // 2. Linux 6.28+ SchedExt eBPF AI-Predictive Power Topology Governor Engine V73
 #[derive(Debug, Default)]
-pub struct Linux628SchedExtAiPredictivePowerGovernorEngineV73 {
-    sched_policies: BTreeMap<String, String>,
+pub struct Linux628SchedExtAiPredictivePowerGovernorEngineV73 {    sched_policies: BTreeMap<String, String>,
     predictive_cores: BTreeMap<String, u64>,
 }
 
 impl Linux628SchedExtAiPredictivePowerGovernorEngineV73 {
     pub fn new() -> Self {
-        Self {
-            sched_policies: BTreeMap::new(),
+        Self {            sched_policies: BTreeMap::new(),
             predictive_cores: BTreeMap::new(),
         }
     }
@@ -164,15 +159,13 @@ impl Linux628SchedExtAiPredictivePowerGovernorEngineV73 {
         OpenSourceOsPrProposalV73 {
             pr_id: pr_id.to_string(),
             title: "Linux 6.28+ SchedExt eBPF AI-Predictive Power Governor & NUMA Dynamic Scheduler V73".to_string(),
-            component_name: "Linux628SchedExtAiPredictivePowerGovernorEngineV73".to_string(),
-            os_origin: "Linux Kernel 6.28+".to_string(),
+            component_name: "Linux628SchedExtAiPredictivePowerGovernorEngineV73".to_string(),            os_origin: "Linux Kernel 6.28+".to_string(),
             status: OsPrStatusV73::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
             patch_diff: format!(
                 "--- kernel/sched/scx_ai_predictive_topology_v73.c\n+++ kernel/sched/scx_ai_predictive_topology_v73.c\n@@ -1,5 +1,12 @@\n+ active_sched_policies: {}\n+ predictive_cores: {}\n",
                 self.sched_policies.len(),
-                self.predictive_cores.len()
-            ),
+                self.predictive_cores.len()            ),
         }
     }
 }
@@ -551,8 +544,7 @@ pub struct SovereignOpenSourceOsMissingComponentsV73PrSuite {
     pub comparison_matrix: SigmaOsVsOpenSourceOsComparisonMatrixEngineV73,
     pub linux_sched: Linux628SchedExtAiPredictivePowerGovernorEngineV73,
     pub freebsd_casper: FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73,
-    pub openbsd_fineibt: OpenBsd88FineIbtPinsyscallPteGuardEngineV73,
-    pub dragonfly_hammer2: DragonFly78Hammer2DirectIoErasureEngineV73,
+    pub openbsd_fineibt: OpenBsd88FineIbtPinsyscallPteGuardEngineV73,    pub dragonfly_hammer2: DragonFly78Hammer2DirectIoErasureEngineV73,
     pub netbsd_rump: NetBsd126RumpUserlandAudioPciRouterEngineV73,
     pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV73,
     pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73,
@@ -575,7 +567,6 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
         let mut linux_sched = Linux628SchedExtAiPredictivePowerGovernorEngineV73::new();
         linux_sched.register_policy("scx_ai_predictive_v73", "0xdeadbeef73");
         linux_sched.register_predictive_core("core_0", 7);
-
         let mut freebsd_casper = FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73::new();
         freebsd_casper.spawn_casper_vnet_jail("jail_net_v73", vec!["CAP_SOCKET", "CAP_NET_BIND"]);
 
@@ -608,8 +599,7 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
         tech_media.harvest_idea(
             "Phoronix",
             "Linux 6.28 eBPF AI Predictive NUMA SchedExt Benchmarks",
-        );
-        tech_media.harvest_idea(
+        );        tech_media.harvest_idea(
             "HackerNews",
             "Capability-based Micro-Jail VNET isolation in FreeBSD 16.2",
         );
@@ -650,12 +640,6 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
         100
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
     fn test_v73_pr_suite_execution() {
         let suite = SovereignOpenSourceOsMissingComponentsV73PrSuite::new();
         let proposals = suite.execute_full_v73_pr_pipeline();

@@ -83,8 +83,7 @@ pub struct InspectedPackageManifestV73 {
 
 pub struct UniversalPackageFormatInspectorV73 {
     pub total_formats_supported: usize,
-    pub inspection_cache: BTreeMap<String, InspectedPackageManifestV73>,
-}
+    pub inspection_cache: BTreeMap<String, InspectedPackageManifestV73>,}
 
 impl UniversalPackageFormatInspectorV73 {
     pub fn new() -> Self {
@@ -324,8 +323,7 @@ pub struct UdfExecutionContextV73 {
 
 pub struct UdfScriptletEngineV73 {
     pub hooks_registered: Vec<UdfExecutionContextV73>,
-    pub execution_log: Vec<String>,
-}
+    pub execution_log: Vec<String>,}
 
 impl UdfScriptletEngineV73 {
     pub fn new() -> Self {
@@ -364,8 +362,7 @@ impl UdfScriptletEngineV73 {
 
 pub struct UniversalCrossDistroSatSolverV73 {
     pub canonical_package_map: BTreeMap<String, String>,
-    pub known_vulnerabilities: Vec<String>,
-}
+    pub known_vulnerabilities: Vec<String>,}
 
 impl UniversalCrossDistroSatSolverV73 {
     pub fn new() -> Self {
@@ -423,8 +420,7 @@ pub struct SandboxCapabilityRulesV73 {
 }
 
 pub struct UniversalMultiSandboxGovernorV73 {
-    pub enforced_level: u8,
-}
+    pub enforced_level: u8,}
 
 impl UniversalMultiSandboxGovernorV73 {
     pub fn new() -> Self {
@@ -466,8 +462,7 @@ pub struct CasDeltaRecordV73 {
 }
 
 pub struct UniversalCasDeltaStoreGovernorV73 {
-    pub cas_index: BTreeMap<String, CasDeltaRecordV73>,
-}
+    pub cas_index: BTreeMap<String, CasDeltaRecordV73>,}
 
 impl UniversalCasDeltaStoreGovernorV73 {
     pub fn new() -> Self {
@@ -518,8 +513,7 @@ pub struct BootEnvSnapshotRecordV73 {
 
 pub struct UniversalBootEnvSnapshotGovernorV73 {
     pub snapshots: BTreeMap<u64, BootEnvSnapshotRecordV73>,
-    pub next_id: u64,
-}
+    pub next_id: u64,}
 
 impl UniversalBootEnvSnapshotGovernorV73 {
     pub fn new() -> Self {
@@ -671,8 +665,7 @@ pub struct SovereignPackagePrProposalV73 {
 }
 
 pub struct SovereignDistroPackagePrGatewayV73 {
-    pub active_proposals: Vec<SovereignPackagePrProposalV73>,
-}
+    pub active_proposals: Vec<SovereignPackagePrProposalV73>,}
 
 impl SovereignDistroPackagePrGatewayV73 {
     pub fn new() -> Self {
@@ -685,8 +678,7 @@ impl SovereignDistroPackagePrGatewayV73 {
                     status: "Validated".to_string(),
                     patch_diff: "--- src/package/universal_inspector_v73.rs\n+++ src/package/universal_inspector_v73.rs\n@@ -1,3 +1,8 @@\n+ total_formats_supported: 210\n".to_string(),
                 },
-            ],
-        }
+            ],        }
     }
 }
 
@@ -703,8 +695,7 @@ pub struct SovereignDistroPackageAdvancementsSuiteV73 {
     pub boot_env_governor: UniversalBootEnvSnapshotGovernorV73,
     pub cli_router: UniversalPmCliRouterV73,
     pub pr_gateway: SovereignDistroPackagePrGatewayV73,
-    pub installed_packages: Vec<String>,
-}
+    pub installed_packages: Vec<String>,}
 
 impl SovereignDistroPackageAdvancementsSuiteV73 {
     pub fn new() -> Self {
@@ -753,7 +744,6 @@ impl SovereignDistroPackageAdvancementsSuiteV73 {
 // ============================================================================
 // 10. Standalone Unit Tests V73
 // ============================================================================
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -845,6 +835,5 @@ mod tests {
             .installed_packages
             .contains(&"sigpkg-v73-htop".to_string()));
         assert_eq!(suite.udf_engine.execution_log.len(), 1);
-        assert_eq!(suite.pr_gateway.active_proposals.len(), 1);
-    }
+        assert_eq!(suite.pr_gateway.active_proposals.len(), 1);    }
 }

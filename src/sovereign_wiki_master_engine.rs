@@ -196,6 +196,15 @@ impl Sovereign100IdeasSuite {
                 .to_string(),
             is_fulfilled: true,
         });
+        self.ideas.push(ImprovementIdeaRecord {
+            id: 36,
+            name: "SigmaOS System-Call Development Plan & 17-PR Gateway Suite".to_string(),
+            category: IdeaCategory::PerformanceAndKernel,
+            legacy_counterparts: "Linux Syscall Table, POSIX.1-2024, FreeBSD Syscalls".to_string(),
+            implementation_module: "src/syscall/sovereign_syscall_development_and_pr_suite.rs"
+                .to_string(),
+            is_fulfilled: true,
+        });
 
         // Security & Privacy (34-45)
         self.ideas.push(ImprovementIdeaRecord {
