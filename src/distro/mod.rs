@@ -514,6 +514,8 @@ pub mod dragonflybsd_missing_components_v63_pr;
 pub use dragonflybsd_missing_components_v63_pr::*;
 pub mod dragonflybsd_missing_components_v64_pr;
 pub use dragonflybsd_missing_components_v64_pr::*;
+pub mod dragonflybsd_missing_components_v65_pr;
+pub use dragonflybsd_missing_components_v65_pr::*;
 pub mod openbsd_missing_components_v55_pr;
 pub use openbsd_missing_components_v55_pr::*;
 pub mod openbsd_missing_components_v66_pr;
