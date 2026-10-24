@@ -2176,6 +2176,13 @@ if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
     ./build/test_network_development_pr_suite
 fi
 
+if [ -f "src/syscall/sovereign_syscall_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Syscall Development and PR Suite..."
+    mkdir -p build
+    rustc --test src/syscall/sovereign_syscall_development_and_pr_suite.rs --edition=2021 -o build/test_syscall_pr_suite
+    ./build/test_syscall_pr_suite
+fi
+
 if [ -f "src/shell/sovereign_command_interpreter.rs" ]; then
     echo "Running Sovereign Command Interpreter and 17-PR Gateway Suite..."
     mkdir -p build

@@ -446,6 +446,13 @@ description = "SigmaOS Device Driver Development and Maintenance Plan establishi
 test_evidence = "Architecture specification published in docs/SIGMAOS_DEVICE_DRIVER_DEVELOPMENT_PLAN.md and wiki/35-SigmaOS-Device-Driver-Development-Plan.md; standalone unit test passes via rustc --test src/driver/sovereign_device_driver_development_and_pr_suite.rs"
 next_milestone = "PR 1: docs(drivers): audit driver status and define support evidence & PR 8: feat(drivers): integrate VirtIO block through PCI discovery"
 
+[syscall.development_plan]
+status = "integrated"
+files = ["docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/36-SigmaOS-Syscall-Development-Plan.md", "src/syscall/sovereign_syscall_development_and_pr_suite.rs"]
+description = "SigmaOS System-Call Development and Maintenance Plan establishing 10 mandatory ABI policies, 17-PR implementation sequence, periodic maintenance cadences, component rules, PR review gates, and rollout criteria"
+test_evidence = "Architecture specification published in docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/36-SigmaOS-Syscall-Development-Plan.md; standalone unit tests pass via rustc --test src/syscall/sovereign_syscall_development_and_pr_suite.rs"
+next_milestone = "PR 1: docs(syscall): define ABI policy and component status & PR 3: test(syscall): add user-memory access harness"
+
 
 [compilation.status]
 status = "in-progress"
