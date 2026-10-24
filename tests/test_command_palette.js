@@ -311,6 +311,17 @@ gstRate.value = "18";
 const gstRes = createMockElement("gst-result");
 createMockElement("kernel-logs"); // container for showToast
 
+const logsContainer = mockElements["kernel-logs"];
+const initialToastCount = logsContainer ? logsContainer.children.length : 0;
+const toastEl = zenith.showToast("Test Toast Dismissal");
+assert.notStrictEqual(toastEl, null, "Expected showToast to return created toast element");
+assert.strictEqual(toastEl.getAttribute("title"), "Click to dismiss notification", "Expected toast title tooltip attribute");
+assert.strictEqual(toastEl.getAttribute("aria-label"), "Test Toast Dismissal (Click to dismiss)", "Expected toast aria-label attribute");
+
+// Simulate click dismissal on the toast element
+toastEl.dispatchEvent({ type: "click" });
+assert.strictEqual(toastEl.classList.contains("fade-out"), true, "Expected toast to have .fade-out class on click dismissal");
+
 zenith.calculateGST();
 assert.strictEqual(gstRes.textContent, "> Result: Base ₹100.00 + Tax ₹18.00 (18%) = Total ₹118.00", "Expected GST result text calculation");
 
