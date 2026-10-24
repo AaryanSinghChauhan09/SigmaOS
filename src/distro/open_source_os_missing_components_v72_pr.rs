@@ -90,16 +90,76 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV72 {
 
     pub fn populate_default_matrix(&mut self) {
         let comparisons = vec![
-            ("Linux 6.27+", "Scheduling", "SchedExt eBPF AI-Predictive Power Governor", "PR Staged / Component Added", "PR-V72-001"),
-            ("FreeBSD 16.1+", "Security", "Capsicum Casper Netlink Micro-Jail Mesh", "PR Staged / Component Added", "PR-V72-002"),
-            ("OpenBSD 8.7+", "Memory Protection", "FineIBT Pinsyscall PTE Shadow Stack Guard", "PR Staged / Component Added", "PR-V72-003"),
-            ("DragonFly BSD 7.7+", "Filesystem", "HAMMER2 PFS Erasure-Coded Direct-IO", "PR Staged / Component Added", "PR-V72-004"),
-            ("NetBSD 12.5", "Device Drivers", "Rump Hypercall Userland Audio/PCI Router", "PR Staged / Component Added", "PR-V72-005"),
-            ("Haiku OS R1/Beta 7", "File Indexing", "BFS Live Relational Attribute Search Engine", "PR Staged / Component Added", "PR-V72-006"),
-            ("Plan 9 / 9front", "Virtual VFS", "Synthetic 9P2000 Rfork Process Isolation", "PR Staged / Component Added", "PR-V72-007"),
-            ("NixOS / GNU Guix", "Package Management", "Hermetic CAS Merkle Closure Tree Rollback", "PR Staged / Component Added", "PR-V72-008"),
-            ("Illumos / OpenIndiana", "Networking", "Crossbow VNIC Virtual Switch DTrace Mesh", "PR Staged / Component Added", "PR-V72-009"),
-            ("Omarchy Linux", "Desktop Experience", "Wallust Palette Reload & Chord Hotkey Navigator", "PR Staged / Component Added", "PR-V72-010"),
+            (
+                "Linux 6.27+",
+                "Scheduling",
+                "SchedExt eBPF AI-Predictive Power Governor",
+                "PR Staged / Component Added",
+                "PR-V72-001",
+            ),
+            (
+                "FreeBSD 16.1+",
+                "Security",
+                "Capsicum Casper Netlink Micro-Jail Mesh",
+                "PR Staged / Component Added",
+                "PR-V72-002",
+            ),
+            (
+                "OpenBSD 8.7+",
+                "Memory Protection",
+                "FineIBT Pinsyscall PTE Shadow Stack Guard",
+                "PR Staged / Component Added",
+                "PR-V72-003",
+            ),
+            (
+                "DragonFly BSD 7.7+",
+                "Filesystem",
+                "HAMMER2 PFS Erasure-Coded Direct-IO",
+                "PR Staged / Component Added",
+                "PR-V72-004",
+            ),
+            (
+                "NetBSD 12.5",
+                "Device Drivers",
+                "Rump Hypercall Userland Audio/PCI Router",
+                "PR Staged / Component Added",
+                "PR-V72-005",
+            ),
+            (
+                "Haiku OS R1/Beta 7",
+                "File Indexing",
+                "BFS Live Relational Attribute Search Engine",
+                "PR Staged / Component Added",
+                "PR-V72-006",
+            ),
+            (
+                "Plan 9 / 9front",
+                "Virtual VFS",
+                "Synthetic 9P2000 Rfork Process Isolation",
+                "PR Staged / Component Added",
+                "PR-V72-007",
+            ),
+            (
+                "NixOS / GNU Guix",
+                "Package Management",
+                "Hermetic CAS Merkle Closure Tree Rollback",
+                "PR Staged / Component Added",
+                "PR-V72-008",
+            ),
+            (
+                "Illumos / OpenIndiana",
+                "Networking",
+                "Crossbow VNIC Virtual Switch DTrace Mesh",
+                "PR Staged / Component Added",
+                "PR-V72-009",
+            ),
+            (
+                "Omarchy Linux",
+                "Desktop Experience",
+                "Wallust Palette Reload & Chord Hotkey Navigator",
+                "PR Staged / Component Added",
+                "PR-V72-010",
+            ),
         ];
 
         for (os, cat, cap, status, pr) in comparisons {
@@ -118,7 +178,9 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV72 {
     }
 
     pub fn generate_matrix_report(&self) -> String {
-        let mut report = String::from("# SigmaOS vs Open Source Operating Systems Feature Parity Matrix V72\n\n");
+        let mut report = String::from(
+            "# SigmaOS vs Open Source Operating Systems Feature Parity Matrix V72\n\n",
+        );
         report.push_str("| Open Source OS | Feature Category | Native OS Capability | SigmaOS Parity Status | PR ID |\n");
         report.push_str("|---|---|---|---|---|\n");
         for entry in self.matrix_entries.values() {
@@ -675,7 +737,9 @@ mod tests {
         assert!(wiki_page.contains("Phoronix"));
 
         let report = suite.comparison_matrix.generate_matrix_report();
-        assert!(report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V72"));
+        assert!(
+            report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V72")
+        );
         assert!(report.contains("Linux 6.27+"));
         assert!(report.contains("FreeBSD 16.1+"));
     }

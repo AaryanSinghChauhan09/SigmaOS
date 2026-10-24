@@ -6,8 +6,7 @@
 // OS comparison matrix, and automated execution pipeline for missing/enhanced Linux, BSD,
 // GitHub Wiki/repo ideas, and 33 Global Tech Media Portals advancing SigmaOS across all core subsystems:
 // 1. `SigmaOsVsOpenSourceOsComparisonMatrixEngineV73`: Comprehensive comparison matrix comparing SigmaOS against 10 Tier-1 open-source operating systems across architectural dimensions.
-// 2. `Linux629SchedExtAiPredictivePowerGovernorEngineV73`: Linux 6.29+ SchedExt eBPF AI-predictive dynamic workload scheduler & sub-milliwatt power governor.
-// 3. `FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73`: FreeBSD 16.2+ Capsicum Casper Netlink capability delegates & micro-jail VNET mesh isolation.
+// 2. `Linux629SchedExtAiPredictivePowerGovernorEngineV73`: Linux 6.29+ SchedExt eBPF AI-predictive dynamic workload scheduler & sub-milliwatt power governor.// 3. `FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73`: FreeBSD 16.2+ Capsicum Casper Netlink capability delegates & micro-jail VNET mesh isolation.
 // 4. `OpenBsd88FineIbtPinsyscallPteGuardEngineV73`: OpenBSD 8.8+ FineIBT CFI enforcement & shadow call stack PTE guard.
 // 5. `DragonFly78Hammer2DirectIoErasureEngineV73`: DragonFly BSD 7.8+ HAMMER2 PFS erasure-coded zero-copy direct-IO cluster engine.
 // 6. `NetBsd126RumpUserlandAudioPciRouterEngineV73`: NetBSD 12.6 Rump hypercall userland audio & PCI driver router.
@@ -18,18 +17,6 @@
 // 11. `OmarchyWallustThemeChordNavigatorEngineV73`: Omarchy Linux Wallust dynamic palette reloading & chorded hotkey navigation engine V73.
 // 12. `GlobalTechMedia33PortalUnimplementedIdeasEngineV73`: Harvester, synthesizer, and GitHub Wiki page generator for all 33 global tech media portals, GitHub Wiki, and .md roadmaps.
 // 13. `SovereignOpenSourceOsMissingComponentsV73PrSuite`: Master coordinator harmonizing all V73 distro inspirations with 100% interop score across all subsystems of SigmaOS.
-
-#![allow(non_camel_case_types)]
-#![allow(dead_code)]
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-extern crate alloc;
-
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::collections::BTreeMap;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::format;
-#[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::string::{String, ToString};
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::vec;
@@ -90,8 +77,7 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
 
     pub fn populate_default_matrix(&mut self) {
         let comparisons = vec![
-            ("Linux 6.29+", "Scheduling", "SchedExt eBPF AI-Predictive Power Governor", "PR Staged / Component Added", "PR-V73-001"),
-            ("FreeBSD 16.2+", "Security", "Capsicum Casper Netlink Micro-Jail Mesh", "PR Staged / Component Added", "PR-V73-002"),
+            ("Linux 6.29+", "Scheduling", "SchedExt eBPF AI-Predictive Power Governor", "PR Staged / Component Added", "PR-V73-001"),            ("FreeBSD 16.2+", "Security", "Capsicum Casper Netlink Micro-Jail Mesh", "PR Staged / Component Added", "PR-V73-002"),
             ("OpenBSD 8.8+", "Memory Protection", "FineIBT Pinsyscall PTE Shadow Stack Guard", "PR Staged / Component Added", "PR-V73-003"),
             ("DragonFly BSD 7.8+", "Filesystem", "HAMMER2 PFS Erasure-Coded Direct-IO", "PR Staged / Component Added", "PR-V73-004"),
             ("NetBSD 12.6", "Device Drivers", "Rump Hypercall Userland Audio/PCI Router", "PR Staged / Component Added", "PR-V73-005"),
@@ -113,8 +99,7 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
                     sigma_os_parity_status: status.to_string(),
                     missing_component_pr_id: pr.to_string(),
                 },
-            );
-        }
+            );        }
     }
 
     pub fn generate_matrix_report(&self) -> String {
@@ -137,13 +122,11 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
 
 // 2. Linux 6.29+ SchedExt eBPF AI-Predictive Power Topology Governor Engine V73
 #[derive(Debug, Default)]
-pub struct Linux629SchedExtAiPredictivePowerGovernorEngineV73 {
-    sched_policies: BTreeMap<String, String>,
+pub struct Linux629SchedExtAiPredictivePowerGovernorEngineV73 {    sched_policies: BTreeMap<String, String>,
     predictive_cores: BTreeMap<String, u64>,
 }
 
-impl Linux629SchedExtAiPredictivePowerGovernorEngineV73 {
-    pub fn new() -> Self {
+impl Linux629SchedExtAiPredictivePowerGovernorEngineV73 {    pub fn new() -> Self {
         Self {
             sched_policies: BTreeMap::new(),
             predictive_cores: BTreeMap::new(),
@@ -169,8 +152,7 @@ impl Linux629SchedExtAiPredictivePowerGovernorEngineV73 {
             status: OsPrStatusV73::Validated,
             impacted_subsystems: vec!["KernelScheduling".to_string(), "HardwarePower".to_string()],
             patch_diff: format!(
-                "--- kernel/sched/scx_ai_predictive_topology_v73.c\n+++ kernel/sched/scx_ai_predictive_topology_v73.c\n@@ -1,5 +1,12 @@\n+ active_sched_policies: {}\n+ predictive_cores: {}\n",
-                self.sched_policies.len(),
+                "--- kernel/sched/scx_ai_predictive_topology_v73.c\n+++ kernel/sched/scx_ai_predictive_topology_v73.c\n@@ -1,5 +1,12 @@\n+ active_sched_policies: {}\n+ predictive_cores: {}\n",                self.sched_policies.len(),
                 self.predictive_cores.len()
             ),
         }
@@ -549,8 +531,7 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV73 {
 #[derive(Debug)]
 pub struct SovereignOpenSourceOsMissingComponentsV73PrSuite {
     pub comparison_matrix: SigmaOsVsOpenSourceOsComparisonMatrixEngineV73,
-    pub linux_sched: Linux629SchedExtAiPredictivePowerGovernorEngineV73,
-    pub freebsd_casper: FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73,
+    pub linux_sched: Linux629SchedExtAiPredictivePowerGovernorEngineV73,    pub freebsd_casper: FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73,
     pub openbsd_fineibt: OpenBsd88FineIbtPinsyscallPteGuardEngineV73,
     pub dragonfly_hammer2: DragonFly78Hammer2DirectIoErasureEngineV73,
     pub netbsd_rump: NetBsd126RumpUserlandAudioPciRouterEngineV73,
@@ -581,7 +562,6 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
 
         let mut openbsd_fineibt = OpenBsd88FineIbtPinsyscallPteGuardEngineV73::new();
         openbsd_fineibt.pin_syscall(1, "sys_exit");
-
         let mut dragonfly_hammer2 = DragonFly78Hammer2DirectIoErasureEngineV73::new();
         dragonfly_hammer2.mount_pfs("pfs_data_v73", 2);
 
@@ -601,8 +581,7 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
         illumos_crossbow.bind_vnic("vnic0_v73", 8080);
 
         let mut omarchy_wallust = OmarchyWallustThemeChordNavigatorEngineV73::new();
-        omarchy_wallust.register_palette("tokyo-night", "#1a1b26,#a9b1d6");
-        omarchy_wallust.register_chord("Super+Shift+Return", "terminal_launch");
+        omarchy_wallust.register_palette("tokyo-night", "#1a1b26,#a9b1d6");        omarchy_wallust.register_chord("Super+Shift+Return", "terminal_launch");
 
         let mut tech_media = GlobalTechMedia33PortalUnimplementedIdeasEngineV73::new();
         tech_media.harvest_idea(
@@ -613,7 +592,6 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
             "HackerNews",
             "Capability-based Micro-Jail VNET isolation in FreeBSD 16.2",
         );
-
         Self {
             comparison_matrix,
             linux_sched,
@@ -651,11 +629,15 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
     }
 }
 
+=======>>>>>>> origin/main
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
+=======
+<<<<<<< HEAD
+>>>>>>> origin/main
     fn test_v73_pr_suite_execution() {
         let suite = SovereignOpenSourceOsMissingComponentsV73PrSuite::new();
         let proposals = suite.execute_full_v73_pr_pipeline();
@@ -676,6 +658,7 @@ mod tests {
 
         let report = suite.comparison_matrix.generate_matrix_report();
         assert!(report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V73"));
+<<<<<<< HEAD
         assert!(report.contains("Linux 6.29+"));
         assert!(report.contains("FreeBSD 16.2+"));
     }
