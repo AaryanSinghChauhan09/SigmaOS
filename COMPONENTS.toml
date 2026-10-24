@@ -1,0 +1,1354 @@
+# SigmaOS Component Registry
+# Generated single source of truth for the multi-repository ecosystem.
+# Modelled on Linux Mint & Omarchy Linux sub-repository architecture.
+# total = 150
+
+[[component]]
+name = "SigmaOS-kernel"
+description = "SigmaOS microkernel core (scheduler, VFS, syscall gate, memory)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kernel"
+engine = "kernel_core"
+language = "rust"
+inspirations = ["https://github.com/omacom/linux-aurora"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-filesystem"
+description = "Virtual filesystem layer, journaling & zero-copy paths"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem"
+engine = "vfs_core"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-network"
+description = "Networking stack: TCP/IP, TLS, mDNS discovery"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network"
+engine = "net_core"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-security"
+description = "Privilege separation, LSM hooks, secure defaults"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-security"
+engine = "security_core"
+language = "rust"
+inspirations = ["https://github.com/omacom/omarchy/security"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-system"
+description = "Init, service manager & system orchestration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system"
+engine = "system_core"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-desktop"
+description = "Wayland compositor shell & desktop primitives"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop"
+engine = "desktop_core"
+language = "rust"
+inspirations = ["native"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-packages"
+description = "Package manager core (resolve, install, verify)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages"
+engine = "pkg_core"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/mintsources", "https://github.com/linuxmint/repolib"]
+visibility = "private"
+
+[[component]]
+name = "SigmaOS-bootloader"
+description = "Bootloader configuration & chainload manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bootloader"
+engine = "bootloader"
+language = "shell"
+inspirations = ["https://github.com/omacom/m1n1"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-plymouth"
+description = "Boot splash / plymouth theme manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plymouth"
+engine = "plymouth"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/plymouth"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-systemd"
+description = "Service unit manager (start/enable/mask/status)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd"
+engine = "unit_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/systemd-betsy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-session-manager"
+description = "XDG session manager (start/stop/save sessions)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-manager"
+engine = "session_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-session"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-live-session"
+description = "Live-session bootstrap for the try-before-install ISO"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-live-session"
+engine = "session_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-live-session"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-display-manager"
+description = "Display manager & login greeter launcher"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-display-manager"
+engine = "greeter"
+language = "shell"
+inspirations = ["https://github.com/omacom/sddm", "https://github.com/linuxmint/mdm"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-greeter"
+description = "Slick login greeter with user list & a11y"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-greeter"
+engine = "greeter"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/slick-greeter"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-power-manager"
+description = "Battery / power-profile & idle management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-power-manager"
+engine = "power_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xfce4-power-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-installer"
+description = "Graphical live installer (partition, copy, bootloader)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-installer"
+engine = "installer"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/live-installer", "https://github.com/omacom/omarchy-mac-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ISO"
+description = "Build the SigmaOS live ISO from a manifest"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ISO"
+engine = "iso_builder"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-iso"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-software-manager"
+description = "GUI/CLI software store (search, install, remove)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-software-manager"
+engine = "software_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintinstall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-update"
+description = "Update notifier & apply (apt backend)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-update"
+engine = "update_checker"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintupdate"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-upgrade"
+description = "Major-release upgrade assistant"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upgrade"
+engine = "upgrade"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintupgrade"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-upgrade-info"
+description = "Release upgrade compatibility metadata"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upgrade-info"
+engine = "upgrade"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-upgrade-info"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-upgrade-legacy"
+description = "Legacy upgrade path for older releases"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upgrade-legacy"
+engine = "upgrade"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintupgrade-legacy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-timeshift"
+description = "Btrfs/rsync system snapshots & restore"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-timeshift"
+engine = "snapshot"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/timeshift"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-backup-tool"
+description = "Backup / restore with manifest & verification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-backup-tool"
+engine = "backup"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintbackup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-drivers"
+description = "Detect & install proprietary drivers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-drivers"
+engine = "driver_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintdrivers", "https://github.com/linuxmint/ubuntu-drivers-common"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-NVIDIA"
+description = "NVIDIA prime / offload GPU management"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-NVIDIA"
+engine = "driver_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/nvidia-prime"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-packages-kit"
+description = "apt/dpkg transaction kit (aptkit-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages-kit"
+engine = "sources_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/aptkit", "https://github.com/linuxmint/packagekit"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-packages-tools"
+description = "Package install/remove CLI (captain/gdebi-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-packages-tools"
+engine = "sources_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/captain", "https://github.com/linuxmint/gdebi"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-apturl"
+description = "apt:// URL handler"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-apturl"
+engine = "sources_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/apturl"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-daemon-apt"
+description = "Privileged apt D-Bus daemon"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-daemon-apt"
+engine = "sources_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/aptdaemon"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mirror"
+description = "Mirror speed tester & automatic selector"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mirror"
+engine = "mirror"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-mirror"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-common"
+description = "Shared helpers + policy kit used by every applet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-common"
+engine = "common_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintcommon"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-daemon-settings"
+description = "Settings daemon (fonts, theme, hotkeys)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-daemon-settings"
+engine = "settings_daemon"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-settings-daemon"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-control-center"
+description = "Central control centre (modules discover settings)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-control-center"
+engine = "configurator"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-control-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-configurator"
+description = "Omarchy-style declarative system configurator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-configurator"
+engine = "configurator"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-desktop-configuration"
+description = "Desktop flavour configuration (browser, shell, WM)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-configuration"
+engine = "configurator"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintdesktop"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-system-locale"
+description = "Locale & language selector"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-locale"
+engine = "locale_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintlocale"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-system-admin"
+description = "System administration toolkit (services, disks, logs)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-admin"
+engine = "sysadmin"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintsysadm"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-troubleshooting-tool"
+description = "System report & troubleshooting generator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-troubleshooting-tool"
+engine = "troubleshoot"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintreport"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-we-can-fix-everything"
+description = "Guided fix-it support workflows"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-we-can-fix-everything"
+engine = "support"
+language = "shell"
+inspirations = ["https://github.com/omacom/wecanfixeverything"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-automate"
+description = "Task automation engine (hooks, rules, schedules)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-automate"
+engine = "automate"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/automate"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-state-of-components"
+description = "Dashboard of component health & parity gaps"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-state-of-components"
+engine = "state_of"
+language = "shell"
+inspirations = ["https://github.com/omacom/state-of-omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-desktop-environment"
+description = "SigmaOS desktop environment (panels, menus, WM glue)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-environment"
+engine = "desktop_lib"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/cinnamon"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-desktop-library"
+description = "Shared desktop library (settings, icons, xapp glue)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-library"
+engine = "desktop_lib"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/cinnamon-desktop"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-window-management-library"
+description = "Compositor / window-manager library"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-window-management-library"
+engine = "wm_lib"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/muffin", "https://github.com/omacom/omarchy-hyprland-titlebars"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-panel"
+description = "Taskbar / panel applet host"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-panel"
+engine = "panel"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xfce-panel"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-menus"
+description = "Application menu & menu database"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-menus"
+engine = "menus"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-menus", "https://github.com/linuxmint/mintmenu"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-indicator-sound"
+description = "Sound indicator (volume, output switch)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-indicator-sound"
+engine = "indicator_sound"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/indicator-sound"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-tray-icon"
+description = "System tray icon host (XAppStatusIcon)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tray-icon"
+engine = "tray_icon"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/rhythmbox-tray-icon"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-notification"
+description = "Notification daemon (d-Bus org.freedesktop.Notifications)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notification"
+engine = "notify"
+language = "shell"
+inspirations = ["https://github.com/omacom/omapager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-notification-center-plugin"
+description = "Notification centre plugin (history, do-not-disturb)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-notification-center-plugin"
+engine = "notify"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-notification-center-plugin"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-screen-saver"
+description = "Lock screen & idle screensaver"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-saver"
+engine = "screensaver"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-screensaver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-session-manager2"
+description = "Session save/restore"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-session-manager2"
+engine = "session_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-session"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-calculator"
+description = "Scientific calculator engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-calculator"
+engine = "calc"
+language = "python"
+inspirations = ["https://github.com/omacom/omacalc"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-chatroom"
+description = "LAN chat server & client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chatroom"
+engine = "chat_server"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/jargonaut"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-draw"
+description = "Simple raster drawing app"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-draw"
+engine = "draw"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/drawing"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-spreadsheet"
+description = "CSV spreadsheet engine with formulas"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-spreadsheet"
+engine = "spreadsheet"
+language = "shell"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-slide-presenter"
+description = "Markdown slide presenter"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-slide-presenter"
+engine = "slide"
+language = "shell"
+inspirations = ["https://github.com/omacom/hype"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-sticky-notes"
+description = "Sticky notes applet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sticky-notes"
+engine = "sticky"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/sticky"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-file-manager-system"
+description = "File manager (nemo-style, tabs, extensions)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-manager-system"
+engine = "file_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/nemo", "https://github.com/omacom/omafind"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-file-writer"
+description = "Minimal distraction-free text writer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-file-writer"
+engine = "file_writer"
+language = "shell"
+inspirations = ["https://github.com/omacom/omawrite"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-folder-color-switcher"
+description = "Colour-code folders in the file manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-folder-color-switcher"
+engine = "folder_color"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/folder-color-switcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-renamer-bulk"
+description = "Bulk regex renamer with live preview"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-renamer-bulk"
+engine = "bulk_renamer"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/bulky"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-renamer-file"
+description = "Single & batch file renamer (pyRenamer-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-renamer-file"
+engine = "bulk_renamer"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/pyRenamer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-photo-viewer"
+description = "Image viewer with fullscreen & EXIF"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-photo-viewer"
+engine = "media_player"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xviewer", "https://github.com/linuxmint/pix"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-player"
+description = "Video player (mpv-backed)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-player"
+engine = "media_player"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xplayer", "https://github.com/debpalash/Opal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-player-library"
+description = "Media playlist / metadata library"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-player-library"
+engine = "media_player"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xplayer-plparser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-reel"
+description = "Vertical short-video reel player"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-reel"
+engine = "reel"
+language = "shell"
+inspirations = ["https://github.com/omacom/omareel"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-stream"
+description = "IPTV / m3u stream player"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stream"
+engine = "stream_player"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/hypnotix", "https://github.com/sam-blakeman/OmarchyIPTV"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-radio-stream"
+description = "Internet radio streamer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-radio-stream"
+engine = "stream_player"
+language = "shell"
+inspirations = ["https://github.com/omacom/radio.omarchy.org"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-screen-shot"
+description = "Screenshot tool (area, window, full)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-shot"
+engine = "screenshot"
+language = "shell"
+inspirations = ["https://github.com/omacom/omasnap"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-screen-recorder"
+description = "Screencast recorder"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-screen-recorder"
+engine = "screen_recorder"
+language = "shell"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-webcam-recorder"
+description = "Webcam photo / video recorder"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webcam-recorder"
+engine = "webcam"
+language = "shell"
+inspirations = ["https://github.com/omacom/monologue"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-simple-scan"
+description = "Scanner (SANE) frontend"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-simple-scan"
+engine = "scanner"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/simple-scan"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-video-cut"
+description = "Lossless-ish video trimmer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-video-cut"
+engine = "video_cut"
+language = "shell"
+inspirations = ["https://github.com/omacom/omacut"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-xreader"
+description = "Document / eBook & comic reader"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xreader"
+engine = "xreader"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xreader", "https://github.com/dlpwaters/omarchy-ebook-reader"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-office"
+description = "LibreOffice icon/style integration"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-office"
+engine = "office_style"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/libreoffice-style-mint"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-webapp-manager"
+description = "Turn websites into desktop webapps"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-webapp-manager"
+engine = "webapp_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/webapp-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-remote-desktop"
+description = "VNC/RDP remote desktop sharing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-remote-desktop"
+engine = "remote_desktop"
+language = "shell"
+inspirations = ["https://github.com/omacom/gliff"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-upload"
+description = "File upload / share service client"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-upload"
+engine = "upload"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintupload"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-stick"
+description = "Write ISOs to USB with hash verification"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-stick"
+engine = "image_writer"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintstick", "https://github.com/balena-io/etcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-wine-installer"
+description = "Wine prefix setup & Windows app installer"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wine-installer"
+engine = "wine_installer"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/wine-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-vpn-pia"
+description = "VPN manager (PIA-style profiles)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vpn-pia"
+engine = "vpn_manager"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/pia-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-draw2"
+description = "Vector drawing app"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-draw2"
+engine = "draw"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/drawing"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bluetooth"
+description = "Bluetooth adapter & device manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth"
+engine = "bluetooth"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-bluetooth"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bluetooth-tool"
+description = "Bluetooth pairing CLI/GUI (blueberry/blueferry)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bluetooth-tool"
+engine = "bluetooth"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/blueberry", "https://github.com/erikkb/blueferry"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-network-discovery"
+description = "Discover hosts & services on the LAN"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-network-discovery"
+engine = "net_discovery"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/network-discovery"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-LAN-fileshare"
+description = "Warpinator-style LAN send/receive"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-LAN-fileshare"
+engine = "lan_share"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/warpinator", "https://github.com/t4t5/owly"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-ssh-port-forward-plugin"
+description = "SSH port-forward manager plugin"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-ssh-port-forward-plugin"
+engine = "ssh_forward"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-port-forward-plugin"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-domain-blocker"
+description = "Block domains system-wide via /etc/hosts"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-domain-blocker"
+engine = "domain_blocker"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintnanny"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-color"
+description = "Palette / accent colour engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-color"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-y-colors"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-cursor"
+description = "Cursor theme pack & switcher"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-cursor"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-cursor-themes", "https://github.com/linuxmint/Bibata_Cursor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-icon"
+description = "Icon theme pack (mint-x/y/l)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-icon"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-y-icons", "https://github.com/linuxmint/mint-x-icons"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-y"
+description = "Mint-Y GTK theme"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-y"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-y-theme"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-gtk3"
+description = "GTK3 theme engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-gtk3"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-themes-gtk3"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-desktop-environment"
+description = "Desktop-shell theme (Cinnamon-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-desktop-environment"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-themes"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-mdm"
+description = "Greeter (MDM) theme pack"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-mdm"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mdm-themes"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-marketplace"
+description = "Community theme marketplace"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-marketplace"
+engine = "theme_marketplace"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-spices-themes", "https://github.com/omacom/omarchy-theme-marketplace"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-registry"
+description = "Theme registry & index"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-registry"
+engine = "theme_marketplace"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-themes", "https://github.com/omacom/omarchy-theme-registry"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-sync"
+description = "Sync themes across machines"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-sync"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-themes", "https://github.com/omacom/omarchy-theme-sync"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theme-support"
+description = "libadwaita/GTK theme bridge"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theme-support"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/libadwaita"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-theming-native"
+description = "Native (CSD-less) theming engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-theming-native"
+engine = "theme_engine"
+language = "shell"
+inspirations = ["https://github.com/omacom/aether"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-wallpaper-engine"
+description = "Wallpaper set / slideshow / randomiser"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wallpaper-engine"
+engine = "wallpaper"
+language = "shell"
+inspirations = ["https://github.com/omacom/owe"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-brand-logo"
+description = "SigmaOS brand logo & identity assets"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-brand-logo"
+engine = "brand_logo"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/brand-logo"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-dots-configuration"
+description = "Dotfiles manager (omadots-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dots-configuration"
+engine = "dots"
+language = "shell"
+inspirations = ["https://github.com/omacom/omadots"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-forum-themes"
+description = "Community forum theme pack"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-forum-themes"
+engine = "forum_themes"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/forums-theme"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-plugin-marketplace"
+description = "Applet/desklet/extension marketplace"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plugin-marketplace"
+engine = "plugin_marketplace"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-spices-applets", "https://github.com/omacom/omarchy-plugin-marketplace"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-plugin-registry"
+description = "Plugin registry & manifest index"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-plugin-registry"
+engine = "plugin_registry"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-plugin-registry"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-actions"
+description = "Reusable GitHub Actions for SigmaOS repos"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-actions"
+engine = "plugin_registry"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-spices-actions", "https://github.com/linuxmint/github-actions"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-Github-Action"
+description = "CI GitHub Actions collection"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-Github-Action"
+engine = "plugin_registry"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/github-actions"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-dev-tools"
+description = "Developer toolchain helpers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dev-tools"
+engine = "dev_tools"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint-dev-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-nvim"
+description = "Neovim distribution (aether/lumon/pixel)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-nvim"
+engine = "nvim_distro"
+language = "shell"
+inspirations = ["https://github.com/omacom/aether.nvim", "https://github.com/omacom/lumon.nvim"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-vim"
+description = "Editor config (xed + lazyvim)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-vim"
+engine = "nvim_distro"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xed", "https://github.com/omacom/omarchy-lazyvim"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-zsh"
+description = "Zsh config & plugins"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zsh"
+engine = "shell_config"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-zsh"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fish"
+description = "Fish config & plugins"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fish"
+engine = "shell_config"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-fish"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-term"
+description = "Terminal launcher wrapper (foot/ghostty/kitty)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-term"
+engine = "term"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/ptyxis-minted", "https://github.com/omacom/omaterm"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-terminal-text-effects"
+description = "Terminal text effects engine"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-terminal-text-effects"
+engine = "tte"
+language = "shell"
+inspirations = ["https://github.com/omacom/ttfx", "https://github.com/omacom/tte-go"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-tte-go"
+description = "Terminal text effects (Go flavour)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-tte-go"
+engine = "tte"
+language = "shell"
+inspirations = ["https://github.com/omacom/tte-go"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-quickshell"
+description = "Quick shell command runner"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-quickshell"
+engine = "quickshell"
+language = "shell"
+inspirations = ["https://github.com/omacom/quickshell"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-herdr-runtime-live-coding-agents"
+description = "Live-coding agent runtime (herdr)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-herdr-runtime-live-coding-agents"
+engine = "herdr"
+language = "shell"
+inspirations = ["https://github.com/omacom/herdr"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-asdcontrol-git"
+description = "ASD control via git-tracked config"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-asdcontrol-git"
+engine = "asdcontrol"
+language = "shell"
+inspirations = ["https://github.com/omacom/asdcontrol-git"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-audio-tuner"
+description = "Audio device tuner (EQ, profiles)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-audio-tuner"
+engine = "audio_tuner"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-audio-tuner"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-JS-interpreter"
+description = "Embedded JS interpreter (cjs/mullion)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-JS-interpreter"
+engine = "js_interpreter"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cjs", "https://github.com/hr1ddh0/omarchy-mullion"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mozjs"
+description = "SpiderMonkey (mozjs) build wrapper"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mozjs"
+engine = "js_interpreter"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mozjs102"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-Node.js-Binary"
+description = "Node.js binary distribution manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-Node.js-Binary"
+engine = "node_binary"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/distributions"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mesa3D"
+description = "Mesa 3D build & VA-API/V4L2 request support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mesa3D"
+engine = "graphics"
+language = "shell"
+inspirations = ["https://github.com/omacom/mesa", "https://github.com/omacom/libva-v4l2_request"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-xorg-server"
+description = "Xorg server LTS build & config"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xorg-server"
+engine = "graphics"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xorg-server-lts-vivid"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-xapp"
+description = "XApp shared library (GTK widgets & helpers)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xapp"
+engine = "xapp_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xapp", "https://github.com/xapp-project"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-xapp-python"
+description = "Python bindings for XApp"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xapp-python"
+engine = "xapp_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/python3-xapp"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-xapp-thumbnailers"
+description = "Thumbnailers for XApp file managers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-xapp-thumbnailers"
+engine = "xapp_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xapp-thumbnailers"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-libappindicator"
+description = "Sys-tray appindicator library"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-libappindicator"
+engine = "xapp_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/libappindicator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-desktop-portal"
+description = "XDG desktop portal backend (screenshot, files)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-desktop-portal"
+engine = "desktop_portal"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/xdg-desktop-portal-xapp"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-GTK"
+description = "GTK build patches & theming glue"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK"
+engine = "gtk_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/gtk"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-GTK+"
+description = "Blueman & Celluloid GTK app wrappers"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-GTK+"
+engine = "gtk_lib"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/blueman", "https://github.com/linuxmint/celluloid"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-setup"
+description = "Post-install setup (omamac-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-setup"
+engine = "setup"
+language = "shell"
+inspirations = ["https://github.com/omacom/omamac"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mac-run"
+description = "Run SigmaOS tooling on macOS host"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mac-run"
+engine = "setup"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-mac"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-try"
+description = "Try SigmaOS in a container/VM"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-try"
+engine = "try_live"
+language = "shell"
+inspirations = ["https://github.com/omacom/try-omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-try-windows"
+description = "Try SigmaOS from Windows (WSL/boot)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-try-windows"
+engine = "try_live"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mint4win", "https://github.com/omacom/try-omarchy-windows"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-install2"
+description = "Alternate installer (ubiquity-style)"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-install2"
+engine = "installer"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/ubiquity"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-website"
+description = "SigmaOS website & docs site generator"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-website"
+engine = "docs_site"
+language = "shell"
+inspirations = ["https://github.com/omacom/omarchy-site", "https://github.com/omacom/omakub-site"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-guide-docs"
+description = "Aggregate documentation build"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guide-docs"
+engine = "docs_site"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintdoc"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-guide-developer"
+description = "Developer guide"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guide-developer"
+engine = "docs_site"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/doc-developer-guide"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-guide-installation"
+description = "Installation guide"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guide-installation"
+engine = "docs_site"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/doc-installation-guide"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-guide-troubleshooting"
+description = "Troubleshooting guide"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guide-troubleshooting"
+engine = "docs_site"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/doc-troubleshooting-guide"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-guide-user"
+description = "User guide"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guide-user"
+engine = "docs_site"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/doc-user-guide"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-guide-translations"
+description = "Translation guide & tooling"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-guide-translations"
+engine = "translations"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-translations", "https://github.com/linuxmint/mint-translations"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-translations"
+description = "Translation catalogue manager"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-translations"
+engine = "translations"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/cinnamon-translations"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-wiki-extra"
+description = "Supplementary wiki content"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-wiki-extra"
+engine = "docs_site"
+language = "shell"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-welcome-screen"
+description = "First-run welcome screen"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-welcome-screen"
+engine = "welcome"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/mintwelcome"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-indicator-sound2"
+description = "Sound indicator alt"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-indicator-sound2"
+engine = "indicator_sound"
+language = "shell"
+inspirations = ["https://github.com/linuxmint/indicator-sound"]
+visibility = "public"
