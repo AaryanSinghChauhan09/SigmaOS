@@ -412,7 +412,7 @@ test_evidence = "Architectural specification published in docs/SYSTEM_UTILITIES_
 next_milestone = "PR 1: Audit current tools and define compatibility policy & PR 4: Implement minimal file/directory utilities against real VFS"
 
 [userspace.cli_development_plan]
-status = "modeled"
+status = "integrated"
 files = ["docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md", "wiki/27-SigmaOS-CLI-Development-Plan.md"]
 description = "SigmaOS CLI Development Plan defining two distinct CLI layers, POSIX compatibility baseline, CLI rules, PR roadmap (PRs 1-18), maintenance cadence, rules for command families, PR template/merge gates, and rollout/exit criteria"
 test_evidence = "Documentation published in docs/SIGMAOS_CLI_DEVELOPMENT_PLAN.md and wiki/27-SigmaOS-CLI-Development-Plan.md; verified by sovereign_task_guidelines_wiki_sync_engine"
