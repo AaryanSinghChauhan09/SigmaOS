@@ -261,7 +261,7 @@ impl SovereignPamManager {
                 entropy_bytes.resize(16, 0u8);
                 let entropy_arr: [u8; 16] = entropy_bytes.try_into().unwrap_or([0u8; 16]);
                 let dummy_hash = hash_password_placeholder(user_token, &entropy_arr);
-                let zero_cmp: Vec<u8> = (0..32).map(|_| 0u8).collect();
+                let zero_cmp = [0u8; 32];
                 let _ = constant_time_eq(&dummy_hash, &zero_cmp);
                 return Err(PamError::UserNotFound);
             }
