@@ -922,6 +922,7 @@ pub use open_source_os_missing_components_v71_pr::*;
 pub mod open_source_os_missing_components_v72_pr;
 pub use open_source_os_missing_components_v72_pr::*;
 
+=======
 pub mod open_source_os_unimplemented_ideas_v72_pr;
 pub use open_source_os_unimplemented_ideas_v72_pr::*;
 
@@ -930,7 +931,6 @@ pub use debian_github_repo_missing_components_v71_pr::*;
 
 pub mod open_source_os_debian_unimplemented_ideas_v72_pr;
 pub use open_source_os_debian_unimplemented_ideas_v72_pr::*;
-=======
 <<<<<<< HEAD
 pub mod open_source_os_unimplemented_ideas_v72_pr;
 pub use open_source_os_unimplemented_ideas_v72_pr::*;

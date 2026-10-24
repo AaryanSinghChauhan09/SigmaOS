@@ -2589,24 +2589,10 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v71_pr.rs" ]; then
     ./build/test_open_source_os_v71_pr
 fi
 
-if [ -f "tests/test_open_source_os_unimplemented_ideas_v72_pr.rs" ]; then
-    echo "Running Open Source OS Unimplemented Ideas V72 PR test suite..."
+if [ -f "tests/test_open_source_os_missing_components_v73_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V73 PR test suite..."
     mkdir -p build
-    rustc --test tests/test_open_source_os_unimplemented_ideas_v72_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v72_pr
-    ./build/test_open_source_os_v72_pr
-fi
-
-if [ -f "tests/test_cachy_linux_missing_components_v71_pr.rs" ]; then
-    echo "Running CachyOS Missing Components V71 PR test suite..."
-    mkdir -p build
-    rustc --test tests/test_cachy_linux_missing_components_v71_pr.rs --edition=2021 -L build/ -o build/test_cachy_v71_pr
-    ./build/test_cachy_v71_pr
-fi
-
-if [ -f "tests/test_open_source_os_and_cachy_linux_v72_pr.rs" ]; then
-    echo "Running Open Source OS V72 & CachyOS V71 PR test suite..."
-    mkdir -p build
-    rustc --test tests/test_open_source_os_and_cachy_linux_v72_pr.rs --edition=2021 -L build/ -o build/test_os_cachy_v72_pr
-    ./build/test_os_cachy_v72_pr
+    rustc --test tests/test_open_source_os_missing_components_v73_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v73_pr
+    ./build/test_open_source_os_v73_pr
 fi
 echo "All SigmaOS test suites completed."
