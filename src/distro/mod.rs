@@ -919,6 +919,10 @@ pub use sovereign_universal_linux_bsd_subsystem_interop_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v70_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
 pub mod sovereign_release_manager;
+
+pub mod arch_linux_missing_components_v73_pr;
+pub use arch_linux_missing_components_v73_pr::*;
+// Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
 
