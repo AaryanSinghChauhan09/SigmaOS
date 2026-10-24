@@ -269,6 +269,7 @@ pub use distro::omarchy_linux_missing_components_v59_pr::*;
 pub use distro::omarchy_linux_missing_components_v60_pr::*;
 pub use distro::omarchy_linux_missing_components_v61_pr::*;
 pub use distro::omarchy_linux_missing_components_v62_pr::*;
+pub use distro::omarchy_linux_missing_components_v72_pr::*;
 pub use distro::omarchy_omakase_ultimate_parity::*;
 pub use distro::open_source_os_debian_unimplemented_ideas_pr::*;
 pub use distro::open_source_os_missing_components_v54_pr::*;

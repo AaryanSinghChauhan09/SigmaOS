@@ -922,6 +922,8 @@ pub use open_source_os_missing_components_v71_pr::*;
 pub mod open_source_os_missing_components_v72_pr;
 pub use open_source_os_missing_components_v72_pr::*;
 
+pub mod omarchy_linux_missing_components_v72_pr;
+pub use omarchy_linux_missing_components_v72_pr::*;
 =======
 pub mod open_source_os_unimplemented_ideas_v72_pr;
 pub use open_source_os_unimplemented_ideas_v72_pr::*;
