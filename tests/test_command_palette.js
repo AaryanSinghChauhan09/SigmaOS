@@ -35,7 +35,15 @@ function createMockElement(id, tag = "div") {
     },
     focus() { activeElement = el; },
     blur() { if (activeElement === el) activeElement = null; },
-    setAttribute(k, v) { this.attributes[k] = v; },
+    setAttribute(k, v) {
+      this.attributes[k] = v;
+      if (k === "class") {
+        this.className = v;
+        if (typeof v === "string") {
+          v.split(/\s+/).filter(Boolean).forEach((c) => this.classList.add(c));
+        }
+      }
+    },
     getAttribute(k) { return this.attributes[k]; },
     hasAttribute(k) { return k in this.attributes; },
     removeAttribute(k) { delete this.attributes[k]; },
@@ -67,6 +75,20 @@ global.document = {
   get activeElement() { return activeElement; },
   createElement: (tag) => {
     const el = createMockElement(`anon_${Math.random()}`, tag);
+    if (tag === "button") {
+      el.type = "button";
+    }
+    Object.defineProperty(el, "className", {
+      get() {
+        return this.attributes["class"] || "";
+      },
+      set(v) {
+        this.attributes["class"] = v;
+        if (typeof v === "string") {
+          v.split(/\s+/).filter(Boolean).forEach((c) => this.classList.add(c));
+        }
+      }
+    });
     return el;
   },
   createTextNode: (text) => ({ textContent: text }),
@@ -315,8 +337,18 @@ const logsContainer = mockElements["kernel-logs"];
 const initialToastCount = logsContainer ? logsContainer.children.length : 0;
 const toastEl = zenith.showToast("Test Toast Dismissal");
 assert.notStrictEqual(toastEl, null, "Expected showToast to return created toast element");
-assert.strictEqual(toastEl.getAttribute("title"), "Click to dismiss notification", "Expected toast title tooltip attribute");
-assert.strictEqual(toastEl.getAttribute("aria-label"), "Test Toast Dismissal (Click to dismiss)", "Expected toast aria-label attribute");
+assert.strictEqual(toastEl.getAttribute("title"), "Click or press dismiss to close notification", "Expected toast title tooltip attribute");
+assert.strictEqual(toastEl.getAttribute("aria-label"), "Test Toast Dismissal (Click or press dismiss to close)", "Expected toast aria-label attribute");
+
+// Test close button dismiss on toast element
+const closeBtnEl = toastEl.children.find((c) => c.attributes && c.attributes.class === "kernel-toast-close" || (c.classList && c.classList.contains("kernel-toast-close")));
+assert.notStrictEqual(closeBtnEl, undefined, "Expected toast element to contain close button child element");
+assert.strictEqual(closeBtnEl.getAttribute("aria-label"), "Dismiss notification", "Expected close button aria-label='Dismiss notification'");
+
+const toast2El = zenith.showToast("Test Close Button Dismissal");
+const closeBtn2El = toast2El.children.find((c) => c.attributes && c.attributes.class === "kernel-toast-close" || (c.classList && c.classList.contains("kernel-toast-close")));
+closeBtn2El.dispatchEvent({ type: "click", stopPropagation: () => {} });
+assert.strictEqual(toast2El.classList.contains("fade-out"), true, "Expected toast to have .fade-out class when close button is clicked");
 
 // Simulate click dismissal on the toast element
 toastEl.dispatchEvent({ type: "click" });
