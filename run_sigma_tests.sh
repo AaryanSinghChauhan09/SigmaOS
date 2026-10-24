@@ -2438,4 +2438,11 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v71_pr.rs" ]; then
     ./build/test_open_source_os_v71_pr
 fi
 
+if [ -f "tests/test_omarchy_linux_v72_pr.rs" ]; then
+    echo "Running Sovereign Omarchy Linux Gap Closure V72 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_omarchy_linux_v72_pr.rs --edition=2021 -o build/test_omarchy_v72_pr
+    ./build/test_omarchy_v72_pr
+fi
+
 echo "All SigmaOS test suites completed."
