@@ -12,6 +12,7 @@ Welcome to the central documentation index for SigmaOS architecture, system deve
 
 ## Kernel & Core Subsystem Plans
 
+- [Dispatcher Plan](DISPATCHER_PLAN.md) — Master Architecture & Support Matrix Plan for SigmaOS dispatcher: scheduler, context-switch, interrupt handling, and deferred work boundaries.
 - [Physical Memory Manager Plan](PHYSICAL_MEMORY_MANAGER_PLAN.md) — Two-stage early-boot to runtime frame allocator, 11 invariants, 20-PR sequence roadmap, and memory protection.
 - [Process Manager Architecture, Support Matrix, and PR Plan](PROCESS_MANAGER_PLAN.md) — Process manager architecture, lifecycle rules, 18-PR sequence roadmap, periodic maintenance cadences, and completion gates.
 - [IPC Handler Master Architecture & Specification Plan](ipc-handler.md) — Formally specified, testable IPC handler subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, event wakeups, signal control plane, FD passing, and access control policies.
