@@ -239,6 +239,7 @@ pub use distro::arch_linux_missing_components_v68_pr::*;
 pub use distro::arch_linux_missing_components_v69_pr::*;
 pub use distro::arch_linux_missing_components_v70_pr::*;
 pub use distro::arch_linux_missing_components_v71_pr::*;
+pub use distro::arch_linux_missing_components_v72_pr::*;
 pub use distro::cachy_linux_missing_components_v56_pr::*;
 pub use distro::cachy_linux_missing_components_v61_pr::*;
 pub use distro::cachy_linux_missing_components_v62_pr::*;
