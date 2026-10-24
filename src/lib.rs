@@ -106,10 +106,7 @@ pub use system::sovereign_init_and_supervisor_advancements_v63_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v67::*;
 pub use system::sovereign_init_and_supervisor_advancements_v68_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v69_pr::*;
-=======
-pub use system::sovereign_init_and_supervisor_advancements_v69_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v71_pr::*;
->>>>>>> origin/main
 pub use system::*;
 pub mod driver;
 pub mod drivers;
@@ -255,7 +252,6 @@ pub use distro::cachy_linux_missing_components_v69_pr::*;
 pub use distro::cachy_linux_missing_components_v70_pr::*;
 pub use distro::cachy_linux_missing_components_v71_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
->>>>>>> origin/main
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::dragonflybsd_missing_components_v61_pr::*;
 pub use distro::dragonflybsd_missing_components_v62_pr::*;
@@ -291,11 +287,9 @@ pub use distro::open_source_os_missing_components_v69_pr::*;
 pub use distro::open_source_os_missing_components_v71_pr::*;
 pub use distro::open_source_os_missing_components_v72_pr::*;
 pub use distro::open_source_os_missing_components_v73_pr::*;
-=======
 pub use distro::open_source_os_missing_components_v73_pr::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
 pub use distro::open_source_os_missing_components_v72_pr::*;
->>>>>>> origin/main
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
@@ -307,7 +301,6 @@ pub use distro::openbsd_missing_components_v62_pr::*;
 pub use distro::openbsd_missing_components_v63_pr::*;
 pub use distro::openbsd_missing_components_v64_pr::*;
 pub use distro::openbsd_missing_components_v65_pr::*;
->>>>>>> origin/main
 pub use distro::openbsd_missing_components_v66_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
@@ -718,21 +711,14 @@ pub use crate::distro::open_source_os_debian_unimplemented_ideas_v72_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
 pub use crate::distro::open_source_os_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v71_pr::*;
-<<<<<<< HEAD
-pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
-<<<<<<< HEAD
-pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
-=======
-<<<<<<< HEAD
 pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
-<<<<<<< HEAD
 pub use crate::distro::debian_github_repo_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v72_pr::*;
-=======
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v70::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
+pub use crate::distro::arch_linux_missing_components_v73_pr::*;

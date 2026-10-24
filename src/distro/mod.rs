@@ -879,10 +879,8 @@ pub use open_source_os_unimplemented_ideas_v70_pr::*;
 pub mod open_source_os_unimplemented_ideas_v71_pr;
 pub use open_source_os_unimplemented_ideas_v71_pr::*;
 
-=======
 pub mod arch_linux_missing_components_v71_pr;
 pub use arch_linux_missing_components_v71_pr::*;
->>>>>>> origin/main
 pub mod open_source_os_unimplemented_ideas_v72_pr;
 pub use open_source_os_unimplemented_ideas_v72_pr::*;
 
@@ -919,7 +917,6 @@ pub use cachy_linux_missing_components_v71_pr::*;
 
 pub mod open_source_os_unimplemented_ideas_v72_pr;
 pub use open_source_os_unimplemented_ideas_v72_pr::*;
->>>>>>> origin/main
 pub mod open_source_os_missing_components_v71_pr;
 pub use open_source_os_missing_components_v71_pr::*;
 
@@ -930,38 +927,29 @@ pub mod open_source_os_missing_components_v73_pr;
 pub use open_source_os_missing_components_v73_pr::*;
 pub mod sovereign_universal_linux_bsd_subsystem_interop_pr;
 pub use sovereign_universal_linux_bsd_subsystem_interop_pr::*;
-<<<<<<< HEAD
-pub mod open_source_os_missing_components_v73_pr;
-pub use open_source_os_missing_components_v73_pr::*;
-pub mod open_source_os_unimplemented_ideas_v72_pr;
-pub use open_source_os_unimplemented_ideas_v72_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v70_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
-=======
+
 pub mod omarchy_linux_missing_components_v72_pr;
 pub use omarchy_linux_missing_components_v72_pr::*;
 
 pub mod omarchy_linux_missing_components_v73_pr;
 pub use omarchy_linux_missing_components_v73_pr::*;
-pub mod open_source_os_unimplemented_ideas_v72_pr;
-pub use open_source_os_unimplemented_ideas_v72_pr::*;
 
 pub mod debian_github_repo_missing_components_v71_pr;
 pub use debian_github_repo_missing_components_v71_pr::*;
-
-pub mod open_source_os_debian_unimplemented_ideas_v72_pr;
-pub use open_source_os_debian_unimplemented_ideas_v72_pr::*;
-<<<<<<< HEAD
-pub mod open_source_os_unimplemented_ideas_v72_pr;
-pub use open_source_os_unimplemented_ideas_v72_pr::*;
 
 pub mod debian_github_repo_missing_components_v72_pr;
 pub use debian_github_repo_missing_components_v72_pr::*;
 
 pub mod open_source_os_debian_unimplemented_ideas_v72_pr;
 pub use open_source_os_debian_unimplemented_ideas_v72_pr::*;
-pub mod open_source_os_missing_components_v73_pr;
-pub use open_source_os_missing_components_v73_pr::*;
+
+pub mod open_source_os_unimplemented_ideas_v72_pr;
+pub use open_source_os_unimplemented_ideas_v72_pr::*;
+
+pub mod arch_linux_missing_components_v73_pr;
+pub use arch_linux_missing_components_v73_pr::*;
 // Re-export stub types
 pub use crate::stubs::distro_stubs::*;
 pub use crate::stubs::large_distro_stubs::*;
