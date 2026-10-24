@@ -65,6 +65,7 @@ pub use creative::soundcraft_artcraft_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
 // pub use creative::threedcraft_artcraft_parity_pr::*;
 pub use creative::threedcraft_spatial_computing_pr::*;
+pub use creative::voicecraft_advancements_v73_pr::*;
 pub use creative::voicecraft_artcraft_parity_pr::*;
 pub use creative::voicecraft_missing_components_parity_pr::*;
 pub use creative::voicecraft_neural_dsp_advancements_v68_pr::*;
