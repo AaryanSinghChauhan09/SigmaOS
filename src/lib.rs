@@ -682,6 +682,8 @@ pub mod io;
 
 pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
+pub use crate::shell::sovereign_shell_repl_advancements_v74_pr::*;
+pub use crate::media::sovereign_web_browser_advancements_v74_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;

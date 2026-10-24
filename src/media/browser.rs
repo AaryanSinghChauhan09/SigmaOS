@@ -2047,6 +2047,7 @@ pub struct SigmaWebBrowser {
     pub brave_ephemeral_storage: BraveShieldsFirstPartyEphemeralStorageEngine,
     pub tor_rendezvous: TorOnionRendezvousHandshakeEngine,
     pub ladybird_selector_engine: LadybirdLibWebCss3SelectorEngine,
+    pub browser_v74_gateway: crate::media::sovereign_web_browser_advancements_v74_pr::SovereignWebBrowserAdvancementsV74PrGatewayEngine,
 }
 
 impl SigmaWebBrowser {
@@ -2117,6 +2118,7 @@ impl SigmaWebBrowser {
             brave_ephemeral_storage: BraveShieldsFirstPartyEphemeralStorageEngine::new(),
             tor_rendezvous: TorOnionRendezvousHandshakeEngine::new(),
             ladybird_selector_engine: LadybirdLibWebCss3SelectorEngine::new(),
+            browser_v74_gateway: crate::media::sovereign_web_browser_advancements_v74_pr::SovereignWebBrowserAdvancementsV74PrGatewayEngine::new(),
         }
     }
 
@@ -2164,6 +2166,9 @@ impl SigmaWebBrowser {
         {
             return Err("Navigation Blocked: Ad/Telemetry Target Detected");
         }
+
+        // 6. Execute V74 Browser Suite Audit checks for navigation
+        let _v74_audit = self.browser_v74_gateway.run_web_browser_suite_audit(&sanitized);
 
         Ok(sanitized)
     }

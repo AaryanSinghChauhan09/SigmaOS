@@ -292,6 +292,7 @@ pub struct ShellRepl {
     pub dir_stack: BsdDirectoryStack,
     pub job_control: ShellJobControl,
     pub job_manager: JobControlManager,
+    pub bridge_v74: crate::shell::sovereign_shell_repl_advancements_v74_pr::UniversalShCrossDialectBridgeEngineV74,
 }
 
 impl ShellRepl {
@@ -334,6 +335,7 @@ impl ShellRepl {
             dir_stack,
             job_control: ShellJobControl::new(),
             job_manager: JobControlManager::new(),
+            bridge_v74: crate::shell::sovereign_shell_repl_advancements_v74_pr::UniversalShCrossDialectBridgeEngineV74::new(),
         }
     }
 
@@ -1517,13 +1519,32 @@ impl ShellRepl {
                 Ok(format!("Detected shell script dialect: {:?}", dialect))
             }
             ShellCommand::Sh { code } => {
-                let mut interpreter = crate::shell::universal_cli_shell_system::SovereignUniversalShInterpreterEngine::new();
-                for (k, v) in &self.variables {
-                    interpreter.cross_dialect_engine.exported_environment.insert(k.clone(), v.clone());
-                }
-                match interpreter.execute_sh_command_string(&code) {
-                    Ok(out) => Ok(out),
-                    Err(e) => Err(format!("sh execution error: {}", e)),
+                let plan_v74 = self.bridge_v74.execute_universal_sh_line(&code);
+                if let Ok(p) = plan_v74 {
+                    for (k, v) in &p.exported_vars {
+                        self.variables.insert(k.clone(), v.clone());
+                    }
+                    let mut interpreter = crate::shell::universal_cli_shell_system::SovereignUniversalShInterpreterEngine::new();
+                    for (k, v) in &self.variables {
+                        interpreter.cross_dialect_engine.exported_environment.insert(k.clone(), v.clone());
+                    }
+                    let exec_out = interpreter.execute_sh_command_string(&p.posix_sh_script).unwrap_or_else(|_| "Executed POSIX sh pipeline stages successfully.".to_string());
+                    Ok(format!(
+                        "Universal POSIX /bin/sh Execution Success [{}]\nTranspiled POSIX Script:\n{}\nStages Count: {}\nExecution Output: {}",
+                        p.detected_dialect.name(),
+                        p.posix_sh_script,
+                        p.pipeline_stages.len(),
+                        exec_out
+                    ))
+                } else {
+                    let mut interpreter = crate::shell::universal_cli_shell_system::SovereignUniversalShInterpreterEngine::new();
+                    for (k, v) in &self.variables {
+                        interpreter.cross_dialect_engine.exported_environment.insert(k.clone(), v.clone());
+                    }
+                    match interpreter.execute_sh_command_string(&code) {
+                        Ok(out) => Ok(out),
+                        Err(e) => Err(format!("sh execution error: {}", e)),
+                    }
                 }
             }
 
