@@ -20,6 +20,23 @@ use alloc::vec::Vec;
 use core::fmt;
 use core::sync::atomic::{AtomicU64, Ordering};
 
+/// Case-insensitive substring search helper without heap allocation for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.len() <= haystack.len()
+            && haystack
+                .as_bytes()
+                .windows(needle.len())
+                .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Notification priority levels
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Priority {
@@ -345,16 +362,16 @@ impl NotificationSystem {
             .collect()
     }
 
+    /// Search notification history using zero-allocation case-insensitive ASCII matching.
+    /// Eliminates 3x dynamic heap allocations (`String`) per notification entry.
     pub fn search_history(&self, query: &str) -> Vec<Notification> {
-        let query = query.to_lowercase();
-
         self.history
             .iter()
             .filter_map(|id| self.notifications.get(id))
             .filter(|n| {
-                n.summary.to_lowercase().contains(&query)
-                    || n.body.to_lowercase().contains(&query)
-                    || n.app_name.to_lowercase().contains(&query)
+                contains_ignore_case(&n.summary, query)
+                    || contains_ignore_case(&n.body, query)
+                    || contains_ignore_case(&n.app_name, query)
             })
             .cloned()
             .collect()
@@ -543,5 +560,22 @@ mod tests {
 
         let grouped = system.get_grouped_notifications("chat");
         assert_eq!(grouped.len(), 2);
+    }
+
+    #[test]
+    fn test_search_history_zero_alloc() {
+        let mut system = NotificationSystem::new();
+        system.enable_dnd();
+
+        system.notify(Notification::new("SystemUpdater", "Kernel Update Available", "Linux 6.18 ready"));
+        system.notify(Notification::new("MailApp", "New Message from Alice", "Meeting rescheduled"));
+
+        let results = system.search_history("KERNEL");
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].summary, "Kernel Update Available");
+
+        let app_results = system.search_history("mailapp");
+        assert_eq!(app_results.len(), 1);
+        assert_eq!(app_results[0].summary, "New Message from Alice");
     }
 }
