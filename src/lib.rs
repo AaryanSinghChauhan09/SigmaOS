@@ -249,6 +249,8 @@ pub use distro::cachy_linux_missing_components_v68_pr::*;
 pub use distro::cachy_linux_missing_components_v69_pr::*;
 pub use distro::cachy_linux_missing_components_v70_pr::*;
 pub use distro::cachy_linux_missing_components_v71_pr::*;
+pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
+>>>>>>> origin/main
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::dragonflybsd_missing_components_v61_pr::*;
 pub use distro::dragonflybsd_missing_components_v62_pr::*;
@@ -703,7 +705,6 @@ pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v72_pr::*;
 =======
->>>>>>> origin/main
 pub use crate::distro::sigmaos_gap_closing_evidence_gated_roadmap_pr::*;
 pub use crate::distro::sovereign_global_tech_media_wiki_distro_parity_pr::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;

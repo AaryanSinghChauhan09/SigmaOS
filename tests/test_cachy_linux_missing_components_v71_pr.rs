@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
-// Comprehensive Integration Test Suite for CachyOS Missing Components PR Engine (V71)
-
+// Integration Test Suite for CachyOS Missing Components V71 PR Engine
+// (`tests/test_cachy_linux_missing_components_v71_pr.rs`)
 #[path = "../src/distro/cachy_linux_missing_components_v71_pr.rs"]
 mod cachy_linux_missing_components_v71_pr;
 
@@ -23,47 +23,41 @@ fn test_cachy_linux_v71_pr_suite_full_cycle() {
 
     let summary = suite.generate_suite_summary();
     assert_eq!(summary.get("total_components").unwrap(), "10");
-}
+    assert_eq!(summary.get("release_parity").unwrap(), "v71.0");
 
-#[test]
-fn test_individual_cachyos_v71_engines() {
+    // Test individual components
     let mut scx = CachyOsScxCentralLavdV5SchedulerPrEngine::new();
-    let msg1 = scx.schedule_gaming_thread(8192, 4);
-    assert!(msg1.contains("Thread 8192"));
+    let sched_res = scx.schedule_gaming_thread(101, 4);
+    assert!(sched_res.contains("pinned to CPU core 4"));
 
-    let mut bolt = CachyOsKernelAutoboltPgoV5PipelinePrEngine::new();
-    let msg2 = bolt.execute_tri_stage_optimization();
-    assert!(msg2.contains("BOLT v5"));
+    let mut bolt = CachyOsKernelAutoBoltPgoV5PipelinePrEngine::new();
+    assert!(bolt.optimize_kernel_binary());
 
-    let mut scanout = CachyOsChwdVulkanWaylandDirectScanoutV5PrEngine::new();
-    let msg3 = scanout.configure_direct_scanout("vk_game_surface");
-    assert!(msg3.contains("vk_game_surface"));
+    let mut chwd = CachyOsChwdVulkanWaylandDirectScanoutV5Engine::new();
+    let scanout_res = chwd.bypass_compositor(42);
+    assert!(scanout_res.contains("Wayland surface 42"));
 
-    let mut pqc = CachyOsPacmanV4PqcDilithiumVerifierV71PrEngine::new();
-    let msg4 = pqc.verify_pqc_package("linux-cachyos-v71");
-    assert!(msg4.contains("linux-cachyos-v71"));
+    let pacman = CachyOsPacmanV5PqcDilithiumVerifierEngine::new();
+    assert!(pacman.verify_package_signature("kernel-cachyos-6.15.pkg.tar.zst"));
 
-    let mut ntsync = CachyOsProtonWineNtsyncFsync5GovernorPrEngine::new();
-    let msg5 = ntsync.dispatch_event_array(64);
-    assert!(msg5.contains("64"));
+    let mut fsync = CachyOsProtonWineNtsyncFsync5GovernorEngine::new();
+    let sync_res = fsync.synchronize_win32_handles(12);
+    assert!(sync_res.contains("12 Win32 primitive handles"));
 
-    let mut ananicy = CachyOsAnanicyRealtimeEbpfV5GovernorPrEngine::new();
-    let msg6 = ananicy.prioritize_game_process("cyberpunk2077.exe");
-    assert!(msg6.contains("cyberpunk2077.exe"));
+    let mut ananicy = CachyOsAnanicyRealtimeEbpfV5GovernorEngine::new();
+    let cls_res = ananicy.classify_process("cyberpunk.exe", 9999);
+    assert!(cls_res.contains("PID 9999"));
 
-    let mut btrfs = CachyOsBtrfsZstdEbpfCompressorV5TunerPrEngine::new();
-    let msg7 = btrfs.optimize_file_compression(true);
-    assert!(msg7.contains("level 1"));
+    let mut btrfs = CachyOsBtrfsZstdEbpfCompressorV5TunerEngine::new();
+    assert_eq!(btrfs.tune_compression_ratio(8000), 1);
 
-    let mut gamescope = CachyOsGamescopeHdr10VrrPassthroughPacerV5PrEngine::new();
-    let msg8 = gamescope.pace_vulkan_presentation(2000);
-    assert!(msg8.contains("2000"));
+    let gamescope = CachyOsGamescopeHdr10VrrPassthroughPacerV5Engine::new();
+    let pace_res = gamescope.pace_frame(1001, 144);
+    assert!(pace_res.contains("144 Hz"));
 
-    let mut zram = CachyOsZramLz4ZstdDynamicPoolV5PrEngine::new();
-    let msg9 = zram.migrate_cold_swap_pages();
-    assert!(msg9.contains("ZRAM Hybrid Pool v5"));
+    let mut zram = CachyOsZramLz4ZstdDynamicPoolV5Engine::new();
+    assert!(zram.allocate_compressed_page(2048));
 
-    let mut power = CachyOsHandheldPowerCapThermalV5GovernorPrEngine::new();
-    let msg10 = power.apply_handheld_settings("Overclock Extreme v5", 35);
-    assert!(msg10.contains("Overclock Extreme v5"));
-}
+    let mut handheld = CachyOsHandheldPowerCapThermalV5GovernorEngine::new();
+    let tdp_res = handheld.set_tdp_cap(25);
+    assert!(tdp_res.contains("25 Watts"));}
