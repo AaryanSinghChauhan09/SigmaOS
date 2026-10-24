@@ -425,6 +425,18 @@ impl UniversalShellScriptTranspiler {
         if l == "else" {
             return "else".to_string();
         }
+        if l.starts_with("contains ") {
+            let rest = l.trim_start_matches("contains ").trim();
+            if let Some(space) = rest.find(' ') {
+                let item = rest[..space].trim().trim_matches('"').trim_matches('\'');
+                let list = rest[space + 1..].trim().trim_matches('"').trim_matches('\'');
+                return format!("echo \"{}\" | grep -q \"{}\"", list, item);
+            }
+        }
+        if l.starts_with("count ") {
+            let list = l.trim_start_matches("count ").trim().trim_matches('"').trim_matches('\'');
+            return format!("echo \"{}\" | wc -w", list);
+        }
         l
     }
 
@@ -468,7 +480,12 @@ impl UniversalShellScriptTranspiler {
         if l.starts_with("if (") && l.contains("then") {
             if let (Some(open), Some(close)) = (l.find('('), l.find(')')) {
                 let cond = l[open + 1..close].trim();
-                return format!("if [ {} ]; then", cond);
+                if cond.starts_with("$?") {
+                    let var = cond.trim_start_matches("$?").trim();
+                    return format!("if [ -n \"${{{}}}\" ]; then", var);
+                } else {
+                    return format!("if [ {} ]; then", cond);
+                }
             }
         }
         if l == "endif" {
@@ -514,6 +531,20 @@ impl UniversalShellScriptTranspiler {
                 .trim_matches('\'');
             vars.insert("PS1".to_string(), prompt_str.to_string());
             return format!("export PS1=\"{}\"", prompt_str);
+        }
+        if l.starts_with("repeat ") {
+            let rest = l.trim_start_matches("repeat ").trim();
+            if let Some(space) = rest.find(' ') {
+                let n = rest[..space].trim();
+                let cmd = rest[space + 1..].trim();
+                return format!("for _i in $(seq {}); do {}; done", n, cmd);
+            }
+        }
+        if l.starts_with("if ($?") && l.contains(") then") {
+            if let (Some(open), Some(close)) = (l.find("($?"), l.find(") then")) {
+                let var = l[open + 3..close].trim();
+                return format!("if [ -n \"${{{}}}\" ]; then", var);
+            }
         }
         l
     }
@@ -1598,7 +1629,7 @@ mod tests {
     #[test]
     fn test_fish_script_transpilation() {
         let script =
-            "#!/usr/bin/env fish\nfish_add_path /opt/bin\nset -gx PORT 8080\nmath \"5 * 10\"";
+            "#!/usr/bin/env fish\nfish_add_path /opt/bin\nset -gx PORT 8080\nmath \"5 * 10\"\ncontains foo \"foo bar\"\ncount \"a b c\"";
         let plan = UniversalShellScriptTranspiler::transpile_script(script);
 
         assert_eq!(plan.target_format, ShellSystemFormat::Fish);
@@ -1607,6 +1638,8 @@ mod tests {
             .contains("export PATH=\"/opt/bin:$PATH\""));
         assert!(plan.posix_sh_script.contains("export PORT=8080"));
         assert!(plan.posix_sh_script.contains("echo $(( 5 * 10 ))"));
+        assert!(plan.posix_sh_script.contains("echo \"foo bar\" | grep -q \"foo\""));
+        assert!(plan.posix_sh_script.contains("echo \"a b c\" | wc -w"));
         assert_eq!(
             plan.exported_variables.get("PORT"),
             Some(&"8080".to_string())
@@ -1615,7 +1648,7 @@ mod tests {
 
     #[test]
     fn test_tcsh_script_transpilation() {
-        let script = "#!/bin/tcsh\nsetenv HOST myhost\nset path = ( /usr/bin /bin )\n@ x = 10 + 20";
+        let script = "#!/bin/tcsh\nsetenv HOST myhost\nset path = ( /usr/bin /bin )\n@ x = 10 + 20\nrepeat 3 echo hi\nif ($?HOST) then";
         let plan = UniversalShellScriptTranspiler::transpile_script(script);
 
         assert_eq!(plan.target_format, ShellSystemFormat::Tcsh);
@@ -1624,6 +1657,8 @@ mod tests {
             .posix_sh_script
             .contains("export PATH=\"/usr/bin:/bin\""));
         assert!(plan.posix_sh_script.contains("x=$(( 10 + 20 ))"));
+        assert!(plan.posix_sh_script.contains("for _i in $(seq 3); do echo hi; done"));
+        assert!(plan.posix_sh_script.contains("if [ -n \"${HOST}\" ]; then"));
     }
 
     #[test]
