@@ -2438,4 +2438,18 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v71_pr.rs" ]; then
     ./build/test_open_source_os_v71_pr
 fi
 
+if [ -f "src/distro/open_source_os_missing_components_v73_pr.rs" ]; then
+    echo "Running Sovereign Open Source OS Missing Components V73 PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v73_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_distro_v73
+    ./build/test_distro_v73
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v73.rs" ]; then
+    echo "Running Sovereign Distro Package Advancements V73 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v73.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_v73
+    ./build/test_package_v73
+fi
+
 echo "All SigmaOS test suites completed."
