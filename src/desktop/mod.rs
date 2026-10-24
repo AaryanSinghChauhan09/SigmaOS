@@ -619,6 +619,8 @@ pub mod zenith;
 pub use sovereign_gui_development_and_pr_suite::*;
 pub mod sovereign_desktop_toolkits_and_services;
 pub use sovereign_desktop_toolkits_and_services::*;
+pub mod sovereign_desktop_toolkits_and_services_v72_pr;
+pub use sovereign_desktop_toolkits_and_services_v72_pr::*;
 pub mod sovereign_de_wm_innovation_engine;
 pub use sovereign_de_wm_innovation_engine::*;
 pub mod elementary_os_missing_components_pr;
@@ -640,5 +642,11 @@ pub use elementary_os_ecosystem_expansion_v64::*;
 pub mod elementary_os_missing_components_v66;
 pub use elementary_os_missing_components_v66::*;
 
+pub mod elementary_os_missing_components_v72;
+pub use elementary_os_missing_components_v72::*;
+
 pub mod sovereign_de_wm_advancements_v68_pr;
 pub use sovereign_de_wm_advancements_v68_pr::*;
+
+pub mod sovereign_desktop_toolkits_and_services_v72_pr;
+pub use sovereign_desktop_toolkits_and_services_v72_pr::*;

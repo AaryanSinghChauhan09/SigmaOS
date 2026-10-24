@@ -347,7 +347,8 @@ impl CachyOsBtrfsZstdEbpfCompressorV4TunerPrEngine {
             "Btrfs ZSTD v4: Adjusted inline compression to level 1 for maximum IOPS during game asset load".to_string()
         } else {
             self.current_zstd_level = 3;
-            "Btrfs ZSTD v4: Restored compression to level 3 for optimal storage efficiency".to_string()
+            "Btrfs ZSTD v4: Restored compression to level 3 for optimal storage efficiency"
+                .to_string()
         }
     }
 
