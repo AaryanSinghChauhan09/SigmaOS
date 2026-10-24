@@ -534,6 +534,8 @@ pub mod openbsd_missing_components_v63_pr;
 pub use openbsd_missing_components_v63_pr::*;
 pub mod openbsd_missing_components_v64_pr;
 pub use openbsd_missing_components_v64_pr::*;
+pub mod openbsd_missing_components_v66_pr;
+pub use openbsd_missing_components_v66_pr::*;
 pub mod cachy;
 pub mod cachy_linux_missing_components_engine;
 pub mod cachy_linux_missing_components_parity_pr;
