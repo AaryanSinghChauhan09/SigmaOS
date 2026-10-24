@@ -101,7 +101,6 @@ pub use distro::sovereign_linux_bsd_wiki_master_engine::*;
 pub use system::sovereign_init_and_supervisor_advancements_v63_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v67::*;
 pub use system::sovereign_init_and_supervisor_advancements_v68_pr::*;
-<<<<<<< HEAD
 =======
 pub use system::sovereign_init_and_supervisor_advancements_v69_pr::*;
 >>>>>>> origin/main
@@ -282,6 +281,7 @@ pub use distro::open_source_os_missing_components_v67_pr::*;
 pub use distro::open_source_os_missing_components_v68_pr::*;
 pub use distro::open_source_os_missing_components_v69_pr::*;
 pub use distro::open_source_os_missing_components_v71_pr::*;
+pub use distro::open_source_os_missing_components_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
@@ -688,6 +688,7 @@ pub use crate::distro::open_source_os_missing_components_v68_pr::*;
 pub use crate::distro::open_source_os_missing_components_v69_pr::*;
 pub use crate::distro::open_source_os_missing_components_v70_pr::*;
 pub use crate::distro::open_source_os_missing_components_v72_pr::*;
+<<<<<<< HEAD
 pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v69_pr::*;
