@@ -940,6 +940,9 @@ pub use sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
 =======
 pub mod omarchy_linux_missing_components_v72_pr;
 pub use omarchy_linux_missing_components_v72_pr::*;
+
+pub mod omarchy_linux_missing_components_v73_pr;
+pub use omarchy_linux_missing_components_v73_pr::*;
 pub mod open_source_os_unimplemented_ideas_v72_pr;
 pub use open_source_os_unimplemented_ideas_v72_pr::*;
 
