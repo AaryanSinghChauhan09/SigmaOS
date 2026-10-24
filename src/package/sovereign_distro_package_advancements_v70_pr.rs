@@ -32,8 +32,11 @@ use std::vec::Vec;
 use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
-use crate::sovereign_distro_package_advancements_v70::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+#[path = "universal.rs"]
+pub mod universal;
 
+#[cfg(feature = "standalone_test")]
+pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 /// Pull Request Proposal Manifest V70
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackagePrProposalManifestV70 {
@@ -94,11 +97,10 @@ mod tests {
         let mut gateway = SovereignDistroPackagePrGatewayV70::new();
         gateway.submit_proposal(
             7001,
-            "Universal Interop for Debian DEB in Sigma-pkg",
+            "Universal Interop for Debian DEB in Sigma-pkg V70",
             PackageFormat::Deb,
             "ripgrep",
-            "Added zero-copy format classification and PQC attestation verification",
-        );
+            "Added zero-copy format classification and PQC attestation verification V70",        );
 
         assert_eq!(gateway.total_proposals(), 1);
         let prop = gateway.get_proposal(7001).unwrap();

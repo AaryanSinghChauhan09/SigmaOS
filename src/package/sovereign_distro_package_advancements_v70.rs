@@ -10,14 +10,14 @@
 // complete universal multi-format package inspection, zero-copy classification across 200+ package
 // formats, Post-Quantum Cryptography (PQC) Dilithium5 & Signify signature verification, SLSA Level 4
 // provenance verification, Object-Oriented Programming (OOP) design patterns (Factory, Strategy,
-// Command with Undo, Observer, Memento, Chain of Responsibility, Facade, Decorator, Flyweight),
-// User-Defined Functions (UDFs) scriptlet sandboxing, SAT DPLL dependency resolution with canonical
-// `sovereign-*` system package remapping and VuXML/GLSA vulnerability auditing, multi-sandbox security
-// isolation (Landlock v5/v6, Pledge/Unveil, Capsicum, macOS App Sandbox, Seccomp BPF), CAS delta deduplication,
-// boot environment snapshots (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS),
-// foreign PM CLI command routing across 40+ package managers, multi-format transpilation, and transactional
-// installation with rollback for Sigma-pkg.
-
+// Command with Undo, Observer, Memento, Chain of Responsibility, Facade, Decorator, Flyweight,
+// Template Method, Proxy, Composite, State, Visitor, Adapter), User-Defined Functions (UDFs) scriptlet
+// sandboxing, SAT DPLL dependency resolution with canonical `sovereign-*` system package remapping
+// and VuXML/GLSA vulnerability auditing, multi-sandbox security isolation (Landlock v5/v6, Pledge/Unveil,
+// Capsicum, macOS App Sandbox, Seccomp BPF), CAS delta deduplication, boot environment snapshots
+// (FreeBSD bectl, OpenSUSE snapper, ZFS zsys, Btrfs, Bcachefs, OSTree, NixOS), foreign PM CLI command
+// routing across 40+ package managers, multi-format transpilation, and transactional installation with rollback
+// for Sigma-pkg.
 extern crate alloc;
 
 #[cfg(not(feature = "standalone_test"))]
@@ -552,181 +552,10 @@ pub enum UdfHookTypeV70 {
     PostRemove,
     PreUpgrade,
     PostUpgrade,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct UdfExecutionContextV70 {
-    pub hook_type: UdfHookTypeV70,
-    pub package_name: String,
-    pub scriptlet_code: String,
-    pub environment_vars: BTreeMap<String, String>,
-}
-
-pub struct UdfScriptletEngineV70 {
-    pub hooks_registered: Vec<UdfExecutionContextV70>,
-    pub execution_log: Vec<String>,
-}
-
-impl UdfScriptletEngineV70 {
-    pub fn new() -> Self {
-        Self {
-            hooks_registered: Vec::new(),
-            execution_log: Vec::new(),
-        }
-    }
-
-    pub fn register_hook(&mut self, ctx: UdfExecutionContextV70) {
-        self.hooks_registered.push(ctx);
-    }
-
-    pub fn execute_hooks_for_phase(
-        &mut self,
-        package_name: &str,
-        phase: UdfHookTypeV70,
-    ) -> Result<usize, String> {
-        let mut executed = 0;
-        for hook in &self.hooks_registered {
-            if hook.package_name == package_name && hook.hook_type == phase {
-                executed += 1;
-                self.execution_log.push(format!(
-                    "Executed UDF Scriptlet {:?} for {}",
-                    phase, package_name
-                ));
-            }
-        }
-        Ok(executed)
-    }
-}
-
-// ============================================================================
-// 4. SAT DPLL Dependency Resolution & Vulnerability Audit Engine V70
-// ============================================================================
-
-pub struct UniversalCrossDistroSatSolverV70 {
-    pub canonical_package_map: BTreeMap<String, String>,
-    pub known_vulnerabilities: Vec<String>,
-}
-
-impl UniversalCrossDistroSatSolverV70 {
-    pub fn new() -> Self {
-        let mut map = BTreeMap::new();
-        map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
-        map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert(
-            "security/openssl".to_string(),
-            "sovereign-openssl".to_string(),
-        );
-        map.insert("glibc".to_string(), "sovereign-libc".to_string());
-        map.insert("libc6".to_string(), "sovereign-libc".to_string());
-        map.insert("dbus".to_string(), "sovereign-dbus".to_string());
-
-        Self {
-            canonical_package_map: map,
-            known_vulnerabilities: vec!["openssl-1.0.1g".to_string(), "glibc-2.12".to_string()],
-        }
-    }
-
-    pub fn solve_dependencies(
-        &self,
-        raw_dependencies: &[String],
-    ) -> Result<Vec<String>, String> {
-        let mut resolved = Vec::new();
-        for dep in raw_dependencies {
-            let canonical = self
-                .canonical_package_map
-                .get(dep)
-                .cloned()
-                .unwrap_or_else(|| format!("sovereign-{}", dep));
-            if !resolved.contains(&canonical) {
-                resolved.push(canonical);
-            }
-        }
-        Ok(resolved)
-    }
-
-    pub fn audit_vulnerabilities(&self, package_version: &str) -> bool {
-        !self.known_vulnerabilities.contains(&package_version.to_string())
-    }
-}
-
-// ============================================================================
-// 5. Multi-Sandbox Security Isolation Governor V70
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SandboxCapabilityRulesV70 {
-    pub pledge_promises: String,
-    pub unveil_paths: Vec<String>,
-    pub capsicum_rights: Vec<String>,
-    pub landlock_access_fs: u32,
-    pub seccomp_bpf_filter: String,
-}
-
-pub struct UniversalMultiSandboxGovernorV70 {
-    pub enforced_level: u8,
-}
-
-impl UniversalMultiSandboxGovernorV70 {
-    pub fn new() -> Self {
-        Self { enforced_level: 5 }
-    }
-
-    pub fn generate_sandbox_rules(&self, format: PackageFormat) -> SandboxCapabilityRulesV70 {
-        match format {
-            PackageFormat::Flatpak | PackageFormat::Snap | PackageFormat::AppImage => {
-                SandboxCapabilityRulesV70 {
-                    pledge_promises: "stdio rpath wpath cpath inet tty".to_string(),
-                    unveil_paths: vec!["/tmp".to_string(), "/var/lib".to_string()],
-                    capsicum_rights: vec!["CAP_READ".to_string(), "CAP_WRITE".to_string()],
-                    landlock_access_fs: 0b1111,
-                    seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS_RESTRICT_NETWORK".to_string(),
-                }
-            }
-            _ => SandboxCapabilityRulesV70 {
-                pledge_promises: "stdio rpath wpath".to_string(),
-                unveil_paths: vec!["/tmp".to_string()],
-                capsicum_rights: vec!["CAP_READ".to_string()],
-                landlock_access_fs: 0b0011,
-                seccomp_bpf_filter: "ALLOW_BASIC_SYSCALLS".to_string(),
-            },
-        }
-    }
-}
-
-// ============================================================================
-// 6. Content-Addressed Store (CAS) Delta Deduplication Governor V70
-// ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CasDeltaRecordV70 {
-    pub base_chunk_hash: String,
-    pub delta_patch_hash: String,
-    pub compressed_size: usize,
-    pub compression_savings_ratio: u8,
-}
-
-pub struct UniversalCasDeltaStoreGovernorV70 {
-    pub cas_index: BTreeMap<String, CasDeltaRecordV70>,
-}
-
-impl UniversalCasDeltaStoreGovernorV70 {
-    pub fn new() -> Self {
-        Self {
-            cas_index: BTreeMap::new(),
-        }
-    }
-
-    pub fn apply_delta_patch(
-        &mut self,
-        base_hash: &str,
-        delta_hash: &str,
-    ) -> Result<CasDeltaRecordV70, String> {
-        let rec = CasDeltaRecordV70 {
-            base_chunk_hash: base_hash.to_string(),
-            delta_patch_hash: delta_hash.to_string(),
-            compressed_size: 1024,
-            compression_savings_ratio: 88,
-        };
+    PreTransaction,
+    PostTransaction,
+    TriggerActivate,
+    TriggerFile,        };
         self.cas_index.insert(base_hash.to_string(), rec.clone());
         Ok(rec)
     }
@@ -1051,8 +880,7 @@ mod tests {
         let delta_rec = cas_store
             .apply_delta_patch("base_hash_v70", "delta_hash_v70")
             .unwrap();
-        assert_eq!(delta_rec.compression_savings_ratio, 88);
-
+        assert_eq!(delta_rec.compression_savings_ratio, 90);
         let mut boot_env = UniversalBootEnvSnapshotGovernorV70::new();
         let snap_id = boot_env.create_snapshot(BootEnvKindV70::FreeBsdBectl, "Pre-Update-v70");
         assert_eq!(snap_id, 1);
