@@ -370,6 +370,117 @@ impl UdevEudevMdevDevdDevfsEngine {
         )
     }
 
+    /// Generate eudev persistent net rule line (`/etc/udev/rules.d/70-persistent-net.rules`).
+    pub fn generate_persistent_net_rule(&self, ifname: &str, mac_bytes: &[u8; 6]) -> String {
+        format!(
+            "SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{{address}}==\"{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}\", NAME=\"{}\"",
+            mac_bytes[0], mac_bytes[1], mac_bytes[2], mac_bytes[3], mac_bytes[4], mac_bytes[5], ifname
+        )
+    }
+
+    /// Parse raw Netlink `KOBJ_UEVENT` payload buffer (null-byte delimited key=value string).
+    pub fn parse_netlink_uevent(&self, raw_payload: &[u8]) -> Option<KernelUeventRecord> {
+        let payload_str = core::str::from_utf8(raw_payload).ok()?;
+        let parts: Vec<&str> = payload_str.split('\0').filter(|s| !s.is_empty()).collect();
+        if parts.is_empty() {
+            return None;
+        }
+
+        let mut action = DynamicDeviceAction::Add;
+        let mut devpath = String::new();
+        let mut subsystem = String::new();
+        let mut devname = String::new();
+        let mut major = 0u32;
+        let mut minor = 0u32;
+        let mut seqnum = 0u64;
+        let mut env_vars = Vec::new();
+
+        // First header item: e.g. "add@/devices/pci0000:00/0000:00:1f.6/net/eth0"
+        if let Some(header) = parts.first() {
+            if let Some((act_str, path_str)) = header.split_once('@') {
+                action = match act_str {
+                    "remove" => DynamicDeviceAction::Remove,
+                    "change" => DynamicDeviceAction::Change,
+                    "bind" => DynamicDeviceAction::Bind,
+                    "unbind" => DynamicDeviceAction::Unbind,
+                    _ => DynamicDeviceAction::Add,
+                };
+                devpath = path_str.to_string();
+            }
+        }
+
+        for kv in parts.iter().skip(1) {
+            if let Some((k, v)) = kv.split_once('=') {
+                env_vars.push((k.to_string(), v.to_string()));
+                match k {
+                    "ACTION" => {
+                        action = match v {
+                            "remove" => DynamicDeviceAction::Remove,
+                            "change" => DynamicDeviceAction::Change,
+                            "bind" => DynamicDeviceAction::Bind,
+                            "unbind" => DynamicDeviceAction::Unbind,
+                            _ => DynamicDeviceAction::Add,
+                        };
+                    }
+                    "DEVPATH" => devpath = v.to_string(),
+                    "SUBSYSTEM" => subsystem = v.to_string(),
+                    "DEVNAME" => devname = v.to_string(),
+                    "MAJOR" => major = v.parse().unwrap_or(0),
+                    "MINOR" => minor = v.parse().unwrap_or(0),
+                    "SEQNUM" => seqnum = v.parse().unwrap_or(0),
+                    _ => {}
+                }
+            }
+        }
+
+        if devname.is_empty() {
+            if let Some(last_part) = devpath.split('/').last() {
+                devname = last_part.to_string();
+            }
+        }
+
+        Some(KernelUeventRecord {
+            action,
+            devpath,
+            subsystem,
+            devname,
+            major,
+            minor,
+            seqnum,
+            env_vars,
+        })
+    }
+
+    /// Parse BusyBox `mdev.conf` rule line (e.g. `sd[a-z][0-9]* 0:6 660 @/sbin/mdev_storage_hotplug`).
+    pub fn parse_mdev_conf_line(&mut self, line: &str) -> bool {
+        let trimmed = line.trim();
+        if trimmed.is_empty() || trimmed.starts_with('#') {
+            return false;
+        }
+
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() < 3 {
+            return false;
+        }
+
+        let device_regex = parts[0].to_string();
+        let owner_uid_gid = parts[1].to_string();
+        let permissions_octal = u32::from_str_radix(parts[2], 8).unwrap_or(0o660);
+        let helper_script = if parts.len() >= 4 {
+            Some(parts[3..].join(" "))
+        } else {
+            None
+        };
+
+        self.mdev_rules.push(MdevRegexRule {
+            device_regex,
+            owner_uid_gid,
+            permissions_octal,
+            helper_script,
+        });
+        true
+    }
+
     /// Process incoming Netlink `KOBJ_UEVENT` or `/dev/devctl` event.
     pub fn process_uevent(&mut self, uevent: &KernelUeventRecord) -> usize {
         let mut matches_count = 0;
@@ -678,6 +789,16 @@ impl AcpidPowerDaemonEngine {
         }
     }
 
+    /// Calculate recommended PWM fan RPM speed target based on thermal policy state.
+    pub fn evaluate_fan_speed_rpm(&self, thermal_state: ThermalPolicyState) -> u32 {
+        match thermal_state {
+            ThermalPolicyState::Normal => 1500,
+            ThermalPolicyState::PassiveCooling => 3000,
+            ThermalPolicyState::FanSpeedHigh => 5500,
+            ThermalPolicyState::EmergencyShutdown => 7200,
+        }
+    }
+
     /// Generate acpid PR proposal.
     pub fn generate_proposal(&self) -> DeviceManagementPrProposalManifest {
         DeviceManagementPrProposalManifest {
@@ -745,6 +866,8 @@ pub struct PowerSupplyDevice {
     pub energy_full_design_wh: f32,
     pub power_rate_w: f32,         // Discharge or charge rate in Watts
     pub charge_stop_threshold: u8, // e.g. 80% limit for longevity
+    pub cycle_count: u32,
+    pub voltage_v: f32,
 }
 
 /// UPower Daemon Engine (`upowerd`).
@@ -773,6 +896,8 @@ impl UpowerBatteryPowerEngine {
             energy_full_design_wh: 60.0,
             power_rate_w: 12.5,
             charge_stop_threshold: 100,
+            cycle_count: 142,
+            voltage_v: 11.4,
         });
 
         self.devices.push(PowerSupplyDevice {
@@ -786,6 +911,8 @@ impl UpowerBatteryPowerEngine {
             energy_full_design_wh: 0.0,
             power_rate_w: 0.0,
             charge_stop_threshold: 100,
+            cycle_count: 0,
+            voltage_v: 19.5,
         });
 
         self.devices.push(PowerSupplyDevice {
@@ -799,6 +926,8 @@ impl UpowerBatteryPowerEngine {
             energy_full_design_wh: 2.2,
             power_rate_w: 0.05,
             charge_stop_threshold: 100,
+            cycle_count: 12,
+            voltage_v: 3.7,
         });
 
         self.current_profile = PowerProfile::Balanced;
@@ -838,6 +967,18 @@ impl UpowerBatteryPowerEngine {
         } else {
             false
         }
+    }
+
+    /// Estimate remaining charge cycles before 80% health degradation (typically ~1000 total cycles design limit).
+    pub fn calculate_estimated_remaining_cycles(&self, dev_name: &str) -> Option<u32> {
+        self.devices.iter().find(|d| d.name == dev_name).map(|d| {
+            let max_design_cycles = 1000u32;
+            if d.cycle_count < max_design_cycles {
+                max_design_cycles - d.cycle_count
+            } else {
+                0
+            }
+        })
     }
 
     /// Calculate aggregated multi-battery capacity percentage weighted by energy.
@@ -1099,6 +1240,32 @@ impl LogindElogindSessionEngine {
         self.inhibitors
             .retain(|i| !(i.pid == pid && i.lock_type == lock_type));
         self.inhibitors.len() < initial_len
+    }
+
+    /// Switch active VT virtual terminal and update session `is_active` state flags.
+    pub fn switch_active_vt(&mut self, new_vtnr: u32) -> Result<String, &'static str> {
+        let mut activated_session = None;
+        for session in &mut self.sessions {
+            if session.vtnr == new_vtnr {
+                session.is_active = true;
+                session.state = UserSessionState::Active;
+                activated_session = Some(session.session_id.clone());
+            } else {
+                session.is_active = false;
+                if session.state == UserSessionState::Active {
+                    session.state = UserSessionState::Online;
+                }
+            }
+        }
+
+        if let Some(sess_id) = activated_session {
+            if let Some(seat) = self.seats.iter_mut().find(|s| s.seat_id == "seat0") {
+                seat.active_session_id = Some(sess_id.clone());
+            }
+            Ok(format!("Switched seat0 VT to tty{} (active session: {})", new_vtnr, sess_id))
+        } else {
+            Err("No session associated with target VT number")
+        }
     }
 
     /// Check if a power transition is blocked by active delay/block inhibitors.
@@ -1433,6 +1600,20 @@ impl DbusSystemBusBrokerEngine {
         }
     }
 
+    /// Retrieve subscriber unique IDs registered for a given interface signal.
+    pub fn get_subscribers_for_interface(&self, interface: &str) -> Vec<String> {
+        self.active_subscribers
+            .iter()
+            .filter_map(|(iface, sub)| {
+                if iface == interface {
+                    Some(sub.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
+
     /// Introspect service interface XML.
     pub fn generate_introspection_xml(&self, interface_name: &str) -> String {
         format!(
@@ -1545,7 +1726,7 @@ impl SovereignDeviceManagementParityPrGateway {
 
     /// Perform master end-to-end verification across all sub-engines.
     pub fn run_master_verification(&mut self) -> bool {
-        // 1. Verify udev / hwdb / net names
+        // 1. Verify udev / hwdb / net names / netlink uevents
         let net_if =
             self.udev_devd
                 .generate_predictable_net_ifname(PredictableNetIfType::Ethernet, 3, 0, 0);
@@ -1558,11 +1739,21 @@ impl SovereignDeviceManagementParityPrGateway {
             return false;
         }
 
+        let raw_uevent = b"add@/devices/pci0000:00/0000:00:1f.6/net/eth0\0ACTION=add\0DEVPATH=/devices/pci0000:00/0000:00:1f.6/net/eth0\0SUBSYSTEM=net\0DEVNAME=eth0\0SEQNUM=2345\0";
+        let parsed_uevent = self.udev_devd.parse_netlink_uevent(raw_uevent);
+        if parsed_uevent.is_none() {
+            return false;
+        }
+
         // 2. Verify acpid
         let acpi_evt = self
             .acpid
             .parse_acpi_event_line("button/power PWRF 00000080 00000000");
         if acpi_evt.is_none() || !self.acpid.dispatch_event(&acpi_evt.unwrap()) {
+            return false;
+        }
+        let rpm = self.acpid.evaluate_fan_speed_rpm(ThermalPolicyState::FanSpeedHigh);
+        if rpm != 5500 {
             return false;
         }
 
@@ -1571,12 +1762,20 @@ impl SovereignDeviceManagementParityPrGateway {
         if prof != PowerProfile::Balanced && prof != PowerProfile::Performance {
             return false;
         }
+        let rem_cycles = self.upower.calculate_estimated_remaining_cycles("BAT0");
+        if rem_cycles.is_none() {
+            return false;
+        }
 
         // 4. Verify logind
         let fd_res = self
             .logind
             .take_device_fd("session-1", "/dev/dri/card0", 1000);
         if fd_res.is_err() {
+            return false;
+        }
+        let vt_switch = self.logind.switch_active_vt(1);
+        if vt_switch.is_err() {
             return false;
         }
 
@@ -1724,6 +1923,23 @@ mod tests {
         // Test OpenBSD hotplugd attach script dispatch
         let hotplugd_exec = engine.process_openbsd_hotplugd(1, "sd0", true).unwrap();
         assert!(hotplugd_exec.contains("attach_storage.sh sd0"));
+
+        // Test Netlink KOBJ_UEVENT binary buffer parsing
+        let raw_uevent = b"add@/devices/pci0000:00/0000:00:1f.6/net/eth0\0ACTION=add\0DEVPATH=/devices/pci0000:00/0000:00:1f.6/net/eth0\0SUBSYSTEM=net\0DEVNAME=eth0\0SEQNUM=2345\0";
+        let parsed = engine.parse_netlink_uevent(raw_uevent).unwrap();
+        assert_eq!(parsed.action, DynamicDeviceAction::Add);
+        assert_eq!(parsed.subsystem, "net");
+        assert_eq!(parsed.devname, "eth0");
+        assert_eq!(parsed.seqnum, 2345);
+
+        // Test mdev.conf line parsing
+        assert!(engine.parse_mdev_conf_line("sd[a-z][0-9]* 0:6 660 @/sbin/mdev_storage_hotplug"));
+        assert_eq!(engine.mdev_rules.len(), 2);
+
+        // Test eudev persistent net rule generation
+        let persistent_rule = engine.generate_persistent_net_rule("eth0", &[0x00, 0x11, 0x22, 0x33, 0x44, 0x55]);
+        assert!(persistent_rule.contains("NAME=\"eth0\""));
+        assert!(persistent_rule.contains("00:11:22:33:44:55"));
     }
 
     #[test]
@@ -1745,6 +1961,9 @@ mod tests {
 
         let thermal = acpid.evaluate_thermal_policy(85);
         assert_eq!(thermal, ThermalPolicyState::FanSpeedHigh);
+
+        let fan_rpm = acpid.evaluate_fan_speed_rpm(thermal);
+        assert_eq!(fan_rpm, 5500);
     }
 
     #[test]
@@ -1765,6 +1984,9 @@ mod tests {
 
         let profile = upower.evaluate_power_profile_hint();
         assert_eq!(profile, PowerProfile::Balanced);
+
+        let rem_cycles = upower.calculate_estimated_remaining_cycles("BAT0").unwrap();
+        assert_eq!(rem_cycles, 858);
     }
 
     #[test]
@@ -1804,6 +2026,11 @@ mod tests {
         assert!(logind.release_inhibitor_lock(1234, "sleep"));
         let power_res_after = logind.request_power_transition(SystemPowerTransition::Suspend);
         assert!(power_res_after.is_ok());
+
+        // Test VT switching
+        let vt_res = logind.switch_active_vt(1);
+        assert!(vt_res.is_ok());
+        assert!(logind.sessions[0].is_active);
     }
 
     #[test]
@@ -1865,6 +2092,9 @@ mod tests {
 
         broker.subscribe_signal(":1.100", "org.freedesktop.UPower");
         assert_eq!(broker.active_subscribers.len(), 1);
+
+        let subscribers = broker.get_subscribers_for_interface("org.freedesktop.UPower");
+        assert_eq!(subscribers, vec![":1.100".to_string()]);
 
         let xml = broker.generate_introspection_xml("org.freedesktop.UPower");
         assert!(xml.contains("org.freedesktop.UPower"));
