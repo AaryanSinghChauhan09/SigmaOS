@@ -22,6 +22,7 @@ pub mod interface;
 pub mod kevent_syscalls;
 pub mod namespace_syscalls;
 pub mod posix_linux_bsd_api;
+pub mod sovereign_syscall_development_and_pr_suite;
 pub mod table;
 pub mod user_syscalls;
 pub mod uts_syscalls;
@@ -29,6 +30,7 @@ pub mod uts_syscalls;
 pub use posix_linux_bsd_api::{
     posix_errno, syscall_abi_numbers, PidFdDescriptor, PosixLinuxBsdApiDispatcher,
 };
+pub use sovereign_syscall_development_and_pr_suite::*;
 pub mod abi;
 
 pub mod linux_compat;
