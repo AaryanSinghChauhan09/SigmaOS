@@ -1,62 +1,49 @@
 ## Summary
 
-<!-- What component does this PR improve, add, or regulate? -->
+<!-- What scheduler behavior changed and why? -->
 
 ## Related issue
 
 Closes #<issue-id>
 
-## Storage component
+## Scheduler component
 
-- [ ] Daily CI maintenance
-- [ ] Weekly open-source study & implementation
-- [ ] Biweekly component gap review
-- [ ] Monthly milestone completion
-- [ ] Quarterly architecture / security review
-
-## Component
-
-<!-- kernel, memory, VFS, IPC, security, drivers, packaging, desktop, installer_update, etc. -->
-
-- [ ] Boot / platform
-- [ ] Kernel
-- [ ] Memory
-- [ ] Scheduler
-- [ ] VFS / filesystems
-- [ ] Syscalls
-- [ ] Drivers
-- [ ] Networking
-- [ ] IPC
-- [ ] Security
-- [ ] Userspace
-- [ ] Packaging
-- [ ] Desktop
-- [ ] Installer / Update
+- [ ] Scheduler core
+- [ ] Run queue / PID allocation
+- [ ] fork / clone
+- [ ] exec
+- [ ] Scheduler / run queue
+- [ ] Context switch
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
 
-## Upstream study
+## Recurring task
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly scheduler audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
 
-## Component rules added or enforced
+## Reference behavior
 
-- [ ] New rule
-- [ ] Existing rule enforced
-- [ ] Rule test added
-- [ ] CI gate added
-- [ ] Documentation updated
+<!-- Required for lifecycle, ABI, or scheduler changes -->
 
-## What SigmaOS adopts
-
-<!-- State the upstream principle or mechanism adopted. -->
-
-## What SigmaOS changes or rejects
-
-<!-- State simplifications, deviations, and rejected ideas. -->
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
@@ -69,45 +56,40 @@ Closes #<issue-id>
 - [ ] Regression protection
 - [ ] Security review, if applicable
 
-## Verification
+## Scheduler safety review
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-make check
-make test
-make format
-```
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-reap prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
-## Runtime evidence
+## Evidence
 
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Scheduler benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
 
-## Safety and rollback
+## Status updates
 
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input validated
-- [ ] Package scripts sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Process documentation
+- [ ] Boot matrix, if applicable
 
-## Shell safety review
+## Risks and rollback
 
-- [ ] Shell lexer/parser safety verified.
-- [ ] Builtin contract and exit code policy enforced.
-
-## Reviewer checklist
-
-- [ ] Scope is narrow
-- [ ] Component rules are enforceable
-- [ ] Tests cover the rules
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported Linux/BSD parity claims
-- [ ] Unsafe blocks verified and documented, if applicable
+- Risk:
+- Rollback:
