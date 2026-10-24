@@ -28,6 +28,7 @@ pub mod sovereign_storage_filesystem_innovations_pr_engine;
 pub mod sovereign_storage_filesystem_innovations_v64_pr;
 pub mod sovereign_storage_filesystem_innovations_v65_pr;
 pub mod sovereign_storage_filesystem_innovations_v68_pr;
+pub mod sovereign_storage_filesystem_innovations_v73_pr;
 pub mod sql_engine;
 pub mod virtio;
 pub mod volume;
@@ -49,6 +50,7 @@ pub use sovereign_storage_filesystem_innovations_pr_engine::*;
 pub use sovereign_storage_filesystem_innovations_v64_pr::*;
 pub use sovereign_storage_filesystem_innovations_v65_pr::*;
 pub use sovereign_storage_filesystem_innovations_v68_pr::*;
+pub use sovereign_storage_filesystem_innovations_v73_pr::*;
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };
