@@ -176,6 +176,17 @@ impl WikiDataTransferEngine {
         );
 
         self.feature_specs.insert(
+            "SigmaOSSyscallDevelopmentPlan".to_string(),
+            FeatureMdStatus {
+                spec_name: "36-SigmaOS-Syscall-Development-Plan.md".to_string(),
+                source_path: "wiki/36-SigmaOS-Syscall-Development-Plan.md".to_string(),
+                is_fully_implemented: true,
+                completion_percentage: 100,
+                wiki_mirrored: true,
+            },
+        );
+
+        self.feature_specs.insert(
             "CommandInterpreterPlan".to_string(),
             FeatureMdStatus {
                 spec_name: "34-SigmaOS-Command-Interpreter-Plan.md".to_string(),
@@ -382,6 +393,11 @@ impl WikiDataTransferEngine {
         self.register_spec_file(
             "35-SigmaOS-Device-Driver-Development-Plan.md",
             "SigmaOS Device Driver Development Plan PR",
+            true,
+        );
+        self.register_spec_file(
+            "36-SigmaOS-Syscall-Development-Plan.md",
+            "SigmaOS Syscall Development Plan PR",
             true,
         );
         self.register_spec_file(
@@ -594,6 +610,11 @@ impl PeriodicImprovementGovernor {
             (
                 "Syscalls",
                 "Linux/FreeBSD",
+                ComponentMaturityLevel::Integrated,
+            ),
+            (
+                "Syscalls",
+                "Linux/POSIX/FreeBSD",
                 ComponentMaturityLevel::Integrated,
             ),
             (
