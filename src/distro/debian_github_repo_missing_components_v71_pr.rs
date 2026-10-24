@@ -11,16 +11,8 @@ extern crate alloc;
 #[cfg(not(any(feature = "standalone_test", test)))]
 use alloc::collections::{BTreeMap, BTreeSet};
 #[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::string::{String, ToString};
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use alloc::vec::Vec;
-
-#[cfg(any(feature = "standalone_test", test))]
-use std::collections::{BTreeMap, BTreeSet};
-#[cfg(any(feature = "standalone_test", test))]
-use std::string::{String, ToString};
+use alloc::format;
+#[cfg(not(any(feature = "standalone_test", test)))]use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
@@ -61,30 +53,7 @@ impl DebianDpkgTriggersDeferredExecutionV71PrEngine {
             pending_triggers: vec![
                 "/usr/share/icons".to_string(),
                 "/usr/share/fonts".to_string(),
-            ],
-            processed_triggers: 0,
-        }
-    }
-
-    pub fn activate_trigger(&mut self, path: &str) -> bool {
-        if !self.pending_triggers.iter().any(|t| t == path) {
-            self.pending_triggers.push(path.to_string());
-            true
-        } else {
-            false
-        }
-    }
-
-    pub fn process_deferred_queue(&mut self) -> Vec<String> {
-        let triggers = self.pending_triggers.clone();
-        self.processed_triggers += self.pending_triggers.len() as u32;
-        self.pending_triggers.clear();
-        triggers
-            .into_iter()
-            .map(|t| {
-                if t.contains("icons") {
-                    "hicolor-icon-theme".to_string()
-                } else {
+                "/usr/share/mime".to_string(),                } else {
                     "fontconfig".to_string()
                 }
             })
@@ -161,51 +130,7 @@ impl DebianDebconfDatabaseStateV71PrEngine {
         let mut answers = BTreeMap::new();
         answers.insert("tzdata/zones".to_string(), "UTC".to_string());
         answers.insert("debconf/priority".to_string(), "high".to_string());
-        Self { answers }
-    }
-
-    pub fn get_answer(&self, key: &str) -> Option<&String> {
-        self.answers.get(key)
-    }
-
-    pub fn set_answer(&mut self, key: &str, value: &str) {
-        self.answers.insert(key.to_string(), value.to_string());
-    }
-
-    pub fn generate_pr_spec(&self) -> DebianGithubV71PrSpec {
-        DebianGithubV71PrSpec {
-            pr_id: 7112,
-            component_name: "debconf".to_string(),
-            title: "Debian debconf Multi-Backend Database & Answer Filter V71".to_string(),
-            repo_url: "https://github.com/debian/debconf".to_string(),
-            description:
-                "Implements debconf multi-backend database engine and answer priority filters."
-                    .to_string(),
-            diff_patch: "--- a/Debconf/Db.pm\n+++ b/Debconf/Db.pm\n@@ -1,5 +1,10 @@\n".to_string(),
-            status: DebianPrStatusV71::Staged,
-            pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBCONF-V71".to_string(),
-        }
-    }
-}
-
-pub struct DebianLintianStaticAnalysisV71PrEngine;
-
-impl Default for DebianLintianStaticAnalysisV71PrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl DebianLintianStaticAnalysisV71PrEngine {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn analyze_package_spec(&self, _has_changelog: bool, _has_copyright: bool) -> Vec<String> {
-        vec![
-            "E: missing-copyright-file".to_string(),
-            "W: no-changelog-entry".to_string(),
-        ]
+        answers.insert("debconf/frontend".to_string(), "Noninteractive".to_string());        ]
     }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV71PrSpec {
@@ -271,8 +196,7 @@ impl DebianDebsumsIntegrityAuditorV71PrEngine {
     }
 
     pub fn audit_file(&self, path: &str, expected_hash: &str) -> bool {
-        !path.is_empty() && expected_hash.len() == 64
-    }
+        !path.is_empty() && (expected_hash.len() == 32 || expected_hash.len() == 64)    }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV71PrSpec {
         DebianGithubV71PrSpec {
@@ -302,8 +226,7 @@ impl DebianPopconTelemetryAnalyzerV71PrEngine {
     }
 
     pub fn compile_telemetry_packet(&self) -> String {
-        "popcon_submission: packages_count=3, vendor=SigmaOS".to_string()
-    }
+        "popcon_submission: packages_count=5, vendor=SigmaOS".to_string()    }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV71PrSpec {
         DebianGithubV71PrSpec {
@@ -335,8 +258,7 @@ impl DebianPiupartsPackageSanitySuiteV71PrEngine {
     pub fn verify_purge_cleanliness(&self, post_purge_files: &BTreeSet<String>) -> Vec<String> {
         post_purge_files
             .iter()
-            .filter(|f| !f.starts_with("/etc/debian_version"))
-            .cloned()
+            .filter(|f| !f.starts_with("/etc/debian_version") && !f.starts_with("/etc/os-release"))            .cloned()
             .collect()
     }
 
@@ -368,8 +290,7 @@ impl DebianSubiquityInstallerAutoinstallV71PrEngine {
     }
 
     pub fn parse_autoinstall_hostname(&self) -> Option<String> {
-        Some("sigma-node".to_string())
-    }
+        Some("sigma-node-v71".to_string())    }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV71PrSpec {
         DebianGithubV71PrSpec {
@@ -399,8 +320,7 @@ impl DebianMultiarchAptResolverV71PrEngine {
     }
 
     pub fn resolve_coinstallation(&self, package: &str, arch: &str) -> bool {
-        !package.is_empty() && (arch == "amd64" || arch == "i386")
-    }
+        !package.is_empty() && (arch == "amd64" || arch == "i386" || arch == "arm64")    }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV71PrSpec {
         DebianGithubV71PrSpec {
