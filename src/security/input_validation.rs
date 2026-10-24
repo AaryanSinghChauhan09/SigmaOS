@@ -622,9 +622,10 @@ pub fn validate_ipv4(addr: &[u8]) -> Result<(), ValidationError> {
             if octet_len == 0 && b == b'0' {
                 octet_has_leading_zero = true;
             }
-            octet_val = octet_val
-                .saturating_mul(10)
-                .saturating_add((b - b'0') as u32);
+            octet_val = octet_val * 10 + (b - b'0') as u32;
+            if octet_val > 255 {
+                return Err(ValidationError::OutOfRange);
+            }
             octet_len += 1;
             if octet_len > 3 {
                 return Err(ValidationError::OutOfRange);
@@ -1176,6 +1177,16 @@ mod tests {
             Err(ValidationError::OutOfRange)
         );
         assert_eq!(validate_ipv4(b"..."), Err(ValidationError::OutOfRange));
+    }
+
+    #[test]
+    fn test_ipv4_octet_overflow_and_leading_zeros() {
+        assert_eq!(validate_ipv4(b"999.0.0.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"256.0.0.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"65536.0.0.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
+        assert_eq!(validate_ipv4(b"192.168..1"), Err(ValidationError::OutOfRange));
     }
 
     #[test]
