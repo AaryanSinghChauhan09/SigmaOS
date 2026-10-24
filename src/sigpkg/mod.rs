@@ -443,6 +443,7 @@ pub use crate::package::sovereign_distro_package_advancements_v68_pr::*;
 pub use crate::package::sovereign_distro_package_advancements_v69::*;
 pub use crate::package::sovereign_distro_package_advancements_v69_pr::*;
 pub use crate::package::sovereign_distro_package_advancements_v73::*;
+pub use crate::package::sovereign_distro_package_advancements_v73_pr::*;
 <<<<<<< HEAD
 =======
 pub use crate::package::sovereign_distro_package_advancements_v70::*;
