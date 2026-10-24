@@ -302,7 +302,6 @@ pub use distro::openbsd_missing_components_v61_pr::*;
 pub use distro::openbsd_missing_components_v62_pr::*;
 pub use distro::openbsd_missing_components_v63_pr::*;
 pub use distro::openbsd_missing_components_v64_pr::*;
-<<<<<<< HEAD
 pub use distro::openbsd_missing_components_v65_pr::*;
 >>>>>>> origin/main
 pub use distro::openbsd_missing_components_v66_pr::*;
@@ -705,7 +704,6 @@ pub use crate::distro::open_source_os_missing_components_v70_pr::*;
 pub use crate::distro::open_source_os_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_missing_components_v73_pr::*;
 pub use crate::distro::sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
-=======
 <<<<<<< HEAD
 pub use crate::distro::open_source_os_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_missing_components_v73_pr::*;
@@ -714,7 +712,11 @@ pub use crate::distro::open_source_os_unimplemented_ideas_v69_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v71_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v72_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v70_pr::*;
+pub use crate::distro::open_source_os_missing_components_v72_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v71_pr::*;
+<<<<<<< HEAD
+pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
+=======
 <<<<<<< HEAD
 pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::open_source_os_unimplemented_ideas_v72_pr::*;
