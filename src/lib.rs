@@ -572,6 +572,7 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV68Gateway, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
     VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
+    XenHypervisorV61Engine, XenHypervisorV63Engine, XenHypervisorV67Engine, XenHypervisorV68Engine,
     XenHypervisorV61Engine, XenHypervisorV63Engine, XenHypervisorV67Engine,
     XenHypervisorV68Engine,
 };
