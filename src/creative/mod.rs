@@ -60,6 +60,7 @@ pub mod soundcraft_artcraft_missing_components_v65_pr;
 pub mod soundcraft_artcraft_parity_pr;
 pub mod soundcraft_missing_components_parity_pr;
 pub mod sovereign_artcraft_craftlibs_pr_engine;
+pub mod threedcraft_advancements_v74_pr;
 pub mod threedcraft_artcraft_parity_pr;
 pub mod threedcraft_missing_components_parity_pr;
 pub mod threedcraft_spatial_computing_pr;
@@ -172,6 +173,7 @@ pub use soundcraft::{
 pub use soundcraft_artcraft_missing_components_v65_pr::*;
 pub use soundcraft_artcraft_parity_pr::*;
 pub use soundcraft_missing_components_parity_pr::*;
+pub use threedcraft_advancements_v74_pr::*;
 pub use threedcraft_artcraft_parity_pr::*;
 pub use threedcraft_missing_components_parity_pr::*;
 pub use threedcraft_spatial_computing_pr::*;
