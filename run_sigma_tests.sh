@@ -720,6 +720,13 @@ if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_innovations_v72_pr.rs
     ./build/test_kernel_distro_innovations_v72_pr
 fi
 
+if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_advancements_v75_pr.rs" ]; then
+    echo "Running Sovereign Kernel Open Source OS & Distro Advancements V75 PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_kernel_open_source_os_distro_advancements_v75_pr.rs --edition=2021 -o build/test_kernel_distro_advancements_v75_pr
+    ./build/test_kernel_distro_advancements_v75_pr
+fi
+
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     echo "Running Sovereign Approximation Proxy Firewall test suite..."
     mkdir -p build
