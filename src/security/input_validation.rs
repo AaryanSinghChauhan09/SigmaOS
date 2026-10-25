@@ -453,6 +453,64 @@ pub fn validate_hostname(name: &[u8]) -> Result<(), ValidationError> {
     Ok(())
 }
 
+/// Validate a fully qualified domain name (FQDN) per RFC 1035 / RFC 1123.
+/// Requires at least two dot-separated labels (e.g. `example.com`).
+pub fn validate_domain_name(domain: &[u8]) -> Result<(), ValidationError> {
+    validate_hostname(domain)?;
+    if !domain.contains(&b'.') {
+        return Err(ValidationError::InvalidChars);
+    }
+    Ok(())
+}
+
+/// Validate an email address per RFC 5322 / RFC 5321.
+///
+/// Rules:
+/// - Total length ≤ 254 bytes
+/// - Exactly one `@` character separating local part and domain part
+/// - Local part: 1..=64 bytes, no leading/trailing dot or consecutive dots (`..`)
+/// - Rejects CRLF and control characters to prevent SMTP command and email header injection (CWE-93)
+/// - Domain part validated as a valid FQDN domain name
+pub fn validate_email_address(email: &[u8]) -> Result<(), ValidationError> {
+    if email.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if email.len() > 254 {
+        return Err(ValidationError::TooLong);
+    }
+    for &b in email {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b < 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
+    let mut parts = email.split(|&b| b == b'@');
+    let local = parts.next().ok_or(ValidationError::InvalidChars)?;
+    let domain = parts.next().ok_or(ValidationError::InvalidChars)?;
+    if parts.next().is_some() {
+        // Multiple @ symbols
+        return Err(ValidationError::InvalidChars);
+    }
+
+    if local.is_empty() || local.len() > 64 {
+        return Err(ValidationError::OutOfRange);
+    }
+    if local.starts_with(b".") || local.ends_with(b".") || local.windows(2).any(|w| w == b"..") {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    for &b in local {
+        if !b.is_ascii_alphanumeric() && b != b'.' && b != b'_' && b != b'%' && b != b'+' && b != b'-' {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
+    validate_domain_name(domain)
+}
+
 // ── Environment variables ──────────────────────────────────────────────────
 
 /// Validate an environment variable key per POSIX / IEEE Std 1003.1 (`[a-zA-Z_][a-zA-Z0-9_]*`).
@@ -1019,6 +1077,31 @@ mod tests {
             validate_hostname(&long_hostname),
             Err(ValidationError::TooLong)
         );
+    }
+
+    #[test]
+    fn test_domain_name_validation() {
+        assert_eq!(validate_domain_name(b"example.com"), Ok(()));
+        assert_eq!(validate_domain_name(b"sub.domain.org"), Ok(()));
+        assert_eq!(validate_domain_name(b"localhost"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_domain_name(b"domain."), Err(ValidationError::InvalidChars));
+    }
+
+    #[test]
+    fn test_email_address_validation() {
+        assert_eq!(validate_email_address(b"user@example.com"), Ok(()));
+        assert_eq!(validate_email_address(b"user.name+tag@sub.domain.co.uk"), Ok(()));
+        assert_eq!(validate_email_address(b"admin%123@security.org"), Ok(()));
+
+        // Rejection cases
+        assert_eq!(validate_email_address(b""), Err(ValidationError::EmptyInput));
+        assert_eq!(validate_email_address(b"user@localhost"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email_address(b"user@example@com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email_address(b".user@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email_address(b"user.@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email_address(b"user..name@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email_address(b"user\r\nHeader:injection@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email_address(&[b'u', 0, b'@', b'a', b'.', b'b']), Err(ValidationError::NullByte));
     }
 
     #[test]
