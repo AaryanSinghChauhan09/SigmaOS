@@ -9389,3 +9389,147 @@ engine = "community_portal"
 language = "shell"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/forum-integration"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-software-manager"
+description = "Software manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-software-manager"
+engine = "software_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/software-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-software"
+description = "Software manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-software"
+engine = "software_manager"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/software"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-software"
+description = "Software manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software"
+engine = "software_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/software"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-pacman-alternatives"
+description = "Pacman alternatives for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-alternatives"
+engine = "package_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-alternatives"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-repositories"
+description = "Repository manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repositories"
+engine = "repo_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/repositories"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-repos"
+description = "Repository manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repos"
+engine = "repo_manager"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/repos"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-repos-full"
+description = "Full repository list for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repos-full"
+engine = "repo_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/repos-full"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-system-updater"
+description = "System updater for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-updater"
+engine = "update_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/system-updater"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-customize"
+description = "Customize component for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-customize"
+engine = "customizer"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/customize"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-customize"
+description = "Customize component for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-customize"
+engine = "customizer"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/customize"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-customize"
+description = "Customize component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-customize"
+engine = "customizer"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/customize"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-helpdesk"
+description = "Helpdesk component for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-helpdesk"
+engine = "support_system"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/helpdesk"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-helpdesk"
+description = "Helpdesk component for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-helpdesk"
+engine = "support_system"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/helpdesk"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-helpdesk"
+description = "Helpdesk component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-helpdesk"
+engine = "support_system"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/helpdesk"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-bugtracker"
+description = "Bug tracker for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bugtracker"
+engine = "issue_tracker"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/bugtracker"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-issue-tracker"
+description = "Issue tracker for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-issue-tracker"
+engine = "issue_tracker"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/issue-tracker"]
+visibility = "public"
