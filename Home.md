@@ -118,3 +118,16 @@ SigmaOS includes a comprehensive, hardware-accelerated creative and office suite
 - ⚡ **[[CachyOS-Ecosystem-Parity|CachyOS]]**: Low-latency BORE/EEVDF scheduler, x86-64-v3/v4 AVX optimizations, and ZSTD-compressed ZRAM swap.
 - 🌀 **[[Debian-Ecosystem-Parity|Debian]]**: Rock-solid stability, multi-architecture dependency resolution, and strict DFSG compliance.
 - 🚀 **[[Ready-to-Work-and-Ready-to-Launch|Ready to Work & Ready to Launch]]**: Turnkey hardware autodiscovery, pre-configured productive workspaces (`Super + 1..4`), instant app launcher (`Super + Space`), and 3-second live boot.
+
+---
+
+## 🏆 Omarchy 4.0.5 Integration, Documentation & Parity Suite
+
+SigmaOS incorporates, matches, and surpasses **Omarchy 4.0.5** across every user-facing and architectural feature:
+
+- 📖 **[[The Complete Omarchy 4.0.5 Manual (Chapters 1–51)|Omarchy-Manual-Comprehensive-Guide]]**: Complete 51-chapter authoritative manual mirrored and cross-referenced with native SigmaOS components.
+- 🛠️ **[[449 Binary Utilities Catalog|Omarchy-4.0.5-Complete-Integration-Catalog]]**: Detailed mapping of all 449 `omarchy-*` commands to `#![no_std]` Rust modules.
+- 🎨 **[[22 First-Party Themes Catalog|Omarchy-Themes-Catalog]]**: Complete styling guide for all 22 themes (`catppuccin`, `everforest`, `gruvbox`, `tokyo-night`, `nord`, `matte-black`, `vantablack`, etc.).
+- 📐 **[[File Layout & Architectural Mental Model|Omarchy-File-Layout-and-Mental-Model]]**: Detailed guide on packaging, `/etc/skel` drop-ins, and userland binaries.
+- 🔊 **[[Audio Tuning Architecture|Omarchy-Audio-Tuning]]**: Latency profiling and PipeWire/WirePlumber tuning mechanics.
+- 🔄 **[[Update System & Migrations Engine|Omarchy-Update-Process-and-Migrations]]**: Declarative upgrade pipelines and atomic state rollbacks.
