@@ -12922,3 +12922,139 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/help-tips"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-package-querier"
+description = "Package Querier for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-querier"
+engine = "package_querier"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/package-querier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-package-querier"
+description = "Package Querier for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-querier"
+engine = "package_querier"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-querier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-package-querier"
+description = "Package Querier for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-querier"
+engine = "package_querier"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/package-querier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-dependency-resolver"
+description = "Dependency Resolver for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dependency-resolver"
+engine = "dependency_resolver"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/dependency-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-dependency-resolver"
+description = "Dependency Resolver for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dependency-resolver"
+engine = "dependency_resolver"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/dependency-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-dependency-resolver"
+description = "Dependency Resolver for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dependency-resolver"
+engine = "dependency_resolver"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/dependency-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-transaction-manager"
+description = "Transaction Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-transaction-manager"
+engine = "transaction_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/transaction-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-transaction-manager"
+description = "Transaction Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-transaction-manager"
+engine = "transaction_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/transaction-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-transaction-manager"
+description = "Transaction Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-transaction-manager"
+engine = "transaction_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/transaction-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-repository-browser"
+description = "Repository Browser for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repository-browser"
+engine = "repository_browser"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/repository-browser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-repository-browser"
+description = "Repository Browser for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repository-browser"
+engine = "repository_browser"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/repository-browser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-repository-browser"
+description = "Repository Browser for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repository-browser"
+engine = "repository_browser"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/repository-browser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-keyring-manager"
+description = "Keyring Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-keyring-manager"
+engine = "keyring_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/keyring-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-keyring-manager"
+description = "Keyring Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-keyring-manager"
+engine = "keyring_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/keyring-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-keyring-manager"
+description = "Keyring Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring-manager"
+engine = "keyring_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/keyring-manager"]
+visibility = "public"
+
