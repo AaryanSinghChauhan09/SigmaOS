@@ -11189,3 +11189,192 @@ engine = "security_auditor"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/security-auditor"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-shell"
+description = "Shell for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-shell"
+engine = "shell"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/shell"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sh"
+description = "Shell for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-shell"
+engine = "shell"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/shell"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-sh"
+description = "Shell for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-shell"
+engine = "shell"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/shell"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-terminal"
+description = "Terminal for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal"
+engine = "terminal"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-tm"
+description = "Terminal for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal"
+engine = "terminal"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-tm"
+description = "Terminal for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal"
+engine = "terminal"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/terminal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-command-processor"
+description = "Command processor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-command-processor"
+engine = "command_processor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/command-processor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-cp"
+description = "Command processor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-command-processor"
+engine = "command_processor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/command-processor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-cp"
+description = "Command processor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-command-processor"
+engine = "command_processor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/command-processor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-job-scheduler"
+description = "Job scheduler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-job-scheduler"
+engine = "job_scheduler"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/job-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-js"
+description = "Job scheduler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-job-scheduler"
+engine = "job_scheduler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/job-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-js"
+description = "Job scheduler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-job-scheduler"
+engine = "job_scheduler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/job-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-event-handler"
+description = "Event handler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-event-handler"
+engine = "event_handler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/event-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-eh"
+description = "Event handler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-event-handler"
+engine = "event_handler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/event-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-eh"
+description = "Event handler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-event-handler"
+engine = "event_handler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/event-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-signal-handler"
+description = "Signal handler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-signal-handler"
+engine = "signal_handler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/signal-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sh2"
+description = "Signal handler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-signal-handler"
+engine = "signal_handler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/signal-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-sh2"
+description = "Signal handler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-signal-handler"
+engine = "signal_handler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/signal-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-memory-manager"
+description = "Memory manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-memory-manager"
+engine = "memory_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/memory-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-mm"
+description = "Memory manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-memory-manager"
+engine = "memory_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/memory-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-mm"
+description = "Memory manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-memory-manager"
+engine = "memory_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/memory-manager"]
+visibility = "public"
