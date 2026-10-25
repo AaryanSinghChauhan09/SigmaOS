@@ -13930,3 +13930,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/dependency-tracker"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-system-optimizer"
+description = "System Optimizer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-optimizer"
+engine = "system_optimizer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-optimizer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-optimizer"
+description = "System Optimizer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-optimizer"
+engine = "system_optimizer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-optimizer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-optimizer"
+description = "System Optimizer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-optimizer"
+engine = "system_optimizer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-optimizer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-performance-monitor"
+description = "Performance Monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-performance-monitor"
+engine = "performance_monitor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/performance-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-performance-monitor"
+description = "Performance Monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-performance-monitor"
+engine = "performance_monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/performance-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-performance-monitor"
+description = "Performance Monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor"
+engine = "performance_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/performance-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-resource-manager"
+description = "Resource Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-manager"
+engine = "resource_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/resource-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-resource-manager"
+description = "Resource Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-manager"
+engine = "resource_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/resource-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-resource-manager"
+description = "Resource Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-manager"
+engine = "resource_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/resource-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-load-balancer"
+description = "Load Balancer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-load-balancer"
+engine = "load_balancer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/load-balancer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-load-balancer"
+description = "Load Balancer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-load-balancer"
+engine = "load_balancer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/load-balancer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-load-balancer"
+description = "Load Balancer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-load-balancer"
+engine = "load_balancer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/load-balancer"]
+visibility = "public"
+
