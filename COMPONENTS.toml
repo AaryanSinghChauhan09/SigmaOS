@@ -13603,3 +13603,112 @@ language = "c"
 inspirations = ["https://fedoraproject.org", "https://github.com/fedora/log-rotator"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-theme-installer"
+description = "Theme Installer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-installer"
+engine = "theme_installer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/theme-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-theme-installer"
+description = "Theme Installer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-theme-installer"
+engine = "theme_installer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/theme-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-theme-installer"
+description = "Theme Installer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-theme-installer"
+engine = "theme_installer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/theme-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-icon-packer"
+description = "Icon Packer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-icon-packer"
+engine = "icon_packer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/icon-packer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-icon-packer"
+description = "Icon Packer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-icon-packer"
+engine = "icon_packer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/icon-packer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-icon-packer"
+description = "Icon Packer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-icon-packer"
+engine = "icon_packer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/icon-packer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-wallpaper-setup"
+description = "Wallpaper Setup for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-wallpaper-setup"
+engine = "wallpaper_setup"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/wallpaper-setup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-wallpaper-setup"
+description = "Wallpaper Setup for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-wallpaper-setup"
+engine = "wallpaper_setup"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/wallpaper-setup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-wallpaper-setup"
+description = "Wallpaper Setup for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wallpaper-setup"
+engine = "wallpaper_setup"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/wallpaper-setup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-desktop-config-importer"
+description = "Desktop Config Importer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-desktop-config-importer"
+engine = "desktop_config_importer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/desktop-config-importer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-desktop-config-importer"
+description = "Desktop Config Importer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-desktop-config-importer"
+engine = "desktop_config_importer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/desktop-config-importer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-desktop-config-importer"
+description = "Desktop Config Importer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-desktop-config-importer"
+engine = "desktop_config_importer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/desktop-config-importer"]
+visibility = "public"
+
