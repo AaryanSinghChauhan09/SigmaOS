@@ -1220,7 +1220,29 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v74.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V74 test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v74.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v74_test
+    ./build/sovereign_advancements_v74_test
+fi
+
+if [ -f "src/package/sovereign_distro_package_advancements_v74_pr.rs" ]; then
+    echo "Running Sovereign Universal Package Advancements Suite V74 PR test suite..."
+    mkdir -p build
+    rustc --test src/package/sovereign_distro_package_advancements_v74_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v74_pr_test
+    ./build/sovereign_advancements_v74_pr_test
+fi
+
+if [ -f "tests/test_package_advancements_v74.rs" ]; then
+    echo "Running Integration Test Suite for Sovereign Universal Package Advancements Suite V74..."
+    mkdir -p build
+    rustc --test tests/test_package_advancements_v74.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v74
+    ./build/test_package_advancements_v74
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
