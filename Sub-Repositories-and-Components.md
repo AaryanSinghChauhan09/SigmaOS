@@ -2,7 +2,7 @@
 
 SigmaOS uses a **distributed multi-repository** architecture modelled on **Linux Mint** and **Omarchy Linux**. Every subsystem and userland tool has a specialised repository linked from the central `SigmaOS` umbrella repo. This catalog is generated from the single source of truth in the main repo's `COMPONENTS.toml`, so the repository and this wiki stay **uniform**.
 
-**Total component repositories: 150**
+**Total component repositories: 164**
 
 
 ## Complete Component Catalog
@@ -159,6 +159,11 @@ SigmaOS uses a **distributed multi-repository** architecture modelled on **Linux
 | [`SigmaOS-wiki-extra`](https://github.com/AaryanSinghChauhan09/SigmaOS-wiki-extra) | Supplementary wiki content | native |
 | [`SigmaOS-welcome-screen`](https://github.com/AaryanSinghChauhan09/SigmaOS-welcome-screen) | First-run welcome screen | https://github.com/linuxmint/mintwelcome |
 | [`SigmaOS-indicator-sound2`](https://github.com/AaryanSinghChauhan09/SigmaOS-indicator-sound2) | Sound indicator alt | https://github.com/linuxmint/indicator-sound |
+
+| [`SigmaOS-accessibility`](https://github.com/AaryanSinghChauhan09/SigmaOS-accessibility) | A11y stack: screen reader, magnifier, on-screen keyboard | https://github.com/GNOME/accerciser; https://github.com/linuxmint/orca |
+| [`SigmaOS-gtk-plus`](https://github.com/AaryanSinghChauhan09/SigmaOS-gtk-plus) | GTK+ app suite: Bluetooth manager and media player | https://github.com/linuxmint/blueman; https://github.com/linuxmint/celluloid |
+| [`SigmaOS-sign`](https://github.com/AaryanSinghChauhan09/SigmaOS-sign) | Cryptographic signing & verification tool for packages | https://github.com/omacom/signed |
+| [`SigmaOS-thingy`](https://github.com/AaryanSinghChauhan09/SigmaOS-thingy) | Quick-access panel and document manager utility | https://github.com/linuxmint/thingy |
 
 ## Design Principles Implemented
 
