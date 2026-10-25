@@ -1,17 +1,17 @@
 # Office and Productivity Suites Specification
 
-> **Principles:** ABSTRACTION · CODE REUSABILITY · INTERFACE SEGREGATION · OPEN STANDARD AND INTEROPERABILITY · SEPARATION OF CONCERNS · UNIFORM ACCESS · USER FREEDOM AND CONTROL · ZERO-COPY · FIRST TESTING · LOCALITY OF REFERENCE
+> **Principles:** ABSTRACTION · CODE REUSABILITY · INTERFACE SEGREGATION · OPEN STANDARD AND INTEROPERABILITY · SEPARATION OF CONCERNS · UNIFORM ACCESS · USER FREEDOM AND CONTROL · ZERO-COPY · FIRST TESTING · LOCALITY OF REFERENCE · SECURE DEFAULTS
 
-This specification documents the document processing, spreadsheet calculation, presentation authoring, vector drawing, mathematical typesetting, database frontend, AI-assisted document generation, real-time collaboration, and Craft format interoperability architectures implemented in **SigmaOS** and **[`SigmaOS-office`](https://github.com/AaryanSinghChauhan09/SigmaOS-office)**.
+This specification documents the document processing, spreadsheet calculation, presentation authoring, vector drawing, mathematical typesetting, database frontend, AI-assisted document generation, real-time collaboration, ODF/OOXML packaging, UNO macro scripting, bibliography management, and cryptographic audit architectures implemented in **SigmaOS** and **[`SigmaOS-office`](https://github.com/AaryanSinghChauhan09/SigmaOS-office)**.
 
 ---
 
 ## 1. Office Module Matrix & Upstream Inspirations
 
 SigmaOS delivers native productivity capabilities inspired by leading open-source and modern office suites:
-- **LibreOffice & Apache OpenOffice:** Complete 6-module application parity (Writer, Calc, Impress, Draw, Math, Base) and icon/style themes (`libreoffice-mint`, `libreoffice-breeze`, `libreoffice-elementary`).
+- **LibreOffice & Apache OpenOffice:** Complete 6-module application parity (Writer, Calc, Impress, Draw, Math, Base), ODF/OOXML zip packaging, UNO service manager/scripting model, and icon/style themes (`libreoffice-mint`, `libreoffice-breeze`, `libreoffice-elementary`).
 - **GenOffice:** Offline-first generative AI assistant for prompt-to-document synthesis, presentation generation, summarization, readability analysis, and template expansion.
-- **OnlyOffice:** Operational Transformation (OT) co-authoring engine, document locking, threaded comments, and user presence telemetry.
+- **OnlyOffice:** Operational Transformation (OT) co-authoring engine, document locking, threaded comments, user presence telemetry, JWT session token verification, and SHA-256 Merkle revision chains.
 - **CraftOffice (Craft Creative Suite):** Native `.wcf` (WordCraft), `.gcf` (GridCraft), `.dcf` (DeckCraft), `.vcf` (VectorCraft), `.mcf` (MathCraft), and `.dbcf` (DataCraft) format processing.
 
 | Productivity Domain | LibreOffice / OpenOffice | OnlyOffice Parity | SigmaOS Craft Engine | Supported File Formats |
@@ -24,6 +24,10 @@ SigmaOS delivers native productivity capabilities inspired by leading open-sourc
 | **Relational Database** | Base | Data Connector | `DataCraft` | SQLite, DuckDB, `.dbcf`, ODBC, CSV |
 | **AI Document Assistant** | — | AI Plugins | `GenOffice AI` | AST synthesis, Markdown summaries |
 | **Real-Time Collaboration** | — | Co-authoring Core | `OnlyOffice Collab` | Operational Transform, Threaded Comments |
+| **Package Archival** | ODF / OOXML Filters | Document Builder | `PackageEngine` | Standard `.odt`, `.ods`, `.docx`, `.xlsx` ZIPs |
+| **Automation & Macros** | UNO Service Manager | JS Macro Plugins | `UNOMacroEngine` | Sandboxed Python Scripting, Event Hooks |
+| **Scholarly Publishing** | Bibliography Database | Zotero/Mendeley Plugin | `BibTOCEngine` | BibTeX, APA/IEEE Citations, Footnotes, TOC |
+| **Security & Auditing** | Digital Signatures | JWT Document Tokens | `CollabSecurity` | Merkle Hash Chains, Visual Word Diff, HMAC Tokens |
 
 ---
 
@@ -33,7 +37,7 @@ SigmaOS delivers native productivity capabilities inspired by leading open-sourc
 graph TD
     UI["SigmaOS Zenith Desktop / CLI (sigma-office)"] --> BRIDGE["CraftBridge & Format Filters"]
     
-    subgraph Core Engines (SigmaOS-office)
+    subgraph Core Processing Engines (SigmaOS-office)
         WRITER["DocumentEngine (Writer / WordCraft)"]
         CALC["SpreadsheetEngine (Calc / GridCraft)"]
         IMPRESS["PresentationEngine (Impress / DeckCraft)"]
@@ -42,6 +46,10 @@ graph TD
         BASE["DatabaseEngine (Base / DataCraft)"]
         GENAI["GenOffice AI Assistant"]
         COLLAB["OnlyOffice Collab & OT Engine"]
+        PACKAGING["ODF & OOXML Zip Packagers"]
+        UNO["UNO Macro & Scripting Runtime"]
+        BIB["BibTeX, Footnotes & TOC Engine"]
+        SEC["Merkle Audit & Session Tokens"]
         STYLE["Style & Icon Coverage Planner"]
     end
     
@@ -52,6 +60,14 @@ graph TD
     BRIDGE --> MATH
     BRIDGE --> BASE
     
+    PACKAGING --> WRITER
+    PACKAGING --> CALC
+    
+    UNO --> WRITER
+    UNO --> CALC
+    
+    BIB --> WRITER
+    SEC --> COLLAB
     GENAI --> WRITER
     GENAI --> IMPRESS
     COLLAB --> WRITER
@@ -64,15 +80,18 @@ graph TD
 
 ### 3.1 Document Engine (`src/document_engine.py`)
 - **AST Architecture:** Hierarchical representation of `CharacterStyle`, `TextRun`, `Paragraph` (with alignment, heading levels, and bullet lists), `Table` with `TableCell` spans, and `TrackedChange` logs.
+- **Page Layout:** `PageStyle` handling margins, page orientation (`portrait`/`landscape`), headers, footers, and page counters.
 - **Serialization Filters:** Multi-format conversion to Markdown, JSON, and plain text.
 - **Metrics:** Real-time word count and character count calculation without external dependencies.
 
 ### 3.2 Spreadsheet Engine (`src/spreadsheet_engine.py`)
 - **Cell Matrix:** Sparse 2D coordinate grid parsing alphanumeric coordinates (`A1`, `B5`, `AA10`) to 0-based indices and vice versa.
 - **Formula DAG Evaluator:** Recursive formula evaluator supporting:
-  - Aggregations over ranges: `SUM(A1:B10)`, `AVERAGE(A1:A5)`, `MIN`, `MAX`, `COUNT`.
-  - Conditionals: `IF(condition, true_val, false_val)`.
-  - Arithmetic: Binary expression evaluation (`+`, `-`, `*`, `/`).
+  - Range aggregations: `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, `STDEV`.
+  - OpenFormula Lookups: `VLOOKUP(val, range, col_idx)`, `INDEX(range, row, col)`.
+  - String manipulation: `CONCATENATE`, `UPPER`, `LOWER`, `TRIM`, `LEN`.
+  - Math & Conditionals: `IF(cond, true_val, false_val)`, `ROUND`, `ABS`.
+- **Topological Cycle Detection:** Guard stack detecting circular cell dependencies and raising fail-fast errors instead of recursion limits.
 - **CSV Engine:** Bidirectional streaming CSV export and import.
 
 ### 3.3 Presentation Engine (`src/presentation_engine.py`)
@@ -81,7 +100,7 @@ graph TD
 - **Markdown Interop:** Bidirectional export and import supporting slide delimiters (`---`) and presenter note blocks (`<!-- Notes: ... -->`).
 
 ### 3.4 Vector Draw Engine (`src/vector_draw_engine.py`)
-- **Primitive Shapes:** `Rectangle` (with rounded corners `rx`, `ry`), `Ellipse`, `Line`, `Connector` (with orthogonal routing and arrow markers), and `TextShape`.
+- **Primitive Shapes:** `Rectangle` (with rounded corners `rx`, `ry`), `Ellipse`, `Line`, `Connector` (with orthogonal routing and arrow markers), `TextShape`, `BezierCurve` (cubic Bezier with parameter sampling), and `Polygon`.
 - **Styling & Geometry:** `StrokeStyle` (color, width, dash array), `FillStyle` (opacity, transparency), and 2D affine `Transform` (translate, rotate, scale).
 - **SVG Generation:** Standards-compliant W3C SVG vector export.
 
@@ -107,7 +126,29 @@ graph TD
 - **Threaded Annotations:** `CommentThread` and `CommentReply` trees anchored to document elements.
 - **Telemetry:** Real-time user cursor presence tracking.
 
-### 3.9 Craft Bridge (`src/craft_bridge.py`)
+### 3.9 ODF & OOXML Packaging Engine (`src/odf_ooxml_engine.py`)
+- **OpenDocument Packages:** In-memory construction of valid `.odt` and `.ods` zip archives with uncompressed `mimetype` entries, `META-INF/manifest.xml`, `meta.xml`, `styles.xml`, and `content.xml`.
+- **Office Open XML Packages:** In-memory construction of `.docx` and `.xlsx` zip archives with `[Content_Types].xml`, `_rels/.rels`, `word/document.xml`, `xl/workbook.xml`, and `xl/worksheets/sheet1.xml`.
+- **Package Inspector:** Non-destructive zip inspection sniffing media types and file manifests.
+
+### 3.10 UNO Scripting & Macro Engine (`src/uno_macro_engine.py`)
+- **Service Registry:** `XComponentContext` and `XMultiComponentFactory` providing component life-cycle management and factory instantiation.
+- **Macro Runner:** Execution of registered macro scripts and sandboxed Python snippets with injected `XSCRIPTCONTEXT` and `ThisComponent` globals.
+- **Event Dispatch Bus:** Event binding for document life-cycle hooks (`OnLoad`, `OnSave`, `OnCalculate`).
+
+### 3.11 Bibliography & Table of Contents Engine (`src/bibliography_toc_engine.py`)
+- **Automatic TOC:** Scans document headings to generate numbered hierarchy (`1`, `1.1`, `1.1.1`) and Markdown/text navigation tables with anchors.
+- **BibTeX Parsing:** Regex-based AST parser extracting `@article`, `@book`, and `@inproceedings` citation records.
+- **Citation Formatters:** Standard APA and IEEE reference list generation.
+- **Footnotes & Endnotes:** Anchor-linked monotonic footnote numbering and bottom-of-page rendering.
+
+### 3.12 Collaboration Security Engine (`src/collab_security.py`)
+- **Merkle Hash Chain:** Cryptographic SHA-256 block chaining over all collaborative changesets ensuring untampered edit histories.
+- **JWT Session Tokens:** HMAC-SHA256 authenticated collaboration session tokens with document permissions (`edit`, `comment`, `download`) and TTL expiration.
+- **Visual Diff Engine:** Word-level diffing highlighting deleted (`[DEL: ...]`) and inserted (`[INS: ...]`) text runs.
+- **Watermark Specification:** Overlay configuration for text, opacity, rotation angle, and SVG export.
+
+### 3.13 Craft Bridge (`src/craft_bridge.py`)
 - **Native Packages:** WordCraft (`.wcf`), GridCraft (`.gcf`), DeckCraft (`.dcf`), VectorCraft (`.vcf`), and MathCraft (`.mcf`).
 - **Format Sniffer:** Unified JSON inspection and signature detection.
 
@@ -127,7 +168,7 @@ sigma-office verify mint --available available.txt
 # Document Writer
 sigma-office writer --title "Release Notes" --text "SigmaOS 2.0 Released." --format markdown
 
-# Spreadsheet Calc
+# Spreadsheet Calc (OpenFormula)
 sigma-office calc --set A1=100 --set A2=200 --set A3==SUM(A1:A2)
 
 # Presentation Impress
@@ -150,6 +191,25 @@ sigma-office gen --review "Text to audit for passive voice and grade level."
 # Collaboration & OT
 sigma-office collab --demo
 
+# ODF & OOXML Packaging
+sigma-office odf --type odt --title "Whitepaper"
+sigma-office ooxml --type docx --title "Enterprise Report"
+
+# UNO Macro Scripting
+sigma-office macro --code "result = ThisComponent.title.upper()"
+
+# Table of Contents
+sigma-office toc --sample
+
+# Bibliography & Citations
+sigma-office bib --style APA
+
+# Visual Diff
+sigma-office diff "Original draft text" "Modified draft text"
+
+# Collaboration Security Token
+sigma-office token --generate --doc-id doc_42 --user-id alice
+
 # Deterministic Self-Tests
 sigma-office self-test
 ```
@@ -158,4 +218,4 @@ sigma-office self-test
 
 ## 5. Quality & Deterministic Verification
 
-All 49 unit tests in `tests/` execute in < 0.15 seconds with 0 network calls and 0 filesystem mutations outside temporary directories, strictly adhering to the **Arrange-Act-Assert (AAA)** and **FIRST** principles.
+All 73 unit tests in `tests/` execute in < 0.25 seconds with 0 network calls and 0 filesystem mutations outside temporary directories, strictly adhering to the **Arrange-Act-Assert (AAA)** and **FIRST** principles.
