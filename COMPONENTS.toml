@@ -8831,3 +8831,138 @@ engine = "theme_manager"
 language = "shell"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/icons"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-artwork"
+description = "Mint artwork and visuals for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-artwork"
+engine = "artwork"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/artwork"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-screensavers"
+description = "Screensavers component for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-screensavers"
+engine = "screensaver"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/screensavers"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sub-repo-creator"
+description = "Sub-repo creator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-sub-repo-creator"
+engine = "repo_creator"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/repo-creator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-module-loader"
+description = "Module loader for SigmaOS inspired by Omarchy Linux architecture"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-module-loader"
+engine = "module_loader"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/module-loader"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-keyring"
+description = "Arch Linux keyring integration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring"
+engine = "keyring"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/keyring"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-mirrorlist"
+description = "Arch mirrorlist manager for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mirrorlist"
+engine = "mirror_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/mirrorlist"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-pacman-contrib"
+description = "Pacman contrib tools for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-contrib"
+engine = "package_tools"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-contrib"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-grub-themes-arch"
+description = "Arch Linux themed GRUB for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub-themes-arch"
+engine = "bootloader"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/grub-themes"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-theme-settings"
+description = "Mint theme settings port for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-settings"
+engine = "theme_settings"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/theme-settings"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-systemd-units"
+description = "Custom systemd units for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-systemd-units"
+engine = "systemd_units"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/systemd-units"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-auto-mounter"
+description = "Auto-mounter for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-auto-mounter"
+engine = "auto_mounter"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/auto-mounter"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-fstab-generator"
+description = "Fstab generator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fstab-generator"
+engine = "fstab_generator"
+language = "python"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/fstab"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-systemd-service-manager"
+description = "Systemd service manager for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-service-manager"
+engine = "service_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/systemd"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-drivers-detector"
+description = "Driver detector for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-detector"
+engine = "driver_detector"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/drivers-detector"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-optimization-tweaks"
+description = "Optimization tweaks for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-optimization-tweaks"
+engine = "optimization"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/optimization"]
+visibility = "public"
