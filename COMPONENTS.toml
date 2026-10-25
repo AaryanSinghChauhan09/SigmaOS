@@ -11945,3 +11945,192 @@ engine = "performance_analyzer"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/performance-analyzer"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-updater"
+description = "System updater for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-updater"
+engine = "system_updater"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-updater"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-su"
+description = "System updater for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-updater"
+engine = "system_updater"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-updater"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-su"
+description = "System updater for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-updater"
+engine = "system_updater"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-updater"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-kernel-manager"
+description = "Kernel manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-kernel-manager"
+engine = "kernel_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/kernel-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-km"
+description = "Kernel manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-kernel-manager"
+engine = "kernel_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/kernel-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-km"
+description = "Kernel manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-manager"
+engine = "kernel_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/kernel-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-modules-loader"
+description = "Modules loader for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-modules-loader"
+engine = "modules_loader"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/modules-loader"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ml"
+description = "Modules loader for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-modules-loader"
+engine = "modules_loader"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/modules-loader"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ml"
+description = "Modules loader for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-modules-loader"
+engine = "modules_loader"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/modules-loader"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-service-wrapper"
+description = "Service wrapper for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-wrapper"
+engine = "service_wrapper"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/service-wrapper"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sw"
+description = "Service wrapper for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-wrapper"
+engine = "service_wrapper"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-wrapper"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-sw"
+description = "Service wrapper for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-wrapper"
+engine = "service_wrapper"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/service-wrapper"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-process-handler"
+description = "Process handler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-process-handler"
+engine = "process_handler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/process-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ph"
+description = "Process handler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-process-handler"
+engine = "process_handler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/process-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ph"
+description = "Process handler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-process-handler"
+engine = "process_handler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/process-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-interrupt-handler"
+description = "Interrupt handler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-interrupt-handler"
+engine = "interrupt_handler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/interrupt-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ih"
+description = "Interrupt handler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-interrupt-handler"
+engine = "interrupt_handler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/interrupt-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ih"
+description = "Interrupt handler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-interrupt-handler"
+engine = "interrupt_handler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/interrupt-handler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-context-switcher"
+description = "Context switcher for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-context-switcher"
+engine = "context_switcher"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/context-switcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-cs"
+description = "Context switcher for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-context-switcher"
+engine = "context_switcher"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/context-switcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-cs"
+description = "Context switcher for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-context-switcher"
+engine = "context_switcher"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/context-switcher"]
+visibility = "public"
