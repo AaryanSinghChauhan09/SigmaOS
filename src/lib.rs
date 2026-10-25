@@ -295,6 +295,7 @@ pub use distro::open_source_os_missing_components_v71_pr::*;
 pub use distro::open_source_os_missing_components_v72_pr::*;
 pub use distro::open_source_os_missing_components_v73_pr::*;
 pub use distro::open_source_os_missing_components_v74_pr::*;
+pub use distro::open_source_os_missing_components_v75_pr::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;

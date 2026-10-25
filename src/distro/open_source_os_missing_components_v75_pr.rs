@@ -131,6 +131,135 @@ impl Default for ExtendedBsdParityEngineV75 {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_extended_bsd_parity_engine() {
+        let mut engine = ExtendedBsdParityEngineV75::new();
+        assert!(engine.verify_hardenedbsd_security());
+
+        let station_msg = engine.configure_ghostbsd_station_tweak("SigmaNet-5G");
+        assert!(station_msg.contains("SigmaNet-5G"));
+
+        let mount_msg = engine.mount_nomadbsd_persistence("zdata");
+        assert!(mount_msg.contains("zdata"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-01-EXT-BSD");
+        assert_eq!(manifest.status, OsPrStatusV75::Validated);
+    }
+
+    #[test]
+    fn test_dos_and_legacy_compatibility_engine() {
+        let mut engine = DosAndLegacyCompatibilityEngineV75::new();
+        let (code, msg) = engine.dispatch_int21h(0x09, 0x0100);
+        assert_eq!(code, 0);
+        assert!(msg.contains("0x0100"));
+
+        let basic_out = engine.execute_basic_line("PRINT \"HELLO SIGMA\"");
+        assert!(basic_out.contains("HELLO SIGMA"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-02-DOS-LEGACY");
+    }
+
+    #[test]
+    fn test_multi_kernel_architecture_synthesis_engine() {
+        let engine = MultiKernelArchitectureSynthesisEngineV75::new();
+        assert!(engine.route_kernel_primitive("Linux").contains("eBPF"));
+        assert!(engine.route_kernel_primitive("Hurd").contains("GNU Hurd"));
+        assert!(engine.route_kernel_primitive("Minix").contains("Minix 3"));
+        assert!(engine.route_kernel_primitive("ReactOS").contains("ReactOS NTOSKRNL"));
+        assert!(engine.route_kernel_primitive("XNU").contains("Apple XNU"));
+        assert!(engine.route_kernel_primitive("Unknown").contains("Universal Microkernel Gateway"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-03-MULTI-KERNEL");
+    }
+
+    #[test]
+    fn test_universal_linux_distro_parity_engine() {
+        let engine = UniversalLinuxDistroParityEngineV75::new();
+        assert!(engine.query_distro_feature("ElementaryOS").contains("Granite"));
+        assert!(engine.query_distro_feature("Fedora").contains("OSTree"));
+        assert!(engine.query_distro_feature("Gentoo").contains("Portage"));
+        assert!(engine.query_distro_feature("Kali").contains("eBPF"));
+        assert!(engine.query_distro_feature("Mint").contains("Linux Mint"));
+        assert!(engine.query_distro_feature("Omarchy").contains("Hyprland"));
+        assert!(engine.query_distro_feature("Qubes").contains("Qubes OS"));
+        assert!(engine.query_distro_feature("RedoxOS").contains("Redox OS"));
+        assert!(engine.query_distro_feature("SUSE").contains("Snapper"));
+        assert!(engine.query_distro_feature("Ubuntu").contains("AppArmor"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-04-UNIVERSAL-LINUX");
+    }
+
+    #[test]
+    fn test_office_productivity_suites_parity_engine() {
+        let engine = OfficeProductivitySuitesParityEngineV75::new();
+        assert!(engine.process_document("Writer", "Annual Report").contains("Writer"));
+        assert!(engine.process_document("Calc", "Budget 2026").contains("Calc"));
+        assert!(engine.process_document("Impress", "Keynote").contains("Impress"));
+        assert!(engine.process_document("Draw", "Architecture").contains("Draw"));
+        assert!(engine.process_document("Math", "Equation").contains("Math"));
+        assert!(engine.process_document("Base", "Customers").contains("Base"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-05-OFFICE-SUITES");
+    }
+
+    #[test]
+    fn test_rdbms_data_engineering_parity_engine() {
+        let mut engine = RdbmsDataEngineeringParityEngineV75::new();
+        let query_res = engine.execute_query_pipeline("SELECT count(*) FROM telemetry", true);
+        assert!(query_res.contains("DuckDB"));
+
+        let oltp_res = engine.execute_query_pipeline("UPDATE users SET active = true", false);
+        assert!(oltp_res.contains("PostgreSQL"));
+
+        let schema_res = engine.introspect_schema();
+        assert!(schema_res.contains("DBeaver"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-06-RDBMS-DATA");
+    }
+
+    #[test]
+    fn test_developer_tools_and_ai_agents_parity_engine() {
+        let mut engine = DeveloperToolsAndAiAgentsParityEngineV75::new();
+        assert!(engine.trigger_tool_action("Blender").contains("Blender"));
+        assert!(engine.trigger_tool_action("Cline").contains("Cline"));
+        assert!(engine.trigger_tool_action("CrewAI").contains("CrewAI"));
+        assert!(engine.trigger_tool_action("Docker").contains("Docker"));
+        assert!(engine.trigger_tool_action("LangChain").contains("LangChain"));
+        assert!(engine.trigger_tool_action("OpenClaw").contains("OpenClaw"));
+        assert!(engine.trigger_tool_action("Warp").contains("Warp"));
+
+        let manifest = engine.generate_manifest();
+        assert_eq!(manifest.pr_id, "PR-SIGMA-V75-07-DEV-AI-TOOLS");
+    }
+
+    #[test]
+    fn test_sovereign_universal_parity_synthesis_engine_v75_pr_suite() {
+        let suite = SovereignUniversalParitySynthesisEngineV75PrSuite::new();
+        let manifests = suite.collect_all_manifests();
+        assert_eq!(manifests.len(), 7);
+
+        for m in &manifests {
+            assert_eq!(m.status, OsPrStatusV75::Validated);
+            assert!(!m.patch_diff.is_empty());
+        }
+
+        let summary = suite.generate_suite_summary();
+        assert_eq!(summary.get("suite_version").unwrap(), "v75.0");
+        assert_eq!(summary.get("total_proposals").unwrap(), "7");
+        assert_eq!(summary.get("interoperability_score").unwrap(), "100.0%");
+    }
+}
+
 // ============================================================================
 // 2. DOS & Legacy Compatibility Engine
 // ============================================================================
