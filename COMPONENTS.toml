@@ -12786,3 +12786,139 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/session-manager"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-firewall"
+description = "Firewall Configuration for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-firewall"
+engine = "firewall"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/firewall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-firewall"
+description = "Firewall Configuration for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-firewall"
+engine = "firewall"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/firewall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-firewall"
+description = "Firewall Configuration for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firewall"
+engine = "firewall"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/firewall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-service-manager"
+description = "Service Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-manager"
+engine = "service_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/service-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-service-manager"
+description = "Service Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-manager"
+engine = "service_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-service-manager"
+description = "Service Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-manager"
+engine = "service_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/service-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-log-viewer"
+description = "Log Viewer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-log-viewer"
+engine = "log_viewer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/log-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-log-viewer"
+description = "Log Viewer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-viewer"
+engine = "log_viewer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-log-viewer"
+description = "Log Viewer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log-viewer"
+engine = "log_viewer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/log-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-help-center"
+description = "Help Center for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
+engine = "help_center"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/help-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-help-center"
+description = "Help Center for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help-center"
+engine = "help_center"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/help-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-help-center"
+description = "Help Center for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help-center"
+engine = "help_center"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/help-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-help-tips"
+description = "Help Tips for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-tips"
+engine = "help_tips"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/help-tips"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-help-tips"
+description = "Help Tips for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help-tips"
+engine = "help_tips"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/help-tips"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-help-tips"
+description = "Help Tips for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help-tips"
+engine = "help_tips"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/help-tips"]
+visibility = "public"
+
