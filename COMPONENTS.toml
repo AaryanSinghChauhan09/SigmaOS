@@ -11756,3 +11756,192 @@ engine = "audio_recorder"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/audio-recorder"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-tracer"
+description = "System tracer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-tracer"
+engine = "system_tracer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-tracer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-st"
+description = "System tracer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-tracer"
+engine = "system_tracer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-tracer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-st"
+description = "System tracer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-tracer"
+engine = "system_tracer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-tracer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-performance-monitor"
+description = "Performance monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-performance-monitor"
+engine = "performance_monitor"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/performance-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pm2"
+description = "Performance monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-performance-monitor"
+engine = "performance_monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/performance-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pm2"
+description = "Performance monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-monitor"
+engine = "performance_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/performance-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-resource-manager"
+description = "Resource manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-manager"
+engine = "resource_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/resource-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-rm2"
+description = "Resource manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-manager"
+engine = "resource_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/resource-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-rm2"
+description = "Resource manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-manager"
+engine = "resource_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/resource-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-task-scheduler"
+description = "Task scheduler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-task-scheduler"
+engine = "task_scheduler"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/task-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ts"
+description = "Task scheduler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-task-scheduler"
+engine = "task_scheduler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/task-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ts"
+description = "Task scheduler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-task-scheduler"
+engine = "task_scheduler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/task-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-job-tracker"
+description = "Job tracker for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-job-tracker"
+engine = "job_tracker"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/job-tracker"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-jt"
+description = "Job tracker for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-job-tracker"
+engine = "job_tracker"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/job-tracker"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-jt"
+description = "Job tracker for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-job-tracker"
+engine = "job_tracker"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/job-tracker"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-resource-monitor"
+description = "Resource monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-resource-monitor"
+engine = "resource_monitor"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/resource-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-rm3"
+description = "Resource monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-resource-monitor"
+engine = "resource_monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/resource-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-rm3"
+description = "Resource monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-resource-monitor"
+engine = "resource_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/resource-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-performance-analyzer"
+description = "Performance analyzer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-performance-analyzer"
+engine = "performance_analyzer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/performance-analyzer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pa"
+description = "Performance analyzer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-performance-analyzer"
+engine = "performance_analyzer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/performance-analyzer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pa"
+description = "Performance analyzer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-performance-analyzer"
+engine = "performance_analyzer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/performance-analyzer"]
+visibility = "public"
