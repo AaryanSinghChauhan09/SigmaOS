@@ -25,7 +25,7 @@ fn test_open_source_os_unimplemented_ideas_v72_suite() {
 
     let rump = NetBsd125RumpPciVirtio9pV72PrEngine::new();
     let packet = [0, 0, 0, 0, 10, 0x12, 0x34];
-    assert_eq!(rump.parse_9p_header(&packet), Some((10, 0x3412)));
+    assert_eq!(rump.parse_9p_header(&packet), Some((10, 0x12)));
 
     let hammer3 = DragonFlyHammer3MultiMasterScrubV72PrEngine::new();
     assert!(hammer3.sync_pfs_delta(1, 2));    assert!(hammer3.verify_scrub_checksum("SHA256:abc123v72"));

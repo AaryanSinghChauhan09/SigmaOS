@@ -29,6 +29,7 @@ pub mod effectcraft;
 pub mod effectcraft_artcraft_missing_components_v65_pr;
 pub mod effectcraft_artcraft_missing_components_v66_pr;
 pub mod effectcraft_artcraft_missing_components_v67_pr;
+pub mod effectcraft_artcraft_missing_components_v68_pr;
 pub mod effectcraft_artcraft_parity_pr;
 pub mod effectcraft_missing_components_parity_pr;
 pub mod figcraft;
@@ -142,6 +143,7 @@ pub use effectcraft::{
 };
 pub use effectcraft_artcraft_missing_components_v66_pr::*;
 pub use effectcraft_artcraft_missing_components_v67_pr::*;
+pub use effectcraft_artcraft_missing_components_v68_pr::*;
 pub use effectcraft_artcraft_parity_pr::*;
 pub use effectcraft_missing_components_parity_pr::*;
 pub use figcraft_artcraft_missing_components_v65_pr::*;
