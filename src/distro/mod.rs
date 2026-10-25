@@ -937,3 +937,20 @@ pub use sovereign_release_manager::{
     EolTracker, HighlightCategory, KnownIssue, PointRelease, ReleaseAnnouncement, ReleaseHighlight,
     ReleaseSeries, SovereignReleaseManager, UpgradeMethod, UpgradePath, UpgradeRisk,
 };
+// ─── Extended Modules ──────────────────────────────────────
+pub mod elementary_os;
+pub use elementary_os::*;
+pub mod kali_linux;
+pub use kali_linux::*;
+pub mod parrot_os;
+pub use parrot_os::*;
+pub mod qubes_os;
+pub use qubes_os::*;
+pub mod redox_os;
+pub use redox_os::*;
+pub mod slackware;
+pub use slackware::*;
+pub mod open_suse;
+pub use open_suse::*;
+pub mod ubuntu;
+pub use ubuntu::*;

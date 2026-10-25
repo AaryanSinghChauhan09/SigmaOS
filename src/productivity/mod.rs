@@ -210,3 +210,9 @@ pub use sigma_office::{
     WorkCenterOeeCalculationResult, WorkCenterOeeMetrics, WorkflowAction, WorkflowRule,
     WorkflowTrigger, WorkgroupChannelMessage, WorkgroupTask, WorkspaceSmartSummary,
 };
+
+// ─── Extended Modules ──────────────────────────────────────
+pub mod libreoffice_parity;
+pub use libreoffice_parity::*;
+pub mod openoffice_parity;
+pub use openoffice_parity::*;

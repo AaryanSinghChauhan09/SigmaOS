@@ -70,3 +70,15 @@ pub use dependency_reduction::*;
 pub mod community_missing_tools;
 
 pub mod sigma_trace;
+
+// ─── Extended Modules ──────────────────────────────────────
+pub mod blender_pipeline;
+pub use blender_pipeline::*;
+pub mod docker_oci;
+pub use docker_oci::*;
+pub mod vlc_pipeline;
+pub use vlc_pipeline::*;
+pub mod notepad_sigma;
+pub use notepad_sigma::*;
+pub mod warp_terminal;
+pub use warp_terminal::*;

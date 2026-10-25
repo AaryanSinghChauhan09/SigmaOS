@@ -345,3 +345,23 @@ pub use mint_omarchy_federated_desktop_engine::*;
 pub use mint_omarchy_migration_bridge::*;
 pub use mint_omarchy_pinnacle_ecosystem_suite::*;
 pub use mint_omarchy_vanguard_subsystem_suite::*;
+
+// ─── Extended Modules ──────────────────────────────────────
+pub mod ghost_bsd;
+pub use ghost_bsd::*;
+pub mod nomad_bsd;
+pub use nomad_bsd::*;
+pub mod midnight_bsd;
+pub use midnight_bsd::*;
+pub mod hardened_bsd;
+pub use hardened_bsd::*;
+pub mod liberty_bsd;
+pub use liberty_bsd::*;
+pub mod fury_bsd;
+pub use fury_bsd::*;
+pub mod desktop_bsd;
+pub use desktop_bsd::*;
+pub mod karma_bsd;
+pub use karma_bsd::*;
+pub mod star_bsd;
+pub use star_bsd::*;

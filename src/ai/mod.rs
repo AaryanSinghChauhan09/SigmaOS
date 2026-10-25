@@ -83,3 +83,17 @@ pub use omarchy_cloud_agent_environment::*;
 
 pub mod omarchy_grok_panel_agent;
 pub use omarchy_grok_panel_agent::*;
+
+// ─── Extended Modules ──────────────────────────────────────
+pub mod cline_agent;
+pub use cline_agent::*;
+pub mod codex_cli;
+pub use codex_cli::*;
+pub mod crewai_orchestrator;
+pub use crewai_orchestrator::*;
+pub mod deepseek_coder;
+pub use deepseek_coder::*;
+pub mod hermes_agent;
+pub use hermes_agent::*;
+pub mod langchain_pipeline;
+pub use langchain_pipeline::*;
