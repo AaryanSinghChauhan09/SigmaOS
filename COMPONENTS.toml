@@ -13167,3 +13167,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/task-manager"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-diagnostic-tool"
+description = "Diagnostic Tool for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-diagnostic-tool"
+engine = "diagnostic"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/diagnostic-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-diagnostic-tool"
+description = "Diagnostic Tool for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-diagnostic-tool"
+engine = "diagnostic"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/diagnostic-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-diagnostic-tool"
+description = "Diagnostic Tool for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-diagnostic-tool"
+engine = "diagnostic"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/diagnostic-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-recovery-tool"
+description = "Recovery Tool for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-recovery-tool"
+engine = "recovery"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/recovery-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-recovery-tool"
+description = "Recovery Tool for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-recovery-tool"
+engine = "recovery"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/recovery-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-recovery-tool"
+description = "Recovery Tool for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-recovery-tool"
+engine = "recovery"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/recovery-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-debugger"
+description = "Debugger for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-debugger"
+engine = "debugger"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/debugger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-debugger"
+description = "Debugger for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-debugger"
+engine = "debugger"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/debugger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-debugger"
+description = "Debugger for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-debugger"
+engine = "debugger"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/debugger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-profiler"
+description = "Profiler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-profiler"
+engine = "profiler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/profiler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-profiler"
+description = "Profiler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-profiler"
+engine = "profiler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/profiler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-profiler"
+description = "Profiler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-profiler"
+engine = "profiler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/profiler"]
+visibility = "public"
+
