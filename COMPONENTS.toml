@@ -8966,3 +8966,147 @@ engine = "optimization"
 language = "shell"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/optimization"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-colorschemes"
+description = "Color schemes component for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-colorschemes"
+engine = "theme_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/colorschemes"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-repository"
+description = "Repository manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repository"
+engine = "repo_manager"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/repository"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-repos"
+description = "Arch Linux repos integration for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repos"
+engine = "repo_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/repos"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-pacman-db-updater"
+description = "Pacman database updater for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-db-updater"
+engine = "package_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-grub-configurator"
+description = "GRUB configurator for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-grub-configurator"
+engine = "bootloader"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/gnu-grub"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-look"
+description = "System look and feel for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-look"
+engine = "system_config"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-look"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-core"
+description = "Core components for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-core"
+engine = "core_lib"
+language = "rust"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/core"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-kernel-headers"
+description = "Arch Linux kernel headers for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-headers"
+engine = "kernel_headers"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/kernel-headers"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-drivers-pack"
+description = "Driver pack for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-pack"
+engine = "driver_pack"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/drivers-pack"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-mirrors-maintenance"
+description = "Mirrors maintenance tool for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-mirrors-maintenance"
+engine = "mirror_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/mirrors"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-systemd-presets"
+description = "Systemd presets for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-systemd-presets"
+engine = "systemd_presets"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/systemd/presets"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-update-notifier"
+description = "Update notifier for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-notifier"
+engine = "update_notifier"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-notifier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-keyring-manager"
+description = "Keyring manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-keyring-manager"
+engine = "keyring_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/keyring"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-theme-installer"
+description = "Theme installer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-installer"
+engine = "theme_installer"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/theme-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-philosophy-docs"
+description = "Philosophy documentation for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-philosophy-docs"
+engine = "doc_generator"
+language = "markdown"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/philosophy-docs"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-configs-backup"
+description = "System configs backup for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-configs-backup"
+engine = "config_backup"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-configs"]
+visibility = "public"
