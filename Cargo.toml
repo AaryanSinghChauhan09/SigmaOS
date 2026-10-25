@@ -93,9 +93,13 @@ codegen-units = 16
 panic = "abort"
 
 # Tests inherit dev; keep assertions but shed full DWARF for faster linking.
+# codegen-units = 1 prevents OOM on large codebases (1M LOC) by serialising
+# code-generation; slower to compile but avoids SIGKILL under swap pressure.
 [profile.test]
-opt-level = 1
+opt-level = 0
 debug = "line-tables-only"
+codegen-units = 1
+incremental = false
 
 [profile.release]
 opt-level = 3

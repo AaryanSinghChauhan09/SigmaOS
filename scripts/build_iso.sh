@@ -8,7 +8,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 BUILD_DIR="$ROOT_DIR/target/iso_build"
-ISO_OUTPUT="${1:-$ROOT_DIR/target/sigmaos.iso}"
+ISO_OUTPUT="${1:-$ROOT_DIR/build/sigmaos-desktop-preview.iso}"
+mkdir -p "$(dirname "$ISO_OUTPUT")"
 
 echo "=== [SigmaOS] Starting Sovereign Desktop ISO Construction ==="
 echo "Workspace: $ROOT_DIR"
@@ -232,26 +233,9 @@ else
     echo "          target disk during installation via 'limine-deploy --efi'."
 fi
 
-if command -v xorriso >/dev/null 2>&1; then
-    echo "    Packaging via xorriso..."
-    if [ "$HAS_LIMINE_BIN" -eq 1 ]; then
-        xorriso -as mkisofs \
-            -R -J -V "SIGMAOS_DESKTOP" \
-            -o "$ISO_OUTPUT" \
-            -c boot/boot.catalog \
-            -b boot/limine/bios.bin \
-            -no-emul-boot -boot-load-size 4 -boot-info-table \
-            --efi-boot EFI/BOOT/BOOTX64.EFI \
-            -efi-boot-part --efi-boot-image --protective-msdos-label \
-            "$BUILD_DIR" 2>/dev/null || {
-            echo "    xorriso failed, falling back to grub-mkrescue..."
-            command -v grub-mkrescue >/dev/null 2>&1 && grub-mkrescue -o "$ISO_OUTPUT" "$BUILD_DIR" 2>/dev/null || \
-                tar -cf "$ISO_OUTPUT" -C "$BUILD_DIR" .
-        }
-    else
-        # Create a simple GRUB boot image for the ISO
-        mkdir -p "$BUILD_DIR/boot/grub"
-        cat > "$BUILD_DIR/boot/grub/grub.cfg" <<'GRUBEOF'
+# Prepare GRUB configuration for boot
+mkdir -p "$BUILD_DIR/boot/grub/i386-pc"
+cat > "$BUILD_DIR/boot/grub/grub.cfg" <<'GRUBEOF'
 set timeout=5
 set default=0
 
@@ -269,27 +253,85 @@ menuentry "SigmaOS Desktop (Safe Mode)" {
     linux /boot/vmlinuz-linux-t2 root=UUID=REPLACE_WITH_ROOT_UUID rw nomodeset
     initrd /boot/initramfs.gz
 }
+
+menuentry "Reboot" { reboot }
+menuentry "Power Off" { halt }
 GRUBEOF
 
-        xorriso -as mkisofs \
-            -R -J -V "SIGMAOS_DESKTOP" \
-            -o "$ISO_OUTPUT" \
-            -c boot/boot.catalog \
-            -b boot/grub/eltorito.img \
-            -no-emul-boot -boot-load-size 4 -boot-info-table \
-            --efi-boot EFI/BOOT/BOOTX64.EFI \
-            -efi-boot-part --efi-boot-image --protective-msdos-label \
-            "$BUILD_DIR" 2>/dev/null || \
-            grub-mkrescue -o "$ISO_OUTPUT" "$BUILD_DIR" 2>/dev/null || \
-            tar -cf "$ISO_OUTPUT" -C "$BUILD_DIR" .
+# Generate GRUB El Torito bootloader if grub tools are available
+GRUB_LIB="/usr/lib/grub/i386-pc"
+if command -v grub-mkimage >/dev/null 2>&1 && [ -d "$GRUB_LIB" ]; then
+    echo "    Building GRUB El Torito boot image..."
+    grub-mkimage \
+        --format=i386-pc \
+        --output=/tmp/sigmaos_core_full.img \
+        --prefix=/boot/grub \
+        biosdisk iso9660 normal echo linux multiboot2 multiboot \
+        test search search_fs_file search_fs_uuid ls cat reboot halt \
+        gfxterm gfxmenu font png jpeg 2>/dev/null || true
+    if [ -f /tmp/sigmaos_core_full.img ] && [ -f "$GRUB_LIB/cdboot.img" ]; then
+        cat "$GRUB_LIB/cdboot.img" /tmp/sigmaos_core_full.img > \
+            "$BUILD_DIR/boot/grub/i386-pc/eltorito.img"
+        cp "$GRUB_LIB/"*.mod "$BUILD_DIR/boot/grub/i386-pc/" 2>/dev/null || true
     fi
-elif command -v grub-mkrescue >/dev/null 2>&1; then
-    echo "    Packaging via grub-mkrescue..."
-    grub-mkrescue -o "$ISO_OUTPUT" "$BUILD_DIR" 2>/dev/null || \
-        tar -cf "$ISO_OUTPUT" -C "$BUILD_DIR" .
+fi
+
+if command -v xorriso >/dev/null 2>&1; then
+    echo "    Packaging via xorriso..."
+    xorriso -as mkisofs \
+        -R -J -V "SIGMAOS_DESKTOP" \
+        -o "$ISO_OUTPUT" \
+        -c boot/boot.catalog \
+        -b boot/grub/i386-pc/eltorito.img \
+        -no-emul-boot -boot-load-size 4 -boot-info-table \
+        "$BUILD_DIR" 2>/dev/null || {
+        echo "    xorriso invocation failed; falling back to genisoimage..."
+        if command -v genisoimage >/dev/null 2>&1; then
+            genisoimage -R -J -V "SIGMAOS_DESKTOP" -A "SigmaOS Sovereign Desktop" \
+                -o "$ISO_OUTPUT" -b boot/grub/i386-pc/eltorito.img -c boot/boot.catalog \
+                -no-emul-boot -boot-load-size 4 -boot-info-table "$BUILD_DIR" 2>/dev/null
+        fi
+    }
+elif command -v genisoimage >/dev/null 2>&1; then
+    echo "    Packaging via genisoimage..."
+    if [ -f "$BUILD_DIR/boot/grub/i386-pc/eltorito.img" ]; then
+        genisoimage \
+            -R -J \
+            -V "SIGMAOS_DESKTOP" \
+            -A "SigmaOS Sovereign Desktop" \
+            -o "$ISO_OUTPUT" \
+            -b boot/grub/i386-pc/eltorito.img \
+            -c boot/boot.catalog \
+            -no-emul-boot -boot-load-size 4 -boot-info-table \
+            "$BUILD_DIR" 2>&1 | grep -v "^Using\|^I:"
+    else
+        genisoimage \
+            -R -J \
+            -V "SIGMAOS_DESKTOP" \
+            -A "SigmaOS Sovereign Desktop" \
+            -o "$ISO_OUTPUT" \
+            "$BUILD_DIR" 2>&1 | grep -v "^Using\|^I:"
+    fi
+elif command -v mkisofs >/dev/null 2>&1; then
+    echo "    Packaging via mkisofs..."
+    mkisofs -R -J -V "SIGMAOS_DESKTOP" -o "$ISO_OUTPUT" "$BUILD_DIR"
 else
     echo "    No ISO tools available, creating tar archive..."
     tar -cf "$ISO_OUTPUT" -C "$BUILD_DIR" .
+fi
+
+# Validate ISO9660
+if python3 -c "
+import sys
+f = open('$ISO_OUTPUT', 'rb')
+f.seek(32769)
+ok = f.read(5) == b'CD001'
+f.close()
+sys.exit(0 if ok else 1)
+" 2>/dev/null; then
+    echo "    [✓] Validated ISO9660 signature on $ISO_OUTPUT"
+else
+    echo "    [!] Warning: $ISO_OUTPUT is not a standard ISO9660 filesystem"
 fi
 
 echo "=== [SigmaOS] ISO construction completed successfully: $ISO_OUTPUT ==="

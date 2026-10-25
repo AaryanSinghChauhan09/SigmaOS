@@ -44,4 +44,3 @@ echo "  sigpkg pacman -Syu"
 echo "  sigpkg pacman -S neovim rust"
 echo "  sigpkg query kernel"
 echo ""
-EOF

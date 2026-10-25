@@ -1,4 +1,4 @@
-.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub run run-stub launch launch-check start clean help
+.PHONY: all check check-fast test test-fast bench fmt fmt-fix verify iso iso-stub run run-stub launch launch-check start mint arch omarchy boot-img clean help
 
 CARGO ?= cargo
 RUSTC ?= rustc
@@ -50,10 +50,12 @@ test:
 	exit $$rc
 
 # 5. Cargo-native unit tests (fast lane: parallel test harness)
+# NOTE: CARGO_BUILD_JOBS=8 prevents OOM on 16 GiB machines for the ~1M-LOC
+# codebase. The profile.test in Cargo.toml forces codegen-units=1 for safety.
 test-fast:
-	@echo "==> Running cargo unit tests in parallel..."
+	@echo "==> Running cargo unit tests (memory-safe: CARGO_BUILD_JOBS=8)..."
 	@start=$$(date +%s); \
-	$(CARGO) test --lib; \
+	CARGO_BUILD_JOBS=8 $(CARGO) test --lib; \
 	rc=$$?; \
 	echo "==> cargo tests finished in $$(( $$(date +%s) - start ))s"; \
 	exit $$rc
@@ -84,8 +86,7 @@ bin/sigmaos: src/bin/sigmaos.rs
 iso: kernel
 	@echo "==> Building SigmaOS Desktop Preview ISO image..."
 	@mkdir -p build
-	@echo "Stage 1: Staging kernel, initramfs, and bootloader..."
-	@bash scripts/build_iso.sh
+	@bash scripts/build_iso.sh build/sigmaos-desktop-preview.iso
 
 # 8b. Build minimal stub ISO (GALL'S LAW: working simple > broken complex)
 # Uses GRUB2 + genisoimage; no nasm required. Boots immediately in QEMU.
@@ -93,6 +94,11 @@ iso-stub: kernel
 	@echo "==> Building SigmaOS Stub ISO (GRUB2-based, with Multiboot kernel)..."
 	@mkdir -p build
 	@bash scripts/build_stub_iso.sh
+
+# 8c. Build standalone UEFI boot image (FAT32 EFI System Partition)
+boot-img:
+	@echo "==> Synthesizing SigmaOS Bare-Metal UEFI Boot Image..."
+	@bash scripts/build_standalone_boot_image.sh
 
 # 9. Run SigmaOS (boots in QEMU if installed; gracefully falls back to native workstation)
 run: iso-stub bin/sigmaos
@@ -120,19 +126,33 @@ launch: bin/sigmaos
 
 start: launch
 
+# 12. Distro personas
+mint:
+	@bash scripts/launch_mint_persona.sh
+
+arch:
+	@bash scripts/launch_arch_persona.sh
+
+omarchy:
+	@bash scripts/launch_omarchy_persona.sh
+
 help:
 	@echo "SigmaOS Unified Build & Test Interface"
 	@echo "  make check        - Static analysis via cargo check (timed)"
 	@echo "  make check-fast   - Cached quick-lane cargo check"
 	@echo "  make test         - Execute native standalone test suites (timed)"
-	@echo "  make test-fast    - Parallel cargo unit tests (timed)"
+	@echo "  make test-fast    - Memory-safe cargo unit tests (timed)"
 	@echo "  make bench        - Benchmarks on thin-LTO release-fast profile"
 	@echo "  make fmt          - Verify formatting style (strict)"
 	@echo "  make fmt-fix      - Auto-apply rustfmt across workspace"
-	@echo "  make iso          - Full ISO build (requires compiled Rust kernel)"
+	@echo "  make iso          - Full Desktop ISO build (GRUB2 + initramfs + installer) ✓"
 	@echo "  make iso-stub     - Stub ISO build (GRUB2, boots NOW in QEMU) ✓"
-	@echo "  make run          - Boot real ISO in QEMU (requires full iso)"
-	@echo "  make run-stub     - Boot stub ISO in QEMU (works immediately!)  ✓"
+	@echo "  make boot-img     - Standalone UEFI ESP image (FAT32 BOOTX64.EFI) ✓"
+	@echo "  make run          - Boot desktop ISO in QEMU / native workstation ✓"
+	@echo "  make run-stub     - Boot stub ISO in QEMU ✓"
 	@echo "  make launch       - Launch interactive SigmaOS Workstation Dashboard ✓"
 	@echo "  make launch-check - Full launch readiness validation"
+	@echo "  make mint         - Launch Linux Mint Ergonomic Persona ✓"
+	@echo "  make arch         - Launch Arch Linux Minimalist Persona ✓"
+	@echo "  make omarchy      - Launch Omarchy Linux Aesthetic Persona ✓"
 	@echo "  make clean        - Remove build artifacts"

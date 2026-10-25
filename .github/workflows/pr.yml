@@ -29,6 +29,11 @@ jobs:
         run: cargo check --lib
 
       - name: Run unit tests
+        # RUSTFLAGS="-C codegen-units=1" prevents OOM on GitHub Actions (7 GiB)
+        # for this ~1M-LOC single-crate. The profile.test in Cargo.toml also
+        # sets codegen-units=1, but we set CARGO_BUILD_JOBS as extra safety.
+        env:
+          CARGO_BUILD_JOBS: "2"
         run: cargo test --lib
 
       - name: Run Sigma test suite

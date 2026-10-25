@@ -37,4 +37,3 @@ echo "  sigpkg apt update"
 echo "  sigpkg apt install libreoffice-style-mint"
 echo "  bash bin/sigmaos-shell summon settings"
 echo ""
-EOF

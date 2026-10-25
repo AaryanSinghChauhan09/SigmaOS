@@ -38,4 +38,3 @@ echo "  Super + D      : Wofi Application Launcher"
 echo "  Super + Q      : Close Focused Window"
 echo "  Super + M      : Exit Session"
 echo ""
-EOF

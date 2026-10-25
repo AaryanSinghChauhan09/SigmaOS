@@ -95,9 +95,12 @@ interactive_menu() {
     echo "  [6] Inspect Linux & BSD Parity Architectures"
     echo "  [7] Run Guided Installation Wizard (Archinstall/Calamares style)"
     echo "  [8] Run SigmaOS Native Standalone Test Suite"
+    echo "  [m] Launch Linux Mint Ergonomic Persona (Cinnamon / XApps)"
+    echo "  [a] Launch Arch Linux Minimalist Persona (Pacman / Rolling Release)"
+    echo "  [o] Launch Omarchy Linux Aesthetic Persona (Hyprland / Wallust)"
     echo "  [q] Quit"
     echo ""
-    read -p "Select [1-8, q]: " choice
+    read -p "Select [1-8, m, a, o, q]: " choice
     case "$choice" in
         1)
             echo ""
@@ -127,7 +130,13 @@ interactive_menu() {
             ;;
         4)
             echo ""
-            bash "$ROOT_DIR/scripts/run_qemu.sh" || true
+            if ! command -v qemu-system-x86_64 >/dev/null 2>&1; then
+                echo -e "${YELLOW}[!] qemu-system-x86_64 not found.${NC}"
+                echo "    Install with: sudo apt-get install qemu-system-x86"
+                echo "    Or run:       bash ${ROOT_DIR}/scripts/setup.sh"
+            else
+                bash "$ROOT_DIR/scripts/run_qemu.sh" || true
+            fi
             read -p "Press Enter to return to menu..."
             interactive_menu
             ;;
@@ -164,6 +173,24 @@ interactive_menu() {
             read -p "Press Enter to return to menu..."
             interactive_menu
             ;;
+        m|M)
+            echo ""
+            bash "$ROOT_DIR/scripts/launch_mint_persona.sh"
+            read -p "Press Enter to return to menu..."
+            interactive_menu
+            ;;
+        a|A)
+            echo ""
+            bash "$ROOT_DIR/scripts/launch_arch_persona.sh"
+            read -p "Press Enter to return to menu..."
+            interactive_menu
+            ;;
+        o|O)
+            echo ""
+            bash "$ROOT_DIR/scripts/launch_omarchy_persona.sh"
+            read -p "Press Enter to return to menu..."
+            interactive_menu
+            ;;
         q|Q)
             echo "Exiting SigmaOS Workstation launcher."
             exit 0
@@ -196,6 +223,18 @@ if [ $# -gt 0 ]; then
             ;;
         --check)
             bash "$ROOT_DIR/scripts/check_launch_ready.sh"
+            exit 0
+            ;;
+        --mint)
+            bash "$ROOT_DIR/scripts/launch_mint_persona.sh"
+            exit 0
+            ;;
+        --arch)
+            bash "$ROOT_DIR/scripts/launch_arch_persona.sh"
+            exit 0
+            ;;
+        --omarchy)
+            bash "$ROOT_DIR/scripts/launch_omarchy_persona.sh"
             exit 0
             ;;
         *)
