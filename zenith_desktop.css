@@ -1581,6 +1581,30 @@ body.high-contrast-active .keyboard-focus {
     -webkit-backdrop-filter: blur(12px);
     animation: toast-in 0.25s ease-out;
     transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.kernel-toast-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 6px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.kernel-toast-close:hover,
+.kernel-toast-close:focus-visible {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .kernel-toast.fade-out {
