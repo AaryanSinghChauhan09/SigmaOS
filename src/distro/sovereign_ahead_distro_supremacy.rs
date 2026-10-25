@@ -186,6 +186,15 @@ impl SovereignPredictiveSchedExtEngine {
             (100u64.saturating_sub(avg_latency / 100)) as u32
         }
     }
+
+    /// Retrieve list of PIDs currently scheduled under real-time boost.
+    pub fn get_realtime_boosted_pids(&self) -> Vec<usize> {
+        self.tasks
+            .iter()
+            .filter(|(_, t)| t.is_realtime_boosted)
+            .map(|(&pid, _)| pid)
+            .collect()
+    }
 }
 
 impl Default for SovereignPredictiveSchedExtEngine {
@@ -799,6 +808,19 @@ impl SovereignAheadOfDistrosSuite {
 
         sched_ok && cas_ok && cap_ok && storage_ok && microarch_ok && mesh_ok
     }
+
+    /// Compute overall distro supremacy index score (0..100).
+    pub fn compute_distro_supremacy_index(&self) -> u32 {
+        let sched_score = self.predictive_sched.compute_quantum_scheduler_efficiency_index();
+        let storage_score = u32::from(self.hammer2_storage.disk_health_percent);
+        let microarch_score = if self.microarch_tuner.detected_tier == MicroarchTier::X86_64V4 {
+            100
+        } else {
+            80
+        };
+
+        (sched_score + storage_score + microarch_score) / 3
+    }
 }
 
 impl Default for SovereignAheadOfDistrosSuite {
@@ -930,5 +952,16 @@ mod tests {
     fn test_ahead_of_distros_suite() {
         let mut suite = SovereignAheadOfDistrosSuite::new();
         assert!(suite.verify_unbroken_distro_dominance());
+        assert!(suite.compute_distro_supremacy_index() >= 90);
+    }
+
+    #[test]
+    fn test_realtime_boosted_pids() {
+        let mut engine = SovereignPredictiveSchedExtEngine::new(PredictiveSchedPolicy::ScxBpfland);
+        engine.register_task(3001, "proc1", 100, 0);
+        engine.register_task(3002, "proc2", 200, 0);
+        engine.boost_realtime(3001);
+        let boosted = engine.get_realtime_boosted_pids();
+        assert_eq!(boosted, vec![3001]);
     }
 }
