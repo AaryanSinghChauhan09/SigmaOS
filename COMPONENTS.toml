@@ -9704,3 +9704,174 @@ engine = "video_manager"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/video"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-security"
+description = "Security manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-security"
+engine = "security"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/security"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-security"
+description = "Security manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security"
+engine = "security"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/security"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-security"
+description = "Security manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security"
+engine = "security"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/security"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-firewall"
+description = "Firewall component for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-firewall"
+engine = "firewall"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/nftables"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-antivirus"
+description = "Antivirus component for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-antivirus"
+engine = "security"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/clamav"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-subprocess"
+description = "Subprocess manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-subprocess"
+engine = "subprocess_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/subprocess"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-subprocess"
+description = "Subprocess manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-subprocess"
+engine = "subprocess_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/subprocess"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-dev-tools"
+description = "Development tools for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dev-tools"
+engine = "dev_tools"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/dev-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-dev-tools"
+description = "Development tools for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dev-tools"
+engine = "dev_tools"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/dev-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-dev-tools"
+description = "Development tools for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dev-tools"
+engine = "dev_tools"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/dev-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-info"
+description = "System info for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-info"
+engine = "system_info"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-info"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-info"
+description = "System info for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-info"
+engine = "system_info"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-info"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-info"
+description = "System info for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-info"
+engine = "system_info"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-info"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-terminal"
+description = "Terminal emulator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal"
+engine = "terminal"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-terminal"
+description = "Terminal emulator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal"
+engine = "terminal"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-terminal"
+description = "Terminal emulator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal"
+engine = "terminal"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/terminal"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-wallpaper"
+description = "Wallpaper setter for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-wallpaper"
+engine = "wallpaper"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/wallpaper"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-wallpaper"
+description = "Wallpaper setter for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-wallpaper"
+engine = "wallpaper"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/wallpaper"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-wallpaper"
+description = "Wallpaper setter for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wallpaper"
+engine = "wallpaper"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/wallpaper"]
+visibility = "public"
