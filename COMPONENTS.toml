@@ -11000,3 +11000,192 @@ engine = "appstream"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/appstream"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-security"
+description = "System security for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-security"
+engine = "system_security"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-security"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ss"
+description = "System security for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-security"
+engine = "system_security"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-security"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ss"
+description = "System security for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-security"
+engine = "system_security"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-security"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-antivirus"
+description = "Antivirus for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-antivirus"
+engine = "antivirus"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/antivirus"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-av"
+description = "Antivirus for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-antivirus"
+engine = "antivirus"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/antivirus"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-av"
+description = "Antivirus for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-antivirus"
+engine = "antivirus"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/antivirus"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-firewall"
+description = "Firewall for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-firewall"
+engine = "firewall"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/firewall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-fw"
+description = "Firewall for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-firewall"
+engine = "firewall"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/firewall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-fw"
+description = "Firewall for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-firewall"
+engine = "firewall"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/firewall"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-crypto-wallet"
+description = "Crypto wallet for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-crypto-wallet"
+engine = "crypto_wallet"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/crypto-wallet"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-cw"
+description = "Crypto wallet for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-crypto-wallet"
+engine = "crypto_wallet"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/crypto-wallet"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-cw"
+description = "Crypto wallet for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-crypto-wallet"
+engine = "crypto_wallet"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/crypto-wallet"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-password-manager"
+description = "Password manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-password-manager"
+engine = "password_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/password-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pm2"
+description = "Password manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-password-manager"
+engine = "password_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/password-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pm2"
+description = "Password manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-password-manager"
+engine = "password_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/password-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-encryption-tool"
+description = "Encryption tool for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-encryption-tool"
+engine = "encryption_tool"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/encryption-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-et"
+description = "Encryption tool for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-encryption-tool"
+engine = "encryption_tool"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/encryption-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-et"
+description = "Encryption tool for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-encryption-tool"
+engine = "encryption_tool"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/encryption-tool"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-security-auditor"
+description = "Security auditor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-security-auditor"
+engine = "security_auditor"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/security-auditor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sa"
+description = "Security auditor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-security-auditor"
+engine = "security_auditor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/security-auditor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-sa"
+description = "Security auditor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-security-auditor"
+engine = "security_auditor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/security-auditor"]
+visibility = "public"
