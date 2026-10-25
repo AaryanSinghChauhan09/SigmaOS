@@ -10055,3 +10055,192 @@ engine = "window_manager"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/window-maximizer"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-terminal-emulator"
+description = "Terminal emulator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal-emulator"
+engine = "terminal"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal-emulator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-terminal-emulator"
+description = "Terminal emulator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-emulator"
+engine = "terminal"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal-emulator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-terminal-emulator"
+description = "Terminal emulator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-emulator"
+engine = "terminal"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/terminal-emulator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-monitor"
+description = "System monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-monitor"
+engine = "monitor"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-monitor"
+description = "System monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
+engine = "monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-monitor"
+description = "System monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
+engine = "monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-package-installer"
+description = "Package installer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-installer"
+engine = "installer"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/package-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-installer"
+description = "Package installer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-installer"
+engine = "installer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-installer"
+description = "Package installer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-installer"
+engine = "installer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-service-manager"
+description = "Service manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-manager"
+engine = "service_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/service-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-service"
+description = "Service manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service"
+engine = "service_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-service"
+description = "Service manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service"
+engine = "service_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/service-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-log-viewer"
+description = "Log viewer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-log-viewer"
+engine = "log_viewer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/log-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-log"
+description = "Log viewer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log"
+engine = "log_viewer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-log"
+description = "Log viewer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log"
+engine = "log_viewer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/log-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-update-manager"
+description = "Update manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-manager"
+engine = "update_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-update"
+description = "Update manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update"
+engine = "update_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-update"
+description = "Update manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update"
+engine = "update_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/update-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-help-center"
+description = "Help center for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
+engine = "support_system"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/help-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-help"
+description = "Help center for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-help"
+engine = "support_system"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/help-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-help"
+description = "Help center for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-help"
+engine = "support_system"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/help-center"]
+visibility = "public"
