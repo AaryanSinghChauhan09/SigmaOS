@@ -1870,6 +1870,13 @@ if [ -f "src/distro/freebsd_missing_components_v65_pr.rs" ]; then
     ./build/test_freebsd_v65_pr
 fi
 
+if [ -f "src/distro/freebsd_missing_components_v66_pr.rs" ]; then
+    echo "Running FreeBSD Missing Components V66 PR Suite..."
+    mkdir -p build
+    rustc --test src/distro/freebsd_missing_components_v66_pr.rs --edition=2021 -o build/test_freebsd_v66_pr
+    ./build/test_freebsd_v66_pr
+fi
+
 if [ -f "src/distro/open_source_os_missing_components_v62_pr.rs" ]; then
     echo "Running Open Source OS Missing Components V62 PR Suite..."
     mkdir -p build
