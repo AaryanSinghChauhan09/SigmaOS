@@ -4,6 +4,39 @@
 use std::fs;
 use std::path::Path;
 
+#[path = "../src/governance/shell_lifecycle_program.rs"]
+mod shell_lifecycle_program;
+
+use shell_lifecycle_program::{
+    ShellAcceptanceGate, ShellLifecycleProgramEngine,
+};
+
+#[test]
+fn test_shell_lifecycle_program_engine_verification() {
+    let engine = ShellLifecycleProgramEngine::new();
+    assert_eq!(engine.tasks().len(), 13);
+    assert_eq!(engine.pipeline().len(), 12);
+
+    let valid_seq: Vec<u8> = (1..=12).collect();
+    assert!(engine.verify_pipeline_sequence(&valid_seq));
+
+    let all_gates = vec![
+        ShellAcceptanceGate::G0CodeQuality,
+        ShellAcceptanceGate::G1ParserTests,
+        ShellAcceptanceGate::G2PosixSubsetTests,
+        ShellAcceptanceGate::G3FuzzSmoke,
+        ShellAcceptanceGate::G4BootToShell,
+        ShellAcceptanceGate::G5InteractiveTerminalRestore,
+        ShellAcceptanceGate::G6SecurityReview,
+        ShellAcceptanceGate::G7BuiltinContracts,
+        ShellAcceptanceGate::G8ReleaseClaimsVerified,
+    ];
+    assert!(engine.evaluate_acceptance_gates(&all_gates));
+
+    let metrics = engine.current_health_metrics();
+    assert!(metrics.is_healthy());
+}
+
 #[test]
 fn test_shell_rules_file_exists_and_valid() {
     assert!(
@@ -28,50 +61,48 @@ fn test_shell_rules_file_exists_and_valid() {
 #[test]
 fn test_pull_request_template_exists() {
     let path = Path::new(".github/PULL_REQUEST_TEMPLATE.md");
-    let wiki_path = Path::new("../SigmaOS.wiki/PULL_REQUEST_TEMPLATE.md");
-    let content = if path.exists() {
-        fs::read_to_string(path).expect("Failed to read PR template")
-    } else if wiki_path.exists() {
-        fs::read_to_string(wiki_path).expect("Failed to read PR template")
-    } else {
-        String::from(
-            "## Shell component\n## Shell safety review\n## Component\n## Kernel safety review",
-        )
-    };
-    assert!(content.contains("## Shell component") || content.contains("## Component"));
-    assert!(
-        content.contains("## Shell safety review")
-            || content.contains("## Kernel safety review")
-            || content.contains("## Safety and rollback")
-            || content.contains("## Reviewer checklist")
-    );
+    assert!(path.exists(), ".github/PULL_REQUEST_TEMPLATE.md must exist");
+    let content = fs::read_to_string(path).expect("Failed to read PR template");
+
+    assert!(content.contains("## Shell component"));
+    assert!(content.contains("## Shell safety review"));
+    assert!(content.contains("## Recurring task"));
+    assert!(content.contains("## Reference behavior"));
 }
 
 #[test]
 fn test_shell_documentation_suite_exists() {
-    let docs_in_repo = Path::new("docs/shell/SHELL_MAINTENANCE.md").exists();
-    let docs_in_wiki = Path::new("../SigmaOS.wiki/Shell-Architecture.md").exists()
-        || Path::new("../SigmaOS.wiki/2026-W41-shell-word-splitting.md").exists();
-    assert!(
-        docs_in_repo || docs_in_wiki,
-        "Shell documentation suite exists in repo or wiki"
-    );
+    let required_docs = [
+        "docs/shell/SHELL_MAINTENANCE.md",
+        "docs/shell/SHELL_CONFORMANCE.md",
+        "docs/shell/GRAMMAR.md",
+        "docs/shell/BUILTINS.md",
+        "docs/shell/EXIT_CODES.md",
+        "docs/shell/INTERACTIVE_SHELL.md",
+        "docs/shell/DIAGNOSTICS.md",
+        "docs/studies/2026-W41-shell-word-splitting.md",
+    ];
+
+    for doc in &required_docs {
+        assert!(
+            Path::new(doc).exists(),
+            "Required documentation file {} must exist",
+            doc
+        );
+    }
 }
 
 #[test]
 fn test_shell_exit_codes_policy() {
-    // 0 = Success
-    // 2 = Parse Error / Misuse
-    // 126 = Cannot execute
-    // 127 = Command not found
-    // 128 + N = Fatal signal N (e.g. 130 for SIGINT)
     let exit_success = 0;
     let exit_parse_error = 2;
+    let exit_cannot_exec = 126;
     let exit_cmd_not_found = 127;
     let exit_sigint = 128 + 2; // SIGINT = 2 -> 130
 
     assert_eq!(exit_success, 0);
     assert_eq!(exit_parse_error, 2);
+    assert_eq!(exit_cannot_exec, 126);
     assert_eq!(exit_cmd_not_found, 127);
     assert_eq!(exit_sigint, 130);
 }
