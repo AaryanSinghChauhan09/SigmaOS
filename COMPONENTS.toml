@@ -13276,3 +13276,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/profiler"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-package-verify"
+description = "Package Verifier for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-verify"
+engine = "package_verify"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/package-verify"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-package-verify"
+description = "Package Verifier for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-verify"
+engine = "package_verify"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-verify"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-package-verify"
+description = "Package Verifier for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-verify"
+engine = "package_verify"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/package-verify"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-iso-builder"
+description = "ISO Builder for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-iso-builder"
+engine = "iso_builder"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/iso-builder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-iso-builder"
+description = "ISO Builder for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-iso-builder"
+engine = "iso_builder"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/iso-builder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-iso-builder"
+description = "ISO Builder for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-iso-builder"
+engine = "iso_builder"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/iso-builder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-boot-manager"
+description = "Boot Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-boot-manager"
+engine = "boot_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/boot-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-boot-manager"
+description = "Boot Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-boot-manager"
+engine = "boot_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/boot-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-boot-manager"
+description = "Boot Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-boot-manager"
+engine = "boot_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/boot-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-disk-utility"
+description = "Disk Utility for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-utility"
+engine = "disk_utility"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/disk-utility"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-disk-utility"
+description = "Disk Utility for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk-utility"
+engine = "disk_utility"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/disk-utility"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-disk-utility"
+description = "Disk Utility for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk-utility"
+engine = "disk_utility"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/disk-utility"]
+visibility = "public"
+
