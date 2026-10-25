@@ -18,10 +18,21 @@
 // Enhanced with Material-You style dynamic color palettes and workspace density profiling
 
 use std::collections::BTreeMap;
+use core::fmt::Write;
 use std::format;
 use std::string::{String, ToString};
 use std::vec;
 use std::vec::Vec;
+
+/// Converts a string to a lowercase key for map lookups using ASCII fast-path.
+#[inline]
+fn to_lowercase_key(s: &str) -> String {
+    if s.is_ascii() {
+        s.to_ascii_lowercase()
+    } else {
+        s.to_lowercase()
+    }
+}
 
 /// Color palette
 #[derive(Debug, Clone)]
@@ -456,7 +467,8 @@ impl BuiltInThemeProvider {
     }
 
     pub fn add_theme(&mut self, theme: Theme) {
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
+        let key = to_lowercase_key(&theme.name);
+        self.themes.insert(key, theme);
     }
 }
 
@@ -466,18 +478,18 @@ impl ThemeProvider for BuiltInThemeProvider {
     }
 
     fn set_theme(&mut self, theme: Theme) -> Result<(), ThemeError> {
-        let theme_name = theme.name.to_lowercase();
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
+        let theme_name = to_lowercase_key(&theme.name);
+        self.themes.insert(theme_name.clone(), theme);
         self.current_theme = theme_name;
         Ok(())
     }
 
     fn get_theme_by_name(&self, name: &str) -> Option<&Theme> {
-        self.themes.get(&name.to_lowercase())
+        self.themes.get(&to_lowercase_key(name))
     }
 
     fn apply_theme(&mut self, theme: &Theme) -> Result<(), ThemeError> {
-        self.current_theme = theme.name.to_lowercase();
+        self.current_theme = to_lowercase_key(&theme.name);
         // In real implementation, this would apply the theme to the UI
         Ok(())
     }
@@ -563,18 +575,18 @@ impl ThemeProvider for CustomThemeProvider {
     }
 
     fn set_theme(&mut self, theme: Theme) -> Result<(), ThemeError> {
-        let theme_name = theme.name.to_lowercase();
-        self.themes.insert(theme.name.clone().to_lowercase(), theme);
+        let theme_name = to_lowercase_key(&theme.name);
+        self.themes.insert(theme_name.clone(), theme);
         self.current_theme = theme_name;
         Ok(())
     }
 
     fn get_theme_by_name(&self, name: &str) -> Option<&Theme> {
-        self.themes.get(&name.to_lowercase())
+        self.themes.get(&to_lowercase_key(name))
     }
 
     fn apply_theme(&mut self, theme: &Theme) -> Result<(), ThemeError> {
-        self.current_theme = theme.name.to_lowercase();
+        self.current_theme = to_lowercase_key(&theme.name);
         Ok(())
     }
 
@@ -825,10 +837,15 @@ impl SovereignCinnamonThemeEngine {
     }
 
     pub fn render_css_stylesheet(&self) -> String {
-        let mut stylesheet = String::new();
+        // Performance optimization: Pre-allocate capacity and avoid intermediate format! String allocations
+        let mut estimated_len = 64;
+        for (selector, rules) in &self.loaded_styles {
+            estimated_len += selector.len() + rules.len() + 12;
+        }
+        let mut stylesheet = String::with_capacity(estimated_len);
         stylesheet.push_str("/* SigmaOS Cinnamon Sovereign Theme Stylesheet */\n");
         for (selector, rules) in &self.loaded_styles {
-            stylesheet.push_str(&format!("{} {{\n  {}\n}}\n\n", selector, rules));
+            let _ = writeln!(stylesheet, "{} {{\n  {}\n}}\n", selector, rules);
         }
         stylesheet
     }
