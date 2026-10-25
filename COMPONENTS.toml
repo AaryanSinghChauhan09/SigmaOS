@@ -13494,3 +13494,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/service-deployer"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-update-notifier"
+description = "Update Notifier for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-notifier"
+engine = "update_notifier"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-notifier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-update-notifier"
+description = "Update Notifier for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update-notifier"
+engine = "update_notifier"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-notifier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-update-notifier"
+description = "Update Notifier for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-notifier"
+engine = "update_notifier"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/update-notifier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-update-notifier"
+description = "Update Notifier for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-update-notifier"
+engine = "update_notifier"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/update-notifier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-session-logger"
+description = "Session Logger for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-session-logger"
+engine = "session_logger"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/session-logger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-session-logger"
+description = "Session Logger for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-logger"
+engine = "session_logger"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/session-logger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-session-logger"
+description = "Session Logger for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-session-logger"
+engine = "session_logger"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/session-logger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-session-logger"
+description = "Session Logger for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-session-logger"
+engine = "session_logger"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/session-logger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-log-rotator"
+description = "Log Rotator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-log-rotator"
+engine = "log_rotator"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/log-rotator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-log-rotator"
+description = "Log Rotator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-log-rotator"
+engine = "log_rotator"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/log-rotator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-log-rotator"
+description = "Log Rotator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-log-rotator"
+engine = "log_rotator"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/log-rotator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-log-rotator"
+description = "Log Rotator for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-log-rotator"
+engine = "log_rotator"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/log-rotator"]
+visibility = "public"
+
