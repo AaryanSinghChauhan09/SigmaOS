@@ -9533,3 +9533,174 @@ engine = "issue_tracker"
 language = "shell"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/issue-tracker"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-packages"
+description = "Packages manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-packages"
+engine = "package_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/packages"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-packages"
+description = "Packages manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-packages"
+engine = "package_manager"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/packages"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-packages-full"
+description = "Full packages list for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-packages-full"
+engine = "package_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/packages-full"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-system-cleaner"
+description = "System cleaner for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-cleaner"
+engine = "cleaner"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/system-cleaner"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-disk-utility"
+description = "Disk utility for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-utility"
+engine = "disk_tool"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/disk-utility"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-disk"
+description = "Disk manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-disk"
+engine = "disk_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/disk"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-disk"
+description = "Disk manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-disk"
+engine = "disk_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/disk"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-network-manager"
+description = "Network manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-manager"
+engine = "network_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-network"
+description = "Network manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/network"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-network"
+description = "Network manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/network"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-bluetooth"
+description = "Bluetooth manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth"
+engine = "bluetooth_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/bluetooth"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-bluetooth"
+description = "Bluetooth manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/bluetooth"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-bluetooth"
+description = "Bluetooth manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/bluetooth"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-audio"
+description = "Audio manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio"
+engine = "audio_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/audio"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-audio"
+description = "Audio manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio"
+engine = "audio_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/audio"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-audio"
+description = "Audio manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio"
+engine = "audio_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/audio"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-video"
+description = "Video manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-video"
+engine = "video_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/video"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-video"
+description = "Video manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-video"
+engine = "video_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/video"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-video"
+description = "Video manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-video"
+engine = "video_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/video"]
+visibility = "public"
