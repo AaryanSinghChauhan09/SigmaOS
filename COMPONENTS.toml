@@ -14186,3 +14186,39 @@ engine = "thingy"
 language = "rust"
 inspirations = ["https://github.com/linuxmint/thingy"]
 visibility = "public"
+
+[[component]]
+name = "Sigma"
+description = "Sigma baseline system substrate bridging Linux Mint and Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/Sigma"
+engine = "substrate_core"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/mintsystem", "https://github.com/omacom/omarchy"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS"
+description = "Central sovereign operating system umbrella repository linking all ecosystem components"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS"
+engine = "os_root"
+language = "rust"
+inspirations = ["native"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-chromium"
+description = "Optimized Chromium browser profile with hardware acceleration and privacy sandboxing"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-chromium"
+engine = "browser_runtime"
+language = "c++"
+inspirations = ["https://github.com/omacom/omarchy-chromium"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-clock-global"
+description = "Global timezone and world clock indicator applet"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-clock-global"
+engine = "clock_applet"
+language = "rust"
+inspirations = ["https://github.com/omacom/elsewhen"]
+visibility = "public"
