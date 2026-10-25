@@ -1220,7 +1220,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
@@ -1958,7 +1959,6 @@ if [ -f "src/distro/open_source_os_missing_components_v73_pr.rs" ]; then
     rustc --test tests/test_open_source_os_missing_components_v73_pr.rs --edition=2021 -o build/test_open_source_v73_pr_integration
     ./build/test_open_source_v73_pr_integration
 fi
-    ./build/test_open_source_v73_pr_integrationfi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
@@ -2456,6 +2456,7 @@ if [ -f "tests/shell.rs" ]; then
     mkdir -p build
     rustc --test tests/shell.rs --edition=2021 -o build/test_shell && ./build/test_shell
     rustc --test tests/shell_lifecycle_tests.rs --edition=2021 -o build/test_shell_lifecycle && ./build/test_shell_lifecycle
+    rustc --test src/governance/shell_lifecycle_program.rs --edition=2021 -o build/test_shell_lifecycle_program && ./build/test_shell_lifecycle_program
 fi
 
 if [ -f "src/creative/deckcraft_missing_components_parity_pr.rs" ]; then
