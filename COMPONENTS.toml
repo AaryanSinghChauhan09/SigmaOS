@@ -12342,3 +12342,139 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/terminal-emulator"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-terminal-text-effects"
+description = "Terminal Text Effects for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-terminal-text-effects"
+engine = "text_effects"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/terminal-text-effects"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-terminal-text-effects"
+description = "Terminal Text Effects for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-terminal-text-effects"
+engine = "text_effects"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/terminal-text-effects"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-terminal-text-effects"
+description = "Terminal Text Effects for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-terminal-text-effects"
+engine = "text_effects"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/terminal-text-effects"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-drawing"
+description = "Drawing Tool for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drawing"
+engine = "drawing"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/drawing"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-drawing"
+description = "Drawing Tool for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-drawing"
+engine = "drawing"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/drawing"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-drawing"
+description = "Drawing Tool for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-drawing"
+engine = "drawing"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/drawing"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-graphing-calculator"
+description = "Graphing Calculator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-graphing-calculator"
+engine = "graphing_calculator"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/graphing-calculator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-graphing-calculator"
+description = "Graphing Calculator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-graphing-calculator"
+engine = "graphing_calculator"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/graphing-calculator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-graphing-calculator"
+description = "Graphing Calculator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-graphing-calculator"
+engine = "graphing_calculator"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/graphing-calculator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-code-editor"
+description = "Code Editor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-code-editor"
+engine = "code_editor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/code-editor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-code-editor"
+description = "Code Editor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-code-editor"
+engine = "code_editor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/code-editor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-code-editor"
+description = "Code Editor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-code-editor"
+engine = "code_editor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/code-editor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-pdf-viewer"
+description = "PDF Viewer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-pdf-viewer"
+engine = "pdf_viewer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/pdf-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pdf-viewer"
+description = "PDF Viewer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-pdf-viewer"
+engine = "pdf_viewer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/pdf-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pdf-viewer"
+description = "PDF Viewer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-pdf-viewer"
+engine = "pdf_viewer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pdf-viewer"]
+visibility = "public"
+
