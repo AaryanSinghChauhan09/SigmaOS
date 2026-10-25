@@ -89,7 +89,7 @@ SigmaOS uses a **distributed multi-repository** architecture modelled on **Linux
 | [`SigmaOS-simple-scan`](https://github.com/AaryanSinghChauhan09/SigmaOS-simple-scan) | Scanner (SANE) frontend | https://github.com/linuxmint/simple-scan |
 | [`SigmaOS-video-cut`](https://github.com/AaryanSinghChauhan09/SigmaOS-video-cut) | Lossless-ish video trimmer | https://github.com/omacom/omacut |
 | [`SigmaOS-xreader`](https://github.com/AaryanSinghChauhan09/SigmaOS-xreader) | Document / eBook & comic reader | https://github.com/linuxmint/xreader; https://github.com/dlpwaters/omarchy-ebook-reader |
-| [`SigmaOS-office`](https://github.com/AaryanSinghChauhan09/SigmaOS-office) | LibreOffice icon/style integration | https://github.com/linuxmint/libreoffice-style-mint |
+| [`SigmaOS-office`](https://github.com/AaryanSinghChauhan09/SigmaOS-office) | Unified productivity suite & style integration (OpenOffice, LibreOffice, GenOffice, OnlyOffice, CraftOffice) | https://github.com/linuxmint/libreoffice-style-mint; https://github.com/LibreOffice/core; https://github.com/ONLYOFFICE/DocumentServer |
 | [`SigmaOS-webapp-manager`](https://github.com/AaryanSinghChauhan09/SigmaOS-webapp-manager) | Turn websites into desktop webapps | https://github.com/linuxmint/webapp-manager |
 | [`SigmaOS-remote-desktop`](https://github.com/AaryanSinghChauhan09/SigmaOS-remote-desktop) | VNC/RDP remote desktop sharing | https://github.com/omacom/gliff |
 | [`SigmaOS-upload`](https://github.com/AaryanSinghChauhan09/SigmaOS-upload) | File upload / share service client | https://github.com/linuxmint/mintupload |
