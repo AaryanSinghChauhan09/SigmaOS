@@ -539,17 +539,17 @@ mod tests {
 
     #[test]
     fn test_btrfs_zstd_optimization() {
-        let mut engine = CachyOsBtrfsZstdEbpfCompressorV5TunerPrEngine::new();
-        let status = engine.optimize_file_compression(true);
-        assert!(status.contains("level 1"));
-        assert_eq!(engine.current_zstd_level, 1);
+        let mut engine = CachyOsBtrfsZstdEbpfCompressorV5TunerEngine::new();
+        let level = engine.tune_compression_ratio(8000);
+        assert_eq!(level, 1);
+        assert_eq!(engine.zstd_compression_level, 1);
     }
 
     #[test]
     fn test_handheld_settings() {
-        let mut engine = CachyOsHandheldPowerCapThermalV5GovernorPrEngine::new();
-        let status = engine.apply_handheld_settings("Overclock Extreme v5", 40);
-        assert!(status.contains("Overclock Extreme v5"));
-        assert_eq!(engine.tdp_limit_watts, 40);
+        let mut engine = CachyOsHandheldPowerCapThermalV5GovernorEngine::new();
+        let status = engine.set_tdp_cap(40);
+        assert!(status.contains("40 Watts"));
+        assert_eq!(engine.tdp_watts, 40);
     }
 }
