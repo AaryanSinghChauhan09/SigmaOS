@@ -10784,3 +10784,219 @@ engine = "graphics_renderer"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/graphics-renderer"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-software-center"
+description = "Software center for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-software-center"
+engine = "software_center"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sc"
+description = "Software center for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-software-center"
+engine = "software_center"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-sc"
+description = "Software center for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software-center"
+engine = "software_center"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-package-manager"
+description = "Package manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-manager"
+engine = "package_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pm"
+description = "Package manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-manager"
+engine = "package_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pm"
+description = "Package manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
+engine = "package_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-dependency-resolver"
+description = "Dependency resolver for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-dependency-resolver"
+engine = "dependency_resolver"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/dependency-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-dr"
+description = "Dependency resolver for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dependency-resolver"
+engine = "dependency_resolver"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/dependency-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-dr"
+description = "Dependency resolver for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dependency-resolver"
+engine = "dependency_resolver"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/dependency-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-uninstaller"
+description = "Uninstaller for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-uninstaller"
+engine = "uninstaller"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/uninstaller"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-un"
+description = "Uninstaller for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-uninstaller"
+engine = "uninstaller"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/uninstaller"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-un"
+description = "Uninstaller for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-uninstaller"
+engine = "uninstaller"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/uninstaller"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-repo-manager"
+description = "Repository manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-repo-manager"
+engine = "repo_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/repo-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-rm"
+description = "Repository manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-repo-manager"
+engine = "repo_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/repo-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-rm"
+description = "Repository manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-repo-manager"
+engine = "repo_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/repo-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-snap-store"
+description = "Snap store for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-snap-store"
+engine = "snap_store"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/snap-store"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ss"
+description = "Snap store for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-snap-store"
+engine = "snap_store"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/snap-store"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ss"
+description = "Snap store for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-snap-store"
+engine = "snap_store"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/snap-store"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-flatpak-manager"
+description = "Flatpak manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-flatpak-manager"
+engine = "flatpak_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/flatpak-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-fm"
+description = "Flatpak manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-flatpak-manager"
+engine = "flatpak_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/flatpak-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-fm"
+description = "Flatpak manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-flatpak-manager"
+engine = "flatpak_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/flatpak-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-appstream"
+description = "AppStream for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-appstream"
+engine = "appstream"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/appstream"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-as"
+description = "AppStream for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-appstream"
+engine = "appstream"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/appstream"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-as"
+description = "AppStream for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-appstream"
+engine = "appstream"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/appstream"]
+visibility = "public"
