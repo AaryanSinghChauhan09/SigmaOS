@@ -13058,3 +13058,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/keyring-manager"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-scheduler"
+description = "Scheduler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-scheduler"
+engine = "scheduler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-scheduler"
+description = "Scheduler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-scheduler"
+engine = "scheduler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-scheduler"
+description = "Scheduler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-scheduler"
+engine = "scheduler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-executor"
+description = "Command Executor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-executor"
+engine = "executor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/executor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-executor"
+description = "Command Executor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-executor"
+engine = "executor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/executor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-executor"
+description = "Command Executor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-executor"
+engine = "executor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/executor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-launcher"
+description = "Application Launcher for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-launcher"
+engine = "launcher"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/launcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-launcher"
+description = "Application Launcher for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-launcher"
+engine = "launcher"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/launcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-launcher"
+description = "Application Launcher for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-launcher"
+engine = "launcher"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/launcher"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-task-manager"
+description = "Task Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-task-manager"
+engine = "task_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/task-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-task-manager"
+description = "Task Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-task-manager"
+engine = "task_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/task-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-task-manager"
+description = "Task Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-task-manager"
+engine = "task_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/task-manager"]
+visibility = "public"
+
