@@ -311,6 +311,13 @@ SigmaOS follows a **docracy** governance model. Contributions are welcome from e
 | [[15-Sovereign-OS-Self-Sufficiency-Encyclopedia-V56]] | Sovereign OS self-sufficiency manual |
 | [[20-Tri-Agent-500-Repos-Absorption-Master-Plan]] | 500 open-source repository absorption plan |
 | [[SOFTWARE-CATEGORY-MATRIX]] | Software category matrix |
+| [[BSD-Extended-Ecosystem-Parity]] | Extended BSD synthesis (Ghost, Nomad, Midnight, Hardened, Fury, Desktop, Karma, Star) |
+| [[DOS-and-Legacy-Compatibility]] | DOS & Legacy runtime (FreeDOS, MS-DOS, BASIC, ReactOS) |
+| [[Kernel-Architectures-Synthesis]] | Multi-kernel architecture synthesis (Linux, GNU Hurd, Minix, ReactOS, XNU) |
+| [[Linux-Universal-Distro-Parity-Advanced]] | Advanced Linux distro parity (Elementary, Fedora, Gentoo, Kali, Parrot, Qubes, Redox, Slackware, SUSE, Ubuntu) |
+| [[Office-and-Productivity-Suites]] | Office productivity parity (LibreOffice & OpenOffice suites: Writer, Calc, Impress, Draw, Math, Base) |
+| [[Database-and-Data-Engineering]] | Database & BI analytics (PostgreSQL, DuckDB, DBeaver, Arrow DataFusion, Superset, Metabase) |
+| [[Developer-Tools-and-AI-Agents]] | Modern AI agent & developer tooling (Cline, CodexCLI, CrewAI, DeepSeek, Docker, Hermes, LangChain, VLC, Warp) |
 
 ---
 

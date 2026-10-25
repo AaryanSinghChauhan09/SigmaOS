@@ -39,9 +39,23 @@
 
 ### 🔱 BSD Ecosystem Parity
 - [[BSD-Universal-Synthesis-and-Parity|Universal BSD Matrix]]
+- [[BSD-Extended-Ecosystem-Parity|Extended BSD (Ghost, Nomad, Midnight, Hardened, Fury, Desktop, Karma, Star)]]
 - [[DragonFlyBSD-Ecosystem-Parity|DragonFly BSD (HAMMER2 & LWKT)]]
 - [[FreeBSD-Ecosystem-Parity|FreeBSD (Capsicum & Jails)]]
 - [[OpenBSD-Ecosystem-Parity|OpenBSD (Pledge & Unveil)]]
+
+### 💾 Retro, DOS & Multi-Kernel Architectures
+- [[DOS-and-Legacy-Compatibility|DOS & Legacy (FreeDOS, MS-DOS, BASIC, ReactOS)]]
+- [[Kernel-Architectures-Synthesis|Kernel Synthesis (Linux, GNU Hurd, Minix, ReactOS, XNU)]]
+
+### 🏢 Office & Productivity Suites
+- [[Office-and-Productivity-Suites|LibreOffice & OpenOffice Suite Parity (Writer, Calc, Impress, Draw, Math, Base)]]
+
+### 🗄️ Database & Data Engineering
+- [[Database-and-Data-Engineering|Databases & Analytics (PostgreSQL, DuckDB, DBeaver, Arrow, Superset, Metabase)]]
+
+### 🤖 Developer Tools & AI Agents
+- [[Developer-Tools-and-AI-Agents|AI Agents & Tools (Cline, CodexCLI, CrewAI, DeepSeek, Docker, Hermes, LangChain, Notepad++, VLC, Warp)]]
 
 ### 🎨 Craft Creative & Office Suite
 - [[Craft-Creative-Suite-Overview|Craft Suite Overview (20 Modules)]]
@@ -68,6 +82,7 @@
 
 ### 🐧 Linux Ecosystem Parity
 - [[Linux-Universal-Distro-Parity|Universal Linux Parity Matrix]]
+- [[Linux-Universal-Distro-Parity-Advanced|Advanced Distros (Elementary, Fedora, Gentoo, Kali, Parrot, Qubes, Redox, Slackware, SUSE, Ubuntu)]]
 - [[Arch-Linux-Ecosystem-Parity|Arch Linux Parity]]
 - [[CachyOS-Ecosystem-Parity|CachyOS (BORE & Microarch)]]
 - [[Debian-Ecosystem-Parity|Debian Parity]]
