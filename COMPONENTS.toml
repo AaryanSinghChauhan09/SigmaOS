@@ -12623,3 +12623,166 @@ language = "c"
 inspirations = ["https://fedoraproject.org", "https://github.com/fedora/update-manager"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-network-manager"
+description = "Network Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-manager"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-network-manager"
+description = "Network Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network-manager"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-network-manager"
+description = "Network Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-manager"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-bluetooth-manager"
+description = "Bluetooth Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth-manager"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/bluetooth-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-bluetooth-manager"
+description = "Bluetooth Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth-manager"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/bluetooth-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-bluetooth-manager"
+description = "Bluetooth Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-manager"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/bluetooth-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-printer-manager"
+description = "Printer Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-printer-manager"
+engine = "printer_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/printer-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-printer-manager"
+description = "Printer Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-printer-manager"
+engine = "printer_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/printer-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-printer-manager"
+description = "Printer Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-printer-manager"
+engine = "printer_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/printer-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-volume-controller"
+description = "Volume Controller for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-volume-controller"
+engine = "volume_controller"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/volume-controller"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-volume-controller"
+description = "Volume Controller for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-volume-controller"
+engine = "volume_controller"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/volume-controller"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-volume-controller"
+description = "Volume Controller for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-volume-controller"
+engine = "volume_controller"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/volume-controller"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-power-profiles"
+description = "Power Profiles for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-power-profiles"
+engine = "power_profiles"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/power-profiles"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-power-profiles"
+description = "Power Profiles for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power-profiles"
+engine = "power_profiles"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/power-profiles"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-power-profiles"
+description = "Power Profiles for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-profiles"
+engine = "power_profiles"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/power-profiles"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-session-manager"
+description = "Session Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-session-manager"
+engine = "session_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/session-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-session-manager"
+description = "Session Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-session-manager"
+engine = "session_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/session-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-session-manager"
+description = "Session Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-session-manager"
+engine = "session_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/session-manager"]
+visibility = "public"
+
