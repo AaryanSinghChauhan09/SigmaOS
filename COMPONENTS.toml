@@ -10595,3 +10595,192 @@ engine = "session_manager"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/session-manager"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-device-manager"
+description = "Device manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-device-manager"
+engine = "device_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/device-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-dm"
+description = "Device manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-device-manager"
+engine = "device_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/device-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-dm"
+description = "Device manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-device-manager"
+engine = "device_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/device-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-audio-manager"
+description = "Audio manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio-manager"
+engine = "audio_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/audio-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-am"
+description = "Audio manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-manager"
+engine = "audio_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/audio-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-am"
+description = "Audio manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio-manager"
+engine = "audio_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/audio-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-volume-control"
+description = "Volume control for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-volume-control"
+engine = "volume_control"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/volume-control"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-vc"
+description = "Volume control for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-volume-control"
+engine = "volume_control"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/volume-control"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-vc"
+description = "Volume control for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-volume-control"
+engine = "volume_control"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/volume-control"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-bluetooth-manager"
+description = "Bluetooth manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth-manager"
+engine = "bluetooth_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/bluetooth-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-bt"
+description = "Bluetooth manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth-manager"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/bluetooth-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-bt"
+description = "Bluetooth manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-manager"
+engine = "bluetooth_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/bluetooth-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-power-supplier"
+description = "Power supplier manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-power-supplier"
+engine = "power_supplier"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/power-supplier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ps"
+description = "Power supplier manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power-supplier"
+engine = "power_supplier"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/power-supplier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ps"
+description = "Power supplier manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power-supplier"
+engine = "power_supplier"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/power-supplier"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-display-manager"
+description = "Display manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-display-manager"
+engine = "display_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/display-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-disp"
+description = "Display manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-display-manager"
+engine = "display_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/display-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-disp"
+description = "Display manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-display-manager"
+engine = "display_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/display-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-graphics-renderer"
+description = "Graphics renderer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-graphics-renderer"
+engine = "graphics_renderer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/graphics-renderer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-gr"
+description = "Graphics renderer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-graphics-renderer"
+engine = "graphics_renderer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/graphics-renderer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-gr"
+description = "Graphics renderer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-graphics-renderer"
+engine = "graphics_renderer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/graphics-renderer"]
+visibility = "public"
