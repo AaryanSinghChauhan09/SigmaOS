@@ -43,7 +43,15 @@ pub struct OpenSourceOsV72PrSpec {
     pub parity_score: u32,
 }
 
+#[derive(Debug, Clone)]
+pub struct SchedExtTaskV72 {
+    pub pid: u32,
+    pub priority: u32,
+    pub cpus_allowed: u32,
+}
+
 pub struct Linux629SchedExtFolioCompactionV72PrEngine {
+    pub task_queue: Vec<SchedExtTaskV72>,
     folios_compacted: u64,
 }
 
@@ -56,13 +64,18 @@ impl Default for Linux629SchedExtFolioCompactionV72PrEngine {
 impl Linux629SchedExtFolioCompactionV72PrEngine {
     pub fn new() -> Self {
         Self {
+            task_queue: Vec::new(),
             folios_compacted: 128,
         }
     }
 
+    pub fn schedule_next_task(&mut self) -> Option<u32> {
+        self.task_queue.pop().map(|t| t.pid)
+    }
+
     pub fn compact_folios(&mut self) -> u64 {
-        self.folios_compacted += 64;
-        self.folios_compacted    }
+        self.folios_compacted
+    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -128,7 +141,7 @@ impl OpenBsd89PinsyscallUnveilV72PrEngine {
     }
 
     pub fn check_unveil_access(&self, path: &str, permissions: char) -> bool {
-        path.starts_with("/usr") && permissions == 'r'
+        path.starts_with("/usr") && (permissions == 'r' || permissions == 'x' || permissions == 'w')
     }
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -149,11 +162,21 @@ pub struct NetBsd125RumpPciVirtio9pV72PrEngine;
 impl Default for NetBsd125RumpPciVirtio9pV72PrEngine {
     fn default() -> Self {
         Self::new()
-    }}
+    }
+}
 
 impl NetBsd125RumpPciVirtio9pV72PrEngine {
     pub fn new() -> Self {
         Self
+    }
+
+    pub fn parse_9p_header(&self, packet: &[u8]) -> Option<(u32, u16)> {
+        if packet.len() >= 7 {
+            let tag = u16::from_le_bytes([packet[5], packet[6]]);
+            Some((packet[4] as u32, tag))
+        } else {
+            None
+        }
     }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
@@ -188,7 +211,7 @@ impl DragonFlyHammer3MultiMasterScrubV72PrEngine {
     }
 
     pub fn verify_scrub_checksum(&self, checksum: &str) -> bool {
-        checksum.starts_with("SHA256:")
+        checksum.starts_with("SHA256:") || checksum.starts_with("BLAKE3:")
     }
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -254,7 +277,8 @@ impl HaikuBeFsAttributeIndexingV72PrEngine {
     }
 
     pub fn query_index(&self, attribute_name: &str) -> bool {
-        attribute_name.starts_with("META:")    }
+        attribute_name.starts_with("META:") || attribute_name.starts_with("BEOS:")
+    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
@@ -318,7 +342,8 @@ impl RedoxFsCowCapabilityV72PrEngine {
     }
 
     pub fn verify_scheme_capability(&self, scheme: &str) -> bool {
-        scheme == "file:" || scheme == "event:"    }
+        scheme == "file:" || scheme == "event:" || scheme == "disk:"
+    }
 
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {

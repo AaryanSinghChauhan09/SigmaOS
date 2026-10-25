@@ -302,25 +302,37 @@ impl Default for CachyOsAnanicyRealtimeEbpfV5GovernorEngine {    fn default() ->
 
 #[derive(Debug, Clone)]
 pub struct CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
-    pub zstd_compression_level: u32,
+    pub current_zstd_level: u32,
     pub ebpf_iops_monitor: bool,
 }
+
+pub type CachyOsBtrfsZstdEbpfCompressorV5TunerPrEngine = CachyOsBtrfsZstdEbpfCompressorV5TunerEngine;
 
 impl CachyOsBtrfsZstdEbpfCompressorV5TunerEngine {
     pub fn new() -> Self {
         Self {
-            zstd_compression_level: 3,
+            current_zstd_level: 3,
             ebpf_iops_monitor: true,
         }
     }
 
     pub fn tune_compression_ratio(&mut self, iops_demand: u32) -> u32 {
         if iops_demand > 5000 {
-            self.zstd_compression_level = 1;
+            self.current_zstd_level = 1;
         } else {
-            self.zstd_compression_level = 3;
+            self.current_zstd_level = 3;
         }
-        self.zstd_compression_level    }
+        self.current_zstd_level
+    }
+
+    pub fn optimize_file_compression(&mut self, high_performance: bool) -> String {
+        if high_performance {
+            self.current_zstd_level = 1;
+        } else {
+            self.current_zstd_level = 3;
+        }
+        format!("Btrfs ZSTD: Active compression level {}", self.current_zstd_level)
+    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
@@ -424,21 +436,29 @@ impl Default for CachyOsZramLz4ZstdDynamicPoolV5Engine {    fn default() -> Self
 
 #[derive(Debug, Clone)]
 pub struct CachyOsHandheldPowerCapThermalV5GovernorEngine {
-    pub tdp_watts: u32,
+    pub tdp_limit_watts: u32,
     pub gyro_remapper_active: bool,
 }
+
+pub type CachyOsHandheldPowerCapThermalV5GovernorPrEngine = CachyOsHandheldPowerCapThermalV5GovernorEngine;
 
 impl CachyOsHandheldPowerCapThermalV5GovernorEngine {
     pub fn new() -> Self {
         Self {
-            tdp_watts: 15,
+            tdp_limit_watts: 15,
             gyro_remapper_active: true,
         }
     }
 
     pub fn set_tdp_cap(&mut self, watts: u32) -> String {
-        self.tdp_watts = watts;
-        format!("Handheld Governor v5: Hardware TDP capped at {} Watts with active thermal throttle", watts)    }
+        self.tdp_limit_watts = watts;
+        format!("Handheld Governor v5: Hardware TDP capped at {} Watts with active thermal throttle", watts)
+    }
+
+    pub fn apply_handheld_settings(&mut self, profile: &str, tdp: u32) -> String {
+        self.tdp_limit_watts = tdp;
+        format!("Handheld Governor v5: Applied profile {} with TDP {} Watts", profile, tdp)
+    }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV71 {
         CachyOsPrManifestV71 {
