@@ -13712,3 +13712,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/desktop-config-importer"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-system-configurator"
+description = "System Configurator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-configurator"
+engine = "system_configurator"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-configurator"
+description = "System Configurator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-configurator"
+engine = "system_configurator"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-configurator"
+description = "System Configurator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-configurator"
+engine = "system_configurator"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-network-configurator"
+description = "Network Configurator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-configurator"
+engine = "network_configurator"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-network-configurator"
+description = "Network Configurator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network-configurator"
+engine = "network_configurator"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-network-configurator"
+description = "Network Configurator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-configurator"
+engine = "network_configurator"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/network-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-storage-manager"
+description = "Storage Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-storage-manager"
+engine = "storage_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/storage-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-storage-manager"
+description = "Storage Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-storage-manager"
+engine = "storage_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/storage-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-storage-manager"
+description = "Storage Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-storage-manager"
+engine = "storage_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/storage-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-permission-manager"
+description = "Permission Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-permission-manager"
+engine = "permission_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/permission-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-permission-manager"
+description = "Permission Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-permission-manager"
+engine = "permission_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/permission-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-permission-manager"
+description = "Permission Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-permission-manager"
+engine = "permission_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/permission-manager"]
+visibility = "public"
+
