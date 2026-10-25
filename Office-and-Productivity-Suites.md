@@ -207,6 +207,11 @@ sigma-office bib --style APA
 # Visual Diff
 sigma-office diff "Original draft text" "Modified draft text"
 
+# Offline Chromium PWA Web Suite
+sigma-office web --verify
+sigma-office web --serve --port 8080
+sigma-office web --export ./dist/web/
+
 # Collaboration Security Token
 sigma-office token --generate --doc-id doc_42 --user-id alice
 
@@ -216,6 +221,70 @@ sigma-office self-test
 
 ---
 
-## 5. Quality & Deterministic Verification
+## 5. Chromium-Based Browser Offline Architecture
 
-All 73 unit tests in `tests/` execute in < 0.25 seconds with 0 network calls and 0 filesystem mutations outside temporary directories, strictly adhering to the **Arrange-Act-Assert (AAA)** and **FIRST** principles.
+SigmaOS-office provides a self-contained Progressive Web App (PWA) runtime engineered to run 100% offline in all Chromium-based browsers (Chromium, Google Chrome, Brave, Microsoft Edge, Opera, Vivaldi).
+
+```mermaid
+graph TD
+    BROWSER["Chromium Browser (Offline / Air-Gapped)"] --> SW["Service Worker (sw.js)"]
+    SW --> CACHE["CacheStorage (Offline Assets Cache)"]
+    
+    subgraph Client-Side Offline Office Runtimes
+        WRITER_WEB["Writer Web (WordCraft WYSIWYG DOM)"]
+        CALC_WEB["Calc Web (Reactive Grid & Formula DAG)"]
+        IMPRESS_WEB["Impress Web (Slide Stage & Fullscreen F5)"]
+        DRAW_WEB["Draw Web (Interactive SVG Surface)"]
+        MATH_WEB["Math Web (LaTeX to Unicode/MathML)"]
+    end
+    
+    BROWSER --> WRITER_WEB
+    BROWSER --> CALC_WEB
+    BROWSER --> IMPRESS_WEB
+    BROWSER --> DRAW_WEB
+    BROWSER --> MATH_WEB
+    
+    WRITER_WEB --> IDB["IndexedDB (SigmaOfficeDB)"]
+    CALC_WEB --> IDB
+    IMPRESS_WEB --> IDB
+    DRAW_WEB --> IDB
+    MATH_WEB --> IDB
+    
+    WRITER_WEB --> FSA["Chromium File System Access API"]
+    CALC_WEB --> FSA
+    IMPRESS_WEB --> FSA
+```
+
+### 5.1 Service Worker & Cache-First Strategy (`web/sw.js`)
+- Pre-caches all essential HTML, CSS, JavaScript, and SVG icons upon `install`.
+- Intercepts all network fetch requests with a **Cache-First** strategy, ensuring instantaneous load times with 0 external network requests.
+- Automatic navigation fallback to `index.html` for offline standalone execution.
+
+### 5.2 Local Persistence via IndexedDB & File System Access API (`web/js/storage_engine.js`)
+- **IndexedDB Stores:** Dedicated `documents`, `revisions`, and `settings` stores persisting documents directly on the user's device.
+- **File System Access API:** Zero-copy local disk access in Chromium via `showOpenFilePicker()` and `showSaveFilePicker()`, allowing direct opening and saving of `.wcf`, `.gcf`, `.dcf`, `.csv`, `.md`, and `.svg` files on the host filesystem without cloud intermediaries.
+
+### 5.3 Client-Side Pure JavaScript Engines
+- **Writer Web (`web/js/writer_web.js`):** Client-side rich text processor with heading levels, lists, tables, live word/character counters, auto-save to IndexedDB, and `.wcf` / `.md` export.
+- **Calc Web (`web/js/calc_web.js`):** Reactive spreadsheet grid with formula bar, computing `SUM`, `AVERAGE`, `MIN`, `MAX`, `COUNT`, `IF`, and arithmetic formulas in real-time, with streaming CSV and GridCraft `.gcf` export.
+- **Impress Web (`web/js/impress_web.js`):** Slide authoring canvas with thumbnail sidebar, speaker notes, fullscreen presentation mode (F5 shortcut), and DeckCraft `.dcf` export.
+- **Draw Web (`web/js/draw_web.js`):** Vector graphics tool supporting rectangles, ellipses, lines, and standard W3C SVG export.
+- **Math Web (`web/js/math_web.js`):** Interactive formula typesetter translating LaTeX tokens to Unicode and MathML with an on-screen Greek symbol palette.
+
+---
+
+## 6. Quality & Deterministic Verification
+
+All 78 unit tests in `tests/` execute in < 0.30 seconds with 0 network calls and 0 filesystem mutations outside temporary directories, strictly adhering to the **Arrange-Act-Assert (AAA)** and **FIRST** principles:
+- Document Engine, Spreadsheet & OpenFormula: 19 tests
+- Presentation & Slide Deck: 4 tests
+- Math & Equation Typesetting: 4 tests
+- Vector Draw & Database Engine: 5 tests
+- GenOffice AI & OnlyOffice Collab: 9 tests
+- Craft Bridge Format Interop: 5 tests
+- ODF & OOXML Packaging: 4 tests
+- UNO Scripting & Macro Execution: 4 tests
+- Bibliography, Footnotes & TOC: 3 tests
+- Collaboration Security & Merkle Audit: 4 tests
+- Web Exporter & Offline PWA Assets: 4 tests
+- Core CLI Integration & Self-Tests: 13 tests
