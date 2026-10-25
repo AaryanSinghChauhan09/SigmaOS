@@ -4,6 +4,7 @@
 
 pub mod anicraft;
 pub mod anicraft_advancements_v69_pr;
+pub mod artcraft_advancements_v75_pr;
 pub mod anicraft_artcraft_parity_pr;
 pub mod anicraft_missing_components_parity_pr;
 pub mod artcraft;
@@ -234,5 +235,6 @@ pub use wordcraft::{
     WordCraftExportConversionPrDeployer, WordCraftMasterPrDeploymentSuite,
     WordCraftPullRequestSpec,
 };
+pub use artcraft_advancements_v75_pr::*;
 pub use wordcraft_artcraft_missing_components_v65_pr::*;
 pub use wordcraft_artcraft_missing_components_v66_pr::*;

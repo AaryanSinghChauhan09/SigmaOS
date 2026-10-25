@@ -22,6 +22,13 @@ fn test_sovereign_artcraft_creative_suite_master_gateway_integration() {
     assert!(md.contains("PhotoCraft"));
     assert!(md.contains("FilmCraft"));
     assert!(md.contains("PdfCraft"));
+    assert!(md.contains("ArtCraft Suite Advancements V75"));
+}
+
+#[test]
+fn test_artcraft_v75_parity_suite_integration() {
+    let mut v75_suite = creative::artcraft_advancements_v75_pr::ArtcraftAdvancementsV75ParitySuite::new();
+    assert!(v75_suite.verify_complete_parity());
 }
 
 #[test]
