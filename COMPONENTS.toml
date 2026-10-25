@@ -8714,3 +8714,120 @@ engine = "package_manager"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/apt"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-xfce"
+description = "Xfce desktop variant for SigmaOS inspired by Linux Mint Xfce"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-xfce"
+engine = "desktop_env"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/xfce"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mate-desktop"
+description = "MATE desktop component for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mate-desktop"
+engine = "desktop_env"
+language = "shell"
+inspirations = ["https://mate.desktop", "https://github.com/mate-desktop"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-kde-plasma"
+description = "KDE Plasma component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-kde-plasma"
+engine = "desktop_env"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/KDE/plasma"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-bspwm"
+description = "BSPWM window manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-bspwm"
+engine = "window_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/bspwm/bspwm"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-sway"
+description = "Sway compositor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sway"
+engine = "window_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/swaywm/sway"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-dunst"
+description = "Dunst notification daemon for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-dunst"
+engine = "notification_system"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/dunst-project/dunst"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-polybar"
+description = "Polybar component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-polybar"
+engine = "panel"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/polybar/polybar"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-conky"
+description = "Conky system monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-conky"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/ conky/monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fzf"
+description = "FZF fuzzy finder for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fzf"
+engine = "search_tool"
+language = "go"
+inspirations = ["https://github.com/junegust/fzf"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-zsh"
+description = "Zsh shell component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-zsh"
+engine = "shell"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/zsh/zsh"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-oh-my-zsh"
+description = "Oh My Zsh component for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-oh-my-zsh"
+engine = "shell_framework"
+language = "shell"
+inspirations = ["https://github.com/ohmyzsh/ohmyzsh"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-gtk-themes"
+description = "GTK themes component for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtk-themes"
+engine = "theme_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/gtk-themes"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-icon-themes"
+description = "Icon themes component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-icon-themes"
+engine = "theme_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/icons"]
+visibility = "public"
