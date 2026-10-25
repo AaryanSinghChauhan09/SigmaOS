@@ -1,8 +1,19 @@
-// BSD-style Resource Limits (rlimits) for SigmaOS
-// Implements process-specific soft and hard limits on system resources.
+//! BSD-style Resource Limits (rlimits) for SigmaOS.
+//!
+//! Implements POSIX-compatible process-specific soft and hard limits on system
+//! resources, following the `getrlimit`/`setrlimit` semantics.
+//!
+//! # Design Principles
+//! - FAIL-FAST: Validate inputs (soft ≤ hard) at the boundary.
+//! - COMMAND-QUERY SEPARATION: `get_limit`/`get_usage` are pure queries;
+//!   `set_limit`/`check_and_add_usage`/`release_usage` are commands that mutate state.
+//! - DEFENSIVE PROGRAMMING: All PIDs and resource types are validated before access.
 
 use std::collections::BTreeMap;
 
+/// Identifies a specific resource that can be limited per-process.
+///
+/// Variants mirror POSIX `RLIMIT_*` constants.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ResourceLimitType {

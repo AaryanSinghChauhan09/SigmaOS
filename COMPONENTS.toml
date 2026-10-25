@@ -14039,3 +14039,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/load-balancer"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-system-monitor"
+description = "System Monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-monitor"
+description = "System Monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-monitor"
+description = "System Monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-process-manager"
+description = "Process Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-process-manager"
+engine = "process_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/process-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-process-manager"
+description = "Process Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-process-manager"
+engine = "process_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/process-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-process-manager"
+description = "Process Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-process-manager"
+engine = "process_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/process-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-file-indexer"
+description = "File Indexer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-indexer"
+engine = "file_indexer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/file-indexer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-file-indexer"
+description = "File Indexer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file-indexer"
+engine = "file_indexer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/file-indexer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-file-indexer"
+description = "File Indexer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file-indexer"
+engine = "file_indexer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/file-indexer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-search-index"
+description = "Search Index for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-search-index"
+engine = "search_index"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/search-index"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-search-index"
+description = "Search Index for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-search-index"
+engine = "search_index"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/search-index"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-search-index"
+description = "Search Index for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-search-index"
+engine = "search_index"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/search-index"]
+visibility = "public"
+

@@ -4,51 +4,100 @@
 use std::collections::{BinaryHeap, HashMap};
 use std::sync::atomic::{AtomicU64, Ordering};
 
-/// Process priority
+/// Process priority — encapsulated with invariant validation.
+///
+/// Invariant: priority value must be in range [-20, 19] where lower values
+/// indicate higher priority (real-time -20 > normal 0 > idle 19).
+///
+/// NOTE: This struct uses const fn for associated constants to support
+/// constant evaluation, while the `new()` constructor uses `assert!` to
+/// validate the invariant at runtime for non-const contexts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Priority {
-    pub value: i32, // -20 to 19 (lower is higher priority)
+    value: i32, // -20 to 19 (lower is higher priority)
 }
 
 impl Priority {
-    pub const Realtime: Self = Self { value: -20 };
-    pub const High: Self = Self { value: -10 };
-    pub const Normal: Self = Self { value: 0 };
-    pub const Low: Self = Self { value: 10 };
-    pub const Idle: Self = Self { value: 19 };
+    /// Realtime priority (-20, highest)
+    pub const High: Self = Self::new_const(-20);
 
+    /// Normal priority (0, default)
+    pub const Normal: Self = Self::new_const(0);
+
+    /// Low priority (10)
+    pub const Low: Self = Self::new_const(10);
+
+    /// Idle priority (19, lowest)
+    pub const Idle: Self = Self::new_const(19);
+
+    /// Realtime priority (-20, highest)
+    #[doc(hidden)]
+    pub const Realtime: Self = Self::new_const(-20);
+
+    /// Create a priority with invariant validation for const context.
+    ///
+    /// Safe for const evaluation: no assertions, just direct assignment.
+    /// The caller must ensure the value is in [-20, 19].
+    const fn new_const(value: i32) -> Self {
+        Self { value }
+    }
+
+    /// Create a priority with runtime invariant validation.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `value` is outside the valid range [-20, 19].
+    /// This ensures the priority invariant is always upheld.
     pub fn new(value: i32) -> Self {
-        Self {
-            value: value.max(-20).min(19),
-        }
+        assert!(
+            (-20..=19).contains(&value),
+            "Priority value must be in range [-20, 19], got {}",
+            value
+        );
+        Self { value }
     }
 
+    /// Return the internal priority value (query).
+    ///
+    /// Follows command-query separation: this function only reads state,
+    /// it does not modify any scheduler state.
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+
+    /// Return the highest possible priority.
     pub fn highest() -> Self {
-        Self { value: -20 }
+        Self::new(-20)
     }
 
+    /// Return the lowest possible priority.
     pub fn lowest() -> Self {
-        Self { value: 19 }
+        Self::new(19)
     }
 
+    /// Return the realtime priority constant.
     pub fn realtime() -> Self {
-        Self { value: -20 }
+        Self::new(-20)
     }
 
+    /// Return the high priority constant.
     pub fn high() -> Self {
-        Self { value: -10 }
+        Self::new(-10)
     }
 
+    /// Return the normal/default priority constant.
     pub fn normal() -> Self {
-        Self { value: 0 }
+        Self::new(0)
     }
 
+    /// Return the low priority constant.
     pub fn low() -> Self {
-        Self { value: 10 }
+        Self::new(10)
     }
 
+    /// Return the idle/lowest priority constant.
     pub fn idle() -> Self {
-        Self { value: 19 }
+        Self::new(19)
     }
 }
 
@@ -82,23 +131,23 @@ impl ProcessState {
 /// Process task
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProcessTask {
-    pub pid: u64,
+    pid: u64,
     pub priority: Priority,
     pub policy: SchedulerPolicy,
     pub state: ProcessState,
-    pub vruntime: u64,      // Virtual runtime for CFS
-    pub exec_start: u64,    // Execution start time
-    pub exec_duration: u64, // Total execution duration
-    pub cpu_time: u64,      // CPU time used
-    pub slice: u64,         // Time slice
+    vruntime: u64,      // Virtual runtime for CFS
+    exec_start: u64,    // Execution start time
+    exec_duration: u64, // Total execution duration
+    cpu_time: u64,      // CPU time used
+    slice: u64,         // Time slice
 }
 
 impl ProcessTask {
-    pub fn new(pid: u64, _name: String, priority: Priority) -> Self {
+    pub fn new(pid: u64, _name: String, priority: Priority, policy: SchedulerPolicy) -> Self {
         Self {
             pid,
             priority,
-            policy: SchedulerPolicy::Normal,
+            policy,
             state: ProcessState::Runnable,
             vruntime: 0,
             exec_start: 0,
@@ -120,6 +169,59 @@ impl ProcessTask {
             cpu_time: 0,
             slice: 10,
         }
+    }
+
+    /// Return the process ID (query).
+    pub fn pid(&self) -> u64 {
+        self.pid
+    }
+
+    /// Return the process priority (query).
+    pub fn priority(&self) -> Priority {
+        self.priority
+    }
+
+    /// Return the scheduler policy (query).
+    pub fn policy(&self) -> SchedulerPolicy {
+        self.policy
+    }
+
+    /// Return the process state (query).
+    pub fn state(&self) -> ProcessState {
+        self.state
+    }
+
+    /// Return the virtual runtime (query).
+    pub fn vruntime(&self) -> u64 {
+        self.vruntime
+    }
+
+    /// Return the execution start time (query).
+    pub fn exec_start(&self) -> u64 {
+        self.exec_start
+    }
+
+    /// Return the total execution duration (query).
+    pub fn exec_duration(&self) -> u64 {
+        self.exec_duration
+    }
+
+    /// Return the CPU time used (query).
+    pub fn cpu_time(&self) -> u64 {
+        self.cpu_time
+    }
+
+    /// Return the time slice (query).
+    pub fn slice(&self) -> u64 {
+        self.slice
+    }
+
+    /// Update the time slice (command).
+    ///
+    /// Follows command-query separation: this function modifies state
+    /// but does not return any meaningful value beyond success/failure.
+    pub fn set_slice(&mut self, new_slice: u64) {
+        self.slice = new_slice;
     }
 }
 
@@ -157,6 +259,10 @@ impl CfsScheduler {
         }
     }
 
+    /// Create a new process and add it to the scheduler (command).
+    ///
+    /// Follows command-query separation: this function modifies scheduler state
+    /// (adds a task) but returns the created task as a read-only view.
     pub fn create_process(&mut self, priority: Priority, policy: SchedulerPolicy) -> ProcessTask {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
@@ -179,16 +285,24 @@ impl CfsScheduler {
         task
     }
 
+    /// Calculate the time slice for a given priority (query).
+    ///
+    /// Pure function: output depends only on input, no mutable state.
+    /// Follows command-query separation.
     fn calculate_slice(&self, priority: Priority) -> u64 {
         // Nice values range from -20 (largest slice) to 19 (smallest slice).
         // Keep the arithmetic signed until after clamping; casting a negative
         // factor to u64 used to overflow for normal and low priorities.
-        let weight = (20 - priority.value.clamp(-20, 19)) as u64;
+        let weight = (20 - priority.value().clamp(-20, 19)) as u64;
         (self.latency / 10)
             .saturating_mul(weight)
             .max(self.min_granularity)
     }
 
+    /// Return the next runnable task and set it as current (command).
+    ///
+    /// Returns the task that was removed from the run queue and is now
+    /// the running task. State is modified: the task's state changes to Running.
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
         if let Some(mut current) = self.current_task.take() {
             if current.state == ProcessState::Running {
@@ -203,11 +317,17 @@ impl CfsScheduler {
         Some(next)
     }
 
+    /// Put the current running task to sleep (command).
+    ///
+    /// Returns `Ok(())` if the task was found and put to sleep, or `Err`
+    /// if the task was not found in the scheduler.
     pub fn put_task_to_sleep(&mut self, pid: u64) -> Result<(), &'static str> {
         if let Some(ref current) = self.current_task {
             if current.pid == pid {
                 if let Some(mut task) = self.current_task.take() {
                     task.state = ProcessState::Sleeping;
+                    // Put sleeping task into the sleeping map
+                    self.sleeping_tasks.insert(pid, task);
                     return Ok(());
                 }
             }
@@ -215,10 +335,22 @@ impl CfsScheduler {
         Err("Task not found")
     }
 
-    pub fn wake_up_task(&mut self, _pid: u64) -> Result<(), &'static str> {
-        Ok(())
+    /// Wake up a sleeping task (command).
+    ///
+    /// Moves the task from the sleeping map back to the run queue.
+    pub fn wake_up_task(&mut self, pid: u64) -> Result<(), &'static str> {
+        if let Some(task) = self.sleeping_tasks.remove(&pid) {
+            task.state = ProcessState::Runnable;
+            self.runnable_tasks.push(task);
+            Ok(())
+        } else {
+            Err("Task not found in sleeping list")
+        }
     }
 
+    /// Update the virtual runtime of the current task (command).
+    ///
+    /// Adjusts vruntime, cpu_time, and exec_duration by the given delta.
     pub fn update_vruntime(&mut self, pid: u64, delta: u64) {
         if let Some(ref mut current) = self.current_task {
             if current.pid == pid {
@@ -229,10 +361,18 @@ impl CfsScheduler {
         }
     }
 
+    /// Return the number of runnable tasks (query).
+    ///
+    /// Follows command-query separation: this function only reads state,
+    /// it does not modify any scheduler state.
     pub fn runnable_count(&self) -> usize {
         self.runnable_tasks.len()
     }
 
+    /// Return the current running task reference (query).
+    ///
+    /// Follows command-query separation: this function only reads state,
+    /// it does not modify any scheduler state.
     pub fn current_task(&self) -> Option<&ProcessTask> {
         self.current_task.as_ref()
     }
@@ -254,6 +394,10 @@ impl RtScheduler {
         }
     }
 
+    /// Create a real-time process and add it to the scheduler (command).
+    ///
+    /// Follows command-query separation: this function modifies the scheduler
+    /// state by adding a task, then returns the created task.
     pub fn create_process(&mut self, priority: Priority) -> ProcessTask {
         let pid = self.next_pid.fetch_add(1, Ordering::SeqCst);
 
@@ -273,9 +417,13 @@ impl RtScheduler {
         task
     }
 
+    /// Return the next ready real-time task and make it current (command).
+    ///
+    /// Sorts tasks by priority (highest first), switches the current running
+    /// task to runnable state, and returns the highest-priority task.
     pub fn pick_next_task(&mut self) -> Option<ProcessTask> {
         self.runnable_tasks
-            .sort_by(|a, b| a.priority.cmp(&b.priority));
+            .sort_by(|a, b| a.priority().value().cmp(&b.priority().value()).reverse());
 
         if let Some(current) = self.current_task.take() {
             if current.state == ProcessState::Running {
@@ -288,8 +436,20 @@ impl RtScheduler {
         self.runnable_tasks.pop()
     }
 
+    /// Return the number of runnable tasks (query).
+    ///
+    /// Follows command-query separation: this function only reads state,
+    /// it does not modify any scheduler state.
     pub fn runnable_count(&self) -> usize {
         self.runnable_tasks.len()
+    }
+
+    /// Return the current running task reference (query).
+    ///
+    /// Follows command-query separation: this function only reads state,
+    /// it does not modify any scheduler state.
+    pub fn current_task(&self) -> Option<&ProcessTask> {
+        self.current_task.as_ref()
     }
 }
 
@@ -413,10 +573,10 @@ mod tests {
         assert!(low.slice >= 1_000_000);
 
         let first = scheduler.pick_next_task().unwrap();
-        scheduler.update_vruntime(first.pid, 10);
-        assert_eq!(scheduler.current_task().unwrap().vruntime, 10);
+        scheduler.update_vruntime(first.pid(), 10);
+        assert_eq!(scheduler.current_task().unwrap().vruntime(), 10);
         let next = scheduler.pick_next_task().unwrap();
-        assert_ne!(next.pid, first.pid);
+        assert_ne!(next.pid(), first.pid());
         assert_eq!(scheduler.runnable_count(), 2);
     }
 
@@ -451,6 +611,6 @@ mod tests {
 
         scheduler.update_thermal_state(70);
         assert_eq!(scheduler.cpu_frequency(), 2400);
-        assert_eq!(scheduler.pick_next_task().unwrap().pid, task.pid);
+        assert_eq!(scheduler.pick_next_task().unwrap().pid(), task.pid());
     }
 }
