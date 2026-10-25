@@ -725,3 +725,4 @@ pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v70::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
+pub use crate::distro::arch_linux_missing_components_v74_pr::*;
