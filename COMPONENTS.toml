@@ -10406,3 +10406,192 @@ engine = "scanner_manager"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/scan-manager"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-network-tools"
+description = "Network tools for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-tools"
+engine = "network_tools"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-net"
+description = "Network tools for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-net"
+engine = "network_tools"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-net"
+description = "Network tools for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-net"
+engine = "network_tools"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/network-tools"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-backup"
+description = "System backup for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-backup"
+engine = "backup"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-backup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-bak"
+description = "System backup for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bak"
+engine = "backup"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/backup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-bak"
+description = "System backup for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bak"
+engine = "backup"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/backup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-disk-cleanup"
+description = "Disk cleanup for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-disk-cleanup"
+engine = "cleanup"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/disk-cleanup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-cln"
+description = "Disk cleanup for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cln"
+engine = "cleanup"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/cleanup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-cln"
+description = "Disk cleanup for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cln"
+engine = "cleanup"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/cleanup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-font-installer"
+description = "Font installer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-font-installer"
+engine = "font_installer"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/font-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-fi"
+description = "Font installer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-fi"
+engine = "font_installer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/font-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-fi"
+description = "Font installer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-fi"
+engine = "font_installer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/font-installer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-themes-manager"
+description = "Themes manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-themes-manager"
+engine = "themes_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/themes-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-tm"
+description = "Themes manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-themes-manager"
+engine = "themes_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/themes-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-tm"
+description = "Themes manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-themes-manager"
+engine = "themes_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/themes-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-updater-scheduler"
+description = "Updater scheduler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-updater-scheduler"
+engine = "updater_scheduler"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/updater-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-us"
+description = "Updater scheduler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-us"
+engine = "updater_scheduler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/updater-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-us"
+description = "Updater scheduler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-us"
+engine = "updater_scheduler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/updater-scheduler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-session-manager"
+description = "Session manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-session-manager"
+engine = "session_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/session-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-sm"
+description = "Session manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-sm"
+engine = "session_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/session-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-sm"
+description = "Session manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-sm"
+engine = "session_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/session-manager"]
+visibility = "public"
