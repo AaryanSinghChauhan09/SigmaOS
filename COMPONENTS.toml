@@ -11378,3 +11378,192 @@ engine = "memory_manager"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/memory-manager"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-file-browser"
+description = "File browser for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-browser"
+engine = "file_browser"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/file-browser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-fb"
+description = "File browser for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file-browser"
+engine = "file_browser"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/file-browser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-fb"
+description = "File browser for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file-browser"
+engine = "file_browser"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/file-browser"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-directory-manager"
+description = "Directory manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-directory-manager"
+engine = "directory_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/directory-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-dm2"
+description = "Directory manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-directory-manager"
+engine = "directory_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/directory-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-dm2"
+description = "Directory manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-directory-manager"
+engine = "directory_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/directory-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-path-resolver"
+description = "Path resolver for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-path-resolver"
+engine = "path_resolver"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/path-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pr"
+description = "Path resolver for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-path-resolver"
+engine = "path_resolver"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/path-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pr"
+description = "Path resolver for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-resolver"
+engine = "path_resolver"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/path-resolver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-link-manager"
+description = "Link manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-link-manager"
+engine = "link_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/link-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-lm"
+description = "Link manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-link-manager"
+engine = "link_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/link-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-lm"
+description = "Link manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-link-manager"
+engine = "link_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/link-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-path-monitor"
+description = "Path monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-path-monitor"
+engine = "path_monitor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/path-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pm3"
+description = "Path monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-path-monitor"
+engine = "path_monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/path-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pm3"
+description = "Path monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-path-monitor"
+engine = "path_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/path-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-permission-manager"
+description = "Permission manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-permission-manager"
+engine = "permission_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/permission-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-pm4"
+description = "Permission manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-permission-manager"
+engine = "permission_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/permission-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-pm4"
+description = "Permission manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-permission-manager"
+engine = "permission_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/permission-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-accessibility"
+description = "Accessibility tools for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-accessibility"
+engine = "accessibility"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/accessibility"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-at"
+description = "Accessibility tools for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-accessibility"
+engine = "accessibility"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/accessibility"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-at"
+description = "Accessibility tools for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-accessibility"
+engine = "accessibility"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/accessibility"]
+visibility = "public"
