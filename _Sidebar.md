@@ -1,5 +1,6 @@
 ### 🗺️ Master Plans & Roadmaps
 - [[Home|🏠 Wiki Home]]
+- [[Sovereign-Independent-OS-Architecture|👑 Sovereign Independent Complete OS]]
 - [[Sub-Repositories-and-Components|📦 150 Sub-Repositories]]
 - [[SOFTWARE-CATEGORY-MATRIX|🗂️ Software Category Matrix]]
 - [[FUTURE-DEVELOPMENT-ROADMAP|Strategic Roadmap (100 Milestones)]]
