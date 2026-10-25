@@ -9245,3 +9245,147 @@ engine = "community_portal"
 language = "shell"
 inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/community"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-drivers-extra"
+description = "Extra drivers for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-drivers-extra"
+engine = "driver_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/drivers-extra"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-driver"
+description = "Driver component for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-driver"
+engine = "driver"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/driver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-driver"
+description = "Arch Linux driver for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-driver"
+engine = "driver"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/driver"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-pacman-frontend"
+description = "Pacman frontend for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-pacman-frontend"
+engine = "package_manager"
+language = "c++"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/pacman-frontend"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-theme-collection"
+description = "Theme collection for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-theme-collection"
+engine = "theme_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/theme-collection"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-theme"
+description = "Theme for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-theme"
+engine = "theme_manager"
+language = "shell"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/theme"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-theme"
+description = "Arch Linux theme for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-theme"
+engine = "theme_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/theme"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-icon-set"
+description = "Icon set for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-icon-set"
+engine = "icon_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/icon-set"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-icon-set"
+description = "Arch Linux icon set for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-icon-set"
+engine = "icon_manager"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/icon-set"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-system-logger"
+description = "System logger for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-system-logger"
+engine = "logger"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/system-logger"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-help-center"
+description = "Help center for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-help-center"
+engine = "support_system"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/help-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-wiki"
+description = "Wiki component for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wiki"
+engine = "wiki"
+language = "markdown"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/wiki"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-knowledge-base"
+description = "Knowledge base for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-knowledge-base"
+engine = "doc_generator"
+language = "markdown"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/knowledge-base"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-manual"
+description = "Manual for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-manual"
+engine = "doc_generator"
+language = "markdown"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/manual"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-faq-system"
+description = "FAQ system for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-faq-system"
+engine = "faq_system"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/faq-system"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-forum-integration"
+description = "Forum integration for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-forum-integration"
+engine = "community_portal"
+language = "shell"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/forum-integration"]
+visibility = "public"
