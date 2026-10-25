@@ -1,0 +1,1 @@
+# SigmaOS Interactive Shell Specification

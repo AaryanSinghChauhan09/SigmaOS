@@ -1220,7 +1220,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
@@ -1367,6 +1368,13 @@ if [ -f "src/distro/tech_media_component_advancements_v73_pr.rs" ]; then
     mkdir -p build
     rustc --test src/distro/tech_media_component_advancements_v73_pr.rs --edition=2021 -o build/tech_media_v73_test
     ./build/tech_media_v73_test
+fi
+
+if [ -f "src/distro/tech_media_component_advancements_v74_pr.rs" ]; then
+    echo "Running Sovereign Tech Media Component Advancements V74 test suite..."
+    mkdir -p build
+    rustc --test src/distro/tech_media_component_advancements_v74_pr.rs --edition=2021 -o build/tech_media_v74_test
+    ./build/tech_media_v74_test
 fi
 
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
@@ -1958,7 +1966,6 @@ if [ -f "src/distro/open_source_os_missing_components_v73_pr.rs" ]; then
     rustc --test tests/test_open_source_os_missing_components_v73_pr.rs --edition=2021 -o build/test_open_source_v73_pr_integration
     ./build/test_open_source_v73_pr_integration
 fi
-    ./build/test_open_source_v73_pr_integrationfi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."

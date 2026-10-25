@@ -1,0 +1,1 @@
+# SigmaOS Shell Conformance Specification

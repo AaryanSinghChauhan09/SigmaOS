@@ -1,0 +1,1 @@
+# SigmaOS Shell Maintenance Guide
