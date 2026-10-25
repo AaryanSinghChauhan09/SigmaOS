@@ -531,6 +531,7 @@ pub use security::{
     SandboxPolicy, SovereignSecurityAndHardeningParityPrGateway,
     SovereignSecurityAndHardeningParityV61Gateway, SovereignSecurityAndHardeningParityV64Gateway,
     SovereignSecurityAndHardeningParityV68Gateway, SovereignSecurityAndHardeningParityV70Gateway,
+    SovereignSecurityAndHardeningParityV74Gateway,
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
