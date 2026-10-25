@@ -12478,3 +12478,148 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/pdf-viewer"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-system-monitor"
+description = "System Monitor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-monitor"
+description = "System Monitor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-monitor"
+description = "System Monitor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-system-monitor"
+description = "System Monitor for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-system-monitor"
+engine = "system_monitor"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/system-monitor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-package-manager"
+description = "Package Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-package-manager"
+engine = "package_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-package-manager"
+description = "Package Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-package-manager"
+engine = "package_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-package-manager"
+description = "Package Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-package-manager"
+engine = "package_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-package-manager"
+description = "Package Manager for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-package-manager"
+engine = "package_manager"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/package-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-software-center"
+description = "Software Center for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-software-center"
+engine = "software_center"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-software-center"
+description = "Software Center for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-software-center"
+engine = "software_center"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-software-center"
+description = "Software Center for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-software-center"
+engine = "software_center"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-software-center"
+description = "Software Center for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-software-center"
+engine = "software_center"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/software-center"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-update-manager"
+description = "Update Manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-update-manager"
+engine = "update_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/update-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-update-manager"
+description = "Update Manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-update-manager"
+engine = "update_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/update-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-update-manager"
+description = "Update Manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-update-manager"
+engine = "update_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/update-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-fedora-update-manager"
+description = "Update Manager for SigmaOS inspired by Fedora Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-fedora-update-manager"
+engine = "update_manager"
+language = "c"
+inspirations = ["https://fedoraproject.org", "https://github.com/fedora/update-manager"]
+visibility = "public"
+
