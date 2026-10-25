@@ -74,6 +74,7 @@
 - [[Sub-Repositories-and-Components|164 Sub-Repositories & Components Catalog]]
 - [[Kernel-Architectures-Synthesis|Kernels: Linux, GNU Hurd, Minix, ReactOS, XNU]]
 - [[DOS-and-Legacy-Compatibility|DOS: FreeDOS, MS-DOS, BASIC, ReactOS]]
+- [[DOS-Runtime-Engine|DOS & Retro Computing Runtime Engine]]
 - [[Office-and-Productivity-Suites|Office: LibreOffice & OpenOffice Suite]]
 - [[Database-and-Data-Engineering|RDBMS: PostgreSQL, DuckDB, DBeaver, Apache]]
 - [[Developer-Tools-and-AI-Agents|Tools: Blender, Docker, Notepad++, VLC, AI Agents]]
@@ -89,6 +90,7 @@
 
 ### BSD Ecosystem Parity
 - [[BSD-Universal-Synthesis-and-Parity|Universal BSD Synthesis Matrix]]
+- [[Extended-BSD-Parity|Extended BSD Parity (9 Distributions)]]
 - [[DragonFlyBSD-Ecosystem-Parity|DragonFly BSD (HAMMER2 & LWKT)]]
 - [[FreeBSD-Ecosystem-Parity|FreeBSD (Capsicum & Jails)]]
 - [[OpenBSD-Ecosystem-Parity|OpenBSD (Pledge & Unveil)]]
