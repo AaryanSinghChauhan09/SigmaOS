@@ -2652,3 +2652,4 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v72_pr.rs" ]; then
     ./build/test_open_source_os_v72_pr
 fi
 echo "All SigmaOS test suites completed."
+fi
