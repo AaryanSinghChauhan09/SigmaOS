@@ -14148,3 +14148,41 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/search-index"]
 visibility = "public"
 
+
+# Added 4 missing ecosystem components
+
+[[component]]
+name = "SigmaOS-accessibility"
+description = "SigmaOS accessibility tools and screen reader support"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-accessibility"
+engine = "accessibility"
+language = "rust"
+inspirations = ["https://github.com/GNOME/accerciser", "https://github.com/linuxmint/orca"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-gtk-plus"
+description = "SigmaOS GTK+ application suite - Bluetooth manager and media player"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-gtk-plus"
+engine = "gtk_apps"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/blueman", "https://github.com/linuxmint/celluloid"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-sign"
+description = "SigmaOS digital signature and code signing tool"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-sign"
+engine = "signer"
+language = "rust"
+inspirations = ["https://github.com/omacom/signed"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-thingy"
+description = "SigmaOS system thingy utility"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-thingy"
+engine = "thingy"
+language = "rust"
+inspirations = ["https://github.com/linuxmint/thingy"]
+visibility = "public"
