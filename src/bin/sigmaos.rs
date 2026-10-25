@@ -169,6 +169,9 @@ fn run_interactive_repl() {
                 );
                 println!("  craft          - Explore the 20-module Craft Creative Suite");
                 println!("  distro         - Inspect Linux (Arch/Cachy/Debian) and BSD (DragonFly/Free/Open) parity");
+                println!("  mint           - Launch the Linux Mint Ergonomic Desktop Persona (Cinnamon / XApps)");
+                println!("  arch           - Launch the Arch Linux Minimalist Persona (Pacman / Rolling Release)");
+                println!("  omarchy        - Launch the Omarchy Aesthetic Persona (Hyprland / Wallust Wayland)");
                 println!("  shell          - Ping the SigmaOS unified desktop shell controller");
                 println!("  iso            - Report built bootable ISO image information");
                 println!("  check          - Run the 21-point automated launch readiness check");
@@ -186,6 +189,27 @@ fn run_interactive_repl() {
             "distro" => {
                 println!();
                 print_distro_parity();
+            }
+            "mint" => {
+                println!();
+                let _ = Command::new("bash")
+                    .arg("scripts/launch_mint_persona.sh")
+                    .status();
+                println!();
+            }
+            "arch" => {
+                println!();
+                let _ = Command::new("bash")
+                    .arg("scripts/launch_arch_persona.sh")
+                    .status();
+                println!();
+            }
+            "omarchy" => {
+                println!();
+                let _ = Command::new("bash")
+                    .arg("scripts/launch_omarchy_persona.sh")
+                    .status();
+                println!();
             }
             "shell" => {
                 println!("\n[Pinging bin/sigmaos-shell...]");
@@ -251,6 +275,21 @@ fn main() {
                 print!("{}", BANNER);
                 print_distro_parity();
             }
+            "--mint" => {
+                let _ = Command::new("bash")
+                    .arg("scripts/launch_mint_persona.sh")
+                    .status();
+            }
+            "--arch" => {
+                let _ = Command::new("bash")
+                    .arg("scripts/launch_arch_persona.sh")
+                    .status();
+            }
+            "--omarchy" => {
+                let _ = Command::new("bash")
+                    .arg("scripts/launch_omarchy_persona.sh")
+                    .status();
+            }
             "--check" => {
                 let _ = Command::new("bash")
                     .arg("scripts/check_launch_ready.sh")
@@ -263,6 +302,9 @@ fn main() {
                 println!("  --status, -s   Display system and launch status");
                 println!("  --craft, -c    Display Craft Creative Suite catalog");
                 println!("  --distro, -d   Display Linux and BSD parity architectures");
+                println!("  --mint         Launch Linux Mint Ergonomic Desktop Persona");
+                println!("  --arch         Launch Arch Linux Minimalist Persona");
+                println!("  --omarchy      Launch Omarchy Aesthetic Persona");
                 println!("  --check        Execute launch readiness check");
                 println!("  --help, -h     Show this help");
             }
