@@ -339,7 +339,7 @@ impl CfsScheduler {
     ///
     /// Moves the task from the sleeping map back to the run queue.
     pub fn wake_up_task(&mut self, pid: u64) -> Result<(), &'static str> {
-        if let Some(task) = self.sleeping_tasks.remove(&pid) {
+        if let Some(mut task) = self.sleeping_tasks.remove(&pid) {
             task.state = ProcessState::Runnable;
             self.runnable_tasks.push(task);
             Ok(())

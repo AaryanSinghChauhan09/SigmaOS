@@ -28,7 +28,7 @@ impl CpuPriorityOptimizer {
         for proc in processes.iter_mut() {
             if proc.state == ProcessState::Running {
                 // Elevate active/running foreground process to High priority (Glary priority booster)
-                proc.scheduling.static_priority = Priority::High.value;
+                proc.scheduling.static_priority = Priority::High.value();
                 println!(
                     "SmartOptimizer: Elevated active foreground process ID {} to Priority::High.",
                     proc.pid
@@ -37,7 +37,7 @@ impl CpuPriorityOptimizer {
                 || proc.state == ProcessState::Uninterruptible
             {
                 // Demote blocked/idle background process to protect CPU bounds
-                proc.scheduling.static_priority = Priority::Low.value;
+                proc.scheduling.static_priority = Priority::Low.value();
                 println!(
                     "SmartOptimizer: Demoted blocked/background process ID {} to Priority::Low.",
                     proc.pid

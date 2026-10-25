@@ -125,7 +125,7 @@ pub struct ScheduledProcess {
 
 impl ScheduledProcess {
     pub fn new(process: ProcessTask) -> Self {
-        let posix_rt_priority = match process.priority.value {
+        let posix_rt_priority = match process.priority.value() {
             -20 => 99, // Realtime
             -10 => 70, // High
             0 => 50,   // Normal
@@ -173,7 +173,7 @@ impl ScheduledProcess {
 
     /// Priority-based weight: higher priority gets a larger time slice multiplier
     pub fn time_slice_ticks(&self, base_slice: u64) -> u64 {
-        let multiplier: u64 = match self.process.priority.value {
+        let multiplier: u64 = match self.process.priority.value() {
             -20 => 8, // Realtime
             -10 => 4, // High
             0 => 2,   // Normal
@@ -297,7 +297,7 @@ impl RoundRobinScheduler {
     pub fn sched_rr_get_interval(&self, pid: u64) -> Option<u64> {
         self.processes
             .iter()
-            .find(|e| e.process.pid == pid)
+            .find(|e| e.process.pid() == pid)
             .map(|e| e.time_slice_ticks(self.dynamic_time_slice(self.config.time_slice)))
     }
 
@@ -331,7 +331,7 @@ impl RoundRobinScheduler {
     }
 
     pub fn set_cpu_affinity(&mut self, pid: u64, affinity: u64) {
-        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid == pid) {
+        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid() == pid) {
             entry.cpu_affinity = affinity;
         }
     }
@@ -399,13 +399,13 @@ impl RoundRobinScheduler {
     }
 
     pub fn set_process_state(&mut self, pid: u64, state: ProcessState) {
-        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid == pid) {
+        if let Some(entry) = self.processes.iter_mut().find(|e| e.process.pid() == pid) {
             entry.process.state = state;
         }
     }
 
     pub fn remove_process(&mut self, pid: u64) {
-        self.processes.retain(|e| e.process.pid != pid);
+        self.processes.retain(|e| e.process.pid() != pid);
         if self.current_index >= self.processes.len() && !self.processes.is_empty() {
             self.current_index = 0;
         }
