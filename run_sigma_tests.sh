@@ -380,6 +380,13 @@ if [ -f "src/creative/deckcraft_artcraft_missing_components_v67_pr.rs" ]; then
     ./build/test_deckcraft_v67
 fi
 
+if [ -f "src/creative/deckcraft_artcraft_missing_components_v68_pr.rs" ]; then
+    echo "Running Deckcraft & ArtCraft Missing Components Parity PR Gateway V68 test suite..."
+    mkdir -p build
+    TMPDIR=$(pwd)/build rustc --test src/creative/deckcraft_artcraft_missing_components_v68_pr.rs --edition=2021 -o build/test_deckcraft_v68
+    ./build/test_deckcraft_v68
+fi
+
 if [ -f "src/creative/effectcraft.rs" ]; then
     echo "Running Sovereign EffectCraft Visual Effects PR test suite..."
     mkdir -p build
@@ -1220,7 +1227,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
