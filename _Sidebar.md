@@ -1,5 +1,6 @@
 ### 🗺️ Master Plans & Roadmaps
 - [[Home|🏠 Wiki Home]]
+- [[Running-SigmaOS-Like-Mint-Arch-Omarchy|🚀 Run Like Mint / Arch / Omarchy]]
 - [[Sovereign-Independent-OS-Architecture|👑 Sovereign Independent Complete OS]]
 - [[Sub-Repositories-and-Components|📦 150 Sub-Repositories]]
 - [[SOFTWARE-CATEGORY-MATRIX|🗂️ Software Category Matrix]]

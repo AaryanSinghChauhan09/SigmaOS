@@ -319,6 +319,7 @@ SigmaOS follows a **docracy** governance model. Contributions are welcome from e
 | [[Database-and-Data-Engineering]] | Database & BI analytics (PostgreSQL, DuckDB, DBeaver, Arrow DataFusion, Superset, Metabase) |
 | [[Developer-Tools-and-AI-Agents]] | Modern AI agent & developer tooling (Cline, CodexCLI, CrewAI, DeepSeek, Docker, Hermes, LangChain, VLC, Warp) |
 | [[Sovereign-Independent-OS-Architecture]] | Sovereign complete OS architecture, 98.5% code independence, and Tier-1 market standing |
+| [[Running-SigmaOS-Like-Mint-Arch-Omarchy]] | Complete guide and runtime instructions for Linux Mint, Arch, and Omarchy personas |
 
 ---
 
