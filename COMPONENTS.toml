@@ -9875,3 +9875,183 @@ engine = "wallpaper"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/wallpaper"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-calculator"
+description = "Calculator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-calculator"
+engine = " calculator"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/calculator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-calculator"
+description = "Calculator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-calculator"
+engine = " calculator"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/calculator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-calculator"
+description = "Calculator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-calculator"
+engine = " calculator"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/calculator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-reader"
+description = "RSS reader for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-reader"
+engine = " rss_reader"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/reader"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-rss"
+description = "RSS reader for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-rss"
+engine = " rss_reader"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/rss"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-rss"
+description = "RSS reader for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-rss"
+engine = " rss_reader"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/rss"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-file-manager"
+description = "File manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-file-manager"
+engine = " file_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/file-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-file"
+description = "File manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-file"
+engine = " file_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/file"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-file"
+description = "File manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-file"
+engine = " file_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/file"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mit-editor"
+description = "Text editor for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mit-editor"
+engine = " text_editor"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/editor"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-edit"
+description = "Text editor for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-edit"
+engine = " text_editor"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/edit"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-edit"
+description = "Text editor for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-edit"
+engine = " text_editor"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/edit"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-image-viewer"
+description = "Image viewer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-image-viewer"
+engine = " image_viewer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/image-viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-viewer"
+description = "Image viewer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-viewer"
+engine = " image_viewer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-viewer"
+description = "Image viewer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-viewer"
+engine = " image_viewer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/viewer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-media-player"
+description = "Media player for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-media-player"
+engine = " media_player"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/media-player"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-player"
+description = "Media player for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-player"
+engine = " media_player"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/player"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-player"
+description = "Media player for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-player"
+engine = " media_player"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/player"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-minimizer"
+description = "Window minimizer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-minimizer"
+engine = "window_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/window-minimizer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-maximizer"
+description = "Window maximizer for SigmaOS"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-maximizer"
+engine = "window_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/window-maximizer"]
+visibility = "public"
