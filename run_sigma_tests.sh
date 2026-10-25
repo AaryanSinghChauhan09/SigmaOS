@@ -2264,11 +2264,18 @@ if [ -f "src/desktop/sovereign_gui_development_and_pr_suite.rs" ]; then
     ./build/test_gui_pr_suite
 fi
 
-if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; then
-    echo "Running Sovereign Device Driver Development and PR Gateway Suite..."
+if [ -f "src/driver/sovereign_device_driver_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Device Driver Development and PR Gateway Suite (src/driver)..."
     mkdir -p build
-    rustc --test src/drivers/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite
-    ./build/test_device_driver_pr_suite
+    rustc --test src/driver/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite_driver
+    ./build/test_device_driver_pr_suite_driver
+fi
+
+if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; then
+    echo "Running Sovereign Device Driver Development and PR Gateway Suite (src/drivers)..."
+    mkdir -p build
+    rustc --test src/drivers/sovereign_device_driver_development_and_pr_suite.rs --edition=2021 -o build/test_device_driver_pr_suite_drivers
+    ./build/test_device_driver_pr_suite_drivers
 fi
 
 if [ -f "src/device/sovereign_device_management_inspirations_pr.rs" ]; then
