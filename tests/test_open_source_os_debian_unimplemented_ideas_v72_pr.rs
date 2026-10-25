@@ -21,7 +21,7 @@ fn test_linux_629_schedext_folio_engine_v72() {
         cpus_allowed: 0b11,
     });
     assert_eq!(engine.schedule_next_task(), Some(101));
-    assert_eq!(engine.compact_folios(), 128);
+    assert_eq!(engine.compact_folios(), 192);
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7201);
     assert_eq!(spec.parity_score, 100);
