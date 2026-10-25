@@ -11,6 +11,13 @@ if [ -f "src/io/mod.rs" ]; then
     ./build/test_io
 fi
 
+if [ -f "tests/test_kernel_lifecycle_program.rs" ]; then
+    echo "Running Kernel Lifecycle Program Engine test suite..."
+    mkdir -p build
+    rustc --test tests/test_kernel_lifecycle_program.rs --edition=2021 -o build/test_kernel_lifecycle
+    ./build/test_kernel_lifecycle
+fi
+
 if [ -f "tests/test_periodic_study_improve_prove.rs" ]; then
     echo "Running Periodic Study-Improve-Prove Governance Engine test suite..."
     mkdir -p build

@@ -1,4 +1,4 @@
-//! SigmaOS Kernel Lifecycle Program Engine
+//! SigmaOS Kernel Lifecycle Program Engine Specification & Operating Model
 //!
 //! Models, evaluates, and verifies recurring development, validation, hardening,
 //! and maintenance tasks for the SigmaOS kernel codebase.
