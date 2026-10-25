@@ -30,19 +30,19 @@ While Linux Mint and Omarchy provide traditional monolithic integrations, SigmaO
 
 ### Initialization
 ```c
-int how_sigmaos_surpasses_linuxmint_init(struct SigmaComponent* comp);
+int linuxmint_init(struct SigmaComponent* comp);
 ```
 Initializes the subsystem. Returns 0 on success.
 
 ### Configuration
 ```c
-int how_sigmaos_surpasses_linuxmint_set_config(const char* key, const char* value);
+int linuxmint_set_config(const char* key, const char* value);
 ```
 Updates configuration dynamically.
 
 ### Teardown
 ```c
-void how_sigmaos_surpasses_linuxmint_shutdown(void);
+void linuxmint_shutdown(void);
 ```
 Safely shuts down the subsystem, freeing resources.
 
@@ -50,9 +50,9 @@ Safely shuts down the subsystem, freeing resources.
 
 ### Basic Usage
 ```python
-import sigma_how_sigmaos_surpasses_linuxmint
+import sigma_linuxmint
 
-engine = sigma_how_sigmaos_surpasses_linuxmint.Engine()
+engine = sigma_linuxmint.Engine()
 engine.start()
 print("Engine started successfully!")
 ```
@@ -63,57 +63,16 @@ engine.configure({"cache_size": 1024, "mode": "async"})
 ```
 
 ## Testing Information
-Unit tests are located in `/tests/how_sigmaos_surpasses_linuxmint_tests/`.
+Unit tests are located in `/tests/linuxmint_tests/`.
 Run tests via the build system:
 ```bash
-make test COMPONENT=how_sigmaos_surpasses_linuxmint
+make test COMPONENT=linuxmint
 ```
 Integration testing requires the full SigmaOS QA harness.
 
 ## Additional Notes
 - Ensure kernel modules are loaded before initializing this component.
-- Review security logs via `journalctl -u sigma_how_sigmaos_surpasses_linuxmint`.
+- Review security logs via `journalctl -u sigma_linuxmint`.
 - Further documentation can be found in the source files.
 - Remember to check memory constraints on embedded targets.
 
-
-- Additional context line 0 for LinuxMint Parity
-- Additional context line 1 for LinuxMint Parity
-- Additional context line 2 for LinuxMint Parity
-- Additional context line 3 for LinuxMint Parity
-- Additional context line 4 for LinuxMint Parity
-- Additional context line 5 for LinuxMint Parity
-- Additional context line 6 for LinuxMint Parity
-- Additional context line 7 for LinuxMint Parity
-- Additional context line 8 for LinuxMint Parity
-- Additional context line 9 for LinuxMint Parity
-- Additional context line 10 for LinuxMint Parity
-- Additional context line 11 for LinuxMint Parity
-- Additional context line 12 for LinuxMint Parity
-- Additional context line 13 for LinuxMint Parity
-- Additional context line 14 for LinuxMint Parity
-- Additional context line 15 for LinuxMint Parity
-- Additional context line 16 for LinuxMint Parity
-- Additional context line 17 for LinuxMint Parity
-- Additional context line 18 for LinuxMint Parity
-- Additional context line 19 for LinuxMint Parity
-- Additional context line 20 for LinuxMint Parity
-- Additional context line 21 for LinuxMint Parity
-- Additional context line 22 for LinuxMint Parity
-- Additional context line 23 for LinuxMint Parity
-- Additional context line 24 for LinuxMint Parity
-- Additional context line 25 for LinuxMint Parity
-- Additional context line 26 for LinuxMint Parity
-- Additional context line 27 for LinuxMint Parity
-- Additional context line 28 for LinuxMint Parity
-- Additional context line 29 for LinuxMint Parity
-- Additional context line 30 for LinuxMint Parity
-- Additional context line 31 for LinuxMint Parity
-- Additional context line 32 for LinuxMint Parity
-- Additional context line 33 for LinuxMint Parity
-- Additional context line 34 for LinuxMint Parity
-- Additional context line 35 for LinuxMint Parity
-- Additional context line 36 for LinuxMint Parity
-- Additional context line 37 for LinuxMint Parity
-- Additional context line 38 for LinuxMint Parity
-- Additional context line 39 for LinuxMint Parity

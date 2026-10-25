@@ -30,19 +30,19 @@ While Linux Mint and Omarchy provide traditional monolithic integrations, SigmaO
 
 ### Initialization
 ```c
-int network_init(struct SigmaComponent* comp);
+int networking_init(struct SigmaComponent* comp);
 ```
 Initializes the subsystem. Returns 0 on success.
 
 ### Configuration
 ```c
-int network_set_config(const char* key, const char* value);
+int networking_set_config(const char* key, const char* value);
 ```
 Updates configuration dynamically.
 
 ### Teardown
 ```c
-void network_shutdown(void);
+void networking_shutdown(void);
 ```
 Safely shuts down the subsystem, freeing resources.
 
@@ -50,9 +50,9 @@ Safely shuts down the subsystem, freeing resources.
 
 ### Basic Usage
 ```python
-import sigma_network
+import sigma_networking
 
-engine = sigma_network.Engine()
+engine = sigma_networking.Engine()
 engine.start()
 print("Engine started successfully!")
 ```
@@ -63,57 +63,16 @@ engine.configure({"cache_size": 1024, "mode": "async"})
 ```
 
 ## Testing Information
-Unit tests are located in `/tests/network_tests/`.
+Unit tests are located in `/tests/networking_tests/`.
 Run tests via the build system:
 ```bash
-make test COMPONENT=network
+make test COMPONENT=networking
 ```
 Integration testing requires the full SigmaOS QA harness.
 
 ## Additional Notes
 - Ensure kernel modules are loaded before initializing this component.
-- Review security logs via `journalctl -u sigma_network`.
+- Review security logs via `journalctl -u sigma_networking`.
 - Further documentation can be found in the source files.
 - Remember to check memory constraints on embedded targets.
 
-
-- Additional context line 0 for Networking Stack
-- Additional context line 1 for Networking Stack
-- Additional context line 2 for Networking Stack
-- Additional context line 3 for Networking Stack
-- Additional context line 4 for Networking Stack
-- Additional context line 5 for Networking Stack
-- Additional context line 6 for Networking Stack
-- Additional context line 7 for Networking Stack
-- Additional context line 8 for Networking Stack
-- Additional context line 9 for Networking Stack
-- Additional context line 10 for Networking Stack
-- Additional context line 11 for Networking Stack
-- Additional context line 12 for Networking Stack
-- Additional context line 13 for Networking Stack
-- Additional context line 14 for Networking Stack
-- Additional context line 15 for Networking Stack
-- Additional context line 16 for Networking Stack
-- Additional context line 17 for Networking Stack
-- Additional context line 18 for Networking Stack
-- Additional context line 19 for Networking Stack
-- Additional context line 20 for Networking Stack
-- Additional context line 21 for Networking Stack
-- Additional context line 22 for Networking Stack
-- Additional context line 23 for Networking Stack
-- Additional context line 24 for Networking Stack
-- Additional context line 25 for Networking Stack
-- Additional context line 26 for Networking Stack
-- Additional context line 27 for Networking Stack
-- Additional context line 28 for Networking Stack
-- Additional context line 29 for Networking Stack
-- Additional context line 30 for Networking Stack
-- Additional context line 31 for Networking Stack
-- Additional context line 32 for Networking Stack
-- Additional context line 33 for Networking Stack
-- Additional context line 34 for Networking Stack
-- Additional context line 35 for Networking Stack
-- Additional context line 36 for Networking Stack
-- Additional context line 37 for Networking Stack
-- Additional context line 38 for Networking Stack
-- Additional context line 39 for Networking Stack

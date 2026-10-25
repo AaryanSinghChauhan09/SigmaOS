@@ -30,19 +30,19 @@ While Linux Mint and Omarchy provide traditional monolithic integrations, SigmaO
 
 ### Initialization
 ```c
-int drivers_init(struct SigmaComponent* comp);
+int hardware_init(struct SigmaComponent* comp);
 ```
 Initializes the subsystem. Returns 0 on success.
 
 ### Configuration
 ```c
-int drivers_set_config(const char* key, const char* value);
+int hardware_set_config(const char* key, const char* value);
 ```
 Updates configuration dynamically.
 
 ### Teardown
 ```c
-void drivers_shutdown(void);
+void hardware_shutdown(void);
 ```
 Safely shuts down the subsystem, freeing resources.
 
@@ -50,9 +50,9 @@ Safely shuts down the subsystem, freeing resources.
 
 ### Basic Usage
 ```python
-import sigma_drivers
+import sigma_hardware
 
-engine = sigma_drivers.Engine()
+engine = sigma_hardware.Engine()
 engine.start()
 print("Engine started successfully!")
 ```
@@ -63,57 +63,16 @@ engine.configure({"cache_size": 1024, "mode": "async"})
 ```
 
 ## Testing Information
-Unit tests are located in `/tests/drivers_tests/`.
+Unit tests are located in `/tests/hardware_tests/`.
 Run tests via the build system:
 ```bash
-make test COMPONENT=drivers
+make test COMPONENT=hardware
 ```
 Integration testing requires the full SigmaOS QA harness.
 
 ## Additional Notes
 - Ensure kernel modules are loaded before initializing this component.
-- Review security logs via `journalctl -u sigma_drivers`.
+- Review security logs via `journalctl -u sigma_hardware`.
 - Further documentation can be found in the source files.
 - Remember to check memory constraints on embedded targets.
 
-
-- Additional context line 0 for Hardware Drivers
-- Additional context line 1 for Hardware Drivers
-- Additional context line 2 for Hardware Drivers
-- Additional context line 3 for Hardware Drivers
-- Additional context line 4 for Hardware Drivers
-- Additional context line 5 for Hardware Drivers
-- Additional context line 6 for Hardware Drivers
-- Additional context line 7 for Hardware Drivers
-- Additional context line 8 for Hardware Drivers
-- Additional context line 9 for Hardware Drivers
-- Additional context line 10 for Hardware Drivers
-- Additional context line 11 for Hardware Drivers
-- Additional context line 12 for Hardware Drivers
-- Additional context line 13 for Hardware Drivers
-- Additional context line 14 for Hardware Drivers
-- Additional context line 15 for Hardware Drivers
-- Additional context line 16 for Hardware Drivers
-- Additional context line 17 for Hardware Drivers
-- Additional context line 18 for Hardware Drivers
-- Additional context line 19 for Hardware Drivers
-- Additional context line 20 for Hardware Drivers
-- Additional context line 21 for Hardware Drivers
-- Additional context line 22 for Hardware Drivers
-- Additional context line 23 for Hardware Drivers
-- Additional context line 24 for Hardware Drivers
-- Additional context line 25 for Hardware Drivers
-- Additional context line 26 for Hardware Drivers
-- Additional context line 27 for Hardware Drivers
-- Additional context line 28 for Hardware Drivers
-- Additional context line 29 for Hardware Drivers
-- Additional context line 30 for Hardware Drivers
-- Additional context line 31 for Hardware Drivers
-- Additional context line 32 for Hardware Drivers
-- Additional context line 33 for Hardware Drivers
-- Additional context line 34 for Hardware Drivers
-- Additional context line 35 for Hardware Drivers
-- Additional context line 36 for Hardware Drivers
-- Additional context line 37 for Hardware Drivers
-- Additional context line 38 for Hardware Drivers
-- Additional context line 39 for Hardware Drivers
