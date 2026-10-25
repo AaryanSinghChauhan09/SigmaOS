@@ -507,6 +507,13 @@ if [ -f "src/creative/wordcraft_artcraft_missing_components_v66_pr.rs" ]; then
     ./build/test_wordcraft_v66
 fi
 
+if [ -f "src/creative/wordcraft_artcraft_missing_components_v67_pr.rs" ]; then
+    echo "Running Sovereign WordCraft & ArtCraft Missing Components Parity PR Gateway V67 test suite..."
+    mkdir -p build
+    rustc --test src/creative/wordcraft_artcraft_missing_components_v67_pr.rs --edition=2021 -o build/test_wordcraft_v67
+    ./build/test_wordcraft_v67
+fi
+
 if [ -f "src/creative/figcraft.rs" ]; then
     echo "Running Sovereign FigCraft UI/UX Vector Canvas PR test suite..."
     mkdir -p build
@@ -1220,7 +1227,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
@@ -1958,7 +1966,6 @@ if [ -f "src/distro/open_source_os_missing_components_v73_pr.rs" ]; then
     rustc --test tests/test_open_source_os_missing_components_v73_pr.rs --edition=2021 -o build/test_open_source_v73_pr_integration
     ./build/test_open_source_v73_pr_integration
 fi
-    ./build/test_open_source_v73_pr_integrationfi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
