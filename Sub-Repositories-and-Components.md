@@ -9,6 +9,10 @@ SigmaOS uses a **distributed multi-repository** architecture modelled on **Linux
 
 | Repository | Description | Upstream Inspirations |
 | :--- | :--- | :--- |
+| [`Sigma`](https://github.com/AaryanSinghChauhan09/Sigma) | Sigma baseline system substrate bridging Linux Mint and Omarchy Linux | https://github.com/linuxmint/mintsystem; https://github.com/omacom/omarchy |
+| [`SigmaOS`](https://github.com/AaryanSinghChauhan09/SigmaOS) | Central sovereign operating system umbrella repository linking all ecosystem components | native |
+| [`SigmaOS-chromium`](https://github.com/AaryanSinghChauhan09/SigmaOS-chromium) | Optimized Chromium browser profile with hardware acceleration and privacy sandboxing | https://github.com/omacom/omarchy-chromium |
+| [`SigmaOS-clock-global`](https://github.com/AaryanSinghChauhan09/SigmaOS-clock-global) | Global timezone and world clock indicator applet | https://github.com/omacom/elsewhen |
 | [`SigmaOS-kernel`](https://github.com/AaryanSinghChauhan09/SigmaOS-kernel) | SigmaOS microkernel core (scheduler, VFS, syscall gate, memory) | https://github.com/omacom/linux-aurora |
 | [`SigmaOS-filesystem`](https://github.com/AaryanSinghChauhan09/SigmaOS-filesystem) | Virtual filesystem layer, journaling & zero-copy paths | native |
 | [`SigmaOS-network`](https://github.com/AaryanSinghChauhan09/SigmaOS-network) | Networking stack: TCP/IP, TLS, mDNS discovery | native |
