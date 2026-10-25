@@ -156,6 +156,14 @@ impl NetBsd125RumpPciVirtio9pV72PrEngine {
         Self
     }
 
+    pub fn parse_9p_header(&self, packet: &[u8]) -> Option<(u8, u16)> {
+        if packet.len() >= 7 {
+            Some((packet[4], (packet[6] as u16) << 8 | (packet[5] as u16)))
+        } else {
+            None
+        }
+    }
+
     pub fn generate_pr_spec(&self) -> OpenSourceOsV72PrSpec {
         OpenSourceOsV72PrSpec {
             pr_id: 7204,

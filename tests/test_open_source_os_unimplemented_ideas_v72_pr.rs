@@ -21,7 +21,7 @@ fn test_open_source_os_unimplemented_ideas_v72_suite() {
 
     // Verify individual engines
     let mut sched = Linux629SchedExtFolioCompactionV72PrEngine::new();
-    assert_eq!(sched.compact_folios(), 128);
+    assert_eq!(sched.compact_folios(), 192);
 
     let rump = NetBsd125RumpPciVirtio9pV72PrEngine::new();
     let packet = [0, 0, 0, 0, 10, 0x12, 0x34];
