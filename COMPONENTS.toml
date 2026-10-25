@@ -10244,3 +10244,165 @@ engine = "support_system"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/help-center"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-system-configurator"
+description = "System configurator for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-configurator"
+engine = "configurator"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-configurator"
+description = "System configurator for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-configurator"
+engine = "configurator"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-configurator"
+description = "System configurator for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-configurator"
+engine = "configurator"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/configurator"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-power-manager"
+description = "Power manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-power-manager"
+engine = "power_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/power-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-power"
+description = "Power manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-power"
+engine = "power_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/power-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-power"
+description = "Power manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-power"
+engine = "power_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/power-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-date-time"
+description = "Date and time manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-date-time"
+engine = "date_time"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/date-time"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-dt"
+description = "Date and time manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-dt"
+engine = "date_time"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/date-time"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-dt"
+description = "Date and time manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-dt"
+engine = "date_time"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/date-time"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-calendar"
+description = "Calendar for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-calendar"
+engine = "calendar"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/calendar"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-cal"
+description = "Calendar for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-cal"
+engine = "calendar"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/calendar"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-cal"
+description = "Calendar for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-cal"
+engine = "calendar"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/calendar"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-printer-manager"
+description = "Printer manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-printer-manager"
+engine = "printer_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/printer-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-print"
+description = "Printer manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-print"
+engine = "printer_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/print-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-print"
+description = "Printer manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-print"
+engine = "printer_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/print-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-scanner"
+description = "Scanner manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-scanner"
+engine = "scanner_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/scanner-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-scan"
+description = "Scanner manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-scan"
+engine = "scanner_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/scan-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-scan"
+description = "Scanner manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-scan"
+engine = "scanner_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/scan-manager"]
+visibility = "public"
