@@ -27,6 +27,7 @@ pub mod sovereign_application_replacements_v3_pr_suite;
 pub mod sovereign_application_replacements_v4_pr_suite;
 pub mod sovereign_apps;
 pub mod sovereign_office_suite_innovations_v5;
+pub mod sovereign_office_suite_innovations_v6;
 pub mod subtitle_editor;
 pub mod system_settings;
 pub mod tasks;
@@ -36,6 +37,7 @@ pub mod utility_suite;
 
 pub use enterprise_productivity_suite::*;
 pub use sovereign_office_suite_innovations_v5::*;
+pub use sovereign_office_suite_innovations_v6::*;
 
 pub use itsfoss_apps_synthesis::{
     IptvChannelNode, ItsFossBulkyBatchRenamerEngine, ItsFossHypnotixIptvEngine,
