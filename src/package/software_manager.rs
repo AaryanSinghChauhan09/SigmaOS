@@ -5,6 +5,21 @@
 
 use std::collections::HashMap;
 
+/// Fast case-insensitive substring check without dynamic heap allocations for ASCII text.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if haystack.is_ascii() && needle.is_ascii() {
+        needle.is_empty()
+            || (needle.len() <= haystack.len()
+                && haystack
+                    .as_bytes()
+                    .windows(needle.len())
+                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// AppPackage status
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppPackageStatus {
@@ -16,12 +31,18 @@ pub enum AppPackageStatus {
 
 impl AppPackageStatus {
     pub fn from_str(s: &str) -> Option<Self> {
-        match s.to_lowercase().as_str() {
-            "installed" => Some(AppPackageStatus::Installed),
-            "notinstalled" | "not_installed" => Some(AppPackageStatus::NotInstalled),
-            "updateavailable" | "update_available" => Some(AppPackageStatus::UpdateAvailable),
-            "pinned" => Some(AppPackageStatus::Pinned),
-            _ => None,
+        if s.eq_ignore_ascii_case("installed") {
+            Some(AppPackageStatus::Installed)
+        } else if s.eq_ignore_ascii_case("notinstalled") || s.eq_ignore_ascii_case("not_installed") {
+            Some(AppPackageStatus::NotInstalled)
+        } else if s.eq_ignore_ascii_case("updateavailable")
+            || s.eq_ignore_ascii_case("update_available")
+        {
+            Some(AppPackageStatus::UpdateAvailable)
+        } else if s.eq_ignore_ascii_case("pinned") {
+            Some(AppPackageStatus::Pinned)
+        } else {
+            None
         }
     }
 
@@ -51,17 +72,26 @@ pub enum AppPackageCategory {
 
 impl AppPackageCategory {
     pub fn from_str(s: &str) -> Option<Self> {
-        match s.to_lowercase().as_str() {
-            "system" => Some(AppPackageCategory::System),
-            "development" => Some(AppPackageCategory::Development),
-            "multimedia" => Some(AppPackageCategory::Multimedia),
-            "network" => Some(AppPackageCategory::Network),
-            "graphics" => Some(AppPackageCategory::Graphics),
-            "office" => Some(AppPackageCategory::Office),
-            "games" => Some(AppPackageCategory::Games),
-            "education" => Some(AppPackageCategory::Education),
-            "utility" => Some(AppPackageCategory::Utility),
-            _ => None,
+        if s.eq_ignore_ascii_case("system") {
+            Some(AppPackageCategory::System)
+        } else if s.eq_ignore_ascii_case("development") {
+            Some(AppPackageCategory::Development)
+        } else if s.eq_ignore_ascii_case("multimedia") {
+            Some(AppPackageCategory::Multimedia)
+        } else if s.eq_ignore_ascii_case("network") {
+            Some(AppPackageCategory::Network)
+        } else if s.eq_ignore_ascii_case("graphics") {
+            Some(AppPackageCategory::Graphics)
+        } else if s.eq_ignore_ascii_case("office") {
+            Some(AppPackageCategory::Office)
+        } else if s.eq_ignore_ascii_case("games") {
+            Some(AppPackageCategory::Games)
+        } else if s.eq_ignore_ascii_case("education") {
+            Some(AppPackageCategory::Education)
+        } else if s.eq_ignore_ascii_case("utility") {
+            Some(AppPackageCategory::Utility)
+        } else {
+            None
         }
     }
 
@@ -272,14 +302,12 @@ impl SoftwarePackageManager {
             .collect()
     }
 
-    /// Search packages
+    /// Search packages without per-package heap allocations
     pub fn search(&self, query: &str) -> Vec<&AppPackage> {
-        let query_lower = query.to_lowercase();
         self.packages
             .values()
             .filter(|p| {
-                p.name.to_lowercase().contains(&query_lower)
-                    || p.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&p.name, query) || contains_ignore_case(&p.description, query)
             })
             .collect()
     }
