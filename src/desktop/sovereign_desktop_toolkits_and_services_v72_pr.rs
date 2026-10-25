@@ -22,7 +22,8 @@ pub enum AdwColorSchemeV72 {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Qt6PlatformStyleV72 {    Breeze = 0,
+pub enum Qt6PlatformStyleV72 {
+    Breeze = 0,
     Fusion = 1,
     AdwaitaQt = 2,
     Oxygen = 3,
@@ -57,7 +58,8 @@ pub struct SovereignGtkQtToolkitEngineV72 {
     pub gtk_render_pipeline: Gtk4RenderPipelineV72,
     pub active_accent_hex: String,
     pub kvantum_spec: Option<KvantumThemeSpecV72>,
-    pub css_custom_rules: Vec<String>,}
+    pub css_custom_rules: Vec<String>,
+}
 
 impl SovereignGtkQtToolkitEngineV72 {
     pub fn new() -> Self {
@@ -127,7 +129,8 @@ impl SovereignGtkQtToolkitEngineV72 {
             )
         } else {
             "[Config]\ntheme=Default\n".to_string()
-        }    }
+        }
+    }
 }
 
 // ============================================================================
@@ -184,7 +187,13 @@ pub struct SovereignDisplayManagerSuiteEngineV72 {
 impl SovereignDisplayManagerSuiteEngineV72 {
     pub fn new(kind: DisplayManagerKindV72) -> Self {
         let mut seat_assignments = BTreeMap::new();
-        seat_assignments.insert("seat0".to_string(), vec!["/dev/dri/card0".to_string(), "/dev/input/event0".to_string()]);
+        seat_assignments.insert(
+            "seat0".to_string(),
+            vec![
+                "/dev/dri/card0".to_string(),
+                "/dev/input/event0".to_string(),
+            ],
+        );
         Self {
             dm_kind: kind,
             seat_assignments,
@@ -235,7 +244,8 @@ impl SovereignDisplayManagerSuiteEngineV72 {
     pub fn build_xdmcp_query(&self, target_host: &str) -> Vec<u8> {
         let mut packet = vec![0x00, 0x01, 0x00, 0x02]; // XDMCP Header
         packet.extend_from_slice(target_host.as_bytes());
-        packet    }
+        packet
+    }
 }
 
 // ============================================================================
@@ -301,7 +311,8 @@ impl SovereignGvfsGioFileSystemEngineV72 {
     }
 
     pub fn get_dconf_value(&self, key: &str) -> Option<&String> {
-        self.dconf_tree.get(key)    }
+        self.dconf_tree.get(key)
+    }
 }
 
 // ============================================================================
@@ -319,7 +330,8 @@ pub struct PolkitRuleV72 {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignPolicyKitAuthorizationEngineV72 {
     pub rules: Vec<PolkitRuleV72>,
-    pub active_agent_sessions: BTreeMap<String, String>,}
+    pub active_agent_sessions: BTreeMap<String, String>,
+}
 
 impl SovereignPolicyKitAuthorizationEngineV72 {
     pub fn new() -> Self {
@@ -361,7 +373,8 @@ impl SovereignPolicyKitAuthorizationEngineV72 {
                 count += 1;
             }
         }
-        count    }
+        count
+    }
 }
 
 // ============================================================================
@@ -377,8 +390,14 @@ pub struct SovereignXdgPortalsUtilitiesEngineV72 {
 impl SovereignXdgPortalsUtilitiesEngineV72 {
     pub fn new() -> Self {
         let mut mime = BTreeMap::new();
-        mime.insert("text/html".to_string(), "org.gnome.Epiphany.desktop".to_string());
-        mime.insert("application/pdf".to_string(), "org.gnome.Evince.desktop".to_string());
+        mime.insert(
+            "text/html".to_string(),
+            "org.gnome.Epiphany.desktop".to_string(),
+        );
+        mime.insert(
+            "application/pdf".to_string(),
+            "org.gnome.Evince.desktop".to_string(),
+        );
 
         let mut portals = BTreeMap::new();
         portals.insert("default".to_string(), "gtk;hyprland".to_string());
@@ -407,11 +426,13 @@ impl SovereignXdgPortalsUtilitiesEngineV72 {
                 continue;
             }
             if let Some((k, v)) = trimmed.split_once('=') {
-                self.portals_config.insert(k.trim().to_string(), v.trim().to_string());
+                self.portals_config
+                    .insert(k.trim().to_string(), v.trim().to_string());
                 count += 1;
             }
         }
-        count    }
+        count
+    }
 }
 
 // ============================================================================
@@ -471,7 +492,11 @@ impl SovereignFontTextLayoutEngineV72 {
     }
 
     pub fn parse_pango_markup(&self, markup: &str) -> String {
-        let clean = markup.replace("<b>", "").replace("</b>", "").replace("<i>", "").replace("</i>", "");
+        let clean = markup
+            .replace("<b>", "")
+            .replace("</b>", "")
+            .replace("<i>", "")
+            .replace("</i>", "");
         format!("PangoLayout::clean_text('{}')", clean)
     }
 }
@@ -498,16 +523,24 @@ impl SovereignInputMethodFrameworkEngineV72 {
         Self {
             ime_kind: kind,
             active_layout: "us".to_string(),
-            enabled_addons: vec!["pinyin".to_string(), "mozc".to_string(), "hangul".to_string()],
+            enabled_addons: vec![
+                "pinyin".to_string(),
+                "mozc".to_string(),
+                "hangul".to_string(),
+            ],
         }
     }
 
     pub fn handle_text_input_v3_commit(&mut self, text: &str) -> String {
-        format!("text-input-v3: committed '{}' via {:?}", text, self.ime_kind)
+        format!(
+            "text-input-v3: committed '{}' via {:?}",
+            text, self.ime_kind
+        )
     }
 
     pub fn switch_layout(&mut self, layout: &str) {
-        self.active_layout = layout.to_string();    }
+        self.active_layout = layout.to_string();
+    }
 }
 
 // ============================================================================
@@ -540,7 +573,14 @@ impl SovereignNotificationDaemonEngineV72 {
         }
     }
 
-    pub fn notify(&mut self, app: &str, summary: &str, body: &str, urgency: u8, timeout: i32) -> u32 {
+    pub fn notify(
+        &mut self,
+        app: &str,
+        summary: &str,
+        body: &str,
+        urgency: u8,
+        timeout: i32,
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         if !self.dnd_enabled {
@@ -560,7 +600,8 @@ impl SovereignNotificationDaemonEngineV72 {
     }
 
     pub fn close_notification(&mut self, id: u32) -> bool {
-        self.notifications.remove(&id).is_some()    }
+        self.notifications.remove(&id).is_some()
+    }
 }
 
 // ============================================================================
@@ -572,7 +613,8 @@ pub struct SovereignScreenLockerEngineV72 {
     pub is_locked: bool,
     pub pam_backoff_sec: u32,
     pub blur_radius: u32,
-    pub password_hash: String,}
+    pub password_hash: String,
+}
 
 impl SovereignScreenLockerEngineV72 {
     pub fn new() -> Self {
@@ -605,7 +647,11 @@ impl SovereignScreenLockerEngineV72 {
     }
 
     pub fn generate_kawase_blur_pipeline(&self) -> String {
-        format!("OpenGL::DualKawaseBlur(radius={}, passes=4)", self.blur_radius)    }
+        format!(
+            "OpenGL::DualKawaseBlur(radius={}, passes=4)",
+            self.blur_radius
+        )
+    }
 }
 
 // ============================================================================
@@ -623,7 +669,8 @@ pub struct ClipboardItemV72 {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignClipboardManagerEngineV72 {
     pub history: Vec<ClipboardItemV72>,
-    pub max_history: usize,}
+    pub max_history: usize,
+}
 
 impl SovereignClipboardManagerEngineV72 {
     pub fn new() -> Self {
@@ -649,7 +696,8 @@ impl SovereignClipboardManagerEngineV72 {
     pub fn wipe_secrets(&mut self) -> usize {
         let orig_len = self.history.len();
         self.history.retain(|item| !item.is_secret);
-        orig_len - self.history.len()    }
+        orig_len - self.history.len()
+    }
 }
 
 // ============================================================================
@@ -672,19 +720,32 @@ pub struct SovereignDesktopServicesV72PrGatewayEngine {
 
 impl SovereignDesktopServicesV72PrGatewayEngine {
     pub fn new() -> Self {
-        Self { proposals: Vec::new() }
+        Self {
+            proposals: Vec::new(),
+        }
     }
 
     pub fn generate_10_distro_prs(&mut self) -> usize {
         let distros = [
-            "Debian", "Ubuntu", "Fedora", "Arch Linux", "Alpine Linux",
-            "FreeBSD", "OpenBSD", "Void Linux", "Gentoo", "openSUSE",
+            "Debian",
+            "Ubuntu",
+            "Fedora",
+            "Arch Linux",
+            "Alpine Linux",
+            "FreeBSD",
+            "OpenBSD",
+            "Void Linux",
+            "Gentoo",
+            "openSUSE",
         ];
         for d in distros {
             self.proposals.push(DesktopPrProposalV72 {
                 distro_target: d.to_string(),
                 component_name: "SovereignDesktopServicesV72".to_string(),
-                description: format!("Integrate V72 GTK/Qt/Polkit/Portals/Font/IME suite into {}", d),
+                description: format!(
+                    "Integrate V72 GTK/Qt/Polkit/Portals/Font/IME suite into {}",
+                    d
+                ),
                 code_changes_count: 42,
                 passed_audit: true,
             });
@@ -693,7 +754,8 @@ impl SovereignDesktopServicesV72PrGatewayEngine {
     }
 
     pub fn audit_all_proposals(&self) -> bool {
-        self.proposals.iter().all(|p| p.passed_audit)    }
+        self.proposals.iter().all(|p| p.passed_audit)
+    }
 }
 
 // ============================================================================
@@ -725,12 +787,14 @@ mod tests {
             username: "sigma".to_string(),
             password: "secret_password".to_string(),
             password_hash: "sha256_secret_password".to_string(),
-            mfa_otp: None,            seat_id: "seat0".to_string(),
+            mfa_otp: None,
+            seat_id: "seat0".to_string(),
         };
         let res = dm.authenticate_pam(&req);
         assert!(res.authenticated);
 
-        let limits = dm.parse_bsd_login_conf("default:\\\n  :maxproc=2048:\\\n  :openfiles=1024:\n");
+        let limits =
+            dm.parse_bsd_login_conf("default:\\\n  :maxproc=2048:\\\n  :openfiles=1024:\n");
         assert_eq!(limits.get("maxproc"), Some(&"2048".to_string()));
 
         let xdmcp = dm.build_xdmcp_query("192.168.1.10");
@@ -776,7 +840,9 @@ mod tests {
         assert_eq!(glyphs.len(), 5);
 
         let mut ime = SovereignInputMethodFrameworkEngineV72::new(ImeEngineKindV72::Fcitx5);
-        assert!(ime.handle_text_input_v3_commit("Text").contains("committed 'Text'"));
+        assert!(ime
+            .handle_text_input_v3_commit("Text")
+            .contains("committed 'Text'"));
 
         let mut notif = SovereignNotificationDaemonEngineV72::new();
         let nid = notif.notify("App", "Sum", "Body", 1, 3000);
@@ -796,5 +862,6 @@ mod tests {
 
         let mut pr = SovereignDesktopServicesV72PrGatewayEngine::new();
         assert_eq!(pr.generate_10_distro_prs(), 10);
-        assert!(pr.audit_all_proposals());    }
+        assert!(pr.audit_all_proposals());
+    }
 }

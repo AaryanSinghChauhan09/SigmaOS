@@ -59,8 +59,16 @@ impl OpenBsdSoftraidCryptoVolumeKeyringPrEngine {
         self.registered_volumes.push(spec);
     }
 
-    pub fn unlock_volume(&self, volume_id: &str, key_pin: &str) -> Result<SoftraidVolumeStatus, String> {
-        if let Some(spec) = self.registered_volumes.iter().find(|v| v.volume_id == volume_id) {
+    pub fn unlock_volume(
+        &self,
+        volume_id: &str,
+        key_pin: &str,
+    ) -> Result<SoftraidVolumeStatus, String> {
+        if let Some(spec) = self
+            .registered_volumes
+            .iter()
+            .find(|v| v.volume_id == volume_id)
+        {
             if key_pin.is_empty() {
                 return Err(String::from("Key pin cannot be empty"));
             }
@@ -78,7 +86,11 @@ impl OpenBsdSoftraidCryptoVolumeKeyringPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} softraid volumes registered", self.engine_name, self.registered_volumes.len())
+        format!(
+            "{}: {} softraid volumes registered",
+            self.engine_name,
+            self.registered_volumes.len()
+        )
     }
 }
 
@@ -126,7 +138,12 @@ impl OpenBsdPfStatefulSynProxySctpPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} active PF rules, {} total tracked states", self.engine_name, self.active_rules.len(), self.active_states_count)
+        format!(
+            "{}: {} active PF rules, {} total tracked states",
+            self.engine_name,
+            self.active_rules.len(),
+            self.active_states_count
+        )
     }
 }
 
@@ -164,7 +181,11 @@ impl OpenBsdVmdVirtioNetPciPassPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} microVMs running", self.engine_name, self.running_vms.len())
+        format!(
+            "{}: {} microVMs running",
+            self.engine_name,
+            self.running_vms.len()
+        )
     }
 }
 
@@ -189,12 +210,20 @@ impl OpenBsdSmtpdDnsblSpfDmarcPrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD OpenSMTPD DNSBL/SPF/DMARC MTA Filter PR Engine V65"),
-            dnsbl_servers: Vec::from([String::from("zen.spamhaus.org"), String::from("bl.spamcop.net")]),
+            dnsbl_servers: Vec::from([
+                String::from("zen.spamhaus.org"),
+                String::from("bl.spamcop.net"),
+            ]),
             total_emails_processed: 0,
         }
     }
 
-    pub fn filter_incoming_mail(&mut self, sender: &str, recipient: &str, sender_ip: &str) -> SmtpdMailFilterResult {
+    pub fn filter_incoming_mail(
+        &mut self,
+        sender: &str,
+        recipient: &str,
+        sender_ip: &str,
+    ) -> SmtpdMailFilterResult {
         self.total_emails_processed += 1;
         let is_clean = !sender_ip.starts_with("192.0.2.");
         let spf = sender.contains('@');
@@ -210,7 +239,12 @@ impl OpenBsdSmtpdDnsblSpfDmarcPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} mails processed using {} DNSBL zones", self.engine_name, self.total_emails_processed, self.dnsbl_servers.len())
+        format!(
+            "{}: {} mails processed using {} DNSBL zones",
+            self.engine_name,
+            self.total_emails_processed,
+            self.dnsbl_servers.len()
+        )
     }
 }
 
@@ -232,12 +266,24 @@ impl OpenBsdSignifyPqcMinisignVerifyPrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Signify & PQC Minisign Verifier PR Engine V65"),
-            trusted_keys: Vec::from([String::from("openbsd-76-base.pub"), String::from("openbsd-76-pkg.pub")]),
+            trusted_keys: Vec::from([
+                String::from("openbsd-76-base.pub"),
+                String::from("openbsd-76-pkg.pub"),
+            ]),
         }
     }
 
-    pub fn verify_artifact(&self, artifact_name: &str, signature: &str, key_fingerprint: &str) -> SignifyVerifyResult {
-        let is_valid = !signature.is_empty() && self.trusted_keys.iter().any(|k: &String| k.contains(key_fingerprint) || key_fingerprint == "trusted");
+    pub fn verify_artifact(
+        &self,
+        artifact_name: &str,
+        signature: &str,
+        key_fingerprint: &str,
+    ) -> SignifyVerifyResult {
+        let is_valid = !signature.is_empty()
+            && self
+                .trusted_keys
+                .iter()
+                .any(|k: &String| k.contains(key_fingerprint) || key_fingerprint == "trusted");
         SignifyVerifyResult {
             artifact_name: String::from(artifact_name),
             public_key_fingerprint: String::from(key_fingerprint),
@@ -247,7 +293,11 @@ impl OpenBsdSignifyPqcMinisignVerifyPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} trusted signify keys loaded", self.engine_name, self.trusted_keys.len())
+        format!(
+            "{}: {} trusted signify keys loaded",
+            self.engine_name,
+            self.trusted_keys.len()
+        )
     }
 }
 
@@ -289,7 +339,11 @@ impl OpenBsdRelaydStreamTlsSniProxyPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} upstream proxy backends configured", self.engine_name, self.backends.len())
+        format!(
+            "{}: {} upstream proxy backends configured",
+            self.engine_name,
+            self.backends.len()
+        )
     }
 }
 
@@ -311,7 +365,10 @@ impl OpenBsdUnwindDnssecDoTDoHPrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Unwind DNSSEC DoT/DoH Resolving Stub PR Engine V65"),
-            upstream_resolvers: Vec::from([String::from("tls://1.1.1.1:853"), String::from("https://dns.quad9.net/dns-query")]),
+            upstream_resolvers: Vec::from([
+                String::from("tls://1.1.1.1:853"),
+                String::from("https://dns.quad9.net/dns-query"),
+            ]),
         }
     }
 
@@ -319,13 +376,21 @@ impl OpenBsdUnwindDnssecDoTDoHPrEngine {
         UnwindQueryResult {
             domain: String::from(domain),
             dnssec_validated: true,
-            transport_protocol: String::from(if prefer_doh { "DNS-over-HTTPS" } else { "DNS-over-TLS" }),
+            transport_protocol: String::from(if prefer_doh {
+                "DNS-over-HTTPS"
+            } else {
+                "DNS-over-TLS"
+            }),
             resolved_ip: String::from("192.0.2.100"),
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} secure upstream resolvers active", self.engine_name, self.upstream_resolvers.len())
+        format!(
+            "{}: {} secure upstream resolvers active",
+            self.engine_name,
+            self.upstream_resolvers.len()
+        )
     }
 }
 
@@ -349,7 +414,10 @@ impl OpenBsdPfsyncStateReplicationV3PrEngine {
         Self {
             engine_name: String::from("OpenBSD pfsync v3 HA State Replication PR Engine V65"),
             sync_interface: String::from("pfsync0"),
-            cluster_nodes: Vec::from([String::from("node1.fw.internal"), String::from("node2.fw.internal")]),
+            cluster_nodes: Vec::from([
+                String::from("node1.fw.internal"),
+                String::from("node2.fw.internal"),
+            ]),
         }
     }
 
@@ -363,7 +431,12 @@ impl OpenBsdPfsyncStateReplicationV3PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: interface {} syncing across {} HA nodes", self.engine_name, self.sync_interface, self.cluster_nodes.len())
+        format!(
+            "{}: interface {} syncing across {} HA nodes",
+            self.engine_name,
+            self.sync_interface,
+            self.cluster_nodes.len()
+        )
     }
 }
 
@@ -385,7 +458,9 @@ pub struct OpenBsdSndiodSubdeviceRoutingPrEngine {
 impl OpenBsdSndiodSubdeviceRoutingPrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Sndiod Network Subdevice & MIDI Routing PR Engine V65"),
+            engine_name: String::from(
+                "OpenBSD Sndiod Network Subdevice & MIDI Routing PR Engine V65",
+            ),
             active_routes: Vec::new(),
         }
     }
@@ -395,7 +470,11 @@ impl OpenBsdSndiodSubdeviceRoutingPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} active audio/MIDI subdevice streams", self.engine_name, self.active_routes.len())
+        format!(
+            "{}: {} active audio/MIDI subdevice streams",
+            self.engine_name,
+            self.active_routes.len()
+        )
     }
 }
 
@@ -416,7 +495,9 @@ pub struct OpenBsdSysupgradeFirmwareAutoPrEngine {
 impl OpenBsdSysupgradeFirmwareAutoPrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Sysupgrade OS & Firmware Auto-Upgrader PR Engine V65"),
+            engine_name: String::from(
+                "OpenBSD Sysupgrade OS & Firmware Auto-Upgrader PR Engine V65",
+            ),
             cdn_mirror: String::from("https://cdn.openbsd.org/pub/OpenBSD/"),
         }
     }
@@ -432,7 +513,10 @@ impl OpenBsdSysupgradeFirmwareAutoPrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: connected to mirror {}", self.engine_name, self.cdn_mirror)
+        format!(
+            "{}: connected to mirror {}",
+            self.engine_name, self.cdn_mirror
+        )
     }
 }
 
@@ -454,7 +538,9 @@ pub struct OpenBsdMissingComponentsV65PrSuite {
 impl OpenBsdMissingComponentsV65PrSuite {
     pub fn new() -> Self {
         Self {
-            suite_name: String::from("SigmaOS OpenBSD Missing Components V65 Master PR Gateway Suite"),
+            suite_name: String::from(
+                "SigmaOS OpenBSD Missing Components V65 Master PR Gateway Suite",
+            ),
             softraid_engine: OpenBsdSoftraidCryptoVolumeKeyringPrEngine::new(),
             pf_engine: OpenBsdPfStatefulSynProxySctpPrEngine::new(),
             vmd_engine: OpenBsdVmdVirtioNetPciPassPrEngine::new(),
@@ -545,7 +631,8 @@ mod tests {
     #[test]
     fn test_openbsd_smtpd_filter_engine() {
         let mut engine = OpenBsdSmtpdDnsblSpfDmarcPrEngine::new();
-        let filter = engine.filter_incoming_mail("user@example.com", "admin@sigmaos.org", "198.51.100.1");
+        let filter =
+            engine.filter_incoming_mail("user@example.com", "admin@sigmaos.org", "198.51.100.1");
         assert!(filter.accepted);
         assert!(filter.is_dnsbl_clean);
         assert!(filter.spf_pass);

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Principle: SELF-HEALING, FAULT ISOLATION, MICROKERNEL ROBUSTNESS, SERVICE REINCARNATION
 
-use alloc::{vec::Vec, string::String, collections::BTreeMap};
+use alloc::{collections::BTreeMap, string::String, vec::Vec};
 
 /// Policy controlling how a driver is restarted upon failure
 #[derive(Debug, Clone)]
@@ -23,7 +23,12 @@ impl DriverPolicy {
     }
 
     pub fn critical() -> Self {
-        Self { max_restarts: 3, backoff_ms: 100, restart_on_crash: true, critical: true }
+        Self {
+            max_restarts: 3,
+            backoff_ms: 100,
+            restart_on_crash: true,
+            critical: true,
+        }
     }
 }
 
@@ -107,7 +112,11 @@ impl ReincarnationServer {
         let record = self.services.get_mut(name).ok_or("service not found")?;
         record.state = DriverState::Crashed;
         record.last_crash_tick = tick;
-        self.log(alloc::format!("service '{}' crashed at tick {}", name, tick));
+        self.log(alloc::format!(
+            "service '{}' crashed at tick {}",
+            name,
+            tick
+        ));
         Ok(())
     }
 
@@ -194,7 +203,12 @@ mod tests {
 
     #[test]
     fn test_max_restarts_disables_service() {
-        let policy = DriverPolicy { max_restarts: 2, backoff_ms: 0, restart_on_crash: true, critical: false };
+        let policy = DriverPolicy {
+            max_restarts: 2,
+            backoff_ms: 0,
+            restart_on_crash: true,
+            critical: false,
+        };
         let mut srv = ReincarnationServer::new();
         srv.register_service(String::from("net"), policy);
 
@@ -214,7 +228,10 @@ mod tests {
         srv.register_service(String::from("audio"), DriverPolicy::default());
         srv.report_crash("audio").unwrap();
         srv.tick();
-        assert_eq!(srv.get_service("audio").unwrap().state, DriverState::Running);
+        assert_eq!(
+            srv.get_service("audio").unwrap().state,
+            DriverState::Running
+        );
     }
 
     #[test]

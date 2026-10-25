@@ -54,7 +54,11 @@ impl LinuxBsdVfsPathTranslationEngine {
     }
 
     /// Translates canonical native paths to distro-specific path schemes.
-    pub fn translate_path(&self, distro: LinuxBsdDistroInspiration, canonical_path: &str) -> String {
+    pub fn translate_path(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        canonical_path: &str,
+    ) -> String {
         match (distro, canonical_path) {
             (LinuxBsdDistroInspiration::NixOS, path) if path.starts_with("/usr/bin/") => {
                 format!("/nix/store/canonical-bin/{}", &path[9..])
@@ -71,7 +75,9 @@ impl LinuxBsdVfsPathTranslationEngine {
             (LinuxBsdDistroInspiration::VoidLinux, path) if path.starts_with("/var/run/") => {
                 format!("/run/{}", &path[9..])
             }
-            (LinuxBsdDistroInspiration::AlpineLinux, path) if path.starts_with("/usr/local/bin/") => {
+            (LinuxBsdDistroInspiration::AlpineLinux, path)
+                if path.starts_with("/usr/local/bin/") =>
+            {
                 format!("/bin/{}", &path[15..])
             }
             (LinuxBsdDistroInspiration::ClearLinux, path) if path.starts_with("/etc/") => {
@@ -137,7 +143,11 @@ impl LinuxBsdPackageFormatResolverEngine {
     }
 
     /// Maps package name to distro-native specifier extension.
-    pub fn resolve_package_spec(&self, distro: LinuxBsdDistroInspiration, package_name: &str) -> String {
+    pub fn resolve_package_spec(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        package_name: &str,
+    ) -> String {
         match distro {
             LinuxBsdDistroInspiration::ArchLinux
             | LinuxBsdDistroInspiration::GarudaLinux
@@ -182,7 +192,12 @@ impl LinuxBsdServiceSupervisorEngine {
     }
 
     /// Adapts service command string to native supervisor format.
-    pub fn adapt_service_cmd(&self, distro: LinuxBsdDistroInspiration, service: &str, action: &str) -> String {
+    pub fn adapt_service_cmd(
+        &self,
+        distro: LinuxBsdDistroInspiration,
+        service: &str,
+        action: &str,
+    ) -> String {
         match distro {
             LinuxBsdDistroInspiration::ArchLinux
             | LinuxBsdDistroInspiration::DebianGNU
@@ -191,7 +206,9 @@ impl LinuxBsdServiceSupervisorEngine {
             | LinuxBsdDistroInspiration::FedoraLinux
             | LinuxBsdDistroInspiration::OpenSUSE
             | LinuxBsdDistroInspiration::ClearLinux
-            | LinuxBsdDistroInspiration::PopOS => format!("systemctl {} {}.service", action, service),
+            | LinuxBsdDistroInspiration::PopOS => {
+                format!("systemctl {} {}.service", action, service)
+            }
             LinuxBsdDistroInspiration::VoidLinux => format!("sv {} {}", action, service),
             LinuxBsdDistroInspiration::AlpineLinux | LinuxBsdDistroInspiration::GentooLinux => {
                 format!("rc-service {} {}", service, action)
@@ -314,8 +331,14 @@ mod tests {
     #[test]
     fn test_security_isolation_score() {
         let iso_engine = LinuxBsdSecurityIsolationLevelEngine::new();
-        assert_eq!(iso_engine.evaluate_isolation_score(LinuxBsdDistroInspiration::QubesOS), 99);
-        assert_eq!(iso_engine.evaluate_isolation_score(LinuxBsdDistroInspiration::OpenBSD), 96);
+        assert_eq!(
+            iso_engine.evaluate_isolation_score(LinuxBsdDistroInspiration::QubesOS),
+            99
+        );
+        assert_eq!(
+            iso_engine.evaluate_isolation_score(LinuxBsdDistroInspiration::OpenBSD),
+            96
+        );
     }
 
     #[test]

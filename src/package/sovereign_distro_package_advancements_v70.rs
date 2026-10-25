@@ -357,7 +357,9 @@ impl PackageAdapterStrategyV70 for ApkPackageStrategyV70 {
 pub struct UniversalPackageAdapterFactoryV70;
 
 impl UniversalPackageAdapterFactoryV70 {
-    pub fn create_strategy(format: PackageFormat) -> Vec<alloc::boxed::Box<dyn PackageAdapterStrategyV70>> {
+    pub fn create_strategy(
+        format: PackageFormat,
+    ) -> Vec<alloc::boxed::Box<dyn PackageAdapterStrategyV70>> {
         match format {
             PackageFormat::Deb | PackageFormat::Superdeb => {
                 vec![alloc::boxed::Box::new(DebPackageStrategyV70)]
@@ -631,10 +633,7 @@ impl UniversalCrossDistroSatSolverV70 {
         }
     }
 
-    pub fn solve_dependencies(
-        &self,
-        raw_dependencies: &[String],
-    ) -> Result<Vec<String>, String> {
+    pub fn solve_dependencies(&self, raw_dependencies: &[String]) -> Result<Vec<String>, String> {
         let mut resolved = Vec::new();
         for dep in raw_dependencies {
             let canonical = self
@@ -650,7 +649,9 @@ impl UniversalCrossDistroSatSolverV70 {
     }
 
     pub fn audit_vulnerabilities(&self, package_version: &str) -> bool {
-        !self.known_vulnerabilities.contains(&package_version.to_string())
+        !self
+            .known_vulnerabilities
+            .contains(&package_version.to_string())
     }
 }
 
@@ -791,7 +792,10 @@ impl UniversalBootEnvSnapshotGovernorV70 {
     pub fn rollback(&mut self, snapshot_id: u64) -> Result<String, String> {
         if let Some(snap) = self.snapshots.get_mut(&snapshot_id) {
             snap.active = true;
-            Ok(format!("Rolled back boot environment to snapshot {}", snap.name))
+            Ok(format!(
+                "Rolled back boot environment to snapshot {}",
+                snap.name
+            ))
         } else {
             Err("Snapshot ID not found".to_string())
         }
@@ -949,7 +953,8 @@ impl SovereignDistroPackageAdvancementsSuiteV70 {
         self.udf_engine
             .execute_hooks_for_phase(&manifest.name, UdfHookTypeV70::PreInstall)?;
 
-        self.installed_packages.push(format!("sigpkg-v70-{}", manifest.name));
+        self.installed_packages
+            .push(format!("sigpkg-v70-{}", manifest.name));
 
         let mut pkg = UnifiedPackage::new(manifest.name, manifest.version)
             .with_format(manifest.detected_format);

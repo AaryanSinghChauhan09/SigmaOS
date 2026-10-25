@@ -2,15 +2,36 @@
 // SigmaOS - BASIC Interpreter Engine (GW-BASIC / QBASIC compatible)
 // Principles: INTERPRETER DESIGN, MODULARITY, COMPOSITION OVER INHERITANCE
 
-use alloc::{string::String, vec::Vec, collections::BTreeMap};
+use alloc::{collections::BTreeMap, string::String, vec::Vec};
 
 /// BASIC token types
 #[derive(Debug, Clone, PartialEq)]
 pub enum BasicToken {
     // Keywords
-    Print, Input, Let, If, Then, Else, For, To, Step, Next,
-    Goto, Gosub, Return, Rem, Dim, End, Run, List, New, Save, Load,
-    And, Or, Not,
+    Print,
+    Input,
+    Let,
+    If,
+    Then,
+    Else,
+    For,
+    To,
+    Step,
+    Next,
+    Goto,
+    Gosub,
+    Return,
+    Rem,
+    Dim,
+    End,
+    Run,
+    List,
+    New,
+    Save,
+    Load,
+    And,
+    Or,
+    Not,
     // Literals
     NumberLit(i64),
     FloatLit(f64),
@@ -18,9 +39,26 @@ pub enum BasicToken {
     Ident(String),
     LineNumber(u32),
     // Operators & punctuation
-    Plus, Minus, Mul, Div, Mod, Exp, Eq, Ne, Lt, Le, Gt, Ge,
-    LParen, RParen, Comma, Semicolon, Colon, Quote,
-    Newline, EOF,
+    Plus,
+    Minus,
+    Mul,
+    Div,
+    Mod,
+    Exp,
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    LParen,
+    RParen,
+    Comma,
+    Semicolon,
+    Colon,
+    Quote,
+    Newline,
+    EOF,
 }
 
 /// Runtime value
@@ -48,7 +86,13 @@ impl BasicValue {
         match self {
             BasicValue::Int(n) => *n,
             BasicValue::Float(f) => *f as i64,
-            BasicValue::Bool(b) => if *b { 1 } else { 0 },
+            BasicValue::Bool(b) => {
+                if *b {
+                    1
+                } else {
+                    0
+                }
+            }
             _ => 0,
         }
     }
@@ -57,7 +101,13 @@ impl BasicValue {
         match self {
             BasicValue::Int(n) => alloc::format!("{}", n),
             BasicValue::Float(f) => alloc::format!("{}", f),
-            BasicValue::Bool(b) => if *b { String::from("-1") } else { String::from("0") },
+            BasicValue::Bool(b) => {
+                if *b {
+                    String::from("-1")
+                } else {
+                    String::from("0")
+                }
+            }
             BasicValue::Str(s) => s.clone(),
             BasicValue::Nil => String::new(),
         }
@@ -78,13 +128,23 @@ pub struct BasicProgram {
 }
 
 impl BasicProgram {
-    pub fn new() -> Self { Self { lines: BTreeMap::new() } }
+    pub fn new() -> Self {
+        Self {
+            lines: BTreeMap::new(),
+        }
+    }
 
     pub fn add_line(&mut self, number: u32, source: &str) {
         if source.trim().is_empty() {
             self.lines.remove(&number);
         } else {
-            self.lines.insert(number, BasicLine { number, source: source.into() });
+            self.lines.insert(
+                number,
+                BasicLine {
+                    number,
+                    source: source.into(),
+                },
+            );
         }
     }
 
@@ -102,7 +162,7 @@ pub struct BasicInterpreter {
     pub program: BasicProgram,
     pub variables: BTreeMap<String, BasicValue>,
     pub output: Vec<String>,
-    pub call_stack: Vec<u32>,  // GOSUB return addresses
+    pub call_stack: Vec<u32>, // GOSUB return addresses
     pub data_pointer: usize,
     pub running: bool,
     pub for_stacks: Vec<ForLoop>,
@@ -138,7 +198,10 @@ impl BasicInterpreter {
     }
 
     pub fn get_variable(&self, name: &str) -> BasicValue {
-        self.variables.get(&name.to_ascii_uppercase()).cloned().unwrap_or(BasicValue::Int(0))
+        self.variables
+            .get(&name.to_ascii_uppercase())
+            .cloned()
+            .unwrap_or(BasicValue::Int(0))
     }
 
     /// Execute a single BASIC statement line
@@ -147,7 +210,7 @@ impl BasicInterpreter {
         let upper = trimmed.to_ascii_uppercase();
 
         if upper.starts_with("REM") || upper.starts_with("'") {
-            return Ok(None);  // comment, skip
+            return Ok(None); // comment, skip
         }
 
         if upper.starts_with("PRINT") {
@@ -157,11 +220,17 @@ impl BasicInterpreter {
             return Ok(None);
         }
 
-        if upper.starts_with("LET ") || (!upper.contains(' ') == false && upper.contains('=') && !upper.starts_with("IF")) {
-            let stmt = if upper.starts_with("LET ") { &trimmed[4..] } else { trimmed };
+        if upper.starts_with("LET ")
+            || (!upper.contains(' ') == false && upper.contains('=') && !upper.starts_with("IF"))
+        {
+            let stmt = if upper.starts_with("LET ") {
+                &trimmed[4..]
+            } else {
+                trimmed
+            };
             if let Some(eq_pos) = stmt.find('=') {
                 let var = stmt[..eq_pos].trim();
-                let expr = stmt[eq_pos+1..].trim();
+                let expr = stmt[eq_pos + 1..].trim();
                 let val = self.eval_expr(expr);
                 self.set_variable(var, val);
             }
@@ -174,17 +243,26 @@ impl BasicInterpreter {
         }
 
         if upper.starts_with("GOTO ") {
-            let target: u32 = trimmed[5..].trim().parse().map_err(|_| String::from("invalid GOTO target"))?;
+            let target: u32 = trimmed[5..]
+                .trim()
+                .parse()
+                .map_err(|_| String::from("invalid GOTO target"))?;
             return Ok(Some(target));
         }
 
         if upper.starts_with("GOSUB ") {
-            let target: u32 = trimmed[6..].trim().parse().map_err(|_| String::from("invalid GOSUB target"))?;
+            let target: u32 = trimmed[6..]
+                .trim()
+                .parse()
+                .map_err(|_| String::from("invalid GOSUB target"))?;
             return Ok(Some(target));
         }
 
         if upper.starts_with("RETURN") {
-            let ret = self.call_stack.pop().ok_or_else(|| String::from("RETURN without GOSUB"))?;
+            let ret = self
+                .call_stack
+                .pop()
+                .ok_or_else(|| String::from("RETURN without GOSUB"))?;
             return Ok(Some(ret));
         }
 
@@ -197,7 +275,7 @@ impl BasicInterpreter {
 
         // String literal
         if trimmed.starts_with('"') && trimmed.ends_with('"') {
-            return BasicValue::Str(trimmed[1..trimmed.len()-1].into());
+            return BasicValue::Str(trimmed[1..trimmed.len() - 1].into());
         }
 
         // Numeric literal
@@ -211,7 +289,7 @@ impl BasicInterpreter {
         // Simple addition/subtraction
         if let Some(pos) = trimmed.rfind('+') {
             let left = self.eval_expr(&trimmed[..pos]);
-            let right = self.eval_expr(&trimmed[pos+1..]);
+            let right = self.eval_expr(&trimmed[pos + 1..]);
             return match (left, right) {
                 (BasicValue::Int(a), BasicValue::Int(b)) => BasicValue::Int(a + b),
                 (BasicValue::Float(a), BasicValue::Float(b)) => BasicValue::Float(a + b),
@@ -243,7 +321,10 @@ impl BasicInterpreter {
                     }
                 }
                 Ok(None) => {}
-                Err(_) => { self.running = false; break; }
+                Err(_) => {
+                    self.running = false;
+                    break;
+                }
             }
             idx += 1;
         }

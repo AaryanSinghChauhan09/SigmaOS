@@ -944,12 +944,30 @@ mod tests {
 
     #[test]
     fn test_null_byte_rejected() {
-        assert_eq!(validate_path(&[b'/', b'f', 0, b'o']), Err(ValidationError::NullByte));
-        assert_eq!(validate_username(b"user\x00name"), Err(ValidationError::NullByte));
-        assert_eq!(validate_hostname(b"host\x00name.com"), Err(ValidationError::NullByte));
-        assert_eq!(validate_env_key(b"ENV\x00KEY"), Err(ValidationError::NullByte));
-        assert_eq!(validate_ipv4(b"192.168.\x001.1"), Err(ValidationError::NullByte));
-        assert_eq!(validate_ipv6(b"2001:db8::\x001"), Err(ValidationError::NullByte));
+        assert_eq!(
+            validate_path(&[b'/', b'f', 0, b'o']),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_username(b"user\x00name"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_hostname(b"host\x00name.com"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_env_key(b"ENV\x00KEY"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168.\x001.1"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_ipv6(b"2001:db8::\x001"),
+            Err(ValidationError::NullByte)
+        );
     }
 
     #[test]
@@ -1181,12 +1199,30 @@ mod tests {
 
     #[test]
     fn test_ipv4_octet_overflow_and_leading_zeros() {
-        assert_eq!(validate_ipv4(b"999.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"256.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"65536.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192.168..1"), Err(ValidationError::OutOfRange));
+        assert_eq!(
+            validate_ipv4(b"999.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"256.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"65536.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"010.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168.01.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168..1"),
+            Err(ValidationError::OutOfRange)
+        );
     }
 
     #[test]

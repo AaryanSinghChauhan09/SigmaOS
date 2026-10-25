@@ -32,8 +32,8 @@ use super::gridcraft_artcraft_parity_pr::SovereignGridcraftArtcraftParityPrGatew
 use super::lightcraft_artcraft_parity_pr::SovereignLightcraftArtcraftParityPrGateway;
 use super::pdfcraft_artcraft_parity_pr::SovereignPdfcraftArtcraftParityPrGateway;
 use super::photocraft_artcraft_parity_pr::SovereignPhotocraftArtcraftParityPrGateway;
-use super::sovereign_artcraft_craftlibs_pr_engine::ArtcraftCraftlibsMasterPrDeploymentSuite;
 use super::soundcraft_artcraft_parity_pr::SovereignSoundcraftArtcraftParityPrGateway;
+use super::sovereign_artcraft_craftlibs_pr_engine::ArtcraftCraftlibsMasterPrDeploymentSuite;
 use super::threedcraft_artcraft_parity_pr::SovereignThreeDCraftArtcraftParityPrGateway;
 use super::voicecraft_artcraft_parity_pr::SovereignVoicecraftArtcraftParityPrGateway;
 use super::wordcraft_artcraft_parity_pr::SovereignWordcraftArtcraftParityPrGateway;
@@ -102,17 +102,27 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
         let film_ok = self.filmcraft_gateway.evaluate_filmcraft_artcraft_parity();
         let pdf_proposals = self.pdfcraft_gateway.collect_all_proposals();
         let pdf_ok = !pdf_proposals.is_empty();
-        let design_ok = self.designcraft_gateway.evaluate_designcraft_artcraft_parity();
-        let effect_ok = self.effectcraft_gateway.evaluate_effectcraft_artcraft_parity();
-        let light_ok = self.lightcraft_gateway.evaluate_lightcraft_artcraft_parity();
-        let sound_ok = self.soundcraft_gateway.evaluate_soundcraft_artcraft_parity();
+        let design_ok = self
+            .designcraft_gateway
+            .evaluate_designcraft_artcraft_parity();
+        let effect_ok = self
+            .effectcraft_gateway
+            .evaluate_effectcraft_artcraft_parity();
+        let light_ok = self
+            .lightcraft_gateway
+            .evaluate_lightcraft_artcraft_parity();
+        let sound_ok = self
+            .soundcraft_gateway
+            .evaluate_soundcraft_artcraft_parity();
         let grid_ok = self.gridcraft_gateway.evaluate_gridcraft_artcraft_parity();
         let word_ok = self.wordcraft_gateway.evaluate_wordcraft_artcraft_parity();
         let font_ok = self.fontcraft_gateway.evaluate_fontcraft_artcraft_parity();
         let cad_ok = self.cadcraft_gateway.evaluate_cadcraft_parity();
         let threed_ok = self.threedcraft_gateway.evaluate_3dcraft_parity();
         let ani_ok = self.anicraft_gateway.evaluate_anicraft_parity();
-        let voice_ok = self.voicecraft_gateway.evaluate_voicecraft_artcraft_parity();
+        let voice_ok = self
+            .voicecraft_gateway
+            .evaluate_voicecraft_artcraft_parity();
         let fig_ok = self.figcraft_gateway.evaluate_figcraft_artcraft_parity();
         let deck_ok = self.deckcraft_gateway.evaluate_deckcraft_artcraft_parity();
         let craft_ok = self.craftlibs_gateway.evaluate_craftlibs_parity();
@@ -388,9 +398,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
         let proposals = self.collect_all_artcraft_pr_proposals();
         let parity_score = self.compute_artcraft_creative_suite_parity_score();
 
-        let mut manifest = format!(
-            "## Sovereign ArtCraft Creative Suite Master PR Manifest\n"
-        );
+        let mut manifest = format!("## Sovereign ArtCraft Creative Suite Master PR Manifest\n");
         manifest.push_str(&format!(
             "- **Total Master PR Proposals**: {}\n",
             proposals.len()

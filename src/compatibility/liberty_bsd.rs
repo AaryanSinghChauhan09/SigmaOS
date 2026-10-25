@@ -120,7 +120,8 @@ mod tests {
         let mut policy = LibrePolicy::new();
         policy.enforce_strict_mode();
 
-        let nonfree = FirmwareBlob::new("iwlwifi-9260-th-b0-jf-b0-46.ucode", make_hash(0xAB), false);
+        let nonfree =
+            FirmwareBlob::new("iwlwifi-9260-th-b0-jf-b0-46.ucode", make_hash(0xAB), false);
         assert!(!policy.is_allowed(&nonfree));
     }
 

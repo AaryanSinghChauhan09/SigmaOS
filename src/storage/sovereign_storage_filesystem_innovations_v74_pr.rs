@@ -68,7 +68,14 @@ impl Ext4AdvancementsV74Engine {
         }
     }
 
-    pub fn record_fast_commit(&mut self, inode_num: u32, logical: u32, physical: u64, count: u16, unwritten: bool) {
+    pub fn record_fast_commit(
+        &mut self,
+        inode_num: u32,
+        logical: u32,
+        physical: u64,
+        count: u16,
+        unwritten: bool,
+    ) {
         self.fast_commit_log.push(Ext4V74FastCommitEntry {
             inode_num,
             logical_block: logical,
@@ -167,13 +174,20 @@ impl XfsAdvancementsV74Engine {
         None
     }
 
-    pub fn register_reflink_cow_extent(&mut self, _source_block: u64, _target_block: u64, _len: u32) {
+    pub fn register_reflink_cow_extent(
+        &mut self,
+        _source_block: u64,
+        _target_block: u64,
+        _len: u32,
+    ) {
         self.reflink_extent_count += 1;
         self.rmapbt_nodes += 2;
     }
 
     pub fn run_online_scrub(&self) -> bool {
-        self.allocation_groups.iter().all(|ag| ag.free_blocks <= ag.total_blocks)
+        self.allocation_groups
+            .iter()
+            .all(|ag| ag.free_blocks <= ag.total_blocks)
     }
 }
 
@@ -213,7 +227,13 @@ impl BtrfsAdvancementsV74Engine {
         }
     }
 
-    pub fn create_snapshot(&mut self, parent_id: u64, new_id: u64, name: &str, read_only: bool) -> bool {
+    pub fn create_snapshot(
+        &mut self,
+        parent_id: u64,
+        new_id: u64,
+        name: &str,
+        read_only: bool,
+    ) -> bool {
         if let Some(parent) = self.subvolumes.iter().find(|s| s.subvol_id == parent_id) {
             let snap = BtrfsV74Subvolume {
                 subvol_id: new_id,
@@ -239,7 +259,10 @@ impl BtrfsAdvancementsV74Engine {
         while idx < payload.len() {
             let current = payload[idx];
             let mut run_len = 1;
-            while idx + run_len < payload.len() && payload[idx + run_len] == current && run_len < 255 {
+            while idx + run_len < payload.len()
+                && payload[idx + run_len] == current
+                && run_len < 255
+            {
                 run_len += 1;
             }
             if run_len >= 4 {
@@ -403,7 +426,11 @@ impl F2fsAdvancementsV74Engine {
     }
 
     pub fn invalidate_block(&mut self, segment_id: u32) {
-        if let Some(s) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
+        if let Some(s) = self
+            .segments
+            .iter_mut()
+            .find(|s| s.segment_id == segment_id)
+        {
             if s.valid_blocks > 0 {
                 s.valid_blocks -= 1;
                 s.invalid_blocks += 1;
@@ -537,7 +564,9 @@ impl NtfsNfsCifsPseudoFsV74Engine {
     }
 
     pub fn match_devfs_rule(&self, dev_path: &str, required_group: &str) -> bool {
-        self.devfs_rules.iter().any(|r| r.contains(dev_path) || (r.contains("nvme*") && dev_path.starts_with("nvme")))
+        self.devfs_rules
+            .iter()
+            .any(|r| r.contains(dev_path) || (r.contains("nvme*") && dev_path.starts_with("nvme")))
             && self.devfs_rules.iter().any(|r| r.contains(required_group))
     }
 }
@@ -559,7 +588,11 @@ impl LvmCryptoMaintenanceUtilsV74Engine {
         }
     }
 
-    pub fn calculate_thin_overcommit_pct(&self, allocated_virtual_mb: u64, physical_pool_mb: u64) -> u32 {
+    pub fn calculate_thin_overcommit_pct(
+        &self,
+        allocated_virtual_mb: u64,
+        physical_pool_mb: u64,
+    ) -> u32 {
         if physical_pool_mb == 0 {
             0
         } else {
@@ -591,7 +624,10 @@ impl LvmCryptoMaintenanceUtilsV74Engine {
 
     /// Sound Argon2id-inspired multi-round memory-hard PBKDF implementation for no_std state verification
     pub fn derive_argon2id_key(&self, password: &[u8]) -> [u8; 32] {
-        let salt: [u8; 16] = [0xA5, 0x5A, 0xF0, 0x0F, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x11, 0x22, 0x33, 0x44];
+        let salt: [u8; 16] = [
+            0xA5, 0x5A, 0xF0, 0x0F, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x11, 0x22,
+            0x33, 0x44,
+        ];
         let mut state = [0u8; 32];
         for (i, &b) in password.iter().chain(salt.iter()).enumerate() {
             state[i % 32] = state[i % 32].wrapping_add(b).wrapping_mul(31);

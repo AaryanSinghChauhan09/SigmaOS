@@ -996,18 +996,18 @@ pub mod compatibility_foundations {
 // ─── SigmaOS Kernel Synthesis Modules ─────────────────────────────────────────
 // Principles: MODULAR KERNEL DESIGN, LAYERED DESIGN, SEPARATION OF CONCERNS
 
-pub mod mach_port;
+pub mod dos;
 pub mod hurd_translator;
+pub mod mach_port;
 pub mod minix_reincarnation;
 pub mod nt_object_manager;
-pub mod xnu_iokit;
 pub mod pe_loader;
-pub mod dos;
+pub mod xnu_iokit;
 
-pub use mach_port::*;
+pub use dos::*;
 pub use hurd_translator::*;
+pub use mach_port::*;
 pub use minix_reincarnation::*;
 pub use nt_object_manager::*;
-pub use xnu_iokit::*;
 pub use pe_loader::*;
-pub use dos::*;
+pub use xnu_iokit::*;

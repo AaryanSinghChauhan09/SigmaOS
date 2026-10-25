@@ -10,25 +10,53 @@ pub enum DosCall {
     PrintString(String),
     PrintChar(u8),
     GetChar,
-    OpenFile { name: String, mode: u8 },
-    ReadFile { handle: u16, count: u16 },
-    WriteFile { handle: u16, data: Vec<u8> },
+    OpenFile {
+        name: String,
+        mode: u8,
+    },
+    ReadFile {
+        handle: u16,
+        count: u16,
+    },
+    WriteFile {
+        handle: u16,
+        data: Vec<u8>,
+    },
     CloseFile(u16),
     Terminate(u8),
     GetVersion,
     AllocMem(u16),
     FreeMem(u16),
-    CreateFile { name: String, attr: u8 },
+    CreateFile {
+        name: String,
+        attr: u8,
+    },
     DeleteFile(String),
-    RenameFile { old: String, new: String },
+    RenameFile {
+        old: String,
+        new: String,
+    },
     GetCurrentDir,
     ChangeDir(String),
     GetDta,
     SetDta(u32),
-    FindFirst { pattern: String, attr: u8 },
+    FindFirst {
+        pattern: String,
+        attr: u8,
+    },
     FindNext,
-    GetSetTime { set: bool, hour: u8, min: u8, sec: u8 },
-    GetSetDate { set: bool, year: u16, month: u8, day: u8 },
+    GetSetTime {
+        set: bool,
+        hour: u8,
+        min: u8,
+        sec: u8,
+    },
+    GetSetDate {
+        set: bool,
+        year: u16,
+        month: u8,
+        day: u8,
+    },
 }
 
 /// Result of a DOS service call
@@ -81,7 +109,10 @@ impl Int21Dispatcher {
                 let c = self.input_buffer.pop().unwrap_or(b'\n');
                 DosResult::Char(c)
             }
-            DosCall::GetVersion => DosResult::Version { major: 6, minor: 22 },
+            DosCall::GetVersion => DosResult::Version {
+                major: 6,
+                minor: 22,
+            },
             DosCall::OpenFile { name, mode: _ } => {
                 let handle = self.alloc_handle();
                 self.open_handles.insert(handle, name);
@@ -119,8 +150,16 @@ impl Int21Dispatcher {
                 self.current_dir = path;
                 DosResult::Ok
             }
-            DosCall::Terminate(code) => DosResult::Error { code: code as u16, message: String::from("process terminated") },
-            DosCall::GetSetTime { set, hour, min, sec } => DosResult::Ok,
+            DosCall::Terminate(code) => DosResult::Error {
+                code: code as u16,
+                message: String::from("process terminated"),
+            },
+            DosCall::GetSetTime {
+                set,
+                hour,
+                min,
+                sec,
+            } => DosResult::Ok,
             DosCall::GetSetDate { .. } => DosResult::Ok,
             _ => DosResult::Ok,
         }
@@ -152,13 +191,22 @@ mod tests {
     fn test_get_version() {
         let mut d = Int21Dispatcher::new();
         let r = d.dispatch(DosCall::GetVersion);
-        assert!(matches!(r, DosResult::Version { major: 6, minor: 22 }));
+        assert!(matches!(
+            r,
+            DosResult::Version {
+                major: 6,
+                minor: 22
+            }
+        ));
     }
 
     #[test]
     fn test_open_close_file() {
         let mut d = Int21Dispatcher::new();
-        let r = d.dispatch(DosCall::OpenFile { name: String::from("TEST.TXT"), mode: 0 });
+        let r = d.dispatch(DosCall::OpenFile {
+            name: String::from("TEST.TXT"),
+            mode: 0,
+        });
         if let DosResult::Handle(h) = r {
             assert!(h >= 3);
             d.dispatch(DosCall::CloseFile(h));
