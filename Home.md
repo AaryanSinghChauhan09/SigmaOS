@@ -76,3 +76,45 @@ SigmaOS is engineered in strict compliance with industry and systems engineering
 - [[Community-Toolkit-Components]]: Decentralized packaging recipes and contributor licensing hooks.
 - [[System-Governance-and-RFC-Components]]: RFC decision registry and architectural council voting.
 - [[Legal-and-Licensing-Components]]: SPDX licensing compliance, patent disclosures, and contributor attestations.
+
+---
+
+## 🔱 BSD Subsystem Parity (DragonFly, FreeBSD, OpenBSD)
+SigmaOS natively synthesizes the most advanced primitives across the BSD ecosystem:
+- 🐉 **[[DragonFlyBSD-Ecosystem-Parity|DragonFly BSD]]**: HAMMER2 filesystem with instant atomic snapshots, lightweight kernel threads (LWKT), and lock-free token messaging.
+- 😈 **[[FreeBSD-Ecosystem-Parity|FreeBSD]]**: Capsicum capability rights sandboxing, Jails process isolation, and kqueue/kevent edge-triggered kernel event dispatch.
+- 🐡 **[[OpenBSD-Ecosystem-Parity|OpenBSD]]**: Uncompromising security mitigations with `pledge()` syscall restrictions, `unveil()` path concealment, W^X memory guarantees, and stateful PF firewalling.
+- 📊 **[[Universal BSD Synthesis Matrix|BSD-Universal-Synthesis-and-Parity]]**: Master cross-comparison across all BSD families.
+
+---
+
+## 🎨 The 20-Module Craft Creative & Office Productivity Suite
+SigmaOS includes a comprehensive, hardware-accelerated creative and office suite built on `#![no_std]` Rust and `CraftLibs`:
+- 🧊 **[[1. 3DCraft|3DCraft-Modeling-and-Rendering]]**: 3D polygon modeling, NURBS curves, and BVH-accelerated ray tracing.
+- 🎞️ **[[2. AniCraft|AniCraft-Animation-Studio]]**: 2D animation, onion skinning, timing charts, and 2D IK skeletal rigging.
+- 🖌️ **[[3. ArtCraft|ArtCraft-Digital-Painting]]**: Digital painting with sub-millisecond stylus latency and dynamic brush mixing.
+- 📐 **[[4. CADCraft|CADCraft-Parametric-Engineering]]**: Parametric mechanical 2D sketching, constraint solving, and 3D B-Rep solid modeling.
+- 🧬 **[[5. CraftLibs|CraftLibs-Unified-Creative-Foundation]]**: Shared color spaces (sRGB, Display P3, CMYK), SIMD vector math, and undo/redo DAGs.
+- 📊 **[[6. DeckCraft|DeckCraft-Presentations]]**: Slide deck authoring with GPU transitions and dual-display presenter mode.
+- 📱 **[[7. DesignCraft|DesignCraft-UI-UX-Design]]**: Vector UI/UX interface prototyping and responsive flexbox auto-layout.
+- 💥 **[[8. EffectCraft|EffectCraft-Visual-Effects-Compositor]]**: Node-based VFX compositing, optical flow motion estimation, and green screen keying.
+- 📈 **[[9. FigCraft|FigCraft-Technical-Diagrams]]**: Technical flowcharts, UML diagrams, and automatic obstacle-avoiding line routing.
+- 🎬 **[[10. FilmCraft|FilmCraft-Video-Editor]]**: Non-linear multi-track video editing, proxy playback, and 3D LUT color grading.
+- 🔤 **[[11. FontCraft|FontCraft-Typography-Studio]]**: Vector typography design, Bézier curve editing, and OpenType table compilation.
+- 📉 **[[12. GridCraft|GridCraft-Reactive-Spreadsheets]]**: Reactive formula dependency DAG evaluating 400+ functions over 10M+ virtualized cells.
+- 💡 **[[13. LightCraft|LightCraft-Lighting-and-Color]]**: DMX512 stage lighting, Kelvin color temperature control, and cue sequences.
+- 📄 **[[14. PDFCraft|PDFCraft-Document-Engine]]**: PDF 2.0 / PDF-A rendering, AcroForms filling, and cryptographic X.509 signing.
+- 📷 **[[15. PhotoCraft|PhotoCraft-Raw-Photo-Studio]]**: Non-destructive RAW camera development, demosaicing algorithms, and lens correction.
+- 📰 **[[16. PrintCraft|PrintCraft-Desktop-Publishing]]**: Multi-page DTP layout, CMYK color plate separations, and bleed/slug crop marks.
+- 🎧 **[[17. SoundCraft|SoundCraft-Digital-Audio-Workstation]]**: Multi-track DAW, sub-3ms latency audio pipeline, and MIDI 2.0 sequencing.
+- ✒️ **[[18. VectorCraft|VectorCraft-Vector-Illustration]]**: Scalable vector graphics (SVG2), Boolean path operations, and gradient meshes.
+- 🎙️ **[[19. VoiceCraft|VoiceCraft-Speech-and-Dictation]]**: Real-time on-device neural Whisper speech recognition and expressive TTS synthesis.
+- 📝 **[[20. WordCraft|WordCraft-Typographic-Document-Processor]]**: Rich typographical word processor with automatic footnotes and DOCX/ODT support.
+
+---
+
+## 🐧 Linux Ecosystem Parity & Ready to Launch
+- 🏹 **[[Arch-Linux-Ecosystem-Parity|Arch Linux]]**: Pacman package database, sandboxed unprivileged AUR builds, and rolling release purity.
+- ⚡ **[[CachyOS-Ecosystem-Parity|CachyOS]]**: Low-latency BORE/EEVDF scheduler, x86-64-v3/v4 AVX optimizations, and ZSTD-compressed ZRAM swap.
+- 🌀 **[[Debian-Ecosystem-Parity|Debian]]**: Rock-solid stability, multi-architecture dependency resolution, and strict DFSG compliance.
+- 🚀 **[[Ready-to-Work-and-Ready-to-Launch|Ready to Work & Ready to Launch]]**: Turnkey hardware autodiscovery, pre-configured productive workspaces (`Super + 1..4`), instant app launcher (`Super + Space`), and 3-second live boot.

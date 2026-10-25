@@ -30,35 +30,3 @@ SigmaOS synthesizes the best characteristics of the foremost Linux distributions
 | **Desktop Environment** | Custom | Custom | GNOME/XFCE | Cinnamon | Quickshell/Hypr | **Hardware-Accelerated Zenith Desktop** |
 | **Creative Suite** | External | External | External | External | External | **Built-in 20-Module Craft Suite** |
 | **Startup Latency** | Fast | Very Fast | Standard | Moderate | Fast | **Microsecond Direct Hardware Boot** |
-
----
-
-## 🌍 Full Distro Category Coverage
-
-The complete category membership kept uniform with the repository
-(**UNIFORM INFORMATION IN GITHUB REPOS & GITHUB WIKI**, **AVOID FRAGMENTATION**):
-
-`Arch; Cachy; Debian; ElementaryOS; EndeavourOS; Fedora; Gentoo; Kali; Mint;
-Omarchy; Parrot; Qubes; ReactOS; RedoxOS; Slackware; SUSE; Ubuntu`
-
-| Distro | Family | Dedicated Page |
-| :--- | :--- | :--- |
-| Arch Linux | rolling | [[Arch-Linux-Ecosystem-Parity]] |
-| CachyOS | rolling (perf) | [[CachyOS-Ecosystem-Parity]] |
-| Debian | stable | [[Debian-Ecosystem-Parity]] |
-| ElementaryOS | desktop | this matrix |
-| EndeavourOS | rolling (user-friendly) | this matrix |
-| Fedora | innovation | this matrix |
-| Gentoo | source-based | this matrix |
-| Kali | security | this matrix |
-| Linux Mint | desktop (Cinnamon) | this matrix |
-| Omarchy | minimal rolling | this matrix |
-| Parrot | security | this matrix |
-| Qubes | isolation (Xen) | this matrix |
-| ReactOS | NT-compat | [[PR_PROPOSAL_REACTOS_MISSING_COMPONENTS_PARITY]] |
-| RedoxOS | microkernel Rust | this matrix |
-| Slackware | classic stable | this matrix |
-| SUSE | enterprise (RPM) | this matrix |
-| Ubuntu | derived stable (deb) | this matrix |
-
-Consolidated category index: [[SOFTWARE-CATEGORY-MATRIX]]
