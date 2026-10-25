@@ -689,11 +689,11 @@ visibility = "public"
 
 [[component]]
 name = "SigmaOS-office"
-description = "LibreOffice icon/style integration"
+description = "Unified productivity suite & style integration (OpenOffice, LibreOffice, GenOffice, OnlyOffice, CraftOffice)"
 repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-office"
 engine = "office_style"
-language = "shell"
-inspirations = ["https://github.com/linuxmint/libreoffice-style-mint"]
+language = "python"
+inspirations = ["https://github.com/linuxmint/libreoffice-style-mint", "https://github.com/LibreOffice/core", "https://github.com/ONLYOFFICE/DocumentServer"]
 visibility = "public"
 
 [[component]]
