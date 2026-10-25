@@ -11567,3 +11567,192 @@ engine = "accessibility"
 language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/accessibility"]
 visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-network-manager"
+description = "Network manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-network-manager"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-nm"
+description = "Network manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-network-manager"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-nm"
+description = "Network manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-network-manager"
+engine = "network_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/network-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-wifi-manager"
+description = "WiFi manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-wifi-manager"
+engine = "wifi_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/wifi-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-wm"
+description = "WiFi manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-wifi-manager"
+engine = "wifi_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/wifi-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-wm"
+description = "WiFi manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-wifi-manager"
+engine = "wifi_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/wifi-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-bluetooth-setup"
+description = "Bluetooth setup for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-bluetooth-setup"
+engine = "bluetooth_setup"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/bluetooth-setup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-bs"
+description = "Bluetooth setup for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-bluetooth-setup"
+engine = "bluetooth_setup"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/bluetooth-setup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-bs"
+description = "Bluetooth setup for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-bluetooth-setup"
+engine = "bluetooth_setup"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/bluetooth-setup"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-modem-manager"
+description = "Modem manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-modem-manager"
+engine = "modem_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/modem-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-mm2"
+description = "Modem manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-modem-manager"
+engine = "modem_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/modem-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-mm2"
+description = "Modem manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-modem-manager"
+engine = "modem_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/modem-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-voice-manager"
+description = "Voice manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-voice-manager"
+engine = "voice_manager"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/voice-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-vm"
+description = "Voice manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-voice-manager"
+engine = "voice_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/voice-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-vm"
+description = "Voice manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-voice-manager"
+engine = "voice_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/voice-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-call-manager"
+description = "Call manager for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-call-manager"
+engine = "call_manager"
+language = "shell"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/call-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-cm"
+description = "Call manager for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-call-manager"
+engine = "call_manager"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/call-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-cm"
+description = "Call manager for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-call-manager"
+engine = "call_manager"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/call-manager"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-audio-recorder"
+description = "Audio recorder for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-audio-recorder"
+engine = "audio_recorder"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/audio-recorder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-ar"
+description = "Audio recorder for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-audio-recorder"
+engine = "audio_recorder"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/audio-recorder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-ar"
+description = "Audio recorder for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-audio-recorder"
+engine = "audio_recorder"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/audio-recorder"]
+visibility = "public"
