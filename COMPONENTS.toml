@@ -13385,3 +13385,112 @@ language = "c"
 inspirations = ["https://archlinux.org", "https://github.com/archlinux/disk-utility"]
 visibility = "public"
 
+
+[[component]]
+name = "SigmaOS-mint-system-updater-v2"
+description = "System Updater v2 for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-system-updater-v2"
+engine = "system_updater"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/system-updater-v2"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-system-updater-v2"
+description = "System Updater v2 for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-system-updater-v2"
+engine = "system_updater"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/system-updater-v2"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-system-updater-v2"
+description = "System Updater v2 for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-system-updater-v2"
+engine = "system_updater"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/system-updater-v2"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-kernel-builder"
+description = "Kernel Builder for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-kernel-builder"
+engine = "kernel_builder"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/kernel-builder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-kernel-builder"
+description = "Kernel Builder for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-kernel-builder"
+engine = "kernel_builder"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/kernel-builder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-kernel-builder"
+description = "Kernel Builder for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-kernel-builder"
+engine = "kernel_builder"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/kernel-builder"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-module-compiler"
+description = "Module Compiler for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-module-compiler"
+engine = "module_compiler"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/module-compiler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-module-compiler"
+description = "Module Compiler for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-module-compiler"
+engine = "module_compiler"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/module-compiler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-module-compiler"
+description = "Module Compiler for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-module-compiler"
+engine = "module_compiler"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/module-compiler"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-mint-service-deployer"
+description = "Service Deployer for SigmaOS inspired by Linux Mint"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-mint-service-deployer"
+engine = "service_deployer"
+language = "c"
+inspirations = ["https://linuxmint.com", "https://github.com/linuxmint/service-deployer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-omarchy-service-deployer"
+description = "Service Deployer for SigmaOS inspired by Omarchy Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-omarchy-service-deployer"
+engine = "service_deployer"
+language = "c"
+inspirations = ["https://omarchy.org", "https://github.com/omarchy/service-deployer"]
+visibility = "public"
+
+[[component]]
+name = "SigmaOS-arch-service-deployer"
+description = "Service Deployer for SigmaOS inspired by Arch Linux"
+repo = "https://github.com/AaryanSinghChauhan09/SigmaOS-arch-service-deployer"
+engine = "service_deployer"
+language = "c"
+inspirations = ["https://archlinux.org", "https://github.com/archlinux/service-deployer"]
+visibility = "public"
+
