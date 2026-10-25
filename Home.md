@@ -131,3 +131,83 @@ SigmaOS incorporates, matches, and surpasses **Omarchy 4.0.5** across every user
 - 📐 **[[File Layout & Architectural Mental Model|Omarchy-File-Layout-and-Mental-Model]]**: Detailed guide on packaging, `/etc/skel` drop-ins, and userland binaries.
 - 🔊 **[[Audio Tuning Architecture|Omarchy-Audio-Tuning]]**: Latency profiling and PipeWire/WirePlumber tuning mechanics.
 - 🔄 **[[Update System & Migrations Engine|Omarchy-Update-Process-and-Migrations]]**: Declarative upgrade pipelines and atomic state rollbacks.
+
+---
+
+## 🌐 Universal Operating System & Subsystem Synthesis
+
+SigmaOS enables users to natively experience the workflows, guarantees, and application paradigms of every major operating system, runtime, and productivity suite:
+
+### 🧩 1. Multi-Kernel Synthesis (`src/kernel/`)
+- 🐧 **Linux**: Monolithic multi-core performance, eBPF JIT filter pipelines, cgroups v2, and io_uring async I/O.
+- 🦬 **GNU Hurd**: Capability-based Mach IPC message ports (`mach_port.rs`) and userspace filesystem translators (`hurd_translator.rs`).
+- 🔄 **Minix 3**: Microkernel multi-server architecture with Reincarnation Server self-healing crashed device drivers (`minix_reincarnation.rs`).
+- 🪟 **ReactOS / Windows NT**: Executive Object Manager namespace (`nt_object_manager.rs`) and PE32+ executable binary loader (`pe_loader.rs`).
+- 🍏 **Apple XNU**: Mach core messaging + I/O Kit object-oriented C++ driver hierarchy translated to safe Rust (`xnu_iokit.rs`).
+- 📖 Read more: [[Kernel-Architectures-Synthesis]]
+
+### 💾 2. DOS & Retro Computing Runtime (`src/kernel/dos/`)
+- 🕹️ **FreeDOS & MS-DOS**: Clean-room INT 21h service dispatcher (`int21h.rs`) with AH register function multiplexing.
+- ⚡ **DPMI 0.9+ Host**: Dynamic Local Descriptor Table (LDT) segment allocation and real-to-protected mode switching (`dpmi.rs`).
+- 📜 **BASIC Language Engine**: AST-based interpreter supporting Dartmouth, GW-BASIC, and QBASIC command syntax (`basic_engine.rs`).
+- 🖥️ **NTVDM Subsystem**: NT Virtual DOS Machine 16-to-32 bit thunking tables and console buffer virtualization (`ntvdm.rs`).
+- ⚙️ **Virtual 8086 Machine**: In-kernel real-mode execution with 256 IVT vectors and I/O port trapping (`vdm.rs`).
+- 📖 Read more: [[DOS-Runtime-Engine]] & [[DOS-and-Legacy-Compatibility]]
+
+### 🔱 3. Extended BSD Distributions (`src/compatibility/`)
+- 👻 **GhostBSD**: OpenRC init service management, MATE session integration, and NetworkManager bridge (`ghost_bsd.rs`).
+- 🧭 **NomadBSD**: Fast hardware autodetect and layered live USB persistence (`nomad_bsd.rs`).
+- 🌙 **MidnightBSD**: `mports` package indexing and GNUstep desktop environment bridge (`midnight_bsd.rs`).
+- 🛡️ **HardenedBSD**: SafeStack isolation, forward/backward CFI enforcement, ASLR entropy, and strict W^X PTE validation (`hardened_bsd.rs`).
+- 🕊️ **LibertyBSD**: Cryptographic SHA-256 firmware audit rejecting proprietary microcode blobs (`liberty_bsd.rs`).
+- 🌊 **FuryBSD**: ZFS Boot Environment (`beadm`/`bectl`) snapshot, clone, and rollback manager (`fury_bsd.rs`).
+- 💻 **DesktopBSD**: Polkit user authorization delegation and pkgng GUI installation bridges (`desktop_bsd.rs`).
+- 👁️ **KarmaBSD**: DTrace dynamic tracepoint providers and ZFS latency observability (`karma_bsd.rs`).
+- ⭐ **StarBSD**: Ultra-lightweight sub-10MB RTOS persona with static memory guard (`star_bsd.rs`).
+- 📖 Read more: [[Extended-BSD-Parity]]
+
+### 🐧 4. Extended Linux Distributions (`src/distro/`)
+- 🍬 **ElementaryOS**: Pantheon desktop shell, Granite widget bridge, Gala window manager, and AppCenter (`elementary_os.rs`).
+- 🚀 **EndeavourOS**: Arch-based minimal base with dynamic desktop selection and welcoming assistant (`endeavour_os.rs`).
+- 🐉 **Kali Linux**: Penetration testing tool registry, Undercover Windows camouflage mode, and SDR tools (`kali_linux.rs`).
+- 🦜 **Parrot OS**: AnonSurf system-wide Tor router, forensic disk imager, and decoy session mode (`parrot_os.rs`).
+- ⬛ **Qubes OS**: Security domain management (Vault, Work, Personal, Untrusted) with disposable VMs and colored borders (`qubes_os.rs`).
+- 🔬 **Redox OS**: URL scheme-based microkernel IPC (`file:`, `tcp:`) and Ion shell variable expansion (`redox_os.rs`).
+- 📦 **Slackware**: BSD-style rc init runlevels and `.txz` Slackware pkgtool package manager (`slackware.rs`).
+- 🦎 **openSUSE**: Zypper SAT dependency solver, Snapper pre/post Btrfs snapshots, and YaST2 configuration (`open_suse.rs`).
+- 🟠 **Ubuntu**: Netplan network configuration generation, Snap strictly-confined sandbox, and Ubuntu Pro hooks (`ubuntu.rs`).
+- 📖 Read more: [[Linux-Universal-Distro-Parity]]
+
+### 📑 5. Complete Office Productivity Suites (`src/productivity/`)
+- ✍️ **Writer**: ODF/DOCX bidirectional import/export, styles catalog, and tracked changes (`libreoffice_parity.rs`).
+- 📊 **Calc**: ODS/XLSX formula DAG, cell evaluation, pivot tables, and charting.
+- 📽️ **Impress**: ODP/PPTX slide deck manager, hardware slide transitions, and presenter view.
+- 📐 **Draw**: Vector graphics canvas, Bézier shape tools, and SVG/ODG export.
+- ➗ **Math**: Formula editor rendering LaTeX, MathML, OpenFormula, and TeX mathematical typography.
+- 🗃️ **Base**: Database frontend with form designers, query designers, and SQL reporting workbenches.
+- 🏛️ **Apache OpenOffice Parity**: Binary and XML parity with legacy StarOffice (`.sxw`, `.sxc`, `.sxi`, `.sxd`) compatibility (`openoffice_parity.rs`).
+- 📖 Read more: [[Office-and-Productivity-Suites]]
+
+### 🗄️ 6. Relational Database & Analytics Engines (`src/database/`)
+- 🐘 **PostgreSQL**: MVCC ACID transaction engine, B-Tree indices, isolation levels, and SQL parser (`postgres.rs`).
+- 🦆 **DuckDB**: Vectorized columnar in-process OLAP engine with predicate filter pushdown and aggregation (`duckdb.rs`).
+- 🏹 **Apache Arrow & DataFusion**: Zero-copy in-memory columnar array buffers, IPC streaming, and query planner (`arrow_datafusion.rs`).
+- 🦫 **DBeaver**: Universal database workbench connection manager, multi-format exporter, and ER diagrams (`dbeaver.rs`).
+- 📊 **Apache Superset**: Enterprise BI visualization slice and dashboard catalog (`superset.rs`).
+- ❓ **Metabase**: Self-service question builder and natural-language to SQL translation parser (`metabase.rs`).
+- 📖 Read more: [[Database-and-Data-Engineering]]
+
+### 🛠️ 7. Developer & Autonomous AI Tools (`src/tools/` & `src/ai/`)
+- 🎨 **Blender Pipeline**: Headless 3D render pipeline with Cycles and Eevee material graph evaluation (`blender_pipeline.rs`).
+- 🐳 **Docker OCI Runtime**: Rootless container runtime (`sigma-runc`), layer unpacker, and Compose parser (`docker_oci.rs`).
+- 🎥 **VLC Pipeline**: Universal media container demuxer, VA-API hardware acceleration, and Wayland video presentation (`vlc_pipeline.rs`).
+- 📝 **NotepadSigma**: Instant startup (<5ms) Scintilla-grade multi-cursor text editor with 20+ syntax lexers (`notepad_sigma.rs`).
+- ⚡ **Warp Terminal**: GPU block-based terminal session manager with AI command recommendations (`warp_terminal.rs`).
+- 🤖 **Autonomous AI Coding Agents**:
+  - **Cline**: Dual-stage planning and execution agent with safety checks and diff previews (`cline_agent.rs`).
+  - **CodexCLI**: Natural language to shell command generator with sandboxed execution (`codex_cli.rs`).
+  - **CrewAI**: Multi-role autonomous agent team coordinator (Developer, QA, Security, PM) (`crewai_orchestrator.rs`).
+  - **DeepSeek Coder**: Local GGUF quantized model runner with Fill-in-the-Middle and code review (`deepseek_coder.rs`).
+  - **Hermes Agent**: Autonomous system debugger with kernel panic triage and gated self-healing fixes (`hermes_agent.rs`).
+  - **LangChain**: Vector index RAG pipeline, tool registration, and conversational memory buffers (`langchain_pipeline.rs`).
+- 📖 Read more: [[Developer-Tools-and-AI-Agents]]
