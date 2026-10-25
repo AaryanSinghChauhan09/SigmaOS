@@ -185,6 +185,8 @@ pub mod sovereign_distro_package_advancements_v70;
 pub mod sovereign_distro_package_advancements_v70_pr;
 pub mod sovereign_distro_package_advancements_v73;
 pub mod sovereign_distro_package_advancements_v73_pr;
+pub mod sovereign_distro_package_advancements_v74;
+pub mod sovereign_distro_package_advancements_v74_pr;
 pub use sovereign_distro_package_advancements_v63::*;
 pub use sovereign_distro_package_advancements_v64::*;
 
@@ -200,6 +202,8 @@ pub use sovereign_distro_package_advancements_v70::*;
 pub use sovereign_distro_package_advancements_v70_pr::*;
 pub use sovereign_distro_package_advancements_v73::*;
 pub use sovereign_distro_package_advancements_v73_pr::*;
+pub use sovereign_distro_package_advancements_v74::*;
+pub use sovereign_distro_package_advancements_v74_pr::*;
 pub mod sovereign_universal_multi_distro_pm_gateway;
 pub use sovereign_universal_multi_distro_pm_gateway::*;
 pub mod aptkit;
