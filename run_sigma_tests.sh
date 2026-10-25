@@ -1220,7 +1220,8 @@ if [ -f "src/package/sovereign_distro_package_advancements_v70_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V70 PR test suite..."
     mkdir -p build
     rustc --test src/package/sovereign_distro_package_advancements_v70_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v70_pr_test
-    ./build/sovereign_advancements_v70_pr_testfi
+    ./build/sovereign_advancements_v70_pr_test
+fi
 
 if [ -f "src/package/sovereign_distro_package_advancements_v30.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V30 test suite..."
@@ -1444,6 +1445,13 @@ if [ -f "src/distro/sovereign_open_source_os_gap_closure_pr.rs" ]; then
     mkdir -p build
     rustc --test src/distro/sovereign_open_source_os_gap_closure_pr.rs --edition=2021 -o build/test_os_gap_closure_pr
     ./build/test_os_gap_closure_pr
+fi
+
+if [ -f "src/distro/reactos_linux_distro_innovations_pr.rs" ]; then
+    echo "Running Sovereign ReactOS & Linux Distro Hybrid Innovations PR test suite..."
+    mkdir -p build
+    rustc --test src/distro/reactos_linux_distro_innovations_pr.rs --edition=2021 -o build/test_reactos_linux_innovations
+    ./build/test_reactos_linux_innovations
 fi
 
 if [ -f "src/distro/freebsd_gap_closure_pr_engine.rs" ]; then
@@ -1958,7 +1966,6 @@ if [ -f "src/distro/open_source_os_missing_components_v73_pr.rs" ]; then
     rustc --test tests/test_open_source_os_missing_components_v73_pr.rs --edition=2021 -o build/test_open_source_v73_pr_integration
     ./build/test_open_source_v73_pr_integration
 fi
-    ./build/test_open_source_v73_pr_integrationfi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."

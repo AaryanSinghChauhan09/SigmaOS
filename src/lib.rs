@@ -297,6 +297,7 @@ pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::openbsd_missing_components_parity_pr::*;
 pub use distro::reactos_missing_components_parity_pr::*;
+pub use distro::reactos_linux_distro_innovations_pr::*;
 pub use distro::openbsd_missing_components_v55_pr::*;
 pub use distro::openbsd_missing_components_v61_pr::*;
 pub use distro::openbsd_missing_components_v62_pr::*;
