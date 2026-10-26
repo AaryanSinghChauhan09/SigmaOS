@@ -69,8 +69,7 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
-# Documentation policy: NO .md or .txt files tracked in main branch.
-# All documentation lives in the SigmaOS.wiki repository.
+# Documentation policy: NO .md or .txt files tracked in main branch except designated repo plans and journals.
 *.md
 **/*.md
 *.txt
@@ -81,7 +80,16 @@ wiki/
 # Allow Python tools and scripts
 !scripts/*.py
 !tools/*.py
-!tools/**/*.py*.md
-*.txt
-docs/
-wiki/
+!tools/**/*.py
+# Allow GitHub templates, docs, journals, and master plans
+!.github/
+!.github/PULL_REQUEST_TEMPLATE.md
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
+!.jules/**/*.md
+!docs/
+!docs/*.md
+!docs/**/*.md
