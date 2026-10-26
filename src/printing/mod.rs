@@ -8,6 +8,7 @@
 pub mod printer_manager;
 pub mod scanner_manager;
 pub mod sovereign_printing_scanning_v72_pr;
+pub mod sovereign_printing_scanning_v76_pr;
 
 pub use printer_manager::{
     BsdLpdAccountingQuotaEngine, BsdLpdProtocolQueueManager, Cups3IppSystemServiceEngine,
@@ -51,4 +52,14 @@ pub use sovereign_printing_scanning_v72_pr::{
     SovereignPopplerPdfUaSearchEngine, SovereignPopplerSearchHit,
     SovereignPrintScanV72PrGatewayEngine, SovereignSaneImageProcessingEngine,
     SovereignSaneNetMultiplexerEngine,
+};
+pub use sovereign_printing_scanning_v76_pr::{
+    SovereignAdfBatchOcrEngineV76, SovereignAirScanWsdEngineV76,
+    SovereignBsdLpdAccountingEngineV76, SovereignCups3DriverlessAppGatewayEngineV76,
+    SovereignCups3ServiceModeV76, SovereignCupsFilterNodeV76,
+    SovereignCupsFilterV2GraphEngineV76, SovereignGhostscriptDistillerEngineV76,
+    SovereignGhostscriptIccTicEngineV76, SovereignPopplerAcroFormEngineV76,
+    SovereignPopplerPdfUaSearchEngineV76, SovereignPopplerSearchHitV76,
+    SovereignPrintScanV76PrGatewayEngine, SovereignSaneImageProcessingEngineV76,
+    SovereignSaneNetMultiplexerEngineV76,
 };
