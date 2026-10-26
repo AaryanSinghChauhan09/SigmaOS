@@ -2291,6 +2291,13 @@ if [ -f "src/drivers/sovereign_device_driver_development_and_pr_suite.rs" ]; the
     ./build/test_device_driver_pr_suite
 fi
 
+if [ -f "tests/test_device_driver_development_plan.rs" ]; then
+    echo "Running Sovereign Device Driver Development Plan Integration Test Suite..."
+    mkdir -p build
+    rustc --test tests/test_device_driver_development_plan.rs --edition=2021 -o build/test_device_driver_plan
+    ./build/test_device_driver_plan
+fi
+
 if [ -f "src/device/sovereign_device_management_inspirations_pr.rs" ]; then
     echo "Running Sovereign Device Management Inspirations PR Suite..."
     mkdir -p build

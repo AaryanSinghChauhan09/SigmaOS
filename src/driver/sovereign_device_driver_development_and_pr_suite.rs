@@ -199,7 +199,7 @@ impl DriverPrTracker {
     }
 
     pub fn overall_status(&self) -> DriverSupportStatus {
-        let integrated_count = self
+        let supported_integrated_count = self
             .prs
             .values()
             .filter(|p| {
@@ -208,11 +208,17 @@ impl DriverPrTracker {
             })
             .count();
 
-        if integrated_count == self.prs.len() {
+        let active_count = self
+            .prs
+            .values()
+            .filter(|p| p.status != DriverSupportStatus::Proposed)
+            .count();
+
+        if supported_integrated_count == self.prs.len() {
             DriverSupportStatus::Supported
-        } else if integrated_count >= 7 {
+        } else if supported_integrated_count >= 7 {
             DriverSupportStatus::Integrated
-        } else if integrated_count > 0 {
+        } else if active_count > 0 {
             DriverSupportStatus::Prototype
         } else {
             DriverSupportStatus::Proposed

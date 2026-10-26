@@ -1,5 +1,5 @@
-// Sovereign Device Driver Development and Maintenance Plan PR Suite
-// (`src/drivers/sovereign_device_driver_development_and_pr_suite.rs`)
+// SigmaOS Sovereign Device Driver Development and PR Suite
+// (`src/driver/sovereign_device_driver_development_and_pr_suite.rs`)
 //
 // Zero-dependency, safe Rust implementation of the 15-PR Device Driver Development and Maintenance Plan.
 //
@@ -16,7 +16,9 @@
 extern crate alloc;
 
 use alloc::collections::BTreeMap;
+use alloc::format;
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 
 // =========================================================================
@@ -29,6 +31,17 @@ pub enum DriverSupportStatus {
     Prototype,
     Integrated,
     Supported,
+}
+
+impl DriverSupportStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            DriverSupportStatus::Proposed => "Proposed",
+            DriverSupportStatus::Prototype => "Prototype",
+            DriverSupportStatus::Integrated => "Integrated",
+            DriverSupportStatus::Supported => "Supported",
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -186,7 +199,7 @@ impl DriverPrTracker {
     }
 
     pub fn overall_status(&self) -> DriverSupportStatus {
-        let integrated_count = self
+        let supported_integrated_count = self
             .prs
             .values()
             .filter(|p| {
@@ -195,11 +208,17 @@ impl DriverPrTracker {
             })
             .count();
 
-        if integrated_count == self.prs.len() {
+        let active_count = self
+            .prs
+            .values()
+            .filter(|p| p.status != DriverSupportStatus::Proposed)
+            .count();
+
+        if supported_integrated_count == self.prs.len() {
             DriverSupportStatus::Supported
-        } else if integrated_count >= 7 {
+        } else if supported_integrated_count >= 7 {
             DriverSupportStatus::Integrated
-        } else if integrated_count > 0 {
+        } else if active_count > 0 {
             DriverSupportStatus::Prototype
         } else {
             DriverSupportStatus::Proposed
@@ -1040,7 +1059,6 @@ impl DeviceDiagnosticsHealthAndPowerGovernor {
             .get_mut(device_key)
             .ok_or("Health/Power Error: Device not found")?;
 
-        // Validate power transition
         entry.power_state = new_state;
         Ok(())
     }
