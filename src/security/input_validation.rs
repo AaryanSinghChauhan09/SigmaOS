@@ -14,6 +14,7 @@ pub const MAX_ENV_KEY_LEN: usize = 256;
 pub const MAX_IPV4_LEN: usize = 15; // "255.255.255.255"
 pub const MAX_IPV6_LEN: usize = 39; // full IPv6 text
 pub const MAX_URL_LEN: usize = 2048; // Standard HTTP/HTTPS maximum URL length
+pub const MAX_EMAIL_LEN: usize = 254; // RFC 5321 maximum email length limit
 
 /// Errors produced by input validation routines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -118,6 +119,76 @@ pub fn validate_path(path: &[u8]) -> Result<(), ValidationError> {
     if seg_only_dots && seg_len >= 2 {
         return Err(ValidationError::PathTraversal);
     }
+
+    Ok(())
+}
+
+// ── Email Validation ───────────────────────────────────────────────────────
+
+/// Validate an email address per RFC 5321 / RFC 5322.
+///
+/// Rules:
+/// - Non-empty, total length ≤ `MAX_EMAIL_LEN` (254 bytes)
+/// - Exactly one `@` symbol separating local-part and domain-part
+/// - Local-part must be 1..=64 bytes
+/// - Local-part must contain valid unquoted characters (ASCII alphanumeric or `!#$%&'*+-/=?^_`{|}~.`)
+/// - Local-part cannot start or end with a dot (`.`) or contain consecutive dots (`..`)
+/// - Domain-part must be a valid hostname per `validate_hostname`
+pub fn validate_email(email: &[u8]) -> Result<(), ValidationError> {
+    if email.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if email.len() > MAX_EMAIL_LEN {
+        return Err(ValidationError::TooLong);
+    }
+
+    for &b in email {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b < 32 || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
+    // Find the `@` separator. Ensure there is exactly one `@` character.
+    let at_indices: Vec<usize> = email
+        .iter()
+        .enumerate()
+        .filter_map(|(idx, &b)| if b == b'@' { Some(idx) } else { None })
+        .collect();
+
+    if at_indices.len() != 1 {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    let at_pos = at_indices[0];
+    let local = &email[..at_pos];
+    let domain = &email[at_pos + 1..];
+
+    if local.is_empty() || local.len() > 64 || domain.is_empty() {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    // Local-part dot constraints: cannot start/end with dot or contain consecutive dots
+    if local[0] == b'.' || local[local.len() - 1] == b'.' {
+        return Err(ValidationError::InvalidChars);
+    }
+    if local.windows(2).any(|w| w[0] == b'.' && w[1] == b'.') {
+        return Err(ValidationError::InvalidChars);
+    }
+
+    // Check valid local-part unquoted characters
+    for &b in local {
+        if !b.is_ascii_alphanumeric()
+            && !b"!#$%&'*+-/=?^_`{|}~.".contains(&b)
+        {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
+
+    // Domain part must be a valid hostname
+    validate_hostname(domain)?;
 
     Ok(())
 }
@@ -1540,5 +1611,48 @@ mod tests {
             validate_mac_address(b"00:1A:2B:3C:4D:5Z"),
             Err(ValidationError::InvalidChars)
         );
+    }
+
+    #[test]
+    fn test_email_validation() {
+        assert_eq!(validate_email(b"user@example.com"), Ok(()));
+        assert_eq!(validate_email(b"user.name+tag@sub.domain.co.uk"), Ok(()));
+        assert_eq!(validate_email(b"user_123!#$%&'*+-/=?^_`{|}~@example.org"), Ok(()));
+
+        // Rejection of empty input & length exceeding limits
+        assert_eq!(validate_email(b""), Err(ValidationError::EmptyInput));
+        let long_local = vec![b'a'; 65];
+        let long_local_email = [long_local.as_slice(), b"@example.com"].concat();
+        assert_eq!(validate_email(&long_local_email), Err(ValidationError::InvalidChars));
+
+        let long_domain = vec![b'a'; 250];
+        let long_email = [b"user@", long_domain.as_slice(), b".com"].concat();
+        assert_eq!(validate_email(&long_email), Err(ValidationError::TooLong));
+
+        // Rejection of NUL byte and ASCII control characters
+        assert_eq!(validate_email(b"user\x00@example.com"), Err(ValidationError::NullByte));
+        assert_eq!(validate_email(b"user\n@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user\r@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user\t@example.com"), Err(ValidationError::InvalidChars));
+
+        // Rejection of missing @, multiple @, and empty parts
+        assert_eq!(validate_email(b"userexample.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user@foo@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user@"), Err(ValidationError::InvalidChars));
+
+        // Local-part dot violations
+        assert_eq!(validate_email(b".user@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user.@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"us..er@example.com"), Err(ValidationError::InvalidChars));
+
+        // Local-part disallowed characters
+        assert_eq!(validate_email(b"user(comment)@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user[name]@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user\\name@example.com"), Err(ValidationError::InvalidChars));
+
+        // Domain part hostname validation
+        assert_eq!(validate_email(b"user@-example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_email(b"user@example..com"), Err(ValidationError::InvalidChars));
     }
 }
