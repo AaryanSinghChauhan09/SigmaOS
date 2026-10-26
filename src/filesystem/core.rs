@@ -1,3 +1,7 @@
+// SigmaOS Filesystem Core Manager
+// Enforces bounded capacity, sequence tracking, and lost-update prevention.
+// See docs/filesystem/MOUNT_POLICY.md for specification.
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;

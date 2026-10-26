@@ -1,3 +1,7 @@
+// SigmaOS Filesystem Mount Manager
+// Enforces race-free mount/unmount lifecycle and failure rollback semantics.
+// See docs/filesystem/MOUNT_POLICY.md for specification.
+
 use std::collections::BTreeMap;
 use std::string::{String, ToString};
 use std::vec::Vec;

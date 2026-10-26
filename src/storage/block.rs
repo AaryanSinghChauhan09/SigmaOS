@@ -1,3 +1,7 @@
+// SigmaOS Secondary Memory Block Device Manager
+// Enforces race-free enqueue/dequeue, bounded queues, and exactly-once request completions.
+// See docs/storage/BLOCK_POLICY.md for specification.
+
 use core::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::boxed::Box;
 use std::collections::BTreeMap;

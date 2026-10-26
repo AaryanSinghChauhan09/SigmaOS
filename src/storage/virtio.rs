@@ -1,3 +1,6 @@
+// SigmaOS VirtIO Block Device Driver Subsystem
+// Governed by docs/storage/BLOCK_POLICY.md and docs/storage/SECONDARY_MEMORY_POLICY.md.
+
 use super::block::{BlockDeviceID, BlockError, BlockNumber, BlockOrientedDevice, DeviceClass};
 
 use std::vec::Vec;
