@@ -702,6 +702,7 @@ pub mod workflow;
 pub mod io;
 
 pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
+pub use crate::desktop::sovereign_de_wm_advancements_v74_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
