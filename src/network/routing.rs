@@ -26,7 +26,8 @@ impl RoutingTable {
 
     pub fn remove_route(&mut self, dest: Ipv4Addr, netmask: Ipv4Addr) -> bool {
         let len_before = self.routes.len();
-        self.routes.retain(|r| !(r.destination == dest && r.netmask == netmask));
+        self.routes
+            .retain(|r| !(r.destination == dest && r.netmask == netmask));
         self.routes.len() < len_before
     }
 
@@ -232,7 +233,8 @@ impl MultiTableRoutingEngine {
     /// Get or insert active routing table mutable reference
     pub fn get_active_routing_table(&mut self) -> &mut AdvancedRoutingTable {
         self.routing_tables
-            .entry(self.active_table.clone())            .or_insert_with(AdvancedRoutingTable::new)
+            .entry(self.active_table.clone())
+            .or_insert_with(AdvancedRoutingTable::new)
     }
 
     /// Forward packet using active routing table
@@ -275,7 +277,8 @@ impl MultiTableRoutingEngine {
 
     /// Lookup route in active table
     pub fn lookup_route(&self, dest: Ipv4Addr) -> Option<&RouteEntry> {
-        self.active_table().and_then(|t| t.lookup_primary(dest))    }
+        self.active_table().and_then(|t| t.lookup_primary(dest))
+    }
 
     /// Get all routes from active table
     pub fn get_routes(&self) -> alloc::vec::Vec<RouteEntry> {
@@ -303,7 +306,8 @@ impl MultiTableRoutingEngine {
 
     /// Get local addresses
     pub fn local_addresses(&self) -> Option<&alloc::vec::Vec<Ipv4Addr>> {
-        self.active_table().map(|t| &t.local_addresses)    }
+        self.active_table().map(|t| &t.local_addresses)
+    }
 }
 
 /// Policy Routing Decision
@@ -373,7 +377,8 @@ impl PolicyRoutingEngine {
                         if tbl.lookup_secondary(table.clone(), dest).is_some() {
                             return PolicyRoutingDecision::Policy {
                                 table: table.clone(),
-                                decision: decision.clone(),                            };
+                                decision: decision.clone(),
+                            };
                         }
                     }
                 }

@@ -5,7 +5,7 @@
 // six LibreOffice applications: Writer, Calc, Impress, Draw, Math, and Base.
 // Built on top of ODF (Open Document Format) standards, ensuring interoperability.
 
-use alloc::{vec::Vec, string::String, collections::BTreeMap};
+use alloc::{collections::BTreeMap, string::String, vec::Vec};
 
 // ─── Writer (Word Processor) ─────────────────────────────────────────────────
 
@@ -129,7 +129,11 @@ impl CalcSheet {
     pub fn set_cell(&mut self, row: u32, col: u32, val: CellValue) {
         self.cells.insert(
             (row, col),
-            CalcCell { row, col, value: val },
+            CalcCell {
+                row,
+                col,
+                value: val,
+            },
         );
     }
 
@@ -231,7 +235,12 @@ impl ImpressPresentation {
     }
 
     /// Add a slide with custom transition.
-    pub fn add_slide_with_transition(&mut self, title: &str, body: &str, transition: SlideTransition) {
+    pub fn add_slide_with_transition(
+        &mut self,
+        title: &str,
+        body: &str,
+        transition: SlideTransition,
+    ) {
         let idx = self.slides.len() as u32;
         self.slides.push(ImpressSlide {
             index: idx,
@@ -483,7 +492,10 @@ mod tests {
     fn test_calc_cell() {
         let mut sheet = CalcSheet::new("Sheet1");
         sheet.set_cell(0, 0, CellValue::Int(42));
-        assert!(matches!(sheet.get_cell(0, 0).unwrap().value, CellValue::Int(42)));
+        assert!(matches!(
+            sheet.get_cell(0, 0).unwrap().value,
+            CellValue::Int(42)
+        ));
     }
 
     #[test]
@@ -523,8 +535,17 @@ mod tests {
     #[test]
     fn test_draw_canvas() {
         let mut canvas = DrawCanvas::new(800.0, 600.0);
-        canvas.add_shape(DrawShape::Rect { x: 10.0, y: 10.0, w: 100.0, h: 50.0 });
-        canvas.add_shape(DrawShape::Circle { cx: 200.0, cy: 200.0, r: 50.0 });
+        canvas.add_shape(DrawShape::Rect {
+            x: 10.0,
+            y: 10.0,
+            w: 100.0,
+            h: 50.0,
+        });
+        canvas.add_shape(DrawShape::Circle {
+            cx: 200.0,
+            cy: 200.0,
+            r: 50.0,
+        });
         assert_eq!(canvas.shapes.len(), 2);
         let svg = canvas.export_svg();
         assert!(!svg.is_empty());

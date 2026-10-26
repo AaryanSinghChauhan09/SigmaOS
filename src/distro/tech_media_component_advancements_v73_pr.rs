@@ -58,7 +58,10 @@ impl ItsFossTerminalOptimizationEngineV73 {
     }
 
     pub fn render_prompt(&self, user: &str, host: &str, path: &str) -> String {
-        format!("\x1b[32m{}@{}\x1b[0m:\x1b[34m{}\x1b[0m [{}] $ ", user, host, path, self.active_theme)
+        format!(
+            "\x1b[32m{}@{}\x1b[0m:\x1b[34m{}\x1b[0m [{}] $ ",
+            user, host, path, self.active_theme
+        )
     }
 
     pub fn parse_cli_args(&self, args: &[&str]) -> Vec<String> {
@@ -460,7 +463,10 @@ impl LinuxFoundationSbomLicenseAuditEngineV73 {
     }
 
     pub fn is_valid_spdx_id(&self, spdx: &str) -> bool {
-        matches!(spdx, "MIT" | "Apache-2.0" | "GPL-2.0-only" | "GPL-3.0-only" | "BSD-3-Clause")
+        matches!(
+            spdx,
+            "MIT" | "Apache-2.0" | "GPL-2.0-only" | "GPL-3.0-only" | "BSD-3-Clause"
+        )
     }
 }
 
@@ -648,7 +654,11 @@ impl TechSpotFramePacingDirectStorageEngineV73 {
             return 0.0;
         }
         let mean = frame_times.iter().sum::<f32>() / frame_times.len() as f32;
-        let var = frame_times.iter().map(|&t| (t - mean) * (t - mean)).sum::<f32>() / frame_times.len() as f32;
+        let var = frame_times
+            .iter()
+            .map(|&t| (t - mean) * (t - mean))
+            .sum::<f32>()
+            / frame_times.len() as f32;
         var.sqrt()
     }
 }
@@ -678,7 +688,13 @@ impl TheNewStackEbpfMeshWasmEngineV73 {
         self.ebpf_traced_pods > 0 && self.wasm_runtime_active
     }
 
-    pub fn check_wasm_sandbox_bounds(&self, base_addr: usize, offset: usize, len: usize, max_mem: usize) -> bool {
+    pub fn check_wasm_sandbox_bounds(
+        &self,
+        base_addr: usize,
+        offset: usize,
+        len: usize,
+        max_mem: usize,
+    ) -> bool {
         base_addr.saturating_add(offset).saturating_add(len) <= max_mem
     }
 }
@@ -1598,15 +1614,27 @@ impl SovereignTechMediaComponentAdvancementsV73MasterSuite {
 
         insight_verified
             && self.itsfoss.verify_tooling()
-            && !self.itsfoss.render_prompt("root", "sigmaos", "/root").is_empty()
+            && !self
+                .itsfoss
+                .render_prompt("root", "sigmaos", "/root")
+                .is_empty()
             && self.ninetofivelinux.is_lts_rt_active()
             && self.ninetofivelinux.estimate_worst_case_latency_us(90) <= 10
             && self.geeky_gadgets.audit_sbc_telemetry()
-            && self.geeky_gadgets.validate_i2c_checksum(&[0x10, 0x20], 0x30)
+            && self
+                .geeky_gadgets
+                .validate_i2c_checksum(&[0x10, 0x20], 0x30)
             && self.linux_dot_com.verify_hardening()
-            && self.linux_dot_com.validate_path_access(&["/usr/bin"], "/usr/bin/ls")
+            && self
+                .linux_dot_com
+                .validate_path_access(&["/usr/bin"], "/usr/bin/ls")
             && self.kdnuggets.normalize_vector(&[1.0, 2.0, 3.0]).len() == 3
-            && (self.kdnuggets.compute_cosine_similarity(&[1.0, 0.0], &[1.0, 0.0]) - 1.0).abs() < 1e-4
+            && (self
+                .kdnuggets
+                .compute_cosine_similarity(&[1.0, 0.0], &[1.0, 0.0])
+                - 1.0)
+                .abs()
+                < 1e-4
             && self.hwbusters.is_power_rail_safe()
             && self.hwbusters.calculate_psu_efficiency(400.0) > 90.0
             && self.itdaily.verify_sla()
@@ -1614,7 +1642,9 @@ impl SovereignTechMediaComponentAdvancementsV73MasterSuite {
             && self.howtogeek.translate("ip address") == "ip a"
             && self.linux_org.is_realtime_tuned()
             && self.infoworld.is_enterprise_ready()
-            && self.infoworld.validate_mtls_token("MTLS-SIGMA-1234567890ABCDEF")
+            && self
+                .infoworld
+                .validate_mtls_token("MTLS-SIGMA-1234567890ABCDEF")
             && self.linux_foundation.is_sbom_compliant()
             && self.linux_foundation.is_valid_spdx_id("MIT")
             && self.makeuseof.recommend_de(512) == "Zenith-Minimal-Tiling"
@@ -1627,7 +1657,10 @@ impl SovereignTechMediaComponentAdvancementsV73MasterSuite {
                 .win_to_posix("C:\\Users")
                 .contains("/mnt/c/Users")
             && self.techspot.is_smooth()
-            && self.techspot.analyze_frame_time_variance_ms(&[16.6, 16.7, 16.5]) < 1.0
+            && self
+                .techspot
+                .analyze_frame_time_variance_ms(&[16.6, 16.7, 16.5])
+                < 1.0
             && self.thenewstack.is_observable()
             && self.thenewstack.check_wasm_sandbox_bounds(0, 10, 20, 100)
             && self.techpowerup.is_thermal_safe()
@@ -1669,8 +1702,8 @@ mod tests {
     #[test]
     fn test_flexible_domain_concatenated_query_resolution() {
         let synthesis = SovereignTechMediaArticleInsightSynthesisEngineV73::new();
-        let flex = synthesis
-            .query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
+        let flex =
+            synthesis.query_insights_by_flexible_domain("techpowerup.techpwindowscentral.com");
         assert!(flex.len() >= 2);
         let domains: Vec<String> = flex.iter().map(|i| i.publication_domain.clone()).collect();
         assert!(domains.contains(&String::from("techpowerup.com")));
@@ -1681,7 +1714,9 @@ mod tests {
     fn test_all_individual_v73_engines_rich_algorithms() {
         let itsfoss = ItsFossTerminalOptimizationEngineV73::new();
         assert!(itsfoss.verify_tooling());
-        assert!(itsfoss.render_prompt("alice", "laptop", "/home/alice").contains("alice@laptop"));
+        assert!(itsfoss
+            .render_prompt("alice", "laptop", "/home/alice")
+            .contains("alice@laptop"));
         let flags = itsfoss.parse_cli_args(&["--verbose", "--output=file.txt"]);
         assert_eq!(flags, vec!["verbose", "output=file.txt"]);
 
@@ -1732,7 +1767,10 @@ mod tests {
 
         let muo = MakeUseOfLowRamDeProfileEngineV73::new();
         assert_eq!(muo.recommend_de(512), "Zenith-Minimal-Tiling");
-        assert_eq!(muo.estimate_de_memory_footprint_mb("Zenith-Minimal-Tiling"), 120);
+        assert_eq!(
+            muo.estimate_de_memory_footprint_mb("Zenith-Minimal-Tiling"),
+            120
+        );
 
         let pcw = PCWorldBatteryHealthGovernorEngineV73::new();
         assert!(pcw.should_charge(75));
@@ -1789,7 +1827,9 @@ mod tests {
 
         let lteck = LinuxTeckFirewallSysadminEngineV73::new();
         assert!(lteck.is_sysadmin_hardened());
-        assert!(lteck.generate_nftables_rate_limit_rule(22, 10).contains("22"));
+        assert!(lteck
+            .generate_nftables_rate_limit_rule(22, 10)
+            .contains("22"));
 
         let mut appuals = AppualsAutomatedPackageResolverEngineV73::new();
         assert!(appuals.auto_repair(404).contains("404"));

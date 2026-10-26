@@ -85,7 +85,10 @@ impl WordcraftSemanticAiSummarizerPrEngine {
                 format!("• Point A: Analyzed primary thesis.\n• Point B: Summarized operational impacts.\n• Point C: Synthesized document conclusions (length: {} chars).", text.len())
             }
             SummarizationModeV66::KeyTakeaways => {
-                format!("Key Takeaway: Synthesized summary for document with {} words.", text.split_whitespace().count())
+                format!(
+                    "Key Takeaway: Synthesized summary for document with {} words.",
+                    text.split_whitespace().count()
+                )
             }
         }
     }
@@ -120,7 +123,9 @@ impl WordcraftSemanticAiSummarizerPrEngine {
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6601,
-            pr_title: String::from("Wordcraft Semantic AI Summarizer & Keyphrase Extraction Engine"),
+            pr_title: String::from(
+                "Wordcraft Semantic AI Summarizer & Keyphrase Extraction Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / AI Engine"),
             original_suite: String::from("ArtCraft Wordcraft AI V66"),
             components_added: vec![
@@ -169,7 +174,13 @@ impl WordcraftFootnoteEndnoteCrossReferencePrEngine {
         }
     }
 
-    pub fn add_note(&mut self, kind: NoteKindV66, label: &str, content: &str, target_page: u32) -> u32 {
+    pub fn add_note(
+        &mut self,
+        kind: NoteKindV66,
+        label: &str,
+        content: &str,
+        target_page: u32,
+    ) -> u32 {
         let id = (self.notes.len() as u32) + 1;
         self.notes.push(NoteEntryV66 {
             id,
@@ -182,7 +193,8 @@ impl WordcraftFootnoteEndnoteCrossReferencePrEngine {
     }
 
     pub fn register_cross_reference(&mut self, tag: &str, target_id: &str) {
-        self.cross_refs.insert(tag.to_string(), target_id.to_string());
+        self.cross_refs
+            .insert(tag.to_string(), target_id.to_string());
     }
 
     pub fn resolve_cross_reference(&self, tag: &str) -> Option<String> {
@@ -200,7 +212,9 @@ impl WordcraftFootnoteEndnoteCrossReferencePrEngine {
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6602,
-            pr_title: String::from("Wordcraft Footnote, Endnote & Dynamic Cross-Reference Pointer Engine"),
+            pr_title: String::from(
+                "Wordcraft Footnote, Endnote & Dynamic Cross-Reference Pointer Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Citation Layout"),
             original_suite: String::from("ArtCraft Wordcraft References V66"),
             components_added: vec![
@@ -273,11 +287,16 @@ impl WordcraftIndexGlossaryTableOfAuthoritiesPrEngine {
     }
 
     pub fn add_glossary_term(&mut self, term: &str, definition: &str) {
-        self.glossary_terms.insert(term.to_string(), definition.to_string());
+        self.glossary_terms
+            .insert(term.to_string(), definition.to_string());
     }
 
     pub fn add_authority(&mut self, category: AuthorityCategoryV66, citation: &str, page: u32) {
-        if let Some(auth) = self.authorities.iter_mut().find(|a| a.citation == citation && a.category == category) {
+        if let Some(auth) = self
+            .authorities
+            .iter_mut()
+            .find(|a| a.citation == citation && a.category == category)
+        {
             if !auth.page_references.contains(&page) {
                 auth.page_references.push(page);
                 auth.page_references.sort_unstable();
@@ -365,7 +384,11 @@ impl WordcraftMasterDocumentSubdocumentBinderPrEngine {
     }
 
     pub fn compile_master_manifest(&self) -> String {
-        let mut manifest = format!("MASTER DOCUMENT: {}\nTotal Pages: {}\nSubdocuments:\n", self.master_title, self.compute_total_master_pages());
+        let mut manifest = format!(
+            "MASTER DOCUMENT: {}\nTotal Pages: {}\nSubdocuments:\n",
+            self.master_title,
+            self.compute_total_master_pages()
+        );
         for (i, sub) in self.subdocuments.iter().enumerate() {
             manifest.push_str(&format!(
                 "  [{}] {} | Pages {}-{} | Read-Only: {}\n",
@@ -382,7 +405,9 @@ impl WordcraftMasterDocumentSubdocumentBinderPrEngine {
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6604,
-            pr_title: String::from("Wordcraft Master Document & Subdocument Assembly Binder Engine"),
+            pr_title: String::from(
+                "Wordcraft Master Document & Subdocument Assembly Binder Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Project Assembly"),
             original_suite: String::from("ArtCraft Wordcraft Binder V66"),
             components_added: vec![
@@ -417,7 +442,12 @@ impl WordcraftDigitalSignatureTimestampVerifierPrEngine {
         Self
     }
 
-    pub fn sign_document(&self, content: &str, signer: &str, cert_issuer: &str) -> DigitalSignatureManifestV66 {
+    pub fn sign_document(
+        &self,
+        content: &str,
+        signer: &str,
+        cert_issuer: &str,
+    ) -> DigitalSignatureManifestV66 {
         // FNV-1a hash computation for deterministic signature validation
         let mut hash: u64 = 0xcbf29ce484222325;
         for byte in content.bytes() {
@@ -442,7 +472,9 @@ impl WordcraftDigitalSignatureTimestampVerifierPrEngine {
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6605,
-            pr_title: String::from("Wordcraft Digital Signature & TSA Timestamp Verification Engine"),
+            pr_title: String::from(
+                "Wordcraft Digital Signature & TSA Timestamp Verification Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Security & PKI"),
             original_suite: String::from("ArtCraft Wordcraft Security V66"),
             components_added: vec![
@@ -487,7 +519,9 @@ pub struct WordcraftInteractiveFormPdfAcroformGeneratorPrEngine {
 
 impl WordcraftInteractiveFormPdfAcroformGeneratorPrEngine {
     pub fn new() -> Self {
-        Self { widgets: Vec::new() }
+        Self {
+            widgets: Vec::new(),
+        }
     }
 
     pub fn add_widget(&mut self, widget: FormWidgetV66) {
@@ -546,8 +580,9 @@ impl WordcraftMultiLanguageTransliterationPhoneticPrEngine {
 
     pub fn transliterate(&self, text: &str, script: TransliterationScriptV66) -> String {
         match script {
-            TransliterationScriptV66::CyrillicToLatin => {
-                text.chars().map(|c| match c {
+            TransliterationScriptV66::CyrillicToLatin => text
+                .chars()
+                .map(|c| match c {
                     'П' => "P",
                     'п' => "p",
                     'р' => "r",
@@ -556,24 +591,27 @@ impl WordcraftMultiLanguageTransliterationPhoneticPrEngine {
                     'е' => "e",
                     'т' => "t",
                     _ => "",
-                }).collect::<Vec<&str>>().join("")
-            }
-            TransliterationScriptV66::GreekToLatin => {
-                text.replace("α", "a").replace("β", "b").replace("γ", "g").replace("δ", "d")
-            }
+                })
+                .collect::<Vec<&str>>()
+                .join(""),
+            TransliterationScriptV66::GreekToLatin => text
+                .replace("α", "a")
+                .replace("β", "b")
+                .replace("γ", "g")
+                .replace("δ", "d"),
             TransliterationScriptV66::PinyinToIPA => {
                 text.replace("ni3", "ni˥˩").replace("hao3", "xaʊ˥˩")
             }
-            TransliterationScriptV66::HebrewToLatin => {
-                text.replace("שָׁלוֹם", "shalom")
-            }
+            TransliterationScriptV66::HebrewToLatin => text.replace("שָׁלוֹם", "shalom"),
         }
     }
 
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6607,
-            pr_title: String::from("Wordcraft Multi-Language Transliteration & Phonetic Annotation Engine"),
+            pr_title: String::from(
+                "Wordcraft Multi-Language Transliteration & Phonetic Annotation Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Internationalization"),
             original_suite: String::from("ArtCraft Wordcraft Transliteration V66"),
             components_added: vec![
@@ -609,9 +647,7 @@ impl WordcraftBidiComplexScriptArabicHebrewPrEngine {
     pub fn process_bidi_layout(&self, text: &str, direction: TextDirectionV66) -> String {
         match direction {
             TextDirectionV66::LeftToRight => text.to_string(),
-            TextDirectionV66::RightToLeft => {
-                text.chars().rev().collect()
-            }
+            TextDirectionV66::RightToLeft => text.chars().rev().collect(),
             TextDirectionV66::BiDirectionalMixed => {
                 format!("[RTL-Embedded] {}", text)
             }
@@ -660,32 +696,43 @@ impl WordcraftMarkdownLatexDocxBidirectionalTranspilerPrEngine {
         Self
     }
 
-    pub fn transpile(&self, content: &str, from_fmt: TranspileFormatV66, to_fmt: TranspileFormatV66) -> String {
+    pub fn transpile(
+        &self,
+        content: &str,
+        from_fmt: TranspileFormatV66,
+        to_fmt: TranspileFormatV66,
+    ) -> String {
         if from_fmt == to_fmt {
             return content.to_string();
         }
 
         match (from_fmt, to_fmt) {
-            (TranspileFormatV66::Markdown, TranspileFormatV66::LaTeX) => {
-                content
-                    .replace("# ", "\\section{")
-                    .replace("\n", "}\n")
-                    .replace("**", "\\textbf{")
-            }
+            (TranspileFormatV66::Markdown, TranspileFormatV66::LaTeX) => content
+                .replace("# ", "\\section{")
+                .replace("\n", "}\n")
+                .replace("**", "\\textbf{"),
             (TranspileFormatV66::Markdown, TranspileFormatV66::Html) => {
-                format!("<html><body><p>{}</p></body></html>", content.replace("\n", "<br/>"))
+                format!(
+                    "<html><body><p>{}</p></body></html>",
+                    content.replace("\n", "<br/>")
+                )
             }
             (TranspileFormatV66::LaTeX, TranspileFormatV66::Markdown) => {
                 content.replace("\\section{", "# ").replace("}", "")
             }
-            _ => format!("[Transpiled from {:?} to {:?}]: {}", from_fmt, to_fmt, content),
+            _ => format!(
+                "[Transpiled from {:?} to {:?}]: {}",
+                from_fmt, to_fmt, content
+            ),
         }
     }
 
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6609,
-            pr_title: String::from("Wordcraft Markdown, LaTeX & Docx Bidirectional Transpiler Engine"),
+            pr_title: String::from(
+                "Wordcraft Markdown, LaTeX & Docx Bidirectional Transpiler Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Multi-Format Transpilation"),
             original_suite: String::from("ArtCraft Wordcraft Transpiler V66"),
             components_added: vec![
@@ -718,7 +765,11 @@ impl WordcraftAccessibilityPdfUaScreenReaderOptimizerPrEngine {
         Self
     }
 
-    pub fn optimize_accessibility(&self, doc_tree_xml: &str, standard: AccessibilityStandardV66) -> String {
+    pub fn optimize_accessibility(
+        &self,
+        doc_tree_xml: &str,
+        standard: AccessibilityStandardV66,
+    ) -> String {
         format!(
             "<AccessibilityTaggedDoc standard=\"{:?}\">\n  <!-- Screen Reader Alt Text & Heading Tag Structure Injected -->\n  {}\n</AccessibilityTaggedDoc>",
             standard, doc_tree_xml
@@ -728,7 +779,9 @@ impl WordcraftAccessibilityPdfUaScreenReaderOptimizerPrEngine {
     pub fn generate_proposal(&self) -> WordcraftV66PrProposalManifest {
         WordcraftV66PrProposalManifest {
             pr_id: 6610,
-            pr_title: String::from("Wordcraft Accessibility & PDF/UA Screen Reader Optimizer Engine"),
+            pr_title: String::from(
+                "Wordcraft Accessibility & PDF/UA Screen Reader Optimizer Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Accessibility Compliance"),
             original_suite: String::from("ArtCraft Wordcraft PDF/UA V66"),
             components_added: vec![
@@ -758,7 +811,8 @@ impl SovereignWordcraftArtcraftMissingComponentsV66PrGateway {
             WordcraftSemanticAiSummarizerPrEngine::new().generate_proposal(),
             WordcraftFootnoteEndnoteCrossReferencePrEngine::new().generate_proposal(),
             WordcraftIndexGlossaryTableOfAuthoritiesPrEngine::new().generate_proposal(),
-            WordcraftMasterDocumentSubdocumentBinderPrEngine::new("Wordcraft Master Thesis").generate_proposal(),
+            WordcraftMasterDocumentSubdocumentBinderPrEngine::new("Wordcraft Master Thesis")
+                .generate_proposal(),
             WordcraftDigitalSignatureTimestampVerifierPrEngine::new().generate_proposal(),
             WordcraftInteractiveFormPdfAcroformGeneratorPrEngine::new().generate_proposal(),
             WordcraftMultiLanguageTransliterationPhoneticPrEngine::new().generate_proposal(),
@@ -782,7 +836,10 @@ impl WordcraftArtcraftMissingComponentsV66PrSuite {
 
         // Test 1: Summarizer
         let ai = WordcraftSemanticAiSummarizerPrEngine::new();
-        let summary = ai.summarize("SigmaOS provides high performance document processing.", SummarizationModeV66::ExecutiveSummary);
+        let summary = ai.summarize(
+            "SigmaOS provides high performance document processing.",
+            SummarizationModeV66::ExecutiveSummary,
+        );
         if !summary.contains("Executive Summary") {
             return false;
         }
@@ -790,7 +847,11 @@ impl WordcraftArtcraftMissingComponentsV66PrSuite {
         // Test 2: Notes
         let mut notes_eng = WordcraftFootnoteEndnoteCrossReferencePrEngine::new();
         notes_eng.add_note(NoteKindV66::Footnote, "1", "See reference A.", 1);
-        if notes_eng.render_notes_for_page(1, NoteKindV66::Footnote).len() != 1 {
+        if notes_eng
+            .render_notes_for_page(1, NoteKindV66::Footnote)
+            .len()
+            != 1
+        {
             return false;
         }
 

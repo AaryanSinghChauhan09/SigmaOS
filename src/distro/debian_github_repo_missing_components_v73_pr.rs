@@ -166,7 +166,10 @@ impl DebianDebconfDatabaseStateV73PrEngine {
         let mut answers = BTreeMap::new();
         answers.insert("tzdata/zones".to_string(), "UTC".to_string());
         answers.insert("debconf/priority".to_string(), "high".to_string());
-        answers.insert("locales/default_environment_locale".to_string(), "en_US.UTF-8".to_string());
+        answers.insert(
+            "locales/default_environment_locale".to_string(),
+            "en_US.UTF-8".to_string(),
+        );
         Self { answers }
     }
 

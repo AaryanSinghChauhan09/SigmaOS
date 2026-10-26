@@ -2,16 +2,16 @@
 // SigmaOS - NT Virtual DOS Machine (NTVDM) bridge
 // Principles: ABSTRACTION, COMPATIBILITY, INTERFACE SEGREGATION
 
-use alloc::{string::String, vec::Vec, collections::BTreeMap};
+use alloc::{collections::BTreeMap, string::String, vec::Vec};
 
 /// NTVDM session configuration
 #[derive(Debug, Clone)]
 pub struct NtvdmConfig {
-    pub mem_size_kb: u32,   // conventional memory (up to 640KB)
-    pub xms_size_kb: u32,   // extended memory (XMS)
-    pub ems_size_kb: u32,   // expanded memory (EMS)
-    pub com_port_base: [u16; 4],  // COM1-4 I/O base addresses
-    pub lpt_port_base: [u16; 3],  // LPT1-3 I/O base addresses
+    pub mem_size_kb: u32,        // conventional memory (up to 640KB)
+    pub xms_size_kb: u32,        // extended memory (XMS)
+    pub ems_size_kb: u32,        // expanded memory (EMS)
+    pub com_port_base: [u16; 4], // COM1-4 I/O base addresses
+    pub lpt_port_base: [u16; 3], // LPT1-3 I/O base addresses
     pub video_mode: VideoMode,
 }
 
@@ -42,7 +42,7 @@ pub enum VideoMode {
 #[derive(Debug, Clone)]
 pub struct Ntvdm16BitThunk {
     pub thunk_id: u16,
-    pub target_fn: u32,  // 32-bit flat address
+    pub target_fn: u32, // 32-bit flat address
     pub param_bytes: u8,
     pub ret_bytes: u8,
 }
@@ -59,20 +59,38 @@ pub struct NtvdmConsole {
 
 impl NtvdmConsole {
     pub fn new(mode: VideoMode) -> Self {
-        Self { output: Vec::new(), input_queue: Vec::new(), cursor_row: 0, cursor_col: 0, video_mode: mode }
+        Self {
+            output: Vec::new(),
+            input_queue: Vec::new(),
+            cursor_row: 0,
+            cursor_col: 0,
+            video_mode: mode,
+        }
     }
 
     pub fn write_char(&mut self, c: u8) {
         match c {
-            b'\n' => { self.cursor_row += 1; self.cursor_col = 0; }
-            b'\r' => { self.cursor_col = 0; }
-            _ => { self.output.push(c); self.cursor_col += 1; }
+            b'\n' => {
+                self.cursor_row += 1;
+                self.cursor_col = 0;
+            }
+            b'\r' => {
+                self.cursor_col = 0;
+            }
+            _ => {
+                self.output.push(c);
+                self.cursor_col += 1;
+            }
         }
         self.output.push(c);
     }
 
-    pub fn read_char(&mut self) -> Option<u8> { self.input_queue.pop() }
-    pub fn inject_input(&mut self, data: &[u8]) { self.input_queue.extend_from_slice(data); }
+    pub fn read_char(&mut self) -> Option<u8> {
+        self.input_queue.pop()
+    }
+    pub fn inject_input(&mut self, data: &[u8]) {
+        self.input_queue.extend_from_slice(data);
+    }
 }
 
 /// NTVDM session — emulates DOS environment under NT/SigmaOS
@@ -83,7 +101,7 @@ pub struct NtvdmSession {
     pub thunks: Vec<Ntvdm16BitThunk>,
     pub exit_code: Option<u8>,
     pub program_name: String,
-    pub psp_segment: u16,  // Program Segment Prefix
+    pub psp_segment: u16, // Program Segment Prefix
 }
 
 impl NtvdmSession {
@@ -115,23 +133,32 @@ impl NtvdmSession {
     pub fn run_ticks(&mut self, ticks: u32) -> Option<u8> {
         // Stub: simulate N ticks of DOS execution
         for _ in 0..ticks {
-            if self.exit_code.is_some() { break; }
+            if self.exit_code.is_some() {
+                break;
+            }
             // In a real implementation this would step the V86 machine
         }
         self.exit_code
     }
 
-    pub fn terminate(&mut self, code: u8) { self.exit_code = Some(code); }
+    pub fn terminate(&mut self, code: u8) {
+        self.exit_code = Some(code);
+    }
 
-    pub fn console_output(&self) -> &[u8] { &self.console.output }
-    pub fn console_input(&mut self, data: &[u8]) { self.console.inject_input(data); }
+    pub fn console_output(&self) -> &[u8] {
+        &self.console.output
+    }
+    pub fn console_input(&mut self, data: &[u8]) {
+        self.console.inject_input(data);
+    }
 
     pub fn register_thunk(&mut self, thunk: Ntvdm16BitThunk) {
         self.thunks.push(thunk);
     }
 
     pub fn call_thunk(&self, thunk_id: u16) -> Result<u32, &'static str> {
-        self.thunks.iter()
+        self.thunks
+            .iter()
             .find(|t| t.thunk_id == thunk_id)
             .map(|t| t.target_fn)
             .ok_or("thunk not found")
@@ -146,7 +173,9 @@ impl NtvdmSession {
     pub fn memory_write(&mut self, addr: u32, data: &[u8]) -> Result<(), &'static str> {
         let start = addr as usize;
         let end = start + data.len();
-        if end > self.memory.len() { return Err("address out of range"); }
+        if end > self.memory.len() {
+            return Err("address out of range");
+        }
         self.memory[start..end].copy_from_slice(data);
         Ok(())
     }
@@ -176,7 +205,8 @@ mod tests {
     fn test_memory_read_write() {
         let cfg = NtvdmConfig::default();
         let mut sess = NtvdmSession::create(cfg);
-        sess.memory_write(0x1000, &[0xDE, 0xAD, 0xBE, 0xEF]).unwrap();
+        sess.memory_write(0x1000, &[0xDE, 0xAD, 0xBE, 0xEF])
+            .unwrap();
         let data = sess.memory_read(0x1000, 4);
         assert_eq!(data, &[0xDE, 0xAD, 0xBE, 0xEF]);
     }
@@ -185,7 +215,12 @@ mod tests {
     fn test_thunk_registration() {
         let cfg = NtvdmConfig::default();
         let mut sess = NtvdmSession::create(cfg);
-        sess.register_thunk(Ntvdm16BitThunk { thunk_id: 1, target_fn: 0xCAFEBABE, param_bytes: 4, ret_bytes: 4 });
+        sess.register_thunk(Ntvdm16BitThunk {
+            thunk_id: 1,
+            target_fn: 0xCAFEBABE,
+            param_bytes: 4,
+            ret_bytes: 4,
+        });
         assert_eq!(sess.call_thunk(1).unwrap(), 0xCAFEBABE);
         assert!(sess.call_thunk(99).is_err());
     }

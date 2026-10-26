@@ -49,11 +49,17 @@ impl ZfsBeManager {
         }
     }
 
-    pub fn create_be(&mut self, name: &str, dataset: &str, created_at: u64) -> Result<(), &'static str> {
+    pub fn create_be(
+        &mut self,
+        name: &str,
+        dataset: &str,
+        created_at: u64,
+    ) -> Result<(), &'static str> {
         if self.environments.iter().any(|e| e.name == name) {
             return Err("Boot environment already exists");
         }
-        self.environments.push(BootEnvironment::new(name, dataset, created_at));
+        self.environments
+            .push(BootEnvironment::new(name, dataset, created_at));
         Ok(())
     }
 
@@ -103,16 +109,30 @@ mod tests {
     #[test]
     fn test_create_and_activate_be() {
         let mut mgr = ZfsBeManager::new();
-        mgr.create_be("default", "zroot/ROOT/default", 1000000).unwrap();
-        mgr.create_be("upgrade-2024", "zroot/ROOT/upgrade-2024", 1000100).unwrap();
+        mgr.create_be("default", "zroot/ROOT/default", 1000000)
+            .unwrap();
+        mgr.create_be("upgrade-2024", "zroot/ROOT/upgrade-2024", 1000100)
+            .unwrap();
 
         mgr.activate_be("default").unwrap();
         assert_eq!(mgr.active_name.as_deref(), Some("default"));
 
         mgr.activate_be("upgrade-2024").unwrap();
         assert_eq!(mgr.active_name.as_deref(), Some("upgrade-2024"));
-        assert!(mgr.environments.iter().find(|e| e.name == "upgrade-2024").unwrap().active);
-        assert!(!mgr.environments.iter().find(|e| e.name == "default").unwrap().active);
+        assert!(
+            mgr.environments
+                .iter()
+                .find(|e| e.name == "upgrade-2024")
+                .unwrap()
+                .active
+        );
+        assert!(
+            !mgr.environments
+                .iter()
+                .find(|e| e.name == "default")
+                .unwrap()
+                .active
+        );
     }
 
     #[test]

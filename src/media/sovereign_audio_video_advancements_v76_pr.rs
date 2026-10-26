@@ -81,12 +81,16 @@ impl SovereignAlsaUcm2EngineV76 {
             self.active_verb = verb.to_string();
             Ok(())
         } else {
-            Err(format!("UCM verb '{}' not supported on card {}", verb, self.soundcard_id))
+            Err(format!(
+                "UCM verb '{}' not supported on card {}",
+                verb, self.soundcard_id
+            ))
         }
     }
 
     pub fn set_jack_status(&mut self, jack_name: &str, plugged: bool) {
-        self.jack_detection_map.insert(jack_name.to_string(), plugged);
+        self.jack_detection_map
+            .insert(jack_name.to_string(), plugged);
         if jack_name == "Headphone Jack" {
             if plugged {
                 let _ = self.set_verb("HiFi");
@@ -148,7 +152,8 @@ impl SovereignOss4EngineV76 {
     pub fn new(dsp_path: &str) -> Self {
         Self {
             dsp_device_path: dsp_path.to_string(),
-            sndstat_summary: "FreeBSD Audio Driver (newpcm) pcm0: <Realtek ALC892> default".to_string(),
+            sndstat_summary: "FreeBSD Audio Driver (newpcm) pcm0: <Realtek ALC892> default"
+                .to_string(),
             virtual_channels: vec!["vchan0".to_string(), "vchan1".to_string()],
             active_audio_format: "AFMT_S32_LE".to_string(),
             sample_rate_hz: 96000,
@@ -184,7 +189,11 @@ impl SovereignOss4EngineV76 {
         if pcm_samples.is_empty() {
             return self.peak_levels_dbfs;
         }
-        let max_amp = pcm_samples.iter().map(|&s| s.unsigned_abs()).max().unwrap_or(0) as f32;
+        let max_amp = pcm_samples
+            .iter()
+            .map(|&s| s.unsigned_abs())
+            .max()
+            .unwrap_or(0) as f32;
         let dbfs = if max_amp > 0.0 {
             20.0 * (max_amp / (i32::MAX as f32)).log10()
         } else {
@@ -221,8 +230,14 @@ impl SovereignPulseAudioEngineV76 {
     pub fn new() -> Self {
         let mut modules = BTreeMap::new();
         modules.insert("module-device-restore".to_string(), "".to_string());
-        modules.insert("module-role-cork".to_string(), "cork_roles=phone,nav".to_string());
-        modules.insert("module-echo-cancel".to_string(), "aec_method=webrtc".to_string());
+        modules.insert(
+            "module-role-cork".to_string(),
+            "cork_roles=phone,nav".to_string(),
+        );
+        modules.insert(
+            "module-echo-cancel".to_string(),
+            "aec_method=webrtc".to_string(),
+        );
 
         Self {
             server_socket_path: "/run/user/1000/pulse/native".to_string(),
@@ -237,7 +252,8 @@ impl SovereignPulseAudioEngineV76 {
     }
 
     pub fn load_module(&mut self, name: &str, args: &str) {
-        self.active_modules.insert(name.to_string(), args.to_string());
+        self.active_modules
+            .insert(name.to_string(), args.to_string());
     }
 
     pub fn compute_ducked_volume(&self, original_vol: u32, stream_role: &str) -> u32 {
@@ -362,7 +378,8 @@ impl SovereignJackEngineV76 {
     }
 
     pub fn connect_ports(&mut self, out_port: &str, in_port: &str) {
-        self.connected_port_pairs.push((out_port.to_string(), in_port.to_string()));
+        self.connected_port_pairs
+            .push((out_port.to_string(), in_port.to_string()));
     }
 
     pub fn push_sysex_msg(&mut self, msg: &[u8]) -> Result<usize, &'static str> {
@@ -380,7 +397,9 @@ impl SovereignJackEngineV76 {
 
     pub fn calculate_latency_us(&self) -> f32 {
         if self.sample_rate_hz > 0 {
-            ((self.buffer_size_frames + self.jitter_buffer_compensation_frames) as f32 / self.sample_rate_hz as f32) * 1_000_000.0
+            ((self.buffer_size_frames + self.jitter_buffer_compensation_frames) as f32
+                / self.sample_rate_hz as f32)
+                * 1_000_000.0
         } else {
             0.0
         }
@@ -426,7 +445,8 @@ impl SovereignSndioEngineV76 {
     }
 
     pub fn set_sioctl_level(&mut self, control_name: &str, val: i32) {
-        self.sioctl_controls.insert(control_name.to_string(), val.clamp(0, 127));
+        self.sioctl_controls
+            .insert(control_name.to_string(), val.clamp(0, 127));
     }
 
     pub fn advance_mtc_clock(&mut self, delta_ticks: u64) -> u64 {
@@ -590,7 +610,8 @@ impl SovereignV4l2EngineV76 {
     }
 
     pub fn setup_media_link(&mut self, source_pad: &str, sink_pad: &str) {
-        self.subdev_pad_links.push((source_pad.to_string(), sink_pad.to_string()));
+        self.subdev_pad_links
+            .push((source_pad.to_string(), sink_pad.to_string()));
     }
 }
 
@@ -683,7 +704,8 @@ impl SovereignMpvEngineV76 {
     }
 
     pub fn register_property_observer(&mut self, obs_id: u32, property_name: &str) {
-        self.property_observers.insert(obs_id, property_name.to_string());
+        self.property_observers
+            .insert(obs_id, property_name.to_string());
     }
 
     pub fn show_osd_message(&mut self, msg: &str) {
@@ -783,16 +805,37 @@ impl SovereignAudioVideoV76PrGatewayEngine {
     pub fn register_v76_prs(&mut self) {
         let prs = [
             ("ALSA UCM2 Profile Switcher & Xrun Recovery", "ALSA"),
-            ("OSSv4 Virtual Matrix Multiplexer & /dev/sndstat Parser", "OSS"),
-            ("PulseAudio Native Stream Protocol & WebRTC AEC", "PulseAudio"),
-            ("PipeWire SPA POD Buffer & Filter-Chain Convolver", "PipeWire"),
-            ("JACK Zero-Copy Execution Graph & NSM Session Protocol", "JACK"),
+            (
+                "OSSv4 Virtual Matrix Multiplexer & /dev/sndstat Parser",
+                "OSS",
+            ),
+            (
+                "PulseAudio Native Stream Protocol & WebRTC AEC",
+                "PulseAudio",
+            ),
+            (
+                "PipeWire SPA POD Buffer & Filter-Chain Convolver",
+                "PipeWire",
+            ),
+            (
+                "JACK Zero-Copy Execution Graph & NSM Session Protocol",
+                "JACK",
+            ),
             ("sndio BSD sioctl Controls & Raw MTC Clock Sync", "sndio"),
-            ("GStreamer SplitMuxSink Recorder & RTSP Server Bin", "GStreamer"),
+            (
+                "GStreamer SplitMuxSink Recorder & RTSP Server Bin",
+                "GStreamer",
+            ),
             ("FFmpeg DRM PRIME Surface Allocator & Custom AVIO", "FFmpeg"),
-            ("V4L2 Multi-Planar DMABUF Exporter & PTZ ISP Controls", "V4L2"),
+            (
+                "V4L2 Multi-Planar DMABUF Exporter & PTZ ISP Controls",
+                "V4L2",
+            ),
             ("VLC libVLC Core Module Loader & ASS Subtitle Engine", "VLC"),
-            ("mpv JSON-RPC Output Bridge & Libplacebo GPU-Next Shader", "mpv"),
+            (
+                "mpv JSON-RPC Output Bridge & Libplacebo GPU-Next Shader",
+                "mpv",
+            ),
         ];
 
         for (title, subsystem) in prs {

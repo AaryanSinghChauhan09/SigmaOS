@@ -45,7 +45,7 @@ pub enum ToolchainOptModeV76 {
 /// Hardening profile inspired by Linux & BSD security posture (V76).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolchainHardeningModeV76 {
-    FedoraFortifyLevel3,   // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
+    FedoraFortifyLevel3, // Fedora/NixOS strict defensive posture (-D_FORTIFY_SOURCE=3 -fstack-clash-protection)
     StandardFortifyLevel2, // Standard Ubuntu/Debian hardening (-D_FORTIFY_SOURCE=2 -fstack-protector-strong)
     None,
 }
@@ -288,7 +288,8 @@ impl GccClangLlvmToolchainV76Engine {
     pub fn generate_proposal(&self) -> ToolchainDevelopmentPrProposalManifestV76 {
         ToolchainDevelopmentPrProposalManifestV76 {
             pr_number: 6015,
-            pr_title: "toolchain(gcc-llvm): GCC 15+, Clang 19+, Mold 2.30 & LLD Linker Parity".to_string(),
+            pr_title: "toolchain(gcc-llvm): GCC 15+, Clang 19+, Mold 2.30 & LLD Linker Parity"
+                .to_string(),
             target_subsystem: "Compiler & Linker Infrastructure".to_string(),
             distro_inspirations: vec![
                 "Clear Linux (AVX-512/FMV auto-tuning)".to_string(),
@@ -608,12 +609,21 @@ impl DebuggersTracersProfilersV76Engine {
         }
     }
 
-    pub fn filter_syscalls_by_path(&self, events: &[SyscallTraceEventV76], _path_filter: &str) -> usize {
+    pub fn filter_syscalls_by_path(
+        &self,
+        events: &[SyscallTraceEventV76],
+        _path_filter: &str,
+    ) -> usize {
         events.len()
     }
 
     pub fn format_ltrace_call_args(&self, symbol: &str, args: &[u64]) -> String {
-        format!("{}({:#x}, {:#x}) = 0x0", symbol, args.get(0).unwrap_or(&0), args.get(1).unwrap_or(&0))
+        format!(
+            "{}({:#x}, {:#x}) = 0x0",
+            symbol,
+            args.get(0).unwrap_or(&0),
+            args.get(1).unwrap_or(&0)
+        )
     }
 
     pub fn ltrace_symbol_interceptor(&self, symbol: &str, plt_got_addr: u64) -> String {
@@ -647,7 +657,11 @@ impl DebuggersTracersProfilersV76Engine {
         }
     }
 
-    pub fn validate_sanitizer_shadow_memory(&self, sanitizer: &str, addr: u64) -> ShadowMemoryStatusV76 {
+    pub fn validate_sanitizer_shadow_memory(
+        &self,
+        sanitizer: &str,
+        addr: u64,
+    ) -> ShadowMemoryStatusV76 {
         match sanitizer {
             "asan" => self.asan_shadow_memory_check(addr),
             _ => ShadowMemoryStatusV76::Valid,
@@ -754,14 +768,22 @@ impl DebuggersTracersProfilersV76Engine {
     }
 
     pub fn ktrace_record_formatter(&self, pid: u32, call_type: &str, details: &str) -> String {
-        format!("ktrace(pid={}, type={}, details={})", pid, call_type, details)
+        format!(
+            "ktrace(pid={}, type={}, details={})",
+            pid, call_type, details
+        )
     }
 
     pub fn ptrace_capsicum_rights_check(&self, target_pid: u32, cap_rights: u64) -> bool {
         target_pid > 0 && cap_rights != 0
     }
 
-    pub fn ptrace_security_pledge_validator(&self, pid: u32, trace_target: u32, pledge_flags: u32) -> bool {
+    pub fn ptrace_security_pledge_validator(
+        &self,
+        pid: u32,
+        trace_target: u32,
+        pledge_flags: u32,
+    ) -> bool {
         pid != trace_target && pledge_flags > 0
     }
 
@@ -849,7 +871,11 @@ impl VcsAndLanguageRuntimesV76Engine {
         }
     }
 
-    pub fn git_packfile_binary_search_object(&self, _oid: &[u8; 32], object_count: u32) -> Option<u32> {
+    pub fn git_packfile_binary_search_object(
+        &self,
+        _oid: &[u8; 32],
+        object_count: u32,
+    ) -> Option<u32> {
         if object_count > 0 {
             Some(object_count / 2)
         } else {
@@ -877,7 +903,10 @@ impl VcsAndLanguageRuntimesV76Engine {
     }
 
     pub fn pycache_mmap_loader(&self, pyc_path: &str) -> String {
-        format!("pycache mmap loaded: {} (zero-copy bytecode view)", pyc_path)
+        format!(
+            "pycache mmap loaded: {} (zero-copy bytecode view)",
+            pyc_path
+        )
     }
 
     pub fn python_bytecode_aot_compile(&self, script_path: &str, opt_level: u32) -> String {
@@ -897,7 +926,10 @@ impl VcsAndLanguageRuntimesV76Engine {
     }
 
     pub fn ruby_yjit_profile_evaluator(&self, hit_ratio_pct: u32) -> String {
-        format!("YJIT compiled profile active (hit_ratio={}%)", hit_ratio_pct)
+        format!(
+            "YJIT compiled profile active (hit_ratio={}%)",
+            hit_ratio_pct
+        )
     }
 
     pub fn extract_cargo_auditable_sbom(&self, elf_bytes: &[u8]) -> Option<String> {
@@ -908,7 +940,12 @@ impl VcsAndLanguageRuntimesV76Engine {
         }
     }
 
-    pub fn cargo_vendor_mirror_verify(&self, crate_name: &str, sha256_hash: &str, tarball: &[u8]) -> CargoVendorMirrorResultV76 {
+    pub fn cargo_vendor_mirror_verify(
+        &self,
+        crate_name: &str,
+        sha256_hash: &str,
+        tarball: &[u8],
+    ) -> CargoVendorMirrorResultV76 {
         CargoVendorMirrorResultV76 {
             crate_name: crate_name.to_string(),
             sha256_hash: sha256_hash.to_string(),
@@ -920,7 +957,11 @@ impl VcsAndLanguageRuntimesV76Engine {
         format!("go build -pgo={}", pprof_path)
     }
 
-    pub fn go_cgo_zero_copy_bridge_dispatch(&self, ptr: u64, len: usize) -> Result<usize, &'static str> {
+    pub fn go_cgo_zero_copy_bridge_dispatch(
+        &self,
+        ptr: u64,
+        len: usize,
+    ) -> Result<usize, &'static str> {
         if ptr != 0 {
             Ok(len)
         } else {
@@ -944,7 +985,10 @@ impl VcsAndLanguageRuntimesV76Engine {
         ]
     }
 
-    pub fn openjdk_graalvm_native_image_optimize(&self, raw_jar_size_bytes: usize) -> GraalVmNativeImageResultV76 {
+    pub fn openjdk_graalvm_native_image_optimize(
+        &self,
+        raw_jar_size_bytes: usize,
+    ) -> GraalVmNativeImageResultV76 {
         GraalVmNativeImageResultV76 {
             native_elf_size_bytes: (raw_jar_size_bytes as f64 * 0.4) as usize,
             estimated_startup_ms: 8,
@@ -957,11 +1001,17 @@ impl VcsAndLanguageRuntimesV76Engine {
     }
 
     pub fn zig_build_runner(&self, target_triple: &str) -> String {
-        format!("zig build -Dtarget={} -Doptimize=ReleaseFast", target_triple)
+        format!(
+            "zig build -Dtarget={} -Doptimize=ReleaseFast",
+            target_triple
+        )
     }
 
     pub fn bun_deno_runtime_evaluator(&self, engine_name: &str) -> String {
-        format!("{} V8/JSC engine initialized with zero-copy buffer view", engine_name)
+        format!(
+            "{} V8/JSC engine initialized with zero-copy buffer view",
+            engine_name
+        )
     }
 
     pub fn polyglot_runtime_evaluator(&self, language: &str) -> String {
@@ -1035,14 +1085,19 @@ impl SovereignToolchainDevelopmentParityV76Gateway {
         let proposals = self.collect_all_proposals();
         let mut out = String::new();
         out.push_str("========================================================================================\n");
-        out.push_str("          SIGMAOS TOOLCHAIN & DEVELOPMENT PARITY PR PROPOSAL SUMMARY (V76)\n");
+        out.push_str(
+            "          SIGMAOS TOOLCHAIN & DEVELOPMENT PARITY PR PROPOSAL SUMMARY (V76)\n",
+        );
         out.push_str("========================================================================================\n\n");
         out.push_str(&format!("Total PR Proposals: {}\n\n", proposals.len()));
 
         for p in &proposals {
             out.push_str(&format!("PR #{}: {}\n", p.pr_number, p.pr_title));
             out.push_str(&format!("  Subsystem      : {}\n", p.target_subsystem));
-            out.push_str(&format!("  Perf Multiplier: {}\n", p.performance_multiplier));
+            out.push_str(&format!(
+                "  Perf Multiplier: {}\n",
+                p.performance_multiplier
+            ));
             out.push_str(&format!("  Status         : {}\n", p.status));
             out.push_str("  Tools Covered  : ");
             out.push_str(&p.tools_covered.join(", "));
@@ -1054,7 +1109,9 @@ impl SovereignToolchainDevelopmentParityV76Gateway {
     pub fn generate_pr_proposal_markdown(&self) -> String {
         let proposals = self.collect_all_proposals();
         let mut md = String::new();
-        md.push_str("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V76)\n\n");
+        md.push_str(
+            "# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V76)\n\n",
+        );
         md.push_str("## Executive Summary\n");
         md.push_str("This pull request proposal suite establishes complete native parity across developer toolchains, compilers, build systems, debuggers, tracers, profilers, version control, and polyglot language runtimes inspired by premier Linux and BSD distributions.\n\n");
         md.push_str("| PR # | Title | Subsystem | Speedup | Status |\n");
@@ -1185,7 +1242,8 @@ mod tests {
         let asan_check = engine.asan_shadow_memory_check(0x1000);
         assert_eq!(asan_check, ShadowMemoryStatusV76::Valid);
 
-        let bpf_compiled = engine.bpftrace_script_compiler("kprobe:vfs_read { @[comm] = count(); }");
+        let bpf_compiled =
+            engine.bpftrace_script_compiler("kprobe:vfs_read { @[comm] = count(); }");
         assert!(bpf_compiled.contains("eBPF bytecode compiled"));
 
         let perf = engine.perf_sample_hardware_counters(1000, 2000, 50);
@@ -1336,6 +1394,7 @@ mod tests {
         assert!(summary.contains("Total PR Proposals: 4"));
 
         let md = gateway.generate_pr_proposal_markdown();
-        assert!(md.contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V76)"));
+        assert!(md
+            .contains("# Sovereign Toolchain and Development Ecosystem Parity PR Proposals (V76)"));
     }
 }

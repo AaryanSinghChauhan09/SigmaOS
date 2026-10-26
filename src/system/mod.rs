@@ -217,7 +217,6 @@ pub use sigmastallmanager::{
     SoftwareItem as InstallManagerItem,
 };
 pub use sigmataskscheduler::{
-    pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
 };
@@ -303,7 +302,6 @@ pub mod user_manager;
 
 pub mod abi;
 pub mod automation;
-pub mod cleanup;
 pub mod config;
 pub mod cron;
 pub mod declarative_state;
@@ -339,21 +337,21 @@ pub use automation::{
 
 pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
-    CleanupCategory, CleanupOption, CleanupStats, SystemCleanupManager,
-    init_system_cleanup, get_system_cleanup,
-};
-pub use logrotate::{
-    LogRotateManager, LogFileConfig, RotationSchedule, CompressionType,
-    init_log_rotate, get_log_rotate,
-};
-pub use restore::{
-    SystemRestoreManager, SystemSnapshot, SnapshotType, SnapshotStatus, RestorePoint,
-    init_system_restore, get_system_restore,
+    get_system_cleanup, init_system_cleanup, CleanupCategory, CleanupOption, CleanupStats,
+    SystemCleanupManager,
 };
 pub use firewall::{
-    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
-    init_firewall, get_firewall,
-}
+    get_firewall, init_firewall, Direction, FirewallManager, FirewallProfile, FirewallRule,
+    Protocol, RuleAction,
+};
+pub use logrotate::{
+    get_log_rotate, init_log_rotate, CompressionType, LogFileConfig, LogRotateManager,
+    RotationSchedule,
+};
+pub use restore::{
+    get_system_restore, init_system_restore, RestorePoint, SnapshotStatus, SnapshotType,
+    SystemRestoreManager, SystemSnapshot,
+};
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
@@ -510,7 +508,7 @@ pub use sigmafilm::{
 };
 pub use sigmafirewall::{
     create_rule, get_sigmafirewall, get_sigmafirewall_mut, init_sigmafirewall, FirewallAction,
-    FirewallChain, FirewallProtocol, FirewallRule, RuleState, SigmaFirewall,
+    FirewallChain, FirewallProtocol, FirewallRule as OtherFirewallRule, RuleState, SigmaFirewall,
 };
 pub use sigmaflatpak::{
     add_flatpak, get_sigmaflatpak, init_sigmaflatpak, install_flatpak, Flatpak, FlatpakRemote,
@@ -568,8 +566,8 @@ pub use sigmalight::{
     LightType, LightingScene, SigmaLight,
 };
 pub use sigmalogrotate::{
-    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig,
-    SigmaLogRotate,
+    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod,
+    LogFileConfig as OtherLogFileConfig, SigmaLogRotate,
 };
 pub use sigmalvm::{
     create_volume_group, get_sigmalvm, init_sigmalvm, LVState, LogicalVolume, PVState,
@@ -903,7 +901,6 @@ pub use task_scheduler::{
     get_task_scheduler, init_task_scheduler, ScheduleFrequency as SchedFrequency,
     ScheduledTask as SchedTask, TaskScheduler, TaskStatus as SchedTaskStatus,
 };
-
 
 pub mod sovereign_init_and_supervisor_inspirations_pr;
 pub use sovereign_init_and_supervisor_inspirations_pr::*;

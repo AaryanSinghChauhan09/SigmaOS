@@ -100,7 +100,8 @@ mod tests {
             "Universal Interop for Debian DEB in Sigma-pkg V70",
             PackageFormat::Deb,
             "ripgrep",
-            "Added zero-copy format classification and PQC attestation verification V70",        );
+            "Added zero-copy format classification and PQC attestation verification V70",
+        );
 
         assert_eq!(gateway.total_proposals(), 1);
         let prop = gateway.get_proposal(7001).unwrap();

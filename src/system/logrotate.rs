@@ -39,9 +39,9 @@ pub struct LogFileConfig {
     pub rotate_count: u32, // Number of rotated files to keep
     pub compression: CompressionType,
     pub compress_delay: u32, // Delay compression by N rotations
-    pub size_limit: u64, // Rotate when size exceeds
-    pub missingok: bool, // Don't error if file is missing
-    pub notifempty: bool, // Don't rotate if empty
+    pub size_limit: u64,     // Rotate when size exceeds
+    pub missingok: bool,     // Don't error if file is missing
+    pub notifempty: bool,    // Don't rotate if empty
     pub sharedscripts: bool, // Run scripts once per rotation
 }
 
@@ -72,31 +72,31 @@ impl LogRotateManager {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize log rotation manager
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Add log file configuration
     pub fn add_config(&mut self, path: String, config: LogFileConfig) {
         self.configs.insert(path, config);
     }
-    
+
     /// Remove log file configuration
     pub fn remove_config(&mut self, path: &str) -> Result<(), &'static str> {
         self.configs.remove(path).ok_or("Config not found")?;
         Ok(())
     }
-    
+
     /// Rotate log file
     pub fn rotate_log(&mut self, path: &str) -> Result<String, &'static str> {
         let config = self.configs.get(path).ok_or("Config not found")?;
-        
+
         // Generate rotated path
         let rotation_number = self.get_next_rotation_number(path);
         let rotated_path = format!("{}.{}", path, rotation_number);
-        
+
         // Add rotation entry
         let entry = LogRotationEntry {
             original_path: path.to_string(),
@@ -106,38 +106,39 @@ impl LogRotateManager {
             compressed: false,
         };
         self.rotated_logs.push(entry);
-        
+
         // Enforce rotate count
         self.enforce_rotate_count(path, config.rotate_count);
-        
+
         Ok(rotated_path)
     }
-    
+
     /// Get next rotation number for a log file
     fn get_next_rotation_number(&self, path: &str) -> u32 {
-        let count = self.rotated_logs
+        let count = self
+            .rotated_logs
             .iter()
             .filter(|e| e.original_path == path)
             .count() as u32;
         count + 1
     }
-    
+
     /// Enforce rotate count by removing old rotations
     fn enforce_rotate_count(&mut self, path: &str, rotate_count: u32) {
         let mut to_remove = Vec::new();
-        
+
         for (i, entry) in self.rotated_logs.iter().enumerate() {
             if entry.original_path == path && entry.rotation_number > rotate_count {
                 to_remove.push(i);
             }
         }
-        
+
         // Remove in reverse order to maintain indices
         for i in to_remove.into_iter().rev() {
             self.rotated_logs.remove(i);
         }
     }
-    
+
     /// Check if rotation is needed
     pub fn should_rotate(&self, path: &str, current_size: u64) -> bool {
         if let Some(config) = self.configs.get(path) {
@@ -149,7 +150,7 @@ impl LogRotateManager {
             false
         }
     }
-    
+
     /// Compress rotated log
     pub fn compress_log(&mut self, path: &str) -> Result<(), &'static str> {
         for entry in self.rotated_logs.iter_mut() {
@@ -160,17 +161,17 @@ impl LogRotateManager {
         }
         Err("Log entry not found")
     }
-    
+
     /// Get configuration
     pub fn get_config(&self, path: &str) -> Option<&LogFileConfig> {
         self.configs.get(path)
     }
-    
+
     /// Get all configurations
     pub fn get_all_configs(&self) -> Vec<(&String, &LogFileConfig)> {
         self.configs.iter().collect()
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -195,22 +196,20 @@ pub fn init_log_rotate() {
 
 /// Get global log rotation manager
 pub fn get_log_rotate() -> Option<&'static mut LogRotateManager> {
-    unsafe {
-        LOG_ROTATE.as_mut()
-    }
+    unsafe { LOG_ROTATE.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_log_rotate_init() {
         let mut manager = LogRotateManager::new();
         manager.init();
         assert!(manager.is_active());
     }
-    
+
     #[test]
     fn test_add_config() {
         let mut manager = LogRotateManager::new();
@@ -228,7 +227,7 @@ mod tests {
         manager.add_config("/var/log/test.log".to_string(), config);
         assert!(manager.get_config("/var/log/test.log").is_some());
     }
-    
+
     #[test]
     fn test_rotate_log() {
         let mut manager = LogRotateManager::new();
@@ -244,12 +243,12 @@ mod tests {
             sharedscripts: false,
         };
         manager.add_config("/var/log/test.log".to_string(), config);
-        
+
         let rotated = manager.rotate_log("/var/log/test.log").unwrap();
         assert_eq!(rotated, "/var/log/test.log.1");
         assert_eq!(manager.rotated_logs.len(), 1);
     }
-    
+
     #[test]
     fn test_should_rotate() {
         let mut manager = LogRotateManager::new();
@@ -265,11 +264,11 @@ mod tests {
             sharedscripts: false,
         };
         manager.add_config("/var/log/test.log".to_string(), config);
-        
+
         assert!(!manager.should_rotate("/var/log/test.log", 500));
         assert!(manager.should_rotate("/var/log/test.log", 1500));
     }
-    
+
     #[test]
     fn test_enforce_rotate_count() {
         let mut manager = LogRotateManager::new();
@@ -285,12 +284,12 @@ mod tests {
             sharedscripts: false,
         };
         manager.add_config("/var/log/test.log".to_string(), config);
-        
+
         // Rotate multiple times
         for _ in 0..5 {
             let _ = manager.rotate_log("/var/log/test.log");
         }
-        
+
         // Should only keep 3 rotations
         assert_eq!(manager.rotated_logs.len(), 3);
     }

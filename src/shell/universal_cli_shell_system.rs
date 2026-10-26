@@ -429,12 +429,19 @@ impl UniversalShellScriptTranspiler {
             let rest = l.trim_start_matches("contains ").trim();
             if let Some(space) = rest.find(' ') {
                 let item = rest[..space].trim().trim_matches('"').trim_matches('\'');
-                let list = rest[space + 1..].trim().trim_matches('"').trim_matches('\'');
+                let list = rest[space + 1..]
+                    .trim()
+                    .trim_matches('"')
+                    .trim_matches('\'');
                 return format!("echo \"{}\" | grep -q \"{}\"", list, item);
             }
         }
         if l.starts_with("count ") {
-            let list = l.trim_start_matches("count ").trim().trim_matches('"').trim_matches('\'');
+            let list = l
+                .trim_start_matches("count ")
+                .trim()
+                .trim_matches('"')
+                .trim_matches('\'');
             return format!("echo \"{}\" | wc -w", list);
         }
         l
@@ -1638,7 +1645,9 @@ mod tests {
             .contains("export PATH=\"/opt/bin:$PATH\""));
         assert!(plan.posix_sh_script.contains("export PORT=8080"));
         assert!(plan.posix_sh_script.contains("echo $(( 5 * 10 ))"));
-        assert!(plan.posix_sh_script.contains("echo \"foo bar\" | grep -q \"foo\""));
+        assert!(plan
+            .posix_sh_script
+            .contains("echo \"foo bar\" | grep -q \"foo\""));
         assert!(plan.posix_sh_script.contains("echo \"a b c\" | wc -w"));
         assert_eq!(
             plan.exported_variables.get("PORT"),
@@ -1657,7 +1666,9 @@ mod tests {
             .posix_sh_script
             .contains("export PATH=\"/usr/bin:/bin\""));
         assert!(plan.posix_sh_script.contains("x=$(( 10 + 20 ))"));
-        assert!(plan.posix_sh_script.contains("for _i in $(seq 3); do echo hi; done"));
+        assert!(plan
+            .posix_sh_script
+            .contains("for _i in $(seq 3); do echo hi; done"));
         assert!(plan.posix_sh_script.contains("if [ -n \"${HOST}\" ]; then"));
     }
 

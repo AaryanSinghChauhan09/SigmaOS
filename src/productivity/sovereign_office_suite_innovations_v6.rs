@@ -149,10 +149,7 @@ impl SovereignGoogleSlidesVidsStoryboardTimelineEngine {
         Self
     }
 
-    pub fn sync_timeline(
-        &self,
-        scenes: &[StoryboardSceneCue],
-    ) -> PresentationTimelineSyncResult {
+    pub fn sync_timeline(&self, scenes: &[StoryboardSceneCue]) -> PresentationTimelineSyncResult {
         let total_duration = scenes.iter().map(|s| s.duration_ms).sum();
         let mut active_cue = None;
 
@@ -834,7 +831,10 @@ impl SovereignOdooInventoryFefoStrategyEngine {
         let mut sorted_lots = lots.to_vec();
         sorted_lots.sort_by_key(|l| l.expiration_timestamp);
 
-        if let Some(best_lot) = sorted_lots.iter().find(|l| l.quantity_on_hand >= required_qty) {
+        if let Some(best_lot) = sorted_lots
+            .iter()
+            .find(|l| l.quantity_on_hand >= required_qty)
+        {
             FefoPickResult {
                 selected_lot_id: best_lot.lot_id.clone(),
                 selected_bin_id: best_lot.bin_id.clone(),
@@ -1110,7 +1110,8 @@ impl SovereignEnterpriseProductivitySuiteV6PrGatewayEngine {
                 sentiment_tag: "Feedback".to_string(),
             }],
         );
-        let docs_passed = docs_res.unresolved_count == 1 && docs_res.mentioned_users.contains(&"alice".to_string());
+        let docs_passed = docs_res.unresolved_count == 1
+            && docs_res.mentioned_users.contains(&"alice".to_string());
 
         // 2. Google Sheets Multi-Threaded DAG Spill Matrix Engine
         let sheets_eng = SovereignGoogleSheetsMultiThreadedDagSpillEngine::new();
@@ -1126,7 +1127,8 @@ impl SovereignEnterpriseProductivitySuiteV6PrGatewayEngine {
             transition_effect: "FadeCross".to_string(),
             media_asset_url: "v1.mp4".to_string(),
         }]);
-        let slides_passed = slides_res.total_scenes == 1 && slides_res.active_cue_at_5s == Some("S1".to_string());
+        let slides_passed =
+            slides_res.total_scenes == 1 && slides_res.active_cue_at_5s == Some("S1".to_string());
 
         // 4. Google Looker Studio Cross-Source Blend Engine
         let looker_eng = SovereignGoogleLookerStudioCrossSourceBlendEngine::new();
@@ -1218,7 +1220,8 @@ impl SovereignEnterpriseProductivitySuiteV6PrGatewayEngine {
             },
             1.15,
         );
-        let zoho_books_passed = zoho_books_res.is_gain && zoho_books_res.unrealized_gain_loss == 50.0;
+        let zoho_books_passed =
+            zoho_books_res.is_gain && zoho_books_res.unrealized_gain_loss == 50.0;
 
         // 10. Zoho Desk SLA Escalation Router Engine
         let zoho_desk_eng = SovereignZohoDeskSlaEscalationRouterEngine::new();
@@ -1233,7 +1236,8 @@ impl SovereignEnterpriseProductivitySuiteV6PrGatewayEngine {
                 escalation_queue: "Escalated_Queue".to_string(),
             }],
         );
-        let zoho_desk_passed = zoho_desk_res.is_breached && zoho_desk_res.assigned_queue == "Escalated_Queue";
+        let zoho_desk_passed =
+            zoho_desk_res.is_breached && zoho_desk_res.assigned_queue == "Escalated_Queue";
 
         // 11. Zoho Projects CPM Scheduling Engine
         let zoho_proj_eng = SovereignZohoProjectsCpmSchedulingEngine::new();
@@ -1325,9 +1329,11 @@ impl SovereignEnterpriseProductivitySuiteV6PrGatewayEngine {
             call_id: "CALL1".to_string(),
             agent_talk_time_secs: 100,
             customer_talk_time_secs: 100,
-            transcript_text: "Hello welcome! Thank you for recorded for quality purpose.".to_string(),
+            transcript_text: "Hello welcome! Thank you for recorded for quality purpose."
+                .to_string(),
         });
-        let bitrix_voice_passed = bitrix_voice_res.greeting_compliant && bitrix_voice_res.recording_notice_compliant;
+        let bitrix_voice_passed =
+            bitrix_voice_res.greeting_compliant && bitrix_voice_res.recording_notice_compliant;
 
         // 19. Bitrix24 CRM Kanban Automation Engine
         let bitrix_kanban_eng = SovereignBitrix24CrmKanbanAutomationEngine::new();
@@ -1344,7 +1350,8 @@ impl SovereignEnterpriseProductivitySuiteV6PrGatewayEngine {
                 auto_send_email: false,
             }],
         );
-        let bitrix_kanban_passed = bitrix_kanban_res.automation_triggered && bitrix_kanban_res.generated_task_id.is_some();
+        let bitrix_kanban_passed =
+            bitrix_kanban_res.automation_triggered && bitrix_kanban_res.generated_task_id.is_some();
 
         // 20. Bitrix24 Workgroup Gantt Workload Engine
         let bitrix_gantt_eng = SovereignBitrix24WorkgroupGanttWorkloadEngine::new();

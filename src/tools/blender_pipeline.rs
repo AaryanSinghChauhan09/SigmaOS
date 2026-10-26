@@ -59,7 +59,11 @@ pub struct BlendMesh {
 
 impl BlendMesh {
     pub fn new(vertices: Vec<[f32; 3]>, faces: Vec<[u32; 3]>, material_idx: u32) -> Self {
-        Self { vertices, faces, material_idx }
+        Self {
+            vertices,
+            faces,
+            material_idx,
+        }
     }
 }
 
@@ -76,7 +80,11 @@ pub struct BlendCamera {
 
 impl BlendCamera {
     pub fn new(location: [f32; 3], rotation: [f32; 3], fov_degrees: f32) -> Self {
-        Self { location, rotation, fov_degrees }
+        Self {
+            location,
+            rotation,
+            fov_degrees,
+        }
     }
 }
 
@@ -111,7 +119,12 @@ impl BlendScene {
         camera: BlendCamera,
         lights: Vec<BlendLight>,
     ) -> Self {
-        Self { objects, materials, camera, lights }
+        Self {
+            objects,
+            materials,
+            camera,
+            lights,
+        }
     }
 }
 
@@ -161,7 +174,11 @@ pub struct BlenderPipeline {
 impl BlenderPipeline {
     /// Construct a new pipeline for the given scene and render engine.
     pub fn new(scene: BlendScene, engine: RenderEngine) -> Self {
-        Self { scene, engine, modifiers: Vec::new() }
+        Self {
+            scene,
+            engine,
+            modifiers: Vec::new(),
+        }
     }
 
     /// Push a geometry node modifier onto the stack.
@@ -224,12 +241,7 @@ mod tests {
     use super::*;
 
     fn make_scene() -> BlendScene {
-        let mat = BlendMaterial::new(
-            "metal",
-            [0.8, 0.8, 0.8, 1.0],
-            1.0,
-            0.2,
-        );
+        let mat = BlendMaterial::new("metal", [0.8, 0.8, 0.8, 1.0], 1.0, 0.2);
         let mesh = BlendMesh::new(
             alloc::vec![[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.5, 1.0, 0.0]],
             alloc::vec![[0, 1, 2]],
@@ -263,7 +275,12 @@ mod tests {
     #[test]
     fn test_pipeline_eevee() {
         let scene = make_scene();
-        let pipeline = BlenderPipeline::new(scene, RenderEngine::Eevee { shadow_map_res: 1024 });
+        let pipeline = BlenderPipeline::new(
+            scene,
+            RenderEngine::Eevee {
+                shadow_map_res: 1024,
+            },
+        );
         assert_eq!(pipeline.cycles_samples(), 0);
     }
 
@@ -289,8 +306,15 @@ mod tests {
     #[test]
     fn test_run_python_script() {
         let scene = make_scene();
-        let pipeline = BlenderPipeline::new(scene, RenderEngine::Eevee { shadow_map_res: 512 });
-        assert!(pipeline.run_python_script("import bpy; bpy.ops.render.render()").is_ok());
+        let pipeline = BlenderPipeline::new(
+            scene,
+            RenderEngine::Eevee {
+                shadow_map_res: 512,
+            },
+        );
+        assert!(pipeline
+            .run_python_script("import bpy; bpy.ops.render.render()")
+            .is_ok());
     }
 
     #[test]
@@ -298,7 +322,9 @@ mod tests {
         let scene = make_scene();
         let mut pipeline = BlenderPipeline::new(scene, RenderEngine::Cycles { samples: 16 });
         pipeline.add_modifier(GeometryNode::Subdivide);
-        pipeline.add_modifier(GeometryNode::Boolean { operation: BoolOp::Union });
+        pipeline.add_modifier(GeometryNode::Boolean {
+            operation: BoolOp::Union,
+        });
         assert_eq!(pipeline.modifiers.len(), 2);
     }
 

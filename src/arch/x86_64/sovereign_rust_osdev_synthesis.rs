@@ -1728,7 +1728,7 @@ impl X2ApicTimerHpetClockEngine {
     pub fn new() -> Self {
         Self {
             x2apic_id: 0x0000_0000,
-            hpet_frequency_hz: 14_318_180, // 14.31818 MHz HPET
+            hpet_frequency_hz: 14_318_180,   // 14.31818 MHz HPET
             tsc_ticks_per_microsecond: 3800, // 3.8 GHz TSC clock
         }
     }
@@ -2004,8 +2004,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5113,
-            title: "feat(arch_x86_64): Implement virtio-drivers VirtIO Blk, Net, GPU & Console drivers"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement virtio-drivers VirtIO Blk, Net, GPU & Console drivers"
+                    .to_string(),
             target_subsystem: "Bare-Metal VirtIO Acceleration".to_string(),
             rust_osdev_crate_inspiration: "virtio-drivers".to_string(),
             components_added: vec![
@@ -2082,8 +2083,9 @@ impl RustOsdevPrProposalGateway {
 
         self.proposals.push(RustOsdevPrManifest {
             pr_id: 5119,
-            title: "feat(arch_x86_64): Implement bootloader_api / limine Modern Boot Protocol Engine"
-                .to_string(),
+            title:
+                "feat(arch_x86_64): Implement bootloader_api / limine Modern Boot Protocol Engine"
+                    .to_string(),
             target_subsystem: "Modern Boot Protocol Interop".to_string(),
             rust_osdev_crate_inspiration: "bootloader_api / limine".to_string(),
             components_added: vec![
@@ -2328,7 +2330,10 @@ mod tests {
 
     #[test]
     fn test_smoltcp_network_engine() {
-        let mut net = SmoltcpBareMetalNetworkEngine::new([0x52, 0x54, 0x00, 0x12, 0x34, 0x56], [192, 168, 1, 100]);
+        let mut net = SmoltcpBareMetalNetworkEngine::new(
+            [0x52, 0x54, 0x00, 0x12, 0x34, 0x56],
+            [192, 168, 1, 100],
+        );
         let sock_id = net.create_socket(BareMetalSocketType::Udp, 8080);
         assert_eq!(sock_id, 1);
         assert_eq!(net.send_packet(1, b"Hello Network"), Ok(13));
@@ -2351,7 +2356,10 @@ mod tests {
     #[test]
     fn test_bootloader_api_protocol() {
         let api = BootloaderApiProtocolEngine::new();
-        let resp = api.process_request(BootloaderApiRequest { request_id: 1, revision: 3 });
+        let resp = api.process_request(BootloaderApiRequest {
+            request_id: 1,
+            revision: 3,
+        });
         assert_eq!(resp.kernel_address, 0x0010_0000);
     }
 

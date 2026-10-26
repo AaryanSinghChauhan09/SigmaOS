@@ -123,7 +123,10 @@ impl OmarchyWaybarStatusHudEngineV73 {
     pub fn new() -> Self {
         Self {
             position: "top".to_string(),
-            modules_left: vec!["hyprland/workspaces".to_string(), "hyprland/window".to_string()],
+            modules_left: vec![
+                "hyprland/workspaces".to_string(),
+                "hyprland/window".to_string(),
+            ],
             modules_center: vec!["clock".to_string(), "custom/weather".to_string()],
             modules_right: vec![
                 "cpu".to_string(),
@@ -223,7 +226,11 @@ impl OmarchyWalkerLauncherEngineV73 {
 
     pub fn search_query(&self, query: &str) -> Vec<String> {
         if query.is_empty() {
-            vec!["Terminal (Ghostty)".to_string(), "Browser (Zen)".to_string(), "Files (Thunar)".to_string()]
+            vec![
+                "Terminal (Ghostty)".to_string(),
+                "Browser (Zen)".to_string(),
+                "Files (Thunar)".to_string(),
+            ]
         } else {
             vec![format!("Matched app for: '{}'", query)]
         }
@@ -314,7 +321,11 @@ impl OmarchyHyprlockPamSecurityEngineV73 {
         format!(
             "auth {{\n  pam_module = {}\n  fingerprint = {}\n}}\n",
             self.pam_service,
-            if self.biometric_fprint_enabled { "enabled" } else { "disabled" }
+            if self.biometric_fprint_enabled {
+                "enabled"
+            } else {
+                "disabled"
+            }
         )
     }
 
@@ -391,7 +402,10 @@ impl OmarchyHerdrAiSchedulerEngineV73 {
     }
 
     pub fn dispatch_ai_task(&self, task_prompt: &str) -> String {
-        format!("Herdr AI Agent scheduled task: '{}' via {}", task_prompt, self.local_agent_endpoint)
+        format!(
+            "Herdr AI Agent scheduled task: '{}' via {}",
+            task_prompt, self.local_agent_endpoint
+        )
     }
 
     pub fn generate_pr_diff(&self) -> String {
@@ -457,8 +471,14 @@ pub struct OmarchyWallustChordThemeNavigatorEngineV73 {
 impl OmarchyWallustChordThemeNavigatorEngineV73 {
     pub fn new() -> Self {
         let mut chords = BTreeMap::new();
-        chords.insert("SUPER+SHIFT+T".to_string(), "wallust next-theme".to_string());
-        chords.insert("SUPER+SHIFT+W".to_string(), "swww img --transition-type outer".to_string());
+        chords.insert(
+            "SUPER+SHIFT+T".to_string(),
+            "wallust next-theme".to_string(),
+        );
+        chords.insert(
+            "SUPER+SHIFT+W".to_string(),
+            "swww img --transition-type outer".to_string(),
+        );
         chords.insert("SUPER+SHIFT+C".to_string(), "hyprpicker -a".to_string());
 
         Self {
@@ -524,71 +544,92 @@ impl OmarchyLinuxMissingComponentsV73MasterSuite {
         vec![
             OmarchyPrRecordV73 {
                 pr_id: 7301,
-                title: "feat(hyprland): Omarchy dynamic gesture & window rules layout engine V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(hyprland): Omarchy dynamic gesture & window rules layout engine V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.hyprland.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7302,
-                title: "feat(waybar): Omarchy Waybar status HUD & CSS live reload module V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(waybar): Omarchy Waybar status HUD & CSS live reload module V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.waybar.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7303,
-                title: "feat(ghostty): Omarchy Ghostty PTY terminal profile & font engine V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(ghostty): Omarchy Ghostty PTY terminal profile & font engine V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.ghostty.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7304,
-                title: "feat(walker): Omarchy Walker fuzzy search launcher & cliphist integration V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title:
+                    "feat(walker): Omarchy Walker fuzzy search launcher & cliphist integration V73"
+                        .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.walker.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7305,
-                title: "feat(wallust): Omarchy Wallust color extraction & theme sync engine V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(wallust): Omarchy Wallust color extraction & theme sync engine V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.wallust.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7306,
-                title: "feat(hyprlock): Omarchy Hyprlock PAM & Hypridle security governor V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(hyprlock): Omarchy Hyprlock PAM & Hypridle security governor V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.hyprlock.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7307,
-                title: "feat(ananicy): Omarchy Ananicy-cpp auto-nice process scheduler engine V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(ananicy): Omarchy Ananicy-cpp auto-nice process scheduler engine V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.ananicy.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7308,
-                title: "feat(herdr): Omarchy Herdr AI workflow & Quickshell HUD overlay V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(herdr): Omarchy Herdr AI workflow & Quickshell HUD overlay V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.herdr.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7309,
-                title: "feat(security): Omarchy fail-closed sudo shield & polkit policy gate V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(security): Omarchy fail-closed sudo shield & polkit policy gate V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.sudo_shield.generate_pr_diff(),
             },
             OmarchyPrRecordV73 {
                 pr_id: 7310,
-                title: "feat(theme): Omarchy Wallust chord theme navigator & shortcut engine V73".to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs".to_string(),
+                title: "feat(theme): Omarchy Wallust chord theme navigator & shortcut engine V73"
+                    .to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v73_pr.rs"
+                    .to_string(),
                 status: OmarchyPrStatusV73::Merged,
                 diff_patch: self.chord_navigator.generate_pr_diff(),
             },
@@ -610,7 +651,10 @@ impl OmarchyLinuxMissingComponentsV73MasterSuite {
         pr.push_str("- Herdr AI Agent Workflow & Quickshell HUD Overlay V73\n");
         pr.push_str("- Fail-Closed Sudo Privilege Shield & Polkit Policy Gate V73\n");
         pr.push_str("- Wallust Chord Theme Navigator & Shortcut Engine V73\n\n");
-        pr.push_str(&format!("## Parity Score: {}%\n", self.calculate_parity_score()));
+        pr.push_str(&format!(
+            "## Parity Score: {}%\n",
+            self.calculate_parity_score()
+        ));
         pr
     }
 }
@@ -647,7 +691,9 @@ mod tests {
         assert!(hypr.generate_hyprland_conf().contains("layout = master"));
 
         let waybar = OmarchyWaybarStatusHudEngineV73::new();
-        assert!(waybar.render_config_json().contains("\"position\": \"top\""));
+        assert!(waybar
+            .render_config_json()
+            .contains("\"position\": \"top\""));
     }
 
     #[test]

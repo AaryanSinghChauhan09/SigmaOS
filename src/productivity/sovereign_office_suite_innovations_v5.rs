@@ -109,7 +109,10 @@ impl SovereignGoogleSheetsDynamicNamedRangeEngine {
             };
         }
 
-        if let Some(col_name) = range_expr.strip_prefix(&format!("{}[", table.table_name)).and_then(|s| s.strip_suffix("]")) {
+        if let Some(col_name) = range_expr
+            .strip_prefix(&format!("{}[", table.table_name))
+            .and_then(|s| s.strip_suffix("]"))
+        {
             if let Some(idx) = table.headers.iter().position(|h| h == col_name) {
                 let vals: Vec<Vec<String>> = table
                     .data_rows
@@ -520,7 +523,11 @@ impl SovereignZohoBlueprintProcessEngine {
         {
             for req_field in &trans.required_fields {
                 if !record.field_data.contains_key(req_field)
-                    || record.field_data.get(req_field).map(|s| s.is_empty()).unwrap_or(true)
+                    || record
+                        .field_data
+                        .get(req_field)
+                        .map(|s| s.is_empty())
+                        .unwrap_or(true)
                 {
                     return BlueprintTransitionResult {
                         record_id: record.record_id.clone(),
@@ -590,7 +597,9 @@ impl SovereignSalesforceTerritoryAndScoringEngine {
     ) -> TerritoryScoreResult {
         let assigned = rules
             .iter()
-            .find(|r| r.required_region == lead.region && lead.annual_revenue >= r.min_annual_revenue)
+            .find(|r| {
+                r.required_region == lead.region && lead.annual_revenue >= r.min_annual_revenue
+            })
             .map(|r| r.territory_name.clone())
             .unwrap_or_else(|| "Unassigned_Queue".to_string());
 
@@ -989,7 +998,8 @@ impl SovereignEnterpriseProductivitySuiteV5PrGatewayEngine {
                 available_options: vec!["Pending".to_string(), "Approved".to_string()],
             }],
         );
-        let google_docs_passed = docs_res.evaluation_success && docs_res.rendered_document.contains("Alex");
+        let google_docs_passed =
+            docs_res.evaluation_success && docs_res.rendered_document.contains("Alex");
 
         // 2. Google Sheets Dynamic Named Range Engine Check
         let sheets_engine = SovereignGoogleSheetsDynamicNamedRangeEngine::new();
@@ -1069,7 +1079,8 @@ impl SovereignEnterpriseProductivitySuiteV5PrGatewayEngine {
                 uppercase_columns: vec!["Status".to_string()],
             },
         );
-        let query_passed = query_res.is_pipeline_success && query_res.processed_rows[0][1] == "ACTIVE";
+        let query_passed =
+            query_res.is_pipeline_success && query_res.processed_rows[0][1] == "ACTIVE";
 
         // 7. Visio Loop Sync Check
         let visio_engine = SovereignMicrosoftVisioLoopComponentEngine::new();
@@ -1148,7 +1159,8 @@ impl SovereignEnterpriseProductivitySuiteV5PrGatewayEngine {
                 min_annual_revenue: 500_000.0,
             }],
         );
-        let sf_passed = sf_res.assigned_territory == "NA_Enterprise" && sf_res.calculated_score > 0.0;
+        let sf_passed =
+            sf_res.assigned_territory == "NA_Enterprise" && sf_res.calculated_score > 0.0;
 
         // 11. Salesforce CPQ MDQ Check
         let cpq_engine = SovereignSalesforceCpqMultiDimensionalQuotingEngine::new();

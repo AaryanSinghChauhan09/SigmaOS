@@ -186,7 +186,11 @@ impl NetBsd127RumpPciVirtio9pV73PrEngine {
             Some((tag, msg_type))
         } else if packet.len() >= 5 {
             let tag = packet[4] as u32;
-            let msg_type = if packet.len() >= 6 { packet[5] as u16 } else { 0 };
+            let msg_type = if packet.len() >= 6 {
+                packet[5] as u16
+            } else {
+                0
+            };
             Some((tag, msg_type))
         } else {
             None
@@ -199,8 +203,11 @@ impl NetBsd127RumpPciVirtio9pV73PrEngine {
             subsystem: "NetBSD Rump".to_string(),
             title: "NetBSD 12.7 Rump PCI Virtio 9P V73".to_string(),
             upstream_target: "sys/rump/fs/lib/lib9p".to_string(),
-            description: "Implements NetBSD rump-heap PCI Virtio 9P zero-copy block device server.".to_string(),
-            diff_patch: "--- a/sys/rump/fs/lib/lib9p\n+++ b/sys/rump/fs/lib/lib9p\n@@ -1,5 +1,10 @@\n".to_string(),
+            description: "Implements NetBSD rump-heap PCI Virtio 9P zero-copy block device server."
+                .to_string(),
+            diff_patch:
+                "--- a/sys/rump/fs/lib/lib9p\n+++ b/sys/rump/fs/lib/lib9p\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: OsPrStatusV73::Validated,
             parity_score: 97,
         }

@@ -60,4 +60,5 @@ fn test_cachy_linux_v71_pr_suite_full_cycle() {
 
     let mut handheld = CachyOsHandheldPowerCapThermalV5GovernorEngine::new();
     let tdp_res = handheld.set_tdp_cap(25);
-    assert!(tdp_res.contains("25 Watts"));}
+    assert!(tdp_res.contains("25 Watts"));
+}
