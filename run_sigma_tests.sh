@@ -2678,4 +2678,11 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v76_pr.rs" ]; then
     rustc --test tests/test_open_source_os_unimplemented_ideas_v76_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v76_pr
     ./build/test_open_source_os_v76_pr
 fi
+
+if [ -f "tests/test_system_utilities_plan_verification.rs" ]; then
+    echo "Running System Utilities Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/test_system_utilities_plan_verification.rs --edition=2021 -o build/test_sys_utils_plan
+    ./build/test_sys_utils_plan
+fi
 echo "All SigmaOS test suites completed."

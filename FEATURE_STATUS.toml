@@ -408,7 +408,7 @@ next_milestone = "Instrument kernel locks with lockdep annotations"
 status = "modeled"
 files = ["docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md", "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md", "wiki/26-System-Utilities-Development-Plan.md", "src/userland/system_utilities.rs"]
 description = "SigmaOS System Utilities Master Architecture, POSIX compatibility baseline, 18-PR roadmap, command registry framework, foundational file inspection engines, system diagnostics, and periodic maintenance runner"
-test_evidence = "Architectural specification published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md and wiki/26-System-Utilities-Development-Plan.md; 10 unit tests pass via rustc --test src/userland/system_utilities.rs"
+test_evidence = "Architectural specification published in docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md and wiki/26-System-Utilities-Development-Plan.md; 13 unit tests pass via rustc --test src/userland/system_utilities.rs and plan verification test passes via tests/test_system_utilities_plan_verification.rs"
 next_milestone = "PR 1: Audit current tools and define compatibility policy & PR 4: Implement minimal file/directory utilities against real VFS"
 
 [userspace.cli_development_plan]
