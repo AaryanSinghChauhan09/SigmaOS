@@ -1931,6 +1931,12 @@ if [ -f "src/distro/openbsd_missing_components_v66_pr.rs" ]; then
     ./build/test_openbsd_v66_pr
 fi
 
+if [ -f "src/distro/openbsd_missing_components_v68_pr.rs" ]; then
+    echo "Running OpenBSD Missing Components Parity PR Gateway V68 test suite..."
+    rustc --test src/distro/openbsd_missing_components_v68_pr.rs --edition=2021 -o build/test_openbsd_v68_pr
+    ./build/test_openbsd_v68_pr
+fi
+
 if [ -f "src/distro/freebsd_missing_components_v62_pr.rs" ]; then
     echo "Running FreeBSD Missing Components V62 PR Suite..."
     mkdir -p build
