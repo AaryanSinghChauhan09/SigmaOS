@@ -134,16 +134,16 @@ next_milestone = "Per-CPU cache pools"
 
 [kernel.process_manager]
 status = "modeled"
-files = ["docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md", "src/kernel/process.rs", "src/userspace/sigma_init.rs"]
+files = ["docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md", "src/kernel/process.rs", "src/userspace/sigma_init.rs", "tests/process/test_process_manager_plan.rs"]
 description = "SigmaOS Process Manager Master Architecture, design & safety rules, 18-PR sequence roadmap, periodic maintenance cadences, component-specific rules, PR template, and completion gates"
-test_evidence = "Architectural specification published in docs/PROCESS_MANAGER_PLAN.md and wiki/PROCESS_MANAGER_PLAN.md; standalone unit tests pass via rustc --test src/kernel/process.rs"
+test_evidence = "Architectural specification published in docs/PROCESS_MANAGER_PLAN.md and wiki/PROCESS_MANAGER_PLAN.md; standalone unit tests pass via rustc --test tests/process/test_process_manager_plan.rs"
 next_milestone = "PR 1: docs(process): audit process lifecycle and manager status & PR 2: docs(process): define process and service lifecycle contracts"
 
 [userspace.process_manager]
 status = "modeled"
-files = ["src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md"]
+files = ["src/userspace/sigma_init.rs", "docs/PROCESS_MANAGER_PLAN.md", "wiki/PROCESS_MANAGER_PLAN.md", "tests/process/test_process_manager_plan.rs"]
 description = "Init process service creation, dependency resolution, process tree supervision, and service status tracking"
-test_evidence = "Architectural specification in docs/PROCESS_MANAGER_PLAN.md and wiki/PROCESS_MANAGER_PLAN.md; standalone unit tests pass via rustc --test src/userspace/sigma_init.rs"
+test_evidence = "Architectural specification in docs/PROCESS_MANAGER_PLAN.md and wiki/PROCESS_MANAGER_PLAN.md; standalone unit tests pass via rustc --test tests/process/test_process_manager_plan.rs"
 next_milestone = "PR 9: feat(init): spawn and supervise real service processes & PR 10: feat(init): validate service dependencies and readiness"
 
 [process.lifecycle]
