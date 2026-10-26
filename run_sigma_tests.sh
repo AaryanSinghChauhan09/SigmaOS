@@ -39,6 +39,13 @@ if [ -f "tests/test_role_based_operating_plan.rs" ]; then
     ./build/test_role_based_plan
 fi
 
+if [ -f "tests/dispatch/test_dispatcher_plan.rs" ]; then
+    echo "Running Dispatcher Plan test suite..."
+    mkdir -p build
+    rustc --test tests/dispatch/test_dispatcher_plan.rs --edition=2021 -o build/test_dispatcher_plan
+    ./build/test_dispatcher_plan
+fi
+
 if [ -f "tests/io/interrupt.rs" ]; then
     echo "Running Interrupt Manager test suite..."
     mkdir -p build
