@@ -661,7 +661,18 @@ export function showToast(message, duration = 3000) {
   toast.setAttribute("title", "Click to dismiss notification");
   toast.setAttribute("aria-label", `${message} (Click to dismiss)`);
   toast.style.cursor = "pointer";
-  toast.textContent = message;
+
+  const msgSpan = document.createElement("span");
+  msgSpan.textContent = message;
+  toast.appendChild(msgSpan);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.type = "button";
+  closeBtn.className = "kernel-toast-close";
+  closeBtn.setAttribute("aria-label", "Dismiss notification");
+  closeBtn.textContent = "✕";
+  toast.appendChild(closeBtn);
+
   container.appendChild(toast);
 
   let timerId = null;
@@ -681,6 +692,13 @@ export function showToast(message, duration = 3000) {
       toast.parentNode.removeChild(toast);
     }
   };
+
+  closeBtn.addEventListener("click", (e) => {
+    if (e && typeof e.stopPropagation === "function") {
+      e.stopPropagation();
+    }
+    dismiss();
+  });
 
   toast.addEventListener("click", dismiss);
 
