@@ -355,6 +355,16 @@ if [ -f "src/creative/anicraft_advancements_v69_pr.rs" ]; then
     ./build/test_anicraft_v69
 fi
 
+if [ -f "src/creative/anicraft_advancements_v75_pr.rs" ]; then
+    echo "Running Sovereign AniCraft Advancements V75 PR Gateway test suite..."
+    mkdir -p build
+    rustc --test src/creative/anicraft_advancements_v75_pr.rs --edition=2021 -o build/test_anicraft_v75
+    ./build/test_anicraft_v75
+
+    rustc --test tests/test_anicraft_advancements_v75_pr.rs --edition=2021 -o build/test_anicraft_v75_integration
+    ./build/test_anicraft_v75_integration
+fi
+
 if [ -f "src/creative/deckcraft.rs" ]; then
     echo "Running Sovereign DeckCraft Presentation Slide PR test suite..."
     mkdir -p build
