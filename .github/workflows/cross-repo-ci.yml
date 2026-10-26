@@ -1,0 +1,86 @@
+name: SigmaOS Cross-Repository CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS-kernel
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo test
+
+  test-iso:
+    runs-on: ubuntu-latest
+    needs: test-kernel
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS-ISO
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo test
+
+  test-desktop:
+    runs-on: ubuntu-latest
+    needs: test-kernel
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS-desktop-environment
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo test
+
+  test-screen-recorder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS-screen-recorder
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo test
+
+  test-screen-shot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS-screen-shot
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo test
+
+  test-software-manager:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS-software-manager
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: cargo test
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [test-kernel, test-iso, test-desktop]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: AaryanSinghChauhan09/SigmaOS
+      - name: Run integration tests
+        run: cargo test --test-threads=1
