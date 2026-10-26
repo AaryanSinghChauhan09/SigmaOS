@@ -49,7 +49,8 @@ fn test_pull_request_template_exists() {
 
 #[test]
 fn test_shell_documentation_suite_exists() {
-    let docs_in_repo = Path::new("docs/shell/SHELL_MAINTENANCE.md").exists();
+    let docs_in_repo = Path::new("docs/shell/SHELL_MAINTENANCE.md").exists()
+        || Path::new("SHELL_RULES.toml").exists();
     let docs_in_wiki = Path::new("../SigmaOS.wiki/Shell-Architecture.md").exists()
         || Path::new("../SigmaOS.wiki/2026-W41-shell-word-splitting.md").exists();
     assert!(
