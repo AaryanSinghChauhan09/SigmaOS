@@ -25,6 +25,48 @@ pub enum ControlPanel {
     About,
 }
 
+impl ControlPanel {
+    /// Returns static string representation to avoid heap allocation from Debug formatting
+    pub const fn as_str(&self) -> &'static str {
+        match self {
+            Self::Network => "Network",
+            Self::Display => "Display",
+            Self::Sound => "Sound",
+            Self::Bluetooth => "Bluetooth",
+            Self::Wifi => "Wifi",
+            Self::Power => "Power",
+            Self::Storage => "Storage",
+            Self::Accessibility => "Accessibility",
+            Self::Security => "Security",
+            Self::Accounts => "Accounts",
+            Self::Updates => "Updates",
+            Self::About => "About",
+        }
+    }
+}
+
+/// Zero-allocation case-insensitive substring search helper.
+/// Uses `eq_ignore_ascii_case` on byte slice windows to enable SIMD-friendly
+/// comparisons without per-panel dynamic heap allocations (`format!`/`to_lowercase()`).
+#[inline]
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
+    if needle.is_ascii() && haystack.is_ascii() {
+        let n_bytes = needle.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
+    } else {
+        haystack.to_lowercase().contains(&needle.to_lowercase())
+    }
+}
+
 /// Panel state
 #[derive(Debug, Clone)]
 pub struct PanelState {
@@ -366,14 +408,11 @@ impl UnifiedControlCenter {
     /// Search panels
     pub fn search(&mut self, query: String) -> Vec<ControlPanel> {
         self.search_query = query.clone();
-        let query_lower = query.to_lowercase();
 
+        // Optimized zero-allocation matching avoiding `format!("{:?}", panel)` allocations on every search
         self.panels
             .keys()
-            .filter(|panel| {
-                let panel_name = format!("{:?}", panel).to_lowercase();
-                panel_name.contains(&query_lower)
-            })
+            .filter(|panel| contains_ignore_case(panel.as_str(), &query))
             .cloned()
             .collect()
     }
@@ -531,5 +570,20 @@ mod tests {
             .find(|s| s.id == "wifi")
             .unwrap();
         assert!(!setting.is_enabled);
+    }
+
+    #[test]
+    fn test_search_panels_zero_alloc() {
+        let mut center = UnifiedControlCenter::default();
+        let results = center.search("NET".to_string());
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0], ControlPanel::Network);
+
+        let sound_results = center.search("sound".to_string());
+        assert_eq!(sound_results.len(), 1);
+        assert_eq!(sound_results[0], ControlPanel::Sound);
+
+        let empty_results = center.search("nonexistent".to_string());
+        assert!(empty_results.is_empty());
     }
 }
