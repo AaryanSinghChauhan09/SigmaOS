@@ -280,6 +280,7 @@ pub use distro::dragonflybsd_missing_components_v61_pr::*;
 pub use distro::dragonflybsd_missing_components_v62_pr::*;
 pub use distro::dragonflybsd_missing_components_v63_pr::*;
 pub use distro::dragonflybsd_missing_components_v64_pr::*;
+pub use distro::dragonflybsd_missing_components_v65_pr::*;
 pub use distro::freebsd_missing_components_v61_pr::*;
 pub use distro::freebsd_missing_components_v62_pr::*;
 pub use distro::freebsd_missing_components_v63_pr::*;
