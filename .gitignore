@@ -82,3 +82,13 @@ wiki/
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
+
+# Explicit negations for tracked markdown and journal files
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/*.md
+!docs/shell/SHELL_MAINTENANCE.md
+!docs/**/*.md
+!.github/PULL_REQUEST_TEMPLATE.md
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
