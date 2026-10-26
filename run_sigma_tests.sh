@@ -495,6 +495,13 @@ if [ -f "src/creative/gridcraft_artcraft_missing_components_v67_pr.rs" ]; then
     ./build/test_gridcraft_v67
 fi
 
+if [ -f "src/creative/gridcraft_artcraft_missing_components_v68_pr.rs" ]; then
+    echo "Running Sovereign Gridcraft & ArtCraft Missing Components Parity PR Gateway V68 test suite..."
+    mkdir -p build
+    rustc --test src/creative/gridcraft_artcraft_missing_components_v68_pr.rs --edition=2021 -o build/test_gridcraft_v68
+    ./build/test_gridcraft_v68
+fi
+
 if [ -f "src/creative/wordcraft.rs" ]; then
     echo "Running Sovereign Wordcraft Document Processing PR test suite..."
     mkdir -p build
