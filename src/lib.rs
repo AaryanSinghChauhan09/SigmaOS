@@ -120,6 +120,7 @@ pub use system::sovereign_init_and_supervisor_advancements_v69_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v71_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v75_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v76_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v79_pr::*;
 pub use system::*;
 pub mod driver;
 pub mod drivers;
@@ -398,6 +399,7 @@ pub mod toolchain {
     pub mod self_host;
     pub mod sovereign_toolchain_development_advancements_pr;
     pub mod sovereign_toolchain_development_advancements_v74_pr;
+    pub mod sovereign_toolchain_development_advancements_v76_pr;
 }
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
