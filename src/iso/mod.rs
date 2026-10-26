@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+pub mod builder;
 // SigmaOS Iso Module
 // ISO image creation and mounting
 // Zero-dependency implementation - no external libraries required

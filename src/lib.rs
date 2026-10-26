@@ -755,3 +755,6 @@ pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
 pub use crate::distro::open_source_os_missing_components_v76_pr::*;
+
+pub mod screen;
+pub mod software_manager;

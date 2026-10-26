@@ -30,9 +30,9 @@ use crate::distro::debian_github_repo_missing_components_v73_pr::*;
 use crate::distro::open_source_os_unimplemented_ideas_v73_pr::*;
 
 #[cfg(any(feature = "standalone_test", test))]
-use crate::debian_github_repo_missing_components_v73_pr::*;
+use crate::distro::debian_github_repo_missing_components_v73_pr::*;
 #[cfg(any(feature = "standalone_test", test))]
-use crate::open_source_os_unimplemented_ideas_v73_pr::*;
+use crate::distro::open_source_os_unimplemented_ideas_v73_pr::*;
 
 #[derive(Debug, Clone)]
 pub struct UnifiedOsDebianV73PrProposal {

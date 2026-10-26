@@ -81,4 +81,7 @@ wiki/
 # Allow Python tools and scripts
 !scripts/*.py
 !tools/*.py
-!tools/**/*.py
+!tools/**/*.py*.md
+*.txt
+docs/
+wiki/
