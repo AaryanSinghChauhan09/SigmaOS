@@ -11,6 +11,7 @@
 //! - TempleOS: HolyC Dynamic Execution Engine & symbol table evaluator.
 //! - QNX Neutrino: Microkernel synchronous message passing & adaptive CPU budget manager.
 //! - Cosmopolitan Libc: APE (Actually Portable Executable) multi-OS binary polyglot header engine.
+//! - Fuchsia Zircon: Capability-based handle table & IPC channel message passing engine.
 
 extern crate alloc;
 
@@ -1019,6 +1020,19 @@ mod tests {
         assert!(sec.check_unveil(1000, "/usr/share/fonts", "r"));
         assert!(!sec.check_unveil(1000, "/etc/shadow", "r"));
     }
+
+    #[test]
+    fn test_fuchsia_zircon_capability_channel_engine() {
+        let mut zircon = FuchsiaZirconCapabilityChannelEngine::new();
+        let handle_a = zircon.create_handle("svc:fuchsia.sys.Launcher", 0x1F);
+        let handle_b = zircon.create_handle("svc:fuchsia.ui.scenic.Scenic", 0x0F);
+        assert_eq!(handle_a, 1);
+        assert_eq!(handle_b, 2);
+
+        assert!(zircon.write_channel(handle_a, b"LAUNCH_COMPONENT").is_ok());
+        let msg = zircon.read_channel(handle_a).unwrap();
+        assert_eq!(msg, b"LAUNCH_COMPONENT");
+    }
 }
 
 /// 11. AmigaOS Exec Library Preemptive Multitasking & Signal Message Port Engine
@@ -1097,6 +1111,64 @@ impl AmigaOsExecLibraryEngine {
             (current & mask) != 0
         } else {
             false
+        }
+    }
+}
+
+/// 15. Fuchsia Zircon Capability Handle Table & IPC Channel Message Passing Engine
+#[derive(Debug, Clone)]
+pub struct ZirconHandle {
+    pub handle_id: u32,
+    pub rights_rights: u32,
+    pub object_label: String,
+}
+
+#[derive(Debug, Default)]
+pub struct FuchsiaZirconCapabilityChannelEngine {
+    pub handles: BTreeMap<u32, ZirconHandle>,
+    pub channel_buffers: BTreeMap<u32, Vec<Vec<u8>>>,
+    pub next_handle_id: u32,
+}
+
+impl FuchsiaZirconCapabilityChannelEngine {
+    pub fn new() -> Self {
+        Self {
+            handles: BTreeMap::new(),
+            channel_buffers: BTreeMap::new(),
+            next_handle_id: 1,
+        }
+    }
+
+    pub fn create_handle(&mut self, label: &str, rights: u32) -> u32 {
+        let handle_id = self.next_handle_id;
+        self.next_handle_id += 1;
+        self.handles.insert(
+            handle_id,
+            ZirconHandle {
+                handle_id,
+                rights_rights: rights,
+                object_label: label.to_string(),
+            },
+        );
+        self.channel_buffers.insert(handle_id, Vec::new());
+        handle_id
+    }
+
+    pub fn write_channel(&mut self, handle_id: u32, payload: &[u8]) -> Result<(), &'static str> {
+        let buf = self
+            .channel_buffers
+            .get_mut(&handle_id)
+            .ok_or("Zircon Channel: Handle invalid or closed")?;
+        buf.push(payload.to_vec());
+        Ok(())
+    }
+
+    pub fn read_channel(&mut self, handle_id: u32) -> Option<Vec<u8>> {
+        let buf = self.channel_buffers.get_mut(&handle_id)?;
+        if buf.is_empty() {
+            None
+        } else {
+            Some(buf.remove(0))
         }
     }
 }

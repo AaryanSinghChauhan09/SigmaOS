@@ -53,8 +53,9 @@ fn test_shell_documentation_suite_exists() {
         || Path::new("SHELL_RULES.toml").exists();
     let docs_in_wiki = Path::new("../SigmaOS.wiki/Shell-Architecture.md").exists()
         || Path::new("../SigmaOS.wiki/2026-W41-shell-word-splitting.md").exists();
+    let shell_rules_exists = Path::new("SHELL_RULES.toml").exists();
     assert!(
-        docs_in_repo || docs_in_wiki,
+        docs_in_repo || docs_in_wiki || shell_rules_exists,
         "Shell documentation suite exists in repo or wiki"
     );
 }
