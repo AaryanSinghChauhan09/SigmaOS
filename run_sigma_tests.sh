@@ -159,6 +159,16 @@ if [ -f "src/system/sovereign_init_and_supervisor_advancements_v75_pr.rs" ]; the
     ./build/test_init_v75_integration
 fi
 
+if [ -f "src/system/sovereign_init_and_supervisor_advancements_v77_pr.rs" ]; then
+    echo "Running Sovereign Init & Supervisor Advancements V77 test suite..."
+    mkdir -p build
+    rustc --test src/system/sovereign_init_and_supervisor_advancements_v77_pr.rs --edition=2021 -o build/test_init_advancements_v77
+    ./build/test_init_advancements_v77
+
+    rustc --test tests/test_init_and_supervisor_v77_pr.rs --edition=2021 -o build/test_init_v77_integration
+    ./build/test_init_v77_integration
+fi
+
 if [ -f "src/memory/huge_pages.rs" ]; then
     echo "Running huge pages & transparent huge pages (THP) test suite..."
     mkdir -p build
