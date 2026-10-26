@@ -13,11 +13,15 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 pub mod boot_manager;
+pub mod cleanup;
+pub mod firewall;
+pub mod logrotate;
 pub mod mint_tools;
 pub mod monitor;
 pub mod network_manager;
 pub mod power_manager;
 pub mod preload;
+pub mod restore;
 pub mod scheduler_manager;
 pub mod service_manager;
 pub mod settings_manager;
@@ -213,6 +217,7 @@ pub use sigmastallmanager::{
     SoftwareItem as InstallManagerItem,
 };
 pub use sigmataskscheduler::{
+    pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
 };
@@ -334,9 +339,22 @@ pub use automation::{
 
 pub use boot_manager::{BootManager, StartupEntry, StartupStatistics, StartupType};
 pub use cleanup::{
-    CacheStrategy, CleanupError, CleanupStats, CleanupStrategy, LogFileStrategy,
-    SystemCleanupManager, TempFileStrategy,
+    CleanupCategory, CleanupOption, CleanupStats, SystemCleanupManager,
+    init_system_cleanup, get_system_cleanup,
 };
+pub use logrotate::{
+    LogRotateManager, LogFileConfig, RotationSchedule, CompressionType,
+    init_log_rotate, get_log_rotate,
+};
+pub use restore::{
+    SystemRestoreManager, SystemSnapshot, SnapshotType, SnapshotStatus, RestorePoint,
+    init_system_restore, get_system_restore,
+};
+pub use firewall::{
+    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
+    init_firewall, get_firewall,
+}
+
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
     DefragError, DefragResult, DefragStrategy, DiskDefragmenter, FileBlockInfo,
