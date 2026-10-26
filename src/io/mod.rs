@@ -33,3 +33,9 @@ pub use scheduler_queue::{IoOperationKind, IoPriority, IoRequest, IoStage};
 
 pub mod callback;
 pub use callback::{CallbackHandle, CallbackManager, CallbackStatus};
+
+pub mod sovereign_io_management_and_pr_suite;
+pub use sovereign_io_management_and_pr_suite::{
+    IoHealthMetrics, IoPrDefinition, IoPrTracker, IoSupportStatus,
+    SovereignIoManagementAndPrMasterSuite, TenStageIoLifecycleCoordinator,
+};

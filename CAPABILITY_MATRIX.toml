@@ -136,6 +136,12 @@ tested_on = ["unit-test"]
 required_for_release = true
 description = "Bounded block device manager, LRU page cache, filesystem core, and failure-safe mount manager enforcing exact-once completion and lost-update prevention."
 
+[feature.io_subsystem_lifecycle_management]
+status = "implemented"
+tested_on = ["unit-test", "qemu-virtio-blk"]
+required_for_release = true
+description = "Authoritative 10-stage lifecycle I/O management subsystem (submit -> validate -> enqueue -> execute -> interrupt/DMA -> complete -> callback -> reclaim -> free -> error/recovery), race-free interrupt manager, scatter-gather DMA manager, and multi-queue priority scheduler."
+
 [feature.nvme_driver_mmio]
 status = "partial"
 tested_on = ["unit-test"]

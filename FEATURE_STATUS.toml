@@ -491,6 +491,13 @@ description = "Phase 1 io_uring implementation with submission/completion queue 
 test_evidence = "Implementation merged in commit c8e27c43d8; unit tests passing"
 next_milestone = "Driver integration and userspace API exposure"
 
+[io.management_plan]
+status = "integrated"
+files = ["src/io/sovereign_io_management_and_pr_suite.rs", "docs/io/IO_MANAGEMENT_POLICY.md", "docs/io/IO_MANAGEMENT_ADR.md", "docs/io/INTERRUPT_POLICY.md", "docs/io/DMA_POLICY.md", "docs/io/SCHEDULER_POLICY.md", "docs/filesystem/BUFFER_POLICY.md", "docs/io/CALLBACK_POLICY.md"]
+description = "SigmaOS Subsystem I/O Lifecycle Management & 15-PR Gateway Suite enforcing authoritative 10-stage lifecycle (submit -> validate -> enqueue -> execute -> interrupt/DMA -> complete -> callback -> reclaim -> free -> error/recovery), race-free interrupt routing, scatter-gather DMA mappings, bounded block buffer cache, and multi-queue priority I/O scheduling."
+test_evidence = "17/17 standalone unit tests pass via rustc --test src/io/mod.rs --edition=2021"
+next_milestone = "Continuous hardware and driver integration"
+
 [security.hardening_advancements]
 status = "working"
 files = ["src/security/sovereign_security_and_hardening_advancements_pr.rs"]
