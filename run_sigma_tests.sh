@@ -49,6 +49,12 @@ if [ -f "tests/io/interrupt.rs" ]; then
     rustc --test tests/io/callback.rs --edition=2021 -o build/test_io_callback && ./build/test_io_callback
 fi
 
+if [ -f "tests/interrupt/test_interrupt_handler_plan.rs" ]; then
+    echo "Running Interrupt Handler Master Architecture & Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/interrupt/test_interrupt_handler_plan.rs --edition=2021 -o build/test_interrupt_plan && ./build/test_interrupt_plan
+fi
+
 if [ -f "tests/storage/block.rs" ]; then
     echo "Running Secondary Memory & Storage Subsystem test suites..."
     mkdir -p build
