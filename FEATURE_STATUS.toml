@@ -526,5 +526,26 @@ description = "Sovereign Bare-Metal Independent Boot System: UEFI 2.10 ESP bootl
 test_evidence = "6/6 unit tests pass in 0.00s via rustc --test src/boot/bare_metal_independent_boot_system.rs --cfg 'feature=\"standalone_test\"'; standalone boot image synthesizer script verified"
 next_milestone = "Direct USB flash automation and live OEM laptop certification"
 
+[userland.screen_subsystem]
+status = "unit-tested"
+files = ["src/screen/mod.rs", "src/screen/screenshot.rs", "src/screen/recorder.rs"]
+description = "SigmaOS Screen Subsystem: screenshot tool with multiple modes (fullscreen, window, region, timed) and screen recorder with state machine (idle, recording, paused, saving). Supports multiple image formats (PNG, JPEG, WebP, AVIF) and video formats (MP4, MKV, WebM, GIF). Inspired by GNOME Screenshot, Flameshot, OBS Studio, and SimpleScreenRecorder."
+test_evidence = "Unit tests pass for screenshot filename generation, capture increment, format extensions, recorder state transitions, pause/resume cycles, capture region area calculation, and size estimation."
+next_milestone = "Integrate with Wayland compositor for real screen capture and graphics backend connection"
+
+[userland.software_manager]
+status = "unit-tested"
+files = ["src/software_manager/mod.rs"]
+description = "SigmaOS Software Manager with plugin backend architecture: abstract PackageBackend trait for multiple package sources (APT, Flatpak, Snap, AppImage). Supports package search, install, remove operations, featured apps, and category taxonomy. Inspired by Linux Mint Software Manager (mintinstall), GNOME Software, KDE Discover, and Omarchy ISO package tooling."
+test_evidence = "Unit tests pass for backend registration, search results, empty query handling, installation status checks, package removal error handling, and category labels."
+next_milestone = "Implement real APT/Flatpak/Snap backends with actual package operations and integrate with desktop GUI"
+
+[iso.builder_modernization]
+status = "unit-tested"
+files = ["src/iso/builder.rs", "src/iso/mod.rs"]
+description = "Modernized SigmaOS ISO Builder: refactored from OOP-based to functional design with multiple ISO variants (Desktop, Minimal, Live, Recovery, Developer), multi-architecture support (x86_64, aarch64, riscv64, armv7, loongarch64), configurable bootloaders (GRUB2, systemd-boot, syslinux, rEFInd, m1n1), build plan estimation, and validation. Inspired by Omarchy ISO, Linux Mint ISO, and Ubuntu casper."
+test_evidence = "Unit tests pass for config validation, empty package detection, volume label length checks, size estimation, build plan steps, architecture string conversion, and build output path generation."
+next_milestone = "Implement actual build system calling mksquashfs, xorriso, grub-mkrescue, and other ISO tools"
+
 
 
