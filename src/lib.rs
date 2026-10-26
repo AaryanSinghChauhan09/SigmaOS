@@ -271,6 +271,9 @@ pub use distro::cachy_linux_missing_components_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v76_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v77_pr::*;
+pub use distro::open_source_os_unimplemented_ideas_v80_pr::*;
+pub use distro::arch_linux_missing_components_v80_pr::*;
+pub use distro::open_source_os_and_arch_missing_components_v80_pr::*;
 pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 // Module-path re-exports so `crate::<module>` resolves under cfg(test)/standalone_test
 pub use distro::debian_github_repo_missing_components_v71_pr;
