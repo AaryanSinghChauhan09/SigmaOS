@@ -590,6 +590,7 @@ pub use userland::shell::{
 pub use userland::sovereign_coreutils_and_userland_advancements_v69_pr::*;
 pub use userland::sovereign_coreutils_and_userland_advancements_v70_pr::*;
 pub use userland::sovereign_coreutils_and_userland_advancements_v74_pr::*;
+pub use userland::sovereign_coreutils_and_userland_advancements_v76_pr::*;
 pub use userland::system_utilities::*;
 pub use virtualization::{
     Container, FirecrackerCloudHypervisorV61Engine, FirecrackerCloudHypervisorV63Engine,
