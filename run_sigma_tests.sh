@@ -2820,4 +2820,18 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v77_pr.rs" ]; then
     rustc --test tests/test_open_source_os_unimplemented_ideas_v77_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v77_pr
     ./build/test_open_source_os_v77_pr
 fi
+
+if [ -f "tests/test_open_source_os_unimplemented_ideas_v78_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V78 PR test suite..."
+    mkdir -p build
+    rustc --test tests/test_open_source_os_unimplemented_ideas_v78_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v78_pr
+    ./build/test_open_source_os_v78_pr
+fi
+
+if [ -f "tests/test_elementary_os_missing_components_v78.rs" ]; then
+    echo "Running Elementary OS Missing Components V78 test suite..."
+    mkdir -p build
+    rustc --test tests/test_elementary_os_missing_components_v78.rs --edition=2021 -L build/ -o build/test_elementary_os_v78
+    ./build/test_elementary_os_v78
+fi
 echo "All SigmaOS test suites completed."

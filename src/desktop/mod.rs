@@ -646,6 +646,8 @@ pub use elementary_os_missing_components_v66::*;
 
 pub mod elementary_os_missing_components_v72;
 pub use elementary_os_missing_components_v72::*;
+pub mod elementary_os_missing_components_v78;
+pub use elementary_os_missing_components_v78::*;
 
 pub mod sovereign_de_wm_advancements_v68_pr;
 pub use sovereign_de_wm_advancements_v68_pr::*;
