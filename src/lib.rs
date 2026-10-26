@@ -29,6 +29,7 @@ pub use creative::anicraft::*;
 pub use creative::anicraft_advancements_v69_pr::*;
 pub use creative::anicraft_artcraft_parity_pr::*;
 pub use creative::anicraft_missing_components_parity_pr::*;
+pub use creative::artcraft_advancements_v75_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::craftlibs_artcraft_missing_components_v69_pr::*;
 pub use creative::craftlibs_missing_components_parity_pr::*;

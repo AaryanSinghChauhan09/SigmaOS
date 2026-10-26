@@ -19,6 +19,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 use super::anicraft_artcraft_parity_pr::SovereignAnicraftArtcraftParityPrGateway;
+use super::artcraft_advancements_v75_pr::SovereignArtcraftAdvancementsV75MasterSuite;
 use super::cadcraft_artcraft_parity_pr::SovereignCadcraftArtcraftParityPrGateway;
 use super::craftlibs_artcraft_parity_pr::SovereignCraftlibsArtcraftParityPrGateway;
 use super::deckcraft_artcraft_parity_pr::SovereignDeckcraftArtcraftParityPrGateway;
@@ -70,6 +71,7 @@ pub struct SovereignArtcraftCreativeSuiteMasterPrGateway {
     pub deckcraft_gateway: SovereignDeckcraftArtcraftParityPrGateway,
     pub craftlibs_gateway: SovereignCraftlibsArtcraftParityPrGateway,
     pub artcraftlibs_gateway: SovereignArtcraftCraftlibsParityPrGateway,
+    pub artcraft_v75_gateway: SovereignArtcraftAdvancementsV75MasterSuite,
 }
 
 impl SovereignArtcraftCreativeSuiteMasterPrGateway {
@@ -93,6 +95,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             deckcraft_gateway: SovereignDeckcraftArtcraftParityPrGateway::new(),
             craftlibs_gateway: SovereignCraftlibsArtcraftParityPrGateway::new(),
             artcraftlibs_gateway: SovereignArtcraftCraftlibsParityPrGateway::new(),
+            artcraft_v75_gateway: SovereignArtcraftAdvancementsV75MasterSuite::new(),
         }
     }
 
@@ -117,6 +120,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
         let deck_ok = self.deckcraft_gateway.evaluate_deckcraft_artcraft_parity();
         let craft_ok = self.craftlibs_gateway.evaluate_craftlibs_parity();
         let artcraftlibs_ok = self.artcraftlibs_gateway.evaluate_craftlibs_parity();
+        let v75_ok = self.artcraft_v75_gateway.evaluate_artcraft_advancements_v75_parity();
 
         photo_ok
             && film_ok
@@ -136,6 +140,7 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
             && deck_ok
             && craft_ok
             && artcraftlibs_ok
+            && v75_ok
     }
 
     /// Collects all master PR proposals across all 18+ creative applications.
@@ -353,6 +358,18 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
                 pr_id: id_counter,
                 pr_title: p.pr_title,
                 creative_app: "ArtCraftLibs Media".to_string(),
+                target_subsystem: p.target_subsystem,
+                components_added_count: p.components_added.len(),
+                status: p.status,
+            });
+        }
+
+        for p in self.artcraft_v75_gateway.collect_all_proposals() {
+            id_counter += 1;
+            proposals.push(ArtcraftMasterPrProposal {
+                pr_id: id_counter,
+                pr_title: p.pr_title,
+                creative_app: "ArtCraft V75 Core".to_string(),
                 target_subsystem: p.target_subsystem,
                 components_added_count: p.components_added.len(),
                 status: p.status,
