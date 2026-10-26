@@ -50,6 +50,7 @@ pub use creative::effectcraft_artcraft_missing_components_v67_pr::*;
 // pub use creative::effectcraft_artcraft_parity_pr::*;
 pub use creative::effectcraft_missing_components_parity_pr::*;
 pub use creative::figcraft_artcraft_missing_components_v65_pr::*;
+pub use creative::figcraft_artcraft_missing_components_v66_pr::*;
 // pub use creative::figcraft_missing_components_parity_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v66_pr::*;
