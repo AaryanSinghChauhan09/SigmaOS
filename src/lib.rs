@@ -314,6 +314,7 @@ pub use distro::open_source_os_missing_components_v73_pr::*;
 pub use distro::open_source_os_missing_components_v74_pr::*;
 pub use distro::open_source_os_missing_components_v75_pr::*;
 pub use distro::open_source_os_missing_components_v76_pr::*;
+pub use distro::open_source_os_missing_components_v77_pr::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
 pub use package::sovereign_distro_package_advancements_v74::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
@@ -755,6 +756,7 @@ pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
 pub use crate::distro::open_source_os_missing_components_v76_pr::*;
+pub use crate::distro::open_source_os_missing_components_v77_pr::*;
 
 pub mod screen;
 pub mod software_manager;
