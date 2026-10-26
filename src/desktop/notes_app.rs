@@ -48,24 +48,22 @@ pub struct NoteFolder {
 }
 
 /// Zero-allocation case-insensitive substring search helper.
-fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
-    if needle.is_empty() {
+/// Expects `needle_lower` to be pre-lowercased when non-ASCII fallback is needed.
+fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+    if needle_lower.is_empty() {
         return true;
     }
-    if needle.is_ascii() && haystack.is_ascii() {
-        let h_bytes = haystack.as_bytes();
-        let n_bytes = needle.as_bytes();
-        if n_bytes.len() > h_bytes.len() {
+    if needle_lower.is_ascii() && haystack.is_ascii() {
+        if haystack.len() < needle_lower.len() {
             return false;
         }
-        h_bytes.windows(n_bytes.len()).any(|window| {
-            window
-                .iter()
-                .zip(n_bytes)
-                .all(|(&h, &n)| h.to_ascii_lowercase() == n.to_ascii_lowercase())
-        })
+        let n_bytes = needle_lower.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
     } else {
-        haystack.to_lowercase().contains(&needle.to_lowercase())
+        haystack.to_lowercase().contains(needle_lower)
     }
 }
 
@@ -227,17 +225,15 @@ impl NotesApp {
         Ok(())
     }
 
-    /// Search notes using case-insensitive substring matching
+    /// Search notes using zero-allocation case-insensitive substring matching on ASCII fast-path
     pub fn search_notes(&self, query: &str) -> Vec<&Note> {
         let query_lower = query.to_lowercase();
         self.notes
             .values()
             .filter(|n| {
-                n.title.to_lowercase().contains(&query_lower)
-                    || n.content.to_lowercase().contains(&query_lower)
-                    || n.tags
-                        .iter()
-                        .any(|t| t.to_lowercase().contains(&query_lower))
+                contains_ignore_case(&n.title, &query_lower)
+                    || contains_ignore_case(&n.content, &query_lower)
+                    || n.tags.iter().any(|t| contains_ignore_case(t, &query_lower))
             })
             .collect()
     }
@@ -330,14 +326,22 @@ mod tests {
     #[test]
     fn test_search_notes() {
         let mut app = NotesApp::new();
-        app.add_note(
+        let id = app.add_note(
             "Shopping List".to_string(),
             "Milk, Eggs".to_string(),
             Some(1),
             NoteColor::Default,
         );
+        app.add_tag(id, "groceries".to_string()).unwrap();
+
         let results = app.search_notes("shopping");
         assert_eq!(results.len(), 1);
+
+        let content_results = app.search_notes("MILK");
+        assert_eq!(content_results.len(), 1);
+
+        let tag_results = app.search_notes("GROCERIES");
+        assert_eq!(tag_results.len(), 1);
     }
 
     #[test]
