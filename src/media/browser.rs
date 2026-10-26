@@ -1982,7 +1982,12 @@ impl FirefoxWebSocketsSanitizerEngine {
 // 22. UNIFIED SIGMAWEB BROWSER SUITE
 // =========================================================================
 
+#[path = "sovereign_web_browser_advancements_v78_pr.rs"]
+mod sovereign_web_browser_advancements_v78_pr;
+use sovereign_web_browser_advancements_v78_pr::SovereignWebBrowserV78PrGatewayEngine;
+
 pub struct SigmaWebBrowser {
+    pub v78_gateway: SovereignWebBrowserV78PrGatewayEngine,
     pub engine: SovereignBrowserEngine,
     pub rfp: ResistFingerprintingEngine,
     pub stripper: TelemetryAndTrackerStripper,
@@ -2053,6 +2058,7 @@ impl SigmaWebBrowser {
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
+            v78_gateway: SovereignWebBrowserV78PrGatewayEngine::new(),
             engine: SovereignBrowserEngine::new(),
             rfp: ResistFingerprintingEngine::new(),
             stripper: TelemetryAndTrackerStripper::new(),

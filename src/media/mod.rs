@@ -4,6 +4,8 @@
 pub mod browser;
 pub mod browser_innovations_suite;
 pub use browser_innovations_suite::*;
+pub mod sovereign_web_browser_advancements_v78_pr;
+pub use sovereign_web_browser_advancements_v78_pr::*;
 pub mod distro_media_engine;
 pub mod pix_image_organizer;
 pub mod sovereign_audio_video_advancements_v76_pr;

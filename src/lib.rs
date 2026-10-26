@@ -565,11 +565,12 @@ pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
     ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine,
     JobControlManager, ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
-    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile,
-    ShellStatistics, ShellSyntaxHighlighter, ShellType,
+    ShellCommand, ShellDialectV78, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard,
+    ShellProfile, ShellStatistics, ShellSyntaxHighlighter, ShellType,
     ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
+    SovereignUniversalReplEngineV78, SovereignUniversalShTranspilerV78,
     SovereignShellsTerminalsSupervisorsParityPrGateway, TerminalMultiplexersAndEmulatorsPrEngine,
-    ZshPromptFormatter,
+    UniversalShCrossDialectBridgeEngineV78, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
@@ -654,6 +655,7 @@ pub mod location;
 pub mod logging;
 pub mod media;
 pub use media::sovereign_audio_video_advancements_v76_pr::*;
+pub use media::sovereign_web_browser_advancements_v78_pr::*;
 pub mod microphone;
 pub mod mm;
 pub mod monitor;

@@ -14,6 +14,7 @@ pub mod repl;
 pub mod sigma_sh;
 pub mod sovereign_command_interpreter;
 pub mod sovereign_shell_parity;
+pub mod sovereign_shell_repl_advancements_v78_pr;
 pub mod sovereign_shells_terminals_supervisors_pr;
 pub mod tech_media_shell_innovations;
 pub mod terminal_emulator;
@@ -21,6 +22,7 @@ pub mod universal_cli_shell_system;
 pub mod zsh_bash_parity;
 
 pub use self::command::{ShellCommand, SimpleShellSession};
+pub use self::sovereign_shell_repl_advancements_v78_pr::*;
 pub use self::diagnostics::*;
 pub use self::interactive::*;
 pub use self::repl::ShellRepl;

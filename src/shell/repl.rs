@@ -267,6 +267,7 @@ impl Default for AgentAutomationEngine {
 
 /// Shell REPL
 pub struct ShellRepl {
+    pub universal_repl_engine: crate::shell::sovereign_shell_repl_advancements_v78_pr::SovereignUniversalReplEngineV78,
     running: bool,
     variables: std::collections::HashMap<String, String>,
     aliases: std::collections::HashMap<String, String>,
@@ -309,6 +310,7 @@ impl ShellRepl {
         services.insert("cron".to_string(), "Running".to_string());
 
         Self {
+            universal_repl_engine: crate::shell::sovereign_shell_repl_advancements_v78_pr::SovereignUniversalReplEngineV78::new(),
             running: true,
             variables: HashMap::new(),
             aliases: HashMap::new(),
