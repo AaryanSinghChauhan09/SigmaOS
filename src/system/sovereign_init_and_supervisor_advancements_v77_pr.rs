@@ -150,8 +150,8 @@ impl SystemdAdvancementsV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4185,
-            pr_title: "systemd V77 Advancements: Dynamic State Machine, Cgroup v2, Socket Activation & Journal Streaming".to_string(),
+            pr_id: 4206,
+            pr_title: "PR #4206: systemd V77 Dynamic State Machine, Cgroup v2, Socket Activation & Journal Streaming".to_string(),
             target_subsystem: "Init & Service Manager".to_string(),
             original_system: "Linux systemd".to_string(),
             components_added: vec![
@@ -276,8 +276,8 @@ impl OpenRcAdvancementsV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4186,
-            pr_title: "OpenRC V77 Advancements: /etc/rc.conf Parser, Runlevel Dependency Solver & rc-status Inspector".to_string(),
+            pr_id: 4207,
+            pr_title: "PR #4207: OpenRC V77 /etc/rc.conf Parser, Runlevel Dependency Solver & rc-status Inspector".to_string(),
             target_subsystem: "Runlevel Dependency Init".to_string(),
             original_system: "Gentoo / Alpine OpenRC".to_string(),
             components_added: vec![
@@ -331,8 +331,8 @@ impl RunitS6AdvancementsV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4187,
-            pr_title: "runit & s6 V77 Advancements: Service Directory Scanner, s6-rc Database Transition & Descriptor Readiness".to_string(),
+            pr_id: 4208,
+            pr_title: "PR #4208: runit & s6 V77 Service Directory Scanner, s6-rc Database Transition & Descriptor Readiness".to_string(),
             target_subsystem: "Lightweight Supervision".to_string(),
             original_system: "Void Linux runit / Skarnet s6".to_string(),
             components_added: vec![
@@ -411,8 +411,8 @@ impl SysVinitAdvancementsV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4188,
-            pr_title: "SysVinit V77 Advancements: /etc/inittab Action Parser & telinit State Machine".to_string(),
+            pr_id: 4209,
+            pr_title: "PR #4209: SysVinit V77 /etc/inittab Action Parser & telinit State Machine".to_string(),
             target_subsystem: "Legacy SysV Init".to_string(),
             original_system: "Debian / Slackware SysVinit".to_string(),
             components_added: vec![
@@ -473,8 +473,8 @@ impl BsdRcAdvancementsV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4189,
-            pr_title: "BSD rc V77 Advancements: FreeBSD rc.d Hooks, OpenBSD rcctl & NetBSD rc.subr Jail Router".to_string(),
+            pr_id: 4210,
+            pr_title: "PR #4210: BSD rc V77 FreeBSD rc.d Hooks, OpenBSD rcctl & NetBSD rc.subr Jail Router".to_string(),
             target_subsystem: "BSD Service Framework".to_string(),
             original_system: "FreeBSD / OpenBSD / NetBSD rc".to_string(),
             components_added: vec![
@@ -538,8 +538,8 @@ impl LaunchdAndroidInitAdvancementsV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4190,
-            pr_title: "launchd & Android Init V77 Advancements: Property-List Condition Evaluator & init.rc Capabilities Domain".to_string(),
+            pr_id: 4211,
+            pr_title: "PR #4211: launchd & Android Init V77 Property-List Condition Evaluator & init.rc Capabilities Domain".to_string(),
             target_subsystem: "Cross-Platform Supervisors".to_string(),
             original_system: "macOS launchd / Android init.rc".to_string(),
             components_added: vec![
@@ -601,8 +601,8 @@ impl CronAnacronTimersAtV77Engine {
 
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
-            pr_id: 4191,
-            pr_title: "Cron, Anacron, systemd Timers & At V77 Advancements: Monotonic Timer Solver & Batch Spool Queue".to_string(),
+            pr_id: 4212,
+            pr_title: "PR #4212: Cron, Anacron, systemd Timers & At V77 Monotonic Timer Solver & Batch Spool Queue".to_string(),
             target_subsystem: "Task Scheduling & Timers".to_string(),
             original_system: "Vixie Cron / systemd.timer / at".to_string(),
             components_added: vec![
