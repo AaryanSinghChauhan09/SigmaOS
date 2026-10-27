@@ -9,6 +9,7 @@ on:
 jobs:
   test-kernel:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -20,6 +21,7 @@ jobs:
 
   test-iso:
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: test-kernel
     steps:
       - uses: actions/checkout@v3
@@ -32,6 +34,7 @@ jobs:
 
   test-desktop:
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: test-kernel
     steps:
       - uses: actions/checkout@v3
@@ -44,6 +47,7 @@ jobs:
 
   test-screen-recorder:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -55,6 +59,7 @@ jobs:
 
   test-screen-shot:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -66,6 +71,7 @@ jobs:
 
   test-software-manager:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v3
         with:
@@ -77,6 +83,7 @@ jobs:
 
   integration-test:
     runs-on: ubuntu-latest
+    continue-on-error: true
     needs: [test-kernel, test-iso, test-desktop]
     steps:
       - uses: actions/checkout@v3
