@@ -272,7 +272,9 @@ impl SoundcraftPolyphonicPitchToMidiTrackerEngine {
 
     pub fn detect_polyphonic_notes(&self, audio_buffer: &[f32]) -> Vec<PolyphonicMidiNoteEvent> {
         let mut notes = Vec::new();
-        let rms: f32 = (audio_buffer.iter().map(|s| s * s).sum::<f32>() / audio_buffer.len().max(1) as f32).sqrt();
+        let rms: f32 = (audio_buffer.iter().map(|s| s * s).sum::<f32>()
+            / audio_buffer.len().max(1) as f32)
+            .sqrt();
 
         if rms > 0.01 {
             // Simulated polyphonic chord detection (A minor chord A4, C5, E5)
@@ -498,7 +500,11 @@ impl SoundcraftBinauralSpatialAudioHeadTrackingEngine {
         self.head_pose = pose;
     }
 
-    pub fn render_binaural_stereo(&self, mono_input: &[f32], source_angle_deg: f32) -> (Vec<f32>, Vec<f32>) {
+    pub fn render_binaural_stereo(
+        &self,
+        mono_input: &[f32],
+        source_angle_deg: f32,
+    ) -> (Vec<f32>, Vec<f32>) {
         let relative_angle = source_angle_deg - self.head_pose.yaw_deg;
         let angle_rad = relative_angle * (PI as f32) / 180.0;
 
@@ -737,8 +743,13 @@ impl SovereignSoundcraftArtcraftMissingComponentsV66PrGateway {
             transient_shaper: SoundcraftTransientShaperSustainEngine::new(),
             stem_mixer: SoundcraftMultiTrackStemAutomatedMixerEngine::new(),
             head_tracking: SoundcraftBinauralSpatialAudioHeadTrackingEngine::new(),
-            plugin_host: SoundcraftVst3ClapPluginHostSandboxEngine::new("SovereignSynth", PluginFormat::Clap),
-            transcoder: SoundcraftBatchAudioFileTranspilerConverterEngine::new(AudioCodecFormat::FlacLossless),
+            plugin_host: SoundcraftVst3ClapPluginHostSandboxEngine::new(
+                "SovereignSynth",
+                PluginFormat::Clap,
+            ),
+            transcoder: SoundcraftBatchAudioFileTranspilerConverterEngine::new(
+                AudioCodecFormat::FlacLossless,
+            ),
             atmos_spatializer: SoundcraftDolbyAtmosBedObjectAudioSpatializerEngine::new(),
         }
     }
@@ -767,7 +778,11 @@ impl SovereignSoundcraftArtcraftMissingComponentsV66PrGateway {
         for manifest in self.collect_all_pr_manifests() {
             md.push_str(&format!(
                 "## PR #{}: {}\n- Target: {}\n- Multiplier: {}\n- Status: {}\n\n",
-                manifest.pr_id, manifest.pr_title, manifest.target_subsystem, manifest.performance_multiplier, manifest.status
+                manifest.pr_id,
+                manifest.pr_title,
+                manifest.target_subsystem,
+                manifest.performance_multiplier,
+                manifest.status
             ));
         }
         md
@@ -867,7 +882,8 @@ mod tests {
 
     #[test]
     fn test_plugin_host_sandbox_engine() {
-        let host = SoundcraftVst3ClapPluginHostSandboxEngine::new("TestCompressor", PluginFormat::Vst3);
+        let host =
+            SoundcraftVst3ClapPluginHostSandboxEngine::new("TestCompressor", PluginFormat::Vst3);
         let mut buf = vec![0.5f32; 10];
         let ok = host.process_audio_buffer_sandboxed(&mut buf);
         assert!(ok);
@@ -875,7 +891,8 @@ mod tests {
 
     #[test]
     fn test_batch_transcoder_engine() {
-        let transcoder = SoundcraftBatchAudioFileTranspilerConverterEngine::new(AudioCodecFormat::FlacLossless);
+        let transcoder =
+            SoundcraftBatchAudioFileTranspilerConverterEngine::new(AudioCodecFormat::FlacLossless);
         let stems = vec![String::from("vocal_stem"), String::from("drum_stem")];
         let output = transcoder.transcode_batch_stems(&stems);
         assert_eq!(output.len(), 2);
@@ -885,7 +902,14 @@ mod tests {
     #[test]
     fn test_atmos_spatializer_engine() {
         let mut spatializer = SoundcraftDolbyAtmosBedObjectAudioSpatializerEngine::new();
-        spatializer.place_3d_audio_object(101, AudioObject3dCoordinate { x: 0.5, y: 0.8, z: 0.2 });
+        spatializer.place_3d_audio_object(
+            101,
+            AudioObject3dCoordinate {
+                x: 0.5,
+                y: 0.8,
+                z: 0.2,
+            },
+        );
         let total_channels = spatializer.render_atmos_bed_mix();
         assert_eq!(total_channels, 13);
     }

@@ -85,7 +85,9 @@ fn test_debian_debsums_integrity_auditor_engine_v75() {
 #[test]
 fn test_debian_popcon_telemetry_analyzer_engine_v75() {
     let engine = DebianPopconUsageTelemetryEngineV75Pr::new();
-    assert!(engine.compile_telemetry_packet().contains("vendor=SigmaOS-V75"));
+    assert!(engine
+        .compile_telemetry_packet()
+        .contains("vendor=SigmaOS-V75"));
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7516);
 }
