@@ -2094,6 +2094,13 @@ if [ -f "src/distro/open_source_os_missing_components_v78_pr.rs" ]; then
 
     rustc --test tests/test_open_source_os_missing_components_v78_pr.rs --edition=2021 -o build/test_open_source_v78_pr_integration
     ./build/test_open_source_v78_pr_integration
+
+    echo "Running Open Source OS Missing Components V79 PR Suite tests..."
+    rustc --test src/distro/open_source_os_missing_components_v79_pr.rs --edition=2021 -o build/test_open_source_v79_pr
+    ./build/test_open_source_v79_pr
+
+    rustc --test tests/test_open_source_os_missing_components_v79_pr.rs --edition=2021 -o build/test_open_source_v79_pr_integration
+    ./build/test_open_source_v79_pr_integration
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
