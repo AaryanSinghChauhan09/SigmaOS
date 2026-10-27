@@ -176,7 +176,9 @@ impl ArchCachyOsScxLavenderEnergyEfficiencySchedulerPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.lavender_ebpf_active && self.energy_efficiency_gain_pct > 0 && self.core_parking_latency_us > 0
+        self.lavender_ebpf_active
+            && self.energy_efficiency_gain_pct > 0
+            && self.core_parking_latency_us > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV73PrSpec {
@@ -218,7 +220,9 @@ impl ArchArchinstallSubvolumeSnapshotRollbackEnginePrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.auto_snapper_config && self.systemd_boot_rollback_entries > 0 && self.max_snapshots_retained > 0
+        self.auto_snapper_config
+            && self.systemd_boot_rollback_entries > 0
+            && self.max_snapshots_retained > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV73PrSpec {
@@ -386,7 +390,9 @@ impl ArchSecurityTrackerCveMitigationAutomatorPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.cve_database_synced && self.automated_patch_applier && self.vulnerabilities_mitigated > 0
+        self.cve_database_synced
+            && self.automated_patch_applier
+            && self.vulnerabilities_mitigated > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV73PrSpec {
@@ -428,7 +434,9 @@ impl ArchKeyringWebKeyDirectoryDilithium3RotationPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.wkd_pqc_dilithium3_enabled && self.key_rotation_interval_days > 0 && self.keys_signed_count > 0
+        self.wkd_pqc_dilithium3_enabled
+            && self.key_rotation_interval_days > 0
+            && self.keys_signed_count > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV73PrSpec {
@@ -548,7 +556,10 @@ impl ArchLinuxMissingComponentsV73PrSuite {
         pr.push_str("- Archiso PXE HTTP Netboot Ephemeral MemFS Live Bootstrapper V73\n");
         pr.push_str("- Arch Security Tracker CVE Vulnerability Patch Automator V73\n");
         pr.push_str("- Keyring WKD Dilithium3 Post-Quantum Key Rotation V73\n\n");
-        pr.push_str(&format!("## Gap Closure Score: {}%\n", self.compute_gap_closure_score()));
+        pr.push_str(&format!(
+            "## Gap Closure Score: {}%\n",
+            self.compute_gap_closure_score()
+        ));
         pr
     }
 }

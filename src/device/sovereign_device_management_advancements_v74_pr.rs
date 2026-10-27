@@ -201,8 +201,14 @@ impl SovereignUdevEudevMdevDevdHotplugV74Engine {
 
         // Hwdb modalias entry
         let mut props = BTreeMap::new();
-        props.insert("ID_VENDOR_FROM_DATABASE".to_string(), "Intel Corporation".to_string());
-        props.insert("ID_MODEL_FROM_DATABASE".to_string(), "Ethernet Controller I225-V".to_string());
+        props.insert(
+            "ID_VENDOR_FROM_DATABASE".to_string(),
+            "Intel Corporation".to_string(),
+        );
+        props.insert(
+            "ID_MODEL_FROM_DATABASE".to_string(),
+            "Ethernet Controller I225-V".to_string(),
+        );
         self.hwdb_entries.push(UdevHwdbEntryV74 {
             modalias_pattern: "pci:v00008086d000015F3s*".to_string(),
             properties: props,
@@ -298,7 +304,8 @@ impl SovereignUdevEudevMdevDevdHotplugV74Engine {
     pub fn generate_proposal(&self) -> DeviceManagementV74PrProposalManifest {
         DeviceManagementV74PrProposalManifest {
             pr_id: 1007,
-            pr_title: "udev/eudev/mdev/devd/devfs/hotplug Unified Event Processing Engine".to_string(),
+            pr_title: "udev/eudev/mdev/devd/devfs/hotplug Unified Event Processing Engine"
+                .to_string(),
             target_subsystem: "Kernel & Userland Device Subsystem".to_string(),
             original_distros: "Arch Linux, Gentoo, Alpine, FreeBSD, OpenBSD".to_string(),
             components_added: vec![
@@ -556,7 +563,8 @@ impl SovereignUpowerBatteryDaemonV74Engine {
     pub fn generate_proposal(&self) -> DeviceManagementV74PrProposalManifest {
         DeviceManagementV74PrProposalManifest {
             pr_id: 1009,
-            pr_title: "UPower Battery Health, Discharge Estimation & Power Profile Engine".to_string(),
+            pr_title: "UPower Battery Health, Discharge Estimation & Power Profile Engine"
+                .to_string(),
             target_subsystem: "Userland Power Management".to_string(),
             original_distros: "Ubuntu, Fedora, Arch Linux, openSUSE".to_string(),
             components_added: vec![
@@ -646,7 +654,12 @@ impl SovereignLogindElogindSessionV74Engine {
     }
 
     /// Perform unprivileged DRI / evdev FD passing for Wayland compositors (take_device).
-    pub fn take_device_fd(&self, session_id: &str, device_path: &str, caller_uid: u32) -> Result<u32, &'static str> {
+    pub fn take_device_fd(
+        &self,
+        session_id: &str,
+        device_path: &str,
+        caller_uid: u32,
+    ) -> Result<u32, &'static str> {
         let sess = self.sessions.get(session_id).ok_or("Session not found")?;
         if sess.uid != caller_uid && caller_uid != 0 {
             return Err("Permission denied: caller UID mismatch");
@@ -709,7 +722,8 @@ impl SovereignLogindElogindSessionV74Engine {
     pub fn generate_proposal(&self) -> DeviceManagementV74PrProposalManifest {
         DeviceManagementV74PrProposalManifest {
             pr_id: 1010,
-            pr_title: "logind/elogind User Session, Seat & Unprivileged FD Passing Engine".to_string(),
+            pr_title: "logind/elogind User Session, Seat & Unprivileged FD Passing Engine"
+                .to_string(),
             target_subsystem: "Session & Seat Subsystem".to_string(),
             original_distros: "Arch Linux, Debian, Void Linux, Alpine".to_string(),
             components_added: vec![
@@ -816,13 +830,24 @@ impl SovereignPolkitAuthorizationV74Engine {
     }
 
     /// Cache authorization result with expiration TTL.
-    pub fn cache_authorization(&mut self, action_id: &str, uid: u32, ttl_seconds: u64, current_time: u64) {
+    pub fn cache_authorization(
+        &mut self,
+        action_id: &str,
+        uid: u32,
+        ttl_seconds: u64,
+        current_time: u64,
+    ) {
         let key = format!("{}:{}", action_id, uid);
         self.auth_cache.insert(key, current_time + ttl_seconds);
     }
 
     /// Verify if user has valid cached privilege authorization.
-    pub fn is_cached_authorization_valid(&self, action_id: &str, uid: u32, current_time: u64) -> bool {
+    pub fn is_cached_authorization_valid(
+        &self,
+        action_id: &str,
+        uid: u32,
+        current_time: u64,
+    ) -> bool {
         let key = format!("{}:{}", action_id, uid);
         if let Some(&expiry) = self.auth_cache.get(&key) {
             expiry > current_time
@@ -917,7 +942,12 @@ impl SovereignDbusSystemBusBrokerV74Engine {
     }
 
     /// Register or acquire a well-known name on the system bus.
-    pub fn request_name(&mut self, well_known_name: &str, unique_id: &str, allow_replacement: bool) -> bool {
+    pub fn request_name(
+        &mut self,
+        well_known_name: &str,
+        unique_id: &str,
+        allow_replacement: bool,
+    ) -> bool {
         if let Some(existing) = self.name_registry.get_mut(well_known_name) {
             if existing.allow_replacement {
                 existing.owner_unique_id = unique_id.to_string();
@@ -941,7 +971,8 @@ impl SovereignDbusSystemBusBrokerV74Engine {
 
     /// Subscribe to a D-Bus signal broadcast.
     pub fn subscribe_signal(&mut self, interface: &str, member: &str) {
-        self.signal_subscriptions.push((interface.to_string(), member.to_string()));
+        self.signal_subscriptions
+            .push((interface.to_string(), member.to_string()));
     }
 
     /// Route message and evaluate security policy filter.
@@ -951,8 +982,7 @@ impl SovereignDbusSystemBusBrokerV74Engine {
             return true;
         }
 
-        self.name_registry.contains_key(&header.destination)
-            || header.destination.starts_with(':')
+        self.name_registry.contains_key(&header.destination) || header.destination.starts_with(':')
     }
 
     /// Generate dynamic D-Bus Introspection XML string for an interface.
@@ -1081,7 +1111,9 @@ impl SovereignDeviceManagementAdvancementsV74PrGateway {
         }
 
         // 6. Verify dbus broker
-        let req_res = self.dbus_broker.request_name("org.custom.Service", ":1.9", true);
+        let req_res = self
+            .dbus_broker
+            .request_name("org.custom.Service", ":1.9", true);
         if !req_res {
             return false;
         }
@@ -1115,10 +1147,12 @@ mod tests {
         assert!(!links.is_empty());
         assert_eq!(mode, Some(0o660));
 
-        let netname = engine.generate_predictable_net_ifname(PredictableNetIfTypeV74::Ethernet, 3, 0, 0);
+        let netname =
+            engine.generate_predictable_net_ifname(PredictableNetIfTypeV74::Ethernet, 3, 0, 0);
         assert_eq!(netname, "enp3s0");
 
-        let onboard_name = engine.generate_predictable_net_ifname(PredictableNetIfTypeV74::PciOnboard, 0, 0, 0);
+        let onboard_name =
+            engine.generate_predictable_net_ifname(PredictableNetIfTypeV74::PciOnboard, 0, 0, 0);
         assert_eq!(onboard_name, "eno1");
     }
 
@@ -1174,11 +1208,16 @@ mod tests {
             session_id: "session-1".to_string(),
         };
 
-        let res = engine.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
+        let res =
+            engine.check_authorization("org.freedesktop.udisks2.filesystem-mount", &subj, true);
         assert_eq!(res, PolkitAuthResultV74::Yes);
 
         engine.cache_authorization("org.freedesktop.udisks2.filesystem-mount", 1000, 300, 10000);
-        assert!(engine.is_cached_authorization_valid("org.freedesktop.udisks2.filesystem-mount", 1000, 10100));
+        assert!(engine.is_cached_authorization_valid(
+            "org.freedesktop.udisks2.filesystem-mount",
+            1000,
+            10100
+        ));
     }
 
     #[test]
