@@ -292,6 +292,23 @@ impl SovereignUniversalLinuxBsdSubsystemInteropGateway {
     pub fn get_proposals(&self) -> &[UniversalLinuxBsdInteropPrProposal] {
         &self.proposals
     }
+
+    /// Performs an audit across all 44 subsystems and 38 distro paradigms.
+    pub fn audit_all_subsystems_harmony(&self) -> (core::collections::BTreeMap<String, bool>, u32) {
+        self.harmony_engine.audit_all_subsystems_distro_compliance()
+    }
+
+    /// Executes a cross-distro subsystem interop workflow.
+    pub fn execute_interop_workflow(
+        &mut self,
+        source: SigmaOsSubsystem,
+        target: SigmaOsSubsystem,
+        action: &str,
+        payload: &str,
+    ) -> Result<u64, String> {
+        self.harmony_engine
+            .execute_cross_subsystem_workflow(source, target, action, payload)
+    }
 }
 
 #[cfg(test)]
@@ -348,5 +365,23 @@ mod tests {
     fn test_interop_gateway_proposals() {
         let gateway = SovereignUniversalLinuxBsdSubsystemInteropGateway::new();
         assert_eq!(gateway.get_proposals().len(), 5);
+    }
+
+    #[test]
+    fn test_gateway_audit_and_interop_workflow() {
+        let mut gateway = SovereignUniversalLinuxBsdSubsystemInteropGateway::new();
+        let (audit_map, score) = gateway.audit_all_subsystems_harmony();
+        assert_eq!(audit_map.len(), 44);
+        assert_eq!(score, 100);
+
+        let workflow_id = gateway
+            .execute_interop_workflow(
+                SigmaOsSubsystem::KernelScheduling,
+                SigmaOsSubsystem::SecuritySandboxing,
+                "ENFORCE_SANDBOX_POLICY",
+                "target_pid=1001",
+            )
+            .expect("Workflow execution must succeed");
+        assert!(workflow_id > 0);
     }
 }
