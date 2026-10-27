@@ -8,6 +8,8 @@ pub mod distro_media_engine;
 pub mod pix_image_organizer;
 pub mod sovereign_audio_video_advancements_v76_pr;
 pub use sovereign_audio_video_advancements_v76_pr::*;
+pub mod sovereign_audio_video_advancements_v80_pr;
+pub use sovereign_audio_video_advancements_v80_pr::*;
 pub mod sovereign_screen_recorder;
 pub mod sovereign_video_editor;
 pub mod sovereign_video_player;

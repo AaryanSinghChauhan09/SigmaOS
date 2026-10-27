@@ -398,6 +398,7 @@ pub mod toolchain {
     pub mod self_host;
     pub mod sovereign_toolchain_development_advancements_pr;
     pub mod sovereign_toolchain_development_advancements_v74_pr;
+    pub mod sovereign_toolchain_development_advancements_v76_pr;
 }
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
@@ -654,6 +655,7 @@ pub mod location;
 pub mod logging;
 pub mod media;
 pub use media::sovereign_audio_video_advancements_v76_pr::*;
+pub use media::sovereign_audio_video_advancements_v80_pr::*;
 pub mod microphone;
 pub mod mm;
 pub mod monitor;
