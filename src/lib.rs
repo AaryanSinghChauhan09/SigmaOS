@@ -189,8 +189,8 @@ pub mod thread;
 pub mod virtualization;
 pub use desktop::sovereign_desktop_toolkits_and_services::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v72_pr::*;
-pub use desktop::sovereign_desktop_toolkits_and_services_v76_pr::*;
 pub use desktop::sovereign_desktop_toolkits_and_services_v75_pr::*;
+pub use desktop::sovereign_desktop_toolkits_and_services_v76_pr::*;
 pub use desktop::{
     CachyosGamescopeHandheldOverlay, Gnome46MutterEngine, ItsFossQuickShareAndBackupHud,
     KdePlasma6Engine, LuminaBsdDesktopEngine, PhoronixPerformanceBenchmarkWidget,
@@ -399,6 +399,7 @@ pub mod toolchain {
     pub mod self_host;
     pub mod sovereign_toolchain_development_advancements_pr;
     pub mod sovereign_toolchain_development_advancements_v74_pr;
+    pub mod sovereign_toolchain_development_advancements_v76_pr;
 }
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
