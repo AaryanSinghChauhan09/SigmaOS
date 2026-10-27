@@ -54,7 +54,9 @@ impl JitEngineBoundsAuditorV78 {
     }
 
     pub fn audit_isolate_memory(&self, heap_size_mb: usize) -> bool {
-        heap_size_mb < 4096 && self.v8_isolate_pointer_compression && self.partition_alloc_slot_guard
+        heap_size_mb < 4096
+            && self.v8_isolate_pointer_compression
+            && self.partition_alloc_slot_guard
     }
 }
 
@@ -198,7 +200,10 @@ impl SovereignWebBrowserV78PrGatewayEngine {
 
     pub fn audit_web_browser_suite(&mut self) -> BTreeMap<String, String> {
         let mut report = BTreeMap::new();
-        report.insert("webrender_frame".to_string(), self.webrender.render_frame(2048));
+        report.insert(
+            "webrender_frame".to_string(),
+            self.webrender.render_frame(2048),
+        );
         report.insert(
             "jit_memory_audit".to_string(),
             self.jit_auditor.audit_isolate_memory(2048).to_string(),
@@ -209,10 +214,17 @@ impl SovereignWebBrowserV78PrGatewayEngine {
         );
         report.insert(
             "deamp_result".to_string(),
-            self.brave_shields.unwrap_amp_url("https://google.com/amp/s/example.com/article"),
+            self.brave_shields
+                .unwrap_amp_url("https://google.com/amp/s/example.com/article"),
         );
-        report.insert("tor_rendezvous".to_string(), self.tor_circuit.build_rendezvous_circuit());
-        report.insert("libweb_parser".to_string(), self.ladybird_zen.libweb_css_parser_version.clone());
+        report.insert(
+            "tor_rendezvous".to_string(),
+            self.tor_circuit.build_rendezvous_circuit(),
+        );
+        report.insert(
+            "libweb_parser".to_string(),
+            self.ladybird_zen.libweb_css_parser_version.clone(),
+        );
         report
     }
 }
@@ -225,8 +237,14 @@ mod tests {
     fn test_browser_advancements_v78() {
         let mut gateway = SovereignWebBrowserV78PrGatewayEngine::new();
         let report = gateway.audit_web_browser_suite();
-        assert_eq!(report.get("deamp_result").unwrap(), "https://example.com/article");
+        assert_eq!(
+            report.get("deamp_result").unwrap(),
+            "https://example.com/article"
+        );
         assert_eq!(report.get("rfp_quantized_time").unwrap(), "1220");
-        assert!(report.get("tor_rendezvous").unwrap().contains("6-hop onion circuit"));
+        assert!(report
+            .get("tor_rendezvous")
+            .unwrap()
+            .contains("6-hop onion circuit"));
     }
 }

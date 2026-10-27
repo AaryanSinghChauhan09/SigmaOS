@@ -119,7 +119,11 @@ impl SovereignUniversalShTranspilerV78 {
                 ShellDialectV78::Nushell => {
                     if trimmed.starts_with("let-env ") || trimmed.starts_with("$env.") {
                         if let Some(eq_idx) = trimmed.find('=') {
-                            let var = trimmed[..eq_idx].replace("let-env ", "").replace("$env.", "").trim().to_string();
+                            let var = trimmed[..eq_idx]
+                                .replace("let-env ", "")
+                                .replace("$env.", "")
+                                .trim()
+                                .to_string();
                             let val = trimmed[eq_idx + 1..].trim();
                             posix_lines.push(format!("export {}={}", var, val));
                             continue;
@@ -141,7 +145,10 @@ impl SovereignUniversalShTranspilerV78 {
 
             // General replacement for standard syntax aliases
             let mut normalized = line.to_string();
-            if dialect == ShellDialectV78::Bash || dialect == ShellDialectV78::Zsh || dialect == ShellDialectV78::Ksh {
+            if dialect == ShellDialectV78::Bash
+                || dialect == ShellDialectV78::Zsh
+                || dialect == ShellDialectV78::Ksh
+            {
                 normalized = normalized.replace("[[ ", "[ ").replace(" ]]", " ]");
             }
 
@@ -170,7 +177,11 @@ impl UniversalShCrossDialectBridgeEngineV78 {
         }
     }
 
-    pub fn execute_dialect_script(&mut self, script: &str, dialect: ShellDialectV78) -> (i32, String) {
+    pub fn execute_dialect_script(
+        &mut self,
+        script: &str,
+        dialect: ShellDialectV78,
+    ) -> (i32, String) {
         let posix_script = self.transpiler.normalize_to_posix_sh(script, dialect);
         let mut output = Vec::new();
         let lines = posix_script.lines();
@@ -187,7 +198,8 @@ impl UniversalShCrossDialectBridgeEngineV78 {
             } else if trimmed.contains('=') && !trimmed.contains(' ') {
                 let parts: Vec<&str> = trimmed.splitn(2, '=').collect();
                 if parts.len() == 2 {
-                    self.environment_vars.insert(parts[0].to_string(), parts[1].to_string());
+                    self.environment_vars
+                        .insert(parts[0].to_string(), parts[1].to_string());
                 }
             } else if !trimmed.is_empty() && !trimmed.starts_with('#') {
                 output.push(format!("[exec/posix] {}", line));
