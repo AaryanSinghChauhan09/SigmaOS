@@ -455,9 +455,9 @@ next_milestone = "PR 1: docs(drivers): audit driver status and define support ev
 
 [syscall.development_plan]
 status = "integrated"
-files = ["docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/36-SigmaOS-Syscall-Development-Plan.md", "src/syscall/sovereign_syscall_development_and_pr_suite.rs"]
+files = ["docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md", "wiki/36-SigmaOS-Syscall-Development-Plan.md", "src/syscall/sovereign_syscall_development_and_pr_suite.rs", "tests/test_syscall_development_plan.rs"]
 description = "SigmaOS System-Call Development and Maintenance Plan establishing 10 mandatory ABI policies, 17-PR implementation sequence, periodic maintenance cadences, component rules, PR review gates, and rollout criteria"
-test_evidence = "Architecture specification published in docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/36-SigmaOS-Syscall-Development-Plan.md; standalone unit tests pass via rustc --test src/syscall/sovereign_syscall_development_and_pr_suite.rs"
+test_evidence = "Architecture specification published in docs/syscall/SYSCALL_DEVELOPMENT_AND_MAINTENANCE_PLAN.md and wiki/36-SigmaOS-Syscall-Development-Plan.md; unit and integration tests pass via rustc --test src/syscall/sovereign_syscall_development_and_pr_suite.rs and tests/test_syscall_development_plan.rs"
 next_milestone = "PR 1: docs(syscall): define ABI policy and component status & PR 3: test(syscall): add user-memory access harness"
 
 
