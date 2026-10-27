@@ -209,24 +209,39 @@ impl PatternSearch {
 
     pub fn search(&self, text: &str) -> Vec<GrepMatch> {
         let mut matches = Vec::new();
+        // Bolt performance optimization: Pre-compute lowercased pattern strings outside
+        // the outer `text.lines()` loop to avoid repeated `pattern.to_lowercase()` heap allocations per line.
+        let lower_patterns: Vec<String> = if self.options.ignore_case {
+            self.patterns.iter().map(|p| p.to_lowercase()).collect()
+        } else {
+            Vec::new()
+        };
+
         for (line_num, line) in text.lines().enumerate() {
-            for pattern in &self.patterns {
-                if self.options.ignore_case {
-                    if line.to_lowercase().contains(&pattern.to_lowercase()) {
-                        matches.push(GrepMatch {
-                            line_number: line_num + 1,
-                            line: line.to_string(),
-                            pattern: pattern.clone(),
-                        });
+            for (idx, pattern) in self.patterns.iter().enumerate() {
+                let is_match = if self.options.ignore_case {
+                    // Bolt performance optimization: Zero-allocation ASCII fast path
+                    // using slice window matching (`window.eq_ignore_ascii_case`).
+                    if line.is_ascii() && pattern.is_ascii() {
+                        pattern.is_empty()
+                            || (pattern.len() <= line.len()
+                                && line
+                                    .as_bytes()
+                                    .windows(pattern.len())
+                                    .any(|window| window.eq_ignore_ascii_case(pattern.as_bytes())))
+                    } else {
+                        line.to_lowercase().contains(&lower_patterns[idx])
                     }
                 } else {
-                    if line.contains(pattern) {
-                        matches.push(GrepMatch {
-                            line_number: line_num + 1,
-                            line: line.to_string(),
-                            pattern: pattern.clone(),
-                        });
-                    }
+                    line.contains(pattern)
+                };
+
+                if is_match {
+                    matches.push(GrepMatch {
+                        line_number: line_num + 1,
+                        line: line.to_string(),
+                        pattern: pattern.clone(),
+                    });
                 }
             }
         }
@@ -294,8 +309,17 @@ mod tests {
 
     #[test]
     fn test_pattern_search() {
-        let grep = PatternSearch::new("test");
-        let matches = grep.search("test line\ntest2 line");
+        let mut grep = PatternSearch::new("Test");
+        grep.options.set_ignore_case(true);
+        let matches = grep.search("test line\nTEST2 line\nno match\nÜBER line");
         assert_eq!(matches.len(), 2);
+        assert_eq!(matches[0].line_number, 1);
+        assert_eq!(matches[1].line_number, 2);
+
+        let mut grep_unicode = PatternSearch::new("über");
+        grep_unicode.options.set_ignore_case(true);
+        let matches_unicode = grep_unicode.search("test line\nÜBER line");
+        assert_eq!(matches_unicode.len(), 1);
+        assert_eq!(matches_unicode[0].line_number, 2);
     }
 }
