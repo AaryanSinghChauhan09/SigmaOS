@@ -49,7 +49,9 @@ pub struct OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine {
 impl OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD FineIBT & Pinsyscall Branch Protection Engine V68"),
+            engine_name: String::from(
+                "OpenBSD FineIBT & Pinsyscall Branch Protection Engine V68",
+            ),
             specs: Vec::new(),
             total_validated: 0,
             total_violations: 0,
@@ -60,12 +62,21 @@ impl OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine {
         self.specs.push(spec);
     }
 
-    pub fn validate_indirect_branch(&mut self, pid: u32, target_addr: usize) -> Result<PinsyscallFineIbtStatus, String> {
+    pub fn validate_indirect_branch(
+        &mut self,
+        pid: u32,
+        target_addr: usize,
+    ) -> Result<PinsyscallFineIbtStatus, String> {
         self.total_validated += 1;
         if let Some(spec) = self.specs.iter().find(|s| s.process_id == pid) {
-            if spec.fine_ibt_enabled && (target_addr < spec.syscall_start_addr || target_addr > spec.syscall_end_addr) {
+            if spec.fine_ibt_enabled
+                && (target_addr < spec.syscall_start_addr
+                    || target_addr > spec.syscall_end_addr)
+            {
                 self.total_violations += 1;
-                return Err(String::from("SIGSEGV: FineIBT branch target violation - indirect jump outside pinned syscall region"));
+                return Err(String::from(
+                    "SIGSEGV: FineIBT branch target violation - indirect jump outside pinned syscall region",
+                ));
             }
         }
         Ok(PinsyscallFineIbtStatus {
@@ -77,7 +88,12 @@ impl OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} processes registered, {} branch violations blocked", self.engine_name, self.specs.len(), self.total_violations)
+        format!(
+            "{}: {} processes registered, {} branch violations blocked",
+            self.engine_name,
+            self.specs.len(),
+            self.total_violations
+        )
     }
 }
 
@@ -101,15 +117,24 @@ pub struct OpenBsdUnveilWildcardMountIsolationV68PrEngine {
 impl OpenBsdUnveilWildcardMountIsolationV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Unveil Wildcard Mount Isolation Engine V68"),
+            engine_name: String::from(
+                "OpenBSD Unveil Wildcard Mount Isolation Engine V68",
+            ),
             wildcard_table: Vec::new(),
             is_locked: false,
         }
     }
 
-    pub fn add_wildcard_unveil(&mut self, pattern: &str, mount: &str, permissions: &str) -> Result<(), String> {
+    pub fn add_wildcard_unveil(
+        &mut self,
+        pattern: &str,
+        mount: &str,
+        permissions: &str,
+    ) -> Result<(), String> {
         if self.is_locked {
-            return Err(String::from("EPERM: Unveil wildcard table is permanently locked"));
+            return Err(String::from(
+                "EPERM: Unveil wildcard table is permanently locked",
+            ));
         }
         self.wildcard_table.push(UnveilWildcardRule {
             path_pattern: String::from(pattern),
@@ -153,7 +178,12 @@ impl OpenBsdUnveilWildcardMountIsolationV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} wildcard rules active, locked: {}", self.engine_name, self.wildcard_table.len(), self.is_locked)
+        format!(
+            "{}: {} wildcard rules active, locked: {}",
+            self.engine_name,
+            self.wildcard_table.len(),
+            self.is_locked
+        )
     }
 }
 
@@ -181,7 +211,9 @@ pub struct OpenBsdPledgeDynamicCategorySandboxV68PrEngine {
 impl OpenBsdPledgeDynamicCategorySandboxV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Pledge Dynamic Category Sandbox Engine V68"),
+            engine_name: String::from(
+                "OpenBSD Pledge Dynamic Category Sandbox Engine V68",
+            ),
             active_pledge: None,
         }
     }
@@ -210,7 +242,9 @@ impl OpenBsdPledgeDynamicCategorySandboxV68PrEngine {
                 self.active_pledge = Some(new_set);
                 Ok(())
             } else {
-                Err(String::from("EPERM: Pledge promises can only be narrowed, never broadened"))
+                Err(String::from(
+                    "EPERM: Pledge promises can only be narrowed, never broadened",
+                ))
             }
         } else {
             self.active_pledge = Some(new_set);
@@ -239,7 +273,11 @@ impl OpenBsdPledgeDynamicCategorySandboxV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: active dynamic pledge: {}", self.engine_name, self.active_pledge.is_some())
+        format!(
+            "{}: active dynamic pledge: {}",
+            self.engine_name,
+            self.active_pledge.is_some()
+        )
     }
 }
 
@@ -262,7 +300,9 @@ pub struct OpenBsdSoftraidMultiKeyRaid10V68PrEngine {
 impl OpenBsdSoftraidMultiKeyRaid10V68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Softraid Multi-Key RAID10 Engine V68"),
+            engine_name: String::from(
+                "OpenBSD Softraid Multi-Key RAID10 Engine V68",
+            ),
             volumes: Vec::new(),
         }
     }
@@ -271,11 +311,17 @@ impl OpenBsdSoftraidMultiKeyRaid10V68PrEngine {
         self.volumes.push(spec);
     }
 
-    pub fn provide_key(&mut self, volume_uuid: &str, key_data: &str) -> Result<bool, String> {
+    pub fn provide_key(
+        &mut self,
+        volume_uuid: &str,
+        key_data: &str,
+    ) -> Result<bool, String> {
         if key_data.is_empty() {
             return Err(String::from("Key data cannot be empty"));
         }
-        if let Some(vol) = self.volumes.iter_mut().find(|v| v.volume_uuid == volume_uuid) {
+        if let Some(vol) =
+            self.volumes.iter_mut().find(|v| v.volume_uuid == volume_uuid)
+        {
             vol.keys_unlocked += 1;
             if vol.keys_unlocked >= vol.required_keys {
                 vol.status = String::from("ONLINE_ENCRYPTED");
@@ -287,7 +333,11 @@ impl OpenBsdSoftraidMultiKeyRaid10V68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} Softraid RAID10 multi-key volumes managed", self.engine_name, self.volumes.len())
+        format!(
+            "{}: {} Softraid RAID10 multi-key volumes managed",
+            self.engine_name,
+            self.volumes.len()
+        )
     }
 }
 
@@ -309,7 +359,9 @@ pub struct OpenBsdPfHardwareOffloadSynProxyV68PrEngine {
 impl OpenBsdPfHardwareOffloadSynProxyV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD PF Hardware-Offloaded SYN Proxy Engine V68"),
+            engine_name: String::from(
+                "OpenBSD PF Hardware-Offloaded SYN Proxy Engine V68",
+            ),
             offload_specs: Vec::new(),
             total_syn_processed: 0,
         }
@@ -325,7 +377,12 @@ impl OpenBsdPfHardwareOffloadSynProxyV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} NIC queues offloaded, {} SYN packets hardware-filtered", self.engine_name, self.offload_specs.len(), self.total_syn_processed)
+        format!(
+            "{}: {} NIC queues offloaded, {} SYN packets hardware-filtered",
+            self.engine_name,
+            self.offload_specs.len(),
+            self.total_syn_processed
+        )
     }
 }
 
@@ -347,22 +404,36 @@ pub struct OpenBsdVmdVirtio3dDirectPassthroughV68PrEngine {
 impl OpenBsdVmdVirtio3dDirectPassthroughV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD VMD Virtio-3D Direct GPU Passthrough Engine V68"),
+            engine_name: String::from(
+                "OpenBSD VMD Virtio-3D Direct GPU Passthrough Engine V68",
+            ),
             passthrough_vms: Vec::new(),
         }
     }
 
-    pub fn attach_direct_gpu(&mut self, spec: VmdVirtio3dPassthroughSpec) -> Result<String, String> {
+    pub fn attach_direct_gpu(
+        &mut self,
+        spec: VmdVirtio3dPassthroughSpec,
+    ) -> Result<String, String> {
         if spec.vram_mb < 128 {
-            return Err(String::from("Virtio-3D Direct Passthrough requires at least 128MB VRAM"));
+            return Err(String::from(
+                "Virtio-3D Direct Passthrough requires at least 128MB VRAM",
+            ));
         }
         let name = spec.vm_name.clone();
         self.passthrough_vms.push(spec);
-        Ok(format!("Virtio-3D Direct GPU passthrough enabled for VM '{}'", name))
+        Ok(format!(
+            "Virtio-3D Direct GPU passthrough enabled for VM '{}'",
+            name
+        ))
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} VMD VMs with direct 3D GPU passthrough", self.engine_name, self.passthrough_vms.len())
+        format!(
+            "{}: {} VMD VMs with direct 3D GPU passthrough",
+            self.engine_name,
+            self.passthrough_vms.len()
+        )
     }
 }
 
@@ -384,12 +455,20 @@ pub struct OpenBsdSmtpdSpamTrapDmarcVerifierV68PrEngine {
 impl OpenBsdSmtpdSpamTrapDmarcVerifierV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD OpenSMTPD Spam Trap & DMARC Verifier Engine V68"),
+            engine_name: String::from(
+                "OpenBSD OpenSMTPD Spam Trap & DMARC Verifier Engine V68",
+            ),
             spam_traps: Vec::from([String::from("trap@openbsd-sigmaos.org")]),
         }
     }
 
-    pub fn verify_incoming(&self, sender: &str, recipient: &str, dkim: bool, spf: bool) -> SmtpdDmarcResult {
+    pub fn verify_incoming(
+        &self,
+        sender: &str,
+        recipient: &str,
+        dkim: bool,
+        spf: bool,
+    ) -> SmtpdDmarcResult {
         let is_trap = self.spam_traps.iter().any(|t| t == recipient);
         let domain = sender.split('@').nth(1).unwrap_or("unknown");
 
@@ -411,7 +490,11 @@ impl OpenBsdSmtpdSpamTrapDmarcVerifierV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} honeypot spam traps active", self.engine_name, self.spam_traps.len())
+        format!(
+            "{}: {} honeypot spam traps active",
+            self.engine_name,
+            self.spam_traps.len()
+        )
     }
 }
 
@@ -432,12 +515,22 @@ pub struct OpenBsdSignifyPqcDilithiumVerifierV68PrEngine {
 impl OpenBsdSignifyPqcDilithiumVerifierV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Signify Post-Quantum Dilithium-5 Verifier Engine V68"),
-            trusted_keys: Vec::from([String::from("openbsd-v68-master.pub"), String::from("sigmaos-pqc-root.pub")]),
+            engine_name: String::from(
+                "OpenBSD Signify Post-Quantum Dilithium-5 Verifier Engine V68",
+            ),
+            trusted_keys: Vec::from([
+                String::from("openbsd-v68-master.pub"),
+                String::from("sigmaos-pqc-root.pub"),
+            ]),
         }
     }
 
-    pub fn verify_artifact(&self, name: &str, sig_data: &str, key: &str) -> SignifyDilithiumResult {
+    pub fn verify_artifact(
+        &self,
+        name: &str,
+        sig_data: &str,
+        key: &str,
+    ) -> SignifyDilithiumResult {
         let is_trusted = self.trusted_keys.iter().any(|k| k == key);
         let valid = !sig_data.is_empty() && is_trusted;
 
@@ -450,7 +543,11 @@ impl OpenBsdSignifyPqcDilithiumVerifierV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} Dilithium-5 signify keys registered", self.engine_name, self.trusted_keys.len())
+        format!(
+            "{}: {} Dilithium-5 signify keys registered",
+            self.engine_name,
+            self.trusted_keys.len()
+        )
     }
 }
 
@@ -472,7 +569,9 @@ pub struct OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
 impl OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Relayd gRPC & HTTP/2 Load Balancer Engine V68"),
+            engine_name: String::from(
+                "OpenBSD Relayd gRPC & HTTP/2 Load Balancer Engine V68",
+            ),
             targets: Vec::new(),
         }
     }
@@ -482,11 +581,19 @@ impl OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
     }
 
     pub fn route_sni(&self, sni: &str) -> Option<RelaydGrpcHttp2Target> {
-        self.targets.iter().find(|t| t.sni_name == sni).cloned().or_else(|| self.targets.first().cloned())
+        self.targets
+            .iter()
+            .find(|t| t.sni_name == sni)
+            .cloned()
+            .or_else(|| self.targets.first().cloned())
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} gRPC/HTTP2 load balancer backends active", self.engine_name, self.targets.len())
+        format!(
+            "{}: {} gRPC/HTTP2 load balancer backends active",
+            self.engine_name,
+            self.targets.len()
+        )
     }
 }
 
@@ -508,8 +615,12 @@ pub struct OpenBsdUnwindDnssecDoHDoTResolverV68PrEngine {
 impl OpenBsdUnwindDnssecDoHDoTResolverV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Unwind DNSSEC DoH/DoT Resolver Engine V68"),
-            doh_endpoints: Vec::from([String::from("https://dns.quad9.net/dns-query")]),
+            engine_name: String::from(
+                "OpenBSD Unwind DNSSEC DoH/DoT Resolver Engine V68",
+            ),
+            doh_endpoints: Vec::from([String::from(
+                "https://dns.quad9.net/dns-query",
+            )]),
             dot_endpoints: Vec::from([String::from("tls://1.1.1.1:853")]),
         }
     }
@@ -518,13 +629,22 @@ impl OpenBsdUnwindDnssecDoHDoTResolverV68PrEngine {
         UnwindResolverResult {
             query_domain: String::from(domain),
             dnssec_validated: true,
-            protocol: String::from(if use_doh { "DNS-over-HTTPS" } else { "DNS-over-TLS" }),
+            protocol: String::from(if use_doh {
+                "DNS-over-HTTPS"
+            } else {
+                "DNS-over-TLS"
+            }),
             addresses: Vec::from([String::from("198.51.100.99")]),
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} DoH & {} DoT resolver endpoints active", self.engine_name, self.doh_endpoints.len(), self.dot_endpoints.len())
+        format!(
+            "{}: {} DoH & {} DoT resolver endpoints active",
+            self.engine_name,
+            self.doh_endpoints.len(),
+            self.dot_endpoints.len()
+        )
     }
 }
 
@@ -546,8 +666,11 @@ pub struct OpenBsdMissingComponentsV68PrSuite {
 impl OpenBsdMissingComponentsV68PrSuite {
     pub fn new() -> Self {
         Self {
-            suite_name: String::from("SigmaOS OpenBSD Missing Components V68 Master PR Gateway Suite"),
-            pinsyscall_engine: OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine::new(),
+            suite_name: String::from(
+                "SigmaOS OpenBSD Missing Components V68 Master PR Gateway Suite",
+            ),
+            pinsyscall_engine:
+                OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine::new(),
             unveil_engine: OpenBsdUnveilWildcardMountIsolationV68PrEngine::new(),
             pledge_engine: OpenBsdPledgeDynamicCategorySandboxV68PrEngine::new(),
             softraid_engine: OpenBsdSoftraidMultiKeyRaid10V68PrEngine::new(),
@@ -582,7 +705,8 @@ mod tests {
 
     #[test]
     fn test_pinsyscall_fine_ibt_engine() {
-        let mut engine = OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine::new();
+        let mut engine =
+            OpenBsdPinsyscallFineIbtBranchProtectionV68PrEngine::new();
         engine.register_spec(PinsyscallFineIbtSpec {
             process_id: 2001,
             executable_path: String::from("/usr/libexec/ld.so"),
@@ -602,7 +726,9 @@ mod tests {
     #[test]
     fn test_unveil_wildcard_engine() {
         let mut engine = OpenBsdUnveilWildcardMountIsolationV68PrEngine::new();
-        assert!(engine.add_wildcard_unveil("/var/log/*", "/var/log", "rw").is_ok());
+        assert!(engine
+            .add_wildcard_unveil("/var/log/*", "/var/log", "rw")
+            .is_ok());
         assert!(engine.evaluate_access("/var/log/syslog", 'r'));
         assert!(engine.evaluate_access("/var/log/messages", 'w'));
         assert!(!engine.evaluate_access("/var/log/messages", 'x'));
@@ -630,7 +756,12 @@ mod tests {
         engine.register_volume(MultiKeyRaid10VolumeSpec {
             volume_uuid: String::from("raid10-vol-99"),
             cipher: String::from("AES-XTS-256"),
-            member_disks: Vec::from([String::from("sd0"), String::from("sd1"), String::from("sd2"), String::from("sd3")]),
+            member_disks: Vec::from([
+                String::from("sd0"),
+                String::from("sd1"),
+                String::from("sd2"),
+                String::from("sd3"),
+            ]),
             keys_unlocked: 0,
             required_keys: 2,
             status: String::from("LOCKED"),
@@ -677,17 +808,27 @@ mod tests {
     #[test]
     fn test_smtpd_dmarc_verifier_engine() {
         let engine = OpenBsdSmtpdSpamTrapDmarcVerifierV68PrEngine::new();
-        let res1 = engine.verify_incoming("sender@example.com", "trap@openbsd-sigmaos.org", true, true);
+        let res1 = engine.verify_incoming(
+            "sender@example.com",
+            "trap@openbsd-sigmaos.org",
+            true,
+            true,
+        );
         assert_eq!(res1.action, "BLACKHOLE_TRAP");
 
-        let res2 = engine.verify_incoming("user@good.org", "inbox@sigmaos.org", true, true);
+        let res2 =
+            engine.verify_incoming("user@good.org", "inbox@sigmaos.org", true, true);
         assert_eq!(res2.action, "DELIVER");
     }
 
     #[test]
     fn test_signify_dilithium_verifier_engine() {
         let engine = OpenBsdSignifyPqcDilithiumVerifierV68PrEngine::new();
-        let res = engine.verify_artifact("bsd.rd-v68", "pqc_signature_blob", "openbsd-v68-master.pub");
+        let res = engine.verify_artifact(
+            "bsd.rd-v68",
+            "pqc_signature_blob",
+            "openbsd-v68-master.pub",
+        );
         assert!(res.verified);
         assert_eq!(res.pqc_algorithm, "Dilithium5-Ed25519-SphincsPlus");
     }
