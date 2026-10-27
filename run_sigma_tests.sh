@@ -2673,6 +2673,12 @@ if [ -f "tests/fs/fd_table.rs" ]; then
     rustc --test tests/filesystem/lock.rs --edition=2021 -o build/test_vfs_lock && ./build/test_vfs_lock
 fi
 
+if [ -f "src/kernel/thread.rs" ]; then
+    echo "Running Canonical Thread Subsystem & Lifecycle Manager test suite..."
+    mkdir -p build
+    rustc --test src/kernel/thread.rs --edition=2021 -o build/test_thread && ./build/test_thread
+fi
+
 if [ -f "tests/scheduler/core.rs" ]; then
     echo "Running Process Scheduler Core & Lifecycle test suite..."
     mkdir -p build
