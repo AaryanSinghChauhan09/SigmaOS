@@ -106,6 +106,60 @@ fn test_component_maturity_levels() {
 }
 
 #[test]
+fn test_industry_standard_rules() {
+    let rules = [
+        IndustryStandardRule::Rule1OneComponentPerCycle,
+        IndustryStandardRule::Rule2StudyProducesDecision,
+        IndustryStandardRule::Rule3RuntimeEvidenceControlsStatus,
+        IndustryStandardRule::Rule4CiGatesEveryImprovement,
+        IndustryStandardRule::Rule5Reproducibility,
+        IndustryStandardRule::Rule6LeastPrivilege,
+        IndustryStandardRule::Rule7SecurityReviewSeparate,
+        IndustryStandardRule::Rule8FailSafely,
+        IndustryStandardRule::Rule9RegressionTestsMandatory,
+        IndustryStandardRule::Rule10LicenseComplianceFirst,
+        IndustryStandardRule::Rule11NoBorrowedStatusClaims,
+        IndustryStandardRule::Rule12HumanApprovalHighRisk,
+        IndustryStandardRule::Rule13ArchiveStaleResearch,
+        IndustryStandardRule::Rule14KeepDocumentationExecutable,
+    ];
+
+    assert_eq!(rules.len(), 14);
+    for rule in &rules {
+        assert!(rule.rule_number() >= 1 && rule.rule_number() <= 14);
+        assert!(!rule.title().is_empty());
+        assert!(!rule.description().is_empty());
+    }
+}
+
+#[test]
+fn test_backlog_items_and_priorities() {
+    let engine = PeriodicImprovementEngine::new();
+    assert_eq!(engine.backlog_items.len(), 15);
+
+    let p0_items: Vec<_> = engine
+        .backlog_items
+        .iter()
+        .filter(|b| b.priority == BacklogPriority::P0RealCore)
+        .collect();
+    assert_eq!(p0_items.len(), 5);
+
+    let p1_items: Vec<_> = engine
+        .backlog_items
+        .iter()
+        .filter(|b| b.priority == BacklogPriority::P1Resilience)
+        .collect();
+    assert_eq!(p1_items.len(), 5);
+
+    let p2_items: Vec<_> = engine
+        .backlog_items
+        .iter()
+        .filter(|b| b.priority == BacklogPriority::P2Capability)
+        .collect();
+    assert_eq!(p2_items.len(), 5);
+}
+
+#[test]
 fn test_maturity_promotion_rule_3_enforcement() {
     let mut engine = PeriodicImprovementEngine::new();
     assert_eq!(
@@ -194,6 +248,8 @@ fn test_monthly_milestone_completion_and_report() {
     let summary = engine.generate_program_summary();
     assert!(summary.contains("SigmaOS Periodic Improvement Program Status Report"));
     assert!(summary.contains("Month 1: Reproducible QEMU x86_64 boot-to-shell [COMPLETED]"));
+    assert!(summary.contains("Industry Standard Rules Enforced"));
+    assert!(summary.contains("Priority Backlog Status"));
 }
 
 #[test]
@@ -211,6 +267,10 @@ fn test_periodic_pr_gateway_and_proposal_formatting() {
     assert!(formatted_desc.contains("ADR-012: VFS Path-Resolution Hardening"));
     assert!(formatted_desc.contains("reports/vfs/vfs_conformance.json"));
     assert!(formatted_desc.contains("Rule 3: Runtime evidence gated status promotion"));
+
+    let diff = gateway.generate_patch_diff();
+    assert!(diff.contains("PR Title: feat(governance): Adopt Periodic Study-Improve-Prove Operating Program"));
+    assert!(diff.contains("Staged PR Proposals Count: 6"));
 
     let summary_report = gateway.generate_pr_gateway_summary();
     assert!(summary_report.contains("SigmaOS Periodic Study-Improve-Prove PR Gateway Report"));
