@@ -78,9 +78,9 @@ next_milestone = "QEMU virt machine boot to kernel_main"
 
 [kernel.interrupt_framework]
 status = "modeled"
-files = ["docs/INTERRUPT_HANDLER_PLAN.md", "wiki/INTERRUPT_HANDLER_PLAN.md", "docs/INDEX.md", "wiki/INDEX.md"]
+files = ["docs/INTERRUPT_HANDLER_PLAN.md", "wiki/INTERRUPT_HANDLER_PLAN.md"]
 description = "Master Architecture, Support Matrix, and 17-PR Plan for SigmaOS interrupt handling: 5-stage decoupled pipeline, multi-arch vector contracts, and deferred work dispatch."
-test_evidence = "Master specification published in docs/INTERRUPT_HANDLER_PLAN.md & wiki/INTERRUPT_HANDLER_PLAN.md; unit tests pass via rustc --test src/kernel/interrupt.rs"
+test_evidence = "Master specification published in docs/INTERRUPT_HANDLER_PLAN.md & wiki/INTERRUPT_HANDLER_PLAN.md; unit tests pass via rustc --test src/kernel/interrupt.rs and tests/interrupt/test_interrupt_handler_plan.rs"
 next_milestone = "PR 1: audit interrupt paths & PR 2: define handler context contracts"
 
 [kernel.irq_subsystem]

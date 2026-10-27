@@ -2706,6 +2706,12 @@ if [ -f "tests/dispatch/test_dispatcher_plan.rs" ]; then
     rustc --test tests/dispatch/test_dispatcher_plan.rs --edition=2021 -o build/test_dispatcher_plan && ./build/test_dispatcher_plan
 fi
 
+if [ -f "tests/interrupt/test_interrupt_handler_plan.rs" ]; then
+    echo "Running Interrupt Handler Plan test suite..."
+    mkdir -p build
+    rustc --test tests/interrupt/test_interrupt_handler_plan.rs --edition=2021 -o build/test_interrupt_handler_plan && ./build/test_interrupt_handler_plan
+fi
+
 if [ -f "tests/shell.rs" ]; then
     echo "Running Shell Conformance and Lifecycle test suites..."
     mkdir -p build
