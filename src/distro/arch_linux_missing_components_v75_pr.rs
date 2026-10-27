@@ -56,7 +56,8 @@ impl ArchPacmanMultiThreadedAlpmDatabaseSyncV75PrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7501,
-            title: "PR Proposal: Pacman Libalpm Multi-Threaded Database Sync & Delta Engine V75".to_string(),
+            title: "PR Proposal: Pacman Libalpm Multi-Threaded Database Sync & Delta Engine V75"
+                .to_string(),
             subsystem: "Package/PacmanLibalpm".to_string(),
             target_repo: "archlinux/pacman".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -64,7 +65,9 @@ impl ArchPacmanMultiThreadedAlpmDatabaseSyncV75PrEngine {
                 "Synchronized {} repository DBs across {} worker threads using delta cache V75.",
                 self.total_dbs_synced, self.worker_threads
             ),
-            patch_diff: "--- a/lib/libalpm/sync_v75.c\n+++ b/lib/libalpm/sync_v75.c\n@@ -0,0 +1,15 @@\n+// Multi-threaded ALPM DB sync V75\n".to_string(),
+            patch_diff:
+                "--- a/lib/libalpm/sync_v75.c\n+++ b/lib/libalpm/sync_v75.c\n@@ -0,0 +1,15 @@\n+// Multi-threaded ALPM DB sync V75\n"
+                    .to_string(),
         }
     }
 }
@@ -98,7 +101,8 @@ impl ArchAurwebOidcChrootIsolatedBuilderV75PrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7502,
-            title: "PR Proposal: Aurweb OIDC Authenticated Systemd-Nspawn Isolated Builder V75".to_string(),
+            title: "PR Proposal: Aurweb OIDC Authenticated Systemd-Nspawn Isolated Builder V75"
+                .to_string(),
             subsystem: "AUR/AurwebBuilder".to_string(),
             target_repo: "archlinux/aurweb".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -106,7 +110,9 @@ impl ArchAurwebOidcChrootIsolatedBuilderV75PrEngine {
                 "Orchestrated {} isolated AUR package builds via systemd-nspawn and OIDC auth V75.",
                 self.active_builds_count
             ),
-            patch_diff: "--- a/aurweb/builder/nspawn_v75.py\n+++ b/aurweb/builder/nspawn_v75.py\n@@ -0,0 +1,15 @@\n+# Aurweb OIDC nspawn container builder V75\n".to_string(),
+            patch_diff:
+                "--- a/aurweb/builder/nspawn_v75.py\n+++ b/aurweb/builder/nspawn_v75.py\n@@ -0,0 +1,15 @@\n+# Aurweb OIDC nspawn container builder V75\n"
+                    .to_string(),
         }
     }
 }
@@ -140,7 +146,8 @@ impl ArchMkinitcpioEarlyMicrocodeTpm2NvramMeasurementV75PrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7503,
-            title: "PR Proposal: Mkinitcpio Early CPU Microcode & TPM2 NVRAM PCR Engine V75".to_string(),
+            title: "PR Proposal: Mkinitcpio Early CPU Microcode & TPM2 NVRAM PCR Engine V75"
+                .to_string(),
             subsystem: "Initramfs/Mkinitcpio".to_string(),
             target_repo: "archlinux/mkinitcpio".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -148,7 +155,9 @@ impl ArchMkinitcpioEarlyMicrocodeTpm2NvramMeasurementV75PrEngine {
                 "Loaded early CPU microcode and measured boot stage to TPM2 PCR {} V75.",
                 self.tpm2_nvram_pcr_index
             ),
-            patch_diff: "--- a/mkinitcpio/hooks/microcode_tpm2_v75.sh\n+++ b/mkinitcpio/hooks/microcode_tpm2_v75.sh\n@@ -0,0 +1,15 @@\n+# Early microcode TPM2 NVRAM measurer V75\n".to_string(),
+            patch_diff:
+                "--- a/mkinitcpio/hooks/microcode_tpm2_v75.sh\n+++ b/mkinitcpio/hooks/microcode_tpm2_v75.sh\n@@ -0,0 +1,15 @@\n+# Early microcode TPM2 NVRAM measurer V75\n"
+                    .to_string(),
         }
     }
 }
@@ -176,13 +185,16 @@ impl ArchCachyOsScxLavenderEnergyEfficiencySchedulerV75PrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.lavender_ebpf_active && self.energy_efficiency_gain_pct > 0 && self.core_parking_latency_us > 0
+        self.lavender_ebpf_active
+            && self.energy_efficiency_gain_pct > 0
+            && self.core_parking_latency_us > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7504,
-            title: "PR Proposal: CachyOS SCX Lavender eBPF Energy Efficiency Scheduler V75".to_string(),
+            title: "PR Proposal: CachyOS SCX Lavender eBPF Energy Efficiency Scheduler V75"
+                .to_string(),
             subsystem: "Kernel/SchedExt".to_string(),
             target_repo: "CachyOS/sched-ext".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -190,7 +202,9 @@ impl ArchCachyOsScxLavenderEnergyEfficiencySchedulerV75PrEngine {
                 "Achieved {}% power gain via SCX Lavender eBPF core parking with {}us latency V75.",
                 self.energy_efficiency_gain_pct, self.core_parking_latency_us
             ),
-            patch_diff: "--- a/kernel/sched/scx_lavender_v75.bpf.c\n+++ b/kernel/sched/scx_lavender_v75.bpf.c\n@@ -0,0 +1,15 @@\n+// SCX Lavender energy efficiency scheduler V75\n".to_string(),
+            patch_diff:
+                "--- a/kernel/sched/scx_lavender_v75.bpf.c\n+++ b/kernel/sched/scx_lavender_v75.bpf.c\n@@ -0,0 +1,15 @@\n+// SCX Lavender energy efficiency scheduler V75\n"
+                    .to_string(),
         }
     }
 }
@@ -218,13 +232,16 @@ impl ArchArchinstallSubvolumeSnapshotRollbackEngineV75PrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.auto_snapper_config && self.systemd_boot_rollback_entries > 0 && self.max_snapshots_retained > 0
+        self.auto_snapper_config
+            && self.systemd_boot_rollback_entries > 0
+            && self.max_snapshots_retained > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7505,
-            title: "PR Proposal: Archinstall Snapper Subvolume & Systemd-Boot Rollback V75".to_string(),
+            title: "PR Proposal: Archinstall Snapper Subvolume & Systemd-Boot Rollback V75"
+                .to_string(),
             subsystem: "Installer/Archinstall".to_string(),
             target_repo: "archlinux/archinstall".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -232,7 +249,9 @@ impl ArchArchinstallSubvolumeSnapshotRollbackEngineV75PrEngine {
                 "Configured Snapper Btrfs subvolumes generating {} systemd-boot rollback entries V75.",
                 self.systemd_boot_rollback_entries
             ),
-            patch_diff: "--- a/archinstall/lib/installer/btrfs_snapper_v75.py\n+++ b/archinstall/lib/installer/btrfs_snapper_v75.py\n@@ -0,0 +1,15 @@\n+# Archinstall Snapper systemd-boot rollback engine V75\n".to_string(),
+            patch_diff:
+                "--- a/archinstall/lib/installer/btrfs_snapper_v75.py\n+++ b/archinstall/lib/installer/btrfs_snapper_v75.py\n@@ -0,0 +1,15 @@\n+# Archinstall Snapper systemd-boot rollback engine V75\n"
+                    .to_string(),
         }
     }
 }
@@ -266,7 +285,8 @@ impl ArchReflectorGeoIpLatencyAwareMirrorSelectorV75PrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7506,
-            title: "PR Proposal: Reflector GeoIP & HTTP/3 Latency-Aware Mirror Selector V75".to_string(),
+            title: "PR Proposal: Reflector GeoIP & HTTP/3 Latency-Aware Mirror Selector V75"
+                .to_string(),
             subsystem: "System/Reflector".to_string(),
             target_repo: "archlinux/reflector".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -274,7 +294,9 @@ impl ArchReflectorGeoIpLatencyAwareMirrorSelectorV75PrEngine {
                 "Evaluated {} mirrors using GeoIP routing and HTTP/3 QUIC latency probing V75.",
                 self.mirrors_evaluated
             ),
-            patch_diff: "--- a/reflector/mirror_selector_v75.py\n+++ b/reflector/mirror_selector_v75.py\n@@ -0,0 +1,15 @@\n+# Reflector GeoIP HTTP/3 selector V75\n".to_string(),
+            patch_diff:
+                "--- a/reflector/mirror_selector_v75.py\n+++ b/reflector/mirror_selector_v75.py\n@@ -0,0 +1,15 @@\n+# Reflector GeoIP HTTP/3 selector V75\n"
+                    .to_string(),
         }
     }
 }
@@ -316,7 +338,9 @@ impl ArchPacmanCacheMetadataZstdCompressorV75PrEngine {
                 "Saved {} MB of cache space using Zstd level {} dictionary compression V75.",
                 self.space_saved_mb, self.compression_level
             ),
-            patch_diff: "--- a/lib/libalpm/compress_zstd_v75.c\n+++ b/lib/libalpm/compress_zstd_v75.c\n@@ -0,0 +1,15 @@\n+// Pacman Zstd dictionary metadata compressor V75\n".to_string(),
+            patch_diff:
+                "--- a/lib/libalpm/compress_zstd_v75.c\n+++ b/lib/libalpm/compress_zstd_v75.c\n@@ -0,0 +1,15 @@\n+// Pacman Zstd dictionary metadata compressor V75\n"
+                    .to_string(),
         }
     }
 }
@@ -350,7 +374,8 @@ impl ArchisoNetbootEphemeralMemfsLiveBootstrapperV75PrEngine {
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7508,
-            title: "PR Proposal: Archiso PXE HTTP Netboot Ephemeral MemFS Live Bootstrapper V75".to_string(),
+            title: "PR Proposal: Archiso PXE HTTP Netboot Ephemeral MemFS Live Bootstrapper V75"
+                .to_string(),
             subsystem: "ISO/Archiso".to_string(),
             target_repo: "archlinux/archiso".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -358,7 +383,9 @@ impl ArchisoNetbootEphemeralMemfsLiveBootstrapperV75PrEngine {
                 "Bootstrapped PXE HTTP live image into {} GB ephemeral RAM-backed MemFS V75.",
                 self.memfs_ram_allocated_gb
             ),
-            patch_diff: "--- a/archiso/initramfs/hooks/archiso_netboot_v75\n+++ b/archiso/initramfs/hooks/archiso_netboot_v75\n@@ -0,0 +1,15 @@\n+# Archiso PXE HTTP MemFS bootstrapper V75\n".to_string(),
+            patch_diff:
+                "--- a/archiso/initramfs/hooks/archiso_netboot_v75\n+++ b/archiso/initramfs/hooks/archiso_netboot_v75\n@@ -0,0 +1,15 @@\n+# Archiso PXE HTTP MemFS bootstrapper V75\n"
+                    .to_string(),
         }
     }
 }
@@ -386,13 +413,16 @@ impl ArchSecurityTrackerCveMitigationAutomatorV75PrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.cve_database_synced && self.automated_patch_applier && self.vulnerabilities_mitigated > 0
+        self.cve_database_synced
+            && self.automated_patch_applier
+            && self.vulnerabilities_mitigated > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
         ArchLinuxV75PrSpec {
             pr_id: 7509,
-            title: "PR Proposal: Arch Security Tracker CVE Vulnerability Patch Automator V75".to_string(),
+            title: "PR Proposal: Arch Security Tracker CVE Vulnerability Patch Automator V75"
+                .to_string(),
             subsystem: "Security/ArchSecurityTracker".to_string(),
             target_repo: "archlinux/arch-security-tracker".to_string(),
             status: ArchV75PrStatus::Merged,
@@ -400,7 +430,9 @@ impl ArchSecurityTrackerCveMitigationAutomatorV75PrEngine {
                 "Automated PKGBUILD security mitigations resolving {} tracked CVEs V75.",
                 self.vulnerabilities_mitigated
             ),
-            patch_diff: "--- a/tracker/security_patcher_v75.py\n+++ b/tracker/security_patcher_v75.py\n@@ -0,0 +1,15 @@\n+# Arch Security Tracker CVE mitigation automator V75\n".to_string(),
+            patch_diff:
+                "--- a/tracker/security_patcher_v75.py\n+++ b/tracker/security_patcher_v75.py\n@@ -0,0 +1,15 @@\n+# Arch Security Tracker CVE mitigation automator V75\n"
+                    .to_string(),
         }
     }
 }
@@ -428,7 +460,9 @@ impl ArchKeyringWebKeyDirectoryDilithium3RotationV75PrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.wkd_pqc_dilithium3_enabled && self.key_rotation_interval_days > 0 && self.keys_signed_count > 0
+        self.wkd_pqc_dilithium3_enabled
+            && self.key_rotation_interval_days > 0
+            && self.keys_signed_count > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -442,7 +476,9 @@ impl ArchKeyringWebKeyDirectoryDilithium3RotationV75PrEngine {
                 "Rotated and verified {} keys via Dilithium3 PQC WKD every {} days V75.",
                 self.keys_signed_count, self.key_rotation_interval_days
             ),
-            patch_diff: "--- a/keyring/wkd_dilithium3_rotation_v75.sh\n+++ b/keyring/wkd_dilithium3_rotation_v75.sh\n@@ -0,0 +1,15 @@\n+# Keyring WKD Dilithium3 PQC rotation engine V75\n".to_string(),
+            patch_diff:
+                "--- a/keyring/wkd_dilithium3_rotation_v75.sh\n+++ b/keyring/wkd_dilithium3_rotation_v75.sh\n@@ -0,0 +1,15 @@\n+# Keyring WKD Dilithium3 PQC rotation engine V75\n"
+                    .to_string(),
         }
     }
 }
@@ -548,7 +584,10 @@ impl ArchLinuxMissingComponentsV75PrSuite {
         pr.push_str("- Archiso PXE HTTP Netboot Ephemeral MemFS Live Bootstrapper V75\n");
         pr.push_str("- Arch Security Tracker CVE Vulnerability Patch Automator V75\n");
         pr.push_str("- Keyring WKD Dilithium3 Post-Quantum Key Rotation V75\n\n");
-        pr.push_str(&format!("## Gap Closure Score: {}%\n", self.compute_gap_closure_score()));
+        pr.push_str(&format!(
+            "## Gap Closure Score: {}%\n",
+            self.compute_gap_closure_score()
+        ));
         pr
     }
 }
