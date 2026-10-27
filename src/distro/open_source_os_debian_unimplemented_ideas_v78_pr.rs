@@ -28,7 +28,14 @@ use std::string::{String, ToString};
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::distro::debian_github_repo_missing_components_v78_pr::*;
+#[cfg(not(any(feature = "standalone_test", test)))]
+use crate::distro::open_source_os_unimplemented_ideas_v78_pr::*;
+
+#[cfg(any(feature = "standalone_test", test))]
 use crate::debian_github_repo_missing_components_v78_pr::*;
+#[cfg(any(feature = "standalone_test", test))]
 use crate::open_source_os_unimplemented_ideas_v78_pr::*;
 
 #[derive(Debug, Clone)]
