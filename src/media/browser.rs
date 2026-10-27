@@ -3604,7 +3604,11 @@ impl ChromiumBlinkV8IsolateMemoryGovernorEngine {
 
     pub fn audit_isolate_memory_limits(&self) -> (u64, u64, bool) {
         let is_healthy = self.active_allocations_bytes < self.heap_limit_bytes;
-        (self.active_allocations_bytes, self.heap_limit_bytes, is_healthy)
+        (
+            self.active_allocations_bytes,
+            self.heap_limit_bytes,
+            is_healthy,
+        )
     }
 }
 

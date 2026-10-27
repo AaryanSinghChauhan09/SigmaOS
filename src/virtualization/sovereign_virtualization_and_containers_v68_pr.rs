@@ -98,7 +98,11 @@ impl KvmQemuV68Engine {
         spec
     }
 
-    pub fn trigger_live_migration(&mut self, vm_id: &str, target_host: &str) -> Result<String, String> {
+    pub fn trigger_live_migration(
+        &mut self,
+        vm_id: &str,
+        target_host: &str,
+    ) -> Result<String, String> {
         if let Some(vm) = self.vms.iter_mut().find(|v| v.vm_id == vm_id) {
             vm.state = KvmVmStateV68::Migrating;
             Ok(format!("KVM VM '{}' live migration initiated to target host '{}' via TLS dirty-page ring stream", vm_id, target_host))
@@ -161,7 +165,9 @@ pub struct LibvirtDomainV68Engine {
 impl LibvirtDomainV68Engine {
     pub fn new() -> Self {
         let mut engine = Self::default();
-        engine.storage_pools.insert("default".to_string(), "/var/lib/libvirt/images".to_string());
+        engine
+            .storage_pools
+            .insert("default".to_string(), "/var/lib/libvirt/images".to_string());
         engine
     }
 
@@ -365,7 +371,10 @@ impl VirtualBoxBhyveVmmV68Engine {
     }
 
     pub fn format_vbox_vmmdev_ipc(&self, guest_id: &str, channel: &str) -> String {
-        format!("VirtualBox VMMdev Guest Channel IPC: guest '{}' talking to host channel '{}'", guest_id, channel)
+        format!(
+            "VirtualBox VMMdev Guest Channel IPC: guest '{}' talking to host channel '{}'",
+            guest_id, channel
+        )
     }
 
     pub fn generate_pr_manifest(&self) -> VirtualizationV68PrProposalManifest {
