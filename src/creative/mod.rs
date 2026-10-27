@@ -74,7 +74,8 @@ pub mod mediacraft;
 pub mod model3d;
 pub mod pdfcraft;
 pub mod pdfcraft_artcraft_parity_pr;
-// pub mod pdfcraft_missing_components_parity_pr;
+pub mod pdfcraft_missing_components_parity_pr;
+pub mod pdfcraft_artcraft_missing_components_v68_pr;
 pub mod photocraft;
 pub mod photocraft_artcraft_missing_components_v65_pr;
 pub mod photocraft_artcraft_parity_pr;
@@ -224,6 +225,8 @@ pub use pdfcraft::{
     SecuritySettings, ShapeObject, ShapeType, TextAlignment as PdfTextAlignment, TextObject,
 };
 pub use pdfcraft_artcraft_parity_pr::*;
+pub use pdfcraft_missing_components_parity_pr::*;
+pub use pdfcraft_artcraft_missing_components_v68_pr::*;
 pub use photocraft::{
     get_photocraft, init_photocraft, Adjustment, AdjustmentType, Filter, ImageLayer, LayerMask,
     LayerStyle, LayerType, MaskType, PhotoEditor, SelectionTool, SmartFilter,
