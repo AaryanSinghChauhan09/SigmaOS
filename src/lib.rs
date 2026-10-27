@@ -671,6 +671,7 @@ pub mod power;
 pub use power::sovereign_acpi_slit_pr_engine::*;
 pub mod print;
 pub mod printing;
+pub use printing::*;
 pub mod privacy;
 pub mod provisioning;
 pub mod recovery;
