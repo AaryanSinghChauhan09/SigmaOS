@@ -60,7 +60,7 @@ impl fmt::Display for CompressionMethod {
 
 /// Log file configuration
 #[derive(Debug, Clone)]
-pub struct LogFileConfig {
+pub struct SigmaLogFileConfig {
     /// Log file path
     pub path: String,
     /// Rotation policy
@@ -75,7 +75,7 @@ pub struct LogFileConfig {
     pub enabled: bool,
 }
 
-impl LogFileConfig {
+impl SigmaLogFileConfig {
     /// Create a new log file configuration
     pub fn new(path: String, policy: RotationPolicy, rotate_count: u32) -> Self {
         Self {
@@ -110,7 +110,7 @@ impl LogFileConfig {
 /// SigmaLogRotate - Log Rotation Daemon
 pub struct SigmaLogRotate {
     /// Log file configurations (path -> config)
-    configs: BTreeMap<String, LogFileConfig>,
+    configs: BTreeMap<String, SigmaLogFileConfig>,
     /// Running state
     running: bool,
     /// Rotation counter
@@ -143,7 +143,7 @@ impl SigmaLogRotate {
     }
 
     /// Add a log file configuration
-    pub fn add_config(&mut self, config: LogFileConfig) -> Result<(), String> {
+    pub fn add_config(&mut self, config: SigmaLogFileConfig) -> Result<(), String> {
         if self.configs.contains_key(&config.path) {
             return Err(format!("Config for '{}' already exists", config.path));
         }
@@ -161,7 +161,7 @@ impl SigmaLogRotate {
     }
 
     /// Get a log file configuration
-    pub fn get_config(&self, path: &str) -> Option<&LogFileConfig> {
+    pub fn get_config(&self, path: &str) -> Option<&SigmaLogFileConfig> {
         self.configs.get(path)
     }
 
@@ -220,12 +220,12 @@ impl SigmaLogRotate {
     }
 
     /// List all configurations
-    pub fn list_configs(&self) -> Vec<&LogFileConfig> {
+    pub fn list_configs(&self) -> Vec<&SigmaLogFileConfig> {
         self.configs.values().collect()
     }
 
     /// List enabled configurations
-    pub fn list_enabled(&self) -> Vec<&LogFileConfig> {
+    pub fn list_enabled(&self) -> Vec<&SigmaLogFileConfig> {
         self.configs.values().filter(|c| c.enabled).collect()
     }
 
@@ -299,7 +299,7 @@ mod tests {
 
     #[test]
     fn test_log_file_config() {
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
             .with_size_threshold(50)
             .with_compression(CompressionMethod::Gzip)
             .with_enabled(true);
@@ -323,7 +323,7 @@ mod tests {
     fn test_sigmalogrotate_add_config() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         assert!(logrotate.add_config(config).is_ok());
         assert_eq!(logrotate.config_count(), 1);
@@ -333,7 +333,7 @@ mod tests {
     fn test_sigmalogrotate_enable_config() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
             .with_enabled(false);
 
         logrotate.add_config(config).unwrap();
@@ -347,7 +347,7 @@ mod tests {
     fn test_sigmalogrotate_disable_config() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.disable_config("/var/log/syslog").is_ok());
@@ -360,7 +360,7 @@ mod tests {
     fn test_sigmalogrotate_rotate_log() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.rotate_log("/var/log/syslog").is_ok());
@@ -372,7 +372,7 @@ mod tests {
         let mut logrotate = SigmaLogRotate::new();
         logrotate.start();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.rotate_all().is_ok());
@@ -383,7 +383,7 @@ mod tests {
     fn test_sigmalogrotate_list_enabled() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
 
@@ -395,7 +395,7 @@ mod tests {
     fn test_sigmalogrotate_stats() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
 
@@ -410,7 +410,7 @@ mod tests {
 
         let mut logrotate = get_sigmalogrotate().unwrap();
 
-        let config = LogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
 

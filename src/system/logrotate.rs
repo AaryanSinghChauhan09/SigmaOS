@@ -33,7 +33,7 @@ pub enum CompressionType {
 
 /// Log file configuration
 #[derive(Debug, Clone)]
-pub struct LogFileConfig {
+pub struct SysLogFileConfig {
     pub path: String,
     pub schedule: RotationSchedule,
     pub rotate_count: u32, // Number of rotated files to keep
@@ -57,7 +57,7 @@ pub struct LogRotationEntry {
 
 /// Log rotation manager
 pub struct LogRotateManager {
-    pub configs: BTreeMap<String, LogFileConfig>,
+    pub configs: BTreeMap<String, SysLogFileConfig>,
     pub rotated_logs: Vec<LogRotationEntry>,
     pub next_config_id: AtomicU32,
     pub active: AtomicBool,
@@ -79,7 +79,7 @@ impl LogRotateManager {
     }
     
     /// Add log file configuration
-    pub fn add_config(&mut self, path: String, config: LogFileConfig) {
+    pub fn add_config(&mut self, path: String, config: SysLogFileConfig) {
         self.configs.insert(path, config);
     }
     
@@ -162,12 +162,12 @@ impl LogRotateManager {
     }
     
     /// Get configuration
-    pub fn get_config(&self, path: &str) -> Option<&LogFileConfig> {
+    pub fn get_config(&self, path: &str) -> Option<&SysLogFileConfig> {
         self.configs.get(path)
     }
     
     /// Get all configurations
-    pub fn get_all_configs(&self) -> Vec<(&String, &LogFileConfig)> {
+    pub fn get_all_configs(&self) -> Vec<(&String, &SysLogFileConfig)> {
         self.configs.iter().collect()
     }
     
@@ -214,7 +214,7 @@ mod tests {
     #[test]
     fn test_add_config() {
         let mut manager = LogRotateManager::new();
-        let config = LogFileConfig {
+        let config = SysLogFileConfig {
             path: "/var/log/test.log".to_string(),
             schedule: RotationSchedule::Daily,
             rotate_count: 7,
@@ -232,7 +232,7 @@ mod tests {
     #[test]
     fn test_rotate_log() {
         let mut manager = LogRotateManager::new();
-        let config = LogFileConfig {
+        let config = SysLogFileConfig {
             path: "/var/log/test.log".to_string(),
             schedule: RotationSchedule::Daily,
             rotate_count: 7,
@@ -253,7 +253,7 @@ mod tests {
     #[test]
     fn test_should_rotate() {
         let mut manager = LogRotateManager::new();
-        let config = LogFileConfig {
+        let config = SysLogFileConfig {
             path: "/var/log/test.log".to_string(),
             schedule: RotationSchedule::Size(1000),
             rotate_count: 7,
@@ -273,7 +273,7 @@ mod tests {
     #[test]
     fn test_enforce_rotate_count() {
         let mut manager = LogRotateManager::new();
-        let config = LogFileConfig {
+        let config = SysLogFileConfig {
             path: "/var/log/test.log".to_string(),
             schedule: RotationSchedule::Daily,
             rotate_count: 3,
