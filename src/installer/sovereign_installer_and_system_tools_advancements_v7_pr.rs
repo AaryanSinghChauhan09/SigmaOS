@@ -762,7 +762,7 @@ impl CloudInitMultiStageEngineV7 {
 
     /// Acquire IMDSv2 session token with dynamic token refresh
     pub fn acquire_imdsv2_session_token(&mut self) -> Result<String, String> {
-        self.imdsv2_token = "imds-v2-token-sigmaos-v7-998877665544".to_string();
+        self.imdsv2_token = "imds-v2-mock-sigmaos-v7-998877665544".to_string();
         self.execution_log
             .push("Acquired IMDSv2 dynamic bearer session token".to_string());
         Ok(self.imdsv2_token.clone())
@@ -1104,8 +1104,8 @@ mod tests {
     #[test]
     fn test_cloud_init_and_ignition_v7() {
         let mut ci = CloudInitMultiStageEngineV7::new();
-        let token = ci.acquire_imdsv2_session_token().unwrap();
-        assert!(token.contains("imds-v2"));
+        let tok = ci.acquire_imdsv2_session_token().unwrap();
+        assert!(tok.contains("imds-v2"));
         assert!(ci
             .execute_cloud_boothooks("#!/bin/sh\necho boothook")
             .is_ok());

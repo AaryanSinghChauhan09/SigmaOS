@@ -93,7 +93,9 @@ impl SoundcraftNonLinearAnalogVacuumTubeSaturationV67Engine {
     pub fn generate_pr_manifest(&self) -> SoundcraftV67PrProposalManifest {
         SoundcraftV67PrProposalManifest {
             pr_id: 67001,
-            pr_title: String::from("Non-Linear Analog Vacuum Tube Saturation & Tape Modeler Engine"),
+            pr_title: String::from(
+                "Non-Linear Analog Vacuum Tube Saturation & Tape Modeler Engine",
+            ),
             target_subsystem: String::from("creative/soundcraft/analog_modeling"),
             original_suite: String::from("ArtCraft SoundCraft V67 Analog Suite"),
             components_added: vec![
@@ -735,14 +737,19 @@ impl SovereignSoundcraftArtcraftMissingComponentsV67PrGateway {
     pub fn new() -> Self {
         Self {
             vacuum_tube_saturation: SoundcraftNonLinearAnalogVacuumTubeSaturationV67Engine::new(),
-            multiband_mastering: SoundcraftSpectralLookaheadMultibandMasteringCompressorV67Engine::new(),
+            multiband_mastering:
+                SoundcraftSpectralLookaheadMultibandMasteringCompressorV67Engine::new(),
             convolution_reverb: SoundcraftConvolutionAcousticImpulseResponseReverbV67Engine::new(),
             audio_to_midi: SoundcraftRealtimePolyphonicAudioToMidiConversionV67Engine::new(),
             transient_shaper: SoundcraftDualBandTransientPunchShaperV67Engine::new(),
             stem_mixer: SoundcraftAutomatedMultiTrackStemMixerAutoLevelerV67Engine::new(),
             head_tracked_binaural: SoundcraftHeadTracked6DofBinauralSpatialAudioV67Engine::new(),
-            plugin_host: SoundcraftSandboxedVst3ClapPluginHostV67Engine::new("SovereignCompressorV67"),
-            batch_transcoder: SoundcraftBatchAudioFileTranscoderConverterV67Engine::new(AudioCodecFormatV67::FlacLossless),
+            plugin_host: SoundcraftSandboxedVst3ClapPluginHostV67Engine::new(
+                "SovereignCompressorV67",
+            ),
+            batch_transcoder: SoundcraftBatchAudioFileTranscoderConverterV67Engine::new(
+                AudioCodecFormatV67::FlacLossless,
+            ),
             atmos_spatializer: SoundcraftDolbyAtmos714Bed3dObjectSpatializerV67Engine::new(),
         }
     }
@@ -771,7 +778,11 @@ impl SovereignSoundcraftArtcraftMissingComponentsV67PrGateway {
         for manifest in self.collect_all_pr_manifests() {
             md.push_str(&format!(
                 "## PR #{}: {}\n- Target: {}\n- Multiplier: {}\n- Status: {}\n\n",
-                manifest.pr_id, manifest.pr_title, manifest.target_subsystem, manifest.performance_multiplier, manifest.status
+                manifest.pr_id,
+                manifest.pr_title,
+                manifest.target_subsystem,
+                manifest.performance_multiplier,
+                manifest.status
             ));
         }
         md
@@ -880,7 +891,9 @@ mod tests {
 
     #[test]
     fn test_batch_transcoder_engine() {
-        let transcoder = SoundcraftBatchAudioFileTranscoderConverterV67Engine::new(AudioCodecFormatV67::FlacLossless);
+        let transcoder = SoundcraftBatchAudioFileTranscoderConverterV67Engine::new(
+            AudioCodecFormatV67::FlacLossless,
+        );
         let files = vec![String::from("track1"), String::from("track2")];
         let out = transcoder.transcode_file_names(&files);
         assert_eq!(out.len(), 2);
@@ -890,7 +903,14 @@ mod tests {
     #[test]
     fn test_atmos_spatializer_engine() {
         let mut spatializer = SoundcraftDolbyAtmos714Bed3dObjectSpatializerV67Engine::new();
-        spatializer.add_object(1, ObjectSpatialPositionV67 { x: 0.1, y: 0.2, z: 0.3 });
+        spatializer.add_object(
+            1,
+            ObjectSpatialPositionV67 {
+                x: 0.1,
+                y: 0.2,
+                z: 0.3,
+            },
+        );
         assert_eq!(spatializer.total_rendered_channels(), 13);
     }
 
