@@ -91,7 +91,8 @@ impl DesigncraftAiDesignCopilotLayoutSuggestionsV67PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV67PrProposalManifest {
         DesigncraftV67PrProposalManifest {
             pr_id: 6711,
-            pr_title: "feat(designcraft): Add AI Design Copilot Layout Suggestions Engine".to_string(),
+            pr_title: "feat(designcraft): Add AI Design Copilot Layout Suggestions Engine"
+                .to_string(),
             target_subsystem: "DesignCraft AI Copilot Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft AI Studio".to_string(),
             components_added: vec![
@@ -153,10 +154,18 @@ impl DesigncraftVectorBooleanShapeIntersectionMeshV67PrEngine {
         let mut max_y_a = f32::MIN;
 
         for v in &self.vertices_a {
-            if v.x < min_x_a { min_x_a = v.x; }
-            if v.x > max_x_a { max_x_a = v.x; }
-            if v.y < min_y_a { min_y_a = v.y; }
-            if v.y > max_y_a { max_y_a = v.y; }
+            if v.x < min_x_a {
+                min_x_a = v.x;
+            }
+            if v.x > max_x_a {
+                max_x_a = v.x;
+            }
+            if v.y < min_y_a {
+                min_y_a = v.y;
+            }
+            if v.y > max_y_a {
+                max_y_a = v.y;
+            }
         }
 
         let mut min_x_b = f32::MAX;
@@ -165,10 +174,18 @@ impl DesigncraftVectorBooleanShapeIntersectionMeshV67PrEngine {
         let mut max_y_b = f32::MIN;
 
         for v in &self.vertices_b {
-            if v.x < min_x_b { min_x_b = v.x; }
-            if v.x > max_x_b { max_x_b = v.x; }
-            if v.y < min_y_b { min_y_b = v.y; }
-            if v.y > max_y_b { max_y_b = v.y; }
+            if v.x < min_x_b {
+                min_x_b = v.x;
+            }
+            if v.x > max_x_b {
+                max_x_b = v.x;
+            }
+            if v.y < min_y_b {
+                min_y_b = v.y;
+            }
+            if v.y > max_y_b {
+                max_y_b = v.y;
+            }
         }
 
         let inter_min_x = min_x_a.max(min_x_b);
@@ -178,8 +195,14 @@ impl DesigncraftVectorBooleanShapeIntersectionMeshV67PrEngine {
 
         if inter_min_x < inter_max_x && inter_min_y < inter_max_y {
             Some((
-                MeshVertex2D { x: inter_min_x, y: inter_min_y },
-                MeshVertex2D { x: inter_max_x, y: inter_max_y },
+                MeshVertex2D {
+                    x: inter_min_x,
+                    y: inter_min_y,
+                },
+                MeshVertex2D {
+                    x: inter_max_x,
+                    y: inter_max_y,
+                },
             ))
         } else {
             None
@@ -189,7 +212,8 @@ impl DesigncraftVectorBooleanShapeIntersectionMeshV67PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV67PrProposalManifest {
         DesigncraftV67PrProposalManifest {
             pr_id: 6712,
-            pr_title: "feat(designcraft): Add Vector Boolean Shape Intersection Mesh Engine".to_string(),
+            pr_title: "feat(designcraft): Add Vector Boolean Shape Intersection Mesh Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Vector Mesh Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Vector Geometry Studio".to_string(),
             components_added: vec![
@@ -257,11 +281,15 @@ impl DesigncraftResponsiveFluidTypographyClampGridV67PrEngine {
     pub fn export_css_clamp_string(&self) -> String {
         let slope = (self.clamp_spec.max_font_size_px - self.clamp_spec.min_font_size_px)
             / (self.clamp_spec.max_viewport_px - self.clamp_spec.min_viewport_px);
-        let y_axis_intersection = -self.clamp_spec.min_viewport_px * slope + self.clamp_spec.min_font_size_px;
+        let y_axis_intersection =
+            -self.clamp_spec.min_viewport_px * slope + self.clamp_spec.min_font_size_px;
         let vw_val = slope * 100.0;
         format!(
             "clamp({:.2}px, {:.2}px + {:.2}vw, {:.2}px)",
-            self.clamp_spec.min_font_size_px, y_axis_intersection, vw_val, self.clamp_spec.max_font_size_px
+            self.clamp_spec.min_font_size_px,
+            y_axis_intersection,
+            vw_val,
+            self.clamp_spec.max_font_size_px
         )
     }
 
@@ -338,7 +366,8 @@ impl DesigncraftComponentSlotArchitectureCompositionV67PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV67PrProposalManifest {
         DesigncraftV67PrProposalManifest {
             pr_id: 6714,
-            pr_title: "feat(designcraft): Add Component Slot Architecture & Composition Engine".to_string(),
+            pr_title: "feat(designcraft): Add Component Slot Architecture & Composition Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Component Slot Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Component Composition Studio".to_string(),
             components_added: vec![
@@ -440,7 +469,8 @@ impl DesigncraftRealtimeDesignTokenDiffSyncV67PrEngine {
     pub fn update_token(&mut self, token_key: &str, new_value: &str) -> bool {
         let old_value = self.token_store.get(token_key).cloned().unwrap_or_default();
         if old_value != new_value {
-            self.token_store.insert(token_key.to_string(), new_value.to_string());
+            self.token_store
+                .insert(token_key.to_string(), new_value.to_string());
             self.diff_history.push(TokenDiffEntry {
                 token_key: token_key.to_string(),
                 old_value,
@@ -520,7 +550,8 @@ impl DesigncraftColorSpaceLchOklchPaletteSynthesizerV67PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV67PrProposalManifest {
         DesigncraftV67PrProposalManifest {
             pr_id: 6717,
-            pr_title: "feat(designcraft): Add LCH / OKLCH Color Space Palette Synthesizer Engine".to_string(),
+            pr_title: "feat(designcraft): Add LCH / OKLCH Color Space Palette Synthesizer Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Color Synthesizer Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Perceptual Color Studio".to_string(),
             components_added: vec![
@@ -601,7 +632,8 @@ impl DesigncraftMicroInteractionTimelinePhysicsV67PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV67PrProposalManifest {
         DesigncraftV67PrProposalManifest {
             pr_id: 6718,
-            pr_title: "feat(designcraft): Add Micro-Interaction Timeline Physics Animation Engine".to_string(),
+            pr_title: "feat(designcraft): Add Micro-Interaction Timeline Physics Animation Engine"
+                .to_string(),
             target_subsystem: "DesignCraft Animation Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Micro-Interaction Studio".to_string(),
             components_added: vec![
@@ -649,13 +681,22 @@ impl DesigncraftHeadlessCodeExporterTailwindReactV67PrEngine {
     pub fn export_button_component(&self, label: &str, _color_hex: &str) -> String {
         match self.target_framework {
             ExportFrameworkTargetV67::TailwindCss => {
-                format!("<button className=\"px-4 py-2 bg-blue-600 text-white rounded-lg\">{}</button>", label)
+                format!(
+                    "<button className=\"px-4 py-2 bg-blue-600 text-white rounded-lg\">{}</button>",
+                    label
+                )
             }
             ExportFrameworkTargetV67::ReactJsx => {
-                format!("export const Button = () => <button className=\"btn-primary\">{}</button>;", label)
+                format!(
+                    "export const Button = () => <button className=\"btn-primary\">{}</button>;",
+                    label
+                )
             }
             ExportFrameworkTargetV67::Vue3 => {
-                format!("<template><button class=\"btn-primary\">{}</button></template>", label)
+                format!(
+                    "<template><button class=\"btn-primary\">{}</button></template>",
+                    label
+                )
             }
         }
     }
@@ -722,7 +763,9 @@ impl DesigncraftSpatial3dCanvasHapticFeedbackV67PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV67PrProposalManifest {
         DesigncraftV67PrProposalManifest {
             pr_id: 6720,
-            pr_title: "feat(designcraft): Add Spatial 3D Canvas Projection & Haptic Feedback Engine".to_string(),
+            pr_title:
+                "feat(designcraft): Add Spatial 3D Canvas Projection & Haptic Feedback Engine"
+                    .to_string(),
             target_subsystem: "DesignCraft Spatial Haptics Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Spatial Haptic Studio".to_string(),
             components_added: vec![
@@ -765,12 +808,16 @@ impl SovereignDesigncraftArtcraftMissingComponentsV67PrGateway {
     pub fn new() -> Self {
         Self {
             ai_copilot_suggestions: DesigncraftAiDesignCopilotLayoutSuggestionsV67PrEngine::new(),
-            vector_mesh_intersection: DesigncraftVectorBooleanShapeIntersectionMeshV67PrEngine::new(),
+            vector_mesh_intersection: DesigncraftVectorBooleanShapeIntersectionMeshV67PrEngine::new(
+            ),
             fluid_typography_grid: DesigncraftResponsiveFluidTypographyClampGridV67PrEngine::new(),
-            component_slot_architecture: DesigncraftComponentSlotArchitectureCompositionV67PrEngine::new(),
-            subpixel_sdf_font_rasterizer: DesigncraftSubpixelSdfVectorFontRasterizerV67PrEngine::new(),
+            component_slot_architecture:
+                DesigncraftComponentSlotArchitectureCompositionV67PrEngine::new(),
+            subpixel_sdf_font_rasterizer:
+                DesigncraftSubpixelSdfVectorFontRasterizerV67PrEngine::new(),
             realtime_token_diff_sync: DesigncraftRealtimeDesignTokenDiffSyncV67PrEngine::new(),
-            oklch_palette_synthesizer: DesigncraftColorSpaceLchOklchPaletteSynthesizerV67PrEngine::new(),
+            oklch_palette_synthesizer:
+                DesigncraftColorSpaceLchOklchPaletteSynthesizerV67PrEngine::new(),
             micro_interaction_physics: DesigncraftMicroInteractionTimelinePhysicsV67PrEngine::new(),
             headless_code_exporter: DesigncraftHeadlessCodeExporterTailwindReactV67PrEngine::new(
                 ExportFrameworkTargetV67::TailwindCss,
@@ -878,7 +925,10 @@ mod tests {
 
         let res = engine.assign_element_to_slot(slot_id, 42);
         assert!(res.is_ok());
-        assert_eq!(engine.slots.get(&slot_id).unwrap().assigned_element_id, Some(42));
+        assert_eq!(
+            engine.slots.get(&slot_id).unwrap().assigned_element_id,
+            Some(42)
+        );
     }
 
     #[test]
@@ -936,7 +986,10 @@ mod tests {
         let mut engine = DesigncraftSpatial3dCanvasHapticFeedbackV67PrEngine::new();
         let triggered = engine.trigger_haptic_feedback(HapticPatternType::SnapToGrid);
         assert!(triggered);
-        assert_eq!(engine.active_haptic_pattern, Some(HapticPatternType::SnapToGrid));
+        assert_eq!(
+            engine.active_haptic_pattern,
+            Some(HapticPatternType::SnapToGrid)
+        );
     }
 
     #[test]
