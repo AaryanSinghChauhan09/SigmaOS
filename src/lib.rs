@@ -398,6 +398,7 @@ pub mod toolchain {
     pub mod self_host;
     pub mod sovereign_toolchain_development_advancements_pr;
     pub mod sovereign_toolchain_development_advancements_v74_pr;
+    pub mod sovereign_toolchain_development_advancements_v76_pr;
 }
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
@@ -713,6 +714,7 @@ pub mod io;
 
 pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
 pub use crate::desktop::sovereign_de_wm_advancements_v74_pr::*;
+pub use crate::desktop::sovereign_de_wm_advancements_v80_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
 pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
