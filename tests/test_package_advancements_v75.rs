@@ -8,9 +8,9 @@ mod sovereign_distro_package_advancements_v75;
 #[path = "../src/package/sovereign_distro_package_advancements_v75_pr.rs"]
 mod sovereign_distro_package_advancements_v75_pr;
 
+use sovereign_distro_package_advancements_v75::universal::{PackageFormat, PackageState};
 use sovereign_distro_package_advancements_v75::*;
 use sovereign_distro_package_advancements_v75_pr::SovereignDistroPackagePrGatewayV75;
-use sovereign_distro_package_advancements_v75::universal::{PackageFormat, PackageState};
 
 #[test]
 fn test_package_advancements_v75_full_cycle() {
@@ -19,32 +19,92 @@ fn test_package_advancements_v75_full_cycle() {
     assert_eq!(inspector.total_formats_supported, 230);
 
     let formats_to_verify = vec![
-        ("ripgrep-13.0.0-amd64.deb", b"!<arch>".as_slice(), PackageFormat::Deb),
+        (
+            "ripgrep-13.0.0-amd64.deb",
+            b"!<arch>".as_slice(),
+            PackageFormat::Deb,
+        ),
         ("package.air", b"AIR_PAYLOAD".as_slice(), PackageFormat::Air),
-        ("package.bottle", b"BOTTLE_PAYLOAD".as_slice(), PackageFormat::Bottle),
+        (
+            "package.bottle",
+            b"BOTTLE_PAYLOAD".as_slice(),
+            PackageFormat::Bottle,
+        ),
         ("app.ipa", b"IPA_PAYLOAD".as_slice(), PackageFormat::Ipa),
-        ("bsd.ports", b"PORTS_PAYLOAD".as_slice(), PackageFormat::Ports),
+        (
+            "bsd.ports",
+            b"PORTS_PAYLOAD".as_slice(),
+            PackageFormat::Ports,
+        ),
         ("freebsd.pkg", b"PKG_PAYLOAD".as_slice(), PackageFormat::Pkg),
         ("app.aab", b"AAB_PAYLOAD".as_slice(), PackageFormat::Aab),
         ("app.apk", b"APK_PAYLOAD".as_slice(), PackageFormat::Apk),
         ("app.appimage", b"hsqs".as_slice(), PackageFormat::AppImage),
-        ("solus.eopkg", b"EOPKG_PAYLOAD".as_slice(), PackageFormat::Eopkg),
-        ("store.nixpkg", b"NIXPKG_PAYLOAD".as_slice(), PackageFormat::Nixpkg),
-        ("gcc.ebuild", b"EBUILD_PAYLOAD".as_slice(), PackageFormat::Ebuild),
-        ("archive.tar.gz", b"\x1f\x8bPAYLOAD".as_slice(), PackageFormat::TarGz),
-        ("archive.tar .gz", b"\x1f\x8bPAYLOAD".as_slice(), PackageFormat::TarGz),
-        ("archive.xz", b"\xfd\x37\x7a\x58\x5a\x00".as_slice(), PackageFormat::Xz),
-        ("package.rpm", b"\xed\xab\xee\xdb".as_slice(), PackageFormat::Rpm),
-        ("app.flatpak", b"FLATPAK_PAYLOAD".as_slice(), PackageFormat::Flatpak),
+        (
+            "solus.eopkg",
+            b"EOPKG_PAYLOAD".as_slice(),
+            PackageFormat::Eopkg,
+        ),
+        (
+            "store.nixpkg",
+            b"NIXPKG_PAYLOAD".as_slice(),
+            PackageFormat::Nixpkg,
+        ),
+        (
+            "gcc.ebuild",
+            b"EBUILD_PAYLOAD".as_slice(),
+            PackageFormat::Ebuild,
+        ),
+        (
+            "archive.tar.gz",
+            b"\x1f\x8bPAYLOAD".as_slice(),
+            PackageFormat::TarGz,
+        ),
+        (
+            "archive.tar .gz",
+            b"\x1f\x8bPAYLOAD".as_slice(),
+            PackageFormat::TarGz,
+        ),
+        (
+            "archive.xz",
+            b"\xfd\x37\x7a\x58\x5a\x00".as_slice(),
+            PackageFormat::Xz,
+        ),
+        (
+            "package.rpm",
+            b"\xed\xab\xee\xdb".as_slice(),
+            PackageFormat::Rpm,
+        ),
+        (
+            "app.flatpak",
+            b"FLATPAK_PAYLOAD".as_slice(),
+            PackageFormat::Flatpak,
+        ),
         ("app.app", b"APP_PAYLOAD".as_slice(), PackageFormat::App),
         ("app.hap", b"HAP_PAYLOAD".as_slice(), PackageFormat::Hap),
-        ("package.PiSi", b"PISI_PAYLOAD".as_slice(), PackageFormat::Pisi),
-        ("archive.tgz", b"\x1f\x8bPAYLOAD".as_slice(), PackageFormat::TarGz),
-        ("deepin.superdeb", b"SUPERDEB_PAYLOAD".as_slice(), PackageFormat::Superdeb),
+        (
+            "package.PiSi",
+            b"PISI_PAYLOAD".as_slice(),
+            PackageFormat::Pisi,
+        ),
+        (
+            "archive.tgz",
+            b"\x1f\x8bPAYLOAD".as_slice(),
+            PackageFormat::TarGz,
+        ),
+        (
+            "deepin.superdeb",
+            b"SUPERDEB_PAYLOAD".as_slice(),
+            PackageFormat::Superdeb,
+        ),
         ("slax.lzm", b"LZM_PAYLOAD".as_slice(), PackageFormat::Lzm),
         ("pup", b"PUP_PAYLOAD".as_slice(), PackageFormat::Pup),
         ("app.snap", b"b'hsqs'".as_slice(), PackageFormat::Snap),
-        ("pacman", b"\x28\xb5\x2f\xfd".as_slice(), PackageFormat::Pacman),
+        (
+            "pacman",
+            b"\x28\xb5\x2f\xfd".as_slice(),
+            PackageFormat::Pacman,
+        ),
         ("archive.tar", b"TAR_PAYLOAD".as_slice(), PackageFormat::Tar),
         ("package.pet", b"PET_PAYLOAD".as_slice(), PackageFormat::Pet),
     ];
@@ -53,7 +113,11 @@ fn test_package_advancements_v75_full_cycle() {
         let manifest = inspector
             .inspect_package(filename, payload)
             .expect("Failed to inspect package format");
-        assert_eq!(manifest.detected_format, expected_fmt, "Format mismatch for {}", filename);
+        assert_eq!(
+            manifest.detected_format, expected_fmt,
+            "Format mismatch for {}",
+            filename
+        );
         assert_eq!(manifest.provenance.as_ref().unwrap().slsa_level, 4);
     }
 

@@ -27,13 +27,25 @@ pub enum CleanupCategory {
 }
 
 /// Cleanup option
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CleanupOption {
     pub category: CleanupCategory,
     pub name: String,
     pub description: String,
     pub path: String,
     pub enabled: AtomicBool,
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category.clone(),
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 /// Cleanup statistics
@@ -63,14 +75,20 @@ impl SystemCleanupManager {
             active: AtomicBool::new(false),
         }
     }
-    
+
     /// Initialize system cleanup manager
     pub fn init(&mut self) {
         self.active.store(true, Ordering::Relaxed);
     }
-    
+
     /// Add cleanup option
-    pub fn add_option(&mut self, category: CleanupCategory, name: String, description: String, path: String) {
+    pub fn add_option(
+        &mut self,
+        category: CleanupCategory,
+        name: String,
+        description: String,
+        path: String,
+    ) {
         let option = CleanupOption {
             category,
             name,
@@ -80,27 +98,35 @@ impl SystemCleanupManager {
         };
         self.options.push(option);
     }
-    
+
     /// Enable cleanup option
     pub fn enable_option(&mut self, name: &str) -> Result<(), &'static str> {
-        let option = self.options.iter_mut().find(|o| o.name == name).ok_or("Option not found")?;
+        let option = self
+            .options
+            .iter_mut()
+            .find(|o| o.name == name)
+            .ok_or("Option not found")?;
         option.enabled.store(true, Ordering::Relaxed);
         Ok(())
     }
-    
+
     /// Disable cleanup option
     pub fn disable_option(&mut self, name: &str) -> Result<(), &'static str> {
-        let option = self.options.iter_mut().find(|o| o.name == name).ok_or("Option not found")?;
+        let option = self
+            .options
+            .iter_mut()
+            .find(|o| o.name == name)
+            .ok_or("Option not found")?;
         option.enabled.store(false, Ordering::Relaxed);
         Ok(())
     }
-    
+
     /// Run cleanup for enabled options
     pub fn run_cleanup(&mut self) -> CleanupStats {
         let mut files_cleaned = 0;
         let mut bytes_freed = 0;
         let mut errors = 0;
-        
+
         for option in self.options.iter() {
             if option.enabled.load(Ordering::Relaxed) {
                 // Simulate cleanup
@@ -108,36 +134,36 @@ impl SystemCleanupManager {
                 bytes_freed += 1_000_000;
             }
         }
-        
+
         self.stats = CleanupStats {
             files_cleaned,
             bytes_freed,
             errors,
         };
-        
+
         self.stats
     }
-    
+
     /// Run cleanup for specific category
     pub fn cleanup_category(&mut self, category: CleanupCategory) -> CleanupStats {
         let mut files_cleaned = 0;
         let mut bytes_freed = 0;
         let mut errors = 0;
-        
+
         for option in self.options.iter() {
             if option.category == category && option.enabled.load(Ordering::Relaxed) {
                 files_cleaned += 5;
                 bytes_freed += 500_000;
             }
         }
-        
+
         CleanupStats {
             files_cleaned,
             bytes_freed,
             errors,
         }
     }
-    
+
     /// Get options by category
     pub fn get_options_by_category(&self, category: CleanupCategory) -> Vec<&CleanupOption> {
         self.options
@@ -145,17 +171,17 @@ impl SystemCleanupManager {
             .filter(|o| o.category == category)
             .collect()
     }
-    
+
     /// Get all options
     pub fn get_all_options(&self) -> Vec<&CleanupOption> {
         self.options.iter().collect()
     }
-    
+
     /// Get statistics
     pub fn get_stats(&self) -> CleanupStats {
         self.stats
     }
-    
+
     /// Reset statistics
     pub fn reset_stats(&mut self) {
         self.stats = CleanupStats {
@@ -164,7 +190,7 @@ impl SystemCleanupManager {
             errors: 0,
         };
     }
-    
+
     /// Is active
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::Relaxed)
@@ -189,22 +215,20 @@ pub fn init_system_cleanup() {
 
 /// Get global system cleanup manager
 pub fn get_system_cleanup() -> Option<&'static mut SystemCleanupManager> {
-    unsafe {
-        SYSTEM_CLEANUP.as_mut()
-    }
+    unsafe { SYSTEM_CLEANUP.as_mut() }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_system_cleanup_init() {
         let mut manager = SystemCleanupManager::new();
         manager.init();
         assert!(manager.is_active());
     }
-    
+
     #[test]
     fn test_add_option() {
         let mut manager = SystemCleanupManager::new();
@@ -216,7 +240,7 @@ mod tests {
         );
         assert_eq!(manager.options.len(), 1);
     }
-    
+
     #[test]
     fn test_enable_disable_option() {
         let mut manager = SystemCleanupManager::new();
@@ -226,14 +250,14 @@ mod tests {
             "Test".to_string(),
             "/tmp/test".to_string(),
         );
-        
+
         manager.disable_option("Test").unwrap();
         assert!(!manager.options[0].enabled.load(Ordering::Relaxed));
-        
+
         manager.enable_option("Test").unwrap();
         assert!(manager.options[0].enabled.load(Ordering::Relaxed));
     }
-    
+
     #[test]
     fn test_run_cleanup() {
         let mut manager = SystemCleanupManager::new();
@@ -249,12 +273,12 @@ mod tests {
             "Test".to_string(),
             "/tmp/test2".to_string(),
         );
-        
+
         let stats = manager.run_cleanup();
         assert_eq!(stats.files_cleaned, 20);
         assert_eq!(stats.bytes_freed, 2_000_000);
     }
-    
+
     #[test]
     fn test_cleanup_category() {
         let mut manager = SystemCleanupManager::new();
@@ -270,7 +294,7 @@ mod tests {
             "Test".to_string(),
             "/tmp/test2".to_string(),
         );
-        
+
         let stats = manager.cleanup_category(CleanupCategory::Cache);
         assert_eq!(stats.files_cleaned, 5);
     }
