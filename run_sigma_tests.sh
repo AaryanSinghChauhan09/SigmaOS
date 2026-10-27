@@ -1522,6 +1522,12 @@ if [ -f "src/distro/tech_media_component_advancements_v74_pr.rs" ]; then
     ./build/tech_media_v74_test
 fi
 
+if [ -f "src/distro/tech_media_component_advancements_v75_pr.rs" ]; then
+    echo "Running Sovereign Tech Media Component Advancements V75 test suite..."
+    rustc --test src/distro/tech_media_component_advancements_v75_pr.rs --edition=2021 -o build/tech_media_v75_test
+    ./build/tech_media_v75_test
+fi
+
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
     echo "Running Open Source OS Gap Closure test suite..."
     mkdir -p build
