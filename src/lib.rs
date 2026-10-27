@@ -723,6 +723,7 @@ pub use crate::distro::omarchy_linux_missing_components_v69_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v70_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v73_pr::*;
 pub use crate::distro::omarchy_linux_missing_components_v74_pr::*;
+pub use crate::distro::omarchy_linux_missing_components_v75_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v63_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v68_pr::*;
 pub use crate::distro::open_source_os_debian_unimplemented_ideas_v69_pr::*;

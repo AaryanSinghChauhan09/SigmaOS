@@ -920,6 +920,8 @@ pub mod omarchy_linux_missing_components_v73_pr;
 pub use omarchy_linux_missing_components_v73_pr::*;
 pub mod omarchy_linux_missing_components_v74_pr;
 pub use omarchy_linux_missing_components_v74_pr::*;
+pub mod omarchy_linux_missing_components_v75_pr;
+pub use omarchy_linux_missing_components_v75_pr::*;
 pub mod cachy_linux_missing_components_v69_pr;
 pub use cachy_linux_missing_components_v69_pr::*;
 pub mod cachy_linux_missing_components_v70_pr;
