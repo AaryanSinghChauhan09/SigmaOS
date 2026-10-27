@@ -8,14 +8,8 @@ extern crate alloc;
 
 use alloc::vec::Vec;
 
-#[path = "open_source_os_unimplemented_ideas_v80_pr.rs"]
-pub mod open_source_os_unimplemented_ideas_v80_pr;
-
-#[path = "arch_linux_missing_components_v80_pr.rs"]
-pub mod arch_linux_missing_components_v80_pr;
-
-pub use arch_linux_missing_components_v80_pr::*;
-pub use open_source_os_unimplemented_ideas_v80_pr::*;
+use super::arch_linux_missing_components_v80_pr::*;
+use super::open_source_os_unimplemented_ideas_v80_pr::*;
 
 /// Master Gateway unifying Open Source OS Unimplemented Ideas and Arch Linux Missing Components V80 PRs.
 pub struct MasterOpenSourceOsAndArchMissingComponentsV80PrGateway {
