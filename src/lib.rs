@@ -59,6 +59,7 @@ pub use creative::figcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v67_pr::*;
+pub use creative::filmcraft_artcraft_missing_components_v68_pr::*;
 pub use creative::gridcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::gridcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::gridcraft_artcraft_missing_components_v68_pr::*;
