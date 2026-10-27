@@ -50,6 +50,8 @@
 
 <!-- Required for compatibility or specification changes -->
 
+- Upstream study / Reference study:
+- What SigmaOS adopts:
 - POSIX section:
 - Reference behavior (Bash/dash/Zsh/BusyBox/Linux/BSD):
 - SigmaOS current behavior:
@@ -71,6 +73,7 @@
 - [ ] No unbounded recursion or allocation
 - [ ] Interactive terminal state is restored
 - [ ] Script mode does not execute invalid partial input
+- [ ] Kernel safety review / Reviewer checklist
 
 ## Evidence
 
