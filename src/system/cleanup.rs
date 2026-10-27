@@ -27,13 +27,25 @@ pub enum CleanupCategory {
 }
 
 /// Cleanup option
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CleanupOption {
     pub category: CleanupCategory,
     pub name: String,
     pub description: String,
     pub path: String,
     pub enabled: AtomicBool,
+}
+
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 /// Cleanup statistics

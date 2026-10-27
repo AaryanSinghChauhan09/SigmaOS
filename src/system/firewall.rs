@@ -38,7 +38,7 @@ pub enum Direction {
 }
 
 /// Firewall rule
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct FirewallRule {
     pub id: u32,
     pub action: RuleAction,
@@ -48,6 +48,21 @@ pub struct FirewallRule {
     pub from_address: Option<String>,
     pub to_address: Option<String>,
     pub enabled: AtomicBool,
+}
+
+impl Clone for FirewallRule {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id,
+            action: self.action,
+            protocol: self.protocol,
+            direction: self.direction,
+            port: self.port,
+            from_address: self.from_address.clone(),
+            to_address: self.to_address.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
 }
 
 /// Firewall profile
