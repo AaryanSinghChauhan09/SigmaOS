@@ -14,6 +14,7 @@ pub mod sovereign_graphics_display_advancements_pr;
 pub mod sovereign_graphics_display_pr_suite;
 pub mod sovereign_graphics_display_v72_pr;
 pub mod sovereign_graphics_display_v74_pr;
+pub mod sovereign_graphics_display_v76_pr;
 pub mod vector_engine;
 pub mod video;
 pub mod video_editor;
@@ -31,6 +32,7 @@ pub use sovereign_graphics_display_advancements_pr::*;
 pub use sovereign_graphics_display_pr_suite::*;
 pub use sovereign_graphics_display_v72_pr::*;
 pub use sovereign_graphics_display_v74_pr::*;
+pub use sovereign_graphics_display_v76_pr::*;
 pub use video::{PixelRgba, VideoFrame};
 
 // Color type for UI compatibility
