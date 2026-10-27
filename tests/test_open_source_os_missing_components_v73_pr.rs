@@ -35,8 +35,7 @@ fn test_open_source_os_missing_components_v73_pr_suite_full_cycle() {
     let pr_001 = &proposals[0];
     assert_eq!(pr_001.pr_id, "PR-V73-001");
     assert!(pr_001.title.contains("Linux 6.28+"));
-    assert!(pr_001
-        .impacted_subsystems
+    assert!(pr_001        .impacted_subsystems
         .contains(&"KernelScheduling".to_string()));
 
     let pr_002 = &proposals[1];
@@ -64,5 +63,4 @@ fn test_open_source_os_missing_components_v73_pr_suite_full_cycle() {
     assert!(report.contains("Linux 6.28+"));
     assert!(report.contains("FreeBSD 16.2+"));
 
-    assert_eq!(suite.universal_adapter.supported_categories.len(), 44);
-}
+    assert_eq!(suite.universal_adapter.supported_categories.len(), 44);}

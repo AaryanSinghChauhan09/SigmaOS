@@ -120,11 +120,8 @@ impl DebianDpkgTriggersOrderingEngineV71Pr {
             title: "Debian dpkg Trigger Execution Graph & Deferred Action Governor V71".to_string(),
             target_component: "src/distro/debian_dpkg_triggers_v71.rs".to_string(),
             status: "Staged".to_string(),
-            description:
-                "Implements topological dependency ordering and deferred trigger execution."
-                    .to_string(),
-            git_diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n"
-                .to_string(),
+            description: "Implements topological dependency ordering and deferred trigger execution.".to_string(),
+            git_diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n".to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DPKG-TRIGGERS-V71".to_string(),
         }
     }
@@ -220,9 +217,7 @@ impl DebianUsrMergeAliasedSymlinksEngineV71Pr {
             title: "Debian Merged-/usr Symlink Resolution & Migration Engine V71".to_string(),
             target_component: "src/distro/debian_usr_merge_v71.rs".to_string(),
             status: "Staged".to_string(),
-            description:
-                "Enforces canonical merged-/usr path resolution and aliased symlink validation."
-                    .to_string(),
+            description: "Enforces canonical merged-/usr path resolution and aliased symlink validation.".to_string(),
             git_diff_patch: "--- a/usrmerge\n+++ b/usrmerge\n@@ -1,5 +1,10 @@\n".to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-USR-MERGE-V71".to_string(),
         }
@@ -281,11 +276,8 @@ impl DebianAptListbugsSecurityAdvisoryEngineV71Pr {
             title: "Debian apt-listbugs BTS Grave Bug Safety Gate V71".to_string(),
             target_component: "src/distro/debian_apt_listbugs_v71.rs".to_string(),
             status: "Staged".to_string(),
-            description:
-                "Queries Debian BTS for grave/critical bugs and prevents unsafe apt operations."
-                    .to_string(),
-            git_diff_patch: "--- a/apt-listbugs\n+++ b/apt-listbugs\n@@ -1,5 +1,10 @@\n"
-                .to_string(),
+            description: "Queries Debian BTS for grave/critical bugs and prevents unsafe apt operations.".to_string(),
+            git_diff_patch: "--- a/apt-listbugs\n+++ b/apt-listbugs\n@@ -1,5 +1,10 @@\n".to_string(),
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-APT-LISTBUGS-V71".to_string(),
         }
     }

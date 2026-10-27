@@ -91,43 +91,16 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
 
     pub fn populate_default_matrix(&mut self) {
         let os_list = [
-            (
-                "Linux 6.28+",
-                "SchedExt eBPF AI Scheduler & Dynamic Power Governor",
-            ),
-            (
-                "FreeBSD 16.2+",
-                "Capsicum Casper Netlink VNET Micro-Jail Mesh",
-            ),
-            (
-                "OpenBSD 8.8+",
-                "FineIBT CFI Enforcement & Shadow Call Stack PTE Guard",
-            ),
-            (
-                "DragonFly BSD 7.8+",
-                "HAMMER2 PFS Erasure DirectIO Cluster Engine",
-            ),
+            ("Linux 6.28+", "SchedExt eBPF AI Scheduler & Dynamic Power Governor"),
+            ("FreeBSD 16.2+", "Capsicum Casper Netlink VNET Micro-Jail Mesh"),
+            ("OpenBSD 8.8+", "FineIBT CFI Enforcement & Shadow Call Stack PTE Guard"),
+            ("DragonFly BSD 7.8+", "HAMMER2 PFS Erasure DirectIO Cluster Engine"),
             ("NetBSD 12.6", "Rump Hypercall Userland Audio & PCI Router"),
-            (
-                "Haiku R1/Beta 8",
-                "BFS Live Relational Attribute Query Metadata Engine",
-            ),
-            (
-                "Plan 9 / 9front",
-                "Synthetic 9P2000 VFS Namespace Multiplexer & Rfork",
-            ),
-            (
-                "NixOS / GNU Guix",
-                "Hermetic CAS Store Merkle Closure Tree Builder",
-            ),
-            (
-                "Illumos / SmartOS",
-                "Crossbow VNIC Virtual Switch Mesh & DTrace Probes",
-            ),
-            (
-                "Omarchy Linux",
-                "Wallust Dynamic Palette Reloading & Chord Navigator",
-            ),
+            ("Haiku R1/Beta 8", "BFS Live Relational Attribute Query Metadata Engine"),
+            ("Plan 9 / 9front", "Synthetic 9P2000 VFS Namespace Multiplexer & Rfork"),
+            ("NixOS / GNU Guix", "Hermetic CAS Store Merkle Closure Tree Builder"),
+            ("Illumos / SmartOS", "Crossbow VNIC Virtual Switch Mesh & DTrace Probes"),
+            ("Omarchy Linux", "Wallust Dynamic Palette Reloading & Chord Navigator"),
         ];
 
         let categories = [
@@ -191,16 +164,14 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV73 {
                 };
                 self.matrix_entries.insert(key, entry);
                 idx += 1;
-            }
-        }
+            }        }
     }
 
     pub fn generate_matrix_report(&self) -> String {
         let mut report = String::from(
             "# SigmaOS vs Open Source Operating Systems Feature Parity Matrix V73\n\n",
         );
-        report.push_str("| Operating System | Subsystem Category | OS Capability | SigmaOS Parity Status | PR ID |\n");
-        report.push_str("|---|---|---|---|---|\n");
+        report.push_str("| Operating System | Subsystem Category | OS Capability | SigmaOS Parity Status | PR ID |\n");        report.push_str("|---|---|---|---|---|\n");
         for entry in self.matrix_entries.values() {
             report.push_str(&format!(
                 "| {} | {} | {} | {} | {} |\n",
@@ -236,8 +207,7 @@ impl Linux628SchedExtAiPredictivePowerGovernorEngineV73 {
         } else {
             load_samples.iter().sum::<f32>() / load_samples.len() as f32
         };
-        (avg * 4800.0) as u32
-    }
+        (avg * 4800.0) as u32    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -260,8 +230,7 @@ impl Linux628SchedExtAiPredictivePowerGovernorEngineV73 {
 #[derive(Debug, Default)]
 pub struct FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73 {
     pub active_micro_jails: u32,
-    pub netlink_mesh_enabled: bool,
-}
+    pub netlink_mesh_enabled: bool,}
 
 impl FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73 {
     pub fn new() -> Self {
@@ -272,8 +241,7 @@ impl FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73 {
     }
 
     pub fn verify_jail_vnet_isolation(&self, jail_id: u32) -> bool {
-        jail_id < 1024 && self.netlink_mesh_enabled
-    }
+        jail_id < 1024 && self.netlink_mesh_enabled    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -295,8 +263,7 @@ impl FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73 {
 #[derive(Debug, Default)]
 pub struct OpenBsd88FineIbtPinsyscallPteGuardEngineV73 {
     pub shadow_stack_pages: usize,
-    pub fineibt_enforced: bool,
-}
+    pub fineibt_enforced: bool,}
 
 impl OpenBsd88FineIbtPinsyscallPteGuardEngineV73 {
     pub fn new() -> Self {
@@ -307,8 +274,7 @@ impl OpenBsd88FineIbtPinsyscallPteGuardEngineV73 {
     }
 
     pub fn validate_syscall_entry_point(&self, target_addr: u64) -> bool {
-        (target_addr & 0x0000_FFFF_FFFF_F000) != 0 && self.fineibt_enforced
-    }
+        (target_addr & 0x0000_FFFF_FFFF_F000) != 0 && self.fineibt_enforced    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -330,8 +296,7 @@ impl OpenBsd88FineIbtPinsyscallPteGuardEngineV73 {
 #[derive(Debug, Default)]
 pub struct DragonFly78Hammer2DirectIoErasureEngineV73 {
     pub stripe_count: u32,
-    pub redundancy_level: u32,
-}
+    pub redundancy_level: u32,}
 
 impl DragonFly78Hammer2DirectIoErasureEngineV73 {
     pub fn new() -> Self {
@@ -348,8 +313,7 @@ impl DragonFly78Hammer2DirectIoErasureEngineV73 {
                 *p ^= b;
             }
         }
-        parity
-    }
+        parity    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -371,8 +335,7 @@ impl DragonFly78Hammer2DirectIoErasureEngineV73 {
 #[derive(Debug, Default)]
 pub struct NetBsd126RumpUserlandAudioPciRouterEngineV73 {
     pub routed_devices: u32,
-    pub hypercall_latency_ns: u32,
-}
+    pub hypercall_latency_ns: u32,}
 
 impl NetBsd126RumpUserlandAudioPciRouterEngineV73 {
     pub fn new() -> Self {
@@ -383,8 +346,7 @@ impl NetBsd126RumpUserlandAudioPciRouterEngineV73 {
     }
 
     pub fn route_pci_hypercall(&self, dev_id: u32) -> bool {
-        dev_id < self.routed_devices
-    }
+        dev_id < self.routed_devices    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -405,8 +367,7 @@ impl NetBsd126RumpUserlandAudioPciRouterEngineV73 {
 // 7. Haiku BFS Relational Live Query Engine V73
 #[derive(Debug, Default)]
 pub struct HaikuBfsRelationalLiveQueryMetadataEngineV73 {
-    pub indexed_attributes: Vec<String>,
-}
+    pub indexed_attributes: Vec<String>,}
 
 impl HaikuBfsRelationalLiveQueryMetadataEngineV73 {
     pub fn new() -> Self {
@@ -425,8 +386,7 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV73 {
             .iter()
             .filter(|attr| attr.to_lowercase().contains(&query_string.to_lowercase()))
             .cloned()
-            .collect()
-    }
+            .collect()    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -447,22 +407,18 @@ impl HaikuBfsRelationalLiveQueryMetadataEngineV73 {
 // 8. Plan 9 Synthetic 9P2000 VFS Multiplexer Engine V73
 #[derive(Debug, Default)]
 pub struct Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73 {
-    pub mounted_namespaces: u32,
-}
+    pub mounted_namespaces: u32,}
 
 impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73 {
     pub fn new() -> Self {
-        Self {
-            mounted_namespaces: 128,
-        }
+        Self { mounted_namespaces: 128 }
     }
 
     pub fn rfork_namespace(&mut self, flags: u32) -> u32 {
         if flags > 0 {
             self.mounted_namespaces += 1;
         }
-        self.mounted_namespaces
-    }
+        self.mounted_namespaces    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -483,24 +439,20 @@ impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73 {
 // 9. NixOS / Guix Hermetic CAS Merkle Closure Engine V73
 #[derive(Debug, Default)]
 pub struct NixGuixHermeticCasMerkleClosureEngineV73 {
-    pub merkle_roots: Vec<String>,
-}
+    pub merkle_roots: Vec<String>,}
 
 impl NixGuixHermeticCasMerkleClosureEngineV73 {
     pub fn new() -> Self {
         Self {
             merkle_roots: vec![
-                "sha256-a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0"
-                    .to_string(),
-                "sha256-f0e9d8c7b6a543210987654321fedcba0987654321fedcba0987654321fedcba"
-                    .to_string(),
+                "sha256-a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0".to_string(),
+                "sha256-f0e9d8c7b6a543210987654321fedcba0987654321fedcba0987654321fedcba".to_string(),
             ],
         }
     }
 
     pub fn verify_hermetic_closure(&self, hash: &str) -> bool {
-        self.merkle_roots.iter().any(|r| r == hash)
-    }
+        self.merkle_roots.iter().any(|r| r == hash)    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -522,8 +474,7 @@ impl NixGuixHermeticCasMerkleClosureEngineV73 {
 #[derive(Debug, Default)]
 pub struct IllumosCrossbowVnicDtraceSwitchMeshEngineV73 {
     pub active_vnics: u32,
-    pub dtrace_probes_active: bool,
-}
+    pub dtrace_probes_active: bool,}
 
 impl IllumosCrossbowVnicDtraceSwitchMeshEngineV73 {
     pub fn new() -> Self {
@@ -538,8 +489,7 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV73 {
             12
         } else {
             9999
-        }
-    }
+        }    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -561,16 +511,12 @@ impl IllumosCrossbowVnicDtraceSwitchMeshEngineV73 {
 #[derive(Debug, Default)]
 pub struct OmarchyWallustThemeChordNavigatorEngineV73 {
     pub active_theme: String,
-    pub chord_hotkeys: BTreeMap<String, String>,
-}
+    pub chord_hotkeys: BTreeMap<String, String>,}
 
 impl OmarchyWallustThemeChordNavigatorEngineV73 {
     pub fn new() -> Self {
         let mut hotkeys = BTreeMap::new();
-        hotkeys.insert(
-            "Super+Shift+T".to_string(),
-            "toggle_wallust_theme".to_string(),
-        );
+        hotkeys.insert("Super+Shift+T".to_string(), "toggle_wallust_theme".to_string());
         hotkeys.insert("Super+Ctrl+M".to_string(), "open_chord_menu".to_string());
         Self {
             active_theme: "Catppuccin-Mocha".to_string(),
@@ -580,8 +526,7 @@ impl OmarchyWallustThemeChordNavigatorEngineV73 {
 
     pub fn reload_theme(&mut self, new_theme: &str) -> bool {
         self.active_theme = new_theme.to_string();
-        true
-    }
+        true    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -602,46 +547,23 @@ impl OmarchyWallustThemeChordNavigatorEngineV73 {
 // 12. Global Tech Media 33 Portals Unimplemented Ideas Engine V73
 #[derive(Debug, Default)]
 pub struct GlobalTechMedia33PortalUnimplementedIdeasEngineV73 {
-    pub media_portals: Vec<String>,
-}
+    pub media_portals: Vec<String>,}
 
 impl GlobalTechMedia33PortalUnimplementedIdeasEngineV73 {
     pub fn new() -> Self {
         Self {
             media_portals: vec![
-                "Phoronix".to_string(),
-                "Ars Technica".to_string(),
-                "LWN.net".to_string(),
-                "It's FOSS".to_string(),
-                "OMG! Ubuntu!".to_string(),
-                "9to5Linux".to_string(),
-                "Pebble Linux".to_string(),
-                "DistroWatch".to_string(),
-                "OSNews".to_string(),
-                "Slashdot Tech".to_string(),
-                "Hacker News".to_string(),
-                "Reddit r/linux".to_string(),
-                "The Register".to_string(),
-                "Tom's Hardware".to_string(),
-                "AnandTech".to_string(),
-                "ServeTheHome".to_string(),
-                "Phoronix Premium".to_string(),
-                "BSD Now".to_string(),
-                "Daemon News".to_string(),
-                "FreeBSD Journal".to_string(),
-                "OpenBSD Journal".to_string(),
-                "NetBSD Blog".to_string(),
-                "DragonFly Digest".to_string(),
-                "Haiku Gazette".to_string(),
-                "Plan 9 Matrix".to_string(),
-                "Redox Magazine".to_string(),
-                "Fuchsia Weekly".to_string(),
-                "Qubes Security Brief".to_string(),
-                "GamingOnLinux".to_string(),
-                "Linux Today".to_string(),
-                "Linux Magazine".to_string(),
-                "Linux Format".to_string(),
-                "Linux Insider".to_string(),
+                "Phoronix".to_string(), "Ars Technica".to_string(), "LWN.net".to_string(),
+                "It's FOSS".to_string(), "OMG! Ubuntu!".to_string(), "9to5Linux".to_string(),
+                "Pebble Linux".to_string(), "DistroWatch".to_string(), "OSNews".to_string(),
+                "Slashdot Tech".to_string(), "Hacker News".to_string(), "Reddit r/linux".to_string(),
+                "The Register".to_string(), "Tom's Hardware".to_string(), "AnandTech".to_string(),
+                "ServeTheHome".to_string(), "Phoronix Premium".to_string(), "BSD Now".to_string(),
+                "Daemon News".to_string(), "FreeBSD Journal".to_string(), "OpenBSD Journal".to_string(),
+                "NetBSD Blog".to_string(), "DragonFly Digest".to_string(), "Haiku Gazette".to_string(),
+                "Plan 9 Matrix".to_string(), "Redox Magazine".to_string(), "Fuchsia Weekly".to_string(),
+                "Qubes Security Brief".to_string(), "GamingOnLinux".to_string(), "Linux Today".to_string(),
+                "Linux Magazine".to_string(), "Linux Format".to_string(), "Linux Insider".to_string(),
             ],
         }
     }
@@ -652,8 +574,7 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV73 {
         for portal in &self.media_portals {
             wiki.push_str(&format!("- {}\n", portal));
         }
-        wiki
-    }
+        wiki    }
 
     pub fn generate_pr_proposal(&self, pr_id: &str) -> OpenSourceOsPrProposalV73 {
         OpenSourceOsPrProposalV73 {
@@ -735,22 +656,19 @@ impl UniversalSubsystemCrossDistroAdapterEngineV73 {
 }
 
 // 14. Master Suite V73 Coordinator
-#[derive(Debug, Default)]
-pub struct SovereignOpenSourceOsMissingComponentsV73PrSuite {
+#[derive(Debug, Default)]pub struct SovereignOpenSourceOsMissingComponentsV73PrSuite {
     pub comparison_matrix: SigmaOsVsOpenSourceOsComparisonMatrixEngineV73,
     pub linux_sched: Linux628SchedExtAiPredictivePowerGovernorEngineV73,
     pub freebsd_casper: FreeBsd162CapsicumCasperNetlinkMeshVnetEngineV73,
     pub openbsd_fineibt: OpenBsd88FineIbtPinsyscallPteGuardEngineV73,
     pub dragonfly_hammer2: DragonFly78Hammer2DirectIoErasureEngineV73,
     pub netbsd_rump: NetBsd126RumpUserlandAudioPciRouterEngineV73,
-    pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV73,
-    pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73,
+    pub haiku_bfs: HaikuBfsRelationalLiveQueryMetadataEngineV73,    pub plan9_9p: Plan9Synthetic9P2000VfsRforkMultiplexerEngineV73,
     pub nix_guix: NixGuixHermeticCasMerkleClosureEngineV73,
     pub illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV73,
     pub omarchy_wallust: OmarchyWallustThemeChordNavigatorEngineV73,
     pub tech_media: GlobalTechMedia33PortalUnimplementedIdeasEngineV73,
-    pub universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV73,
-}
+    pub universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV73,}
 
 impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
     pub fn new() -> Self {
@@ -767,8 +685,7 @@ impl SovereignOpenSourceOsMissingComponentsV73PrSuite {
             illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV73::new(),
             omarchy_wallust: OmarchyWallustThemeChordNavigatorEngineV73::new(),
             tech_media: GlobalTechMedia33PortalUnimplementedIdeasEngineV73::new(),
-            universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV73::new(),
-        }
+            universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV73::new(),        }
     }
 
     pub fn execute_full_v73_pr_pipeline(&self) -> Vec<OpenSourceOsPrProposalV73> {

@@ -227,9 +227,7 @@ impl FilmcraftSpatialAudioAmbisonicsBinauralV2V67PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV67PrProposalManifest {
         FilmcraftV67PrProposalManifest {
             pr_id: 353,
-            pr_title:
-                "feat(filmcraft): 4th-Order Spatial Audio Ambisonics & Head-Tracked Binaural DSP"
-                    .to_string(),
+            pr_title: "feat(filmcraft): 4th-Order Spatial Audio Ambisonics & Head-Tracked Binaural DSP".to_string(),
             target_subsystem: "3D Spatial Audio Post-Production".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -320,9 +318,7 @@ impl FilmcraftRealtimeDepthMapKeyingRelightingV67PrEngine {
     pub fn generate_proposal(&self) -> FilmcraftV67PrProposalManifest {
         FilmcraftV67PrProposalManifest {
             pr_id: 354,
-            pr_title:
-                "feat(filmcraft): Real-Time Depth Map Keying & 3D Virtual Scene Relighting Engine"
-                    .to_string(),
+            pr_title: "feat(filmcraft): Real-Time Depth Map Keying & 3D Virtual Scene Relighting Engine".to_string(),
             target_subsystem: "Depth Keying & Relighting".to_string(),
             original_suite: "ArtCraft FilmCraft Suite".to_string(),
             components_added: vec![
@@ -593,8 +589,8 @@ impl FilmcraftSubframeAudioPhaseAlignmentCrossfadeV67PrEngine {
 
         for i in 0..count {
             let t = i as f32 / count as f32;
-            let gain_a = ((1.0 - t) * half_pi).sin();
-            let gain_b = (t * half_pi).sin();
+            let gain_a = ( (1.0 - t) * half_pi ).sin();
+            let gain_b = ( t * half_pi ).sin();
 
             let blended = samples_a[i] * gain_a + samples_b[i] * gain_b;
             out_crossfade.push(blended.clamp(-1.0, 1.0));
@@ -717,22 +713,13 @@ impl FilmcraftUniversalNleFcpxmlAafOtioBridgeV67PrEngine {
     pub fn export_timeline_schema(&self, clip_count: usize) -> String {
         match self.target_format {
             InterchangeFormat::Fcpxml => {
-                format!(
-                    "<fcpxml version=\"1.11\"><project name=\"{}\" clips=\"{}\"/></fcpxml>",
-                    self.timeline_name, clip_count
-                )
+                format!("<fcpxml version=\"1.11\"><project name=\"{}\" clips=\"{}\"/></fcpxml>", self.timeline_name, clip_count)
             }
             InterchangeFormat::OpenTimelineIo => {
-                format!(
-                    "{{\"OTIO_SCHEMA\": \"Timeline.1\", \"name\": \"{}\", \"clips\": {}}}",
-                    self.timeline_name, clip_count
-                )
+                format!("{{\"OTIO_SCHEMA\": \"Timeline.1\", \"name\": \"{}\", \"clips\": {}}}", self.timeline_name, clip_count)
             }
             InterchangeFormat::Aaf => {
-                format!(
-                    "AAF_COMPOSITION_HEADER:{}:{}",
-                    self.timeline_name, clip_count
-                )
+                format!("AAF_COMPOSITION_HEADER:{}:{}", self.timeline_name, clip_count)
             }
             InterchangeFormat::Cmx3600Edl => {
                 format!("TITLE: {}\nFCM: DROP FRAME", self.timeline_name)

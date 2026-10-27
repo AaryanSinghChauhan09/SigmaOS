@@ -99,8 +99,7 @@ impl ThreeDCraftTemporalReprojectionDenoisingPrEngine {
                 };
 
                 // Temporal exponential moving average blend
-                let blended = self.history_alpha * history_val
-                    + (1.0 - self.history_alpha) * current_frame[idx];
+                let blended = self.history_alpha * history_val + (1.0 - self.history_alpha) * current_frame[idx];
 
                 // Spatial Bilateral Filter smoothing step over local neighborhood
                 let mut spatial_sum = 0.0f32;
@@ -117,9 +116,7 @@ impl ThreeDCraftTemporalReprojectionDenoisingPrEngine {
                             let spatial_dist_sq = (dx * dx + dy * dy) as f32;
                             let color_diff = (sample_val - blended).abs();
 
-                            let weight = (-spatial_dist_sq / 4.0
-                                - color_diff / self.variance_threshold)
-                                .exp();
+                            let weight = (-spatial_dist_sq / 4.0 - color_diff / self.variance_threshold).exp();
                             spatial_sum += sample_val * weight;
                             weight_sum += weight;
                         }
@@ -293,23 +290,15 @@ impl ThreeDCraftNeuralHairStrandPhysicsPrEngine {
                 curr_pos[1] - prev_pos[1],
                 curr_pos[2] - prev_pos[2],
             ];
-            let dist = (dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2])
-                .sqrt()
-                .max(1e-4);
+            let dist = (dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]).sqrt().max(1e-4);
 
             let rest_len = 0.1f32;
             let stretch_force = (dist - rest_len) * self.bending_stiffness;
 
             // Update velocity with gravity and elastic strain
-            segments[i].velocity[0] = (segments[i].velocity[0]
-                + (gravity[0] - (dir[0] / dist) * stretch_force) * dt)
-                * self.damping;
-            segments[i].velocity[1] = (segments[i].velocity[1]
-                + (gravity[1] - (dir[1] / dist) * stretch_force) * dt)
-                * self.damping;
-            segments[i].velocity[2] = (segments[i].velocity[2]
-                + (gravity[2] - (dir[2] / dist) * stretch_force) * dt)
-                * self.damping;
+            segments[i].velocity[0] = (segments[i].velocity[0] + (gravity[0] - (dir[0] / dist) * stretch_force) * dt) * self.damping;
+            segments[i].velocity[1] = (segments[i].velocity[1] + (gravity[1] - (dir[1] / dist) * stretch_force) * dt) * self.damping;
+            segments[i].velocity[2] = (segments[i].velocity[2] + (gravity[2] - (dir[2] / dist) * stretch_force) * dt) * self.damping;
 
             // Integrate position
             segments[i].position[0] += segments[i].velocity[0] * dt;
@@ -369,7 +358,11 @@ impl ThreeDCraftInverseKinematicsFullBodySkeletonPrEngine {
     }
 
     /// Forward and Backward Reaching Inverse Kinematics (FABRIK) 3D solver.
-    pub fn solve_fabrik_ik(&self, joints: &mut [SkeletonJoint3D], target_pos: [f32; 3]) -> f32 {
+    pub fn solve_fabrik_ik(
+        &self,
+        joints: &mut [SkeletonJoint3D],
+        target_pos: [f32; 3],
+    ) -> f32 {
         if joints.len() < 2 {
             return 0.0;
         }
@@ -394,14 +387,8 @@ impl ThreeDCraftInverseKinematicsFullBodySkeletonPrEngine {
                 let p_next = joints[i + 1].position;
                 let p_curr = joints[i].position;
 
-                let dir = [
-                    p_curr[0] - p_next[0],
-                    p_curr[1] - p_next[1],
-                    p_curr[2] - p_next[2],
-                ];
-                let dist = (dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2])
-                    .sqrt()
-                    .max(1e-4);
+                let dir = [p_curr[0] - p_next[0], p_curr[1] - p_next[1], p_curr[2] - p_next[2]];
+                let dist = (dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]).sqrt().max(1e-4);
                 let target_dist = joints[i].length;
 
                 joints[i].position = [
@@ -417,14 +404,8 @@ impl ThreeDCraftInverseKinematicsFullBodySkeletonPrEngine {
                 let p_curr = joints[i].position;
                 let p_next = joints[i + 1].position;
 
-                let dir = [
-                    p_next[0] - p_curr[0],
-                    p_next[1] - p_curr[1],
-                    p_next[2] - p_curr[2],
-                ];
-                let dist = (dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2])
-                    .sqrt()
-                    .max(1e-4);
+                let dir = [p_next[0] - p_curr[0], p_next[1] - p_curr[1], p_next[2] - p_curr[2]];
+                let dist = (dir[0] * dir[0] + dir[1] * dir[1] + dir[2] * dir[2]).sqrt().max(1e-4);
                 let target_dist = joints[i].length;
 
                 joints[i + 1].position = [
@@ -554,9 +535,7 @@ impl SovereignThreeDCraftAdvancementsV74MasterSuite {
         let current = [1.0f32; 16];
         let motion = [0.0f32; 32];
         let history = [0.8f32; 16];
-        let denoised = self
-            .denoising_engine
-            .reproject_and_filter(&current, &motion, &history, 4, 4);
+        let denoised = self.denoising_engine.reproject_and_filter(&current, &motion, &history, 4, 4);
         let denoising_ok = denoised.len() == 16;
 
         let cluster = MeshCluster {
@@ -566,52 +545,22 @@ impl SovereignThreeDCraftAdvancementsV74MasterSuite {
             triangle_count: 128,
             lod_error: 0.001,
         };
-        let visible =
-            self.virtual_geometry_engine
-                .cull_and_select_lod(&[cluster], [0.0, 0.0, 0.0], 5.0);
+        let visible = self.virtual_geometry_engine.cull_and_select_lod(&[cluster], [0.0, 0.0, 0.0], 5.0);
         let geom_ok = visible.len() == 1;
 
         let mut hair_segments = vec![
-            HairStrandSegment {
-                position: [0.0, 1.0, 0.0],
-                velocity: [0.0, 0.0, 0.0],
-                orientation_quaternion: [1.0, 0.0, 0.0, 0.0],
-                stiffness: 0.8,
-            },
-            HairStrandSegment {
-                position: [0.0, 0.9, 0.0],
-                velocity: [0.0, 0.0, 0.0],
-                orientation_quaternion: [1.0, 0.0, 0.0, 0.0],
-                stiffness: 0.8,
-            },
+            HairStrandSegment { position: [0.0, 1.0, 0.0], velocity: [0.0, 0.0, 0.0], orientation_quaternion: [1.0, 0.0, 0.0, 0.0], stiffness: 0.8 },
+            HairStrandSegment { position: [0.0, 0.9, 0.0], velocity: [0.0, 0.0, 0.0], orientation_quaternion: [1.0, 0.0, 0.0, 0.0], stiffness: 0.8 },
         ];
-        self.hair_physics_engine.step_cosserat_dynamics(
-            &mut hair_segments,
-            [0.0, -9.81, 0.0],
-            0.016,
-        );
+        self.hair_physics_engine.step_cosserat_dynamics(&mut hair_segments, [0.0, -9.81, 0.0], 0.016);
         let hair_ok = hair_segments.len() == 2;
 
         let mut joints = vec![
-            SkeletonJoint3D {
-                position: [0.0, 0.0, 0.0],
-                length: 1.0,
-                max_angle_rad: PI,
-            },
-            SkeletonJoint3D {
-                position: [0.0, 1.0, 0.0],
-                length: 1.0,
-                max_angle_rad: PI,
-            },
-            SkeletonJoint3D {
-                position: [0.0, 2.0, 0.0],
-                length: 0.0,
-                max_angle_rad: PI,
-            },
+            SkeletonJoint3D { position: [0.0, 0.0, 0.0], length: 1.0, max_angle_rad: PI },
+            SkeletonJoint3D { position: [0.0, 1.0, 0.0], length: 1.0, max_angle_rad: PI },
+            SkeletonJoint3D { position: [0.0, 2.0, 0.0], length: 0.0, max_angle_rad: PI },
         ];
-        let error = self
-            .ik_skeleton_engine
-            .solve_fabrik_ik(&mut joints, [0.0, 2.0, 0.0]);
+        let error = self.ik_skeleton_engine.solve_fabrik_ik(&mut joints, [0.0, 2.0, 0.0]);
         let ik_ok = error < 0.1;
 
         let pose = SpatialPose6DoF {
@@ -647,8 +596,7 @@ impl SovereignThreeDCraftAdvancementsV74MasterSuite {
     }
 
     pub fn export_all_pr_manifests_markdown(&self) -> String {
-        let mut markdown =
-            String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering V74 PR Manifest\n\n");
+        let mut markdown = String::from("# 3DCraft Spatial Computing & Advanced 3D Rendering V74 PR Manifest\n\n");
         markdown.push_str("## Staged Pull Request Proposals\n\n");
 
         for pr in self.collect_all_proposals() {
@@ -720,8 +668,7 @@ mod tests {
         }
 
         let markdown = master.export_all_pr_manifests_markdown();
-        assert!(markdown
-            .contains("# 3DCraft Spatial Computing & Advanced 3D Rendering V74 PR Manifest"));
+        assert!(markdown.contains("# 3DCraft Spatial Computing & Advanced 3D Rendering V74 PR Manifest"));
         assert!(markdown.contains("PR #7401"));
         assert!(markdown.contains("PR #7405"));
 
@@ -746,20 +693,8 @@ mod tests {
     fn test_virtual_geometry_nanite_engine() {
         let engine = ThreeDCraftVirtualGeometryNaniteMeshClusterPrEngine::new();
         let clusters = vec![
-            MeshCluster {
-                cluster_id: 0,
-                bounds_center: [0.0, 0.0, 5.0],
-                bounds_radius: 1.0,
-                triangle_count: 128,
-                lod_error: 0.001,
-            },
-            MeshCluster {
-                cluster_id: 1,
-                bounds_center: [0.0, 0.0, 1000.0],
-                bounds_radius: 1.0,
-                triangle_count: 128,
-                lod_error: 0.001,
-            },
+            MeshCluster { cluster_id: 0, bounds_center: [0.0, 0.0, 5.0], bounds_radius: 1.0, triangle_count: 128, lod_error: 0.001 },
+            MeshCluster { cluster_id: 1, bounds_center: [0.0, 0.0, 1000.0], bounds_radius: 1.0, triangle_count: 128, lod_error: 0.001 },
         ];
         let visible = engine.cull_and_select_lod(&clusters, [0.0, 0.0, 0.0], 5.0);
         assert_eq!(visible, vec![0]);
@@ -772,18 +707,8 @@ mod tests {
     fn test_cosserat_hair_physics_engine() {
         let engine = ThreeDCraftNeuralHairStrandPhysicsPrEngine::new();
         let mut segments = vec![
-            HairStrandSegment {
-                position: [0.0, 1.0, 0.0],
-                velocity: [0.0, 0.0, 0.0],
-                orientation_quaternion: [1.0, 0.0, 0.0, 0.0],
-                stiffness: 0.8,
-            },
-            HairStrandSegment {
-                position: [0.0, 0.9, 0.0],
-                velocity: [0.0, 0.0, 0.0],
-                orientation_quaternion: [1.0, 0.0, 0.0, 0.0],
-                stiffness: 0.8,
-            },
+            HairStrandSegment { position: [0.0, 1.0, 0.0], velocity: [0.0, 0.0, 0.0], orientation_quaternion: [1.0, 0.0, 0.0, 0.0], stiffness: 0.8 },
+            HairStrandSegment { position: [0.0, 0.9, 0.0], velocity: [0.0, 0.0, 0.0], orientation_quaternion: [1.0, 0.0, 0.0, 0.0], stiffness: 0.8 },
         ];
         engine.step_cosserat_dynamics(&mut segments, [0.0, -9.81, 0.0], 0.016);
         assert!(segments[1].position[1] < 0.9);
@@ -796,21 +721,9 @@ mod tests {
     fn test_fabrik_ik_skeleton_engine() {
         let engine = ThreeDCraftInverseKinematicsFullBodySkeletonPrEngine::new();
         let mut joints = vec![
-            SkeletonJoint3D {
-                position: [0.0, 0.0, 0.0],
-                length: 1.0,
-                max_angle_rad: PI,
-            },
-            SkeletonJoint3D {
-                position: [0.0, 1.0, 0.0],
-                length: 1.0,
-                max_angle_rad: PI,
-            },
-            SkeletonJoint3D {
-                position: [0.0, 2.0, 0.0],
-                length: 0.0,
-                max_angle_rad: PI,
-            },
+            SkeletonJoint3D { position: [0.0, 0.0, 0.0], length: 1.0, max_angle_rad: PI },
+            SkeletonJoint3D { position: [0.0, 1.0, 0.0], length: 1.0, max_angle_rad: PI },
+            SkeletonJoint3D { position: [0.0, 2.0, 0.0], length: 0.0, max_angle_rad: PI },
         ];
         let err = engine.solve_fabrik_ik(&mut joints, [0.0, 2.0, 0.0]);
         assert!(err < 0.01);

@@ -44,9 +44,9 @@ pub mod figcraft_missing_components_parity_pr;
 pub mod filmcraft;
 pub mod filmcraft_artcraft_missing_components_v65_pr;
 pub mod filmcraft_artcraft_missing_components_v66_pr;
-pub mod filmcraft_artcraft_missing_components_v67_pr;
 pub mod filmcraft_artcraft_parity_pr;
 pub mod filmcraft_lightcraft_mediacraft_artcraft_parity_pr;
+pub mod filmcraft_artcraft_missing_components_v67_pr;
 // pub mod filmcraft_artcraft_parity_pr;
 // pub mod filmcraft_missing_components_parity_pr;
 pub mod fontcraft;
@@ -109,14 +109,15 @@ pub mod wordcraft_missing_components_parity_pr;
 
 pub use anicraft_advancements_v69_pr::*;
 pub use anicraft_artcraft_parity_pr::*;
-pub use anicraft_missing_components_parity_pr::*;
 pub use artcraft_advancements_v75_pr::*;
+pub use anicraft_missing_components_parity_pr::*;
 pub use cadcraft_artcraft_missing_components_v65_pr::*;
 pub use cadcraft_artcraft_missing_components_v67_pr::*;
 pub use cadcraft_artcraft_missing_components_v68_pr::*;
 pub use cadcraft_artcraft_parity_pr::*;
 pub use cadcraft_missing_components_parity_pr::*;
 pub use craftlibs_artcraft_missing_components_v69_pr::*;
+pub use craftlibs_missing_components_parity_pr::*;
 pub use craftlibs_artcraft_parity_pr::{
     CraftlibsArtcraftParityPrSuite, CraftlibsEmbreeBvhRaytracingKernelPrEngine,
     CraftlibsGpuTextureCompressionAstcBtcPrEngine, CraftlibsNeuralSuperResolutionUpscalerPrEngine,
@@ -127,7 +128,6 @@ pub use craftlibs_artcraft_parity_pr::{
     CraftlibsRealtimeCrdtCanvasSyncPrEngine, CraftlibsUniversalFormatTranspilerPrEngine,
     SovereignCraftlibsArtcraftParityPrGateway,
 };
-pub use craftlibs_missing_components_parity_pr::*;
 pub use deckcraft::{
     fnv1a_deckcraft_pr_digest, get_deckcraft, init_deckcraft,
     DeckCraftAnimationTransitionPrDeployer, DeckCraftEngine, DeckCraftMasterPrDeploymentSuite,
@@ -167,9 +167,9 @@ pub use figcraft_artcraft_parity_pr::*;
 pub use figcraft_missing_components_parity_pr::*;
 pub use filmcraft_artcraft_missing_components_v65_pr::*;
 pub use filmcraft_artcraft_missing_components_v66_pr::*;
-pub use filmcraft_artcraft_missing_components_v67_pr::*;
 pub use filmcraft_artcraft_parity_pr::*;
 pub use filmcraft_lightcraft_mediacraft_artcraft_parity_pr::*;
+pub use filmcraft_artcraft_missing_components_v67_pr::*;
 pub use fontcraft_advancements_v77_pr::*;
 pub use fontcraft_artcraft_missing_components_v66_pr::*;
 pub use gridcraft::{

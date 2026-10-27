@@ -39,12 +39,7 @@ impl CmykColor {
 
         let k = 1.0 - rf.max(gf).max(bf);
         if (1.0 - k).abs() < 1e-4 {
-            return Self {
-                c: 0.0,
-                m: 0.0,
-                y: 0.0,
-                k: 1.0,
-            };
+            return Self { c: 0.0, m: 0.0, y: 0.0, k: 1.0 };
         }
 
         let c = (1.0 - rf - k) / (1.0 - k);
@@ -87,13 +82,7 @@ impl SovereignPrintSpooler {
     }
 
     /// Submit a document to the spooler queue
-    pub fn submit_job(
-        &mut self,
-        title: &str,
-        user: &str,
-        copies: u32,
-        raster_data: Vec<u8>,
-    ) -> u32 {
+    pub fn submit_job(&mut self, title: &str, user: &str, copies: u32, raster_data: Vec<u8>) -> u32 {
         let job_id = self.next_job_id;
         self.next_job_id += 1;
 
@@ -131,8 +120,8 @@ impl SovereignPrintSpooler {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use alloc::vec;
+    use super::*;
 
     #[test]
     fn test_printcraft_cmyk_conversion() {

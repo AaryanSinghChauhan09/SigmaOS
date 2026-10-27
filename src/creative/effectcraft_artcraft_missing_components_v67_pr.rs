@@ -66,8 +66,7 @@ impl EffectcraftTemporalNoiseReductionMotionDegrainPrEngine {
                 luma_threshold: 0.15,
                 chroma_threshold: 0.10,
                 temporal_frames: 4,
-                motion_threshold: 0.05,
-            },
+                motion_threshold: 0.05,            },
         }
     }
 
@@ -97,8 +96,7 @@ impl EffectcraftTemporalNoiseReductionMotionDegrainPrEngine {
             }
         }
 
-        Ok(degrained_count)
-    }
+        Ok(degrained_count)    }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV67PrProposalManifest {
         EffectcraftV67PrProposalManifest {
@@ -118,8 +116,7 @@ impl EffectcraftTemporalNoiseReductionMotionDegrainPrEngine {
     }
 }
 
-impl Default for EffectcraftTemporalNoiseReductionMotionDegrainPrEngine {
-    fn default() -> Self {
+impl Default for EffectcraftTemporalNoiseReductionMotionDegrainPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -159,11 +156,8 @@ impl EffectcraftDeepCompositingVolumeZDepthChannelPrEngine {
 
     pub fn composite_deep_samples_front_to_back(&mut self) -> (f32, f32, f32, f32) {
         // Sort samples by z_front ascending
-        self.deep_samples.sort_by(|a, b| {
-            a.z_front
-                .partial_cmp(&b.z_front)
-                .unwrap_or(core::cmp::Ordering::Equal)
-        });
+        self.deep_samples
+            .sort_by(|a, b| a.z_front.partial_cmp(&b.z_front).unwrap_or(core::cmp::Ordering::Equal));
 
         let mut acc_r = 0.0f32;
         let mut acc_g = 0.0f32;
@@ -189,15 +183,13 @@ impl EffectcraftDeepCompositingVolumeZDepthChannelPrEngine {
             acc_g.clamp(0.0, 1.0),
             acc_b.clamp(0.0, 1.0),
             acc_a.clamp(0.0, 1.0),
-        )
-    }
+        )    }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV67PrProposalManifest {
         EffectcraftV67PrProposalManifest {
             pr_id: 6702,
-            pr_title:
-                "feat(effectcraft): Add Deep Alpha & Volume Z-Depth Multi-Channel Compositing"
-                    .to_string(),
+            pr_title: "feat(effectcraft): Add Deep Alpha & Volume Z-Depth Multi-Channel Compositing"
+                .to_string(),
             target_subsystem: "EffectCraft Deep Compositing Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Deep Studio".to_string(),
             components_added: vec![
@@ -205,16 +197,14 @@ impl EffectcraftDeepCompositingVolumeZDepthChannelPrEngine {
                 "VolumetricZDepthSliceCompositor".to_string(),
                 "DeepEXRMultiChannelSplitter".to_string(),
             ],
-            performance_multiplier: "14.2x Deep Pixel Flattening".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: "14.2x Deep Pixel Flattening".to_string(),            status: "Ready for Merge".to_string(),
         }
     }
 }
 
 impl Default for EffectcraftDeepCompositingVolumeZDepthChannelPrEngine {
     fn default() -> Self {
-        Self::new()
-    }
+        Self::new()    }
 }
 
 // ============================================================================
@@ -269,8 +259,7 @@ impl EffectcraftMultiAxisCameraMotionStabilizerPrEngine {
         let avg_dy = (total_dy / count) * self.smoothness_factor;
         let rot_deg = (avg_dx - avg_dy) * 0.1;
 
-        (-avg_dx, -avg_dy, rot_deg)
-    }
+        (-avg_dx, -avg_dy, rot_deg)    }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV67PrProposalManifest {
         EffectcraftV67PrProposalManifest {
@@ -285,14 +274,12 @@ impl EffectcraftMultiAxisCameraMotionStabilizerPrEngine {
                 "GyroscopeMetadataSyncStabilizer".to_string(),
                 "SubPixelWarpCornerPinEstimator".to_string(),
             ],
-            performance_multiplier: "16.8x Real-Time Stabilization".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: "16.8x Real-Time Stabilization".to_string(),            status: "Ready for Merge".to_string(),
         }
     }
 }
 
-impl Default for EffectcraftMultiAxisCameraMotionStabilizerPrEngine {
-    fn default() -> Self {
+impl Default for EffectcraftMultiAxisCameraMotionStabilizerPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -362,8 +349,7 @@ impl EffectcraftPhysicallyBasedGlareLensFlarePrEngine {
             }
         }
 
-        Ok(affected)
-    }
+        Ok(affected)    }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV67PrProposalManifest {
         EffectcraftV67PrProposalManifest {
@@ -383,8 +369,7 @@ impl EffectcraftPhysicallyBasedGlareLensFlarePrEngine {
     }
 }
 
-impl Default for EffectcraftPhysicallyBasedGlareLensFlarePrEngine {
-    fn default() -> Self {
+impl Default for EffectcraftPhysicallyBasedGlareLensFlarePrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -420,11 +405,9 @@ impl EffectcraftProceduralCausticsFluidWaveletShaderPrEngine {
 
     pub fn evaluate_caustics_intensity(&self, x: f32, y: f32, time_sec: f32) -> f32 {
         let wave1 = (x * self.config.wave_frequency + time_sec * self.config.speed).sin();
-        let wave2 =
-            (y * self.config.wave_frequency * 1.3 - time_sec * self.config.speed * 0.8).cos();
+        let wave2 = (y * self.config.wave_frequency * 1.3 - time_sec * self.config.speed * 0.8).cos();
         let intensity = ((wave1 + wave2 + 2.0) * 0.25).powf(2.0);
-        intensity.clamp(0.0, 1.0)
-    }
+        intensity.clamp(0.0, 1.0)    }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV67PrProposalManifest {
         EffectcraftV67PrProposalManifest {
@@ -439,14 +422,12 @@ impl EffectcraftProceduralCausticsFluidWaveletShaderPrEngine {
                 "PhotonicCausticsRefractionSolver".to_string(),
                 "UnderwaterSpectralAbsorptionFilter".to_string(),
             ],
-            performance_multiplier: "19.2x Wavelet Shader Computation".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: "19.2x Wavelet Shader Computation".to_string(),            status: "Ready for Merge".to_string(),
         }
     }
 }
 
-impl Default for EffectcraftProceduralCausticsFluidWaveletShaderPrEngine {
-    fn default() -> Self {
+impl Default for EffectcraftProceduralCausticsFluidWaveletShaderPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -502,8 +483,7 @@ impl EffectcraftNeuralMatteGenerativeObjectEraserPrEngine {
             }
         }
 
-        Ok(erased_pixels)
-    }
+        Ok(erased_pixels)    }
 
     pub fn generate_pr_manifest(&self) -> EffectcraftV67PrProposalManifest {
         EffectcraftV67PrProposalManifest {
@@ -518,14 +498,12 @@ impl EffectcraftNeuralMatteGenerativeObjectEraserPrEngine {
                 "PatchMatchTemporalInpaintSynthesizer".to_string(),
                 "BoundaryDilationMaskFeatheringNode".to_string(),
             ],
-            performance_multiplier: "15.6x Neural Inpainting Inference".to_string(),
-            status: "Ready for Merge".to_string(),
+            performance_multiplier: "15.6x Neural Inpainting Inference".to_string(),            status: "Ready for Merge".to_string(),
         }
     }
 }
 
-impl Default for EffectcraftNeuralMatteGenerativeObjectEraserPrEngine {
-    fn default() -> Self {
+impl Default for EffectcraftNeuralMatteGenerativeObjectEraserPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -597,11 +575,11 @@ impl Default for EffectcraftSpatialStereoscopic3dDepthDisplacementPrEngine {
 /// Audio frequency band spectrum energy descriptor.
 #[derive(Debug, Clone)]
 pub struct AudioSpectrumBands {
-    pub sub_bass: f32,   // 20Hz - 60Hz
-    pub bass: f32,       // 60Hz - 250Hz
-    pub midrange: f32,   // 250Hz - 4kHz
-    pub presence: f32,   // 4kHz - 6kHz
-    pub brilliance: f32, // 6kHz - 20kHz
+    pub sub_bass: f32,  // 20Hz - 60Hz
+    pub bass: f32,      // 60Hz - 250Hz
+    pub midrange: f32,  // 250Hz - 4kHz
+    pub presence: f32,  // 4kHz - 6kHz
+    pub brilliance: f32,// 6kHz - 20kHz
 }
 
 /// Multi-Band Audio Reactive Visualizer & Particle Spectrum Synchronizer PR Engine.
@@ -623,7 +601,14 @@ impl EffectcraftAudioReactiveVfxSpectrumParticlePrEngine {
         }
     }
 
-    pub fn update_audio_spectrum(&mut self, sub: f32, bass: f32, mid: f32, pres: f32, brill: f32) {
+    pub fn update_audio_spectrum(
+        &mut self,
+        sub: f32,
+        bass: f32,
+        mid: f32,
+        pres: f32,
+        brill: f32,
+    ) {
         self.bands.sub_bass = sub.clamp(0.0, 1.0);
         self.bands.bass = bass.clamp(0.0, 1.0);
         self.bands.midrange = mid.clamp(0.0, 1.0);
@@ -791,8 +776,7 @@ impl EffectcraftColorMatchLutPytorchGradingPrEngine {
     }
 }
 
-impl Default for EffectcraftColorMatchLutPytorchGradingPrEngine {
-    fn default() -> Self {
+impl Default for EffectcraftColorMatchLutPytorchGradingPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -813,8 +797,7 @@ pub struct SovereignEffectcraftArtcraftMissingComponentsV67PrGateway {
     pub stereo_3d: EffectcraftSpatialStereoscopic3dDepthDisplacementPrEngine,
     pub audio_vfx: EffectcraftAudioReactiveVfxSpectrumParticlePrEngine,
     pub expressions: EffectcraftExpressionsPythonRiggingAutomationPrEngine,
-    pub color_match: EffectcraftColorMatchLutPytorchGradingPrEngine,
-}
+    pub color_match: EffectcraftColorMatchLutPytorchGradingPrEngine,}
 
 impl SovereignEffectcraftArtcraftMissingComponentsV67PrGateway {
     pub fn new() -> Self {
@@ -828,8 +811,7 @@ impl SovereignEffectcraftArtcraftMissingComponentsV67PrGateway {
             stereo_3d: EffectcraftSpatialStereoscopic3dDepthDisplacementPrEngine::new(),
             audio_vfx: EffectcraftAudioReactiveVfxSpectrumParticlePrEngine::new(),
             expressions: EffectcraftExpressionsPythonRiggingAutomationPrEngine::new(),
-            color_match: EffectcraftColorMatchLutPytorchGradingPrEngine::new(),
-        }
+            color_match: EffectcraftColorMatchLutPytorchGradingPrEngine::new(),        }
     }
 
     pub fn collect_all_pr_manifests(&self) -> Vec<EffectcraftV67PrProposalManifest> {
@@ -843,8 +825,7 @@ impl SovereignEffectcraftArtcraftMissingComponentsV67PrGateway {
             self.stereo_3d.generate_pr_manifest(),
             self.audio_vfx.generate_pr_manifest(),
             self.expressions.generate_pr_manifest(),
-            self.color_match.generate_pr_manifest(),
-        ]
+            self.color_match.generate_pr_manifest(),        ]
     }
 }
 
@@ -892,9 +873,7 @@ mod tests {
         let curr = vec![100, 100, 100, 255];
         let prev = vec![102, 102, 102, 255];
         let mut out = vec![0u8; 4];
-        let count = engine
-            .process_degrain_frame(&curr, &prev, &mut out)
-            .unwrap();
+        let count = engine.process_degrain_frame(&curr, &prev, &mut out).unwrap();
         assert_eq!(count, 4);
         assert_eq!(out[0], 101);
     }
@@ -972,13 +951,11 @@ mod tests {
     #[test]
     fn test_color_match_pytorch_grading() {
         let engine = EffectcraftColorMatchLutPytorchGradingPrEngine::new();
-        let (r, g, b) = engine.apply_neural_lut_transform(0.5, 0.5, 0.5);
-        assert!(r > 0.0 && g > 0.0 && b > 0.0);
+        let (r, g, b) = engine.apply_neural_lut_transform(0.5, 0.5, 0.5);        assert!(r > 0.0 && g > 0.0 && b > 0.0);
     }
 
     #[test]
-    fn test_master_gateway_and_suite() {
-        let gateway = SovereignEffectcraftArtcraftMissingComponentsV67PrGateway::new();
+    fn test_master_gateway_and_suite() {        let gateway = SovereignEffectcraftArtcraftMissingComponentsV67PrGateway::new();
         let manifests = gateway.collect_all_pr_manifests();
         assert_eq!(manifests.len(), 10);
 

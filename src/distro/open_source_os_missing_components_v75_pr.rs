@@ -96,18 +96,12 @@ impl ExtendedBsdParityEngineV75 {
 
     pub fn configure_ghostbsd_station_tweak(&mut self, ssid: &str) -> String {
         self.ghostbsd_netmgr_configured = true;
-        format!(
-            "GhostBSD Netmgr: Associated interface wlan0 with SSID '{}' and station tweaks",
-            ssid
-        )
+        format!("GhostBSD Netmgr: Associated interface wlan0 with SSID '{}' and station tweaks", ssid)
     }
 
     pub fn mount_nomadbsd_persistence(&mut self, pool: &str) -> String {
         self.nomadbsd_zfs_persistence_active = true;
-        format!(
-            "NomadBSD: Mounted persistent ZFS overlay pool '{}' onto /data",
-            pool
-        )
+        format!("NomadBSD: Mounted persistent ZFS overlay pool '{}' onto /data", pool)
     }
 
     pub fn verify_hardenedbsd_security(&self) -> bool {
@@ -117,24 +111,16 @@ impl ExtendedBsdParityEngineV75 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV75 {
         OpenSourceOsPrProposalV75 {
             pr_id: "PR-SIGMA-V75-01-EXT-BSD".to_string(),
-            title:
-                "feat(bsd): Extended BSD Ecosystem Parity Suite (Ghost, Nomad, Midnight, Hardened)"
-                    .to_string(),
+            title: "feat(bsd): Extended BSD Ecosystem Parity Suite (Ghost, Nomad, Midnight, Hardened)".to_string(),
             component_name: "sigmaos-extended-bsd-engine".to_string(),
             os_origin: "GhostBSD / NomadBSD / MidnightBSD / HardenedBSD".to_string(),
             status: OsPrStatusV75::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::Networking.as_str().to_string(),
-                UniversalSubsystemCategory::FilesystemStorage
-                    .as_str()
-                    .to_string(),
-                UniversalSubsystemCategory::SecuritySandboxing
-                    .as_str()
-                    .to_string(),
+                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
             ],
-            patch_diff:
-                "diff --git a/sys/bsd/extended_parity_v75.rs b/sys/bsd/extended_parity_v75.rs"
-                    .to_string(),
+            patch_diff: "diff --git a/sys/bsd/extended_parity_v75.rs b/sys/bsd/extended_parity_v75.rs".to_string(),
         }
     }
 }
@@ -175,34 +161,10 @@ impl DosAndLegacyCompatibilityEngineV75 {
 
     pub fn dispatch_int21h(&mut self, ah_function: u8, dx_param: u16) -> (u8, String) {
         match ah_function {
-            0x09 => (
-                0,
-                format!(
-                    "DOS Int 21h AH=09h: Print string at offset 0x{:04X}",
-                    dx_param
-                ),
-            ),
-            0x25 => (
-                0,
-                format!(
-                    "DOS Int 21h AH=25h: Set interrupt vector to 0x{:04X}",
-                    dx_param
-                ),
-            ),
-            0x4C => (
-                0,
-                format!(
-                    "DOS Int 21h AH=4Ch: Terminate process with return code {}",
-                    dx_param & 0xFF
-                ),
-            ),
-            _ => (
-                0,
-                format!(
-                    "DOS Int 21h AH=0x{:02X}: Handled via V86 NTVDM fallback",
-                    ah_function
-                ),
-            ),
+            0x09 => (0, format!("DOS Int 21h AH=09h: Print string at offset 0x{:04X}", dx_param)),
+            0x25 => (0, format!("DOS Int 21h AH=25h: Set interrupt vector to 0x{:04X}", dx_param)),
+            0x4C => (0, format!("DOS Int 21h AH=4Ch: Terminate process with return code {}", dx_param & 0xFF)),
+            _ => (0, format!("DOS Int 21h AH=0x{:02X}: Handled via V86 NTVDM fallback", ah_function)),
         }
     }
 
@@ -213,24 +175,16 @@ impl DosAndLegacyCompatibilityEngineV75 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV75 {
         OpenSourceOsPrProposalV75 {
             pr_id: "PR-SIGMA-V75-02-DOS-LEGACY".to_string(),
-            title: "feat(compat): FreeDOS, MS-DOS, BASIC, and ReactOS NTVDM Subsystem Bridge"
-                .to_string(),
+            title: "feat(compat): FreeDOS, MS-DOS, BASIC, and ReactOS NTVDM Subsystem Bridge".to_string(),
             component_name: "sigmaos-dos-compatibility-engine".to_string(),
             os_origin: "FreeDOS / MS-DOS / ReactOS NTVDM".to_string(),
             status: OsPrStatusV75::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage
-                    .as_str()
-                    .to_string(),
-                UniversalSubsystemCategory::MemoryVirtualization
-                    .as_str()
-                    .to_string(),
-                UniversalSubsystemCategory::VirtualizationHypervisor
-                    .as_str()
-                    .to_string(),
+                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
+                UniversalSubsystemCategory::MemoryVirtualization.as_str().to_string(),
+                UniversalSubsystemCategory::VirtualizationHypervisor.as_str().to_string(),
             ],
-            patch_diff: "diff --git a/sys/dos/ntvdm_bridge_v75.rs b/sys/dos/ntvdm_bridge_v75.rs"
-                .to_string(),
+            patch_diff: "diff --git a/sys/dos/ntvdm_bridge_v75.rs b/sys/dos/ntvdm_bridge_v75.rs".to_string(),
         }
     }
 }
@@ -267,25 +221,11 @@ impl MultiKernelArchitectureSynthesisEngineV75 {
 
     pub fn route_kernel_primitive(&self, kernel_type: &str) -> String {
         match kernel_type {
-            "Linux" => {
-                "Linux Monolithic: eBPF in-kernel sandbox & io_uring dispatch active".to_string()
-            }
-            "GNU" | "Hurd" => format!(
-                "GNU Hurd Microkernel: Mach 3.0 IPC active with {} translator ports",
-                self.gnu_hurd_mach_ports_mapped
-            ),
-            "Minix" => {
-                "Minix 3 Microkernel: Reincarnation Server self-healing driver monitoring active"
-                    .to_string()
-            }
-            "ReactOS" => format!(
-                "ReactOS NTOSKRNL: I/O Request Packet (IRP) manager depth {}",
-                self.reactos_ntoskrnl_irp_queue_depth
-            ),
-            "XNU" => {
-                "Apple XNU: Hybrid Mach microkernel IPC + BSD POSIX layer + I/O Kit runtime active"
-                    .to_string()
-            }
+            "Linux" => "Linux Monolithic: eBPF in-kernel sandbox & io_uring dispatch active".to_string(),
+            "GNU" | "Hurd" => format!("GNU Hurd Microkernel: Mach 3.0 IPC active with {} translator ports", self.gnu_hurd_mach_ports_mapped),
+            "Minix" => "Minix 3 Microkernel: Reincarnation Server self-healing driver monitoring active".to_string(),
+            "ReactOS" => format!("ReactOS NTOSKRNL: I/O Request Packet (IRP) manager depth {}", self.reactos_ntoskrnl_irp_queue_depth),
+            "XNU" => "Apple XNU: Hybrid Mach microkernel IPC + BSD POSIX layer + I/O Kit runtime active".to_string(),
             _ => "Universal Microkernel Gateway: Fallback to SigmaOS native VFS gate".to_string(),
         }
     }
@@ -340,12 +280,7 @@ impl UniversalLinuxDistroParityEngineV75 {
             elementary_granite_widgets: true,
             endeavouros_mirror_rank: 1,
             fedora_ostree_sysroot_sealed: true,
-            gentoo_portage_use_flags: vec![
-                "pie".to_string(),
-                "hardened".to_string(),
-                "zstd".to_string(),
-                "ebpf".to_string(),
-            ],
+            gentoo_portage_use_flags: vec!["pie".to_string(), "hardened".to_string(), "zstd".to_string(), "ebpf".to_string()],
             kali_ebpf_forensics_active: true,
             mint_xapps_integrated: true,
             omarchy_wallust_hyprland_ready: true,
@@ -431,34 +366,13 @@ impl OfficeProductivitySuitesParityEngineV75 {
 
     pub fn process_document(&self, module: &str, title: &str) -> String {
         match module {
-            "Writer" => format!(
-                "Office Writer: Document '{}' formatted with typography and ODF/DOCX parser",
-                title
-            ),
-            "Calc" => format!(
-                "Office Calc: Sheet '{}' calculated with SIMD vectorized formulas and pivot tables",
-                title
-            ),
-            "Impress" => format!(
-                "Office Impress: Presentation '{}' staged with {} slide masters",
-                title, self.impress_slide_master_count
-            ),
-            "Draw" => format!(
-                "Office Draw: Diagram '{}' vectorized with Bézier precision {:.4}",
-                title, self.draw_bezier_curve_accuracy
-            ),
-            "Math" => format!(
-                "Office Math: Formula '{}' rendered via MathML / TeX typography engine",
-                title
-            ),
-            "Base" => format!(
-                "Office Base: Relational database frontend connected for '{}'",
-                title
-            ),
-            _ => format!(
-                "Office Craft Suite: Mapped '{}' to unified CraftLibs memory workspace",
-                title
-            ),
+            "Writer" => format!("Office Writer: Document '{}' formatted with typography and ODF/DOCX parser", title),
+            "Calc" => format!("Office Calc: Sheet '{}' calculated with SIMD vectorized formulas and pivot tables", title),
+            "Impress" => format!("Office Impress: Presentation '{}' staged with {} slide masters", title, self.impress_slide_master_count),
+            "Draw" => format!("Office Draw: Diagram '{}' vectorized with Bézier precision {:.4}", title, self.draw_bezier_curve_accuracy),
+            "Math" => format!("Office Math: Formula '{}' rendered via MathML / TeX typography engine", title),
+            "Base" => format!("Office Base: Relational database frontend connected for '{}'", title),
+            _ => format!("Office Craft Suite: Mapped '{}' to unified CraftLibs memory workspace", title),
         }
     }
 
@@ -513,20 +427,14 @@ impl RdbmsDataEngineeringParityEngineV75 {
 
     pub fn execute_query_pipeline(&mut self, query: &str, is_analytical: bool) -> String {
         if is_analytical {
-            format!(
-                "DuckDB + Apache Arrow: Executed analytical query '{}' across {} record batches",
-                query, self.arrow_datafusion_record_batches
-            )
+            format!("DuckDB + Apache Arrow: Executed analytical query '{}' across {} record batches", query, self.arrow_datafusion_record_batches)
         } else {
             format!("PostgreSQL Wire v3: Executed OLTP transactional statement '{}' with MVCC isolation", query)
         }
     }
 
     pub fn introspect_schema(&self) -> String {
-        format!(
-            "DBeaver Universal Navigator: {} table schemas indexed in metadata catalog",
-            self.dbeaver_metadata_catalog_size
-        )
+        format!("DBeaver Universal Navigator: {} table schemas indexed in metadata catalog", self.dbeaver_metadata_catalog_size)
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV75 {
@@ -591,35 +499,14 @@ impl DeveloperToolsAndAiAgentsParityEngineV75 {
     pub fn trigger_tool_action(&mut self, tool: &str) -> String {
         match tool {
             "Blender" => "Blender: Headless Python 3D rendering pipeline initialized".to_string(),
-            "Cline" => format!(
-                "Cline: Running autonomous execution plan across {} iteration loops",
-                self.cline_autonomous_loops
-            ),
-            "CrewAI" => format!(
-                "CrewAI: Orchestrating team of {} hierarchical agents with shared goals",
-                self.crewai_hierarchical_agents
-            ),
-            "Docker" => {
-                "Docker: OCI containerd daemon bridge active on /var/run/docker.sock".to_string()
-            }
-            "LangChain" | "Hermes" => format!(
-                "Hermes & LangChain: Executing RAG retrieval chain with {} memory steps",
-                self.hermes_langchain_chains_count
-            ),
-            "Notepad++" => {
-                "Notepad++: Scintilla text buffer ready with high-speed regex engine".to_string()
-            }
-            "OpenClaw" => format!(
-                "OpenClaw: {} robotic actuators and telemetry sensors calibrated",
-                self.openclaw_robotic_actuators_online
-            ),
-            "VLC" => {
-                "VLC: LibVLC media pipeline loaded with hardware-accelerated codecs".to_string()
-            }
-            "Warp" => format!(
-                "Warp: Modern terminal session active with {} block history slots",
-                self.warp_modern_terminal_blocks
-            ),
+            "Cline" => format!("Cline: Running autonomous execution plan across {} iteration loops", self.cline_autonomous_loops),
+            "CrewAI" => format!("CrewAI: Orchestrating team of {} hierarchical agents with shared goals", self.crewai_hierarchical_agents),
+            "Docker" => "Docker: OCI containerd daemon bridge active on /var/run/docker.sock".to_string(),
+            "LangChain" | "Hermes" => format!("Hermes & LangChain: Executing RAG retrieval chain with {} memory steps", self.hermes_langchain_chains_count),
+            "Notepad++" => "Notepad++: Scintilla text buffer ready with high-speed regex engine".to_string(),
+            "OpenClaw" => format!("OpenClaw: {} robotic actuators and telemetry sensors calibrated", self.openclaw_robotic_actuators_online),
+            "VLC" => "VLC: LibVLC media pipeline loaded with hardware-accelerated codecs".to_string(),
+            "Warp" => format!("Warp: Modern terminal session active with {} block history slots", self.warp_modern_terminal_blocks),
             _ => "Universal Developer Gateway: Standard CLI pipeline engaged".to_string(),
         }
     }

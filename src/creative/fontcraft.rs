@@ -253,15 +253,8 @@ impl FontCraftMsdfVectorRasterizerPrDeployer {
     }
 
     /// Compute multi-channel signed distance (R, G, B) for a sample point against line segment
-    pub fn generate_msdf_sample(
-        &self,
-        px: f32,
-        py: f32,
-        segment: (f32, f32, f32, f32),
-    ) -> (f32, f32, f32) {
-        let dist = SovereignFontEngine::point_segment_distance(
-            px, py, segment.0, segment.1, segment.2, segment.3,
-        );
+    pub fn generate_msdf_sample(&self, px: f32, py: f32, segment: (f32, f32, f32, f32)) -> (f32, f32, f32) {
+        let dist = SovereignFontEngine::point_segment_distance(px, py, segment.0, segment.1, segment.2, segment.3);
         let r_dist = (dist * 0.95).clamp(0.0, 1.0);
         let g_dist = dist.clamp(0.0, 1.0);
         let b_dist = (dist * 1.05).clamp(0.0, 1.0);
@@ -310,13 +303,7 @@ impl FontCraftVariableFontInterpolationPrDeployer {
     }
 
     /// Interpolate font design axis coordinate delta based on target value
-    pub fn interpolate_axis_delta(
-        &self,
-        default_val: f32,
-        axis_val: f32,
-        min_val: f32,
-        max_val: f32,
-    ) -> f32 {
+    pub fn interpolate_axis_delta(&self, default_val: f32, axis_val: f32, min_val: f32, max_val: f32) -> f32 {
         if max_val <= min_val {
             return 0.0;
         }
@@ -363,12 +350,7 @@ impl FontCraftColorEmojiCompositorPrDeployer {
     }
 
     /// Composite two RGBA color layers using source-over alpha blending
-    pub fn composite_colrv1_layer(
-        &self,
-        base_color: (u8, u8, u8),
-        layer_color: (u8, u8, u8),
-        opacity: f32,
-    ) -> (u8, u8, u8) {
+    pub fn composite_colrv1_layer(&self, base_color: (u8, u8, u8), layer_color: (u8, u8, u8), opacity: f32) -> (u8, u8, u8) {
         let alpha = opacity.clamp(0.0, 1.0);
         let r = (base_color.0 as f32 * (1.0 - alpha) + layer_color.0 as f32 * alpha) as u8;
         let g = (base_color.1 as f32 * (1.0 - alpha) + layer_color.1 as f32 * alpha) as u8;
@@ -492,8 +474,7 @@ impl FontCraftMasterPrDeploymentSuite {
 
     /// Export Markdown PR manifest
     pub fn export_all_pr_specs_markdown(&self) -> String {
-        let mut md =
-            String::from("# FontCraft Typography & Vector Font PR Deployment Manifest\n\n");
+        let mut md = String::from("# FontCraft Typography & Vector Font PR Deployment Manifest\n\n");
         for spec in self.collect_all_pr_specs() {
             let digest = fnv1a_fontcraft_pr_digest(spec.pr_id, &spec.title);
             md.push_str(&format!(
@@ -604,11 +585,10 @@ mod tests {
         let shaped = deployer.shape_text_run("fine flag");
         assert_eq!(shaped[0], (0xFB01, 550)); // 'fi' ligature
 
-        let spans =
-            deployer.reorder_bidi_spans("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
+        let spans = deployer.reorder_bidi_spans("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
         assert_eq!(spans.len(), 2);
         assert!(!spans[0].1); // LTR
-        assert!(spans[1].1); // RTL
+        assert!(spans[1].1);  // RTL
     }
 
     #[test]

@@ -84,30 +84,10 @@ impl FigcraftAiGenerativeUiLayoutConstraintMeshEngineV66 {
                 mesh_id: 1,
                 layout_type: "Dashboard".to_string(),
                 vertices: vec![
-                    LayoutMeshVertexV66 {
-                        id: 0,
-                        x: 0.0,
-                        y: 0.0,
-                        weight: 1.0,
-                    },
-                    LayoutMeshVertexV66 {
-                        id: 1,
-                        x: 100.0,
-                        y: 0.0,
-                        weight: 1.0,
-                    },
-                    LayoutMeshVertexV66 {
-                        id: 2,
-                        x: 100.0,
-                        y: 100.0,
-                        weight: 1.0,
-                    },
-                    LayoutMeshVertexV66 {
-                        id: 3,
-                        x: 0.0,
-                        y: 100.0,
-                        weight: 1.0,
-                    },
+                    LayoutMeshVertexV66 { id: 0, x: 0.0, y: 0.0, weight: 1.0 },
+                    LayoutMeshVertexV66 { id: 1, x: 100.0, y: 0.0, weight: 1.0 },
+                    LayoutMeshVertexV66 { id: 2, x: 100.0, y: 100.0, weight: 1.0 },
+                    LayoutMeshVertexV66 { id: 3, x: 0.0, y: 100.0, weight: 1.0 },
                 ],
                 grid_rows: 2,
                 grid_cols: 2,
@@ -330,38 +310,10 @@ impl FigcraftMultiColorGradientMesh3dLightingEngineV66 {
     pub fn new() -> Self {
         Self {
             gradient_points: vec![
-                MeshGradientPointV66 {
-                    u: 0.0,
-                    v: 0.0,
-                    r: 255,
-                    g: 0,
-                    b: 128,
-                    a: 255,
-                },
-                MeshGradientPointV66 {
-                    u: 1.0,
-                    v: 0.0,
-                    r: 0,
-                    g: 200,
-                    b: 255,
-                    a: 255,
-                },
-                MeshGradientPointV66 {
-                    u: 0.0,
-                    v: 1.0,
-                    r: 255,
-                    g: 220,
-                    b: 0,
-                    a: 255,
-                },
-                MeshGradientPointV66 {
-                    u: 1.0,
-                    v: 1.0,
-                    r: 100,
-                    g: 0,
-                    b: 255,
-                    a: 255,
-                },
+                MeshGradientPointV66 { u: 0.0, v: 0.0, r: 255, g: 0, b: 128, a: 255 },
+                MeshGradientPointV66 { u: 1.0, v: 0.0, r: 0, g: 200, b: 255, a: 255 },
+                MeshGradientPointV66 { u: 0.0, v: 1.0, r: 255, g: 220, b: 0, a: 255 },
+                MeshGradientPointV66 { u: 1.0, v: 1.0, r: 100, g: 0, b: 255, a: 255 },
             ],
             main_light: DirectionalLight3dV66 {
                 dir_x: 0.577,
@@ -378,18 +330,9 @@ impl FigcraftMultiColorGradientMesh3dLightingEngineV66 {
         let p2 = &self.gradient_points[2];
         let p3 = &self.gradient_points[3];
 
-        let r = (1.0 - u) * (1.0 - v) * p0.r as f32
-            + u * (1.0 - v) * p1.r as f32
-            + (1.0 - u) * v * p2.r as f32
-            + u * v * p3.r as f32;
-        let g = (1.0 - u) * (1.0 - v) * p0.g as f32
-            + u * (1.0 - v) * p1.g as f32
-            + (1.0 - u) * v * p2.g as f32
-            + u * v * p3.g as f32;
-        let b = (1.0 - u) * (1.0 - v) * p0.b as f32
-            + u * (1.0 - v) * p1.b as f32
-            + (1.0 - u) * v * p2.b as f32
-            + u * v * p3.b as f32;
+        let r = (1.0 - u) * (1.0 - v) * p0.r as f32 + u * (1.0 - v) * p1.r as f32 + (1.0 - u) * v * p2.r as f32 + u * v * p3.r as f32;
+        let g = (1.0 - u) * (1.0 - v) * p0.g as f32 + u * (1.0 - v) * p1.g as f32 + (1.0 - u) * v * p2.g as f32 + u * v * p3.g as f32;
+        let b = (1.0 - u) * (1.0 - v) * p0.b as f32 + u * (1.0 - v) * p1.b as f32 + (1.0 - u) * v * p2.b as f32 + u * v * p3.b as f32;
 
         let dot = (self.main_light.dir_z * normal_z).max(0.2);
         let factor = dot * self.main_light.intensity;
@@ -483,18 +426,9 @@ impl FigcraftOpenTypeVariableFontAxisSynthesizerEngineV66 {
     pub fn new() -> Self {
         Self {
             active_axes: vec![
-                FontAxisSettingV66 {
-                    axis_tag: "wght".to_string(),
-                    value: 400.0,
-                },
-                FontAxisSettingV66 {
-                    axis_tag: "wdth".to_string(),
-                    value: 100.0,
-                },
-                FontAxisSettingV66 {
-                    axis_tag: "slnt".to_string(),
-                    value: 0.0,
-                },
+                FontAxisSettingV66 { axis_tag: "wght".to_string(), value: 400.0 },
+                FontAxisSettingV66 { axis_tag: "wdth".to_string(), value: 100.0 },
+                FontAxisSettingV66 { axis_tag: "slnt".to_string(), value: 0.0 },
             ],
         }
     }
@@ -578,16 +512,14 @@ pub struct FigcraftInteractiveDesignSystemDocsiteExporterEngineV66 {
 impl FigcraftInteractiveDesignSystemDocsiteExporterEngineV66 {
     pub fn new() -> Self {
         Self {
-            specs: vec![ComponentSpecDocV66 {
-                component_name: "Button".to_string(),
-                category: "Inputs".to_string(),
-                variants: vec![
-                    "Primary".to_string(),
-                    "Secondary".to_string(),
-                    "Outline".to_string(),
-                ],
-                tokens_used: vec!["color.brand.primary".to_string(), "spacing.md".to_string()],
-            }],
+            specs: vec![
+                ComponentSpecDocV66 {
+                    component_name: "Button".to_string(),
+                    category: "Inputs".to_string(),
+                    variants: vec!["Primary".to_string(), "Secondary".to_string(), "Outline".to_string()],
+                    tokens_used: vec!["color.brand.primary".to_string(), "spacing.md".to_string()],
+                },
+            ],
         }
     }
 
@@ -631,12 +563,7 @@ impl FigcraftMultiPlatformNativeIosAndroidTokenCompilerEngineV66 {
         Self
     }
 
-    pub fn compile_tokens_for_platform(
-        &self,
-        token_name: &str,
-        hex_color: &str,
-        platform: NativePlatformV66,
-    ) -> String {
+    pub fn compile_tokens_for_platform(&self, token_name: &str, hex_color: &str, platform: NativePlatformV66) -> String {
         let clean_name = token_name.replace('.', "_");
 
         match platform {
@@ -893,11 +820,7 @@ impl FigcraftArtcraftMissingComponentsV66PrSuite {
         }
 
         let compiler = gateway.platform_compiler.clone();
-        let code = compiler.compile_tokens_for_platform(
-            "color.brand.primary",
-            "#0066FF",
-            NativePlatformV66::IosSwift,
-        );
+        let code = compiler.compile_tokens_for_platform("color.brand.primary", "#0066FF", NativePlatformV66::IosSwift);
         if !code.contains("color_brand_primary") {
             return false;
         }
@@ -984,11 +907,7 @@ mod tests {
     #[test]
     fn test_native_compiler_engine_v66() {
         let compiler = FigcraftMultiPlatformNativeIosAndroidTokenCompilerEngineV66::new();
-        let code = compiler.compile_tokens_for_platform(
-            "color.brand.primary",
-            "#0066FF",
-            NativePlatformV66::IosSwift,
-        );
+        let code = compiler.compile_tokens_for_platform("color.brand.primary", "#0066FF", NativePlatformV66::IosSwift);
         assert!(code.contains("color_brand_primary"));
     }
 

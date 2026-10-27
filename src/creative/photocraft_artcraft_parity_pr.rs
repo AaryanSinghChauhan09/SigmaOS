@@ -1,7 +1,7 @@
 #![no_std]
 extern crate alloc;
-use alloc::format;
 use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - Photocraft to ArtCraft Parity PR Proposal Engine
 // (`src/creative/photocraft_artcraft_parity_pr.rs`)
@@ -23,6 +23,10 @@ use alloc::vec;
 use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
+
+
+
+
 
 /// Structured PR proposal manifest descriptor for Photocraft / Artcraft parity features.
 #[derive(Debug, Clone, PartialEq, Eq)]
