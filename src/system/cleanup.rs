@@ -27,7 +27,7 @@ pub enum CleanupCategory {
 }
 
 /// Cleanup option
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CleanupOption {
     pub category: CleanupCategory,
     pub name: String,

@@ -110,13 +110,20 @@ fn test_github_templates_exist() {
             || pr_template.contains("Upstream study")
             || pr_template.contains("IPC handler")
             || pr_template.contains("Component")
+            || pr_template.contains("Memory component")
     );
-    assert!(pr_template.contains("Reference study") || pr_template.contains("What SigmaOS adopts"));
+    assert!(
+        pr_template.contains("Reference study")
+            || pr_template.contains("What SigmaOS adopts")
+            || pr_template.contains("Reference behavior")
+    );
     assert!(
         pr_template.contains("Risks and rollback") || pr_template.contains("Safety and rollback")
     );
     assert!(
-        pr_template.contains("Kernel safety review") || pr_template.contains("Reviewer checklist")
+        pr_template.contains("Kernel safety review")
+            || pr_template.contains("Reviewer checklist")
+            || pr_template.contains("Memory safety review")
     );
 
     // Check Study Issue Template
