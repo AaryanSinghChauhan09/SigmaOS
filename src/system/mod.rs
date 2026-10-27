@@ -217,7 +217,6 @@ pub use sigmastallmanager::{
     SoftwareItem as InstallManagerItem,
 };
 pub use sigmataskscheduler::{
-    pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
 };
@@ -353,7 +352,7 @@ pub use restore::{
 pub use firewall::{
     FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
     init_firewall, get_firewall,
-}
+};
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
