@@ -5,8 +5,8 @@
 //! Covers task schedules, component scope, issue classification, release gates G0-G8,
 //! health metrics, and the first 12 shell roadmap PRs.
 
-use std::vec::Vec;
 use std::string::String;
+use std::vec::Vec;
 
 /// Recurring frequency for shell maintenance tasks
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -143,7 +143,9 @@ impl ShellAcceptanceGate {
             Self::G3FuzzSmoke => "Fuzz smoke passes",
             Self::G4BootToShell => "Boot reaches shell or defined diagnostic state",
             Self::G5TerminalState => "Interactive shell restores terminal state",
-            Self::G6SecurityReview => "Security review complete for expansion, redirection, and process execution",
+            Self::G6SecurityReview => {
+                "Security review complete for expansion, redirection, and process execution"
+            }
             Self::G7BuiltinContracts => "Built-ins have documented contracts and tests",
             Self::G8ReleaseClaims => "Release claims match tested capability",
         }
@@ -253,7 +255,8 @@ impl ShellLifecycleProgramEngine {
             ShellTaskDefinition {
                 cadence: ShellTaskCadence::Monthly,
                 name: "Fuzzing and crash triage",
-                description: "Triage lexer, parser, and expansion fuzz targets and add regression tests",
+                description:
+                    "Triage lexer, parser, and expansion fuzz targets and add regression tests",
                 primary_output: "Crash reports + fixes",
                 required_pr_prefix: "fix(shell)",
             },
@@ -281,25 +284,74 @@ impl ShellLifecycleProgramEngine {
             ShellTaskDefinition {
                 cadence: ShellTaskCadence::Quarterly,
                 name: "Performance benchmark review",
-                description: "Benchmark startup time, lexing/parsing throughput, and pipeline overhead",
+                description:
+                    "Benchmark startup time, lexing/parsing throughput, and pipeline overhead",
                 primary_output: "Benchmark report",
                 required_pr_prefix: "perf(shell)",
             },
         ];
 
         let roadmap = vec![
-            ShellRoadmapPr { number: 1, pr_title: "docs(shell): add shell maintenance calendar", purpose: "Establish recurring shell work" },
-            ShellRoadmapPr { number: 2, pr_title: "docs(shell): define POSIX compatibility subset", purpose: "Prevent vague compatibility claims" },
-            ShellRoadmapPr { number: 3, pr_title: "docs(shell): add grammar and expansion-order specification", purpose: "Make parser behavior authoritative" },
-            ShellRoadmapPr { number: 4, pr_title: "test(shell): add lexer and parser unit tests", purpose: "Establish parser correctness baseline" },
-            ShellRoadmapPr { number: 5, pr_title: "feat(shell): implement deterministic script execution", purpose: "Ensure repeatable non-interactive behavior" },
-            ShellRoadmapPr { number: 6, pr_title: "feat(shell): add exit-code policy and tests", purpose: "Make failures observable" },
-            ShellRoadmapPr { number: 7, pr_title: "feat(shell/builtins): add cd, pwd, echo, export contracts", purpose: "Establish core built-ins" },
-            ShellRoadmapPr { number: 8, pr_title: "test(shell): add pipeline and redirection conformance tests", purpose: "Validate core execution" },
-            ShellRoadmapPr { number: 9, pr_title: "feat(shell): add interactive prompt and Ctrl-C handling", purpose: "Establish usable interactive mode" },
-            ShellRoadmapPr { number: 10, pr_title: "feat(fuzz): add lexer, parser, and expansion fuzz targets", purpose: "Protect against malformed input" },
-            ShellRoadmapPr { number: 11, pr_title: "test(boot): add boot-to-shell smoke validation", purpose: "Connect shell to SigmaOS boot path" },
-            ShellRoadmapPr { number: 12, pr_title: "docs(release): add shell release gates", purpose: "Prevent premature \"usable shell\" claims" },
+            ShellRoadmapPr {
+                number: 1,
+                pr_title: "docs(shell): add shell maintenance calendar",
+                purpose: "Establish recurring shell work",
+            },
+            ShellRoadmapPr {
+                number: 2,
+                pr_title: "docs(shell): define POSIX compatibility subset",
+                purpose: "Prevent vague compatibility claims",
+            },
+            ShellRoadmapPr {
+                number: 3,
+                pr_title: "docs(shell): add grammar and expansion-order specification",
+                purpose: "Make parser behavior authoritative",
+            },
+            ShellRoadmapPr {
+                number: 4,
+                pr_title: "test(shell): add lexer and parser unit tests",
+                purpose: "Establish parser correctness baseline",
+            },
+            ShellRoadmapPr {
+                number: 5,
+                pr_title: "feat(shell): implement deterministic script execution",
+                purpose: "Ensure repeatable non-interactive behavior",
+            },
+            ShellRoadmapPr {
+                number: 6,
+                pr_title: "feat(shell): add exit-code policy and tests",
+                purpose: "Make failures observable",
+            },
+            ShellRoadmapPr {
+                number: 7,
+                pr_title: "feat(shell/builtins): add cd, pwd, echo, export contracts",
+                purpose: "Establish core built-ins",
+            },
+            ShellRoadmapPr {
+                number: 8,
+                pr_title: "test(shell): add pipeline and redirection conformance tests",
+                purpose: "Validate core execution",
+            },
+            ShellRoadmapPr {
+                number: 9,
+                pr_title: "feat(shell): add interactive prompt and Ctrl-C handling",
+                purpose: "Establish usable interactive mode",
+            },
+            ShellRoadmapPr {
+                number: 10,
+                pr_title: "feat(fuzz): add lexer, parser, and expansion fuzz targets",
+                purpose: "Protect against malformed input",
+            },
+            ShellRoadmapPr {
+                number: 11,
+                pr_title: "test(boot): add boot-to-shell smoke validation",
+                purpose: "Connect shell to SigmaOS boot path",
+            },
+            ShellRoadmapPr {
+                number: 12,
+                pr_title: "docs(release): add shell release gates",
+                purpose: "Prevent premature \"usable shell\" claims",
+            },
         ];
 
         Self { tasks, roadmap }
