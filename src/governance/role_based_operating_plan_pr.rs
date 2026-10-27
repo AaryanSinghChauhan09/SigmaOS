@@ -145,7 +145,8 @@ impl RoleBasedOperatingPlanEngine {
             RoleDefinition {
                 role: MaintenanceRole::Updater,
                 title: "Updater".to_string(),
-                mission: "Keeps dependencies, toolchain, and upstream knowledge current".to_string(),
+                mission: "Keeps dependencies, toolchain, and upstream knowledge current"
+                    .to_string(),
                 cadence: "Daily / Weekly".to_string(),
                 leadership: LeadershipProfile::MostlyAgent,
             },
@@ -194,7 +195,8 @@ impl RoleBasedOperatingPlanEngine {
             RoleDefinition {
                 role: MaintenanceRole::ReleaseManager,
                 title: "Release Manager".to_string(),
-                mission: "Builds release ISOs, verifies reproducible builds, and ships releases".to_string(),
+                mission: "Builds release ISOs, verifies reproducible builds, and ships releases"
+                    .to_string(),
                 cadence: "Per Release".to_string(),
                 leadership: LeadershipProfile::HumanLedAgentAssisted,
             },
@@ -333,27 +335,51 @@ impl RoleBasedOperatingPlanEngine {
             OperationalDayFocus {
                 day: CalendarDay::Monday,
                 focus_area: "Triage sweep, planning, and upstream advisory digest".to_string(),
-                assigned_roles: vec![MaintenanceRole::Triager, MaintenanceRole::Updater, MaintenanceRole::Maintainer],
+                assigned_roles: vec![
+                    MaintenanceRole::Triager,
+                    MaintenanceRole::Updater,
+                    MaintenanceRole::Maintainer,
+                ],
             },
             OperationalDayFocus {
                 day: CalendarDay::Tuesday,
                 focus_area: "Active subsystem development and code review".to_string(),
-                assigned_roles: vec![MaintenanceRole::Maintainer, MaintenanceRole::Reviewer, MaintenanceRole::Researcher],
+                assigned_roles: vec![
+                    MaintenanceRole::Maintainer,
+                    MaintenanceRole::Reviewer,
+                    MaintenanceRole::Researcher,
+                ],
             },
             OperationalDayFocus {
                 day: CalendarDay::Wednesday,
-                focus_area: "Security review, unsafe audit, and researcher design notes".to_string(),
-                assigned_roles: vec![MaintenanceRole::SecurityOfficer, MaintenanceRole::Researcher, MaintenanceRole::Reviewer],
+                focus_area: "Security review, unsafe audit, and researcher design notes"
+                    .to_string(),
+                assigned_roles: vec![
+                    MaintenanceRole::SecurityOfficer,
+                    MaintenanceRole::Researcher,
+                    MaintenanceRole::Reviewer,
+                ],
             },
             OperationalDayFocus {
                 day: CalendarDay::Thursday,
-                focus_area: "Consolidation sweep, doc sync, and benchmark performance run".to_string(),
-                assigned_roles: vec![MaintenanceRole::Consolidator, MaintenanceRole::DocsSteward, MaintenanceRole::Benchmarker],
+                focus_area: "Consolidation sweep, doc sync, and benchmark performance run"
+                    .to_string(),
+                assigned_roles: vec![
+                    MaintenanceRole::Consolidator,
+                    MaintenanceRole::DocsSteward,
+                    MaintenanceRole::Benchmarker,
+                ],
             },
             OperationalDayFocus {
                 day: CalendarDay::Friday,
-                focus_area: "Release candidate verification, weekly health report, and retrospective".to_string(),
-                assigned_roles: vec![MaintenanceRole::ReleaseManager, MaintenanceRole::TesterFuzzer, MaintenanceRole::CommunityManager],
+                focus_area:
+                    "Release candidate verification, weekly health report, and retrospective"
+                        .to_string(),
+                assigned_roles: vec![
+                    MaintenanceRole::ReleaseManager,
+                    MaintenanceRole::TesterFuzzer,
+                    MaintenanceRole::CommunityManager,
+                ],
             },
         ];
     }
@@ -445,11 +471,18 @@ mod tests {
     #[test]
     fn test_role_definitions() {
         let engine = RoleBasedOperatingPlanEngine::new();
-        let maintainer = engine.get_role_definition(MaintenanceRole::Maintainer).unwrap();
+        let maintainer = engine
+            .get_role_definition(MaintenanceRole::Maintainer)
+            .unwrap();
         assert_eq!(maintainer.title, "Maintainer");
-        assert_eq!(maintainer.leadership, LeadershipProfile::HumanLedAgentAssisted);
+        assert_eq!(
+            maintainer.leadership,
+            LeadershipProfile::HumanLedAgentAssisted
+        );
 
-        let updater = engine.get_role_definition(MaintenanceRole::Updater).unwrap();
+        let updater = engine
+            .get_role_definition(MaintenanceRole::Updater)
+            .unwrap();
         assert_eq!(updater.title, "Updater");
         assert_eq!(updater.leadership, LeadershipProfile::MostlyAgent);
     }

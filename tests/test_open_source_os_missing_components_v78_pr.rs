@@ -29,9 +29,7 @@ fn test_v78_pr_suite_execution_integration() {
     assert!(wiki_page.contains("34 Tech Media Portals"));
 
     let report = suite.comparison_matrix.generate_matrix_report();
-    assert!(
-        report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V78")
-    );
+    assert!(report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V78"));
     assert!(report.contains("Linux 6.32+"));
     assert!(report.contains("FreeBSD 16.2+"));
 

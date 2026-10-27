@@ -235,7 +235,10 @@ impl OpenRcAdvancementsV77Engine {
                     OpenRcDependencyTypeV77::Need | OpenRcDependencyTypeV77::After
                 ) {
                     if graph.contains_key(target) {
-                        graph.entry(target.clone()).or_default().push(s.name.clone());
+                        graph
+                            .entry(target.clone())
+                            .or_default()
+                            .push(s.name.clone());
                         *in_degree.entry(s.name.clone()).or_insert(0) += 1;
                     }
                 }
@@ -412,7 +415,9 @@ impl SysVinitAdvancementsV77Engine {
     pub fn generate_manifest(&self) -> CoreUserlandV77Manifest {
         CoreUserlandV77Manifest {
             pr_id: 4188,
-            pr_title: "SysVinit V77 Advancements: /etc/inittab Action Parser & telinit State Machine".to_string(),
+            pr_title:
+                "SysVinit V77 Advancements: /etc/inittab Action Parser & telinit State Machine"
+                    .to_string(),
             target_subsystem: "Legacy SysV Init".to_string(),
             original_system: "Debian / Slackware SysVinit".to_string(),
             components_added: vec![
@@ -657,7 +662,10 @@ impl SovereignInitAndSupervisorAdvancementsV77Suite {
 
     pub fn run_master_verification(&self) -> bool {
         let manifests = self.collect_all_manifests();
-        manifests.len() == 7 && manifests.iter().all(|m| m.status == "Ready for Integration")
+        manifests.len() == 7
+            && manifests
+                .iter()
+                .all(|m| m.status == "Ready for Integration")
     }
 }
 

@@ -93,16 +93,43 @@ impl SigmaOsVsOpenSourceOsComparisonMatrixEngineV76 {
 
     pub fn populate_default_matrix(&mut self) {
         let os_list = [
-            ("Linux 6.30+", "SchedExt eBPF AI Scheduler & Dynamic Power Governor"),
-            ("FreeBSD 16.4+", "Capsicum Casper Netlink VNET Micro-Jail Mesh"),
-            ("OpenBSD 9.0+", "FineIBT CFI Enforcement & Shadow Call Stack PTE Guard"),
-            ("DragonFly BSD 8.0+", "HAMMER2 PFS Erasure DirectIO Cluster Engine"),
+            (
+                "Linux 6.30+",
+                "SchedExt eBPF AI Scheduler & Dynamic Power Governor",
+            ),
+            (
+                "FreeBSD 16.4+",
+                "Capsicum Casper Netlink VNET Micro-Jail Mesh",
+            ),
+            (
+                "OpenBSD 9.0+",
+                "FineIBT CFI Enforcement & Shadow Call Stack PTE Guard",
+            ),
+            (
+                "DragonFly BSD 8.0+",
+                "HAMMER2 PFS Erasure DirectIO Cluster Engine",
+            ),
             ("NetBSD 12.8", "Rump Hypercall Userland Audio & PCI Router"),
-            ("Haiku R1/Beta 10", "BFS Live Relational Attribute Query Metadata Engine"),
-            ("Plan 9 / 9front", "Synthetic 9P2000 VFS Namespace Multiplexer & Rfork"),
-            ("NixOS / GNU Guix", "Hermetic CAS Store Merkle Closure Tree Builder"),
-            ("Illumos / SmartOS", "Crossbow VNIC Virtual Switch Mesh & DTrace Probes"),
-            ("Omarchy Linux", "Wallust Dynamic Palette Reloading & Chord Navigator"),
+            (
+                "Haiku R1/Beta 10",
+                "BFS Live Relational Attribute Query Metadata Engine",
+            ),
+            (
+                "Plan 9 / 9front",
+                "Synthetic 9P2000 VFS Namespace Multiplexer & Rfork",
+            ),
+            (
+                "NixOS / GNU Guix",
+                "Hermetic CAS Store Merkle Closure Tree Builder",
+            ),
+            (
+                "Illumos / SmartOS",
+                "Crossbow VNIC Virtual Switch Mesh & DTrace Probes",
+            ),
+            (
+                "Omarchy Linux",
+                "Wallust Dynamic Palette Reloading & Chord Navigator",
+            ),
         ];
 
         let categories = [
@@ -433,7 +460,9 @@ pub struct Plan9Synthetic9P2000VfsRforkMultiplexerEngineV76 {
 
 impl Plan9Synthetic9P2000VfsRforkMultiplexerEngineV76 {
     pub fn new() -> Self {
-        Self { mounted_namespaces: 512 }
+        Self {
+            mounted_namespaces: 512,
+        }
     }
 
     pub fn rfork_namespace(&mut self, flags: u32) -> u32 {
@@ -470,9 +499,12 @@ impl NixGuixHermeticCasMerkleClosureEngineV76 {
     pub fn new() -> Self {
         Self {
             merkle_roots: vec![
-                "sha256-a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0".to_string(),
-                "sha256-f0e9d8c7b6a543210987654321fedcba0987654321fedcba0987654321fedcba".to_string(),
-                "sha256-7676767676767676767676767676767676767676767676767676767676767676".to_string(),
+                "sha256-a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0"
+                    .to_string(),
+                "sha256-f0e9d8c7b6a543210987654321fedcba0987654321fedcba0987654321fedcba"
+                    .to_string(),
+                "sha256-7676767676767676767676767676767676767676767676767676767676767676"
+                    .to_string(),
             ],
         }
     }
@@ -548,7 +580,10 @@ pub struct OmarchyWallustThemeChordNavigatorEngineV76 {
 impl OmarchyWallustThemeChordNavigatorEngineV76 {
     pub fn new() -> Self {
         let mut hotkeys = BTreeMap::new();
-        hotkeys.insert("Super+Shift+T".to_string(), "toggle_wallust_theme".to_string());
+        hotkeys.insert(
+            "Super+Shift+T".to_string(),
+            "toggle_wallust_theme".to_string(),
+        );
         hotkeys.insert("Super+Ctrl+M".to_string(), "open_chord_menu".to_string());
         hotkeys.insert("Super+Alt+V".to_string(), "trigger_v76_palette".to_string());
         Self {
@@ -589,17 +624,39 @@ impl GlobalTechMedia33PortalUnimplementedIdeasEngineV76 {
     pub fn new() -> Self {
         Self {
             media_portals: vec![
-                "Phoronix".to_string(), "Ars Technica".to_string(), "LWN.net".to_string(),
-                "It's FOSS".to_string(), "OMG! Ubuntu!".to_string(), "9to5Linux".to_string(),
-                "Pebble Linux".to_string(), "DistroWatch".to_string(), "OSNews".to_string(),
-                "Slashdot Tech".to_string(), "Hacker News".to_string(), "Reddit r/linux".to_string(),
-                "The Register".to_string(), "Tom's Hardware".to_string(), "AnandTech".to_string(),
-                "ServeTheHome".to_string(), "Phoronix Premium".to_string(), "BSD Now".to_string(),
-                "Daemon News".to_string(), "FreeBSD Journal".to_string(), "OpenBSD Journal".to_string(),
-                "NetBSD Blog".to_string(), "DragonFly Digest".to_string(), "Haiku Gazette".to_string(),
-                "Plan 9 Matrix".to_string(), "Redox Magazine".to_string(), "Fuchsia Weekly".to_string(),
-                "Qubes Security Brief".to_string(), "GamingOnLinux".to_string(), "Linux Today".to_string(),
-                "Linux Magazine".to_string(), "Linux Format".to_string(), "Linux Insider".to_string(),
+                "Phoronix".to_string(),
+                "Ars Technica".to_string(),
+                "LWN.net".to_string(),
+                "It's FOSS".to_string(),
+                "OMG! Ubuntu!".to_string(),
+                "9to5Linux".to_string(),
+                "Pebble Linux".to_string(),
+                "DistroWatch".to_string(),
+                "OSNews".to_string(),
+                "Slashdot Tech".to_string(),
+                "Hacker News".to_string(),
+                "Reddit r/linux".to_string(),
+                "The Register".to_string(),
+                "Tom's Hardware".to_string(),
+                "AnandTech".to_string(),
+                "ServeTheHome".to_string(),
+                "Phoronix Premium".to_string(),
+                "BSD Now".to_string(),
+                "Daemon News".to_string(),
+                "FreeBSD Journal".to_string(),
+                "OpenBSD Journal".to_string(),
+                "NetBSD Blog".to_string(),
+                "DragonFly Digest".to_string(),
+                "Haiku Gazette".to_string(),
+                "Plan 9 Matrix".to_string(),
+                "Redox Magazine".to_string(),
+                "Fuchsia Weekly".to_string(),
+                "Qubes Security Brief".to_string(),
+                "GamingOnLinux".to_string(),
+                "Linux Today".to_string(),
+                "Linux Magazine".to_string(),
+                "Linux Format".to_string(),
+                "Linux Insider".to_string(),
             ],
         }
     }

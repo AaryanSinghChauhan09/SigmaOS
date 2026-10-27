@@ -2,7 +2,9 @@
 
 <!-- What secondary-memory behavior changed and why? -->
 
-## Storage component
+## Storage component / Component
+
+<!-- Upstream study / Reference study / What SigmaOS adopts -->
 
 - [ ] Block device manager
 - [ ] virtio / NVMe / virtio
@@ -43,7 +45,9 @@
 -
 -
 
-## Storage safety review
+## Storage safety review / Reviewer checklist
+
+<!-- Kernel safety review / Reviewer checklist -->
 
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
