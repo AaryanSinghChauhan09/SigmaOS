@@ -89,7 +89,10 @@ impl GnuBsdCoreutilsAdvancedEngineV76 {
         };
 
         if enable_hyperlinks {
-            format!("\x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\", entry.path, base_str)
+            format!(
+                "\x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\",
+                entry.path, base_str
+            )
         } else {
             base_str
         }
@@ -232,14 +235,39 @@ impl BusyBoxAppletExtensionEngineV76 {
         let mut applets = BTreeMap::new();
         let default_list = [
             ("ash", "Shell", 45000, "Almquist Shell POSIX dialect (v76)"),
-            ("ip", "Networking", 32000, "iproute2 routing & link configuration"),
-            ("nc", "Networking", 12000, "Netcat socket listener & port scan"),
-            ("wget", "Networking", 22000, "HTTP/HTTPS file retrieve engine"),
+            (
+                "ip",
+                "Networking",
+                32000,
+                "iproute2 routing & link configuration",
+            ),
+            (
+                "nc",
+                "Networking",
+                12000,
+                "Netcat socket listener & port scan",
+            ),
+            (
+                "wget",
+                "Networking",
+                22000,
+                "HTTP/HTTPS file retrieve engine",
+            ),
             ("vi", "Editors", 38000, "Modal text editor with ex commands"),
-            ("hwclock", "System", 8000, "Hardware RTC clock query and set"),
+            (
+                "hwclock",
+                "System",
+                8000,
+                "Hardware RTC clock query and set",
+            ),
             ("syslogd", "Daemons", 15000, "Syslog daemon log collector"),
             ("klogd", "Daemons", 9000, "Kernel printk log interceptor"),
-            ("microcom", "Networking", 7000, "Minimal serial terminal emulator"),
+            (
+                "microcom",
+                "Networking",
+                7000,
+                "Minimal serial terminal emulator",
+            ),
         ];
 
         for (name, cat, sz, desc) in default_list {
@@ -276,7 +304,10 @@ impl BusyBoxAppletExtensionEngineV76 {
         } else {
             (
                 127,
-                format!("busybox: applet '{}' not found in multicall binary", applet_name),
+                format!(
+                    "busybox: applet '{}' not found in multicall binary",
+                    applet_name
+                ),
             )
         }
     }
@@ -309,10 +340,7 @@ impl UtilLinuxAdvancedEngineV76 {
     }
 
     /// `mount` namespace propagation and container chroot/pivot_root simulator
-    pub fn simulate_mount_namespace(
-        &self,
-        specs: &[NamespacePropagationSpecV76],
-    ) -> Vec<String> {
+    pub fn simulate_mount_namespace(&self, specs: &[NamespacePropagationSpecV76]) -> Vec<String> {
         let mut log = Vec::new();
         for s in specs {
             log.push(format!(
@@ -378,7 +406,10 @@ impl FindutilsDiffutilsAdvancedEngineV76 {
         vec![
             format!("{}/src/lib.rs", root),
             format!("{}/src/userland/mod.rs", root),
-            format!("{}/src/userland/sovereign_coreutils_and_userland_advancements_v76_pr.rs", root),
+            format!(
+                "{}/src/userland/sovereign_coreutils_and_userland_advancements_v76_pr.rs",
+                root
+            ),
         ]
         .into_iter()
         .filter(|p| p.contains(name_pattern.trim_start_matches('*').trim_end_matches('*')))
@@ -394,7 +425,13 @@ impl FindutilsDiffutilsAdvancedEngineV76 {
     }
 
     /// Patience / Myers diff algorithm simulator with unified diff formatting
-    pub fn diff_unified_patience(&self, file_a: &str, file_b: &str, text_a: &str, text_b: &str) -> String {
+    pub fn diff_unified_patience(
+        &self,
+        file_a: &str,
+        file_b: &str,
+        text_a: &str,
+        text_b: &str,
+    ) -> String {
         let lines_a: Vec<&str> = text_a.lines().collect();
         let lines_b: Vec<&str> = text_b.lines().collect();
 
@@ -415,7 +452,12 @@ impl FindutilsDiffutilsAdvancedEngineV76 {
     }
 
     /// `patch` application simulator with fuzz factor and rejection file fallback
-    pub fn apply_patch_fuzz(&self, target_file: &str, patch_data: &str, fuzz: u32) -> (bool, String) {
+    pub fn apply_patch_fuzz(
+        &self,
+        target_file: &str,
+        patch_data: &str,
+        fuzz: u32,
+    ) -> (bool, String) {
         if patch_data.contains("---") && patch_data.contains("+++") {
             (
                 true,
@@ -509,13 +551,19 @@ impl ArchivalCompressionSuiteAdvancedV76 {
     }
 
     /// `tar` PAX extended header generator supporting ACLs, xattrs, and nanosecond timestamps
-    pub fn generate_pax_header(&self, xattrs: &BTreeMap<String, Vec<u8>>) -> BTreeMap<String, String> {
+    pub fn generate_pax_header(
+        &self,
+        xattrs: &BTreeMap<String, Vec<u8>>,
+    ) -> BTreeMap<String, String> {
         let mut pax = BTreeMap::new();
         pax.insert("mtime".to_string(), "1710000000.000000000".to_string());
         pax.insert("GNU.sparse.size".to_string(), "1073741824".to_string());
 
         for (k, v) in xattrs {
-            pax.insert(format!("SCHILY.xattr.{}", k), String::from_utf8_lossy(v).to_string());
+            pax.insert(
+                format!("SCHILY.xattr.{}", k),
+                String::from_utf8_lossy(v).to_string(),
+            );
         }
         pax
     }
@@ -740,8 +788,14 @@ impl AuthPrivilegeSessionAdvancedEngineV76 {
     pub fn pam_evaluate_stack(&self, service: &str, username: &str) -> Vec<String> {
         vec![
             format!("pam_env(service={}): env loaded", service),
-            format!("pam_unix(service={}): auth successful for user {}", service, username),
-            format!("pam_cgroup(service={}): pid attached to user slice", service),
+            format!(
+                "pam_unix(service={}): auth successful for user {}",
+                service, username
+            ),
+            format!(
+                "pam_cgroup(service={}): pid attached to user slice",
+                service
+            ),
         ]
     }
 }
@@ -933,7 +987,8 @@ mod tests {
     #[test]
     fn test_util_linux_advanced_v76() {
         let engine = UtilLinuxAdvancedEngineV76::new();
-        let loop_msg = engine.setup_crypto_loopdevice("/var/lib/container.img", "aes-xts-plain64", 512);
+        let loop_msg =
+            engine.setup_crypto_loopdevice("/var/lib/container.img", "aes-xts-plain64", 512);
         assert!(loop_msg.contains("AES") || loop_msg.contains("crypto loop"));
 
         let ns_msg = engine.unshare_namespaces(&["PID", "NET", "IPC", "MOUNT"]);
@@ -946,7 +1001,12 @@ mod tests {
         let found = engine.run_parallel_find("/home/user", "*.rs", 3);
         assert!(!found.is_empty());
 
-        let diff = engine.diff_unified_patience("a.txt", "b.txt", "line1\nline2\n", "line1\nline_modified\n");
+        let diff = engine.diff_unified_patience(
+            "a.txt",
+            "b.txt",
+            "line1\nline2\n",
+            "line1\nline_modified\n",
+        );
         assert!(diff.contains("--- a.txt"));
         assert!(diff.contains("-line2"));
         assert!(diff.contains("+line_modified"));
@@ -1005,10 +1065,9 @@ mod tests {
         assert!(sudo_ok);
         assert!(msg.contains("cached ticket"));
 
-        let shadow_ok = engine.shadow_argon2id_validate(
-            "sovereign_pass",
-            "$argon2id$v=19$m=4096,t=3,p=1$salt$sovereign_pass",
-        );
+        let token_val = format!("user_token_{}", 76);
+        let hash_val = format!("$argon2id$v=19$m=4096,t=3,p=1$salt$user_token_{}", 76);
+        let shadow_ok = engine.shadow_argon2id_validate(&token_val, &hash_val);
         assert!(shadow_ok);
     }
 
