@@ -110,10 +110,14 @@ impl CraftlibsSimdColorSpaceConversionEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6901,
-            pr_title: String::from("PR-6901: CraftLibs SIMD Color Space Matrix Transformation Engine V69"),
+            pr_title: String::from(
+                "PR-6901: CraftLibs SIMD Color Space Matrix Transformation Engine V69",
+            ),
             target_subsystem: String::from("CraftLibs / Color Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft SIMD Color Pipeline V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft SIMD Color Pipeline V69",
+            ),
             components_added: vec![
                 String::from("SimdColorMatrixTransform"),
                 String::from("BradfordAdaptation"),
@@ -155,7 +159,11 @@ impl CraftlibsGpuTextureCompressionAstcBtcEngineV69 {
         }
     }
 
-    pub fn compress_rgba_block_4x4(&mut self, rgba_16_pixels: &[u8], output_block: &mut [u8]) -> Result<(), &'static str> {
+    pub fn compress_rgba_block_4x4(
+        &mut self,
+        rgba_16_pixels: &[u8],
+        output_block: &mut [u8],
+    ) -> Result<(), &'static str> {
         if rgba_16_pixels.len() != 64 {
             return Err("Input pixel block must be 64 bytes (16 RGBA pixels)");
         }
@@ -175,10 +183,14 @@ impl CraftlibsGpuTextureCompressionAstcBtcEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6902,
-            pr_title: String::from("PR-6902: CraftLibs ASTC / BC1-7 GPU Texture Transcoder Engine V69"),
+            pr_title: String::from(
+                "PR-6902: CraftLibs ASTC / BC1-7 GPU Texture Transcoder Engine V69",
+            ),
             target_subsystem: String::from("CraftLibs / Texture Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft GPU Texture Compression V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft GPU Texture Compression V69",
+            ),
             components_added: vec![
                 String::from("Astc4x4Compressor"),
                 String::from("Bc7RgbaTranscoder"),
@@ -222,7 +234,9 @@ impl CraftlibsOpenColorIoColorGradingLutEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6903,
-            pr_title: String::from("PR-6903: CraftLibs OpenColorIO v2 3D LUT Color Grading Engine V69"),
+            pr_title: String::from(
+                "PR-6903: CraftLibs OpenColorIO v2 3D LUT Color Grading Engine V69",
+            ),
             target_subsystem: String::from("CraftLibs / Color Pipeline"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft OCIO v2 Pipeline V69"),
@@ -286,10 +300,14 @@ impl CraftlibsEmbreeBvhRaytracingKernelEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6904,
-            pr_title: String::from("PR-6904: CraftLibs Intel Embree-Inspired BVH Raytracing Kernel V69"),
+            pr_title: String::from(
+                "PR-6904: CraftLibs Intel Embree-Inspired BVH Raytracing Kernel V69",
+            ),
             target_subsystem: String::from("CraftLibs / Raytracing Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Embree Ray Accelerator V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Embree Ray Accelerator V69",
+            ),
             components_added: vec![
                 String::from("SahBvhBuilder"),
                 String::from("SimdRayBoxIntersection"),
@@ -330,10 +348,14 @@ impl CraftlibsOpenSubdivTessellationSurfaceEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6905,
-            pr_title: String::from("PR-6905: CraftLibs OpenSubdiv Catmull-Clark Tessellation Engine V69"),
+            pr_title: String::from(
+                "PR-6905: CraftLibs OpenSubdiv Catmull-Clark Tessellation Engine V69",
+            ),
             target_subsystem: String::from("CraftLibs / SubD Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft OpenSubdiv Engine V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft OpenSubdiv Engine V69",
+            ),
             components_added: vec![
                 String::from("CatmullClarkSubdivisionMatrix"),
                 String::from("AdaptiveLimitEvaluationStencil"),
@@ -379,7 +401,9 @@ impl CraftlibsOpenVdbVolumetricGridEngineV69 {
             pr_title: String::from("PR-6906: CraftLibs OpenVDB Sparse Volumetric Grid Engine V69"),
             target_subsystem: String::from("CraftLibs / Volumetric Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft OpenVDB Sparse Grid V69"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft OpenVDB Sparse Grid V69",
+            ),
             components_added: vec![
                 String::from("SparseVoxelTree543"),
                 String::from("MarchingCubesLevelSetMesher"),
@@ -415,7 +439,12 @@ impl CraftlibsOpenFxPluginHostRouterEngineV69 {
         Ok(())
     }
 
-    pub fn render_frame(&self, plugin_id: &str, in_pixels: &[u8], out_pixels: &mut [u8]) -> Result<(), &'static str> {
+    pub fn render_frame(
+        &self,
+        plugin_id: &str,
+        in_pixels: &[u8],
+        out_pixels: &mut [u8],
+    ) -> Result<(), &'static str> {
         if !self.registered_plugins.iter().any(|p| p == plugin_id) {
             return Err("Plugin not registered");
         }
@@ -481,7 +510,9 @@ impl CraftlibsRealtimeCrdtCanvasSyncEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6908,
-            pr_title: String::from("PR-6908: CraftLibs Lockless CRDT Vector Canvas Sync Engine V69"),
+            pr_title: String::from(
+                "PR-6908: CraftLibs Lockless CRDT Vector Canvas Sync Engine V69",
+            ),
             target_subsystem: String::from("CraftLibs / Collaboration Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft CRDT Sync Engine V69"),
@@ -549,7 +580,9 @@ impl CraftlibsNeuralSuperResolutionUpscalerEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6909,
-            pr_title: String::from("PR-6909: CraftLibs Neural 4x Super-Resolution Upscaler Engine V69"),
+            pr_title: String::from(
+                "PR-6909: CraftLibs Neural 4x Super-Resolution Upscaler Engine V69",
+            ),
             target_subsystem: String::from("CraftLibs / Neural ML Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft ML Upscaler V69"),
@@ -610,7 +643,9 @@ impl CraftlibsPhysicallyBasedFluidClothPhysicsEngineV69 {
     pub fn generate_proposal(&self) -> CraftlibsV69PrProposalManifest {
         CraftlibsV69PrProposalManifest {
             pr_id: 6910,
-            pr_title: String::from("PR-6910: CraftLibs GPU SPH Fluid & PBD Cloth Physics Solver V69"),
+            pr_title: String::from(
+                "PR-6910: CraftLibs GPU SPH Fluid & PBD Cloth Physics Solver V69",
+            ),
             target_subsystem: String::from("CraftLibs / Physics Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft GPU SPH Physics V69"),
@@ -709,7 +744,12 @@ mod tests {
         let mut engine = CraftlibsSimdColorSpaceConversionEngineV69::new();
         let input = [200, 150, 100, 255];
         let mut output = [0; 4];
-        let res = engine.convert_rgba_buffer(&input, ColorSpaceV69::Srgb, ColorSpaceV69::DisplayP3, &mut output);
+        let res = engine.convert_rgba_buffer(
+            &input,
+            ColorSpaceV69::Srgb,
+            ColorSpaceV69::DisplayP3,
+            &mut output,
+        );
         assert!(res.is_ok());
         assert_eq!(output[3], 255);
         assert_eq!(engine.generate_proposal().pr_id, 6901);

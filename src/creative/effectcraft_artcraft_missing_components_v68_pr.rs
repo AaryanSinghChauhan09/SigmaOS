@@ -294,7 +294,8 @@ impl EffectcraftCryptomatteAovObjectExtractorV68Engine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV68PrProposalManifest {
         EffectcraftV68PrProposalManifest {
             pr_id: 6804,
-            pr_title: "feat(effectcraft): Add Cryptomatte EXR AOV Object Mask Isolator Engine V68".to_string(),
+            pr_title: "feat(effectcraft): Add Cryptomatte EXR AOV Object Mask Isolator Engine V68"
+                .to_string(),
             target_subsystem: "EffectCraft Matte Extraction Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft Cryptomatte Studio".to_string(),
             components_added: vec![
@@ -367,7 +368,9 @@ impl EffectcraftVolumetricLightingRaymarchingV68Engine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV68PrProposalManifest {
         EffectcraftV68PrProposalManifest {
             pr_id: 6805,
-            pr_title: "feat(effectcraft): Add Volumetric God-Rays & Atmospheric Raymarching Engine V68".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Volumetric God-Rays & Atmospheric Raymarching Engine V68"
+                    .to_string(),
             target_subsystem: "EffectCraft Volumetric Lighting Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft GodRays Studio".to_string(),
             components_added: vec![
@@ -492,7 +495,9 @@ impl EffectcraftStereoscopicVr360SpatialVideoV68Engine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV68PrProposalManifest {
         EffectcraftV68PrProposalManifest {
             pr_id: 6807,
-            pr_title: "feat(effectcraft): Add Stereoscopic VR 360 Spatial Video Stitching Engine V68".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Stereoscopic VR 360 Spatial Video Stitching Engine V68"
+                    .to_string(),
             target_subsystem: "EffectCraft VR & Immersive Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft VR 360 Studio".to_string(),
             components_added: vec![
@@ -547,7 +552,11 @@ impl EffectcraftOpenFxPluginHostRouterV68Engine {
         });
     }
 
-    pub fn route_frame_to_plugin(&self, plugin_id: &str, buffer: &mut [u8]) -> Result<usize, String> {
+    pub fn route_frame_to_plugin(
+        &self,
+        plugin_id: &str,
+        buffer: &mut [u8],
+    ) -> Result<usize, String> {
         if let Some(_plug) = self.plugins.iter().find(|p| p.plugin_id == plugin_id) {
             let len = buffer.len();
             for byte in buffer.iter_mut() {
@@ -562,7 +571,9 @@ impl EffectcraftOpenFxPluginHostRouterV68Engine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV68PrProposalManifest {
         EffectcraftV68PrProposalManifest {
             pr_id: 6808,
-            pr_title: "feat(effectcraft): Add OpenFX (OFX 1.4) Plugin Host & Pipeline Router Engine V68".to_string(),
+            pr_title:
+                "feat(effectcraft): Add OpenFX (OFX 1.4) Plugin Host & Pipeline Router Engine V68"
+                    .to_string(),
             target_subsystem: "EffectCraft OpenFX Plugin Host Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft OFX Host Studio".to_string(),
             components_added: vec![
@@ -678,7 +689,9 @@ impl EffectcraftSubsurfaceScatteringSkinShaderV68Engine {
     pub fn generate_pr_manifest(&self) -> EffectcraftV68PrProposalManifest {
         EffectcraftV68PrProposalManifest {
             pr_id: 6810,
-            pr_title: "feat(effectcraft): Add Subsurface Scattering (SSS) Human Skin Shader Engine V68".to_string(),
+            pr_title:
+                "feat(effectcraft): Add Subsurface Scattering (SSS) Human Skin Shader Engine V68"
+                    .to_string(),
             target_subsystem: "EffectCraft Realistic Materials Subsystem".to_string(),
             original_suite: "ArtCraft EffectCraft SSS Skin Studio".to_string(),
             components_added: vec![
@@ -801,7 +814,9 @@ mod tests {
         let engine = EffectcraftOpticalFlowMotionVectorEstimationV68Engine::new();
         let frame_a = vec![100u8; 16];
         let frame_b = vec![110u8; 16];
-        let vectors = engine.estimate_flow_field(&frame_a, &frame_b, 4, 4).unwrap();
+        let vectors = engine
+            .estimate_flow_field(&frame_a, &frame_b, 4, 4)
+            .unwrap();
         assert_eq!(vectors.len(), 16);
         assert!(vectors[0].confidence > 0.0);
     }
@@ -818,8 +833,14 @@ mod tests {
         let mut engine = EffectcraftCryptomatteAovObjectExtractorV68Engine::new();
         engine.add_target_object_hash(0x12345678);
         let aov = vec![
-            CryptoObjectV68 { name_hash: 0x12345678, coverage: 0.8 },
-            CryptoObjectV68 { name_hash: 0x87654321, coverage: 0.5 },
+            CryptoObjectV68 {
+                name_hash: 0x12345678,
+                coverage: 0.8,
+            },
+            CryptoObjectV68 {
+                name_hash: 0x87654321,
+                coverage: 0.5,
+            },
         ];
         let matte = engine.extract_matte_mask(&aov);
         assert_eq!(matte, vec![0.8, 0.0]);
@@ -851,7 +872,9 @@ mod tests {
         let mut engine = EffectcraftOpenFxPluginHostRouterV68Engine::new();
         engine.register_plugin("org.sigma.blur", "Sigma Blur", 1, 4);
         let mut buf = vec![50u8; 4];
-        let len = engine.route_frame_to_plugin("org.sigma.blur", &mut buf).unwrap();
+        let len = engine
+            .route_frame_to_plugin("org.sigma.blur", &mut buf)
+            .unwrap();
         assert_eq!(len, 4);
         assert_eq!(buf[0], 60);
     }

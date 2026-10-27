@@ -8,9 +8,9 @@ mod sovereign_distro_package_advancements_v73;
 #[path = "../src/package/sovereign_distro_package_advancements_v73_pr.rs"]
 mod sovereign_distro_package_advancements_v73_pr;
 
+use sovereign_distro_package_advancements_v73::universal::{PackageFormat, PackageState};
 use sovereign_distro_package_advancements_v73::*;
 use sovereign_distro_package_advancements_v73_pr::SovereignDistroPackagePrGatewayV73;
-use sovereign_distro_package_advancements_v73::universal::{PackageFormat, PackageState};
 
 #[test]
 fn test_package_advancements_v73_full_cycle() {

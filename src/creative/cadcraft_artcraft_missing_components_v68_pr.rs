@@ -190,7 +190,8 @@ impl CadcraftHybridAdditiveSubtractiveDirectedEnergyDepositionEngineV68 {
         let bead_area = layer_thickness_mm * bead_width_mm;
 
         let total_bead_length_mm = cladding_volume_mm3 / bead_area;
-        let cladding_layers = (cladding_volume_mm3 / (100.0 * 100.0 * layer_thickness_mm)).ceil() as usize;
+        let cladding_layers =
+            (cladding_volume_mm3 / (100.0 * 100.0 * layer_thickness_mm)).ceil() as usize;
 
         let laser_energy_density = laser_power_watts / (powder_feed_rate_g_min.max(0.1) * 10.0);
         let total_cycle_time_sec = (total_bead_length_mm / 15.0) + (cladding_layers as f64 * 30.0);
@@ -226,7 +227,11 @@ impl CadcraftMultiDisciplinaryDesignOptimizationMdoEngineV68 {
         weight_thermal: f64,
         design_variables: usize,
     ) -> (Vec<f64>, f64, f64) {
-        let vars = if design_variables == 0 { 10 } else { design_variables };
+        let vars = if design_variables == 0 {
+            10
+        } else {
+            design_variables
+        };
         let mut pareto_variables = Vec::with_capacity(vars);
 
         let total_weight = (weight_mass + weight_stiffness + weight_thermal).max(0.001);
@@ -238,8 +243,10 @@ impl CadcraftMultiDisciplinaryDesignOptimizationMdoEngineV68 {
             pareto_variables.push(val.clamp(0.1, 1.0));
         }
 
-        let pareto_score = norm_mass * 0.85 + norm_stiff * 0.92 + (1.0 - (norm_mass + norm_stiff)) * 0.78;
-        let mass_reduction_pct = (1.0 - (pareto_variables.iter().sum::<f64>() / vars as f64)) * 100.0;
+        let pareto_score =
+            norm_mass * 0.85 + norm_stiff * 0.92 + (1.0 - (norm_mass + norm_stiff)) * 0.78;
+        let mass_reduction_pct =
+            (1.0 - (pareto_variables.iter().sum::<f64>() / vars as f64)) * 100.0;
 
         (pareto_variables, pareto_score, mass_reduction_pct)
     }
@@ -275,7 +282,8 @@ impl CadcraftGenerativeSurfaceLoftSweepBlendEngineV68 {
         let v = if v_samples == 0 { 20 } else { v_samples };
 
         let total_control_points = section_curves_count * u * v;
-        let total_surface_area_mm2 = (u as f64 * 10.0) * (v as f64 * 15.0) * (section_curves_count as f64 * 0.5);
+        let total_surface_area_mm2 =
+            (u as f64 * 10.0) * (v as f64 * 15.0) * (section_curves_count as f64 * 0.5);
         let g3_continuous = section_curves_count >= 2;
 
         (total_control_points, total_surface_area_mm2, g3_continuous)
@@ -369,13 +377,22 @@ impl CadcraftElectrostaticCapacitiveSensorMemsDesignEngineV68 {
         let total_capacitance_pf = (2.0 * finger_pairs as f64 * epsilon_0 * area / gap_m) * 1.0e12;
 
         // Electrostatic force F = N * eps * t * V^2 / g
-        let electrostatic_force_un = (finger_pairs as f64 * epsilon_0 * finger_thickness_m * applied_volts * applied_volts / gap_m) * 1.0e6;
+        let electrostatic_force_un =
+            (finger_pairs as f64 * epsilon_0 * finger_thickness_m * applied_volts * applied_volts
+                / gap_m)
+                * 1.0e6;
 
         // Pull-in voltage estimate V_pi
         let spring_constant_n_m = 0.5;
-        let pull_in_voltage = ((8.0 * spring_constant_n_m * gap_m.powi(3)) / (27.0 * epsilon_0 * area * finger_pairs as f64)).sqrt();
+        let pull_in_voltage = ((8.0 * spring_constant_n_m * gap_m.powi(3))
+            / (27.0 * epsilon_0 * area * finger_pairs as f64))
+            .sqrt();
 
-        (total_capacitance_pf, electrostatic_force_un, pull_in_voltage)
+        (
+            total_capacitance_pf,
+            electrostatic_force_un,
+            pull_in_voltage,
+        )
     }
 }
 
@@ -417,10 +434,15 @@ impl CadcraftAutomatedAssemblyFastenerTorqueClampingEngineV68 {
         let material_shear_yield_mpa = 350.0; // Steel grade 8.8
         let max_allowable_force_kn = (shear_area_mm2 * material_shear_yield_mpa) / 1000.0;
 
-        let thread_stripping_safety_factor = max_allowable_force_kn / target_clamp_force_kn.max(0.1);
+        let thread_stripping_safety_factor =
+            max_allowable_force_kn / target_clamp_force_kn.max(0.1);
         let is_safe = thread_stripping_safety_factor >= 1.5;
 
-        (tightening_torque_nm, thread_stripping_safety_factor, is_safe)
+        (
+            tightening_torque_nm,
+            thread_stripping_safety_factor,
+            is_safe,
+        )
     }
 }
 
@@ -449,7 +471,8 @@ impl CadcraftAugmentedRealityCad3dSpatialOverlayEngineV68 {
         marker_count: usize,
         spatial_distance_m: f64,
     ) -> (f64, f64, bool) {
-        let tracking_accuracy_mm = (0.5 + spatial_distance_m * 0.1) / (marker_count.max(1) as f64).sqrt();
+        let tracking_accuracy_mm =
+            (0.5 + spatial_distance_m * 0.1) / (marker_count.max(1) as f64).sqrt();
         let frame_rate_fps = (120.0 - spatial_distance_m * 2.0).clamp(60.0, 120.0);
         let alignment_locked = tracking_accuracy_mm <= 1.0;
 
@@ -488,7 +511,8 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
             gdt_engine: CadcraftParametricGeometricDimensioningToleranceGdAndTEngineV68::new(),
             crash_engine: CadcraftDynamicCrashExplicitDynamicsImpactFeaEngineV68::new(),
             swarf_cam_engine: CadcraftFiveAxisFlankSwarfMillingCamEngineV68::new(),
-            hybrid_ded_engine: CadcraftHybridAdditiveSubtractiveDirectedEnergyDepositionEngineV68::new(),
+            hybrid_ded_engine:
+                CadcraftHybridAdditiveSubtractiveDirectedEnergyDepositionEngineV68::new(),
             mdo_engine: CadcraftMultiDisciplinaryDesignOptimizationMdoEngineV68::new(),
             loft_engine: CadcraftGenerativeSurfaceLoftSweepBlendEngineV68::new(),
             weld_fatigue_engine: CadcraftWeldedStructureJointFatigueLifeEngineV68::new(),
@@ -502,10 +526,14 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
         vec![
             CadcraftV68PrProposalManifest {
                 pr_id: 6801,
-                pr_title: String::from("ASME Y14.5 / ISO 1101 GD&T Feature Control Frame Solver PR"),
+                pr_title: String::from(
+                    "ASME Y14.5 / ISO 1101 GD&T Feature Control Frame Solver PR",
+                ),
                 target_subsystem: String::from("Creative::Cadcraft::GDT"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftParametricGeometricDimensioningToleranceGdAndTEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftParametricGeometricDimensioningToleranceGdAndTEngineV68",
+                )],
                 performance_multiplier: String::from("22.4x MMC bonus tolerance solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -514,7 +542,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Explicit Dynamics Crash Impact Johnson-Cook Strain FEA PR"),
                 target_subsystem: String::from("Creative::Cadcraft::CrashFEA"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftDynamicCrashExplicitDynamicsImpactFeaEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftDynamicCrashExplicitDynamicsImpactFeaEngineV68",
+                )],
                 performance_multiplier: String::from("35.2x time-integration step acceleration"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -523,25 +553,35 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("5-Axis Flank Swarf Milling CAM Toolpath Generator PR"),
                 target_subsystem: String::from("Creative::Cadcraft::CAM"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftFiveAxisFlankSwarfMillingCamEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftFiveAxisFlankSwarfMillingCamEngineV68",
+                )],
                 performance_multiplier: String::from("19.8x ruled wall surface tool aligner"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV68PrProposalManifest {
                 pr_id: 6804,
-                pr_title: String::from("Hybrid Additive DED Laser Cladding & Subtractive CAM Planner PR"),
+                pr_title: String::from(
+                    "Hybrid Additive DED Laser Cladding & Subtractive CAM Planner PR",
+                ),
                 target_subsystem: String::from("Creative::Cadcraft::HybridAM"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftHybridAdditiveSubtractiveDirectedEnergyDepositionEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftHybridAdditiveSubtractiveDirectedEnergyDepositionEngineV68",
+                )],
                 performance_multiplier: String::from("27.6x multi-axis laser bead layer planner"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV68PrProposalManifest {
                 pr_id: 6805,
-                pr_title: String::from("Multidisciplinary Design Optimization (MDO) Pareto Front PR"),
+                pr_title: String::from(
+                    "Multidisciplinary Design Optimization (MDO) Pareto Front PR",
+                ),
                 target_subsystem: String::from("Creative::Cadcraft::MDO"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftMultiDisciplinaryDesignOptimizationMdoEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftMultiDisciplinaryDesignOptimizationMdoEngineV68",
+                )],
                 performance_multiplier: String::from("31.0x structural-thermal trade-off solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -550,8 +590,12 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("G3 Curvature-Continuous Surface Lofting & Sweeping PR"),
                 target_subsystem: String::from("Creative::Cadcraft::Surfacing"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftGenerativeSurfaceLoftSweepBlendEngineV68")],
-                performance_multiplier: String::from("24.5x freeform surface control mesh generator"),
+                components_added: vec![String::from(
+                    "CadcraftGenerativeSurfaceLoftSweepBlendEngineV68",
+                )],
+                performance_multiplier: String::from(
+                    "24.5x freeform surface control mesh generator",
+                ),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV68PrProposalManifest {
@@ -559,8 +603,12 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Welded Structure Joint S-N Fatigue Life Calculator PR"),
                 target_subsystem: String::from("Creative::Cadcraft::FatigueCAE"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftWeldedStructureJointFatigueLifeEngineV68")],
-                performance_multiplier: String::from("16.3x Basquin Manson-Coffin strain damage evaluator"),
+                components_added: vec![String::from(
+                    "CadcraftWeldedStructureJointFatigueLifeEngineV68",
+                )],
+                performance_multiplier: String::from(
+                    "16.3x Basquin Manson-Coffin strain damage evaluator",
+                ),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV68PrProposalManifest {
@@ -568,7 +616,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Electrostatic Capacitive Sensor MEMS Comb-Drive CAE PR"),
                 target_subsystem: String::from("Creative::Cadcraft::MEMS"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftElectrostaticCapacitiveSensorMemsDesignEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftElectrostaticCapacitiveSensorMemsDesignEngineV68",
+                )],
                 performance_multiplier: String::from("28.4x micro-actuator pull-in voltage solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -577,7 +627,9 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Automated Fastener Torque Clamping & Thread Stripping PR"),
                 target_subsystem: String::from("Creative::Cadcraft::AssemblyFasteners"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftAutomatedAssemblyFastenerTorqueClampingEngineV68")],
+                components_added: vec![String::from(
+                    "CadcraftAutomatedAssemblyFastenerTorqueClampingEngineV68",
+                )],
                 performance_multiplier: String::from("21.2x bolt tension preload verifier"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -586,8 +638,12 @@ impl SovereignCadcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: String::from("Augmented Reality 3D Spatial CAD Overlay Inspector PR"),
                 target_subsystem: String::from("Creative::Cadcraft::ARInspection"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from("CadcraftAugmentedRealityCad3dSpatialOverlayEngineV68")],
-                performance_multiplier: String::from("42.0x sub-millisecond holographic tracking lock"),
+                components_added: vec![String::from(
+                    "CadcraftAugmentedRealityCad3dSpatialOverlayEngineV68",
+                )],
+                performance_multiplier: String::from(
+                    "42.0x sub-millisecond holographic tracking lock",
+                ),
                 status: String::from("APPROVED_AND_MERGED"),
             },
         ]

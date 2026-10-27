@@ -76,11 +76,26 @@ pub struct SovereignCraftCreativeMatrix {
 impl SovereignCraftCreativeMatrix {
     pub fn new() -> Self {
         let modules = vec![
-            "3D".to_string(), "Ani".to_string(), "Art".to_string(), "CAD".to_string(),
-            "CraftLibs".to_string(), "Deck".to_string(), "Design".to_string(), "Effect".to_string(),
-            "Fig".to_string(), "Film".to_string(), "Font".to_string(), "Grid".to_string(),
-            "Light".to_string(), "PDF".to_string(), "Photo".to_string(), "Print".to_string(),
-            "Sound".to_string(), "Vector".to_string(), "Voice".to_string(), "Word".to_string(),
+            "3D".to_string(),
+            "Ani".to_string(),
+            "Art".to_string(),
+            "CAD".to_string(),
+            "CraftLibs".to_string(),
+            "Deck".to_string(),
+            "Design".to_string(),
+            "Effect".to_string(),
+            "Fig".to_string(),
+            "Film".to_string(),
+            "Font".to_string(),
+            "Grid".to_string(),
+            "Light".to_string(),
+            "PDF".to_string(),
+            "Photo".to_string(),
+            "Print".to_string(),
+            "Sound".to_string(),
+            "Vector".to_string(),
+            "Voice".to_string(),
+            "Word".to_string(),
         ];
         Self {
             active_modules: modules,
@@ -135,13 +150,34 @@ impl SovereignOfficeEngine {
 
     pub fn dispatch_office_task(&self, task_type: &str, file_name: &str) -> String {
         match task_type {
-            "Writer" => format!("WordCraft: Typeset independent document '{}' with native typography", file_name),
-            "Calc" => format!("SheetCraft: Evaluated {} vectorized formulas for spreadsheet '{}'", self.sheet_craft_cells_vectorized, file_name),
-            "Impress" => format!("DeckCraft: Staged presentation '{}' with {} native slide master layouts", file_name, self.deck_craft_slides_count),
-            "Draw" => format!("DrawCraft: Processed {} vector Bézier path nodes for '{}'", self.draw_craft_bezier_nodes, file_name),
-            "Math" => format!("MathCraft: Rendered mathematical expression for '{}' without external TeX binary", file_name),
-            "Base" => format!("BaseCraft: Embedded columnar schema manager loaded {} tables for '{}'", self.base_craft_tables_managed, file_name),
-            _ => format!("Sovereign Office: Universal document router processed '{}'", file_name),
+            "Writer" => format!(
+                "WordCraft: Typeset independent document '{}' with native typography",
+                file_name
+            ),
+            "Calc" => format!(
+                "SheetCraft: Evaluated {} vectorized formulas for spreadsheet '{}'",
+                self.sheet_craft_cells_vectorized, file_name
+            ),
+            "Impress" => format!(
+                "DeckCraft: Staged presentation '{}' with {} native slide master layouts",
+                file_name, self.deck_craft_slides_count
+            ),
+            "Draw" => format!(
+                "DrawCraft: Processed {} vector Bézier path nodes for '{}'",
+                self.draw_craft_bezier_nodes, file_name
+            ),
+            "Math" => format!(
+                "MathCraft: Rendered mathematical expression for '{}' without external TeX binary",
+                file_name
+            ),
+            "Base" => format!(
+                "BaseCraft: Embedded columnar schema manager loaded {} tables for '{}'",
+                self.base_craft_tables_managed, file_name
+            ),
+            _ => format!(
+                "Sovereign Office: Universal document router processed '{}'",
+                file_name
+            ),
         }
     }
 }
@@ -227,13 +263,34 @@ impl SovereignAiDeveloperEngine {
 
     pub fn trigger_developer_service(&self, service: &str) -> String {
         match service {
-            "Blender" => format!("Sovereign 3D Studio: Headless geometry pipeline generated {} meshes", self.blender_procedural_mesh_count),
-            "Agents" => format!("Sovereign Agent Loop: Autonomous task planner finished {} self-reflective steps", self.autonomous_agent_loops_executed),
-            "Terminal" => format!("Sovereign Warp Terminal: GPU-rendered command blocks active ({} buffer entries)", self.warp_block_terminal_history_size),
-            "Editor" => format!("Sovereign Text Core: Native UTF-8 Scintilla buffer allocate {} bytes", self.notepad_scintilla_buffer_bytes),
-            "Containers" => format!("Sovereign Container Runtime: {} isolated Linux/FreeBSD jail namespaces running", self.docker_container_namespaces_active),
-            "Robotics" => format!("Sovereign OpenClaw: {} real-time hardware actuators calibrated", self.openclaw_sensors_calibrated),
-            "VLC" => format!("Sovereign VLC Core: {} hardware-accelerated AV codecs ready", self.vlc_hardware_codecs_loaded),
+            "Blender" => format!(
+                "Sovereign 3D Studio: Headless geometry pipeline generated {} meshes",
+                self.blender_procedural_mesh_count
+            ),
+            "Agents" => format!(
+                "Sovereign Agent Loop: Autonomous task planner finished {} self-reflective steps",
+                self.autonomous_agent_loops_executed
+            ),
+            "Terminal" => format!(
+                "Sovereign Warp Terminal: GPU-rendered command blocks active ({} buffer entries)",
+                self.warp_block_terminal_history_size
+            ),
+            "Editor" => format!(
+                "Sovereign Text Core: Native UTF-8 Scintilla buffer allocate {} bytes",
+                self.notepad_scintilla_buffer_bytes
+            ),
+            "Containers" => format!(
+                "Sovereign Container Runtime: {} isolated Linux/FreeBSD jail namespaces running",
+                self.docker_container_namespaces_active
+            ),
+            "Robotics" => format!(
+                "Sovereign OpenClaw: {} real-time hardware actuators calibrated",
+                self.openclaw_sensors_calibrated
+            ),
+            "VLC" => format!(
+                "Sovereign VLC Core: {} hardware-accelerated AV codecs ready",
+                self.vlc_hardware_codecs_loaded
+            ),
             _ => "Sovereign Developer Tooling: Native developer subsystem ready".to_string(),
         }
     }
@@ -321,15 +378,45 @@ impl SovereignCompleteOsMasterCoordinator {
 
     pub fn audit_system_sovereignty(&self) -> BTreeMap<String, String> {
         let mut report = BTreeMap::new();
-        report.insert("os_name".to_string(), "SigmaOS Sovereign Edition".to_string());
-        report.insert("independence_level".to_string(), IndependenceLevel::PureCleanRoomRust.as_str().to_string());
-        report.insert("sovereignty_score".to_string(), format!("{:.1}% Independent Codebase", self.sovereignty_independence_percentage));
-        report.insert("craft_modules_count".to_string(), self.craft_matrix.total_module_count().to_string());
-        report.insert("office_suite_status".to_string(), "Clean-Room Native Rust Architecture".to_string());
-        report.insert("data_engine_status".to_string(), "PostgreSQL/DuckDB/Arrow Native In-Memory Engine".to_string());
-        report.insert("ai_developer_status".to_string(), "Autonomous Agents & Modern GPU Terminal Active".to_string());
-        report.insert("kernel_gateway_status".to_string(), "Universal Zero-Blob ABI Compatibility Layer".to_string());
-        report.insert("market_competitiveness".to_string(), "Tier-1 Autonomous OS Competitive Standing".to_string());
+        report.insert(
+            "os_name".to_string(),
+            "SigmaOS Sovereign Edition".to_string(),
+        );
+        report.insert(
+            "independence_level".to_string(),
+            IndependenceLevel::PureCleanRoomRust.as_str().to_string(),
+        );
+        report.insert(
+            "sovereignty_score".to_string(),
+            format!(
+                "{:.1}% Independent Codebase",
+                self.sovereignty_independence_percentage
+            ),
+        );
+        report.insert(
+            "craft_modules_count".to_string(),
+            self.craft_matrix.total_module_count().to_string(),
+        );
+        report.insert(
+            "office_suite_status".to_string(),
+            "Clean-Room Native Rust Architecture".to_string(),
+        );
+        report.insert(
+            "data_engine_status".to_string(),
+            "PostgreSQL/DuckDB/Arrow Native In-Memory Engine".to_string(),
+        );
+        report.insert(
+            "ai_developer_status".to_string(),
+            "Autonomous Agents & Modern GPU Terminal Active".to_string(),
+        );
+        report.insert(
+            "kernel_gateway_status".to_string(),
+            "Universal Zero-Blob ABI Compatibility Layer".to_string(),
+        );
+        report.insert(
+            "market_competitiveness".to_string(),
+            "Tier-1 Autonomous OS Competitive Standing".to_string(),
+        );
         report
     }
 
