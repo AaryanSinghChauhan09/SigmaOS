@@ -2710,6 +2710,12 @@ if [ -f "src/creative/threedcraft_advancements_v74_pr.rs" ]; then
     ./build/threedcraft_v74_test
 fi
 
+if [ -f "src/creative/threedcraft_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign 3DCraft Advancements V78 PR test suite..."
+    rustc --test src/creative/threedcraft_advancements_v78_pr.rs --edition=2021 -o build/threedcraft_v78_test
+    ./build/threedcraft_v78_test
+fi
+
 if [ -f "src/creative/artcraft_advancements_v75_pr.rs" ]; then
     echo "Running Sovereign Artcraft Advancements V75 PR test suite..."
     rustc --test src/creative/artcraft_advancements_v75_pr.rs --edition=2021 -o build/test_artcraft_v75_pr
