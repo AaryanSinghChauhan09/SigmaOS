@@ -71,6 +71,7 @@ pub use creative::filmcraft_artcraft_parity_pr::*;
 // pub use creative::filmcraft_missing_components_parity_pr::*;
 pub use creative::fontcraft::*;
 pub use creative::fontcraft_advancements_v77_pr::*;
+pub use creative::fontcraft_advancements_v78_pr::*;
 pub use creative::fontcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::fontcraft_artcraft_parity_pr::*;
 pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;

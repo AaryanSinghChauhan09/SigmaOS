@@ -702,6 +702,13 @@ if [ -f "src/creative/fontcraft_advancements_v77_pr.rs" ]; then
     ./build/test_fontcraft_v77
 fi
 
+if [ -f "src/creative/fontcraft_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign FontCraft Advancements V78 PR test suite..."
+    mkdir -p build
+    rustc --test src/creative/fontcraft_advancements_v78_pr.rs --edition=2021 -o build/test_fontcraft_v78
+    ./build/test_fontcraft_v78
+fi
+
 if [ -f "src/creative/voicecraft.rs" ]; then
     echo "Running Sovereign VoiceCraft Engine test suite..."
     mkdir -p build
