@@ -2428,6 +2428,13 @@ if [ -f "src/userland/system_utilities.rs" ]; then
     ./build/test_system_utilities
 fi
 
+if [ -f "tests/test_system_utilities_plan_verification.rs" ]; then
+    echo "Running System Utilities Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/test_system_utilities_plan_verification.rs --edition=2021 -o build/test_sys_utils_plan
+    ./build/test_sys_utils_plan
+fi
+
 if [ -f "src/productivity/sovereign_application_replacements_pr_suite.rs" ]; then
     echo "Running Sovereign Application Replacements PR Suite..."
     mkdir -p build
