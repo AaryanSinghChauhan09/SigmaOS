@@ -845,6 +845,16 @@ if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_advancements_v75_pr.r
     ./build/test_kernel_distro_advancements_v75_pr
 fi
 
+if [ -f "src/kernel/sovereign_kernel_open_source_os_distro_advancements_v78_pr.rs" ]; then
+    echo "Running Sovereign Kernel Open Source OS & Distro Advancements V78 PR Engine test suite..."
+    mkdir -p build
+    rustc --test src/kernel/sovereign_kernel_open_source_os_distro_advancements_v78_pr.rs --edition=2021 -o build/test_kernel_distro_advancements_v78_pr
+    ./build/test_kernel_distro_advancements_v78_pr
+
+    rustc --test tests/test_kernel_open_source_os_distro_advancements_v78_pr.rs --edition=2021 -o build/test_kernel_distro_advancements_v78_pr_integration
+    ./build/test_kernel_distro_advancements_v78_pr_integration
+fi
+
 if [ -f "src/network/approximation_proxy_firewall.rs" ]; then
     echo "Running Sovereign Approximation Proxy Firewall test suite..."
     mkdir -p build
@@ -1368,7 +1378,7 @@ fi
 if [ -f "src/package/sovereign_distro_package_advancements_v78_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V78 PR test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v78_pr_test
+    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' --cfg 'feature="standalone_pr_only"' -o build/sovereign_advancements_v78_pr_test
     ./build/sovereign_advancements_v78_pr_test
 fi
 

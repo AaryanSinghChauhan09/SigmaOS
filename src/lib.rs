@@ -218,6 +218,7 @@ pub use kernel::{
     SovereignKernelOpenSourceOsDistroAdvancementsV68PrGateway,
     SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV75PrGateway,
+    SovereignKernelOpenSourceOsDistroAdvancementsV78PrGateway,
     SovereignKernelOpenSourceOsDistroInnovationsV72PrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };
