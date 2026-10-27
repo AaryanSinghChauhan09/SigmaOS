@@ -39,35 +39,65 @@ fn test_cachy_linux_v79_engines_and_manifests() {
     assert_eq!(manifests.len(), 10);
 
     assert_eq!(manifests[0].pr_number, 7901);
-    assert_eq!(manifests[0].component_id, "cachyos-scx-central-lavd-v7-scheduler");
+    assert_eq!(
+        manifests[0].component_id,
+        "cachyos-scx-central-lavd-v7-scheduler"
+    );
     assert_eq!(manifests[0].status, CachyOsPrStatusV79::Active);
 
     assert_eq!(manifests[1].pr_number, 7902);
-    assert_eq!(manifests[1].component_id, "cachyos-kernel-autobolt-pgo-v7-pipeline");
+    assert_eq!(
+        manifests[1].component_id,
+        "cachyos-kernel-autobolt-pgo-v7-pipeline"
+    );
 
     assert_eq!(manifests[2].pr_number, 7903);
-    assert_eq!(manifests[2].component_id, "cachyos-chwd-vulkan-wayland-direct-scanout-v7");
+    assert_eq!(
+        manifests[2].component_id,
+        "cachyos-chwd-vulkan-wayland-direct-scanout-v7"
+    );
 
     assert_eq!(manifests[3].pr_number, 7904);
-    assert_eq!(manifests[3].component_id, "cachyos-pacman-v7-pqc-dilithium-verifier");
+    assert_eq!(
+        manifests[3].component_id,
+        "cachyos-pacman-v7-pqc-dilithium-verifier"
+    );
 
     assert_eq!(manifests[4].pr_number, 7905);
-    assert_eq!(manifests[4].component_id, "cachyos-proton-wine-ntsync-fsync7-governor");
+    assert_eq!(
+        manifests[4].component_id,
+        "cachyos-proton-wine-ntsync-fsync7-governor"
+    );
 
     assert_eq!(manifests[5].pr_number, 7906);
-    assert_eq!(manifests[5].component_id, "cachyos-ananicy-realtime-ebpf-v7-governor");
+    assert_eq!(
+        manifests[5].component_id,
+        "cachyos-ananicy-realtime-ebpf-v7-governor"
+    );
 
     assert_eq!(manifests[6].pr_number, 7907);
-    assert_eq!(manifests[6].component_id, "cachyos-btrfs-zstd-ebpf-compressor-v7-tuner");
+    assert_eq!(
+        manifests[6].component_id,
+        "cachyos-btrfs-zstd-ebpf-compressor-v7-tuner"
+    );
 
     assert_eq!(manifests[7].pr_number, 7908);
-    assert_eq!(manifests[7].component_id, "cachyos-gamescope-hdr10-vrr-passthrough-pacer-v7");
+    assert_eq!(
+        manifests[7].component_id,
+        "cachyos-gamescope-hdr10-vrr-passthrough-pacer-v7"
+    );
 
     assert_eq!(manifests[8].pr_number, 7909);
-    assert_eq!(manifests[8].component_id, "cachyos-zram-lz4-zstd-dynamic-pool-v7");
+    assert_eq!(
+        manifests[8].component_id,
+        "cachyos-zram-lz4-zstd-dynamic-pool-v7"
+    );
 
     assert_eq!(manifests[9].pr_number, 7910);
-    assert_eq!(manifests[9].component_id, "cachyos-handheld-power-cap-thermal-v7-governor");
+    assert_eq!(
+        manifests[9].component_id,
+        "cachyos-handheld-power-cap-thermal-v7-governor"
+    );
 
     let summary = suite.generate_suite_summary();
     assert_eq!(summary.get("total_components").unwrap(), "10");
@@ -87,7 +117,7 @@ fn test_cachy_linux_individual_engine_functionality() {
 
     let mut chwd = CachyOsChwdVulkanWaylandDirectScanoutV7Engine::new();
     let chwd_msg = chwd.bypass_compositor(42);
-        assert!(chwd_msg.contains("surface 42"));
+    assert!(chwd_msg.contains("surface 42"));
 
     let pacman = CachyOsPacmanV7PqcDilithiumVerifierEngine::new();
     assert!(pacman.verify_package_signature("linux-cachyos-6.33.pkg.tar.zst"));
