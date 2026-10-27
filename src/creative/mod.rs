@@ -3,6 +3,7 @@
 // Creative applications framework inspired by GIMP, Krita, Inkscape, Blender, etc.
 
 pub mod anicraft;
+pub mod anicraft_advancements_pr;
 pub mod anicraft_advancements_v69_pr;
 pub mod anicraft_artcraft_parity_pr;
 pub mod anicraft_missing_components_parity_pr;
@@ -107,6 +108,7 @@ pub mod wordcraft_artcraft_missing_components_v67_pr;
 pub mod wordcraft_artcraft_parity_pr;
 pub mod wordcraft_missing_components_parity_pr;
 
+pub use anicraft_advancements_pr::*;
 pub use anicraft_advancements_v69_pr::*;
 pub use anicraft_artcraft_parity_pr::*;
 pub use artcraft_advancements_v75_pr::*;
