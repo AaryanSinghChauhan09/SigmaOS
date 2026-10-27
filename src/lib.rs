@@ -389,16 +389,7 @@ pub mod boot;
 pub use boot::start_assembly_entry::*;
 pub use boot::*;
 pub mod browser_handoff;
-pub mod toolchain {
-    pub mod adapter;
-    pub mod bootstrap;
-    pub mod capsule;
-    pub mod codex;
-    pub mod cross_compile;
-    pub mod self_host;
-    pub mod sovereign_toolchain_development_advancements_pr;
-    pub mod sovereign_toolchain_development_advancements_v74_pr;
-}
+pub mod toolchain;
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v76_pr::*;
