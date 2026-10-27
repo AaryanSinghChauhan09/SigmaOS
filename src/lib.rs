@@ -710,6 +710,7 @@ pub mod wireless;
 pub mod workflow;
 
 pub mod io;
+pub use crate::io::sovereign_io_management_and_pr_suite::*;
 
 pub use crate::desktop::sovereign_de_wm_advancements_v68_pr::*;
 pub use crate::desktop::sovereign_de_wm_advancements_v74_pr::*;
