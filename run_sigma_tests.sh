@@ -2096,6 +2096,16 @@ if [ -f "src/distro/open_source_os_missing_components_v78_pr.rs" ]; then
     ./build/test_open_source_v78_pr_integration
 fi
 
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v78_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure V78 PR Suite tests..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -o build/test_linux_bsd_gap_v78_standalone
+    ./build/test_linux_bsd_gap_v78_standalone
+
+    rustc --test tests/test_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -o build/test_linux_bsd_gap_v78_integration
+    ./build/test_linux_bsd_gap_v78_integration
+fi
+
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build
