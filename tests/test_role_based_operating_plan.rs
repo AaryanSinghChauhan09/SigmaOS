@@ -16,18 +16,32 @@ fn test_engine_initialization() {
 fn test_role_metadata_and_leadership() {
     let engine = RoleBasedOperatingPlanEngine::new();
 
-    let maintainer = engine.get_role_definition(MaintenanceRole::Maintainer).expect("Maintainer role found");
+    let maintainer = engine
+        .get_role_definition(MaintenanceRole::Maintainer)
+        .expect("Maintainer role found");
     assert_eq!(maintainer.title, "Maintainer");
-    assert_eq!(maintainer.leadership, LeadershipProfile::HumanLedAgentAssisted);
+    assert_eq!(
+        maintainer.leadership,
+        LeadershipProfile::HumanLedAgentAssisted
+    );
 
-    let updater = engine.get_role_definition(MaintenanceRole::Updater).expect("Updater role found");
+    let updater = engine
+        .get_role_definition(MaintenanceRole::Updater)
+        .expect("Updater role found");
     assert_eq!(updater.title, "Updater");
     assert_eq!(updater.leadership, LeadershipProfile::MostlyAgent);
 
-    let reviewer = engine.get_role_definition(MaintenanceRole::Reviewer).expect("Reviewer role found");
-    assert_eq!(reviewer.leadership, LeadershipProfile::AgentFirstPassHumanApproval);
+    let reviewer = engine
+        .get_role_definition(MaintenanceRole::Reviewer)
+        .expect("Reviewer role found");
+    assert_eq!(
+        reviewer.leadership,
+        LeadershipProfile::AgentFirstPassHumanApproval
+    );
 
-    let sec = engine.get_role_definition(MaintenanceRole::SecurityOfficer).expect("SecurityOfficer role found");
+    let sec = engine
+        .get_role_definition(MaintenanceRole::SecurityOfficer)
+        .expect("SecurityOfficer role found");
     assert_eq!(sec.leadership, LeadershipProfile::HumanLed);
 }
 
@@ -69,10 +83,16 @@ fn test_governance_guardrail_validation() {
 fn test_weekly_calendar_dispatch() {
     let engine = RoleBasedOperatingPlanEngine::new();
 
-    let monday = engine.get_day_focus(CalendarDay::Monday).expect("Monday focus found");
+    let monday = engine
+        .get_day_focus(CalendarDay::Monday)
+        .expect("Monday focus found");
     assert!(monday.assigned_roles.contains(&MaintenanceRole::Triager));
     assert!(monday.assigned_roles.contains(&MaintenanceRole::Updater));
 
-    let friday = engine.get_day_focus(CalendarDay::Friday).expect("Friday focus found");
-    assert!(friday.assigned_roles.contains(&MaintenanceRole::ReleaseManager));
+    let friday = engine
+        .get_day_focus(CalendarDay::Friday)
+        .expect("Friday focus found");
+    assert!(friday
+        .assigned_roles
+        .contains(&MaintenanceRole::ReleaseManager));
 }

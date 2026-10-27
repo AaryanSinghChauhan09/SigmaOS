@@ -736,7 +736,10 @@ impl SovereignGraphicsDisplayV74MasterSuiteEngine {
 
         // 3. Mesa
         let bc = self.mesa.compile_nir_shader("test_shader");
-        audit.insert("Mesa Gallium3D ACO Shader Compilation Functional", !bc.is_empty());
+        audit.insert(
+            "Mesa Gallium3D ACO Shader Compilation Functional",
+            !bc.is_empty(),
+        );
 
         // 4. DRM/KMS
         let prime = self.drm_kms.alloc_gem_export_prime(1920, 1080);
@@ -756,7 +759,10 @@ impl SovereignGraphicsDisplayV74MasterSuiteEngine {
 
         // 8. Weston
         self.weston.schedule_repaint();
-        audit.insert("Weston Repaint Scheduler Functional", self.weston.repaint_pending);
+        audit.insert(
+            "Weston Repaint Scheduler Functional",
+            self.weston.repaint_pending,
+        );
 
         // 9. Sway
         let split = self.sway.split_container(1, true);
@@ -764,7 +770,10 @@ impl SovereignGraphicsDisplayV74MasterSuiteEngine {
 
         // 10. wlroots
         self.wlroots.add_damage(0, 0, 100, 100);
-        audit.insert("wlroots Damage Ring Functional", !self.wlroots.damage_rects.is_empty());
+        audit.insert(
+            "wlroots Damage Ring Functional",
+            !self.wlroots.damage_rects.is_empty(),
+        );
 
         // 11. Mutter
         let px = self.mutter.scale_geometry(100.0);
@@ -772,11 +781,17 @@ impl SovereignGraphicsDisplayV74MasterSuiteEngine {
 
         // 12. KWin
         let (kw_w, kw_h) = self.kwin.compute_decorated_extents(800, 600);
-        audit.insert("KWin Decorated Window Geometry Functional", kw_w == 832 && kw_h == 660);
+        audit.insert(
+            "KWin Decorated Window Geometry Functional",
+            kw_w == 832 && kw_h == 660,
+        );
 
         // 13. Compiz
         self.compiz.rotate_cube(0.5);
-        audit.insert("Compiz 3D Cube Rotation Functional", self.compiz.cube_angle_rad > 0.0);
+        audit.insert(
+            "Compiz 3D Cube Rotation Functional",
+            self.compiz.cube_angle_rad > 0.0,
+        );
 
         // 14. Picom
         let corner = self.picom.is_inside_rounded_corner(50, 50, 100, 100);
@@ -784,11 +799,17 @@ impl SovereignGraphicsDisplayV74MasterSuiteEngine {
 
         // 15. Xwayland
         self.xwayland.set_clipboard("Wayland Paste V74");
-        audit.insert("Xwayland Clipboard Selection Bridge Functional", self.xwayland.clipboard_text == "Wayland Paste V74");
+        audit.insert(
+            "Xwayland Clipboard Selection Bridge Functional",
+            self.xwayland.clipboard_text == "Wayland Paste V74",
+        );
 
         // 16. evdev
         self.evdev.update_slot_position(0, 100, 200);
-        audit.insert("evdev Multitouch Slot Tracker Functional", self.evdev.slots[0] == (100, 200));
+        audit.insert(
+            "evdev Multitouch Slot Tracker Functional",
+            self.evdev.slots[0] == (100, 200),
+        );
 
         // 17. libinput
         let palm = self.libinput.is_palm_touch(10, 1000);
@@ -796,7 +817,10 @@ impl SovereignGraphicsDisplayV74MasterSuiteEngine {
 
         // 18. Framebuffer
         self.fbdev.draw_pixel(10, 10, 0xFF00FF00);
-        audit.insert("Console Framebuffer ARGB Pixel Drawing Functional", self.fbdev.buffer[10 * 1920 + 10] == 0xFF00FF00);
+        audit.insert(
+            "Console Framebuffer ARGB Pixel Drawing Functional",
+            self.fbdev.buffer[10 * 1920 + 10] == 0xFF00FF00,
+        );
 
         // 19. Virtual Terminal
         let vt_ok = self.vt.switch_vt(3);
@@ -828,26 +852,106 @@ impl SovereignGraphicsDisplayV74PrGatewayEngine {
 
     fn bootstrap_v74_prs(&mut self) {
         let prs = vec![
-            (1, "X11 DRI3/XRandR 1.5 Protocol Enhancements", GraphicsDisplayV74PrCategory::X11ServerExtensionsAndMultipointer),
-            (2, "Wayland Color Management v4 and Tearing Protocol", GraphicsDisplayV74PrCategory::WaylandCoreSubsurfacesAndColorManagement),
-            (3, "Mesa Gallium3D ACO Wave64 Optimization Pass", GraphicsDisplayV74PrCategory::MesaEglGallium3dAcoAndZinkTranslation),
-            (4, "DRM/KMS Atomic Modesetting and VRR Sync Matrix", GraphicsDisplayV74PrCategory::DrmKmsAtomicModesettingVrrAndCtm),
-            (5, "libdrm Dumb Buffer and Ioctl Probe Gate", GraphicsDisplayV74PrCategory::LibdrmUserlandIoctlAndDumbBuffers),
-            (6, "Vulkan 1.4 Task/Mesh Shading and Ray Tracing Suite", GraphicsDisplayV74PrCategory::Vulkan13And14MeshShadingAndRayTracing),
-            (7, "OpenGL 4.6 Compute Shader and GLSL Pipeline", GraphicsDisplayV74PrCategory::OpenGl46GlslAndComputeShaderContext),
-            (8, "Weston Shell Repaint Scheduler and Blitting Engine", GraphicsDisplayV74PrCategory::WestonReferenceShellAndRepaintScheduler),
-            (9, "Sway Dynamic Container Tiling and IPC Gateway", GraphicsDisplayV74PrCategory::SwayDynamicTilingAndIpcEngine),
-            (10, "wlroots Damage Ring and Seat Multi-Device Router", GraphicsDisplayV74PrCategory::WlrootsModularBackendAndSeatDispatcher),
-            (11, "Mutter Clutter Scene Graph and Fractional Scale", GraphicsDisplayV74PrCategory::MutterClutterSceneGraphAndFractionalScaling),
-            (12, "KWin Plasma Blur Effects and Window Decoration", GraphicsDisplayV74PrCategory::KWinPlasmaCompositorBlurAndDecorations),
-            (13, "Compiz 3D Cube Projection and Spring Physics", GraphicsDisplayV74PrCategory::Compiz3dCubeAndWobblyWindowPhysics),
-            (14, "Picom Vsync Backend and Dual-Kawase Multi-Blur", GraphicsDisplayV74PrCategory::PicomX11VsyncAndDualKawaseBlur),
-            (15, "Xwayland Glamor 2D-over-3D and Clipboard Sync", GraphicsDisplayV74PrCategory::XwaylandGlamor2dAndClipboardBridge),
-            (16, "evdev Multitouch Slot Tracker and Rumble Output", GraphicsDisplayV74PrCategory::EvdevMultitouchSlotTrackerAndRumble),
-            (17, "libinput Gesture Recognition and Accel Curves", GraphicsDisplayV74PrCategory::LibinputGesturePalmRejectionAndAccel),
-            (18, "Console Framebuffer fbdev Pixel and Glyph Engine", GraphicsDisplayV74PrCategory::ConsoleFramebufferFbdevAndPsfGlyph),
-            (19, "Virtual Terminal VT_ACTIVATE Matrix and ANSI Parser", GraphicsDisplayV74PrCategory::VirtualTerminalWsconsMatrixAndIoctls),
-            (20, "COSMIC Smithay Rust Wayland Applet Router", GraphicsDisplayV74PrCategory::CosmicSmithayFrameworkAndAppletRouter),
+            (
+                1,
+                "X11 DRI3/XRandR 1.5 Protocol Enhancements",
+                GraphicsDisplayV74PrCategory::X11ServerExtensionsAndMultipointer,
+            ),
+            (
+                2,
+                "Wayland Color Management v4 and Tearing Protocol",
+                GraphicsDisplayV74PrCategory::WaylandCoreSubsurfacesAndColorManagement,
+            ),
+            (
+                3,
+                "Mesa Gallium3D ACO Wave64 Optimization Pass",
+                GraphicsDisplayV74PrCategory::MesaEglGallium3dAcoAndZinkTranslation,
+            ),
+            (
+                4,
+                "DRM/KMS Atomic Modesetting and VRR Sync Matrix",
+                GraphicsDisplayV74PrCategory::DrmKmsAtomicModesettingVrrAndCtm,
+            ),
+            (
+                5,
+                "libdrm Dumb Buffer and Ioctl Probe Gate",
+                GraphicsDisplayV74PrCategory::LibdrmUserlandIoctlAndDumbBuffers,
+            ),
+            (
+                6,
+                "Vulkan 1.4 Task/Mesh Shading and Ray Tracing Suite",
+                GraphicsDisplayV74PrCategory::Vulkan13And14MeshShadingAndRayTracing,
+            ),
+            (
+                7,
+                "OpenGL 4.6 Compute Shader and GLSL Pipeline",
+                GraphicsDisplayV74PrCategory::OpenGl46GlslAndComputeShaderContext,
+            ),
+            (
+                8,
+                "Weston Shell Repaint Scheduler and Blitting Engine",
+                GraphicsDisplayV74PrCategory::WestonReferenceShellAndRepaintScheduler,
+            ),
+            (
+                9,
+                "Sway Dynamic Container Tiling and IPC Gateway",
+                GraphicsDisplayV74PrCategory::SwayDynamicTilingAndIpcEngine,
+            ),
+            (
+                10,
+                "wlroots Damage Ring and Seat Multi-Device Router",
+                GraphicsDisplayV74PrCategory::WlrootsModularBackendAndSeatDispatcher,
+            ),
+            (
+                11,
+                "Mutter Clutter Scene Graph and Fractional Scale",
+                GraphicsDisplayV74PrCategory::MutterClutterSceneGraphAndFractionalScaling,
+            ),
+            (
+                12,
+                "KWin Plasma Blur Effects and Window Decoration",
+                GraphicsDisplayV74PrCategory::KWinPlasmaCompositorBlurAndDecorations,
+            ),
+            (
+                13,
+                "Compiz 3D Cube Projection and Spring Physics",
+                GraphicsDisplayV74PrCategory::Compiz3dCubeAndWobblyWindowPhysics,
+            ),
+            (
+                14,
+                "Picom Vsync Backend and Dual-Kawase Multi-Blur",
+                GraphicsDisplayV74PrCategory::PicomX11VsyncAndDualKawaseBlur,
+            ),
+            (
+                15,
+                "Xwayland Glamor 2D-over-3D and Clipboard Sync",
+                GraphicsDisplayV74PrCategory::XwaylandGlamor2dAndClipboardBridge,
+            ),
+            (
+                16,
+                "evdev Multitouch Slot Tracker and Rumble Output",
+                GraphicsDisplayV74PrCategory::EvdevMultitouchSlotTrackerAndRumble,
+            ),
+            (
+                17,
+                "libinput Gesture Recognition and Accel Curves",
+                GraphicsDisplayV74PrCategory::LibinputGesturePalmRejectionAndAccel,
+            ),
+            (
+                18,
+                "Console Framebuffer fbdev Pixel and Glyph Engine",
+                GraphicsDisplayV74PrCategory::ConsoleFramebufferFbdevAndPsfGlyph,
+            ),
+            (
+                19,
+                "Virtual Terminal VT_ACTIVATE Matrix and ANSI Parser",
+                GraphicsDisplayV74PrCategory::VirtualTerminalWsconsMatrixAndIoctls,
+            ),
+            (
+                20,
+                "COSMIC Smithay Rust Wayland Applet Router",
+                GraphicsDisplayV74PrCategory::CosmicSmithayFrameworkAndAppletRouter,
+            ),
         ];
 
         for (id, title, cat) in prs {

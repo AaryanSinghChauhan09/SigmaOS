@@ -14,7 +14,9 @@ fn test_elementary_missing_components_v78_integration_suite() {
     suite.files.open_new_tab("/home/user/Downloads");
     assert_eq!(suite.files.open_tabs.len(), 2);
 
-    suite.code.set_document_content("// TODO: optimize performance");
+    suite
+        .code
+        .set_document_content("// TODO: optimize performance");
     assert_eq!(suite.code.diagnostics.len(), 1);
 
     suite.mail.add_account("dev@sigmaos.org");

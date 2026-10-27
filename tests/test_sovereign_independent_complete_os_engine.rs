@@ -53,7 +53,8 @@ fn test_sovereign_unified_data_engine() {
     let data_engine = SovereignUnifiedDataEngine::new();
 
     // Act
-    let query_res = data_engine.execute_hybrid_query("SELECT user_id, count(*) FROM events GROUP BY user_id");
+    let query_res =
+        data_engine.execute_hybrid_query("SELECT user_id, count(*) FROM events GROUP BY user_id");
     let bi_res = data_engine.render_bi_dashboard("Executive Global Overview");
 
     // Assert
@@ -123,7 +124,10 @@ fn test_sovereign_master_coordinator_full_audit() {
     // Assert
     assert!(audit.get("sovereignty_score").unwrap().contains("98.5%"));
     assert_eq!(audit.get("craft_modules_count").unwrap(), "20");
-    assert_eq!(audit.get("independence_level").unwrap(), "100% Pure Clean-Room Rust");
+    assert_eq!(
+        audit.get("independence_level").unwrap(),
+        "100% Pure Clean-Room Rust"
+    );
     assert!(manifest.contains("Creative Suite: 20 Craft Modules"));
     assert!(manifest.contains("Office Suite: Native Writer, Calc, Impress"));
     assert!(manifest.contains("Universal ABI Translation"));

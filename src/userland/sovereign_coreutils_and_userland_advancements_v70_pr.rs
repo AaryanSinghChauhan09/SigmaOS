@@ -89,7 +89,10 @@ impl GnuBsdCoreutilsAdvancedEngineV70 {
         };
 
         if enable_hyperlinks {
-            format!("\x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\", entry.path, base_str)
+            format!(
+                "\x1b]8;;file://{}\x1b\\{}\x1b]8;;\x1b\\",
+                entry.path, base_str
+            )
         } else {
             base_str
         }
@@ -476,7 +479,10 @@ impl FindutilsDiffutilsAdvancedEngineV70 {
             }
         }
         if buf1.len() != buf2.len() {
-            Some((buf1.len().min(buf2.len()) + 1, buf1.len().min(buf2.len()) + 1))
+            Some((
+                buf1.len().min(buf2.len()) + 1,
+                buf1.len().min(buf2.len()) + 1,
+            ))
         } else {
             None
         }
