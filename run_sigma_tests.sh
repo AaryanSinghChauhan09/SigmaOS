@@ -2683,6 +2683,12 @@ if [ -f "tests/scheduler/core.rs" ]; then
     rustc --test tests/scheduler/affinity/affinity_test.rs --edition=2021 -o build/test_sched_affinity && ./build/test_sched_affinity
 fi
 
+if [ -f "tests/scheduler/test_scheduler_plan_verification.rs" ]; then
+    echo "Running Scheduler Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/scheduler/test_scheduler_plan_verification.rs --edition=2021 -o build/test_scheduler_plan_verification && ./build/test_scheduler_plan_verification
+fi
+
 if [ -f "tests/process/pid_allocator.rs" ]; then
     echo "Running Process Management Lifecycle & Isolation test suites..."
     mkdir -p build
