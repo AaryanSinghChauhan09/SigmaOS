@@ -47,7 +47,7 @@ pub struct FirewallRule {
     pub port: Option<u16>,
     pub from_address: Option<String>,
     pub to_address: Option<String>,
-    pub enabled: AtomicBool,
+    pub enabled: bool,
 }
 
 /// Firewall profile
@@ -97,7 +97,7 @@ impl FirewallManager {
             port,
             from_address: None,
             to_address: None,
-            enabled: AtomicBool::new(true),
+            enabled: true,
         };
         self.rules.push(rule);
         id
@@ -113,14 +113,14 @@ impl FirewallManager {
     /// Enable rule
     pub fn enable_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
         let rule = self.rules.iter_mut().find(|r| r.id == rule_id).ok_or("Rule not found")?;
-        rule.enabled.store(true, Ordering::Relaxed);
+        rule.enabled = true;
         Ok(())
     }
     
     /// Disable rule
     pub fn disable_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
         let rule = self.rules.iter_mut().find(|r| r.id == rule_id).ok_or("Rule not found")?;
-        rule.enabled.store(false, Ordering::Relaxed);
+        rule.enabled = false;
         Ok(())
     }
     
@@ -198,7 +198,7 @@ impl FirewallManager {
     pub fn get_enabled_rules(&self) -> Vec<&FirewallRule> {
         self.rules
             .iter()
-            .filter(|r| r.enabled.load(Ordering::Relaxed))
+            .filter(|r| r.enabled)
             .collect()
     }
     
@@ -279,10 +279,10 @@ mod tests {
         let id = manager.add_rule(RuleAction::Allow, Protocol::Tcp, Direction::Incoming, Some(80));
         
         manager.disable_rule(id).unwrap();
-        assert!(!manager.get_rule(id).unwrap().enabled.load(Ordering::Relaxed));
+        assert!(!manager.get_rule(id).unwrap().enabled);
         
         manager.enable_rule(id).unwrap();
-        assert!(manager.get_rule(id).unwrap().enabled.load(Ordering::Relaxed));
+        assert!(manager.get_rule(id).unwrap().enabled);
     }
     
     #[test]

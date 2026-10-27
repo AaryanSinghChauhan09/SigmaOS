@@ -33,7 +33,7 @@ pub struct CleanupOption {
     pub name: String,
     pub description: String,
     pub path: String,
-    pub enabled: AtomicBool,
+    pub enabled: bool,
 }
 
 /// Cleanup statistics
@@ -76,7 +76,7 @@ impl SystemCleanupManager {
             name,
             description,
             path,
-            enabled: AtomicBool::new(true),
+            enabled: true,
         };
         self.options.push(option);
     }
@@ -84,14 +84,14 @@ impl SystemCleanupManager {
     /// Enable cleanup option
     pub fn enable_option(&mut self, name: &str) -> Result<(), &'static str> {
         let option = self.options.iter_mut().find(|o| o.name == name).ok_or("Option not found")?;
-        option.enabled.store(true, Ordering::Relaxed);
+        option.enabled = true;
         Ok(())
     }
     
     /// Disable cleanup option
     pub fn disable_option(&mut self, name: &str) -> Result<(), &'static str> {
         let option = self.options.iter_mut().find(|o| o.name == name).ok_or("Option not found")?;
-        option.enabled.store(false, Ordering::Relaxed);
+        option.enabled = false;
         Ok(())
     }
     
@@ -102,7 +102,7 @@ impl SystemCleanupManager {
         let mut errors = 0;
         
         for option in self.options.iter() {
-            if option.enabled.load(Ordering::Relaxed) {
+            if option.enabled {
                 // Simulate cleanup
                 files_cleaned += 10;
                 bytes_freed += 1_000_000;
@@ -125,7 +125,7 @@ impl SystemCleanupManager {
         let mut errors = 0;
         
         for option in self.options.iter() {
-            if option.category == category && option.enabled.load(Ordering::Relaxed) {
+            if option.category == category && option.enabled {
                 files_cleaned += 5;
                 bytes_freed += 500_000;
             }
@@ -228,10 +228,10 @@ mod tests {
         );
         
         manager.disable_option("Test").unwrap();
-        assert!(!manager.options[0].enabled.load(Ordering::Relaxed));
+        assert!(!manager.options[0].enabled);
         
         manager.enable_option("Test").unwrap();
-        assert!(manager.options[0].enabled.load(Ordering::Relaxed));
+        assert!(manager.options[0].enabled);
     }
     
     #[test]
