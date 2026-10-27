@@ -104,7 +104,10 @@ impl KvmQemuV74Engine {
     pub fn trigger_live_migration(&mut self, name: &str, target_host: &str) -> String {
         if let Some(vm) = self.active_vms.get_mut(name) {
             vm.state = KvmVmStateV74::Migrating;
-            format!("Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream", name, target_host)
+            format!(
+                "Live migration for VM '{}' to host '{}' initiated via QMP/io_uring ring stream",
+                name, target_host
+            )
         } else {
             format!("VM '{}' not found", name)
         }
@@ -139,7 +142,13 @@ impl LibvirtDomainV74Engine {
 
     pub fn parse_domain_xml(&mut self, xml_data: &str) -> LibvirtDomainSpecV74 {
         let name = if xml_data.contains("<name>") {
-            xml_data.split("<name>").nth(1).unwrap_or("default").split("</name>").next().unwrap_or("default")
+            xml_data
+                .split("<name>")
+                .nth(1)
+                .unwrap_or("default")
+                .split("</name>")
+                .next()
+                .unwrap_or("default")
         } else {
             "default-domain"
         };
@@ -158,8 +167,10 @@ impl LibvirtDomainV74Engine {
 
     pub fn generate_domain_summary(&self, name: &str) -> String {
         if let Some(dom) = self.domains.get(name) {
-            format!("<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
-                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface)
+            format!(
+                "<domain type='{}'><name>{}</name><memory>{}</memory><bridge>{}</bridge></domain>",
+                dom.virt_type, dom.domain_name, dom.memory_kb, dom.bridge_interface
+            )
         } else {
             "<domain>Unknown</domain>".to_string()
         }
@@ -198,7 +209,13 @@ impl XenHypervisorV74Engine {
         }
     }
 
-    pub fn create_domu_guest(&mut self, domid: u32, name: &str, mode: XenGuestModeV74, grant_frames: u32) -> XenGuestSpecV74 {
+    pub fn create_domu_guest(
+        &mut self,
+        domid: u32,
+        name: &str,
+        mode: XenGuestModeV74,
+        grant_frames: u32,
+    ) -> XenGuestSpecV74 {
         let mut xs = BTreeMap::new();
         xs.insert("name".to_string(), name.to_string());
         xs.insert("domid".to_string(), domid.to_string());
@@ -277,7 +294,10 @@ impl VirtualBoxBhyveVmmV74Engine {
     }
 
     pub fn format_vbox_vmmdev_ipc(&self, guest_name: &str, channel: &str) -> String {
-        format!("VMMdev Guest Channel IPC: Guest '{}' linked on channel '{}' with guest additions sync", guest_name, channel)
+        format!(
+            "VMMdev Guest Channel IPC: Guest '{}' linked on channel '{}' with guest additions sync",
+            guest_name, channel
+        )
     }
 }
 
@@ -306,7 +326,12 @@ impl OciDockerPodmanRuncV74Engine {
         }
     }
 
-    pub fn run_podman_rootless(&mut self, container_id: &str, image: &str, mem_mb: u64) -> OciContainerSpecV74 {
+    pub fn run_podman_rootless(
+        &mut self,
+        container_id: &str,
+        image: &str,
+        mem_mb: u64,
+    ) -> OciContainerSpecV74 {
         let spec = OciContainerSpecV74 {
             container_id: container_id.to_string(),
             image: image.to_string(),
@@ -315,7 +340,8 @@ impl OciDockerPodmanRuncV74Engine {
             cgroups_version: "v2".to_string(),
             memory_limit_mb: mem_mb,
         };
-        self.containers.insert(container_id.to_string(), spec.clone());
+        self.containers
+            .insert(container_id.to_string(), spec.clone());
         spec
     }
 
@@ -352,7 +378,11 @@ impl LxcLxdNspawnV74Engine {
         }
     }
 
-    pub fn spawn_nspawn_chroot(&mut self, instance_name: &str, rootfs: &str) -> SystemContainerSpecV74 {
+    pub fn spawn_nspawn_chroot(
+        &mut self,
+        instance_name: &str,
+        rootfs: &str,
+    ) -> SystemContainerSpecV74 {
         let spec = SystemContainerSpecV74 {
             instance_name: instance_name.to_string(),
             engine_type: "nspawn".to_string(),
@@ -360,11 +390,16 @@ impl LxcLxdNspawnV74Engine {
             ovn_network_id: None,
             machinectl_registered: true,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 
-    pub fn create_incus_instance(&mut self, instance_name: &str, ovn_net: &str) -> SystemContainerSpecV74 {
+    pub fn create_incus_instance(
+        &mut self,
+        instance_name: &str,
+        ovn_net: &str,
+    ) -> SystemContainerSpecV74 {
         let spec = SystemContainerSpecV74 {
             instance_name: instance_name.to_string(),
             engine_type: "incus".to_string(),
@@ -372,7 +407,8 @@ impl LxcLxdNspawnV74Engine {
             ovn_network_id: Some(ovn_net.to_string()),
             machinectl_registered: false,
         };
-        self.instances.insert(instance_name.to_string(), spec.clone());
+        self.instances
+            .insert(instance_name.to_string(), spec.clone());
         spec
     }
 }
@@ -423,7 +459,12 @@ impl FreeBsdJailsZonesV74Engine {
         jail
     }
 
-    pub fn create_illumos_zone(&mut self, name: &str, brand: &str, mem_mb: u64) -> IllumosZoneSpecV74 {
+    pub fn create_illumos_zone(
+        &mut self,
+        name: &str,
+        brand: &str,
+        mem_mb: u64,
+    ) -> IllumosZoneSpecV74 {
         let zone = IllumosZoneSpecV74 {
             name: name.to_string(),
             brand: brand.to_string(),
@@ -475,7 +516,8 @@ impl KubernetesK3sRancherV74Engine {
     }
 
     pub fn map_harvester_vm(&mut self, vm_name: &str, pod_name: &str) {
-        self.harvester_vm_mappings.insert(vm_name.to_string(), pod_name.to_string());
+        self.harvester_vm_mappings
+            .insert(vm_name.to_string(), pod_name.to_string());
     }
 }
 
@@ -504,7 +546,12 @@ impl FirecrackerCloudHypervisorV74Engine {
         }
     }
 
-    pub fn spawn_firecracker_microvm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV74 {
+    pub fn spawn_firecracker_microvm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV74 {
         let mvm = MicroVmSpecV74 {
             microvm_id: id.to_string(),
             vcpus,
@@ -517,7 +564,12 @@ impl FirecrackerCloudHypervisorV74Engine {
         mvm
     }
 
-    pub fn spawn_cloud_hypervisor_vm(&mut self, id: &str, vcpus: u32, mem_mb: u64) -> MicroVmSpecV74 {
+    pub fn spawn_cloud_hypervisor_vm(
+        &mut self,
+        id: &str,
+        vcpus: u32,
+        mem_mb: u64,
+    ) -> MicroVmSpecV74 {
         let mvm = MicroVmSpecV74 {
             microvm_id: id.to_string(),
             vcpus,
@@ -579,7 +631,12 @@ impl GvisorKataAppleHvV74Engine {
         spec
     }
 
-    pub fn launch_apple_hv_guest(&mut self, id: &str, _mem_mb: u64, rosetta: bool) -> SecureSandboxSpecV74 {
+    pub fn launch_apple_hv_guest(
+        &mut self,
+        id: &str,
+        _mem_mb: u64,
+        rosetta: bool,
+    ) -> SecureSandboxSpecV74 {
         let spec = SecureSandboxSpecV74 {
             sandbox_id: id.to_string(),
             technology: "apple_hypervisor".to_string(),
@@ -609,7 +666,8 @@ pub struct SovereignVirtualizationAndContainersParityV74Gateway {
     pub secure_sandboxes: GvisorKataAppleHvV74Engine,
 }
 
-pub type SovereignVirtualizationAndContainersV74PrGatewayEngine = SovereignVirtualizationAndContainersParityV74Gateway;
+pub type SovereignVirtualizationAndContainersV74PrGatewayEngine =
+    SovereignVirtualizationAndContainersParityV74Gateway;
 
 impl SovereignVirtualizationAndContainersParityV74Gateway {
     pub fn new() -> Self {
@@ -744,12 +802,24 @@ impl SovereignVirtualizationAndContainersParityV74Gateway {
 
     pub fn generate_pr_markdown_summary(&self) -> String {
         let proposals = self.collect_all_proposals();
-        let mut out = String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v74)\n\n");
-        out.push_str("| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n");
-        out.push_str("|-------|-------|----------|--------------|-------------------|----------------|\n");
+        let mut out =
+            String::from("# Sovereign Virtualization & Container Ecosystem Parity Suite (v74)\n\n");
+        out.push_str(
+            "| PR ID | Title | Category | Boot Latency | Overhead Reduction | Isolation Tier |\n",
+        );
+        out.push_str(
+            "|-------|-------|----------|--------------|-------------------|----------------|\n",
+        );
         for p in &proposals {
-            out.push_str(&format!("| PR #{} | {} | {} | {}ms | {}% | {} |\n",
-                p.pr_id, p.title, p.category, p.boot_latency_ms, p.overhead_reduction_pct, p.isolation_tier));
+            out.push_str(&format!(
+                "| PR #{} | {} | {} | {}ms | {}% | {} |\n",
+                p.pr_id,
+                p.title,
+                p.category,
+                p.boot_latency_ms,
+                p.overhead_reduction_pct,
+                p.isolation_tier
+            ));
         }
         out
     }

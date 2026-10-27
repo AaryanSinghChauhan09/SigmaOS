@@ -344,7 +344,9 @@ impl UclibcInspirationsV65Engine {
     pub fn generate_pr_proposal(&self) -> CRuntimePrProposalManifestV65 {
         CRuntimePrProposalManifestV65 {
             pr_number: 5043,
-            pr_title: "uClibc-ng V65 Parity: FD-PIC MMU-less GOT Handling & Modular Feature Stripping".to_string(),
+            pr_title:
+                "uClibc-ng V65 Parity: FD-PIC MMU-less GOT Handling & Modular Feature Stripping"
+                    .to_string(),
             target_subsystem: "Embedded C Runtime".to_string(),
             original_runtime: "uClibc-ng".to_string(),
             components_added: alloc::vec![
@@ -503,8 +505,10 @@ impl BsdLibcInspirationsV65Engine {
 
     /// Evaluate OpenBSD `pledge` and `unveil` permission rules.
     pub fn evaluate_pledge_unveil(promises: &str, path: &str, access_mode: &str) -> bool {
-        let has_pledge = promises.contains("rpath") || promises.contains("wpath") || promises.contains("stdio");
-        let has_unveil = !path.is_empty() && (access_mode == "r" || access_mode == "rw" || access_mode == "rx");
+        let has_pledge =
+            promises.contains("rpath") || promises.contains("wpath") || promises.contains("stdio");
+        let has_unveil =
+            !path.is_empty() && (access_mode == "r" || access_mode == "rw" || access_mode == "rx");
         has_pledge && has_unveil
     }
 
@@ -581,7 +585,9 @@ impl BionicInspirationsV65Engine {
     pub fn generate_pr_proposal(&self) -> CRuntimePrProposalManifestV65 {
         CRuntimePrProposalManifestV65 {
             pr_number: 5045,
-            pr_title: "bionic V65 Parity: Scudo Hardened Allocation, PAC/BTI, fdsan & Namespace Isolation".to_string(),
+            pr_title:
+                "bionic V65 Parity: Scudo Hardened Allocation, PAC/BTI, fdsan & Namespace Isolation"
+                    .to_string(),
             target_subsystem: "Android / Bionic C Runtime".to_string(),
             original_runtime: "bionic".to_string(),
             components_added: alloc::vec![
@@ -1185,8 +1191,7 @@ mod tests {
         let found = GlibcInspirationsV65Engine::check_gnu_bloom_filter(hash, &bloom, 5);
         assert!(found || !found);
 
-        let memcpy_impl =
-            GlibcInspirationsV65Engine::resolve_ifunc_symbol(&["amx_tile"], "memcpy");
+        let memcpy_impl = GlibcInspirationsV65Engine::resolve_ifunc_symbol(&["amx_tile"], "memcpy");
         assert_eq!(memcpy_impl, "matrix_vector_hw_accelerated");
 
         let memset_impl = GlibcInspirationsV65Engine::resolve_ifunc_symbol(&["sse2"], "memset");
@@ -1311,7 +1316,11 @@ mod tests {
             Err("EIO_ENTROPY_LIMIT_256")
         );
 
-        assert!(BsdLibcInspirationsV65Engine::evaluate_pledge_unveil("stdio rpath", "/tmp/foo", "r"));
+        assert!(BsdLibcInspirationsV65Engine::evaluate_pledge_unveil(
+            "stdio rpath",
+            "/tmp/foo",
+            "r"
+        ));
     }
 
     #[test]

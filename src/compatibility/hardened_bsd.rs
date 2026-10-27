@@ -14,7 +14,10 @@ pub struct SafeStackConfig {
 
 impl SafeStackConfig {
     pub fn new(enabled: bool, shadow_stack_size: usize) -> Self {
-        Self { enabled, shadow_stack_size }
+        Self {
+            enabled,
+            shadow_stack_size,
+        }
     }
 }
 
@@ -36,7 +39,11 @@ pub struct AslrEntropy {
 
 impl AslrEntropy {
     pub fn new(stack_bits: u8, heap_bits: u8, mmap_bits: u8) -> Self {
-        Self { stack_bits, heap_bits, mmap_bits }
+        Self {
+            stack_bits,
+            heap_bits,
+            mmap_bits,
+        }
     }
 
     /// Minimal recommended entropy for 64-bit systems.
@@ -52,7 +59,7 @@ impl WxEnforcer {
     /// Returns true if the PTE is valid (not simultaneously writable AND executable).
     /// Bit 1 = Writable, Bit 2 = User-Executable (simplified model).
     pub fn check_pte_flags(pte: u64) -> bool {
-        let writable   = (pte >> 1) & 1;
+        let writable = (pte >> 1) & 1;
         let executable = (pte >> 2) & 1;
         !(writable == 1 && executable == 1)
     }
