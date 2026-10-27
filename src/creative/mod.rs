@@ -105,6 +105,7 @@ pub mod voicecraft_artcraft_parity_pr;
 pub mod voicecraft_missing_components_parity_pr;
 pub mod voicecraft_neural_dsp_advancements_v68_pr;
 
+pub use voicecraft::*;
 pub use voicecraft_advancements_v73_pr::*;
 pub use voicecraft_advancements_v76_pr::*;
 pub mod wordcraft;
