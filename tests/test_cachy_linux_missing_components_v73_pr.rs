@@ -20,8 +20,14 @@ fn test_cachy_v73_pr_suite_manifests_and_execution() {
     }
 
     let summary = suite.generate_suite_summary();
-    assert_eq!(summary.get("total_components").map(|s| s.as_str()), Some("10"));
-    assert_eq!(summary.get("release_parity").map(|s| s.as_str()), Some("v73.0"));
+    assert_eq!(
+        summary.get("total_components").map(|s| s.as_str()),
+        Some("10")
+    );
+    assert_eq!(
+        summary.get("release_parity").map(|s| s.as_str()),
+        Some("v73.0")
+    );
 }
 
 #[test]
@@ -36,12 +42,16 @@ fn test_cachy_v73_sub_engines_behavior() {
     let scanout_msg = suite.chwd_scanout.bypass_compositor(88);
     assert!(scanout_msg.contains("surface 88"));
 
-    assert!(suite.pacman_verifier.verify_package_signature("kernel.pkg.tar.zst"));
+    assert!(suite
+        .pacman_verifier
+        .verify_package_signature("kernel.pkg.tar.zst"));
 
     let fsync_msg = suite.proton_fsync.synchronize_win32_handles(16);
     assert!(fsync_msg.contains("16 Win32"));
 
-    let ananicy_msg = suite.ananicy_governor.classify_process("cyberpunk.exe", 9999);
+    let ananicy_msg = suite
+        .ananicy_governor
+        .classify_process("cyberpunk.exe", 9999);
     assert!(ananicy_msg.contains("cyberpunk.exe"));
 
     let comp_level = suite.btrfs_tuner.tune_compression_ratio(10000);
