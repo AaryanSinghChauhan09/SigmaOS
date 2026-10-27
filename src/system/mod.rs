@@ -217,7 +217,6 @@ pub use sigmastallmanager::{
     SoftwareItem as InstallManagerItem,
 };
 pub use sigmataskscheduler::{
-    pub use sigmataskscheduler::{
     ScheduledTask as SchedulerTask, SigmaTaskScheduler, TaskPriority as SchedulerTaskPriority,
     TaskStatus as SchedulerTaskStatus,
 };
@@ -353,7 +352,7 @@ pub use restore::{
 pub use firewall::{
     FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
     init_firewall, get_firewall,
-}
+};
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
 pub use defrag::{
@@ -948,6 +947,9 @@ pub use sovereign_init_and_supervisor_advancements_v76_pr::*;
 
 pub mod sovereign_init_and_supervisor_advancements_v77_pr;
 pub use sovereign_init_and_supervisor_advancements_v77_pr::*;
+
+pub mod sovereign_init_and_supervisor_advancements_v78_pr;
+pub use sovereign_init_and_supervisor_advancements_v78_pr::*;
 
 pub use mint_tools::{
     get_system_tools, init_system_tools, BackupConfig, BackupJob as MintBackupJob,
