@@ -282,6 +282,7 @@ pub use distro::cachy_linux_missing_components_v69_pr::*;
 pub use distro::cachy_linux_missing_components_v70_pr::*;
 pub use distro::cachy_linux_missing_components_v71_pr::*;
 pub use distro::cachy_linux_missing_components_v72_pr::*;
+pub use distro::cachy_linux_missing_components_v73_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v76_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v77_pr::*;

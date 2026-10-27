@@ -294,7 +294,7 @@ impl SovereignUniversalLinuxBsdSubsystemInteropGateway {
     }
 
     /// Performs an audit across all 44 subsystems and 38 distro paradigms.
-    pub fn audit_all_subsystems_harmony(&self) -> (core::collections::BTreeMap<String, bool>, u32) {
+    pub fn audit_all_subsystems_harmony(&self) -> (alloc::collections::BTreeMap<String, bool>, u32) {
         self.harmony_engine.audit_all_subsystems_distro_compliance()
     }
 
