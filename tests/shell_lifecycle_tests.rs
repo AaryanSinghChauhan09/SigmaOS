@@ -4,6 +4,13 @@
 use std::fs;
 use std::path::Path;
 
+#[path = "../src/governance/shell_lifecycle_program.rs"]
+mod shell_lifecycle_program;
+
+use shell_lifecycle_program::{
+    ShellAcceptanceGate, ShellIssueArea, ShellLifecycleProgramEngine,
+};
+
 #[test]
 fn test_shell_rules_file_exists_and_valid() {
     assert!(
@@ -28,49 +35,64 @@ fn test_shell_rules_file_exists_and_valid() {
 #[test]
 fn test_pull_request_template_exists() {
     let path = Path::new(".github/PULL_REQUEST_TEMPLATE.md");
-    let wiki_path = Path::new("../SigmaOS.wiki/PULL_REQUEST_TEMPLATE.md");
-    let content = if path.exists() {
-        fs::read_to_string(path).expect("Failed to read PR template")
-    } else if wiki_path.exists() {
-        fs::read_to_string(wiki_path).expect("Failed to read PR template")
-    } else {
-        String::from(
-            "## Shell component\n## Shell safety review\n## Component\n## Kernel safety review",
-        )
-    };
-    assert!(content.contains("## Shell component") || content.contains("## Component"));
-    assert!(
-        content.contains("## Shell safety review")
-            || content.contains("## Kernel safety review")
-            || content.contains("## Safety and rollback")
-            || content.contains("## Reviewer checklist")
-    );
+    assert!(path.exists(), ".github/PULL_REQUEST_TEMPLATE.md must exist");
+    let content = fs::read_to_string(path).expect("Failed to read PR template");
+    assert!(content.contains("## Shell component"));
+    assert!(content.contains("## Shell safety review"));
 }
 
 #[test]
 fn test_shell_documentation_suite_exists() {
-    let docs_in_repo = Path::new("docs/shell/SHELL_MAINTENANCE.md").exists()
-        || Path::new("SHELL_RULES.toml").exists();
-    let docs_in_wiki = Path::new("../SigmaOS.wiki/Shell-Architecture.md").exists()
-        || Path::new("../SigmaOS.wiki/2026-W41-shell-word-splitting.md").exists();
-    let shell_rules_exists = Path::new("SHELL_RULES.toml").exists();
-    assert!(
-        docs_in_repo || docs_in_wiki || shell_rules_exists,
-        "Shell documentation suite exists in repo or wiki"
+    assert!(Path::new("docs/shell/SHELL_MAINTENANCE.md").exists());
+    assert!(Path::new("docs/shell/SHELL_CONFORMANCE.md").exists());
+    assert!(Path::new("docs/shell/GRAMMAR.md").exists());
+    assert!(Path::new("docs/shell/BUILTINS.md").exists());
+    assert!(Path::new("docs/shell/EXIT_CODES.md").exists());
+    assert!(Path::new("docs/shell/INTERACTIVE_SHELL.md").exists());
+    assert!(Path::new("docs/shell/DIAGNOSTICS.md").exists());
+    assert!(Path::new("docs/studies/2026-W41-shell-word-splitting.md").exists());
+}
+
+#[test]
+fn test_shell_governance_engine() {
+    let engine = ShellLifecycleProgramEngine::new();
+    assert_eq!(engine.tasks().len(), 13);
+    assert_eq!(engine.roadmap().len(), 12);
+
+    let all_gates = vec![
+        ShellAcceptanceGate::G0CodeQuality,
+        ShellAcceptanceGate::G1UnitParser,
+        ShellAcceptanceGate::G2PosixSubset,
+        ShellAcceptanceGate::G3FuzzSmoke,
+        ShellAcceptanceGate::G4BootToShell,
+        ShellAcceptanceGate::G5TerminalState,
+        ShellAcceptanceGate::G6SecurityReview,
+        ShellAcceptanceGate::G7BuiltinContracts,
+        ShellAcceptanceGate::G8ReleaseClaims,
+    ];
+    assert!(engine.evaluate_acceptance_gates(&all_gates));
+
+    let metrics = engine.current_health_metrics();
+    assert!(metrics.is_healthy());
+
+    let triage = engine.format_issue_triage(
+        ShellIssueArea::Redirection,
+        "cat < non_existent",
+        "sigma-sh: non_existent: No such file or directory",
+        "hangs",
+        "POSIX 2.7",
+        "test_redirection_error",
     );
+    assert!(triage.contains("## Shell issue"));
+    assert!(triage.contains("**Area:** redirection"));
 }
 
 #[test]
 fn test_shell_exit_codes_policy() {
-    // 0 = Success
-    // 2 = Parse Error / Misuse
-    // 126 = Cannot execute
-    // 127 = Command not found
-    // 128 + N = Fatal signal N (e.g. 130 for SIGINT)
     let exit_success = 0;
     let exit_parse_error = 2;
     let exit_cmd_not_found = 127;
-    let exit_sigint = 128 + 2; // SIGINT = 2 -> 130
+    let exit_sigint = 128 + 2;
 
     assert_eq!(exit_success, 0);
     assert_eq!(exit_parse_error, 2);

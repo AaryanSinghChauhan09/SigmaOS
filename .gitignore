@@ -96,3 +96,8 @@ wiki/
 !wiki/COMPONENT_BOUNDARIES_AND_DEPENDENCY_CONTRACTS.md
 !wiki/GOVERNANCE.md
 !wiki/REPOSITORY_MIGRATION_MATRIX.md
+
+!SHELL_RULES.toml
+!.github/PULL_REQUEST_TEMPLATE.md
+!docs/shell/*.md
+!docs/studies/*.md
