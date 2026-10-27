@@ -92,7 +92,9 @@ impl ArchAurwebPqcDilithium5PkgbuildAuditorPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.pqc_dilithium5_active && self.ast_security_checks_count > 0 && self.verified_packages_count > 0
+        self.pqc_dilithium5_active
+            && self.ast_security_checks_count > 0
+            && self.verified_packages_count > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -134,7 +136,9 @@ impl ArchMkinitcpioUkiSbatTpm2PolicySealerPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.uki_systemd_stub_active && self.sbat_revocation_generation > 0 && self.tpm2_pcr_sealed_mask > 0
+        self.uki_systemd_stub_active
+            && self.sbat_revocation_generation > 0
+            && self.tpm2_pcr_sealed_mask > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -176,7 +180,9 @@ impl ArchCachyOsScxLavenderEevdfSchedulerTunerPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.scx_lavender_active && self.eevdf_preemption_granularity_ns > 0 && self.throughput_boost_pct > 0
+        self.scx_lavender_active
+            && self.eevdf_preemption_granularity_ns > 0
+            && self.throughput_boost_pct > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -218,7 +224,9 @@ impl ArchArchinstallAutomatedBtrfsZsysSnapperLayoutPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.auto_profile_active && self.btrfs_subvolumes_count > 0 && self.zsys_timeline_retention_days > 0
+        self.auto_profile_active
+            && self.btrfs_subvolumes_count > 0
+            && self.zsys_timeline_retention_days > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -260,7 +268,9 @@ impl ArchReflectorPqcSignedGeoIpMirrorRankerPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.geoip_ranking_active && self.pqc_dilithium5_mirrorlist_signed && self.top_mirrors_selected > 0
+        self.geoip_ranking_active
+            && self.pqc_dilithium5_mirrorlist_signed
+            && self.top_mirrors_selected > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -302,7 +312,9 @@ impl ArchPacmanCacheZstdDictDeduplicatorPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.block_level_dedup_active && self.zstd_dictionary_size_kb > 0 && self.storage_savings_gb > 0
+        self.block_level_dedup_active
+            && self.zstd_dictionary_size_kb > 0
+            && self.storage_savings_gb > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -344,7 +356,9 @@ impl ArchisoPxeHttp3NetbootMemfsOverlayLiveEnginePr {
     }
 
     pub fn verify(&self) -> bool {
-        self.http3_netboot_active && self.memfs_ram_disk_gb > 0 && self.squashfs_zstd_compression_ratio > 0
+        self.http3_netboot_active
+            && self.memfs_ram_disk_gb > 0
+            && self.squashfs_zstd_compression_ratio > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -386,7 +400,9 @@ impl ArchSecurityTrackerCveAutoHotfixEnginePr {
     }
 
     pub fn verify(&self) -> bool {
-        self.tracker_feed_synced && self.auto_hotfix_patches_applied > 0 && self.zero_day_cves_remediated > 0
+        self.tracker_feed_synced
+            && self.auto_hotfix_patches_applied > 0
+            && self.zero_day_cves_remediated > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -428,7 +444,9 @@ impl ArchKeyringWkdPqcDilithium5AutoRotationPrEngine {
     }
 
     pub fn verify(&self) -> bool {
-        self.wkd_pqc_dilithium5_active && self.master_keys_rotated_count > 0 && self.web_of_trust_trust_depth > 0
+        self.wkd_pqc_dilithium5_active
+            && self.master_keys_rotated_count > 0
+            && self.web_of_trust_trust_depth > 0
     }
 
     pub fn generate_pr(&self) -> ArchLinuxV75PrSpec {
@@ -540,7 +558,9 @@ impl ArchLinuxMissingComponentsV75PrSuite {
         pr.push_str("## Integrated Components\n");
         pr.push_str("- Pacman 7.5+ io_uring Async Block I/O & HTTP/3 Parallel Download Pool V75\n");
         pr.push_str("- AURweb PQC Dilithium-5 Signature Verifier & AST PKGBUILD Auditor V75\n");
-        pr.push_str("- Mkinitcpio Systemd-Stub UKI Auto-Builder with SBAT & TPM2 Policy Sealer V75\n");
+        pr.push_str(
+            "- Mkinitcpio Systemd-Stub UKI Auto-Builder with SBAT & TPM2 Policy Sealer V75\n",
+        );
         pr.push_str("- CachyOS SCX Lavender & EEVDF eBPF Kernel Scheduler Governor V75\n");
         pr.push_str("- Archinstall Btrfs Subvolume Layout with Snapper & Zsys Snapshots V75\n");
         pr.push_str("- Reflector PQC Dilithium5 Signed GeoIP Latency Mirror Ranker V75\n");
@@ -548,7 +568,10 @@ impl ArchLinuxMissingComponentsV75PrSuite {
         pr.push_str("- Archiso PXE HTTP/3 Netboot MemFS Overlay Live Environment V75\n");
         pr.push_str("- Arch Security Tracker Advisory Feed Parser & CVE Auto-Hotfix Applier V75\n");
         pr.push_str("- Keyring Automated WKD PQC Dilithium-5 Key Rotation & Web-of-Trust V75\n\n");
-        pr.push_str(&format!("## Gap Closure Score: {}%\n", self.compute_gap_closure_score()));
+        pr.push_str(&format!(
+            "## Gap Closure Score: {}%\n",
+            self.compute_gap_closure_score()
+        ));
         pr
     }
 }
