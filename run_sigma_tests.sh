@@ -660,6 +660,13 @@ if [ -f "src/creative/cadcraft_artcraft_missing_components_v68_pr.rs" ]; then
     ./build/test_cadcraft_v68
 fi
 
+if [ -f "src/creative/cadcraft_artcraft_missing_components_v69_pr.rs" ]; then
+    echo "Running Sovereign CadCraft & ArtCraft Missing Components Parity PR Gateway V69 test suite..."
+    mkdir -p build
+    rustc --test src/creative/cadcraft_artcraft_missing_components_v69_pr.rs --edition=2021 -o build/test_cadcraft_v69
+    ./build/test_cadcraft_v69
+fi
+
 if [ -f "src/creative/fontcraft.rs" ]; then
     echo "Running Sovereign FontCraft Typography Engine test suite..."
     mkdir -p build
