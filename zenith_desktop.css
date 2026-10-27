@@ -1515,6 +1515,7 @@ body.high-contrast-active .keyboard-focus {
 
 /* Custom Developer Tools Styles */
 .dev-portal-tab-content { display: none; }
+.dev-portal-tab-content.active { display: block; }
 .syscall-list-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); }
 .wizard-step-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 .cicd-status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
