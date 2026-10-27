@@ -586,8 +586,10 @@ pub use shell::{
     ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile,
     ShellStatistics, ShellSyntaxHighlighter, ShellType,
     ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
-    SovereignShellsTerminalsSupervisorsParityPrGateway, TerminalMultiplexersAndEmulatorsPrEngine,
-    ZshPromptFormatter,
+    SovereignShellsTerminalsSupervisorsParityPrGateway,
+    SovereignShellsTerminalsSupervisorsParityV78Gateway,
+    SovereignShellsTerminalsSupervisorsV78PrSuite,
+    TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
