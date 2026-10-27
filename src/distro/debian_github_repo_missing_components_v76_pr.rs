@@ -141,10 +141,15 @@ impl DebianSecureAptPqcDilithiumInReleaseEngineV76Pr {
         DebianGithubV76PrSpec {
             pr_id: 7611,
             component_name: "apt-pqc".to_string(),
-            title: "Debian Secure APT PQC Dilithium-5 Keyring & InRelease Verification V76".to_string(),
+            title: "Debian Secure APT PQC Dilithium-5 Keyring & InRelease Verification V76"
+                .to_string(),
             repo_url: "https://github.com/debian/apt".to_string(),
-            description: "Extends APT package manager with post-quantum Dilithium-5 signature verification.".to_string(),
-            diff_patch: "--- a/apt-pkg/contrib/gpgv.cc\n+++ b/apt-pkg/contrib/gpgv.cc\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Extends APT package manager with post-quantum Dilithium-5 signature verification."
+                    .to_string(),
+            diff_patch:
+                "--- a/apt-pkg/contrib/gpgv.cc\n+++ b/apt-pkg/contrib/gpgv.cc\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-APT-PQC-V76".to_string(),
         }
@@ -167,7 +172,10 @@ impl DebianDebconfStateDatabaseEngineV76Pr {
         let mut answers = BTreeMap::new();
         answers.insert("tzdata/zones".to_string(), "UTC".to_string());
         answers.insert("debconf/priority".to_string(), "high".to_string());
-        answers.insert("locales/default_environment_locale".to_string(), "en_US.UTF-8".to_string());
+        answers.insert(
+            "locales/default_environment_locale".to_string(),
+            "en_US.UTF-8".to_string(),
+        );
         answers.insert("debconf/frontend".to_string(), "Noninteractive".to_string());
         Self { answers }
     }
@@ -186,7 +194,9 @@ impl DebianDebconfStateDatabaseEngineV76Pr {
             component_name: "debconf".to_string(),
             title: "Debian debconf Multi-Backend Database & Answer Filter V76".to_string(),
             repo_url: "https://github.com/debian/debconf".to_string(),
-            description: "Implements debconf multi-backend database engine and answer priority filters.".to_string(),
+            description:
+                "Implements debconf multi-backend database engine and answer priority filters."
+                    .to_string(),
             diff_patch: "--- a/Debconf/Db.pm\n+++ b/Debconf/Db.pm\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBCONF-V76".to_string(),
@@ -226,8 +236,12 @@ impl DebianLintianStaticPolicyCheckerEngineV76Pr {
             component_name: "lintian".to_string(),
             title: "Debian lintian Static Package Policy Checker Engine V76".to_string(),
             repo_url: "https://github.com/debian/lintian".to_string(),
-            description: "Enforces Debian policy compliance and static package linting rule checks.".to_string(),
-            diff_patch: "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Enforces Debian policy compliance and static package linting rule checks."
+                    .to_string(),
+            diff_patch:
+                "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-LINTIAN-V76".to_string(),
         }
@@ -413,7 +427,8 @@ impl DebianMultiarchAptResolverEngineV76Pr {
     }
 
     pub fn resolve_coinstallation(&self, package: &str, arch: &str) -> bool {
-        !package.is_empty() && (arch == "amd64" || arch == "i386" || arch == "arm64" || arch == "riscv64")
+        !package.is_empty()
+            && (arch == "amd64" || arch == "i386" || arch == "arm64" || arch == "riscv64")
     }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV76PrSpec {

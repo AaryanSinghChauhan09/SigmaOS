@@ -24,15 +24,8 @@ use std::string::String;
 #[cfg(any(feature = "standalone_test", test))]
 use std::vec::Vec;
 
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::distro::debian_github_repo_missing_components_v76_pr::*;
-#[cfg(not(any(feature = "standalone_test", test)))]
-use crate::distro::open_source_os_missing_components_v76_pr::*;
-
-#[cfg(any(feature = "standalone_test", test))]
-use crate::debian_github_repo_missing_components_v76_pr::*;
-#[cfg(any(feature = "standalone_test", test))]
-use crate::open_source_os_missing_components_v76_pr::*;
+use super::debian_github_repo_missing_components_v76_pr::*;
+use super::open_source_os_missing_components_v76_pr::*;
 
 #[derive(Debug, Clone)]
 pub struct UnifiedOsDebianV76PrProposal {
