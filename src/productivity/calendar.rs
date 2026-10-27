@@ -20,22 +20,45 @@ use std::vec::Vec;
 // SigmaOS Calendar App
 // OOP-based calendar with events, reminders, and scheduling
 
-/// Case-insensitive substring search without allocation for ASCII text.
+/// Case-insensitive substring search helper without allocation for ASCII text.
+/// Uses zero-allocation SIMD-friendly `eq_ignore_ascii_case` byte slice matching when both
+/// haystack and needle are ASCII. Computes lowercased needle lazily only for non-ASCII text.
 #[inline]
-fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+fn contains_ignore_case(haystack: &str, needle: &str, needle_lower: Option<&str>) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle.len() {
+        return false;
+    }
     if haystack.is_ascii() && needle.is_ascii() {
-        needle.is_empty()
-            || (needle.len() <= haystack.len()
-                && haystack
-                    .as_bytes()
-                    .windows(needle.len())
-                    .any(|window| window.eq_ignore_ascii_case(needle.as_bytes())))
+        haystack
+            .as_bytes()
+            .windows(needle.len())
+            .any(|window| window.eq_ignore_ascii_case(needle.as_bytes()))
+    } else if let Some(lower) = needle_lower {
+        haystack.to_lowercase().contains(lower)
     } else {
         haystack.to_lowercase().contains(&needle.to_lowercase())
     }
 }
 
+#[cfg(not(feature = "standalone_test"))]
 use crate::klib::btreemap::BTreeMap;
+#[cfg(feature = "standalone_test")]
+use std::collections::BTreeMap;
+
+#[cfg(feature = "standalone_test")]
+trait BTreeMapStrExt<V> {
+    fn get_str(&self, key: &str) -> Option<&V>;
+}
+
+#[cfg(feature = "standalone_test")]
+impl<V> BTreeMapStrExt<V> for std::collections::BTreeMap<String, V> {
+    fn get_str(&self, key: &str) -> Option<&V> {
+        self.get(key)
+    }
+}
 // SystemTime not in no_std
 
 /// Event type
@@ -322,11 +345,17 @@ impl CalendarApp {
 
     /// Search events
     pub fn search_events(&self, query: &str) -> Vec<CalendarEvent> {
+        let query_lower = if query.is_ascii() {
+            None
+        } else {
+            Some(query.to_lowercase())
+        };
         self.storage
             .get_all_events()
             .into_iter()
             .filter(|e| {
-                contains_ignore_case(&e.title, query) || contains_ignore_case(&e.description, query)
+                contains_ignore_case(&e.title, query, query_lower.as_deref())
+                    || contains_ignore_case(&e.description, query, query_lower.as_deref())
             })
             .collect()
     }
@@ -540,5 +569,41 @@ mod tests {
         let collisions = app.detect_event_collisions(&event2);
         assert_eq!(collisions.len(), 1);
         assert_eq!(collisions[0].id, "m1");
+    }
+
+    #[test]
+    fn test_search_events_edge_cases_and_non_ascii() {
+        let mut app = CalendarApp::default();
+        let e1 = CalendarEvent {
+            id: "e1".to_string(),
+            title: "Crème Brûlée Workshop".to_string(),
+            description: "Baking event with non-ASCII text".to_string(),
+            event_type: EventType::Other,
+            start_time: 1000,
+            end_time: 2000,
+            location: None,
+            attendees: vec![],
+            recurrence: RecurrencePattern::None,
+            status: EventStatus::Confirmed,
+            reminder_minutes_before: vec![],
+            color: "#00FF00".to_string(),
+            sub_calendar_id: None,
+        };
+        app.add_event(e1).unwrap();
+
+        // Test non-ASCII search
+        let res_non_ascii = app.search_events("CRÈME");
+        assert_eq!(res_non_ascii.len(), 1);
+        assert_eq!(res_non_ascii[0].id, "e1");
+
+        // Test empty query (matches all events)
+        let res_empty = app.search_events("");
+        assert_eq!(res_empty.len(), 1);
+
+        // Test query longer than title/description
+        let res_long = app.search_events(
+            "This query string is significantly longer than any event title or description in the calendar app",
+        );
+        assert_eq!(res_long.len(), 0);
     }
 }
