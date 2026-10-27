@@ -950,6 +950,8 @@ pub mod sovereign_linux_bsd_ecosystem_gap_closure_v70_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v70_pr::*;
 pub mod sovereign_linux_bsd_ecosystem_gap_closure_v77_pr;
 pub use sovereign_linux_bsd_ecosystem_gap_closure_v77_pr::*;
+pub mod sovereign_linux_bsd_ecosystem_gap_closure_v78_pr;
+pub use sovereign_linux_bsd_ecosystem_gap_closure_v78_pr::*;
 pub mod sovereign_release_manager;
 
 pub mod arch_linux_missing_components_v73_pr;
