@@ -67,7 +67,10 @@ fn test_multi_kernel_synthesis_engine() {
     assert!(minix_route.contains("Reincarnation Server"));
     assert!(reactos_route.contains("IRP"));
     assert!(xnu_route.contains("Hybrid Mach microkernel"));
-    assert_eq!(manifest.component_name, "sigmaos-multi-kernel-synthesis-engine");
+    assert_eq!(
+        manifest.component_name,
+        "sigmaos-multi-kernel-synthesis-engine"
+    );
 }
 
 #[test]
@@ -97,7 +100,10 @@ fn test_universal_linux_distro_parity_engine() {
     assert!(qubes_res.contains("Xen isolation"));
     assert!(redox_res.contains("schemes"));
     assert!(suse_res.contains("Snapper"));
-    assert_eq!(manifest.component_name, "sigmaos-universal-linux-distro-engine");
+    assert_eq!(
+        manifest.component_name,
+        "sigmaos-universal-linux-distro-engine"
+    );
 }
 
 #[test]
@@ -121,7 +127,10 @@ fn test_office_productivity_suites_parity_engine() {
     assert!(draw_res.contains("Bézier"));
     assert!(math_res.contains("MathML"));
     assert!(base_res.contains("Relational database"));
-    assert_eq!(manifest.component_name, "sigmaos-office-productivity-engine");
+    assert_eq!(
+        manifest.component_name,
+        "sigmaos-office-productivity-engine"
+    );
 }
 
 #[test]
@@ -131,7 +140,8 @@ fn test_rdbms_data_engineering_parity_engine() {
 
     // Act
     let oltp_res = data_engine.execute_query_pipeline("SELECT * FROM users WHERE id = 1", false);
-    let olap_res = data_engine.execute_query_pipeline("SELECT AVG(price), SUM(qty) FROM sales GROUP BY date", true);
+    let olap_res = data_engine
+        .execute_query_pipeline("SELECT AVG(price), SUM(qty) FROM sales GROUP BY date", true);
     let dbeaver_res = data_engine.introspect_schema();
     let manifest = data_engine.generate_manifest();
 
