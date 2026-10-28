@@ -541,9 +541,10 @@ impl SosreportSanitizerEngineV15 {
             let mut l = line.to_string();
             let mut redacted_in_line = false;
 
-            // Password key-value redaction (mock pattern check)
-            if let Some(pos) = l.find(concat!("pass", "word=")) {
-                let start = pos + 9; // mock length
+            // Password key-value redaction
+            let pwd_prefix = concat!("pass", "word=");
+            if let Some(pos) = l.find(pwd_prefix) {
+                let start = pos + pwd_prefix.len();
                 let end = l[start..]
                     .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
                     .map(|idx| start + idx)
