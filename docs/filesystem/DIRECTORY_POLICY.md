@@ -1,12 +1,9 @@
-# Directory Policy (DIRECTORY_POLICY)
+# Directory & Inode Policy (Filesystem)
 
-## Directory Structure & Bounds
-- Directories contain ordered entries of `DirectoryEntry` (`name`, `inode_id`, `inode_type`).
-- Directory capacity is bounded by `MAX_DIR_ENTRIES = 4096`.
-- Maximum filename length is enforced at `MAX_FILENAME_LEN = 255`.
+## Overview
+Re-exported directory and inode specification for filesystem drivers and mount targets.
 
-## Directory Lifecycle & Operations
-- Entry insertion checks for duplicate names (`FsError::FileAlreadyExists`).
-- Entry removal checks for existence (`FsError::NotFound`).
-- Directory deletion requires the directory to be empty (`FsError::DirectoryNotEmpty`).
-- Double-unlink protection ensures an unlinked entry cannot be removed twice or leave stale child pointers.
+## Policy Rules
+- **Directory Capacity**: Maximum child entries per directory are enforced at VFS and driver levels.
+- **Atomic Operations**: `mkdir`, `rmdir`, `unlink`, and `rename` operations guarantee filesystem state consistency.
+- **Double Unlink Protection**: Inode deletion only triggers when link count drops to 0 AND open reference count reaches 0.

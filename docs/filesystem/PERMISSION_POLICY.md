@@ -1,16 +1,10 @@
-# Permission Policy (PERMISSION_POLICY)
+# Filesystem Permission Policy
 
-## Representation
-- File permissions are represented by a 9-bit mode field:
-  - Owner: `S_IRUSR` (0o400), `S_IWUSR` (0o200), `S_IXUSR` (0o100)
-  - Group: `S_IRGRP` (0o040), `S_IWGRP` (0o020), `S_IXGRP` (0o010)
-  - Other: `S_IROTH` (0o004), `S_IWOTH` (0o002), `S_IXOTH` (0o001)
-- Process identity is represented by `ProcessCredentials` (`uid`, `gid`, `euid`, `egid`, `capabilities`).
+## Overview
+SigmaOS permission evaluation engine (`src/fs/permission.rs`) governs access control across files and directories.
 
-## Security Verification Rules
-1. Root user (`euid == 0`) or processes with `CAP_DAC_OVERRIDE` bypass standard mode checks.
-2. If `process.euid == file.uid`, Owner bits are checked.
-3. Else if `process.egid == file.gid` or matching supplemental groups, Group bits are checked.
-4. Else, Other bits are checked.
-5. `CAP_DAC_READ_SEARCH` allows read access or directory traversal even if standard read/execute mode bits are clear.
-6. Access denial returns `FsError::PermissionDenied`.
+## Specifications
+1. **Permission Representation**: Represented as standard POSIX octal mode flags (`rwxrwxrwx`), setuid (`04000`), setgid (`02000`), and sticky bit (`01000`).
+2. **Access Evaluation**: Evaluated against process effective UID/GID, process capability flags (`CAP_DAC_OVERRIDE`, `CAP_DAC_READ_SEARCH`), and path sandbox filters (Landlock/Unveil).
+3. **Typed Error Codes**: Unpermitted access yields `FsError::PermissionDenied` (`EACCES` or `EPERM`).
+4. **Exhaustion & Bounds**: Access decisions require zero heap allocations in critical evaluation loops.

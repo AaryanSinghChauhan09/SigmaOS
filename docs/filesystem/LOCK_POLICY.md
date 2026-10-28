@@ -1,12 +1,11 @@
-# Lock Policy (LOCK_POLICY)
+# File Lock Policy
 
-## File Lock Types & Semantics
-- Advisory locks (`flock`) support `LOCK_SH` (Shared), `LOCK_EX` (Exclusive), `LOCK_NB` (Non-blocking), and `LOCK_UN` (Unlock).
-- Range locks (`fcntl`) support `F_RDLCK` (Read lock), `F_WRLCK` (Write lock), and `F_UNLCK` (Unlock) over offset sub-ranges `[start, start + len)`.
+## Overview
+SigmaOS file lock manager (`src/fs/flock.rs` / `src/fs/lock.rs`) enforces shared (`LOCK_SH`), exclusive (`LOCK_EX`), and unlock (`LOCK_UN`) semantics.
 
-## Conflict & Verification Discipline
-- Multiple shared/read locks may overlap on the same file/range.
-- An exclusive/write lock conflicts with any overlapping lock from a different owner process (`owner_pid`).
-- Lock requests in non-blocking mode return `FsError::ResourceBusy` immediately on conflict.
-- When a process closes a descriptor or terminates, all associated range locks held by that process are automatically released.
-- Double-unlock requests or unlocks on non-existent locks return success without altering lock table state.
+## Specifications
+1. **Race-Free Enqueue/Dequeue**: Lock table modifications are protected against concurrent modification races.
+2. **Lock Reuse & Lifetime**: Locks are tied to process file descriptors and inode handles; closing all descriptors associated with a lock releases it automatically.
+3. **Lost-Lock Prevention**: Pending lock requests queued on blocking locks are cancelled cleanly if the waiting process receives an interrupting signal or dies.
+4. **Double-Unlock Prevention**: Unlocking a file descriptor that does not hold a lock succeeds idempotently without corrupting lock table state.
+5. **Bounded Metadata**: The maximum active locks per inode and per process are capped to guarantee lock table memory safety.

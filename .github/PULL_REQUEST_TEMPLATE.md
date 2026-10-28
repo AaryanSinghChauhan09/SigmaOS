@@ -1,20 +1,47 @@
 ## Summary
 
-<!-- One paragraph: what changed and why. -->
+<!-- What file-management behavior changed and why? -->
 
 ## Component
 
-- [ ] Thread manager
-- [ ] Scheduler
-- [ ] Process management
-- [ ] Memory management
-- [ ] VFS / filesystems
-- [ ] Drivers
-- [ ] IPC
-- [ ] Security
-- [ ] Installer / packaging
+Closes #<issue-id>
+
+## File component
+
+- [ ] File descriptor manager
+- [ ] fd / handle / file
+- [ ] Inode and directory manager
+- [ ] Permission manager
+- [ ] Lock manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Recurring task
+
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly file audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
+
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or file changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
 
 ## Changes
 
@@ -36,6 +63,19 @@
 - [ ] Fuzz tests added/updated
 - [ ] Boot smoke test performed, if kernel-facing
 - [ ] No regression in existing tests
+
+## File safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-unlink prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
 
 ## Verification
 

@@ -1,27 +1,17 @@
-# SigmaOS VFS Architectural Decision Records (VFS_ADR)
+# VFS Architectural Decision Record (ADR)
 
-## ADR-0001: Hybrid Request/Inode-Based VFS Architecture
+## Title
+SigmaOS Hybrid Request/Inode VFS Architecture & Lifecycle Contract
 
-### Context
-SigmaOS requires a high-performance, safe, and recoverable Virtual Filesystem (VFS) abstraction capable of supporting diverse file systems (ext4, procfs, tmpfs, autofs, overlay) while enforcing strict memory bounds and POSIX compatibility.
+## Context
+SigmaOS requires a safe, high-performance Virtual File System (VFS) to coordinate file descriptors, inodes, directories, locking, and permissions across monolithic and microkernel IPC interfaces. Existing file abstractions must comply with deterministic resource cleanup, race freedom, and POSIX compliance.
 
-### Decision
-SigmaOS adopts a hybrid VFS architecture:
-1. **Inode Layer**: Tracks file metadata, reference counts, lock queues, and lifecycle states in memory (`src/fs/inode.rs`).
-2. **Handle/Descriptor Layer**: Manages process-local handle tables (`src/fs/fd_table.rs`) mapping integer file descriptors to open file handles with atomic seek offsets and cloexec flags.
-3. **Request Router Layer**: Converts VFS operations (open, read, write, seek, lock) into validated requests executed exactly once.
+## Decision
+1. **Hybrid VFS Architecture**: Adopt an inode-centric hierarchy coupled with asynchronous request queues for non-blocking I/O.
+2. **Authoritative Lifecycle State Machine**: Enforce the exact state progression: `open -> read/write -> seek -> lock -> metadata -> close -> cleanup`.
+3. **Descriptor Isolation**: Isolate process file descriptor tables with atomic bitsets for FD allocation, protecting reserved descriptors (0, 1, 2).
+4. **Typed Error Hierarchy**: All VFS routines return explicit, non-panicking typed errors. Unbounded operations and panic paths are strictly forbidden.
 
-### Consequences
-- Guarantees zero descriptor leaks under stress.
-- Enforces strict memory bounds without unbounded kernel allocations.
-- Provides diagnosable, typed `FsError` status codes across all syscall paths.
-
----
-
-## ADR-0002: Race-Free Advisory and Range Locking Discipline
-
-### Context
-Concurrent processes accessing shared files require synchronization mechanisms (`flock` advisory locking and `fcntl` byte-range locking) to prevent data corruption.
-
-### Decision
-File range locking is managed by `FileRangeLockManager` (`src/fs/flock.rs`). Shared locks can overlap, but exclusive locks require disjoint ranges. Deadlock prevention is guaranteed via atomic non-blocking trial evaluation and automatic lock teardown on file descriptor closure.
+## Consequences
+- **Pros**: Clean isolation between process file handles and kernel VFS layers; race-free descriptor allocation and cleanup; full auditability under stress tests.
+- **Cons**: Requires explicit ref-counting and double-unlock / double-unlink validation logic across all VFS entry points.
