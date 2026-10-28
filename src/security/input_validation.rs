@@ -180,9 +180,7 @@ pub fn validate_email(email: &[u8]) -> Result<(), ValidationError> {
 
     // Check valid local-part unquoted characters
     for &b in local {
-        if !b.is_ascii_alphanumeric()
-            && !b"!#$%&'*+-/=?^_`{|}~.".contains(&b)
-        {
+        if !b.is_ascii_alphanumeric() && !b"!#$%&'*+-/=?^_`{|}~.".contains(&b) {
             return Err(ValidationError::InvalidChars);
         }
     }
@@ -1015,12 +1013,30 @@ mod tests {
 
     #[test]
     fn test_null_byte_rejected() {
-        assert_eq!(validate_path(&[b'/', b'f', 0, b'o']), Err(ValidationError::NullByte));
-        assert_eq!(validate_username(b"user\x00name"), Err(ValidationError::NullByte));
-        assert_eq!(validate_hostname(b"host\x00name.com"), Err(ValidationError::NullByte));
-        assert_eq!(validate_env_key(b"ENV\x00KEY"), Err(ValidationError::NullByte));
-        assert_eq!(validate_ipv4(b"192.168.\x001.1"), Err(ValidationError::NullByte));
-        assert_eq!(validate_ipv6(b"2001:db8::\x001"), Err(ValidationError::NullByte));
+        assert_eq!(
+            validate_path(&[b'/', b'f', 0, b'o']),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_username(b"user\x00name"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_hostname(b"host\x00name.com"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_env_key(b"ENV\x00KEY"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168.\x001.1"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_ipv6(b"2001:db8::\x001"),
+            Err(ValidationError::NullByte)
+        );
     }
 
     #[test]
@@ -1252,12 +1268,30 @@ mod tests {
 
     #[test]
     fn test_ipv4_octet_overflow_and_leading_zeros() {
-        assert_eq!(validate_ipv4(b"999.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"256.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"65536.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"010.0.0.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192.168.01.1"), Err(ValidationError::OutOfRange));
-        assert_eq!(validate_ipv4(b"192.168..1"), Err(ValidationError::OutOfRange));
+        assert_eq!(
+            validate_ipv4(b"999.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"256.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"65536.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"010.0.0.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168.01.1"),
+            Err(ValidationError::OutOfRange)
+        );
+        assert_eq!(
+            validate_ipv4(b"192.168..1"),
+            Err(ValidationError::OutOfRange)
+        );
     }
 
     #[test]
@@ -1617,42 +1651,93 @@ mod tests {
     fn test_email_validation() {
         assert_eq!(validate_email(b"user@example.com"), Ok(()));
         assert_eq!(validate_email(b"user.name+tag@sub.domain.co.uk"), Ok(()));
-        assert_eq!(validate_email(b"user_123!#$%&'*+-/=?^_`{|}~@example.org"), Ok(()));
+        assert_eq!(
+            validate_email(b"user_123!#$%&'*+-/=?^_`{|}~@example.org"),
+            Ok(())
+        );
 
         // Rejection of empty input & length exceeding limits
         assert_eq!(validate_email(b""), Err(ValidationError::EmptyInput));
         let long_local = vec![b'a'; 65];
         let long_local_email = [long_local.as_slice(), b"@example.com"].concat();
-        assert_eq!(validate_email(&long_local_email), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_email(&long_local_email),
+            Err(ValidationError::InvalidChars)
+        );
 
         let long_domain = vec![b'a'; 250];
         let long_email = [b"user@", long_domain.as_slice(), b".com"].concat();
         assert_eq!(validate_email(&long_email), Err(ValidationError::TooLong));
 
         // Rejection of NUL byte and ASCII control characters
-        assert_eq!(validate_email(b"user\x00@example.com"), Err(ValidationError::NullByte));
-        assert_eq!(validate_email(b"user\n@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user\r@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user\t@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_email(b"user\x00@example.com"),
+            Err(ValidationError::NullByte)
+        );
+        assert_eq!(
+            validate_email(b"user\n@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user\r@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user\t@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Rejection of missing @, multiple @, and empty parts
-        assert_eq!(validate_email(b"userexample.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user@foo@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_email(b"userexample.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user@foo@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
         assert_eq!(validate_email(b"user@"), Err(ValidationError::InvalidChars));
 
         // Local-part dot violations
-        assert_eq!(validate_email(b".user@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user.@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"us..er@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_email(b".user@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user.@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"us..er@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Local-part disallowed characters
-        assert_eq!(validate_email(b"user(comment)@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user[name]@example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user\\name@example.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_email(b"user(comment)@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user[name]@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user\\name@example.com"),
+            Err(ValidationError::InvalidChars)
+        );
 
         // Domain part hostname validation
-        assert_eq!(validate_email(b"user@-example.com"), Err(ValidationError::InvalidChars));
-        assert_eq!(validate_email(b"user@example..com"), Err(ValidationError::InvalidChars));
+        assert_eq!(
+            validate_email(b"user@-example.com"),
+            Err(ValidationError::InvalidChars)
+        );
+        assert_eq!(
+            validate_email(b"user@example..com"),
+            Err(ValidationError::InvalidChars)
+        );
     }
 }

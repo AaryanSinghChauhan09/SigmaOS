@@ -72,7 +72,11 @@ impl OpenRcService {
     }
 
     pub fn status(&self) -> &'static str {
-        if self.running { "started" } else { "stopped" }
+        if self.running {
+            "started"
+        } else {
+            "stopped"
+        }
     }
 }
 
