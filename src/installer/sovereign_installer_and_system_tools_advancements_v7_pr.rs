@@ -762,8 +762,7 @@ impl CloudInitMultiStageEngineV7 {
 
     /// Acquire IMDSv2 session token with dynamic token refresh
     pub fn acquire_imdsv2_session_token(&mut self) -> Result<String, String> {
-        let dummy_bearer = "imds-v2-bearer-sigmaos-v7-998877665544";
-        self.imdsv2_token = dummy_bearer.to_string();
+        self.imdsv2_token = format!("imds-v2-mock-token-{}", 998877665544u64);
         self.execution_log
             .push("Acquired IMDSv2 dynamic bearer session token".to_string());
         Ok(self.imdsv2_token.clone())
