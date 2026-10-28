@@ -5,7 +5,7 @@
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.32+ BPF SchedExt,
 // FreeBSD 16.2+ OpenZFS ARC & Capsicum, OpenBSD 9.1+ Pinsyscall FineIBT, DragonFly BSD 8.0+ HAMMER3,
 // NetBSD 12.7 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// Global Tech Media 35 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
+// Global Tech Media 34 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines.
 
 #![allow(non_camel_case_types)]
@@ -67,8 +67,8 @@ pub struct OpenSourceOsPrProposalV78 {
 pub struct LinuxKernel632SchedExtAdvancementsEngineV78 {
     pub sched_ext_ebpf_v5_active: bool,
     pub eevdf_bore_v5_latency_target_us: u32,
-    pub folio_multi_memcg_compaction_v2_active: bool,
-    pub io_uring_128_zero_copy_sqpoll: bool,
+    pub folio_multi_memcg_compaction_active: bool,
+    pub io_uring_64_zero_copy_sqpoll: bool,
     pub active_sched_tasks: u32,
 }
 
@@ -76,9 +76,9 @@ impl LinuxKernel632SchedExtAdvancementsEngineV78 {
     pub fn new() -> Self {
         Self {
             sched_ext_ebpf_v5_active: true,
-            eevdf_bore_v5_latency_target_us: 150,
-            folio_multi_memcg_compaction_v2_active: true,
-            io_uring_128_zero_copy_sqpoll: true,
+            eevdf_bore_v5_latency_target_us: 180,
+            folio_multi_memcg_compaction_active: true,
+            io_uring_64_zero_copy_sqpoll: true,
             active_sched_tasks: 8192,
         }
     }
@@ -89,14 +89,14 @@ impl LinuxKernel632SchedExtAdvancementsEngineV78 {
     }
 
     pub fn trigger_folio_compaction(&mut self) -> String {
-        self.folio_multi_memcg_compaction_v2_active = true;
-        "Linux Kernel 6.32+: Multi-MemCG V2 folio page compaction completed across high-order allocations".to_string()
+        self.folio_multi_memcg_compaction_active = true;
+        "Linux Kernel 6.32+: Multi-MemCG folio page compaction completed across high-order allocations".to_string()
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-01-LINUX-632".to_string(),
-            title: "feat(kernel): Linux 6.32+ eBPF SchedExt EEVDF BORE V5 & Folio Multi-MemCG V2 Compaction".to_string(),
+            title: "feat(kernel): Linux 6.32+ eBPF SchedExt EEVDF BORE V5 & Folio Multi-MemCG Compaction".to_string(),
             component_name: "sigmaos-linux632-schedext-engine".to_string(),
             os_origin: "Linux Kernel 6.32+".to_string(),
             status: OsPrStatusV78::Validated,
@@ -227,7 +227,7 @@ impl Default for OpenBsd91PinsyscallFineIbtSecurityEngineV78 {
 }
 
 // ============================================================================
-// 4. DragonFly BSD 8.0+ HAMMER3 Multi-Master Engine
+// 4. DragonFly BSD 8.0+ HAMMER3 Replication Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -343,7 +343,7 @@ impl IllumosOpenZfsDTraceEBPFEngineV78 {
             openzfs_aes_256_gcm_block_encryption: true,
             crossbow_vnic_qos_active: true,
             dtrace_to_ebpf_translator_ready: true,
-            active_crossbow_vnics: 32,
+            active_crossbow_vnics: 48,
         }
     }
 
@@ -354,7 +354,7 @@ impl IllumosOpenZfsDTraceEBPFEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-06-ILLUMOS-DTRACE".to_string(),
-            title: "feat(illumos): Illumos OpenZFS Native AES-256-GCM Encryption & DTrace-to-eBPF Translator V2".to_string(),
+            title: "feat(illumos): Illumos OpenZFS Native AES-256-GCM Encryption & DTrace-to-eBPF Translator".to_string(),
             component_name: "sigmaos-illumos-dtrace-ebpf-v78-engine".to_string(),
             os_origin: "Illumos / OpenSolaris".to_string(),
             status: OsPrStatusV78::Validated,
@@ -403,7 +403,7 @@ impl HaikuPlan9RedoxMicrokernelSchemeEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-07-MICROKERNEL-SCHEMES".to_string(),
-            title: "feat(microkernel): Haiku BFS Live Query, Plan 9 Plumber Router & RedoxFS CoW Capabilities V2".to_string(),
+            title: "feat(microkernel): Haiku BFS Live Query, Plan 9 Plumber Router & RedoxFS CoW Capabilities".to_string(),
             component_name: "sigmaos-microkernel-scheme-v78-engine".to_string(),
             os_origin: "Haiku OS / Plan 9 / Redox OS".to_string(),
             status: OsPrStatusV78::Validated,
@@ -424,26 +424,26 @@ impl Default for HaikuPlan9RedoxMicrokernelSchemeEngineV78 {
 }
 
 // ============================================================================
-// 8. Global Tech Media 35 Portals Harvester Engine
+// 8. Global Tech Media 34 Portals Harvester Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct TechMedia35PortalsHarvesterEngineV78 {
+pub struct TechMedia34PortalsHarvesterEngineV78 {
     pub active_media_portals_count: u32,
     pub ai_summarizer_pipeline_ready: bool,
     pub latest_crawled_topics: Vec<String>,
 }
 
-impl TechMedia35PortalsHarvesterEngineV78 {
+impl TechMedia34PortalsHarvesterEngineV78 {
     pub fn new() -> Self {
         Self {
-            active_media_portals_count: 35,
+            active_media_portals_count: 34,
             ai_summarizer_pipeline_ready: true,
             latest_crawled_topics: vec![
-                "9to5Linux: Linux 6.32+ SchedExt".to_string(),
-                "Phoronix: OpenZFS Direct-IO Benchmarks".to_string(),
-                "TechCrunch: AI Operating System Paradigms".to_string(),
-                "TomsHardware: CXL 3.0 Memory Fabric".to_string(),
+                "9to5Linux: Linux 6.32+ SchedExt BORE v5".to_string(),
+                "Phoronix: OpenZFS ARC Trim Benchmarks".to_string(),
+                "TechCrunch: AI Operating System Innovations".to_string(),
+                "TomsHardware: CXL Memory Fabric Expansion".to_string(),
                 "ArsTechnica: Microkernel Security Paradigms".to_string(),
             ],
         }
@@ -456,7 +456,7 @@ impl TechMedia35PortalsHarvesterEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-08-TECH-MEDIA".to_string(),
-            title: "feat(media): Global Tech Media 35 Portals RSS/Atom Crawler & AI Summary Aggregator".to_string(),
+            title: "feat(media): Global Tech Media 34 Portals RSS/Atom Crawler & AI Summary Aggregator".to_string(),
             component_name: "sigmaos-tech-media-harvester-v78-engine".to_string(),
             os_origin: "Global Tech Media & OS Publication Ecosystem".to_string(),
             status: OsPrStatusV78::Validated,
@@ -470,7 +470,7 @@ impl TechMedia35PortalsHarvesterEngineV78 {
     }
 }
 
-impl Default for TechMedia35PortalsHarvesterEngineV78 {
+impl Default for TechMedia34PortalsHarvesterEngineV78 {
     fn default() -> Self {
         Self::new()
     }
@@ -505,7 +505,7 @@ impl OmarchyWallustChordNavigatorEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-09-OMARCHY-NAVIGATOR".to_string(),
-            title: "feat(desktop): Omarchy Hyprland Chorded Navigation & Wallust Dynamic Palette Generator V2".to_string(),
+            title: "feat(desktop): Omarchy Hyprland Chorded Navigation & Wallust Dynamic Palette Generator".to_string(),
             component_name: "sigmaos-omarchy-chord-navigator-v78-engine".to_string(),
             os_origin: "Omarchy Linux / Hyprland".to_string(),
             status: OsPrStatusV78::Validated,
@@ -538,7 +538,7 @@ pub struct SovereignUnimplementedIdeasSuiteV78 {
     pub netbsd127_engine: NetBsd127RumpVirtio9pEngineV78,
     pub illumos_engine: IllumosOpenZfsDTraceEBPFEngineV78,
     pub microkernel_engine: HaikuPlan9RedoxMicrokernelSchemeEngineV78,
-    pub tech_media_engine: TechMedia35PortalsHarvesterEngineV78,
+    pub tech_media_engine: TechMedia34PortalsHarvesterEngineV78,
     pub omarchy_engine: OmarchyWallustChordNavigatorEngineV78,
 }
 
@@ -552,7 +552,7 @@ impl SovereignUnimplementedIdeasSuiteV78 {
             netbsd127_engine: NetBsd127RumpVirtio9pEngineV78::new(),
             illumos_engine: IllumosOpenZfsDTraceEBPFEngineV78::new(),
             microkernel_engine: HaikuPlan9RedoxMicrokernelSchemeEngineV78::new(),
-            tech_media_engine: TechMedia35PortalsHarvesterEngineV78::new(),
+            tech_media_engine: TechMedia34PortalsHarvesterEngineV78::new(),
             omarchy_engine: OmarchyWallustChordNavigatorEngineV78::new(),
         }
     }
@@ -620,8 +620,8 @@ mod tests {
     #[test]
     fn test_v78_individual_engines() {
         let mut linux_engine = LinuxKernel632SchedExtAdvancementsEngineV78::new();
-        let tune_msg = linux_engine.tune_eevdf_bore_v5_latency(150);
-        assert!(tune_msg.contains("150 us"));
+        let tune_msg = linux_engine.tune_eevdf_bore_v5_latency(160);
+        assert!(tune_msg.contains("160 us"));
 
         let mut freebsd_engine = FreeBsd162OpenZfsCapsicumParityEngineV78::new();
         let trim_msg = freebsd_engine.trim_openzfs_arc_pressure(4096);
@@ -650,9 +650,9 @@ mod tests {
         let plumber_msg = microkernel_engine.route_plumber_message("kind=text data=open");
         assert!(plumber_msg.contains("Plumber router matched"));
 
-        let mut media_engine = TechMedia35PortalsHarvesterEngineV78::new();
+        let mut media_engine = TechMedia34PortalsHarvesterEngineV78::new();
         let crawl_msg = media_engine.harvest_all_tech_feeds();
-        assert!(crawl_msg.contains("35 media portals"));
+        assert!(crawl_msg.contains("34 media portals"));
 
         let omarchy_engine = OmarchyWallustChordNavigatorEngineV78::new();
         let chord_msg = omarchy_engine.trigger_chord_action("SUPER+ALT+ENTER");

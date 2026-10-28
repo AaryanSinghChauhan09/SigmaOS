@@ -24,7 +24,7 @@ fn test_v78_integration_suite_full() {
 
     // Verify individual component engines
     let mut linux = LinuxKernel632SchedExtAdvancementsEngineV78::new();
-    assert!(linux.tune_eevdf_bore_v5_latency(150).contains("150 us"));
+    assert!(linux.tune_eevdf_bore_v5_latency(160).contains("160 us"));
     assert!(linux
         .trigger_folio_compaction()
         .contains("folio page compaction completed"));
@@ -37,19 +37,19 @@ fn test_v78_integration_suite_full() {
     assert!(openbsd
         .enforce_pinsyscall_fine_ibt(60)
         .contains("FineIBT shadow call stack"));
-    assert!(openbsd.evaluate_unveil_wildcard_path("/var/log/*"));
+    assert!(openbsd.evaluate_unveil_wildcard_path("/usr/local/*"));
 
     let mut dfbsd = DragonFlyBsdHAMMER3ReplicationEngineV78::new();
     assert!(dfbsd.sync_replica_node(5).contains("node #5"));
 
     let netbsd = NetBsd127RumpVirtio9pEngineV78::new();
     assert!(netbsd
-        .verify_binary_integrity("/bin/ls")
+        .verify_binary_integrity("/usr/bin/sudo")
         .contains("Veriexec V7"));
 
     let illumos = IllumosOpenZfsDTraceEBPFEngineV78::new();
     assert!(illumos
-        .translate_dtrace_script("syscall:::entry")
+        .translate_dtrace_script("sysinfo:::syscall-entry")
         .contains("eBPF bytecode"));
 
     let microkernel = HaikuPlan9RedoxMicrokernelSchemeEngineV78::new();
@@ -57,8 +57,8 @@ fn test_v78_integration_suite_full() {
         .route_plumber_message("click target")
         .contains("Plumber router matched"));
 
-    let mut media = TechMedia35PortalsHarvesterEngineV78::new();
-    assert!(media.harvest_all_tech_feeds().contains("35 media portals"));
+    let mut media = TechMedia34PortalsHarvesterEngineV78::new();
+    assert!(media.harvest_all_tech_feeds().contains("34 media portals"));
 
     let omarchy = OmarchyWallustChordNavigatorEngineV78::new();
     assert!(omarchy
