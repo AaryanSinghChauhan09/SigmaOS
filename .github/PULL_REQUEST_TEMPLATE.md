@@ -1,76 +1,103 @@
 ## Summary
 
-<!-- What component does this PR improve or add? -->
+<!-- What secondary-memory or system behavior changed and why? -->
 
-## Related issue
+## Storage component
 
-Closes #<issue-id>
+- [ ] Block device manager
+- [ ] virtio / NVMe / virtio
+- [ ] Block cache manager
+- [ ] Filesystem manager
+- [ ] Mount / unmount
+- [ ] Cache
+- [ ] Filesystem
+- [ ] Recovery
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
+- [ ] Component
 
-## Upstream study
+## Shell component
 
-- Project:
-- Version/commit:
-- Research note:
-- ADR:
+- [ ] Interactive shell
+- [ ] Lexer / parser / AST
+- [ ] Builtin commands
+- [ ] Diagnostics
 
-## What SigmaOS adopts
+## Recurring task
 
-<!-- State the design principle or mechanism adopted. -->
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly storage audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
 
-## What SigmaOS changes or rejects
+## Reference behavior & Upstream study
 
-<!-- State simplifications, deviations, and rejected ideas. -->
+<!-- Required for lifecycle, ABI, or storage changes -->
 
-## Component impact
-
-- Component:
-- Maturity before:
-- Maturity after:
-- Runtime path affected:
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- What SigmaOS adopts:
+- Reference study:
+- Compatibility impact:
 
 ## Changes
 
-- [ ] Source implementation
-- [ ] Unit tests
-- [ ] Integration tests
-- [ ] QEMU/runtime test
-- [ ] Documentation
-- [ ] Capability/status update
-- [ ] Regression protection
-- [ ] Security review, if applicable
+-
 
-## Verification
+## Shell safety review
 
-```bash
-cargo check --lib
-cargo test --lib
-./run_sigma_tests.sh
-make check
-make test
-make format
-```
-
-## Runtime evidence
-
-- [ ] QEMU boot log
-- [ ] Installer/update test log
-- [ ] Package dry-run report
-- [ ] Hardware test log, if applicable
-- [ ] Artifact hash
-
-## Safety and rollback
-
-- [ ] No broad credentials or host access introduced
-- [ ] Untrusted input is validated
-- [ ] Package scripts are sandboxed, if applicable
-- [ ] Rollback/recovery behavior defined
-- [ ] Security review completed, if applicable
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-completion prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+- [ ] Kernel safety review completed
+- [ ] Study document provided
+- [ ] Safety and rollback plan defined
 
 ## Reviewer checklist
 
-- [ ] Scope is narrow
-- [ ] Tests cover the change
-- [ ] Runtime evidence is linked
-- [ ] Documentation matches implementation
-- [ ] Capability status is evidence-based
-- [ ] No unsupported parity claims
+- [ ] Safety review completed
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Storage benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Storage documentation
+- [ ] Boot matrix, if applicable
+
+## Risks and rollback
+
+- Risk:
+- Rollback:
+
+## Safety and rollback
+
+- Risk:
+- Rollback:

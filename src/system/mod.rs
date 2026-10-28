@@ -508,7 +508,7 @@ pub use sigmafilm::{
 };
 pub use sigmafirewall::{
     create_rule, get_sigmafirewall, get_sigmafirewall_mut, init_sigmafirewall, FirewallAction,
-    FirewallChain, FirewallProtocol, FirewallRule as OtherFirewallRule, RuleState, SigmaFirewall,
+    FirewallChain, FirewallProtocol, FirewallRule as SigmaFirewallRule, RuleState, SigmaFirewall,
 };
 pub use sigmaflatpak::{
     add_flatpak, get_sigmaflatpak, init_sigmaflatpak, install_flatpak, Flatpak, FlatpakRemote,
@@ -566,7 +566,7 @@ pub use sigmalight::{
     LightType, LightingScene, SigmaLight,
 };
 pub use sigmalogrotate::{
-    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig as OtherLogFileConfig,
+    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig as SigmaLogFileConfig,
     SigmaLogRotate,
 };
 pub use sigmalvm::{
