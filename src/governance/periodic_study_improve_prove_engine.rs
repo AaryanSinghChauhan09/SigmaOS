@@ -607,23 +607,98 @@ impl PeriodicImprovementEngine {
     fn seed_backlog(&mut self) {
         let backlog_specs = [
             // P0: Make the core real
-            (1, BacklogPriority::P0RealCore, "Audit component status claims", "Audit every component in CAPABILITY_MATRIX.toml and FEATURE_STATUS.toml."),
-            (2, BacklogPriority::P0RealCore, "Downgrade unevidenced claims", "Downgrade claims that lack runtime evidence."),
-            (3, BacklogPriority::P0RealCore, "QEMU boot validator", "Implement a QEMU x86_64 boot-to-shell validator."),
-            (4, BacklogPriority::P0RealCore, "Connect boot subsystems", "Connect memory, scheduler, syscall, VFS, and init paths to actual boot."),
-            (5, BacklogPriority::P0RealCore, "Boot matrix & serial logs", "Add a boot matrix with serial logs, artifact hashes, and failure classification."),
+            (
+                1,
+                BacklogPriority::P0RealCore,
+                "Audit component status claims",
+                "Audit every component in CAPABILITY_MATRIX.toml and FEATURE_STATUS.toml.",
+            ),
+            (
+                2,
+                BacklogPriority::P0RealCore,
+                "Downgrade unevidenced claims",
+                "Downgrade claims that lack runtime evidence.",
+            ),
+            (
+                3,
+                BacklogPriority::P0RealCore,
+                "QEMU boot validator",
+                "Implement a QEMU x86_64 boot-to-shell validator.",
+            ),
+            (
+                4,
+                BacklogPriority::P0RealCore,
+                "Connect boot subsystems",
+                "Connect memory, scheduler, syscall, VFS, and init paths to actual boot.",
+            ),
+            (
+                5,
+                BacklogPriority::P0RealCore,
+                "Boot matrix & serial logs",
+                "Add a boot matrix with serial logs, artifact hashes, and failure classification.",
+            ),
             // P1: Improve resilience
-            (6, BacklogPriority::P1Resilience, "Panic handling & watchdog", "Add panic handling, watchdog-style boot timeout, and failure-stage reporting."),
-            (7, BacklogPriority::P1Resilience, "Syscall/VFS/IPC fuzzing", "Add fuzzing for syscall, VFS, IPC, and package parsers."),
-            (8, BacklogPriority::P1Resilience, "Installer recovery tests", "Add installer recovery and update rollback tests."),
-            (9, BacklogPriority::P1Resilience, "Flaky test detection", "Add flaky-test detection and failure triage."),
-            (10, BacklogPriority::P1Resilience, "Closed bug regression tests", "Add regression tests for every closed bug."),
+            (
+                6,
+                BacklogPriority::P1Resilience,
+                "Panic handling & watchdog",
+                "Add panic handling, watchdog-style boot timeout, and failure-stage reporting.",
+            ),
+            (
+                7,
+                BacklogPriority::P1Resilience,
+                "Syscall/VFS/IPC fuzzing",
+                "Add fuzzing for syscall, VFS, IPC, and package parsers.",
+            ),
+            (
+                8,
+                BacklogPriority::P1Resilience,
+                "Installer recovery tests",
+                "Add installer recovery and update rollback tests.",
+            ),
+            (
+                9,
+                BacklogPriority::P1Resilience,
+                "Flaky test detection",
+                "Add flaky-test detection and failure triage.",
+            ),
+            (
+                10,
+                BacklogPriority::P1Resilience,
+                "Closed bug regression tests",
+                "Add regression tests for every closed bug.",
+            ),
             // P2: Improve capability
-            (11, BacklogPriority::P2Capability, "VFS mounts & permissions", "Improve VFS with mount points, permissions, and persistent filesystem support."),
-            (12, BacklogPriority::P2Capability, "Scheduler starvation check", "Improve scheduler with priorities, fairness metrics, and starvation detection."),
-            (13, BacklogPriority::P2Capability, "Sandboxed security policy", "Improve security with capability checks and sandboxed package execution."),
-            (14, BacklogPriority::P2Capability, "Signed package manifests", "Improve packaging with signed manifests and dependency conflict handling."),
-            (15, BacklogPriority::P2Capability, "Zenith window diagnostics", "Improve Zenith with input, window lifecycle, diagnostics, and crash reporting."),
+            (
+                11,
+                BacklogPriority::P2Capability,
+                "VFS mounts & permissions",
+                "Improve VFS with mount points, permissions, and persistent filesystem support.",
+            ),
+            (
+                12,
+                BacklogPriority::P2Capability,
+                "Scheduler starvation check",
+                "Improve scheduler with priorities, fairness metrics, and starvation detection.",
+            ),
+            (
+                13,
+                BacklogPriority::P2Capability,
+                "Sandboxed security policy",
+                "Improve security with capability checks and sandboxed package execution.",
+            ),
+            (
+                14,
+                BacklogPriority::P2Capability,
+                "Signed package manifests",
+                "Improve packaging with signed manifests and dependency conflict handling.",
+            ),
+            (
+                15,
+                BacklogPriority::P2Capability,
+                "Zenith window diagnostics",
+                "Improve Zenith with input, window lifecycle, diagnostics, and crash reporting.",
+            ),
         ];
 
         for (id, priority, title, desc) in backlog_specs {

@@ -259,7 +259,13 @@ impl ArtcraftGpuCompositingGraphPrEngine {
         }
     }
 
-    pub fn add_node(&mut self, node_id: u32, label: &str, blend_mode: CompositorBlendMode, opacity: u8) -> bool {
+    pub fn add_node(
+        &mut self,
+        node_id: u32,
+        label: &str,
+        blend_mode: CompositorBlendMode,
+        opacity: u8,
+    ) -> bool {
         let node = CompositorNode {
             node_id,
             label: label.to_string(),
@@ -287,12 +293,14 @@ impl ArtcraftGpuCompositingGraphPrEngine {
     pub fn generate_proposal(&self) -> ArtcraftPrProposalSpec {
         ArtcraftPrProposalSpec {
             pr_id: 7801,
-            pr_title: "feat(artcraft): Implement Real-Time GPU Compositing Node Graph Engine".to_string(),
+            pr_title: "feat(artcraft): Implement Real-Time GPU Compositing Node Graph Engine"
+                .to_string(),
             target_subsystem: "ArtCraft Compositor Core".to_string(),
             original_suite: "ArtCraft Compositor".to_string(),
             components_added: vec![
                 "GPU zero-copy layer tree compositing node graph".to_string(),
-                "Real-time blend mode rasterization pipeline (Multiply, Screen, Overlay)".to_string(),
+                "Real-time blend mode rasterization pipeline (Multiply, Screen, Overlay)"
+                    .to_string(),
                 "Deterministic FNV-1a graph checksum integrity validator".to_string(),
             ],
             performance_multiplier: "120 FPS 4K compositing (<1.0ms latency)".to_string(),
@@ -376,7 +384,8 @@ impl ArtcraftAiAssetCachePrEngine {
     pub fn generate_proposal(&self) -> ArtcraftPrProposalSpec {
         ArtcraftPrProposalSpec {
             pr_id: 7802,
-            pr_title: "feat(artcraft): Implement Generative AI Asset Neural Cache Engine".to_string(),
+            pr_title: "feat(artcraft): Implement Generative AI Asset Neural Cache Engine"
+                .to_string(),
             target_subsystem: "ArtCraft AI Core".to_string(),
             original_suite: "ArtCraft Generative AI".to_string(),
             components_added: vec![
@@ -419,7 +428,12 @@ impl ArtcraftVectorBooleanTopologyPrEngine {
         Self { path_count: 0 }
     }
 
-    pub fn execute_boolean_op(&mut self, op: VectorBooleanOp, path_a: &[u8], path_b: &[u8]) -> Vec<u8> {
+    pub fn execute_boolean_op(
+        &mut self,
+        op: VectorBooleanOp,
+        path_a: &[u8],
+        path_b: &[u8],
+    ) -> Vec<u8> {
         self.path_count += 2;
         let mut result = Vec::with_capacity(path_a.len() + path_b.len());
         match op {
@@ -448,7 +462,8 @@ impl ArtcraftVectorBooleanTopologyPrEngine {
     pub fn generate_proposal(&self) -> ArtcraftPrProposalSpec {
         ArtcraftPrProposalSpec {
             pr_id: 7803,
-            pr_title: "feat(artcraft): Implement Vector Path Sweep-Line Boolean Topology Engine".to_string(),
+            pr_title: "feat(artcraft): Implement Vector Path Sweep-Line Boolean Topology Engine"
+                .to_string(),
             target_subsystem: "ArtCraft Vector Geometry".to_string(),
             original_suite: "ArtCraft Vector CAD/Design".to_string(),
             components_added: vec![
@@ -529,7 +544,9 @@ impl ArtcraftAudioDspPipelinePrEngine {
     pub fn generate_proposal(&self) -> ArtcraftPrProposalSpec {
         ArtcraftPrProposalSpec {
             pr_id: 7804,
-            pr_title: "feat(artcraft): Implement Non-Destructive Multi-Track Audio DSP Pipeline Engine".to_string(),
+            pr_title:
+                "feat(artcraft): Implement Non-Destructive Multi-Track Audio DSP Pipeline Engine"
+                    .to_string(),
             target_subsystem: "ArtCraft Audio Core".to_string(),
             original_suite: "ArtCraft Sound/Audio".to_string(),
             components_added: vec![
@@ -537,7 +554,8 @@ impl ArtcraftAudioDspPipelinePrEngine {
                 "Low-latency Gain, LPF, and HPF biquad audio nodes".to_string(),
                 "Lock-free audio ring buffer streaming driver".to_string(),
             ],
-            performance_multiplier: "Sub-millisecond buffer processing (<0.5ms latency)".to_string(),
+            performance_multiplier: "Sub-millisecond buffer processing (<0.5ms latency)"
+                .to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -616,7 +634,8 @@ impl ArtcraftSpatial3dMeshBvhPrEngine {
     pub fn generate_proposal(&self) -> ArtcraftPrProposalSpec {
         ArtcraftPrProposalSpec {
             pr_id: 7805,
-            pr_title: "feat(artcraft): Implement Spatial 3D Mesh BVH Ray/Collider Engine".to_string(),
+            pr_title: "feat(artcraft): Implement Spatial 3D Mesh BVH Ray/Collider Engine"
+                .to_string(),
             target_subsystem: "ArtCraft Spatial 3D".to_string(),
             original_suite: "ArtCraft 3D/Spatial".to_string(),
             components_added: vec![
@@ -662,22 +681,29 @@ impl ArtcraftAdvancementsMasterSuite {
     }
 
     pub fn evaluate_all_advancements_parity(&mut self) -> bool {
-        self.gpu_compositor.add_node(1, "BaseLayer", CompositorBlendMode::Normal, 255);
-        self.gpu_compositor.add_node(2, "OverlayLayer", CompositorBlendMode::Overlay, 200);
+        self.gpu_compositor
+            .add_node(1, "BaseLayer", CompositorBlendMode::Normal, 255);
+        self.gpu_compositor
+            .add_node(2, "OverlayLayer", CompositorBlendMode::Overlay, 200);
         let compositor_ok = self.gpu_compositor.compute_graph_checksum() != 0;
 
         self.ai_cache.store("cat picture", b"fake_png_data");
         let ai_ok = self.ai_cache.fetch("cat picture").is_some();
 
-        let union_res = self.vector_topology.execute_boolean_op(VectorBooleanOp::Union, &[1, 2], &[3, 4]);
+        let union_res =
+            self.vector_topology
+                .execute_boolean_op(VectorBooleanOp::Union, &[1, 2], &[3, 4]);
         let vector_ok = union_res.len() == 4;
 
         self.audio_dsp.add_dsp_node(DspNodeType::Gain, 1.5);
         let audio_res = self.audio_dsp.process_buffer(&[0.5, 0.8]);
         let audio_ok = (audio_res[0] - 0.75).abs() < 1e-4;
 
-        self.spatial_bvh.insert_box([-1.0, -1.0, -1.0], [1.0, 1.0, 1.0]);
-        let hits = self.spatial_bvh.query_ray_intersections([0.0, 0.0, -5.0], [0.0, 0.0, 1.0]);
+        self.spatial_bvh
+            .insert_box([-1.0, -1.0, -1.0], [1.0, 1.0, 1.0]);
+        let hits = self
+            .spatial_bvh
+            .query_ray_intersections([0.0, 0.0, -5.0], [0.0, 0.0, 1.0]);
         let spatial_ok = hits == 1;
 
         compositor_ok && ai_ok && vector_ok && audio_ok && spatial_ok
@@ -822,7 +848,8 @@ mod tests {
         let union_res = engine.execute_boolean_op(VectorBooleanOp::Union, &[1, 2], &[3, 4]);
         assert_eq!(union_res, vec![1, 2, 3, 4]);
 
-        let intersect_res = engine.execute_boolean_op(VectorBooleanOp::Intersection, &[1, 2, 3], &[2, 3, 4]);
+        let intersect_res =
+            engine.execute_boolean_op(VectorBooleanOp::Intersection, &[1, 2, 3], &[2, 3, 4]);
         assert_eq!(intersect_res, vec![2, 3]);
 
         let proposal = engine.generate_proposal();

@@ -50,7 +50,10 @@ impl SovereignCups3DriverlessAppGatewayEngineV78 {
     }
 
     /// Convert legacy PPD options into standard IPP Everywhere attributes
-    pub fn convert_ppd_to_ipp_attributes(&self, ppd_options: &[(&str, &str)]) -> HashMap<String, String> {
+    pub fn convert_ppd_to_ipp_attributes(
+        &self,
+        ppd_options: &[(&str, &str)],
+    ) -> HashMap<String, String> {
         let mut ipp_attrs = HashMap::new();
         for (opt, val) in ppd_options {
             let key = format!("ipp-ppd-{}", opt.to_lowercase());
@@ -66,9 +69,15 @@ impl SovereignCups3DriverlessAppGatewayEngineV78 {
         vec![
             ("txtvers".to_string(), "1".to_string()),
             ("qtotal".to_string(), "1".to_string()),
-            ("pdl".to_string(), "application/pdf,image/pwg-raster,image/urf".to_string()),
+            (
+                "pdl".to_string(),
+                "application/pdf,image/pwg-raster,image/urf".to_string(),
+            ),
             ("rp".to_string(), format!("printers/{}", printer_name)),
-            ("note".to_string(), "Sovereign CUPS 3.0 Driverless App V78".to_string()),
+            (
+                "note".to_string(),
+                "Sovereign CUPS 3.0 Driverless App V78".to_string(),
+            ),
             ("Color".to_string(), "T".to_string()),
             ("Duplex".to_string(), "T".to_string()),
         ]
@@ -132,7 +141,11 @@ impl SovereignCupsFilterV2GraphEngineV78 {
     }
 
     /// Resolve multi-hop conversion path using BFS graph search
-    pub fn resolve_pipeline(&self, src_mime: &str, target_mime: &str) -> Result<Vec<String>, String> {
+    pub fn resolve_pipeline(
+        &self,
+        src_mime: &str,
+        target_mime: &str,
+    ) -> Result<Vec<String>, String> {
         if src_mime == target_mime {
             return Ok(Vec::new());
         }
@@ -158,11 +171,19 @@ impl SovereignCupsFilterV2GraphEngineV78 {
             }
         }
 
-        Err(format!("No transformation path found from {} to {}", src_mime, target_mime))
+        Err(format!(
+            "No transformation path found from {} to {}",
+            src_mime, target_mime
+        ))
     }
 
     /// Execute filter pipeline chain transformation simulation
-    pub fn execute_pipeline(&self, src_mime: &str, target_mime: &str, payload: &[u8]) -> Result<Vec<u8>, String> {
+    pub fn execute_pipeline(
+        &self,
+        src_mime: &str,
+        target_mime: &str,
+        payload: &[u8],
+    ) -> Result<Vec<u8>, String> {
         let chain = self.resolve_pipeline(src_mime, target_mime)?;
         let mut data = payload.to_vec();
 
@@ -355,9 +376,21 @@ impl SovereignPopplerAcroFormEngineV78 {
             return Vec::new();
         }
         vec![
-            ("CustomerName".to_string(), "Text".to_string(), "Sovereign User V78".to_string()),
-            ("TotalAmount".to_string(), "Text".to_string(), "$1,250.00".to_string()),
-            ("Signature".to_string(), "DigitalSig".to_string(), "PQC-Dilithium5-Verified".to_string()),
+            (
+                "CustomerName".to_string(),
+                "Text".to_string(),
+                "Sovereign User V78".to_string(),
+            ),
+            (
+                "TotalAmount".to_string(),
+                "Text".to_string(),
+                "$1,250.00".to_string(),
+            ),
+            (
+                "Signature".to_string(),
+                "DigitalSig".to_string(),
+                "PQC-Dilithium5-Verified".to_string(),
+            ),
         ]
     }
 
@@ -404,11 +437,17 @@ pub struct SovereignPopplerPdfUaSearchEngineV78 {
 
 impl SovereignPopplerPdfUaSearchEngineV78 {
     pub fn new() -> Self {
-        Self { enforce_iso14289: true }
+        Self {
+            enforce_iso14289: true,
+        }
     }
 
     /// Search text with character bounding box coordinates
-    pub fn search_text_bbox(&self, _pdf_data: &[u8], query: &str) -> Vec<SovereignPopplerSearchHitV78> {
+    pub fn search_text_bbox(
+        &self,
+        _pdf_data: &[u8],
+        query: &str,
+    ) -> Vec<SovereignPopplerSearchHitV78> {
         if query.is_empty() {
             return Vec::new();
         }
@@ -461,7 +500,11 @@ impl SovereignSaneNetMultiplexerEngineV78 {
     }
 
     pub fn sane_open(&mut self, device_name: &str) -> Result<String, String> {
-        if !self.connected_devices.iter().any(|d| d.contains(device_name)) {
+        if !self
+            .connected_devices
+            .iter()
+            .any(|d| d.contains(device_name))
+        {
             return Err(format!("Device '{}' not found", device_name));
         }
         self.is_open = true;
@@ -527,7 +570,10 @@ impl SovereignAirScanWsdEngineV78 {
 
     pub fn create_escl_job(&mut self, dpi: u32) -> String {
         self.active_jobs += 1;
-        format!("http://{}:{}/eSCL/ScanJobs/v78-job-{}", self.scanner_ip, self.port, dpi)
+        format!(
+            "http://{}:{}/eSCL/ScanJobs/v78-job-{}",
+            self.scanner_ip, self.port, dpi
+        )
     }
 }
 
@@ -572,7 +618,10 @@ impl SovereignAdfBatchOcrEngineV78 {
 
     pub fn process_batch_page(&self, page_data: &[u8], page_num: u32) -> String {
         let deskew = self.calculate_deskew_angle(page_data);
-        format!("PAGE {}: Deskew={:.2}deg, OCR='Sovereign Document V78 Page {}'", page_num, deskew, page_num)
+        format!(
+            "PAGE {}: Deskew={:.2}deg, OCR='Sovereign Document V78 Page {}'",
+            page_num, deskew, page_num
+        )
     }
 }
 
@@ -661,7 +710,14 @@ impl SovereignBsdLpdAccountingEngineV78 {
     pub fn format_lpr_control_file(&self, job_id: u32, host: &str, user: &str) -> String {
         format!(
             "H{}\nP{}\nJPrint Job #{}\nL{}\nfdfA{:03}{}\nUdfA{:03}{}\n",
-            host, user, job_id, user, job_id % 1000, host, job_id % 1000, host
+            host,
+            user,
+            job_id,
+            user,
+            job_id % 1000,
+            host,
+            job_id % 1000,
+            host
         )
     }
 }
@@ -720,15 +776,36 @@ impl SovereignPrintScanV78PrGatewayEngine {
         vec![
             ("1. CUPS 3.0 Driverless Gateway V78".to_string(), true),
             ("2. CUPS-Filters v2.0 Graph Resolver V78".to_string(), true),
-            ("3. Ghostscript PostScript/PDF Distiller V78".to_string(), true),
+            (
+                "3. Ghostscript PostScript/PDF Distiller V78".to_string(),
+                true,
+            ),
             ("4. Ghostscript ICC/TIC Color Engine V78".to_string(), true),
-            ("5. Poppler AcroForm & PQC Signature Engine V78".to_string(), true),
-            ("6. Poppler PDF/UA Text Search & BBox Engine V78".to_string(), true),
+            (
+                "5. Poppler AcroForm & PQC Signature Engine V78".to_string(),
+                true,
+            ),
+            (
+                "6. Poppler PDF/UA Text Search & BBox Engine V78".to_string(),
+                true,
+            ),
             ("7. SANE Net Protocol v2 Multiplexer V78".to_string(), true),
-            ("8. Driverless eSCL / AirScan & WSD Gateway V78".to_string(), true),
-            ("9. ADF Ultrasonic Double-Feed & Batch OCR V78".to_string(), true),
-            ("10. SANE 16-Bit Gamma Calibration Pipeline V78".to_string(), true),
-            ("11. BSD LPD Spooler & Accounting Quota V78".to_string(), true),
+            (
+                "8. Driverless eSCL / AirScan & WSD Gateway V78".to_string(),
+                true,
+            ),
+            (
+                "9. ADF Ultrasonic Double-Feed & Batch OCR V78".to_string(),
+                true,
+            ),
+            (
+                "10. SANE 16-Bit Gamma Calibration Pipeline V78".to_string(),
+                true,
+            ),
+            (
+                "11. BSD LPD Spooler & Accounting Quota V78".to_string(),
+                true,
+            ),
             ("12. Sovereign Print/Scan V78 PR Gateway".to_string(), true),
         ]
     }
@@ -752,7 +829,11 @@ impl SovereignPrintScanV78PrGatewayEngine {
 
 impl Default for SovereignPrintScanV78PrGatewayEngine {
     fn default() -> Self {
-        Self::new(78001, "Sovereign Printing & Scanning V78 Innovations", "Sovereign Core Team")
+        Self::new(
+            78001,
+            "Sovereign Printing & Scanning V78 Innovations",
+            "Sovereign Core Team",
+        )
     }
 }
 
@@ -770,19 +851,30 @@ mod tests {
         assert_eq!(attrs.get("ipp-ppd-pagesize").unwrap(), "A4");
 
         let txt = gw.generate_dns_sd_txt_records("Office-Printer");
-        assert!(txt.iter().any(|(k, v)| k == "rp" && v == "printers/Office-Printer"));
+        assert!(txt
+            .iter()
+            .any(|(k, v)| k == "rp" && v == "printers/Office-Printer"));
 
-        let route = gw.route_ipp_operation("Print-Job", "ipp://localhost/ipp/print").unwrap();
+        let route = gw
+            .route_ipp_operation("Print-Job", "ipp://localhost/ipp/print")
+            .unwrap();
         assert!(route.contains("Print-Job"));
     }
 
     #[test]
     fn test_cups_filter_v2_graph_v78() {
         let graph = SovereignCupsFilterV2GraphEngineV78::default();
-        let pipeline = graph.resolve_pipeline("text/plain", "image/pwg-raster").unwrap();
-        assert_eq!(pipeline, vec!["texttopdf".to_string(), "pdftoraster".to_string()]);
+        let pipeline = graph
+            .resolve_pipeline("text/plain", "image/pwg-raster")
+            .unwrap();
+        assert_eq!(
+            pipeline,
+            vec!["texttopdf".to_string(), "pdftoraster".to_string()]
+        );
 
-        let exec = graph.execute_pipeline("text/plain", "image/pwg-raster", b"Hello").unwrap();
+        let exec = graph
+            .execute_pipeline("text/plain", "image/pwg-raster", b"Hello")
+            .unwrap();
         let exec_str = String::from_utf8_lossy(&exec);
         assert!(exec_str.contains("texttopdf"));
     }

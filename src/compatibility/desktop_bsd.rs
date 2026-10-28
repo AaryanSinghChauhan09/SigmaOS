@@ -127,7 +127,9 @@ mod tests {
         // Auth required → not allowed initially
         assert!(!delegate.check_permission("org.desktopbsd.install-pkg"));
         // Grant and check
-        delegate.grant_temporary("org.desktopbsd.install-pkg").unwrap();
+        delegate
+            .grant_temporary("org.desktopbsd.install-pkg")
+            .unwrap();
         assert!(delegate.check_permission("org.desktopbsd.install-pkg"));
     }
 
@@ -144,7 +146,11 @@ mod tests {
     #[test]
     fn test_no_auth_action_always_allowed() {
         let mut delegate = PermissionDelegate::new();
-        delegate.register_action(PolkitAction::new("org.desktopbsd.read-log", "View log", false));
+        delegate.register_action(PolkitAction::new(
+            "org.desktopbsd.read-log",
+            "View log",
+            false,
+        ));
         assert!(delegate.check_permission("org.desktopbsd.read-log"));
     }
 }

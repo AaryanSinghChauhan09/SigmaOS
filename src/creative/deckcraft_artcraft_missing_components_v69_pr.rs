@@ -76,9 +76,27 @@ impl DeckcraftKineticTypographyGlitchMorphV69Engine {
             glitch_intensity: 0.15,
             font_optical_size: 14.0,
             text_path: vec![
-                GlitchPoint2DV69 { x: 0.0, y: 0.0, r_offset: 1.5, g_offset: -0.6, b_offset: 0.9 },
-                GlitchPoint2DV69 { x: 120.0, y: 60.0, r_offset: 2.2, g_offset: -1.2, b_offset: 1.8 },
-                GlitchPoint2DV69 { x: 240.0, y: 0.0, r_offset: 0.8, g_offset: -0.3, b_offset: 0.5 },
+                GlitchPoint2DV69 {
+                    x: 0.0,
+                    y: 0.0,
+                    r_offset: 1.5,
+                    g_offset: -0.6,
+                    b_offset: 0.9,
+                },
+                GlitchPoint2DV69 {
+                    x: 120.0,
+                    y: 60.0,
+                    r_offset: 2.2,
+                    g_offset: -1.2,
+                    b_offset: 1.8,
+                },
+                GlitchPoint2DV69 {
+                    x: 240.0,
+                    y: 0.0,
+                    r_offset: 0.8,
+                    g_offset: -0.3,
+                    b_offset: 0.5,
+                },
             ],
         }
     }
@@ -172,7 +190,9 @@ impl DeckcraftSpatial3dVrArSceneCompositorV69Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV69PrProposalManifest {
         DeckcraftV69PrProposalManifest {
             pr_id: 6902,
-            pr_title: String::from("PR #6902: Spatial 3D VR/AR Scene Compositor & Stereo Frustum V69"),
+            pr_title: String::from(
+                "PR #6902: Spatial 3D VR/AR Scene Compositor & Stereo Frustum V69",
+            ),
             target_subsystem: String::from("Deckcraft Spatial 3D Graphics Engine V69"),
             original_suite: String::from("ArtCraft Deckcraft Spatial Computing Suite V69"),
             components_added: vec![
@@ -210,7 +230,9 @@ impl DeckcraftRealtimeAudioVisualizerKeyframeSyncV69Engine {
     }
 
     pub fn is_transient_spike_detected(&self) -> bool {
-        self.fft_bands.iter().any(|&b| b >= self.transient_threshold)
+        self.fft_bands
+            .iter()
+            .any(|&b| b >= self.transient_threshold)
     }
 
     pub fn compute_pulse_scale(&self) -> f32 {
@@ -258,9 +280,24 @@ impl DeckcraftSmartDiagramSankeyFlowAutoLayoutV69Engine {
     pub fn new() -> Self {
         Self {
             nodes: vec![
-                SankeyNodeV69 { node_id: 1, name: String::from("Revenue Stream"), inflow: 1500.0, outflow: 1500.0 },
-                SankeyNodeV69 { node_id: 2, name: String::from("R&D Allocation"), inflow: 600.0, outflow: 600.0 },
-                SankeyNodeV69 { node_id: 3, name: String::from("Operations"), inflow: 900.0, outflow: 900.0 },
+                SankeyNodeV69 {
+                    node_id: 1,
+                    name: String::from("Revenue Stream"),
+                    inflow: 1500.0,
+                    outflow: 1500.0,
+                },
+                SankeyNodeV69 {
+                    node_id: 2,
+                    name: String::from("R&D Allocation"),
+                    inflow: 600.0,
+                    outflow: 600.0,
+                },
+                SankeyNodeV69 {
+                    node_id: 3,
+                    name: String::from("Operations"),
+                    inflow: 900.0,
+                    outflow: 900.0,
+                },
             ],
         }
     }
@@ -330,7 +367,9 @@ impl DeckcraftLiveAudiencePollQnaModerationV69Engine {
                 QuestionItemV69 {
                     question_id: 2,
                     author: String::from("Bob"),
-                    content: String::from("What is the GPU memory footprint for V69 presentation decks?"),
+                    content: String::from(
+                        "What is the GPU memory footprint for V69 presentation decks?",
+                    ),
                     upvotes: 35,
                     approved: true,
                 },
@@ -351,7 +390,11 @@ impl DeckcraftLiveAudiencePollQnaModerationV69Engine {
     }
 
     pub fn upvote_question(&mut self, question_id: u32) {
-        if let Some(q) = self.questions.iter_mut().find(|q| q.question_id == question_id) {
+        if let Some(q) = self
+            .questions
+            .iter_mut()
+            .find(|q| q.question_id == question_id)
+        {
             q.upvotes += 1;
         }
     }
@@ -460,7 +503,11 @@ impl DeckcraftAiSlideGeneratorWcagDesignBalancerV69Engine {
     }
 
     pub fn compute_contrast_ratio(&self, lum1: f32, lum2: f32) -> WcagResultV69 {
-        let (l1, l2) = if lum1 > lum2 { (lum1, lum2) } else { (lum2, lum1) };
+        let (l1, l2) = if lum1 > lum2 {
+            (lum1, lum2)
+        } else {
+            (lum2, lum1)
+        };
         let ratio = (l1 + 0.05) / (l2 + 0.05);
         WcagResultV69 {
             contrast_ratio: ratio,
@@ -471,7 +518,9 @@ impl DeckcraftAiSlideGeneratorWcagDesignBalancerV69Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV69PrProposalManifest {
         DeckcraftV69PrProposalManifest {
             pr_id: 6907,
-            pr_title: String::from("PR #6907: AI Slide Generator & WCAG 2.1 AAA Design Balancer V69"),
+            pr_title: String::from(
+                "PR #6907: AI Slide Generator & WCAG 2.1 AAA Design Balancer V69",
+            ),
             target_subsystem: String::from("Deckcraft Intelligence & WCAG Layout Core V69"),
             original_suite: String::from("ArtCraft Deckcraft AI Design Suite V69"),
             components_added: vec![
@@ -522,7 +571,9 @@ impl DeckcraftAiTeleprompterSpeechPacingAnalyticsV69Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV69PrProposalManifest {
         DeckcraftV69PrProposalManifest {
             pr_id: 6908,
-            pr_title: String::from("PR #6908: AI Teleprompter & Speech Pacing Analytics Engine V69"),
+            pr_title: String::from(
+                "PR #6908: AI Teleprompter & Speech Pacing Analytics Engine V69",
+            ),
             target_subsystem: String::from("Deckcraft Presenter Copilot Subsystem V69"),
             original_suite: String::from("ArtCraft Deckcraft Speech Copilot V69"),
             components_added: vec![
@@ -617,7 +668,9 @@ impl DeckcraftMultiFormatBatchExporterPdfaRevealV69Engine {
         let mut output = Vec::new();
         let header = match format {
             ExportFormatV69::PdfA3b => "%PDF-1.7 (PDF/A-3b ISO 19005-3 V69)",
-            ExportFormatV69::RevealJsBundle => "<!DOCTYPE html><html><head><title>Reveal.js V69 Deck</title></head>",
+            ExportFormatV69::RevealJsBundle => {
+                "<!DOCTYPE html><html><head><title>Reveal.js V69 Deck</title></head>"
+            }
             ExportFormatV69::Mp4Video4K => "\x00\x00\x00\x1cftypisom",
             ExportFormatV69::SvgSlideDeck => "<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg>",
         };
@@ -629,7 +682,9 @@ impl DeckcraftMultiFormatBatchExporterPdfaRevealV69Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV69PrProposalManifest {
         DeckcraftV69PrProposalManifest {
             pr_id: 6910,
-            pr_title: String::from("PR #6910: Multi-Format High-Res PDF/A & Reveal.js Batch Exporter V69"),
+            pr_title: String::from(
+                "PR #6910: Multi-Format High-Res PDF/A & Reveal.js Batch Exporter V69",
+            ),
             target_subsystem: String::from("Deckcraft Multi-Format Publishing Core V69"),
             original_suite: String::from("ArtCraft Deckcraft Multi-Format Exporter V69"),
             components_added: vec![

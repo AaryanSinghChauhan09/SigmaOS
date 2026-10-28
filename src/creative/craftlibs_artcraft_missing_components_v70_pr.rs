@@ -79,10 +79,14 @@ impl CraftlibsGpuShaderJitCompilerOptimizerEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7001,
-            pr_title: String::from("PR-7001: CraftLibs GPU SPIR-V / WGSL Shader JIT Compiler & Bytecode Optimizer V70"),
+            pr_title: String::from(
+                "PR-7001: CraftLibs GPU SPIR-V / WGSL Shader JIT Compiler & Bytecode Optimizer V70",
+            ),
             target_subsystem: String::from("CraftLibs / Shader JIT Compiler"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft GPU Shader JIT Engine V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft GPU Shader JIT Engine V70",
+            ),
             components_added: vec![
                 String::from("WgslToSpirvTranspiler"),
                 String::from("SpirvConstantFolderPass"),
@@ -157,10 +161,14 @@ impl CraftlibsHighDynamicRangeGainmapToneMappingEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7002,
-            pr_title: String::from("PR-7002: CraftLibs Dual-Layer HDR Gainmap Tone Mapping & ACES Engine V70"),
+            pr_title: String::from(
+                "PR-7002: CraftLibs Dual-Layer HDR Gainmap Tone Mapping & ACES Engine V70",
+            ),
             target_subsystem: String::from("CraftLibs / HDR Tone Mapping"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft HDR Gainmap Engine V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft HDR Gainmap Engine V70",
+            ),
             components_added: vec![
                 String::from("UltraHdrGainmapDecoder"),
                 String::from("AcesFilmicToneMapper"),
@@ -207,7 +215,10 @@ impl CraftlibsMultiThreadedImageIoCodecEngineV70 {
         }
     }
 
-    pub fn decode_header_dimensions(&mut self, encoded_bytes: &[u8]) -> Result<(u32, u32, usize), &'static str> {
+    pub fn decode_header_dimensions(
+        &mut self,
+        encoded_bytes: &[u8],
+    ) -> Result<(u32, u32, usize), &'static str> {
         if encoded_bytes.len() < 12 {
             return Err("Encoded buffer too small for header inspection");
         }
@@ -222,10 +233,14 @@ impl CraftlibsMultiThreadedImageIoCodecEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7003,
-            pr_title: String::from("PR-7003: CraftLibs Multi-Threaded AVIF / HEIC / WebP / EXR / TIFF Codec V70"),
+            pr_title: String::from(
+                "PR-7003: CraftLibs Multi-Threaded AVIF / HEIC / WebP / EXR / TIFF Codec V70",
+            ),
             target_subsystem: String::from("CraftLibs / Image I/O Codecs"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Multi-Threaded Codec V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Multi-Threaded Codec V70",
+            ),
             components_added: vec![
                 String::from("AvifAv1TileDecoder"),
                 String::from("HeicHevcBitstreamParser"),
@@ -280,7 +295,13 @@ impl CraftlibsProceduralNoisePatternSynthesizerEngineV70 {
         (sin_val * 2.0 - 1.0).clamp(-1.0, 1.0)
     }
 
-    pub fn fill_noise_grid_3d(&self, width: usize, height: usize, depth: usize, grid_out: &mut [f32]) -> Result<(), &'static str> {
+    pub fn fill_noise_grid_3d(
+        &self,
+        width: usize,
+        height: usize,
+        depth: usize,
+        grid_out: &mut [f32],
+    ) -> Result<(), &'static str> {
         let expected_size = width * height * depth;
         if grid_out.len() != expected_size {
             return Err("Output grid size mismatch");
@@ -290,7 +311,8 @@ impl CraftlibsProceduralNoisePatternSynthesizerEngineV70 {
             for y in 0..height {
                 for x in 0..width {
                     let idx = z * (width * height) + y * width + x;
-                    grid_out[idx] = self.sample_noise_3d(x as f32 * 0.1, y as f32 * 0.1, z as f32 * 0.1);
+                    grid_out[idx] =
+                        self.sample_noise_3d(x as f32 * 0.1, y as f32 * 0.1, z as f32 * 0.1);
                 }
             }
         }
@@ -300,10 +322,14 @@ impl CraftlibsProceduralNoisePatternSynthesizerEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7004,
-            pr_title: String::from("PR-7004: CraftLibs SIMD Procedural Simplex / Worley Noise Synthesizer V70"),
+            pr_title: String::from(
+                "PR-7004: CraftLibs SIMD Procedural Simplex / Worley Noise Synthesizer V70",
+            ),
             target_subsystem: String::from("CraftLibs / Procedural Noise"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft SIMD Noise Engine V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft SIMD Noise Engine V70",
+            ),
             components_added: vec![
                 String::from("SimplexNoise3d4dSimdKernel"),
                 String::from("WorleyVoronoiCellularDistance"),
@@ -352,10 +378,14 @@ impl CraftlibsSubsurfaceScatteringSkinMaterialShaderEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7005,
-            pr_title: String::from("PR-7005: CraftLibs BSSRDF Subsurface Scattering Skin Material Shader V70"),
+            pr_title: String::from(
+                "PR-7005: CraftLibs BSSRDF Subsurface Scattering Skin Material Shader V70",
+            ),
             target_subsystem: String::from("CraftLibs / Material Shaders"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Subsurface Scattering V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Subsurface Scattering V70",
+            ),
             components_added: vec![
                 String::from("BssrdfDipoleDiffusionSolver"),
                 String::from("NormalizedDiffusionSkinProfile"),
@@ -391,7 +421,13 @@ impl CraftlibsSpatialAudioAmbisonicsBinauralHrtfEngineV70 {
         }
     }
 
-    pub fn encode_source_hoa_3d(&self, input_sample: f32, azimuth_rad: f32, elevation_rad: f32, hoa_channels_out: &mut [f32]) -> Result<(), &'static str> {
+    pub fn encode_source_hoa_3d(
+        &self,
+        input_sample: f32,
+        azimuth_rad: f32,
+        elevation_rad: f32,
+        hoa_channels_out: &mut [f32],
+    ) -> Result<(), &'static str> {
         let channel_count = ((self.ambisonic_order + 1) * (self.ambisonic_order + 1)) as usize;
         if hoa_channels_out.len() < channel_count {
             return Err("Output array length insufficient for HOA order");
@@ -418,10 +454,14 @@ impl CraftlibsSpatialAudioAmbisonicsBinauralHrtfEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7006,
-            pr_title: String::from("PR-7006: CraftLibs Higher-Order Ambisonics 3D Spatial Audio HRTF Renderer V70"),
+            pr_title: String::from(
+                "PR-7006: CraftLibs Higher-Order Ambisonics 3D Spatial Audio HRTF Renderer V70",
+            ),
             target_subsystem: String::from("CraftLibs / Spatial Audio Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Spatial Audio HOA V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Spatial Audio HOA V70",
+            ),
             components_added: vec![
                 String::from("ThirdOrderAmbisonicsEncoder"),
                 String::from("KemarHrtfBinauralSynthesizer"),
@@ -486,7 +526,9 @@ impl CraftlibsOpticalFlowMotionEstimationEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7007,
-            pr_title: String::from("PR-7007: CraftLibs Dense Optical Flow Motion Vector Estimation & Retiming V70"),
+            pr_title: String::from(
+                "PR-7007: CraftLibs Dense Optical Flow Motion Vector Estimation & Retiming V70",
+            ),
             target_subsystem: String::from("CraftLibs / Motion Estimation"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Optical Flow V70"),
@@ -554,7 +596,9 @@ impl CraftlibsHardwareAcceleratedFontShapingEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7008,
-            pr_title: String::from("PR-7008: CraftLibs GPU Complex Script Font Shaping & Glyph Cache V70"),
+            pr_title: String::from(
+                "PR-7008: CraftLibs GPU Complex Script Font Shaping & Glyph Cache V70",
+            ),
             target_subsystem: String::from("CraftLibs / Font Shaping Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft Font Shaping V70"),
@@ -604,7 +648,12 @@ impl CraftlibsDirectStorageAsyncIoGpuUploaderEngineV70 {
         }
     }
 
-    pub fn enqueue_async_vram_upload(&mut self, _file_offset: u64, size_bytes: u64, _vram_address: u64) -> Result<(), &'static str> {
+    pub fn enqueue_async_vram_upload(
+        &mut self,
+        _file_offset: u64,
+        size_bytes: u64,
+        _vram_address: u64,
+    ) -> Result<(), &'static str> {
         if self.queue_status.pending_requests >= self.max_queue_depth {
             return Err("DirectStorage transfer queue is full");
         }
@@ -618,7 +667,9 @@ impl CraftlibsDirectStorageAsyncIoGpuUploaderEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7009,
-            pr_title: String::from("PR-7009: CraftLibs DirectStorage Async NVMe to GPU VRAM Streaming Engine V70"),
+            pr_title: String::from(
+                "PR-7009: CraftLibs DirectStorage Async NVMe to GPU VRAM Streaming Engine V70",
+            ),
             target_subsystem: String::from("CraftLibs / DirectStorage Async I/O"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
             artcraft_feature_parity: String::from("100% Parity with ArtCraft DirectStorage V70"),
@@ -691,10 +742,14 @@ impl CraftlibsNeuralStyleTransferInpaintingEngineV70 {
     pub fn generate_proposal(&self) -> CraftlibsV70PrProposalManifest {
         CraftlibsV70PrProposalManifest {
             pr_id: 7010,
-            pr_title: String::from("PR-7010: CraftLibs Neural ML Fast Style Transfer & Generative Inpainting V70"),
+            pr_title: String::from(
+                "PR-7010: CraftLibs Neural ML Fast Style Transfer & Generative Inpainting V70",
+            ),
             target_subsystem: String::from("CraftLibs / Neural ML Engine"),
             original_suite: String::from("ArtCraft / CraftLibs Core"),
-            artcraft_feature_parity: String::from("100% Parity with ArtCraft Neural Style Inpaint V70"),
+            artcraft_feature_parity: String::from(
+                "100% Parity with ArtCraft Neural Style Inpaint V70",
+            ),
             components_added: vec![
                 String::from("NeuralFastStyleTransferNet"),
                 String::from("GenerativeFillInpaintingUNet"),

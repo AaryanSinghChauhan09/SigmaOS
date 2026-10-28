@@ -8,9 +8,9 @@ mod system_utilities;
 
 use system_utilities::{
     CatEngine, CpEngine, EnvEngine, LsEngine, MkdirEngine, MutationBehavior, PeriodicRunnerEngine,
-    PeriodicTaskGroup, PrivilegeLevel, PwdEngine, RmEngine, SigmaDiagEngine, SystemUtilityArgParser,
-    SystemUtilityRegistry, TouchEngine, UnameEngine, UtilityStatus, WcEngine, EXIT_PERMISSION_DENIED,
-    EXIT_SUCCESS,
+    PeriodicTaskGroup, PrivilegeLevel, PwdEngine, RmEngine, SigmaDiagEngine,
+    SystemUtilityArgParser, SystemUtilityRegistry, TouchEngine, UnameEngine, UtilityStatus,
+    WcEngine, EXIT_PERMISSION_DENIED, EXIT_SUCCESS,
 };
 
 #[test]
@@ -19,16 +19,31 @@ fn test_system_utilities_documentation_plan_verification() {
     let wiki_path_1 = "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md";
     let wiki_path_2 = "wiki/26-System-Utilities-Development-Plan.md";
 
-    assert!(Path::new(docs_path).exists(), "docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md must exist");
-    assert!(Path::new(wiki_path_1).exists(), "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md must exist");
-    assert!(Path::new(wiki_path_2).exists(), "wiki/26-System-Utilities-Development-Plan.md must exist");
+    assert!(
+        Path::new(docs_path).exists(),
+        "docs/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md must exist"
+    );
+    assert!(
+        Path::new(wiki_path_1).exists(),
+        "wiki/SYSTEM_UTILITIES_DEVELOPMENT_PLAN.md must exist"
+    );
+    assert!(
+        Path::new(wiki_path_2).exists(),
+        "wiki/26-System-Utilities-Development-Plan.md must exist"
+    );
 
     let docs_content = fs::read_to_string(docs_path).expect("Read docs plan");
     let wiki_content_1 = fs::read_to_string(wiki_path_1).expect("Read wiki plan 1");
     let wiki_content_2 = fs::read_to_string(wiki_path_2).expect("Read wiki plan 2");
 
-    assert_eq!(docs_content, wiki_content_1, "Wiki plan 1 must match docs plan");
-    assert_eq!(docs_content, wiki_content_2, "Wiki plan 2 must match docs plan");
+    assert_eq!(
+        docs_content, wiki_content_1,
+        "Wiki plan 1 must match docs plan"
+    );
+    assert_eq!(
+        docs_content, wiki_content_2,
+        "Wiki plan 2 must match docs plan"
+    );
 
     // Verify key sections and contracts exist in documentation
     assert!(docs_content.contains("SigmaOS System Utilities Development Plan"));
@@ -53,7 +68,9 @@ fn test_system_utilities_registry_and_parser_contract_verification() {
     let rm_cmd = registry.get_command("rm").expect("rm command registered");
     assert_eq!(rm_cmd.mutation, MutationBehavior::MutatingDestructive);
 
-    let diag_cmd = registry.get_command("sigma-diag").expect("sigma-diag command registered");
+    let diag_cmd = registry
+        .get_command("sigma-diag")
+        .expect("sigma-diag command registered");
     assert_eq!(diag_cmd.privilege, PrivilegeLevel::Admin);
 
     // Test Argument Parser POSIX compliance

@@ -7,8 +7,6 @@ extern crate alloc;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
-
-
 /// Structured PR proposal manifest descriptor for Pdfcraft / Artcraft parity features.
 
 #[derive(Debug, Clone, PartialEq, Eq)]

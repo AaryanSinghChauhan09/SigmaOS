@@ -299,10 +299,11 @@ mod tests {
 
     #[test]
     fn test_log_file_config() {
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
-            .with_size_threshold(50)
-            .with_compression(CompressionMethod::Gzip)
-            .with_enabled(true);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
+                .with_size_threshold(50)
+                .with_compression(CompressionMethod::Gzip)
+                .with_enabled(true);
 
         assert_eq!(config.path, "/var/log/syslog");
         assert_eq!(config.rotate_count, 7);
@@ -323,7 +324,8 @@ mod tests {
     fn test_sigmalogrotate_add_config() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         assert!(logrotate.add_config(config).is_ok());
         assert_eq!(logrotate.config_count(), 1);
@@ -333,8 +335,9 @@ mod tests {
     fn test_sigmalogrotate_enable_config() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
-            .with_enabled(false);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7)
+                .with_enabled(false);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.enable_config("/var/log/syslog").is_ok());
@@ -347,7 +350,8 @@ mod tests {
     fn test_sigmalogrotate_disable_config() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.disable_config("/var/log/syslog").is_ok());
@@ -360,7 +364,8 @@ mod tests {
     fn test_sigmalogrotate_rotate_log() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.rotate_log("/var/log/syslog").is_ok());
@@ -372,7 +377,8 @@ mod tests {
         let mut logrotate = SigmaLogRotate::new();
         logrotate.start();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
         assert!(logrotate.rotate_all().is_ok());
@@ -383,7 +389,8 @@ mod tests {
     fn test_sigmalogrotate_list_enabled() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
 
@@ -395,7 +402,8 @@ mod tests {
     fn test_sigmalogrotate_stats() {
         let mut logrotate = SigmaLogRotate::new();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
 
@@ -410,7 +418,8 @@ mod tests {
 
         let mut logrotate = get_sigmalogrotate().unwrap();
 
-        let config = SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
+        let config =
+            SigmaLogFileConfig::new("/var/log/syslog".to_string(), RotationPolicy::Daily, 7);
 
         logrotate.add_config(config).unwrap();
 

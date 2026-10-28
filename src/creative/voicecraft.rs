@@ -197,7 +197,9 @@ impl VoicecraftFlowMatchingAcousticMelSynthesizerPrEngine {
         duration_frames: usize,
     ) -> Vec<Vec<f32>> {
         let mut mel_matrix = Vec::with_capacity(duration_frames);
-        let prompt_hash = text_prompt.bytes().fold(0u32, |acc, b| acc.wrapping_add(b as u32));
+        let prompt_hash = text_prompt
+            .bytes()
+            .fold(0u32, |acc, b| acc.wrapping_add(b as u32));
         let ctx_energy = VoiceActivityDetector::compute_energy(masked_audio_ctx);
 
         for t in 0..duration_frames {
@@ -221,7 +223,9 @@ impl VoicecraftFlowMatchingAcousticMelSynthesizerPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrManifest {
         VoicecraftPrManifest {
             pr_id: 8801,
-            pr_title: String::from("VoiceCraft Optimal Transport Continuous Flow-Matching Acoustic Mel Synthesizer"),
+            pr_title: String::from(
+                "VoiceCraft Optimal Transport Continuous Flow-Matching Acoustic Mel Synthesizer",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Neural Audio DSP PR Suite"),
             components_added: alloc::vec![
@@ -269,9 +273,7 @@ impl VoicecraftMultiCodebookRvqTokenLanguageModelPrEngine {
         let zcr = VoiceActivityDetector::compute_zcr(pcm_frame);
 
         for level in 0..self.codebook_levels {
-            let raw_code = ((energy * 1000.0) as usize
-                + (zcr * 500.0) as usize
-                + level * 137)
+            let raw_code = ((energy * 1000.0) as usize + (zcr * 500.0) as usize + level * 137)
                 % self.codebook_size;
             codes.push(raw_code as u16);
         }
@@ -307,7 +309,9 @@ impl VoicecraftMultiCodebookRvqTokenLanguageModelPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrManifest {
         VoicecraftPrManifest {
             pr_id: 8802,
-            pr_title: String::from("VoiceCraft Multi-Codebook RVQ Token Language Model for Zero-Shot Voice Cloning"),
+            pr_title: String::from(
+                "VoiceCraft Multi-Codebook RVQ Token Language Model for Zero-Shot Voice Cloning",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Neural Audio DSP PR Suite"),
             components_added: alloc::vec![
@@ -355,7 +359,11 @@ impl VoicecraftHarmonicNoiseDifferentiableDspVocoderPrEngine {
         let sample_rate = SAMPLE_RATE as f32;
 
         for (frame_idx, mel_frame) in mel_spectrogram.iter().enumerate() {
-            let f0 = f0_contour.get(frame_idx).copied().unwrap_or(130.0).max(50.0);
+            let f0 = f0_contour
+                .get(frame_idx)
+                .copied()
+                .unwrap_or(130.0)
+                .max(50.0);
             let frame_amp = mel_frame.iter().sum::<f32>() / (mel_frame.len().max(1) as f32);
             let gain = (frame_amp.exp()).clamp(0.01, 1.0);
 
@@ -374,7 +382,8 @@ impl VoicecraftHarmonicNoiseDifferentiableDspVocoderPrEngine {
                 }
 
                 // 2. Filtered noise synthesis (LTI noise filtering approximation)
-                let noise_raw = (((sample_idx * 1103515245 + 12345) / 65536) % 32768) as f32 / 32768.0 - 0.5;
+                let noise_raw =
+                    (((sample_idx * 1103515245 + 12345) / 65536) % 32768) as f32 / 32768.0 - 0.5;
                 let filtered_noise = noise_raw * gain * 0.15;
 
                 let output_sample = (harmonic_signal * 0.8 + filtered_noise).clamp(-1.0, 1.0);
@@ -387,7 +396,9 @@ impl VoicecraftHarmonicNoiseDifferentiableDspVocoderPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftPrManifest {
         VoicecraftPrManifest {
             pr_id: 8803,
-            pr_title: String::from("VoiceCraft Differentiable DSP Harmonic-Plus-Noise Neural Vocoder"),
+            pr_title: String::from(
+                "VoiceCraft Differentiable DSP Harmonic-Plus-Noise Neural Vocoder",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Neural Audio DSP PR Suite"),
             components_added: alloc::vec![
@@ -578,14 +589,19 @@ impl VoicecraftWaylandVoiceAssistantPipelinePrEngine {
             "open terminal" => String::from("EXEC: wayland-compositor spawn ghostty"),
             "toggle dark theme" => String::from("EXEC: wayland-compositor theme toggle-dark"),
             "volume up" => String::from("EXEC: pipewire-ctl volume +10%"),
-            _ => format!("EXEC: wayland-assistant generic-action --intent='{}'", intent),
+            _ => format!(
+                "EXEC: wayland-assistant generic-action --intent='{}'",
+                intent
+            ),
         }
     }
 
     pub fn generate_pr_proposal(&self) -> VoicecraftPrManifest {
         VoicecraftPrManifest {
             pr_id: 8805,
-            pr_title: String::from("VoiceCraft Wayland Voice Assistant Pipeline with Adaptive VAD & Intent Dispatcher"),
+            pr_title: String::from(
+                "VoiceCraft Wayland Voice Assistant Pipeline with Adaptive VAD & Intent Dispatcher",
+            ),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Neural Audio DSP PR Suite"),
             components_added: alloc::vec![
@@ -651,7 +667,11 @@ impl SovereignVoicecraftMasterPrSuite {
         }
 
         // Test 1: Flow matching mel synthesis
-        let mel = self.flow_matching_engine.synthesize_mel_spectrogram("sigma os voice", &[0.1f32; 320], 10);
+        let mel = self.flow_matching_engine.synthesize_mel_spectrogram(
+            "sigma os voice",
+            &[0.1f32; 320],
+            10,
+        );
         if mel.len() != 10 || mel[0].len() != 80 {
             return false;
         }
@@ -674,8 +694,12 @@ impl SovereignVoicecraftMasterPrSuite {
         let mic1 = vec![0.1f32; 320];
         let mic2 = vec![0.12f32; 320];
         let multi_mic = vec![mic1, mic2];
-        let beamformed = self.spatial_beamforming_engine.delay_and_sum_beamform(&multi_mic, 15.0);
-        let (left, right) = self.spatial_beamforming_engine.render_binaural_3d(&beamformed, 30.0, 0.0);
+        let beamformed = self
+            .spatial_beamforming_engine
+            .delay_and_sum_beamform(&multi_mic, 15.0);
+        let (left, right) =
+            self.spatial_beamforming_engine
+                .render_binaural_3d(&beamformed, 30.0, 0.0);
         if left.len() != 320 || right.len() != 320 {
             return false;
         }
@@ -685,7 +709,9 @@ impl SovereignVoicecraftMasterPrSuite {
         for i in 0..320 {
             active_stream.push(if i % 2 == 0 { 0.3 } else { -0.3 });
         }
-        let intent = self.voice_assistant_engine.process_audio_stream(&active_stream);
+        let intent = self
+            .voice_assistant_engine
+            .process_audio_stream(&active_stream);
         if let Some(ref text) = intent {
             let action = self.voice_assistant_engine.dispatch_intent_action(text);
             if !action.starts_with("EXEC:") {
