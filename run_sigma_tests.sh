@@ -2232,14 +2232,14 @@ if [ -f "src/distro/open_source_os_missing_components_v80_pr.rs" ]; then
     ./build/test_open_source_v80_pr_integration
 fi
 
-if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v78_pr.rs" ]; then
-    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure V78 PR Suite tests..."
+if [ -f "src/distro/open_source_os_missing_components_v81_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V81 PR Suite tests..."
     mkdir -p build
-    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -o build/test_linux_bsd_gap_v78_standalone
-    ./build/test_linux_bsd_gap_v78_standalone
+    rustc --test src/distro/open_source_os_missing_components_v81_pr.rs --edition=2021 -o build/test_open_source_v81_pr
+    ./build/test_open_source_v81_pr
 
-    rustc --test tests/test_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -o build/test_linux_bsd_gap_v78_integration
-    ./build/test_linux_bsd_gap_v78_integration
+    rustc --test tests/test_open_source_os_missing_components_v81_pr.rs --edition=2021 -o build/test_open_source_v81_pr_integration
+    ./build/test_open_source_v81_pr_integration
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
@@ -3030,10 +3030,10 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v77_pr.rs" ]; then
     ./build/test_open_source_os_v77_pr
 fi
 
-if [ -f "tests/test_open_source_os_unimplemented_ideas_v78_pr.rs" ]; then
-    echo "Running Open Source OS Unimplemented Ideas V78 PR test suite..."
+if [ -f "tests/test_open_source_os_unimplemented_ideas_v81_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas V81 PR test suite..."
     mkdir -p build
-    rustc --test tests/test_open_source_os_unimplemented_ideas_v78_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v78_pr
-    ./build/test_open_source_os_v78_pr
+    rustc --test tests/test_open_source_os_unimplemented_ideas_v81_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v81_pr
+    ./build/test_open_source_os_v81_pr
 fi
 echo "All SigmaOS test suites completed."

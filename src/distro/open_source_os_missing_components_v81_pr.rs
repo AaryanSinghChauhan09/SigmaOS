@@ -5,7 +5,7 @@
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.35+ BPF SchedExt,
 // FreeBSD 16.5+ OpenZFS ARC & Capsicum, OpenBSD 9.4+ Pinsyscall FineIBT, DragonFly BSD 8.3+ HAMMER3,
 // NetBSD 13.0 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// Global Tech Media 38 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
+// Global Tech Media 37 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
 #![allow(non_camel_case_types)]
@@ -149,7 +149,7 @@ impl Linux635SchedExtAiPredictivePowerGovernorEngineV81 {
         }
         let avg_load: f64 = workload_history.iter().sum::<f64>() / workload_history.len() as f64;
         if avg_load > 0.8 {
-            5200
+            5500
         } else if avg_load > 0.4 {
             4000
         } else {
@@ -614,19 +614,19 @@ impl Default for OmarchyWallustThemeChordNavigatorEngineV81 {
 }
 
 // ============================================================================
-// 12. Global Tech Media 38 Portals Unimplemented Ideas Engine V81
+// 12. Global Tech Media 37 Portals Unimplemented Ideas Engine V81
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct GlobalTechMedia38PortalUnimplementedIdeasEngineV81 {
+pub struct GlobalTechMedia37PortalUnimplementedIdeasEngineV81 {
     pub active_portals_count: u32,
     pub crawled_ideas_count: u32,
 }
 
-impl GlobalTechMedia38PortalUnimplementedIdeasEngineV81 {
+impl GlobalTechMedia37PortalUnimplementedIdeasEngineV81 {
     pub fn new() -> Self {
         Self {
-            active_portals_count: 38,
+            active_portals_count: 37,
             crawled_ideas_count: 4096,
         }
     }
@@ -634,7 +634,7 @@ impl GlobalTechMedia38PortalUnimplementedIdeasEngineV81 {
     pub fn generate_wiki_documentation_page(&self, title: &str) -> String {
         format!(
             "# Wiki Documentation: {}\n\n\
-            Harvester active across {} Tech Media Portals (including 9to5Linux, Phoronix, TechCrunch, TomsHardware, ArsTechnica, LWN, Slashdot, HackerNews).\n\
+            Harvester active across {} Tech Media Portals (including 9to5Linux, Phoronix, TechCrunch, TomsHardware, ArsTechnica, LWN, Slashdot).\n\
             Crawled ideas count: {}.",
             title, self.active_portals_count, self.crawled_ideas_count
         )
@@ -643,20 +643,20 @@ impl GlobalTechMedia38PortalUnimplementedIdeasEngineV81 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV81 {
         OpenSourceOsPrProposalV81 {
             pr_id: "PR-SIGMA-V81-11-MEDIA".to_string(),
-            title: "feat(media): Global Tech Media 38 Portals Unimplemented Ideas Synthesizer V81".to_string(),
+            title: "feat(media): Global Tech Media 37 Portals Unimplemented Ideas Synthesizer V81".to_string(),
             component_name: "sigmaos-global-tech-media-v81".to_string(),
-            os_origin: "38 Global Tech Media Portals".to_string(),
+            os_origin: "37 Global Tech Media Portals".to_string(),
             status: OsPrStatusV81::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::AiWorkflowAgent.as_str().to_string(),
                 UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
             ],
-            patch_diff: "diff --git a/sys/media/tech_media_38_v81.rs b/sys/media/tech_media_38_v81.rs".to_string(),
+            patch_diff: "diff --git a/sys/media/tech_media_37_v81.rs b/sys/media/tech_media_37_v81.rs".to_string(),
         }
     }
 }
 
-impl Default for GlobalTechMedia38PortalUnimplementedIdeasEngineV81 {
+impl Default for GlobalTechMedia37PortalUnimplementedIdeasEngineV81 {
     fn default() -> Self {
         Self::new()
     }
@@ -755,7 +755,7 @@ pub struct SovereignOpenSourceOsMissingComponentsV81PrSuite {
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV81,
     pub illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV81,
     pub omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV81,
-    pub tech_media: GlobalTechMedia38PortalUnimplementedIdeasEngineV81,
+    pub tech_media: GlobalTechMedia37PortalUnimplementedIdeasEngineV81,
     pub universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV81,
 }
 
@@ -773,7 +773,7 @@ impl SovereignOpenSourceOsMissingComponentsV81PrSuite {
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV81::new(),
             illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV81::new(),
             omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV81::new(),
-            tech_media: GlobalTechMedia38PortalUnimplementedIdeasEngineV81::new(),
+            tech_media: GlobalTechMedia37PortalUnimplementedIdeasEngineV81::new(),
             universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV81::new(),
         }
     }
@@ -835,7 +835,7 @@ mod tests {
         assert!(report.contains("Feature Parity Matrix V81"));
 
         let sched = Linux635SchedExtAiPredictivePowerGovernorEngineV81::new();
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5200);
+        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5500);
 
         let freebsd = FreeBsd165CapsicumCasperNetlinkMeshVnetEngineV81::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));
@@ -866,9 +866,9 @@ mod tests {
         assert!(omarchy.reload_theme("Dark-V81"));
         assert_eq!(omarchy.active_theme, "Dark-V81");
 
-        let media = GlobalTechMedia38PortalUnimplementedIdeasEngineV81::new();
+        let media = GlobalTechMedia37PortalUnimplementedIdeasEngineV81::new();
         let page = media.generate_wiki_documentation_page("V81 Test");
-        assert!(page.contains("38 Tech Media Portals"));
+        assert!(page.contains("37 Tech Media Portals"));
 
         let adapter = UniversalSubsystemCrossDistroAdapterEngineV81::new();
         assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));
