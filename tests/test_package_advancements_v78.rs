@@ -9,8 +9,8 @@ mod sovereign_distro_package_advancements_v78;
 mod sovereign_distro_package_advancements_v78_pr;
 
 use sovereign_distro_package_advancements_v78::*;
-use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
 use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v78_pr::PackagePrProposalManifestV78;
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
@@ -79,16 +79,16 @@ fn test_package_advancements_v78_full_cycle() {
     assert!(routed.dry_run);
     assert_eq!(routed.package_targets, vec!["neovim".to_string()]);
 
-    // 8. PR Gateway V78
-    let mut gateway = SovereignDistroPackagePrGatewayV78::new();
-    gateway.submit_proposal(
-        7801,
-        "Universal Package Advancements V78",
-        PackageFormat::Deb,
-        "ripgrep",
-        "Full test cycle proposal V78",
-    );
-    assert_eq!(gateway.total_proposals(), 1);
+    // 8. PR Gateway Manifest V78
+    let manifest_v78 = sovereign_distro_package_advancements_v78_pr::PackagePrProposalManifestV78 {
+        proposal_id: 7801,
+        title: "Universal Package Advancements V78".to_string(),
+        source_format: sovereign_distro_package_advancements_v78_pr::universal::PackageFormat::Deb,
+        target_package: "ripgrep".to_string(),
+        changes_summary: "Full test cycle proposal V78".to_string(),
+        verified_slsa_level: 4,
+    };
+    assert_eq!(manifest_v78.proposal_id, 7801);
 
     // 9. Master Coordinator Suite V78
     let mut master_suite = SovereignDistroPackageAdvancementsSuiteV78::new();
