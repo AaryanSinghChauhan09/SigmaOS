@@ -1,81 +1,85 @@
-# SigmaOS Secondary Memory Policy
+# SigmaOS Secondary Memory Subsystem Policy
 
-## Executive Summary
+## 1. Overview and Objective
 
-SigmaOS manages secondary memory—persistent storage, block devices, filesystems, caches, and paging-backed storage—as a safe, observable, and recoverable subsystem. The secondary memory subsystem guarantees crash consistency, predictable resource limits, and deterministic error handling across device enumeration, block I/O, cache eviction, filesystem mounting, page swapping, and failure recovery.
+SigmaOS manages secondary memory—persistent storage, block devices, filesystems, caches, and paging-backed storage—as an integrated, safe, observable, and recoverable lifecycle subsystem. The primary objective is to maintain secondary memory as a storage subsystem that enumerates devices, manages block I/O, mounts filesystems, caches data, pages to disk, reclaims space, and recovers from failures without corruption or undefined behavior.
 
-## Authoritative Lifecycle State Machine
+## 2. Authoritative Storage Lifecycle
 
-Every secondary memory storage path must follow this single authoritative 11-stage lifecycle state machine:
+Every persistent storage device and path in SigmaOS adheres strictly to a single authoritative lifecycle:
 
 ```text
 probe -> identify -> block layer -> cache -> filesystem -> mount ->
 read/write -> flush -> unmount -> detach -> error/recovery
 ```
 
-### Stage Contracts
+### Lifecycle Stage Guarantees
 
-| Stage | Required Behavior | Invariant / Failure Guarantee |
-|---|---|---|
-| **Probe** | Device hardware discovered during boot or hotplug event | Non-blocking detection, safe drop on missing hardware |
-| **Identify** | Sector size, geometry, queue depth, and capability flags extracted | Unidentified devices rejected with `NotFound` or `InvalidBlockSize` |
-| **Block Layer** | Requests enqueued, scheduled, and completed exactly once | Bounded queue depth; exhaustion returns `BlockError::RequestExhaustion` |
-| **Cache** | In-memory block and page caching with LRU eviction | Coherent read/write; dirty writebacks executed before eviction |
-| **Filesystem** | On-disk metadata and directory structures parsed | Transactional metadata updates; lost updates strictly prevented |
-| **Mount** | VFS mount point registered and isolated | Atomic mount table insertion; duplicate mounts return `MountError::AlreadyMounted` |
-| **Read/Write** | I/O transfers executed against block cache or direct storage | Range checking enforced; out-of-bounds access returns `OutOfBounds` |
-| **Flush** | Dirty cache pages synchronized to persistent medium | Durability barrier guaranteed upon completion |
-| **Unmount** | Filesystem flushed, open file descriptors revoked, VFS node unlinked | Safe unmount guaranteed; double-unmount returns `MountError::DoubleUnmount` |
-| **Detach** | Block device unbound and queue drained | Active transactions aborted safely; lost-completion timeout handled |
-| **Error/Recovery**| SCSI sense keys mapped, journal replayed, cache invalidation | Non-corrupting error recovery; filesystem restored to last safe state |
+| Stage | Required Behavior |
+|---|---|
+| **Probe** | Hardware or virtio controller discovered, PCI/device capabilities reported. |
+| **Identify** | Storage geometry, sector/block size, capacity, and operational limits determined. |
+| **Block I/O** | Requests validated against bounds, queued in lock-free ring, completed exactly once. |
+| **Cache** | Invalidation, writeback dirtying, LRU eviction, and cache coherence explicitly defined. |
+| **Filesystem** | Superblock read, transaction recovery validated, mount/unmount lifecycle safe. |
+| **Mount** | VFS mount entry attached, namespace isolation enforced, custom mount flags applied. |
+| **Read/Write** | Bounded buffer reads/writes, transaction sequence numbering, lost-update prevention. |
+| **Flush** | Durability semantics explicit, sync flush barriers enforced down to block device. |
+| **Unmount** | Resources, buffer locks, and references released exactly once with rollback safety. |
+| **Detach** | Safe device unplug or driver detachment, active queues drained or aborted. |
+| **Recovery** | Failure during any stage triggers journal replay/rollback without corruption. |
 
----
+## 3. Subsystem Architecture Classes
 
-## Subsystem Classes
+### 3.1 Block Layer Class
+SigmaOS employs a **hybrid bio/request-based block layer**:
+- **Bio-based submission**: Low-latency, direct block I/O requests for virtualized devices (VirtIO-blk) and fast NVMe ring buffers.
+- **Request-based scheduling**: Queue-based request aggregation, elevator sorting, and deadline scheduling for high-throughput persistent disks.
 
-### 1. Block Layer Class
-SigmaOS employs a **Hybrid Request-Based / Bio-Based Block Layer**. Small, uniform sector operations use fixed-size request descriptors (`BoundedBlockRequest`), while high-throughput DMA and scatter-gather operations use bio-based descriptor chains.
+### 3.2 Device Classes
+The subsystem explicitly supports four primary block device classes:
+1. **NVMe**: Non-Volatile Memory Express controller with multi-queue support and ZNS (Zone Namespaces).
+2. **SATA/AHCI**: Standard Serial ATA controllers with NCQ (Native Command Queuing).
+3. **VirtIO Block**: VirtIO-blk para-virtualized devices with split/packed ring descriptors.
+4. **USB / Mass Storage**: Bulk-Only Transport (BOT) and USB Attached SCSI (UAS) storage devices.
 
-### 2. Device Class
-Supported device classes include:
-- **NVMe 2.0+**: Multi-queue high-performance SSD storage with submission/completion queues (`NvmeBlockDevice`).
-- **SATA / AHCI**: Legacy rotational disks and legacy SSDs.
-- **VirtIO-Block**: Paravirtualized QEMU/KVM block storage (`VirtIoBlockDevice`).
-- **RAM Disks / Loop Devices**: Memory-backed testing and installation targets.
+### 3.3 Cache Class
+- **Hybrid Page & Buffer Cache**: Unifies block device buffer caches with virtual memory page caches.
+- **LRU Eviction & Watermarks**: Multi-tiered watermark tracking (`Normal`, `HighPressure`, `OomCritical`) with background dirty-page writeback workers.
 
-### 3. Cache Class
-SigmaOS implements a **Hybrid Page/Buffer Cache** managed by `BlockCacheManager`. The cache maintains an LRU eviction queue, tracks dirty page watermarks, enforces atomic writebacks, and reports OOM metrics when memory thresholds are exceeded.
+### 3.4 Filesystem Class
+- Supports ZFS (OpenZFS-inspired CoW pool management), OverlayFS (container layers), TmpFS (RAM-backed transient filesystem), and SigmaFS (custom POSIX-compliant CoW journaling filesystem).
 
-### 4. Filesystem Class
-SigmaOS supports a tiered filesystem architecture:
-- **SigmaFS / ext4 / Btrfs**: Native transactional persistent filesystems.
-- **ZFS / HAMMER2**: Advanced storage pool filesystems with snapshots and self-healing.
-- **Overlay / Tmpfs**: Ephemeral memory and layered container filesystems.
+## 4. Operational Policies
 
----
+### 4.1 Mount Policy
+- Mount operations must be atomic and race-free.
+- Target mount points must exist and be free of concurrent unmount operations.
+- Failure during mount initialization triggers a complete rollback to `Unmounted` state (`MountError::RollbackSuccessful`).
 
-## Operating Policies
+### 4.2 Flush Policy
+- Synchronous flush requests (`VIRTIO_BLK_T_FLUSH`, `fsync`, `fdatasync`) issue immediate barrier commands to the underlying block driver.
+- Dirty cache pages are flushed before unmount or unmap operations proceed.
 
-### Mount Policy
-- Mount point targets must be empty directory inodes within the VFS hierarchy.
-- Mount operations execute under lock ordering: `vfs_lock -> mount_table_lock -> superblock_lock`.
-- Rollback on failure: If filesystem initialization fails midway through mounting, all allocated VFS nodes and lock references are released immediately.
+### 4.3 Reclaim and OOM Policy
+- When memory pressure hits `HighPressure`, background cache reclamation evicts clean pages.
+- Under `OomCritical`, dirty pages are synchronously written back, and unmapped cache pages are forcibly reclaimed.
+- OOM metrics (`CacheOomMetrics`) are tracked continuously and exposed via diagnostics.
 
-### Flush Policy
-- Synchronous flushes (`fsync`, `sync`) drain the dirty block cache queue and issue hardware `BlockOpCode::Flush` commands.
-- Asynchronous flushes execute via periodic kernel flusher threads when dirty page capacity reaches the 70% high-water mark.
+### 4.4 Typed Error Policy
+All storage operations must return strongly-typed errors. Generic untyped failures or accidental panics are prohibited:
+- `BlockError`: `RequestExhaustion`, `LostCompletion`, `DoubleCompletion`, `QueueFull`, `DeviceDetached`.
+- `CacheError`: `NotCached`, `CacheFull`, `DoubleEviction`, `WritebackFailed`, `InvalidPage`.
+- `FsCoreError`: `CapacityExceeded`, `LostUpdateDetected`, `FsCorrupted`.
+- `MountError`: `AlreadyMounted`, `DoubleUnmount`, `ResourceBusy`, `RollbackSuccessful`.
 
-### Reclaim & OOM Policy
-- When system memory pressure reaches 90% (OOM watermark), `BlockCacheManager` triggers aggressive LRU eviction for clean cached blocks.
-- Dirty blocks are prioritized for emergency background writebacks. Cache memory allocation fails gracefully without panics.
+### 4.5 Queue and Allocation Limits
+- Kernel request queues are bounded (e.g. maximum 256 pending requests per device queue).
+- Cache metadata structures allocation is bounded by configurable physical memory percentages (default max 25% of RAM).
 
-### Error Policy
-- All storage I/O errors are strongly typed using `BlockError`, `CacheError`, `FsCoreError`, and `MountError`.
-- Hardware errors map SCSI Sense Keys (`ScsiSenseData`) directly into kernel diagnostic logs without silent dropping.
+### 4.6 NUMA Behavior
+- Block request queues and DMA buffer pools are allocated on the local NUMA node corresponding to the PCIe host bridge interrupt domain.
 
-### NUMA Behavior
-- Block request queues and page cache allocations are bound to local NUMA nodes corresponding to the PCI root complex of the storage controller.
-
-### Storage Hotplug Policy
-- On device detachment, the block manager transitions active requests to `RequestState::Failed` with `BlockError::DeviceDetached`.
-- In-flight requests timeout via `detect_lost_completions` and are reaped safely.
+### 4.7 Storage Hotplug Behavior
+- Upon device detachment, active pending requests transition immediately to `BlockError::DeviceDetached`.
+- Mount points attached to detached storage transition to read-only state, preventing further dirty allocations.

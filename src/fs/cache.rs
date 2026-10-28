@@ -1,3 +1,7 @@
+// SigmaOS Block Cache Manager Subsystem
+// Enforces race-free LRU eviction, dirty writebacks, and observable OOM metrics.
+// See docs/filesystem/CACHE_POLICY.md for specification.
+
 use std::collections::BTreeMap;
 use std::vec::Vec;
 

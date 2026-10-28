@@ -1,19 +1,23 @@
-# Block Cache Policy Specification
+# SigmaOS Block Cache Policy
 
-## Architectural Overview
+## 1. Overview
 
-`BlockCacheManager` manages secondary memory block caching, LRU eviction, dirty page flushing, and OOM pressure mitigation.
+The SigmaOS block cache manager (`src/fs/cache.rs`) manages in-memory caching for block device data, maintaining data consistency, dirty writeback, and memory bounds.
 
-## Core Requirements & Rules
+## 2. Invariants and Safety Guarantees
 
-### 1. Race-Free Eviction
-- Page cache eviction executes atomically under lock discipline.
-- Clean pages are evicted immediately; dirty pages trigger synchronous writeback to storage before slot release.
+### 2.1 Cache Eviction and Reuse
+- Cache eviction is race-free and follows an LRU (Least Recently Used) policy based on access timestamps (`last_access_ms`) and access counts (`access_count`).
+- Cached pages transition through states: `Active` -> `Flushing` -> `Evicting` -> `Evicted`.
 
-### 2. Double-Eviction Prevention
-- Evicting an unmapped page returns `CacheError::NotCached`.
-- Attempting to evict a page already undergoing eviction returns `CacheError::DoubleEviction`.
+### 2.2 Lost-Writeback Prevention
+- Dirty pages (`is_dirty == true`) must be flushed to the underlying block device before eviction completes.
+- Evicting a dirty page without writeback returns `CacheError::WritebackFailed`.
 
-### 3. Observable OOM Enforcement
-- `BlockCacheManager` tracks memory usage and watermark thresholds.
-- Metrics (`total_pages`, `dirty_pages`, `evictions`, `watermark_hits`) are exposed for system diagnostics and observability.
+### 2.3 Double-Eviction Prevention
+- Evicting a page already in `Evicted` or `Evicting` state returns `CacheError::DoubleEviction`.
+
+### 2.4 Bounded Metadata and OOM Enforcement
+- Cache size is strictly bounded by `max_pages`.
+- Watermark levels (`Normal`, `HighPressure`, `OomCritical`) dictate eviction aggressiveness.
+- OOM metrics (`CacheOomMetrics`) continuously measure total pages, dirty pages, hits, misses, evictions, and reclaimed bytes.

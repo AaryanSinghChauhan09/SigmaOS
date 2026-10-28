@@ -1,3 +1,6 @@
+# SigmaOS Secondary Memory Component Rules
+# Governed by docs/storage/SECONDARY_MEMORY_POLICY.md and docs/storage/SECONDARY_MEMORY_ADR.md
+
 [rule.storage_completeness]
 requirement = "Secondary memory defines block I/O, cache, mount, and filesystem semantics."
 enforcement = "Storage tests + rehearsals"
