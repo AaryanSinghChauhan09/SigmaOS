@@ -2,7 +2,7 @@
 //!
 //! Complete, high-performance `#![no_std]` / `alloc` compatible native implementation inspired by leading
 //! Linux, BSD, macOS, and Android init systems, service supervisors, timers, and scheduled job engines:
-//! - **systemd (V78)**: Dynamic Unit State Machine (`Inactive`, `Activating`, `Active`, `Deactivating`, `Failed`, `Reloading`), Cgroup v2 resource limits calculation (`MemoryMax`, `MemoryHigh`, `CPUQuota`, `TasksMax`, `IOWeight`), socket activation matrix with `sd_listen_fds` pass-through simulation, and `sd_journal` structured event streaming with cursor generation.
+//! - **systemd (V78)**: Dynamic Unit State Machine (`Inactive`, `Activating`, `Active`, `Deactivating`, `Failed`, `Reloading`), Cgroup v2 resource limits calculation (`MemoryMax`, `CPUQuota`, `TasksMax`, `IOWeight`), socket activation matrix with `sd_listen_fds` pass-through simulation, and `sd_journal` structured event streaming with cursor generation.
 //! - **OpenRC (V78)**: `/etc/rc.conf` global directive configuration parser, runlevel dependency graph solver with cycle detection (`need`, `use`, `after`, `before`, `provide`), and `rc-status` runlevel service health inspector.
 //! - **runit & s6 (V78)**: `runsvdir` / `s6-svscan` active service scanner & state monitor, `s6-rc` compiled dependency database builder & atomic service set state transitions, and readiness notification parser (`s6-notifyoncheck` & `fd 3` descriptor notification).
 //! - **SysVinit (V78)**: `/etc/inittab` multi-runlevel action engine (`initdefault`, `sysinit`, `respawn`, `once`, `wait`, `ctrlaltdel`, `powerfail`), and runlevel switching state machine (`telinit 0-6, S, Q`).
@@ -160,7 +160,7 @@ impl SystemdAdvancementsV78Engine {
                 "SystemdSocketActivationSpecV78".to_string(),
                 "SystemdJournalEntryV78".to_string(),
             ],
-            performance_multiplier: "5.0x".to_string(),
+            performance_multiplier: "4.8x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -284,7 +284,7 @@ impl OpenRcAdvancementsV78Engine {
                 "OpenRcDependencyTypeV78".to_string(),
                 "OpenRcServiceSpecV78".to_string(),
             ],
-            performance_multiplier: "4.7x".to_string(),
+            performance_multiplier: "4.5x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -338,7 +338,7 @@ impl RunitS6AdvancementsV78Engine {
             components_added: vec![
                 "S6NotificationSpecV78".to_string(),
             ],
-            performance_multiplier: "5.4x".to_string(),
+            performance_multiplier: "5.2x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -419,7 +419,7 @@ impl SysVinitAdvancementsV78Engine {
                 "SysVinitActionV78".to_string(),
                 "SysVinitSpecV78".to_string(),
             ],
-            performance_multiplier: "4.2x".to_string(),
+            performance_multiplier: "4.0x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -480,7 +480,7 @@ impl BsdRcAdvancementsV78Engine {
             components_added: vec![
                 "BsdRcScriptHooksV78".to_string(),
             ],
-            performance_multiplier: "4.8x".to_string(),
+            performance_multiplier: "4.6x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -545,7 +545,7 @@ impl LaunchdAndroidInitAdvancementsV78Engine {
             components_added: vec![
                 "LaunchdKeepAliveSpecV78".to_string(),
             ],
-            performance_multiplier: "5.2x".to_string(),
+            performance_multiplier: "5.0x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -608,7 +608,7 @@ impl CronAnacronTimersAtV78Engine {
             components_added: vec![
                 "SystemdTimerSpecV78".to_string(),
             ],
-            performance_multiplier: "5.1x".to_string(),
+            performance_multiplier: "4.9x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
