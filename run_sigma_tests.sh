@@ -2571,6 +2571,13 @@ if [ -f "src/net/sovereign_network_development_and_pr_suite.rs" ]; then
     ./build/test_network_development_pr_suite
 fi
 
+if [ -f "tests/test_network_development_plan.rs" ]; then
+    echo "Running Sovereign Network Development Plan Integration Test..."
+    mkdir -p build
+    rustc --test tests/test_network_development_plan.rs --edition=2021 -o build/test_network_development_plan
+    ./build/test_network_development_plan
+fi
+
 if [ -f "src/syscall/sovereign_syscall_development_and_pr_suite.rs" ]; then
     echo "Running Sovereign Syscall Development and PR Suite..."
     mkdir -p build
