@@ -4,6 +4,7 @@
 use crate::distro::sovereign_linux_bsd_all_subsystems_harmony::{
     LinuxBsdDistroInspiration, SigmaOsSubsystem, SovereignSubsystemDistroHarmonyEngine,
 };
+use alloc::collections::BTreeMap;
 use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
@@ -311,7 +312,7 @@ impl SovereignUniversalLinuxBsdSubsystemInteropGateway {
     }
 
     /// Performs an audit across all 44 subsystems and 38 distro paradigms.
-    pub fn audit_all_subsystems_harmony(&self) -> (alloc::collections::BTreeMap<String, bool>, u32) {
+    pub fn audit_all_subsystems_harmony(&self) -> (BTreeMap<String, bool>, u32) {
         self.harmony_engine.audit_all_subsystems_distro_compliance()
     }
 

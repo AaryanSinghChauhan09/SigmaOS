@@ -1,25 +1,46 @@
-# SigmaOS Filesystem Core & Mount Policy
+# Filesystem Core & Mount Manager Policy Specification
 
-## 1. Overview
+## 1. Scope & Purpose
 
-The SigmaOS filesystem core and mount manager (`src/filesystem/core.rs` and `src/filesystem/mount.rs`) manage volume capacity, transaction sequencing, and mount/unmount lifecycles.
+This document specifies the operational policies, capacity limits, mount state transitions, and recovery semantics enforced by `FilesystemCoreManager` (`src/filesystem/core.rs`) and `MountManager` (`src/filesystem/mount.rs`).
 
-## 2. Invariants and Safety Guarantees
+---
 
-### 2.1 Race-Free Mount Operations
-- Mount points transition through `Unmounted` -> `Mounting` -> `Mounted` -> `Unmounting` -> `Unmounted`.
-- Concurrent mount requests on the same path return `MountError::AlreadyMounted`.
+## 2. Mount Lifecycle State Machine
 
-### 2.2 Double-Unmount Prevention
-- Attempting to unmount an unmounted or invalid target returns `MountError::DoubleUnmount`.
+Mount operations follow a deterministic 4-state lifecycle:
 
-### 2.3 Bounded Filesystem Capacity
-- Total volume capacity (`VolumeCapacityBounds`) tracks total bytes, used bytes, free bytes, and inode counts.
-- Operations exceeding volume capacity return `FsCoreError::CapacityExceeded`.
+```text
+Unmounted -> Mounting -> Mounted -> Unmounting -> Unmounted
+```
 
-### 2.4 Lost-Update Prevention
-- Filesystem transactions use strictly increasing sequence numbers (`FileTransactionRecord`).
-- Out-of-order or duplicate updates trigger `FsCoreError::LostUpdateDetected`.
+### State Transitions & Rules
+- **Mount Request**: Initiating a mount transitions target state from `Unmounted` to `Mounting`.
+- **Initialization & Options**: Applies `CustomMountFlags` (read-only, no-exec, no-suid, sync, bind).
+- **Mount Completion**: On successful driver initialization, state transitions to `Mounted`.
+- **Rollback Guarantee**: If mount initialization fails, dirty mount entries are undone and state rolls back to `Unmounted`, returning `Err(MountError::RollbackSuccessful)`.
+- **Double-Unmount Prevention**: Calling `unmount` on an already unmounted or non-existent path returns `Err(MountError::DoubleUnmount)`.
 
-### 2.5 Failure-Safe Mount Rollback
-- If an error occurs during mount setup, all partial allocations are undone and the mount entry rolls back to `Unmounted` (`MountError::RollbackSuccessful`).
+---
+
+## 3. Capacity Bounds & Transaction Isolation
+
+### 3.1 Bounded Filesystem Capacity
+- Every volume registered with `FilesystemCoreManager` maintains strict `VolumeCapacityBounds`: `total_bytes`, `used_bytes`, `free_bytes`, `total_inodes`, `used_inodes`.
+- Space allocation (`allocate_space`) checks bounds. Requests exceeding capacity fail with `Err(FsCoreError::CapacityExceeded)`.
+
+### 3.2 Sequence Tracking & Lost-Update Prevention
+- File transactions (`begin_transaction`, `commit_transaction`) assign sequence numbers.
+- Committing a transaction with an out-of-order sequence number returns `Err(FsCoreError::LostUpdateDetected)`.
+
+### 3.3 Health Status Monitoring
+- Volume health is tracked via `FsHealthStatus`: `Healthy`, `Degraded`, `ReadOnly`, `Corrupted`.
+
+---
+
+## 4. Verification
+
+Enforced via unit test suite `tests/filesystem/core.rs`:
+- `test_filesystem_core_capacity_and_lost_update_prevention`
+- `test_mount_lifecycle_and_double_unmount_prevention`
+- `test_mount_rollback_on_failure`

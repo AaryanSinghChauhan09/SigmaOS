@@ -1,85 +1,88 @@
 # SigmaOS Secondary Memory Subsystem Policy
 
-## 1. Overview and Objective
+## 1. Overview & Objectives
 
-SigmaOS manages secondary memory—persistent storage, block devices, filesystems, caches, and paging-backed storage—as an integrated, safe, observable, and recoverable lifecycle subsystem. The primary objective is to maintain secondary memory as a storage subsystem that enumerates devices, manages block I/O, mounts filesystems, caches data, pages to disk, reclaims space, and recovers from failures without corruption or undefined behavior.
+SigmaOS manages secondary memory—persistent storage, block devices, filesystems, caches, and paging-backed storage—as a safe, observable, recoverable lifecycle subsystem.
 
-## 2. Authoritative Storage Lifecycle
+The secondary memory subsystem objective is to:
+> **Maintain SigmaOS secondary memory as a safe, observable, recoverable storage subsystem: enumerate devices, manage block I/O, mount filesystems, cache data, page to disk, reclaim space, and recover from failures without corruption or undefined behavior.**
 
-Every persistent storage device and path in SigmaOS adheres strictly to a single authoritative lifecycle:
+---
+
+## 2. Authoritative Storage Lifecycle Contract
+
+SigmaOS enforces a single authoritative lifecycle contract across all storage paths:
 
 ```text
 probe -> identify -> block layer -> cache -> filesystem -> mount ->
 read/write -> flush -> unmount -> detach -> error/recovery
 ```
 
-### Lifecycle Stage Guarantees
+### Stage Requirements
 
 | Stage | Required Behavior |
 |---|---|
-| **Probe** | Hardware or virtio controller discovered, PCI/device capabilities reported. |
-| **Identify** | Storage geometry, sector/block size, capacity, and operational limits determined. |
-| **Block I/O** | Requests validated against bounds, queued in lock-free ring, completed exactly once. |
-| **Cache** | Invalidation, writeback dirtying, LRU eviction, and cache coherence explicitly defined. |
-| **Filesystem** | Superblock read, transaction recovery validated, mount/unmount lifecycle safe. |
-| **Mount** | VFS mount entry attached, namespace isolation enforced, custom mount flags applied. |
-| **Read/Write** | Bounded buffer reads/writes, transaction sequence numbering, lost-update prevention. |
-| **Flush** | Durability semantics explicit, sync flush barriers enforced down to block device. |
-| **Unmount** | Resources, buffer locks, and references released exactly once with rollback safety. |
-| **Detach** | Safe device unplug or driver detachment, active queues drained or aborted. |
-| **Recovery** | Failure during any stage triggers journal replay/rollback without corruption. |
+| **Probe** | Device discovered, hardware capabilities reported |
+| **Identify** | Geometry, sector size, queue limits, and capabilities known |
+| **Block I/O** | Requests validated, queued, completed exactly once |
+| **Cache** | Invalidation, dirty page writeback, and coherence defined |
+| **Filesystem** | Mount/unmount lifecycle safe and transactional |
+| **Flush** | Data durability semantics explicit across block and cache layers |
+| **Unmount** | Resources, references, and buffers released exactly once |
+| **Recovery** | Failure does not corrupt filesystem state or leak state |
+
+---
 
 ## 3. Subsystem Architecture Classes
 
 ### 3.1 Block Layer Class
-SigmaOS employs a **hybrid bio/request-based block layer**:
-- **Bio-based submission**: Low-latency, direct block I/O requests for virtualized devices (VirtIO-blk) and fast NVMe ring buffers.
-- **Request-based scheduling**: Queue-based request aggregation, elevator sorting, and deadline scheduling for high-throughput persistent disks.
+- **Hybrid Request-Based Architecture**: Supports direct bio request dispatch and multi-queue ring submission (`BoundedBlockDeviceManager`).
+- **Bounded Request Queues**: Kernel request allocations are strictly bounded to prevent unbounded kernel memory growth. Request exhaustion returns a typed error (`BlockError::RequestExhaustion`).
+- **Exact-Once Completion**: Double completion returns `BlockError::DoubleCompletion`; lost completion triggers timeout detection and failure status (`BlockError::LostCompletion`).
 
-### 3.2 Device Classes
-The subsystem explicitly supports four primary block device classes:
-1. **NVMe**: Non-Volatile Memory Express controller with multi-queue support and ZNS (Zone Namespaces).
-2. **SATA/AHCI**: Standard Serial ATA controllers with NCQ (Native Command Queuing).
-3. **VirtIO Block**: VirtIO-blk para-virtualized devices with split/packed ring descriptors.
-4. **USB / Mass Storage**: Bulk-Only Transport (BOT) and USB Attached SCSI (UAS) storage devices.
+### 3.2 Device Class
+- **NVMe 2.0**: High-performance submission/completion multi-queue device model (`NvmeBlockDevice`).
+- **VirtIO Block**: Virtqueue-backed async I/O driver (`VirtIoBlockDevice`).
+- **SATA / SSD**: Flash Translation Level (FTL) wear-leveling simulation (`SsdBlockDevice`).
+- **RAM Disk / Loop Device**: In-memory and file-backed block devices.
 
 ### 3.3 Cache Class
-- **Hybrid Page & Buffer Cache**: Unifies block device buffer caches with virtual memory page caches.
-- **LRU Eviction & Watermarks**: Multi-tiered watermark tracking (`Normal`, `HighPressure`, `OomCritical`) with background dirty-page writeback workers.
+- **Page & Buffer Cache**: Managed by `BlockCacheManager` in `src/fs/cache.rs`.
+- **LRU Eviction**: Eviction is race-free and deterministic based on timestamp/access metrics.
+- **OOM Watermark Metrics**: `CacheOomMetrics` measures active, dirty, evicted, and reclaimed pages across `Normal`, `HighPressure`, and `OomCritical` levels.
 
 ### 3.4 Filesystem Class
-- Supports ZFS (OpenZFS-inspired CoW pool management), OverlayFS (container layers), TmpFS (RAM-backed transient filesystem), and SigmaFS (custom POSIX-compliant CoW journaling filesystem).
+- **Managed Core**: Managed by `FilesystemCoreManager` in `src/filesystem/core.rs`.
+- **Supported FS Types**: Ext4, Btrfs, ZFS, Overlay, Tmpfs, and SigmaFS.
+- **Capacity Bounds**: Volume total/used/free byte and inode limits strictly enforced (`VolumeCapacityBounds`).
 
-## 4. Operational Policies
+---
+
+## 4. Subsystem Operational Policies
 
 ### 4.1 Mount Policy
-- Mount operations must be atomic and race-free.
-- Target mount points must exist and be free of concurrent unmount operations.
-- Failure during mount initialization triggers a complete rollback to `Unmounted` state (`MountError::RollbackSuccessful`).
+- Managed by `MountManager` in `src/filesystem/mount.rs`.
+- **State Machine**: `Unmounted -> Mounting -> Mounted -> Unmounting`.
+- **Rollback Guarantee**: Initialization failure during mount automatically rolls back dirty state (`MountError::RollbackSuccessful`).
+- **Double-Unmount Protection**: Attempting to unmount an already unmounted path returns `MountError::DoubleUnmount`.
 
 ### 4.2 Flush Policy
-- Synchronous flush requests (`VIRTIO_BLK_T_FLUSH`, `fsync`, `fdatasync`) issue immediate barrier commands to the underlying block driver.
-- Dirty cache pages are flushed before unmount or unmap operations proceed.
+- All dirty cache pages must be written back to underlying block devices before device unmount or detachment.
+- `BlockOpCode::Flush` forces explicit hardware controller flush operations.
 
-### 4.3 Reclaim and OOM Policy
-- When memory pressure hits `HighPressure`, background cache reclamation evicts clean pages.
-- Under `OomCritical`, dirty pages are synchronously written back, and unmapped cache pages are forcibly reclaimed.
-- OOM metrics (`CacheOomMetrics`) are tracked continuously and exposed via diagnostics.
+### 4.3 Reclaim Policy
+- Under memory pressure (`HighPressure` / `OomCritical`), clean LRU cache pages are reclaimed first.
+- Dirty pages are enqueued for writeback before reclamation.
 
-### 4.4 Typed Error Policy
-All storage operations must return strongly-typed errors. Generic untyped failures or accidental panics are prohibited:
-- `BlockError`: `RequestExhaustion`, `LostCompletion`, `DoubleCompletion`, `QueueFull`, `DeviceDetached`.
-- `CacheError`: `NotCached`, `CacheFull`, `DoubleEviction`, `WritebackFailed`, `InvalidPage`.
-- `FsCoreError`: `CapacityExceeded`, `LostUpdateDetected`, `FsCorrupted`.
-- `MountError`: `AlreadyMounted`, `DoubleUnmount`, `ResourceBusy`, `RollbackSuccessful`.
+### 4.4 Error Policy
+- All storage I/O and lifecycle operations return strongly-typed Rust `Result<T, E>` enums: `BlockError`, `CacheError`, `FsCoreError`, `MountError`.
+- Unbounded loops or hidden panics on storage failure are strictly prohibited.
 
-### 4.5 Queue and Allocation Limits
-- Kernel request queues are bounded (e.g. maximum 256 pending requests per device queue).
-- Cache metadata structures allocation is bounded by configurable physical memory percentages (default max 25% of RAM).
+### 4.5 Limits & Bounds
+- **Max Requests**: Bounded per block manager instance.
+- **Max Cache Pages**: Bounded cache entry limits.
+- **Max Volumes & Mount Entries**: Bounded volume tables.
 
-### 4.6 NUMA Behavior
-- Block request queues and DMA buffer pools are allocated on the local NUMA node corresponding to the PCIe host bridge interrupt domain.
-
-### 4.7 Storage Hotplug Behavior
-- Upon device detachment, active pending requests transition immediately to `BlockError::DeviceDetached`.
-- Mount points attached to detached storage transition to read-only state, preventing further dirty allocations.
+### 4.6 NUMA & Hotplug Behavior
+- Cache pages and I/O buffers bind to local NUMA memory nodes where available.
+- Storage hotplug triggers immediate request drain, cache invalidation, clean unmount, and device removal.

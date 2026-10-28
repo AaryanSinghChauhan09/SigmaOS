@@ -1,23 +1,51 @@
-# SigmaOS Block Cache Policy
+# Block Cache Manager Policy Specification
 
-## 1. Overview
+## 1. Scope & Purpose
 
-The SigmaOS block cache manager (`src/fs/cache.rs`) manages in-memory caching for block device data, maintaining data consistency, dirty writeback, and memory bounds.
+This document specifies the operational policies, eviction semantics, and memory safety invariants enforced by the SigmaOS Block Cache Manager (`src/fs/cache.rs`).
 
-## 2. Invariants and Safety Guarantees
+---
 
-### 2.1 Cache Eviction and Reuse
-- Cache eviction is race-free and follows an LRU (Least Recently Used) policy based on access timestamps (`last_access_ms`) and access counts (`access_count`).
-- Cached pages transition through states: `Active` -> `Flushing` -> `Evicting` -> `Evicted`.
+## 2. Cache Semantics & Invariants
+
+### 2.1 LRU Eviction & Race Freedom
+- Block cache pages (`CachePage`) are managed by `BlockCacheManager`.
+- Cache insertion (`insert_page`) checks page capacity. When capacity is reached, the least recently used (LRU) clean or dirty page is selected based on `last_access_ms`.
+- Eviction is race-free and deterministic.
 
 ### 2.2 Lost-Writeback Prevention
-- Dirty pages (`is_dirty == true`) must be flushed to the underlying block device before eviction completes.
-- Evicting a dirty page without writeback returns `CacheError::WritebackFailed`.
+- If an LRU page selected for eviction is marked `is_dirty = true`, its contents are automatically written back to the underlying block device before eviction.
+- If writeback fails, eviction is aborted and `Err(CacheError::WritebackFailed)` is returned.
 
 ### 2.3 Double-Eviction Prevention
-- Evicting a page already in `Evicted` or `Evicting` state returns `CacheError::DoubleEviction`.
+- Explicit page eviction (`evict_page`) transitions page state to `Evicting` then `Evicted`.
+- Attempting to evict an already evicted or non-cached page returns `Err(CacheError::NotCached)` or `Err(CacheError::DoubleEviction)`.
 
-### 2.4 Bounded Metadata and OOM Enforcement
-- Cache size is strictly bounded by `max_pages`.
-- Watermark levels (`Normal`, `HighPressure`, `OomCritical`) dictate eviction aggressiveness.
-- OOM metrics (`CacheOomMetrics`) continuously measure total pages, dirty pages, hits, misses, evictions, and reclaimed bytes.
+---
+
+## 3. OOM Watermark Metrics & Observability
+
+`BlockCacheManager` measures cache memory usage and OOM pressure using `CacheOomMetrics`:
+
+| Watermark Level | Threshold | Action Taken |
+|---|---|---|
+| **Normal** | Usage < 80% | Standard LRU caching and access tracking |
+| **HighPressure** | Usage >= 80% | Proactive clean LRU page eviction triggered |
+| **OomCritical** | Usage >= 95% | Immediate flush of dirty pages and aggressive clean page reclamation |
+
+### Observable Metrics
+- `total_pages`: Current active cache pages
+- `max_pages`: Total allocated page capacity
+- `dirty_pages`: Current dirty cache pages awaiting writeback
+- `cache_hits` & `cache_misses`: Cache hit/miss ratio
+- `eviction_count`: Total evicted pages
+- `reclaimed_bytes`: Total memory reclaimed under OOM pressure
+
+---
+
+## 4. Verification
+
+Enforced via unit test suite `tests/filesystem/cache.rs`:
+- `test_cache_lru_eviction_and_dirty_writeback`
+- `test_cache_double_eviction_prevention`
+- `test_cache_oom_watermark_metrics`
