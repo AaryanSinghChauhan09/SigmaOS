@@ -2700,6 +2700,12 @@ if [ -f "tests/process/test_process_synchronization_plan.rs" ]; then
     rustc --test tests/process/test_process_synchronization_plan.rs --edition=2021 -o build/test_proc_sync && ./build/test_proc_sync
 fi
 
+if [ -f "tests/process/test_process_manager_plan.rs" ]; then
+    echo "Running Process Manager Plan test suite..."
+    mkdir -p build
+    rustc --test tests/process/test_process_manager_plan.rs --edition=2021 -o build/test_pm_plan && ./build/test_pm_plan
+fi
+
 if [ -f "tests/dispatch/test_dispatcher_plan.rs" ]; then
     echo "Running Dispatcher Plan test suite..."
     mkdir -p build
