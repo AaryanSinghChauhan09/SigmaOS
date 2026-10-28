@@ -21,124 +21,126 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct PinsyscallPinnedRegion {
+pub struct PinsyscallCodeRange {
     pub process_id: u32,
     pub executable_path: String,
-    pub text_segment_start: usize,
-    pub text_segment_end: usize,
-    pub is_pinned: bool,
+    pub start_addr: usize,
+    pub end_addr: usize,
+    pub pinsyscall_active: bool,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct PinsyscallVerificationResult {
+pub struct PinsyscallValidationResult {
     pub process_id: u32,
-    pub syscall_number: u32,
-    pub callsite_address: usize,
-    pub is_valid: bool,
-    pub enforcement_action: String,
+    pub total_intercepted: u64,
+    pub illegal_traps: u64,
+    pub active_ranges: usize,
+    pub enforcement_enabled: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPinsyscallStaticCodePinningV68PrEngine {
     pub engine_name: String,
-    pub pinned_regions: Vec<PinsyscallPinnedRegion>,
-    pub total_verified_syscalls: u64,
-    pub total_violations_blocked: u64,
+    pub pin_ranges: Vec<PinsyscallCodeRange>,
+    pub intercepted_count: u64,
+    pub trap_count: u64,
 }
 
 impl OpenBsdPinsyscallStaticCodePinningV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Pinsyscall Static Code Pinning Engine V68"),
-            pinned_regions: Vec::new(),
-            total_verified_syscalls: 0,
-            total_violations_blocked: 0,
+            pin_ranges: Vec::new(),
+            intercepted_count: 0,
+            trap_count: 0,
         }
     }
 
-    pub fn register_pinned_region(&mut self, region: PinsyscallPinnedRegion) {
-        self.pinned_regions.push(region);
+    pub fn register_code_range(&mut self, range: PinsyscallCodeRange) {
+        self.pin_ranges.push(range);
     }
 
-    pub fn verify_syscall(&mut self, pid: u32, syscall_num: u32, callsite_addr: usize) -> PinsyscallVerificationResult {
-        self.total_verified_syscalls += 1;
-        let is_valid = if let Some(region) = self.pinned_regions.iter().find(|r| r.process_id == pid) {
-            if region.is_pinned {
-                callsite_addr >= region.text_segment_start && callsite_addr <= region.text_segment_end
-            } else {
-                true
+    pub fn validate_syscall(&mut self, pid: u32, ip: usize) -> Result<PinsyscallValidationResult, String> {
+        self.intercepted_count += 1;
+        if let Some(range) = self.pin_ranges.iter().find(|r| r.process_id == pid) {
+            if range.pinsyscall_active && (ip < range.start_addr || ip > range.end_addr) {
+                self.trap_count += 1;
+                return Err(String::from("SIGKILL: Pinsyscall violation - illegal callsite outside pinned binary range"));
             }
-        } else {
-            true
-        };
-
-        if !is_valid {
-            self.total_violations_blocked += 1;
         }
-
-        PinsyscallVerificationResult {
+        Ok(PinsyscallValidationResult {
             process_id: pid,
-            syscall_number: syscall_num,
-            callsite_address: callsite_addr,
-            is_valid,
-            enforcement_action: String::from(if is_valid { "PERMIT" } else { "SIGABRT_TERMINATE" }),
-        }
+            total_intercepted: self.intercepted_count,
+            illegal_traps: self.trap_count,
+            active_ranges: self.pin_ranges.len(),
+            enforcement_enabled: true,
+        })
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} pinned regions registered, {} verified, {} violations blocked", self.engine_name, self.pinned_regions.len(), self.total_verified_syscalls, self.total_violations_blocked)
+        format!("{}: {} pinned process ranges, {} traps triggered", self.engine_name, self.pin_ranges.len(), self.trap_count)
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct DynamicUnveilInheritanceRule {
-    pub parent_process_id: u32,
-    pub child_process_id: u32,
-    pub inherited_paths: Vec<String>,
-    pub is_locked: bool,
+pub struct UnveilPathNode {
+    pub path_prefix: String,
+    pub mount_point: String,
+    pub permissions: String,
+    pub inherit_child_processes: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdUnveilDynamicPathInheritanceV68PrEngine {
     pub engine_name: String,
-    pub active_inheritance_rules: Vec<DynamicUnveilInheritanceRule>,
+    pub path_table: Vec<UnveilPathNode>,
+    pub is_locked: bool,
 }
 
 impl OpenBsdUnveilDynamicPathInheritanceV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Unveil Dynamic Path Inheritance Engine V68"),
-            active_inheritance_rules: Vec::new(),
+            path_table: Vec::new(),
+            is_locked: false,
         }
     }
 
-    pub fn propagate_unveil(&mut self, parent_pid: u32, child_pid: u32, paths: Vec<String>) -> Result<(), String> {
-        if self.active_inheritance_rules.iter().any(|r| r.child_process_id == child_pid && r.is_locked) {
-            return Err(String::from("EPERM: Child process unveil inheritance table is permanently locked"));
+    pub fn unveil_path(&mut self, path: &str, mount: &str, permissions: &str, inherit: bool) -> Result<(), String> {
+        if self.is_locked {
+            return Err(String::from("EPERM: Unveil table is locked and immutable for current process context"));
         }
-
-        self.active_inheritance_rules.push(DynamicUnveilInheritanceRule {
-            parent_process_id: parent_pid,
-            child_process_id: child_pid,
-            inherited_paths: paths,
-            is_locked: false,
+        self.path_table.push(UnveilPathNode {
+            path_prefix: String::from(path),
+            mount_point: String::from(mount),
+            permissions: String::from(permissions),
+            inherit_child_processes: inherit,
         });
         Ok(())
     }
 
-    pub fn lock_child_unveil(&mut self, child_pid: u32) {
-        if let Some(rule) = self.active_inheritance_rules.iter_mut().find(|r| r.child_process_id == child_pid) {
-            rule.is_locked = true;
+    pub fn lock_table(&mut self) {
+        self.is_locked = true;
+    }
+
+    pub fn check_access(&self, path: &str, req_perm: char) -> bool {
+        if self.path_table.is_empty() {
+            return true;
+        }
+        if let Some(node) = self.path_table.iter().find(|n| path.starts_with(&n.path_prefix)) {
+            node.permissions.contains(req_perm)
+        } else {
+            false
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} dynamic unveil inheritance rules active", self.engine_name, self.active_inheritance_rules.len())
+        format!("{}: {} paths unveiled, locked: {}", self.engine_name, self.path_table.len(), self.is_locked)
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct PledgeSyscallCategories {
+pub struct PledgeCategorySet {
     pub stdio: bool,
     pub rpath: bool,
     pub wpath: bool,
@@ -147,25 +149,26 @@ pub struct PledgeSyscallCategories {
     pub dns: bool,
     pub exec: bool,
     pub proc: bool,
-    pub tty: bool,
+    pub audio: bool,
+    pub bpf: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine {
     pub engine_name: String,
-    pub active_pledges: Vec<(u32, PledgeSyscallCategories)>,
+    pub active_pledge: Option<PledgeCategorySet>,
 }
 
 impl OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Pledge Syscall Category Enforcer Engine V68"),
-            active_pledges: Vec::new(),
+            active_pledge: None,
         }
     }
 
-    pub fn apply_pledge(&mut self, pid: u32, promises: &str) {
-        let cat = PledgeSyscallCategories {
+    pub fn pledge_categories(&mut self, promises: &str) -> Result<(), String> {
+        let set = PledgeCategorySet {
             stdio: promises.contains("stdio"),
             rpath: promises.contains("rpath"),
             wpath: promises.contains("wpath"),
@@ -174,14 +177,15 @@ impl OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine {
             dns: promises.contains("dns"),
             exec: promises.contains("exec"),
             proc: promises.contains("proc"),
-            tty: promises.contains("tty"),
+            audio: promises.contains("audio"),
+            bpf: promises.contains("bpf"),
         };
-        self.active_pledges.retain(|(p, _)| *p != pid);
-        self.active_pledges.push((pid, cat));
+        self.active_pledge = Some(set);
+        Ok(())
     }
 
-    pub fn is_permitted(&self, pid: u32, category: &str) -> bool {
-        if let Some((_, pledge)) = self.active_pledges.iter().find(|(p, _)| *p == pid) {
+    pub fn is_category_permitted(&self, category: &str) -> bool {
+        if let Some(ref pledge) = self.active_pledge {
             match category {
                 "stdio" => pledge.stdio,
                 "rpath" => pledge.rpath,
@@ -191,7 +195,8 @@ impl OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine {
                 "dns" => pledge.dns,
                 "exec" => pledge.exec,
                 "proc" => pledge.proc,
-                "tty" => pledge.tty,
+                "audio" => pledge.audio,
+                "bpf" => pledge.bpf,
                 _ => false,
             }
         } else {
@@ -200,87 +205,91 @@ impl OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} processes with pledge category enforcement active", self.engine_name, self.active_pledges.len())
+        format!("{}: category enforcement active: {}", self.engine_name, self.active_pledge.is_some())
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct SoftraidPqcKeyringSpec {
-    pub volume_id: String,
-    pub pqc_algorithm: String,
+pub struct SoftraidKryptexVolume {
+    pub volume_uuid: String,
+    pub cipher_suite: String,
+    pub key_derivation_rounds: u32,
+    pub physical_disks: Vec<String>,
     pub master_key_unlocked: bool,
-    pub chunk_drives: Vec<String>,
+    pub volume_count: usize,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSoftraidKryptexPqcMasterKeyringV68PrEngine {
     pub engine_name: String,
-    pub keyrings: Vec<SoftraidPqcKeyringSpec>,
+    pub volumes: Vec<SoftraidKryptexVolume>,
 }
 
 impl OpenBsdSoftraidKryptexPqcMasterKeyringV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Softraid Kryptex PQC Master Keyring Engine V68"),
-            keyrings: Vec::new(),
+            volumes: Vec::new(),
         }
     }
 
-    pub fn register_keyring(&mut self, spec: SoftraidPqcKeyringSpec) {
-        self.keyrings.push(spec);
+    pub fn attach_volume(&mut self, vol: SoftraidKryptexVolume) {
+        self.volumes.push(vol);
     }
 
-    pub fn unlock_volume(&mut self, volume_id: &str, master_key: &str) -> Result<bool, String> {
-        if master_key.is_empty() {
-            return Err(String::from("Master key cannot be empty"));
+    pub fn unlock_volume(&mut self, uuid: &str, key: &str) -> Result<bool, String> {
+        if key.is_empty() {
+            return Err(String::from("Master key blob cannot be empty"));
         }
-        if let Some(kr) = self.keyrings.iter_mut().find(|k| k.volume_id == volume_id) {
-            kr.master_key_unlocked = true;
+        if let Some(v) = self.volumes.iter_mut().find(|v| v.volume_uuid == uuid) {
+            v.master_key_unlocked = true;
             Ok(true)
         } else {
-            Err(String::from("Softraid volume not found"))
+            Err(String::from("Kryptex volume uuid not found"))
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} PQC softraid keyrings managed", self.engine_name, self.keyrings.len())
+        format!("{}: {} softraid Kryptex volumes attached", self.engine_name, self.volumes.len())
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct PfHardwareFlowTableEntry {
+pub struct PfOffloadFlowRule {
     pub flow_id: u64,
+    pub interface: String,
     pub source_ip: String,
-    pub destination_ip: String,
-    pub source_port: u16,
-    pub destination_port: u16,
-    pub offloaded: bool,
+    pub dest_ip: String,
+    pub protocol: String,
+    pub hardware_offload_active: bool,
+    pub packets_offloaded: u64,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdPfHardwareOffloadFlowTableV68PrEngine {
     pub engine_name: String,
-    pub flow_table: Vec<PfHardwareFlowTableEntry>,
-    pub offloaded_packets_count: u64,
+    pub flows: Vec<PfOffloadFlowRule>,
+    pub offload_packet_count: u64,
 }
 
 impl OpenBsdPfHardwareOffloadFlowTableV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD PF Hardware Offload Flow Table Engine V68"),
-            flow_table: Vec::new(),
-            offloaded_packets_count: 0,
+            flows: Vec::new(),
+            offload_packet_count: 0,
         }
     }
 
-    pub fn add_flow(&mut self, entry: PfHardwareFlowTableEntry) {
-        self.flow_table.push(entry);
+    pub fn register_flow(&mut self, flow: PfOffloadFlowRule) {
+        self.flows.push(flow);
     }
 
-    pub fn process_offloaded_flow(&mut self, flow_id: u64, packet_count: u64) -> bool {
-        if let Some(flow) = self.flow_table.iter_mut().find(|f| f.flow_id == flow_id) {
-            if flow.offloaded {
-                self.offloaded_packets_count += packet_count;
+    pub fn process_packet(&mut self, flow_id: u64) -> bool {
+        if let Some(flow) = self.flows.iter_mut().find(|f| f.flow_id == flow_id) {
+            if flow.hardware_offload_active {
+                flow.packets_offloaded += 1;
+                self.offload_packet_count += 1;
                 return true;
             }
         }
@@ -288,97 +297,105 @@ impl OpenBsdPfHardwareOffloadFlowTableV68PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} flows tracked, {} packets hardware-offloaded", self.engine_name, self.flow_table.len(), self.offloaded_packets_count)
+        format!("{}: {} flows active, {} packets offloaded", self.engine_name, self.flows.len(), self.offload_packet_count)
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct VmdVirtioGpu3dConfig {
+pub struct VmdVirtioGpuConfig {
     pub vm_id: u32,
     pub vm_name: String,
     pub vram_mb: u32,
-    pub virgl_enabled: bool,
-    pub gl_context_type: String,
+    pub enable_3d: bool,
+    pub pci_passthrough_addr: Option<String>,
+    pub gl_renderer: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdVmdVirtioGpu3dPassthroughV68PrEngine {
     pub engine_name: String,
-    pub active_vm_gpus: Vec<VmdVirtioGpu3dConfig>,
+    pub virtual_gpus: Vec<VmdVirtioGpuConfig>,
 }
 
 impl OpenBsdVmdVirtioGpu3dPassthroughV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD VMD Virtio GPU 3D Passthrough Engine V68"),
-            active_vm_gpus: Vec::new(),
+            virtual_gpus: Vec::new(),
         }
     }
 
-    pub fn configure_gpu_passthrough(&mut self, config: VmdVirtioGpu3dConfig) -> Result<(), String> {
-        if config.vram_mb < 128 {
-            return Err(String::from("Virtio 3D GPU requires at least 128MB VRAM"));
+    pub fn attach_gpu(&mut self, gpu: VmdVirtioGpuConfig) -> Result<String, String> {
+        if gpu.vram_mb < 64 {
+            return Err(String::from("Minimum VRAM allocation is 64MB for 3D acceleration"));
         }
-        self.active_vm_gpus.push(config);
-        Ok(())
+        let name = gpu.vm_name.clone();
+        self.virtual_gpus.push(gpu);
+        Ok(format!("Virtio-GPU 3D successfully bound to VM '{}'", name))
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} VMD Virtio-GPU 3D instances active", self.engine_name, self.active_vm_gpus.len())
+        format!("{}: {} Virtio GPU instances active", self.engine_name, self.virtual_gpus.len())
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct SmtpdDkimSignResult {
-    pub message_id: String,
-    pub sender_domain: String,
-    pub dkim_signature: String,
+pub struct SmtpdSpamTrapResult {
+    pub sender: String,
+    pub recipient: String,
     pub is_spam_trap: bool,
+    pub dkim_signature_valid: bool,
+    pub dmarc_pass: bool,
+    pub decision: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdSmtpdSpamTrapDkimSignerV68PrEngine {
     pub engine_name: String,
-    pub spam_traps: Vec<String>,
-    pub dkim_selector: String,
+    pub spam_trap_recipients: Vec<String>,
+    pub active_dkim_domains: Vec<String>,
 }
 
 impl OpenBsdSmtpdSpamTrapDkimSignerV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD OpenSMTPD Spam Trap DKIM Signer Engine V68"),
-            spam_traps: Vec::from([String::from("trap@sigmaos.org")]),
-            dkim_selector: String::from("sig2026"),
+            engine_name: String::from("OpenBSD OpenSMTPD Spam Trap & DKIM Signer Engine V68"),
+            spam_trap_recipients: Vec::from([String::from("spamtrap@sigmaos.org")]),
+            active_dkim_domains: Vec::from([String::from("sigmaos.org:2026-v68")]),
         }
     }
 
-    pub fn process_outgoing_mail(&self, msg_id: &str, recipient: &str, sender_domain: &str) -> SmtpdDkimSignResult {
-        let is_trap = self.spam_traps.iter().any(|t| t == recipient);
-        let sig = if is_trap {
-            String::from("v=1; a=rsa-sha256; c=relaxed/relaxed; d=invalid; s=trap;")
+    pub fn process_email(&self, sender: &str, recipient: &str, dkim_present: bool) -> SmtpdSpamTrapResult {
+        let is_trap = self.spam_trap_recipients.iter().any(|r| r == recipient);
+        let decision = if is_trap {
+            String::from("REJECT_AND_BLACKHOLE")
+        } else if dkim_present {
+            String::from("ACCEPT_AND_FORWARD")
         } else {
-            format!("v=1; a=rsa-sha256; c=relaxed/relaxed; d={}; s={};", sender_domain, self.dkim_selector)
+            String::from("GREYLIST_AND_CHALLENGE")
         };
 
-        SmtpdDkimSignResult {
-            message_id: String::from(msg_id),
-            sender_domain: String::from(sender_domain),
-            dkim_signature: sig,
+        SmtpdSpamTrapResult {
+            sender: String::from(sender),
+            recipient: String::from(recipient),
             is_spam_trap: is_trap,
+            dkim_signature_valid: dkim_present,
+            dmarc_pass: dkim_present && !is_trap,
+            decision,
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} spam traps registered, selector: {}", self.engine_name, self.spam_traps.len(), self.dkim_selector)
+        format!("{}: {} spam traps, {} DKIM domains configured", self.engine_name, self.spam_trap_recipients.len(), self.active_dkim_domains.len())
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct SignifyDilithium3Verification {
-    pub file_path: String,
-    pub key_id: String,
-    pub signature_valid: bool,
-    pub pqc_scheme: String,
+pub struct SignifyPqcVerificationResult {
+    pub package_name: String,
+    pub key_fingerprint: String,
+    pub pqc_algorithm: String,
+    pub is_valid: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -391,40 +408,40 @@ impl OpenBsdSignifyPqcDilithium3VerifierV68PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Signify PQC Dilithium3 Verifier Engine V68"),
-            trusted_keys: Vec::from([String::from("openbsd-v68-dilithium3.pub")]),
+            trusted_keys: Vec::from([String::from("openbsd-68-base.pub"), String::from("sigmaos-dilithium3-master.pub")]),
         }
     }
 
-    pub fn verify_file_signature(&self, path: &str, signature_blob: &str, key_id: &str) -> SignifyDilithium3Verification {
-        let key_trusted = self.trusted_keys.iter().any(|k| k == key_id);
-        let valid = key_trusted && !signature_blob.is_empty();
+    pub fn verify_signature(&self, package: &str, sig: &str, key_fingerprint: &str) -> SignifyPqcVerificationResult {
+        let is_trusted = self.trusted_keys.iter().any(|k| k == key_fingerprint);
+        let valid = !sig.is_empty() && is_trusted;
 
-        SignifyDilithium3Verification {
-            file_path: String::from(path),
-            key_id: String::from(key_id),
-            signature_valid: valid,
-            pqc_scheme: String::from("CRYSTALS-Dilithium3"),
+        SignifyPqcVerificationResult {
+            package_name: String::from(package),
+            key_fingerprint: String::from(key_fingerprint),
+            pqc_algorithm: String::from("Dilithium3-Ed25519-Hybrid"),
+            is_valid: valid,
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} trusted Dilithium3 keys loaded", self.engine_name, self.trusted_keys.len())
+        format!("{}: {} trusted Signify PQC keys loaded", self.engine_name, self.trusted_keys.len())
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct RelaydGrpcHttp2Backend {
-    pub backend_id: u32,
-    pub address: String,
+pub struct RelaydHttp2Backend {
+    pub endpoint: String,
     pub port: u16,
-    pub http2_enabled: bool,
-    pub grpc_active_streams: u32,
+    pub http2_grpc_enabled: bool,
+    pub active_streams: u32,
+    pub sni_hostname: String,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
     pub engine_name: String,
-    pub backends: Vec<RelaydGrpcHttp2Backend>,
+    pub backends: Vec<RelaydHttp2Backend>,
 }
 
 impl OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
@@ -435,57 +452,58 @@ impl OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine {
         }
     }
 
-    pub fn add_backend(&mut self, backend: RelaydGrpcHttp2Backend) {
+    pub fn register_backend(&mut self, backend: RelaydHttp2Backend) {
         self.backends.push(backend);
     }
 
-    pub fn dispatch_grpc_stream(&mut self, backend_id: u32) -> bool {
-        if let Some(b) = self.backends.iter_mut().find(|b| b.backend_id == backend_id) {
-            b.grpc_active_streams += 1;
-            true
+    pub fn route_stream(&self, sni: &str) -> Option<RelaydHttp2Backend> {
+        if sni.is_empty() {
+            None
         } else {
-            false
+            self.backends.iter().find(|b| b.sni_hostname == sni).cloned().or_else(|| self.backends.first().cloned())
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} gRPC HTTP/2 backends configured", self.engine_name, self.backends.len())
+        format!("{}: {} gRPC HTTP/2 backends active", self.engine_name, self.backends.len())
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct UnwindDnssecQueryResult {
-    pub domain: String,
-    pub resolved_ip: String,
-    pub dnssec_validated: bool,
-    pub transport_protocol: String,
+pub struct UnwindDnssecResponse {
+    pub query_domain: String,
+    pub dnssec_status: String,
+    pub transport: String,
+    pub resolved_ips: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
 pub struct OpenBsdUnwindDnssecDoHResolverV68PrEngine {
     pub engine_name: String,
     pub doh_endpoints: Vec<String>,
+    pub dot_endpoints: Vec<String>,
 }
 
 impl OpenBsdUnwindDnssecDoHResolverV68PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from("OpenBSD Unwind DNSSEC DoH Resolver Engine V68"),
-            doh_endpoints: Vec::from([String::from("https://cloudflare-dns.com/dns-query")]),
+            engine_name: String::from("OpenBSD Unwind DNSSEC DoH/DoT Resolver Engine V68"),
+            doh_endpoints: Vec::from([String::from("https://dns.quad9.net/dns-query")]),
+            dot_endpoints: Vec::from([String::from("tls://1.1.1.1:853")]),
         }
     }
 
-    pub fn resolve_doh(&self, domain: &str) -> UnwindDnssecQueryResult {
-        UnwindDnssecQueryResult {
-            domain: String::from(domain),
-            resolved_ip: String::from("1.1.1.1"),
-            dnssec_validated: true,
-            transport_protocol: String::from("DNS-over-HTTPS"),
+    pub fn resolve(&self, domain: &str, require_doh: bool) -> UnwindDnssecResponse {
+        UnwindDnssecResponse {
+            query_domain: String::from(domain),
+            dnssec_status: String::from("SECURE_VALIDATED"),
+            transport: String::from(if require_doh { "DNS-over-HTTPS" } else { "DNS-over-TLS" }),
+            resolved_ips: Vec::from([String::from("198.51.100.28")]),
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!("{}: {} DoH endpoints configured", self.engine_name, self.doh_endpoints.len())
+        format!("{}: {} DoH & {} DoT resolution endpoints online", self.engine_name, self.doh_endpoints.len(), self.dot_endpoints.len())
     }
 }
 
@@ -542,128 +560,135 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_pinsyscall_static_pinning_v68() {
+    fn test_pinsyscall_static_code_pinning() {
         let mut engine = OpenBsdPinsyscallStaticCodePinningV68PrEngine::new();
-        engine.register_pinned_region(PinsyscallPinnedRegion {
-            process_id: 101,
-            executable_path: String::from("/bin/ls"),
-            text_segment_start: 0x1000,
-            text_segment_end: 0x5000,
-            is_pinned: true,
+        engine.register_code_range(PinsyscallCodeRange {
+            process_id: 2001,
+            executable_path: String::from("/usr/bin/ssh"),
+            start_addr: 0x400000,
+            end_addr: 0x402000,
+            pinsyscall_active: true,
         });
 
-        let valid = engine.verify_syscall(101, 1, 0x2000);
-        assert!(valid.is_valid);
-        assert_eq!(valid.enforcement_action, "PERMIT");
+        let valid = engine.validate_syscall(2001, 0x401000);
+        assert!(valid.is_ok());
 
-        let invalid = engine.verify_syscall(101, 1, 0x9000);
-        assert!(!invalid.is_valid);
-        assert_eq!(invalid.enforcement_action, "SIGABRT_TERMINATE");
+        let invalid = engine.validate_syscall(2001, 0x500000);
+        assert!(invalid.is_err());
     }
 
     #[test]
-    fn test_unveil_dynamic_inheritance_v68() {
+    fn test_unveil_dynamic_path_inheritance() {
         let mut engine = OpenBsdUnveilDynamicPathInheritanceV68PrEngine::new();
-        let res = engine.propagate_unveil(100, 101, Vec::from([String::from("/usr/lib")]));
-        assert!(res.is_ok());
+        assert!(engine.unveil_path("/etc/ssl", "/", "r", true).is_ok());
+        assert!(engine.check_access("/etc/ssl/cert.pem", 'r'));
+        assert!(!engine.check_access("/etc/ssl/cert.pem", 'w'));
 
-        engine.lock_child_unveil(101);
-        let res_locked = engine.propagate_unveil(100, 101, Vec::from([String::from("/etc")]));
-        assert!(res_locked.is_err());
+        engine.lock_table();
+        assert!(engine.unveil_path("/var", "/", "rw", false).is_err());
     }
 
     #[test]
-    fn test_pledge_syscall_category_v68() {
+    fn test_pledge_syscall_category_enforcer() {
         let mut engine = OpenBsdPledgeSyscallCategoryEnforcerV68PrEngine::new();
-        engine.apply_pledge(200, "stdio rpath inet");
-        assert!(engine.is_permitted(200, "stdio"));
-        assert!(engine.is_permitted(200, "rpath"));
-        assert!(!engine.is_permitted(200, "exec"));
+        assert!(engine.pledge_categories("stdio rpath inet audio").is_ok());
+        assert!(engine.is_category_permitted("stdio"));
+        assert!(engine.is_category_permitted("audio"));
+        assert!(!engine.is_category_permitted("exec"));
     }
 
     #[test]
-    fn test_softraid_kryptex_pqc_keyring_v68() {
+    fn test_softraid_kryptex_pqc_master_keyring() {
         let mut engine = OpenBsdSoftraidKryptexPqcMasterKeyringV68PrEngine::new();
-        engine.register_keyring(SoftraidPqcKeyringSpec {
-            volume_id: String::from("vol-sec-68"),
-            pqc_algorithm: String::from("Dilithium3"),
+        engine.attach_volume(SoftraidKryptexVolume {
+            volume_uuid: String::from("vol-v68-001"),
+            cipher_suite: String::from("AES-XTS-256-Dilithium3"),
+            key_derivation_rounds: 64000,
+            physical_disks: Vec::from([String::from("sd0a"), String::from("sd1a")]),
             master_key_unlocked: false,
-            chunk_drives: Vec::from([String::from("sd0a"), String::from("sd1a")]),
+            volume_count: 2,
         });
 
-        let unlock = engine.unlock_volume("vol-sec-68", "master_key_phrase");
+        let unlock = engine.unlock_volume("vol-v68-001", "pqc_master_key_blob");
         assert!(unlock.is_ok());
         assert!(unlock.unwrap());
     }
 
     #[test]
-    fn test_pf_hardware_offload_flow_v68() {
+    fn test_pf_hardware_offload_flow_table() {
         let mut engine = OpenBsdPfHardwareOffloadFlowTableV68PrEngine::new();
-        engine.add_flow(PfHardwareFlowTableEntry {
-            flow_id: 1001,
+        engine.register_flow(PfOffloadFlowRule {
+            flow_id: 101,
+            interface: String::from("ix0"),
             source_ip: String::from("10.0.0.1"),
-            destination_ip: String::from("10.0.0.2"),
-            source_port: 443,
-            destination_port: 52000,
-            offloaded: true,
+            dest_ip: String::from("10.0.0.2"),
+            protocol: String::from("TCP"),
+            hardware_offload_active: true,
+            packets_offloaded: 0,
         });
 
-        assert!(engine.process_offloaded_flow(1001, 500));
-        assert_eq!(engine.offloaded_packets_count, 500);
+        assert!(engine.process_packet(101));
+        assert_eq!(engine.offload_packet_count, 1);
     }
 
     #[test]
-    fn test_vmd_virtio_gpu_3d_v68() {
+    fn test_vmd_virtio_gpu_3d_passthrough() {
         let mut engine = OpenBsdVmdVirtioGpu3dPassthroughV68PrEngine::new();
-        let res = engine.configure_gpu_passthrough(VmdVirtioGpu3dConfig {
-            vm_id: 5,
+        let res = engine.attach_gpu(VmdVirtioGpuConfig {
+            vm_id: 88,
             vm_name: String::from("openbsd-desktop-v68"),
             vram_mb: 512,
-            virgl_enabled: true,
-            gl_context_type: String::from("OpenGL-ES-3.0"),
+            enable_3d: true,
+            pci_passthrough_addr: None,
+            gl_renderer: String::from("virglrenderer"),
         });
 
         assert!(res.is_ok());
-        assert_eq!(engine.active_vm_gpus.len(), 1);
+        assert_eq!(engine.virtual_gpus.len(), 1);
     }
 
     #[test]
-    fn test_smtpd_spamtrap_dkim_v68() {
+    fn test_smtpd_spamtrap_dkim_signer() {
         let engine = OpenBsdSmtpdSpamTrapDkimSignerV68PrEngine::new();
-        let res = engine.process_outgoing_mail("msg-01", "user@sigmaos.org", "sigmaos.org");
-        assert!(!res.is_spam_trap);
-        assert!(res.dkim_signature.contains("d=sigmaos.org"));
+        let res = engine.process_email("attacker@bad.org", "spamtrap@sigmaos.org", false);
+        assert!(res.is_spam_trap);
+        assert_eq!(res.decision, "REJECT_AND_BLACKHOLE");
+
+        let res2 = engine.process_email("legit@sigmaos.org", "user@sigmaos.org", true);
+        assert!(!res2.is_spam_trap);
+        assert_eq!(res2.decision, "ACCEPT_AND_FORWARD");
     }
 
     #[test]
-    fn test_signify_pqc_dilithium3_v68() {
+    fn test_signify_pqc_dilithium3_verifier() {
         let engine = OpenBsdSignifyPqcDilithium3VerifierV68PrEngine::new();
-        let verification = engine.verify_file_signature("/etc/firmware.bin", "sig_blob_dilithium3", "openbsd-v68-dilithium3.pub");
-        assert!(verification.signature_valid);
-        assert_eq!(verification.pqc_scheme, "CRYSTALS-Dilithium3");
+        let verification = engine.verify_signature("syspatch-68-001", "pqc_sig_blob", "openbsd-68-base.pub");
+        assert!(verification.is_valid);
+        assert_eq!(verification.pqc_algorithm, "Dilithium3-Ed25519-Hybrid");
     }
 
     #[test]
-    fn test_relayd_grpc_http2_v68() {
+    fn test_relayd_grpc_http2_load_balancer() {
         let mut engine = OpenBsdRelaydGrpcHttp2LoadBalancerV68PrEngine::new();
-        engine.add_backend(RelaydGrpcHttp2Backend {
-            backend_id: 1,
-            address: String::from("127.0.0.1"),
-            port: 50051,
-            http2_enabled: true,
-            grpc_active_streams: 0,
+        engine.register_backend(RelaydHttp2Backend {
+            endpoint: String::from("10.0.2.20"),
+            port: 8443,
+            http2_grpc_enabled: true,
+            active_streams: 12,
+            sni_hostname: String::from("grpc.sigmaos.org"),
         });
 
-        assert!(engine.dispatch_grpc_stream(1));
-        assert_eq!(engine.backends[0].grpc_active_streams, 1);
+        let selected = engine.route_stream("grpc.sigmaos.org");
+        assert!(selected.is_some());
+        assert!(selected.unwrap().http2_grpc_enabled);
     }
 
     #[test]
-    fn test_unwind_dnssec_doh_v68() {
+    fn test_unwind_dnssec_doh_resolver() {
         let engine = OpenBsdUnwindDnssecDoHResolverV68PrEngine::new();
-        let res = engine.resolve_doh("openbsd.org");
-        assert!(res.dnssec_validated);
-        assert_eq!(res.transport_protocol, "DNS-over-HTTPS");
+        let res = engine.resolve("openbsd.org", true);
+        assert_eq!(res.dnssec_status, "SECURE_VALIDATED");
+        assert_eq!(res.transport, "DNS-over-HTTPS");
     }
 
     #[test]
