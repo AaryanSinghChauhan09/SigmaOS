@@ -144,20 +144,31 @@ impl FreeBsd162CapsicumCasperEngineV78 {
 
     pub fn adjust_openzfs_arc_ratio(&mut self, ratio: f32) -> String {
         self.openzfs_arc_mru_lru_ratio = ratio;
-        format!("FreeBSD 16.2+ OpenZFS: ARC MRU/LRU target ratio tuned to {:.2}", ratio)
+        format!(
+            "FreeBSD 16.2+ OpenZFS: ARC MRU/LRU target ratio tuned to {:.2}",
+            ratio
+        )
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-02-FREEBSD-162".to_string(),
-            title: "feat(freebsd): FreeBSD 16.2+ Capsicum Casper Sandboxing & OpenZFS ARC V78 Engine".to_string(),
+            title:
+                "feat(freebsd): FreeBSD 16.2+ Capsicum Casper Sandboxing & OpenZFS ARC V78 Engine"
+                    .to_string(),
             component_name: "sigmaos-freebsd162-casper-zfs".to_string(),
             os_origin: "FreeBSD 16.2+".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-                UniversalSubsystemCategory::ContainerVirt.as_str().to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::ContainerVirt
+                    .as_str()
+                    .to_string(),
             ],
             patch_diff: "diff --git a/sys/bsd/casper_v78.rs b/sys/bsd/casper_v78.rs".to_string(),
         }
@@ -199,15 +210,23 @@ impl OpenBsd91PinsyscallFineIbtEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-03-OPENBSD-91".to_string(),
-            title: "feat(openbsd): OpenBSD 9.1+ Pinsyscall, FineIBT CFI & Unveil Sandbox V78 Engine".to_string(),
+            title:
+                "feat(openbsd): OpenBSD 9.1+ Pinsyscall, FineIBT CFI & Unveil Sandbox V78 Engine"
+                    .to_string(),
             component_name: "sigmaos-openbsd91-pinsyscall".to_string(),
             os_origin: "OpenBSD 9.1+".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
-                UniversalSubsystemCategory::KernelScheduling.as_str().to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::KernelScheduling
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/openbsd/pinsyscall_v78.rs b/sys/openbsd/pinsyscall_v78.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/openbsd/pinsyscall_v78.rs b/sys/openbsd/pinsyscall_v78.rs"
+                    .to_string(),
         }
     }
 }
@@ -241,15 +260,22 @@ impl NetBsd128RumpVirtIoEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-04-NETBSD-128".to_string(),
-            title: "feat(netbsd): NetBSD 12.8+ Rump Kernel PCI Isolation & VirtIO 9P VFS Engine".to_string(),
+            title: "feat(netbsd): NetBSD 12.8+ Rump Kernel PCI Isolation & VirtIO 9P VFS Engine"
+                .to_string(),
             component_name: "sigmaos-netbsd128-rump-virtio".to_string(),
             os_origin: "NetBSD 12.8+".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-                UniversalSubsystemCategory::DriversHardware.as_str().to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::DriversHardware
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/netbsd/rump_virtio_v78.rs b/sys/netbsd/rump_virtio_v78.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/netbsd/rump_virtio_v78.rs b/sys/netbsd/rump_virtio_v78.rs"
+                    .to_string(),
         }
     }
 }
@@ -283,14 +309,17 @@ impl DragonFlyBsd80Hammer3EngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-05-DRAGONFLY-80".to_string(),
-            title: "feat(dragonfly): DragonFly BSD 8.0+ HAMMER3 Multi-Master Replication V78 Engine".to_string(),
+            title:
+                "feat(dragonfly): DragonFly BSD 8.0+ HAMMER3 Multi-Master Replication V78 Engine"
+                    .to_string(),
             component_name: "sigmaos-dragonfly80-hammer3".to_string(),
             os_origin: "DragonFly BSD 8.0+".to_string(),
             status: OsPrStatusV78::Validated,
-            impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-            ],
-            patch_diff: "diff --git a/sys/dragonfly/hammer3_v78.rs b/sys/dragonfly/hammer3_v78.rs".to_string(),
+            impacted_subsystems: vec![UniversalSubsystemCategory::FilesystemStorage
+                .as_str()
+                .to_string()],
+            patch_diff: "diff --git a/sys/dragonfly/hammer3_v78.rs b/sys/dragonfly/hammer3_v78.rs"
+                .to_string(),
         }
     }
 }
@@ -324,15 +353,20 @@ impl IllumosOpenZfsDTraceEbpfEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-06-ILLUMOS".to_string(),
-            title: "feat(illumos): Illumos OpenZFS eBPF DTrace & Crossbow VNIC Switch V78 Engine".to_string(),
+            title: "feat(illumos): Illumos OpenZFS eBPF DTrace & Crossbow VNIC Switch V78 Engine"
+                .to_string(),
             component_name: "sigmaos-illumos-dtrace-crossbow".to_string(),
             os_origin: "Illumos".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
+                UniversalSubsystemCategory::ObservabilityDiagnostics
+                    .as_str()
+                    .to_string(),
                 UniversalSubsystemCategory::Networking.as_str().to_string(),
             ],
-            patch_diff: "diff --git a/sys/illumos/dtrace_ebpf_v78.rs b/sys/illumos/dtrace_ebpf_v78.rs".to_string(),
+            patch_diff:
+                "diff --git a/sys/illumos/dtrace_ebpf_v78.rs b/sys/illumos/dtrace_ebpf_v78.rs"
+                    .to_string(),
         }
     }
 }
@@ -366,14 +400,16 @@ impl HaikuBefsAttributeIndexingEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-07-HAIKU".to_string(),
-            title: "feat(haiku): Haiku BeFS Relational Attribute Indexing & Query V78 Engine".to_string(),
+            title: "feat(haiku): Haiku BeFS Relational Attribute Indexing & Query V78 Engine"
+                .to_string(),
             component_name: "sigmaos-haiku-befs-index".to_string(),
             os_origin: "Haiku OS".to_string(),
             status: OsPrStatusV78::Validated,
-            impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-            ],
-            patch_diff: "diff --git a/sys/haiku/befs_index_v78.rs b/sys/haiku/befs_index_v78.rs".to_string(),
+            impacted_subsystems: vec![UniversalSubsystemCategory::FilesystemStorage
+                .as_str()
+                .to_string()],
+            patch_diff: "diff --git a/sys/haiku/befs_index_v78.rs b/sys/haiku/befs_index_v78.rs"
+                .to_string(),
         }
     }
 }
@@ -407,15 +443,19 @@ impl Plan9Plumber9P2000EngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-08-PLAN9".to_string(),
-            title: "feat(plan9): Plan 9 9P2000.L VFS & Plumber IPC Pattern Router V78 Engine".to_string(),
+            title: "feat(plan9): Plan 9 9P2000.L VFS & Plumber IPC Pattern Router V78 Engine"
+                .to_string(),
             component_name: "sigmaos-plan9-plumber-9p".to_string(),
             os_origin: "Plan 9 from Bell Labs".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
                 UniversalSubsystemCategory::IpcMemory.as_str().to_string(),
             ],
-            patch_diff: "diff --git a/sys/plan9/plumber_v78.rs b/sys/plan9/plumber_v78.rs".to_string(),
+            patch_diff: "diff --git a/sys/plan9/plumber_v78.rs b/sys/plan9/plumber_v78.rs"
+                .to_string(),
         }
     }
 }
@@ -449,15 +489,21 @@ impl RedoxFsCapabilitySchemeEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-09-REDOX".to_string(),
-            title: "feat(redox): RedoxFS CoW Transactional Scheme Capability Tokens V78 Engine".to_string(),
+            title: "feat(redox): RedoxFS CoW Transactional Scheme Capability Tokens V78 Engine"
+                .to_string(),
             component_name: "sigmaos-redoxfs-scheme-engine".to_string(),
             os_origin: "Redox OS".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
-                UniversalSubsystemCategory::FilesystemStorage.as_str().to_string(),
-                UniversalSubsystemCategory::SecuritySandboxing.as_str().to_string(),
+                UniversalSubsystemCategory::FilesystemStorage
+                    .as_str()
+                    .to_string(),
+                UniversalSubsystemCategory::SecuritySandboxing
+                    .as_str()
+                    .to_string(),
             ],
-            patch_diff: "diff --git a/sys/redox/scheme_v78.rs b/sys/redox/scheme_v78.rs".to_string(),
+            patch_diff: "diff --git a/sys/redox/scheme_v78.rs b/sys/redox/scheme_v78.rs"
+                .to_string(),
         }
     }
 }
@@ -515,15 +561,42 @@ impl OpenSourceOsUnimplementedIdeasV78PrSuite {
 
     pub fn evaluate_parity_matrix(&self) -> BTreeMap<String, bool> {
         let mut map = BTreeMap::new();
-        map.insert("Linux 6.32+ SchedExt".to_string(), self.linux632.sched_ext_ebpf_v5_active);
-        map.insert("FreeBSD 16.2+ Capsicum".to_string(), self.freebsd162.capsicum_rights_verification);
-        map.insert("OpenBSD 9.1+ Pinsyscall".to_string(), self.openbsd91.pinsyscall_active);
-        map.insert("NetBSD 12.8+ Rump VirtIO".to_string(), self.netbsd128.rump_pci_driver_isolation);
-        map.insert("DragonFly BSD 8.0+ HAMMER3".to_string(), self.dragonfly80.hammer3_pfs_multi_master_active);
-        map.insert("Illumos DTrace eBPF".to_string(), self.illumos.dtrace_ebpf_translation_layer);
-        map.insert("Haiku BeFS Indexing".to_string(), self.haiku.befs_attribute_index_active);
-        map.insert("Plan 9 Plumber Router".to_string(), self.plan9.vfs_9p2000l_active);
-        map.insert("RedoxFS CoW Schemes".to_string(), self.redox.redoxfs_cow_transactional);
+        map.insert(
+            "Linux 6.32+ SchedExt".to_string(),
+            self.linux632.sched_ext_ebpf_v5_active,
+        );
+        map.insert(
+            "FreeBSD 16.2+ Capsicum".to_string(),
+            self.freebsd162.capsicum_rights_verification,
+        );
+        map.insert(
+            "OpenBSD 9.1+ Pinsyscall".to_string(),
+            self.openbsd91.pinsyscall_active,
+        );
+        map.insert(
+            "NetBSD 12.8+ Rump VirtIO".to_string(),
+            self.netbsd128.rump_pci_driver_isolation,
+        );
+        map.insert(
+            "DragonFly BSD 8.0+ HAMMER3".to_string(),
+            self.dragonfly80.hammer3_pfs_multi_master_active,
+        );
+        map.insert(
+            "Illumos DTrace eBPF".to_string(),
+            self.illumos.dtrace_ebpf_translation_layer,
+        );
+        map.insert(
+            "Haiku BeFS Indexing".to_string(),
+            self.haiku.befs_attribute_index_active,
+        );
+        map.insert(
+            "Plan 9 Plumber Router".to_string(),
+            self.plan9.vfs_9p2000l_active,
+        );
+        map.insert(
+            "RedoxFS CoW Schemes".to_string(),
+            self.redox.redoxfs_cow_transactional,
+        );
         map
     }
 }
