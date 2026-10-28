@@ -561,7 +561,7 @@ pub use sigmalight::{
     LightType, LightingScene, SigmaLight,
 };
 pub use sigmalogrotate::{
-    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, SigmaLogFileConfig,
+    get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod, LogFileConfig as OtherLogFileConfig,
     SigmaLogRotate,
 };
 pub use sigmalvm::{
