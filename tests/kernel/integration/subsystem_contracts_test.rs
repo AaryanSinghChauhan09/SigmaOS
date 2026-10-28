@@ -1,6 +1,9 @@
 //! Integration test for SigmaOS Kernel Subsystem Contracts & Dependencies
 
-use sigmaos::governance::kernel_lifecycle_program::{BootState, KernelLifecycleProgramEngine, ReleaseGate};
+#[path = "../../../src/governance/kernel_lifecycle_program.rs"]
+mod kernel_lifecycle_program;
+
+use kernel_lifecycle_program::{BootState, KernelLifecycleProgramEngine, ReleaseGate};
 
 #[test]
 fn test_kernel_subsystem_contract_verification() {

@@ -1,4 +1,7 @@
-use sigmaos::diagnostics::{
+#[path = "../../src/diagnostics/mod.rs"]
+mod diagnostics;
+
+use diagnostics::{
     KernelBootDiagnosticReport, KernelPanicDiagnosticReport, SubsystemBootStatus,
     SimpleCrashPipeline, PipelineCapability, CrashSeverity, CrashPipeline,
 };
