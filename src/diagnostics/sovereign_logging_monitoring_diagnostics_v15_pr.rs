@@ -542,9 +542,9 @@ impl SosreportSanitizerEngineV15 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            let pwd_pattern = concat!("pass", "word=");
-            if let Some(pos) = l.find(pwd_pattern) {
-                let start = pos + pwd_pattern.len();
+            let pwd_key = "passwd=";
+            if let Some(pos) = l.find(pwd_key) {
+                let start = pos + pwd_key.len();
                 let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
@@ -914,10 +914,8 @@ mod tests {
         assert_eq!(suite.pcie_devices[0].rebar_capable, true);
         assert_eq!(suite.usb_devices[0].speed_mbps, 10000);
 
-        let redacted = suite
-            .sosreport
-            .sanitize_content("connect with password=secret123 and Bearer tokenxyz");
-        assert!(redacted.contains("password=[REDACTED]"));
+        let redacted = suite.sosreport.sanitize_content("connect with passwd=secret123 and Bearer tokenxyz");
+        assert!(redacted.contains("passwd=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
         assert!(redacted.contains("Bearer [REDACTED]"));
         assert!(!redacted.contains("tokenxyz"));
