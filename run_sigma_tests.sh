@@ -1368,7 +1368,7 @@ fi
 if [ -f "src/package/sovereign_distro_package_advancements_v78_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V78 PR test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v78_pr_test
+    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -L build/ -o build/sovereign_advancements_v78_pr_test
     ./build/sovereign_advancements_v78_pr_test
 fi
 
@@ -1536,6 +1536,12 @@ if [ -f "src/distro/tech_media_component_advancements_v75_pr.rs" ]; then
     echo "Running Sovereign Tech Media Component Advancements V75 test suite..."
     rustc --test src/distro/tech_media_component_advancements_v75_pr.rs --edition=2021 -o build/tech_media_v75_test
     ./build/tech_media_v75_test
+fi
+
+if [ -f "src/distro/tech_media_component_advancements_v76_pr.rs" ]; then
+    echo "Running Sovereign Tech Media Component Advancements V76 test suite..."
+    rustc --test src/distro/tech_media_component_advancements_v76_pr.rs --edition=2021 -o build/tech_media_v76_test
+    ./build/tech_media_v76_test
 fi
 
 if [ -f "src/open_source_os_gap_closure.rs" ]; then
