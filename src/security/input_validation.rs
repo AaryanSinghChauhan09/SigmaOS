@@ -15,6 +15,8 @@ pub const MAX_IPV4_LEN: usize = 15; // "255.255.255.255"
 pub const MAX_IPV6_LEN: usize = 39; // full IPv6 text
 pub const MAX_URL_LEN: usize = 2048; // Standard HTTP/HTTPS maximum URL length
 pub const MAX_EMAIL_LEN: usize = 254; // RFC 5321 maximum email length limit
+pub const MAX_HTTP_HEADER_NAME_LEN: usize = 256;
+pub const MAX_HTTP_HEADER_VALUE_LEN: usize = 8192;
 
 /// Errors produced by input validation routines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -805,6 +807,58 @@ pub fn validate_ipv6(addr: &[u8]) -> Result<(), ValidationError> {
         return Err(ValidationError::OutOfRange);
     }
 
+    Ok(())
+}
+
+// ── HTTP Header Validation ──────────────────────────────────────────────────
+
+/// Validate an HTTP header field name per RFC 7230 / RFC 9110 (`token`).
+///
+/// Rules:
+/// - Non-empty, ≤ `MAX_HTTP_HEADER_NAME_LEN` (256 bytes)
+/// - Composed exclusively of valid HTTP token characters (`tchar`):
+///   ASCII alphanumeric (`a-z`, `A-Z`, `0-9`) or `!#$%&'*+-.^_`|~`
+/// - Rejects colons (`:`), spaces, NUL bytes, and control characters to prevent
+///   HTTP header injection, CRLF injection, and response splitting (CWE-113).
+pub fn validate_http_header_name(name: &[u8]) -> Result<(), ValidationError> {
+    if name.is_empty() {
+        return Err(ValidationError::EmptyInput);
+    }
+    if name.len() > MAX_HTTP_HEADER_NAME_LEN {
+        return Err(ValidationError::TooLong);
+    }
+    for &b in name {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if b.is_ascii_alphanumeric() || b"!#$%&'*+-.^_`|~".contains(&b) {
+            continue;
+        }
+        return Err(ValidationError::InvalidChars);
+    }
+    Ok(())
+}
+
+/// Validate an HTTP header field value per RFC 7230 / RFC 9110.
+///
+/// Rules:
+/// - Length ≤ `MAX_HTTP_HEADER_VALUE_LEN` (8192 bytes)
+/// - Rejects NUL bytes (`0x00`) to prevent C-ABI string truncation (CWE-626)
+/// - Rejects control characters (`b < 32` except SP `0x20` and HTAB `0x09`) and DEL (`0x7F`)
+///   Rejects `\r` (`0x0D`) and `\n` (`0x0A`) to prevent HTTP response splitting,
+///   CRLF injection, and header parameter injection (CWE-113 / CWE-150).
+pub fn validate_http_header_value(val: &[u8]) -> Result<(), ValidationError> {
+    if val.len() > MAX_HTTP_HEADER_VALUE_LEN {
+        return Err(ValidationError::TooLong);
+    }
+    for &b in val {
+        if b == 0 {
+            return Err(ValidationError::NullByte);
+        }
+        if (b < 32 && b != b' ' && b != b'\t') || b == 127 {
+            return Err(ValidationError::InvalidChars);
+        }
+    }
     Ok(())
 }
 
@@ -1763,5 +1817,37 @@ mod tests {
             validate_email(b"user@example..com"),
             Err(ValidationError::InvalidChars)
         );
+    }
+
+    #[test]
+    fn test_validate_http_header_name_and_value() {
+        // Valid header names
+        assert_eq!(validate_http_header_name(b"Content-Type"), Ok(()));
+        assert_eq!(validate_http_header_name(b"X-Custom-Header_123"), Ok(()));
+        assert_eq!(validate_http_header_name(b"Authorization"), Ok(()));
+
+        // Invalid header names
+        assert_eq!(validate_http_header_name(b""), Err(ValidationError::EmptyInput));
+        assert_eq!(validate_http_header_name(b"Header:Name"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_http_header_name(b"Header Name"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_http_header_name(b"Header\r\nName"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_http_header_name(&[b'X', 0, b'Y']), Err(ValidationError::NullByte));
+
+        let long_name = [b'A'; MAX_HTTP_HEADER_NAME_LEN + 1];
+        assert_eq!(validate_http_header_name(&long_name), Err(ValidationError::TooLong));
+
+        // Valid header values
+        assert_eq!(validate_http_header_value(b"application/json; charset=utf-8"), Ok(()));
+        assert_eq!(validate_http_header_value(b"Bearer token_123\t"), Ok(()));
+        assert_eq!(validate_http_header_value(b""), Ok(()));
+
+        // Invalid header values (CRLF injection / response splitting CWE-113, NUL truncation CWE-626)
+        assert_eq!(validate_http_header_value(b"value\r\nSet-Cookie: session=evil"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_http_header_value(b"value\nHost: evil.com"), Err(ValidationError::InvalidChars));
+        assert_eq!(validate_http_header_value(b"v\x00al"), Err(ValidationError::NullByte));
+        assert_eq!(validate_http_header_value(b"value\x7f"), Err(ValidationError::InvalidChars));
+
+        let long_val = vec![b'V'; MAX_HTTP_HEADER_VALUE_LEN + 1];
+        assert_eq!(validate_http_header_value(&long_val), Err(ValidationError::TooLong));
     }
 }
