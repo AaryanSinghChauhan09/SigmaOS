@@ -217,7 +217,7 @@ impl Default for OpenBsdSoftraidBioctlV78PrEngine {
 }
 
 // ============================================================================
-// 4. DragonFly BSD HAMMER3 PFS Replication Engine V78
+// 4. DragonFly BSD HAMMER3 PFS Cluster Replication Engine V78
 // ============================================================================
 
 #[derive(Debug, Clone)]
@@ -353,7 +353,7 @@ impl AlpineApkV4ApkovlV78PrEngine {
     pub fn generate_overlay(&mut self, name: &str, files: u32) -> String {
         let spec = ApkovlOverlaySpecV78 {
             overlay_name: name.to_string(),
-            compressed_size: 8192,
+            compressed_size: 16384,
             file_count: files,
         };
         self.overlays.insert(name.to_string(), spec);
@@ -493,7 +493,7 @@ impl ClearLinuxStatelessPstateV78PrEngine {
                 governor: "performance".to_string(),
                 energy_perf_bias: 0,
                 min_freq_mhz: 800,
-                max_freq_mhz: 6000,
+                max_freq_mhz: 6400,
             },
         }
     }
@@ -539,7 +539,7 @@ impl IllumosDtraceCrossbowV78PrEngine {
             CrossbowVnicSpecV78 {
                 vnic_name: "vnic0".to_string(),
                 underlying_link: "e1000g0".to_string(),
-                max_bandwidth_mbps: 25000,
+                max_bandwidth_mbps: 40000,
                 priority: "high".to_string(),
             },
         );
@@ -714,7 +714,7 @@ mod tests {
         assert!(hdiff.contains("pfs-create"));
 
         let mut gentoo = GentooPortageEapi10V78PrEngine::new();
-        let gdiff = gentoo.add_ebuild("dev-lang/rust-1.89", "0", "1.89", vec!["clippy"]);
+        let gdiff = gentoo.add_ebuild("dev-lang/rust-1.90", "0", "1.90", vec!["clippy"]);
         assert!(gdiff.contains("EAPI=10"));
 
         let mut alpine = AlpineApkV4ApkovlV78PrEngine::new();

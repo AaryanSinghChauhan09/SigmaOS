@@ -12,7 +12,7 @@ fn test_linux_io_uring_futex2_v78_engine() {
     assert_eq!(engine.sq_ring_entries, 32768);
     assert_eq!(engine.sqpoll_cpu, 32);
 
-    let diff = engine.register_futex_waiter(0x1000, 42, 0, 1);
+    let diff = engine.register_futex_waiter(0x2000, 84, 0, 1);
     assert!(diff.contains("sys_futex_waitv_v78"));
     assert_eq!(engine.futex_waiters.len(), 1);
 }

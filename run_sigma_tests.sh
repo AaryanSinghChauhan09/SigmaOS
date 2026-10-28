@@ -1919,8 +1919,8 @@ if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v78_pr.rs" ]; then
     rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -o build/test_gap_closure_v78_pr
     ./build/test_gap_closure_v78_pr
 
-    rustc --test tests/test_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -L build/ -o build/test_linux_bsd_gap_closure_v78_pr_integration
-    ./build/test_linux_bsd_gap_closure_v78_pr_integration
+    rustc --test tests/test_linux_bsd_ecosystem_gap_closure_v78_pr.rs --edition=2021 -o build/test_gap_closure_v78_pr_integration
+    ./build/test_gap_closure_v78_pr_integration
 fi
 
 if [ -f "src/distro/omarchy_linux_gap_closure_pr_suite.rs" ]; then
