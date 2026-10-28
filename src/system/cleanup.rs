@@ -96,6 +96,18 @@ impl Clone for CleanupOption {
     }
 }
 
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::SeqCst)),
+        }
+    }
+}
+
 /// Cleanup statistics
 #[derive(Debug, Clone, Copy)]
 pub struct CleanupStats {
