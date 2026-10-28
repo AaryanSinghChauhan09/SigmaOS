@@ -220,7 +220,7 @@ pub use kernel::{
     SovereignKernelOpenSourceOsDistroAdvancementsV65PrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV68PrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV75PrGateway,
-    SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
+    SovereignKernelOpenSourceOsDistroAdvancementsV78PrGateway,
     SovereignKernelOpenSourceOsDistroInnovationsV72PrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };
