@@ -588,10 +588,16 @@ impl SimpleCommandRegistry {
         let sigmadiff = SigmaDiffCommand;
         self.commands.push(Some(Box::new(sigmadiff)));
 
-        let mintupdate = SimpleShellCommand::new(b"mintupdate", b"Check for and apply package updates via APT");
+        let mintupdate = SimpleShellCommand::new(
+            b"mintupdate",
+            b"Check for and apply package updates via APT",
+        );
         self.commands.push(Some(Box::new(mintupdate)));
 
-        let timeshift = SimpleShellCommand::new(b"timeshift", b"Create and manage Btrfs/ZFS snapshots for system rollback");
+        let timeshift = SimpleShellCommand::new(
+            b"timeshift",
+            b"Create and manage Btrfs/ZFS snapshots for system rollback",
+        );
         self.commands.push(Some(Box::new(timeshift)));
 
         let which = WhichCommand;

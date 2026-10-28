@@ -189,7 +189,13 @@ pub struct SovereignDisplayManagerSuiteEngineV75 {
 impl SovereignDisplayManagerSuiteEngineV75 {
     pub fn new(kind: DisplayManagerKindV75) -> Self {
         let mut seat_assignments = BTreeMap::new();
-        seat_assignments.insert("seat0".to_string(), vec!["/dev/dri/card0".to_string(), "/dev/input/event0".to_string()]);
+        seat_assignments.insert(
+            "seat0".to_string(),
+            vec![
+                "/dev/dri/card0".to_string(),
+                "/dev/input/event0".to_string(),
+            ],
+        );
         Self {
             dm_kind: kind,
             seat_assignments,
@@ -389,15 +395,24 @@ pub struct SovereignXdgPortalsUtilitiesEngineV75 {
 impl SovereignXdgPortalsUtilitiesEngineV75 {
     pub fn new() -> Self {
         let mut mime = BTreeMap::new();
-        mime.insert("text/html".to_string(), "org.gnome.Epiphany.desktop".to_string());
-        mime.insert("application/pdf".to_string(), "org.gnome.Evince.desktop".to_string());
+        mime.insert(
+            "text/html".to_string(),
+            "org.gnome.Epiphany.desktop".to_string(),
+        );
+        mime.insert(
+            "application/pdf".to_string(),
+            "org.gnome.Evince.desktop".to_string(),
+        );
 
         let mut portals = BTreeMap::new();
         portals.insert("default".to_string(), "gtk;hyprland".to_string());
 
         let mut user_dirs = BTreeMap::new();
         user_dirs.insert("XDG_DESKTOP_DIR".to_string(), "$HOME/Desktop".to_string());
-        user_dirs.insert("XDG_DOWNLOAD_DIR".to_string(), "$HOME/Downloads".to_string());
+        user_dirs.insert(
+            "XDG_DOWNLOAD_DIR".to_string(),
+            "$HOME/Downloads".to_string(),
+        );
 
         Self {
             mime_associations: mime,
@@ -424,7 +439,8 @@ impl SovereignXdgPortalsUtilitiesEngineV75 {
                 continue;
             }
             if let Some((k, v)) = trimmed.split_once('=') {
-                self.portals_config.insert(k.trim().to_string(), v.trim().to_string());
+                self.portals_config
+                    .insert(k.trim().to_string(), v.trim().to_string());
                 count += 1;
             }
         }
@@ -440,7 +456,8 @@ impl SovereignXdgPortalsUtilitiesEngineV75 {
             }
             if let Some((k, v)) = trimmed.split_once('=') {
                 let clean_val = v.trim().trim_matches('"');
-                self.user_dirs.insert(k.trim().to_string(), clean_val.to_string());
+                self.user_dirs
+                    .insert(k.trim().to_string(), clean_val.to_string());
                 count += 1;
             }
         }
@@ -515,7 +532,11 @@ impl SovereignFontTextLayoutEngineV75 {
     }
 
     pub fn parse_pango_markup(&self, markup: &str) -> String {
-        let clean = markup.replace("<b>", "").replace("</b>", "").replace("<i>", "").replace("</i>", "");
+        let clean = markup
+            .replace("<b>", "")
+            .replace("</b>", "")
+            .replace("<i>", "")
+            .replace("</i>", "");
         format!("PangoLayout::clean_text('{}')", clean)
     }
 }
@@ -542,12 +563,19 @@ impl SovereignInputMethodFrameworkEngineV75 {
         Self {
             ime_kind: kind,
             active_layout: "us".to_string(),
-            enabled_addons: vec!["pinyin".to_string(), "mozc".to_string(), "hangul".to_string()],
+            enabled_addons: vec![
+                "pinyin".to_string(),
+                "mozc".to_string(),
+                "hangul".to_string(),
+            ],
         }
     }
 
     pub fn handle_text_input_v3_commit(&mut self, text: &str) -> String {
-        format!("text-input-v3: committed '{}' via {:?}", text, self.ime_kind)
+        format!(
+            "text-input-v3: committed '{}' via {:?}",
+            text, self.ime_kind
+        )
     }
 
     pub fn switch_layout(&mut self, layout: &str) {
@@ -586,7 +614,14 @@ impl SovereignNotificationDaemonEngineV75 {
         }
     }
 
-    pub fn notify(&mut self, app: &str, summary: &str, body: &str, urgency: u8, timeout: i32) -> u32 {
+    pub fn notify(
+        &mut self,
+        app: &str,
+        summary: &str,
+        body: &str,
+        urgency: u8,
+        timeout: i32,
+    ) -> u32 {
         let id = self.next_id;
         self.next_id += 1;
         if !self.dnd_enabled {
@@ -654,7 +689,10 @@ impl SovereignScreenLockerEngineV75 {
     }
 
     pub fn generate_kawase_blur_pipeline(&self) -> String {
-        format!("OpenGL::DualKawaseBlur(radius={}, passes=4)", self.blur_radius)
+        format!(
+            "OpenGL::DualKawaseBlur(radius={}, passes=4)",
+            self.blur_radius
+        )
     }
 }
 
@@ -724,19 +762,32 @@ pub struct SovereignDesktopServicesV75PrGatewayEngine {
 
 impl SovereignDesktopServicesV75PrGatewayEngine {
     pub fn new() -> Self {
-        Self { proposals: Vec::new() }
+        Self {
+            proposals: Vec::new(),
+        }
     }
 
     pub fn generate_10_distro_prs(&mut self) -> usize {
         let distros = [
-            "Debian", "Ubuntu", "Fedora", "Arch Linux", "Alpine Linux",
-            "FreeBSD", "OpenBSD", "Void Linux", "Gentoo", "openSUSE",
+            "Debian",
+            "Ubuntu",
+            "Fedora",
+            "Arch Linux",
+            "Alpine Linux",
+            "FreeBSD",
+            "OpenBSD",
+            "Void Linux",
+            "Gentoo",
+            "openSUSE",
         ];
         for d in distros {
             self.proposals.push(DesktopPrProposalV75 {
                 distro_target: d.to_string(),
                 component_name: "SovereignDesktopServicesV75".to_string(),
-                description: format!("Integrate V75 GTK/Qt/Polkit/Portals/Font/IME suite into {}", d),
+                description: format!(
+                    "Integrate V75 GTK/Qt/Polkit/Portals/Font/IME suite into {}",
+                    d
+                ),
                 code_changes_count: 45,
                 passed_audit: true,
             });
@@ -785,7 +836,8 @@ mod tests {
         let res = dm.authenticate_pam(&req);
         assert!(res.authenticated);
 
-        let limits = dm.parse_bsd_login_conf("default:\\\n  :maxproc=2048:\\\n  :openfiles=1024:\n");
+        let limits =
+            dm.parse_bsd_login_conf("default:\\\n  :maxproc=2048:\\\n  :openfiles=1024:\n");
         assert_eq!(limits.get("maxproc"), Some(&"2048".to_string()));
 
         let xdmcp = dm.build_xdmcp_query("192.168.1.10");
@@ -824,7 +876,10 @@ mod tests {
 
         let dirs_count = portals.parse_user_dirs("XDG_DOCUMENTS_DIR=\"$HOME/Documents\"\n");
         assert_eq!(dirs_count, 1);
-        assert_eq!(portals.user_dirs.get("XDG_DOCUMENTS_DIR"), Some(&"$HOME/Documents".to_string()));
+        assert_eq!(
+            portals.user_dirs.get("XDG_DOCUMENTS_DIR"),
+            Some(&"$HOME/Documents".to_string())
+        );
     }
 
     #[test]
@@ -835,7 +890,9 @@ mod tests {
         assert_eq!(glyphs.len(), 5);
 
         let mut ime = SovereignInputMethodFrameworkEngineV75::new(ImeEngineKindV75::Fcitx5);
-        assert!(ime.handle_text_input_v3_commit("Text").contains("committed 'Text'"));
+        assert!(ime
+            .handle_text_input_v3_commit("Text")
+            .contains("committed 'Text'"));
 
         let mut notif = SovereignNotificationDaemonEngineV75::new();
         let nid = notif.notify("App", "Sum", "Body", 1, 3000);

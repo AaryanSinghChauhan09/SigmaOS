@@ -62,7 +62,9 @@ impl WordcraftSemanticAiSummarizerV67Engine {
     pub fn generate_proposal(&self) -> WordcraftV67PrProposalManifest {
         WordcraftV67PrProposalManifest {
             pr_id: 6701,
-            pr_title: String::from("Wordcraft Semantic AI Summarizer & Keyphrase Extraction V67 Engine"),
+            pr_title: String::from(
+                "Wordcraft Semantic AI Summarizer & Keyphrase Extraction V67 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / AI Engine"),
             original_suite: String::from("ArtCraft Wordcraft AI V67"),
             components_added: vec![
@@ -133,7 +135,9 @@ impl WordcraftFootnoteEndnoteCrossReferenceV67Engine {
     pub fn generate_proposal(&self) -> WordcraftV67PrProposalManifest {
         WordcraftV67PrProposalManifest {
             pr_id: 6702,
-            pr_title: String::from("Wordcraft Footnote, Endnote & Dynamic Cross-Reference Pointer V67 Engine"),
+            pr_title: String::from(
+                "Wordcraft Footnote, Endnote & Dynamic Cross-Reference Pointer V67 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Citation Layout"),
             original_suite: String::from("ArtCraft Wordcraft References V67"),
             components_added: vec![
@@ -187,20 +191,24 @@ impl WordcraftIndexGlossaryTableOfAuthoritiesV67Engine {
             pr_title: String::from("Wordcraft Index, Glossary & Table of Authorities V67 Engine"),
             target_subsystem: String::from("Wordcraft Creative Suite / Publishing & Legal"),
             original_suite: String::from("ArtCraft Wordcraft Indexing V67"),
-            components_added: vec![
-                String::from("WordcraftIndexGlossaryTableOfAuthoritiesV67Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftIndexGlossaryTableOfAuthoritiesV67Engine",
+            )],
             performance_multiplier: String::from("32.1x zero-copy alphabetical sorting"),
             status: String::from("MERGED_PR_STAGE_V67"),
         }
     }
 
     pub fn add_glossary_term(&mut self, term: &str, definition: &str) {
-        self.glossary.insert(term.to_string(), definition.to_string());
+        self.glossary
+            .insert(term.to_string(), definition.to_string());
     }
 
     pub fn add_index_term(&mut self, term: &str, page: usize) {
-        self.index_terms.entry(term.to_string()).or_default().push(page);
+        self.index_terms
+            .entry(term.to_string())
+            .or_default()
+            .push(page);
     }
 
     pub fn render_glossary(&self) -> String {
@@ -298,7 +306,12 @@ impl WordcraftDigitalSignatureTimestampVerifierV67Engine {
         }
     }
 
-    pub fn sign_document(&self, content: &str, signer: &str, authority: &str) -> SignatureManifestV67 {
+    pub fn sign_document(
+        &self,
+        content: &str,
+        signer: &str,
+        authority: &str,
+    ) -> SignatureManifestV67 {
         let mut hash: u64 = 0xcbf29ce484222325;
         for byte in content.bytes() {
             hash ^= byte as u64;
@@ -349,7 +362,9 @@ impl WordcraftInteractiveFormPdfAcroformGeneratorV67Engine {
     pub fn generate_proposal(&self) -> WordcraftV67PrProposalManifest {
         WordcraftV67PrProposalManifest {
             pr_id: 6706,
-            pr_title: String::from("Wordcraft Interactive Form & PDF AcroForm Generator V67 Engine"),
+            pr_title: String::from(
+                "Wordcraft Interactive Form & PDF AcroForm Generator V67 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Forms Engine"),
             original_suite: String::from("ArtCraft Wordcraft Forms V67"),
             components_added: vec![
@@ -371,7 +386,10 @@ impl WordcraftInteractiveFormPdfAcroformGeneratorV67Engine {
     }
 
     pub fn render_form_summary(&self) -> String {
-        format!("[V67 AcroForm]: {} interactive fields configured.", self.fields.len())
+        format!(
+            "[V67 AcroForm]: {} interactive fields configured.",
+            self.fields.len()
+        )
     }
 }
 
@@ -389,12 +407,14 @@ impl WordcraftMultiLanguageTransliterationPhoneticV67Engine {
     pub fn generate_proposal(&self) -> WordcraftV67PrProposalManifest {
         WordcraftV67PrProposalManifest {
             pr_id: 6707,
-            pr_title: String::from("Wordcraft Multi-Language Transliteration & Phonetic V67 Engine"),
+            pr_title: String::from(
+                "Wordcraft Multi-Language Transliteration & Phonetic V67 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Internationalization"),
             original_suite: String::from("ArtCraft Wordcraft Transliteration V67"),
-            components_added: vec![
-                String::from("WordcraftMultiLanguageTransliterationPhoneticV67Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftMultiLanguageTransliterationPhoneticV67Engine",
+            )],
             performance_multiplier: String::from("28.4x SIMD character map transliteration"),
             status: String::from("MERGED_PR_STAGE_V67"),
         }
@@ -502,7 +522,9 @@ impl WordcraftMarkdownLatexDocxBidirectionalTranspilerV67Engine {
     pub fn generate_proposal(&self) -> WordcraftV67PrProposalManifest {
         WordcraftV67PrProposalManifest {
             pr_id: 6709,
-            pr_title: String::from("Wordcraft Markdown / LaTeX / DOCX Bidirectional Transpiler V67 Engine"),
+            pr_title: String::from(
+                "Wordcraft Markdown / LaTeX / DOCX Bidirectional Transpiler V67 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Document Transpiler"),
             original_suite: String::from("ArtCraft Wordcraft Transpiler V67"),
             components_added: vec![
@@ -514,18 +536,29 @@ impl WordcraftMarkdownLatexDocxBidirectionalTranspilerV67Engine {
         }
     }
 
-    pub fn transpile(&self, content: &str, source: MarkupFormatV67, target: MarkupFormatV67) -> String {
+    pub fn transpile(
+        &self,
+        content: &str,
+        source: MarkupFormatV67,
+        target: MarkupFormatV67,
+    ) -> String {
         if source == target {
             return content.to_string();
         }
         match (source, target) {
             (MarkupFormatV67::Markdown, MarkupFormatV67::LaTeX) => {
-                format!("\\documentclass{{article}}\n\\begin{{document}}\n{}\n\\end{{document}}", content)
+                format!(
+                    "\\documentclass{{article}}\n\\begin{{document}}\n{}\n\\end{{document}}",
+                    content
+                )
             }
             (MarkupFormatV67::Markdown, MarkupFormatV67::HTML5) => {
                 format!("<article><p>{}</p></article>", content)
             }
-            _ => format!("[V67 Transpiled from {:?} to {:?}]: {}", source, target, content),
+            _ => format!(
+                "[V67 Transpiled from {:?} to {:?}]: {}",
+                source, target, content
+            ),
         }
     }
 }
@@ -544,12 +577,14 @@ impl WordcraftAccessibilityPdfUaScreenReaderOptimizerV67Engine {
     pub fn generate_proposal(&self) -> WordcraftV67PrProposalManifest {
         WordcraftV67PrProposalManifest {
             pr_id: 6710,
-            pr_title: String::from("Wordcraft Accessibility & PDF/UA Screen Reader Optimizer V67 Engine"),
+            pr_title: String::from(
+                "Wordcraft Accessibility & PDF/UA Screen Reader Optimizer V67 Engine",
+            ),
             target_subsystem: String::from("Wordcraft Creative Suite / Accessibility"),
             original_suite: String::from("ArtCraft Wordcraft Accessibility V67"),
-            components_added: vec![
-                String::from("WordcraftAccessibilityPdfUaScreenReaderOptimizerV67Engine"),
-            ],
+            components_added: vec![String::from(
+                "WordcraftAccessibilityPdfUaScreenReaderOptimizerV67Engine",
+            )],
             performance_multiplier: String::from("15.9x tagged structure tree verification"),
             status: String::from("MERGED_PR_STAGE_V67"),
         }
@@ -604,7 +639,10 @@ impl WordcraftArtcraftMissingComponentsV67PrSuite {
 
         // Test 1: Summarizer
         let ai = WordcraftSemanticAiSummarizerV67Engine::new();
-        let summary = ai.summarize("SigmaOS provides high performance document processing.", SummarizationModeV67::ExecutiveSummary);
+        let summary = ai.summarize(
+            "SigmaOS provides high performance document processing.",
+            SummarizationModeV67::ExecutiveSummary,
+        );
         if !summary.contains("Executive Summary") {
             return false;
         }
@@ -612,7 +650,11 @@ impl WordcraftArtcraftMissingComponentsV67PrSuite {
         // Test 2: Notes
         let mut notes_eng = WordcraftFootnoteEndnoteCrossReferenceV67Engine::new();
         notes_eng.add_note(NoteKindV67::Footnote, "1", "See reference A.", 1);
-        if notes_eng.render_notes_for_page(1, NoteKindV67::Footnote).len() != 1 {
+        if notes_eng
+            .render_notes_for_page(1, NoteKindV67::Footnote)
+            .len()
+            != 1
+        {
             return false;
         }
 
@@ -659,7 +701,8 @@ impl WordcraftArtcraftMissingComponentsV67PrSuite {
 
         // Test 9: Transpiler
         let transpiler = WordcraftMarkdownLatexDocxBidirectionalTranspilerV67Engine::new();
-        let latex = transpiler.transpile("Header", MarkupFormatV67::Markdown, MarkupFormatV67::LaTeX);
+        let latex =
+            transpiler.transpile("Header", MarkupFormatV67::Markdown, MarkupFormatV67::LaTeX);
         if !latex.contains("documentclass") {
             return false;
         }
