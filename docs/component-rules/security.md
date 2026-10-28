@@ -4,12 +4,13 @@
 security-agent
 
 ## Upstream references
-- OpenBSD pledge/unveil & Pinsyscall
-- FreeBSD Capsicum sandbox framework
-- Linux Seccomp & Landlock
+- OpenBSD pledge and unveil
+- FreeBSD Capsicum sandbox model
+- Linux capabilities & seccomp
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Security components.
+Define privilege isolation, capability enforcement, and sandboxing rules
+for SigmaOS Security components.
 
 ## Mandatory rules
 
@@ -20,17 +21,17 @@ Define required behavior, safety boundaries, and validation for SigmaOS Security
 
 ## Prohibited
 
-- Implicit root or elevated privilege escalation
+- Default root or ambient privilege exposure
 - Unsandboxed execution of untrusted package scripts
-- Merging security changes without negative/denial tests
-- Disabling security checks for convenience
+- Security claims without denial test verification
+- Status promotion without security review signoff
 
 ## Required evidence
 
-- Security capability denial test suite report
-- Sandbox containment verification log
-- Dedicated security review sign-off
-- Fuzzing and static analysis reports
+- Capability denial test report
+- Fuzzing & negative security check log
+- Security audit signoff report
+- Regression test for every security advisory
 
 ## Promotion criteria
 

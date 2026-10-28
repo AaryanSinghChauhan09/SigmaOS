@@ -4,12 +4,13 @@
 kernel-agent
 
 ## Upstream references
-- Linux kernel entry
-- xv6 / OSDev bootloader & kernel architecture
+- Linux Kernel entry & sysvec
+- xv6 kernel boot
 - FreeBSD kernel initialization
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Kernel components.
+Define required boot contract, safety boundaries, and validation
+for SigmaOS Kernel components.
 
 ## Mandatory rules
 
@@ -21,16 +22,16 @@ Define required behavior, safety boundaries, and validation for SigmaOS Kernel c
 
 ## Prohibited
 
-- Unchecked raw pointer dereferences in kernel space
-- Unhandled panic conditions or silent continuing after fatal errors
-- Direct hardware access without defined abstraction layers
-- Status promotion without QEMU boot validation
+- Unjustified unsafe code blocks
+- Unvalidated user pointers in syscalls
+- Silent panic continuations
+- Status promotion without runtime boot logs
 
 ## Required evidence
 
-- Unit test report (`cargo test --lib`)
-- Integration test report (`./run_sigma_tests.sh`)
-- QEMU boot-to-shell log and boot trace
+- Unit test report
+- Integration test report
+- QEMU kernel boot trace log
 - Regression test for every bug fix
 
 ## Promotion criteria

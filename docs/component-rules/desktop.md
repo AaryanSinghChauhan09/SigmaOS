@@ -4,33 +4,33 @@
 desktop-agent
 
 ## Upstream references
-- Linux Mint Cinnamon / GTK ecosystem
-- elementary OS Pantheon & Granite HIG
-- Hyprland / Wayland compositor architecture
+- Linux Mint Cinnamon / XApp
+- elementary OS Pantheon
+- Omarchy / Wayland desktop stack
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Zenith Desktop components.
+Define graphical desktop stability, input failure resilience, and UI session lifecycle
+for SigmaOS Desktop components.
 
 ## Mandatory rules
 
 1. Desktop features must not precede a stable boot and core-runtime path.
 2. Every desktop change must define behavior for input loss, application crash, display failure, and shutdown.
 3. Graphical claims require a QEMU graphical smoke test.
-4. User interface components must fail gracefully without crashing core graphics services.
 
 ## Prohibited
 
-- Desktop development blocking kernel/VFS/boot validation work
-- Silent crashes or unhandled display server disconnects
-- Unsupported desktop parity claims without graphical evidence
-- Status promotion without QEMU GUI verification
+- Adding UI features while core boot or system paths are unstable
+- Silent crashes on display or compositor failure
+- Unsupported GUI parity claims without visual or smoke test evidence
+- Status promotion without QEMU graphical smoke test logs
 
 ## Required evidence
 
-- Desktop unit test report
-- Input/display failure recovery test log
-- QEMU graphical boot & display smoke test output
-- Interface regression test suite log
+- Unit test report
+- Input loss & app crash recovery log
+- QEMU graphical smoke test log
+- Regression test for desktop session crashes
 
 ## Promotion criteria
 

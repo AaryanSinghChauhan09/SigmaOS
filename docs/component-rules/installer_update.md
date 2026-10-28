@@ -4,33 +4,33 @@
 installer-agent
 
 ## Upstream references
-- Debian Subiquity / Calamares installer engine
-- Fedora Silverblue / OSTree A/B update mechanism
-- Linux Mint Update Manager (mintupdate)
+- Fedora / RHEL Anaconda & OSTree updates
+- Debian Subiquity / debian-installer
+- Linux Mint Timeshift & Update Manager
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Installer and Update components.
+Define installation verification, atomic updates, and recovery rollback safety
+for SigmaOS Installer & Update components.
 
 ## Mandatory rules
 
 1. Installation must be testable in QEMU from a clean virtual disk.
 2. Updates must define pre-checks, staged activation, rollback, and recovery.
 3. A failed update must either complete atomically or restore the prior state.
-4. Storage formatting or partition modification requires explicit confirmation safety checks.
 
 ## Prohibited
 
-- Destructive disk operations without dry-run validation options
-- Unrecoverable update failures that leave system unbootable
-- Direct drive modification without verifying target disk identifiers
-- Parity claims without clean virtual disk installation logs
+- Unrecoverable installation or update failures
+- Modifying target disk state without user confirmation or dry-run validation
+- Incomplete updates leaving system in an unbootable state
+- Status promotion without full QEMU clean install/update test logs
 
 ## Required evidence
 
-- Clean virtual disk QEMU installation log
-- Failure injection & atomic rollback verification test output
-- System update dry-run report
-- Recovery runbook execution trace
+- QEMU clean disk install report
+- Staged update and atomic rollback log
+- Recovery runbook validation report
+- Regression test for failed update recovery
 
 ## Promotion criteria
 

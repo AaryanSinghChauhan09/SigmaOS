@@ -4,32 +4,32 @@
 ipc-agent
 
 ## Upstream references
-- Linux IPC (pipes, signals, domain sockets)
-- FreeBSD Capsicum IPC
-- xv6 pipe implementation
+- Linux IPC primitives (pipes, signal, unix sockets)
+- FreeBSD Capsicum / IPC mechanisms
+- xv6 pipe & signal handling
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Inter-Process Communication components.
+Define ownership, capability validation, and inter-process lifecycle
+for SigmaOS IPC components.
 
 ## Mandatory rules
 
 1. Pipes, signals, shared memory, message queues, and event mechanisms must have defined ownership and lifetime rules.
 2. IPC must enforce capability checks.
 3. Cross-process tests are mandatory for every IPC mechanism.
-4. Resource cleanup must occur automatically when process endpoints terminate.
 
 ## Prohibited
 
-- Unchecked IPC message buffers or unbounded queueing
-- Unauthenticated IPC channels bypassing capability checks
-- Orphaned IPC channels after process exit
-- Status promotion without multi-process integration tests
+- Unbounded IPC queue allocations
+- Unsandboxed or unverified cross-process communication
+- Bypassing capability checks on IPC endpoints
+- Status promotion without cross-process integration evidence
 
 ## Required evidence
 
-- IPC unit test report
-- Cross-process end-to-end test execution log
-- Resource leakage audit log on process termination
+- Unit test report
+- Cross-process interop test report
+- Stress test log for queue limits
 - Regression test for every IPC bug fix
 
 ## Promotion criteria

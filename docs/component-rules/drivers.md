@@ -1,15 +1,16 @@
 # Component Rules: Drivers
 
 ## Component owner
-drivers-agent
+driver-agent
 
 ## Upstream references
-- Linux virtio device subsystem
-- FreeBSD device driver architecture
-- Redox OS userspace driver model
+- Linux virtio subsystem
+- FreeBSD device driver framework
+- Redox driver schemes
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Hardware Driver components.
+Define hardware probe, lifecycle contracts, and validation evidence
+for SigmaOS Device Driver components.
 
 ## Mandatory rules
 
@@ -20,17 +21,17 @@ Define required behavior, safety boundaries, and validation for SigmaOS Hardware
 
 ## Prohibited
 
-- Unsubstantiated parity or physical hardware support claims
-- Missing initialization or shutdown cleanup handlers
-- Direct port/MMIO access without safety wrappers
-- Promotion to `Supported` status without runtime hardware logs
+- Claiming physical hardware compatibility without test logs
+- Ignoring driver probe failure or device disconnects
+- Bypassing I/O memory safety boundaries
+- Status promotion without device-specific runtime logs
 
 ## Required evidence
 
-- Driver unit test suite log
-- QEMU virtio device verification output (virtio-blk, virtio-net, VGA)
-- Named device evidence ledger entry with test log
-- Regression test for driver stability
+- Unit test report
+- QEMU virtio device test report
+- Hardware diagnostic log (when physical claims made)
+- Regression test for driver crashes
 
 ## Promotion criteria
 

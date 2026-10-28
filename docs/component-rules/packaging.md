@@ -5,11 +5,12 @@ packaging-agent
 
 ## Upstream references
 - Arch Linux pacman & PKGBUILD
-- Debian dpkg / APT ecosystem
-- Fedora RPM / DNF dependency management
+- Debian dpkg & apt
+- Nix package store
 
 ## Purpose
-Define required behavior, safety boundaries, and validation for SigmaOS Package Management components.
+Define package metadata verification, dependency resolution, and sandboxed installation
+for SigmaOS Packaging components.
 
 ## Mandatory rules
 
@@ -20,17 +21,17 @@ Define required behavior, safety boundaries, and validation for SigmaOS Package 
 
 ## Prohibited
 
-- Executing package scripts outside an isolated sandbox
-- Mutating system state before metadata verification completes
-- Unresolved dependency loops or broken graph execution
-- Unsupported package format claims without dry-run validation
+- Executing untrusted package scripts outside a sandbox
+- Non-deterministic or unvalidated package dependency trees
+- Overwriting existing package files without atomic transaction safety
+- Status promotion without dry-run and install evidence
 
 ## Required evidence
 
-- Package metadata parser test suite report
-- Dependency graph dry-run execution report
-- Sandboxed script execution security log
-- Atomic rollback verification test
+- Unit test report
+- Dependency resolution dry-run report
+- Package script sandbox denial log
+- Regression test for package corruption
 
 ## Promotion criteria
 
