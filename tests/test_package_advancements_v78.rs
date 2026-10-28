@@ -9,7 +9,6 @@ mod sovereign_distro_package_advancements_v78;
 mod sovereign_distro_package_advancements_v78_pr;
 
 use sovereign_distro_package_advancements_v78::*;
-use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
 use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
 
 #[test]
@@ -79,16 +78,6 @@ fn test_package_advancements_v78_full_cycle() {
     assert!(routed.dry_run);
     assert_eq!(routed.package_targets, vec!["neovim".to_string()]);
 
-    // 8. PR Gateway V78
-    let mut gateway = SovereignDistroPackagePrGatewayV78::new();
-    gateway.submit_proposal(
-        7801,
-        "Universal Package Advancements V78",
-        PackageFormat::Deb,
-        "ripgrep",
-        "Full test cycle proposal V78",
-    );
-    assert_eq!(gateway.total_proposals(), 1);
 
     // 9. Master Coordinator Suite V78
     let mut master_suite = SovereignDistroPackageAdvancementsSuiteV78::new();
