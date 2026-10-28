@@ -1617,13 +1617,15 @@ export function searchSyscalls() {
       containerEl.children.length = 0;
     }
     if (filtered.length === 0) {
-      const emptyState = document.createElement("div");
-      emptyState.className = "syscall-empty-state";
-      emptyState.setAttribute("role", "status");
-      emptyState.textContent = query
-        ? `No matching syscalls found for "${query}". Try searching for "write", "read", "exit", or "fork".`
-        : "No syscalls available.";
-      containerEl.appendChild(emptyState);
+      const emptyCard = document.createElement("div");
+      emptyCard.className = "syscall-empty-state";
+      emptyCard.setAttribute("role", "status");
+      emptyCard.style.padding = "10px";
+      emptyCard.style.color = "var(--text-muted)";
+      emptyCard.style.fontSize = "0.85rem";
+      emptyCard.style.fontStyle = "italic";
+      emptyCard.textContent = `No syscalls matching "${query}". Try searching "write", "read", "exit", or "fork".`;
+      containerEl.appendChild(emptyCard);
     } else {
       filtered.forEach((s) => {
         const card = document.createElement("div");

@@ -363,12 +363,12 @@ const syscallContainer = createMockElement("syscall-list-container");
 zenith.searchSyscalls();
 assert.strictEqual(syscallContainer.children.length, 1, "Expected searchSyscalls to filter 1 matching syscall");
 
-// Verify empty state handling for non-matching search queries
-syscallSearch.value = "nonexistent_syscall_xyz";
+// Test searchSyscalls empty state for non-matching query
+syscallSearch.value = "unknown_syscall_xyz";
 zenith.searchSyscalls();
-assert.strictEqual(syscallContainer.children.length, 1, "Expected searchSyscalls to append 1 empty state element");
-assert.strictEqual(syscallContainer.children[0].getAttribute("role"), "status", "Expected empty state element to have role='status'");
-assert.strictEqual(syscallContainer.children[0].textContent.includes("No matching syscalls found"), true, "Expected empty state message guidance text");
+assert.strictEqual(syscallContainer.children.length, 1, "Expected searchSyscalls empty state element when no match");
+assert.strictEqual(syscallContainer.children[0].getAttribute("role"), "status", "Expected searchSyscalls empty state role='status'");
+assert.strictEqual(syscallContainer.children[0].textContent.includes("No syscalls matching"), true, "Expected empty state suggestion text");
 
 const fmCrumbs = createMockElement("fm-breadcrumbs");
 zenith.fmBack();
