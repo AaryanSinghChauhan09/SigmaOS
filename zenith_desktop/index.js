@@ -1185,6 +1185,7 @@ if (typeof window !== "undefined" && typeof document !== "undefined") {
     initOmniShellTerminal();
     initFormInputEnterSubmit();
     initFileManagerGrid();
+    searchSyscalls();
     updateDockAppStates();
   };
   if (document.readyState === "loading") {
@@ -1609,12 +1610,28 @@ export function searchSyscalls() {
   const filtered = syscalls.filter((s) => s.name.includes(query) || s.desc.toLowerCase().includes(query));
   if (containerEl) {
     containerEl.textContent = "";
-    filtered.forEach((s) => {
-      const card = document.createElement("div");
-      card.className = "syscall-list-card";
-      card.textContent = `${s.name}: ${s.desc}`;
-      containerEl.appendChild(card);
-    });
+    while (containerEl.firstChild) {
+      containerEl.removeChild(containerEl.firstChild);
+    }
+    if (containerEl.children && Array.isArray(containerEl.children)) {
+      containerEl.children.length = 0;
+    }
+    if (filtered.length === 0) {
+      const emptyState = document.createElement("div");
+      emptyState.className = "syscall-empty-state";
+      emptyState.setAttribute("role", "status");
+      emptyState.textContent = query
+        ? `No matching syscalls found for "${query}". Try searching for "write", "read", "exit", or "fork".`
+        : "No syscalls available.";
+      containerEl.appendChild(emptyState);
+    } else {
+      filtered.forEach((s) => {
+        const card = document.createElement("div");
+        card.className = "syscall-list-card";
+        card.textContent = `${s.name}: ${s.desc}`;
+        containerEl.appendChild(card);
+      });
+    }
   }
 }
 
