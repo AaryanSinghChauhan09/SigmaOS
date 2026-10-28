@@ -4,7 +4,7 @@ SigmaOS’s public README says the memory-management source contains modules for
 
 The key industry pattern is **two-stage memory management**: a boot-time allocator tracks firmware-provided memory and reservations; after core page metadata and paging are ready, usable pages transfer to the runtime page allocator. Linux uses memblock early and releases remaining pages to the buddy allocator; its runtime allocator also models nodes and zones. FreeBSD’s VM tracks physical pages with explicit states and queues. These are design references, not required SigmaOS APIs.
 
-## PMM Rules and Invariants
+## PMM rules and invariants
 
 - **Only explicitly usable RAM is allocatable.** Start from “reserved” and mark only validated usable ranges free. Exclude the kernel, bootloader data still in use, page tables, firmware tables until consumed, memory-mapped I/O, framebuffer, crash logs, and all reserved/unknown ranges. ACPI/UEFI memory types distinguish usable, reserved, reclaimable, NVS, unusable, and unaccepted ranges.
 - **Keep physical and virtual addresses distinct.** Use typed addresses and frame numbers; a physical address is not a dereferenceable pointer. Map memory explicitly through the VMM when CPU access is required.
@@ -18,7 +18,7 @@ The key industry pattern is **two-stage memory management**: a boot-time allocat
 - **Support observability without exposing writable allocator internals.** Provide read-only counters for present, reserved, free, allocated, and high-order frames, with snapshot consistency defined.
 - **Evidence gates capability claims.** A bitmap/buddy model test is not a booted PMM. “Integrated” requires real boot memory-map parsing and frame allocation in QEMU; “Supported” additionally requires repeatable tests across named architectures/configurations.
 
-## Proposed PR Sequence
+## Proposed PR sequence
 
 | PR | Proposed title | Scope | Acceptance criteria |
 |---|---|---|---|
@@ -45,7 +45,7 @@ The key industry pattern is **two-stage memory management**: a boot-time allocat
 
 **Recommended first milestone:** complete PRs 1–9 and 13 for a single x86_64 QEMU configuration. A correct simple frame allocator with safe reservations and real paging integration is more valuable than an unvalidated buddy allocator, NUMA policy, memory hotplug, or page-cache integration.
 
-## Periodic Maintenance PR Cadence
+## Periodic maintenance PR cadence
 
 | Cadence | Proposed recurring PR/task | Required evidence |
 |---|---|---|
@@ -62,7 +62,7 @@ The key industry pattern is **two-stage memory management**: a boot-time allocat
 
 These are maintenance review tasks, not automatic code changes. For any allocator performance claim, include the workload and configuration; prioritize correctness and memory safety over microbenchmarks.
 
-## Cross-Component Implementation Rules
+## Cross-component implementation rules
 
 - **Bootloader/firmware handoff:** Define one versioned memory-map structure; validate descriptor count/size and address arithmetic; preserve provenance. ACPI/UEFI distinguishes usable memory from reserved, NVS, unusable, and unaccepted ranges—never treat a missing descriptor as usable by default.
 - **Boot allocator to runtime PMM:** Transfer only regions not reserved by the kernel, bootloader, firmware, or early allocations. Keep a debug record of each reservation and its owner. Linux’s boot-time allocator is explicitly temporary and its remaining usable memory is handed off to the buddy allocator.
@@ -76,7 +76,7 @@ These are maintenance review tasks, not automatic code changes. For any allocato
 - **Diagnostics:** Expose present, usable, reserved, managed, free, and allocated memory separately; do not conflate “installed RAM” with “allocator-managed pages.”
 - **Memory hotplug and NUMA:** Treat as later features. Linux supports memory hotplug and node/zone management, but they depend on page metadata, migration, isolation, and VMM cooperation; do not add superficial APIs before those components exist.
 
-## PR Template and Merge Gates
+## PR template and merge gates
 
 ```text
 ## Summary
@@ -115,9 +115,9 @@ Link updated memory docs, feature inventory, and test evidence.
 - [ ] Required CI and QEMU checks pass; review conversations resolved
 ```
 
-Require one maintainer approval for isolated tests/docs and two relevant reviewers for boot memory-map changes, frame-state transitions, page-table integration, DMA constraints, or user-page exposure. Protect the default branch with pull-request reviews and required checks. GitHub branch protection supports these gates.
+Require one maintainer approval for isolated tests/docs and two relevant reviewers for boot memory-map changes, frame-state transitions, page-table integration, DMA constraints, or user-page exposure. Protect the default branch with pull-request reviews and required checks.
 
-## Completion Gates
+## Completion gates
 
 - **Prototype:** allocator algorithms or memory-map parsing pass unit tests, but are not connected to boot-time physical memory.
 - **Integrated:** a booted QEMU target parses its actual memory map, reserves critical ranges, allocates/frees physical frames, and maps them through the VMM without corrupting the kernel.
