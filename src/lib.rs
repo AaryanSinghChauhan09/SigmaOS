@@ -26,15 +26,18 @@ pub mod container;
 pub mod contributing;
 pub mod creative;
 pub use creative::anicraft::*;
+pub use creative::anicraft_advancements_pr::*;
 pub use creative::anicraft_advancements_v69_pr::*;
 pub use creative::anicraft_artcraft_parity_pr::*;
 pub use creative::anicraft_missing_components_parity_pr::*;
 pub use creative::artcraft_advancements_v75_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::craftlibs_artcraft_missing_components_v69_pr::*;
+pub use creative::craftlibs_artcraft_missing_components_v70_pr::*;
 pub use creative::craftlibs_missing_components_parity_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::cadcraft_artcraft_missing_components_v68_pr::*;
+pub use creative::cadcraft_artcraft_missing_components_v69_pr::*;
 // pub use creative::craftlibs_missing_components_parity_pr::*;
 pub use creative::designcraft::*;
 pub use creative::designcraft_artcraft_missing_components_v65_pr::*;
@@ -45,6 +48,7 @@ pub use creative::deckcraft::*;
 pub use creative::deckcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::deckcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::deckcraft_artcraft_missing_components_v68_pr::*;
+pub use creative::deckcraft_artcraft_missing_components_v69_pr::*;
 // pub use creative::designcraft_artcraft_parity_pr::*;
 // pub use creative::designcraft_missing_components_parity_pr::*;
 pub use creative::effectcraft_artcraft_missing_components_v65_pr::*;
@@ -55,6 +59,7 @@ pub use creative::effectcraft_artcraft_missing_components_v68_pr::*;
 pub use creative::effectcraft_missing_components_parity_pr::*;
 pub use creative::figcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::figcraft_artcraft_missing_components_v66_pr::*;
+pub use creative::figcraft_artcraft_missing_components_v67_pr::*;
 // pub use creative::figcraft_missing_components_parity_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::filmcraft_artcraft_missing_components_v66_pr::*;
@@ -67,11 +72,15 @@ pub use creative::filmcraft_artcraft_parity_pr::*;
 // pub use creative::filmcraft_missing_components_parity_pr::*;
 pub use creative::fontcraft::*;
 pub use creative::fontcraft_advancements_v77_pr::*;
+pub use creative::fontcraft_advancements_v78_pr::*;
 pub use creative::fontcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::fontcraft_artcraft_parity_pr::*;
 pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;
+pub use creative::lightcraft_artcraft_missing_components_v68_pr::*;
 pub use creative::fontcraft_missing_components_parity_pr::*;
 pub use creative::pdfcraft_artcraft_parity_pr::*;
+pub use creative::pdfcraft_missing_components_parity_pr::*;
+pub use creative::pdfcraft_artcraft_missing_components_v68_pr::*;
 pub use creative::photocraft_artcraft_missing_components_v65_pr::*;
 pub use creative::photocraft_artcraft_parity_pr::*;
 pub use creative::sovereign_artcraft_creative_suite_master_pr::*;
@@ -85,7 +94,9 @@ pub use creative::soundcraft_artcraft_parity_pr::*;
 pub use creative::soundcraft_missing_components_parity_pr::*;
 // pub use creative::threedcraft_artcraft_parity_pr::*;
 pub use creative::threedcraft_advancements_v74_pr::*;
+pub use creative::threedcraft_advancements_v78_pr::*;
 pub use creative::threedcraft_spatial_computing_pr::*;
+pub use creative::voicecraft::*;
 pub use creative::voicecraft_advancements_v73_pr::*;
 pub use creative::voicecraft_advancements_v76_pr::*;
 pub use creative::voicecraft_artcraft_parity_pr::*;
@@ -95,6 +106,7 @@ pub use creative::wordcraft::*;
 pub use creative::wordcraft_artcraft_missing_components_v65_pr::*;
 pub use creative::wordcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::wordcraft_artcraft_missing_components_v67_pr::*;
+pub use creative::wordcraft_artcraft_missing_components_v68_pr::*;
 pub use creative::wordcraft_artcraft_parity_pr::*;
 pub use creative::wordcraft_missing_components_parity_pr::*;
 pub mod customization;
@@ -120,6 +132,8 @@ pub use system::sovereign_init_and_supervisor_advancements_v69_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v71_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v75_pr::*;
 pub use system::sovereign_init_and_supervisor_advancements_v76_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v77_pr::*;
+pub use system::sovereign_init_and_supervisor_advancements_v78_pr::*;
 pub use system::*;
 pub mod driver;
 pub mod drivers;
@@ -315,6 +329,7 @@ pub use distro::open_source_os_missing_components_v74_pr::*;
 pub use distro::open_source_os_missing_components_v75_pr::*;
 pub use distro::open_source_os_missing_components_v76_pr::*;
 pub use distro::open_source_os_missing_components_v77_pr::*;
+pub use distro::open_source_os_missing_components_v79_pr::*;
 pub use package::sovereign_distro_package_advancements_v73::*;
 pub use package::sovereign_distro_package_advancements_v74::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
@@ -329,6 +344,7 @@ pub use distro::openbsd_missing_components_v64_pr::*;
 pub use distro::openbsd_missing_components_v65_pr::*;
 pub use distro::openbsd_missing_components_v66_pr::*;
 pub use distro::openbsd_missing_components_v67_pr::*;
+pub use distro::openbsd_missing_components_v68_pr::*;
 pub use distro::sovereign_2050_distro_supremacy_engine::*;
 pub use distro::sovereign_2055_distro_supremacy_engine::*;
 pub use distro::sovereign_2060_distro_supremacy_engine::*;
@@ -362,6 +378,7 @@ pub use distro::sovereign_universal_subsystem_interop::*;
 pub use distro::tech_media_publication_innovations::*;
 pub use distro::tech_media_component_advancements_v73_pr::*;
 pub use distro::tech_media_component_advancements_v74_pr::*;
+pub use distro::tech_media_component_advancements_v75_pr::*;
 pub use distro::SovereignMasterSubsystemDistroHarmonizer;
 pub use kernel::tss_ring3_user_mode::*;
 pub use open_source_obsoletion::open_source_os_gap_closure::*;
@@ -398,6 +415,7 @@ pub mod toolchain {
     pub mod self_host;
     pub mod sovereign_toolchain_development_advancements_pr;
     pub mod sovereign_toolchain_development_advancements_v74_pr;
+    pub mod sovereign_toolchain_development_advancements_v76_pr;
 }
 pub use toolchain::sovereign_toolchain_development_advancements_pr::*;
 pub use toolchain::sovereign_toolchain_development_advancements_v74_pr::*;
@@ -606,9 +624,7 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV61Gateway,
     SovereignVirtualizationAndContainersParityV63Gateway,
     SovereignVirtualizationAndContainersParityV67Gateway,
-    SovereignVirtualizationAndContainersParityV68Gateway,
-    SovereignVirtualizationAndContainersParityV74Gateway,
-    SovereignVirtualizationAndContainersParityV76Gateway, VirtualBoxBhyveVmmV61Engine,
+    SovereignVirtualizationAndContainersParityV68Gateway, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
     VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
     XenHypervisorV61Engine, XenHypervisorV63Engine, XenHypervisorV67Engine, XenHypervisorV68Engine,
@@ -673,6 +689,7 @@ pub mod power;
 pub use power::sovereign_acpi_slit_pr_engine::*;
 pub mod print;
 pub mod printing;
+pub use printing::*;
 pub mod privacy;
 pub mod provisioning;
 pub mod recovery;
@@ -761,6 +778,8 @@ pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
 pub use crate::distro::open_source_os_missing_components_v76_pr::*;
 pub use crate::distro::open_source_os_missing_components_v77_pr::*;
+pub use crate::distro::open_source_os_missing_components_v78_pr::*;
+pub use crate::distro::open_source_os_missing_components_v80_pr::*;
 
 pub mod screen;
 pub mod software_manager;
