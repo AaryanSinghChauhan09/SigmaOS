@@ -542,13 +542,9 @@ impl SosreportSanitizerEngineV15 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            let pass_prefix = concat!("pass", "word=");
-            if let Some(pos) = l.find(pass_prefix) {
-                let start = pos + pass_prefix.len();
-                let end = l[start..]
-                    .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
-                    .map(|idx| start + idx)
-                    .unwrap_or(l.len());
+            if let Some(pos) = l.find("password=") { // test mask password
+                let start = pos + "password=".len(); // test password length
+                let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
             }
