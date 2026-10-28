@@ -68,8 +68,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
 
         let mut proposals = Vec::new();
 
-        for spec in os_specs {
-            proposals.push(UnifiedOsDebianV72PrProposal {
+        for spec in os_specs {            proposals.push(UnifiedOsDebianV72PrProposal {
                 pr_id: format!("PR-OS-V72-{}", spec.pr_id),
                 title: spec.title,
                 target_component: spec.subsystem,
@@ -85,8 +84,7 @@ impl OpenSourceOsDebianUnimplementedIdeasV72PrSuite {
                 pr_id: format!("PR-DEBIAN-V71-{}", spec.pr_id),
                 title: spec.title,
                 target_component: spec.component_name,
-                status: format!("{:?}", spec.status),
-                description: spec.description,
+                status: format!("{:?}", spec.status),                description: spec.description,
                 git_diff_patch: spec.diff_patch,
                 pqc_signature: spec.pqc_signature,
             });

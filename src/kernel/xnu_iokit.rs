@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Principle: OBJECT-ORIENTED DRIVER MODEL, PLUG-AND-PLAY, POWER MANAGEMENT, WORKLOOP CONCURRENCY
 
-use alloc::{boxed::Box, collections::BTreeMap, string::String, vec::Vec};
+use alloc::{vec::Vec, string::String, collections::BTreeMap, boxed::Box};
 
 /// Lifecycle state of an IOService instance
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,12 +32,7 @@ pub enum IOMemoryDirection {
 
 impl IOMemoryDescriptor {
     pub fn new(phys_addr: u64, length: usize, direction: IOMemoryDirection) -> Self {
-        Self {
-            phys_addr,
-            length,
-            direction,
-            mapped: false,
-        }
+        Self { phys_addr, length, direction, mapped: false }
     }
 
     pub fn map(&mut self) -> u64 {
@@ -61,11 +56,7 @@ pub struct IOWorkLoop {
 
 impl IOWorkLoop {
     pub fn new(name: String) -> Self {
-        Self {
-            name,
-            running: false,
-            pending_work: 0,
-        }
+        Self { name, running: false, pending_work: 0 }
     }
 
     pub fn start(&mut self) {
@@ -98,10 +89,7 @@ pub struct IOCommandGate {
 
 impl IOCommandGate {
     pub fn new(work_loop: IOWorkLoop) -> Self {
-        Self {
-            work_loop,
-            commands: Vec::new(),
-        }
+        Self { work_loop, commands: Vec::new() }
     }
 
     pub fn run_action(&mut self, action: String) -> Result<(), &'static str> {
@@ -125,11 +113,7 @@ pub struct IOMatchingTable {
 }
 
 impl IOMatchingTable {
-    pub fn new() -> Self {
-        Self {
-            properties: BTreeMap::new(),
-        }
-    }
+    pub fn new() -> Self { Self { properties: BTreeMap::new() } }
 
     pub fn set(&mut self, key: &str, val: &str) {
         self.properties.insert(String::from(key), String::from(val));
@@ -173,16 +157,11 @@ pub struct IODriverRegistry {
 
 impl IODriverRegistry {
     pub fn new() -> Self {
-        Self {
-            drivers: Vec::new(),
-        }
+        Self { drivers: Vec::new() }
     }
 
     pub fn register_driver(&mut self, driver: Box<dyn IOService>) {
-        self.drivers.push(IODriverEntry {
-            driver,
-            state: IOServiceState::Uninitialized,
-        });
+        self.drivers.push(IODriverEntry { driver, state: IOServiceState::Uninitialized });
     }
 
     /// Probe all registered drivers against a hardware matching table
@@ -199,10 +178,7 @@ impl IODriverRegistry {
     }
 
     pub fn start_service(&mut self, index: usize) -> Result<(), &'static str> {
-        let entry = self
-            .drivers
-            .get_mut(index)
-            .ok_or("driver index out of range")?;
+        let entry = self.drivers.get_mut(index).ok_or("driver index out of range")?;
         if entry.state != IOServiceState::Probed {
             return Err("driver not in probed state");
         }
@@ -212,10 +188,7 @@ impl IODriverRegistry {
     }
 
     pub fn stop_service(&mut self, index: usize) -> Result<(), &'static str> {
-        let entry = self
-            .drivers
-            .get_mut(index)
-            .ok_or("driver index out of range")?;
+        let entry = self.drivers.get_mut(index).ok_or("driver index out of range")?;
         entry.driver.stop();
         entry.state = IOServiceState::Terminated;
         Ok(())
@@ -237,17 +210,11 @@ pub struct NullBlockDriver {
 }
 
 impl NullBlockDriver {
-    pub fn new() -> Self {
-        Self {
-            state: IOServiceState::Uninitialized,
-        }
-    }
+    pub fn new() -> Self { Self { state: IOServiceState::Uninitialized } }
 }
 
 impl IOService for NullBlockDriver {
-    fn name(&self) -> &str {
-        "NullBlockDriver"
-    }
+    fn name(&self) -> &str { "NullBlockDriver" }
 
     fn matching_table(&self) -> IOMatchingTable {
         let mut t = IOMatchingTable::new();
@@ -268,9 +235,7 @@ impl IOService for NullBlockDriver {
         self.state = IOServiceState::Terminated;
     }
 
-    fn state(&self) -> IOServiceState {
-        self.state
-    }
+    fn state(&self) -> IOServiceState { self.state }
 }
 
 pub struct PCINetworkDriver {
@@ -281,18 +246,12 @@ pub struct PCINetworkDriver {
 
 impl PCINetworkDriver {
     pub fn new(vendor_id: u16, device_id: u16) -> Self {
-        Self {
-            state: IOServiceState::Uninitialized,
-            vendor_id,
-            device_id,
-        }
+        Self { state: IOServiceState::Uninitialized, vendor_id, device_id }
     }
 }
 
 impl IOService for PCINetworkDriver {
-    fn name(&self) -> &str {
-        "PCINetworkDriver"
-    }
+    fn name(&self) -> &str { "PCINetworkDriver" }
 
     fn matching_table(&self) -> IOMatchingTable {
         let mut t = IOMatchingTable::new();
@@ -310,12 +269,8 @@ impl IOService for PCINetworkDriver {
         Ok(())
     }
 
-    fn stop(&mut self) {
-        self.state = IOServiceState::Terminated;
-    }
-    fn state(&self) -> IOServiceState {
-        self.state
-    }
+    fn stop(&mut self) { self.state = IOServiceState::Terminated; }
+    fn state(&self) -> IOServiceState { self.state }
 }
 
 #[cfg(test)]

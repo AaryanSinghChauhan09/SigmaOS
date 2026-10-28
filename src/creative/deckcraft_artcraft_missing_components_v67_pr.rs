@@ -91,9 +91,7 @@ impl DeckcraftKineticTypographyPathMorphingV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6701,
-            pr_title: String::from(
-                "PR #6701: Kinetic Vector Typography & Variable Font Path Morphing Engine V67",
-            ),
+            pr_title: String::from("PR #6701: Kinetic Vector Typography & Variable Font Path Morphing Engine V67"),
             target_subsystem: String::from("Deckcraft Typography & Motion Kernel V67"),
             original_suite: String::from("ArtCraft Deckcraft Kinetic Motion Suite"),
             components_added: vec![
@@ -146,9 +144,7 @@ impl DeckcraftRealtimeAudioVisualSyncKeyframeV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6702,
-            pr_title: String::from(
-                "PR #6702: Real-Time Audio-Visual Spectrum Keyframe Sync Engine V67",
-            ),
+            pr_title: String::from("PR #6702: Real-Time Audio-Visual Spectrum Keyframe Sync Engine V67"),
             target_subsystem: String::from("Deckcraft Audio-Visual Sync Pipeline V67"),
             original_suite: String::from("ArtCraft Deckcraft Sound-Reactive Slides"),
             components_added: vec![
@@ -184,26 +180,10 @@ impl DeckcraftSmartDiagramMatrixAutoLayoutV67Engine {
     pub fn new() -> Self {
         Self {
             nodes: vec![
-                DiagramNodeV67 {
-                    id: 1,
-                    label: String::from("Executive Summary"),
-                    level: 0,
-                },
-                DiagramNodeV67 {
-                    id: 2,
-                    label: String::from("Market Strategy"),
-                    level: 1,
-                },
-                DiagramNodeV67 {
-                    id: 3,
-                    label: String::from("Financial Roadmap"),
-                    level: 1,
-                },
-                DiagramNodeV67 {
-                    id: 4,
-                    label: String::from("Operations"),
-                    level: 2,
-                },
+                DiagramNodeV67 { id: 1, label: String::from("Executive Summary"), level: 0 },
+                DiagramNodeV67 { id: 2, label: String::from("Market Strategy"), level: 1 },
+                DiagramNodeV67 { id: 3, label: String::from("Financial Roadmap"), level: 1 },
+                DiagramNodeV67 { id: 4, label: String::from("Operations"), level: 2 },
             ],
         }
     }
@@ -236,9 +216,7 @@ impl DeckcraftSmartDiagramMatrixAutoLayoutV67Engine {
         DeckcraftV67PrProposalManifest {
             pr_id: 6703,
             pr_title: String::from("PR #6703: Smart Diagram Matrix Auto-Layout Engine V67"),
-            target_subsystem: String::from(
-                "Deckcraft Diagramming & Vector Connectivity Kernel V67",
-            ),
+            target_subsystem: String::from("Deckcraft Diagramming & Vector Connectivity Kernel V67"),
             original_suite: String::from("ArtCraft Deckcraft Smart Layouts"),
             components_added: vec![
                 String::from("Sugiyama Hierarchical Node Layout Router V67"),
@@ -274,21 +252,9 @@ impl DeckcraftLiveAudienceQnaPollingModerationV67Engine {
     pub fn new() -> Self {
         Self {
             options: vec![
-                PollOptionV67 {
-                    option_id: 1,
-                    text: String::from("Option A: Cloud Native"),
-                    vote_count: 45,
-                },
-                PollOptionV67 {
-                    option_id: 2,
-                    text: String::from("Option B: On-Prem Sovereign"),
-                    vote_count: 120,
-                },
-                PollOptionV67 {
-                    option_id: 3,
-                    text: String::from("Option C: Hybrid Mesh"),
-                    vote_count: 85,
-                },
+                PollOptionV67 { option_id: 1, text: String::from("Option A: Cloud Native"), vote_count: 45 },
+                PollOptionV67 { option_id: 2, text: String::from("Option B: On-Prem Sovereign"), vote_count: 120 },
+                PollOptionV67 { option_id: 3, text: String::from("Option C: Hybrid Mesh"), vote_count: 85 },
             ],
             total_participants: 250,
         }
@@ -381,9 +347,7 @@ impl DeckcraftCrdtLocklessMultiUserCoAuthoringV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6705,
-            pr_title: String::from(
-                "PR #6705: CRDT Lockless Multi-User Co-Authoring & Presence Engine V67",
-            ),
+            pr_title: String::from("PR #6705: CRDT Lockless Multi-User Co-Authoring & Presence Engine V67"),
             target_subsystem: String::from("Deckcraft Distributed Collaboration Engine V67"),
             original_suite: String::from("ArtCraft Deckcraft Real-Time Collaboration"),
             components_added: vec![
@@ -391,9 +355,7 @@ impl DeckcraftCrdtLocklessMultiUserCoAuthoringV67Engine {
                 String::from("Lockless Multi-User Cursor & Selection Presence Router"),
                 String::from("Vector History Undo/Redo DAG Branching Model"),
             ],
-            performance_multiplier: String::from(
-                "Conflict Resolution for 100+ Active Editors (<1ms)",
-            ),
+            performance_multiplier: String::from("Conflict Resolution for 100+ Active Editors (<1ms)"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -445,18 +407,14 @@ impl DeckcraftAiSlideGeneratorTopicSynthesizerV67Engine {
         DeckcraftV67PrProposalManifest {
             pr_id: 6706,
             pr_title: String::from("PR #6706: AI Slide Outline Synthesizer & Design Balancer V67"),
-            target_subsystem: String::from(
-                "Deckcraft Intelligence & Generative Layout Subsystem V67",
-            ),
+            target_subsystem: String::from("Deckcraft Intelligence & Generative Layout Subsystem V67"),
             original_suite: String::from("ArtCraft Deckcraft AI Copilot"),
             components_added: vec![
                 String::from("LLM Prompt-to-Slide Outline & Visual Hierarchy Synthesizer"),
                 String::from("Automated WCAG 2.1 AAA Contrast & Typography Auto-Balancer"),
                 String::from("Smart Asset Suggestion & Dynamic Vector Illustration Picker"),
             ],
-            performance_multiplier: String::from(
-                "Instant Deck Generation (<50ms local model latency)",
-            ),
+            performance_multiplier: String::from("Instant Deck Generation (<50ms local model latency)"),
             status: String::from("READY_FOR_MERGE"),
         }
     }
@@ -485,16 +443,8 @@ pub struct DeckcraftSpatial3dCameraPathOrbitV67Engine {
 impl DeckcraftSpatial3dCameraPathOrbitV67Engine {
     pub fn new() -> Self {
         Self {
-            camera_position: Vector3DV67 {
-                x: 0.0,
-                y: 0.0,
-                z: 1000.0,
-            },
-            focal_target: Vector3DV67 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            },
+            camera_position: Vector3DV67 { x: 0.0, y: 0.0, z: 1000.0 },
+            focal_target: Vector3DV67 { x: 0.0, y: 0.0, z: 0.0 },
             fov_degrees: 60.0,
         }
     }
@@ -508,9 +458,7 @@ impl DeckcraftSpatial3dCameraPathOrbitV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6707,
-            pr_title: String::from(
-                "PR #6707: Spatial 3D Camera Orbit & Depth Transition Engine V67",
-            ),
+            pr_title: String::from("PR #6707: Spatial 3D Camera Orbit & Depth Transition Engine V67"),
             target_subsystem: String::from("Deckcraft 3D Graphics & Spatial Canvas Kernel V67"),
             original_suite: String::from("ArtCraft Deckcraft Spatial 3D"),
             components_added: vec![
@@ -548,8 +496,7 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsV67Engine {
     pub fn register_spoken_words(&mut self, word_count: usize, elapsed_seconds: f32) {
         self.speech_recognized_words += word_count;
         if elapsed_seconds > 0.0 {
-            self.current_wpm =
-                ((self.speech_recognized_words as f32 / elapsed_seconds) * 60.0) as u32;
+            self.current_wpm = ((self.speech_recognized_words as f32 / elapsed_seconds) * 60.0) as u32;
         }
     }
 
@@ -568,9 +515,7 @@ impl DeckcraftAiTeleprompterSpeechAnalyticsV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6708,
-            pr_title: String::from(
-                "PR #6708: AI Teleprompter Speech Analytics & Auto-Scroll Engine V67",
-            ),
+            pr_title: String::from("PR #6708: AI Teleprompter Speech Analytics & Auto-Scroll Engine V67"),
             target_subsystem: String::from("Deckcraft Presenter Tools & Speech AI V67"),
             original_suite: String::from("ArtCraft Deckcraft Presenter Suite"),
             components_added: vec![
@@ -625,9 +570,7 @@ impl DeckcraftMobileRemoteGyroLaserPointerV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6709,
-            pr_title: String::from(
-                "PR #6709: Mobile Remote Gyroscope Laser Pointer & Gesture Bridge V67",
-            ),
+            pr_title: String::from("PR #6709: Mobile Remote Gyroscope Laser Pointer & Gesture Bridge V67"),
             target_subsystem: String::from("Deckcraft Mobile Interactivity Kernel V67"),
             original_suite: String::from("ArtCraft Deckcraft Remote Control Suite"),
             components_added: vec![
@@ -679,17 +622,13 @@ impl DeckcraftMultiFormatBatchExporterPdfaRevealV67Engine {
     pub fn generate_pr_manifest(&self) -> DeckcraftV67PrProposalManifest {
         DeckcraftV67PrProposalManifest {
             pr_id: 6710,
-            pr_title: String::from(
-                "PR #6710: Multi-Format High-Res PDF/A & Reveal.js Batch Exporter V67",
-            ),
+            pr_title: String::from("PR #6710: Multi-Format High-Res PDF/A & Reveal.js Batch Exporter V67"),
             target_subsystem: String::from("Deckcraft Publishing & Exporter Pipeline V67"),
             original_suite: String::from("ArtCraft Deckcraft Multi-Format Exporter"),
             components_added: vec![
                 String::from("ISO 19005-2 PDF/A-2b Long-Term Archiving Exporter V67"),
                 String::from("Standalone Reveal.js HTML5 Interactive Deck Bundler"),
-                String::from(
-                    "Hardware-Accelerated 4K 60FPS MP4 Video Renderer with Alpha Transitions",
-                ),
+                String::from("Hardware-Accelerated 4K 60FPS MP4 Video Renderer with Alpha Transitions"),
             ],
             performance_multiplier: String::from("Batch Parallel Exporter Speedup (10x faster)"),
             status: String::from("READY_FOR_MERGE"),
@@ -874,15 +813,7 @@ mod tests {
     fn test_mobile_remote_gyro_v67() {
         let mut engine = DeckcraftMobileRemoteGyroLaserPointerV67Engine::new();
         engine.toggle_laser(true);
-        engine.update_gyro_input(
-            GyroDataV67 {
-                pitch: 1.0,
-                roll: 0.0,
-                yaw: 2.0,
-            },
-            1920.0,
-            1080.0,
-        );
+        engine.update_gyro_input(GyroDataV67 { pitch: 1.0, roll: 0.0, yaw: 2.0 }, 1920.0, 1080.0);
         assert!(engine.laser_active);
         assert!(engine.pointer_x > 960.0);
 

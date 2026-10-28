@@ -75,9 +75,8 @@ impl VoicecraftZeroShotSpeechInfillingMaskedLmPrEngine {
         for i in 0..mask_len {
             // Predict acoustic token via bidirectional context interpolation
             let alpha = (i + 1) as f32 / (mask_len + 1) as f32;
-            let predicted_token = ((1.0 - alpha) * prefix_last as f32 + alpha * suffix_first as f32)
-                as u32
-                % (self.vocab_size as u32 - 1);
+            let predicted_token =
+                ((1.0 - alpha) * prefix_last as f32 + alpha * suffix_first as f32) as u32 % (self.vocab_size as u32 - 1);
             filled.push(predicted_token);
         }
 
@@ -88,9 +87,7 @@ impl VoicecraftZeroShotSpeechInfillingMaskedLmPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftV73PrProposalManifest {
         VoicecraftV73PrProposalManifest {
             pr_id: 9731,
-            pr_title: String::from(
-                "VoiceCraft Zero-Shot Speech Infilling & Masked Language Modeling Engine",
-            ),
+            pr_title: String::from("VoiceCraft Zero-Shot Speech Infilling & Masked Language Modeling Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Speech Editing & Infilling Parity"),
             components_added: vec![
@@ -140,11 +137,7 @@ impl VoicecraftNeuralAudioCodecCompressorPrEngine {
         };
 
         let frame_size = 320; // 20ms at 16kHz
-        let num_frames = if pcm.is_empty() {
-            1
-        } else {
-            (pcm.len() + frame_size - 1) / frame_size
-        };
+        let num_frames = if pcm.is_empty() { 1 } else { (pcm.len() + frame_size - 1) / frame_size };
 
         let mut rvq_codes = vec![vec![0u16; num_frames]; layers];
 
@@ -158,8 +151,7 @@ impl VoicecraftNeuralAudioCodecCompressorPrEngine {
                     0.0
                 };
 
-                let code =
-                    ((frame_energy * 1000.0 + (layer * 13) as f32) as usize) % self.codebook_size;
+                let code = ((frame_energy * 1000.0 + (layer * 13) as f32) as usize) % self.codebook_size;
                 rvq_codes[layer][f] = code as u16;
             }
         }
@@ -196,9 +188,7 @@ impl VoicecraftNeuralAudioCodecCompressorPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftV73PrProposalManifest {
         VoicecraftV73PrProposalManifest {
             pr_id: 9732,
-            pr_title: String::from(
-                "VoiceCraft Residual Vector Quantized (RVQ) Neural Audio Codec Engine",
-            ),
+            pr_title: String::from("VoiceCraft Residual Vector Quantized (RVQ) Neural Audio Codec Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Ultra-Low Bitrate Neural Codec Parity"),
             components_added: vec![
@@ -206,9 +196,7 @@ impl VoicecraftNeuralAudioCodecCompressorPrEngine {
                 String::from("MultiBandMelDecomposer"),
                 String::from("NeuralAudioDecompressor"),
             ],
-            performance_multiplier: String::from(
-                "32.1x (3.0 kbps High-Fidelity Audio Compression)",
-            ),
+            performance_multiplier: String::from("32.1x (3.0 kbps High-Fidelity Audio Compression)"),
             status: String::from("PR_READY"),
         }
     }
@@ -262,15 +250,8 @@ impl VoicecraftSpatialAecRoomDereferebrationPrEngine {
 
             // Update filter coefficients
             let ref_energy: f32 = (0..self.filter_taps)
-                .map(|tap| {
-                    if i >= tap {
-                        echo_reference[i - tap] * echo_reference[i - tap]
-                    } else {
-                        0.0
-                    }
-                })
-                .sum::<f32>()
-                + 1e-6;
+                .map(|tap| if i >= tap { echo_reference[i - tap] * echo_reference[i - tap] } else { 0.0 })
+                .sum::<f32>() + 1e-6;
 
             let norm_step = self.step_size / ref_energy;
             for tap in 0..self.filter_taps {
@@ -303,9 +284,7 @@ impl VoicecraftSpatialAecRoomDereferebrationPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftV73PrProposalManifest {
         VoicecraftV73PrProposalManifest {
             pr_id: 9733,
-            pr_title: String::from(
-                "VoiceCraft Spatial AEC & Blind Room Impulse Response Dereverberation Engine",
-            ),
+            pr_title: String::from("VoiceCraft Spatial AEC & Blind Room Impulse Response Dereverberation Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Spatial Audio & Echo Cancellation Parity"),
             components_added: vec![
@@ -375,9 +354,7 @@ impl VoicecraftRealtimeStreamingSpeechTranslatorPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftV73PrProposalManifest {
         VoicecraftV73PrProposalManifest {
             pr_id: 9734,
-            pr_title: String::from(
-                "VoiceCraft Sub-50ms Realtime Streaming Speech-to-Speech Translator Engine",
-            ),
+            pr_title: String::from("VoiceCraft Sub-50ms Realtime Streaming Speech-to-Speech Translator Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Cross-Lingual Voice Translation Parity"),
             components_added: vec![
@@ -385,9 +362,7 @@ impl VoicecraftRealtimeStreamingSpeechTranslatorPrEngine {
                 String::from("CrossLingualTimbrePreserver"),
                 String::from("LowLatencyStreamSynchronizer"),
             ],
-            performance_multiplier: String::from(
-                "35.4x (Sub-40ms End-to-End Translation Pipeline)",
-            ),
+            performance_multiplier: String::from("35.4x (Sub-40ms End-to-End Translation Pipeline)"),
             status: String::from("PR_READY"),
         }
     }
@@ -481,9 +456,7 @@ impl VoicecraftWaylandVoiceControlAssistantPrEngine {
     pub fn generate_pr_proposal(&self) -> VoicecraftV73PrProposalManifest {
         VoicecraftV73PrProposalManifest {
             pr_id: 9735,
-            pr_title: String::from(
-                "VoiceCraft Wayland Voice Assistant & 'Hey Sigma' Neural Wake-Word Engine",
-            ),
+            pr_title: String::from("VoiceCraft Wayland Voice Assistant & 'Hey Sigma' Neural Wake-Word Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Hands-Free Wayland Voice Control Parity"),
             components_added: vec![
@@ -543,7 +516,7 @@ impl SovereignVoicecraftAdvancementsV73MasterSuite {
     pub fn export_pr_manifest_markdown(&self) -> String {
         let manifests = self.generate_all_manifests();
         let mut markdown = String::from(
-            "# VoiceCraft V73 Speech Synthesis & Audio DSP Advancements PR Proposal Suite\n\n",
+            "# VoiceCraft V73 Speech Synthesis & Audio DSP Advancements PR Proposal Suite\n\n"
         );
         markdown.push_str("| PR ID | Proposal Title | Target Subsystem | Components Added | Performance Multiplier | Status |\n");
         markdown.push_str("|-------|----------------|------------------|------------------|-----------------------|--------|\n");

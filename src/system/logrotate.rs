@@ -39,9 +39,9 @@ pub struct LogFileConfig {
     pub rotate_count: u32, // Number of rotated files to keep
     pub compression: CompressionType,
     pub compress_delay: u32, // Delay compression by N rotations
-    pub size_limit: u64,     // Rotate when size exceeds
-    pub missingok: bool,     // Don't error if file is missing
-    pub notifempty: bool,    // Don't rotate if empty
+    pub size_limit: u64, // Rotate when size exceeds
+    pub missingok: bool, // Don't error if file is missing
+    pub notifempty: bool, // Don't rotate if empty
     pub sharedscripts: bool, // Run scripts once per rotation
 }
 
@@ -115,8 +115,7 @@ impl LogRotateManager {
 
     /// Get next rotation number for a log file
     fn get_next_rotation_number(&self, path: &str) -> u32 {
-        let count = self
-            .rotated_logs
+        let count = self.rotated_logs
             .iter()
             .filter(|e| e.original_path == path)
             .count() as u32;
@@ -196,7 +195,9 @@ pub fn init_log_rotate() {
 
 /// Get global log rotation manager
 pub fn get_log_rotate() -> Option<&'static mut LogRotateManager> {
-    unsafe { LOG_ROTATE.as_mut() }
+    unsafe {
+        LOG_ROTATE.as_mut()
+    }
 }
 
 #[cfg(test)]

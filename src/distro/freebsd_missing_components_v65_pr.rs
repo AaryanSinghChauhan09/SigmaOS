@@ -224,8 +224,7 @@ impl FreeBsdBhyveVirtioFsPrEngine {
     }
 }
 
-impl Default for FreeBsdBhyveVirtioFsPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdBhyveVirtioFsPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -327,13 +326,11 @@ impl FreeBsdOpenZfsSpecialVdevMetadataDedupPrEngine {
         self.pools.insert(pool.to_string(), spec);
         format!(
             "zpool add {} special {}\nzfs set special_small_blocks={}k {}\nzfs set dedup=fast {}\n",
-            pool, vdev, small_kb, pool, pool
-        )
+            pool, vdev, small_kb, pool, pool        )
     }
 }
 
-impl Default for FreeBsdOpenZfsSpecialVdevMetadataDedupPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdOpenZfsSpecialVdevMetadataDedupPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -387,8 +384,7 @@ impl FreeBsdNetgraphL2tpIpsecVpnPrEngine {
     }
 }
 
-impl Default for FreeBsdNetgraphL2tpIpsecVpnPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdNetgraphL2tpIpsecVpnPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -439,8 +435,7 @@ impl FreeBsdAuditdistdZstdRingBufferPrEngine {
     }
 }
 
-impl Default for FreeBsdAuditdistdZstdRingBufferPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdAuditdistdZstdRingBufferPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -487,13 +482,11 @@ impl FreeBsdRctlGpuMemoryComputeGovernorPrEngine {
         self.gpu_rules.insert(target.to_string(), spec);
         format!(
             "rctl -a {}:gputime:deny:{}\nrctl -a {}:vramuse:deny:{}M\n",
-            target, compute_pct, target, vram_mb
-        )
+            target, compute_pct, target, vram_mb        )
     }
 }
 
-impl Default for FreeBsdRctlGpuMemoryComputeGovernorPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdRctlGpuMemoryComputeGovernorPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -540,13 +533,11 @@ impl FreeBsdPkgBaseAtomicSnapshotRollbackPrEngine {
         self.boot_environments.insert(rel.to_string(), spec);
         format!(
             "bectl create {}\npkg upgrade -y FreeBSD-base-*\nbectl activate {}\n",
-            be_name, be_name
-        )
+            be_name, be_name        )
     }
 }
 
-impl Default for FreeBsdPkgBaseAtomicSnapshotRollbackPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdPkgBaseAtomicSnapshotRollbackPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -597,8 +588,7 @@ impl FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine {
     }
 }
 
-impl Default for FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine {
-    fn default() -> Self {
+impl Default for FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine {    fn default() -> Self {
         Self::new()
     }
 }
@@ -617,8 +607,7 @@ pub struct FreeBsdMissingComponentsV65PrSuite {
     pub audit_ring: FreeBsdAuditdistdZstdRingBufferPrEngine,
     pub gpu_quota: FreeBsdRctlGpuMemoryComputeGovernorPrEngine,
     pub pkgbase_rollback: FreeBsdPkgBaseAtomicSnapshotRollbackPrEngine,
-    pub netisr_dtrace: FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine,
-    pub proposals: BTreeMap<u64, FreeBsdPrProposalV65>,
+    pub netisr_dtrace: FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine,    pub proposals: BTreeMap<u64, FreeBsdPrProposalV65>,
     pub next_pr_id: u64,
 }
 
@@ -634,8 +623,7 @@ impl FreeBsdMissingComponentsV65PrSuite {
             audit_ring: FreeBsdAuditdistdZstdRingBufferPrEngine::new(),
             gpu_quota: FreeBsdRctlGpuMemoryComputeGovernorPrEngine::new(),
             pkgbase_rollback: FreeBsdPkgBaseAtomicSnapshotRollbackPrEngine::new(),
-            netisr_dtrace: FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine::new(),
-            proposals: BTreeMap::new(),
+            netisr_dtrace: FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine::new(),            proposals: BTreeMap::new(),
             next_pr_id: 6500,
         }
     }
@@ -689,9 +677,9 @@ impl FreeBsdMissingComponentsV65PrSuite {
         );
         self.validate_and_merge_pr(pr1);
 
-        let zfs_diff = self
-            .special_vdev
-            .configure_special_vdev("zroot", "nvd1p1", 128);
+        let zfs_diff =
+            self.special_vdev
+                .configure_special_vdev("zroot", "nvd1p1", 128);
         let pr2 = self.submit_pr_proposal(
             "Add OpenZFS Special Allocation Vdev for metadata and fast inline dedup",
             "jules",
@@ -701,16 +689,16 @@ impl FreeBsdMissingComponentsV65PrSuite {
         );
         self.validate_and_merge_pr(pr2);
 
-        let pkg_diff = self
-            .pkgbase_rollback
-            .perform_atomic_pkgbase_upgrade("15.0-CURRENT", "be_15_pre_upgrade");
+        let pkg_diff = self.pkgbase_rollback.perform_atomic_pkgbase_upgrade(
+            "15.0-CURRENT",
+            "be_15_pre_upgrade",
+        );
         let pr3 = self.submit_pr_proposal(
             "Enable pkgbase atomic release upgrades with bectl ZFS snapshot rollback",
             "jules",
             "usr.bin/bectl",
             "Zero-downtime base system update and ZFS boot environment governor",
-            &pkg_diff,
-        );
+            &pkg_diff,        );
         self.validate_and_merge_pr(pr3);
 
         self.proposals
@@ -784,8 +772,7 @@ mod tests {
 
         let mut dtrace = FreeBsdDtraceEpfwNetisrLatencyProfilerPrEngine::new();
         let diff5 = dtrace.profile_netisr_pipeline("netisr_enqueue", 100);
-        assert!(diff5.contains("netisr_dispatch"));
-    }
+        assert!(diff5.contains("netisr_dispatch"));    }
 
     #[test]
     fn test_master_suite_v65() {

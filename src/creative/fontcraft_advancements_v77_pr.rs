@@ -65,15 +65,10 @@ impl FontcraftOpentypeGsubGposShapingPrEngineV77 {
 
         while i < chars.len() {
             // Check for common ligatures like "fi", "fl", "ffi", "ffl"
-            if i + 2 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'f' && chars[i + 2] == 'i'
-            {
+            if i + 2 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'f' && chars[i + 2] == 'i' {
                 shaped.push((0xFB03, 750)); // 'ffi' ligature
                 i += 3;
-            } else if i + 2 < chars.len()
-                && chars[i] == 'f'
-                && chars[i + 1] == 'f'
-                && chars[i + 2] == 'l'
-            {
+            } else if i + 2 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'f' && chars[i + 2] == 'l' {
                 shaped.push((0xFB04, 780)); // 'ffl' ligature
                 i += 3;
             } else if i + 1 < chars.len() && chars[i] == 'f' && chars[i + 1] == 'i' {
@@ -120,9 +115,7 @@ impl FontcraftOpentypeGsubGposShapingPrEngineV77 {
     pub fn generate_pr_manifest(&self) -> FontcraftV77PrProposalManifest {
         FontcraftV77PrProposalManifest {
             pr_id: 7701,
-            pr_title:
-                "feat(fontcraft): OpenType GSUB/GPOS Complex Script Text Shaping & Bidi Engine V77"
-                    .to_string(),
+            pr_title: "feat(fontcraft): OpenType GSUB/GPOS Complex Script Text Shaping & Bidi Engine V77".to_string(),
             target_subsystem: "FontCraft Typography & Text Shaping".to_string(),
             original_suite: "FontCraft Sovereign Typography Studio".to_string(),
             components_added: vec![
@@ -153,12 +146,7 @@ impl FontcraftMsdfGpuVectorShaderRasterizerPrEngineV77 {
     }
 
     /// Compute MSDF triple channel distance sample for sample point (px, py) against segment (ax, ay, bx, by)
-    pub fn generate_msdf_sample_v77(
-        &self,
-        px: f32,
-        py: f32,
-        segment: (f32, f32, f32, f32),
-    ) -> (f32, f32, f32) {
+    pub fn generate_msdf_sample_v77(&self, px: f32, py: f32, segment: (f32, f32, f32, f32)) -> (f32, f32, f32) {
         let abx = segment.2 - segment.0;
         let aby = segment.3 - segment.1;
         let apx = px - segment.0;
@@ -230,13 +218,7 @@ impl FontcraftVariableFontInterpolationPrEngineV77 {
     }
 
     /// Interpolate font design axis coordinate delta
-    pub fn interpolate_axis_delta_v77(
-        &self,
-        default_val: f32,
-        axis_val: f32,
-        min_val: f32,
-        max_val: f32,
-    ) -> f32 {
+    pub fn interpolate_axis_delta_v77(&self, default_val: f32, axis_val: f32, min_val: f32, max_val: f32) -> f32 {
         if max_val <= min_val {
             return 0.0;
         }
@@ -244,12 +226,7 @@ impl FontcraftVariableFontInterpolationPrEngineV77 {
     }
 
     /// Blend tuple variation deltas across design axes
-    pub fn blend_tuple_deltas_v77(
-        &self,
-        base_width: f32,
-        axis_weights: &[f32],
-        deltas: &[f32],
-    ) -> f32 {
+    pub fn blend_tuple_deltas_v77(&self, base_width: f32, axis_weights: &[f32], deltas: &[f32]) -> f32 {
         let mut total = base_width;
         let count = axis_weights.len().min(deltas.len());
         for i in 0..count {
@@ -261,8 +238,7 @@ impl FontcraftVariableFontInterpolationPrEngineV77 {
     pub fn generate_pr_manifest(&self) -> FontcraftV77PrProposalManifest {
         FontcraftV77PrProposalManifest {
             pr_id: 7703,
-            pr_title: "feat(fontcraft): OpenType Variable Font Design Axis Delta Interpolator V77"
-                .to_string(),
+            pr_title: "feat(fontcraft): OpenType Variable Font Design Axis Delta Interpolator V77".to_string(),
             target_subsystem: "FontCraft Variable Font Engine".to_string(),
             original_suite: "FontCraft Sovereign Typography Studio".to_string(),
             components_added: vec![
@@ -271,8 +247,7 @@ impl FontcraftVariableFontInterpolationPrEngineV77 {
                 "OpticalSizeScalingEngineV77".to_string(),
                 "NormalizedCoordinateMatrixV77".to_string(),
             ],
-            performance_multiplier: "120 FPS Fluid Axis Variable Interpolation (<0.02ms)"
-                .to_string(),
+            performance_multiplier: "120 FPS Fluid Axis Variable Interpolation (<0.02ms)".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -294,12 +269,7 @@ impl FontcraftColorEmojiCompositorPrEngineV77 {
     }
 
     /// Composite two RGBA color layers using source-over alpha blending
-    pub fn composite_colrv1_layer_v77(
-        &self,
-        base_color: (u8, u8, u8),
-        layer_color: (u8, u8, u8),
-        opacity: f32,
-    ) -> (u8, u8, u8) {
+    pub fn composite_colrv1_layer_v77(&self, base_color: (u8, u8, u8), layer_color: (u8, u8, u8), opacity: f32) -> (u8, u8, u8) {
         let alpha = opacity.clamp(0.0, 1.0);
         let r = (base_color.0 as f32 * (1.0 - alpha) + layer_color.0 as f32 * alpha) as u8;
         let g = (base_color.1 as f32 * (1.0 - alpha) + layer_color.1 as f32 * alpha) as u8;
@@ -350,10 +320,7 @@ impl FontcraftWoff2BrotliTranscoderPrEngineV77 {
     }
 
     /// Validate and estimate uncompressed size for WOFF2 Brotli header
-    pub fn decompress_brotli_header_v77(
-        &self,
-        compressed_size: usize,
-    ) -> Result<usize, &'static str> {
+    pub fn decompress_brotli_header_v77(&self, compressed_size: usize) -> Result<usize, &'static str> {
         if compressed_size == 0 {
             return Err("Empty compressed WOFF2 buffer");
         }
@@ -433,8 +400,7 @@ impl SovereignFontcraftAdvancementsV77MasterSuite {
     }
 
     pub fn export_pr_manifest_markdown(&self) -> String {
-        let mut md =
-            String::from("# FontCraft Typography & Vector Font V77 Advancements PR Manifest\n\n");
+        let mut md = String::from("# FontCraft Typography & Vector Font V77 Advancements PR Manifest\n\n");
         for manifest in self.collect_all_pr_manifests() {
             let digest = fnv1a_fontcraft_v77_pr_digest(manifest.pr_id, &manifest.pr_title);
             md.push_str(&format!(
@@ -497,11 +463,10 @@ mod tests {
         assert_eq!(shaped[0], ('o' as u32, 500));
         assert_eq!(shaped[1], (0xFB03, 750)); // 'ffi' ligature
 
-        let spans =
-            engine.reorder_bidi_spans_v77("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
+        let spans = engine.reorder_bidi_spans_v77("Hello \u{0627}\u{0644}\u{0633}\u{0644}\u{0627}\u{0645}");
         assert_eq!(spans.len(), 2);
         assert!(!spans[0].1); // LTR
-        assert!(spans[1].1); // RTL
+        assert!(spans[1].1);  // RTL
     }
 
     #[test]
@@ -550,9 +515,7 @@ mod tests {
         assert_eq!(manifests.len(), 5);
 
         let markdown = suite.export_pr_manifest_markdown();
-        assert!(
-            markdown.contains("FontCraft Typography & Vector Font V77 Advancements PR Manifest")
-        );
+        assert!(markdown.contains("FontCraft Typography & Vector Font V77 Advancements PR Manifest"));
         assert!(markdown.contains("OpenType GSUB/GPOS Complex Script Text Shaping"));
 
         let digest = fnv1a_fontcraft_v77_pr_digest(7701, "Test");

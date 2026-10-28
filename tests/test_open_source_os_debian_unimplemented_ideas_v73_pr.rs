@@ -156,16 +156,17 @@ fn test_debian_dpkg_triggers_deferred_execution_v73_engine() {
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7310);
-    assert_eq!(
-        spec.pqc_signature,
-        "DILITHIUM5-SIG-DEBIAN-DPKG-TRIGGERS-V73"
-    );
+    assert_eq!(spec.pqc_signature, "DILITHIUM5-SIG-DEBIAN-DPKG-TRIGGERS-V73");
 }
 
 #[test]
 fn test_debian_secure_apt_pqc_dilithium_inrelease_v73_engine() {
     let engine = DebianSecureAptPqcDilithiumInReleaseV73PrEngine::new();
-    assert!(engine.verify_inrelease_signature("stable", b"Package: sigmaos", "DILITHIUM5-SIG-OK"));
+    assert!(engine.verify_inrelease_signature(
+        "stable",
+        b"Package: sigmaos",
+        "DILITHIUM5-SIG-OK"
+    ));
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7311);
@@ -176,10 +177,7 @@ fn test_debian_debconf_database_state_v73_engine() {
     let mut engine = DebianDebconfDatabaseStateV73PrEngine::new();
     assert_eq!(engine.get_answer("tzdata/zones"), Some(&"UTC".to_string()));
     engine.set_answer("tzdata/zones", "America/New_York");
-    assert_eq!(
-        engine.get_answer("tzdata/zones"),
-        Some(&"America/New_York".to_string())
-    );
+    assert_eq!(engine.get_answer("tzdata/zones"), Some(&"America/New_York".to_string()));
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7312);
@@ -243,10 +241,7 @@ fn test_debian_piuparts_package_sanity_suite_v73_engine() {
 #[test]
 fn test_debian_subiquity_installer_autoinstall_v73_engine() {
     let engine = DebianSubiquityInstallerAutoinstallV73PrEngine::new();
-    assert_eq!(
-        engine.parse_autoinstall_hostname(),
-        Some("sigma-node-v73".to_string())
-    );
+    assert_eq!(engine.parse_autoinstall_hostname(), Some("sigma-node-v73".to_string()));
 
     let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7318);

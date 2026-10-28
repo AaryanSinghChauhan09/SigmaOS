@@ -105,120 +105,49 @@ impl UniversalPackageFormatInspectorV73 {
     }
 
     /// Detects package format based on header magic bytes or file extension V73
-    pub fn detect_format_by_magic_bytes(
-        &self,
-        raw_payload: &[u8],
-        filename: &str,
-    ) -> (PackageFormat, PackageSignatureKindV73, &'static str) {
+    pub fn detect_format_by_magic_bytes(&self, raw_payload: &[u8], filename: &str) -> (PackageFormat, PackageSignatureKindV73, &'static str) {
         if raw_payload.len() >= 8 && &raw_payload[0..7] == b"!<arch>" {
-            return (
-                PackageFormat::Deb,
-                PackageSignatureKindV73::GpgOpenPgp,
-                "ar/tar",
-            );
+            return (PackageFormat::Deb, PackageSignatureKindV73::GpgOpenPgp, "ar/tar");
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0xed, 0xab, 0xee, 0xdb] {
-            return (
-                PackageFormat::Rpm,
-                PackageSignatureKindV73::GpgOpenPgp,
-                "rpm-lead",
-            );
+            return (PackageFormat::Rpm, PackageSignatureKindV73::GpgOpenPgp, "rpm-lead");
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x28, 0xb5, 0x2f, 0xfd] {
-            return (
-                PackageFormat::Pacman,
-                PackageSignatureKindV73::GpgOpenPgp,
-                "zstd",
-            );
+            return (PackageFormat::Pacman, PackageSignatureKindV73::GpgOpenPgp, "zstd");
         }
         if raw_payload.len() >= 4 && &raw_payload[0..4] == b"hsqs" {
-            return (
-                PackageFormat::AppImage,
-                PackageSignatureKindV73::Minisign,
-                "squashfs",
-            );
+            return (PackageFormat::AppImage, PackageSignatureKindV73::Minisign, "squashfs");
         }
         if raw_payload.len() >= 4 && raw_payload[0..4] == [0x50, 0x4b, 0x03, 0x04] {
             if filename.ends_with(".apk") || filename.ends_with(".aab") {
-                return (
-                    PackageFormat::Apk,
-                    PackageSignatureKindV73::ApkV2V3Signature,
-                    "zip",
-                );
+                return (PackageFormat::Apk, PackageSignatureKindV73::ApkV2V3Signature, "zip");
             }
-            if filename.ends_with(".ipa")
-                || filename.ends_with(".app")
-                || filename.ends_with(".hap")
-            {
-                return (
-                    PackageFormat::Ipa,
-                    PackageSignatureKindV73::X509Certificate,
-                    "zip",
-                );
+            if filename.ends_with(".ipa") || filename.ends_with(".app") || filename.ends_with(".hap") {
+                return (PackageFormat::Ipa, PackageSignatureKindV73::X509Certificate, "zip");
             }
-            return (
-                PackageFormat::Air,
-                PackageSignatureKindV73::X509Certificate,
-                "zip",
-            );
+            return (PackageFormat::Air, PackageSignatureKindV73::X509Certificate, "zip");
         }
         if raw_payload.len() >= 2 && raw_payload[0..2] == [0x1f, 0x8b] {
-            return (
-                PackageFormat::Apk,
-                PackageSignatureKindV73::ApkV2V3Signature,
-                "gzip",
-            );
+            return (PackageFormat::Apk, PackageSignatureKindV73::ApkV2V3Signature, "gzip");
         }
 
         let cleaned = filename.replace(' ', "").to_lowercase();
         if cleaned.ends_with(".superdeb") {
-            (
-                PackageFormat::Superdeb,
-                PackageSignatureKindV73::PqcKyberDilithium5,
-                "zstd",
-            )
+            (PackageFormat::Superdeb, PackageSignatureKindV73::PqcKyberDilithium5, "zstd")
         } else if cleaned.ends_with(".ports") || cleaned.ends_with(".openbsd.tgz") {
-            (
-                PackageFormat::Ports,
-                PackageSignatureKindV73::OpenBsdSignify,
-                "gzip",
-            )
+            (PackageFormat::Ports, PackageSignatureKindV73::OpenBsdSignify, "gzip")
         } else if cleaned.ends_with(".ebuild") || cleaned.ends_with(".portage") {
-            (
-                PackageFormat::Ebuild,
-                PackageSignatureKindV73::OpenBsdSignify,
-                "bzip2",
-            )
+            (PackageFormat::Ebuild, PackageSignatureKindV73::OpenBsdSignify, "bzip2")
         } else if cleaned.ends_with(".xbps") {
-            (
-                PackageFormat::Xbps,
-                PackageSignatureKindV73::OpenBsdSignify,
-                "zstd",
-            )
+            (PackageFormat::Xbps, PackageSignatureKindV73::OpenBsdSignify, "zstd")
         } else if cleaned.ends_with(".nix") || cleaned.ends_with(".nixpkg") {
-            (
-                PackageFormat::Nix,
-                PackageSignatureKindV73::CosignSigstore,
-                "xz",
-            )
+            (PackageFormat::Nix, PackageSignatureKindV73::CosignSigstore, "xz")
         } else if cleaned.ends_with(".flatpak") {
-            (
-                PackageFormat::Flatpak,
-                PackageSignatureKindV73::CosignSigstore,
-                "ostree",
-            )
+            (PackageFormat::Flatpak, PackageSignatureKindV73::CosignSigstore, "ostree")
         } else if cleaned.ends_with(".snap") {
-            (
-                PackageFormat::Snap,
-                PackageSignatureKindV73::X509Certificate,
-                "squashfs",
-            )
+            (PackageFormat::Snap, PackageSignatureKindV73::X509Certificate, "squashfs")
         } else {
-            (
-                PackageFormat::Deb,
-                PackageSignatureKindV73::Unsigned,
-                "tar.gz",
-            )
+            (PackageFormat::Deb, PackageSignatureKindV73::Unsigned, "tar.gz")
         }
     }
 
@@ -228,8 +157,7 @@ impl UniversalPackageFormatInspectorV73 {
         filename: &str,
         raw_payload: &[u8],
     ) -> Result<InspectedPackageManifestV73, String> {
-        let (format, sig_kind, compression) =
-            self.detect_format_by_magic_bytes(raw_payload, filename);
+        let (format, sig_kind, compression) = self.detect_format_by_magic_bytes(raw_payload, filename);
 
         let base_name = filename
             .split('/')
@@ -324,9 +252,7 @@ impl PackageAdapterStrategyV73 for ApkPackageStrategyV73 {
 pub struct UniversalPackageAdapterFactoryV73;
 
 impl UniversalPackageAdapterFactoryV73 {
-    pub fn create_strategy(
-        format: PackageFormat,
-    ) -> Vec<alloc::boxed::Box<dyn PackageAdapterStrategyV73>> {
+    pub fn create_strategy(format: PackageFormat) -> Vec<alloc::boxed::Box<dyn PackageAdapterStrategyV73>> {
         match format {
             PackageFormat::Deb | PackageFormat::Superdeb => {
                 vec![alloc::boxed::Box::new(DebPackageStrategyV73)]
@@ -560,9 +486,7 @@ impl UdfScriptletEngineV73 {
                 executed += 1;
                 self.execution_log.push(format!(
                     "Executed UDF Scriptlet {:?} for {} with code length {}",
-                    phase,
-                    package_name,
-                    hook.scriptlet_code.len()
+                    phase, package_name, hook.scriptlet_code.len()
                 ));
             }
         }
@@ -589,10 +513,7 @@ impl UniversalCrossDistroSatSolverV73 {
         let mut map = BTreeMap::new();
         map.insert("libssl-dev".to_string(), "sovereign-openssl".to_string());
         map.insert("openssl-devel".to_string(), "sovereign-openssl".to_string());
-        map.insert(
-            "security/openssl".to_string(),
-            "sovereign-openssl".to_string(),
-        );
+        map.insert("security/openssl".to_string(), "sovereign-openssl".to_string());
         map.insert("glibc".to_string(), "sovereign-libc".to_string());
         map.insert("libc6".to_string(), "sovereign-libc".to_string());
         map.insert("dbus".to_string(), "sovereign-dbus".to_string());
@@ -610,11 +531,7 @@ impl UniversalCrossDistroSatSolverV73 {
     }
 
     /// Evaluates clause satisfiability using DPLL unit propagation algorithm V73
-    pub fn dpll_solve_clauses(
-        &self,
-        clauses: &[SatClauseV73],
-        assignments: &mut BTreeMap<String, bool>,
-    ) -> bool {
+    pub fn dpll_solve_clauses(&self, clauses: &[SatClauseV73], assignments: &mut BTreeMap<String, bool>) -> bool {
         for clause in clauses {
             let mut clause_satisfied = false;
             for (var, pos) in &clause.literals {
@@ -636,7 +553,10 @@ impl UniversalCrossDistroSatSolverV73 {
         true
     }
 
-    pub fn solve_dependencies(&self, raw_dependencies: &[String]) -> Result<Vec<String>, String> {
+    pub fn solve_dependencies(
+        &self,
+        raw_dependencies: &[String],
+    ) -> Result<Vec<String>, String> {
         let mut resolved = Vec::new();
         for dep in raw_dependencies {
             let canonical = self
@@ -794,10 +714,7 @@ impl UniversalBootEnvSnapshotGovernorV73 {
     pub fn rollback(&mut self, snapshot_id: u64) -> Result<String, String> {
         if let Some(snap) = self.snapshots.get_mut(&snapshot_id) {
             snap.active = true;
-            Ok(format!(
-                "Rolled back boot environment to snapshot {}",
-                snap.name
-            ))
+            Ok(format!("Rolled back boot environment to snapshot {}", snap.name))
         } else {
             Err("Snapshot ID not found".to_string())
         }
@@ -955,8 +872,7 @@ impl SovereignDistroPackageAdvancementsSuiteV73 {
         self.udf_engine
             .execute_hooks_for_phase(&manifest.name, UdfHookTypeV73::PreInstall)?;
 
-        self.installed_packages
-            .push(format!("sigpkg-v73-{}", manifest.name));
+        self.installed_packages.push(format!("sigpkg-v73-{}", manifest.name));
 
         let mut pkg = UnifiedPackage::new(manifest.name, manifest.version)
             .with_format(manifest.detected_format);
@@ -1027,9 +943,7 @@ mod tests {
         assert!(dec_res.contains("Encrypted[AES-256-GCM]"));
 
         let mut facade = SovereignPackageFacadeV73::new();
-        let fac_res = facade
-            .quick_install("ripgrep.apk", b"PK\x03\x04_APK_PAYLOAD")
-            .unwrap();
+        let fac_res = facade.quick_install("ripgrep.apk", b"PK\x03\x04_APK_PAYLOAD").unwrap();
         assert!(fac_res.contains("ripgrep"));
     }
 

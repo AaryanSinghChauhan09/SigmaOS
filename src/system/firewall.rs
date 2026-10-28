@@ -102,13 +102,7 @@ impl FirewallManager {
     }
 
     /// Add rule
-    pub fn add_rule(
-        &mut self,
-        action: RuleAction,
-        protocol: Protocol,
-        direction: Direction,
-        port: Option<u16>,
-    ) -> u32 {
+    pub fn add_rule(&mut self, action: RuleAction, protocol: Protocol, direction: Direction, port: Option<u16>) -> u32 {
         let id = self.next_rule_id.fetch_add(1, Ordering::Relaxed);
         let rule = FirewallRule {
             id,
@@ -126,33 +120,21 @@ impl FirewallManager {
 
     /// Remove rule
     pub fn remove_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
-        let pos = self
-            .rules
-            .iter()
-            .position(|r| r.id == rule_id)
-            .ok_or("Rule not found")?;
+        let pos = self.rules.iter().position(|r| r.id == rule_id).ok_or("Rule not found")?;
         self.rules.remove(pos);
         Ok(())
     }
 
     /// Enable rule
     pub fn enable_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
-        let rule = self
-            .rules
-            .iter_mut()
-            .find(|r| r.id == rule_id)
-            .ok_or("Rule not found")?;
+        let rule = self.rules.iter_mut().find(|r| r.id == rule_id).ok_or("Rule not found")?;
         rule.enabled.store(true, Ordering::Relaxed);
         Ok(())
     }
 
     /// Disable rule
     pub fn disable_rule(&mut self, rule_id: u32) -> Result<(), &'static str> {
-        let rule = self
-            .rules
-            .iter_mut()
-            .find(|r| r.id == rule_id)
-            .ok_or("Rule not found")?;
+        let rule = self.rules.iter_mut().find(|r| r.id == rule_id).ok_or("Rule not found")?;
         rule.enabled.store(false, Ordering::Relaxed);
         Ok(())
     }
@@ -199,8 +181,7 @@ impl FirewallManager {
 
     /// Remove port
     pub fn remove_port(&mut self, port: u16, protocol: Protocol) -> Result<(), &'static str> {
-        let rule_id = self
-            .rules
+        let rule_id = self.rules
             .iter()
             .find(|r| r.port == Some(port) && r.protocol == protocol)
             .map(|r| r.id)
@@ -260,7 +241,9 @@ pub fn init_firewall() {
 
 /// Get global firewall manager
 pub fn get_firewall() -> Option<&'static mut FirewallManager> {
-    unsafe { FIREWALL.as_mut() }
+    unsafe {
+        FIREWALL.as_mut()
+    }
 }
 
 #[cfg(test)]
@@ -277,12 +260,7 @@ mod tests {
     #[test]
     fn test_add_rule() {
         let mut manager = FirewallManager::new();
-        let id = manager.add_rule(
-            RuleAction::Allow,
-            Protocol::Tcp,
-            Direction::Incoming,
-            Some(80),
-        );
+        let id = manager.add_rule(RuleAction::Allow, Protocol::Tcp, Direction::Incoming, Some(80));
         assert!(manager.get_rule(id).is_some());
     }
 
@@ -313,26 +291,13 @@ mod tests {
     #[test]
     fn test_enable_disable_rule() {
         let mut manager = FirewallManager::new();
-        let id = manager.add_rule(
-            RuleAction::Allow,
-            Protocol::Tcp,
-            Direction::Incoming,
-            Some(80),
-        );
+        let id = manager.add_rule(RuleAction::Allow, Protocol::Tcp, Direction::Incoming, Some(80));
 
         manager.disable_rule(id).unwrap();
-        assert!(!manager
-            .get_rule(id)
-            .unwrap()
-            .enabled
-            .load(Ordering::Relaxed));
+        assert!(!manager.get_rule(id).unwrap().enabled.load(Ordering::Relaxed));
 
         manager.enable_rule(id).unwrap();
-        assert!(manager
-            .get_rule(id)
-            .unwrap()
-            .enabled
-            .load(Ordering::Relaxed));
+        assert!(manager.get_rule(id).unwrap().enabled.load(Ordering::Relaxed));
     }
 
     #[test]

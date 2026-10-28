@@ -129,20 +129,11 @@ impl SystemdAdvancementsV75Engine {
     }
 
     /// Simulate socket activation file descriptor passing (`sd_listen_fds`).
-    pub fn build_sd_listen_fds_env(
-        &self,
-        socket_spec: &SystemdSocketActivationSpecV75,
-    ) -> BTreeMap<String, String> {
+    pub fn build_sd_listen_fds_env(&self, socket_spec: &SystemdSocketActivationSpecV75) -> BTreeMap<String, String> {
         let mut env = BTreeMap::new();
-        env.insert(
-            "LISTEN_FDS".to_string(),
-            socket_spec.pass_fds_count.to_string(),
-        );
+        env.insert("LISTEN_FDS".to_string(), socket_spec.pass_fds_count.to_string());
         env.insert("LISTEN_PID".to_string(), "1001".to_string());
-        env.insert(
-            "LISTEN_FDNAMES".to_string(),
-            socket_spec.socket_name.clone(),
-        );
+        env.insert("LISTEN_FDNAMES".to_string(), socket_spec.socket_name.clone());
         env
     }
 
@@ -173,8 +164,7 @@ impl SystemdAdvancementsV75Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV75Manifest {
         CoreUserlandV75Manifest {
             pr_id: 4178,
-            pr_title: "PR #4178: systemd V75 Dynamic Unit State Machine & Socket Activation Matrix"
-                .to_string(),
+            pr_title: "PR #4178: systemd V75 Dynamic Unit State Machine & Socket Activation Matrix".to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "Linux systemd".to_string(),
             components_added: vec![
@@ -365,8 +355,7 @@ impl RunitS6AdvancementsV75Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV75Manifest {
         CoreUserlandV75Manifest {
             pr_id: 4180,
-            pr_title: "PR #4180: runit & s6 V75 Active Supervision Tree & Readiness Evaluator"
-                .to_string(),
+            pr_title: "PR #4180: runit & s6 V75 Active Supervision Tree & Readiness Evaluator".to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "runit / s6 / Void Linux".to_string(),
             components_added: vec![
@@ -523,8 +512,7 @@ impl BsdRcAdvancementsV75Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV75Manifest {
         CoreUserlandV75Manifest {
             pr_id: 4182,
-            pr_title: "PR #4182: BSD rc V75 FreeBSD rc.d Pre/Post Hooks & rcctl Inspector"
-                .to_string(),
+            pr_title: "PR #4182: BSD rc V75 FreeBSD rc.d Pre/Post Hooks & rcctl Inspector".to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "FreeBSD / OpenBSD / NetBSD rc".to_string(),
             components_added: vec![
@@ -599,9 +587,7 @@ impl LaunchdAndroidInitAdvancementsV75Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV75Manifest {
         CoreUserlandV75Manifest {
             pr_id: 4183,
-            pr_title:
-                "PR #4183: launchd & Android init V75 Plist Rules & init.rc Property Triggers"
-                    .to_string(),
+            pr_title: "PR #4183: launchd & Android init V75 Plist Rules & init.rc Property Triggers".to_string(),
             target_subsystem: "Init / Service Supervision".to_string(),
             original_system: "macOS launchd / Android init.rc".to_string(),
             components_added: vec![
@@ -669,9 +655,7 @@ impl CronAnacronTimersAtV75Engine {
     pub fn generate_pr_manifest(&self) -> CoreUserlandV75Manifest {
         CoreUserlandV75Manifest {
             pr_id: 4184,
-            pr_title:
-                "PR #4184: Cron, Anacron, Timers & At V75 systemd.timer & Batch Load Evaluator"
-                    .to_string(),
+            pr_title: "PR #4184: Cron, Anacron, Timers & At V75 systemd.timer & Batch Load Evaluator".to_string(),
             target_subsystem: "Scheduled Tasks / Timers".to_string(),
             original_system: "systemd.timer / atd / Vixie Cron / Anacron".to_string(),
             components_added: vec![
@@ -847,8 +831,7 @@ mod tests {
         let env = engine.build_sd_listen_fds_env(&sock_spec);
         assert_eq!(env.get("LISTEN_FDS"), Some(&"3".to_string()));
 
-        let entry =
-            engine.generate_journal_entry("sshd.service", 6, "Accepted pubkey for root", 50000);
+        let entry = engine.generate_journal_entry("sshd.service", 6, "Accepted pubkey for root", 50000);
         assert!(entry.cursor.contains("50000"));
         assert_eq!(entry.priority, 6);
     }

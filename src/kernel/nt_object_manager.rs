@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Principle: HIERARCHICAL NAMESPACE, CAPABILITY HANDLES, SECURITY DESCRIPTORS, OBJECT LIFECYCLE
 
-use alloc::{boxed::Box, collections::BTreeMap, string::String, vec::Vec};
+use alloc::{vec::Vec, string::String, collections::BTreeMap, boxed::Box};
 
 /// NT object type identifiers
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -15,7 +15,7 @@ pub enum ObjectType {
     Mutex,
     Semaphore,
     Section,
-    Key, // Registry key
+    Key,       // Registry key
     Token,
     Process,
     Thread,
@@ -37,21 +37,11 @@ pub struct SecurityDescriptor {
 
 impl SecurityDescriptor {
     pub fn world_readable() -> Self {
-        Self {
-            owner_sid: 0,
-            group_sid: 0,
-            dacl_present: true,
-            access_mask: 0x00120089,
-        }
+        Self { owner_sid: 0, group_sid: 0, dacl_present: true, access_mask: 0x00120089 }
     }
 
     pub fn kernel_only() -> Self {
-        Self {
-            owner_sid: 0,
-            group_sid: 0,
-            dacl_present: true,
-            access_mask: 0x001F01FF,
-        }
+        Self { owner_sid: 0, group_sid: 0, dacl_present: true, access_mask: 0x001F01FF }
     }
 }
 
@@ -67,13 +57,7 @@ pub struct ObjectHeader {
 
 impl ObjectHeader {
     pub fn new(object_type: ObjectType, name: String, security: SecurityDescriptor) -> Self {
-        Self {
-            object_type,
-            name,
-            ref_count: 1,
-            handle_count: 0,
-            security,
-        }
+        Self { object_type, name, ref_count: 1, handle_count: 0, security }
     }
 }
 
@@ -87,20 +71,12 @@ pub struct NtObject {
 
 impl NtObject {
     pub fn new(header: ObjectHeader, body: Vec<u8>) -> Self {
-        Self {
-            header,
-            body,
-            symlink_target: None,
-        }
+        Self { header, body, symlink_target: None }
     }
 
     pub fn symlink(name: String, target: String, security: SecurityDescriptor) -> Self {
         let header = ObjectHeader::new(ObjectType::SymbolicLink, name, security);
-        Self {
-            header,
-            body: Vec::new(),
-            symlink_target: Some(target),
-        }
+        Self { header, body: Vec::new(), symlink_target: Some(target) }
     }
 }
 
@@ -147,21 +123,10 @@ impl ObjectManager {
     pub fn new() -> Self {
         let mut root = ObjectDirectory::new(String::from("\\"));
         // Pre-create standard NT directories
-        for dir_name in &[
-            "Device",
-            "Driver",
-            "FileSystem",
-            "Registry",
-            "KernelObjects",
-            "Sessions",
-        ] {
+        for dir_name in &["Device", "Driver", "FileSystem", "Registry", "KernelObjects", "Sessions"] {
             root.insert_subdir(ObjectDirectory::new(String::from(*dir_name)));
         }
-        Self {
-            root,
-            handles: BTreeMap::new(),
-            next_handle: 1,
-        }
+        Self { root, handles: BTreeMap::new(), next_handle: 1 }
     }
 
     /// Navigate to a subdirectory, creating it if necessary
@@ -169,17 +134,11 @@ impl ObjectManager {
         let parts = Self::split_path(path);
         let mut cur = &mut self.root;
         for part in parts {
-            if part.is_empty() {
-                continue;
-            }
+            if part.is_empty() { continue; }
             if !cur.subdirs.contains_key(part.as_str()) {
-                cur.subdirs
-                    .insert(part.clone(), ObjectDirectory::new(part.clone()));
+                cur.subdirs.insert(part.clone(), ObjectDirectory::new(part.clone()));
             }
-            cur = cur
-                .subdirs
-                .get_mut(part.as_str())
-                .ok_or("navigation error")?;
+            cur = cur.subdirs.get_mut(part.as_str()).ok_or("navigation error")?;
         }
         Ok(())
     }
@@ -189,13 +148,8 @@ impl ObjectManager {
         let parts = Self::split_path(dir_path);
         let mut cur = &mut self.root;
         for part in &parts {
-            if part.is_empty() {
-                continue;
-            }
-            cur = cur
-                .subdirs
-                .get_mut(part.as_str())
-                .ok_or("directory not found")?;
+            if part.is_empty() { continue; }
+            cur = cur.subdirs.get_mut(part.as_str()).ok_or("directory not found")?;
         }
         cur.insert_object(obj);
         Ok(())
@@ -241,13 +195,8 @@ impl ObjectManager {
     fn navigate_ref<'a>(&'a self, parts: &[String]) -> Result<&'a ObjectDirectory, &'static str> {
         let mut cur = &self.root;
         for part in parts {
-            if part.is_empty() {
-                continue;
-            }
-            cur = cur
-                .subdirs
-                .get(part.as_str())
-                .ok_or("directory not found")?;
+            if part.is_empty() { continue; }
+            cur = cur.subdirs.get(part.as_str()).ok_or("directory not found")?;
         }
         Ok(cur)
     }
@@ -255,19 +204,16 @@ impl ObjectManager {
     fn navigate(&mut self, parts: &[String]) -> Result<&mut ObjectDirectory, &'static str> {
         let mut cur = &mut self.root;
         for part in parts {
-            if part.is_empty() {
-                continue;
-            }
-            cur = cur
-                .subdirs
-                .get_mut(part.as_str())
-                .ok_or("directory not found")?;
+            if part.is_empty() { continue; }
+            cur = cur.subdirs.get_mut(part.as_str()).ok_or("directory not found")?;
         }
         Ok(cur)
     }
 
     fn split_path(path: &str) -> Vec<String> {
-        path.split('\\').map(|s| String::from(s)).collect()
+        path.split('\\')
+            .map(|s| String::from(s))
+            .collect()
     }
 
     pub fn handle_count(&self) -> usize {
@@ -281,11 +227,7 @@ mod tests {
 
     fn make_device_obj(name: &str) -> NtObject {
         NtObject::new(
-            ObjectHeader::new(
-                ObjectType::Device,
-                String::from(name),
-                SecurityDescriptor::kernel_only(),
-            ),
+            ObjectHeader::new(ObjectType::Device, String::from(name), SecurityDescriptor::kernel_only()),
             alloc::vec![0xDE, 0xAD],
         )
     }
@@ -293,8 +235,7 @@ mod tests {
     #[test]
     fn test_insert_and_open_object() {
         let mut om = ObjectManager::new();
-        om.insert_object("\\Device", make_device_obj("Disk0"))
-            .unwrap();
+        om.insert_object("\\Device", make_device_obj("Disk0")).unwrap();
         let h = om.open_object("\\Device\\Disk0").unwrap();
         assert!(h.0 >= 1);
         om.close_handle(h).unwrap();

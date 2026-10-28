@@ -97,12 +97,7 @@ impl GridcraftStatisticalRegressionTrendlineForecastEngine {
         })
     }
 
-    pub fn exponential_smoothing_forecast(
-        &self,
-        time_series: &[f64],
-        alpha: f64,
-        steps_ahead: usize,
-    ) -> Vec<f64> {
+    pub fn exponential_smoothing_forecast(&self, time_series: &[f64], alpha: f64, steps_ahead: usize) -> Vec<f64> {
         if time_series.is_empty() {
             return Vec::new();
         }
@@ -118,9 +113,7 @@ impl GridcraftStatisticalRegressionTrendlineForecastEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6721,
-            pr_title: String::from(
-                "PR #6721: Statistical Regression & Trendline Time-Series Forecast Engine",
-            ),
+            pr_title: String::from("PR #6721: Statistical Regression & Trendline Time-Series Forecast Engine"),
             target_subsystem: String::from("GridCraft Advanced Analytics"),
             original_suite: String::from("ArtCraft GridCraft Forecasting Engine"),
             components_added: vec![
@@ -175,16 +168,8 @@ impl GridcraftMultiTableDataModelRelationalSchemaEngine {
         });
     }
 
-    pub fn evaluate_related_lookup(
-        &self,
-        child_table: &str,
-        child_row_idx: usize,
-        target_parent_col: &str,
-    ) -> Option<String> {
-        let rel = self
-            .relationships
-            .iter()
-            .find(|r| r.child_table == child_table)?;
+    pub fn evaluate_related_lookup(&self, child_table: &str, child_row_idx: usize, target_parent_col: &str) -> Option<String> {
+        let rel = self.relationships.iter().find(|r| r.child_table == child_table)?;
         let child_rows = self.tables.get(child_table)?;
         let child_row = child_rows.get(child_row_idx)?;
         let fk_val = child_row.get(&rel.child_fk)?;
@@ -275,9 +260,7 @@ impl GridcraftSolversLinearNonLinearOptimizationEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6723,
-            pr_title: String::from(
-                "PR #6723: Solvers Linear & Non-Linear Constrained Optimization Engine",
-            ),
+            pr_title: String::from("PR #6723: Solvers Linear & Non-Linear Constrained Optimization Engine"),
             target_subsystem: String::from("GridCraft Operations Research Solver"),
             original_suite: String::from("ArtCraft GridCraft Optimization Engine"),
             components_added: vec![
@@ -319,13 +302,7 @@ impl GridcraftInCellDataBarColorScaleIconSetGraphicEngine {
         ((val - min_val) / (max_val - min_val)).clamp(0.0, 1.0)
     }
 
-    pub fn compute_3color_gradient(
-        &self,
-        val: f64,
-        min_val: f64,
-        mid_val: f64,
-        max_val: f64,
-    ) -> String {
+    pub fn compute_3color_gradient(&self, val: f64, min_val: f64, mid_val: f64, max_val: f64) -> String {
         if val <= min_val {
             return String::from("#F8696B"); // Red
         }
@@ -350,12 +327,7 @@ impl GridcraftInCellDataBarColorScaleIconSetGraphicEngine {
         }
     }
 
-    pub fn assign_traffic_light_icon(
-        &self,
-        val: f64,
-        low_thresh: f64,
-        high_thresh: f64,
-    ) -> &'static str {
+    pub fn assign_traffic_light_icon(&self, val: f64, low_thresh: f64, high_thresh: f64) -> &'static str {
         if val >= high_thresh {
             "icon-traffic-green"
         } else if val >= low_thresh {
@@ -368,9 +340,7 @@ impl GridcraftInCellDataBarColorScaleIconSetGraphicEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6724,
-            pr_title: String::from(
-                "PR #6724: In-Cell Data Bars, 3-Color Gradients & Icon Set Graphic Engine",
-            ),
+            pr_title: String::from("PR #6724: In-Cell Data Bars, 3-Color Gradients & Icon Set Graphic Engine"),
             target_subsystem: String::from("GridCraft Cell Graphic Renderer"),
             original_suite: String::from("ArtCraft GridCraft Conditional Graphics"),
             components_added: vec![
@@ -450,11 +420,7 @@ impl GridcraftAutomatedDataCleansingFuzzyDeduplicationEngine {
         result
     }
 
-    pub fn find_fuzzy_duplicates(
-        &self,
-        entries: &[String],
-        max_distance: usize,
-    ) -> Vec<(usize, usize, usize)> {
+    pub fn find_fuzzy_duplicates(&self, entries: &[String], max_distance: usize) -> Vec<(usize, usize, usize)> {
         let mut duplicates = Vec::new();
         for i in 0..entries.len() {
             for j in (i + 1)..entries.len() {
@@ -470,9 +436,7 @@ impl GridcraftAutomatedDataCleansingFuzzyDeduplicationEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6725,
-            pr_title: String::from(
-                "PR #6725: Automated Data Cleansing & Fuzzy Levenshtein Deduplication",
-            ),
+            pr_title: String::from("PR #6725: Automated Data Cleansing & Fuzzy Levenshtein Deduplication"),
             target_subsystem: String::from("GridCraft Data Prep & Scrubbing"),
             original_suite: String::from("ArtCraft GridCraft Data Cleanser"),
             components_added: vec![
@@ -525,9 +489,7 @@ impl GridcraftNaturalLanguageQueryFormulaSynthesizerEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6726,
-            pr_title: String::from(
-                "PR #6726: Natural Language Query to GridCraft Formula Synthesizer",
-            ),
+            pr_title: String::from("PR #6726: Natural Language Query to GridCraft Formula Synthesizer"),
             target_subsystem: String::from("GridCraft AI Formula Assistant"),
             original_suite: String::from("ArtCraft GridCraft AI Assistant"),
             components_added: vec![
@@ -556,13 +518,10 @@ impl GridcraftSpatial3dSurfaceContourMapPlotterEngine {
 
     pub fn render_3d_wireframe_svg(&self, grid: &[Vec<f64>]) -> String {
         if grid.is_empty() || grid[0].is_empty() {
-            return String::from(
-                "<svg width=\"200\" height=\"150\" xmlns=\"http://www.w3.org/2000/svg\"></svg>",
-            );
+            return String::from("<svg width=\"200\" height=\"150\" xmlns=\"http://www.w3.org/2000/svg\"></svg>");
         }
 
-        let mut svg =
-            String::from("<svg width=\"200\" height=\"150\" xmlns=\"http://www.w3.org/2000/svg\">");
+        let mut svg = String::from("<svg width=\"200\" height=\"150\" xmlns=\"http://www.w3.org/2000/svg\">");
         let rows = grid.len();
         let cols = grid[0].len();
 
@@ -587,9 +546,7 @@ impl GridcraftSpatial3dSurfaceContourMapPlotterEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6727,
-            pr_title: String::from(
-                "PR #6727: Spatial 3D Bivariate Surface Mesh & Isometric Contour Plotter",
-            ),
+            pr_title: String::from("PR #6727: Spatial 3D Bivariate Surface Mesh & Isometric Contour Plotter"),
             target_subsystem: String::from("GridCraft 3D Visualization"),
             original_suite: String::from("ArtCraft GridCraft Spatial Graphics"),
             components_added: vec![
@@ -650,9 +607,7 @@ impl GridcraftEncryptedCellAccessRowLevelSecurityEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6728,
-            pr_title: String::from(
-                "PR #6728: Encrypted Cell Access & Enterprise Row-Level Security (RLS)",
-            ),
+            pr_title: String::from("PR #6728: Encrypted Cell Access & Enterprise Row-Level Security (RLS)"),
             target_subsystem: String::from("GridCraft Security & Compliance"),
             original_suite: String::from("ArtCraft GridCraft Enterprise Security"),
             components_added: vec![
@@ -698,9 +653,7 @@ impl GridcraftExternalDatabaseSqlConnectorEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6729,
-            pr_title: String::from(
-                "PR #6729: External Database SQL Connector & Parameterized Query Table",
-            ),
+            pr_title: String::from("PR #6729: External Database SQL Connector & Parameterized Query Table"),
             target_subsystem: String::from("GridCraft Database Integration"),
             original_suite: String::from("ArtCraft GridCraft DB Connector"),
             components_added: vec![
@@ -734,9 +687,7 @@ pub struct GridcraftInteractiveDashboardControlSlicerWidgetEngine {
 
 impl GridcraftInteractiveDashboardControlSlicerWidgetEngine {
     pub fn new() -> Self {
-        Self {
-            slicers: Vec::new(),
-        }
+        Self { slicers: Vec::new() }
     }
 
     pub fn add_slicer(&mut self, slicer_id: &str, col: u32, selected: Vec<String>) {
@@ -763,9 +714,7 @@ impl GridcraftInteractiveDashboardControlSlicerWidgetEngine {
     pub fn generate_pr_manifest(&self) -> GridcraftV67PrProposalManifest {
         GridcraftV67PrProposalManifest {
             pr_id: 6730,
-            pr_title: String::from(
-                "PR #6730: Interactive Dashboard Slicers & Timeline Range Widgets",
-            ),
+            pr_title: String::from("PR #6730: Interactive Dashboard Slicers & Timeline Range Widgets"),
             target_subsystem: String::from("GridCraft Dashboard Interactivity"),
             original_suite: String::from("ArtCraft GridCraft Dashboard Widgets"),
             components_added: vec![
@@ -926,11 +875,7 @@ mod tests {
         let norm = engine.normalize_whitespace("  Hello   World   ");
         assert_eq!(norm, "Hello World");
 
-        let items = vec![
-            "Acme Corp".to_string(),
-            "Acme Corporation".to_string(),
-            "Other Inc".to_string(),
-        ];
+        let items = vec!["Acme Corp".to_string(), "Acme Corporation".to_string(), "Other Inc".to_string()];
         let dups = engine.find_fuzzy_duplicates(&items, 8);
         assert!(!dups.is_empty());
     }
@@ -976,19 +921,14 @@ mod tests {
             param_name: "region".to_string(),
             param_value: "'EMEA'".to_string(),
         }];
-        let sql =
-            engine.substitute_sql_params("SELECT * FROM Sales WHERE Region = :region", &params);
+        let sql = engine.substitute_sql_params("SELECT * FROM Sales WHERE Region = :region", &params);
         assert_eq!(sql, "SELECT * FROM Sales WHERE Region = 'EMEA'");
     }
 
     #[test]
     fn test_dashboard_slicer_engine() {
         let mut engine = GridcraftInteractiveDashboardControlSlicerWidgetEngine::new();
-        engine.add_slicer(
-            "slicer_1",
-            0,
-            vec!["North".to_string(), "South".to_string()],
-        );
+        engine.add_slicer("slicer_1", 0, vec!["North".to_string(), "South".to_string()]);
 
         let row_valid = vec!["North".to_string(), "100".to_string()];
         let row_invalid = vec!["West".to_string(), "100".to_string()];

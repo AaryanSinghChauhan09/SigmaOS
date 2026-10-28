@@ -58,8 +58,7 @@ impl LightcraftAiNeuralSkySubjectSegmentationV67PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV67PrProposalManifest {
         LightcraftV67PrProposalManifest {
             pr_id: 6701,
-            pr_title: "feat(lightcraft): AI Neural Sky & Subject Semantic Auto-Masking Engine V67"
-                .to_string(),
+            pr_title: "feat(lightcraft): AI Neural Sky & Subject Semantic Auto-Masking Engine V67".to_string(),
             target_subsystem: "LightCraft AI Masking Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -242,9 +241,7 @@ impl LightcraftColorGrading3WayWheelV67PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV67PrProposalManifest {
         LightcraftV67PrProposalManifest {
             pr_id: 6704,
-            pr_title:
-                "feat(lightcraft): 3-Way Color Grading Wheels with Crossover Luma Control V67"
-                    .to_string(),
+            pr_title: "feat(lightcraft): 3-Way Color Grading Wheels with Crossover Luma Control V67".to_string(),
             target_subsystem: "LightCraft Color Grading Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -299,8 +296,7 @@ impl LightcraftDamCatalogSmartCollectionV67PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV67PrProposalManifest {
         LightcraftV67PrProposalManifest {
             pr_id: 6705,
-            pr_title: "feat(lightcraft): Digital Asset Management Catalog & Fast Search Engine V67"
-                .to_string(),
+            pr_title: "feat(lightcraft): Digital Asset Management Catalog & Fast Search Engine V67".to_string(),
             target_subsystem: "LightCraft Catalog Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -401,11 +397,9 @@ impl LightcraftLensCorrectionPerspectiveTransformV67PrEngine {
         let k1_factor = 1.0 + self.radial_k1;
         for chunk in input_rgb.chunks(3) {
             if chunk.len() == 3 {
-                let r = (chunk[0] as f32 * k1_factor * self.chromatic_aberration_r)
-                    .clamp(0.0, 255.0) as u8;
+                let r = (chunk[0] as f32 * k1_factor * self.chromatic_aberration_r).clamp(0.0, 255.0) as u8;
                 let g = (chunk[1] as f32 * k1_factor).clamp(0.0, 255.0) as u8;
-                let b = (chunk[2] as f32 * k1_factor / self.chromatic_aberration_r)
-                    .clamp(0.0, 255.0) as u8;
+                let b = (chunk[2] as f32 * k1_factor / self.chromatic_aberration_r).clamp(0.0, 255.0) as u8;
                 output.extend_from_slice(&[r, g, b]);
             }
         }
@@ -497,14 +491,8 @@ pub struct LightcraftXmpPresetNonDestructiveHistoryV67PrEngine {
 impl LightcraftXmpPresetNonDestructiveHistoryV67PrEngine {
     pub fn new() -> Self {
         let mut preset_store = BTreeMap::new();
-        preset_store.insert(
-            "CinematicV67".to_string(),
-            "exposure:+0.3,contrast:+12,shadows:-5".to_string(),
-        );
-        preset_store.insert(
-            "PortraitSoftV67".to_string(),
-            "clarity:-10,skin_smooth:+20".to_string(),
-        );
+        preset_store.insert("CinematicV67".to_string(), "exposure:+0.3,contrast:+12,shadows:-5".to_string());
+        preset_store.insert("PortraitSoftV67".to_string(), "clarity:-10,skin_smooth:+20".to_string());
         Self {
             preset_store,
             history_snapshots: Vec::new(),
@@ -513,8 +501,7 @@ impl LightcraftXmpPresetNonDestructiveHistoryV67PrEngine {
 
     pub fn apply_preset(&mut self, preset_name: &str) -> Option<&String> {
         if let Some(val) = self.preset_store.get(preset_name) {
-            self.history_snapshots
-                .push(format!("Applied preset: {}", preset_name));
+            self.history_snapshots.push(format!("Applied preset: {}", preset_name));
             Some(val)
         } else {
             None
@@ -528,9 +515,7 @@ impl LightcraftXmpPresetNonDestructiveHistoryV67PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV67PrProposalManifest {
         LightcraftV67PrProposalManifest {
             pr_id: 6709,
-            pr_title:
-                "feat(lightcraft): XMP Non-Destructive Adjustment Stack & History Snapshot Tree V67"
-                    .to_string(),
+            pr_title: "feat(lightcraft): XMP Non-Destructive Adjustment Stack & History Snapshot Tree V67".to_string(),
             target_subsystem: "LightCraft Preset & History Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -598,9 +583,7 @@ impl LightcraftFrequencySeparationSkinRetouchV67PrEngine {
     pub fn generate_pr_manifest(&self) -> LightcraftV67PrProposalManifest {
         LightcraftV67PrProposalManifest {
             pr_id: 6710,
-            pr_title:
-                "feat(lightcraft): Spatial Frequency Separation High/Low Pass Skin Retouching V67"
-                    .to_string(),
+            pr_title: "feat(lightcraft): Spatial Frequency Separation High/Low Pass Skin Retouching V67".to_string(),
             target_subsystem: "LightCraft Retouch & Filter Subsystem".to_string(),
             original_suite: "ArtCraft LightCraft Photo Studio".to_string(),
             components_added: vec![
@@ -608,8 +591,7 @@ impl LightcraftFrequencySeparationSkinRetouchV67PrEngine {
                 "GaussianLowPassToneBlurFilter".to_string(),
                 "HighPassTextureDetailIsolationLayer".to_string(),
             ],
-            performance_multiplier: "18.5x Acceleration via GPU Frequency Decomposition"
-                .to_string(),
+            performance_multiplier: "18.5x Acceleration via GPU Frequency Decomposition".to_string(),
             status: "Ready for Merge".to_string(),
         }
     }
@@ -663,9 +645,7 @@ impl SovereignLightcraftArtcraftMissingComponentsV67PrGateway {
         }
 
         let raw_bytes = vec![120u8; 16];
-        let rgb = self
-            .raw_denoise_engine
-            .demosaic_and_denoise_raw(&raw_bytes, 4, 4);
+        let rgb = self.raw_denoise_engine.demosaic_and_denoise_raw(&raw_bytes, 4, 4);
         if rgb.is_empty() {
             return false;
         }
@@ -680,8 +660,7 @@ impl SovereignLightcraftArtcraftMissingComponentsV67PrGateway {
             return false;
         }
 
-        self.dam_catalog_engine
-            .index_asset(1, "photo_001.raw", &["portrait", "studio"]);
+        self.dam_catalog_engine.index_asset(1, "photo_001.raw", &["portrait", "studio"]);
         let search_res = self.dam_catalog_engine.search_catalog("studio");
         if search_res.is_empty() {
             return false;
@@ -692,9 +671,7 @@ impl SovereignLightcraftArtcraftMissingComponentsV67PrGateway {
             return false;
         }
 
-        let corrected = self
-            .lens_correction_engine
-            .correct_lens_geometry_and_ca(&graded);
+        let corrected = self.lens_correction_engine.correct_lens_geometry_and_ca(&graded);
         if corrected.is_empty() {
             return false;
         }
@@ -708,9 +685,7 @@ impl SovereignLightcraftArtcraftMissingComponentsV67PrGateway {
             return false;
         }
 
-        let (low, high) = self
-            .frequency_separation_engine
-            .process_frequency_separation(&corrected);
+        let (low, high) = self.frequency_separation_engine.process_frequency_separation(&corrected);
         if low.is_empty() || high.is_empty() {
             return false;
         }

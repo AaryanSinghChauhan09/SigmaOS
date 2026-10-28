@@ -1,7 +1,7 @@
 #![no_std]
 extern crate alloc;
-use alloc::format;
 use alloc::vec;
+use alloc::format;
 // SPDX-License-Identifier: MIT
 // SigmaOS - ArtCraft Craftlibs Missing Components Parity PR Gateway
 // (`src/creative/filmcraft_lightcraft_mediacraft_artcraft_parity_pr.rs`)
@@ -20,6 +20,10 @@ use alloc::collections::BTreeMap;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::f64::consts::PI;
+
+
+
+
 
 /// Structured PR proposal manifest for missing ArtCraft Craftlibs components.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -64,16 +68,8 @@ impl FilmcraftNleTimelineOpticalFlowPrEngine {
         }
     }
 
-    pub fn compute_optical_flow_slow_mo(
-        &mut self,
-        frame_a_rgb: &[u8],
-        frame_b_rgb: &[u8],
-        interpolation_factor: f32,
-        output_interpolated_rgb: &mut [u8],
-    ) -> Result<usize, String> {
-        if frame_a_rgb.len() != frame_b_rgb.len()
-            || output_interpolated_rgb.len() != frame_a_rgb.len()
-        {
+    pub fn compute_optical_flow_slow_mo(&mut self, frame_a_rgb: &[u8], frame_b_rgb: &[u8], interpolation_factor: f32, output_interpolated_rgb: &mut [u8]) -> Result<usize, String> {
+        if frame_a_rgb.len() != frame_b_rgb.len() || output_interpolated_rgb.len() != frame_a_rgb.len() {
             return Err("Optical flow input/output buffer dimensions mismatch".to_string());
         }
 
@@ -90,11 +86,7 @@ impl FilmcraftNleTimelineOpticalFlowPrEngine {
         Ok(output_interpolated_rgb.len())
     }
 
-    pub fn sync_multicam_audio_tracks(
-        &mut self,
-        track_a_samples: &[f32],
-        track_b_samples: &[f32],
-    ) -> Result<i32, String> {
+    pub fn sync_multicam_audio_tracks(&mut self, track_a_samples: &[f32], track_b_samples: &[f32]) -> Result<i32, String> {
         if track_a_samples.is_empty() || track_b_samples.is_empty() {
             return Err("Empty audio tracks provided for multicam sync".to_string());
         }
@@ -125,15 +117,12 @@ impl FilmcraftNleTimelineOpticalFlowPrEngine {
 
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
-            pr_title:
-                "feat(filmcraft): NLE Multicam Audio Sync, GPU Optical Flow & ACES Color Pipeline"
-                    .to_string(),
+            pr_title: "feat(filmcraft): NLE Multicam Audio Sync, GPU Optical Flow & ACES Color Pipeline".to_string(),
             target_subsystem: "FilmCraft Video Engine".to_string(),
             original_suite: "ArtCraft FilmCraftlibs NLE Master".to_string(),
             components_added: vec![
                 "Sub-frame multicam audio waveform correlation auto-alignment".to_string(),
-                "GPU bidirectional optical flow motion estimation for 120fps time warping"
-                    .to_string(),
+                "GPU bidirectional optical flow motion estimation for 120fps time warping".to_string(),
                 "ACES 1.3 logarithmic color space 3D LUT grading transform pipeline".to_string(),
                 "ProRes & DNxHR low-latency background proxy transcode engine".to_string(),
             ],
@@ -177,13 +166,7 @@ impl LightcraftToneCurveAiMaskingCatalogPrEngine {
         }
     }
 
-    pub fn generate_ai_mask(
-        &self,
-        target: AiMaskTarget,
-        width: u32,
-        height: u32,
-        output_mask_alpha: &mut [u8],
-    ) -> Result<usize, String> {
+    pub fn generate_ai_mask(&self, target: AiMaskTarget, width: u32, height: u32, output_mask_alpha: &mut [u8]) -> Result<usize, String> {
         let expected_len = (width * height) as usize;
         if output_mask_alpha.len() != expected_len {
             return Err("Output mask buffer size mismatch".to_string());
@@ -203,12 +186,7 @@ impl LightcraftToneCurveAiMaskingCatalogPrEngine {
         Ok(expected_len)
     }
 
-    pub fn apply_spline_tone_curve(
-        &self,
-        rgb_in: &[u8],
-        curve_points: &[[f32; 2]],
-        rgb_out: &mut [u8],
-    ) -> Result<(), String> {
+    pub fn apply_spline_tone_curve(&self, rgb_in: &[u8], curve_points: &[[f32; 2]], rgb_out: &mut [u8]) -> Result<(), String> {
         if rgb_in.len() != rgb_out.len() {
             return Err("Tone curve buffer dimensions mismatch".to_string());
         }
@@ -227,12 +205,7 @@ impl LightcraftToneCurveAiMaskingCatalogPrEngine {
         Ok(())
     }
 
-    pub fn index_catalog_photo(
-        &mut self,
-        file_path: &str,
-        exif_camera: &str,
-        keywords: &[&str],
-    ) -> usize {
+    pub fn index_catalog_photo(&mut self, file_path: &str, exif_camera: &str, keywords: &[&str]) -> usize {
         if !file_path.is_empty() && !exif_camera.is_empty() && !keywords.is_empty() {
             self.catalog_indexed_photos += 1;
         }
@@ -291,11 +264,7 @@ impl MediacraftLowLatencyPipelineEqualizerPrEngine {
         }
     }
 
-    pub fn process_31_band_equalizer(
-        &mut self,
-        audio_pcm_in: &[f32],
-        audio_pcm_out: &mut [f32],
-    ) -> Result<usize, String> {
+    pub fn process_31_band_equalizer(&mut self, audio_pcm_in: &[f32], audio_pcm_out: &mut [f32]) -> Result<usize, String> {
         if audio_pcm_in.len() != audio_pcm_out.len() {
             return Err("PCM buffer dimensions mismatch for EQ filter".to_string());
         }
@@ -310,13 +279,7 @@ impl MediacraftLowLatencyPipelineEqualizerPrEngine {
         Ok(audio_pcm_out.len())
     }
 
-    pub fn render_binaural_3d_audio(
-        &self,
-        pcm_mono: &[f32],
-        azimuth_deg: f32,
-        pcm_left: &mut [f32],
-        pcm_right: &mut [f32],
-    ) -> Result<(), String> {
+    pub fn render_binaural_3d_audio(&self, pcm_mono: &[f32], azimuth_deg: f32, pcm_left: &mut [f32], pcm_right: &mut [f32]) -> Result<(), String> {
         if pcm_mono.len() != pcm_left.len() || pcm_mono.len() != pcm_right.len() {
             return Err("Stereo channel buffer dimensions mismatch".to_string());
         }
@@ -335,17 +298,13 @@ impl MediacraftLowLatencyPipelineEqualizerPrEngine {
 
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
-            pr_title:
-                "feat(mediacraft): Low-Latency Media Pipeline, 3D Spatial Audio & 31-Band DSP EQ"
-                    .to_string(),
+            pr_title: "feat(mediacraft): Low-Latency Media Pipeline, 3D Spatial Audio & 31-Band DSP EQ".to_string(),
             target_subsystem: "MediaCraft Audio/Video Playback Infrastructure".to_string(),
             original_suite: "ArtCraft MediaCraftlibs Universal Engine".to_string(),
             components_added: vec![
                 "Hardware-accelerated H.265/AV1/ProRes 4444 zero-copy video decoder".to_string(),
-                "HRTF binaural 3D spatial audio renderer with head-tracking compensation"
-                    .to_string(),
-                "31-band graphic/parametric DSP equalizer with linear-phase FIR filtering"
-                    .to_string(),
+                "HRTF binaural 3D spatial audio renderer with head-tracking compensation".to_string(),
+                "31-band graphic/parametric DSP equalizer with linear-phase FIR filtering".to_string(),
                 "Sub-10ms RTP/RTSP low-latency live streaming network router".to_string(),
             ],
             performance_multiplier: "< 5ms Audio-Video Sync Drift".to_string(),
@@ -390,13 +349,7 @@ impl Model3dSculptingRiggingPbrExporterPrEngine {
         }
     }
 
-    pub fn apply_sculpt_brush(
-        &mut self,
-        vertices: &mut [[f32; 3]],
-        brush_center: [f32; 3],
-        brush_radius: f32,
-        intensity: f32,
-    ) -> usize {
+    pub fn apply_sculpt_brush(&mut self, vertices: &mut [[f32; 3]], brush_center: [f32; 3], brush_radius: f32, intensity: f32) -> usize {
         let mut modified = 0;
         let radius_sq = brush_radius * brush_radius;
 
@@ -430,15 +383,12 @@ impl Model3dSculptingRiggingPbrExporterPrEngine {
 
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
-            pr_title:
-                "feat(model3d): Dynamic Sculpt Brushes, IK Skeleton Rigging & PBR GLTF Exporter"
-                    .to_string(),
+            pr_title: "feat(model3d): Dynamic Sculpt Brushes, IK Skeleton Rigging & PBR GLTF Exporter".to_string(),
             target_subsystem: "Model3D Mesh & Scene Engine".to_string(),
             original_suite: "ArtCraft Model3DCraftlibs Viewport Studio".to_string(),
             components_added: vec![
                 "Dynamic topology mesh sculpting brushes (clay, grab, crease, smooth)".to_string(),
-                "Analytical Inverse Kinematics (IK) skeleton solver with joint constraints"
-                    .to_string(),
+                "Analytical Inverse Kinematics (IK) skeleton solver with joint constraints".to_string(),
                 "Node-based PBR metallic-roughness material shader graph renderer".to_string(),
                 "GLTF 2.0 / USDZ multi-format 3D scene exporter with animation tracks".to_string(),
             ],
@@ -473,23 +423,14 @@ impl VectorcraftAnimationLottieBonesPrEngine {
         }
     }
 
-    pub fn compute_boolean_union_path(
-        &self,
-        path_a_points: &[[f32; 2]],
-        path_b_points: &[[f32; 2]],
-    ) -> Vec<[f32; 2]> {
+    pub fn compute_boolean_union_path(&self, path_a_points: &[[f32; 2]], path_b_points: &[[f32; 2]]) -> Vec<[f32; 2]> {
         let mut result = Vec::with_capacity(path_a_points.len() + path_b_points.len());
         result.extend_from_slice(path_a_points);
         result.extend_from_slice(path_b_points);
         result
     }
 
-    pub fn export_lottie_json(
-        &mut self,
-        layers_count: usize,
-        frame_rate: u32,
-        duration_frames: u32,
-    ) -> String {
+    pub fn export_lottie_json(&mut self, layers_count: usize, frame_rate: u32, duration_frames: u32) -> String {
         self.animated_tracks_count += layers_count;
         format!(
             "{{\"v\":\"5.7.4\",\"fr\":{},\"ip\":0,\"op\":{},\"w\":1920,\"h\":1080,\"assets\":[],\"layers\":[]}}",
@@ -499,16 +440,13 @@ impl VectorcraftAnimationLottieBonesPrEngine {
 
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
-            pr_title:
-                "feat(vectorcraft): Non-Destructive Boolean Paths, Bone Rigging & Lottie Exporter"
-                    .to_string(),
+            pr_title: "feat(vectorcraft): Non-Destructive Boolean Paths, Bone Rigging & Lottie Exporter".to_string(),
             target_subsystem: "VectorCraft & VectorAnimation Engine".to_string(),
             original_suite: "ArtCraft VectorCraftlibs Motion Suite".to_string(),
             components_added: vec![
                 "Constructive Solid Geometry (CSG) non-destructive boolean path solver".to_string(),
                 "Bone deformation rigging with spline keyframe interpolation handles".to_string(),
-                "Multi-frame onion skinning overlay for traditional 2D animation workflow"
-                    .to_string(),
+                "Multi-frame onion skinning overlay for traditional 2D animation workflow".to_string(),
                 "Lottie JSON & animated SVG vector motion graphic exporter".to_string(),
             ],
             performance_multiplier: "1,000+ Vector Paths Rendered at 120 FPS".to_string(),
@@ -542,12 +480,7 @@ impl AudiocraftDawSynthesizerVst3MasteringPrEngine {
         }
     }
 
-    pub fn render_spectral_wavetable_oscillator(
-        &self,
-        frequency_hz: f32,
-        sample_rate: u32,
-        samples_out: &mut [f32],
-    ) -> Result<usize, String> {
+    pub fn render_spectral_wavetable_oscillator(&self, frequency_hz: f32, sample_rate: u32, samples_out: &mut [f32]) -> Result<usize, String> {
         if sample_rate == 0 || samples_out.is_empty() {
             return Err("Invalid sample rate or empty output buffer".to_string());
         }
@@ -582,19 +515,14 @@ impl AudiocraftDawSynthesizerVst3MasteringPrEngine {
 
     pub fn generate_proposal(&self) -> CraftlibsPrProposalManifest {
         CraftlibsPrProposalManifest {
-            pr_title:
-                "feat(audiocraft): Multi-Track DAW, Spectral Wavetable Synth & VST3 Mastering Chain"
-                    .to_string(),
+            pr_title: "feat(audiocraft): Multi-Track DAW, Spectral Wavetable Synth & VST3 Mastering Chain".to_string(),
             target_subsystem: "AudioCraft & SoundCraft Engine".to_string(),
             original_suite: "ArtCraft AudioCraftlibs DAW & DSP Suite".to_string(),
             components_added: vec![
                 "Sample-accurate multi-track DAW automation lanes & MIDI sequencer".to_string(),
-                "Spectral wavetable synthesizer with additive/subtractive synthesis engines"
-                    .to_string(),
-                "VST3 / CLAP audio plugin hosting framework with sandboxed memory protection"
-                    .to_string(),
-                "EBU R128 integrated loudness meter, true-peak limiter & mastering chain"
-                    .to_string(),
+                "Spectral wavetable synthesizer with additive/subtractive synthesis engines".to_string(),
+                "VST3 / CLAP audio plugin hosting framework with sandboxed memory protection".to_string(),
+                "EBU R128 integrated loudness meter, true-peak limiter & mastering chain".to_string(),
             ],
             performance_multiplier: "64-Channel Zero-Drop Audio Buffer Processing".to_string(),
             status: "Ready for Merge".to_string(),
@@ -639,36 +567,22 @@ impl SovereignArtcraftCraftlibsParityPrGateway {
         let frame_a = vec![100u8; 12];
         let frame_b = vec![200u8; 12];
         let mut interp = vec![0u8; 12];
-        let _film_ok = self
-            .filmcraft_engine
-            .compute_optical_flow_slow_mo(&frame_a, &frame_b, 0.5, &mut interp)
-            .is_ok();
+        let _film_ok = self.filmcraft_engine.compute_optical_flow_slow_mo(&frame_a, &frame_b, 0.5, &mut interp).is_ok();
 
         let mut mask = vec![0u8; 16];
-        let _light_ok = self
-            .lightcraft_engine
-            .generate_ai_mask(AiMaskTarget::Sky, 4, 4, &mut mask)
-            .is_ok();
+        let _light_ok = self.lightcraft_engine.generate_ai_mask(AiMaskTarget::Sky, 4, 4, &mut mask).is_ok();
 
         let pcm_in = vec![0.5f32; 16];
         let mut pcm_out = vec![0.0f32; 16];
-        let _media_ok = self
-            .mediacraft_engine
-            .process_31_band_equalizer(&pcm_in, &mut pcm_out)
-            .is_ok();
+        let _media_ok = self.mediacraft_engine.process_31_band_equalizer(&pcm_in, &mut pcm_out).is_ok();
 
         let mut verts = [[0.0f32, 0.0f32, 0.0f32]];
-        let _sculpt_cnt =
-            self.model3d_engine
-                .apply_sculpt_brush(&mut verts, [0.0, 0.0, 0.0], 1.0, 0.5);
+        let _sculpt_cnt = self.model3d_engine.apply_sculpt_brush(&mut verts, [0.0, 0.0, 0.0], 1.0, 0.5);
 
         let _lottie = self.vectorcraft_engine.export_lottie_json(2, 60, 300);
 
         let mut audio_samples = vec![0.0f32; 64];
-        let _synth_ok = self
-            .audiocraft_engine
-            .render_spectral_wavetable_oscillator(440.0, 48000, &mut audio_samples)
-            .is_ok();
+        let _synth_ok = self.audiocraft_engine.render_spectral_wavetable_oscillator(440.0, 48000, &mut audio_samples).is_ok();
 
         true
     }
@@ -737,8 +651,7 @@ mod tests {
         assert!(res.is_ok());
         assert_eq!(mask[0], 255);
 
-        let indexed =
-            engine.index_catalog_photo("photo.raw", "Sony A7R V", &["portrait", "outdoor"]);
+        let indexed = engine.index_catalog_photo("photo.raw", "Sony A7R V", &["portrait", "outdoor"]);
         assert_eq!(indexed, 1);
     }
 
@@ -755,9 +668,7 @@ mod tests {
         let mono = vec![0.8f32; 4];
         let mut left = vec![0.0f32; 4];
         let mut right = vec![0.0f32; 4];
-        assert!(engine
-            .render_binaural_3d_audio(&mono, 0.0, &mut left, &mut right)
-            .is_ok());
+        assert!(engine.render_binaural_3d_audio(&mono, 0.0, &mut left, &mut right).is_ok());
     }
 
     #[test]

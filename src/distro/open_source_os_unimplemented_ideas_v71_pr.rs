@@ -464,25 +464,18 @@ mod tests {
 
         // 3. OpenBSD Pinsyscall
         assert!(suite.openbsd_pinsyscall.validate_pinsyscall(0x7fff0500));
-        assert!(suite
-            .openbsd_pinsyscall
-            .check_unveil_access("/usr/bin", 'r'));
+        assert!(suite.openbsd_pinsyscall.check_unveil_access("/usr/bin", 'r'));
 
         // 4. NetBSD Rump
         let packet = [0, 0, 0, 0, 100, 1, 2];
-        assert_eq!(
-            suite.netbsd_rump.parse_9p_header(&packet),
-            Some((100, 0x0201))
-        );
+        assert_eq!(suite.netbsd_rump.parse_9p_header(&packet), Some((100, 0x0201)));
 
         // 5. DragonFly HAMMER3
         assert!(suite.dragonfly_hammer3.sync_pfs_delta(1, 2));
         assert!(suite.dragonfly_hammer3.verify_scrub_checksum("SHA256:abcd"));
 
         // 6. Illumos OpenZFS
-        let encrypted = suite
-            .illumos_openzfs
-            .encrypt_block_aes_gcm(&[1, 2, 3], &[7u8; 32]);
+        let encrypted = suite.illumos_openzfs.encrypt_block_aes_gcm(&[1, 2, 3], &[7u8; 32]);
         assert_eq!(encrypted.len(), 3);
         assert_eq!(
             suite.illumos_openzfs.translate_dtrace_to_ebpf("zfs:read"),
@@ -494,9 +487,7 @@ mod tests {
 
         // 8. Plan 9 Plumber
         assert_eq!(
-            suite
-                .plan9_plumber
-                .route_plumber_message("https://example.com"),
+            suite.plan9_plumber.route_plumber_message("https://example.com"),
             Some("dispatch_browser")
         );
 

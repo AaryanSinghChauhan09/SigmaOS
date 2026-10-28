@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Principle: CAPABILITY-BASED IPC, INFORMATION HIDING, ENCAPSULATION, SAFE CONCURRENCY
 
-use alloc::{collections::BTreeMap, string::String, vec::Vec};
+use alloc::{vec::Vec, collections::BTreeMap, string::String};
 use core::sync::atomic::{AtomicU32, AtomicUsize, Ordering};
 
 pub type PortName = u32;
@@ -83,9 +83,7 @@ pub struct PortSet {
 
 impl PortSet {
     pub fn new() -> Self {
-        Self {
-            members: Vec::new(),
-        }
+        Self { members: Vec::new() }
     }
 
     pub fn insert(&mut self, name: PortName) {
@@ -149,10 +147,7 @@ pub struct IpcVoucher {
 
 impl IpcVoucher {
     pub fn new(id: u32) -> Self {
-        Self {
-            id,
-            attributes: BTreeMap::new(),
-        }
+        Self { id, attributes: BTreeMap::new() }
     }
 
     pub fn set_attribute(&mut self, key: u32, value: Vec<u8>) {
@@ -194,12 +189,7 @@ mod tests {
         let recv = ns.allocate(PortRight::Receive);
         let msg = MachMessage {
             header: MachMsgHeader {
-                bits: 0,
-                size: 0,
-                remote_port: recv,
-                local_port: 0,
-                voucher_port: 0,
-                id: 0,
+                bits: 0, size: 0, remote_port: recv, local_port: 0, voucher_port: 0, id: 0,
             },
             body: alloc::vec![],
         };

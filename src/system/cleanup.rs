@@ -82,13 +82,7 @@ impl SystemCleanupManager {
     }
 
     /// Add cleanup option
-    pub fn add_option(
-        &mut self,
-        category: CleanupCategory,
-        name: String,
-        description: String,
-        path: String,
-    ) {
+    pub fn add_option(&mut self, category: CleanupCategory, name: String, description: String, path: String) {
         let option = CleanupOption {
             category,
             name,
@@ -101,22 +95,14 @@ impl SystemCleanupManager {
 
     /// Enable cleanup option
     pub fn enable_option(&mut self, name: &str) -> Result<(), &'static str> {
-        let option = self
-            .options
-            .iter_mut()
-            .find(|o| o.name == name)
-            .ok_or("Option not found")?;
+        let option = self.options.iter_mut().find(|o| o.name == name).ok_or("Option not found")?;
         option.enabled.store(true, Ordering::Relaxed);
         Ok(())
     }
 
     /// Disable cleanup option
     pub fn disable_option(&mut self, name: &str) -> Result<(), &'static str> {
-        let option = self
-            .options
-            .iter_mut()
-            .find(|o| o.name == name)
-            .ok_or("Option not found")?;
+        let option = self.options.iter_mut().find(|o| o.name == name).ok_or("Option not found")?;
         option.enabled.store(false, Ordering::Relaxed);
         Ok(())
     }
@@ -215,7 +201,9 @@ pub fn init_system_cleanup() {
 
 /// Get global system cleanup manager
 pub fn get_system_cleanup() -> Option<&'static mut SystemCleanupManager> {
-    unsafe { SYSTEM_CLEANUP.as_mut() }
+    unsafe {
+        SYSTEM_CLEANUP.as_mut()
+    }
 }
 
 #[cfg(test)]

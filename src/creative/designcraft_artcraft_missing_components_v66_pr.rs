@@ -107,8 +107,7 @@ impl DesigncraftAiGenerativeLayoutConstraintMeshV66PrEngine {
     pub fn resolve_breakpoint_column_width(&self, screen_w: f32) -> (String, f32) {
         for bp in &self.breakpoints {
             if screen_w >= bp.min_width_px && screen_w <= bp.max_width_px {
-                let available_w =
-                    screen_w - (bp.margin_px * 2.0) - (bp.gutter_px * (bp.columns - 1) as f32);
+                let available_w = screen_w - (bp.margin_px * 2.0) - (bp.gutter_px * (bp.columns - 1) as f32);
                 let col_w = (available_w / bp.columns as f32).max(0.0);
                 return (bp.breakpoint_name.clone(), col_w);
             }
@@ -329,38 +328,10 @@ pub struct DesigncraftMultiColorGradientMesh3dLightingV66PrEngine {
 impl DesigncraftMultiColorGradientMesh3dLightingV66PrEngine {
     pub fn new() -> Self {
         let points = vec![
-            GradientMeshControlPoint {
-                x: 0.0,
-                y: 0.0,
-                r: 255,
-                g: 100,
-                b: 100,
-                a: 255,
-            },
-            GradientMeshControlPoint {
-                x: 100.0,
-                y: 0.0,
-                r: 100,
-                g: 255,
-                b: 100,
-                a: 255,
-            },
-            GradientMeshControlPoint {
-                x: 0.0,
-                y: 100.0,
-                r: 100,
-                g: 100,
-                b: 255,
-                a: 255,
-            },
-            GradientMeshControlPoint {
-                x: 100.0,
-                y: 100.0,
-                r: 255,
-                g: 255,
-                b: 100,
-                a: 255,
-            },
+            GradientMeshControlPoint { x: 0.0, y: 0.0, r: 255, g: 100, b: 100, a: 255 },
+            GradientMeshControlPoint { x: 100.0, y: 0.0, r: 100, g: 255, b: 100, a: 255 },
+            GradientMeshControlPoint { x: 0.0, y: 100.0, r: 100, g: 100, b: 255, a: 255 },
+            GradientMeshControlPoint { x: 100.0, y: 100.0, r: 255, g: 255, b: 100, a: 255 },
         ];
         Self {
             mesh_points: points,
@@ -402,9 +373,7 @@ impl DesigncraftMultiColorGradientMesh3dLightingV66PrEngine {
     pub fn generate_pr_manifest(&self) -> DesigncraftV66PrProposalManifest {
         DesigncraftV66PrProposalManifest {
             pr_id: 6614,
-            pr_title:
-                "feat(designcraft): Add 3D Vector Gradient Mesh & Volumetric Lighting Shader Engine"
-                    .to_string(),
+            pr_title: "feat(designcraft): Add 3D Vector Gradient Mesh & Volumetric Lighting Shader Engine".to_string(),
             target_subsystem: "DesignCraft Vector Gradient Mesh Subsystem".to_string(),
             original_suite: "ArtCraft DesignCraft Vector Color Studio".to_string(),
             components_added: vec![
@@ -459,17 +428,12 @@ impl DesigncraftDesignTokenDesignSystemLinterV66PrEngine {
     }
 
     pub fn lint_element_fill_color(&mut self, element_id: u32, color_hex: &str) -> bool {
-        if color_hex.starts_with('#')
-            && !self.registered_token_keys.contains(&color_hex.to_string())
-        {
+        if color_hex.starts_with('#') && !self.registered_token_keys.contains(&color_hex.to_string()) {
             let issue = DesignLintIssue {
                 issue_id: (self.issues.len() + 1) as u32,
                 element_id,
                 category: "HardcodedColor".to_string(),
-                description: format!(
-                    "Element {} uses raw hex color {} without token binding",
-                    element_id, color_hex
-                ),
+                description: format!("Element {} uses raw hex color {} without token binding", element_id, color_hex),
             };
             self.issues.push(issue);
             return false;
@@ -532,33 +496,24 @@ pub struct DesigncraftVariableFontGlyphAxisSynthesizerV66PrEngine {
 impl DesigncraftVariableFontGlyphAxisSynthesizerV66PrEngine {
     pub fn new() -> Self {
         let mut axes = BTreeMap::new();
-        axes.insert(
-            "wght".to_string(),
-            FontVariableAxisSetting {
-                axis_tag: "wght".to_string(),
-                current_val: 400.0,
-                min_val: 100.0,
-                max_val: 900.0,
-            },
-        );
-        axes.insert(
-            "wdth".to_string(),
-            FontVariableAxisSetting {
-                axis_tag: "wdth".to_string(),
-                current_val: 100.0,
-                min_val: 75.0,
-                max_val: 125.0,
-            },
-        );
-        axes.insert(
-            "opsz".to_string(),
-            FontVariableAxisSetting {
-                axis_tag: "opsz".to_string(),
-                current_val: 12.0,
-                min_val: 8.0,
-                max_val: 144.0,
-            },
-        );
+        axes.insert("wght".to_string(), FontVariableAxisSetting {
+            axis_tag: "wght".to_string(),
+            current_val: 400.0,
+            min_val: 100.0,
+            max_val: 900.0,
+        });
+        axes.insert("wdth".to_string(), FontVariableAxisSetting {
+            axis_tag: "wdth".to_string(),
+            current_val: 100.0,
+            min_val: 75.0,
+            max_val: 125.0,
+        });
+        axes.insert("opsz".to_string(), FontVariableAxisSetting {
+            axis_tag: "opsz".to_string(),
+            current_val: 12.0,
+            min_val: 8.0,
+            max_val: 144.0,
+        });
         Self {
             axes,
             tracking_em: 0.0,
@@ -706,10 +661,7 @@ impl DesigncraftInteractiveDesignSystemDocsiteExporterV66PrEngine {
     pub fn generate_html_docsite_index(&self) -> String {
         let mut html = format!("<!DOCTYPE html>\n<html><head><title>{}</title></head><body>\n<h1>{} Documentation</h1>\n", self.docsite_title, self.docsite_title);
         for doc in &self.component_docs {
-            html.push_str(&format!(
-                "<section>\n  <h2>{}</h2>\n  <p>{}</p>\n  <pre><code>{}</code></pre>\n</section>\n",
-                doc.component_name, doc.description, doc.html_snippet
-            ));
+            html.push_str(&format!("<section>\n  <h2>{}</h2>\n  <p>{}</p>\n  <pre><code>{}</code></pre>\n</section>\n", doc.component_name, doc.description, doc.html_snippet));
         }
         html.push_str("</body></html>\n");
         html
@@ -759,36 +711,23 @@ pub struct DesigncraftDesignTokensIosAndroidTokenCompilerV66PrEngine {
 
 impl DesigncraftDesignTokensIosAndroidTokenCompilerV66PrEngine {
     pub fn new(target: NativeTokenPlatform) -> Self {
-        Self {
-            target_platform: target,
-        }
+        Self { target_platform: target }
     }
 
     pub fn compile_token(&self, token_name: &str, token_type: &str, hex_val: &str) -> String {
         let sanitized_name = token_name.replace('.', "_");
         match self.target_platform {
             NativeTokenPlatform::IosSwift => {
-                format!(
-                    "public static let {} = Color(hex: \"{}\")",
-                    sanitized_name, hex_val
-                )
+                format!("public static let {} = Color(hex: \"{}\")", sanitized_name, hex_val)
             }
             NativeTokenPlatform::AndroidKotlinCompose => {
-                format!(
-                    "val {} = Color(0xFF{})",
-                    sanitized_name,
-                    hex_val.trim_start_matches('#')
-                )
+                format!("val {} = Color(0xFF{})", sanitized_name, hex_val.trim_start_matches('#'))
             }
             NativeTokenPlatform::WebCssVariables => {
                 format!("--{}: {};", token_name.replace('.', "-"), hex_val)
             }
             NativeTokenPlatform::FlutterDart => {
-                format!(
-                    "static const Color {} = Color(0xFF{});",
-                    sanitized_name,
-                    hex_val.trim_start_matches('#')
-                )
+                format!("static const Color {} = Color(0xFF{});", sanitized_name, hex_val.trim_start_matches('#'))
             }
         }
     }
@@ -860,12 +799,7 @@ impl DesigncraftSpatial3dUiVrArCanvasProjectionV66PrEngine {
         );
     }
 
-    pub fn project_2d_point_to_spatial_3d(
-        &self,
-        artboard_id: u32,
-        x2d: f32,
-        y2d: f32,
-    ) -> Option<(f32, f32, f32)> {
+    pub fn project_2d_point_to_spatial_3d(&self, artboard_id: u32, x2d: f32, y2d: f32) -> Option<(f32, f32, f32)> {
         let node = self.spatial_artboards.get(&artboard_id)?;
         let x3d = node.pos_3d.0 + x2d * 0.001;
         let y3d = node.pos_3d.1 + y2d * 0.001;
@@ -1057,12 +991,7 @@ mod tests {
     #[test]
     fn test_docsite_exporter_engine() {
         let mut engine = DesigncraftInteractiveDesignSystemDocsiteExporterV66PrEngine::new();
-        engine.add_component_doc(
-            "Button",
-            "Primary call to action button",
-            &["color.brand.primary"],
-            "<button>Click</button>",
-        );
+        engine.add_component_doc("Button", "Primary call to action button", &["color.brand.primary"], "<button>Click</button>");
         let html = engine.generate_html_docsite_index();
         assert!(html.contains("Primary call to action button"));
         assert!(html.contains("<button>Click</button>"));
@@ -1070,15 +999,11 @@ mod tests {
 
     #[test]
     fn test_native_token_compiler_engine() {
-        let compiler_swift = DesigncraftDesignTokensIosAndroidTokenCompilerV66PrEngine::new(
-            NativeTokenPlatform::IosSwift,
-        );
+        let compiler_swift = DesigncraftDesignTokensIosAndroidTokenCompilerV66PrEngine::new(NativeTokenPlatform::IosSwift);
         let code_swift = compiler_swift.compile_token("color.brand.primary", "color", "#0066FF");
         assert!(code_swift.contains("Color(hex: \"#0066FF\")"));
 
-        let compiler_kt = DesigncraftDesignTokensIosAndroidTokenCompilerV66PrEngine::new(
-            NativeTokenPlatform::AndroidKotlinCompose,
-        );
+        let compiler_kt = DesigncraftDesignTokensIosAndroidTokenCompilerV66PrEngine::new(NativeTokenPlatform::AndroidKotlinCompose);
         let code_kt = compiler_kt.compile_token("color.brand.primary", "color", "#0066FF");
         assert!(code_kt.contains("Color(0xFF0066FF)"));
     }
@@ -1087,9 +1012,7 @@ mod tests {
     fn test_spatial_3d_projection_engine() {
         let mut engine = DesigncraftSpatial3dUiVrArCanvasProjectionV66PrEngine::new();
         engine.register_spatial_artboard(1, (1.0, 2.0, 0.5), (0.0, 0.0, 0.0), 2);
-        let p3d = engine
-            .project_2d_point_to_spatial_3d(1, 100.0, 200.0)
-            .unwrap();
+        let p3d = engine.project_2d_point_to_spatial_3d(1, 100.0, 200.0).unwrap();
         assert_eq!(p3d, (1.1, 2.2, 0.52));
     }
 

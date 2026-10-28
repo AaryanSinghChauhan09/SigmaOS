@@ -5,7 +5,7 @@
 // OpenOffice applications. Includes legacy StarOffice format support (Sxw, Sxc, Sxi, Sxd)
 // for backward compatibility with older document archives.
 
-use alloc::{collections::BTreeMap, string::String, vec::Vec};
+use alloc::{vec::Vec, string::String, collections::BTreeMap};
 
 // ─── StarOffice Legacy Formats ───────────────────────────────────────────────
 
@@ -55,11 +55,7 @@ impl OooDocument {
     }
 
     /// Import a document from legacy StarOffice binary format.
-    pub fn import_star_office(
-        &mut self,
-        _bytes: &[u8],
-        fmt: StarOfficeFormat,
-    ) -> Result<(), &'static str> {
+    pub fn import_star_office(&mut self, _bytes: &[u8], fmt: StarOfficeFormat) -> Result<(), &'static str> {
         self.format = Some(fmt);
         Ok(())
     }
@@ -129,11 +125,7 @@ impl OooWriterDoc {
     }
 
     /// Import from StarWriter legacy format.
-    pub fn import_star_office(
-        &mut self,
-        _bytes: &[u8],
-        _fmt: StarOfficeFormat,
-    ) -> Result<(), &'static str> {
+    pub fn import_star_office(&mut self, _bytes: &[u8], _fmt: StarOfficeFormat) -> Result<(), &'static str> {
         Ok(())
     }
 
@@ -209,11 +201,7 @@ impl OooCalcSheet {
     pub fn set_cell(&mut self, row: u32, col: u32, val: OooCellValue) {
         self.cells.insert(
             (row, col),
-            OooCalcCell {
-                row,
-                col,
-                value: val,
-            },
+            OooCalcCell { row, col, value: val },
         );
     }
 
@@ -238,11 +226,7 @@ impl OooCalcSheet {
     }
 
     /// Import from StarCalc legacy format.
-    pub fn import_star_office(
-        &mut self,
-        _bytes: &[u8],
-        _fmt: StarOfficeFormat,
-    ) -> Result<(), &'static str> {
+    pub fn import_star_office(&mut self, _bytes: &[u8], _fmt: StarOfficeFormat) -> Result<(), &'static str> {
         Ok(())
     }
 
@@ -329,12 +313,7 @@ impl OooImpressPresentation {
     }
 
     /// Add a slide with custom transition.
-    pub fn add_slide_with_transition(
-        &mut self,
-        title: &str,
-        body: &str,
-        transition: OooSlideTransition,
-    ) {
+    pub fn add_slide_with_transition(&mut self, title: &str, body: &str, transition: OooSlideTransition) {
         let idx = self.slides.len() as u32;
         self.slides.push(OooImpressSlide {
             index: idx,
@@ -356,11 +335,7 @@ impl OooImpressPresentation {
     }
 
     /// Import from StarImpress legacy format.
-    pub fn import_star_office(
-        &mut self,
-        _bytes: &[u8],
-        _fmt: StarOfficeFormat,
-    ) -> Result<(), &'static str> {
+    pub fn import_star_office(&mut self, _bytes: &[u8], _fmt: StarOfficeFormat) -> Result<(), &'static str> {
         Ok(())
     }
 
@@ -431,11 +406,7 @@ impl OooDrawCanvas {
     }
 
     /// Import from StarDraw legacy format.
-    pub fn import_star_office(
-        &mut self,
-        _bytes: &[u8],
-        _fmt: StarOfficeFormat,
-    ) -> Result<(), &'static str> {
+    pub fn import_star_office(&mut self, _bytes: &[u8], _fmt: StarOfficeFormat) -> Result<(), &'static str> {
         Ok(())
     }
 
@@ -621,8 +592,7 @@ mod tests {
         doc.insert_text("Star content");
         let bytes = doc.export_star_office(StarOfficeFormat::Sxw);
         let mut doc2 = OooWriterDoc::new("Loaded");
-        doc2.import_star_office(&bytes, StarOfficeFormat::Sxw)
-            .unwrap();
+        doc2.import_star_office(&bytes, StarOfficeFormat::Sxw).unwrap();
     }
 
     #[test]
@@ -630,19 +600,14 @@ mod tests {
         let mut sheet = OooCalcSheet::new("Sheet1");
         sheet.set_cell(0, 0, OooCellValue::Int(99));
         sheet.set_cell(0, 1, OooCellValue::Text("hello".into()));
-        assert!(matches!(
-            sheet.get_cell(0, 0).unwrap().value,
-            OooCellValue::Int(99)
-        ));
+        assert!(matches!(sheet.get_cell(0, 0).unwrap().value, OooCellValue::Int(99)));
         assert_eq!(sheet.cell_count(), 2);
     }
 
     #[test]
     fn test_ooo_calc_star_office() {
         let mut sheet = OooCalcSheet::new("Data");
-        sheet
-            .import_star_office(&[], StarOfficeFormat::Sxc)
-            .unwrap();
+        sheet.import_star_office(&[], StarOfficeFormat::Sxc).unwrap();
         let exported = sheet.export_star_office(StarOfficeFormat::Sxc);
         let _ = exported;
     }
@@ -666,17 +631,8 @@ mod tests {
     #[test]
     fn test_ooo_draw_canvas() {
         let mut canvas = OooDrawCanvas::new(1024.0, 768.0);
-        canvas.add_shape(OooDrawShape::Rect {
-            x: 0.0,
-            y: 0.0,
-            w: 200.0,
-            h: 100.0,
-        });
-        canvas.add_shape(OooDrawShape::Circle {
-            cx: 400.0,
-            cy: 300.0,
-            r: 80.0,
-        });
+        canvas.add_shape(OooDrawShape::Rect { x: 0.0, y: 0.0, w: 200.0, h: 100.0 });
+        canvas.add_shape(OooDrawShape::Circle { cx: 400.0, cy: 300.0, r: 80.0 });
         assert_eq!(canvas.shapes.len(), 2);
         let svg = canvas.export_svg();
         assert!(!svg.is_empty());

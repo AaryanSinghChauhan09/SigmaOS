@@ -50,9 +50,7 @@ pub struct OpenBsdPinsyscallAddressSpaceLayoutRandomizationV67PrEngine {
 impl OpenBsdPinsyscallAddressSpaceLayoutRandomizationV67PrEngine {
     pub fn new() -> Self {
         Self {
-            engine_name: String::from(
-                "OpenBSD Pinsyscall Address Space Layout Randomization Engine V67",
-            ),
+            engine_name: String::from("OpenBSD Pinsyscall Address Space Layout Randomization Engine V67"),
             registered_ranges: Vec::new(),
             intercepted_count: 0,
             trap_count: 0,
@@ -63,17 +61,10 @@ impl OpenBsdPinsyscallAddressSpaceLayoutRandomizationV67PrEngine {
         self.registered_ranges.push(range);
     }
 
-    pub fn validate_syscall_entry(
-        &mut self,
-        pid: u32,
-        instruction_pointer: usize,
-    ) -> Result<PinsyscallAslrEnforcementStatus, String> {
+    pub fn validate_syscall_entry(&mut self, pid: u32, instruction_pointer: usize) -> Result<PinsyscallAslrEnforcementStatus, String> {
         self.intercepted_count += 1;
         if let Some(range) = self.registered_ranges.iter().find(|r| r.process_id == pid) {
-            if range.enforcement_enabled
-                && (instruction_pointer < range.syscall_start_addr
-                    || instruction_pointer > range.syscall_end_addr)
-            {
+            if range.enforcement_enabled && (instruction_pointer < range.syscall_start_addr || instruction_pointer > range.syscall_end_addr) {
                 self.trap_count += 1;
                 return Err(String::from("SIGKILL: Pinsyscall ASLR trap violation - syscall executed outside randomized code range"));
             }
@@ -88,12 +79,7 @@ impl OpenBsdPinsyscallAddressSpaceLayoutRandomizationV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} process pin ranges registered, {} traps triggered",
-            self.engine_name,
-            self.registered_ranges.len(),
-            self.trap_count
-        )
+        format!("{}: {} process pin ranges registered, {} traps triggered", self.engine_name, self.registered_ranges.len(), self.trap_count)
     }
 }
 
@@ -125,9 +111,7 @@ impl OpenBsdUnveilStaticMountIsolationV67PrEngine {
 
     pub fn add_unveil(&mut self, path: &str, mount: &str, permissions: &str) -> Result<(), String> {
         if self.is_locked {
-            return Err(String::from(
-                "EPERM: Unveil table is permanently locked for this process",
-            ));
+            return Err(String::from("EPERM: Unveil table is permanently locked for this process"));
         }
         let allow_read = permissions.contains('r');
         let allow_write = permissions.contains('w');
@@ -153,11 +137,7 @@ impl OpenBsdUnveilStaticMountIsolationV67PrEngine {
         if self.unveil_table.is_empty() {
             return true;
         }
-        if let Some(node) = self
-            .unveil_table
-            .iter()
-            .find(|n| path.starts_with(&n.path_prefix))
-        {
+        if let Some(node) = self.unveil_table.iter().find(|n| path.starts_with(&n.path_prefix)) {
             match required_perm {
                 'r' => node.allow_read,
                 'w' => node.allow_write,
@@ -171,12 +151,7 @@ impl OpenBsdUnveilStaticMountIsolationV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} path mounts unveiled, locked: {}",
-            self.engine_name,
-            self.unveil_table.len(),
-            self.is_locked
-        )
+        format!("{}: {} path mounts unveiled, locked: {}", self.engine_name, self.unveil_table.len(), self.is_locked)
     }
 }
 
@@ -246,11 +221,7 @@ impl OpenBsdPledgeExtendedCategorySandboxV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: active extended pledge configured: {}",
-            self.engine_name,
-            self.active_pledge.is_some()
-        )
+        format!("{}: active extended pledge configured: {}", self.engine_name, self.active_pledge.is_some())
     }
 }
 
@@ -286,11 +257,7 @@ impl OpenBsdSoftraidKryptexMultiVolumeV67PrEngine {
         if passphrase.is_empty() {
             return Err(String::from("Passphrase cannot be empty"));
         }
-        if let Some(vol) = self
-            .volumes
-            .iter_mut()
-            .find(|v| v.volume_uuid == volume_uuid)
-        {
+        if let Some(vol) = self.volumes.iter_mut().find(|v| v.volume_uuid == volume_uuid) {
             vol.master_key_unlocked = true;
             Ok(true)
         } else {
@@ -299,11 +266,7 @@ impl OpenBsdSoftraidKryptexMultiVolumeV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} Kryptex multi-volumes managed",
-            self.engine_name,
-            self.volumes.len()
-        )
+        format!("{}: {} Kryptex multi-volumes managed", self.engine_name, self.volumes.len())
     }
 }
 
@@ -342,12 +305,7 @@ impl OpenBsdPfMultiQueueSynProxyV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} PF queues active, {} SYN proxy sessions tracked",
-            self.engine_name,
-            self.queues.len(),
-            self.active_syn_proxies
-        )
+        format!("{}: {} PF queues active, {} SYN proxy sessions tracked", self.engine_name, self.queues.len(), self.active_syn_proxies)
     }
 }
 
@@ -381,18 +339,11 @@ impl OpenBsdVmdVirtio3dPassthroughV67PrEngine {
         }
         let name = gpu.vm_name.clone();
         self.active_gpus.push(gpu);
-        Ok(format!(
-            "Virtio-3D GPU successfully assigned to VM '{}'",
-            name
-        ))
+        Ok(format!("Virtio-3D GPU successfully assigned to VM '{}'", name))
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} Virtio-3D instances active",
-            self.engine_name,
-            self.active_gpus.len()
-        )
+        format!("{}: {} Virtio-3D instances active", self.engine_name, self.active_gpus.len())
     }
 }
 
@@ -422,12 +373,7 @@ impl OpenBsdSmtpdSpamTrapDkimV67PrEngine {
         }
     }
 
-    pub fn process_email(
-        &self,
-        sender: &str,
-        recipient: &str,
-        dkim_present: bool,
-    ) -> SmtpdSpamTrapResult {
+    pub fn process_email(&self, sender: &str, recipient: &str, dkim_present: bool) -> SmtpdSpamTrapResult {
         let is_trap = self.trap_addresses.iter().any(|addr| addr == recipient);
         let decision = if is_trap {
             String::from("REJECT_AND_BLACKHOLE")
@@ -448,12 +394,7 @@ impl OpenBsdSmtpdSpamTrapDkimV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} spam traps, {} DKIM domain keys active",
-            self.engine_name,
-            self.trap_addresses.len(),
-            self.domain_keys.len()
-        )
+        format!("{}: {} spam traps, {} DKIM domain keys active", self.engine_name, self.trap_addresses.len(), self.domain_keys.len())
     }
 }
 
@@ -475,23 +416,12 @@ impl OpenBsdSignifyPqcHybridVerifierV67PrEngine {
     pub fn new() -> Self {
         Self {
             engine_name: String::from("OpenBSD Signify Post-Quantum Hybrid Verifier Engine V67"),
-            trusted_key_fingerprints: Vec::from([
-                String::from("openbsd-v67-base.pub"),
-                String::from("sigmaos-pqc-master.pub"),
-            ]),
+            trusted_key_fingerprints: Vec::from([String::from("openbsd-v67-base.pub"), String::from("sigmaos-pqc-master.pub")]),
         }
     }
 
-    pub fn verify_syspatch(
-        &self,
-        package_name: &str,
-        signature_blob: &str,
-        key_fingerprint: &str,
-    ) -> SignifyHybridVerification {
-        let is_trusted = self
-            .trusted_key_fingerprints
-            .iter()
-            .any(|k| k == key_fingerprint);
+    pub fn verify_syspatch(&self, package_name: &str, signature_blob: &str, key_fingerprint: &str) -> SignifyHybridVerification {
+        let is_trusted = self.trusted_key_fingerprints.iter().any(|k| k == key_fingerprint);
         let valid = !signature_blob.is_empty() && is_trusted;
 
         SignifyHybridVerification {
@@ -503,11 +433,7 @@ impl OpenBsdSignifyPqcHybridVerifierV67PrEngine {
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} trusted signify PQC public keys loaded",
-            self.engine_name,
-            self.trusted_key_fingerprints.len()
-        )
+        format!("{}: {} trusted signify PQC public keys loaded", self.engine_name, self.trusted_key_fingerprints.len())
     }
 }
 
@@ -542,20 +468,12 @@ impl OpenBsdRelaydGrpcSniLoadBalancerV67PrEngine {
         if sni_host.is_empty() {
             None
         } else {
-            self.backends
-                .iter()
-                .find(|b| b.sni_hostname == sni_host)
-                .cloned()
-                .or_else(|| self.backends.first().cloned())
+            self.backends.iter().find(|b| b.sni_hostname == sni_host).cloned().or_else(|| self.backends.first().cloned())
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} gRPC backends configured",
-            self.engine_name,
-            self.backends.len()
-        )
+        format!("{}: {} gRPC backends configured", self.engine_name, self.backends.len())
     }
 }
 
@@ -587,22 +505,13 @@ impl OpenBsdUnwindDohDotResolverV67PrEngine {
         UnwindDohDotResponse {
             query_domain: String::from(domain),
             dnssec_status: String::from("SECURE_VALIDATED"),
-            upstream_transport: String::from(if require_doh {
-                "DNS-over-HTTPS"
-            } else {
-                "DNS-over-TLS"
-            }),
+            upstream_transport: String::from(if require_doh { "DNS-over-HTTPS" } else { "DNS-over-TLS" }),
             ip_addresses: Vec::from([String::from("198.51.100.25")]),
         }
     }
 
     pub fn get_summary(&self) -> String {
-        format!(
-            "{}: {} DoH & {} DoT resolvers active",
-            self.engine_name,
-            self.doh_servers.len(),
-            self.dot_servers.len()
-        )
+        format!("{}: {} DoH & {} DoT resolvers active", self.engine_name, self.doh_servers.len(), self.dot_servers.len())
     }
 }
 
@@ -624,9 +533,7 @@ pub struct OpenBsdMissingComponentsV67PrSuite {
 impl OpenBsdMissingComponentsV67PrSuite {
     pub fn new() -> Self {
         Self {
-            suite_name: String::from(
-                "SigmaOS OpenBSD Missing Components V67 Master PR Gateway Suite",
-            ),
+            suite_name: String::from("SigmaOS OpenBSD Missing Components V67 Master PR Gateway Suite"),
             pinsyscall_engine: OpenBsdPinsyscallAddressSpaceLayoutRandomizationV67PrEngine::new(),
             unveil_engine: OpenBsdUnveilStaticMountIsolationV67PrEngine::new(),
             pledge_engine: OpenBsdPledgeExtendedCategorySandboxV67PrEngine::new(),
@@ -763,11 +670,7 @@ mod tests {
     #[test]
     fn test_signify_pqc_hybrid_verifier_engine() {
         let engine = OpenBsdSignifyPqcHybridVerifierV67PrEngine::new();
-        let verification = engine.verify_syspatch(
-            "syspatch-67-002",
-            "sig_data_dilithium3",
-            "openbsd-v67-base.pub",
-        );
+        let verification = engine.verify_syspatch("syspatch-67-002", "sig_data_dilithium3", "openbsd-v67-base.pub");
         assert!(verification.is_valid);
         assert_eq!(verification.pqc_algorithm, "Dilithium3-Ed25519-Hybrid");
     }

@@ -64,7 +64,11 @@ impl GridcraftWhatIfDataTablesSensitivityMatrixEngineV68 {
         }
     }
 
-    pub fn simulate_1variable_table<F>(&self, input_values: &[f64], evaluator: F) -> Vec<(f64, f64)>
+    pub fn simulate_1variable_table<F>(
+        &self,
+        input_values: &[f64],
+        evaluator: F,
+    ) -> Vec<(f64, f64)>
     where
         F: Fn(f64) -> f64,
     {
@@ -104,22 +108,10 @@ impl GridcraftWhatIfDataTablesSensitivityMatrixEngineV68 {
 /// Power Query Transformation Step
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PowerQueryStep {
-    FilterEquals {
-        col_idx: usize,
-        target: String,
-    },
-    Unpivot {
-        id_col_idx: usize,
-    },
-    SplitColumn {
-        col_idx: usize,
-        delimiter: char,
-    },
-    MergeColumns {
-        col_1: usize,
-        col_2: usize,
-        delimiter: String,
-    },
+    FilterEquals { col_idx: usize, target: String },
+    Unpivot { id_col_idx: usize },
+    SplitColumn { col_idx: usize, delimiter: char },
+    MergeColumns { col_1: usize, col_2: usize, delimiter: String },
 }
 
 /// Simple Table Structure
@@ -137,8 +129,7 @@ pub struct GridcraftHierarchicalDataUnpivotPowerQueryPipelineEngineV68 {
 impl GridcraftHierarchicalDataUnpivotPowerQueryPipelineEngineV68 {
     pub fn new() -> Self {
         Self {
-            engine_name: "Gridcraft Hierarchical Data Unpivot Power Query Pipeline Engine V68"
-                .to_string(),
+            engine_name: "Gridcraft Hierarchical Data Unpivot Power Query Pipeline Engine V68".to_string(),
         }
     }
 
@@ -198,11 +189,7 @@ impl GridcraftHierarchicalDataUnpivotPowerQueryPipelineEngineV68 {
                     rows: new_rows,
                 }
             }
-            PowerQueryStep::MergeColumns {
-                col_1,
-                col_2,
-                delimiter,
-            } => {
+            PowerQueryStep::MergeColumns { col_1, col_2, delimiter } => {
                 let mut new_headers = table.headers.clone();
                 let h1 = new_headers[*col_1].clone();
                 let h2 = new_headers[*col_2].clone();
@@ -352,12 +339,7 @@ impl GridcraftDynamicCascadingDataValidationListEngineV68 {
         valid_options
     }
 
-    pub fn validate_selection(
-        &self,
-        field_name: &str,
-        parent_value: Option<&str>,
-        selected_value: &str,
-    ) -> bool {
+    pub fn validate_selection(&self, field_name: &str, parent_value: Option<&str>, selected_value: &str) -> bool {
         let options = self.resolve_options(field_name, parent_value);
         options.iter().any(|opt| opt == selected_value)
     }
@@ -427,12 +409,7 @@ impl GridcraftFinancialCashFlowXirrXnpvYieldEngineV68 {
         Some(rate)
     }
 
-    pub fn calculate_mirr(
-        &self,
-        finance_rate: f64,
-        reinvest_rate: f64,
-        cashflows: &[f64],
-    ) -> Option<f64> {
+    pub fn calculate_mirr(&self, finance_rate: f64, reinvest_rate: f64, cashflows: &[f64]) -> Option<f64> {
         let n = cashflows.len();
         if n < 2 {
             return None;
@@ -549,11 +526,7 @@ impl GridcraftAutomatedChartAiInsightGeneratorEngineV68 {
         }
     }
 
-    pub fn generate_recommendation(
-        &self,
-        numeric_series: &[f64],
-        categories: &[String],
-    ) -> ChartRecommendation {
+    pub fn generate_recommendation(&self, numeric_series: &[f64], categories: &[String]) -> ChartRecommendation {
         let len = numeric_series.len();
         if len == 0 {
             return ChartRecommendation {
@@ -576,10 +549,7 @@ impl GridcraftAutomatedChartAiInsightGeneratorEngineV68 {
             ChartRecommendation {
                 recommended_chart_type: "Pie / Donut Chart".to_string(),
                 confidence_score: 0.88,
-                summary_insight: format!(
-                    "Proportional composition suitable for {} categories.",
-                    len
-                ),
+                summary_insight: format!("Proportional composition suitable for {} categories.", len),
             }
         } else {
             ChartRecommendation {
@@ -646,17 +616,11 @@ pub struct GridcraftEncryptedWorkbookWatermarkingDigitalSignatureEngineV68 {
 impl GridcraftEncryptedWorkbookWatermarkingDigitalSignatureEngineV68 {
     pub fn new() -> Self {
         Self {
-            engine_name: "Gridcraft Encrypted Workbook Watermarking Digital Signature Engine V68"
-                .to_string(),
+            engine_name: "Gridcraft Encrypted Workbook Watermarking Digital Signature Engine V68".to_string(),
         }
     }
 
-    pub fn sign_workbook(
-        &self,
-        content: &[u8],
-        signer: &str,
-        timestamp: u64,
-    ) -> DigitalSignatureManifest {
+    pub fn sign_workbook(&self, content: &[u8], signer: &str, timestamp: u64) -> DigitalSignatureManifest {
         let mut hash_acc: u64 = 0xcbf29ce484222325;
         for &byte in content {
             hash_acc ^= byte as u64;
@@ -710,17 +674,11 @@ pub struct GridcraftStreamingBigDataParquetArrowFeatherEngineV68 {
 impl GridcraftStreamingBigDataParquetArrowFeatherEngineV68 {
     pub fn new() -> Self {
         Self {
-            engine_name: "Gridcraft Streaming Big Data Parquet Arrow Feather Engine V68"
-                .to_string(),
+            engine_name: "Gridcraft Streaming Big Data Parquet Arrow Feather Engine V68".to_string(),
         }
     }
 
-    pub fn filter_batch(
-        &self,
-        batch: &RecordBatch,
-        target_col: &str,
-        target_val: &str,
-    ) -> RecordBatch {
+    pub fn filter_batch(&self, batch: &RecordBatch, target_col: &str, target_val: &str) -> RecordBatch {
         let mut target_idx = None;
         for (idx, col) in batch.columns.iter().enumerate() {
             if col.col_name == target_col {
@@ -776,8 +734,7 @@ pub struct SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
 impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
     pub fn new() -> Self {
         Self {
-            gateway_name: "Sovereign Gridcraft & ArtCraft Missing Components Parity PR Gateway V68"
-                .to_string(),
+            gateway_name: "Sovereign Gridcraft & ArtCraft Missing Components Parity PR Gateway V68".to_string(),
         }
     }
 
@@ -785,37 +742,28 @@ impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
         vec![
             GridcraftV68PrProposalManifest {
                 pr_id: 6801,
-                pr_title: "PR #6801: What-If Data Tables & Sensitivity Matrix Simulation Engine"
-                    .to_string(),
+                pr_title: "PR #6801: What-If Data Tables & Sensitivity Matrix Simulation Engine".to_string(),
                 target_subsystem: "GridCraft Analysis Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftWhatIfDataTablesSensitivityMatrixEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftWhatIfDataTablesSensitivityMatrixEngineV68".to_string()],
                 performance_multiplier: "4.8x".to_string(),
                 status: "APPROVED".to_string(),
             },
             GridcraftV68PrProposalManifest {
                 pr_id: 6802,
-                pr_title: "PR #6802: Hierarchical Data Unpivot & Power Query ETL Pipeline Engine"
-                    .to_string(),
+                pr_title: "PR #6802: Hierarchical Data Unpivot & Power Query ETL Pipeline Engine".to_string(),
                 target_subsystem: "GridCraft Data ETL Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftHierarchicalDataUnpivotPowerQueryPipelineEngineV68".to_string(),
-                ],
+                components_added: vec!["GridcraftHierarchicalDataUnpivotPowerQueryPipelineEngineV68".to_string()],
                 performance_multiplier: "5.2x".to_string(),
                 status: "APPROVED".to_string(),
             },
             GridcraftV68PrProposalManifest {
                 pr_id: 6803,
-                pr_title: "PR #6803: GPU Vectorized Accelerated Matrix Calculation Engine"
-                    .to_string(),
+                pr_title: "PR #6803: GPU Vectorized Accelerated Matrix Calculation Engine".to_string(),
                 target_subsystem: "GridCraft Math Compute Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftGpuAcceleratedMatrixCalculationEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftGpuAcceleratedMatrixCalculationEngineV68".to_string()],
                 performance_multiplier: "8.5x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -824,9 +772,7 @@ impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: "PR #6804: Dynamic Cascading Data Validation List Engine".to_string(),
                 target_subsystem: "GridCraft Validation Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftDynamicCascadingDataValidationListEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftDynamicCascadingDataValidationListEngineV68".to_string()],
                 performance_multiplier: "3.6x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -835,9 +781,7 @@ impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: "PR #6805: Financial Cash Flow XIRR/XNPV/MIRR Yield Engine".to_string(),
                 target_subsystem: "GridCraft Financial Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftFinancialCashFlowXirrXnpvYieldEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftFinancialCashFlowXirrXnpvYieldEngineV68".to_string()],
                 performance_multiplier: "4.2x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -846,9 +790,7 @@ impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: "PR #6806: Realtime Distributed Cell Locking Mesh Engine".to_string(),
                 target_subsystem: "GridCraft Collab Mesh Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftRealtimeDistributedCellLockingMeshEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftRealtimeDistributedCellLockingMeshEngineV68".to_string()],
                 performance_multiplier: "6.0x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -857,9 +799,7 @@ impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
                 pr_title: "PR #6807: Automated Chart AI Insight Generator Engine".to_string(),
                 target_subsystem: "GridCraft Visualization Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftAutomatedChartAiInsightGeneratorEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftAutomatedChartAiInsightGeneratorEngineV68".to_string()],
                 performance_multiplier: "4.5x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -874,25 +814,19 @@ impl SovereignGridcraftArtcraftMissingComponentsV68PrGateway {
             },
             GridcraftV68PrProposalManifest {
                 pr_id: 6809,
-                pr_title: "PR #6809: Encrypted Workbook Watermarking & Digital Signature Engine"
-                    .to_string(),
+                pr_title: "PR #6809: Encrypted Workbook Watermarking & Digital Signature Engine".to_string(),
                 target_subsystem: "GridCraft Security Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftEncryptedWorkbookWatermarkingDigitalSignatureEngineV68".to_string(),
-                ],
+                components_added: vec!["GridcraftEncryptedWorkbookWatermarkingDigitalSignatureEngineV68".to_string()],
                 performance_multiplier: "4.0x".to_string(),
                 status: "APPROVED".to_string(),
             },
             GridcraftV68PrProposalManifest {
                 pr_id: 6810,
-                pr_title: "PR #6810: Streaming Big Data Parquet / Arrow / Feather Engine"
-                    .to_string(),
+                pr_title: "PR #6810: Streaming Big Data Parquet / Arrow / Feather Engine".to_string(),
                 target_subsystem: "GridCraft Columnar Storage Subsystem".to_string(),
                 original_suite: "ArtCraft GridCraft".to_string(),
-                components_added: vec![
-                    "GridcraftStreamingBigDataParquetArrowFeatherEngineV68".to_string()
-                ],
+                components_added: vec!["GridcraftStreamingBigDataParquetArrowFeatherEngineV68".to_string()],
                 performance_multiplier: "7.1x".to_string(),
                 status: "APPROVED".to_string(),
             },
@@ -986,14 +920,8 @@ mod tests {
     fn test_financial_cashflow_engine() {
         let engine = GridcraftFinancialCashFlowXirrXnpvYieldEngineV68::new();
         let cashflows = vec![
-            DatedCashFlow {
-                days_offset: 0.0,
-                amount: -1000.0,
-            },
-            DatedCashFlow {
-                days_offset: 365.0,
-                amount: 1100.0,
-            },
+            DatedCashFlow { days_offset: 0.0, amount: -1000.0 },
+            DatedCashFlow { days_offset: 365.0, amount: 1100.0 },
         ];
         let xnpv = engine.calculate_xnpv(0.10, &cashflows);
         assert!((xnpv - 0.0).abs() < 1e-4);
@@ -1029,12 +957,7 @@ mod tests {
     fn test_automated_chart_insight_engine() {
         let engine = GridcraftAutomatedChartAiInsightGeneratorEngineV68::new();
         let series = vec![10.0, 20.0, 30.0, 40.0];
-        let cats = vec![
-            "Q1".to_string(),
-            "Q2".to_string(),
-            "Q3".to_string(),
-            "Q4".to_string(),
-        ];
+        let cats = vec!["Q1".to_string(), "Q2".to_string(), "Q3".to_string(), "Q4".to_string()];
         let rec = engine.generate_recommendation(&series, &cats);
         assert_eq!(rec.recommended_chart_type, "Line Chart");
     }
@@ -1068,11 +991,7 @@ mod tests {
                 ColumnarChunk {
                     col_name: "Region".to_string(),
                     data_type: "String".to_string(),
-                    values: vec![
-                        "North".to_string(),
-                        "South".to_string(),
-                        "North".to_string(),
-                    ],
+                    values: vec!["North".to_string(), "South".to_string(), "North".to_string()],
                 },
                 ColumnarChunk {
                     col_name: "Sales".to_string(),

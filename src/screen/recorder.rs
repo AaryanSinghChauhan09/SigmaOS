@@ -21,12 +21,7 @@ pub struct CaptureRegion {
 
 impl CaptureRegion {
     pub fn full_screen(width: u32, height: u32) -> Self {
-        Self {
-            x: 0,
-            y: 0,
-            width,
-            height,
-        }
+        Self { x: 0, y: 0, width, height }
     }
 
     pub fn area_pixels(&self) -> u64 {
@@ -75,11 +70,7 @@ pub struct ScreenRecorder {
 
 impl ScreenRecorder {
     pub fn new(config: RecordConfig) -> Self {
-        Self {
-            config,
-            state: RecorderState::Idle,
-            frames_captured: 0,
-        }
+        Self { config, state: RecorderState::Idle, frames_captured: 0 }
     }
 
     pub fn start(&mut self) -> Result<(), &'static str> {
@@ -117,23 +108,17 @@ impl ScreenRecorder {
         Ok(path)
     }
 
-    pub fn state(&self) -> &RecorderState {
-        &self.state
-    }
-    pub fn frames_captured(&self) -> u64 {
-        self.frames_captured
-    }
-    pub fn config(&self) -> &RecordConfig {
-        &self.config
-    }
+    pub fn state(&self) -> &RecorderState { &self.state }
+    pub fn frames_captured(&self) -> u64 { self.frames_captured }
+    pub fn config(&self) -> &RecordConfig { &self.config }
 
     /// Estimate output file size in MB (query — no side effects).
     pub fn estimate_size_mb(&self, duration_secs: u32) -> u32 {
         let bitrate_mbps = match self.config.format {
-            RecordFormat::Mp4 => 8,
-            RecordFormat::Mkv => 10,
+            RecordFormat::Mp4  => 8,
+            RecordFormat::Mkv  => 10,
             RecordFormat::Webm => 6,
-            RecordFormat::Gif => 20,
+            RecordFormat::Gif  => 20,
         };
         (bitrate_mbps * duration_secs) / 8
     }

@@ -68,14 +68,7 @@ impl Ext4AdvancementsV75Engine {
         }
     }
 
-    pub fn record_fast_commit(
-        &mut self,
-        inode: u32,
-        lblk: u32,
-        pblk: u64,
-        count: u16,
-        unwritten: bool,
-    ) {
+    pub fn record_fast_commit(&mut self, inode: u32, lblk: u32, pblk: u64, count: u16, unwritten: bool) {
         self.fast_commit_log.push(Ext4V75FastCommitEntry {
             inode_num: inode,
             logical_block: lblk,
@@ -172,11 +165,7 @@ impl XfsAdvancementsV75Engine {
     }
 
     pub fn add_reflink_extent(&mut self, phys_start: u64, count: u64) {
-        if let Some(ext) = self
-            .reflink_tree
-            .iter_mut()
-            .find(|e| e.physical_start == phys_start)
-        {
+        if let Some(ext) = self.reflink_tree.iter_mut().find(|e| e.physical_start == phys_start) {
             ext.ref_count += 1;
         } else {
             self.reflink_tree.push(XfsV75ReflinkExtent {
@@ -238,12 +227,7 @@ impl BtrfsAdvancementsV75Engine {
     }
 
     pub fn create_snapshot(&mut self, parent_id: u64, snap_id: u64, snap_name: &str) -> bool {
-        if let Some(parent) = self
-            .subvolumes
-            .iter()
-            .find(|s| s.subvol_id == parent_id)
-            .cloned()
-        {
+        if let Some(parent) = self.subvolumes.iter().find(|s| s.subvol_id == parent_id).cloned() {
             self.subvolumes.push(BtrfsV75Subvolume {
                 subvol_id: snap_id,
                 name: snap_name.to_string(),
@@ -434,11 +418,7 @@ impl F2fsAdvancementsV75Engine {
     }
 
     pub fn invalidate_block(&mut self, segment_id: u32) -> bool {
-        if let Some(seg) = self
-            .segments
-            .iter_mut()
-            .find(|s| s.segment_id == segment_id)
-        {
+        if let Some(seg) = self.segments.iter_mut().find(|s| s.segment_id == segment_id) {
             if seg.valid_blocks > 0 {
                 seg.valid_blocks -= 1;
                 true
@@ -599,8 +579,7 @@ impl NtfsNfsCifsPseudoFsV75Engine {
 
     pub fn match_devfs_rule(&self, dev_name: &str, target_group: &str) -> bool {
         self.devfs_rules.iter().any(|r| {
-            (r.dev_pattern == "nvme*" && dev_name.starts_with("nvme"))
-                || r.group_owner == target_group
+            (r.dev_pattern == "nvme*" && dev_name.starts_with("nvme")) || r.group_owner == target_group
         })
     }
 }
@@ -616,11 +595,7 @@ impl LvmCryptoMaintenanceUtilsV75Engine {
         Self
     }
 
-    pub fn calculate_thin_overcommit_pct(
-        &self,
-        allocated_virtual_mb: u64,
-        physical_pool_mb: u64,
-    ) -> u32 {
+    pub fn calculate_thin_overcommit_pct(&self, allocated_virtual_mb: u64, physical_pool_mb: u64) -> u32 {
         if physical_pool_mb == 0 {
             0
         } else {

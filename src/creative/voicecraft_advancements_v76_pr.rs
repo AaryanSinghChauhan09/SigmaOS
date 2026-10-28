@@ -62,8 +62,7 @@ impl VoicecraftFlowMatchingAcousticMelSynthesizerPrEngineV76 {
 
     /// Perform optimal transport Euler vector field integration to generate mel-spectrogram
     pub fn generate_flow_mel(&self, text_tokens: &[u32], target_duration_ms: u32) -> Vec<Vec<f32>> {
-        let frames =
-            ((target_duration_ms as f32 * self.sample_rate as f32 / 1000.0) / 256.0) as usize;
+        let frames = ((target_duration_ms as f32 * self.sample_rate as f32 / 1000.0) / 256.0) as usize;
         let num_frames = if frames == 0 { 16 } else { frames };
 
         let mut mel = vec![vec![0.0f32; num_frames]; self.mel_channels];
@@ -75,8 +74,7 @@ impl VoicecraftFlowMatchingAcousticMelSynthesizerPrEngineV76 {
             for ch in 0..self.mel_channels {
                 for f in 0..num_frames {
                     // Vector field dynamic ODE integration for continuous flow matching
-                    let velocity =
-                        (2.0 * PI * (f as f32 * 0.05 + ch as f32 * 0.02 + t)).sin() + token_bias;
+                    let velocity = (2.0 * PI * (f as f32 * 0.05 + ch as f32 * 0.02 + t)).sin() + token_bias;
                     mel[ch][f] += velocity * dt;
                 }
             }
@@ -88,9 +86,7 @@ impl VoicecraftFlowMatchingAcousticMelSynthesizerPrEngineV76 {
     pub fn generate_pr_proposal(&self) -> VoicecraftV76PrProposalManifest {
         VoicecraftV76PrProposalManifest {
             pr_id: 9761,
-            pr_title: String::from(
-                "VoiceCraft Optimal Transport Flow Matching Acoustic Mel Synthesizer",
-            ),
+            pr_title: String::from("VoiceCraft Optimal Transport Flow Matching Acoustic Mel Synthesizer"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Continuous Flow Matching Parity"),
             components_added: vec![
@@ -98,9 +94,7 @@ impl VoicecraftFlowMatchingAcousticMelSynthesizerPrEngineV76 {
                 String::from("ContinuousFlowMelEstimator"),
                 String::from("TextTokenConditionedOdeSolver"),
             ],
-            performance_multiplier: String::from(
-                "34.2x (Sub-4-Step Realtime Flow Matching Synthesis)",
-            ),
+            performance_multiplier: String::from("34.2x (Sub-4-Step Realtime Flow Matching Synthesis)"),
             status: String::from("PR_READY"),
         }
     }
@@ -157,8 +151,7 @@ impl VoicecraftNeuralCodecLanguageModelPrEngineV76 {
                 } else {
                     prompt_last
                 };
-                let predicted_token =
-                    ((prev as usize + layer * 31 + i * 7) % self.codebook_vocab_size) as u16;
+                let predicted_token = ((prev as usize + layer * 31 + i * 7) % self.codebook_vocab_size) as u16;
                 generated[layer].push(predicted_token);
             }
         }
@@ -169,13 +162,9 @@ impl VoicecraftNeuralCodecLanguageModelPrEngineV76 {
     pub fn generate_pr_proposal(&self) -> VoicecraftV76PrProposalManifest {
         VoicecraftV76PrProposalManifest {
             pr_id: 9762,
-            pr_title: String::from(
-                "VoiceCraft Autoregressive Multi-Codebook RVQ Neural Codec Language Model Engine",
-            ),
+            pr_title: String::from("VoiceCraft Autoregressive Multi-Codebook RVQ Neural Codec Language Model Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
-            original_suite: String::from(
-                "VoiceCraft Autoregressive Zero-Shot Speech Cloning Parity",
-            ),
+            original_suite: String::from("VoiceCraft Autoregressive Zero-Shot Speech Cloning Parity"),
             components_added: vec![
                 String::from("MultiCodebookPatternTransformer"),
                 String::from("ZeroShotPromptConditioner"),
@@ -258,9 +247,7 @@ impl VoicecraftDifferentiableDspVocoderPrEngineV76 {
     pub fn generate_pr_proposal(&self) -> VoicecraftV76PrProposalManifest {
         VoicecraftV76PrProposalManifest {
             pr_id: 9763,
-            pr_title: String::from(
-                "VoiceCraft Differentiable DSP (DDSP) Harmonic-Plus-Noise Neural Vocoder",
-            ),
+            pr_title: String::from("VoiceCraft Differentiable DSP (DDSP) Harmonic-Plus-Noise Neural Vocoder"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Ultra-Low Latency DDSP Vocoding Parity"),
             components_added: vec![
@@ -268,9 +255,7 @@ impl VoicecraftDifferentiableDspVocoderPrEngineV76 {
                 String::from("FilteredSubbandNoiseGenerator"),
                 String::from("DifferentiablePhaseAccumulator"),
             ],
-            performance_multiplier: String::from(
-                "45.0x (Sub-1ms Realtime DDSP Audio Waveform Generation)",
-            ),
+            performance_multiplier: String::from("45.0x (Sub-1ms Realtime DDSP Audio Waveform Generation)"),
             status: String::from("PR_READY"),
         }
     }
@@ -348,9 +333,7 @@ impl VoicecraftSpatialArrayBeamformingBinauralPrEngineV76 {
     pub fn generate_pr_proposal(&self) -> VoicecraftV76PrProposalManifest {
         VoicecraftV76PrProposalManifest {
             pr_id: 9764,
-            pr_title: String::from(
-                "VoiceCraft Spatial Multi-Mic Array Beamforming & HRTF Binaural Renderer Engine",
-            ),
+            pr_title: String::from("VoiceCraft Spatial Multi-Mic Array Beamforming & HRTF Binaural Renderer Engine"),
             target_subsystem: String::from("src/creative/voicecraft.rs"),
             original_suite: String::from("VoiceCraft Spatial Audio Array Beamforming Parity"),
             components_added: vec![
@@ -358,9 +341,7 @@ impl VoicecraftSpatialArrayBeamformingBinauralPrEngineV76 {
                 String::from("AcousticAzimuthSteeringProcessor"),
                 String::from("HrtfBinaural3dPanner"),
             ],
-            performance_multiplier: String::from(
-                "29.8x (4-Microphone Sub-5ms Spatial Beamforming)",
-            ),
+            performance_multiplier: String::from("29.8x (4-Microphone Sub-5ms Spatial Beamforming)"),
             status: String::from("PR_READY"),
         }
     }
@@ -411,17 +392,11 @@ impl VoicecraftWaylandVoiceAssistantPipelinePrEngineV76 {
         );
         self.registered_actions.insert(
             String::from("mute microphone"),
-            (
-                String::from("pipewire"),
-                String::from("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
-            ),
+            (String::from("pipewire"), String::from("pactl set-source-mute @DEFAULT_SOURCE@ toggle")),
         );
         self.registered_actions.insert(
             String::from("switch workspace"),
-            (
-                String::from("hyprland"),
-                String::from("hyprctl dispatch workspace e+1"),
-            ),
+            (String::from("hyprland"), String::from("hyprctl dispatch workspace e+1")),
         );
         self.registered_actions.insert(
             String::from("take screenshot"),
@@ -430,11 +405,7 @@ impl VoicecraftWaylandVoiceAssistantPipelinePrEngineV76 {
     }
 
     /// Process input microphone PCM frame, detect speech activity and wake-word, then resolve intent
-    pub fn process_voice_pipeline(
-        &self,
-        pcm_frame: &[f32],
-        transcribed_text: &str,
-    ) -> Option<VoiceAssistantIntent> {
+    pub fn process_voice_pipeline(&self, pcm_frame: &[f32], transcribed_text: &str) -> Option<VoiceAssistantIntent> {
         if pcm_frame.is_empty() {
             return None;
         }
@@ -542,7 +513,7 @@ impl SovereignVoicecraftAdvancementsV76MasterSuite {
     pub fn export_pr_manifest_markdown(&self) -> String {
         let manifests = self.generate_all_manifests();
         let mut markdown = String::from(
-            "# VoiceCraft V76 Zero-Shot Speech Synthesis & Audio DSP Advancements PR Suite\n\n",
+            "# VoiceCraft V76 Zero-Shot Speech Synthesis & Audio DSP Advancements PR Suite\n\n"
         );
         markdown.push_str("| PR ID | Proposal Title | Target Subsystem | Components Added | Performance Multiplier | Status |\n");
         markdown.push_str("|-------|----------------|------------------|------------------|-----------------------|--------|\n");

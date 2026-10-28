@@ -46,17 +46,17 @@ pub enum PackageCategory {
 impl PackageCategory {
     pub fn label(&self) -> &'static str {
         match self {
-            Self::Internet => "Internet",
-            Self::Multimedia => "Multimedia",
-            Self::Graphics => "Graphics",
-            Self::Office => "Office",
-            Self::Games => "Games",
-            Self::Development => "Development",
-            Self::Education => "Education",
-            Self::System => "System",
-            Self::Accessories => "Accessories",
-            Self::Science => "Science",
-            Self::Other => "Other",
+            Self::Internet     => "Internet",
+            Self::Multimedia   => "Multimedia",
+            Self::Graphics     => "Graphics",
+            Self::Office       => "Office",
+            Self::Games        => "Games",
+            Self::Development  => "Development",
+            Self::Education    => "Education",
+            Self::System       => "System",
+            Self::Accessories  => "Accessories",
+            Self::Science      => "Science",
+            Self::Other        => "Other",
         }
     }
 }
@@ -69,10 +69,7 @@ pub struct SoftwareManager {
 
 impl SoftwareManager {
     pub fn new() -> Self {
-        Self {
-            backends: Vec::new(),
-            featured: Vec::new(),
-        }
+        Self { backends: Vec::new(), featured: Vec::new() }
     }
 
     /// Register a backend (Inversion of Control / Plug-in Driver Model).
@@ -83,8 +80,7 @@ impl SoftwareManager {
     /// Search across all registered backends (aggregated results).
     pub fn search(&self, query: &str) -> Vec<PackageInfo> {
         let q = query.to_lowercase();
-        self.backends
-            .iter()
+        self.backends.iter()
             .flat_map(|b| b.search(&q))
             .filter(|p| !p.name.is_empty())
             .collect()
@@ -92,9 +88,7 @@ impl SoftwareManager {
 
     /// Install a package via its designated backend.
     pub fn install(&self, pkg: &PackageInfo) -> Result<(), InstallError> {
-        let backend = self
-            .backends
-            .iter()
+        let backend = self.backends.iter()
             .find(|b| b.name() == pkg.backend)
             .ok_or(InstallError::BackendNotFound(pkg.backend.to_string()))?;
         backend.install(pkg)
@@ -125,9 +119,7 @@ impl SoftwareManager {
 }
 
 impl Default for SoftwareManager {
-    fn default() -> Self {
-        Self::new()
-    }
+    fn default() -> Self { Self::new() }
 }
 
 #[derive(Debug)]
@@ -143,9 +135,9 @@ impl std::fmt::Display for InstallError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::BackendNotFound(b) => write!(f, "backend not found: {b}"),
-            Self::NotInstalled(p) => write!(f, "package not installed: {p}"),
-            Self::PermissionDenied => write!(f, "permission denied"),
-            Self::NetworkError(m) => write!(f, "network error: {m}"),
+            Self::NotInstalled(p)    => write!(f, "package not installed: {p}"),
+            Self::PermissionDenied   => write!(f, "permission denied"),
+            Self::NetworkError(m)    => write!(f, "network error: {m}"),
             Self::DependencyConflict(m) => write!(f, "dependency conflict: {m}"),
         }
     }
@@ -163,44 +155,34 @@ impl StubAptBackend {
     pub fn new() -> Self {
         Self {
             installed: std::collections::HashSet::new(),
-            packages: vec![PackageInfo {
-                name: "firefox".into(),
-                version: "120.0".into(),
-                description: "Web browser".into(),
-                category: PackageCategory::Internet,
-                size_kb: 80_000,
-                icon_name: "firefox".into(),
-                backend: "apt",
-                rating: 4.5,
-            }],
+            packages: vec![
+                PackageInfo {
+                    name: "firefox".into(),
+                    version: "120.0".into(),
+                    description: "Web browser".into(),
+                    category: PackageCategory::Internet,
+                    size_kb: 80_000,
+                    icon_name: "firefox".into(),
+                    backend: "apt",
+                    rating: 4.5,
+                },
+            ],
         }
     }
 }
 
 #[cfg(test)]
 impl PackageBackend for StubAptBackend {
-    fn name(&self) -> &'static str {
-        "apt"
-    }
+    fn name(&self) -> &'static str { "apt" }
     fn search(&self, query: &str) -> Vec<PackageInfo> {
-        self.packages
-            .iter()
+        self.packages.iter()
             .filter(|p| p.name.contains(query) || p.description.to_lowercase().contains(query))
-            .cloned()
-            .collect()
+            .cloned().collect()
     }
-    fn install(&self, _pkg: &PackageInfo) -> Result<(), InstallError> {
-        Ok(())
-    }
-    fn remove(&self, _pkg: &str) -> Result<(), InstallError> {
-        Ok(())
-    }
-    fn is_installed(&self, pkg_name: &str) -> bool {
-        self.installed.contains(pkg_name)
-    }
-    fn list_installed(&self) -> Vec<PackageInfo> {
-        Vec::new()
-    }
+    fn install(&self, _pkg: &PackageInfo) -> Result<(), InstallError> { Ok(()) }
+    fn remove(&self, _pkg: &str) -> Result<(), InstallError> { Ok(()) }
+    fn is_installed(&self, pkg_name: &str) -> bool { self.installed.contains(pkg_name) }
+    fn list_installed(&self) -> Vec<PackageInfo> { Vec::new() }
 }
 
 #[cfg(test)]
@@ -244,10 +226,7 @@ mod tests {
     #[test]
     fn test_remove_not_installed_error() {
         let mgr = manager_with_apt();
-        assert!(matches!(
-            mgr.remove("firefox"),
-            Err(InstallError::NotInstalled(_))
-        ));
+        assert!(matches!(mgr.remove("firefox"), Err(InstallError::NotInstalled(_))));
     }
 
     #[test]

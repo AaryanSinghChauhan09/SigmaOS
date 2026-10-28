@@ -28,8 +28,7 @@ fn test_open_source_os_unimplemented_ideas_v72_suite() {
     assert_eq!(rump.parse_9p_header(&packet), Some((10, 0x3412)));
 
     let hammer3 = DragonFlyHammer3MultiMasterScrubV72PrEngine::new();
-    assert!(hammer3.sync_pfs_delta(1, 2));
-    assert!(hammer3.verify_scrub_checksum("SHA256:abc123v72"));
+    assert!(hammer3.sync_pfs_delta(1, 2));    assert!(hammer3.verify_scrub_checksum("SHA256:abc123v72"));
 
     let zfs = IllumosOpenZfsDtraceEbpfV72PrEngine::new();
     let key = [7u8; 32];
@@ -45,5 +44,4 @@ fn test_open_source_os_unimplemented_ideas_v72_suite() {
     );
 
     let redox = RedoxFsCowCapabilityV72PrEngine::new();
-    assert!(redox.verify_scheme_capability("file:"));
-}
+    assert!(redox.verify_scheme_capability("file:"));}

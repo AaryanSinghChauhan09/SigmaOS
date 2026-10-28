@@ -66,8 +66,7 @@ impl CadcraftComputationalFluidDynamicsTurbulenceCfdV67Engine {
         let drag_coeff = 0.31;
         let area = 2.5; // m^2
         let drag_force = 0.5 * density * inlet_velocity * inlet_velocity * drag_coeff * area;
-        let pressure_drop =
-            0.5 * density * inlet_velocity * inlet_velocity * (1.0 + viscosity * 0.05);
+        let pressure_drop = 0.5 * density * inlet_velocity * inlet_velocity * (1.0 + viscosity * 0.05);
 
         (velocity_field, drag_force, pressure_drop)
     }
@@ -99,11 +98,7 @@ impl CadcraftAdditiveManufacturingSlicingSupportGpuV67Engine {
         layer_thickness_mm: f64,
         infill_percent: f64,
     ) -> (usize, Vec<f64>, f64) {
-        let thickness = if layer_thickness_mm <= 0.001 {
-            0.2
-        } else {
-            layer_thickness_mm
-        };
+        let thickness = if layer_thickness_mm <= 0.001 { 0.2 } else { layer_thickness_mm };
         let layer_count = (model_height_mm / thickness).ceil() as usize;
 
         let mut layer_heights = Vec::with_capacity(layer_count);
@@ -240,11 +235,7 @@ impl CadcraftMultiPhysicsElectromagneticThermalCaeV67Engine {
         let freq = frequency_hz.max(1.0);
         let thermal_expansion_microns = (joule_heating_watts * 0.002) / (freq.log10() + 1.0);
 
-        (
-            joule_heating_watts,
-            b_field_tesla,
-            thermal_expansion_microns,
-        )
+        (joule_heating_watts, b_field_tesla, thermal_expansion_microns)
     }
 }
 
@@ -359,7 +350,11 @@ impl CadcraftGenerativePipingHarnessRoutingV67Engine {
         let mid_y = (start_point.1 + end_point.1) * 0.5 + min_bend_radius_mm * 0.1;
         let mid_z = (start_point.2 + end_point.2) * 0.5;
 
-        let waypoints = vec![start_point, (mid_x, mid_y, mid_z), end_point];
+        let waypoints = vec![
+            start_point,
+            (mid_x, mid_y, mid_z),
+            end_point,
+        ];
 
         let dx = end_point.0 - start_point.0;
         let dy = end_point.1 - start_point.1;
@@ -402,8 +397,8 @@ impl CadcraftCompositeMaterialLaminateLayupFeaV67Engine {
         let transverse_strength_mpa = 50.0;
 
         let effective_strength = longitudinal_strength_mpa * 0.6 + transverse_strength_mpa * 0.4;
-        let tsai_wu_index =
-            (tensile_stress_mpa / effective_strength).powi(2) + (shear_stress_mpa / 80.0).powi(2);
+        let tsai_wu_index = (tensile_stress_mpa / effective_strength).powi(2)
+            + (shear_stress_mpa / 80.0).powi(2);
 
         let max_interlaminar_shear = shear_stress_mpa * (1.0 + 0.1 / ply_count as f64);
         let is_safe = tsai_wu_index < 1.0;
@@ -440,11 +435,7 @@ impl CadcraftDigitalTwinSensorTelemetryReplicationV67Engine {
     ) -> (f64, f64, bool) {
         let strain_factor = (strain_microstrain / 1000.0).powf(3.0);
         let vibration_factor = vibration_g * 0.05;
-        let temp_factor = if temp_c > 80.0 {
-            (temp_c - 80.0) * 0.01
-        } else {
-            0.0
-        };
+        let temp_factor = if temp_c > 80.0 { (temp_c - 80.0) * 0.01 } else { 0.0 };
 
         let hourly_fatigue_damage = (strain_factor + vibration_factor + temp_factor) * 1e-6;
         let total_fatigue_life = 1.0; // Cumulative Miner's rule threshold
@@ -456,11 +447,7 @@ impl CadcraftDigitalTwinSensorTelemetryReplicationV67Engine {
 
         let anomaly_detected = strain_microstrain > 2500.0 || vibration_g > 15.0 || temp_c > 120.0;
 
-        (
-            hourly_fatigue_damage,
-            estimated_remaining_hours,
-            anomaly_detected,
-        )
+        (hourly_fatigue_damage, estimated_remaining_hours, anomaly_detected)
     }
 }
 
@@ -512,9 +499,7 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("3D Finite Volume Navier-Stokes CFD Turbulence Solver PR"),
                 target_subsystem: String::from("Creative::Cadcraft::CFD"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftComputationalFluidDynamicsTurbulenceCfdV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftComputationalFluidDynamicsTurbulenceCfdV67Engine")],
                 performance_multiplier: String::from("16.8x GPU accelerated cell iteration"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -523,9 +508,7 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("Additive Manufacturing SLA/FDM Adaptive Slicer PR"),
                 target_subsystem: String::from("Creative::Cadcraft::CAM"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftAdditiveManufacturingSlicingSupportGpuV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftAdditiveManufacturingSlicingSupportGpuV67Engine")],
                 performance_multiplier: String::from("24.1x tree support contour generator"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -534,9 +517,7 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("Plastic Injection Molding Cavity Fill & Warpage Solver PR"),
                 target_subsystem: String::from("Creative::Cadcraft::Molding"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftPlasticInjectionMoldingFlowWarpV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftPlasticInjectionMoldingFlowWarpV67Engine")],
                 performance_multiplier: String::from("18.4x polymer shrinkage predictor"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -545,22 +526,16 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("TPMS Metamaterial Parametric Structural Lattice Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::Lattice"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftParametricLatticeMetamaterialDesignV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftParametricLatticeMetamaterialDesignV67Engine")],
                 performance_multiplier: String::from("32.0x Gyroid micro-mesh generator"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV67PrProposalManifest {
                 pr_id: 6705,
-                pr_title: String::from(
-                    "Multi-Physics 3D Maxwell EM Heating & Thermal CAE Engine PR",
-                ),
+                pr_title: String::from("Multi-Physics 3D Maxwell EM Heating & Thermal CAE Engine PR"),
                 target_subsystem: String::from("Creative::Cadcraft::CAE"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftMultiPhysicsElectromagneticThermalCaeV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftMultiPhysicsElectromagneticThermalCaeV67Engine")],
                 performance_multiplier: String::from("21.5x Joule heat coupled solver"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -569,35 +544,25 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("1D/3D GD&T Tolerance Stackup Monte Carlo Solver PR"),
                 target_subsystem: String::from("Creative::Cadcraft::GDT"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftToleranceStackupMonteCarloDimensioningV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftToleranceStackupMonteCarloDimensioningV67Engine")],
                 performance_multiplier: String::from("14.2x 3-Sigma yield calculator"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV67PrProposalManifest {
                 pr_id: 6707,
-                pr_title: String::from(
-                    "Large Assembly Hierarchical BVH & LOD Occlusion Culling PR",
-                ),
+                pr_title: String::from("Large Assembly Hierarchical BVH & LOD Occlusion Culling PR"),
                 target_subsystem: String::from("Creative::Cadcraft::Assembly"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftLargeAssemblyHierarchyLODClusteringV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftLargeAssemblyHierarchyLODClusteringV67Engine")],
                 performance_multiplier: String::from("45.0x multi-million part frame renderer"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
             CadcraftV67PrProposalManifest {
                 pr_id: 6708,
-                pr_title: String::from(
-                    "Generative 3D Piping & Wire Harness Routing Synthesizer PR",
-                ),
+                pr_title: String::from("Generative 3D Piping & Wire Harness Routing Synthesizer PR"),
                 target_subsystem: String::from("Creative::Cadcraft::Routing"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftGenerativePipingHarnessRoutingV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftGenerativePipingHarnessRoutingV67Engine")],
                 performance_multiplier: String::from("19.7x path bend constraint optimizer"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -606,9 +571,7 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("Composite Laminate Ply Layup & Tsai-Wu Failure Solver PR"),
                 target_subsystem: String::from("Creative::Cadcraft::Composites"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftCompositeMaterialLaminateLayupFeaV67Engine",
-                )],
+                components_added: vec![String::from("CadcraftCompositeMaterialLaminateLayupFeaV67Engine")],
                 performance_multiplier: String::from("22.3x orthotropic ply stress evaluator"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
@@ -617,12 +580,8 @@ impl SovereignCadcraftArtcraftMissingComponentsV67PrGateway {
                 pr_title: String::from("Digital Twin IoT Telemetry Fatigue Life Replicator PR"),
                 target_subsystem: String::from("Creative::Cadcraft::DigitalTwin"),
                 original_suite: String::from("ArtCraft CadCraft"),
-                components_added: vec![String::from(
-                    "CadcraftDigitalTwinSensorTelemetryReplicationV67Engine",
-                )],
-                performance_multiplier: String::from(
-                    "28.6x real-time Miner's fatigue damage tracker",
-                ),
+                components_added: vec![String::from("CadcraftDigitalTwinSensorTelemetryReplicationV67Engine")],
+                performance_multiplier: String::from("28.6x real-time Miner's fatigue damage tracker"),
                 status: String::from("APPROVED_AND_MERGED"),
             },
         ]
