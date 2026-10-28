@@ -22,7 +22,7 @@
 
 ## Motivation
 
-<!-- Link the issue, roadmap item, or gap-analysis entry. -->
+<!-- Link the issue, roadmap item, or gap-analysis entry. Upstream study / Reference study / What SigmaOS adopts. -->
 
 ## Implementation notes
 
@@ -62,6 +62,10 @@ Paste relevant output below.
 - [ ] Boot path validated
 - [ ] Installer/update path validated
 - [ ] Hardware tested
+
+## Safety and rollback
+
+- [ ] Safety guarantees and rollback steps documented
 
 ## Reviewer checklist
 
