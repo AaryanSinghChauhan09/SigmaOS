@@ -195,7 +195,12 @@ impl MuslLibcInspirationsV66Engine {
     }
 
     /// Lockless stdio stream buffer state manager.
-    pub fn evaluate_stdio_buffer_flush(buf_len: usize, capacity: usize, is_line_buffered: bool, contains_newline: bool) -> bool {
+    pub fn evaluate_stdio_buffer_flush(
+        buf_len: usize,
+        capacity: usize,
+        is_line_buffered: bool,
+        contains_newline: bool,
+    ) -> bool {
         if buf_len >= capacity {
             true
         } else if is_line_buffered && contains_newline {
@@ -252,11 +257,7 @@ impl UclibcInspirationsV66Engine {
     }
 
     /// Simulate FD-PIC GOT relocation table adjustment for MMU-less embedded architectures.
-    pub fn calculate_fdpic_got_offset(
-        base_addr: u64,
-        got_index: usize,
-        reloc_type: u32,
-    ) -> u64 {
+    pub fn calculate_fdpic_got_offset(base_addr: u64, got_index: usize, reloc_type: u32) -> u64 {
         if reloc_type == 21 {
             base_addr + (got_index as u64 * 8) + 0x1000
         } else {
@@ -297,7 +298,9 @@ impl BsdLibcInspirationsV66Engine {
         let mut buf = Vec::with_capacity(len);
         let mut state = seed;
         for _ in 0..len {
-            state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
             buf.push((state >> 24) as u8);
         }
         buf
@@ -474,12 +477,12 @@ impl CosmopolitanInspirationsV66Engine {
     /// Map POSIX file creation flags to Win32 `CreateFileW` access/share modes.
     pub fn posix_to_win32_file_flags(posix_flags: u32) -> (u32, u32) {
         let mut access = 0x8000_0000u32; // GENERIC_READ
-        let mut share = 0x0000_0001u32;  // FILE_SHARE_READ
+        let mut share = 0x0000_0001u32; // FILE_SHARE_READ
         if posix_flags & 0x01 != 0 {
             access = 0x4000_0000; // GENERIC_WRITE
         } else if posix_flags & 0x02 != 0 {
             access = 0xC000_0000; // GENERIC_READ | GENERIC_WRITE
-            share |= 0x0000_0002;  // FILE_SHARE_WRITE
+            share |= 0x0000_0002; // FILE_SHARE_WRITE
         }
         (access, share)
     }
@@ -670,7 +673,9 @@ impl DynamicLinkerLdSoInspirationsV66Engine {
         preloaded_libs: &[&'a str],
         symbol_name: &str,
     ) -> Option<&'static str> {
-        if !preloaded_libs.is_empty() && (symbol_name == "malloc" || symbol_name == "free" || symbol_name == "open") {
+        if !preloaded_libs.is_empty()
+            && (symbol_name == "malloc" || symbol_name == "free" || symbol_name == "open")
+        {
             Some("interposed_by_preload")
         } else {
             None
@@ -713,7 +718,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
         alloc::vec![
             CRuntimePrProposalManifestV66 {
                 pr_number: 5051,
-                pr_title: "glibc 2.40+ Parity: IFUNC SIMD/AMX Resolvers & Malloc Telemetry".to_string(),
+                pr_title: "glibc 2.40+ Parity: IFUNC SIMD/AMX Resolvers & Malloc Telemetry"
+                    .to_string(),
                 target_subsystem: "C Library / glibc".to_string(),
                 original_runtime: "glibc".to_string(),
                 components_added: alloc::vec![
@@ -728,7 +734,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5052,
-                pr_title: "musl libc 1.2.5+ Parity: Hardened Malloc-ng & Synccall Engine".to_string(),
+                pr_title: "musl libc 1.2.5+ Parity: Hardened Malloc-ng & Synccall Engine"
+                    .to_string(),
                 target_subsystem: "C Library / musl".to_string(),
                 original_runtime: "musl libc".to_string(),
                 components_added: alloc::vec![
@@ -742,7 +749,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5053,
-                pr_title: "uClibc-ng Parity: FD-PIC GOT Relocations & Target Feature Stripper".to_string(),
+                pr_title: "uClibc-ng Parity: FD-PIC GOT Relocations & Target Feature Stripper"
+                    .to_string(),
                 target_subsystem: "C Library / uClibc-ng".to_string(),
                 original_runtime: "uClibc-ng".to_string(),
                 components_added: alloc::vec![
@@ -755,7 +763,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5054,
-                pr_title: "BSD Libc Parity: Arc4random ChaCha20 Stream & Pledge/Unveil Engine".to_string(),
+                pr_title: "BSD Libc Parity: Arc4random ChaCha20 Stream & Pledge/Unveil Engine"
+                    .to_string(),
                 target_subsystem: "C Library / BSD libc".to_string(),
                 original_runtime: "FreeBSD / OpenBSD libc".to_string(),
                 components_added: alloc::vec![
@@ -769,7 +778,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5055,
-                pr_title: "Android Bionic Parity: Scudo Allocator Verification & Fdsan Guards".to_string(),
+                pr_title: "Android Bionic Parity: Scudo Allocator Verification & Fdsan Guards"
+                    .to_string(),
                 target_subsystem: "C Library / Bionic".to_string(),
                 original_runtime: "Android Bionic".to_string(),
                 components_added: alloc::vec![
@@ -782,7 +792,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5056,
-                pr_title: "Newlib Embedded Parity: Reentrant Contexts & Low-Power Syscall Bridge".to_string(),
+                pr_title: "Newlib Embedded Parity: Reentrant Contexts & Low-Power Syscall Bridge"
+                    .to_string(),
                 target_subsystem: "C Library / Newlib".to_string(),
                 original_runtime: "Newlib".to_string(),
                 components_added: alloc::vec![
@@ -795,7 +806,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5057,
-                pr_title: "Cosmopolitan Parity: Polyglot APE Executable & Fat ELF Dispatcher".to_string(),
+                pr_title: "Cosmopolitan Parity: Polyglot APE Executable & Fat ELF Dispatcher"
+                    .to_string(),
                 target_subsystem: "C Library / Cosmopolitan".to_string(),
                 original_runtime: "Cosmopolitan Libc".to_string(),
                 components_added: alloc::vec![
@@ -808,7 +820,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5058,
-                pr_title: "GNU libstdc++ Parity: Itanium ABI Demangler & SSO Buffer Decider".to_string(),
+                pr_title: "GNU libstdc++ Parity: Itanium ABI Demangler & SSO Buffer Decider"
+                    .to_string(),
                 target_subsystem: "C++ Runtime / libstdc++".to_string(),
                 original_runtime: "GNU libstdc++".to_string(),
                 components_added: alloc::vec![
@@ -822,7 +835,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5059,
-                pr_title: "LLVM libc++ Parity: Fast Charconv & Futex Atomic Wait Engine".to_string(),
+                pr_title: "LLVM libc++ Parity: Fast Charconv & Futex Atomic Wait Engine"
+                    .to_string(),
                 target_subsystem: "C++ Runtime / libc++".to_string(),
                 original_runtime: "LLVM libc++".to_string(),
                 components_added: alloc::vec![
@@ -836,7 +850,8 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
             },
             CRuntimePrProposalManifestV66 {
                 pr_number: 5060,
-                pr_title: "Dynamic Linker ld.so Parity: Preload Interposition & RTLD-Audit Hooks".to_string(),
+                pr_title: "Dynamic Linker ld.so Parity: Preload Interposition & RTLD-Audit Hooks"
+                    .to_string(),
                 target_subsystem: "Dynamic Linker / ld.so".to_string(),
                 original_runtime: "Linux ld.so / BSD ld-elf.so".to_string(),
                 components_added: alloc::vec![
@@ -869,7 +884,12 @@ impl SovereignCRuntimeAndLinkerParityV66Gateway {
         for pr in &proposals {
             markdown.push_str(&format!(
                 "| #{} | {} | {} | {} | {} | {} |\n",
-                pr.pr_number, pr.target_subsystem, pr.original_runtime, pr.pr_title, pr.performance_multiplier, pr.status
+                pr.pr_number,
+                pr.target_subsystem,
+                pr.original_runtime,
+                pr.pr_title,
+                pr.performance_multiplier,
+                pr.status
             ));
         }
 
@@ -899,17 +919,21 @@ mod tests {
         let resolver = GlibcInspirationsV66Engine::resolve_ifunc_symbol(&["amx_tile"], "memcpy");
         assert_eq!(resolver, "matrix_vector_hw_accelerated");
 
-        let resolver_avx512 = GlibcInspirationsV66Engine::resolve_ifunc_symbol(&["avx512f"], "memset");
+        let resolver_avx512 =
+            GlibcInspirationsV66Engine::resolve_ifunc_symbol(&["avx512f"], "memset");
         assert_eq!(resolver_avx512, "avx512_optimized");
 
-        let tunables = GlibcInspirationsV66Engine::parse_glibc_tunables("glibc.malloc.trim_threshold=128:glibc.cpu.hwcaps=AVX2");
+        let tunables = GlibcInspirationsV66Engine::parse_glibc_tunables(
+            "glibc.malloc.trim_threshold=128:glibc.cpu.hwcaps=AVX2",
+        );
         assert_eq!(tunables.len(), 2);
         assert_eq!(tunables[0], ("glibc.malloc.trim_threshold", "128"));
 
         let tls_offset = GlibcInspirationsV66Engine::calculate_tls_offset(1, 64, 8, 16);
         assert_eq!(tls_offset, 80);
 
-        let phdrs = GlibcInspirationsV66Engine::simulate_dl_iterate_phdr(&[("libc.so.6", 0x7fff0000)]);
+        let phdrs =
+            GlibcInspirationsV66Engine::simulate_dl_iterate_phdr(&[("libc.so.6", 0x7fff0000)]);
         assert_eq!(phdrs[0], "module:libc.so.6,base:0x7fff0000");
 
         let released = GlibcInspirationsV66Engine::execute_malloc_trim(1024, 20);
@@ -931,11 +955,21 @@ mod tests {
         let synccall = MuslLibcInspirationsV66Engine::simulate_synccall(8);
         assert_eq!(synccall, "synccall_dispatched_threads:8");
 
-        assert!(MuslLibcInspirationsV66Engine::evaluate_stdio_buffer_flush(100, 100, false, false));
-        assert!(MuslLibcInspirationsV66Engine::evaluate_stdio_buffer_flush(10, 100, true, true));
+        assert!(MuslLibcInspirationsV66Engine::evaluate_stdio_buffer_flush(
+            100, 100, false, false
+        ));
+        assert!(MuslLibcInspirationsV66Engine::evaluate_stdio_buffer_flush(
+            10, 100, true, true
+        ));
 
-        assert_eq!(MuslLibcInspirationsV66Engine::syscall_cp_wrapper(1, false), Ok(10));
-        assert_eq!(MuslLibcInspirationsV66Engine::syscall_cp_wrapper(1, true), Err("ECANCELED"));
+        assert_eq!(
+            MuslLibcInspirationsV66Engine::syscall_cp_wrapper(1, false),
+            Ok(10)
+        );
+        assert_eq!(
+            MuslLibcInspirationsV66Engine::syscall_cp_wrapper(1, true),
+            Err("ECANCELED")
+        );
 
         let dns = MuslLibcInspirationsV66Engine::res_msend_dns(&["example.com"], &["1.1.1.1"]);
         assert_eq!(dns[0], "resolved:example.com_via_1.1.1.1");
@@ -950,7 +984,10 @@ mod tests {
         assert_eq!(got, 0x1000_1010);
 
         let features = UclibcInspirationsV66Engine::apply_feature_mask_strip(0x05);
-        assert_eq!(features, alloc::vec!["UCLIBC_HAS_FLOATS", "UCLIBC_HAS_LOCALE"]);
+        assert_eq!(
+            features,
+            alloc::vec!["UCLIBC_HAS_FLOATS", "UCLIBC_HAS_LOCALE"]
+        );
     }
 
     #[test]
@@ -968,7 +1005,10 @@ mod tests {
         assert_eq!(&dst[..5], b"hello");
         assert_eq!(dst[7], 0);
 
-        assert_eq!(BsdLibcInspirationsV66Engine::reallocarray_check(10, 20), Ok(200));
+        assert_eq!(
+            BsdLibcInspirationsV66Engine::reallocarray_check(10, 20),
+            Ok(200)
+        );
         assert!(BsdLibcInspirationsV66Engine::reallocarray_check(usize::MAX, 2).is_err());
 
         let pledge = BsdLibcInspirationsV66Engine::evaluate_pledge_unveil(
@@ -985,7 +1025,11 @@ mod tests {
 
     #[test]
     fn test_bionic_and_newlib_and_cosmopolitan_v66() {
-        let scudo_ok = BionicInspirationsV66Engine::verify_scudo_chunk_header(1, 2, (((1u16) << 8) | 2u16) ^ 0xA5A5);
+        let scudo_ok = BionicInspirationsV66Engine::verify_scudo_chunk_header(
+            1,
+            2,
+            (((1u16) << 8) | 2u16) ^ 0xA5A5,
+        );
         assert!(scudo_ok);
 
         let prop = BionicInspirationsV66Engine::parse_android_property("ro.build.version.sdk=34");
@@ -1009,12 +1053,17 @@ mod tests {
 
         assert_eq!(NewlibInspirationsV66Engine::route_mcu_syscall(1, 5), 6);
 
-        assert!(CosmopolitanInspirationsV66Engine::validate_ape_header(b"MZqFpD="));
+        assert!(CosmopolitanInspirationsV66Engine::validate_ape_header(
+            b"MZqFpD="
+        ));
         let (acc, share) = CosmopolitanInspirationsV66Engine::posix_to_win32_file_flags(0x02);
         assert_eq!(acc, 0xC000_0000);
         assert_eq!(share, 0x0000_0003);
 
-        assert_eq!(CosmopolitanInspirationsV66Engine::dispatch_fat_elf("x86_64"), "fat_elf_x86_64_entry");
+        assert_eq!(
+            CosmopolitanInspirationsV66Engine::dispatch_fat_elf("x86_64"),
+            "fat_elf_x86_64_entry"
+        );
     }
 
     #[test]
@@ -1035,10 +1084,8 @@ mod tests {
         assert_eq!(sz, 24);
         assert_eq!(align, 8);
 
-        let lsda = LibstdcxxInspirationsV66Engine::lookup_eh_frame_ip(
-            0x1005,
-            &[(0x1000, 0x1010, 0x2000)],
-        );
+        let lsda =
+            LibstdcxxInspirationsV66Engine::lookup_eh_frame_ip(0x1005, &[(0x1000, 0x1010, 0x2000)]);
         assert_eq!(lsda, Some(0x2000));
     }
 
@@ -1050,8 +1097,14 @@ mod tests {
         let (s, w) = LibcxxInspirationsV66Engine::update_shared_ref_count(1, 0, "inc_strong");
         assert_eq!((s, w), (2, 0));
 
-        assert_eq!(LibcxxInspirationsV66Engine::futex_atomic_wait(5, 5), "futex_wait_blocked");
-        assert_eq!(LibcxxInspirationsV66Engine::futex_atomic_wait(6, 5), "value_changed_no_wait");
+        assert_eq!(
+            LibcxxInspirationsV66Engine::futex_atomic_wait(5, 5),
+            "futex_wait_blocked"
+        );
+        assert_eq!(
+            LibcxxInspirationsV66Engine::futex_atomic_wait(6, 5),
+            "value_changed_no_wait"
+        );
 
         let float_str = LibcxxInspirationsV66Engine::fast_to_chars_f64_sim(PI);
         assert_eq!(float_str, "3.14");
@@ -1070,13 +1123,22 @@ mod tests {
         assert_eq!(flags, alloc::vec!["DF_1_NOW", "DF_1_PIE"]);
 
         let _engine = DynamicLinkerLdSoInspirationsV66Engine::new();
-        assert_eq!(DynamicLinkerLdSoInspirationsV66Engine::execute_dlinfo(2), Ok("RTLD_DI_LINKMAP"));
         assert_eq!(
-            DynamicLinkerLdSoInspirationsV66Engine::evaluate_ld_preload_interposition(&["libfaketime.so"], "malloc"),
+            DynamicLinkerLdSoInspirationsV66Engine::execute_dlinfo(2),
+            Ok("RTLD_DI_LINKMAP")
+        );
+        assert_eq!(
+            DynamicLinkerLdSoInspirationsV66Engine::evaluate_ld_preload_interposition(
+                &["libfaketime.so"],
+                "malloc"
+            ),
             Some("interposed_by_preload")
         );
         assert_eq!(
-            DynamicLinkerLdSoInspirationsV66Engine::evaluate_ld_preload_interposition(&[], "malloc"),
+            DynamicLinkerLdSoInspirationsV66Engine::evaluate_ld_preload_interposition(
+                &[],
+                "malloc"
+            ),
             None
         );
 
@@ -1087,7 +1149,12 @@ mod tests {
         assert!(DynamicLinkerLdSoInspirationsV66Engine::verify_gnu_relro_protection(0x01 | 0x04));
         assert!(!DynamicLinkerLdSoInspirationsV66Engine::verify_gnu_relro_protection(0x00));
 
-        assert!(DynamicLinkerLdSoInspirationsV66Engine::match_elf_symbol_versions("GLIBC_2.34", &["GLIBC_2.2.5", "GLIBC_2.34"]));
+        assert!(
+            DynamicLinkerLdSoInspirationsV66Engine::match_elf_symbol_versions(
+                "GLIBC_2.34",
+                &["GLIBC_2.2.5", "GLIBC_2.34"]
+            )
+        );
     }
 
     #[test]

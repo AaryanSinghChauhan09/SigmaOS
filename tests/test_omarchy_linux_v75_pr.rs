@@ -32,7 +32,9 @@ fn test_omarchy_linux_v75_pr_suite_full_cycle() {
     assert!(markdown_proposal.contains("Hyprlock PAM Biometric Locker & Hypridle Governor V75"));
     assert!(markdown_proposal.contains("Ananicy-cpp Auto-Nice Real-Time Priority Scheduler V75"));
     assert!(markdown_proposal.contains("Herdr AI Agent Workflow & Quickshell HUD Overlay V75"));
-    assert!(markdown_proposal.contains("Fail-Closed Sudo Privilege Shield & Polkit Policy Gate V75"));
+    assert!(
+        markdown_proposal.contains("Fail-Closed Sudo Privilege Shield & Polkit Policy Gate V75")
+    );
     assert!(markdown_proposal.contains("Wallust Chord Theme Navigator & Shortcut Engine V75"));
 }
 
@@ -45,7 +47,9 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(hypr.generate_hyprland_conf().contains("layout = master"));
 
     let waybar = OmarchyWaybarStatusHudEngineV75::new();
-    assert!(waybar.render_config_json().contains("\"position\": \"top\""));
+    assert!(waybar
+        .render_config_json()
+        .contains("\"position\": \"top\""));
 
     let ghostty = OmarchyGhosttyPtyTerminalEngineV75::new();
     assert!(ghostty.render_ghostty_config().contains("JetBrainsMono"));
@@ -58,7 +62,9 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(wallust.generate_wallust_colors_json().contains("#1e1e2e"));
 
     let hyprlock = OmarchyHyprlockPamSecurityEngineV75::new();
-    assert!(hyprlock.generate_hyprlock_conf().contains("pam_module = hyprlock"));
+    assert!(hyprlock
+        .generate_hyprlock_conf()
+        .contains("pam_module = hyprlock"));
 
     let ananicy = OmarchyAnanicyGameModeEngineV75::new();
     assert_eq!(ananicy.get_nice_value("hyprland"), -15);
@@ -71,5 +77,8 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(!sudo_shield.validate_privilege_request("guest", "ls -la"));
 
     let chord = OmarchyWallustChordThemeNavigatorEngineV75::new();
-    assert_eq!(chord.trigger_chord("SUPER+SHIFT+T"), Some("wallust next-theme".to_string()));
+    assert_eq!(
+        chord.trigger_chord("SUPER+SHIFT+T"),
+        Some("wallust next-theme".to_string())
+    );
 }
