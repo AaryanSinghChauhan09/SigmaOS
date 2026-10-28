@@ -1,70 +1,93 @@
 # SigmaOS CPU Scheduler Status, Architecture & Policy Invariants
 
-## Executive Overview & Architectural Inventory
+## Executive Summary & Subsystem Inventory Audit
 
-SigmaOS's published `FEATURE_STATUS.toml` identifies three primary scheduling implementations in `src/scheduler/` and `src/kernel/`:
-* **Completely Fair Scheduler (CFS)** (`src/kernel/cfs_scheduler.rs`, `src/scheduler/cfs.rs`, `src/scheduler/distro_schedulers.rs`)
-* **Burst-Oriented Response Enhancer (BORE)** (`src/scheduler/bore.rs`, `src/scheduler/bore_engine.rs`)
-* **Real-Time FIFO & Round-Robin (SCHED_FIFO / SCHED_RR)** (`src/scheduler/distro_schedulers.rs`, `src/kernel/roundrobin.rs`, `src/scheduler/preempt_rt.rs`)
-* **Earliest Eligible Virtual Deadline First (EEVDF)** (`src/scheduler/eevdf.rs`, `src/kernel/sigma_scheduler_eevdf.rs`)
+SigmaOS provides a multi-policy CPU scheduling architecture designed to support general-purpose workstation, server, real-time, interactive, and custom kernel workloads. The scheduler infrastructure comprises five primary scheduling policies alongside core run-queue management, architecture context-switching hooks, interrupt timer integration, and CPU resource control models.
 
-Current evidence for these scheduling modules is at unit-level—verifying fairness metrics, burst scoring calculations, FIFO ordering, and RR quantum rotations. Real kernel execution requires connecting scheduling policy to actual runnable tasks, timer preemption interrupts, and x86_64/AArch64/RISC-V context switching before extending the policy set.
+### Subsystem Architecture Inventory Audit
+
+| Subsystem / Policy | Source Files | Evidence Tier | Architectural Status & Gaps |
+|---|---|---|---|
+| **Core Scheduler & Run-Queue** | `src/scheduler/scheduler.rs`<br>`src/kernel/scheduler.rs`<br>`src/scheduler/core.rs` | **Prototype** | Provides per-CPU run queues, task state transition logic, and basic lock management. Currently tested at unit level; full integration with real kernel tasks and context switching is pending. |
+| **Completely Fair Scheduler (CFS)** | `src/kernel/cfs_scheduler.rs`<br>`src/scheduler/distro_schedulers.rs` | **Prototype** | Implements virtual runtime (`vruntime`) tracking, red-black tree/queue ordering, nice-to-weight conversions, and basic latency target calculations. Lacks group-scheduling accounting and timer interrupt preemption integration. |
+| **Burst-Oriented Response Encoder (BORE)** | `src/scheduler/bore.rs`<br>`src/scheduler/bore_engine.rs` | **Prototype** | Implements burst-score tracking with exponential moving average (EMA) decay for boosting interactive tasks. Currently operates as a unit-tested heuristic model; requires explicit policy guardrails to prevent starvation of non-burst workloads. |
+| **Real-Time FIFO & Round-Robin (SCHED_FIFO / SCHED_RR)** | `src/scheduler/distro_schedulers.rs`<br>`src/kernel/roundrobin.rs` | **Prototype** | Supports 100 real-time priority levels with bitmap-accelerated $O(1)$ run-queue selection and quantum rotation. Guardrails, priority inheritance/ceiling, and bandwidth limits require measurement under interrupt load. |
+| **Earliest Eligible Virtual Deadline First (EEVDF)** | `src/scheduler/eevdf.rs`<br>`src/kernel/sigma_scheduler_eevdf.rs` | **Prototype** | Implements virtual deadline calculation, lag tracking, and eligibility criteria based on Linux EEVDF principles. Operates standalone; requires integration into the primary fair class selection loop. |
+| **Extensible Scheduler Framework (SchedExt / BPF)** | `src/scheduler/schedext.rs`<br>`src/scheduler/ebpf_scheduler.rs` | **Prototype** | Exposes dynamic scheduling callbacks for eBPF/custom governors (e.g. gaming, server tuning). Lacks safe fallback handlers and execution boundary protections. |
+| **x86_64 Context Switch & APIC Timer** | `src/arch/x86_64/context.rs`<br>`src/kernel/apic.rs` | **Prototype** | Register save/restore and APIC timer tick handlers exist in isolation. APIC calibration in QEMU and scheduler reschedule interrupt returns are outstanding. |
+| **AArch64 & RISC-V Architecture Paths** | `src/arch/aarch64/`<br>`src/arch/riscv/` | **Proposed / Prototype** | Context-switch frames, timer drivers, and idle paths exist as compile-checked stubs; unvalidated on live vCPU targets. |
+| **CPU Controllers & Resource Controls** | `src/kernel/cgroup.rs` | **Prototype** | Defines CPU weight and quota models; needs full accounting integration into run-queue time-slice distribution. |
+
+---
 
 ## Core Scheduling Rules & Invariants
 
-Adopt the following architectural invariants and safety rules across all SigmaOS CPU scheduler components:
+To guarantee deterministic, safe, and starvation-free execution across all supported CPU architectures, all scheduler modifications must satisfy nine strict rules and invariants:
 
-### Policy/Mechanism Separation
-The scheduler core owns run-queue locking, task-state transitions, timer interactions, context-switch hooks, and CPU selection interfaces. Scheduling classes (Idle, Fair, Real-Time, Deadline) own policy decisions. A hybrid CFS/BORE/EEVDF policy must not be used until class boundaries and precedence rules are explicitly defined.
+### Rule 1: Policy/Mechanism Separation
+- **Invariant:** The scheduler core owns mechanism (run-queue lock ordering, task-state machine, timer accounting, context-switch hooks, and CPU selection interfaces). Scheduling classes own policy decisions (task selection, virtual runtime/deadline updates, priority evaluation).
+- **Rule:** A hybrid scheduling policy (e.g., combining CFS, BORE, or EEVDF) must never blur class boundaries. Scheduling decisions must follow strict policy precedence:
+  1. **Real-Time Class:** `SCHED_FIFO` / `SCHED_RR` (highest precedence, strictly prioritized over fair work).
+  2. **Fair Class:** `SCHED_NORMAL` / `SCHED_BATCH` (EEVDF or weighted fair policy with optional BORE interactive heuristics).
+  3. **Idle Class:** `SCHED_IDLE` (lowest precedence, scheduled only when no runnable RT or Fair tasks exist).
 
-### Explicit Task State Machine
-Document and enforce all valid task lifecycle states and transitions:
-* **States**: `New`, `Runnable`, `Running`, `Blocked` (Sleeping), `Stopped`, `Exiting` (Zombie/Reaped), `Idle`.
-* **Transitions**: Valid enqueue, dequeue, select_to_run, block, yield, wakeup, and exit/reap paths.
-* **Invariants**:
-  1. A task must be present on at most **one** run queue at any given instant.
-  2. A task must **never** run on two CPUs simultaneously.
-  3. Transitions directly from `Blocked` or `Exiting` to `Running` without passing through `Runnable` enqueue are prohibited.
+### Rule 2: Explicit Task State Machine
+- **Invariant:** Every task in the system resides in exactly one explicit state: `New`, `Runnable`, `Running`, `Blocked`, `Stopped`, `Exiting`, or `Idle`.
+- **Transitions:**
+  - `New` $\rightarrow$ `Runnable`: Task initialization complete; enqueued into CPU run queue.
+  - `Runnable` $\rightarrow$ `Running`: Selected by scheduler core for CPU execution.
+  - `Running` $\rightarrow$ `Runnable`: Preempted by timer interrupt or voluntary yield.
+  - `Running` $\rightarrow$ `Blocked`: Task waits on I/O, IPC, futex, or sleep timer.
+  - `Blocked` $\rightarrow$ `Runnable`: Wakeup event occurs; task re-enqueued.
+  - `Running` $\rightarrow$ `Stopped`: Received stop signal (`SIGSTOP`/`SIGTSTP`).
+  - `Stopped` $\rightarrow$ `Runnable`: Received continue signal (`SIGCONT`).
+  - `Running` $\rightarrow$ `Exiting`: Task invokes exit or receives fatal signal; resources pending cleanup.
+- **Queue Ownership:** A task must exist on at most one CPU run queue at any moment and must never be assigned to run on two CPUs simultaneously.
 
-### Measurable Fair Scheduling Contract
-Fair scheduling policy must specify relative CPU share by weight, wakeup latency targets, starvation bounds, and how sleeping tasks accrue or decay fairness debt (lag). Linux EEVDF serves as a reference for combining virtual runtime fairness with virtual deadlines (`vruntime` / `vdeadline`) and handling sleeper behavior without allowing sleeper-burst exploitation.
+### Rule 3: Policy/Mechanism Separation & Measurable Fair Scheduling Contract
+- **Invariant:** The fair scheduling policy must enforce proportional CPU allocation based on task weight (derived from nice values or cgroup weights).
+- **Contract:** Relative CPU share for task $i$ with weight $w_i$ among runnable tasks in set $R$ is given by:
+  $$\text{Share}_i = \frac{w_i}{\sum_{j \in R} w_j}$$
+- **Sleeper Debt & Lag Bounding:** Sleeping tasks accruing fairness debt (lag) must be bounded upon wakeup to prevent CPU starvation of long-running tasks. EEVDF virtual deadlines and eligibility rules serve as the target reference model.
 
-### Real-Time Policy Guardrails
-Real-time policies (`SCHED_FIFO`, `SCHED_RR`) must have explicit priority semantics (100 priority levels), quantum behavior, privilege checking, and starvation controls (e.g., RT bandwidth throttling). A policy cannot be labeled "real-time" until interrupt, timer, preemption, and worst-case scheduling latency paths are measured on booted targets.
+### Rule 4: Real-Time Policy Guardrails
+- **Invariant:** `SCHED_FIFO` tasks run until they yield, block, or are preempted by a higher-priority RT task. `SCHED_RR` tasks rotate within equal priority levels upon quantum expiration.
+- **Guardrails:**
+  - Real-time priority escalation requires explicit administrative capabilities (`CAP_SYS_NICE`).
+  - Real-time bandwidth throttling must reserve a configurable slice (default 5%) for non-RT administrative tasks to prevent unrecoverable kernel lockups.
+  - Worst-case interrupt-to-run latency must be bounded and measured under load.
 
-### Data-Driven Empirical Benchmarking
-Scheduler changes require hard telemetry, not anecdotes. Every benchmark or comparison must record:
-* Throughput, fairness index (Jain's fairness index), wake-to-run latency (median, p95, p99), context-switch rate, CPU migrations, run-queue imbalance, and idle time.
-* Baseline workloads and hardware/QEMU configurations for side-by-side comparisons.
+### Rule 5: Data-Driven Scheduler Decisions
+- **Invariant:** All scheduler optimizations, tuning changes, or heuristic additions must be backed by quantitative benchmark data across baseline workloads.
+- **Tracked Metrics:** Throughput, fairness index (Jain's Fairness Index), wake-to-run latency (median and 99th percentile), context-switch frequency, per-CPU migration rate, run-queue imbalance ratio, and CPU idle time.
 
-### Concurrency and Correctness
-Explicitly define:
-* Run-queue lock ordering (e.g., per-CPU run-queue lock before task lock; double-lock acquired in ascending CPU ID order).
-* Preemption and interrupt assumptions (preemption disabled during critical scheduling paths).
-* Per-CPU state protection and memory ordering (atomic memory barriers on context switch).
-* Task ownership during context switching. Preemption creates concurrency/reentrancy hazards, including for per-CPU state.
+### Rule 6: Concurrency and Reentrancy Correctness
+- **Invariant:** Run-queue locking must follow strict hierarchical lock ordering to prevent deadlocks during task migration or cross-CPU wakeups.
+- **Preemption & Interrupt Rules:** Context switches must never occur while holding spinlocks or inside hard-interrupt handlers unless explicitly executing on a dedicated interrupt-return boundary. Per-CPU scheduler state must be protected against reentrant interrupt execution.
 
-### Resource Control Integration
-CPU controllers (cgroup-like quotas and weights) must affect real scheduling paths. CPU quotas, limits, and weights must be accounted for in scheduler run-queue accounting and throttling logic rather than existing solely as an unintegrated model.
+### Rule 7: Enforced Resource Controls
+- **Invariant:** CPU controllers (`cgroups`) must enforce configured weights and hard quota limits during runtime scheduling accounting.
+- **Rule:** Unenforced or stubbed resource limits must be marked as `Prototype` or `Proposed` in system telemetry and must not be reported as `Supported`.
 
-### Independent Per-Architecture Validation
-A scheduler is not Supported on AArch64 or RISC-V merely because it passes on x86_64. Validate each architecture's:
-* Timer setup and APIC/GIC/PLIC calibration.
-* Context switch save/restore (registers, stack, address space, FPU/SIMD state).
-* Idle loop and interrupt return paths.
-* CPU topology and SMP messaging.
+### Rule 8: Per-Architecture Status Isolation
+- **Invariant:** Feature status for CPU scheduling is evaluated independently per CPU architecture (`x86_64`, `AArch64`, `RISC-V`).
+- **Rule:** Validating scheduler behavior on `x86_64` QEMU does not grant `Supported` status to `AArch64` or `RISC-V`. Each architecture must independently pass timer preemption, context-switching, idle loop, and interrupt return verification.
 
-### Versioned Bounded Diagnostics
-Expose versioned, read-only scheduler counters (`/proc/schedstat` style). Counter formats evolve over time, so interfaces must include explicit versioning (`schedstat_version: 1`) to guarantee diagnostic tools remain stable.
+### Rule 9: Bounded & Stable Diagnostics
+- **Invariant:** Scheduler counters and statistics (e.g. `/proc/schedstat` or versioned kernel IPC interfaces) must be read-only, non-allocating, and versioned.
+- **Rule:** Counter updates must use atomic or per-CPU lockless operations to avoid adding contention to primary scheduling paths.
 
-## Subsystem Capability and Status Matrix
+---
 
-| Subsystem Component | Module Location | Status | Current Evidence | Next Milestone |
-| :--- | :--- | :--- | :--- | :--- |
-| **Scheduler Core** | `src/scheduler/core.rs`, `src/kernel/scheduler.rs` | Prototype | Core run-queue operations & state transitions | PR 2: State-transition & fairness test expansion |
-| **CFS Fair Class** | `src/kernel/cfs_scheduler.rs`, `src/scheduler/cfs.rs` | Prototype | Unit tests for vruntime & weight mapping | PR 7: Weighted fair scheduling semantics |
-| **BORE Heuristic** | `src/scheduler/bore.rs`, `src/scheduler/bore_engine.rs` | Prototype | Burst score decay & priority boost calculations | PR 9: Optional interactive heuristic for Fair class |
-| **Real-Time (FIFO/RR)** | `src/scheduler/distro_schedulers.rs`, `src/kernel/roundrobin.rs` | Prototype | FIFO ordering & RR quantum rotation tests | PR 10: RT priority semantics & bandwidth limits |
-| **EEVDF Prototype** | `src/scheduler/eevdf.rs`, `src/kernel/sigma_scheduler_eevdf.rs` | Prototype | Eligibility, lag, & virtual deadline calculations | PR 8: EEVDF fair-class prototype & evaluation |
-| **x86_64 Context Switch** | `src/arch/x86_64/context.rs` | Prototype | Assembly register save/restore stubs | PR 6: x86_64 context switch & idle loop integration |
-| **CPU Controllers** | `src/kernel/cgroup.rs` | Proposed | Model parameters for CPU weights/quotas | PR 13: Scheduler quota enforcement & throttling |
+## Evidence Tiers & Capability Matrix
+
+| Feature / Subsystem | Capability Status | Current Evidence Level | Target Verification Gate |
+|---|---|---|---|
+| Task State Machine | Integrated | Unit Tests (`tests/scheduler/core.rs`) | Booted QEMU multi-task execution |
+| CFS Fair Class | Prototype | Unit Tests (`tests/scheduler/fairness/`) | Bounded CPU share under load |
+| BORE Interactive Boosting | Prototype | Model Tests (`src/scheduler/bore.rs`) | Latency benchmark comparison |
+| Real-Time FIFO / RR | Prototype | Unit Tests (`src/scheduler/distro_schedulers.rs`) | Hard-IRQ preemption measurement |
+| EEVDF Deadline Class | Prototype | Algorithm Tests (`src/scheduler/eevdf.rs`) | Single-CPU QEMU fair selection |
+| x86_64 Preemptive Switch | Prototype | Unit Tests (`tests/scheduler/context_switch/`) | Booted Ring 3 multi-task execution |
+| SMP Load Balancing | Prototype | Unit Tests (`tests/scheduler/affinity/`) | Multi-vCPU QEMU load distribution |
+| CPU Controller Limits | Proposed | Model Definition (`src/kernel/cgroup.rs`) | Quota throttling integration |

@@ -1,21 +1,26 @@
 # SigmaOS CPU Scheduler Development Plan
 
-## Overview & Objectives
+## Overview & Reference Design
 
-This document establishes the official 18-PR sequence roadmap, periodic engineering cadences, review and merge rules, and completion gates for the SigmaOS CPU Scheduler. The primary focus of this plan is connecting scheduler policy to real runnable tasks, timer preemption interrupts, and context switching on booted targets before extending policy heuristics.
+The SigmaOS CPU scheduler development roadmap defines a phased, evidence-gated sequence to transform unit-tested policy models into an integrated, preemptive, multi-policy kernel scheduler. Design choices draw reference from Linux EEVDF (virtual runtime/lag and virtual deadlines for fair, low-latency scheduling) and FreeBSD ULE (per-CPU run queues, affinity, and load balancing), tailored to SigmaOS's micro-kernel/modular architecture and strict safety invariants.
+
+### Recommended First Milestone
+**Complete PRs 1–7 first.** Completing PRs 1–7 establishes the fundamental vertical slice: task lifecycle integration, architecture timer ticks, preemptive context switching, idle handoff, and weighted fair scheduling. Advanced policy decisions (such as designating EEVDF or BORE as default fair policy) must wait until real runtime scheduling is functional.
+
+---
 
 ## 18-PR Sequence Roadmap
 
 | PR | Proposed Title | Scope | Acceptance Criteria |
-| :--- | :--- | :--- | :--- |
-| **1** | `docs(scheduler): audit scheduler status and define invariants` | Audit `cfs.rs`, `bore.rs`, `realtime.rs`, scheduler core, context switch, timers, APIC, task states, CPU controllers, and per-architecture paths. Document policy precedence, states, fairness goals, and test levels. | Every scheduler component is marked Proposed, Prototype, Integrated, or Supported with evidence; unit/model results are not described as runtime scheduling. |
+|---|---|---|---|
+| **1** | `docs(scheduler): audit scheduler status and define invariants` | Audit `cfs.rs`, `bore.rs`, `realtime.rs`, scheduler core, context switch, timers, APIC, task states, CPU controllers, and per-architecture paths. Document policy precedence, states, fairness goals, and test levels. | Every scheduler component is marked `Proposed`, `Prototype`, `Integrated`, or `Supported` with evidence; unit/model results are not described as runtime scheduling. |
 | **2** | `test(scheduler): add deterministic state-transition and fairness tests` | Expand unit tests for enqueue/dequeue, wakeups, blocking, exit, duplicate enqueue, priority changes, and task migration. Add deterministic simulated-clock tests. | Invalid transitions are rejected; task/run-queue invariants are checked; fairness tests report measurable shares and bounded error under defined workloads. |
 | **3** | `refactor(scheduler): define class interface and single policy selection path` | Introduce an explicit scheduler-class interface (`SchedClass`) and policy ordering for idle, fair, and real-time classes. Make selection and lifecycle callbacks consistent. | Each runnable task is owned by one class; class precedence is tested; adding a class does not duplicate task lifecycle logic. |
 | **4** | `feat(scheduler): integrate runnable queues with task lifecycle` | Connect process/thread creation, wakeup, block, yield, exit, and wait paths to run-queue operations. | Real kernel tasks are enqueued/dequeued exactly once; no lost wakeups, stale queue entries, or double-running tasks in stress tests. |
 | **5** | `feat(scheduler): connect timer ticks and preemption to scheduler core` | Wire architecture timer interrupts to accounting, time-slice expiration, reschedule requests, and safe return-to-user scheduling points. | QEMU test proves two CPU-bound user tasks alternate according to policy; timer interrupts do not corrupt context; idle CPUs wake correctly. |
 | **6** | `feat(scheduler): integrate x86_64 context switching and idle loop` | Connect `src/arch/x86_64/context.rs`, APIC timer, scheduler run queues, and idle path. Validate FPU/SIMD state and stack/address-space switching. | Booted x86_64 QEMU runs multiple Ring 3 tasks; preemption and block/wakeup work; context state is preserved; idle does not miss a reschedule interrupt. |
 | **7** | `feat(scheduler): implement weighted fair scheduling semantics` | Define weight mapping and accounting for the existing CFS-inspired implementation; document fairness and nice-like behavior. | Long-running equal-weight tasks converge to equal CPU share within a stated tolerance; weighted tasks receive defined proportional shares; runnable tasks do not starve. |
-| **8** | `feat(scheduler): implement EEVDF fair-class prototype` | Implement EEVDF-style eligibility, lag, virtual deadlines, requested slices, and sleeper accounting as a separate class or behind a development feature flag. | Deterministic tests cover eligibility, earliest deadline selection, sleeper abuse, wakeup preemption, and weight changes; benchmarks compare to existing fair policy before any default change. |
+| **8** | `feat(scheduler): implement EEVDF fair-class prototype` | Implement EEVDF-style eligibility, lag, virtual deadlines, requested slices, and sleeper accounting as a separate class or behind a feature flag. | Deterministic tests cover eligibility, earliest deadline selection, sleeper abuse, wakeup preemption, and weight changes; benchmarks compare to the existing fair policy before any default change. |
 | **9** | `feat(scheduler): integrate BORE as optional interactive heuristic` | Define exactly how BORE burst scoring influences the fair class; prevent it from overriding fairness bounds or real-time precedence. | Interactive latency improves on named workloads without violating starvation/fairness thresholds; hostile yield/sleep patterns cannot gain unbounded CPU advantage; policy can be disabled for comparison. |
 | **10** | `feat(scheduler): enforce FIFO and round-robin policy semantics` | Integrate existing real-time FIFO/RR policy with task priorities, preemption, time quanta, and permissions. | FIFO runs until block/yield/preemption by higher-priority work; RR rotates peers at the configured quantum; unprivileged priority escalation is denied; starvation and recovery behavior are tested. |
 | **11** | `feat(scheduler): add CPU affinity and per-CPU run queues` | Add affinity masks, CPU selection, per-CPU queues, and migration rules after SMP context switching is stable. | Tasks never run outside their affinity; migration preserves queue/accounting invariants; idle CPU balancing is tested; single-CPU mode remains correct. |
@@ -27,14 +32,12 @@ This document establishes the official 18-PR sequence roadmap, periodic engineer
 | **17** | `feat(scheduler): bring up AArch64 and RISC-V scheduling paths` | Integrate timer, context-switch, idle, and interrupt-return paths per architecture in separate PRs. | Each target boots to multiple user tasks and passes core scheduling tests; per-architecture status is independently reported. |
 | **18** | `docs(scheduler): publish policy guide and support matrix` | Document scheduler classes, weights/priorities, limits, tuning knobs, observability, architecture support, and known limitations. | Every public policy claim links to implementation and runtime tests; experimental policies are labeled; no Linux/BSD parity is implied. |
 
-## Recommended First Milestone
-
-The recommended first milestone is to complete **PRs 1–7** before deciding whether EEVDF or BORE becomes the default fair policy. A policy implementation that passes unit tests but is not wired to task lifecycle, timer preemption, and context switching is still a model, not an integrated scheduler.
+---
 
 ## Periodic Maintenance Cadences
 
-| Cadence | Recurring PR/Task | Required Evidence |
-| :--- | :--- | :--- |
+| Cadence | Proposed Recurring PR/Task | Required Evidence |
+|---|---|---|
 | **Every PR** | `ci(scheduler): run scheduler checks for changed paths` | Formatting/build, scheduler unit tests, architecture checks, and QEMU integration where applicable; skipped checks explained. |
 | **Weekly** | `maint(scheduler): triage scheduler failures and regressions` | Reproducer, affected policy/architecture, severity, owner, and fix or tracked issue; test failures are not ignored as "flaky" without evidence. |
 | **Weekly** | `test(scheduler): review fairness and wakeup-latency trends` | Compare baseline workload results; flag regressions in tail latency, fairness, context switches, or CPU balance. |
@@ -46,9 +49,12 @@ The recommended first milestone is to complete **PRs 1–7** before deciding whe
 | **Each Release Candidate** | `release(scheduler): certify architecture support claims` | Booted-task evidence per claimed architecture, policy tests, known issues, scheduler stats, and recovery behavior. |
 | **After Each Incident** | `fix(scheduler): prevent recurrence of <race or starvation issue>` | Minimal reproducer, root cause, regression test, affected policies/architectures, and release/backport decision. |
 
+---
+
 ## Review and Merge Rules
 
-All scheduler PRs must use the standard PR template:
+### Mandatory PR Review Template
+All scheduler Pull Requests must utilize the following template structure:
 
 ```markdown
 ## Summary
@@ -88,13 +94,21 @@ Link updated feature matrix, scheduler docs, and test results.
 - [ ] Required reviews and CI checks pass
 ```
 
-### Reviewer Approval Requirements
-* **1 maintainer approval**: Isolated documentation or test changes.
-* **2 qualified reviewers**: Scheduler-core locking, context switching, SMP migration, real-time policy, or CPU-controller enforcement.
-* Main branch protected with PR-only changes, required approvals, passing CI checks, and resolved review conversations.
+### Reviewer & Approval Requirements
+- **1 Maintainer Approval:** Isolated documentation changes, tuning updates, or standalone test additions.
+- **2 Qualified Reviewers:** Core scheduler locking, context switching, SMP migration algorithms, real-time policy modifications, or CPU controller quota enforcement.
+
+### Branch Protection & Merge Gates
+- Main branch protection requires PR-only changes with enforced CI checks.
+- All review conversations must be explicitly resolved before merging.
+- Compliance with OpenSSF OSPS Baseline branch protection and human review standards is mandatory.
+
+---
 
 ## Completion Gates
 
-* **Prototype**: Policy algorithms and model tests exist, but no real runtime integration is claimed.
-* **Integrated**: A booted target schedules actual user tasks through timer preemption, context switching, block/wakeup, and exit.
-* **Supported**: Repeated tests cover fairness, latency, priority classes, failure/race paths, observability, and every advertised architecture/configuration.
+| Maturity Level | Definition & Criteria |
+|---|---|
+| **Prototype** | Policy algorithms and isolated model tests exist. No real runtime integration or preemptive execution is claimed. |
+| **Integrated** | A booted QEMU target schedules real kernel/user tasks through timer preemption, context switching, block/wakeup, and exit paths. |
+| **Supported** | Repeated automated tests cover fairness, latency targets, priority classes, race/stress failure paths, telemetry counters, and every advertised CPU architecture. |
