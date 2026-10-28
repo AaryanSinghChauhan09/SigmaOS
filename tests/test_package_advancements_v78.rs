@@ -2,6 +2,13 @@
 // Integration Test Suite for Sovereign Distro Package Advancements Suite V78
 // (`tests/test_package_advancements_v78.rs`)
 
+#[path = "../src/package/universal.rs"]
+pub mod universal;
+
+mod package {
+    pub use super::universal;
+}
+
 #[path = "../src/package/sovereign_distro_package_advancements_v78.rs"]
 mod sovereign_distro_package_advancements_v78;
 
@@ -9,8 +16,8 @@ mod sovereign_distro_package_advancements_v78;
 mod sovereign_distro_package_advancements_v78_pr;
 
 use sovereign_distro_package_advancements_v78::*;
-use sovereign_distro_package_advancements_v78_pr::{PackageFormat as PrPackageFormat, SovereignDistroPackagePrGatewayV78};
-use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
+use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
+use universal::{PackageFormat, PackageState};
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
