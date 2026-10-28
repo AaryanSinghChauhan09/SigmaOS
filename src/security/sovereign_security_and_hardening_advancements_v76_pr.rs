@@ -231,7 +231,10 @@ impl BsdHardeningAndIsolationV76Engine {
     /// Check BSD securelevel restrictions (-1 = Permanently Permissive, 0 = Secure, 1 = Secure, 2 = Highly Secure, 3 = Network Secure).
     pub fn check_securelevel_allow_mod(securelevel: i32, operation: &str) -> bool {
         if securelevel >= 1 {
-            if operation == "kldload" || operation == "dev_kmem_write" || operation == "sysctl_immutable" {
+            if operation == "kldload"
+                || operation == "dev_kmem_write"
+                || operation == "sysctl_immutable"
+            {
                 return false;
             }
         }
@@ -396,7 +399,9 @@ impl AntivirusAndCryptoEngineV76Engine {
         if signature_pattern.is_empty() || content.len() < signature_pattern.len() {
             return false;
         }
-        content.windows(signature_pattern.len()).any(|w| w == signature_pattern)
+        content
+            .windows(signature_pattern.len())
+            .any(|w| w == signature_pattern)
     }
 
     /// Parse GnuPG ASCII armor header/footer block format.
@@ -404,7 +409,7 @@ impl AntivirusAndCryptoEngineV76Engine {
         armor_text.contains("-----BEGIN PGP PUBLIC KEY BLOCK-----")
             && armor_text.contains("-----END PGP PUBLIC KEY BLOCK-----")
             || armor_text.contains("-----BEGIN PGP SIGNATURE-----")
-            && armor_text.contains("-----END PGP SIGNATURE-----")
+                && armor_text.contains("-----END PGP SIGNATURE-----")
     }
 
     /// Compute TPM 2.0 PCR extend operation digest (SHA-256(old_pcr || event_hash)).
@@ -417,8 +422,15 @@ impl AntivirusAndCryptoEngineV76Engine {
     }
 
     /// Verify TPM 2.0 PCR Quote against signed measurement digest.
-    pub fn verify_tpm2_pcr_quote(&self, pcr_digest: &[u8; 32], signature: &[u8; 64], public_key: &[u8; 32]) -> bool {
-        !pcr_digest.iter().all(|&b| b == 0) && !signature.iter().all(|&b| b == 0) && !public_key.iter().all(|&b| b == 0)
+    pub fn verify_tpm2_pcr_quote(
+        &self,
+        pcr_digest: &[u8; 32],
+        signature: &[u8; 64],
+        public_key: &[u8; 32],
+    ) -> bool {
+        !pcr_digest.iter().all(|&b| b == 0)
+            && !signature.iter().all(|&b| b == 0)
+            && !public_key.iter().all(|&b| b == 0)
     }
 
     /// Verify UEFI Secure Boot executable against allowed `db` and forbidden `dbx` hash databases.
@@ -507,7 +519,12 @@ impl IdentityAndEnterpriseAuthV76Engine {
     }
 
     /// Generate SSSD offline PAM/NSS identity mapping response tuple `(username, uid, gid)`.
-    pub fn generate_sssd_pam_nss_response(&self, username: &str, uid: u32, gid: u32) -> (String, u32, u32) {
+    pub fn generate_sssd_pam_nss_response(
+        &self,
+        username: &str,
+        uid: u32,
+        gid: u32,
+    ) -> (String, u32, u32) {
         (username.to_string(), uid, gid)
     }
 
@@ -590,20 +607,51 @@ mod tests {
         assert!(LinuxAccessControlAndSandboxingV76Engine::check_landlock_access(0x0F, 0x03));
         assert!(!LinuxAccessControlAndSandboxingV76Engine::check_landlock_access(0x01, 0x03));
 
-        let ctx = LinuxAccessControlAndSandboxingV76Engine::format_selinux_context("system_u", "system_r", "httpd_t", "s0");
+        let ctx = LinuxAccessControlAndSandboxingV76Engine::format_selinux_context(
+            "system_u", "system_r", "httpd_t", "s0",
+        );
         assert_eq!(ctx, "system_u:system_r:httpd_t:s0");
 
-        assert!(engine.evaluate_selinux_avc("system_u:system_r:httpd_t:s0", "system_u:object_r:httpd_sys_content_t:s0", "file", "read"));
-        assert!(!engine.evaluate_selinux_avc("system_u:system_r:httpd_t:s0", "system_u:object_r:shadow_t:s0", "file", "read"));
+        assert!(engine.evaluate_selinux_avc(
+            "system_u:system_r:httpd_t:s0",
+            "system_u:object_r:httpd_sys_content_t:s0",
+            "file",
+            "read"
+        ));
+        assert!(!engine.evaluate_selinux_avc(
+            "system_u:system_r:httpd_t:s0",
+            "system_u:object_r:shadow_t:s0",
+            "file",
+            "read"
+        ));
 
-        assert!(LinuxAccessControlAndSandboxingV76Engine::check_landlock_net_port_access(&[80, 443], 80, true, 0x01));
-        assert!(!LinuxAccessControlAndSandboxingV76Engine::check_landlock_net_port_access(&[80, 443], 8080, true, 0x01));
+        assert!(
+            LinuxAccessControlAndSandboxingV76Engine::check_landlock_net_port_access(
+                &[80, 443],
+                80,
+                true,
+                0x01
+            )
+        );
+        assert!(
+            !LinuxAccessControlAndSandboxingV76Engine::check_landlock_net_port_access(
+                &[80, 443],
+                8080,
+                true,
+                0x01
+            )
+        );
 
         assert!(engine.matches_apparmor_path_profile("/etc/nginx/nginx.conf", "/etc/nginx/*"));
         assert!(engine.matches_apparmor_path_profile("/var/log/nginx/access.log", "/var/log/**"));
 
         assert!(LinuxAccessControlAndSandboxingV76Engine::validate_seccomp_bpf_arch(0xC000003E));
-        assert!(LinuxAccessControlAndSandboxingV76Engine::is_cgroup_controller_enabled("cpu memory io pids", "memory"));
+        assert!(
+            LinuxAccessControlAndSandboxingV76Engine::is_cgroup_controller_enabled(
+                "cpu memory io pids",
+                "memory"
+            )
+        );
 
         assert_eq!(engine.evaluate_seccomp_bpf(1, &[1, 2, 3]), 3);
         assert_eq!(engine.evaluate_seccomp_bpf(99, &[1, 2, 3]), 0);
@@ -611,7 +659,9 @@ mod tests {
         assert!(engine.check_capability(0b1010, 1));
         assert!(!engine.check_capability(0b1010, 2));
 
-        assert!(LinuxAccessControlAndSandboxingV76Engine::evaluate_namespace_isolation(0b0101, 0b0100));
+        assert!(
+            LinuxAccessControlAndSandboxingV76Engine::evaluate_namespace_isolation(0b0101, 0b0100)
+        );
     }
 
     #[test]
@@ -626,14 +676,30 @@ mod tests {
         ));
 
         let unveil_map = [("/usr/lib", "r"), ("/tmp", "rwc")];
-        assert!(BsdHardeningAndIsolationV76Engine::check_unveil_access(&unveil_map, "/usr/lib/libc.so", 'r'));
-        assert!(!BsdHardeningAndIsolationV76Engine::check_unveil_access(&unveil_map, "/usr/lib/libc.so", 'w'));
+        assert!(BsdHardeningAndIsolationV76Engine::check_unveil_access(
+            &unveil_map,
+            "/usr/lib/libc.so",
+            'r'
+        ));
+        assert!(!BsdHardeningAndIsolationV76Engine::check_unveil_access(
+            &unveil_map,
+            "/usr/lib/libc.so",
+            'w'
+        ));
 
-        assert!(BsdHardeningAndIsolationV76Engine::check_capsicum_rights(0x0F, 0x03));
-        assert!(!BsdHardeningAndIsolationV76Engine::check_capsicum_rights(0x01, 0x03));
+        assert!(BsdHardeningAndIsolationV76Engine::check_capsicum_rights(
+            0x0F, 0x03
+        ));
+        assert!(!BsdHardeningAndIsolationV76Engine::check_capsicum_rights(
+            0x01, 0x03
+        ));
 
-        assert!(BsdHardeningAndIsolationV76Engine::evaluate_mac_biba_rule(2, 1, "read"));
-        assert!(!BsdHardeningAndIsolationV76Engine::evaluate_mac_biba_rule(1, 2, "read"));
+        assert!(BsdHardeningAndIsolationV76Engine::evaluate_mac_biba_rule(
+            2, 1, "read"
+        ));
+        assert!(!BsdHardeningAndIsolationV76Engine::evaluate_mac_biba_rule(
+            1, 2, "read"
+        ));
 
         assert!(!BsdHardeningAndIsolationV76Engine::check_securelevel_allow_mod(1, "kldload"));
         assert!(BsdHardeningAndIsolationV76Engine::check_securelevel_allow_mod(0, "kldload"));
@@ -641,7 +707,9 @@ mod tests {
 
     #[test]
     fn test_audit_and_intrusion_v76() {
-        let fmt = AuditAndIntrusionPreventionV76Engine::format_audit_event("SYSCALL", 1234, "bash", 59, true);
+        let fmt = AuditAndIntrusionPreventionV76Engine::format_audit_event(
+            "SYSCALL", 1234, "bash", 59, true,
+        );
         assert!(fmt.contains("type=SYSCALL"));
         assert!(fmt.contains("success=yes"));
 
@@ -655,15 +723,27 @@ mod tests {
         let score = AuditAndIntrusionPreventionV76Engine::compute_lynis_hardening_index(80, 100);
         assert_eq!(score, 80);
 
-        let record = AuditAndIntrusionPreventionV76Engine::generate_aide_baseline_record("/etc/passwd", 1024, "abcdef123456");
-        assert!(AuditAndIntrusionPreventionV76Engine::check_aide_integrity(&record, "abcdef123456"));
-        assert!(!AuditAndIntrusionPreventionV76Engine::check_aide_integrity(&record, "wronghash"));
+        let record = AuditAndIntrusionPreventionV76Engine::generate_aide_baseline_record(
+            "/etc/passwd",
+            1024,
+            "abcdef123456",
+        );
+        assert!(AuditAndIntrusionPreventionV76Engine::check_aide_integrity(
+            &record,
+            "abcdef123456"
+        ));
+        assert!(!AuditAndIntrusionPreventionV76Engine::check_aide_integrity(
+            &record,
+            "wronghash"
+        ));
     }
 
     #[test]
     fn test_antivirus_and_crypto_v76() {
         let engine = AntivirusAndCryptoEngineV76Engine::new();
-        assert!(engine.scan_clamav_signature(b"test virus signature pattern here", b"virus signature"));
+        assert!(
+            engine.scan_clamav_signature(b"test virus signature pattern here", b"virus signature")
+        );
         assert!(!engine.scan_clamav_signature(b"clean content", b"virus signature"));
 
         let armor = "-----BEGIN PGP PUBLIC KEY BLOCK-----\nkey\n-----END PGP PUBLIC KEY BLOCK-----";
@@ -692,7 +772,11 @@ mod tests {
 
         assert!(engine.validate_kerberos_tgt("SIGMAOS.ORG", "jules@SIGMAOS.ORG", &[0x01; 16]));
 
-        let conf = IdentityAndEnterpriseAuthV76Engine::generate_sssd_domain_conf("SIGMAOS.ORG", "ldap", "ldap://ldap.sigmaos.org");
+        let conf = IdentityAndEnterpriseAuthV76Engine::generate_sssd_domain_conf(
+            "SIGMAOS.ORG",
+            "ldap",
+            "ldap://ldap.sigmaos.org",
+        );
         assert!(conf.contains("[domain/SIGMAOS.ORG]"));
 
         let resp = engine.generate_sssd_pam_nss_response("jules", 1000, 1000);
