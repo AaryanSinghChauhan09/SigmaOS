@@ -1516,6 +1516,7 @@ body.high-contrast-active .keyboard-focus {
 /* Custom Developer Tools Styles */
 .dev-portal-tab-content { display: none; }
 .syscall-list-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); }
+.syscall-empty-state { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.15); color: var(--text-muted, rgba(255,255,255,0.6)); font-size: 0.85rem; text-align: center; }
 .wizard-step-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
 .cicd-status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
 .cicd-status-card { background: rgba(0,255,0,0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(0,255,0,0.3); text-align: center; }
