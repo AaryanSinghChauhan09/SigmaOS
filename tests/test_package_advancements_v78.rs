@@ -5,9 +5,9 @@
 #[path = "../src/package/sovereign_distro_package_advancements_v78_pr.rs"]
 mod sovereign_distro_package_advancements_v78_pr;
 
-use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
-use sovereign_distro_package_advancements_v78::*;
+use sovereign_distro_package_advancements_v78_pr::sovereign_distro_package_advancements_v78::*;
 use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
+use sovereign_distro_package_advancements_v78_pr::{PackageFormat, PackageState};
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
