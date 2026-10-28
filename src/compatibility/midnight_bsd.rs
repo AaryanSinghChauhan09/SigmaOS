@@ -55,7 +55,10 @@ impl MPortsEngine {
     }
 
     pub fn upgrade(&mut self, name: &str, new_version: &str) -> Result<(), &'static str> {
-        let pkg = self.installed.get_mut(name).ok_or("Package not installed")?;
+        let pkg = self
+            .installed
+            .get_mut(name)
+            .ok_or("Package not installed")?;
         pkg.version = new_version.to_string();
         Ok(())
     }
