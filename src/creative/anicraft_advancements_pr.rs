@@ -4,8 +4,7 @@
 //
 // Zero-dependency Rust engine implementing missing AniCraft
 // animation timeline, keyframing, skeletal rigging, dual quaternion skinning, NLA track crossfading,
-// subpixel vector rasterization, neural lip-sync alignment, Bézier curve optimization,
-// FABRIK inverse kinematics solvers, sprite sheet atlas export, and BVH mocap retargeting components in Pull Request proposal format.
+// subpixel vector rasterization, and neural lip-sync alignment components in Pull Request proposal format.
 
 extern crate alloc;
 
@@ -437,336 +436,6 @@ impl Default for AnicraftMultiLayerOnionSkinningDepthPrEngine {
 }
 
 // ============================================================================
-// 6. Cubic Bézier Easing Curve Optimization Engine
-// ============================================================================
-
-/// Cubic Bézier Control Point Handle
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct BezierControlHandle2D {
-    pub x: f32,
-    pub y: f32,
-}
-
-/// Cubic Bézier Speed Curve Lookup & Newton-Raphson Sampling Optimization Engine.
-#[derive(Debug, Clone)]
-pub struct AnicraftBezierEasingCurveOptimizationPrEngine {
-    pub lut_samples: usize,
-}
-
-impl AnicraftBezierEasingCurveOptimizationPrEngine {
-    pub fn new(samples: usize) -> Self {
-        Self {
-            lut_samples: samples.max(16),
-        }
-    }
-
-    /// Sample cubic Bézier curve value at progress t using Newton-Raphson optimization
-    pub fn sample_optimized_easing(&self, handle1: BezierControlHandle2D, handle2: BezierControlHandle2D, t: f32) -> f32 {
-        let t = t.clamp(0.0, 1.0);
-        let mut current_t = t;
-
-        for _ in 0..5 {
-            let one_minus = 1.0 - current_t;
-            let x_calc = 3.0 * one_minus * one_minus * current_t * handle1.x
-                + 3.0 * one_minus * current_t * current_t * handle2.x
-                + current_t * current_t * current_t;
-            let dx_dt = 3.0 * one_minus * one_minus * handle1.x
-                + 6.0 * one_minus * current_t * (handle2.x - handle1.x)
-                + 3.0 * current_t * current_t * (1.0 - handle2.x);
-
-            if dx_dt.abs() < 1e-6 {
-                break;
-            }
-            let diff = x_calc - t;
-            current_t -= diff / dx_dt;
-            current_t = current_t.clamp(0.0, 1.0);
-        }
-
-        let one_minus = 1.0 - current_t;
-        3.0 * one_minus * one_minus * current_t * handle1.y
-            + 3.0 * one_minus * current_t * current_t * handle2.y
-            + current_t * current_t * current_t
-    }
-
-    pub fn generate_proposal(&self) -> AnicraftAdvancementsPrProposalManifest {
-        AnicraftAdvancementsPrProposalManifest {
-            pr_id: 8806,
-            pr_title: "feat(anicraft): Implement Cubic Bézier Speed Curve Newton-Raphson Optimization Engine".to_string(),
-            target_subsystem: "AniCraft Curve Editor & Keyframing Subsystem".to_string(),
-            original_suite: "ArtCraft AniCraft Bézier Optimization".to_string(),
-            components_added: vec![
-                "CubicBezierSpeedCurveOptimizer".to_string(),
-                "NewtonRaphsonTSamplingSolver".to_string(),
-                "KeyframeEasingLookupTableBuilder".to_string(),
-            ],
-            performance_multiplier: "5,400,000 Curve Evaluations / sec (<0.02ms)".to_string(),
-            status: "Ready for Merge".to_string(),
-        }
-    }
-}
-
-impl Default for AnicraftBezierEasingCurveOptimizationPrEngine {
-    fn default() -> Self {
-        Self::new(256)
-    }
-}
-
-// ============================================================================
-// 7. FABRIK/CCD Inverse Kinematics Bone Rigging Solver Engine
-// ============================================================================
-
-/// 2D Joint Bone Segment for IK Solver
-#[derive(Debug, Clone)]
-pub struct IkBoneSegment2D {
-    pub length: f32,
-    pub current_pos: (f32, f32),
-}
-
-/// FABRIK & CCD Analytic Inverse Kinematics Bone Chain Constraint Solver Engine.
-#[derive(Debug, Clone)]
-pub struct AnicraftSkeletalIkRiggingSolverPrEngine {
-    pub max_ik_iterations: usize,
-    pub tolerance: f32,
-}
-
-impl AnicraftSkeletalIkRiggingSolverPrEngine {
-    pub fn new() -> Self {
-        Self {
-            max_ik_iterations: 10,
-            tolerance: 1e-3,
-        }
-    }
-
-    /// Solve FABRIK 2D inverse kinematics joint positions towards target point
-    pub fn solve_fabrik_chain(&self, bone_lengths: &[f32], target: (f32, f32)) -> Vec<(f32, f32)> {
-        let count = bone_lengths.len();
-        if count == 0 {
-            return Vec::new();
-        }
-
-        let mut positions = Vec::with_capacity(count + 1);
-        positions.push((0.0, 0.0));
-        let mut curr_x = 0.0;
-
-        for &len in bone_lengths {
-            curr_x += len;
-            positions.push((curr_x, 0.0));
-        }
-
-        let root_origin = positions[0];
-
-        for _ in 0..self.max_ik_iterations {
-            let end_idx = positions.len() - 1;
-            let dist_to_target = ((positions[end_idx].0 - target.0).powi(2) + (positions[end_idx].1 - target.1).powi(2)).sqrt();
-            if dist_to_target <= self.tolerance {
-                break;
-            }
-
-            // Backward pass
-            positions[end_idx] = target;
-            for i in (0..end_idx).rev() {
-                let dx = positions[i].0 - positions[i + 1].0;
-                let dy = positions[i].1 - positions[i + 1].1;
-                let dist = (dx * dx + dy * dy).sqrt().max(1e-6);
-                let factor = bone_lengths[i] / dist;
-                positions[i] = (positions[i + 1].0 + dx * factor, positions[i + 1].1 + dy * factor);
-            }
-
-            // Forward pass
-            positions[0] = root_origin;
-            for i in 0..end_idx {
-                let dx = positions[i + 1].0 - positions[i].0;
-                let dy = positions[i + 1].1 - positions[i].1;
-                let dist = (dx * dx + dy * dy).sqrt().max(1e-6);
-                let factor = bone_lengths[i] / dist;
-                positions[i + 1] = (positions[i].0 + dx * factor, positions[i].1 + dy * factor);
-            }
-        }
-
-        positions
-    }
-
-    pub fn generate_proposal(&self) -> AnicraftAdvancementsPrProposalManifest {
-        AnicraftAdvancementsPrProposalManifest {
-            pr_id: 8807,
-            pr_title: "feat(anicraft): Implement FABRIK Analytic Inverse Kinematics Rigging Solver Engine".to_string(),
-            target_subsystem: "AniCraft Skeletal Rigging & IK Subsystem".to_string(),
-            original_suite: "ArtCraft AniCraft IK Solver".to_string(),
-            components_added: vec![
-                "FabrikInverseKinematicsSolver".to_string(),
-                "CcdJointAngleConstraintEnforcer".to_string(),
-                "InteractiveTargetBoneManipulator".to_string(),
-            ],
-            performance_multiplier: "450,000 IK Iterations / sec (<0.10ms)".to_string(),
-            status: "Ready for Merge".to_string(),
-        }
-    }
-}
-
-impl Default for AnicraftSkeletalIkRiggingSolverPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
-// 8. Keyframe Sprite Sheet Grid Packing & UV Atlas Exporter Engine
-// ============================================================================
-
-/// Sub-Texture Region UV Descriptor
-#[derive(Debug, Clone, PartialEq)]
-pub struct SpriteSheetRegionUv {
-    pub frame_index: u32,
-    pub u_min: f32,
-    pub v_min: f32,
-    pub u_max: f32,
-    pub v_max: f32,
-}
-
-/// Keyframe Sprite Sheet Grid Packing & Texture UV Atlas Exporter Engine.
-#[derive(Debug, Clone)]
-pub struct AnicraftSpriteSheetAtlasExporterPrEngine {
-    pub atlas_width: u32,
-    pub atlas_height: u32,
-}
-
-impl AnicraftSpriteSheetAtlasExporterPrEngine {
-    pub fn new(width: u32, height: u32) -> Self {
-        Self {
-            atlas_width: width.next_power_of_two(),
-            atlas_height: height.next_power_of_two(),
-        }
-    }
-
-    /// Calculate grid packed sub-texture UV coordinates for frame sequence
-    pub fn pack_frame_grid(&self, frame_width: u32, frame_height: u32, total_frames: u32) -> Vec<SpriteSheetRegionUv> {
-        let cols = (self.atlas_width / frame_width.max(1)).max(1);
-        let mut regions = Vec::with_capacity(total_frames as usize);
-
-        for i in 0..total_frames {
-            let col = i % cols;
-            let row = i / cols;
-
-            let x_px = col * frame_width;
-            let y_px = row * frame_height;
-
-            regions.push(SpriteSheetRegionUv {
-                frame_index: i,
-                u_min: x_px as f32 / self.atlas_width as f32,
-                v_min: y_px as f32 / self.atlas_height as f32,
-                u_max: (x_px + frame_width) as f32 / self.atlas_width as f32,
-                v_max: (y_px + frame_height) as f32 / self.atlas_height as f32,
-            });
-        }
-
-        regions
-    }
-
-    pub fn generate_proposal(&self) -> AnicraftAdvancementsPrProposalManifest {
-        AnicraftAdvancementsPrProposalManifest {
-            pr_id: 8808,
-            pr_title: "feat(anicraft): Implement Keyframe Sprite Sheet Grid Packing & Texture UV Atlas Exporter".to_string(),
-            target_subsystem: "AniCraft Export & Texture Atlas Subsystem".to_string(),
-            original_suite: "ArtCraft AniCraft Sprite Atlas".to_string(),
-            components_added: vec![
-                "PowerOfTwoSpriteAtlasPacker".to_string(),
-                "SubTextureUvRegionCalculator".to_string(),
-                "SpriteSheetMetadataJsonExporter".to_string(),
-            ],
-            performance_multiplier: "Instant Power-of-Two Sprite Atlas Generation (<0.01ms)".to_string(),
-            status: "Ready for Merge".to_string(),
-        }
-    }
-}
-
-impl Default for AnicraftSpriteSheetAtlasExporterPrEngine {
-    fn default() -> Self {
-        Self::new(2048, 2048)
-    }
-}
-
-// ============================================================================
-// 9. Motion Capture BVH Retargeting Engine
-// ============================================================================
-
-/// BVH Motion Capture Joint Node Definition
-#[derive(Debug, Clone)]
-pub struct BvhJointNodeSpec {
-    pub name: String,
-    pub offset: (f32, f32, f32),
-    pub channels: Vec<String>,
-}
-
-/// Motion Capture BVH Joint Hierarchy Parser & Retargeting Engine.
-#[derive(Debug, Clone)]
-pub struct AnicraftMocapBvhImporterPrEngine {
-    pub joints: Vec<BvhJointNodeSpec>,
-}
-
-impl AnicraftMocapBvhImporterPrEngine {
-    pub fn new() -> Self {
-        let joints = vec![
-            BvhJointNodeSpec {
-                name: String::from("Hips"),
-                offset: (0.0, 0.0, 0.0),
-                channels: vec![String::from("Xposition"), String::from("Yposition"), String::from("Zrotation")],
-            },
-            BvhJointNodeSpec {
-                name: String::from("Spine"),
-                offset: (0.0, 15.0, 0.0),
-                channels: vec![String::from("Zrotation")],
-            },
-            BvhJointNodeSpec {
-                name: String::from("Head"),
-                offset: (0.0, 10.0, 0.0),
-                channels: vec![String::from("Zrotation")],
-            },
-        ];
-
-        Self { joints }
-    }
-
-    /// Retarget BVH joint rotations onto target AniCraft bone hierarchy
-    pub fn retarget_bvh_channel_rotations(&self, channel_data: &[f32]) -> Vec<(String, f32)> {
-        let mut retargeted = Vec::new();
-        let mut data_idx = 0;
-
-        for joint in &self.joints {
-            for ch in &joint.channels {
-                if data_idx < channel_data.len() && ch.contains("rotation") {
-                    retargeted.push((joint.name.clone(), channel_data[data_idx]));
-                }
-                data_idx += 1;
-            }
-        }
-
-        retargeted
-    }
-
-    pub fn generate_proposal(&self) -> AnicraftAdvancementsPrProposalManifest {
-        AnicraftAdvancementsPrProposalManifest {
-            pr_id: 8809,
-            pr_title: "feat(anicraft): Implement Motion Capture BVH Joint Hierarchy Parsing & Retargeting Engine".to_string(),
-            target_subsystem: "AniCraft Mocap & Retargeting Subsystem".to_string(),
-            original_suite: "ArtCraft AniCraft Mocap BVH".to_string(),
-            components_added: vec![
-                "BvhJointHierarchyParser".to_string(),
-                "MotionCaptureSkeletalRetargeter".to_string(),
-                "ChannelRotationBoneMapper".to_string(),
-            ],
-            performance_multiplier: "1,500,000 Mocap Frames Retargeted / sec (<0.03ms)".to_string(),
-            status: "Ready for Merge".to_string(),
-        }
-    }
-}
-
-impl Default for AnicraftMocapBvhImporterPrEngine {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-// ============================================================================
 // Master Gateway Coordinator & Suite for AniCraft Advancements
 // ============================================================================
 
@@ -778,10 +447,6 @@ pub struct SovereignAnicraftAdvancementsMasterSuite {
     pub phoneme_aligner: AnicraftPhonemeVisemeAlignmentNeuralPrEngine,
     pub nla_crossfade: AnicraftNlaTrackCrossfadeCurvePrEngine,
     pub onion_depth: AnicraftMultiLayerOnionSkinningDepthPrEngine,
-    pub bezier_optimizer: AnicraftBezierEasingCurveOptimizationPrEngine,
-    pub ik_solver: AnicraftSkeletalIkRiggingSolverPrEngine,
-    pub sprite_atlas: AnicraftSpriteSheetAtlasExporterPrEngine,
-    pub mocap_importer: AnicraftMocapBvhImporterPrEngine,
 }
 
 impl SovereignAnicraftAdvancementsMasterSuite {
@@ -792,10 +457,6 @@ impl SovereignAnicraftAdvancementsMasterSuite {
             phoneme_aligner: AnicraftPhonemeVisemeAlignmentNeuralPrEngine::new(),
             nla_crossfade: AnicraftNlaTrackCrossfadeCurvePrEngine::new(30),
             onion_depth: AnicraftMultiLayerOnionSkinningDepthPrEngine::new(),
-            bezier_optimizer: AnicraftBezierEasingCurveOptimizationPrEngine::new(256),
-            ik_solver: AnicraftSkeletalIkRiggingSolverPrEngine::new(),
-            sprite_atlas: AnicraftSpriteSheetAtlasExporterPrEngine::new(2048, 2048),
-            mocap_importer: AnicraftMocapBvhImporterPrEngine::new(),
         }
     }
 
@@ -822,21 +483,7 @@ impl SovereignAnicraftAdvancementsMasterSuite {
         let sorted = self.onion_depth.compute_depth_sorted_layers();
         let onion_ok = sorted.len() == 4 && sorted[0].z_depth < sorted[3].z_depth;
 
-        let h1 = BezierControlHandle2D { x: 0.42, y: 0.0 };
-        let h2 = BezierControlHandle2D { x: 0.58, y: 1.0 };
-        let eased = self.bezier_optimizer.sample_optimized_easing(h1, h2, 0.5);
-        let bezier_ok = eased > 0.0 && eased < 1.0;
-
-        let ik_chain = self.ik_solver.solve_fabrik_chain(&[100.0, 100.0], (150.0, 50.0));
-        let ik_ok = ik_chain.len() == 3;
-
-        let regions = self.sprite_atlas.pack_frame_grid(64, 64, 16);
-        let atlas_ok = regions.len() == 16;
-
-        let retargeted = self.mocap_importer.retarget_bvh_channel_rotations(&[10.0, 20.0, 0.5, -0.2]);
-        let mocap_ok = !retargeted.is_empty();
-
-        raster_ok && dqs_ok && phoneme_ok && nla_ok && onion_ok && bezier_ok && ik_ok && atlas_ok && mocap_ok
+        raster_ok && dqs_ok && phoneme_ok && nla_ok && onion_ok
     }
 
     pub fn collect_all_pr_manifests(&self) -> Vec<AnicraftAdvancementsPrProposalManifest> {
@@ -846,10 +493,6 @@ impl SovereignAnicraftAdvancementsMasterSuite {
             self.phoneme_aligner.generate_proposal(),
             self.nla_crossfade.generate_proposal(),
             self.onion_depth.generate_proposal(),
-            self.bezier_optimizer.generate_proposal(),
-            self.ik_solver.generate_proposal(),
-            self.sprite_atlas.generate_proposal(),
-            self.mocap_importer.generate_proposal(),
         ]
     }
 
@@ -890,7 +533,7 @@ impl AnicraftAdvancementsParitySuite {
 
     pub fn verify_complete_parity(&mut self) -> bool {
         self.gateway.evaluate_anicraft_parity()
-            && self.gateway.collect_all_pr_manifests().len() == 9
+            && self.gateway.collect_all_pr_manifests().len() == 5
     }
 }
 
@@ -957,44 +600,12 @@ mod tests {
     }
 
     #[test]
-    fn test_bezier_easing_curve_optimizer() {
-        let optimizer = AnicraftBezierEasingCurveOptimizationPrEngine::new(256);
-        let h1 = BezierControlHandle2D { x: 0.42, y: 0.0 };
-        let h2 = BezierControlHandle2D { x: 0.58, y: 1.0 };
-        let eased = optimizer.sample_optimized_easing(h1, h2, 0.5);
-        assert!(eased > 0.0 && eased < 1.0);
-    }
-
-    #[test]
-    fn test_skeletal_ik_solver() {
-        let solver = AnicraftSkeletalIkRiggingSolverPrEngine::new();
-        let chain = solver.solve_fabrik_chain(&[100.0, 100.0], (150.0, 50.0));
-        assert_eq!(chain.len(), 3);
-    }
-
-    #[test]
-    fn test_sprite_sheet_atlas_exporter() {
-        let exporter = AnicraftSpriteSheetAtlasExporterPrEngine::new(2048, 2048);
-        let regions = exporter.pack_frame_grid(64, 64, 16);
-        assert_eq!(regions.len(), 16);
-        assert_eq!(regions[0].u_min, 0.0);
-    }
-
-    #[test]
-    fn test_mocap_bvh_importer() {
-        let importer = AnicraftMocapBvhImporterPrEngine::new();
-        let channel_data = vec![10.0, 20.0, 0.5, -0.2];
-        let retargeted = importer.retarget_bvh_channel_rotations(&channel_data);
-        assert!(!retargeted.is_empty());
-    }
-
-    #[test]
     fn test_master_gateway_and_suite() {
         let mut gateway = SovereignAnicraftAdvancementsMasterSuite::new();
         assert!(gateway.evaluate_anicraft_parity());
 
         let manifests = gateway.collect_all_pr_manifests();
-        assert_eq!(manifests.len(), 9);
+        assert_eq!(manifests.len(), 5);
 
         let markdown = gateway.export_pr_manifest_markdown();
         assert!(markdown.contains("AniCraft 2D/3D Animation & Rigging PR Manifest"));

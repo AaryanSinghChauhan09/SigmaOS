@@ -69,16 +69,9 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
-# Documentation policy: NO .md or .txt files tracked in main branch.
-# All documentation lives in the SigmaOS.wiki repository.
-# Allow tracked markdown documentation in docs/ and .github/
-!docs/**/*.md
-!docs/*.md
-!.github/PULL_REQUEST_TEMPLATE.md
-!VFS_RULES.toml
-!src/fs/
-!tests/fs/
-!tests/filesystem/
+# Documentation policy default ignore
+*.md
+**/*.md
 *.txt
 **/*.txt
 
@@ -87,7 +80,7 @@ wiki_repo/
 !tools/*.py
 !tools/**/*.py
 
-# Explicit exceptions for Master Roadmap Specification and AI Agent Roadmaps
+# Explicit exceptions for Master Roadmap Specification, Agent Framework & Repos Absorption Plans
 !FUTURE-DEVELOPMENT-ROADMAP.md
 !docs/FUTURE-DEVELOPMENT-ROADMAP.md
 !docs/roadmap/FUTURE-DEVELOPMENT-ROADMAP.md
@@ -97,8 +90,15 @@ wiki_repo/
 !wiki/COMPONENT_BOUNDARIES_AND_DEPENDENCY_CONTRACTS.md
 !wiki/GOVERNANCE.md
 !wiki/REPOSITORY_MIGRATION_MATRIX.md
-!.github/PULL_REQUEST_TEMPLATE.md
-!.github/ROADMAP_*.md
-!Agents/*.md
-!docs/roadmap/*.md
-!wiki/*.md
+
+!SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
+!ImprovementPlan.md
+!NEXT_STEPS_GUIDELINES.md
+!.jules/
+!.jules/**
+!docs/
+!docs/**
+!wiki/
+!wiki/**
+!WIKI/
+!WIKI/**

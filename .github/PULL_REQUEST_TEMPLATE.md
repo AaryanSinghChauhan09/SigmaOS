@@ -1,100 +1,76 @@
 ## Summary
 
-<!-- What subsystem behavior changed and why? -->
+<!-- What component does this PR improve or add? -->
 
-## Shell component
+## Related issue
 
-- [ ] Lexer
-- [ ] Parser
-- [ ] Expansion
-- [ ] Executor
-- [ ] Pipelines
-- [ ] Redirection
-- [ ] Job control
-- [ ] Signals
-- [ ] Built-ins
-- [ ] Interactive line editor
-- [ ] Script runner
-- [ ] Diagnostics
-- [ ] Security / sandboxing
-- [ ] Documentation
-- [ ] CI / tooling
+Closes #<issue-id>
 
-## Subsystem / Component
+## Upstream study
 
-- [ ] Shell
-- [ ] Kernel
-- [ ] Process
-- [ ] Memory / MM / Swap
-- [ ] VFS / Filesystem / Storage
-- [ ] Scheduler
-- [ ] Drivers / Devices
-- [ ] Network
-- [ ] Governance / Lifecycle
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
 
-## Recurring task
+## What SigmaOS adopts
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly feature/bug triage
-- [ ] Weekly POSIX/sh study
-- [ ] Biweekly parser/expansion audit
-- [ ] Biweekly built-in review
-- [ ] Monthly boot-to-shell validation
-- [ ] Monthly compatibility suite
-- [ ] Monthly fuzz triage
-- [ ] Monthly security review
-- [ ] Quarterly release/UX/performance review
+<!-- State the design principle or mechanism adopted. -->
 
-## Reference behavior
+## What SigmaOS changes or rejects
 
-<!-- Required for compatibility or specification changes -->
+<!-- State simplifications, deviations, and rejected ideas. -->
 
-- Upstream study / Reference study:
-- What SigmaOS adopts:
-- POSIX section:
-- Reference behavior (Bash/dash/Zsh/BusyBox/Linux/BSD):
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
 
 ## Changes
 
--
--
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
 
-## Shell safety review
+## Verification
 
-- [ ] Expansion order is correct
-- [ ] Quoting behavior is preserved
-- [ ] Redirection failures are handled
-- [ ] Exit codes are explicit
-- [ ] Signal behavior is defined
-- [ ] No unbounded recursion or allocation
-- [ ] Interactive terminal state is restored
-- [ ] Script mode does not execute invalid partial input
-- [ ] Kernel safety review / Reviewer checklist
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
 
-## Evidence
+## Runtime evidence
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated shell tests
-- [ ] POSIX/conformance test evidence
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Security review requested, if applicable
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
 
-## Status updates
+## Safety and rollback
 
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Shell documentation
-- [ ] Boot matrix, if applicable
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
-## Risks and rollback
+## Reviewer checklist
 
-- Risk:
-- Rollback:
+- [ ] Scope is narrow
+- [ ] Tests cover the change
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported parity claims

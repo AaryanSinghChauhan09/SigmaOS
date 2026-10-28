@@ -696,13 +696,6 @@ if [ -f "src/creative/cadcraft_artcraft_missing_components_v69_pr.rs" ]; then
     ./build/test_cadcraft_v69
 fi
 
-if [ -f "src/creative/cadcraft_artcraft_missing_components_v70_pr.rs" ]; then
-    echo "Running Sovereign CadCraft & ArtCraft Missing Components Parity PR Gateway V70 test suite..."
-    mkdir -p build
-    rustc --test src/creative/cadcraft_artcraft_missing_components_v70_pr.rs --edition=2021 -o build/test_cadcraft_v70
-    ./build/test_cadcraft_v70
-fi
-
 if [ -f "src/creative/fontcraft.rs" ]; then
     echo "Running Sovereign FontCraft Typography Engine test suite..."
     mkdir -p build
@@ -1404,12 +1397,12 @@ fi
 if [ -f "src/package/sovereign_distro_package_advancements_v78_pr.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V78 PR test suite..."
     mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' --cfg 'feature="standalone_pr_only"' -o build/sovereign_advancements_v78_pr_test
+    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v78_pr_test
     ./build/sovereign_advancements_v78_pr_test
 fi
 
 if [ -f "tests/test_package_advancements_v78.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V78 test suite..."
+    echo "Running Sovereign Universal Package Advancements Suite V78 Integration test suite..."
     mkdir -p build
     rustc --test tests/test_package_advancements_v78.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v78
     ./build/test_package_advancements_v78
@@ -2232,16 +2225,6 @@ if [ -f "src/distro/open_source_os_missing_components_v80_pr.rs" ]; then
     ./build/test_open_source_v80_pr_integration
 fi
 
-if [ -f "src/distro/open_source_os_missing_components_v81_pr.rs" ]; then
-    echo "Running Open Source OS Missing Components V81 PR Suite tests..."
-    mkdir -p build
-    rustc --test src/distro/open_source_os_missing_components_v81_pr.rs --edition=2021 -o build/test_open_source_v81_pr
-    ./build/test_open_source_v81_pr
-
-    rustc --test tests/test_open_source_os_missing_components_v81_pr.rs --edition=2021 -o build/test_open_source_v81_pr_integration
-    ./build/test_open_source_v81_pr_integration
-fi
-
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
     echo "Running Cachy Linux Missing Components Engine test suite..."
     mkdir -p build
@@ -2917,12 +2900,6 @@ if [ -f "src/creative/threedcraft_advancements_v78_pr.rs" ]; then
     echo "Running Sovereign 3DCraft Advancements V78 PR test suite..."
     rustc --test src/creative/threedcraft_advancements_v78_pr.rs --edition=2021 -o build/threedcraft_v78_test
     ./build/threedcraft_v78_test
-fi
-
-if [ -f "src/creative/threedcraft_advancements_v79_pr.rs" ]; then
-    echo "Running Sovereign 3DCraft Advancements V79 PR test suite..."
-    rustc --test src/creative/threedcraft_advancements_v79_pr.rs --edition=2021 -o build/threedcraft_v79_test
-    ./build/threedcraft_v79_test
 fi
 
 if [ -f "src/creative/artcraft_advancements_v75_pr.rs" ]; then

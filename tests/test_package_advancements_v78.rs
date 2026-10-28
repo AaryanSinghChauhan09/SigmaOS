@@ -2,107 +2,102 @@
 // Integration Test Suite for Sovereign Distro Package Advancements Suite V78
 // (`tests/test_package_advancements_v78.rs`)
 
+#[path = "../src/package/sovereign_distro_package_advancements_v78.rs"]
+mod sovereign_distro_package_advancements_v78;
+
 #[path = "../src/package/sovereign_distro_package_advancements_v78_pr.rs"]
 mod sovereign_distro_package_advancements_v78_pr;
 
 use sovereign_distro_package_advancements_v78::*;
+use sovereign_distro_package_advancements_v78_pr::SovereignDistroPackagePrGatewayV78;
 use sovereign_distro_package_advancements_v78::universal::{PackageFormat, PackageState};
-use sovereign_distro_package_advancements_v78_pr::PackagePrProposalManifestV78;
 
 #[test]
 fn test_package_advancements_v78_full_cycle() {
-    // 1. Universal Package Format Inspector V78
+    // 1. Universal Package Inspector V78
     let mut inspector = UniversalPackageFormatInspectorV78::new();
     assert_eq!(inspector.total_formats_supported, 240);
 
     let manifest = inspector
-        .inspect_package_payload("ripgrep", b"!<arch>\ndeb_payload", "ripgrep_13.0.0_amd64.deb")
-        .expect("Failed to inspect DEB package payload");
+        .inspect_package("ripgrep-13.0.0-amd64.deb", b"!<arch>\ndebian-binary\n")
+        .clone();
     assert_eq!(manifest.name, "ripgrep");
     assert_eq!(manifest.detected_format, PackageFormat::Deb);
     assert_eq!(manifest.signature_kind, PackageSignatureKindV78::GpgOpenPgp);
     assert_eq!(manifest.provenance.as_ref().unwrap().slsa_level, 4);
 
-    // 2. Polyglot OOP Design Patterns V78
-    let mut pattern_engine = PolyglotPatternEngineV78::new();
-    let cmd = Box::new(InstallPackageCommandV78 {
-        package_id: "curl".to_string(),
-    });
-    let dispatch_res = pattern_engine
-        .dispatch_command(cmd)
-        .expect("Dispatch failed");
-    assert!(dispatch_res.contains("curl"));
-    let rollback_res = pattern_engine
-        .rollback_last_command()
-        .expect("Rollback failed");
-    assert!(rollback_res.contains("curl"));
+    // Test extended format inspection (.air, .bottle, .ipa, .aab, .hap, .eopkg, .lzm, .pup, .snap, etc.)
+    let manifest_air = inspector.inspect_package("app.air", &[0x50, 0x4b, 0x03, 0x04]);
+    assert_eq!(manifest_air.detected_format, PackageFormat::Air);
 
-    // 3. UDF Scriptlet Execution Engine V78
-    let mut scriptlet_engine = UdfScriptletEngineV78::new();
-    let script_res = scriptlet_engine
-        .run_scriptlet(ScriptletHookV78::PostInstall, "echo Hello SigmaOS")
-        .expect("Scriptlet execution failed");
-    assert!(script_res.contains("PostInstall"));
+    let manifest_bottle = inspector.inspect_package("curl.bottle", b"tar_gz_bottle");
+    assert_eq!(manifest_bottle.detected_format, PackageFormat::Bottle);
 
-    let malicious_res = scriptlet_engine.run_scriptlet(ScriptletHookV78::PreRemove, "rm -rf /");
-    assert!(malicious_res.is_err());
+    let manifest_lzm = inspector.inspect_package("slax.lzm", b"squashfs_lzm");
+    assert_eq!(manifest_lzm.detected_format, PackageFormat::Lzm);
 
-    // 4. SAT Dependency Solver & Vulnerability Auditor V78
-    let solver = UniversalCrossDistroSatSolverV78::new();
-    let raw_deps = vec!["libssl-dev".to_string(), "glibc".to_string(), "custom-tool".to_string()];
-    let solved = solver.solve_and_remap(&raw_deps).expect("SAT solving failed");
-    assert_eq!(
-        solved,
-        vec![
-            "sovereign-openssl-dev".to_string(),
-            "sovereign-libc".to_string(),
-            "sovereign-custom-tool".to_string()
-        ]
-    );
+    // 2. OOP Design Patterns V78
+    let mut facade = SovereignPackageFacadeV78::new();
+    let fac_res = facade
+        .quick_install("curl.apk", &[0x50, 0x4b, 0x03, 0x04])
+        .expect("Facade install failed");
+    assert!(fac_res.contains("curl"));
 
-    let vuln_deps = vec!["CVE-2024-9999-bad-ssl".to_string()];
-    assert!(solver.solve_and_remap(&vuln_deps).is_err());
+    // 3. SAT Dependency Resolution V78
+    let solver = SatDpllDependencySolverV78::new();
+    let raw_deps = vec!["libssl3".to_string(), "glibc".to_string()];
+    let solved = solver
+        .solve_dependencies("ripgrep", &raw_deps)
+        .expect("SAT solver failed");
+    assert_eq!(solved, vec!["sovereign-openssl", "sovereign-libc", "sovereign-base-v78"]);
 
-    // 5. Multi-Sandbox Security Governor V78
+    // 4. Multi-Sandbox Security Governor V78
     let sandbox_gov = UniversalMultiSandboxGovernorV78::new();
-    let sandbox_policy = sandbox_gov.enforce_sandbox_policy("ripgrep");
-    assert!(sandbox_policy.contains("LinuxLandlockSeccomp"));
+    let rules = sandbox_gov.generate_sandbox_rules(PackageFormat::Flatpak);
+    assert!(rules.pledge_promises.contains("inet"));
+    assert_eq!(rules.landlock_abi_version, 6);
 
-    // 6. CAS Delta Store Governor V78
+    // 5. CAS Delta Store V78
     let mut cas_store = UniversalCasDeltaStoreGovernorV78::new();
-    let res1 = cas_store.store_chunk_cas("chunk123", b"data1");
-    assert!(res1.contains("Stored new CAS chunk"));
-    let res2 = cas_store.store_chunk_cas("chunk123", b"data1");
-    assert!(res2.contains("Deduplicated CAS chunk"));
-    assert_eq!(cas_store.total_dedup_bytes, 5);
+    let delta = cas_store
+        .apply_delta_patch("base_v78", "patch_v78")
+        .expect("CAS delta patch failed");
+    assert_eq!(delta.compression_savings_ratio, 94);
 
-    // 7. Boot Environment Snapshot Governor V78
-    let mut bootenv_gov = UniversalBootEnvSnapshotGovernorV78::new();
-    let snap_res = bootenv_gov.create_pre_install_snapshot(SnapshotEngineKindV78::FreeBsdBectl, "v78-update");
-    assert!(snap_res.contains("be-snap-FreeBsdBectl-v78-update"));
+    // 6. Boot Env Snapshot Governor V78
+    let mut boot_env = UniversalBootEnvSnapshotGovernorV78::new();
+    let snap_id = boot_env.create_snapshot(BootEnvKindV78::FreeBsdBectl, "Pre-Update-v78");
+    let rb_res = boot_env.rollback(snap_id).expect("Rollback failed");
+    assert!(rb_res.contains("Pre-Update-v78"));
 
-    // 8. Foreign PM CLI Router V78
+    // 7. CLI Command Router V78
     let router = UniversalPmCliRouterV78::new();
-    let route_res = router
-        .route_cli_command(&["apt", "install", "ripgrep"])
-        .expect("CLI routing failed");
-    assert!(route_res.contains("Translated APT command"));
+    let routed = router
+        .route_command("pacman -S neovim --print")
+        .expect("Routing failed");
+    assert_eq!(routed.action, UniversalPmActionV78::Install);
+    assert!(routed.dry_run);
+    assert_eq!(routed.package_targets, vec!["neovim".to_string()]);
 
-    // 8. PR Gateway Manifest V78
-    let manifest_v78 = sovereign_distro_package_advancements_v78_pr::PackagePrProposalManifestV78 {
-        proposal_id: 7801,
-        title: "Universal Package Advancements V78".to_string(),
-        source_format: sovereign_distro_package_advancements_v78_pr::universal::PackageFormat::Deb,
-        target_package: "ripgrep".to_string(),
-        changes_summary: "Full test cycle proposal V78".to_string(),
-        verified_slsa_level: 4,
-    };
-    assert_eq!(manifest_v78.proposal_id, 7801);
+    // 8. PR Gateway V78
+    let mut gateway = SovereignDistroPackagePrGatewayV78::new();
+    gateway.submit_proposal(
+        7801,
+        "Universal Package Advancements V78",
+        PackageFormat::Deb,
+        "ripgrep",
+        "Full test cycle proposal V78",
+    );
+    assert_eq!(gateway.total_proposals(), 1);
 
-    // 10. Master Suite Coordinator V78
-    let mut suite = SovereignDistroPackageAdvancementsSuiteV78::new();
-    let pipeline_res = suite
-        .run_full_suite_pipeline("htop", b"!<arch>\nhtop_data", "htop_1.0_amd64.deb")
-        .expect("Master pipeline failed");
-    assert!(pipeline_res.contains("Suite V78 Execution Succeeded"));
+    // 9. Master Coordinator Suite V78
+    let mut master_suite = SovereignDistroPackageAdvancementsSuiteV78::new();
+    let installed_pkg = master_suite
+        .process_and_install("htop-3.3.0.apk", &[0x50, 0x4b, 0x03, 0x04])
+        .expect("Master suite installation failed");
+    assert_eq!(installed_pkg.name, "htop");
+    assert_eq!(installed_pkg.state, PackageState::Installed);
+    assert!(master_suite
+        .installed_packages
+        .contains(&"sigpkg-v78-htop".to_string()));
 }
