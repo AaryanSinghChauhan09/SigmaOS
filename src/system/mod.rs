@@ -336,8 +336,16 @@ pub use cleanup::{
     SystemCleanupManager,
 };
 pub use firewall::{
-    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
-    init_firewall, get_firewall,
+    get_firewall, init_firewall, Direction, FirewallManager, FirewallProfile,
+    FirewallRule as SystemFirewallRule, Protocol, RuleAction,
+};
+pub use logrotate::{
+    get_log_rotate, init_log_rotate, CompressionType, LogFileConfig, LogRotateManager,
+    RotationSchedule,
+};
+pub use restore::{
+    get_system_restore, init_system_restore, RestorePoint, SnapshotStatus, SnapshotType,
+    SystemRestoreManager, SystemSnapshot,
 };
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};
@@ -554,7 +562,7 @@ pub use sigmalight::{
 };
 pub use sigmalogrotate::{
     get_sigmalogrotate, init_sigmalogrotate, rotate_log_file, CompressionMethod,
-    LogFileConfig as SigmaLogFileConfig, SigmaLogRotate,
+    LogFileConfig as OtherLogFileConfig, SigmaLogRotate,
 };
 pub use sigmalvm::{
     create_volume_group, get_sigmalvm, init_sigmalvm, LVState, LogicalVolume, PVState,
@@ -933,8 +941,8 @@ pub use sovereign_init_and_supervisor_advancements_v76_pr::*;
 pub mod sovereign_init_and_supervisor_advancements_v77_pr;
 pub use sovereign_init_and_supervisor_advancements_v77_pr::*;
 
-pub mod sovereign_init_and_supervisor_advancements_v78_pr;
-pub use sovereign_init_and_supervisor_advancements_v78_pr::*;
+pub mod sovereign_init_and_supervisor_advancements_v79_pr;
+pub use sovereign_init_and_supervisor_advancements_v79_pr::*;
 
 pub use mint_tools::{
     get_system_tools, init_system_tools, BackupConfig, BackupJob as MintBackupJob,
