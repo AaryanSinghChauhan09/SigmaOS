@@ -491,6 +491,13 @@ description = "Phase 1 io_uring implementation with submission/completion queue 
 test_evidence = "Implementation merged in commit c8e27c43d8; unit tests passing"
 next_milestone = "Driver integration and userspace API exposure"
 
+[io.management_plan]
+status = "integrated"
+files = ["docs/io/IO_MANAGEMENT_POLICY.md", "docs/io/IO_MANAGEMENT_ADR.md", "docs/io/INTERRUPT_POLICY.md", "docs/io/DMA_POLICY.md", "docs/filesystem/BUFFER_POLICY.md", "docs/io/IO_SCHEDULER_POLICY.md", "docs/io/CALLBACK_POLICY.md", "IO_RULES.toml", ".github/PULL_REQUEST_TEMPLATE.md", "src/io/sovereign_io_management_and_pr_suite.rs"]
+description = "SigmaOS Subsystem I/O Lifecycle Management & 15-PR Gateway Suite enforcing the 10-stage authoritative lifecycle contract: submit -> validate -> enqueue -> execute -> interrupt/DMA -> complete -> callback -> reclaim -> free -> error/recovery across interrupts, DMA, buffer cache, multi-queue I/O scheduler, and callbacks"
+test_evidence = "Architecture policy documents published in docs/io/ and docs/filesystem/; standardized PR template in .github/PULL_REQUEST_TEMPLATE.md; unit tests pass via rustc --test src/io/sovereign_io_management_and_pr_suite.rs"
+next_milestone = "QEMU VirtIO block driver and nvme hardware ring integration"
+
 [security.hardening_advancements]
 status = "working"
 files = ["src/security/sovereign_security_and_hardening_advancements_pr.rs"]
