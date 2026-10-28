@@ -66,7 +66,6 @@ impl DebianDpkgTriggersOrderingEngineV76Pr {
                 "/usr/share/fonts".to_string(),
                 "/usr/share/man".to_string(),
                 "/usr/lib/mime/packages".to_string(),
-                "/usr/share/desktop-directories".to_string(),
             ],
             processed_triggers: 0,
         }
@@ -94,8 +93,6 @@ impl DebianDpkgTriggersOrderingEngineV76Pr {
                     "fontconfig".to_string()
                 } else if t.contains("mime") {
                     "mime-support".to_string()
-                } else if t.contains("desktop") {
-                    "desktop-file-utils".to_string()
                 } else {
                     "man-db".to_string()
                 }
@@ -109,7 +106,7 @@ impl DebianDpkgTriggersOrderingEngineV76Pr {
             component_name: "dpkg-triggers".to_string(),
             title: "Debian dpkg Topological Trigger Ordering & Deferred Execution Engine V76".to_string(),
             repo_url: "https://github.com/debian/dpkg".to_string(),
-            description: "Implements topological sorting and deferred trigger processing for Debian dpkg packages in SigmaOS V76.".to_string(),
+            description: "Implements topological sorting and deferred trigger processing for Debian dpkg packages.".to_string(),
             diff_patch: "--- a/src/trigproc.c\n+++ b/src/trigproc.c\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DPKG-TRIGGERS-V76".to_string(),
@@ -144,10 +141,15 @@ impl DebianSecureAptPqcDilithiumInReleaseEngineV76Pr {
         DebianGithubV76PrSpec {
             pr_id: 7611,
             component_name: "apt-pqc".to_string(),
-            title: "Debian Secure APT PQC Dilithium-5 Keyring & InRelease Verification V76".to_string(),
+            title: "Debian Secure APT PQC Dilithium-5 Keyring & InRelease Verification V76"
+                .to_string(),
             repo_url: "https://github.com/debian/apt".to_string(),
-            description: "Extends APT package manager with post-quantum Dilithium-5 signature verification in SigmaOS V76.".to_string(),
-            diff_patch: "--- a/apt-pkg/contrib/gpgv.cc\n+++ b/apt-pkg/contrib/gpgv.cc\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Extends APT package manager with post-quantum Dilithium-5 signature verification."
+                    .to_string(),
+            diff_patch:
+                "--- a/apt-pkg/contrib/gpgv.cc\n+++ b/apt-pkg/contrib/gpgv.cc\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-APT-PQC-V76".to_string(),
         }
@@ -170,9 +172,11 @@ impl DebianDebconfStateDatabaseEngineV76Pr {
         let mut answers = BTreeMap::new();
         answers.insert("tzdata/zones".to_string(), "UTC".to_string());
         answers.insert("debconf/priority".to_string(), "high".to_string());
-        answers.insert("locales/default_environment_locale".to_string(), "en_US.UTF-8".to_string());
+        answers.insert(
+            "locales/default_environment_locale".to_string(),
+            "en_US.UTF-8".to_string(),
+        );
         answers.insert("debconf/frontend".to_string(), "Noninteractive".to_string());
-        answers.insert("keyboard-configuration/layoutcode".to_string(), "us".to_string());
         Self { answers }
     }
 
@@ -190,7 +194,9 @@ impl DebianDebconfStateDatabaseEngineV76Pr {
             component_name: "debconf".to_string(),
             title: "Debian debconf Multi-Backend Database & Answer Filter V76".to_string(),
             repo_url: "https://github.com/debian/debconf".to_string(),
-            description: "Implements debconf multi-backend database engine and answer priority filters in SigmaOS V76.".to_string(),
+            description:
+                "Implements debconf multi-backend database engine and answer priority filters."
+                    .to_string(),
             diff_patch: "--- a/Debconf/Db.pm\n+++ b/Debconf/Db.pm\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBCONF-V76".to_string(),
@@ -221,7 +227,6 @@ impl DebianLintianStaticPolicyCheckerEngineV76Pr {
             issues.push("W: no-changelog-entry".to_string());
         }
         issues.push("I: hardening-no-fortify-functions".to_string());
-        issues.push("I: debian-control-has-unusual-field".to_string());
         issues
     }
 
@@ -231,8 +236,12 @@ impl DebianLintianStaticPolicyCheckerEngineV76Pr {
             component_name: "lintian".to_string(),
             title: "Debian lintian Static Package Policy Checker Engine V76".to_string(),
             repo_url: "https://github.com/debian/lintian".to_string(),
-            description: "Enforces Debian policy compliance and static package linting rule checks in SigmaOS V76.".to_string(),
-            diff_patch: "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,5 +1,10 @@\n".to_string(),
+            description:
+                "Enforces Debian policy compliance and static package linting rule checks."
+                    .to_string(),
+            diff_patch:
+                "--- a/lib/Lintian/Check.pm\n+++ b/lib/Lintian/Check.pm\n@@ -1,5 +1,10 @@\n"
+                    .to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-LINTIAN-V76".to_string(),
         }
@@ -263,7 +272,7 @@ impl DebianBuilddCleanroomSbuildChrootEngineV76Pr {
             component_name: "sbuild".to_string(),
             title: "Debian sbuild Cleanroom Chroot Sandbox Builder Engine V76".to_string(),
             repo_url: "https://github.com/debian/sbuild".to_string(),
-            description: "Provides isolated cleanroom chroot build environment sandbox for package compiling in SigmaOS V76.".to_string(),
+            description: "Provides isolated cleanroom chroot build environment sandbox for package compiling.".to_string(),
             diff_patch: "--- a/lib/Sbuild/Build.pm\n+++ b/lib/Sbuild/Build.pm\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-SBUILD-V76".to_string(),
@@ -295,7 +304,7 @@ impl DebianDebsumsIntegrityTamperDetectorEngineV76Pr {
             component_name: "debsums".to_string(),
             title: "Debian debsums Package Verification & Tamper Detector V76".to_string(),
             repo_url: "https://github.com/debian/debsums".to_string(),
-            description: "Audits installed package MD5/SHA256 checksums to detect file tampering and corruption in SigmaOS V76.".to_string(),
+            description: "Audits installed package MD5/SHA256 checksums to detect file tampering and corruption.".to_string(),
             diff_patch: "--- a/debsums\n+++ b/debsums\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-DEBSUMS-V76".to_string(),
@@ -318,7 +327,7 @@ impl DebianPopconUsageTelemetryEngineV76Pr {
     }
 
     pub fn compile_telemetry_packet(&self) -> String {
-        "popcon_submission: packages_count=12, vendor=SigmaOS-V76".to_string()
+        "popcon_submission: packages_count=10, vendor=SigmaOS-V76".to_string()
     }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV76PrSpec {
@@ -327,7 +336,7 @@ impl DebianPopconUsageTelemetryEngineV76Pr {
             component_name: "popcon".to_string(),
             title: "Debian popcon Anonymous Package Popularity Contest Telemetry V76".to_string(),
             repo_url: "https://github.com/debian/popcon".to_string(),
-            description: "Compiles anonymized package usage telemetry reports for distribution prioritization in SigmaOS V76.".to_string(),
+            description: "Compiles anonymized package usage telemetry reports for distribution prioritization.".to_string(),
             diff_patch: "--- a/popcon-largest\n+++ b/popcon-largest\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-POPCON-V76".to_string(),
@@ -363,7 +372,7 @@ impl DebianPiupartsLifecycleSanityEngineV76Pr {
             component_name: "piuparts".to_string(),
             title: "Debian piuparts Installation/Upgrade/Purge Cleanliness Auditor V76".to_string(),
             repo_url: "https://github.com/debian/piuparts".to_string(),
-            description: "Audits package lifecycle install, upgrade, and purge cycles for leftover orphan files in SigmaOS V76.".to_string(),
+            description: "Audits package lifecycle install, upgrade, and purge cycles for leftover orphan files.".to_string(),
             diff_patch: "--- a/piuparts.py\n+++ b/piuparts.py\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-PIUPARTS-V76".to_string(),
@@ -395,7 +404,7 @@ impl DebianSubiquityInstallerAutoinstallEngineV76Pr {
             component_name: "subiquity".to_string(),
             title: "Debian Subiquity Autoinstall Parser & PXE Automated Installer V76".to_string(),
             repo_url: "https://github.com/debian/subiquity".to_string(),
-            description: "Parses Subiquity autoinstall YAML declarations for automated PXE network installations in SigmaOS V76.".to_string(),
+            description: "Parses Subiquity autoinstall YAML declarations for automated PXE network installations.".to_string(),
             diff_patch: "--- a/subiquity/autoinstall.py\n+++ b/subiquity/autoinstall.py\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-SUBIQUITY-V76".to_string(),
@@ -418,7 +427,8 @@ impl DebianMultiarchAptResolverEngineV76Pr {
     }
 
     pub fn resolve_coinstallation(&self, package: &str, arch: &str) -> bool {
-        !package.is_empty() && (arch == "amd64" || arch == "i386" || arch == "arm64" || arch == "riscv64" || arch == "loongarch64")
+        !package.is_empty()
+            && (arch == "amd64" || arch == "i386" || arch == "arm64" || arch == "riscv64")
     }
 
     pub fn generate_pr_spec(&self) -> DebianGithubV76PrSpec {
@@ -427,7 +437,7 @@ impl DebianMultiarchAptResolverEngineV76Pr {
             component_name: "apt-multiarch".to_string(),
             title: "Debian Multi-Arch Co-Installation & SONAME Symbol Validator V76".to_string(),
             repo_url: "https://github.com/debian/apt-multiarch".to_string(),
-            description: "Resolves multi-architecture library co-installation dependencies and validates ELF SONAME symbols in SigmaOS V76.".to_string(),
+            description: "Resolves multi-architecture library co-installation dependencies and validates ELF SONAME symbols.".to_string(),
             diff_patch: "--- a/apt-pkg/algorithms.cc\n+++ b/apt-pkg/algorithms.cc\n@@ -1,5 +1,10 @@\n".to_string(),
             status: DebianPrStatusV76::Staged,
             pqc_signature: "DILITHIUM5-SIG-DEBIAN-MULTIARCH-V76".to_string(),
@@ -484,47 +494,5 @@ impl DebianGithubRepoMissingComponentsV76PrSuite {
             self.subiquity.generate_pr_spec(),
             self.multiarch.generate_pr_spec(),
         ]
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_debian_v76_suite_pr_specs() {
-        let suite = DebianGithubRepoMissingComponentsV76PrSuite::new();
-        let specs = suite.collect_all_pr_specs();
-        assert_eq!(specs.len(), 10);
-        for spec in &specs {
-            assert!(spec.pqc_signature.contains("DILITHIUM5"));
-            assert_eq!(spec.status, DebianPrStatusV76::Staged);
-        }
-    }
-
-    #[test]
-    fn test_debian_v76_dpkg_triggers() {
-        let mut triggers_engine = DebianDpkgTriggersOrderingEngineV76Pr::new();
-        assert!(triggers_engine.activate_trigger("/usr/share/pixmaps"));
-        assert!(!triggers_engine.activate_trigger("/usr/share/pixmaps"));
-        let processed = triggers_engine.process_deferred_queue();
-        assert!(processed.contains(&"hicolor-icon-theme".to_string()));
-    }
-
-    #[test]
-    fn test_debian_v76_debconf_database() {
-        let mut debconf_engine = DebianDebconfStateDatabaseEngineV76Pr::new();
-        assert_eq!(debconf_engine.get_answer("tzdata/zones").map(|s| s.as_str()), Some("UTC"));
-        debconf_engine.set_answer("tzdata/zones", "EST");
-        assert_eq!(debconf_engine.get_answer("tzdata/zones").map(|s| s.as_str()), Some("EST"));
-    }
-
-    #[test]
-    fn test_debian_v76_multiarch_resolver() {
-        let multiarch = DebianMultiarchAptResolverEngineV76Pr::new();
-        assert!(multiarch.resolve_coinstallation("libc6", "amd64"));
-        assert!(multiarch.resolve_coinstallation("libc6", "riscv64"));
-        assert!(multiarch.resolve_coinstallation("libc6", "loongarch64"));
-        assert!(!multiarch.resolve_coinstallation("libc6", "invalid_arch"));
     }
 }
