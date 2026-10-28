@@ -38,7 +38,11 @@ fn test_pull_request_template_exists() {
             "## Shell component\n## Shell safety review\n## Component\n## Kernel safety review",
         )
     };
-    assert!(content.contains("## Shell component") || content.contains("## Component"));
+    assert!(
+        content.contains("## Shell component")
+            || content.contains("## Component")
+            || content.contains("## Storage component")
+    );
     assert!(
         content.contains("## Shell safety review")
             || content.contains("## Kernel safety review")
