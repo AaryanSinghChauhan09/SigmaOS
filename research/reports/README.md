@@ -1,3 +1,3 @@
-# Evidence Reports Directory
+# Study and Implementation Reports
 
-Contains daily, weekly, monthly, and quarterly evidence reports produced by periodic cycles.
+Periodic reports capturing progress on the study-to-implementation pipeline.
