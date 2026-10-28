@@ -1375,7 +1375,7 @@ fi
 if [ -f "tests/test_package_advancements_v78.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V78 Integration test suite..."
     mkdir -p build
-    rustc --test tests/test_package_advancements_v78.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/test_package_advancements_v78
+    rustc --test tests/test_package_advancements_v78.rs --edition=2021 -o build/test_package_advancements_v78
     ./build/test_package_advancements_v78
 fi
 
