@@ -77,9 +77,6 @@ pub use creative::fontcraft_advancements_v77_pr::*;
 pub use creative::fontcraft_advancements_v78_pr::*;
 pub use creative::fontcraft_artcraft_missing_components_v66_pr::*;
 pub use creative::fontcraft_artcraft_parity_pr::*;
-pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;
-pub use creative::lightcraft_artcraft_missing_components_v68_pr::*;
-pub use creative::lightcraft_artcraft_missing_components_v69_pr::*;
 pub use creative::fontcraft_missing_components_parity_pr::*;
 pub use creative::lightcraft_artcraft_missing_components_v67_pr::*;
 pub use creative::pdfcraft_artcraft_parity_pr::*;
@@ -223,7 +220,7 @@ pub use kernel::{
     SovereignKernelOpenSourceOsDistroAdvancementsV65PrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV68PrGateway,
     SovereignKernelOpenSourceOsDistroAdvancementsV75PrGateway,
-    SovereignKernelOpenSourceOsDistroAdvancementsV78PrGateway,
+    SovereignKernelOpenSourceOsDistroBreakthroughsPrGateway,
     SovereignKernelOpenSourceOsDistroInnovationsV72PrGateway,
     SovereignLinuxBsdKernelInnovationsPrGateway,
 };
@@ -288,7 +285,7 @@ pub use distro::cachy_linux_missing_components_v69_pr::*;
 pub use distro::cachy_linux_missing_components_v70_pr::*;
 pub use distro::cachy_linux_missing_components_v71_pr::*;
 pub use distro::cachy_linux_missing_components_v72_pr::*;
-pub use distro::cachy_linux_missing_components_v76_pr::*;
+pub use distro::debian_github_repo_unimplemented_ideas_v27_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v72_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v76_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v77_pr::*;
@@ -335,9 +332,6 @@ pub use distro::open_source_os_missing_components_v74_pr::*;
 pub use distro::open_source_os_missing_components_v75_pr::*;
 pub use distro::open_source_os_missing_components_v76_pr::*;
 pub use distro::open_source_os_missing_components_v77_pr::*;
-pub use distro::sovereign_linux_bsd_ecosystem_gap_closure_v78_pr::*;
-pub use package::sovereign_distro_package_advancements_v73::*;
-pub use package::sovereign_distro_package_advancements_v74::*;
 pub use distro::open_source_os_unimplemented_ideas_v64_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v65_pr::*;
 pub use distro::open_source_os_unimplemented_ideas_v71_pr;
@@ -786,15 +780,8 @@ pub use crate::distro::sovereign_open_source_os_apex_inspirations_v54::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v55::*;
 pub use crate::distro::sovereign_open_source_os_apex_inspirations_v70::*;
 pub use crate::distro::sovereign_openbsd_ultimate_parity_pr_suite::*;
-pub use crate::distro::arch_linux_missing_components_v73_pr::*;
-pub use crate::distro::arch_linux_missing_components_v74_pr::*;
-pub use crate::distro::debian_github_repo_missing_components_v75_pr::*;
-pub use crate::distro::debian_github_repo_missing_components_v76_pr::*;
-pub use crate::distro::open_source_os_debian_unimplemented_ideas_v75_pr::*;
-pub use crate::distro::open_source_os_debian_unimplemented_ideas_v76_pr::*;
-pub use crate::distro::open_source_os_missing_components_v76_pr::*;
-pub use crate::distro::open_source_os_missing_components_v77_pr::*;
-pub use crate::distro::sovereign_linux_bsd_ecosystem_gap_closure_v78_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v72_pr::*;
+pub use crate::graphics::sovereign_graphics_display_v74_pr::*;
 
 pub mod screen;
 pub mod software_manager;

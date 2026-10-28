@@ -341,8 +341,16 @@ pub use cleanup::{
     SystemCleanupManager,
 };
 pub use firewall::{
-    FirewallManager, FirewallRule as SysFirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
-    init_firewall, get_firewall,
+    get_firewall, init_firewall, Direction, FirewallManager, FirewallProfile,
+    FirewallRule as SysFirewallRule, Protocol, RuleAction,
+};
+pub use logrotate::{
+    get_log_rotate, init_log_rotate, CompressionType, LogFileConfig as SysLogFileConfig,
+    LogRotateManager, RotationSchedule,
+};
+pub use restore::{
+    get_system_restore, init_system_restore, RestorePoint, SnapshotStatus, SnapshotType,
+    SystemRestoreManager, SystemSnapshot,
 };
 
 pub use cron::{CronDaemon, CronError, CronField, CronJob, CronSchedule, SovereignCronDaemon};

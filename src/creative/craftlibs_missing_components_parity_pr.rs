@@ -2210,37 +2210,6 @@ impl SovereignCraftlibsMissingComponentsParityPrGateway {
             .upscale_frame_4x(&sr_in, 2, 2, &mut sr_out)
             .is_ok();
 
-        let noisy = vec![100u8; 16];
-        let norm_depth = vec![1.0f32; 4];
-        let mut denoised = vec![0u8; 16];
-        let _denoise_ok = self.path_tracing_denoiser.denoise_noisy_frame(&noisy, &norm_depth, &mut denoised).is_ok();
-
-        let mut rad = [0.0f32; 3];
-        let _vxgi_ok = self.vxgi_global_illumination.trace_indirect_diffuse([0.0, 1.0, 0.0], [0.0, 1.0, 0.0], &mut rad).is_ok();
-
-        let mut positions = vec![[0.0f32, 10.0, 0.0]];
-        let _xpbd_ok = self.xpbd_cloth_physics.simulate_xpbd_step(&mut positions, 0.016).is_ok();
-
-        let _ocio2_lut = self.ocio_v2_grading_lut.apply_grading_3d_lut([100, 100, 100]);
-
-        let indices = vec![0u32, 1, 2];
-        let mut simplified = Vec::new();
-        let _lod_ok = self.mesh_optimizer_lod.simplify_mesh_qem(&indices, &mut simplified).is_ok();
-
-        let bitstream = vec![0xAAu8; 16];
-        let mut v_out = vec![0u8; 16];
-        let _video_ok = self.hardware_video_codec.decode_video_bitstream_frame(&bitstream, &mut v_out).is_ok();
-
-        let _vdb_raymarch = self.sparse_vdb_raymarcher.raymarch_sparse_grid_volume([0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
-
-        let _anim = self.universal_vector_anim.interpolate_keyframe_cubic(0.0, 100.0, 0.5);
-
-        let _crdt_adv = self.crdt_canvas_advanced.sync_peer_state(2);
-
-        let heightmap = vec![128u8; 4];
-        let mut normal_map = vec![0u8; 16];
-        let _gen_ok = self.generative_vector_texture.synthesize_pbr_normal_map(&heightmap, &mut normal_map).is_ok();
-
         true
     }
 
