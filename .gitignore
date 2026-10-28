@@ -69,9 +69,16 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
-# Documentation policy default ignore
-*.md
-**/*.md
+# Documentation policy: NO .md or .txt files tracked in main branch.
+# All documentation lives in the SigmaOS.wiki repository.
+# Allow tracked markdown documentation in docs/ and .github/
+!docs/**/*.md
+!docs/*.md
+!.github/PULL_REQUEST_TEMPLATE.md
+!VFS_RULES.toml
+!src/fs/
+!tests/fs/
+!tests/filesystem/
 *.txt
 **/*.txt
 
