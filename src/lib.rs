@@ -640,10 +640,14 @@ pub use virtualization::{
     SovereignVirtualizationAndContainersParityV61Gateway,
     SovereignVirtualizationAndContainersParityV63Gateway,
     SovereignVirtualizationAndContainersParityV67Gateway,
-    SovereignVirtualizationAndContainersParityV68Gateway, VirtualBoxBhyveVmmV61Engine,
+    SovereignVirtualizationAndContainersParityV68Gateway,
+    SovereignVirtualizationAndContainersParityV74Gateway,
+    SovereignVirtualizationAndContainersParityV77Gateway,
+    SovereignVirtualizationAndContainersV77PrGatewayEngine, VirtualBoxBhyveVmmV61Engine,
     VirtualBoxBhyveVmmV63Engine, VirtualBoxBhyveVmmV67Engine, VirtualBoxBhyveVmmV68Engine,
-    VirtualMachine, VirtualizationError, VirtualizationOrchestrator, VirtualizationTech, VmState,
-    XenHypervisorV61Engine, XenHypervisorV63Engine, XenHypervisorV67Engine, XenHypervisorV68Engine,
+    VirtualBoxBhyveVmmV77Engine, VirtualMachine, VirtualizationError, VirtualizationOrchestrator,
+    VirtualizationTech, VirtualizationV77PrProposalManifest, VmState, XenHypervisorV61Engine,
+    XenHypervisorV63Engine, XenHypervisorV67Engine, XenHypervisorV68Engine, XenHypervisorV77Engine,
 };
 
 pub use thread::{Mutex as ThreadMutex, Thread, ThreadError};
