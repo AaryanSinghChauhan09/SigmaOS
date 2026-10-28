@@ -756,6 +756,8 @@ pub use crate::desktop::sovereign_de_wm_advancements_v74_pr::*;
 pub use crate::distro::arch_linux_missing_components_v71_pr::*;
 pub use crate::distro::arch_linux_missing_components_v73_pr::*;
 pub use crate::distro::arch_linux_missing_components_v74_pr::*;
+pub use crate::distro::arch_linux_missing_components_v81_pr::*;
+pub use crate::distro::open_source_os_and_arch_missing_components_v81_pr::*;
 pub use crate::distro::bootable_vertical_slices_missing_components_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v68_pr::*;
 pub use crate::distro::debian_github_repo_missing_components_v69_pr::*;
