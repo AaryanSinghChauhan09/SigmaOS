@@ -36,7 +36,7 @@ use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 pub mod universal;
 
 #[cfg(feature = "standalone_test")]
-pub use self::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]
