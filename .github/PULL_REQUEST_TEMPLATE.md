@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- What secondary-memory or system behavior changed and why? -->
+<!-- What secondary-memory behavior changed and why? -->
 
 ## Storage component
 
@@ -16,14 +16,6 @@
 - [ ] Security / capabilities
 - [ ] Documentation
 - [ ] CI / tooling
-- [ ] Component
-
-## Shell component
-
-- [ ] Interactive shell
-- [ ] Lexer / parser / AST
-- [ ] Builtin commands
-- [ ] Diagnostics
 
 ## Recurring task
 
@@ -36,7 +28,7 @@
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review
 
-## Reference behavior & Upstream study
+## Reference behavior
 
 <!-- Required for lifecycle, ABI, or storage changes -->
 
@@ -44,15 +36,14 @@
 - Linux/BSD/Redox/xv6 reference:
 - SigmaOS current behavior:
 - New behavior:
-- What SigmaOS adopts:
-- Reference study:
 - Compatibility impact:
 
 ## Changes
 
 -
+-
 
-## Shell safety review
+## Storage safety review
 
 - [ ] Lifecycle transitions are valid
 - [ ] Zombies are eventually reaped
@@ -64,13 +55,6 @@
 - [ ] Double-completion prevented
 - [ ] Resource limits enforced
 - [ ] No unbounded allocation or recursion
-- [ ] Kernel safety review completed
-- [ ] Study document provided
-- [ ] Safety and rollback plan defined
-
-## Reviewer checklist
-
-- [ ] Safety review completed
 
 ## Evidence
 
@@ -93,11 +77,6 @@
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback
-
-- Risk:
-- Rollback:
-
-## Safety and rollback
 
 - Risk:
 - Rollback:

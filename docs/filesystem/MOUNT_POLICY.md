@@ -1,28 +1,21 @@
-# Filesystem Core and Mount Manager Specification and Policy
+# Filesystem Mount Manager Policy
 
-## 1. Overview
+## Overview
+The Filesystem Mount Manager (`MountManager`) in `src/filesystem/mount.rs` controls filesystem mounting, active reference management, unmounting, and transactional rollback.
 
-The Filesystem Core Manager (`src/filesystem/core.rs`) and Mount Manager (`src/filesystem/mount.rs`) enforce volume capacity bounds, transaction sequencing, mount lifecycle, and failure recovery.
+## Requirements & Rules
 
-## 2. Capacity Bounding & Lost-Update Prevention
+1. **Safe Mount & Unmount Lifecycle**:
+   - Valid mount states: `Unmounted`, `Mounting`, `Mounted`, `Unmounting`.
+   - Attempting to mount an already mounted target returns `MountError::AlreadyMounted`.
 
-### 2.1 Volume Capacity Limits
-- Every registered filesystem volume defines explicit limits: `total_bytes` and `total_inodes`.
-- Space allocations (`allocate_space`) checking against `used_bytes` return `Err(FsCoreError::CapacityExceeded)` when requested allocation exceeds available volume capacity.
+2. **Active Reference Tracking**:
+   - `acquire_ref` and `release_ref` maintain open file descriptor and process handle counts (`open_ref_count`).
+   - Unmounting a target with `open_ref_count > 0` returns `MountError::ResourceBusy`.
 
-### 2.2 Transaction Logging & Lost-Update Prevention
-- Filesystem updates begin transactions (`begin_transaction`), returning unique `tx_id` handles and current file sequence numbers.
-- Concurrent updates that modify file sequence numbers before transaction commit cause `commit_transaction` to detect sequencing conflicts and return `Err(FsCoreError::LostUpdateDetected)`.
+3. **Double-Unmount Protection**:
+   - Unmounting an unmounted target returns `MountError::NotMounted` or `MountError::DoubleUnmount`.
 
-## 3. Mount Lifecycle and Safety
-
-### 3.1 Mount State Machine
-Mount points transition through explicit states:
-```text
-Unmounted -> Mounting -> Mounted -> Unmounting -> Unmounted
-```
-
-### 3.2 Double-Unmount and Error Recovery
-- Mounting an already mounted path returns `Err(MountError::AlreadyMounted)`.
-- Unmounting an unmounted path returns `Err(MountError::NotMounted)` or `Err(MountError::DoubleUnmount)`.
-- Mount initialization failures automatically execute atomic state rollbacks, returning `Err(MountError::RollbackSuccessful)`.
+4. **Transactional Rollback**:
+   - `mount_with_rollback` executes custom initialization hooks.
+   - If initialization fails, mount state is atomically restored to `Unmounted` and returns `MountError::RollbackSuccessful`.

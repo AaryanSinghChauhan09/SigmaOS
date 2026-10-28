@@ -1,27 +1,22 @@
-# Block Cache Manager Specification and Policy
+# Block Cache Manager Policy
 
-## 1. Overview
+## Overview
+The Block Cache Manager (`BlockCacheManager`) in `src/fs/cache.rs` provides cached page management, writeback queueing, and OOM pressure watermarks for block I/O operations.
 
-The Block Cache Manager (`src/fs/cache.rs`) provides in-memory page and block caching between high-level filesystem layers and low-level block devices.
+## Requirements & Rules
 
-## 2. Cache Page Lifecycle & Eviction
+1. **Race-Free Eviction & LRU Selection**:
+   - Cache page eviction selects the Least Recently Used (LRU) block based on `last_access_ms`.
+   - Double-eviction attempts return `CacheError::DoubleEviction`.
 
-### 2.1 Capacity Bounds and LRU Eviction
-- Cache capacity is bounded by `max_pages`.
-- Insertion into a full cache triggers automatic Least-Recently-Used (LRU) eviction based on access timestamps (`last_access_ms`).
+2. **Lost-Writeback Prevention**:
+   - When a dirty page is evicted, its data is synchronized to persistent storage before buffer removal.
+   - Flush operations (`flush_writeback_queue`) write dirty blocks to disk and mark page state as `Active`.
 
-### 2.2 Dirty Page Writeback & Lost-Writeback Prevention
-- Cache pages modified by write operations are marked dirty (`is_dirty = true`).
-- Evicting a dirty page invokes underlying block device writeback before freeing the cached page, preventing lost writeback data.
-- Flush operations (`flush_dirty_pages()`) synchronously commit all dirty pages to storage.
-
-### 2.3 Double-Eviction Prevention
-- Attempting to evict a page that is not currently cached returns `Err(CacheError::NotCached)`.
-- Re-evicting pages in `Evicting` or `Evicted` states is rejected.
-
-## 3. OOM Observability and Watermarks
-
-Cache pressure is monitored via `CacheOomMetrics` and `WatermarkLevel`:
-- **Normal**: Cache utilization below 80%.
-- **HighPressure**: Cache utilization between 80% and 95%. Eviction rate increases.
-- **OomCritical**: Cache utilization exceeds 95%. Emergency synchronous page reclamation triggered.
+3. **Observable OOM Watermarks**:
+   - Cache capacity is bounded by `max_pages`.
+   - Watermarks automatically transition:
+     - `Normal`: Page count < 75% max pages.
+     - `HighPressure`: Page count >= 75% max pages.
+     - `OomCritical`: Page count >= 90% max pages.
+   - Metrics (`CacheOomMetrics`) track total pages, dirty pages, hits, misses, evictions, and reclaimed bytes.

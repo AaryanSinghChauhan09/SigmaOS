@@ -1,26 +1,29 @@
-# ADR-0002: Secondary Memory Architecture and Storage Lifecycle Contract
+# Secondary Memory Architectural Decision Record (ADR)
 
 ## Status
 Accepted
 
 ## Context
-SigmaOS requires a safe, observable, deterministic, and recoverable secondary-memory subsystem managing persistent storage, block I/O, filesystems, caches, and swap/paging storage. Previously, isolated models existed across `zfs`, `swap`, `paging`, and `tmpfs`, but lacked a unified lifecycle contract and race-prevention policies.
+SigmaOS requires a safe, observable, and recoverable secondary memory subsystem. Historically, storage components existed as isolated models without a unified lifecycle contract or strict error handling. Without an explicit lifecycle contract, race conditions, double-completions, lost writebacks, and illegal unmount states can corrupt persistent data.
 
 ## Decision
-We establish a single authoritative secondary-memory storage lifecycle state machine:
+We establish a unified secondary memory subsystem with the following architectural commitments:
 
-```text
-probe -> identify -> block layer -> cache -> filesystem -> mount ->
-read/write -> flush -> unmount -> detach -> error/recovery
-```
+1. **Authoritative 11-Stage Storage Lifecycle**:
+   `probe -> identify -> block layer -> cache -> filesystem -> mount -> read/write -> flush -> unmount -> detach -> error/recovery`
 
-### Core Architecture Invariants
-1. **Bounded Allocation**: Every request queue, block cache, and volume metadata structure must enforce explicit capacity bounds. Request exhaustion returns a typed `BlockError::RequestExhaustion` error instead of panicking or growing silently.
-2. **Exact-Once Completion**: Block requests transition through `Unallocated -> Pending -> Dispatched -> Completed/Failed -> Freed`. Re-completing an already completed or freed request returns `BlockError::DoubleCompletion`.
-3. **Lost-Completion Prevention**: Pending and dispatched requests are tracked via internal sequence counters and timeout watchers to detect lost completions.
-4. **Cache Eviction and Dirty Writeback**: Buffer/page cache eviction uses LRU ordering. Dirty pages must be written back to underlying block devices before eviction, preventing lost writes. Re-evicting an evicted page returns `CacheError::NotCached`.
-5. **Mount Integrity & Capacity Enforcers**: Volume operations track byte and inode capacity bounds (`VolumeCapacityBounds`). Exceeding allocation bounds returns `FsCoreError::CapacityExceeded`. Double-unmounting returns `MountError::NotMounted` or `MountError::DoubleUnmount`.
+2. **Bounded Request Queues and Exact-Once Completion**:
+   All block request allocations are bounded by `max_requests`. Request completion transitions state atomically (`Pending -> Dispatched -> Completed/Failed`). Attempting to complete a request multiple times yields `BlockError::DoubleCompletion`. Lost requests are detected via submission timestamps and timeout scans.
+
+3. **Page Cache Watermarks and Lost-Writeback Prevention**:
+   The buffer/page cache (`BlockCacheManager`) enforces eviction limits (`max_pages`). Dirty pages are synchronized prior to eviction to guarantee data durability. Watermarks (`Normal`, `HighPressure`, `OomCritical`) provide full observability into kernel storage memory usage.
+
+4. **Mount Lifecycle with Reference Tracking**:
+   Filesystem mounts (`MountManager`) track open references (`open_ref_count`). Active mounts cannot be unmounted (`MountError::ResourceBusy`). Unmounting an unmounted volume returns `MountError::DoubleUnmount`. Failed initialization triggers automatic transaction rollback.
+
+5. **Volume Capacity and Lost-Update Protection**:
+   `FilesystemCoreManager` limits byte and inode capacity per volume, returning `FsCoreError::CapacityExceeded` when full. Transactions verify sequence numbers upon commit to prevent lost updates (`FsCoreError::LostUpdateDetected`).
 
 ## Consequences
-- Secondary-memory subsystem state transitions are fully predictable, testable, and safe against memory corruption or unbounded growth.
-- System observability is enhanced through explicit error types (`BlockError`, `CacheError`, `FsCoreError`, `MountError`) and watermark metrics (`CacheOomMetrics`).
+- **Positive**: Eliminates storage leaks, lost updates, double completions, and unmount races. Provides diagnostic visibility into storage OOM and watermark states.
+- **Negative**: Requires explicit error handling across storage call sites and strict compliance with memory bounds.
