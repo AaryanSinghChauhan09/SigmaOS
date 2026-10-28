@@ -23,21 +23,59 @@ pub enum DesktopAppCategory {
     Other,
 }
 
+/// Zero-allocation case-insensitive substring search helper.
+/// Expects `needle_lower` to already be pre-lowercased for non-ASCII fallbacks.
+/// Uses `eq_ignore_ascii_case` on byte slice windows to enable fast SIMD-friendly
+/// comparisons without per-application dynamic memory allocations.
+#[inline]
+fn contains_ignore_case(haystack: &str, needle_lower: &str) -> bool {
+    if needle_lower.is_empty() {
+        return true;
+    }
+    if haystack.len() < needle_lower.len() {
+        return false;
+    }
+    if needle_lower.is_ascii() && haystack.is_ascii() {
+        let n_bytes = needle_lower.as_bytes();
+        haystack
+            .as_bytes()
+            .windows(n_bytes.len())
+            .any(|window| window.eq_ignore_ascii_case(n_bytes))
+    } else {
+        haystack.to_lowercase().contains(needle_lower)
+    }
+}
+
 impl DesktopAppCategory {
     pub fn from_str(s: &str) -> Option<Self> {
-        match s.to_lowercase().as_str() {
-            "accessories" => Some(DesktopAppCategory::Accessories),
-            "audiovideo" | "audio" | "video" => Some(DesktopAppCategory::AudioVideo),
-            "development" | "dev" => Some(DesktopAppCategory::Development),
-            "education" => Some(DesktopAppCategory::Education),
-            "games" => Some(DesktopAppCategory::Games),
-            "graphics" => Some(DesktopAppCategory::Graphics),
-            "internet" => Some(DesktopAppCategory::Internet),
-            "office" => Some(DesktopAppCategory::Office),
-            "science" => Some(DesktopAppCategory::Science),
-            "system" => Some(DesktopAppCategory::System),
-            "utility" => Some(DesktopAppCategory::Utility),
-            _ => Some(DesktopAppCategory::Other),
+        let trimmed = s.trim();
+        if trimmed.eq_ignore_ascii_case("accessories") {
+            Some(DesktopAppCategory::Accessories)
+        } else if trimmed.eq_ignore_ascii_case("audiovideo")
+            || trimmed.eq_ignore_ascii_case("audio")
+            || trimmed.eq_ignore_ascii_case("video")
+        {
+            Some(DesktopAppCategory::AudioVideo)
+        } else if trimmed.eq_ignore_ascii_case("development") || trimmed.eq_ignore_ascii_case("dev") {
+            Some(DesktopAppCategory::Development)
+        } else if trimmed.eq_ignore_ascii_case("education") {
+            Some(DesktopAppCategory::Education)
+        } else if trimmed.eq_ignore_ascii_case("games") {
+            Some(DesktopAppCategory::Games)
+        } else if trimmed.eq_ignore_ascii_case("graphics") {
+            Some(DesktopAppCategory::Graphics)
+        } else if trimmed.eq_ignore_ascii_case("internet") {
+            Some(DesktopAppCategory::Internet)
+        } else if trimmed.eq_ignore_ascii_case("office") {
+            Some(DesktopAppCategory::Office)
+        } else if trimmed.eq_ignore_ascii_case("science") {
+            Some(DesktopAppCategory::Science)
+        } else if trimmed.eq_ignore_ascii_case("system") {
+            Some(DesktopAppCategory::System)
+        } else if trimmed.eq_ignore_ascii_case("utility") {
+            Some(DesktopAppCategory::Utility)
+        } else {
+            Some(DesktopAppCategory::Other)
         }
     }
 
@@ -307,12 +345,15 @@ impl AppManager {
 
     /// Search applications
     pub fn search(&self, query: &str) -> Vec<&Application> {
+        if query.is_empty() {
+            return self.applications.values().collect();
+        }
         let query_lower = query.to_lowercase();
         self.applications
             .values()
             .filter(|app| {
-                app.name.to_lowercase().contains(&query_lower)
-                    || app.description.to_lowercase().contains(&query_lower)
+                contains_ignore_case(&app.name, &query_lower)
+                    || contains_ignore_case(&app.description, &query_lower)
             })
             .collect()
     }
