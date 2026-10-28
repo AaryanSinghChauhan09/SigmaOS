@@ -60,7 +60,7 @@ impl Clone for FirewallRule {
             port: self.port,
             from_address: self.from_address.clone(),
             to_address: self.to_address.clone(),
-            enabled: AtomicBool::new(self.enabled.load(core::sync::atomic::Ordering::Relaxed)),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
         }
     }
 }

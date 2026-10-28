@@ -43,7 +43,7 @@ impl Clone for CleanupOption {
             name: self.name.clone(),
             description: self.description.clone(),
             path: self.path.clone(),
-            enabled: AtomicBool::new(self.enabled.load(core::sync::atomic::Ordering::Relaxed)),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
         }
     }
 }
