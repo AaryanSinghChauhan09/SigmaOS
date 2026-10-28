@@ -3030,10 +3030,10 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v77_pr.rs" ]; then
     ./build/test_open_source_os_v77_pr
 fi
 
-if [ -f "tests/test_ipc_handler_plan.rs" ]; then
-    echo "Running SigmaOS IPC Handler Plan Verification test suite..."
+if [ -f "tests/test_omarchy_linux_v75_pr.rs" ]; then
+    echo "Running Omarchy Linux Missing Components Parity PR Gateway V75 test suite..."
     mkdir -p build
-    rustc --test tests/test_ipc_handler_plan.rs --edition=2021 -o build/test_ipc_plan
-    ./build/test_ipc_plan
+    rustc --test tests/test_omarchy_linux_v75_pr.rs --edition=2021 -o build/test_omarchy_v75_pr
+    ./build/test_omarchy_v75_pr
 fi
 echo "All SigmaOS test suites completed."

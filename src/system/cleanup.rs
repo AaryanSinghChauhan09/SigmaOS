@@ -48,6 +48,18 @@ impl Clone for CleanupOption {
     }
 }
 
+impl Clone for CleanupOption {
+    fn clone(&self) -> Self {
+        Self {
+            category: self.category,
+            name: self.name.clone(),
+            description: self.description.clone(),
+            path: self.path.clone(),
+            enabled: AtomicBool::new(self.enabled.load(Ordering::Relaxed)),
+        }
+    }
+}
+
 /// Cleanup statistics
 #[derive(Debug, Clone, Copy)]
 pub struct CleanupStats {
@@ -106,7 +118,7 @@ impl SystemCleanupManager {
             .iter_mut()
             .find(|o| o.name == name)
             .ok_or("Option not found")?;
-        option.enabled = true;
+        option.enabled.store(true, Ordering::Relaxed);
         Ok(())
     }
 
@@ -117,7 +129,7 @@ impl SystemCleanupManager {
             .iter_mut()
             .find(|o| o.name == name)
             .ok_or("Option not found")?;
-        option.enabled = false;
+        option.enabled.store(false, Ordering::Relaxed);
         Ok(())
     }
 
@@ -252,7 +264,7 @@ mod tests {
         );
 
         manager.disable_option("Test").unwrap();
-        assert!(!manager.options[0].enabled);
+        assert!(!manager.options[0].enabled.load(Ordering::Relaxed));
 
         manager.enable_option("Test").unwrap();
         assert!(manager.options[0].enabled);

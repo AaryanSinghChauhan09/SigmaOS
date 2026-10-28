@@ -1,90 +1,31 @@
-## Summary
-
-<!-- What memory-management behavior changed and why? -->
+# Pull Request: SigmaOS Feature Implementation & Distro Parity Update
 
 ## Component
+- **Component Name**:
+- **Subsystem**: `src/distro/` | `src/desktop/` | `src/kernel/` | `src/security/`
+- **Target OS / Inspiring Distro**: Omarchy Linux / Arch Linux / FreeBSD / OpenBSD
 
-- [ ] Memory policy
-- [ ] Physical memory manager
-- [ ] Buddy allocator
-- [ ] Slab allocator
-- [ ] Paging
-- [ ] Page tables
-- [ ] Virtual memory
-- [ ] Protection
-- [ ] Swap
-- [ ] Reclaim
-- [ ] OOM
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
-- [ ] Shell / CLI / UI
-- [ ] Documentation
-- [ ] CI / tooling
+## Rationale
+- **Issue / Gap Addressed**:
+- **Upstream Study / Reference study**:
 
-## Recurring task
+## Architecture & Technical Design
+- **Key Structs & Modules**:
+- **IPC / Protocol Details**:
+- **Config & State Persistence**:
 
-- [ ] PR validation
-- [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+## Safety and rollback
+- **Kernel safety review**:
+- **Fail-Closed Guarantees**:
+- **Rollback Procedure**:
 
-## Reference behavior
+## Verification & Testing
+- [ ] Unit tests pass via `rustc --test`
+- [ ] Integration test suite passes in `./run_sigma_tests.sh`
+- [ ] Deterministic config generation validated
+- [ ] Security privilege gates verified
 
-<!-- Required for lifecycle, ABI, or memory changes -->
-
-- POSIX section:
-- Linux/BSD/Redox/xv6 reference:
-- SigmaOS current behavior:
-- New behavior:
-- Compatibility impact:
-
-## Changes
-
--
--
-
-## Memory safety review
-
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-free prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
-
-## Kernel safety review
-
-- [ ] Safety constraints verified
-
-## Evidence
-
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or documented exemption
-- [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Memory benchmark, if performance-affecting
-- [ ] Security review requested, if applicable
-
-## Status updates
-
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Memory documentation
-- [ ] Boot matrix, if applicable
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
+## Reviewer Checklist
+- [ ] Code follows SigmaOS memory & performance guidelines (zero unnecessary allocations)
+- [ ] Proper error handling and fail-closed state recovery
+- [ ] Documentation updated in `docs/` and `wiki/`
