@@ -28,7 +28,11 @@ use std::string::{String, ToString};
 use crate::package::sovereign_distro_package_advancements_v78::PackageFormat;
 
 #[cfg(feature = "standalone_test")]
-use crate::package::sovereign_distro_package_advancements_v78::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+#[path = "universal.rs"]
+pub mod universal;
+
+#[cfg(feature = "standalone_test")]
+pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]

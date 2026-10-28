@@ -1,31 +1,85 @@
 # Pull Request: SigmaOS Feature Implementation & Distro Parity Update
 
-## Component
-- **Component Name**:
-- **Subsystem**: `src/distro/` | `src/desktop/` | `src/kernel/` | `src/security/`
-- **Target OS / Inspiring Distro**: Omarchy Linux / Arch Linux / FreeBSD / OpenBSD
+<!-- What scheduler behavior changed and why? -->
 
-## Rationale
-- **Issue / Gap Addressed**:
-- **Upstream Study / Reference study**:
+## Scheduler component
 
-## Architecture & Technical Design
-- **Key Structs & Modules**:
-- **IPC / Protocol Details**:
-- **Config & State Persistence**:
+- [ ] Scheduler core
+- [ ] Run queue / PID allocation
+- [ ] fork / clone
+- [ ] exec
+- [ ] Scheduler / run queue
+- [ ] Context switch
+- [ ] Signals
+- [ ] Wait / zombie / reaping
+- [ ] Process groups / sessions
+- [ ] Resource limits
+- [ ] Namespaces / isolation
+- [ ] procfs / diagnostics
+- [ ] Security / capabilities
+- [ ] Documentation
+- [ ] CI / tooling
 
-## Safety and rollback
-- **Kernel safety review**:
-- **Fail-Closed Guarantees**:
-- **Rollback Procedure**:
+## Recurring task
 
-## Verification & Testing
-- [ ] Unit tests pass via `rustc --test`
-- [ ] Integration test suite passes in `./run_sigma_tests.sh`
-- [ ] Deterministic config generation validated
-- [ ] Security privilege gates verified
+- [ ] PR validation
+- [ ] Daily CI triage
+- [ ] Weekly lifecycle review
+- [ ] Weekly Linux/BSD study
+- [ ] Biweekly scheduler audit
+- [ ] Biweekly signal/wait audit
+- [ ] Monthly boot validation
+- [ ] Quarterly architecture/security/release review
 
-## Reviewer Checklist
-- [ ] Code follows SigmaOS memory & performance guidelines (zero unnecessary allocations)
-- [ ] Proper error handling and fail-closed state recovery
-- [ ] Documentation updated in `docs/` and `wiki/`
+## Reference behavior
+
+<!-- Required for lifecycle, ABI, or scheduler changes -->
+
+- POSIX section:
+- Linux/BSD/Redox/xv6 reference:
+- SigmaOS current behavior:
+- New behavior:
+- Compatibility impact:
+
+## Changes
+
+-
+-
+
+## Scheduler safety review
+
+- [ ] Lifecycle transitions are valid
+- [ ] Zombies are eventually reaped
+- [ ] Orphans are adopted
+- [ ] PID reuse is safe
+- [ ] Lock ordering is documented
+- [ ] Interrupt-context safety considered
+- [ ] Signal races considered
+- [ ] Double-reap prevented
+- [ ] Resource limits enforced
+- [ ] No unbounded allocation or recursion
+
+## Evidence
+
+- [ ] `cargo check --lib`
+- [ ] `cargo fmt --check`
+- [ ] `cargo test --lib`
+- [ ] `./run_sigma_tests.sh`
+- [ ] New/updated unit tests
+- [ ] Integration tests
+- [ ] Fuzz target or documented exemption
+- [ ] Boot-to-shell evidence, if boot-affecting
+- [ ] Scheduler benchmark, if performance-affecting
+- [ ] Security review requested, if applicable
+
+## Status updates
+
+- [ ] `FEATURE_STATUS.toml`
+- [ ] `CAPABILITY_MATRIX.toml`
+- [ ] Process documentation
+- [ ] Boot matrix, if applicable
+
+## Risks and rollback
+
+- Risk:
+- Rollback:

@@ -1,23 +1,32 @@
-// Comprehensive Unit Tests for CPU Scheduler Status, Invariants, and Plan Verification
+// Comprehensive Unit Tests for CPU Scheduler Policies, Invariants, and Plan Verification
 
 #[test]
-fn test_scheduler_documentation_plan_verification() {
+fn test_scheduler_documentation_policy_verification() {
     use std::fs;
 
-    let invariants_doc = fs::read_to_string("docs/SCHEDULER_STATUS_AND_INVARIANTS.md")
-        .expect("docs/SCHEDULER_STATUS_AND_INVARIANTS.md must exist");
-    let dev_plan_doc = fs::read_to_string("docs/SCHEDULER_DEVELOPMENT_PLAN.md")
-        .expect("docs/SCHEDULER_DEVELOPMENT_PLAN.md must exist");
+    let sched_policy = fs::read_to_string("docs/process/SCHEDULER_POLICY.md")
+        .expect("docs/process/SCHEDULER_POLICY.md must exist");
+    let sched_adr = fs::read_to_string("docs/process/SCHEDULER_ADR.md")
+        .expect("docs/process/SCHEDULER_ADR.md must exist");
+    let rq_policy = fs::read_to_string("docs/process/RUN_QUEUE_POLICY.md")
+        .expect("docs/process/RUN_QUEUE_POLICY.md must exist");
+    let ctx_policy = fs::read_to_string("docs/process/CONTEXT_SWITCH_POLICY.md")
+        .expect("docs/process/CONTEXT_SWITCH_POLICY.md must exist");
+    let preempt_policy = fs::read_to_string("docs/process/PREEMPTION_POLICY.md")
+        .expect("docs/process/PREEMPTION_POLICY.md must exist");
+    let fairness_policy = fs::read_to_string("docs/process/FAIRNESS_POLICY.md")
+        .expect("docs/process/FAIRNESS_POLICY.md must exist");
+    let affinity_policy = fs::read_to_string("docs/process/CPU_AFFINITY_POLICY.md")
+        .expect("docs/process/CPU_AFFINITY_POLICY.md must exist");
 
-    assert!(invariants_doc.contains("SigmaOS CPU Scheduler Status, Architecture & Policy Invariants"));
-    assert!(invariants_doc.contains("Core Scheduling Rules & Invariants"));
-    assert!(invariants_doc.contains("Policy/Mechanism Separation"));
-    assert!(invariants_doc.contains("Explicit Task State Machine"));
-
-    assert!(dev_plan_doc.contains("SigmaOS CPU Scheduler Development Plan"));
-    assert!(dev_plan_doc.contains("18-PR Sequence Roadmap"));
-    assert!(dev_plan_doc.contains("Periodic Maintenance Cadences"));
-    assert!(dev_plan_doc.contains("Review and Merge Rules"));
+    assert!(sched_policy.contains("SigmaOS Scheduler Subsystem Policy"));
+    assert!(sched_policy.contains("Authoritative Lifecycle State Machine"));
+    assert!(sched_adr.contains("Architectural Decision Record: Scheduler Subsystem Lifecycle State Machine"));
+    assert!(rq_policy.contains("Run Queue Policy Specification"));
+    assert!(ctx_policy.contains("Context Switch Policy Specification"));
+    assert!(preempt_policy.contains("Preemption Policy Specification"));
+    assert!(fairness_policy.contains("Fairness and Starvation Prevention Policy"));
+    assert!(affinity_policy.contains("CPU Affinity Policy Specification"));
 }
 
 #[test]
@@ -26,32 +35,32 @@ fn test_scheduler_task_state_machine_invariants() {
     #[derive(Debug, PartialEq, Eq, Clone, Copy)]
     enum TaskState {
         New,
-        Runnable,
+        Ready,
         Running,
-        Blocked,
+        Sleeping,
         Stopped,
-        Exiting,
-        Idle,
+        Zombie,
+        Reaped,
     }
 
     struct Task {
-        id: u64,
+        pid: u64,
         state: TaskState,
         cpu_id: Option<u32>,
     }
 
     impl Task {
-        fn new(id: u64) -> Self {
+        fn new(pid: u64) -> Self {
             Self {
-                id,
+                pid,
                 state: TaskState::New,
                 cpu_id: None,
             }
         }
 
         fn enqueue(&mut self, cpu: u32) -> Result<(), &'static str> {
-            if self.state == TaskState::New || self.state == TaskState::Blocked || self.state == TaskState::Runnable {
-                self.state = TaskState::Runnable;
+            if self.state == TaskState::New || self.state == TaskState::Sleeping || self.state == TaskState::Stopped {
+                self.state = TaskState::Ready;
                 self.cpu_id = Some(cpu);
                 Ok(())
             } else {
@@ -60,21 +69,36 @@ fn test_scheduler_task_state_machine_invariants() {
         }
 
         fn select_to_run(&mut self) -> Result<(), &'static str> {
-            if self.state == TaskState::Runnable {
+            if self.state == TaskState::Ready {
                 self.state = TaskState::Running;
                 Ok(())
             } else {
-                Err("Task must be Runnable to be selected for Running")
+                Err("Task must be Ready to be selected for Running")
             }
         }
 
-        fn block(&mut self) -> Result<(), &'static str> {
+        fn sleep(&mut self) -> Result<(), &'static str> {
             if self.state == TaskState::Running {
-                self.state = TaskState::Blocked;
+                self.state = TaskState::Sleeping;
                 self.cpu_id = None;
                 Ok(())
             } else {
-                Err("Task must be Running to Block")
+                Err("Task must be Running to Sleep")
+            }
+        }
+
+        fn exit(&mut self) -> Result<(), &'static str> {
+            self.state = TaskState::Zombie;
+            self.cpu_id = None;
+            Ok(())
+        }
+
+        fn reap(&mut self) -> Result<(), &'static str> {
+            if self.state == TaskState::Zombie {
+                self.state = TaskState::Reaped;
+                Ok(())
+            } else {
+                Err("Task must be Zombie to be Reaped")
             }
         }
     }
@@ -83,14 +107,26 @@ fn test_scheduler_task_state_machine_invariants() {
     assert_eq!(task.state, TaskState::New);
 
     assert!(task.enqueue(0).is_ok());
-    assert_eq!(task.state, TaskState::Runnable);
+    assert_eq!(task.state, TaskState::Ready);
 
     assert!(task.select_to_run().is_ok());
     assert_eq!(task.state, TaskState::Running);
 
-    assert!(task.block().is_ok());
-    assert_eq!(task.state, TaskState::Blocked);
+    assert!(task.sleep().is_ok());
+    assert_eq!(task.state, TaskState::Sleeping);
 
-    // Cannot run directly from Blocked
+    // Cannot run directly from Sleeping
     assert!(task.select_to_run().is_err());
+
+    assert!(task.enqueue(0).is_ok());
+    assert_eq!(task.state, TaskState::Ready);
+
+    assert!(task.select_to_run().is_ok());
+    assert_eq!(task.state, TaskState::Running);
+
+    assert!(task.exit().is_ok());
+    assert_eq!(task.state, TaskState::Zombie);
+
+    assert!(task.reap().is_ok());
+    assert_eq!(task.state, TaskState::Reaped);
 }
