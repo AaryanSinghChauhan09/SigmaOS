@@ -2659,6 +2659,7 @@ if [ -f "tests/memory/physical.rs" ]; then
     echo "Running Main Memory Subsystem test suites..."
     mkdir -p build
     [ -f "tests/memory/physical.rs" ] && rustc --test tests/memory/physical.rs --edition=2021 -o build/test_mem_physical && ./build/test_mem_physical
+    [ -f "tests/memory/test_physical_memory_manager_plan.rs" ] && rustc --test tests/memory/test_physical_memory_manager_plan.rs --edition=2021 -o build/test_pmm_plan && ./build/test_pmm_plan
     [ -f "tests/mm/paging.rs" ] && rustc --test tests/mm/paging.rs --edition=2021 -o build/test_mm_paging && ./build/test_mm_paging
     [ -f "tests/mm/virtual.rs" ] && rustc --test tests/mm/virtual.rs --edition=2021 -o build/test_mm_virtual && ./build/test_mm_virtual
     [ -f "tests/swap/core.rs" ] && rustc --test tests/swap/core.rs --edition=2021 -o build/test_swap_core && ./build/test_swap_core
