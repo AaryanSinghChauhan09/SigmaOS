@@ -586,17 +586,15 @@ pub use security::{
 };
 pub use shell::sovereign_command_interpreter::*;
 pub use shell::{
-    ContextualCompleter, CronAnacronTimersAtAdvancementsV77Engine, HistoryExpansionEngine,
-    InitSupervisorsAndTimersPrEngine, JobControlManager, OpenRcAdvancementsV77Engine,
-    ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
-    PosixAndAdvancedShellsV77Engine, RunitS6AdvancementsV77Engine, ShellCommand,
-    ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile, ShellStatistics,
-    ShellSyntaxHighlighter, ShellType, ShellsTerminalsSupervisorsPrProposalManifest,
-    SimpleShellSession as ShellRepl, SovereignShellsTerminalsSupervisorsParityPrGateway,
-    SovereignShellsTerminalsSupervisorsV77PrProposalManifest,
-    SovereignShellsTerminalsSupervisorsV77PrSuite, SysVinitBsdRcLaunchdAdvancementsV77Engine,
-    SystemdAdvancementsV77Engine, TerminalMultiplexersAndEmulatorsPrEngine,
-    TerminalMultiplexersAndEmulatorsV77Engine, ZshPromptFormatter,
+    ContextualCompleter, HistoryExpansionEngine, InitSupervisorsAndTimersPrEngine,
+    JobControlManager, ParameterExpansionEngine, PipelineExecutor, PosixAndAdvancedShellsPrEngine,
+    ShellCommand, ShellManager as ShellProfileManager, ShellPledgeUnveilGuard, ShellProfile,
+    ShellStatistics, ShellSyntaxHighlighter, ShellType,
+    ShellsTerminalsSupervisorsPrProposalManifest, SimpleShellSession as ShellRepl,
+    SovereignShellsTerminalsSupervisorsParityPrGateway,
+    SovereignShellsTerminalsSupervisorsParityV78Gateway,
+    SovereignShellsTerminalsSupervisorsV78PrSuite,
+    TerminalMultiplexersAndEmulatorsPrEngine, ZshPromptFormatter,
 };
 pub use sigpkg::{
     AdapterError, BuildSystem, ContentAddressedStore, CryptoVerifier, DebAdapter,
