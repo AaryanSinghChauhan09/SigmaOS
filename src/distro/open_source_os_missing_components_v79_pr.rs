@@ -5,7 +5,7 @@
 // Synthesizes missing, visionary, and unimplemented ideas across Linux 6.33+ BPF SchedExt,
 // FreeBSD 16.3+ OpenZFS ARC & Capsicum, OpenBSD 9.2+ Pinsyscall FineIBT, DragonFly BSD 8.1+ HAMMER3,
 // NetBSD 12.8 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// Global Tech Media 34 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
+// Global Tech Media 35 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
 // Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines across all 44 core subsystems.
 
 #![allow(non_camel_case_types)]
@@ -149,9 +149,9 @@ impl Linux633SchedExtAiPredictivePowerGovernorEngineV79 {
         }
         let avg_load: f64 = workload_history.iter().sum::<f64>() / workload_history.len() as f64;
         if avg_load > 0.8 {
-            5000
+            4800
         } else if avg_load > 0.4 {
-            3800
+            3600
         } else {
             1800
         }
@@ -614,19 +614,19 @@ impl Default for OmarchyWallustThemeChordNavigatorEngineV79 {
 }
 
 // ============================================================================
-// 12. Global Tech Media 34 Portals Unimplemented Ideas Engine V79
+// 12. Global Tech Media 35 Portals Unimplemented Ideas Engine V79
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct GlobalTechMedia34PortalUnimplementedIdeasEngineV79 {
+pub struct GlobalTechMedia35PortalUnimplementedIdeasEngineV79 {
     pub active_portals_count: u32,
     pub crawled_ideas_count: u32,
 }
 
-impl GlobalTechMedia34PortalUnimplementedIdeasEngineV79 {
+impl GlobalTechMedia35PortalUnimplementedIdeasEngineV79 {
     pub fn new() -> Self {
         Self {
-            active_portals_count: 34,
+            active_portals_count: 35,
             crawled_ideas_count: 1024,
         }
     }
@@ -643,20 +643,20 @@ impl GlobalTechMedia34PortalUnimplementedIdeasEngineV79 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV79 {
         OpenSourceOsPrProposalV79 {
             pr_id: "PR-SIGMA-V79-11-MEDIA".to_string(),
-            title: "feat(media): Global Tech Media 34 Portals Unimplemented Ideas Synthesizer V79".to_string(),
+            title: "feat(media): Global Tech Media 35 Portals Unimplemented Ideas Synthesizer V79".to_string(),
             component_name: "sigmaos-global-tech-media-v79".to_string(),
-            os_origin: "34 Global Tech Media Portals".to_string(),
+            os_origin: "35 Global Tech Media Portals".to_string(),
             status: OsPrStatusV79::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::AiWorkflowAgent.as_str().to_string(),
                 UniversalSubsystemCategory::ObservabilityDiagnostics.as_str().to_string(),
             ],
-            patch_diff: "diff --git a/sys/media/tech_media_34_v79.rs b/sys/media/tech_media_34_v79.rs".to_string(),
+            patch_diff: "diff --git a/sys/media/tech_media_35_v79.rs b/sys/media/tech_media_35_v79.rs".to_string(),
         }
     }
 }
 
-impl Default for GlobalTechMedia34PortalUnimplementedIdeasEngineV79 {
+impl Default for GlobalTechMedia35PortalUnimplementedIdeasEngineV79 {
     fn default() -> Self {
         Self::new()
     }
@@ -755,7 +755,7 @@ pub struct SovereignOpenSourceOsMissingComponentsV79PrSuite {
     pub nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV79,
     pub illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV79,
     pub omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV79,
-    pub tech_media: GlobalTechMedia34PortalUnimplementedIdeasEngineV79,
+    pub tech_media: GlobalTechMedia35PortalUnimplementedIdeasEngineV79,
     pub universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV79,
 }
 
@@ -773,7 +773,7 @@ impl SovereignOpenSourceOsMissingComponentsV79PrSuite {
             nix_guix_cas: NixGuixHermeticCasMerkleClosureEngineV79::new(),
             illumos_crossbow: IllumosCrossbowVnicDtraceSwitchMeshEngineV79::new(),
             omarchy_theme: OmarchyWallustThemeChordNavigatorEngineV79::new(),
-            tech_media: GlobalTechMedia34PortalUnimplementedIdeasEngineV79::new(),
+            tech_media: GlobalTechMedia35PortalUnimplementedIdeasEngineV79::new(),
             universal_adapter: UniversalSubsystemCrossDistroAdapterEngineV79::new(),
         }
     }
@@ -835,7 +835,7 @@ mod tests {
         assert!(report.contains("Feature Parity Matrix V79"));
 
         let sched = Linux633SchedExtAiPredictivePowerGovernorEngineV79::new();
-        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 5000);
+        assert_eq!(sched.predict_optimal_cpu_frequency(&[0.9, 0.95]), 4800);
 
         let freebsd = FreeBsd163CapsicumCasperNetlinkMeshVnetEngineV79::new();
         assert!(freebsd.verify_jail_vnet_isolation(10));
@@ -866,9 +866,9 @@ mod tests {
         assert!(omarchy.reload_theme("Dark-V79"));
         assert_eq!(omarchy.active_theme, "Dark-V79");
 
-        let media = GlobalTechMedia34PortalUnimplementedIdeasEngineV79::new();
+        let media = GlobalTechMedia35PortalUnimplementedIdeasEngineV79::new();
         let page = media.generate_wiki_documentation_page("V79 Test");
-        assert!(page.contains("34 Tech Media Portals"));
+        assert!(page.contains("35 Tech Media Portals"));
 
         let adapter = UniversalSubsystemCrossDistroAdapterEngineV79::new();
         assert!(adapter.adapt_subsystem(UniversalSubsystemCategory::KernelScheduling));
