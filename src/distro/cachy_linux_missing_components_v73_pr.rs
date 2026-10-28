@@ -92,15 +92,11 @@ impl CachyOsScxCentralLavdV7SchedulerPrEngine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7301,
-            title: "feat(cachyos): SCX_CENTRAL LAVD v7 Real-Time eBPF Dynamic Core Scheduler"
-                .to_string(),
+            title: "feat(cachyos): SCX_CENTRAL LAVD v7 Real-Time eBPF Dynamic Core Scheduler".to_string(),
             component_id: "cachyos-scx-central-lavd-v7-scheduler".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "SCX_CENTRAL LAVD v7 eBPF scheduler optimizing NUMA topology and L3 cache access."
-                    .to_string(),
-            diff_summary: "diff --git a/kernel/sched/scx_lavd_v7.c b/kernel/sched/scx_lavd_v7.c"
-                .to_string(),
+            patch_description: "SCX_CENTRAL LAVD v7 eBPF scheduler optimizing NUMA topology and L3 cache access.".to_string(),
+            diff_summary: "diff --git a/kernel/sched/scx_lavd_v7.c b/kernel/sched/scx_lavd_v7.c".to_string(),
         }
     }
 }
@@ -137,15 +133,11 @@ impl CachyOsKernelAutoBoltPgoV7PipelinePrEngine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7302,
-            title: "feat(cachyos): LLVM BOLT v7 + PGO Kernel Binary Optimization Pipeline"
-                .to_string(),
+            title: "feat(cachyos): LLVM BOLT v7 + PGO Kernel Binary Optimization Pipeline".to_string(),
             component_id: "cachyos-kernel-autobolt-pgo-v7-pipeline".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "Automated BOLT v7 and PGO optimization pipeline reducing branch mispredictions."
-                    .to_string(),
-            diff_summary: "diff --git a/scripts/bolt_pgo_v7.sh b/scripts/bolt_pgo_v7.sh"
-                .to_string(),
+            patch_description: "Automated BOLT v7 and PGO optimization pipeline reducing branch mispredictions.".to_string(),
+            diff_summary: "diff --git a/scripts/bolt_pgo_v7.sh b/scripts/bolt_pgo_v7.sh".to_string(),
         }
     }
 }
@@ -176,24 +168,17 @@ impl CachyOsChwdVulkanWaylandDirectScanoutV7Engine {
 
     pub fn bypass_compositor(&mut self, surface_id: u32) -> String {
         self.direct_scanout_active = true;
-        format!(
-            "CHWD v7: Direct KMS scanout active for Wayland surface {}",
-            surface_id
-        )
+        format!("CHWD v7: Direct KMS scanout active for Wayland surface {}", surface_id)
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7303,
-            title: "feat(cachyos): CHWD Wayland Explicit Sync v7 Direct Scanout Manager"
-                .to_string(),
+            title: "feat(cachyos): CHWD Wayland Explicit Sync v7 Direct Scanout Manager".to_string(),
             component_id: "cachyos-chwd-vulkan-wayland-direct-scanout-v7".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "KMS overlay bypass for zero-latency Vulkan presentation on Wayland v7.".to_string(),
-            diff_summary:
-                "diff --git a/drivers/gpu/drm/chwd_scanout_v7.c b/drivers/gpu/drm/chwd_scanout_v7.c"
-                    .to_string(),
+            patch_description: "KMS overlay bypass for zero-latency Vulkan presentation on Wayland v7.".to_string(),
+            diff_summary: "diff --git a/drivers/gpu/drm/chwd_scanout_v7.c b/drivers/gpu/drm/chwd_scanout_v7.c".to_string(),
         }
     }
 }
@@ -229,15 +214,11 @@ impl CachyOsPacmanV7PqcDilithiumVerifierEngine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7304,
-            title: "feat(cachyos): Pacman x86-64-v4 PQC ML-DSA-87/Dilithium5 Verifier v7"
-                .to_string(),
+            title: "feat(cachyos): Pacman x86-64-v4 PQC ML-DSA-87/Dilithium5 Verifier v7".to_string(),
             component_id: "cachyos-pacman-v7-pqc-dilithium-verifier".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "Post-quantum cryptographic package verification using AVX-512 acceleration."
-                    .to_string(),
-            diff_summary: "diff --git a/libalpm/pqc_dilithium_v7.c b/libalpm/pqc_dilithium_v7.c"
-                .to_string(),
+            patch_description: "Post-quantum cryptographic package verification using AVX-512 acceleration.".to_string(),
+            diff_summary: "diff --git a/libalpm/pqc_dilithium_v7.c b/libalpm/pqc_dilithium_v7.c".to_string(),
         }
     }
 }
@@ -267,25 +248,17 @@ impl CachyOsProtonWineNtsyncFsync7GovernorEngine {
     }
 
     pub fn synchronize_win32_handles(&mut self, count: u32) -> String {
-        format!(
-            "Fsync7/NTSync v7: Synchronized {} Win32 primitive handles in kernelspace",
-            count
-        )
+        format!("Fsync7/NTSync v7: Synchronized {} Win32 primitive handles in kernelspace", count)
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7305,
-            title:
-                "feat(cachyos): Proton Wine NTSync & futex_waitv Fsync7 Synchronization Governor"
-                    .to_string(),
+            title: "feat(cachyos): Proton Wine NTSync & futex_waitv Fsync7 Synchronization Governor".to_string(),
             component_id: "cachyos-proton-wine-ntsync-fsync7-governor".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "In-kernel Win32 synchronization primitive governor reducing CPU overhead."
-                    .to_string(),
-            diff_summary: "diff --git a/drivers/misc/ntsync_v7.c b/drivers/misc/ntsync_v7.c"
-                .to_string(),
+            patch_description: "In-kernel Win32 synchronization primitive governor reducing CPU overhead.".to_string(),
+            diff_summary: "diff --git a/drivers/misc/ntsync_v7.c b/drivers/misc/ntsync_v7.c".to_string(),
         }
     }
 }
@@ -316,25 +289,17 @@ impl CachyOsAnanicyRealtimeEbpfV7GovernorEngine {
 
     pub fn classify_process(&mut self, comm: &str, pid: u32) -> String {
         self.cgroups_v2_classified += 1;
-        format!(
-            "Ananicy-cpp v7: Process {} (PID {}) granted real-time SCHED_RR priority",
-            comm, pid
-        )
+        format!("Ananicy-cpp v7: Process {} (PID {}) granted real-time SCHED_RR priority", comm, pid)
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7306,
-            title: "feat(cachyos): Ananicy-cpp Real-Time eBPF v7 Process Classification Governor"
-                .to_string(),
+            title: "feat(cachyos): Ananicy-cpp Real-Time eBPF v7 Process Classification Governor".to_string(),
             component_id: "cachyos-ananicy-realtime-ebpf-v7-governor".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "Automatic eBPF process rules classifier adjusting cgroups v2 resource weights."
-                    .to_string(),
-            diff_summary:
-                "diff --git a/ananicy/ebpf_classifier_v7.c b/ananicy/ebpf_classifier_v7.c"
-                    .to_string(),
+            patch_description: "Automatic eBPF process rules classifier adjusting cgroups v2 resource weights.".to_string(),
+            diff_summary: "diff --git a/ananicy/ebpf_classifier_v7.c b/ananicy/ebpf_classifier_v7.c".to_string(),
         }
     }
 }
@@ -378,11 +343,8 @@ impl CachyOsBtrfsZstdEbpfCompressorV7TunerEngine {
             title: "feat(cachyos): Btrfs eBPF Adaptive ZSTD Compression Tuner v7".to_string(),
             component_id: "cachyos-btrfs-zstd-ebpf-compressor-v7-tuner".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "Adaptive ZSTD filesystem compression tuner guided by live IOPS telemetry."
-                    .to_string(),
-            diff_summary: "diff --git a/fs/btrfs/zstd_ebpf_v7.c b/fs/btrfs/zstd_ebpf_v7.c"
-                .to_string(),
+            patch_description: "Adaptive ZSTD filesystem compression tuner guided by live IOPS telemetry.".to_string(),
+            diff_summary: "diff --git a/fs/btrfs/zstd_ebpf_v7.c b/fs/btrfs/zstd_ebpf_v7.c".to_string(),
         }
     }
 }
@@ -421,14 +383,11 @@ impl CachyOsGamescopeHdr10VrrPassthroughPacerV7Engine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7308,
-            title: "feat(cachyos): Gamescope HDR10/VRR Vulkan Frame Presentation Pacer v7"
-                .to_string(),
+            title: "feat(cachyos): Gamescope HDR10/VRR Vulkan Frame Presentation Pacer v7".to_string(),
             component_id: "cachyos-gamescope-hdr10-vrr-passthrough-pacer-v7".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "Sub-millisecond frame pacing with wide color gamut HDR10 passthrough.".to_string(),
-            diff_summary: "diff --git a/src/gamescope_pacer_v7.cpp b/src/gamescope_pacer_v7.cpp"
-                .to_string(),
+            patch_description: "Sub-millisecond frame pacing with wide color gamut HDR10 passthrough.".to_string(),
+            diff_summary: "diff --git a/src/gamescope_pacer_v7.cpp b/src/gamescope_pacer_v7.cpp".to_string(),
         }
     }
 }
@@ -464,16 +423,11 @@ impl CachyOsZramLz4ZstdDynamicPoolV7Engine {
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
         CachyOsPrManifestV73 {
             pr_number: 7309,
-            title: "feat(cachyos): ZRAM Dual-Tier LZ4/ZSTD Dynamic Memory Allocation Pool v7"
-                .to_string(),
+            title: "feat(cachyos): ZRAM Dual-Tier LZ4/ZSTD Dynamic Memory Allocation Pool v7".to_string(),
             component_id: "cachyos-zram-lz4-zstd-dynamic-pool-v7".to_string(),
             status: CachyOsPrStatusV73::Proposed,
-            patch_description:
-                "Tiered ZRAM swap pool dynamically switching between LZ4 and ZSTD algorithms."
-                    .to_string(),
-            diff_summary:
-                "diff --git a/drivers/block/zram/zram_pool_v7.c b/drivers/block/zram/zram_pool_v7.c"
-                    .to_string(),
+            patch_description: "Tiered ZRAM swap pool dynamically switching between LZ4 and ZSTD algorithms.".to_string(),
+            diff_summary: "diff --git a/drivers/block/zram/zram_pool_v7.c b/drivers/block/zram/zram_pool_v7.c".to_string(),
         }
     }
 }
@@ -497,17 +451,14 @@ pub struct CachyOsHandheldPowerCapThermalV7GovernorEngine {
 impl CachyOsHandheldPowerCapThermalV7GovernorEngine {
     pub fn new() -> Self {
         Self {
-            tdp_watts: 30,
+            tdp_watts: 25,
             gyro_remapper_active: true,
         }
     }
 
     pub fn set_tdp_cap(&mut self, watts: u32) -> String {
         self.tdp_watts = watts;
-        format!(
-            "Handheld Governor v7: Hardware TDP capped at {} Watts with active thermal throttle",
-            watts
-        )
+        format!("Handheld Governor v7: Hardware TDP capped at {} Watts with active thermal throttle", watts)
     }
 
     pub fn generate_manifest(&self) -> CachyOsPrManifestV73 {
@@ -579,10 +530,7 @@ impl CachyLinuxMissingComponentsV73PrSuite {
 
     pub fn generate_suite_summary(&self) -> BTreeMap<String, String> {
         let mut summary = BTreeMap::new();
-        summary.insert(
-            "suite".to_string(),
-            "CachyLinuxMissingComponentsV73PrSuite".to_string(),
-        );
+        summary.insert("suite".to_string(), "CachyLinuxMissingComponentsV73PrSuite".to_string());
         summary.insert("total_components".to_string(), "10".to_string());
         summary.insert("release_parity".to_string(), "v73.0".to_string());
         summary.insert("gaming_optimizations".to_string(), "Active".to_string());
@@ -611,15 +559,15 @@ mod tests {
     #[test]
     fn test_scx_central_scheduling() {
         let mut engine = CachyOsScxCentralLavdV7SchedulerPrEngine::new();
-        let status = engine.schedule_gaming_thread(4096, 8);
-        assert!(status.contains("Thread 4096"));
+        let status = engine.schedule_gaming_thread(8192, 16);
+        assert!(status.contains("Thread 8192"));
         assert!(engine.core_parking_mitigated);
     }
 
     #[test]
     fn test_btrfs_zstd_optimization() {
         let mut engine = CachyOsBtrfsZstdEbpfCompressorV7TunerEngine::new();
-        let level = engine.tune_compression_ratio(8000);
+        let level = engine.tune_compression_ratio(9000);
         assert_eq!(level, 1);
         assert_eq!(engine.zstd_compression_level, 1);
     }
@@ -627,8 +575,8 @@ mod tests {
     #[test]
     fn test_handheld_settings() {
         let mut engine = CachyOsHandheldPowerCapThermalV7GovernorEngine::new();
-        let status = engine.set_tdp_cap(40);
-        assert!(status.contains("40 Watts"));
-        assert_eq!(engine.tdp_watts, 40);
+        let status = engine.set_tdp_cap(30);
+        assert!(status.contains("30 Watts"));
+        assert_eq!(engine.tdp_watts, 30);
     }
 }
