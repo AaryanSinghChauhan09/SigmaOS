@@ -1,21 +1,22 @@
-# SigmaOS Hardware Support Evidence Matrix
+# SigmaOS Hardware Support & Driver Evidence Ledger
 
-## Overview
-This matrix distinguishes driver implementation status from verified hardware support claims, citing test evidence for each driver class.
+> **Notice:** A driver implementation or module name in the source tree does NOT imply verified hardware support. Hardware support claims require documented emulator or physical hardware test evidence.
 
----
+## Driver Evidence Matrix
 
-## Hardware Matrix
+| Driver Class | Driver Module / Controller | Implementation Status | Evidence / Test Target | Known Limitations & Scope |
+|---|---|---|---|---|
+| Serial | 16550 UART / COM1 | Implemented | `scripts/ci/qemu_boot_smoke.sh` | I/O port 0x3F8 baud 115200 only |
+| RTC | CMOS RTC / MC146818 | Implemented | Unit tests (`tests/hardware/driver_evidence_test.rs`) | BCD mode handling, no lockless sync |
+| Display | VBE 3.0 / Framebuffer | Implemented | Unit tests (`src/drivers/phase7_hardware_expansion.rs`) | Fixed resolution modes, no acceleration |
+| Input | PS/2 Keyboard & Mouse | Implemented | Unit tests | Standard scancode set 2 only |
+| Storage | VirtIO-Block / NVMe 2.0 | Implemented | `tests/storage/block.rs` | VirtIO mmio/pci rings supported |
+| USB | xHCI 3.2 SuperSpeed+ | Implemented | `src/drivers/phase7_hardware_expansion.rs` | Root hub enumeration verified in tests |
+| Network | VirtIO-Net / mac80211 | Implemented | `tests/network_interface_tests.rs` | Ring buffer packet rx/tx |
+| Audio | Intel HD Audio | Partial / Model | Model unit tests | Unverified physical audio output |
 
-| Driver class | Implementation Status | Evidence / Test Link | Known Limitations |
-|---|---|---|---|
-| **Serial / UART** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | 16550A FIFO 16-byte buffer max |
-| **RTC / Clock** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | CMOS century byte variation |
-| **Display / VBE** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | Framebuffer double-buffering required |
-| **Input / PS2** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | Dual-channel multiplexing only |
-| **Storage / VirtIO-Block** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | VirtQueue queue depth limit 256 |
-| **Storage / NVMe** | Implemented & Verified | `src/drivers/phase7_hardware_expansion.rs` | ZNS namespace size limit |
-| **USB / xHCI** | Implemented & Verified | `src/drivers/phase7_hardware_expansion.rs` | USB 3.2 SuperSpeed+ mode only |
-| **Network / VirtIO-Net** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | TAP device bridging required |
-| **Network / Wi-Fi 7 MLO** | Implemented & Verified | `src/drivers/phase7_hardware_expansion.rs` | `mac80211` firmware blob required |
-| **Audio / Intel HDA** | Implemented & Verified | `tests/hardware/driver_evidence_test.rs` | PCM 16-bit 44.1kHz stereo default |
+## Evidence Standards
+
+- **Implemented:** Code compiles in `#![no_std]` or `std` context and passes logic unit tests.
+- **Verified:** Tested in QEMU or physical hardware with a saved execution log or CI test run.
+- **Untested:** Driver code exists, but no execution log or hardware test evidence is attached.

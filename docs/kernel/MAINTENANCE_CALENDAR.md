@@ -1,13 +1,14 @@
-# SigmaOS Kernel Maintenance Calendar and Development Plan
+# SigmaOS Kernel Maintenance Calendar
 
-## Overview
-This document defines the formal recurring task calendar, subsystem review rotation, reference-project study framework, biweekly/monthly/quarterly audit cycles, and the first 12 PR roadmap for the **SigmaOS Kernel Lifecycle Program**.
+This document establishes the recurring kernel development, validation, hardening, and maintenance task cadences for SigmaOS.
 
----
+## Kernel Maintenance Objective
 
-## Recurring Task Calendar
+> **Maintain SigmaOS as a bootable, testable, secure, recoverable kernel codebase—not as a collection of independently passing subsystem models.**
 
-| Frequency | Kernel task | Primary output | Required PR |
+## Recurring Task Schedule
+
+| Frequency | Kernel Task | Primary Output | Required PR |
 |---|---|---|---|
 | Every PR | Build, lint, unit, and standalone test gate | CI result | `fix`, `feat`, `test`, or `chore` PR |
 | Daily | CI and nightly failure triage | Root-cause issue or fix | `fix(ci)` / `fix(kernel)` PR |
@@ -24,36 +25,15 @@ This document defines the formal recurring task calendar, subsystem review rotat
 | Quarterly | Security architecture review | Threat model update | `security(...)` PR |
 | Semiannual | Kernel code-health and dependency audit | Tech-debt backlog | `chore(kernel)` PR |
 
----
+## Weekly Kernel Subsystem Rotation Schedule
 
-## Weekly Subsystem Review Rotation (8 Weeks)
-
-| Week | Area | Review questions |
+| Week | Area | Review Scope & Focus |
 |---|---|---|
-| 1 | Boot, interrupts, traps | Does early boot reach the kernel? Are interrupt paths safe and testable? |
-| 2 | Memory: paging, allocators, swap | Are allocation limits, OOM behavior, and page-table invariants defined? |
-| 3 | Scheduler and processes | Are fairness, priorities, context switches, and process lifecycle tested? |
-| 4 | VFS and filesystems | Are path validation, permissions, mounts, and crash behavior tested? |
-| 5 | Syscalls and ELF | Are argument validation, error codes, and loader boundaries tested? |
-| 6 | Drivers and devices | Is each driver probe/remove-safe, interrupt-safe, and evidence-backed? |
-| 7 | Networking and sockets | Are packet parsing, socket lifecycle, and resource limits tested? |
-| 8 | IPC, signals, timers | Are races, cleanup, masking, and timeout semantics tested? |
-
----
-
-## First 12 Kernel PR Roadmap
-
-| # | PR | Purpose | Status |
-|---:|---|---|---|
-| 1 | `docs(kernel): add kernel maintenance calendar` | Establish recurring kernel work | Completed |
-| 2 | `docs(kernel): add integration contracts and dependency map` | Make subsystem boundaries explicit | Completed |
-| 3 | `feat(boot): add QEMU boot-to-shell smoke test` | Create the first runtime gate | Completed |
-| 4 | `docs(platform): add boot matrix and failure policy` | Track boot evidence | Completed |
-| 5 | `feat(syscalls): add syscall contract and validation tests` | Stabilize syscall boundary | Completed |
-| 6 | `test(memory): add allocator OOM and leak stress tests` | Harden memory management | Completed |
-| 7 | `feat(diagnostics): add structured boot and panic reports` | Make failures actionable | Completed |
-| 8 | `docs(drivers): add evidence-based hardware matrix` | Prevent unverified driver claims | Completed |
-| 9 | `feat(security): add kernel threat model and capability policy` | Establish security baseline | Completed |
-| 10 | `test(fuzz): add syscall and ELF fuzz targets` | Protect external-input paths | Completed |
-| 11 | `feat(installer): add recovery-path rehearsal` | Validate install/update recoverability | Completed |
-| 12 | `docs(release): add kernel release gates and checklist` | Prevent premature release claims | Completed |
+| 1 | Boot, interrupts, traps | Firmware-to-kernel handoff, GDT/IDT setups, interrupt latency & safety |
+| 2 | Memory: paging, allocators, swap | Frame allocator limits, 4-level page tables, swap slot bounds, OOM recovery |
+| 3 | Scheduler and processes | Bounded run queues, priority levels, context switches, POSIX lifecycle |
+| 4 | VFS and filesystems | Path resolution, permission checks, mount hierarchy, crash consistency |
+| 5 | Syscalls and ELF | Argument bounds validation, copy-in/copy-out safety, ELF header checks |
+| 6 | Drivers and devices | Probing, IRQ handlers, DMA safety, emulator/hardware evidence |
+| 7 | Networking and sockets | Packet buffer limits, TCP state machine, socket locks, resource bounds |
+| 8 | IPC, signals, timers | Queue capacity, signal masking, timer handler race safety, cleanup |

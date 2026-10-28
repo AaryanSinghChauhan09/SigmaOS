@@ -1,66 +1,52 @@
-# SigmaOS Kernel Subsystem Dependency Map
-
-## Overview
-This document models the explicit dependency graph across SigmaOS kernel subsystems, preventing cyclic initialization dependencies and defining boot-time load order.
-
----
-
-## Subsystem Dependency Map
+# SigmaOS Kernel Subsystem Dependency Graph
 
 ```text
-+-----------------------+
-|  Firmware / Bootloader |
-+-----------+-----------+
-            |
-            v
-+-----------+-----------+
-| Physical Memory Mgr   |
-+-----------+-----------+
-            |
-            v
-+-----------+-----------+
-| Paging & Page Tables  |
-+-----------+-----------+
-            |
-            v
-+-----------+-----------+
-| Virtual Memory Manager|
-+-----------+-----------+
-            |
-            +-----------------------+
-            |                       |
-            v                       v
-+-----------+-----------+   +-------+---------------+
-| Interrupts & Timers   |   | Block Storage Devices |
-+-----------+-----------+   +-------+---------------+
-            |                       |
-            v                       v
-+-----------+-----------+   +-------+---------------+
-| Process & Scheduler   |   | Swap Subsystem        |
-+-----------+-----------+   +-----------------------+
-            |
-            v
-+-----------+-----------+
-| VFS & Mount Manager   |
-+-----------+-----------+
-            |
-            v
-+-----------+-----------+
-| Syscall Dispatcher    |
-+-----------+-----------+
-            |
-            v
-+-----------+-----------+
-| Userspace Init / Shell|
-+-----------------------+
+                        +----------------------+
+                        |       Firmware       |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |      Bootloader      |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |  Physical Allocator  |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |  Paging / VM Manager |
+                        +----------+-----------+
+                                   |
+                 +-----------------+-----------------+
+                 |                                   |
+                 v                                   v
+    +-------------------------+         +-------------------------+
+    |  Interrupt Controller   |         |   Block Device Manager  |
+    +------------+------------+         +------------+------------+
+                 |                                   |
+                 v                                   v
+    +-------------------------+         +-------------------------+
+    | Scheduler & Run Queue   |         | VFS & Mount Hierarchy   |
+    +------------+------------+         +------------+------------+
+                 |                                   |
+                 +-----------------+-----------------+
+                                   |
+                                   v
+                        +----------------------+
+                        |  Syscall Dispatcher  |
+                        +----------+-----------+
+                                   |
+                                   v
+                        +----------------------+
+                        |   Userspace / Shell  |
+                        +----------------------+
 ```
 
----
+## Dependency Rules
 
-## Initialization Order Verification Rules
-
-1. Memory Subsystems must complete before interrupt handlers register dynamic buffers.
-2. Timers must initialize before `scheduler_init`.
-3. Block Storage devices must probe before VFS mounts root filesystem or swap initializes.
-4. VFS must initialize before Syscall Dispatch accepts userland file i/o requests.
-5. Userspace Init / Shell is launched as PID 1 after all boot-critical subsystems report ready.
+1. Subsystems lower in the dependency graph must not invoke public APIs of subsystems above them (strict acyclic dependency hierarchy).
+2. Memory managers must initialize before any heap allocation or device probing occurs.
+3. Interrupt safety must be established before scheduler preemption is enabled.

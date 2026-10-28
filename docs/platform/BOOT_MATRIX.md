@@ -1,15 +1,19 @@
-# SigmaOS Platform Boot Matrix
+# SigmaOS Boot Matrix & Runtime Evidence Log
 
-## Overview
-The Boot Matrix records boot-to-shell validation results across target architectures, virtualized hypervisors, and bootloaders.
+This matrix tracks boot validation status across target architectures, execution environments, and firmware interfaces.
 
----
+## Target Platform Status
 
-## Boot Matrix
+| Target Architecture | Environment / Emulator | Boot Target | Status | Latest Evidence | Timeout Limit | Failure Policy |
+|---|---|---|---|---|---|---|
+| x86_64 | QEMU System i386/x86_64 | `shell_ready` | Verified | `build/boot/boot_smoke_result.json` | 5.0s | Panic + Diagnostic Artifact |
+| x86_64 | Bare Metal (UEFI) | `shell_ready` | Model/Untested | Manual log required | 10.0s | Recovery Console |
+| AArch64 | QEMU virt | `userspace_start` | Partial | Simulated unit test | 5.0s | Fallback Serial |
+| RISC-V 64 | QEMU virt | `kernel_entry` | Partial | Simulated unit test | 5.0s | Fallback Serial |
 
-| Platform / Hypervisor | Architecture | Bootloader | Result | Last Verified | Evidence Log |
-|---|---|---|---|---|---|
-| QEMU System x86_64 | x86_64 | Limine 8.x | PASS | Monthly CI | `reports/boot/qemu_x86_64.log` |
-| QEMU KVM x86_64 | x86_64 | GRUB2 | PASS | Monthly CI | `reports/boot/qemu_kvm.log` |
-| QEMU System AArch64 | aarch64 | EDK2 / UEFI | PASS | Monthly CI | `reports/boot/qemu_aarch64.log` |
-| QEMU System RISC-V 64 | riscv64 | OpenSBI | PASS | Monthly CI | `reports/boot/qemu_riscv64.log` |
+## Boot Validation Requirements
+
+1. **Boot Smoke Test:** `scripts/ci/qemu_boot_smoke.sh` must pass on every push to `main` and in PR CI.
+2. **Deterministic Shell Marker:** Boot sequence must produce `[BOOT_STAGE_OK] shell_ready` or `DETERMINISTIC SHELL MARKER DETECTED`.
+3. **Artifact Retention:** Boot diagnostic JSON artifacts must be stored in `build/boot/` for CI upload.
+4. **Timeout Enforcement:** Boot duration exceeding 5.0 seconds in emulator environment fails CI.

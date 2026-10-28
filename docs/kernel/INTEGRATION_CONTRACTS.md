@@ -1,59 +1,47 @@
-# SigmaOS Kernel Integration Contracts
+# SigmaOS Subsystem Integration Contracts
 
-## Overview
-Integration contracts define public interfaces, prerequisite subsystems, runtime entry points, boot dependencies, and failure policies for all core kernel subsystems.
+This specification defines public APIs, dependency requirements, runtime entry points, and failure policies for core kernel subsystems.
 
----
+## Core Subsystem Contracts
 
-## Contract Definitions
+### 1. Physical Memory Allocator (`physical_allocator`)
+- **Public API:** `alloc_frame`, `free_frame`, `total_frames`, `allocated_frames`
+- **Requires:** `boot_info_map`, `reserved_memory_ranges`
+- **Runtime Entry:** `src/memory/physical.rs`
+- **Boot Dependency:** Required
+- **Failure Policy:** `panic_with_diagnostic`
 
-```toml
-[subsystem.physical_memory]
-public_api = ["allocate_frame", "free_frame", "get_free_frame_count"]
-requires = ["bootloader_memory_map"]
-runtime_entry = "crate::memory::physical"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
+### 2. Page Table & Virtual Memory Manager (`paging`)
+- **Public API:** `alloc_pages`, `free_pages`, `map_range`, `unmap_range`, `switch_page_table`
+- **Requires:** `physical_allocator`, `interrupt_safety`
+- **Runtime Entry:** `src/mm/paging.rs`, `src/mm/virtual.rs`
+- **Boot Dependency:** Required
+- **Failure Policy:** `panic_with_diagnostic`
 
-[subsystem.paging]
-public_api = ["alloc_pages", "free_pages", "map_range", "unmap_range"]
-requires = ["physical_memory", "interrupt_safety"]
-runtime_entry = "crate::mm::paging"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
+### 3. Swap Manager (`swap`)
+- **Public API:** `allocate_swap_slot`, `free_swap_slot`, `read_swap_page`, `write_swap_page`
+- **Requires:** `paging`, `block_device_manager`
+- **Runtime Entry:** `src/swap/core.rs`
+- **Boot Dependency:** Optional / Deferred
+- **Failure Policy:** `return_oom_error`
 
-[subsystem.virtual_memory]
-public_api = ["allocate_user_region", "map_kernel_space", "protect_region"]
-requires = ["paging", "physical_memory"]
-runtime_entry = "crate::mm::virtual_mem"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
+### 4. Scheduler Core & Run Queue (`scheduler`)
+- **Public API:** `enqueue_process`, `schedule_next`, `yield_current`, `set_priority`
+- **Requires:** `paging`, `timer_subsystem`, `interrupt_controller`
+- **Runtime Entry:** `src/scheduler/core.rs`, `src/scheduler/run_queue.rs`
+- **Boot Dependency:** Required
+- **Failure Policy:** `panic_with_diagnostic`
 
-[subsystem.swap]
-public_api = ["allocate_swap_slot", "read_swap_slot", "free_swap_slot"]
-requires = ["paging", "block_storage"]
-runtime_entry = "crate::swap::core"
-boot_dependency = "optional"
-failure_policy = "log_warning_fallback_oom"
+### 5. Virtual Filesystem & File Locks (`vfs`)
+- **Public API:** `vfs_open`, `vfs_read`, `vfs_write`, `vfs_mount`, `vfs_flock`
+- **Requires:** `paging`, `block_cache_manager`, `permission_engine`
+- **Runtime Entry:** `src/fs/fd_table.rs`, `src/filesystem/core.rs`
+- **Boot Dependency:** Required
+- **Failure Policy:** `return_vfs_errno`
 
-[subsystem.scheduler]
-public_api = ["schedule", "add_task", "yield_now", "block_task"]
-requires = ["paging", "timer_interrupt"]
-runtime_entry = "crate::scheduler::core"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
-
-[subsystem.vfs]
-public_api = ["open", "read", "write", "close", "mount", "unmount"]
-requires = ["scheduler", "block_storage"]
-runtime_entry = "crate::fs"
-boot_dependency = "required"
-failure_policy = "panic_with_diagnostic"
-
-[subsystem.syscall_dispatch]
-public_api = ["dispatch_syscall", "register_syscall"]
-requires = ["scheduler", "vfs", "virtual_memory"]
-runtime_entry = "crate::kernel::syscall"
-boot_dependency = "required"
-failure_policy = "return_errno_or_kill_process"
-```
+### 6. Syscall Dispatcher (`syscalls`)
+- **Public API:** `dispatch_syscall`, `register_syscall_handler`, `validate_user_pointer`
+- **Requires:** `scheduler`, `vfs`, `security_capability_policy`
+- **Runtime Entry:** `src/kernel/syscalls.rs`
+- **Boot Dependency:** Required
+- **Failure Policy:** `return_syscall_errno`
