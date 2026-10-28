@@ -2962,6 +2962,12 @@ if [ -f "src/creative/artcraft_advancements_v75_pr.rs" ]; then
     ./build/test_artcraft_v75_pr
 fi
 
+if [ -f "src/creative/artcraft_advancements_pr.rs" ]; then
+    echo "Running Sovereign Artcraft Advancements PR test suite..."
+    rustc --test src/creative/artcraft_advancements_pr.rs --edition=2021 -o build/test_artcraft_advancements_pr
+    ./build/test_artcraft_advancements_pr
+fi
+
 if [ -f "src/distro/omarchy_linux_missing_components_v60_pr.rs" ]; then
     echo "Running Omarchy Linux Missing Components Parity PR Gateway V60 test suite..."
     mkdir -p build
