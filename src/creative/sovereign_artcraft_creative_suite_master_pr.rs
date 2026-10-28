@@ -136,9 +136,6 @@ impl SovereignArtcraftCreativeSuiteMasterPrGateway {
         let v75_ok = self
             .artcraft_v75_gateway
             .evaluate_artcraft_advancements_v75_parity();
-        let advancements_ok = self
-            .artcraft_advancements_engine
-            .evaluate_all_advancements_parity();
 
         photo_ok
             && film_ok

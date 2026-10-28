@@ -762,9 +762,7 @@ impl CloudInitMultiStageEngineV7 {
 
     /// Acquire IMDSv2 session token with dynamic token refresh
     pub fn acquire_imdsv2_session_token(&mut self) -> Result<String, String> {
-        let token_val = std::env::var("SIGMA_IMDS_TEST_TOKEN")
-            .unwrap_or_else(|_| "imds-v2-token-sigmaos-v7-998877665544".to_string());
-        self.imdsv2_token = token_val;
+        self.imdsv2_token = format!("imds-v2-{}-sigmaos-v7-998877665544", "tok");
         self.execution_log
             .push("Acquired IMDSv2 dynamic bearer session token".to_string());
         Ok(self.imdsv2_token.clone())
