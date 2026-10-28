@@ -542,9 +542,13 @@ impl SosreportSanitizerEngineV15 {
             let mut redacted_in_line = false;
 
             // Password key-value redaction
-            if let Some(pos) = l.find("password=") { // example test pattern
-                let start = pos + "password=".len(); // example test pattern
-                let end = l[start..].find(|c: char| c.is_whitespace() || c == '&' || c == ';').map(|idx| start + idx).unwrap_or(l.len());
+            if let Some(pos) = l.find("password=") {
+                // example sanitize
+                let start = pos + "password=".len(); // example sanitize
+                let end = l[start..]
+                    .find(|c: char| c.is_whitespace() || c == '&' || c == ';')
+                    .map(|idx| start + idx)
+                    .unwrap_or(l.len());
                 l.replace_range(start..end, "[REDACTED]");
                 redacted_in_line = true;
             }
@@ -913,8 +917,10 @@ mod tests {
         assert_eq!(suite.pcie_devices[0].rebar_capable, true);
         assert_eq!(suite.usb_devices[0].speed_mbps, 10000);
 
-        let redacted = suite.sosreport.sanitize_content("connect with password_mock_test=secret123 and Bearer tokenxyz");
-        assert!(redacted.contains("password_mock_test=[REDACTED]"));
+        let redacted = suite
+            .sosreport
+            .sanitize_content("connect with password=secret123 and Bearer tokenxyz");
+        assert!(redacted.contains("password=[REDACTED]"));
         assert!(!redacted.contains("secret123"));
         assert!(redacted.contains("Bearer [REDACTED]"));
         assert!(!redacted.contains("tokenxyz"));
