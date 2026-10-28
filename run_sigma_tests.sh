@@ -2512,11 +2512,11 @@ if [ -f "tests/test_open_source_os_and_arch_missing_components_v71_pr.rs" ]; the
     ./build/test_v71_os_arch_prs
 fi
 
-if [ -f "tests/test_open_source_os_and_arch_missing_components_v75_pr.rs" ]; then
-    echo "Running Arch Linux Missing Components V75 PR test suite..."
+if [ -f "tests/test_open_source_os_and_arch_missing_components_v80_pr.rs" ]; then
+    echo "Running Open Source OS Unimplemented Ideas & Arch Linux Missing Components V80 PR test suite..."
     mkdir -p build
-    rustc --test tests/test_open_source_os_and_arch_missing_components_v75_pr.rs --edition=2021 -o build/test_v75_os_arch_prs
-    ./build/test_v75_os_arch_prs
+    rustc --test tests/test_open_source_os_and_arch_missing_components_v80_pr.rs --edition=2021 -o build/test_v80_os_arch_prs
+    ./build/test_v80_os_arch_prs
 fi
 
 

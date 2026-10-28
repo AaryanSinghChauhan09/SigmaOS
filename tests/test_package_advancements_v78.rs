@@ -84,7 +84,7 @@ fn test_package_advancements_v78_full_cycle() {
     gateway.submit_proposal(
         7801,
         "Universal Package Advancements V78",
-        PackageFormat::Deb,
+        sovereign_distro_package_advancements_v78_pr::universal::PackageFormat::Deb,
         "ripgrep",
         "Full test cycle proposal V78",
     );
