@@ -2946,4 +2946,11 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v77_pr.rs" ]; then
     rustc --test tests/test_open_source_os_unimplemented_ideas_v77_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v77_pr
     ./build/test_open_source_os_v77_pr
 fi
+if [ -f "tests/signal/test_signal_handler_plan.rs" ]; then
+    echo "Running SigmaOS Signal Handler Plan Verification Suite..."
+    mkdir -p build
+    rustc --test tests/signal/test_signal_handler_plan.rs --edition=2021 -o build/test_signal_handler_plan
+    ./build/test_signal_handler_plan
+fi
+
 echo "All SigmaOS test suites completed."
