@@ -1,10 +1,12 @@
-# SigmaOS process-manager plan
+# SigmaOS Process Manager Master Architecture & Support Matrix Plan
 
-SigmaOS’s published inventory says `src/userspace/init.rs` contains a PID 1 service manager with dependency ordering and service-state tracking, but its stated next milestone is **process spawning via `execve` and dependency enforcement**. The same inventory lists process groups, signals, cgroups, resource limits, and process inspection components, but those entries do not establish that a complete process-management path runs end to end. The README likewise cautions that modules and unit tests do not prove a bootable, usable OS.
+SigmaOS's published inventory says `src/userspace/init.rs` contains a PID 1 service manager with dependency ordering and service-state tracking, but its stated next milestone is **process spawning via `execve` and dependency enforcement**. The same inventory lists process groups, signals, cgroups, resource limits, and process inspection components, but those entries do not establish that a complete process-management path runs end to end. The README likewise cautions that modules and unit tests do not prove a bootable, usable OS.
 
 The plan below orders the work around that gap: first prove process creation, execution, waiting, and cleanup in a booted target; then build reliable service supervision and management tools. Linux, POSIX, and FreeBSD are references for semantics and operational practices—not claims that SigmaOS has their ABI compatibility.
 
-## Design and safety rules
+---
+
+## Design and Safety Rules
 
 - **Separate kernel lifecycle from service policy.** The kernel owns process/thread creation, scheduling, exit, wait, signal delivery, and resource accounting. PID 1 or a service manager owns service definitions, dependency policy, restart decisions, and shutdown orchestration.
 - **Model lifecycle states explicitly.** Define valid transitions for created, starting, running, blocked, stopping, exited, reaped, and failed processes/services. Reject invalid transitions and test races such as exit during stop or restart.
@@ -12,12 +14,14 @@ The plan below orders the work around that gap: first prove process creation, ex
 - **Avoid PID-reuse races in management.** Use a stable kernel process reference or descriptor for long-lived supervisor handles; if management operates on numeric PIDs, validate identity at the time of action. Linux pidfds are one reference design for stable references to processes.
 - **Bound service recovery.** Restart policies need delays and start-rate limits; otherwise a crashing service can consume resources or block boot in a restart loop. Linux service managers document restart policies, start timeouts, stop timeouts, and rate limits as separate controls.
 - **Keep service dependencies declarative and cycle-checked.** A service must not start until required dependencies satisfy their readiness condition; dependency cycles should fail validation with a clear diagnostic. FreeBSD `rcorder` and service dependencies provide a useful comparison.
-- **Make resource controls enforceable, not decorative.** The inventory’s cgroup-like controllers should not be advertised as effective limits until process creation, scheduler, and memory paths enforce them. Linux cgroup v2 organizes processes hierarchically and distributes resources through controllers.
+- **Make resource controls enforceable, not decorative.** The inventory's cgroup-like controllers should not be advertised as effective limits until process creation, scheduler, and memory paths enforce them. Linux cgroup v2 organizes processes hierarchically and distributes resources through controllers.
 - **Use least privilege.** Services should run under distinct identities/permissions when those mechanisms are real; expose only required files, IPC, devices, and network access.
 - **Make stop and shutdown graceful but bounded.** Attempt the configured graceful termination, wait for a deadline, then use a documented forced-stop policy; always reap and record the outcome.
 - **Test at multiple levels.** Unit tests validate state machines; integration tests exercise actual user processes; QEMU boot tests validate PID 1 and service behavior. Linux separates in-kernel unit tests from userspace selftests that exercise live interfaces.
 
-## Proposed PR sequence
+---
+
+## Proposed PR Sequence
 
 | PR | Proposed title | Scope | Acceptance criteria |
 |---|---|---|---|
@@ -27,24 +31,26 @@ The plan below orders the work around that gap: first prove process creation, ex
 | 4 | `feat(process): complete user-mode transition and minimal process launch` | Connect architecture user-mode transition, address-space setup, ELF loading, initial stack, argv/envp, and a minimal user program. Start with the primary QEMU architecture. | Fresh QEMU boot launches a user process, executes a known program, and records exit status; invalid executable and setup failure return cleanly without corrupting the kernel. |
 | 5 | `feat(process): implement spawn and exec interface` | Implement a documented process creation/exec path with structured arguments, environment, inherited descriptors, working directory, permissions, and error reporting. | Real user program can launch another program; arguments and environment are preserved exactly; setup errors are reported to the parent; no shell-string execution is used internally. |
 | 6 | `feat(process): implement wait and child status collection` | Implement `wait`/`waitpid` subset, status encoding, nonblocking wait, and supported stopped/continued status. | Tests cover normal exit, signal exit, no child, invalid options, `EINTR`, `WNOHANG`, and one-time status consumption; behavior matches the documented subset of POSIX. |
-| 7 | `feat(process): add orphan adoption and PID 1 child reaping` | Define reparenting/adoption when a parent exits and implement PID 1’s wait loop. | Parent-exit tests prove descendants are adopted and eventually reaped; PID 1 remains responsive while reaping and does not lose exit status for supervised children. |
+| 7 | `feat(process): add orphan adoption and PID 1 child reaping` | Define reparenting/adoption when a parent exits and implement PID 1's wait loop. | Parent-exit tests prove descendants are adopted and eventually reaped; PID 1 remains responsive while reaping and does not lose exit status for supervised children. |
 | 8 | `feat(process): add stable process references for supervision` | Add an internal kernel process handle or FD-backed process reference for service-manager operations; define identity lifetime and permission semantics. | A stale reference cannot target a newly reused PID; exited-process state is observable until collection; access checks are tested. Linux pidfds demonstrate the stable-reference design goal. |
 | 9 | `feat(init): spawn and supervise real service processes` | Replace service-state-only transitions with real spawn, readiness, exit collection, logs, and service identity. | QEMU starts a minimal dependency-ordered service set; service state reflects actual process state; failure to execute a binary is not reported as successful startup. |
-| 10 | `feat(init): validate service dependencies and readiness` | Add declarative service definitions, dependency graph validation, required/optional dependencies, startup ordering, and readiness contract. | Cycles and missing required dependencies fail before launch; dependents wait for readiness, not merely process creation; shutdown order reverses dependency order. FreeBSD’s service system similarly models dependency ordering. |
+| 10 | `feat(init): validate service dependencies and readiness` | Add declarative service definitions, dependency graph validation, required/optional dependencies, startup ordering, and readiness contract. | Cycles and missing required dependencies fail before launch; dependents wait for readiness, not merely process creation; shutdown order reverses dependency order. FreeBSD's service system similarly models dependency ordering. |
 | 11 | `feat(init): add bounded restart and failure policies` | Add no-restart, on-failure, and bounded restart policies with backoff, start limits, failure history, and manual reset. | Crash loops are rate-limited; intentional stop does not trigger restart; backoff and failure state are visible and tested. Linux service units provide restart and rate-limit patterns to adapt. |
 | 12 | `feat(init): implement graceful service stop and system shutdown` | Add stop deadlines, signal delivery, escalation policy, dependency-ordered shutdown, child reaping, and final sync/teardown hooks. | Services receive graceful stop; deadline escalation is tested; shutdown cannot wait forever on an unresponsive service; all children are accounted for. |
 | 13 | `feat(process): integrate process groups and terminal job control` | Connect process groups, sessions, controlling terminal, foreground/background jobs, and signal routing once the shell and TTY are integrated. | PTY/QEMU tests cover foreground group signals, stop/continue, shell exit, and terminal restoration; unsupported semantics are documented. |
-| 14 | `feat(process): enforce per-service resource limits` | Connect CPU/memory/process limits and accounting to scheduler, allocator, and process creation. Define service-level defaults and delegation. | Limits are enforced in runtime—not only stored in config; fork/spawn fails predictably at limits; parent limits remain authoritative. Linux cgroup v2’s hierarchy and controller model is a reference, not a requirement to clone its filesystem ABI. |
+| 14 | `feat(process): enforce per-service resource limits` | Connect CPU/memory/process limits and accounting to scheduler, allocator, and process creation. Define service-level defaults and delegation. | Limits are enforced in runtime—not only stored in config; fork/spawn fails predictably at limits; parent limits remain authoritative. Linux cgroup v2's hierarchy and controller model is a reference, not a requirement to clone its filesystem ABI. |
 | 15 | `feat(process): add process inspection and service-control interfaces` | Provide read-only process/service status APIs, events, logs, and typed start/stop/restart requests for CLI/GUI clients. | Access control limits visibility and actions; events cannot be lost silently; user tools report authoritative live state and support machine-readable output. |
-| 16 | `security(process): enforce service isolation and privilege boundaries` | Integrate per-service identity, capability restrictions, filesystem/network access policy, inherited-FD policy, and syscall restrictions where enforcement exists. | Negative tests prove service A cannot access service B’s restricted resources; policy denial occurs in kernel/service boundary; unsupported controls are not shown as active. |
+| 16 | `security(process): enforce service isolation and privilege boundaries` | Integrate per-service identity, capability restrictions, filesystem/network access policy, inherited-FD policy, and syscall restrictions where enforcement exists. | Negative tests prove service A cannot access service B's restricted resources; policy denial occurs in kernel/service boundary; unsupported controls are not shown as active. |
 | 17 | `test(process): add booted multi-service and fault-injection suite` | Test missing executable, malformed ELF, dependency failure, crash, blocked stop, repeated restart, parent death, memory/process limit, and shutdown under QEMU. | Tests use actual user processes; failure artifacts identify the stage; resource counts return to expected values; no test depends on arbitrary sleeps for synchronization. |
 | 18 | `docs(process): publish process-manager reference and support matrix` | Document process APIs, service definition format, states, permissions, recovery, logs, architecture support, and known limitations. | Every supported claim links to runtime tests; process-manager docs distinguish process supervision from service configuration and resource control. |
 
-### Recommended first milestone
+### Recommended First Milestone
 
-Start with PRs **1–7** and prove one end-to-end path: PID 1 launches a simple user program, the program exits, PID 1 collects its status, and resources are released. Only after this works should the project add restart policies, advanced service dependencies, process-group management, or cgroup-like controls. This sequencing addresses the repo’s explicit init milestone—real process spawning and dependency enforcement—rather than expanding the service-state model alone.
+Start with PRs **1–7** and prove one end-to-end path: PID 1 launches a simple user program, the program exits, PID 1 collects its status, and resources are released. Only after this works should the project add restart policies, advanced service dependencies, process-group management, or cgroup-like controls. This sequencing addresses the repo's explicit init milestone—real process spawning and dependency enforcement—rather than expanding the service-state model alone.
 
-## Periodic maintenance PR cadence
+---
+
+## Periodic Maintenance PR Cadence
 
 | Cadence | Proposed recurring PR/task | Required evidence |
 |---|---|---|
@@ -59,9 +65,9 @@ Start with PRs **1–7** and prove one end-to-end path: PID 1 launches a simple 
 | Each release candidate | `release(process): certify process-manager claims` | Exact architecture/QEMU configuration, boot-to-user-process test, service matrix, shutdown/recovery evidence, and known gaps. |
 | After each incident | `fix(process): prevent recurrence of <failure>` | Root cause, regression test, affected targets, security/data-loss impact, and backport decision. |
 
-These are recurring reviews, not automatic code changes. A task should produce a useful fix, test, documentation correction, or explicit “no change needed” record.
+---
 
-## Component-specific rules
+## Component-Specific Rules
 
 - **Scheduler and context switching:** Keep runnable, blocked, stopped, and exiting state transitions synchronized with process management. Test wakeups, preemption, and exit races on the actual architecture path.
 - **ELF loader and exec:** Validate headers, segment bounds, permissions, stack layout, and argument limits before replacing the current image. A failed exec must not leave a half-installed address space.
@@ -69,13 +75,15 @@ These are recurring reviews, not automatic code changes. A task should produce a
 - **Signals:** Keep process-directed and thread-directed delivery distinct; define stop, continue, terminate, and service-stop behavior. Do not treat a signal sent as proof the service has exited—wait for actual termination.
 - **Init/PID 1:** Never block indefinitely on one service; continue reaping children; distinguish “process launched,” “service ready,” and “service healthy”; keep a recovery console path.
 - **Process identity:** Do not rely on PID alone for asynchronous management if a stable object reference can be provided. Linux pidfds are specifically useful to avoid accidentally acting on a reused PID.
-- **Service graph:** Validate dependencies before boot; reject cycles; distinguish ordering from requirement; make startup and shutdown ordering deterministic. FreeBSD’s rc system uses explicit dependency metadata rather than relying on script listing order.
+- **Service graph:** Validate dependencies before boot; reject cycles; distinguish ordering from requirement; make startup and shutdown ordering deterministic. FreeBSD's rc system uses explicit dependency metadata rather than relying on script listing order.
 - **Restart and watchdog:** Restart only according to declared policy; add delay and rate limiting; expose the reason for failure; avoid restarting after an intentional manager stop. systemd documents restart modes, timeouts, watchdog behavior, and start-rate limiting as separate service controls.
 - **Resource controls:** Apply limits at process creation or an authoritative kernel control point; ensure descendants inherit policy; prevent a delegated service from escaping parent limits. Linux cgroup v2 describes hierarchical distribution and delegation boundaries.
 - **Observability:** Record service state transitions, exit codes, signal causes, restart counts, and start/stop durations. Bound logs and redact secrets.
-- **Compatibility:** Keep native SigmaOS process APIs distinct from Linux emulation and POSIX libc behavior. Don’t claim Linux/BSD compatibility from similarly named modules.
+- **Compatibility:** Keep native SigmaOS process APIs distinct from Linux emulation and POSIX libc behavior. Don't claim Linux/BSD compatibility from similarly named modules.
 
-## PR template and merge gates
+---
+
+## PR Template and Merge Gates
 
 ```text
 ## Summary
@@ -114,8 +122,8 @@ Link updated feature inventory, service/process docs, and test evidence.
 - [ ] Required CI passes; review conversations resolved
 ```
 
-Require one maintainer approval for routine tests/docs and two qualified reviewers for process creation/exec, PID 1, signal/wait semantics, privilege boundaries, and resource enforcement. Protect the default branch with required PR reviews, status checks, and resolved conversations.
+---
 
-## Completion gates
+## Completion Gates
 
-Mark process management **Integrated** only when a booted SigmaOS target launches and executes a real user process, collects its exit status, and reaps it correctly. Mark it **Supported** only after repeatable tests cover failure to execute, child exit and adoption, signals, service dependencies/readiness, bounded restart, graceful shutdown, and the resource controls actually advertised. Linux’s testing guidance emphasizes that unit tests and userspace end-to-end tests serve different purposes; SigmaOS should report those evidence levels separately.
+Mark process management **Integrated** only when a booted SigmaOS target launches and executes a real user process, collects its exit status, and reaps it correctly. Mark it **Supported** only after repeatable tests cover failure to execute, child exit and adoption, signals, service dependencies/readiness, bounded restart, graceful shutdown, and the resource controls actually advertised.
