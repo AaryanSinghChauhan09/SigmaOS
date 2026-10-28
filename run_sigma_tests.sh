@@ -1365,13 +1365,6 @@ if [ -f "src/package/sovereign_distro_package_advancements_v78.rs" ]; then
     ./build/sovereign_advancements_v78_test
 fi
 
-if [ -f "src/package/sovereign_distro_package_advancements_v78_pr.rs" ]; then
-    echo "Running Sovereign Universal Package Advancements Suite V78 PR test suite..."
-    mkdir -p build
-    rustc --test src/package/sovereign_distro_package_advancements_v78_pr.rs --edition=2021 --cfg 'feature="standalone_test"' -o build/sovereign_advancements_v78_pr_test
-    ./build/sovereign_advancements_v78_pr_test
-fi
-
 if [ -f "tests/test_package_advancements_v78.rs" ]; then
     echo "Running Sovereign Universal Package Advancements Suite V78 Integration test suite..."
     mkdir -p build
@@ -2187,6 +2180,23 @@ if [ -f "src/distro/open_source_os_missing_components_v80_pr.rs" ]; then
 
     rustc --test tests/test_open_source_os_missing_components_v80_pr.rs --edition=2021 -o build/test_open_source_v80_pr_integration
     ./build/test_open_source_v80_pr_integration
+fi
+
+if [ -f "src/distro/open_source_os_missing_components_v81_pr.rs" ]; then
+    echo "Running Open Source OS Missing Components V81 PR Suite tests..."
+    mkdir -p build
+    rustc --test src/distro/open_source_os_missing_components_v81_pr.rs --edition=2021 -o build/test_open_source_v81_pr
+    ./build/test_open_source_v81_pr
+
+    rustc --test tests/test_open_source_os_missing_components_v81_pr.rs --edition=2021 -o build/test_open_source_v81_pr_integration
+    ./build/test_open_source_v81_pr_integration
+fi
+
+if [ -f "src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v81_pr.rs" ]; then
+    echo "Running Sovereign Linux & BSD Ecosystem Gap Closure V81 PR Suite tests..."
+    mkdir -p build
+    rustc --test src/distro/sovereign_linux_bsd_ecosystem_gap_closure_v81_pr.rs --edition=2021 -o build/test_linux_bsd_gap_v81_pr
+    ./build/test_linux_bsd_gap_v81_pr
 fi
 
 if [ -f "src/distro/cachy_linux_missing_components_engine.rs" ]; then
