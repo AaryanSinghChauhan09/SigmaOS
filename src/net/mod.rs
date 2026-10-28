@@ -113,3 +113,6 @@ pub use sovereign_networking_stack_and_daemons_v76_pr::*;
 
 pub mod sovereign_networking_stack_and_daemons_v77_pr;
 pub use sovereign_networking_stack_and_daemons_v77_pr::*;
+
+pub mod sovereign_networking_stack_and_daemons_v78_pr;
+pub use sovereign_networking_stack_and_daemons_v78_pr::*;
