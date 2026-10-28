@@ -69,7 +69,7 @@ wiki_repo/
 /user_group_db
 /uts_namespace
 /zfs
-# Documentation policy: NO .md or .txt files tracked in main branch except designated repo plans and journals.
+# Documentation policy default ignore
 *.md
 **/*.md
 *.txt
@@ -79,15 +79,26 @@ wiki_repo/
 !scripts/*.py
 !tools/*.py
 !tools/**/*.py
-# Allow GitHub templates, docs, journals, and master plans
-!.github/
-!.github/PULL_REQUEST_TEMPLATE.md
+
+# Explicit exceptions for Master Roadmap Specification, Agent Framework & Repos Absorption Plans
+!FUTURE-DEVELOPMENT-ROADMAP.md
+!docs/FUTURE-DEVELOPMENT-ROADMAP.md
+!docs/roadmap/FUTURE-DEVELOPMENT-ROADMAP.md
+!wiki/FUTURE-DEVELOPMENT-ROADMAP.md
+!wiki/Home.md
+!WIKI/Home.md
+!wiki/COMPONENT_BOUNDARIES_AND_DEPENDENCY_CONTRACTS.md
+!wiki/GOVERNANCE.md
+!wiki/REPOSITORY_MIGRATION_MATRIX.md
+
 !SIGMAOS_MASTER_PLAN_TRI_AGENT_500_REPOS_ABSORPTION.md
 !ImprovementPlan.md
 !NEXT_STEPS_GUIDELINES.md
 !.jules/
-!.jules/*.md
-!.jules/**/*.md
+!.jules/**
 !docs/
-!docs/*.md
-!docs/**/*.md
+!docs/**
+!wiki/
+!wiki/**
+!WIKI/
+!WIKI/**

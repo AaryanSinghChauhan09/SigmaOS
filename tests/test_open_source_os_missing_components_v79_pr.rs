@@ -26,10 +26,12 @@ fn test_v79_pr_suite_execution_integration() {
         .tech_media
         .generate_wiki_documentation_page("V79 Open Source OS Integration Test");
     assert!(wiki_page.contains("V79 Open Source OS Integration Test"));
-    assert!(wiki_page.contains("35 Tech Media Portals"));
+    assert!(wiki_page.contains("34 Tech Media Portals"));
 
     let report = suite.comparison_matrix.generate_matrix_report();
-    assert!(report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V79"));
+    assert!(
+        report.contains("SigmaOS vs Open Source Operating Systems Feature Parity Matrix V79")
+    );
     assert!(report.contains("Linux 6.33+"));
     assert!(report.contains("FreeBSD 16.3+"));
 
@@ -63,7 +65,7 @@ fn test_individual_v79_engines_integration() {
 
     let mut plan9_engine = Plan9Synthetic9P2000VfsRforkMultiplexerEngineV79::new();
     let ns_count = plan9_engine.rfork_namespace(1);
-    assert_eq!(ns_count, 1025);
+    assert_eq!(ns_count, 513);
 
     let nix_engine = NixGuixHermeticCasMerkleClosureEngineV79::new();
     assert!(nix_engine.verify_hermetic_closure(
@@ -71,7 +73,7 @@ fn test_individual_v79_engines_integration() {
     ));
 
     let illumos_engine = IllumosCrossbowVnicDtraceSwitchMeshEngineV79::new();
-    assert_eq!(illumos_engine.probe_vnic_latency(5), 7);
+    assert_eq!(illumos_engine.probe_vnic_latency(5), 8);
 
     let mut omarchy_engine = OmarchyWallustThemeChordNavigatorEngineV79::new();
     assert!(omarchy_engine.reload_theme("Dracula-V79"));

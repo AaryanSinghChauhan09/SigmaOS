@@ -1,45 +1,76 @@
-## Component
-- [ ] Kernel Core / Architecture (`src/kernel/`, `src/arch/`)
-- [ ] Memory Management / Allocator (`src/memory/`, `src/mm/`, `src/swap/`)
-- [ ] Scheduler & Process Control (`src/scheduler/`, `src/process/`)
-- [ ] Virtual File System / Storage (`src/vfs/`, `src/fs/`, `src/storage/`)
-- [ ] Drivers & Hardware Abstraction (`src/drivers/`, `src/hardware/`)
-- [ ] Userland Primitives & Shell (`src/userland/`, `src/shell/`)
-- [ ] Security & Capability System (`src/security/`, `src/tpm/`)
-- [ ] Desktop & Innovations (`src/desktop/`, `src/creative/`)
-- [ ] Distro & Open-Source OS Adoption (`src/distro/`)
+## Summary
 
-## Open-Source OS Idea Adoption Reference & Upstream Study
-- Upstream OS Reference / Reference study: Redox, seL4, Tock, Fuchsia, Linux, FreeBSD, OpenBSD, Plan 9, Haiku, Debian
-- What SigmaOS adopts:
-- Open-Source Idea Issue Link / Study document:
+<!-- What component does this PR improve or add? -->
 
-## Architectural & Kernel Safety Review
-- [ ] **`#![no_std]` Compliance**: Maintained in kernel and driver modules without unallowed `std::` imports.
-- [ ] **Capability Tokens**: Entrypoints for system calls include explicit `CapabilityToken` verification.
-- [ ] **Driver Lifecycle**: New/modified drivers follow `IoManager` / `DriverObject` / `DeviceObject` lifecycle guidelines with unit test coverage.
-- [ ] **Memory Pools**: Proper isolation and handling between `Paged` and `NonPaged` memory allocations.
-- [ ] **Type Annotations**: Explicit type signatures on public APIs and key kernel collections.
-- [ ] **Memory Safety**: Bounds-checked copy operations and audited `unsafe` block invariants.
-- [ ] **ABI Stability**: Highlight any system call number or ABI modifications.
+## Related issue
 
-## Shell safety review
-- [ ] Interactive shell, lexer/parser, builtins, and POSIX conformance verified.
+Closes #<issue-id>
 
-## Kernel safety review
-- [ ] Kernel panic handlers, register contexts, and memory isolation audited.
+## Upstream study
+
+- Project:
+- Version/commit:
+- Research note:
+- ADR:
+
+## What SigmaOS adopts
+
+<!-- State the design principle or mechanism adopted. -->
+
+## What SigmaOS changes or rejects
+
+<!-- State simplifications, deviations, and rejected ideas. -->
+
+## Component impact
+
+- Component:
+- Maturity before:
+- Maturity after:
+- Runtime path affected:
+
+## Changes
+
+- [ ] Source implementation
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] QEMU/runtime test
+- [ ] Documentation
+- [ ] Capability/status update
+- [ ] Regression protection
+- [ ] Security review, if applicable
+
+## Verification
+
+```bash
+cargo check --lib
+cargo test --lib
+./run_sigma_tests.sh
+make check
+make test
+make format
+```
+
+## Runtime evidence
+
+- [ ] QEMU boot log
+- [ ] Installer/update test log
+- [ ] Package dry-run report
+- [ ] Hardware test log, if applicable
+- [ ] Artifact hash
 
 ## Safety and rollback
-- [ ] Rollback strategy, feature flags, and fail-safe recovery plans documented (Risks and rollback).
+
+- [ ] No broad credentials or host access introduced
+- [ ] Untrusted input is validated
+- [ ] Package scripts are sandboxed, if applicable
+- [ ] Rollback/recovery behavior defined
+- [ ] Security review completed, if applicable
 
 ## Reviewer checklist
-- [ ] All test suites passed, architectural constraints satisfied, documentation updated.
 
-## Testing & Evidence
-- [ ] Standalone file unit test executed (`rustc --test`)
-- [ ] Repository test suite executed (`./run_sigma_tests.sh`)
-- [ ] QEMU boot smoke test executed (if kernel/boot modified)
-- [ ] Benchmarks / Fuzzing executed (if applicable)
-
-## Additional Notes
-<!-- Detail any potential risks, performance impact, or safety and rollback strategy -->
+- [ ] Scope is narrow
+- [ ] Tests cover the change
+- [ ] Runtime evidence is linked
+- [ ] Documentation matches implementation
+- [ ] Capability status is evidence-based
+- [ ] No unsupported parity claims
