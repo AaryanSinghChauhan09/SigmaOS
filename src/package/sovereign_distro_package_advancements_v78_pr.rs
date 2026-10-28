@@ -25,14 +25,16 @@ use alloc::vec::Vec;
 use std::collections::BTreeMap;
 #[cfg(feature = "standalone_test")]
 use std::string::{String, ToString};
-#[cfg(feature = "standalone_test")]
-use std::vec::Vec;
 
 #[cfg(not(feature = "standalone_test"))]
 use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
 
 #[cfg(feature = "standalone_test")]
-use crate::sovereign_distro_package_advancements_v78::universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+#[path = "universal.rs"]
+pub mod universal;
+
+#[cfg(feature = "standalone_test")]
+pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]
