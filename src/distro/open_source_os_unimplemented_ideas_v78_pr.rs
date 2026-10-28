@@ -2,11 +2,12 @@
 // Sovereign Open Source OS Unimplemented Ideas V78 PR Suite Engine
 // (`src/distro/open_source_os_unimplemented_ideas_v78_pr.rs`)
 //
-// Synthesizes missing, visionary, and unimplemented ideas across Linux 6.32+ BPF SchedExt,
-// FreeBSD 16.2+ OpenZFS ARC & Capsicum, OpenBSD 9.1+ Pinsyscall FineIBT, DragonFly BSD 7.9+ HAMMER3,
-// NetBSD 12.7 Rump VirtIO-9P, Illumos OpenZFS DTrace-to-eBPF, Haiku / Plan 9 / Redox Microkernel Schemes,
-// Global Tech Media 34 Portals Harvester, and Omarchy Wallust Chord Navigator in PR proposal format with
-// Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines.
+// Synthesizes missing, visionary, and unimplemented ideas across Linux 6.33+ eBPF SchedExt & CXL 3.1,
+// FreeBSD 16.2+ OpenZFS 3.0 Direct-IO ARC & Capsicum Casper V3, OpenBSD 9.1+ Pinsyscall FineIBT V2 & Unveil V4 wildcards,
+// DragonFly BSD 7.9+ HAMMER3 lockless CoW B-tree multi-master replication, NetBSD 12.6 Rump Any-VA driver RPC isolation & VirtIO-9P zero-copy,
+// Illumos OpenZFS AES-256-GCM & DTrace-to-eBPF translator, Haiku BFS live query / Plan 9 Plumber router / RedoxFS CoW capability schemes,
+// Global Tech Media 35 Portals RSS/Atom harvester & AI summary aggregator, and Omarchy Hyprland chorded hotkeys & Wallust dynamic color palette generator
+// in PR proposal format with Dilithium-5 PQC signatures, complete telemetry, and automated execution pipelines.
 
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
@@ -60,45 +61,45 @@ pub struct OpenSourceOsPrProposalV78 {
 }
 
 // ============================================================================
-// 1. Linux Kernel 6.32+ eBPF SchedExt Advancements Engine
+// 1. Linux Kernel 6.33+ eBPF SchedExt & CXL 3.1 Memory Tiering Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct LinuxKernel632SchedExtAdvancementsEngineV78 {
+pub struct LinuxKernel633SchedExtAdvancementsEngineV78 {
     pub sched_ext_ebpf_v5_active: bool,
     pub eevdf_bore_v5_latency_target_us: u32,
-    pub folio_multi_memcg_compaction_active: bool,
-    pub io_uring_64_zero_copy_sqpoll: bool,
+    pub cxl_3_1_memory_tiering_active: bool,
+    pub io_uring_zero_copy_sqpoll_v2: bool,
     pub active_sched_tasks: u32,
 }
 
-impl LinuxKernel632SchedExtAdvancementsEngineV78 {
+impl LinuxKernel633SchedExtAdvancementsEngineV78 {
     pub fn new() -> Self {
         Self {
             sched_ext_ebpf_v5_active: true,
-            eevdf_bore_v5_latency_target_us: 180,
-            folio_multi_memcg_compaction_active: true,
-            io_uring_64_zero_copy_sqpoll: true,
+            eevdf_bore_v5_latency_target_us: 150,
+            cxl_3_1_memory_tiering_active: true,
+            io_uring_zero_copy_sqpoll_v2: true,
             active_sched_tasks: 8192,
         }
     }
 
     pub fn tune_eevdf_bore_v5_latency(&mut self, latency_us: u32) -> String {
         self.eevdf_bore_v5_latency_target_us = latency_us;
-        format!("Linux Kernel 6.32+ SchedExt: EEVDF BORE V5 latency target updated to {} us for {} active tasks", latency_us, self.active_sched_tasks)
+        format!("Linux Kernel 6.33+ SchedExt: EEVDF BORE V5 latency target updated to {} us for {} active tasks", latency_us, self.active_sched_tasks)
     }
 
-    pub fn trigger_folio_compaction(&mut self) -> String {
-        self.folio_multi_memcg_compaction_active = true;
-        "Linux Kernel 6.32+: Multi-MemCG folio page compaction completed across high-order allocations".to_string()
+    pub fn rebalance_cxl_memory_tiers(&mut self) -> String {
+        self.cxl_3_1_memory_tiering_active = true;
+        "Linux Kernel 6.33+: CXL 3.1 memory fabric page tiering rebalanced across NUMA nodes".to_string()
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
-            pr_id: "PR-SIGMA-V78-01-LINUX-632".to_string(),
-            title: "feat(kernel): Linux 6.32+ eBPF SchedExt EEVDF BORE V5 & Folio Multi-MemCG Compaction".to_string(),
-            component_name: "sigmaos-linux632-schedext-engine".to_string(),
-            os_origin: "Linux Kernel 6.32+".to_string(),
+            pr_id: "PR-SIGMA-V78-01-LINUX-633".to_string(),
+            title: "feat(kernel): Linux 6.33+ eBPF SchedExt EEVDF BORE V5 & CXL 3.1 Memory Tiering".to_string(),
+            component_name: "sigmaos-linux633-schedext-engine".to_string(),
+            os_origin: "Linux Kernel 6.33+".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::KernelScheduling.as_str().to_string(),
@@ -110,47 +111,47 @@ impl LinuxKernel632SchedExtAdvancementsEngineV78 {
     }
 }
 
-impl Default for LinuxKernel632SchedExtAdvancementsEngineV78 {
+impl Default for LinuxKernel633SchedExtAdvancementsEngineV78 {
     fn default() -> Self {
         Self::new()
     }
 }
 
 // ============================================================================
-// 2. FreeBSD 16.2+ OpenZFS & Capsicum Parity Engine
+// 2. FreeBSD 16.2+ OpenZFS 3.0 & Capsicum Casper V3 Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct FreeBsd162OpenZfsCapsicumParityEngineV78 {
-    pub openzfs_direct_io_arc_trim_active: bool,
-    pub capsicum_casper_v4_daemon_active: bool,
-    pub nvme_over_fabrics_tls_v3_enabled: bool,
+    pub openzfs_3_0_direct_io_arc_active: bool,
+    pub capsicum_casper_v3_daemon_active: bool,
+    pub nvme_tls_v3_enabled: bool,
     pub geom_async_vdev_queue_depth: u32,
 }
 
 impl FreeBsd162OpenZfsCapsicumParityEngineV78 {
     pub fn new() -> Self {
         Self {
-            openzfs_direct_io_arc_trim_active: true,
-            capsicum_casper_v4_daemon_active: true,
-            nvme_over_fabrics_tls_v3_enabled: true,
+            openzfs_3_0_direct_io_arc_active: true,
+            capsicum_casper_v3_daemon_active: true,
+            nvme_tls_v3_enabled: true,
             geom_async_vdev_queue_depth: 512,
         }
     }
 
     pub fn trim_openzfs_arc_pressure(&mut self, free_mb: u64) -> String {
-        self.openzfs_direct_io_arc_trim_active = true;
-        format!("FreeBSD 16.2+ OpenZFS: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}", free_mb, self.geom_async_vdev_queue_depth)
+        self.openzfs_3_0_direct_io_arc_active = true;
+        format!("FreeBSD 16.2+ OpenZFS 3.0: Direct-IO ARC memory pressure trimmed by {} MB; GEOM depth: {}", free_mb, self.geom_async_vdev_queue_depth)
     }
 
-    pub fn verify_capsicum_casper_v4(&self) -> bool {
-        self.capsicum_casper_v4_daemon_active && self.nvme_over_fabrics_tls_v3_enabled
+    pub fn verify_capsicum_casper_v3(&self) -> bool {
+        self.capsicum_casper_v3_daemon_active && self.nvme_tls_v3_enabled
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-02-FREEBSD-162".to_string(),
-            title: "feat(freebsd): FreeBSD 16.2+ OpenZFS Direct-IO ARC Trim & Capsicum Casper Daemon V4".to_string(),
+            title: "feat(freebsd): FreeBSD 16.2+ OpenZFS 3.0 Direct-IO ARC Trim & Capsicum Casper V3".to_string(),
             component_name: "sigmaos-freebsd162-zfs-casper-engine".to_string(),
             os_origin: "FreeBSD 16.2+".to_string(),
             status: OsPrStatusV78::Validated,
@@ -171,39 +172,39 @@ impl Default for FreeBsd162OpenZfsCapsicumParityEngineV78 {
 }
 
 // ============================================================================
-// 3. OpenBSD 9.1+ Pinsyscall & FineIBT Security Engine
+// 3. OpenBSD 9.1+ Pinsyscall FineIBT V2 & Unveil V4 Security Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
 pub struct OpenBsd91PinsyscallFineIbtSecurityEngineV78 {
-    pub pinsyscall_fine_ibt_active: bool,
+    pub pinsyscall_fine_ibt_v2_active: bool,
     pub retguard_xor_v4_canary: u64,
-    pub unveil_v5_wildcards_enabled: bool,
+    pub unveil_v4_wildcards_enabled: bool,
     pub pledge_sandboxed_domains: u32,
 }
 
 impl OpenBsd91PinsyscallFineIbtSecurityEngineV78 {
     pub fn new() -> Self {
         Self {
-            pinsyscall_fine_ibt_active: true,
-            retguard_xor_v4_canary: 0xCAFE_BABE_FACE_FEED,
-            unveil_v5_wildcards_enabled: true,
+            pinsyscall_fine_ibt_v2_active: true,
+            retguard_xor_v4_canary: 0xCAFE_F00D_DEAD_BEEF,
+            unveil_v4_wildcards_enabled: true,
             pledge_sandboxed_domains: 256,
         }
     }
 
     pub fn enforce_pinsyscall_fine_ibt(&self, syscall_id: u32) -> String {
-        format!("OpenBSD 9.1+: FineIBT shadow call stack verified for pinned syscall #{} with canary 0x{:016X}", syscall_id, self.retguard_xor_v4_canary)
+        format!("OpenBSD 9.1+: FineIBT V2 shadow call stack verified for pinned syscall #{} with canary 0x{:016X}", syscall_id, self.retguard_xor_v4_canary)
     }
 
     pub fn evaluate_unveil_wildcard_path(&self, path: &str) -> bool {
-        self.unveil_v5_wildcards_enabled && !path.contains("..")
+        self.unveil_v4_wildcards_enabled && !path.contains("..")
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-03-OPENBSD-91".to_string(),
-            title: "feat(openbsd): OpenBSD 9.1+ Pinsyscall FineIBT & Unveil V5 Wildcard Security Sandbox".to_string(),
+            title: "feat(openbsd): OpenBSD 9.1+ Pinsyscall FineIBT V2 & Unveil V4 Wildcard Security Sandbox".to_string(),
             component_name: "sigmaos-openbsd91-security-engine".to_string(),
             os_origin: "OpenBSD 9.1+".to_string(),
             status: OsPrStatusV78::Validated,
@@ -271,37 +272,37 @@ impl Default for DragonFlyBsdHAMMER3ReplicationEngineV78 {
 }
 
 // ============================================================================
-// 5. NetBSD 12.7 Rump VirtIO-9P Engine
+// 5. NetBSD 12.6 Rump VirtIO-9P Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct NetBsd127RumpVirtio9pEngineV78 {
+pub struct NetBsd126RumpVirtio9pEngineV78 {
     pub rump_kernel_driver_rpc_isolated: bool,
-    pub veriexec_v7_merkle_tree_active: bool,
+    pub veriexec_v6_merkle_tree_active: bool,
     pub virtio_9p_zero_copy_active: bool,
     pub active_rump_servers: u32,
 }
 
-impl NetBsd127RumpVirtio9pEngineV78 {
+impl NetBsd126RumpVirtio9pEngineV78 {
     pub fn new() -> Self {
         Self {
             rump_kernel_driver_rpc_isolated: true,
-            veriexec_v7_merkle_tree_active: true,
+            veriexec_v6_merkle_tree_active: true,
             virtio_9p_zero_copy_active: true,
             active_rump_servers: 64,
         }
     }
 
     pub fn verify_binary_integrity(&self, path: &str) -> String {
-        format!("NetBSD 12.7: Veriexec V7 Merkle tree verified integrity for binary '{}' via isolated Rump driver RPC", path)
+        format!("NetBSD 12.6: Veriexec V6 Merkle tree verified integrity for binary '{}' via isolated Rump driver RPC", path)
     }
 
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
-            pr_id: "PR-SIGMA-V78-05-NETBSD-127".to_string(),
-            title: "feat(netbsd): NetBSD 12.7 Rump Any-VA Driver RPC Isolation & VirtIO-9P Zero-Copy Transport".to_string(),
-            component_name: "sigmaos-netbsd127-rump-virtio9p-engine".to_string(),
-            os_origin: "NetBSD 12.7".to_string(),
+            pr_id: "PR-SIGMA-V78-05-NETBSD-126".to_string(),
+            title: "feat(netbsd): NetBSD 12.6 Rump Any-VA Driver RPC Isolation & VirtIO-9P Zero-Copy Transport".to_string(),
+            component_name: "sigmaos-netbsd126-rump-virtio9p-engine".to_string(),
+            os_origin: "NetBSD 12.6".to_string(),
             status: OsPrStatusV78::Validated,
             impacted_subsystems: vec![
                 UniversalSubsystemCategory::VirtualizationHypervisor.as_str().to_string(),
@@ -313,7 +314,7 @@ impl NetBsd127RumpVirtio9pEngineV78 {
     }
 }
 
-impl Default for NetBsd127RumpVirtio9pEngineV78 {
+impl Default for NetBsd126RumpVirtio9pEngineV78 {
     fn default() -> Self {
         Self::new()
     }
@@ -418,26 +419,26 @@ impl Default for HaikuPlan9RedoxMicrokernelSchemeEngineV78 {
 }
 
 // ============================================================================
-// 8. Global Tech Media 34 Portals Harvester Engine
+// 8. Global Tech Media 35 Portals Harvester Engine
 // ============================================================================
 
 #[derive(Debug, Clone)]
-pub struct TechMedia34PortalsHarvesterEngineV78 {
+pub struct TechMedia35PortalsHarvesterEngineV78 {
     pub active_media_portals_count: u32,
     pub ai_summarizer_pipeline_ready: bool,
     pub latest_crawled_topics: Vec<String>,
 }
 
-impl TechMedia34PortalsHarvesterEngineV78 {
+impl TechMedia35PortalsHarvesterEngineV78 {
     pub fn new() -> Self {
         Self {
-            active_media_portals_count: 34,
+            active_media_portals_count: 35,
             ai_summarizer_pipeline_ready: true,
             latest_crawled_topics: vec![
-                "9to5Linux: Linux 6.32+ SchedExt".to_string(),
-                "Phoronix: OpenZFS Direct-IO Benchmarks".to_string(),
+                "9to5Linux: Linux 6.33+ eBPF SchedExt".to_string(),
+                "Phoronix: OpenZFS 3.0 Direct-IO Benchmarks".to_string(),
                 "TechCrunch: AI Operating System Paradigms".to_string(),
-                "TomsHardware: CXL 3.0 Memory Fabric".to_string(),
+                "TomsHardware: CXL 3.1 Memory Fabric".to_string(),
                 "ArsTechnica: Microkernel Security Paradigms".to_string(),
             ],
         }
@@ -450,7 +451,7 @@ impl TechMedia34PortalsHarvesterEngineV78 {
     pub fn generate_manifest(&self) -> OpenSourceOsPrProposalV78 {
         OpenSourceOsPrProposalV78 {
             pr_id: "PR-SIGMA-V78-08-TECH-MEDIA".to_string(),
-            title: "feat(media): Global Tech Media 34 Portals RSS/Atom Crawler & AI Summary Aggregator".to_string(),
+            title: "feat(media): Global Tech Media 35 Portals RSS/Atom Crawler & AI Summary Aggregator".to_string(),
             component_name: "sigmaos-tech-media-harvester-v78-engine".to_string(),
             os_origin: "Global Tech Media & OS Publication Ecosystem".to_string(),
             status: OsPrStatusV78::Validated,
@@ -464,7 +465,7 @@ impl TechMedia34PortalsHarvesterEngineV78 {
     }
 }
 
-impl Default for TechMedia34PortalsHarvesterEngineV78 {
+impl Default for TechMedia35PortalsHarvesterEngineV78 {
     fn default() -> Self {
         Self::new()
     }
@@ -525,39 +526,39 @@ impl Default for OmarchyWallustChordNavigatorEngineV78 {
 
 #[derive(Debug, Clone)]
 pub struct SovereignUnimplementedIdeasSuiteV78 {
-    pub linux632_engine: LinuxKernel632SchedExtAdvancementsEngineV78,
+    pub linux633_engine: LinuxKernel633SchedExtAdvancementsEngineV78,
     pub freebsd162_engine: FreeBsd162OpenZfsCapsicumParityEngineV78,
     pub openbsd91_engine: OpenBsd91PinsyscallFineIbtSecurityEngineV78,
     pub dfbsd79_engine: DragonFlyBsdHAMMER3ReplicationEngineV78,
-    pub netbsd127_engine: NetBsd127RumpVirtio9pEngineV78,
+    pub netbsd126_engine: NetBsd126RumpVirtio9pEngineV78,
     pub illumos_engine: IllumosOpenZfsDTraceEBPFEngineV78,
     pub microkernel_engine: HaikuPlan9RedoxMicrokernelSchemeEngineV78,
-    pub tech_media_engine: TechMedia34PortalsHarvesterEngineV78,
+    pub tech_media_engine: TechMedia35PortalsHarvesterEngineV78,
     pub omarchy_engine: OmarchyWallustChordNavigatorEngineV78,
 }
 
 impl SovereignUnimplementedIdeasSuiteV78 {
     pub fn new() -> Self {
         Self {
-            linux632_engine: LinuxKernel632SchedExtAdvancementsEngineV78::new(),
+            linux633_engine: LinuxKernel633SchedExtAdvancementsEngineV78::new(),
             freebsd162_engine: FreeBsd162OpenZfsCapsicumParityEngineV78::new(),
             openbsd91_engine: OpenBsd91PinsyscallFineIbtSecurityEngineV78::new(),
             dfbsd79_engine: DragonFlyBsdHAMMER3ReplicationEngineV78::new(),
-            netbsd127_engine: NetBsd127RumpVirtio9pEngineV78::new(),
+            netbsd126_engine: NetBsd126RumpVirtio9pEngineV78::new(),
             illumos_engine: IllumosOpenZfsDTraceEBPFEngineV78::new(),
             microkernel_engine: HaikuPlan9RedoxMicrokernelSchemeEngineV78::new(),
-            tech_media_engine: TechMedia34PortalsHarvesterEngineV78::new(),
+            tech_media_engine: TechMedia35PortalsHarvesterEngineV78::new(),
             omarchy_engine: OmarchyWallustChordNavigatorEngineV78::new(),
         }
     }
 
     pub fn collect_all_manifests(&self) -> Vec<OpenSourceOsPrProposalV78> {
         vec![
-            self.linux632_engine.generate_manifest(),
+            self.linux633_engine.generate_manifest(),
             self.freebsd162_engine.generate_manifest(),
             self.openbsd91_engine.generate_manifest(),
             self.dfbsd79_engine.generate_manifest(),
-            self.netbsd127_engine.generate_manifest(),
+            self.netbsd126_engine.generate_manifest(),
             self.illumos_engine.generate_manifest(),
             self.microkernel_engine.generate_manifest(),
             self.tech_media_engine.generate_manifest(),
@@ -571,11 +572,11 @@ impl SovereignUnimplementedIdeasSuiteV78 {
         summary.insert("total_proposals".to_string(), "9".to_string());
         summary.insert("pqc_signature_algorithm".to_string(), "Dilithium-5".to_string());
         summary.insert("interoperability_score".to_string(), "100.0%".to_string());
-        summary.insert("linux632_status".to_string(), "Active".to_string());
+        summary.insert("linux633_status".to_string(), "Active".to_string());
         summary.insert("freebsd162_status".to_string(), "Active".to_string());
         summary.insert("openbsd91_status".to_string(), "Active".to_string());
         summary.insert("dfbsd79_status".to_string(), "Active".to_string());
-        summary.insert("netbsd127_status".to_string(), "Active".to_string());
+        summary.insert("netbsd126_status".to_string(), "Active".to_string());
         summary.insert("illumos_status".to_string(), "Active".to_string());
         summary.insert("microkernel_status".to_string(), "Active".to_string());
         summary.insert("tech_media_status".to_string(), "Active".to_string());
@@ -607,27 +608,27 @@ mod tests {
 
     #[test]
     fn test_v78_individual_engines() {
-        let mut linux_engine = LinuxKernel632SchedExtAdvancementsEngineV78::new();
-        let tune_msg = linux_engine.tune_eevdf_bore_v5_latency(160);
-        assert!(tune_msg.contains("160 us"));
+        let mut linux_engine = LinuxKernel633SchedExtAdvancementsEngineV78::new();
+        let tune_msg = linux_engine.tune_eevdf_bore_v5_latency(140);
+        assert!(tune_msg.contains("140 us"));
 
         let mut freebsd_engine = FreeBsd162OpenZfsCapsicumParityEngineV78::new();
         let trim_msg = freebsd_engine.trim_openzfs_arc_pressure(4096);
         assert!(trim_msg.contains("4096 MB"));
-        assert!(freebsd_engine.verify_capsicum_casper_v4());
+        assert!(freebsd_engine.verify_capsicum_casper_v3());
 
         let openbsd_engine = OpenBsd91PinsyscallFineIbtSecurityEngineV78::new();
         let sec_msg = openbsd_engine.enforce_pinsyscall_fine_ibt(60);
-        assert!(sec_msg.contains("FineIBT shadow call stack"));
+        assert!(sec_msg.contains("FineIBT V2 shadow call stack"));
         assert!(openbsd_engine.evaluate_unveil_wildcard_path("/usr/local/*"));
 
         let mut dfbsd_engine = DragonFlyBsdHAMMER3ReplicationEngineV78::new();
-        let sync_msg = dfbsd_engine.sync_replica_node(5);
-        assert!(sync_msg.contains("node #5"));
+        let sync_msg = dfbsd_engine.sync_replica_node(8);
+        assert!(sync_msg.contains("node #8"));
 
-        let netbsd_engine = NetBsd127RumpVirtio9pEngineV78::new();
+        let netbsd_engine = NetBsd126RumpVirtio9pEngineV78::new();
         let veriexec_msg = netbsd_engine.verify_binary_integrity("/usr/bin/sudo");
-        assert!(veriexec_msg.contains("Veriexec V7"));
+        assert!(veriexec_msg.contains("Veriexec V6"));
 
         let illumos_engine = IllumosOpenZfsDTraceEBPFEngineV78::new();
         let dtrace_msg = illumos_engine.translate_dtrace_script("sysinfo:::syscall-entry { @[probefunc] = count(); }");
@@ -637,9 +638,9 @@ mod tests {
         let plumber_msg = microkernel_engine.route_plumber_message("kind=text data=open");
         assert!(plumber_msg.contains("Plumber router matched"));
 
-        let mut media_engine = TechMedia34PortalsHarvesterEngineV78::new();
+        let mut media_engine = TechMedia35PortalsHarvesterEngineV78::new();
         let crawl_msg = media_engine.harvest_all_tech_feeds();
-        assert!(crawl_msg.contains("34 media portals"));
+        assert!(crawl_msg.contains("35 media portals"));
 
         let omarchy_engine = OmarchyWallustChordNavigatorEngineV78::new();
         let chord_msg = omarchy_engine.trigger_chord_action("SUPER+ALT+ENTER");

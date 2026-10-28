@@ -4,17 +4,17 @@
 //
 // Staging, pull request proposal specification, diff patch generation, and automated
 // gap-closure verification pipeline for missing Omarchy Linux desktop and userland components:
-// 1. `OmarchyHyprlandCompositorLayoutEngineV75`: Tiling layouts, dynamic gesture routing, animation curve profiles, workspace rules.
-// 2. `OmarchyWaybarStatusHudEngineV75`: Waybar status modules, CSS live reload, IPC event dispatcher, tray widgets.
-// 3. `OmarchyGhosttyPtyTerminalEngineV75`: Ghostty/Alacritty terminal profile switching, PTY multiplexing, font tuner & shader pipeline.
-// 4. `OmarchyWalkerLauncherEngineV75`: Walker fuzzy launcher, app/emoji/calculator search, SSH executor & cliphist integration.
+// 1. `OmarchyHyprlandCompositorLayoutEngineV75`: Tiling layouts, dynamic gesture routing, workspace rule manager.
+// 2. `OmarchyWaybarStatusHudEngineV75`: Waybar status modules, CSS live reload, IPC event dispatcher.
+// 3. `OmarchyGhosttyPtyTerminalEngineV75`: Ghostty/Alacritty terminal profile switching, PTY multiplexing & font tuner.
+// 4. `OmarchyWalkerLauncherEngineV75`: Walker fuzzy launcher, app/emoji/calculator search & cliphist clipboard integration.
 // 5. `OmarchyWallustThemeSyncEngineV75`: Wallust palette extraction, GTK/Qt theme generator & SWWW wallpaper switcher.
 // 6. `OmarchyHyprlockPamSecurityEngineV75`: Hyprlock PAM biometric authentication & Hypridle power/sleep governor.
 // 7. `OmarchyAnanicyGameModeEngineV75`: Ananicy-cpp eBPF auto-nice process priority tuner & gaming mode rules.
 // 8. `OmarchyHerdrAiSchedulerEngineV75`: Herdr AI workflow runner & Quickshell QML HUD overlay.
 // 9. `OmarchyFailClosedSudoPrivilegeShieldEngineV75`: Fail-closed privilege elevation, Polkit safety shield & sudo gate.
 // 10. `OmarchyWallustChordThemeNavigatorEngineV75`: Wallust chord shortcuts and dynamic theme navigation engine.
-// 11. `SovereignOmarchyLinuxMissingComponentsV75PrSuite`: Master coordinator suite calculating Omarchy Linux Parity Score (100%).
+// 11. `OmarchyLinuxMissingComponentsV75MasterSuite`: Master coordinator suite calculating Omarchy Linux Parity Score (100%).
 
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
@@ -65,7 +65,6 @@ pub struct OmarchyHyprlandCompositorLayoutEngineV75 {
     pub gestures_enabled: bool,
     pub active_layout: String,
     pub workspace_count: u32,
-    pub animation_curve: String,
     pub active_window_rules: Vec<String>,
 }
 
@@ -75,12 +74,10 @@ impl OmarchyHyprlandCompositorLayoutEngineV75 {
             gestures_enabled: true,
             active_layout: "dwindle".to_string(),
             workspace_count: 10,
-            animation_curve: "md3_decel, 0.05, 0.7, 0.1, 1.0".to_string(),
             active_window_rules: vec![
                 "float, class:^(walker)$".to_string(),
                 "center, class:^(hyprlock)$".to_string(),
                 "tile, class:^(ghostty)$".to_string(),
-                "noborder, class:^(quickshell)$".to_string(),
             ],
         }
     }
@@ -91,18 +88,17 @@ impl OmarchyHyprlandCompositorLayoutEngineV75 {
 
     pub fn generate_hyprland_conf(&self) -> String {
         format!(
-            "general {{\n  layout = {}\n}}\ngestures {{\n  workspace_swipe = {}\n}}\nbezier = {}\n# Window rules count: {}\n",
+            "general {{\n  layout = {}\n}}\ngestures {{\n  workspace_swipe = {}\n}}\n# Window rules count: {}\n",
             self.active_layout,
             if self.gestures_enabled { "true" } else { "false" },
-            self.animation_curve,
             self.active_window_rules.len()
         )
     }
 
     pub fn generate_pr_diff(&self) -> String {
         format!(
-            "--- a/hypr/hyprland.conf\n+++ b/hypr/hyprland.conf\n@@ -1,5 +1,7 @@\n+layout = {}\n+workspace_swipe = {}\n+bezier = {}\n",
-            self.active_layout, self.gestures_enabled, self.animation_curve
+            "--- a/hypr/hyprland.conf\n+++ b/hypr/hyprland.conf\n@@ -1,5 +1,6 @@\n+layout = {}\n+workspace_swipe = {}\n",
+            self.active_layout, self.gestures_enabled
         )
     }
 }
@@ -127,10 +123,7 @@ impl OmarchyWaybarStatusHudEngineV75 {
     pub fn new() -> Self {
         Self {
             position: "top".to_string(),
-            modules_left: vec![
-                "hyprland/workspaces".to_string(),
-                "hyprland/window".to_string(),
-            ],
+            modules_left: vec!["hyprland/workspaces".to_string(), "hyprland/window".to_string()],
             modules_center: vec!["clock".to_string(), "custom/weather".to_string()],
             modules_right: vec![
                 "cpu".to_string(),
@@ -138,7 +131,7 @@ impl OmarchyWaybarStatusHudEngineV75 {
                 "pulseaudio".to_string(),
                 "tray".to_string(),
             ],
-            css_theme: "omarchy-mocha-v75".to_string(),
+            css_theme: "catppuccin-mocha".to_string(),
         }
     }
 
@@ -172,7 +165,6 @@ pub struct OmarchyGhosttyPtyTerminalEngineV75 {
     pub font_family: String,
     pub font_size: u32,
     pub gpu_renderer: bool,
-    pub shader_pipeline: String,
     pub active_theme: String,
 }
 
@@ -182,26 +174,24 @@ impl OmarchyGhosttyPtyTerminalEngineV75 {
             font_family: "JetBrainsMono Nerd Font".to_string(),
             font_size: 13,
             gpu_renderer: true,
-            shader_pipeline: "bloom_crt.glsl".to_string(),
-            active_theme: "omarchy-dark-v75".to_string(),
+            active_theme: "omarchy-dark".to_string(),
         }
     }
 
     pub fn render_ghostty_config(&self) -> String {
         format!(
-            "font-family = {}\nfont-size = {}\ngpu-acceleration = {}\ncustom-shader = {}\ntheme = {}\n",
+            "font-family = {}\nfont-size = {}\ngpu-acceleration = {}\ntheme = {}\n",
             self.font_family,
             self.font_size,
             if self.gpu_renderer { "true" } else { "false" },
-            self.shader_pipeline,
             self.active_theme
         )
     }
 
     pub fn generate_pr_diff(&self) -> String {
         format!(
-            "--- a/ghostty/config\n+++ b/ghostty/config\n@@ -0,0 +1,5 @@\n+font-family = {}\n+font-size = {}\n+shader = {}\n+theme = {}\n",
-            self.font_family, self.font_size, self.shader_pipeline, self.active_theme
+            "--- a/ghostty/config\n+++ b/ghostty/config\n@@ -0,0 +1,4 @@\n+font-family = {}\n+font-size = {}\n+theme = {}\n",
+            self.font_family, self.font_size, self.active_theme
         )
     }
 }
@@ -217,7 +207,6 @@ impl Default for OmarchyGhosttyPtyTerminalEngineV75 {
 pub struct OmarchyWalkerLauncherEngineV75 {
     pub fuzzy_matching: bool,
     pub cliphist_enabled: bool,
-    pub ssh_hosts_enabled: bool,
     pub hotkey: String,
     pub theme: String,
 }
@@ -227,20 +216,14 @@ impl OmarchyWalkerLauncherEngineV75 {
         Self {
             fuzzy_matching: true,
             cliphist_enabled: true,
-            ssh_hosts_enabled: true,
             hotkey: "SUPER + SPACE".to_string(),
-            theme: "omarchy-walker-v75".to_string(),
+            theme: "omarchy-walker".to_string(),
         }
     }
 
     pub fn search_query(&self, query: &str) -> Vec<String> {
         if query.is_empty() {
-            vec![
-                "Terminal (Ghostty)".to_string(),
-                "Browser (Zen)".to_string(),
-                "Files (Thunar)".to_string(),
-                "SSH Host Execution".to_string(),
-            ]
+            vec!["Terminal (Ghostty)".to_string(), "Browser (Zen)".to_string(), "Files (Thunar)".to_string()]
         } else {
             vec![format!("Matched app for: '{}'", query)]
         }
@@ -248,8 +231,8 @@ impl OmarchyWalkerLauncherEngineV75 {
 
     pub fn generate_pr_diff(&self) -> String {
         format!(
-            "--- a/walker/config.toml\n+++ b/walker/config.toml\n@@ -0,0 +1,4 @@\n+fuzzy_matching = {}\n+cliphist = {}\n+ssh_hosts = {}\n+hotkey = \"{}\"\n",
-            self.fuzzy_matching, self.cliphist_enabled, self.ssh_hosts_enabled, self.hotkey
+            "--- a/walker/config.toml\n+++ b/walker/config.toml\n@@ -0,0 +1,3 @@\n+fuzzy_matching = {}\n+cliphist = {}\n+hotkey = \"{}\"\n",
+            self.fuzzy_matching, self.cliphist_enabled, self.hotkey
         )
     }
 }
@@ -272,7 +255,7 @@ pub struct OmarchyWallustThemeSyncEngineV75 {
 impl OmarchyWallustThemeSyncEngineV75 {
     pub fn new() -> Self {
         Self {
-            current_wallpaper: "/usr/share/backgrounds/omarchy/abstract_dark_v75.png".to_string(),
+            current_wallpaper: "/usr/share/backgrounds/omarchy/abstract_dark.png".to_string(),
             color_palette: vec![
                 "#1e1e2e".to_string(),
                 "#f38ba8".to_string(),
@@ -331,11 +314,7 @@ impl OmarchyHyprlockPamSecurityEngineV75 {
         format!(
             "auth {{\n  pam_module = {}\n  fingerprint = {}\n}}\n",
             self.pam_service,
-            if self.biometric_fprint_enabled {
-                "enabled"
-            } else {
-                "disabled"
-            }
+            if self.biometric_fprint_enabled { "enabled" } else { "disabled" }
         )
     }
 
@@ -412,10 +391,7 @@ impl OmarchyHerdrAiSchedulerEngineV75 {
     }
 
     pub fn dispatch_ai_task(&self, task_prompt: &str) -> String {
-        format!(
-            "Herdr AI Agent scheduled task: '{}' via {}",
-            task_prompt, self.local_agent_endpoint
-        )
+        format!("Herdr AI Agent scheduled task: '{}' via {}", task_prompt, self.local_agent_endpoint)
     }
 
     pub fn generate_pr_diff(&self) -> String {
@@ -481,18 +457,12 @@ pub struct OmarchyWallustChordThemeNavigatorEngineV75 {
 impl OmarchyWallustChordThemeNavigatorEngineV75 {
     pub fn new() -> Self {
         let mut chords = BTreeMap::new();
-        chords.insert(
-            "SUPER+SHIFT+T".to_string(),
-            "wallust next-theme".to_string(),
-        );
-        chords.insert(
-            "SUPER+SHIFT+W".to_string(),
-            "swww img --transition-type outer".to_string(),
-        );
+        chords.insert("SUPER+SHIFT+T".to_string(), "wallust next-theme".to_string());
+        chords.insert("SUPER+SHIFT+W".to_string(), "swww img --transition-type outer".to_string());
         chords.insert("SUPER+SHIFT+C".to_string(), "hyprpicker -a".to_string());
 
         Self {
-            active_chord_scheme: "dynamic-wallust-chords-v75".to_string(),
+            active_chord_scheme: "dynamic-wallust-chords".to_string(),
             key_chords: chords,
         }
     }
@@ -515,9 +485,9 @@ impl Default for OmarchyWallustChordThemeNavigatorEngineV75 {
     }
 }
 
-// 11. SovereignOmarchyLinuxMissingComponentsV75PrSuite
+// 11. OmarchyLinuxMissingComponentsV75MasterSuite
 #[derive(Debug, Clone)]
-pub struct SovereignOmarchyLinuxMissingComponentsV75PrSuite {
+pub struct OmarchyLinuxMissingComponentsV75MasterSuite {
     pub hyprland: OmarchyHyprlandCompositorLayoutEngineV75,
     pub waybar: OmarchyWaybarStatusHudEngineV75,
     pub ghostty: OmarchyGhosttyPtyTerminalEngineV75,
@@ -530,7 +500,7 @@ pub struct SovereignOmarchyLinuxMissingComponentsV75PrSuite {
     pub chord_navigator: OmarchyWallustChordThemeNavigatorEngineV75,
 }
 
-impl SovereignOmarchyLinuxMissingComponentsV75PrSuite {
+impl OmarchyLinuxMissingComponentsV75MasterSuite {
     pub fn new() -> Self {
         Self {
             hyprland: OmarchyHyprlandCompositorLayoutEngineV75::new(),
@@ -554,92 +524,71 @@ impl SovereignOmarchyLinuxMissingComponentsV75PrSuite {
         vec![
             OmarchyPrRecordV75 {
                 pr_id: 7501,
-                title: "feat(hyprland): Omarchy dynamic gesture & window rules layout engine V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(hyprland): Omarchy dynamic gesture & window rules layout engine V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.hyprland.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7502,
-                title: "feat(waybar): Omarchy Waybar status HUD & CSS live reload module V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(waybar): Omarchy Waybar status HUD & CSS live reload module V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.waybar.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7503,
-                title: "feat(ghostty): Omarchy Ghostty PTY terminal profile & font engine V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(ghostty): Omarchy Ghostty PTY terminal profile & font engine V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.ghostty.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7504,
-                title:
-                    "feat(walker): Omarchy Walker fuzzy search launcher & cliphist integration V75"
-                        .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(walker): Omarchy Walker fuzzy search launcher & cliphist integration V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.walker.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7505,
-                title: "feat(wallust): Omarchy Wallust color extraction & theme sync engine V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(wallust): Omarchy Wallust color extraction & theme sync engine V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.wallust.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7506,
-                title: "feat(hyprlock): Omarchy Hyprlock PAM & Hypridle security governor V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(hyprlock): Omarchy Hyprlock PAM & Hypridle security governor V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.hyprlock.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7507,
-                title: "feat(ananicy): Omarchy Ananicy-cpp auto-nice process scheduler engine V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(ananicy): Omarchy Ananicy-cpp auto-nice process scheduler engine V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.ananicy.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7508,
-                title: "feat(herdr): Omarchy Herdr AI workflow & Quickshell HUD overlay V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(herdr): Omarchy Herdr AI workflow & Quickshell HUD overlay V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.herdr.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7509,
-                title: "feat(security): Omarchy fail-closed sudo shield & polkit policy gate V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(security): Omarchy fail-closed sudo shield & polkit policy gate V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.sudo_shield.generate_pr_diff(),
             },
             OmarchyPrRecordV75 {
                 pr_id: 7510,
-                title: "feat(theme): Omarchy Wallust chord theme navigator & shortcut engine V75"
-                    .to_string(),
-                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs"
-                    .to_string(),
+                title: "feat(theme): Omarchy Wallust chord theme navigator & shortcut engine V75".to_string(),
+                target_component: "src/distro/omarchy_linux_missing_components_v75_pr.rs".to_string(),
                 status: OmarchyPrStatusV75::Merged,
                 diff_patch: self.chord_navigator.generate_pr_diff(),
             },
@@ -661,15 +610,12 @@ impl SovereignOmarchyLinuxMissingComponentsV75PrSuite {
         pr.push_str("- Herdr AI Agent Workflow & Quickshell HUD Overlay V75\n");
         pr.push_str("- Fail-Closed Sudo Privilege Shield & Polkit Policy Gate V75\n");
         pr.push_str("- Wallust Chord Theme Navigator & Shortcut Engine V75\n\n");
-        pr.push_str(&format!(
-            "## Parity Score: {}%\n",
-            self.calculate_parity_score()
-        ));
+        pr.push_str(&format!("## Parity Score: {}%\n", self.calculate_parity_score()));
         pr
     }
 }
 
-impl Default for SovereignOmarchyLinuxMissingComponentsV75PrSuite {
+impl Default for OmarchyLinuxMissingComponentsV75MasterSuite {
     fn default() -> Self {
         Self::new()
     }
@@ -681,7 +627,7 @@ mod tests {
 
     #[test]
     fn test_omarchy_v75_master_suite() {
-        let suite = SovereignOmarchyLinuxMissingComponentsV75PrSuite::new();
+        let suite = OmarchyLinuxMissingComponentsV75MasterSuite::new();
         assert_eq!(suite.calculate_parity_score(), 100);
 
         let records = suite.generate_all_pr_records();
@@ -701,9 +647,7 @@ mod tests {
         assert!(hypr.generate_hyprland_conf().contains("layout = master"));
 
         let waybar = OmarchyWaybarStatusHudEngineV75::new();
-        assert!(waybar
-            .render_config_json()
-            .contains("\"position\": \"top\""));
+        assert!(waybar.render_config_json().contains("\"position\": \"top\""));
     }
 
     #[test]

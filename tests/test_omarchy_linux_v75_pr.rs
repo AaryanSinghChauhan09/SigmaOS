@@ -8,7 +8,7 @@ use omarchy_linux_missing_components_v75_pr::*;
 
 #[test]
 fn test_omarchy_linux_v75_pr_suite_full_cycle() {
-    let suite = SovereignOmarchyLinuxMissingComponentsV75PrSuite::new();
+    let suite = OmarchyLinuxMissingComponentsV75MasterSuite::new();
     assert_eq!(suite.calculate_parity_score(), 100);
 
     let records = suite.generate_all_pr_records();
@@ -24,18 +24,16 @@ fn test_omarchy_linux_v75_pr_suite_full_cycle() {
     let markdown_proposal = suite.generate_markdown_pr_proposal();
     assert!(markdown_proposal.contains("# PR Proposal: Sovereign Omarchy Linux Gap Closure V75"));
     assert!(markdown_proposal.contains("Parity Score: 100%"));
-    assert!(markdown_proposal.contains("Hyprland Compositor & Tiling Layout Engine V75"));
-    assert!(markdown_proposal.contains("Waybar Status HUD & Live CSS Module Engine V75"));
-    assert!(markdown_proposal.contains("Ghostty / Alacritty GPU Terminal PTY Engine V75"));
-    assert!(markdown_proposal.contains("Walker Fuzzy Search Launcher & Clipboard History V75"));
-    assert!(markdown_proposal.contains("Wallust Dynamic Palette Extractor & GTK/Qt Theme Sync V75"));
-    assert!(markdown_proposal.contains("Hyprlock PAM Biometric Locker & Hypridle Governor V75"));
-    assert!(markdown_proposal.contains("Ananicy-cpp Auto-Nice Real-Time Priority Scheduler V75"));
-    assert!(markdown_proposal.contains("Herdr AI Agent Workflow & Quickshell HUD Overlay V75"));
-    assert!(
-        markdown_proposal.contains("Fail-Closed Sudo Privilege Shield & Polkit Policy Gate V75")
-    );
-    assert!(markdown_proposal.contains("Wallust Chord Theme Navigator & Shortcut Engine V75"));
+    assert!(markdown_proposal.contains("Hyprland Compositor & Tiling Layout Engine"));
+    assert!(markdown_proposal.contains("Waybar Status HUD & Live CSS Module Engine"));
+    assert!(markdown_proposal.contains("Ghostty / Alacritty GPU Terminal PTY Engine"));
+    assert!(markdown_proposal.contains("Walker Fuzzy Search Launcher & Clipboard History"));
+    assert!(markdown_proposal.contains("Wallust Dynamic Palette Extractor & GTK/Qt Theme Sync"));
+    assert!(markdown_proposal.contains("Hyprlock PAM Biometric Locker & Hypridle Governor"));
+    assert!(markdown_proposal.contains("Ananicy-cpp Auto-Nice Real-Time Priority Scheduler"));
+    assert!(markdown_proposal.contains("Herdr AI Agent Workflow & Quickshell HUD Overlay"));
+    assert!(markdown_proposal.contains("Fail-Closed Sudo Privilege Shield & Polkit Policy Gate"));
+    assert!(markdown_proposal.contains("Wallust Chord Theme Navigator & Shortcut Engine"));
 }
 
 #[test]
@@ -47,9 +45,7 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(hypr.generate_hyprland_conf().contains("layout = master"));
 
     let waybar = OmarchyWaybarStatusHudEngineV75::new();
-    assert!(waybar
-        .render_config_json()
-        .contains("\"position\": \"top\""));
+    assert!(waybar.render_config_json().contains("\"position\": \"top\""));
 
     let ghostty = OmarchyGhosttyPtyTerminalEngineV75::new();
     assert!(ghostty.render_ghostty_config().contains("JetBrainsMono"));
@@ -62,9 +58,7 @@ fn test_omarchy_linux_v75_subsystem_engines() {
     assert!(wallust.generate_wallust_colors_json().contains("#1e1e2e"));
 
     let hyprlock = OmarchyHyprlockPamSecurityEngineV75::new();
-    assert!(hyprlock
-        .generate_hyprlock_conf()
-        .contains("pam_module = hyprlock"));
+    assert!(hyprlock.generate_hyprlock_conf().contains("pam_module = hyprlock"));
 
     let ananicy = OmarchyAnanicyGameModeEngineV75::new();
     assert_eq!(ananicy.get_nice_value("hyprland"), -15);
