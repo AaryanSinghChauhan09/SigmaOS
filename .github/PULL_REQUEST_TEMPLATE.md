@@ -1,83 +1,45 @@
-## Summary
+## Component
+- [ ] Kernel Core / Architecture (`src/kernel/`, `src/arch/`)
+- [ ] Memory Management / Allocator (`src/memory/`, `src/mm/`, `src/swap/`)
+- [ ] Scheduler & Process Control (`src/scheduler/`, `src/process/`)
+- [ ] Virtual File System / Storage (`src/vfs/`, `src/fs/`, `src/storage/`)
+- [ ] Drivers & Hardware Abstraction (`src/drivers/`, `src/hardware/`)
+- [ ] Userland Primitives & Shell (`src/userland/`, `src/shell/`)
+- [ ] Security & Capability System (`src/security/`, `src/tpm/`)
+- [ ] Desktop & Innovations (`src/desktop/`, `src/creative/`)
+- [ ] Distro & Open-Source OS Adoption (`src/distro/`)
 
-<!-- What kernel behavior changed and why? -->
+## Open-Source OS Idea Adoption Reference & Upstream Study
+- Upstream OS Reference / Reference study: Redox, seL4, Tock, Fuchsia, Linux, FreeBSD, OpenBSD, Plan 9, Haiku, Debian
+- What SigmaOS adopts:
+- Open-Source Idea Issue Link / Study document:
 
-## Kernel component
+## Architectural & Kernel Safety Review
+- [ ] **`#![no_std]` Compliance**: Maintained in kernel and driver modules without unallowed `std::` imports.
+- [ ] **Capability Tokens**: Entrypoints for system calls include explicit `CapabilityToken` verification.
+- [ ] **Driver Lifecycle**: New/modified drivers follow `IoManager` / `DriverObject` / `DeviceObject` lifecycle guidelines with unit test coverage.
+- [ ] **Memory Pools**: Proper isolation and handling between `Paged` and `NonPaged` memory allocations.
+- [ ] **Type Annotations**: Explicit type signatures on public APIs and key kernel collections.
+- [ ] **Memory Safety**: Bounds-checked copy operations and audited `unsafe` block invariants.
+- [ ] **ABI Stability**: Highlight any system call number or ABI modifications.
 
-- [ ] Boot / arch init
-- [ ] Interrupts / traps
-- [ ] Memory / paging / swap
-- [ ] Scheduler / processes
-- [ ] VFS / filesystems
-- [ ] Syscalls / ELF
-- [ ] Drivers
-- [ ] Networking / sockets
-- [ ] IPC / signals / timers
-- [ ] Security / capabilities
-- [ ] Diagnostics
-- [ ] Build / CI
-
-## Recurring task
-
-- [ ] PR-level validation
-- [ ] Daily CI triage
-- [ ] Weekly subsystem review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly syscall/ABI review
-- [ ] Biweekly memory/concurrency audit
-- [ ] Monthly boot validation
-- [ ] Monthly driver/hardware audit
-- [ ] Monthly fuzz triage
-- [ ] Monthly diagnostics rehearsal
-- [ ] Quarterly release/architecture/security review
-
-## Reference study
-
-<!-- Required for design-changing kernel PRs -->
-
-- Study document:
-- Linux/BSD/Redox/xv6 reference:
-- Decision: Adopt / Adapt / Reject
-- Reason:
-
-## Changes
-
--
--
+## Shell safety review
+- [ ] Interactive shell, lexer/parser, builtins, and POSIX conformance verified.
 
 ## Kernel safety review
+- [ ] Kernel panic handlers, register contexts, and memory isolation audited.
 
-- [ ] No unnecessary `unsafe`
-- [ ] Every `unsafe` block documents invariants
-- [ ] Lock ordering documented
-- [ ] Interrupt-context safety considered
-- [ ] Allocation limits defined
-- [ ] OOM behavior defined
-- [ ] Error paths tested
-- [ ] No silent failure introduced
+## Safety and rollback
+- [ ] Rollback strategy, feature flags, and fail-safe recovery plans documented (Risks and rollback).
 
-## Evidence
+## Reviewer checklist
+- [ ] All test suites passed, architectural constraints satisfied, documentation updated.
 
-- [ ] `cargo check --lib`
-- [ ] `cargo fmt --check`
-- [ ] `cargo test --lib`
-- [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
-- [ ] Fuzz target or reason for exemption
-- [ ] QEMU boot evidence, if boot-affecting
-- [ ] Driver/hardware evidence, if driver-affecting
-- [ ] Security review requested, if applicable
+## Testing & Evidence
+- [ ] Standalone file unit test executed (`rustc --test`)
+- [ ] Repository test suite executed (`./run_sigma_tests.sh`)
+- [ ] QEMU boot smoke test executed (if kernel/boot modified)
+- [ ] Benchmarks / Fuzzing executed (if applicable)
 
-## Status updates
-
-- [ ] `FEATURE_STATUS.toml`
-- [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Component documentation
-- [ ] Boot matrix, if applicable
-- [ ] Hardware matrix, if applicable
-
-## Risks and rollback
-
-- Risk:
-- Rollback:
+## Additional Notes
+<!-- Detail any potential risks, performance impact, or safety and rollback strategy -->
