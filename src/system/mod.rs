@@ -341,7 +341,7 @@ pub use cleanup::{
     init_system_cleanup, get_system_cleanup,
 };
 pub use logrotate::{
-    LogRotateManager, SysLogFileConfig, RotationSchedule, CompressionType,
+    LogRotateManager, LogFileConfig as SysLogFileConfig, RotationSchedule, CompressionType,
     init_log_rotate, get_log_rotate,
 };
 pub use restore::{
@@ -349,7 +349,7 @@ pub use restore::{
     init_system_restore, get_system_restore,
 };
 pub use firewall::{
-    FirewallManager, FirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
+    FirewallManager, FirewallRule as SysFirewallRule, RuleAction, Protocol, Direction, FirewallProfile,
     init_firewall, get_firewall,
 };
 
