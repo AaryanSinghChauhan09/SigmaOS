@@ -295,16 +295,22 @@ impl AppLauncher {
 
     pub fn get_suggested_apps(&self) -> Vec<AppEntry> {
         let count = self.apps.len().min(5);
-        let mut suggested = Vec::with_capacity(count);
-
-        // Get most frequently used apps
-        let mut sorted_apps: Vec<&AppEntry> = self.apps.values().collect();
-        sorted_apps.sort_by(|a, b| b.use_count.cmp(&a.use_count));
-
-        for app in sorted_apps.iter().take(5) {
-            suggested.push((*app).clone());
+        if count == 0 {
+            return Vec::new();
         }
 
+        let mut sorted_apps: Vec<&AppEntry> = self.apps.values().collect();
+        // Performance optimization: Use O(N) quickselect (select_nth_unstable_by) instead of
+        // O(N log N) full sorting when selecting only top 5 most used apps.
+        if sorted_apps.len() > count {
+            sorted_apps.select_nth_unstable_by(count - 1, |a, b| b.use_count.cmp(&a.use_count));
+        }
+
+        let mut suggested = Vec::with_capacity(count);
+        for app in sorted_apps.iter().take(count) {
+            suggested.push((*app).clone());
+        }
+        suggested.sort_by(|a, b| b.use_count.cmp(&a.use_count));
         suggested
     }
 
@@ -461,6 +467,7 @@ pub fn init_default_apps() -> AppLauncher {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::format;
 
     #[test]
     fn test_app_entry() {
@@ -531,5 +538,25 @@ mod tests {
         let pinned = launcher.get_pinned_apps();
         assert_eq!(pinned.len(), 1);
         assert_eq!(pinned[0].name, "Pinned App");
+    }
+
+    #[test]
+    fn test_get_suggested_apps_partial_selection() {
+        let mut launcher = AppLauncher::new();
+
+        for i in 1..=10 {
+            let mut app = AppEntry::new(&format!("App {}", i), &format!("/usr/bin/app{}", i));
+            app.use_count = i * 10;
+            launcher.register_app(app);
+        }
+
+        let suggested = launcher.get_suggested_apps();
+        assert_eq!(suggested.len(), 5);
+        // Verify top 5 apps are selected in descending order of use_count (App 10, App 9, App 8, App 7, App 6)
+        assert_eq!(suggested[0].use_count, 100);
+        assert_eq!(suggested[1].use_count, 90);
+        assert_eq!(suggested[2].use_count, 80);
+        assert_eq!(suggested[3].use_count, 70);
+        assert_eq!(suggested[4].use_count, 60);
     }
 }
