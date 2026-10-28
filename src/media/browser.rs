@@ -16,6 +16,7 @@
 #![allow(clippy::collapsible_match)]
 #![allow(clippy::unnecessary_lazy_evaluations)]
 
+use crate::media::sovereign_web_browser_advancements_v82_pr::SovereignWebBrowserAdvancementsV82PrGatewayEngine;
 use std::collections::BTreeMap;
 use std::format;
 use std::string::{String, ToString};
@@ -2047,6 +2048,7 @@ pub struct SigmaWebBrowser {
     pub brave_ephemeral_storage: BraveShieldsFirstPartyEphemeralStorageEngine,
     pub tor_rendezvous: TorOnionRendezvousHandshakeEngine,
     pub ladybird_selector_engine: LadybirdLibWebCss3SelectorEngine,
+    pub v82_gateway: SovereignWebBrowserAdvancementsV82PrGatewayEngine,
 }
 
 impl SigmaWebBrowser {
@@ -2117,6 +2119,7 @@ impl SigmaWebBrowser {
             brave_ephemeral_storage: BraveShieldsFirstPartyEphemeralStorageEngine::new(),
             tor_rendezvous: TorOnionRendezvousHandshakeEngine::new(),
             ladybird_selector_engine: LadybirdLibWebCss3SelectorEngine::new(),
+            v82_gateway: SovereignWebBrowserAdvancementsV82PrGatewayEngine::new(),
         }
     }
 
