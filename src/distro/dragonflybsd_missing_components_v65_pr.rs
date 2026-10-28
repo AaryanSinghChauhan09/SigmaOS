@@ -9,9 +9,9 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
-/// Status of PR Proposal.
+/// Status of PR Proposal V65.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PrProposalStatus {
+pub enum PrProposalStatusV65 {
     Draft,
     Proposed,
     UnderReview,
@@ -19,14 +19,14 @@ pub enum PrProposalStatus {
     Merged,
 }
 
-/// Specifications for DragonFly BSD Component PR Proposal.
+/// Specifications for DragonFly BSD Component PR Proposal V65.
 #[derive(Debug, Clone)]
-pub struct DragonFlyComponentPrSpec {
+pub struct DragonFlyComponentPrSpecV65 {
     pub pr_id: u32,
     pub title: String,
     pub target_component: String,
     pub description: String,
-    pub status: PrProposalStatus,
+    pub status: PrProposalStatusV65,
     pub unified_diff: String,
 }
 
@@ -534,110 +534,110 @@ impl DragonFlyBsdMissingComponentsV65PrSuite {
         }
     }
 
-    pub fn generate_manifest(&self) -> Vec<DragonFlyComponentPrSpec> {
+    pub fn generate_manifest(&self) -> Vec<DragonFlyComponentPrSpecV65> {
         let mut prs = Vec::new();
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6501,
             title: "HAMMER2 Zero-Copy Delta Live Snapshot Sync & Replication Engine V3".to_string(),
             target_component: "filesystem/hammer2".to_string(),
             description: "Zero-copy delta PFS snapshot replication and live sync.".to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff:
                 "--- a/fs/hammer2_delta_repl.rs\n+++ b/fs/hammer2_delta_repl.rs\n+ pub fn sync_pfs_replica()"
                     .to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6502,
             title: "LWKT Cache-Affinity Aware Lockless Dynamic Thread Scheduler Engine V3".to_string(),
             target_component: "kernel/scheduler/lwkt".to_string(),
             description: "Cache affinity scoring and lockless NUMA thread scheduling.".to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff:
                 "--- a/kernel/lwkt_cache.rs\n+++ b/kernel/lwkt_cache.rs\n+ pub fn schedule_thread()"
                     .to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6503,
             title: "vkernel Direct VirtIO GPU Hypercall Acceleration & Shared Memory Fence Engine V3".to_string(),
             target_component: "virtualization/vkernel".to_string(),
             description: "Direct VirtIO GPU hypercall acceleration with SHM fence tracking.".to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff: "--- a/virt/vkernel_shm_gpu.rs\n+++ b/virt/vkernel_shm_gpu.rs\n+ pub fn submit_hypercall_cmd()".to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6504,
             title: "dsynth PQC Cluster Package Build Orchestrator & Dependency Resolver V3".to_string(),
             target_component: "package/dsynth".to_string(),
             description: "PQC cluster build verification and dependency package dispatching."
                 .to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff:
                 "--- a/pkg/dsynth_pqc_cluster.rs\n+++ b/pkg/dsynth_pqc_cluster.rs\n+ pub fn dispatch_jobs()"
                     .to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6505,
             title: "VFS Variant Symlinks Multi-Tenant Jail Scope Isolation Engine V3".to_string(),
             target_component: "vfs/varsyms".to_string(),
             description: "Multi-tenant jail scope variant symlink path resolution."
                 .to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff:
                 "--- a/vfs/varsyms_tenant.rs\n+++ b/vfs/varsyms_tenant.rs\n+ pub fn resolve_jail_path()"
                     .to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6506,
             title: "Swapcache NVMe Hot-Tiering & ZSTD Dynamic Eviction Governor V3".to_string(),
             target_component: "storage/swapcache".to_string(),
             description: "NVMe tiering elevation and ZSTD dynamic eviction.".to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff: "--- a/storage/swapcache_zstd.rs\n+++ b/storage/swapcache_zstd.rs\n+ pub fn elevate_to_nvme_tier()".to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6507,
             title: "Lockless Per-CPU Namecache Concurrent Lookup Engine V3".to_string(),
             target_component: "vfs/namecache".to_string(),
             description: "Lockless per-CPU namecache hit-count tracking and concurrent lookup.".to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff: "--- a/vfs/namecache_percpu.rs\n+++ b/vfs/namecache_percpu.rs\n+ pub fn insert_entry()".to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6508,
             title: "Devctl Kqueue Device Hotplug Event Rule Policy Router V3".to_string(),
             target_component: "dev/devctl".to_string(),
             description: "Kqueue hotplug active rule priority filtering and driver matching.".to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff: "--- a/dev/devctl_router.rs\n+++ b/dev/devctl_router.rs\n+ pub fn evaluate_hotplug()".to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6509,
             title: "Firmlink Mount Namespace Quota & Storage Boundary Guard V3".to_string(),
             target_component: "vfs/firmlink".to_string(),
             description: "Mount namespace storage boundary quota enforcement."
                 .to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff:
                 "--- a/vfs/firmlink_guard.rs\n+++ b/vfs/firmlink_guard.rs\n+ pub fn allocate_bytes()"
                     .to_string(),
         });
 
-        prs.push(DragonFlyComponentPrSpec {
+        prs.push(DragonFlyComponentPrSpecV65 {
             pr_id: 6510,
             title: "SMP Cross-CPU TSC Drift Compensation & IPI Sync Governor V3".to_string(),
             target_component: "kernel/smp".to_string(),
             description: "SMP IPI clock sync, drift measurement, and hardware TSC calibration V3."
                 .to_string(),
-            status: PrProposalStatus::Approved,
+            status: PrProposalStatusV65::Approved,
             unified_diff:
                 "--- a/kernel/smp_tsc_v3.rs\n+++ b/kernel/smp_tsc_v3.rs\n+ pub fn calibrate_tsc()"
                     .to_string(),
