@@ -55,6 +55,8 @@ pub mod sovereign_storage_filesystem_innovations_v74_pr;
 pub use sovereign_storage_filesystem_innovations_v74_pr::*;
 pub mod sovereign_storage_filesystem_innovations_v75_pr;
 pub use sovereign_storage_filesystem_innovations_v75_pr::*;
+pub mod sovereign_storage_filesystem_innovations_v77_pr;
+pub use sovereign_storage_filesystem_innovations_v77_pr::*;
 pub use sql_engine::{
     Column, QueryResult, SqlEngine, SqlType, SqlValue, Table, Transaction, TransactionState,
 };
