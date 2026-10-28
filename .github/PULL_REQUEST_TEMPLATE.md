@@ -1,42 +1,59 @@
-# Pull Request: SigmaOS Feature Implementation & Distro Parity Update
+## Summary
 
-<!-- What scheduler behavior changed and why? -->
+<!-- What subsystem behavior changed and why? -->
 
-## Scheduler component
+## Shell component
 
-- [ ] Scheduler core
-- [ ] Run queue / PID allocation
-- [ ] fork / clone
-- [ ] exec
-- [ ] Scheduler / run queue
-- [ ] Context switch
+- [ ] Lexer
+- [ ] Parser
+- [ ] Expansion
+- [ ] Executor
+- [ ] Pipelines
+- [ ] Redirection
+- [ ] Job control
 - [ ] Signals
-- [ ] Wait / zombie / reaping
-- [ ] Process groups / sessions
-- [ ] Resource limits
-- [ ] Namespaces / isolation
-- [ ] procfs / diagnostics
-- [ ] Security / capabilities
+- [ ] Built-ins
+- [ ] Interactive line editor
+- [ ] Script runner
+- [ ] Diagnostics
+- [ ] Security / sandboxing
 - [ ] Documentation
 - [ ] CI / tooling
+
+## Subsystem / Component
+
+- [ ] Shell
+- [ ] Kernel
+- [ ] Process
+- [ ] Memory / MM / Swap
+- [ ] VFS / Filesystem / Storage
+- [ ] Scheduler
+- [ ] Drivers / Devices
+- [ ] Network
+- [ ] Governance / Lifecycle
 
 ## Recurring task
 
 - [ ] PR validation
 - [ ] Daily CI triage
-- [ ] Weekly lifecycle review
-- [ ] Weekly Linux/BSD study
-- [ ] Biweekly scheduler audit
-- [ ] Biweekly signal/wait audit
-- [ ] Monthly boot validation
-- [ ] Quarterly architecture/security/release review
+- [ ] Weekly feature/bug triage
+- [ ] Weekly POSIX/sh study
+- [ ] Biweekly parser/expansion audit
+- [ ] Biweekly built-in review
+- [ ] Monthly boot-to-shell validation
+- [ ] Monthly compatibility suite
+- [ ] Monthly fuzz triage
+- [ ] Monthly security review
+- [ ] Quarterly release/UX/performance review
 
 ## Reference behavior
 
-<!-- Required for lifecycle, ABI, or scheduler changes -->
+<!-- Required for compatibility or specification changes -->
 
+- Upstream study / Reference study:
+- What SigmaOS adopts:
 - POSIX section:
-- Linux/BSD/Redox/xv6 reference:
+- Reference behavior (Bash/dash/Zsh/BusyBox/Linux/BSD):
 - SigmaOS current behavior:
 - New behavior:
 - Compatibility impact:
@@ -46,18 +63,17 @@
 -
 -
 
-## Scheduler safety review
+## Shell safety review
 
-- [ ] Lifecycle transitions are valid
-- [ ] Zombies are eventually reaped
-- [ ] Orphans are adopted
-- [ ] PID reuse is safe
-- [ ] Lock ordering is documented
-- [ ] Interrupt-context safety considered
-- [ ] Signal races considered
-- [ ] Double-reap prevented
-- [ ] Resource limits enforced
-- [ ] No unbounded allocation or recursion
+- [ ] Expansion order is correct
+- [ ] Quoting behavior is preserved
+- [ ] Redirection failures are handled
+- [ ] Exit codes are explicit
+- [ ] Signal behavior is defined
+- [ ] No unbounded recursion or allocation
+- [ ] Interactive terminal state is restored
+- [ ] Script mode does not execute invalid partial input
+- [ ] Kernel safety review / Reviewer checklist
 
 ## Evidence
 
@@ -65,18 +81,17 @@
 - [ ] `cargo fmt --check`
 - [ ] `cargo test --lib`
 - [ ] `./run_sigma_tests.sh`
-- [ ] New/updated unit tests
-- [ ] Integration tests
+- [ ] New/updated shell tests
+- [ ] POSIX/conformance test evidence
 - [ ] Fuzz target or documented exemption
 - [ ] Boot-to-shell evidence, if boot-affecting
-- [ ] Scheduler benchmark, if performance-affecting
 - [ ] Security review requested, if applicable
 
 ## Status updates
 
 - [ ] `FEATURE_STATUS.toml`
 - [ ] `CAPABILITY_MATRIX.toml`
-- [ ] Process documentation
+- [ ] Shell documentation
 - [ ] Boot matrix, if applicable
 
 ## Risks and rollback
