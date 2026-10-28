@@ -3,13 +3,15 @@
 
 #[path = "../src/distro/debian_github_repo_missing_components_v71_pr.rs"]
 mod debian_github_repo_missing_components_v71_pr;
-#[path = "../src/distro/open_source_os_unimplemented_ideas_v72_pr.rs"]mod open_source_os_unimplemented_ideas_v72_pr;
+#[path = "../src/distro/open_source_os_unimplemented_ideas_v72_pr.rs"]
+mod open_source_os_unimplemented_ideas_v72_pr;
 
 #[path = "../src/distro/open_source_os_debian_unimplemented_ideas_v72_pr.rs"]
 mod open_source_os_debian_unimplemented_ideas_v72_pr;
 
 use debian_github_repo_missing_components_v71_pr::*;
-use open_source_os_debian_unimplemented_ideas_v72_pr::*;use open_source_os_unimplemented_ideas_v72_pr::*;
+use open_source_os_debian_unimplemented_ideas_v72_pr::*;
+use open_source_os_unimplemented_ideas_v72_pr::*;
 use std::collections::BTreeSet;
 
 #[test]
@@ -41,7 +43,8 @@ fn test_freebsd_161_capsicum_casper_engine_v72() {
 fn test_openbsd_89_pinsyscall_unveil_engine_v72() {
     let engine = OpenBsd89PinsyscallUnveilV72PrEngine::new();
     assert!(engine.validate_pinsyscall(0x7fff0600));
-    assert!(engine.check_unveil_access("/usr/bin", 'x'));    let spec = engine.generate_pr_spec();
+    assert!(engine.check_unveil_access("/usr/bin", 'x'));
+    let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7203);
 }
 
@@ -49,7 +52,8 @@ fn test_openbsd_89_pinsyscall_unveil_engine_v72() {
 fn test_netbsd_125_rump_pci_virtio9p_engine_v72() {
     let engine = NetBsd125RumpPciVirtio9pV72PrEngine::new();
     let packet = vec![0, 0, 0, 0, 100, 1, 0];
-    assert_eq!(engine.parse_9p_header(&packet), Some((100, 1)));    let spec = engine.generate_pr_spec();
+    assert_eq!(engine.parse_9p_header(&packet), Some((100, 1)));
+    let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7204);
 }
 
@@ -57,7 +61,8 @@ fn test_netbsd_125_rump_pci_virtio9p_engine_v72() {
 fn test_dragonfly_hammer3_multimaster_engine_v72() {
     let engine = DragonFlyHammer3MultiMasterScrubV72PrEngine::new();
     assert!(engine.sync_pfs_delta(1, 2));
-    assert!(engine.verify_scrub_checksum("BLAKE3:abcdef"));    let spec = engine.generate_pr_spec();
+    assert!(engine.verify_scrub_checksum("BLAKE3:abcdef"));
+    let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7205);
 }
 
@@ -70,7 +75,8 @@ fn test_illumos_openzfs_dtrace_ebpf_engine_v72() {
     assert_eq!(
         engine.translate_dtrace_to_ebpf("zfs:zil:commit"),
         "bpf_probe_zfs_zil_commit"
-    );    let spec = engine.generate_pr_spec();
+    );
+    let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7206);
 }
 
@@ -102,7 +108,8 @@ fn test_plan9_9p2000l_plumber_engine_v72() {
 fn test_redoxfs_cow_capability_engine_v72() {
     let engine = RedoxFsCowCapabilityV72PrEngine::new();
     assert!(engine.verify_scheme_capability("file:"));
-    assert!(engine.verify_scheme_capability("disk:"));    let spec = engine.generate_pr_spec();
+    assert!(engine.verify_scheme_capability("disk:"));
+    let spec = engine.generate_pr_spec();
     assert_eq!(spec.pr_id, 7209);
 }
 
@@ -219,4 +226,5 @@ fn test_unified_open_source_os_debian_v72_suite() {
     assert!(proposals[0].pr_id.starts_with("PR-OS-V72-"));
     assert!(proposals[9].pr_id.starts_with("PR-DEBIAN-V71-"));
     let parity = suite.evaluate_distro_parity_score();
-    assert!(parity >= 98);}
+    assert!(parity >= 98);
+}
