@@ -2995,4 +2995,11 @@ if [ -f "tests/test_open_source_os_unimplemented_ideas_v77_pr.rs" ]; then
     rustc --test tests/test_open_source_os_unimplemented_ideas_v77_pr.rs --edition=2021 -L build/ -o build/test_open_source_os_v77_pr
     ./build/test_open_source_os_v77_pr
 fi
+
+if [ -f "tests/test_ipc_handler_plan.rs" ]; then
+    echo "Running SigmaOS IPC Handler Plan Verification test suite..."
+    mkdir -p build
+    rustc --test tests/test_ipc_handler_plan.rs --edition=2021 -o build/test_ipc_plan
+    ./build/test_ipc_plan
+fi
 echo "All SigmaOS test suites completed."

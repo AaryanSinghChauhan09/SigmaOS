@@ -25,10 +25,6 @@
 
 <!-- Link issue, roadmap item, or gap-analysis entry. -->
 
-## Reference study / What SigmaOS adopts
-
-<!-- Reference study, roadmap specification, or upstream paradigm. -->
-
 ## IPC semantics
 
 - Blocking behavior:
@@ -39,7 +35,7 @@
 - Resource limits:
 - Backpressure policy:
 
-## Security review & Safety and rollback
+## Security review
 
 - [ ] User input validated
 - [ ] Descriptor lifecycle checked
@@ -47,13 +43,6 @@
 - [ ] No unbounded kernel allocation
 - [ ] `unsafe` justified with SAFETY comments
 - [ ] Threat model updated
-- [ ] Risks and rollback strategy documented
-
-## Reviewer checklist
-
-- [ ] Kernel safety review complete
-- [ ] Code formatting and clippy clean
-- [ ] Security invariants verified
 
 ## Tests
 

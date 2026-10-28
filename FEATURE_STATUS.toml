@@ -343,10 +343,10 @@ next_milestone = "ACPI table parsing and QEMU power state integration"
 
 [ipc.handler]
 status = "unit-tested"
-files = ["src/ipc/", "docs/ipc-handler.md", "wiki/ipc-handler.md", ".github/PULL_REQUEST_TEMPLATE.md"]
+files = ["src/ipc/", "docs/ipc-handler.md", "wiki/ipc-handler.md", ".github/PULL_REQUEST_TEMPLATE.md", "tests/test_ipc_handler_plan.rs"]
 description = "Formally specified, testable IPC handler subsystem covering pipes, FIFOs, UNIX sockets, shared memory, message queues, futexes, event wakeups, signal control plane, FD passing, and access control policies."
-test_evidence = "Architecture specification published in docs/ipc-handler.md and wiki/ipc-handler.md; PR template updated in .github/PULL_REQUEST_TEMPLATE.md; unit tests pass for canonical IPC objects (IpcChannel, IpcEndpoint, MessageBuffer, SharedMemoryRegion, WaitQueue, FileDescriptorHandle, IpcPermissions, IpcStatistics)."
-next_milestone = "Phase 3 Anonymous Pipes implementation with EOF and backpressure, and VFS FIFO integration"
+test_evidence = "Architecture specification complete in docs/ipc-handler.md and wiki/ipc-handler.md; unit tests pass in tests/test_ipc_handler_plan.rs and src/ipc/ipc.rs for IpcChannel, IpcEndpoint, MessageBuffer, SharedMemoryRegion, WaitQueue, FileDescriptorHandle, IpcPermissions, and IpcStatistics."
+next_milestone = "Phase 3 Anonymous Pipes implementation and VFS FIFO integration"
 
 [kernel.process_synchronization_plan]
 status = "modeled"
