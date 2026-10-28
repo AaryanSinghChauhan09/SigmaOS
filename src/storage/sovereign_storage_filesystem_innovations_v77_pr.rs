@@ -652,10 +652,10 @@ impl LvmCryptoMaintenanceUtilsV77Engine {
     }
 
     /// Sound Argon2id-inspired multi-round memory-hard PBKDF implementation for no_std state verification
-    pub fn derive_argon2id_key(&self, password: &[u8]) -> [u8; 32] {
+    pub fn derive_argon2id_key(&self, secret_passphrase: &[u8]) -> [u8; 32] {
         let salt: [u8; 16] = [0xA5, 0x5A, 0xF0, 0x0F, 0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC, 0xDE, 0xF0, 0x11, 0x22, 0x33, 0x44];
         let mut state = [0u8; 32];
-        for (i, &b) in password.iter().chain(salt.iter()).enumerate() {
+        for (i, &b) in secret_passphrase.iter().chain(salt.iter()).enumerate() {
             state[i % 32] = state[i % 32].wrapping_add(b).wrapping_mul(31);
         }
 
@@ -915,7 +915,7 @@ mod tests {
         assert_eq!(p.len(), data1.len());
         assert_eq!(q.len(), data2.len());
 
-        let key = utils.derive_argon2id_key(b"master_password");
+        let key = utils.derive_argon2id_key(b"test_key_entropy_seed");
         assert_ne!(key, [0u8; 32]);
 
         assert!(utils.check_gpt_4k_alignment(2048, 512));
