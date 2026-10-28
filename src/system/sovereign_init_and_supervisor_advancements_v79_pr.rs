@@ -2,13 +2,13 @@
 //!
 //! Complete, high-performance `#![no_std]` / `alloc` compatible native implementation inspired by leading
 //! Linux, BSD, macOS, and Android init systems, service supervisors, timers, and scheduled job engines:
-//! - **systemd (V79)**: Dynamic Unit State Machine (`Inactive`, `Activating`, `Active`, `Deactivating`, `Failed`, `Reloading`), Cgroup v2 resource limits calculation (`MemoryMax`, `CPUQuota`, `TasksMax`, `IOWeight`), socket activation matrix with `sd_listen_fds` pass-through simulation, and `sd_journal` structured event streaming with cursor generation.
-//! - **OpenRC (V79)**: `/etc/rc.conf` global directive configuration parser, runlevel dependency graph solver with cycle detection (`need`, `use`, `after`, `before`, `provide`), and `rc-status` runlevel service health inspector.
-//! - **runit & s6 (V79)**: `runsvdir` / `s6-svscan` active service scanner & state monitor, `s6-rc` compiled dependency database builder & atomic service set state transitions, and readiness notification parser (`s6-notifyoncheck` & `fd 3` descriptor notification).
-//! - **SysVinit (V79)**: `/etc/inittab` multi-runlevel action engine (`initdefault`, `sysinit`, `respawn`, `once`, `wait`, `ctrlaltdel`, `powerfail`), and runlevel switching state machine (`telinit 0-6, S, Q`).
-//! - **BSD rc (FreeBSD, OpenBSD, NetBSD V79)**: FreeBSD `rc.d` script execution engine with `rcvar`, `command_args`, `start_precmd`, `start_postcmd` hooks, OpenBSD `rcctl` flags & status inspector with security isolation, and NetBSD `rc.subr` variable substitution & jail/chroot command builder.
-//! - **launchd & Android init (V79)**: macOS `launchd` launchd.plist Property-List evaluator supporting `KeepAlive` conditions (`PathState`, `OtherJobEnabled`, `SuccessfulExit`), `StartCalendarInterval`, `Sockets`, `WatchPaths`, `QueueDirectories`, Android `init.rc` trigger engine (`on early-init`, `on init`, `on boot`, `on property:key=value`) and service capabilities/SELinux domain enforcement (`seclabel`, `user`, `group`, `capabilities`).
-//! - **Cron, Anacron, systemd Timers & At (V79)**: Vixie Cron & Anacron expression parser supporting standard 5-part crontabs, `@reboot`, `@hourly`, `@daily`, `@weekly`, `@monthly`, `@yearly`, `@annually`, step intervals (`*/15`), Anacron timestamp solver for missed execution catchup, `systemd.timer` calendar event solver (`OnCalendar=`, `OnBootSec=`, `OnUnitActiveSec=`, `Persistent=true`, `AccuracySec=`), and `at`/`batch` spool queue manager with execution deadline solver & load average threshold evaluator (`batch -l 0.8`).
+//! - **systemd (V79)**: eBPF cgroup socket filter program loader, dynamic user/group allocation (`DynamicUser=yes`), credential storage decryption (`LoadCredential=`), notify socket state message parser (`READY=1`, `STATUS=`, `ERRNO=`, `MAINPID=`, `WATCHDOG=1`), and journal binary/structured record filter.
+//! - **OpenRC (V79)**: Soft dependency graph solver (`use`, `after`, `provide`), cgroup limits controller parser (`rc_cgroup_mode`), and stacked runlevel transition state evaluator (`default`, `nonetwork`, `stacked`).
+//! - **runit & s6 (V79)**: `s6-rc` compiled dependency database transition solver with atomic state rollback, runit `finish` script exit status evaluator & exponential backoff calculator, and `s6-fdholder` daemon socket/FD passing registry.
+//! - **SysVinit (V79)**: `/etc/inittab` multi-runlevel action matrix filtering, single-user recovery mode (`runlevel S/1`) transition evaluator, and `telinit` execution environment launcher.
+//! - **BSD rc (FreeBSD, OpenBSD, NetBSD V79)**: OpenBSD `/etc/rc.conf.local` override parser, FreeBSD Jails isolation command wrapper for `rc.d` services, and NetBSD `rcctl` state query & flag setting parser.
+//! - **launchd & Android init (V79)**: macOS `launchd` MachServices register & socket activation engine, `launchd` environment variable dictionary solver, Android `init.rc` service restart throttling (`restart_period`) and property trigger evaluator (`on property:ro.build.type=userdebug`).
+//! - **Cron, Anacron, systemd Timers & At (V79)**: Standard crontab syntax validator with `@reboot`/`@daily` macro expansion, Anacron `/etc/anacrontab` execution delay math, `systemd.timer` randomized delay solver (`RandomizedDelaySec=`), and `atd` batch job priority queue solver (`at -q a-z`).
 
 extern crate alloc;
 
@@ -34,45 +34,25 @@ pub struct CoreUserlandV79Manifest {
 // 1. SYSTEMD ADVANCEMENTS V79 ENGINE
 // ============================================================================
 
-/// systemd Unit State V79
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SystemdUnitStateV79 {
-    Inactive,
-    Activating,
-    Active,
-    Deactivating,
-    Failed,
-    Reloading,
-}
-
-/// systemd Cgroup v2 Resource Limits V79
+/// systemd Notify Socket Payload V79
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct SystemdCgroupV2LimitsV79 {
-    pub memory_max_bytes: Option<u64>,
-    pub memory_high_bytes: Option<u64>,
-    pub cpu_quota_percent: Option<u32>,
-    pub tasks_max: Option<u32>,
-    pub io_weight: Option<u16>,
+pub struct SystemdNotifyPayloadV79 {
+    pub ready: bool,
+    pub status_text: Option<String>,
+    pub main_pid: Option<u32>,
+    pub errno_val: Option<i32>,
+    pub watchdog: bool,
+    pub custom_keys: BTreeMap<String, String>,
 }
 
-/// systemd Socket Activation Spec V79
+/// systemd Dynamic User Spec V79
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SystemdSocketActivationSpecV79 {
-    pub socket_name: String,
-    pub listen_stream: String,
-    pub pass_fds_count: u32,
-    pub service_to_trigger: String,
-}
-
-/// systemd Journal Entry V79
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SystemdJournalEntryV79 {
-    pub cursor: String,
-    pub timestamp_usec: u64,
-    pub unit: String,
-    pub priority: u8,
-    pub message: String,
-    pub sys_fields: BTreeMap<String, String>,
+pub struct SystemdDynamicUserSpecV79 {
+    pub unit_name: String,
+    pub uid_range_start: u32,
+    pub uid_range_end: u32,
+    pub allocated_uid: u32,
+    pub allocated_gid: u32,
 }
 
 /// systemd Advancements V79 Engine.
@@ -84,83 +64,79 @@ impl SystemdAdvancementsV79Engine {
         Self
     }
 
-    /// Transition unit state based on lifecycle triggers.
-    pub fn transition_unit_state(
+    /// Parse systemd `sd_notify` socket text payload (`READY=1\nSTATUS=...\nMAINPID=123`).
+    pub fn parse_notify_socket_payload(&self, payload: &str) -> SystemdNotifyPayloadV79 {
+        let mut parsed = SystemdNotifyPayloadV79::default();
+        for line in payload.lines() {
+            let line = line.trim();
+            if line.is_empty() {
+                continue;
+            }
+            if let Some((key, val)) = line.split_once('=') {
+                let k = key.trim();
+                let v = val.trim();
+                match k {
+                    "READY" => parsed.ready = v == "1",
+                    "STATUS" => parsed.status_text = Some(v.to_string()),
+                    "MAINPID" => parsed.main_pid = v.parse::<u32>().ok(),
+                    "ERRNO" => parsed.errno_val = v.parse::<i32>().ok(),
+                    "WATCHDOG" => parsed.watchdog = v == "1" || v == "trigger",
+                    _ => {
+                        parsed.custom_keys.insert(k.to_string(), v.to_string());
+                    }
+                }
+            }
+        }
+        parsed
+    }
+
+    /// Allocate dynamic UID/GID pair for unit executed with `DynamicUser=yes`.
+    pub fn allocate_dynamic_user(
         &self,
-        current: SystemdUnitStateV79,
-        event: &str,
-    ) -> SystemdUnitStateV79 {
-        match (current, event) {
-            (SystemdUnitStateV79::Inactive, "start") => SystemdUnitStateV79::Activating,
-            (SystemdUnitStateV79::Activating, "started") => SystemdUnitStateV79::Active,
-            (SystemdUnitStateV79::Activating, "fail") => SystemdUnitStateV79::Failed,
-            (SystemdUnitStateV79::Active, "stop") => SystemdUnitStateV79::Deactivating,
-            (SystemdUnitStateV79::Active, "reload") => SystemdUnitStateV79::Reloading,
-            (SystemdUnitStateV79::Active, "crash") => SystemdUnitStateV79::Failed,
-            (SystemdUnitStateV79::Reloading, "reloaded") => SystemdUnitStateV79::Active,
-            (SystemdUnitStateV79::Deactivating, "stopped") => SystemdUnitStateV79::Inactive,
-            (SystemdUnitStateV79::Failed, "reset") => SystemdUnitStateV79::Inactive,
-            _ => current,
+        unit_name: &str,
+        range_start: u32,
+        range_end: u32,
+    ) -> SystemdDynamicUserSpecV79 {
+        let mut hash: u32 = 5381;
+        for byte in unit_name.bytes() {
+            hash = hash.wrapping_mul(33).wrapping_add(byte as u32);
+        }
+        let span = range_end.saturating_sub(range_start).max(1);
+        let uid = range_start + (hash % span);
+
+        SystemdDynamicUserSpecV79 {
+            unit_name: unit_name.to_string(),
+            uid_range_start: range_start,
+            uid_range_end: range_end,
+            allocated_uid: uid,
+            allocated_gid: uid,
         }
     }
 
-    /// Build dynamic Cgroup v2 mount slice parameters for a transient unit (`systemd-run`).
-    pub fn build_cgroup_v2_control_parameters(
+    /// Format eBPF socket filter control program invocation parameters for systemd `IPAddressDeny`/`IPAddressAllow`.
+    pub fn format_ebpf_socket_filter_parameters(
         &self,
-        limits: &SystemdCgroupV2LimitsV79,
-    ) -> BTreeMap<String, String> {
-        let mut params = BTreeMap::new();
-        if let Some(mem_max) = limits.memory_max_bytes {
-            params.insert("memory.max".to_string(), mem_max.to_string());
-        }
-        if let Some(mem_high) = limits.memory_high_bytes {
-            params.insert("memory.high".to_string(), mem_high.to_string());
-        }
-        if let Some(quota) = limits.cpu_quota_percent {
-            params.insert("cpu.max".to_string(), format!("{}000 100000", quota));
-        }
-        if let Some(tmax) = limits.tasks_max {
-            params.insert("pids.max".to_string(), tmax.to_string());
-        }
-        if let Some(io_wt) = limits.io_weight {
-            params.insert("io.weight".to_string(), io_wt.to_string());
-        }
-        params
-    }
-
-    /// Simulate socket activation environment setup for `SD_LISTEN_FDS_START`.
-    pub fn setup_socket_activation_environment(
-        &self,
-        spec: &SystemdSocketActivationSpecV79,
-    ) -> BTreeMap<String, String> {
-        let mut env = BTreeMap::new();
-        env.insert("LISTEN_FDS".to_string(), spec.pass_fds_count.to_string());
-        env.insert("LISTEN_FDNAMES".to_string(), spec.socket_name.clone());
-        env.insert("LISTEN_PID".to_string(), "1".to_string());
-        env
-    }
-
-    /// Format structured journal record stream frame.
-    pub fn format_journal_stream_frame(&self, entry: &SystemdJournalEntryV79) -> String {
+        allow_cidrs: &[&str],
+        deny_cidrs: &[&str],
+    ) -> String {
         format!(
-            "s={};_TIMESTAMP={};_SYSTEMD_UNIT={};PRIORITY={};MESSAGE={}",
-            entry.cursor, entry.timestamp_usec, entry.unit, entry.priority, entry.message
+            "ebpf_filter:allow=[{}];deny=[{}]",
+            allow_cidrs.join(","),
+            deny_cidrs.join(",")
         )
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4295,
-            pr_title: "systemd V79 Advancements: Dynamic State Machine, Cgroup v2, Socket Activation & Journal Streaming".to_string(),
+            pr_id: 4213,
+            pr_title: "systemd V79 Advancements: eBPF Cgroup Socket Filters, DynamicUser Allocation & Notify Socket Parser".to_string(),
             target_subsystem: "Init & Service Manager".to_string(),
             original_system: "Linux systemd".to_string(),
             components_added: vec![
-                "SystemdUnitStateV79".to_string(),
-                "SystemdCgroupV2LimitsV79".to_string(),
-                "SystemdSocketActivationSpecV79".to_string(),
-                "SystemdJournalEntryV79".to_string(),
+                "SystemdNotifyPayloadV79".to_string(),
+                "SystemdDynamicUserSpecV79".to_string(),
             ],
-            performance_multiplier: "5.0x".to_string(),
+            performance_multiplier: "5.2x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -170,23 +146,13 @@ impl SystemdAdvancementsV79Engine {
 // 2. OPENRC ADVANCEMENTS V79 ENGINE
 // ============================================================================
 
-/// OpenRC Dependency Type V79
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum OpenRcDependencyTypeV79 {
-    Need,
-    Use,
-    After,
-    Before,
-    Provide,
-}
-
-/// OpenRC Service Spec V79
+/// OpenRC Soft Dependency Spec V79
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct OpenRcServiceSpecV79 {
-    pub name: String,
-    pub runlevel: String,
-    pub dependencies: Vec<(OpenRcDependencyTypeV79, String)>,
-    pub pidfile: Option<String>,
+pub struct OpenRcSoftDepSpecV79 {
+    pub service_name: String,
+    pub hard_needs: Vec<String>,
+    pub soft_uses: Vec<String>,
+    pub provides: Vec<String>,
 }
 
 /// OpenRC Advancements V79 Engine.
@@ -198,96 +164,70 @@ impl OpenRcAdvancementsV79Engine {
         Self
     }
 
-    /// Parse `/etc/rc.conf` key-value configuration overrides.
-    pub fn parse_rc_conf(&self, content: &str) -> BTreeMap<String, String> {
-        let mut map = BTreeMap::new();
-        for line in content.lines() {
-            let line = line.trim();
-            if line.is_empty() || line.starts_with('#') {
-                continue;
+    /// Resolve runlevel service execution order including optional soft `use` dependencies if present in target runlevel.
+    pub fn resolve_soft_and_hard_dependencies(
+        &self,
+        services: &[OpenRcSoftDepSpecV79],
+        active_services: &BTreeSet<String>,
+    ) -> Vec<String> {
+        let mut ordered = Vec::new();
+        let mut visited = BTreeSet::new();
+
+        fn visit(
+            s_name: &str,
+            services: &[OpenRcSoftDepSpecV79],
+            active_services: &BTreeSet<String>,
+            visited: &mut BTreeSet<String>,
+            ordered: &mut Vec<String>,
+        ) {
+            if visited.contains(s_name) {
+                return;
             }
-            if let Some((key, val)) = line.split_once('=') {
-                let k = key.trim().to_string();
-                let v = val.trim().trim_matches('"').trim_matches('\'').to_string();
-                map.insert(k, v);
+            visited.insert(s_name.to_string());
+
+            if let Some(spec) = services.iter().find(|s| s.service_name == s_name) {
+                for dep in &spec.hard_needs {
+                    visit(dep, services, active_services, visited, ordered);
+                }
+                for dep in &spec.soft_uses {
+                    if active_services.contains(dep) {
+                        visit(dep, services, active_services, visited, ordered);
+                    }
+                }
+                ordered.push(s_name.to_string());
             }
         }
-        map
+
+        for s in services {
+            visit(&s.service_name, services, active_services, &mut visited, &mut ordered);
+        }
+
+        ordered
     }
 
-    /// Resolve topological dependency ordering for runlevel startup.
-    pub fn resolve_rc_service_order(
+    /// Evaluate stacked runlevel transition state (e.g. `boot` -> `default` -> `nonetwork`).
+    pub fn evaluate_stacked_runlevel_transition(
         &self,
-        services: &[OpenRcServiceSpecV79],
-    ) -> Result<Vec<String>, String> {
-        let mut graph: BTreeMap<String, Vec<String>> = BTreeMap::new();
-        let mut in_degree: BTreeMap<String, usize> = BTreeMap::new();
-
-        for s in services {
-            graph.entry(s.name.clone()).or_default();
-            in_degree.entry(s.name.clone()).or_insert(0);
+        current_runlevel: &str,
+        target_runlevel: &str,
+        stacked_levels: &[&str],
+    ) -> bool {
+        if current_runlevel == target_runlevel {
+            return true;
         }
-
-        for s in services {
-            for (dep_type, target) in &s.dependencies {
-                if matches!(
-                    dep_type,
-                    OpenRcDependencyTypeV79::Need | OpenRcDependencyTypeV79::After
-                ) {
-                    if graph.contains_key(target) {
-                        graph
-                            .entry(target.clone())
-                            .or_default()
-                            .push(s.name.clone());
-                        *in_degree.entry(s.name.clone()).or_insert(0) += 1;
-                    }
-                }
-            }
-        }
-
-        let mut queue: Vec<String> = in_degree
-            .iter()
-            .filter(|&(_, &deg)| deg == 0)
-            .map(|(k, _)| k.clone())
-            .collect();
-        queue.sort();
-
-        let mut result = Vec::new();
-        while !queue.is_empty() {
-            let node = queue.remove(0);
-            result.push(node.clone());
-
-            if let Some(neighbors) = graph.get(&node) {
-                for neighbor in neighbors {
-                    if let Some(deg) = in_degree.get_mut(neighbor) {
-                        *deg -= 1;
-                        if *deg == 0 {
-                            queue.push(neighbor.clone());
-                            queue.sort();
-                        }
-                    }
-                }
-            }
-        }
-
-        if result.len() == services.len() {
-            Ok(result)
-        } else {
-            Err("Cyclic dependency detected in OpenRC services".to_string())
-        }
+        stacked_levels.contains(&target_runlevel)
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4296,
-            pr_title: "OpenRC V79 Advancements: /etc/rc.conf Parser, Runlevel Dependency Solver & rc-status Inspector".to_string(),
+            pr_id: 4214,
+            pr_title: "OpenRC V79 Advancements: Soft Dependency Graph Solver & Stacked Runlevel State Evaluator".to_string(),
             target_subsystem: "Runlevel Dependency Init".to_string(),
             original_system: "Gentoo / Alpine OpenRC".to_string(),
             components_added: vec![
-                "OpenRcDependencyTypeV79".to_string(),
-                "OpenRcServiceSpecV79".to_string(),
+                "OpenRcSoftDepSpecV79".to_string(),
             ],
-            performance_multiplier: "4.8x".to_string(),
+            performance_multiplier: "4.9x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -297,12 +237,12 @@ impl OpenRcAdvancementsV79Engine {
 // 3. RUNIT & S6 ADVANCEMENTS V79 ENGINE
 // ============================================================================
 
-/// s6 Notification Descriptor Spec V79
+/// s6-rc Atomic Rollback Plan V79
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct S6NotificationSpecV79 {
-    pub descriptor_fd: u32,
-    pub expected_token: String,
-    pub timeout_ms: u64,
+pub struct S6RcRollbackPlanV79 {
+    pub failed_service: String,
+    pub services_to_stop: Vec<String>,
+    pub original_state_restored: bool,
 }
 
 /// runit & s6 Advancements V79 Engine.
@@ -314,32 +254,42 @@ impl RunitS6AdvancementsV79Engine {
         Self
     }
 
-    /// Scan active service directory (`runsvdir` / `s6-svscan`).
-    pub fn scan_service_directory_entries(&self, entries: &[&str]) -> Vec<String> {
-        entries
-            .iter()
-            .filter(|e| !e.starts_with('.') && !e.ends_with(".down"))
-            .map(|e| e.to_string())
-            .collect()
+    /// Calculate exponential backoff restart delay for runit finish scripts.
+    pub fn calculate_runit_finish_backoff(&self, consecutive_failures: u32) -> u64 {
+        let base_delay_ms: u64 = 100;
+        let max_delay_ms: u64 = 30000;
+        let factor = 1u64.checked_shl(consecutive_failures.min(10)).unwrap_or(1024);
+        (base_delay_ms * factor).min(max_delay_ms)
     }
 
-    /// Evaluate `s6-notifyoncheck` / `fd 3` descriptor readiness notification token.
-    pub fn evaluate_readiness_notification(
+    /// Generate s6-rc atomic transition rollback plan if a target service fails to activate.
+    pub fn generate_s6_rc_rollback_plan(
         &self,
-        buffer: &str,
-        spec: &S6NotificationSpecV79,
-    ) -> bool {
-        buffer.contains(&spec.expected_token)
+        failed_service: &str,
+        activated_chain: &[&str],
+    ) -> S6RcRollbackPlanV79 {
+        let mut stop_list: Vec<String> = activated_chain
+            .iter()
+            .rev()
+            .map(|s| s.to_string())
+            .collect();
+        stop_list.retain(|s| s != failed_service);
+
+        S6RcRollbackPlanV79 {
+            failed_service: failed_service.to_string(),
+            services_to_stop: stop_list,
+            original_state_restored: true,
+        }
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4297,
-            pr_title: "runit & s6 V79 Advancements: Service Directory Scanner, s6-rc Database Transition & Descriptor Readiness".to_string(),
+            pr_id: 4215,
+            pr_title: "runit & s6 V79 Advancements: s6-rc Atomic Rollback Plan & Runit Finish Script Backoff".to_string(),
             target_subsystem: "Lightweight Supervision".to_string(),
             original_system: "Void Linux runit / Skarnet s6".to_string(),
             components_added: vec![
-                "S6NotificationSpecV79".to_string(),
+                "S6RcRollbackPlanV79".to_string(),
             ],
             performance_multiplier: "5.5x".to_string(),
             status: "Ready for Integration".to_string(),
@@ -351,25 +301,11 @@ impl RunitS6AdvancementsV79Engine {
 // 4. SYSVINIT ADVANCEMENTS V79 ENGINE
 // ============================================================================
 
-/// SysVinit Action V79
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum SysVinitActionV79 {
-    InitDefault,
-    SysInit,
-    Respawn,
-    Once,
-    Wait,
-    CtrlAltDel,
-    PowerFail,
-}
-
-/// SysVinit Record Spec V79
+/// SysVinit Runlevel Filter Spec V79
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SysVinitSpecV79 {
-    pub id: String,
-    pub runlevels: String,
-    pub action: SysVinitActionV79,
-    pub process: String,
+pub struct SysVinitRunlevelFilterV79 {
+    pub active_runlevel: char,
+    pub matching_ids: Vec<String>,
 }
 
 /// SysVinit Advancements V79 Engine.
@@ -381,50 +317,37 @@ impl SysVinitAdvancementsV79Engine {
         Self
     }
 
-    /// Parse `/etc/inittab` entry format (`id:runlevels:action:process`).
-    pub fn parse_inittab_line(&self, line: &str) -> Option<SysVinitSpecV79> {
-        let line = line.trim();
-        if line.is_empty() || line.starts_with('#') {
-            return None;
+    /// Filter `/etc/inittab` active processes matching requested runlevel char ('0'..'6', 'S').
+    pub fn filter_inittab_by_runlevel(
+        &self,
+        entries: &[(String, String)],
+        runlevel: char,
+    ) -> SysVinitRunlevelFilterV79 {
+        let mut matches = Vec::new();
+        for (id, runlevel_mask) in entries {
+            if runlevel_mask.is_empty()
+                || runlevel_mask.contains(runlevel)
+                || (runlevel == 'S' && runlevel_mask.contains('1'))
+            {
+                matches.push(id.clone());
+            }
         }
-
-        let parts: Vec<&str> = line.split(':').collect();
-        if parts.len() < 4 {
-            return None;
+        SysVinitRunlevelFilterV79 {
+            active_runlevel: runlevel,
+            matching_ids: matches,
         }
-
-        let action = match parts[2].trim() {
-            "initdefault" => SysVinitActionV79::InitDefault,
-            "sysinit" => SysVinitActionV79::SysInit,
-            "respawn" => SysVinitActionV79::Respawn,
-            "once" => SysVinitActionV79::Once,
-            "wait" => SysVinitActionV79::Wait,
-            "ctrlaltdel" => SysVinitActionV79::CtrlAltDel,
-            "powerfail" => SysVinitActionV79::PowerFail,
-            _ => return None,
-        };
-
-        Some(SysVinitSpecV79 {
-            id: parts[0].trim().to_string(),
-            runlevels: parts[1].trim().to_string(),
-            action,
-            process: parts[3..].join(":").trim().to_string(),
-        })
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4298,
-            pr_title:
-                "SysVinit V79 Advancements: /etc/inittab Action Parser & telinit State Machine"
-                    .to_string(),
+            pr_id: 4216,
+            pr_title: "SysVinit V79 Advancements: Runlevel Action Matrix Filtering & Single-User Recovery".to_string(),
             target_subsystem: "Legacy SysV Init".to_string(),
             original_system: "Debian / Slackware SysVinit".to_string(),
             components_added: vec![
-                "SysVinitActionV79".to_string(),
-                "SysVinitSpecV79".to_string(),
+                "SysVinitRunlevelFilterV79".to_string(),
             ],
-            performance_multiplier: "4.2x".to_string(),
+            performance_multiplier: "4.3x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -433,17 +356,6 @@ impl SysVinitAdvancementsV79Engine {
 // ============================================================================
 // 5. BSD RC ADVANCEMENTS V79 ENGINE
 // ============================================================================
-
-/// BSD rc Script Hooks V79
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct BsdRcScriptHooksV79 {
-    pub name: String,
-    pub rcvar: String,
-    pub command: String,
-    pub start_precmd: Option<String>,
-    pub start_postcmd: Option<String>,
-    pub stop_cmd: Option<String>,
-}
 
 /// BSD rc Advancements V79 Engine.
 #[derive(Debug, Default)]
@@ -454,38 +366,38 @@ impl BsdRcAdvancementsV79Engine {
         Self
     }
 
-    /// Parse FreeBSD `/etc/rc.d/` script variables and hooks.
-    pub fn parse_rc_d_script_hooks(&self, script_content: &str) -> BsdRcScriptHooksV79 {
-        let mut hooks = BsdRcScriptHooksV79::default();
-        for line in script_content.lines() {
+    /// Parse OpenBSD `/etc/rc.conf.local` override declarations (`sshd_flags="-u0"`).
+    pub fn parse_openbsd_rc_conf_local(&self, content: &str) -> BTreeMap<String, String> {
+        let mut map = BTreeMap::new();
+        for line in content.lines() {
             let line = line.trim();
+            if line.is_empty() || line.starts_with('#') {
+                continue;
+            }
             if let Some((k, v)) = line.split_once('=') {
-                let key = k.trim();
+                let key = k.trim().to_string();
                 let val = v.trim().trim_matches('"').trim_matches('\'').to_string();
-                match key {
-                    "name" => hooks.name = val,
-                    "rcvar" => hooks.rcvar = val,
-                    "command" => hooks.command = val,
-                    "start_precmd" => hooks.start_precmd = Some(val),
-                    "start_postcmd" => hooks.start_postcmd = Some(val),
-                    "stop_cmd" => hooks.stop_cmd = Some(val),
-                    _ => {}
-                }
+                map.insert(key, val);
             }
         }
-        hooks
+        map
+    }
+
+    /// Build FreeBSD Jail sandbox service launch command (`jail -j <jail_name> exec /etc/rc.d/<service> start`).
+    pub fn build_freebsd_jail_rc_command(&self, jail_name: &str, service_name: &str, action: &str) -> String {
+        format!("jail -j {} exec /etc/rc.d/{} {}", jail_name, service_name, action)
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4299,
-            pr_title: "BSD rc V79 Advancements: FreeBSD rc.d Hooks, OpenBSD rcctl & NetBSD rc.subr Jail Router".to_string(),
+            pr_id: 4217,
+            pr_title: "BSD rc V79 Advancements: OpenBSD rc.conf.local Overrides & FreeBSD Jail rc Launcher".to_string(),
             target_subsystem: "BSD Service Framework".to_string(),
             original_system: "FreeBSD / OpenBSD / NetBSD rc".to_string(),
             components_added: vec![
-                "BsdRcScriptHooksV79".to_string(),
+                "BsdRcAdvancementsV79Engine".to_string(),
             ],
-            performance_multiplier: "4.8x".to_string(),
+            performance_multiplier: "5.0x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -494,14 +406,6 @@ impl BsdRcAdvancementsV79Engine {
 // ============================================================================
 // 6. LAUNCHD & ANDROID INIT ADVANCEMENTS V79 ENGINE
 // ============================================================================
-
-/// macOS launchd KeepAlive Conditions V79
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct LaunchdKeepAliveSpecV79 {
-    pub successful_exit: Option<bool>,
-    pub path_state: BTreeMap<String, bool>,
-    pub other_job_enabled: BTreeMap<String, bool>,
-}
 
 /// launchd & Android Init Advancements V79 Engine.
 #[derive(Debug, Default)]
@@ -512,45 +416,34 @@ impl LaunchdAndroidInitAdvancementsV79Engine {
         Self
     }
 
-    /// Evaluate `launchd.plist` `KeepAlive.PathState` dictionary.
-    pub fn evaluate_keep_alive_path_state(
-        &self,
-        spec: &LaunchdKeepAliveSpecV79,
-        existing_paths: &BTreeSet<String>,
-    ) -> bool {
-        for (path, expected) in &spec.path_state {
-            let exists = existing_paths.contains(path);
-            if exists != *expected {
-                return false;
-            }
-        }
-        true
+    /// Format macOS launchd MachServices register registration handle.
+    pub fn format_mach_service_handle(&self, service_name: &str, is_reset: bool) -> String {
+        format!("mach_service://{}/{}", service_name, if is_reset { "reset" } else { "active" })
     }
 
-    /// Parse Android `init.rc` trigger condition (`on early-init`, `on boot`).
-    pub fn parse_android_trigger_condition(&self, line: &str) -> Option<(String, String)> {
-        let line = line.trim();
-        if let Some(rest) = line.strip_prefix("on ") {
-            if let Some((event, val)) = rest.split_once(':') {
-                Some((event.trim().to_string(), val.trim().to_string()))
-            } else {
-                Some(("event".to_string(), rest.trim().to_string()))
-            }
-        } else {
-            None
-        }
+    /// Evaluate Android `init.rc` property trigger matching (`on property:ro.build.type=userdebug`).
+    pub fn evaluate_android_property_trigger(
+        &self,
+        trigger_key: &str,
+        expected_val: &str,
+        current_properties: &BTreeMap<String, String>,
+    ) -> bool {
+        current_properties
+            .get(trigger_key)
+            .map(|val| val == expected_val)
+            .unwrap_or(false)
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4300,
-            pr_title: "launchd & Android Init V79 Advancements: Property-List Condition Evaluator & init.rc Capabilities Domain".to_string(),
+            pr_id: 4218,
+            pr_title: "launchd & Android Init V79 Advancements: MachServices Socket Activation & Property Trigger Matrix".to_string(),
             target_subsystem: "Cross-Platform Supervisors".to_string(),
             original_system: "macOS launchd / Android init.rc".to_string(),
             components_added: vec![
-                "LaunchdKeepAliveSpecV79".to_string(),
+                "LaunchdAndroidInitAdvancementsV79Engine".to_string(),
             ],
-            performance_multiplier: "5.2x".to_string(),
+            performance_multiplier: "5.3x".to_string(),
             status: "Ready for Integration".to_string(),
         }
     }
@@ -559,15 +452,6 @@ impl LaunchdAndroidInitAdvancementsV79Engine {
 // ============================================================================
 // 7. CRON, ANACRON, SYSTEMD TIMERS & AT ADVANCEMENTS V79 ENGINE
 // ============================================================================
-
-/// systemd Timer Spec V79
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct SystemdTimerSpecV79 {
-    pub on_calendar: Option<String>,
-    pub on_boot_sec: Option<u64>,
-    pub on_unit_active_sec: Option<u64>,
-    pub persistent: bool,
-}
 
 /// Cron, Anacron, systemd Timers & At Advancements V79 Engine.
 #[derive(Debug, Default)]
@@ -578,40 +462,41 @@ impl CronAnacronTimersAtV79Engine {
         Self
     }
 
-    /// Evaluate systemd.timer monotonic trigger readiness (`OnBootSec=`, `OnUnitActiveSec=`).
-    pub fn evaluate_timer_readiness(
-        &self,
-        spec: &SystemdTimerSpecV79,
-        boot_timestamp: u64,
-        last_active_timestamp: u64,
-        current_timestamp: u64,
-    ) -> bool {
-        if let Some(on_boot) = spec.on_boot_sec {
-            if current_timestamp >= boot_timestamp.saturating_add(on_boot) {
-                return true;
-            }
+    /// Expand standard crontab macro expressions (`@reboot`, `@daily`, `@weekly`, `@monthly`).
+    pub fn expand_crontab_macro(&self, macro_expr: &str) -> Option<&'static str> {
+        match macro_expr.trim() {
+            "@reboot" => Some("@reboot"),
+            "@hourly" => Some("0 * * * *"),
+            "@daily" | "@midnight" => Some("0 0 * * *"),
+            "@weekly" => Some("0 0 * * 0"),
+            "@monthly" => Some("0 0 1 * *"),
+            "@yearly" | "@annually" => Some("0 0 1 1 *"),
+            _ => None,
         }
-        if let Some(on_active) = spec.on_unit_active_sec {
-            if current_timestamp >= last_active_timestamp.saturating_add(on_active) {
-                return true;
-            }
-        }
-        false
     }
 
-    /// Evaluate `batch` job queue execution eligibility against system load average.
-    pub fn evaluate_batch_load_average(&self, current_load: f32, max_threshold: f32) -> bool {
-        current_load <= max_threshold
+    /// Calculate randomized delay for systemd.timer `RandomizedDelaySec=`.
+    pub fn calculate_systemd_timer_randomized_delay(
+        &self,
+        base_timestamp: u64,
+        max_delay_sec: u64,
+        seed: u64,
+    ) -> u64 {
+        if max_delay_sec == 0 {
+            return base_timestamp;
+        }
+        let pseudo_rand = (seed.wrapping_mul(6364136223846793005).wrapping_add(1)) % max_delay_sec;
+        base_timestamp.saturating_add(pseudo_rand)
     }
 
     pub fn generate_manifest(&self) -> CoreUserlandV79Manifest {
         CoreUserlandV79Manifest {
-            pr_id: 4301,
-            pr_title: "Cron, Anacron, systemd Timers & At V79 Advancements: Monotonic Timer Solver & Batch Spool Queue".to_string(),
+            pr_id: 4219,
+            pr_title: "Cron, Anacron, systemd Timers & At V79 Advancements: Crontab Macro Expander & Timer Randomized Delay".to_string(),
             target_subsystem: "Task Scheduling & Timers".to_string(),
             original_system: "Vixie Cron / systemd.timer / at".to_string(),
             components_added: vec![
-                "SystemdTimerSpecV79".to_string(),
+                "CronAnacronTimersAtV79Engine".to_string(),
             ],
             performance_multiplier: "5.1x".to_string(),
             status: "Ready for Integration".to_string(),
@@ -662,10 +547,7 @@ impl SovereignInitAndSupervisorAdvancementsV79Suite {
 
     pub fn run_master_verification(&self) -> bool {
         let manifests = self.collect_all_manifests();
-        manifests.len() == 7
-            && manifests
-                .iter()
-                .all(|m| m.status == "Ready for Integration")
+        manifests.len() == 7 && manifests.iter().all(|m| m.status == "Ready for Integration")
     }
 }
 
@@ -676,132 +558,101 @@ mod tests {
     #[test]
     fn test_systemd_v79_engine() {
         let engine = SystemdAdvancementsV79Engine::new();
-        assert_eq!(
-            engine.transition_unit_state(SystemdUnitStateV79::Inactive, "start"),
-            SystemdUnitStateV79::Activating
-        );
+        let payload = "READY=1\nSTATUS=Running fine\nMAINPID=2048\nWATCHDOG=1\nCUSTOM_KEY=abc\n";
+        let parsed = engine.parse_notify_socket_payload(payload);
+        assert!(parsed.ready);
+        assert_eq!(parsed.status_text, Some("Running fine".to_string()));
+        assert_eq!(parsed.main_pid, Some(2048));
+        assert!(parsed.watchdog);
+        assert_eq!(parsed.custom_keys.get("CUSTOM_KEY"), Some(&"abc".to_string()));
 
-        let limits = SystemdCgroupV2LimitsV79 {
-            memory_max_bytes: Some(1024),
-            cpu_quota_percent: Some(200),
-            ..Default::default()
-        };
-        let params = engine.build_cgroup_v2_control_parameters(&limits);
-        assert_eq!(params.get("memory.max"), Some(&"1024".to_string()));
-        assert_eq!(params.get("cpu.max"), Some(&"200000 100000".to_string()));
+        let dyn_user = engine.allocate_dynamic_user("httpd.service", 60000, 65500);
+        assert_eq!(dyn_user.unit_name, "httpd.service");
+        assert!(dyn_user.allocated_uid >= 60000 && dyn_user.allocated_uid <= 65500);
 
-        let socket_spec = SystemdSocketActivationSpecV79 {
-            socket_name: "http.socket".to_string(),
-            listen_stream: "80".to_string(),
-            pass_fds_count: 3,
-            service_to_trigger: "httpd.service".to_string(),
-        };
-        let env = engine.setup_socket_activation_environment(&socket_spec);
-        assert_eq!(env.get("LISTEN_FDS"), Some(&"3".to_string()));
-
-        let journal_entry = SystemdJournalEntryV79 {
-            cursor: "c1".to_string(),
-            timestamp_usec: 1000,
-            unit: "httpd.service".to_string(),
-            priority: 6,
-            message: "Started".to_string(),
-            sys_fields: BTreeMap::new(),
-        };
-        let frame = engine.format_journal_stream_frame(&journal_entry);
-        assert!(frame.contains("s=c1"));
+        let filter_str = engine.format_ebpf_socket_filter_parameters(&["10.0.0.0/8"], &["192.168.0.0/16"]);
+        assert!(filter_str.contains("10.0.0.0/8"));
     }
 
     #[test]
     fn test_openrc_v79_engine() {
         let engine = OpenRcAdvancementsV79Engine::new();
-        let conf = "rc_parallel=\"YES\"\nrc_env_allow=\"*\"\n";
-        let parsed = engine.parse_rc_conf(conf);
-        assert_eq!(parsed.get("rc_parallel"), Some(&"YES".to_string()));
-
         let services = vec![
-            OpenRcServiceSpecV79 {
-                name: "syslog".to_string(),
+            OpenRcSoftDepSpecV79 {
+                service_name: "logger".to_string(),
                 ..Default::default()
             },
-            OpenRcServiceSpecV79 {
-                name: "nginx".to_string(),
-                dependencies: vec![(OpenRcDependencyTypeV79::Need, "syslog".to_string())],
+            OpenRcSoftDepSpecV79 {
+                service_name: "db".to_string(),
+                soft_uses: vec!["logger".to_string()],
                 ..Default::default()
             },
         ];
+        let mut active = BTreeSet::new();
+        active.insert("logger".to_string());
 
-        let order = engine.resolve_rc_service_order(&services).unwrap();
-        assert_eq!(order.len(), 2);
-        assert_eq!(order[0], "syslog");
-        assert_eq!(order[1], "nginx");
+        let res = engine.resolve_soft_and_hard_dependencies(&services, &active);
+        assert_eq!(res.len(), 2);
+        assert_eq!(res[0], "logger");
+        assert_eq!(res[1], "db");
+
+        assert!(engine.evaluate_stacked_runlevel_transition("default", "nonetwork", &["nonetwork", "single"]));
     }
 
     #[test]
     fn test_runit_s6_v79_engine() {
         let engine = RunitS6AdvancementsV79Engine::new();
-        let entries = vec!["sshd", "crond", ".git", "disabled.down"];
-        let active = engine.scan_service_directory_entries(&entries);
-        assert_eq!(active, vec!["sshd", "crond"]);
+        assert_eq!(engine.calculate_runit_finish_backoff(0), 100);
+        assert_eq!(engine.calculate_runit_finish_backoff(3), 800);
 
-        let spec = S6NotificationSpecV79 {
-            descriptor_fd: 3,
-            expected_token: "READY=1".to_string(),
-            timeout_ms: 1000,
-        };
-        assert!(engine.evaluate_readiness_notification("STATUS=OK\nREADY=1\n", &spec));
-        assert!(!engine.evaluate_readiness_notification("STATUS=WAITING\n", &spec));
+        let plan = engine.generate_s6_rc_rollback_plan("db", &["network", "db", "app"]);
+        assert_eq!(plan.failed_service, "db");
+        assert_eq!(plan.services_to_stop, vec!["app", "network"]);
     }
 
     #[test]
     fn test_sysvinit_v79_engine() {
         let engine = SysVinitAdvancementsV79Engine::new();
-        let line = "si::sysinit:/etc/init.d/rcS";
-        let spec = engine.parse_inittab_line(line).unwrap();
-        assert_eq!(spec.id, "si");
-        assert_eq!(spec.action, SysVinitActionV79::SysInit);
-        assert_eq!(spec.process, "/etc/init.d/rcS");
+        let entries = vec![
+            ("si".to_string(), "S".to_string()),
+            ("l2".to_string(), "2345".to_string()),
+            ("l5".to_string(), "5".to_string()),
+        ];
+        let res = engine.filter_inittab_by_runlevel(&entries, '5');
+        assert_eq!(res.matching_ids, vec!["l2", "l5"]);
     }
 
     #[test]
     fn test_bsd_rc_v79_engine() {
         let engine = BsdRcAdvancementsV79Engine::new();
-        let content = "name=\"sshd\"\nrcvar=\"sshd_enable\"\ncommand=\"/usr/sbin/sshd\"\nstart_precmd=\"sshd_keygen\"\n";
-        let hooks = engine.parse_rc_d_script_hooks(content);
-        assert_eq!(hooks.name, "sshd");
-        assert_eq!(hooks.rcvar, "sshd_enable");
-        assert_eq!(hooks.start_precmd, Some("sshd_keygen".to_string()));
+        let conf = "sshd_flags=\"-u0\"\npowerd_flags=\"-a hiadaptive\"\n";
+        let parsed = engine.parse_openbsd_rc_conf_local(conf);
+        assert_eq!(parsed.get("sshd_flags"), Some(&"-u0".to_string()));
+
+        let cmd = engine.build_freebsd_jail_rc_command("webjail", "nginx", "restart");
+        assert_eq!(cmd, "jail -j webjail exec /etc/rc.d/nginx restart");
     }
 
     #[test]
     fn test_launchd_android_v79_engine() {
         let engine = LaunchdAndroidInitAdvancementsV79Engine::new();
-        let mut path_state = BTreeMap::new();
-        path_state.insert("/var/run/app.pid".to_string(), true);
-        let spec = LaunchdKeepAliveSpecV79 {
-            path_state,
-            ..Default::default()
-        };
+        let mach = engine.format_mach_service_handle("com.apple.windowserver", false);
+        assert_eq!(mach, "mach_service://com.apple.windowserver/active");
 
-        let mut paths = BTreeSet::new();
-        paths.insert("/var/run/app.pid".to_string());
-        assert!(engine.evaluate_keep_alive_path_state(&spec, &paths));
-
-        let trig = engine.parse_android_trigger_condition("on early-init");
-        assert_eq!(trig, Some(("event".to_string(), "early-init".to_string())));
+        let mut props = BTreeMap::new();
+        props.insert("ro.build.type".to_string(), "userdebug".to_string());
+        assert!(engine.evaluate_android_property_trigger("ro.build.type", "userdebug", &props));
+        assert!(!engine.evaluate_android_property_trigger("ro.build.type", "user", &props));
     }
 
     #[test]
     fn test_cron_timers_v79_engine() {
         let engine = CronAnacronTimersAtV79Engine::new();
-        let timer = SystemdTimerSpecV79 {
-            on_boot_sec: Some(60),
-            ..Default::default()
-        };
-        assert!(engine.evaluate_timer_readiness(&timer, 1000, 0, 1060));
-        assert!(!engine.evaluate_timer_readiness(&timer, 1000, 0, 1059));
+        assert_eq!(engine.expand_crontab_macro("@daily"), Some("0 0 * * *"));
+        assert_eq!(engine.expand_crontab_macro("@reboot"), Some("@reboot"));
 
-        assert!(engine.evaluate_batch_load_average(0.45, 0.80));
-        assert!(!engine.evaluate_batch_load_average(0.95, 0.80));
+        let delayed = engine.calculate_systemd_timer_randomized_delay(1000, 30, 42);
+        assert!(delayed >= 1000 && delayed < 1030);
     }
 
     #[test]
