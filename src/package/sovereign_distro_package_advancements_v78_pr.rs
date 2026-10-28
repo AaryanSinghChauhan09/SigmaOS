@@ -5,8 +5,8 @@
 // Inspired by Linux (Debian, Arch, Fedora, Alpine, Gentoo, Void, Solus, Slax, Puppy,
 // Tiny Core, Clear Linux) & BSD (FreeBSD, OpenBSD, NetBSD, DragonFly BSD) distributions,
 // language-level package managers (Cargo, Pip, Gem, NPM, Pnpm, Yarn, LuaRocks, Go, Zig, Swift),
-// and mobile/app image bundles (AppImage, Flatpak, Snap, APK, AAB, APEX, IPA, HAP, AIR, Bottle),
-// this suite provides Pull Request proposal generators and state engines for universal package interop for SigmaOS.
+// and mobile/app image bundles (AppImage, Flatpak, Snap, APK, AAB, APEX, IPA, HAP, AIR), this suite
+// provides Pull Request proposal generators and state engines for universal package interop for SigmaOS.
 
 extern crate alloc;
 
@@ -17,8 +17,6 @@ use alloc::format;
 #[cfg(not(feature = "standalone_test"))]
 use alloc::string::{String, ToString};
 #[cfg(not(feature = "standalone_test"))]
-use alloc::vec;
-#[cfg(not(feature = "standalone_test"))]
 use alloc::vec::Vec;
 
 #[cfg(feature = "standalone_test")]
@@ -27,14 +25,10 @@ use std::collections::BTreeMap;
 use std::string::{String, ToString};
 
 #[cfg(not(feature = "standalone_test"))]
-use crate::package::universal::{PackageFormat, PackageState, UnifiedPackage};
+use crate::package::sovereign_distro_package_advancements_v78::PackageFormat;
 
 #[cfg(feature = "standalone_test")]
-#[path = "universal.rs"]
-pub mod universal;
-
-#[cfg(feature = "standalone_test")]
-pub use universal::{PackageError, PackageFormat, PackageState, UnifiedPackage};
+use super::sovereign_distro_package_advancements_v78::PackageFormat;
 
 /// Pull Request Proposal Manifest V78
 #[derive(Debug, Clone, PartialEq, Eq)]
