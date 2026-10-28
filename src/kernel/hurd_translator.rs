@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Principle: MICROKERNEL TRANSLATORS, SEPARATION OF MECHANISM AND POLICY, HURD VFS ABSTRACTION
 
-use alloc::{vec::Vec, string::String, collections::BTreeMap, boxed::Box};
+use alloc::{boxed::Box, collections::BTreeMap, string::String, vec::Vec};
 
 /// A mounted translator instance
 #[derive(Debug, Clone)]
@@ -14,7 +14,12 @@ pub struct TranslatorMount {
 
 impl TranslatorMount {
     pub fn new(path: String, translator_name: String, flags: u32) -> Self {
-        Self { path, translator_name, flags, active: false }
+        Self {
+            path,
+            translator_name,
+            flags,
+            active: false,
+        }
     }
 }
 
@@ -47,8 +52,15 @@ pub struct TranslatorResponse {
 }
 
 impl TranslatorResponse {
-    pub fn ok(data: Vec<u8>) -> Self { Self { status: 0, data } }
-    pub fn err(code: i32) -> Self { Self { status: code, data: Vec::new() } }
+    pub fn ok(data: Vec<u8>) -> Self {
+        Self { status: 0, data }
+    }
+    pub fn err(code: i32) -> Self {
+        Self {
+            status: code,
+            data: Vec::new(),
+        }
+    }
 }
 
 /// Trait for all Hurd filesystem translators
@@ -69,12 +81,19 @@ pub struct Ext2Translator {
 
 impl Ext2Translator {
     pub fn new(device: String) -> Self {
-        Self { device, block_size: 4096, inode_count: 0, mounted: false }
+        Self {
+            device,
+            block_size: 4096,
+            inode_count: 0,
+            mounted: false,
+        }
     }
 }
 
 impl Translator for Ext2Translator {
-    fn name(&self) -> &str { "ext2fs" }
+    fn name(&self) -> &str {
+        "ext2fs"
+    }
 
     fn startup(&mut self) -> Result<(), &'static str> {
         // Would parse superblock from block device
@@ -101,19 +120,26 @@ impl Translator for Ext2Translator {
 /// FAT translator
 pub struct FatTranslator {
     pub device: String,
-    pub fat_type: u8,  // 12, 16, or 32
+    pub fat_type: u8, // 12, 16, or 32
     pub cluster_size: u32,
     pub mounted: bool,
 }
 
 impl FatTranslator {
     pub fn new(device: String, fat_type: u8) -> Self {
-        Self { device, fat_type, cluster_size: 4096, mounted: false }
+        Self {
+            device,
+            fat_type,
+            cluster_size: 4096,
+            mounted: false,
+        }
     }
 }
 
 impl Translator for FatTranslator {
-    fn name(&self) -> &str { "fatfs" }
+    fn name(&self) -> &str {
+        "fatfs"
+    }
 
     fn startup(&mut self) -> Result<(), &'static str> {
         if self.fat_type != 12 && self.fat_type != 16 && self.fat_type != 32 {
@@ -143,7 +169,9 @@ pub struct ProcTranslator {
 
 impl ProcTranslator {
     pub fn new() -> Self {
-        Self { pid_entries: BTreeMap::new() }
+        Self {
+            pid_entries: BTreeMap::new(),
+        }
     }
 
     pub fn register_pid(&mut self, pid: u32, name: String) {
@@ -152,10 +180,16 @@ impl ProcTranslator {
 }
 
 impl Translator for ProcTranslator {
-    fn name(&self) -> &str { "procfs" }
+    fn name(&self) -> &str {
+        "procfs"
+    }
 
-    fn startup(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn shutdown(&mut self) { self.pid_entries.clear(); }
+    fn startup(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn shutdown(&mut self) {
+        self.pid_entries.clear();
+    }
 
     fn handle_request(&mut self, req: TranslatorRequest) -> TranslatorResponse {
         match req.op {
@@ -190,7 +224,11 @@ pub struct PfinetTranslator {
 
 impl PfinetTranslator {
     pub fn new(interface: String) -> Self {
-        Self { interface, ip_address: [127, 0, 0, 1], running: false }
+        Self {
+            interface,
+            ip_address: [127, 0, 0, 1],
+            running: false,
+        }
     }
 
     pub fn set_ip(&mut self, ip: [u8; 4]) {
@@ -199,17 +237,23 @@ impl PfinetTranslator {
 }
 
 impl Translator for PfinetTranslator {
-    fn name(&self) -> &str { "pfinet" }
+    fn name(&self) -> &str {
+        "pfinet"
+    }
 
     fn startup(&mut self) -> Result<(), &'static str> {
         self.running = true;
         Ok(())
     }
 
-    fn shutdown(&mut self) { self.running = false; }
+    fn shutdown(&mut self) {
+        self.running = false;
+    }
 
     fn handle_request(&mut self, req: TranslatorRequest) -> TranslatorResponse {
-        if !self.running { return TranslatorResponse::err(-5); }
+        if !self.running {
+            return TranslatorResponse::err(-5);
+        }
         TranslatorResponse::ok(self.ip_address.to_vec())
     }
 }
@@ -224,15 +268,26 @@ pub struct TermTranslator {
 
 impl TermTranslator {
     pub fn new(tty_name: String) -> Self {
-        Self { tty_name, buffer: Vec::new(), cols: 80, rows: 24 }
+        Self {
+            tty_name,
+            buffer: Vec::new(),
+            cols: 80,
+            rows: 24,
+        }
     }
 }
 
 impl Translator for TermTranslator {
-    fn name(&self) -> &str { "term" }
+    fn name(&self) -> &str {
+        "term"
+    }
 
-    fn startup(&mut self) -> Result<(), &'static str> { Ok(()) }
-    fn shutdown(&mut self) { self.buffer.clear(); }
+    fn startup(&mut self) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn shutdown(&mut self) {
+        self.buffer.clear();
+    }
 
     fn handle_request(&mut self, req: TranslatorRequest) -> TranslatorResponse {
         match req.op {
@@ -271,7 +326,12 @@ impl HurdVfs {
         Ok(())
     }
 
-    pub fn mount(&mut self, path: String, translator_name: String, flags: u32) -> Result<(), &'static str> {
+    pub fn mount(
+        &mut self,
+        path: String,
+        translator_name: String,
+        flags: u32,
+    ) -> Result<(), &'static str> {
         if !self.translators.contains_key(&translator_name) {
             return Err("translator not registered");
         }
@@ -284,7 +344,11 @@ impl HurdVfs {
     pub fn unmount(&mut self, path: &str) -> Result<(), &'static str> {
         let before = self.mounts.len();
         self.mounts.retain(|m| m.path != path);
-        if self.mounts.len() < before { Ok(()) } else { Err("path not mounted") }
+        if self.mounts.len() < before {
+            Ok(())
+        } else {
+            Err("path not mounted")
+        }
     }
 
     pub fn lookup_path(&self, path: &str) -> Option<&str> {
@@ -324,7 +388,8 @@ mod tests {
         let mut vfs = HurdVfs::new();
         let ext2 = Box::new(Ext2Translator::new(String::from("/dev/sda1")));
         vfs.register_translator(ext2).unwrap();
-        vfs.mount(String::from("/"), String::from("ext2fs"), 0).unwrap();
+        vfs.mount(String::from("/"), String::from("ext2fs"), 0)
+            .unwrap();
         let t = vfs.lookup_path("/home/user");
         assert_eq!(t, Some("ext2fs"));
     }
@@ -334,7 +399,8 @@ mod tests {
         let mut vfs = HurdVfs::new();
         let ext2 = Box::new(Ext2Translator::new(String::from("/dev/sda1")));
         vfs.register_translator(ext2).unwrap();
-        vfs.mount(String::from("/"), String::from("ext2fs"), 0).unwrap();
+        vfs.mount(String::from("/"), String::from("ext2fs"), 0)
+            .unwrap();
         vfs.unmount("/").unwrap();
         assert!(vfs.lookup_path("/").is_none());
     }

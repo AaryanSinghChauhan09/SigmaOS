@@ -2,45 +2,101 @@
 // SigmaOS - Virtual 8086 Mode Machine (V86)
 // Principles: LOW LEVEL CONTROL, DIRECT DEVICE CONTROL, MEMORY DISCIPLINE, DEFENSIVE PROGRAMMING
 
-use alloc::{vec::Vec, collections::BTreeMap};
+use alloc::{collections::BTreeMap, vec::Vec};
 
 /// x86 register file for V86 mode
 #[derive(Debug, Clone, Default)]
 pub struct V86Registers {
-    pub ax: u16, pub bx: u16, pub cx: u16, pub dx: u16,
-    pub si: u16, pub di: u16, pub bp: u16, pub sp: u16,
-    pub cs: u16, pub ds: u16, pub es: u16, pub ss: u16,
-    pub fs: u16, pub gs: u16,
+    pub ax: u16,
+    pub bx: u16,
+    pub cx: u16,
+    pub dx: u16,
+    pub si: u16,
+    pub di: u16,
+    pub bp: u16,
+    pub sp: u16,
+    pub cs: u16,
+    pub ds: u16,
+    pub es: u16,
+    pub ss: u16,
+    pub fs: u16,
+    pub gs: u16,
     pub ip: u16,
     pub flags: u16,
 }
 
 impl V86Registers {
     // High/low byte accessors
-    pub fn al(&self) -> u8 { (self.ax & 0xFF) as u8 }
-    pub fn ah(&self) -> u8 { (self.ax >> 8) as u8 }
-    pub fn bl(&self) -> u8 { (self.bx & 0xFF) as u8 }
-    pub fn bh(&self) -> u8 { (self.bx >> 8) as u8 }
-    pub fn cl(&self) -> u8 { (self.cx & 0xFF) as u8 }
-    pub fn ch(&self) -> u8 { (self.cx >> 8) as u8 }
-    pub fn dl(&self) -> u8 { (self.dx & 0xFF) as u8 }
-    pub fn dh(&self) -> u8 { (self.dx >> 8) as u8 }
+    pub fn al(&self) -> u8 {
+        (self.ax & 0xFF) as u8
+    }
+    pub fn ah(&self) -> u8 {
+        (self.ax >> 8) as u8
+    }
+    pub fn bl(&self) -> u8 {
+        (self.bx & 0xFF) as u8
+    }
+    pub fn bh(&self) -> u8 {
+        (self.bx >> 8) as u8
+    }
+    pub fn cl(&self) -> u8 {
+        (self.cx & 0xFF) as u8
+    }
+    pub fn ch(&self) -> u8 {
+        (self.cx >> 8) as u8
+    }
+    pub fn dl(&self) -> u8 {
+        (self.dx & 0xFF) as u8
+    }
+    pub fn dh(&self) -> u8 {
+        (self.dx >> 8) as u8
+    }
 
-    pub fn set_al(&mut self, v: u8) { self.ax = (self.ax & 0xFF00) | v as u16; }
-    pub fn set_ah(&mut self, v: u8) { self.ax = (self.ax & 0x00FF) | ((v as u16) << 8); }
+    pub fn set_al(&mut self, v: u8) {
+        self.ax = (self.ax & 0xFF00) | v as u16;
+    }
+    pub fn set_ah(&mut self, v: u8) {
+        self.ax = (self.ax & 0x00FF) | ((v as u16) << 8);
+    }
 
     // Flag bits
-    pub fn carry(&self) -> bool { (self.flags & 0x0001) != 0 }
-    pub fn zero(&self) -> bool { (self.flags & 0x0040) != 0 }
-    pub fn sign(&self) -> bool { (self.flags & 0x0080) != 0 }
-    pub fn interrupt_enable(&self) -> bool { (self.flags & 0x0200) != 0 }
-    pub fn vm_flag(&self) -> bool { (self.flags & 0x0800) != 0 }  // V86 mode flag
+    pub fn carry(&self) -> bool {
+        (self.flags & 0x0001) != 0
+    }
+    pub fn zero(&self) -> bool {
+        (self.flags & 0x0040) != 0
+    }
+    pub fn sign(&self) -> bool {
+        (self.flags & 0x0080) != 0
+    }
+    pub fn interrupt_enable(&self) -> bool {
+        (self.flags & 0x0200) != 0
+    }
+    pub fn vm_flag(&self) -> bool {
+        (self.flags & 0x0800) != 0
+    } // V86 mode flag
 
-    pub fn set_carry(&mut self, v: bool) { if v { self.flags |= 0x0001; } else { self.flags &= !0x0001; } }
-    pub fn set_zero(&mut self, v: bool) { if v { self.flags |= 0x0040; } else { self.flags &= !0x0040; } }
+    pub fn set_carry(&mut self, v: bool) {
+        if v {
+            self.flags |= 0x0001;
+        } else {
+            self.flags &= !0x0001;
+        }
+    }
+    pub fn set_zero(&mut self, v: bool) {
+        if v {
+            self.flags |= 0x0040;
+        } else {
+            self.flags &= !0x0040;
+        }
+    }
 
-    pub fn linear_ip(&self) -> u32 { (self.cs as u32) * 16 + self.ip as u32 }
-    pub fn linear_sp(&self) -> u32 { (self.ss as u32) * 16 + self.sp as u32 }
+    pub fn linear_ip(&self) -> u32 {
+        (self.cs as u32) * 16 + self.ip as u32
+    }
+    pub fn linear_sp(&self) -> u32 {
+        (self.ss as u32) * 16 + self.sp as u32
+    }
 }
 
 /// Port I/O trap handler
@@ -53,7 +109,7 @@ pub struct PortTrap {
 /// Virtual 8086 Mode machine state
 pub struct V86Machine {
     pub regs: V86Registers,
-    pub memory: Vec<u8>,       // 1MB real-mode address space
+    pub memory: Vec<u8>, // 1MB real-mode address space
     pub port_traps: BTreeMap<u16, PortTrap>,
     pub int_vectors: [u32; 256], // IVT at 0000:0000
     pub halted: bool,
@@ -85,19 +141,27 @@ impl V86Machine {
     pub fn load_image(&mut self, seg: u16, off: u16, data: &[u8]) -> Result<(), &'static str> {
         let addr = (seg as usize) * 16 + off as usize;
         let end = addr + data.len();
-        if end > self.memory.len() { return Err("image exceeds memory"); }
+        if end > self.memory.len() {
+            return Err("image exceeds memory");
+        }
         self.memory[addr..end].copy_from_slice(data);
         Ok(())
     }
 
     pub fn mem_read8(&self, seg: u16, off: u16) -> u8 {
         let addr = (seg as usize) * 16 + off as usize;
-        if addr < self.memory.len() { self.memory[addr] } else { 0xFF }
+        if addr < self.memory.len() {
+            self.memory[addr]
+        } else {
+            0xFF
+        }
     }
 
     pub fn mem_write8(&mut self, seg: u16, off: u16, val: u8) {
         let addr = (seg as usize) * 16 + off as usize;
-        if addr < self.memory.len() { self.memory[addr] = val; }
+        if addr < self.memory.len() {
+            self.memory[addr] = val;
+        }
     }
 
     pub fn mem_read16(&self, seg: u16, off: u16) -> u16 {
@@ -164,22 +228,29 @@ impl V86Machine {
 
     /// Execute one instruction (simplified decoder)
     pub fn step(&mut self) -> Result<(), &'static str> {
-        if self.halted { return Err("machine halted"); }
+        if self.halted {
+            return Err("machine halted");
+        }
         let opcode = self.fetch8();
         self.step_count += 1;
 
         match opcode {
-            0x90 => {}  // NOP
-            0xF4 => { self.halted = true; }  // HLT
-            0xEB => {   // JMP short
+            0x90 => {} // NOP
+            0xF4 => {
+                self.halted = true;
+            } // HLT
+            0xEB => {
+                // JMP short
                 let rel = self.fetch8() as i8;
                 self.regs.ip = self.regs.ip.wrapping_add(rel as u16);
             }
-            0xCD => {   // INT n
+            0xCD => {
+                // INT n
                 let n = self.fetch8();
                 self.handle_int(n);
             }
-            0xCF => {   // IRET
+            0xCF => {
+                // IRET
                 let ip = self.stack_pop16();
                 let cs = self.stack_pop16();
                 let flags = self.stack_pop16();
@@ -187,7 +258,8 @@ impl V86Machine {
                 self.regs.cs = cs;
                 self.regs.flags = flags;
             }
-            0xB8..=0xBF => {  // MOV r16, imm16
+            0xB8..=0xBF => {
+                // MOV r16, imm16
                 let reg = opcode - 0xB8;
                 let imm = self.fetch16();
                 let regs = &mut self.regs;
@@ -203,7 +275,7 @@ impl V86Machine {
                     _ => {}
                 }
             }
-            _ => {}  // unimplemented opcode — real impl would raise #UD
+            _ => {} // unimplemented opcode — real impl would raise #UD
         }
         Ok(())
     }
@@ -211,8 +283,12 @@ impl V86Machine {
     /// Run up to `max_steps` instructions
     pub fn run(&mut self, max_steps: u64) {
         for _ in 0..max_steps {
-            if self.halted { break; }
-            if self.step().is_err() { break; }
+            if self.halted {
+                break;
+            }
+            if self.step().is_err() {
+                break;
+            }
         }
     }
 
@@ -253,7 +329,8 @@ mod tests {
         m.regs.cs = 0x0000;
         m.regs.ip = 0x0200;
         // MOV AX, 0x1234; HLT
-        m.load_image(0x0000, 0x0200, &[0xB8, 0x34, 0x12, 0xF4]).unwrap();
+        m.load_image(0x0000, 0x0200, &[0xB8, 0x34, 0x12, 0xF4])
+            .unwrap();
         m.run(10);
         assert_eq!(m.regs.ax, 0x1234);
         assert!(m.halted);
