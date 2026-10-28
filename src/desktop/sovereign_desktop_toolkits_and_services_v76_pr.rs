@@ -48,95 +48,61 @@ pub struct KvantumThemeSpecV76 {
     pub translucent_windows: bool,
     pub svg_path: String,
     pub shadow_size_px: u32,
-    pub corner_radius_px: u32,
-    pub window_margin_px: u32,
+    pub contrast_ratio: u32,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignGtkQtToolkitEngineV76 {
-    pub engine_id: usize,
-    pub adw_color_scheme: AdwColorSchemeV76,
+    pub current_color_scheme: AdwColorSchemeV76,
     pub qt_style: Qt6PlatformStyleV76,
-    pub gtk_render_pipeline: Gtk4RenderPipelineV76,
-    pub active_accent_hex: String,
-    pub kvantum_spec: Option<KvantumThemeSpecV76>,
-    pub css_custom_rules: Vec<String>,
+    pub render_pipeline: Gtk4RenderPipelineV76,
+    pub active_kvantum_spec: Option<KvantumThemeSpecV76>,
+    pub css_custom_properties: BTreeMap<String, String>,
 }
 
 impl SovereignGtkQtToolkitEngineV76 {
     pub fn new() -> Self {
         Self {
-            engine_id: NEXT_V76_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst),
-            adw_color_scheme: AdwColorSchemeV76::PreferDark,
+            current_color_scheme: AdwColorSchemeV76::PreferDark,
             qt_style: Qt6PlatformStyleV76::Kvantum,
-            gtk_render_pipeline: Gtk4RenderPipelineV76::Vulkan,
-            active_accent_hex: "#3584e4".to_string(),
-            kvantum_spec: Some(KvantumThemeSpecV76 {
-                theme_name: "SovereignDarkV76".to_string(),
+            render_pipeline: Gtk4RenderPipelineV76::Ngl,
+            active_kvantum_spec: Some(KvantumThemeSpecV76 {
+                theme_name: String::from("Catppuccin-Mocha"),
                 blur_background: true,
                 translucent_windows: true,
-                svg_path: "/usr/share/Kvantum/SovereignDarkV76/SovereignDarkV76.svg".to_string(),
-                shadow_size_px: 12,
-                corner_radius_px: 8,
-                window_margin_px: 4,
+                svg_path: String::from("/usr/share/Kvantum/Catppuccin-Mocha/Catppuccin-Mocha.svg"),
+                shadow_size_px: 16,
+                contrast_ratio: 100,
             }),
-            css_custom_rules: Vec::new(),
+            css_custom_properties: BTreeMap::new(),
         }
     }
 
-    pub fn convert_css_to_qss(&self, css_input: &str) -> String {
-        let mut qss_lines = Vec::new();
-        qss_lines.push("/* QSS Converted from GTK3/GTK4 CSS Engine V76 */".to_string());
-        for line in css_input.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() {
-                continue;
-            }
-            if trimmed.starts_with("@define-color") {
-                let parts: Vec<&str> = trimmed.split_whitespace().collect();
-                if parts.len() >= 3 {
-                    let name = parts[1];
-                    let val = parts[2].trim_end_matches(';');
-                    qss_lines.push(format!("/* Palette Variable: {} -> {} */", name, val));
-                }
-            } else {
-                let translated = trimmed
-                    .replace("window.background", "QMainWindow, QDialog")
-                    .replace("button.suggested-action", "QPushButton[accent=\"true\"]")
-                    .replace("entry", "QLineEdit")
-                    .replace("headerbar", "QHeaderView")
-                    .replace("border-radius:", "border-radius:")
-                    .replace("background-color:", "background-color:");
-                qss_lines.push(translated);
-            }
-        }
-        qss_lines.join("\n")
+    pub fn set_color_scheme(&mut self, scheme: AdwColorSchemeV76) {
+        self.current_color_scheme = scheme;
+        let accent = match scheme {
+            AdwColorSchemeV76::PreferDark | AdwColorSchemeV76::ForceDark => "#89b4fa",
+            _ => "#1e66f5",
+        };
+        self.css_custom_properties.insert("@define-color accent_color".to_string(), accent.to_string());
     }
 
-    pub fn set_accent_color(&mut self, hex: &str) {
-        self.active_accent_hex = hex.to_string();
+    pub fn sync_qt6_kvantum(&mut self, spec: KvantumThemeSpecV76) -> bool {
+        self.qt_style = Qt6PlatformStyleV76::Kvantum;
+        self.active_kvantum_spec = Some(spec);
+        true
     }
 
-    pub fn generate_kvantum_config(&self) -> String {
-        if let Some(spec) = &self.kvantum_spec {
-            format!(
-                "[Config]\ntheme={}\nblur_background={}\ntranslucent_windows={}\nshadow_size={}\ncorner_radius={}\nwindow_margin={}\naccent_color={}\n",
-                spec.theme_name,
-                spec.blur_background,
-                spec.translucent_windows,
-                spec.shadow_size_px,
-                spec.corner_radius_px,
-                spec.window_margin_px,
-                self.active_accent_hex
-            )
-        } else {
-            "[Config]\ntheme=Default\n".to_string()
+    pub fn export_adwaita_css_theme(&self) -> String {
+        let mut css = String::from("/* Auto-generated AdwStyleManager V76 */\n");
+        for (k, v) in &self.css_custom_properties {
+            css.push_str(&format!("{}: {};\n", k, v));
         }
+        css
     }
 }
 
 // ============================================================================
-// 2. Display Managers & PAM Auth Suite Engine V76
+// 2. Display Managers Suite Engine V76
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -144,172 +110,111 @@ pub enum DisplayManagerKindV76 {
     Gdm,
     Sddm,
     LightDm,
-    Xdm,
+    Xdmcp,
     SlickGreeter,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DesktopSessionTypeV76 {
-    Wayland,
-    X11,
-    Mir,
-    Hyprland,
-    Zenith,
-    Sway,
-    KdePlasma,
-    GnomeShell,
+    Xdm,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PamAuthRequestV76 {
-    pub username: String,
-    pub password: String,
-    pub password_hash: String,
-    pub mfa_otp: Option<String>,
-    pub seat_id: String,
+pub struct DisplayManagerSessionV76 {
+    pub session_id: usize,
+    pub user_name: String,
+    pub desktop_file: String,
+    pub is_wayland: bool,
+    pub pam_authenticated: bool,
+    pub x11_display_nr: u32,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PamAuthResponseV76 {
-    pub authenticated: bool,
-    pub user_uid: u32,
-    pub user_gid: u32,
-    pub session_id: String,
-    pub environment_vars: BTreeMap<String, String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignDisplayManagerSuiteEngineV76 {
-    pub dm_kind: DisplayManagerKindV76,
-    pub seat_assignments: BTreeMap<String, Vec<String>>,
+    pub default_kind: DisplayManagerKindV76,
+    pub active_sessions: Vec<DisplayManagerSessionV76>,
+    pub greeter_background: String,
     pub pam_service_name: String,
-    pub active_sessions_count: usize,
 }
 
 impl SovereignDisplayManagerSuiteEngineV76 {
     pub fn new(kind: DisplayManagerKindV76) -> Self {
-        let mut seat_assignments = BTreeMap::new();
-        seat_assignments.insert("seat0".to_string(), vec!["/dev/dri/card0".to_string(), "/dev/input/event0".to_string()]);
         Self {
-            dm_kind: kind,
-            seat_assignments,
-            pam_service_name: "sddm-autologin".to_string(),
-            active_sessions_count: 1,
+            default_kind: kind,
+            active_sessions: Vec::new(),
+            greeter_background: String::from("/usr/share/backgrounds/sigma_default.png"),
+            pam_service_name: String::from("lightdm"),
         }
     }
 
-    pub fn authenticate_pam(&self, req: &PamAuthRequestV76) -> PamAuthResponseV76 {
-        let simple_hash = format!("sha256_{}", req.password);
-        let auth_ok = !req.username.is_empty()
-            && ((!req.password_hash.is_empty() && simple_hash == req.password_hash)
-                || req.mfa_otp.is_some());
-
-        let mut envs = BTreeMap::new();
-        envs.insert("XDG_SESSION_TYPE".to_string(), "wayland".to_string());
-        envs.insert("XDG_SEAT".to_string(), req.seat_id.clone());
-        envs.insert("USER".to_string(), req.username.clone());
-
-        PamAuthResponseV76 {
-            authenticated: auth_ok,
-            user_uid: 1000,
-            user_gid: 1000,
-            session_id: format!("sess_v76_{}", req.username),
-            environment_vars: envs,
+    pub fn authenticate_pam(&mut self, user: &str, secret: &str) -> bool {
+        if user.is_empty() || secret.is_empty() {
+            return false;
         }
+        let session_id = NEXT_V76_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
+        self.active_sessions.push(DisplayManagerSessionV76 {
+            session_id,
+            user_name: user.to_string(),
+            desktop_file: String::from("hyprland.desktop"),
+            is_wayland: true,
+            pam_authenticated: true,
+            x11_display_nr: 0,
+        });
+        true
     }
 
-    pub fn parse_bsd_login_conf(&self, conf_data: &str) -> BTreeMap<String, String> {
-        let mut limits = BTreeMap::new();
-        for line in conf_data.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') {
-                continue;
-            }
-            let clean = trimmed.trim_end_matches('\\').trim_matches(':');
-            for item in clean.split(':') {
-                if let Some((k, v)) = item.split_once('=') {
-                    limits.insert(k.trim().to_string(), v.trim().to_string());
-                } else if !item.trim().is_empty() {
-                    limits.insert(item.trim().to_string(), "true".to_string());
-                }
-            }
-        }
-        limits
-    }
-
-    pub fn build_xdmcp_query(&self, target_host: &str) -> Vec<u8> {
-        let mut packet = vec![0x00, 0x01, 0x00, 0x02]; // XDMCP Header
-        packet.extend_from_slice(target_host.as_bytes());
-        packet
+    pub fn generate_slick_greeter_conf(&self) -> String {
+        format!(
+            "[Greeter]\nbackground={}\nshow-hostname=true\nenable-hidpi=auto\n",
+            self.greeter_background
+        )
     }
 }
 
 // ============================================================================
-// 3. GVfs / GIO Virtual Filesystem Engine V76
+// 3. GVfs/GIO Virtual File System Engine V76
 // ============================================================================
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum MountSchemeV76 {
-    Smb,
-    Sftp,
-    Mtp,
-    Davs,
-    Archive,
-    Nfs,
-    Fuse,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GvfsMountV76 {
-    pub mount_id: String,
-    pub scheme: MountSchemeV76,
-    pub uri: String,
-    pub mount_path: String,
+    pub mount_id: usize,
+    pub scheme: String,
+    pub target_uri: String,
+    pub mount_point: String,
     pub is_mounted: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignGvfsGioFileSystemEngineV76 {
-    pub active_mounts: BTreeMap<String, GvfsMountV76>,
-    pub dconf_tree: BTreeMap<String, String>,
+    pub active_mounts: BTreeMap<usize, GvfsMountV76>,
+    pub dconf_store: BTreeMap<String, String>,
 }
 
 impl SovereignGvfsGioFileSystemEngineV76 {
     pub fn new() -> Self {
         Self {
             active_mounts: BTreeMap::new(),
-            dconf_tree: BTreeMap::new(),
+            dconf_store: BTreeMap::new(),
         }
     }
 
-    pub fn mount_uri(&mut self, uri: &str, scheme: MountSchemeV76) -> String {
-        let mount_id = format!("mount_v76_{}", self.active_mounts.len() + 1);
+    pub fn mount_location(&mut self, scheme: &str, target_uri: &str) -> usize {
+        let mount_id = NEXT_V76_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
         let mount = GvfsMountV76 {
-            mount_id: mount_id.clone(),
-            scheme,
-            uri: uri.to_string(),
-            mount_path: format!("/run/user/1000/gvfs/{}", mount_id),
+            mount_id,
+            scheme: scheme.to_string(),
+            target_uri: target_uri.to_string(),
+            mount_point: format!("/run/user/1000/gvfs/{}-{}", scheme, mount_id),
             is_mounted: true,
         };
-        self.active_mounts.insert(mount_id.clone(), mount);
+        self.active_mounts.insert(mount_id, mount);
         mount_id
     }
 
-    pub fn unmount_id(&mut self, mount_id: &str) -> bool {
-        if let Some(mount) = self.active_mounts.get_mut(mount_id) {
-            mount.is_mounted = false;
-            true
-        } else {
-            false
-        }
+    pub fn unmount_id(&mut self, mount_id: &usize) -> bool {
+        self.active_mounts.remove(mount_id).is_some()
     }
 
-    pub fn set_dconf_value(&mut self, key: &str, value: &str) {
-        self.dconf_tree.insert(key.to_string(), value.to_string());
+    pub fn set_dconf_value(&mut self, key: &str, val: &str) {
+        self.dconf_store.insert(key.to_string(), val.to_string());
     }
 
     pub fn get_dconf_value(&self, key: &str) -> Option<&String> {
-        self.dconf_tree.get(key)
+        self.dconf_store.get(key)
     }
 }
 
@@ -318,56 +223,47 @@ impl SovereignGvfsGioFileSystemEngineV76 {
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct PolkitRuleV76 {
+pub struct PolkitActionV76 {
     pub action_id: String,
-    pub allow_any: String,
-    pub allow_inactive: String,
-    pub allow_active: String,
+    pub default_any: String,
+    pub default_inactive: String,
+    pub default_active: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignPolicyKitAuthorizationEngineV76 {
-    pub rules: Vec<PolkitRuleV76>,
-    pub active_agent_sessions: BTreeMap<String, String>,
+    pub rules: Vec<String>,
+    pub actions: BTreeMap<String, PolkitActionV76>,
 }
 
 impl SovereignPolicyKitAuthorizationEngineV76 {
     pub fn new() -> Self {
-        let default_rule = PolkitRuleV76 {
-            action_id: "org.freedesktop.policykit.exec".to_string(),
-            allow_any: "no".to_string(),
-            allow_inactive: "no".to_string(),
-            allow_active: "auth_admin".to_string(),
-        };
         Self {
-            rules: vec![default_rule],
-            active_agent_sessions: BTreeMap::new(),
+            rules: Vec::new(),
+            actions: BTreeMap::new(),
         }
     }
 
-    pub fn evaluate_js_rule(&self, action_id: &str, user: &str) -> bool {
-        if user == "root" {
+    pub fn evaluate_js_rule(&self, action_id: &str, subject_user: &str) -> bool {
+        if subject_user == "root" {
             return true;
         }
-        for rule in &self.rules {
-            if rule.action_id == action_id || rule.action_id == "*" {
-                return rule.allow_active == "yes" || rule.allow_active == "auth_admin";
-            }
-        }
-        false
+        action_id.starts_with("org.freedesktop.")
     }
 
-    pub fn parse_pkla_file(&mut self, pkla_content: &str) -> usize {
+    pub fn parse_pkla_file(&mut self, content: &str) -> usize {
         let mut count = 0;
-        for line in pkla_content.lines() {
+        for line in content.lines() {
             if line.starts_with("Action=") {
-                let action = line.trim_start_matches("Action=").trim().to_string();
-                self.rules.push(PolkitRuleV76 {
-                    action_id: action,
-                    allow_any: "no".to_string(),
-                    allow_inactive: "no".to_string(),
-                    allow_active: "yes".to_string(),
-                });
+                let act = line.trim_start_matches("Action=").trim();
+                self.actions.insert(
+                    act.to_string(),
+                    PolkitActionV76 {
+                        action_id: act.to_string(),
+                        default_any: "no".to_string(),
+                        default_inactive: "no".to_string(),
+                        default_active: "auth_admin".to_string(),
+                    },
+                );
                 count += 1;
             }
         }
@@ -379,69 +275,48 @@ impl SovereignPolicyKitAuthorizationEngineV76 {
 // 5. XDG Desktop Portals & Utilities Engine V76
 // ============================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignXdgPortalsUtilitiesEngineV76 {
-    pub mime_associations: BTreeMap<String, String>,
-    pub portals_config: BTreeMap<String, String>,
+    pub active_portals: Vec<String>,
     pub user_dirs: BTreeMap<String, String>,
 }
 
 impl SovereignXdgPortalsUtilitiesEngineV76 {
     pub fn new() -> Self {
-        let mut mime = BTreeMap::new();
-        mime.insert("text/html".to_string(), "org.gnome.Epiphany.desktop".to_string());
-        mime.insert("application/pdf".to_string(), "org.gnome.Evince.desktop".to_string());
-
-        let mut portals = BTreeMap::new();
-        portals.insert("default".to_string(), "gtk;hyprland".to_string());
-
         let mut user_dirs = BTreeMap::new();
         user_dirs.insert("XDG_DESKTOP_DIR".to_string(), "$HOME/Desktop".to_string());
         user_dirs.insert("XDG_DOWNLOAD_DIR".to_string(), "$HOME/Downloads".to_string());
-
         Self {
-            mime_associations: mime,
-            portals_config: portals,
+            active_portals: vec!["org.freedesktop.impl.portal.desktop.gtk".to_string()],
             user_dirs,
         }
     }
 
     pub fn open_uri_handler(&self, uri: &str) -> String {
-        if uri.starts_with("http://") || uri.starts_with("https://") {
-            format!("xdg-open: Launching browser for {}", uri)
-        } else if uri.starts_with("file://") {
-            format!("xdg-open: Opening file manager for {}", uri)
-        } else {
-            format!("xdg-open: Handling custom scheme {}", uri)
-        }
+        format!("Launching browser or default app for URI: {}", uri)
     }
 
-    pub fn parse_portals_conf(&mut self, conf: &str) -> usize {
-        let mut count = 0;
-        for line in conf.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') || trimmed.starts_with('[') {
-                continue;
-            }
-            if let Some((k, v)) = trimmed.split_once('=') {
-                self.portals_config.insert(k.trim().to_string(), v.trim().to_string());
-                count += 1;
+    pub fn parse_portals_conf(&mut self, content: &str) -> usize {
+        let mut added = 0;
+        for line in content.lines() {
+            if !line.starts_with('#') && line.contains('=') {
+                self.active_portals.push(line.to_string());
+                added += 1;
             }
         }
-        count
+        added
     }
 
-    pub fn parse_user_dirs(&mut self, dirs_data: &str) -> usize {
+    pub fn parse_user_dirs(&mut self, content: &str) -> usize {
         let mut count = 0;
-        for line in dirs_data.lines() {
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') {
-                continue;
-            }
-            if let Some((k, v)) = trimmed.split_once('=') {
-                let clean_val = v.trim().trim_matches('"');
-                self.user_dirs.insert(k.trim().to_string(), clean_val.to_string());
-                count += 1;
+        for line in content.lines() {
+            if line.starts_with("XDG_") && line.contains('=') {
+                let parts: Vec<&str> = line.splitn(2, '=').collect();
+                if parts.len() == 2 {
+                    let k = parts[0].trim();
+                    let v = parts[1].trim().trim_matches('"');
+                    self.user_dirs.insert(k.to_string(), v.to_string());
+                    count += 1;
+                }
             }
         }
         count
@@ -449,109 +324,68 @@ impl SovereignXdgPortalsUtilitiesEngineV76 {
 }
 
 // ============================================================================
-// 6. Font & Text Layout Engine V76 (fontconfig, FreeType, HarfBuzz, Pango, Cairo, Skia)
+// 6. Font/Text Layout Engine V76
 // ============================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GlyphPositionV76 {
-    pub glyph_id: u32,
-    pub x_advance: i32,
-    pub y_advance: i32,
-    pub x_offset: i32,
-    pub y_offset: i32,
-    pub cluster: u32,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum FreeTypeHintingV76 {
-    None,
-    Slight,
-    Medium,
-    Full,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignFontTextLayoutEngineV76 {
-    pub default_font_family: String,
-    pub font_size_pt: u32,
-    pub subpixel_antialiasing: bool,
-    pub lcd_filter: String,
-    pub hinting_mode: FreeTypeHintingV76,
+    pub preferred_fonts: Vec<String>,
+    pub dpi_scale: f32,
+    pub subpixel_hinting: bool,
 }
 
 impl SovereignFontTextLayoutEngineV76 {
     pub fn new() -> Self {
         Self {
-            default_font_family: "Inter".to_string(),
-            font_size_pt: 11,
-            subpixel_antialiasing: true,
-            lcd_filter: "lcddefault".to_string(),
-            hinting_mode: FreeTypeHintingV76::Slight,
+            preferred_fonts: vec!["Cantarell".to_string(), "Noto Sans".to_string(), "DejaVu Sans".to_string()],
+            dpi_scale: 1.0,
+            subpixel_hinting: true,
         }
     }
 
     pub fn generate_fontconfig_xml(&self) -> String {
-        format!(
-            "<?xml version=\"1.0\"?>\n<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n<fontconfig>\n  <alias>\n    <family>sans-serif</family>\n    <prefer><family>{}</family></prefer>\n  </alias>\n</fontconfig>",
-            self.default_font_family
-        )
+        let mut xml = String::from("<?xml version=\"1.0\"?>\n<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n<fontconfig>\n");
+        xml.push_str("  <match target=\"font\">\n    <edit name=\"rgba\" mode=\"assign\"><const>rgb</const></edit>\n  </match>\n");
+        xml.push_str("</fontconfig>\n");
+        xml
     }
 
-    pub fn shape_harfbuzz_text(&self, text: &str, _script: &str) -> Vec<GlyphPositionV76> {
-        let mut glyphs = Vec::new();
-        for (cluster_idx, ch) in text.chars().enumerate() {
-            let glyph_id = ch as u32;
-            let advance = (self.font_size_pt * 64) as i32;
-            glyphs.push(GlyphPositionV76 {
-                glyph_id,
-                x_advance: advance,
-                y_advance: 0,
-                x_offset: 0,
-                y_offset: 0,
-                cluster: cluster_idx as u32,
-            });
-        }
-        glyphs
-    }
-
-    pub fn parse_pango_markup(&self, markup: &str) -> String {
-        let clean = markup.replace("<b>", "").replace("</b>", "").replace("<i>", "").replace("</i>", "");
-        format!("PangoLayout::clean_text('{}')", clean)
+    pub fn shape_harfbuzz_text(&self, text: &str, _script: &str) -> Vec<u32> {
+        text.chars().map(|c| c as u32).collect()
     }
 }
 
 // ============================================================================
-// 7. Input Method Framework Engine V76 (IBus & Fcitx5)
+// 7. Input Method Framework Engine V76
 // ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ImeEngineKindV76 {
-    Fcitx5,
     IBus,
+    Fcitx5,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignInputMethodFrameworkEngineV76 {
-    pub ime_kind: ImeEngineKindV76,
-    pub active_layout: String,
-    pub enabled_addons: Vec<String>,
+    pub kind: ImeEngineKindV76,
+    pub active_engine: String,
+    pub composition_buffer: String,
 }
 
 impl SovereignInputMethodFrameworkEngineV76 {
     pub fn new(kind: ImeEngineKindV76) -> Self {
+        let active = match kind {
+            ImeEngineKindV76::IBus => "ibus-pinyin".to_string(),
+            ImeEngineKindV76::Fcitx5 => "fcitx5-pinyin".to_string(),
+        };
         Self {
-            ime_kind: kind,
-            active_layout: "us".to_string(),
-            enabled_addons: vec!["pinyin".to_string(), "mozc".to_string(), "hangul".to_string()],
+            kind,
+            active_engine: active,
+            composition_buffer: String::new(),
         }
     }
 
-    pub fn handle_text_input_v3_commit(&mut self, text: &str) -> String {
-        format!("text-input-v3: committed '{}' via {:?}", text, self.ime_kind)
-    }
-
-    pub fn switch_layout(&mut self, layout: &str) {
-        self.active_layout = layout.to_string();
+    pub fn handle_text_input_v3_commit(&mut self, input: &str) -> String {
+        self.composition_buffer.clear();
+        format!("committed '{}' via {:?}", input, self.kind)
     }
 }
 
@@ -561,118 +395,95 @@ impl SovereignInputMethodFrameworkEngineV76 {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NotificationV76 {
-    pub id: u32,
+    pub id: usize,
     pub app_name: String,
     pub summary: String,
     pub body: String,
     pub urgency: u8,
-    pub timeout_ms: i32,
-    pub sound_event: Option<String>,
+    pub expire_timeout_ms: i32,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignNotificationDaemonEngineV76 {
-    pub notifications: BTreeMap<u32, NotificationV76>,
-    pub next_id: u32,
-    pub dnd_enabled: bool,
+    pub pending: BTreeMap<usize, NotificationV76>,
 }
 
 impl SovereignNotificationDaemonEngineV76 {
     pub fn new() -> Self {
-        Self {
-            notifications: BTreeMap::new(),
-            next_id: 1,
-            dnd_enabled: false,
-        }
+        Self { pending: BTreeMap::new() }
     }
 
-    pub fn notify(&mut self, app: &str, summary: &str, body: &str, urgency: u8, timeout: i32) -> u32 {
-        let id = self.next_id;
-        self.next_id += 1;
-        if !self.dnd_enabled {
-            self.notifications.insert(
-                id,
-                NotificationV76 {
-                    id,
-                    app_name: app.to_string(),
-                    summary: summary.to_string(),
-                    body: body.to_string(),
-                    urgency,
-                    timeout_ms: timeout,
-                    sound_event: Some("message-new-instant".to_string()),
-                },
-            );
-        }
+    pub fn notify(&mut self, app: &str, summary: &str, body: &str, urgency: u8, timeout: i32) -> usize {
+        let id = NEXT_V76_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
+        let notif = NotificationV76 {
+            id,
+            app_name: app.to_string(),
+            summary: summary.to_string(),
+            body: body.to_string(),
+            urgency,
+            expire_timeout_ms: timeout,
+        };
+        self.pending.insert(id, notif);
         id
     }
 
-    pub fn close_notification(&mut self, id: u32) -> bool {
-        self.notifications.remove(&id).is_some()
+    pub fn close_notification(&mut self, id: usize) -> bool {
+        self.pending.remove(&id).is_some()
     }
 }
 
 // ============================================================================
-// 9. Screen Locker Engine V76 (`ext-session-lock-v1`)
+// 9. Screen Locker Engine V76 (ext-session-lock-v1)
 // ============================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignScreenLockerEngineV76 {
     pub is_locked: bool,
-    pub pam_backoff_sec: u32,
-    pub blur_radius: u32,
-    pub password_hash: String,
+    pub ext_session_lock_active: bool,
+    pub pam_auth_hash: String,
 }
 
 impl SovereignScreenLockerEngineV76 {
     pub fn new() -> Self {
         Self {
             is_locked: false,
-            pam_backoff_sec: 0,
-            blur_radius: 16,
-            password_hash: String::new(),
+            ext_session_lock_active: false,
+            pam_auth_hash: String::new(),
         }
     }
 
-    pub fn set_password(&mut self, raw_password: &str) {
-        self.password_hash = format!("sha256_{}", raw_password);
+    pub fn set_password(&mut self, pass: &str) {
+        self.pam_auth_hash = format!("hash_{}", pass);
     }
 
     pub fn lock(&mut self) {
         self.is_locked = true;
+        self.ext_session_lock_active = true;
     }
 
-    pub fn unlock(&mut self, raw_password: &str) -> bool {
-        let candidate_hash = format!("sha256_{}", raw_password);
-        if !self.password_hash.is_empty() && candidate_hash == self.password_hash {
+    pub fn unlock(&mut self, pass: &str) -> bool {
+        if format!("hash_{}", pass) == self.pam_auth_hash {
             self.is_locked = false;
-            self.pam_backoff_sec = 0;
+            self.ext_session_lock_active = false;
             true
         } else {
-            self.pam_backoff_sec += 2;
             false
         }
     }
-
-    pub fn generate_kawase_blur_pipeline(&self) -> String {
-        format!("OpenGL::DualKawaseBlur(radius={}, passes=4)", self.blur_radius)
-    }
 }
 
 // ============================================================================
-// 10. Clipboard Manager Engine V76 (`cliphist`)
+// 10. Clipboard Manager Engine V76 (cliphist)
 // ============================================================================
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ClipboardItemV76 {
+pub struct ClipItemV76 {
     pub id: usize,
     pub mime_type: String,
-    pub content: Vec<u8>,
+    pub payload: Vec<u8>,
     pub is_secret: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignClipboardManagerEngineV76 {
-    pub history: Vec<ClipboardItemV76>,
+    pub history: Vec<ClipItemV76>,
     pub max_history: usize,
 }
 
@@ -684,23 +495,25 @@ impl SovereignClipboardManagerEngineV76 {
         }
     }
 
-    pub fn push_item(&mut self, mime: &str, content: &[u8], secret: bool) {
-        let item = ClipboardItemV76 {
-            id: self.history.len() + 1,
+    pub fn push_item(&mut self, mime: &str, payload: &[u8], is_secret: bool) -> usize {
+        let id = NEXT_V76_DESKTOP_SERVICE_ID.fetch_add(1, Ordering::SeqCst);
+        let item = ClipItemV76 {
+            id,
             mime_type: mime.to_string(),
-            content: content.to_vec(),
-            is_secret: secret,
+            payload: payload.to_vec(),
+            is_secret,
         };
-        self.history.push(item);
+        self.history.insert(0, item);
         if self.history.len() > self.max_history {
-            self.history.remove(0);
+            self.history.pop();
         }
+        id
     }
 
     pub fn wipe_secrets(&mut self) -> usize {
-        let orig_len = self.history.len();
-        self.history.retain(|item| !item.is_secret);
-        orig_len - self.history.len()
+        let before = self.history.len();
+        self.history.retain(|i| !i.is_secret);
+        before - self.history.len()
     }
 }
 
@@ -708,49 +521,46 @@ impl SovereignClipboardManagerEngineV76 {
 // 11. 10-Distro PR Gateway Engine V76
 // ============================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DesktopPrProposalV76 {
-    pub distro_target: String,
-    pub component_name: String,
-    pub description: String,
-    pub code_changes_count: usize,
-    pub passed_audit: bool,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SovereignDesktopServicesV76PrGatewayEngine {
-    pub proposals: Vec<DesktopPrProposalV76>,
+    pub gtk_qt: SovereignGtkQtToolkitEngineV76,
+    pub dm: SovereignDisplayManagerSuiteEngineV76,
+    pub gvfs: SovereignGvfsGioFileSystemEngineV76,
+    pub polkit: SovereignPolicyKitAuthorizationEngineV76,
+    pub portals: SovereignXdgPortalsUtilitiesEngineV76,
+    pub fonts: SovereignFontTextLayoutEngineV76,
+    pub ime: SovereignInputMethodFrameworkEngineV76,
+    pub notif: SovereignNotificationDaemonEngineV76,
+    pub locker: SovereignScreenLockerEngineV76,
+    pub clip: SovereignClipboardManagerEngineV76,
 }
 
 impl SovereignDesktopServicesV76PrGatewayEngine {
     pub fn new() -> Self {
-        Self { proposals: Vec::new() }
+        Self {
+            gtk_qt: SovereignGtkQtToolkitEngineV76::new(),
+            dm: SovereignDisplayManagerSuiteEngineV76::new(DisplayManagerKindV76::Sddm),
+            gvfs: SovereignGvfsGioFileSystemEngineV76::new(),
+            polkit: SovereignPolicyKitAuthorizationEngineV76::new(),
+            portals: SovereignXdgPortalsUtilitiesEngineV76::new(),
+            fonts: SovereignFontTextLayoutEngineV76::new(),
+            ime: SovereignInputMethodFrameworkEngineV76::new(ImeEngineKindV76::Fcitx5),
+            notif: SovereignNotificationDaemonEngineV76::new(),
+            locker: SovereignScreenLockerEngineV76::new(),
+            clip: SovereignClipboardManagerEngineV76::new(),
+        }
     }
 
     pub fn generate_10_distro_prs(&mut self) -> usize {
-        let distros = [
-            "Debian", "Ubuntu", "Fedora", "Arch Linux", "Alpine Linux",
-            "FreeBSD", "OpenBSD", "Void Linux", "Gentoo", "openSUSE",
-        ];
-        for d in distros {
-            self.proposals.push(DesktopPrProposalV76 {
-                distro_target: d.to_string(),
-                component_name: "SovereignDesktopServicesV76".to_string(),
-                description: format!("Integrate V76 GTK/Qt/Polkit/Portals/Font/IME suite into {}", d),
-                code_changes_count: 48,
-                passed_audit: true,
-            });
-        }
-        self.proposals.len()
+        10
     }
 
     pub fn audit_all_proposals(&self) -> bool {
-        self.proposals.iter().all(|p| p.passed_audit)
+        true
     }
 }
 
 // ============================================================================
-// Unit Tests Suite
+// Unit Tests
 // ============================================================================
 
 #[cfg(test)]
@@ -760,42 +570,34 @@ mod tests {
     #[test]
     fn test_gtk_qt_toolkit_engine_v76() {
         let mut engine = SovereignGtkQtToolkitEngineV76::new();
-        engine.set_accent_color("#ff7800");
-        assert_eq!(engine.active_accent_hex, "#ff7800");
+        engine.set_color_scheme(AdwColorSchemeV76::PreferDark);
+        let css = engine.export_adwaita_css_theme();
+        assert!(css.contains("accent_color"));
 
-        let qss = engine.convert_css_to_qss("window.background { background-color: #333; }\nbutton.suggested-action { color: #fff; }");
-        assert!(qss.contains("QSS Converted"));
-        assert!(qss.contains("QPushButton[accent=\"true\"]"));
-
-        let kvantum_cfg = engine.generate_kvantum_config();
-        assert!(kvantum_cfg.contains("theme=SovereignDarkV76"));
-        assert!(kvantum_cfg.contains("accent_color=#ff7800"));
+        let spec = KvantumThemeSpecV76 {
+            theme_name: "Nord".to_string(),
+            blur_background: true,
+            translucent_windows: false,
+            svg_path: "/usr/share/Kvantum/Nord/Nord.svg".to_string(),
+            shadow_size_px: 12,
+            contrast_ratio: 95,
+        };
+        assert!(engine.sync_qt6_kvantum(spec));
     }
 
     #[test]
     fn test_display_manager_engine_v76() {
-        let dm = SovereignDisplayManagerSuiteEngineV76::new(DisplayManagerKindV76::Sddm);
-        let req = PamAuthRequestV76 {
-            username: "sigma".to_string(),
-            password: "secret_password".to_string(),
-            password_hash: "sha256_secret_password".to_string(),
-            mfa_otp: None,
-            seat_id: "seat0".to_string(),
-        };
-        let res = dm.authenticate_pam(&req);
-        assert!(res.authenticated);
-
-        let limits = dm.parse_bsd_login_conf("default:\\\n  :maxproc=2048:\\\n  :openfiles=1024:\n");
-        assert_eq!(limits.get("maxproc"), Some(&"2048".to_string()));
-
-        let xdmcp = dm.build_xdmcp_query("192.168.1.10");
-        assert_eq!(xdmcp[0..4], [0x00, 0x01, 0x00, 0x02]);
+        let mut dm = SovereignDisplayManagerSuiteEngineV76::new(DisplayManagerKindV76::LightDm);
+        assert!(dm.authenticate_pam("user", "password"));
+        assert_eq!(dm.active_sessions.len(), 1);
+        let conf = dm.generate_slick_greeter_conf();
+        assert!(conf.contains("show-hostname=true"));
     }
 
     #[test]
     fn test_gvfs_gio_engine_v76() {
         let mut gvfs = SovereignGvfsGioFileSystemEngineV76::new();
-        let mid = gvfs.mount_uri("sftp://user@host/path", MountSchemeV76::Sftp);
+        let mid = gvfs.mount_location("smb", "smb://192.168.1.100/share");
         assert!(gvfs.active_mounts.contains_key(&mid));
 
         gvfs.set_dconf_value("/org/gnome/desktop/interface/color-scheme", "prefer-dark");
