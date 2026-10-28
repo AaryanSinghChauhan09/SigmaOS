@@ -5,6 +5,7 @@
 ## File component
 
 - [ ] File descriptor manager
+- [ ] fd / handle / file
 - [ ] Inode and directory manager
 - [ ] Permission manager
 - [ ] Lock manager
@@ -23,7 +24,7 @@
 - [ ] Daily CI triage
 - [ ] Weekly lifecycle review
 - [ ] Weekly Linux/BSD study
-- [ ] Biweekly memory audit
+- [ ] Biweekly file audit
 - [ ] Biweekly signal/wait audit
 - [ ] Monthly boot validation
 - [ ] Quarterly architecture/security/release review

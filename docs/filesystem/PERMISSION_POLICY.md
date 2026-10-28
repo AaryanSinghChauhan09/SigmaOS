@@ -1,24 +1,16 @@
-# Permission Management Policy
+# Permission Policy (PERMISSION_POLICY)
 
-## Overview
+## Representation
+- File permissions are represented by a 9-bit mode field:
+  - Owner: `S_IRUSR` (0o400), `S_IWUSR` (0o200), `S_IXUSR` (0o100)
+  - Group: `S_IRGRP` (0o040), `S_IWGRP` (0o020), `S_IXGRP` (0o010)
+  - Other: `S_IROTH` (0o004), `S_IWOTH` (0o002), `S_IXOTH` (0o001)
+- Process identity is represented by `ProcessCredentials` (`uid`, `gid`, `euid`, `egid`, `capabilities`).
 
-The permission manager (`src/fs/permission.rs`) evaluates process credentials (`ProcessCredentials`) against inode access modes (`AccessMode`: Read, Write, Execute) and ownership bits.
-
-## Key Rules & Invariants
-
-1. **Credential Structure**: Process credentials include `uid` (user ID), `gid` (group ID), `effective_uid`, `effective_gid`, and process capabilities (`capabilities: u64`).
-2. **Permission Evaluation Hierarchy**:
-   - **Root Override**: Root user (`uid == 0` or `effective_uid == 0`) or processes with `CAP_DAC_OVERRIDE` bypass standard mode bit checks.
-   - **Owner Match**: If `process.euid == file.uid`, permission bits `0700` apply.
-   - **Group Match**: If `process.egid == file.gid`, permission bits `0070` apply.
-   - **Other Match**: Otherwise, permission bits `0007` apply.
-3. **Capability Overrides**:
-   - `CAP_DAC_OVERRIDE` (1 << 1): Overrides DAC read, write, and execute restrictions.
-   - `CAP_DAC_READ_SEARCH` (1 << 2): Overrides DAC read restrictions and directory search restrictions.
-   - `CAP_FOWNER` (1 << 3): Overrides permission checks on operations that normally require file ownership (e.g. `chmod`).
-4. **Error Semantics**:
-   - Unmet permission requirements fail deterministically returning `FsError::PermissionDenied`.
-
-## Testing & Verification
-
-Permission checks and capability overrides are tested in `tests/filesystem/permission.rs`.
+## Security Verification Rules
+1. Root user (`euid == 0`) or processes with `CAP_DAC_OVERRIDE` bypass standard mode checks.
+2. If `process.euid == file.uid`, Owner bits are checked.
+3. Else if `process.egid == file.gid` or matching supplemental groups, Group bits are checked.
+4. Else, Other bits are checked.
+5. `CAP_DAC_READ_SEARCH` allows read access or directory traversal even if standard read/execute mode bits are clear.
+6. Access denial returns `FsError::PermissionDenied`.

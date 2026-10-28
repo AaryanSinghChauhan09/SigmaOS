@@ -1,19 +1,27 @@
-# Architecture Decision Record: VFS, File Descriptors, Inodes, Permissions, and Locking
+# SigmaOS VFS Architectural Decision Records (VFS_ADR)
 
-- **Status**: Accepted
-- **Date**: 2026-03-30
-- **Context**: SigmaOS requires an authoritative, safe, observable, and recoverable virtual file system (VFS) architecture that governs file descriptors, inodes, directories, permissions, locking, and file lifecycles.
+## ADR-0001: Hybrid Request/Inode-Based VFS Architecture
 
-## Decision Summary
+### Context
+SigmaOS requires a high-performance, safe, and recoverable Virtual Filesystem (VFS) abstraction capable of supporting diverse file systems (ext4, procfs, tmpfs, autofs, overlay) while enforcing strict memory bounds and POSIX compatibility.
 
-1. **VFS Structure**: Adopt a request-based, inode-indexed hybrid VFS layer with clear boundary abstractions between process-local file descriptor tables (`ProcessFdTable`), system file handles (`FileHandle`), inodes (`Inode`), and filesystem backends (`SigmaFS`, `Btrfs`, `XFS`, `autofs`, `procfs`, `tmpfs`).
-2. **File Descriptor Management**: Implement process-local descriptor tables with fixed bounds (`DEFAULT_MAX_FDS = 1024`), low-fd reuse policy, protected standard streams (0: stdin, 1: stdout, 2: stderr), atomic `FD_CLOEXEC` handling on exec, and typed exhaustion errors (`FsError::NoFileDescriptorsAvailable`).
-3. **Inode & Directory Lifecycle**: Maintain unique 64-bit inode indexing with atomic reference counting (`inc_ref`/`dec_ref`), explicit unlinking checks preventing double-unlink, bounded directory entry capacities (`MAX_DIR_ENTRIES = 1024`), and lost-update prevention during metadata modifications.
-4. **Permissions & Capabilities**: Enforce POSIX permission bit checking (read, write, execute across User, Group, Other) supplemented by Linux-style capabilities (`CAP_DAC_OVERRIDE`, `CAP_DAC_READ_SEARCH`, `CAP_FOWNER`) for process credential evaluation.
-5. **Locking Infrastructure**: Implement advisory file range locking (`FileRangeLock`) and BSD `flock` semantics (`LOCK_SH`, `LOCK_EX`, `LOCK_NB`, `LOCK_UN`) with lock overlap detection and automatic cleanup on process descriptor close or termination.
+### Decision
+SigmaOS adopts a hybrid VFS architecture:
+1. **Inode Layer**: Tracks file metadata, reference counts, lock queues, and lifecycle states in memory (`src/fs/inode.rs`).
+2. **Handle/Descriptor Layer**: Manages process-local handle tables (`src/fs/fd_table.rs`) mapping integer file descriptors to open file handles with atomic seek offsets and cloexec flags.
+3. **Request Router Layer**: Converts VFS operations (open, read, write, seek, lock) into validated requests executed exactly once.
 
-## Consequences & Safety Guarantees
+### Consequences
+- Guarantees zero descriptor leaks under stress.
+- Enforces strict memory bounds without unbounded kernel allocations.
+- Provides diagnosable, typed `FsError` status codes across all syscall paths.
 
-- **Memory Safety & Resource Bounds**: Zero allocation leaks, deterministic cleanup on process exit or handle release.
-- **Race Prevention**: Synchronization primitives and atomic flags ensure concurrent syscalls do not cause descriptor reuse races or partial metadata updates.
-- **Observability**: Exhaustion and permission denial conditions yield typed `FsError` codes.
+---
+
+## ADR-0002: Race-Free Advisory and Range Locking Discipline
+
+### Context
+Concurrent processes accessing shared files require synchronization mechanisms (`flock` advisory locking and `fcntl` byte-range locking) to prevent data corruption.
+
+### Decision
+File range locking is managed by `FileRangeLockManager` (`src/fs/flock.rs`). Shared locks can overlap, but exclusive locks require disjoint ranges. Deadlock prevention is guaranteed via atomic non-blocking trial evaluation and automatic lock teardown on file descriptor closure.

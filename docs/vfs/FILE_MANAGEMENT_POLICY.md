@@ -1,66 +1,35 @@
-# SigmaOS File Management Subsystem Policy
+# SigmaOS File Management Policy
 
-## Objective
+## Architectural Overview
 
-Maintain SigmaOS file management as a safe, observable, recoverable subsystem: validate paths, enforce permissions, manage file descriptors and inodes, handle locks and events, and release resources exactly once.
+SigmaOS treats **file management** (VFS, file descriptors, inodes, directories, permissions, locking, and file lifecycle) as an integrated, safe, observable, and recoverable lifecycle subsystem.
 
-## Authoritative File Lifecycle Contract
+### Class Architecture
+- **VFS Class**: Hybrid request-based and inode-based virtual filesystem router.
+- **File Descriptor Class**: Handle-based process-local descriptor table with atomic handle references.
+- **Inode Class**: Inode-based lifecycle management with explicit state transitions (`Allocated` -> `Active` -> `Unlinked` -> `Reclaimed`).
+- **Directory Semantics**: Bounded capacity (`MAX_DIR_ENTRIES = 4096`), race-safe entry insertion and removal, double-unlink prevention.
+- **Permission Semantics**: POSIX mode bits (`0o777` mask), process credential verification (`uid`, `gid`, `euid`, `egid`), and capability-based overrides (`CAP_DAC_OVERRIDE`, `CAP_DAC_READ_SEARCH`, `CAP_FOWNER`).
+- **Lock Semantics**: POSIX advisory (`flock`) and byte-range locks (`fcntl`), non-blocking lock trials, lock queue bound enforcement, lost-lock/double-unlock prevention.
+- **Metadata Semantics**: Coherent update propagation across timestamps (`atime`, `mtime`, `ctime`), refcounts, and file sizes.
+- **Error Policy**: Typed `FsError` return codes (`NotFound`, `PermissionDenied`, `InvalidFileDescriptor`, `NoFileDescriptorsAvailable`, `FileAlreadyExists`, `IsADirectory`, `NotADirectory`, `DirectoryNotEmpty`, `ResourceBusy`, `StorageFull`, `OutOfMemory`, `IoError`, `BadOffset`, `InvalidOperation`).
+- **Limits & Bounds**: Strictly enforced static allocation limits preventing kernel queue or cache memory exhaustion.
+- **NUMA & Memory Domain**: Core memory structures avoid cross-NUMA socket allocations.
+- **Hotplug & Detachment**: Graceful handling of storage hotplug detachments without corrupting kernel state or deadlocking lock queues.
 
-SigmaOS defines one authoritative file lifecycle contract:
+## Single Authoritative File Lifecycle
 
 ```text
 open -> read/write -> seek -> lock -> metadata -> close -> cleanup
 ```
 
-### State Behaviors and Invariants
-
-| State | Required Behavior | Invariants & Guarantees |
-|---|---|---|
-| **Open** | File descriptor allocated, inode resolved, permissions checked | Race-free FD allocation, path/permission validation before handle assignment. |
-| **Read/Write** | Requests validated, queued, completed exactly once | Bounds checked against file limits and handle offsets, no partial corrupted writes. |
-| **Seek** | Offset updated race-safe | Seek operation modifies atomic handle position, bounds checked against maximum file offset. |
-| **Lock** | Lock lifecycle failure-safe | Enqueue/dequeue of flock/range locks are race-free, automatic cleanup on process termination. |
-| **Metadata** | Metadata updates coherent | Inode mtime/ctime/atime and size updates synchronized, dirty metadata flushed cleanly. |
-| **Close** | Descriptor and references released exactly once | FD freed, underlying file handle reference count decremented, no double-free. |
-| **Close-on-exec** | Descriptor semantics explicit | Descriptors marked with `O_CLOEXEC` / `FD_CLOEXEC` are closed atomically during `execve`. |
-| **Error** | Failure does not corrupt filesystem state | Errors are typed (`FsError`), diagnosable, and propagated without partial state leaking. |
-
-## Subsystem Architecture & Classification
-
-- **VFS Class**: Request-based, inode-indexed hybrid VFS layer.
-- **File Descriptor Class**: Process-local fd-table mapping non-negative integer descriptors to shared `FileHandle` ref-counted references.
-- **Inode Class**: Inode-based with unique 64-bit inode IDs and underlying filesystem drivers (SigmaFS, Btrfs, XFS, procfs, tmpfs).
-- **Directory Semantics**: Bounded capacity, entries stored as `(name, inode_id, entry_type)` tuples, protected against double-unlink and lost-updates.
-- **Permission Semantics**: POSIX mode bit mask (owner, group, other) + capability overrides (`CAP_DAC_OVERRIDE`, `CAP_DAC_READ_SEARCH`, `CAP_FOWNER`).
-- **Lock Semantics**: Advisory process-level (`flock`) and range-based byte locking (`FileRangeLock`) with non-blocking support (`LOCK_NB`).
-
-## Periodic Task Calendar
-
-| Frequency | File-management Task | Output | Required PR |
-|---|---|---|---|
-| Every PR | Build, lint, library, and standalone tests | CI result | `feat`, `fix`, `test`, or `docs` PR |
-| Daily | CI/nightly triage | Root cause + fix | `fix(vfs)` or `fix(filesystem)` PR |
-| Weekly | File subsystem review | Gap list + status | `docs(file-management)` PR |
-| Weekly | Linux/BSD file study | Study note | `docs(studies)` PR |
-| Biweekly | Descriptor audit | Leak/race findings | `fix(fd_table)` / `test(fd_table)` PR |
-| Weekly | Inode and mapping audit | Mapping findings | `fix(inode)` PR |
-| Monthly | Boot-to-shell file validation | Boot log + smoke report | `test(vfs)` PR |
-| Monthly | File stress/fuzz triage | Crash reports + fixes | `fix(vfs)` PR |
-| Monthly | Lock rehearsal | Lock enforcement report | `test(flock)` PR |
-| Quarterly | VFS architecture review | ADR + roadmap | `docs(adr)` PR |
-| Quarterly | Security review | Threat-model update | `security(vfs)` PR |
-| Quarterly | Release readiness review | Release checklist | `docs(release)` PR |
-
-## File Subsystem Health Metrics
-
-| Metric | Target |
+| Lifecycle State | Enforced Invariants |
 |---|---|
-| File CI pass rate | 100% |
-| Boot-to-boot pass rate | 100% |
-| Orphan descriptors after stress test | 0 |
-| Double-unlink incidents | 0 |
-| Descriptor reuse races | 0 |
-| File corruption incidents | 0 |
-| Declared limits with enforcement tests | 100% |
-| File claims linked to evidence | 100% |
-| Security-sensitive PRs reviewed | 100% |
+| Open | Race-free fd table allocation, inode resolution, credential/capability check |
+| Read/Write | Validated request offsets, bounded transfer buffers, exactly-once completion |
+| Seek | Race-safe atomic offset adjustments with `SeekFrom::Start`, `Current`, `End` |
+| Lock | Bounded range lock tracking, non-deadlocking lock trials, automatic release on close |
+| Metadata | Coherent inode attribute updates, refcount modification |
+| Close | Single release of descriptor slots, atomically decrementing inode/handle refcounts |
+| Close-on-exec | Descriptor flag `FD_CLOEXEC` evaluated during `exec` transitions |
+| Error | Failure does not corrupt filesystem state or leak descriptor slots |
